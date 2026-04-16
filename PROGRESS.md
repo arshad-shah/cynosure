@@ -9,7 +9,7 @@
 | # | Phase                         | Status        | Started    | Completed  | Notes |
 |---|-------------------------------|---------------|------------|------------|-------|
 | 01 | Foundation & tooling         | 🟢 Complete    | 2026-04-16 | 2026-04-16 | Pinned to Storybook 8.6 and Vitest 2.1 (node env); Playwright browser mode deferred to Phase 14. |
-| 02 | Design tokens                | ⬜ Not started |            |            |       |
+| 02 | Design tokens                | 🟢 Complete    | 2026-04-16 | 2026-04-16 | DTCG primitives + semantic (light/dark) → Style Dictionary → per-theme CSS + typed TS. Combined base+dark gzipped ≈ 2.3 KB. Typography composites are pre-expanded to flat CSS custom properties. |
 | 03 | Theming system               | ⬜ Not started |            |            |       |
 | 04 | Core utilities               | ⬜ Not started |            |            |       |
 | 05 | Layout primitives            | ⬜ Not started |            |            |       |
@@ -31,8 +31,8 @@
 
 ## Current focus
 
-> **Phase:** 02 — Design tokens
-> **Next action:** Read `02-design-tokens.md` and set up the DTCG + Style Dictionary pipeline in `@lumen/tokens`.
+> **Phase:** 03 — Theming system
+> **Next action:** Read `03-theming-system.md` and build `ThemeProvider` + `useTheme` on top of the `@lumen/tokens` CSS layer.
 
 ---
 
@@ -51,6 +51,10 @@ Record every meaningful technical decision here, with rationale. When you (or fu
 | 2026-04-16 | `.changeset/config.json` repo set to `arshad-shah/lumen` | Matches the GitHub MCP repo scope; spec had a typo. |
 | 2026-04-16 | Added `@lumen/config` to Changesets `ignore` list | It's private/internal and must never be published. |
 | 2026-04-16 | Used `publint <pkg-dir>` (not `<pkg-dir>/dist`) | publint 0.3.x expects the package root; it packs via `pnpm pack` internally. |
+| 2026-04-16 | Pre-expand DTCG `typography` composites into flat sub-tokens (`family`, `size`, `weight`, `line-height`, `letter-spacing`) via a preprocessor | CSS has no single property that captures the full composite portably, and the `css/variables` format can't emit a nested shorthand on its own. Consumers compose via separate custom properties, matching the spec's "shorthand or individual" guidance. |
+| 2026-04-16 | Generated TS tokens land in `src/generated/` (gitignored) | Keeps tsup's `rootDir: src` assumption intact and lets tsup bundle the re-exports. CSS goes to `dist/css/` directly; tsup runs with `clean: false` after Style Dictionary so the CSS survives. |
+| 2026-04-16 | Dark theme stylesheet emits only semantic overrides (uses SD `include` + file-path filter) | Primitives live in base.css. Keeps dark.css small (gzipped ≈ 0.5 KB) and guarantees one canonical primitive definition. |
+| 2026-04-16 | `@lumen/tokens` tsconfig sets `composite: false` | tsup's DTS worker (rollup-plugin-dts) refused to include the generated files under the inherited `composite: true`. Disabling composite on the package tsconfig fixes the build; root references don't use `tsc --build` anyway. |
 
 ---
 
@@ -83,6 +87,7 @@ Example:
 <!-- newest at top; append after every commit -->
 
 <!-- commit hashes appended after `git commit` lands each chunk; see `git log --oneline` for the canonical record -->
+- 2026-04-16 · @lumen/tokens · feat(phase-02): DTCG token pipeline (primitives + semantic light/dark, Style Dictionary v4 CSS+TS output, Ajv schema validator) [changeset: minor]
 - 2026-04-16 · repo · chore(phase-01): complete Phase 01 foundation scaffold (monorepo, tooling, Storybook, Vitest, tsup, CI, playground)
 
 ---

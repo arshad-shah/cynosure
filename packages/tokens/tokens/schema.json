@@ -1,0 +1,40 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Lumen DTCG token file",
+  "description": "W3C Design Tokens Community Group (DTCG) format. Every leaf must have $type + $value; non-leaves group tokens.",
+  "type": "object",
+  "additionalProperties": { "$ref": "#/definitions/node" },
+  "definitions": {
+    "node": {
+      "oneOf": [{ "$ref": "#/definitions/token" }, { "$ref": "#/definitions/group" }]
+    },
+    "group": {
+      "type": "object",
+      "not": { "required": ["$value"] },
+      "additionalProperties": { "$ref": "#/definitions/node" }
+    },
+    "token": {
+      "type": "object",
+      "required": ["$type", "$value"],
+      "properties": {
+        "$type": {
+          "type": "string",
+          "enum": [
+            "color",
+            "dimension",
+            "fontFamily",
+            "fontWeight",
+            "duration",
+            "cubicBezier",
+            "number",
+            "shadow",
+            "typography"
+          ]
+        },
+        "$value": {},
+        "$description": { "type": "string" }
+      },
+      "additionalProperties": false
+    }
+  }
+}

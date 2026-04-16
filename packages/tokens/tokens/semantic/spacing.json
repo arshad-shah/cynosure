@@ -1,0 +1,28 @@
+{
+  "space": {
+    "component": {
+      "xs": { "$type": "dimension", "$value": "{space.1}" },
+      "sm": { "$type": "dimension", "$value": "{space.2}" },
+      "md": { "$type": "dimension", "$value": "{space.3}" },
+      "lg": { "$type": "dimension", "$value": "{space.4}" },
+      "xl": { "$type": "dimension", "$value": "{space.6}" }
+    },
+    "layout": {
+      "xs": { "$type": "dimension", "$value": "{space.4}" },
+      "sm": { "$type": "dimension", "$value": "{space.6}" },
+      "md": { "$type": "dimension", "$value": "{space.8}" },
+      "lg": { "$type": "dimension", "$value": "{space.12}" },
+      "xl": { "$type": "dimension", "$value": "{space.16}" },
+      "2xl": { "$type": "dimension", "$value": "{space.24}" }
+    }
+  },
+  "radius": {
+    "component": {
+      "xs": { "$type": "dimension", "$value": "{radius.xs}" },
+      "sm": { "$type": "dimension", "$value": "{radius.sm}" },
+      "md": { "$type": "dimension", "$value": "{radius.md}" },
+      "lg": { "$type": "dimension", "$value": "{radius.lg}" },
+      "pill": { "$type": "dimension", "$value": "{radius.full}" }
+    }
+  }
+}

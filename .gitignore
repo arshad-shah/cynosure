@@ -1,6 +1,7 @@
 node_modules
 dist
 .turbo
+**/src/generated
 storybook-static
 coverage
 *.tsbuildinfo

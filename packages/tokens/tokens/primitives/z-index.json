@@ -1,0 +1,14 @@
+{
+  "z": {
+    "hide": { "$type": "number", "$value": -1 },
+    "base": { "$type": "number", "$value": 0 },
+    "docked": { "$type": "number", "$value": 10 },
+    "dropdown": { "$type": "number", "$value": 1000 },
+    "sticky": { "$type": "number", "$value": 1100 },
+    "overlay": { "$type": "number", "$value": 1200 },
+    "modal": { "$type": "number", "$value": 1300 },
+    "popover": { "$type": "number", "$value": 1400 },
+    "toast": { "$type": "number", "$value": 1500 },
+    "tooltip": { "$type": "number", "$value": 1600 }
+  }
+}
