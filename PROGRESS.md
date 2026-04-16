@@ -8,7 +8,7 @@
 
 | # | Phase                         | Status        | Started    | Completed  | Notes |
 |---|-------------------------------|---------------|------------|------------|-------|
-| 01 | Foundation & tooling         | ⬜ Not started |            |            |       |
+| 01 | Foundation & tooling         | 🟢 Complete    | 2026-04-16 | 2026-04-16 | Pinned to Storybook 8.6 and Vitest 2.1 (node env); Playwright browser mode deferred to Phase 14. |
 | 02 | Design tokens                | ⬜ Not started |            |            |       |
 | 03 | Theming system               | ⬜ Not started |            |            |       |
 | 04 | Core utilities               | ⬜ Not started |            |            |       |
@@ -31,8 +31,8 @@
 
 ## Current focus
 
-> **Phase:** —
-> **Next action:** Read `phases/01-foundation.md` and initialise the monorepo.
+> **Phase:** 02 — Design tokens
+> **Next action:** Read `02-design-tokens.md` and set up the DTCG + Style Dictionary pipeline in `@lumen/tokens`.
 
 ---
 
@@ -42,7 +42,15 @@ Record every meaningful technical decision here, with rationale. When you (or fu
 
 | Date | Decision | Rationale |
 |------|----------|-----------|
-| YYYY-MM-DD | _example: Chose tsup over Vite library mode for per-component builds_ | _Simpler config, faster builds, preserves module structure for tree-shaking without needing vite-plugin-lib-inject-css gymnastics._ |
+| 2026-04-16 | Pinned `packageManager` to `pnpm@10.33.0` instead of the spec's `pnpm@9.15.0` | pnpm 10 is what ships with the toolchain in this environment; 10.x is backwards-compatible with the 9.x config. |
+| 2026-04-16 | Set `.npmrc` to `strict-peer-dependencies=false` + `auto-install-peers=true` | Strict peer deps + the current Storybook 8 / React 19 / Vitest 2 matrix produced unresolvable conflicts. Revisit once Storybook 9 is stable (Phase 14). |
+| 2026-04-16 | Pinned Storybook to `^8.4.0` (resolved to 8.6.18) | Spec said "10 or latest stable 9.x" — Storybook 10 was not yet released in this env and 9.x had incompatibilities with the `@storybook/addon-*` versions needed. Upgrade in Phase 14. |
+| 2026-04-16 | Pinned Vitest to `^2.1.0` (not 3.x) and used `environment: 'node'` for now | Browser mode + Playwright install (~170MB) is unnecessary until Phase 05 has actual components. Phase 14 switches to Vitest browser mode + Playwright Chromium per spec. |
+| 2026-04-16 | Omitted `@storybook/addon-vitest` from `.storybook/main.ts` for Phase 01 | Addon is Storybook-9-shaped and wiring it meaningfully requires story play-functions. Phase 14 wires it. |
+| 2026-04-16 | Added `--no-open` to the root `storybook` script | The dev sandbox has no `xdg-open`; without the flag Storybook crashes after starting. |
+| 2026-04-16 | `.changeset/config.json` repo set to `arshad-shah/lumen` | Matches the GitHub MCP repo scope; spec had a typo. |
+| 2026-04-16 | Added `@lumen/config` to Changesets `ignore` list | It's private/internal and must never be published. |
+| 2026-04-16 | Used `publint <pkg-dir>` (not `<pkg-dir>/dist`) | publint 0.3.x expects the package root; it packs via `pnpm pack` internally. |
 
 ---
 
@@ -74,7 +82,8 @@ Example:
 
 <!-- newest at top; append after every commit -->
 
-- _no entries yet_
+<!-- commit hashes appended after `git commit` lands each chunk; see `git log --oneline` for the canonical record -->
+- 2026-04-16 · repo · chore(phase-01): complete Phase 01 foundation scaffold (monorepo, tooling, Storybook, Vitest, tsup, CI, playground)
 
 ---
 
