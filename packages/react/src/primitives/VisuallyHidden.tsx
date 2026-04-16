@@ -1,0 +1,28 @@
+import { type CSSProperties, type ComponentPropsWithoutRef, forwardRef } from 'react';
+
+const STYLE: CSSProperties = {
+  position: 'absolute',
+  width: 1,
+  height: 1,
+  padding: 0,
+  margin: -1,
+  overflow: 'hidden',
+  clip: 'rect(0 0 0 0)',
+  clipPath: 'inset(50%)',
+  whiteSpace: 'nowrap',
+  border: 0,
+};
+
+export interface VisuallyHiddenProps extends ComponentPropsWithoutRef<'span'> {}
+
+/**
+ * Visually hides content while keeping it available to assistive tech. Used
+ * for icon-only buttons, off-screen labels, and live-region announcers. The
+ * inline styles override any cascade so the element is hidden even without
+ * Lumen's stylesheet.
+ */
+export const VisuallyHidden = forwardRef<HTMLSpanElement, VisuallyHiddenProps>(
+  function VisuallyHidden({ style, ...rest }, ref) {
+    return <span ref={ref} {...rest} style={{ ...STYLE, ...style }} />;
+  },
+);

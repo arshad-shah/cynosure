@@ -11,7 +11,7 @@
 | 01 | Foundation & tooling         | 🟢 Complete    | 2026-04-16 | 2026-04-16 | Pinned to Storybook 8.6 and Vitest 2.1 (node env); Playwright browser mode deferred to Phase 14. |
 | 02 | Design tokens                | 🟢 Complete    | 2026-04-16 | 2026-04-16 | DTCG primitives + semantic (light/dark) → Style Dictionary → per-theme CSS + typed TS. Combined base+dark gzipped ≈ 2.3 KB. Typography composites are pre-expanded to flat CSS custom properties. |
 | 03 | Theming system               | 🟢 Complete    | 2026-04-16 | 2026-04-16 | `@lumen/react` ThemeProvider/DirectionProvider + hooks; `@lumen/themes` ships terminal + high-contrast as side-effect CSS; tokens gain breakpoints, focus shadow, and a reduced-motion override. |
-| 04 | Core utilities               | ⬜ Not started |            |            |       |
+| 04 | Core utilities               | 🟢 Complete    | 2026-04-16 | 2026-04-16 | Primitives (Slot/Portal/VisuallyHidden) + utils (cn, composeRefs, composeEventHandlers, callAll, createContext, cva re-export, getOwnerDocument) + 21 hooks, all shipped from `@lumen/react` with per-hook tsup entries. `class-variance-authority` v0.7 replaces the spec's nominal `cva v1`. |
 | 05 | Layout primitives            | ⬜ Not started |            |            |       |
 | 06 | Typography                   | ⬜ Not started |            |            |       |
 | 07 | Forms — basic                | ⬜ Not started |            |            |       |
@@ -31,8 +31,8 @@
 
 ## Current focus
 
-> **Phase:** 04 — Core utilities
-> **Next action:** Read `04-core-utilities.md` and start filling out `@lumen/core` (cn, polymorphic helpers, focus-ring utilities, Slot, etc.) on top of the now-complete theming layer.
+> **Phase:** 05 — Layout primitives
+> **Next action:** Read `05-layout-primitives.md` and start shipping `Box`, `Stack`, `Grid`, `Container`, etc. on top of the now-complete hook / primitive layer.
 
 ---
 
@@ -66,6 +66,11 @@ Record every meaningful technical decision here, with rationale. When you (or fu
 | 2026-04-16 | CI publint path corrected (`packages/react`, not `packages/react/dist`) and `@lumen/themes` added to publint+attw runs | The Phase 01 wiring pointed at `dist/`, which publint can't read directly (it expects the package root). Phase 02's decision log already flagged the right pattern; this commit updates CI to match and extends both checks to themes. |
 | 2026-04-16 | Promoted `build:tokens` to a turbo task and made `@lumen/tokens#typecheck`/`#build` depend on it | Turbo runs typecheck and build in parallel within a package. The tokens build script's `pnpm clean` step deletes `src/generated/` mid-typecheck, so CI's clean run failed `tsc` with `Cannot find module './generated/base.js'`. Modelling Style Dictionary as its own task forces typecheck to wait until the generated files exist. |
 | 2026-04-16 | Bumped CI / `engines.node` from Node 20 → Node 22 | `@lumen/config` exports `tsup.config.base.ts` as a `.ts` file. tsup transpiles `tsup.config.ts` to JS but the runtime `import` of `@lumen/config/tsup.config.base` then hits Node's ESM loader, which only natively understands `.ts` from Node 22 (`--experimental-strip-types` is on by default in 22.6+). Reproduced the failure under Node 20 locally; bumping CI fixes it without forcing a tsx/jiti runtime loader into every config import. |
+| 2026-04-16 | Depend on `@radix-ui/react-slot` for the `Slot` primitive (Phase 04) | Radix's implementation is ~600 B gzipped and handles several subtle cases (Fragment detection, `Slottable` merging, event-handler composition, ref forwarding) that aren't worth re-deriving. Re-exported as `Slot` / `Slottable` from `@lumen/react`. |
+| 2026-04-16 | Shipped `class-variance-authority@^0.7` instead of the spec's nominal `cva@^1` | The spec references a hypothetical `cva` v1 that doesn't exist on npm — the `cva` package at 0.0.0 is an unrelated placeholder. `class-variance-authority@0.7` is the mainstream v0 implementation; we wrap it in `utils/variants.ts` and only re-export `cva`, `cx`, `VariantProps`, so swapping to cva v1 later is a one-file migration. |
+| 2026-04-16 | Kept phase-03 hook implementations under `theme/hooks/` and added thin re-exports under `hooks/` | Moving the files would have invalidated the phase-03 tests (`src/theme/__tests__/…`) without adding behaviour. The re-exports satisfy the Phase 04 inventory ("all hooks reachable from `@lumen/react/hooks`") while leaving the existing test layout intact. |
+| 2026-04-16 | `useControllableState` reads `process.env.NODE_ENV` behind a `declare const process` + `typeof` guard | tsup's DTS worker (rollup-plugin-dts) refused to build without `@types/node` otherwise. Declaring `process` locally keeps the dev-only warning without pulling a dependency that isn't needed at runtime. |
+| 2026-04-16 | Per-hook tsup entries via `readdirSync('src/hooks')` in `tsup.config.ts` | Satisfies the Phase 04 exit criterion ("`pnpm build` produces per-entry output for hooks, e.g. `dist/hooks/useDisclosure.js`") and verifies tree-shaking works. `useDisclosure` + its transitive `useControllableState` + `useCallbackRef` total ~620 bytes uncompressed — well under the 1 KB gzipped sanity budget. |
 
 ---
 
@@ -98,6 +103,7 @@ Example:
 <!-- newest at top; append after every commit -->
 
 <!-- commit hashes appended after `git commit` lands each chunk; see `git log --oneline` for the canonical record -->
+- 2026-04-16 · @lumen/react · feat(phase-04): core utilities — Slot/Portal/VisuallyHidden primitives, cn/composeRefs/composeEventHandlers/callAll/createContext/cva utils, 21 hooks, per-hook tsup entries, Storybook + playground demos [changeset: minor]
 - 2026-04-16 · @lumen/react,@lumen/themes,@lumen/tokens · feat(phase-03): runtime-free theming system — ThemeProvider, DirectionProvider, hooks, getThemeInitScript; prebuilt terminal + high-contrast themes; breakpoint tokens, focus shadow, reduced-motion CSS [changeset: minor × 3]
 - 2026-04-16 · @lumen/tokens · feat(phase-02): DTCG token pipeline (primitives + semantic light/dark, Style Dictionary v4 CSS+TS output, Ajv schema validator) [changeset: minor]
 - 2026-04-16 · repo · chore(phase-01): complete Phase 01 foundation scaffold (monorepo, tooling, Storybook, Vitest, tsup, CI, playground)

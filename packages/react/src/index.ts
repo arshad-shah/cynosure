@@ -1,13 +1,14 @@
 export const VERSION = '0.0.0';
 
+export * from './hooks/index.js';
+export * from './primitives/index.js';
+export * from './utils/index.js';
+
 export {
   DirectionProvider,
   ThemeProvider,
   getThemeInitScript,
-  useBreakpoint,
   useColorScheme,
-  useDirection,
-  useReducedMotion,
   useTheme,
 } from './theme/index.js';
 export type {

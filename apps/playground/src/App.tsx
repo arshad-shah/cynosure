@@ -1,8 +1,12 @@
 import {
   DirectionProvider,
+  Portal,
   ThemeProvider,
   VERSION,
+  VisuallyHidden,
   useDirection,
+  useDisclosure,
+  useMediaQuery,
   useReducedMotion,
   useTheme,
 } from '@lumen/react';
@@ -121,6 +125,89 @@ function RadixDirectionDemo() {
   );
 }
 
+function HooksDemo() {
+  const isMedium = useMediaQuery('(min-width: 48em)');
+  const { isOpen, onOpen, onClose, onToggle } = useDisclosure();
+  return (
+    <div
+      style={{
+        padding: '1rem',
+        background: 'var(--lumen-color-background-surface)',
+        border: '1px solid var(--lumen-color-border-default)',
+        borderRadius: 'var(--lumen-radius-component-lg)',
+        boxShadow: 'var(--lumen-shadow-sm)',
+      }}
+    >
+      <p style={{ marginTop: 0 }}>
+        <strong>Phase 04 hooks</strong> — <code>useMediaQuery</code> resolves{' '}
+        <code>(min-width: 48em)</code> to <strong>{isMedium ? 'true' : 'false'}</strong>.{' '}
+        <code>useDisclosure</code> drives the overlay below.
+      </p>
+      <button
+        type="button"
+        onClick={onToggle}
+        style={{
+          background: 'var(--lumen-color-accent-solid)',
+          color: 'var(--lumen-color-accent-on-solid)',
+          border: 'none',
+          padding: '0.5rem 1rem',
+          borderRadius: 'var(--lumen-radius-component-md)',
+          cursor: 'pointer',
+        }}
+      >
+        <span aria-hidden>{isOpen ? 'Close' : 'Open'} portaled overlay</span>
+        <VisuallyHidden>{isOpen ? 'Close' : 'Open'} Phase 04 demo overlay</VisuallyHidden>
+      </button>
+      {isOpen ? (
+        <Portal>
+          <dialog
+            open
+            aria-label="Phase 04 hooks demo"
+            style={{
+              position: 'fixed',
+              inset: 0,
+              display: 'grid',
+              placeItems: 'center',
+              background: 'rgba(0,0,0,0.5)',
+              border: 'none',
+              width: '100%',
+              height: '100%',
+              margin: 0,
+              padding: 0,
+              zIndex: 1000,
+            }}
+          >
+            <div
+              style={{
+                background: 'var(--lumen-color-background-raised)',
+                color: 'var(--lumen-color-foreground-default)',
+                border: '1px solid var(--lumen-color-border-default)',
+                borderRadius: 'var(--lumen-radius-component-lg)',
+                boxShadow: 'var(--lumen-shadow-component-popover)',
+                padding: '1.25rem 1.5rem',
+                minWidth: '20rem',
+              }}
+            >
+              <p style={{ marginTop: 0 }}>
+                Rendered via <code>&lt;Portal&gt;</code>, state driven by <code>useDisclosure</code>
+                .
+              </p>
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <button type="button" onClick={onClose}>
+                  Close
+                </button>
+                <button type="button" onClick={onOpen} aria-pressed={isOpen}>
+                  Keep open
+                </button>
+              </div>
+            </div>
+          </dialog>
+        </Portal>
+      ) : null}
+    </div>
+  );
+}
+
 function ReducedMotionBanner() {
   const reduced = useReducedMotion();
   if (!reduced) return null;
@@ -158,7 +245,7 @@ function Body() {
       <header>
         <h1 style={{ marginBottom: '0.25rem' }}>Lumen {VERSION}</h1>
         <p style={{ color: 'var(--lumen-color-foreground-muted)', margin: 0 }}>
-          Phase 03 — theming, direction, reduced motion.
+          Phase 04 — hooks, utilities, and primitives on top of Phase 03 theming.
         </p>
       </header>
 
@@ -182,6 +269,8 @@ function Body() {
         </p>
         <RadixDirectionDemo />
       </div>
+
+      <HooksDemo />
     </div>
   );
 }
