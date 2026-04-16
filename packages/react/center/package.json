@@ -1,0 +1,9 @@
+{
+  "name": "@lumen/react/center",
+  "private": true,
+  "type": "module",
+  "main": "../dist/center.js",
+  "module": "../dist/center.js",
+  "types": "../dist/center.d.ts",
+  "sideEffects": ["*.css"]
+}

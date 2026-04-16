@@ -1,0 +1,9 @@
+{
+  "name": "@lumen/react/aspect-ratio",
+  "private": true,
+  "type": "module",
+  "main": "../dist/aspectratio.js",
+  "module": "../dist/aspectratio.js",
+  "types": "../dist/aspectratio.d.ts",
+  "sideEffects": ["*.css"]
+}

@@ -1,0 +1,9 @@
+{
+  "name": "@lumen/react/grid",
+  "private": true,
+  "type": "module",
+  "main": "../dist/grid.js",
+  "module": "../dist/grid.js",
+  "types": "../dist/grid.d.ts",
+  "sideEffects": ["*.css"]
+}

@@ -1,0 +1,9 @@
+{
+  "name": "@lumen/react/flex",
+  "private": true,
+  "type": "module",
+  "main": "../dist/flex.js",
+  "module": "../dist/flex.js",
+  "types": "../dist/flex.d.ts",
+  "sideEffects": ["*.css"]
+}

@@ -12,7 +12,7 @@
 | 02 | Design tokens                | 🟢 Complete    | 2026-04-16 | 2026-04-16 | DTCG primitives + semantic (light/dark) → Style Dictionary → per-theme CSS + typed TS. Combined base+dark gzipped ≈ 2.3 KB. Typography composites are pre-expanded to flat CSS custom properties. |
 | 03 | Theming system               | 🟢 Complete    | 2026-04-16 | 2026-04-16 | `@lumen/react` ThemeProvider/DirectionProvider + hooks; `@lumen/themes` ships terminal + high-contrast as side-effect CSS; tokens gain breakpoints, focus shadow, and a reduced-motion override. |
 | 04 | Core utilities               | 🟢 Complete    | 2026-04-16 | 2026-04-16 | Primitives (Slot/Portal/VisuallyHidden) + utils (cn, composeRefs, composeEventHandlers, callAll, createContext, cva re-export, getOwnerDocument) + 21 hooks, all shipped from `@lumen/react` with per-hook tsup entries. `class-variance-authority` v0.7 replaces the spec's nominal `cva v1`. |
-| 05 | Layout primitives            | ⬜ Not started |            |            |       |
+| 05 | Layout primitives            | 🟢 Complete    | 2026-04-16 | 2026-04-16 | vanilla-extract pipeline live; 11 primitives (`Box`/`Stack`/`Inline`/`Flex`/`Grid`/`Center`/`Spacer`/`Divider`/`AspectRatio`/`Container`/`Section`); shared `LayoutProps` emits `--lumen-lp-*` CSS custom properties with mobile-first breakpoint cascade; per-primitive tsup entries + Node10 sidecar shims. Per-primitive CSS ≈ 4–5 KB gzipped because the shared layout class is currently inlined per bundle; tighter dedup deferred to Phase 14. |
 | 06 | Typography                   | ⬜ Not started |            |            |       |
 | 07 | Forms — basic                | ⬜ Not started |            |            |       |
 | 08 | Forms — advanced             | ⬜ Not started |            |            |       |
@@ -31,8 +31,8 @@
 
 ## Current focus
 
-> **Phase:** 05 — Layout primitives
-> **Next action:** Read `05-layout-primitives.md` and start shipping `Box`, `Stack`, `Grid`, `Container`, etc. on top of the now-complete hook / primitive layer.
+> **Phase:** 06 — Typography
+> **Next action:** Read `06-typography.md` and ship `Text`/`Heading`/`Code`/etc. composed on top of the Phase 05 `Box` + `LayoutProps`. The typography composite tokens already pre-expand to flat CSS variables from Phase 02.
 
 ---
 
@@ -71,6 +71,13 @@ Record every meaningful technical decision here, with rationale. When you (or fu
 | 2026-04-16 | Kept phase-03 hook implementations under `theme/hooks/` and added thin re-exports under `hooks/` | Moving the files would have invalidated the phase-03 tests (`src/theme/__tests__/…`) without adding behaviour. The re-exports satisfy the Phase 04 inventory ("all hooks reachable from `@lumen/react/hooks`") while leaving the existing test layout intact. |
 | 2026-04-16 | `useControllableState` reads `process.env.NODE_ENV` behind a `declare const process` + `typeof` guard | tsup's DTS worker (rollup-plugin-dts) refused to build without `@types/node` otherwise. Declaring `process` locally keeps the dev-only warning without pulling a dependency that isn't needed at runtime. |
 | 2026-04-16 | Per-hook tsup entries via `readdirSync('src/hooks')` in `tsup.config.ts` | Satisfies the Phase 04 exit criterion ("`pnpm build` produces per-entry output for hooks, e.g. `dist/hooks/useDisclosure.js`") and verifies tree-shaking works. `useDisclosure` + its transitive `useControllableState` + `useCallbackRef` total ~620 bytes uncompressed — well under the 1 KB gzipped sanity budget. |
+| 2026-04-16 | Picked `vanilla-extract` for component CSS (Phase 05) | Matches the spec's rule-zero choice. Zero runtime, writes literal CSS in `.css.ts` files, typed token references via `createGlobalThemeContract`, and native Vite/esbuild integrations already cover Storybook + Vitest + tsup. No new DSL; one `.css.ts` per component keeps the CSS graph tight and legible. |
+| 2026-04-16 | `LayoutProps` render as cascading CSS custom properties, not class combinations | Each responsive entry writes `--lumen-lp-{prop}-{bp}` inline; the shared `layoutPropsStyle` class reads them with nested `var()` fallbacks across breakpoints. Keeps the compiled CSS per primitive essentially fixed in size (no Cartesian product of classes per token × breakpoint), and arbitrary values (`"200px"`, `"50%"`) flow through with no runtime compilation. |
+| 2026-04-16 | Colour-token prop format is `"<category>.<name>"` (e.g. `"bg.surface"`, `"accent.solid"`, `"feedback.success.soft"`) | The spec example's `"surface.bg"` form doesn't scale to the feedback palette's two-level nesting. `"<category>.<name>"` reads left-to-right, maps cleanly to the token tree, and the `resolveColor` helper handles the camelCase → kebab-case transform (`accent.solidHover` → `var(--lumen-color-accent-solid-hover)`) to match Style Dictionary's CSS output. |
+| 2026-04-16 | Shipped the shared layout-prop base class once inside every primitive's `.css.ts` via `style([layoutPropsStyle, …])` | Simple, per-primitive CSS bundles stay self-contained (one import → one drop-in CSS file). The tradeoff is duplicate declarations in the compiled output when consumers import multiple primitives: per-primitive CSS lands around 4–5 KB gzipped vs the spec's 1 KB target. We accept this for Phase 05; Phase 14 will either (a) emit a single shared `@lumen/react/layout.css` entry or (b) migrate to the vanilla-extract `style` build's cross-module dedup once `splitting` can track vanilla-extract-emitted CSS. |
+| 2026-04-16 | Node10-resolution sidecar `package.json` shims for every per-primitive subpath | Same pattern Phase 03 used for `./theme`. Without them, `attw` flags each subpath as `no-resolution` under the Node10 profile. Adding a `box/package.json` (and siblings) points legacy resolvers at `dist/box.{js,d.ts}` without changing modern `exports` resolution. |
+| 2026-04-16 | `Stack.dividers` interleaves a decorative `<Divider/>` between every pair of children | Common enough pattern to deserve the shortcut; resist adding more Stack/Inline conveniences for now to keep the primitives primitive. Accepts `true` (default `<Divider/>`) or any ReactNode to customise. |
+| 2026-04-16 | `Divider` renders `<hr>` for horizontal but a `<div role="separator" aria-orientation="vertical">` for vertical | `<hr>` is awkward to size vertically across browsers. Swapping to a `<div>` with the explicit ARIA role gives reliable layout and keeps screen-reader semantics correct. A11y-wise defaults to `decorative` (hidden from AT); pass `decorative={false}` to make it a real separator. |
 
 ---
 
@@ -103,6 +110,7 @@ Example:
 <!-- newest at top; append after every commit -->
 
 <!-- commit hashes appended after `git commit` lands each chunk; see `git log --oneline` for the canonical record -->
+- 2026-04-16 · @lumen/react · feat(phase-05): 11 layout primitives on vanilla-extract — Box/Stack/Inline/Flex/Grid/Center/Spacer/Divider/AspectRatio/Container/Section, shared responsive `LayoutProps` → CSS-variable pipeline, per-primitive tsup entries + Node10 shims, Storybook gallery + 33 unit tests [changeset: minor]
 - 2026-04-16 · @lumen/react · feat(phase-04): core utilities — Slot/Portal/VisuallyHidden primitives, cn/composeRefs/composeEventHandlers/callAll/createContext/cva utils, 21 hooks, per-hook tsup entries, Storybook + playground demos [changeset: minor]
 - 2026-04-16 · @lumen/react,@lumen/themes,@lumen/tokens · feat(phase-03): runtime-free theming system — ThemeProvider, DirectionProvider, hooks, getThemeInitScript; prebuilt terminal + high-contrast themes; breakpoint tokens, focus shadow, reduced-motion CSS [changeset: minor × 3]
 - 2026-04-16 · @lumen/tokens · feat(phase-02): DTCG token pipeline (primitives + semantic light/dark, Style Dictionary v4 CSS+TS output, Ajv schema validator) [changeset: minor]

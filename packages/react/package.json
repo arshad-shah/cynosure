@@ -14,12 +14,72 @@
       "types": "./dist/theme/index.d.ts",
       "import": "./dist/theme/index.js"
     },
+    "./box": {
+      "types": "./dist/box.d.ts",
+      "import": "./dist/box.js"
+    },
+    "./stack": {
+      "types": "./dist/stack.d.ts",
+      "import": "./dist/stack.js"
+    },
+    "./inline": {
+      "types": "./dist/inline.d.ts",
+      "import": "./dist/inline.js"
+    },
+    "./flex": {
+      "types": "./dist/flex.d.ts",
+      "import": "./dist/flex.js"
+    },
+    "./grid": {
+      "types": "./dist/grid.d.ts",
+      "import": "./dist/grid.js"
+    },
+    "./center": {
+      "types": "./dist/center.d.ts",
+      "import": "./dist/center.js"
+    },
+    "./spacer": {
+      "types": "./dist/spacer.d.ts",
+      "import": "./dist/spacer.js"
+    },
+    "./divider": {
+      "types": "./dist/divider.d.ts",
+      "import": "./dist/divider.js"
+    },
+    "./aspect-ratio": {
+      "types": "./dist/aspectratio.d.ts",
+      "import": "./dist/aspectratio.js"
+    },
+    "./container": {
+      "types": "./dist/container.d.ts",
+      "import": "./dist/container.js"
+    },
+    "./section": {
+      "types": "./dist/section.d.ts",
+      "import": "./dist/section.js"
+    },
     "./package.json": "./package.json"
   },
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "files": ["dist", "theme", "README.md", "CHANGELOG.md"],
+  "files": [
+    "dist",
+    "theme",
+    "box",
+    "stack",
+    "inline",
+    "flex",
+    "grid",
+    "center",
+    "spacer",
+    "divider",
+    "aspect-ratio",
+    "container",
+    "section",
+    "README.md",
+    "CHANGELOG.md"
+  ],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
@@ -37,6 +97,8 @@
     "@lumen/tokens": "workspace:*",
     "@radix-ui/react-direction": "^1.1.0",
     "@radix-ui/react-slot": "^1.2.4",
+    "@vanilla-extract/css": "^1.20.1",
+    "@vanilla-extract/recipes": "^0.5.7",
     "class-variance-authority": "^0.7.1"
   },
   "devDependencies": {

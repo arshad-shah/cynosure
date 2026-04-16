@@ -1,0 +1,9 @@
+{
+  "name": "@lumen/react/box",
+  "private": true,
+  "type": "module",
+  "main": "../dist/box.js",
+  "module": "../dist/box.js",
+  "types": "../dist/box.d.ts",
+  "sideEffects": ["*.css"]
+}
