@@ -1,0 +1,20 @@
+{
+  "name": "@lumen/config",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Lumen UI — shared tooling presets (internal, not published)",
+  "license": "MIT",
+  "type": "module",
+  "exports": {
+    "./biome.json": "./biome.json",
+    "./tsconfig.base.json": "./tsconfig.base.json",
+    "./tsconfig.lib.json": "./tsconfig.lib.json",
+    "./tsup.config.base": "./tsup.config.base.ts",
+    "./package.json": "./package.json"
+  },
+  "files": ["biome.json", "tsconfig.base.json", "tsconfig.lib.json", "tsup.config.base.ts"],
+  "devDependencies": {
+    "tsup": "^8.3.0",
+    "typescript": "^5.6.0"
+  }
+}
