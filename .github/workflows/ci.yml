@@ -15,12 +15,14 @@ jobs:
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm lint
       - run: pnpm typecheck
       - run: pnpm test
       - run: pnpm build
-      - run: pnpm exec publint packages/react/dist --level warning
+      - run: pnpm exec publint packages/react --level warning
+      - run: pnpm exec publint packages/themes --level warning
       - run: pnpm exec attw --pack packages/react --ignore-rules cjs-resolves-to-esm
+      - run: pnpm exec attw --pack packages/themes --ignore-rules cjs-resolves-to-esm

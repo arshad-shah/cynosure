@@ -11,7 +11,9 @@
   },
   "dependencies": {
     "@lumen/react": "workspace:*",
+    "@lumen/themes": "workspace:*",
     "@lumen/tokens": "workspace:*",
+    "@radix-ui/react-popover": "^1.1.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },

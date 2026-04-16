@@ -10,12 +10,16 @@
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     },
+    "./theme": {
+      "types": "./dist/theme/index.d.ts",
+      "import": "./dist/theme/index.js"
+    },
     "./package.json": "./package.json"
   },
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "files": ["dist", "README.md", "CHANGELOG.md"],
+  "files": ["dist", "theme", "README.md", "CHANGELOG.md"],
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
@@ -30,12 +34,16 @@
   },
   "dependencies": {
     "@lumen/core": "workspace:*",
-    "@lumen/tokens": "workspace:*"
+    "@lumen/tokens": "workspace:*",
+    "@radix-ui/react-direction": "^1.1.0"
   },
   "devDependencies": {
     "@lumen/config": "workspace:*",
+    "@testing-library/jest-dom": "^6.6.0",
+    "@testing-library/react": "^16.1.0",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "jsdom": "^25.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "tsup": "^8.3.0",

@@ -4,7 +4,8 @@
       "dropdown": { "$type": "shadow", "$value": "{shadow.md}" },
       "popover": { "$type": "shadow", "$value": "{shadow.lg}" },
       "modal": { "$type": "shadow", "$value": "{shadow.xl}" },
-      "tooltip": { "$type": "shadow", "$value": "{shadow.sm}" }
+      "tooltip": { "$type": "shadow", "$value": "{shadow.sm}" },
+      "focus": { "$type": "shadow", "$value": "{shadow.focus-ring}" }
     }
   },
   "duration": {

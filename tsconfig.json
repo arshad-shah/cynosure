@@ -2,7 +2,6 @@
   "files": [],
   "references": [
     { "path": "packages/tokens" },
-    { "path": "packages/themes" },
     { "path": "packages/core" },
     { "path": "packages/react" },
     { "path": "packages/icons" }
