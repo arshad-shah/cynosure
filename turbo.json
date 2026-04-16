@@ -32,6 +32,19 @@
       "dependsOn": ["^build"],
       "outputs": []
     },
+    "@lumen/tokens#typecheck": {
+      "dependsOn": ["^build", "build:tokens"],
+      "outputs": []
+    },
+    "@lumen/tokens#build": {
+      "dependsOn": ["^build", "build:tokens"],
+      "outputs": ["dist/**"],
+      "inputs": ["src/**", "package.json", "tsconfig.json", "tsup.config.ts"]
+    },
+    "build:tokens": {
+      "outputs": ["src/generated/**", "dist/css/**"],
+      "inputs": ["tokens/**", "scripts/**", "style-dictionary.config.mjs"]
+    },
     "clean": { "cache": false }
   }
 }

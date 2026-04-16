@@ -64,6 +64,7 @@ Record every meaningful technical decision here, with rationale. When you (or fu
 | 2026-04-16 | Reduced-motion CSS appended to `dist/css/base.css` by the Style Dictionary build | Style Dictionary's `css/variables` format can't emit an `@media` block; appending after the build keeps the snippet inside the same file consumers already import via `@lumen/tokens/css`. |
 | 2026-04-16 | Custom theme names default `colorScheme` to dark when the name matches `/dark|terminal|midnight|night/i`, otherwise light | Provides a useful default so `colorScheme` is meaningful for prebuilt themes; consumers can still override by setting `color-scheme` in their own CSS. |
 | 2026-04-16 | CI publint path corrected (`packages/react`, not `packages/react/dist`) and `@lumen/themes` added to publint+attw runs | The Phase 01 wiring pointed at `dist/`, which publint can't read directly (it expects the package root). Phase 02's decision log already flagged the right pattern; this commit updates CI to match and extends both checks to themes. |
+| 2026-04-16 | Promoted `build:tokens` to a turbo task and made `@lumen/tokens#typecheck`/`#build` depend on it | Turbo runs typecheck and build in parallel within a package. The tokens build script's `pnpm clean` step deletes `src/generated/` mid-typecheck, so CI's clean run failed `tsc` with `Cannot find module './generated/base.js'`. Modelling Style Dictionary as its own task forces typecheck to wait until the generated files exist. |
 
 ---
 
