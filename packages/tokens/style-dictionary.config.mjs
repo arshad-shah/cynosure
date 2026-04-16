@@ -16,25 +16,36 @@ const root = resolve(__dirname);
 StyleDictionary.registerPreprocessor({
   name: 'lumen/expand-typography',
   preprocessor: (dictionary) => {
-    const walk = (node, path = []) => {
+    const walk = (node) => {
       if (node && typeof node === 'object' && '$type' in node && '$value' in node) {
         if (node.$type === 'typography' && node.$value && typeof node.$value === 'object') {
           const value = node.$value;
+          // Propagate the original node's filePath onto every sub-token so the
+          // per-platform `filter` (which keys off `token.filePath`) can still
+          // decide whether to emit them. Without this SD assigns filePath
+          // during source parsing, and new tokens created here would fall
+          // through the filter and vanish from the CSS output.
+          const filePath = node.filePath;
+          const mk = (subType, subValue) => ({
+            $type: subType,
+            $value: subValue,
+            ...(filePath ? { filePath } : {}),
+          });
           const expanded = {};
           if (value.fontFamily !== undefined) {
-            expanded.family = { $type: 'fontFamily', $value: value.fontFamily };
+            expanded.family = mk('fontFamily', value.fontFamily);
           }
           if (value.fontSize !== undefined) {
-            expanded.size = { $type: 'dimension', $value: value.fontSize };
+            expanded.size = mk('dimension', value.fontSize);
           }
           if (value.fontWeight !== undefined) {
-            expanded.weight = { $type: 'fontWeight', $value: value.fontWeight };
+            expanded.weight = mk('fontWeight', value.fontWeight);
           }
           if (value.lineHeight !== undefined) {
-            expanded['line-height'] = { $type: 'number', $value: value.lineHeight };
+            expanded['line-height'] = mk('number', value.lineHeight);
           }
           if (value.letterSpacing !== undefined) {
-            expanded['letter-spacing'] = { $type: 'dimension', $value: value.letterSpacing };
+            expanded['letter-spacing'] = mk('dimension', value.letterSpacing);
           }
           return expanded;
         }
@@ -43,7 +54,7 @@ StyleDictionary.registerPreprocessor({
       if (node && typeof node === 'object') {
         const out = {};
         for (const [key, child] of Object.entries(node)) {
-          out[key] = walk(child, [...path, key]);
+          out[key] = walk(child);
         }
         return out;
       }

@@ -1,0 +1,9 @@
+{
+  "name": "@lumen/react/kbd",
+  "private": true,
+  "type": "module",
+  "main": "../dist/kbd.js",
+  "module": "../dist/kbd.js",
+  "types": "../dist/kbd.d.ts",
+  "sideEffects": ["*.css"]
+}

@@ -1,0 +1,9 @@
+{
+  "name": "@lumen/react/blockquote",
+  "private": true,
+  "type": "module",
+  "main": "../dist/blockquote.js",
+  "module": "../dist/blockquote.js",
+  "types": "../dist/blockquote.d.ts",
+  "sideEffects": ["*.css"]
+}

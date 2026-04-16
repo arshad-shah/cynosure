@@ -1,0 +1,9 @@
+{
+  "name": "@lumen/react/link",
+  "private": true,
+  "type": "module",
+  "main": "../dist/link.js",
+  "module": "../dist/link.js",
+  "types": "../dist/link.d.ts",
+  "sideEffects": ["*.css"]
+}
