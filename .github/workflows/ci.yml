@@ -22,5 +22,7 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm test
       - run: pnpm build
-      - run: pnpm exec publint packages/react/dist --level warning
+      - run: pnpm exec publint packages/react --level warning
+      - run: pnpm exec publint packages/themes --level warning
       - run: pnpm exec attw --pack packages/react --ignore-rules cjs-resolves-to-esm
+      - run: pnpm exec attw --pack packages/themes --ignore-rules cjs-resolves-to-esm

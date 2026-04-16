@@ -1,34 +1,24 @@
 {
   "name": "@lumen/themes",
   "version": "0.0.0",
-  "description": "Lumen UI — prebuilt themes (default, dark, terminal)",
+  "description": "Lumen UI — prebuilt themes (terminal, high-contrast)",
   "license": "MIT",
   "type": "module",
   "sideEffects": ["**/*.css"],
   "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
-    },
+    "./terminal": "./src/terminal/index.css",
+    "./high-contrast": "./src/high-contrast/index.css",
     "./package.json": "./package.json"
   },
-  "main": "./dist/index.js",
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "files": ["dist", "README.md", "CHANGELOG.md"],
+  "files": ["src", "README.md", "CHANGELOG.md"],
   "scripts": {
-    "build": "tsup",
-    "dev": "tsup --watch",
-    "typecheck": "tsc --noEmit",
-    "clean": "rm -rf dist .turbo"
+    "build": "echo \"@lumen/themes is CSS-only; nothing to build\"",
+    "dev": "echo \"@lumen/themes is CSS-only; nothing to watch\"",
+    "typecheck": "echo \"@lumen/themes ships no TypeScript\"",
+    "clean": "rm -rf .turbo"
   },
   "dependencies": {
     "@lumen/tokens": "workspace:*"
-  },
-  "devDependencies": {
-    "@lumen/config": "workspace:*",
-    "tsup": "^8.3.0",
-    "typescript": "^5.6.0"
   },
   "publishConfig": { "access": "public" }
 }

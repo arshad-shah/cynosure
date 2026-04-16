@@ -1,3 +1,4 @@
+import { appendFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import StyleDictionary from 'style-dictionary';
@@ -126,6 +127,7 @@ const baseSemantic = [
   'tokens/semantic/spacing.json',
   'tokens/semantic/typography.json',
   'tokens/semantic/shadows.json',
+  'tokens/semantic/breakpoints.json',
 ];
 
 const darkSemantic = ['tokens/semantic/colors.dark.json'];
@@ -184,3 +186,21 @@ await build({
   include: primitives,
   selector: "[data-theme='dark']",
 });
+
+/**
+ * Append a `prefers-reduced-motion` override that zeroes out the semantic
+ * motion durations. Any component using `var(--lumen-duration-motion-*)` in a
+ * transition or animation automatically loses motion without code changes.
+ */
+const reducedMotionSnippet = `
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --lumen-duration-motion-micro: 0ms;
+    --lumen-duration-motion-short: 0ms;
+    --lumen-duration-motion-medium: 0ms;
+    --lumen-duration-motion-long: 0ms;
+  }
+}
+`;
+
+await appendFile(resolve(root, 'dist/css/base.css'), reducedMotionSnippet, 'utf8');

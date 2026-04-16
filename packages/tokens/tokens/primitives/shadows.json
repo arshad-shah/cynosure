@@ -17,6 +17,7 @@
       "$type": "shadow",
       "$value": "0 20px 25px -5px rgba(9, 9, 11, 0.1), 0 8px 10px -6px rgba(9, 9, 11, 0.1)"
     },
-    "2xl": { "$type": "shadow", "$value": "0 25px 50px -12px rgba(9, 9, 11, 0.25)" }
+    "2xl": { "$type": "shadow", "$value": "0 25px 50px -12px rgba(9, 9, 11, 0.25)" },
+    "focus-ring": { "$type": "shadow", "$value": "0 0 0 3px rgba(59, 130, 246, 0.5)" }
   }
 }

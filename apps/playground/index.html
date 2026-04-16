@@ -4,6 +4,12 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Lumen Playground</title>
+    <script>
+      // Inlined output of getThemeInitScript() — kept hand-mirrored here so the
+      // playground proves the FOUC prevention contract without a build step.
+      // If you change the helper, re-paste its output here.
+      (function(){try{var d=document.documentElement;var a="data-theme";var def="system";var allowed=["system","light","dark","terminal","high-contrast"];var get=function(){try{return window.localStorage.getItem("lumen-theme")}catch(e){return null}};var stored=get();var theme=stored||def;if(allowed&&allowed.indexOf(theme)===-1&&theme!=='system'){theme=def}var resolved=theme;if(theme==='system'){if(true&&window.matchMedia){resolved=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}else{resolved='light'}}d.setAttribute(a,resolved);d.style.colorScheme=(resolved==='dark'?'dark':'light')}catch(e){}})();
+    </script>
   </head>
   <body>
     <div id="root"></div>

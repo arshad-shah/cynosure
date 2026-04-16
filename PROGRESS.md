@@ -10,7 +10,7 @@
 |---|-------------------------------|---------------|------------|------------|-------|
 | 01 | Foundation & tooling         | 🟢 Complete    | 2026-04-16 | 2026-04-16 | Pinned to Storybook 8.6 and Vitest 2.1 (node env); Playwright browser mode deferred to Phase 14. |
 | 02 | Design tokens                | 🟢 Complete    | 2026-04-16 | 2026-04-16 | DTCG primitives + semantic (light/dark) → Style Dictionary → per-theme CSS + typed TS. Combined base+dark gzipped ≈ 2.3 KB. Typography composites are pre-expanded to flat CSS custom properties. |
-| 03 | Theming system               | ⬜ Not started |            |            |       |
+| 03 | Theming system               | 🟢 Complete    | 2026-04-16 | 2026-04-16 | `@lumen/react` ThemeProvider/DirectionProvider + hooks; `@lumen/themes` ships terminal + high-contrast as side-effect CSS; tokens gain breakpoints, focus shadow, and a reduced-motion override. |
 | 04 | Core utilities               | ⬜ Not started |            |            |       |
 | 05 | Layout primitives            | ⬜ Not started |            |            |       |
 | 06 | Typography                   | ⬜ Not started |            |            |       |
@@ -31,8 +31,8 @@
 
 ## Current focus
 
-> **Phase:** 03 — Theming system
-> **Next action:** Read `03-theming-system.md` and build `ThemeProvider` + `useTheme` on top of the `@lumen/tokens` CSS layer.
+> **Phase:** 04 — Core utilities
+> **Next action:** Read `04-core-utilities.md` and start filling out `@lumen/core` (cn, polymorphic helpers, focus-ring utilities, Slot, etc.) on top of the now-complete theming layer.
 
 ---
 
@@ -55,6 +55,15 @@ Record every meaningful technical decision here, with rationale. When you (or fu
 | 2026-04-16 | Generated TS tokens land in `src/generated/` (gitignored) | Keeps tsup's `rootDir: src` assumption intact and lets tsup bundle the re-exports. CSS goes to `dist/css/` directly; tsup runs with `clean: false` after Style Dictionary so the CSS survives. |
 | 2026-04-16 | Dark theme stylesheet emits only semantic overrides (uses SD `include` + file-path filter) | Primitives live in base.css. Keeps dark.css small (gzipped ≈ 0.5 KB) and guarantees one canonical primitive definition. |
 | 2026-04-16 | `@lumen/tokens` tsconfig sets `composite: false` | tsup's DTS worker (rollup-plugin-dts) refused to include the generated files under the inherited `composite: true`. Disabling composite on the package tsconfig fixes the build; root references don't use `tsc --build` anyway. |
+| 2026-04-16 | Roll our own `ThemeProvider` instead of `next-themes` | The whole module is < 200 LOC, has no peer-dep, and lets us couple cleanly with our `@lumen/tokens` CSS layer (no need to map theme names through `next-themes`'s `value` prop). |
+| 2026-04-16 | `@lumen/themes` is CSS-only — dropped tsup, tsconfig, src/index.ts | The package's only artefacts are `terminal/index.css` and `high-contrast/index.css`, exposed via `exports`. Adding a TS entrypoint would emit an empty bundle and pollute `attw`/`publint` runs. |
+| 2026-04-16 | `@lumen/themes` distributes CSS straight from `src/` | Avoids a meaningless build step and keeps consumers reading the same file authors edit. The `files` whitelist publishes only `src/`. |
+| 2026-04-16 | Wrap our `DirectionProvider` around Radix's `DirectionProvider` | Radix primitives in Phases 09+ read direction from Radix's context. Mirroring it now means `<DirectionProvider dir="rtl">` flips Lumen + Radix in one place. |
+| 2026-04-16 | `@lumen/react/theme` subpath ships a sidecar `theme/package.json` for Node10 resolution | `attw` flags `no-resolution` under node10 because that profile predates `exports`. The `theme/` shim re-points node10 to `dist/theme/index.{js,d.ts}` without changing modern resolution. |
+| 2026-04-16 | `@lumen/react` tsconfig sets `composite: false` | Same reason as `@lumen/tokens`: `rollup-plugin-dts` refuses subpath entries under composite. Root tsconfig dropped the `packages/react` reference along with it. |
+| 2026-04-16 | Reduced-motion CSS appended to `dist/css/base.css` by the Style Dictionary build | Style Dictionary's `css/variables` format can't emit an `@media` block; appending after the build keeps the snippet inside the same file consumers already import via `@lumen/tokens/css`. |
+| 2026-04-16 | Custom theme names default `colorScheme` to dark when the name matches `/dark|terminal|midnight|night/i`, otherwise light | Provides a useful default so `colorScheme` is meaningful for prebuilt themes; consumers can still override by setting `color-scheme` in their own CSS. |
+| 2026-04-16 | CI publint path corrected (`packages/react`, not `packages/react/dist`) and `@lumen/themes` added to publint+attw runs | The Phase 01 wiring pointed at `dist/`, which publint can't read directly (it expects the package root). Phase 02's decision log already flagged the right pattern; this commit updates CI to match and extends both checks to themes. |
 
 ---
 
@@ -87,6 +96,7 @@ Example:
 <!-- newest at top; append after every commit -->
 
 <!-- commit hashes appended after `git commit` lands each chunk; see `git log --oneline` for the canonical record -->
+- 2026-04-16 · @lumen/react,@lumen/themes,@lumen/tokens · feat(phase-03): runtime-free theming system — ThemeProvider, DirectionProvider, hooks, getThemeInitScript; prebuilt terminal + high-contrast themes; breakpoint tokens, focus shadow, reduced-motion CSS [changeset: minor × 3]
 - 2026-04-16 · @lumen/tokens · feat(phase-02): DTCG token pipeline (primitives + semantic light/dark, Style Dictionary v4 CSS+TS output, Ajv schema validator) [changeset: minor]
 - 2026-04-16 · repo · chore(phase-01): complete Phase 01 foundation scaffold (monorepo, tooling, Storybook, Vitest, tsup, CI, playground)
 
