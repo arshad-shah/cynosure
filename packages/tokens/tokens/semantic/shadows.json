@@ -1,0 +1,18 @@
+{
+  "shadow": {
+    "component": {
+      "dropdown": { "$type": "shadow", "$value": "{shadow.md}" },
+      "popover": { "$type": "shadow", "$value": "{shadow.lg}" },
+      "modal": { "$type": "shadow", "$value": "{shadow.xl}" },
+      "tooltip": { "$type": "shadow", "$value": "{shadow.sm}" }
+    }
+  },
+  "duration": {
+    "motion": {
+      "micro": { "$type": "duration", "$value": "{duration.fast}" },
+      "short": { "$type": "duration", "$value": "{duration.normal}" },
+      "medium": { "$type": "duration", "$value": "{duration.slow}" },
+      "long": { "$type": "duration", "$value": "{duration.slower}" }
+    }
+  }
+}

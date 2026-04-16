@@ -5,7 +5,15 @@
     "build": {
       "dependsOn": ["^build"],
       "outputs": ["dist/**"],
-      "inputs": ["src/**", "package.json", "tsconfig.json", "tsup.config.ts"]
+      "inputs": [
+        "src/**",
+        "tokens/**",
+        "scripts/**",
+        "package.json",
+        "tsconfig.json",
+        "tsup.config.ts",
+        "style-dictionary.config.mjs"
+      ]
     },
     "dev": {
       "cache": false,

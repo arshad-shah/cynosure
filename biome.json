@@ -9,7 +9,8 @@
       ".turbo",
       "node_modules",
       "*.md",
-      "pnpm-lock.yaml"
+      "pnpm-lock.yaml",
+      "**/src/generated"
     ]
   },
   "formatter": {
