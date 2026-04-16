@@ -1,0 +1,9 @@
+{
+  "name": "@lumen/react/text",
+  "private": true,
+  "type": "module",
+  "main": "../dist/text.js",
+  "module": "../dist/text.js",
+  "types": "../dist/text.d.ts",
+  "sideEffects": ["*.css"]
+}

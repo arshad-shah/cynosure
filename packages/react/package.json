@@ -58,6 +58,34 @@
       "types": "./dist/section.d.ts",
       "import": "./dist/section.js"
     },
+    "./text": {
+      "types": "./dist/text.d.ts",
+      "import": "./dist/text.js"
+    },
+    "./heading": {
+      "types": "./dist/heading.d.ts",
+      "import": "./dist/heading.js"
+    },
+    "./code": {
+      "types": "./dist/code.d.ts",
+      "import": "./dist/code.js"
+    },
+    "./kbd": {
+      "types": "./dist/kbd.d.ts",
+      "import": "./dist/kbd.js"
+    },
+    "./link": {
+      "types": "./dist/link.d.ts",
+      "import": "./dist/link.js"
+    },
+    "./blockquote": {
+      "types": "./dist/blockquote.d.ts",
+      "import": "./dist/blockquote.js"
+    },
+    "./list": {
+      "types": "./dist/list.d.ts",
+      "import": "./dist/list.js"
+    },
     "./package.json": "./package.json"
   },
   "main": "./dist/index.js",
@@ -77,6 +105,13 @@
     "aspect-ratio",
     "container",
     "section",
+    "text",
+    "heading",
+    "code",
+    "kbd",
+    "link",
+    "blockquote",
+    "list",
     "README.md",
     "CHANGELOG.md"
   ],

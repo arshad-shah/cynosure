@@ -37,14 +37,34 @@ const primitiveEntries = (): Record<string, string> => {
   return entries;
 };
 
+const typographyComponents = [
+  'Text',
+  'Heading',
+  'Code',
+  'Kbd',
+  'Link',
+  'Blockquote',
+  'List',
+] as const;
+
+const typographyEntries = (): Record<string, string> => {
+  const entries: Record<string, string> = {};
+  for (const name of typographyComponents) {
+    entries[name.toLowerCase()] = `src/typography/${name}/index.ts`;
+  }
+  return entries;
+};
+
 export default createConfig({
   entry: {
     index: 'src/index.ts',
     'theme/index': 'src/theme/index.ts',
     'primitives/index': 'src/primitives/index.ts',
+    'typography/index': 'src/typography/index.ts',
     'utils/index': 'src/utils/index.ts',
     ...hookEntries(),
     ...primitiveEntries(),
+    ...typographyEntries(),
   },
   esbuildPlugins: [vanillaExtractPlugin()],
   // vanilla-extract emits real CSS — surface it as loose CSS alongside JS
