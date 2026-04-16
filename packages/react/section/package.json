@@ -1,0 +1,9 @@
+{
+  "name": "@lumen/react/section",
+  "private": true,
+  "type": "module",
+  "main": "../dist/section.js",
+  "module": "../dist/section.js",
+  "types": "../dist/section.d.ts",
+  "sideEffects": ["*.css"]
+}

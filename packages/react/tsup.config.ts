@@ -1,6 +1,7 @@
 import { readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { createConfig } from '@lumen/config/tsup.config.base';
+import { vanillaExtractPlugin } from '@vanilla-extract/esbuild-plugin';
 
 const hookEntries = (): Record<string, string> => {
   const dir = join(process.cwd(), 'src/hooks');
@@ -14,6 +15,28 @@ const hookEntries = (): Record<string, string> => {
   return entries;
 };
 
+const layoutPrimitives = [
+  'Box',
+  'Stack',
+  'Inline',
+  'Flex',
+  'Grid',
+  'Center',
+  'Spacer',
+  'Divider',
+  'AspectRatio',
+  'Container',
+  'Section',
+] as const;
+
+const primitiveEntries = (): Record<string, string> => {
+  const entries: Record<string, string> = {};
+  for (const name of layoutPrimitives) {
+    entries[name.toLowerCase()] = `src/primitives/layout/${name}/index.ts`;
+  }
+  return entries;
+};
+
 export default createConfig({
   entry: {
     index: 'src/index.ts',
@@ -21,7 +44,11 @@ export default createConfig({
     'primitives/index': 'src/primitives/index.ts',
     'utils/index': 'src/utils/index.ts',
     ...hookEntries(),
+    ...primitiveEntries(),
   },
+  esbuildPlugins: [vanillaExtractPlugin()],
+  // vanilla-extract emits real CSS — surface it as loose CSS alongside JS
+  loader: { '.css': 'copy' },
   external: [
     'react',
     'react-dom',

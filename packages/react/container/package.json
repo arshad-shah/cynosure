@@ -1,0 +1,9 @@
+{
+  "name": "@lumen/react/container",
+  "private": true,
+  "type": "module",
+  "main": "../dist/container.js",
+  "module": "../dist/container.js",
+  "types": "../dist/container.d.ts",
+  "sideEffects": ["*.css"]
+}

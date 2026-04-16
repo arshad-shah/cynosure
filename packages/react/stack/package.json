@@ -1,0 +1,9 @@
+{
+  "name": "@lumen/react/stack",
+  "private": true,
+  "type": "module",
+  "main": "../dist/stack.js",
+  "module": "../dist/stack.js",
+  "types": "../dist/stack.d.ts",
+  "sideEffects": ["*.css"]
+}

@@ -21,7 +21,7 @@
   "scripts": {
     "validate": "node scripts/validate.mjs",
     "build:tokens": "node style-dictionary.config.mjs",
-    "build": "pnpm clean && pnpm validate && pnpm build:tokens && tsup",
+    "build": "pnpm validate && pnpm build:tokens && tsup",
     "dev": "pnpm build:tokens && tsup --watch",
     "typecheck": "tsc --noEmit",
     "clean": "rm -rf dist src/generated .turbo"
