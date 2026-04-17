@@ -1,0 +1,9 @@
+{
+  "name": "@lumen/react/dialog",
+  "private": true,
+  "type": "module",
+  "main": "../dist/dialog.js",
+  "module": "../dist/dialog.js",
+  "types": "../dist/dialog.d.ts",
+  "sideEffects": ["*.css"]
+}

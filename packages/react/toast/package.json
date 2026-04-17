@@ -1,0 +1,9 @@
+{
+  "name": "@lumen/react/toast",
+  "private": true,
+  "type": "module",
+  "main": "../dist/toast.js",
+  "module": "../dist/toast.js",
+  "types": "../dist/toast.d.ts",
+  "sideEffects": ["*.css"]
+}

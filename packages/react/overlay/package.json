@@ -1,0 +1,9 @@
+{
+  "name": "@lumen/react/overlay",
+  "private": true,
+  "type": "module",
+  "main": "../dist/overlay/index.js",
+  "module": "../dist/overlay/index.js",
+  "types": "../dist/overlay/index.d.ts",
+  "sideEffects": ["*.css"]
+}

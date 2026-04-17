@@ -1,0 +1,9 @@
+{
+  "name": "@lumen/react/hover-card",
+  "private": true,
+  "type": "module",
+  "main": "../dist/hovercard.js",
+  "module": "../dist/hovercard.js",
+  "types": "../dist/hovercard.d.ts",
+  "sideEffects": ["*.css"]
+}

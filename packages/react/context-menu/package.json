@@ -1,0 +1,9 @@
+{
+  "name": "@lumen/react/context-menu",
+  "private": true,
+  "type": "module",
+  "main": "../dist/contextmenu.js",
+  "module": "../dist/contextmenu.js",
+  "types": "../dist/contextmenu.d.ts",
+  "sideEffects": ["*.css"]
+}

@@ -1,0 +1,9 @@
+{
+  "name": "@lumen/react/modal",
+  "private": true,
+  "type": "module",
+  "main": "../dist/modal.js",
+  "module": "../dist/modal.js",
+  "types": "../dist/modal.d.ts",
+  "sideEffects": ["*.css"]
+}
