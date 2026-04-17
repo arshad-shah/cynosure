@@ -39,15 +39,15 @@ export const dividerDotted = style({
 });
 export const dividerVerticalDashed = style({
   background: 'transparent',
-  borderLeftWidth: 'var(--lumen-divider-thickness, 1px)',
-  borderLeftStyle: 'dashed',
-  borderLeftColor: 'currentColor',
+  borderInlineStartWidth: 'var(--lumen-divider-thickness, 1px)',
+  borderInlineStartStyle: 'dashed',
+  borderInlineStartColor: 'currentColor',
   width: 0,
 });
 export const dividerVerticalDotted = style({
   background: 'transparent',
-  borderLeftWidth: 'var(--lumen-divider-thickness, 1px)',
-  borderLeftStyle: 'dotted',
-  borderLeftColor: 'currentColor',
+  borderInlineStartWidth: 'var(--lumen-divider-thickness, 1px)',
+  borderInlineStartStyle: 'dotted',
+  borderInlineStartColor: 'currentColor',
   width: 0,
 });

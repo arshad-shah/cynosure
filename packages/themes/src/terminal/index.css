@@ -40,8 +40,10 @@
   --lumen-color-accent-ring: #388bfd;
   --lumen-color-accent-on-solid: #ffffff;
 
-  /* Feedback */
-  --lumen-color-feedback-success-solid: #3fb950;
+  /* Feedback — success-solid darkened from GitHub's #3fb950 to hit 3:1 with
+     white text (SC 1.4.11). The softer #3fb950 is kept for the foreground
+     on the soft surface below, where it pairs with the dark canvas. */
+  --lumen-color-feedback-success-solid: #2a8a38;
   --lumen-color-feedback-success-soft: rgba(63, 185, 80, 0.12);
   --lumen-color-feedback-success-foreground: #56d364;
   --lumen-color-feedback-success-border: rgba(63, 185, 80, 0.4);

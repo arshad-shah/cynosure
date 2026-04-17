@@ -20,5 +20,7 @@
   "dependencies": {
     "@lumen/tokens": "workspace:*"
   },
-  "publishConfig": { "access": "public" }
+  "publishConfig": {
+    "access": "public"
+  }
 }

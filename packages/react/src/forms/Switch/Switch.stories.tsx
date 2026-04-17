@@ -135,6 +135,34 @@ export const InsideFormField: Story = {
   },
 };
 
+export const Loading: Story = {
+  name: 'loading — blocks interaction, shows spinner',
+  render: () => {
+    function Demo(): React.ReactElement {
+      const [on, setOn] = useState(false);
+      const [pending, setPending] = useState(false);
+      const toggle = (next: boolean) => {
+        setPending(true);
+        setTimeout(() => {
+          setOn(next);
+          setPending(false);
+        }, 1200);
+      };
+      return (
+        <Stack gap="3" width="320px">
+          <Switch checked={on} onCheckedChange={toggle} loading={pending}>
+            Sync photos to cloud
+          </Switch>
+          <Text size="sm" color="fg.muted">
+            {pending ? 'Saving…' : on ? 'Enabled' : 'Disabled'}
+          </Text>
+        </Stack>
+      );
+    }
+    return <Demo />;
+  },
+};
+
 export const LongLabel: Story = {
   render: () => (
     <Stack gap="3" width="360px">

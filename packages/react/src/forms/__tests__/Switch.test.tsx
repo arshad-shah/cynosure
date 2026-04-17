@@ -36,4 +36,24 @@ describe('Switch', () => {
     render(<Switch>Enable notifications</Switch>);
     expect(screen.getByText('Enable notifications').closest('label')).not.toBeNull();
   });
+
+  it('blocks interaction and exposes aria-busy while loading', () => {
+    const handle = vi.fn();
+    render(
+      <Switch checked={false} onCheckedChange={handle} loading>
+        Syncing
+      </Switch>,
+    );
+    const control = screen.getByRole('switch');
+    expect(control).toHaveAttribute('aria-busy', 'true');
+    expect(control).toBeDisabled();
+    fireEvent.click(control);
+    expect(handle).not.toHaveBeenCalled();
+  });
+
+  it('flags the invalid state via data-invalid', () => {
+    render(<Switch invalid>Opt in</Switch>);
+    const control = screen.getByRole('switch');
+    expect(control).toHaveAttribute('data-invalid', 'true');
+  });
 });

@@ -143,6 +143,55 @@ export const Controlled: Story = {
   },
 };
 
+export const WithRenderValue: Story = {
+  name: 'renderValue — hover-aware trailing label',
+  render: () => (
+    <Stack gap="3">
+      <Rating
+        allowHalf
+        defaultValue={3.5}
+        label="Hover to preview"
+        renderValue={(v, m, preview) => (
+          <Text size="sm" color="fg.muted">
+            {(preview ?? v).toFixed(1)} / {m}
+          </Text>
+        )}
+      />
+      <Rating
+        defaultValue={4}
+        label="Descriptive"
+        renderValue={(v, _m, preview) => {
+          const shown = preview ?? v;
+          const labels = ['No rating', 'Needs work', 'Average', 'Good', 'Great', 'Excellent'];
+          return (
+            <Text size="sm" color="fg.muted">
+              {labels[Math.round(shown)]}
+            </Text>
+          );
+        }}
+      />
+    </Stack>
+  ),
+};
+
+export const ClearOnRepeatClick: Story = {
+  name: 'Click the current star again to clear',
+  render: () => {
+    function Demo(): React.ReactElement {
+      const [value, setValue] = useState<number>(3);
+      return (
+        <Stack gap="3">
+          <Rating value={value} onValueChange={setValue} label="Clear by clicking selected star" />
+          <Text size="sm" color="fg.muted">
+            Current: <strong>{value}</strong>
+          </Text>
+        </Stack>
+      );
+    }
+    return <Demo />;
+  },
+};
+
 export const Uncontrolled: Story = {
   render: () => <Rating defaultValue={4} label="Uncontrolled" />,
 };

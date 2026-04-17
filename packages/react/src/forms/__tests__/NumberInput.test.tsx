@@ -29,4 +29,10 @@ describe('NumberInput', () => {
     fireEvent.click(screen.getByLabelText('Increment'));
     expect(handle).not.toHaveBeenCalled();
   });
+
+  it('renders prefix and suffix inline', () => {
+    render(<NumberInput defaultValue={256} prefix="$" suffix="px" aria-label="Size" />);
+    expect(screen.getByText('$')).toBeInTheDocument();
+    expect(screen.getByText('px')).toBeInTheDocument();
+  });
 });

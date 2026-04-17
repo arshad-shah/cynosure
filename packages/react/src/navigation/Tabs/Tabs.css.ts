@@ -44,7 +44,7 @@ export const tabsListLine = style({
       borderBottom: `1px solid ${vars.color.border.subtle}`,
     },
     '&[data-orientation="vertical"]': {
-      borderRight: `1px solid ${vars.color.border.subtle}`,
+      borderInlineEnd: `1px solid ${vars.color.border.subtle}`,
     },
   },
 });

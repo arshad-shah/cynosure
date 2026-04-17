@@ -34,7 +34,7 @@ export const cell = style({
     '&[data-filled="true"]': {
       borderColor: vars.color.accent.solid,
       background: vars.color.accent.soft,
-      color: vars.color.accent.foreground,
+      color: vars.color.accent.solidHover,
     },
     '&[data-filled="true"]:focus': {
       background: vars.color.background.surface,

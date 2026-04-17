@@ -35,6 +35,9 @@ export interface CheckboxProps extends BooleanFormControlBase {
   colorScheme?: CheckboxColorScheme;
   children?: ReactNode;
   className?: string;
+  'aria-label'?: string;
+  'aria-labelledby'?: string;
+  'aria-describedby'?: string;
 }
 
 export const Checkbox = forwardRef<HTMLButtonElement, CheckboxProps>(function Checkbox(props, ref) {
@@ -56,6 +59,9 @@ export const Checkbox = forwardRef<HTMLButtonElement, CheckboxProps>(function Ch
     autoFocus,
     children,
     className,
+    'aria-label': ariaLabel,
+    'aria-labelledby': ariaLabelledBy,
+    'aria-describedby': ariaDescribedBy,
   } = props;
 
   const inGroup = group !== undefined && value !== undefined;
@@ -86,6 +92,9 @@ export const Checkbox = forwardRef<HTMLButtonElement, CheckboxProps>(function Ch
       id={id}
       value={value}
       autoFocus={autoFocus}
+      aria-label={ariaLabel}
+      aria-labelledby={ariaLabelledBy}
+      aria-describedby={ariaDescribedBy}
       data-invalid={invalid || undefined}
       data-disabled={disabled || undefined}
       className={cn(

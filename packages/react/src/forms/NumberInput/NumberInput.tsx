@@ -1,4 +1,5 @@
-import { type CSSProperties, forwardRef } from 'react';
+import { ChevronDown, ChevronUp } from 'lucide-react';
+import { type CSSProperties, type ReactNode, forwardRef } from 'react';
 import {
   Button as AriaButton,
   Group as AriaGroup,
@@ -9,7 +10,16 @@ import {
 import { cn } from '../../utils/cn.js';
 import { controlSize, controlWrapperBase, controlWrapperVariant } from '../shared/control.css.js';
 import type { FormControlSize, FormControlVariant } from '../shared/types.js';
-import { numberInputField, numberInputStepper, numberInputSteppers } from './NumberInput.css.js';
+import {
+  numberInputAffix,
+  numberInputField,
+  numberInputInput,
+  numberInputStepper,
+  numberInputStepperSize,
+  numberInputSteppers,
+  numberInputSteppersSize,
+  numberInputWrapper,
+} from './NumberInput.css.js';
 
 type BaseNumberFieldProps = Omit<NumberFieldProps, 'className' | 'style' | 'children'>;
 
@@ -19,12 +29,18 @@ export interface NumberInputOwnProps extends BaseNumberFieldProps {
   invalid?: boolean;
   className?: string;
   style?: CSSProperties;
+  /** Muted inline content before the value (e.g. `$`, `€`, `#`). */
+  prefix?: ReactNode;
+  /** Muted inline content after the value (e.g. `px`, `%`, `kg`). */
+  suffix?: ReactNode;
   /** Custom labels override the localized "Increment"/"Decrement" strings. */
   incrementLabel?: string;
   decrementLabel?: string;
 }
 
 export type NumberInputProps = NumberInputOwnProps;
+
+const ICON_SIZE: Record<FormControlSize, number> = { sm: 11, md: 12, lg: 14 };
 
 /**
  * Numeric input with stepper buttons. Delegates to React Aria's `NumberField`
@@ -40,6 +56,8 @@ export const NumberInput = forwardRef<HTMLDivElement, NumberInputProps>(
       invalid,
       className,
       style,
+      prefix,
+      suffix,
       incrementLabel,
       decrementLabel,
       isDisabled,
@@ -53,8 +71,12 @@ export const NumberInput = forwardRef<HTMLDivElement, NumberInputProps>(
       controlWrapperBase,
       controlWrapperVariant[variant],
       controlSize[size],
+      numberInputWrapper,
       className,
     );
+    const stepperClass = cn(numberInputStepper, numberInputStepperSize[size]);
+    const steppersClass = cn(numberInputSteppers, numberInputSteppersSize[size]);
+    const iconSize = ICON_SIZE[size];
 
     return (
       <NumberField
@@ -71,21 +93,33 @@ export const NumberInput = forwardRef<HTMLDivElement, NumberInputProps>(
           data-invalid={invalidFlag || undefined}
           style={style}
         >
-          <AriaInput className={numberInputField} />
-          <div className={numberInputSteppers} aria-hidden="true">
+          <div className={numberInputField}>
+            {prefix !== undefined && prefix !== null ? (
+              <span className={numberInputAffix} aria-hidden="true">
+                {prefix}
+              </span>
+            ) : null}
+            <AriaInput className={numberInputInput} />
+            {suffix !== undefined && suffix !== null ? (
+              <span className={numberInputAffix} aria-hidden="true">
+                {suffix}
+              </span>
+            ) : null}
+          </div>
+          <div className={steppersClass} aria-hidden="true">
             <AriaButton
               slot="increment"
               aria-label={incrementLabel ?? 'Increment'}
-              className={numberInputStepper}
+              className={stepperClass}
             >
-              ▲
+              <ChevronUp size={iconSize} strokeWidth={2.4} aria-hidden />
             </AriaButton>
             <AriaButton
               slot="decrement"
               aria-label={decrementLabel ?? 'Decrement'}
-              className={numberInputStepper}
+              className={stepperClass}
             >
-              ▼
+              <ChevronDown size={iconSize} strokeWidth={2.4} aria-hidden />
             </AriaButton>
           </div>
         </AriaGroup>

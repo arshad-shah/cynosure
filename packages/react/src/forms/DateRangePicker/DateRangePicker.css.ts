@@ -23,7 +23,7 @@ export const presetRail = style({
   width: '10rem',
   flexShrink: 0,
   padding: `${vars.space['3']} ${vars.space['2']}`,
-  borderRight: `1px solid ${vars.color.border.subtle}`,
+  borderInlineEnd: `1px solid ${vars.color.border.subtle}`,
   background: vars.color.background.subtle,
   display: 'flex',
   flexDirection: 'column',

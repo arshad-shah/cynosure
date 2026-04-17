@@ -1,14 +1,25 @@
 import * as RadixSwitch from '@radix-ui/react-switch';
+import { Check, Loader2 } from 'lucide-react';
 import { type ReactNode, forwardRef } from 'react';
 import { cn } from '../../utils/cn.js';
 import type { BooleanFormControlBase } from '../shared/types.js';
-import { switchLabel, switchRoot, switchSize, switchThumb } from './Switch.css.js';
+import {
+  switchLabel,
+  switchRoot,
+  switchSize,
+  switchThumb,
+  thumbCheck,
+  thumbCheckInvalid,
+  thumbLoader,
+} from './Switch.css.js';
 
 export interface SwitchProps extends BooleanFormControlBase {
   checked?: boolean;
   defaultChecked?: boolean;
   onCheckedChange?: (checked: boolean) => void;
   value?: string;
+  /** Renders a spinner inside the thumb and blocks interaction while awaiting async work. */
+  loading?: boolean;
   children?: ReactNode;
   className?: string;
 }
@@ -31,9 +42,14 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(function Switch
     id,
     value,
     autoFocus,
+    loading = false,
     children,
     className,
   } = props;
+
+  const showIcon = size !== 'sm';
+  const iconPx = size === 'lg' ? 14 : 12;
+  const effectiveDisabled = disabled || loading;
 
   const control = (
     <RadixSwitch.Root
@@ -41,16 +57,29 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(function Switch
       checked={checked}
       defaultChecked={defaultChecked}
       onCheckedChange={onCheckedChange}
-      disabled={disabled}
+      disabled={effectiveDisabled}
       required={required}
       name={name}
       id={id}
       value={value}
       autoFocus={autoFocus}
+      aria-busy={loading || undefined}
       data-invalid={invalid || undefined}
+      data-loading={loading || undefined}
       className={cn(switchRoot, switchSize[size], children ? undefined : className)}
     >
-      <RadixSwitch.Thumb className={switchThumb} />
+      <RadixSwitch.Thumb className={switchThumb}>
+        {loading ? (
+          <Loader2 className={thumbLoader} size={iconPx} aria-hidden="true" />
+        ) : showIcon ? (
+          <Check
+            className={cn(thumbCheck, invalid && thumbCheckInvalid)}
+            size={iconPx}
+            strokeWidth={3}
+            aria-hidden="true"
+          />
+        ) : null}
+      </RadixSwitch.Thumb>
     </RadixSwitch.Root>
   );
 

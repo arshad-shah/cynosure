@@ -58,7 +58,7 @@ export const surfaceClose = style({
   width: '1.5rem',
   height: '1.5rem',
   padding: 0,
-  marginLeft: 'auto',
+  marginInlineStart: 'auto',
   background: 'transparent',
   border: 'none',
   color: 'inherit',

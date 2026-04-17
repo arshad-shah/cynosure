@@ -9,6 +9,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   verify:
+    name: Verify (lint · typecheck · test · build · audits)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -18,11 +19,84 @@ jobs:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm lint
-      - run: pnpm typecheck
-      - run: pnpm test
-      - run: pnpm build
-      - run: pnpm exec publint packages/react --level warning
-      - run: pnpm exec publint packages/themes --level warning
-      - run: pnpm exec attw --pack packages/react --ignore-rules cjs-resolves-to-esm
-      - run: pnpm exec attw --pack packages/themes --ignore-rules cjs-resolves-to-esm
+
+      # --- Static checks ----------------------------------------------------
+      - name: Lint
+        run: pnpm lint
+      - name: Typecheck
+        run: pnpm typecheck
+      - name: RTL audit (no physical CSS properties)
+        run: pnpm audit:rtl
+
+      # --- Build ------------------------------------------------------------
+      - name: Build (packages)
+        run: pnpm build
+
+      # --- Tests ------------------------------------------------------------
+      - name: Unit tests
+        run: pnpm test
+      - name: Coverage thresholds
+        run: pnpm --filter @lumen/react test:coverage
+
+      # --- Runtime audits ---------------------------------------------------
+      - name: Contrast audit (WCAG AA for every theme)
+        run: pnpm audit:contrast
+      - name: Bundle-size budgets
+        run: pnpm size
+
+      # --- Package health ---------------------------------------------------
+      # tsup's onSuccess hook emits dist/styles.css; this is a belt-and-braces
+      # check in case a build cache was restored from before the hook landed.
+      - name: Ensure dist/styles.css exists
+        run: node scripts/ensure-styles-css.mjs
+      - name: publint @lumen/react
+        run: pnpm exec publint packages/react --level warning
+      - name: publint @lumen/themes
+        run: pnpm exec publint packages/themes --level warning
+      - name: attw @lumen/react
+        run: pnpm exec attw --pack packages/react --ignore-rules cjs-resolves-to-esm
+      - name: attw @lumen/themes
+        run: pnpm exec attw --pack packages/themes --ignore-rules cjs-resolves-to-esm
+
+  cross-browser:
+    name: Cross-browser (Chromium · Firefox · WebKit)
+    runs-on: ubuntu-latest
+    # Only run on PRs targeting main or on pushes to main — the Playwright
+    # install is heavy and pr-branch pushes get their feedback from `verify`.
+    if: ${{ github.event_name == 'pull_request' || github.ref == 'refs/heads/main' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      # Skip the whole chain when no `*.browser.test.*` files exist. Phase 14
+      # wires the matrix but no tests target real browsers yet; installing
+      # ~350 MB of Playwright browsers just to have vitest find zero tests
+      # wastes CI time and exposes the job to Playwright-install flakiness.
+      - name: Detect browser tests
+        id: detect
+        run: |
+          if find packages/react/src -type f \( -name '*.browser.test.ts' -o -name '*.browser.test.tsx' \) -print -quit | grep -q .; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "No *.browser.test.{ts,tsx} files found — skipping Playwright install + run."
+            echo "present=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Install dependencies
+        if: steps.detect.outputs.present == 'true'
+        run: pnpm install --frozen-lockfile
+      - name: Install Playwright browsers
+        if: steps.detect.outputs.present == 'true'
+        run: pnpm exec playwright install --with-deps chromium firefox webkit
+      - name: Build (packages)
+        if: steps.detect.outputs.present == 'true'
+        run: pnpm build
+      - name: Browser-mode tests
+        if: steps.detect.outputs.present == 'true'
+        env:
+          LUMEN_BROWSER_MODE: '1'
+        run: pnpm --filter @lumen/react test:browser

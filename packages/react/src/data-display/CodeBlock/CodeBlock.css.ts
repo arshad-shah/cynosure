@@ -82,9 +82,9 @@ export const codeBlockLine = style({
 export const codeBlockLineNumber = style({
   display: 'inline-block',
   width: '2.5ch',
-  marginRight: vars.space['3'],
+  marginInlineEnd: vars.space['3'],
   color: vars.color.foreground.subtle,
-  textAlign: 'right',
+  textAlign: 'end',
   userSelect: 'none',
   fontVariantNumeric: 'tabular-nums',
 });

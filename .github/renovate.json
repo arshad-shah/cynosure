@@ -1,0 +1,50 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended", ":prHourlyLimit2", ":prConcurrentLimit10"],
+  "schedule": ["before 6am on monday"],
+  "labels": ["dependencies"],
+  "rangeStrategy": "bump",
+  "dependencyDashboard": true,
+  "packageRules": [
+    {
+      "description": "Don't touch React peer versions automatically — consumers pin their own.",
+      "matchPackageNames": ["react", "react-dom", "@types/react", "@types/react-dom"],
+      "enabled": false
+    },
+    {
+      "description": "Group Radix UI primitives — they're versioned in lockstep.",
+      "matchPackagePatterns": ["^@radix-ui/"],
+      "groupName": "radix"
+    },
+    {
+      "description": "Group React Aria — locale + component packages ship together.",
+      "matchPackagePatterns": ["^react-aria", "^@react-aria/", "^@react-stately/"],
+      "groupName": "react-aria"
+    },
+    {
+      "description": "Group vanilla-extract — plugin + CSS + recipes move together.",
+      "matchPackagePatterns": ["^@vanilla-extract/"],
+      "groupName": "vanilla-extract"
+    },
+    {
+      "description": "Group Storybook — framework, addons and core release on the same day.",
+      "matchPackagePatterns": ["^@storybook/", "^storybook$"],
+      "groupName": "storybook"
+    },
+    {
+      "description": "Group Vitest — @vitest/* packages follow vitest's version.",
+      "matchPackagePatterns": ["^vitest$", "^@vitest/"],
+      "groupName": "vitest"
+    },
+    {
+      "description": "Group TanStack packages together.",
+      "matchPackagePatterns": ["^@tanstack/"],
+      "groupName": "tanstack"
+    },
+    {
+      "description": "Group Internationalized date packages.",
+      "matchPackagePatterns": ["^@internationalized/"],
+      "groupName": "internationalized"
+    }
+  ]
+}

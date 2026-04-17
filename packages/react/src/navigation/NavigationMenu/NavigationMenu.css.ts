@@ -144,8 +144,8 @@ export const navigationMenuIndicatorArrow = style({
   transform: 'rotate(45deg)',
   background: vars.color.background.surface,
   borderTop: `1px solid ${vars.color.border.default}`,
-  borderLeft: `1px solid ${vars.color.border.default}`,
-  borderTopLeftRadius: vars.radius.xs,
+  borderInlineStart: `1px solid ${vars.color.border.default}`,
+  borderStartStartRadius: vars.radius.xs,
 });
 
 export const navigationMenuViewport = style({

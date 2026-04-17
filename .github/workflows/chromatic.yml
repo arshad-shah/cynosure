@@ -1,0 +1,78 @@
+name: Chromatic
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+concurrency:
+  group: chromatic-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  chromatic:
+    name: Visual regression
+    runs-on: ubuntu-latest
+    # Forks can't read the CHROMATIC_TOKEN secret. Skip the job entirely
+    # instead of letting it fail the status check.
+    if: ${{ github.event.pull_request.head.repo.fork == false || github.event_name == 'push' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      # Short-circuit when the secret isn't configured on the repo yet.
+      # Every later step reads this output and no-ops if missing.
+      - name: Check for CHROMATIC_TOKEN
+        id: token
+        env:
+          CHROMATIC_TOKEN: ${{ secrets.CHROMATIC_TOKEN }}
+        run: |
+          if [ -z "${CHROMATIC_TOKEN:-}" ]; then
+            echo "CHROMATIC_TOKEN secret is not configured — skipping visual regression."
+            echo "present=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Install dependencies
+        if: steps.token.outputs.present == 'true'
+        run: pnpm install --frozen-lockfile
+      - name: Build packages
+        if: steps.token.outputs.present == 'true'
+        run: pnpm build
+      # Pre-build Storybook here rather than letting chromaui/action run it
+      # internally — the action's internal build spawns `npm run …` which
+      # doesn't play well with the pnpm workspace; pre-building and pointing
+      # the action at `storybook-static` side-steps that class of failure.
+      - name: Build Storybook
+        if: steps.token.outputs.present == 'true'
+        run: pnpm build-storybook
+      - name: Publish to Chromatic
+        if: steps.token.outputs.present == 'true'
+        # Non-blocking while the baseline is still being established.
+        # Once Chromatic has accepted a baseline on main, remove this
+        # line so the check starts gating merges on real regressions.
+        continue-on-error: true
+        uses: chromaui/action@v11
+        env:
+          # `chromaui/action` also reads CHROMATIC_PROJECT_TOKEN from the env;
+          # surface CHROMATIC_TOKEN under both names so the action picks it
+          # up regardless of which variable it checks first.
+          CHROMATIC_PROJECT_TOKEN: ${{ secrets.CHROMATIC_TOKEN }}
+        with:
+          projectToken: ${{ secrets.CHROMATIC_TOKEN }}
+          # Point at the pre-built Storybook output instead of re-running
+          # the build under the action's npm-first harness.
+          storybookBuildDir: storybook-static
+          # PRs: report visual diffs but don't block merge — reviewers follow
+          # the build link and accept/reject in the Chromatic UI. Main-branch
+          # builds auto-accept so the baseline always matches what shipped.
+          exitZeroOnChanges: ${{ github.event_name == 'pull_request' }}
+          autoAcceptChanges: main
+          onlyChanged: true
