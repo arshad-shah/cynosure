@@ -1,4 +1,8 @@
-// Placeholder for Phase 14 — Storybook × Vitest integration setup.
-// When @storybook/addon-vitest is wired up, this file will register the addon's
-// beforeAll hook and any shared test setup.
-export {};
+import * as a11yAddonAnnotations from '@storybook/addon-a11y/preview';
+import { setProjectAnnotations } from '@storybook/react-vite';
+import { beforeAll } from 'vitest';
+import * as previewAnnotations from './preview';
+
+const annotations = setProjectAnnotations([a11yAddonAnnotations, previewAnnotations]);
+
+beforeAll(annotations.beforeAll);

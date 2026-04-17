@@ -14,7 +14,7 @@ const stripedMove = keyframes({
 export const progressRoot = style({
   display: 'flex',
   alignItems: 'center',
-  gap: vars.space['2'],
+  gap: vars.space['3'],
   width: '100%',
 });
 
@@ -24,6 +24,7 @@ export const progressTrack = style({
   overflow: 'hidden',
   background: vars.color.background.muted,
   borderRadius: vars.radius.full,
+  boxShadow: `inset 0 1px 2px color-mix(in oklab, ${vars.color.foreground.default} 8%, transparent)`,
 });
 
 export const progressTrackSize = styleVariants({
@@ -37,8 +38,9 @@ export const progressIndicator = style({
   height: '100%',
   width: '100%',
   borderRadius: vars.radius.full,
-  transition: `transform ${vars.duration.normal} ease`,
+  transition: `transform ${vars.duration.slow} cubic-bezier(0.2, 0.8, 0.2, 1)`,
   transformOrigin: 'left',
+  boxShadow: 'inset 0 -1px 0 color-mix(in oklab, currentColor 18%, transparent)',
   selectors: {
     '[dir="rtl"] &': {
       transformOrigin: 'right',
@@ -59,7 +61,7 @@ export const progressColorNeutral = style({ background: vars.color.foreground.mu
 
 export const progressStriped = style({
   backgroundImage:
-    'linear-gradient(45deg, rgba(255,255,255,0.18) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.18) 50%, rgba(255,255,255,0.18) 75%, transparent 75%, transparent)',
+    'linear-gradient(45deg, rgba(255,255,255,0.28) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.28) 50%, rgba(255,255,255,0.28) 75%, transparent 75%, transparent)',
   backgroundSize: '1rem 1rem',
 });
 
@@ -77,13 +79,14 @@ export const progressStripedAnimated = style({
 
 export const progressIndeterminateIndicator = style({
   position: 'absolute',
-  inset: 0,
+  insetBlockStart: 0,
+  insetBlockEnd: 0,
   width: '40%',
   borderRadius: vars.radius.full,
   animationName: indeterminateSlide,
   animationDuration: '1.4s',
   animationIterationCount: 'infinite',
-  animationTimingFunction: 'ease-in-out',
+  animationTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)',
   '@media': {
     '(prefers-reduced-motion: reduce)': {
       animation: 'none',
@@ -95,10 +98,12 @@ export const progressIndeterminateIndicator = style({
 
 export const progressValueLabel = style({
   fontSize: 'var(--lumen-font-body-sm-size)',
-  color: vars.color.foreground.muted,
+  fontWeight: 600,
+  color: vars.color.foreground.default,
   fontVariantNumeric: 'tabular-nums',
-  minWidth: '3ch',
-  textAlign: 'right',
+  minWidth: '3.5ch',
+  textAlign: 'end',
+  flexShrink: 0,
 });
 
 /* ProgressCircle */
@@ -131,7 +136,7 @@ export const circleTrack = style({
 export const circleProgress = style({
   fill: 'none',
   strokeLinecap: 'round',
-  transition: `stroke-dashoffset ${vars.duration.normal} ease`,
+  transition: `stroke-dashoffset ${vars.duration.slow} cubic-bezier(0.2, 0.8, 0.2, 1)`,
   '@media': {
     '(prefers-reduced-motion: reduce)': {
       transition: 'none',
@@ -140,14 +145,16 @@ export const circleProgress = style({
 });
 
 const indeterminateRotate = keyframes({
+  from: { transform: 'rotate(-90deg)' },
   to: { transform: 'rotate(270deg)' },
 });
 
 export const circleSvgIndeterminate = style({
   animationName: indeterminateRotate,
-  animationDuration: '1.4s',
+  animationDuration: '1s',
   animationIterationCount: 'infinite',
   animationTimingFunction: 'linear',
+  transformOrigin: 'center',
   '@media': {
     '(prefers-reduced-motion: reduce)': {
       animation: 'none',
@@ -162,4 +169,8 @@ export const circleContent = style({
   alignItems: 'center',
   justifyContent: 'center',
   lineHeight: 1,
+  fontWeight: 600,
+  fontSize: 'var(--lumen-font-body-sm-size)',
+  fontVariantNumeric: 'tabular-nums',
+  color: vars.color.foreground.default,
 });

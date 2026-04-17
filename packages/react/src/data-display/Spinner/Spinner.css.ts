@@ -6,7 +6,7 @@ const spin = keyframes({
 });
 
 const dotPulse = keyframes({
-  '0%, 80%, 100%': { transform: 'scale(0)', opacity: 0.3 },
+  '0%, 80%, 100%': { transform: 'scale(0.3)', opacity: 0.3 },
   '40%': { transform: 'scale(1)', opacity: 1 },
 });
 
@@ -30,15 +30,13 @@ export const spinnerColorAccent = style({ color: vars.color.accent.solid });
 export const spinnerColorNeutral = style({ color: vars.color.foreground.muted });
 export const spinnerColorCurrent = style({ color: 'currentColor' });
 
-export const spinnerBorder = style({
+export const spinnerLucide = style({
   width: '100%',
   height: '100%',
-  borderRadius: '50%',
-  border: '2px solid currentColor',
-  borderTopColor: 'transparent',
   animationName: spin,
   animationIterationCount: 'infinite',
   animationTimingFunction: 'linear',
+  transformOrigin: 'center',
   '@media': {
     '(prefers-reduced-motion: reduce)': {
       animation: 'none',
@@ -47,38 +45,9 @@ export const spinnerBorder = style({
   },
 });
 
-export const spinnerRing = style({
-  width: '100%',
-  height: '100%',
-});
-
-export const spinnerRingCircleTrack = style({
-  fill: 'none',
-  stroke: 'currentColor',
-  strokeWidth: 2,
-  opacity: 0.2,
-});
-
-export const spinnerRingCircleProgress = style({
-  fill: 'none',
-  stroke: 'currentColor',
-  strokeWidth: 2,
-  strokeLinecap: 'round',
-  strokeDasharray: '60 120',
-  transformOrigin: 'center',
-  animationName: spin,
-  animationIterationCount: 'infinite',
-  animationTimingFunction: 'linear',
-  '@media': {
-    '(prefers-reduced-motion: reduce)': {
-      animation: 'none',
-    },
-  },
-});
-
 export const spinnerDots = style({
   display: 'inline-flex',
-  gap: '20%',
+  gap: '15%',
   width: '100%',
   height: '100%',
   alignItems: 'center',
@@ -86,8 +55,8 @@ export const spinnerDots = style({
 });
 
 export const spinnerDot = style({
-  width: '25%',
-  height: '25%',
+  width: '22%',
+  height: '22%',
   borderRadius: '50%',
   background: 'currentColor',
   animationName: dotPulse,

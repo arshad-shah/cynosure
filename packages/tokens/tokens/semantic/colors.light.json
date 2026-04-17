@@ -39,25 +39,29 @@
         "solid": { "$type": "color", "$value": "{color.green.600}" },
         "soft": { "$type": "color", "$value": "{color.green.50}" },
         "foreground": { "$type": "color", "$value": "{color.green.700}" },
-        "border": { "$type": "color", "$value": "{color.green.200}" }
+        "border": { "$type": "color", "$value": "{color.green.200}" },
+        "onSolid": { "$type": "color", "$value": "#ffffff" }
       },
       "danger": {
         "solid": { "$type": "color", "$value": "{color.red.600}" },
         "soft": { "$type": "color", "$value": "{color.red.50}" },
         "foreground": { "$type": "color", "$value": "{color.red.700}" },
-        "border": { "$type": "color", "$value": "{color.red.200}" }
+        "border": { "$type": "color", "$value": "{color.red.200}" },
+        "onSolid": { "$type": "color", "$value": "#ffffff" }
       },
       "warning": {
         "solid": { "$type": "color", "$value": "{color.amber.500}" },
         "soft": { "$type": "color", "$value": "{color.amber.50}" },
         "foreground": { "$type": "color", "$value": "{color.amber.700}" },
-        "border": { "$type": "color", "$value": "{color.amber.200}" }
+        "border": { "$type": "color", "$value": "{color.amber.200}" },
+        "onSolid": { "$type": "color", "$value": "#ffffff" }
       },
       "info": {
         "solid": { "$type": "color", "$value": "{color.blue.600}" },
         "soft": { "$type": "color", "$value": "{color.blue.50}" },
         "foreground": { "$type": "color", "$value": "{color.blue.700}" },
-        "border": { "$type": "color", "$value": "{color.blue.200}" }
+        "border": { "$type": "color", "$value": "{color.blue.200}" },
+        "onSolid": { "$type": "color", "$value": "#ffffff" }
       }
     }
   }
