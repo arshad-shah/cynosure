@@ -146,6 +146,62 @@
       "types": "./dist/fieldset.d.ts",
       "import": "./dist/fieldset.js"
     },
+    "./select": {
+      "types": "./dist/select.d.ts",
+      "import": "./dist/select.js"
+    },
+    "./combobox": {
+      "types": "./dist/combobox.d.ts",
+      "import": "./dist/combobox.js"
+    },
+    "./multi-select": {
+      "types": "./dist/multiselect.d.ts",
+      "import": "./dist/multiselect.js"
+    },
+    "./slider": {
+      "types": "./dist/slider.d.ts",
+      "import": "./dist/slider.js"
+    },
+    "./range-slider": {
+      "types": "./dist/rangeslider.d.ts",
+      "import": "./dist/rangeslider.js"
+    },
+    "./date-picker": {
+      "types": "./dist/datepicker.d.ts",
+      "import": "./dist/datepicker.js"
+    },
+    "./date-range-picker": {
+      "types": "./dist/daterangepicker.d.ts",
+      "import": "./dist/daterangepicker.js"
+    },
+    "./time-picker": {
+      "types": "./dist/timepicker.d.ts",
+      "import": "./dist/timepicker.js"
+    },
+    "./color-picker": {
+      "types": "./dist/colorpicker.d.ts",
+      "import": "./dist/colorpicker.js"
+    },
+    "./file-upload": {
+      "types": "./dist/fileupload.d.ts",
+      "import": "./dist/fileupload.js"
+    },
+    "./search-input": {
+      "types": "./dist/searchinput.d.ts",
+      "import": "./dist/searchinput.js"
+    },
+    "./pin-input": {
+      "types": "./dist/pininput.d.ts",
+      "import": "./dist/pininput.js"
+    },
+    "./tags-input": {
+      "types": "./dist/tagsinput.d.ts",
+      "import": "./dist/tagsinput.js"
+    },
+    "./rating": {
+      "types": "./dist/rating.d.ts",
+      "import": "./dist/rating.js"
+    },
     "./forms": {
       "types": "./dist/forms/index.d.ts",
       "import": "./dist/forms/index.js"
@@ -191,6 +247,20 @@
     "helper-text",
     "error-text",
     "fieldset",
+    "select",
+    "combobox",
+    "multi-select",
+    "slider",
+    "range-slider",
+    "date-picker",
+    "date-range-picker",
+    "time-picker",
+    "color-picker",
+    "file-upload",
+    "search-input",
+    "pin-input",
+    "tags-input",
+    "rating",
     "forms",
     "README.md",
     "CHANGELOG.md"
@@ -208,6 +278,7 @@
     "react-dom": ">=19.0.0"
   },
   "dependencies": {
+    "@internationalized/date": "^3.12.1",
     "@lumen/core": "workspace:*",
     "@lumen/tokens": "workspace:*",
     "@radix-ui/react-checkbox": "^1.3.3",

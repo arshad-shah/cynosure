@@ -8,9 +8,11 @@ export * from './utils/index.js';
 
 export {
   DirectionProvider,
+  LocaleProvider,
   ThemeProvider,
   getThemeInitScript,
   useColorScheme,
+  useLocale,
   useTheme,
 } from './theme/index.js';
 export type {
@@ -19,6 +21,7 @@ export type {
   Direction,
   DirectionContextValue,
   DirectionProviderProps,
+  LocaleProviderProps,
   ResponsiveValue,
   StorageAdapter,
   ThemeContextValue,

@@ -1,5 +1,7 @@
 export { ThemeProvider } from './ThemeProvider.js';
 export { DirectionProvider } from './DirectionProvider.js';
+export { LocaleProvider, useLocale } from './LocaleProvider.js';
+export type { LocaleProviderProps } from './LocaleProvider.js';
 export { getThemeInitScript } from './getThemeInitScript.js';
 export type { ThemeInitScriptOptions } from './getThemeInitScript.js';
 export { useTheme } from './hooks/useTheme.js';

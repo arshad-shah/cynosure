@@ -1,0 +1,9 @@
+{
+  "name": "@lumen/react/pin-input",
+  "private": true,
+  "type": "module",
+  "main": "../dist/pininput.js",
+  "module": "../dist/pininput.js",
+  "types": "../dist/pininput.d.ts",
+  "sideEffects": ["*.css"]
+}

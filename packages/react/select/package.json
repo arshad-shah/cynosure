@@ -1,0 +1,9 @@
+{
+  "name": "@lumen/react/select",
+  "private": true,
+  "type": "module",
+  "main": "../dist/select.js",
+  "module": "../dist/select.js",
+  "types": "../dist/select.d.ts",
+  "sideEffects": ["*.css"]
+}

@@ -1,0 +1,9 @@
+{
+  "name": "@lumen/react/rating",
+  "private": true,
+  "type": "module",
+  "main": "../dist/rating.js",
+  "module": "../dist/rating.js",
+  "types": "../dist/rating.d.ts",
+  "sideEffects": ["*.css"]
+}

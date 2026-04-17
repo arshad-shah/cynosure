@@ -1,0 +1,94 @@
+import { style, styleVariants } from '@vanilla-extract/css';
+import { vars } from '../../styles/vars.css.js';
+
+export const root = style({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: vars.space['2'],
+  width: '100%',
+});
+
+export const headerRow = style({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  gap: vars.space['2'],
+});
+
+export const valueLabel = style({
+  fontSize: 'var(--lumen-font-body-sm-size)',
+  color: vars.color.foreground.muted,
+  fontVariantNumeric: 'tabular-nums',
+});
+
+export const track = style({
+  position: 'relative',
+  width: '100%',
+  background: vars.color.background.muted,
+  borderRadius: vars.radius.full,
+  selectors: {
+    '&[data-disabled]': {
+      opacity: 0.5,
+    },
+  },
+});
+
+export const trackSize = styleVariants({
+  sm: { height: '4px' },
+  md: { height: '6px' },
+  lg: { height: '8px' },
+});
+
+export const fill = style({
+  position: 'absolute',
+  height: '100%',
+  background: vars.color.accent.solid,
+  borderRadius: vars.radius.full,
+});
+
+export const thumb = style({
+  width: '1rem',
+  height: '1rem',
+  borderRadius: vars.radius.full,
+  background: vars.color.accent.solid,
+  border: `2px solid ${vars.color.background.surface}`,
+  boxShadow: vars.shadow.sm,
+  outline: 'none',
+  cursor: 'grab',
+  selectors: {
+    '&[data-dragging]': {
+      cursor: 'grabbing',
+    },
+    '&[data-focus-visible]': {
+      boxShadow: `0 0 0 4px ${vars.color.accent.ring}`,
+    },
+    '&[data-disabled]': {
+      cursor: 'not-allowed',
+    },
+  },
+});
+
+export const marksRow = style({
+  position: 'relative',
+  width: '100%',
+  height: '0.75rem',
+});
+
+export const markDot = style({
+  position: 'absolute',
+  top: 0,
+  transform: 'translateX(-50%)',
+  width: '3px',
+  height: '3px',
+  borderRadius: vars.radius.full,
+  background: vars.color.border.strong,
+});
+
+export const markLabel = style({
+  position: 'absolute',
+  top: '0.5rem',
+  transform: 'translateX(-50%)',
+  fontSize: 'var(--lumen-font-body-sm-size)',
+  color: vars.color.foreground.muted,
+  whiteSpace: 'nowrap',
+});

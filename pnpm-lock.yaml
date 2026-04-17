@@ -196,6 +196,9 @@ importers:
 
   packages/react:
     dependencies:
+      '@internationalized/date':
+        specifier: ^3.12.1
+        version: 3.12.1
       '@lumen/core':
         specifier: workspace:*
         version: link:../core

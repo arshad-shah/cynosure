@@ -71,6 +71,20 @@ const formsComponents = [
   'HelperText',
   'ErrorText',
   'Fieldset',
+  'Select',
+  'Combobox',
+  'MultiSelect',
+  'Slider',
+  'RangeSlider',
+  'DatePicker',
+  'DateRangePicker',
+  'TimePicker',
+  'ColorPicker',
+  'FileUpload',
+  'SearchInput',
+  'PinInput',
+  'TagsInput',
+  'Rating',
 ] as const;
 
 const formsEntries = (): Record<string, string> => {
@@ -108,5 +122,6 @@ export default createConfig({
     '@radix-ui/react-switch',
     'class-variance-authority',
     'react-aria-components',
+    '@internationalized/date',
   ],
 });
