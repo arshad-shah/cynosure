@@ -1,0 +1,9 @@
+{
+  "name": "@lumen/react/breadcrumb",
+  "private": true,
+  "type": "module",
+  "main": "../dist/breadcrumb.js",
+  "module": "../dist/breadcrumb.js",
+  "types": "../dist/breadcrumb.d.ts",
+  "sideEffects": ["*.css"]
+}

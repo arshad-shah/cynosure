@@ -117,6 +117,26 @@ const overlayEntries = (): Record<string, string> => {
   return entries;
 };
 
+const navigationComponents = [
+  'Tabs',
+  'Breadcrumb',
+  'Pagination',
+  'Menu',
+  'NavigationMenu',
+  'Sidebar',
+  'Stepper',
+  'Anchor',
+  'BackToTop',
+] as const;
+
+const navigationEntries = (): Record<string, string> => {
+  const entries: Record<string, string> = {};
+  for (const name of navigationComponents) {
+    entries[name.toLowerCase()] = `src/navigation/${name}/index.ts`;
+  }
+  return entries;
+};
+
 export default createConfig({
   entry: {
     index: 'src/index.ts',
@@ -125,12 +145,14 @@ export default createConfig({
     'typography/index': 'src/typography/index.ts',
     'forms/index': 'src/forms/index.ts',
     'overlay/index': 'src/overlay/index.ts',
+    'navigation/index': 'src/navigation/index.ts',
     'utils/index': 'src/utils/index.ts',
     ...hookEntries(),
     ...primitiveEntries(),
     ...typographyEntries(),
     ...formsEntries(),
     ...overlayEntries(),
+    ...navigationEntries(),
   },
   esbuildPlugins: [vanillaExtractPlugin()],
   // vanilla-extract emits real CSS — surface it as loose CSS alongside JS
@@ -147,9 +169,11 @@ export default createConfig({
     '@radix-ui/react-dropdown-menu',
     '@radix-ui/react-hover-card',
     '@radix-ui/react-menubar',
+    '@radix-ui/react-navigation-menu',
     '@radix-ui/react-popover',
     '@radix-ui/react-radio-group',
     '@radix-ui/react-slot',
+    '@radix-ui/react-tabs',
     '@radix-ui/react-switch',
     '@radix-ui/react-tooltip',
     'class-variance-authority',

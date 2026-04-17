@@ -1,0 +1,9 @@
+{
+  "name": "@lumen/react/sidebar",
+  "private": true,
+  "type": "module",
+  "main": "../dist/sidebar.js",
+  "module": "../dist/sidebar.js",
+  "types": "../dist/sidebar.d.ts",
+  "sideEffects": ["*.css"]
+}

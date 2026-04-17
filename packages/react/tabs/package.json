@@ -1,0 +1,9 @@
+{
+  "name": "@lumen/react/tabs",
+  "private": true,
+  "type": "module",
+  "main": "../dist/tabs.js",
+  "module": "../dist/tabs.js",
+  "types": "../dist/tabs.d.ts",
+  "sideEffects": ["*.css"]
+}
