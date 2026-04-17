@@ -45,6 +45,10 @@ jobs:
         run: pnpm size
 
       # --- Package health ---------------------------------------------------
+      # tsup's onSuccess hook emits dist/styles.css; this is a belt-and-braces
+      # check in case a build cache was restored from before the hook landed.
+      - name: Ensure dist/styles.css exists
+        run: node scripts/ensure-styles-css.mjs
       - name: publint @lumen/react
         run: pnpm exec publint packages/react --level warning
       - name: publint @lumen/themes
