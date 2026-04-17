@@ -28,11 +28,13 @@
   },
   "devDependencies": {
     "@lumen/config": "workspace:*",
-    "ajv": "^8.17.0",
-    "glob": "^11.0.0",
-    "style-dictionary": "^4.3.0",
-    "tsup": "^8.3.0",
-    "typescript": "^5.6.0"
+    "ajv": "catalog:",
+    "glob": "catalog:",
+    "style-dictionary": "catalog:",
+    "tsup": "catalog:",
+    "typescript": "catalog:"
   },
-  "publishConfig": { "access": "public" }
+  "publishConfig": {
+    "access": "public"
+  }
 }
