@@ -20,6 +20,7 @@ import {
   useMemo,
   useState,
 } from 'react';
+import { Checkbox } from '../../forms/Checkbox/Checkbox.js';
 import { Pagination } from '../../navigation/Pagination/Pagination.js';
 import { cn } from '../../utils/cn.js';
 import { Skeleton } from '../Skeleton/Skeleton.js';
@@ -105,14 +106,11 @@ const RowCheckbox = ({
   onChange: (next: boolean) => void;
   label: string;
 }): ReactElement => (
-  <input
-    type="checkbox"
+  <Checkbox
     aria-label={label}
-    checked={checked}
-    ref={(el) => {
-      if (el) el.indeterminate = !!indeterminate && !checked;
-    }}
-    onChange={(e) => onChange(e.target.checked)}
+    size="sm"
+    checked={indeterminate && !checked ? 'indeterminate' : checked}
+    onCheckedChange={(next) => onChange(next === true)}
   />
 );
 
@@ -218,6 +216,7 @@ function DataTableInner<TData>(
   // `rowSelection` is the trigger here — biome's exhaustive-deps rule thinks
   // it's redundant because `table` closes over it, but `table` is a stable ref
   // and only the selection map mutation actually warrants re-firing the callback.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: rowSelection is the intentional trigger; `table` is a stable ref and listing it alone would not re-fire on selection map mutation.
   useEffect(() => {
     if (!selectable || !onSelectionChange) return;
     const selectedRows = table.getSelectedRowModel().rows.map((r) => r.original);

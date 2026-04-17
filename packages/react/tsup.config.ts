@@ -226,8 +226,21 @@ export default createConfig({
     ...feedbackEntries(),
   },
   esbuildPlugins: [vanillaExtractPlugin()],
-  // vanilla-extract emits real CSS — surface it as loose CSS alongside JS
   loader: { '.css': 'copy' },
+  async onSuccess() {
+    const { readdir, readFile, writeFile } = await import('node:fs/promises');
+    const { join } = await import('node:path');
+    const dist = join(process.cwd(), 'dist');
+    const files = (await readdir(dist))
+      .filter((f) => f.endsWith('.css') && f !== 'styles.css')
+      .sort();
+    const chunks: string[] = [];
+    for (const file of files) {
+      chunks.push(`/* ${file} */`);
+      chunks.push(await readFile(join(dist, file), 'utf8'));
+    }
+    await writeFile(join(dist, 'styles.css'), chunks.join('\n'));
+  },
   external: [
     'react',
     'react-dom',

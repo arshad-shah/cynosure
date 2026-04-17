@@ -12,12 +12,15 @@ const meta: Meta<typeof Toaster> = {
   component: Toaster,
   parameters: { layout: 'centered' },
   decorators: [
-    (Story) => (
-      <>
+    (Story, ctx) =>
+      ctx.parameters.disableDefaultToaster ? (
         <Story />
-        <Toaster />
-      </>
-    ),
+      ) : (
+        <>
+          <Story />
+          <Toaster />
+        </>
+      ),
   ],
 };
 export default meta;
@@ -170,6 +173,7 @@ export const PromiseBased: Story = {
 
 export const Positions: Story = {
   name: 'Position — per-story Toaster',
+  parameters: { disableDefaultToaster: true },
   render: () => {
     function Positions(): React.ReactElement {
       const [position, setPosition] = useState<ToasterPosition>('bottom-right');
