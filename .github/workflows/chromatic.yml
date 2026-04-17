@@ -13,8 +13,8 @@ jobs:
   chromatic:
     name: Visual regression
     runs-on: ubuntu-latest
-    # Skip when the fork doesn't have access to the CHROMATIC_PROJECT_TOKEN
-    # secret; the job stays visible but the step is a no-op for external PRs.
+    # Forks can't read the CHROMATIC_TOKEN secret. Skip the job entirely
+    # instead of letting it fail the status check.
     if: ${{ github.event.pull_request.head.repo.fork == false || github.event_name == 'push' }}
     steps:
       - uses: actions/checkout@v4
@@ -25,12 +25,37 @@ jobs:
         with:
           node-version: 22
           cache: pnpm
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm build
+
+      # Short-circuit when the secret isn't configured on the repo yet.
+      # Every later step reads this output and no-ops if missing.
+      - name: Check for CHROMATIC_TOKEN
+        id: token
+        env:
+          CHROMATIC_TOKEN: ${{ secrets.CHROMATIC_TOKEN }}
+        run: |
+          if [ -z "${CHROMATIC_TOKEN:-}" ]; then
+            echo "CHROMATIC_TOKEN secret is not configured — skipping visual regression."
+            echo "present=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Install dependencies
+        if: steps.token.outputs.present == 'true'
+        run: pnpm install --frozen-lockfile
+      - name: Build packages
+        if: steps.token.outputs.present == 'true'
+        run: pnpm build
       - name: Publish to Chromatic
+        if: steps.token.outputs.present == 'true'
         uses: chromaui/action@v11
+        env:
+          # `chromaui/action` also reads CHROMATIC_PROJECT_TOKEN from the env;
+          # surface CHROMATIC_TOKEN under both names so the action picks it
+          # up regardless of which variable it checks first.
+          CHROMATIC_PROJECT_TOKEN: ${{ secrets.CHROMATIC_TOKEN }}
         with:
-          projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+          projectToken: ${{ secrets.CHROMATIC_TOKEN }}
           exitZeroOnChanges: false
           onlyChanged: true
           buildScriptName: build-storybook

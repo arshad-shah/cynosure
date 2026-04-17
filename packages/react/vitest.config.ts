@@ -9,9 +9,10 @@ import { defineConfig } from 'vitest/config';
  * CI       : all three engines — parity check per PR.
  *
  * Toggle by setting `LUMEN_BROWSER_MODE=1` (CI) or leaving it unset (local).
- * Even when browser mode is enabled the jsdom-only suites in `__tests__`
- * still run under the default environment; only tests in `*.browser.test.*`
- * opt in via the `@browser` filter on the project side.
+ * Browser mode only picks up files matching `*.browser.test.{ts,tsx}` — the
+ * bulk of the suite continues to run under jsdom (faster feedback, no need
+ * to re-derive every polyfill). As real-browser coverage expands, new tests
+ * land under the `.browser.test.*` suffix and get the full engine matrix.
  */
 const ciBrowsers = process.env.CI ? ['chromium', 'firefox', 'webkit'] : ['chromium'];
 const browserMode = process.env.LUMEN_BROWSER_MODE === '1';
@@ -23,7 +24,8 @@ export default defineConfig({
     globals: false,
     setupFiles: ['./src/test/setup.ts'],
     passWithNoTests: true,
-    include: ['src/**/*.{test,spec}.{ts,tsx}'],
+    include: browserMode ? ['src/**/*.browser.test.{ts,tsx}'] : ['src/**/*.{test,spec}.{ts,tsx}'],
+    exclude: browserMode ? [] : ['src/**/*.browser.test.{ts,tsx}'],
     ...(browserMode
       ? {
           browser: {

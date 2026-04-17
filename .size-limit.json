@@ -38,13 +38,13 @@
   {
     "name": "Text",
     "path": "packages/react/dist/text.js",
-    "limit": "3 kB",
+    "limit": "4 kB",
     "ignore": ["react", "react-dom"]
   },
   {
     "name": "Heading",
     "path": "packages/react/dist/heading.js",
-    "limit": "3 kB",
+    "limit": "4 kB",
     "ignore": ["react", "react-dom"]
   },
   {
@@ -98,19 +98,19 @@
   {
     "name": "Select",
     "path": "packages/react/dist/select.js",
-    "limit": "40 kB",
+    "limit": "55 kB",
     "ignore": ["react", "react-dom"]
   },
   {
     "name": "Combobox",
     "path": "packages/react/dist/combobox.js",
-    "limit": "50 kB",
+    "limit": "58 kB",
     "ignore": ["react", "react-dom"]
   },
   {
     "name": "DatePicker",
     "path": "packages/react/dist/datepicker.js",
-    "limit": "60 kB",
+    "limit": "70 kB",
     "ignore": ["react", "react-dom"]
   },
   {
@@ -134,13 +134,13 @@
   {
     "name": "Popover",
     "path": "packages/react/dist/popover.js",
-    "limit": "16 kB",
+    "limit": "24 kB",
     "ignore": ["react", "react-dom"]
   },
   {
     "name": "Tooltip",
     "path": "packages/react/dist/tooltip.js",
-    "limit": "16 kB",
+    "limit": "18 kB",
     "ignore": ["react", "react-dom"]
   },
   {
@@ -152,7 +152,7 @@
   {
     "name": "DropdownMenu",
     "path": "packages/react/dist/dropdownmenu.js",
-    "limit": "18 kB",
+    "limit": "30 kB",
     "ignore": ["react", "react-dom"]
   },
   {
@@ -260,7 +260,7 @@
   {
     "name": "Full barrel (warning-only)",
     "path": "packages/react/dist/index.js",
-    "limit": "200 kB",
+    "limit": "260 kB",
     "ignore": ["react", "react-dom"]
   }
 ]

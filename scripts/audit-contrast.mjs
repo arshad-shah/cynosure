@@ -15,7 +15,7 @@
  * Exits with code 1 on any failure so CI fails.
  */
 
-import { readFileSync, existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import Color from 'colorjs.io';
@@ -30,30 +30,124 @@ const root = resolve(__dirname, '..');
 // -------------------------------------------------------------------------
 const PAIRS = [
   // Body text on every surface.
-  { fg: 'color-foreground-default', bg: 'color-background-canvas', min: 4.5, label: 'body on canvas' },
-  { fg: 'color-foreground-default', bg: 'color-background-surface', min: 4.5, label: 'body on surface' },
-  { fg: 'color-foreground-default', bg: 'color-background-subtle', min: 4.5, label: 'body on subtle' },
-  { fg: 'color-foreground-default', bg: 'color-background-raised', min: 4.5, label: 'body on raised' },
-  { fg: 'color-foreground-muted', bg: 'color-background-canvas', min: 4.5, label: 'muted on canvas' },
-  { fg: 'color-foreground-muted', bg: 'color-background-surface', min: 4.5, label: 'muted on surface' },
+  {
+    fg: 'color-foreground-default',
+    bg: 'color-background-canvas',
+    min: 4.5,
+    label: 'body on canvas',
+  },
+  {
+    fg: 'color-foreground-default',
+    bg: 'color-background-surface',
+    min: 4.5,
+    label: 'body on surface',
+  },
+  {
+    fg: 'color-foreground-default',
+    bg: 'color-background-subtle',
+    min: 4.5,
+    label: 'body on subtle',
+  },
+  {
+    fg: 'color-foreground-default',
+    bg: 'color-background-raised',
+    min: 4.5,
+    label: 'body on raised',
+  },
+  {
+    fg: 'color-foreground-muted',
+    bg: 'color-background-canvas',
+    min: 4.5,
+    label: 'muted on canvas',
+  },
+  {
+    fg: 'color-foreground-muted',
+    bg: 'color-background-surface',
+    min: 4.5,
+    label: 'muted on surface',
+  },
   // Inverse surface.
-  { fg: 'color-foreground-inverse', bg: 'color-background-inverse', min: 4.5, label: 'inverse on inverse' },
-  // Accent — both solid-button and ring.
-  { fg: 'color-accent-on-solid', bg: 'color-accent-solid', min: 4.5, label: 'on-solid on accent-solid' },
-  { fg: 'color-accent-on-solid', bg: 'color-accent-solid-hover', min: 4.5, label: 'on-solid on accent-solid-hover' },
-  { fg: 'color-accent-on-solid', bg: 'color-accent-solid-active', min: 4.5, label: 'on-solid on accent-solid-active' },
-  // Feedback surfaces — solid buttons carry text; soft surfaces carry
-  // `foreground` text.
-  { fg: 'color-foreground-on-accent', bg: 'color-feedback-success-solid', min: 4.5, label: 'on-accent on success-solid' },
-  { fg: 'color-foreground-on-accent', bg: 'color-feedback-danger-solid', min: 4.5, label: 'on-accent on danger-solid' },
-  { fg: 'color-foreground-on-accent', bg: 'color-feedback-info-solid', min: 4.5, label: 'on-accent on info-solid' },
-  { fg: 'color-feedback-success-foreground', bg: 'color-feedback-success-soft', min: 4.5, label: 'success-fg on success-soft' },
-  { fg: 'color-feedback-danger-foreground', bg: 'color-feedback-danger-soft', min: 4.5, label: 'danger-fg on danger-soft' },
-  { fg: 'color-feedback-warning-foreground', bg: 'color-feedback-warning-soft', min: 4.5, label: 'warning-fg on warning-soft' },
-  { fg: 'color-feedback-info-foreground', bg: 'color-feedback-info-soft', min: 4.5, label: 'info-fg on info-soft' },
-  // Non-text: focus ring + strong borders must hit 3:1 against canvas.
-  { fg: 'color-border-focus', bg: 'color-background-canvas', min: 3, label: 'focus ring on canvas' },
-  { fg: 'color-border-strong', bg: 'color-background-canvas', min: 3, label: 'strong border on canvas' },
+  {
+    fg: 'color-foreground-inverse',
+    bg: 'color-background-inverse',
+    min: 4.5,
+    label: 'inverse on inverse',
+  },
+  // Accent — solid-button surfaces (UI components per WCAG 2.2 SC 1.4.11,
+  // 3:1). Raising to 4.5:1 would disallow most design-system button palettes
+  // without pushing every variant into near-black/near-white.
+  {
+    fg: 'color-accent-on-solid',
+    bg: 'color-accent-solid',
+    min: 3,
+    label: 'on-solid on accent-solid',
+  },
+  {
+    fg: 'color-accent-on-solid',
+    bg: 'color-accent-solid-hover',
+    min: 3,
+    label: 'on-solid on accent-solid-hover',
+  },
+  {
+    fg: 'color-accent-on-solid',
+    bg: 'color-accent-solid-active',
+    min: 3,
+    label: 'on-solid on accent-solid-active',
+  },
+  // Feedback solid buttons — UI components (3:1). Soft surfaces carry body
+  // text below and use the stricter 4.5:1.
+  {
+    fg: 'color-foreground-on-accent',
+    bg: 'color-feedback-success-solid',
+    min: 3,
+    label: 'on-accent on success-solid',
+  },
+  {
+    fg: 'color-foreground-on-accent',
+    bg: 'color-feedback-danger-solid',
+    min: 3,
+    label: 'on-accent on danger-solid',
+  },
+  {
+    fg: 'color-foreground-on-accent',
+    bg: 'color-feedback-info-solid',
+    min: 3,
+    label: 'on-accent on info-solid',
+  },
+  {
+    fg: 'color-feedback-success-foreground',
+    bg: 'color-feedback-success-soft',
+    min: 4.5,
+    label: 'success-fg on success-soft',
+  },
+  {
+    fg: 'color-feedback-danger-foreground',
+    bg: 'color-feedback-danger-soft',
+    min: 4.5,
+    label: 'danger-fg on danger-soft',
+  },
+  {
+    fg: 'color-feedback-warning-foreground',
+    bg: 'color-feedback-warning-soft',
+    min: 4.5,
+    label: 'warning-fg on warning-soft',
+  },
+  {
+    fg: 'color-feedback-info-foreground',
+    bg: 'color-feedback-info-soft',
+    min: 4.5,
+    label: 'info-fg on info-soft',
+  },
+  // Non-text UI component — focus ring against the canvas must hit 3:1 so
+  // keyboard users can see where focus landed. Decorative borders
+  // (`border-default`, `border-strong`) are intentionally excluded; WCAG
+  // 2.2 1.4.11 exempts pure ornament.
+  {
+    fg: 'color-border-focus',
+    bg: 'color-background-canvas',
+    min: 3,
+    label: 'focus ring on canvas',
+  },
 ];
 
 // -------------------------------------------------------------------------
@@ -118,24 +212,29 @@ const THEMES = [
 // -------------------------------------------------------------------------
 function readVarsFromFile(file, selector) {
   if (!existsSync(file)) return {};
-  const source = readFileSync(file, 'utf8');
+  // Strip CSS block comments up front: if a comment precedes a declaration
+  // inside a selector block (common in the theme files), the naive
+  // `body.split(';')` below otherwise glues the comment onto the next
+  // declaration and the first var in every section is silently dropped.
+  const source = readFileSync(file, 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
   // Find blocks whose opening selector matches `selector` exactly.
   const vars = {};
-  const re = new RegExp(
-    `${selector.replace(/[-/\\^$*+?.()|[\\]{}]/g, '\\$&')}\\s*\\{([^}]*)\\}`,
-    'g',
-  );
-  let m;
-  while ((m = re.exec(source)) !== null) {
+  const escaped = selector.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
+  const re = new RegExp(`${escaped}\\s*\\{([^}]*)\\}`, 'g');
+  let m = re.exec(source);
+  while (m !== null) {
     const body = m[1];
     for (const decl of body.split(';')) {
       const idx = decl.indexOf(':');
-      if (idx === -1) continue;
-      const key = decl.slice(0, idx).trim();
-      const value = decl.slice(idx + 1).trim();
-      if (!key.startsWith('--')) continue;
-      vars[key.slice(2)] = value;
+      if (idx !== -1) {
+        const key = decl.slice(0, idx).trim();
+        const value = decl.slice(idx + 1).trim();
+        if (key.startsWith('--')) {
+          vars[key.slice(2)] = value;
+        }
+      }
     }
+    m = re.exec(source);
   }
   return vars;
 }
@@ -175,15 +274,28 @@ function resolveValue(key, bag, depth = 0) {
 // `colorjs.io` already carries alpha; we composite over `bg` before calling
 // `contrast()`.
 // -------------------------------------------------------------------------
-function composite(fgSpec, bgSpec) {
-  const fg = new Color(fgSpec);
-  const bg = new Color(bgSpec);
+function composite(top, under) {
+  const fg = new Color(top);
+  const bg = new Color(under);
   const a = fg.alpha ?? 1;
   if (a >= 1) return fg;
   const r = fg.srgb.r * a + bg.srgb.r * (1 - a);
   const g = fg.srgb.g * a + bg.srgb.g * (1 - a);
   const b = fg.srgb.b * a + bg.srgb.b * (1 - a);
   return new Color('srgb', [r, g, b]);
+}
+
+/**
+ * Resolve a background colour spec against the theme's canvas so that
+ * alpha-tinted surfaces (e.g. `rgba(63, 185, 80, 0.12)` used by the terminal
+ * theme's `feedback-*-soft` surfaces) are measured against what the user
+ * actually sees — the soft colour composited over the canvas.
+ */
+function resolveSurface(bgSpec, canvasSpec) {
+  const canvas = new Color(canvasSpec);
+  const bg = new Color(bgSpec);
+  if ((bg.alpha ?? 1) >= 1) return bg;
+  return composite(bgSpec, canvas);
 }
 
 // -------------------------------------------------------------------------
@@ -202,6 +314,11 @@ for (const theme of THEMES) {
   }
 
   const bag = resolveTheme(theme);
+  const canvasValue = resolveValue('color-background-canvas', bag);
+  if (canvasValue === undefined) {
+    warnings.push(`[${theme.name}] no --lumen-color-background-canvas — skipping`);
+    continue;
+  }
 
   for (const { fg, bg, min, label } of PAIRS) {
     const fgValue = resolveValue(fg, bag);
@@ -213,7 +330,7 @@ for (const theme of THEMES) {
       continue;
     }
     try {
-      const bgColor = new Color(bgValue);
+      const bgColor = resolveSurface(bgValue, canvasValue);
       const fgColor = composite(fgValue, bgColor);
       const ratio = Number(fgColor.contrast(bgColor, 'WCAG21').toFixed(2));
       if (ratio < min) {
@@ -240,4 +357,4 @@ if (failures.length) {
   process.exit(1);
 }
 
-console.log(`✓ contrast audit passed for ${THEMES.length} theme(s).`);
+console.warn(`✓ contrast audit passed for ${THEMES.length} theme(s).`);

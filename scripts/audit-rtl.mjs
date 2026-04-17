@@ -70,18 +70,20 @@ for (const file of walk(root)) {
     if (!/(margin|padding|border).*(Left|Right|left|right)/.test(line)) continue;
     for (const re of PHYSICAL) {
       re.lastIndex = 0;
-      let m;
-      while ((m = re.exec(line)) !== null) {
+      let m = re.exec(line);
+      while (m !== null) {
         // Skip matches inside comments.
         const before = line.slice(0, m.index);
-        if (before.includes('//')) continue;
-        failures.push({
-          file: rel,
-          line: i + 1,
-          column: m.index + 1,
-          match: m[0],
-          source: line.trim(),
-        });
+        if (!before.includes('//')) {
+          failures.push({
+            file: rel,
+            line: i + 1,
+            column: m.index + 1,
+            match: m[0],
+            source: line.trim(),
+          });
+        }
+        m = re.exec(line);
       }
     }
   }
@@ -94,11 +96,9 @@ if (failures.length) {
     console.error(`      ${f.source}`);
   }
   console.error(
-    `\n${failures.length} physical property usage(s) found. ` +
-      'Replace with logical properties (marginInlineStart / paddingInlineEnd / borderInlineStart / etc.) ' +
-      'or, if the usage is intentional, add the file to ALLOWLIST in scripts/audit-rtl.mjs with rationale.',
+    `\n${failures.length} physical property usage(s) found. Replace with logical properties (marginInlineStart / paddingInlineEnd / borderInlineStart / etc.) or, if the usage is intentional, add the file to ALLOWLIST in scripts/audit-rtl.mjs with rationale.`,
   );
   process.exit(1);
 }
 
-console.log('✓ RTL audit passed — no physical directional CSS properties in packages/react/src.');
+console.warn('✓ RTL audit passed — no physical directional CSS properties in packages/react/src.');
