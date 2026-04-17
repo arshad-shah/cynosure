@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
+import { expect, userEvent, within } from 'storybook/test';
 import { Inline } from '../../primitives/layout/Inline/Inline.js';
 import { Stack } from '../../primitives/layout/Stack/Stack.js';
 import { Text } from '../../typography/Text/Text.js';
@@ -197,4 +198,31 @@ export const LongLabel: Story = {
       </Checkbox>
     </Stack>
   ),
+};
+
+export const ClickToggles: Story = {
+  name: 'Interaction · click toggles state',
+  render: () => <Checkbox>Click me</Checkbox>,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const cb = canvas.getByRole('checkbox');
+    await expect(cb).toHaveAttribute('data-state', 'unchecked');
+    await userEvent.click(cb);
+    await expect(cb).toHaveAttribute('data-state', 'checked');
+    await userEvent.click(cb);
+    await expect(cb).toHaveAttribute('data-state', 'unchecked');
+  },
+};
+
+export const KeyboardToggles: Story = {
+  name: 'Interaction · space toggles focused control',
+  render: () => <Checkbox>Focus me then press space</Checkbox>,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const cb = canvas.getByRole('checkbox');
+    cb.focus();
+    await expect(cb).toHaveFocus();
+    await userEvent.keyboard(' ');
+    await expect(cb).toHaveAttribute('data-state', 'checked');
+  },
 };

@@ -1,18 +1,16 @@
+import { Loader2, LoaderCircle } from 'lucide-react';
 import { type HTMLAttributes, type ReactElement, forwardRef } from 'react';
 import { cn } from '../../utils/cn.js';
 import {
   speedFast,
   speedNormal,
   speedSlow,
-  spinnerBorder,
   spinnerColorAccent,
   spinnerColorCurrent,
   spinnerColorNeutral,
   spinnerDot,
   spinnerDots,
-  spinnerRing,
-  spinnerRingCircleProgress,
-  spinnerRingCircleTrack,
+  spinnerLucide,
   spinnerRoot,
   spinnerSize,
 } from './Spinner.css.js';
@@ -57,14 +55,7 @@ export const Spinner = forwardRef<HTMLSpanElement, SpinnerProps>(function Spinne
   const speedCls = speedClass[speed];
 
   let inner: ReactElement;
-  if (variant === 'ring') {
-    inner = (
-      <svg viewBox="0 0 24 24" className={spinnerRing} aria-hidden="true">
-        <circle cx="12" cy="12" r="10" className={spinnerRingCircleTrack} />
-        <circle cx="12" cy="12" r="10" className={cn(spinnerRingCircleProgress, speedCls)} />
-      </svg>
-    );
-  } else if (variant === 'dots') {
+  if (variant === 'dots') {
     inner = (
       <span aria-hidden="true" className={spinnerDots}>
         <span className={cn(spinnerDot, speedCls)} style={{ animationDelay: '-0.32s' }} />
@@ -72,8 +63,14 @@ export const Spinner = forwardRef<HTMLSpanElement, SpinnerProps>(function Spinne
         <span className={cn(spinnerDot, speedCls)} />
       </span>
     );
+  } else if (variant === 'ring') {
+    inner = (
+      <LoaderCircle aria-hidden="true" strokeWidth={2.25} className={cn(spinnerLucide, speedCls)} />
+    );
   } else {
-    inner = <span aria-hidden="true" className={cn(spinnerBorder, speedCls)} />;
+    inner = (
+      <Loader2 aria-hidden="true" strokeWidth={2.25} className={cn(spinnerLucide, speedCls)} />
+    );
   }
 
   return (

@@ -30,15 +30,20 @@ export const controlSize = styleVariants({
   },
 });
 
-/** Wrapper class that paints the border/bg/focus ring around the raw control. */
+/**
+ * "Punched card" control frame. The field sits in a subtly recessed well with
+ * a hairline inner shadow, so it reads as a slot stamped into the host
+ * surface. Focus lifts the field to `background.surface` with an accent ring.
+ */
 export const controlWrapperBase = style({
   display: 'inline-flex',
   alignItems: 'stretch',
   width: '100%',
   boxSizing: 'border-box',
-  background: vars.color.background.surface,
+  background: vars.color.background.subtle,
   color: vars.color.foreground.default,
   border: `1px solid ${vars.color.border.default}`,
+  boxShadow: 'inset 0 1px 0 rgba(24, 24, 27, 0.04)',
   transitionProperty: 'border-color, box-shadow, background-color',
   transitionDuration: vars.duration.fast,
   selectors: {
@@ -46,6 +51,7 @@ export const controlWrapperBase = style({
       borderColor: vars.color.border.strong,
     },
     '&[data-focus-within="true"]:not([data-invalid="true"])': {
+      background: vars.color.background.surface,
       borderColor: vars.color.border.focus,
       boxShadow: `0 0 0 2px ${vars.color.accent.ring}`,
     },
@@ -53,6 +59,7 @@ export const controlWrapperBase = style({
       borderColor: vars.color.feedback.danger.border,
     },
     '&[data-invalid="true"][data-focus-within="true"]': {
+      background: vars.color.background.surface,
       boxShadow: `0 0 0 2px ${vars.color.feedback.danger.border}`,
     },
     '&[data-disabled="true"]': {
@@ -61,15 +68,15 @@ export const controlWrapperBase = style({
       borderColor: vars.color.border.disabled,
     },
     '&[data-readonly="true"]': {
-      background: vars.color.background.subtle,
+      background: vars.color.background.muted,
     },
   },
 });
 
 export const controlWrapperVariant = styleVariants({
-  outline: {
-    background: vars.color.background.surface,
-  },
+  /** Default punched well — subtle recessed background, hairline border. */
+  outline: {},
+  /** Deeper recess — `background.muted`, border recedes so only the color says "pocket". */
   filled: {
     background: vars.color.background.muted,
     borderColor: 'transparent',
@@ -82,15 +89,18 @@ export const controlWrapperVariant = styleVariants({
       },
     },
   },
+  /** Minimal — no well at rest; the frame only appears on hover / focus. */
   ghost: {
     background: 'transparent',
     borderColor: 'transparent',
+    boxShadow: 'none',
     selectors: {
       '&[data-hover="true"]:not([data-disabled="true"])': {
         background: vars.color.background.subtle,
       },
       '&[data-focus-within="true"]': {
         background: vars.color.background.surface,
+        boxShadow: `0 0 0 2px ${vars.color.accent.ring}`,
       },
     },
   },

@@ -62,10 +62,10 @@ export const vars = createGlobalThemeContract(
         onSolid: '',
       },
       feedback: {
-        success: { solid: '', soft: '', foreground: '', border: '' },
-        danger: { solid: '', soft: '', foreground: '', border: '' },
-        warning: { solid: '', soft: '', foreground: '', border: '' },
-        info: { solid: '', soft: '', foreground: '', border: '' },
+        success: { solid: '', soft: '', foreground: '', border: '', onSolid: '' },
+        danger: { solid: '', soft: '', foreground: '', border: '', onSolid: '' },
+        warning: { solid: '', soft: '', foreground: '', border: '', onSolid: '' },
+        info: { solid: '', soft: '', foreground: '', border: '', onSolid: '' },
       },
     },
     space: {

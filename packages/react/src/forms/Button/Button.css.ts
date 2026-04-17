@@ -118,7 +118,7 @@ export const solidNeutral = style({
 
 export const solidSuccess = style({
   background: vars.color.feedback.success.solid,
-  color: vars.color.feedback.success.foreground,
+  color: vars.color.feedback.success.onSolid,
   selectors: {
     '&:hover:not(:disabled):not([data-loading="true"])': {
       filter: 'brightness(0.95)',
@@ -128,7 +128,7 @@ export const solidSuccess = style({
 
 export const solidDanger = style({
   background: vars.color.feedback.danger.solid,
-  color: vars.color.feedback.danger.foreground,
+  color: vars.color.feedback.danger.onSolid,
   selectors: {
     '&:hover:not(:disabled):not([data-loading="true"])': {
       filter: 'brightness(0.95)',
@@ -138,7 +138,7 @@ export const solidDanger = style({
 
 export const solidWarning = style({
   background: vars.color.feedback.warning.solid,
-  color: vars.color.feedback.warning.foreground,
+  color: vars.color.feedback.warning.onSolid,
   selectors: {
     '&:hover:not(:disabled):not([data-loading="true"])': {
       filter: 'brightness(0.95)',

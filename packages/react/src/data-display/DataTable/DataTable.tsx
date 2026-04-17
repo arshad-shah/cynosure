@@ -20,6 +20,7 @@ import {
   useMemo,
   useState,
 } from 'react';
+import { Checkbox } from '../../forms/Checkbox/Checkbox.js';
 import { Pagination } from '../../navigation/Pagination/Pagination.js';
 import { cn } from '../../utils/cn.js';
 import { Skeleton } from '../Skeleton/Skeleton.js';
@@ -105,14 +106,11 @@ const RowCheckbox = ({
   onChange: (next: boolean) => void;
   label: string;
 }): ReactElement => (
-  <input
-    type="checkbox"
+  <Checkbox
     aria-label={label}
-    checked={checked}
-    ref={(el) => {
-      if (el) el.indeterminate = !!indeterminate && !checked;
-    }}
-    onChange={(e) => onChange(e.target.checked)}
+    size="sm"
+    checked={indeterminate && !checked ? 'indeterminate' : checked}
+    onCheckedChange={(next) => onChange(next === true)}
   />
 );
 

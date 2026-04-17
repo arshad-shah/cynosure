@@ -5,12 +5,14 @@ import {
   type ReactNode,
   forwardRef,
   useCallback,
+  useEffect,
   useId,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
 } from 'react';
-import { Popover as AriaPopover } from 'react-aria-components';
+import { createPortal } from 'react-dom';
 import { useControllableState } from '../../hooks/useControllableState.js';
 import { useMergedRef } from '../../hooks/useMergedRef.js';
 import { cn } from '../../utils/cn.js';
@@ -89,6 +91,46 @@ export const MultiSelect = forwardRef<HTMLInputElement, MultiSelectProps<string>
     const inputNodeRef = useRef<HTMLInputElement | null>(null);
     const mergedRef = useMergedRef(ref, inputNodeRef);
     const wrapperRef = useRef<HTMLDivElement | null>(null);
+    const popoverRef = useRef<HTMLDivElement | null>(null);
+    const [popoverRect, setPopoverRect] = useState<{
+      top: number;
+      left: number;
+      width: number;
+    } | null>(null);
+
+    useLayoutEffect(() => {
+      if (!open) return;
+      const measure = () => {
+        const el = wrapperRef.current;
+        if (!el) return;
+        const rect = el.getBoundingClientRect();
+        setPopoverRect({
+          top: rect.bottom + window.scrollY + 4,
+          left: rect.left + window.scrollX,
+          width: rect.width,
+        });
+      };
+      measure();
+      window.addEventListener('scroll', measure, true);
+      window.addEventListener('resize', measure);
+      return () => {
+        window.removeEventListener('scroll', measure, true);
+        window.removeEventListener('resize', measure);
+      };
+    }, [open]);
+
+    useEffect(() => {
+      if (!open) return;
+      const handlePointerDown = (event: PointerEvent) => {
+        const target = event.target as Node | null;
+        if (!target) return;
+        if (wrapperRef.current?.contains(target)) return;
+        if (popoverRef.current?.contains(target)) return;
+        setOpen(false);
+      };
+      document.addEventListener('pointerdown', handlePointerDown, true);
+      return () => document.removeEventListener('pointerdown', handlePointerDown, true);
+    }, [open]);
 
     const filtered = useMemo(() => {
       const selected = new Set(value);
@@ -201,48 +243,53 @@ export const MultiSelect = forwardRef<HTMLInputElement, MultiSelectProps<string>
             />
           </div>
         </div>
-        {open && !disabled ? (
-          <AriaPopover
-            triggerRef={wrapperRef as React.RefObject<HTMLDivElement>}
-            isOpen={open}
-            onOpenChange={setOpen}
-            placement="bottom start"
-            className={popover}
-            style={{ width: 'var(--trigger-width)' }}
-          >
-            {/* biome-ignore lint/a11y/useFocusableInteractive: the listbox is announced via the trigger's aria-activedescendant pattern; the input keeps the actual focus. */}
-            {/* biome-ignore lint/a11y/noNoninteractiveElementToInteractiveRole: composite widget — listbox/option is the correct WAI-ARIA pattern here. */}
-            {/* biome-ignore lint/a11y/useSemanticElements: there is no native equivalent for a multi-select listbox. */}
-            <ul role="listbox" className={listbox} aria-multiselectable="true">
-              {filtered.length === 0 ? (
-                <li className={listboxEmpty} role="presentation">
-                  {emptyState ?? 'No results'}
-                </li>
-              ) : (
-                filtered.map((item) => (
-                  <li
-                    key={item.value}
-                    // biome-ignore lint/a11y/noNoninteractiveElementToInteractiveRole: listbox/option is the correct WAI-ARIA composite widget pattern.
-                    // biome-ignore lint/a11y/useSemanticElements: no native HTML equivalent preserves the option role inside a custom listbox.
-                    role="option"
-                    aria-selected={false}
-                    aria-disabled={item.disabled || !canAdd}
-                    className={listboxItem}
-                    tabIndex={-1}
-                    onMouseDown={(e) => {
-                      e.preventDefault();
-                      if (item.disabled || !canAdd) return;
-                      addValue(item.value);
-                      inputNodeRef.current?.focus();
-                    }}
-                  >
-                    <span>{item.label}</span>
-                  </li>
-                ))
-              )}
-            </ul>
-          </AriaPopover>
-        ) : null}
+        {open && !disabled && popoverRect
+          ? createPortal(
+              <div
+                ref={popoverRef}
+                className={popover}
+                style={{
+                  position: 'absolute',
+                  top: popoverRect.top,
+                  left: popoverRect.left,
+                  width: popoverRect.width,
+                }}
+              >
+                {/* biome-ignore lint/a11y/useFocusableInteractive: the listbox is announced via the trigger's aria-activedescendant pattern; the input keeps the actual focus. */}
+                {/* biome-ignore lint/a11y/noNoninteractiveElementToInteractiveRole: composite widget — listbox/option is the correct WAI-ARIA pattern here. */}
+                {/* biome-ignore lint/a11y/useSemanticElements: there is no native equivalent for a multi-select listbox. */}
+                <ul role="listbox" className={listbox} aria-multiselectable="true">
+                  {filtered.length === 0 ? (
+                    <li className={listboxEmpty} role="presentation">
+                      {emptyState ?? 'No results'}
+                    </li>
+                  ) : (
+                    filtered.map((item) => (
+                      <li
+                        key={item.value}
+                        // biome-ignore lint/a11y/noNoninteractiveElementToInteractiveRole: listbox/option is the correct WAI-ARIA composite widget pattern.
+                        // biome-ignore lint/a11y/useSemanticElements: no native HTML equivalent preserves the option role inside a custom listbox.
+                        role="option"
+                        aria-selected={false}
+                        aria-disabled={item.disabled || !canAdd}
+                        className={listboxItem}
+                        tabIndex={-1}
+                        onMouseDown={(e) => {
+                          e.preventDefault();
+                          if (item.disabled || !canAdd) return;
+                          addValue(item.value);
+                          inputNodeRef.current?.focus();
+                        }}
+                      >
+                        <span>{item.label}</span>
+                      </li>
+                    ))
+                  )}
+                </ul>
+              </div>,
+              document.body,
+            )
+          : null}
       </>
     );
   },
