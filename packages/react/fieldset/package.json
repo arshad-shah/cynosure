@@ -1,0 +1,9 @@
+{
+  "name": "@lumen/react/fieldset",
+  "private": true,
+  "type": "module",
+  "main": "../dist/fieldset.js",
+  "module": "../dist/fieldset.js",
+  "types": "../dist/fieldset.d.ts",
+  "sideEffects": ["*.css"]
+}

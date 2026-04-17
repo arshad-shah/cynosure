@@ -1,0 +1,9 @@
+{
+  "name": "@lumen/react/label",
+  "private": true,
+  "type": "module",
+  "main": "../dist/label.js",
+  "module": "../dist/label.js",
+  "types": "../dist/label.d.ts",
+  "sideEffects": ["*.css"]
+}

@@ -1,0 +1,9 @@
+{
+  "name": "@lumen/react/error-text",
+  "private": true,
+  "type": "module",
+  "main": "../dist/errortext.js",
+  "module": "../dist/errortext.js",
+  "types": "../dist/errortext.d.ts",
+  "sideEffects": ["*.css"]
+}

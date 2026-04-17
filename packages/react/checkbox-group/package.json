@@ -1,0 +1,9 @@
+{
+  "name": "@lumen/react/checkbox-group",
+  "private": true,
+  "type": "module",
+  "main": "../dist/checkboxgroup.js",
+  "module": "../dist/checkboxgroup.js",
+  "types": "../dist/checkboxgroup.d.ts",
+  "sideEffects": ["*.css"]
+}

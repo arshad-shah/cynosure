@@ -1,0 +1,9 @@
+{
+  "name": "@lumen/react/number-input",
+  "private": true,
+  "type": "module",
+  "main": "../dist/numberinput.js",
+  "module": "../dist/numberinput.js",
+  "types": "../dist/numberinput.d.ts",
+  "sideEffects": ["*.css"]
+}

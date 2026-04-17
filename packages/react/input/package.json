@@ -1,0 +1,9 @@
+{
+  "name": "@lumen/react/input",
+  "private": true,
+  "type": "module",
+  "main": "../dist/input.js",
+  "module": "../dist/input.js",
+  "types": "../dist/input.d.ts",
+  "sideEffects": ["*.css"]
+}

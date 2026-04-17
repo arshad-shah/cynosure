@@ -1,0 +1,9 @@
+{
+  "name": "@lumen/react/icon-button",
+  "private": true,
+  "type": "module",
+  "main": "../dist/iconbutton.js",
+  "module": "../dist/iconbutton.js",
+  "types": "../dist/iconbutton.d.ts",
+  "sideEffects": ["*.css"]
+}

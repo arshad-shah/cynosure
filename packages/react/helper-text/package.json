@@ -1,0 +1,9 @@
+{
+  "name": "@lumen/react/helper-text",
+  "private": true,
+  "type": "module",
+  "main": "../dist/helpertext.js",
+  "module": "../dist/helpertext.js",
+  "types": "../dist/helpertext.d.ts",
+  "sideEffects": ["*.css"]
+}
