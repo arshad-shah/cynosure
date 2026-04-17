@@ -67,12 +67,32 @@ jobs:
         with:
           node-version: 22
           cache: pnpm
-      - run: pnpm install --frozen-lockfile
+
+      # Skip the whole chain when no `*.browser.test.*` files exist. Phase 14
+      # wires the matrix but no tests target real browsers yet; installing
+      # ~350 MB of Playwright browsers just to have vitest find zero tests
+      # wastes CI time and exposes the job to Playwright-install flakiness.
+      - name: Detect browser tests
+        id: detect
+        run: |
+          if find packages/react/src -type f \( -name '*.browser.test.ts' -o -name '*.browser.test.tsx' \) -print -quit | grep -q .; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "No *.browser.test.{ts,tsx} files found — skipping Playwright install + run."
+            echo "present=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Install dependencies
+        if: steps.detect.outputs.present == 'true'
+        run: pnpm install --frozen-lockfile
       - name: Install Playwright browsers
+        if: steps.detect.outputs.present == 'true'
         run: pnpm exec playwright install --with-deps chromium firefox webkit
       - name: Build (packages)
+        if: steps.detect.outputs.present == 'true'
         run: pnpm build
       - name: Browser-mode tests
+        if: steps.detect.outputs.present == 'true'
         env:
           LUMEN_BROWSER_MODE: '1'
         run: pnpm --filter @lumen/react test:browser
