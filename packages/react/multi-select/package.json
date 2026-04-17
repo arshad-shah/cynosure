@@ -1,0 +1,9 @@
+{
+  "name": "@lumen/react/multi-select",
+  "private": true,
+  "type": "module",
+  "main": "../dist/multiselect.js",
+  "module": "../dist/multiselect.js",
+  "types": "../dist/multiselect.d.ts",
+  "sideEffects": ["*.css"]
+}

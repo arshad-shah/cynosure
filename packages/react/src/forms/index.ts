@@ -13,6 +13,20 @@ export * from './Label/index.js';
 export * from './HelperText/index.js';
 export * from './ErrorText/index.js';
 export * from './Fieldset/index.js';
+export * from './Select/index.js';
+export * from './Combobox/index.js';
+export * from './MultiSelect/index.js';
+export * from './Slider/index.js';
+export * from './RangeSlider/index.js';
+export * from './DatePicker/index.js';
+export * from './DateRangePicker/index.js';
+export * from './TimePicker/index.js';
+export * from './ColorPicker/index.js';
+export * from './FileUpload/index.js';
+export * from './SearchInput/index.js';
+export * from './PinInput/index.js';
+export * from './TagsInput/index.js';
+export * from './Rating/index.js';
 export type {
   BooleanFormControlBase,
   FormControlBase,

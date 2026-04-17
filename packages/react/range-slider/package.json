@@ -1,0 +1,9 @@
+{
+  "name": "@lumen/react/range-slider",
+  "private": true,
+  "type": "module",
+  "main": "../dist/rangeslider.js",
+  "module": "../dist/rangeslider.js",
+  "types": "../dist/rangeslider.d.ts",
+  "sideEffects": ["*.css"]
+}

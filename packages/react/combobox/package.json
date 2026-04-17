@@ -1,0 +1,9 @@
+{
+  "name": "@lumen/react/combobox",
+  "private": true,
+  "type": "module",
+  "main": "../dist/combobox.js",
+  "module": "../dist/combobox.js",
+  "types": "../dist/combobox.d.ts",
+  "sideEffects": ["*.css"]
+}

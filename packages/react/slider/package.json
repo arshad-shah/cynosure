@@ -1,0 +1,9 @@
+{
+  "name": "@lumen/react/slider",
+  "private": true,
+  "type": "module",
+  "main": "../dist/slider.js",
+  "module": "../dist/slider.js",
+  "types": "../dist/slider.d.ts",
+  "sideEffects": ["*.css"]
+}

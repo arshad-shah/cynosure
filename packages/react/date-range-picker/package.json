@@ -1,0 +1,9 @@
+{
+  "name": "@lumen/react/date-range-picker",
+  "private": true,
+  "type": "module",
+  "main": "../dist/daterangepicker.js",
+  "module": "../dist/daterangepicker.js",
+  "types": "../dist/daterangepicker.d.ts",
+  "sideEffects": ["*.css"]
+}

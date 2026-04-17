@@ -1,0 +1,9 @@
+{
+  "name": "@lumen/react/date-picker",
+  "private": true,
+  "type": "module",
+  "main": "../dist/datepicker.js",
+  "module": "../dist/datepicker.js",
+  "types": "../dist/datepicker.d.ts",
+  "sideEffects": ["*.css"]
+}
