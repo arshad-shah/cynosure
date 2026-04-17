@@ -28,6 +28,30 @@ describe('Slider', () => {
   });
 });
 
+describe('Slider extras', () => {
+  it('renders the label and showValue output', () => {
+    render(<Slider label="Volume" defaultValue={20} showValue />);
+    expect(screen.getByText('Volume')).toBeInTheDocument();
+  });
+
+  it('renders marks below the track', () => {
+    const { container } = render(
+      <Slider
+        aria-label="Volume"
+        defaultValue={50}
+        marks={[{ value: 0, label: '0' }, { value: 50 }, { value: 100, label: '100' }]}
+      />,
+    );
+    expect(container.querySelector('[style*="inset-inline-start: 0%"]')).not.toBeNull();
+    expect(container.querySelector('[style*="inset-inline-start: 100%"]')).not.toBeNull();
+  });
+
+  it('marks the track as disabled when isDisabled is set', () => {
+    const { container } = render(<Slider aria-label="Volume" defaultValue={20} isDisabled />);
+    expect(container.querySelector('[data-disabled="true"]')).not.toBeNull();
+  });
+});
+
 describe('RangeSlider', () => {
   it('renders two slider thumbs', () => {
     render(<RangeSlider label="Price" defaultValue={[10, 40]} minValue={0} maxValue={100} />);
@@ -35,5 +59,26 @@ describe('RangeSlider', () => {
     expect(inputs).toHaveLength(2);
     expect(inputs[0]?.value).toBe('10');
     expect(inputs[1]?.value).toBe('40');
+  });
+
+  it('shows the value output and label header when configured', () => {
+    render(<RangeSlider label="Price" defaultValue={[10, 40]} showValue />);
+    expect(screen.getByText('Price')).toBeInTheDocument();
+  });
+
+  it('reports both endpoints via the onChange callback', () => {
+    const onChange = vi.fn();
+    render(<RangeSlider label="Price" defaultValue={[10, 40]} onChange={onChange} />);
+    const inputs = screen.getAllByRole('slider');
+    inputs[0]?.focus();
+    fireEvent.keyDown(inputs[0]!, { key: 'ArrowRight' });
+    expect(onChange).toHaveBeenCalled();
+    const last = onChange.mock.calls.at(-1)?.[0];
+    expect(Array.isArray(last)).toBe(true);
+  });
+
+  it('marks the track as disabled when isDisabled is set', () => {
+    const { container } = render(<RangeSlider label="Price" defaultValue={[10, 40]} isDisabled />);
+    expect(container.querySelector('[data-disabled="true"]')).not.toBeNull();
   });
 });

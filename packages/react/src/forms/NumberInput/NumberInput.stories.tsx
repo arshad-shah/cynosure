@@ -69,6 +69,18 @@ export const MinMaxStep: Story = {
   ),
 };
 
+export const Affixes: Story = {
+  name: 'Prefix / suffix slots',
+  render: () => (
+    <Stack gap="3" width="240px">
+      <NumberInput defaultValue={256} suffix="px" aria-label="Width" />
+      <NumberInput defaultValue={1200} prefix="$" aria-label="Amount" />
+      <NumberInput defaultValue={3.5} step={0.1} suffix="kg" aria-label="Weight" />
+      <NumberInput defaultValue={80} minValue={0} maxValue={100} suffix="%" aria-label="Opacity" />
+    </Stack>
+  ),
+};
+
 export const Formatted: Story = {
   name: 'Format — currency / percent / units',
   render: () => (

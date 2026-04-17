@@ -21,6 +21,8 @@ export const star = style({
   justifyContent: 'center',
   cursor: 'pointer',
   color: vars.color.border.strong,
+  transitionProperty: 'color',
+  transitionDuration: vars.duration.fast,
   selectors: {
     '&[data-filled="true"]': {
       color: vars.color.feedback.warning.solid,
@@ -41,13 +43,29 @@ export const starSize = styleVariants({
   lg: { width: '1.5rem', height: '1.5rem' },
 });
 
-export const halfOverlay = style({
+export const fillLayer = style({
   position: 'absolute',
   inset: 0,
   display: 'inline-flex',
   alignItems: 'center',
   justifyContent: 'center',
-  overflow: 'hidden',
-  width: '50%',
   color: vars.color.feedback.warning.solid,
+  pointerEvents: 'none',
+  transitionProperty: 'clip-path',
+  transitionDuration: vars.duration.fast,
+});
+
+export const halfClip = style({
+  clipPath: 'inset(0 50% 0 0)',
+  selectors: {
+    '[dir="rtl"] &': {
+      clipPath: 'inset(0 0 0 50%)',
+    },
+  },
+});
+
+export const valueSlot = style({
+  marginInlineStart: vars.space['2'],
+  display: 'inline-flex',
+  alignItems: 'center',
 });

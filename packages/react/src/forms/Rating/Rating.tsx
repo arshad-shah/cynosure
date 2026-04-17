@@ -1,24 +1,17 @@
-import { type CSSProperties, type KeyboardEvent, forwardRef } from 'react';
+import { Star } from 'lucide-react';
+import {
+  type CSSProperties,
+  type KeyboardEvent,
+  type MouseEvent,
+  type PointerEvent,
+  type ReactNode,
+  forwardRef,
+  useState,
+} from 'react';
 import { useControllableState } from '../../hooks/useControllableState.js';
 import { cn } from '../../utils/cn.js';
 import type { FormControlSize } from '../shared/types.js';
-import { halfOverlay, root, star, starSize } from './Rating.css.js';
-
-const Star = ({ filled }: { filled: boolean }): React.ReactElement => (
-  <svg
-    width="100%"
-    height="100%"
-    viewBox="0 0 24 24"
-    fill={filled ? 'currentColor' : 'none'}
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    aria-hidden="true"
-  >
-    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-  </svg>
-);
+import { fillLayer, halfClip, root, star, starSize, valueSlot } from './Rating.css.js';
 
 export interface RatingProps {
   value?: number;
@@ -35,6 +28,11 @@ export interface RatingProps {
   id?: string;
   label?: string;
   'aria-label'?: string;
+  /**
+   * Render a trailing slot (e.g. numeric label). `previewValue` is the
+   * currently-hovered value, or `undefined` when not hovering.
+   */
+  renderValue?: (value: number, max: number, previewValue: number | undefined) => ReactNode;
   className?: string;
   style?: CSSProperties;
 }
@@ -54,6 +52,7 @@ export const Rating = forwardRef<HTMLDivElement, RatingProps>(function Rating(pr
     name,
     id,
     label,
+    renderValue,
     className,
     style,
   } = props;
@@ -66,10 +65,14 @@ export const Rating = forwardRef<HTMLDivElement, RatingProps>(function Rating(pr
     onChange: onValueChange,
   });
 
+  const [hoverValue, setHoverValue] = useState<number | undefined>(undefined);
+
+  const interactive = !disabled && !readOnly;
   const step = allowHalf ? 0.5 : 1;
+  const displayValue = hoverValue ?? value;
 
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    if (disabled || readOnly) return;
+    if (!interactive) return;
     const rtl = typeof document !== 'undefined' && document.dir === 'rtl';
     const inc = rtl ? -step : step;
     switch (event.key) {
@@ -96,9 +99,21 @@ export const Rating = forwardRef<HTMLDivElement, RatingProps>(function Rating(pr
     }
   };
 
-  const set = (next: number) => {
-    if (disabled || readOnly) return;
-    setValue(next);
+  const valueAtPointer = (
+    event: PointerEvent<HTMLElement> | MouseEvent<HTMLElement>,
+    index: number,
+  ): number => {
+    if (!allowHalf) return index;
+    const target = event.currentTarget;
+    const rect = target.getBoundingClientRect();
+    const isRtl = typeof document !== 'undefined' && document.dir === 'rtl';
+    const offset = isRtl ? rect.right - event.clientX : event.clientX - rect.left;
+    return offset < rect.width / 2 ? index - 0.5 : index;
+  };
+
+  const commit = (next: number) => {
+    if (!interactive) return;
+    setValue(next === value ? 0 : next);
   };
 
   return (
@@ -116,40 +131,44 @@ export const Rating = forwardRef<HTMLDivElement, RatingProps>(function Rating(pr
       aria-required={required || undefined}
       tabIndex={disabled ? -1 : 0}
       onKeyDown={handleKeyDown}
+      onPointerLeave={() => setHoverValue(undefined)}
     >
       {name ? <input type="hidden" name={name} id={id} value={String(value)} /> : null}
       {Array.from({ length: max }).map((_, i) => {
         const index = i + 1;
-        const filled = value >= index;
-        const half = allowHalf && !filled && value >= index - 0.5;
+        const filled = displayValue >= index;
+        const half = allowHalf && !filled && displayValue >= index - 0.5;
         return (
           // biome-ignore lint/a11y/useKeyWithClickEvents: keyboard interaction is owned by the parent's role="slider" ↑/↓/←/→/Home/End handler.
           <span
             key={index}
             className={cn(star, starSize[size])}
             data-filled={filled || undefined}
+            data-half={half || undefined}
             data-readonly={readOnly || undefined}
             data-disabled={disabled || undefined}
             role="presentation"
+            onPointerMove={(event) => {
+              if (!interactive) return;
+              setHoverValue(valueAtPointer(event, index));
+            }}
             onClick={(event) => {
-              if (!allowHalf) return set(index);
-              const target = event.currentTarget as HTMLElement;
-              const rect = target.getBoundingClientRect();
-              const isRtl = typeof document !== 'undefined' && document.dir === 'rtl';
-              const offset = isRtl ? rect.right - event.clientX : event.clientX - rect.left;
-              const isLeftHalf = offset < rect.width / 2;
-              set(isLeftHalf ? index - 0.5 : index);
+              if (!interactive) return;
+              commit(valueAtPointer(event, index));
             }}
           >
-            <Star filled={filled} />
-            {half ? (
-              <span className={halfOverlay} aria-hidden="true">
-                <Star filled={true} />
+            <Star size="100%" strokeWidth={2} aria-hidden="true" />
+            {filled || half ? (
+              <span className={cn(fillLayer, half && halfClip)} aria-hidden="true">
+                <Star size="100%" strokeWidth={2} fill="currentColor" />
               </span>
             ) : null}
           </span>
         );
       })}
+      {renderValue ? (
+        <span className={valueSlot}>{renderValue(value, max, hoverValue)}</span>
+      ) : null}
     </div>
   );
 });

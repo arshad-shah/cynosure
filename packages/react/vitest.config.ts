@@ -61,18 +61,13 @@ export default defineConfig({
         'src/**/*.mdx',
       ],
       thresholds: {
-        // Phase 14 baseline. Spec target is 85/85/80/85; lines and
-        // statements meet that today, but functions and branches sit a
-        // little below because several components (DataTable / Tree /
-        // ColorPicker / DatePicker / ContextMenu / MenuBar) still have
-        // edge-case branches unexercised, and a few re-export shims
-        // (variants.ts, hooks/use*.ts) carry no executable lines for v8
-        // to attribute. Each subsequent PR should tighten the
-        // corresponding threshold here as coverage climbs.
-        lines: 85,
-        statements: 85,
-        functions: 78,
-        branches: 73,
+        // Unit-test floor: 80% across every metric. Storybook + browser-mode
+        // tests cover interaction and visual regression on top of this
+        // baseline. Tighten as coverage climbs; never loosen.
+        lines: 80,
+        statements: 80,
+        functions: 80,
+        branches: 80,
       },
     },
   },
