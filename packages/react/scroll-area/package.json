@@ -1,0 +1,9 @@
+{
+  "name": "@lumen/react/scroll-area",
+  "private": true,
+  "type": "module",
+  "main": "../dist/scroll-area.js",
+  "module": "../dist/scroll-area.js",
+  "types": "../dist/scroll-area.d.ts",
+  "sideEffects": ["*.css"]
+}

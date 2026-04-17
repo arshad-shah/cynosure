@@ -1,0 +1,9 @@
+{
+  "name": "@lumen/react/code-block",
+  "private": true,
+  "type": "module",
+  "main": "../dist/code-block.js",
+  "module": "../dist/code-block.js",
+  "types": "../dist/code-block.d.ts",
+  "sideEffects": ["*.css"]
+}

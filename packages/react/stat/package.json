@@ -1,0 +1,9 @@
+{
+  "name": "@lumen/react/stat",
+  "private": true,
+  "type": "module",
+  "main": "../dist/stat.js",
+  "module": "../dist/stat.js",
+  "types": "../dist/stat.d.ts",
+  "sideEffects": ["*.css"]
+}

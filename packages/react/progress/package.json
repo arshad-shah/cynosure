@@ -1,0 +1,9 @@
+{
+  "name": "@lumen/react/progress",
+  "private": true,
+  "type": "module",
+  "main": "../dist/progress.js",
+  "module": "../dist/progress.js",
+  "types": "../dist/progress.d.ts",
+  "sideEffects": ["*.css"]
+}

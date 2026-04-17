@@ -1,0 +1,9 @@
+{
+  "name": "@lumen/react/table",
+  "private": true,
+  "type": "module",
+  "main": "../dist/table.js",
+  "module": "../dist/table.js",
+  "types": "../dist/table.d.ts",
+  "sideEffects": ["*.css"]
+}

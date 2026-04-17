@@ -1,0 +1,9 @@
+{
+  "name": "@lumen/react/collapsible",
+  "private": true,
+  "type": "module",
+  "main": "../dist/collapsible.js",
+  "module": "../dist/collapsible.js",
+  "types": "../dist/collapsible.d.ts",
+  "sideEffects": ["*.css"]
+}
