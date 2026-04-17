@@ -1,0 +1,11 @@
+# Cloudflare Pages configuration for the Lumen docs site.
+#
+# Matches Arshad's existing arshadshah.com infra on Cloudflare.
+# See: https://developers.cloudflare.com/pages/configuration/build-configuration/
+#
+# The docs site is the built Storybook (`storybook-static/`), served as
+# plain static assets. No functions or workers are required.
+
+name = "lumen-docs"
+pages_build_output_dir = "./storybook-static"
+compatibility_date = "2026-04-17"

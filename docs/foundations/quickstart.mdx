@@ -1,0 +1,138 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Getting started/Quickstart" />
+
+# Quickstart
+
+A minimal end-to-end Lumen app.
+
+## 1. Install
+
+```bash
+pnpm add @lumen/react @lumen/tokens
+```
+
+## 2. Wire the providers
+
+`ThemeProvider` owns the theme state and toggles `data-theme` on `<html>`.
+`TooltipProvider` deduplicates Radix tooltips. `DirectionProvider` lets you
+render in RTL without re-mounting the tree.
+
+```tsx
+// src/main.tsx
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import {
+  DirectionProvider,
+  ThemeProvider,
+  TooltipProvider,
+} from '@lumen/react';
+import '@lumen/tokens/css';
+import '@lumen/tokens/css/dark';
+import '@lumen/react/styles.css';
+import App from './App';
+
+ReactDOM.createRoot(document.getElementById('root')!).render(
+  <React.StrictMode>
+    <ThemeProvider defaultTheme="system">
+      <DirectionProvider dir="ltr">
+        <TooltipProvider>
+          <App />
+        </TooltipProvider>
+      </DirectionProvider>
+    </ThemeProvider>
+  </React.StrictMode>,
+);
+```
+
+## 3. Your first screen
+
+```tsx
+// src/App.tsx
+import {
+  Button,
+  Card,
+  CardContent,
+  CardHeader,
+  Heading,
+  Stack,
+  Text,
+} from '@lumen/react';
+
+export default function App() {
+  return (
+    <Stack gap="6" padding="6" maxWidth="md" marginX="auto">
+      <Heading level={1}>Hello, Lumen</Heading>
+      <Card>
+        <CardHeader>
+          <Heading level={2} size="lg">
+            A minimal card
+          </Heading>
+        </CardHeader>
+        <CardContent>
+          <Stack gap="3">
+            <Text>Lumen ships primitives that render real HTML and components that compose those primitives.</Text>
+            <Button>Primary action</Button>
+          </Stack>
+        </CardContent>
+      </Card>
+    </Stack>
+  );
+}
+```
+
+## 4. Switch themes
+
+```tsx
+import { useTheme } from '@lumen/react';
+
+function ThemeSwitcher() {
+  const { theme, setTheme, themes } = useTheme();
+  return (
+    <select value={theme} onChange={(e) => setTheme(e.target.value)}>
+      {themes.map((t) => (
+        <option key={t} value={t}>{t}</option>
+      ))}
+    </select>
+  );
+}
+```
+
+## 5. Ship a form
+
+```tsx
+import {
+  Button,
+  Form,
+  FormControl,
+  FormField,
+  FormLabel,
+  FormMessage,
+  Input,
+  Stack,
+} from '@lumen/react';
+
+export function ContactForm() {
+  return (
+    <Form onSubmit={(e) => { e.preventDefault(); /* … */ }}>
+      <Stack gap="4">
+        <FormField name="email" required>
+          <FormLabel>Email</FormLabel>
+          <FormControl>
+            <Input type="email" />
+          </FormControl>
+          <FormMessage />
+        </FormField>
+        <Button type="submit">Send</Button>
+      </Stack>
+    </Form>
+  );
+}
+```
+
+## Next steps
+
+- [Theming overview](?path=/docs/foundations-theming-overview--docs)
+- [Accessibility](?path=/docs/foundations-accessibility--docs)
+- Browse components in the sidebar → **Forms**, **Overlay**, **Data display**.
+- [Recipes](?path=/docs/recipes-login-form--docs) for worked examples.

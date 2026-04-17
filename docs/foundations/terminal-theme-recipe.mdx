@@ -1,0 +1,46 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Foundations/Theming/Terminal theme" />
+
+# Terminal theme recipe
+
+Lumen ships a dark "terminal" theme inspired by GitHub Dark / JetBrains
+Mono aesthetics. It's useful as a reference for authoring your own dark
+palette.
+
+## Enable it
+
+```ts
+import '@lumen/themes/terminal';
+```
+
+Then add `'terminal'` to your `ThemeProvider` allowed themes:
+
+```tsx
+<ThemeProvider themes={['light', 'dark', 'terminal']} defaultTheme="terminal">
+  {children}
+</ThemeProvider>
+```
+
+## What's in it
+
+- Background: `#0d0f14` with `#161b22` for elevated surfaces.
+- Foreground: `#e6edf3` default, `#8b949e` muted.
+- Accent: `#388bfd` across solid / hover / soft / focus families.
+- Body font: `JetBrains Mono` with a monospace fallback stack.
+- Feedback tokens (success / danger / warning) darkened enough to hit 3:1
+  contrast with white text — verified by the contrast audit.
+
+## Authoring your own dark palette
+
+1. Start by copying `packages/themes/src/terminal/index.css`.
+2. Change the primitive values.
+3. Run `pnpm audit:contrast` to validate the pairs.
+4. Document any intentional contrast exceptions in your own docs.
+
+## Why monospace?
+
+Not mandatory — Lumen only uses `--lumen-font-body-family` and
+`--lumen-font-mono-family`. The terminal theme rebinds the body family to
+a monospace stack because that's the "feel" it's going for. Your theme
+can rebind to anything.

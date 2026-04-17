@@ -59,7 +59,10 @@ jobs:
         # Once Chromatic has accepted a baseline on main, remove this
         # line so the check starts gating merges on real regressions.
         continue-on-error: true
-        uses: chromaui/action@v11
+        # chromaui/action@v16 is the current major — it runs under Node 24
+        # and pins the latest chromatic CLI. Keep an eye on the action's
+        # release notes at https://github.com/chromaui/action/releases.
+        uses: chromaui/action@v16
         env:
           # `chromaui/action` also reads CHROMATIC_PROJECT_TOKEN from the env;
           # surface CHROMATIC_TOKEN under both names so the action picks it
