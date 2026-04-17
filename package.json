@@ -61,5 +61,8 @@
   },
   "lint-staged": {
     "*.{ts,tsx,js,jsx,json,md}": ["biome check --write --no-errors-on-unmatched"]
+  },
+  "volta": {
+    "node": "24.15.0"
   }
 }

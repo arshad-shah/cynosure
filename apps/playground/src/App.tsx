@@ -1,43 +1,48 @@
 import {
   DirectionProvider,
-  Portal,
   ThemeProvider,
+  Toaster,
+  TooltipProvider,
   VERSION,
-  VisuallyHidden,
-  useDirection,
-  useDisclosure,
-  useMediaQuery,
-  useReducedMotion,
   useTheme,
 } from '@lumen/react';
-import * as Popover from '@radix-ui/react-popover';
 import { useState } from 'react';
+import { DataDisplaySection } from './sections/dataDisplay';
+import { FeedbackSection } from './sections/feedback';
+import { FormsSection } from './sections/forms';
+import { NavigationSection } from './sections/navigation';
+import { OverlaySection } from './sections/overlay';
+import { PrimitivesSection } from './sections/primitives';
+import { TypographySection } from './sections/typography';
+import './showcase.css';
 
 const THEMES = ['system', 'light', 'dark', 'terminal', 'high-contrast'] as const;
+
+type SectionKey =
+  | 'primitives'
+  | 'typography'
+  | 'forms'
+  | 'overlay'
+  | 'navigation'
+  | 'dataDisplay'
+  | 'feedback';
+
+const SECTIONS: { key: SectionKey; label: string; render: () => React.ReactNode }[] = [
+  { key: 'primitives', label: 'Primitives', render: () => <PrimitivesSection /> },
+  { key: 'typography', label: 'Typography', render: () => <TypographySection /> },
+  { key: 'forms', label: 'Forms', render: () => <FormsSection /> },
+  { key: 'overlay', label: 'Overlays', render: () => <OverlaySection /> },
+  { key: 'navigation', label: 'Navigation', render: () => <NavigationSection /> },
+  { key: 'dataDisplay', label: 'Data display', render: () => <DataDisplaySection /> },
+  { key: 'feedback', label: 'Feedback', render: () => <FeedbackSection /> },
+];
 
 function ThemeSwitcher() {
   const { theme, setTheme, resolvedTheme, colorScheme } = useTheme();
   return (
-    <label
-      style={{
-        display: 'inline-flex',
-        gap: '0.5rem',
-        alignItems: 'center',
-        color: 'var(--lumen-color-foreground-default)',
-      }}
-    >
+    <label style={{ display: 'inline-flex', gap: '0.5rem', alignItems: 'center' }}>
       <span>Theme</span>
-      <select
-        value={theme}
-        onChange={(event) => setTheme(event.target.value)}
-        style={{
-          background: 'var(--lumen-color-background-surface)',
-          color: 'var(--lumen-color-foreground-default)',
-          border: '1px solid var(--lumen-color-border-default)',
-          borderRadius: 'var(--lumen-radius-component-md)',
-          padding: '0.25rem 0.5rem',
-        }}
-      >
+      <select value={theme} onChange={(e) => setTheme(e.target.value)}>
         {THEMES.map((name) => (
           <option key={name} value={name}>
             {name}
@@ -45,262 +50,62 @@ function ThemeSwitcher() {
         ))}
       </select>
       <small style={{ color: 'var(--lumen-color-foreground-muted)' }}>
-        resolved: {resolvedTheme} · scheme: {colorScheme}
+        {resolvedTheme} · {colorScheme}
       </small>
     </label>
   );
 }
 
-function DirectionSwitcher({
-  dir,
-  onChange,
-}: {
-  dir: 'ltr' | 'rtl';
-  onChange: (dir: 'ltr' | 'rtl') => void;
-}) {
-  const ctxDir = useDirection();
-  return (
-    <label
-      style={{
-        display: 'inline-flex',
-        gap: '0.5rem',
-        alignItems: 'center',
-        color: 'var(--lumen-color-foreground-default)',
-      }}
-    >
-      <span>Direction</span>
-      <select
-        value={dir}
-        onChange={(event) => onChange(event.target.value as 'ltr' | 'rtl')}
-        style={{
-          background: 'var(--lumen-color-background-surface)',
-          color: 'var(--lumen-color-foreground-default)',
-          border: '1px solid var(--lumen-color-border-default)',
-          borderRadius: 'var(--lumen-radius-component-md)',
-          padding: '0.25rem 0.5rem',
-        }}
-      >
-        <option value="ltr">ltr</option>
-        <option value="rtl">rtl</option>
-      </select>
-      <small style={{ color: 'var(--lumen-color-foreground-muted)' }}>context: {ctxDir}</small>
-    </label>
-  );
-}
+function Shell() {
+  const [active, setActive] = useState<SectionKey>('primitives');
+  const [dir, setDir] = useState<'ltr' | 'rtl'>('ltr');
+  const section = SECTIONS.find((s) => s.key === active);
 
-function RadixDirectionDemo() {
   return (
-    <Popover.Root>
-      <Popover.Trigger
-        style={{
-          background: 'var(--lumen-color-accent-solid)',
-          color: 'var(--lumen-color-accent-on-solid)',
-          border: 'none',
-          padding: '0.5rem 1rem',
-          borderRadius: 'var(--lumen-radius-component-md)',
-          cursor: 'pointer',
-        }}
-      >
-        Open Radix popover
-      </Popover.Trigger>
-      <Popover.Portal>
-        <Popover.Content
-          sideOffset={6}
-          style={{
-            background: 'var(--lumen-color-background-raised)',
-            color: 'var(--lumen-color-foreground-default)',
-            border: '1px solid var(--lumen-color-border-default)',
-            borderRadius: 'var(--lumen-radius-component-md)',
-            boxShadow: 'var(--lumen-shadow-component-popover)',
-            padding: '0.75rem 1rem',
-          }}
-        >
-          Radix inherits the active <code>dir</code> from
-          <br />
-          Lumen's <code>DirectionProvider</code>.
-          <Popover.Arrow style={{ fill: 'var(--lumen-color-background-raised)' }} />
-        </Popover.Content>
-      </Popover.Portal>
-    </Popover.Root>
-  );
-}
-
-function HooksDemo() {
-  const isMedium = useMediaQuery('(min-width: 48em)');
-  const { isOpen, onOpen, onClose, onToggle } = useDisclosure();
-  return (
-    <div
-      style={{
-        padding: '1rem',
-        background: 'var(--lumen-color-background-surface)',
-        border: '1px solid var(--lumen-color-border-default)',
-        borderRadius: 'var(--lumen-radius-component-lg)',
-        boxShadow: 'var(--lumen-shadow-sm)',
-      }}
-    >
-      <p style={{ marginTop: 0 }}>
-        <strong>Phase 04 hooks</strong> — <code>useMediaQuery</code> resolves{' '}
-        <code>(min-width: 48em)</code> to <strong>{isMedium ? 'true' : 'false'}</strong>.{' '}
-        <code>useDisclosure</code> drives the overlay below.
-      </p>
-      <button
-        type="button"
-        onClick={onToggle}
-        style={{
-          background: 'var(--lumen-color-accent-solid)',
-          color: 'var(--lumen-color-accent-on-solid)',
-          border: 'none',
-          padding: '0.5rem 1rem',
-          borderRadius: 'var(--lumen-radius-component-md)',
-          cursor: 'pointer',
-        }}
-      >
-        <span aria-hidden>{isOpen ? 'Close' : 'Open'} portaled overlay</span>
-        <VisuallyHidden>{isOpen ? 'Close' : 'Open'} Phase 04 demo overlay</VisuallyHidden>
-      </button>
-      {isOpen ? (
-        <Portal>
-          <dialog
-            open
-            aria-label="Phase 04 hooks demo"
-            style={{
-              position: 'fixed',
-              inset: 0,
-              display: 'grid',
-              placeItems: 'center',
-              background: 'rgba(0,0,0,0.5)',
-              border: 'none',
-              width: '100%',
-              height: '100%',
-              margin: 0,
-              padding: 0,
-              zIndex: 1000,
-            }}
-          >
-            <div
-              style={{
-                background: 'var(--lumen-color-background-raised)',
-                color: 'var(--lumen-color-foreground-default)',
-                border: '1px solid var(--lumen-color-border-default)',
-                borderRadius: 'var(--lumen-radius-component-lg)',
-                boxShadow: 'var(--lumen-shadow-component-popover)',
-                padding: '1.25rem 1.5rem',
-                minWidth: '20rem',
-              }}
+    <DirectionProvider dir={dir}>
+      <div className="showcase-shell">
+        <nav className="showcase-nav" aria-label="Showcase sections">
+          <strong style={{ padding: '0.25rem 0.75rem 0.5rem' }}>Lumen {VERSION}</strong>
+          {SECTIONS.map((s) => (
+            <button
+              key={s.key}
+              type="button"
+              aria-current={active === s.key ? 'page' : undefined}
+              onClick={() => setActive(s.key)}
             >
-              <p style={{ marginTop: 0 }}>
-                Rendered via <code>&lt;Portal&gt;</code>, state driven by <code>useDisclosure</code>
-                .
-              </p>
-              <div style={{ display: 'flex', gap: '0.5rem' }}>
-                <button type="button" onClick={onClose}>
-                  Close
-                </button>
-                <button type="button" onClick={onOpen} aria-pressed={isOpen}>
-                  Keep open
-                </button>
-              </div>
-            </div>
-          </dialog>
-        </Portal>
-      ) : null}
-    </div>
-  );
-}
-
-function ReducedMotionBanner() {
-  const reduced = useReducedMotion();
-  if (!reduced) return null;
-  return (
-    <div
-      style={{
-        marginTop: '0.5rem',
-        padding: '0.5rem 0.75rem',
-        background: 'var(--lumen-color-feedback-info-soft)',
-        color: 'var(--lumen-color-feedback-info-foreground)',
-        border: '1px solid var(--lumen-color-feedback-info-border)',
-        borderRadius: 'var(--lumen-radius-component-md)',
-        fontSize: '0.875rem',
-      }}
-    >
-      Reduced-motion preference detected — token-driven motion is disabled.
-    </div>
-  );
-}
-
-function Body() {
-  return (
-    <div
-      style={{
-        minHeight: '100vh',
-        padding: '2rem',
-        background: 'var(--lumen-color-background-canvas)',
-        color: 'var(--lumen-color-foreground-default)',
-        fontFamily: 'var(--lumen-font-family-sans)',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '1.5rem',
-      }}
-    >
-      <header>
-        <h1 style={{ marginBottom: '0.25rem' }}>Lumen {VERSION}</h1>
-        <p style={{ color: 'var(--lumen-color-foreground-muted)', margin: 0 }}>
-          Phase 04 — hooks, utilities, and primitives on top of Phase 03 theming.
-        </p>
-      </header>
-
-      <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
-        <ThemeSwitcher />
+              {s.label}
+            </button>
+          ))}
+        </nav>
+        <main className="showcase-main">
+          <div className="showcase-topbar">
+            <ThemeSwitcher />
+            <label style={{ display: 'inline-flex', gap: '0.5rem', alignItems: 'center' }}>
+              <span>Direction</span>
+              <select value={dir} onChange={(e) => setDir(e.target.value as 'ltr' | 'rtl')}>
+                <option value="ltr">ltr</option>
+                <option value="rtl">rtl</option>
+              </select>
+            </label>
+          </div>
+          {section?.render()}
+        </main>
       </div>
-      <ReducedMotionBanner />
-
-      <div
-        style={{
-          padding: '1rem',
-          background: 'var(--lumen-color-background-surface)',
-          border: '1px solid var(--lumen-color-border-default)',
-          borderRadius: 'var(--lumen-radius-component-lg)',
-          boxShadow: 'var(--lumen-shadow-sm)',
-        }}
-      >
-        <p style={{ marginTop: 0 }}>
-          Surface card. The background, foreground, border, accent and shadow all come from CSS
-          custom properties, so swapping <code>data-theme</code> repaints everything in one frame.
-        </p>
-        <RadixDirectionDemo />
-      </div>
-
-      <HooksDemo />
-    </div>
+      <Toaster />
+    </DirectionProvider>
   );
 }
 
 export function App() {
-  const [dir, setDir] = useState<'ltr' | 'rtl'>('ltr');
   return (
     <ThemeProvider
       defaultTheme="system"
       themes={['system', 'light', 'dark', 'terminal', 'high-contrast']}
       disableTransitionOnChange
     >
-      <DirectionProvider dir={dir}>
-        <div
-          style={{
-            position: 'fixed',
-            top: '1rem',
-            right: '1rem',
-            zIndex: 1,
-            background: 'var(--lumen-color-background-raised)',
-            border: '1px solid var(--lumen-color-border-default)',
-            borderRadius: 'var(--lumen-radius-component-md)',
-            padding: '0.5rem 0.75rem',
-            boxShadow: 'var(--lumen-shadow-sm)',
-          }}
-        >
-          <DirectionSwitcher dir={dir} onChange={setDir} />
-        </div>
-        <Body />
-      </DirectionProvider>
+      <TooltipProvider>
+        <Shell />
+      </TooltipProvider>
     </ThemeProvider>
   );
 }

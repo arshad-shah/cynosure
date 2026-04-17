@@ -218,6 +218,7 @@ function DataTableInner<TData>(
   // `rowSelection` is the trigger here — biome's exhaustive-deps rule thinks
   // it's redundant because `table` closes over it, but `table` is a stable ref
   // and only the selection map mutation actually warrants re-firing the callback.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: rowSelection is the intentional trigger; `table` is a stable ref and listing it alone would not re-fire on selection map mutation.
   useEffect(() => {
     if (!selectable || !onSelectionChange) return;
     const selectedRows = table.getSelectedRowModel().rows.map((r) => r.original);

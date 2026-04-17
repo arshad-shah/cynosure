@@ -1,3 +1,4 @@
+import { X } from 'lucide-react';
 import {
   type CSSProperties,
   type KeyboardEvent,
@@ -17,12 +18,6 @@ import { controlSize, controlWrapperBase, controlWrapperVariant } from '../share
 import { listbox, listboxEmpty, listboxItem, popover } from '../shared/popover.css.js';
 import type { FormControlSize, FormControlVariant } from '../shared/types.js';
 import { inlineInput, tag, tagRemove, tagsRow } from './MultiSelect.css.js';
-
-const XIcon = (): React.ReactElement => (
-  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-    <path stroke="currentColor" strokeWidth="3" strokeLinecap="round" d="M18 6 6 18M6 6l12 12" />
-  </svg>
-);
 
 export interface MultiSelectItemData<T extends string = string> {
   value: T;
@@ -182,7 +177,7 @@ export const MultiSelect = forwardRef<HTMLInputElement, MultiSelectProps<string>
                   }}
                   disabled={disabled}
                 >
-                  <XIcon />
+                  <X size={12} strokeWidth={3} aria-hidden />
                 </button>
               </span>
             ))}

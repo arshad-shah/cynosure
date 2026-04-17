@@ -1,4 +1,5 @@
 import * as RadixCheckbox from '@radix-ui/react-checkbox';
+import { Check, Minus } from 'lucide-react';
 import { type ReactNode, forwardRef, useContext } from 'react';
 import { cn } from '../../utils/cn.js';
 import { CheckboxGroupContext } from '../CheckboxGroup/context.js';
@@ -10,6 +11,12 @@ import {
   checkboxRoot,
   checkboxSize,
 } from './Checkbox.css.js';
+
+const INDICATOR_SIZE_PX: Record<'sm' | 'md' | 'lg', number> = {
+  sm: 16,
+  md: 20,
+  lg: 24,
+};
 
 export type CheckboxColorScheme = keyof typeof checkboxColorScheme;
 export type CheckboxState = boolean | 'indeterminate';
@@ -29,24 +36,6 @@ export interface CheckboxProps extends BooleanFormControlBase {
   children?: ReactNode;
   className?: string;
 }
-
-const CheckIcon = (): React.ReactElement => (
-  <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-    <path
-      d="M3 8l3 3 7-7"
-      stroke="currentColor"
-      strokeWidth="2.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-);
-
-const IndeterminateIcon = (): React.ReactElement => (
-  <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-    <path d="M3 8h10" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
-  </svg>
-);
 
 export const Checkbox = forwardRef<HTMLButtonElement, CheckboxProps>(function Checkbox(props, ref) {
   const group = useContext(CheckboxGroupContext);
@@ -107,7 +96,11 @@ export const Checkbox = forwardRef<HTMLButtonElement, CheckboxProps>(function Ch
       )}
     >
       <RadixCheckbox.Indicator className={checkboxIndicator}>
-        {checked === 'indeterminate' ? <IndeterminateIcon /> : <CheckIcon />}
+        {checked === 'indeterminate' ? (
+          <Minus size={INDICATOR_SIZE_PX[size]} strokeWidth={3.5} aria-hidden />
+        ) : (
+          <Check size={INDICATOR_SIZE_PX[size]} strokeWidth={3.5} aria-hidden />
+        )}
       </RadixCheckbox.Indicator>
     </RadixCheckbox.Root>
   );
