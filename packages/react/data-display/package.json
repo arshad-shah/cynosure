@@ -1,0 +1,9 @@
+{
+  "name": "@lumen/react/data-display",
+  "private": true,
+  "type": "module",
+  "main": "../dist/data-display/index.js",
+  "module": "../dist/data-display/index.js",
+  "types": "../dist/data-display/index.d.ts",
+  "sideEffects": ["*.css"]
+}
