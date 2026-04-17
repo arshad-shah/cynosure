@@ -1,0 +1,9 @@
+{
+  "name": "@lumen/react/banner",
+  "private": true,
+  "type": "module",
+  "main": "../dist/banner.js",
+  "module": "../dist/banner.js",
+  "types": "../dist/banner.d.ts",
+  "sideEffects": ["*.css"]
+}

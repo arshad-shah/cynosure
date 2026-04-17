@@ -1,0 +1,9 @@
+{
+  "name": "@lumen/react/badge",
+  "private": true,
+  "type": "module",
+  "main": "../dist/badge.js",
+  "module": "../dist/badge.js",
+  "types": "../dist/badge.d.ts",
+  "sideEffects": ["*.css"]
+}

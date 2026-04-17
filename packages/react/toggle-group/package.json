@@ -1,0 +1,9 @@
+{
+  "name": "@lumen/react/toggle-group",
+  "private": true,
+  "type": "module",
+  "main": "../dist/toggle-group.js",
+  "module": "../dist/toggle-group.js",
+  "types": "../dist/toggle-group.d.ts",
+  "sideEffects": ["*.css"]
+}

@@ -1,0 +1,9 @@
+{
+  "name": "@lumen/react/avatar",
+  "private": true,
+  "type": "module",
+  "main": "../dist/avatar.js",
+  "module": "../dist/avatar.js",
+  "types": "../dist/avatar.d.ts",
+  "sideEffects": ["*.css"]
+}
