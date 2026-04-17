@@ -1,0 +1,183 @@
+import * as Radix from '@radix-ui/react-dropdown-menu';
+import {
+  type ComponentPropsWithoutRef,
+  type ElementRef,
+  type HTMLAttributes,
+  type ReactNode,
+  forwardRef,
+} from 'react';
+import { cn } from '../../utils/cn.js';
+import {
+  menuContent,
+  menuIndicator,
+  menuItem,
+  menuLabel,
+  menuSeparator,
+  menuShortcut,
+  menuSubChevron,
+} from '../shared/menu.css.js';
+
+export const DropdownMenu = Radix.Root;
+export const DropdownMenuTrigger = Radix.Trigger;
+export const DropdownMenuPortal = Radix.Portal;
+export const DropdownMenuGroup = Radix.Group;
+export const DropdownMenuSub = Radix.Sub;
+export const DropdownMenuRadioGroup = Radix.RadioGroup;
+
+const CheckIcon = () => (
+  <svg width="12" height="12" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+    <path
+      d="M3 8l3 3 7-7"
+      stroke="currentColor"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
+const RadioDot = () => (
+  <svg width="8" height="8" viewBox="0 0 8 8" fill="currentColor" aria-hidden="true">
+    <circle cx="4" cy="4" r="3" />
+  </svg>
+);
+
+const ChevronRight = () => (
+  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <path
+      d="m9 6 6 6-6 6"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+);
+
+export interface DropdownMenuContentProps
+  extends Omit<ComponentPropsWithoutRef<typeof Radix.Content>, 'asChild'> {
+  container?: HTMLElement | (() => HTMLElement);
+  children?: ReactNode;
+}
+
+export const DropdownMenuContent = forwardRef<
+  ElementRef<typeof Radix.Content>,
+  DropdownMenuContentProps
+>(function DropdownMenuContent(
+  {
+    className,
+    sideOffset = 6,
+    collisionPadding = 8,
+    align = 'start',
+    container,
+    children,
+    ...rest
+  },
+  ref,
+) {
+  const resolvedContainer = typeof container === 'function' ? container() : container;
+  return (
+    <Radix.Portal container={resolvedContainer}>
+      <Radix.Content
+        ref={ref}
+        data-lumen-overlay=""
+        sideOffset={sideOffset}
+        collisionPadding={collisionPadding}
+        align={align}
+        className={cn(menuContent, className)}
+        {...rest}
+      >
+        {children}
+      </Radix.Content>
+    </Radix.Portal>
+  );
+});
+
+export const DropdownMenuSubContent = forwardRef<
+  ElementRef<typeof Radix.SubContent>,
+  ComponentPropsWithoutRef<typeof Radix.SubContent>
+>(function DropdownMenuSubContent({ className, sideOffset = 2, ...rest }, ref) {
+  return (
+    <Radix.Portal>
+      <Radix.SubContent
+        ref={ref}
+        data-lumen-overlay=""
+        sideOffset={sideOffset}
+        className={cn(menuContent, className)}
+        {...rest}
+      />
+    </Radix.Portal>
+  );
+});
+
+export interface DropdownMenuItemProps extends ComponentPropsWithoutRef<typeof Radix.Item> {
+  inset?: boolean;
+}
+export const DropdownMenuItem = forwardRef<ElementRef<typeof Radix.Item>, DropdownMenuItemProps>(
+  function DropdownMenuItem({ className, inset: _inset, ...rest }, ref) {
+    return <Radix.Item ref={ref} className={cn(menuItem, className)} {...rest} />;
+  },
+);
+
+export const DropdownMenuCheckboxItem = forwardRef<
+  ElementRef<typeof Radix.CheckboxItem>,
+  ComponentPropsWithoutRef<typeof Radix.CheckboxItem>
+>(function DropdownMenuCheckboxItem({ className, children, ...rest }, ref) {
+  return (
+    <Radix.CheckboxItem ref={ref} className={cn(menuItem, className)} {...rest}>
+      <Radix.ItemIndicator className={menuIndicator}>
+        <CheckIcon />
+      </Radix.ItemIndicator>
+      {children}
+    </Radix.CheckboxItem>
+  );
+});
+
+export const DropdownMenuRadioItem = forwardRef<
+  ElementRef<typeof Radix.RadioItem>,
+  ComponentPropsWithoutRef<typeof Radix.RadioItem>
+>(function DropdownMenuRadioItem({ className, children, ...rest }, ref) {
+  return (
+    <Radix.RadioItem ref={ref} className={cn(menuItem, className)} {...rest}>
+      <Radix.ItemIndicator className={menuIndicator}>
+        <RadioDot />
+      </Radix.ItemIndicator>
+      {children}
+    </Radix.RadioItem>
+  );
+});
+
+export const DropdownMenuLabel = forwardRef<
+  ElementRef<typeof Radix.Label>,
+  ComponentPropsWithoutRef<typeof Radix.Label>
+>(function DropdownMenuLabel({ className, ...rest }, ref) {
+  return <Radix.Label ref={ref} className={cn(menuLabel, className)} {...rest} />;
+});
+
+export const DropdownMenuSeparator = forwardRef<
+  ElementRef<typeof Radix.Separator>,
+  ComponentPropsWithoutRef<typeof Radix.Separator>
+>(function DropdownMenuSeparator({ className, ...rest }, ref) {
+  return <Radix.Separator ref={ref} className={cn(menuSeparator, className)} {...rest} />;
+});
+
+export const DropdownMenuSubTrigger = forwardRef<
+  ElementRef<typeof Radix.SubTrigger>,
+  ComponentPropsWithoutRef<typeof Radix.SubTrigger>
+>(function DropdownMenuSubTrigger({ className, children, ...rest }, ref) {
+  return (
+    <Radix.SubTrigger ref={ref} className={cn(menuItem, className)} {...rest}>
+      {children}
+      <span className={menuSubChevron} aria-hidden="true">
+        <ChevronRight />
+      </span>
+    </Radix.SubTrigger>
+  );
+});
+
+/** Keyboard-shortcut chip. Purely decorative — not announced. */
+export const DropdownMenuShortcut = forwardRef<HTMLSpanElement, HTMLAttributes<HTMLSpanElement>>(
+  function DropdownMenuShortcut({ className, ...rest }, ref) {
+    return <span ref={ref} className={cn(menuShortcut, className)} {...rest} />;
+  },
+);

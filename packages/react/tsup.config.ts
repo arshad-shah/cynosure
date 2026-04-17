@@ -95,6 +95,28 @@ const formsEntries = (): Record<string, string> => {
   return entries;
 };
 
+const overlayComponents = [
+  'Dialog',
+  'AlertDialog',
+  'Drawer',
+  'Popover',
+  'HoverCard',
+  'Tooltip',
+  'Toast',
+  'DropdownMenu',
+  'ContextMenu',
+  'MenuBar',
+  'Modal',
+] as const;
+
+const overlayEntries = (): Record<string, string> => {
+  const entries: Record<string, string> = {};
+  for (const name of overlayComponents) {
+    entries[name.toLowerCase()] = `src/overlay/${name}/index.ts`;
+  }
+  return entries;
+};
+
 export default createConfig({
   entry: {
     index: 'src/index.ts',
@@ -102,11 +124,13 @@ export default createConfig({
     'primitives/index': 'src/primitives/index.ts',
     'typography/index': 'src/typography/index.ts',
     'forms/index': 'src/forms/index.ts',
+    'overlay/index': 'src/overlay/index.ts',
     'utils/index': 'src/utils/index.ts',
     ...hookEntries(),
     ...primitiveEntries(),
     ...typographyEntries(),
     ...formsEntries(),
+    ...overlayEntries(),
   },
   esbuildPlugins: [vanillaExtractPlugin()],
   // vanilla-extract emits real CSS — surface it as loose CSS alongside JS
@@ -115,13 +139,22 @@ export default createConfig({
     'react',
     'react-dom',
     'react/jsx-runtime',
+    '@radix-ui/react-alert-dialog',
     '@radix-ui/react-checkbox',
+    '@radix-ui/react-context-menu',
+    '@radix-ui/react-dialog',
     '@radix-ui/react-direction',
+    '@radix-ui/react-dropdown-menu',
+    '@radix-ui/react-hover-card',
+    '@radix-ui/react-menubar',
+    '@radix-ui/react-popover',
     '@radix-ui/react-radio-group',
     '@radix-ui/react-slot',
     '@radix-ui/react-switch',
+    '@radix-ui/react-tooltip',
     'class-variance-authority',
     'react-aria-components',
     '@internationalized/date',
+    'sonner',
   ],
 });

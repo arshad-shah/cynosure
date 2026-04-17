@@ -4,6 +4,7 @@ export * from './hooks/index.js';
 export * from './primitives/index.js';
 export * from './typography/index.js';
 export * from './forms/index.js';
+export * from './overlay/index.js';
 export * from './utils/index.js';
 
 export {

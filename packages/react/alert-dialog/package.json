@@ -1,0 +1,9 @@
+{
+  "name": "@lumen/react/alert-dialog",
+  "private": true,
+  "type": "module",
+  "main": "../dist/alertdialog.js",
+  "module": "../dist/alertdialog.js",
+  "types": "../dist/alertdialog.d.ts",
+  "sideEffects": ["*.css"]
+}
