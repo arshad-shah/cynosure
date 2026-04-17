@@ -42,7 +42,7 @@ export const menuItem = style({
   position: 'relative',
   paddingBlock: vars.space['1.5'],
   paddingInline: vars.space['2'],
-  paddingLeft: vars.space['6'],
+  paddingInlineStart: vars.space['6'],
   borderRadius: vars.radius.sm,
   cursor: 'default',
   userSelect: 'none',
@@ -66,10 +66,10 @@ export const menuItem = style({
   },
 });
 
-/** Left-side check indicator for CheckboxItem / RadioItem. */
+/** Inline-start check indicator for CheckboxItem / RadioItem. */
 export const menuIndicator = style({
   position: 'absolute',
-  left: vars.space['2'],
+  insetInlineStart: vars.space['2'],
   top: '50%',
   transform: 'translateY(-50%)',
   display: 'inline-flex',
@@ -77,9 +77,9 @@ export const menuIndicator = style({
   justifyContent: 'center',
 });
 
-/** Chevron at the right edge of SubTrigger. */
+/** Chevron at the inline-end edge of SubTrigger. */
 export const menuSubChevron = style({
-  marginLeft: 'auto',
+  marginInlineStart: 'auto',
   display: 'inline-flex',
 });
 
@@ -95,7 +95,7 @@ export const menuSeparator = style({
 export const menuLabel = style({
   paddingInline: vars.space['2'],
   paddingBlock: vars.space['1'],
-  paddingLeft: vars.space['6'],
+  paddingInlineStart: vars.space['6'],
   fontSize: 'var(--lumen-font-body-sm-size)',
   fontWeight: 600,
   color: vars.color.foreground.muted,
@@ -103,10 +103,10 @@ export const menuLabel = style({
   letterSpacing: '0.05em',
 });
 
-/** Keyboard shortcut chip rendered at the right of an item. */
+/** Keyboard shortcut chip rendered at the inline-end of an item. */
 export const menuShortcut = style({
-  marginLeft: 'auto',
-  paddingLeft: vars.space['4'],
+  marginInlineStart: 'auto',
+  paddingInlineStart: vars.space['4'],
   fontSize: 'var(--lumen-font-body-sm-size)',
   color: vars.color.foreground.muted,
   fontVariantNumeric: 'tabular-nums',

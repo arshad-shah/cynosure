@@ -531,6 +531,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run --passWithNoTests",
     "test:watch": "vitest --passWithNoTests",
+    "test:coverage": "vitest run --coverage --passWithNoTests",
+    "test:browser": "LUMEN_BROWSER_MODE=1 vitest run --passWithNoTests",
     "clean": "rm -rf dist .turbo"
   },
   "peerDependencies": {

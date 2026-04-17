@@ -7,7 +7,7 @@ export const calloutRoot = style({
   gap: vars.space['3'],
   padding: vars.space['4'],
   borderRadius: vars.radius.md,
-  borderLeft: `3px solid ${vars.color.accent.solid}`,
+  borderInlineStart: `3px solid ${vars.color.accent.solid}`,
   background: vars.color.background.subtle,
   color: vars.color.foreground.default,
   fontFamily: 'var(--lumen-font-body-md-family)',
@@ -17,53 +17,53 @@ export const calloutRoot = style({
 export const calloutVariantOutline = style({
   background: 'transparent',
   border: `1px solid ${vars.color.border.default}`,
-  borderLeft: `3px solid ${vars.color.accent.solid}`,
+  borderInlineStart: `3px solid ${vars.color.accent.solid}`,
 });
 
 export const calloutColorScheme = styleVariants({
   accent: {
     background: vars.color.accent.soft,
-    borderLeftColor: vars.color.accent.solid,
+    borderInlineStartColor: vars.color.accent.solid,
     color: vars.color.accent.solid,
   },
   neutral: {
     background: vars.color.background.subtle,
-    borderLeftColor: vars.color.foreground.muted,
+    borderInlineStartColor: vars.color.foreground.muted,
     color: vars.color.foreground.default,
   },
   success: {
     background: vars.color.feedback.success.soft,
-    borderLeftColor: vars.color.feedback.success.solid,
+    borderInlineStartColor: vars.color.feedback.success.solid,
     color: vars.color.feedback.success.foreground,
   },
   warning: {
     background: vars.color.feedback.warning.soft,
-    borderLeftColor: vars.color.feedback.warning.solid,
+    borderInlineStartColor: vars.color.feedback.warning.solid,
     color: vars.color.feedback.warning.foreground,
   },
   danger: {
     background: vars.color.feedback.danger.soft,
-    borderLeftColor: vars.color.feedback.danger.solid,
+    borderInlineStartColor: vars.color.feedback.danger.solid,
     color: vars.color.feedback.danger.foreground,
   },
 });
 
 export const calloutOutlineColorScheme = styleVariants({
-  accent: { borderLeftColor: vars.color.accent.solid, color: vars.color.accent.solid },
+  accent: { borderInlineStartColor: vars.color.accent.solid, color: vars.color.accent.solid },
   neutral: {
-    borderLeftColor: vars.color.foreground.muted,
+    borderInlineStartColor: vars.color.foreground.muted,
     color: vars.color.foreground.default,
   },
   success: {
-    borderLeftColor: vars.color.feedback.success.solid,
+    borderInlineStartColor: vars.color.feedback.success.solid,
     color: vars.color.feedback.success.foreground,
   },
   warning: {
-    borderLeftColor: vars.color.feedback.warning.solid,
+    borderInlineStartColor: vars.color.feedback.warning.solid,
     color: vars.color.feedback.warning.foreground,
   },
   danger: {
-    borderLeftColor: vars.color.feedback.danger.solid,
+    borderInlineStartColor: vars.color.feedback.danger.solid,
     color: vars.color.feedback.danger.foreground,
   },
 });
