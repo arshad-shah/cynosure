@@ -208,6 +208,8 @@ export default createConfig({
     'theme/index': 'src/theme/index.ts',
     'primitives/index': 'src/primitives/index.ts',
     'typography/index': 'src/typography/index.ts',
+    form: 'src/forms/Form/index.ts',
+    rhf: 'src/forms/Form/rhf/index.ts',
     'forms/index': 'src/forms/index.ts',
     'overlay/index': 'src/overlay/index.ts',
     'navigation/index': 'src/navigation/index.ts',
@@ -258,5 +260,6 @@ export default createConfig({
     '@radix-ui/react-toggle-group',
     'react-resizable-panels',
     'shiki',
+    'react-hook-form',
   ],
 });

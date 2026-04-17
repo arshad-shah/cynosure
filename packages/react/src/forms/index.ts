@@ -27,6 +27,26 @@ export * from './SearchInput/index.js';
 export * from './PinInput/index.js';
 export * from './TagsInput/index.js';
 export * from './Rating/index.js';
+export {
+  Form,
+  FormField,
+  FormLabel,
+  FormControl,
+  FormDescription,
+  FormMessage,
+  FormFieldContext,
+  FormFieldProvider,
+  useFormField,
+} from './Form/index.js';
+export type {
+  FormProps,
+  FormFieldProps,
+  FormLabelProps,
+  FormControlProps,
+  FormDescriptionProps,
+  FormMessageProps,
+  FormFieldContextValue,
+} from './Form/index.js';
 export type {
   BooleanFormControlBase,
   FormControlBase,
