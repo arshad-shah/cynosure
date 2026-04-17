@@ -55,16 +55,44 @@ const typographyEntries = (): Record<string, string> => {
   return entries;
 };
 
+const formsComponents = [
+  'Button',
+  'IconButton',
+  'ButtonGroup',
+  'Input',
+  'Textarea',
+  'NumberInput',
+  'Checkbox',
+  'CheckboxGroup',
+  'Radio',
+  'RadioGroup',
+  'Switch',
+  'Label',
+  'HelperText',
+  'ErrorText',
+  'Fieldset',
+] as const;
+
+const formsEntries = (): Record<string, string> => {
+  const entries: Record<string, string> = {};
+  for (const name of formsComponents) {
+    entries[name.toLowerCase()] = `src/forms/${name}/index.ts`;
+  }
+  return entries;
+};
+
 export default createConfig({
   entry: {
     index: 'src/index.ts',
     'theme/index': 'src/theme/index.ts',
     'primitives/index': 'src/primitives/index.ts',
     'typography/index': 'src/typography/index.ts',
+    'forms/index': 'src/forms/index.ts',
     'utils/index': 'src/utils/index.ts',
     ...hookEntries(),
     ...primitiveEntries(),
     ...typographyEntries(),
+    ...formsEntries(),
   },
   esbuildPlugins: [vanillaExtractPlugin()],
   // vanilla-extract emits real CSS — surface it as loose CSS alongside JS
@@ -73,8 +101,12 @@ export default createConfig({
     'react',
     'react-dom',
     'react/jsx-runtime',
+    '@radix-ui/react-checkbox',
     '@radix-ui/react-direction',
+    '@radix-ui/react-radio-group',
     '@radix-ui/react-slot',
+    '@radix-ui/react-switch',
     'class-variance-authority',
+    'react-aria-components',
   ],
 });

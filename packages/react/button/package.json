@@ -1,0 +1,9 @@
+{
+  "name": "@lumen/react/button",
+  "private": true,
+  "type": "module",
+  "main": "../dist/button.js",
+  "module": "../dist/button.js",
+  "types": "../dist/button.d.ts",
+  "sideEffects": ["*.css"]
+}

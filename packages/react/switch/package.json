@@ -1,0 +1,9 @@
+{
+  "name": "@lumen/react/switch",
+  "private": true,
+  "type": "module",
+  "main": "../dist/switch.js",
+  "module": "../dist/switch.js",
+  "types": "../dist/switch.d.ts",
+  "sideEffects": ["*.css"]
+}

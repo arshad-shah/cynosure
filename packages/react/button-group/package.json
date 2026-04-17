@@ -1,0 +1,9 @@
+{
+  "name": "@lumen/react/button-group",
+  "private": true,
+  "type": "module",
+  "main": "../dist/buttongroup.js",
+  "module": "../dist/buttongroup.js",
+  "types": "../dist/buttongroup.d.ts",
+  "sideEffects": ["*.css"]
+}

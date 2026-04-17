@@ -1,0 +1,9 @@
+{
+  "name": "@lumen/react/textarea",
+  "private": true,
+  "type": "module",
+  "main": "../dist/textarea.js",
+  "module": "../dist/textarea.js",
+  "types": "../dist/textarea.d.ts",
+  "sideEffects": ["*.css"]
+}

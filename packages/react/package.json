@@ -86,6 +86,70 @@
       "types": "./dist/list.d.ts",
       "import": "./dist/list.js"
     },
+    "./button": {
+      "types": "./dist/button.d.ts",
+      "import": "./dist/button.js"
+    },
+    "./icon-button": {
+      "types": "./dist/iconbutton.d.ts",
+      "import": "./dist/iconbutton.js"
+    },
+    "./button-group": {
+      "types": "./dist/buttongroup.d.ts",
+      "import": "./dist/buttongroup.js"
+    },
+    "./input": {
+      "types": "./dist/input.d.ts",
+      "import": "./dist/input.js"
+    },
+    "./textarea": {
+      "types": "./dist/textarea.d.ts",
+      "import": "./dist/textarea.js"
+    },
+    "./number-input": {
+      "types": "./dist/numberinput.d.ts",
+      "import": "./dist/numberinput.js"
+    },
+    "./checkbox": {
+      "types": "./dist/checkbox.d.ts",
+      "import": "./dist/checkbox.js"
+    },
+    "./checkbox-group": {
+      "types": "./dist/checkboxgroup.d.ts",
+      "import": "./dist/checkboxgroup.js"
+    },
+    "./radio": {
+      "types": "./dist/radio.d.ts",
+      "import": "./dist/radio.js"
+    },
+    "./radio-group": {
+      "types": "./dist/radiogroup.d.ts",
+      "import": "./dist/radiogroup.js"
+    },
+    "./switch": {
+      "types": "./dist/switch.d.ts",
+      "import": "./dist/switch.js"
+    },
+    "./label": {
+      "types": "./dist/label.d.ts",
+      "import": "./dist/label.js"
+    },
+    "./helper-text": {
+      "types": "./dist/helpertext.d.ts",
+      "import": "./dist/helpertext.js"
+    },
+    "./error-text": {
+      "types": "./dist/errortext.d.ts",
+      "import": "./dist/errortext.js"
+    },
+    "./fieldset": {
+      "types": "./dist/fieldset.d.ts",
+      "import": "./dist/fieldset.js"
+    },
+    "./forms": {
+      "types": "./dist/forms/index.d.ts",
+      "import": "./dist/forms/index.js"
+    },
     "./package.json": "./package.json"
   },
   "main": "./dist/index.js",
@@ -112,6 +176,22 @@
     "link",
     "blockquote",
     "list",
+    "button",
+    "icon-button",
+    "button-group",
+    "input",
+    "textarea",
+    "number-input",
+    "checkbox",
+    "checkbox-group",
+    "radio",
+    "radio-group",
+    "switch",
+    "label",
+    "helper-text",
+    "error-text",
+    "fieldset",
+    "forms",
     "README.md",
     "CHANGELOG.md"
   ],
@@ -130,11 +210,15 @@
   "dependencies": {
     "@lumen/core": "workspace:*",
     "@lumen/tokens": "workspace:*",
+    "@radix-ui/react-checkbox": "^1.3.3",
     "@radix-ui/react-direction": "^1.1.0",
+    "@radix-ui/react-radio-group": "^1.3.8",
     "@radix-ui/react-slot": "^1.2.4",
+    "@radix-ui/react-switch": "^1.2.6",
     "@vanilla-extract/css": "^1.20.1",
     "@vanilla-extract/recipes": "^0.5.7",
-    "class-variance-authority": "^0.7.1"
+    "class-variance-authority": "^0.7.1",
+    "react-aria-components": "^1.17.0"
   },
   "devDependencies": {
     "@lumen/config": "workspace:*",
