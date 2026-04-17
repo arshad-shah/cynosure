@@ -1,0 +1,9 @@
+{
+  "name": "@lumen/react/tree",
+  "private": true,
+  "type": "module",
+  "main": "../dist/tree.js",
+  "module": "../dist/tree.js",
+  "types": "../dist/tree.d.ts",
+  "sideEffects": ["*.css"]
+}

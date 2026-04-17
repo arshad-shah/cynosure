@@ -137,6 +137,40 @@ const navigationEntries = (): Record<string, string> => {
   return entries;
 };
 
+const dataDisplayComponents = [
+  'Card',
+  'Table',
+  'DataTable',
+  'Tree',
+  'Timeline',
+  'Stat',
+  'Progress',
+  'Skeleton',
+  'Spinner',
+  'Accordion',
+  'Collapsible',
+  'ScrollArea',
+  'Resizable',
+  'CodeBlock',
+] as const;
+
+const dataDisplayEntries = (): Record<string, string> => {
+  const entries: Record<string, string> = {};
+  for (const name of dataDisplayComponents) {
+    // CodeBlock gets a kebab-cased entry to match the `/code-block` subpath
+    const key =
+      name === 'DataTable'
+        ? 'data-table'
+        : name === 'ScrollArea'
+          ? 'scroll-area'
+          : name === 'CodeBlock'
+            ? 'code-block'
+            : name.toLowerCase();
+    entries[key] = `src/data-display/${name}/index.ts`;
+  }
+  return entries;
+};
+
 export default createConfig({
   entry: {
     index: 'src/index.ts',
@@ -146,6 +180,7 @@ export default createConfig({
     'forms/index': 'src/forms/index.ts',
     'overlay/index': 'src/overlay/index.ts',
     'navigation/index': 'src/navigation/index.ts',
+    'data-display/index': 'src/data-display/index.ts',
     'utils/index': 'src/utils/index.ts',
     ...hookEntries(),
     ...primitiveEntries(),
@@ -153,6 +188,7 @@ export default createConfig({
     ...formsEntries(),
     ...overlayEntries(),
     ...navigationEntries(),
+    ...dataDisplayEntries(),
   },
   esbuildPlugins: [vanillaExtractPlugin()],
   // vanilla-extract emits real CSS — surface it as loose CSS alongside JS
@@ -180,5 +216,11 @@ export default createConfig({
     'react-aria-components',
     '@internationalized/date',
     'sonner',
+    '@radix-ui/react-accordion',
+    '@radix-ui/react-collapsible',
+    '@radix-ui/react-scroll-area',
+    '@tanstack/react-table',
+    'react-resizable-panels',
+    'shiki',
   ],
 });

@@ -1,0 +1,9 @@
+{
+  "name": "@lumen/react/timeline",
+  "private": true,
+  "type": "module",
+  "main": "../dist/timeline.js",
+  "module": "../dist/timeline.js",
+  "types": "../dist/timeline.d.ts",
+  "sideEffects": ["*.css"]
+}

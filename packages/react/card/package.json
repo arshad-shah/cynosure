@@ -1,0 +1,9 @@
+{
+  "name": "@lumen/react/card",
+  "private": true,
+  "type": "module",
+  "main": "../dist/card.js",
+  "module": "../dist/card.js",
+  "types": "../dist/card.d.ts",
+  "sideEffects": ["*.css"]
+}

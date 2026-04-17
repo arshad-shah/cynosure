@@ -1,0 +1,9 @@
+{
+  "name": "@lumen/react/skeleton",
+  "private": true,
+  "type": "module",
+  "main": "../dist/skeleton.js",
+  "module": "../dist/skeleton.js",
+  "types": "../dist/skeleton.d.ts",
+  "sideEffects": ["*.css"]
+}

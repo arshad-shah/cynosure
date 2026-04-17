@@ -1,0 +1,9 @@
+{
+  "name": "@lumen/react/accordion",
+  "private": true,
+  "type": "module",
+  "main": "../dist/accordion.js",
+  "module": "../dist/accordion.js",
+  "types": "../dist/accordion.d.ts",
+  "sideEffects": ["*.css"]
+}
