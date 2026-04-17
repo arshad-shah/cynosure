@@ -1,0 +1,74 @@
+import { Meta } from '@storybook/blocks';
+
+<Meta title="Forms/Form composition/Recipes/react-hook-form + Zod" />
+
+# `react-hook-form` + Zod schema
+
+Schema-first validation. `@hookform/resolvers` bridges Zod (or Yup, Valibot,
+Joi, …) into `useForm`, and `RHFField` takes care of surfacing the parsed
+error messages onto `FormMessage`.
+
+```bash
+pnpm add react-hook-form zod @hookform/resolvers
+```
+
+## Example
+
+```tsx
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
+import { Form, Input, Button, Stack } from '@lumen/react';
+import { RHFField } from '@lumen/react/rhf';
+
+const schema = z.object({
+  email: z.string().min(1, 'Email is required').email('Must be a valid email'),
+  password: z.string().min(8, '8+ characters'),
+});
+type FormValues = z.infer<typeof schema>;
+
+export function LoginForm() {
+  const { control, handleSubmit } = useForm<FormValues>({
+    resolver: zodResolver(schema),
+    defaultValues: { email: '', password: '' },
+  });
+
+  const onSubmit = handleSubmit((values) => {
+    fetch('/api/sign-in', { method: 'POST', body: JSON.stringify(values) });
+  });
+
+  return (
+    <Form onSubmit={onSubmit}>
+      <Stack gap="4">
+        <RHFField
+          control={control}
+          name="email"
+          label="Email"
+          description="We will never share your email."
+        >
+          <Input type="email" />
+        </RHFField>
+
+        <RHFField control={control} name="password" label="Password">
+          <Input type="password" />
+        </RHFField>
+
+        <Button type="submit">Sign in</Button>
+      </Stack>
+    </Form>
+  );
+}
+```
+
+The `rules` prop is omitted because validation lives in the Zod schema.
+Messages arrive on `fieldState.error.message` exactly as before.
+
+## Why a resolver?
+
+- Schema lives in **one place** — server and client can import the same Zod
+  object and stay in sync.
+- Types are **inferred** via `z.infer<typeof schema>`, so `useForm` always
+  reflects the current schema.
+- Cross-field rules (`z.refine`, `z.superRefine`) land on the correct field
+  via the resolver's `path` output — `RHFField` will render the message
+  automatically.

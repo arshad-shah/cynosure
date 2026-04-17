@@ -1,0 +1,93 @@
+import { Meta } from '@storybook/blocks';
+
+<Meta title="Forms/Form composition/Recipes/react-hook-form" />
+
+# `react-hook-form` integration
+
+`@lumen/react/rhf` ships a thin adapter that plugs `useController` into the
+`FormField` scaffolding. `react-hook-form` is declared as an **optional peer
+dependency** — bundlers and type checkers will only demand it when the `/rhf`
+subpath is imported.
+
+```bash
+pnpm add react-hook-form
+```
+
+## `RHFField`
+
+```tsx
+import { useForm } from 'react-hook-form';
+import { Form, Input, Button, Stack } from '@lumen/react';
+import { RHFField } from '@lumen/react/rhf';
+
+type FormValues = { email: string; password: string };
+
+export function LoginForm() {
+  const { control, handleSubmit } = useForm<FormValues>({
+    defaultValues: { email: '', password: '' },
+  });
+
+  const onSubmit = handleSubmit((values) => {
+    fetch('/api/sign-in', { method: 'POST', body: JSON.stringify(values) });
+  });
+
+  return (
+    <Form onSubmit={onSubmit}>
+      <Stack gap="4">
+        <RHFField
+          control={control}
+          name="email"
+          label="Email"
+          rules={{ required: 'Email is required' }}
+        >
+          <Input type="email" />
+        </RHFField>
+
+        <RHFField
+          control={control}
+          name="password"
+          label="Password"
+          rules={{
+            required: 'Password is required',
+            minLength: { value: 8, message: '8+ characters' },
+          }}
+        >
+          <Input type="password" />
+        </RHFField>
+
+        <Button type="submit">Sign in</Button>
+      </Stack>
+    </Form>
+  );
+}
+```
+
+## What the adapter does
+
+- Wires `useController({ control, name, rules })`.
+- Marks the enclosing `FormField` as `invalid` when `fieldState.error` exists.
+- Surfaces `fieldState.error?.message` through `FormMessage` — unset errors
+  render nothing, so you can always mount it.
+- Binds `field.value`, `field.onChange`, `field.onBlur`, and `field.ref` onto
+  the inner control element.
+
+If you need more control than `RHFField` exposes, import the primitives
+directly and call `useController` yourself:
+
+```tsx
+import { useController } from 'react-hook-form';
+import { FormField, FormLabel, FormControl, FormMessage, Input } from '@lumen/react';
+
+function CustomField({ control, name }) {
+  const { field, fieldState } = useController({ control, name });
+  return (
+    <FormField name={name} invalid={!!fieldState.error}>
+      <FormLabel>Email</FormLabel>
+      <FormControl>
+        <Input {...field} />
+      </FormControl>
+      <FormMessage>{fieldState.error?.message}</FormMessage>
+    </FormField>
+  );
+}
+```

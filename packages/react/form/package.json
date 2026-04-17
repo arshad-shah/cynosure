@@ -1,0 +1,9 @@
+{
+  "name": "@lumen/react/form",
+  "private": true,
+  "type": "module",
+  "main": "../dist/form.js",
+  "module": "../dist/form.js",
+  "types": "../dist/form.d.ts",
+  "sideEffects": ["*.css"]
+}

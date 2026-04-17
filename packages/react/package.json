@@ -202,6 +202,14 @@
       "types": "./dist/rating.d.ts",
       "import": "./dist/rating.js"
     },
+    "./form": {
+      "types": "./dist/form.d.ts",
+      "import": "./dist/form.js"
+    },
+    "./rhf": {
+      "types": "./dist/rhf.d.ts",
+      "import": "./dist/rhf.js"
+    },
     "./forms": {
       "types": "./dist/forms/index.d.ts",
       "import": "./dist/forms/index.js"
@@ -461,6 +469,8 @@
     "pin-input",
     "tags-input",
     "rating",
+    "form",
+    "rhf",
     "forms",
     "dialog",
     "alert-dialog",
@@ -525,7 +535,11 @@
   },
   "peerDependencies": {
     "react": ">=19.0.0",
-    "react-dom": ">=19.0.0"
+    "react-dom": ">=19.0.0",
+    "react-hook-form": ">=7.0.0"
+  },
+  "peerDependenciesMeta": {
+    "react-hook-form": { "optional": true }
   },
   "dependencies": {
     "@internationalized/date": "^3.12.1",
@@ -562,6 +576,7 @@
     "sonner": "^2.0.7"
   },
   "devDependencies": {
+    "@hookform/resolvers": "^3.10.0",
     "@lumen/config": "workspace:*",
     "@testing-library/jest-dom": "^6.6.0",
     "@testing-library/react": "^16.1.0",
@@ -570,9 +585,11 @@
     "jsdom": "^25.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-hook-form": "^7.72.1",
     "tsup": "^8.3.0",
     "typescript": "^5.6.0",
-    "vitest": "^2.1.0"
+    "vitest": "^2.1.0",
+    "zod": "^3.25.76"
   },
   "publishConfig": {
     "access": "public"
