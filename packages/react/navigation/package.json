@@ -1,0 +1,9 @@
+{
+  "name": "@lumen/react/navigation",
+  "private": true,
+  "type": "module",
+  "main": "../dist/navigation/index.js",
+  "module": "../dist/navigation/index.js",
+  "types": "../dist/navigation/index.d.ts",
+  "sideEffects": ["*.css"]
+}

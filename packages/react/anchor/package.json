@@ -1,0 +1,9 @@
+{
+  "name": "@lumen/react/anchor",
+  "private": true,
+  "type": "module",
+  "main": "../dist/anchor.js",
+  "module": "../dist/anchor.js",
+  "types": "../dist/anchor.d.ts",
+  "sideEffects": ["*.css"]
+}

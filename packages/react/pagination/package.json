@@ -1,0 +1,9 @@
+{
+  "name": "@lumen/react/pagination",
+  "private": true,
+  "type": "module",
+  "main": "../dist/pagination.js",
+  "module": "../dist/pagination.js",
+  "types": "../dist/pagination.d.ts",
+  "sideEffects": ["*.css"]
+}
