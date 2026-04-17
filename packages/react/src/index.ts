@@ -7,6 +7,7 @@ export * from './forms/index.js';
 export * from './overlay/index.js';
 export * from './navigation/index.js';
 export * from './data-display/index.js';
+export * from './feedback/index.js';
 export * from './utils/index.js';
 
 export {

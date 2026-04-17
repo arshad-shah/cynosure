@@ -1,0 +1,9 @@
+{
+  "name": "@lumen/react/empty-state",
+  "private": true,
+  "type": "module",
+  "main": "../dist/empty-state.js",
+  "module": "../dist/empty-state.js",
+  "types": "../dist/empty-state.d.ts",
+  "sideEffects": ["*.css"]
+}

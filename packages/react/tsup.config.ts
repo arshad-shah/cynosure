@@ -137,6 +137,37 @@ const navigationEntries = (): Record<string, string> => {
   return entries;
 };
 
+const feedbackComponents = [
+  'Badge',
+  'Tag',
+  'Chip',
+  'Avatar',
+  'AvatarGroup',
+  'Alert',
+  'Banner',
+  'Notification',
+  'Callout',
+  'EmptyState',
+  'Toggle',
+  'ToggleGroup',
+] as const;
+
+const feedbackEntries = (): Record<string, string> => {
+  const entries: Record<string, string> = {};
+  for (const name of feedbackComponents) {
+    const key =
+      name === 'AvatarGroup'
+        ? 'avatar-group'
+        : name === 'EmptyState'
+          ? 'empty-state'
+          : name === 'ToggleGroup'
+            ? 'toggle-group'
+            : name.toLowerCase();
+    entries[key] = `src/feedback/${name}/index.ts`;
+  }
+  return entries;
+};
+
 const dataDisplayComponents = [
   'Card',
   'Table',
@@ -181,6 +212,7 @@ export default createConfig({
     'overlay/index': 'src/overlay/index.ts',
     'navigation/index': 'src/navigation/index.ts',
     'data-display/index': 'src/data-display/index.ts',
+    'feedback/index': 'src/feedback/index.ts',
     'utils/index': 'src/utils/index.ts',
     ...hookEntries(),
     ...primitiveEntries(),
@@ -189,6 +221,7 @@ export default createConfig({
     ...overlayEntries(),
     ...navigationEntries(),
     ...dataDisplayEntries(),
+    ...feedbackEntries(),
   },
   esbuildPlugins: [vanillaExtractPlugin()],
   // vanilla-extract emits real CSS — surface it as loose CSS alongside JS
@@ -220,6 +253,9 @@ export default createConfig({
     '@radix-ui/react-collapsible',
     '@radix-ui/react-scroll-area',
     '@tanstack/react-table',
+    '@radix-ui/react-avatar',
+    '@radix-ui/react-toggle',
+    '@radix-ui/react-toggle-group',
     'react-resizable-panels',
     'shiki',
   ],

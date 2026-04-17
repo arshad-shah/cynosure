@@ -1,0 +1,9 @@
+{
+  "name": "@lumen/react/callout",
+  "private": true,
+  "type": "module",
+  "main": "../dist/callout.js",
+  "module": "../dist/callout.js",
+  "types": "../dist/callout.d.ts",
+  "sideEffects": ["*.css"]
+}
