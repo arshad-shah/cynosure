@@ -1,6 +1,6 @@
 {
   "name": "@lumen/react",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Lumen UI — React component library",
   "license": "MIT",
   "type": "module",
