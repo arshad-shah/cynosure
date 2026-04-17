@@ -56,6 +56,10 @@ jobs:
           CHROMATIC_PROJECT_TOKEN: ${{ secrets.CHROMATIC_TOKEN }}
         with:
           projectToken: ${{ secrets.CHROMATIC_TOKEN }}
-          exitZeroOnChanges: false
+          # PRs: report visual diffs but don't block merge — reviewers follow
+          # the build link and accept/reject in the Chromatic UI. Main-branch
+          # builds auto-accept so the baseline always matches what shipped.
+          exitZeroOnChanges: ${{ github.event_name == 'pull_request' }}
+          autoAcceptChanges: main
           onlyChanged: true
           buildScriptName: build-storybook
