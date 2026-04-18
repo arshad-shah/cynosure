@@ -22,7 +22,9 @@ const dist = resolve(__dirname, '..', 'packages/react/dist');
 const target = join(dist, 'styles.css');
 
 if (!existsSync(dist) || !statSync(dist).isDirectory()) {
-  console.warn(`No ${dist} — skipping (run \`pnpm --filter @arshad-shah/cynosure-react build\` first).`);
+  console.warn(
+    `No ${dist} — skipping (run \`pnpm --filter @arshad-shah/cynosure-react build\` first).`,
+  );
   process.exit(0);
 }
 

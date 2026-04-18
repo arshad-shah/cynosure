@@ -95,12 +95,22 @@ StyleDictionary.registerTransform({
 
 StyleDictionary.registerTransformGroup({
   name: 'cynosure/css',
-  transforms: ['attribute/cti', 'name/kebab', 'cynosure/fontFamily/css', 'cynosure/cubicBezier/css'],
+  transforms: [
+    'attribute/cti',
+    'name/kebab',
+    'cynosure/fontFamily/css',
+    'cynosure/cubicBezier/css',
+  ],
 });
 
 StyleDictionary.registerTransformGroup({
   name: 'cynosure/ts',
-  transforms: ['attribute/cti', 'name/camel', 'cynosure/fontFamily/css', 'cynosure/cubicBezier/css'],
+  transforms: [
+    'attribute/cti',
+    'name/camel',
+    'cynosure/fontFamily/css',
+    'cynosure/cubicBezier/css',
+  ],
 });
 
 StyleDictionary.registerFormat({

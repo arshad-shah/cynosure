@@ -1,0 +1,16 @@
+# Enforce LF line endings for all text in the repo. Biome, eslint,
+# and CI runners expect LF; without this, a contributor on Windows
+# with `core.autocrlf=true` can commit files that CI sees as CRLF
+# and fail formatting on otherwise-identical content.
+*           text=auto eol=lf
+
+# Known-binary extensions — never touch line endings.
+*.png       binary
+*.jpg       binary
+*.jpeg      binary
+*.gif       binary
+*.webp      binary
+*.ico       binary
+*.woff      binary
+*.woff2     binary
+*.pdf       binary
