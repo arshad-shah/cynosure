@@ -29,10 +29,12 @@ release hardening that Phase 15 + 16 require.
   `docs/reference/changelog.mdx` produced by
   `scripts/build-changelog-page.mjs`.
 - **Cloudflare Pages deploy.** Root `wrangler.toml` declares
-  `pages_build_output_dir: ./storybook-static`; a new
-  `.github/workflows/docs.yml` builds Storybook on every push / PR and
-  deploys to Cloudflare Pages from `main` when the
-  `CLOUDFLARE_API_TOKEN` / `CLOUDFLARE_ACCOUNT_ID` secrets are present.
+  `pages_build_output_dir: ./storybook-static` for the `wrangler pages
+  deploy` / `wrangler pages dev` flow. Production deploys use the
+  Cloudflare Pages Git integration: Pages builds `pnpm install && pnpm
+  build && pnpm docs:changelog && pnpm build-storybook` on its own
+  runners and publishes `storybook-static/` on every push to `main`.
+  No GitHub Actions workflow required.
 - **Release hardening.** `.github/workflows/release.yml` now runs
   `typecheck`, `test`, `publint`, and `attw` before handing off to
   Changesets, so a broken release can't go out.
