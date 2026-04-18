@@ -50,6 +50,16 @@ jobs:
           node-version: 22
           cache: pnpm
           registry-url: https://registry.npmjs.org
+
+      # Upgrade npm to a version that supports Trusted Publishing.
+      # Node 22 bundles npm 10, which has provenance signing but
+      # authenticates publishes via token only. TP (OIDC-based
+      # publish auth, no token needed) is npm >= 11.5.1. Without
+      # this step, provenance works but the PUT returns a generic
+      # "not in this registry" 404 because no token is present.
+      - name: Upgrade npm for Trusted Publishing
+        run: npm install -g npm@latest
+
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
 
