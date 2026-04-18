@@ -1,5 +1,5 @@
 {
-  "name": "@lumen/react/progress",
+  "name": "@arshad-shah/cynosure-react/progress",
   "private": true,
   "type": "module",
   "main": "../dist/progress.js",

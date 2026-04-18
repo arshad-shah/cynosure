@@ -1,5 +1,5 @@
 {
-  "name": "@lumen/react/hover-card",
+  "name": "@arshad-shah/cynosure-react/hover-card",
   "private": true,
   "type": "module",
   "main": "../dist/hovercard.js",

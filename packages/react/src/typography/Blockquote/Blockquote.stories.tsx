@@ -150,8 +150,8 @@ export const Styled: Story = {
       maxWidth="520px"
     >
       <Blockquote variant="callout" attribution="Product review, 2026">
-        Lumen changed the way our design team works with engineers. Tokens align first — everything
-        else follows.
+        Cynosure changed the way our design team works with engineers. Tokens align first —
+        everything else follows.
       </Blockquote>
     </Box>
   ),

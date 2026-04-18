@@ -1,0 +1,40 @@
+version: 2
+updates:
+  # GitHub Actions — keep pinned SHAs current. Dependabot rewrites the
+  # SHA in-place and updates the trailing `# vX` comment, so pinning
+  # stays both cryptographically sound AND human-readable over time.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 5
+    groups:
+      actions:
+        patterns: ['*']
+
+  # npm dependencies across the whole pnpm workspace. One weekly PR
+  # grouped per risk tier cuts review fatigue without hiding majors.
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 10
+    versioning-strategy: increase
+    groups:
+      # Production deps — grouped by bump type so breaking changes
+      # surface as their own PR instead of being buried with patches.
+      prod-patch:
+        dependency-type: production
+        update-types: [patch]
+      prod-minor:
+        dependency-type: production
+        update-types: [minor]
+      # Dev deps — one big PR for everything non-major. Tools don't
+      # ship in the tarball, so the review bar is lower.
+      dev-non-major:
+        dependency-type: development
+        update-types: [patch, minor]
+    # Security updates bypass the schedule and get opened immediately.
+    # Keep this default — no `ignore` for security-flagged versions.

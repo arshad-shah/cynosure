@@ -147,7 +147,7 @@ export type MenuItemProps = MenuItemOwnProps &
 
 const indentStyle = (indent: number): CSSProperties | undefined => {
   if (!indent) return undefined;
-  return { paddingLeft: `calc(var(--lumen-space-2) + ${indent} * 1rem)` };
+  return { paddingLeft: `calc(var(--cynosure-space-2) + ${indent} * 1rem)` };
 };
 
 type AnyElement = HTMLButtonElement & HTMLAnchorElement;

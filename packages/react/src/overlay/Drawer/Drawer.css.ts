@@ -139,16 +139,16 @@ export const drawerFooter = style({
 
 export const drawerTitle = style({
   margin: 0,
-  fontFamily: 'var(--lumen-font-heading-3-family)',
-  fontSize: 'var(--lumen-font-heading-3-size)',
-  fontWeight: 'var(--lumen-font-heading-3-weight)',
-  lineHeight: 'var(--lumen-font-heading-3-line-height)',
+  fontFamily: 'var(--cynosure-font-heading-3-family)',
+  fontSize: 'var(--cynosure-font-heading-3-size)',
+  fontWeight: 'var(--cynosure-font-heading-3-weight)',
+  lineHeight: 'var(--cynosure-font-heading-3-line-height)',
   color: vars.color.foreground.default,
 });
 
 export const drawerDescription = style({
   margin: 0,
-  fontSize: 'var(--lumen-font-body-md-size)',
-  lineHeight: 'var(--lumen-font-body-md-line-height)',
+  fontSize: 'var(--cynosure-font-body-md-size)',
+  lineHeight: 'var(--cynosure-font-body-md-line-height)',
   color: vars.color.foreground.muted,
 });

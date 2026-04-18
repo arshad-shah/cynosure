@@ -1,0 +1,53 @@
+name: Changeset Check
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, labeled, unlabeled]
+
+# One run per PR; newer commits cancel in-flight checks.
+concurrency:
+  group: changeset-check-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: Require changeset or skip-changeset label
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+    steps:
+      # Pin by SHA — the tag `v4` is a moving target and supply-chain
+      # risk if ever compromised/re-pointed. Dependabot keeps the SHA
+      # fresh via scheduled PRs.
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 0
+
+      - name: Check for changeset or skip label
+        env:
+          LABELS: ${{ toJSON(github.event.pull_request.labels.*.name) }}
+          BASE_REF: ${{ github.event.pull_request.base.ref }}
+        run: |
+          set -euo pipefail
+
+          # Escape hatch: `skip-changeset` label on the PR bypasses the
+          # check. Use for doc-only, tooling, or CI-only changes that
+          # don't warrant a release. This must be visible in the PR
+          # history — a label is better than a commit footer for audit.
+          if echo "$LABELS" | grep -q '"skip-changeset"'; then
+            echo "::notice::'skip-changeset' label present — bypassing changeset requirement."
+            exit 0
+          fi
+
+          # Find changeset files introduced by this PR. A changeset is
+          # any new `.md` under `.changeset/` (excluding README/config).
+          ADDED=$(git diff --name-only --diff-filter=A "origin/${BASE_REF}"...HEAD -- '.changeset/*.md' | grep -Ev '\.changeset/(README|config)\.' || true)
+
+          if [ -z "$ADDED" ]; then
+            echo "::error::No changeset found. Run 'pnpm changeset' to describe the release impact of this PR, or apply the 'skip-changeset' label if this change does not warrant a release (docs, CI, tooling only)."
+            exit 1
+          fi
+
+          echo "Changesets added by this PR:"
+          echo "$ADDED"

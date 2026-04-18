@@ -1,5 +1,5 @@
 {
-  "name": "@lumen/react/aspect-ratio",
+  "name": "@arshad-shah/cynosure-react/aspect-ratio",
   "private": true,
   "type": "module",
   "main": "../dist/aspectratio.js",

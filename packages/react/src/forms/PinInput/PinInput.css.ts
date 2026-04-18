@@ -10,7 +10,7 @@ export const cell = style({
   width: '2.75rem',
   height: '2.75rem',
   textAlign: 'center',
-  fontSize: 'var(--lumen-font-body-lg-size)',
+  fontSize: 'var(--cynosure-font-body-lg-size)',
   fontWeight: 600,
   fontVariantNumeric: 'tabular-nums',
   border: `1.5px solid ${vars.color.border.strong}`,
@@ -53,7 +53,7 @@ export const cell = style({
 });
 
 export const cellSize = styleVariants({
-  sm: { width: '2.25rem', height: '2.25rem', fontSize: 'var(--lumen-font-body-md-size)' },
-  md: { width: '2.75rem', height: '2.75rem', fontSize: 'var(--lumen-font-body-lg-size)' },
-  lg: { width: '3.25rem', height: '3.25rem', fontSize: 'var(--lumen-font-heading-xs-size)' },
+  sm: { width: '2.25rem', height: '2.25rem', fontSize: 'var(--cynosure-font-body-md-size)' },
+  md: { width: '2.75rem', height: '2.75rem', fontSize: 'var(--cynosure-font-body-lg-size)' },
+  lg: { width: '3.25rem', height: '3.25rem', fontSize: 'var(--cynosure-font-heading-xs-size)' },
 });

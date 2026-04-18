@@ -1,5 +1,5 @@
 {
-  "name": "@lumen/react/stat",
+  "name": "@arshad-shah/cynosure-react/stat",
   "private": true,
   "type": "module",
   "main": "../dist/stat.js",

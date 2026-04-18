@@ -34,9 +34,9 @@ export const InlineInProse: Story = {
   render: () => (
     <Stack gap="3" maxWidth="prose">
       <Text>
-        Install with <Code>pnpm add @lumen/react</Code> and import what you need from{' '}
-        <Code colorScheme="accent">&quot;@lumen/react&quot;</Code>. The <Code>Box</Code> primitive
-        is the foundation — every other primitive composes it.
+        Install with <Code>pnpm add @arshad-shah/cynosure-react</Code> and import what you need from{' '}
+        <Code colorScheme="accent">&quot;@arshad-shah/cynosure-react&quot;</Code>. The{' '}
+        <Code>Box</Code> primitive is the foundation — every other primitive composes it.
       </Text>
       <Text>
         Need to override a style? Reach for <Code>className</Code> or <Code>style</Code>, though
@@ -88,7 +88,7 @@ export const Block: Story = {
     <Stack gap="4" maxWidth="prose">
       <Text>A block code snippet preserves whitespace and renders as a styled pre/code pair.</Text>
       <Code variant="block">
-        {`import { Button, Stack } from '@lumen/react';
+        {`import { Button, Stack } from '@arshad-shah/cynosure-react';
 
 export function CallToAction() {
   return (
@@ -110,7 +110,7 @@ export const BlockOverflow: Story = {
   render: () => (
     <Box maxWidth="520px">
       <Code variant="block">
-        {`const handler = await fetch('https://api.lumen.dev/v1/projects/12345?include=members,settings,billing&expand=all', { headers });`}
+        {`const handler = await fetch('https://api.cynosure.dev/v1/projects/12345?include=members,settings,billing&expand=all', { headers });`}
       </Code>
     </Box>
   ),
@@ -154,8 +154,8 @@ export const ApiReference: Story = {
       </Code>
       <Text size="sm" color="fg.muted">
         Read the full API at{' '}
-        <Link href="https://lumen.dev" external>
-          lumen.dev
+        <Link href="https://cynosure.dev" external>
+          cynosure.dev
         </Link>
         .
       </Text>

@@ -1,5 +1,5 @@
 /**
- * Lumen UI — GitHub Dark Terminal theme.
+ * Cynosure UI — GitHub Dark Terminal theme.
  *
  * Arshad's named design language: near-black surfaces, JetBrains Mono,
  * a muted blue accent with a soft glow on focus rings, and tighter radii
@@ -7,69 +7,69 @@
  */
 [data-theme="terminal"] {
   /* Canvas & surfaces */
-  --lumen-color-background-canvas: #0d0f14;
-  --lumen-color-background-surface: #161b22;
-  --lumen-color-background-subtle: #10141a;
-  --lumen-color-background-muted: #1c232c;
-  --lumen-color-background-raised: #1c232c;
-  --lumen-color-background-overlay: rgba(0, 0, 0, 0.7);
-  --lumen-color-background-inverse: #e6edf3;
+  --cynosure-color-background-canvas: #0d0f14;
+  --cynosure-color-background-surface: #161b22;
+  --cynosure-color-background-subtle: #10141a;
+  --cynosure-color-background-muted: #1c232c;
+  --cynosure-color-background-raised: #1c232c;
+  --cynosure-color-background-overlay: rgba(0, 0, 0, 0.7);
+  --cynosure-color-background-inverse: #e6edf3;
 
   /* Foreground */
-  --lumen-color-foreground-default: #e6edf3;
-  --lumen-color-foreground-muted: #7d8590;
-  --lumen-color-foreground-subtle: #484f58;
-  --lumen-color-foreground-disabled: #30363d;
-  --lumen-color-foreground-inverse: #0d0f14;
-  --lumen-color-foreground-on-accent: #ffffff;
+  --cynosure-color-foreground-default: #e6edf3;
+  --cynosure-color-foreground-muted: #7d8590;
+  --cynosure-color-foreground-subtle: #484f58;
+  --cynosure-color-foreground-disabled: #30363d;
+  --cynosure-color-foreground-inverse: #0d0f14;
+  --cynosure-color-foreground-on-accent: #ffffff;
 
   /* Borders */
-  --lumen-color-border-default: #30363d;
-  --lumen-color-border-subtle: #21262d;
-  --lumen-color-border-strong: #484f58;
-  --lumen-color-border-focus: #388bfd;
-  --lumen-color-border-disabled: #21262d;
+  --cynosure-color-border-default: #30363d;
+  --cynosure-color-border-subtle: #21262d;
+  --cynosure-color-border-strong: #484f58;
+  --cynosure-color-border-focus: #388bfd;
+  --cynosure-color-border-disabled: #21262d;
 
   /* Accent — muted blue with glow */
-  --lumen-color-accent-solid: #388bfd;
-  --lumen-color-accent-solid-hover: #4493f8;
-  --lumen-color-accent-solid-active: #1f6feb;
-  --lumen-color-accent-soft: rgba(56, 139, 253, 0.1);
-  --lumen-color-accent-soft-hover: rgba(56, 139, 253, 0.16);
-  --lumen-color-accent-soft-active: rgba(56, 139, 253, 0.22);
-  --lumen-color-accent-ring: #388bfd;
-  --lumen-color-accent-on-solid: #ffffff;
+  --cynosure-color-accent-solid: #388bfd;
+  --cynosure-color-accent-solid-hover: #4493f8;
+  --cynosure-color-accent-solid-active: #1f6feb;
+  --cynosure-color-accent-soft: rgba(56, 139, 253, 0.1);
+  --cynosure-color-accent-soft-hover: rgba(56, 139, 253, 0.16);
+  --cynosure-color-accent-soft-active: rgba(56, 139, 253, 0.22);
+  --cynosure-color-accent-ring: #388bfd;
+  --cynosure-color-accent-on-solid: #ffffff;
 
   /* Feedback — success-solid darkened from GitHub's #3fb950 to hit 3:1 with
      white text (SC 1.4.11). The softer #3fb950 is kept for the foreground
      on the soft surface below, where it pairs with the dark canvas. */
-  --lumen-color-feedback-success-solid: #2a8a38;
-  --lumen-color-feedback-success-soft: rgba(63, 185, 80, 0.12);
-  --lumen-color-feedback-success-foreground: #56d364;
-  --lumen-color-feedback-success-border: rgba(63, 185, 80, 0.4);
-  --lumen-color-feedback-danger-solid: #f85149;
-  --lumen-color-feedback-danger-soft: rgba(248, 81, 73, 0.12);
-  --lumen-color-feedback-danger-foreground: #ff7b72;
-  --lumen-color-feedback-danger-border: rgba(248, 81, 73, 0.4);
-  --lumen-color-feedback-warning-solid: #d29922;
-  --lumen-color-feedback-warning-soft: rgba(210, 153, 34, 0.12);
-  --lumen-color-feedback-warning-foreground: #e3b341;
-  --lumen-color-feedback-warning-border: rgba(210, 153, 34, 0.4);
-  --lumen-color-feedback-info-solid: #388bfd;
-  --lumen-color-feedback-info-soft: rgba(56, 139, 253, 0.12);
-  --lumen-color-feedback-info-foreground: #79c0ff;
-  --lumen-color-feedback-info-border: rgba(56, 139, 253, 0.4);
+  --cynosure-color-feedback-success-solid: #2a8a38;
+  --cynosure-color-feedback-success-soft: rgba(63, 185, 80, 0.12);
+  --cynosure-color-feedback-success-foreground: #56d364;
+  --cynosure-color-feedback-success-border: rgba(63, 185, 80, 0.4);
+  --cynosure-color-feedback-danger-solid: #f85149;
+  --cynosure-color-feedback-danger-soft: rgba(248, 81, 73, 0.12);
+  --cynosure-color-feedback-danger-foreground: #ff7b72;
+  --cynosure-color-feedback-danger-border: rgba(248, 81, 73, 0.4);
+  --cynosure-color-feedback-warning-solid: #d29922;
+  --cynosure-color-feedback-warning-soft: rgba(210, 153, 34, 0.12);
+  --cynosure-color-feedback-warning-foreground: #e3b341;
+  --cynosure-color-feedback-warning-border: rgba(210, 153, 34, 0.4);
+  --cynosure-color-feedback-info-solid: #388bfd;
+  --cynosure-color-feedback-info-soft: rgba(56, 139, 253, 0.12);
+  --cynosure-color-feedback-info-foreground: #79c0ff;
+  --cynosure-color-feedback-info-border: rgba(56, 139, 253, 0.4);
 
   /* Typography — JetBrains Mono everywhere */
-  --lumen-font-family-sans: "JetBrains Mono", "SF Mono", ui-monospace, monospace;
-  --lumen-font-family-mono: "JetBrains Mono", "SF Mono", ui-monospace, monospace;
+  --cynosure-font-family-sans: "JetBrains Mono", "SF Mono", ui-monospace, monospace;
+  --cynosure-font-family-mono: "JetBrains Mono", "SF Mono", ui-monospace, monospace;
 
   /* Radii — tighter, terminal aesthetic */
-  --lumen-radius-component-xs: 1px;
-  --lumen-radius-component-sm: 2px;
-  --lumen-radius-component-md: 4px;
-  --lumen-radius-component-lg: 6px;
+  --cynosure-radius-component-xs: 1px;
+  --cynosure-radius-component-sm: 2px;
+  --cynosure-radius-component-md: 4px;
+  --cynosure-radius-component-lg: 6px;
 
   /* Subtle glow on accent rings */
-  --lumen-shadow-component-focus: 0 0 0 1px #388bfd, 0 0 8px rgba(56, 139, 253, 0.4);
+  --cynosure-shadow-component-focus: 0 0 0 1px #388bfd, 0 0 8px rgba(56, 139, 253, 0.4);
 }

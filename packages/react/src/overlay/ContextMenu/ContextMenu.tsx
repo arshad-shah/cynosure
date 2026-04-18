@@ -74,7 +74,7 @@ export const ContextMenuContent = forwardRef<
     <Radix.Portal container={resolvedContainer}>
       <Radix.Content
         ref={ref}
-        data-lumen-overlay=""
+        data-cynosure-overlay=""
         collisionPadding={collisionPadding}
         className={cn(menuContent, className)}
         {...rest}
@@ -156,7 +156,7 @@ export const ContextMenuSubContent = forwardRef<
     <Radix.Portal>
       <Radix.SubContent
         ref={ref}
-        data-lumen-overlay=""
+        data-cynosure-overlay=""
         className={cn(menuContent, className)}
         {...rest}
       />

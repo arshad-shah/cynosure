@@ -1,5 +1,5 @@
 {
-  "name": "@lumen/react/multi-select",
+  "name": "@arshad-shah/cynosure-react/multi-select",
   "private": true,
   "type": "module",
   "main": "../dist/multiselect.js",

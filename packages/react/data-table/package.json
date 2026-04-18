@@ -1,5 +1,5 @@
 {
-  "name": "@lumen/react/data-table",
+  "name": "@arshad-shah/cynosure-react/data-table",
   "private": true,
   "type": "module",
   "main": "../dist/data-table.js",

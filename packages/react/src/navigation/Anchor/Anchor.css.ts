@@ -6,7 +6,7 @@ export const anchorWrapper = style({
   display: 'flex',
   alignItems: 'center',
   gap: vars.space['2'],
-  scrollMarginTop: 'var(--lumen-anchor-offset, 0)',
+  scrollMarginTop: 'var(--cynosure-anchor-offset, 0)',
 });
 
 globalStyle(
@@ -48,7 +48,7 @@ export const anchorLink = style({
       opacity: 1,
       boxShadow: `0 0 0 2px ${vars.color.accent.ring}`,
     },
-    '[data-lumen-reduced-motion] &': {
+    '[data-cynosure-reduced-motion] &': {
       transitionDuration: '0s',
     },
   },

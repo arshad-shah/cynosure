@@ -1,5 +1,5 @@
 {
-  "name": "@lumen/react/sidebar",
+  "name": "@arshad-shah/cynosure-react/sidebar",
   "private": true,
   "type": "module",
   "main": "../dist/sidebar.js",

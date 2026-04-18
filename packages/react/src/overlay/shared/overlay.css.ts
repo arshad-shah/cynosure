@@ -40,7 +40,7 @@ export const overlaySlideOut = keyframes({
 /**
  * Full-viewport semi-transparent scrim. Radix mounts this inside its Portal
  * and toggles `data-state="open|closed"`. Tokens already zero
- * `--lumen-duration-*` under `prefers-reduced-motion`, which short-circuits
+ * `--cynosure-duration-*` under `prefers-reduced-motion`, which short-circuits
  * the visible animation.
  */
 export const overlayBackdrop = style({

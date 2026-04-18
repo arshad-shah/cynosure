@@ -8,13 +8,13 @@ const root = resolve(__dirname);
 
 /**
  * Expand DTCG `typography` composites into sibling sub-tokens so they emit as
- * individual CSS custom properties (--lumen-font-heading-1-size, etc.).
+ * individual CSS custom properties (--cynosure-font-heading-1-size, etc.).
  *
  * The original typography token is dropped since it can't be serialised to a
  * single CSS value that covers every property portably.
  */
 StyleDictionary.registerPreprocessor({
-  name: 'lumen/expand-typography',
+  name: 'cynosure/expand-typography',
   preprocessor: (dictionary) => {
     const walk = (node) => {
       if (node && typeof node === 'object' && '$type' in node && '$value' in node) {
@@ -69,7 +69,7 @@ StyleDictionary.registerPreprocessor({
  * CSS font-family string with quotes around names that contain spaces.
  */
 StyleDictionary.registerTransform({
-  name: 'lumen/fontFamily/css',
+  name: 'cynosure/fontFamily/css',
   type: 'value',
   filter: (token) => token.$type === 'fontFamily' || token.type === 'fontFamily',
   transform: (token) => {
@@ -83,7 +83,7 @@ StyleDictionary.registerTransform({
  * DTCG cubicBezier is [x1, y1, x2, y2]; emit as `cubic-bezier(...)`.
  */
 StyleDictionary.registerTransform({
-  name: 'lumen/cubicBezier/css',
+  name: 'cynosure/cubicBezier/css',
   type: 'value',
   filter: (token) => token.$type === 'cubicBezier' || token.type === 'cubicBezier',
   transform: (token) => {
@@ -94,17 +94,27 @@ StyleDictionary.registerTransform({
 });
 
 StyleDictionary.registerTransformGroup({
-  name: 'lumen/css',
-  transforms: ['attribute/cti', 'name/kebab', 'lumen/fontFamily/css', 'lumen/cubicBezier/css'],
+  name: 'cynosure/css',
+  transforms: [
+    'attribute/cti',
+    'name/kebab',
+    'cynosure/fontFamily/css',
+    'cynosure/cubicBezier/css',
+  ],
 });
 
 StyleDictionary.registerTransformGroup({
-  name: 'lumen/ts',
-  transforms: ['attribute/cti', 'name/camel', 'lumen/fontFamily/css', 'lumen/cubicBezier/css'],
+  name: 'cynosure/ts',
+  transforms: [
+    'attribute/cti',
+    'name/camel',
+    'cynosure/fontFamily/css',
+    'cynosure/cubicBezier/css',
+  ],
 });
 
 StyleDictionary.registerFormat({
-  name: 'lumen/typescript-tokens',
+  name: 'cynosure/typescript-tokens',
   format: ({ dictionary }) => {
     const tree = {};
     for (const token of dictionary.allTokens) {
@@ -150,17 +160,22 @@ const build = async ({ name, source, include, selector }) => {
   // `source` tokens are always emitted; `include` tokens are only referenced
   // for alias resolution. Filter output to the source set so dark.css only
   // carries the overrides.
-  const filter = (token) => sourcePaths.includes(token.filePath);
+  //
+  // Style Dictionary 4.x stores `token.filePath` as the relative path it was
+  // given in `source`, not the absolute resolved path. Match either form so
+  // the filter is robust to that platform-specific normalization.
+  const sourceSet = new Set([...source, ...sourcePaths]);
+  const filter = (token) => sourceSet.has(token.filePath);
 
   const sd = new StyleDictionary({
     source: sourcePaths,
     include: includePaths,
-    preprocessors: ['lumen/expand-typography'],
+    preprocessors: ['cynosure/expand-typography'],
     platforms: {
       css: {
-        transformGroup: 'lumen/css',
+        transformGroup: 'cynosure/css',
         buildPath: `${resolve(root, 'dist/css')}/`,
-        prefix: 'lumen',
+        prefix: 'cynosure',
         files: [
           {
             destination: `${name}.css`,
@@ -174,9 +189,9 @@ const build = async ({ name, source, include, selector }) => {
         ],
       },
       ts: {
-        transformGroup: 'lumen/ts',
+        transformGroup: 'cynosure/ts',
         buildPath: `${resolve(root, 'src/generated')}/`,
-        files: [{ destination: `${name}.ts`, format: 'lumen/typescript-tokens' }],
+        files: [{ destination: `${name}.ts`, format: 'cynosure/typescript-tokens' }],
       },
     },
   });
@@ -200,16 +215,16 @@ await build({
 
 /**
  * Append a `prefers-reduced-motion` override that zeroes out the semantic
- * motion durations. Any component using `var(--lumen-duration-motion-*)` in a
+ * motion durations. Any component using `var(--cynosure-duration-motion-*)` in a
  * transition or animation automatically loses motion without code changes.
  */
 const reducedMotionSnippet = `
 @media (prefers-reduced-motion: reduce) {
   :root {
-    --lumen-duration-motion-micro: 0ms;
-    --lumen-duration-motion-short: 0ms;
-    --lumen-duration-motion-medium: 0ms;
-    --lumen-duration-motion-long: 0ms;
+    --cynosure-duration-motion-micro: 0ms;
+    --cynosure-duration-motion-short: 0ms;
+    --cynosure-duration-motion-medium: 0ms;
+    --cynosure-duration-motion-long: 0ms;
   }
 }
 `;

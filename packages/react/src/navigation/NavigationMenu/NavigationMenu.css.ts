@@ -36,8 +36,8 @@ export const navigationMenuTrigger = style({
   background: 'transparent',
   border: 'none',
   color: vars.color.foreground.default,
-  fontFamily: 'var(--lumen-font-body-md-family)',
-  fontSize: 'var(--lumen-font-body-md-size)',
+  fontFamily: 'var(--cynosure-font-body-md-family)',
+  fontSize: 'var(--cynosure-font-body-md-size)',
   fontWeight: 500,
   cursor: 'pointer',
   borderRadius: vars.radius.sm,
@@ -59,7 +59,7 @@ export const navigationMenuCaret = style({
     '[data-state="open"] &': {
       transform: 'rotate(180deg)',
     },
-    '[data-lumen-reduced-motion] &': {
+    '[data-cynosure-reduced-motion] &': {
       transitionDuration: '0s',
     },
   },
@@ -96,7 +96,7 @@ export const navigationMenuLink = style({
   color: vars.color.foreground.default,
   textDecoration: 'none',
   borderRadius: vars.radius.sm,
-  fontSize: 'var(--lumen-font-body-md-size)',
+  fontSize: 'var(--cynosure-font-body-md-size)',
   fontWeight: 500,
   selectors: {
     '&:hover': {
@@ -130,7 +130,7 @@ export const navigationMenuIndicator = style({
     '&[data-state="visible"]': {
       opacity: 1,
     },
-    '[data-lumen-reduced-motion] &': {
+    '[data-cynosure-reduced-motion] &': {
       transitionDuration: '0s',
     },
   },
@@ -161,7 +161,7 @@ export const navigationMenuViewport = style({
   transitionDuration: vars.duration.fast,
   transformOrigin: 'top center',
   selectors: {
-    '[data-lumen-reduced-motion] &': {
+    '[data-cynosure-reduced-motion] &': {
       transitionDuration: '0s',
     },
   },

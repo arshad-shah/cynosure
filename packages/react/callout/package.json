@@ -1,5 +1,5 @@
 {
-  "name": "@lumen/react/callout",
+  "name": "@arshad-shah/cynosure-react/callout",
   "private": true,
   "type": "module",
   "main": "../dist/callout.js",

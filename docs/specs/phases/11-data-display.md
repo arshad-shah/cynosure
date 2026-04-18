@@ -32,7 +32,7 @@ Compound component for card-shaped content.
 <Card variant="elevated" interactive>
   <CardImage src="/hero.jpg" alt="" aspectRatio={16/9} />
   <CardHeader>
-    <CardTitle>Lumen UI</CardTitle>
+    <CardTitle>Cynosure UI</CardTitle>
     <CardDescription>A tiny React component library.</CardDescription>
   </CardHeader>
   <CardBody>
@@ -116,7 +116,7 @@ The advanced table. Opt-in features: sorting, selection, pagination, filtering, 
 Use **TanStack Table v8** (headless) + our own rendering components. TanStack is the standard; we don't reinvent table state.
 
 ```bash
-pnpm --filter @lumen/react add @tanstack/react-table
+pnpm --filter @arshad-shah/cynosure-react add @tanstack/react-table
 ```
 
 ### API
@@ -390,7 +390,7 @@ Use **Shiki** (the VS Code syntax highlighter) for quality. Shiki's bundle is la
 
 Install:
 ```bash
-pnpm --filter @lumen/react add shiki
+pnpm --filter @arshad-shah/cynosure-react add shiki
 ```
 
 ### Props
@@ -404,7 +404,7 @@ pnpm --filter @lumen/react add shiki
 ### Composition
 Outer wrapper is a `Card variant="filled"`. Copy button is an `IconButton` with a state-change tooltip.
 
-**Note:** CodeBlock is heavyweight. Export as a separate entry point (`@lumen/react/code-block`); don't include in the root barrel.
+**Note:** CodeBlock is heavyweight. Export as a separate entry point (`@arshad-shah/cynosure-react/code-block`); don't include in the root barrel.
 
 ---
 
@@ -442,7 +442,7 @@ Pane resizer for split layouts (IDE-like).
 Use **`react-resizable-panels`** (battle-tested, Vercel-maintained).
 
 ```bash
-pnpm --filter @lumen/react add react-resizable-panels
+pnpm --filter @arshad-shah/cynosure-react add react-resizable-panels
 ```
 
 Re-skin its handles with our tokens.
@@ -475,7 +475,7 @@ Per component:
 - [ ] Bundle:
   - `import { DataTable }` ≤ 40 KB gzipped (TanStack Table + our code).
   - `import { CodeBlock }` can be larger (Shiki) but documented.
-- [ ] Changesets: `@lumen/react` minor "Data display components".
+- [ ] Changesets: `@arshad-shah/cynosure-react` minor "Data display components".
 
 ## Decisions to log
 

@@ -33,7 +33,7 @@ const TallContent = ({ rows = 30 }: { rows?: number }): ReactElement => (
         key={`row-${i.toString()}`}
         style={{
           padding: 16,
-          border: '1px solid var(--lumen-color-border-subtle, #e5e7eb)',
+          border: '1px solid var(--cynosure-color-border-subtle, #e5e7eb)',
           borderRadius: 8,
         }}
       >
@@ -143,7 +143,7 @@ export const ContainedInPortalTarget: Story = {
               position: 'relative',
               marginTop: 24,
               padding: 16,
-              border: '1px dashed var(--lumen-color-border-subtle, #e5e7eb)',
+              border: '1px dashed var(--cynosure-color-border-subtle, #e5e7eb)',
               borderRadius: 8,
             }}
           >

@@ -11,8 +11,10 @@ describe('Grid', () => {
       </Grid>,
     );
     const el = container.querySelector('[data-testid="grid"]') as HTMLElement;
-    expect(el.style.getPropertyValue('--lumen-grid-cols-base')).toBe('repeat(3, minmax(0, 1fr))');
-    expect(el.style.getPropertyValue('--lumen-grid-gap-base')).toBe('var(--lumen-space-4)');
+    expect(el.style.getPropertyValue('--cynosure-grid-cols-base')).toBe(
+      'repeat(3, minmax(0, 1fr))',
+    );
+    expect(el.style.getPropertyValue('--cynosure-grid-gap-base')).toBe('var(--cynosure-space-4)');
   });
 
   it('passes `templateColumns` through verbatim', () => {
@@ -22,7 +24,7 @@ describe('Grid', () => {
       </Grid>,
     );
     const el = container.querySelector('[data-testid="grid"]') as HTMLElement;
-    expect(el.style.getPropertyValue('--lumen-grid-cols-base')).toBe('200px 1fr 200px');
+    expect(el.style.getPropertyValue('--cynosure-grid-cols-base')).toBe('200px 1fr 200px');
   });
 
   it('supports responsive `columns` maps', () => {
@@ -32,8 +34,10 @@ describe('Grid', () => {
       </Grid>,
     );
     const el = container.querySelector('[data-testid="grid"]') as HTMLElement;
-    expect(el.style.getPropertyValue('--lumen-grid-cols-base')).toBe('repeat(1, minmax(0, 1fr))');
-    expect(el.style.getPropertyValue('--lumen-grid-cols-md')).toBe('repeat(3, minmax(0, 1fr))');
+    expect(el.style.getPropertyValue('--cynosure-grid-cols-base')).toBe(
+      'repeat(1, minmax(0, 1fr))',
+    );
+    expect(el.style.getPropertyValue('--cynosure-grid-cols-md')).toBe('repeat(3, minmax(0, 1fr))');
   });
 
   it('forwards `gridColumn` from LayoutProps onto a Box child', () => {
@@ -45,6 +49,6 @@ describe('Grid', () => {
       </Grid>,
     );
     const cell = container.querySelector('[data-testid="cell"]') as HTMLElement;
-    expect(cell.style.getPropertyValue('--lumen-lp-gc-base')).toBe('span 2');
+    expect(cell.style.getPropertyValue('--cynosure-lp-gc-base')).toBe('span 2');
   });
 });

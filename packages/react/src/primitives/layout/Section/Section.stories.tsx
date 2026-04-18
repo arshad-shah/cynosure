@@ -209,7 +209,7 @@ export const Footer: Story = {
         </Grid>
         <Inline justify="between" align="center" paddingTop="8">
           <Text color="fg.subtle" size="sm">
-            © 2026 Lumen
+            © 2026 Cynosure
           </Text>
           <Text color="fg.subtle" size="sm">
             Made with care

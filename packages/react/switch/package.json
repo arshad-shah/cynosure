@@ -1,5 +1,5 @@
 {
-  "name": "@lumen/react/switch",
+  "name": "@arshad-shah/cynosure-react/switch",
   "private": true,
   "type": "module",
   "main": "../dist/switch.js",

@@ -181,7 +181,7 @@ export const SharePopover: Story = {
             </Text>
           </Stack>
           <Inline gap="2">
-            <Input readOnly defaultValue="https://lumen.app/d/abc" />
+            <Input readOnly defaultValue="https://cynosure.app/d/abc" />
             <Button variant="outline">Copy</Button>
           </Inline>
           <Inline gap="2" justify="end">

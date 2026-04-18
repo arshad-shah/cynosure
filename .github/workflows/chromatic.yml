@@ -9,19 +9,25 @@ concurrency:
   group: chromatic-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   chromatic:
     name: Visual regression
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
     # Forks can't read the CHROMATIC_TOKEN secret. Skip the job entirely
     # instead of letting it fail the status check.
     if: ${{ github.event.pull_request.head.repo.fork == false || github.event_name == 'push' }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
           fetch-depth: 0
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      - uses: pnpm/action-setup@f40ffcd9367d9f12939873eb1018b921a783ffaa # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: 22
           cache: pnpm
@@ -62,7 +68,7 @@ jobs:
         # chromaui/action@v16 is the current major — it runs under Node 24
         # and pins the latest chromatic CLI. Keep an eye on the action's
         # release notes at https://github.com/chromaui/action/releases.
-        uses: chromaui/action@v16
+        uses: chromaui/action@2fb44ca753dba58544cc5dd1d018e25df6887dd2 # v16
         env:
           # `chromaui/action` also reads CHROMATIC_PROJECT_TOKEN from the env;
           # surface CHROMATIC_TOKEN under both names so the action picks it

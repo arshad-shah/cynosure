@@ -90,16 +90,16 @@ const FlexRender = (props: AnyProps, ref: ForwardedRef<Element>): ReactElement =
 
   const layoutStyle = resolveLayoutProps(layoutProps);
   const flexStyle = mergeStyles(
-    toResponsiveVars(direction, 'lumen-flex-dir', (v) => v),
-    toResponsiveVars(wrap, 'lumen-flex-wrap', (v) => v),
-    toResponsiveVars(grow, 'lumen-flex-grow', (v) => String(v)),
-    toResponsiveVars(shrink, 'lumen-flex-shrink', (v) => String(v)),
-    toResponsiveVars(basis, 'lumen-flex-basis', (v) => resolveSize(v)),
-    toResponsiveVars(gap, 'lumen-flex-gap', (v) => resolveSpace(v)),
-    toResponsiveVars(rowGap, 'lumen-flex-row-gap', (v) => resolveSpace(v)),
-    toResponsiveVars(columnGap, 'lumen-flex-col-gap', (v) => resolveSpace(v)),
-    toResponsiveVars(align, 'lumen-flex-align', (v) => ALIGN_MAP[v]),
-    toResponsiveVars(justify, 'lumen-flex-justify', (v) => JUSTIFY_MAP[v]),
+    toResponsiveVars(direction, 'cynosure-flex-dir', (v) => v),
+    toResponsiveVars(wrap, 'cynosure-flex-wrap', (v) => v),
+    toResponsiveVars(grow, 'cynosure-flex-grow', (v) => String(v)),
+    toResponsiveVars(shrink, 'cynosure-flex-shrink', (v) => String(v)),
+    toResponsiveVars(basis, 'cynosure-flex-basis', (v) => resolveSize(v)),
+    toResponsiveVars(gap, 'cynosure-flex-gap', (v) => resolveSpace(v)),
+    toResponsiveVars(rowGap, 'cynosure-flex-row-gap', (v) => resolveSpace(v)),
+    toResponsiveVars(columnGap, 'cynosure-flex-col-gap', (v) => resolveSpace(v)),
+    toResponsiveVars(align, 'cynosure-flex-align', (v) => ALIGN_MAP[v]),
+    toResponsiveVars(justify, 'cynosure-flex-justify', (v) => JUSTIFY_MAP[v]),
   );
   const mergedStyle = mergeStyles(layoutStyle, flexStyle, style);
 

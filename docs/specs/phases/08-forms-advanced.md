@@ -28,7 +28,7 @@
 For anything involving popovers, listboxes, virtualisation, or complex keyboard navigation: **use React Aria Components as the base** and style with vanilla-extract. Rolling your own here invites bugs around touch, screen readers, virtualised focus, RTL, and i18n.
 
 ```bash
-pnpm --filter @lumen/react add react-aria-components @internationalized/date
+pnpm --filter @arshad-shah/cynosure-react add react-aria-components @internationalized/date
 ```
 
 Pattern per component:
@@ -286,7 +286,7 @@ Radio-group-style semantics under the hood (using React Aria's `useRadio` primit
 - [ ] Keyboard interaction fully covered by tests.
 - [ ] Locale-aware: DatePicker respects `DirectionProvider` and locale (`en-IE` by default for Arshad, configurable via a `LocaleProvider` we add here).
 - [ ] Bundle check: `import { DatePicker }` produces ≤ 25 KB gzipped (including React Aria and `@internationalized/date` — these are the big deps; consumers understand).
-- [ ] Changesets: `@lumen/react` minor "Advanced form controls".
+- [ ] Changesets: `@arshad-shah/cynosure-react` minor "Advanced form controls".
 
 ## Decisions to log
 

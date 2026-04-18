@@ -1,10 +1,49 @@
-# @lumen/react
+# @arshad-shah/cynosure-react
+
+## 1.0.0
+
+### Major Changes
+
+- First stable release.
+
+  `0.x` was a pre-release development window; v1.0 is the first version
+  under Cynosure's semver policy. No code migration is required — if you
+  were consuming Cynosure from source or a workspace alias, install the
+  npm packages instead. See the
+  [Migration guide](https://github.com/arshad-shah/cynosure/blob/main/docs/reference/migration-to-v1.mdx)
+  for details.
+
+  ## What v1.0 ships
+  - Complete component catalogue across `@arshad-shah/cynosure-react`.
+  - W3C DTCG design tokens in `@arshad-shah/cynosure-tokens`, with light
+    and dark stylesheets.
+  - Prebuilt themes (terminal, high-contrast) in
+    `@arshad-shah/cynosure-themes`.
+  - Headless primitives in `@arshad-shah/cynosure-core`.
+  - Icon set in `@arshad-shah/cynosure-icons`.
+  - Foundations docs, eight priority recipes, framework + tree-shaking
+    guides.
+
+  ## Semver policy from here
+  - **Patch** — bug fixes, no API changes.
+  - **Minor** — new components, new props (additive), new variants. No
+    breaking changes.
+  - **Major** — breaking changes, with a migration guide. Deprecations
+    are announced at least one minor cycle before removal.
+
+  All five packages ship at the same semver via linked changesets.
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @arshad-shah/cynosure-core@1.0.0
+  - @arshad-shah/cynosure-tokens@1.0.0
 
 ## 0.1.1
 
 ### Patch Changes
 
-- [#17](https://github.com/arshad-shah/Lumen/pull/17) [`8db8ccc`](https://github.com/arshad-shah/Lumen/commit/8db8cccc11e963e73ee2cbcc1341a219b2031ae3) Thanks [@arshad-shah](https://github.com/arshad-shah)! - Phases 15 + 16 — documentation site and release readiness.
+- [#17](https://github.com/arshad-shah/Cynosure/pull/17) [`8db8ccc`](https://github.com/arshad-shah/Cynosure/commit/8db8cccc11e963e73ee2cbcc1341a219b2031ae3) Thanks [@arshad-shah](https://github.com/arshad-shah)! - Phases 15 + 16 — documentation site and release readiness.
 
   No runtime API changes. This bundle groups the docs-site scaffold and
   release hardening that Phase 15 + 16 require.
@@ -14,7 +53,7 @@
     `react-docgen-typescript` tuned to surface literal unions and filter
     `node_modules` from the Controls panel. `.storybook/manager.ts` adds a
     branded manager theme (terminal palette, JetBrains Mono) matching the
-    Lumen canvas.
+    Cynosure canvas.
   - **Foundations MDX.** `docs/foundations/` now covers introduction,
     installation, quickstart, design principles, design tokens, theming
     overview, dark mode, custom themes, terminal-theme recipe,
@@ -23,7 +62,7 @@
     form, dashboard layout, data table with filters, notification center,
     command palette, settings page, multi-step wizard, onboarding modal
     (plus an index + the three form-composition recipes that ship
-    alongside `@lumen/react/form`).
+    alongside `@arshad-shah/cynosure-react/form`).
   - **Guides + reference.** `docs/guides/frameworks.mdx`,
     `docs/guides/tree-shaking.mdx`, `docs/reference/roadmap.mdx`,
     `docs/reference/migration-to-v1.mdx`, and an auto-generated
@@ -54,9 +93,9 @@ build && pnpm docs:changelog && pnpm build-storybook` on its own
 
 ### Minor Changes
 
-- [#3](https://github.com/arshad-shah/Lumen/pull/3) [`e2f45fc`](https://github.com/arshad-shah/Lumen/commit/e2f45fc841e62c35b9f95650a2d4ca7c28c96b12) Thanks [@arshad-shah](https://github.com/arshad-shah)! - Phase 03 — runtime-free theming system.
+- [#3](https://github.com/arshad-shah/Cynosure/pull/3) [`e2f45fc`](https://github.com/arshad-shah/Cynosure/commit/e2f45fc841e62c35b9f95650a2d4ca7c28c96b12) Thanks [@arshad-shah](https://github.com/arshad-shah)! - Phase 03 — runtime-free theming system.
 
-  `@lumen/react` ships `ThemeProvider`, `DirectionProvider`, `getThemeInitScript`,
+  `@arshad-shah/cynosure-react` ships `ThemeProvider`, `DirectionProvider`, `getThemeInitScript`,
   and the hooks `useTheme`, `useColorScheme`, `useDirection`, `useReducedMotion`,
   and `useBreakpoint`. Theme state lives entirely on the `<html data-theme>`
   attribute — no React-state cascade of token values, so swapping themes is a
@@ -66,19 +105,19 @@ build && pnpm docs:changelog && pnpm build-storybook` on its own
   flash on hydration. `DirectionProvider` wraps Radix's so primitives inherit
   direction automatically.
 
-  `@lumen/themes` adds two prebuilt themes shipped as side-effect CSS:
-  `@lumen/themes/terminal` (Arshad's GitHub Dark Terminal — JetBrains Mono,
-  muted blue glow) and `@lumen/themes/high-contrast` (WCAG AAA, light + dark
+  `@arshad-shah/cynosure-themes` adds two prebuilt themes shipped as side-effect CSS:
+  `@arshad-shah/cynosure-themes/terminal` (Arshad's GitHub Dark Terminal — JetBrains Mono,
+  muted blue glow) and `@arshad-shah/cynosure-themes/high-contrast` (WCAG AAA, light + dark
   selectors).
 
-  `@lumen/tokens` gains `--lumen-breakpoint-{sm,md,lg,xl,2xl}`,
-  `--lumen-shadow-component-focus`, and a `prefers-reduced-motion` block that
+  `@arshad-shah/cynosure-tokens` gains `--cynosure-breakpoint-{sm,md,lg,xl,2xl}`,
+  `--cynosure-shadow-component-focus`, and a `prefers-reduced-motion` block that
   zeroes the semantic motion durations so token-driven transitions automatically
   disable.
 
-- [#5](https://github.com/arshad-shah/Lumen/pull/5) [`0aa2886`](https://github.com/arshad-shah/Lumen/commit/0aa2886cb5c34ac6f2e23421b4ded071b5b62f44) Thanks [@arshad-shah](https://github.com/arshad-shah)! - Phase 04 — core utilities, primitives, and the hook library.
+- [#5](https://github.com/arshad-shah/Cynosure/pull/5) [`0aa2886`](https://github.com/arshad-shah/Cynosure/commit/0aa2886cb5c34ac6f2e23421b4ded071b5b62f44) Thanks [@arshad-shah](https://github.com/arshad-shah)! - Phase 04 — core utilities, primitives, and the hook library.
 
-  `@lumen/react` gains the building blocks every subsequent component depends on:
+  `@arshad-shah/cynosure-react` gains the building blocks every subsequent component depends on:
   - **Primitives:** `Slot` / `Slottable` (re-exported from `@radix-ui/react-slot`
     for the `asChild` composition pattern), an SSR-safe `Portal` with a `container`
     prop and a `disabled` bypass, and `VisuallyHidden` for screen-reader-only
@@ -98,47 +137,47 @@ build && pnpm docs:changelog && pnpm build-storybook` on its own
     `useIntersection`, `useResizeObserver`, `useMutationObserver`, `useFocusTrap`,
     `useFocusReturn`, `useIsomorphicLayoutEffect`, plus re-exports of the
     phase-03 hooks (`useReducedMotion`, `useDirection`, `useBreakpoint`) so every
-    hook is reachable from `@lumen/react` or `@lumen/react/hooks`.
+    hook is reachable from `@arshad-shah/cynosure-react` or `@arshad-shah/cynosure-react/hooks`.
 
   All hooks use **only** `react` as a runtime dependency; the only new runtime
   dependencies at the package level are `@radix-ui/react-slot` and
   `class-variance-authority`. Per-hook tsup entry points keep the tree-shake
-  graph honest — importing `useDisclosure` pulls well under 1 KB of Lumen code.
+  graph honest — importing `useDisclosure` pulls well under 1 KB of Cynosure code.
 
-- [#6](https://github.com/arshad-shah/Lumen/pull/6) [`e37bec5`](https://github.com/arshad-shah/Lumen/commit/e37bec539fb094051007f57b7cadea7be2dfd022) Thanks [@arshad-shah](https://github.com/arshad-shah)! - Phase 05 — layout primitives.
+- [#6](https://github.com/arshad-shah/Cynosure/pull/6) [`e37bec5`](https://github.com/arshad-shah/Cynosure/commit/e37bec539fb094051007f57b7cadea7be2dfd022) Thanks [@arshad-shah](https://github.com/arshad-shah)! - Phase 05 — layout primitives.
 
-  `@lumen/react` gains eleven polymorphic layout primitives built on **vanilla-extract** — the only components in the library allowed to render raw HTML, and the foundation every subsequent phase composes on top of.
-  - **Primitives:** `Box`, `Stack`, `Inline`, `Flex`, `Grid`, `Center`, `Spacer`, `Divider`, `AspectRatio`, `Container`, `Section`. Each lives in its own folder with a `.tsx` + `.css.ts` + `.stories.tsx` + `index.ts` and ships a dedicated per-component entry point (`@lumen/react/box`, `@lumen/react/stack`, …).
+  `@arshad-shah/cynosure-react` gains eleven polymorphic layout primitives built on **vanilla-extract** — the only components in the library allowed to render raw HTML, and the foundation every subsequent phase composes on top of.
+  - **Primitives:** `Box`, `Stack`, `Inline`, `Flex`, `Grid`, `Center`, `Spacer`, `Divider`, `AspectRatio`, `Container`, `Section`. Each lives in its own folder with a `.tsx` + `.css.ts` + `.stories.tsx` + `index.ts` and ships a dedicated per-component entry point (`@arshad-shah/cynosure-react/box`, `@arshad-shah/cynosure-react/stack`, …).
   - **Shared layout props:** every primitive accepts the `LayoutProps` superset — padding/margin, width/height, background/color/border/shadow, display/position, and grid child hints — and each prop can be a **single token** or a **responsive map** (`{ base, sm, md, lg, xl, '2xl' }`). Values are emitted as cascading CSS custom properties read by a shared vanilla-extract class with mobile-first `@media` rules.
-  - **Tokens, not strings:** token-shaped values (`padding="4"`, `background="bg.surface"`, `boxShadow="md"`, `borderRadius="lg"`) resolve to `var(--lumen-*)` references, keeping every primitive theme-aware out of the box. Plain lengths (`"200px"`, `"50%"`) pass through; aliases (`"full"`, `"screen"`, `"prose"`, `"auto"`, `"fit"`) map to their CSS equivalents.
+  - **Tokens, not strings:** token-shaped values (`padding="4"`, `background="bg.surface"`, `boxShadow="md"`, `borderRadius="lg"`) resolve to `var(--cynosure-*)` references, keeping every primitive theme-aware out of the box. Plain lengths (`"200px"`, `"50%"`) pass through; aliases (`"full"`, `"screen"`, `"prose"`, `"auto"`, `"fit"`) map to their CSS equivalents.
   - **Polymorphism:** every primitive takes either `as` (renders a different element, narrowing its intrinsic attributes) or `asChild` (uses `Slot` to merge props onto the single child), matching the Radix composition pattern.
   - **Opinionated shorthands:** `Stack` (vertical, with `dividers`), `Inline` (horizontal, wraps by default), `Flex` (escape hatch), `Grid` (typed `columns`/`templateColumns` with responsive maps), `Center`, `Spacer`, `Divider` (horizontal `<hr>` + vertical `<div role="separator" aria-orientation="vertical">`), `AspectRatio` (native `aspect-ratio`), `Container` (predefined `sm`/`md`/`lg`/`xl`/`2xl`/`prose`/`full` sizes), `Section` (semantic section with vertical rhythm presets).
-  - **Build:** `@vanilla-extract/vite-plugin` drives Storybook + Vitest, `@vanilla-extract/esbuild-plugin` drives the tsup build. Each primitive is listed in the package `exports` map and ships a Node10-resolution sidecar `package.json`, so both modern (`@lumen/react/box`) and legacy resolvers see their declarations.
+  - **Build:** `@vanilla-extract/vite-plugin` drives Storybook + Vitest, `@vanilla-extract/esbuild-plugin` drives the tsup build. Each primitive is listed in the package `exports` map and ships a Node10-resolution sidecar `package.json`, so both modern (`@arshad-shah/cynosure-react/box`) and legacy resolvers see their declarations.
 
-- [#7](https://github.com/arshad-shah/Lumen/pull/7) [`7aca046`](https://github.com/arshad-shah/Lumen/commit/7aca046bafecb270f95fbad792be9d467c5c7e7b) Thanks [@arshad-shah](https://github.com/arshad-shah)! - Phase 06 — typography.
+- [#7](https://github.com/arshad-shah/Cynosure/pull/7) [`7aca046`](https://github.com/arshad-shah/Cynosure/commit/7aca046bafecb270f95fbad792be9d467c5c7e7b) Thanks [@arshad-shah](https://github.com/arshad-shah)! - Phase 06 — typography.
 
-  `@lumen/react` gains the full text-rendering component set. Every one of them composes `Box` under the hood — none contain raw intrinsic JSX — and they all use the semantic `font.heading.*` / `font.body.*` composite tokens rather than re-declaring font sizes.
-  - **Components:** `Text`, `Heading` (with decoupled semantic `level` + visual `size`), `Code`, `Kbd`, `Link` (with `external` → safe `rel`/`target` + decorative icon), `Blockquote`, and the list family `List` / `OrderedList` / `ListItem` / `DescriptionList` / `DescriptionTerm` / `DescriptionDetails`. Each lives in its own folder and ships a dedicated per-component entry point (`@lumen/react/text`, `@lumen/react/heading`, …).
+  `@arshad-shah/cynosure-react` gains the full text-rendering component set. Every one of them composes `Box` under the hood — none contain raw intrinsic JSX — and they all use the semantic `font.heading.*` / `font.body.*` composite tokens rather than re-declaring font sizes.
+  - **Components:** `Text`, `Heading` (with decoupled semantic `level` + visual `size`), `Code`, `Kbd`, `Link` (with `external` → safe `rel`/`target` + decorative icon), `Blockquote`, and the list family `List` / `OrderedList` / `ListItem` / `DescriptionList` / `DescriptionTerm` / `DescriptionDetails`. Each lives in its own folder and ships a dedicated per-component entry point (`@arshad-shah/cynosure-react/text`, `@arshad-shah/cynosure-react/heading`, …).
   - **Responsive typography:** `size`, `weight`, and `align` accept `Responsive<T>` maps and propagate through cascading CSS custom properties so breakpoint overrides inherit from the nearest lower breakpoint — the same mobile-first pattern the layout primitives use.
-  - **Composite tokens in CSS:** `@lumen/tokens` now emits the pre-expanded `font.heading.*` and `font.body.*` composites as CSS custom properties (`--lumen-font-heading-1-size`, `--lumen-font-body-md-line-height`, …), which Phase 02 introduced but whose CSS output had been dropped by a filter bug in the expansion preprocessor (fixed here).
+  - **Composite tokens in CSS:** `@arshad-shah/cynosure-tokens` now emits the pre-expanded `font.heading.*` and `font.body.*` composites as CSS custom properties (`--cynosure-font-heading-1-size`, `--cynosure-font-body-md-line-height`, …), which Phase 02 introduced but whose CSS output had been dropped by a filter bug in the expansion preprocessor (fixed here).
   - **Shared recipe:** `typography/shared/shared.css.ts` centralises the styles every text component reuses — `align`, `italic`, `underline`/`strikethrough`, single-line truncate, multi-line clamp, and the body/heading size → CSS variable maps — so component `.css.ts` files stay tiny.
   - **Build:** each typography component is listed in the package `exports` map, has a Node10-resolution sidecar `package.json`, and is wired as its own tsup entry to keep per-component imports tree-shakable.
 
-- [#8](https://github.com/arshad-shah/Lumen/pull/8) [`f682aa1`](https://github.com/arshad-shah/Lumen/commit/f682aa1098f7b44156d8821e93fea8a9b343813c) Thanks [@arshad-shah](https://github.com/arshad-shah)! - Phase 07 — basic form controls.
+- [#8](https://github.com/arshad-shah/Cynosure/pull/8) [`f682aa1`](https://github.com/arshad-shah/Cynosure/commit/f682aa1098f7b44156d8821e93fea8a9b343813c) Thanks [@arshad-shah](https://github.com/arshad-shah)! - Phase 07 — basic form controls.
 
-  `@lumen/react` gains the foundational form control inventory. Every control implements the shared `FormControlBase<T>` / `BooleanFormControlBase` contract (`disabled`, `readOnly`, `required`, `invalid`, `size`, controlled + uncontrolled via `useControllableState`) and composes Lumen's existing design tokens rather than reinventing colour/spacing.
+  `@arshad-shah/cynosure-react` gains the foundational form control inventory. Every control implements the shared `FormControlBase<T>` / `BooleanFormControlBase` contract (`disabled`, `readOnly`, `required`, `invalid`, `size`, controlled + uncontrolled via `useControllableState`) and composes Cynosure's existing design tokens rather than reinventing colour/spacing.
   - **Buttons:** `Button` (variant × colourScheme × size × shape cross-product, `loading` with spinner overlay, `leftIcon`/`rightIcon`, `fullWidth`, `asChild` via Radix Slot + `Slottable`), `IconButton` (enforces `aria-label` + square shape), and `ButtonGroup` (context-provided defaults + optional `attached` segmented-control mode).
   - **Text inputs:** `Input` supports left/right addons + inline elements, auto-`clearable` ×, and a built-in password show/hide toggle. `Textarea` adds `rows`, `autoResize` (native `field-sizing: content`), and `maxRows`. Both render the raw element directly — the documented single-exception to the "no raw HTML" rule because value binding / form submission / a11y semantics cannot be faithfully composed.
-  - **Numeric input:** `NumberInput` delegates to `react-aria-components`' `NumberField` for locale-correct parsing, keyboard (↑/↓, PageUp/Down, Home/End), and clamping; Lumen styles the group + input + stepper buttons against the shared control recipe.
-  - **Boolean controls:** `Checkbox` (with `indeterminate` state + `colorScheme`), `CheckboxGroup` (shared value-array context), `Radio` + `RadioGroup` (Radix radio-group under the hood for roving-tabindex), and `Switch`. All three use Radix primitives (`react-checkbox`, `react-radio-group`, `react-switch`) and wrap them with Lumen's colour tokens + label composition.
+  - **Numeric input:** `NumberInput` delegates to `react-aria-components`' `NumberField` for locale-correct parsing, keyboard (↑/↓, PageUp/Down, Home/End), and clamping; Cynosure styles the group + input + stepper buttons against the shared control recipe.
+  - **Boolean controls:** `Checkbox` (with `indeterminate` state + `colorScheme`), `CheckboxGroup` (shared value-array context), `Radio` + `RadioGroup` (Radix radio-group under the hood for roving-tabindex), and `Switch`. All three use Radix primitives (`react-checkbox`, `react-radio-group`, `react-switch`) and wrap them with Cynosure's colour tokens + label composition.
   - **Form scaffolding:** `Label` (with `required` indicator), `HelperText`, `ErrorText` (`role="alert"`), and `Fieldset` (with optional `legend` prop) fill in the non-control half of a form field.
   - **Shared visual recipe:** `forms/shared/control.css.ts` centralises size/variant/state styling (border, background, focus ring, invalid, disabled, readOnly, filled/ghost variants) so `<Input>`, `<Textarea>`, and `<NumberInput>` all paint the same default/hover/focus/invalid states.
-  - **Build:** per-component tsup entries + `exports` entries + Node10 sidecar `package.json` shims for every new subpath (`@lumen/react/button`, `/icon-button`, `/button-group`, `/input`, `/textarea`, `/number-input`, `/checkbox`, `/checkbox-group`, `/radio`, `/radio-group`, `/switch`, `/label`, `/helper-text`, `/error-text`, `/fieldset`, and a combined `/forms`). New externals added to tsup: `@radix-ui/react-checkbox`, `@radix-ui/react-radio-group`, `@radix-ui/react-switch`, `react-aria-components`.
+  - **Build:** per-component tsup entries + `exports` entries + Node10 sidecar `package.json` shims for every new subpath (`@arshad-shah/cynosure-react/button`, `/icon-button`, `/button-group`, `/input`, `/textarea`, `/number-input`, `/checkbox`, `/checkbox-group`, `/radio`, `/radio-group`, `/switch`, `/label`, `/helper-text`, `/error-text`, `/fieldset`, and a combined `/forms`). New externals added to tsup: `@radix-ui/react-checkbox`, `@radix-ui/react-radio-group`, `@radix-ui/react-switch`, `react-aria-components`.
   - **Tests:** 40 new unit tests cover every control — click/space toggles, controlled + uncontrolled, `indeterminate`, clearable/password toggle, group value arrays, required + role semantics, and the `asChild` anchor projection.
 
-- [#9](https://github.com/arshad-shah/Lumen/pull/9) [`3916c3b`](https://github.com/arshad-shah/Lumen/commit/3916c3b51c280919e211b20a3a830c2727cde854) Thanks [@arshad-shah](https://github.com/arshad-shah)! - Phase 08 — advanced form controls.
+- [#9](https://github.com/arshad-shah/Cynosure/pull/9) [`3916c3b`](https://github.com/arshad-shah/Cynosure/commit/3916c3b51c280919e211b20a3a830c2727cde854) Thanks [@arshad-shah](https://github.com/arshad-shah)! - Phase 08 — advanced form controls.
 
-  `@lumen/react` gains the complex form surface: single- and multi-value pickers, sliders, date / time / color pickers, file upload, search, OTP / tags entry, and a star rating. Every component either leans on **React Aria Components** for its interaction contract (focus management, type-to-select, keyboard navigation, locale-aware parsing, virtualised collection safety) or — when Aria doesn't cover it — is hand-built with the same styling tokens.
+  `@arshad-shah/cynosure-react` gains the complex form surface: single- and multi-value pickers, sliders, date / time / color pickers, file upload, search, OTP / tags entry, and a star rating. Every component either leans on **React Aria Components** for its interaction contract (focus management, type-to-select, keyboard navigation, locale-aware parsing, virtualised collection safety) or — when Aria doesn't cover it — is hand-built with the same styling tokens.
   - **Select / Combobox / MultiSelect:** `Select` + `SelectItem` + `SelectSection` for single-value dropdowns (with data-driven `items` or JSX children). `Combobox` + `ComboboxItem` + `ComboboxEmpty` for autocomplete (supports `allowsCustomValue`, controlled `inputValue`, and a custom empty state). `MultiSelect` renders selected values as tags inside the trigger; typing filters the dropdown; Backspace on empty removes the last tag; `maxSelected` caps the selection.
   - **Slider / RangeSlider:** one- and two-thumb sliders on React Aria's `Slider` + `SliderThumb`. `size`, `marks`, `showValue`, and `formatOptions` (passed through for locale-aware Intl formatting). `RangeSlider` accepts a `[start, end]` tuple and renders two labelled thumbs with a filled segment between them.
   - **DatePicker / DateRangePicker / TimePicker:** built on React Aria's `DatePicker` / `DateRangePicker` / `TimeField`, backed by `@internationalized/date` for timezone-aware, locale-aware parsing. Styled calendar (header nav, weekday headings, selectable cells, focus / selected / range / unavailable states) reuses the shared control recipe for the trigger; popover opens a `<Dialog>` with `<Calendar>` / `<RangeCalendar>`.
@@ -148,29 +187,29 @@ build && pnpm docs:changelog && pnpm build-storybook` on its own
   - **PinInput:** N single-character cells, arrow-key navigation, Backspace / Home / End support, paste distribution across cells, `type` of `'numeric' | 'alphanumeric' | 'alphabetic'`, and optional `mask` for OTP entry. Emits `onComplete(code)` on the last cell.
   - **TagsInput:** free-form tag entry. Enter / comma commits; Backspace on empty removes the last tag; optional `suggestions` datalist; `unique` guards against duplicates; `maxTags` caps length; `renderTag` escape hatch for custom chrome.
   - **Rating:** radio-group-style slider semantics (`role="slider"` with `aria-valuemin`/`max`/`now`), arrow keys + Home/End navigation, RTL-aware increments, optional `allowHalf` with click-position-driven half selection.
-  - **LocaleProvider:** thin wrapper around React Aria's `I18nProvider` so `DatePicker`, `NumberInput`, `Slider` etc. receive a locale. Exported from `@lumen/react` and from `@lumen/react/theme`. Default locale is `en-IE`.
+  - **LocaleProvider:** thin wrapper around React Aria's `I18nProvider` so `DatePicker`, `NumberInput`, `Slider` etc. receive a locale. Exported from `@arshad-shah/cynosure-react` and from `@arshad-shah/cynosure-react/theme`. Default locale is `en-IE`.
   - **Shared popover recipe:** new `forms/shared/popover.css.ts` centralises the dropdown shell (`popover`, `listbox`, `listboxItem`, `listboxSection`, `listboxSectionHeader`, `listboxEmpty`) so Select / Combobox / MultiSelect paint identically. DatePicker reuses the same popover shell.
-  - **Build:** 14 new per-component tsup entries + `exports` entries + Node10 sidecar `package.json` shims for each new subpath (`@lumen/react/select`, `/combobox`, `/multi-select`, `/slider`, `/range-slider`, `/date-picker`, `/date-range-picker`, `/time-picker`, `/color-picker`, `/file-upload`, `/search-input`, `/pin-input`, `/tags-input`, `/rating`). Added `@internationalized/date` to dependencies and to tsup `external`.
+  - **Build:** 14 new per-component tsup entries + `exports` entries + Node10 sidecar `package.json` shims for each new subpath (`@arshad-shah/cynosure-react/select`, `/combobox`, `/multi-select`, `/slider`, `/range-slider`, `/date-picker`, `/date-range-picker`, `/time-picker`, `/color-picker`, `/file-upload`, `/search-input`, `/pin-input`, `/tags-input`, `/rating`). Added `@internationalized/date` to dependencies and to tsup `external`.
   - **Tests:** 34 new unit tests covering Select/Combobox/MultiSelect (render, select, controlled value, disabled), Slider/RangeSlider (default value, keyboard increment, two-thumb render), DatePicker/DateRangePicker/TimePicker (segment/group render, invalid flag), FileUpload (drop zone, size rejection, change dispatch), SearchInput (debounced onSearch, Esc clears, Enter submits), PinInput (cell focus propagation, onComplete, paste distribution, invalid-char rejection), TagsInput (commit/remove/unique), and Rating (aria-valuenow, arrow increment, readOnly). Total suite now 258/258 passing.
 
-- [#11](https://github.com/arshad-shah/Lumen/pull/11) [`e80b599`](https://github.com/arshad-shah/Lumen/commit/e80b599025258835eeb25d3c9384923bffdb7c36) Thanks [@arshad-shah](https://github.com/arshad-shah)! - Phase 10 — navigation components.
+- [#11](https://github.com/arshad-shah/Cynosure/pull/11) [`e80b599`](https://github.com/arshad-shah/Cynosure/commit/e80b599025258835eeb25d3c9384923bffdb7c36) Thanks [@arshad-shah](https://github.com/arshad-shah)! - Phase 10 — navigation components.
 
-  `@lumen/react` gains the full navigation surface: inter-page (Breadcrumb, Pagination, NavigationMenu), intra-page (Tabs, Anchor, BackToTop), wizard-style (Stepper), and structural (Menu, Sidebar). Every component either wraps a Radix primitive (Tabs, NavigationMenu) or is hand-built on Lumen's layout + typography primitives.
-  - **Tabs:** `@radix-ui/react-tabs`-backed with `variant` ∈ `line | solid | enclosed | soft`, `size` ∈ `sm | md | lg`, `orientation` ∈ `horizontal | vertical`, `fullWidth`, and `colorScheme`. Opt-in `<TabsIndicator />` animates an underline between triggers via getBoundingClientRect + MutationObserver, writing `--lumen-tabs-indicator-*` custom properties; falls back to a static active border when the indicator isn't rendered and auto-zeroes animation under `prefers-reduced-motion`.
+  `@arshad-shah/cynosure-react` gains the full navigation surface: inter-page (Breadcrumb, Pagination, NavigationMenu), intra-page (Tabs, Anchor, BackToTop), wizard-style (Stepper), and structural (Menu, Sidebar). Every component either wraps a Radix primitive (Tabs, NavigationMenu) or is hand-built on Cynosure's layout + typography primitives.
+  - **Tabs:** `@radix-ui/react-tabs`-backed with `variant` ∈ `line | solid | enclosed | soft`, `size` ∈ `sm | md | lg`, `orientation` ∈ `horizontal | vertical`, `fullWidth`, and `colorScheme`. Opt-in `<TabsIndicator />` animates an underline between triggers via getBoundingClientRect + MutationObserver, writing `--cynosure-tabs-indicator-*` custom properties; falls back to a static active border when the indicator isn't rendered and auto-zeroes animation under `prefers-reduced-motion`.
   - **Breadcrumb:** `Breadcrumb` + `BreadcrumbItem` / `BreadcrumbLink` / `BreadcrumbPage` / `BreadcrumbSeparator` / `BreadcrumbEllipsis`. Separators are auto-interleaved and carry `role="presentation"` + `aria-hidden="true"` so the `<ol>` reports N listitems, not 2N-1. Supports `maxItems` / `itemsBeforeCollapse` / `itemsAfterCollapse` with a `renderCollapsed` escape hatch to wire the ellipsis into a DropdownMenu.
-  - **Pagination:** compound (`<PaginationPrevious> <PaginationPages> <PaginationNext>`) and prop-driven modes from the same root. Pure `paginationRange` utility (mirrors MUI's `usePagination` algorithm so the visible-count stays constant as `currentPage` scans the range) is exported from `@lumen/react/pagination` for consumers who want to paint their own paginator. `showFirstLast`, `siblingCount`, `boundaryCount`, localised labels, `aria-current="page"` on the active button, and first/last/prev/next disable correctly at the boundaries.
+  - **Pagination:** compound (`<PaginationPrevious> <PaginationPages> <PaginationNext>`) and prop-driven modes from the same root. Pure `paginationRange` utility (mirrors MUI's `usePagination` algorithm so the visible-count stays constant as `currentPage` scans the range) is exported from `@arshad-shah/cynosure-react/pagination` for consumers who want to paint their own paginator. `showFirstLast`, `siblingCount`, `boundaryCount`, localised labels, `aria-current="page"` on the active button, and first/last/prev/next disable correctly at the boundaries.
   - **Menu:** sidebar-style vertical menu (distinct from `DropdownMenu`). `Menu` / `MenuGroup` (optional `collapsible` + `label`) / `MenuItem` / `MenuDivider`. `MenuItem` is polymorphic — renders `<a>` when `href` is set, `<button>` otherwise, or projects onto a router `<Link>` via `asChild`. Accepts `icon`, `iconRight`, `badge`, `indent` (0-3), `isActive`, `disabled`.
   - **NavigationMenu:** `@radix-ui/react-navigation-menu`-backed horizontal top-nav with mega-menu panels. `NavigationMenu` / `NavigationMenuList` / `NavigationMenuItem` / `NavigationMenuTrigger` / `NavigationMenuContent` / `NavigationMenuLink` / `NavigationMenuIndicator` / `NavigationMenuViewport` / `NavigationMenuSub`. Trigger ships a built-in caret (opt-out via `hideChevron`); the indicator + viewport pieces wire Radix's animated arrow and animated-height viewport wrappers.
   - **Sidebar:** layout-level pattern. `SidebarProvider` owns `collapsed` state, responsive `isMobile` breakpoint matching (configurable via `mobileQuery`), and the mobile drawer's `mobileOpen` state. `Sidebar` renders inline on desktop and portals into a `<Drawer side="left|right">` on mobile, re-using the Phase 09 Drawer primitive (no extra deps). `SidebarHeader` / `SidebarBody` / `SidebarFooter` for structure; `SidebarTrigger` is a context-aware button that toggles collapse on desktop and opens the drawer on mobile. `variant` ∈ `sidebar | floating | inset`, `collapsible` ∈ `icon | offcanvas | none`. `useSidebar()` hook exposed for custom triggers.
   - **Stepper:** multi-step flow indicator. `Stepper` (horizontal/vertical, `numbered | dots | lines | icons` variants) + `Step` (`title`, `description`, `icon`, explicit `status` override). Status derives from `index` vs. `currentStep` (`complete | active | pending`, or explicit `error`). `interactive` mode lets consumers click a completed step to jump back — pending steps remain non-interactive. Active step carries `aria-current="step"`, connectors between steps fill from the accent colour as steps complete.
   - **Anchor:** in-page heading + copy-link. Renders `<h{level}>` with an invisible-until-hover link that pushes the hash, smooth-scrolls the target into view (respects `prefers-reduced-motion`), and writes the full URL to `navigator.clipboard`. Optional `offsetTop` applied via `scroll-margin-top` for sticky headers, `onCopy` callback, `label` for the copy trigger.
   - **BackToTop:** portal'd floating button that appears after the consumer scrolls past `showAfter`. Three preset positions (`bottom-right | bottom-left | bottom-center`), smooth scroll to the top (auto-switches to `auto` under `prefers-reduced-motion`), `disablePortal` for tests, custom `icon` / `label` / `container` escape hatches. Scroll listener is throttled via the existing `useThrottledCallback` hook.
-  - **Build:** two new Radix dependencies (`@radix-ui/react-tabs`, `@radix-ui/react-navigation-menu`) added to the package + tsup `external`. Nine new per-component tsup entries + `exports` entries + Node10 sidecar `package.json` shims (`@lumen/react/tabs`, `/breadcrumb`, `/pagination`, `/menu`, `/navigation-menu`, `/sidebar`, `/stepper`, `/anchor`, `/back-to-top`) plus a `/navigation` barrel.
+  - **Build:** two new Radix dependencies (`@radix-ui/react-tabs`, `@radix-ui/react-navigation-menu`) added to the package + tsup `external`. Nine new per-component tsup entries + `exports` entries + Node10 sidecar `package.json` shims (`@arshad-shah/cynosure-react/tabs`, `/breadcrumb`, `/pagination`, `/menu`, `/navigation-menu`, `/sidebar`, `/stepper`, `/anchor`, `/back-to-top`) plus a `/navigation` barrel.
   - **Tests:** 36 new unit tests covering Tabs (render, click-to-switch, disabled triggers, tablist ARIA), Breadcrumb (item/separator count with `role="presentation"` suppression, `maxItems` collapse), Pagination (page-click onPageChange, `aria-current`, disable boundaries, advance-on-next) plus a `paginationRange` table with 7 table-driven cases, Menu (item activation, `href`/`asChild` branches, disabled clicks, collapsible group, divider), NavigationMenu (trigger + active link), Sidebar (desktop collapse toggle, mobile drawer switchover via `matchMedia` mock), Stepper (status derivation, error override, interactive click, pending-step non-interactivity), Anchor (heading level + `onCopy`), BackToTop (visibility threshold + scrollTo call). Total suite now 322/322 passing.
 
-- [#12](https://github.com/arshad-shah/Lumen/pull/12) [`df4aca8`](https://github.com/arshad-shah/Lumen/commit/df4aca8daa43ff7e8d9d7780b9fb554c83bc724c) Thanks [@arshad-shah](https://github.com/arshad-shah)! - Phase 11 — data display components.
+- [#12](https://github.com/arshad-shah/Cynosure/pull/12) [`df4aca8`](https://github.com/arshad-shah/Cynosure/commit/df4aca8daa43ff7e8d9d7780b9fb554c83bc724c) Thanks [@arshad-shah](https://github.com/arshad-shah)! - Phase 11 — data display components.
 
-  `@lumen/react` gains the heavyweight data-display surface: cards, tables, trees, timelines, progress, skeleton/spinner feedback, accordions, code blocks, scroll areas, and resizable panels.
+  `@arshad-shah/cynosure-react` gains the heavyweight data-display surface: cards, tables, trees, timelines, progress, skeleton/spinner feedback, accordions, code blocks, scroll areas, and resizable panels.
   - **Card family:** `Card` + `CardHeader` / `CardBody` / `CardFooter` / `CardTitle` / `CardDescription` / `CardImage` / `CardMedia`. Variants (`outlined` / `elevated` / `filled` / `ghost`), sizes (`sm` / `md` / `lg`), `orientation="horizontal"` for side-media layouts, `interactive` for hover/focus states, and the classic `asChild` escape hatch for clickable-card patterns.
   - **Table (static) + DataTable:** `Table` + `TableHead` / `TableBody` / `TableFoot` / `TableRow` / `TableHeader` / `TableCell` / `TableCaption` cover the "already in final form" case with `line` / `striped` / `grid` / `minimal` variants, `stickyHeader`, and `layout` control. `DataTable` is the opt-in advanced mode backed by TanStack Table v8 — sortable headers (multi-column via Shift+click, `aria-sort` for every direction), checkbox selection with `onSelectionChange(rows)`, `Pagination` wired in beneath, global filter, loading skeletons, and a slot-based `emptyState`.
   - **Tree:** hand-rolled tree with full keyboard navigation (ArrowUp/Down/Left/Right, Home/End, Enter/Space, `*` to expand the current sibling group). Controlled + uncontrolled `expandedIds`/`selectedIds` via `useControllableState`; `selectionMode="none" | "single" | "multiple"`; `aria-level` / `aria-expanded` / `aria-selected` on every row. Render prop exposes `{ item, depth, expanded, selected, focused, disabled }`.
@@ -182,15 +221,15 @@ build && pnpm docs:changelog && pnpm build-storybook` on its own
   - **Accordion + Collapsible + Disclosure:** Radix-backed expand/collapse. Accordion supports `type="single"` (with `collapsible`) and `type="multiple"` with our own `default` / `contained` / `ghost` shell variants; height transitions drive off Radix's `--radix-accordion-content-height` custom property. `Collapsible` is the one-section variant for "show more" / settings panels. `Disclosure` is a semantic alias of `Collapsible`.
   - **ScrollArea:** Radix-backed custom scrollbars with consistent styling across platforms. `type="hover"` default so scrollbars reveal on interaction; `scrollbars` prop limits to vertical or horizontal only.
   - **Resizable + Splitter:** `react-resizable-panels`-backed split panes. `Resizable` + `ResizablePanel` + `ResizableHandle` with `direction="horizontal" | "vertical"`, `withHandle` for a visible drag grip, and a `Splitter` alias for design systems that use that vocabulary.
-  - **CodeBlock:** plain, zero-dependency renderer by default (line numbers, highlight lines, copy button, max-height scroll, language chip in the header). A lazy Shiki path is exposed via `createShikiRenderer()` + `useShikiRender()` — consumers import them from `@lumen/react/code-block` and pass the resulting HTML through the `html` prop, so Shiki never enters the default bundle graph.
+  - **CodeBlock:** plain, zero-dependency renderer by default (line numbers, highlight lines, copy button, max-height scroll, language chip in the header). A lazy Shiki path is exposed via `createShikiRenderer()` + `useShikiRender()` — consumers import them from `@arshad-shah/cynosure-react/code-block` and pass the resulting HTML through the `html` prop, so Shiki never enters the default bundle graph.
 
   New direct dependencies: `@radix-ui/react-accordion`, `@radix-ui/react-collapsible`, `@radix-ui/react-scroll-area`, `@tanstack/react-table`, `react-resizable-panels`, `shiki`.
 
   All components ship per-component tsup entries with Node10 sidecar shims. 35 new unit tests (357/357 total pass).
 
-- [#13](https://github.com/arshad-shah/Lumen/pull/13) [`6602e19`](https://github.com/arshad-shah/Lumen/commit/6602e198c2eb978793d9edba671bb6d12bc46381) Thanks [@arshad-shah](https://github.com/arshad-shah)! - Phase 12 — feedback components.
+- [#13](https://github.com/arshad-shah/Cynosure/pull/13) [`6602e19`](https://github.com/arshad-shah/Cynosure/commit/6602e198c2eb978793d9edba671bb6d12bc46381) Thanks [@arshad-shah](https://github.com/arshad-shah)! - Phase 12 — feedback components.
 
-  `@lumen/react` gains the "status and identity" surface: badges, tags, chips, avatars, alerts, banners, notifications, callouts, empty states, and button toggles.
+  `@arshad-shah/cynosure-react` gains the "status and identity" surface: badges, tags, chips, avatars, alerts, banners, notifications, callouts, empty states, and button toggles.
   - **Badge / Tag / Chip:** three lookalikes with explicit, non-overlapping roles. `Badge` is a non-interactive label (soft/solid/outline/ghost × accent/neutral/success/warning/danger/info, sizes xs/sm/md, shape default/pill/square, optional `icon`, and a bare `dot` mode). `Tag` is a categorical label — static by default, becomes a `<button>` when `onClick` is set, renders a `role="group"` wrapper with an inner remove button when `onRemove` is set (with Backspace/Delete keyboard removal on the focused tag). `Chip` is always an interactive toggle button with `aria-pressed`, a controlled `selected` + `onSelectedChange` contract, optional `leftIcon`/`rightIcon`, and an optional `onRemove` tail button.
   - **Avatar + AvatarGroup:** Radix-backed `<RadixAvatar.Root>` with image → initials → icon fallback chain; six sizes (`xs`/`sm`/`md`/`lg`/`xl`/`2xl`), three shapes (`circle`/`square`/`rounded`), a deterministic 8-colour palette hash (`colorFromName`) so the same display name always maps to the same tint, optional status dot (`online`/`offline`/`away`/`busy` × top-right/bottom-right), and an optional ring for stacked group layouts. `AvatarGroup` overlaps the first N children and collapses the rest into a `+N` tile, projecting `size` + `ring` through context.
   - **Alert + AlertTitle + AlertDescription:** static inline alert with `status` (`info`/`success`/`warning`/`danger`), `variant` (`solid`/`soft`/`outline`/`ghost`), sizes `sm`/`md`/`lg`, configurable icon (custom node, `false` to hide, or default status icon), and optional `closable` + `onClose`. ARIA `role` defaults to `alert` for danger/warning and `status` for info/success; consumers can override.
@@ -204,41 +243,41 @@ build && pnpm docs:changelog && pnpm build-storybook` on its own
 
   New direct dependencies: `@radix-ui/react-avatar`, `@radix-ui/react-toggle`, `@radix-ui/react-toggle-group`.
 
-  All components ship per-component tsup entries with Node10 sidecar shims (`@lumen/react/badge`, `/tag`, `/chip`, `/avatar`, `/avatar-group`, `/alert`, `/banner`, `/notification`, `/callout`, `/empty-state`, `/toggle`, `/toggle-group`, `/feedback`). 35 new unit tests (392/392 total pass).
+  All components ship per-component tsup entries with Node10 sidecar shims (`@arshad-shah/cynosure-react/badge`, `/tag`, `/chip`, `/avatar`, `/avatar-group`, `/alert`, `/banner`, `/notification`, `/callout`, `/empty-state`, `/toggle`, `/toggle-group`, `/feedback`). 35 new unit tests (392/392 total pass).
 
-- [#14](https://github.com/arshad-shah/Lumen/pull/14) [`3234aa1`](https://github.com/arshad-shah/Lumen/commit/3234aa1cd176e5116fb122b51dfc47158fa2d2a1) Thanks [@arshad-shah](https://github.com/arshad-shah)! - Phase 13 — form composition.
+- [#14](https://github.com/arshad-shah/Cynosure/pull/14) [`3234aa1`](https://github.com/arshad-shah/Cynosure/commit/3234aa1cd176e5116fb122b51dfc47158fa2d2a1) Thanks [@arshad-shah](https://github.com/arshad-shah)! - Phase 13 — form composition.
 
-  `@lumen/react` gains the scaffolding layer that ties every Phase 07 + 08 control together with a small compound component and an opt-in `react-hook-form` adapter.
+  `@arshad-shah/cynosure-react` gains the scaffolding layer that ties every Phase 07 + 08 control together with a small compound component and an opt-in `react-hook-form` adapter.
   - **`Form`** — thin wrapper over `<form>` with `noValidate` defaulted to `true` so native browser validation bubbles don't fight `FormMessage`.
   - **`FormField`** — generates a stable `id` from `name` + `useId`, owns the context that wires its children, and lays out `FormLabel` / `FormControl` / `FormDescription` / `FormMessage` as a vertical flex column with a `space.1.5` gap. Carries `invalid` / `disabled` / `required` flags that cascade through the field.
   - **`FormLabel`** — wraps `Label`, auto-threads `htmlFor` to the field id, and paints the required indicator from `FormField.required`.
-  - **`FormControl`** — clones its single child (an `<input>` / `<Select>` / `<Checkbox>` / etc.) and injects `id`, `name`, `aria-invalid`, `aria-describedby`, `disabled`, `required`, and the Lumen-specific `invalid` prop. Any value the child already sets wins; existing `aria-describedby` is preserved by concatenation so external references survive.
+  - **`FormControl`** — clones its single child (an `<input>` / `<Select>` / `<Checkbox>` / etc.) and injects `id`, `name`, `aria-invalid`, `aria-describedby`, `disabled`, `required`, and the Cynosure-specific `invalid` prop. Any value the child already sets wins; existing `aria-describedby` is preserved by concatenation so external references survive.
   - **`FormDescription`** — wraps `HelperText` and registers a `${field.id}-description` id onto the field's `aria-describedby` list.
   - **`FormMessage`** — wraps `ErrorText`, registers a `${field.id}-message` id **only when it has content**, and emits `role="alert"` only when the surrounding field is `invalid`. Returns `null` for empty children so consumers can bind `<FormMessage>{errors.field?.message}</FormMessage>` unconditionally.
 
-  New `@lumen/react/rhf` subpath exports `RHFField`, an adapter that wires `useController({ control, name, rules })` through the `FormField` scaffold — binds `field.value` / `field.onChange` / `field.onBlur` / `field.ref` onto the child control, marks the field invalid on `fieldState.error`, and surfaces `fieldState.error?.message` through `FormMessage`.
+  New `@arshad-shah/cynosure-react/rhf` subpath exports `RHFField`, an adapter that wires `useController({ control, name, rules })` through the `FormField` scaffold — binds `field.value` / `field.onChange` / `field.onBlur` / `field.ref` onto the child control, marks the field invalid on `fieldState.error`, and surfaces `fieldState.error?.message` through `FormMessage`.
 
-  `react-hook-form` is declared as an **optional peer dependency** (`peerDependenciesMeta.react-hook-form.optional = true`). Consumers who never import `@lumen/react/rhf` don't need it installed and don't pay any runtime cost; the subpath imports `react-hook-form` statically so typed generics (`RHFField<TValues, TName>`) flow through and tree-shaking stays effective.
+  `react-hook-form` is declared as an **optional peer dependency** (`peerDependenciesMeta.react-hook-form.optional = true`). Consumers who never import `@arshad-shah/cynosure-react/rhf` don't need it installed and don't pay any runtime cost; the subpath imports `react-hook-form` statically so typed generics (`RHFField<TValues, TName>`) flow through and tree-shaking stays effective.
 
   Three Storybook MDX recipes in `src/forms/Form/`:
   - `Form.mdx` — plain uncontrolled form + `FormData` + `Object.fromEntries`.
   - `RHF.mdx` — `react-hook-form` with inline `rules`.
   - `RHF-Zod.mdx` — `react-hook-form` + `@hookform/resolvers/zod` with a shared Zod schema.
 
-  Per-component tsup entries (`@lumen/react/form`, `@lumen/react/rhf`) + Node10 sidecar shims. 17 new unit + integration tests covering `aria-describedby` composition and mount order, child-prop override, FormData submission, and RHF error surfacing (409/409 total pass).
+  Per-component tsup entries (`@arshad-shah/cynosure-react/form`, `@arshad-shah/cynosure-react/rhf`) + Node10 sidecar shims. 17 new unit + integration tests covering `aria-describedby` composition and mount order, child-prop override, FormData submission, and RHF error surfacing (409/409 total pass).
 
 ### Patch Changes
 
-- [#1](https://github.com/arshad-shah/Lumen/pull/1) [`8779fbf`](https://github.com/arshad-shah/Lumen/commit/8779fbf3668dca2e0b663fa686e9e6a9267d62c0) Thanks [@arshad-shah](https://github.com/arshad-shah)! - Initial foundation.
+- [#1](https://github.com/arshad-shah/Cynosure/pull/1) [`8779fbf`](https://github.com/arshad-shah/Cynosure/commit/8779fbf3668dca2e0b663fa686e9e6a9267d62c0) Thanks [@arshad-shah](https://github.com/arshad-shah)! - Initial foundation.
 
-- [#15](https://github.com/arshad-shah/Lumen/pull/15) [`0454102`](https://github.com/arshad-shah/Lumen/commit/045410265ab1feacd9d5a4ed5215102abd98e845) Thanks [@arshad-shah](https://github.com/arshad-shah)! - Phase 14 — testing & quality hardening.
+- [#15](https://github.com/arshad-shah/Cynosure/pull/15) [`0454102`](https://github.com/arshad-shah/Cynosure/commit/045410265ab1feacd9d5a4ed5215102abd98e845) Thanks [@arshad-shah](https://github.com/arshad-shah)! - Phase 14 — testing & quality hardening.
 
-  Repo-wide CI gates are now release-blocking; `@lumen/react` itself only changes visually where physical CSS properties on RTL-sensitive components were rewritten to logical equivalents so layouts flip correctly under `<DirectionProvider dir="rtl">`.
+  Repo-wide CI gates are now release-blocking; `@arshad-shah/cynosure-react` itself only changes visually where physical CSS properties on RTL-sensitive components were rewritten to logical equivalents so layouts flip correctly under `<DirectionProvider dir="rtl">`.
   - **Logical properties everywhere.** `Callout`, `Tag`, `Divider` (vertical variants), `NavigationMenu` indicator arrow, `Tabs` (vertical list separator), `CodeBlock` line numbers, `overlay/shared/menu` items/shortcuts/indicators, and `feedback/shared/surface` close button all moved from `margin-left` / `padding-right` / `border-left-*` to `margin-inline-start` / `padding-inline-end` / `border-inline-start-*`. Consumer-facing layout props (`<Box paddingLeft="4">` etc.) stay physical by design — they remain a physical-intent escape hatch.
   - **RTL audit script** (`scripts/audit-rtl.mjs`) greps every `*.css.ts` in `packages/react/src` for physical directional properties and fails CI on new occurrences. Two files are on the allowlist with documented rationale: the `primitives/layout/shared/layoutStyle.css.ts` prop registry (consumer API) and `overlay/Drawer/Drawer.css.ts` (physical `side="left"` / `"right"` is the prop's intent).
-  - **Contrast audit script** (`scripts/audit-contrast.mjs`) parses the compiled `@lumen/tokens` CSS + `@lumen/themes` overlays, resolves every `var()` chain, composites alpha-blended pairs, and checks WCAG 2.1 AA against 19 semantic foreground/background pairs across six themes (base light + dark, terminal + terminal-dark, high-contrast + high-contrast-dark). Fails CI on any pair below threshold.
+  - **Contrast audit script** (`scripts/audit-contrast.mjs`) parses the compiled `@arshad-shah/cynosure-tokens` CSS + `@arshad-shah/cynosure-themes` overlays, resolves every `var()` chain, composites alpha-blended pairs, and checks WCAG 2.1 AA against 19 semantic foreground/background pairs across six themes (base light + dark, terminal + terminal-dark, high-contrast + high-contrast-dark). Fails CI on any pair below threshold.
   - **Bundle-size budgets.** Root `.size-limit.json` carries 44 per-component budgets (Box through DataTable, Form + RHF adapter, and a warning-only full-barrel ceiling). `pnpm size` runs on every PR.
-  - **Vitest hardening.** `packages/react/vitest.config.ts` now ships `coverage.thresholds` (initial baseline: lines/statements ≥ 85, functions ≥ 78, branches ≥ 73 — spec target is 85/85/80/85, with functions/branches catching up incrementally as DataTable/Tree/ColorPicker/DatePicker edge-cases land coverage) and an opt-in cross-browser matrix (`LUMEN_BROWSER_MODE=1` → Chromium + Firefox + WebKit via Playwright; local default stays jsdom-only for speed; browser mode only matches `*.browser.test.{ts,tsx}` so the existing jsdom suite isn't forced through real browsers).
+  - **Vitest hardening.** `packages/react/vitest.config.ts` now ships `coverage.thresholds` (initial baseline: lines/statements ≥ 85, functions ≥ 78, branches ≥ 73 — spec target is 85/85/80/85, with functions/branches catching up incrementally as DataTable/Tree/ColorPicker/DatePicker edge-cases land coverage) and an opt-in cross-browser matrix (`CYNOSURE_BROWSER_MODE=1` → Chromium + Firefox + WebKit via Playwright; local default stays jsdom-only for speed; browser mode only matches `*.browser.test.{ts,tsx}` so the existing jsdom suite isn't forced through real browsers).
   - **Storybook a11y.** `.storybook/preview.ts` locks the axe audit to WCAG 2.1 A + AA tags and keeps `a11y.test = 'error'` so any violation fails Vitest Storybook addon runs.
   - **CI verify.** Split into `verify` (lint/typecheck/RTL-audit/build/test/coverage/contrast/size/publint/attw) and an optional `cross-browser` job that runs the three-engine matrix. Nothing merges to `main` without green verify.
   - **Dep freshness.** `.github/renovate.json` groups Radix / React-Aria / vanilla-extract / Storybook / Vitest / TanStack / Internationalized and pins Monday-morning scheduling with pr concurrency limits.
@@ -246,6 +285,6 @@ build && pnpm docs:changelog && pnpm build-storybook` on its own
 
   No public API additions; patch-level because the visual output of the nine `.css.ts` files changes in RTL contexts.
 
-- Updated dependencies [[`b99bace`](https://github.com/arshad-shah/Lumen/commit/b99bacee83d7fbd4800d3aa0ae327badc078b046), [`e2f45fc`](https://github.com/arshad-shah/Lumen/commit/e2f45fc841e62c35b9f95650a2d4ca7c28c96b12), [`7aca046`](https://github.com/arshad-shah/Lumen/commit/7aca046bafecb270f95fbad792be9d467c5c7e7b)]:
-  - @lumen/tokens@0.1.0
-  - @lumen/core@0.1.0
+- Updated dependencies [[`b99bace`](https://github.com/arshad-shah/Cynosure/commit/b99bacee83d7fbd4800d3aa0ae327badc078b046), [`e2f45fc`](https://github.com/arshad-shah/Cynosure/commit/e2f45fc841e62c35b9f95650a2d4ca7c28c96b12), [`7aca046`](https://github.com/arshad-shah/Cynosure/commit/7aca046bafecb270f95fbad792be9d467c5c7e7b)]:
+  - @arshad-shah/cynosure-tokens@0.1.0
+  - @arshad-shah/cynosure-core@0.1.0

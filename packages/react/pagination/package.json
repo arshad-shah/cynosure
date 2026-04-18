@@ -1,5 +1,5 @@
 {
-  "name": "@lumen/react/pagination",
+  "name": "@arshad-shah/cynosure-react/pagination",
   "private": true,
   "type": "module",
   "main": "../dist/pagination.js",

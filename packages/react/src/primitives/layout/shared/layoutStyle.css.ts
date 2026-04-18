@@ -10,51 +10,51 @@ import { MEDIA_QUERIES } from './breakpoints.js';
  */
 const LAYOUT_PROPS: Array<[string, string]> = [
   // spacing
-  ['padding', 'lumen-lp-p'],
-  ['padding-inline', 'lumen-lp-px'],
-  ['padding-block', 'lumen-lp-py'],
-  ['padding-top', 'lumen-lp-pt'],
-  ['padding-right', 'lumen-lp-pr'],
-  ['padding-bottom', 'lumen-lp-pb'],
-  ['padding-left', 'lumen-lp-pl'],
-  ['margin', 'lumen-lp-m'],
-  ['margin-inline', 'lumen-lp-mx'],
-  ['margin-block', 'lumen-lp-my'],
-  ['margin-top', 'lumen-lp-mt'],
-  ['margin-right', 'lumen-lp-mr'],
-  ['margin-bottom', 'lumen-lp-mb'],
-  ['margin-left', 'lumen-lp-ml'],
+  ['padding', 'cynosure-lp-p'],
+  ['padding-inline', 'cynosure-lp-px'],
+  ['padding-block', 'cynosure-lp-py'],
+  ['padding-top', 'cynosure-lp-pt'],
+  ['padding-right', 'cynosure-lp-pr'],
+  ['padding-bottom', 'cynosure-lp-pb'],
+  ['padding-left', 'cynosure-lp-pl'],
+  ['margin', 'cynosure-lp-m'],
+  ['margin-inline', 'cynosure-lp-mx'],
+  ['margin-block', 'cynosure-lp-my'],
+  ['margin-top', 'cynosure-lp-mt'],
+  ['margin-right', 'cynosure-lp-mr'],
+  ['margin-bottom', 'cynosure-lp-mb'],
+  ['margin-left', 'cynosure-lp-ml'],
   // size
-  ['width', 'lumen-lp-w'],
-  ['height', 'lumen-lp-h'],
-  ['min-width', 'lumen-lp-minw'],
-  ['max-width', 'lumen-lp-maxw'],
-  ['min-height', 'lumen-lp-minh'],
-  ['max-height', 'lumen-lp-maxh'],
+  ['width', 'cynosure-lp-w'],
+  ['height', 'cynosure-lp-h'],
+  ['min-width', 'cynosure-lp-minw'],
+  ['max-width', 'cynosure-lp-maxw'],
+  ['min-height', 'cynosure-lp-minh'],
+  ['max-height', 'cynosure-lp-maxh'],
   // visual
-  ['background', 'lumen-lp-bg'],
-  ['color', 'lumen-lp-fg'],
-  ['border-color', 'lumen-lp-bc'],
-  ['border-width', 'lumen-lp-bw'],
-  ['border-style', 'lumen-lp-bs'],
-  ['border-radius', 'lumen-lp-br'],
-  ['box-shadow', 'lumen-lp-sh'],
-  ['opacity', 'lumen-lp-op'],
-  ['overflow', 'lumen-lp-ov'],
-  ['overflow-x', 'lumen-lp-ovx'],
-  ['overflow-y', 'lumen-lp-ovy'],
+  ['background', 'cynosure-lp-bg'],
+  ['color', 'cynosure-lp-fg'],
+  ['border-color', 'cynosure-lp-bc'],
+  ['border-width', 'cynosure-lp-bw'],
+  ['border-style', 'cynosure-lp-bs'],
+  ['border-radius', 'cynosure-lp-br'],
+  ['box-shadow', 'cynosure-lp-sh'],
+  ['opacity', 'cynosure-lp-op'],
+  ['overflow', 'cynosure-lp-ov'],
+  ['overflow-x', 'cynosure-lp-ovx'],
+  ['overflow-y', 'cynosure-lp-ovy'],
   // display / position
-  ['display', 'lumen-lp-d'],
-  ['position', 'lumen-lp-pos'],
-  ['top', 'lumen-lp-top'],
-  ['right', 'lumen-lp-right'],
-  ['bottom', 'lumen-lp-bottom'],
-  ['left', 'lumen-lp-left'],
-  ['z-index', 'lumen-lp-z'],
+  ['display', 'cynosure-lp-d'],
+  ['position', 'cynosure-lp-pos'],
+  ['top', 'cynosure-lp-top'],
+  ['right', 'cynosure-lp-right'],
+  ['bottom', 'cynosure-lp-bottom'],
+  ['left', 'cynosure-lp-left'],
+  ['z-index', 'cynosure-lp-z'],
   // grid child hints
-  ['grid-column', 'lumen-lp-gc'],
-  ['grid-row', 'lumen-lp-gr'],
-  ['grid-area', 'lumen-lp-ga'],
+  ['grid-column', 'cynosure-lp-gc'],
+  ['grid-row', 'cynosure-lp-gr'],
+  ['grid-area', 'cynosure-lp-ga'],
 ];
 
 const cascade = (base: string, bps: Array<'base' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'>): string => {
@@ -88,7 +88,7 @@ const LAYOUT_PROPS_2XL = buildRule(['base', 'sm', 'md', 'lg', 'xl', '2xl']);
  * The shared layout-prop base class. Every layout primitive composes this so
  * that `LayoutProps` render identically across them.
  *
- * Consumers set the `--lumen-lp-*-{bp}` custom properties via inline style
+ * Consumers set the `--cynosure-lp-*-{bp}` custom properties via inline style
  * (handled by `resolveLayoutProps`). The cascading `var()` fallbacks here
  * ensure that unset higher breakpoints inherit from the nearest lower one.
  */

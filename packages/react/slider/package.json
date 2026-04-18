@@ -1,5 +1,5 @@
 {
-  "name": "@lumen/react/slider",
+  "name": "@arshad-shah/cynosure-react/slider",
   "private": true,
   "type": "module",
   "main": "../dist/slider.js",

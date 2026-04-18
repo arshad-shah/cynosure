@@ -64,7 +64,7 @@ export const AlertDialogContent = forwardRef<
       {!hideOverlay ? <RadixAlertDialog.Overlay className={overlayBackdrop} /> : null}
       <RadixAlertDialog.Content
         ref={ref}
-        data-lumen-overlay=""
+        data-cynosure-overlay=""
         className={cn(
           dialogContent,
           dialogSize[size],

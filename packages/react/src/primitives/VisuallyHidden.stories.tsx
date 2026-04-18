@@ -98,8 +98,8 @@ export const IconOnlyButton: Story = {
             width: 36,
             height: 36,
             borderRadius: 999,
-            border: '1px solid var(--lumen-color-border-default)',
-            background: 'var(--lumen-color-bg-surface)',
+            border: '1px solid var(--cynosure-color-border-default)',
+            background: 'var(--cynosure-color-bg-surface)',
             cursor: 'pointer',
           }}
         >
@@ -114,8 +114,8 @@ export const IconOnlyButton: Story = {
             width: 36,
             height: 36,
             borderRadius: 999,
-            border: '1px solid var(--lumen-color-border-default)',
-            background: 'var(--lumen-color-bg-surface)',
+            border: '1px solid var(--cynosure-color-border-default)',
+            background: 'var(--cynosure-color-bg-surface)',
             cursor: 'pointer',
           }}
         >
@@ -151,8 +151,8 @@ export const SkipToContent: Story = {
           style={{
             position: 'absolute',
             padding: '0.5rem 1rem',
-            background: 'var(--lumen-color-accent-solid)',
-            color: 'var(--lumen-color-accent-on-solid)',
+            background: 'var(--cynosure-color-accent-solid)',
+            color: 'var(--cynosure-color-accent-on-solid)',
             borderRadius: '0.25rem',
             // Hidden unless focused — use VisuallyHidden's technique with a
             // focus-visible override for this pattern.
@@ -242,7 +242,7 @@ export const HiddenDescription: Story = {
           style={{
             width: '100%',
             padding: '0.5rem',
-            border: '1px solid var(--lumen-color-border-default)',
+            border: '1px solid var(--cynosure-color-border-default)',
             borderRadius: '0.25rem',
           }}
         />

@@ -1,5 +1,5 @@
 {
-  "name": "@lumen/react/tags-input",
+  "name": "@arshad-shah/cynosure-react/tags-input",
   "private": true,
   "type": "module",
   "main": "../dist/tagsinput.js",

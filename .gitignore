@@ -12,3 +12,10 @@ test-results
 .env.local
 *.log
 .vite
+
+# tsup emits these when bundling an ESM config file for Node to load.
+# They're transient build artefacts, never meant to ship or lint.
+tsup.config.bundled_*.mjs
+
+# Claude Code local settings — per-machine, not shared.
+.claude/

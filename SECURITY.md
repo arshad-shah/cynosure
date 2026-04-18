@@ -2,7 +2,7 @@
 
 ## Supported versions
 
-While Lumen is pre-v1.0.0, only the `main` branch receives fixes. Post-v1.0.0
+While Cynosure is pre-v1.0.0, only the `main` branch receives fixes. Post-v1.0.0
 the latest major receives full support and the previous major receives
 security fixes for six months.
 
@@ -16,7 +16,7 @@ security fixes for six months.
 Please report vulnerabilities privately. **Do not open a public issue.**
 
 - Email: **arshad@arshadshah.com**
-- Subject: `[lumen security] <short description>`
+- Subject: `[cynosure security] <short description>`
 
 Include:
 
@@ -38,11 +38,11 @@ anonymity is requested.
 
 In scope:
 
-- Components shipped under `@lumen/*` packages.
+- Components shipped under `@arshad-shah/cynosure-*` packages.
 - Published build artefacts on npm.
-- Docs site at `lumen.arshadshah.com`.
+- Docs site at `cynosure.arshadshah.com`.
 
 Out of scope:
 
-- Consumer applications that depend on Lumen.
+- Consumer applications that depend on Cynosure.
 - Third-party libraries listed as peer dependencies.

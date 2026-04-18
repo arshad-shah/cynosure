@@ -54,10 +54,10 @@ export const accordionTrigger = style({
   alignItems: 'center',
   justifyContent: 'space-between',
   gap: vars.space['2'],
-  paddingBlock: `var(--lumen-acc-pad-y, ${vars.space['3']})`,
-  paddingInline: `var(--lumen-acc-pad-x, ${vars.space['4']})`,
-  fontFamily: 'var(--lumen-font-body-md-family)',
-  fontSize: 'var(--lumen-font-body-md-size)',
+  paddingBlock: `var(--cynosure-acc-pad-y, ${vars.space['3']})`,
+  paddingInline: `var(--cynosure-acc-pad-x, ${vars.space['4']})`,
+  fontFamily: 'var(--cynosure-font-body-md-family)',
+  fontSize: 'var(--cynosure-font-body-md-size)',
   fontWeight: 600,
   color: vars.color.foreground.default,
   cursor: 'pointer',
@@ -94,7 +94,7 @@ globalStyle(`${accordionTrigger}[data-state="open"] [data-slot="chevron"]`, {
 
 export const accordionContent = style({
   overflow: 'hidden',
-  fontSize: 'var(--lumen-font-body-md-size)',
+  fontSize: 'var(--cynosure-font-body-md-size)',
   color: vars.color.foreground.default,
   selectors: {
     '&[data-state="open"]': {
@@ -117,12 +117,18 @@ export const accordionContent = style({
 
 export const accordionContentInner = style({
   paddingBlock: vars.space['2'],
-  paddingInline: `var(--lumen-acc-pad-x, ${vars.space['4']})`,
+  paddingInline: `var(--cynosure-acc-pad-x, ${vars.space['4']})`,
   paddingBottom: vars.space['3'],
 });
 
 export const accordionSize = styleVariants({
-  sm: { vars: { '--lumen-acc-pad-y': vars.space['2'], '--lumen-acc-pad-x': vars.space['3'] } },
-  md: { vars: { '--lumen-acc-pad-y': vars.space['3'], '--lumen-acc-pad-x': vars.space['4'] } },
-  lg: { vars: { '--lumen-acc-pad-y': vars.space['4'], '--lumen-acc-pad-x': vars.space['5'] } },
+  sm: {
+    vars: { '--cynosure-acc-pad-y': vars.space['2'], '--cynosure-acc-pad-x': vars.space['3'] },
+  },
+  md: {
+    vars: { '--cynosure-acc-pad-y': vars.space['3'], '--cynosure-acc-pad-x': vars.space['4'] },
+  },
+  lg: {
+    vars: { '--cynosure-acc-pad-y': vars.space['4'], '--cynosure-acc-pad-x': vars.space['5'] },
+  },
 });

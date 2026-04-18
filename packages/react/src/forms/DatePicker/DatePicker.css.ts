@@ -13,8 +13,8 @@ export const pickerRoot = style({
   boxSizing: 'border-box',
   gap: vars.space['2'],
   color: vars.color.foreground.default,
-  fontSize: 'var(--lumen-font-body-md-size)',
-  lineHeight: 'var(--lumen-font-body-md-line-height)',
+  fontSize: 'var(--cynosure-font-body-md-size)',
+  lineHeight: 'var(--cynosure-font-body-md-line-height)',
   selectors: {
     '&[data-disabled="true"]': {
       opacity: 0.6,

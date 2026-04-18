@@ -4,49 +4,49 @@ import { Meta } from '@storybook/addon-docs/blocks';
 
 # Design tokens
 
-Every visual decision in Lumen lives as a token in `@lumen/tokens`. Tokens
+Every visual decision in Cynosure lives as a token in `@arshad-shah/cynosure-tokens`. Tokens
 are authored in [W3C DTCG JSON](https://tr.designtokens.org/format/) and
 compiled by Style Dictionary to:
 
-- `dist/css/base.css` — `:root { --lumen-*: …; }` primitives + semantic
+- `dist/css/base.css` — `:root { --cynosure-*: …; }` primitives + semantic
   tokens for the light theme.
 - `dist/css/dark.css` — semantic overrides for dark mode.
 - `dist/ts/*.ts` — typed TS constants (rarely needed by consumers; mostly
-  used by Lumen internals).
+  used by Cynosure internals).
 
 ## Categories
 
 | Category     | Example                                    | Usage                         |
 | ------------ | ------------------------------------------ | ----------------------------- |
-| Colour       | `--lumen-color-accent-solid`               | Buttons, links, focus rings   |
-| Space        | `--lumen-space-3`                          | Gaps, padding, margins        |
-| Radius       | `--lumen-radius-component-md`              | Inputs, buttons, cards        |
-| Shadow       | `--lumen-shadow-md`                        | Elevated surfaces             |
-| Typography   | `--lumen-font-body-md-size`                | Font size + line-height pairs |
-| Breakpoint   | `--lumen-bp-md`                            | Used by `LayoutProps`         |
-| Focus        | `--lumen-shadow-focus-ring`                | Focus ring on interactives    |
-| Motion       | `--lumen-duration-fast`                    | Transition durations          |
+| Colour       | `--cynosure-color-accent-solid`               | Buttons, links, focus rings   |
+| Space        | `--cynosure-space-3`                          | Gaps, padding, margins        |
+| Radius       | `--cynosure-radius-component-md`              | Inputs, buttons, cards        |
+| Shadow       | `--cynosure-shadow-md`                        | Elevated surfaces             |
+| Typography   | `--cynosure-font-body-md-size`                | Font size + line-height pairs |
+| Breakpoint   | `--cynosure-bp-md`                            | Used by `LayoutProps`         |
+| Focus        | `--cynosure-shadow-focus-ring`                | Focus ring on interactives    |
+| Motion       | `--cynosure-duration-fast`                    | Transition durations          |
 
 ## Primitives vs. semantic
 
-- **Primitive** tokens (`--lumen-color-blue-500`) are the palette.
-- **Semantic** tokens (`--lumen-color-accent-solid`) are named by purpose
+- **Primitive** tokens (`--cynosure-color-blue-500`) are the palette.
+- **Semantic** tokens (`--cynosure-color-accent-solid`) are named by purpose
   and are what components consume.
 
 Themes override semantic tokens. The palette stays put.
 
 ## Consuming tokens in your app
 
-You rarely need to read tokens directly — most styling happens via Lumen
+You rarely need to read tokens directly — most styling happens via Cynosure
 props or component variants. For custom CSS, reference the custom
 properties:
 
 ```css
 .my-hero {
-  background: var(--lumen-color-surface-subtle);
-  color: var(--lumen-color-fg-default);
-  border-radius: var(--lumen-radius-component-lg);
-  padding: var(--lumen-space-6);
+  background: var(--cynosure-color-surface-subtle);
+  color: var(--cynosure-color-fg-default);
+  border-radius: var(--cynosure-radius-component-lg);
+  padding: var(--cynosure-space-6);
 }
 ```
 
@@ -57,8 +57,8 @@ a container class for local:
 
 ```css
 [data-theme='brand'] {
-  --lumen-color-accent-solid: #0f766e;
-  --lumen-color-accent-solid-hover: #115e59;
+  --cynosure-color-accent-solid: #0f766e;
+  --cynosure-color-accent-solid-hover: #115e59;
 }
 ```
 

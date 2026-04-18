@@ -78,7 +78,7 @@ export const InlineInProse: Story = {
   render: () => (
     <div style={{ maxWidth: 640 }}>
       <Text as="p">
-        Lumen UI is a themable component system built on vanilla-extract. It ships accessible
+        Cynosure UI is a themable component system built on vanilla-extract. It ships accessible
         primitives for forms, feedback, navigation, and overlays. Tokens are mirrored in CSS custom
         properties so you can mix it with plain CSS freely.
       </Text>

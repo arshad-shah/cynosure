@@ -26,6 +26,6 @@ describe('Divider', () => {
   it('applies thickness via CSS custom property', () => {
     const { container } = render(<Divider thickness="2" />);
     const el = container.querySelector('hr') as HTMLElement;
-    expect(el.style.getPropertyValue('--lumen-divider-thickness')).toBe('2px');
+    expect(el.style.getPropertyValue('--cynosure-divider-thickness')).toBe('2px');
   });
 });

@@ -61,7 +61,7 @@ describe('ThemeProvider', () => {
     );
     const { result, unmount } = renderHook(() => useTheme(), { wrapper });
     act(() => result.current.setTheme('dark'));
-    expect(window.localStorage.getItem('lumen-theme')).toBe('dark');
+    expect(window.localStorage.getItem('cynosure-theme')).toBe('dark');
     expect(document.documentElement.getAttribute('data-theme')).toBe('dark');
     unmount();
 
@@ -107,7 +107,7 @@ describe('ThemeProvider', () => {
     );
     const { result } = renderHook(() => useTheme(), { wrapper });
     act(() => result.current.setTheme('dark'));
-    expect(store.get('lumen-theme')).toBe('dark');
+    expect(store.get('cynosure-theme')).toBe('dark');
   });
 
   it('throws when useTheme is called without a provider', () => {

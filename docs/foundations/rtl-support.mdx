@@ -4,7 +4,7 @@ import { Meta } from '@storybook/addon-docs/blocks';
 
 # RTL support
 
-Lumen is RTL-safe by construction. The rules:
+Cynosure is RTL-safe by construction. The rules:
 
 1. Every internal `.css.ts` uses **logical CSS properties** (`padding-inline`,
    `margin-inline`, `inset-inline`, `border-inline-end`, …). Physical
@@ -21,7 +21,7 @@ Lumen is RTL-safe by construction. The rules:
 Wrap your app in `DirectionProvider`:
 
 ```tsx
-import { DirectionProvider } from '@lumen/react';
+import { DirectionProvider } from '@arshad-shah/cynosure-react';
 
 <DirectionProvider dir="rtl">
   {children}

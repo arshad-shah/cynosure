@@ -1,5 +1,5 @@
 {
-  "name": "@lumen/react/text",
+  "name": "@arshad-shah/cynosure-react/text",
   "private": true,
   "type": "module",
   "main": "../dist/text.js",

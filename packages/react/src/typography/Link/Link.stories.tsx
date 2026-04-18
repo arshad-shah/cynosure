@@ -95,7 +95,7 @@ export const Download: Story = {
       <Link href="/brand-guidelines.pdf" download>
         Download brand guidelines (PDF)
       </Link>
-      <Link href="/report.csv" download="lumen-report.csv" variant="emphasis">
+      <Link href="/report.csv" download="cynosure-report.csv" variant="emphasis">
         Download monthly report (CSV)
       </Link>
     </Stack>
@@ -132,7 +132,7 @@ export const InProse: Story = {
         </Link>
         . Instead, link the phrase the reader would use to describe the destination, like the{' '}
         <Link href="#" variant="emphasis">
-          Lumen documentation
+          Cynosure documentation
         </Link>
         .
       </Text>
@@ -190,7 +190,7 @@ export const NavigationList: Story = {
         <Link href="#components" variant="subtle" underline="none">
           Components
         </Link>
-        <Link href="https://github.com/lumen" external underline="none">
+        <Link href="https://github.com/cynosure" external underline="none">
           GitHub
         </Link>
       </Stack>

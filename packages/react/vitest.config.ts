@@ -8,14 +8,14 @@ import { defineConfig } from 'vitest/config';
  * Local dev: Chromium only — fast loop, no Playwright install churn.
  * CI       : all three engines — parity check per PR.
  *
- * Toggle by setting `LUMEN_BROWSER_MODE=1` (CI) or leaving it unset (local).
+ * Toggle by setting `CYNOSURE_BROWSER_MODE=1` (CI) or leaving it unset (local).
  * Browser mode only picks up files matching `*.browser.test.{ts,tsx}` — the
  * bulk of the suite continues to run under jsdom (faster feedback, no need
  * to re-derive every polyfill). As real-browser coverage expands, new tests
  * land under the `.browser.test.*` suffix and get the full engine matrix.
  */
 const ciBrowsers = process.env.CI ? ['chromium', 'firefox', 'webkit'] : ['chromium'];
-const browserMode = process.env.LUMEN_BROWSER_MODE === '1';
+const browserMode = process.env.CYNOSURE_BROWSER_MODE === '1';
 
 export default defineConfig({
   plugins: [react(), vanillaExtractPlugin()],

@@ -35,7 +35,7 @@ export interface RHFFieldProps<
 }
 
 /**
- * `react-hook-form` adapter that wires `useController` through the Lumen
+ * `react-hook-form` adapter that wires `useController` through the Cynosure
  * `FormField` scaffolding. Handles error state, `aria-invalid`, message
  * announcement, and `field.onChange`/`value` binding in one component.
  *
@@ -46,7 +46,7 @@ export interface RHFFieldProps<
  * ```
  *
  * `react-hook-form` is declared as an **optional peer dependency** in
- * `@lumen/react`'s `package.json`. Consumers that never import this adapter
+ * `@arshad-shah/cynosure-react`'s `package.json`. Consumers that never import this adapter
  * don't need it installed and don't pay any runtime cost.
  */
 export function RHFField<

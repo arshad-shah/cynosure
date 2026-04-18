@@ -1,5 +1,5 @@
 {
-  "name": "@lumen/react/rhf",
+  "name": "@arshad-shah/cynosure-react/rhf",
   "private": true,
   "type": "module",
   "main": "../dist/rhf.js",

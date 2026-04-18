@@ -1,6 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
-  "title": "Lumen DTCG token file",
+  "title": "Cynosure DTCG token file",
   "description": "W3C Design Tokens Community Group (DTCG) format. Every leaf must have $type + $value; non-leaves group tokens.",
   "type": "object",
   "additionalProperties": { "$ref": "#/definitions/node" },

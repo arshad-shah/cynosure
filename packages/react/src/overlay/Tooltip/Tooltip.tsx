@@ -77,7 +77,7 @@ export function Tooltip({
           sideOffset={sideOffset}
           alignOffset={alignOffset}
           className={cn(tooltipContent, className)}
-          data-lumen-overlay=""
+          data-cynosure-overlay=""
         >
           {content}
           {withArrow ? <RadixTooltip.Arrow className={tooltipArrow} width={10} height={5} /> : null}

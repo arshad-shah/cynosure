@@ -1,5 +1,5 @@
 {
-  "name": "@lumen/react/pin-input",
+  "name": "@arshad-shah/cynosure-react/pin-input",
   "private": true,
   "type": "module",
   "main": "../dist/pininput.js",

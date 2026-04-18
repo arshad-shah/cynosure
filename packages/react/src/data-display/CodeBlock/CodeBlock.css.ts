@@ -6,7 +6,7 @@ export const codeBlockRoot = style({
   background: vars.color.background.muted,
   border: `1px solid ${vars.color.border.subtle}`,
   borderRadius: vars.radius.md,
-  fontSize: 'var(--lumen-font-body-sm-size)',
+  fontSize: 'var(--cynosure-font-body-sm-size)',
   color: vars.color.foreground.default,
   overflow: 'hidden',
 });
@@ -19,7 +19,7 @@ export const codeBlockHeader = style({
   paddingBlock: vars.space['1'],
   paddingInline: vars.space['3'],
   borderBottom: `1px solid ${vars.color.border.subtle}`,
-  fontSize: 'var(--lumen-font-body-xs-size, 0.75rem)',
+  fontSize: 'var(--cynosure-font-body-xs-size, 0.75rem)',
   color: vars.color.foreground.muted,
   textTransform: 'uppercase',
   letterSpacing: '0.05em',
@@ -39,7 +39,7 @@ export const codeBlockCopyButton = style({
   color: vars.color.foreground.muted,
   cursor: 'pointer',
   transition: `background ${vars.duration.fast} ease`,
-  fontSize: 'var(--lumen-font-body-xs-size, 0.75rem)',
+  fontSize: 'var(--cynosure-font-body-xs-size, 0.75rem)',
   selectors: {
     '&:hover': {
       background: vars.color.background.subtle,
@@ -54,15 +54,15 @@ export const codeBlockCopyButton = style({
 
 export const codeBlockScroll = style({
   overflow: 'auto',
-  maxHeight: 'var(--lumen-code-max-height, none)',
+  maxHeight: 'var(--cynosure-code-max-height, none)',
 });
 
 export const codeBlockPre = style({
   margin: 0,
   padding: vars.space['3'],
   fontFamily:
-    'var(--lumen-font-code-family, ui-monospace, SFMono-Regular, Menlo, Monaco, "Cascadia Mono", "Roboto Mono", monospace)',
-  fontSize: 'var(--lumen-font-code-size, 0.8125rem)',
+    'var(--cynosure-font-code-family, ui-monospace, SFMono-Regular, Menlo, Monaco, "Cascadia Mono", "Roboto Mono", monospace)',
+  fontSize: 'var(--cynosure-font-code-size, 0.8125rem)',
   lineHeight: 1.6,
   whiteSpace: 'pre',
   tabSize: 2,

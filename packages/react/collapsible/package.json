@@ -1,5 +1,5 @@
 {
-  "name": "@lumen/react/collapsible",
+  "name": "@arshad-shah/cynosure-react/collapsible",
   "private": true,
   "type": "module",
   "main": "../dist/collapsible.js",

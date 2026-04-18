@@ -5,7 +5,7 @@ export interface FormControlProps {
   /**
    * Exactly one input-like element. `FormControl` clones it and injects
    * `id`, `name`, `aria-invalid`, `aria-describedby`, `disabled`, `required`,
-   * and `invalid` (the Lumen-specific prop), preferring any value the child
+   * and `invalid` (the Cynosure-specific prop), preferring any value the child
    * already sets.
    */
   children: ReactNode;

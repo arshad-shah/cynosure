@@ -1,17 +1,17 @@
 html,
 body,
 #storybook-root {
-  background: var(--lumen-color-background-canvas);
-  color: var(--lumen-color-foreground-default);
-  font-family: var(--lumen-font-family-sans);
+  background: var(--cynosure-color-background-canvas);
+  color: var(--cynosure-color-foreground-default);
+  font-family: var(--cynosure-font-family-sans);
 }
 
 .sb-canvas {
   min-height: 100%;
-  color: var(--lumen-color-foreground-default);
+  color: var(--cynosure-color-foreground-default);
 }
 
 .sbdocs.sbdocs-preview,
 .docs-story {
-  background: var(--lumen-color-background-canvas) !important;
+  background: var(--cynosure-color-background-canvas) !important;
 }

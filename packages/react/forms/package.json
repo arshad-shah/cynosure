@@ -1,5 +1,5 @@
 {
-  "name": "@lumen/react/forms",
+  "name": "@arshad-shah/cynosure-react/forms",
   "private": true,
   "type": "module",
   "main": "../dist/forms/index.js",

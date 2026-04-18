@@ -1,7 +1,7 @@
 {
-  "name": "@lumen/themes",
-  "version": "0.1.0",
-  "description": "Lumen UI — prebuilt themes (terminal, high-contrast)",
+  "name": "@arshad-shah/cynosure-themes",
+  "version": "1.0.0",
+  "description": "Cynosure UI — prebuilt themes (terminal, high-contrast)",
   "license": "MIT",
   "type": "module",
   "sideEffects": ["**/*.css"],
@@ -12,13 +12,13 @@
   },
   "files": ["src", "README.md", "CHANGELOG.md"],
   "scripts": {
-    "build": "echo \"@lumen/themes is CSS-only; nothing to build\"",
-    "dev": "echo \"@lumen/themes is CSS-only; nothing to watch\"",
-    "typecheck": "echo \"@lumen/themes ships no TypeScript\"",
+    "build": "echo \"@arshad-shah/cynosure-themes is CSS-only; nothing to build\"",
+    "dev": "echo \"@arshad-shah/cynosure-themes is CSS-only; nothing to watch\"",
+    "typecheck": "echo \"@arshad-shah/cynosure-themes ships no TypeScript\"",
     "clean": "rm -rf .turbo"
   },
   "dependencies": {
-    "@lumen/tokens": "workspace:*"
+    "@arshad-shah/cynosure-tokens": "workspace:*"
   },
   "publishConfig": {
     "access": "public"

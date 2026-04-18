@@ -1,11 +1,11 @@
 {
   "$schema": "https://unpkg.com/@changesets/config@3.0.0/schema.json",
-  "changelog": ["@changesets/changelog-github", { "repo": "arshad-shah/lumen" }],
+  "changelog": ["@changesets/changelog-github", { "repo": "arshad-shah/cynosure" }],
   "commit": false,
   "fixed": [],
-  "linked": [["@lumen/*"]],
+  "linked": [["@arshad-shah/cynosure-*"]],
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
-  "ignore": ["@lumen/config"]
+  "ignore": ["@arshad-shah/cynosure-config"]
 }

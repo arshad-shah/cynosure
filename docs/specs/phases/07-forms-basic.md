@@ -78,13 +78,13 @@ import { Spinner } from '../../feedback/Spinner';           // from Phase 12 —
 import { VisuallyHidden } from '../../primitives/VisuallyHidden';
 
 const button = cva({
-  base: 'lumen-button',
+  base: 'cynosure-button',
   variants: {
-    variant:     { solid: 'lumen-button--solid',   soft: 'lumen-button--soft',   outline: 'lumen-button--outline', ghost: 'lumen-button--ghost', link: 'lumen-button--link' },
-    colorScheme: { accent: 'lumen-button--accent', neutral: 'lumen-button--neutral', success: 'lumen-button--success', danger: 'lumen-button--danger', warning: 'lumen-button--warning' },
-    size:        { xs: 'lumen-button--xs', sm: 'lumen-button--sm', md: 'lumen-button--md', lg: 'lumen-button--lg', xl: 'lumen-button--xl' },
-    shape:       { default: 'lumen-button--shape-default', square: 'lumen-button--shape-square', pill: 'lumen-button--shape-pill' },
-    fullWidth:   { true: 'lumen-button--full-width' },
+    variant:     { solid: 'cynosure-button--solid',   soft: 'cynosure-button--soft',   outline: 'cynosure-button--outline', ghost: 'cynosure-button--ghost', link: 'cynosure-button--link' },
+    colorScheme: { accent: 'cynosure-button--accent', neutral: 'cynosure-button--neutral', success: 'cynosure-button--success', danger: 'cynosure-button--danger', warning: 'cynosure-button--warning' },
+    size:        { xs: 'cynosure-button--xs', sm: 'cynosure-button--sm', md: 'cynosure-button--md', lg: 'cynosure-button--lg', xl: 'cynosure-button--xl' },
+    shape:       { default: 'cynosure-button--shape-default', square: 'cynosure-button--shape-square', pill: 'cynosure-button--shape-pill' },
+    fullWidth:   { true: 'cynosure-button--full-width' },
   },
   defaultVariants: { variant: 'solid', colorScheme: 'accent', size: 'md', shape: 'default' },
 });
@@ -116,7 +116,7 @@ Important details:
 - **Default `type="button"`** unless `asChild` (so consumers don't accidentally submit forms).
 - **`disabled || loading`** — loading state must disable.
 - **`data-loading`** attribute for CSS styling of the non-spinner content (dim it or preserve width).
-- **Focus visible** — custom `:focus-visible` ring using `var(--lumen-color-border-focus)` and `var(--lumen-shadow-component-focus)`.
+- **Focus visible** — custom `:focus-visible` ring using `var(--cynosure-color-border-focus)` and `var(--cynosure-shadow-component-focus)`.
 
 ### Accessibility
 - Native `<button>` gives keyboard + enter/space + focus for free. Don't fight it.
@@ -211,7 +211,7 @@ Renders: Input + two stacked IconButtons (up/down arrows). Keyboard: arrow up/do
 
 Install:
 ```bash
-pnpm --filter @lumen/react add react-aria-components
+pnpm --filter @arshad-shah/cynosure-react add react-aria-components
 ```
 
 ---
@@ -225,10 +225,10 @@ pnpm --filter @lumen/react add react-aria-components
 
 ### Implementation
 
-Use `@radix-ui/react-checkbox` as the accessibility base. Style with vanilla-extract. Compose Radix's primitives inside Lumen's layout primitives so focus rings and spacing are consistent.
+Use `@radix-ui/react-checkbox` as the accessibility base. Style with vanilla-extract. Compose Radix's primitives inside Cynosure's layout primitives so focus rings and spacing are consistent.
 
 ```bash
-pnpm --filter @lumen/react add @radix-ui/react-checkbox
+pnpm --filter @arshad-shah/cynosure-react add @radix-ui/react-checkbox
 ```
 
 ### Props
@@ -350,8 +350,8 @@ Per component, at minimum:
 - [ ] Keyboard interaction is exhaustively covered by play functions.
 - [ ] Per-component tsup entries and `exports` map entries added.
 - [ ] `@radix-ui/react-*` and `react-aria-components` added only where used, pinned to ^ caret with a pnpm override to a specific minor for reproducibility.
-- [ ] Bundle: `import { Button } from '@lumen/react/button'` ≤ 5 KB gzipped (component + Slot + CVA + CSS).
-- [ ] Changesets: `@lumen/react` minor "Basic form controls".
+- [ ] Bundle: `import { Button } from '@arshad-shah/cynosure-react/button'` ≤ 5 KB gzipped (component + Slot + CVA + CSS).
+- [ ] Changesets: `@arshad-shah/cynosure-react` minor "Basic form controls".
 
 ## Decisions to log
 

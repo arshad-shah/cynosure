@@ -37,7 +37,7 @@ describe('Radio + RadioGroup', () => {
       </RadioGroup>,
     );
     // Radix manages roving-tabindex + arrow keys — we delegate entirely
-    // there and just verify the group exposes the right role so Lumen's
+    // there and just verify the group exposes the right role so Cynosure's
     // thin wrapper isn't swallowing it.
     expect(screen.getByRole('radiogroup')).toBeInTheDocument();
   });

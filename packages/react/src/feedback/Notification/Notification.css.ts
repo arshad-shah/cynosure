@@ -12,7 +12,7 @@ export const notificationRoot = style({
   border: `1px solid ${vars.color.border.subtle}`,
   borderRadius: vars.radius.md,
   background: vars.color.background.surface,
-  fontFamily: 'var(--lumen-font-body-md-family)',
+  fontFamily: 'var(--cynosure-font-body-md-family)',
   color: vars.color.foreground.default,
   transitionProperty: 'background-color, border-color',
   transitionDuration: vars.duration.fast,
@@ -54,16 +54,16 @@ export const notificationHeader = style({
 
 export const notificationTitle = style({
   margin: 0,
-  fontSize: 'var(--lumen-font-body-md-size)',
-  fontWeight: 'var(--lumen-font-weight-semibold)',
-  lineHeight: 'var(--lumen-font-body-md-line-height)',
+  fontSize: 'var(--cynosure-font-body-md-size)',
+  fontWeight: 'var(--cynosure-font-weight-semibold)',
+  lineHeight: 'var(--cynosure-font-body-md-line-height)',
   overflow: 'hidden',
   textOverflow: 'ellipsis',
   whiteSpace: 'nowrap',
 });
 
 export const notificationTimestamp = style({
-  fontSize: 'var(--lumen-font-body-xs-size)',
+  fontSize: 'var(--cynosure-font-body-xs-size)',
   color: vars.color.foreground.muted,
   flex: '0 0 auto',
   fontVariantNumeric: 'tabular-nums',
@@ -73,9 +73,9 @@ export const notificationDescription = style({
   gridColumn: 2,
   gridRow: 2,
   margin: 0,
-  fontSize: 'var(--lumen-font-body-sm-size)',
+  fontSize: 'var(--cynosure-font-body-sm-size)',
   color: vars.color.foreground.muted,
-  lineHeight: 'var(--lumen-font-body-sm-line-height)',
+  lineHeight: 'var(--cynosure-font-body-sm-line-height)',
 });
 
 export const notificationActions = style({

@@ -28,11 +28,11 @@ describe('Heading', () => {
       </Heading>,
     );
     const el = container.querySelector('[data-testid="h"]') as HTMLElement;
-    expect(el.style.getPropertyValue('--lumen-heading-size-base')).toBe(
-      'var(--lumen-font-heading-1-size)',
+    expect(el.style.getPropertyValue('--cynosure-heading-size-base')).toBe(
+      'var(--cynosure-font-heading-1-size)',
     );
-    expect(el.style.getPropertyValue('--lumen-heading-weight-base')).toBe(
-      'var(--lumen-font-heading-1-weight)',
+    expect(el.style.getPropertyValue('--cynosure-heading-weight-base')).toBe(
+      'var(--cynosure-font-heading-1-weight)',
     );
   });
 
@@ -44,8 +44,8 @@ describe('Heading', () => {
     );
     const el = container.querySelector('[data-testid="h"]') as HTMLElement;
     expect(el.tagName).toBe('H1');
-    expect(el.style.getPropertyValue('--lumen-heading-size-base')).toBe(
-      'var(--lumen-font-body-xs-size)',
+    expect(el.style.getPropertyValue('--cynosure-heading-size-base')).toBe(
+      'var(--cynosure-font-body-xs-size)',
     );
   });
 
@@ -58,8 +58,8 @@ describe('Heading', () => {
     const el = container.querySelector('[data-testid="h"]') as HTMLElement;
     // Explicit weight wins — `weight="regular"` writes the variable after the
     // level default does.
-    expect(el.style.getPropertyValue('--lumen-heading-weight-base')).toBe(
-      'var(--lumen-font-weight-regular)',
+    expect(el.style.getPropertyValue('--cynosure-heading-weight-base')).toBe(
+      'var(--cynosure-font-weight-regular)',
     );
   });
 
@@ -71,7 +71,7 @@ describe('Heading', () => {
     );
     const el = container.querySelector('[data-testid="h"]') as HTMLElement;
     expect(el.className).toMatch(/lineClamp/);
-    expect(el.style.getPropertyValue('--lumen-typography-line-clamp')).toBe('3');
+    expect(el.style.getPropertyValue('--cynosure-typography-line-clamp')).toBe('3');
   });
 
   it('asChild projects Heading onto a custom child', () => {

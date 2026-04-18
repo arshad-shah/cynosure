@@ -18,15 +18,15 @@ export default meta;
 type Story = StoryObj<typeof ScrollArea>;
 
 const BOX_STYLE: React.CSSProperties = {
-  borderRadius: 'var(--lumen-radius-md)',
-  border: '1px solid var(--lumen-color-border-default)',
+  borderRadius: 'var(--cynosure-radius-md)',
+  border: '1px solid var(--cynosure-color-border-default)',
 };
 
 export const Vertical: Story = {
   name: 'Vertical scrolling',
   render: () => (
     <ScrollArea height={240} width={320} style={BOX_STYLE} scrollbars="vertical">
-      <Stack gap="2" style={{ padding: 'var(--lumen-space-3)' }}>
+      <Stack gap="2" style={{ padding: 'var(--cynosure-space-3)' }}>
         {Array.from({ length: 40 }, (_, i) => (
           <Text key={`line-${i.toString()}`} size="sm">
             Item #{(i + 1).toString().padStart(2, '0')} — a short entry in a long list.
@@ -41,7 +41,7 @@ export const Horizontal: Story = {
   name: 'Horizontal scrolling',
   render: () => (
     <ScrollArea width={480} style={BOX_STYLE} scrollbars="horizontal">
-      <Inline gap="3" wrap={false} style={{ padding: 'var(--lumen-space-3)' }}>
+      <Inline gap="3" wrap={false} style={{ padding: 'var(--cynosure-space-3)' }}>
         {Array.from({ length: 20 }, (_, i) => (
           <div
             key={`tile-${i.toString()}`}
@@ -51,9 +51,9 @@ export const Horizontal: Story = {
               height: 100,
               display: 'grid',
               placeItems: 'center',
-              borderRadius: 'var(--lumen-radius-md)',
-              background: 'var(--lumen-color-background-muted)',
-              border: '1px solid var(--lumen-color-border-subtle)',
+              borderRadius: 'var(--cynosure-radius-md)',
+              background: 'var(--cynosure-color-background-muted)',
+              border: '1px solid var(--cynosure-color-border-subtle)',
               fontWeight: 600,
             }}
           >
@@ -69,11 +69,11 @@ export const Both: Story = {
   name: 'Both axes',
   render: () => (
     <ScrollArea width={480} height={280} style={BOX_STYLE} scrollbars="both">
-      <div style={{ padding: 'var(--lumen-space-3)', minWidth: 800 }}>
+      <div style={{ padding: 'var(--cynosure-space-3)', minWidth: 800 }}>
         <Heading level={3} size="sm">
           A wide, tall surface
         </Heading>
-        <Stack gap="2" style={{ marginTop: 'var(--lumen-space-3)' }}>
+        <Stack gap="2" style={{ marginTop: 'var(--cynosure-space-3)' }}>
           {Array.from({ length: 30 }, (_, i) => (
             <Text key={`line-${i.toString()}`} size="sm">
               Row {(i + 1).toString()} — Lorem ipsum dolor sit amet, consectetur adipiscing elit,
@@ -90,7 +90,7 @@ export const TypeAlways: Story = {
   name: 'type="always"',
   render: () => (
     <ScrollArea type="always" height={200} width={320} style={BOX_STYLE}>
-      <Stack gap="2" style={{ padding: 'var(--lumen-space-3)' }}>
+      <Stack gap="2" style={{ padding: 'var(--cynosure-space-3)' }}>
         {Array.from({ length: 20 }, (_, i) => (
           <Text key={`always-${i.toString()}`} size="sm">
             Scrollbar always visible — row {(i + 1).toString()}
@@ -105,7 +105,7 @@ export const LongList: Story = {
   name: 'Long formatted list',
   render: () => (
     <ScrollArea height={320} width={360} style={BOX_STYLE}>
-      <Stack gap="2" style={{ padding: 'var(--lumen-space-4)' }} dividers>
+      <Stack gap="2" style={{ padding: 'var(--cynosure-space-4)' }} dividers>
         {Array.from({ length: 25 }, (_, i) => (
           <Inline key={`user-${i.toString()}`} gap="3" align="center">
             <div
@@ -114,8 +114,8 @@ export const LongList: Story = {
                 width: 32,
                 height: 32,
                 borderRadius: '50%',
-                background: 'var(--lumen-color-accent-muted)',
-                color: 'var(--lumen-color-accent-solid)',
+                background: 'var(--cynosure-color-accent-muted)',
+                color: 'var(--cynosure-color-accent-solid)',
                 display: 'grid',
                 placeItems: 'center',
                 fontSize: 12,
@@ -146,8 +146,8 @@ export const CodeBlockContainer: Story = {
       <pre
         style={{
           margin: 0,
-          padding: 'var(--lumen-space-4)',
-          fontFamily: 'var(--lumen-font-mono)',
+          padding: 'var(--cynosure-space-4)',
+          fontFamily: 'var(--cynosure-font-mono)',
           fontSize: 13,
           lineHeight: 1.6,
           whiteSpace: 'pre',

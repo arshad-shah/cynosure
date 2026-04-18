@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Lumen UI — defensive `packages/react/dist/styles.css` aggregator.
+ * Cynosure UI — defensive `packages/react/dist/styles.css` aggregator.
  *
  * The tsup config's `onSuccess` hook in `packages/react/tsup.config.ts`
  * already emits this file. This script is a CI-side belt-and-braces that
@@ -22,7 +22,9 @@ const dist = resolve(__dirname, '..', 'packages/react/dist');
 const target = join(dist, 'styles.css');
 
 if (!existsSync(dist) || !statSync(dist).isDirectory()) {
-  console.warn(`No ${dist} — skipping (run \`pnpm --filter @lumen/react build\` first).`);
+  console.warn(
+    `No ${dist} — skipping (run \`pnpm --filter @arshad-shah/cynosure-react build\` first).`,
+  );
   process.exit(0);
 }
 

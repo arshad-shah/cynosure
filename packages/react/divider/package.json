@@ -1,5 +1,5 @@
 {
-  "name": "@lumen/react/divider",
+  "name": "@arshad-shah/cynosure-react/divider",
   "private": true,
   "type": "module",
   "main": "../dist/divider.js",

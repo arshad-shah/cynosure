@@ -1,7 +1,7 @@
 # Date & Time Pickers Redesign
 
 **Date:** 2026-04-17
-**Scope:** `@lumen/react` — `DatePicker`, `DateRangePicker`, `TimePicker`
+**Scope:** `@arshad-shah/cynosure-react` — `DatePicker`, `DateRangePicker`, `TimePicker`
 **Status:** Approved — implementation in progress
 
 ## Goal

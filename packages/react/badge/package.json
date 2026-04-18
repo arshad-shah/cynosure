@@ -1,5 +1,5 @@
 {
-  "name": "@lumen/react/badge",
+  "name": "@arshad-shah/cynosure-react/badge",
   "private": true,
   "type": "module",
   "main": "../dist/badge.js",

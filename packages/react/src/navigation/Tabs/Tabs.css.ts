@@ -73,7 +73,7 @@ export const tabsTriggerBase = style({
   border: 'none',
   background: 'transparent',
   color: 'inherit',
-  fontFamily: 'var(--lumen-font-body-md-family)',
+  fontFamily: 'var(--cynosure-font-body-md-family)',
   fontWeight: 500,
   cursor: 'pointer',
   outline: 'none',
@@ -95,17 +95,17 @@ export const tabsTriggerSize = styleVariants({
   sm: {
     paddingBlock: vars.space['1'],
     paddingInline: vars.space['2'],
-    fontSize: 'var(--lumen-font-body-sm-size)',
+    fontSize: 'var(--cynosure-font-body-sm-size)',
   },
   md: {
     paddingBlock: vars.space['1.5'],
     paddingInline: vars.space['3'],
-    fontSize: 'var(--lumen-font-body-md-size)',
+    fontSize: 'var(--cynosure-font-body-md-size)',
   },
   lg: {
     paddingBlock: vars.space['2'],
     paddingInline: vars.space['4'],
-    fontSize: 'var(--lumen-font-body-lg-size)',
+    fontSize: 'var(--cynosure-font-body-lg-size)',
   },
 });
 
@@ -193,7 +193,7 @@ export const tabsTriggerNeutral = style({
 
 /**
  * Animated indicator for `line` variant. Positions itself via CSS custom
- * properties (`--lumen-tabs-indicator-left|top|width|height`) so motion is
+ * properties (`--cynosure-tabs-indicator-left|top|width|height`) so motion is
  * cheap and GPU-compositable.
  */
 export const tabsIndicator = style({
@@ -204,18 +204,18 @@ export const tabsIndicator = style({
   transitionDuration: vars.duration.fast,
   transitionTimingFunction: 'ease-out',
   selectors: {
-    '[data-lumen-reduced-motion] &': {
+    '[data-cynosure-reduced-motion] &': {
       transitionDuration: '0s',
     },
     '&[data-orientation="horizontal"]': {
-      left: 'var(--lumen-tabs-indicator-left, 0)',
-      width: 'var(--lumen-tabs-indicator-width, 0)',
+      left: 'var(--cynosure-tabs-indicator-left, 0)',
+      width: 'var(--cynosure-tabs-indicator-width, 0)',
       bottom: 0,
       height: '2px',
     },
     '&[data-orientation="vertical"]': {
-      top: 'var(--lumen-tabs-indicator-top, 0)',
-      height: 'var(--lumen-tabs-indicator-height, 0)',
+      top: 'var(--cynosure-tabs-indicator-top, 0)',
+      height: 'var(--cynosure-tabs-indicator-height, 0)',
       right: 0,
       width: '2px',
     },

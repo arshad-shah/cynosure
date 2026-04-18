@@ -1,5 +1,5 @@
 {
-  "name": "@lumen/react/popover",
+  "name": "@arshad-shah/cynosure-react/popover",
   "private": true,
   "type": "module",
   "main": "../dist/popover.js",

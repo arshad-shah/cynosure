@@ -16,9 +16,9 @@ export const timelineRoot = style({
 });
 
 export const timelineSize = styleVariants({
-  sm: { vars: { '--lumen-tl-dot': '0.5rem', '--lumen-tl-line': '2px' } },
-  md: { vars: { '--lumen-tl-dot': '0.75rem', '--lumen-tl-line': '2px' } },
-  lg: { vars: { '--lumen-tl-dot': '1rem', '--lumen-tl-line': '2.5px' } },
+  sm: { vars: { '--cynosure-tl-dot': '0.5rem', '--cynosure-tl-line': '2px' } },
+  md: { vars: { '--cynosure-tl-dot': '0.75rem', '--cynosure-tl-line': '2px' } },
+  lg: { vars: { '--cynosure-tl-dot': '1rem', '--cynosure-tl-line': '2.5px' } },
 });
 
 export const timelineItem = style({
@@ -47,8 +47,8 @@ export const timelineSeparator = style({
 });
 
 export const timelineDot = style({
-  width: 'var(--lumen-tl-dot, 0.75rem)',
-  height: 'var(--lumen-tl-dot, 0.75rem)',
+  width: 'var(--cynosure-tl-dot, 0.75rem)',
+  height: 'var(--cynosure-tl-dot, 0.75rem)',
   borderRadius: vars.radius.full,
   background: vars.color.accent.solid,
   border: `2px solid ${vars.color.background.surface}`,
@@ -88,14 +88,14 @@ export const timelineDot = style({
 });
 
 export const timelineConnector = style({
-  width: 'var(--lumen-tl-line, 2px)',
+  width: 'var(--cynosure-tl-line, 2px)',
   flex: '1 1 auto',
   background: vars.color.border.subtle,
   minHeight: vars.space['3'],
   selectors: {
     '[data-orientation="horizontal"] &': {
       width: 'auto',
-      height: 'var(--lumen-tl-line, 2px)',
+      height: 'var(--cynosure-tl-line, 2px)',
       minHeight: 0,
       minWidth: vars.space['3'],
     },

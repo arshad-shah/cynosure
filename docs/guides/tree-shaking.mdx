@@ -4,25 +4,25 @@ import { Meta } from '@storybook/addon-docs/blocks';
 
 # Tree-shaking & bundle size
 
-Lumen is authored to be as friendly to tree-shaking as a modern ESM
+Cynosure is authored to be as friendly to tree-shaking as a modern ESM
 library can be. Here's how to get the smallest possible bundles.
 
 ## Use per-component entries
 
 ```ts
 // Smallest possible
-import { Button } from '@lumen/react/button';
-import { Input } from '@lumen/react/input';
+import { Button } from '@arshad-shah/cynosure-react/button';
+import { Input } from '@arshad-shah/cynosure-react/input';
 ```
 
-Each component has its own tsup entry. The barrel (`@lumen/react`) also
+Each component has its own tsup entry. The barrel (`@arshad-shah/cynosure-react`) also
 tree-shakes with modern bundlers, but per-component imports are a
 guarantee: no matter which bundler version you're on, you only pull in
 the subpath you reach for.
 
 ## `sideEffects`
 
-Lumen packages declare `sideEffects: ["**/*.css"]`. Bundlers drop any JS
+Cynosure packages declare `sideEffects: ["**/*.css"]`. Bundlers drop any JS
 file whose only effect is its module graph, while keeping the CSS imports
 the components rely on.
 
@@ -47,6 +47,6 @@ grew and by how much.
 
 ## Dedup
 
-Lumen's peers (`react`, `react-dom`, Radix, React Aria) must exist once in
+Cynosure's peers (`react`, `react-dom`, Radix, React Aria) must exist once in
 your graph. If you see duplicated copies, run `pnpm why <pkg>` and align
 the version via your package manager's hoisting / catalog.

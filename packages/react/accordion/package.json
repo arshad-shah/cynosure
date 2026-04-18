@@ -1,5 +1,5 @@
 {
-  "name": "@lumen/react/accordion",
+  "name": "@arshad-shah/cynosure-react/accordion",
   "private": true,
   "type": "module",
   "main": "../dist/accordion.js",

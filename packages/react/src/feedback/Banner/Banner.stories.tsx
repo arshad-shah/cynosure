@@ -29,7 +29,7 @@ export const Playground: Story = {
   render: (args) => (
     <Banner {...args}>
       <BannerContent>
-        <Text weight="semibold">Lumen UI</Text>
+        <Text weight="semibold">Cynosure UI</Text>
         <Text size="sm">A new feedback module is now available.</Text>
       </BannerContent>
     </Banner>
@@ -143,10 +143,10 @@ export const PersistentDismissal: Story = {
         <Stack gap="3">
           <Banner key={nonce} status="info" closable dismissKey={KEY}>
             <BannerContent>
-              <Text weight="semibold">Welcome to Lumen</Text>
+              <Text weight="semibold">Welcome to Cynosure</Text>
               <Text size="sm">
                 Dismissing this banner persists via <code>localStorage</code> under the key
-                <code> lumen:banner:{KEY}</code>.
+                <code> cynosure:banner:{KEY}</code>.
               </Text>
             </BannerContent>
           </Banner>
@@ -170,8 +170,8 @@ export const FullWidth: Story = {
   render: () => (
     <div
       style={{
-        marginInline: 'calc(-1 * var(--lumen-space-6, 24px))',
-        width: 'calc(100% + 2 * var(--lumen-space-6, 24px))',
+        marginInline: 'calc(-1 * var(--cynosure-space-6, 24px))',
+        width: 'calc(100% + 2 * var(--cynosure-space-6, 24px))',
       }}
     >
       <Banner status="danger" closable>

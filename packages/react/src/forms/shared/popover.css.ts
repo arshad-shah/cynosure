@@ -56,8 +56,8 @@ export const listboxItem = style({
   transitionDuration: vars.duration.fast,
   color: vars.color.foreground.default,
   outline: 'none',
-  fontSize: 'var(--lumen-font-body-md-size)',
-  lineHeight: 'var(--lumen-font-body-md-line-height)',
+  fontSize: 'var(--cynosure-font-body-md-size)',
+  lineHeight: 'var(--cynosure-font-body-md-line-height)',
   selectors: {
     '&[data-hovered], &[data-focused]': {
       background: vars.color.accent.soft,
@@ -95,7 +95,7 @@ export const listboxSection = style({
 export const listboxSectionHeader = style({
   paddingInline: vars.space['2'],
   paddingBlock: vars.space['1'],
-  fontSize: 'var(--lumen-font-body-sm-size)',
+  fontSize: 'var(--cynosure-font-body-sm-size)',
   fontWeight: 600,
   color: vars.color.foreground.muted,
   textTransform: 'uppercase',
@@ -108,6 +108,6 @@ export const listboxEmpty = style({
   alignItems: 'center',
   justifyContent: 'center',
   padding: vars.space['4'],
-  fontSize: 'var(--lumen-font-body-md-size)',
+  fontSize: 'var(--cynosure-font-body-md-size)',
   color: vars.color.foreground.muted,
 });

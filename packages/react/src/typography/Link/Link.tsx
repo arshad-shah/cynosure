@@ -35,7 +35,7 @@ type AnyProps = LinkOwnProps & { [key: string]: unknown };
 
 /**
  * Minimal external-link chevron. Kept inline so typography doesn't depend on
- * `@lumen/icons` (which is its own shippable package arriving post-v1).
+ * `@arshad-shah/cynosure-icons` (which is its own shippable package arriving post-v1).
  */
 const ExternalIcon = (): ReactElement => (
   <svg

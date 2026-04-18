@@ -63,10 +63,10 @@ export const ColorSchemes: Story = {
           </Text>
           <Spinner variant={variant} colorScheme="accent" size="lg" />
           <Spinner variant={variant} colorScheme="neutral" size="lg" />
-          <span style={{ color: 'var(--lumen-color-feedback-success-solid)' }}>
+          <span style={{ color: 'var(--cynosure-color-feedback-success-solid)' }}>
             <Spinner variant={variant} colorScheme="currentColor" size="lg" />
           </span>
-          <span style={{ color: 'var(--lumen-color-feedback-danger-solid)' }}>
+          <span style={{ color: 'var(--cynosure-color-feedback-danger-solid)' }}>
             <Spinner variant={variant} colorScheme="currentColor" size="lg" />
           </span>
         </Inline>
@@ -132,9 +132,9 @@ export const FullScreenCenter: Story = {
       style={{
         position: 'relative',
         height: 360,
-        borderRadius: 'var(--lumen-radius-md)',
-        border: '1px dashed var(--lumen-color-border-default)',
-        background: 'var(--lumen-color-background-muted)',
+        borderRadius: 'var(--cynosure-radius-md)',
+        border: '1px dashed var(--cynosure-color-border-default)',
+        background: 'var(--cynosure-color-background-muted)',
       }}
     >
       <div

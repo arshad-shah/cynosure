@@ -10,8 +10,8 @@ export const avatarRoot = style({
   overflow: 'hidden',
   userSelect: 'none',
   verticalAlign: 'middle',
-  fontFamily: 'var(--lumen-font-body-md-family)',
-  fontWeight: 'var(--lumen-font-weight-medium)',
+  fontFamily: 'var(--cynosure-font-body-md-family)',
+  fontWeight: 'var(--cynosure-font-weight-medium)',
   background: vars.color.background.muted,
   color: vars.color.foreground.default,
 });

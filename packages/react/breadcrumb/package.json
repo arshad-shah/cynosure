@@ -1,5 +1,5 @@
 {
-  "name": "@lumen/react/breadcrumb",
+  "name": "@arshad-shah/cynosure-react/breadcrumb",
   "private": true,
   "type": "module",
   "main": "../dist/breadcrumb.js",

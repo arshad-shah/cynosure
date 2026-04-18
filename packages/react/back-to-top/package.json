@@ -1,5 +1,5 @@
 {
-  "name": "@lumen/react/back-to-top",
+  "name": "@arshad-shah/cynosure-react/back-to-top",
   "private": true,
   "type": "module",
   "main": "../dist/backtotop.js",

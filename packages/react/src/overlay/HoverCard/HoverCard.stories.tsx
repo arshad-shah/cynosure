@@ -21,12 +21,12 @@ export const Default: Story = {
       Hover over{' '}
       <HoverCard>
         <HoverCardTrigger asChild>
-          <Link href="#">@lumen</Link>
+          <Link href="#">@cynosure</Link>
         </HoverCardTrigger>
         <HoverCardContent>
           <Stack gap="2" padding="4" minWidth="260px">
             <Heading level={4} size="sm">
-              Lumen UI
+              Cynosure UI
             </Heading>
             <Text size="sm" color="fg.muted">
               A tokens-first React design system for Anthropic surfaces.

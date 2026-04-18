@@ -42,7 +42,7 @@ export const Basic: Story = {
           <Button variant="outline">Show more</Button>
         </CollapsibleTrigger>
         <CollapsibleContent>
-          <Stack gap="2" style={{ paddingTop: 'var(--lumen-space-3)' }}>
+          <Stack gap="2" style={{ paddingTop: 'var(--cynosure-space-3)' }}>
             <Text>
               This content only exists in the DOM while the Collapsible is open — perfect for
               revealing supplementary detail without cluttering the default view.
@@ -74,7 +74,7 @@ export const Controlled: Story = {
               <Button variant="outline">Toggle via trigger</Button>
             </CollapsibleTrigger>
             <CollapsibleContent>
-              <Stack gap="2" style={{ paddingTop: 'var(--lumen-space-3)' }}>
+              <Stack gap="2" style={{ paddingTop: 'var(--cynosure-space-3)' }}>
                 <Text>Open state is driven from the parent component.</Text>
                 <Text size="sm" color="fg.muted">
                   Current state: <strong>{open ? 'open' : 'closed'}</strong>
@@ -103,7 +103,7 @@ export const WithChevron: Story = {
               </Button>
             </CollapsibleTrigger>
             <CollapsibleContent>
-              <Stack gap="2" style={{ paddingTop: 'var(--lumen-space-3)' }}>
+              <Stack gap="2" style={{ paddingTop: 'var(--cynosure-space-3)' }}>
                 <Text>
                   The chevron on the trigger rotates via a CSS transform bound to the open state.
                 </Text>
@@ -123,9 +123,9 @@ export const NestedDetails: Story = {
     <div
       style={{
         maxWidth: 480,
-        padding: 'var(--lumen-space-4)',
-        border: '1px solid var(--lumen-color-border-default)',
-        borderRadius: 'var(--lumen-radius-md)',
+        padding: 'var(--cynosure-space-4)',
+        border: '1px solid var(--cynosure-color-border-default)',
+        borderRadius: 'var(--cynosure-radius-md)',
       }}
     >
       <Stack gap="3">
@@ -150,8 +150,8 @@ export const NestedDetails: Story = {
             <Stack
               gap="2"
               style={{
-                paddingTop: 'var(--lumen-space-2)',
-                borderTop: '1px solid var(--lumen-color-border-subtle)',
+                paddingTop: 'var(--cynosure-space-2)',
+                borderTop: '1px solid var(--cynosure-color-border-subtle)',
               }}
             >
               <Text size="sm">• AI drafts</Text>
@@ -174,7 +174,7 @@ export const LongContent: Story = {
           <Button variant="outline">Read full changelog</Button>
         </CollapsibleTrigger>
         <CollapsibleContent>
-          <Stack gap="2" style={{ paddingTop: 'var(--lumen-space-3)' }}>
+          <Stack gap="2" style={{ paddingTop: 'var(--cynosure-space-3)' }}>
             {Array.from({ length: 6 }, (_, i) => (
               <Text key={`p-${i.toString()}`}>
                 v1.{(12 - i).toString()} — bugfixes, performance improvements, and a renewed focus

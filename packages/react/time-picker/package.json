@@ -1,5 +1,5 @@
 {
-  "name": "@lumen/react/time-picker",
+  "name": "@arshad-shah/cynosure-react/time-picker",
   "private": true,
   "type": "module",
   "main": "../dist/timepicker.js",

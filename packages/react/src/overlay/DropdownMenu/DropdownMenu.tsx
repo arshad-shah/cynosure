@@ -80,7 +80,7 @@ export const DropdownMenuContent = forwardRef<
     <Radix.Portal container={resolvedContainer}>
       <Radix.Content
         ref={ref}
-        data-lumen-overlay=""
+        data-cynosure-overlay=""
         sideOffset={sideOffset}
         collisionPadding={collisionPadding}
         align={align}
@@ -101,7 +101,7 @@ export const DropdownMenuSubContent = forwardRef<
     <Radix.Portal>
       <Radix.SubContent
         ref={ref}
-        data-lumen-overlay=""
+        data-cynosure-overlay=""
         sideOffset={sideOffset}
         className={cn(menuContent, className)}
         {...rest}

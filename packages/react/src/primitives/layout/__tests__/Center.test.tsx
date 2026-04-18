@@ -19,6 +19,6 @@ describe('Center', () => {
       </Center>,
     );
     const el = container.querySelector('[data-testid="center"]') as HTMLElement;
-    expect(el.style.getPropertyValue('--lumen-lp-minh-base')).toBe('100vh');
+    expect(el.style.getPropertyValue('--cynosure-lp-minh-base')).toBe('100vh');
   });
 });

@@ -69,7 +69,7 @@ export interface TabsProps
 /**
  * Tabs root — thin wrapper around `@radix-ui/react-tabs`. Keyboard
  * navigation, RTL handling, and activation mode all come from Radix; we layer
- * Lumen visual variants and an animated underline indicator on top.
+ * Cynosure visual variants and an animated underline indicator on top.
  */
 export const Tabs = forwardRef<ElementRef<typeof RadixTabs.Root>, TabsProps>(function Tabs(
   {
@@ -129,7 +129,7 @@ export const TabsList = forwardRef<ElementRef<typeof RadixTabs.List>, TabsListPr
     return (
       <RadixTabs.List
         ref={ref}
-        data-lumen-variant={ctx.variant}
+        data-cynosure-variant={ctx.variant}
         className={cn(
           tabsListBase,
           variantListClass[ctx.variant],
@@ -163,7 +163,7 @@ export const TabsTrigger = forwardRef<ElementRef<typeof RadixTabs.Trigger>, Tabs
     return (
       <RadixTabs.Trigger
         ref={ref}
-        data-lumen-value={rest.value}
+        data-cynosure-value={rest.value}
         className={cn(
           tabsTriggerBase,
           tabsTriggerSize[ctx.size],
@@ -279,10 +279,10 @@ export const TabsIndicator = forwardRef<HTMLSpanElement, TabsIndicatorProps>(fun
 
   const cssVars: CSSProperties & Record<string, string | number> = {};
   if (metrics) {
-    cssVars['--lumen-tabs-indicator-left'] = `${metrics.left}px`;
-    cssVars['--lumen-tabs-indicator-top'] = `${metrics.top}px`;
-    cssVars['--lumen-tabs-indicator-width'] = `${metrics.width}px`;
-    cssVars['--lumen-tabs-indicator-height'] = `${metrics.height}px`;
+    cssVars['--cynosure-tabs-indicator-left'] = `${metrics.left}px`;
+    cssVars['--cynosure-tabs-indicator-top'] = `${metrics.top}px`;
+    cssVars['--cynosure-tabs-indicator-width'] = `${metrics.width}px`;
+    cssVars['--cynosure-tabs-indicator-height'] = `${metrics.height}px`;
   }
 
   return (

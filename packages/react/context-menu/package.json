@@ -1,5 +1,5 @@
 {
-  "name": "@lumen/react/context-menu",
+  "name": "@arshad-shah/cynosure-react/context-menu",
   "private": true,
   "type": "module",
   "main": "../dist/contextmenu.js",

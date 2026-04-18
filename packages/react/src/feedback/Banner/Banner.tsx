@@ -13,7 +13,7 @@ import type { FeedbackStatus, FeedbackVariant } from '../shared/types.js';
 import { surfaceVariantClass } from '../shared/variants.js';
 import { bannerActions, bannerContent, bannerRoot, bannerSize } from './Banner.css.js';
 
-const STORAGE_KEY_PREFIX = 'lumen:banner:';
+const STORAGE_KEY_PREFIX = 'cynosure:banner:';
 
 export type BannerStatus = FeedbackStatus;
 export type BannerVariant = FeedbackVariant;

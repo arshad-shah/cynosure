@@ -35,34 +35,34 @@ export type TextWeight = 'regular' | 'medium' | 'semibold' | 'bold';
 export type TextAlign = 'start' | 'center' | 'end' | 'justify';
 
 const BODY_FAMILY = {
-  xs: 'var(--lumen-font-body-xs-family)',
-  sm: 'var(--lumen-font-body-sm-family)',
-  md: 'var(--lumen-font-body-md-family)',
-  lg: 'var(--lumen-font-body-lg-family)',
-  xl: 'var(--lumen-font-body-lg-family)',
+  xs: 'var(--cynosure-font-body-xs-family)',
+  sm: 'var(--cynosure-font-body-sm-family)',
+  md: 'var(--cynosure-font-body-md-family)',
+  lg: 'var(--cynosure-font-body-lg-family)',
+  xl: 'var(--cynosure-font-body-lg-family)',
 } as const satisfies Record<TextSize, string>;
 
 const BODY_SIZE = {
-  xs: 'var(--lumen-font-body-xs-size)',
-  sm: 'var(--lumen-font-body-sm-size)',
-  md: 'var(--lumen-font-body-md-size)',
-  lg: 'var(--lumen-font-body-lg-size)',
-  xl: 'var(--lumen-font-size-xl)',
+  xs: 'var(--cynosure-font-body-xs-size)',
+  sm: 'var(--cynosure-font-body-sm-size)',
+  md: 'var(--cynosure-font-body-md-size)',
+  lg: 'var(--cynosure-font-body-lg-size)',
+  xl: 'var(--cynosure-font-size-xl)',
 } as const satisfies Record<TextSize, string>;
 
 const BODY_LINE_HEIGHT = {
-  xs: 'var(--lumen-font-body-xs-line-height)',
-  sm: 'var(--lumen-font-body-sm-line-height)',
-  md: 'var(--lumen-font-body-md-line-height)',
-  lg: 'var(--lumen-font-body-lg-line-height)',
-  xl: 'var(--lumen-font-body-lg-line-height)',
+  xs: 'var(--cynosure-font-body-xs-line-height)',
+  sm: 'var(--cynosure-font-body-sm-line-height)',
+  md: 'var(--cynosure-font-body-md-line-height)',
+  lg: 'var(--cynosure-font-body-lg-line-height)',
+  xl: 'var(--cynosure-font-body-lg-line-height)',
 } as const satisfies Record<TextSize, string>;
 
 const WEIGHT_VAR: Record<TextWeight, string> = {
-  regular: 'var(--lumen-font-weight-regular)',
-  medium: 'var(--lumen-font-weight-medium)',
-  semibold: 'var(--lumen-font-weight-semibold)',
-  bold: 'var(--lumen-font-weight-bold)',
+  regular: 'var(--cynosure-font-weight-regular)',
+  medium: 'var(--cynosure-font-weight-medium)',
+  semibold: 'var(--cynosure-font-weight-semibold)',
+  bold: 'var(--cynosure-font-weight-bold)',
 };
 
 const ALIGN_VALUE: Record<TextAlign, string> = {
@@ -120,11 +120,11 @@ const TextRender = (props: AnyProps, ref: ForwardedRef<HTMLElement>): ReactEleme
   } = props;
 
   const textStyle = mergeStyles(
-    toResponsiveVars(size, 'lumen-text-family', (v) => BODY_FAMILY[v]),
-    toResponsiveVars(size, 'lumen-text-size', (v) => BODY_SIZE[v]),
-    toResponsiveVars(size, 'lumen-text-lh', (v) => BODY_LINE_HEIGHT[v]),
-    toResponsiveVars(weight, 'lumen-text-weight', (v) => WEIGHT_VAR[v]),
-    toResponsiveVars(align, 'lumen-text-align', (v) => ALIGN_VALUE[v]),
+    toResponsiveVars(size, 'cynosure-text-family', (v) => BODY_FAMILY[v]),
+    toResponsiveVars(size, 'cynosure-text-size', (v) => BODY_SIZE[v]),
+    toResponsiveVars(size, 'cynosure-text-lh', (v) => BODY_LINE_HEIGHT[v]),
+    toResponsiveVars(weight, 'cynosure-text-weight', (v) => WEIGHT_VAR[v]),
+    toResponsiveVars(align, 'cynosure-text-align', (v) => ALIGN_VALUE[v]),
     typographyInlineStyle({ truncate, decorationColor }),
     style,
   );

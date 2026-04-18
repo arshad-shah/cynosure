@@ -37,7 +37,7 @@ export interface NavigationMenuProps extends ComponentPropsWithoutRef<typeof Rad
 /**
  * Horizontal top-nav pattern with rich hover-to-reveal panels. Radix
  * handles hover intent, keyboard navigation, and focus management; we
- * layer Lumen visuals via vanilla-extract recipes.
+ * layer Cynosure visuals via vanilla-extract recipes.
  */
 export const NavigationMenu = forwardRef<ElementRef<typeof Radix.Root>, NavigationMenuProps>(
   function NavigationMenu({ className, children, ...rest }, ref) {

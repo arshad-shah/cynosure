@@ -224,7 +224,7 @@ export const CheckoutUseCase: Story = {
             style={{
               minHeight: 120,
               padding: 16,
-              border: '1px solid var(--lumen-color-border-subtle, #e5e7eb)',
+              border: '1px solid var(--cynosure-color-border-subtle, #e5e7eb)',
               borderRadius: 8,
             }}
           >

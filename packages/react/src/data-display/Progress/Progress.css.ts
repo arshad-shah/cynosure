@@ -97,7 +97,7 @@ export const progressIndeterminateIndicator = style({
 });
 
 export const progressValueLabel = style({
-  fontSize: 'var(--lumen-font-body-sm-size)',
+  fontSize: 'var(--cynosure-font-body-sm-size)',
   fontWeight: 600,
   color: vars.color.foreground.default,
   fontVariantNumeric: 'tabular-nums',
@@ -170,7 +170,7 @@ export const circleContent = style({
   justifyContent: 'center',
   lineHeight: 1,
   fontWeight: 600,
-  fontSize: 'var(--lumen-font-body-sm-size)',
+  fontSize: 'var(--cynosure-font-body-sm-size)',
   fontVariantNumeric: 'tabular-nums',
   color: vars.color.foreground.default,
 });

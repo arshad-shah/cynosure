@@ -32,10 +32,10 @@ const Pane = ({
     gap="2"
     style={{
       height: '100%',
-      padding: 'var(--lumen-space-4)',
+      padding: 'var(--cynosure-space-4)',
       background: accent
-        ? 'var(--lumen-color-accent-muted)'
-        : 'var(--lumen-color-background-muted)',
+        ? 'var(--cynosure-color-accent-muted)'
+        : 'var(--cynosure-color-background-muted)',
     }}
   >
     <Heading level={4} size="xs">
@@ -51,9 +51,9 @@ const Pane = ({
 
 const CONTAINER_STYLE: React.CSSProperties = {
   height: 320,
-  borderRadius: 'var(--lumen-radius-md)',
+  borderRadius: 'var(--cynosure-radius-md)',
   overflow: 'hidden',
-  border: '1px solid var(--lumen-color-border-default)',
+  border: '1px solid var(--cynosure-color-border-default)',
 };
 
 export const HorizontalSplit: Story = {
@@ -113,7 +113,7 @@ export const IDELayout: Story = {
                 <pre
                   style={{
                     margin: 0,
-                    fontFamily: 'var(--lumen-font-mono)',
+                    fontFamily: 'var(--cynosure-font-mono)',
                     fontSize: 12,
                     lineHeight: 1.6,
                   }}
@@ -125,7 +125,7 @@ export const IDELayout: Story = {
             <ResizableHandle withHandle />
             <ResizablePanel defaultSize={30}>
               <Pane label="Terminal">
-                <Text size="sm" style={{ fontFamily: 'var(--lumen-font-mono)' }}>
+                <Text size="sm" style={{ fontFamily: 'var(--cynosure-font-mono)' }}>
                   $ pnpm test — 42 passing
                 </Text>
               </Pane>

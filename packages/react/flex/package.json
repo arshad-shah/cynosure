@@ -1,5 +1,5 @@
 {
-  "name": "@lumen/react/flex",
+  "name": "@arshad-shah/cynosure-react/flex",
   "private": true,
   "type": "module",
   "main": "../dist/flex.js",

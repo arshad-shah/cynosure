@@ -13,12 +13,12 @@ const cascade = (base: string, bps: string[]): string => {
 };
 
 const propsAt = (bps: string[]): Record<string, string> => ({
-  fontFamily: cascade('lumen-heading-family', bps),
-  fontSize: cascade('lumen-heading-size', bps),
-  lineHeight: cascade('lumen-heading-lh', bps),
-  letterSpacing: cascade('lumen-heading-ls', bps),
-  fontWeight: cascade('lumen-heading-weight', bps),
-  textAlign: cascade('lumen-heading-align', bps),
+  fontFamily: cascade('cynosure-heading-family', bps),
+  fontSize: cascade('cynosure-heading-size', bps),
+  lineHeight: cascade('cynosure-heading-lh', bps),
+  letterSpacing: cascade('cynosure-heading-ls', bps),
+  fontWeight: cascade('cynosure-heading-weight', bps),
+  textAlign: cascade('cynosure-heading-align', bps),
 });
 
 export const heading = style([

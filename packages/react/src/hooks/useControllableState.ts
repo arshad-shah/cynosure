@@ -71,7 +71,7 @@ export function useControllableState<T>({
         const from = wasControlledRef.current ? 'controlled' : 'uncontrolled';
         const to = isControlled ? 'controlled' : 'uncontrolled';
         console.warn(
-          `[lumen] useControllableState: component is switching from ${from} to ${to}. Decide between passing \`value\` (controlled) or \`defaultValue\` (uncontrolled) for the lifetime of the component.`,
+          `[cynosure] useControllableState: component is switching from ${from} to ${to}. Decide between passing \`value\` (controlled) or \`defaultValue\` (uncontrolled) for the lifetime of the component.`,
         );
       }
     }

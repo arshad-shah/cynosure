@@ -14,7 +14,7 @@ export const bannerRoot = style({
 });
 
 export const bannerSize = styleVariants({
-  sm: { paddingBlock: vars.space['2'], fontSize: 'var(--lumen-font-body-sm-size)' },
+  sm: { paddingBlock: vars.space['2'], fontSize: 'var(--cynosure-font-body-sm-size)' },
   md: { paddingBlock: vars.space['3'] },
   lg: { paddingBlock: vars.space['4'] },
 });

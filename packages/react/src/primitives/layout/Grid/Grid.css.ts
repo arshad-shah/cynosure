@@ -12,13 +12,13 @@ const cascade = (base: string, bps: string[]): string => {
 };
 
 const propsAt = (bps: string[]): Record<string, string> => ({
-  'grid-template-columns': cascade('lumen-grid-cols', bps),
-  'grid-template-rows': cascade('lumen-grid-rows', bps),
-  gap: cascade('lumen-grid-gap', bps),
-  'column-gap': cascade('lumen-grid-col-gap', bps),
-  'row-gap': cascade('lumen-grid-row-gap', bps),
-  'align-items': cascade('lumen-grid-align', bps),
-  'justify-items': cascade('lumen-grid-justify', bps),
+  'grid-template-columns': cascade('cynosure-grid-cols', bps),
+  'grid-template-rows': cascade('cynosure-grid-rows', bps),
+  gap: cascade('cynosure-grid-gap', bps),
+  'column-gap': cascade('cynosure-grid-col-gap', bps),
+  'row-gap': cascade('cynosure-grid-row-gap', bps),
+  'align-items': cascade('cynosure-grid-align', bps),
+  'justify-items': cascade('cynosure-grid-justify', bps),
 });
 
 export const grid = style([

@@ -1,5 +1,5 @@
 {
-  "name": "@lumen/react/tooltip",
+  "name": "@arshad-shah/cynosure-react/tooltip",
   "private": true,
   "type": "module",
   "main": "../dist/tooltip.js",

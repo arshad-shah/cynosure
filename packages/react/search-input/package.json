@@ -1,5 +1,5 @@
 {
-  "name": "@lumen/react/search-input",
+  "name": "@arshad-shah/cynosure-react/search-input",
   "private": true,
   "type": "module",
   "main": "../dist/searchinput.js",

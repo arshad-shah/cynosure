@@ -70,8 +70,10 @@ describe('RangeSlider', () => {
     const onChange = vi.fn();
     render(<RangeSlider label="Price" defaultValue={[10, 40]} onChange={onChange} />);
     const inputs = screen.getAllByRole('slider');
-    inputs[0]?.focus();
-    fireEvent.keyDown(inputs[0]!, { key: 'ArrowRight' });
+    const first = inputs[0];
+    if (!first) throw new Error('RangeSlider did not render a first thumb');
+    first.focus();
+    fireEvent.keyDown(first, { key: 'ArrowRight' });
     expect(onChange).toHaveBeenCalled();
     const last = onChange.mock.calls.at(-1)?.[0];
     expect(Array.isArray(last)).toBe(true);

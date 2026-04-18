@@ -1,5 +1,5 @@
 {
-  "name": "@lumen/react/error-text",
+  "name": "@arshad-shah/cynosure-react/error-text",
   "private": true,
   "type": "module",
   "main": "../dist/errortext.js",

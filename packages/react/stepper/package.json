@@ -1,5 +1,5 @@
 {
-  "name": "@lumen/react/stepper",
+  "name": "@arshad-shah/cynosure-react/stepper",
   "private": true,
   "type": "module",
   "main": "../dist/stepper.js",

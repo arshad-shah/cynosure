@@ -225,7 +225,7 @@ export const RichContent: Story = {
                 alt="Developer workstation"
                 style={{
                   width: '100%',
-                  borderRadius: 'var(--lumen-radius-md)',
+                  borderRadius: 'var(--cynosure-radius-md)',
                   display: 'block',
                 }}
               />

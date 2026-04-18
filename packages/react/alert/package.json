@@ -1,5 +1,5 @@
 {
-  "name": "@lumen/react/alert",
+  "name": "@arshad-shah/cynosure-react/alert",
   "private": true,
   "type": "module",
   "main": "../dist/alert.js",

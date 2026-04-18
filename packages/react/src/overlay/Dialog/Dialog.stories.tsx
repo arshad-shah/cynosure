@@ -169,7 +169,7 @@ export const DestructiveConfirm: Story = {
       </DialogTrigger>
       <DialogContent size="sm">
         <DialogHeader>
-          <DialogTitle>Delete &ldquo;lumen-app&rdquo;?</DialogTitle>
+          <DialogTitle>Delete &ldquo;cynosure-app&rdquo;?</DialogTitle>
           <DialogDescription>
             This permanently removes the project and all of its data.
           </DialogDescription>
@@ -235,7 +235,7 @@ export const ShareUseCase: Story = {
         </DialogHeader>
         <Stack gap="4" paddingX="5" paddingBottom="3">
           <Inline gap="2">
-            <Input readOnly defaultValue="https://lumen.app/d/q4-planning" />
+            <Input readOnly defaultValue="https://cynosure.app/d/q4-planning" />
             <Button variant="outline">Copy link</Button>
           </Inline>
           <Stack gap="2">

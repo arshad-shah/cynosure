@@ -3,17 +3,31 @@ on:
   push:
     branches: [main]
 concurrency: ${{ github.workflow }}-${{ github.ref }}
+
+permissions:
+  contents: read
+
 jobs:
   release:
     runs-on: ubuntu-latest
+    # Environment gate: the npm publish step runs only after a manual
+    # approval in the Actions UI. Defence-in-depth against a compromised
+    # workflow file — the attacker needs your click, not just the merge.
+    # See `required_reviewers` on the `production` environment.
+    environment: production
     permissions:
+      # `changesets/action@v1` needs write access to open/update the
+      # "Version packages" PR and to push release tags.
       contents: write
       pull-requests: write
+      # OIDC token for npm Trusted Publishing — no long-lived NPM_TOKEN
+      # secret is required when the package has Trusted Publishing
+      # configured at https://www.npmjs.com/package/<name>/access.
       id-token: write
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: pnpm/action-setup@f40ffcd9367d9f12939873eb1018b921a783ffaa # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: 22
           cache: pnpm
@@ -40,7 +54,8 @@ jobs:
           pnpm exec attw --pack packages/react --ignore-rules cjs-resolves-to-esm
           pnpm exec attw --pack packages/themes --ignore-rules cjs-resolves-to-esm
 
-      - uses: changesets/action@v1
+      - uses: changesets/action@6a0a831ff30acef54f2c6aa1cbbc1096b066edaf # v1.7.0
+        id: changesets
         with:
           publish: pnpm release
           version: pnpm version-packages
@@ -48,5 +63,21 @@ jobs:
           title: 'chore(release): version packages'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          # Enables npm provenance attestations on publish. Works only
+          # when the job has `id-token: write` AND the package has
+          # Trusted Publishing configured on npmjs.com. If either is
+          # missing, publish silently falls back to un-attested.
           NPM_CONFIG_PROVENANCE: 'true'
+
+      - name: Release summary
+        if: ${{ steps.changesets.outputs.published == 'true' }}
+        env:
+          PUBLISHED: ${{ steps.changesets.outputs.publishedPackages }}
+        run: |
+          {
+            echo "## Published"
+            echo ''
+            echo '```json'
+            echo "$PUBLISHED"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"

@@ -1,5 +1,5 @@
 {
-  "name": "@lumen/react/menu-bar",
+  "name": "@arshad-shah/cynosure-react/menu-bar",
   "private": true,
   "type": "module",
   "main": "../dist/menubar.js",

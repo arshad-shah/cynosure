@@ -75,7 +75,7 @@ export const DrawerContent = forwardRef<ElementRef<typeof RadixDialog.Content>, 
         {!hideOverlay ? <RadixDialog.Overlay className={overlayBackdrop} /> : null}
         <RadixDialog.Content
           ref={ref}
-          data-lumen-overlay=""
+          data-cynosure-overlay=""
           data-side={side}
           className={cn(
             drawerContent,

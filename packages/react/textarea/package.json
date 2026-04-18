@@ -1,5 +1,5 @@
 {
-  "name": "@lumen/react/textarea",
+  "name": "@arshad-shah/cynosure-react/textarea",
   "private": true,
   "type": "module",
   "main": "../dist/textarea.js",

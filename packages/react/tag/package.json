@@ -1,5 +1,5 @@
 {
-  "name": "@lumen/react/tag",
+  "name": "@arshad-shah/cynosure-react/tag",
   "private": true,
   "type": "module",
   "main": "../dist/tag.js",

@@ -1,5 +1,5 @@
 {
-  "name": "@lumen/react/overlay",
+  "name": "@arshad-shah/cynosure-react/overlay",
   "private": true,
   "type": "module",
   "main": "../dist/overlay/index.js",

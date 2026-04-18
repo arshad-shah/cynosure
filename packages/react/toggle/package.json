@@ -1,5 +1,5 @@
 {
-  "name": "@lumen/react/toggle",
+  "name": "@arshad-shah/cynosure-react/toggle",
   "private": true,
   "type": "module",
   "main": "../dist/toggle.js",

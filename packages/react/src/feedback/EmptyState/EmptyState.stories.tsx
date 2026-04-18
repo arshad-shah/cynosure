@@ -136,7 +136,7 @@ export const NoResults: Story = {
       </EmptyStateIcon>
       <EmptyStateTitle>No results found</EmptyStateTitle>
       <EmptyStateDescription>
-        We could not find anything matching “lumen@2.0”. Try a different query or clear your
+        We could not find anything matching “cynosure@2.0”. Try a different query or clear your
         filters.
       </EmptyStateDescription>
       <EmptyStateActions>

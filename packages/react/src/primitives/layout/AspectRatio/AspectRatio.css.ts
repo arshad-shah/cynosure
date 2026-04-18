@@ -6,7 +6,7 @@ export const aspectRatio = style([
   {
     position: 'relative',
     width: '100%',
-    aspectRatio: 'var(--lumen-aspect-ratio, 1)',
+    aspectRatio: 'var(--cynosure-aspect-ratio, 1)',
   },
 ]);
 

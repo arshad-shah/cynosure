@@ -1,5 +1,5 @@
 {
-  "name": "@lumen/react/file-upload",
+  "name": "@arshad-shah/cynosure-react/file-upload",
   "private": true,
   "type": "module",
   "main": "../dist/fileupload.js",

@@ -90,7 +90,7 @@ export const field = style({
   background: vars.color.background.surface,
   color: vars.color.foreground.default,
   font: 'inherit',
-  fontFamily: 'var(--lumen-font-body-md-family)',
+  fontFamily: 'var(--cynosure-font-body-md-family)',
   outline: 'none',
   selectors: {
     '&:focus': {

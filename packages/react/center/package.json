@@ -1,5 +1,5 @@
 {
-  "name": "@lumen/react/center",
+  "name": "@arshad-shah/cynosure-react/center",
   "private": true,
   "type": "module",
   "main": "../dist/center.js",

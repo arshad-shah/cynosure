@@ -27,7 +27,7 @@ export const sidebarRoot = style({
       borderInlineEnd: 'none',
       overflow: 'hidden',
     },
-    '[data-lumen-reduced-motion] &': {
+    '[data-cynosure-reduced-motion] &': {
       transitionDuration: '0s',
     },
   },

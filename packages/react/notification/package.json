@@ -1,5 +1,5 @@
 {
-  "name": "@lumen/react/notification",
+  "name": "@arshad-shah/cynosure-react/notification",
   "private": true,
   "type": "module",
   "main": "../dist/notification.js",

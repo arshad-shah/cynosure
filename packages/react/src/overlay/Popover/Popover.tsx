@@ -36,7 +36,7 @@ export const PopoverContent = forwardRef<
     <RadixPopover.Portal container={resolvedContainer}>
       <RadixPopover.Content
         ref={ref}
-        data-lumen-overlay=""
+        data-cynosure-overlay=""
         sideOffset={sideOffset}
         align={align}
         side={side}

@@ -49,13 +49,13 @@
 | `useMergedRef` | Forward merging refs for the Slot pattern |
 | `useCallbackRef` | Stable callback ref |
 
-All hooks live in `@lumen/react/hooks` and are also re-exported from the root. They use **no** runtime dependencies beyond React.
+All hooks live in `@arshad-shah/cynosure-react/hooks` and are also re-exported from the root. They use **no** runtime dependencies beyond React.
 
 ---
 
 ## `Slot` — the composition primitive
 
-`Slot` is the cornerstone of Lumen's "primitives compose other components" model. Pattern is Radix's `asChild`.
+`Slot` is the cornerstone of Cynosure's "primitives compose other components" model. Pattern is Radix's `asChild`.
 
 ### Why
 Every interactive component (Button, Link, MenuItem, …) should be able to render as any underlying element without duplicating logic. Instead of `<Button as="a">`, we use:
@@ -88,10 +88,10 @@ Every interactive component (Button, Link, MenuItem, …) should be able to rend
 Reference implementation: closely mirror `@radix-ui/react-slot`. **Don't fork it — depend on it.** The utility is too subtle to re-implement safely.
 
 ```bash
-pnpm --filter @lumen/react add @radix-ui/react-slot
+pnpm --filter @arshad-shah/cynosure-react add @radix-ui/react-slot
 ```
 
-Then re-export as `Slot` from `@lumen/react`.
+Then re-export as `Slot` from `@arshad-shah/cynosure-react`.
 
 ---
 
@@ -116,7 +116,7 @@ React 19 has `createPortal` directly. Build a tiny wrapper that:
 The classic `.sr-only` pattern, implemented as a component with a ref-forwarding wrapper.
 
 ```css
-.lumen-vh {
+.cynosure-vh {
   position: absolute;
   width: 1px; height: 1px;
   padding: 0; margin: -1px;
@@ -233,7 +233,7 @@ const [ThemeProvider, useThemeContext] = createContext<ThemeContextValue>('Theme
 Install `cva` v1:
 
 ```bash
-pnpm --filter @lumen/react add cva
+pnpm --filter @arshad-shah/cynosure-react add cva
 ```
 
 Re-export from a shared module to establish repo conventions:
@@ -321,13 +321,13 @@ All tests run in Vitest browser mode except pure-logic ones (which can run in `n
 
 ## Exit criteria
 
-- [ ] Every item in the "Inventory" section exists and is exported from `@lumen/react`.
+- [ ] Every item in the "Inventory" section exists and is exported from `@arshad-shah/cynosure-react`.
 - [ ] Every hook has ≥1 Vitest unit test; `useControllableState` has ≥5.
 - [ ] `pnpm test` passes; coverage for `hooks/` and `utils/` ≥ 90% lines.
 - [ ] `Slot`, `Portal`, `VisuallyHidden` have Storybook stories (even if minimal).
 - [ ] `pnpm build` produces per-entry output for hooks (e.g. `dist/hooks/useDisclosure.js`) — add `src/hooks/*.ts` to tsup `entry` to verify tree-shaking works.
 - [ ] Playground uses `useMediaQuery` and `useDisclosure` to demonstrate they work.
-- [ ] Bundle size sanity check: a minimal consumer importing `useDisclosure` only pulls ≤1 KB gzipped of Lumen code (run `pnpm exec size-limit` or a manual Rollup build in CI).
+- [ ] Bundle size sanity check: a minimal consumer importing `useDisclosure` only pulls ≤1 KB gzipped of Cynosure code (run `pnpm exec size-limit` or a manual Rollup build in CI).
 
 ## Decisions to log
 

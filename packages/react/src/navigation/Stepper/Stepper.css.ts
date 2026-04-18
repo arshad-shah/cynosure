@@ -72,8 +72,8 @@ export const stepperMarker = style({
   border: `1px solid ${vars.color.border.default}`,
   background: vars.color.background.surface,
   color: vars.color.foreground.muted,
-  fontFamily: 'var(--lumen-font-body-sm-family)',
-  fontSize: 'var(--lumen-font-body-sm-size)',
+  fontFamily: 'var(--cynosure-font-body-sm-family)',
+  fontSize: 'var(--cynosure-font-body-sm-size)',
   fontWeight: 600,
   fontVariantNumeric: 'tabular-nums',
   selectors: {
@@ -96,9 +96,9 @@ export const stepperMarker = style({
 });
 
 export const stepperMarkerSize = styleVariants({
-  sm: { width: '1.5rem', height: '1.5rem', fontSize: 'var(--lumen-font-body-xs-size, 0.75rem)' },
+  sm: { width: '1.5rem', height: '1.5rem', fontSize: 'var(--cynosure-font-body-xs-size, 0.75rem)' },
   md: { width: '1.75rem', height: '1.75rem' },
-  lg: { width: '2.25rem', height: '2.25rem', fontSize: 'var(--lumen-font-body-md-size)' },
+  lg: { width: '2.25rem', height: '2.25rem', fontSize: 'var(--cynosure-font-body-md-size)' },
 });
 
 export const stepperVariant = styleVariants({
@@ -132,8 +132,8 @@ export const stepperConnector = style({
 });
 
 export const stepperTitle = style({
-  fontFamily: 'var(--lumen-font-body-md-family)',
-  fontSize: 'var(--lumen-font-body-md-size)',
+  fontFamily: 'var(--cynosure-font-body-md-family)',
+  fontSize: 'var(--cynosure-font-body-md-size)',
   fontWeight: 600,
   color: vars.color.foreground.default,
   margin: 0,
@@ -149,7 +149,7 @@ export const stepperTitle = style({
 });
 
 export const stepperDescription = style({
-  fontSize: 'var(--lumen-font-body-sm-size)',
+  fontSize: 'var(--cynosure-font-body-sm-size)',
   color: vars.color.foreground.muted,
   margin: 0,
 });

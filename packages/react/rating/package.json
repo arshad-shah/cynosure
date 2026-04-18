@@ -1,5 +1,5 @@
 {
-  "name": "@lumen/react/rating",
+  "name": "@arshad-shah/cynosure-react/rating",
   "private": true,
   "type": "module",
   "main": "../dist/rating.js",

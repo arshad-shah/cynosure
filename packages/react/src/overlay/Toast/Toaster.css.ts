@@ -16,18 +16,18 @@ export const toastBase = style({
   borderRadius: vars.radius.md,
   boxShadow: vars.shadow.lg,
   padding: vars.space['3'],
-  fontFamily: 'var(--lumen-font-body-md-family)',
+  fontFamily: 'var(--cynosure-font-body-md-family)',
 });
 
 export const toastTitle = style({
-  fontWeight: 'var(--lumen-font-weight-medium)',
-  fontSize: 'var(--lumen-font-body-md-size)',
-  lineHeight: 'var(--lumen-font-body-md-line-height)',
+  fontWeight: 'var(--cynosure-font-weight-medium)',
+  fontSize: 'var(--cynosure-font-body-md-size)',
+  lineHeight: 'var(--cynosure-font-body-md-line-height)',
 });
 
 export const toastDescription = style({
-  fontSize: 'var(--lumen-font-body-sm-size)',
-  lineHeight: 'var(--lumen-font-body-sm-line-height)',
+  fontSize: 'var(--cynosure-font-body-sm-size)',
+  lineHeight: 'var(--cynosure-font-body-sm-line-height)',
   opacity: 0.85,
 });
 
@@ -37,8 +37,8 @@ export const toastActionButton = style({
   padding: `${vars.space['1']} ${vars.space['2']}`,
   borderRadius: vars.radius.sm,
   border: 'none',
-  fontSize: 'var(--lumen-font-body-sm-size)',
-  fontWeight: 'var(--lumen-font-weight-medium)',
+  fontSize: 'var(--cynosure-font-body-sm-size)',
+  fontWeight: 'var(--cynosure-font-weight-medium)',
   cursor: 'pointer',
 });
 
@@ -48,7 +48,7 @@ export const toastCancelButton = style({
   padding: `${vars.space['1']} ${vars.space['2']}`,
   borderRadius: vars.radius.sm,
   border: '1px solid currentColor',
-  fontSize: 'var(--lumen-font-body-sm-size)',
+  fontSize: 'var(--cynosure-font-body-sm-size)',
   cursor: 'pointer',
   opacity: 0.8,
 });

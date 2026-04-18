@@ -1,5 +1,5 @@
 {
-  "name": "@lumen/react/stack",
+  "name": "@arshad-shah/cynosure-react/stack",
   "private": true,
   "type": "module",
   "main": "../dist/stack.js",

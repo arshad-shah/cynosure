@@ -52,7 +52,7 @@ export const Anchor = forwardRef<HTMLElement, AnchorProps>(function Anchor(
   const Tag = `h${level}` as const;
   const wrapperStyle: CSSProperties | undefined = offsetTop
     ? {
-        ['--lumen-anchor-offset' as string]:
+        ['--cynosure-anchor-offset' as string]:
           typeof offsetTop === 'number' ? `${offsetTop}px` : offsetTop,
         ...style,
       }

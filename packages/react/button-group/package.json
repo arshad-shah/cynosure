@@ -1,5 +1,5 @@
 {
-  "name": "@lumen/react/button-group",
+  "name": "@arshad-shah/cynosure-react/button-group",
   "private": true,
   "type": "module",
   "main": "../dist/buttongroup.js",

@@ -1,0 +1,5 @@
+# Every file in the repo requires review from @arshad-shah.
+# Combined with the "require code-owner review" rule on `main`, this
+# means every PR must be reviewed by the maintainer (or merged via an
+# explicit ruleset-bypass allowance) before landing.
+*       @arshad-shah

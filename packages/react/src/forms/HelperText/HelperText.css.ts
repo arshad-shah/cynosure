@@ -4,6 +4,6 @@ import { vars } from '../../styles/vars.css.js';
 export const helperText = style({
   margin: 0,
   color: vars.color.foreground.muted,
-  fontSize: 'var(--lumen-font-body-xs-size)',
-  lineHeight: 'var(--lumen-font-body-xs-line-height)',
+  fontSize: 'var(--cynosure-font-body-xs-size)',
+  lineHeight: 'var(--cynosure-font-body-xs-line-height)',
 });

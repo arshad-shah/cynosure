@@ -12,16 +12,16 @@ const cascade = (base: string, bps: string[]): string => {
 };
 
 const propsAt = (bps: string[]): Record<string, string> => ({
-  'flex-direction': cascade('lumen-flex-dir', bps),
-  'flex-wrap': cascade('lumen-flex-wrap', bps),
-  'flex-grow': cascade('lumen-flex-grow', bps),
-  'flex-shrink': cascade('lumen-flex-shrink', bps),
-  'flex-basis': cascade('lumen-flex-basis', bps),
-  gap: cascade('lumen-flex-gap', bps),
-  'row-gap': cascade('lumen-flex-row-gap', bps),
-  'column-gap': cascade('lumen-flex-col-gap', bps),
-  'align-items': cascade('lumen-flex-align', bps),
-  'justify-content': cascade('lumen-flex-justify', bps),
+  'flex-direction': cascade('cynosure-flex-dir', bps),
+  'flex-wrap': cascade('cynosure-flex-wrap', bps),
+  'flex-grow': cascade('cynosure-flex-grow', bps),
+  'flex-shrink': cascade('cynosure-flex-shrink', bps),
+  'flex-basis': cascade('cynosure-flex-basis', bps),
+  gap: cascade('cynosure-flex-gap', bps),
+  'row-gap': cascade('cynosure-flex-row-gap', bps),
+  'column-gap': cascade('cynosure-flex-col-gap', bps),
+  'align-items': cascade('cynosure-flex-align', bps),
+  'justify-content': cascade('cynosure-flex-justify', bps),
 });
 
 export const flex = style([

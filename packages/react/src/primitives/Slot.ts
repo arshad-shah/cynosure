@@ -1,5 +1,5 @@
 /**
- * Re-export Radix's `Slot`/`Slottable` as Lumen's composition primitive.
+ * Re-export Radix's `Slot`/`Slottable` as Cynosure's composition primitive.
  *
  * We intentionally depend on `@radix-ui/react-slot` rather than reimplementing:
  * it's ~600 bytes gzipped and handles several subtle cases (Fragment

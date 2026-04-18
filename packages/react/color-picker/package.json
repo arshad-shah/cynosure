@@ -1,5 +1,5 @@
 {
-  "name": "@lumen/react/color-picker",
+  "name": "@arshad-shah/cynosure-react/color-picker",
   "private": true,
   "type": "module",
   "main": "../dist/colorpicker.js",

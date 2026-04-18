@@ -1,5 +1,5 @@
 {
-  "name": "@lumen/react/table",
+  "name": "@arshad-shah/cynosure-react/table",
   "private": true,
   "type": "module",
   "main": "../dist/table.js",

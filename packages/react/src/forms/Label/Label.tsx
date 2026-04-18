@@ -13,7 +13,7 @@ export interface LabelProps extends Omit<LabelHTMLAttributes<HTMLLabelElement>, 
 }
 
 /**
- * Form control label. Renders a `<label>` with Lumen typography/colour so
+ * Form control label. Renders a `<label>` with Cynosure typography/colour so
  * form fields look consistent. Pair with an input via `htmlFor={id}`.
  */
 export const Label = forwardRef<HTMLLabelElement, LabelProps>(function Label(
