@@ -1,0 +1,67 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Foundations/RTL support" />
+
+# RTL support
+
+Lumen is RTL-safe by construction. The rules:
+
+1. Every internal `.css.ts` uses **logical CSS properties** (`padding-inline`,
+   `margin-inline`, `inset-inline`, `border-inline-end`, …). Physical
+   `*-left` / `*-right` declarations live only in the public `LayoutProps`
+   escape hatch and in two deliberately-physical files documented in the
+   RTL audit.
+2. Icons that imply direction (chevrons, arrows, indicators) mirror via
+   `transform: scaleX(-1)` when the document direction flips.
+3. Focus-order and tab sequence are unaffected by direction — the document
+   still flows from first to last.
+
+## Enable RTL
+
+Wrap your app in `DirectionProvider`:
+
+```tsx
+import { DirectionProvider } from '@lumen/react';
+
+<DirectionProvider dir="rtl">
+  {children}
+</DirectionProvider>
+```
+
+This sets `dir="rtl"` on the wrapping element and also seeds Radix's own
+`DirectionProvider` so Radix-backed primitives (Tabs, NavigationMenu,
+menus, etc.) render in RTL without extra wiring.
+
+## Mix LTR + RTL on the same page
+
+Nest another `DirectionProvider`:
+
+```tsx
+<DirectionProvider dir="rtl">
+  <ArabicChrome>
+    <DirectionProvider dir="ltr">
+      <EnglishExcerpt />
+    </DirectionProvider>
+  </ArabicChrome>
+</DirectionProvider>
+```
+
+Each subtree resolves its own direction.
+
+## Author-facing escape hatch
+
+If you *really* need a physical property at the call site (e.g. "always
+add 8px to the left"), use the `LayoutProps` escape hatch:
+
+```tsx
+<Box paddingLeft="2">Physical padding — will NOT flip in RTL.</Box>
+```
+
+Prefer the logical variants (`paddingStart`, `paddingInline`) unless you
+are deliberately opting out.
+
+## Audit
+
+`pnpm audit:rtl` walks every `.css.ts` in `packages/react/src` and fails
+if it finds a physical `*-left` / `*-right` declaration outside the
+allowlist. Run it locally before pushing RTL-sensitive changes.

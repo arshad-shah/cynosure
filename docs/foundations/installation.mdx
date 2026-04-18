@@ -1,0 +1,71 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Getting started/Installation" />
+
+# Installation
+
+## Requirements
+
+- Node 22 or newer (Lumen is authored against ESM and uses native TypeScript
+  loading where possible).
+- React 19 and React DOM 19 as peer dependencies.
+
+## Install
+
+```bash
+pnpm add @lumen/react @lumen/tokens
+```
+
+Or with npm / yarn:
+
+```bash
+npm install @lumen/react @lumen/tokens
+yarn add @lumen/react @lumen/tokens
+```
+
+## Import the CSS
+
+Lumen ships CSS separately from JS so bundlers can tree-shake unused
+components. Import the tokens + component styles once at the root of your
+app:
+
+```ts
+import '@lumen/tokens/css';          // design tokens, light theme
+import '@lumen/tokens/css/dark';     // dark overrides (optional)
+import '@lumen/react/styles.css';    // component styles barrel
+```
+
+### Per-component CSS
+
+If you want to import only the components you use:
+
+```ts
+import { Button } from '@lumen/react/button';
+import '@lumen/react/button/button.css';
+```
+
+Your bundler wires up the CSS automatically when you use the per-component
+ESM entries.
+
+## Optional themes
+
+```ts
+import '@lumen/themes/terminal';
+import '@lumen/themes/high-contrast';
+```
+
+## TypeScript
+
+Lumen is authored in TypeScript and publishes types with full JSDoc. If you
+use `skipLibCheck: false`, make sure your `lib` includes `DOM` and `DOM.Iterable`.
+
+## Peer dependencies
+
+| Peer               | Range            | Required |
+| ------------------ | ---------------- | -------- |
+| `react`            | `^19`            | yes      |
+| `react-dom`        | `^19`            | yes      |
+| `react-hook-form`  | `^7`             | only if you import `@lumen/react/rhf` |
+
+See the [quickstart](?path=/docs/getting-started-quickstart--docs) for a
+minimal end-to-end example.

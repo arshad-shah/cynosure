@@ -25,13 +25,16 @@
     "size": "size-limit",
     "audit:contrast": "node scripts/audit-contrast.mjs",
     "audit:rtl": "node scripts/audit-rtl.mjs",
-    "audit": "pnpm audit:rtl && pnpm audit:contrast"
+    "audit": "pnpm audit:rtl && pnpm audit:contrast",
+    "docs:changelog": "node scripts/build-changelog-page.mjs",
+    "chromatic": "chromatic --storybook-build-dir=storybook-static --exit-zero-on-changes"
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "catalog:",
     "@biomejs/biome": "catalog:",
     "@changesets/changelog-github": "catalog:",
     "@changesets/cli": "catalog:",
+    "chromatic": "catalog:",
     "@lumen/react": "workspace:*",
     "@lumen/themes": "workspace:*",
     "@lumen/tokens": "workspace:*",

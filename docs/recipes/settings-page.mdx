@@ -1,0 +1,110 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Recipes/Settings page" />
+
+# Settings page
+
+Tabs across the top, grouped form sections per tab, `Switch` + `Select`
+for preferences.
+
+```tsx
+import {
+  Button,
+  Container,
+  Fieldset,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormLabel,
+  Heading,
+  Input,
+  Select,
+  Stack,
+  Switch,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from '@lumen/react';
+
+export function SettingsPage() {
+  return (
+    <Container>
+      <Stack gap="6" padding="6">
+        <Heading level={1} size="2xl">Settings</Heading>
+
+        <Tabs defaultValue="profile">
+          <TabsList>
+            <TabsTrigger value="profile">Profile</TabsTrigger>
+            <TabsTrigger value="notifications">Notifications</TabsTrigger>
+            <TabsTrigger value="appearance">Appearance</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="profile">
+            <Fieldset legend="Profile">
+              <Stack gap="4">
+                <FormField name="name">
+                  <FormLabel>Display name</FormLabel>
+                  <FormControl><Input /></FormControl>
+                </FormField>
+                <FormField name="email">
+                  <FormLabel>Email</FormLabel>
+                  <FormControl><Input type="email" /></FormControl>
+                  <FormDescription>Used for account recovery.</FormDescription>
+                </FormField>
+              </Stack>
+            </Fieldset>
+          </TabsContent>
+
+          <TabsContent value="notifications">
+            <Fieldset legend="Notifications">
+              <Stack gap="4">
+                <FormField name="emailDigest">
+                  <FormLabel>Weekly email digest</FormLabel>
+                  <FormControl><Switch /></FormControl>
+                </FormField>
+                <FormField name="mentions">
+                  <FormLabel>Push mentions</FormLabel>
+                  <FormControl><Switch defaultChecked /></FormControl>
+                </FormField>
+              </Stack>
+            </Fieldset>
+          </TabsContent>
+
+          <TabsContent value="appearance">
+            <Fieldset legend="Appearance">
+              <Stack gap="4">
+                <FormField name="theme">
+                  <FormLabel>Theme</FormLabel>
+                  <FormControl>
+                    <Select
+                      items={[
+                        { value: 'system', label: 'System' },
+                        { value: 'light', label: 'Light' },
+                        { value: 'dark', label: 'Dark' },
+                        { value: 'terminal', label: 'Terminal' },
+                      ]}
+                    />
+                  </FormControl>
+                </FormField>
+                <FormField name="reducedMotion">
+                  <FormLabel>Reduce motion</FormLabel>
+                  <FormControl><Switch /></FormControl>
+                  <FormDescription>
+                    Overrides the system preference.
+                  </FormDescription>
+                </FormField>
+              </Stack>
+            </Fieldset>
+          </TabsContent>
+        </Tabs>
+
+        <Stack direction="row" gap="3" justify="end">
+          <Button variant="outline">Cancel</Button>
+          <Button>Save changes</Button>
+        </Stack>
+      </Stack>
+    </Container>
+  );
+}
+```

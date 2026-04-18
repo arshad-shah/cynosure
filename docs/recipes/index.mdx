@@ -1,0 +1,38 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Recipes/Overview" />
+
+# Recipes
+
+Worked examples that combine Lumen primitives + components into real UI
+patterns. Each recipe is a copy-pasteable Storybook page with fully
+working code.
+
+## Priority recipes (ship v1)
+
+1. [Login form](?path=/docs/recipes-login-form--docs)
+2. [Dashboard layout](?path=/docs/recipes-dashboard-layout--docs)
+3. [Data table with filters](?path=/docs/recipes-data-table-with-filters--docs)
+4. [Notification center](?path=/docs/recipes-notification-center--docs)
+5. [Command palette](?path=/docs/recipes-command-palette--docs)
+6. [Settings page](?path=/docs/recipes-settings-page--docs)
+7. [Multi-step wizard](?path=/docs/recipes-multi-step-wizard--docs)
+8. [Onboarding modal](?path=/docs/recipes-onboarding-modal--docs)
+
+## Form composition recipes
+
+Live alongside the `Form` component:
+
+- [Plain + `FormData`](?path=/docs/forms-form-composition-recipes-plain-formdata--docs)
+- [react-hook-form](?path=/docs/forms-form-composition-recipes-rhf--docs)
+- [react-hook-form + Zod](?path=/docs/forms-form-composition-recipes-rhf-zod--docs)
+
+## Contributing a recipe
+
+Add a new MDX file under `docs/recipes/`:
+
+- Give the `<Meta>` a `title` of `Recipes/<your slug>`.
+- Write the recipe as a single code block with concise prose around it.
+- Prefer Lumen primitives over raw HTML in your examples.
+- Verify the example compiles by pasting it into
+  `apps/playground/` (when available) before submitting.

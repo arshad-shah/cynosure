@@ -20,6 +20,26 @@ jobs:
           registry-url: https://registry.npmjs.org
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
+
+      # Validate published packages before letting changesets cut a
+      # release. These match the same checks the `verify` CI job runs —
+      # double-checking them here guards against a release that lint /
+      # test happen to miss (e.g. a drift between dist files and
+      # source).
+      - run: pnpm typecheck
+      - run: pnpm test
+      # Mirror the package-validation gates the `verify` CI job runs.
+      # Keeps a hypothetical "main drifted from the last green verify
+      # run" class of issue from silently publishing.
+      - name: publint
+        run: |
+          pnpm exec publint packages/react --level warning
+          pnpm exec publint packages/themes --level warning
+      - name: attw
+        run: |
+          pnpm exec attw --pack packages/react --ignore-rules cjs-resolves-to-esm
+          pnpm exec attw --pack packages/themes --ignore-rules cjs-resolves-to-esm
+
       - uses: changesets/action@v1
         with:
           publish: pnpm release

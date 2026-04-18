@@ -1,0 +1,76 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Foundations/Theming/Overview" />
+
+# Theming overview
+
+Lumen ships two runtime theming building blocks:
+
+1. **Tokens as CSS custom properties.** Every design decision resolves to a
+   `--lumen-*` variable at runtime. Swap the values, swap the theme.
+2. **`ThemeProvider`.** A 200-LOC React component that writes `data-theme`
+   on `<html>`, persists the choice, syncs across tabs, and supports
+   `system`.
+
+## `<ThemeProvider>`
+
+```tsx
+import { ThemeProvider } from '@lumen/react';
+
+<ThemeProvider
+  themes={['light', 'dark', 'terminal', 'high-contrast']}
+  defaultTheme="system"
+  storageKey="lumen-theme"
+>
+  {children}
+</ThemeProvider>
+```
+
+Props worth knowing:
+
+| Prop                         | Default           | Purpose                                                    |
+| ---------------------------- | ----------------- | ---------------------------------------------------------- |
+| `themes`                     | `['light','dark']`| Allowed theme names.                                        |
+| `defaultTheme`               | `'system'`        | Falls back to `prefers-color-scheme`.                       |
+| `storage`                    | `localStorage`    | Pass `null` to disable persistence.                         |
+| `storageKey`                 | `'lumen-theme'`   | Name of the persisted value.                                |
+| `disableTransitionOnChange`  | `false`           | Blocks transitions during a theme flip (prevents flash).    |
+
+## `useTheme()`
+
+```tsx
+const { theme, setTheme, resolvedTheme, themes } = useTheme();
+```
+
+- `theme` — the user's selection (can be `'system'`).
+- `resolvedTheme` — the concrete theme the UI is currently rendering
+  (`'light'` or `'dark'` etc.), honouring `system` preference.
+- `setTheme(name)` — switches the theme, persists, and broadcasts.
+- `themes` — the allowed set passed to `ThemeProvider`.
+
+## Flash-free SSR
+
+Render the init script before the tree hydrates so the theme is correct on
+first paint:
+
+```tsx
+import { getThemeInitScript } from '@lumen/react';
+
+// inside <head>:
+<script dangerouslySetInnerHTML={{ __html: getThemeInitScript() }} />
+```
+
+## Built-in themes
+
+| Theme             | Import                                    |
+| ----------------- | ----------------------------------------- |
+| Light (default)   | `@lumen/tokens/css`                       |
+| Dark              | `@lumen/tokens/css/dark`                  |
+| Terminal          | `@lumen/themes/terminal`                  |
+| High contrast     | `@lumen/themes/high-contrast`             |
+
+## Further reading
+
+- [Dark mode](?path=/docs/foundations-theming-dark-mode--docs)
+- [Custom themes](?path=/docs/foundations-theming-custom-themes--docs)
+- [Terminal theme recipe](?path=/docs/foundations-theming-terminal-recipe--docs)
