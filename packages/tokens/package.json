@@ -1,7 +1,7 @@
 {
-  "name": "@lumen/tokens",
-  "version": "0.1.0",
-  "description": "Lumen UI — design tokens (DTCG JSON + generated CSS/TS)",
+  "name": "@arshad-shah/cynosure-tokens",
+  "version": "1.0.0",
+  "description": "Cynosure UI — design tokens (DTCG JSON + generated CSS/TS)",
   "license": "MIT",
   "type": "module",
   "sideEffects": ["**/*.css"],
@@ -27,7 +27,7 @@
     "clean": "rm -rf dist src/generated .turbo"
   },
   "devDependencies": {
-    "@lumen/config": "workspace:*",
+    "@arshad-shah/cynosure-config": "workspace:*",
     "ajv": "catalog:",
     "glob": "catalog:",
     "style-dictionary": "catalog:",

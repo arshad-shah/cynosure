@@ -1,7 +1,7 @@
 {
-  "name": "@lumen/core",
-  "version": "0.1.0",
-  "description": "Lumen UI — primitives, utilities, hooks",
+  "name": "@arshad-shah/cynosure-core",
+  "version": "1.0.0",
+  "description": "Cynosure UI — primitives, utilities, hooks",
   "license": "MIT",
   "type": "module",
   "sideEffects": ["**/*.css"],
@@ -29,10 +29,10 @@
     "react-dom": ">=19.0.0"
   },
   "dependencies": {
-    "@lumen/tokens": "workspace:*"
+    "@arshad-shah/cynosure-tokens": "workspace:*"
   },
   "devDependencies": {
-    "@lumen/config": "workspace:*",
+    "@arshad-shah/cynosure-config": "workspace:*",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "react": "catalog:",

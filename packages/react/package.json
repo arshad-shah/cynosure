@@ -1,7 +1,7 @@
 {
-  "name": "@lumen/react",
-  "version": "0.1.1",
-  "description": "Lumen UI — React component library",
+  "name": "@arshad-shah/cynosure-react",
+  "version": "1.0.0",
+  "description": "Cynosure UI — React component library",
   "license": "MIT",
   "type": "module",
   "sideEffects": ["**/*.css"],
@@ -531,13 +531,13 @@
     "CHANGELOG.md"
   ],
   "scripts": {
-    "build": "NODE_OPTIONS='--max-old-space-size=6144' tsup",
+    "build": "cross-env NODE_OPTIONS=--max-old-space-size=6144 tsup",
     "dev": "tsup --watch",
     "typecheck": "tsc --noEmit",
     "test": "vitest run --passWithNoTests",
     "test:watch": "vitest --passWithNoTests",
     "test:coverage": "vitest run --coverage --passWithNoTests",
-    "test:browser": "LUMEN_BROWSER_MODE=1 vitest run --passWithNoTests",
+    "test:browser": "cross-env CYNOSURE_BROWSER_MODE=1 vitest run --passWithNoTests",
     "clean": "rm -rf dist .turbo"
   },
   "peerDependencies": {
@@ -552,8 +552,8 @@
   },
   "dependencies": {
     "@internationalized/date": "catalog:",
-    "@lumen/core": "workspace:*",
-    "@lumen/tokens": "workspace:*",
+    "@arshad-shah/cynosure-core": "workspace:*",
+    "@arshad-shah/cynosure-tokens": "workspace:*",
     "@radix-ui/react-accordion": "catalog:",
     "@radix-ui/react-alert-dialog": "catalog:",
     "@radix-ui/react-avatar": "catalog:",
@@ -587,8 +587,9 @@
   },
   "devDependencies": {
     "@hookform/resolvers": "catalog:",
-    "@lumen/config": "workspace:*",
+    "@arshad-shah/cynosure-config": "workspace:*",
     "@testing-library/jest-dom": "catalog:",
+    "cross-env": "catalog:",
     "@testing-library/react": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",

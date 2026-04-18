@@ -1,4 +1,4 @@
-# @arshad-shah/cynosure-core
+# @arshad-shah/cynosure-icons
 
 ## 1.0.0
 
@@ -32,15 +32,3 @@
     are announced at least one minor cycle before removal.
 
   All five packages ship at the same semver via linked changesets.
-
-### Patch Changes
-
-- Updated dependencies []:
-  - @arshad-shah/cynosure-tokens@1.0.0
-
-## 0.1.0
-
-### Patch Changes
-
-- Updated dependencies [[`b99bace`](https://github.com/arshad-shah/Cynosure/commit/b99bacee83d7fbd4800d3aa0ae327badc078b046), [`e2f45fc`](https://github.com/arshad-shah/Cynosure/commit/e2f45fc841e62c35b9f95650a2d4ca7c28c96b12), [`7aca046`](https://github.com/arshad-shah/Cynosure/commit/7aca046bafecb270f95fbad792be9d467c5c7e7b)]:
-  - @arshad-shah/cynosure-tokens@0.1.0
