@@ -1,6 +1,6 @@
 {
   "name": "@arshad-shah/cynosure-icons",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Cynosure UI — Lucide React re-exports with tree-shaken bundles",
   "license": "MIT",
   "type": "module",

@@ -1,5 +1,13 @@
 # @arshad-shah/cynosure-icons
 
+## 1.0.1
+
+### Patch Changes
+
+- [#23](https://github.com/arshad-shah/cynosure/pull/23) [`2593498`](https://github.com/arshad-shah/cynosure/commit/2593498ec28d6c82007bb6d663d034a0bf030eb3) Thanks [@arshad-shah](https://github.com/arshad-shah)! - Add per-package `README.md` files. Each package now displays
+  installation, quick-start usage, and links on its npm package page —
+  critical for discovery and adoption. No runtime changes.
+
 ## 1.0.0
 
 ### Major Changes
