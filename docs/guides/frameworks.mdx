@@ -4,7 +4,7 @@ import { Meta } from '@storybook/addon-docs/blocks';
 
 # Using with React frameworks
 
-Lumen is a plain React package — it works with every major React framework.
+Cynosure is a plain React package — it works with every major React framework.
 A few framework-specific notes below.
 
 ## Next.js (App Router)
@@ -13,9 +13,9 @@ A few framework-specific notes below.
    `app/layout.tsx`:
 
    ```tsx
-   import '@lumen/tokens/css';
-   import '@lumen/tokens/css/dark';
-   import '@lumen/react/styles.css';
+   import '@arshad-shah/cynosure-tokens/css';
+   import '@arshad-shah/cynosure-tokens/css/dark';
+   import '@arshad-shah/cynosure-react/styles.css';
    ```
 
 2. Mark the file that hosts `ThemeProvider` as a client boundary:
@@ -23,7 +23,7 @@ A few framework-specific notes below.
    ```tsx
    // app/providers.tsx
    'use client';
-   import { ThemeProvider, TooltipProvider } from '@lumen/react';
+   import { ThemeProvider, TooltipProvider } from '@arshad-shah/cynosure-react';
 
    export function Providers({ children }) {
      return (
@@ -37,7 +37,7 @@ A few framework-specific notes below.
 3. Render the theme init script in `<head>` to avoid a flash on reload:
 
    ```tsx
-   import { getThemeInitScript } from '@lumen/react';
+   import { getThemeInitScript } from '@arshad-shah/cynosure-react';
 
    export default function RootLayout({ children }) {
      return (
@@ -62,8 +62,8 @@ before React hydrates.
 - Put the stylesheet imports in `root.tsx` and export them via `links`:
 
   ```tsx
-  import styles from '@lumen/react/styles.css?url';
-  import tokens from '@lumen/tokens/css?url';
+  import styles from '@arshad-shah/cynosure-react/styles.css?url';
+  import tokens from '@arshad-shah/cynosure-tokens/css?url';
 
   export const links = () => [
     { rel: 'stylesheet', href: tokens },
@@ -85,14 +85,14 @@ theme init script + `suppressHydrationWarning` pattern applies.
 
 ## Astro (islands only)
 
-Render Lumen inside a React island (`client:load` or `client:idle`). Keep
+Render Cynosure inside a React island (`client:load` or `client:idle`). Keep
 the island container small so hydration cost stays proportional.
 
 ## Tree-shaking
 
-- Use per-component entries in hot paths: `@lumen/react/button`,
-  `@lumen/react/combobox`, …
-- Root barrel (`@lumen/react`) works fine with modern bundlers (Vite,
+- Use per-component entries in hot paths: `@arshad-shah/cynosure-react/button`,
+  `@arshad-shah/cynosure-react/combobox`, …
+- Root barrel (`@arshad-shah/cynosure-react`) works fine with modern bundlers (Vite,
   Next.js with Webpack 5 / Turbopack, Rollup) — `sideEffects: false` +
   per-component modules keep tree-shaking effective.
 

@@ -69,7 +69,7 @@ function splitLines(source: string): string[] {
  * pass a pre-rendered `html` string (typically from `shiki.codeToHtml`) to get
  * highlighted output. Shiki is intentionally not pulled in at module load so
  * the base bundle stays lean; wire it up in userland or via the
- * `@lumen/react/code-block` entry point.
+ * `@arshad-shah/cynosure-react/code-block` entry point.
  */
 export const CodeBlock = forwardRef<HTMLDivElement, CodeBlockProps>(function CodeBlock(
   {
@@ -106,7 +106,7 @@ export const CodeBlock = forwardRef<HTMLDivElement, CodeBlockProps>(function Cod
     ...style,
     ...(maxHeight !== undefined
       ? {
-          ['--lumen-code-max-height' as string]:
+          ['--cynosure-code-max-height' as string]:
             typeof maxHeight === 'number' ? `${maxHeight.toString()}px` : maxHeight,
         }
       : {}),
@@ -180,7 +180,7 @@ export const CodeBlock = forwardRef<HTMLDivElement, CodeBlockProps>(function Cod
  * Consumers call this once at module scope, pass the result into `<CodeBlock html={…}>`.
  *
  * ```tsx
- * import { createShikiRenderer } from '@lumen/react/code-block';
+ * import { createShikiRenderer } from '@arshad-shah/cynosure-react/code-block';
  * const highlight = await createShikiRenderer({ langs: ['tsx'], themes: ['github-dark'] });
  * const html = highlight('const x = 1', { lang: 'tsx', theme: 'github-dark' });
  * ```

@@ -34,7 +34,7 @@ export const backToTopButton = style({
       outline: 'none',
       boxShadow: `${vars.shadow.lg}, 0 0 0 3px ${vars.color.accent.ring}`,
     },
-    '[data-lumen-reduced-motion] &': {
+    '[data-cynosure-reduced-motion] &': {
       transitionDuration: '0s',
     },
   },

@@ -27,11 +27,11 @@ describe('Text', () => {
       </Text>,
     );
     const el = container.querySelector('[data-testid="t"]') as HTMLElement;
-    expect(el.style.getPropertyValue('--lumen-text-size-base')).toBe(
-      'var(--lumen-font-body-lg-size)',
+    expect(el.style.getPropertyValue('--cynosure-text-size-base')).toBe(
+      'var(--cynosure-font-body-lg-size)',
     );
-    expect(el.style.getPropertyValue('--lumen-text-lh-base')).toBe(
-      'var(--lumen-font-body-lg-line-height)',
+    expect(el.style.getPropertyValue('--cynosure-text-lh-base')).toBe(
+      'var(--cynosure-font-body-lg-line-height)',
     );
   });
 
@@ -42,11 +42,11 @@ describe('Text', () => {
       </Text>,
     );
     const el = container.querySelector('[data-testid="t"]') as HTMLElement;
-    expect(el.style.getPropertyValue('--lumen-text-size-base')).toBe(
-      'var(--lumen-font-body-sm-size)',
+    expect(el.style.getPropertyValue('--cynosure-text-size-base')).toBe(
+      'var(--cynosure-font-body-sm-size)',
     );
-    expect(el.style.getPropertyValue('--lumen-text-size-md')).toBe(
-      'var(--lumen-font-body-lg-size)',
+    expect(el.style.getPropertyValue('--cynosure-text-size-md')).toBe(
+      'var(--cynosure-font-body-lg-size)',
     );
   });
 
@@ -57,8 +57,8 @@ describe('Text', () => {
       </Text>,
     );
     const el = container.querySelector('[data-testid="t"]') as HTMLElement;
-    expect(el.style.getPropertyValue('--lumen-text-weight-base')).toBe(
-      'var(--lumen-font-weight-bold)',
+    expect(el.style.getPropertyValue('--cynosure-text-weight-base')).toBe(
+      'var(--cynosure-font-weight-bold)',
     );
   });
 
@@ -80,7 +80,7 @@ describe('Text', () => {
     );
     const el = container.querySelector('[data-testid="t"]') as HTMLElement;
     expect(el.className).toMatch(/lineClamp/);
-    expect(el.style.getPropertyValue('--lumen-typography-line-clamp')).toBe('3');
+    expect(el.style.getPropertyValue('--cynosure-typography-line-clamp')).toBe('3');
   });
 
   it('resolves decoration color to a CSS var', () => {
@@ -90,8 +90,8 @@ describe('Text', () => {
       </Text>,
     );
     const el = container.querySelector('[data-testid="t"]') as HTMLElement;
-    expect(el.style.getPropertyValue('--lumen-typography-decoration-color')).toBe(
-      'var(--lumen-color-accent-solid)',
+    expect(el.style.getPropertyValue('--cynosure-typography-decoration-color')).toBe(
+      'var(--cynosure-color-accent-solid)',
     );
   });
 
@@ -102,8 +102,8 @@ describe('Text', () => {
       </Text>,
     );
     const el = container.querySelector('[data-testid="t"]') as HTMLElement;
-    expect(el.style.getPropertyValue('--lumen-lp-fg-base')).toBe(
-      'var(--lumen-color-foreground-muted)',
+    expect(el.style.getPropertyValue('--cynosure-lp-fg-base')).toBe(
+      'var(--cynosure-color-foreground-muted)',
     );
   });
 
@@ -115,8 +115,8 @@ describe('Text', () => {
     );
     const a = getByRole('link') as HTMLAnchorElement;
     expect(a.getAttribute('href')).toBe('/docs');
-    expect(a.style.getPropertyValue('--lumen-text-size-base')).toBe(
-      'var(--lumen-font-body-sm-size)',
+    expect(a.style.getPropertyValue('--cynosure-text-size-base')).toBe(
+      'var(--cynosure-font-body-sm-size)',
     );
   });
 

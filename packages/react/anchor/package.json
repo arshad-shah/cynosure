@@ -1,5 +1,5 @@
 {
-  "name": "@lumen/react/anchor",
+  "name": "@arshad-shah/cynosure-react/anchor",
   "private": true,
   "type": "module",
   "main": "../dist/anchor.js",

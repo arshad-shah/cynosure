@@ -1,5 +1,5 @@
 {
-  "name": "@lumen/react/range-slider",
+  "name": "@arshad-shah/cynosure-react/range-slider",
   "private": true,
   "type": "module",
   "main": "../dist/rangeslider.js",

@@ -96,7 +96,7 @@ const ShellLayout = ({ children }: { children: ReactNode }): ReactElement => (
     style={{
       display: 'flex',
       minHeight: 420,
-      border: '1px solid var(--lumen-color-border-subtle, #e5e7eb)',
+      border: '1px solid var(--cynosure-color-border-subtle, #e5e7eb)',
       borderRadius: 12,
       overflow: 'hidden',
     }}
@@ -201,7 +201,7 @@ export const MobileDrawer: Story = {
         style={{
           minHeight: 360,
           padding: 24,
-          border: '1px solid var(--lumen-color-border-subtle, #e5e7eb)',
+          border: '1px solid var(--cynosure-color-border-subtle, #e5e7eb)',
           borderRadius: 12,
         }}
       >
@@ -270,7 +270,7 @@ export const WithHeaderAndFooter: Story = {
                   width: 28,
                   height: 28,
                   borderRadius: '50%',
-                  background: 'var(--lumen-color-accent-9, #4f46e5)',
+                  background: 'var(--cynosure-color-accent-9, #4f46e5)',
                 }}
               />
               <Stack gap="0">
@@ -333,7 +333,7 @@ export const DocsUseCase: Story = {
           <ShellLayout>
             <Sidebar>
               <SidebarHeader>
-                <Text weight="semibold">Lumen docs</Text>
+                <Text weight="semibold">Cynosure docs</Text>
               </SidebarHeader>
               <SidebarBody>
                 <Menu aria-label="Docs">

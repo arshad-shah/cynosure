@@ -21,9 +21,9 @@ describe('Stack', () => {
       </Stack>,
     );
     const el = container.querySelector('[data-testid="stack"]') as HTMLElement;
-    expect(el.style.getPropertyValue('--lumen-stack-gap-base')).toBe('var(--lumen-space-4)');
-    expect(el.style.getPropertyValue('--lumen-stack-align-base')).toBe('center');
-    expect(el.style.getPropertyValue('--lumen-stack-justify-base')).toBe('space-between');
+    expect(el.style.getPropertyValue('--cynosure-stack-gap-base')).toBe('var(--cynosure-space-4)');
+    expect(el.style.getPropertyValue('--cynosure-stack-align-base')).toBe('center');
+    expect(el.style.getPropertyValue('--cynosure-stack-justify-base')).toBe('space-between');
   });
 
   it('inserts <hr> dividers between children when `dividers` is true', () => {

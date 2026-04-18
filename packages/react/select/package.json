@@ -1,5 +1,5 @@
 {
-  "name": "@lumen/react/select",
+  "name": "@arshad-shah/cynosure-react/select",
   "private": true,
   "type": "module",
   "main": "../dist/select.js",

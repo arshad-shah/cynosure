@@ -1,7 +1,7 @@
 import { type Options, defineConfig } from 'tsup';
 
 /**
- * Shared tsup preset for all @lumen packages.
+ * Shared tsup preset for all @cynosure packages.
  *
  * - Per-component entry points (one file per component exported from src/<Component>/index.ts)
  * - ESM only

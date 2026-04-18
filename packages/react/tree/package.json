@@ -1,5 +1,5 @@
 {
-  "name": "@lumen/react/tree",
+  "name": "@arshad-shah/cynosure-react/tree",
   "private": true,
   "type": "module",
   "main": "../dist/tree.js",

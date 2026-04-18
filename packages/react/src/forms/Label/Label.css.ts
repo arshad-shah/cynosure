@@ -6,9 +6,9 @@ export const label = style({
   alignItems: 'center',
   gap: vars.space['1'],
   color: vars.color.foreground.default,
-  fontSize: 'var(--lumen-font-body-sm-size)',
-  lineHeight: 'var(--lumen-font-body-sm-line-height)',
-  fontWeight: 'var(--lumen-font-weight-medium)',
+  fontSize: 'var(--cynosure-font-body-sm-size)',
+  lineHeight: 'var(--cynosure-font-body-sm-line-height)',
+  fontWeight: 'var(--cynosure-font-weight-medium)',
   cursor: 'pointer',
   selectors: {
     '&[data-disabled="true"]': {

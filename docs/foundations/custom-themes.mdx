@@ -4,7 +4,7 @@ import { Meta } from '@storybook/addon-docs/blocks';
 
 # Authoring a custom theme
 
-A Lumen theme is a CSS file that overrides the semantic tokens for a
+A Cynosure theme is a CSS file that overrides the semantic tokens for a
 `data-theme` selector. That's the whole API.
 
 ## 1. Define the overrides
@@ -14,22 +14,22 @@ Create `src/themes/brand.css`:
 ```css
 [data-theme='brand'] {
   /* Accent family — buttons, links, focus rings. */
-  --lumen-color-accent-solid: #0f766e;
-  --lumen-color-accent-solid-hover: #115e59;
-  --lumen-color-accent-soft: rgba(15 118 110 / 0.12);
-  --lumen-color-accent-soft-hover: rgba(15 118 110 / 0.2);
-  --lumen-color-accent-fg: #0f766e;
+  --cynosure-color-accent-solid: #0f766e;
+  --cynosure-color-accent-solid-hover: #115e59;
+  --cynosure-color-accent-soft: rgba(15 118 110 / 0.12);
+  --cynosure-color-accent-soft-hover: rgba(15 118 110 / 0.2);
+  --cynosure-color-accent-fg: #0f766e;
 
   /* Surface family — backgrounds, cards, inputs. */
-  --lumen-color-surface-default: #ffffff;
-  --lumen-color-surface-subtle: #f6fbfa;
-  --lumen-color-surface-muted: #ecf5f3;
+  --cynosure-color-surface-default: #ffffff;
+  --cynosure-color-surface-subtle: #f6fbfa;
+  --cynosure-color-surface-muted: #ecf5f3;
 
   /* Foreground family — body text, headings, borders. */
-  --lumen-color-fg-default: #042f2e;
-  --lumen-color-fg-muted: #134e4a;
-  --lumen-color-fg-subtle: #5eead4;
-  --lumen-color-border-default: #d6e4e1;
+  --cynosure-color-fg-default: #042f2e;
+  --cynosure-color-fg-muted: #134e4a;
+  --cynosure-color-fg-subtle: #5eead4;
+  --cynosure-color-border-default: #d6e4e1;
 
   /* Optional: signal the browser colour-scheme so native controls match. */
   color-scheme: light;
@@ -46,7 +46,7 @@ If you're authoring a theme package:
 {
   "name": "my-brand-theme",
   "exports": {
-    "./lumen": "./dist/lumen.css"
+    "./cynosure": "./dist/cynosure.css"
   },
   "sideEffects": ["./dist/*.css"]
 }
@@ -55,7 +55,7 @@ If you're authoring a theme package:
 Consumers import it once:
 
 ```ts
-import 'my-brand-theme/lumen';
+import 'my-brand-theme/cynosure';
 ```
 
 ## 3. Enable the theme
@@ -86,7 +86,7 @@ Minimum tokens you probably want to override:
 
 ## Testing a custom theme
 
-Lumen ships a contrast audit script that walks compiled CSS and asserts
+Cynosure ships a contrast audit script that walks compiled CSS and asserts
 WCAG 2.1 AA pairs. Add your theme to `scripts/audit-contrast.mjs` to
 run the check against CI:
 
@@ -105,5 +105,5 @@ Sometimes you want a theme only inside a specific container (for example a
 </div>
 ```
 
-All Lumen components read CSS custom properties through normal cascade, so
+All Cynosure components read CSS custom properties through normal cascade, so
 scoping "just works".

@@ -63,7 +63,7 @@ Backed by `@radix-ui/react-tabs`.
   </BreadcrumbItem>
   <BreadcrumbSeparator />
   <BreadcrumbItem isCurrent>
-    <BreadcrumbPage>Lumen</BreadcrumbPage>
+    <BreadcrumbPage>Cynosure</BreadcrumbPage>
   </BreadcrumbItem>
 </Breadcrumb>
 ```
@@ -198,7 +198,7 @@ This is a layout pattern, not a small component. It's a container that manages c
   <Box display="flex" minHeight="screen">
     <Sidebar>
       <SidebarHeader>
-        <Heading level={1} size="md">Lumen</Heading>
+        <Heading level={1} size="md">Cynosure</Heading>
       </SidebarHeader>
       <SidebarBody>
         <Menu>…</Menu>
@@ -338,7 +338,7 @@ Per component:
 - [ ] Breadcrumb collapse behaviour works and is tested.
 - [ ] Tabs indicator animates smoothly (when motion enabled) and is absent under reduced motion.
 - [ ] RTL flip verified for Tabs, Breadcrumb, Sidebar.
-- [ ] Changesets: `@lumen/react` minor "Navigation components".
+- [ ] Changesets: `@arshad-shah/cynosure-react` minor "Navigation components".
 
 ## Decisions to log
 

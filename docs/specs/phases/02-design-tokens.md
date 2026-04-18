@@ -1,6 +1,6 @@
 # Phase 02 — Design tokens
 
-> **Goal:** Author every design decision as W3C DTCG-format JSON tokens, compile them to CSS custom properties + TypeScript constants, and ship them as `@lumen/tokens`.
+> **Goal:** Author every design decision as W3C DTCG-format JSON tokens, compile them to CSS custom properties + TypeScript constants, and ship them as `@arshad-shah/cynosure-tokens`.
 
 **Depends on:** Phase 01.
 **Blocks:** Phases 03, 05, 06 (everything that styles anything).
@@ -22,11 +22,11 @@ We generate CSS custom properties and TS constants. We do **not** ship the JSON 
 
 ## What you're building
 
-`@lumen/tokens` package containing:
+`@arshad-shah/cynosure-tokens` package containing:
 1. Source JSON in DTCG format (`tokens/*.json`).
 2. A Style Dictionary v4 build pipeline.
 3. Two output artefacts:
-   - `dist/tokens.css` — a `:root { --lumen-*: … }` stylesheet.
+   - `dist/tokens.css` — a `:root { --cynosure-*: … }` stylesheet.
    - `dist/index.js` + `dist/index.d.ts` — typed constants for use inside components.
 4. A JSON Schema for validating token files on commit.
 
@@ -298,7 +298,7 @@ const build = async (themeName, sources) => {
         transformGroup: 'css',
         transforms: commonTransforms,
         buildPath: `dist/css/`,
-        prefix: 'lumen',
+        prefix: 'cynosure',
         files: [{
           destination: `${themeName}.css`,
           format: 'css/variables',
@@ -323,7 +323,7 @@ await build('base',  ['tokens/primitives/**/*.json', 'tokens/semantic/colors.lig
 await build('dark',  ['tokens/primitives/**/*.json', 'tokens/semantic/colors.dark.json']);
 ```
 
-> **Key choice: `outputReferences: true`** means generated CSS uses `var(--lumen-color-gray-900)` instead of inlining `#18181b`. This is what lets consumers override one primitive and have every semantic token cascade. **Do not turn this off.**
+> **Key choice: `outputReferences: true`** means generated CSS uses `var(--cynosure-color-gray-900)` instead of inlining `#18181b`. This is what lets consumers override one primitive and have every semantic token cascade. **Do not turn this off.**
 
 ### Output shape
 
@@ -331,12 +331,12 @@ await build('dark',  ['tokens/primitives/**/*.json', 'tokens/semantic/colors.dar
 
 ```css
 :root {
-  --lumen-color-gray-50: #fafafa;
+  --cynosure-color-gray-50: #fafafa;
   /* ... */
-  --lumen-color-gray-900: #18181b;
+  --cynosure-color-gray-900: #18181b;
   /* ... */
-  --lumen-color-background-canvas: var(--lumen-color-gray-50);
-  --lumen-color-foreground-default: var(--lumen-color-gray-900);
+  --cynosure-color-background-canvas: var(--cynosure-color-gray-50);
+  --cynosure-color-foreground-default: var(--cynosure-color-gray-900);
   /* ... */
 }
 ```
@@ -345,8 +345,8 @@ await build('dark',  ['tokens/primitives/**/*.json', 'tokens/semantic/colors.dar
 
 ```css
 [data-theme='dark'] {
-  --lumen-color-background-canvas: var(--lumen-color-gray-950);
-  --lumen-color-foreground-default: var(--lumen-color-gray-50);
+  --cynosure-color-background-canvas: var(--cynosure-color-gray-950);
+  --cynosure-color-foreground-default: var(--cynosure-color-gray-50);
   /* ... */
 }
 ```
@@ -356,17 +356,17 @@ await build('dark',  ['tokens/primitives/**/*.json', 'tokens/semantic/colors.dar
 Typography composites need special handling. Extend the Style Dictionary config with a custom transformer that emits:
 
 ```css
---lumen-font-heading-1-family: var(--lumen-font-family-sans);
---lumen-font-heading-1-size: var(--lumen-font-size-5xl);
---lumen-font-heading-1-weight: var(--lumen-font-weight-bold);
---lumen-font-heading-1-line-height: var(--lumen-line-height-tight);
+--cynosure-font-heading-1-family: var(--cynosure-font-family-sans);
+--cynosure-font-heading-1-size: var(--cynosure-font-size-5xl);
+--cynosure-font-heading-1-weight: var(--cynosure-font-weight-bold);
+--cynosure-font-heading-1-line-height: var(--cynosure-line-height-tight);
 ```
 
-Components then use a shorthand like `font: var(--lumen-font-heading-1-weight) var(--lumen-font-heading-1-size)/var(--lumen-font-heading-1-line-height) var(--lumen-font-heading-1-family);` when they need the composite.
+Components then use a shorthand like `font: var(--cynosure-font-heading-1-weight) var(--cynosure-font-heading-1-size)/var(--cynosure-font-heading-1-line-height) var(--cynosure-font-heading-1-family);` when they need the composite.
 
 ---
 
-## The `@lumen/tokens` public API
+## The `@arshad-shah/cynosure-tokens` public API
 
 `packages/tokens/src/index.ts`:
 
@@ -376,7 +376,7 @@ export { tokens as darkTokens } from '../dist/ts/dark.js';
 export type { Tokens } from '../dist/ts/base.js';
 
 // Re-export CSS as a side-effect import path:
-//   import '@lumen/tokens/css';
+//   import '@arshad-shah/cynosure-tokens/css';
 // The actual file is resolved via exports map.
 ```
 
@@ -442,17 +442,17 @@ Wire `validate` into the `prebuild` hook so invalid tokens fail the build, not r
 ## Exit criteria
 
 - [ ] `tokens/primitives/` and `tokens/semantic/` are populated per the inventory above.
-- [ ] `pnpm --filter @lumen/tokens build` produces:
-  - `dist/css/base.css` containing all semantic tokens as `var(--lumen-…)` references.
+- [ ] `pnpm --filter @arshad-shah/cynosure-tokens build` produces:
+  - `dist/css/base.css` containing all semantic tokens as `var(--cynosure-…)` references.
   - `dist/css/dark.css` overriding only what changes for dark.
   - `dist/ts/base.ts` and `dist/ts/dark.ts` exporting typed constants.
   - `dist/index.js` + `dist/index.d.ts` re-exporting them.
-- [ ] `pnpm --filter @lumen/tokens validate` passes.
-- [ ] Importing `@lumen/tokens/css` in the playground and switching `data-theme` on `<html>` visibly changes colours (use a throwaway `style={{background: 'var(--lumen-color-background-canvas)'}}` div to verify).
-- [ ] `@lumen/tokens` gzipped CSS is under **8 KB** for base + dark combined. If larger, audit for redundant tokens.
-- [ ] Write a changeset: `@lumen/tokens` minor, "Initial token pipeline".
+- [ ] `pnpm --filter @arshad-shah/cynosure-tokens validate` passes.
+- [ ] Importing `@arshad-shah/cynosure-tokens/css` in the playground and switching `data-theme` on `<html>` visibly changes colours (use a throwaway `style={{background: 'var(--cynosure-color-background-canvas)'}}` div to verify).
+- [ ] `@arshad-shah/cynosure-tokens` gzipped CSS is under **8 KB** for base + dark combined. If larger, audit for redundant tokens.
+- [ ] Write a changeset: `@arshad-shah/cynosure-tokens` minor, "Initial token pipeline".
 
 ## Decisions to log
 
-- The naming convention: `--lumen-<domain>-<subdomain>-<step>` (kebab, dash-separated). **Do not change this later** — components encode it.
+- The naming convention: `--cynosure-<domain>-<subdomain>-<step>` (kebab, dash-separated). **Do not change this later** — components encode it.
 - No `!important`, ever. If a consumer needs to override, they change the token, not overload selectors.

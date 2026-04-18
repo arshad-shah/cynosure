@@ -36,7 +36,7 @@ jobs:
       - name: Unit tests
         run: pnpm test
       - name: Coverage thresholds
-        run: pnpm --filter @lumen/react test:coverage
+        run: pnpm --filter @arshad-shah/cynosure-react test:coverage
 
       # --- Runtime audits ---------------------------------------------------
       - name: Contrast audit (WCAG AA for every theme)
@@ -49,13 +49,13 @@ jobs:
       # check in case a build cache was restored from before the hook landed.
       - name: Ensure dist/styles.css exists
         run: node scripts/ensure-styles-css.mjs
-      - name: publint @lumen/react
+      - name: publint @arshad-shah/cynosure-react
         run: pnpm exec publint packages/react --level warning
-      - name: publint @lumen/themes
+      - name: publint @arshad-shah/cynosure-themes
         run: pnpm exec publint packages/themes --level warning
-      - name: attw @lumen/react
+      - name: attw @arshad-shah/cynosure-react
         run: pnpm exec attw --pack packages/react --ignore-rules cjs-resolves-to-esm
-      - name: attw @lumen/themes
+      - name: attw @arshad-shah/cynosure-themes
         run: pnpm exec attw --pack packages/themes --ignore-rules cjs-resolves-to-esm
 
   cross-browser:
@@ -98,5 +98,5 @@ jobs:
       - name: Browser-mode tests
         if: steps.detect.outputs.present == 'true'
         env:
-          LUMEN_BROWSER_MODE: '1'
-        run: pnpm --filter @lumen/react test:browser
+          CYNOSURE_BROWSER_MODE: '1'
+        run: pnpm --filter @arshad-shah/cynosure-react test:browser

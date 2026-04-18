@@ -23,6 +23,6 @@ describe('Container', () => {
       </Container>,
     );
     const el = container.querySelector('[data-testid="c"]') as HTMLElement;
-    expect(el.style.getPropertyValue('--lumen-lp-px-base')).toBe('var(--lumen-space-4)');
+    expect(el.style.getPropertyValue('--cynosure-lp-px-base')).toBe('var(--cynosure-space-4)');
   });
 });

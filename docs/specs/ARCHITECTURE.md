@@ -1,4 +1,4 @@
-# Lumen UI — Architecture Reference
+# Cynosure UI — Architecture Reference
 
 > Cross-cutting rules and patterns that every phase and every component must honour. If a phase document conflicts with this file, this file wins and the phase is wrong.
 
@@ -6,7 +6,7 @@
 
 ## The seven laws
 
-1. **One source of truth for design decisions.** Every visual value lives in `@lumen/tokens` as a DTCG JSON entry. Never hardcode a colour, radius, space, duration, or shadow in a component.
+1. **One source of truth for design decisions.** Every visual value lives in `@arshad-shah/cynosure-tokens` as a DTCG JSON entry. Never hardcode a colour, radius, space, duration, or shadow in a component.
 2. **Six primitives render the DOM.** Only `Box`, `Stack`, `Inline`, `Flex`, `Grid`, `Center` (plus the utility trio `Spacer`, `Divider`, `AspectRatio`, `Container`, `Section`) may use intrinsic JSX elements directly. **Exception:** form controls (`<input>`, `<textarea>`, `<select>`) because browser behaviour depends on the native element.
 3. **Variants are typed via `cva`.** Every component that has visual variants exposes them through `cva`, and its props interface extends `VariantProps<typeof componentRecipe>`.
 4. **Accessibility is a build-time contract.** Every component has `@storybook/addon-a11y` stories that pass at `test: 'error'` level. A component that fails axe cannot be released.
@@ -25,7 +25,7 @@
                │  pnpm build (style-dictionary)
                ▼
 ┌─────────────────────────────┐
-│  dist/css/base.css          │  ← :root { --lumen-*: …; }
+│  dist/css/base.css          │  ← :root { --cynosure-*: …; }
 │  dist/css/dark.css          │  ← [data-theme='dark'] { …; }
 │  dist/ts/base.ts            │  ← typed constants
 └──────────────┬──────────────┘
@@ -33,7 +33,7 @@
                ▼
 ┌─────────────────────────────┐
 │  vars.css.ts                │  ← createGlobalThemeContract mirrors the shape
-│    (vanilla-extract)        │     of tokens with `var(--lumen-…)` strings
+│    (vanilla-extract)        │     of tokens with `var(--cynosure-…)` strings
 └──────────────┬──────────────┘
                │  imported by
                ▼
@@ -50,7 +50,7 @@
 ```
 
 **Theme switch at runtime** = `<html data-theme='dark'>` flips the cascaded custom properties; zero re-renders.
-**Custom theme** = user ships an additional CSS file with `[data-theme='mine'] { --lumen-*: …; }` and sets the attribute.
+**Custom theme** = user ships an additional CSS file with `[data-theme='mine'] { --cynosure-*: …; }` and sets the attribute.
 **Per-component CSS** = Vite code-splits, consumer only ships CSS for components they imported.
 
 ---
@@ -210,10 +210,10 @@ export type { ButtonProps } from './Button';
 | Dep                                     | Peer  | Range              | Notes                                              |
 |-----------------------------------------|-------|--------------------|----------------------------------------------------|
 | `react`, `react-dom`                    | ✅    | `>=19.0.0`          | Strict. Older Reacts aren't supported.             |
-| `react-hook-form`                       | Optional | `>=7.0.0`       | Only needed if using `@lumen/react/rhf`.          |
+| `react-hook-form`                       | Optional | `>=7.0.0`       | Only needed if using `@arshad-shah/cynosure-react/rhf`.          |
 | `@tanstack/react-table`                 | Optional | `>=8.0.0`       | Only needed if using `DataTable`.                  |
 | `lucide-react`                          | ✅    | `>=0.400.0`         | Our icon set.                                      |
-| `@lumen/tokens`, `@lumen/core`          | —     | `workspace:*`       | Internal deps; pnpm resolves from workspace.       |
+| `@arshad-shah/cynosure-tokens`, `@arshad-shah/cynosure-core`          | —     | `workspace:*`       | Internal deps; pnpm resolves from workspace.       |
 
 Direct deps we bring:
 - `@radix-ui/react-*` — the specific primitives we use.
@@ -231,7 +231,7 @@ Direct deps we bring:
 - **Component body:** must not throw on SSR. `window`, `document`, `matchMedia` references are guarded with `useIsomorphicLayoutEffect` or typeof checks.
 - **`ThemeProvider`:** renders a flash-prevention script via `getThemeInitScript()` — consumers insert this in `<head>` on SSR frameworks.
 - **Vanilla-extract CSS:** extracted at build time, served as a plain stylesheet. No SSR concerns.
-- **RSC compatibility:** because our components are client-rendered (need hooks, refs, events), export them as client components. Documented in the Next.js guide: `'use client'` at the top of each consumer file that imports interactive Lumen components.
+- **RSC compatibility:** because our components are client-rendered (need hooks, refs, events), export them as client components. Documented in the Next.js guide: `'use client'` at the top of each consumer file that imports interactive Cynosure components.
 
 Future work (post-v1): investigate if purely presentational components (Box, Stack, Inline, Grid, Card, Heading with no interactivity) can be marked as server-safe. Not worth the complexity for v1.
 
@@ -264,13 +264,13 @@ Initial ceilings; treat as sacred:
 - DatePicker: **≤ 30 KB gz**
 - Dialog, Popover, DropdownMenu: **≤ 12 KB gz**
 - DataTable: **≤ 45 KB gz**
-- Full barrel `@lumen/react`: **≤ 150 KB gz** (target, not a hard ceiling)
+- Full barrel `@arshad-shah/cynosure-react`: **≤ 150 KB gz** (target, not a hard ceiling)
 
 ---
 
 ## Versioning
 
-- All `@lumen/*` packages linked → single version bumps across the board.
+- All `@arshad-shah/cynosure-*` packages linked → single version bumps across the board.
 - Breaking change → major bump → migration guide required.
 - Additive change → minor bump.
 - Bug fix → patch bump.

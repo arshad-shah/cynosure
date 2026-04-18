@@ -1,6 +1,6 @@
 import { readdirSync } from 'node:fs';
 import { join } from 'node:path';
-import { createConfig } from '@lumen/config/tsup.config.base';
+import { createConfig } from '@arshad-shah/cynosure-config/tsup.config.base';
 import { vanillaExtractPlugin } from '@vanilla-extract/esbuild-plugin';
 
 const hookEntries = (): Record<string, string> => {

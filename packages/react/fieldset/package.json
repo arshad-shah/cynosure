@@ -1,5 +1,5 @@
 {
-  "name": "@lumen/react/fieldset",
+  "name": "@arshad-shah/cynosure-react/fieldset",
   "private": true,
   "type": "module",
   "main": "../dist/fieldset.js",

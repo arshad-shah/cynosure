@@ -291,7 +291,7 @@ export const AsChild: Story = {
         borderStyle="solid"
         borderColor="border.default"
       >
-        <a href="https://lumen.dev">asChild &lt;a&gt;</a>
+        <a href="https://cynosure.dev">asChild &lt;a&gt;</a>
       </Box>
     </Stack>
   ),

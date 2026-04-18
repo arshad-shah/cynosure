@@ -1,11 +1,11 @@
 import { type ReactNode, useEffect, useState } from 'react';
 import { Portal } from '../../primitives/Portal.js';
 
-const DEFAULT_ID = 'lumen-portal';
+const DEFAULT_ID = 'cynosure-portal';
 
 /**
- * Thin wrapper around Lumen's `Portal` that lazily mounts a default
- * `#lumen-portal` container. Every overlay in Phase 09 uses its own
+ * Thin wrapper around Cynosure's `Portal` that lazily mounts a default
+ * `#cynosure-portal` container. Every overlay in Phase 09 uses its own
  * primitive's portal by default (Radix provides one), but consumers that
  * build custom overlays can reuse this to keep all portalled content
  * under a single, inspectable DOM node.

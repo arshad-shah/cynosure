@@ -18,8 +18,8 @@ pnpm add react-hook-form zod @hookform/resolvers
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Form, Input, Button, Stack } from '@lumen/react';
-import { RHFField } from '@lumen/react/rhf';
+import { Form, Input, Button, Stack } from '@arshad-shah/cynosure-react';
+import { RHFField } from '@arshad-shah/cynosure-react/rhf';
 
 const schema = z.object({
   email: z.string().min(1, 'Email is required').email('Must be a valid email'),

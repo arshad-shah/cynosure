@@ -1,5 +1,5 @@
 {
-  "name": "@lumen/react/spinner",
+  "name": "@arshad-shah/cynosure-react/spinner",
   "private": true,
   "type": "module",
   "main": "../dist/spinner.js",

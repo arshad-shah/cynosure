@@ -19,14 +19,14 @@ describe('Breadcrumb', () => {
           <BreadcrumbLink href="/projects">Projects</BreadcrumbLink>
         </BreadcrumbItem>
         <BreadcrumbItem isCurrent>
-          <BreadcrumbPage>Lumen</BreadcrumbPage>
+          <BreadcrumbPage>Cynosure</BreadcrumbPage>
         </BreadcrumbItem>
       </Breadcrumb>,
     );
     const nav = screen.getByRole('navigation', { name: 'Breadcrumb' });
     // separators are role="presentation" so only real items show up as listitems
     expect(within(nav).getAllByRole('listitem')).toHaveLength(3);
-    expect(within(nav).getByText('Lumen').closest('li')).toHaveAttribute('aria-current', 'page');
+    expect(within(nav).getByText('Cynosure').closest('li')).toHaveAttribute('aria-current', 'page');
   });
 
   it('collapses middle items when maxItems is exceeded', () => {
@@ -45,17 +45,17 @@ describe('Breadcrumb', () => {
           <BreadcrumbLink href="/c">C</BreadcrumbLink>
         </BreadcrumbItem>
         <BreadcrumbItem isCurrent>
-          <BreadcrumbPage>Lumen</BreadcrumbPage>
+          <BreadcrumbPage>Cynosure</BreadcrumbPage>
         </BreadcrumbItem>
       </Breadcrumb>,
     );
-    // Home + ellipsis placeholder + Lumen should remain.
+    // Home + ellipsis placeholder + Cynosure should remain.
     expect(screen.getByRole('link', { name: 'Home' })).toBeInTheDocument();
     expect(screen.queryByRole('link', { name: 'A' })).not.toBeInTheDocument();
     expect(screen.queryByRole('link', { name: 'B' })).not.toBeInTheDocument();
     expect(screen.queryByRole('link', { name: 'C' })).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Show more' })).toBeInTheDocument();
-    expect(screen.getByText('Lumen')).toBeInTheDocument();
+    expect(screen.getByText('Cynosure')).toBeInTheDocument();
   });
 
   it('renders BreadcrumbEllipsis standalone with an accessible label', () => {

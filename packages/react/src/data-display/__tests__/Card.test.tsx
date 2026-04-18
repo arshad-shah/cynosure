@@ -16,14 +16,14 @@ describe('Card', () => {
       <Card orientation="horizontal" variant="elevated" interactive>
         <CardImage src="/hero.jpg" alt="Hero" />
         <CardHeader>
-          <CardTitle>Lumen</CardTitle>
+          <CardTitle>Cynosure</CardTitle>
           <CardDescription>Tiny library</CardDescription>
         </CardHeader>
         <CardBody>body</CardBody>
         <CardFooter>footer</CardFooter>
       </Card>,
     );
-    const card = screen.getByRole('heading', { name: 'Lumen' }).closest('div[data-orientation]');
+    const card = screen.getByRole('heading', { name: 'Cynosure' }).closest('div[data-orientation]');
     expect(card).toHaveAttribute('data-orientation', 'horizontal');
     expect(card).toHaveAttribute('data-interactive', 'true');
     expect(screen.getByText('Tiny library')).toBeInTheDocument();

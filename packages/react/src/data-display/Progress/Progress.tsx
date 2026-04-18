@@ -132,11 +132,11 @@ export interface ProgressCircleProps extends Omit<HTMLAttributes<HTMLDivElement>
 }
 
 const circleColorStroke: Record<ProgressColorScheme, string> = {
-  accent: 'var(--lumen-color-accent-solid)',
-  success: 'var(--lumen-color-feedback-success-solid)',
-  warning: 'var(--lumen-color-feedback-warning-solid)',
-  danger: 'var(--lumen-color-feedback-danger-solid)',
-  neutral: 'var(--lumen-color-foreground-muted)',
+  accent: 'var(--cynosure-color-accent-solid)',
+  success: 'var(--cynosure-color-feedback-success-solid)',
+  warning: 'var(--cynosure-color-feedback-warning-solid)',
+  danger: 'var(--cynosure-color-feedback-danger-solid)',
+  neutral: 'var(--cynosure-color-foreground-muted)',
 };
 
 export const ProgressCircle = forwardRef<HTMLDivElement, ProgressCircleProps>(

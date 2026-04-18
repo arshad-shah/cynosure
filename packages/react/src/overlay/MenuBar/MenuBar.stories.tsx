@@ -58,7 +58,7 @@ export const DesktopApp: Story = {
                   <MenuBarSubTrigger>Open recent</MenuBarSubTrigger>
                   <MenuBarSubContent>
                     <MenuBarItem>Q4 planning.md</MenuBarItem>
-                    <MenuBarItem>lumen-app/README.md</MenuBarItem>
+                    <MenuBarItem>cynosure-app/README.md</MenuBarItem>
                     <MenuBarItem>notes.md</MenuBarItem>
                     <MenuBarSeparator />
                     <MenuBarItem>Clear recent</MenuBarItem>
@@ -135,7 +135,7 @@ export const DesktopApp: Story = {
                 <MenuBarItem>Documentation</MenuBarItem>
                 <MenuBarItem>Keyboard shortcuts</MenuBarItem>
                 <MenuBarSeparator />
-                <MenuBarItem>About Lumen</MenuBarItem>
+                <MenuBarItem>About Cynosure</MenuBarItem>
               </MenuBarContent>
             </MenuBarMenu>
           </MenuBar>

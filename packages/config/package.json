@@ -1,8 +1,8 @@
 {
-  "name": "@lumen/config",
+  "name": "@arshad-shah/cynosure-config",
   "version": "0.0.0",
   "private": true,
-  "description": "Lumen UI — shared tooling presets (internal, not published)",
+  "description": "Cynosure UI — shared tooling presets (internal, not published)",
   "license": "MIT",
   "type": "module",
   "exports": {

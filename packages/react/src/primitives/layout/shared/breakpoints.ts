@@ -1,5 +1,5 @@
 /**
- * Breakpoint tokens mirrored from `@lumen/tokens/breakpoints`. Kept in sync
+ * Breakpoint tokens mirrored from `@arshad-shah/cynosure-tokens/breakpoints`. Kept in sync
  * with the token definitions. These are the only breakpoints the layout
  * primitives honour. Order matters — `BREAKPOINTS` is consumed in mobile-first
  * order by the responsive utility.

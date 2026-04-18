@@ -1,5 +1,5 @@
 {
-  "name": "@lumen/react/feedback",
+  "name": "@arshad-shah/cynosure-react/feedback",
   "private": true,
   "type": "module",
   "main": "../dist/feedback/index.js",

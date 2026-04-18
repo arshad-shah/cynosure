@@ -48,8 +48,8 @@ export const menuItem = style({
   userSelect: 'none',
   color: vars.color.foreground.default,
   outline: 'none',
-  fontSize: 'var(--lumen-font-body-md-size)',
-  lineHeight: 'var(--lumen-font-body-md-line-height)',
+  fontSize: 'var(--cynosure-font-body-md-size)',
+  lineHeight: 'var(--cynosure-font-body-md-line-height)',
   selectors: {
     '&[data-highlighted]': {
       background: vars.color.accent.soft,
@@ -96,7 +96,7 @@ export const menuLabel = style({
   paddingInline: vars.space['2'],
   paddingBlock: vars.space['1'],
   paddingInlineStart: vars.space['6'],
-  fontSize: 'var(--lumen-font-body-sm-size)',
+  fontSize: 'var(--cynosure-font-body-sm-size)',
   fontWeight: 600,
   color: vars.color.foreground.muted,
   textTransform: 'uppercase',
@@ -107,7 +107,7 @@ export const menuLabel = style({
 export const menuShortcut = style({
   marginInlineStart: 'auto',
   paddingInlineStart: vars.space['4'],
-  fontSize: 'var(--lumen-font-body-sm-size)',
+  fontSize: 'var(--cynosure-font-body-sm-size)',
   color: vars.color.foreground.muted,
   fontVariantNumeric: 'tabular-nums',
 });
@@ -135,8 +135,8 @@ export const menubarTrigger = style({
   background: 'transparent',
   color: vars.color.foreground.default,
   borderRadius: vars.radius.sm,
-  fontSize: 'var(--lumen-font-body-sm-size)',
-  fontFamily: 'var(--lumen-font-body-md-family)',
+  fontSize: 'var(--cynosure-font-body-sm-size)',
+  fontFamily: 'var(--cynosure-font-body-md-family)',
   fontWeight: 500,
   cursor: 'pointer',
   outline: 'none',

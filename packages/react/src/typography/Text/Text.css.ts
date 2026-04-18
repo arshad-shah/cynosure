@@ -18,12 +18,12 @@ const cascade = (base: string, bps: string[]): string => {
  * so the component never has to know which breakpoints the caller set.
  */
 const propsAt = (bps: string[]): Record<string, string> => ({
-  fontSize: cascade('lumen-text-size', bps),
-  fontFamily: cascade('lumen-text-family', bps),
-  lineHeight: cascade('lumen-text-lh', bps),
-  letterSpacing: cascade('lumen-text-ls', bps),
-  fontWeight: cascade('lumen-text-weight', bps),
-  textAlign: cascade('lumen-text-align', bps),
+  fontSize: cascade('cynosure-text-size', bps),
+  fontFamily: cascade('cynosure-text-family', bps),
+  lineHeight: cascade('cynosure-text-lh', bps),
+  letterSpacing: cascade('cynosure-text-ls', bps),
+  fontWeight: cascade('cynosure-text-weight', bps),
+  textAlign: cascade('cynosure-text-align', bps),
 });
 
 export const text = style([

@@ -1,5 +1,5 @@
 {
-  "name": "@lumen/react/modal",
+  "name": "@arshad-shah/cynosure-react/modal",
   "private": true,
   "type": "module",
   "main": "../dist/modal.js",

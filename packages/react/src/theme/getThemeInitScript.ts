@@ -5,7 +5,7 @@ export interface ThemeInitScriptOptions {
   themes?: readonly string[];
   /** Storage backend. Defaults to "localStorage". Pass null to skip persistence. */
   storage?: 'localStorage' | 'sessionStorage' | null;
-  /** Persistence key. Defaults to "lumen-theme". */
+  /** Persistence key. Defaults to "cynosure-theme". */
   storageKey?: string;
   /** Attribute used for the theme selector. Defaults to "data-theme". */
   attribute?: `data-${string}`;
@@ -28,7 +28,7 @@ export function getThemeInitScript(options: ThemeInitScriptOptions = {}): string
     defaultTheme = 'system',
     themes,
     storage = 'localStorage',
-    storageKey = 'lumen-theme',
+    storageKey = 'cynosure-theme',
     attribute = 'data-theme',
     enableSystem = true,
   } = options;

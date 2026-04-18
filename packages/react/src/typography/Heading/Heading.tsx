@@ -30,70 +30,70 @@ export type HeadingAlign = 'start' | 'center' | 'end';
  * size="xs">`) and still keep semantic hierarchy intact.
  */
 const HEADING_FAMILY = {
-  xs: 'var(--lumen-font-body-xs-family)',
-  sm: 'var(--lumen-font-body-sm-family)',
-  md: 'var(--lumen-font-body-md-family)',
-  lg: 'var(--lumen-font-heading-6-family)',
-  xl: 'var(--lumen-font-heading-5-family)',
-  '2xl': 'var(--lumen-font-heading-4-family)',
-  '3xl': 'var(--lumen-font-heading-3-family)',
-  '4xl': 'var(--lumen-font-heading-2-family)',
-  '5xl': 'var(--lumen-font-heading-1-family)',
+  xs: 'var(--cynosure-font-body-xs-family)',
+  sm: 'var(--cynosure-font-body-sm-family)',
+  md: 'var(--cynosure-font-body-md-family)',
+  lg: 'var(--cynosure-font-heading-6-family)',
+  xl: 'var(--cynosure-font-heading-5-family)',
+  '2xl': 'var(--cynosure-font-heading-4-family)',
+  '3xl': 'var(--cynosure-font-heading-3-family)',
+  '4xl': 'var(--cynosure-font-heading-2-family)',
+  '5xl': 'var(--cynosure-font-heading-1-family)',
 } as const satisfies Record<HeadingSize, string>;
 
 const HEADING_SIZE = {
-  xs: 'var(--lumen-font-body-xs-size)',
-  sm: 'var(--lumen-font-body-sm-size)',
-  md: 'var(--lumen-font-body-md-size)',
-  lg: 'var(--lumen-font-heading-6-size)',
-  xl: 'var(--lumen-font-heading-5-size)',
-  '2xl': 'var(--lumen-font-heading-4-size)',
-  '3xl': 'var(--lumen-font-heading-3-size)',
-  '4xl': 'var(--lumen-font-heading-2-size)',
-  '5xl': 'var(--lumen-font-heading-1-size)',
+  xs: 'var(--cynosure-font-body-xs-size)',
+  sm: 'var(--cynosure-font-body-sm-size)',
+  md: 'var(--cynosure-font-body-md-size)',
+  lg: 'var(--cynosure-font-heading-6-size)',
+  xl: 'var(--cynosure-font-heading-5-size)',
+  '2xl': 'var(--cynosure-font-heading-4-size)',
+  '3xl': 'var(--cynosure-font-heading-3-size)',
+  '4xl': 'var(--cynosure-font-heading-2-size)',
+  '5xl': 'var(--cynosure-font-heading-1-size)',
 } as const satisfies Record<HeadingSize, string>;
 
 const HEADING_LINE_HEIGHT = {
-  xs: 'var(--lumen-font-body-xs-line-height)',
-  sm: 'var(--lumen-font-body-sm-line-height)',
-  md: 'var(--lumen-font-body-md-line-height)',
-  lg: 'var(--lumen-font-heading-6-line-height)',
-  xl: 'var(--lumen-font-heading-5-line-height)',
-  '2xl': 'var(--lumen-font-heading-4-line-height)',
-  '3xl': 'var(--lumen-font-heading-3-line-height)',
-  '4xl': 'var(--lumen-font-heading-2-line-height)',
-  '5xl': 'var(--lumen-font-heading-1-line-height)',
+  xs: 'var(--cynosure-font-body-xs-line-height)',
+  sm: 'var(--cynosure-font-body-sm-line-height)',
+  md: 'var(--cynosure-font-body-md-line-height)',
+  lg: 'var(--cynosure-font-heading-6-line-height)',
+  xl: 'var(--cynosure-font-heading-5-line-height)',
+  '2xl': 'var(--cynosure-font-heading-4-line-height)',
+  '3xl': 'var(--cynosure-font-heading-3-line-height)',
+  '4xl': 'var(--cynosure-font-heading-2-line-height)',
+  '5xl': 'var(--cynosure-font-heading-1-line-height)',
 } as const satisfies Record<HeadingSize, string>;
 
 const HEADING_LETTER_SPACING = {
-  xs: 'var(--lumen-letter-spacing-normal)',
-  sm: 'var(--lumen-letter-spacing-normal)',
-  md: 'var(--lumen-letter-spacing-normal)',
-  lg: 'var(--lumen-font-heading-6-letter-spacing)',
-  xl: 'var(--lumen-font-heading-5-letter-spacing)',
-  '2xl': 'var(--lumen-font-heading-4-letter-spacing)',
-  '3xl': 'var(--lumen-font-heading-3-letter-spacing)',
-  '4xl': 'var(--lumen-font-heading-2-letter-spacing)',
-  '5xl': 'var(--lumen-font-heading-1-letter-spacing)',
+  xs: 'var(--cynosure-letter-spacing-normal)',
+  sm: 'var(--cynosure-letter-spacing-normal)',
+  md: 'var(--cynosure-letter-spacing-normal)',
+  lg: 'var(--cynosure-font-heading-6-letter-spacing)',
+  xl: 'var(--cynosure-font-heading-5-letter-spacing)',
+  '2xl': 'var(--cynosure-font-heading-4-letter-spacing)',
+  '3xl': 'var(--cynosure-font-heading-3-letter-spacing)',
+  '4xl': 'var(--cynosure-font-heading-2-letter-spacing)',
+  '5xl': 'var(--cynosure-font-heading-1-letter-spacing)',
 } as const satisfies Record<HeadingSize, string>;
 
 const HEADING_WEIGHT_DEFAULT = {
-  xs: 'var(--lumen-font-weight-regular)',
-  sm: 'var(--lumen-font-weight-regular)',
-  md: 'var(--lumen-font-weight-regular)',
-  lg: 'var(--lumen-font-heading-6-weight)',
-  xl: 'var(--lumen-font-heading-5-weight)',
-  '2xl': 'var(--lumen-font-heading-4-weight)',
-  '3xl': 'var(--lumen-font-heading-3-weight)',
-  '4xl': 'var(--lumen-font-heading-2-weight)',
-  '5xl': 'var(--lumen-font-heading-1-weight)',
+  xs: 'var(--cynosure-font-weight-regular)',
+  sm: 'var(--cynosure-font-weight-regular)',
+  md: 'var(--cynosure-font-weight-regular)',
+  lg: 'var(--cynosure-font-heading-6-weight)',
+  xl: 'var(--cynosure-font-heading-5-weight)',
+  '2xl': 'var(--cynosure-font-heading-4-weight)',
+  '3xl': 'var(--cynosure-font-heading-3-weight)',
+  '4xl': 'var(--cynosure-font-heading-2-weight)',
+  '5xl': 'var(--cynosure-font-heading-1-weight)',
 } as const satisfies Record<HeadingSize, string>;
 
 const WEIGHT_OVERRIDE: Record<HeadingWeight, string> = {
-  regular: 'var(--lumen-font-weight-regular)',
-  medium: 'var(--lumen-font-weight-medium)',
-  semibold: 'var(--lumen-font-weight-semibold)',
-  bold: 'var(--lumen-font-weight-bold)',
+  regular: 'var(--cynosure-font-weight-regular)',
+  medium: 'var(--cynosure-font-weight-medium)',
+  semibold: 'var(--cynosure-font-weight-semibold)',
+  bold: 'var(--cynosure-font-weight-bold)',
 };
 
 const ALIGN_VALUE: Record<HeadingAlign, string> = {
@@ -136,15 +136,15 @@ const HeadingRender = (props: AnyProps, ref: ForwardedRef<HTMLHeadingElement>): 
   const resolvedSize = size ?? HEADING_LEVEL_DEFAULT_SIZE[level];
 
   const headingStyle = mergeStyles(
-    toResponsiveVars(resolvedSize, 'lumen-heading-family', (v) => HEADING_FAMILY[v]),
-    toResponsiveVars(resolvedSize, 'lumen-heading-size', (v) => HEADING_SIZE[v]),
-    toResponsiveVars(resolvedSize, 'lumen-heading-lh', (v) => HEADING_LINE_HEIGHT[v]),
-    toResponsiveVars(resolvedSize, 'lumen-heading-ls', (v) => HEADING_LETTER_SPACING[v]),
+    toResponsiveVars(resolvedSize, 'cynosure-heading-family', (v) => HEADING_FAMILY[v]),
+    toResponsiveVars(resolvedSize, 'cynosure-heading-size', (v) => HEADING_SIZE[v]),
+    toResponsiveVars(resolvedSize, 'cynosure-heading-lh', (v) => HEADING_LINE_HEIGHT[v]),
+    toResponsiveVars(resolvedSize, 'cynosure-heading-ls', (v) => HEADING_LETTER_SPACING[v]),
     // Default weight comes from the heading token; an explicit `weight` prop
     // overrides it at the same breakpoint via the same cascade variable.
-    toResponsiveVars(resolvedSize, 'lumen-heading-weight', (v) => HEADING_WEIGHT_DEFAULT[v]),
-    toResponsiveVars(weight, 'lumen-heading-weight', (v) => WEIGHT_OVERRIDE[v]),
-    toResponsiveVars(align, 'lumen-heading-align', (v) => ALIGN_VALUE[v]),
+    toResponsiveVars(resolvedSize, 'cynosure-heading-weight', (v) => HEADING_WEIGHT_DEFAULT[v]),
+    toResponsiveVars(weight, 'cynosure-heading-weight', (v) => WEIGHT_OVERRIDE[v]),
+    toResponsiveVars(align, 'cynosure-heading-align', (v) => ALIGN_VALUE[v]),
     typographyInlineStyle({ truncate }),
     style,
   );

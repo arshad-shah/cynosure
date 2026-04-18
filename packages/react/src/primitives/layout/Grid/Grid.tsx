@@ -85,17 +85,17 @@ const GridRender = (props: AnyProps, ref: ForwardedRef<Element>): ReactElement =
   const rowsValue = templateRows ?? (rows !== undefined ? rows : undefined);
 
   const gridStyle = mergeStyles(
-    toResponsiveVars(colsValue, 'lumen-grid-cols', (v) =>
+    toResponsiveVars(colsValue, 'cynosure-grid-cols', (v) =>
       typeof v === 'number' ? columnsTemplate(v) : (v as string),
     ),
-    toResponsiveVars(rowsValue, 'lumen-grid-rows', (v) =>
+    toResponsiveVars(rowsValue, 'cynosure-grid-rows', (v) =>
       typeof v === 'number' ? rowsTemplate(v) : (v as string),
     ),
-    toResponsiveVars(gap, 'lumen-grid-gap', (v) => resolveSpace(v)),
-    toResponsiveVars(columnGap, 'lumen-grid-col-gap', (v) => resolveSpace(v)),
-    toResponsiveVars(rowGap, 'lumen-grid-row-gap', (v) => resolveSpace(v)),
-    toResponsiveVars(align, 'lumen-grid-align', (v) => ALIGN_MAP[v]),
-    toResponsiveVars(justify, 'lumen-grid-justify', (v) => ALIGN_MAP[v]),
+    toResponsiveVars(gap, 'cynosure-grid-gap', (v) => resolveSpace(v)),
+    toResponsiveVars(columnGap, 'cynosure-grid-col-gap', (v) => resolveSpace(v)),
+    toResponsiveVars(rowGap, 'cynosure-grid-row-gap', (v) => resolveSpace(v)),
+    toResponsiveVars(align, 'cynosure-grid-align', (v) => ALIGN_MAP[v]),
+    toResponsiveVars(justify, 'cynosure-grid-justify', (v) => ALIGN_MAP[v]),
   );
   const mergedStyle = mergeStyles(layoutStyle, gridStyle, style);
 

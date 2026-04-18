@@ -42,62 +42,62 @@ export const lineClamp = style({
   overflow: 'hidden',
   display: '-webkit-box',
   WebkitBoxOrient: 'vertical',
-  WebkitLineClamp: 'var(--lumen-typography-line-clamp, 1)',
+  WebkitLineClamp: 'var(--cynosure-typography-line-clamp, 1)',
 });
 
 export const italicClass = style({ fontStyle: 'italic' });
 
 /**
  * Decoration stack. `textDecorationLine` is set separately so underline +
- * strikethrough can coexist; colour is driven by `--lumen-typography-decoration-color`.
+ * strikethrough can coexist; colour is driven by `--cynosure-typography-decoration-color`.
  */
 export const underlineClass = style({
   textDecorationLine: 'underline',
-  textDecorationColor: 'var(--lumen-typography-decoration-color, currentColor)',
+  textDecorationColor: 'var(--cynosure-typography-decoration-color, currentColor)',
   textUnderlineOffset: '0.15em',
 });
 
 export const strikethroughClass = style({
   textDecorationLine: 'line-through',
-  textDecorationColor: 'var(--lumen-typography-decoration-color, currentColor)',
+  textDecorationColor: 'var(--cynosure-typography-decoration-color, currentColor)',
 });
 
 export const underlineAndStrikethrough = style({
   textDecorationLine: 'underline line-through',
-  textDecorationColor: 'var(--lumen-typography-decoration-color, currentColor)',
+  textDecorationColor: 'var(--cynosure-typography-decoration-color, currentColor)',
   textUnderlineOffset: '0.15em',
 });
 
 /**
  * Body size variants driven by the semantic `font.body.*` composite tokens.
- * The composites expand to flat custom properties in `@lumen/tokens/css`, so
+ * The composites expand to flat custom properties in `@arshad-shah/cynosure-tokens/css`, so
  * we reference them directly here rather than duplicating sizes/weights.
  */
 export const bodySize = styleVariants({
   xs: {
-    fontFamily: 'var(--lumen-font-body-xs-family)',
-    fontSize: 'var(--lumen-font-body-xs-size)',
-    lineHeight: 'var(--lumen-font-body-xs-line-height)',
+    fontFamily: 'var(--cynosure-font-body-xs-family)',
+    fontSize: 'var(--cynosure-font-body-xs-size)',
+    lineHeight: 'var(--cynosure-font-body-xs-line-height)',
   },
   sm: {
-    fontFamily: 'var(--lumen-font-body-sm-family)',
-    fontSize: 'var(--lumen-font-body-sm-size)',
-    lineHeight: 'var(--lumen-font-body-sm-line-height)',
+    fontFamily: 'var(--cynosure-font-body-sm-family)',
+    fontSize: 'var(--cynosure-font-body-sm-size)',
+    lineHeight: 'var(--cynosure-font-body-sm-line-height)',
   },
   md: {
-    fontFamily: 'var(--lumen-font-body-md-family)',
-    fontSize: 'var(--lumen-font-body-md-size)',
-    lineHeight: 'var(--lumen-font-body-md-line-height)',
+    fontFamily: 'var(--cynosure-font-body-md-family)',
+    fontSize: 'var(--cynosure-font-body-md-size)',
+    lineHeight: 'var(--cynosure-font-body-md-line-height)',
   },
   lg: {
-    fontFamily: 'var(--lumen-font-body-lg-family)',
-    fontSize: 'var(--lumen-font-body-lg-size)',
-    lineHeight: 'var(--lumen-font-body-lg-line-height)',
+    fontFamily: 'var(--cynosure-font-body-lg-family)',
+    fontSize: 'var(--cynosure-font-body-lg-size)',
+    lineHeight: 'var(--cynosure-font-body-lg-line-height)',
   },
   xl: {
-    fontFamily: 'var(--lumen-font-body-lg-family)',
-    fontSize: 'var(--lumen-font-font-size-xl, var(--lumen-font-size-xl))',
-    lineHeight: 'var(--lumen-font-body-lg-line-height)',
+    fontFamily: 'var(--cynosure-font-body-lg-family)',
+    fontSize: 'var(--cynosure-font-font-size-xl, var(--cynosure-font-size-xl))',
+    lineHeight: 'var(--cynosure-font-body-lg-line-height)',
   },
 });
 
@@ -107,10 +107,10 @@ export type BodySize = keyof typeof bodySize;
  * Overrides applied per font-weight token. Keeps weight orthogonal to size.
  */
 export const weightClass = styleVariants({
-  regular: { fontWeight: 'var(--lumen-font-weight-regular)' },
-  medium: { fontWeight: 'var(--lumen-font-weight-medium)' },
-  semibold: { fontWeight: 'var(--lumen-font-weight-semibold)' },
-  bold: { fontWeight: 'var(--lumen-font-weight-bold)' },
+  regular: { fontWeight: 'var(--cynosure-font-weight-regular)' },
+  medium: { fontWeight: 'var(--cynosure-font-weight-medium)' },
+  semibold: { fontWeight: 'var(--cynosure-font-weight-semibold)' },
+  bold: { fontWeight: 'var(--cynosure-font-weight-bold)' },
 });
 
 export type WeightVariant = keyof typeof weightClass;
@@ -124,18 +124,18 @@ export const textVariant = styleVariants({
   body: {},
   caption: {
     color: vars.color.foreground.muted,
-    letterSpacing: 'var(--lumen-letter-spacing-normal)',
+    letterSpacing: 'var(--cynosure-letter-spacing-normal)',
   },
   overline: {
     textTransform: 'uppercase',
-    letterSpacing: 'var(--lumen-letter-spacing-wide)',
-    fontWeight: 'var(--lumen-font-weight-semibold)',
+    letterSpacing: 'var(--cynosure-letter-spacing-wide)',
+    fontWeight: 'var(--cynosure-font-weight-semibold)',
     color: vars.color.foreground.muted,
   },
   lead: {
     color: vars.color.foreground.muted,
-    fontWeight: 'var(--lumen-font-weight-regular)',
-    lineHeight: 'var(--lumen-line-height-relaxed)',
+    fontWeight: 'var(--cynosure-font-weight-regular)',
+    lineHeight: 'var(--cynosure-line-height-relaxed)',
   },
 });
 
@@ -148,61 +148,61 @@ export type TextVariant = keyof typeof textVariant;
  */
 export const headingSize = styleVariants({
   xs: {
-    fontFamily: 'var(--lumen-font-body-xs-family)',
-    fontSize: 'var(--lumen-font-body-xs-size)',
-    lineHeight: 'var(--lumen-font-body-xs-line-height)',
+    fontFamily: 'var(--cynosure-font-body-xs-family)',
+    fontSize: 'var(--cynosure-font-body-xs-size)',
+    lineHeight: 'var(--cynosure-font-body-xs-line-height)',
   },
   sm: {
-    fontFamily: 'var(--lumen-font-body-sm-family)',
-    fontSize: 'var(--lumen-font-body-sm-size)',
-    lineHeight: 'var(--lumen-font-body-sm-line-height)',
+    fontFamily: 'var(--cynosure-font-body-sm-family)',
+    fontSize: 'var(--cynosure-font-body-sm-size)',
+    lineHeight: 'var(--cynosure-font-body-sm-line-height)',
   },
   md: {
-    fontFamily: 'var(--lumen-font-body-md-family)',
-    fontSize: 'var(--lumen-font-body-md-size)',
-    lineHeight: 'var(--lumen-font-body-md-line-height)',
+    fontFamily: 'var(--cynosure-font-body-md-family)',
+    fontSize: 'var(--cynosure-font-body-md-size)',
+    lineHeight: 'var(--cynosure-font-body-md-line-height)',
   },
   lg: {
-    fontFamily: 'var(--lumen-font-heading-6-family)',
-    fontSize: 'var(--lumen-font-heading-6-size)',
-    lineHeight: 'var(--lumen-font-heading-6-line-height)',
-    fontWeight: 'var(--lumen-font-heading-6-weight)',
-    letterSpacing: 'var(--lumen-font-heading-6-letter-spacing)',
+    fontFamily: 'var(--cynosure-font-heading-6-family)',
+    fontSize: 'var(--cynosure-font-heading-6-size)',
+    lineHeight: 'var(--cynosure-font-heading-6-line-height)',
+    fontWeight: 'var(--cynosure-font-heading-6-weight)',
+    letterSpacing: 'var(--cynosure-font-heading-6-letter-spacing)',
   },
   xl: {
-    fontFamily: 'var(--lumen-font-heading-5-family)',
-    fontSize: 'var(--lumen-font-heading-5-size)',
-    lineHeight: 'var(--lumen-font-heading-5-line-height)',
-    fontWeight: 'var(--lumen-font-heading-5-weight)',
-    letterSpacing: 'var(--lumen-font-heading-5-letter-spacing)',
+    fontFamily: 'var(--cynosure-font-heading-5-family)',
+    fontSize: 'var(--cynosure-font-heading-5-size)',
+    lineHeight: 'var(--cynosure-font-heading-5-line-height)',
+    fontWeight: 'var(--cynosure-font-heading-5-weight)',
+    letterSpacing: 'var(--cynosure-font-heading-5-letter-spacing)',
   },
   '2xl': {
-    fontFamily: 'var(--lumen-font-heading-4-family)',
-    fontSize: 'var(--lumen-font-heading-4-size)',
-    lineHeight: 'var(--lumen-font-heading-4-line-height)',
-    fontWeight: 'var(--lumen-font-heading-4-weight)',
-    letterSpacing: 'var(--lumen-font-heading-4-letter-spacing)',
+    fontFamily: 'var(--cynosure-font-heading-4-family)',
+    fontSize: 'var(--cynosure-font-heading-4-size)',
+    lineHeight: 'var(--cynosure-font-heading-4-line-height)',
+    fontWeight: 'var(--cynosure-font-heading-4-weight)',
+    letterSpacing: 'var(--cynosure-font-heading-4-letter-spacing)',
   },
   '3xl': {
-    fontFamily: 'var(--lumen-font-heading-3-family)',
-    fontSize: 'var(--lumen-font-heading-3-size)',
-    lineHeight: 'var(--lumen-font-heading-3-line-height)',
-    fontWeight: 'var(--lumen-font-heading-3-weight)',
-    letterSpacing: 'var(--lumen-font-heading-3-letter-spacing)',
+    fontFamily: 'var(--cynosure-font-heading-3-family)',
+    fontSize: 'var(--cynosure-font-heading-3-size)',
+    lineHeight: 'var(--cynosure-font-heading-3-line-height)',
+    fontWeight: 'var(--cynosure-font-heading-3-weight)',
+    letterSpacing: 'var(--cynosure-font-heading-3-letter-spacing)',
   },
   '4xl': {
-    fontFamily: 'var(--lumen-font-heading-2-family)',
-    fontSize: 'var(--lumen-font-heading-2-size)',
-    lineHeight: 'var(--lumen-font-heading-2-line-height)',
-    fontWeight: 'var(--lumen-font-heading-2-weight)',
-    letterSpacing: 'var(--lumen-font-heading-2-letter-spacing)',
+    fontFamily: 'var(--cynosure-font-heading-2-family)',
+    fontSize: 'var(--cynosure-font-heading-2-size)',
+    lineHeight: 'var(--cynosure-font-heading-2-line-height)',
+    fontWeight: 'var(--cynosure-font-heading-2-weight)',
+    letterSpacing: 'var(--cynosure-font-heading-2-letter-spacing)',
   },
   '5xl': {
-    fontFamily: 'var(--lumen-font-heading-1-family)',
-    fontSize: 'var(--lumen-font-heading-1-size)',
-    lineHeight: 'var(--lumen-font-heading-1-line-height)',
-    fontWeight: 'var(--lumen-font-heading-1-weight)',
-    letterSpacing: 'var(--lumen-font-heading-1-letter-spacing)',
+    fontFamily: 'var(--cynosure-font-heading-1-family)',
+    fontSize: 'var(--cynosure-font-heading-1-size)',
+    lineHeight: 'var(--cynosure-font-heading-1-line-height)',
+    fontWeight: 'var(--cynosure-font-heading-1-weight)',
+    letterSpacing: 'var(--cynosure-font-heading-1-letter-spacing)',
   },
 });
 

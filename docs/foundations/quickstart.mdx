@@ -4,12 +4,12 @@ import { Meta } from '@storybook/addon-docs/blocks';
 
 # Quickstart
 
-A minimal end-to-end Lumen app.
+A minimal end-to-end Cynosure app.
 
 ## 1. Install
 
 ```bash
-pnpm add @lumen/react @lumen/tokens
+pnpm add @arshad-shah/cynosure-react @arshad-shah/cynosure-tokens
 ```
 
 ## 2. Wire the providers
@@ -26,10 +26,10 @@ import {
   DirectionProvider,
   ThemeProvider,
   TooltipProvider,
-} from '@lumen/react';
-import '@lumen/tokens/css';
-import '@lumen/tokens/css/dark';
-import '@lumen/react/styles.css';
+} from '@arshad-shah/cynosure-react';
+import '@arshad-shah/cynosure-tokens/css';
+import '@arshad-shah/cynosure-tokens/css/dark';
+import '@arshad-shah/cynosure-react/styles.css';
 import App from './App';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
@@ -57,12 +57,12 @@ import {
   Heading,
   Stack,
   Text,
-} from '@lumen/react';
+} from '@arshad-shah/cynosure-react';
 
 export default function App() {
   return (
     <Stack gap="6" padding="6" maxWidth="md" marginX="auto">
-      <Heading level={1}>Hello, Lumen</Heading>
+      <Heading level={1}>Hello, Cynosure</Heading>
       <Card>
         <CardHeader>
           <Heading level={2} size="lg">
@@ -71,7 +71,7 @@ export default function App() {
         </CardHeader>
         <CardContent>
           <Stack gap="3">
-            <Text>Lumen ships primitives that render real HTML and components that compose those primitives.</Text>
+            <Text>Cynosure ships primitives that render real HTML and components that compose those primitives.</Text>
             <Button>Primary action</Button>
           </Stack>
         </CardContent>
@@ -84,7 +84,7 @@ export default function App() {
 ## 4. Switch themes
 
 ```tsx
-import { useTheme } from '@lumen/react';
+import { useTheme } from '@arshad-shah/cynosure-react';
 
 function ThemeSwitcher() {
   const { theme, setTheme, themes } = useTheme();
@@ -110,7 +110,7 @@ import {
   FormMessage,
   Input,
   Stack,
-} from '@lumen/react';
+} from '@arshad-shah/cynosure-react';
 
 export function ContactForm() {
   return (

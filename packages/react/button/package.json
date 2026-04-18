@@ -1,5 +1,5 @@
 {
-  "name": "@lumen/react/button",
+  "name": "@arshad-shah/cynosure-react/button",
   "private": true,
   "type": "module",
   "main": "../dist/button.js",

@@ -21,7 +21,7 @@ export type ToasterPosition = SonnerToasterProps['position'];
 export type ToasterTheme = NonNullable<SonnerToasterProps['theme']>;
 
 export interface ToasterProps extends Omit<SonnerToasterProps, 'toastOptions'> {
-  /** Override `toastOptions` — merged with Lumen's token-derived class names. */
+  /** Override `toastOptions` — merged with Cynosure's token-derived class names. */
   toastOptions?: SonnerToasterProps['toastOptions'];
 }
 
@@ -46,27 +46,27 @@ export function Toaster({
       icons={DEFAULT_ICONS}
       style={
         {
-          '--normal-bg': 'var(--lumen-color-background-surface)',
-          '--normal-border': 'var(--lumen-color-border-default)',
-          '--normal-text': 'var(--lumen-color-foreground-default)',
-          '--gray1': 'var(--lumen-color-background-canvas)',
-          '--gray2': 'var(--lumen-color-background-surface)',
-          '--gray3': 'var(--lumen-color-background-raised)',
-          '--gray4': 'var(--lumen-color-border-subtle)',
-          '--gray5': 'var(--lumen-color-border-default)',
-          '--gray12': 'var(--lumen-color-foreground-default)',
-          '--success-bg': 'var(--lumen-color-feedback-success-soft)',
-          '--success-border': 'var(--lumen-color-feedback-success-border)',
-          '--success-text': 'var(--lumen-color-feedback-success-foreground)',
-          '--error-bg': 'var(--lumen-color-feedback-danger-soft)',
-          '--error-border': 'var(--lumen-color-feedback-danger-border)',
-          '--error-text': 'var(--lumen-color-feedback-danger-foreground)',
-          '--warning-bg': 'var(--lumen-color-feedback-warning-soft)',
-          '--warning-border': 'var(--lumen-color-feedback-warning-border)',
-          '--warning-text': 'var(--lumen-color-feedback-warning-foreground)',
-          '--info-bg': 'var(--lumen-color-feedback-info-soft)',
-          '--info-border': 'var(--lumen-color-feedback-info-border)',
-          '--info-text': 'var(--lumen-color-feedback-info-foreground)',
+          '--normal-bg': 'var(--cynosure-color-background-surface)',
+          '--normal-border': 'var(--cynosure-color-border-default)',
+          '--normal-text': 'var(--cynosure-color-foreground-default)',
+          '--gray1': 'var(--cynosure-color-background-canvas)',
+          '--gray2': 'var(--cynosure-color-background-surface)',
+          '--gray3': 'var(--cynosure-color-background-raised)',
+          '--gray4': 'var(--cynosure-color-border-subtle)',
+          '--gray5': 'var(--cynosure-color-border-default)',
+          '--gray12': 'var(--cynosure-color-foreground-default)',
+          '--success-bg': 'var(--cynosure-color-feedback-success-soft)',
+          '--success-border': 'var(--cynosure-color-feedback-success-border)',
+          '--success-text': 'var(--cynosure-color-feedback-success-foreground)',
+          '--error-bg': 'var(--cynosure-color-feedback-danger-soft)',
+          '--error-border': 'var(--cynosure-color-feedback-danger-border)',
+          '--error-text': 'var(--cynosure-color-feedback-danger-foreground)',
+          '--warning-bg': 'var(--cynosure-color-feedback-warning-soft)',
+          '--warning-border': 'var(--cynosure-color-feedback-warning-border)',
+          '--warning-text': 'var(--cynosure-color-feedback-warning-foreground)',
+          '--info-bg': 'var(--cynosure-color-feedback-info-soft)',
+          '--info-border': 'var(--cynosure-color-feedback-info-border)',
+          '--info-text': 'var(--cynosure-color-feedback-info-foreground)',
         } as React.CSSProperties
       }
       toastOptions={{

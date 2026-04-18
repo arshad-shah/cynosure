@@ -10,8 +10,8 @@ export const checkboxLabel = style({
   display: 'inline-flex',
   alignItems: 'center',
   gap: vars.space['2'],
-  fontSize: 'var(--lumen-font-body-md-size)',
-  lineHeight: 'var(--lumen-font-body-md-line-height)',
+  fontSize: 'var(--cynosure-font-body-md-size)',
+  lineHeight: 'var(--cynosure-font-body-md-line-height)',
   color: vars.color.foreground.default,
   cursor: 'pointer',
   selectors: {

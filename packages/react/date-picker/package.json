@@ -1,5 +1,5 @@
 {
-  "name": "@lumen/react/date-picker",
+  "name": "@arshad-shah/cynosure-react/date-picker",
   "private": true,
   "type": "module",
   "main": "../dist/datepicker.js",

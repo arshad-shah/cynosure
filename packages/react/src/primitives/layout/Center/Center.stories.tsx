@@ -185,9 +185,9 @@ export const AsChild: Story = {
   render: () => (
     <Center asChild minHeight="160px" background="bg.subtle" borderRadius="md">
       <a
-        href="https://lumen.dev"
+        href="https://cynosure.dev"
         style={{
-          color: 'var(--lumen-color-accent-solid)',
+          color: 'var(--cynosure-color-accent-solid)',
           textDecoration: 'none',
           fontWeight: 600,
         }}

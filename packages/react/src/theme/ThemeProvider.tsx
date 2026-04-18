@@ -60,7 +60,7 @@ export function ThemeProvider({
   themes = DEFAULT_THEMES,
   attribute = 'data-theme',
   storage = 'localStorage',
-  storageKey = 'lumen-theme',
+  storageKey = 'cynosure-theme',
   disableTransitionOnChange = false,
   enableSystem = true,
   nonce,

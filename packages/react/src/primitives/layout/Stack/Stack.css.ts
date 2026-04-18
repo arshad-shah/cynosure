@@ -12,9 +12,9 @@ const cascade = (base: string, bps: string[]): string => {
 };
 
 const propsAt = (bps: string[]): Record<string, string> => ({
-  gap: cascade('lumen-stack-gap', bps),
-  'align-items': cascade('lumen-stack-align', bps),
-  'justify-content': cascade('lumen-stack-justify', bps),
+  gap: cascade('cynosure-stack-gap', bps),
+  'align-items': cascade('cynosure-stack-align', bps),
+  'justify-content': cascade('cynosure-stack-justify', bps),
 });
 
 export const stack = style([

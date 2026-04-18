@@ -32,11 +32,11 @@
       "dependsOn": ["^build"],
       "outputs": []
     },
-    "@lumen/tokens#typecheck": {
+    "@arshad-shah/cynosure-tokens#typecheck": {
       "dependsOn": ["^build", "build:tokens"],
       "outputs": []
     },
-    "@lumen/tokens#build": {
+    "@arshad-shah/cynosure-tokens#build": {
       "dependsOn": ["^build", "build:tokens"],
       "outputs": ["dist/**"],
       "inputs": ["src/**", "package.json", "tsconfig.json", "tsup.config.ts"]

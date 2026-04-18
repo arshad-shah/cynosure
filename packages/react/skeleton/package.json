@@ -1,5 +1,5 @@
 {
-  "name": "@lumen/react/skeleton",
+  "name": "@arshad-shah/cynosure-react/skeleton",
   "private": true,
   "type": "module",
   "main": "../dist/skeleton.js",

@@ -1,5 +1,5 @@
 {
-  "name": "@lumen/react/kbd",
+  "name": "@arshad-shah/cynosure-react/kbd",
   "private": true,
   "type": "module",
   "main": "../dist/kbd.js",

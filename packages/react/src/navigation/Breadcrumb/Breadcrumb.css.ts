@@ -4,8 +4,8 @@ import { vars } from '../../styles/vars.css.js';
 export const breadcrumbRoot = style({
   display: 'block',
   color: vars.color.foreground.muted,
-  fontSize: 'var(--lumen-font-body-sm-size)',
-  lineHeight: 'var(--lumen-font-body-sm-line-height)',
+  fontSize: 'var(--cynosure-font-body-sm-size)',
+  lineHeight: 'var(--cynosure-font-body-sm-line-height)',
 });
 
 export const breadcrumbList = style({

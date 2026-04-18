@@ -1,5 +1,5 @@
 {
-  "name": "@lumen/react/checkbox-group",
+  "name": "@arshad-shah/cynosure-react/checkbox-group",
   "private": true,
   "type": "module",
   "main": "../dist/checkboxgroup.js",

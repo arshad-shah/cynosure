@@ -1,5 +1,5 @@
 {
-  "name": "@lumen/react/card",
+  "name": "@arshad-shah/cynosure-react/card",
   "private": true,
   "type": "module",
   "main": "../dist/card.js",

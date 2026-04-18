@@ -1,6 +1,6 @@
 # Phase 16 — v1.0.0 Release
 
-> **Goal:** Flip Lumen from `0.x` private development to public `1.0.0` on npm. Adopt it in one of Arshad's real projects as the proof point.
+> **Goal:** Flip Cynosure from `0.x` private development to public `1.0.0` on npm. Adopt it in one of Arshad's real projects as the proof point.
 
 **Depends on:** Phases 01–15.
 **Blocks:** Nothing — this is the finish line.
@@ -25,8 +25,8 @@
 ### Package health
 - [ ] `publint` clean on every published package.
 - [ ] `attw` clean on every published package (strict profile).
-- [ ] `pnpm pack` and install into a fresh test project; verify `import { Button } from '@lumen/react'` resolves types and runtime works.
-- [ ] Per-component entries work: `import { Button } from '@lumen/react/button'`.
+- [ ] `pnpm pack` and install into a fresh test project; verify `import { Button } from '@arshad-shah/cynosure-react'` resolves types and runtime works.
+- [ ] Per-component entries work: `import { Button } from '@arshad-shah/cynosure-react/button'`.
 - [ ] `peerDependencies` correct; no accidentally-bundled React.
 - [ ] `sideEffects` array points only to `**/*.css` files.
 
@@ -37,7 +37,7 @@
 
 ### Docs
 - [ ] Every component has an MDX page.
-- [ ] README at repo root and in `@lumen/react` are consumer-facing and accurate.
+- [ ] README at repo root and in `@arshad-shah/cynosure-react` are consumer-facing and accurate.
 - [ ] CHANGELOG populated from all changesets.
 - [ ] Migration guide from "nothing" to v1 published (even if trivial — say so).
 - [ ] LICENSE file (MIT).
@@ -55,7 +55,7 @@ Changesets defaults to "pre.0" style pre-releases. For the 1.0.0 cut:
 # Consume every outstanding changeset into final versions
 pnpm changeset version
 
-# Manually edit package.json in each @lumen/* package to set "version": "1.0.0"
+# Manually edit package.json in each @arshad-shah/cynosure-* package to set "version": "1.0.0"
 # (Changesets will have moved them to something like 0.1.0 by default)
 
 # Regenerate the lockfile
@@ -82,14 +82,14 @@ Or let the release workflow handle it:
 
 ### Pin strategy for linked packages
 
-Because `@lumen/*` are linked in the Changesets config, they all move to 1.0.0 together. This is the behaviour we want — a cohesive design system releases as a unit.
+Because `@arshad-shah/cynosure-*` are linked in the Changesets config, they all move to 1.0.0 together. This is the behaviour we want — a cohesive design system releases as a unit.
 
 ---
 
 ## npm publishing
 
 ### Scope
-Reserve the `@lumen` scope on npm (or `@arshadshah/lumen` if `@lumen` is taken — check availability in advance).
+Reserve the `@cynosure` scope on npm (or `@arshadshah/cynosure` if `@cynosure` is taken — check availability in advance).
 
 ### Provenance
 Publishing workflow uses `--provenance` (already wired in Phase 01 via `NPM_CONFIG_PROVENANCE: 'true'`). This cryptographically signs packages with GitHub Actions attestation metadata — installable with `npm audit signatures`.
@@ -107,7 +107,7 @@ All packages are `"access": "public"` in `publishConfig`.
 ### Blog post
 Write an announcement post. Outline:
 
-1. What Lumen is (one-paragraph pitch from the README).
+1. What Cynosure is (one-paragraph pitch from the README).
 2. Why another UI framework (tiny, tree-shakable, composable primitives, no CSS to write).
 3. Installation + first component.
 4. Theming walkthrough (show dark mode + terminal theme).
@@ -133,7 +133,7 @@ Publish on Arshad's own blog / personal site (consistent with the rest of his wr
 
 ## Dogfood: adopt in a real project
 
-Pick **one** of Arshad's active projects and port it to Lumen:
+Pick **one** of Arshad's active projects and port it to Cynosure:
 
 Candidates:
 - **CCTUI** — terminal for Claude Code. Already uses the GitHub Dark Terminal aesthetic; natural fit.
@@ -144,7 +144,7 @@ Candidates:
 **Recommendation:** start with **arshadshah.com** — small, visible, proves the install/consume flow end-to-end. Then migrate CCTUI next (bigger surface, exercises more components).
 
 ### Dogfood checklist
-- [ ] `pnpm add @lumen/react` works in a real project.
+- [ ] `pnpm add @arshad-shah/cynosure-react` works in a real project.
 - [ ] Tree-shaking confirmed: production bundle only contains imported components (inspect with `@next/bundle-analyzer` or Rollup visualiser).
 - [ ] Theme switching works in production build.
 - [ ] No hydration mismatch on SSR frameworks.
@@ -182,20 +182,20 @@ Good things to signal even if unscheduled:
 
 - **Command palette component** (recipe → first-class component).
 - **Toast collaborative API** (queue controls, grouped toasts).
-- **Charts** (thin wrappers over Recharts/Visx with Lumen theming).
+- **Charts** (thin wrappers over Recharts/Visx with Cynosure theming).
 - **RichText / Markdown editor primitives**.
-- **@lumen/forms** — a higher-level form package with built-in validation adapters.
-- **@lumen/vue** — framework port (not promised, but the clean `@lumen/core` separation means it's feasible).
+- **@arshad-shah/cynosure-forms** — a higher-level form package with built-in validation adapters.
+- **@arshad-shah/cynosure-vue** — framework port (not promised, but the clean `@arshad-shah/cynosure-core` separation means it's feasible).
 
 ---
 
 ## Exit criteria
 
-- [ ] `@lumen/react` v1.0.0 published to npm.
-- [ ] `@lumen/tokens`, `@lumen/themes`, `@lumen/core`, `@lumen/icons` all v1.0.0 on npm.
+- [ ] `@arshad-shah/cynosure-react` v1.0.0 published to npm.
+- [ ] `@arshad-shah/cynosure-tokens`, `@arshad-shah/cynosure-themes`, `@arshad-shah/cynosure-core`, `@arshad-shah/cynosure-icons` all v1.0.0 on npm.
 - [ ] Provenance attached (verify with `npm audit signatures`).
-- [ ] Docs site live at `lumen.arshadshah.com`.
-- [ ] Dogfood project shipped with Lumen.
+- [ ] Docs site live at `cynosure.arshadshah.com`.
+- [ ] Dogfood project shipped with Cynosure.
 - [ ] Announcement post published.
 - [ ] GitHub repo public; stars, issues, discussions enabled.
 - [ ] `PROGRESS.md` updated with release info and archived as v1.0.0 state.
@@ -203,7 +203,7 @@ Good things to signal even if unscheduled:
 
 ## Decisions to log
 
-- npm scope: `@lumen` (or fallback to `@arshadshah/lumen`).
+- npm scope: `@cynosure` (or fallback to `@arshadshah/cynosure`).
 - Dogfood project order: arshadshah.com → CCTUI → OpsPilot.
 - Semver policy: documented in CONTRIBUTING.md.
 

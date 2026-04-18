@@ -80,12 +80,12 @@ const InlineRender = (props: AnyProps, ref: ForwardedRef<Element>): ReactElement
 
   const layoutStyle = resolveLayoutProps(layoutProps);
   const inlineStyle = mergeStyles(
-    toResponsiveVars(gap, 'lumen-inline-gap', (v) => resolveSpace(v)),
-    toResponsiveVars(rowGap, 'lumen-inline-row-gap', (v) => resolveSpace(v)),
-    toResponsiveVars(columnGap, 'lumen-inline-col-gap', (v) => resolveSpace(v)),
-    toResponsiveVars(align, 'lumen-inline-align', (v) => ALIGN_MAP[v]),
-    toResponsiveVars(justify, 'lumen-inline-justify', (v) => JUSTIFY_MAP[v]),
-    toResponsiveVars(wrap, 'lumen-inline-wrap', (v) => (v ? 'wrap' : 'nowrap')),
+    toResponsiveVars(gap, 'cynosure-inline-gap', (v) => resolveSpace(v)),
+    toResponsiveVars(rowGap, 'cynosure-inline-row-gap', (v) => resolveSpace(v)),
+    toResponsiveVars(columnGap, 'cynosure-inline-col-gap', (v) => resolveSpace(v)),
+    toResponsiveVars(align, 'cynosure-inline-align', (v) => ALIGN_MAP[v]),
+    toResponsiveVars(justify, 'cynosure-inline-justify', (v) => JUSTIFY_MAP[v]),
+    toResponsiveVars(wrap, 'cynosure-inline-wrap', (v) => (v ? 'wrap' : 'nowrap')),
   );
   const mergedStyle = mergeStyles(layoutStyle, inlineStyle, style);
 

@@ -203,7 +203,7 @@ export const NoValidateDefault: Story = {
     >
       <Stack gap="4" width="420px">
         <Text size="sm" color="fg.muted">
-          <code>Form</code> defaults <code>noValidate</code> to <code>true</code> so Lumen's
+          <code>Form</code> defaults <code>noValidate</code> to <code>true</code> so Cynosure's
           <code> FormMessage </code> stays the single source of validation UX. Pass{' '}
           <code>noValidate=&#123;false&#125;</code> to opt back into native bubbles.
         </Text>

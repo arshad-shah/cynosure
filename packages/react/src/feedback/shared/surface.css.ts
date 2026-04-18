@@ -11,7 +11,7 @@ export const surfaceRoot = style({
   alignItems: 'flex-start',
   gap: vars.space['3'],
   borderRadius: vars.radius.md,
-  fontFamily: 'var(--lumen-font-body-md-family)',
+  fontFamily: 'var(--cynosure-font-body-md-family)',
   color: vars.color.foreground.default,
   boxSizing: 'border-box',
   position: 'relative',
@@ -38,15 +38,15 @@ export const surfaceContent = style({
 
 export const surfaceTitle = style({
   margin: 0,
-  fontWeight: 'var(--lumen-font-weight-semibold)',
-  fontSize: 'var(--lumen-font-body-md-size)',
-  lineHeight: 'var(--lumen-font-body-md-line-height)',
+  fontWeight: 'var(--cynosure-font-weight-semibold)',
+  fontSize: 'var(--cynosure-font-body-md-size)',
+  lineHeight: 'var(--cynosure-font-body-md-line-height)',
 });
 
 export const surfaceDescription = style({
   margin: 0,
-  fontSize: 'var(--lumen-font-body-sm-size)',
-  lineHeight: 'var(--lumen-font-body-sm-line-height)',
+  fontSize: 'var(--cynosure-font-body-sm-size)',
+  lineHeight: 'var(--cynosure-font-body-sm-line-height)',
   color: 'inherit',
 });
 
@@ -83,7 +83,7 @@ export const surfaceClose = style({
 });
 
 export const surfaceSize = styleVariants({
-  sm: { padding: vars.space['2'], fontSize: 'var(--lumen-font-body-sm-size)' },
+  sm: { padding: vars.space['2'], fontSize: 'var(--cynosure-font-body-sm-size)' },
   md: { padding: vars.space['3'] },
   lg: { padding: vars.space['4'] },
 });

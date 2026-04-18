@@ -205,7 +205,7 @@ export function FormMessage({ children, ...rest }: TextProps) {
 
 ## `react-hook-form` integration recipe
 
-Ship a small helper package path `@lumen/react/rhf` that exports adapters without hard-depending on RHF (RHF is a peer, optional).
+Ship a small helper package path `@arshad-shah/cynosure-react/rhf` that exports adapters without hard-depending on RHF (RHF is a peer, optional).
 
 ### `packages/react/src/form/rhf/index.ts`
 
@@ -263,7 +263,7 @@ Package the path as a separate entry:
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Form, RHFField, Input, Button } from '@lumen/react';
+import { Form, RHFField, Input, Button } from '@arshad-shah/cynosure-react';
 
 const schema = z.object({
   email: z.string().email(),
@@ -310,7 +310,7 @@ For simple forms that don't need a library:
 </Form>
 ```
 
-Every Lumen form control accepts `name` and forwards it to the underlying element, so FormData works out of the box.
+Every Cynosure form control accepts `name` and forwards it to the underlying element, so FormData works out of the box.
 
 ---
 
@@ -331,10 +331,10 @@ Every Lumen form control accepts `name` and forwards it to the underlying elemen
 
 - [ ] `Form`, `FormField`, `FormLabel`, `FormControl`, `FormDescription`, `FormMessage` exist and are exported.
 - [ ] `FormField` context auto-wires IDs; `aria-describedby` composition correct by construction.
-- [ ] `@lumen/react/rhf` entry point exists; `react-hook-form` listed as optional peer.
+- [ ] `@arshad-shah/cynosure-react/rhf` entry point exists; `react-hook-form` listed as optional peer.
 - [ ] Three docs pages in Storybook MDX showing recipes (plain / RHF / RHF + Zod).
 - [ ] Unit + integration tests pass with ≥ 95% coverage on the form directory.
-- [ ] Changesets: `@lumen/react` minor "Form composition primitives".
+- [ ] Changesets: `@arshad-shah/cynosure-react` minor "Form composition primitives".
 
 ## Decisions to log
 

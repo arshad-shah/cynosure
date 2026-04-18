@@ -1,5 +1,5 @@
 {
-  "name": "@lumen/react/blockquote",
+  "name": "@arshad-shah/cynosure-react/blockquote",
   "private": true,
   "type": "module",
   "main": "../dist/blockquote.js",

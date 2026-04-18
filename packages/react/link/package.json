@@ -1,5 +1,5 @@
 {
-  "name": "@lumen/react/link",
+  "name": "@arshad-shah/cynosure-react/link",
   "private": true,
   "type": "module",
   "main": "../dist/link.js",

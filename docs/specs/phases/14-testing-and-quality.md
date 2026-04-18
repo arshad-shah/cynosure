@@ -154,7 +154,7 @@ import { readFileSync } from 'node:fs';
 import postcss from 'postcss';
 import Color from 'colorjs.io';
 
-// Parse dist/css/base.css, extract :root {--lumen-*: …}
+// Parse dist/css/base.css, extract :root {--cynosure-*: …}
 // Parse dist/css/dark.css similarly.
 // For each "foreground × background" pair that we know is paired:
 //   check WCAG AA (4.5:1 for normal text, 3:1 for large text)
@@ -321,7 +321,7 @@ pnpm -w add -D @lhci/cli
 - [ ] `publint` + `attw` clean for every published package.
 - [ ] CI pipeline completes in < 10 minutes.
 - [ ] Renovate configured and first PRs landing cleanly.
-- [ ] Changesets: `@lumen/react` patch "Testing infrastructure hardening".
+- [ ] Changesets: `@arshad-shah/cynosure-react` patch "Testing infrastructure hardening".
 
 ## Decisions to log
 

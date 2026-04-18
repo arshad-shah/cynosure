@@ -1,14 +1,14 @@
 import { addons } from 'storybook/manager-api';
 import { create } from 'storybook/theming';
 
-// Branded Storybook manager UI for the Lumen docs site.
-// Colours mirror the `@lumen/themes/terminal` palette so the manager chrome
+// Branded Storybook manager UI for the Cynosure docs site.
+// Colours mirror the `@arshad-shah/cynosure-themes/terminal` palette so the manager chrome
 // matches the canvas when the terminal theme is active, and stays legible
 // against the other themes.
 const theme = create({
   base: 'dark',
-  brandTitle: 'Lumen UI',
-  brandUrl: 'https://lumen.arshadshah.com',
+  brandTitle: 'Cynosure UI',
+  brandUrl: 'https://cynosure.arshadshah.com',
   brandTarget: '_self',
 
   colorPrimary: '#388bfd',

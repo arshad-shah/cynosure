@@ -1,5 +1,5 @@
 {
-  "name": "@lumen/react/icon-button",
+  "name": "@arshad-shah/cynosure-react/icon-button",
   "private": true,
   "type": "module",
   "main": "../dist/iconbutton.js",

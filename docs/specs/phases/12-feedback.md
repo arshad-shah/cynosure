@@ -324,7 +324,7 @@ Per component:
 - [ ] Banner `dismissKey` persists (localStorage mocked in test).
 - [ ] All components compose layout primitives + Radix bases; zero raw HTML.
 - [ ] Bundle sanity: each individual component ≤ 3 KB gzipped unless using a Radix primitive that adds more.
-- [ ] Changesets: `@lumen/react` minor "Feedback components".
+- [ ] Changesets: `@arshad-shah/cynosure-react` minor "Feedback components".
 
 ## Decisions to log
 

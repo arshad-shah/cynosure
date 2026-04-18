@@ -6,7 +6,7 @@ export interface LocaleProviderProps {
    * BCP-47 locale tag (e.g. `"en-IE"`, `"ar-SA"`). When omitted, React Aria
    * falls back to the browser / navigator locale.
    *
-   * Default is `"en-IE"` — Lumen's house default.
+   * Default is `"en-IE"` — Cynosure's house default.
    */
   locale?: string;
   children: ReactNode;

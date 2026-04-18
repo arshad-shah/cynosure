@@ -250,7 +250,7 @@ export const AppShell: Story = {
         padding="3"
         background="bg.surface"
         borderWidth="0"
-        style={{ borderBottom: '1px solid var(--lumen-color-border-default)' }}
+        style={{ borderBottom: '1px solid var(--cynosure-color-border-default)' }}
       >
         <Text weight="semibold">Header</Text>
       </Box>

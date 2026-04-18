@@ -1,5 +1,5 @@
 {
-  "name": "@lumen/react/section",
+  "name": "@arshad-shah/cynosure-react/section",
   "private": true,
   "type": "module",
   "main": "../dist/section.js",

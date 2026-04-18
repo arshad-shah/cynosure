@@ -86,7 +86,7 @@ describe('CodeBlock', () => {
       </CodeBlock>,
     );
     const root = container.firstElementChild as HTMLElement;
-    expect(root.style.getPropertyValue('--lumen-code-max-height')).toBe('400px');
+    expect(root.style.getPropertyValue('--cynosure-code-max-height')).toBe('400px');
   });
 
   it('accepts a string maxHeight value', () => {
@@ -96,6 +96,6 @@ describe('CodeBlock', () => {
       </CodeBlock>,
     );
     const root = container.firstElementChild as HTMLElement;
-    expect(root.style.getPropertyValue('--lumen-code-max-height')).toBe('50vh');
+    expect(root.style.getPropertyValue('--cynosure-code-max-height')).toBe('50vh');
   });
 });

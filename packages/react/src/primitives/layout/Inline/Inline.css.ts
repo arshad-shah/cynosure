@@ -12,12 +12,12 @@ const cascade = (base: string, bps: string[]): string => {
 };
 
 const propsAt = (bps: string[]): Record<string, string> => ({
-  gap: cascade('lumen-inline-gap', bps),
-  'column-gap': cascade('lumen-inline-col-gap', bps),
-  'row-gap': cascade('lumen-inline-row-gap', bps),
-  'align-items': cascade('lumen-inline-align', bps),
-  'justify-content': cascade('lumen-inline-justify', bps),
-  'flex-wrap': cascade('lumen-inline-wrap', bps),
+  gap: cascade('cynosure-inline-gap', bps),
+  'column-gap': cascade('cynosure-inline-col-gap', bps),
+  'row-gap': cascade('cynosure-inline-row-gap', bps),
+  'align-items': cascade('cynosure-inline-align', bps),
+  'justify-content': cascade('cynosure-inline-justify', bps),
+  'flex-wrap': cascade('cynosure-inline-wrap', bps),
 });
 
 export const inline = style([

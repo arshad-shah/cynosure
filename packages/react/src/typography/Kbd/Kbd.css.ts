@@ -10,8 +10,8 @@ export const kbdBase = style([
     display: 'inline-flex',
     alignItems: 'center',
     justifyContent: 'center',
-    fontFamily: 'var(--lumen-font-family-mono)',
-    fontWeight: 'var(--lumen-font-weight-medium)',
+    fontFamily: 'var(--cynosure-font-family-mono)',
+    fontWeight: 'var(--cynosure-font-weight-medium)',
     lineHeight: 1,
     color: vars.color.foreground.default,
     backgroundColor: vars.color.background.subtle,
@@ -27,21 +27,21 @@ export const kbdBase = style([
 
 export const kbdSize = styleVariants({
   sm: {
-    fontSize: 'var(--lumen-font-body-xs-size)',
+    fontSize: 'var(--cynosure-font-body-xs-size)',
     paddingInline: '0.35em',
     paddingBlock: '0.1em',
     minWidth: '1.5em',
     minHeight: '1.5em',
   },
   md: {
-    fontSize: 'var(--lumen-font-body-sm-size)',
+    fontSize: 'var(--cynosure-font-body-sm-size)',
     paddingInline: '0.45em',
     paddingBlock: '0.15em',
     minWidth: '1.75em',
     minHeight: '1.75em',
   },
   lg: {
-    fontSize: 'var(--lumen-font-body-md-size)',
+    fontSize: 'var(--cynosure-font-body-md-size)',
     paddingInline: '0.55em',
     paddingBlock: '0.2em',
     minWidth: '2em',

@@ -2,7 +2,7 @@ import { type ReactNode, forwardRef } from 'react';
 import { Button, type ButtonProps } from '../Button/Button.js';
 
 export interface IconButtonProps extends Omit<ButtonProps, 'leftIcon' | 'rightIcon' | 'children'> {
-  /** The icon element — typically a Lumen icon or an inline SVG. */
+  /** The icon element — typically a Cynosure icon or an inline SVG. */
   icon: ReactNode;
   /** Accessible label — announced in place of textual content. Required. */
   label: string;

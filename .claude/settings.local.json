@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm view *)",
+      "Bash(node -e \"const fs=require\\('fs'\\); for \\(const p of ['react','tokens','themes','core','icons','config']\\) { try { const j=JSON.parse\\(fs.readFileSync\\('packages/'+p+'/package.json','utf8'\\)\\); console.log\\(j.name+': '+j.version+' private='+!!j.private\\); } catch\\(e\\) { console.log\\(p+': '+e.message\\); } }\")",
+      "Bash(npm whoami *)",
+      "Bash(node scripts/rename-lumen-to-cynosure.mjs)",
+      "Bash(pnpm build *)",
+      "Bash(pnpm run *)",
+      "Bash(pnpm --filter @arshad-shah/cynosure-tokens run build:tokens)",
+      "Bash(pnpm turbo *)",
+      "Bash(python -c ' *)",
+      "Read(//tmp/**)",
+      "Bash(node -e 'const p=require\\('\\\\''./packages/__TRACKED_VAR__/package.json'\\\\''\\); console.log\\(p.scripts?.build || '\\\\''\\(no build script\\)'\\\\''\\)')",
+      "Bash(command -v gh)",
+      "Bash(gh --version)",
+      "Bash(gh repo *)",
+      "Bash(pnpm version-packages *)",
+      "Bash(pnpm typecheck *)",
+      "Bash(pnpm test *)",
+      "Bash(pnpm exec *)",
+      "Bash(echo \"exit=$?\")",
+      "Bash(npm search *)",
+      "Bash(git commit -m ' *)"
+    ]
+  }
+}

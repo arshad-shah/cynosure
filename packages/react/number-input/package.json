@@ -1,5 +1,5 @@
 {
-  "name": "@lumen/react/number-input",
+  "name": "@arshad-shah/cynosure-react/number-input",
   "private": true,
   "type": "module",
   "main": "../dist/numberinput.js",

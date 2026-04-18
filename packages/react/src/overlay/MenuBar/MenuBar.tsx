@@ -89,7 +89,7 @@ export const MenuBarContent = forwardRef<ElementRef<typeof Radix.Content>, MenuB
       <Radix.Portal container={resolvedContainer}>
         <Radix.Content
           ref={ref}
-          data-lumen-overlay=""
+          data-cynosure-overlay=""
           align={align}
           sideOffset={sideOffset}
           className={cn(menuContent, className)}
@@ -173,7 +173,7 @@ export const MenuBarSubContent = forwardRef<
     <Radix.Portal>
       <Radix.SubContent
         ref={ref}
-        data-lumen-overlay=""
+        data-cynosure-overlay=""
         className={cn(menuContent, className)}
         {...rest}
       />

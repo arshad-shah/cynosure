@@ -24,7 +24,7 @@
 **Radix Primitives is the base for every overlay in this phase.** Not React Aria — Radix's overlay primitives (Dialog, Popover, Tooltip, DropdownMenu, ContextMenu, HoverCard) are extraordinarily well-tuned for the exact set of interactions we need and are the lightest well-behaved option on npm.
 
 ```bash
-pnpm --filter @lumen/react add \
+pnpm --filter @arshad-shah/cynosure-react add \
   @radix-ui/react-dialog \
   @radix-ui/react-alert-dialog \
   @radix-ui/react-popover \
@@ -46,10 +46,10 @@ Create `packages/react/src/overlay/shared/` with:
 
 - **`overlay.css.ts`** — animation keyframes, shared z-index tokens, backdrop styles
 - **`useOverlayMount.ts`** — hook that handles mount/unmount animation sync (uses Radix's `Presence` internally)
-- **`OverlayPortal.tsx`** — thin wrapper around Lumen's Portal adding a default `id="lumen-portal"` container
+- **`OverlayPortal.tsx`** — thin wrapper around Cynosure's Portal adding a default `id="cynosure-portal"` container
 - **`ScrollLock.ts`** — body scroll lock utility (Radix's Dialog does this; export it so Drawer reuses)
 
-All animations use tokens: `var(--lumen-duration-motion-short)` for enter/exit, `var(--lumen-easing-ease-out)` for timing. Reduced motion automatically zeroes durations via the Phase 03 media query.
+All animations use tokens: `var(--cynosure-duration-motion-short)` for enter/exit, `var(--cynosure-easing-ease-out)` for timing. Reduced motion automatically zeroes durations via the Phase 03 media query.
 
 ---
 
@@ -253,7 +253,7 @@ interface TooltipProps {
 
 ### `TooltipProvider`
 
-Radix requires a `TooltipProvider` ancestor. Export `TooltipProvider` from `@lumen/react` and add a note: place once at app root for shared delay/skipDelay behaviour.
+Radix requires a `TooltipProvider` ancestor. Export `TooltipProvider` from `@arshad-shah/cynosure-react` and add a note: place once at app root for shared delay/skipDelay behaviour.
 
 ---
 
@@ -266,7 +266,7 @@ Use **sonner**. Wrap it minimally.
 <Toaster position="bottom-right" theme="system" />
 
 // Anywhere
-import { toast } from '@lumen/react';
+import { toast } from '@arshad-shah/cynosure-react';
 toast.success('Saved');
 toast.error('Failed to save', { description: 'Network error.' });
 toast.promise(savePromise, {
@@ -422,7 +422,7 @@ Per overlay component:
 - [ ] Portal target: all overlays portal into `<body>` by default but accept custom `container`.
 - [ ] Bundle: `import { Dialog }` ≤ 12 KB gzipped (Radix Dialog + our wrapper + CSS).
 - [ ] RTL: all overlays position and flip correctly in `<DirectionProvider dir="rtl">`.
-- [ ] Changesets: `@lumen/react` minor "Overlay components".
+- [ ] Changesets: `@arshad-shah/cynosure-react` minor "Overlay components".
 
 ## Decisions to log
 

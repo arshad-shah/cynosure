@@ -9,7 +9,7 @@ export const statRoot = style({
 });
 
 export const statLabel = style({
-  fontSize: 'var(--lumen-font-body-sm-size)',
+  fontSize: 'var(--cynosure-font-body-sm-size)',
   color: vars.color.foreground.muted,
   margin: 0,
   textTransform: 'uppercase',
@@ -19,8 +19,8 @@ export const statLabel = style({
 
 export const statValue = style({
   margin: 0,
-  fontFamily: 'var(--lumen-font-heading-2-family)',
-  fontSize: 'var(--lumen-font-heading-2-size)',
+  fontFamily: 'var(--cynosure-font-heading-2-family)',
+  fontSize: 'var(--cynosure-font-heading-2-size)',
   fontWeight: 700,
   lineHeight: 1.1,
   color: vars.color.foreground.default,
@@ -31,7 +31,7 @@ export const statHelp = style({
   display: 'inline-flex',
   alignItems: 'center',
   gap: vars.space['1'],
-  fontSize: 'var(--lumen-font-body-sm-size)',
+  fontSize: 'var(--cynosure-font-body-sm-size)',
   color: vars.color.foreground.muted,
   margin: 0,
 });

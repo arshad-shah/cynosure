@@ -29,13 +29,13 @@ describe('ScrollLock', () => {
 });
 
 describe('OverlayPortal', () => {
-  it('lazily creates the #lumen-portal default container and portals into it', () => {
+  it('lazily creates the #cynosure-portal default container and portals into it', () => {
     render(
       <OverlayPortal>
         <div data-testid="portaled">Hi</div>
       </OverlayPortal>,
     );
-    const portalNode = document.getElementById('lumen-portal');
+    const portalNode = document.getElementById('cynosure-portal');
     expect(portalNode).not.toBeNull();
     expect(screen.getByTestId('portaled').parentElement).toBe(portalNode);
   });

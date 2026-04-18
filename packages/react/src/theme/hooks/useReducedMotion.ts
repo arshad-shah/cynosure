@@ -10,8 +10,8 @@ const readPreference = (): boolean => {
 /**
  * Returns `true` when the user has requested reduced motion. Components that
  * animate must check this and either disable or shorten the animation. The
- * CSS-level fallback in `@lumen/tokens/css` already zeroes the
- * `--lumen-duration-motion-*` values, so transitions driven by tokens are
+ * CSS-level fallback in `@arshad-shah/cynosure-tokens/css` already zeroes the
+ * `--cynosure-duration-motion-*` values, so transitions driven by tokens are
  * automatically covered.
  */
 export function useReducedMotion(): boolean {

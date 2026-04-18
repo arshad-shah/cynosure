@@ -1,5 +1,5 @@
 {
-  "name": "@lumen/react/container",
+  "name": "@arshad-shah/cynosure-react/container",
   "private": true,
   "type": "module",
   "main": "../dist/container.js",

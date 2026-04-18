@@ -210,14 +210,14 @@ export const MegaMenu: Story = {
                     justifyContent: 'flex-end',
                     padding: 16,
                     background:
-                      'linear-gradient(135deg, var(--lumen-color-accent-9, #4f46e5), var(--lumen-color-accent-11, #312e81))',
+                      'linear-gradient(135deg, var(--cynosure-color-accent-9, #4f46e5), var(--cynosure-color-accent-11, #312e81))',
                     color: '#fff',
                     borderRadius: 10,
                     textDecoration: 'none',
                   }}
                 >
                   <Heading level={4} size="md" style={{ color: '#fff' }}>
-                    Lumen Platform
+                    Cynosure Platform
                   </Heading>
                   <Text size="sm" style={{ color: '#fff' }}>
                     Everything you need to ship a polished UI.
@@ -303,7 +303,7 @@ export const TopNavUseCase: Story = {
           alignItems: 'center',
           justifyContent: 'space-between',
           padding: '12px 20px',
-          border: '1px solid var(--lumen-color-border-subtle, #e5e7eb)',
+          border: '1px solid var(--cynosure-color-border-subtle, #e5e7eb)',
           borderRadius: 12,
         }}
       >

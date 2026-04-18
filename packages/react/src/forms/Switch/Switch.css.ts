@@ -12,8 +12,8 @@ export const switchLabel = style({
   display: 'inline-flex',
   alignItems: 'center',
   gap: vars.space['2'],
-  fontSize: 'var(--lumen-font-body-md-size)',
-  lineHeight: 'var(--lumen-font-body-md-line-height)',
+  fontSize: 'var(--cynosure-font-body-md-size)',
+  lineHeight: 'var(--cynosure-font-body-md-line-height)',
   color: vars.color.foreground.default,
   cursor: 'pointer',
   selectors: {
@@ -75,7 +75,7 @@ export const switchRoot = style({
 
 /**
  * Sizing — width ≈ 2× height so the thumb has room to slide. Each size
- * publishes `--lumen-switch-thumb-size` and `--lumen-switch-translate` so a
+ * publishes `--cynosure-switch-thumb-size` and `--cynosure-switch-translate` so a
  * single `switchThumb` rule can read them, keeping the per-size cost a few
  * custom properties rather than a full recipe × 3.
  */
@@ -89,24 +89,24 @@ export const switchSize = styleVariants({
     width: '1.75rem', // 28 — content 24×12, thumb 12, translate 12
     height: '1rem',
     vars: {
-      ['--lumen-switch-thumb-size' as string]: '0.75rem',
-      ['--lumen-switch-translate' as string]: '0.75rem',
+      ['--cynosure-switch-thumb-size' as string]: '0.75rem',
+      ['--cynosure-switch-translate' as string]: '0.75rem',
     },
   },
   md: {
     width: '2.25rem', // 36 — content 32×16, thumb 16, translate 16
     height: '1.25rem',
     vars: {
-      ['--lumen-switch-thumb-size' as string]: '1rem',
-      ['--lumen-switch-translate' as string]: '1rem',
+      ['--cynosure-switch-thumb-size' as string]: '1rem',
+      ['--cynosure-switch-translate' as string]: '1rem',
     },
   },
   lg: {
     width: '2.75rem', // 44 — content 40×20, thumb 20, translate 20
     height: '1.5rem',
     vars: {
-      ['--lumen-switch-thumb-size' as string]: '1.25rem',
-      ['--lumen-switch-translate' as string]: '1.25rem',
+      ['--cynosure-switch-thumb-size' as string]: '1.25rem',
+      ['--cynosure-switch-translate' as string]: '1.25rem',
     },
   },
 });
@@ -115,8 +115,8 @@ export const switchThumb = style({
   display: 'grid',
   placeItems: 'center',
   boxSizing: 'border-box',
-  width: 'var(--lumen-switch-thumb-size)',
-  height: 'var(--lumen-switch-thumb-size)',
+  width: 'var(--cynosure-switch-thumb-size)',
+  height: 'var(--cynosure-switch-thumb-size)',
   background: vars.color.background.surface,
   borderRadius: vars.radius.full,
   boxShadow: vars.shadow.sm,
@@ -127,10 +127,10 @@ export const switchThumb = style({
   willChange: 'transform',
   selectors: {
     '&[data-state="checked"]': {
-      transform: 'translateX(var(--lumen-switch-translate))',
+      transform: 'translateX(var(--cynosure-switch-translate))',
     },
     '[dir="rtl"] &[data-state="checked"]': {
-      transform: 'translateX(calc(-1 * var(--lumen-switch-translate)))',
+      transform: 'translateX(calc(-1 * var(--cynosure-switch-translate)))',
     },
   },
 });

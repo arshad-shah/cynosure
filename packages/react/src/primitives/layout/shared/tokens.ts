@@ -2,7 +2,7 @@ import type { vars } from '../../../styles/vars.css.js';
 
 /**
  * Token-shaped string literals accepted by the layout primitives and the
- * resolvers that turn them into raw CSS values (typically `var(--lumen-...)`).
+ * resolvers that turn them into raw CSS values (typically `var(--cynosure-...)`).
  */
 
 export type SpaceToken = keyof typeof vars.space;
@@ -56,29 +56,30 @@ const isColorToken = (v: string): v is ColorToken =>
 const hasDot = (v: string): boolean => /[.]/.test(v);
 
 const spaceVarName = (token: SpaceToken): string =>
-  `--lumen-space-${String(token).replace(/\./g, '-')}`;
+  `--cynosure-space-${String(token).replace(/\./g, '-')}`;
 
-/** `"4"` → `var(--lumen-space-4)`; `"0.5"` → `var(--lumen-space-0-5)`. */
+/** `"4"` → `var(--cynosure-space-4)`; `"0.5"` → `var(--cynosure-space-0-5)`. */
 export const resolveSpace = (value: SpaceToken | 'auto'): string => {
   if (value === 'auto') return 'auto';
   return `var(${spaceVarName(value)})`;
 };
 
-/** `"md"` → `var(--lumen-radius-md)`. */
-export const resolveRadius = (value: RadiusToken): string => `var(--lumen-radius-${String(value)})`;
+/** `"md"` → `var(--cynosure-radius-md)`. */
+export const resolveRadius = (value: RadiusToken): string =>
+  `var(--cynosure-radius-${String(value)})`;
 
-/** `"md"` → `var(--lumen-shadow-md)`; `"focusRing"` → `var(--lumen-shadow-focus-ring)`. */
+/** `"md"` → `var(--cynosure-shadow-md)`; `"focusRing"` → `var(--cynosure-shadow-focus-ring)`. */
 export const resolveShadow = (value: ShadowToken): string => {
   const seg = String(value)
     .replace(/([a-z])([A-Z])/g, '$1-$2')
     .toLowerCase();
-  return `var(--lumen-shadow-${seg})`;
+  return `var(--cynosure-shadow-${seg})`;
 };
 
-/** `"modal"` → `var(--lumen-z-modal)`. */
-export const resolveZIndex = (value: ZIndexToken): string => `var(--lumen-z-${String(value)})`;
+/** `"modal"` → `var(--cynosure-z-modal)`. */
+export const resolveZIndex = (value: ZIndexToken): string => `var(--cynosure-z-${String(value)})`;
 
-/** `"bg.surface"` → `var(--lumen-color-background-surface)`. */
+/** `"bg.surface"` → `var(--cynosure-color-background-surface)`. */
 export const resolveColor = (value: ColorToken): string => {
   const [head, ...rest] = value.split('.');
   const mapHead: Record<string, string> = {
@@ -90,7 +91,7 @@ export const resolveColor = (value: ColorToken): string => {
   };
   const category = mapHead[head as string] ?? (head as string);
   const tail = rest.map((seg) => seg.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase()).join('-');
-  return `var(--lumen-color-${category}-${tail})`;
+  return `var(--cynosure-color-${category}-${tail})`;
 };
 
 const SIZE_ALIASES: Record<string, string> = {

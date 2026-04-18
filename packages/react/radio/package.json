@@ -1,5 +1,5 @@
 {
-  "name": "@lumen/react/radio",
+  "name": "@arshad-shah/cynosure-react/radio",
   "private": true,
   "type": "module",
   "main": "../dist/radio.js",

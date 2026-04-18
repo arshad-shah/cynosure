@@ -1,6 +1,6 @@
-# Contributing to Lumen
+# Contributing to Cynosure
 
-Thanks for your interest in contributing. Lumen is built in small, disciplined
+Thanks for your interest in contributing. Cynosure is built in small, disciplined
 increments and everything ships with a decision log, so new contributors can
 move with the same grain as the existing codebase.
 
@@ -35,7 +35,7 @@ pnpm storybook
 pnpm test
 
 # Cross-browser tests (Playwright, opt-in)
-LUMEN_BROWSER_MODE=1 pnpm test
+CYNOSURE_BROWSER_MODE=1 pnpm test
 
 # Lint + format
 pnpm lint
@@ -54,13 +54,13 @@ pnpm audit
 ## How the repo is organised
 
 ```
-lumen/
+cynosure/
 ├── packages/
-│   ├── react/     @lumen/react — main component library
-│   ├── tokens/    @lumen/tokens — DTCG tokens + CSS + TS
-│   ├── themes/    @lumen/themes — prebuilt alternative themes
-│   ├── core/      @lumen/core — framework-agnostic primitives
-│   ├── icons/     @lumen/icons — Lucide re-exports
+│   ├── react/     @arshad-shah/cynosure-react — main component library
+│   ├── tokens/    @arshad-shah/cynosure-tokens — DTCG tokens + CSS + TS
+│   ├── themes/    @arshad-shah/cynosure-themes — prebuilt alternative themes
+│   ├── core/      @arshad-shah/cynosure-core — framework-agnostic primitives
+│   ├── icons/     @arshad-shah/cynosure-icons — Lucide re-exports
 │   └── config/    internal — shared tsconfig/tsup/biome presets
 ├── docs/
 │   ├── foundations/     public-facing foundations (MDX)
@@ -76,7 +76,7 @@ lumen/
 
 ## The phase-based workflow
 
-Lumen is built across 16 phases (see `docs/specs/phases/`). Each phase has:
+Cynosure is built across 16 phases (see `docs/specs/phases/`). Each phase has:
 
 - A spec document.
 - Explicit exit criteria.
@@ -167,4 +167,4 @@ All participants are expected to uphold the
 
 ---
 
-Thank you for helping build Lumen.
+Thank you for helping build Cynosure.

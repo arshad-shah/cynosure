@@ -1,5 +1,5 @@
 {
-  "name": "@lumen/react/theme",
+  "name": "@arshad-shah/cynosure-react/theme",
   "private": true,
   "type": "module",
   "main": "../dist/theme/index.js",

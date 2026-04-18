@@ -1,5 +1,5 @@
 {
-  "name": "@lumen/react/helper-text",
+  "name": "@arshad-shah/cynosure-react/helper-text",
   "private": true,
   "type": "module",
   "main": "../dist/helpertext.js",

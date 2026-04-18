@@ -1,5 +1,5 @@
 {
-  "name": "@lumen/react/alert-dialog",
+  "name": "@arshad-shah/cynosure-react/alert-dialog",
   "private": true,
   "type": "module",
   "main": "../dist/alertdialog.js",

@@ -2,11 +2,11 @@
 
 **Status:** approved
 **Date:** 2026-04-17
-**Package:** `@lumen/react` · `src/forms/NumberInput`
+**Package:** `@arshad-shah/cynosure-react` · `src/forms/NumberInput`
 
 ## Summary
 
-Keep the current stacked-stepper shape; re-ground every detail in Lumen tokens. Swap the `▲`/`▼` unicode glyphs for lucide chevrons, widen stepper hit targets, add inline `prefix`/`suffix` slots, and tighten cursor, hover, and divider details so the control reads as flat, token-driven, and coherent with `Input` / `Textarea`.
+Keep the current stacked-stepper shape; re-ground every detail in Cynosure tokens. Swap the `▲`/`▼` unicode glyphs for lucide chevrons, widen stepper hit targets, add inline `prefix`/`suffix` slots, and tighten cursor, hover, and divider details so the control reads as flat, token-driven, and coherent with `Input` / `Textarea`.
 
 No new interaction model. No gradients, no custom shadows. Chevron direction (up-top, down-bottom) is unchanged.
 
@@ -16,13 +16,13 @@ No new interaction model. No gradients, no custom shadows. Chevron direction (up
 - Stepper hit targets (`min-width: 1.5rem`) are tight for pointer and terrible for touch.
 - No way to show a unit (`px`, `%`, `$`) inline — consumers are working around it with bespoke wrappers.
 - Hover/divider colors don't track the shared wrapper cleanly, so the steppers read as a separate component grafted on.
-- Cursors don't follow the Lumen cursor rule across all states.
+- Cursors don't follow the Cynosure cursor rule across all states.
 
 ## Scope
 
 **In scope**
 
-- Visual redesign of `NumberInput` in `@lumen/react`.
+- Visual redesign of `NumberInput` in `@arshad-shah/cynosure-react`.
 - New `prefix` and `suffix` props (inline muted text inside the field).
 - Stepper sizing, iconography, hover, divider, cursor fixes.
 - Story and test updates to cover the new slots and states.
@@ -93,7 +93,7 @@ Steppers grow with the control. All values are in the existing `controlSize` rec
 | md   | 2.5rem | 1.75rem           | 12px |
 | lg   | 3rem   | 2rem              | 14px |
 
-### Cursors (per Lumen cursor rule)
+### Cursors (per Cynosure cursor rule)
 
 - Field: `text` (default for the input; the `field` wrapper also declares `cursor: text` so clicking the prefix/suffix still focuses the input).
 - Stepper buttons: `pointer`.

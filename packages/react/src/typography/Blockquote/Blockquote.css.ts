@@ -7,9 +7,9 @@ export const blockquoteBase = style([
   layoutPropsStyle,
   typographyBase,
   {
-    fontFamily: 'var(--lumen-font-family-serif)',
-    fontSize: 'var(--lumen-font-body-lg-size)',
-    lineHeight: 'var(--lumen-font-body-lg-line-height)',
+    fontFamily: 'var(--cynosure-font-family-serif)',
+    fontSize: 'var(--cynosure-font-body-lg-size)',
+    lineHeight: 'var(--cynosure-font-body-lg-line-height)',
     color: vars.color.foreground.default,
   },
 ]);
@@ -36,8 +36,8 @@ export const blockquoteVariant = styleVariants({
 export const blockquoteAttribution = style({
   display: 'block',
   marginBlockStart: vars.space[2],
-  fontFamily: 'var(--lumen-font-body-md-family)',
-  fontSize: 'var(--lumen-font-body-sm-size)',
+  fontFamily: 'var(--cynosure-font-body-md-family)',
+  fontSize: 'var(--cynosure-font-body-sm-size)',
   fontStyle: 'normal',
   color: vars.color.foreground.muted,
   selectors: {

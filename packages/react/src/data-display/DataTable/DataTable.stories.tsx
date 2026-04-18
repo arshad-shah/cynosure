@@ -217,9 +217,9 @@ export const WithSelection: Story = {
               align="center"
               justify="between"
               style={{
-                padding: 'var(--lumen-space-3)',
-                background: 'var(--lumen-color-accent-muted)',
-                borderRadius: 'var(--lumen-radius-md)',
+                padding: 'var(--cynosure-space-3)',
+                background: 'var(--cynosure-color-accent-muted)',
+                borderRadius: 'var(--cynosure-radius-md)',
               }}
             >
               <Text weight="medium">{selected.length} selected</Text>
@@ -324,7 +324,7 @@ export const RowClick: Story = {
                   border: 0,
                   padding: 0,
                   cursor: 'pointer',
-                  color: 'var(--lumen-color-accent-solid)',
+                  color: 'var(--cynosure-color-accent-solid)',
                   textDecoration: 'underline',
                   font: 'inherit',
                 }}
@@ -403,8 +403,8 @@ export const CustomCellRenderers: Story = {
                 width: 28,
                 height: 28,
                 borderRadius: '50%',
-                background: 'var(--lumen-color-accent-muted)',
-                color: 'var(--lumen-color-accent-solid)',
+                background: 'var(--cynosure-color-accent-muted)',
+                color: 'var(--cynosure-color-accent-solid)',
                 fontSize: 12,
                 fontWeight: 600,
               }}
@@ -480,9 +480,9 @@ export const Kitchen: Story = {
               align="center"
               justify="between"
               style={{
-                padding: 'var(--lumen-space-3)',
-                background: 'var(--lumen-color-accent-muted)',
-                borderRadius: 'var(--lumen-radius-md)',
+                padding: 'var(--cynosure-space-3)',
+                background: 'var(--cynosure-color-accent-muted)',
+                borderRadius: 'var(--cynosure-radius-md)',
               }}
             >
               <Text weight="medium">{selected.length} selected</Text>

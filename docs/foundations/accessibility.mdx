@@ -4,7 +4,7 @@ import { Meta } from '@storybook/addon-docs/blocks';
 
 # Accessibility
 
-Accessibility is a build-time contract at Lumen, not an aspiration.
+Accessibility is a build-time contract at Cynosure, not an aspiration.
 
 ## The contract
 
@@ -15,7 +15,7 @@ Accessibility is a build-time contract at Lumen, not an aspiration.
   (including alpha-composited surfaces) — `pnpm audit:contrast`.
 - **Keyboard complete.** Every interactive component is reachable and
   operable via keyboard alone.
-- **Focus visible.** A single token (`--lumen-shadow-focus-ring`) drives
+- **Focus visible.** A single token (`--cynosure-shadow-focus-ring`) drives
   the focus ring across every component.
 - **RTL safe.** Every `.css.ts` file uses logical CSS properties (padding
   inline / block, inset-inline, etc.); physical `Left`/`Right` exist only
@@ -48,7 +48,7 @@ a table.
 
 ## `asChild` composition + ARIA
 
-`asChild` lets consumers project their own element. Lumen merges props
+`asChild` lets consumers project their own element. Cynosure merges props
 onto the projected element — including ARIA attributes — and preserves any
 attribute the consumer has already set (consumer wins on conflict).
 

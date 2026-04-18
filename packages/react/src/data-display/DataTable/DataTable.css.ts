@@ -78,6 +78,6 @@ export const paginationFooter = style({
 });
 
 export const selectionSummary = style({
-  fontSize: 'var(--lumen-font-body-sm-size)',
+  fontSize: 'var(--cynosure-font-body-sm-size)',
   color: vars.color.foreground.muted,
 });

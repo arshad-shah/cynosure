@@ -1,13 +1,13 @@
 import { createGlobalThemeContract } from '@vanilla-extract/css';
 
 /**
- * Typed mirror of the `@lumen/tokens` CSS custom properties.
+ * Typed mirror of the `@arshad-shah/cynosure-tokens` CSS custom properties.
  *
  * The contract only types the names — consumers must import
- * `@lumen/tokens/css` (and optionally `@lumen/tokens/css/dark`) at runtime for
+ * `@arshad-shah/cynosure-tokens/css` (and optionally `@arshad-shah/cynosure-tokens/css/dark`) at runtime for
  * the values. Every leaf is the CSS variable name (sans the leading `--`),
  * so referring to e.g. `vars.color.accent.solid` inside a `.css.ts` file
- * emits `var(--lumen-color-accent-solid)` at build time.
+ * emits `var(--cynosure-color-accent-solid)` at build time.
  *
  * The key shape here mirrors the token tree *logically*. The `path` mapper
  * below performs the camelCase → kebab-case and `.` → `-` transforms that
@@ -128,7 +128,7 @@ export const vars = createGlobalThemeContract(
       tooltip: '',
     },
   },
-  (_value, path) => `lumen-${toCssName(path as string[])}`,
+  (_value, path) => `cynosure-${toCssName(path as string[])}`,
 );
 
 export type Vars = typeof vars;

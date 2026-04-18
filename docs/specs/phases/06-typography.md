@@ -78,7 +78,7 @@ interface HeadingProps extends LayoutProps {
 
 Critical design: **decouple semantic level from visual size.** `<Heading level={1} size="md">` renders an `h1` (for accessibility / SEO / document outline) but styled as medium text. This is a mandatory pattern in a design system — designers care about visual hierarchy, screen readers and SEO care about semantics.
 
-Renders `<Box as={\`h${level}\`}>` by default. Uses composite typography tokens — `var(--lumen-font-heading-1-weight)`, etc.
+Renders `<Box as={\`h${level}\`}>` by default. Uses composite typography tokens — `var(--cynosure-font-heading-1-weight)`, etc.
 
 ---
 
@@ -139,7 +139,7 @@ interface LinkProps extends LayoutProps, Omit<React.AnchorHTMLAttributes<HTMLAnc
 }
 ```
 
-`external` appends a small arrow icon (from `@lumen/icons`) after the text **unless the link's children include `VisuallyHidden` instructing otherwise** — keeps a11y for screen readers (icon is `aria-hidden`).
+`external` appends a small arrow icon (from `@arshad-shah/cynosure-icons`) after the text **unless the link's children include `VisuallyHidden` instructing otherwise** — keeps a11y for screen readers (icon is `aria-hidden`).
 
 **asChild is the expected pattern** when consumers use framework-level routing:
 
@@ -254,13 +254,13 @@ Edge cases to explicitly test:
 ## Exit criteria
 
 - [ ] All typography components exist with the file structure from Phase 05.
-- [ ] None of them contains a raw JSX element other than `<Box>`, `<Slot>`, or other Lumen primitives.
+- [ ] None of them contains a raw JSX element other than `<Box>`, `<Slot>`, or other Cynosure primitives.
 - [ ] Heading level/size decoupling works and is tested.
 - [ ] `Link external` renders the correct icon + `rel` attributes.
 - [ ] Typography composite tokens are used (no duplicated font sizes in component CSS).
 - [ ] Per-component entry points added to tsup config and `exports` map.
-- [ ] Bundle: `import { Text } from '@lumen/react/text'` produces ≤ 2 KB gzipped total (component + shared CSS).
-- [ ] Changesets: `@lumen/react` minor "Typography components".
+- [ ] Bundle: `import { Text } from '@arshad-shah/cynosure-react/text'` produces ≤ 2 KB gzipped total (component + shared CSS).
+- [ ] Changesets: `@arshad-shah/cynosure-react` minor "Typography components".
 
 ## Decisions to log
 

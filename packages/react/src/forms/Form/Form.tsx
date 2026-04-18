@@ -2,7 +2,7 @@ import { type FormHTMLAttributes, forwardRef } from 'react';
 
 export interface FormProps extends FormHTMLAttributes<HTMLFormElement> {
   /**
-   * Defaults to `true` — Lumen renders its own validation messages via
+   * Defaults to `true` — Cynosure renders its own validation messages via
    * `FormMessage`, so the native browser bubbles conflict with our UI. Pass
    * `noValidate={false}` if you specifically want the browser's validation UI.
    */

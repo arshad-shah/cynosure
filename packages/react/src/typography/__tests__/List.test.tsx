@@ -29,7 +29,7 @@ describe('List', () => {
       </List>,
     );
     const el = container.querySelector('[data-testid="l"]') as HTMLElement;
-    expect(el.style.getPropertyValue('--lumen-list-marker-base')).toBe('square');
+    expect(el.style.getPropertyValue('--cynosure-list-marker-base')).toBe('square');
   });
 
   it('marker="none" hides the marker via data attribute', () => {
@@ -49,8 +49,8 @@ describe('List', () => {
       </List>,
     );
     const el = container.querySelector('[data-testid="l"]') as HTMLElement;
-    expect(el.style.getPropertyValue('--lumen-list-marker-color')).toBe(
-      'var(--lumen-color-accent-solid)',
+    expect(el.style.getPropertyValue('--cynosure-list-marker-color')).toBe(
+      'var(--cynosure-color-accent-solid)',
     );
   });
 
@@ -93,7 +93,7 @@ describe('OrderedList', () => {
       </OrderedList>,
     );
     const el = container.querySelector('[data-testid="ol"]') as HTMLElement;
-    expect(el.style.getPropertyValue('--lumen-list-marker-base')).toBe('decimal');
+    expect(el.style.getPropertyValue('--cynosure-list-marker-base')).toBe('decimal');
   });
 });
 

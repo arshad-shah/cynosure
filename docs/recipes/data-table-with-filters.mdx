@@ -18,7 +18,7 @@ import {
   PopoverContent,
   PopoverTrigger,
   Stack,
-} from '@lumen/react';
+} from '@arshad-shah/cynosure-react';
 
 type Order = {
   id: string;
@@ -106,6 +106,6 @@ export function OrdersTable({ data }: { data: Order[] }) {
 - `DataTable.selectable` adds a row-select column and tri-state header
   checkbox.
 - `onSelectionChange` emits the selected `TData[]`, not TanStack's internal
-  record — a Lumen convenience so you get rows, not ids.
+  record — a Cynosure convenience so you get rows, not ids.
 - For very large datasets, virtualise at the consumer level — row
   virtualisation is on the v1.1 roadmap.

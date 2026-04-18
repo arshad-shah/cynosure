@@ -48,7 +48,7 @@ export type InputProps = InputOwnProps &
     'size' | 'value' | 'defaultValue' | 'onChange' | 'type'
   >;
 
-/** Tiny inline icons — avoid `@lumen/icons` until that package exists. */
+/** Tiny inline icons — avoid `@arshad-shah/cynosure-icons` until that package exists. */
 const EyeIcon = (): React.ReactElement => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
     <path

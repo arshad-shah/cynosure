@@ -15,8 +15,8 @@ export const fieldset = style({
 
 export const legend = style({
   paddingInline: vars.space['1'],
-  fontSize: 'var(--lumen-font-body-sm-size)',
-  lineHeight: 'var(--lumen-font-body-sm-line-height)',
-  fontWeight: 'var(--lumen-font-weight-semibold)',
+  fontSize: 'var(--cynosure-font-body-sm-size)',
+  lineHeight: 'var(--cynosure-font-body-sm-line-height)',
+  fontWeight: 'var(--cynosure-font-weight-semibold)',
   color: vars.color.foreground.default,
 });

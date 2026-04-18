@@ -10,32 +10,34 @@ import {
 
 describe('tokens resolvers', () => {
   it('resolveSpace handles fractional tokens', () => {
-    expect(resolveSpace('4')).toBe('var(--lumen-space-4)');
-    expect(resolveSpace('0.5')).toBe('var(--lumen-space-0-5)');
+    expect(resolveSpace('4')).toBe('var(--cynosure-space-4)');
+    expect(resolveSpace('0.5')).toBe('var(--cynosure-space-0-5)');
     expect(resolveSpace('auto')).toBe('auto');
   });
 
   it('resolveRadius maps to radius CSS var', () => {
-    expect(resolveRadius('md')).toBe('var(--lumen-radius-md)');
-    expect(resolveRadius('2xl')).toBe('var(--lumen-radius-2xl)');
+    expect(resolveRadius('md')).toBe('var(--cynosure-radius-md)');
+    expect(resolveRadius('2xl')).toBe('var(--cynosure-radius-2xl)');
   });
 
   it('resolveShadow kebab-cases camelCase tokens', () => {
-    expect(resolveShadow('md')).toBe('var(--lumen-shadow-md)');
-    expect(resolveShadow('focusRing')).toBe('var(--lumen-shadow-focus-ring)');
+    expect(resolveShadow('md')).toBe('var(--cynosure-shadow-md)');
+    expect(resolveShadow('focusRing')).toBe('var(--cynosure-shadow-focus-ring)');
   });
 
   it('resolveZIndex maps to z CSS var', () => {
-    expect(resolveZIndex('modal')).toBe('var(--lumen-z-modal)');
+    expect(resolveZIndex('modal')).toBe('var(--cynosure-z-modal)');
   });
 
   it('resolveColor handles all categories', () => {
-    expect(resolveColor('bg.surface')).toBe('var(--lumen-color-background-surface)');
-    expect(resolveColor('fg.default')).toBe('var(--lumen-color-foreground-default)');
-    expect(resolveColor('border.focus')).toBe('var(--lumen-color-border-focus)');
-    expect(resolveColor('accent.solid')).toBe('var(--lumen-color-accent-solid)');
-    expect(resolveColor('accent.solidHover')).toBe('var(--lumen-color-accent-solid-hover)');
-    expect(resolveColor('feedback.success.soft')).toBe('var(--lumen-color-feedback-success-soft)');
+    expect(resolveColor('bg.surface')).toBe('var(--cynosure-color-background-surface)');
+    expect(resolveColor('fg.default')).toBe('var(--cynosure-color-foreground-default)');
+    expect(resolveColor('border.focus')).toBe('var(--cynosure-color-border-focus)');
+    expect(resolveColor('accent.solid')).toBe('var(--cynosure-color-accent-solid)');
+    expect(resolveColor('accent.solidHover')).toBe('var(--cynosure-color-accent-solid-hover)');
+    expect(resolveColor('feedback.success.soft')).toBe(
+      'var(--cynosure-color-feedback-success-soft)',
+    );
   });
 
   it('resolveSize handles aliases, lengths and space tokens', () => {
@@ -46,6 +48,6 @@ describe('tokens resolvers', () => {
     expect(resolveSize('prose')).toBe('65ch');
     expect(resolveSize('200px')).toBe('200px');
     expect(resolveSize('50%')).toBe('50%');
-    expect(resolveSize('4')).toBe('var(--lumen-space-4)');
+    expect(resolveSize('4')).toBe('var(--cynosure-space-4)');
   });
 });

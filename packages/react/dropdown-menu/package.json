@@ -1,5 +1,5 @@
 {
-  "name": "@lumen/react/dropdown-menu",
+  "name": "@arshad-shah/cynosure-react/dropdown-menu",
   "private": true,
   "type": "module",
   "main": "../dist/dropdownmenu.js",

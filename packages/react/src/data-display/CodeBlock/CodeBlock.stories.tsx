@@ -141,11 +141,11 @@ export const InlineComposition: Story = {
         tree-shake friendly.
       </Text>
       <CodeBlock language="sh" copyable>
-        {'pnpm add @lumen/react'}
+        {'pnpm add @arshad-shah/cynosure-react'}
       </CodeBlock>
       <Text>Then use the components directly:</Text>
       <CodeBlock language="tsx" filename="App.tsx" copyable showLineNumbers>
-        {`import { Button } from '@lumen/react';\n\nexport default function App() {\n  return <Button>Click me</Button>;\n}\n`}
+        {`import { Button } from '@arshad-shah/cynosure-react';\n\nexport default function App() {\n  return <Button>Click me</Button>;\n}\n`}
       </CodeBlock>
     </Stack>
   ),

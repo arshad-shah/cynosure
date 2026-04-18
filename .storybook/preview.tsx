@@ -1,10 +1,10 @@
-import { DirectionProvider, ThemeProvider, TooltipProvider } from '@lumen/react';
+import { DirectionProvider, ThemeProvider, TooltipProvider } from '@arshad-shah/cynosure-react';
 import type { Decorator, Preview } from '@storybook/react';
-import '@lumen/tokens/css';
-import '@lumen/tokens/css/dark';
-import '@lumen/react/styles.css';
-import '@lumen/themes/terminal';
-import '@lumen/themes/high-contrast';
+import '@arshad-shah/cynosure-tokens/css';
+import '@arshad-shah/cynosure-tokens/css/dark';
+import '@arshad-shah/cynosure-react/styles.css';
+import '@arshad-shah/cynosure-themes/terminal';
+import '@arshad-shah/cynosure-themes/high-contrast';
 import './storybook.css';
 
 const THEMES = ['system', 'light', 'dark', 'terminal', 'high-contrast'] as const;
@@ -57,7 +57,7 @@ const preview: Preview = {
   },
   globalTypes: {
     theme: {
-      description: 'Lumen theme',
+      description: 'Cynosure theme',
       defaultValue: 'light',
       toolbar: {
         title: 'Theme',

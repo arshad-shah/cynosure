@@ -45,7 +45,7 @@ const radiusResolver = (v: RadiusToken, _bp: Breakpoint) => resolveRadius(v);
 const shadowResolver = (v: ShadowToken, _bp: Breakpoint) => resolveShadow(v);
 const zResolver = (v: ZIndexToken, _bp: Breakpoint) => resolveZIndex(v);
 
-/** `--lumen-lp-{key}-{bp}` for each breakpoint the user provided. */
+/** `--cynosure-lp-{key}-{bp}` for each breakpoint the user provided. */
 const emit = <T>(
   value: Responsive<T> | undefined,
   varBase: string,
@@ -53,7 +53,7 @@ const emit = <T>(
 ): CSSProperties | undefined => toResponsiveVars(value, varBase, transform);
 
 /**
- * Map every `LayoutProps` entry into its `--lumen-lp-*-{bp}` CSS custom
+ * Map every `LayoutProps` entry into its `--cynosure-lp-*-{bp}` CSS custom
  * property form so that `layoutPropsStyle` can pick it up. Unknown / undefined
  * props are skipped.
  *
@@ -62,52 +62,52 @@ const emit = <T>(
 export const resolveLayoutProps = (props: LayoutProps): CSSProperties | undefined =>
   mergeStyles(
     // padding
-    emit(props.padding, 'lumen-lp-p', spaceResolver),
-    emit(props.paddingX, 'lumen-lp-px', spaceResolver),
-    emit(props.paddingY, 'lumen-lp-py', spaceResolver),
-    emit(props.paddingTop, 'lumen-lp-pt', spaceResolver),
-    emit(props.paddingRight, 'lumen-lp-pr', spaceResolver),
-    emit(props.paddingBottom, 'lumen-lp-pb', spaceResolver),
-    emit(props.paddingLeft, 'lumen-lp-pl', spaceResolver),
+    emit(props.padding, 'cynosure-lp-p', spaceResolver),
+    emit(props.paddingX, 'cynosure-lp-px', spaceResolver),
+    emit(props.paddingY, 'cynosure-lp-py', spaceResolver),
+    emit(props.paddingTop, 'cynosure-lp-pt', spaceResolver),
+    emit(props.paddingRight, 'cynosure-lp-pr', spaceResolver),
+    emit(props.paddingBottom, 'cynosure-lp-pb', spaceResolver),
+    emit(props.paddingLeft, 'cynosure-lp-pl', spaceResolver),
     // margin
-    emit(props.margin, 'lumen-lp-m', spaceResolver),
-    emit(props.marginX, 'lumen-lp-mx', spaceResolver),
-    emit(props.marginY, 'lumen-lp-my', spaceResolver),
-    emit(props.marginTop, 'lumen-lp-mt', spaceResolver),
-    emit(props.marginRight, 'lumen-lp-mr', spaceResolver),
-    emit(props.marginBottom, 'lumen-lp-mb', spaceResolver),
-    emit(props.marginLeft, 'lumen-lp-ml', spaceResolver),
+    emit(props.margin, 'cynosure-lp-m', spaceResolver),
+    emit(props.marginX, 'cynosure-lp-mx', spaceResolver),
+    emit(props.marginY, 'cynosure-lp-my', spaceResolver),
+    emit(props.marginTop, 'cynosure-lp-mt', spaceResolver),
+    emit(props.marginRight, 'cynosure-lp-mr', spaceResolver),
+    emit(props.marginBottom, 'cynosure-lp-mb', spaceResolver),
+    emit(props.marginLeft, 'cynosure-lp-ml', spaceResolver),
     // size
-    emit(props.width, 'lumen-lp-w', sizeResolver),
-    emit(props.height, 'lumen-lp-h', sizeResolver),
-    emit(props.minWidth, 'lumen-lp-minw', sizeResolver),
-    emit(props.maxWidth, 'lumen-lp-maxw', sizeResolver),
-    emit(props.minHeight, 'lumen-lp-minh', sizeResolver),
-    emit(props.maxHeight, 'lumen-lp-maxh', sizeResolver),
+    emit(props.width, 'cynosure-lp-w', sizeResolver),
+    emit(props.height, 'cynosure-lp-h', sizeResolver),
+    emit(props.minWidth, 'cynosure-lp-minw', sizeResolver),
+    emit(props.maxWidth, 'cynosure-lp-maxw', sizeResolver),
+    emit(props.minHeight, 'cynosure-lp-minh', sizeResolver),
+    emit(props.maxHeight, 'cynosure-lp-maxh', sizeResolver),
     // visual
-    emit(props.background, 'lumen-lp-bg', colorResolver),
-    emit(props.color, 'lumen-lp-fg', colorResolver),
-    emit(props.borderColor, 'lumen-lp-bc', colorResolver),
-    emit(props.borderWidth, 'lumen-lp-bw', borderWidthResolver),
-    emit(props.borderStyle, 'lumen-lp-bs', passthrough as never),
-    emit(props.borderRadius, 'lumen-lp-br', radiusResolver),
-    emit(props.boxShadow, 'lumen-lp-sh', shadowResolver),
-    emit(props.opacity, 'lumen-lp-op', passthrough as never),
-    emit(props.overflow, 'lumen-lp-ov', passthrough as never),
-    emit(props.overflowX, 'lumen-lp-ovx', passthrough as never),
-    emit(props.overflowY, 'lumen-lp-ovy', passthrough as never),
+    emit(props.background, 'cynosure-lp-bg', colorResolver),
+    emit(props.color, 'cynosure-lp-fg', colorResolver),
+    emit(props.borderColor, 'cynosure-lp-bc', colorResolver),
+    emit(props.borderWidth, 'cynosure-lp-bw', borderWidthResolver),
+    emit(props.borderStyle, 'cynosure-lp-bs', passthrough as never),
+    emit(props.borderRadius, 'cynosure-lp-br', radiusResolver),
+    emit(props.boxShadow, 'cynosure-lp-sh', shadowResolver),
+    emit(props.opacity, 'cynosure-lp-op', passthrough as never),
+    emit(props.overflow, 'cynosure-lp-ov', passthrough as never),
+    emit(props.overflowX, 'cynosure-lp-ovx', passthrough as never),
+    emit(props.overflowY, 'cynosure-lp-ovy', passthrough as never),
     // display / position
-    emit(props.display, 'lumen-lp-d', passthrough as never),
-    emit(props.position, 'lumen-lp-pos', passthrough as never),
-    emit(props.top, 'lumen-lp-top', sizeResolver as never),
-    emit(props.right, 'lumen-lp-right', sizeResolver as never),
-    emit(props.bottom, 'lumen-lp-bottom', sizeResolver as never),
-    emit(props.left, 'lumen-lp-left', sizeResolver as never),
-    emit(props.zIndex, 'lumen-lp-z', zResolver),
+    emit(props.display, 'cynosure-lp-d', passthrough as never),
+    emit(props.position, 'cynosure-lp-pos', passthrough as never),
+    emit(props.top, 'cynosure-lp-top', sizeResolver as never),
+    emit(props.right, 'cynosure-lp-right', sizeResolver as never),
+    emit(props.bottom, 'cynosure-lp-bottom', sizeResolver as never),
+    emit(props.left, 'cynosure-lp-left', sizeResolver as never),
+    emit(props.zIndex, 'cynosure-lp-z', zResolver),
     // grid child hints
-    emit(props.gridColumn, 'lumen-lp-gc', passthrough as never),
-    emit(props.gridRow, 'lumen-lp-gr', passthrough as never),
-    emit(props.gridArea, 'lumen-lp-ga', passthrough as never),
+    emit(props.gridColumn, 'cynosure-lp-gc', passthrough as never),
+    emit(props.gridRow, 'cynosure-lp-gr', passthrough as never),
+    emit(props.gridArea, 'cynosure-lp-ga', passthrough as never),
   );
 
 /**

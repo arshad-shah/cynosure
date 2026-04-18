@@ -75,8 +75,8 @@ const interleave = (children: ReactNode, divider: ReactNode): ReactNode => {
     if (i < array.length - 1) {
       const key =
         isValidElement(child) && child.key !== null
-          ? `lumen-divider-${child.key}`
-          : `lumen-divider-${i}`;
+          ? `cynosure-divider-${child.key}`
+          : `cynosure-divider-${i}`;
       out.push(<Fragment key={key}>{divider}</Fragment>);
     }
   });
@@ -90,9 +90,9 @@ const StackRender = (props: AnyProps, ref: ForwardedRef<Element>): ReactElement 
 
   const layoutStyle = resolveLayoutProps(layoutProps);
   const stackStyle = mergeStyles(
-    toResponsiveVars(gap, 'lumen-stack-gap', (v) => resolveSpace(v)),
-    toResponsiveVars(align, 'lumen-stack-align', (v) => ALIGN_MAP[v]),
-    toResponsiveVars(justify, 'lumen-stack-justify', (v) => JUSTIFY_MAP[v]),
+    toResponsiveVars(gap, 'cynosure-stack-gap', (v) => resolveSpace(v)),
+    toResponsiveVars(align, 'cynosure-stack-align', (v) => ALIGN_MAP[v]),
+    toResponsiveVars(justify, 'cynosure-stack-justify', (v) => JUSTIFY_MAP[v]),
   );
   const mergedStyle = mergeStyles(layoutStyle, stackStyle, style);
 

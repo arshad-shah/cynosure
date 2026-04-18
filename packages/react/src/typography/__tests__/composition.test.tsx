@@ -17,8 +17,8 @@ describe('typography composition', () => {
     const t = container.querySelector('[data-testid="t"]') as HTMLElement;
     expect(t.tagName).toBe('SPAN');
     // Text's weight prop flows through Slot's ref/style merging
-    expect(t.style.getPropertyValue('--lumen-text-weight-base')).toBe(
-      'var(--lumen-font-weight-regular)',
+    expect(t.style.getPropertyValue('--cynosure-text-weight-base')).toBe(
+      'var(--cynosure-font-weight-regular)',
     );
   });
 });

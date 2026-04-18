@@ -172,7 +172,7 @@ export const SemanticHierarchy: Story = {
   name: 'Semantic hierarchy — article outline',
   render: () => (
     <Stack gap="4" maxWidth="prose">
-      <Heading level={1}>Introduction to Lumen</Heading>
+      <Heading level={1}>Introduction to Cynosure</Heading>
       <Text color="fg.muted">An opinionated set of primitives for building UI fast.</Text>
 
       <Heading level={2}>Philosophy</Heading>
@@ -191,7 +191,7 @@ export const SemanticHierarchy: Story = {
 
       <Heading level={3}>Install</Heading>
       <Heading level={4}>Peer dependencies</Heading>
-      <Text>React 19+, @lumen/tokens.</Text>
+      <Text>React 19+, @arshad-shah/cynosure-tokens.</Text>
     </Stack>
   ),
 };

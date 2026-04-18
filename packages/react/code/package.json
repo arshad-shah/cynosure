@@ -1,5 +1,5 @@
 {
-  "name": "@lumen/react/code",
+  "name": "@arshad-shah/cynosure-react/code",
   "private": true,
   "type": "module",
   "main": "../dist/code.js",

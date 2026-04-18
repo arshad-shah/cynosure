@@ -13,11 +13,11 @@ export const dividerBase = style({
 
 export const dividerHorizontal = style({
   width: '100%',
-  height: 'var(--lumen-divider-thickness, 1px)',
+  height: 'var(--cynosure-divider-thickness, 1px)',
 });
 
 export const dividerVertical = style({
-  width: 'var(--lumen-divider-thickness, 1px)',
+  width: 'var(--cynosure-divider-thickness, 1px)',
   height: 'auto',
   minHeight: '1em',
 });
@@ -25,28 +25,28 @@ export const dividerVertical = style({
 export const dividerSolid = style({ borderStyle: 'solid' });
 export const dividerDashed = style({
   background: 'transparent',
-  borderTopWidth: 'var(--lumen-divider-thickness, 1px)',
+  borderTopWidth: 'var(--cynosure-divider-thickness, 1px)',
   borderTopStyle: 'dashed',
   borderTopColor: 'currentColor',
   height: 0,
 });
 export const dividerDotted = style({
   background: 'transparent',
-  borderTopWidth: 'var(--lumen-divider-thickness, 1px)',
+  borderTopWidth: 'var(--cynosure-divider-thickness, 1px)',
   borderTopStyle: 'dotted',
   borderTopColor: 'currentColor',
   height: 0,
 });
 export const dividerVerticalDashed = style({
   background: 'transparent',
-  borderInlineStartWidth: 'var(--lumen-divider-thickness, 1px)',
+  borderInlineStartWidth: 'var(--cynosure-divider-thickness, 1px)',
   borderInlineStartStyle: 'dashed',
   borderInlineStartColor: 'currentColor',
   width: 0,
 });
 export const dividerVerticalDotted = style({
   background: 'transparent',
-  borderInlineStartWidth: 'var(--lumen-divider-thickness, 1px)',
+  borderInlineStartWidth: 'var(--cynosure-divider-thickness, 1px)',
   borderInlineStartStyle: 'dotted',
   borderInlineStartColor: 'currentColor',
   width: 0,

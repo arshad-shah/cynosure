@@ -19,7 +19,7 @@ export interface VisuallyHiddenProps extends ComponentPropsWithoutRef<'span'> {}
  * Visually hides content while keeping it available to assistive tech. Used
  * for icon-only buttons, off-screen labels, and live-region announcers. The
  * inline styles override any cascade so the element is hidden even without
- * Lumen's stylesheet.
+ * Cynosure's stylesheet.
  */
 export const VisuallyHidden = forwardRef<HTMLSpanElement, VisuallyHiddenProps>(
   function VisuallyHidden({ style, ...rest }, ref) {

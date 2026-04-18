@@ -35,7 +35,7 @@ export const linkVariant = styleVariants({
   },
   emphasis: {
     color: vars.color.accent.solid,
-    fontWeight: 'var(--lumen-font-weight-semibold)',
+    fontWeight: 'var(--cynosure-font-weight-semibold)',
   },
 });
 

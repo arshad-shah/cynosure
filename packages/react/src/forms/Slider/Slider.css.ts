@@ -16,7 +16,7 @@ export const headerRow = style({
 });
 
 export const valueLabel = style({
-  fontSize: 'var(--lumen-font-body-sm-size)',
+  fontSize: 'var(--cynosure-font-body-sm-size)',
   color: vars.color.foreground.muted,
   fontVariantNumeric: 'tabular-nums',
 });
@@ -88,7 +88,7 @@ export const markLabel = style({
   position: 'absolute',
   top: '0.5rem',
   transform: 'translateX(-50%)',
-  fontSize: 'var(--lumen-font-body-sm-size)',
+  fontSize: 'var(--cynosure-font-body-sm-size)',
   color: vars.color.foreground.muted,
   whiteSpace: 'nowrap',
 });

@@ -1,7 +1,7 @@
 import type { ComponentPropsWithoutRef, ElementType, ReactElement, Ref } from 'react';
 
 /**
- * Minimal polymorphic component helper. Every Lumen layout primitive accepts
+ * Minimal polymorphic component helper. Every Cynosure layout primitive accepts
  * either an `as` prop (renders that intrinsic/custom element) or `asChild`
  * (uses `Slot` to merge props onto the single child). Only `as` participates
  * in the polymorphic type narrowing — `asChild` keeps the declared element's

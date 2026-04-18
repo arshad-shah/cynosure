@@ -29,7 +29,7 @@
 
 ## Rule zero: the styling system
 
-Lumen uses **vanilla-extract** for all component CSS. This is the choice and it's final — revisit only in a major version.
+Cynosure uses **vanilla-extract** for all component CSS. This is the choice and it's final — revisit only in a major version.
 
 ### Why vanilla-extract over alternatives
 
@@ -48,7 +48,7 @@ We pick **vanilla-extract** because it writes literal CSS inside `.css.ts` files
 Install:
 
 ```bash
-pnpm --filter @lumen/react add @vanilla-extract/css @vanilla-extract/recipes
+pnpm --filter @arshad-shah/cynosure-react add @vanilla-extract/css @vanilla-extract/recipes
 pnpm -w add -D @vanilla-extract/vite-plugin
 ```
 
@@ -61,7 +61,7 @@ Create `packages/react/src/styles/vars.css.ts`:
 ```ts
 import { createGlobalThemeContract } from '@vanilla-extract/css';
 
-// Build this programmatically from the @lumen/tokens output shape.
+// Build this programmatically from the @arshad-shah/cynosure-tokens output shape.
 // The resulting `vars` object mirrors the token tree with the CSS custom property
 // names as string values, giving us TS-autocompleted access to tokens.
 export const vars = createGlobalThemeContract(
@@ -80,11 +80,11 @@ export const vars = createGlobalThemeContract(
     duration: { micro: '', short: '', medium: '', long: '' },
     zIndex: { /* … */ },
   },
-  (_value, path) => `lumen-${path.join('-')}` // maps to --lumen-color-background-canvas, etc.
+  (_value, path) => `cynosure-${path.join('-')}` // maps to --cynosure-color-background-canvas, etc.
 );
 ```
 
-`createGlobalThemeContract` does NOT emit any CSS — it just types the variables. The actual values come from `@lumen/tokens/css`. This means: consumers can style using `vars.color.accent.solid` in a `.css.ts` file and we generate correct `var(--lumen-color-accent-solid)` without runtime overhead.
+`createGlobalThemeContract` does NOT emit any CSS — it just types the variables. The actual values come from `@arshad-shah/cynosure-tokens/css`. This means: consumers can style using `vars.color.accent.solid` in a `.css.ts` file and we generate correct `var(--cynosure-color-accent-solid)` without runtime overhead.
 
 ---
 
@@ -370,7 +370,7 @@ export * from './primitives/layout/Stack';
 // …
 ```
 
-The tsup config adds one entry per primitive so consumers can do `import { Box } from '@lumen/react/box'` for the narrowest possible graph:
+The tsup config adds one entry per primitive so consumers can do `import { Box } from '@arshad-shah/cynosure-react/box'` for the narrowest possible graph:
 
 ```ts
 // packages/react/tsup.config.ts
@@ -425,14 +425,14 @@ Every primitive must have, at minimum:
 
 - [ ] All 11 primitives exist with files matching the required layout.
 - [ ] Vanilla-extract pipeline builds per-component CSS files; each primitive's CSS is ≤ 1 KB gzipped.
-- [ ] `import { Box } from '@lumen/react/box'` works and yields a ≤ 3 KB gzipped bundle (Box + shared Slot util + minimal CSS).
+- [ ] `import { Box } from '@arshad-shah/cynosure-react/box'` works and yields a ≤ 3 KB gzipped bundle (Box + shared Slot util + minimal CSS).
 - [ ] A story gallery in Storybook renders every primitive with every variant without console warnings.
 - [ ] A11y addon reports no violations.
 - [ ] Every primitive has ≥ 90% line coverage from Vitest.
 - [ ] RTL flip visually inverts `Inline` and `Stack align="start"` vs `"end"` — verified with a manual Storybook check.
 - [ ] `publint` and `attw` still clean.
 - [ ] Playground renders a dashboard-like layout using only layout primitives + theme colours.
-- [ ] Changesets: `@lumen/react` minor "Layout primitives".
+- [ ] Changesets: `@arshad-shah/cynosure-react` minor "Layout primitives".
 
 ## Decisions to log
 

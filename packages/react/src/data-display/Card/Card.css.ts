@@ -45,9 +45,9 @@ export const cardVariant = styleVariants({
 });
 
 export const cardPaddingSize = styleVariants({
-  sm: { vars: { '--lumen-card-pad': vars.space['3'] } },
-  md: { vars: { '--lumen-card-pad': vars.space['4'] } },
-  lg: { vars: { '--lumen-card-pad': vars.space['6'] } },
+  sm: { vars: { '--cynosure-card-pad': vars.space['3'] } },
+  md: { vars: { '--cynosure-card-pad': vars.space['4'] } },
+  lg: { vars: { '--cynosure-card-pad': vars.space['6'] } },
 });
 
 export const cardInteractive = style({
@@ -77,12 +77,12 @@ export const cardHeader = style({
   display: 'flex',
   flexDirection: 'column',
   gap: vars.space['1'],
-  padding: `var(--lumen-card-pad, ${vars.space['4']})`,
+  padding: `var(--cynosure-card-pad, ${vars.space['4']})`,
 });
 
 export const cardBody = style({
   flex: '1 1 auto',
-  padding: `var(--lumen-card-pad, ${vars.space['4']})`,
+  padding: `var(--cynosure-card-pad, ${vars.space['4']})`,
   selectors: {
     [`.${cardHeader} + &`]: {
       paddingTop: 0,
@@ -95,7 +95,7 @@ export const cardFooter = style({
   gap: vars.space['2'],
   justifyContent: 'flex-end',
   alignItems: 'center',
-  padding: `var(--lumen-card-pad, ${vars.space['4']})`,
+  padding: `var(--cynosure-card-pad, ${vars.space['4']})`,
   selectors: {
     [`.${cardBody} + &`]: {
       paddingTop: 0,
@@ -105,16 +105,16 @@ export const cardFooter = style({
 
 export const cardTitle = style({
   margin: 0,
-  fontFamily: 'var(--lumen-font-heading-3-family)',
-  fontSize: 'var(--lumen-font-heading-3-size)',
-  fontWeight: 'var(--lumen-font-heading-3-weight)',
-  lineHeight: 'var(--lumen-font-heading-3-line-height)',
+  fontFamily: 'var(--cynosure-font-heading-3-family)',
+  fontSize: 'var(--cynosure-font-heading-3-size)',
+  fontWeight: 'var(--cynosure-font-heading-3-weight)',
+  lineHeight: 'var(--cynosure-font-heading-3-line-height)',
   color: vars.color.foreground.default,
 });
 
 export const cardDescription = style({
   margin: 0,
-  fontSize: 'var(--lumen-font-body-sm-size)',
+  fontSize: 'var(--cynosure-font-body-sm-size)',
   color: vars.color.foreground.muted,
 });
 

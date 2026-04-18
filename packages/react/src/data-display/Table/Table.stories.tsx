@@ -233,8 +233,8 @@ export const StickyHeader: Story = {
       style={{
         maxHeight: 280,
         overflow: 'auto',
-        border: '1px solid var(--lumen-color-border-default)',
-        borderRadius: 'var(--lumen-radius-md)',
+        border: '1px solid var(--cynosure-color-border-default)',
+        borderRadius: 'var(--cynosure-radius-md)',
       }}
     >
       <Table variant="striped" stickyHeader>

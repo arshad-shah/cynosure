@@ -13,8 +13,8 @@ const cascade = (base: string, bps: string[]): string => {
 };
 
 const listPropsAt = (bps: string[]): Record<string, string> => ({
-  rowGap: cascade('lumen-list-spacing', bps),
-  listStyleType: cascade('lumen-list-marker', bps),
+  rowGap: cascade('cynosure-list-spacing', bps),
+  listStyleType: cascade('cynosure-list-marker', bps),
 });
 
 /**
@@ -40,7 +40,7 @@ export const listBase = style([
     },
     selectors: {
       '&[data-marker-hidden="true"]': { listStyleType: 'none', paddingInlineStart: 0 },
-      '&::marker': { color: 'var(--lumen-list-marker-color, currentColor)' },
+      '&::marker': { color: 'var(--cynosure-list-marker-color, currentColor)' },
     },
   },
 ]);
@@ -49,7 +49,7 @@ export const listItemBase = style({
   // Make sure markers don't get pushed out of the row gap.
   margin: 0,
   selectors: {
-    '&::marker': { color: 'var(--lumen-list-marker-color, currentColor)' },
+    '&::marker': { color: 'var(--cynosure-list-marker-color, currentColor)' },
   },
 });
 
@@ -64,24 +64,24 @@ export const descriptionListBase = style([
   {
     display: 'grid',
     gridTemplateColumns: 'auto 1fr',
-    rowGap: 'var(--lumen-list-spacing-base)',
-    columnGap: 'var(--lumen-space-4)',
+    rowGap: 'var(--cynosure-list-spacing-base)',
+    columnGap: 'var(--cynosure-space-4)',
     margin: 0,
     '@media': {
       [MEDIA_QUERIES.sm]: {
-        rowGap: cascade('lumen-list-spacing', ['base', 'sm']),
+        rowGap: cascade('cynosure-list-spacing', ['base', 'sm']),
       },
       [MEDIA_QUERIES.md]: {
-        rowGap: cascade('lumen-list-spacing', ['base', 'sm', 'md']),
+        rowGap: cascade('cynosure-list-spacing', ['base', 'sm', 'md']),
       },
       [MEDIA_QUERIES.lg]: {
-        rowGap: cascade('lumen-list-spacing', ['base', 'sm', 'md', 'lg']),
+        rowGap: cascade('cynosure-list-spacing', ['base', 'sm', 'md', 'lg']),
       },
       [MEDIA_QUERIES.xl]: {
-        rowGap: cascade('lumen-list-spacing', ['base', 'sm', 'md', 'lg', 'xl']),
+        rowGap: cascade('cynosure-list-spacing', ['base', 'sm', 'md', 'lg', 'xl']),
       },
       [MEDIA_QUERIES['2xl']]: {
-        rowGap: cascade('lumen-list-spacing', ['base', 'sm', 'md', 'lg', 'xl', '2xl']),
+        rowGap: cascade('cynosure-list-spacing', ['base', 'sm', 'md', 'lg', 'xl', '2xl']),
       },
     },
   },
@@ -89,7 +89,7 @@ export const descriptionListBase = style([
 
 export const descriptionTerm = style({
   margin: 0,
-  fontWeight: 'var(--lumen-font-weight-semibold)',
+  fontWeight: 'var(--cynosure-font-weight-semibold)',
 });
 
 export const descriptionDetails = style({

@@ -53,7 +53,7 @@ const devWarnAs = (as: unknown, element: string): void => {
     if (typeof as === 'string') {
       // eslint-disable-next-line no-console
       console.error(
-        `[lumen] Do not pass \`as="${as}"\` to <${element}>. List components are bound to their semantic element; use the matching component instead.`,
+        `[cynosure] Do not pass \`as="${as}"\` to <${element}>. List components are bound to their semantic element; use the matching component instead.`,
       );
     }
   }
@@ -66,10 +66,10 @@ const buildListStyle = (
   style: CSSProperties | undefined,
 ): CSSProperties | undefined =>
   mergeStyles(
-    toResponsiveVars(spacing, 'lumen-list-spacing', (v) => resolveSpace(v)),
-    toResponsiveVars(marker, 'lumen-list-marker', (v) => v),
+    toResponsiveVars(spacing, 'cynosure-list-spacing', (v) => resolveSpace(v)),
+    toResponsiveVars(marker, 'cynosure-list-marker', (v) => v),
     markerColor !== undefined
-      ? ({ '--lumen-list-marker-color': resolveColor(markerColor) } as CSSProperties)
+      ? ({ '--cynosure-list-marker-color': resolveColor(markerColor) } as CSSProperties)
       : undefined,
     style,
   );

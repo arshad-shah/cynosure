@@ -191,7 +191,7 @@ export const InArticle: Story = {
     <Stack gap="4" maxWidth="prose">
       <Heading level={2}>Primitives we ship</Heading>
       <Text>
-        The Lumen primitives are split into two layers. <strong>Layout primitives</strong> solve
+        The Cynosure primitives are split into two layers. <strong>Layout primitives</strong> solve
         flow, spacing, and sizing; <strong>typography primitives</strong> solve hierarchy and
         readability. Here is a terse map:
       </Text>

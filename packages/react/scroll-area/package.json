@@ -1,5 +1,5 @@
 {
-  "name": "@lumen/react/scroll-area",
+  "name": "@arshad-shah/cynosure-react/scroll-area",
   "private": true,
   "type": "module",
   "main": "../dist/scroll-area.js",

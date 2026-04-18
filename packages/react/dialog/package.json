@@ -1,5 +1,5 @@
 {
-  "name": "@lumen/react/dialog",
+  "name": "@arshad-shah/cynosure-react/dialog",
   "private": true,
   "type": "module",
   "main": "../dist/dialog.js",

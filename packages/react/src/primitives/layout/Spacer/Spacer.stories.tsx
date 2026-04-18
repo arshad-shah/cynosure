@@ -168,7 +168,7 @@ export const StickyFooter: Story = {
       <Box
         padding="3"
         background="bg.subtle"
-        style={{ borderTop: '1px solid var(--lumen-color-border-default)' }}
+        style={{ borderTop: '1px solid var(--cynosure-color-border-default)' }}
       >
         <Text size="sm" color="fg.muted">
           Sticky footer — Spacer consumes all leftover space above.

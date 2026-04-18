@@ -1,6 +1,6 @@
 # Phase 03 — Theming system
 
-> **Goal:** Make `@lumen/tokens` usable at the app level. Provide `ThemeProvider`, `DirectionProvider`, dark-mode mechanics, custom theme authoring, and RTL/reduced-motion plumbing.
+> **Goal:** Make `@arshad-shah/cynosure-tokens` usable at the app level. Provide `ThemeProvider`, `DirectionProvider`, dark-mode mechanics, custom theme authoring, and RTL/reduced-motion plumbing.
 
 **Depends on:** Phase 02.
 **Blocks:** Phases 05+ (components).
@@ -13,8 +13,8 @@ A runtime-free theming system. The provider is only responsible for setting `dat
 
 ### Deliverables
 
-1. `@lumen/react` exports: `ThemeProvider`, `DirectionProvider`, `useTheme()`, `useDirection()`, `useColorScheme()`, `useReducedMotion()`.
-2. `@lumen/themes` package with prebuilt themes: `default` (light/dark), `terminal` (GitHub Dark Terminal), `high-contrast`.
+1. `@arshad-shah/cynosure-react` exports: `ThemeProvider`, `DirectionProvider`, `useTheme()`, `useDirection()`, `useColorScheme()`, `useReducedMotion()`.
+2. `@arshad-shah/cynosure-themes` package with prebuilt themes: `default` (light/dark), `terminal` (GitHub Dark Terminal), `high-contrast`.
 3. A documented **theme authoring recipe** for consumers to make their own.
 4. A sample theme switcher in the playground.
 
@@ -22,12 +22,12 @@ A runtime-free theming system. The provider is only responsible for setting `dat
 
 ## Architecture: the two-layer approach
 
-**Layer A — the CSS layer** (`@lumen/tokens` emits, `@lumen/themes` extends):
+**Layer A — the CSS layer** (`@arshad-shah/cynosure-tokens` emits, `@arshad-shah/cynosure-themes` extends):
 - `:root` carries the base (light) palette.
 - `[data-theme='dark']` overrides semantic tokens for dark.
 - Custom themes emit `[data-theme='<name>']` selectors overriding whichever layer they want.
 
-**Layer B — the React layer** (`ThemeProvider` in `@lumen/react`):
+**Layer B — the React layer** (`ThemeProvider` in `@arshad-shah/cynosure-react`):
 - Reads/writes `<html data-theme>` and `<html dir>`.
 - Exposes a tiny `{ theme, setTheme, resolvedTheme, colorScheme }` through context.
 - Syncs with `prefers-color-scheme` when `theme === 'system'`.
@@ -41,12 +41,12 @@ This separation is why switching themes is instant and cost-free: no re-render s
 ## `ThemeProvider` API
 
 ```tsx
-import { ThemeProvider } from '@lumen/react';
+import { ThemeProvider } from '@arshad-shah/cynosure-react';
 
 <ThemeProvider
   defaultTheme="system"           // "light" | "dark" | "system" | string custom
   themes={['light', 'dark', 'terminal']}  // allowed names; guards typos
-  storageKey="lumen-theme"        // null to disable persistence
+  storageKey="cynosure-theme"        // null to disable persistence
   storage="localStorage"          // "localStorage" | "sessionStorage" | { get, set }
   attribute="data-theme"          // the HTML attribute to set
   disableTransitionOnChange       // adds a 1-frame *{transition:none} to avoid flash
@@ -130,7 +130,7 @@ packages/react/src/theme/
 
 ## `DirectionProvider`
 
-Simple context for `dir="ltr" | "rtl"`. Mirrors Radix's `DirectionProvider` so that Radix primitives inside Lumen inherit direction automatically.
+Simple context for `dir="ltr" | "rtl"`. Mirrors Radix's `DirectionProvider` so that Radix primitives inside Cynosure inherit direction automatically.
 
 ```tsx
 <DirectionProvider dir="rtl">
@@ -148,20 +148,20 @@ Sets `<html dir="rtl">` by default; can be scoped to a subtree by rendering a `<
 
 `useReducedMotion()` — wraps `matchMedia('(prefers-reduced-motion: reduce)')`. Every animated component must check this and either disable or shorten its animations.
 
-CSS-level: also add a global snippet in `@lumen/tokens/css` (appended to `base.css`):
+CSS-level: also add a global snippet in `@arshad-shah/cynosure-tokens/css` (appended to `base.css`):
 
 ```css
 @media (prefers-reduced-motion: reduce) {
   :root {
-    --lumen-duration-motion-micro: 0ms;
-    --lumen-duration-motion-short: 0ms;
-    --lumen-duration-motion-medium: 0ms;
-    --lumen-duration-motion-long: 0ms;
+    --cynosure-duration-motion-micro: 0ms;
+    --cynosure-duration-motion-short: 0ms;
+    --cynosure-duration-motion-medium: 0ms;
+    --cynosure-duration-motion-long: 0ms;
   }
 }
 ```
 
-This means any component using `var(--lumen-duration-motion-short)` in a `transition-duration` automatically loses motion without code changes.
+This means any component using `var(--cynosure-duration-motion-short)` in a `transition-duration` automatically loses motion without code changes.
 
 ---
 
@@ -177,11 +177,11 @@ export type Breakpoint = 'base' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
 The breakpoint values come from tokens:
 
 ```css
---lumen-breakpoint-sm: 40em;   /* 640px */
---lumen-breakpoint-md: 48em;   /* 768px */
---lumen-breakpoint-lg: 64em;   /* 1024px */
---lumen-breakpoint-xl: 80em;   /* 1280px */
---lumen-breakpoint-2xl: 96em;  /* 1536px */
+--cynosure-breakpoint-sm: 40em;   /* 640px */
+--cynosure-breakpoint-md: 48em;   /* 768px */
+--cynosure-breakpoint-lg: 64em;   /* 1024px */
+--cynosure-breakpoint-xl: 80em;   /* 1280px */
+--cynosure-breakpoint-2xl: 96em;  /* 1536px */
 ```
 
 **Strategy:** responsive props generate inline CSS custom properties on the element (`style={{ '--p-base': 2, '--p-md': 4 }}`), and components have pre-compiled media queries reading those properties. This avoids runtime CSS-in-JS while keeping the ergonomics.
@@ -195,7 +195,7 @@ This is a Phase 05 concern in detail; just ship the breakpoint tokens and the `u
 
 ---
 
-## `@lumen/themes` package
+## `@arshad-shah/cynosure-themes` package
 
 A small package that ships pre-built themes as CSS files. Consumers pick and choose.
 
@@ -231,43 +231,43 @@ Honouring Arshad's named design language from memory.
 ```css
 [data-theme='terminal'] {
   /* Canvas & surfaces */
-  --lumen-color-background-canvas: #0d0f14;
-  --lumen-color-background-surface: #161b22;
-  --lumen-color-background-subtle: #10141a;
-  --lumen-color-background-muted: #1c232c;
-  --lumen-color-background-raised: #1c232c;
-  --lumen-color-background-overlay: rgba(0, 0, 0, 0.7);
+  --cynosure-color-background-canvas: #0d0f14;
+  --cynosure-color-background-surface: #161b22;
+  --cynosure-color-background-subtle: #10141a;
+  --cynosure-color-background-muted: #1c232c;
+  --cynosure-color-background-raised: #1c232c;
+  --cynosure-color-background-overlay: rgba(0, 0, 0, 0.7);
 
   /* Foreground */
-  --lumen-color-foreground-default: #e6edf3;
-  --lumen-color-foreground-muted: #7d8590;
-  --lumen-color-foreground-subtle: #484f58;
-  --lumen-color-foreground-disabled: #30363d;
+  --cynosure-color-foreground-default: #e6edf3;
+  --cynosure-color-foreground-muted: #7d8590;
+  --cynosure-color-foreground-subtle: #484f58;
+  --cynosure-color-foreground-disabled: #30363d;
 
   /* Borders */
-  --lumen-color-border-default: #30363d;
-  --lumen-color-border-subtle: #21262d;
-  --lumen-color-border-strong: #484f58;
-  --lumen-color-border-focus: #388bfd;
+  --cynosure-color-border-default: #30363d;
+  --cynosure-color-border-subtle: #21262d;
+  --cynosure-color-border-strong: #484f58;
+  --cynosure-color-border-focus: #388bfd;
 
   /* Accent — muted blue with glow */
-  --lumen-color-accent-solid: #388bfd;
-  --lumen-color-accent-solidHover: #4493f8;
-  --lumen-color-accent-soft: rgba(56, 139, 253, 0.1);
-  --lumen-color-accent-ring: #388bfd;
-  --lumen-color-accent-onSolid: #ffffff;
+  --cynosure-color-accent-solid: #388bfd;
+  --cynosure-color-accent-solidHover: #4493f8;
+  --cynosure-color-accent-soft: rgba(56, 139, 253, 0.1);
+  --cynosure-color-accent-ring: #388bfd;
+  --cynosure-color-accent-onSolid: #ffffff;
 
   /* Typography */
-  --lumen-font-family-sans: 'JetBrains Mono', 'SF Mono', ui-monospace, monospace;
-  --lumen-font-family-mono: 'JetBrains Mono', 'SF Mono', ui-monospace, monospace;
+  --cynosure-font-family-sans: 'JetBrains Mono', 'SF Mono', ui-monospace, monospace;
+  --cynosure-font-family-mono: 'JetBrains Mono', 'SF Mono', ui-monospace, monospace;
 
   /* Radii — tighter than default, terminal aesthetic */
-  --lumen-radius-component-sm: 2px;
-  --lumen-radius-component-md: 4px;
-  --lumen-radius-component-lg: 6px;
+  --cynosure-radius-component-sm: 2px;
+  --cynosure-radius-component-md: 4px;
+  --cynosure-radius-component-lg: 6px;
 
   /* Subtle glow on accent rings */
-  --lumen-shadow-component-focus: 0 0 0 1px #388bfd, 0 0 8px rgba(56, 139, 253, 0.4);
+  --cynosure-shadow-component-focus: 0 0 0 1px #388bfd, 0 0 8px rgba(56, 139, 253, 0.4);
 }
 ```
 
@@ -279,9 +279,9 @@ This theme is the reference implementation of Arshad's "GitHub Dark Terminal" de
 
 Write an MDX page in Storybook: *Foundations → Theming → Authoring a custom theme*. Walk through:
 
-1. Copy the `[data-theme='…']` block from `@lumen/themes/terminal`.
+1. Copy the `[data-theme='…']` block from `@arshad-shah/cynosure-themes/terminal`.
 2. Override only what you care about. Unlisted tokens cascade from `:root`.
-3. Include the CSS file after `@lumen/tokens/css`.
+3. Include the CSS file after `@arshad-shah/cynosure-tokens/css`.
 4. Pass the name to `<ThemeProvider themes={['light', 'dark', 'mybrand']}>`.
 5. Optional: run the contrast check script (Phase 14) against the new theme.
 
@@ -289,7 +289,7 @@ Write an MDX page in Storybook: *Foundations → Theming → Authoring a custom 
 
 ## Playground demonstration
 
-Update `apps/playground/src/App.tsx` to include a theme switcher using Lumen's own Button (imported from `@lumen/react`, even though Button arrives in Phase 07 — this phase can stub Button as a native `<button>` and swap later, OR wait for Phase 07). Better: ship a minimal `<select>` switcher now and upgrade in Phase 07.
+Update `apps/playground/src/App.tsx` to include a theme switcher using Cynosure's own Button (imported from `@arshad-shah/cynosure-react`, even though Button arrives in Phase 07 — this phase can stub Button as a native `<button>` and swap later, OR wait for Phase 07). Better: ship a minimal `<select>` switcher now and upgrade in Phase 07.
 
 ---
 
@@ -298,10 +298,10 @@ Update `apps/playground/src/App.tsx` to include a theme switcher using Lumen's o
 - [ ] `ThemeProvider` mounted in the playground toggles `data-theme` between `light`, `dark`, `terminal` and colours visibly change without a reload.
 - [ ] FOUC prevented: reloading with dark preference renders dark immediately (inspect the initial paint — no flash).
 - [ ] `useTheme()`, `useColorScheme()`, `useDirection()`, `useReducedMotion()` all have Vitest unit tests with simulated media queries.
-- [ ] `@lumen/themes/terminal` imported as a CSS side-effect makes the terminal theme available.
+- [ ] `@arshad-shah/cynosure-themes/terminal` imported as a CSS side-effect makes the terminal theme available.
 - [ ] `DirectionProvider dir="rtl"` flips document direction and Radix primitives pick it up (verify by mounting a stub Radix `Popover` in the playground).
-- [ ] Biome passes; `publint` passes; `attw` passes for both `@lumen/themes` and the updated `@lumen/react`.
-- [ ] Changesets: `@lumen/react` minor, `@lumen/themes` minor.
+- [ ] Biome passes; `publint` passes; `attw` passes for both `@arshad-shah/cynosure-themes` and the updated `@arshad-shah/cynosure-react`.
+- [ ] Changesets: `@arshad-shah/cynosure-react` minor, `@arshad-shah/cynosure-themes` minor.
 
 ## Decisions to log
 

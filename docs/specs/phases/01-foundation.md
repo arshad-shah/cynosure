@@ -16,7 +16,7 @@ A pnpm + Turborepo monorepo containing empty-but-wired packages, shared tooling 
 ## Folder layout to produce
 
 ```
-lumen/
+cynosure/
 ├── .changeset/
 │   └── config.json
 ├── .github/
@@ -41,23 +41,23 @@ lumen/
 │   │   ├── tsconfig.lib.json
 │   │   ├── tsup.config.base.ts
 │   │   └── package.json
-│   ├── tokens/                   # @lumen/tokens
+│   ├── tokens/                   # @arshad-shah/cynosure-tokens
 │   │   ├── src/
 │   │   │   └── index.ts          # empty export for now
 │   │   ├── package.json
 │   │   ├── tsconfig.json
 │   │   └── tsup.config.ts
-│   ├── themes/                   # @lumen/themes
+│   ├── themes/                   # @arshad-shah/cynosure-themes
 │   │   └── …                     # same shape
-│   ├── core/                     # @lumen/core
+│   ├── core/                     # @arshad-shah/cynosure-core
 │   │   └── …
-│   ├── react/                    # @lumen/react
+│   ├── react/                    # @arshad-shah/cynosure-react
 │   │   ├── src/
 │   │   │   └── index.ts
 │   │   ├── package.json
 │   │   ├── tsconfig.json
 │   │   └── tsup.config.ts
-│   └── icons/                    # @lumen/icons
+│   └── icons/                    # @arshad-shah/cynosure-icons
 │       └── …
 ├── .storybook/
 │   ├── main.ts
@@ -80,7 +80,7 @@ lumen/
 ### 1. Repo init
 
 ```bash
-mkdir lumen && cd lumen
+mkdir cynosure && cd cynosure
 git init
 pnpm init
 ```
@@ -89,7 +89,7 @@ Root `package.json`:
 
 ```json
 {
-  "name": "lumen",
+  "name": "cynosure",
   "private": true,
   "version": "0.0.0",
   "packageManager": "pnpm@9.15.0",
@@ -301,10 +301,10 @@ Edit `.changeset/config.json`:
 ```json
 {
   "$schema": "https://unpkg.com/@changesets/config@3.0.0/schema.json",
-  "changelog": ["@changesets/changelog-github", { "repo": "arshadshah/lumen" }],
+  "changelog": ["@changesets/changelog-github", { "repo": "arshadshah/cynosure" }],
   "commit": false,
   "fixed": [],
-  "linked": [["@lumen/*"]],
+  "linked": [["@arshad-shah/cynosure-*"]],
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
@@ -312,7 +312,7 @@ Edit `.changeset/config.json`:
 }
 ```
 
-The `linked` array keeps all `@lumen/*` packages on the same version — this matters for a cohesive design system where `@lumen/react` depends on `@lumen/tokens`.
+The `linked` array keeps all `@arshad-shah/cynosure-*` packages on the same version — this matters for a cohesive design system where `@arshad-shah/cynosure-react` depends on `@arshad-shah/cynosure-tokens`.
 
 ### 7. tsup shared preset
 
@@ -322,7 +322,7 @@ The `linked` array keeps all `@lumen/*` packages on the same version — this ma
 import { defineConfig, type Options } from 'tsup';
 
 /**
- * Shared tsup preset for all @lumen packages.
+ * Shared tsup preset for all @cynosure packages.
  *
  * Design goals:
  * - Per-component entry points (one file per component exported from src/<Component>/index.ts)
@@ -347,15 +347,15 @@ export const createConfig = (overrides: Partial<Options> = {}): Options =>
   }) as Options;
 ```
 
-### 8. Package shell — using `@lumen/react` as the canonical example
+### 8. Package shell — using `@arshad-shah/cynosure-react` as the canonical example
 
 `packages/react/package.json`:
 
 ```json
 {
-  "name": "@lumen/react",
+  "name": "@arshad-shah/cynosure-react",
   "version": "0.0.0",
-  "description": "Lumen UI — React component library",
+  "description": "Cynosure UI — React component library",
   "license": "MIT",
   "type": "module",
   "sideEffects": ["**/*.css"],
@@ -384,11 +384,11 @@ export const createConfig = (overrides: Partial<Options> = {}): Options =>
     "react-dom": ">=19.0.0"
   },
   "dependencies": {
-    "@lumen/core": "workspace:*",
-    "@lumen/tokens": "workspace:*"
+    "@arshad-shah/cynosure-core": "workspace:*",
+    "@arshad-shah/cynosure-tokens": "workspace:*"
   },
   "devDependencies": {
-    "@lumen/config": "workspace:*",
+    "@arshad-shah/cynosure-config": "workspace:*",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "react": "^19.0.0",
@@ -401,12 +401,12 @@ export const createConfig = (overrides: Partial<Options> = {}): Options =>
 }
 ```
 
-> **Per-component exports (comes in Phase 05):** once components exist, we'll extend the `exports` map so `import { Button } from "@lumen/react/button"` works as a sub-path. For now the root export is enough.
+> **Per-component exports (comes in Phase 05):** once components exist, we'll extend the `exports` map so `import { Button } from "@arshad-shah/cynosure-react/button"` works as a sub-path. For now the root export is enough.
 
 `packages/react/tsup.config.ts`:
 
 ```ts
-import { createConfig } from '@lumen/config/tsup.config.base';
+import { createConfig } from '@arshad-shah/cynosure-config/tsup.config.base';
 
 export default createConfig({
   entry: {
@@ -422,7 +422,7 @@ export default createConfig({
 export const VERSION = '0.0.0';
 ```
 
-Do the same pattern for `@lumen/tokens`, `@lumen/themes`, `@lumen/core`, `@lumen/icons` — each with the same `package.json` skeleton, its own `tsconfig.json` extending `packages/config/tsconfig.lib.json`, and a `tsup.config.ts`.
+Do the same pattern for `@arshad-shah/cynosure-tokens`, `@arshad-shah/cynosure-themes`, `@arshad-shah/cynosure-core`, `@arshad-shah/cynosure-icons` — each with the same `package.json` skeleton, its own `tsconfig.json` extending `packages/config/tsconfig.lib.json`, and a `tsup.config.ts`.
 
 ### 9. Vitest (browser mode)
 
@@ -433,7 +433,7 @@ pnpm add -Dw vitest @vitest/browser playwright @testing-library/react @testing-l
 pnpm exec playwright install chromium
 ```
 
-Per-package `vitest.config.ts` (example for `@lumen/react`):
+Per-package `vitest.config.ts` (example for `@arshad-shah/cynosure-react`):
 
 ```ts
 import { defineConfig } from 'vitest/config';
@@ -589,7 +589,7 @@ jobs:
   "type": "module",
   "scripts": { "dev": "vite", "build": "vite build" },
   "dependencies": {
-    "@lumen/react": "workspace:*",
+    "@arshad-shah/cynosure-react": "workspace:*",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
@@ -603,14 +603,14 @@ jobs:
 `apps/playground/src/App.tsx`:
 
 ```tsx
-import { VERSION } from '@lumen/react';
+import { VERSION } from '@arshad-shah/cynosure-react';
 
 export function App() {
-  return <div>Lumen {VERSION}</div>;
+  return <div>Cynosure {VERSION}</div>;
 }
 ```
 
-This sanity-checks that the workspace dependency resolution and the `@lumen/react` build output actually work when consumed.
+This sanity-checks that the workspace dependency resolution and the `@arshad-shah/cynosure-react` build output actually work when consumed.
 
 ---
 
@@ -627,7 +627,7 @@ Every one of these must pass before Phase 02 begins. Each is a literal command y
 - [ ] `pnpm exec publint packages/react/dist` — clean, no warnings
 - [ ] `pnpm exec attw --pack packages/react` — no type-resolution issues
 - [ ] `pnpm changeset` — interactive prompt runs
-- [ ] `cd apps/playground && pnpm dev` — renders "Lumen 0.0.0"
+- [ ] `cd apps/playground && pnpm dev` — renders "Cynosure 0.0.0"
 - [ ] CI workflow runs green on a test PR
 - [ ] Git hooks (`pre-commit`, `commit-msg`) fire on a real commit
 
@@ -640,4 +640,4 @@ Every one of these must pass before Phase 02 begins. Each is a literal command y
 
 - Set Phase 01 to 🟢 Complete.
 - Fill in the "Decisions log" with anything you deviated from in this doc.
-- Write a single changeset `pnpm changeset` at `patch` level scoped to `@lumen/react` with message "Initial foundation"; don't version-bump until Phase 16.
+- Write a single changeset `pnpm changeset` at `patch` level scoped to `@arshad-shah/cynosure-react` with message "Initial foundation"; don't version-bump until Phase 16.

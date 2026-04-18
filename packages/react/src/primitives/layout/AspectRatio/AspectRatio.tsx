@@ -38,7 +38,7 @@ const AspectRatioRender = (props: AnyProps, ref: ForwardedRef<Element>): ReactEl
 
   const layoutStyle = resolveLayoutProps(layoutProps);
   const ratioStyle: CSSProperties = {
-    ['--lumen-aspect-ratio' as string]: String(ratio),
+    ['--cynosure-aspect-ratio' as string]: String(ratio),
   };
   const mergedStyle = mergeStyles(layoutStyle, ratioStyle, style);
 

@@ -10,10 +10,10 @@ describe('Flex', () => {
       </Flex>,
     );
     const el = container.querySelector('[data-testid="flex"]') as HTMLElement;
-    expect(el.style.getPropertyValue('--lumen-flex-dir-base')).toBe('row-reverse');
-    expect(el.style.getPropertyValue('--lumen-flex-grow-base')).toBe('1');
-    expect(el.style.getPropertyValue('--lumen-flex-shrink-base')).toBe('0');
-    expect(el.style.getPropertyValue('--lumen-flex-basis-base')).toBe('auto');
+    expect(el.style.getPropertyValue('--cynosure-flex-dir-base')).toBe('row-reverse');
+    expect(el.style.getPropertyValue('--cynosure-flex-grow-base')).toBe('1');
+    expect(el.style.getPropertyValue('--cynosure-flex-shrink-base')).toBe('0');
+    expect(el.style.getPropertyValue('--cynosure-flex-basis-base')).toBe('auto');
   });
 
   it('handles baseline alignment', () => {
@@ -23,6 +23,6 @@ describe('Flex', () => {
       </Flex>,
     );
     const el = container.querySelector('[data-testid="flex"]') as HTMLElement;
-    expect(el.style.getPropertyValue('--lumen-flex-align-base')).toBe('baseline');
+    expect(el.style.getPropertyValue('--cynosure-flex-align-base')).toBe('baseline');
   });
 });

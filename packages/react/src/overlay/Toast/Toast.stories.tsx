@@ -84,7 +84,7 @@ export const WithDescription: Story = {
     <Button
       onClick={() => {
         toast.success('Invite sent', {
-          description: 'alex@lumen.app will receive an email shortly.',
+          description: 'alex@cynosure.app will receive an email shortly.',
         });
       }}
     >
@@ -225,7 +225,7 @@ export const RichContent: Story = {
               Deployment succeeded
             </Text>
             <Text size="xs" color="fg.muted">
-              Deployed <code>lumen-app@1.20.0</code> to production in 34s.
+              Deployed <code>cynosure-app@1.20.0</code> to production in 34s.
             </Text>
           </Stack>,
         );

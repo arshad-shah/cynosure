@@ -10,8 +10,8 @@ export const radioLabel = style({
   display: 'inline-flex',
   alignItems: 'center',
   gap: vars.space['2'],
-  fontSize: 'var(--lumen-font-body-md-size)',
-  lineHeight: 'var(--lumen-font-body-md-line-height)',
+  fontSize: 'var(--cynosure-font-body-md-size)',
+  lineHeight: 'var(--cynosure-font-body-md-line-height)',
   color: vars.color.foreground.default,
   cursor: 'pointer',
   selectors: {
@@ -64,17 +64,17 @@ export const radioSize = styleVariants({
   sm: {
     width: '1.125rem',
     height: '1.125rem',
-    vars: { '--lumen-radio-dot-size': '0.5rem' },
+    vars: { '--cynosure-radio-dot-size': '0.5rem' },
   },
   md: {
     width: '1.375rem',
     height: '1.375rem',
-    vars: { '--lumen-radio-dot-size': '0.625rem' },
+    vars: { '--cynosure-radio-dot-size': '0.625rem' },
   },
   lg: {
     width: '1.625rem',
     height: '1.625rem',
-    vars: { '--lumen-radio-dot-size': '0.75rem' },
+    vars: { '--cynosure-radio-dot-size': '0.75rem' },
   },
 });
 
@@ -88,8 +88,8 @@ export const radioIndicator = style({
     '&::after': {
       content: '""',
       display: 'block',
-      width: 'var(--lumen-radio-dot-size, 0.625rem)',
-      height: 'var(--lumen-radio-dot-size, 0.625rem)',
+      width: 'var(--cynosure-radio-dot-size, 0.625rem)',
+      height: 'var(--cynosure-radio-dot-size, 0.625rem)',
       borderRadius: vars.radius.full,
       background: 'currentColor',
     },

@@ -1,6 +1,6 @@
 # Phase 15 — Documentation site
 
-> **Goal:** Ship a public documentation site that is the authoritative resource for Lumen. Storybook is the primary tool; we enhance it to serve as a proper docs site rather than bolt on Docusaurus.
+> **Goal:** Ship a public documentation site that is the authoritative resource for Cynosure. Storybook is the primary tool; we enhance it to serve as a proper docs site rather than bolt on Docusaurus.
 
 **Depends on:** Phases 01–14.
 **Blocks:** Phase 16 (release).
@@ -11,14 +11,14 @@
 
 **Storybook is the docs site.** Don't build a separate Docusaurus/Astro/Next site. Storybook 9/10's Docs mode is excellent: MDX pages, interactive component playgrounds, auto-generated API tables from TypeScript types, search, and responsive viewport testing. Running a second docs site means duplicating effort and keeping examples in sync manually.
 
-Published at `docs.lumen.arshad.example` (or similar — on the arshadshah.com infra Arshad already moved to Cloudflare Pages).
+Published at `docs.cynosure.arshad.example` (or similar — on the arshadshah.com infra Arshad already moved to Cloudflare Pages).
 
 ---
 
 ## Site structure
 
 ```
-Lumen
+Cynosure
 ├── Getting started
 │   ├── Introduction
 │   ├── Installation
@@ -115,7 +115,7 @@ import * as ButtonStories from './Button.stories';
 ## Installation
 
 ```bash
-pnpm add @lumen/react
+pnpm add @arshad-shah/cynosure-react
 ```
 
 ## Basic usage
@@ -164,9 +164,9 @@ pnpm add @lumen/react
 
 This component reads from these tokens:
 
-- `--lumen-color-accent-solid`
-- `--lumen-color-accent-solidHover`
-- `--lumen-radius-component-md`
+- `--cynosure-color-accent-solid`
+- `--cynosure-color-accent-solidHover`
+- `--cynosure-radius-component-md`
 - …
 ```
 
@@ -290,7 +290,7 @@ Consistent with Arshad's `arshadshah.com` setup.
 
 ## Custom Storybook theme
 
-Match the Lumen aesthetic. `.storybook/manager.ts`:
+Match the Cynosure aesthetic. `.storybook/manager.ts`:
 
 ```ts
 import { addons } from 'storybook/manager-api';
@@ -298,12 +298,12 @@ import { create } from 'storybook/theming';
 
 const theme = create({
   base: 'dark',
-  brandTitle: 'Lumen UI',
-  brandUrl: 'https://lumen.arshadshah.com',
-  brandImage: '/lumen-logo.svg',
+  brandTitle: 'Cynosure UI',
+  brandUrl: 'https://cynosure.arshadshah.com',
+  brandImage: '/cynosure-logo.svg',
   brandTarget: '_self',
 
-  // Colours derived from Lumen's own terminal theme
+  // Colours derived from Cynosure's own terminal theme
   colorPrimary: '#388bfd',
   colorSecondary: '#388bfd',
   appBg: '#0d0f14',
@@ -328,7 +328,7 @@ Storybook search is basic; consider `@storybook/addon-search` (if available) or 
 
 ## Versioned docs (optional, v1+)
 
-For now, single-version docs on `main`. Defer versioned docs until we have a v2 in flight — at that point, deploy per-major-version subdomains (`v1.lumen.…`, `v2.lumen.…`) and link from a version selector in the nav.
+For now, single-version docs on `main`. Defer versioned docs until we have a v2 in flight — at that point, deploy per-major-version subdomains (`v1.cynosure.…`, `v2.cynosure.…`) and link from a version selector in the nav.
 
 ---
 
@@ -345,7 +345,7 @@ Informs what to document better.
 
 ## Domain & deployment
 
-- Primary: `lumen.arshadshah.com` (subdomain of Arshad's existing root).
+- Primary: `cynosure.arshadshah.com` (subdomain of Arshad's existing root).
 - CDN: Cloudflare Pages.
 - SSL: automatic via Cloudflare.
 - Robots.txt + sitemap generated at build time.
@@ -372,11 +372,11 @@ Before announcing:
 ## Exit criteria
 
 - [ ] Docs site builds cleanly from `pnpm build-storybook`.
-- [ ] Deployed to Cloudflare Pages with the `lumen.arshadshah.com` subdomain (or temporary one).
+- [ ] Deployed to Cloudflare Pages with the `cynosure.arshadshah.com` subdomain (or temporary one).
 - [ ] Every component in the library has an MDX doc page.
 - [ ] All 8 priority recipes published and working.
 - [ ] Launch checklist complete.
-- [ ] Changesets: `@lumen/react` patch "Documentation site".
+- [ ] Changesets: `@arshad-shah/cynosure-react` patch "Documentation site".
 
 ## Decisions to log
 

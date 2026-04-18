@@ -30,8 +30,8 @@ describe('Box', () => {
     const anchor = getByRole('link');
     expect(anchor.tagName).toBe('A');
     expect(anchor.getAttribute('href')).toBe('/home');
-    expect((anchor as HTMLElement).style.getPropertyValue('--lumen-lp-p-base')).toBe(
-      'var(--lumen-space-4)',
+    expect((anchor as HTMLElement).style.getPropertyValue('--cynosure-lp-p-base')).toBe(
+      'var(--cynosure-space-4)',
     );
   });
 
@@ -61,8 +61,8 @@ describe('Box', () => {
       </Box>,
     );
     const el = container.querySelector('[data-testid="box"]') as HTMLElement;
-    expect(el.style.getPropertyValue('--lumen-lp-p-base')).toBe('var(--lumen-space-2)');
-    expect(el.style.getPropertyValue('--lumen-lp-p-md')).toBe('var(--lumen-space-4)');
+    expect(el.style.getPropertyValue('--cynosure-lp-p-base')).toBe('var(--cynosure-space-2)');
+    expect(el.style.getPropertyValue('--cynosure-lp-p-md')).toBe('var(--cynosure-space-4)');
   });
 
   it('resolves size aliases (`full`/`screen`/`prose`)', () => {
@@ -72,9 +72,9 @@ describe('Box', () => {
       </Box>,
     );
     const el = container.querySelector('[data-testid="box"]') as HTMLElement;
-    expect(el.style.getPropertyValue('--lumen-lp-w-base')).toBe('100%');
-    expect(el.style.getPropertyValue('--lumen-lp-h-base')).toBe('100vh');
-    expect(el.style.getPropertyValue('--lumen-lp-maxw-base')).toBe('65ch');
+    expect(el.style.getPropertyValue('--cynosure-lp-w-base')).toBe('100%');
+    expect(el.style.getPropertyValue('--cynosure-lp-h-base')).toBe('100vh');
+    expect(el.style.getPropertyValue('--cynosure-lp-maxw-base')).toBe('65ch');
   });
 
   it('resolves raw length values without translation', () => {
@@ -84,24 +84,26 @@ describe('Box', () => {
       </Box>,
     );
     const el = container.querySelector('[data-testid="box"]') as HTMLElement;
-    expect(el.style.getPropertyValue('--lumen-lp-w-base')).toBe('240px');
-    expect(el.style.getPropertyValue('--lumen-lp-h-base')).toBe('50%');
+    expect(el.style.getPropertyValue('--cynosure-lp-w-base')).toBe('240px');
+    expect(el.style.getPropertyValue('--cynosure-lp-h-base')).toBe('50%');
   });
 
-  it('resolves color tokens to `var(--lumen-color-*)`', () => {
+  it('resolves color tokens to `var(--cynosure-color-*)`', () => {
     const { container } = render(
       <Box background="bg.surface" color="fg.default" borderColor="border.focus" data-testid="box">
         x
       </Box>,
     );
     const el = container.querySelector('[data-testid="box"]') as HTMLElement;
-    expect(el.style.getPropertyValue('--lumen-lp-bg-base')).toBe(
-      'var(--lumen-color-background-surface)',
+    expect(el.style.getPropertyValue('--cynosure-lp-bg-base')).toBe(
+      'var(--cynosure-color-background-surface)',
     );
-    expect(el.style.getPropertyValue('--lumen-lp-fg-base')).toBe(
-      'var(--lumen-color-foreground-default)',
+    expect(el.style.getPropertyValue('--cynosure-lp-fg-base')).toBe(
+      'var(--cynosure-color-foreground-default)',
     );
-    expect(el.style.getPropertyValue('--lumen-lp-bc-base')).toBe('var(--lumen-color-border-focus)');
+    expect(el.style.getPropertyValue('--cynosure-lp-bc-base')).toBe(
+      'var(--cynosure-color-border-focus)',
+    );
   });
 
   it('resolves feedback color tokens', () => {
@@ -111,8 +113,8 @@ describe('Box', () => {
       </Box>,
     );
     const el = container.querySelector('[data-testid="box"]') as HTMLElement;
-    expect(el.style.getPropertyValue('--lumen-lp-bg-base')).toBe(
-      'var(--lumen-color-feedback-success-soft)',
+    expect(el.style.getPropertyValue('--cynosure-lp-bg-base')).toBe(
+      'var(--cynosure-color-feedback-success-soft)',
     );
   });
 
@@ -124,7 +126,7 @@ describe('Box', () => {
     );
     const el = container.querySelector('[data-testid="box"]') as HTMLElement;
     expect(el.style.outline).toBe('1px solid red');
-    expect(el.style.getPropertyValue('--lumen-lp-p-base')).toBe('var(--lumen-space-4)');
+    expect(el.style.getPropertyValue('--cynosure-lp-p-base')).toBe('var(--cynosure-space-4)');
   });
 
   it('forwards unknown intrinsic attributes to the underlying element', () => {

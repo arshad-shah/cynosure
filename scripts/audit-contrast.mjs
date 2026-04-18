@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 /**
- * Lumen UI — colour-contrast audit (Phase 14).
+ * Cynosure UI — colour-contrast audit (Phase 14).
  *
- * Parses the compiled CSS custom properties emitted by `@lumen/tokens` + the
- * prebuilt themes in `@lumen/themes`, resolves every foreground / background
+ * Parses the compiled CSS custom properties emitted by `@arshad-shah/cynosure-tokens` + the
+ * prebuilt themes in `@arshad-shah/cynosure-themes`, resolves every foreground / background
  * pair that we know is paired visually, and checks its WCAG 2.1 contrast
  * ratio against the target minimum for the text size.
  *
@@ -153,7 +153,7 @@ const PAIRS = [
 // -------------------------------------------------------------------------
 // Themes we audit. Each theme is a selector (`:root`, `[data-theme="dark"]`,
 // etc.) + the list of CSS files whose declarations contribute. The base CSS
-// contains `:root` + the dark override; the @lumen/themes package contributes
+// contains `:root` + the dark override; the @arshad-shah/cynosure-themes package contributes
 // the terminal + high-contrast surfaces.
 // -------------------------------------------------------------------------
 const BASE_CSS = resolve(root, 'packages/tokens/dist/css/base.css');
@@ -252,9 +252,9 @@ function resolveTheme(theme) {
 // through up to ~4 levels in practice (semantic → ramp → primitive).
 // -------------------------------------------------------------------------
 function resolveValue(key, bag, depth = 0) {
-  if (depth > 16) throw new Error(`Circular variable reference at --lumen-${key}`);
-  const lookupKey = key.startsWith('lumen-') ? key.slice('lumen-'.length) : key;
-  let value = bag[`lumen-${lookupKey}`] ?? bag[lookupKey];
+  if (depth > 16) throw new Error(`Circular variable reference at --cynosure-${key}`);
+  const lookupKey = key.startsWith('cynosure-') ? key.slice('cynosure-'.length) : key;
+  let value = bag[`cynosure-${lookupKey}`] ?? bag[lookupKey];
   if (value === undefined) return undefined;
   value = value.trim();
   const varMatch = value.match(/^var\(\s*(--[a-zA-Z0-9-]+)\s*(?:,\s*(.+))?\)$/);
@@ -308,7 +308,7 @@ for (const theme of THEMES) {
   const missingLayer = theme.layers.find((l) => !existsSync(l.file));
   if (missingLayer) {
     warnings.push(
-      `[${theme.name}] skipped — missing ${missingLayer.file} (run \`pnpm --filter @lumen/tokens build\` first).`,
+      `[${theme.name}] skipped — missing ${missingLayer.file} (run \`pnpm --filter @arshad-shah/cynosure-tokens build\` first).`,
     );
     continue;
   }
@@ -316,7 +316,7 @@ for (const theme of THEMES) {
   const bag = resolveTheme(theme);
   const canvasValue = resolveValue('color-background-canvas', bag);
   if (canvasValue === undefined) {
-    warnings.push(`[${theme.name}] no --lumen-color-background-canvas — skipping`);
+    warnings.push(`[${theme.name}] no --cynosure-color-background-canvas — skipping`);
     continue;
   }
 

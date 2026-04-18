@@ -23,7 +23,7 @@ export const menuGroupLabelRow = style({
 
 export const menuGroupLabel = style({
   flex: '1 1 auto',
-  fontSize: 'var(--lumen-font-body-sm-size)',
+  fontSize: 'var(--cynosure-font-body-sm-size)',
   fontWeight: 600,
   color: vars.color.foreground.muted,
   textTransform: 'uppercase',
@@ -55,7 +55,7 @@ export const menuGroupCaret = style({
     '&[data-open="true"]': {
       transform: 'rotate(90deg)',
     },
-    '[data-lumen-reduced-motion] &': {
+    '[data-cynosure-reduced-motion] &': {
       transitionDuration: '0s',
     },
   },
@@ -85,8 +85,8 @@ export const menuItemBase = style({
   borderRadius: vars.radius.sm,
   cursor: 'pointer',
   textAlign: 'left',
-  fontSize: 'var(--lumen-font-body-md-size)',
-  fontFamily: 'var(--lumen-font-body-md-family)',
+  fontSize: 'var(--cynosure-font-body-md-size)',
+  fontFamily: 'var(--cynosure-font-body-md-family)',
   fontWeight: 500,
   selectors: {
     '&:hover': {
@@ -131,7 +131,7 @@ export const menuItemLabel = style({
 
 export const menuItemBadge = style({
   flex: '0 0 auto',
-  fontSize: 'var(--lumen-font-body-xs-size, 0.75rem)',
+  fontSize: 'var(--cynosure-font-body-xs-size, 0.75rem)',
   color: vars.color.foreground.muted,
 });
 

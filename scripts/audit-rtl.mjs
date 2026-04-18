@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Lumen UI — RTL audit (Phase 14).
+ * Cynosure UI — RTL audit (Phase 14).
  *
  * Greps `packages/react/src` for physical-direction CSS properties that
  * should be logical. Matches both kebab-case (`margin-left`, used in strings

@@ -4,7 +4,7 @@ import { Meta } from '@storybook/addon-docs/blocks';
 
 # `react-hook-form` integration
 
-`@lumen/react/rhf` ships a thin adapter that plugs `useController` into the
+`@arshad-shah/cynosure-react/rhf` ships a thin adapter that plugs `useController` into the
 `FormField` scaffolding. `react-hook-form` is declared as an **optional peer
 dependency** — bundlers and type checkers will only demand it when the `/rhf`
 subpath is imported.
@@ -17,8 +17,8 @@ pnpm add react-hook-form
 
 ```tsx
 import { useForm } from 'react-hook-form';
-import { Form, Input, Button, Stack } from '@lumen/react';
-import { RHFField } from '@lumen/react/rhf';
+import { Form, Input, Button, Stack } from '@arshad-shah/cynosure-react';
+import { RHFField } from '@arshad-shah/cynosure-react/rhf';
 
 type FormValues = { email: string; password: string };
 
@@ -76,7 +76,7 @@ directly and call `useController` yourself:
 
 ```tsx
 import { useController } from 'react-hook-form';
-import { FormField, FormLabel, FormControl, FormMessage, Input } from '@lumen/react';
+import { FormField, FormLabel, FormControl, FormMessage, Input } from '@arshad-shah/cynosure-react';
 
 function CustomField({ control, name }) {
   const { field, fieldState } = useController({ control, name });

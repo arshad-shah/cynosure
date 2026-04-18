@@ -1,5 +1,5 @@
 {
-  "name": "@lumen/react/date-range-picker",
+  "name": "@arshad-shah/cynosure-react/date-range-picker",
   "private": true,
   "type": "module",
   "main": "../dist/daterangepicker.js",

@@ -57,7 +57,7 @@ export const Divider = forwardRef<HTMLElement, DividerProps>(function Divider(
   ref: ForwardedRef<HTMLElement>,
 ) {
   const resolvedStyle: CSSProperties = {
-    ['--lumen-divider-thickness' as string]: `${thickness}px`,
+    ['--cynosure-divider-thickness' as string]: `${thickness}px`,
     ...style,
   };
   const classes = cn(resolveClasses(orientation, variant), className);

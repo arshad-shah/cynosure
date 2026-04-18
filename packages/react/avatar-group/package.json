@@ -1,5 +1,5 @@
 {
-  "name": "@lumen/react/avatar-group",
+  "name": "@arshad-shah/cynosure-react/avatar-group",
   "private": true,
   "type": "module",
   "main": "../dist/avatar-group.js",

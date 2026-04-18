@@ -75,7 +75,7 @@ export const fileMeta = style({
 });
 
 export const fileName = style({
-  fontSize: 'var(--lumen-font-body-md-size)',
+  fontSize: 'var(--cynosure-font-body-md-size)',
   fontWeight: 500,
   color: vars.color.foreground.default,
   overflow: 'hidden',
@@ -84,7 +84,7 @@ export const fileName = style({
 });
 
 export const fileSize = style({
-  fontSize: 'var(--lumen-font-body-sm-size)',
+  fontSize: 'var(--cynosure-font-body-sm-size)',
   color: vars.color.foreground.muted,
   fontVariantNumeric: 'tabular-nums',
 });

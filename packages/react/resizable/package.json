@@ -1,5 +1,5 @@
 {
-  "name": "@lumen/react/resizable",
+  "name": "@arshad-shah/cynosure-react/resizable",
   "private": true,
   "type": "module",
   "main": "../dist/resizable.js",

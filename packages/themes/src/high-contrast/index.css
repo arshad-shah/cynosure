@@ -1,5 +1,5 @@
 /**
- * Lumen UI — High Contrast theme.
+ * Cynosure UI — High Contrast theme.
  *
  * Designed for WCAG 2.2 AAA contrast: pure-black on white in light mode and
  * the inverse in dark mode. All borders are full-strength, focus rings are
@@ -9,82 +9,82 @@
  * or apply selectively via `data-theme='high-contrast'` on a wrapping element.
  */
 [data-theme="high-contrast"] {
-  --lumen-color-background-canvas: #ffffff;
-  --lumen-color-background-surface: #ffffff;
-  --lumen-color-background-subtle: #ffffff;
-  --lumen-color-background-muted: #f4f4f5;
-  --lumen-color-background-raised: #ffffff;
-  --lumen-color-background-overlay: rgba(0, 0, 0, 0.85);
-  --lumen-color-background-inverse: #000000;
+  --cynosure-color-background-canvas: #ffffff;
+  --cynosure-color-background-surface: #ffffff;
+  --cynosure-color-background-subtle: #ffffff;
+  --cynosure-color-background-muted: #f4f4f5;
+  --cynosure-color-background-raised: #ffffff;
+  --cynosure-color-background-overlay: rgba(0, 0, 0, 0.85);
+  --cynosure-color-background-inverse: #000000;
 
-  --lumen-color-foreground-default: #000000;
-  --lumen-color-foreground-muted: #000000;
-  --lumen-color-foreground-subtle: #1f1f1f;
-  --lumen-color-foreground-disabled: #595959;
-  --lumen-color-foreground-inverse: #ffffff;
-  --lumen-color-foreground-on-accent: #ffffff;
+  --cynosure-color-foreground-default: #000000;
+  --cynosure-color-foreground-muted: #000000;
+  --cynosure-color-foreground-subtle: #1f1f1f;
+  --cynosure-color-foreground-disabled: #595959;
+  --cynosure-color-foreground-inverse: #ffffff;
+  --cynosure-color-foreground-on-accent: #ffffff;
 
-  --lumen-color-border-default: #000000;
-  --lumen-color-border-subtle: #000000;
-  --lumen-color-border-strong: #000000;
-  --lumen-color-border-focus: #0040c0;
-  --lumen-color-border-disabled: #595959;
+  --cynosure-color-border-default: #000000;
+  --cynosure-color-border-subtle: #000000;
+  --cynosure-color-border-strong: #000000;
+  --cynosure-color-border-focus: #0040c0;
+  --cynosure-color-border-disabled: #595959;
 
-  --lumen-color-accent-solid: #0040c0;
-  --lumen-color-accent-solid-hover: #002a80;
-  --lumen-color-accent-solid-active: #001f60;
-  --lumen-color-accent-soft: #ffffff;
-  --lumen-color-accent-soft-hover: #f4f4f5;
-  --lumen-color-accent-soft-active: #e4e4e7;
-  --lumen-color-accent-ring: #0040c0;
-  --lumen-color-accent-on-solid: #ffffff;
+  --cynosure-color-accent-solid: #0040c0;
+  --cynosure-color-accent-solid-hover: #002a80;
+  --cynosure-color-accent-solid-active: #001f60;
+  --cynosure-color-accent-soft: #ffffff;
+  --cynosure-color-accent-soft-hover: #f4f4f5;
+  --cynosure-color-accent-soft-active: #e4e4e7;
+  --cynosure-color-accent-ring: #0040c0;
+  --cynosure-color-accent-on-solid: #ffffff;
 
-  --lumen-color-feedback-success-solid: #006400;
-  --lumen-color-feedback-success-foreground: #006400;
-  --lumen-color-feedback-success-border: #006400;
-  --lumen-color-feedback-danger-solid: #b00000;
-  --lumen-color-feedback-danger-foreground: #b00000;
-  --lumen-color-feedback-danger-border: #b00000;
-  --lumen-color-feedback-warning-solid: #8a5a00;
-  --lumen-color-feedback-warning-foreground: #8a5a00;
-  --lumen-color-feedback-warning-border: #8a5a00;
-  --lumen-color-feedback-info-solid: #0040c0;
-  --lumen-color-feedback-info-foreground: #0040c0;
-  --lumen-color-feedback-info-border: #0040c0;
+  --cynosure-color-feedback-success-solid: #006400;
+  --cynosure-color-feedback-success-foreground: #006400;
+  --cynosure-color-feedback-success-border: #006400;
+  --cynosure-color-feedback-danger-solid: #b00000;
+  --cynosure-color-feedback-danger-foreground: #b00000;
+  --cynosure-color-feedback-danger-border: #b00000;
+  --cynosure-color-feedback-warning-solid: #8a5a00;
+  --cynosure-color-feedback-warning-foreground: #8a5a00;
+  --cynosure-color-feedback-warning-border: #8a5a00;
+  --cynosure-color-feedback-info-solid: #0040c0;
+  --cynosure-color-feedback-info-foreground: #0040c0;
+  --cynosure-color-feedback-info-border: #0040c0;
 
-  --lumen-shadow-component-focus: 0 0 0 3px #0040c0;
+  --cynosure-shadow-component-focus: 0 0 0 3px #0040c0;
 }
 
 [data-theme="high-contrast-dark"] {
-  --lumen-color-background-canvas: #000000;
-  --lumen-color-background-surface: #000000;
-  --lumen-color-background-subtle: #000000;
-  --lumen-color-background-muted: #0a0a0a;
-  --lumen-color-background-raised: #000000;
-  --lumen-color-background-overlay: rgba(0, 0, 0, 0.92);
-  --lumen-color-background-inverse: #ffffff;
+  --cynosure-color-background-canvas: #000000;
+  --cynosure-color-background-surface: #000000;
+  --cynosure-color-background-subtle: #000000;
+  --cynosure-color-background-muted: #0a0a0a;
+  --cynosure-color-background-raised: #000000;
+  --cynosure-color-background-overlay: rgba(0, 0, 0, 0.92);
+  --cynosure-color-background-inverse: #ffffff;
 
-  --lumen-color-foreground-default: #ffffff;
-  --lumen-color-foreground-muted: #ffffff;
-  --lumen-color-foreground-subtle: #e4e4e7;
-  --lumen-color-foreground-disabled: #a1a1aa;
-  --lumen-color-foreground-inverse: #000000;
-  --lumen-color-foreground-on-accent: #000000;
+  --cynosure-color-foreground-default: #ffffff;
+  --cynosure-color-foreground-muted: #ffffff;
+  --cynosure-color-foreground-subtle: #e4e4e7;
+  --cynosure-color-foreground-disabled: #a1a1aa;
+  --cynosure-color-foreground-inverse: #000000;
+  --cynosure-color-foreground-on-accent: #000000;
 
-  --lumen-color-border-default: #ffffff;
-  --lumen-color-border-subtle: #ffffff;
-  --lumen-color-border-strong: #ffffff;
-  --lumen-color-border-focus: #ffd400;
-  --lumen-color-border-disabled: #a1a1aa;
+  --cynosure-color-border-default: #ffffff;
+  --cynosure-color-border-subtle: #ffffff;
+  --cynosure-color-border-strong: #ffffff;
+  --cynosure-color-border-focus: #ffd400;
+  --cynosure-color-border-disabled: #a1a1aa;
 
-  --lumen-color-accent-solid: #ffd400;
-  --lumen-color-accent-solid-hover: #ffe14d;
-  --lumen-color-accent-solid-active: #e6bf00;
-  --lumen-color-accent-soft: #000000;
-  --lumen-color-accent-soft-hover: #1a1a1a;
-  --lumen-color-accent-soft-active: #2a2a2a;
-  --lumen-color-accent-ring: #ffd400;
-  --lumen-color-accent-on-solid: #000000;
+  --cynosure-color-accent-solid: #ffd400;
+  --cynosure-color-accent-solid-hover: #ffe14d;
+  --cynosure-color-accent-solid-active: #e6bf00;
+  --cynosure-color-accent-soft: #000000;
+  --cynosure-color-accent-soft-hover: #1a1a1a;
+  --cynosure-color-accent-soft-active: #2a2a2a;
+  --cynosure-color-accent-ring: #ffd400;
+  --cynosure-color-accent-on-solid: #000000;
 
-  --lumen-shadow-component-focus: 0 0 0 3px #ffd400;
+  --cynosure-shadow-component-focus: 0 0 0 3px #ffd400;
 }

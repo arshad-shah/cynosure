@@ -10,7 +10,7 @@ describe('AspectRatio', () => {
       </AspectRatio>,
     );
     const el = container.querySelector('[data-testid="ar"]') as HTMLElement;
-    expect(el.style.getPropertyValue('--lumen-aspect-ratio')).toBe(String(16 / 9));
+    expect(el.style.getPropertyValue('--cynosure-aspect-ratio')).toBe(String(16 / 9));
     expect(getByAltText('pic')).toBeInTheDocument();
   });
 
@@ -21,6 +21,6 @@ describe('AspectRatio', () => {
       </AspectRatio>,
     );
     const el = container.querySelector('[data-testid="ar"]') as HTMLElement;
-    expect(el.style.getPropertyValue('--lumen-aspect-ratio')).toBe('4 / 3');
+    expect(el.style.getPropertyValue('--cynosure-aspect-ratio')).toBe('4 / 3');
   });
 });
