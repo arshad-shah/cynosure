@@ -7,14 +7,23 @@ on:
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
+
+# Default to read-only GITHUB_TOKEN; any job that needs writes must
+# opt in explicitly. Limits blast radius if a workflow file is ever
+# tampered with.
+permissions:
+  contents: read
+
 jobs:
   verify:
     name: Verify (lint · typecheck · test · build · audits)
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: pnpm/action-setup@f40ffcd9367d9f12939873eb1018b921a783ffaa # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: 22
           cache: pnpm
@@ -61,13 +70,15 @@ jobs:
   cross-browser:
     name: Cross-browser (Chromium · Firefox · WebKit)
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     # Only run on PRs targeting main or on pushes to main — the Playwright
     # install is heavy and pr-branch pushes get their feedback from `verify`.
     if: ${{ github.event_name == 'pull_request' || github.ref == 'refs/heads/main' }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: pnpm/action-setup@f40ffcd9367d9f12939873eb1018b921a783ffaa # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
         with:
           node-version: 22
           cache: pnpm
@@ -100,3 +111,33 @@ jobs:
         env:
           CYNOSURE_BROWSER_MODE: '1'
         run: pnpm --filter @arshad-shah/cynosure-react test:browser
+
+  # Single required status check for branch protection. Listing every
+  # individual job in the ruleset is fragile (rename a job → protection
+  # silently passes); a stable `gate` name that fans in to every job
+  # means the ruleset never needs touching when CI structure changes.
+  gate:
+    name: CI gate
+    needs: [verify, cross-browser]
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Require all upstream jobs green
+        env:
+          RESULTS: ${{ toJSON(needs) }}
+        run: |
+          set -euo pipefail
+          echo "$RESULTS"
+          # A job that was skipped (cross-browser on PR branch pushes that
+          # bypass the trigger filter) is fine. Failure/cancelled is not.
+          echo "$RESULTS" | python3 -c "
+          import json, sys
+          needs = json.load(sys.stdin)
+          bad = [name for name, meta in needs.items() if meta.get('result') not in ('success', 'skipped')]
+          if bad:
+              print(f'::error::Upstream jobs not green: {bad}')
+              sys.exit(1)
+          print('All upstream jobs passed.')
+          "
