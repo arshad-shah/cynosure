@@ -1,6 +1,6 @@
 {
   "name": "@lumen/themes",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Lumen UI — prebuilt themes (terminal, high-contrast)",
   "license": "MIT",
   "type": "module",
