@@ -28,13 +28,26 @@ jobs:
         env:
           LABELS: ${{ toJSON(github.event.pull_request.labels.*.name) }}
           BASE_REF: ${{ github.event.pull_request.base.ref }}
+          AUTHOR_TYPE: ${{ github.event.pull_request.user.type }}
+          AUTHOR_LOGIN: ${{ github.event.pull_request.user.login }}
         run: |
           set -euo pipefail
 
-          # Escape hatch: `skip-changeset` label on the PR bypasses the
-          # check. Use for doc-only, tooling, or CI-only changes that
-          # don't warrant a release. This must be visible in the PR
-          # history — a label is better than a commit footer for audit.
+          # Bypass 1: bot-authored PRs. Dependabot doesn't write
+          # changesets, and the changesets action's own "Version
+          # packages" PR consumes changesets rather than adding them.
+          # Both show `user.type == "Bot"`. Requiring a label on every
+          # bot PR would mean manual work on each Dependabot update —
+          # exactly the toil this automation is meant to eliminate.
+          if [ "$AUTHOR_TYPE" = "Bot" ]; then
+            echo "::notice::PR authored by bot ($AUTHOR_LOGIN) — bypassing changeset requirement."
+            exit 0
+          fi
+
+          # Bypass 2: `skip-changeset` label on the PR. Use for
+          # human-authored doc-only, tooling, or CI-only changes that
+          # don't warrant a release. A label is better than a commit
+          # footer for audit — it's visible in the PR history.
           if echo "$LABELS" | grep -q '"skip-changeset"'; then
             echo "::notice::'skip-changeset' label present — bypassing changeset requirement."
             exit 0
