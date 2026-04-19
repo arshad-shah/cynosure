@@ -4,30 +4,45 @@ import { Meta } from '@storybook/addon-docs/blocks';
 
 # Installation
 
+## Zero-config
+
+```bash
+npx cynosure init
+```
+
+Detects your framework (Next.js App Router, Next.js Pages, Vite, CRA, Remix),
+installs the right packages, writes the single CSS import, and adds
+`CynosureProvider` (plus a `providers.tsx` for Next.js App Router). Add
+`--dry-run` to preview.
+
 ## Requirements
 
-- Node 22 or newer (Cynosure is authored against ESM and uses native TypeScript
-  loading where possible).
-- React 19 and React DOM 19 as peer dependencies.
+- Node 22 or newer for local development (Cynosure is authored against ESM and
+  uses native TypeScript loading).
+- **React 18 or 19** (peer dependency). Works with Next.js 13 / 14 / 15, Vite,
+  CRA, and Remix.
 
-## Install
+## Manual install
 
 ```bash
 pnpm add @arshad-shah/cynosure-react @arshad-shah/cynosure-tokens
+# or: npm install … · yarn add … · bun add …
 ```
 
-Or with npm / yarn:
+## Import the CSS — the one-line way
 
-```bash
-npm install @arshad-shah/cynosure-react @arshad-shah/cynosure-tokens
-yarn add @arshad-shah/cynosure-react @arshad-shah/cynosure-tokens
+```ts
+import '@arshad-shah/cynosure-react/all.css';
 ```
 
-## Import the CSS
+This single file bundles tokens (light + dark) and every component's CSS. For
+most apps it's the right choice.
 
-Cynosure ships CSS separately from JS so bundlers can tree-shake unused
-components. Import the tokens + component styles once at the root of your
-app:
+### The three-import way (granular control)
+
+If you want to load tokens and component styles separately — useful when you
+want to inline critical CSS, ship dark overrides conditionally, or control
+cascade order yourself:
 
 ```ts
 import '@arshad-shah/cynosure-tokens/css';          // design tokens, light theme
@@ -37,15 +52,26 @@ import '@arshad-shah/cynosure-react/styles.css';    // component styles barrel
 
 ### Per-component CSS
 
-If you want to import only the components you use:
+If you import per-component, your bundler wires up the CSS automatically:
 
 ```ts
 import { Button } from '@arshad-shah/cynosure-react/button';
-import '@arshad-shah/cynosure-react/button/button.css';
 ```
 
-Your bundler wires up the CSS automatically when you use the per-component
-ESM entries.
+## Wrap your app
+
+`CynosureProvider` composes `ThemeProvider`, `DirectionProvider`, `LocaleProvider`, and the global `TooltipProvider` in a single wrapper:
+
+```tsx
+import { CynosureProvider } from '@arshad-shah/cynosure-react';
+
+<CynosureProvider theme={{ defaultTheme: 'system' }}>
+  <App />
+</CynosureProvider>
+```
+
+Everything is optional — pass only what you want to override. The individual
+providers are still exported if you prefer to compose them yourself.
 
 ## Optional themes
 
@@ -63,9 +89,10 @@ use `skipLibCheck: false`, make sure your `lib` includes `DOM` and `DOM.Iterable
 
 | Peer               | Range            | Required |
 | ------------------ | ---------------- | -------- |
-| `react`            | `^19`            | yes      |
-| `react-dom`        | `^19`            | yes      |
+| `react`            | `>=18`           | yes      |
+| `react-dom`        | `>=18`           | yes      |
 | `react-hook-form`  | `^7`             | only if you import `@arshad-shah/cynosure-react/rhf` |
 
 See the [quickstart](?path=/docs/getting-started-quickstart--docs) for a
-minimal end-to-end example.
+minimal end-to-end example, or the [Server Components guide](?path=/docs/getting-started-server-components-rsc--docs)
+for Next.js App Router integration.

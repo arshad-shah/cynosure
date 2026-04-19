@@ -1,10 +1,12 @@
 {
-  "name": "@arshad-shah/cynosure-core",
+  "name": "@arshad-shah/cynosure-cli",
   "version": "1.0.1",
-  "description": "Cynosure UI — primitives, utilities, hooks",
+  "description": "Cynosure UI — project scaffolding CLI (npx cynosure init)",
   "license": "MIT",
   "type": "module",
-  "sideEffects": ["**/*.css"],
+  "bin": {
+    "cynosure": "./dist/cli.js"
+  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -20,26 +22,13 @@
     "build": "tsup",
     "dev": "tsup --watch",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run --passWithNoTests",
-    "test:watch": "vitest --passWithNoTests",
     "clean": "rm -rf dist .turbo"
-  },
-  "peerDependencies": {
-    "react": ">=18.0.0",
-    "react-dom": ">=18.0.0"
-  },
-  "dependencies": {
-    "@arshad-shah/cynosure-tokens": "workspace:*"
   },
   "devDependencies": {
     "@arshad-shah/cynosure-config": "workspace:*",
-    "@types/react": "catalog:",
-    "@types/react-dom": "catalog:",
-    "react": "catalog:",
-    "react-dom": "catalog:",
+    "@types/node": "22.10.5",
     "tsup": "catalog:",
-    "typescript": "catalog:",
-    "vitest": "catalog:"
+    "typescript": "catalog:"
   },
   "publishConfig": {
     "access": "public"

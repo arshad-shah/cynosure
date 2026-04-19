@@ -4,85 +4,117 @@
 
 Cynosure is a headless-at-the-core, themed-on-top component library built around a tiny set of layout primitives, W3C DTCG design tokens, and hybrid Radix + React Aria behaviour. Every component ships as its own ESM entry point with its own CSS, so consumers pay only for what they import.
 
-[![npm](https://img.shields.io/npm/v/%40cynosure%2Freact)](https://www.npmjs.com/package/@arshad-shah/cynosure-react)
-[![license](https://img.shields.io/npm/l/%40cynosure%2Freact)](./LICENSE)
-[![bundle](https://img.shields.io/bundlephobia/minzip/%40cynosure%2Freact)](https://bundlephobia.com/package/@arshad-shah/cynosure-react)
+[![npm](https://img.shields.io/npm/v/@arshad-shah/cynosure-react.svg?label=%40arshad-shah%2Fcynosure-react)](https://www.npmjs.com/package/@arshad-shah/cynosure-react)
+[![license](https://img.shields.io/npm/l/@arshad-shah/cynosure-react.svg)](./LICENSE)
+[![bundle](https://img.shields.io/bundlephobia/minzip/@arshad-shah/cynosure-react.svg?label=minzip)](https://bundlephobia.com/package/@arshad-shah/cynosure-react)
+[![types](https://img.shields.io/npm/types/@arshad-shah/cynosure-react.svg)](https://www.npmjs.com/package/@arshad-shah/cynosure-react)
+[![react](https://img.shields.io/badge/react-18%20%7C%2019-61dafb?logo=react&logoColor=white)](./docs/foundations/rsc.mdx)
+[![a11y](https://img.shields.io/badge/WCAG-2.2%20AA-0b8043)](./docs/foundations/accessibility.mdx)
 
 ---
 
-## Install
+## Install in 30 seconds
+
+```bash
+npx cynosure init
+```
+
+One command: detects your framework (Next.js App Router, Next.js Pages, Vite, CRA, Remix), installs the right packages, wires the single CSS import, and adds `CynosureProvider` for you.
+
+### Or install manually
 
 ```bash
 pnpm add @arshad-shah/cynosure-react @arshad-shah/cynosure-tokens
 ```
 
-Peer requirements: `react@^19`, `react-dom@^19`.
-
-Import the CSS once at the root of your app:
-
 ```ts
-import '@arshad-shah/cynosure-tokens/css';          // design tokens (light by default)
-import '@arshad-shah/cynosure-tokens/css/dark';     // dark-mode overrides
-import '@arshad-shah/cynosure-react/styles.css';    // component styles
+// one CSS import covers tokens (light + dark) + every component
+import '@arshad-shah/cynosure-react/all.css';
 ```
-
-Optional prebuilt themes:
-
-```ts
-import '@arshad-shah/cynosure-themes/terminal';
-import '@arshad-shah/cynosure-themes/high-contrast';
-```
-
----
-
-## Hello, Cynosure
 
 ```tsx
-import { Button, Stack, ThemeProvider } from '@arshad-shah/cynosure-react';
+import { CynosureProvider, Button } from '@arshad-shah/cynosure-react';
 
 export default function App() {
   return (
-    <ThemeProvider defaultTheme="system">
-      <Stack gap="3" align="center">
-        <Button>Get started</Button>
-        <Button variant="soft" colorScheme="accent">
-          Read the docs
-        </Button>
-      </Stack>
-    </ThemeProvider>
+    <CynosureProvider>
+      <Button>Hello, Cynosure</Button>
+    </CynosureProvider>
   );
 }
 ```
 
-Per-component imports for the smallest possible bundle:
+Peer requirements: **React 18 or 19** (`react`, `react-dom`). `react-hook-form` is an optional peer for the forms adapter.
 
-```ts
-import { Button } from '@arshad-shah/cynosure-react/button';
-import { Stack } from '@arshad-shah/cynosure-react/stack';
-```
+> **Upgrading?** The older three-import setup (`tokens/css`, `tokens/css/dark`, `react/styles.css`) still works — `all.css` and `CynosureProvider` are additive.
 
 ---
 
-## What you get
+## Why Cynosure
 
-- **90+ components** across layout, typography, forms, overlays, navigation, data display, and feedback.
-- **Theming that is data.** Six built-in themes (light, dark, terminal, high-contrast, + two variants), or author your own by writing CSS custom properties.
-- **Accessibility at the floor.** WCAG 2.2 AA, keyboard complete, RTL-safe, reduced-motion honoured. Every component ships with an axe-passing story.
-- **Tree-shakeable ESM.** Per-component entries (`@arshad-shah/cynosure-react/button`, `@arshad-shah/cynosure-react/combobox`, …) and per-component CSS.
-- **Forms you can actually compose.** `Form` + `FormField` + `FormControl` auto-wire `id`, `aria-describedby`, `aria-invalid`, `name`, `required`, `disabled`. Drop-in adapter for `react-hook-form`.
-- **Storybook-first docs** with interactive playgrounds, MDX recipes, and Chromatic visual regression.
+- **90+ components** across layout, typography, forms, overlays, navigation, data display, and feedback — all pre-styled, all themeable.
+- **Zero-config DX.** One CSS import, one provider, works out of the box with Next.js App Router, Vite, Remix, and CRA.
+- **WCAG 2.2 AA** across every component. Every story is locked to axe-passing. RTL-safe, keyboard complete, reduced-motion honoured.
+- **Pay for what you import.** Per-component ESM entries (`@arshad-shah/cynosure-react/button`) and per-component CSS — your bundler keeps the rest.
+- **Theming that is data.** Six built-in themes (light, dark, terminal, high-contrast) or roll your own by overriding CSS custom properties. No CSS-in-JS runtime.
+- **Forms that auto-wire.** `Form` + `FormField` + `FormControl` wire `id`, `aria-describedby`, `aria-invalid`, `name`, `required`, `disabled` for you. Drop-in `react-hook-form` adapter.
+- **Ships with a docs site.** Interactive Storybook playgrounds, MDX recipes, and Chromatic visual regression in CI.
+
+---
+
+## Bundle sizes
+
+Minified + brotli, per [`size-limit`](./.size-limit.json) budgets enforced in CI:
+
+| Component | Size | Component | Size |
+| --- | ---: | --- | ---: |
+| `Box`, `Stack`, `Flex`, `Grid` | **3 kB** | `Button` | **6 kB** |
+| `Text`, `Heading`, `Link` | **4 kB** | `Input`, `Textarea` | **8 kB** |
+| `Card`, `Badge`, `Alert` | **3–4 kB** | `Checkbox`, `Radio`, `Switch` | **10 kB** |
+| `Tooltip`, `Dialog`, `Drawer` | **18 kB** | `DropdownMenu` | **30 kB** |
+| `Tabs` | **14 kB** | `Accordion` | **14 kB** |
+| `Select` | **55 kB** | `Combobox` | **58 kB** |
+| `DatePicker` | **70 kB** | `DataTable` | **60 kB** |
+| `Form` | **6 kB** | RHF adapter | **8 kB** |
+
+The full barrel tops out at **260 kB** (warning-only). In practice you import per-component and never pay that.
+
+Run `pnpm size` locally to verify against current master.
+
+---
+
+## Server Components (RSC)
+
+Cynosure is RSC-aware. Structural components (`Box`, `Stack`, `Card`, `Text`, `Heading`, `Badge`, `Alert`, …) render inside Server Components. Interactive components (`Button`, form controls, overlays, menus) go inside a `'use client'` boundary — usually a tiny `providers.tsx` at the root.
+
+Full [compatibility matrix and Next.js App Router recipe →](./docs/foundations/rsc.mdx)
 
 ---
 
 ## Packages
 
-| Package                 | What it ships                                                                   |
-| ----------------------- | ------------------------------------------------------------------------------- |
-| `@arshad-shah/cynosure-react`          | The component library — primitives, typography, forms, overlays, nav, data.    |
-| `@arshad-shah/cynosure-tokens`         | W3C DTCG design tokens; compiled CSS (`:root` + dark) and typed TS constants.  |
-| `@arshad-shah/cynosure-themes`         | Prebuilt alternative themes (terminal, high-contrast) as side-effect CSS.      |
-| `@arshad-shah/cynosure-core`           | Framework-agnostic primitives (reserved for cross-framework reuse).            |
-| `@arshad-shah/cynosure-icons`          | Tree-shaken Lucide re-exports.                                                 |
+| Package | What it ships |
+| --- | --- |
+| [`@arshad-shah/cynosure-react`](./packages/react) | The component library — primitives, typography, forms, overlays, nav, data, feedback. |
+| [`@arshad-shah/cynosure-tokens`](./packages/tokens) | W3C DTCG design tokens; compiled CSS (`:root` + dark) and typed TS constants. |
+| [`@arshad-shah/cynosure-themes`](./packages/themes) | Prebuilt alternative themes (terminal, high-contrast) as side-effect CSS. |
+| [`@arshad-shah/cynosure-icons`](./packages/icons) | Tree-shaken Lucide re-exports. |
+| [`@arshad-shah/cynosure-core`](./packages/core) | Framework-agnostic primitives (reserved for cross-framework reuse). |
+| [`@arshad-shah/cynosure-cli`](./packages/cli) | `npx cynosure init` scaffolding CLI. |
+
+---
+
+## Theming in two lines
+
+```tsx
+import { CynosureProvider } from '@arshad-shah/cynosure-react';
+
+<CynosureProvider theme={{ themes: ['light', 'dark', 'terminal'], defaultTheme: 'system' }}>
+  {children}
+</CynosureProvider>
+```
+
+Flip themes at runtime by setting `data-theme` on `<html>`. Authoring a custom theme is one CSS file — see [`custom-themes.mdx`](./docs/foundations/custom-themes.mdx).
 
 ---
 
@@ -93,39 +125,23 @@ Full docs live in Storybook:
 - [**Live docs**](https://cynosure.arshadshah.com) (once deployed)
 - Run locally with `pnpm storybook`
 
-In-repo documentation:
+In-repo:
 
-| Area                                             | Where                                                                    |
-| ------------------------------------------------ | ------------------------------------------------------------------------ |
-| Architecture (the seven laws, styling pipeline)  | [`docs/specs/ARCHITECTURE.md`](./docs/specs/ARCHITECTURE.md)             |
-| Build progress + decisions log                   | [`docs/specs/PROGRESS.md`](./docs/specs/PROGRESS.md)                     |
-| Phase-by-phase build spec                        | [`docs/specs/phases/`](./docs/specs/phases/)                             |
-| Foundations (installation, theming, tokens, …)   | [`docs/foundations/`](./docs/foundations/)                               |
-| Recipes (login, dashboard, data table, …)        | [`docs/recipes/`](./docs/recipes/)                                       |
-| Component source + MDX docs                      | [`packages/react/src/`](./packages/react/src/)                           |
-
----
-
-## Theming in two lines
-
-```tsx
-import { ThemeProvider } from '@arshad-shah/cynosure-react';
-
-<ThemeProvider themes={['light', 'dark', 'terminal']} defaultTheme="system">
-  {children}
-</ThemeProvider>
-```
-
-Flip themes at runtime by setting `data-theme` on `<html>`. Authoring a custom theme is one CSS file — see [`docs/foundations/custom-themes.mdx`](./docs/foundations/custom-themes.mdx).
+| Area | Where |
+| --- | --- |
+| Installation & quick start | [`docs/foundations/installation.mdx`](./docs/foundations/installation.mdx) |
+| Server Components / SSR | [`docs/foundations/rsc.mdx`](./docs/foundations/rsc.mdx) |
+| Theming & custom themes | [`docs/foundations/theming-overview.mdx`](./docs/foundations/theming-overview.mdx) |
+| Accessibility | [`docs/foundations/accessibility.mdx`](./docs/foundations/accessibility.mdx) |
+| RTL support | [`docs/foundations/rtl-support.mdx`](./docs/foundations/rtl-support.mdx) |
+| Recipes (login, dashboard, data table, …) | [`docs/recipes/`](./docs/recipes/) |
+| Architecture deep dives | [`docs/specs/`](./docs/specs/) |
 
 ---
 
 ## Status
 
-Cynosure is currently on the road to `v1.0.0`. See [`docs/specs/PROGRESS.md`](./docs/specs/PROGRESS.md) for phase-by-phase status.
-
-- **Shipped** (phases 01–14): foundation, tokens, theming, core utilities, layout primitives, typography, forms (basic + advanced), overlays, navigation, data display, feedback, form composition, quality hardening.
-- **In progress** (phases 15–16): hosted docs site, v1.0.0 release.
+Cynosure is **v1.0.1** — released and stable. All 14 build phases shipped (foundation, tokens, theming, primitives, typography, forms, overlays, navigation, data display, feedback, form composition, quality hardening). Phases 15–16 (hosted docs site, post-1.0 polish) are in progress.
 
 ---
 

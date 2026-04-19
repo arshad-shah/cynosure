@@ -2,6 +2,8 @@ export { ThemeProvider } from './ThemeProvider.js';
 export { DirectionProvider } from './DirectionProvider.js';
 export { LocaleProvider, useLocale } from './LocaleProvider.js';
 export type { LocaleProviderProps } from './LocaleProvider.js';
+export { CynosureProvider } from './CynosureProvider.js';
+export type { CynosureProviderProps } from './CynosureProvider.js';
 export { getThemeInitScript } from './getThemeInitScript.js';
 export type { ThemeInitScriptOptions } from './getThemeInitScript.js';
 export { useTheme } from './hooks/useTheme.js';

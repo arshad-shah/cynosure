@@ -230,16 +230,36 @@ export default createConfig({
   async onSuccess() {
     const { readdir, readFile, writeFile } = await import('node:fs/promises');
     const { join } = await import('node:path');
+    const { createRequire } = await import('node:module');
     const dist = join(process.cwd(), 'dist');
     const files = (await readdir(dist))
-      .filter((f) => f.endsWith('.css') && f !== 'styles.css')
+      .filter((f) => f.endsWith('.css') && f !== 'styles.css' && f !== 'all.css')
       .sort();
     const chunks: string[] = [];
     for (const file of files) {
       chunks.push(`/* ${file} */`);
       chunks.push(await readFile(join(dist, file), 'utf8'));
     }
-    await writeFile(join(dist, 'styles.css'), chunks.join('\n'));
+    const stylesCss = chunks.join('\n');
+    await writeFile(join(dist, 'styles.css'), stylesCss);
+
+    // Additionally emit `all.css`: a single-import bundle that includes design
+    // tokens (light + dark overrides) alongside every component's CSS. This is
+    // the zero-config path — consumers import one file instead of three.
+    const require = createRequire(import.meta.url);
+    const tokensPkgJson = require.resolve('@arshad-shah/cynosure-tokens/package.json');
+    const tokensDist = join(tokensPkgJson, '..', 'dist', 'css');
+    const baseCss = await readFile(join(tokensDist, 'base.css'), 'utf8');
+    const darkCss = await readFile(join(tokensDist, 'dark.css'), 'utf8');
+    const allCss = [
+      '/* @arshad-shah/cynosure-tokens/css (base) */',
+      baseCss,
+      '/* @arshad-shah/cynosure-tokens/css/dark */',
+      darkCss,
+      '/* @arshad-shah/cynosure-react/styles.css */',
+      stylesCss,
+    ].join('\n');
+    await writeFile(join(dist, 'all.css'), allCss);
   },
   external: [
     'react',
