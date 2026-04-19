@@ -15,7 +15,7 @@
       "default": "./dist/styles.css"
     },
     "./all.css": {
-      "types": "./styles.css.d.ts",
+      "types": "./all.css.d.ts",
       "default": "./dist/all.css"
     },
     "./theme": {
@@ -531,6 +531,7 @@
     "toggle-group",
     "feedback",
     "styles.css.d.ts",
+    "all.css.d.ts",
     "README.md",
     "CHANGELOG.md"
   ],
