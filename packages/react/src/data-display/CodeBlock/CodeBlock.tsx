@@ -8,8 +8,6 @@ import {
   useRef,
 } from 'react';
 import { useClipboard } from '../../hooks/useClipboard.js';
-import { Box } from '../../primitives/layout/Box/Box.js';
-import { Inline } from '../../primitives/layout/Inline/Inline.js';
 import { cn } from '../../utils/cn.js';
 import {
   codeBlockCopyButton,
@@ -39,9 +37,8 @@ export interface CodeBlockProps extends Omit<HTMLAttributes<HTMLDivElement>, 'ch
   /** Pre-rendered HTML (from `highlightCode` or Shiki's `codeToHtml`). Bypasses the auto-highlighter. */
   html?: string;
   /**
-   * Shiki theme. A single string forces one theme; a `{ light, dark }` pair
-   * emits dual-theme CSS variables that follow the Cynosure `data-theme`
-   * attribute with a `prefers-color-scheme` fallback.
+   * Shiki theme. A string forces a single theme; a `{ light, dark }` pair
+   * emits dual-theme CSS variables that follow Cynosure's `data-theme`.
    */
   theme?: CodeTheme;
   /** Override the filename shown in the header. */
@@ -54,6 +51,7 @@ const CopyIcon = (): ReactElement => (
     <path d="M5 15V5a2 2 0 0 1 2-2h10" stroke="currentColor" strokeWidth="2" />
   </svg>
 );
+
 const CheckIcon = (): ReactElement => (
   <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true">
     <path
@@ -72,13 +70,13 @@ function splitLines(source: string): string[] {
 }
 
 /**
- * Syntax-highlighted code block built on Cynosure layout primitives. When
- * `language` is set (and `html` isn't) Shiki is lazy-loaded via the
- * module-level singleton and the source is highlighted in dual-theme mode —
- * the output follows the active `ThemeProvider` theme automatically.
+ * Syntax-highlighted code block. When `language` is set (and no `html` is
+ * provided) Shiki is lazy-loaded via a module-level singleton and the
+ * source is highlighted in dual-theme mode — output follows the active
+ * `ThemeProvider` theme automatically with a `prefers-color-scheme` fallback.
  *
- * For fine control (pre-rendered HTML, custom highlighters) call
- * `highlightCode` / `useCodeHighlight` directly and pass the result as `html`.
+ * For pre-rendered output (SSR, custom highlighters) call `highlightCode`
+ * or `useCodeHighlight` and pass the result as `html`.
  */
 export const CodeBlock = forwardRef<HTMLDivElement, CodeBlockProps>(function CodeBlock(
   {
@@ -107,7 +105,7 @@ export const CodeBlock = forwardRef<HTMLDivElement, CodeBlockProps>(function Cod
   });
   const effectiveHtml = html ?? autoHtml;
 
-  // Apply per-line highlight data attributes after Shiki-rendered HTML paints.
+  // Apply highlight-line data attrs after Shiki-rendered HTML paints.
   useEffect(() => {
     if (!effectiveHtml || !preRef.current) return;
     const lines = preRef.current.querySelectorAll('.line');
@@ -133,27 +131,15 @@ export const CodeBlock = forwardRef<HTMLDivElement, CodeBlockProps>(function Cod
   const hasHeader = filename !== undefined || copyable || language !== 'text';
 
   return (
-    <Box
-      ref={ref as React.Ref<HTMLDivElement>}
-      position="relative"
-      background="background.surface"
-      borderColor="border.subtle"
-      borderWidth="1"
-      borderStyle="solid"
-      borderRadius="md"
-      overflow="hidden"
+    <div
+      ref={ref}
       className={cn(codeBlockRoot, className)}
       style={mergedStyle}
+      data-line-numbers={showLineNumbers || undefined}
       {...rest}
     >
       {hasHeader ? (
-        <Inline
-          justify="between"
-          align="center"
-          paddingX="3"
-          paddingY="1.5"
-          className={codeBlockHeader}
-        >
+        <div className={codeBlockHeader}>
           <span className={codeBlockLabel}>{filename ?? language}</span>
           {copyable ? (
             <button
@@ -168,9 +154,9 @@ export const CodeBlock = forwardRef<HTMLDivElement, CodeBlockProps>(function Cod
               <span>{hasCopied ? 'Copied' : 'Copy'}</span>
             </button>
           ) : null}
-        </Inline>
+        </div>
       ) : null}
-      <Box className={codeBlockScroll}>
+      <div className={codeBlockScroll}>
         {effectiveHtml ? (
           <div
             ref={preRef as unknown as React.Ref<HTMLDivElement>}
@@ -200,7 +186,7 @@ export const CodeBlock = forwardRef<HTMLDivElement, CodeBlockProps>(function Cod
             </code>
           </pre>
         )}
-      </Box>
-    </Box>
+      </div>
+    </div>
   );
 });
