@@ -1,32 +1,35 @@
 import {
   type CSSProperties,
-  type FocusEvent,
+  type ReactNode,
   type TextareaHTMLAttributes,
   forwardRef,
-  useCallback,
-  useId,
-  useState,
 } from 'react';
-import { useControllableState } from '../../hooks/useControllableState.js';
-import { cn } from '../../utils/cn.js';
-import {
-  controlField,
-  controlSize,
-  controlWrapperBase,
-  controlWrapperVariant,
-} from '../shared/control.css.js';
 import type { FormControlBase } from '../shared/types.js';
-import { textareaAutoResize, textareaField } from './Textarea.css.js';
+import { TextareaActions } from './TextareaActions.js';
+import { TextareaClearButton } from './TextareaClearButton.js';
+import { TextareaCounter } from './TextareaCounter.js';
+import type { TextareaResizeMode } from './TextareaContext.js';
+import { TextareaField } from './TextareaField.js';
+import { TextareaFooter } from './TextareaFooter.js';
+import { TextareaResizeHandle } from './TextareaResizeHandle.js';
+import { TextareaRoot } from './TextareaRoot.js';
 
 export interface TextareaOwnProps extends FormControlBase<string> {
   rows?: number;
-  /**
-   * Grow to fit content. Uses native `field-sizing: content` where supported
-   * (Chromium-based browsers) and falls back to the consumer-provided `rows`
-   * otherwise.
-   */
   autoResize?: boolean;
   maxRows?: number;
+  /** Corner-grip resize axis. Default `"vertical"`; `"none"` removes the grip. */
+  resize?: TextareaResizeMode;
+
+  /** Character limit. Soft — typing past it still works but the counter + `aria-invalid` flip. */
+  limit?: number;
+  /** Force the counter to render even without a `limit`. Implied when `limit` is set. */
+  showCount?: boolean;
+  /** Renders a clear button in the top-right corner (visible once the field has content). */
+  clearable?: boolean;
+  /** Footer toolbar contents — rendered inside `<TextareaActions>` on the left of the footer. */
+  toolbar?: ReactNode;
+
   className?: string;
   style?: CSSProperties;
   placeholder?: string;
@@ -38,104 +41,76 @@ export type TextareaProps = TextareaOwnProps &
     'size' | 'value' | 'defaultValue' | 'onChange' | 'rows'
   >;
 
-export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
-  function Textarea(props, ref) {
-    const {
-      id: idProp,
-      value: valueProp,
-      defaultValue,
-      onChange,
-      disabled,
-      readOnly,
-      required,
-      invalid,
-      size = 'md',
-      variant = 'outline',
-      rows = 3,
-      autoResize,
-      maxRows,
-      className,
-      style,
-      onFocus,
-      onBlur,
-      ...rest
-    } = props;
+/**
+ * Convenience wrapper — the everyday entry point. Composes the primitive
+ * sub-components (`TextareaRoot`, `TextareaField`, `TextareaCounter`, etc.)
+ * behind flat feature flags. Break out to the primitives directly when you
+ * need a custom layout.
+ */
+export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(function Textarea(
+  props,
+  ref,
+) {
+  const {
+    id,
+    name,
+    value,
+    defaultValue,
+    onChange,
+    disabled,
+    readOnly,
+    required,
+    invalid,
+    size = 'md',
+    variant = 'outline',
+    rows,
+    autoResize,
+    maxRows,
+    resize = 'vertical',
+    limit,
+    showCount,
+    clearable,
+    toolbar,
+    className,
+    style,
+    placeholder,
+    'aria-describedby': ariaDescribedBy,
+    ...rest
+  } = props;
 
-    const fallbackId = useId();
-    const id = idProp ?? fallbackId;
+  const showCounter = showCount ?? limit != null;
+  const showFooter = showCounter || toolbar != null;
 
-    const [value, setValue] = useControllableState<string>({
-      value: valueProp,
-      defaultValue: defaultValue ?? '',
-      onChange,
-    });
-
-    const [focused, setFocused] = useState(false);
-    const [hover, setHover] = useState(false);
-
-    const handleChange = useCallback(
-      (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-        setValue(e.target.value);
-      },
-      [setValue],
-    );
-
-    const handleFocus = useCallback(
-      (e: FocusEvent<HTMLTextAreaElement>) => {
-        setFocused(true);
-        onFocus?.(e);
-      },
-      [onFocus],
-    );
-    const handleBlur = useCallback(
-      (e: FocusEvent<HTMLTextAreaElement>) => {
-        setFocused(false);
-        onBlur?.(e);
-      },
-      [onBlur],
-    );
-
-    const wrapperClass = cn(
-      controlWrapperBase,
-      controlWrapperVariant[variant],
-      controlSize[size],
-      className,
-    );
-
-    const fieldClass = cn(controlField, textareaField, autoResize ? textareaAutoResize : undefined);
-
-    const fieldStyle: CSSProperties | undefined =
-      autoResize && maxRows ? { maxHeight: `${maxRows * 1.5}em` } : undefined;
-
-    return (
-      <div
-        className={wrapperClass}
-        data-disabled={disabled || undefined}
-        data-readonly={readOnly || undefined}
-        data-invalid={invalid || undefined}
-        data-focus-within={focused || undefined}
-        data-hover={hover || undefined}
-        onMouseEnter={() => setHover(true)}
-        onMouseLeave={() => setHover(false)}
-        style={{ ...style, alignItems: 'stretch' }}
-      >
-        <textarea
-          id={id}
-          ref={ref}
-          rows={rows}
-          value={value}
-          onChange={handleChange}
-          onFocus={handleFocus}
-          onBlur={handleBlur}
-          disabled={disabled}
-          readOnly={readOnly}
-          required={required}
-          aria-invalid={invalid || undefined}
-          className={fieldClass}
-          style={fieldStyle}
-          {...rest}
-        />
-      </div>
-    );
-  },
-);
+  return (
+    <TextareaRoot
+      id={id}
+      name={name}
+      value={value}
+      defaultValue={defaultValue}
+      onChange={onChange}
+      disabled={disabled}
+      readOnly={readOnly}
+      required={required}
+      invalid={invalid}
+      size={size}
+      variant={variant}
+      autoResize={autoResize}
+      maxRows={maxRows}
+      resize={resize}
+      limit={limit}
+      className={className}
+      style={style}
+      aria-describedby={ariaDescribedBy}
+    >
+      <TextareaField ref={ref} rows={rows} placeholder={placeholder} {...rest} />
+      {clearable ? <TextareaClearButton /> : null}
+      {showFooter ? (
+        <TextareaFooter>
+          {toolbar != null ? <TextareaActions>{toolbar}</TextareaActions> : <span aria-hidden />}
+          {showCounter ? <TextareaCounter /> : <span aria-hidden />}
+        </TextareaFooter>
+      ) : null}
+      <TextareaResizeHandle />
+    </TextareaRoot>
+  );
+});
