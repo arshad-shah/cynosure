@@ -11,6 +11,7 @@ export * from './feedback/index.js';
 export * from './utils/index.js';
 
 export {
+  CynosureProvider,
   DirectionProvider,
   LocaleProvider,
   ThemeProvider,
@@ -22,6 +23,7 @@ export {
 export type {
   Breakpoint,
   ColorScheme,
+  CynosureProviderProps,
   Direction,
   DirectionContextValue,
   DirectionProviderProps,

@@ -23,7 +23,7 @@
     "clean": "rm -rf dist .turbo"
   },
   "peerDependencies": {
-    "react": ">=19.0.0"
+    "react": ">=18.0.0"
   },
   "devDependencies": {
     "@arshad-shah/cynosure-config": "workspace:*",
