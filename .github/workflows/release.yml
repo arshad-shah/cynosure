@@ -31,13 +31,22 @@ jobs:
       # events cannot trigger downstream workflows (GitHub's
       # infinite-loop guard) — using the App identity means the
       # Version PR actually runs CI, which in turn unblocks
-      # auto-merge. The App must be installed on the repo with
-      # Contents:write and Pull requests:write.
+      # auto-merge.
+      #
+      # The `permission-*` inputs request the exact scopes this
+      # workflow uses. If the App installation is missing any of
+      # them, this step fails fast with a clear message instead of
+      # surfacing later as an opaque GraphQL "Resource not accessible
+      # by integration" from `@changesets/changelog-github` (which
+      # reads `Commit.associatedPullRequests`, requiring
+      # `pull-requests: read` — implied by `write`).
       - uses: actions/create-github-app-token@fee1f7d63c2ff003460e3d139729b119787bc349 # v2
         id: app-token
         with:
           app-id: ${{ secrets.RELEASE_APP_ID }}
           private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+          permission-contents: write
+          permission-pull-requests: write
 
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
         with:
