@@ -21,7 +21,24 @@
       "Bash(pnpm exec *)",
       "Bash(echo \"exit=$?\")",
       "Bash(npm search *)",
-      "Bash(git commit -m ' *)"
+      "Bash(git commit -m ' *)",
+      "Bash(bash *)",
+      "Bash(command -v pwsh)",
+      "Bash(command -v powershell.exe)",
+      "Bash(curl -s http://localhost:60133/_ping)",
+      "Bash(ls \"\\\\\\\\wsl.localhost\\\\Ubuntu\\\\home\\\\shaha\\\\cynosure\\\\docs\")",
+      "Bash(cat \"\\\\\\\\wsl.localhost\\\\Ubuntu\\\\home\\\\shaha\\\\cynosure\\\\package.json\")",
+      "Bash(cat \"\\\\\\\\wsl.localhost\\\\Ubuntu\\\\home\\\\shaha\\\\cynosure\\\\packages\\\\react\\\\package.json\")",
+      "Bash(grep -E '\"\\\\./\\\\w+\":' \"\\\\\\\\wsl.localhost\\\\Ubuntu\\\\home\\\\shaha\\\\cynosure\\\\packages\\\\react\\\\package.json\")",
+      "Bash(grep -n 'textarea' \"\\\\\\\\wsl.localhost\\\\Ubuntu\\\\home\\\\shaha\\\\cynosure\\\\packages\\\\react\\\\package.json\")",
+      "Bash(grep -nE \"feedback\\\\.\\(warning|danger\\)|feedback\\\\.success|background\\\\.muted|foreground\\\\.\\(muted|subtle|default\\)\" \"\\\\\\\\wsl.localhost\\\\Ubuntu\\\\home\\\\shaha\\\\cynosure\\\\packages\\\\react\\\\src\\\\styles\\\\vars.css.ts\")",
+      "Bash(ls \"\\\\\\\\wsl.localhost\\\\Ubuntu\\\\home\\\\shaha\\\\cynosure\\\\packages\\\\react\\\\\" | head -20 && echo \"---\" && grep -rn \"vitest.config\\\\|vitest.setup\" \"\\\\\\\\wsl.localhost\\\\Ubuntu\\\\home\\\\shaha\\\\cynosure\\\\packages\\\\react\\\\\" --include=\"*.ts\" --include=\"*.json\" -l)",
+      "Bash(ls \"\\\\\\\\wsl.localhost\\\\Ubuntu\\\\home\\\\shaha\\\\cynosure\\\\packages\\\\react\")",
+      "PowerShell(pnpm *)",
+      "Bash(wsl *)",
+      "Bash(pnpm --filter @arshad-shah/cynosure-react test -- src/forms/__tests__/Textarea.test.tsx)",
+      "Bash(wsl.exe -d Ubuntu -- bash -lc 'cd /home/shaha/cynosure && git commit -m \"refactor\\(Textarea\\): split monolith into compound components\" -m \"Break Textarea apart into Root/Field/Footer/Counter/ClearButton/Actions/ResizeHandle pieces sharing a TextareaContext, so consumers can compose the layout they need without a stack of boolean props.\" -m \"Co-Authored-By: Claude Opus 4.7 \\(1M context\\) <noreply@anthropic.com>\"')",
+      "Bash(wsl.exe -d Ubuntu -- bash -lc 'cd /home/shaha/cynosure && git add packages/react/src/data-display/CodeBlock/ && git commit -m \"refactor\\(CodeBlock\\): extract Shiki into a cached highlight module\" -m \"Move createHighlighter/codeToHtml plumbing into CodeBlock/highlight.ts with a module-level \\(lang, theme\\) promise cache, and expose useCodeHighlight/highlightCode as the public surface. CodeBlock itself becomes pure rendering. Single-theme output carries token colors inline, so the card stops fighting the theme background and Shiki line rows display as blocks for the highlight stripe.\" -m \"Co-Authored-By: Claude Opus 4.7 \\(1M context\\) <noreply@anthropic.com>\"')"
     ]
   }
 }
