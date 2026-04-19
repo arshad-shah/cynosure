@@ -57,8 +57,13 @@ jobs:
       # publish auth, no token needed) is npm >= 11.5.1. Without
       # this step, provenance works but the PUT returns a generic
       # "not in this registry" 404 because no token is present.
+      #
+      # Pinned — not `@latest`. Taking the literal newest npm on
+      # every release run turned `npm install -g npm@latest` into
+      # a supply-chain-of-CI-failures single point of failure.
+      # Bump deliberately when npm ships a fix you need.
       - name: Upgrade npm for Trusted Publishing
-        run: npm install -g npm@latest
+        run: npm install -g npm@11.5.2
 
       - run: pnpm install --frozen-lockfile
       - run: pnpm build
