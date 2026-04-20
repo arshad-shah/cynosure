@@ -10,6 +10,7 @@ export const kbdBase = style([
     display: 'inline-flex',
     alignItems: 'center',
     justifyContent: 'center',
+    gap: '0.2em',
     fontFamily: 'var(--cynosure-font-family-mono)',
     fontWeight: 'var(--cynosure-font-weight-medium)',
     lineHeight: 1,

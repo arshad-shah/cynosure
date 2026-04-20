@@ -62,16 +62,24 @@ const GLYPH_TO_ICON: Record<string, LucideIcon> = {
 const ICON_SIZE: Record<KbdSize, number> = { sm: 12, md: 14, lg: 16 };
 
 function renderChildren(children: ReactNode, size: KbdSize): ReactNode {
-  if (typeof children === 'string') {
-    const Icon = GLYPH_TO_ICON[children];
-    if (Icon != null) {
-      return <Icon size={ICON_SIZE[size]} className={kbdIcon} aria-hidden="true" />;
-    }
+  if (typeof children !== 'string') {
+    return isValidElement(children) ? children : children;
   }
-  // A single-child ReactElement representing a recognized glyph (rare, but
-  // future-proof: consumers may wrap in a fragment). Fall through untouched.
-  if (isValidElement(children)) return children;
-  return children;
+  // Walk the string by grapheme so combined shortcuts like "⌘R" or "⇧⌫"
+  // swap known modifier glyphs for icons while letters stay as text. Uses
+  // Array.from to split correctly on Unicode characters.
+  const parts = Array.from(children);
+  const hasIcon = parts.some((ch) => GLYPH_TO_ICON[ch] != null);
+  if (!hasIcon) return children;
+  return parts.map((ch, i) => {
+    const Icon = GLYPH_TO_ICON[ch];
+    if (Icon != null) {
+      // biome-ignore lint/suspicious/noArrayIndexKey: static input; duplicate glyphs allowed within one keycap.
+      return <Icon key={i} size={ICON_SIZE[size]} className={kbdIcon} aria-hidden="true" />;
+    }
+    // biome-ignore lint/suspicious/noArrayIndexKey: static input; duplicate characters allowed within one keycap.
+    return <span key={i}>{ch}</span>;
+  });
 }
 
 const KbdRender = (props: AnyProps, ref: ForwardedRef<HTMLElement>): ReactElement => {
