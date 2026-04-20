@@ -121,13 +121,14 @@ export const menuLabel = style({
   letterSpacing: '0.05em',
 });
 
-/** Cluster of keycaps at the inline-end of a menu item with a guaranteed gap from the label. */
+/** Cluster of keycaps pinned to the inline-end of a menu item, never shrinking. */
 export const menuShortcut = style({
   marginInlineStart: 'auto',
   paddingInlineStart: vars.space['4'],
   display: 'inline-flex',
   alignItems: 'center',
   gap: vars.space['1'],
+  flex: '0 0 auto',
 });
 
 export const menubarRoot = style({

@@ -12,20 +12,24 @@ export const menuLeadingSlot = style({
   color: 'currentColor',
 });
 
-/** Label + description vertical stack; takes all remaining space. */
+/** Label + description vertical stack; takes all remaining space and shrinks before siblings. */
 export const menuLabelStack = style({
   display: 'flex',
   flexDirection: 'column',
   minWidth: 0,
   flex: '1 1 auto',
   gap: '2px',
+  overflow: 'hidden',
 });
 
-/** Primary label line. */
+/** Primary label line — truncates with ellipsis before pushing the shortcut off the edge. */
 export const menuLabelText = style({
   fontSize: 'inherit',
   lineHeight: 'inherit',
   color: 'inherit',
+  whiteSpace: 'nowrap',
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
 });
 
 /** Muted second-line description. */
