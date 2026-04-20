@@ -106,7 +106,6 @@ const overlayComponents = [
   'DropdownMenu',
   'ContextMenu',
   'MenuBar',
-  'Modal',
 ] as const;
 
 const overlayEntries = (): Record<string, string> => {

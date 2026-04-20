@@ -146,22 +146,3 @@ export const DrawerDescription = forwardRef<
     <RadixDialog.Description ref={ref} className={cn(drawerDescription, className)} {...rest} />
   );
 });
-
-// `Sheet` aliases. Same component, different name.
-export {
-  Drawer as Sheet,
-  DrawerTrigger as SheetTrigger,
-  DrawerClose as SheetClose,
-  DrawerPortal as SheetPortal,
-  DrawerContent as SheetContent,
-  DrawerHeader as SheetHeader,
-  DrawerFooter as SheetFooter,
-  DrawerTitle as SheetTitle,
-  DrawerDescription as SheetDescription,
-};
-
-export type {
-  DrawerContentProps as SheetContentProps,
-  DrawerSide as SheetSide,
-  DrawerSize as SheetSize,
-};

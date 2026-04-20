@@ -262,10 +262,6 @@
       "types": "./dist/menubar.d.ts",
       "import": "./dist/menubar.js"
     },
-    "./modal": {
-      "types": "./dist/modal.d.ts",
-      "import": "./dist/modal.js"
-    },
     "./overlay": {
       "types": "./dist/overlay/index.d.ts",
       "import": "./dist/overlay/index.js"
@@ -494,7 +490,6 @@
     "dropdown-menu",
     "context-menu",
     "menu-bar",
-    "modal",
     "overlay",
     "tabs",
     "breadcrumb",

@@ -1,16 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { useState } from 'react';
 import { describe, expect, it } from 'vitest';
-import {
-  Drawer,
-  DrawerContent,
-  DrawerTitle,
-  DrawerTrigger,
-  Sheet,
-  SheetContent,
-  SheetTitle,
-  SheetTrigger,
-} from '../Drawer/index.js';
+import { Drawer, DrawerContent, DrawerTitle, DrawerTrigger } from '../Drawer/index.js';
 
 describe('Drawer', () => {
   function Harness({ side }: { side?: 'top' | 'right' | 'bottom' | 'left' } = {}) {
@@ -31,13 +22,6 @@ describe('Drawer', () => {
     const dialog = screen.getByRole('dialog');
     expect(dialog).toBeInTheDocument();
     expect(dialog.getAttribute('data-side')).toBe('left');
-  });
-
-  it('Sheet aliases expose the same component', () => {
-    expect(Sheet).toBe(Drawer);
-    expect(SheetContent).toBe(DrawerContent);
-    expect(SheetTitle).toBe(DrawerTitle);
-    expect(SheetTrigger).toBe(DrawerTrigger);
   });
 
   it('renders close button and dismisses on click', () => {
