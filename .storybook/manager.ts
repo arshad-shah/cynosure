@@ -10,6 +10,7 @@ const theme = create({
   brandTitle: 'Cynosure UI',
   brandUrl: 'https://cynosure.arshadshah.com',
   brandTarget: '_self',
+  brandImage: './brand/cynosure-lockup.svg',
 
   colorPrimary: '#388bfd',
   colorSecondary: '#388bfd',
