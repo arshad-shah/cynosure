@@ -39,7 +39,8 @@
       "Bash(pnpm --filter @arshad-shah/cynosure-react test -- src/forms/__tests__/Textarea.test.tsx)",
       "Bash(wsl.exe -d Ubuntu -- bash -lc 'cd /home/shaha/cynosure && git commit -m \"refactor\\(Textarea\\): split monolith into compound components\" -m \"Break Textarea apart into Root/Field/Footer/Counter/ClearButton/Actions/ResizeHandle pieces sharing a TextareaContext, so consumers can compose the layout they need without a stack of boolean props.\" -m \"Co-Authored-By: Claude Opus 4.7 \\(1M context\\) <noreply@anthropic.com>\"')",
       "Bash(wsl.exe -d Ubuntu -- bash -lc 'cd /home/shaha/cynosure && git add packages/react/src/data-display/CodeBlock/ && git commit -m \"refactor\\(CodeBlock\\): extract Shiki into a cached highlight module\" -m \"Move createHighlighter/codeToHtml plumbing into CodeBlock/highlight.ts with a module-level \\(lang, theme\\) promise cache, and expose useCodeHighlight/highlightCode as the public surface. CodeBlock itself becomes pure rendering. Single-theme output carries token colors inline, so the card stops fighting the theme background and Shiki line rows display as blocks for the highlight stripe.\" -m \"Co-Authored-By: Claude Opus 4.7 \\(1M context\\) <noreply@anthropic.com>\"')",
-      "Bash(C:/Users/shaha/.claude/plugins/cache/claude-plugins-official/superpowers/5.0.7/skills/brainstorming/scripts/start-server.sh *)"
+      "Bash(C:/Users/shaha/.claude/plugins/cache/claude-plugins-official/superpowers/5.0.7/skills/brainstorming/scripts/start-server.sh *)",
+      "Bash(pnpm --filter @arshad-shah/cynosure-react typecheck)"
     ]
   }
 }

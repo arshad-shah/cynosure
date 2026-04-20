@@ -121,17 +121,9 @@ export const menuLabel = style({
   letterSpacing: '0.05em',
 });
 
-/** Keyboard shortcut chip rendered at the inline-end of an item. */
+/** Positions cynosure's `<Kbd>` at the inline-end of a menu item. */
 export const menuShortcut = style({
   marginInlineStart: 'auto',
-  paddingInline: vars.space['1'],
-  paddingBlock: '0',
-  fontSize: 'var(--cynosure-font-body-sm-size)',
-  color: vars.color.foreground.muted,
-  fontVariantNumeric: 'tabular-nums',
-  border: `1px solid ${vars.color.border.subtle}`,
-  borderRadius: vars.radius.xs,
-  lineHeight: '1.5',
 });
 
 export const menubarRoot = style({

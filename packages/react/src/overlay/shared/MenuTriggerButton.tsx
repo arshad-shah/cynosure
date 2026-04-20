@@ -1,8 +1,8 @@
 import * as RadixDropdown from '@radix-ui/react-dropdown-menu';
+import { ChevronDown } from 'lucide-react';
 import { type ElementRef, type ReactElement, forwardRef } from 'react';
 import { Button, type ButtonProps } from '../../forms/Button/Button.js';
 import { triggerChevron } from './createMenuKit.css.js';
-import { ChevronDown } from './menuIcons.js';
 
 export interface MenuTriggerButtonProps extends Omit<ButtonProps, 'asChild' | 'rightIcon'> {}
 
@@ -20,7 +20,7 @@ export const MenuTriggerButton = forwardRef<ElementRef<typeof Button>, MenuTrigg
           {...rest}
           rightIcon={
             <span className={triggerChevron} aria-hidden="true">
-              <ChevronDown />
+              <ChevronDown size={14} />
             </span>
           }
         >

@@ -14,208 +14,127 @@ const meta: Meta<typeof Divider> = {
     orientation: { control: 'select', options: ['horizontal', 'vertical'] },
     variant: { control: 'select', options: ['solid', 'dashed', 'dotted'] },
     thickness: { control: 'select', options: ['1', '2'] },
+    tone: { control: 'select', options: ['subtle', 'default'] },
+    labelAlign: { control: 'select', options: ['start', 'center', 'end'] },
+    soft: { control: 'boolean' },
     decorative: { control: 'boolean' },
+    children: { control: 'text' },
   },
 };
 export default meta;
 type Story = StoryObj<typeof Divider>;
+
+const Row = ({ label, children }: { label: string; children: React.ReactNode }) => (
+  <Stack gap="2">
+    <Text size="sm" variant="overline" color="fg.muted">
+      {label}
+    </Text>
+    {children}
+  </Stack>
+);
+
+// ── Playground ─────────────────────────────────────────────────────────
 
 export const Playground: Story = {
   args: {
     orientation: 'horizontal',
     variant: 'solid',
     thickness: '1',
+    tone: 'subtle',
+    soft: false,
+    labelAlign: 'center',
     decorative: true,
+    children: '',
   },
   render: (args) => (
-    <Stack gap="3" width="320px">
+    <Stack gap="3" width="360px">
       <Text>above</Text>
-      <Divider {...args} />
+      <Divider {...args}>{args.children || undefined}</Divider>
       <Text>below</Text>
     </Stack>
   ),
 };
 
-// ── Horizontal variants ────────────────────────────────────────────────
+// ── Variants × thickness ───────────────────────────────────────────────
 
-export const Horizontal: Story = {
+export const Variants: Story = {
   render: () => (
-    <Stack gap="4" width="360px">
-      <Stack gap="3">
-        <Text size="sm" variant="overline">
-          Solid (default)
-        </Text>
+    <Stack gap="5" width="420px">
+      <Row label="Solid · 1">
         <Divider />
-      </Stack>
-      <Stack gap="3">
-        <Text size="sm" variant="overline">
-          Dashed
-        </Text>
-        <Divider variant="dashed" />
-      </Stack>
-      <Stack gap="3">
-        <Text size="sm" variant="overline">
-          Dotted
-        </Text>
-        <Divider variant="dotted" />
-      </Stack>
-      <Stack gap="3">
-        <Text size="sm" variant="overline">
-          Thickness 2
-        </Text>
+      </Row>
+      <Row label="Solid · 2">
         <Divider thickness="2" />
-      </Stack>
+      </Row>
+      <Row label="Dashed · 1">
+        <Divider variant="dashed" />
+      </Row>
+      <Row label="Dashed · 2">
+        <Divider variant="dashed" thickness="2" />
+      </Row>
+      <Row label="Dotted · 1">
+        <Divider variant="dotted" />
+      </Row>
+      <Row label="Dotted · 2">
+        <Divider variant="dotted" thickness="2" />
+      </Row>
     </Stack>
   ),
 };
 
-// ── Vertical variants ──────────────────────────────────────────────────
+// ── Tone & soft edges ──────────────────────────────────────────────────
+
+export const ToneAndSoft: Story = {
+  render: () => (
+    <Stack gap="5" width="420px">
+      <Row label='tone="subtle" (default)'>
+        <Divider />
+      </Row>
+      <Row label='tone="default"'>
+        <Divider tone="default" />
+      </Row>
+      <Row label="soft edges">
+        <Divider soft />
+      </Row>
+      <Row label='soft + dashed + tone="default"'>
+        <Divider soft variant="dashed" tone="default" />
+      </Row>
+    </Stack>
+  ),
+};
+
+// ── With label ─────────────────────────────────────────────────────────
+
+export const WithLabel: Story = {
+  render: () => (
+    <Stack gap="5" width="420px">
+      <Row label="center (default)">
+        <Divider>or continue with</Divider>
+      </Row>
+      <Row label="start">
+        <Divider labelAlign="start">Recent</Divider>
+      </Row>
+      <Row label="end">
+        <Divider labelAlign="end">Archived</Divider>
+      </Row>
+      <Row label="with icon">
+        <Divider>
+          <span aria-hidden>★</span>
+          <span>Featured</span>
+        </Divider>
+      </Row>
+      <Row label="dashed + soft">
+        <Divider variant="dashed" soft>
+          2026
+        </Divider>
+      </Row>
+    </Stack>
+  ),
+};
+
+// ── Vertical — stat row ────────────────────────────────────────────────
 
 export const Vertical: Story = {
-  render: () => (
-    <Inline
-      gap="4"
-      align="center"
-      height="72px"
-      padding="3"
-      background="bg.subtle"
-      borderRadius="md"
-    >
-      <Text>left</Text>
-      <Divider orientation="vertical" />
-      <Text>middle</Text>
-      <Divider orientation="vertical" variant="dashed" />
-      <Text>dashed</Text>
-      <Divider orientation="vertical" variant="dotted" thickness="2" />
-      <Text>dotted · 2</Text>
-    </Inline>
-  ),
-};
-
-// ── Semantic vs decorative ─────────────────────────────────────────────
-
-export const SemanticVsDecorative: Story = {
-  name: 'decorative={false} — announces as separator',
-  render: () => (
-    <Stack gap="4" width="360px">
-      <Box
-        padding="3"
-        background="bg.surface"
-        borderRadius="md"
-        borderWidth="1"
-        borderStyle="solid"
-        borderColor="border.default"
-      >
-        <Stack gap="2">
-          <Text weight="semibold">Decorative (default)</Text>
-          <Text size="sm" color="fg.muted">
-            Not announced to assistive tech — use when the divider is purely visual.
-          </Text>
-          <Text>Above</Text>
-          <Divider />
-          <Text>Below</Text>
-        </Stack>
-      </Box>
-      <Box
-        padding="3"
-        background="bg.surface"
-        borderRadius="md"
-        borderWidth="1"
-        borderStyle="solid"
-        borderColor="border.default"
-      >
-        <Stack gap="2">
-          <Text weight="semibold">Semantic</Text>
-          <Text size="sm" color="fg.muted">
-            <code>decorative=&#123;false&#125;</code> adds <code>role=&quot;separator&quot;</code>{' '}
-            so the divider is announced.
-          </Text>
-          <Text>Above</Text>
-          <Divider decorative={false} />
-          <Text>Below</Text>
-        </Stack>
-      </Box>
-    </Stack>
-  ),
-};
-
-// ── Inside a menu ──────────────────────────────────────────────────────
-
-export const InMenu: Story = {
-  render: () => (
-    <Box
-      role="menu"
-      padding="2"
-      background="bg.surface"
-      borderRadius="md"
-      borderWidth="1"
-      borderStyle="solid"
-      borderColor="border.default"
-      boxShadow="md"
-      width="220px"
-    >
-      <Stack gap="1">
-        <Box role="menuitem" padding="2" borderRadius="sm">
-          <Text>Profile</Text>
-        </Box>
-        <Box role="menuitem" padding="2" borderRadius="sm">
-          <Text>Settings</Text>
-        </Box>
-        <Box role="menuitem" padding="2" borderRadius="sm">
-          <Text>Preferences</Text>
-        </Box>
-        <Divider decorative={false} />
-        <Box role="menuitem" padding="2" borderRadius="sm">
-          <Text>Keyboard shortcuts</Text>
-        </Box>
-        <Box role="menuitem" padding="2" borderRadius="sm">
-          <Text>Changelog</Text>
-        </Box>
-        <Divider decorative={false} />
-        <Box role="menuitem" padding="2" borderRadius="sm">
-          <Text color="feedback.danger.foreground">Sign out</Text>
-        </Box>
-      </Stack>
-    </Box>
-  ),
-};
-
-// ── In a Card header ───────────────────────────────────────────────────
-
-export const InCard: Story = {
-  render: () => (
-    <Box
-      padding="0"
-      background="bg.surface"
-      borderRadius="md"
-      borderWidth="1"
-      borderStyle="solid"
-      borderColor="border.default"
-      width="400px"
-      overflow="hidden"
-    >
-      <Box padding="4">
-        <Heading level={3} size="md">
-          Settings
-        </Heading>
-      </Box>
-      <Divider />
-      <Box padding="4">
-        <Text>Body content lives below the header rule.</Text>
-      </Box>
-      <Divider />
-      <Inline justify="end" padding="3" gap="2">
-        <Text color="fg.muted" size="sm">
-          Saved
-        </Text>
-      </Inline>
-    </Box>
-  ),
-};
-
-// ── Stats row with vertical dividers ──────────────────────────────────
-
-export const StatRow: Story = {
   render: () => (
     <Inline
       align="center"
@@ -251,24 +170,79 @@ export const StatRow: Story = {
   ),
 };
 
-// ── Orientation swap at breakpoint (decorative HTML-level demo) ───────
+// ── In a Card ──────────────────────────────────────────────────────────
 
-export const OrientationDemo: Story = {
-  name: 'Horizontal + vertical together',
+export const InCard: Story = {
   render: () => (
-    <Stack gap="4">
-      <Stack gap="2" width="320px">
-        <Text>Row 1</Text>
-        <Divider />
-        <Text>Row 2</Text>
-      </Stack>
-      <Inline gap="4" align="center" padding="3" background="bg.subtle" borderRadius="md">
-        <Text>Col 1</Text>
-        <Divider orientation="vertical" />
-        <Text>Col 2</Text>
-        <Divider orientation="vertical" />
-        <Text>Col 3</Text>
+    <Box
+      padding="0"
+      background="bg.surface"
+      borderRadius="md"
+      borderWidth="1"
+      borderStyle="solid"
+      borderColor="border.default"
+      width="420px"
+      overflow="hidden"
+    >
+      <Box padding="4">
+        <Heading level={3} size="md">
+          Settings
+        </Heading>
+      </Box>
+      <Divider />
+      <Box padding="4">
+        <Text>Body content lives below the header rule.</Text>
+      </Box>
+      <Divider>section</Divider>
+      <Box padding="4">
+        <Text color="fg.muted" size="sm">
+          More content after the labeled divider.
+        </Text>
+      </Box>
+      <Divider />
+      <Inline justify="end" padding="3" gap="2">
+        <Text color="fg.muted" size="sm">
+          Saved
+        </Text>
       </Inline>
-    </Stack>
+    </Box>
+  ),
+};
+
+// ── In a menu ──────────────────────────────────────────────────────────
+
+export const InMenu: Story = {
+  render: () => (
+    <Box
+      role="menu"
+      padding="2"
+      background="bg.surface"
+      borderRadius="md"
+      borderWidth="1"
+      borderStyle="solid"
+      borderColor="border.default"
+      boxShadow="md"
+      width="240px"
+    >
+      <Stack gap="1">
+        <Box role="menuitem" padding="2" borderRadius="sm">
+          <Text>Profile</Text>
+        </Box>
+        <Box role="menuitem" padding="2" borderRadius="sm">
+          <Text>Settings</Text>
+        </Box>
+        <Divider decorative={false} />
+        <Box role="menuitem" padding="2" borderRadius="sm">
+          <Text>Keyboard shortcuts</Text>
+        </Box>
+        <Box role="menuitem" padding="2" borderRadius="sm">
+          <Text>Changelog</Text>
+        </Box>
+        <Divider decorative={false} />
+        <Box role="menuitem" padding="2" borderRadius="sm">
+          <Text color="feedback.danger.foreground">Sign out</Text>
+        </Box>
+      </Stack>
+    </Box>
   ),
 };

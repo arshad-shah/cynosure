@@ -1,3 +1,4 @@
+import { Check, ChevronRight, Circle } from 'lucide-react';
 import {
   type ComponentPropsWithoutRef,
   type ComponentType,
@@ -7,6 +8,7 @@ import {
   type RefAttributes,
   forwardRef,
 } from 'react';
+import { Kbd } from '../../typography/Kbd/Kbd.js';
 import { cn } from '../../utils/cn.js';
 import {
   menuContent,
@@ -16,7 +18,6 @@ import {
   menuShortcut,
   menuSubChevron,
 } from './menu.css.js';
-import { CheckIcon, ChevronRight, RadioDot } from './menuIcons.js';
 import { MenuItemContent } from './menuItemContent.js';
 
 /**
@@ -245,7 +246,7 @@ export function createMenuKit<N extends MenuNamespace>(Radix: N): MenuKit<N> {
         <MenuItemContent
           leading={
             <RadixItemIndicator>
-              <CheckIcon />
+              <Check size={12} strokeWidth={2.5} aria-hidden="true" />
             </RadixItemIndicator>
           }
           description={description}
@@ -271,7 +272,7 @@ export function createMenuKit<N extends MenuNamespace>(Radix: N): MenuKit<N> {
         <MenuItemContent
           leading={
             <RadixItemIndicator>
-              <RadioDot />
+              <Circle size={6} fill="currentColor" strokeWidth={0} aria-hidden="true" />
             </RadixItemIndicator>
           }
           description={description}
@@ -298,7 +299,7 @@ export function createMenuKit<N extends MenuNamespace>(Radix: N): MenuKit<N> {
           description={description}
           trailing={
             <span className={menuSubChevron} aria-hidden="true">
-              <ChevronRight />
+              <ChevronRight size={14} aria-hidden="true" />
             </span>
           }
         >
@@ -324,13 +325,16 @@ export function createMenuKit<N extends MenuNamespace>(Radix: N): MenuKit<N> {
     );
   });
 
-  /** Keyboard-shortcut chip. Purely decorative — not announced. */
-  const Shortcut = forwardRef<HTMLSpanElement, HTMLAttributes<HTMLSpanElement>>(function Shortcut(
-    { className, ...rest },
-    ref,
-  ) {
-    return <span ref={ref} {...rest} className={cn(menuShortcut, className)} />;
-  });
+  /** Keyboard-shortcut keycap. Renders cynosure's `<Kbd>` so glyphs look like keycaps, not plain text. Decorative — not announced. */
+  const Shortcut = forwardRef<HTMLElement, { className?: string; children?: ReactNode }>(
+    function Shortcut({ className, children }, ref) {
+      return (
+        <Kbd ref={ref} size="sm" className={cn(menuShortcut, className)}>
+          {children}
+        </Kbd>
+      );
+    },
+  );
 
   return {
     Content,
