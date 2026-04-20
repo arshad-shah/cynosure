@@ -10,3 +10,5 @@ export * from './Divider/index.js';
 export * from './AspectRatio/index.js';
 export * from './Container/index.js';
 export * from './Section/index.js';
+export * from './SimpleGrid/index.js';
+export * from './Wrap/index.js';

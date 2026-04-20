@@ -31,6 +31,7 @@ const config: StorybookConfig = {
     },
   },
   docs: { autodocs: 'tag' },
+  staticDirs: [{ from: '../brand', to: '/brand' }],
 };
 
 export default config;
