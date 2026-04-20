@@ -280,7 +280,7 @@ export function createMenuKit<N extends MenuNamespace>(Radix: N): MenuKit<N> {
           leading={
             <span className={menuFormIndicator} aria-hidden="true">
               <RadixRadioGroup.Root value="">
-                <Radio value="on" />
+                <Radio value="on" size="sm" />
               </RadixRadioGroup.Root>
               <RadixItemIndicator className={menuFormIndicatorOverlay}>
                 <RadixRadioGroup.Root value="on">
