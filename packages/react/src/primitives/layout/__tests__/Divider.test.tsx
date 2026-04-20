@@ -17,9 +17,10 @@ describe('Divider', () => {
     expect(el.hasAttribute('aria-hidden')).toBe(false);
   });
 
-  it('renders a vertical separator as a div with role="separator" and aria-orientation', () => {
+  it('renders a vertical separator as an <hr> with role="separator" and aria-orientation="vertical"', () => {
     const { container } = render(<Divider orientation="vertical" decorative={false} />);
-    const el = container.querySelector('div[role="separator"]') as HTMLElement;
+    const el = container.querySelector('hr[role="separator"]') as HTMLElement;
+    expect(el).not.toBeNull();
     expect(el.getAttribute('aria-orientation')).toBe('vertical');
   });
 

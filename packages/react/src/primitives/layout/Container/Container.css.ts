@@ -1,19 +1,6 @@
 import { style } from '@vanilla-extract/css';
-import { buildResponsiveRules, layoutPropsStyle } from '../shared/layoutStyle.css.js';
-
-/**
- * Named container widths. Consumed via the `--cynosure-container-maxw-{bp}`
- * custom property chain so `size` can be responsive without switching classes.
- */
-export const CONTAINER_MAX_WIDTHS = {
-  sm: '40rem', //  640px
-  md: '48rem', //  768px
-  lg: '64rem', // 1024px (default)
-  xl: '80rem', // 1280px
-  '2xl': '96rem', // 1536px
-  prose: '65ch',
-  full: '100%',
-} as const;
+import { buildResponsiveRules } from '../shared/buildResponsive.js';
+import { layoutPropsStyle } from '../shared/layoutStyle.css.js';
 
 const CONTAINER_ENTRIES: Array<[string, string]> = [['max-width', 'cynosure-container-maxw']];
 

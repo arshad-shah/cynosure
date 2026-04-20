@@ -17,7 +17,21 @@ import {
   splitLayoutProps,
   toResponsiveVars,
 } from '../shared/index.js';
-import { CONTAINER_MAX_WIDTHS, containerBase } from './Container.css.js';
+import { containerBase } from './Container.css.js';
+
+/**
+ * Named container widths. Consumed via the `--cynosure-container-maxw-{bp}`
+ * custom property chain so `size` can be responsive without switching classes.
+ */
+const CONTAINER_MAX_WIDTHS = {
+  sm: '40rem', //  640px
+  md: '48rem', //  768px
+  lg: '64rem', // 1024px (default)
+  xl: '80rem', // 1280px
+  '2xl': '96rem', // 1536px
+  prose: '65ch',
+  full: '100%',
+} as const;
 
 export type ContainerSize = keyof typeof CONTAINER_MAX_WIDTHS;
 

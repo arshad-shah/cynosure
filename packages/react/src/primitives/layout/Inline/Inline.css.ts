@@ -1,5 +1,6 @@
 import { style } from '@vanilla-extract/css';
-import { buildResponsiveRules, layoutPropsStyle } from '../shared/layoutStyle.css.js';
+import { buildResponsiveRules } from '../shared/buildResponsive.js';
+import { layoutPropsStyle } from '../shared/layoutStyle.css.js';
 
 const INLINE_ENTRIES: Array<[string, string]> = [
   ['gap', 'cynosure-inline-gap'],
