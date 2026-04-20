@@ -326,12 +326,31 @@ export function createMenuKit<N extends MenuNamespace>(Radix: N): MenuKit<N> {
   });
 
   /** Keyboard-shortcut keycap. Renders cynosure's `<Kbd>` so glyphs look like keycaps, not plain text. Decorative — not announced. */
-  const Shortcut = forwardRef<HTMLElement, { className?: string; children?: ReactNode }>(
+  /**
+   * Keyboard-shortcut cluster. Splits a string like "⌘R" into per-key
+   * `<Kbd>` keycaps so each glyph gets its own chip — avoids the cramped
+   * "two-symbols-in-one-box" look. Non-string children render as a single
+   * keycap unchanged. Decorative — not announced.
+   */
+  const Shortcut = forwardRef<HTMLSpanElement, { className?: string; children?: ReactNode }>(
     function Shortcut({ className, children }, ref) {
+      const keys =
+        typeof children === 'string'
+          ? Array.from(children).filter((c) => c.trim().length > 0)
+          : null;
       return (
-        <Kbd ref={ref} size="sm" className={cn(menuShortcut, className)}>
-          {children}
-        </Kbd>
+        <span ref={ref} className={cn(menuShortcut, className)} aria-hidden="true">
+          {keys != null ? (
+            keys.map((k, i) => (
+              // biome-ignore lint/suspicious/noArrayIndexKey: static shortcut string; duplicates allowed.
+              <Kbd key={i} size="sm">
+                {k}
+              </Kbd>
+            ))
+          ) : (
+            <Kbd size="sm">{children}</Kbd>
+          )}
+        </span>
       );
     },
   );
