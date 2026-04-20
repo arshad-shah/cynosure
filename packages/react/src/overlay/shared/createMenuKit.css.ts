@@ -69,6 +69,15 @@ export const menuFormIndicatorOverlay = style({
   justifyContent: 'center',
 });
 
+/**
+ * Makes a wrapping `<RadixRadioGroup.Root>` layout-transparent so the nested
+ * `<Radio>` (which must live inside a RadixRadioGroup context) positions
+ * exactly at the flex center rather than nested inside an extra div.
+ */
+export const menuFormIndicatorGroup = style({
+  display: 'contents',
+});
+
 /** Animated down-chevron on DropdownMenuTriggerButton. */
 export const triggerChevron = style({
   display: 'inline-flex',

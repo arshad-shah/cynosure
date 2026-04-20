@@ -13,7 +13,11 @@ import { Checkbox } from '../../forms/Checkbox/Checkbox.js';
 import { Radio } from '../../forms/Radio/Radio.js';
 import { Kbd } from '../../typography/Kbd/Kbd.js';
 import { cn } from '../../utils/cn.js';
-import { menuFormIndicator, menuFormIndicatorOverlay } from './createMenuKit.css.js';
+import {
+  menuFormIndicator,
+  menuFormIndicatorGroup,
+  menuFormIndicatorOverlay,
+} from './createMenuKit.css.js';
 import {
   menuContent,
   menuItem,
@@ -279,11 +283,11 @@ export function createMenuKit<N extends MenuNamespace>(Radix: N): MenuKit<N> {
         <MenuItemContent
           leading={
             <span className={menuFormIndicator} aria-hidden="true">
-              <RadixRadioGroup.Root value="">
+              <RadixRadioGroup.Root value="" className={menuFormIndicatorGroup}>
                 <Radio value="on" size="sm" />
               </RadixRadioGroup.Root>
               <RadixItemIndicator className={menuFormIndicatorOverlay}>
-                <RadixRadioGroup.Root value="on">
+                <RadixRadioGroup.Root value="on" className={menuFormIndicatorGroup}>
                   <Radio value="on" size="sm" />
                 </RadixRadioGroup.Root>
               </RadixItemIndicator>
