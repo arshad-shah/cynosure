@@ -334,9 +334,13 @@
       "types": "./dist/stat.d.ts",
       "import": "./dist/stat.js"
     },
-    "./progress": {
-      "types": "./dist/progress.d.ts",
-      "import": "./dist/progress.js"
+    "./linear-progress": {
+      "types": "./dist/linear-progress.d.ts",
+      "import": "./dist/linear-progress.js"
+    },
+    "./circular-progress": {
+      "types": "./dist/circular-progress.d.ts",
+      "import": "./dist/circular-progress.js"
     },
     "./skeleton": {
       "types": "./dist/skeleton.d.ts",
@@ -508,7 +512,8 @@
     "tree",
     "timeline",
     "stat",
-    "progress",
+    "linear-progress",
+    "circular-progress",
     "skeleton",
     "spinner",
     "accordion",

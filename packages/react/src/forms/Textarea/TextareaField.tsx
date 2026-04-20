@@ -1,4 +1,5 @@
 import {
+  type ChangeEventHandler,
   type TextareaHTMLAttributes,
   forwardRef,
   useCallback,
@@ -24,6 +25,12 @@ export interface TextareaFieldProps
   > {
   /** Initial row count; applies when `autoResize` isn't active. */
   rows?: number;
+  /**
+   * Native change event — fires alongside the context update, so consumers
+   * can inspect the underlying `<textarea>` (e.g. for selection APIs) on top
+   * of the controlled value forwarded to `Root`.
+   */
+  onChange?: ChangeEventHandler<HTMLTextAreaElement>;
 }
 
 const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? useLayoutEffect : useEffect;
