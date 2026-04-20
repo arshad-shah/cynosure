@@ -46,12 +46,11 @@ export const menuContent = style({
 /** One item — MenuItem, CheckboxItem, RadioItem, SubTrigger. */
 export const menuItem = style({
   display: 'flex',
-  alignItems: 'flex-start',
+  alignItems: 'center',
   gap: vars.space['2'],
   position: 'relative',
   paddingBlock: vars.space['2'],
   paddingInline: vars.space['2'],
-  paddingInlineStart: vars.space['2'],
   borderRadius: vars.radius.sm,
   cursor: 'pointer',
   userSelect: 'none',
@@ -112,7 +111,8 @@ export const menuSeparator = style({
 
 /** Section label (non-interactive). */
 export const menuLabel = style({
-  paddingInline: vars.space['2'],
+  paddingInlineEnd: vars.space['2'],
+  paddingInlineStart: `calc(${vars.space['2']} + 1.25rem + ${vars.space['2']})`,
   paddingBlock: vars.space['1'],
   fontSize: 'var(--cynosure-font-body-sm-size)',
   fontWeight: 600,
