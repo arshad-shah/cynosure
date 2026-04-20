@@ -55,10 +55,25 @@ const LAYOUT_PROPS: Array<[string, string]> = [
   ['grid-column', 'cynosure-lp-gc'],
   ['grid-row', 'cynosure-lp-gr'],
   ['grid-area', 'cynosure-lp-ga'],
+  // flex-child hints
+  ['flex', 'cynosure-lp-flex'],
+  ['flex-grow', 'cynosure-lp-fg'],
+  ['flex-shrink', 'cynosure-lp-fs'],
+  ['flex-basis', 'cynosure-lp-fb'],
+  ['align-self', 'cynosure-lp-as'],
+  ['justify-self', 'cynosure-lp-js'],
+  ['order', 'cynosure-lp-order'],
 ];
 
-const cascade = (base: string, bps: Array<'base' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'>): string => {
-  // Build nested `var()` fallbacks: var(--x-md, var(--x-sm, var(--x-base)))
+type BpLadder = Array<'base' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'>;
+
+/**
+ * Build nested `var()` fallbacks: `var(--x-md, var(--x-sm, var(--x-base)))`.
+ * Ensures that unset higher breakpoints inherit from the nearest lower one.
+ * Exported so individual layout primitives can build their own responsive
+ * rules without re-implementing the cascade.
+ */
+export const cascade = (base: string, bps: BpLadder): string => {
   let expr = `var(--${base}-base)`;
   for (const bp of bps) {
     if (bp === 'base') continue;
@@ -67,22 +82,43 @@ const cascade = (base: string, bps: Array<'base' | 'sm' | 'md' | 'lg' | 'xl' | '
   return expr;
 };
 
-const buildRule = (
-  bpsUpTo: Array<'base' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'>,
-): Record<string, string> => {
-  const out: Record<string, string> = {};
-  for (const [prop, base] of LAYOUT_PROPS) {
-    out[prop] = cascade(base, bpsUpTo);
-  }
-  return out;
+/** The ascending breakpoint ladders used for `@media` rule bodies. */
+export const BP_LADDERS: Record<'base' | 'sm' | 'md' | 'lg' | 'xl' | '2xl', BpLadder> = {
+  base: ['base'],
+  sm: ['base', 'sm'],
+  md: ['base', 'sm', 'md'],
+  lg: ['base', 'sm', 'md', 'lg'],
+  xl: ['base', 'sm', 'md', 'lg', 'xl'],
+  '2xl': ['base', 'sm', 'md', 'lg', 'xl', '2xl'],
 };
 
-const LAYOUT_PROPS_BASE = buildRule(['base']);
-const LAYOUT_PROPS_SM = buildRule(['base', 'sm']);
-const LAYOUT_PROPS_MD = buildRule(['base', 'sm', 'md']);
-const LAYOUT_PROPS_LG = buildRule(['base', 'sm', 'md', 'lg']);
-const LAYOUT_PROPS_XL = buildRule(['base', 'sm', 'md', 'lg', 'xl']);
-const LAYOUT_PROPS_2XL = buildRule(['base', 'sm', 'md', 'lg', 'xl', '2xl']);
+/**
+ * Build a responsive rule set from a map of CSS properties → var base names.
+ * Each entry becomes a `cascade()` expression at every breakpoint ladder.
+ * This is the shared helper every layout primitive's `.css.ts` uses to wire
+ * its responsive props into the `@media` cascade without duplicating logic.
+ */
+export const buildResponsiveRules = (
+  entries: Array<[string, string]>,
+): { base: Record<string, string>; media: Record<string, Record<string, string>> } => {
+  const at = (bps: BpLadder): Record<string, string> => {
+    const out: Record<string, string> = {};
+    for (const [prop, base] of entries) out[prop] = cascade(base, bps);
+    return out;
+  };
+  return {
+    base: at(BP_LADDERS.base),
+    media: {
+      [MEDIA_QUERIES.sm]: at(BP_LADDERS.sm),
+      [MEDIA_QUERIES.md]: at(BP_LADDERS.md),
+      [MEDIA_QUERIES.lg]: at(BP_LADDERS.lg),
+      [MEDIA_QUERIES.xl]: at(BP_LADDERS.xl),
+      [MEDIA_QUERIES['2xl']]: at(BP_LADDERS['2xl']),
+    },
+  };
+};
+
+const LAYOUT_RULES = buildResponsiveRules(LAYOUT_PROPS);
 
 /**
  * The shared layout-prop base class. Every layout primitive composes this so
@@ -93,12 +129,6 @@ const LAYOUT_PROPS_2XL = buildRule(['base', 'sm', 'md', 'lg', 'xl', '2xl']);
  * ensure that unset higher breakpoints inherit from the nearest lower one.
  */
 export const layoutPropsStyle = style({
-  ...LAYOUT_PROPS_BASE,
-  '@media': {
-    [MEDIA_QUERIES.sm]: LAYOUT_PROPS_SM,
-    [MEDIA_QUERIES.md]: LAYOUT_PROPS_MD,
-    [MEDIA_QUERIES.lg]: LAYOUT_PROPS_LG,
-    [MEDIA_QUERIES.xl]: LAYOUT_PROPS_XL,
-    [MEDIA_QUERIES['2xl']]: LAYOUT_PROPS_2XL,
-  },
+  ...LAYOUT_RULES.base,
+  '@media': LAYOUT_RULES.media,
 });

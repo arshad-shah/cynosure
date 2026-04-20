@@ -6,6 +6,7 @@ import {
   useEffect,
   useState,
 } from 'react';
+import { IconButton } from '../../forms/IconButton/IconButton.js';
 import { useThrottledCallback } from '../../hooks/useThrottledCallback.js';
 import { Portal } from '../../primitives/Portal.js';
 import { cn } from '../../utils/cn.js';
@@ -86,17 +87,17 @@ export const BackToTop = forwardRef<HTMLButtonElement, BackToTopProps>(function 
   };
 
   const button = (
-    <button
+    <IconButton
       ref={ref}
-      type={type ?? 'button'}
-      aria-label={label}
+      variant="bare"
+      type={type}
+      label={label}
+      icon={icon ?? <UpIcon />}
       data-visible={visible ? 'true' : 'false'}
       className={cn(backToTopButton, backToTopPosition[position], className)}
       onClick={onClick}
       {...rest}
-    >
-      {icon ?? <UpIcon />}
-    </button>
+    />
   );
 
   if (disablePortal) return button;

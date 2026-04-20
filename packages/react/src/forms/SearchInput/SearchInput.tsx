@@ -13,6 +13,8 @@ import { useControllableState } from '../../hooks/useControllableState.js';
 import { useDebouncedValue } from '../../hooks/useDebouncedValue.js';
 import { useMergedRef } from '../../hooks/useMergedRef.js';
 import { cn } from '../../utils/cn.js';
+import { IconButton } from '../IconButton/IconButton.js';
+import { inputAffordance } from '../shared/affordance.css.js';
 import {
   controlElement,
   controlField,
@@ -160,23 +162,13 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
         />
         {value !== '' && !disabled && !readOnly ? (
           <span className={controlElement}>
-            <button
-              type="button"
+            <IconButton
+              variant="bare"
+              label="Clear search"
+              icon={<XIcon />}
+              className={inputAffordance}
               onClick={handleClear}
-              aria-label="Clear search"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                background: 'transparent',
-                border: 'none',
-                cursor: 'pointer',
-                color: 'currentColor',
-                padding: 0,
-              }}
-            >
-              <XIcon />
-            </button>
+            />
           </span>
         ) : null}
       </div>

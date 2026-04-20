@@ -12,6 +12,8 @@ import {
 import { useControllableState } from '../../hooks/useControllableState.js';
 import { useMergedRef } from '../../hooks/useMergedRef.js';
 import { cn } from '../../utils/cn.js';
+import { IconButton } from '../IconButton/IconButton.js';
+import { inputAffordance } from '../shared/affordance.css.js';
 import {
   controlAddonLeft,
   controlAddonRight,
@@ -161,42 +163,22 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(pro
   const resolvedRightElement =
     rightElement ??
     (showClearButton ? (
-      <button
-        type="button"
+      <IconButton
+        variant="bare"
+        label="Clear input"
+        icon={<XIcon />}
+        className={inputAffordance}
         onClick={handleClear}
-        aria-label="Clear input"
-        style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          background: 'transparent',
-          border: 'none',
-          cursor: 'pointer',
-          color: 'currentColor',
-          padding: 0,
-        }}
-      >
-        <XIcon />
-      </button>
+      />
     ) : showPasswordToggle ? (
-      <button
-        type="button"
-        onClick={() => setPasswordVisible((v) => !v)}
-        aria-label={passwordVisible ? 'Hide password' : 'Show password'}
+      <IconButton
+        variant="bare"
+        label={passwordVisible ? 'Hide password' : 'Show password'}
+        icon={passwordVisible ? <EyeOffIcon /> : <EyeIcon />}
+        className={inputAffordance}
         aria-pressed={passwordVisible}
-        style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          background: 'transparent',
-          border: 'none',
-          cursor: 'pointer',
-          color: 'currentColor',
-          padding: 0,
-        }}
-      >
-        {passwordVisible ? <EyeOffIcon /> : <EyeIcon />}
-      </button>
+        onClick={() => setPasswordVisible((v) => !v)}
+      />
     ) : null);
 
   const wrapperClass = cn(

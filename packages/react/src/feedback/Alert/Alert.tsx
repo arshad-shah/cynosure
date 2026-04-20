@@ -7,6 +7,7 @@ import {
   useId,
   useMemo,
 } from 'react';
+import { IconButton } from '../../forms/IconButton/IconButton.js';
 import { cn } from '../../utils/cn.js';
 import { CloseIcon, StatusIcon } from '../shared/icons.js';
 import {
@@ -100,9 +101,13 @@ export const Alert = forwardRef<HTMLDivElement, AlertProps>(function Alert(
         {showIcon ? <span className={surfaceIcon}>{iconNode}</span> : null}
         <div className={surfaceContent}>{children}</div>
         {closable ? (
-          <button type="button" aria-label={closeLabel} className={surfaceClose} onClick={onClose}>
-            <CloseIcon />
-          </button>
+          <IconButton
+            variant="bare"
+            label={closeLabel}
+            icon={<CloseIcon />}
+            className={surfaceClose}
+            onClick={onClose}
+          />
         ) : null}
       </div>
     </AlertContext.Provider>

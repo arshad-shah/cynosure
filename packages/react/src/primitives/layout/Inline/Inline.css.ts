@@ -1,24 +1,16 @@
 import { style } from '@vanilla-extract/css';
-import { MEDIA_QUERIES } from '../shared/breakpoints.js';
-import { layoutPropsStyle } from '../shared/layoutStyle.css.js';
+import { buildResponsiveRules, layoutPropsStyle } from '../shared/layoutStyle.css.js';
 
-const cascade = (base: string, bps: string[]): string => {
-  let expr = `var(--${base}-base)`;
-  for (const bp of bps) {
-    if (bp === 'base') continue;
-    expr = `var(--${base}-${bp}, ${expr})`;
-  }
-  return expr;
-};
+const INLINE_ENTRIES: Array<[string, string]> = [
+  ['gap', 'cynosure-inline-gap'],
+  ['column-gap', 'cynosure-inline-col-gap'],
+  ['row-gap', 'cynosure-inline-row-gap'],
+  ['align-items', 'cynosure-inline-align'],
+  ['justify-content', 'cynosure-inline-justify'],
+  ['flex-wrap', 'cynosure-inline-wrap'],
+];
 
-const propsAt = (bps: string[]): Record<string, string> => ({
-  gap: cascade('cynosure-inline-gap', bps),
-  'column-gap': cascade('cynosure-inline-col-gap', bps),
-  'row-gap': cascade('cynosure-inline-row-gap', bps),
-  'align-items': cascade('cynosure-inline-align', bps),
-  'justify-content': cascade('cynosure-inline-justify', bps),
-  'flex-wrap': cascade('cynosure-inline-wrap', bps),
-});
+const INLINE_RULES = buildResponsiveRules(INLINE_ENTRIES);
 
 export const inline = style([
   layoutPropsStyle,
@@ -27,13 +19,7 @@ export const inline = style([
     flexDirection: 'row',
     flexWrap: 'wrap',
     minWidth: 0,
-    ...propsAt(['base']),
-    '@media': {
-      [MEDIA_QUERIES.sm]: propsAt(['base', 'sm']),
-      [MEDIA_QUERIES.md]: propsAt(['base', 'sm', 'md']),
-      [MEDIA_QUERIES.lg]: propsAt(['base', 'sm', 'md', 'lg']),
-      [MEDIA_QUERIES.xl]: propsAt(['base', 'sm', 'md', 'lg', 'xl']),
-      [MEDIA_QUERIES['2xl']]: propsAt(['base', 'sm', 'md', 'lg', 'xl', '2xl']),
-    },
+    ...INLINE_RULES.base,
+    '@media': INLINE_RULES.media,
   },
 ]);

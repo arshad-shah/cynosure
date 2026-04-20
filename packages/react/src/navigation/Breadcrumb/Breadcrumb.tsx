@@ -10,6 +10,7 @@ import {
   forwardRef,
   isValidElement,
 } from 'react';
+import { IconButton } from '../../forms/IconButton/IconButton.js';
 import { cn } from '../../utils/cn.js';
 import {
   breadcrumbEllipsisButton,
@@ -202,15 +203,15 @@ export interface BreadcrumbEllipsisProps extends ButtonHTMLAttributes<HTMLButton
 export const BreadcrumbEllipsis = forwardRef<HTMLButtonElement, BreadcrumbEllipsisProps>(
   function BreadcrumbEllipsis({ className, label = 'Show more', type, ...rest }, ref) {
     return (
-      <button
+      <IconButton
         ref={ref}
-        type={type ?? 'button'}
-        aria-label={label}
+        variant="bare"
+        type={type}
+        label={label}
+        icon={<EllipsisIcon />}
         className={cn(breadcrumbEllipsisButton, className)}
         {...rest}
-      >
-        <EllipsisIcon />
-      </button>
+      />
     );
   },
 );

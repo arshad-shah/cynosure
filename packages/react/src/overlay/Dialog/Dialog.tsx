@@ -6,6 +6,7 @@ import {
   type ReactNode,
   forwardRef,
 } from 'react';
+import { IconButton } from '../../forms/IconButton/IconButton.js';
 import { cn } from '../../utils/cn.js';
 import { overlayBackdrop, overlayCloseButton } from '../shared/overlay.css.js';
 import type { OverlaySize } from '../shared/types.js';
@@ -110,9 +111,10 @@ export const DialogContent = forwardRef<ElementRef<typeof RadixDialog.Content>, 
           {children}
           {showCloseButton ? (
             <RadixDialog.Close asChild>
-              <button
-                type="button"
-                aria-label={closeLabel}
+              <IconButton
+                variant="bare"
+                label={closeLabel}
+                icon={<CloseIcon />}
                 className={overlayCloseButton}
                 style={{
                   background: 'transparent',
@@ -122,9 +124,7 @@ export const DialogContent = forwardRef<ElementRef<typeof RadixDialog.Content>, 
                   cursor: 'pointer',
                   color: 'inherit',
                 }}
-              >
-                <CloseIcon />
-              </button>
+              />
             </RadixDialog.Close>
           ) : null}
         </RadixDialog.Content>

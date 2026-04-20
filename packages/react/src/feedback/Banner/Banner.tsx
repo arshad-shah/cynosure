@@ -6,6 +6,7 @@ import {
   useEffect,
   useState,
 } from 'react';
+import { IconButton } from '../../forms/IconButton/IconButton.js';
 import { cn } from '../../utils/cn.js';
 import { CloseIcon, StatusIcon } from '../shared/icons.js';
 import { surfaceClose, surfaceIcon } from '../shared/surface.css.js';
@@ -93,14 +94,13 @@ export const Banner = forwardRef<HTMLDivElement, BannerProps>(function Banner(
       {showIcon ? <span className={surfaceIcon}>{iconNode}</span> : null}
       {children}
       {closable ? (
-        <button
-          type="button"
-          aria-label={closeLabel}
+        <IconButton
+          variant="bare"
+          label={closeLabel}
+          icon={<CloseIcon />}
           className={surfaceClose}
           onClick={handleClose}
-        >
-          <CloseIcon />
-        </button>
+        />
       ) : null}
     </div>
   );
