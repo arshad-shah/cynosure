@@ -121,9 +121,10 @@ export const menuLabel = style({
   letterSpacing: '0.05em',
 });
 
-/** Positions cynosure's `<Kbd>` at the inline-end of a menu item. */
+/** Positions cynosure's `<Kbd>` at the inline-end of a menu item with a guaranteed gap from the label. */
 export const menuShortcut = style({
   marginInlineStart: 'auto',
+  paddingInlineStart: vars.space['4'],
 });
 
 export const menubarRoot = style({
