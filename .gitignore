@@ -19,3 +19,6 @@ tsup.config.bundled_*.mjs
 
 # Claude Code local settings — per-machine, not shared.
 .claude/
+
+# Superpowers brainstorm scratch — per-session mockups.
+.superpowers/
