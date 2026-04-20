@@ -25,6 +25,16 @@ export const kbdBase = style([
   },
 ]);
 
+/**
+ * Icon rendered inside a keycap (for known keyboard glyphs). Dropped to
+ * baseline of the surrounding text so the keycap stays centered on the text
+ * line rather than growing the row height.
+ */
+export const kbdIcon = style({
+  display: 'inline-block',
+  verticalAlign: 'middle',
+});
+
 export const kbdSize = styleVariants({
   sm: {
     fontSize: 'var(--cynosure-font-body-xs-size)',
