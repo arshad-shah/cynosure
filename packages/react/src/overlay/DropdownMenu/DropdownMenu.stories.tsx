@@ -18,6 +18,7 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
+  DropdownMenuTriggerButton,
 } from './DropdownMenu.js';
 
 const meta: Meta<typeof DropdownMenu> = {
@@ -63,9 +64,7 @@ const IconTrash = (): React.ReactElement => (
 export const Default: Story = {
   render: () => (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="outline">Actions ▾</Button>
-      </DropdownMenuTrigger>
+      <DropdownMenuTriggerButton variant="outline">Actions</DropdownMenuTriggerButton>
       <DropdownMenuContent>
         <DropdownMenuItem>Profile</DropdownMenuItem>
         <DropdownMenuItem>Billing</DropdownMenuItem>
@@ -80,34 +79,45 @@ export const Default: Story = {
 export const WithIconsAndShortcuts: Story = {
   render: () => (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button>Document ▾</Button>
-      </DropdownMenuTrigger>
+      <DropdownMenuTriggerButton>Document</DropdownMenuTriggerButton>
       <DropdownMenuContent>
         <DropdownMenuLabel>Document</DropdownMenuLabel>
-        <DropdownMenuItem>
-          <Inline gap="2" align="center">
-            <IconEdit />
-            <Text size="sm">Rename</Text>
-          </Inline>
+        <DropdownMenuItem icon={<IconEdit />}>
+          Rename
           <DropdownMenuShortcut>⌘R</DropdownMenuShortcut>
         </DropdownMenuItem>
-        <DropdownMenuItem>
-          <Inline gap="2" align="center">
-            <IconCopy />
-            <Text size="sm">Duplicate</Text>
-          </Inline>
+        <DropdownMenuItem icon={<IconCopy />}>
+          Duplicate
           <DropdownMenuShortcut>⌘D</DropdownMenuShortcut>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
-          <Inline gap="2" align="center">
-            <IconTrash />
-            <Text size="sm" color="feedback.danger.solid">
-              Delete
-            </Text>
-          </Inline>
+        <DropdownMenuItem icon={<IconTrash />} variant="danger">
+          Delete
           <DropdownMenuShortcut>⌫</DropdownMenuShortcut>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  ),
+};
+
+export const WithDescriptions: Story = {
+  render: () => (
+    <DropdownMenu>
+      <DropdownMenuTriggerButton variant="outline">Project</DropdownMenuTriggerButton>
+      <DropdownMenuContent>
+        <DropdownMenuItem icon={<IconEdit />} description="Change the project title">
+          Rename
+        </DropdownMenuItem>
+        <DropdownMenuItem icon={<IconCopy />} description="Create a copy in the same workspace">
+          Duplicate
+        </DropdownMenuItem>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem
+          icon={<IconTrash />}
+          variant="danger"
+          description="This action cannot be undone"
+        >
+          Delete permanently
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
@@ -117,9 +127,7 @@ export const WithIconsAndShortcuts: Story = {
 export const WithSubmenu: Story = {
   render: () => (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="outline">File ▾</Button>
-      </DropdownMenuTrigger>
+      <DropdownMenuTriggerButton variant="outline">File</DropdownMenuTriggerButton>
       <DropdownMenuContent>
         <DropdownMenuItem>New</DropdownMenuItem>
         <DropdownMenuItem>Open…</DropdownMenuItem>
@@ -154,9 +162,7 @@ export const CheckboxItems: Story = {
       return (
         <Stack gap="3">
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline">View ▾</Button>
-            </DropdownMenuTrigger>
+            <DropdownMenuTriggerButton variant="outline">View</DropdownMenuTriggerButton>
             <DropdownMenuContent>
               <DropdownMenuLabel>Canvas</DropdownMenuLabel>
               <DropdownMenuCheckboxItem checked={showGrid} onCheckedChange={setShowGrid}>
@@ -187,9 +193,7 @@ export const RadioItems: Story = {
       return (
         <Stack gap="3">
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline">Theme ▾</Button>
-            </DropdownMenuTrigger>
+            <DropdownMenuTriggerButton variant="outline">Theme</DropdownMenuTriggerButton>
             <DropdownMenuContent>
               <DropdownMenuLabel>Appearance</DropdownMenuLabel>
               <DropdownMenuRadioGroup value={theme} onValueChange={setTheme}>
@@ -209,33 +213,10 @@ export const RadioItems: Story = {
   },
 };
 
-export const DestructiveItem: Story = {
-  render: () => (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="outline">Project ▾</Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent>
-        <DropdownMenuItem>Rename</DropdownMenuItem>
-        <DropdownMenuItem>Archive</DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem>
-          <Text size="sm" color="feedback.danger.solid">
-            Delete permanently
-          </Text>
-          <DropdownMenuShortcut>⇧⌫</DropdownMenuShortcut>
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
-  ),
-};
-
 export const Disabled: Story = {
   render: () => (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="outline">Edit ▾</Button>
-      </DropdownMenuTrigger>
+      <DropdownMenuTriggerButton variant="outline">Edit</DropdownMenuTriggerButton>
       <DropdownMenuContent>
         <DropdownMenuItem>Undo</DropdownMenuItem>
         <DropdownMenuItem disabled>Redo</DropdownMenuItem>
@@ -243,6 +224,20 @@ export const Disabled: Story = {
         <DropdownMenuItem>Cut</DropdownMenuItem>
         <DropdownMenuItem>Copy</DropdownMenuItem>
         <DropdownMenuItem disabled>Paste</DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  ),
+};
+
+export const CustomTrigger: Story = {
+  render: () => (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost">Custom (no chevron)</Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent>
+        <DropdownMenuItem>First</DropdownMenuItem>
+        <DropdownMenuItem>Second</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   ),
@@ -256,9 +251,7 @@ export const Controlled: Story = {
         <Inline gap="3" align="center">
           <Button onClick={() => setOpen((o) => !o)}>Toggle menu</Button>
           <DropdownMenu open={open} onOpenChange={setOpen}>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline">Controlled ▾</Button>
-            </DropdownMenuTrigger>
+            <DropdownMenuTriggerButton variant="outline">Controlled</DropdownMenuTriggerButton>
             <DropdownMenuContent>
               <DropdownMenuItem>First</DropdownMenuItem>
               <DropdownMenuItem>Second</DropdownMenuItem>
