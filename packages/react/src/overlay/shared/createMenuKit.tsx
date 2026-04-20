@@ -1,4 +1,5 @@
-import { Check, ChevronRight, Circle } from 'lucide-react';
+import * as RadixRadioGroup from '@radix-ui/react-radio-group';
+import { ChevronRight } from 'lucide-react';
 import {
   type ComponentPropsWithoutRef,
   type ComponentType,
@@ -8,8 +9,11 @@ import {
   type RefAttributes,
   forwardRef,
 } from 'react';
+import { Checkbox } from '../../forms/Checkbox/Checkbox.js';
+import { Radio } from '../../forms/Radio/Radio.js';
 import { Kbd } from '../../typography/Kbd/Kbd.js';
 import { cn } from '../../utils/cn.js';
+import { menuFormIndicator, menuFormIndicatorOverlay } from './createMenuKit.css.js';
 import {
   menuContent,
   menuItem,
@@ -156,9 +160,9 @@ export function createMenuKit<N extends MenuNamespace>(Radix: N): MenuKit<N> {
   const RadixSubTrigger = Radix.SubTrigger as unknown as ComponentType<AnyProps>;
   const RadixLabel = Radix.Label as unknown as ComponentType<AnyProps>;
   const RadixSeparator = Radix.Separator as unknown as ComponentType<AnyProps>;
-  const RadixItemIndicator = Radix.ItemIndicator as unknown as ComponentType<{
-    children?: ReactNode;
-  }>;
+  const RadixItemIndicator = Radix.ItemIndicator as unknown as ComponentType<
+    { children?: ReactNode; className?: string } & AnyProps
+  >;
   const RadixPortal = Radix.Portal as unknown as ComponentType<{
     container?: Element | DocumentFragment | null;
     children?: ReactNode;
@@ -245,9 +249,12 @@ export function createMenuKit<N extends MenuNamespace>(Radix: N): MenuKit<N> {
       >
         <MenuItemContent
           leading={
-            <RadixItemIndicator>
-              <Check size={12} strokeWidth={2.5} aria-hidden="true" />
-            </RadixItemIndicator>
+            <span className={menuFormIndicator} aria-hidden="true">
+              <Checkbox size="sm" checked={false} onCheckedChange={() => {}} />
+              <RadixItemIndicator className={menuFormIndicatorOverlay}>
+                <Checkbox size="sm" checked={true} onCheckedChange={() => {}} />
+              </RadixItemIndicator>
+            </span>
           }
           description={description}
         >
@@ -271,9 +278,16 @@ export function createMenuKit<N extends MenuNamespace>(Radix: N): MenuKit<N> {
       >
         <MenuItemContent
           leading={
-            <RadixItemIndicator>
-              <Circle size={6} fill="currentColor" strokeWidth={0} aria-hidden="true" />
-            </RadixItemIndicator>
+            <span className={menuFormIndicator} aria-hidden="true">
+              <RadixRadioGroup.Root value="">
+                <Radio value="on" />
+              </RadixRadioGroup.Root>
+              <RadixItemIndicator className={menuFormIndicatorOverlay}>
+                <RadixRadioGroup.Root value="on">
+                  <Radio value="on" size="sm" />
+                </RadixRadioGroup.Root>
+              </RadixItemIndicator>
+            </span>
           }
           description={description}
         >

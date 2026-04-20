@@ -39,6 +39,36 @@ export const menuDescription = style({
   color: vars.color.foreground.muted,
 });
 
+/**
+ * Wraps a nested `<Checkbox>` / `<Radio>` visual inside a menu item's leading
+ * slot. The form control itself is purely decorative inside a menuitem —
+ * the outer Radix menu item owns keyboard + click interaction — so this
+ * wrapper disables the inner control's pointer events. Positioned relatively
+ * so that a `<RadixItemIndicator>` can stack a checked-state overlay on top.
+ */
+export const menuFormIndicator = style({
+  position: 'relative',
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  pointerEvents: 'none',
+  width: '1.125rem',
+  height: '1.125rem',
+});
+
+/**
+ * Absolute-positioned overlay rendered by Radix's `ItemIndicator` when the
+ * parent menu item is checked. Sits on top of the always-rendered unchecked
+ * visual so the Checkbox/Radio component itself shows both states.
+ */
+export const menuFormIndicatorOverlay = style({
+  position: 'absolute',
+  inset: 0,
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+});
+
 /** Animated down-chevron on DropdownMenuTriggerButton. */
 export const triggerChevron = style({
   display: 'inline-flex',
