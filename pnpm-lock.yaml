@@ -18,6 +18,12 @@ catalogs:
     '@changesets/cli':
       specifier: 2.30.0
       version: 2.30.0
+    '@fontsource-variable/geist':
+      specifier: 5.2.8
+      version: 5.2.8
+    '@fontsource-variable/jetbrains-mono':
+      specifier: 5.2.8
+      version: 5.2.8
     '@hookform/resolvers':
       specifier: 3.10.0
       version: 3.10.0
@@ -263,6 +269,12 @@ importers:
       '@changesets/cli':
         specifier: 'catalog:'
         version: 2.30.0(@types/node@25.6.0)
+      '@fontsource-variable/geist':
+        specifier: 'catalog:'
+        version: 5.2.8
+      '@fontsource-variable/jetbrains-mono':
+        specifier: 'catalog:'
+        version: 5.2.8
       '@size-limit/preset-small-lib':
         specifier: 'catalog:'
         version: 11.2.0(size-limit@11.2.0)
@@ -604,6 +616,13 @@ importers:
         version: link:../tokens
 
   packages/tokens:
+    dependencies:
+      '@fontsource-variable/geist':
+        specifier: 'catalog:'
+        version: 5.2.8
+      '@fontsource-variable/jetbrains-mono':
+        specifier: 'catalog:'
+        version: 5.2.8
     devDependencies:
       '@arshad-shah/cynosure-config':
         specifier: workspace:*
@@ -1247,6 +1266,12 @@ packages:
 
   '@floating-ui/utils@0.2.11':
     resolution: {integrity: sha512-RiB/yIh78pcIxl6lLMG0CgBXAZ2Y0eVHqMPYugu+9U0AeT6YBeiJpf7lbdJNIugFP5SIjwNRgo4DhR1Qxi26Gg==}
+
+  '@fontsource-variable/geist@5.2.8':
+    resolution: {integrity: sha512-cJ6m9e+8MQ5dCYJsLylfZrgBh6KkG4bOLckB35Tr9J/EqdkEM6QllH5PxqP1dhTvFup+HtMRPuz9xOjxXJggxw==}
+
+  '@fontsource-variable/jetbrains-mono@5.2.8':
+    resolution: {integrity: sha512-WBA9elru6Jdp5df2mES55wuOO0WIrn3kpXnI4+W2ek5u3ZgLS9XS4gmIlcQhiZOWEKl95meYdvK7xI+ETLCq/Q==}
 
   '@hookform/resolvers@3.10.0':
     resolution: {integrity: sha512-79Dv+3mDF7i+2ajj7SkypSKHhl1cbln1OGavqrsF7p6mbUv11xpqpacPsGDCTRvCSjEEIez2ef1NveSVL3b0Ag==}
@@ -6237,6 +6262,10 @@ snapshots:
 
   '@floating-ui/utils@0.2.11': {}
 
+  '@fontsource-variable/geist@5.2.8': {}
+
+  '@fontsource-variable/jetbrains-mono@5.2.8': {}
+
   '@hookform/resolvers@3.10.0(react-hook-form@7.72.1(react@19.2.5))':
     dependencies:
       react-hook-form: 7.72.1(react@19.2.5)
@@ -7861,9 +7890,9 @@ snapshots:
       obug: 2.1.1
       std-env: 4.1.0
       tinyrainbow: 3.1.0
-      vitest: 4.1.4(@types/node@25.6.0)(@vitest/browser-playwright@4.1.4)(@vitest/coverage-v8@4.1.4)(jsdom@25.0.1)(msw@2.13.4(@types/node@25.6.0)(typescript@5.9.3))(vite@6.4.2(@types/node@25.6.0)(jiti@2.6.1)(lightningcss@1.32.0)(yaml@2.8.3))
+      vitest: 4.1.4(@types/node@25.6.0)(@vitest/browser-playwright@4.1.4)(@vitest/coverage-v8@4.1.4)(jsdom@25.0.1)(msw@2.13.4(@types/node@25.6.0)(typescript@5.9.3))(vite@8.0.8(@types/node@25.6.0)(esbuild@0.27.7)(jiti@2.6.1)(yaml@2.8.3))
     optionalDependencies:
-      '@vitest/browser': 4.1.4(msw@2.13.4(@types/node@25.6.0)(typescript@5.9.3))(vite@6.4.2(@types/node@25.6.0)(jiti@2.6.1)(lightningcss@1.32.0)(yaml@2.8.3))(vitest@4.1.4)
+      '@vitest/browser': 4.1.4(msw@2.13.4(@types/node@25.6.0)(typescript@5.9.3))(vite@8.0.8(@types/node@25.6.0)(esbuild@0.27.7)(jiti@2.6.1)(yaml@2.8.3))(vitest@4.1.4)
 
   '@vitest/expect@3.2.4':
     dependencies:

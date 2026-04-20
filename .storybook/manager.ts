@@ -1,10 +1,11 @@
+import '@fontsource-variable/geist';
+import '@fontsource-variable/jetbrains-mono';
 import { addons } from 'storybook/manager-api';
 import { create } from 'storybook/theming';
 
 // Branded Storybook manager UI for the Cynosure docs site.
-// Colours mirror the `@arshad-shah/cynosure-themes/terminal` palette so the manager chrome
-// matches the canvas when the terminal theme is active, and stays legible
-// against the other themes.
+// Accent colors mirror the default library theme (iris) so the manager
+// chrome reads as Cynosure regardless of which canvas theme is selected.
 const theme = create({
   base: 'dark',
   brandTitle: 'Cynosure UI',
@@ -12,8 +13,8 @@ const theme = create({
   brandTarget: '_self',
   brandImage: './brand/cynosure-lockup.svg',
 
-  colorPrimary: '#388bfd',
-  colorSecondary: '#388bfd',
+  colorPrimary: '#8b9dff',
+  colorSecondary: '#6d7ff5',
 
   appBg: '#0d0f14',
   appContentBg: '#161b22',
@@ -26,7 +27,7 @@ const theme = create({
   textMutedColor: '#8b949e',
 
   barTextColor: '#8b949e',
-  barSelectedColor: '#388bfd',
+  barSelectedColor: '#8b9dff',
   barHoverColor: '#e6edf3',
   barBg: '#161b22',
 
@@ -35,8 +36,10 @@ const theme = create({
   inputTextColor: '#e6edf3',
   inputBorderRadius: 4,
 
-  fontBase: '"JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
-  fontCode: '"JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
+  fontBase:
+    '"Geist Variable", Geist, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif',
+  fontCode:
+    '"JetBrains Mono Variable", "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace',
 });
 
 addons.setConfig({

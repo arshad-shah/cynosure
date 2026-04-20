@@ -38,6 +38,8 @@
     "@biomejs/biome": "catalog:",
     "@changesets/changelog-github": "catalog:",
     "@changesets/cli": "catalog:",
+    "@fontsource-variable/geist": "catalog:",
+    "@fontsource-variable/jetbrains-mono": "catalog:",
     "@size-limit/preset-small-lib": "catalog:",
     "@storybook/addon-a11y": "catalog:",
     "@storybook/addon-docs": "catalog:",

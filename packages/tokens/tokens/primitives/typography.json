@@ -4,6 +4,8 @@
       "sans": {
         "$type": "fontFamily",
         "$value": [
+          "Geist Variable",
+          "Geist",
           "ui-sans-serif",
           "system-ui",
           "-apple-system",
@@ -17,6 +19,8 @@
       "mono": {
         "$type": "fontFamily",
         "$value": [
+          "JetBrains Mono Variable",
+          "JetBrains Mono",
           "ui-monospace",
           "SFMono-Regular",
           "Menlo",

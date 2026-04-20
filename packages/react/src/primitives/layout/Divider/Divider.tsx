@@ -1,5 +1,6 @@
 import { type CSSProperties, type ForwardedRef, forwardRef } from 'react';
 import { cn } from '../../../utils/cn.js';
+import { type LengthValue, type SpaceToken, resolveSize, resolveSpace } from '../shared/tokens.js';
 import {
   dividerBase,
   dividerDashed,
@@ -7,8 +8,6 @@ import {
   dividerHorizontal,
   dividerSolid,
   dividerVertical,
-  dividerVerticalDashed,
-  dividerVerticalDotted,
 } from './Divider.css.js';
 
 export type DividerOrientation = 'horizontal' | 'vertical';
@@ -19,6 +18,20 @@ export interface DividerProps {
   orientation?: DividerOrientation;
   variant?: DividerVariant;
   thickness?: DividerThickness;
+  /**
+   * Explicit cross-axis length. For `horizontal`, sets the width;
+   * for `vertical`, sets the height. Accepts a size token (`"full"`,
+   * `"prose"`, …), a space token (`"8"`), or a raw length (`"200px"`).
+   * Vertical dividers default to stretching to the parent flex height
+   * with a `1.5em` floor; pass `length` to pin an explicit size.
+   */
+  length?: LengthValue | 'full' | 'auto' | 'fit' | 'screen' | 'prose' | SpaceToken;
+  /**
+   * Margin on the axis perpendicular to the divider. Horizontal dividers
+   * apply it block-wise (above/below); vertical dividers apply it inline
+   * (left/right). Accepts a space token like `"3"`.
+   */
+  spacing?: SpaceToken;
   className?: string;
   style?: CSSProperties;
   /**
@@ -29,15 +42,10 @@ export interface DividerProps {
   decorative?: boolean;
 }
 
-const resolveClasses = (orientation: DividerOrientation, variant: DividerVariant): string => {
-  if (orientation === 'horizontal') {
-    if (variant === 'dashed') return cn(dividerBase, dividerHorizontal, dividerDashed);
-    if (variant === 'dotted') return cn(dividerBase, dividerHorizontal, dividerDotted);
-    return cn(dividerBase, dividerHorizontal, dividerSolid);
-  }
-  if (variant === 'dashed') return cn(dividerBase, dividerVertical, dividerVerticalDashed);
-  if (variant === 'dotted') return cn(dividerBase, dividerVertical, dividerVerticalDotted);
-  return cn(dividerBase, dividerVertical, dividerSolid);
+const variantClass = (variant: DividerVariant): string => {
+  if (variant === 'dashed') return dividerDashed;
+  if (variant === 'dotted') return dividerDotted;
+  return dividerSolid;
 };
 
 /**
@@ -52,17 +60,33 @@ export const Divider = forwardRef<HTMLHRElement, DividerProps>(function Divider(
     orientation = 'horizontal',
     variant = 'solid',
     thickness = '1',
+    length,
+    spacing,
     className,
     style,
     decorative = true,
   },
   ref: ForwardedRef<HTMLHRElement>,
 ) {
+  const isVertical = orientation === 'vertical';
+  const orientationClass = isVertical ? dividerVertical : dividerHorizontal;
+
   const resolvedStyle: CSSProperties = {
     ['--cynosure-divider-thickness' as string]: `${thickness}px`,
+    ...(length !== undefined
+      ? isVertical
+        ? { ['--cynosure-divider-length' as string]: resolveSize(length) }
+        : { width: resolveSize(length) }
+      : null),
+    ...(spacing !== undefined
+      ? isVertical
+        ? { marginInline: resolveSpace(spacing) }
+        : { marginBlock: resolveSpace(spacing) }
+      : null),
     ...style,
   };
-  const classes = cn(resolveClasses(orientation, variant), className);
+
+  const classes = cn(dividerBase, orientationClass, variantClass(variant), className);
 
   return (
     <hr
