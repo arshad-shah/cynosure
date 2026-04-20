@@ -51,7 +51,7 @@ export const menuItem = style({
   position: 'relative',
   paddingBlock: vars.space['2'],
   paddingInline: vars.space['2'],
-  paddingInlineStart: vars.space['2.5'],
+  paddingInlineStart: vars.space['2'],
   borderRadius: vars.radius.sm,
   cursor: 'pointer',
   userSelect: 'none',
@@ -112,7 +112,7 @@ export const menuSeparator = style({
 
 /** Section label (non-interactive). */
 export const menuLabel = style({
-  paddingInline: vars.space['2.5'],
+  paddingInline: vars.space['2'],
   paddingBlock: vars.space['1'],
   fontSize: 'var(--cynosure-font-body-sm-size)',
   fontWeight: 600,
