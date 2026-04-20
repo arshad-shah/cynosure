@@ -11,20 +11,25 @@ import { Slot } from '../../Slot.js';
 import {
   type AsChildProps,
   type LayoutProps,
+  type Responsive,
   mergeStyles,
   resolveLayoutProps,
   splitLayoutProps,
+  toResponsiveVars,
 } from '../shared/index.js';
-import { containerBase, containerSize } from './Container.css.js';
+import { CONTAINER_MAX_WIDTHS, containerBase } from './Container.css.js';
 
-export type ContainerSize = keyof typeof containerSize;
+export type ContainerSize = keyof typeof CONTAINER_MAX_WIDTHS;
 
 export interface ContainerOwnProps extends LayoutProps, AsChildProps {
   className?: string;
   style?: CSSProperties;
   children?: ReactNode;
-  /** `sm`, `md`, `lg` (default), `xl`, `2xl`, `prose` (65ch), `full`. */
-  size?: ContainerSize;
+  /**
+   * Max-width preset: `sm`, `md`, `lg` (default), `xl`, `2xl`, `prose` (65ch),
+   * `full`. Accepts a responsive object too — e.g. `size={{ base: 'sm', md: 'lg' }}`.
+   */
+  size?: Responsive<ContainerSize>;
 }
 
 export type ContainerProps<E extends ElementType = 'div'> = ContainerOwnProps & {
@@ -39,14 +44,19 @@ const ContainerRender = (props: AnyProps, ref: ForwardedRef<Element>): ReactElem
   const { layoutProps, rest: domProps } = splitLayoutProps(rest as ContainerOwnProps);
 
   const layoutStyle = resolveLayoutProps(layoutProps);
-  const mergedStyle = mergeStyles(layoutStyle, style);
+  const sizeStyle = toResponsiveVars(
+    size,
+    'cynosure-container-maxw',
+    (v) => CONTAINER_MAX_WIDTHS[v],
+  );
+  const mergedStyle = mergeStyles(layoutStyle, sizeStyle, style);
 
   const Comp: ElementType = asChild ? Slot : (as ?? 'div');
 
   return (
     <Comp
       ref={ref}
-      className={cn(containerBase, containerSize[size], className)}
+      className={cn(containerBase, className)}
       style={mergedStyle}
       {...(domProps as Record<string, unknown>)}
     >
@@ -57,7 +67,8 @@ const ContainerRender = (props: AnyProps, ref: ForwardedRef<Element>): ReactElem
 
 /**
  * Max-width container, horizontally centred. Pass one of the predefined
- * `size`s (`sm`/`md`/`lg`/`xl`/`2xl`/`prose`/`full`) and optionally responsive
+ * `size`s (`sm`/`md`/`lg`/`xl`/`2xl`/`prose`/`full`) — either flat or
+ * responsive (`{ base: 'sm', md: 'lg' }`) — and optionally responsive
  * `paddingX` for gutter behaviour.
  */
 export const Container = forwardRef<Element, AnyProps>(ContainerRender) as <

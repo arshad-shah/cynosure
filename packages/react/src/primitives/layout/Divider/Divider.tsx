@@ -22,17 +22,17 @@ export interface DividerProps {
   className?: string;
   style?: CSSProperties;
   /**
-   * When `decorative` (default), renders an ARIA-hidden `<hr>` /
-   * `<div role="separator" aria-orientation>`. Setting `decorative={false}`
-   * exposes the divider as a meaningful separator to assistive tech.
+   * When `decorative` (default), the divider is hidden from assistive tech
+   * (`role="presentation"` + `aria-hidden`). Set `decorative={false}` to expose
+   * it as a meaningful separator with the appropriate orientation.
    */
   decorative?: boolean;
 }
 
 const resolveClasses = (orientation: DividerOrientation, variant: DividerVariant): string => {
   if (orientation === 'horizontal') {
-    if (variant === 'dashed') return cn(dividerBase, dividerDashed);
-    if (variant === 'dotted') return cn(dividerBase, dividerDotted);
+    if (variant === 'dashed') return cn(dividerBase, dividerHorizontal, dividerDashed);
+    if (variant === 'dotted') return cn(dividerBase, dividerHorizontal, dividerDotted);
     return cn(dividerBase, dividerHorizontal, dividerSolid);
   }
   if (variant === 'dashed') return cn(dividerBase, dividerVertical, dividerVerticalDashed);
@@ -41,11 +41,13 @@ const resolveClasses = (orientation: DividerOrientation, variant: DividerVariant
 };
 
 /**
- * Visual separator. Horizontal renders an `<hr>`; vertical renders a
- * `<div role="separator" aria-orientation="vertical">` because a real `<hr>`
- * doesn't resolve vertically across browsers without CSS gymnastics.
+ * Visual separator. Renders an `<hr>` in both orientations — the semantic
+ * choice for a thematic break. Horizontal is the browser default; vertical
+ * uses `aria-orientation="vertical"` so AT announces the axis correctly.
+ * Decorative dividers (the default) drop the implicit separator role with
+ * `role="presentation"` so they don't clutter the accessibility tree.
  */
-export const Divider = forwardRef<HTMLElement, DividerProps>(function Divider(
+export const Divider = forwardRef<HTMLHRElement, DividerProps>(function Divider(
   {
     orientation = 'horizontal',
     variant = 'solid',
@@ -54,7 +56,7 @@ export const Divider = forwardRef<HTMLElement, DividerProps>(function Divider(
     style,
     decorative = true,
   },
-  ref: ForwardedRef<HTMLElement>,
+  ref: ForwardedRef<HTMLHRElement>,
 ) {
   const resolvedStyle: CSSProperties = {
     ['--cynosure-divider-thickness' as string]: `${thickness}px`,
@@ -62,24 +64,12 @@ export const Divider = forwardRef<HTMLElement, DividerProps>(function Divider(
   };
   const classes = cn(resolveClasses(orientation, variant), className);
 
-  if (orientation === 'vertical') {
-    return (
-      <div
-        ref={ref as ForwardedRef<HTMLDivElement>}
-        role={decorative ? undefined : 'separator'}
-        aria-orientation="vertical"
-        aria-hidden={decorative ? true : undefined}
-        className={classes}
-        style={resolvedStyle}
-      />
-    );
-  }
-
   return (
     <hr
-      ref={ref as ForwardedRef<HTMLHRElement>}
+      ref={ref}
+      role={decorative ? 'presentation' : 'separator'}
+      aria-orientation={decorative ? undefined : orientation}
       aria-hidden={decorative ? true : undefined}
-      role={decorative ? undefined : 'separator'}
       className={classes}
       style={resolvedStyle}
     />
