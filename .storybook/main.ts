@@ -5,11 +5,12 @@ const config: StorybookConfig = {
   stories: [
     // Ordered so "Getting started" / "Foundations" / "Recipes" appear first
     // in the sidebar, followed by per-component docs + stories under
-    // packages/react/src.
+    // packages/react/src. Scoped to packages/react so the Astro-based
+    // packages/docs content collection (also *.mdx) isn't pulled in.
     '../docs/foundations/**/*.mdx',
     '../docs/recipes/**/*.mdx',
-    '../packages/**/*.mdx',
-    '../packages/**/*.stories.@(ts|tsx)',
+    '../packages/react/**/*.mdx',
+    '../packages/react/**/*.stories.@(ts|tsx)',
   ],
   addons: [
     '@storybook/addon-docs',
