@@ -1,0 +1,16 @@
+---
+import type { SidebarSection } from '../../config/sidebar';
+interface Props { section: SidebarSection; current: string }
+const { section, current } = Astro.props;
+---
+<details open>
+  <summary>{section.title}</summary>
+  <ul>
+    {section.links.map((l) => (
+      <li data-current={current === l.href ? '' : undefined}>
+        <a href={l.href}>{l.title}</a>
+        {l.status ? <span data-status={l.status}>{l.status}</span> : null}
+      </li>
+    ))}
+  </ul>
+</details>

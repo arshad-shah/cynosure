@@ -1,0 +1,8 @@
+---
+import { sidebar } from '../../config/sidebar';
+import SidebarSection from './SidebarSection.astro';
+const current = Astro.url.pathname.replace(/\/$/, '');
+---
+<aside data-sidebar>
+  {sidebar.map((s) => <SidebarSection section={s} current={current} />)}
+</aside>

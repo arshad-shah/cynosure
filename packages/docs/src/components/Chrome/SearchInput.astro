@@ -1,0 +1,65 @@
+<div data-search>
+  <input type="search" id="search" placeholder="Search docs…  ⌘K" autocomplete="off" />
+  <div id="search-results" role="listbox" hidden></div>
+</div>
+<script>
+  interface PagefindResult { url: string; meta: { title?: string }; excerpt: string }
+  interface PagefindModule { search(q: string): Promise<{ results: { data(): Promise<PagefindResult> }[] }> }
+
+  const input = document.getElementById('search') as HTMLInputElement | null;
+  const results = document.getElementById('search-results') as HTMLDivElement | null;
+  if (!input || !results) throw new Error('Search elements missing');
+
+  function clearChildren(el: HTMLElement): void {
+    while (el.firstChild) el.removeChild(el.firstChild);
+  }
+
+  function renderResults(items: PagefindResult[]): void {
+    clearChildren(results!);
+    for (const item of items) {
+      const a = document.createElement('a');
+      a.href = item.url;
+      a.setAttribute('role', 'option');
+      const title = document.createElement('strong');
+      title.textContent = item.meta.title ?? item.url;
+      const excerpt = document.createElement('p');
+      excerpt.textContent = item.excerpt.replace(/<[^>]+>/g, '');
+      a.appendChild(title);
+      a.appendChild(excerpt);
+      results!.appendChild(a);
+    }
+  }
+
+  // Pagefind bundle is emitted by the build step at /pagefind/pagefind.js
+  // In dev before first build it will 404 — wrap in try/catch.
+  let pagefind: PagefindModule | null = null;
+  try {
+    // @ts-expect-error — dynamic runtime URL import
+    pagefind = (await import('/pagefind/pagefind.js')) as PagefindModule;
+  } catch {
+    // Pagefind not available yet (dev before first build). Search is disabled silently.
+    input.placeholder = 'Search (build docs first)';
+    input.disabled = true;
+  }
+
+  input.addEventListener('input', async () => {
+    if (!pagefind) return;
+    const q = input.value.trim();
+    if (!q) {
+      results.hidden = true;
+      clearChildren(results);
+      return;
+    }
+    const search = await pagefind.search(q);
+    const items = await Promise.all(search.results.slice(0, 8).map((r) => r.data()));
+    results.hidden = false;
+    renderResults(items);
+  });
+
+  window.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+      e.preventDefault();
+      input.focus();
+    }
+  });
+</script>

@@ -1,0 +1,31 @@
+---
+import type { MarkdownHeading } from 'astro';
+interface Props { headings: MarkdownHeading[] }
+const { headings } = Astro.props;
+const filtered = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
+---
+<nav data-toc aria-label="On this page">
+  <p>On this page</p>
+  <ul>
+    {filtered.map((h) => (
+      <li data-depth={h.depth}><a href={`#${h.slug}`}>{h.text}</a></li>
+    ))}
+  </ul>
+</nav>
+<script>
+  const links = document.querySelectorAll<HTMLAnchorElement>('[data-toc] a');
+  const targets = [...links]
+    .map((a) => document.getElementById(a.hash.slice(1)))
+    .filter((x): x is HTMLElement => x !== null);
+
+  const io = new IntersectionObserver((entries) => {
+    for (const e of entries) {
+      const link = [...links].find((a) => a.hash === `#${e.target.id}`);
+      if (!link) continue;
+      if (e.isIntersecting) link.setAttribute('data-active', '');
+      else link.removeAttribute('data-active');
+    }
+  }, { rootMargin: '-40% 0px -55% 0px' });
+
+  for (const t of targets) io.observe(t);
+</script>

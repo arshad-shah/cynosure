@@ -16,3 +16,140 @@ code, pre, kbd {
     transition-duration: 0ms !important;
   }
 }
+
+/* Utility */
+.visually-hidden {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0, 0, 0, 0);
+  white-space: nowrap; border: 0;
+}
+
+body {
+  margin: 0;
+  background: var(--color-bg, canvas);
+  color: var(--color-fg, canvastext);
+  min-height: 100vh;
+}
+
+/* Topbar */
+[data-topbar] {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4, 1rem);
+  padding: var(--space-3, 0.75rem) var(--space-5, 1.25rem);
+  border-bottom: 1px solid var(--color-border, color-mix(in srgb, currentColor 15%, transparent));
+  position: sticky; top: 0; z-index: 10;
+  background: var(--color-bg, canvas);
+}
+[data-brand-lockup] {
+  display: inline-flex; align-items: center; gap: var(--space-2, 0.5rem);
+  text-decoration: none; color: inherit; font-weight: 600;
+}
+[data-version-pill] {
+  font-size: 0.8em; padding: 0.15em 0.5em;
+  border: 1px solid var(--color-border, color-mix(in srgb, currentColor 15%, transparent));
+  border-radius: var(--radius-full, 9999px);
+  text-decoration: none; color: inherit;
+}
+[data-search] { flex: 1; position: relative; }
+[data-search] input { width: 100%; padding: 0.4em 0.7em; border-radius: var(--radius-md, 0.5rem);
+  border: 1px solid var(--color-border, color-mix(in srgb, currentColor 15%, transparent));
+  background: transparent; color: inherit; font: inherit;
+}
+[data-search] #search-results {
+  position: absolute; top: calc(100% + 4px); left: 0; right: 0;
+  background: var(--color-bg, canvas);
+  border: 1px solid var(--color-border, color-mix(in srgb, currentColor 15%, transparent));
+  border-radius: var(--radius-md, 0.5rem);
+  max-height: 60vh; overflow-y: auto;
+}
+[data-search] #search-results a {
+  display: block; padding: var(--space-3, 0.75rem); text-decoration: none; color: inherit;
+  border-bottom: 1px solid var(--color-border, color-mix(in srgb, currentColor 8%, transparent));
+}
+[data-theme-switcher] select { font: inherit; padding: 0.3em 0.5em; background: transparent; color: inherit; border: 1px solid var(--color-border, color-mix(in srgb, currentColor 15%, transparent)); border-radius: var(--radius-md, 0.5rem); }
+
+/* Doc layout — grid */
+[data-doc-layout] {
+  display: grid;
+  grid-template-columns: 260px 1fr 220px;
+  gap: var(--space-6, 1.5rem);
+  padding: var(--space-5, 1.25rem);
+  max-width: 1400px; margin: 0 auto;
+}
+[data-sidebar] { position: sticky; top: 64px; align-self: start; max-height: calc(100vh - 80px); overflow-y: auto; }
+[data-sidebar] details { margin-bottom: var(--space-3, 0.75rem); }
+[data-sidebar] summary { font-weight: 600; cursor: pointer; padding: var(--space-2, 0.5rem) 0; }
+[data-sidebar] ul { list-style: none; padding: 0; margin: 0; }
+[data-sidebar] li { padding: 0.2em 0; }
+[data-sidebar] li[data-current] a { font-weight: 600; }
+[data-sidebar] a { color: inherit; text-decoration: none; }
+[data-sidebar] a:hover { text-decoration: underline; }
+[data-sidebar] [data-status] { font-size: 0.7em; margin-left: 0.4em; padding: 0.05em 0.3em; border-radius: var(--radius-sm, 0.25rem); border: 1px solid var(--color-border, color-mix(in srgb, currentColor 15%, transparent)); }
+
+[data-toc] { position: sticky; top: 64px; align-self: start; font-size: 0.9em; }
+[data-toc] ul { list-style: none; padding: 0; margin: 0; }
+[data-toc] li[data-depth="3"] { padding-left: 1em; }
+[data-toc] a { color: inherit; text-decoration: none; opacity: 0.7; }
+[data-toc] a[data-active] { opacity: 1; font-weight: 600; }
+
+main { min-width: 0; }
+
+@media (max-width: 900px) {
+  [data-doc-layout] { grid-template-columns: 1fr; }
+  [data-sidebar], [data-toc] { position: static; max-height: none; }
+}
+
+/* Status badge + bundle size + code block basic styles (tokens-only) */
+[data-status-badge] {
+  display: inline-block; padding: 0.15em 0.5em; border-radius: var(--radius-full, 9999px);
+  font-size: 0.75em; text-transform: uppercase; letter-spacing: 0.05em;
+  border: 1px solid var(--color-border, color-mix(in srgb, currentColor 15%, transparent));
+}
+[data-bundle-size] {
+  display: inline-block; margin-left: 0.5em; padding: 0.1em 0.5em;
+  font-family: 'JetBrains Mono Variable', ui-monospace, monospace;
+  font-size: 0.8em;
+  border: 1px solid var(--color-border, color-mix(in srgb, currentColor 15%, transparent));
+  border-radius: var(--radius-full, 9999px);
+}
+[data-code-block] { position: relative; margin: var(--space-4, 1rem) 0; }
+[data-code-block] [data-copy-btn] {
+  position: absolute; top: 0.5em; right: 0.5em; z-index: 1;
+  font: inherit; font-size: 0.8em; padding: 0.2em 0.6em;
+  border: 1px solid var(--color-border, color-mix(in srgb, currentColor 15%, transparent));
+  border-radius: var(--radius-sm, 0.25rem);
+  background: var(--color-bg, canvas); color: inherit; cursor: pointer;
+}
+[data-code-block] pre { padding: var(--space-4, 1rem); border-radius: var(--radius-md, 0.5rem); overflow-x: auto; }
+
+[data-live-preview] {
+  border: 1px solid var(--color-border, color-mix(in srgb, currentColor 15%, transparent));
+  border-radius: var(--radius-md, 0.5rem);
+  margin: var(--space-4, 1rem) 0;
+}
+[data-live-preview-frame] { padding: var(--space-5, 1.25rem); display: flex; justify-content: center; align-items: center; min-height: 120px; }
+[data-live-preview-controls] {
+  display: flex; gap: var(--space-2, 0.5rem); justify-content: flex-end;
+  padding: var(--space-2, 0.5rem); border-top: 1px solid var(--color-border, color-mix(in srgb, currentColor 15%, transparent));
+}
+[data-live-preview-controls] button, [data-live-preview-controls] a {
+  font: inherit; font-size: 0.85em; padding: 0.2em 0.6em;
+  border: 1px solid var(--color-border, color-mix(in srgb, currentColor 15%, transparent));
+  border-radius: var(--radius-sm, 0.25rem);
+  background: transparent; color: inherit; cursor: pointer; text-decoration: none;
+}
+
+/* Tables */
+[data-props-table], [data-token-table] { width: 100%; border-collapse: collapse; margin: var(--space-4, 1rem) 0; }
+[data-props-table] th, [data-props-table] td, [data-token-table] th, [data-token-table] td {
+  padding: var(--space-2, 0.5rem); text-align: left; border-bottom: 1px solid var(--color-border, color-mix(in srgb, currentColor 8%, transparent));
+  font-size: 0.9em;
+}
+[data-token-table] [data-swatch] {
+  display: inline-block; width: 1.2em; height: 1.2em; border-radius: var(--radius-sm, 0.25rem);
+  border: 1px solid var(--color-border, color-mix(in srgb, currentColor 15%, transparent));
+  vertical-align: middle;
+}
