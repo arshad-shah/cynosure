@@ -5,10 +5,12 @@
   "type": "module",
   "scripts": {
     "dev": "astro dev",
-    "build": "tsx scripts/verify-component-pages.ts && tsx scripts/build-changelog.ts && pnpm run generate:props && astro build && pnpm run build:search",
+    "build": "tsx scripts/verify-component-pages.ts && tsx scripts/build-changelog.ts && pnpm run generate:props && astro build && pnpm run build:search && pnpm run sync-search-to-public",
     "preview": "astro preview",
     "generate:props": "tsx scripts/generate-props.ts",
     "build:search": "pagefind --site dist",
+    "sync-search-to-public": "rm -rf public/pagefind && cp -R dist/pagefind public/pagefind",
+    "dev:search": "pnpm run build && echo 'Pagefind now populated in public/pagefind — dev search will work on next astro dev'",
     "check": "astro check && tsc --noEmit",
     "lint": "biome check .",
     "test": "vitest run --passWithNoTests",
