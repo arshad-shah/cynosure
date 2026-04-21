@@ -1,0 +1,70 @@
+---
+title: Input
+description: Single-line text field built on the native <input>; supports addons, clearable, and password-toggle affordances.
+order: 2
+category: components
+status: stable
+since: 0.1.0
+a11y: Renders a native <input>; aria-invalid toggled on invalid state; focus ring follows design tokens.
+bundleSize: "8 kB"
+tags: [form, input]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+import StatusBadge from '@/components/StatusBadge.astro';
+import BundleSizePill from '@/components/BundleSizePill.astro';
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="Input" /></div>
+
+<LivePreview example="input/basic" />
+
+## Usage
+
+```tsx
+import { Input } from '@arshad-shah/cynosure-react';
+
+<Input placeholder="Type something…" />
+```
+
+## Sizes
+
+Three sizes are available: `sm`, `md` (default), and `lg`.
+
+<LivePreview example="input/sizes" />
+
+## Invalid state
+
+Set `invalid` to signal a validation error visually.
+
+<LivePreview example="input/invalid" />
+
+## Disabled state
+
+<LivePreview example="input/disabled" />
+
+## With addons
+
+Use `leadingSlot` and `trailingSlot` to attach icons or text prefixes/suffixes.
+
+<LivePreview example="input/with-addons" />
+
+## With helper text
+
+Pair with a visible description below the field.
+
+<LivePreview example="input/with-helper" />
+
+## API
+
+<PropsTable component="Input" />
+
+## Accessibility
+
+- Renders a native `<input>` — inherits all built-in ARIA semantics.
+- `invalid` sets `aria-invalid="true"` on the underlying input element.
+- Focus ring is token-driven and never removed.
+
+## Recipes
+
+- Use `type="password"` to automatically get a show/hide toggle affordance.
+- Use `clearable` to append an accessible clear button when the field has a value.
