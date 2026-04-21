@@ -17,7 +17,7 @@ const meta: Meta<typeof Input> = {
   component: Input,
   parameters: { layout: 'padded' },
   argTypes: {
-    variant: { control: 'select', options: ['outline', 'filled', 'ghost'] },
+    variant: { control: 'select', options: ['outline', 'filled', 'ghost', 'flat'] },
     size: { control: 'select', options: ['sm', 'md', 'lg'] },
     type: {
       control: 'select',
@@ -40,6 +40,7 @@ const SearchIcon = (): React.ReactElement => (
     strokeLinecap="round"
     strokeLinejoin="round"
   >
+    <title>Search</title>
     <circle cx="11" cy="11" r="8" />
     <line x1="21" y1="21" x2="16.65" y2="16.65" />
   </svg>
@@ -57,6 +58,7 @@ export const Variants: Story = {
       <Input variant="outline" placeholder="Outline" />
       <Input variant="filled" placeholder="Filled" />
       <Input variant="ghost" placeholder="Ghost" />
+      <Input variant="flat" placeholder="Flat (legacy single-well)" />
     </Stack>
   ),
 };
@@ -97,22 +99,27 @@ export const States: Story = {
   ),
 };
 
-export const Addons: Story = {
+export const Slots: Story = {
+  name: 'Slots — inert (icon / prefix) and action (button)',
   render: () => (
     <Stack gap="3" width="360px">
-      <Input leftAddon="https://" placeholder="example.com" />
-      <Input rightAddon=".com" placeholder="example" />
-      <Input leftAddon="https://" rightAddon=".com" placeholder="example" />
+      <Input leadingSlot="https://" placeholder="example.com" />
+      <Input trailingSlot=".com" placeholder="example" />
+      <Input leadingSlot="https://" trailingSlot=".com" placeholder="example" />
+      <Input leadingSlot={<SearchIcon />} placeholder="Search…" />
+      <Input leadingSlot={<Dollar />} trailingSlot={<span>USD</span>} placeholder="0.00" />
     </Stack>
   ),
 };
 
-export const Elements: Story = {
-  name: 'Inline elements (icons / adornments)',
+export const MultipleSlots: Story = {
+  name: 'Slots — multiple on a side',
   render: () => (
     <Stack gap="3" width="360px">
-      <Input leftElement={<SearchIcon />} placeholder="Search…" />
-      <Input leftElement={<Dollar />} rightElement={<span>USD</span>} placeholder="0.00" />
+      <Input
+        leadingSlot={[<SearchIcon key="i" />, <span key="t">Search</span>]}
+        placeholder="Filtered search…"
+      />
     </Stack>
   ),
 };
@@ -124,6 +131,13 @@ export const Clearable: Story = {
       return (
         <Stack gap="3" width="320px">
           <Input clearable value={value} onChange={setValue} placeholder="Clearable" />
+          <Input
+            clearable
+            invalid
+            value={value}
+            onChange={setValue}
+            placeholder="Clearable, invalid"
+          />
           <Text size="sm" color="fg.muted">
             Value: <code>{JSON.stringify(value)}</code>
           </Text>
@@ -137,6 +151,17 @@ export const Clearable: Story = {
 export const Password: Story = {
   name: 'Password — show/hide toggle',
   render: () => <Input type="password" defaultValue="hunter2" placeholder="Password" />,
+};
+
+export const Flat: Story = {
+  name: 'Flat variant (dense layouts)',
+  render: () => (
+    <Stack gap="3" width="320px">
+      <Input variant="flat" placeholder="Flat, plain" />
+      <Input variant="flat" leadingSlot="https://" placeholder="example.com" />
+      <Input variant="flat" clearable defaultValue="Clear me" placeholder="Flat, clearable" />
+    </Stack>
+  ),
 };
 
 export const Controlled: Story = {
