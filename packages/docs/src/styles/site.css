@@ -1,0 +1,18 @@
+@import '@arshad-shah/cynosure-tokens/css';
+@import '@arshad-shah/cynosure-react/styles.css';
+@import './fonts.css';
+
+:root {
+  font-family: 'Geist Variable', ui-sans-serif, system-ui, sans-serif;
+}
+
+code, pre, kbd {
+  font-family: 'JetBrains Mono Variable', ui-monospace, monospace;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0ms !important;
+    transition-duration: 0ms !important;
+  }
+}
