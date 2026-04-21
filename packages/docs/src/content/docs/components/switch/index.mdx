@@ -1,0 +1,52 @@
+---
+title: Switch
+description: Toggle switch for on/off settings that take effect immediately, without a Save step. Built on Radix UI.
+order: 6
+category: components
+status: stable
+since: 0.1.0
+a11y: Uses Radix UI switch root; role="switch" with aria-checked; aria-busy set during loading state.
+bundleSize: "10 kB"
+tags: [form, input]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+import StatusBadge from '@/components/StatusBadge.astro';
+import BundleSizePill from '@/components/BundleSizePill.astro';
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="Switch" /></div>
+
+<LivePreview example="switch/basic" />
+
+## Usage
+
+```tsx
+import { Switch } from '@arshad-shah/cynosure-react';
+
+<Switch>Dark mode</Switch>
+```
+
+## Sizes
+
+Three sizes are available: `sm`, `md` (default), and `lg`.
+
+<LivePreview example="switch/sizes" />
+
+## Disabled state
+
+<LivePreview example="switch/disabled" />
+
+## API
+
+<PropsTable component="Switch" />
+
+## Accessibility
+
+- Built on Radix UI switch — exposes `role="switch"` with `aria-checked` reflecting on/off state.
+- `loading` sets `aria-busy="true"` and blocks all interaction while async work completes.
+- Space key toggles the switch; focus ring follows design tokens.
+
+## Recipes
+
+- Prefer `<Switch>` over `<Checkbox>` when the action takes effect immediately (e.g. enabling a feature flag).
+- Use `loading` when toggling requires an async API call — it prevents double-toggling and communicates progress.
