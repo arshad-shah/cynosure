@@ -1,5 +1,6 @@
 import { style } from '@vanilla-extract/css';
 import { vars } from '../../styles/vars.css.js';
+import { fieldWellBase } from '../shared/control.css.js';
 
 /**
  * The "punched card" root for DatePicker / DateRangePicker / TimePicker. No
@@ -24,44 +25,35 @@ export const pickerRoot = style({
 });
 
 /**
- * Base punched well. Sits `background.subtle` against the host card's
- * `background.surface`, with a hairline inner shadow and the token border.
- * Variant and state (invalid / readonly) are driven by `data-*` attributes
- * on the `pickerRoot` so all wells change in lockstep.
+ * DatePicker-local well composition: the shared tile + DatePicker's
+ * parent-scoped state selectors. Tile chrome is shared with Input.
  */
-const wellBase = style({
-  display: 'inline-flex',
-  alignItems: 'center',
-  minHeight: '2.5rem',
-  background: vars.color.background.subtle,
-  border: `1px solid ${vars.color.border.default}`,
-  borderRadius: vars.radius.md,
-  boxShadow: 'inset 0 1px 0 rgba(24, 24, 27, 0.04)',
-  transitionProperty: 'background-color, border-color, box-shadow, color',
-  transitionDuration: vars.duration.fast,
-  color: vars.color.foreground.default,
-  selectors: {
-    // variant: filled — deeper recess, border recedes
-    [`${pickerRoot}[data-variant="filled"] &`]: {
-      background: vars.color.background.muted,
-      borderColor: 'transparent',
-    },
-    // variant: ghost — minimal, no inset shadow, subtle borderless rest state
-    [`${pickerRoot}[data-variant="ghost"] &`]: {
-      background: 'transparent',
-      borderColor: 'transparent',
-      boxShadow: 'none',
-    },
-    // invalid — danger border on every well
-    [`${pickerRoot}[data-invalid="true"] &`]: {
-      borderColor: vars.color.feedback.danger.border,
-    },
-    // readonly — slightly deeper well surface
-    [`${pickerRoot}[data-readonly="true"] &`]: {
-      background: vars.color.background.muted,
+const wellBase = style([
+  fieldWellBase,
+  {
+    selectors: {
+      // variant: filled — deeper recess, border recedes
+      [`${pickerRoot}[data-variant="filled"] &`]: {
+        background: vars.color.background.muted,
+        borderColor: 'transparent',
+      },
+      // variant: ghost — minimal, no inset shadow, subtle borderless rest state
+      [`${pickerRoot}[data-variant="ghost"] &`]: {
+        background: 'transparent',
+        borderColor: 'transparent',
+        boxShadow: 'none',
+      },
+      // invalid — danger border on every well
+      [`${pickerRoot}[data-invalid="true"] &`]: {
+        borderColor: vars.color.feedback.danger.border,
+      },
+      // readonly — slightly deeper well surface
+      [`${pickerRoot}[data-readonly="true"] &`]: {
+        background: vars.color.background.muted,
+      },
     },
   },
-});
+]);
 
 /** The leading-icon pocket — inert, just a visual label. */
 export const leadWell = style([
