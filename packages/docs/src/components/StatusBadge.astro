@@ -1,5 +1,23 @@
 ---
+import { Badge } from '@arshad-shah/cynosure-react';
+import type { BadgeColorScheme } from '@arshad-shah/cynosure-react';
+
 interface Props { status: 'stable' | 'beta' | 'alpha' | 'experimental' | 'deprecated' }
 const { status } = Astro.props;
+
+const colorMap: Record<Props['status'], BadgeColorScheme> = {
+  stable: 'success',
+  beta: 'warning',
+  alpha: 'danger',
+  experimental: 'accent',
+  deprecated: 'neutral',
+};
 ---
-<span data-status-badge data-status={status}>{status}</span>
+<Badge
+  variant="soft"
+  colorScheme={colorMap[status]}
+  size="sm"
+  shape="pill"
+  data-status-badge
+  data-status={status}
+>{status}</Badge>

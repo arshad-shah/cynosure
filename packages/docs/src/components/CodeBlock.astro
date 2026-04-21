@@ -1,22 +1,12 @@
 ---
 import { codeToHtml } from 'shiki';
+import CopyButton from './CopyButton.tsx';
 
 interface Props { code: string; lang?: string }
 const { code, lang = 'tsx' } = Astro.props;
 const html = await codeToHtml(code, { lang, theme: 'github-dark-dimmed' });
 ---
 <div data-code-block>
-  <button type="button" data-copy-btn data-code={code} aria-label="Copy code">Copy</button>
+  <CopyButton code={code} client:visible />
   <Fragment set:html={html} />
 </div>
-<script>
-  for (const btn of document.querySelectorAll<HTMLButtonElement>('[data-copy-btn]')) {
-    btn.addEventListener('click', async () => {
-      const code = btn.dataset.code ?? '';
-      await navigator.clipboard.writeText(code);
-      const prev = btn.textContent;
-      btn.textContent = 'Copied';
-      setTimeout(() => { btn.textContent = prev; }, 1500);
-    });
-  }
-</script>

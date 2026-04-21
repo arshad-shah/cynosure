@@ -1,3 +1,4 @@
+import { Select } from '@arshad-shah/cynosure-react';
 import { useEffect, useState } from 'react';
 import { THEMES, THEME_STORAGE_KEY, type Theme } from '../../lib/theme-init';
 
@@ -17,15 +18,12 @@ export default function ThemeSwitcher() {
   };
 
   return (
-    <label data-theme-switcher>
-      <span className="visually-hidden">Theme</span>
-      <select value={theme} onChange={(e) => apply(e.target.value as Theme)}>
-        {THEMES.map((t) => (
-          <option key={t} value={t}>
-            {t}
-          </option>
-        ))}
-      </select>
-    </label>
+    <Select
+      aria-label="Theme"
+      value={theme}
+      onValueChange={(v) => apply(v as Theme)}
+      items={THEMES.map((t) => ({ value: t, label: t }))}
+      size="sm"
+    />
   );
 }

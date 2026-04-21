@@ -1,3 +1,4 @@
+import { Button, Link } from '@arshad-shah/cynosure-react';
 import { type ReactNode, useState } from 'react';
 
 interface Props {
@@ -22,15 +23,33 @@ export default function PreviewFrame({ children, source, slug }: Props) {
         {children}
       </div>
       <div data-live-preview-controls>
-        <button type="button" onClick={onCopy} aria-label="Copy code">
+        <Button
+          variant="ghost"
+          colorScheme="neutral"
+          size="sm"
+          onClick={onCopy}
+          aria-label="Copy code"
+        >
           {copied ? 'Copied' : 'Copy'}
-        </button>
-        <button type="button" onClick={() => setKey((k) => k + 1)} aria-label="Reset preview">
+        </Button>
+        <Button
+          variant="ghost"
+          colorScheme="neutral"
+          size="sm"
+          onClick={() => setKey((k) => k + 1)}
+          aria-label="Reset preview"
+        >
           Reset
-        </button>
-        <a href={`/preview/${slug}`} target="_blank" rel="noreferrer" aria-label="Open in new tab">
-          Open
-        </a>
+        </Button>
+        <Link
+          href={`/preview/${slug}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Open in new tab"
+          underline="hover"
+        >
+          Open ↗
+        </Link>
       </div>
     </div>
   );

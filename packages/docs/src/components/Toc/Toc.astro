@@ -5,10 +5,12 @@ const { headings } = Astro.props;
 const filtered = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
 ---
 <nav data-toc aria-label="On this page">
-  <p>On this page</p>
+  <p style="font-weight:600;margin:0 0 var(--space-2,0.5rem);">On this page</p>
   <ul>
     {filtered.map((h) => (
-      <li data-depth={h.depth}><a href={`#${h.slug}`}>{h.text}</a></li>
+      <li data-depth={h.depth}>
+        <a href={`#${h.slug}`}>{h.text}</a>
+      </li>
     ))}
   </ul>
 </nav>
