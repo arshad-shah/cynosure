@@ -1,0 +1,24 @@
+---
+import lockupUrl from '@brand/cynosure-lockup.svg?url';
+import CopyButton from '../CopyButton.tsx';
+---
+
+<section data-home-hero>
+  <div data-hero-inner>
+    <a href="/" data-hero-brand>
+      <img src={lockupUrl} alt="Cynosure" height="52" />
+    </a>
+    <p data-hero-tagline>
+      Tiny, accessible, themeable React components — built for the modern web.
+    </p>
+    <div data-hero-cta>
+      <a href="/getting-started/introduction" data-hero-btn-primary>
+        Get started
+      </a>
+      <div data-hero-snippet>
+        <code>npx cynosure init</code>
+        <CopyButton code="npx cynosure init" client:load />
+      </div>
+    </div>
+  </div>
+</section>

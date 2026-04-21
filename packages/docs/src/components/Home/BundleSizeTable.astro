@@ -1,0 +1,45 @@
+---
+import sizeLimitRaw from '@repo/.size-limit.json';
+import {
+  Box,
+  Table,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableHeader,
+  TableCell,
+} from '@arshad-shah/cynosure-react';
+
+interface SizeLimitEntry {
+  name: string;
+  path: string;
+  limit: string;
+  ignore?: string[];
+}
+
+const entries = (sizeLimitRaw as SizeLimitEntry[]).filter(
+  (e) => e.name !== 'Full barrel (warning-only)',
+);
+---
+
+<section data-home-bundle>
+  <h2 data-section-heading>Bundle sizes</h2>
+  <Box style={{ overflowX: 'auto' }}>
+    <Table variant="line" size="sm">
+      <TableHead>
+        <TableRow>
+          <TableHeader>Component</TableHeader>
+          <TableHeader>Limit (gzip)</TableHeader>
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        {entries.map((e) => (
+          <TableRow>
+            <TableCell>{e.name}</TableCell>
+            <TableCell>{e.limit}</TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  </Box>
+</section>

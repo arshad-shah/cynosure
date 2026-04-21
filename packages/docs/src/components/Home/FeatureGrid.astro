@@ -1,0 +1,52 @@
+---
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+  CardBody,
+} from '@arshad-shah/cynosure-react';
+
+const features = [
+  {
+    title: 'Tiny',
+    body: 'Components like Button ship under 6 kB. Every component is tree-shakeable via subpath exports — pay only for what you import.',
+  },
+  {
+    title: 'Accessible',
+    body: 'Every component passes axe audits. Focus rings honor design tokens and full keyboard and screen-reader support is built in from day one.',
+  },
+  {
+    title: 'Themeable',
+    body: 'Light, dark, terminal, and high-contrast themes ship out of the box. Extend or replace any theme with plain CSS variables.',
+  },
+  {
+    title: 'RSC-safe',
+    body: 'Built on native primitives and Radix UI. Components work inside React Server Components without extra client-boundary dance.',
+  },
+  {
+    title: 'Forms',
+    body: 'A complete form system with a react-hook-form adapter, inline validation, and polished, accessible inputs for every field type.',
+  },
+  {
+    title: 'Documented',
+    body: 'Live previews, auto-generated props tables from TypeScript types, and a growing recipe cookbook — so answers are one click away.',
+  },
+] as const;
+---
+
+<section data-home-features>
+  <h2 data-section-heading>Why Cynosure?</h2>
+  <div data-feature-grid>
+    {features.map((f) => (
+      <Card variant="outlined" size="md">
+        <CardHeader>
+          <CardTitle as="h3">{f.title}</CardTitle>
+        </CardHeader>
+        <CardBody>
+          <CardDescription>{f.body}</CardDescription>
+        </CardBody>
+      </Card>
+    ))}
+  </div>
+</section>
