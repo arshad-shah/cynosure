@@ -37,10 +37,10 @@ export default function Example() {
           </DialogHeader>
           <div style={{ padding: '0 1.5rem' }}>
             <Input
-              label="Display name"
               value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Jane Doe"
+              onChange={setName}
+              placeholder="Display name"
+              aria-label="Display name"
             />
           </div>
           <DialogFooter>

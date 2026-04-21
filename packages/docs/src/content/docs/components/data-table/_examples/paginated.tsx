@@ -2,11 +2,14 @@ import { type ColumnDef, DataTable } from '@arshad-shah/cynosure-react';
 
 type Order = { id: string; customer: string; total: number; status: string };
 
+const CUSTOMERS = ['Alice', 'Bob', 'Carol', 'Dan', 'Eva', 'Frank'] as const;
+const STATUSES = ['Shipped', 'Pending', 'Delivered', 'Cancelled'] as const;
+
 const data: Order[] = Array.from({ length: 12 }, (_, i) => ({
   id: `ORD-${String(i + 1).padStart(3, '0')}`,
-  customer: ['Alice', 'Bob', 'Carol', 'Dan', 'Eva', 'Frank'][i % 6],
+  customer: CUSTOMERS[i % CUSTOMERS.length] ?? 'Unknown',
   total: Number(((i + 1) * 17.5).toFixed(2)),
-  status: ['Shipped', 'Pending', 'Delivered', 'Cancelled'][i % 4],
+  status: STATUSES[i % STATUSES.length] ?? 'Pending',
 }));
 
 const columns: ColumnDef<Order>[] = [

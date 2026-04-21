@@ -25,7 +25,6 @@ export default function SearchWidget() {
     (async () => {
       try {
         const url = /* @vite-ignore */ `${'/pagefind'}/pagefind.js`;
-        // @ts-expect-error — dynamic runtime URL import
         pagefindRef.current = (await import(/* @vite-ignore */ url)) as PagefindModule;
       } catch {
         setPlaceholder('Search (build docs first)');
