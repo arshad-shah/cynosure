@@ -12,7 +12,7 @@ export const multiWellRoot = style({
   alignItems: 'stretch',
   width: '100%',
   boxSizing: 'border-box',
-  gap: vars.space[2],
+  gap: vars.space[1],
   color: vars.color.foreground.default,
   selectors: {
     '&[data-disabled="true"]': { opacity: 0.6, cursor: 'not-allowed' },
@@ -23,7 +23,7 @@ export const multiWellRoot = style({
 export const slotGroup = style({
   display: 'inline-flex',
   alignItems: 'stretch',
-  gap: vars.space[2],
+  gap: vars.space[1],
   flex: '0 0 auto',
 });
 
@@ -36,8 +36,8 @@ export const inertWell = style([
   {
     flex: '0 0 auto',
     justifyContent: 'center',
-    paddingInline: vars.space[2],
-    minWidth: '2.5rem',
+    paddingInline: vars.space[1],
+    minWidth: '2rem',
     color: vars.color.foreground.subtle,
     cursor: 'default',
     pointerEvents: 'none',
@@ -70,7 +70,7 @@ export const actionWell = style([
   {
     flex: '0 0 auto',
     justifyContent: 'center',
-    minWidth: '2.5rem',
+    minWidth: '2rem',
     padding: 0,
     cursor: 'pointer',
     color: vars.color.foreground.muted,
@@ -180,7 +180,7 @@ export const inputElement = style({
   background: 'transparent',
   color: 'inherit',
   font: 'inherit',
-  paddingBlock: vars.space[1],
+  paddingBlock: 0,
   selectors: {
     '&::placeholder': { color: vars.color.foreground.subtle },
     '&:disabled': { cursor: 'not-allowed' },
