@@ -164,7 +164,7 @@ export const textareaFieldSize = styleVariants({
     padding: '0.5rem 0.625rem',
     // 8 + 20 + 2 = 30px
     selectors: {
-      '&[data-clearable="true"]': { paddingRight: '1.875rem' },
+      '&[data-clearable="true"]': { paddingInlineEnd: '1.875rem' },
       [`${textareaRoot}[data-has-grip="true"]:not([data-has-footer="true"]) &`]: {
         // grip 10 + inset 3 + 3 gap = 16px
         paddingBottom: '1rem',
@@ -175,7 +175,7 @@ export const textareaFieldSize = styleVariants({
     padding: '0.6875rem 0.875rem',
     // 10 + 24 + 2 = 36px
     selectors: {
-      '&[data-clearable="true"]': { paddingRight: '2.25rem' },
+      '&[data-clearable="true"]': { paddingInlineEnd: '2.25rem' },
       [`${textareaRoot}[data-has-grip="true"]:not([data-has-footer="true"]) &`]: {
         // grip 12 + inset 4 + 4 gap = 20px
         paddingBottom: '1.25rem',
@@ -186,7 +186,7 @@ export const textareaFieldSize = styleVariants({
     padding: '0.875rem 1rem',
     // 12 + 28 + 2 = 42px
     selectors: {
-      '&[data-clearable="true"]': { paddingRight: '2.625rem' },
+      '&[data-clearable="true"]': { paddingInlineEnd: '2.625rem' },
       [`${textareaRoot}[data-has-grip="true"]:not([data-has-footer="true"]) &`]: {
         // grip 14 + inset 5 + 5 gap = 24px
         paddingBottom: '1.5rem',
@@ -285,7 +285,7 @@ export const footerSize = styleVariants({
     selectors: {
       [`${textareaRoot}[data-has-grip="true"] &`]: {
         // grip 10 + inset 3 + 3 gap = 16px
-        paddingRight: '1rem',
+        paddingInlineEnd: '1rem',
       },
     },
   },
@@ -294,7 +294,7 @@ export const footerSize = styleVariants({
     selectors: {
       [`${textareaRoot}[data-has-grip="true"] &`]: {
         // grip 12 + inset 4 + 4 gap = 20px
-        paddingRight: '1.25rem',
+        paddingInlineEnd: '1.25rem',
       },
     },
   },
@@ -303,7 +303,7 @@ export const footerSize = styleVariants({
     selectors: {
       [`${textareaRoot}[data-has-grip="true"] &`]: {
         // grip 14 + inset 5 + 5 gap = 24px
-        paddingRight: '1.5rem',
+        paddingInlineEnd: '1.5rem',
       },
     },
   },
