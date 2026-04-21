@@ -1,6 +1,7 @@
 ---
 import props from '../generated/props.json';
 import {
+  Box,
   Table,
   TableHead,
   TableBody,
@@ -21,7 +22,7 @@ if (!record) {
   throw new Error(`PropsTable: component "${component}" not found in props.json. Run 'pnpm generate:props'.`);
 }
 ---
-<div data-props-table style="overflow-x:auto;margin:var(--space-4,1rem) 0;">
+<Box data-props-table style={{ overflowX: 'auto', margin: 'var(--space-4,1rem) 0' }}>
   <Table variant="line" size="sm">
     <TableHead>
       <TableRow>
@@ -44,4 +45,4 @@ if (!record) {
       ))}
     </TableBody>
   </Table>
-</div>
+</Box>

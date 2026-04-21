@@ -1,14 +1,15 @@
 ---
+import { Box } from '@arshad-shah/cynosure-react';
 import BrandLockup from './BrandLockup.astro';
 import VersionPill from './VersionPill.astro';
 import SearchInput from './SearchInput.astro';
 import ThemeSwitcher from './ThemeSwitcher.tsx';
 import GitHubLink from './GitHubLink.astro';
 ---
-<header data-topbar>
+<Box as="header" data-topbar>
   <BrandLockup />
   <VersionPill />
   <SearchInput />
   <ThemeSwitcher client:load />
   <GitHubLink />
-</header>
+</Box>

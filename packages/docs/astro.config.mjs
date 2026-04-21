@@ -1,9 +1,9 @@
-import { defineConfig } from 'astro/config';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import mdx from '@astrojs/mdx';
 import react from '@astrojs/react';
 import sitemap from '@astrojs/sitemap';
-import { fileURLToPath } from 'node:url';
-import { dirname, resolve } from 'node:path';
+import { defineConfig } from 'astro/config';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(__dirname, '../..');
@@ -25,7 +25,11 @@ export default defineConfig({
       },
     },
     ssr: {
-      noExternal: ['@arshad-shah/cynosure-react', '@arshad-shah/cynosure-tokens', '@arshad-shah/cynosure-themes'],
+      noExternal: [
+        '@arshad-shah/cynosure-react',
+        '@arshad-shah/cynosure-tokens',
+        '@arshad-shah/cynosure-themes',
+      ],
     },
     build: {
       rollupOptions: {

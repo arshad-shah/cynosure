@@ -1,6 +1,6 @@
 ---
 import sizeLimit from '@repo/.size-limit.json';
-import { Badge } from '@arshad-shah/cynosure-react';
+import { Badge, Box } from '@arshad-shah/cynosure-react';
 
 interface Props { name: string }
 const { name } = Astro.props;
@@ -10,12 +10,12 @@ const entries = sizeLimit as SizeLimitEntry[];
 const entry = entries.find((e) => e.name === name);
 ---
 {entry ? (
-  <span data-bundle-size>
+  <Box as="span" data-bundle-size>
     <Badge
       variant="outline"
       colorScheme="neutral"
       size="sm"
       shape="pill"
     >{entry.limit}</Badge>
-  </span>
+  </Box>
 ) : null}

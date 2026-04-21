@@ -1,5 +1,14 @@
 ---
 import { baseTokens } from '@arshad-shah/cynosure-tokens';
+import {
+  Code,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@arshad-shah/cynosure-react';
 
 type SupportedGroup = 'color' | 'space' | 'radius' | 'font' | 'shadow' | 'z' | 'duration' | 'easing' | 'line' | 'letter' | 'breakpoint';
 
@@ -54,30 +63,30 @@ function isColor(value: string): boolean {
 }
 ---
 
-<table data-token-table>
-  <thead>
-    <tr>
-      <th>Token</th>
-      <th>Value</th>
-      <th>Preview</th>
-    </tr>
-  </thead>
-  <tbody>
+<Table data-token-table variant="line" size="sm">
+  <TableHead>
+    <TableRow>
+      <TableHeader>Token</TableHeader>
+      <TableHeader>Value</TableHeader>
+      <TableHeader>Preview</TableHeader>
+    </TableRow>
+  </TableHead>
+  <TableBody>
     {rows.map(({ name, value }) => (
-      <tr>
-        <td><code>--{group}{subKey ? `-${subKey}` : ''}-{name}</code></td>
-        <td><code>{value}</code></td>
-        <td>
+      <TableRow>
+        <TableCell><Code>--{group}{subKey ? `-${subKey}` : ''}-{name}</Code></TableCell>
+        <TableCell><Code>{value}</Code></TableCell>
+        <TableCell>
           {isColor(value)
             ? <span data-swatch style={`background:${value}`} aria-hidden="true"></span>
             : group === 'shadow'
             ? <span data-swatch style={`box-shadow:${value};background:transparent`} aria-hidden="true"></span>
             : null}
-        </td>
-      </tr>
+        </TableCell>
+      </TableRow>
     ))}
-  </tbody>
-</table>
+  </TableBody>
+</Table>
 
 <style>
   [data-token-table] {
