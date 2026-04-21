@@ -1,0 +1,5 @@
+/docs                      /getting-started/introduction   301
+/docs/*                    /:splat                          301
+/?path=/docs/*             /:splat                          301
+/?path=/story/*            /:splat                          301
+/iframe.html               /                                301
