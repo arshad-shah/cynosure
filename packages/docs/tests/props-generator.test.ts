@@ -9,7 +9,7 @@ describe('extractProps', () => {
   it('returns an entry for Button with expected prop fields', () => {
     const result = extractProps({ tsconfigPath: REACT_TSCONFIG, sourceRoot: REACT_SRC });
     const btn = result.Button;
-    expect(btn).toBeDefined();
+    if (!btn) throw new Error('Button not found in extractProps result');
     expect(Array.isArray(btn.props)).toBe(true);
     const names = btn.props.map((p) => p.name);
     expect(names).toContain('variant');
