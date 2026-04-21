@@ -1,0 +1,111 @@
+---
+title: Dashboard Layout
+description: A responsive dashboard chrome built from Sidebar, Container, Grid, Card, and Stat that collapses into a drawer on mobile.
+order: 2
+category: recipes
+---
+
+{/* migrated from /docs/recipes/dashboard-layout.mdx */}
+
+# Dashboard layout
+
+A responsive dashboard chrome built from `Sidebar`, `Container`, `Grid`,
+`Card`, and `Stat`. The sidebar collapses into a drawer below the `md`
+breakpoint via `SidebarProvider`.
+
+```tsx
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  Container,
+  Grid,
+  Heading,
+  Sidebar,
+  SidebarContent,
+  SidebarHeader,
+  SidebarProvider,
+  SidebarTrigger,
+  Stack,
+  Stat,
+  StatLabel,
+  StatNumber,
+} from '@arshad-shah/cynosure-react';
+
+export function Dashboard() {
+  return (
+    <SidebarProvider>
+      <Stack direction="row" minHeight="100vh">
+        <Sidebar>
+          <SidebarHeader>
+            <Heading level={2} size="md">Cynosure</Heading>
+          </SidebarHeader>
+          <SidebarContent>
+            <SidebarNav />
+          </SidebarContent>
+        </Sidebar>
+
+        <Stack as="main" flex="1" padding="6" gap="6">
+          <Stack direction="row" align="center" justify="space-between">
+            <Heading level={1} size="xl">Overview</Heading>
+            <SidebarTrigger />
+          </Stack>
+
+          <Container>
+            <Grid columns={{ base: 1, md: 2, lg: 4 }} gap="4">
+              <Card>
+                <CardContent>
+                  <Stat>
+                    <StatLabel>Revenue</StatLabel>
+                    <StatNumber>$128.4k</StatNumber>
+                  </Stat>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent>
+                  <Stat>
+                    <StatLabel>Active users</StatLabel>
+                    <StatNumber>12 408</StatNumber>
+                  </Stat>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent>
+                  <Stat>
+                    <StatLabel>Conversions</StatLabel>
+                    <StatNumber>3.4%</StatNumber>
+                  </Stat>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent>
+                  <Stat>
+                    <StatLabel>Avg. latency</StatLabel>
+                    <StatNumber>118ms</StatNumber>
+                  </Stat>
+                </CardContent>
+              </Card>
+            </Grid>
+          </Container>
+        </Stack>
+      </Stack>
+    </SidebarProvider>
+  );
+}
+```
+
+## Responsive behaviour
+
+`SidebarProvider` observes the configured breakpoint (`md` by default)
+and:
+
+- Above `md` — renders the sidebar as a rail; `SidebarTrigger` toggles
+  `collapsed`.
+- Below `md` — hides the rail and replaces it with a `Drawer` anchored to
+  the inline-start. `SidebarTrigger` opens the drawer instead.
+
+## Accessibility
+
+- The sidebar's top-level landmark is a real `<aside>`; pair with a
+  `<main>` as shown above so screen readers can skip.
+- `SidebarTrigger` manages its own `aria-expanded` and `aria-controls`.

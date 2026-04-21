@@ -1,0 +1,116 @@
+---
+title: Command Palette
+description: A keyboard-driven command palette bound to Cmd+K / Ctrl+K using Dialog, Combobox, and useHotkeys.
+order: 1
+category: recipes
+---
+
+{/* migrated from /docs/recipes/command-palette.mdx */}
+
+# Command palette
+
+A keyboard-driven command palette bound to `Cmd+K` / `Ctrl+K`. Uses the
+`Dialog` overlay + `Combobox` for filter-as-you-type + `useHotkeys` for
+the global shortcut.
+
+```tsx
+import { useState } from 'react';
+import {
+  Combobox,
+  ComboboxInput,
+  ComboboxList,
+  ComboboxOption,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  Kbd,
+  Stack,
+  VisuallyHidden,
+  useHotkeys,
+} from '@arshad-shah/cynosure-react';
+
+type Command = {
+  id: string;
+  label: string;
+  shortcut?: string;
+  run: () => void;
+};
+
+export function CommandPalette({ commands }: { commands: Command[] }) {
+  const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState('');
+
+  useHotkeys([['mod+k', () => setOpen((v) => !v)]]);
+
+  const filtered = commands.filter((c) =>
+    c.label.toLowerCase().includes(query.toLowerCase()),
+  );
+
+  return (
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogContent>
+        <VisuallyHidden>
+          <DialogTitle>Command palette</DialogTitle>
+        </VisuallyHidden>
+        <Combobox
+          value={null}
+          onChange={(id) => {
+            const cmd = commands.find((c) => c.id === id);
+            if (cmd) {
+              cmd.run();
+              setOpen(false);
+            }
+          }}
+        >
+          <Stack gap="3" padding="3">
+            <ComboboxInput
+              autoFocus
+              placeholder="Type a command or search"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+            />
+            <ComboboxList>
+              {filtered.map((c) => (
+                <ComboboxOption key={c.id} value={c.id}>
+                  <Stack direction="row" align="center" justify="space-between">
+                    <span>{c.label}</span>
+                    {c.shortcut && <Kbd>{c.shortcut}</Kbd>}
+                  </Stack>
+                </ComboboxOption>
+              ))}
+            </ComboboxList>
+          </Stack>
+        </Combobox>
+      </DialogContent>
+    </Dialog>
+  );
+}
+```
+
+## Wiring commands
+
+```tsx
+<CommandPalette
+  commands={[
+    {
+      id: 'theme-toggle',
+      label: 'Toggle theme',
+      shortcut: '⌘⇧L',
+      run: () => setTheme((t) => (t === 'dark' ? 'light' : 'dark')),
+    },
+    {
+      id: 'new-issue',
+      label: 'Create new issue',
+      run: () => navigate('/issues/new'),
+    },
+  ]}
+/>
+```
+
+## Accessibility
+
+- Rendered as a real `Dialog` — focus is trapped, `Esc` closes, background
+  scroll is locked.
+- `DialogTitle` is visually hidden but announced to screen readers.
+- `Combobox` manages `aria-activedescendant` for the active option so
+  arrow-key navigation is announced correctly.
