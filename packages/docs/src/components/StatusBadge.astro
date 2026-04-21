@@ -1,0 +1,5 @@
+---
+interface Props { status: 'stable' | 'beta' | 'alpha' | 'experimental' | 'deprecated' }
+const { status } = Astro.props;
+---
+<span data-status-badge data-status={status}>{status}</span>

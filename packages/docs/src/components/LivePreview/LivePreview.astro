@@ -1,0 +1,13 @@
+---
+import { getExample } from '../../lib/example-loader';
+import PreviewFrame from './PreviewFrame.tsx';
+import CodeBlock from '../CodeBlock.astro';
+
+interface Props { example: string }
+const { example } = Astro.props;
+const { component: Example, source, slug } = getExample(example);
+---
+<PreviewFrame client:visible source={source} slug={slug}>
+  <Example client:visible />
+</PreviewFrame>
+<CodeBlock code={source} lang="tsx" />

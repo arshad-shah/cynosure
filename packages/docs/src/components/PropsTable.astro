@@ -1,0 +1,28 @@
+---
+import props from '../generated/props.json';
+
+interface Props { component: string }
+const { component } = Astro.props;
+
+interface PropEntry { name: string; type: string; description: string; required: boolean; defaultValue: string | null }
+interface Record { props: PropEntry[] }
+
+const record = (props as globalThis.Record<string, Record>)[component];
+if (!record) {
+  throw new Error(`PropsTable: component "${component}" not found in props.json. Run 'pnpm generate:props'.`);
+}
+---
+<table data-props-table>
+  <thead><tr><th>Prop</th><th>Type</th><th>Default</th><th>Required</th><th>Description</th></tr></thead>
+  <tbody>
+    {record.props.map((p) => (
+      <tr>
+        <td><code>{p.name}</code></td>
+        <td><code>{p.type}</code></td>
+        <td>{p.defaultValue ? <code>{p.defaultValue}</code> : '—'}</td>
+        <td>{p.required ? 'yes' : 'no'}</td>
+        <td>{p.description}</td>
+      </tr>
+    ))}
+  </tbody>
+</table>
