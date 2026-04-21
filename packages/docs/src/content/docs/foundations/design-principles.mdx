@@ -1,0 +1,61 @@
+---
+title: Design Principles
+description: The eight constraints every Cynosure component and theme is measured against.
+order: 1
+category: foundations
+---
+
+# Design principles
+
+Cynosure's constraints are deliberate. These are the rules every component and
+every theme is measured against.
+
+## 1. Tiny by default
+
+Tree-shakeable ESM. Per-component entry points. Per-component CSS files.
+`sideEffects: false` except for bare CSS imports. Consumers pay only for
+what they import.
+
+## 2. Props-only styling
+
+Consumers should never need to write CSS to use Cynosure. Every visual concern
+is a prop, a variant, or a token override.
+
+## 3. Raw HTML in one place
+
+Only the eleven layout primitives (`Box`, `Stack`, `Inline`, `Flex`, `Grid`,
+`Center`, `Spacer`, `Divider`, `AspectRatio`, `Container`, `Section`) touch
+intrinsic JSX elements directly. Form controls are the single necessary
+exception — browser behaviour depends on the native element.
+
+## 4. Accessibility is not optional
+
+WCAG 2.2 AA is the floor. Keyboard complete, focus visible, reduced-motion
+honoured, RTL safe. Every component has an axe-passing story.
+
+## 5. Themes are data
+
+All design decisions live in W3C DTCG JSON tokens. CSS custom properties
+are generated. Consumers swap themes with a single prop or a
+`data-theme` attribute.
+
+## 6. Controlled + uncontrolled both work
+
+Every stateful component accepts `value` / `defaultValue` / `onChange` (or
+domain-appropriate names) and uses `useControllableState` internally.
+
+## 7. `asChild` is the composition escape hatch
+
+Every component that renders a single root element supports `asChild`.
+Compose by passing your own element; we merge props via `Slot`.
+
+## 8. Self-documenting
+
+Every component ships with MDX docs, interactive Storybook, JSDoc on props,
+and an auto-generated API reference.
+
+## Architecture reference
+
+The full architecture (styling pipeline, standard component anatomy,
+perf budgets) lives in
+[`docs/specs/ARCHITECTURE.md`](https://github.com/arshad-shah/cynosure/blob/main/docs/specs/ARCHITECTURE.md).

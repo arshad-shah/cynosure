@@ -1,0 +1,71 @@
+---
+title: Design Tokens
+description: How Cynosure's W3C DTCG design tokens work — categories, primitives vs. semantic tokens, and how to consume or override them.
+order: 2
+category: foundations
+---
+
+# Design tokens
+
+Every visual decision in Cynosure lives as a token in `@arshad-shah/cynosure-tokens`. Tokens
+are authored in [W3C DTCG JSON](https://tr.designtokens.org/format/) and
+compiled by Style Dictionary to:
+
+- `dist/css/base.css` — `:root { --cynosure-*: …; }` primitives + semantic
+  tokens for the light theme.
+- `dist/css/dark.css` — semantic overrides for dark mode.
+- `dist/ts/*.ts` — typed TS constants (rarely needed by consumers; mostly
+  used by Cynosure internals).
+
+## Categories
+
+| Category     | Example                                    | Usage                         |
+| ------------ | ------------------------------------------ | ----------------------------- |
+| Colour       | `--cynosure-color-accent-solid`               | Buttons, links, focus rings   |
+| Space        | `--cynosure-space-3`                          | Gaps, padding, margins        |
+| Radius       | `--cynosure-radius-component-md`              | Inputs, buttons, cards        |
+| Shadow       | `--cynosure-shadow-md`                        | Elevated surfaces             |
+| Typography   | `--cynosure-font-body-md-size`                | Font size + line-height pairs |
+| Breakpoint   | `--cynosure-bp-md`                            | Used by `LayoutProps`         |
+| Focus        | `--cynosure-shadow-focus-ring`                | Focus ring on interactives    |
+| Motion       | `--cynosure-duration-fast`                    | Transition durations          |
+
+## Primitives vs. semantic
+
+- **Primitive** tokens (`--cynosure-color-blue-500`) are the palette.
+- **Semantic** tokens (`--cynosure-color-accent-solid`) are named by purpose
+  and are what components consume.
+
+Themes override semantic tokens. The palette stays put.
+
+{/* TokenTable components will render here after Task 12 */}
+
+## Consuming tokens in your app
+
+You rarely need to read tokens directly — most styling happens via Cynosure
+props or component variants. For custom CSS, reference the custom
+properties:
+
+```css
+.my-hero {
+  background: var(--cynosure-color-surface-subtle);
+  color: var(--cynosure-color-fg-default);
+  border-radius: var(--cynosure-radius-component-lg);
+  padding: var(--cynosure-space-6);
+}
+```
+
+## Overriding tokens
+
+Scope overrides to a selector — `:root` for global, `[data-theme='mine']` or
+a container class for local:
+
+```css
+[data-theme='brand'] {
+  --cynosure-color-accent-solid: #0f766e;
+  --cynosure-color-accent-solid-hover: #115e59;
+}
+```
+
+See [Custom themes](/docs/foundations/custom-themes) for the full
+theme-authoring flow.
