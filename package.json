@@ -9,6 +9,8 @@
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev --parallel",
+    "docs": "pnpm --filter @arshad-shah/cynosure-docs dev",
+    "docs:build": "pnpm --filter @arshad-shah/cynosure-docs build",
     "test": "turbo run test",
     "test:watch": "turbo run test:watch --parallel",
     "lint": "biome check .",
