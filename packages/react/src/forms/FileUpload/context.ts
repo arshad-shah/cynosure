@@ -1,11 +1,14 @@
 import { createContext, useContext } from 'react';
 
+export type FileUploadVariant = 'default' | 'card' | 'compact' | 'minimal';
+
 export interface FileUploadContextValue {
   files: File[];
   disabled: boolean;
   accept?: string;
   multiple: boolean;
   inputId: string;
+  variant: FileUploadVariant;
   openFileDialog: () => void;
   removeFile: (index: number) => void;
 }

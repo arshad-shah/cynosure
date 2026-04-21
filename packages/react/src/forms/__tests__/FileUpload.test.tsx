@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
-import { FileUpload } from '../FileUpload/index.js';
+import { FileUpload, FileUploadList, FileUploadTrigger } from '../FileUpload/index.js';
 
 const makeFile = (name: string, bytes: number, type: string): File => {
   const file = new File(['a'.repeat(bytes)], name, { type });
@@ -108,5 +108,90 @@ describe('FileUpload', () => {
     const zone = screen.getByRole('button', { name: /drop files/i });
     expect(zone).toHaveAttribute('aria-disabled', 'true');
     expect(zone).toHaveAttribute('tabindex', '-1');
+  });
+
+  describe('variants', () => {
+    it('renders the default variant with a Browse files button', () => {
+      const { container } = render(<FileUpload />);
+      const zone = screen.getByRole('button', { name: /drop files/i });
+      expect(zone).toHaveAttribute('data-variant', 'default');
+      const innerButton = container.querySelector('[data-variant="default"] > button');
+      expect(innerButton).not.toBeNull();
+      expect(innerButton?.textContent).toMatch(/browse files/i);
+    });
+
+    it('renders the card variant with an Upload a file label', () => {
+      const { container } = render(<FileUpload variant="card" />);
+      const zone = container.querySelector('[data-variant="card"]');
+      expect(zone).not.toBeNull();
+      expect(screen.getByText(/upload a file/i)).toBeInTheDocument();
+    });
+
+    it('renders the compact variant with inline copy', () => {
+      const { container } = render(<FileUpload variant="compact" />);
+      const zone = container.querySelector('[data-variant="compact"]');
+      expect(zone).not.toBeNull();
+      expect(screen.getByText(/drop a file, or click to browse/i)).toBeInTheDocument();
+    });
+
+    it('renders the minimal variant as an Attach file trigger', () => {
+      render(<FileUpload variant="minimal" />);
+      expect(screen.getByRole('button', { name: /attach file/i })).toHaveAttribute(
+        'data-variant',
+        'minimal',
+      );
+    });
+
+    it('clicking the inner Browse button opens the file dialog via the outer zone', () => {
+      render(<FileUpload />);
+      const zone = screen.getByRole('button', { name: /drop files/i });
+      const innerButton = zone.querySelector('button') as HTMLButtonElement;
+      const input = document.querySelector('input[type="file"]') as HTMLInputElement;
+      let clicks = 0;
+      input.addEventListener('click', () => {
+        clicks += 1;
+      });
+      fireEvent.click(innerButton);
+      expect(clicks).toBe(1);
+    });
+  });
+
+  describe('onPreview', () => {
+    const seedFile = (name = 'memo.txt', type = 'text/plain'): File =>
+      new File(['a'], name, { type });
+
+    it('renders a preview IconButton only when onPreview is provided', () => {
+      const onPreview = vi.fn();
+      render(
+        <FileUpload defaultValue={[seedFile()]}>
+          <FileUploadTrigger />
+          <FileUploadList onPreview={onPreview} />
+        </FileUpload>,
+      );
+      expect(screen.getByRole('button', { name: /preview memo/i })).toBeInTheDocument();
+    });
+
+    it('omits the preview IconButton when onPreview is not provided', () => {
+      render(
+        <FileUpload defaultValue={[seedFile()]}>
+          <FileUploadTrigger />
+          <FileUploadList />
+        </FileUpload>,
+      );
+      expect(screen.queryByRole('button', { name: /preview memo/i })).toBeNull();
+    });
+
+    it('invokes onPreview with the file and index when clicked', () => {
+      const onPreview = vi.fn();
+      const file = seedFile('report.pdf', 'application/pdf');
+      render(
+        <FileUpload defaultValue={[file]}>
+          <FileUploadTrigger />
+          <FileUploadList onPreview={onPreview} />
+        </FileUpload>,
+      );
+      fireEvent.click(screen.getByRole('button', { name: /preview report/i }));
+      expect(onPreview).toHaveBeenCalledWith(file, 0);
+    });
   });
 });
