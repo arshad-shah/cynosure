@@ -1,9 +1,12 @@
+import { LucideEye, LucideEyeOff, X } from 'lucide-react';
 import {
   type CSSProperties,
   type FocusEvent,
   type InputHTMLAttributes,
+  type ReactElement,
   type ReactNode,
   forwardRef,
+  isValidElement,
   useCallback,
   useId,
   useRef,
@@ -15,29 +18,36 @@ import { cn } from '../../utils/cn.js';
 import { IconButton } from '../IconButton/IconButton.js';
 import { inputAffordance } from '../shared/affordance.css.js';
 import {
-  controlAddonLeft,
-  controlAddonRight,
   controlElement,
   controlField,
   controlSize,
   controlWrapperBase,
   controlWrapperVariant,
 } from '../shared/control.css.js';
-import type { FormControlBase } from '../shared/types.js';
+import type { FormControlBase, FormControlSize } from '../shared/types.js';
+import {
+  actionWell,
+  fieldWell,
+  inertWell,
+  inputElement,
+  multiWellRoot,
+  slotGroup,
+  wellSize,
+} from './Input.css.js';
 
 export type InputType = 'text' | 'email' | 'password' | 'tel' | 'url' | 'search' | 'number';
 
-export interface InputOwnProps extends FormControlBase<string> {
+/** Local variant union — adds `'flat'` (legacy single-well escape hatch) to the shared FormControlVariant. */
+export type InputVariant = 'outline' | 'filled' | 'ghost' | 'flat';
+
+export interface InputOwnProps extends Omit<FormControlBase<string>, 'variant'> {
   type?: InputType;
-  /** Visually joined block on the left (e.g. `"https://"`). */
-  leftAddon?: ReactNode;
-  /** Visually joined block on the right (e.g. `".com"`). */
-  rightAddon?: ReactNode;
-  /** Content rendered inside the input on the left (e.g. a search icon). */
-  leftElement?: ReactNode;
-  /** Content rendered inside the input on the right (e.g. a clear button). */
-  rightElement?: ReactNode;
-  /** When `true` and value is non-empty, show a clear (×) button. */
+  variant?: InputVariant;
+  /** Single node or array. Strings/icons render as inert wells; buttons/onClick render as action wells. */
+  leadingSlot?: ReactNode | ReactNode[];
+  /** Single node or array. Same rules as leadingSlot. */
+  trailingSlot?: ReactNode | ReactNode[];
+  /** When true and value is non-empty, appends a clear × as a trailing action well. */
   clearable?: boolean;
   className?: string;
   style?: CSSProperties;
@@ -50,42 +60,30 @@ export type InputProps = InputOwnProps &
     'size' | 'value' | 'defaultValue' | 'onChange' | 'type'
   >;
 
-/** Tiny inline icons — avoid `@arshad-shah/cynosure-icons` until that package exists. */
-const EyeIcon = (): React.ReactElement => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-    <path
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12Z"
-    />
-    <circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="2" />
-  </svg>
-);
-const EyeOffIcon = (): React.ReactElement => (
-  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-    <path
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M17.94 17.94A10.94 10.94 0 0 1 12 19C5 19 1 12 1 12a20.9 20.9 0 0 1 5.17-5.94M9.9 4.24A10.94 10.94 0 0 1 12 4c7 0 11 7 11 7a20.93 20.93 0 0 1-3.16 4.19M1 1l22 22"
-    />
-    <path
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M14.12 14.12A3 3 0 1 1 9.88 9.88"
-    />
-  </svg>
-);
-const XIcon = (): React.ReactElement => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-    <path stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" d="M18 6 6 18M6 6l12 12" />
-  </svg>
-);
+/** Normalize a slot prop into an array, dropping nullish/false entries. */
+function toArray(slot: ReactNode | ReactNode[] | undefined): ReactNode[] {
+  if (slot == null) return [];
+  return (Array.isArray(slot) ? slot : [slot]).filter((n) => n != null && n !== false);
+}
+
+/**
+ * Classify a slot child. Action wells get accent-tinted hover and a focus
+ * ring; inert wells are pointer-events: none decoration.
+ *
+ *  - <button>         → action
+ *  - role="button"    → action
+ *  - has onClick prop → action
+ *  - anything else    → inert
+ */
+function isActionNode(node: ReactNode): boolean {
+  if (!isValidElement(node)) return false;
+  const el = node as ReactElement<{ role?: unknown; onClick?: unknown }>;
+  if (typeof el.type === 'string' && el.type === 'button') return true;
+  const props = el.props ?? {};
+  if (props.role === 'button') return true;
+  if (typeof props.onClick === 'function') return true;
+  return false;
+}
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(props, ref) {
   const {
@@ -100,10 +98,8 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(pro
     invalid,
     size = 'md',
     variant = 'outline',
-    leftAddon,
-    rightAddon,
-    leftElement,
-    rightElement,
+    leadingSlot,
+    trailingSlot,
     clearable,
     className,
     style,
@@ -131,9 +127,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(pro
   const mergedRef = useMergedRef(ref, inputNodeRef);
 
   const handleChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      setValue(e.target.value);
-    },
+    (e: React.ChangeEvent<HTMLInputElement>) => setValue(e.target.value),
     [setValue],
   );
 
@@ -157,40 +151,100 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(pro
     [onBlur],
   );
 
-  const showPasswordToggle = typeProp === 'password' && rightElement === undefined;
+  // Auto-appended trailing affordances.
+  const showPasswordToggle = typeProp === 'password';
   const showClearButton = clearable && value !== '' && !disabled && !readOnly;
 
-  const resolvedRightElement =
-    rightElement ??
-    (showClearButton ? (
+  const autoTrailing: ReactNode[] = [];
+  if (showClearButton) {
+    autoTrailing.push(
       <IconButton
+        key="__clear"
         variant="bare"
         label="Clear input"
-        icon={<XIcon />}
+        icon={<X />}
         className={inputAffordance}
         onClick={handleClear}
-      />
-    ) : showPasswordToggle ? (
+      />,
+    );
+  }
+  if (showPasswordToggle) {
+    autoTrailing.push(
       <IconButton
+        key="__password"
         variant="bare"
         label={passwordVisible ? 'Hide password' : 'Show password'}
-        icon={passwordVisible ? <EyeOffIcon /> : <EyeIcon />}
+        icon={passwordVisible ? <LucideEyeOff /> : <LucideEye />}
         className={inputAffordance}
         aria-pressed={passwordVisible}
         onClick={() => setPasswordVisible((v) => !v)}
-      />
-    ) : null);
+      />,
+    );
+  }
 
-  const wrapperClass = cn(
-    controlWrapperBase,
-    controlWrapperVariant[variant],
-    controlSize[size],
-    className,
-  );
+  const leading = toArray(leadingSlot);
+  const trailing = [...toArray(trailingSlot), ...autoTrailing];
+
+  // ---- `variant="flat"`: today's single-well layout; slots render inline. ----
+
+  if (variant === 'flat') {
+    return (
+      <div
+        className={cn(
+          controlWrapperBase,
+          controlWrapperVariant.outline,
+          controlSize[size],
+          className,
+        )}
+        data-variant="flat"
+        data-disabled={disabled || undefined}
+        data-readonly={readOnly || undefined}
+        data-invalid={invalid || undefined}
+        data-focus-within={focused || undefined}
+        data-hover={hover || undefined}
+        onMouseEnter={() => setHover(true)}
+        onMouseLeave={() => setHover(false)}
+        style={style}
+      >
+        {leading.map((node, i) => (
+          // biome-ignore lint/suspicious/noArrayIndexKey: slot list is a static fixed-arity prop; positional keys are correct
+          <span key={`lead-${i}`} className={controlElement}>
+            {node}
+          </span>
+        ))}
+        <input
+          id={id}
+          ref={mergedRef}
+          type={type}
+          value={value}
+          onChange={handleChange}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
+          disabled={disabled}
+          readOnly={readOnly}
+          required={required}
+          aria-invalid={invalid || undefined}
+          className={controlField}
+          {...rest}
+        />
+        {trailing.map((node, i) => (
+          // biome-ignore lint/suspicious/noArrayIndexKey: slot list is a static fixed-arity prop; positional keys are correct
+          <span key={`trail-${i}`} className={controlElement}>
+            {node}
+          </span>
+        ))}
+      </div>
+    );
+  }
+
+  // ---- Multi-well (outline / filled / ghost): row of wells with a gap. ----
+
+  const sizeClass = wellSize[size as FormControlSize];
 
   return (
     <div
-      className={wrapperClass}
+      className={cn(multiWellRoot, className)}
+      data-variant={variant}
       data-disabled={disabled || undefined}
       data-readonly={readOnly || undefined}
       data-invalid={invalid || undefined}
@@ -200,25 +254,59 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(pro
       onMouseLeave={() => setHover(false)}
       style={style}
     >
-      {leftAddon ? <span className={controlAddonLeft}>{leftAddon}</span> : null}
-      {leftElement ? <span className={controlElement}>{leftElement}</span> : null}
-      <input
-        id={id}
-        ref={mergedRef}
-        type={type}
-        value={value}
-        onChange={handleChange}
-        onFocus={handleFocus}
-        onBlur={handleBlur}
-        disabled={disabled}
-        readOnly={readOnly}
-        required={required}
-        aria-invalid={invalid || undefined}
-        className={controlField}
-        {...rest}
-      />
-      {resolvedRightElement ? <span className={controlElement}>{resolvedRightElement}</span> : null}
-      {rightAddon ? <span className={controlAddonRight}>{rightAddon}</span> : null}
+      {leading.length > 0 ? (
+        <span className={slotGroup}>
+          {leading.map((node, i) => {
+            const action = isActionNode(node);
+            return (
+              <span
+                // biome-ignore lint/suspicious/noArrayIndexKey: slot list is a static fixed-arity prop; positional keys are correct
+                key={`lead-${i}`}
+                className={cn(action ? actionWell : inertWell, sizeClass)}
+                data-slot-kind={action ? 'action' : 'inert'}
+              >
+                {node}
+              </span>
+            );
+          })}
+        </span>
+      ) : null}
+
+      <span className={cn(fieldWell, sizeClass)}>
+        <input
+          id={id}
+          ref={mergedRef}
+          type={type}
+          value={value}
+          onChange={handleChange}
+          onFocus={handleFocus}
+          onBlur={handleBlur}
+          disabled={disabled}
+          readOnly={readOnly}
+          required={required}
+          aria-invalid={invalid || undefined}
+          className={inputElement}
+          {...rest}
+        />
+      </span>
+
+      {trailing.length > 0 ? (
+        <span className={slotGroup}>
+          {trailing.map((node, i) => {
+            const action = isActionNode(node);
+            return (
+              <span
+                // biome-ignore lint/suspicious/noArrayIndexKey: slot list is a static fixed-arity prop; positional keys are correct
+                key={`trail-${i}`}
+                className={cn(action ? actionWell : inertWell, sizeClass)}
+                data-slot-kind={action ? 'action' : 'inert'}
+              >
+                {node}
+              </span>
+            );
+          })}
+        </span>
+      ) : null}
     </div>
   );
 });

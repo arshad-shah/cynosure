@@ -8,6 +8,6 @@ const { example } = Astro.props;
 const { component: Example, source, slug } = getExample(example);
 ---
 <PreviewFrame client:visible source={source} slug={slug}>
-  <Example client:visible />
+  <Example />
 </PreviewFrame>
 <CodeBlock code={source} lang="tsx" />
