@@ -1,4 +1,10 @@
-import { type CSSProperties, type HTMLAttributes, type ReactNode, forwardRef, useMemo } from 'react';
+import {
+  type CSSProperties,
+  type HTMLAttributes,
+  type ReactNode,
+  forwardRef,
+  useMemo,
+} from 'react';
 import { cn } from '../../utils/cn.js';
 import { linearProgressRoot } from './LinearProgress.css.js';
 import {
@@ -74,7 +80,17 @@ export const LinearProgressRoot = forwardRef<HTMLDivElement, LinearProgressRootP
         completionState,
         formatValue,
       }),
-      [clamped, max, size, variant, colorScheme, indeterminate, isComplete, completionState, formatValue],
+      [
+        clamped,
+        max,
+        size,
+        variant,
+        colorScheme,
+        indeterminate,
+        isComplete,
+        completionState,
+        formatValue,
+      ],
     );
 
     return (

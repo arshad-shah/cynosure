@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { Bold, Code as CodeIcon, Italic, Link2, Paperclip, Send } from 'lucide-react';
 import { useState } from 'react';
-import { IconButton } from '../IconButton/IconButton.js';
 import { Stack } from '../../primitives/layout/Stack/Stack.js';
 import { Text } from '../../typography/Text/Text.js';
 import {
@@ -12,6 +11,7 @@ import {
   FormLabel,
   FormMessage,
 } from '../Form/index.js';
+import { IconButton } from '../IconButton/IconButton.js';
 import { Textarea } from './Textarea.js';
 import { TextareaActions } from './TextareaActions.js';
 import { TextareaClearButton } from './TextareaClearButton.js';
@@ -94,7 +94,12 @@ export const WithCharacterLimit: Story = {
       const [value, setValue] = useState('Short message');
       return (
         <Stack gap="2" width="420px">
-          <Textarea value={value} onChange={setValue} limit={100} placeholder="Type to see it shift from default → warning → danger" />
+          <Textarea
+            value={value}
+            onChange={setValue}
+            limit={100}
+            placeholder="Type to see it shift from default → warning → danger"
+          />
           <Text size="sm" color="fg.muted">
             Counter shifts to warning at 80 chars, danger past 100.
           </Text>
@@ -138,7 +143,12 @@ export const WithToolbar: Story = {
             clearable
             toolbar={
               <>
-                <IconButton size="sm" variant="ghost" icon={<Paperclip size={15} />} label="Attach" />
+                <IconButton
+                  size="sm"
+                  variant="ghost"
+                  icon={<Paperclip size={15} />}
+                  label="Attach"
+                />
                 <IconButton size="sm" variant="ghost" icon={<Bold size={15} />} label="Bold" />
                 <IconButton size="sm" variant="ghost" icon={<Italic size={15} />} label="Italic" />
                 <IconButton size="sm" variant="ghost" icon={<Link2 size={15} />} label="Link" />
@@ -158,19 +168,27 @@ export const ResizeAxes: Story = {
   render: () => (
     <Stack gap="3" width="420px">
       <div>
-        <Text size="sm" color="fg.muted">resize="vertical" (default)</Text>
+        <Text size="sm" color="fg.muted">
+          resize="vertical" (default)
+        </Text>
         <Textarea resize="vertical" placeholder="Drag the corner grip" />
       </div>
       <div>
-        <Text size="sm" color="fg.muted">resize="both"</Text>
+        <Text size="sm" color="fg.muted">
+          resize="both"
+        </Text>
         <Textarea resize="both" placeholder="X + Y drag" />
       </div>
       <div>
-        <Text size="sm" color="fg.muted">resize="none"</Text>
+        <Text size="sm" color="fg.muted">
+          resize="none"
+        </Text>
         <Textarea resize="none" placeholder="No grip" />
       </div>
       <div>
-        <Text size="sm" color="fg.muted">autoResize (grip hidden)</Text>
+        <Text size="sm" color="fg.muted">
+          autoResize (grip hidden)
+        </Text>
         <Textarea autoResize maxRows={6} placeholder="Type — the field grows with content" />
       </div>
     </Stack>
@@ -188,7 +206,8 @@ export const AutoResize: Story = {
         <Stack gap="3" width="420px">
           <Textarea autoResize maxRows={8} value={value} onChange={setValue} />
           <Text size="sm" color="fg.muted">
-            Uses native <code>field-sizing: content</code> in Chromium; falls back to a JS resizer elsewhere.
+            Uses native <code>field-sizing: content</code> in Chromium; falls back to a JS resizer
+            elsewhere.
             <code>maxRows</code> caps growth based on the actual resolved line-height.
           </Text>
         </Stack>
@@ -204,7 +223,13 @@ export const Controlled: Story = {
       const [value, setValue] = useState('');
       return (
         <Stack gap="3" width="420px">
-          <Textarea value={value} onChange={setValue} placeholder="Type here" rows={4} limit={140} />
+          <Textarea
+            value={value}
+            onChange={setValue}
+            placeholder="Type here"
+            rows={4}
+            limit={140}
+          />
           <Text size="sm">
             Character count: <strong>{value.length}</strong>
           </Text>
@@ -226,7 +251,14 @@ export const InsideFormField: Story = {
             <FormField name="bio">
               <FormLabel>Short bio</FormLabel>
               <FormControl>
-                <Textarea value={bio} onChange={setBio} rows={4} placeholder="About you…" limit={140} clearable />
+                <Textarea
+                  value={bio}
+                  onChange={setBio}
+                  rows={4}
+                  placeholder="About you…"
+                  limit={140}
+                  clearable
+                />
               </FormControl>
               <FormDescription>Maximum 140 characters.</FormDescription>
               <FormMessage />
@@ -247,8 +279,8 @@ export const CompoundPrimitives: Story = {
       return (
         <Stack gap="2" width="480px">
           <Text size="sm" color="fg.muted">
-            Drop down to the primitives to build a custom layout — here the counter is
-            moved to the left and a send button sits on the right of the footer.
+            Drop down to the primitives to build a custom layout — here the counter is moved to the
+            left and a send button sits on the right of the footer.
           </Text>
           <TextareaRoot value={value} onChange={setValue} limit={500} resize="vertical">
             <TextareaField placeholder="Custom composition…" rows={4} />
@@ -256,7 +288,12 @@ export const CompoundPrimitives: Story = {
             <TextareaFooter>
               <TextareaCounter />
               <TextareaActions>
-                <IconButton size="sm" variant="ghost" icon={<Paperclip size={15} />} label="Attach" />
+                <IconButton
+                  size="sm"
+                  variant="ghost"
+                  icon={<Paperclip size={15} />}
+                  label="Attach"
+                />
                 <IconButton size="sm" variant="solid" icon={<Send size={15} />} label="Send" />
               </TextareaActions>
             </TextareaFooter>

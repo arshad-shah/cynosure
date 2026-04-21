@@ -30,7 +30,11 @@ export function LinearProgressValue({
 
   return (
     <span
-      className={cn(linearProgressValue, isComplete ? linearProgressValueComplete : undefined, className)}
+      className={cn(
+        linearProgressValue,
+        isComplete ? linearProgressValueComplete : undefined,
+        className,
+      )}
       {...rest}
     >
       {children ?? (

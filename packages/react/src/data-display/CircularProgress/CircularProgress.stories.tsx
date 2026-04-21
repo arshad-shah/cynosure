@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { Check } from 'lucide-react';
-import { Heading } from '../../typography/Heading/Heading.js';
 import { Inline } from '../../primitives/layout/Inline/Inline.js';
 import { Stack } from '../../primitives/layout/Stack/Stack.js';
+import { Heading } from '../../typography/Heading/Heading.js';
 import { Text } from '../../typography/Text/Text.js';
 import { CircularProgress } from './CircularProgress.js';
 

@@ -36,7 +36,8 @@ export function CircularProgressTrack({
   children,
   ...rest
 }: CircularProgressTrackProps & { children?: React.ReactNode }): ReactElement {
-  const { radius, thickness, indeterminate, colorScheme, isComplete } = useCircularProgressContext();
+  const { radius, thickness, indeterminate, colorScheme, isComplete } =
+    useCircularProgressContext();
   const effectiveScheme: CircularProgressColorScheme = isComplete ? 'success' : colorScheme;
 
   return (

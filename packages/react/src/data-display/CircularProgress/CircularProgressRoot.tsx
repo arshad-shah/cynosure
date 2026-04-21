@@ -1,4 +1,10 @@
-import { type CSSProperties, type HTMLAttributes, type ReactNode, forwardRef, useMemo } from 'react';
+import {
+  type CSSProperties,
+  type HTMLAttributes,
+  type ReactNode,
+  forwardRef,
+  useMemo,
+} from 'react';
 import { cn } from '../../utils/cn.js';
 import { circularProgressRoot, circularProgressSize } from './CircularProgress.css.js';
 import {

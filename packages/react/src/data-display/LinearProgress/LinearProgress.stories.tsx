@@ -184,8 +184,8 @@ export const Compound: Story = {
   render: () => (
     <Stack gap="3" width="420px">
       <Text size="sm" color="fg.muted">
-        Break out to the primitives when you need custom layout — here, a buffer
-        behind a determinate indicator with a custom footer.
+        Break out to the primitives when you need custom layout — here, a buffer behind a
+        determinate indicator with a custom footer.
       </Text>
       <LinearProgressRoot value={45} max={100} aria-label="Streaming">
         <LinearProgressHeader>

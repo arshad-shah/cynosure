@@ -44,9 +44,7 @@ describe('LinearProgress', () => {
   });
 
   it('renders label + meta header when passed', () => {
-    render(
-      <LinearProgress value={50} label="Uploading" meta="2.4 MB/s" aria-label="Upload" />,
-    );
+    render(<LinearProgress value={50} label="Uploading" meta="2.4 MB/s" aria-label="Upload" />);
     expect(screen.getByText('Uploading')).toBeInTheDocument();
     expect(screen.getByText('2.4 MB/s')).toBeInTheDocument();
   });
@@ -62,7 +60,9 @@ describe('LinearProgress', () => {
         aria-label="Stacked"
       />,
     );
-    expect(container.querySelectorAll('[aria-label="a"], [aria-label="b"], [aria-label="c"]')).toHaveLength(3);
+    expect(
+      container.querySelectorAll('[aria-label="a"], [aria-label="b"], [aria-label="c"]'),
+    ).toHaveLength(3);
   });
 });
 
@@ -95,9 +95,7 @@ describe('LinearProgress compound', () => {
   it('throws a helpful error when primitives render outside a Root', () => {
     // Suppress React's error boundary noise during the assertion.
     const spy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
-    expect(() => render(<LinearProgressSegment value={10} />)).toThrow(
-      /useLinearProgressContext/,
-    );
+    expect(() => render(<LinearProgressSegment value={10} />)).toThrow(/useLinearProgressContext/);
     spy.mockRestore();
   });
 });

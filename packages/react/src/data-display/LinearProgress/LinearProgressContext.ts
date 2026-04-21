@@ -1,12 +1,7 @@
 import { createContext } from '../../utils/createContext.js';
 
 export type LinearProgressSize = 'xs' | 'sm' | 'md' | 'lg';
-export type LinearProgressColorScheme =
-  | 'accent'
-  | 'success'
-  | 'warning'
-  | 'danger'
-  | 'neutral';
+export type LinearProgressColorScheme = 'accent' | 'success' | 'warning' | 'danger' | 'neutral';
 export type LinearProgressVariant = 'solid' | 'ticked';
 export type LinearProgressCompletionState = 'auto' | 'none';
 

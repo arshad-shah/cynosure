@@ -1,12 +1,7 @@
 import { createContext } from '../../utils/createContext.js';
 
 export type CircularProgressSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
-export type CircularProgressColorScheme =
-  | 'accent'
-  | 'success'
-  | 'warning'
-  | 'danger'
-  | 'neutral';
+export type CircularProgressColorScheme = 'accent' | 'success' | 'warning' | 'danger' | 'neutral';
 export type CircularProgressCompletionState = 'auto' | 'none';
 
 export interface CircularProgressContextValue {

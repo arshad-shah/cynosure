@@ -21,11 +21,12 @@ const MIN_WIDTH = 120;
  * - `autoResize` is on
  * - the field is `disabled` or `readOnly`
  */
-export function TextareaResizeHandle({ className }: TextareaResizeHandleProps): ReactElement | null {
+export function TextareaResizeHandle({
+  className,
+}: TextareaResizeHandleProps): ReactElement | null {
   const ctx = useTextareaContext();
 
-  const shouldHide =
-    ctx.autoResize || ctx.resize === 'none' || ctx.disabled || ctx.readOnly;
+  const shouldHide = ctx.autoResize || ctx.resize === 'none' || ctx.disabled || ctx.readOnly;
 
   // Tell Root this grip is present so it reserves a bottom padding lane —
   // keeps consumer content in the footer from sliding under the corner grip.

@@ -239,12 +239,9 @@ globalStyle(`[data-line-numbers="true"] ${codeBlockPre} pre.shiki .line::before`
 });
 
 /* Horizontal divider between line numbers in Shiki mode (skip the first). */
-globalStyle(
-  `[data-line-numbers="true"] ${codeBlockPre} pre.shiki .line + .line::before`,
-  {
-    borderTop: `1px solid ${vars.color.border.subtle}`,
-  },
-);
+globalStyle(`[data-line-numbers="true"] ${codeBlockPre} pre.shiki .line + .line::before`, {
+  borderTop: `1px solid ${vars.color.border.subtle}`,
+});
 
 /* ========================================================================
  * Dual-theme token colors

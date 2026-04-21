@@ -1,12 +1,13 @@
+import { CheckIcon, CopyIcon } from 'lucide-react';
 import {
   type CSSProperties,
   type HTMLAttributes,
-  type ReactElement,
   type ReactNode,
   forwardRef,
   useEffect,
   useRef,
 } from 'react';
+import { Button } from '../../forms/index.js';
 import { useClipboard } from '../../hooks/useClipboard.js';
 import { cn } from '../../utils/cn.js';
 import {
@@ -44,26 +45,6 @@ export interface CodeBlockProps extends Omit<HTMLAttributes<HTMLDivElement>, 'ch
   /** Override the filename shown in the header. */
   filename?: ReactNode;
 }
-
-const CopyIcon = (): ReactElement => (
-  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-    <rect x="9" y="9" width="11" height="11" rx="2" stroke="currentColor" strokeWidth="2" />
-    <path d="M5 15V5a2 2 0 0 1 2-2h10" stroke="currentColor" strokeWidth="2" />
-  </svg>
-);
-
-const CheckIcon = (): ReactElement => (
-  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-    <path
-      d="m5 12 4 4L19 6"
-      stroke="currentColor"
-      strokeWidth="2.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-);
-
 function splitLines(source: string): string[] {
   const trimmed = source.endsWith('\n') ? source.slice(0, -1) : source;
   return trimmed.split('\n');
@@ -142,17 +123,18 @@ export const CodeBlock = forwardRef<HTMLDivElement, CodeBlockProps>(function Cod
         <div className={codeBlockHeader}>
           <span className={codeBlockLabel}>{filename ?? language}</span>
           {copyable ? (
-            <button
-              type="button"
-              className={codeBlockCopyButton}
-              aria-label={hasCopied ? 'Copied' : 'Copy code'}
+            <Button
+              variant="outline"
+              size="sm"
               onClick={() => {
                 void copy(children);
               }}
+              className={codeBlockCopyButton}
+              aria-label={hasCopied ? 'Copied' : 'Copy code'}
             >
-              {hasCopied ? <CheckIcon /> : <CopyIcon />}
+              {hasCopied ? <CheckIcon size={'12'} /> : <CopyIcon size={'12'} />}
               <span>{hasCopied ? 'Copied' : 'Copy'}</span>
-            </button>
+            </Button>
           ) : null}
         </div>
       ) : null}

@@ -14,14 +14,7 @@ import { useTextareaContext } from './TextareaContext.js';
 export interface TextareaFieldProps
   extends Omit<
     TextareaHTMLAttributes<HTMLTextAreaElement>,
-    | 'value'
-    | 'defaultValue'
-    | 'onChange'
-    | 'disabled'
-    | 'readOnly'
-    | 'required'
-    | 'id'
-    | 'name'
+    'value' | 'defaultValue' | 'onChange' | 'disabled' | 'readOnly' | 'required' | 'id' | 'name'
   > {
   /** Initial row count; applies when `autoResize` isn't active. */
   rows?: number;
@@ -55,9 +48,9 @@ export const TextareaField = forwardRef<HTMLTextAreaElement, TextareaFieldProps>
       const el = ctx.fieldRef.current;
       if (!el) return;
       const cs = window.getComputedStyle(el);
-      const lh = parseFloat(cs.lineHeight);
-      const pt = parseFloat(cs.paddingTop) || 0;
-      const pb = parseFloat(cs.paddingBottom) || 0;
+      const lh = Number.parseFloat(cs.lineHeight);
+      const pt = Number.parseFloat(cs.paddingTop) || 0;
+      const pb = Number.parseFloat(cs.paddingBottom) || 0;
       if (!Number.isFinite(lh)) return;
       el.style.maxHeight = `${lh * ctx.maxRows + pt + pb}px`;
     }, [ctx.autoResize, ctx.maxRows, ctx.size]);
@@ -81,7 +74,7 @@ export const TextareaField = forwardRef<HTMLTextAreaElement, TextareaFieldProps>
       resize();
       el.addEventListener('input', resize);
       return () => el.removeEventListener('input', resize);
-    }, [ctx.autoResize, ctx.value]);
+    }, [ctx.autoResize]);
 
     return (
       <textarea

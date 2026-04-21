@@ -1,8 +1,8 @@
 import { type CSSProperties, type ReactElement, type ReactNode, forwardRef } from 'react';
-import {
-  type CircularProgressColorScheme,
-  type CircularProgressCompletionState,
-  type CircularProgressSize,
+import type {
+  CircularProgressColorScheme,
+  CircularProgressCompletionState,
+  CircularProgressSize,
 } from './CircularProgressContext.js';
 import { CircularProgressIndicator } from './CircularProgressIndicator.js';
 import { CircularProgressLabel } from './CircularProgressLabel.js';

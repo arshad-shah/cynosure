@@ -1,3 +1,4 @@
+import { ChevronDown, ChevronRight } from 'lucide-react';
 import {
   type CSSProperties,
   type HTMLAttributes,
@@ -12,15 +13,7 @@ import {
 } from 'react';
 import { useControllableState } from '../../hooks/useControllableState.js';
 import { cn } from '../../utils/cn.js';
-import {
-  treeChevron,
-  treeGroup,
-  treeItem,
-  treeLabel,
-  treeLeaf,
-  treeRoot,
-  treeRow,
-} from './Tree.css.js';
+import { treeGroup, treeItem, treeLabel, treeLeaf, treeRoot, treeRow } from './Tree.css.js';
 
 export type TreeSelectionMode = 'none' | 'single' | 'multiple';
 
@@ -62,18 +55,6 @@ export interface TreeProps<T extends TreeNode = TreeNode>
   'aria-label'?: string;
   'aria-labelledby'?: string;
 }
-
-const CaretIcon = (): ReactElement => (
-  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-    <path
-      d="m9 6 6 6-6 6"
-      stroke="currentColor"
-      strokeWidth="2.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-);
 
 /**
  * Build a flat list of [node, depth, parentId] in DFS order, respecting
@@ -321,8 +302,8 @@ export function Tree<T extends TreeNode = TreeNode>(props: TreeProps<T>): ReactE
           }}
         >
           {hasChildren ? (
-            <span className={treeChevron} aria-hidden="true">
-              <CaretIcon />
+            <span aria-hidden="true">
+              {!isExpanded ? <ChevronRight size={'14'} /> : <ChevronDown size={'14'} />}
             </span>
           ) : (
             <span className={treeLeaf} aria-hidden="true" />

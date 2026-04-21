@@ -161,7 +161,7 @@ export const textareaFieldSize = styleVariants({
   // field itself takes on extra padding-bottom so text never runs under the
   // grip — matches the ClearButton pattern for the right edge.
   sm: {
-    padding: `0.5rem 0.625rem`,
+    padding: '0.5rem 0.625rem',
     // 8 + 20 + 2 = 30px
     selectors: {
       '&[data-clearable="true"]': { paddingRight: '1.875rem' },
@@ -172,7 +172,7 @@ export const textareaFieldSize = styleVariants({
     },
   },
   md: {
-    padding: `0.6875rem 0.875rem`,
+    padding: '0.6875rem 0.875rem',
     // 10 + 24 + 2 = 36px
     selectors: {
       '&[data-clearable="true"]': { paddingRight: '2.25rem' },
@@ -183,7 +183,7 @@ export const textareaFieldSize = styleVariants({
     },
   },
   lg: {
-    padding: `0.875rem 1rem`,
+    padding: '0.875rem 1rem',
     // 12 + 28 + 2 = 42px
     selectors: {
       '&[data-clearable="true"]': { paddingRight: '2.625rem' },
