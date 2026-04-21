@@ -1,4 +1,4 @@
-import { style, styleVariants } from '@vanilla-extract/css';
+import { globalStyle, style, styleVariants } from '@vanilla-extract/css';
 import { vars } from '../../styles/vars.css.js';
 import { fieldWellBase } from '../shared/control.css.js';
 
@@ -186,3 +186,11 @@ export const inputElement = style({
     '&:disabled': { cursor: 'not-allowed' },
   },
 });
+
+// Hide WebKit/Chrome's built-in type="search" decorations — we render our
+// own clear button in the trailing well. These pseudo-elements aren't in
+// vanilla-extract's type map, so globalStyle is required.
+globalStyle(`${inputElement}::-webkit-search-cancel-button`, { appearance: 'none' });
+globalStyle(`${inputElement}::-webkit-search-decoration`, { appearance: 'none' });
+globalStyle(`${inputElement}::-webkit-search-results-button`, { appearance: 'none' });
+globalStyle(`${inputElement}::-webkit-search-results-decoration`, { appearance: 'none' });
