@@ -27,5 +27,10 @@ export default defineConfig({
     ssr: {
       noExternal: ['@arshad-shah/cynosure-react', '@arshad-shah/cynosure-tokens', '@arshad-shah/cynosure-themes'],
     },
+    build: {
+      rollupOptions: {
+        external: ['/pagefind/pagefind.js'],
+      },
+    },
   },
 });

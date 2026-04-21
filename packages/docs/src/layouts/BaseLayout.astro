@@ -1,0 +1,25 @@
+---
+import { getThemeInitScript } from '../lib/theme-init';
+import '../styles/site.css';
+import { site } from '../config/site';
+
+interface Props { title: string; description: string }
+const { title, description } = Astro.props;
+const initScript = getThemeInitScript();
+---
+<!doctype html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title} — {site.name}</title>
+    <meta name="description" content={description} />
+    <link rel="icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta property="og:image" content="/og-image.png" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <script is:inline set:html={initScript}></script>
+  </head>
+  <body><slot /></body>
+</html>
