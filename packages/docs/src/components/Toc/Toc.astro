@@ -15,13 +15,6 @@ const filtered = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
   </ul>
 </nav>
 
-<style>
-  [data-toc-title] {
-    font-weight: 600;
-    margin: 0 0 var(--cynosure-space-2, 0.5rem);
-  }
-</style>
-
 <script>
   const links = document.querySelectorAll<HTMLAnchorElement>('[data-toc] a');
   const targets = [...links]
