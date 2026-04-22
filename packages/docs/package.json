@@ -5,9 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "astro dev",
-    "build": "tsx scripts/verify-component-pages.ts && tsx scripts/build-changelog.ts && pnpm run generate:props && astro build && pnpm run build:search && pnpm run sync-search-to-public",
+    "build": "tsx scripts/verify-component-pages.ts && tsx scripts/build-changelog.ts && pnpm run generate:props && pnpm run generate:component-count && astro build && pnpm run build:search && pnpm run sync-search-to-public",
     "preview": "astro preview",
+    "generate": "pnpm run generate:props && pnpm run generate:component-count",
     "generate:props": "tsx scripts/generate-props.ts",
+    "generate:component-count": "node scripts/component-count.mjs",
     "build:search": "pagefind --site dist",
     "sync-search-to-public": "rm -rf public/pagefind && cp -R dist/pagefind public/pagefind",
     "dev:search": "pnpm run build && echo 'Pagefind now populated in public/pagefind — dev search will work on next astro dev'",
