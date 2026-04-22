@@ -1,57 +1,50 @@
+// packages/react/src/navigation/__tests__/Sidebar.test.tsx
 import { fireEvent, render, screen } from '@testing-library/react';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
-import { installMatchMediaMock } from '../../test/matchMedia.js';
-import {
-  Sidebar,
-  SidebarBody,
-  SidebarFooter,
-  SidebarHeader,
-  SidebarProvider,
-  SidebarTrigger,
-} from '../Sidebar/index.js';
+import { describe, expect, it, vi } from 'vitest';
+import { Sidebar, SidebarBody, SidebarProvider, SidebarTrigger } from '../Sidebar/index.js';
 
-describe('Sidebar', () => {
-  let media: ReturnType<typeof installMatchMediaMock>;
-
-  beforeEach(() => {
-    media = installMatchMediaMock({ '(max-width: 47.99em)': false });
-  });
-
-  afterEach(() => {
-    media.reset();
-  });
-
-  it('toggles collapse state on desktop when the trigger is clicked', () => {
+describe('Sidebar shell', () => {
+  it('renders an aside with data attributes reflecting provider state', () => {
     render(
       <SidebarProvider>
-        <Sidebar data-testid="sidebar">
-          <SidebarHeader>Header</SidebarHeader>
-          <SidebarBody>Body</SidebarBody>
-          <SidebarFooter>Footer</SidebarFooter>
+        <Sidebar aria-label="Primary">
+          <SidebarBody>content</SidebarBody>
         </Sidebar>
-        <SidebarTrigger />
       </SidebarProvider>,
     );
-    const sidebar = screen.getByTestId('sidebar');
-    expect(sidebar).toHaveAttribute('data-collapsed', 'false');
-    const trigger = screen.getByRole('button');
-    fireEvent.click(trigger);
-    expect(sidebar).toHaveAttribute('data-collapsed', 'true');
+    const aside = screen.getByRole('complementary', { name: 'Primary' });
+    expect(aside).toHaveAttribute('data-collapsed', 'false');
+    expect(aside).toHaveAttribute('data-side', 'left');
+    expect(aside).toHaveAttribute('data-collapsible', 'icon');
   });
 
-  it('renders as a Drawer on mobile and opens when trigger is clicked', () => {
-    media.set('(max-width: 47.99em)', true);
+  it('uncontrolled SidebarTrigger toggles collapsed', () => {
     render(
       <SidebarProvider>
-        <Sidebar>
-          <SidebarBody>mobile body</SidebarBody>
+        <Sidebar aria-label="Primary">
+          <SidebarTrigger />
         </Sidebar>
-        <SidebarTrigger />
       </SidebarProvider>,
     );
-    // Drawer content is portalled; before open, body is absent from the DOM.
-    expect(screen.queryByText('mobile body')).not.toBeInTheDocument();
+    const aside = screen.getByRole('complementary', { name: 'Primary' });
+    const button = screen.getByRole('button', { name: /collapse sidebar/i });
+    expect(aside).toHaveAttribute('data-collapsed', 'false');
+    fireEvent.click(button);
+    expect(aside).toHaveAttribute('data-collapsed', 'true');
+  });
+
+  it('controlled collapsed calls onCollapsedChange and does not update internally', () => {
+    const onChange = vi.fn();
+    render(
+      <SidebarProvider collapsed={false} onCollapsedChange={onChange}>
+        <Sidebar aria-label="Primary">
+          <SidebarTrigger />
+        </Sidebar>
+      </SidebarProvider>,
+    );
+    const aside = screen.getByRole('complementary', { name: 'Primary' });
     fireEvent.click(screen.getByRole('button'));
-    expect(screen.getByText('mobile body')).toBeInTheDocument();
+    expect(onChange).toHaveBeenCalledWith(true);
+    expect(aside).toHaveAttribute('data-collapsed', 'false');
   });
 });
