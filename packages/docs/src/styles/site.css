@@ -43,6 +43,9 @@ kbd {
   border: 0;
 }
 
+html {
+  scrollbar-gutter: stable;
+}
 html, body {
   overflow-x: clip;
 }
