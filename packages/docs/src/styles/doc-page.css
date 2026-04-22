@@ -94,3 +94,19 @@
 [data-pager-direction] { font-family: var(--docs-type-mono); font-size: 11px; letter-spacing: 0.1em; color: var(--docs-muted); text-transform: uppercase; }
 [data-pager-title] { font-weight: 500; font-size: 15px; color: var(--color-fg, canvastext); }
 [data-pager-card][data-pager-dir="next"] { text-align: right; }
+
+
+/* Auto-number H2 sections in doc content */
+[data-doc-layout] main article { counter-reset: docH2; }
+[data-doc-layout] main article h2 { counter-increment: docH2; }
+[data-doc-layout] main article h2::before {
+  content: counter(docH2, decimal-leading-zero) "  ";
+  font-family: var(--docs-type-mono);
+  font-size: 12px;
+  color: var(--docs-dim);
+  letter-spacing: 0.1em;
+  font-weight: 500;
+  margin-right: 12px;
+  vertical-align: 2px;
+}
+
