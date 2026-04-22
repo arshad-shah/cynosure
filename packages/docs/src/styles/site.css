@@ -45,8 +45,8 @@ kbd {
 
 body {
   margin: 0;
-  background: var(--color-bg, canvas);
-  color: var(--color-fg, canvastext);
+  background: var(--docs-bg);
+  color: var(--docs-fg);
   min-height: 100vh;
 }
 
