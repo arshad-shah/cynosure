@@ -4,6 +4,7 @@
 @import './tokens-surfaces.css';
 @import './chrome.css';
 @import './home.css';
+@import './doc-page.css';
 
 :root {
   font-family: "Geist Variable", ui-sans-serif, system-ui, sans-serif;
