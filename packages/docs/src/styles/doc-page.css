@@ -90,6 +90,8 @@
 
 /* Pager */
 [data-pager] { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 32px; }
+[data-pager-direction] { display: inline-flex; align-items: center; gap: 6px; }
+[data-pager-card][data-pager-dir="next"] [data-pager-direction] { justify-content: flex-end; }
 [data-pager-card] { padding: 18px 20px; border: 1px solid var(--docs-line); border-radius: 10px; display: flex; flex-direction: column; gap: 4px; }
 [data-pager-card]:hover { border-color: color-mix(in srgb, var(--color-accent-solid) 50%, var(--docs-line)); }
 [data-pager-direction] { font-family: var(--docs-type-mono); font-size: 11px; letter-spacing: 0.1em; color: var(--docs-muted); text-transform: uppercase; }

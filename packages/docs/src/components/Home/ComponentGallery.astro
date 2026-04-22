@@ -1,5 +1,6 @@
 ---
 import counts from '../../generated/component-count.json';
+import ArrowRight from '../icons/ArrowRight.astro';
 const total = (counts as { total: number }).total;
 
 type Preview =
@@ -36,7 +37,7 @@ const tiles: Tile[] = [
         <span data-kicker>On this site / 01</span>
         <h2>{total} components, every one live on this page.</h2>
       </div>
-      <a href="/components/button" data-home-more>See all components →</a>
+      <a href="/components/button" data-home-more>See all components <ArrowRight size={12} /></a>
     </div>
     <div data-gallery>
       {tiles.map((t) => (
@@ -51,13 +52,22 @@ const tiles: Tile[] = [
             {t.preview === 'tag'      && <span class="m-tag">#label</span>}
             {t.preview === 'progress' && <span class="m-progress"></span>}
             {t.preview === 'input'    && <span class="m-input">email</span>}
-            {t.preview === 'select'   && <span class="m-select">Option ⌄</span>}
+            {t.preview === 'select'   && (
+              <span class="m-select">
+                <span>Option</span>
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+              </span>
+            )}
             {t.preview === 'tabs'     && (
               <div class="m-tabs" style="width:100%">
                 <span class="on">Tab 1</span><span>Tab 2</span><span>Tab 3</span>
               </div>
             )}
-            {t.preview === 'checkbox' && <span class="m-check">✓</span>}
+            {t.preview === 'checkbox' && (
+              <span class="m-check">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-11"/></svg>
+              </span>
+            )}
             {t.preview === 'radio'    && <span class="m-radio"></span>}
             {t.preview === 'alert'    && <span class="m-alert">Heads up</span>}
             {t.preview === 'tooltip'  && <span class="m-tooltip">Tooltip</span>}

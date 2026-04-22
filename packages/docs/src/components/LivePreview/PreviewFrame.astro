@@ -1,4 +1,5 @@
 ---
+import External from '../icons/External.astro';
 interface Props {
   slug: string;
 }
@@ -14,7 +15,9 @@ const channel = `preview:${slug}`;
     <button type="button" data-live-tool data-live-rtl aria-pressed="false">RTL</button>
     <button type="button" data-live-tool data-live-theme="light">Light</button>
     <button type="button" data-live-tool data-live-theme="dark">Dark</button>
-    <a data-live-tool href={src} target="_blank" rel="noopener">Open ↗</a>
+    <a data-live-tool href={src} target="_blank" rel="noopener" aria-label="Open preview in new window">
+      <span>Open</span><External size={12} />
+    </a>
   </div>
   <div data-live-stage>
     <iframe
