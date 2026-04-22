@@ -1,6 +1,6 @@
 ---
 import lockupUrl from '@brand/cynosure-lockup.svg?url';
-import CopyButton from '../CopyButton.tsx';
+import CopyButton from '../CopyButton.astro';
 ---
 
 <section data-home-hero>
@@ -17,7 +17,7 @@ import CopyButton from '../CopyButton.tsx';
       </a>
       <div data-hero-snippet>
         <code>npx cynosure init</code>
-        <CopyButton code="npx cynosure init" client:load />
+        <CopyButton code="npx cynosure init" />
       </div>
     </div>
   </div>

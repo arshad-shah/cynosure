@@ -1,12 +1,12 @@
 ---
 import { codeToHtml } from 'shiki';
-import CopyButton from './CopyButton.tsx';
+import CopyButton from './CopyButton.astro';
 
 interface Props { code: string; lang?: string }
 const { code, lang = 'tsx' } = Astro.props;
 const html = await codeToHtml(code, { lang, theme: 'github-dark-dimmed' });
 ---
 <div data-code-block>
-  <CopyButton code={code} client:visible />
+  <CopyButton code={code} />
   <Fragment set:html={html} />
 </div>

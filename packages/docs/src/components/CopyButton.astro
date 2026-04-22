@@ -1,0 +1,146 @@
+---
+interface Props {
+  /** Text to copy to the clipboard. */
+  code?: string;
+  text?: string;
+  label?: string;
+}
+
+const { code, text, label = 'Copy' } = Astro.props;
+const value = text ?? code ?? '';
+const encoded = JSON.stringify(value);
+---
+
+<button
+  type="button"
+  data-copy-button
+  data-copy={encoded}
+  aria-label={`${label} to clipboard`}
+>
+  <span data-copy-icon-copy aria-hidden="true">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect>
+      <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path>
+    </svg>
+  </span>
+  <span data-copy-icon-done aria-hidden="true" hidden>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <polyline points="20 6 9 17 4 12"></polyline>
+    </svg>
+  </span>
+  <span data-copy-label>{label}</span>
+</button>
+
+<style>
+  [data-copy-button] {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    font: inherit;
+    font-size: 0.75rem;
+    line-height: 1;
+    padding: 0.375rem 0.625rem;
+    color: var(--cynosure-color-text, inherit);
+    background: var(--cynosure-color-surface, transparent);
+    border: 1px solid
+      var(--cynosure-color-border, color-mix(in srgb, currentColor 15%, transparent));
+    border-radius: var(--cynosure-radius-sm, 0.375rem);
+    cursor: pointer;
+    position: absolute;
+    top: 0.5em;
+    right: 0.5em;
+    z-index: 1;
+  }
+  [data-copy-button]:hover {
+    background: var(
+      --cynosure-color-surface-hover,
+      color-mix(in srgb, currentColor 6%, transparent)
+    );
+  }
+  [data-copy-button]:focus-visible {
+    outline: 2px solid var(--cynosure-color-focus, currentColor);
+    outline-offset: 2px;
+  }
+  [data-copy-button][data-copied='true'] {
+    color: var(--cynosure-color-success, #16a34a);
+    border-color: currentColor;
+  }
+  [data-copy-icon-copy],
+  [data-copy-icon-done] {
+    display: inline-flex;
+  }
+  [data-copy-icon-done][hidden],
+  [data-copy-icon-copy][hidden] {
+    display: none;
+  }
+</style>
+
+<script>
+  import { copyToClipboard } from '../lib/ui/clipboard.js';
+
+  function decode(raw: string | undefined): string {
+    if (!raw) return '';
+    try {
+      return JSON.parse(raw) as string;
+    } catch {
+      return raw;
+    }
+  }
+
+  function bind(button: HTMLButtonElement): void {
+    if (button.dataset.copyBound === 'true') return;
+    button.dataset.copyBound = 'true';
+
+    const labelEl = button.querySelector<HTMLElement>('[data-copy-label]');
+    const copyIcon = button.querySelector<HTMLElement>('[data-copy-icon-copy]');
+    const doneIcon = button.querySelector<HTMLElement>('[data-copy-icon-done]');
+    const originalLabel = labelEl?.textContent ?? 'Copy';
+    let timer: number | undefined;
+
+    button.addEventListener('click', async () => {
+      const text = decode(button.dataset.copy);
+      const ok = await copyToClipboard(text);
+      if (!ok) return;
+      button.dataset.copied = 'true';
+      if (copyIcon) copyIcon.hidden = true;
+      if (doneIcon) doneIcon.hidden = false;
+      if (labelEl) labelEl.textContent = 'Copied!';
+      if (timer) window.clearTimeout(timer);
+      timer = window.setTimeout(() => {
+        button.dataset.copied = 'false';
+        if (copyIcon) copyIcon.hidden = false;
+        if (doneIcon) doneIcon.hidden = true;
+        if (labelEl) labelEl.textContent = originalLabel;
+      }, 1500);
+    });
+  }
+
+  function init(): void {
+    document
+      .querySelectorAll<HTMLButtonElement>('[data-copy-button]')
+      .forEach((btn) => bind(btn));
+  }
+
+  init();
+  document.addEventListener('astro:page-load', init);
+</script>
