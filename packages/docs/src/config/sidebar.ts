@@ -6,6 +6,7 @@ export interface SidebarLink {
 export interface SidebarSection {
   title: string;
   links: SidebarLink[];
+  count?: number;
 }
 
 export const sidebar: SidebarSection[] = [

@@ -1,8 +1,32 @@
 ---
 import { sidebar } from '../../config/sidebar';
+import counts from '../../generated/component-count.json';
 import SidebarSection from './SidebarSection.astro';
+
+const titleToKey: Record<string, string> = {
+  'Components — Forms': 'forms',
+  'Components — Overlay': 'overlay',
+  'Components — Data display': 'data-display',
+  'Components — Feedback': 'feedback',
+  'Components — Navigation': 'navigation',
+  'Components — Typography': 'typography',
+  'Components — Layout': 'primitives/layout',
+};
+
+interface CountsFile {
+  total: number;
+  categories: Record<string, { label: string; count: number; names: string[] }>;
+}
+const countsData = counts as CountsFile;
+
+const withCounts = sidebar.map((s) => {
+  const key = titleToKey[s.title];
+  const c = key ? countsData.categories[key]?.count : undefined;
+  return { ...s, count: c };
+});
+
 const current = Astro.url.pathname.replace(/\/$/, '');
 ---
 <aside data-sidebar>
-  {sidebar.map((s) => <SidebarSection section={s} current={current} />)}
+  {withCounts.map((s) => <SidebarSection section={s} current={current} />)}
 </aside>
