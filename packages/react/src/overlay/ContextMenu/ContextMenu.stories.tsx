@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { useState } from 'react';
+import { forwardRef, useState } from 'react';
 import { Inline } from '../../primitives/layout/Inline/Inline.js';
 import { Stack } from '../../primitives/layout/Stack/Stack.js';
 import { Heading } from '../../typography/Heading/Heading.js';
@@ -28,24 +28,31 @@ const meta: Meta<typeof ContextMenu> = {
 export default meta;
 type Story = StoryObj<typeof ContextMenu>;
 
-const Target = ({ children }: { children?: React.ReactNode }): React.ReactElement => (
-  <Stack
-    padding="6"
-    minHeight="120px"
-    minWidth="360px"
-    borderRadius="md"
-    borderWidth="1"
-    borderStyle="dashed"
-    borderColor="border.default"
-    background="bg.subtle"
-    align="center"
-    justify="center"
-  >
-    <Text size="sm" color="fg.muted">
-      {children ?? 'Right-click anywhere in this box'}
-    </Text>
-  </Stack>
-);
+const Target = forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(function Target(
+  { children, ...rest },
+  ref,
+) {
+  return (
+    <Stack
+      ref={ref}
+      padding="6"
+      minHeight="120px"
+      minWidth="360px"
+      borderRadius="md"
+      borderWidth="1"
+      borderStyle="dashed"
+      borderColor="border.default"
+      background="bg.subtle"
+      align="center"
+      justify="center"
+      {...rest}
+    >
+      <Text size="sm" color="fg.muted">
+        {children ?? 'Right-click anywhere in this box'}
+      </Text>
+    </Stack>
+  );
+});
 
 export const Default: Story = {
   render: () => (
