@@ -10,7 +10,10 @@
       "node_modules",
       "*.md",
       "pnpm-lock.yaml",
-      "**/src/generated"
+      "**/src/generated",
+      "**/.astro",
+      "**/*.astro",
+      "packages/docs/public/pagefind"
     ]
   },
   "formatter": {
