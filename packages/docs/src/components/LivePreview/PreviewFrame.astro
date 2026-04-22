@@ -7,25 +7,28 @@ const { slug } = Astro.props;
 const src = `/demos/preview/${slug}`;
 const channel = `preview:${slug}`;
 ---
-<div data-live-preview-iframe>
-  <iframe
-    src={src}
-    loading="lazy"
-    title={`Live demo: ${slug}`}
-    data-preview-iframe
-    data-channel={channel}
-  ></iframe>
+<div data-live>
+  <div data-live-toolbar>
+    <span data-live-label>Preview</span>
+    <span data-live-spacer></span>
+    <button type="button" data-live-tool data-live-rtl aria-pressed="false">RTL</button>
+    <button type="button" data-live-tool data-live-theme="light">Light</button>
+    <button type="button" data-live-tool data-live-theme="dark">Dark</button>
+    <a data-live-tool href={src} target="_blank" rel="noopener">Open ↗</a>
+  </div>
+  <div data-live-stage>
+    <iframe
+      src={src}
+      loading="lazy"
+      title={`Live demo: ${slug}`}
+      data-preview-iframe
+      data-channel={channel}
+    ></iframe>
+  </div>
 </div>
 
 <style>
-  [data-live-preview-iframe] {
-    width: 100%;
-    border: 1px solid var(--color-border, color-mix(in srgb, currentColor 15%, transparent));
-    border-radius: var(--radius-md, 0.5rem);
-    overflow: hidden;
-    background: var(--color-surface, transparent);
-  }
-  iframe[data-preview-iframe] {
+  [data-live-stage] iframe[data-preview-iframe] {
     width: 100%;
     height: 320px;
     border: 0;
@@ -35,6 +38,43 @@ const channel = `preview:${slug}`;
 
 <script>
   import { subscribeIframeHeight } from '../../lib/ui/iframe-resize';
+
+  interface FrameState { base: string; rtl: boolean; theme: string | null }
+
+  function applyState(iframe: HTMLIFrameElement, state: FrameState): void {
+    const url = new URL(state.base, window.location.origin);
+    if (state.rtl) url.searchParams.set('rtl', '1');
+    else url.searchParams.delete('rtl');
+    if (state.theme) url.searchParams.set('theme', state.theme);
+    else url.searchParams.delete('theme');
+    iframe.src = url.pathname + url.search;
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-live]').forEach((root) => {
+    const iframe = root.querySelector<HTMLIFrameElement>('iframe[data-preview-iframe]');
+    if (!iframe) return;
+    const state: FrameState = { base: iframe.getAttribute('src') ?? '', rtl: false, theme: null };
+
+    root.querySelector<HTMLButtonElement>('[data-live-rtl]')?.addEventListener('click', (e) => {
+      const btn = e.currentTarget as HTMLButtonElement;
+      state.rtl = !state.rtl;
+      btn.setAttribute('aria-pressed', String(state.rtl));
+      btn.toggleAttribute('data-active', state.rtl);
+      applyState(iframe, state);
+    });
+
+    root.querySelectorAll<HTMLButtonElement>('[data-live-theme]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const next = btn.getAttribute('data-live-theme');
+        state.theme = state.theme === next ? null : next;
+        root.querySelectorAll<HTMLButtonElement>('[data-live-theme]').forEach((b) => {
+          b.toggleAttribute('data-active', b === btn && state.theme !== null);
+        });
+        applyState(iframe, state);
+      });
+    });
+  });
+
   const frames = document.querySelectorAll<HTMLIFrameElement>('iframe[data-preview-iframe]');
   frames.forEach((frame) => {
     const channel = frame.dataset.channel;
