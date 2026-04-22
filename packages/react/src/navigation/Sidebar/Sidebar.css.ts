@@ -8,12 +8,13 @@ export const sidebarRoot = style({
   width: '16rem',
   minWidth: '16rem',
   height: '100%',
+  overflow: 'hidden',
   background: vars.color.background.surface,
   color: vars.color.foreground.default,
   borderInlineEnd: `1px solid ${vars.color.border.subtle}`,
   transitionProperty: 'width, min-width',
-  transitionDuration: vars.duration.fast,
-  transitionTimingFunction: 'ease-in-out',
+  transitionDuration: vars.duration.normal,
+  transitionTimingFunction: 'cubic-bezier(0.22, 1, 0.36, 1)',
   selectors: {
     '&[data-side="right"]': {
       borderInlineEnd: 'none',
@@ -130,10 +131,16 @@ export const sidebarTriggerLabel = style({
   overflow: 'hidden',
   textOverflow: 'ellipsis',
   whiteSpace: 'nowrap',
+  opacity: 1,
+  transitionProperty: 'opacity',
+  transitionDuration: vars.duration.fast,
+  transitionTimingFunction: 'ease-out',
   selectors: {
     [`${sidebarRoot}[data-collapsed="true"][data-collapsible="icon"] &`]: {
-      display: 'none',
+      opacity: 0,
+      pointerEvents: 'none',
     },
+    '[data-cynosure-reduced-motion] &': { transitionDuration: '0s' },
   },
 });
 
@@ -155,10 +162,19 @@ export const sidebarGroupLabelRow = style({
   gap: vars.space['1'],
   paddingInline: vars.space['2'],
   paddingBlock: vars.space['1'],
+  opacity: 1,
+  transitionProperty: 'opacity',
+  transitionDuration: vars.duration.fast,
+  transitionTimingFunction: 'ease-out',
   selectors: {
     [`${sidebarRoot}[data-collapsed="true"][data-collapsible="icon"] &`]: {
-      display: 'none',
+      opacity: 0,
+      pointerEvents: 'none',
+      height: 0,
+      paddingBlock: 0,
+      overflow: 'hidden',
     },
+    '[data-cynosure-reduced-motion] &': { transitionDuration: '0s' },
   },
 });
 
@@ -238,8 +254,9 @@ export const sidebarItemRoot = style({
   cursor: 'pointer',
   width: '100%',
   textAlign: 'start',
-  transitionProperty: 'background-color, color',
-  transitionDuration: vars.duration.fast,
+  transitionProperty: 'background-color, color, width, padding-inline, gap',
+  transitionDuration: vars.duration.normal,
+  transitionTimingFunction: 'cubic-bezier(0.22, 1, 0.36, 1)',
   selectors: {
     '&:hover:not([data-active="true"]):not([disabled])': {
       background: vars.color.accent.soft,
@@ -298,35 +315,53 @@ export const sidebarItemLabel = style({
   overflow: 'hidden',
   textOverflow: 'ellipsis',
   whiteSpace: 'nowrap',
+  opacity: 1,
+  transitionProperty: 'opacity',
+  transitionDuration: vars.duration.fast,
+  transitionTimingFunction: 'ease-out',
   selectors: {
     [`${sidebarRoot}[data-collapsed="true"][data-collapsible="icon"] &`]: {
-      display: 'none',
+      opacity: 0,
+      pointerEvents: 'none',
     },
+    '[data-cynosure-reduced-motion] &': { transitionDuration: '0s' },
   },
 });
 
 export const sidebarItemBadge = style({
+  opacity: 1,
+  transitionProperty: 'opacity',
+  transitionDuration: vars.duration.fast,
+  transitionTimingFunction: 'ease-out',
   selectors: {
     [`${sidebarRoot}[data-collapsed="true"][data-collapsible="icon"] &`]: {
-      display: 'none',
+      opacity: 0,
+      pointerEvents: 'none',
     },
+    '[data-cynosure-reduced-motion] &': { transitionDuration: '0s' },
   },
 });
 
 /** Collapsed-mode dot that replaces the badge on the icon. */
 export const sidebarItemBadgeDot = style({
-  display: 'none',
+  position: 'absolute',
+  top: 0,
+  insetInlineEnd: 0,
+  width: '6px',
+  height: '6px',
+  borderRadius: vars.radius.full,
+  background: vars.color.accent.solid,
+  opacity: 0,
+  transitionProperty: 'opacity',
+  transitionDuration: vars.duration.fast,
+  transitionTimingFunction: 'ease-out',
+  transitionDelay: '0ms',
   selectors: {
     [`${sidebarRoot}[data-collapsed="true"][data-collapsible="icon"] &`]: {
-      display: 'block',
-      position: 'absolute',
-      top: 0,
-      insetInlineEnd: 0,
-      width: '6px',
-      height: '6px',
-      borderRadius: vars.radius.full,
-      background: vars.color.accent.solid,
+      opacity: 1,
+      transitionDelay: vars.duration.fast,
     },
+    '[data-cynosure-reduced-motion] &': { transitionDuration: '0s' },
   },
 });
 

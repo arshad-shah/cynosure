@@ -37,7 +37,7 @@ describe('Sidebar shell', () => {
       </SidebarProvider>,
     );
     const aside = screen.getByRole('complementary', { name: 'Primary' });
-    const button = screen.getByRole('button', { name: /collapse sidebar/i });
+    const button = screen.getByRole('button', { name: /^collapse$/i });
     expect(aside).toHaveAttribute('data-collapsed', 'false');
     fireEvent.click(button);
     expect(aside).toHaveAttribute('data-collapsed', 'true');

@@ -1,5 +1,6 @@
 import { MenuIcon, PanelLeftCloseIcon, PanelLeftOpenIcon, XIcon } from 'lucide-react';
 import { type ButtonHTMLAttributes, type MouseEvent, type ReactNode, forwardRef } from 'react';
+import { Tooltip } from '../../overlay/Tooltip/Tooltip.js';
 import { cn } from '../../utils/cn.js';
 import { sidebarTriggerButton, sidebarTriggerLabel } from './Sidebar.css.js';
 import { useSidebar } from './context.js';
@@ -17,11 +18,11 @@ export const SidebarTrigger = forwardRef<HTMLButtonElement, SidebarTriggerProps>
     const ctx = useSidebar();
     const defaultLabel = ctx.isMobile
       ? ctx.mobileOpen
-        ? 'Close sidebar'
-        : 'Open sidebar'
+        ? 'Close'
+        : 'Open'
       : ctx.collapsed
-        ? 'Expand sidebar'
-        : 'Collapse sidebar';
+        ? 'Expand'
+        : 'Collapse';
     const resolvedLabel = label ?? defaultLabel;
 
     const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
@@ -43,7 +44,7 @@ export const SidebarTrigger = forwardRef<HTMLButtonElement, SidebarTriggerProps>
       <PanelLeftCloseIcon size={18} />
     );
 
-    return (
+    const button = (
       <button
         ref={ref}
         type={type ?? 'button'}
@@ -60,5 +61,19 @@ export const SidebarTrigger = forwardRef<HTMLButtonElement, SidebarTriggerProps>
         {hideLabel ? null : <span className={sidebarTriggerLabel}>{resolvedLabel}</span>}
       </button>
     );
+
+    if (ctx.isCollapsedIconRail) {
+      return (
+        <Tooltip
+          content={resolvedLabel}
+          side={ctx.side === 'right' ? 'left' : 'right'}
+          delayMs={200}
+        >
+          {button}
+        </Tooltip>
+      );
+    }
+
+    return button;
   },
 );
