@@ -2,9 +2,11 @@
 import { getThemeInitScript } from '../lib/theme-init';
 import '../styles/site.css';
 import { site } from '../config/site';
+import TopBar from '../components/Chrome/TopBar.astro';
+import SiteFooter from '../components/Chrome/SiteFooter.astro';
 
-interface Props { title: string; description: string }
-const { title, description } = Astro.props;
+interface Props { title: string; description: string; bare?: boolean }
+const { title, description, bare = false } = Astro.props;
 const initScript = getThemeInitScript();
 ---
 <!doctype html>
@@ -21,5 +23,15 @@ const initScript = getThemeInitScript();
     <meta property="og:description" content={description} />
     <script is:inline set:html={initScript}></script>
   </head>
-  <body><slot /></body>
+  <body>
+    {bare ? (
+      <slot />
+    ) : (
+      <Fragment>
+        <TopBar />
+        <slot />
+        <SiteFooter />
+      </Fragment>
+    )}
+  </body>
 </html>

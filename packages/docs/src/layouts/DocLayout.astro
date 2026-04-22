@@ -1,6 +1,5 @@
 ---
 import BaseLayout from './BaseLayout.astro';
-import TopBar from '../components/Chrome/TopBar.astro';
 import Sidebar from '../components/Sidebar/Sidebar.astro';
 import Toc from '../components/Toc/Toc.astro';
 import type { MarkdownHeading } from 'astro';
@@ -9,7 +8,6 @@ interface Props { title: string; description: string; headings: MarkdownHeading[
 const { title, description, headings } = Astro.props;
 ---
 <BaseLayout title={title} description={description}>
-  <TopBar />
   <div data-doc-layout>
     <Sidebar />
     <main><slot /></main>
