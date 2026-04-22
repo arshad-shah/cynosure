@@ -54,4 +54,55 @@ describe('Divider', () => {
     expect(warn).toHaveBeenCalled();
     warn.mockRestore();
   });
+
+  it('applies length as width on horizontal hr', () => {
+    const { container } = render(<Divider length="200px" />);
+    const el = container.querySelector('hr') as HTMLElement;
+    expect(el.style.width).toBe('200px');
+  });
+
+  it('applies length as --cynosure-divider-length on vertical hr', () => {
+    const { container } = render(<Divider orientation="vertical" length="100px" />);
+    const el = container.querySelector('hr') as HTMLElement;
+    expect(el.style.getPropertyValue('--cynosure-divider-length')).toBe('100px');
+  });
+
+  it('applies length as width on labeled (horizontal) divider', () => {
+    const { container } = render(<Divider length="300px">label</Divider>);
+    const el = container.querySelector('div[role]') as HTMLElement;
+    expect(el.style.width).toBe('300px');
+  });
+
+  it('applies spacing as marginBlock on horizontal divider', () => {
+    const { container } = render(<Divider spacing="4" />);
+    const el = container.querySelector('hr') as HTMLElement;
+    expect(el.style.marginBlock).toContain('var(');
+  });
+
+  it('applies spacing as marginInline on vertical divider', () => {
+    const { container } = render(<Divider orientation="vertical" spacing="4" />);
+    const el = container.querySelector('hr') as HTMLElement;
+    expect(el.style.marginInline).toContain('var(');
+  });
+
+  it('uses dashed and dotted variant classes', () => {
+    const { container: dashed } = render(<Divider variant="dashed" />);
+    const { container: dotted } = render(<Divider variant="dotted" />);
+    expect(dashed.querySelector('hr')?.className).toBeTruthy();
+    expect(dotted.querySelector('hr')?.className).toBeTruthy();
+  });
+
+  it('renders soft + tone="default" + labelAlign variants', () => {
+    const { container } = render(
+      <Divider soft tone="default" labelAlign="start">
+        L
+      </Divider>,
+    );
+    expect(container.querySelector('div[role]')).not.toBeNull();
+  });
+
+  it('treats null children as no label and renders hr', () => {
+    const { container } = render(<Divider>{null}</Divider>);
+    expect(container.querySelector('hr')).not.toBeNull();
+  });
 });
