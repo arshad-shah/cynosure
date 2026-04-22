@@ -1,0 +1,42 @@
+---
+import BrandLockup from './BrandLockup.astro';
+import { site } from '../../config/site';
+---
+<footer data-site-footer>
+  <div data-site-footer-cols>
+    <div>
+      <BrandLockup />
+      <p data-footer-tagline>{site.description}</p>
+    </div>
+    <nav>
+      <h4>Docs</h4>
+      <ul>
+        <li><a href="/getting-started/introduction">Getting started</a></li>
+        <li><a href="/components/button">Components</a></li>
+        <li><a href="/foundations/design-principles">Foundations</a></li>
+        <li><a href="/recipes">Recipes</a></li>
+      </ul>
+    </nav>
+    <nav>
+      <h4>Project</h4>
+      <ul>
+        <li><a href={site.github}>GitHub</a></li>
+        <li><a href="/changelog">Changelog</a></li>
+        <li><a href="/reference/roadmap">Roadmap</a></li>
+        <li><a href={`${site.github}/blob/main/CONTRIBUTING.md`}>Contributing</a></li>
+      </ul>
+    </nav>
+    <nav>
+      <h4>Community</h4>
+      <ul>
+        <li><a href={`${site.github}/discussions`}>Discussions</a></li>
+        <li><a href={`${site.github}/issues`}>Issues</a></li>
+        <li><a href={`${site.github}/blob/main/LICENSE`}>License</a></li>
+      </ul>
+    </nav>
+  </div>
+  <div data-site-footer-bottom>
+    <span>© {new Date().getFullYear()} · MIT · v{site.version}</span>
+    <span>Built with Astro</span>
+  </div>
+</footer>
