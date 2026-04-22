@@ -6,7 +6,7 @@ import { type KeyboardEvent, type RefObject, useCallback, useEffect, useRef } fr
  * render items; they don't need to manage focus themselves.
  */
 export function useRovingFocus<T extends HTMLElement>(): {
-  containerRef: RefObject<T>;
+  containerRef: RefObject<T | null>;
 } {
   const containerRef = useRef<T>(null);
 
