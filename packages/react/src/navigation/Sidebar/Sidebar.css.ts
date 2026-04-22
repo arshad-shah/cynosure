@@ -71,9 +71,18 @@ export const sidebarBody = style({
 });
 
 export const sidebarFooter = style({
+  display: 'flex',
+  alignItems: 'center',
+  gap: vars.space['2'],
   paddingInline: vars.space['2'],
   paddingBlock: vars.space['2'],
   borderBlockStart: `1px solid ${vars.color.border.subtle}`,
+  selectors: {
+    [`${sidebarRoot}[data-collapsed="true"][data-collapsible="icon"] &`]: {
+      justifyContent: 'center',
+      paddingInline: 0,
+    },
+  },
 });
 
 export const sidebarSeparator = style({
@@ -86,20 +95,44 @@ export const sidebarSeparator = style({
 export const sidebarTriggerButton = style({
   display: 'inline-flex',
   alignItems: 'center',
-  justifyContent: 'center',
-  width: '2.25rem',
+  justifyContent: 'flex-start',
+  gap: vars.space['2'],
+  minWidth: '2.25rem',
+  width: '100%',
   height: '2.25rem',
-  padding: 0,
+  paddingInline: vars.space['2'],
+  paddingBlock: 0,
   background: 'transparent',
   border: '1px solid transparent',
   color: vars.color.foreground.default,
-  borderRadius: vars.radius.sm,
+  fontSize: '0.875rem',
+  fontWeight: 500,
+  borderRadius: vars.radius.md,
   cursor: 'pointer',
+  textAlign: 'start',
   selectors: {
     '&:hover': { background: vars.color.accent.soft },
     '&:focus-visible': {
       outline: 'none',
       boxShadow: `0 0 0 2px ${vars.color.accent.ring}`,
+    },
+    [`${sidebarRoot}[data-collapsed="true"][data-collapsible="icon"] &`]: {
+      width: '2.25rem',
+      justifyContent: 'center',
+      paddingInline: 0,
+      gap: 0,
+    },
+  },
+});
+
+export const sidebarTriggerLabel = style({
+  flex: '1 1 auto',
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  whiteSpace: 'nowrap',
+  selectors: {
+    [`${sidebarRoot}[data-collapsed="true"][data-collapsible="icon"] &`]: {
+      display: 'none',
     },
   },
 });

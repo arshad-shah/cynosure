@@ -1,17 +1,19 @@
-// packages/react/src/navigation/Sidebar/SidebarTrigger.tsx
 import { MenuIcon, PanelLeftCloseIcon, PanelLeftOpenIcon, XIcon } from 'lucide-react';
 import { type ButtonHTMLAttributes, type MouseEvent, type ReactNode, forwardRef } from 'react';
 import { cn } from '../../utils/cn.js';
-import { sidebarTriggerButton } from './Sidebar.css.js';
+import { sidebarTriggerButton, sidebarTriggerLabel } from './Sidebar.css.js';
 import { useSidebar } from './context.js';
 
 export interface SidebarTriggerProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  /** Accessible name and visible text (hidden when collapsed to icon rail). */
   label?: string;
   icon?: ReactNode;
+  /** Hide the visible text label; leave accessible name only. Default `false`. */
+  hideLabel?: boolean;
 }
 
 export const SidebarTrigger = forwardRef<HTMLButtonElement, SidebarTriggerProps>(
-  function SidebarTrigger({ className, label, icon, onClick, type, ...rest }, ref) {
+  function SidebarTrigger({ className, label, icon, hideLabel, onClick, type, ...rest }, ref) {
     const ctx = useSidebar();
     const defaultLabel = ctx.isMobile
       ? ctx.mobileOpen
@@ -20,6 +22,7 @@ export const SidebarTrigger = forwardRef<HTMLButtonElement, SidebarTriggerProps>
       : ctx.collapsed
         ? 'Expand sidebar'
         : 'Collapse sidebar';
+    const resolvedLabel = label ?? defaultLabel;
 
     const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
       onClick?.(event);
@@ -44,14 +47,17 @@ export const SidebarTrigger = forwardRef<HTMLButtonElement, SidebarTriggerProps>
       <button
         ref={ref}
         type={type ?? 'button'}
-        aria-label={label ?? defaultLabel}
+        aria-label={resolvedLabel}
         aria-pressed={ctx.isMobile ? ctx.mobileOpen : !ctx.collapsed}
         aria-expanded={ctx.isMobile ? ctx.mobileOpen : !ctx.collapsed}
         className={cn(sidebarTriggerButton, className)}
         onClick={handleClick}
         {...rest}
       >
-        {icon ?? defaultIcon}
+        <span aria-hidden="true" style={{ display: 'inline-flex', flexShrink: 0 }}>
+          {icon ?? defaultIcon}
+        </span>
+        {hideLabel ? null : <span className={sidebarTriggerLabel}>{resolvedLabel}</span>}
       </button>
     );
   },

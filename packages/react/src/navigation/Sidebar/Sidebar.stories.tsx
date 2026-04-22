@@ -60,10 +60,7 @@ export const Default: Story = {
       <ShellLayout>
         <Sidebar aria-label="Primary">
           <SidebarHeader>
-            <Inline gap="2" align="center" justify="between">
-              <Text weight="semibold">Acme</Text>
-              <SidebarTrigger />
-            </Inline>
+            <Text weight="semibold">Acme</Text>
           </SidebarHeader>
           <SidebarBody>
             <SidebarNav aria-label="Primary">
@@ -74,9 +71,7 @@ export const Default: Story = {
             </SidebarNav>
           </SidebarBody>
           <SidebarFooter>
-            <Text size="xs" color="fg.muted">
-              v1.0
-            </Text>
+            <SidebarTrigger />
           </SidebarFooter>
         </Sidebar>
         <DemoMain />
@@ -94,10 +89,7 @@ export const CollapsibleRail: Story = {
           <ShellLayout>
             <Sidebar aria-label="Primary">
               <SidebarHeader>
-                <Inline gap="2" align="center" justify="between">
-                  <Text weight="semibold">Acme</Text>
-                  <SidebarTrigger />
-                </Inline>
+                <Text weight="semibold">Acme</Text>
               </SidebarHeader>
               <SidebarBody>
                 <SidebarNav aria-label="Primary">
@@ -110,6 +102,9 @@ export const CollapsibleRail: Story = {
                   <SidebarItem icon={<UsersIcon size={18} />} label="Team" />
                 </SidebarNav>
               </SidebarBody>
+              <SidebarFooter>
+                <SidebarTrigger />
+              </SidebarFooter>
             </Sidebar>
             <DemoMain>
               <Text>Collapsed: {collapsed ? 'yes' : 'no'}</Text>
@@ -246,16 +241,16 @@ export const RightSide: Story = {
         <DemoMain />
         <Sidebar aria-label="Inspector">
           <SidebarHeader>
-            <Inline gap="2" align="center" justify="between">
-              <Text weight="semibold">Inspector</Text>
-              <SidebarTrigger />
-            </Inline>
+            <Text weight="semibold">Inspector</Text>
           </SidebarHeader>
           <SidebarBody>
             <Text size="sm" color="fg.muted">
               Metadata, tags, linked items.
             </Text>
           </SidebarBody>
+          <SidebarFooter>
+            <SidebarTrigger />
+          </SidebarFooter>
         </Sidebar>
       </ShellLayout>
     </SidebarProvider>
