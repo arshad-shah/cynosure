@@ -7,9 +7,12 @@
   text-transform: uppercase;
 }
 [data-home-container] {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 32px;
+  width: 100%;
+  margin: 0;
+  padding: 0 64px;
+}
+@media (max-width: 768px) {
+  [data-home-container] { padding: 0 24px; }
 }
 
 /* ── HERO ─────────────────────────── */

@@ -1,6 +1,7 @@
 /* ── Doc page content styles ──────────────────────────────────── */
 
-[data-doc-layout] main { padding: 56px 56px 120px; max-width: 860px; }
+[data-doc-layout] main { padding: 56px 72px 120px; min-width: 0; }
+[data-doc-layout] main article { max-width: 920px; }
 
 /* Breadcrumb */
 [data-breadcrumb] { display: flex; gap: 8px; font-family: var(--docs-type-mono); font-size: 11px; letter-spacing: 0.08em; color: var(--docs-dim); text-transform: uppercase; margin-bottom: 18px; }
