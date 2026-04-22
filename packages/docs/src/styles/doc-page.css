@@ -4,8 +4,8 @@
 [data-doc-layout] main article { max-width: 920px; }
 
 /* Breadcrumb */
-[data-breadcrumb] { display: flex; gap: 8px; font-family: var(--docs-type-mono); font-size: 11px; letter-spacing: 0.08em; color: var(--docs-dim); text-transform: uppercase; margin-bottom: 18px; }
-[data-breadcrumb] [data-breadcrumb-sep] { color: var(--docs-line-strong); }
+[data-breadcrumb] { display: flex; align-items: center; gap: 8px; font-family: var(--docs-type-mono); font-size: 11px; letter-spacing: 0.08em; color: var(--docs-dim); text-transform: uppercase; margin-bottom: 18px; }
+[data-breadcrumb] [data-breadcrumb-sep] { display: inline-flex; align-items: center; color: var(--docs-line-strong); opacity: 0.7; }
 [data-breadcrumb] [data-breadcrumb-here] { color: var(--docs-muted); }
 
 /* Title / subtitle */

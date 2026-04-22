@@ -1,5 +1,6 @@
 ---
 import BrandLockup from './BrandLockup.astro';
+import Dot from '../icons/Dot.astro';
 import { site } from '../../config/site';
 ---
 <footer data-site-footer>
@@ -36,7 +37,7 @@ import { site } from '../../config/site';
     </nav>
   </div>
   <div data-site-footer-bottom>
-    <span>© {new Date().getFullYear()} · MIT · v{site.version}</span>
+    <span>© {new Date().getFullYear()} <Dot size={3} /> MIT <Dot size={3} /> v{site.version}</span>
     <span>Built with Astro</span>
   </div>
 </footer>

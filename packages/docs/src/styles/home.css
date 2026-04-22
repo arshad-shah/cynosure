@@ -1,11 +1,21 @@
 [data-kicker] {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
   font-family: var(--docs-type-mono);
   font-size: 11px;
   letter-spacing: 0.14em;
   color: var(--docs-muted);
   text-transform: uppercase;
 }
+[data-kicker] svg { opacity: 0.6; }
+[data-a11y-meta] {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+[data-a11y-meta] svg { opacity: 0.55; }
 [data-home-container] {
   width: 100%;
   margin: 0;

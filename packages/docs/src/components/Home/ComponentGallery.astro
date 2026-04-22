@@ -1,6 +1,7 @@
 ---
 import counts from '../../generated/component-count.json';
 import ArrowRight from '../icons/ArrowRight.astro';
+import Dot from '../icons/Dot.astro';
 const total = (counts as { total: number }).total;
 
 type Preview =
@@ -34,7 +35,7 @@ const tiles: Tile[] = [
   <div data-home-container>
     <div data-home-head>
       <div>
-        <span data-kicker>On this site / 01</span>
+        <span data-kicker>On this site <Dot size={3} /> 01</span>
         <h2>{total} components, every one live on this page.</h2>
       </div>
       <a href="/components/button" data-home-more>See all components <ArrowRight size={12} /></a>

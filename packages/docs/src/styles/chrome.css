@@ -150,6 +150,8 @@
   max-width: 1400px;
   margin: 0 auto;
 }
+[data-site-footer-bottom] > span { display: inline-flex; align-items: center; gap: 8px; }
+[data-site-footer-bottom] svg { opacity: 0.6; }
 @media (max-width: 768px) {
   [data-site-footer] { padding: 48px 24px 28px; }
   [data-site-footer-cols] { grid-template-columns: 1fr 1fr; gap: 32px; }

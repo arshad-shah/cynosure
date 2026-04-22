@@ -1,17 +1,18 @@
 ---
 import Info from '../icons/Info.astro';
-const cards = [
-  { title: 'Keyboard-first', body: 'Every interactive component tested under keyboard-only navigation.', meta: 'arrow-keys · focus traps · skip links' },
-  { title: 'Focus visible',  body: 'High-contrast focus rings that survive themes, gradients, and glass.', meta: ':focus-visible · 3:1 min contrast' },
-  { title: 'Reduced motion', body: 'Every transition honors prefers-reduced-motion. No shaking, no opt-out.', meta: 'honored by default' },
-  { title: 'Audited',        body: 'Continuous axe-core and Playwright a11y checks in CI.', meta: 'axe-core · 0 violations' },
+import Dot from '../icons/Dot.astro';
+const cards: Array<{ title: string; body: string; meta: string[] }> = [
+  { title: 'Keyboard-first', body: 'Every interactive component tested under keyboard-only navigation.', meta: ['arrow-keys', 'focus traps', 'skip links'] },
+  { title: 'Focus visible',  body: 'High-contrast focus rings that survive themes, gradients, and glass.', meta: [':focus-visible', '3:1 min contrast'] },
+  { title: 'Reduced motion', body: 'Every transition honors prefers-reduced-motion. No shaking, no opt-out.', meta: ['honored by default'] },
+  { title: 'Audited',        body: 'Continuous axe-core and Playwright a11y checks in CI.', meta: ['axe-core', '0 violations'] },
 ];
 ---
 <section data-home-band>
   <div data-home-container>
     <div data-home-head>
       <div>
-        <span data-kicker>Accessibility / 03</span>
+        <span data-kicker>Accessibility <Dot size={3} /> 03</span>
         <h2>Built on practice, not promise.</h2>
       </div>
     </div>
@@ -21,7 +22,14 @@ const cards = [
           <Info size={22} />
           <h3>{c.title}</h3>
           <p>{c.body}</p>
-          <div data-a11y-meta>{c.meta}</div>
+          <div data-a11y-meta>
+            {c.meta.map((m, i) => (
+              <>
+                {i > 0 && <Dot size={3} />}
+                <span>{m}</span>
+              </>
+            ))}
+          </div>
         </div>
       ))}
     </div>
