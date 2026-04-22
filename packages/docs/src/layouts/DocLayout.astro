@@ -2,15 +2,63 @@
 import BaseLayout from './BaseLayout.astro';
 import Sidebar from '../components/Sidebar/Sidebar.astro';
 import Toc from '../components/Toc/Toc.astro';
+import Breadcrumb from '../components/Doc/Breadcrumb.astro';
+import StatusRow from '../components/Doc/StatusRow.astro';
 import type { MarkdownHeading } from 'astro';
 
-interface Props { title: string; description: string; headings: MarkdownHeading[] }
-const { title, description, headings } = Astro.props;
+interface Frontmatter {
+  title: string;
+  description: string;
+  category: 'home' | 'getting-started' | 'foundations' | 'components' | 'recipes' | 'changelog';
+  status?: 'stable' | 'beta' | 'alpha' | 'experimental' | 'deprecated';
+  since?: string;
+  a11y?: string;
+  bundleSize?: string;
+}
+
+interface Props {
+  title: string;
+  description: string;
+  headings: MarkdownHeading[];
+  frontmatter?: Frontmatter;
+  slug?: string;
+}
+const { title, description, headings, frontmatter, slug } = Astro.props;
+
+function crumbsFor(slug: string | undefined, title: string): Array<{ label: string; href?: string }> {
+  if (!slug) return [{ label: title }];
+  const parts = slug.split('/').filter(Boolean);
+  const out: Array<{ label: string; href?: string }> = [];
+  let acc = '';
+  for (let i = 0; i < parts.length - 1; i++) {
+    acc += `/${parts[i]}`;
+    out.push({ label: parts[i].replace(/-/g, ' '), href: acc });
+  }
+  out.push({ label: title });
+  return out;
+}
+const crumbs = crumbsFor(slug, title);
+const hasStatus = frontmatter && (frontmatter.status || frontmatter.since || frontmatter.bundleSize || frontmatter.a11y);
 ---
 <BaseLayout title={title} description={description}>
   <div data-doc-layout>
     <Sidebar />
-    <main><slot /></main>
+    <main>
+      <article>
+        <Breadcrumb items={crumbs} />
+        <h1>{title}</h1>
+        <p data-page-sub>{description}</p>
+        {hasStatus && (
+          <StatusRow
+            status={frontmatter?.status}
+            since={frontmatter?.since}
+            bundleSize={frontmatter?.bundleSize}
+            a11y={frontmatter?.a11y}
+          />
+        )}
+        <slot />
+      </article>
+    </main>
     <Toc headings={headings} />
   </div>
 </BaseLayout>
