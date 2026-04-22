@@ -19,12 +19,12 @@
   --docs-ok: #86efac;
   --docs-warn: #fbbf24;
   --docs-danger: #fca5a5;
-  --docs-type-mono: 'JetBrains Mono Variable', ui-monospace, Menlo, monospace;
+  --docs-type-mono: "JetBrains Mono Variable", ui-monospace, Menlo, monospace;
   --docs-kicker-size: 11px;
   --docs-kicker-tracking: 0.14em;
 }
 
-[data-theme='light'] {
+[data-theme="light"] {
   --docs-bg: #fcfcfa;
   --docs-bg-translucent: rgba(252, 252, 250, 0.82);
   --docs-fg: #0f1115;

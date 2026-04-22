@@ -1,6 +1,6 @@
 // packages/docs/scripts/component-count.mjs
-import { readdirSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
-import { join, dirname } from 'node:path';
+import { existsSync, mkdirSync, readdirSync, writeFileSync } from 'node:fs';
+import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -8,12 +8,12 @@ const srcRoot = join(__dirname, '..', '..', 'react', 'src');
 const outFile = join(__dirname, '..', 'src', 'generated', 'component-count.json');
 
 const CATEGORIES = {
-  'forms': 'Forms',
-  'overlay': 'Overlay',
+  forms: 'Forms',
+  overlay: 'Overlay',
   'data-display': 'Data display',
-  'feedback': 'Feedback',
-  'navigation': 'Navigation',
-  'typography': 'Typography',
+  feedback: 'Feedback',
+  navigation: 'Navigation',
+  typography: 'Typography',
   'primitives/layout': 'Layout',
 };
 const SKIP = new Set(['__tests__', 'shared', 'index.ts']);
@@ -33,5 +33,5 @@ for (const [path, label] of Object.entries(CATEGORIES)) {
 
 const out = { total, categories };
 mkdirSync(dirname(outFile), { recursive: true });
-writeFileSync(outFile, JSON.stringify(out, null, 2) + '\n');
-console.log(`[component-count] ${total} components`);
+writeFileSync(outFile, `${JSON.stringify(out, null, 2)}\n`);
+process.stdout.write(`[component-count] ${total} components\n`);

@@ -35,8 +35,10 @@ function crumbsFor(slug: string | undefined, title: string): Array<{ label: stri
   const out: Array<{ label: string; href?: string }> = [];
   let acc = '';
   for (let i = 0; i < parts.length - 1; i++) {
-    acc += `/${parts[i]}`;
-    out.push({ label: parts[i].replace(/-/g, ' '), href: acc });
+    const part = parts[i];
+    if (!part) continue;
+    acc += `/${part}`;
+    out.push({ label: part.replace(/-/g, ' '), href: acc });
   }
   out.push({ label: title });
   return out;

@@ -46,9 +46,10 @@ const filtered = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
         }
       }
       // If nothing has scrolled past the offset, use the first heading once we're past its top.
-      if (!current && headings.length > 0) {
-        const firstTop = headings[0].el.getBoundingClientRect().top;
-        if (firstTop < window.innerHeight * 0.6) current = headings[0];
+      const first = headings[0];
+      if (!current && first) {
+        const firstTop = first.el.getBoundingClientRect().top;
+        if (firstTop < window.innerHeight * 0.6) current = first;
       }
 
       const nextSlug = current?.link.getAttribute('data-toc-link') ?? null;
