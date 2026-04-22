@@ -1,12 +1,4 @@
 ---
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardBody,
-} from '@arshad-shah/cynosure-react';
-
 const features = [
   {
     title: 'Tiny',
@@ -39,14 +31,34 @@ const features = [
   <h2 data-section-heading>Why Cynosure?</h2>
   <div data-feature-grid>
     {features.map((f) => (
-      <Card variant="outlined" size="md">
-        <CardHeader>
-          <CardTitle as="h3">{f.title}</CardTitle>
-        </CardHeader>
-        <CardBody>
-          <CardDescription>{f.body}</CardDescription>
-        </CardBody>
-      </Card>
+      <article data-feature-card>
+        <h3 data-feature-title>{f.title}</h3>
+        <p data-feature-body>{f.body}</p>
+      </article>
     ))}
   </div>
 </section>
+
+<style>
+  [data-feature-card] {
+    padding: var(--cynosure-space-5, 1.25rem);
+    border: 1px solid var(--cynosure-color-border-subtle, color-mix(in srgb, currentColor 15%, transparent));
+    border-radius: var(--cynosure-radius-lg, 0.5rem);
+    background: var(--cynosure-color-background-surface, transparent);
+    display: flex;
+    flex-direction: column;
+    gap: var(--cynosure-space-2, 0.5rem);
+  }
+  [data-feature-title] {
+    margin: 0;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--cynosure-color-foreground-default, inherit);
+  }
+  [data-feature-body] {
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.55;
+    color: var(--cynosure-color-foreground-muted, color-mix(in srgb, currentColor 70%, transparent));
+  }
+</style>

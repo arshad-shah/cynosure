@@ -1,15 +1,5 @@
 ---
 import props from '../generated/props.json';
-import {
-  Box,
-  Table,
-  TableHead,
-  TableBody,
-  TableRow,
-  TableHeader,
-  TableCell,
-  Code,
-} from '@arshad-shah/cynosure-react';
 
 interface Props { component: string }
 const { component } = Astro.props;
@@ -22,27 +12,41 @@ if (!record) {
   throw new Error(`PropsTable: component "${component}" not found in props.json. Run 'pnpm generate:props'.`);
 }
 ---
-<Box data-props-table style={{ overflowX: 'auto', margin: 'var(--space-4,1rem) 0' }}>
-  <Table variant="line" size="sm">
-    <TableHead>
-      <TableRow>
-        <TableHeader>Prop</TableHeader>
-        <TableHeader>Type</TableHeader>
-        <TableHeader>Default</TableHeader>
-        <TableHeader>Required</TableHeader>
-        <TableHeader>Description</TableHeader>
-      </TableRow>
-    </TableHead>
-    <TableBody>
+<div data-props-table-wrap>
+  <table data-props-table>
+    <thead>
+      <tr>
+        <th>Prop</th>
+        <th>Type</th>
+        <th>Default</th>
+        <th>Required</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
       {record.props.map((p) => (
-        <TableRow>
-          <TableCell><Code>{p.name}</Code></TableCell>
-          <TableCell><Code>{p.type}</Code></TableCell>
-          <TableCell>{p.defaultValue ? <Code>{p.defaultValue}</Code> : '—'}</TableCell>
-          <TableCell>{p.required ? 'yes' : 'no'}</TableCell>
-          <TableCell>{p.description}</TableCell>
-        </TableRow>
+        <tr>
+          <td><code>{p.name}</code></td>
+          <td><code>{p.type}</code></td>
+          <td>{p.defaultValue ? <code>{p.defaultValue}</code> : '—'}</td>
+          <td>{p.required ? 'yes' : 'no'}</td>
+          <td>{p.description}</td>
+        </tr>
       ))}
-    </TableBody>
-  </Table>
-</Box>
+    </tbody>
+  </table>
+</div>
+
+<style>
+  [data-props-table-wrap] {
+    overflow-x: auto;
+    margin: var(--cynosure-space-4, 1rem) 0;
+  }
+  [data-props-table] code {
+    font-family: "JetBrains Mono Variable", ui-monospace, monospace;
+    font-size: 0.85em;
+    padding: 0.1em 0.35em;
+    border-radius: var(--cynosure-radius-sm, 0.25rem);
+    background: var(--cynosure-color-background-subtle, color-mix(in srgb, currentColor 6%, transparent));
+  }
+</style>

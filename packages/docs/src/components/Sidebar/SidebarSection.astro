@@ -1,20 +1,8 @@
 ---
 import type { SidebarSection } from '../../config/sidebar';
-import { Badge } from '@arshad-shah/cynosure-react';
-import type { BadgeColorScheme } from '@arshad-shah/cynosure-react';
 
 interface Props { section: SidebarSection; current: string }
 const { section, current } = Astro.props;
-
-type Status = 'stable' | 'beta' | 'alpha' | 'experimental' | 'deprecated';
-
-const statusColor: Record<Status, BadgeColorScheme> = {
-  stable: 'success',
-  beta: 'warning',
-  alpha: 'danger',
-  experimental: 'accent',
-  deprecated: 'neutral',
-};
 ---
 <details open>
   <summary>{section.title}</summary>
@@ -23,13 +11,7 @@ const statusColor: Record<Status, BadgeColorScheme> = {
       <li data-current={current === l.href ? '' : undefined}>
         <a href={l.href}>{l.title}</a>
         {l.status ? (
-          <Badge
-            variant="soft"
-            colorScheme={statusColor[l.status as Status] ?? 'neutral'}
-            size="xs"
-            shape="pill"
-            data-status={l.status}
-          >{l.status}</Badge>
+          <span data-status={l.status} data-sidebar-status>{l.status}</span>
         ) : null}
       </li>
     ))}

@@ -1,12 +1,11 @@
 ---
-import { Box } from '@arshad-shah/cynosure-react';
 import type { MarkdownHeading } from 'astro';
 interface Props { headings: MarkdownHeading[] }
 const { headings } = Astro.props;
 const filtered = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
 ---
-<Box as="nav" data-toc aria-label="On this page">
-  <p style="font-weight:600;margin:0 0 var(--space-2,0.5rem);">On this page</p>
+<nav data-toc aria-label="On this page">
+  <p data-toc-title>On this page</p>
   <ul>
     {filtered.map((h) => (
       <li data-depth={h.depth}>
@@ -14,7 +13,15 @@ const filtered = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
       </li>
     ))}
   </ul>
-</Box>
+</nav>
+
+<style>
+  [data-toc-title] {
+    font-weight: 600;
+    margin: 0 0 var(--cynosure-space-2, 0.5rem);
+  }
+</style>
+
 <script>
   const links = document.querySelectorAll<HTMLAnchorElement>('[data-toc] a');
   const targets = [...links]

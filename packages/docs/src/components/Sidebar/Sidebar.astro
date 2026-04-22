@@ -1,9 +1,8 @@
 ---
-import { Box } from '@arshad-shah/cynosure-react';
 import { sidebar } from '../../config/sidebar';
 import SidebarSection from './SidebarSection.astro';
 const current = Astro.url.pathname.replace(/\/$/, '');
 ---
-<Box as="aside" data-sidebar>
+<aside data-sidebar>
   {sidebar.map((s) => <SidebarSection section={s} current={current} />)}
-</Box>
+</aside>

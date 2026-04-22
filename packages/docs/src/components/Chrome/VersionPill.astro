@@ -1,7 +1,6 @@
 ---
 import { site } from '../../config/site';
-import { Badge } from '@arshad-shah/cynosure-react';
 ---
-<a href="/changelog" style="text-decoration:none;color:inherit;" aria-label={`Version ${site.version} — view changelog`}>
-  <Badge variant="outline" colorScheme="neutral" size="sm" shape="pill">v{site.version}</Badge>
+<a href="/changelog" data-version-pill aria-label={`Version ${site.version} — view changelog`}>
+  v{site.version}
 </a>
