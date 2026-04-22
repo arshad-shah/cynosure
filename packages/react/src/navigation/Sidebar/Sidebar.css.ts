@@ -162,19 +162,10 @@ export const sidebarGroupLabelRow = style({
   gap: vars.space['1'],
   paddingInline: vars.space['2'],
   paddingBlock: vars.space['1'],
-  opacity: 1,
-  transitionProperty: 'opacity',
-  transitionDuration: vars.duration.fast,
-  transitionTimingFunction: 'ease-out',
   selectors: {
     [`${sidebarRoot}[data-collapsed="true"][data-collapsible="icon"] &`]: {
-      opacity: 0,
-      pointerEvents: 'none',
-      height: 0,
-      paddingBlock: 0,
-      overflow: 'hidden',
+      display: 'none',
     },
-    '[data-cynosure-reduced-motion] &': { transitionDuration: '0s' },
   },
 });
 
@@ -254,9 +245,8 @@ export const sidebarItemRoot = style({
   cursor: 'pointer',
   width: '100%',
   textAlign: 'start',
-  transitionProperty: 'background-color, color, width, padding-inline, gap',
-  transitionDuration: vars.duration.normal,
-  transitionTimingFunction: 'cubic-bezier(0.22, 1, 0.36, 1)',
+  transitionProperty: 'background-color, color',
+  transitionDuration: vars.duration.fast,
   selectors: {
     '&:hover:not([data-active="true"]):not([disabled])': {
       background: vars.color.accent.soft,
@@ -344,24 +334,18 @@ export const sidebarItemBadge = style({
 
 /** Collapsed-mode dot that replaces the badge on the icon. */
 export const sidebarItemBadgeDot = style({
-  position: 'absolute',
-  top: 0,
-  insetInlineEnd: 0,
-  width: '6px',
-  height: '6px',
-  borderRadius: vars.radius.full,
-  background: vars.color.accent.solid,
-  opacity: 0,
-  transitionProperty: 'opacity',
-  transitionDuration: vars.duration.fast,
-  transitionTimingFunction: 'ease-out',
-  transitionDelay: '0ms',
+  display: 'none',
   selectors: {
     [`${sidebarRoot}[data-collapsed="true"][data-collapsible="icon"] &`]: {
-      opacity: 1,
-      transitionDelay: vars.duration.fast,
+      display: 'block',
+      position: 'absolute',
+      top: 0,
+      insetInlineEnd: 0,
+      width: '6px',
+      height: '6px',
+      borderRadius: vars.radius.full,
+      background: vars.color.accent.solid,
     },
-    '[data-cynosure-reduced-motion] &': { transitionDuration: '0s' },
   },
 });
 
