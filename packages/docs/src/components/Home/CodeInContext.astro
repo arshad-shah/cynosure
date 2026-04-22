@@ -1,0 +1,61 @@
+---
+const tabs = ['npm', 'pnpm', 'bun'];
+---
+<section data-home-band>
+  <div data-home-container>
+    <div data-home-head>
+      <div>
+        <span data-kicker>Usage / 04</span>
+        <h2>Composition, not configuration.</h2>
+      </div>
+    </div>
+    <div data-code-grid>
+      <div data-code-side>
+        <div data-code-tabs>
+          {tabs.map((t, i) => (
+            <button type="button" data-code-tab={t} data-active={i === 0 ? '' : undefined}>{t}</button>
+          ))}
+        </div>
+        <pre><code id="home-install-cmd">npm install @cynosure/react</code>
+
+<span style="color:var(--docs-dim);font-style:italic">{'// compose'}</span>
+{'import { Stack, Button, Input } from \'@cynosure/react\';'}
+
+{'export function SignIn() {'}
+{'  return ('}
+{'    <Stack gap="4">'}
+{'      <Input label="Email" />'}
+{'      <Input label="Password" type="password" />'}
+{'      <Button variant="primary">Sign in</Button>'}
+{'    </Stack>'}
+{'  );'}
+{'}'}</pre>
+      </div>
+      <div data-demo-side>
+        <div style="width:100%;max-width:320px;display:flex;flex-direction:column;gap:12px">
+          <label style="font-size:11px;color:var(--docs-muted)">Email
+            <input type="email" placeholder="name@domain.com" style="display:block;width:100%;margin-top:4px;padding:10px 12px;background:var(--docs-surface-2);border:1px solid var(--docs-line);border-radius:6px;color:var(--color-fg, canvastext);font:inherit;font-size:13px" />
+          </label>
+          <label style="font-size:11px;color:var(--docs-muted)">Password
+            <input type="password" placeholder="••••••••" style="display:block;width:100%;margin-top:4px;padding:10px 12px;background:var(--docs-surface-2);border:1px solid var(--docs-line);border-radius:6px;color:var(--color-fg, canvastext);font:inherit;font-size:13px" />
+          </label>
+          <button type="button" style="padding:11px;border-radius:8px;background:var(--color-fg, canvastext);color:var(--color-bg, canvas);border:none;font:inherit;font-size:13px;font-weight:500">Sign in</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  const cmds = { npm: 'npm install @cynosure/react', pnpm: 'pnpm add @cynosure/react', bun: 'bun add @cynosure/react' };
+  document.querySelectorAll<HTMLButtonElement>('[data-code-tab]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const name = btn.dataset.codeTab as keyof typeof cmds;
+      const el = document.getElementById('home-install-cmd');
+      if (el) el.textContent = cmds[name];
+      btn.parentElement?.querySelectorAll<HTMLButtonElement>('[data-code-tab]')
+        .forEach((b) => b.removeAttribute('data-active'));
+      btn.setAttribute('data-active', '');
+    });
+  });
+</script>
