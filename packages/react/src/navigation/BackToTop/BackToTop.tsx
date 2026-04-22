@@ -1,11 +1,5 @@
-import {
-  type ButtonHTMLAttributes,
-  type ReactElement,
-  type ReactNode,
-  forwardRef,
-  useEffect,
-  useState,
-} from 'react';
+import { ChevronUp } from 'lucide-react';
+import { type ButtonHTMLAttributes, type ReactNode, forwardRef, useEffect, useState } from 'react';
 import { IconButton } from '../../forms/IconButton/IconButton.js';
 import { useThrottledCallback } from '../../hooks/useThrottledCallback.js';
 import { Portal } from '../../primitives/Portal.js';
@@ -29,19 +23,6 @@ export interface BackToTopProps extends Omit<ButtonHTMLAttributes<HTMLButtonElem
   icon?: ReactNode;
   label?: string;
 }
-
-const UpIcon = (): ReactElement => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-    <path
-      d="m18 15-6-6-6 6"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-);
-
 /**
  * Portal'd floating button that reveals after scrolling past `showAfter`.
  * Scrolls the document back to the top when clicked, respecting
@@ -92,7 +73,7 @@ export const BackToTop = forwardRef<HTMLButtonElement, BackToTopProps>(function 
       variant="bare"
       type={type}
       label={label}
-      icon={icon ?? <UpIcon />}
+      icon={icon ?? <ChevronUp size={18} />}
       data-visible={visible ? 'true' : 'false'}
       className={cn(backToTopButton, backToTopPosition[position], className)}
       onClick={onClick}

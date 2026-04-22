@@ -1,24 +1,13 @@
+import { Link } from 'lucide-react';
 import {
   type CSSProperties,
   type HTMLAttributes,
-  type ReactElement,
   type ReactNode,
   forwardRef,
   useCallback,
 } from 'react';
 import { cn } from '../../utils/cn.js';
 import { anchorHeading, anchorLink, anchorWrapper } from './Anchor.css.js';
-
-const LinkIcon = (): ReactElement => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-    <path
-      d="M9 15a4 4 0 0 0 5.66 0l3-3a4 4 0 0 0-5.66-5.66l-1 1M15 9a4 4 0 0 0-5.66 0l-3 3a4 4 0 0 0 5.66 5.66l1-1"
-      stroke="currentColor"
-      strokeWidth="1.75"
-      strokeLinecap="round"
-    />
-  </svg>
-);
 
 export interface AnchorProps extends Omit<HTMLAttributes<HTMLElement>, 'id'> {
   id: string;
@@ -104,7 +93,7 @@ export const Anchor = forwardRef<HTMLElement, AnchorProps>(function Anchor(
         data-anchor-link=""
         className={anchorLink}
       >
-        <LinkIcon />
+        <Link size={16} />
       </a>
     </Tag>
   );

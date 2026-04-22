@@ -1,3 +1,4 @@
+import { X } from 'lucide-react';
 import {
   type CSSProperties,
   type KeyboardEvent,
@@ -19,12 +20,6 @@ import {
 } from '../MultiSelect/MultiSelect.css.js';
 import { controlSize, controlWrapperBase, controlWrapperVariant } from '../shared/control.css.js';
 import type { FormControlSize, FormControlVariant } from '../shared/types.js';
-
-const XIcon = (): React.ReactElement => (
-  <svg width="10" height="10" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-    <path stroke="currentColor" strokeWidth="3" strokeLinecap="round" d="M18 6 6 18M6 6l12 12" />
-  </svg>
-);
 
 export interface TagsInputProps {
   value?: readonly string[];
@@ -171,7 +166,7 @@ export const TagsInput = forwardRef<HTMLInputElement, TagsInputProps>(
                       remove();
                     }}
                   >
-                    <XIcon />
+                    <X />
                   </button>
                 ) : null}
               </span>

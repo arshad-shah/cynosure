@@ -1,3 +1,4 @@
+import { Check, X } from 'lucide-react';
 import {
   Children,
   type HTMLAttributes,
@@ -129,24 +130,6 @@ export interface StepProps extends Omit<HTMLAttributes<HTMLLIElement>, 'title'> 
   index?: number;
 }
 
-const CheckIcon = (): ReactElement => (
-  <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-    <path
-      d="M3 8l3 3 7-7"
-      stroke="currentColor"
-      strokeWidth="2.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-);
-
-const ErrorIcon = (): ReactElement => (
-  <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-    <path d="M3 3l10 10M13 3L3 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-  </svg>
-);
-
 export const Step = forwardRef<HTMLLIElement, StepProps>(function Step(
   { title, description, status: statusProp, icon, index = 0, className, ...rest },
   ref,
@@ -162,9 +145,9 @@ export const Step = forwardRef<HTMLLIElement, StepProps>(function Step(
     icon !== undefined ? (
       icon
     ) : ctx.variant === 'dots' || ctx.variant === 'lines' ? null : derivedStatus === 'complete' ? (
-      <CheckIcon />
+      <Check />
     ) : derivedStatus === 'error' ? (
-      <ErrorIcon />
+      <X />
     ) : (
       index + 1
     );

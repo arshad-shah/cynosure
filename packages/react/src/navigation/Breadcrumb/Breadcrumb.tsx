@@ -1,3 +1,4 @@
+import { ChevronRight, EllipsisIcon } from 'lucide-react';
 import {
   type AnchorHTMLAttributes,
   type ButtonHTMLAttributes,
@@ -21,26 +22,6 @@ import {
   breadcrumbRoot,
   breadcrumbSeparator,
 } from './Breadcrumb.css.js';
-
-const ChevronRightIcon = (): ReactElement => (
-  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-    <path
-      d="m9 6 6 6-6 6"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-);
-
-const EllipsisIcon = (): ReactElement => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-    <circle cx="5" cy="12" r="1.5" fill="currentColor" />
-    <circle cx="12" cy="12" r="1.5" fill="currentColor" />
-    <circle cx="19" cy="12" r="1.5" fill="currentColor" />
-  </svg>
-);
 
 export interface BreadcrumbProps extends HTMLAttributes<HTMLElement> {
   /** Separator element rendered between items. Defaults to a chevron. */
@@ -81,7 +62,7 @@ export const Breadcrumb = forwardRef<HTMLElement, BreadcrumbProps>(function Brea
   // Normalise — only keep BreadcrumbItem elements; consumers might intersperse
   // their own separators but the typical use case lets us drive them.
   const items = Children.toArray(children).filter(isValidElement) as ReactElement[];
-  const sep = separator ?? <ChevronRightIcon />;
+  const sep = separator ?? <ChevronRight size={12} />;
 
   let visibleItems = items;
   let collapsedItems: ReactElement[] = [];
@@ -186,7 +167,7 @@ export const BreadcrumbSeparator = forwardRef<HTMLLIElement, BreadcrumbSeparator
         className={cn(breadcrumbSeparator, className)}
         {...rest}
       >
-        {children ?? <ChevronRightIcon />}
+        {children ?? <ChevronRight size={12} />}
       </li>
     );
   },
