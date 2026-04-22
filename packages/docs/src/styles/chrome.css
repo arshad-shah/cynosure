@@ -1,0 +1,67 @@
+/* ── TOPBAR ───────────────────────── */
+[data-topbar] { position: sticky; top:0; z-index: 50; height: 56px; display:flex; align-items:center; gap: 20px; padding: 0 24px; background: rgba(11,13,16,0.85); backdrop-filter: blur(12px); border-bottom: 1px solid var(--docs-line); }
+[data-brand-lockup] { display:flex; align-items:center; gap:10px; font-weight:600; letter-spacing:-0.015em; }
+[data-brand-lockup] [data-brand-mark] { width:20px; height:20px; border-radius: 4px; background: linear-gradient(135deg, var(--color-accent-solid), #c084fc); position: relative; }
+[data-brand-lockup] [data-brand-mark]::after { content:''; position:absolute; inset:3px; border-radius: 2px; background: var(--color-bg, canvas); }
+[data-brand-lockup] [data-brand-name] { font-size: 15px; }
+[data-version-pill] { font-size: 11px; padding: 2px 8px; border:1px solid var(--docs-line); border-radius: 999px; color: var(--docs-muted); font-family: var(--docs-type-mono); }
+[data-cmdk] { flex:1; max-width: 440px; display:flex; align-items:center; gap:10px; height: 34px; padding: 0 12px; border: 1px solid var(--docs-line); border-radius: 8px; color: var(--docs-dim); background: var(--docs-surface-1); cursor: pointer; font-size: 13px; }
+[data-cmdk]:hover { border-color: color-mix(in srgb, var(--color-accent-solid) 40%, var(--docs-line)); }
+[data-cmdk] svg { width:14px; height:14px; stroke: currentColor; stroke-width:2; fill:none; }
+[data-cmdk] [data-cmdk-kbd] { margin-left: auto; display:flex; gap:3px; }
+[data-cmdk] [data-cmdk-kbd] kbd { font-family: var(--docs-type-mono); font-size: 10.5px; padding: 1px 6px; background: var(--docs-surface-2); border: 1px solid var(--docs-line); border-radius: 4px; color: var(--docs-muted); }
+[data-topbar-spacer] { flex:1; }
+[data-topbar-right] { display:flex; align-items:center; gap: 14px; }
+[data-icon-btn] { width:32px; height:32px; display:inline-flex; align-items:center; justify-content:center; border-radius: 6px; color: var(--docs-muted); }
+[data-icon-btn]:hover { background: var(--docs-surface-1); color: var(--color-fg, canvastext); }
+[data-theme-seg] { display:inline-flex; border:1px solid var(--docs-line); border-radius:8px; overflow:hidden; background: var(--docs-surface-1); }
+[data-theme-seg] button { width:28px; height:28px; background: transparent; border:none; color: var(--docs-muted); cursor: pointer; display:inline-flex; align-items:center; justify-content:center; }
+[data-theme-seg] button[data-active] { background: var(--docs-surface-2); color: var(--color-fg, canvastext); }
+
+/* ── 3-COL DOC LAYOUT ──────────────────────────── */
+[data-doc-layout] { display: grid; grid-template-columns: 260px minmax(0,1fr) 240px; max-width: 1400px; margin: 0 auto; }
+[data-doc-layout] [data-sidebar] { border-right: 1px solid var(--docs-line); height: calc(100vh - 56px); position: sticky; top: 56px; overflow-y: auto; padding: 28px 0 28px 24px; }
+[data-sidebar] [data-sidebar-section] { margin-bottom: 24px; }
+[data-sidebar] [data-sidebar-section] > summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 8px; padding: 6px 10px 6px 0; font-family: var(--docs-type-mono); font-size: 11px; letter-spacing: 0.12em; color: var(--docs-muted); text-transform: uppercase; user-select: none; }
+[data-sidebar] [data-sidebar-section] > summary::-webkit-details-marker { display: none; }
+[data-sidebar] [data-sidebar-count] { margin-left: auto; font-weight: 500; color: var(--docs-dim); padding-right: 16px; }
+[data-sidebar] [data-sidebar-section] > summary svg { transition: transform .15s ease; }
+[data-sidebar] [data-sidebar-section][open] > summary svg { transform: rotate(90deg); }
+[data-sidebar] [data-sidebar-section] ul { list-style: none; padding: 6px 0 0; margin: 0; display: flex; flex-direction: column; }
+[data-sidebar] [data-sidebar-section] ul a { position: relative; display: block; padding: 6px 12px; font-size: 13.5px; color: var(--docs-muted); border-radius: 0; }
+[data-sidebar] [data-sidebar-section] ul a:hover { color: var(--color-fg, canvastext); background: var(--docs-surface-1); }
+[data-sidebar] [data-sidebar-section] ul [data-current] a { color: var(--color-fg, canvastext); background: var(--docs-surface-1); }
+[data-sidebar] [data-sidebar-section] ul [data-current] a::before { content:''; position: absolute; left: -1px; top: 4px; bottom: 4px; width: 2px; background: var(--color-accent-solid); border-radius: 2px; }
+
+[data-doc-layout] [data-toc] { padding: 80px 24px 28px 32px; height: calc(100vh - 56px); position: sticky; top: 56px; overflow-y: auto; }
+[data-toc-title] { font-family: var(--docs-type-mono); font-size: 11px; letter-spacing: 0.14em; color: var(--docs-muted); text-transform: uppercase; margin-bottom: 14px; }
+[data-toc] ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 2px; border-left: 1px solid var(--docs-line); }
+[data-toc] a { position: relative; display: block; padding: 6px 14px; font-size: 13px; color: var(--docs-muted); margin-left: -1px; border-left: 2px solid transparent; }
+[data-toc] a[data-active] { color: var(--color-accent-solid); border-left-color: var(--color-accent-solid); }
+[data-toc] [data-depth="3"] a { padding-left: 28px; font-size: 12.5px; }
+[data-toc] a:hover { color: var(--color-fg, canvastext); }
+
+/* ── FOOTER ───────────────────────── */
+[data-site-footer] { padding: 56px 0 40px; }
+[data-site-footer-cols] { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 48px; margin-bottom: 40px; }
+[data-site-footer-cols] h4 { font-family: var(--docs-type-mono); font-size: 11px; letter-spacing: 0.14em; color: var(--docs-muted); text-transform: uppercase; margin: 0 0 14px; }
+[data-site-footer-cols] ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
+[data-site-footer-cols] a { color: var(--color-fg, canvastext); font-size: 13.5px; }
+[data-site-footer-cols] a:hover { color: var(--color-accent-solid); }
+[data-site-footer-bottom] { padding-top: 24px; border-top: 1px solid var(--docs-line); display:flex; justify-content: space-between; font-family: var(--docs-type-mono); font-size: 11px; color: var(--docs-dim); letter-spacing: 0.06em; }
+
+/* Command-menu dialog (opened by [data-cmdk]) */
+[data-cmdk-dialog] {
+  border: 1px solid var(--docs-line);
+  border-radius: 12px;
+  padding: 0;
+  background: var(--docs-surface-1);
+  color: var(--color-fg, canvastext);
+  max-width: 640px;
+  width: 90vw;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.5);
+}
+[data-cmdk-dialog]::backdrop {
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+}
