@@ -1,0 +1,7 @@
+---
+interface Props { columns?: number }
+const { columns = 3 } = Astro.props;
+---
+<div data-variant-grid style={`grid-template-columns: repeat(${columns}, 1fr)`}>
+  <slot />
+</div>
