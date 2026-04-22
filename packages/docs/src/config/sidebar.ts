@@ -33,11 +33,11 @@ export const sidebar: SidebarSection[] = [
     ],
   },
   {
-    title: 'Components — Primitives',
+    title: 'Primitives',
     links: [{ title: 'Button', href: '/components/button', status: 'stable' }],
   },
   {
-    title: 'Components — Forms',
+    title: 'Forms',
     links: [
       { title: 'Input', href: '/components/input', status: 'stable' },
       { title: 'Textarea', href: '/components/textarea', status: 'stable' },
@@ -49,14 +49,14 @@ export const sidebar: SidebarSection[] = [
     ],
   },
   {
-    title: 'Components — Feedback',
+    title: 'Feedback',
     links: [
       { title: 'Badge', href: '/components/badge', status: 'stable' },
       { title: 'Alert', href: '/components/alert', status: 'stable' },
     ],
   },
   {
-    title: 'Components — Overlays',
+    title: 'Overlays',
     links: [
       { title: 'Dialog', href: '/components/dialog', status: 'stable' },
       { title: 'Tooltip', href: '/components/tooltip', status: 'stable' },
@@ -64,11 +64,11 @@ export const sidebar: SidebarSection[] = [
     ],
   },
   {
-    title: 'Components — Navigation',
+    title: 'Navigation',
     links: [{ title: 'Tabs', href: '/components/tabs', status: 'stable' }],
   },
   {
-    title: 'Components — Data display',
+    title: 'Data display',
     links: [
       { title: 'Card', href: '/components/card', status: 'stable' },
       { title: 'Accordion', href: '/components/accordion', status: 'stable' },

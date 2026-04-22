@@ -10,14 +10,14 @@ category: foundations
 Dark mode in Cynosure is a semantic-token override, not a component prop. You
 opt in once at the root and every component follows.
 
-## 1. Import the dark stylesheet
+## Import the dark stylesheet
 
 ```ts
 import '@arshad-shah/cynosure-tokens/css';          // base + light
 import '@arshad-shah/cynosure-tokens/css/dark';     // dark overrides
 ```
 
-## 2. Allow dark in `<ThemeProvider>`
+## Allow dark in `<ThemeProvider>`
 
 ```tsx
 <ThemeProvider themes={['light', 'dark']} defaultTheme="system">
@@ -29,7 +29,7 @@ import '@arshad-shah/cynosure-tokens/css/dark';     // dark overrides
 `prefers-color-scheme: dark`. Users can override with `setTheme('dark')`
 and Cynosure persists the choice.
 
-## 3. Flash-free on first paint
+## Flash-free on first paint
 
 Render the init script in the document `<head>` so the theme is applied
 before React hydrates — this avoids a light-then-dark flash on reload.

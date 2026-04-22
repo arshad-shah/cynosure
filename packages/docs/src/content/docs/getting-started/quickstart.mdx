@@ -9,13 +9,13 @@ category: getting-started
 
 A minimal end-to-end Cynosure app.
 
-## 1. Install
+## Install
 
 ```bash
 pnpm add @arshad-shah/cynosure-react @arshad-shah/cynosure-tokens
 ```
 
-## 2. Wire the providers
+## Wire the providers
 
 `ThemeProvider` owns the theme state and toggles `data-theme` on `<html>`.
 `TooltipProvider` deduplicates Radix tooltips. `DirectionProvider` lets you
@@ -48,7 +48,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 );
 ```
 
-## 3. Your first button
+## Your first button
 
 The simplest Cynosure component is `Button`:
 
@@ -65,7 +65,7 @@ export default function App() {
 }
 ```
 
-## 4. A full first screen
+## A full first screen
 
 ```tsx
 // src/App.tsx
@@ -104,7 +104,7 @@ export default function App() {
 }
 ```
 
-## 5. Switch themes
+## Switch themes
 
 ```tsx
 import { useTheme } from '@arshad-shah/cynosure-react';
@@ -121,7 +121,7 @@ function ThemeSwitcher() {
 }
 ```
 
-## 6. Ship a form
+## Ship a form
 
 ```tsx
 import {

@@ -33,6 +33,35 @@
 [data-sidebar] [data-sidebar-section] ul a:hover { color: var(--color-fg, canvastext); background: var(--docs-surface-1); }
 [data-sidebar] [data-sidebar-section] ul [data-current] a { color: var(--color-fg, canvastext); background: var(--docs-surface-1); }
 [data-sidebar] [data-sidebar-section] ul [data-current] a::before { content:''; position: absolute; left: -1px; top: 4px; bottom: 4px; width: 2px; background: var(--color-accent-solid); border-radius: 2px; }
+[data-sidebar] [data-sidebar-section] ul li { display: flex; align-items: center; }
+[data-sidebar] [data-sidebar-section] ul li a { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+[data-sidebar-status] {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-right: 12px;
+  padding: 2px 7px 2px 6px;
+  border-radius: 999px;
+  border: 1px solid var(--docs-line);
+  font-family: var(--docs-type-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--docs-muted);
+  line-height: 1.2;
+}
+[data-sidebar-status]::before {
+  content: '';
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+}
+[data-sidebar-status][data-status="stable"] { color: var(--docs-ok); border-color: color-mix(in srgb, var(--docs-ok) 32%, var(--docs-line)); }
+[data-sidebar-status][data-status="beta"] { color: var(--docs-warn); border-color: color-mix(in srgb, var(--docs-warn) 32%, var(--docs-line)); }
+[data-sidebar-status][data-status="alpha"],
+[data-sidebar-status][data-status="experimental"] { color: var(--docs-warn); border-color: color-mix(in srgb, var(--docs-warn) 32%, var(--docs-line)); }
+[data-sidebar-status][data-status="deprecated"] { color: var(--docs-danger); border-color: color-mix(in srgb, var(--docs-danger) 32%, var(--docs-line)); }
 
 [data-doc-layout] [data-toc] { padding: 80px 24px 28px 32px; height: calc(100vh - 56px); position: sticky; top: 56px; overflow-y: auto; }
 [data-toc-title] { font-family: var(--docs-type-mono); font-size: 11px; letter-spacing: 0.14em; color: var(--docs-muted); text-transform: uppercase; margin-bottom: 14px; }

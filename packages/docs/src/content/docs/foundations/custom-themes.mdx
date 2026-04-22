@@ -10,7 +10,7 @@ category: foundations
 A Cynosure theme is a CSS file that overrides the semantic tokens for a
 `data-theme` selector. That's the whole API.
 
-## 1. Define the overrides
+## Define the overrides
 
 Create `src/themes/brand.css`:
 
@@ -41,7 +41,7 @@ Create `src/themes/brand.css`:
 
 Only override what you need. Unset tokens inherit from `base.css`.
 
-## 2. Ship it as a side-effect import
+## Ship it as a side-effect import
 
 If you're authoring a theme package:
 
@@ -61,7 +61,7 @@ Consumers import it once:
 import 'my-brand-theme/cynosure';
 ```
 
-## 3. Enable the theme
+## Enable the theme
 
 Add the theme name to your `ThemeProvider`:
 
