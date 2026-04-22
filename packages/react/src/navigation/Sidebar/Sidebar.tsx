@@ -1,3 +1,4 @@
+import { HamburgerIcon, ListCollapseIcon } from 'lucide-react';
 import {
   type ButtonHTMLAttributes,
   type HTMLAttributes,
@@ -25,24 +26,6 @@ import {
   sidebarVariant,
 } from './Sidebar.css.js';
 import { SidebarContext, type SidebarContextValue, useSidebar } from './context.js';
-
-const HamburgerIcon = (): ReactElement => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-    <path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-  </svg>
-);
-
-const CollapseIcon = (): ReactElement => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-    <path
-      d="M15 18 9 12l6-6"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-);
 
 export interface SidebarProviderProps {
   defaultCollapsed?: boolean;
@@ -285,7 +268,7 @@ export const SidebarTrigger = forwardRef<HTMLButtonElement, SidebarTriggerProps>
         onClick={handleClick}
         {...rest}
       >
-        {icon ?? (ctx.isMobile ? <HamburgerIcon /> : <CollapseIcon />)}
+        {icon ?? (ctx.isMobile ? <HamburgerIcon /> : <ListCollapseIcon />)}
       </button>
     );
   },
