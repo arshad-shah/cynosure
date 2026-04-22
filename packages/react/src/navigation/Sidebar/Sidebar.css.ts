@@ -137,8 +137,7 @@ export const sidebarTriggerLabel = style({
   transitionTimingFunction: 'ease-out',
   selectors: {
     [`${sidebarRoot}[data-collapsed="true"][data-collapsible="icon"] &`]: {
-      opacity: 0,
-      pointerEvents: 'none',
+      display: 'none',
     },
     '[data-cynosure-reduced-motion] &': { transitionDuration: '0s' },
   },
@@ -305,30 +304,18 @@ export const sidebarItemLabel = style({
   overflow: 'hidden',
   textOverflow: 'ellipsis',
   whiteSpace: 'nowrap',
-  opacity: 1,
-  transitionProperty: 'opacity',
-  transitionDuration: vars.duration.fast,
-  transitionTimingFunction: 'ease-out',
   selectors: {
     [`${sidebarRoot}[data-collapsed="true"][data-collapsible="icon"] &`]: {
-      opacity: 0,
-      pointerEvents: 'none',
+      display: 'none',
     },
-    '[data-cynosure-reduced-motion] &': { transitionDuration: '0s' },
   },
 });
 
 export const sidebarItemBadge = style({
-  opacity: 1,
-  transitionProperty: 'opacity',
-  transitionDuration: vars.duration.fast,
-  transitionTimingFunction: 'ease-out',
   selectors: {
     [`${sidebarRoot}[data-collapsed="true"][data-collapsible="icon"] &`]: {
-      opacity: 0,
-      pointerEvents: 'none',
+      display: 'none',
     },
-    '[data-cynosure-reduced-motion] &': { transitionDuration: '0s' },
   },
 });
 
