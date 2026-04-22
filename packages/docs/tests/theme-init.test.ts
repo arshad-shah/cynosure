@@ -8,7 +8,7 @@ describe('theme-init', () => {
     expect(s.trim().endsWith('})();')).toBe(true);
     expect(s).toContain(THEME_STORAGE_KEY);
   });
-  it('enumerates light and dark themes', () => {
-    expect(THEMES).toEqual(['light', 'dark']);
+  it('enumerates light, dark and system themes', () => {
+    expect(THEMES).toEqual(['light', 'dark', 'system']);
   });
 });
