@@ -1,0 +1,37 @@
+/* packages/docs/src/styles/tokens-surfaces.css
+ * Semantic surface/line/text tokens layered on top of @cynosure/tokens.
+ * Dark is the default; light overrides apply when [data-theme="light"]
+ * is set on <html>.
+ */
+:root {
+  --docs-surface-1: #12151a;
+  --docs-surface-2: #181c22;
+  --docs-surface-3: #1f242c;
+  --docs-line: rgba(255, 255, 255, 0.08);
+  --docs-line-strong: rgba(255, 255, 255, 0.14);
+  --docs-grid-line: rgba(255, 255, 255, 0.045);
+  --docs-grid-strong: rgba(255, 255, 255, 0.09);
+  --docs-muted: #8b95a5;
+  --docs-dim: #5a6472;
+  --docs-ok: #86efac;
+  --docs-warn: #fbbf24;
+  --docs-danger: #fca5a5;
+  --docs-type-mono: 'JetBrains Mono Variable', ui-monospace, Menlo, monospace;
+  --docs-kicker-size: 11px;
+  --docs-kicker-tracking: 0.14em;
+}
+
+[data-theme='light'] {
+  --docs-surface-1: #f7f7f5;
+  --docs-surface-2: #efefec;
+  --docs-surface-3: #e6e6e2;
+  --docs-line: rgba(0, 0, 0, 0.09);
+  --docs-line-strong: rgba(0, 0, 0, 0.15);
+  --docs-grid-line: rgba(0, 0, 0, 0.05);
+  --docs-grid-strong: rgba(0, 0, 0, 0.1);
+  --docs-muted: #626a77;
+  --docs-dim: #909aa7;
+  --docs-ok: #15803d;
+  --docs-warn: #b45309;
+  --docs-danger: #b91c1c;
+}

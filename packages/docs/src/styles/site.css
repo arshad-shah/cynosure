@@ -1,6 +1,7 @@
 @import "../../../../packages/tokens/dist/css/base.css";
 @import "../../../../packages/react/dist/styles.css";
 @import "./fonts.css";
+@import './tokens-surfaces.css';
 
 :root {
   font-family: "Geist Variable", ui-sans-serif, system-ui, sans-serif;
