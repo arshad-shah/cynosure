@@ -4,6 +4,7 @@ import Sidebar from '../components/Sidebar/Sidebar.astro';
 import Toc from '../components/Toc/Toc.astro';
 import Breadcrumb from '../components/Doc/Breadcrumb.astro';
 import StatusRow from '../components/Doc/StatusRow.astro';
+import Pager from '../components/Doc/Pager.astro';
 import type { MarkdownHeading } from 'astro';
 
 interface Frontmatter {
@@ -16,14 +17,17 @@ interface Frontmatter {
   bundleSize?: string;
 }
 
+interface PagerLink { title: string; href: string }
 interface Props {
   title: string;
   description: string;
   headings: MarkdownHeading[];
   frontmatter?: Frontmatter;
   slug?: string;
+  prev?: PagerLink;
+  next?: PagerLink;
 }
-const { title, description, headings, frontmatter, slug } = Astro.props;
+const { title, description, headings, frontmatter, slug, prev, next } = Astro.props;
 
 function crumbsFor(slug: string | undefined, title: string): Array<{ label: string; href?: string }> {
   if (!slug) return [{ label: title }];
@@ -57,6 +61,7 @@ const hasStatus = frontmatter && (frontmatter.status || frontmatter.since || fro
           />
         )}
         <slot />
+        {(prev || next) && <Pager prev={prev} next={next} />}
       </article>
     </main>
     <Toc headings={headings} />
