@@ -1,24 +1,30 @@
 ---
-import lockupUrl from '@brand/cynosure-lockup.svg?url';
+import { site } from '../../config/site';
 import CopyButton from '../CopyButton.astro';
+import MetricStrip from './MetricStrip.astro';
+import ArrowRight from '../icons/ArrowRight.astro';
 ---
-
 <section data-home-hero>
-  <div data-hero-inner>
-    <a href="/" data-hero-brand>
-      <img src={lockupUrl} alt="Cynosure" height="52" />
-    </a>
-    <p data-hero-tagline>
-      Tiny, accessible, themeable React components — built for the modern web.
+  <span data-crosshair style="top:40px;left:40px"></span>
+  <span data-crosshair style="top:40px;right:40px"></span>
+  <span data-crosshair style="bottom:24px;left:40px"></span>
+  <span data-crosshair style="bottom:24px;right:40px"></span>
+  <div data-home-hero-inner>
+    <span data-kicker>{site.name} · v{site.version}</span>
+    <h1>The component library<br />that gets <em>out of the way</em>.</h1>
+    <p data-home-hero-sub>
+      Accessible, tree-shakeable React components. Themed with design tokens. Zero runtime dependencies.
     </p>
-    <div data-hero-cta>
-      <a href="/getting-started/introduction" data-hero-btn-primary>
-        Get started
+    <div data-home-hero-cta>
+      <a href="/getting-started/introduction" data-btn="primary">
+        Get started <ArrowRight size={14} />
       </a>
-      <div data-hero-snippet>
-        <code>npx cynosure init</code>
-        <CopyButton code="npx cynosure init" />
-      </div>
+      <a href="/components/button" data-btn="ghost">Browse components</a>
     </div>
+    <div data-install-snippet>
+      <code>npx cynosure init</code>
+      <CopyButton code="npx cynosure init" />
+    </div>
+    <MetricStrip />
   </div>
 </section>
