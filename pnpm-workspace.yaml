@@ -60,8 +60,10 @@ catalog:
   ajv: 8.18.0
   chromatic: 16.3.0
   class-variance-authority: 0.7.1
+  cmdk: 1.1.1
   "colorjs.io": 0.5.2
   cross-env: 10.1.0
+  "embla-carousel-react": 8.6.0
   glob: 11.1.0
   jsdom: 25.0.1
   lint-staged: 15.5.2
@@ -71,6 +73,7 @@ catalog:
   react: 19.2.5
   "react-aria-components": 1.17.0
   "react-dom": 19.2.5
+  recharts: 3.8.1
   "react-hook-form": 7.72.1
   "react-resizable-panels": 4.10.0
   shiki: 4.0.2

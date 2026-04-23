@@ -1,0 +1,9 @@
+{
+  "name": "@arshad-shah/cynosure-react/carousel",
+  "private": true,
+  "type": "module",
+  "main": "../dist/carousel.js",
+  "module": "../dist/carousel.js",
+  "types": "../dist/carousel.d.ts",
+  "sideEffects": ["*.css"]
+}

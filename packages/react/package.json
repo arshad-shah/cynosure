@@ -422,6 +422,22 @@
       "types": "./dist/feedback/index.d.ts",
       "import": "./dist/feedback/index.js"
     },
+    "./calendar": {
+      "types": "./dist/calendar.d.ts",
+      "import": "./dist/calendar.js"
+    },
+    "./command-palette": {
+      "types": "./dist/command-palette.d.ts",
+      "import": "./dist/command-palette.js"
+    },
+    "./carousel": {
+      "types": "./dist/carousel.d.ts",
+      "import": "./dist/carousel.js"
+    },
+    "./chart": {
+      "types": "./dist/chart.d.ts",
+      "import": "./dist/chart.js"
+    },
     "./package.json": "./package.json"
   },
   "main": "./dist/index.js",
@@ -530,6 +546,10 @@
     "toggle",
     "toggle-group",
     "feedback",
+    "calendar",
+    "command-palette",
+    "carousel",
+    "chart",
     "styles.css.d.ts",
     "all.css.d.ts",
     "README.md",
@@ -584,9 +604,12 @@
     "@vanilla-extract/css": "catalog:",
     "@vanilla-extract/recipes": "catalog:",
     "class-variance-authority": "catalog:",
+    "cmdk": "catalog:",
+    "embla-carousel-react": "catalog:",
     "lucide-react": "catalog:",
     "react-aria-components": "catalog:",
     "react-resizable-panels": "catalog:",
+    "recharts": "catalog:",
     "shiki": "catalog:",
     "sonner": "catalog:"
   },

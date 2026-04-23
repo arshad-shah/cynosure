@@ -1,0 +1,9 @@
+{
+  "name": "@arshad-shah/cynosure-react/command-palette",
+  "private": true,
+  "type": "module",
+  "main": "../dist/command-palette.js",
+  "module": "../dist/command-palette.js",
+  "types": "../dist/command-palette.d.ts",
+  "sideEffects": ["*.css"]
+}
