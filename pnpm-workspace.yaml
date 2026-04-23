@@ -12,7 +12,7 @@ catalog:
   "@changesets/cli": 2.30.0
   "@fontsource-variable/geist": 5.2.8
   "@fontsource-variable/jetbrains-mono": 5.2.8
-  "@hookform/resolvers": 3.10.0
+  "@hookform/resolvers": 5.2.2
   "@internationalized/date": 3.12.1
   "@radix-ui/react-accordion": 1.2.12
   "@radix-ui/react-alert-dialog": 1.1.15
