@@ -1,7 +1,10 @@
 name: Release
+# Auto-release on push is paused while the project is pre-announce.
+# When ready to resume: add `push: { branches: [main] }` back to `on:`.
+# Until then, the workflow is manual-trigger only and still gated by the
+# `production` environment approval before it can publish.
 on:
-  push:
-    branches: [main]
+  workflow_dispatch:
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 permissions:
