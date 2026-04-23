@@ -38,7 +38,12 @@ const preview: Preview = {
       expanded: true,
       matchers: { color: /(background|color)$/i, date: /Date$/i },
     },
-    a11y: { test: 'error' },
+    // In dev, surface a11y violations as blocking errors so CI catches
+    // regressions. In the deployed public Storybook, downgrade to 'todo'
+    // so the panel still reports findings but visitors don't see red
+    // blocking banners for minor, non-blocking issues. `import.meta.env.PROD`
+    // is Vite's canonical build-time boolean — statically replaced.
+    a11y: { test: import.meta.env.PROD ? 'todo' : 'error' },
     layout: 'padded',
     backgrounds: { disable: true },
     options: {
