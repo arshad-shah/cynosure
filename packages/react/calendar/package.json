@@ -1,0 +1,9 @@
+{
+  "name": "@arshad-shah/cynosure-react/calendar",
+  "private": true,
+  "type": "module",
+  "main": "../dist/calendar.js",
+  "module": "../dist/calendar.js",
+  "types": "../dist/calendar.d.ts",
+  "sideEffects": ["*.css"]
+}

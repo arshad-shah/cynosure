@@ -39,6 +39,25 @@ if (typeof globalThis.ResizeObserver === 'undefined') {
   globalThis.ResizeObserver = StubResizeObserver as unknown as typeof ResizeObserver;
 }
 
+// Embla Carousel uses IntersectionObserver to detect in-view slides; jsdom
+// doesn't ship one. The stub emits nothing — fine for unit tests since our
+// assertions don't rely on real visibility changes.
+if (typeof globalThis.IntersectionObserver === 'undefined') {
+  class StubIntersectionObserver {
+    readonly root = null;
+    readonly rootMargin = '';
+    readonly thresholds: ReadonlyArray<number> = [];
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+    takeRecords() {
+      return [] as IntersectionObserverEntry[];
+    }
+  }
+  globalThis.IntersectionObserver =
+    StubIntersectionObserver as unknown as typeof IntersectionObserver;
+}
+
 // Radix scroll-compat inside Tooltip/Popover occasionally touches DOMRect.
 if (typeof Element !== 'undefined' && !Element.prototype.hasPointerCapture) {
   Element.prototype.hasPointerCapture = () => false;

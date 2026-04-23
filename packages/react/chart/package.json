@@ -1,0 +1,9 @@
+{
+  "name": "@arshad-shah/cynosure-react/chart",
+  "private": true,
+  "type": "module",
+  "main": "../dist/chart.js",
+  "module": "../dist/chart.js",
+  "types": "../dist/chart.d.ts",
+  "sideEffects": ["*.css"]
+}

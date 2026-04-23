@@ -135,7 +135,7 @@ export const carouselDots = style({
   selectors: {
     [`${carouselRoot}[data-orientation="vertical"] &`]: {
       marginTop: 0,
-      marginLeft: vars.space['3'],
+      marginInlineStart: vars.space['3'],
       flexDirection: 'column',
     },
   },

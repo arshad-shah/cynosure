@@ -36,7 +36,7 @@ export const calendarMonthsGrid = style({
 export const calendarSecondMonth = style({
   '@media': {
     '(min-width: 640px)': {
-      borderLeft: `1px solid ${vars.color.border.subtle}`,
+      borderInlineStart: `1px solid ${vars.color.border.subtle}`,
     },
   },
 });

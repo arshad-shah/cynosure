@@ -556,7 +556,7 @@
     "CHANGELOG.md"
   ],
   "scripts": {
-    "build": "cross-env NODE_OPTIONS=--max-old-space-size=6144 tsup",
+    "build": "cross-env NODE_OPTIONS=--max-old-space-size=8192 tsup",
     "dev": "tsup --watch",
     "typecheck": "tsc --noEmit",
     "test": "vitest run --passWithNoTests",
