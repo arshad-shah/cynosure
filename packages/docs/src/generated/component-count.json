@@ -1,5 +1,5 @@
 {
-  "total": 98,
+  "total": 101,
   "categories": {
     "forms": {
       "label": "Forms",
@@ -40,9 +40,10 @@
     },
     "overlay": {
       "label": "Overlay",
-      "count": 10,
+      "count": 11,
       "names": [
         "AlertDialog",
+        "CommandPalette",
         "ContextMenu",
         "Dialog",
         "Drawer",
@@ -56,10 +57,12 @@
     },
     "data-display": {
       "label": "Data display",
-      "count": 15,
+      "count": 17,
       "names": [
         "Accordion",
         "Card",
+        "Carousel",
+        "Chart",
         "CircularProgress",
         "CodeBlock",
         "Collapsible",
