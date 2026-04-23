@@ -18,6 +18,10 @@ const meta: Meta<typeof FileUpload> = {
     multiple: { control: 'boolean' },
     disabled: { control: 'boolean' },
     accept: { control: 'text' },
+    variant: {
+      control: 'select',
+      options: ['default', 'card', 'compact', 'minimal'],
+    },
   },
 };
 export default meta;
@@ -28,6 +32,7 @@ export const Playground: Story = {
     multiple: true,
     disabled: false,
     accept: 'image/*,application/pdf',
+    variant: 'default',
   },
   render: (args) => (
     <div style={{ width: '420px' }}>
@@ -36,18 +41,99 @@ export const Playground: Story = {
   ),
 };
 
-export const SingleFile: Story = {
+export const VariantDefault: Story = {
+  name: 'variant="default"',
   render: () => (
-    <div style={{ width: '420px' }}>
-      <FileUpload />
+    <div style={{ width: '460px' }}>
+      <FileUpload multiple accept="image/*,application/pdf" />
     </div>
   ),
 };
 
-export const Multiple: Story = {
+export const VariantCard: Story = {
+  name: 'variant="card"',
+  render: () => (
+    <div style={{ width: '460px' }}>
+      <FileUpload multiple variant="card" accept="image/*,application/pdf" />
+    </div>
+  ),
+};
+
+export const VariantCompact: Story = {
+  name: 'variant="compact"',
+  render: () => (
+    <div style={{ width: '460px' }}>
+      <FileUpload multiple variant="compact" accept="image/*,application/pdf" />
+    </div>
+  ),
+};
+
+export const VariantMinimal: Story = {
+  name: 'variant="minimal"',
+  render: () => (
+    <div style={{ width: '460px' }}>
+      <FileUpload multiple variant="minimal" />
+    </div>
+  ),
+};
+
+export const AllVariants: Story = {
+  name: 'All variants side-by-side',
+  render: () => (
+    <Stack gap="5" width="520px">
+      <Stack gap="2">
+        <Text size="xs" color="fg.muted" weight="medium">
+          default
+        </Text>
+        <FileUpload multiple accept="image/*,application/pdf" />
+      </Stack>
+      <Stack gap="2">
+        <Text size="xs" color="fg.muted" weight="medium">
+          card
+        </Text>
+        <FileUpload multiple variant="card" accept="image/*,application/pdf" />
+      </Stack>
+      <Stack gap="2">
+        <Text size="xs" color="fg.muted" weight="medium">
+          compact
+        </Text>
+        <FileUpload multiple variant="compact" accept="image/*,application/pdf" />
+      </Stack>
+      <Stack gap="2">
+        <Text size="xs" color="fg.muted" weight="medium">
+          minimal
+        </Text>
+        <FileUpload multiple variant="minimal" />
+      </Stack>
+    </Stack>
+  ),
+};
+
+export const WithPreview: Story = {
+  name: 'onPreview handler',
+  render: () => {
+    function Demo(): React.ReactElement {
+      const [last, setLast] = useState<string | null>(null);
+      return (
+        <Stack gap="3" width="460px">
+          <FileUpload multiple>
+            <FileUploadTrigger />
+            <FileUploadList onPreview={(file) => setLast(file.name)} />
+          </FileUpload>
+          <Text size="sm" color="fg.muted">
+            {last ? `Preview requested: ${last}` : 'Click the eye icon on a file to preview.'}
+          </Text>
+        </Stack>
+      );
+    }
+    return <Demo />;
+  },
+};
+
+export const SingleFile: Story = {
   render: () => (
     <div style={{ width: '420px' }}>
-      <FileUpload multiple />
+      <FileUpload />
     </div>
   ),
 };

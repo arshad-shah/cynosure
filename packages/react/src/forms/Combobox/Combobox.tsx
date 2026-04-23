@@ -1,3 +1,4 @@
+import { ChevronDownIcon } from 'lucide-react';
 import { type CSSProperties, type ReactNode, forwardRef } from 'react';
 import {
   Button as AriaButton,
@@ -13,19 +14,6 @@ import { cn } from '../../utils/cn.js';
 import { controlSize, controlWrapperBase, controlWrapperVariant } from '../shared/control.css.js';
 import { listbox, listboxEmpty, listboxItem, popover } from '../shared/popover.css.js';
 import type { FormControlSize, FormControlVariant } from '../shared/types.js';
-
-const ChevronDown = (): React.ReactElement => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-    <path
-      d="m6 9 6 6 6-6"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-);
-
 export interface ComboboxItemData<T extends string = string> {
   value: T;
   label: ReactNode;
@@ -181,7 +169,7 @@ export const Combobox = forwardRef<HTMLInputElement, ComboboxProps<string>>(
             }}
             aria-label="Open options"
           >
-            <ChevronDown />
+            <ChevronDownIcon />
           </AriaButton>
         </div>
         <AriaPopover className={popover} style={{ width: 'var(--trigger-width)' }}>

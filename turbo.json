@@ -45,6 +45,18 @@
       "outputs": ["src/generated/**", "dist/css/**"],
       "inputs": ["tokens/**", "scripts/**", "style-dictionary.config.mjs"]
     },
-    "clean": { "cache": false }
+    "clean": { "cache": false },
+    "@arshad-shah/cynosure-docs#build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**", "src/generated/**"],
+      "inputs": [
+        "src/**",
+        "scripts/**",
+        "public/**",
+        "astro.config.mjs",
+        "tsconfig.json",
+        "package.json"
+      ]
+    }
   }
 }

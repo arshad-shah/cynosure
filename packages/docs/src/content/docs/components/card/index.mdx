@@ -1,0 +1,67 @@
+---
+title: Card
+description: Flexible surface container for grouping related content with optional header, body, footer, and media slots.
+order: 11
+category: components
+status: stable
+since: "0.1.0"
+a11y: Rendered as a <div> by default; interactive mode adds tabIndex=0 for keyboard focus. Use asChild with an <a> or <button> for native semantics when the whole card is actionable.
+bundleSize: "4 kB"
+tags: [layout, container, surface]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+import StatusBadge from '@/components/StatusBadge.astro';
+import BundleSizePill from '@/components/BundleSizePill.astro';
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="Card" /></div>
+
+<LivePreview example="card/basic" />
+
+## Usage
+
+```tsx
+import { Card, CardBody, CardTitle, CardDescription } from '@arshad-shah/cynosure-react';
+
+<Card>
+  <CardBody>
+    <CardTitle>Title</CardTitle>
+    <CardDescription>Description text</CardDescription>
+  </CardBody>
+</Card>
+```
+
+## With header and footer
+
+Use `CardHeader`, `CardBody`, and `CardFooter` for structured three-zone layouts.
+
+<LivePreview example="card/with-header" />
+
+## Interactive
+
+Pass `interactive` to add hover/focus styles and `tabIndex=0`. Use `asChild` to render the card as a native `<a>` or `<button>` for full semantics.
+
+<LivePreview example="card/interactive" />
+
+## Media
+
+Use `CardMedia` to wrap arbitrary media (images, video, or coloured placeholders) with consistent aspect-ratio sizing.
+
+<LivePreview example="card/media" />
+
+## API
+
+<PropsTable component="Card" />
+
+## Accessibility
+
+- Rendered as a `<div>` by default — purely presentational.
+- `interactive` adds `tabIndex=0` and focus ring styles for keyboard navigation, but the element still has no implicit role. For actionable cards, prefer `asChild` with an `<a>` (link cards) or wrap contents in a `<button>`.
+- Heading hierarchy inside `CardTitle` defaults to `<h3>` — override with the `as` prop to match the page's document outline.
+
+## Recipes
+
+- Use `variant="elevated"` for cards that float above the page surface.
+- Use `orientation="horizontal"` with `CardImage horizontal` for side-by-side image+content layouts.
+- Compose with `Badge` in the header for status indicators.
+- Nest `Alert` inside `CardBody` to show inline validation feedback within a card form.

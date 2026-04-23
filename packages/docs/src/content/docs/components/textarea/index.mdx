@@ -1,0 +1,58 @@
+---
+title: Textarea
+description: Multi-line text field with optional auto-resize, character counter, and clear button.
+order: 3
+category: components
+status: stable
+since: 0.1.0
+a11y: Renders a native <textarea>; aria-invalid on invalid state; counter announces limit via aria-describedby.
+bundleSize: "8 kB"
+tags: [form, input]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+import StatusBadge from '@/components/StatusBadge.astro';
+import BundleSizePill from '@/components/BundleSizePill.astro';
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="Textarea" /></div>
+
+<LivePreview example="textarea/basic" />
+
+## Usage
+
+```tsx
+import { Textarea } from '@arshad-shah/cynosure-react';
+
+<Textarea placeholder="Write something…" />
+```
+
+## Auto-resize
+
+Set `autoResize` to grow the field as the user types. Optionally cap growth with `maxRows`.
+
+<LivePreview example="textarea/autosize" />
+
+## With character counter
+
+Set `limit` to show a character counter and flip `aria-invalid` when the limit is exceeded.
+
+<LivePreview example="textarea/with-counter" />
+
+## Invalid state
+
+<LivePreview example="textarea/invalid" />
+
+## API
+
+<PropsTable component="Textarea" />
+
+## Accessibility
+
+- Renders a native `<textarea>` — inherits all built-in ARIA semantics.
+- `invalid` sets `aria-invalid="true"` on the underlying textarea.
+- The character counter is linked via `aria-describedby` so screen readers announce the remaining count.
+
+## Recipes
+
+- Use `clearable` for search-like textareas where emptying with one click is helpful.
+- Use `toolbar` to embed action buttons (e.g. formatting controls) in the footer row.

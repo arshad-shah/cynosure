@@ -1,0 +1,42 @@
+---
+title: Introduction
+description: What is Cynosure — a headless-at-the-core, themed-on-top React component library for production work.
+order: 1
+category: getting-started
+---
+
+# Cynosure UI
+
+Cynosure is a headless-at-the-core, themed-on-top React component library for
+production work.
+
+The whole library is built on three ideas:
+
+1. **Layout primitives own the DOM.** `Box`, `Stack`, `Inline`, `Flex`,
+   `Grid`, `Center` (plus `Spacer`, `Divider`, `AspectRatio`, `Container`,
+   `Section`) are the only components that render raw HTML. Everything else
+   composes those.
+2. **Themes are data.** Visual decisions live in W3C DTCG JSON tokens. CSS
+   custom properties are generated from those tokens, and consumers theme by
+   flipping `data-theme` on `<html>`.
+3. **Behaviour comes from Radix + React Aria.** Cynosure re-skins battle-tested
+   primitives rather than re-deriving focus traps, typeaheads, or calendars.
+
+## Why Cynosure
+
+- **Tiny by default.** Per-component ESM entries (`@arshad-shah/cynosure-react/button`) + per-component CSS. You pay for what you import.
+- **Accessibility at the floor.** WCAG 2.2 AA, keyboard complete, RTL-safe, reduced-motion honoured. Every component ships with an axe-passing story.
+- **No CSS to write.** Consumers compose via props and tokens. If you need an escape hatch, the `asChild` prop lets you project any element.
+- **Forms that compose.** `Form` + `FormField` + `FormControl` auto-wire `id`, `aria-describedby`, `aria-invalid`, `name`, `required`, `disabled`. Works with `react-hook-form` out of the box.
+
+## What Cynosure is not
+
+- Not a visual editor or design-to-code pipeline.
+- Not a charting library (charts are on the roadmap for v1.1+).
+- Not an opinionated page framework — it sits at the component layer.
+
+## Next steps
+
+- [Installation](/docs/getting-started/installation) — add Cynosure to your project in minutes.
+- [Quickstart](/docs/getting-started/quickstart) — render your first components.
+- [Theming overview](/docs/foundations/theming-overview) — learn how themes work.

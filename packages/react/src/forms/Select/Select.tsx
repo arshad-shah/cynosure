@@ -1,3 +1,4 @@
+import { Check, ChevronDownIcon } from 'lucide-react';
 import { type CSSProperties, type ReactNode, forwardRef } from 'react';
 import {
   Button as AriaButton,
@@ -23,30 +24,6 @@ import {
 } from '../shared/popover.css.js';
 import type { FormControlSize, FormControlVariant } from '../shared/types.js';
 import { itemCheck, trigger, triggerIcon, triggerValue } from './Select.css.js';
-
-const ChevronDown = (): React.ReactElement => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-    <path
-      d="m6 9 6 6 6-6"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-);
-
-const CheckIcon = (): React.ReactElement => (
-  <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-    <path
-      d="M3 8l3 3 7-7"
-      stroke="currentColor"
-      strokeWidth="2.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-);
 
 export interface SelectItemData<T extends string = string> {
   value: T;
@@ -191,7 +168,7 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps<string>>(
               }
             </AriaSelectValue>
             <span className={triggerIcon} aria-hidden="true">
-              <ChevronDown />
+              <ChevronDownIcon />
             </span>
           </span>
         </AriaButton>
@@ -222,7 +199,7 @@ export function SelectItem({ className, children, textValue, ...rest }: SelectIt
               : children}
           </span>
           <span className={itemCheck} aria-hidden="true">
-            <CheckIcon />
+            <Check size={14} />
           </span>
         </>
       )}

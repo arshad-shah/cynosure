@@ -262,10 +262,6 @@
       "types": "./dist/menubar.d.ts",
       "import": "./dist/menubar.js"
     },
-    "./modal": {
-      "types": "./dist/modal.d.ts",
-      "import": "./dist/modal.js"
-    },
     "./overlay": {
       "types": "./dist/overlay/index.d.ts",
       "import": "./dist/overlay/index.js"
@@ -334,9 +330,13 @@
       "types": "./dist/stat.d.ts",
       "import": "./dist/stat.js"
     },
-    "./progress": {
-      "types": "./dist/progress.d.ts",
-      "import": "./dist/progress.js"
+    "./linear-progress": {
+      "types": "./dist/linear-progress.d.ts",
+      "import": "./dist/linear-progress.js"
+    },
+    "./circular-progress": {
+      "types": "./dist/circular-progress.d.ts",
+      "import": "./dist/circular-progress.js"
     },
     "./skeleton": {
       "types": "./dist/skeleton.d.ts",
@@ -490,7 +490,6 @@
     "dropdown-menu",
     "context-menu",
     "menu-bar",
-    "modal",
     "overlay",
     "tabs",
     "breadcrumb",
@@ -508,7 +507,8 @@
     "tree",
     "timeline",
     "stat",
-    "progress",
+    "linear-progress",
+    "circular-progress",
     "skeleton",
     "spinner",
     "accordion",
@@ -536,7 +536,7 @@
     "CHANGELOG.md"
   ],
   "scripts": {
-    "build": "cross-env NODE_OPTIONS=--max-old-space-size=6144 tsup",
+    "build": "cross-env NODE_OPTIONS=--max-old-space-size=8192 tsup",
     "dev": "tsup --watch",
     "typecheck": "tsc --noEmit",
     "test": "vitest run --passWithNoTests",

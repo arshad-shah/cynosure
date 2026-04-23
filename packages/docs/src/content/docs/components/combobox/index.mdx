@@ -1,0 +1,61 @@
+---
+title: Combobox
+description: Autocomplete input that filters a dropdown list as the user types. Built on React Aria ComboBox.
+order: 8
+category: components
+status: stable
+since: 0.1.0
+a11y: Uses React Aria ComboBox; role="combobox" on input with aria-expanded and aria-controls pointing to the listbox.
+bundleSize: "58 kB"
+tags: [form, input]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+import StatusBadge from '@/components/StatusBadge.astro';
+import BundleSizePill from '@/components/BundleSizePill.astro';
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="Combobox" /></div>
+
+<LivePreview example="combobox/basic" />
+
+## Usage
+
+```tsx
+import { Combobox } from '@arshad-shah/cynosure-react';
+
+<Combobox
+  aria-label="Country"
+  items={[{ value: 'ie', label: 'Ireland' }, { value: 'uk', label: 'UK' }]}
+/>
+```
+
+## Async filtering
+
+Control `inputValue` and `items` externally to implement server-side filtering.
+
+<LivePreview example="combobox/async" />
+
+## Multi-value (custom value)
+
+Use `allowsCustomValue` to let users enter values not present in the list.
+
+<LivePreview example="combobox/multi" />
+
+## Disabled
+
+<LivePreview example="combobox/disabled" />
+
+## API
+
+<PropsTable component="Combobox" />
+
+## Accessibility
+
+- Built on React Aria ComboBox — `role="combobox"` on the input with `aria-expanded`, `aria-controls`, and `aria-activedescendant` wired automatically.
+- Keyboard: Arrow keys open/navigate the list, Enter selects, Escape clears and closes.
+- Empty state is announced to screen readers when no items match.
+
+## Recipes
+
+- Use `onInputChange` + `items` to implement server-side search with debouncing.
+- Use `allowsCustomValue` when users may need to enter values not in the preset list (e.g. tag creation).

@@ -14,8 +14,6 @@ export {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
+  DropdownMenuTriggerButton,
 } from './DropdownMenu.js';
-export type {
-  DropdownMenuContentProps,
-  DropdownMenuItemProps,
-} from './DropdownMenu.js';
+export type { DropdownMenuContentProps, DropdownMenuItemProps } from './DropdownMenu.js';

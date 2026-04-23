@@ -1,0 +1,116 @@
+---
+title: Data Table with Filters
+description: A TanStack-backed DataTable with sort, select, paginate, and filter built in, plus an advanced-filters popover.
+order: 3
+category: recipes
+---
+
+{/* migrated from /docs/recipes/data-table-with-filters.mdx */}
+
+# Data table with filters
+
+`DataTable` is a TanStack-backed table with sort, select, paginate, filter,
+loading, and empty states built in.
+
+```tsx
+import { useMemo, useState } from 'react';
+import {
+  Badge,
+  Button,
+  DataTable,
+  Input,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  Stack,
+} from '@arshad-shah/cynosure-react';
+
+type Order = {
+  id: string;
+  customer: string;
+  total: number;
+  status: 'pending' | 'paid' | 'refunded';
+};
+
+const columns = [
+  { accessorKey: 'id', header: 'Order' },
+  { accessorKey: 'customer', header: 'Customer' },
+  {
+    accessorKey: 'total',
+    header: 'Total',
+    cell: ({ getValue }) =>
+      new Intl.NumberFormat('en-GB', {
+        style: 'currency',
+        currency: 'GBP',
+      }).format(getValue<number>()),
+  },
+  {
+    accessorKey: 'status',
+    header: 'Status',
+    cell: ({ getValue }) => {
+      const status = getValue<Order['status']>();
+      return (
+        <Badge
+          colorScheme={
+            status === 'paid'
+              ? 'success'
+              : status === 'refunded'
+                ? 'danger'
+                : 'warning'
+          }
+        >
+          {status}
+        </Badge>
+      );
+    },
+  },
+] satisfies import('@tanstack/react-table').ColumnDef<Order>[];
+
+export function OrdersTable({ data }: { data: Order[] }) {
+  const [query, setQuery] = useState('');
+
+  const filtered = useMemo(
+    () =>
+      data.filter((row) =>
+        row.customer.toLowerCase().includes(query.toLowerCase()),
+      ),
+    [data, query],
+  );
+
+  return (
+    <Stack gap="4">
+      <Stack direction="row" gap="3" align="center">
+        <Input
+          placeholder="Search customer"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          aria-label="Search orders"
+        />
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline">Advanced filters</Button>
+          </PopoverTrigger>
+          <PopoverContent>{/* more filters here */}</PopoverContent>
+        </Popover>
+      </Stack>
+
+      <DataTable
+        data={filtered}
+        columns={columns}
+        selectable
+        onSelectionChange={(rows) => console.log('selected', rows)}
+        pageSize={25}
+      />
+    </Stack>
+  );
+}
+```
+
+## Notes
+
+- `DataTable.selectable` adds a row-select column and tri-state header
+  checkbox.
+- `onSelectionChange` emits the selected `TData[]`, not TanStack's internal
+  record — a Cynosure convenience so you get rows, not ids.
+- For very large datasets, virtualise at the consumer level — row
+  virtualisation is on the v1.1 roadmap.

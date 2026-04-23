@@ -17,6 +17,30 @@ import {
 } from './tokens.js';
 import type { LayoutProps } from './types.js';
 
+const ALIGN_SELF_MAP: Record<string, string> = {
+  auto: 'auto',
+  start: 'flex-start',
+  center: 'center',
+  end: 'flex-end',
+  stretch: 'stretch',
+  baseline: 'baseline',
+};
+
+const JUSTIFY_SELF_MAP: Record<string, string> = {
+  auto: 'auto',
+  start: 'start',
+  center: 'center',
+  end: 'end',
+  stretch: 'stretch',
+};
+
+const alignSelfResolver = (v: string, _bp: Breakpoint) => ALIGN_SELF_MAP[v] ?? v;
+const justifySelfResolver = (v: string, _bp: Breakpoint) => JUSTIFY_SELF_MAP[v] ?? v;
+const flexBasisResolver = (v: string, _bp: Breakpoint) => {
+  if (v === 'auto' || v === 'content') return v;
+  return resolveSize(v as SizeValue);
+};
+
 const BORDER_WIDTHS: Record<string, string> = {
   '0': '0px',
   '1': '1px',
@@ -108,6 +132,14 @@ export const resolveLayoutProps = (props: LayoutProps): CSSProperties | undefine
     emit(props.gridColumn, 'cynosure-lp-gc', passthrough as never),
     emit(props.gridRow, 'cynosure-lp-gr', passthrough as never),
     emit(props.gridArea, 'cynosure-lp-ga', passthrough as never),
+    // flex/grid child hints
+    emit(props.flex, 'cynosure-lp-flex', passthrough as never),
+    emit(props.flexGrow, 'cynosure-lp-fg', passthrough as never),
+    emit(props.flexShrink, 'cynosure-lp-fs', passthrough as never),
+    emit(props.flexBasis, 'cynosure-lp-fb', flexBasisResolver as never),
+    emit(props.alignSelf, 'cynosure-lp-as', alignSelfResolver as never),
+    emit(props.justifySelf, 'cynosure-lp-js', justifySelfResolver as never),
+    emit(props.order, 'cynosure-lp-order', passthrough as never),
   );
 
 /**
@@ -156,6 +188,13 @@ export const LAYOUT_PROP_KEYS = new Set<keyof LayoutProps>([
   'gridColumn',
   'gridRow',
   'gridArea',
+  'flex',
+  'flexGrow',
+  'flexShrink',
+  'flexBasis',
+  'alignSelf',
+  'justifySelf',
+  'order',
 ]);
 
 export const splitLayoutProps = <P extends Partial<LayoutProps>>(

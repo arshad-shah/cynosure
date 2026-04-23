@@ -12,6 +12,7 @@
     },
     "./css": "./dist/css/base.css",
     "./css/dark": "./dist/css/dark.css",
+    "./fonts": "./dist/css/fonts.css",
     "./package.json": "./package.json"
   },
   "main": "./dist/index.js",
@@ -21,10 +22,15 @@
   "scripts": {
     "validate": "node scripts/validate.mjs",
     "build:tokens": "node style-dictionary.config.mjs",
-    "build": "pnpm validate && pnpm build:tokens && tsup",
-    "dev": "pnpm build:tokens && tsup --watch",
+    "build:fonts": "cp src/fonts.css dist/css/fonts.css",
+    "build": "pnpm validate && pnpm build:tokens && tsup && pnpm build:fonts",
+    "dev": "pnpm build:tokens && pnpm build:fonts && tsup --watch",
     "typecheck": "tsc --noEmit",
     "clean": "rm -rf dist src/generated .turbo"
+  },
+  "dependencies": {
+    "@fontsource-variable/geist": "catalog:",
+    "@fontsource-variable/jetbrains-mono": "catalog:"
   },
   "devDependencies": {
     "@arshad-shah/cynosure-config": "workspace:*",

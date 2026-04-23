@@ -1,0 +1,81 @@
+---
+title: DataTable
+description: A feature-rich data table built on TanStack Table with sorting, filtering, pagination, and row selection.
+order: 18
+category: components
+status: beta
+since: "0.1.0"
+a11y: Column headers use aria-sort; the table carries a <caption> for screen readers; row checkboxes have aria-label.
+bundleSize: "60 kB"
+tags: [data-display, table, sortable, filterable, pagination]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+import StatusBadge from '@/components/StatusBadge.astro';
+import BundleSizePill from '@/components/BundleSizePill.astro';
+
+<div><StatusBadge status="beta" /> <BundleSizePill name="DataTable" /></div>
+
+<LivePreview example="data-table/basic" />
+
+## Usage
+
+```tsx
+import { DataTable, type ColumnDef } from '@arshad-shah/cynosure-react';
+
+type User = { id: number; name: string; status: string };
+
+const columns: ColumnDef<User>[] = [
+  { accessorKey: 'id', header: 'ID' },
+  { accessorKey: 'name', header: 'Name' },
+  { accessorKey: 'status', header: 'Status' },
+];
+
+const data: User[] = [
+  { id: 1, name: 'Alice', status: 'Active' },
+  { id: 2, name: 'Bob', status: 'Inactive' },
+];
+
+<DataTable data={data} columns={columns} />
+```
+
+## Variants
+
+### Sortable
+
+Enable column sorting by passing `sortable`. Click any column header to toggle ascending / descending order.
+
+<LivePreview example="data-table/sortable" />
+
+### Filterable
+
+Pass a `filter` object with a `global` string and `onGlobalFilterChange` handler. Use the `toolbar` prop to render a search input above the table.
+
+<LivePreview example="data-table/filterable" />
+
+### Paginated
+
+Pass `pagination` with a `pageSize` to split rows into pages. A `Pagination` control is rendered below the table automatically.
+
+<LivePreview example="data-table/paginated" />
+
+## API
+
+<PropsTable component="DataTable" />
+
+## Accessibility
+
+- Sortable column headers carry `aria-sort="ascending"`, `aria-sort="descending"`, or `aria-sort="none"` to communicate sort state to screen readers.
+- Row selection checkboxes have `aria-label="Select row"` / `aria-label="Select all rows on this page"`.
+- Provide a `caption` prop to give the table a meaningful title that is read aloud by screen readers.
+- The empty-state row spans all columns and is announced as a single cell.
+- The loading skeleton rows are visually distinguishable; no ARIA live region is emitted (add one in a wrapper if needed).
+
+## Recipes
+
+- Use `selectable` + `onSelectionChange` to build bulk-action UIs.
+- Use `loading` + `loadingRows` to show skeleton rows while data is fetching.
+- Use `emptyState` with a custom `ReactNode` for a branded empty experience.
+- Set `tableVariant="striped"` or `tableSize="sm"` to pass through to the underlying `Table`.
+- Use `stickyHeader` with a fixed-height scrollable wrapper to keep column headers visible.
+- Supply `getRowId` to use a stable business key (instead of row index) for row selection and re-renders.

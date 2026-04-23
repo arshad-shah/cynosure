@@ -1,10 +1,6 @@
 import * as RadixAccordion from '@radix-ui/react-accordion';
-import {
-  type ComponentPropsWithoutRef,
-  type ElementRef,
-  type ReactElement,
-  forwardRef,
-} from 'react';
+import { ChevronDownIcon } from 'lucide-react';
+import { type ComponentPropsWithoutRef, type ElementRef, forwardRef } from 'react';
 import { cn } from '../../utils/cn.js';
 import {
   accordionChevron,
@@ -48,26 +44,6 @@ export const AccordionItem = forwardRef<ElementRef<typeof RadixAccordion.Item>, 
   },
 );
 
-const ChevronIcon = (): ReactElement => (
-  <svg
-    width="16"
-    height="16"
-    viewBox="0 0 24 24"
-    fill="none"
-    aria-hidden="true"
-    data-slot="chevron"
-    className={accordionChevron}
-  >
-    <path
-      d="m6 9 6 6 6-6"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-);
-
 export interface AccordionTriggerProps
   extends ComponentPropsWithoutRef<typeof RadixAccordion.Trigger> {
   /** Hide the built-in chevron indicator. */
@@ -82,7 +58,7 @@ export const AccordionTrigger = forwardRef<
     <RadixAccordion.Header className={accordionHeader}>
       <RadixAccordion.Trigger ref={ref} className={cn(accordionTrigger, className)} {...rest}>
         <span>{children}</span>
-        {!hideIndicator ? <ChevronIcon /> : null}
+        {!hideIndicator ? <ChevronDownIcon className={accordionChevron} /> : null}
       </RadixAccordion.Trigger>
     </RadixAccordion.Header>
   );

@@ -1,0 +1,43 @@
+---
+import props from '../generated/props.json';
+
+interface Props { component: string }
+const { component } = Astro.props;
+
+interface PropEntry { name: string; type: string; description: string; required: boolean; defaultValue: string | null }
+interface Record { props: PropEntry[] }
+
+const record = (props as globalThis.Record<string, Record>)[component];
+if (!record) {
+  throw new Error(`PropsTable: component "${component}" not found in props.json. Run 'pnpm generate:props'.`);
+}
+
+function formatType(t: string): string {
+  return t.split(/\s*\|\s*/).join('__PIPE__');
+}
+---
+<div data-props>
+  <div data-props-head>
+    <span>Prop</span><span>Type</span><span>Default</span><span>Description</span>
+  </div>
+  {record.props.map((p) => {
+    const parts = formatType(p.type).split('__PIPE__');
+    return (
+      <div data-props-row>
+        <div data-props-name>
+          {p.name}{p.required ? <span data-props-req>*</span> : null}
+        </div>
+        <div data-props-type>
+          {parts.map((part, i) => (
+            <>
+              {i > 0 && <span class="t-sep">|</span>}
+              {part}
+            </>
+          ))}
+        </div>
+        <div data-props-default>{p.defaultValue ?? '—'}</div>
+        <div data-props-desc>{p.description}</div>
+      </div>
+    );
+  })}
+</div>

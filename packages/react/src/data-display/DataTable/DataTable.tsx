@@ -11,6 +11,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
+import { ArrowDownUpIcon, SortAsc, SortDesc } from 'lucide-react';
 import {
   type HTMLAttributes,
   type ReactElement,
@@ -73,27 +74,6 @@ export interface DataTableProps<TData> extends Omit<HTMLAttributes<HTMLDivElemen
   /** Caption rendered inside the `<caption>` element for screen readers. */
   caption?: ReactNode;
 }
-
-const SortAscIcon = (): ReactElement => (
-  <svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true" fill="none">
-    <path d="m6 15 6-6 6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-  </svg>
-);
-const SortDescIcon = (): ReactElement => (
-  <svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true" fill="none">
-    <path d="m6 9 6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-  </svg>
-);
-const SortNoneIcon = (): ReactElement => (
-  <svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true" fill="none">
-    <path
-      d="M7 9l5-5 5 5M7 15l5 5 5-5"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-    />
-  </svg>
-);
 
 const RowCheckbox = ({
   checked,
@@ -260,11 +240,11 @@ function DataTableInner<TData>(
                             <span>{content}</span>
                             <span className={sortIcon} aria-hidden="true">
                               {sortDir === 'asc' ? (
-                                <SortAscIcon />
+                                <SortAsc size={'14'} />
                               ) : sortDir === 'desc' ? (
-                                <SortDescIcon />
+                                <SortDesc size={'14'} />
                               ) : (
-                                <SortNoneIcon />
+                                <ArrowDownUpIcon size={'14'} />
                               )}
                             </span>
                           </button>

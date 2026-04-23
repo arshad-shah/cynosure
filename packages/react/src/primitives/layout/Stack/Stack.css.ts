@@ -1,21 +1,14 @@
 import { style } from '@vanilla-extract/css';
-import { MEDIA_QUERIES } from '../shared/breakpoints.js';
+import { buildResponsiveRules } from '../shared/buildResponsive.js';
 import { layoutPropsStyle } from '../shared/layoutStyle.css.js';
 
-const cascade = (base: string, bps: string[]): string => {
-  let expr = `var(--${base}-base)`;
-  for (const bp of bps) {
-    if (bp === 'base') continue;
-    expr = `var(--${base}-${bp}, ${expr})`;
-  }
-  return expr;
-};
+const STACK_ENTRIES: Array<[string, string]> = [
+  ['gap', 'cynosure-stack-gap'],
+  ['align-items', 'cynosure-stack-align'],
+  ['justify-content', 'cynosure-stack-justify'],
+];
 
-const propsAt = (bps: string[]): Record<string, string> => ({
-  gap: cascade('cynosure-stack-gap', bps),
-  'align-items': cascade('cynosure-stack-align', bps),
-  'justify-content': cascade('cynosure-stack-justify', bps),
-});
+const STACK_RULES = buildResponsiveRules(STACK_ENTRIES);
 
 export const stack = style([
   layoutPropsStyle,
@@ -23,13 +16,7 @@ export const stack = style([
     display: 'flex',
     flexDirection: 'column',
     minWidth: 0,
-    ...propsAt(['base']),
-    '@media': {
-      [MEDIA_QUERIES.sm]: propsAt(['base', 'sm']),
-      [MEDIA_QUERIES.md]: propsAt(['base', 'sm', 'md']),
-      [MEDIA_QUERIES.lg]: propsAt(['base', 'sm', 'md', 'lg']),
-      [MEDIA_QUERIES.xl]: propsAt(['base', 'sm', 'md', 'lg', 'xl']),
-      [MEDIA_QUERIES['2xl']]: propsAt(['base', 'sm', 'md', 'lg', 'xl', '2xl']),
-    },
+    ...STACK_RULES.base,
+    '@media': STACK_RULES.media,
   },
 ]);

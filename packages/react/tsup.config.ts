@@ -106,7 +106,6 @@ const overlayComponents = [
   'DropdownMenu',
   'ContextMenu',
   'MenuBar',
-  'Modal',
 ] as const;
 
 const overlayEntries = (): Record<string, string> => {
@@ -175,7 +174,8 @@ const dataDisplayComponents = [
   'Tree',
   'Timeline',
   'Stat',
-  'Progress',
+  'LinearProgress',
+  'CircularProgress',
   'Skeleton',
   'Spinner',
   'Accordion',
@@ -188,7 +188,8 @@ const dataDisplayComponents = [
 const dataDisplayEntries = (): Record<string, string> => {
   const entries: Record<string, string> = {};
   for (const name of dataDisplayComponents) {
-    // CodeBlock gets a kebab-cased entry to match the `/code-block` subpath
+    // Kebab-cased entries for multi-word names so the build output matches
+    // the subpath exports (`/linear-progress`, `/code-block`, etc.).
     const key =
       name === 'DataTable'
         ? 'data-table'
@@ -196,7 +197,11 @@ const dataDisplayEntries = (): Record<string, string> => {
           ? 'scroll-area'
           : name === 'CodeBlock'
             ? 'code-block'
-            : name.toLowerCase();
+            : name === 'LinearProgress'
+              ? 'linear-progress'
+              : name === 'CircularProgress'
+                ? 'circular-progress'
+                : name.toLowerCase();
     entries[key] = `src/data-display/${name}/index.ts`;
   }
   return entries;

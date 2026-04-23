@@ -1,3 +1,4 @@
+import { ExternalLink } from 'lucide-react';
 import {
   type CSSProperties,
   type ForwardedRef,
@@ -8,7 +9,7 @@ import {
 import { Box } from '../../primitives/layout/Box/Box.js';
 import type { AsChildProps, LayoutProps } from '../../primitives/layout/shared/index.js';
 import { cn } from '../../utils/cn.js';
-import { externalIcon, linkBase, linkDisabled, linkUnderline, linkVariant } from './Link.css.js';
+import { linkBase, linkDisabled, linkUnderline, linkVariant } from './Link.css.js';
 
 export type LinkVariant = 'default' | 'subtle' | 'emphasis';
 export type LinkUnderline = 'always' | 'hover' | 'none';
@@ -32,36 +33,6 @@ export type LinkProps = LinkOwnProps &
   Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, keyof LinkOwnProps | 'color'>;
 
 type AnyProps = LinkOwnProps & { [key: string]: unknown };
-
-/**
- * Minimal external-link chevron. Kept inline so typography doesn't depend on
- * `@arshad-shah/cynosure-icons` (which is its own shippable package arriving post-v1).
- */
-const ExternalIcon = (): ReactElement => (
-  <svg
-    className={externalIcon}
-    viewBox="0 0 16 16"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    aria-hidden="true"
-    focusable="false"
-  >
-    <path
-      d="M6 3h7v7M12.5 3.5L6 10"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-    <path
-      d="M11 9v3.5A1.5 1.5 0 0 1 9.5 14h-6A1.5 1.5 0 0 1 2 12.5v-6A1.5 1.5 0 0 1 3.5 5H7"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-);
 
 const LinkRender = (props: AnyProps, ref: ForwardedRef<HTMLAnchorElement>): ReactElement => {
   const {
@@ -126,7 +97,7 @@ const LinkRender = (props: AnyProps, ref: ForwardedRef<HTMLAnchorElement>): Reac
       {external ? (
         <>
           {children}
-          <ExternalIcon />
+          <ExternalLink />
         </>
       ) : (
         children

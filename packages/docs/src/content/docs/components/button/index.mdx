@@ -1,0 +1,73 @@
+---
+title: Button
+description: Trigger an action. Built on the native <button>; fully keyboard + screen-reader accessible.
+order: 1
+category: components
+status: stable
+since: 0.1.0
+a11y: Uses native <button>; supports disabled, aria-busy during loading; focus ring honors tokens.
+bundleSize: "6 kB"
+tags: [primitive, action]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+import StatusBadge from '@/components/StatusBadge.astro';
+import BundleSizePill from '@/components/BundleSizePill.astro';
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="Button" /></div>
+
+<LivePreview example="button/basic" />
+
+## Usage
+
+```tsx
+import { Button } from '@arshad-shah/cynosure-react';
+
+<Button>Click me</Button>
+```
+
+## Variants
+
+Button ships five visual variants — `solid`, `soft`, `outline`, `ghost`, and `link` — each available in five color schemes: `accent`, `neutral`, `success`, `danger`, and `warning`.
+
+<LivePreview example="button/variants" />
+
+## Sizes
+
+Five sizes are available: `xs`, `sm`, `md` (default), `lg`, and `xl`.
+
+<LivePreview example="button/sizes" />
+
+## With icons
+
+Use `leftIcon` or `rightIcon` to attach a decorative icon without breaking the accessible label.
+
+<LivePreview example="button/with-icon" />
+
+## Loading state
+
+Pass `loading` to show a spinner and set `aria-busy="true"`. The button is automatically disabled while loading so double-submits are prevented.
+
+<LivePreview example="button/loading" />
+
+## Disabled state
+
+<LivePreview example="button/disabled" />
+
+## API
+
+<PropsTable component="Button" />
+
+## Accessibility
+
+- Rendered as a native `<button>` — inherits all ARIA semantics for free.
+- `loading` sets `aria-busy="true"`; the visible label stays announced.
+- Focus outline uses the token-driven focus ring; never removed.
+- `disabled` is forwarded directly to the host element; `loading` also disables the button at the DOM level.
+
+## Recipes
+
+- Pair with `<Tooltip>` when the label is icon-only.
+- Use `variant="ghost"` inside toolbars to reduce visual weight.
+- Use `asChild` to render a link styled as a button: `<Button asChild><a href="/next">Next</a></Button>`.
+- Use `shape="pill"` for rounded pill-style buttons, or `shape="square"` for icon-only square buttons.

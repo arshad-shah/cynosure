@@ -1,11 +1,6 @@
 import * as Radix from '@radix-ui/react-navigation-menu';
-import {
-  type ComponentPropsWithoutRef,
-  type ElementRef,
-  type ReactElement,
-  type ReactNode,
-  forwardRef,
-} from 'react';
+import { ChevronDown } from 'lucide-react';
+import { type ComponentPropsWithoutRef, type ElementRef, type ReactNode, forwardRef } from 'react';
 import { cn } from '../../utils/cn.js';
 import {
   navigationMenuCaret,
@@ -19,18 +14,6 @@ import {
   navigationMenuViewport,
   navigationMenuViewportWrapper,
 } from './NavigationMenu.css.js';
-
-const ChevronDown = (): ReactElement => (
-  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-    <path
-      d="m6 9 6 6 6-6"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-);
 
 export interface NavigationMenuProps extends ComponentPropsWithoutRef<typeof Radix.Root> {}
 

@@ -1,0 +1,72 @@
+---
+title: Accessibility
+description: How Cynosure enforces WCAG 2.2 AA at build time — axe-core CI, keyboard patterns, live regions, and asChild composition.
+order: 7
+category: foundations
+---
+
+# Accessibility
+
+Accessibility is a build-time contract at Cynosure, not an aspiration.
+
+## The contract
+
+- **WCAG 2.2 AA** is the floor for every published component.
+- **axe-core**, via `@storybook/addon-a11y`, runs against every story at
+  `test: 'error'`. A failing story fails CI.
+- **Contrast audit** covers six themes x nineteen text/background pairs
+  (including alpha-composited surfaces) — `pnpm audit:contrast`.
+- **Keyboard complete.** Every interactive component is reachable and
+  operable via keyboard alone.
+- **Focus visible.** A single token (`--cynosure-shadow-focus-ring`) drives
+  the focus ring across every component.
+- **RTL safe.** Every `.css.ts` file uses logical CSS properties (padding
+  inline / block, inset-inline, etc.); physical `Left`/`Right` exist only
+  in the public `LayoutProps` escape hatch.
+- **Reduced motion honoured.** All transitions honour
+  `prefers-reduced-motion: reduce` via the tokens CSS.
+
+## Keyboard patterns
+
+| Component           | Keys                                                         |
+| ------------------- | ------------------------------------------------------------ |
+| Button / Link       | `Enter`, `Space` (button only)                               |
+| Dialog / AlertDialog| `Esc` to close (AlertDialog requires explicit action)        |
+| Tabs                | `Arrow left/right`, `Home`, `End`                            |
+| Combobox / Select   | `Arrow up/down`, `Enter`, `Esc`, typeahead                   |
+| DatePicker          | `Arrow up/down/left/right`, `PageUp/PageDown`, `Home/End`    |
+| Tree                | `Arrow up/down` / `left/right`, `Home/End`, `*` (expand siblings), `Enter`|
+| Menu / DropdownMenu | `Arrow up/down`, typeahead, `Esc`                            |
+
+Every component's docs page lists its keyboard interactions in a table.
+
+## Live regions
+
+- `Toast` announces polite by default, assertive when marked as an error.
+- `Alert` defaults to `role="alert"` for danger/warning, `role="status"`
+  otherwise.
+- `FormMessage` gains `role="alert"` only when `FormField.invalid` is
+  true, so passive helper text doesn't spam the screen reader.
+
+## `asChild` composition + ARIA
+
+`asChild` lets consumers project their own element. Cynosure merges props
+onto the projected element — including ARIA attributes — and preserves any
+attribute the consumer has already set (consumer wins on conflict).
+
+## Testing your own usage
+
+```ts
+import { expect, test } from 'vitest';
+import { axe } from 'jest-axe';
+import { render } from '@testing-library/react';
+
+test('has no a11y violations', async () => {
+  const { container } = render(<MyComponent />);
+  const results = await axe(container);
+  expect(results).toHaveNoViolations();
+});
+```
+
+If you find a regression, file an issue with a minimal reproduction — a11y
+bugs are treated as bugs, not enhancements.

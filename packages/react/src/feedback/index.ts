@@ -10,6 +10,7 @@ export * from './Callout/index.js';
 export * from './EmptyState/index.js';
 export * from './Toggle/index.js';
 export * from './ToggleGroup/index.js';
+export * from './Indicator/index.js';
 export type {
   FeedbackColorScheme,
   FeedbackSize,

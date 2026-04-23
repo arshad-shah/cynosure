@@ -1,5 +1,6 @@
 import { DirectionProvider, ThemeProvider, TooltipProvider } from '@arshad-shah/cynosure-react';
 import type { Decorator, Preview } from '@storybook/react';
+import '@arshad-shah/cynosure-tokens/fonts';
 import '@arshad-shah/cynosure-tokens/css';
 import '@arshad-shah/cynosure-tokens/css/dark';
 import '@arshad-shah/cynosure-react/styles.css';

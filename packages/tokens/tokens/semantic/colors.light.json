@@ -21,17 +21,17 @@
       "default": { "$type": "color", "$value": "{color.gray.200}" },
       "subtle": { "$type": "color", "$value": "{color.gray.100}" },
       "strong": { "$type": "color", "$value": "{color.gray.300}" },
-      "focus": { "$type": "color", "$value": "{color.blue.500}" },
+      "focus": { "$type": "color", "$value": "{color.iris.500}" },
       "disabled": { "$type": "color", "$value": "{color.gray.200}" }
     },
     "accent": {
-      "solid": { "$type": "color", "$value": "{color.blue.600}" },
-      "solidHover": { "$type": "color", "$value": "{color.blue.700}" },
-      "solidActive": { "$type": "color", "$value": "{color.blue.700}" },
-      "soft": { "$type": "color", "$value": "{color.blue.50}" },
-      "softHover": { "$type": "color", "$value": "{color.blue.100}" },
-      "softActive": { "$type": "color", "$value": "{color.blue.200}" },
-      "ring": { "$type": "color", "$value": "{color.blue.500}" },
+      "solid": { "$type": "color", "$value": "{color.iris.600}" },
+      "solidHover": { "$type": "color", "$value": "{color.iris.700}" },
+      "solidActive": { "$type": "color", "$value": "{color.iris.700}" },
+      "soft": { "$type": "color", "$value": "{color.iris.50}" },
+      "softHover": { "$type": "color", "$value": "{color.iris.100}" },
+      "softActive": { "$type": "color", "$value": "{color.iris.200}" },
+      "ring": { "$type": "color", "$value": "{color.iris.500}" },
       "onSolid": { "$type": "color", "$value": "#ffffff" }
     },
     "feedback": {

@@ -1,18 +1,25 @@
+// packages/react/src/navigation/Sidebar/Sidebar.stories.tsx
 import type { Meta, StoryObj } from '@storybook/react';
+import { CogIcon, InboxIcon, LayoutDashboardIcon, PlusIcon, UsersIcon } from 'lucide-react';
 import { type ReactElement, type ReactNode, useState } from 'react';
 import { Inline } from '../../primitives/layout/Inline/Inline.js';
 import { Stack } from '../../primitives/layout/Stack/Stack.js';
 import { Heading } from '../../typography/Heading/Heading.js';
 import { Text } from '../../typography/Text/Text.js';
-import { Menu, MenuDivider, MenuGroup, MenuItem } from '../Menu/Menu.js';
 import {
   Sidebar,
   SidebarBody,
   SidebarFooter,
+  SidebarGroup,
   SidebarHeader,
+  SidebarItem,
+  SidebarNav,
   SidebarProvider,
+  SidebarSeparator,
+  SidebarSubItem,
+  SidebarSubNav,
   SidebarTrigger,
-} from './Sidebar.js';
+} from './index.js';
 
 const meta: Meta<typeof Sidebar> = {
   title: 'Navigation/Sidebar',
@@ -21,75 +28,6 @@ const meta: Meta<typeof Sidebar> = {
 };
 export default meta;
 type Story = StoryObj<typeof Sidebar>;
-
-const IconDashboard = (): ReactElement => (
-  <svg
-    aria-hidden="true"
-    width="16"
-    height="16"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <rect x="3" y="3" width="7" height="7" />
-    <rect x="14" y="3" width="7" height="7" />
-    <rect x="14" y="14" width="7" height="7" />
-    <rect x="3" y="14" width="7" height="7" />
-  </svg>
-);
-const IconInbox = (): ReactElement => (
-  <svg
-    aria-hidden="true"
-    width="16"
-    height="16"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <polyline points="22 12 16 12 14 15 10 15 8 12 2 12" />
-    <path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z" />
-  </svg>
-);
-const IconUsers = (): ReactElement => (
-  <svg
-    aria-hidden="true"
-    width="16"
-    height="16"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
-    <circle cx="9" cy="7" r="4" />
-    <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
-    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
-  </svg>
-);
-const IconGear = (): ReactElement => (
-  <svg
-    aria-hidden="true"
-    width="16"
-    height="16"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <circle cx="12" cy="12" r="3" />
-    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.6 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
-  </svg>
-);
 
 const ShellLayout = ({ children }: { children: ReactNode }): ReactElement => (
   <div
@@ -110,7 +48,7 @@ const DemoMain = ({ children }: { children?: ReactNode }): ReactElement => (
     {children ?? (
       <Stack gap="3">
         <Heading level={3}>Main content</Heading>
-        <Text color="fg.muted">The sidebar sits to the left; toggle it with the trigger.</Text>
+        <Text color="fg.muted">Toggle the sidebar with the trigger.</Text>
       </Stack>
     )}
   </main>
@@ -120,19 +58,21 @@ export const Default: Story = {
   render: () => (
     <SidebarProvider>
       <ShellLayout>
-        <Sidebar>
+        <Sidebar aria-label="Primary">
+          <SidebarHeader>
+            <Text weight="semibold">Acme</Text>
+          </SidebarHeader>
           <SidebarBody>
-            <Menu aria-label="Primary">
-              <MenuItem icon={<IconDashboard />} isActive>
-                Dashboard
-              </MenuItem>
-              <MenuItem icon={<IconInbox />} badge="3">
-                Inbox
-              </MenuItem>
-              <MenuItem icon={<IconUsers />}>Team</MenuItem>
-              <MenuItem icon={<IconGear />}>Settings</MenuItem>
-            </Menu>
+            <SidebarNav aria-label="Primary">
+              <SidebarItem icon={<LayoutDashboardIcon size={18} />} label="Dashboard" isActive />
+              <SidebarItem icon={<InboxIcon size={18} />} label="Inbox" badge="3" />
+              <SidebarItem icon={<UsersIcon size={18} />} label="Team" />
+              <SidebarItem icon={<CogIcon size={18} />} label="Settings" />
+            </SidebarNav>
           </SidebarBody>
+          <SidebarFooter>
+            <SidebarTrigger />
+          </SidebarFooter>
         </Sidebar>
         <DemoMain />
       </ShellLayout>
@@ -140,50 +80,34 @@ export const Default: Story = {
   ),
 };
 
-export const DesktopCollapse: Story = {
-  name: 'Desktop — toggle expanded / collapsed',
+export const CollapsibleRail: Story = {
   render: () => {
     function Demo(): ReactElement {
       const [collapsed, setCollapsed] = useState(false);
       return (
         <SidebarProvider collapsed={collapsed} onCollapsedChange={setCollapsed}>
           <ShellLayout>
-            <Sidebar>
+            <Sidebar aria-label="Primary">
               <SidebarHeader>
-                <Inline gap="2" align="center" justify="between">
-                  <Text weight="semibold">Acme</Text>
-                  <SidebarTrigger />
-                </Inline>
+                <Text weight="semibold">Acme</Text>
               </SidebarHeader>
               <SidebarBody>
-                <Menu aria-label="Primary">
-                  <MenuItem icon={<IconDashboard />} isActive>
-                    Dashboard
-                  </MenuItem>
-                  <MenuItem icon={<IconInbox />}>Inbox</MenuItem>
-                  <MenuItem icon={<IconUsers />}>Team</MenuItem>
-                  <MenuItem icon={<IconGear />}>Settings</MenuItem>
-                </Menu>
+                <SidebarNav aria-label="Primary">
+                  <SidebarItem
+                    icon={<LayoutDashboardIcon size={18} />}
+                    label="Dashboard"
+                    isActive
+                  />
+                  <SidebarItem icon={<InboxIcon size={18} />} label="Inbox" badge="3" />
+                  <SidebarItem icon={<UsersIcon size={18} />} label="Team" />
+                </SidebarNav>
               </SidebarBody>
+              <SidebarFooter>
+                <SidebarTrigger />
+              </SidebarFooter>
             </Sidebar>
             <DemoMain>
-              <Stack gap="3">
-                <Heading level={3}>Desktop layout</Heading>
-                <Text color="fg.muted">
-                  Collapsed: <strong>{collapsed ? 'yes' : 'no'}</strong>
-                </Text>
-                <Inline gap="2">
-                  <button type="button" onClick={() => setCollapsed((c) => !c)}>
-                    Toggle
-                  </button>
-                  <button type="button" onClick={() => setCollapsed(true)}>
-                    Collapse
-                  </button>
-                  <button type="button" onClick={() => setCollapsed(false)}>
-                    Expand
-                  </button>
-                </Inline>
-              </Stack>
+              <Text>Collapsed: {collapsed ? 'yes' : 'no'}</Text>
             </DemoMain>
           </ShellLayout>
         </SidebarProvider>
@@ -193,8 +117,95 @@ export const DesktopCollapse: Story = {
   },
 };
 
+export const NestedNav: Story = {
+  render: () => (
+    <SidebarProvider>
+      <ShellLayout>
+        <Sidebar aria-label="Primary">
+          <SidebarBody>
+            <SidebarNav aria-label="Primary">
+              <SidebarItem icon={<LayoutDashboardIcon size={18} />} label="Dashboard" />
+              <SidebarSubNav
+                parentLabel="Settings"
+                defaultOpen
+                trigger={<SidebarItem icon={<CogIcon size={18} />} label="Settings" />}
+              >
+                <SidebarSubItem isActive>Billing</SidebarSubItem>
+                <SidebarSubItem>Team</SidebarSubItem>
+                <SidebarSubItem>API</SidebarSubItem>
+              </SidebarSubNav>
+            </SidebarNav>
+          </SidebarBody>
+        </Sidebar>
+        <DemoMain />
+      </ShellLayout>
+    </SidebarProvider>
+  ),
+};
+
+export const WithGroups: Story = {
+  render: () => (
+    <SidebarProvider>
+      <ShellLayout>
+        <Sidebar aria-label="Primary">
+          <SidebarBody>
+            <SidebarNav aria-label="Primary">
+              <SidebarGroup label="Workspace">
+                <SidebarItem icon={<LayoutDashboardIcon size={18} />} label="Dashboard" isActive />
+                <SidebarItem icon={<InboxIcon size={18} />} label="Inbox" badge="12" />
+              </SidebarGroup>
+              <SidebarSeparator />
+              <SidebarGroup
+                label="Projects"
+                action={
+                  <button
+                    type="button"
+                    aria-label="New project"
+                    style={{ background: 'transparent', border: 'none', cursor: 'pointer' }}
+                  >
+                    <PlusIcon size={14} />
+                  </button>
+                }
+              >
+                <SidebarItem label="Website" />
+                <SidebarItem label="Mobile app" />
+              </SidebarGroup>
+              <SidebarGroup label="Admin" collapsible>
+                <SidebarItem icon={<UsersIcon size={18} />} label="Members" />
+                <SidebarItem icon={<CogIcon size={18} />} label="Settings" />
+              </SidebarGroup>
+            </SidebarNav>
+          </SidebarBody>
+        </Sidebar>
+        <DemoMain />
+      </ShellLayout>
+    </SidebarProvider>
+  ),
+};
+
+export const AsChildLinks: Story = {
+  render: () => (
+    <SidebarProvider>
+      <ShellLayout>
+        <Sidebar aria-label="Primary">
+          <SidebarBody>
+            <SidebarNav aria-label="Primary">
+              <SidebarItem asChild icon={<LayoutDashboardIcon size={18} />} label="Dashboard">
+                <a href="/dashboard">Dashboard</a>
+              </SidebarItem>
+              <SidebarItem asChild icon={<InboxIcon size={18} />} label="Inbox">
+                <a href="/inbox">Inbox</a>
+              </SidebarItem>
+            </SidebarNav>
+          </SidebarBody>
+        </Sidebar>
+        <DemoMain />
+      </ShellLayout>
+    </SidebarProvider>
+  ),
+};
+
 export const MobileDrawer: Story = {
-  name: 'Mobile drawer (forced via mobileQuery)',
   render: () => (
     <SidebarProvider mobileQuery="(min-width: 0px)">
       <div
@@ -210,82 +221,15 @@ export const MobileDrawer: Story = {
           <Text weight="semibold">Acme — Mobile</Text>
           <span />
         </Inline>
-        <Sidebar mobileTitle="Main menu">
-          <SidebarHeader>
-            <Text weight="semibold">Menu</Text>
-          </SidebarHeader>
+        <Sidebar aria-label="Primary" mobileTitle="Main menu">
           <SidebarBody>
-            <Menu aria-label="Primary">
-              <MenuItem icon={<IconDashboard />}>Dashboard</MenuItem>
-              <MenuItem icon={<IconInbox />}>Inbox</MenuItem>
-              <MenuItem icon={<IconUsers />}>Team</MenuItem>
-              <MenuItem icon={<IconGear />}>Settings</MenuItem>
-            </Menu>
+            <SidebarNav aria-label="Primary">
+              <SidebarItem icon={<LayoutDashboardIcon size={18} />} label="Dashboard" />
+              <SidebarItem icon={<InboxIcon size={18} />} label="Inbox" />
+            </SidebarNav>
           </SidebarBody>
         </Sidebar>
-        <Stack gap="2" marginTop="6">
-          <Text color="fg.muted">
-            This story forces mobile via <code>mobileQuery="(min-width: 0px)"</code>. Tap the
-            hamburger to open the drawer.
-          </Text>
-        </Stack>
       </div>
-    </SidebarProvider>
-  ),
-};
-
-export const WithHeaderAndFooter: Story = {
-  render: () => (
-    <SidebarProvider>
-      <ShellLayout>
-        <Sidebar>
-          <SidebarHeader>
-            <Inline gap="2" align="center" justify="between">
-              <Text weight="semibold">Acme</Text>
-              <SidebarTrigger />
-            </Inline>
-          </SidebarHeader>
-          <SidebarBody>
-            <Menu aria-label="Primary">
-              <MenuGroup label="Workspace">
-                <MenuItem icon={<IconDashboard />} isActive>
-                  Dashboard
-                </MenuItem>
-                <MenuItem icon={<IconInbox />} badge="12">
-                  Inbox
-                </MenuItem>
-              </MenuGroup>
-              <MenuDivider />
-              <MenuGroup label="Admin" collapsible>
-                <MenuItem icon={<IconUsers />}>Members</MenuItem>
-                <MenuItem icon={<IconGear />}>Settings</MenuItem>
-              </MenuGroup>
-            </Menu>
-          </SidebarBody>
-          <SidebarFooter>
-            <Inline gap="2" align="center">
-              <div
-                aria-hidden="true"
-                style={{
-                  width: 28,
-                  height: 28,
-                  borderRadius: '50%',
-                  background: 'var(--cynosure-color-accent-9, #4f46e5)',
-                }}
-              />
-              <Stack gap="0">
-                <Text size="sm" weight="semibold">
-                  Ada Lovelace
-                </Text>
-                <Text size="xs" color="fg.muted">
-                  ada@example.com
-                </Text>
-              </Stack>
-            </Inline>
-          </SidebarFooter>
-        </Sidebar>
-        <DemoMain />
-      </ShellLayout>
     </SidebarProvider>
   ),
 };
@@ -294,79 +238,103 @@ export const RightSide: Story = {
   render: () => (
     <SidebarProvider side="right">
       <ShellLayout>
-        <DemoMain>
-          <Stack gap="3">
-            <Heading level={3}>Inspector</Heading>
-            <Text color="fg.muted">Right-anchored sidebar (e.g. details panel).</Text>
-          </Stack>
-        </DemoMain>
-        <Sidebar>
+        <DemoMain />
+        <Sidebar aria-label="Inspector">
           <SidebarHeader>
-            <Inline gap="2" align="center" justify="between">
-              <Text weight="semibold">Details</Text>
-              <SidebarTrigger />
-            </Inline>
+            <Text weight="semibold">Inspector</Text>
           </SidebarHeader>
           <SidebarBody>
-            <Stack gap="3">
-              <Text size="sm" color="fg.muted">
-                Metadata, tags, linked items.
-              </Text>
-              <Text size="sm">status: open</Text>
-              <Text size="sm">assignee: ada</Text>
-              <Text size="sm">priority: high</Text>
-            </Stack>
+            <Text size="sm" color="fg.muted">
+              Metadata, tags, linked items.
+            </Text>
           </SidebarBody>
+          <SidebarFooter>
+            <SidebarTrigger />
+          </SidebarFooter>
         </Sidebar>
       </ShellLayout>
     </SidebarProvider>
   ),
 };
 
-export const DocsUseCase: Story = {
-  name: 'Use case — docs shell',
+export const FloatingVariant: Story = {
+  render: () => (
+    <SidebarProvider variant="floating">
+      <ShellLayout>
+        <Sidebar aria-label="Primary">
+          <SidebarBody>
+            <SidebarNav aria-label="Primary">
+              <SidebarItem icon={<LayoutDashboardIcon size={18} />} label="Dashboard" isActive />
+              <SidebarItem icon={<InboxIcon size={18} />} label="Inbox" />
+            </SidebarNav>
+          </SidebarBody>
+        </Sidebar>
+        <DemoMain />
+      </ShellLayout>
+    </SidebarProvider>
+  ),
+};
+
+export const InsetVariant: Story = {
+  render: () => (
+    <SidebarProvider variant="inset">
+      <ShellLayout>
+        <Sidebar aria-label="Primary">
+          <SidebarBody>
+            <SidebarNav aria-label="Primary">
+              <SidebarItem icon={<LayoutDashboardIcon size={18} />} label="Dashboard" isActive />
+              <SidebarItem icon={<InboxIcon size={18} />} label="Inbox" />
+            </SidebarNav>
+          </SidebarBody>
+        </Sidebar>
+        <DemoMain />
+      </ShellLayout>
+    </SidebarProvider>
+  ),
+};
+
+export const DocsShell: Story = {
   render: () => {
     function Demo(): ReactElement {
       const [active, setActive] = useState('theming');
       return (
         <SidebarProvider>
           <ShellLayout>
-            <Sidebar>
+            <Sidebar aria-label="Docs">
               <SidebarHeader>
                 <Text weight="semibold">Cynosure docs</Text>
               </SidebarHeader>
               <SidebarBody>
-                <Menu aria-label="Docs">
-                  <MenuGroup label="Getting started">
-                    <MenuItem isActive={active === 'install'} onClick={() => setActive('install')}>
-                      Installation
-                    </MenuItem>
-                    <MenuItem isActive={active === 'quick'} onClick={() => setActive('quick')}>
-                      Quick start
-                    </MenuItem>
-                    <MenuItem isActive={active === 'theming'} onClick={() => setActive('theming')}>
-                      Theming
-                    </MenuItem>
-                  </MenuGroup>
-                  <MenuGroup label="Components" collapsible defaultOpen>
-                    <MenuItem isActive={active === 'button'} onClick={() => setActive('button')}>
-                      Button
-                    </MenuItem>
-                    <MenuItem isActive={active === 'input'} onClick={() => setActive('input')}>
-                      Input
-                    </MenuItem>
-                    <MenuItem isActive={active === 'tabs'} onClick={() => setActive('tabs')}>
-                      Tabs
-                    </MenuItem>
-                  </MenuGroup>
-                </Menu>
+                <SidebarNav aria-label="Docs">
+                  <SidebarGroup label="Getting started">
+                    <SidebarItem
+                      label="Installation"
+                      isActive={active === 'install'}
+                      onClick={() => setActive('install')}
+                    />
+                    <SidebarItem
+                      label="Theming"
+                      isActive={active === 'theming'}
+                      onClick={() => setActive('theming')}
+                    />
+                  </SidebarGroup>
+                  <SidebarGroup label="Components" collapsible defaultOpen>
+                    <SidebarItem
+                      label="Button"
+                      isActive={active === 'button'}
+                      onClick={() => setActive('button')}
+                    />
+                    <SidebarItem
+                      label="Input"
+                      isActive={active === 'input'}
+                      onClick={() => setActive('input')}
+                    />
+                  </SidebarGroup>
+                </SidebarNav>
               </SidebarBody>
             </Sidebar>
             <DemoMain>
-              <Stack gap="3">
-                <Heading level={3}>{active}</Heading>
-                <Text color="fg.muted">Docs content for the "{active}" section goes here.</Text>
-              </Stack>
+              <Heading level={3}>{active}</Heading>
             </DemoMain>
           </ShellLayout>
         </SidebarProvider>

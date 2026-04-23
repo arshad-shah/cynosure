@@ -1,0 +1,81 @@
+---
+title: Tabs
+description: A set of layered sections of content — known as tab panels — that are displayed one at a time.
+order: 15
+category: components
+status: stable
+since: "0.1.0"
+a11y: Uses role="tablist" / role="tab" / role="tabpanel"; keyboard navigable with arrow keys; animated indicator via TabsIndicator.
+bundleSize: "14 kB"
+tags: [navigation, tabs, accessible]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+import StatusBadge from '@/components/StatusBadge.astro';
+import BundleSizePill from '@/components/BundleSizePill.astro';
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="Tabs" /></div>
+
+<LivePreview example="tabs/basic" />
+
+## Usage
+
+```tsx
+import {
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
+  TabsIndicator,
+} from '@arshad-shah/cynosure-react';
+
+<Tabs defaultValue="overview">
+  <TabsList>
+    <TabsTrigger value="overview">Overview</TabsTrigger>
+    <TabsTrigger value="analytics">Analytics</TabsTrigger>
+    <TabsIndicator />
+  </TabsList>
+  <TabsContent value="overview">Overview content</TabsContent>
+  <TabsContent value="analytics">Analytics content</TabsContent>
+</Tabs>
+```
+
+## Variants
+
+### Vertical
+
+Use `orientation="vertical"` to stack the tab list along the side.
+
+<LivePreview example="tabs/vertical" />
+
+### With icons
+
+Add icons alongside tab labels by rendering icon components directly inside `TabsTrigger`.
+
+<LivePreview example="tabs/with-icons" />
+
+### Disabled tab
+
+Pass `disabled` to any `TabsTrigger` to prevent selection.
+
+<LivePreview example="tabs/disabled" />
+
+## API
+
+<PropsTable component="Tabs" />
+
+## Accessibility
+
+- The tab list carries `role="tablist"`; each trigger carries `role="tab"` with `aria-selected` and `aria-controls` managed by Radix UI.
+- Arrow keys cycle between tabs within the list; `Home` / `End` jump to first / last tab.
+- `TabsContent` carries `role="tabpanel"` and is linked to its trigger via `aria-labelledby`.
+- `TabsIndicator` is `aria-hidden="true"` — purely decorative.
+- The `disabled` prop sets `aria-disabled="true"` on the trigger, preventing keyboard focus and interaction.
+
+## Recipes
+
+- Use `variant="solid"` or `variant="enclosed"` for more prominent visual styling.
+- Use `colorScheme="neutral"` to tone down accent colour on the active trigger.
+- Use `fullWidth` to make all triggers share equal width.
+- Omit `<TabsIndicator />` when you prefer a static active border instead of the animated underline.
+- Pair with `size="sm"` or `size="lg"` for dense or spacious UIs.

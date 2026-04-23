@@ -1,5 +1,5 @@
 import { style } from '@vanilla-extract/css';
-import { MEDIA_QUERIES } from './breakpoints.js';
+import { buildResponsiveRules } from './buildResponsive.js';
 
 /**
  * Map of layout-prop → CSS property + the custom-property "base name" that
@@ -55,34 +55,17 @@ const LAYOUT_PROPS: Array<[string, string]> = [
   ['grid-column', 'cynosure-lp-gc'],
   ['grid-row', 'cynosure-lp-gr'],
   ['grid-area', 'cynosure-lp-ga'],
+  // flex-child hints
+  ['flex', 'cynosure-lp-flex'],
+  ['flex-grow', 'cynosure-lp-fg'],
+  ['flex-shrink', 'cynosure-lp-fs'],
+  ['flex-basis', 'cynosure-lp-fb'],
+  ['align-self', 'cynosure-lp-as'],
+  ['justify-self', 'cynosure-lp-js'],
+  ['order', 'cynosure-lp-order'],
 ];
 
-const cascade = (base: string, bps: Array<'base' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'>): string => {
-  // Build nested `var()` fallbacks: var(--x-md, var(--x-sm, var(--x-base)))
-  let expr = `var(--${base}-base)`;
-  for (const bp of bps) {
-    if (bp === 'base') continue;
-    expr = `var(--${base}-${bp}, ${expr})`;
-  }
-  return expr;
-};
-
-const buildRule = (
-  bpsUpTo: Array<'base' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'>,
-): Record<string, string> => {
-  const out: Record<string, string> = {};
-  for (const [prop, base] of LAYOUT_PROPS) {
-    out[prop] = cascade(base, bpsUpTo);
-  }
-  return out;
-};
-
-const LAYOUT_PROPS_BASE = buildRule(['base']);
-const LAYOUT_PROPS_SM = buildRule(['base', 'sm']);
-const LAYOUT_PROPS_MD = buildRule(['base', 'sm', 'md']);
-const LAYOUT_PROPS_LG = buildRule(['base', 'sm', 'md', 'lg']);
-const LAYOUT_PROPS_XL = buildRule(['base', 'sm', 'md', 'lg', 'xl']);
-const LAYOUT_PROPS_2XL = buildRule(['base', 'sm', 'md', 'lg', 'xl', '2xl']);
+const LAYOUT_RULES = buildResponsiveRules(LAYOUT_PROPS);
 
 /**
  * The shared layout-prop base class. Every layout primitive composes this so
@@ -93,12 +76,6 @@ const LAYOUT_PROPS_2XL = buildRule(['base', 'sm', 'md', 'lg', 'xl', '2xl']);
  * ensure that unset higher breakpoints inherit from the nearest lower one.
  */
 export const layoutPropsStyle = style({
-  ...LAYOUT_PROPS_BASE,
-  '@media': {
-    [MEDIA_QUERIES.sm]: LAYOUT_PROPS_SM,
-    [MEDIA_QUERIES.md]: LAYOUT_PROPS_MD,
-    [MEDIA_QUERIES.lg]: LAYOUT_PROPS_LG,
-    [MEDIA_QUERIES.xl]: LAYOUT_PROPS_XL,
-    [MEDIA_QUERIES['2xl']]: LAYOUT_PROPS_2XL,
-  },
+  ...LAYOUT_RULES.base,
+  '@media': LAYOUT_RULES.media,
 });

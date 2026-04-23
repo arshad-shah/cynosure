@@ -1,0 +1,87 @@
+---
+import ArrowRight from '../icons/ArrowRight.astro';
+import Dot from '../icons/Dot.astro';
+---
+<section data-home-band>
+  <div data-home-container>
+    <div data-home-head>
+      <div>
+        <span data-kicker>Tokens <Dot size={3} /> 02</span>
+        <h2>Themeable down to the radius.</h2>
+      </div>
+      <a href="/foundations/design-tokens" data-home-more>Read the token guide <ArrowRight size={12} /></a>
+    </div>
+    <div data-theming>
+      <div data-theming-controls>
+        <div data-control-group>
+          <label>Accent</label>
+          <div data-swatches>
+            <button type="button" data-sw data-accent="#7dd3fc" data-active style="background:#7dd3fc" aria-label="Sky"></button>
+            <button type="button" data-sw data-accent="#34d399" style="background:#34d399" aria-label="Mint"></button>
+            <button type="button" data-sw data-accent="#fbbf24" style="background:#fbbf24" aria-label="Amber"></button>
+            <button type="button" data-sw data-accent="#c084fc" style="background:#c084fc" aria-label="Plum"></button>
+            <button type="button" data-sw data-accent="#f87171" style="background:#f87171" aria-label="Coral"></button>
+          </div>
+        </div>
+        <div data-control-group>
+          <label>Radius</label>
+          <div data-seg>
+            <button type="button" data-radius="4px">sharp</button>
+            <button type="button" data-radius="8px" data-active>soft</button>
+            <button type="button" data-radius="14px">round</button>
+          </div>
+        </div>
+        <div data-control-group>
+          <label>Density</label>
+          <div data-seg>
+            <button type="button" data-density="6px 10px">compact</button>
+            <button type="button" data-density="10px 16px" data-active>default</button>
+            <button type="button" data-density="14px 22px">cozy</button>
+          </div>
+        </div>
+      </div>
+      <div data-theming-preview id="theming-preview">
+        <button data-pv-btn style="padding:var(--pv-density);border-radius:var(--pv-radius);background:var(--pv-accent);color:#0b0d10;border:none;font:inherit;font-size:13px;font-weight:500">Primary</button>
+        <div data-pv-input style="border-radius:var(--pv-radius);padding:var(--pv-density);border:1px solid var(--docs-line);background:var(--docs-surface-2);font-size:13px">name@domain.com</div>
+        <div data-pv-card style="display:flex;align-items:center;gap:10px;padding:12px;background:var(--docs-surface-2);border:1px solid var(--docs-line);border-radius:var(--pv-radius);font-size:13px">
+          <span style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#a78bfa,#ec4899)"></span>
+          <span>Avery Chen</span>
+          <span style="margin-left:auto;width:32px;height:18px;border-radius:999px;background:var(--pv-accent);position:relative"><span style="position:absolute;top:2px;left:16px;width:14px;height:14px;background:#fff;border-radius:50%"></span></span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:var(--pv-density);background:var(--docs-surface-2);border:1px solid var(--docs-line);border-radius:var(--pv-radius);font-size:13px">
+          <span style="width:16px;height:16px;background:var(--pv-accent);border-radius:3px"></span>
+          Publish immediately
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  const preview = document.getElementById('theming-preview');
+  if (preview) {
+    preview.style.setProperty('--pv-accent', '#7dd3fc');
+    preview.style.setProperty('--pv-radius', '8px');
+    preview.style.setProperty('--pv-density', '10px 16px');
+  }
+
+  function bindGroup(attr: string, cssVar: string): void {
+    document.querySelectorAll<HTMLButtonElement>(`[data-${attr}]`).forEach((btn) => {
+      if (btn.dataset.bound === 'true') return;
+      btn.dataset.bound = 'true';
+      btn.addEventListener('click', () => {
+        const value = btn.getAttribute(`data-${attr}`);
+        if (!value || !preview) return;
+        preview.style.setProperty(cssVar, value);
+        btn.parentElement
+          ?.querySelectorAll<HTMLButtonElement>(`[data-${attr}]`)
+          .forEach((b) => b.removeAttribute('data-active'));
+        btn.setAttribute('data-active', '');
+      });
+    });
+  }
+
+  bindGroup('accent', '--pv-accent');
+  bindGroup('radius', '--pv-radius');
+  bindGroup('density', '--pv-density');
+</script>

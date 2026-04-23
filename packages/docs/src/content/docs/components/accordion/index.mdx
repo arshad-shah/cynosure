@@ -1,0 +1,71 @@
+---
+title: Accordion
+description: A vertically stacked set of interactive headings that each reveal a section of content.
+order: 16
+category: components
+status: stable
+since: "0.1.0"
+a11y: Uses role="region" + aria-expanded on triggers; keyboard navigable with Enter/Space; focus managed by Radix UI.
+bundleSize: "14 kB"
+tags: [disclosure, accordion, accessible]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+import StatusBadge from '@/components/StatusBadge.astro';
+import BundleSizePill from '@/components/BundleSizePill.astro';
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="Accordion" /></div>
+
+<LivePreview example="accordion/basic" />
+
+## Usage
+
+```tsx
+import {
+  Accordion,
+  AccordionItem,
+  AccordionTrigger,
+  AccordionContent,
+} from '@arshad-shah/cynosure-react';
+
+<Accordion type="single" collapsible>
+  <AccordionItem value="item-1">
+    <AccordionTrigger>What is Cynosure?</AccordionTrigger>
+    <AccordionContent>A React component library built for accessibility.</AccordionContent>
+  </AccordionItem>
+</Accordion>
+```
+
+## Variants
+
+### Multiple open
+
+Use `type="multiple"` to allow several items to be expanded simultaneously.
+
+<LivePreview example="accordion/multi" />
+
+### Disabled item
+
+Pass `disabled` to any `AccordionItem` to prevent it from being expanded.
+
+<LivePreview example="accordion/disabled" />
+
+## API
+
+<PropsTable component="Accordion" />
+
+## Accessibility
+
+- Each `AccordionTrigger` is a `<button>` with `aria-expanded` managed by Radix UI.
+- The content region carries `role="region"` and is linked to its trigger via `aria-labelledby`.
+- `Enter` or `Space` toggles the focused item; `Tab` moves focus between triggers.
+- Disabled items carry `aria-disabled="true"` and are skipped by keyboard navigation.
+- The chevron icon is `aria-hidden="true"` — it is purely decorative.
+
+## Recipes
+
+- Use `variant="contained"` for a bordered card-style accordion.
+- Use `variant="ghost"` for a minimal look without visible borders.
+- Set `collapsible` on `type="single"` to allow the active item to be toggled closed.
+- Use `hideIndicator` on `AccordionTrigger` to remove the built-in chevron when you supply a custom indicator.
+- Combine with `size="lg"` for more generous padding in spacious layouts.

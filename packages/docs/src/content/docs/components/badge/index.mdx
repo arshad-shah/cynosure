@@ -1,0 +1,56 @@
+---
+title: Badge
+description: Small status label for counts, tags, and state indicators.
+order: 9
+category: components
+status: stable
+since: "0.1.0"
+a11y: Renders as a <span>; dot mode sets aria-hidden by default — provide aria-label when the dot conveys meaningful status.
+bundleSize: "3 kB"
+tags: [feedback, label, status]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+import StatusBadge from '@/components/StatusBadge.astro';
+import BundleSizePill from '@/components/BundleSizePill.astro';
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="Badge" /></div>
+
+<LivePreview example="badge/basic" />
+
+## Usage
+
+```tsx
+import { Badge } from '@arshad-shah/cynosure-react';
+
+<Badge>New</Badge>
+```
+
+## Variants
+
+Badge ships four visual variants — `solid`, `soft` (default), `outline`, and `ghost` — each available in six color schemes: `accent`, `neutral`, `success`, `warning`, `danger`, and `info`.
+
+<LivePreview example="badge/variants" />
+
+## Dot indicator
+
+Pass `dot` to render a bare coloured dot with no text content. Supply an `aria-label` to keep the indicator accessible.
+
+<LivePreview example="badge/with-dot" />
+
+## API
+
+<PropsTable component="Badge" />
+
+## Accessibility
+
+- Rendered as a native `<span>` — purely presentational by default.
+- In `dot` mode with no children, `aria-hidden="true"` is set automatically. Add an explicit `aria-label` when the dot conveys meaningful information (e.g. online status).
+- Colour alone is never the only signal — pair with a visible label or `aria-label` for colour-blind users.
+
+## Recipes
+
+- Use `shape="pill"` for rounded pill badges (e.g. notification counts).
+- Use `shape="square"` for icon-only square badges.
+- Use `icon` prop to prepend a decorative icon: `<Badge icon={<StarIcon />}>Featured</Badge>`.
+- Combine `size="xs"` with `dot` for tight inline status dots next to usernames or connection states.

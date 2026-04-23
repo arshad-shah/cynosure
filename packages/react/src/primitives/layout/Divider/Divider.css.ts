@@ -1,53 +1,129 @@
-import { style } from '@vanilla-extract/css';
+import { style, styleVariants } from '@vanilla-extract/css';
 import { vars } from '../../../styles/vars.css.js';
 
 export const dividerBase = style({
-  border: 0,
   margin: 0,
   padding: 0,
-  background: 'currentColor',
-  color: vars.color.border.default,
-  // Self-stretch inside a flex container if orientation matches.
-  alignSelf: 'stretch',
+  border: 0,
+  background: 'transparent',
+  flexShrink: 0,
+});
+
+export const dividerTone = styleVariants({
+  subtle: { color: vars.color.border.subtle },
+  default: { color: vars.color.border.default },
 });
 
 export const dividerHorizontal = style({
+  display: 'block',
   width: '100%',
-  height: 'var(--cynosure-divider-thickness, 1px)',
+  height: 0,
+  borderTopStyle: 'solid',
+  borderTopColor: 'currentColor',
+  borderTopWidth: 'var(--cynosure-divider-thickness, 1px)',
 });
 
 export const dividerVertical = style({
-  width: 'var(--cynosure-divider-thickness, 1px)',
-  height: 'auto',
-  minHeight: '1em',
+  display: 'inline-block',
+  width: 0,
+  height: 'var(--cynosure-divider-length, auto)',
+  minHeight: '1.5em',
+  alignSelf: 'stretch',
+  borderInlineStartStyle: 'solid',
+  borderInlineStartColor: 'currentColor',
+  borderInlineStartWidth: 'var(--cynosure-divider-thickness, 1px)',
+  verticalAlign: 'middle',
 });
 
-export const dividerSolid = style({ borderStyle: 'solid' });
+export const dividerSolid = style({});
 export const dividerDashed = style({
-  background: 'transparent',
-  borderTopWidth: 'var(--cynosure-divider-thickness, 1px)',
-  borderTopStyle: 'dashed',
-  borderTopColor: 'currentColor',
-  height: 0,
+  selectors: {
+    [`${dividerHorizontal}&`]: { borderTopStyle: 'dashed' },
+    [`${dividerVertical}&`]: { borderInlineStartStyle: 'dashed' },
+  },
 });
 export const dividerDotted = style({
-  background: 'transparent',
-  borderTopWidth: 'var(--cynosure-divider-thickness, 1px)',
-  borderTopStyle: 'dotted',
+  selectors: {
+    [`${dividerHorizontal}&`]: { borderTopStyle: 'dotted' },
+    [`${dividerVertical}&`]: { borderInlineStartStyle: 'dotted' },
+  },
+});
+
+const softHorizontalMask =
+  'linear-gradient(to right, transparent 0%, #000 12%, #000 88%, transparent 100%)';
+const softVerticalMask =
+  'linear-gradient(to bottom, transparent 0%, #000 12%, #000 88%, transparent 100%)';
+
+export const dividerSoft = style({
+  selectors: {
+    [`${dividerHorizontal}&`]: {
+      WebkitMaskImage: softHorizontalMask,
+      maskImage: softHorizontalMask,
+    },
+    [`${dividerVertical}&`]: {
+      WebkitMaskImage: softVerticalMask,
+      maskImage: softVerticalMask,
+    },
+  },
+});
+
+// ── Labeled (horizontal only) ──────────────────────────────────────────
+
+const ruleBefore = {
+  content: '""',
+  alignSelf: 'center',
+  borderTopStyle: 'solid',
   borderTopColor: 'currentColor',
-  height: 0,
-});
-export const dividerVerticalDashed = style({
+  borderTopWidth: 'var(--cynosure-divider-thickness, 1px)',
+  minWidth: vars.space['4'],
+} as const;
+
+export const dividerLabeled = style({
+  display: 'flex',
+  alignItems: 'center',
+  width: '100%',
+  margin: 0,
+  padding: 0,
+  border: 0,
   background: 'transparent',
-  borderInlineStartWidth: 'var(--cynosure-divider-thickness, 1px)',
-  borderInlineStartStyle: 'dashed',
-  borderInlineStartColor: 'currentColor',
-  width: 0,
+  '::before': { ...ruleBefore, flex: '1 1 0%' },
+  '::after': { ...ruleBefore, flex: '1 1 0%' },
+  selectors: {
+    [`&${dividerDashed}::before, &${dividerDashed}::after`]: { borderTopStyle: 'dashed' },
+    [`&${dividerDotted}::before, &${dividerDotted}::after`]: { borderTopStyle: 'dotted' },
+    [`&${dividerSoft}::before`]: {
+      WebkitMaskImage: softHorizontalMask,
+      maskImage: softHorizontalMask,
+    },
+    [`&${dividerSoft}::after`]: {
+      WebkitMaskImage: softHorizontalMask,
+      maskImage: softHorizontalMask,
+    },
+  },
 });
-export const dividerVerticalDotted = style({
-  background: 'transparent',
-  borderInlineStartWidth: 'var(--cynosure-divider-thickness, 1px)',
-  borderInlineStartStyle: 'dotted',
-  borderInlineStartColor: 'currentColor',
-  width: 0,
+
+export const dividerLabelAlign = styleVariants({
+  start: {
+    '::before': { flex: `0 0 ${vars.space['4']}` },
+    '::after': { flex: '1 1 0%' },
+  },
+  center: {
+    '::before': { flex: '1 1 0%' },
+    '::after': { flex: '1 1 0%' },
+  },
+  end: {
+    '::before': { flex: '1 1 0%' },
+    '::after': { flex: `0 0 ${vars.space['4']}` },
+  },
+});
+
+export const dividerLabel = style({
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: vars.space['1.5'],
+  paddingInline: vars.space['3'],
+  color: vars.color.foreground.muted,
+  fontSize: '0.875rem',
+  lineHeight: 1,
+  whiteSpace: 'nowrap',
 });

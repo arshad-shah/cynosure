@@ -1,0 +1,41 @@
+---
+import PlaygroundIsland from '../../components/Home/Playground.tsx';
+import { getThemeInitScript } from '../../lib/theme-init';
+import '../../styles/site.css';
+
+const initScript = getThemeInitScript();
+---
+<!doctype html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Interactive playground</title>
+    <meta name="robots" content="noindex" />
+    <script is:inline set:html={initScript}></script>
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: transparent;
+      }
+      body {
+        padding: var(--space-4, 1rem);
+        display: flex;
+        justify-content: center;
+      }
+      body > section {
+        width: 100%;
+        max-width: 960px;
+      }
+    </style>
+  </head>
+  <body>
+    <PlaygroundIsland client:load />
+    <script>
+      import { startIframeHeightReporter } from '../../lib/ui/iframe-resize.ts';
+      startIframeHeightReporter({ channel: 'playground' });
+    </script>
+  </body>
+</html>
