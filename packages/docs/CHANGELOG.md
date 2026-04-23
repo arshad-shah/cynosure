@@ -1,5 +1,12 @@
 # @arshad-shah/cynosure-docs
 
+## 2.1.0
+
+### Patch Changes
+
+- Updated dependencies [[`8cf2f7d`](https://github.com/arshad-shah/cynosure/commit/8cf2f7dcbe9be3e0fd20b73b588b1cb8fe506b64)]:
+  - @arshad-shah/cynosure-react@2.1.0
+
 ## 2.0.0
 
 ### Patch Changes
