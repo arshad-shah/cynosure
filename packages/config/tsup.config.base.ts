@@ -13,7 +13,7 @@ export const createConfig = (overrides: Partial<Options> = {}): Options =>
     format: ['esm'],
     target: 'es2022',
     dts: true,
-    sourcemap: true,
+    sourcemap: false,
     clean: true,
     splitting: true,
     treeshake: true,
