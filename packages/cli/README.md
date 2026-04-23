@@ -6,6 +6,8 @@ Scaffolding CLI for Cynosure UI. One command, zero setup.
 npx cynosure init
 ```
 
+**Browse the components this CLI sets up, live:** [cynosure.arshadshah.com](https://cynosure.arshadshah.com)
+
 ## What it does
 
 - Detects your framework (Next.js App Router, Next.js Pages, Vite, CRA, Remix)
@@ -36,6 +38,13 @@ import { CynosureProvider } from '@arshad-shah/cynosure-react';
 
 <CynosureProvider>{children}</CynosureProvider>
 ```
+
+## Links
+
+- [Storybook — live component reference](https://cynosure.arshadshah.com)
+- [Main repo](https://github.com/arshad-shah/cynosure)
+- [`@arshad-shah/cynosure-react`](https://www.npmjs.com/package/@arshad-shah/cynosure-react) — the library this CLI wires up
+- [Changelog](./CHANGELOG.md)
 
 ## License
 

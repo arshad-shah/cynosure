@@ -4,6 +4,8 @@
 
 Most application developers want [`@arshad-shah/cynosure-react`](https://www.npmjs.com/package/@arshad-shah/cynosure-react) instead — it's the batteries-included component library. This package is the substrate it sits on: low-level building blocks meant for library authors, advanced consumers, and anyone assembling their own components on top of Cynosure's behaviour layer.
 
+**Explore the full component library, live:** [cynosure.arshadshah.com](https://cynosure.arshadshah.com)
+
 ---
 
 ## Install
@@ -12,7 +14,7 @@ Most application developers want [`@arshad-shah/cynosure-react`](https://www.npm
 pnpm add @arshad-shah/cynosure-core
 ```
 
-Peer requirements: `react@^19`, `react-dom@^19`.
+Peer requirements: `react >= 18`, `react-dom >= 18`.
 
 ---
 
@@ -58,8 +60,9 @@ If none of those apply, you probably want `@arshad-shah/cynosure-react`.
 
 ## Links
 
+- [Storybook — live component reference](https://cynosure.arshadshah.com)
 - [Main repo](https://github.com/arshad-shah/cynosure)
-- [Architecture overview](https://github.com/arshad-shah/cynosure/blob/main/docs/specs/ARCHITECTURE.md)
+- [`@arshad-shah/cynosure-react`](https://www.npmjs.com/package/@arshad-shah/cynosure-react) — the batteries-included component layer
 - [Changelog](./CHANGELOG.md)
 
 ## License

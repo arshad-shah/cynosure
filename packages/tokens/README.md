@@ -4,6 +4,8 @@
 
 Source of truth for colour, spacing, typography, radius, elevation, motion, and z-index across the Cynosure ecosystem. Tokens are authored as DTCG JSON and compiled by Style Dictionary to CSS custom properties, a TypeScript module, and platform outputs.
 
+**See tokens applied across the component library, live:** [cynosure.arshadshah.com](https://cynosure.arshadshah.com)
+
 ---
 
 ## Install
@@ -83,6 +85,7 @@ See the [custom-themes guide](https://github.com/arshad-shah/cynosure/blob/main/
 
 ## Links
 
+- [Storybook — tokens applied in context](https://cynosure.arshadshah.com)
 - [Main repo](https://github.com/arshad-shah/cynosure)
 - [Design tokens docs](https://github.com/arshad-shah/cynosure/blob/main/docs/foundations/design-tokens.mdx)
 - [Changelog](./CHANGELOG.md)

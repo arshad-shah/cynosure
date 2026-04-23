@@ -4,6 +4,8 @@
 
 Each theme is a single CSS file that redefines Cynosure's design-token custom properties under a scoping selector. Import one at the root of your app and every component re-renders in that theme automatically.
 
+**See every theme applied to the component library, live:** [cynosure.arshadshah.com](https://cynosure.arshadshah.com)
+
 ---
 
 ## Install
@@ -61,6 +63,7 @@ A "theme" in Cynosure is just a CSS file that overrides token custom properties.
 
 ## Links
 
+- [Storybook — see themes applied live](https://cynosure.arshadshah.com)
 - [Main repo](https://github.com/arshad-shah/cynosure)
 - [Theming overview](https://github.com/arshad-shah/cynosure/blob/main/docs/foundations/theming-overview.mdx)
 - [Terminal theme recipe](https://github.com/arshad-shah/cynosure/blob/main/docs/foundations/terminal-theme-recipe.mdx)

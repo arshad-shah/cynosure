@@ -4,6 +4,8 @@
 
 Every icon Lucide ships is re-exported by name. Bundlers with proper tree-shaking — Vite, Rollup, Webpack ≥5, Next.js — pick up only the icons you import. The package exists so the Cynosure ecosystem has a single, version-pinned icon source; use it directly if you want one too, or keep importing `lucide-react` if you'd rather not add a layer.
 
+**Explore icons paired with Cynosure components:** [cynosure.arshadshah.com](https://cynosure.arshadshah.com)
+
 ---
 
 ## Install
@@ -12,7 +14,7 @@ Every icon Lucide ships is re-exported by name. Bundlers with proper tree-shakin
 pnpm add @arshad-shah/cynosure-icons
 ```
 
-Peer requirements: `react@^19`.
+Peer requirements: `react >= 18`.
 
 ---
 
@@ -67,6 +69,7 @@ export interface NavItem {
 
 ## Links
 
+- [Storybook — live component reference](https://cynosure.arshadshah.com)
 - [Main repo](https://github.com/arshad-shah/cynosure)
 - [Lucide icon gallery](https://lucide.dev/icons/) — browse every available icon by name
 - [Changelog](./CHANGELOG.md)
