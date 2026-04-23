@@ -66,7 +66,7 @@ catalog:
   "embla-carousel-react": 8.6.0
   glob: 11.1.0
   jsdom: 25.0.1
-  lint-staged: 15.5.2
+  lint-staged: 16.4.0
   lucide-react: 1.8.0
   playwright: 1.59.1
   publint: 0.3.18
