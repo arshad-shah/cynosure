@@ -1,3 +1,4 @@
+import { ChevronRight } from 'lucide-react';
 import {
   type AnchorHTMLAttributes,
   type ButtonHTMLAttributes,
@@ -26,18 +27,6 @@ import {
   menuItemLabel,
   menuRoot,
 } from './Menu.css.js';
-
-const Caret = (): ReactElement => (
-  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-    <path
-      d="m9 6 6 6-6 6"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-);
 
 export interface MenuProps extends HTMLAttributes<HTMLElement> {
   'aria-label'?: string;
@@ -105,7 +94,7 @@ export const MenuGroup = forwardRef<HTMLDivElement, MenuGroupProps>(function Men
               className={menuGroupToggle}
             >
               <span className={menuGroupCaret} data-open={open ? 'true' : 'false'}>
-                <Caret />
+                <ChevronRight />
               </span>
               <span className={menuGroupLabel} style={{ marginLeft: 4 }}>
                 {label}

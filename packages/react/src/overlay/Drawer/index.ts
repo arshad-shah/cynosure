@@ -8,21 +8,5 @@ export {
   DrawerPortal,
   DrawerTitle,
   DrawerTrigger,
-  Sheet,
-  SheetClose,
-  SheetContent,
-  SheetDescription,
-  SheetFooter,
-  SheetHeader,
-  SheetPortal,
-  SheetTitle,
-  SheetTrigger,
 } from './Drawer.js';
-export type {
-  DrawerContentProps,
-  DrawerSide,
-  DrawerSize,
-  SheetContentProps,
-  SheetSide,
-  SheetSize,
-} from './Drawer.js';
+export type { DrawerContentProps, DrawerSide, DrawerSize } from './Drawer.js';

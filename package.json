@@ -9,6 +9,8 @@
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev --parallel",
+    "docs": "pnpm --filter @arshad-shah/cynosure-docs dev",
+    "docs:build": "pnpm --filter @arshad-shah/cynosure-docs build",
     "test": "turbo run test",
     "test:watch": "turbo run test:watch --parallel",
     "lint": "biome check .",
@@ -27,17 +29,20 @@
     "audit:rtl": "node scripts/audit-rtl.mjs",
     "audit": "pnpm audit:rtl && pnpm audit:contrast",
     "docs:changelog": "node scripts/build-changelog-page.mjs",
-    "chromatic": "chromatic --storybook-build-dir=storybook-static --exit-zero-on-changes"
+    "chromatic": "chromatic --storybook-build-dir=storybook-static --exit-zero-on-changes",
+    "brand:generate": "node brand/generate.mjs"
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "catalog:",
-    "@biomejs/biome": "catalog:",
-    "@changesets/changelog-github": "catalog:",
-    "@changesets/cli": "catalog:",
-    "chromatic": "catalog:",
     "@arshad-shah/cynosure-react": "workspace:*",
     "@arshad-shah/cynosure-themes": "workspace:*",
     "@arshad-shah/cynosure-tokens": "workspace:*",
+    "@biomejs/biome": "catalog:",
+    "@changesets/changelog-github": "catalog:",
+    "@changesets/cli": "catalog:",
+    "@fontsource-variable/geist": "catalog:",
+    "@fontsource-variable/jetbrains-mono": "catalog:",
+    "@size-limit/preset-small-lib": "catalog:",
     "@storybook/addon-a11y": "catalog:",
     "@storybook/addon-docs": "catalog:",
     "@storybook/addon-themes": "catalog:",
@@ -52,20 +57,22 @@
     "@types/react-dom": "catalog:",
     "@vanilla-extract/esbuild-plugin": "catalog:",
     "@vanilla-extract/vite-plugin": "catalog:",
-    "@size-limit/preset-small-lib": "catalog:",
-    "colorjs.io": "catalog:",
     "@vitejs/plugin-react": "catalog:",
     "@vitest/browser": "catalog:",
     "@vitest/browser-playwright": "catalog:",
     "@vitest/coverage-v8": "catalog:",
+    "chromatic": "catalog:",
+    "colorjs.io": "catalog:",
     "lint-staged": "catalog:",
     "playwright": "catalog:",
     "publint": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
+    "sharp": "^0.34.5",
     "simple-git-hooks": "catalog:",
     "size-limit": "catalog:",
     "storybook": "catalog:",
+    "to-ico": "^1.1.5",
     "tsup": "catalog:",
     "turbo": "catalog:",
     "typescript": "catalog:",
@@ -80,6 +87,7 @@
     "*.{ts,tsx,js,jsx,json,md}": ["biome check --write --no-errors-on-unmatched"]
   },
   "volta": {
-    "node": "24.15.0"
+    "node": "24.15.0",
+    "pnpm": "10.33.0"
   }
 }

@@ -1,0 +1,21 @@
+export const EXPECTED_COMPONENT_SLUGS = [
+  'button',
+  'input',
+  'textarea',
+  'checkbox',
+  'radio',
+  'switch',
+  'select',
+  'combobox',
+  'badge',
+  'alert',
+  'card',
+  'dialog',
+  'tooltip',
+  'dropdown-menu',
+  'tabs',
+  'accordion',
+  'table',
+  'data-table',
+] as const;
+export type ComponentSlug = (typeof EXPECTED_COMPONENT_SLUGS)[number];

@@ -1,0 +1,10 @@
+---
+import counts from '../../generated/component-count.json';
+const total = (counts as { total: number }).total;
+---
+<div data-metric-strip>
+  <span><b>{total}</b>Components</span>
+  <span><b>0</b>Runtime deps</span>
+  <span><b>WCAG 2.2</b>AA</span>
+  <span><b>MIT</b>Licensed</span>
+</div>

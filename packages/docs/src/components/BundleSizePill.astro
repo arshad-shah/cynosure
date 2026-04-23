@@ -1,0 +1,13 @@
+---
+import sizeLimit from '@repo/.size-limit.json';
+
+interface Props { name: string }
+const { name } = Astro.props;
+
+interface SizeLimitEntry { name: string; limit: string; path: string }
+const entries = sizeLimit as SizeLimitEntry[];
+const entry = entries.find((e) => e.name === name);
+---
+{entry ? (
+  <span data-bundle-size>{entry.limit}</span>
+) : null}

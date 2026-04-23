@@ -1,0 +1,81 @@
+---
+title: DropdownMenu
+description: A contextual menu that reveals a list of actions or options when its trigger is activated.
+order: 14
+category: components
+status: stable
+since: "0.1.0"
+a11y: Uses role="menu" / role="menuitem"; keyboard navigable with arrow keys; Esc closes; focus returns to trigger.
+bundleSize: "30 kB"
+tags: [overlay, menu, accessible]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+import StatusBadge from '@/components/StatusBadge.astro';
+import BundleSizePill from '@/components/BundleSizePill.astro';
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="DropdownMenu" /></div>
+
+<LivePreview example="dropdown-menu/basic" />
+
+## Usage
+
+```tsx
+import {
+  DropdownMenu,
+  DropdownMenuTriggerButton,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuItem,
+} from '@arshad-shah/cynosure-react';
+
+<DropdownMenu>
+  <DropdownMenuTriggerButton>Options</DropdownMenuTriggerButton>
+  <DropdownMenuContent>
+    <DropdownMenuLabel>Account</DropdownMenuLabel>
+    <DropdownMenuSeparator />
+    <DropdownMenuItem>Profile</DropdownMenuItem>
+    <DropdownMenuItem variant="danger">Sign out</DropdownMenuItem>
+  </DropdownMenuContent>
+</DropdownMenu>
+```
+
+## Variants
+
+### With icons
+
+Add a leading icon to any `DropdownMenuItem` via the `icon` prop.
+
+<LivePreview example="dropdown-menu/with-icons" />
+
+### With shortcuts
+
+Render keyboard shortcut hints using `DropdownMenuShortcut`. Each character is wrapped in a `Kbd` keycap automatically.
+
+<LivePreview example="dropdown-menu/with-shortcuts" />
+
+### Checkbox and radio items
+
+Use `DropdownMenuCheckboxItem` for toggleable items and `DropdownMenuRadioItem` inside a `DropdownMenuRadioGroup` for mutually exclusive selections.
+
+<LivePreview example="dropdown-menu/checkbox-radio" />
+
+## API
+
+<PropsTable component="DropdownMenuContent" />
+
+## Accessibility
+
+- The menu follows the ARIA Menu Button pattern: `role="menu"` on the content, `role="menuitem"` on each item.
+- Arrow keys navigate between items; `Home` / `End` jump to first / last item.
+- Pressing `Esc` closes the menu and returns focus to the trigger.
+- `DropdownMenuCheckboxItem` carries `role="menuitemcheckbox"`; `DropdownMenuRadioItem` carries `role="menuitemradio"`.
+- `DropdownMenuShortcut` is `aria-hidden="true"` — decorative only, not announced.
+
+## Recipes
+
+- Use `DropdownMenuSub` + `DropdownMenuSubTrigger` + `DropdownMenuSubContent` for nested sub-menus.
+- Use `DropdownMenuTrigger asChild` instead of `DropdownMenuTriggerButton` to compose with any custom trigger element.
+- Add `description` to any item for a muted second line of context below the label.
+- Use `variant="danger"` on destructive items for red highlight styling.

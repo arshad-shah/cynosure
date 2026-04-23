@@ -1,0 +1,80 @@
+---
+title: Theming Overview
+description: How ThemeProvider and CSS custom properties combine to give Cynosure its runtime theming model.
+order: 3
+category: foundations
+---
+
+# Theming overview
+
+Cynosure ships two runtime theming building blocks:
+
+1. **Tokens as CSS custom properties.** Every design decision resolves to a
+   `--cynosure-*` variable at runtime. Swap the values, swap the theme.
+2. **`ThemeProvider`.** A React component that writes `data-theme`
+   on `<html>`, persists the choice, syncs across tabs, and supports
+   `system`.
+
+## `<ThemeProvider>`
+
+```tsx
+import { ThemeProvider } from '@arshad-shah/cynosure-react';
+
+<ThemeProvider
+  themes={['light', 'dark', 'terminal', 'high-contrast']}
+  defaultTheme="system"
+  storageKey="cynosure-theme"
+>
+  {children}
+</ThemeProvider>
+```
+
+Props worth knowing:
+
+| Prop                         | Default           | Purpose                                                    |
+| ---------------------------- | ----------------- | ---------------------------------------------------------- |
+| `themes`                     | `['light','dark']`| Allowed theme names.                                        |
+| `defaultTheme`               | `'system'`        | Falls back to `prefers-color-scheme`.                       |
+| `storage`                    | `localStorage`    | Pass `null` to disable persistence.                         |
+| `storageKey`                 | `'cynosure-theme'`| Name of the persisted value.                                |
+| `disableTransitionOnChange`  | `false`           | Blocks transitions during a theme flip (prevents flash).    |
+
+## `useTheme()`
+
+```tsx
+const { theme, setTheme, resolvedTheme, themes } = useTheme();
+```
+
+- `theme` — the user's selection (can be `'system'`).
+- `resolvedTheme` — the concrete theme the UI is currently rendering
+  (`'light'` or `'dark'` etc.), honouring `system` preference.
+- `setTheme(name)` — switches the theme, persists, and broadcasts.
+- `themes` — the allowed set passed to `ThemeProvider`.
+
+## Flash-free SSR
+
+Render the init script before the tree hydrates so the theme is correct on
+first paint. Place this in your document `<head>` before React loads:
+
+```ts
+import { getThemeInitScript } from '@arshad-shah/cynosure-react';
+
+// Call getThemeInitScript() and embed the result as an inline script in <head>
+// This reads localStorage and sets data-theme before hydration.
+const script = getThemeInitScript();
+```
+
+## Built-in themes
+
+| Theme             | Import                                    |
+| ----------------- | ----------------------------------------- |
+| Light (default)   | `@arshad-shah/cynosure-tokens/css`                       |
+| Dark              | `@arshad-shah/cynosure-tokens/css/dark`                  |
+| Terminal          | `@arshad-shah/cynosure-themes/terminal`                  |
+| High contrast     | `@arshad-shah/cynosure-themes/high-contrast`             |
+
+## Further reading
+
+- [Dark mode](/docs/foundations/dark-mode)
+- [Custom themes](/docs/foundations/custom-themes)
+- [Terminal theme recipe](/docs/foundations/terminal-theme-recipe)

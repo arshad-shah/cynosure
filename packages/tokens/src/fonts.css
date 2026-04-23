@@ -1,0 +1,10 @@
+/*
+ * Cynosure UI — webfont loader.
+ *
+ * Optional CSS entry that registers the brand typefaces referenced by the
+ * default theme: Geist Variable (sans) and JetBrains Mono Variable (mono).
+ * Import this file once at the app root if you want the typefaces bundled;
+ * otherwise the token font stacks fall through to the system fallbacks.
+ */
+@import "@fontsource-variable/geist";
+@import "@fontsource-variable/jetbrains-mono";

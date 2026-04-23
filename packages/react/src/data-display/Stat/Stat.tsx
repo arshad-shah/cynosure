@@ -1,4 +1,5 @@
-import { type HTMLAttributes, type ReactElement, forwardRef } from 'react';
+import { TrendingDown, TrendingUp } from 'lucide-react';
+import { type HTMLAttributes, forwardRef } from 'react';
 import { cn } from '../../utils/cn.js';
 import { statArrow, statHelp, statLabel, statRoot, statValue } from './Stat.css.js';
 
@@ -44,30 +45,6 @@ export interface StatArrowProps extends HTMLAttributes<HTMLSpanElement> {
   direction?: StatArrowDirection;
 }
 
-const IncreaseIcon = (): ReactElement => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-    <path
-      d="M6 15l6-6 6 6"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-);
-
-const DecreaseIcon = (): ReactElement => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-    <path
-      d="M6 9l6 6 6-6"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-);
-
 export const StatArrow = forwardRef<HTMLSpanElement, StatArrowProps>(function StatArrow(
   { direction = 'increase', className, children, ...rest },
   ref,
@@ -80,7 +57,8 @@ export const StatArrow = forwardRef<HTMLSpanElement, StatArrowProps>(function St
       className={cn(statArrow, className)}
       {...rest}
     >
-      {children ?? (direction === 'increase' ? <IncreaseIcon /> : <DecreaseIcon />)}
+      {children ??
+        (direction === 'increase' ? <TrendingUp size={'14'} /> : <TrendingDown size={'14'} />)}
     </span>
   );
 });

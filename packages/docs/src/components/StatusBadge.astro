@@ -1,0 +1,44 @@
+---
+interface Props { status: 'stable' | 'beta' | 'alpha' | 'experimental' | 'deprecated' }
+const { status } = Astro.props;
+---
+<span data-status-badge data-status={status}>{status}</span>
+
+<style>
+  [data-status-badge] {
+    display: inline-block;
+    padding: 0.15em 0.55em;
+    border-radius: var(--cynosure-radius-full, 9999px);
+    font-size: 0.75em;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border: 1px solid var(--cynosure-color-border-subtle, color-mix(in srgb, currentColor 15%, transparent));
+    line-height: 1;
+  }
+  [data-status-badge][data-status="stable"] {
+    color: var(--cynosure-color-feedback-success-foreground, #166534);
+    background: var(--cynosure-color-feedback-success-soft, #dcfce7);
+    border-color: var(--cynosure-color-feedback-success-border, transparent);
+  }
+  [data-status-badge][data-status="beta"] {
+    color: var(--cynosure-color-feedback-warning-foreground, #92400e);
+    background: var(--cynosure-color-feedback-warning-soft, #fef3c7);
+    border-color: var(--cynosure-color-feedback-warning-border, transparent);
+  }
+  [data-status-badge][data-status="alpha"] {
+    color: var(--cynosure-color-feedback-danger-foreground, #991b1b);
+    background: var(--cynosure-color-feedback-danger-soft, #fee2e2);
+    border-color: var(--cynosure-color-feedback-danger-border, transparent);
+  }
+  [data-status-badge][data-status="experimental"] {
+    color: var(--cynosure-color-accent-solid, #4f46e5);
+    background: var(--cynosure-color-accent-soft, #eef2ff);
+    border-color: transparent;
+  }
+  [data-status-badge][data-status="deprecated"] {
+    color: var(--cynosure-color-foreground-muted, #52525b);
+    background: var(--cynosure-color-background-subtle, #f4f4f5);
+    border-color: var(--cynosure-color-border-subtle, #e4e4e7);
+  }
+</style>

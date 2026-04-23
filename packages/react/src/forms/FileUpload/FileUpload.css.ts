@@ -1,27 +1,12 @@
-import { style } from '@vanilla-extract/css';
+import { style, styleVariants } from '@vanilla-extract/css';
 import { vars } from '../../styles/vars.css.js';
 
-export const root = style({
+const dropZoneBase = style({
   display: 'flex',
-  flexDirection: 'column',
-  gap: vars.space['2'],
-  width: '100%',
-});
-
-export const dropZone = style({
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  justifyContent: 'center',
-  gap: vars.space['2'],
-  padding: vars.space['6'],
-  border: `2px dashed ${vars.color.border.default}`,
-  borderRadius: vars.radius.md,
-  background: vars.color.background.surface,
   color: vars.color.foreground.muted,
   cursor: 'pointer',
-  transition: `border-color ${vars.duration.fast}, background-color ${vars.duration.fast}`,
   outline: 'none',
+  transition: `border-color ${vars.duration.fast}, background-color ${vars.duration.fast}, box-shadow ${vars.duration.fast}`,
   selectors: {
     '&[data-over="true"]': {
       borderColor: vars.color.accent.solid,
@@ -39,71 +24,186 @@ export const dropZone = style({
   },
 });
 
+export const dropZoneVariants = styleVariants({
+  default: [
+    dropZoneBase,
+    {
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      gap: vars.space['2'],
+      padding: vars.space['8'],
+      border: `2px dashed ${vars.color.border.default}`,
+      borderRadius: vars.radius.lg,
+      background: vars.color.background.surface,
+    },
+  ],
+  card: [
+    dropZoneBase,
+    {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: vars.space['3'],
+      padding: vars.space['4'],
+      border: `1px solid ${vars.color.border.subtle}`,
+      borderRadius: vars.radius.lg,
+      background: vars.color.background.surface,
+    },
+  ],
+  compact: [
+    dropZoneBase,
+    {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: vars.space['2'],
+      padding: `${vars.space['2']} ${vars.space['3']}`,
+      border: `1.5px dashed ${vars.color.border.default}`,
+      borderRadius: vars.radius.md,
+      background: vars.color.background.surface,
+    },
+  ],
+  minimal: [
+    dropZoneBase,
+    {
+      display: 'inline-flex',
+      alignItems: 'center',
+      gap: vars.space['2'],
+      padding: `${vars.space['2']} ${vars.space['3']}`,
+      border: `1px dashed ${vars.color.border.default}`,
+      borderRadius: vars.radius.md,
+      background: vars.color.background.surface,
+      color: vars.color.foreground.default,
+      fontSize: '0.875rem',
+      fontWeight: 500,
+    },
+  ],
+});
+
+// Soft-tinted circular icon used in the `default` variant.
+export const iconCircle = style({
+  width: '3rem',
+  height: '3rem',
+  borderRadius: vars.radius.full,
+  background: vars.color.accent.soft,
+  color: vars.color.accent.solid,
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  flexShrink: 0,
+});
+
+// Rounded tile icon used in the `card` variant.
+export const iconTile = style({
+  width: '2.5rem',
+  height: '2.5rem',
+  borderRadius: vars.radius.md,
+  background: vars.color.accent.soft,
+  color: vars.color.accent.solid,
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  flexShrink: 0,
+});
+
+// Small neutral icon for the `compact` variant.
+export const iconInline = style({
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  color: vars.color.foreground.muted,
+  flexShrink: 0,
+});
+
+// "or" divider between title and browse button in the `default` variant.
+export const orDivider = style({
+  display: 'flex',
+  alignItems: 'center',
+  gap: vars.space['2'],
+  fontSize: '0.75rem',
+  color: vars.color.foreground.subtle,
+  selectors: {
+    '&::before, &::after': {
+      content: '""',
+      display: 'block',
+      width: '2rem',
+      height: '1px',
+      background: vars.color.border.subtle,
+    },
+  },
+});
+
+// Zero out UA list defaults — Stack handles layout.
 export const list = style({
   listStyle: 'none',
   margin: 0,
   padding: 0,
-  display: 'flex',
-  flexDirection: 'column',
-  gap: vars.space['2'],
 });
 
-export const listItem = style({
-  display: 'flex',
-  alignItems: 'center',
-  gap: vars.space['3'],
-  padding: vars.space['2'],
+// Row wrapper — richer border, hover lift.
+export const row = style({
   border: `1px solid ${vars.color.border.subtle}`,
-  borderRadius: vars.radius.sm,
-  background: vars.color.background.subtle,
+  borderRadius: vars.radius.md,
+  background: vars.color.background.surface,
+  transition: `border-color ${vars.duration.fast}`,
+  selectors: {
+    '&:hover': {
+      borderColor: vars.color.border.default,
+    },
+  },
 });
 
 export const thumbnail = style({
-  width: '2.5rem',
-  height: '2.5rem',
-  borderRadius: vars.radius.sm,
+  width: '2.75rem',
+  height: '2.75rem',
+  borderRadius: vars.radius.md,
   objectFit: 'cover',
   background: vars.color.background.muted,
+  flexShrink: 0,
+  display: 'block',
 });
 
-export const fileMeta = style({
-  flex: 1,
-  minWidth: 0,
-  display: 'flex',
-  flexDirection: 'column',
-  gap: '2px',
-});
-
-export const fileName = style({
-  fontSize: 'var(--cynosure-font-body-md-size)',
-  fontWeight: 500,
-  color: vars.color.foreground.default,
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
-  whiteSpace: 'nowrap',
-});
-
-export const fileSize = style({
-  fontSize: 'var(--cynosure-font-body-sm-size)',
-  color: vars.color.foreground.muted,
-  fontVariantNumeric: 'tabular-nums',
-});
-
-export const removeButton = style({
+// Doc-style tile for non-image files: houses the extension Badge centered.
+export const thumbnailDoc = style({
+  width: '2.75rem',
+  height: '2.75rem',
+  borderRadius: vars.radius.md,
+  background: vars.color.background.subtle,
+  border: `1px solid ${vars.color.border.subtle}`,
   display: 'inline-flex',
   alignItems: 'center',
   justifyContent: 'center',
-  width: '1.75rem',
-  height: '1.75rem',
-  background: 'transparent',
-  border: 'none',
-  cursor: 'pointer',
+  flexShrink: 0,
+});
+
+// Fallback icon-filled thumbnail when the file has no extension.
+export const thumbnailIcon = style({
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
   color: vars.color.foreground.muted,
-  borderRadius: vars.radius.sm,
+});
+
+// Tabular numerals for sizes so digits align column-wise as files are added.
+export const fileSize = style({
+  fontVariantNumeric: 'tabular-nums',
+});
+
+// Small dot separator between size chip and type descriptor.
+export const metaDot = style({
+  width: '2px',
+  height: '2px',
+  borderRadius: vars.radius.full,
+  background: vars.color.border.default,
+  display: 'inline-block',
+  flexShrink: 0,
+});
+
+// Red-on-hover modifier for the remove IconButton's ghost styling.
+export const removeButton = style({
   selectors: {
     '&:hover': {
-      background: vars.color.background.muted,
-      color: vars.color.foreground.default,
+      color: vars.color.feedback.danger.foreground,
+      background: vars.color.feedback.danger.soft,
     },
   },
 });

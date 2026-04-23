@@ -2,34 +2,43 @@ import { keyframes, style } from '@vanilla-extract/css';
 import { vars } from '../../styles/vars.css.js';
 
 const menuIn = keyframes({
-  from: { opacity: 0, transform: 'translateY(-2px) scale(0.98)' },
+  from: { opacity: 0, transform: 'translateY(-4px) scale(0.98)' },
   to: { opacity: 1, transform: 'translateY(0) scale(1)' },
 });
 
 const menuOut = keyframes({
   from: { opacity: 1, transform: 'translateY(0) scale(1)' },
-  to: { opacity: 0, transform: 'translateY(-2px) scale(0.98)' },
+  to: { opacity: 0, transform: 'translateY(-4px) scale(0.98)' },
 });
 
 /** Shared content shell — DropdownMenu, ContextMenu, MenuBar, sub-menus. */
 export const menuContent = style({
-  minWidth: '10rem',
+  minWidth: '12rem',
   maxHeight: 'min(60vh, 20rem)',
   background: vars.color.background.surface,
   color: vars.color.foreground.default,
   border: `1px solid ${vars.color.border.default}`,
   borderRadius: vars.radius.md,
-  boxShadow: vars.shadow.lg,
+  boxShadow: '0 1px 2px rgba(0,0,0,0.08), 0 12px 32px -8px rgba(0,0,0,0.18)',
   overflow: 'auto',
-  padding: vars.space['1'],
+  padding: vars.space['1.5'],
   zIndex: Number(vars.z.dropdown),
   outline: 'none',
   selectors: {
+    '&[data-side="bottom"]': { transformOrigin: 'top center' },
+    '&[data-side="top"]': { transformOrigin: 'bottom center' },
+    '&[data-side="left"]': { transformOrigin: 'center right' },
+    '&[data-side="right"]': { transformOrigin: 'center left' },
     '&[data-state="open"]': {
       animation: `${menuIn} ${vars.duration.fast} ease-out`,
     },
     '&[data-state="closed"]': {
       animation: `${menuOut} ${vars.duration.fast} ease-in`,
+    },
+  },
+  '@media': {
+    '(prefers-reduced-motion: reduce)': {
+      animation: 'none',
     },
   },
 });
@@ -40,16 +49,16 @@ export const menuItem = style({
   alignItems: 'center',
   gap: vars.space['2'],
   position: 'relative',
-  paddingBlock: vars.space['1.5'],
+  paddingBlock: vars.space['2'],
   paddingInline: vars.space['2'],
-  paddingInlineStart: vars.space['6'],
   borderRadius: vars.radius.sm,
-  cursor: 'default',
+  cursor: 'pointer',
   userSelect: 'none',
   color: vars.color.foreground.default,
   outline: 'none',
   fontSize: 'var(--cynosure-font-body-md-size)',
   lineHeight: 'var(--cynosure-font-body-md-line-height)',
+  transition: 'background-color 120ms ease, color 120ms ease',
   selectors: {
     '&[data-highlighted]': {
       background: vars.color.accent.soft,
@@ -63,15 +72,23 @@ export const menuItem = style({
       cursor: 'not-allowed',
       pointerEvents: 'none',
     },
+    '&[data-variant="danger"]': {
+      color: vars.color.feedback.danger.solid,
+    },
+    '&[data-variant="danger"][data-highlighted]': {
+      background: vars.color.feedback.danger.soft,
+      color: vars.color.feedback.danger.solid,
+    },
+  },
+  '@media': {
+    '(prefers-reduced-motion: reduce)': {
+      transition: 'none',
+    },
   },
 });
 
-/** Inline-start check indicator for CheckboxItem / RadioItem. */
+/** Legacy inline-start indicator — kept exported for back-compat; unused by the kit. */
 export const menuIndicator = style({
-  position: 'absolute',
-  insetInlineStart: vars.space['2'],
-  top: '50%',
-  transform: 'translateY(-50%)',
   display: 'inline-flex',
   alignItems: 'center',
   justifyContent: 'center',
@@ -81,6 +98,7 @@ export const menuIndicator = style({
 export const menuSubChevron = style({
   marginInlineStart: 'auto',
   display: 'inline-flex',
+  alignItems: 'center',
 });
 
 /** Horizontal rule separator. */
@@ -93,9 +111,9 @@ export const menuSeparator = style({
 
 /** Section label (non-interactive). */
 export const menuLabel = style({
-  paddingInline: vars.space['2'],
+  paddingInlineEnd: vars.space['2'],
+  paddingInlineStart: `calc(${vars.space['2']} + 1.25rem + ${vars.space['2']})`,
   paddingBlock: vars.space['1'],
-  paddingInlineStart: vars.space['6'],
   fontSize: 'var(--cynosure-font-body-sm-size)',
   fontWeight: 600,
   color: vars.color.foreground.muted,
@@ -103,19 +121,16 @@ export const menuLabel = style({
   letterSpacing: '0.05em',
 });
 
-/** Keyboard shortcut chip rendered at the inline-end of an item. */
+/** Cluster of keycaps pinned to the inline-end of a menu item, never shrinking. */
 export const menuShortcut = style({
   marginInlineStart: 'auto',
   paddingInlineStart: vars.space['4'],
-  fontSize: 'var(--cynosure-font-body-sm-size)',
-  color: vars.color.foreground.muted,
-  fontVariantNumeric: 'tabular-nums',
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: vars.space['1'],
+  flex: '0 0 auto',
 });
 
-/**
- * Top-level container for `MenuBar`. Horizontal row of triggers styled to
- * match native app menubars.
- */
 export const menubarRoot = style({
   display: 'inline-flex',
   alignItems: 'center',

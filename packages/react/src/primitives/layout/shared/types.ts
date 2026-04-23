@@ -83,4 +83,14 @@ export interface LayoutProps {
   gridColumn?: Responsive<string>;
   gridRow?: Responsive<string>;
   gridArea?: Responsive<string>;
+
+  // ── flex/grid child hints ─────────────────────────────────────────────
+  /** Shorthand: `1 | auto | none | initial | <css>`. Resolves to `flex` on the child. */
+  flex?: Responsive<'1' | 'auto' | 'none' | 'initial' | (string & {})>;
+  flexGrow?: Responsive<number | `${number}`>;
+  flexShrink?: Responsive<number | `${number}`>;
+  flexBasis?: Responsive<SpaceToken | SizeValue | 'auto' | 'content'>;
+  alignSelf?: Responsive<'auto' | 'start' | 'center' | 'end' | 'stretch' | 'baseline'>;
+  justifySelf?: Responsive<'auto' | 'start' | 'center' | 'end' | 'stretch'>;
+  order?: Responsive<number | `${number}`>;
 }

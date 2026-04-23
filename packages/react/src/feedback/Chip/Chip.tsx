@@ -1,4 +1,5 @@
-import { type ButtonHTMLAttributes, type ReactElement, type ReactNode, forwardRef } from 'react';
+import { XCircle } from 'lucide-react';
+import { type ButtonHTMLAttributes, type ReactNode, forwardRef } from 'react';
 import { cn } from '../../utils/cn.js';
 import { badgeIcon, badgeRoot, badgeShape, badgeSize } from '../Badge/Badge.css.js';
 import { badgeVariantClass } from '../Badge/variants.js';
@@ -25,19 +26,6 @@ export interface ChipProps
   removeLabel?: string;
   children?: ReactNode;
 }
-
-const RemoveIcon = (): ReactElement => (
-  <svg
-    width="0.875em"
-    height="0.875em"
-    viewBox="0 0 12 12"
-    fill="none"
-    aria-hidden="true"
-    focusable="false"
-  >
-    <path d="M3 3l6 6M9 3l-6 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-  </svg>
-);
 
 export const Chip = forwardRef<HTMLButtonElement, ChipProps>(function Chip(
   {
@@ -121,7 +109,7 @@ export const Chip = forwardRef<HTMLButtonElement, ChipProps>(function Chip(
             if (!disabled) onRemove();
           }}
         >
-          <RemoveIcon />
+          <XCircle />
         </button>
       </span>
     );

@@ -1,4 +1,5 @@
 import * as RadixDialog from '@radix-ui/react-dialog';
+import { X } from 'lucide-react';
 import {
   type ComponentPropsWithoutRef,
   type ElementRef,
@@ -6,6 +7,7 @@ import {
   type ReactNode,
   forwardRef,
 } from 'react';
+import { IconButton } from '../../forms/IconButton/IconButton.js';
 import { cn } from '../../utils/cn.js';
 import { overlayBackdrop, overlayCloseButton } from '../shared/overlay.css.js';
 import {
@@ -28,12 +30,6 @@ export const Drawer = RadixDialog.Root;
 export const DrawerTrigger = RadixDialog.Trigger;
 export const DrawerClose = RadixDialog.Close;
 export const DrawerPortal = RadixDialog.Portal;
-
-const CloseIcon = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-    <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-  </svg>
-);
 
 export interface DrawerContentProps
   extends Omit<ComponentPropsWithoutRef<typeof RadixDialog.Content>, 'asChild'> {
@@ -96,9 +92,10 @@ export const DrawerContent = forwardRef<ElementRef<typeof RadixDialog.Content>, 
           {children}
           {showCloseButton ? (
             <RadixDialog.Close asChild>
-              <button
-                type="button"
-                aria-label={closeLabel}
+              <IconButton
+                variant="bare"
+                label={closeLabel}
+                icon={<X />}
                 className={overlayCloseButton}
                 style={{
                   background: 'transparent',
@@ -108,9 +105,7 @@ export const DrawerContent = forwardRef<ElementRef<typeof RadixDialog.Content>, 
                   cursor: 'pointer',
                   color: 'inherit',
                 }}
-              >
-                <CloseIcon />
-              </button>
+              />
             </RadixDialog.Close>
           ) : null}
         </RadixDialog.Content>
@@ -146,22 +141,3 @@ export const DrawerDescription = forwardRef<
     <RadixDialog.Description ref={ref} className={cn(drawerDescription, className)} {...rest} />
   );
 });
-
-// `Sheet` aliases. Same component, different name.
-export {
-  Drawer as Sheet,
-  DrawerTrigger as SheetTrigger,
-  DrawerClose as SheetClose,
-  DrawerPortal as SheetPortal,
-  DrawerContent as SheetContent,
-  DrawerHeader as SheetHeader,
-  DrawerFooter as SheetFooter,
-  DrawerTitle as SheetTitle,
-  DrawerDescription as SheetDescription,
-};
-
-export type {
-  DrawerContentProps as SheetContentProps,
-  DrawerSide as SheetSide,
-  DrawerSize as SheetSize,
-};

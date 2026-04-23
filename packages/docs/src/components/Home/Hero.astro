@@ -1,0 +1,31 @@
+---
+import { site } from '../../config/site';
+import CopyButton from '../CopyButton.astro';
+import MetricStrip from './MetricStrip.astro';
+import ArrowRight from '../icons/ArrowRight.astro';
+import Dot from '../icons/Dot.astro';
+---
+<section data-home-hero>
+  <span data-crosshair style="top:40px;left:40px"></span>
+  <span data-crosshair style="top:40px;right:40px"></span>
+  <span data-crosshair style="bottom:24px;left:40px"></span>
+  <span data-crosshair style="bottom:24px;right:40px"></span>
+  <div data-home-hero-inner>
+    <span data-kicker>{site.name} <Dot size={3} /> v{site.version}</span>
+    <h1>The component library<br />that gets <em>out of the way</em>.</h1>
+    <p data-home-hero-sub>
+      Accessible, tree-shakeable React components. Themed with design tokens. Zero runtime dependencies.
+    </p>
+    <div data-home-hero-cta>
+      <a href="/getting-started/introduction" data-btn="primary">
+        Get started <ArrowRight size={14} />
+      </a>
+      <a href="/components/button" data-btn="ghost">Browse components</a>
+    </div>
+    <div data-install-snippet>
+      <code>npx cynosure init</code>
+      <CopyButton code="npx cynosure init" />
+    </div>
+    <MetricStrip />
+  </div>
+</section>

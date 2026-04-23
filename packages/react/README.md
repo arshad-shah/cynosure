@@ -100,11 +100,11 @@ This package works with React Server Components. Structural pieces (`Box`, `Stac
 
 **Forms** — `Input`, `Textarea`, `NumberInput`, `Checkbox`, `Radio`, `Switch`, `Select`, `Combobox`, `MultiSelect`, `Slider`, `RangeSlider`, `DatePicker`, `DateRangePicker`, `TimePicker`, `ColorPicker`, `FileUpload`, `SearchInput`, `PinInput`, `TagsInput`, `Rating`
 
-**Overlays** — `Dialog`, `AlertDialog`, `Drawer`, `Popover`, `HoverCard`, `Tooltip`, `Toast`, `DropdownMenu`, `ContextMenu`, `MenuBar`, `Modal`
+**Overlays** — `Dialog`, `AlertDialog`, `Drawer`, `Popover`, `HoverCard`, `Tooltip`, `Toast`, `DropdownMenu`, `ContextMenu`, `MenuBar`
 
 **Navigation** — `Tabs`, `Breadcrumb`, `Pagination`, `Menu`, `NavigationMenu`, `Sidebar`, `Stepper`, `Anchor`, `BackToTop`
 
-**Data display** — `Card`, `Table`, `DataTable`, `Tree`, `Timeline`, `Stat`, `Progress`, `Skeleton`, `Spinner`, `Accordion`, `Collapsible`, `ScrollArea`, `Resizable`, `CodeBlock`
+**Data display** — `Card`, `Table`, `DataTable`, `Tree`, `Timeline`, `Stat`, `LinearProgress`, `CircularProgress`, `Skeleton`, `Spinner`, `Accordion`, `Collapsible`, `ScrollArea`, `Resizable`, `CodeBlock`
 
 **Feedback** — `Badge`, `Tag`, `Chip`, `Avatar`, `AvatarGroup`, `Alert`, `Banner`, `Notification`, `Callout`, `EmptyState`, `Toggle`, `ToggleGroup`
 

@@ -1,29 +1,31 @@
+import { CheckIcon, CopyIcon } from 'lucide-react';
 import {
   type CSSProperties,
   type HTMLAttributes,
-  type ReactElement,
   type ReactNode,
   forwardRef,
   useEffect,
   useRef,
-  useState,
 } from 'react';
+import { Button } from '../../forms/index.js';
 import { useClipboard } from '../../hooks/useClipboard.js';
 import { cn } from '../../utils/cn.js';
 import {
   codeBlockCopyButton,
   codeBlockHeader,
+  codeBlockLabel,
   codeBlockLine,
   codeBlockLineNumber,
   codeBlockPre,
   codeBlockRoot,
   codeBlockScroll,
 } from './CodeBlock.css.js';
+import { type CodeTheme, useCodeHighlight } from './highlight.js';
 
 export interface CodeBlockProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
   /** Raw source code. */
   children: string;
-  /** Shiki language identifier. Default `text`. */
+  /** Shiki language identifier. Default `text` (no highlighting). */
   language?: string;
   /** Prefix every line with its number. */
   showLineNumbers?: boolean;
@@ -33,43 +35,29 @@ export interface CodeBlockProps extends Omit<HTMLAttributes<HTMLDivElement>, 'ch
   highlightLines?: number[];
   /** Max scrollable height. Adds an internal scroll region above this. */
   maxHeight?: number | string;
-  /** Pre-highlighted HTML (output of `shiki.codeToHtml`). Overrides the plain renderer. */
+  /** Pre-rendered HTML (from `highlightCode` or Shiki's `codeToHtml`). Bypasses the auto-highlighter. */
   html?: string;
-  /** Shiki theme pair — passed to the lazy loader. */
-  theme?: string | { light: string; dark: string };
+  /**
+   * Shiki theme. A string forces a single theme; a `{ light, dark }` pair
+   * emits dual-theme CSS variables that follow Cynosure's `data-theme`.
+   */
+  theme?: CodeTheme;
   /** Override the filename shown in the header. */
   filename?: ReactNode;
 }
-
-const CopyIcon = (): ReactElement => (
-  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-    <rect x="9" y="9" width="11" height="11" rx="2" stroke="currentColor" strokeWidth="2" />
-    <path d="M5 15V5a2 2 0 0 1 2-2h10" stroke="currentColor" strokeWidth="2" />
-  </svg>
-);
-const CheckIcon = (): ReactElement => (
-  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-    <path
-      d="m5 12 4 4L19 6"
-      stroke="currentColor"
-      strokeWidth="2.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-);
-
 function splitLines(source: string): string[] {
   const trimmed = source.endsWith('\n') ? source.slice(0, -1) : source;
   return trimmed.split('\n');
 }
 
 /**
- * Syntax-highlighted code block. By default renders a plain `<pre><code>` tree —
- * pass a pre-rendered `html` string (typically from `shiki.codeToHtml`) to get
- * highlighted output. Shiki is intentionally not pulled in at module load so
- * the base bundle stays lean; wire it up in userland or via the
- * `@arshad-shah/cynosure-react/code-block` entry point.
+ * Syntax-highlighted code block. When `language` is set (and no `html` is
+ * provided) Shiki is lazy-loaded via a module-level singleton and the
+ * source is highlighted in dual-theme mode — output follows the active
+ * `ThemeProvider` theme automatically with a `prefers-color-scheme` fallback.
+ *
+ * For pre-rendered output (SSR, custom highlighters) call `highlightCode`
+ * or `useCodeHighlight` and pass the result as `html`.
  */
 export const CodeBlock = forwardRef<HTMLDivElement, CodeBlockProps>(function CodeBlock(
   {
@@ -91,16 +79,23 @@ export const CodeBlock = forwardRef<HTMLDivElement, CodeBlockProps>(function Cod
   const { copy, hasCopied } = useClipboard();
   const preRef = useRef<HTMLPreElement | null>(null);
 
-  // Apply per-line highlight data attributes after Shiki-rendered HTML paints.
+  const shouldAutoHighlight = !html && language !== 'text';
+  const { html: autoHtml } = useCodeHighlight(children, language, {
+    theme,
+    enabled: shouldAutoHighlight,
+  });
+  const effectiveHtml = html ?? autoHtml;
+
+  // Apply highlight-line data attrs after Shiki-rendered HTML paints.
   useEffect(() => {
-    if (!html || !preRef.current) return;
+    if (!effectiveHtml || !preRef.current) return;
     const lines = preRef.current.querySelectorAll('.line');
     const hl = new Set(highlightLines ?? []);
     lines.forEach((el, idx) => {
       if (hl.has(idx + 1)) el.setAttribute('data-highlighted', 'true');
       else el.removeAttribute('data-highlighted');
     });
-  }, [html, highlightLines]);
+  }, [effectiveHtml, highlightLines]);
 
   const mergedStyle: CSSProperties = {
     ...style,
@@ -112,40 +107,44 @@ export const CodeBlock = forwardRef<HTMLDivElement, CodeBlockProps>(function Cod
       : {}),
   };
 
-  // Swallow the `theme` prop — unused by the plain renderer but accepted so
-  // callers that use `html=` stay API-compatible.
-  void theme;
-
-  const plainLines = html ? null : splitLines(children);
+  const plainLines = effectiveHtml ? null : splitLines(children);
   const hl = new Set(highlightLines ?? []);
+  const hasHeader = filename !== undefined || copyable || language !== 'text';
 
   return (
-    <div ref={ref} className={cn(codeBlockRoot, className)} style={mergedStyle} {...rest}>
-      {filename !== undefined || copyable || language !== 'text' ? (
+    <div
+      ref={ref}
+      className={cn(codeBlockRoot, className)}
+      style={mergedStyle}
+      data-line-numbers={showLineNumbers || undefined}
+      {...rest}
+    >
+      {hasHeader ? (
         <div className={codeBlockHeader}>
-          <span>{filename ?? language}</span>
+          <span className={codeBlockLabel}>{filename ?? language}</span>
           {copyable ? (
-            <button
-              type="button"
-              className={codeBlockCopyButton}
-              aria-label={hasCopied ? 'Copied' : 'Copy code'}
+            <Button
+              variant="outline"
+              size="sm"
               onClick={() => {
                 void copy(children);
               }}
+              className={codeBlockCopyButton}
+              aria-label={hasCopied ? 'Copied' : 'Copy code'}
             >
-              {hasCopied ? <CheckIcon /> : <CopyIcon />}
+              {hasCopied ? <CheckIcon size={'12'} /> : <CopyIcon size={'12'} />}
               <span>{hasCopied ? 'Copied' : 'Copy'}</span>
-            </button>
+            </Button>
           ) : null}
         </div>
       ) : null}
       <div className={codeBlockScroll}>
-        {html ? (
+        {effectiveHtml ? (
           <div
             ref={preRef as unknown as React.Ref<HTMLDivElement>}
             className={codeBlockPre}
-            // biome-ignore lint/security/noDangerouslySetInnerHtml: consumers pass Shiki-generated HTML — sanitisation is their contract
-            dangerouslySetInnerHTML={{ __html: html }}
+            // biome-ignore lint/security/noDangerouslySetInnerHtml: Shiki output is safe-by-construction
+            dangerouslySetInnerHTML={{ __html: effectiveHtml }}
           />
         ) : (
           <pre className={codeBlockPre} data-language={language}>
@@ -163,7 +162,6 @@ export const CodeBlock = forwardRef<HTMLDivElement, CodeBlockProps>(function Cod
                       <span className={codeBlockLineNumber}>{idx + 1}</span>
                     ) : null}
                     {line || ' '}
-                    {'\n'}
                   </span>
                 );
               })}
@@ -174,64 +172,3 @@ export const CodeBlock = forwardRef<HTMLDivElement, CodeBlockProps>(function Cod
     </div>
   );
 });
-
-/**
- * Lazy-loads Shiki and returns a function that renders source -> themed HTML.
- * Consumers call this once at module scope, pass the result into `<CodeBlock html={…}>`.
- *
- * ```tsx
- * import { createShikiRenderer } from '@arshad-shah/cynosure-react/code-block';
- * const highlight = await createShikiRenderer({ langs: ['tsx'], themes: ['github-dark'] });
- * const html = highlight('const x = 1', { lang: 'tsx', theme: 'github-dark' });
- * ```
- */
-export async function createShikiRenderer(options: {
-  langs: string[];
-  themes: string[];
-}): Promise<(code: string, opts: { lang: string; theme: string }) => string> {
-  const shiki = (await import('shiki')) as {
-    createHighlighter: (opts: { langs: string[]; themes: string[] }) => Promise<{
-      codeToHtml: (code: string, opts: { lang: string; theme: string }) => string;
-    }>;
-  };
-  const highlighter = await shiki.createHighlighter({
-    langs: options.langs,
-    themes: options.themes,
-  });
-  return (code, opts) => highlighter.codeToHtml(code, opts);
-}
-
-/** Render into a ref — fire-and-forget style helper, useful for SSR-after. */
-export function useShikiRender(
-  source: string,
-  options: { lang: string; theme: string } & { enabled?: boolean },
-): { html: string | null; loading: boolean; error: Error | null } {
-  const [html, setHtml] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
-
-  useEffect(() => {
-    if (options.enabled === false) return;
-    let cancelled = false;
-    setLoading(true);
-    (async () => {
-      try {
-        const render = await createShikiRenderer({
-          langs: [options.lang],
-          themes: [options.theme],
-        });
-        const out = render(source, { lang: options.lang, theme: options.theme });
-        if (!cancelled) setHtml(out);
-      } catch (cause) {
-        if (!cancelled) setError(cause instanceof Error ? cause : new Error(String(cause)));
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [source, options.lang, options.theme, options.enabled]);
-
-  return { html, loading, error };
-}

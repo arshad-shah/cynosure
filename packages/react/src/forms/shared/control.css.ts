@@ -167,3 +167,26 @@ export const controlElement = style({
 // two globalStyle rules handle the two shapes we care about.
 globalStyle(`${controlElement} button`, { pointerEvents: 'auto' });
 globalStyle(`${controlElement} [role="button"]`, { pointerEvents: 'auto' });
+
+/**
+ * The "punched well" tile used as the tactile unit across multi-well form
+ * controls (DatePicker, Input, and any future ones). Subtly recessed against
+ * the host surface with a hairline inner highlight and the token border.
+ *
+ * This is a bare tile — consumers pair it with a data-driven parent
+ * (`[data-variant]`, `[data-invalid]`, `[data-readonly]`, `[data-disabled]`)
+ * so all wells in a row react in lockstep. Those selectors live in the
+ * parent component's CSS, not here, because each parent node is different.
+ */
+export const fieldWellBase = style({
+  display: 'inline-flex',
+  alignItems: 'center',
+  minHeight: '2.5rem',
+  background: vars.color.background.subtle,
+  border: `1px solid ${vars.color.border.default}`,
+  borderRadius: vars.radius.md,
+  boxShadow: 'inset 0 1px 0 rgba(24, 24, 27, 0.04)',
+  transitionProperty: 'background-color, border-color, box-shadow, color',
+  transitionDuration: vars.duration.fast,
+  color: vars.color.foreground.default,
+});

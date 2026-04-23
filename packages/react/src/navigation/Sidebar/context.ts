@@ -10,6 +10,8 @@ export interface SidebarContextValue {
   side: 'left' | 'right';
   variant: 'sidebar' | 'floating' | 'inset';
   collapsible: 'icon' | 'offcanvas' | 'none';
+  /** True when the sidebar is visible, collapsed, and in icon-rail mode. */
+  isCollapsedIconRail: boolean;
 }
 
 export const SidebarContext = createContext<SidebarContextValue | null>(null);

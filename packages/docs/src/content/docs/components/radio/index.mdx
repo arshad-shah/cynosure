@@ -1,0 +1,55 @@
+---
+title: Radio
+description: Single-select radio button, always used inside a RadioGroup which manages roving-tabindex and keyboard navigation.
+order: 5
+category: components
+status: stable
+since: 0.1.0
+a11y: Built on Radix UI radio-group; roving tabindex managed by the group; role="radio" with aria-checked.
+bundleSize: "10 kB"
+tags: [form, input]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+import StatusBadge from '@/components/StatusBadge.astro';
+import BundleSizePill from '@/components/BundleSizePill.astro';
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="Radio" /></div>
+
+<LivePreview example="radio/basic" />
+
+## Usage
+
+```tsx
+import { Radio, RadioGroup } from '@arshad-shah/cynosure-react';
+
+<RadioGroup defaultValue="b" aria-label="Pick one">
+  <Radio value="a">Option A</Radio>
+  <Radio value="b">Option B</Radio>
+</RadioGroup>
+```
+
+## Group
+
+Use `RadioGroup` to manage selection and keyboard navigation across items.
+
+<LivePreview example="radio/group" />
+
+## Disabled
+
+<LivePreview example="radio/disabled" />
+
+## API
+
+<PropsTable component="Radio" />
+
+## Accessibility
+
+- Built on Radix UI radio-group — manages roving tabindex so only the selected item is in the tab order.
+- Each item exposes `role="radio"` with `aria-checked` reflecting the current value.
+- Arrow keys move selection within the group; Space/Enter select the focused item.
+
+## Recipes
+
+- Provide `orientation="horizontal"` on `RadioGroup` for inline layouts.
+- Always supply `aria-label` or `aria-labelledby` on `RadioGroup` so screen readers announce the group purpose.

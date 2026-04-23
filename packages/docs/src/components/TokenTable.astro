@@ -1,0 +1,120 @@
+---
+import { baseTokens } from '@arshad-shah/cynosure-tokens';
+
+type SupportedGroup = 'color' | 'space' | 'radius' | 'font' | 'shadow' | 'z' | 'duration' | 'easing' | 'line' | 'letter' | 'breakpoint';
+
+interface Props {
+  group: SupportedGroup;
+  /** Optional sub-key within the group, e.g. group="color" subKey="gray" */
+  subKey?: string;
+}
+
+const { group, subKey } = Astro.props;
+
+type NestedValue = string | number | { [key: string]: NestedValue };
+
+/** Recursively flatten a nested object into dot-notated key/value pairs */
+function flatten(obj: { [key: string]: NestedValue }, prefix = ''): Array<{ name: string; value: string }> {
+  const result: Array<{ name: string; value: string }> = [];
+  for (const [key, val] of Object.entries(obj)) {
+    const fullKey = prefix ? `${prefix}-${key}` : key;
+    if (val !== null && typeof val === 'object') {
+      result.push(...flatten(val as { [key: string]: NestedValue }, fullKey));
+    } else {
+      result.push({ name: fullKey, value: String(val) });
+    }
+  }
+  return result;
+}
+
+const groupData = (baseTokens as { [key: string]: { [key: string]: NestedValue } })[group];
+if (!groupData) {
+  throw new Error(`TokenTable: unknown group "${group}". Available: color, space, radius, font, shadow, z, duration, easing, line, letter, breakpoint`);
+}
+
+let source: { [key: string]: NestedValue };
+if (subKey) {
+  const sub = groupData[subKey];
+  if (!sub) {
+    throw new Error(`TokenTable: unknown subKey "${subKey}" within group "${group}"`);
+  }
+  source = typeof sub === 'object' && sub !== null ? (sub as { [key: string]: NestedValue }) : { [subKey]: sub };
+} else {
+  source = groupData as { [key: string]: NestedValue };
+}
+
+const rows = flatten(source);
+if (rows.length === 0) {
+  throw new Error(`TokenTable: group "${group}" is empty`);
+}
+
+/** Detect whether a value looks like a CSS color we can swatch */
+function isColor(value: string): boolean {
+  return /^#|^rgb|^hsl|^oklch/.test(value.trim());
+}
+---
+
+<table data-token-table>
+  <thead>
+    <tr>
+      <th>Token</th>
+      <th>Value</th>
+      <th>Preview</th>
+    </tr>
+  </thead>
+  <tbody>
+    {rows.map(({ name, value }) => (
+      <tr>
+        <td><code>--{group}{subKey ? `-${subKey}` : ''}-{name}</code></td>
+        <td><code>{value}</code></td>
+        <td>
+          {isColor(value)
+            ? <span data-swatch style={`background:${value}`} aria-hidden="true"></span>
+            : group === 'shadow'
+            ? <span data-swatch style={`box-shadow:${value};background:transparent`} aria-hidden="true"></span>
+            : null}
+        </td>
+      </tr>
+    ))}
+  </tbody>
+</table>
+
+<style>
+  [data-token-table] {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+  }
+
+  [data-token-table] th,
+  [data-token-table] td {
+    padding: var(--cynosure-space-2, 0.5rem) var(--cynosure-space-3, 0.75rem);
+    text-align: left;
+    border-bottom: 1px solid var(--cynosure-color-border-subtle, #e4e4e7);
+    vertical-align: middle;
+  }
+
+  [data-token-table] th {
+    font-weight: 600;
+    color: var(--cynosure-color-foreground-muted, #52525b);
+    background: var(--cynosure-color-background-subtle, #f4f4f5);
+  }
+
+  [data-token-table] code {
+    font-family: "JetBrains Mono Variable", ui-monospace, monospace;
+    font-size: 0.8125rem;
+    background: var(--cynosure-color-background-subtle, #f4f4f5);
+    padding: 0.125rem 0.375rem;
+    border-radius: var(--cynosure-radius-sm, 0.25rem);
+    word-break: break-all;
+  }
+
+  [data-swatch] {
+    display: inline-block;
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: var(--cynosure-radius-sm, 0.25rem);
+    border: 1px solid var(--cynosure-color-border-subtle, #e4e4e7);
+    vertical-align: middle;
+  }
+</style>

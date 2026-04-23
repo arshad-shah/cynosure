@@ -1,0 +1,9 @@
+{
+  "name": "@arshad-shah/cynosure-react/linear-progress",
+  "private": true,
+  "type": "module",
+  "main": "../dist/linear-progress.js",
+  "module": "../dist/linear-progress.js",
+  "types": "../dist/linear-progress.d.ts",
+  "sideEffects": ["*.css"]
+}

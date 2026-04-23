@@ -1,0 +1,145 @@
+{
+  "total": 98,
+  "categories": {
+    "forms": {
+      "label": "Forms",
+      "count": 31,
+      "names": [
+        "Button",
+        "ButtonGroup",
+        "Calendar",
+        "Checkbox",
+        "CheckboxGroup",
+        "ColorPicker",
+        "Combobox",
+        "DatePicker",
+        "DateRangePicker",
+        "ErrorText",
+        "Fieldset",
+        "FileUpload",
+        "Form",
+        "HelperText",
+        "IconButton",
+        "Input",
+        "Label",
+        "MultiSelect",
+        "NumberInput",
+        "PinInput",
+        "Radio",
+        "RadioGroup",
+        "RangeSlider",
+        "Rating",
+        "SearchInput",
+        "Select",
+        "Slider",
+        "Switch",
+        "TagsInput",
+        "Textarea",
+        "TimePicker"
+      ]
+    },
+    "overlay": {
+      "label": "Overlay",
+      "count": 10,
+      "names": [
+        "AlertDialog",
+        "ContextMenu",
+        "Dialog",
+        "Drawer",
+        "DropdownMenu",
+        "HoverCard",
+        "MenuBar",
+        "Popover",
+        "Toast",
+        "Tooltip"
+      ]
+    },
+    "data-display": {
+      "label": "Data display",
+      "count": 15,
+      "names": [
+        "Accordion",
+        "Card",
+        "CircularProgress",
+        "CodeBlock",
+        "Collapsible",
+        "DataTable",
+        "LinearProgress",
+        "Resizable",
+        "ScrollArea",
+        "Skeleton",
+        "Spinner",
+        "Stat",
+        "Table",
+        "Timeline",
+        "Tree"
+      ]
+    },
+    "feedback": {
+      "label": "Feedback",
+      "count": 13,
+      "names": [
+        "Alert",
+        "Avatar",
+        "AvatarGroup",
+        "Badge",
+        "Banner",
+        "Callout",
+        "Chip",
+        "EmptyState",
+        "Indicator",
+        "Notification",
+        "Tag",
+        "Toggle",
+        "ToggleGroup"
+      ]
+    },
+    "navigation": {
+      "label": "Navigation",
+      "count": 9,
+      "names": [
+        "Anchor",
+        "BackToTop",
+        "Breadcrumb",
+        "Menu",
+        "NavigationMenu",
+        "Pagination",
+        "Sidebar",
+        "Stepper",
+        "Tabs"
+      ]
+    },
+    "typography": {
+      "label": "Typography",
+      "count": 7,
+      "names": [
+        "Blockquote",
+        "Code",
+        "Heading",
+        "Kbd",
+        "Link",
+        "List",
+        "Text"
+      ]
+    },
+    "primitives/layout": {
+      "label": "Layout",
+      "count": 13,
+      "names": [
+        "AspectRatio",
+        "Box",
+        "Center",
+        "Container",
+        "Divider",
+        "Flex",
+        "Grid",
+        "Inline",
+        "Section",
+        "SimpleGrid",
+        "Spacer",
+        "Stack",
+        "Wrap"
+      ]
+    }
+  }
+}

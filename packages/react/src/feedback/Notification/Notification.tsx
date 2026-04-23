@@ -1,4 +1,5 @@
 import { type HTMLAttributes, type ReactNode, forwardRef } from 'react';
+import { IconButton } from '../../forms/IconButton/IconButton.js';
 import { cn } from '../../utils/cn.js';
 import { CloseIcon } from '../shared/icons.js';
 import { surfaceClose } from '../shared/surface.css.js';
@@ -80,17 +81,16 @@ export const Notification = forwardRef<HTMLDivElement, NotificationProps>(functi
         children
       )}
       {onDismiss ? (
-        <button
-          type="button"
-          aria-label={dismissLabel}
+        <IconButton
+          variant="bare"
+          label={dismissLabel}
+          icon={<CloseIcon />}
           className={cn(surfaceClose, notificationDismiss)}
           onClick={(e) => {
             e.stopPropagation();
             onDismiss();
           }}
-        >
-          <CloseIcon />
-        </button>
+        />
       ) : null}
       {unread ? <span aria-hidden="true" className={notificationUnreadDot} /> : null}
     </div>

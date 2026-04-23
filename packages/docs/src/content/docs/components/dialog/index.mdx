@@ -1,0 +1,91 @@
+---
+title: Dialog
+description: A modal overlay that traps focus and interrupts the user's workflow for important tasks or confirmations.
+order: 12
+category: components
+status: stable
+since: "0.1.0"
+a11y: Uses role="dialog" aria-modal="true"; focus is trapped inside; Esc closes by default; backdrop click closes by default.
+bundleSize: "18 kB"
+tags: [overlay, modal, accessible]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+import StatusBadge from '@/components/StatusBadge.astro';
+import BundleSizePill from '@/components/BundleSizePill.astro';
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="Dialog" /></div>
+
+<LivePreview example="dialog/basic" />
+
+## Usage
+
+```tsx
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  DialogClose,
+} from '@arshad-shah/cynosure-react';
+
+<Dialog>
+  <DialogTrigger asChild>
+    <Button>Open</Button>
+  </DialogTrigger>
+  <DialogContent>
+    <DialogHeader>
+      <DialogTitle>Title</DialogTitle>
+      <DialogDescription>Description</DialogDescription>
+    </DialogHeader>
+    <DialogFooter>
+      <DialogClose asChild>
+        <Button variant="ghost">Cancel</Button>
+      </DialogClose>
+      <Button>Confirm</Button>
+    </DialogFooter>
+  </DialogContent>
+</Dialog>
+```
+
+## Variants
+
+### Confirm dialog
+
+Use `closeOnOverlayClick={false}` and a danger-coloured confirm button for destructive actions that require deliberate intent.
+
+<LivePreview example="dialog/confirm" />
+
+### With form
+
+Embed form controls inside `DialogContent`. Disable the submit button until input is valid to prevent empty submissions.
+
+<LivePreview example="dialog/with-form" />
+
+### Sizes
+
+Six sizes are available: `xs`, `sm`, `md` (default), `lg`, `xl`, and `full`. Each sets a different `max-width` for the content panel.
+
+<LivePreview example="dialog/sizes" />
+
+## API
+
+<PropsTable component="DialogContent" />
+
+## Accessibility
+
+- `DialogContent` sets `role="dialog"` and `aria-modal="true"` automatically via Radix.
+- Focus is trapped inside the dialog while it is open; it returns to the trigger on close.
+- Pressing `Esc` closes the dialog by default (`closeOnEscape={true}`); suppress with `closeOnEscape={false}`.
+- Clicking the backdrop closes the dialog by default (`closeOnOverlayClick={true}`); suppress with `closeOnOverlayClick={false}`.
+- `DialogTitle` maps to `aria-labelledby`; `DialogDescription` maps to `aria-describedby` — both are required for complete accessible markup.
+
+## Recipes
+
+- For non-destructive confirmations, prefer `AlertDialog` which is pre-wired for a single confirm/cancel axis.
+- Use `position="top"` to render the panel near the top of the viewport on long pages.
+- Use `hideOverlay` when stacking dialogs so only the outermost backdrop is visible.
+- Wrap the trigger in `Tooltip` to add a hover label when the trigger is icon-only.

@@ -1,0 +1,21 @@
+---
+interface Props {
+  status?: 'stable' | 'beta' | 'alpha' | 'experimental' | 'deprecated';
+  since?: string;
+  bundleSize?: string;
+  a11y?: string;
+  pkg?: string;
+}
+const { status, since, bundleSize, a11y, pkg = '@cynosure/react' } = Astro.props;
+---
+<div data-status-row>
+  {status && (
+    <span data-status-pill data-status-variant={status}>
+      <span data-status-dot></span>{status}
+    </span>
+  )}
+  {since && <span data-status-pill>v{since}</span>}
+  {bundleSize && <span data-status-pill>{bundleSize}</span>}
+  {a11y && <span data-status-pill>{a11y}</span>}
+  <span data-status-pill>{pkg}</span>
+</div>

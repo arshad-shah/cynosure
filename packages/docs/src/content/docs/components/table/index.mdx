@@ -1,0 +1,81 @@
+---
+title: Table
+description: A semantic HTML table component with visual variants for displaying structured data.
+order: 17
+category: components
+status: stable
+since: "0.1.0"
+a11y: Uses native <table> semantics; TableHeader renders <th scope="col"> by default; numeric cells use data-numeric for screen-reader context.
+bundleSize: "6 kB"
+tags: [data-display, table, accessible]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+import StatusBadge from '@/components/StatusBadge.astro';
+import BundleSizePill from '@/components/BundleSizePill.astro';
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="Table" /></div>
+
+<LivePreview example="table/basic" />
+
+## Usage
+
+```tsx
+import {
+  Table,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableHeader,
+  TableCell,
+} from '@arshad-shah/cynosure-react';
+
+<Table>
+  <TableHead>
+    <TableRow>
+      <TableHeader>Name</TableHeader>
+      <TableHeader>Role</TableHeader>
+    </TableRow>
+  </TableHead>
+  <TableBody>
+    <TableRow>
+      <TableCell>Alice</TableCell>
+      <TableCell>Engineer</TableCell>
+    </TableRow>
+  </TableBody>
+</Table>
+```
+
+## Variants
+
+### Striped
+
+Use `variant="striped"` to apply alternating row backgrounds for easier scanning.
+
+<LivePreview example="table/striped" />
+
+### Compact
+
+Use `size="sm"` for dense tables — useful in dashboards and log viewers.
+
+<LivePreview example="table/compact" />
+
+## API
+
+<PropsTable component="Table" />
+
+## Accessibility
+
+- The component renders a native `<table>` element with proper semantic structure.
+- `TableHeader` defaults to `scope="col"` so screen readers can associate headers with data cells.
+- Pass `numeric` to `TableCell` to set `data-numeric="true"` and right-align values; this does not alter the accessible label.
+- Use `TableCaption` to provide a visible or visually-hidden caption that describes the table purpose.
+- `stickyHeader` keeps column headers visible while scrolling long tables.
+
+## Recipes
+
+- Use `variant="grid"` for a full-bordered spreadsheet appearance.
+- Use `variant="minimal"` to strip all borders for an ultra-clean look.
+- Wrap the table in a scrollable container when the column count may overflow on narrow screens.
+- Pair with `layout="fixed"` when column widths should be driven by the header, not cell content.
+- Combine `variant="striped"` + `stickyHeader` for long financial or data-heavy tables.

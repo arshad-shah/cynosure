@@ -1,0 +1,59 @@
+---
+title: Select
+description: Accessible dropdown for picking one value from a list. Built on React Aria with full keyboard navigation and ARIA listbox semantics.
+order: 7
+category: components
+status: stable
+since: 0.1.0
+a11y: Uses React Aria Select; role="listbox" popup with aria-selected items; full keyboard navigation and typeahead.
+bundleSize: "55 kB"
+tags: [form, input]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+import StatusBadge from '@/components/StatusBadge.astro';
+import BundleSizePill from '@/components/BundleSizePill.astro';
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="Select" /></div>
+
+<LivePreview example="select/basic" />
+
+## Usage
+
+```tsx
+import { Select } from '@arshad-shah/cynosure-react';
+
+<Select
+  aria-label="Country"
+  items={[{ value: 'ie', label: 'Ireland' }, { value: 'uk', label: 'UK' }]}
+/>
+```
+
+## Grouped options
+
+Use the `section` field in the `items` array to automatically group items under section headers.
+
+<LivePreview example="select/grouped" />
+
+## Disabled
+
+<LivePreview example="select/disabled" />
+
+## Invalid state
+
+<LivePreview example="select/invalid" />
+
+## API
+
+<PropsTable component="Select" />
+
+## Accessibility
+
+- Built on React Aria — the popup uses `role="listbox"` with `role="option"` items and `aria-selected`.
+- Full keyboard navigation: Arrow keys move focus, Enter/Space selects, Escape closes.
+- Typeahead: typing a character jumps to the first matching item.
+
+## Recipes
+
+- Pass `items` with a `section` field for automatic grouping — no JSX needed.
+- Use `onValueChange` to trigger async side effects when the user picks a value.

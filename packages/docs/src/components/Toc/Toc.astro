@@ -1,0 +1,92 @@
+---
+import type { MarkdownHeading } from 'astro';
+interface Props { headings: MarkdownHeading[] }
+const { headings } = Astro.props;
+const filtered = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
+---
+<nav data-toc aria-label="On this page">
+  <p data-toc-title>On this page</p>
+  <ul>
+    {filtered.map((h) => (
+      <li data-depth={h.depth}>
+        <a href={`#${h.slug}`} data-toc-link={h.slug}>{h.text}</a>
+      </li>
+    ))}
+  </ul>
+</nav>
+
+<script>
+  function initToc(): void {
+    const root = document.querySelector<HTMLElement>('[data-toc]');
+    if (!root) return;
+    const links = Array.from(root.querySelectorAll<HTMLAnchorElement>('[data-toc-link]'));
+    if (links.length === 0) return;
+
+    const headings = links
+      .map((link) => {
+        const id = link.getAttribute('data-toc-link');
+        const el = id ? document.getElementById(id) : null;
+        return el ? { link, el } : null;
+      })
+      .filter((x): x is { link: HTMLAnchorElement; el: HTMLElement } => x !== null);
+
+    // Offset below sticky topbar (56px) + breathing room
+    const topOffset = 80;
+
+    let activeSlug: string | null = null;
+
+    function update(): void {
+      let current: typeof headings[number] | null = null;
+      for (const h of headings) {
+        const top = h.el.getBoundingClientRect().top;
+        if (top - topOffset <= 0) {
+          current = h;
+        } else {
+          break;
+        }
+      }
+      // If nothing has scrolled past the offset, use the first heading once we're past its top.
+      const first = headings[0];
+      if (!current && first) {
+        const firstTop = first.el.getBoundingClientRect().top;
+        if (firstTop < window.innerHeight * 0.6) current = first;
+      }
+
+      const nextSlug = current?.link.getAttribute('data-toc-link') ?? null;
+      if (nextSlug === activeSlug) return;
+      activeSlug = nextSlug;
+      for (const h of headings) {
+        h.link.toggleAttribute('data-active', h === current);
+      }
+    }
+
+    let raf = 0;
+    function onScroll(): void {
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = 0;
+        update();
+      });
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+    update();
+
+    // Smooth-scroll click handler that also updates active state immediately
+    for (const h of headings) {
+      h.link.addEventListener('click', (e) => {
+        const hash = h.link.getAttribute('href');
+        if (!hash) return;
+        e.preventDefault();
+        const target = h.el;
+        const y = target.getBoundingClientRect().top + window.scrollY - 72;
+        window.scrollTo({ top: y, behavior: 'smooth' });
+        history.replaceState(null, '', hash);
+      });
+    }
+  }
+
+  initToc();
+  document.addEventListener('astro:page-load', initToc);
+</script>

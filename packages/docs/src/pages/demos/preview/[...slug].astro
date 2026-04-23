@@ -1,0 +1,62 @@
+---
+import type { ComponentType } from 'react';
+import PreviewDispatcher from '../../../components/LivePreview/PreviewDispatcher.tsx';
+import { getThemeInitScript } from '../../../lib/theme-init';
+import '../../../styles/site.css';
+
+type ExampleModule = { default: ComponentType };
+
+export async function getStaticPaths() {
+  const allModules = import.meta.glob<ExampleModule>(
+    '../../../content/docs/components/**/_examples/*.tsx',
+    { eager: true },
+  );
+  const slugs: string[] = [];
+  for (const key of Object.keys(allModules)) {
+    const m = key.match(/components\/([^/]+)\/_examples\/([^.]+)\.tsx$/);
+    if (m) slugs.push(`${m[1]}/${m[2]}`);
+  }
+  return slugs.map((slug) => ({ params: { slug } }));
+}
+
+const { slug } = Astro.params;
+if (typeof slug !== 'string') {
+  throw new Error(`Invalid preview slug: ${String(slug)}`);
+}
+
+const initScript = getThemeInitScript();
+const channel = `preview:${slug}`;
+---
+<!doctype html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Preview: {slug}</title>
+    <meta name="robots" content="noindex" />
+    <script is:inline set:html={initScript}></script>
+    <style>
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        background: transparent;
+      }
+      body {
+        padding: var(--space-5, 1.25rem);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 120px;
+      }
+    </style>
+  </head>
+  <body data-preview-channel={channel}>
+    <PreviewDispatcher slug={slug} client:load />
+    <script>
+      import { startIframeHeightReporter } from '../../../lib/ui/iframe-resize.ts';
+      const channel = document.body.dataset.previewChannel ?? 'preview';
+      startIframeHeightReporter({ channel });
+    </script>
+  </body>
+</html>

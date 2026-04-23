@@ -1,11 +1,10 @@
+// packages/react/src/navigation/Sidebar/Sidebar.tsx
 import {
-  type ButtonHTMLAttributes,
   type HTMLAttributes,
   type ReactElement,
   type ReactNode,
   forwardRef,
   useCallback,
-  useEffect,
   useMemo,
   useState,
 } from 'react';
@@ -15,34 +14,11 @@ import {
   DrawerDescription,
   DrawerTitle,
 } from '../../overlay/Drawer/Drawer.js';
+import { TooltipProvider } from '../../overlay/Tooltip/Tooltip.js';
 import { cn } from '../../utils/cn.js';
-import {
-  sidebarBody,
-  sidebarFooter,
-  sidebarHeader,
-  sidebarRoot,
-  sidebarTriggerButton,
-  sidebarVariant,
-} from './Sidebar.css.js';
-import { SidebarContext, type SidebarContextValue, useSidebar } from './context.js';
-
-const HamburgerIcon = (): ReactElement => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-    <path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-  </svg>
-);
-
-const CollapseIcon = (): ReactElement => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-    <path
-      d="M15 18 9 12l6-6"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-);
+import { sidebarRoot, sidebarVariant } from './Sidebar.css.js';
+import { SidebarContext, type SidebarContextValue } from './context.js';
+import { useIsMobile } from './useIsMobile.js';
 
 export interface SidebarProviderProps {
   defaultCollapsed?: boolean;
@@ -51,7 +27,6 @@ export interface SidebarProviderProps {
   defaultMobileOpen?: boolean;
   mobileOpen?: boolean;
   onMobileOpenChange?: (value: boolean) => void;
-  /** Media query that decides when to render as a `Drawer`. Default `(max-width: 47.99em)`. */
   mobileQuery?: string;
   side?: 'left' | 'right';
   variant?: 'sidebar' | 'floating' | 'inset';
@@ -59,11 +34,6 @@ export interface SidebarProviderProps {
   children?: ReactNode;
 }
 
-/**
- * Provides the shared sidebar state (collapse, mobile drawer) and exposes
- * `useSidebar()`. Keep it high enough in the tree that both `<Sidebar>` and
- * `<SidebarTrigger>` sit underneath it.
- */
 export function SidebarProvider({
   defaultCollapsed = false,
   collapsed: collapsedProp,
@@ -90,9 +60,7 @@ export function SidebarProvider({
     },
     [collapsedProp, onCollapsedChange],
   );
-
   const toggleCollapsed = useCallback(() => setCollapsed(!collapsed), [collapsed, setCollapsed]);
-
   const setMobileOpen = useCallback(
     (value: boolean) => {
       if (mobileOpenProp === undefined) setInternalMobileOpen(value);
@@ -101,9 +69,8 @@ export function SidebarProvider({
     [mobileOpenProp, onMobileOpenChange],
   );
 
-  // `useBreakpoint` returns semantic breakpoint names; we only need the
-  // boolean here. Match on the supplied query directly.
   const isMobile = useIsMobile(mobileQuery);
+  const isCollapsedIconRail = !isMobile && collapsed && collapsible === 'icon';
 
   const ctx = useMemo<SidebarContextValue>(
     () => ({
@@ -116,6 +83,7 @@ export function SidebarProvider({
       side,
       variant,
       collapsible,
+      isCollapsedIconRail,
     }),
     [
       collapsed,
@@ -127,70 +95,45 @@ export function SidebarProvider({
       side,
       variant,
       collapsible,
+      isCollapsedIconRail,
     ],
   );
 
-  return <SidebarContext.Provider value={ctx}>{children}</SidebarContext.Provider>;
-}
-
-function useIsMobile(query: string): boolean {
-  const [matches, setMatches] = useState(() => {
-    if (typeof window === 'undefined' || !window.matchMedia) return false;
-    return window.matchMedia(query).matches;
-  });
-  useEffect(() => {
-    if (typeof window === 'undefined' || !window.matchMedia) return;
-    const mql = window.matchMedia(query);
-    const handler = (event: MediaQueryListEvent | MediaQueryList) => setMatches(event.matches);
-    handler(mql);
-    mql.addEventListener('change', handler as (e: MediaQueryListEvent) => void);
-    return () => mql.removeEventListener('change', handler as (e: MediaQueryListEvent) => void);
-  }, [query]);
-  return matches;
+  return (
+    <SidebarContext.Provider value={ctx}>
+      <TooltipProvider delayDuration={200}>{children}</TooltipProvider>
+    </SidebarContext.Provider>
+  );
 }
 
 export interface SidebarProps extends HTMLAttributes<HTMLElement> {
-  /** Override the `side` set on the provider (useful for asymmetric layouts). */
   side?: 'left' | 'right';
-  /** Rendered inside the mobile Drawer as its accessible title. */
   mobileTitle?: ReactNode;
   mobileDescription?: ReactNode;
 }
+
+const visuallyHidden = {
+  position: 'absolute',
+  width: 1,
+  height: 1,
+  overflow: 'hidden',
+  clip: 'rect(0 0 0 0)',
+} as const;
 
 export const Sidebar = forwardRef<HTMLElement, SidebarProps>(function Sidebar(
   { className, children, side: sideProp, mobileTitle = 'Sidebar', mobileDescription, ...rest },
   ref,
 ) {
-  const ctx = useSidebar();
+  const ctx = useSidebarInternal();
   const side = sideProp ?? ctx.side;
 
   if (ctx.isMobile) {
     return (
       <Drawer open={ctx.mobileOpen} onOpenChange={ctx.setMobileOpen}>
         <DrawerContent side={side} showCloseButton>
-          <DrawerTitle
-            style={{
-              position: 'absolute',
-              width: 1,
-              height: 1,
-              overflow: 'hidden',
-              clip: 'rect(0 0 0 0)',
-            }}
-          >
-            {mobileTitle}
-          </DrawerTitle>
+          <DrawerTitle style={visuallyHidden}>{mobileTitle}</DrawerTitle>
           {mobileDescription ? (
-            <DrawerDescription
-              style={{
-                position: 'absolute',
-                width: 1,
-                height: 1,
-                overflow: 'hidden',
-                clip: 'rect(0 0 0 0)',
-              }}
-            >
-              {mobileDescription}
-            </DrawerDescription>
+            <DrawerDescription style={visuallyHidden}>{mobileDescription}</DrawerDescription>
           ) : null}
           <aside
             ref={ref}
@@ -222,74 +165,9 @@ export const Sidebar = forwardRef<HTMLElement, SidebarProps>(function Sidebar(
   );
 });
 
-export interface SidebarHeaderProps extends HTMLAttributes<HTMLDivElement> {}
-export const SidebarHeader = forwardRef<HTMLDivElement, SidebarHeaderProps>(function SidebarHeader(
-  { className, ...rest },
-  ref,
-) {
-  return <div ref={ref} className={cn(sidebarHeader, className)} {...rest} />;
-});
-
-export interface SidebarBodyProps extends HTMLAttributes<HTMLDivElement> {}
-export const SidebarBody = forwardRef<HTMLDivElement, SidebarBodyProps>(function SidebarBody(
-  { className, ...rest },
-  ref,
-) {
-  return <div ref={ref} className={cn(sidebarBody, className)} {...rest} />;
-});
-
-export interface SidebarFooterProps extends HTMLAttributes<HTMLDivElement> {}
-export const SidebarFooter = forwardRef<HTMLDivElement, SidebarFooterProps>(function SidebarFooter(
-  { className, ...rest },
-  ref,
-) {
-  return <div ref={ref} className={cn(sidebarFooter, className)} {...rest} />;
-});
-
-export interface SidebarTriggerProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  /** Accessible label for the trigger. Defaults switch on mobile vs. desktop. */
-  label?: string;
-  icon?: ReactNode;
-}
-
-/**
- * Context-aware trigger. On mobile, opens the Drawer; on desktop, toggles
- * the sidebar collapse state.
- */
-export const SidebarTrigger = forwardRef<HTMLButtonElement, SidebarTriggerProps>(
-  function SidebarTrigger({ className, label, icon, onClick, type, ...rest }, ref) {
-    const ctx = useSidebar();
-    const defaultLabel = ctx.isMobile
-      ? ctx.mobileOpen
-        ? 'Close sidebar'
-        : 'Open sidebar'
-      : ctx.collapsed
-        ? 'Expand sidebar'
-        : 'Collapse sidebar';
-
-    const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-      onClick?.(event);
-      if (event.defaultPrevented) return;
-      if (ctx.isMobile) ctx.setMobileOpen(!ctx.mobileOpen);
-      else ctx.toggleCollapsed();
-    };
-
-    return (
-      <button
-        ref={ref}
-        type={type ?? 'button'}
-        aria-label={label ?? defaultLabel}
-        aria-pressed={ctx.isMobile ? ctx.mobileOpen : !ctx.collapsed}
-        aria-expanded={ctx.isMobile ? ctx.mobileOpen : !ctx.collapsed}
-        className={cn(sidebarTriggerButton, className)}
-        onClick={handleClick}
-        {...rest}
-      >
-        {icon ?? (ctx.isMobile ? <HamburgerIcon /> : <CollapseIcon />)}
-      </button>
-    );
-  },
-);
-
+// Re-export for consumers
 export { useSidebar } from './context.js';
 export type { SidebarContextValue } from './context.js';
+
+// Internal wrapper so the Sidebar component uses the same hook
+import { useSidebar as useSidebarInternal } from './context.js';

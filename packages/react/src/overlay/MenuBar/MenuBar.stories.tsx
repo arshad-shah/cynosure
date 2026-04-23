@@ -41,7 +41,19 @@ export const DesktopApp: Story = {
             <MenuBarMenu>
               <MenuBarTrigger>File</MenuBarTrigger>
               <MenuBarContent>
-                <MenuBarItem>
+                <MenuBarItem
+                  icon={
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <path
+                        d="M5 12h14M12 5v14"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                      />
+                    </svg>
+                  }
+                  description="Start a blank document"
+                >
                   New file
                   <MenuBarShortcut>⌘N</MenuBarShortcut>
                 </MenuBarItem>
@@ -278,10 +290,8 @@ export const Destructive: Story = {
           <MenuBarItem>Rename</MenuBarItem>
           <MenuBarItem>Archive</MenuBarItem>
           <MenuBarSeparator />
-          <MenuBarItem>
-            <Text size="sm" color="feedback.danger.solid">
-              Delete project
-            </Text>
+          <MenuBarItem variant="danger">
+            Delete project
             <MenuBarShortcut>⇧⌫</MenuBarShortcut>
           </MenuBarItem>
         </MenuBarContent>
