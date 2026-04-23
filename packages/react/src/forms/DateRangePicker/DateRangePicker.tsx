@@ -9,11 +9,6 @@ import {
 import type { DateValue } from 'react-aria-components';
 import {
   Button as AriaButton,
-  CalendarCell as AriaCalendarCell,
-  CalendarGrid as AriaCalendarGrid,
-  CalendarGridBody as AriaCalendarGridBody,
-  CalendarGridHeader as AriaCalendarGridHeader,
-  CalendarHeaderCell as AriaCalendarHeaderCell,
   DateInput as AriaDateInput,
   DateRangePicker as AriaDateRangePicker,
   type DateRangePickerProps as AriaDateRangePickerProps,
@@ -21,16 +16,10 @@ import {
   Dialog as AriaDialog,
   Group as AriaGroup,
   Popover as AriaPopover,
-  RangeCalendar as AriaRangeCalendar,
   DateRangePickerStateContext,
 } from 'react-aria-components';
 import { cn } from '../../utils/cn.js';
-import {
-  CalendarHeader,
-  calendarCell,
-  calendarGrid,
-  calendarGridHeaderCell,
-} from '../Calendar/index.js';
+import { RangeCalendar } from '../Calendar/index.js';
 import {
   dateSegments,
   leadWell,
@@ -47,11 +36,9 @@ import {
   kbd,
   kbdChip,
   kbdHintGroup,
-  monthsGrid,
   rangeFooter,
   rangePopover,
   rangePopoverInner,
-  secondMonth,
 } from './DateRangePicker.css.js';
 import { DateRangePickerPresets, type DateRangePreset } from './DateRangePickerPresets.js';
 
@@ -138,20 +125,7 @@ export const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>(
             <div className={rangePopoverInner}>
               {presets && presets.length > 0 ? <DateRangePickerPresets presets={presets} /> : null}
               <div className={calendarArea}>
-                <AriaRangeCalendar
-                  visibleDuration={visibleMonths === 2 ? { months: 2 } : { months: 1 }}
-                >
-                  <CalendarHeader />
-                  <div className={monthsGrid}>
-                    <MonthGrid />
-                    {visibleMonths === 2 ? (
-                      <div className={secondMonth}>
-                        <MonthGrid offset={{ months: 1 }} />
-                      </div>
-                    ) : null}
-                  </div>
-                </AriaRangeCalendar>
-                <RangeFooter />
+                <RangeCalendar visibleMonths={visibleMonths} footer={<RangeFooter />} />
               </div>
             </div>
           </AriaDialog>
@@ -160,21 +134,6 @@ export const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>(
     );
   },
 );
-
-function MonthGrid({ offset }: { offset?: { months: number } }): ReactElement {
-  return (
-    <AriaCalendarGrid className={calendarGrid} offset={offset}>
-      <AriaCalendarGridHeader>
-        {(day) => (
-          <AriaCalendarHeaderCell className={calendarGridHeaderCell}>{day}</AriaCalendarHeaderCell>
-        )}
-      </AriaCalendarGridHeader>
-      <AriaCalendarGridBody>
-        {(date) => <AriaCalendarCell date={date} className={calendarCell} />}
-      </AriaCalendarGridBody>
-    </AriaCalendarGrid>
-  );
-}
 
 function RangeFooter(): ReactElement {
   const state = useContext(DateRangePickerStateContext);

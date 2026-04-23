@@ -76,6 +76,7 @@ const formsComponents = [
   'MultiSelect',
   'Slider',
   'RangeSlider',
+  'Calendar',
   'DatePicker',
   'DateRangePicker',
   'TimePicker',
@@ -107,12 +108,14 @@ const overlayComponents = [
   'ContextMenu',
   'MenuBar',
   'Modal',
+  'CommandPalette',
 ] as const;
 
 const overlayEntries = (): Record<string, string> => {
   const entries: Record<string, string> = {};
   for (const name of overlayComponents) {
-    entries[name.toLowerCase()] = `src/overlay/${name}/index.ts`;
+    const key = name === 'CommandPalette' ? 'command-palette' : name.toLowerCase();
+    entries[key] = `src/overlay/${name}/index.ts`;
   }
   return entries;
 };
@@ -183,6 +186,8 @@ const dataDisplayComponents = [
   'ScrollArea',
   'Resizable',
   'CodeBlock',
+  'Carousel',
+  'Chart',
 ] as const;
 
 const dataDisplayEntries = (): Record<string, string> => {
@@ -294,5 +299,10 @@ export default createConfig({
     'react-resizable-panels',
     'shiki',
     'react-hook-form',
+    'cmdk',
+    'embla-carousel-react',
+    'embla-carousel',
+    'recharts',
+    'react-is',
   ],
 });

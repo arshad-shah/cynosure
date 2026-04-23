@@ -1,6 +1,46 @@
 import { style } from '@vanilla-extract/css';
 import { vars } from '../../styles/vars.css.js';
 
+/** Standalone Calendar surface — no chrome when nested inside a popover. */
+export const calendarRoot = style({
+  display: 'flex',
+  flexDirection: 'column',
+  background: vars.color.background.raised,
+  color: vars.color.foreground.default,
+  borderRadius: vars.radius.lg,
+  overflow: 'hidden',
+  width: 'fit-content',
+  selectors: {
+    '&[data-months="2"]': {
+      width: 'auto',
+    },
+  },
+});
+
+/** Horizontal stack of months when `visibleMonths={2}`. */
+export const calendarMonthsGrid = style({
+  display: 'grid',
+  gridTemplateColumns: '1fr',
+  '@media': {
+    '(min-width: 640px)': {
+      selectors: {
+        [`${calendarRoot}[data-months="2"] &`]: {
+          gridTemplateColumns: '1fr 1fr',
+        },
+      },
+    },
+  },
+});
+
+/** Vertical divider between the two months in the dual-month layout. */
+export const calendarSecondMonth = style({
+  '@media': {
+    '(min-width: 640px)': {
+      borderLeft: `1px solid ${vars.color.border.subtle}`,
+    },
+  },
+});
+
 export const calendarHeader = style({
   display: 'flex',
   alignItems: 'center',

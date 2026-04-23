@@ -1,4 +1,5 @@
 export * from './AlertDialog/index.js';
+export * from './CommandPalette/index.js';
 export * from './ContextMenu/index.js';
 export * from './Dialog/index.js';
 export * from './Drawer/index.js';

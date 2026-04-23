@@ -4,12 +4,6 @@ import { type CSSProperties, type ReactNode, forwardRef, useMemo, useState } fro
 import type { DateValue } from 'react-aria-components';
 import {
   Button as AriaButton,
-  Calendar as AriaCalendar,
-  CalendarCell as AriaCalendarCell,
-  CalendarGrid as AriaCalendarGrid,
-  CalendarGridBody as AriaCalendarGridBody,
-  CalendarGridHeader as AriaCalendarGridHeader,
-  CalendarHeaderCell as AriaCalendarHeaderCell,
   DateInput as AriaDateInput,
   DatePicker as AriaDatePicker,
   type DatePickerProps as AriaDatePickerProps,
@@ -20,12 +14,7 @@ import {
   useLocale,
 } from 'react-aria-components';
 import { cn } from '../../utils/cn.js';
-import {
-  CalendarHeader,
-  calendarCell,
-  calendarGrid,
-  calendarGridHeaderCell,
-} from '../Calendar/index.js';
+import { Calendar } from '../Calendar/index.js';
 import type { FormControlSize, FormControlVariant } from '../shared/types.js';
 import {
   calendarFooter,
@@ -146,30 +135,23 @@ function DateCalendarWithFooter(): React.ReactElement {
   );
 
   return (
-    <>
-      <AriaCalendar focusedValue={focusedValue} onFocusChange={setFocusedValue}>
-        <CalendarHeader />
-        <AriaCalendarGrid className={calendarGrid}>
-          <AriaCalendarGridHeader>
-            {(day) => (
-              <AriaCalendarHeaderCell className={calendarGridHeaderCell}>
-                {day}
-              </AriaCalendarHeaderCell>
-            )}
-          </AriaCalendarGridHeader>
-          <AriaCalendarGridBody>
-            {(date) => <AriaCalendarCell date={date} className={calendarCell} />}
-          </AriaCalendarGridBody>
-        </AriaCalendarGrid>
-      </AriaCalendar>
-      <div className={calendarFooter}>
-        <span className={calendarFooterTodayLabel}>
-          Today is <span className={calendarFooterTodayValue}>{todayLabel}</span>
-        </span>
-        <button type="button" className={goToTodayLink} onClick={() => setFocusedValue(todayDate)}>
-          Go to today
-        </button>
-      </div>
-    </>
+    <Calendar
+      focusedValue={focusedValue}
+      onFocusChange={setFocusedValue}
+      footer={
+        <div className={calendarFooter}>
+          <span className={calendarFooterTodayLabel}>
+            Today is <span className={calendarFooterTodayValue}>{todayLabel}</span>
+          </span>
+          <button
+            type="button"
+            className={goToTodayLink}
+            onClick={() => setFocusedValue(todayDate)}
+          >
+            Go to today
+          </button>
+        </div>
+      }
+    />
   );
 }
