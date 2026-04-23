@@ -1,0 +1,9 @@
+{
+  "name": "@arshad-shah/cynosure-react/circular-progress",
+  "private": true,
+  "type": "module",
+  "main": "../dist/circular-progress.js",
+  "module": "../dist/circular-progress.js",
+  "types": "../dist/circular-progress.d.ts",
+  "sideEffects": ["*.css"]
+}

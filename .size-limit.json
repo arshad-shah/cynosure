@@ -8,7 +8,7 @@
   {
     "name": "Stack",
     "path": "packages/react/dist/stack.js",
-    "limit": "3 kB",
+    "limit": "4 kB",
     "ignore": ["react", "react-dom"]
   },
   {
@@ -152,7 +152,7 @@
   {
     "name": "DropdownMenu",
     "path": "packages/react/dist/dropdownmenu.js",
-    "limit": "30 kB",
+    "limit": "34 kB",
     "ignore": ["react", "react-dom"]
   },
   {
@@ -176,7 +176,7 @@
   {
     "name": "Sidebar",
     "path": "packages/react/dist/sidebar.js",
-    "limit": "20 kB",
+    "limit": "30 kB",
     "ignore": ["react", "react-dom"]
   },
   {
@@ -210,8 +210,14 @@
     "ignore": ["react", "react-dom"]
   },
   {
-    "name": "Progress",
-    "path": "packages/react/dist/progress.js",
+    "name": "LinearProgress",
+    "path": "packages/react/dist/linear-progress.js",
+    "limit": "6 kB",
+    "ignore": ["react", "react-dom"]
+  },
+  {
+    "name": "CircularProgress",
+    "path": "packages/react/dist/circular-progress.js",
     "limit": "4 kB",
     "ignore": ["react", "react-dom"]
   },

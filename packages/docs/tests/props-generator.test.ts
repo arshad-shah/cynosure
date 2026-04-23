@@ -19,5 +19,7 @@ describe('extractProps', () => {
       expect(typeof p.type).toBe('string');
       expect(typeof p.required).toBe('boolean');
     }
-  }, 60_000); // react-docgen-typescript is slow
+    // react-docgen-typescript parses the full react tsconfig graph (~300+
+    // components on this branch) — give it enough headroom on slow CI runners.
+  }, 240_000);
 });
