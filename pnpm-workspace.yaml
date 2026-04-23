@@ -81,7 +81,7 @@ catalog:
   "style-dictionary": 4.4.0
   tsup: 8.5.1
   turbo: 2.9.6
-  typescript: 5.9.3
+  typescript: 6.0.3
   vite: 6.4.2
   vitest: 4.1.4
   zod: 3.25.76
