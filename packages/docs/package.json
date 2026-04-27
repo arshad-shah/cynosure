@@ -24,7 +24,7 @@
     "@arshad-shah/cynosure-tokens": "workspace:*",
     "@astrojs/check": "0.9.4",
     "@astrojs/mdx": "4.2.3",
-    "@astrojs/react": "4.2.1",
+    "@astrojs/react": "5.0.4",
     "@astrojs/sitemap": "3.2.1",
     "@fontsource-variable/geist": "catalog:",
     "@fontsource-variable/jetbrains-mono": "catalog:",
