@@ -26,7 +26,7 @@
   },
   "devDependencies": {
     "@arshad-shah/cynosure-config": "workspace:*",
-    "@types/node": "22.10.5",
+    "@types/node": "25.6.0",
     "tsup": "catalog:",
     "typescript": "catalog:"
   },
