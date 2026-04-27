@@ -28,7 +28,7 @@
     "@astrojs/sitemap": "3.2.1",
     "@fontsource-variable/geist": "catalog:",
     "@fontsource-variable/jetbrains-mono": "catalog:",
-    "astro": "5.2.5",
+    "astro": "6.1.9",
     "glob": "catalog:",
     "lucide-react": "catalog:",
     "pagefind": "1.3.0",
