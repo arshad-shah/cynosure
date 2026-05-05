@@ -3,13 +3,29 @@ import { describe, expect, it, vi } from 'vitest';
 
 // SwiftChart paints to <canvas> via a ResizeObserver; jsdom has neither layout
 // nor canvas. Stub the React entrypoint with simple placeholders so we can
-// assert the wrapper's sizing/className behaviour without bringing in the real
-// renderer.
+// assert the wrapper's sizing/className/theme-routing behaviour without
+// bringing in the real renderer.
+vi.mock('@arshad-shah/swift-chart', () => ({
+  addTheme: vi.fn(),
+}));
 vi.mock('@arshad-shah/swift-chart/react', () => {
   const stub = (label: string) =>
     Object.assign(
-      ({ className, style }: { className?: string; style?: React.CSSProperties }) => (
-        <div data-swift={label} className={className} style={style} />
+      ({
+        className,
+        style,
+        theme,
+      }: {
+        className?: string;
+        style?: React.CSSProperties;
+        theme?: unknown;
+      }) => (
+        <div
+          data-swift={label}
+          data-theme={typeof theme === 'string' ? theme : 'custom'}
+          className={className}
+          style={style}
+        />
       ),
       { displayName: `Swift${label}` },
     );
@@ -30,9 +46,7 @@ vi.mock('@arshad-shah/swift-chart/react', () => {
   };
 });
 
-const { LineChart, BarChart, DonutChart, PieChart, defaultChartTheme } = await import(
-  '../Chart/index.js'
-);
+const { LineChart, BarChart, DonutChart, PieChart } = await import('../Chart/index.js');
 
 const data = [
   { month: 'Jan', revenue: 1200 },
@@ -46,7 +60,6 @@ describe('Chart wrappers', () => {
     expect(wrapper).not.toBeNull();
     expect(wrapper.style.aspectRatio).toBe('16 / 9');
     expect(wrapper.style.minHeight).toBe('220px');
-    // Underlying SwiftChart Line stub mounted inside the wrapper.
     expect(wrapper.querySelector('[data-swift="Line"]')).not.toBeNull();
   });
 
@@ -83,8 +96,26 @@ describe('Chart wrappers', () => {
     expect(wrapper.className).toContain('custom-card');
   });
 
-  it('exposes the Cynosure theme palette', () => {
-    expect(defaultChartTheme.colors.length).toBeGreaterThanOrEqual(4);
-    expect(defaultChartTheme.bg).toBe('transparent');
+  it('defaults to the cynosure-light theme in light mode', () => {
+    document.documentElement.dataset.theme = 'light';
+    const { container } = render(<LineChart data={data} mapping={{ x: 'month', y: 'revenue' }} />);
+    const inner = container.querySelector('[data-swift="Line"]') as HTMLElement;
+    expect(inner.dataset.theme).toBe('cynosure-light');
+  });
+
+  it('defaults to the cynosure-dark theme in dark mode', () => {
+    document.documentElement.dataset.theme = 'dark';
+    const { container } = render(<LineChart data={data} mapping={{ x: 'month', y: 'revenue' }} />);
+    const inner = container.querySelector('[data-swift="Line"]') as HTMLElement;
+    expect(inner.dataset.theme).toBe('cynosure-dark');
+    delete document.documentElement.dataset.theme;
+  });
+
+  it('honours an explicit theme prop over the auto-picked default', () => {
+    const { container } = render(
+      <LineChart data={data} mapping={{ x: 'month', y: 'revenue' }} theme="midnight" />,
+    );
+    const inner = container.querySelector('[data-swift="Line"]') as HTMLElement;
+    expect(inner.dataset.theme).toBe('midnight');
   });
 });

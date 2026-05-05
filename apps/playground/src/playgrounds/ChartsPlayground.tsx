@@ -56,7 +56,7 @@ export function ChartsPlayground() {
   return (
     <div className="pg-stack">
       <p className="pg-section-lede">
-        Cynosure charts are themed wrappers around{' '}
+        Cynosure charts are thin wrappers around{' '}
         <a
           href="https://swiftchart.arshadshah.com"
           target="_blank"
@@ -65,9 +65,12 @@ export function ChartsPlayground() {
         >
           @arshad-shah/swift-chart
         </a>{' '}
-        — a tiny (≈20 KB), zero-dependency Canvas 2D library. Toggle the page theme to confirm
-        colours follow the active token set, and resize the window to verify the responsive Canvas
-        reflow.
+        — a tiny (≈20 KB), zero-dependency Canvas 2D library. We register two themes via
+        SwiftChart's <code>addTheme</code> API — <code>cynosure-light</code> and{' '}
+        <code>cynosure-dark</code> — built from the same iris/feedback tokens the rest of the
+        library uses. The wrapper picks one based on the active scheme; pass <code>theme</code> (any
+        name or full <code>Theme</code>) to override. Toggle the page theme to verify charts repaint
+        with the new palette.
       </p>
 
       <div className="pg-grid-2">

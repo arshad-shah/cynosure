@@ -1,12 +1,15 @@
 export {
   AreaChart,
   BarChart,
-  defaultChartTheme,
+  CYNOSURE_THEME_DARK,
+  CYNOSURE_THEME_LIGHT,
+  cynosureChartThemes,
   DonutChart,
   HBarChart,
   LineChart,
   PieChart,
   RadarChart,
+  registerCynosureThemes,
   ScatterChart,
   Sparkline,
   StackedAreaChart,
@@ -20,4 +23,5 @@ export type {
   ChartDataMapping,
   ChartHandle,
   ChartRef,
+  CynosureChartTheme,
 } from './Chart.js';
