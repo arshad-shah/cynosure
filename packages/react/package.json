@@ -609,7 +609,7 @@
     "lucide-react": "catalog:",
     "react-aria-components": "catalog:",
     "react-resizable-panels": "catalog:",
-    "recharts": "catalog:",
+    "@arshad-shah/swift-chart": "catalog:",
     "shiki": "catalog:",
     "sonner": "catalog:"
   },

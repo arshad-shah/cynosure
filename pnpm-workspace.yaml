@@ -1,5 +1,6 @@
 packages:
   - "packages/*"
+  - "apps/*"
 
 # Single source of truth for every external dependency version.
 # All package.json files reference these via `"<dep>": "catalog:"`.
@@ -73,7 +74,7 @@ catalog:
   react: 19.2.5
   "react-aria-components": 1.17.0
   "react-dom": 19.2.5
-  recharts: 3.8.1
+  "@arshad-shah/swift-chart": 1.1.0
   "react-hook-form": 7.72.1
   "react-resizable-panels": 4.10.0
   shiki: 4.0.2

@@ -307,7 +307,8 @@ export default createConfig({
     'cmdk',
     'embla-carousel-react',
     'embla-carousel',
-    'recharts',
+    '@arshad-shah/swift-chart',
+    '@arshad-shah/swift-chart/react',
     'react-is',
   ],
 });
