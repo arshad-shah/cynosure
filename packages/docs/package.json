@@ -22,7 +22,7 @@
     "@arshad-shah/cynosure-react": "workspace:*",
     "@arshad-shah/cynosure-themes": "workspace:*",
     "@arshad-shah/cynosure-tokens": "workspace:*",
-    "@astrojs/check": "0.9.4",
+    "@astrojs/check": "0.9.9",
     "@astrojs/mdx": "4.2.3",
     "@astrojs/react": "4.2.1",
     "@astrojs/sitemap": "3.2.1",
