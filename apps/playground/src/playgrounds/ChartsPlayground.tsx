@@ -1,4 +1,21 @@
 import {
+  Box,
+  Card,
+  CardBody,
+  CardHeader,
+  Code,
+  Grid,
+  Heading,
+  Inline,
+  Link,
+  Stack,
+  Stat,
+  StatHelp,
+  StatLabel,
+  StatValue,
+  Text,
+} from '@arshad-shah/cynosure-react';
+import {
   AreaChart,
   BarChart,
   DonutChart,
@@ -52,30 +69,41 @@ const waterfall = [
   { label: 'Q4', value: -90 },
 ];
 
+interface ChartCardProps {
+  title: string;
+  children: React.ReactNode;
+}
+
+function ChartCard({ title, children }: ChartCardProps) {
+  return (
+    <Card variant="outlined">
+      <CardHeader>
+        <Heading level={3} size="md">
+          {title}
+        </Heading>
+      </CardHeader>
+      <CardBody>{children}</CardBody>
+    </Card>
+  );
+}
+
 export function ChartsPlayground() {
   return (
-    <div className="pg-stack">
-      <p className="pg-section-lede">
+    <Stack gap="4">
+      <Text color="fg.muted">
         Cynosure charts are thin wrappers around{' '}
-        <a
-          href="https://swiftchart.arshadshah.com"
-          target="_blank"
-          rel="noreferrer noopener"
-          style={{ color: 'var(--cynosure-color-accent-solid)' }}
-        >
+        <Link href="https://swiftchart.arshadshah.com" target="_blank" rel="noreferrer noopener">
           @arshad-shah/swift-chart
-        </a>{' '}
-        — a tiny (≈20 KB), zero-dependency Canvas 2D library. We register two themes via
-        SwiftChart's <code>addTheme</code> API — <code>cynosure-light</code> and{' '}
-        <code>cynosure-dark</code> — built from the same iris/feedback tokens the rest of the
-        library uses. The wrapper picks one based on the active scheme; pass <code>theme</code> (any
-        name or full <code>Theme</code>) to override. Toggle the page theme to verify charts repaint
-        with the new palette.
-      </p>
+        </Link>{' '}
+        — a tiny, zero-dependency Canvas 2D library. We register two themes via SwiftChart's{' '}
+        <Code>addTheme</Code> API — <Code>cynosure-light</Code> and <Code>cynosure-dark</Code> —
+        built from the same iris/feedback tokens the rest of the library uses. The wrapper picks one
+        based on the active scheme; pass <Code>theme</Code> to override. Toggle the page theme to
+        verify charts repaint with the new palette.
+      </Text>
 
-      <div className="pg-grid-2">
-        <div className="pg-card">
-          <h3 className="pg-card-title">Line · revenue vs. cost</h3>
+      <Grid columns={{ base: 1, md: 2 }} gap="4">
+        <ChartCard title="Line · revenue vs. cost">
           <LineChart
             data={monthly}
             mapping={{ x: 'month', y: ['revenue', 'cost'], seriesNames: ['Revenue', 'Cost'] }}
@@ -83,80 +111,71 @@ export function ChartsPlayground() {
             dots
             aspectRatio="16 / 9"
           />
-        </div>
+        </ChartCard>
 
-        <div className="pg-card">
-          <h3 className="pg-card-title">Area · monthly revenue</h3>
+        <ChartCard title="Area · monthly revenue">
           <AreaChart
             data={monthly}
             mapping={{ x: 'month', y: 'revenue', seriesNames: ['Revenue'] }}
             smooth
             aspectRatio="16 / 9"
           />
-        </div>
+        </ChartCard>
 
-        <div className="pg-card">
-          <h3 className="pg-card-title">Bar · monthly signups</h3>
+        <ChartCard title="Bar · monthly signups">
           <BarChart
             data={monthly}
             mapping={{ x: 'month', y: 'signups', seriesNames: ['Signups'] }}
             aspectRatio="16 / 9"
           />
-        </div>
+        </ChartCard>
 
-        <div className="pg-card">
-          <h3 className="pg-card-title">Stacked bar · revenue + cost</h3>
+        <ChartCard title="Stacked bar · revenue + cost">
           <StackedBarChart
             data={monthly}
             mapping={{ x: 'month', y: ['revenue', 'cost'], seriesNames: ['Revenue', 'Cost'] }}
             aspectRatio="16 / 9"
           />
-        </div>
+        </ChartCard>
 
-        <div className="pg-card">
-          <h3 className="pg-card-title">Stacked area</h3>
+        <ChartCard title="Stacked area">
           <StackedAreaChart
             data={monthly}
             mapping={{ x: 'month', y: ['revenue', 'cost'], seriesNames: ['Revenue', 'Cost'] }}
             aspectRatio="16 / 9"
           />
-        </div>
+        </ChartCard>
 
-        <div className="pg-card">
-          <h3 className="pg-card-title">Horizontal bar · traffic</h3>
+        <ChartCard title="Horizontal bar · traffic">
           <HBarChart data={traffic} mapping={{ x: 'source', y: 'visits' }} aspectRatio="4 / 3" />
-        </div>
+        </ChartCard>
 
-        <div className="pg-card">
-          <h3 className="pg-card-title">Pie · share of traffic</h3>
+        <ChartCard title="Pie · share of traffic">
           <PieChart
             data={traffic}
             mapping={{ labelField: 'source', valueField: 'visits' }}
             aspectRatio="1 / 1"
           />
-        </div>
+        </ChartCard>
 
-        <div className="pg-card">
-          <h3 className="pg-card-title">Donut · share of traffic</h3>
+        <ChartCard title="Donut · share of traffic">
           <DonutChart
             data={traffic}
             mapping={{ labelField: 'source', valueField: 'visits' }}
             donutWidth={0.55}
             aspectRatio="1 / 1"
           />
-        </div>
+        </ChartCard>
 
-        <div className="pg-card">
-          <h3 className="pg-card-title">Scatter · grouped samples</h3>
+        <ChartCard title="Scatter · grouped samples">
           <ScatterChart
             data={scatter}
             mapping={{ x: 'x', y: 'y', groupField: 'group' }}
             aspectRatio="16 / 9"
           />
-        </div>
+        </ChartCard>
 
-        <div className="pg-card">
-          <h3 className="pg-card-title">Radar · capability comparison</h3>
+        <ChartCard title="Radar · capability comparison">
           <RadarChart
             data={radarData}
             mapping={{
@@ -166,36 +185,33 @@ export function ChartsPlayground() {
             }}
             aspectRatio="1 / 1"
           />
-        </div>
+        </ChartCard>
 
-        <div className="pg-card">
-          <h3 className="pg-card-title">Waterfall · quarterly deltas</h3>
+        <ChartCard title="Waterfall · quarterly deltas">
           <WaterfallChart
             data={waterfall}
             mapping={{ x: 'label', y: 'value' }}
             aspectRatio="16 / 9"
           />
-        </div>
+        </ChartCard>
 
-        <div className="pg-card">
-          <h3 className="pg-card-title">Sparkline · KPI trend</h3>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-            <div>
-              <div style={{ fontSize: 28, fontWeight: 600 }}>$84.2k</div>
-              <div style={{ color: 'var(--cynosure-color-feedback-success-solid, #22c55e)' }}>
-                +12.4% MoM
-              </div>
-            </div>
-            <div style={{ flex: 1 }}>
+        <ChartCard title="Sparkline · KPI trend">
+          <Inline align="center" gap="4">
+            <Stat>
+              <StatLabel>Revenue</StatLabel>
+              <StatValue>$84.2k</StatValue>
+              <StatHelp>+12.4% MoM</StatHelp>
+            </Stat>
+            <Box flex="1">
               <Sparkline
                 data={[12, 14, 13, 18, 22, 24, 21, 26, 30, 32, 28, 35]}
                 height={56}
                 filled
               />
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+            </Box>
+          </Inline>
+        </ChartCard>
+      </Grid>
+    </Stack>
   );
 }

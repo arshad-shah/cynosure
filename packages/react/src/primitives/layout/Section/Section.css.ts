@@ -5,7 +5,11 @@ import { layoutPropsStyle } from '../shared/layoutStyle.css.js';
 export const sectionBase = style([
   layoutPropsStyle,
   {
-    display: 'block',
+    // See Flex.css.ts: drive `display` via the layoutPropsStyle var so the
+    // default isn't reverted by duplicated layoutPropsStyle emissions later
+    // in the bundle. `block` is the UA default for `<section>` but we still
+    // need to claim the var so user-set overrides go through inline style.
+    vars: { '--cynosure-lp-d-base': 'block' },
   },
 ]);
 

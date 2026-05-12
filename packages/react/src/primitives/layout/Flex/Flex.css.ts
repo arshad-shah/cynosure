@@ -20,7 +20,15 @@ const FLEX_RULES = buildResponsiveRules(FLEX_ENTRIES);
 export const flex = style([
   layoutPropsStyle,
   {
-    display: 'flex',
+    // Drive the layoutPropsStyle `display: var(--cynosure-lp-d-base)` resolver
+    // via the same custom property so that this primitive's display default
+    // can't be silently undone when later modules re-emit layoutPropsStyle
+    // into the bundled stylesheet. Setting `display: flex` directly here is
+    // not enough — duplicated rule emissions for layoutPropsStyle further
+    // down the cascade would otherwise revert `display` to its UA default.
+    // Users can still override via the `display` prop, which sets the var
+    // inline (inline styles win over class-defined custom properties).
+    vars: { '--cynosure-lp-d-base': 'flex' },
     // Prevents flex children from overflowing their container on narrow tracks.
     minWidth: 0,
     ...FLEX_RULES.base,

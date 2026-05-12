@@ -16,7 +16,10 @@ const INLINE_RULES = buildResponsiveRules(INLINE_ENTRIES);
 export const inline = style([
   layoutPropsStyle,
   {
-    display: 'flex',
+    // Drive `display` through the layoutPropsStyle custom property so this
+    // primitive's default survives duplicated layoutPropsStyle emissions
+    // later in the bundled stylesheet. See Flex.css.ts for the full rationale.
+    vars: { '--cynosure-lp-d-base': 'flex' },
     flexDirection: 'row',
     flexWrap: 'wrap',
     minWidth: 0,

@@ -24,7 +24,9 @@ const GRID_RULES = buildResponsiveRules(GRID_ENTRIES);
 export const grid = style([
   layoutPropsStyle,
   {
-    display: 'grid',
+    // See Flex.css.ts: drive `display` via the layoutPropsStyle var to survive
+    // duplicated layoutPropsStyle emissions in the bundled stylesheet.
+    vars: { '--cynosure-lp-d-base': 'grid' },
     minWidth: 0,
     ...GRID_RULES.base,
     '@media': GRID_RULES.media,

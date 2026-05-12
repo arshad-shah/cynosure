@@ -1,5 +1,8 @@
 import {
   Button,
+  Card,
+  CardBody,
+  CardHeader,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -7,21 +10,28 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  Grid,
+  Heading,
+  Inline,
   Popover,
   PopoverContent,
   PopoverTrigger,
+  Text,
   Toaster,
   Tooltip,
-  TooltipProvider,
   toast,
 } from '@arshad-shah/cynosure-react';
 
 export function OverlaysPlayground() {
   return (
-    <TooltipProvider>
-      <div className="pg-grid-2">
-        <div className="pg-card">
-          <h3 className="pg-card-title">Dialog</h3>
+    <Grid columns={{ base: 1, md: 2 }} gap="4">
+      <Card variant="outlined">
+        <CardHeader>
+          <Heading level={3} size="md">
+            Dialog
+          </Heading>
+        </CardHeader>
+        <CardBody>
           <Dialog>
             <DialogTrigger asChild>
               <Button>Open dialog</Button>
@@ -40,41 +50,57 @@ export function OverlaysPlayground() {
               </DialogFooter>
             </DialogContent>
           </Dialog>
-        </div>
+        </CardBody>
+      </Card>
 
-        <div className="pg-card">
-          <h3 className="pg-card-title">Popover</h3>
+      <Card variant="outlined">
+        <CardHeader>
+          <Heading level={3} size="md">
+            Popover
+          </Heading>
+        </CardHeader>
+        <CardBody>
           <Popover>
             <PopoverTrigger asChild>
               <Button variant="outline">Open popover</Button>
             </PopoverTrigger>
             <PopoverContent>
-              <p style={{ margin: 0 }}>
-                Popovers anchor against their trigger and follow it on scroll.
-              </p>
+              <Text>Popovers anchor against their trigger and follow it on scroll.</Text>
             </PopoverContent>
           </Popover>
-        </div>
+        </CardBody>
+      </Card>
 
-        <div className="pg-card">
-          <h3 className="pg-card-title">Tooltip</h3>
+      <Card variant="outlined">
+        <CardHeader>
+          <Heading level={3} size="md">
+            Tooltip
+          </Heading>
+        </CardHeader>
+        <CardBody>
           <Tooltip content="Saves to your draft folder.">
             <Button variant="outline">Hover me</Button>
           </Tooltip>
-        </div>
+        </CardBody>
+      </Card>
 
-        <div className="pg-card">
-          <h3 className="pg-card-title">Toast</h3>
-          <div className="pg-row">
+      <Card variant="outlined">
+        <CardHeader>
+          <Heading level={3} size="md">
+            Toast
+          </Heading>
+        </CardHeader>
+        <CardBody>
+          <Inline align="center" gap="3">
             <Button onClick={() => toast('Saved your changes.')}>Default</Button>
             <Button colorScheme="danger" onClick={() => toast.error('Could not save.')}>
               Error
             </Button>
             <Button onClick={() => toast.success('All set!')}>Success</Button>
-          </div>
-        </div>
-      </div>
+          </Inline>
+        </CardBody>
+      </Card>
       <Toaster />
-    </TooltipProvider>
+    </Grid>
   );
 }
