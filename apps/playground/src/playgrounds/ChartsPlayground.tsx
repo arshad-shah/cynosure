@@ -89,7 +89,7 @@ function ChartCard({ title, children }: ChartCardProps) {
 
 export function ChartsPlayground() {
   return (
-    <Stack gap="4">
+    <Stack gap="4" height="100%">
       <Text color="fg.muted">
         Cynosure charts are thin wrappers around{' '}
         <Link href="https://swiftchart.arshadshah.com" target="_blank" rel="noreferrer noopener">

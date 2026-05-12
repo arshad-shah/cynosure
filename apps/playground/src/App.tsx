@@ -25,7 +25,6 @@ import {
   Layers,
   Moon,
   Pilcrow,
-  Sparkles,
   Sun,
   Table as TableIcon,
   TextCursorInput,
@@ -139,7 +138,6 @@ export function App() {
           background="bg.raised"
         >
           <Inline align="center" gap="3">
-            <Sparkles size={20} aria-hidden />
             <Text weight="semibold">Cynosure · playground</Text>
           </Inline>
           <IconButton
@@ -152,7 +150,7 @@ export function App() {
         </Inline>
         <Divider />
 
-        <Flex direction="row" flex="1" minHeight="0">
+        <Flex direction="row" flex="1">
           <Sidebar aria-label="Playground sections">
             <SidebarHeader>
               <Text size="sm" weight="semibold" color="fg.muted">
