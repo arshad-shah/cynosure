@@ -95,7 +95,11 @@ const FlexRender = (props: AnyProps, ref: ForwardedRef<Element>): ReactElement =
     toResponsiveVars(grow, 'cynosure-flex-grow', (v) => String(v)),
     toResponsiveVars(shrink, 'cynosure-flex-shrink', (v) => String(v)),
     toResponsiveVars(basis, 'cynosure-flex-basis', (v) => resolveSize(v)),
-    toResponsiveVars(gap, 'cynosure-flex-gap', (v) => resolveSpace(v)),
+    // `gap` writes to both longhand vars so the column/row-gap CSS rules in
+    // Flex.css.ts always have a value to resolve. See Grid.tsx for the
+    // shorthand-vs-longhand cascade incident note.
+    toResponsiveVars(gap, 'cynosure-flex-row-gap', (v) => resolveSpace(v)),
+    toResponsiveVars(gap, 'cynosure-flex-col-gap', (v) => resolveSpace(v)),
     toResponsiveVars(rowGap, 'cynosure-flex-row-gap', (v) => resolveSpace(v)),
     toResponsiveVars(columnGap, 'cynosure-flex-col-gap', (v) => resolveSpace(v)),
     toResponsiveVars(align, 'cynosure-flex-align', (v) => ALIGN_MAP[v]),

@@ -3,7 +3,9 @@ import { buildResponsiveRules } from '../shared/buildResponsive.js';
 import { layoutPropsStyle } from '../shared/layoutStyle.css.js';
 
 const INLINE_ENTRIES: Array<[string, string]> = [
-  ['gap', 'cynosure-inline-gap'],
+  // See `Grid.css.ts`: `gap` shorthand would lose to the longhand entries
+  // below when their vars are unset. `gap` prop writes both longhands in
+  // `Inline.tsx` instead.
   ['column-gap', 'cynosure-inline-col-gap'],
   ['row-gap', 'cynosure-inline-row-gap'],
   ['align-items', 'cynosure-inline-align'],

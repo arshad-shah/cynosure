@@ -9,7 +9,6 @@ import {
   Sidebar,
   SidebarBody,
   SidebarFooter,
-  SidebarHeader,
   SidebarItem,
   SidebarNav,
   SidebarProvider,
@@ -133,8 +132,8 @@ export function App() {
           as="header"
           align="center"
           justify="between"
-          paddingX="6"
-          paddingY="3"
+          paddingX="8"
+          paddingY="4"
           background="bg.raised"
         >
           <Inline align="center" gap="3">
@@ -142,7 +141,7 @@ export function App() {
           </Inline>
           <IconButton
             variant="ghost"
-            size="sm"
+            size="md"
             label={`Switch to ${isDark ? 'light' : 'dark'} theme`}
             icon={isDark ? <Sun size={16} aria-hidden /> : <Moon size={16} aria-hidden />}
             onClick={() => setTheme(isDark ? 'light' : 'dark')}
@@ -159,11 +158,6 @@ export function App() {
          */}
         <Flex direction="row" flex="1" minHeight="0">
           <Sidebar aria-label="Playground sections">
-            <SidebarHeader>
-              <Text size="sm" weight="semibold" color="fg.muted">
-                Sections
-              </Text>
-            </SidebarHeader>
             <SidebarBody>
               <SidebarNav aria-label="Playground sections">
                 {PLAYGROUNDS.map((p) => (

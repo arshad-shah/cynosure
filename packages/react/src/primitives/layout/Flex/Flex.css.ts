@@ -8,7 +8,10 @@ const FLEX_ENTRIES: Array<[string, string]> = [
   ['flex-grow', 'cynosure-flex-grow'],
   ['flex-shrink', 'cynosure-flex-shrink'],
   ['flex-basis', 'cynosure-flex-basis'],
-  ['gap', 'cynosure-flex-gap'],
+  // See `Grid.css.ts`: emitting `gap` shorthand here would silently lose
+  // to the `row-gap` / `column-gap` longhands below because their vars are
+  // unset → revert to `normal`. `gap` prop writes to both longhand vars in
+  // `Flex.tsx` instead.
   ['row-gap', 'cynosure-flex-row-gap'],
   ['column-gap', 'cynosure-flex-col-gap'],
   ['align-items', 'cynosure-flex-align'],

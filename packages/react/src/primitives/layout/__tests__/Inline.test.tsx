@@ -10,7 +10,13 @@ describe('Inline', () => {
       </Inline>,
     );
     const el = container.querySelector('[data-testid="inline"]') as HTMLElement;
-    expect(el.style.getPropertyValue('--cynosure-inline-gap-base')).toBe('var(--cynosure-space-2)');
+    // `gap` writes both longhand vars — see Inline.tsx comment.
+    expect(el.style.getPropertyValue('--cynosure-inline-col-gap-base')).toBe(
+      'var(--cynosure-space-2)',
+    );
+    expect(el.style.getPropertyValue('--cynosure-inline-row-gap-base')).toBe(
+      'var(--cynosure-space-2)',
+    );
     expect(el.style.getPropertyValue('--cynosure-inline-align-base')).toBe('center');
     expect(el.style.getPropertyValue('--cynosure-inline-justify-base')).toBe('flex-end');
     expect(el.style.getPropertyValue('--cynosure-inline-wrap-base')).toBe('nowrap');

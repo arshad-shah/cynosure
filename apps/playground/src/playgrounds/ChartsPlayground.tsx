@@ -102,7 +102,7 @@ export function ChartsPlayground() {
         verify charts repaint with the new palette.
       </Text>
 
-      <Grid columns={{ base: 1, md: 2 }} gap="8">
+      <Grid columns={{ base: 1, md: 3 }} gap="4" paddingX="2">
         <ChartCard title="Line · revenue vs. cost">
           <LineChart
             data={monthly}

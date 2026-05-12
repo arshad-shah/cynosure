@@ -130,7 +130,14 @@ const GridRender = (props: AnyProps, ref: ForwardedRef<Element>): ReactElement =
     toResponsiveVars(autoFlow, 'cynosure-grid-flow', (v) => v),
     toResponsiveVars(autoColumns, 'cynosure-grid-auto-cols', (v) => v),
     toResponsiveVars(autoRows, 'cynosure-grid-auto-rows', (v) => v),
-    toResponsiveVars(gap, 'cynosure-grid-gap', (v) => resolveSpace(v)),
+    // `gap` writes to both longhand vars so the `column-gap` / `row-gap`
+    // CSS declarations in `Grid.css.ts` always have a value to resolve to;
+    // writing only the `cynosure-grid-gap` var would leave the longhands
+    // invalid and revert to `normal`. `columnGap` / `rowGap` props are
+    // merged after (later keys in `Object.assign` win), so they override
+    // the individual axis as expected.
+    toResponsiveVars(gap, 'cynosure-grid-col-gap', (v) => resolveSpace(v)),
+    toResponsiveVars(gap, 'cynosure-grid-row-gap', (v) => resolveSpace(v)),
     toResponsiveVars(columnGap, 'cynosure-grid-col-gap', (v) => resolveSpace(v)),
     toResponsiveVars(rowGap, 'cynosure-grid-row-gap', (v) => resolveSpace(v)),
     toResponsiveVars(align, 'cynosure-grid-align', (v) => ITEMS_MAP[v]),

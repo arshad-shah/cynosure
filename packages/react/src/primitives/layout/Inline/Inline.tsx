@@ -80,7 +80,10 @@ const InlineRender = (props: AnyProps, ref: ForwardedRef<Element>): ReactElement
 
   const layoutStyle = resolveLayoutProps(layoutProps);
   const inlineStyle = mergeStyles(
-    toResponsiveVars(gap, 'cynosure-inline-gap', (v) => resolveSpace(v)),
+    // `gap` writes both longhand vars so the column/row-gap CSS rules in
+    // Inline.css.ts always resolve. See Grid.tsx for the rationale.
+    toResponsiveVars(gap, 'cynosure-inline-row-gap', (v) => resolveSpace(v)),
+    toResponsiveVars(gap, 'cynosure-inline-col-gap', (v) => resolveSpace(v)),
     toResponsiveVars(rowGap, 'cynosure-inline-row-gap', (v) => resolveSpace(v)),
     toResponsiveVars(columnGap, 'cynosure-inline-col-gap', (v) => resolveSpace(v)),
     toResponsiveVars(align, 'cynosure-inline-align', (v) => ALIGN_MAP[v]),

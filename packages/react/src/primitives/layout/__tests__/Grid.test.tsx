@@ -14,7 +14,15 @@ describe('Grid', () => {
     expect(el.style.getPropertyValue('--cynosure-grid-cols-base')).toBe(
       'repeat(3, minmax(0, 1fr))',
     );
-    expect(el.style.getPropertyValue('--cynosure-grid-gap-base')).toBe('var(--cynosure-space-4)');
+    // `gap` writes to both longhand vars rather than a single `gap` shorthand
+    // var — see `Grid.tsx` comment. Without the split, the CSS `column-gap`
+    // and `row-gap` longhand rules would clobber the shorthand expansion.
+    expect(el.style.getPropertyValue('--cynosure-grid-col-gap-base')).toBe(
+      'var(--cynosure-space-4)',
+    );
+    expect(el.style.getPropertyValue('--cynosure-grid-row-gap-base')).toBe(
+      'var(--cynosure-space-4)',
+    );
   });
 
   it('passes `templateColumns` through verbatim', () => {
