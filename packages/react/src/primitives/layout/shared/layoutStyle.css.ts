@@ -57,7 +57,8 @@ const LAYOUT_PROPS: Array<[string, string]> = [
   ['grid-area', 'cynosure-lp-ga'],
   // flex-child hints
   ['flex', 'cynosure-lp-flex'],
-  ['flex-grow', 'cynosure-lp-fg'],
+  // `cynosure-lp-grow`, not `lp-fg` — see resolveLayoutProps for context.
+  ['flex-grow', 'cynosure-lp-grow'],
   ['flex-shrink', 'cynosure-lp-fs'],
   ['flex-basis', 'cynosure-lp-fb'],
   ['align-self', 'cynosure-lp-as'],

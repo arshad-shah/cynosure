@@ -307,7 +307,9 @@ export default createConfig({
       'cynosure-lp-gr',
       'cynosure-lp-ga',
       'cynosure-lp-flex',
-      'cynosure-lp-fg',
+      // `cynosure-lp-grow` rather than `lp-fg` — the `fg` slug is reserved
+      // for `color` (foreground); see layoutStyle.css.ts.
+      'cynosure-lp-grow',
       'cynosure-lp-fs',
       'cynosure-lp-fb',
       'cynosure-lp-as',

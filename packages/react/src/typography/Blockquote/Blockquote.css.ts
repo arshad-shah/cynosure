@@ -34,7 +34,10 @@ export const blockquoteVariant = styleVariants({
 });
 
 export const blockquoteAttribution = style({
-  display: 'block',
+  // Applied alongside Box's layoutPropsStyle on a `<cite>`, so drive
+  // `display` through the var (see `Flex.css.ts`) to survive duplicated
+  // layoutPropsStyle emissions later in the bundle.
+  vars: { '--cynosure-lp-d-base': 'block' },
   marginBlockStart: vars.space[2],
   fontFamily: 'var(--cynosure-font-body-md-family)',
   fontSize: 'var(--cynosure-font-body-sm-size)',
