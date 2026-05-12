@@ -89,7 +89,7 @@ function ChartCard({ title, children }: ChartCardProps) {
 
 export function ChartsPlayground() {
   return (
-    <Stack gap="4" height="100%">
+    <Stack gap="4">
       <Text color="fg.muted">
         Cynosure charts are thin wrappers around{' '}
         <Link href="https://swiftchart.arshadshah.com" target="_blank" rel="noreferrer noopener">
@@ -102,7 +102,7 @@ export function ChartsPlayground() {
         verify charts repaint with the new palette.
       </Text>
 
-      <Grid columns={{ base: 1, md: 2 }} gap="4">
+      <Grid columns={{ base: 1, md: 2 }} gap="8">
         <ChartCard title="Line · revenue vs. cost">
           <LineChart
             data={monthly}
