@@ -263,7 +263,18 @@ function DataTableInner<TData>(
                   <TableRow key={`skeleton-${rowIdx.toString()}`}>
                     {Array.from({ length: leafColumnCount }).map((__, colIdx) => (
                       <TableCell key={`skeleton-${rowIdx.toString()}-${colIdx.toString()}`}>
-                        <Skeleton height="1em" width={`${(40 + Math.random() * 40).toFixed(0)}%`} />
+                        {/*
+                         * Width derived deterministically from the cell
+                         * coordinates so SSR and the first client render
+                         * produce the same markup. Using `Math.random()`
+                         * here would land a different value on each side of
+                         * hydration and trigger a React mismatch warning
+                         * plus a visible width-flash on mount.
+                         */}
+                        <Skeleton
+                          height="1em"
+                          width={`${(40 + ((rowIdx * 7 + colIdx * 13) % 40)).toString()}%`}
+                        />
                       </TableCell>
                     ))}
                   </TableRow>
