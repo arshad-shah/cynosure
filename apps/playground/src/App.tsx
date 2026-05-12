@@ -150,7 +150,14 @@ export function App() {
         </Inline>
         <Divider />
 
-        <Flex direction="row" flex="1">
+        {/*
+         * `minHeight="0"` is required: without it, the default
+         * `min-height: auto` on flex items lets this row stretch to its
+         * children's intrinsic size, the Sidebar's `height: 100%` then
+         * resolves against that stretched height, and SidebarFooter ends
+         * up below the viewport.
+         */}
+        <Flex direction="row" flex="1" minHeight="0">
           <Sidebar aria-label="Playground sections">
             <SidebarHeader>
               <Text size="sm" weight="semibold" color="fg.muted">
