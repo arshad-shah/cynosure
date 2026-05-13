@@ -1,0 +1,83 @@
+---
+title: LinearProgress
+description: Horizontal progress bar with optional label, buffer, segmented stacks, and indeterminate loading.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Renders an ARIA progressbar with min/max/now and a formatted aria-valuetext; indeterminate state omits the value.
+bundleSize: "—"
+tags: [data-display, progress, feedback]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+import StatusBadge from '@/components/StatusBadge.astro';
+import BundleSizePill from '@/components/BundleSizePill.astro';
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="LinearProgress" /></div>
+
+<LivePreview example="linear-progress/basic" />
+
+## Usage
+
+```tsx
+import { LinearProgress } from '@arshad-shah/cynosure-react';
+
+<LinearProgress value={60} />
+```
+
+For custom layouts, compose with `LinearProgressRoot`, `LinearProgressTrack`, `LinearProgressIndicator`, `LinearProgressBuffer`, `LinearProgressSegment`, `LinearProgressHeader`, `LinearProgressLabel`, `LinearProgressMeta`, and `LinearProgressValue` directly.
+
+## Sizes
+
+Four sizes are available: `xs`, `sm`, `md` (default), and `lg`.
+
+<LivePreview example="linear-progress/sizes" />
+
+## Color schemes
+
+Pick a scheme that matches the surrounding context: `accent`, `success`, `warning`, `danger`, or `neutral`.
+
+<LivePreview example="linear-progress/color-schemes" />
+
+## With label
+
+Pass `label` and `meta` for a two-up header above the bar. Set `showValue` to render the formatted percentage below.
+
+<LivePreview example="linear-progress/with-label" />
+
+## Indeterminate
+
+Pass `indeterminate` for an unknown-duration loader. The ARIA value attributes are dropped so assistive tech announces an unspecified loading state.
+
+<LivePreview example="linear-progress/indeterminate" />
+
+## Buffer
+
+Pass `buffer` for a YouTube-style preloaded zone behind the active indicator.
+
+<LivePreview example="linear-progress/buffer" />
+
+## Segments
+
+Pass a `segments` array for a stacked multi-value bar — each segment becomes a `LinearProgressSegment` with its own colour scheme.
+
+<LivePreview example="linear-progress/segments" />
+
+## API
+
+<PropsTable component="LinearProgress" />
+
+## Accessibility
+
+- Renders `role="progressbar"` on the root with `aria-valuenow`, `aria-valuemin`, and `aria-valuemax`.
+- `aria-valuetext` follows `formatValue` (defaults to `"NN%"`) so screen readers announce a human-readable value.
+- Omits the value when `indeterminate` is set so assistive tech reports "loading" instead.
+- When `label` is a string it doubles as the accessible name; otherwise pass an explicit `aria-label`.
+- `data-complete` flips on once `value >= max` (unless `completionState="none"`), letting you style the finished state without extra state.
+
+## Recipes
+
+- Use `variant="ticked"` for a stepped bar that emphasises discrete progress milestones.
+- Pass a `formatValue` callback like `` (v, max) => `${v} of ${max}` `` to switch from a percent readout to a count.
+- Use `segments` to visualise quota usage (e.g. used / reserved / free) in a single bar.
+- Combine `buffer` + `value` to surface "downloaded" vs "playing back" progress for media players.

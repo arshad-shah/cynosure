@@ -35,15 +35,14 @@ export default defineConfig({
       customCss: [
         './src/styles/fonts.css',
         './src/styles/starlight-theme.css',
-        // `site.css` / `home.css` carry the visual chrome the cynosure
-        // homepage was built against (Hero / ComponentGallery / ThemingPlayground
-        // / A11yStrip / CodeInContext / BigCTA). Loading them via Starlight's
-        // customCss keeps the existing landing visuals intact under the new
-        // shell. `doc-page.css` rules are scoped to `[data-doc-layout]` —
-        // a Starlight build never matches that selector, so loading it is a
-        // no-op everywhere except inside the old preview iframe routes.
+        // `site.css` carries shared visual chrome (typography, surface
+        // tokens, code-block defaults). The home page now uses Starlight's
+        // built-in splash hero + Tabs/CardGrid components, so no bespoke
+        // landing styles are needed. `doc-page.css` rules are scoped to
+        // `[data-doc-layout]` — a Starlight build never matches that
+        // selector, so loading it is a no-op everywhere except inside the
+        // old preview iframe routes.
         './src/styles/site.css',
-        './src/styles/home.css',
       ],
       // Drop the built-in Pagefind invocation — our existing build script
       // already runs `pagefind --site dist` and syncs the bundle in. Starlight
@@ -95,47 +94,125 @@ export default defineConfig({
           ],
         },
         {
-          label: 'Primitives',
-          items: [{ label: 'Button', slug: 'components/button' }],
+          label: 'Typography',
+          items: [
+            { label: 'Blockquote', slug: 'components/blockquote' },
+            { label: 'Code', slug: 'components/code' },
+            { label: 'Heading', slug: 'components/heading' },
+            { label: 'Kbd', slug: 'components/kbd' },
+            { label: 'Link', slug: 'components/link' },
+            { label: 'List', slug: 'components/list' },
+            { label: 'Text', slug: 'components/text' },
+          ],
+        },
+        {
+          label: 'Buttons',
+          items: [
+            { label: 'Button', slug: 'components/button' },
+            { label: 'ButtonGroup', slug: 'components/button-group' },
+            { label: 'IconButton', slug: 'components/icon-button' },
+            { label: 'Toggle', slug: 'components/toggle' },
+            { label: 'ToggleGroup', slug: 'components/toggle-group' },
+          ],
         },
         {
           label: 'Forms',
           items: [
             { label: 'Input', slug: 'components/input' },
             { label: 'Textarea', slug: 'components/textarea' },
+            { label: 'NumberInput', slug: 'components/number-input' },
+            { label: 'SearchInput', slug: 'components/search-input' },
+            { label: 'PinInput', slug: 'components/pin-input' },
+            { label: 'TagsInput', slug: 'components/tags-input' },
             { label: 'Checkbox', slug: 'components/checkbox' },
+            { label: 'CheckboxGroup', slug: 'components/checkbox-group' },
             { label: 'Radio', slug: 'components/radio' },
+            { label: 'RadioGroup', slug: 'components/radio-group' },
             { label: 'Switch', slug: 'components/switch' },
             { label: 'Select', slug: 'components/select' },
+            { label: 'MultiSelect', slug: 'components/multi-select' },
             { label: 'Combobox', slug: 'components/combobox' },
+            { label: 'Slider', slug: 'components/slider' },
+            { label: 'RangeSlider', slug: 'components/range-slider' },
+            { label: 'Rating', slug: 'components/rating' },
+            { label: 'Calendar', slug: 'components/calendar' },
+            { label: 'DatePicker', slug: 'components/date-picker' },
+            { label: 'DateRangePicker', slug: 'components/date-range-picker' },
+            { label: 'TimePicker', slug: 'components/time-picker' },
+            { label: 'ColorPicker', slug: 'components/color-picker' },
+            { label: 'FileUpload', slug: 'components/file-upload' },
+            { label: 'Label', slug: 'components/label' },
+            { label: 'HelperText', slug: 'components/helper-text' },
+            { label: 'ErrorText', slug: 'components/error-text' },
+            { label: 'Fieldset', slug: 'components/fieldset' },
+            { label: 'Form', slug: 'components/form' },
+            { label: 'RHF', slug: 'components/rhf' },
           ],
         },
         {
           label: 'Feedback',
           items: [
-            { label: 'Badge', slug: 'components/badge' },
             { label: 'Alert', slug: 'components/alert' },
+            { label: 'Avatar', slug: 'components/avatar' },
+            { label: 'AvatarGroup', slug: 'components/avatar-group' },
+            { label: 'Badge', slug: 'components/badge' },
+            { label: 'Callout', slug: 'components/callout' },
+            { label: 'Chip', slug: 'components/chip' },
+            { label: 'EmptyState', slug: 'components/empty-state' },
+            { label: 'Notification', slug: 'components/notification' },
+            { label: 'Tag', slug: 'components/tag' },
           ],
         },
         {
           label: 'Overlays',
           items: [
+            { label: 'AlertDialog', slug: 'components/alert-dialog' },
+            { label: 'CommandPalette', slug: 'components/command-palette' },
+            { label: 'ContextMenu', slug: 'components/context-menu' },
             { label: 'Dialog', slug: 'components/dialog' },
-            { label: 'Tooltip', slug: 'components/tooltip' },
+            { label: 'Drawer', slug: 'components/drawer' },
             { label: 'DropdownMenu', slug: 'components/dropdown-menu' },
+            { label: 'HoverCard', slug: 'components/hover-card' },
+            { label: 'MenuBar', slug: 'components/menu-bar' },
+            { label: 'Popover', slug: 'components/popover' },
+            { label: 'Toast', slug: 'components/toast' },
+            { label: 'Tooltip', slug: 'components/tooltip' },
           ],
         },
         {
           label: 'Navigation',
-          items: [{ label: 'Tabs', slug: 'components/tabs' }],
+          items: [
+            { label: 'Anchor', slug: 'components/anchor' },
+            { label: 'BackToTop', slug: 'components/back-to-top' },
+            { label: 'Breadcrumb', slug: 'components/breadcrumb' },
+            { label: 'Menu', slug: 'components/menu' },
+            { label: 'NavigationMenu', slug: 'components/navigation-menu' },
+            { label: 'Pagination', slug: 'components/pagination' },
+            { label: 'Sidebar', slug: 'components/sidebar' },
+            { label: 'Stepper', slug: 'components/stepper' },
+            { label: 'Tabs', slug: 'components/tabs' },
+          ],
         },
         {
           label: 'Data display',
           items: [
-            { label: 'Card', slug: 'components/card' },
             { label: 'Accordion', slug: 'components/accordion' },
-            { label: 'Table', slug: 'components/table' },
+            { label: 'Card', slug: 'components/card' },
+            { label: 'Carousel', slug: 'components/carousel' },
+            { label: 'Chart', slug: 'components/chart' },
+            { label: 'CircularProgress', slug: 'components/circular-progress' },
+            { label: 'CodeBlock', slug: 'components/code-block' },
+            { label: 'Collapsible', slug: 'components/collapsible' },
             { label: 'DataTable', slug: 'components/data-table', badge: 'beta' },
+            { label: 'LinearProgress', slug: 'components/linear-progress' },
+            { label: 'Resizable', slug: 'components/resizable' },
+            { label: 'ScrollArea', slug: 'components/scroll-area' },
+            { label: 'Skeleton', slug: 'components/skeleton' },
+            { label: 'Spinner', slug: 'components/spinner' },
+            { label: 'Stat', slug: 'components/stat' },
+            { label: 'Table', slug: 'components/table' },
+            { label: 'Timeline', slug: 'components/timeline' },
+            { label: 'Tree', slug: 'components/tree' },
           ],
         },
         {
@@ -149,6 +226,21 @@ export default defineConfig({
             { label: 'Multi-step wizard', slug: 'recipes/multi-step-wizard' },
             { label: 'Notification center', slug: 'recipes/notification-center' },
             { label: 'Settings page', slug: 'recipes/settings-page' },
+          ],
+        },
+        {
+          label: 'Guides',
+          items: [
+            { label: 'Using with frameworks', slug: 'guides/frameworks' },
+            { label: 'Tree-shaking & bundle size', slug: 'guides/tree-shaking' },
+          ],
+        },
+        {
+          label: 'Reference',
+          items: [
+            { label: 'Type reference', slug: 'reference/types' },
+            { label: 'Migration to v1', slug: 'reference/migration-to-v1' },
+            { label: 'Roadmap', slug: 'reference/roadmap' },
           ],
         },
         {

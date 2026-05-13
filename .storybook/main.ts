@@ -3,13 +3,10 @@ import type { StorybookConfig } from '@storybook/react-vite';
 const config: StorybookConfig = {
   framework: { name: '@storybook/react-vite', options: {} },
   stories: [
-    // Ordered so "Getting started" / "Foundations" / "Recipes" appear first
-    // in the sidebar, followed by per-component docs + stories under
-    // packages/react/src. Scoped to packages/react so the Astro-based
-    // packages/docs content collection (also *.mdx) isn't pulled in.
-    '../docs/foundations/**/*.mdx',
-    '../docs/recipes/**/*.mdx',
-    '../packages/react/**/*.mdx',
+    // Storybook is the component dev + showcase surface only.
+    // Long-form docs live in the Astro site under packages/docs and must not
+    // be duplicated here. Stories carry autodocs (`tag: 'autodocs'`) so a
+    // per-component "Docs" tab is still generated from the .stories.tsx.
     '../packages/react/**/*.stories.@(ts|tsx)',
   ],
   addons: [

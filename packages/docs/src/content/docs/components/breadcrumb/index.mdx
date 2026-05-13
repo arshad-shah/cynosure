@@ -1,0 +1,82 @@
+---
+title: Breadcrumb
+description: A hierarchical navigation trail that shows the user's location within a site or app.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Wraps items in a nav landmark with aria-label; the current page receives aria-current="page"; separators are role="presentation".
+bundleSize: "—"
+tags: [navigation, breadcrumb, accessible]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+import StatusBadge from '@/components/StatusBadge.astro';
+import BundleSizePill from '@/components/BundleSizePill.astro';
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="Breadcrumb" /></div>
+
+<LivePreview example="breadcrumb/basic" />
+
+## Usage
+
+```tsx
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbPage,
+} from "@arshad-shah/cynosure-react";
+
+<Breadcrumb>
+  <BreadcrumbItem>
+    <BreadcrumbLink href="/">Home</BreadcrumbLink>
+  </BreadcrumbItem>
+  <BreadcrumbItem>
+    <BreadcrumbLink href="/components">Components</BreadcrumbLink>
+  </BreadcrumbItem>
+  <BreadcrumbItem isCurrent>
+    <BreadcrumbPage>Breadcrumb</BreadcrumbPage>
+  </BreadcrumbItem>
+</Breadcrumb>
+```
+
+Separators are interleaved between `BreadcrumbItem` children automatically — you don't need to add them yourself.
+
+## Variants
+
+### Custom separator
+
+Pass a `separator` ReactNode to swap the default chevron for any glyph.
+
+<LivePreview example="breadcrumb/custom-separator" />
+
+### Collapsed middle items
+
+Set `maxItems` to collapse the middle of a long trail into a `BreadcrumbEllipsis`. Tune which items stay visible at each end with `itemsBeforeCollapse` (default `1`) and `itemsAfterCollapse` (default `2`).
+
+<LivePreview example="breadcrumb/collapsed" />
+
+### With a leading icon
+
+`BreadcrumbLink` accepts any children, so an inline SVG renders alongside the label.
+
+<LivePreview example="breadcrumb/with-icon" />
+
+## API
+
+<PropsTable component="Breadcrumb" />
+
+## Accessibility
+
+- The root renders a `<nav>` with `aria-label="Breadcrumb"` (override via the `aria-label` prop).
+- Items render as `<li>` inside an `<ol>` so the trail order is exposed to assistive tech.
+- `BreadcrumbItem` carries `aria-current="page"` when `isCurrent` is set; `BreadcrumbPage` always carries `aria-current="page"`.
+- Separators are `<li role="presentation" aria-hidden="true">` so they don't pollute the announcement.
+- The collapsed-items trigger is a real `<button>` (rendered via `IconButton`) with `"Show more"` as its default label.
+
+## Recipes
+
+- Pair `<BreadcrumbItem isCurrent>` with `<BreadcrumbPage>` so both the `<li>` and the inner element announce the current page.
+- Use `renderCollapsed` to wire the ellipsis to a `DropdownMenu` listing the hidden links.
+- Lower `maxItems` (e.g. `3`) on mobile breakpoints to shorten the trail.
+- Replace the default chevron with a `/` glyph for a more typographic look.

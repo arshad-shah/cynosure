@@ -1,0 +1,58 @@
+---
+title: Blockquote
+description: Semantic block quotation with optional `<cite>` attribution and an accent-tinted callout variant for pull quotes.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Renders a native `<blockquote>`; the optional `attribution` is wrapped in a `<cite>` so the source is announced as a citation.
+bundleSize: "—"
+tags: [typography, quote]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+import StatusBadge from '@/components/StatusBadge.astro';
+import BundleSizePill from '@/components/BundleSizePill.astro';
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="Blockquote" /></div>
+
+<LivePreview example="blockquote/basic" />
+
+## Usage
+
+```tsx
+import { Blockquote } from '@arshad-shah/cynosure-react';
+
+<Blockquote attribution="Ada Lovelace">
+  That brain of mine is something more than merely mortal, as time will show.
+</Blockquote>
+```
+
+## Variants
+
+`default` is a quiet quotation styled for long-form prose. `callout` swaps in the accent palette so pull quotes and testimonials carry more weight on the page.
+
+<LivePreview example="blockquote/variants" />
+
+## Attribution
+
+Pass any node to `attribution` to render a `<cite>` below the quote body — plain text, a link to the source, or richer markup all work.
+
+<LivePreview example="blockquote/attribution" />
+
+## API
+
+<PropsTable component="Blockquote" />
+
+## Accessibility
+
+- Uses the semantic `<blockquote>` element so assistive technologies announce the quoted passage as such.
+- `attribution` is rendered inside `<cite>` so screen readers identify it as the source of the quote.
+- Decorative quotation marks (where the design adds them) sit in CSS — never rely on them to convey that the text is a quote; the `<blockquote>` semantics carry that signal.
+- When citing a URL, use a `Link` inside `attribution` so the source is keyboard reachable.
+
+## Recipes
+
+- Place a `Heading` directly above for testimonial sections, then the `Blockquote` underneath.
+- Use `variant="callout"` for pull-quotes that should pop out of a long article.
+- Wrap a `Link` inside `attribution` to link out to the original source.
+- Constrain the parent width on long pull-quotes so line length stays readable.

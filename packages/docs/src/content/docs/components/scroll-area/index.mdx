@@ -1,0 +1,65 @@
+---
+title: ScrollArea
+description: Themed, cross-browser scroll container with custom scrollbars — keeps long content contained without breaking native scroll semantics.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Falls back to native scrolling behaviour; keyboard scrolling (arrow keys, Page Up/Down, Home/End) is preserved.
+bundleSize: "—"
+tags: [data-display, scroll, radix]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+import StatusBadge from '@/components/StatusBadge.astro';
+import BundleSizePill from '@/components/BundleSizePill.astro';
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="ScrollArea" /></div>
+
+<LivePreview example="scroll-area/basic" />
+
+## Usage
+
+```tsx
+import { ScrollArea } from '@arshad-shah/cynosure-react';
+
+<ScrollArea height={240}>
+  Long content goes here…
+</ScrollArea>
+```
+
+## Horizontal
+
+Set `scrollbars="horizontal"` for an x-axis scroll region — pair with a wide inner container that overflows the viewport width.
+
+<LivePreview example="scroll-area/horizontal" />
+
+## Both axes
+
+The default `scrollbars="both"` renders thumbs on both axes; a corner element fills the intersection.
+
+<LivePreview example="scroll-area/both" />
+
+## Visibility type
+
+The `type` prop controls when the scrollbars appear: `hover` (default), `auto`, `always`, or `scroll`.
+
+<LivePreview example="scroll-area/type" />
+
+## API
+
+<PropsTable component="ScrollArea" />
+
+## Accessibility
+
+- Preserves native scroll mechanics — keyboard scrolling (arrow keys, `PageUp` / `PageDown`, `Home` / `End`) works without extra wiring.
+- Custom scrollbars are decorative; the underlying content remains the source of truth for assistive tech.
+- Honours `prefers-reduced-motion` for thumb fade transitions.
+- Pass `aria-label` (or `aria-labelledby`) when the scroll region's purpose is not clear from surrounding context.
+- Wheel and pointer scrolling continue to work even when the custom scrollbars are hidden.
+
+## Recipes
+
+- Set `scrollbars="vertical"` or `"horizontal"` to constrain the scroll axis to a single direction.
+- Combine with `CodeBlock` to keep long snippets contained inside a fixed height.
+- Use `type="always"` to keep the scrollbars visible at all times (e.g. macOS users who hide them by default).
+- Pass `width` and `height` directly for an inline-sized scroll region without writing extra styles.

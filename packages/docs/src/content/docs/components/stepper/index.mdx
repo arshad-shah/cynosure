@@ -1,0 +1,89 @@
+---
+title: Stepper
+description: A progress indicator that walks the user through a sequence of ordered steps with pending, active, complete, and error states.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Renders an ordered list; the active step receives aria-current="step"; interactive mode exposes each step as a labelled button.
+bundleSize: "—"
+tags: [navigation, stepper, accessible]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+import StatusBadge from '@/components/StatusBadge.astro';
+import BundleSizePill from '@/components/BundleSizePill.astro';
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="Stepper" /></div>
+
+<LivePreview example="stepper/basic" />
+
+## Usage
+
+```tsx
+import { Stepper, Step } from "@arshad-shah/cynosure-react";
+
+<Stepper currentStep={1}>
+  <Step title="Account" />
+  <Step title="Profile" />
+  <Step title="Confirm" />
+</Stepper>
+```
+
+`currentStep` is zero-indexed. Steps before `currentStep` derive `status="complete"`, the matching step is `"active"`, and any later steps are `"pending"`. Pass `status` explicitly to override the default for a specific step (handy for `"error"`).
+
+## Variants
+
+### Vertical orientation
+
+Use `orientation="vertical"` for sidebar-style flows.
+
+<LivePreview example="stepper/vertical" />
+
+### Variants — dots, lines, icons
+
+Switch the marker style with `variant="numbered"` (default), `"dots"`, `"lines"`, or `"icons"`. The `icons` variant accepts a custom `icon` on each `Step`.
+
+<LivePreview example="stepper/variants" />
+
+### Sizes
+
+Use `size="sm"`, `"md"` (default), or `"lg"` to scale the marker and typography.
+
+<LivePreview example="stepper/sizes" />
+
+### Step descriptions
+
+Pass `description` to render a muted second line under the title.
+
+<LivePreview example="stepper/descriptions" />
+
+### Interactive (clickable steps)
+
+Pass `interactive` together with `onStepChange` to let users click completed or active steps to jump back. Pending steps remain unreachable.
+
+<LivePreview example="stepper/interactive" />
+
+### Error state
+
+Force a step's status with the `status` prop — typically `"error"` for validation failures.
+
+<LivePreview example="stepper/error" />
+
+## API
+
+<PropsTable component="Stepper" />
+
+## Accessibility
+
+- The root renders as `<ol>` so the order of steps is exposed to assistive tech.
+- The active step's `<li>` carries `aria-current="step"`.
+- Each step also gets a `data-status="pending|active|complete|error"` attribute so consumers can target individual states with CSS.
+- In `interactive` mode each reachable step renders a real `<button>` with an `aria-label` derived from its title (or `"Step N"` if the title is non-string).
+- Connector lines are `aria-hidden="true"` — purely decorative.
+
+## Recipes
+
+- Use `variant="dots"` for compact progress meters where titles aren't useful.
+- Pair with a form's `isValid` flag to advance `currentStep` only when the current step's fields pass validation.
+- Provide a custom `icon` on each `Step` plus `variant="icons"` for onboarding flows where the steps represent distinct activities.
+- Combine `interactive` with controlled `currentStep` to let users freely navigate between visited steps.

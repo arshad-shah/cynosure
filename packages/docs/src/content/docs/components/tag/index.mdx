@@ -1,0 +1,75 @@
+---
+title: Tag
+description: Short label that classifies or attributes content with a category or keyword. Optionally clickable or removable.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Tag renders a `<span>` by default. With `onClick`, the whole tag becomes a `<button>`. With `onRemove`, the root becomes `role="group"` and the remove control is a separate focusable `<button>` labelled via `removeLabel`. Supports Backspace/Delete to remove when focused.
+bundleSize: "—"
+tags: [feedback, label, metadata]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+import StatusBadge from '@/components/StatusBadge.astro';
+import BundleSizePill from '@/components/BundleSizePill.astro';
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="Tag" /></div>
+
+<LivePreview example="tag/basic" />
+
+## Usage
+
+```tsx
+import { Tag } from '@arshad-shah/cynosure-react';
+
+<Tag>Design</Tag>
+```
+
+## Variants
+
+Tag ships four variants — `solid`, `soft` (default), `outline`, and `ghost` — across six colour schemes (`accent`, `neutral`, `success`, `warning`, `danger`, `info`).
+
+<LivePreview example="tag/variants" />
+
+## Sizes
+
+Three sizes are available: `xs`, `sm`, and `md` (default).
+
+<LivePreview example="tag/sizes" />
+
+## With icon
+
+Pass any node to `icon` for a leading glyph. The icon is wrapped in an aria-hidden span so it stays decorative.
+
+<LivePreview example="tag/with-icon" />
+
+## Clickable
+
+Provide `onClick` to make the entire tag a button. Use this for filter chips that should respond to a single activation.
+
+<LivePreview example="tag/clickable" />
+
+## Removable
+
+Pass `onRemove` to render a dismiss control. The root becomes `role="group"`, the remove button is keyboard reachable, and pressing Backspace or Delete on the focused group calls `onRemove`.
+
+<LivePreview example="tag/removable" />
+
+## API
+
+<PropsTable component="Tag" />
+
+## Accessibility
+
+- Static tags render as `<span>` — purely presentational.
+- Tags with `onClick` upgrade to `<button>` and inherit native button semantics.
+- Tags with `onRemove` render as `role="group"` with the focusable remove button labelled by `removeLabel` (defaults to `Remove {label}` when children is a string, otherwise `Remove`).
+- The group is `tabIndex={0}` so keyboard users can press Backspace or Delete to remove it without targeting the close button.
+- `disabled` propagates to the remove and click buttons and removes the group from tab order.
+
+## Recipes
+
+- Use tags to classify articles, issues, or library entries with consistent colour.
+- Pair `onClick` with controlled filters to build a quick-filter row.
+- Provide `removeLabel` for non-string children so the remove action remains announced.
+- Use `shape="square"` for compact metadata strips and the default `pill` shape for prose contexts.

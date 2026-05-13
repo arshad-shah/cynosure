@@ -1,0 +1,80 @@
+---
+title: Text
+description: Body-copy primitive with responsive size, weight, alignment, role variants, and truncation.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Renders a `<span>` via `Box` by default; switch to `p`, `div`, `label`, `strong`, or `em` through the `as` prop so the document outline stays semantic.
+bundleSize: "—"
+tags: [typography, primitive]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+import StatusBadge from '@/components/StatusBadge.astro';
+import BundleSizePill from '@/components/BundleSizePill.astro';
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="Text" /></div>
+
+<LivePreview example="text/basic" />
+
+## Usage
+
+```tsx
+import { Text } from '@arshad-shah/cynosure-react';
+
+<Text>Body copy renders in the Text component.</Text>
+```
+
+## Sizes
+
+Five body sizes are available — `xs`, `sm`, `md` (default), `lg`, and `xl` — each pulling family, font-size, and line-height from the matching body composite tokens.
+
+<LivePreview example="text/sizes" />
+
+## Weights
+
+Pick from `regular`, `medium`, `semibold`, and `bold` to shift emphasis without changing scale.
+
+<LivePreview example="text/weights" />
+
+## Variants
+
+`variant` layers a role on top of size: `caption` for de-emphasised metadata, `overline` for uppercase eyebrow labels, and `lead` for relaxed lead-in paragraphs. The default body variant leaves typography untouched.
+
+<LivePreview example="text/variants" />
+
+## Decorations
+
+Combine `italic`, `underline`, and `strikethrough` to style inline runs. `decorationColor` recolours underline and strikethrough independently from the text colour.
+
+<LivePreview example="text/decorations" />
+
+## Truncate
+
+Pass `truncate` as a boolean for single-line ellipsis or a number greater than one for multi-line clamp.
+
+<LivePreview example="text/truncate" />
+
+## Rendered element
+
+Swap the rendered element with `as` (`span`, `p`, `div`, `label`, `strong`, `em`) so semantics match the surrounding flow without losing styling.
+
+<LivePreview example="text/as" />
+
+## API
+
+<PropsTable component="Text" />
+
+## Accessibility
+
+- Choose the rendered element via `as` so the document outline stays meaningful — use `p` for paragraphs, `span` for inline runs, `label` only inside form contexts.
+- Avoid Text where a heading belongs; reach for the Heading component when content introduces a section.
+- Keep size + weight combinations above the platform contrast minimum; `variant="caption"` and `variant="lead"` use the muted foreground token and should stay on backgrounds that preserve contrast.
+- `truncate` hides overflow visually only — supply the full string in the DOM (or `title`) so assistive tech still receives the complete content.
+
+## Recipes
+
+- Pair Text with Heading to build a readable title-and-body grouping.
+- Use `variant="overline"` with `size="xs"` for tight section eyebrows above a Heading.
+- Drop `asChild` onto a framework link to project Text's typography onto a routed element without an extra wrapper.
+- For long-form prose, constrain the parent width so line length stays readable.

@@ -1,0 +1,73 @@
+---
+title: Tree
+description: Hierarchical list view with expand/collapse, single or multi-select, and full WAI-ARIA keyboard support.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Implements the WAI-ARIA tree pattern — roving tabindex, ArrowUp/Down/Left/Right navigation, Home/End jumps, and aria-expanded / aria-selected / aria-level on every node.
+bundleSize: "—"
+tags: [data-display, tree, hierarchy]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+import StatusBadge from '@/components/StatusBadge.astro';
+import BundleSizePill from '@/components/BundleSizePill.astro';
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="Tree" /></div>
+
+<LivePreview example="tree/basic" />
+
+## Usage
+
+```tsx
+import { Tree, type TreeNode } from '@arshad-shah/cynosure-react';
+
+const items: TreeNode[] = [
+  { id: 'a', label: 'Folder', children: [{ id: 'a/1', label: 'File.tsx' }] },
+];
+
+<Tree items={items} aria-label="Files" />
+```
+
+## Default expanded
+
+Pass `defaultExpandedIds` to open a set of branches on first paint without controlling state.
+
+<LivePreview example="tree/default-expanded" />
+
+## Single selection
+
+Pass `selectionMode="single"` (plus optional `defaultSelectedIds`) for a picker-style tree.
+
+<LivePreview example="tree/single-select" />
+
+## Multi selection
+
+Pass `selectionMode="multiple"` for checkbox-style multi-select. Ctrl/Cmd-click toggles individual ids; `aria-multiselectable` flips to `true` on the root.
+
+<LivePreview example="tree/multi-select" />
+
+## Custom rendering
+
+Pass a render function as the `children` prop to fully customise each row — receive the node plus `depth`, `expanded`, `selected`, `focused`, and `disabled` flags.
+
+<LivePreview example="tree/custom-render" />
+
+## API
+
+<PropsTable component="Tree" />
+
+## Accessibility
+
+- Implements the WAI-ARIA tree pattern: the root is `role="tree"`, each row is `role="treeitem"`, and nested branches are `role="group"`.
+- Every node exposes `aria-expanded` (when it has children), `aria-selected` (when selection is enabled), `aria-level`, and `aria-disabled`.
+- Keyboard: `ArrowUp` / `ArrowDown` move focus; `ArrowRight` opens a branch or moves to the first child; `ArrowLeft` closes a branch or moves to the parent; `Home` / `End` jump to the first / last visible row; `Enter` / `Space` toggle and activate; `*` expands every sibling at the current level.
+- Roving `tabIndex` keeps the tree a single tab stop within the surrounding form / page.
+- Provide an `aria-label` (or `aria-labelledby`) so the tree's purpose is announced.
+
+## Recipes
+
+- Use `defaultExpandedIds` for uncontrolled expansion; pair `expandedIds` + `onExpandedChange` to control state externally.
+- Switch `selectionMode` between `"single"` and `"multiple"` for picker-style trees.
+- Pass a `children` render prop to layer in custom icons, badges, or trailing actions.
+- Use the exported `treeCollectIds` helper to implement an "expand all" toggle without recursion at the call site.

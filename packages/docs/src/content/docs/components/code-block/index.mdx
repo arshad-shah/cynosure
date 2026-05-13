@@ -1,0 +1,69 @@
+---
+title: CodeBlock
+description: Syntax-highlighted code block backed by Shiki with dual-theme support, line numbers, line highlighting, and a copy button.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Renders a semantic <pre><code> element; copy button (if enabled) is keyboard-focusable with an accessible label and a success state.
+bundleSize: "—"
+tags: [data-display, code, shiki]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+import StatusBadge from '@/components/StatusBadge.astro';
+import BundleSizePill from '@/components/BundleSizePill.astro';
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="CodeBlock" /></div>
+
+<LivePreview example="code-block/basic" />
+
+## Usage
+
+```tsx
+import { CodeBlock } from '@arshad-shah/cynosure-react/code-block';
+
+<CodeBlock language="tsx">{`const x = 42;`}</CodeBlock>
+```
+
+## Language
+
+Pass a Shiki language identifier (`tsx`, `bash`, `json`, `python`, …) to opt into syntax highlighting. The default `"text"` skips Shiki entirely and renders plain pre-formatted text.
+
+<LivePreview example="code-block/language" />
+
+## Line numbers and highlighting
+
+Combine `showLineNumbers` with `highlightLines` to draw attention to a specific region of the snippet.
+
+<LivePreview example="code-block/line-numbers" />
+
+## Copy button
+
+Set `copyable` to render a copy-to-clipboard button in the header. The label flips to "Copied" with a check icon while the success state is live.
+
+<LivePreview example="code-block/copyable" />
+
+## With filename
+
+Pass `filename` (string or any `ReactNode`) to display a label in the header instead of the language tag.
+
+<LivePreview example="code-block/with-filename" />
+
+## API
+
+<PropsTable component="CodeBlock" />
+
+## Accessibility
+
+- Wraps highlighted code in a semantic `<pre><code>` pair (or Shiki's pre-rendered HTML when provided).
+- The copy button is a real `<button>` with `aria-label` that flips between "Copy code" and "Copied".
+- Theming follows the active `data-theme` via dual-theme CSS variables — contrast stays WCAG AA in both modes.
+- Long snippets stay inside an internal scroll region when `maxHeight` is set, so they never break page layout.
+- Plain (`language="text"`) blocks remain selectable and readable by line.
+
+## Recipes
+
+- Pass `html` directly when you have pre-rendered Shiki output (SSR, MDX, custom highlighters).
+- Pair `showLineNumbers` with `highlightLines={[3, 4]}` to spotlight a fix or diff.
+- Set `maxHeight={320}` for long snippets — the block scrolls internally instead of pushing the page.
+- Override `theme` with a Shiki `{ light, dark }` pair to match a brand palette.

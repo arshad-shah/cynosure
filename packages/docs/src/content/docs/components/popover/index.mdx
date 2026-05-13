@@ -1,0 +1,81 @@
+---
+title: Popover
+description: A click-triggered, non-modal floating panel for small chunks of contextual content and quick edits.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Uses role="dialog"; the trigger exposes aria-expanded; focus moves into the panel on open; Esc closes and restores focus to the trigger.
+bundleSize: "—"
+tags: [overlay, popover, accessible]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+import StatusBadge from '@/components/StatusBadge.astro';
+import BundleSizePill from '@/components/BundleSizePill.astro';
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="Popover" /></div>
+
+<LivePreview example="popover/basic" />
+
+## Usage
+
+```tsx
+import {
+  Button,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@arshad-shah/cynosure-react";
+
+<Popover>
+  <PopoverTrigger asChild>
+    <Button>Show</Button>
+  </PopoverTrigger>
+  <PopoverContent>Hello from inside the popover.</PopoverContent>
+</Popover>
+```
+
+## Variants
+
+### Sides and alignment
+
+`PopoverContent` accepts `side="top" | "right" | "bottom" (default) | "left"` and `align="start" | "center" (default) | "end"`. The default `sideOffset` is `8` and `collisionPadding` is `8` — the panel flips automatically near viewport edges.
+
+<LivePreview example="popover/sides" />
+
+### With arrow
+
+Add `PopoverArrow` inside `PopoverContent` to render a pointer toward the trigger.
+
+<LivePreview example="popover/with-arrow" />
+
+### Controlled
+
+Drive the open state externally with `open` / `onOpenChange`. Useful when the popover hosts a form whose submit closes the panel.
+
+<LivePreview example="popover/controlled" />
+
+### Anchored to a different element
+
+Use `PopoverAnchor` to position the panel relative to an arbitrary element while keeping a separate `PopoverTrigger` button.
+
+<LivePreview example="popover/anchored" />
+
+## API
+
+<PropsTable component="PopoverContent" />
+
+## Accessibility
+
+- The trigger toggles `aria-expanded` and references the panel via `aria-controls`.
+- `PopoverContent` carries `role="dialog"`; focus moves into the panel on open and returns to the trigger on close.
+- `Esc` closes the popover; clicking outside also closes it.
+- The popover is non-modal — the rest of the page remains interactive, but a focus scope keeps Tab cycling within the panel until it is dismissed.
+- Use `PopoverClose` for an explicit close button when the popover hosts a long form.
+
+## Recipes
+
+- Use for color pickers, quick filter clusters, inline edit forms, and "more info" panels.
+- Prefer `Tooltip` for short text-only hover hints and `Dialog` when the task warrants a full modal interrupt.
+- Position with `side` and `align`; let Radix auto-flip handle viewport collisions instead of hard-coding placement.
+- Pair with `PopoverAnchor` when the trigger and the visual anchor must be different (e.g., a global "?" button anchoring help next to whichever field has focus).

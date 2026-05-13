@@ -1,0 +1,74 @@
+---
+title: Chip
+description: Interactive compact element for filters, selections, and removable attributes.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Chip renders a native `<button>` with `aria-pressed` to convey selection state. The dismiss control is a separate focusable button labelled via `removeLabel` (defaults to `Remove {label}` or `Remove`).
+bundleSize: "—"
+tags: [feedback, filter, selection]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+import StatusBadge from '@/components/StatusBadge.astro';
+import BundleSizePill from '@/components/BundleSizePill.astro';
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="Chip" /></div>
+
+<LivePreview example="chip/basic" />
+
+## Usage
+
+```tsx
+import { Chip } from '@arshad-shah/cynosure-react';
+
+<Chip>Status</Chip>
+```
+
+## Variants
+
+Chip ships four visual variants — `solid`, `soft` (default), `outline`, and `ghost` — each available across six colour schemes (`accent`, `neutral`, `success`, `warning`, `danger`, `info`).
+
+<LivePreview example="chip/variants" />
+
+## Sizes
+
+Three sizes are available: `xs`, `sm`, and `md` (default).
+
+<LivePreview example="chip/sizes" />
+
+## Selected state
+
+Chips support a controlled `selected` boolean with `onSelectedChange` for toggle-style filters. Selection state is mirrored to `aria-pressed`.
+
+<LivePreview example="chip/selected" />
+
+## Removable
+
+Pass `onRemove` to render a dismiss control next to the chip label. The chip splits into two focusable buttons — the label and the remove control — so each is independently keyboard reachable.
+
+<LivePreview example="chip/removable" />
+
+## With icon
+
+Use `leftIcon` or `rightIcon` to decorate the chip with a leading or trailing glyph.
+
+<LivePreview example="chip/with-icon" />
+
+## API
+
+<PropsTable component="Chip" />
+
+## Accessibility
+
+- The chip body is a native `<button type="button">` with `aria-pressed` toggled by `selected`.
+- When `onRemove` is set, the dismiss control becomes a separate `<button>` with an accessible `aria-label` derived from the chip label (or `removeLabel` if supplied).
+- `disabled` propagates to both the label and remove buttons, and the wrapper sets `aria-disabled` for assistive tech.
+- Keep chip text short — single tokens or two-word phrases read best for screen reader users navigating filter lists.
+
+## Recipes
+
+- Use chips as toggleable filters in faceted search.
+- Combine with an input to build a token-style multi-select.
+- Use `shape="square"` for compact metadata chips and `shape="pill"` (default) for filters.
+- Provide a `removeLabel` for non-string children so the dismiss action stays announced.

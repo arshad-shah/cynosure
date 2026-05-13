@@ -1,0 +1,66 @@
+---
+title: Fieldset
+description: Native <fieldset> + <legend> wrapper for grouping related form controls; disabling the fieldset cascades to every nested control.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Renders a real <fieldset> with an optional <legend> so the grouping and its name are exposed natively to assistive tech.
+bundleSize: "—"
+tags: [forms]
+---
+import LivePreview from "@/components/LivePreview/LivePreview.astro";
+import PropsTable from "@/components/PropsTable.astro";
+import StatusBadge from "@/components/StatusBadge.astro";
+import BundleSizePill from "@/components/BundleSizePill.astro";
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="Fieldset" /></div>
+
+<LivePreview example="fieldset/basic" />
+
+## Usage
+
+```tsx
+import { Fieldset, Input, Label, Stack } from "@arshad-shah/cynosure-react";
+
+<Fieldset legend="Contact details">
+  <Stack gap="3">
+    <Label htmlFor="email">Email</Label>
+    <Input id="email" type="email" />
+  </Stack>
+</Fieldset>
+```
+
+## With legend
+
+The `legend` prop accepts any node — text, an inline icon, or a heading.
+
+<LivePreview example="fieldset/with-legend" />
+
+## Disabled
+
+Setting `disabled` on the fieldset natively disables every nested form control — no per-field wiring required.
+
+<LivePreview example="fieldset/disabled" />
+
+## Grouping form controls
+
+Combine with `CheckboxGroup` or `RadioGroup` to give a cluster of inputs a visible name plus a focus boundary.
+
+<LivePreview example="fieldset/grouping" />
+
+## API
+
+<PropsTable component="Fieldset" />
+
+## Accessibility
+
+- Renders a real `<fieldset>` and `<legend>` — screen readers automatically announce the legend when focus enters any nested control.
+- `disabled` is forwarded to the native fieldset, which disables every descendant form element without extra ARIA work.
+- A `data-disabled` attribute mirrors the disabled flag for CSS hooks that need to dim sibling content.
+- Keep the legend visible — hiding it removes the group's accessible name.
+
+## Recipes
+
+- Use one Fieldset per logical section ("Account", "Address", "Preferences") instead of one large form.
+- Pair with `CheckboxGroup` / `RadioGroup` to combine semantic grouping with a controlled value.
+- Avoid nesting fieldsets more than one level deep — long announcement chains become noisy.

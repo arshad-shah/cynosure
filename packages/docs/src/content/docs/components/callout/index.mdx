@@ -1,0 +1,65 @@
+---
+title: Callout
+description: Highlighted block that draws attention to supporting information, tips, or guidance inline with content.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Renders a plain `<div>` container — pair with a `CalloutTitle` so screen readers can announce intent. Decorative icons are wrapped in a non-semantic span; pass `icon={false}` (or omit) to skip the icon slot.
+bundleSize: "—"
+tags: [feedback, info, content]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+import StatusBadge from '@/components/StatusBadge.astro';
+import BundleSizePill from '@/components/BundleSizePill.astro';
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="Callout" /></div>
+
+<LivePreview example="callout/basic" />
+
+## Usage
+
+```tsx
+import { Callout, CalloutTitle, CalloutContent } from '@arshad-shah/cynosure-react';
+
+<Callout>
+  <CalloutTitle>Good to know</CalloutTitle>
+  <CalloutContent>Callouts surface helpful context inline with your content.</CalloutContent>
+</Callout>
+```
+
+## Color schemes
+
+Callout ships five colour schemes — `accent` (default), `neutral`, `success`, `warning`, and `danger`. Pick the tone that matches the supporting message.
+
+<LivePreview example="callout/color-schemes" />
+
+## Outline variant
+
+Switch to `variant="outline"` for a lighter, border-only treatment that recedes into dense layouts. The default `soft` variant uses a tinted surface.
+
+<LivePreview example="callout/outline" />
+
+## With icon
+
+Pass any node to the `icon` prop. Icons are wrapped in an aria-hidden span, so colour and shape stay decorative.
+
+<LivePreview example="callout/with-icon" />
+
+## API
+
+<PropsTable component="Callout" />
+
+## Accessibility
+
+- Use `CalloutTitle` (renders a `<p>` by default; pass `as="h3"` for a heading) so the callout is labelled for assistive tech.
+- Colour alone never carries meaning — keep a textual title that conveys intent (e.g. "Heads up", "Required").
+- Reserve `Callout` for non-urgent context. Use `Alert` when the content is interruptive or live.
+- Inline icons render inside a decorative wrapper; supply text labels in `CalloutContent` for screen readers.
+
+## Recipes
+
+- Use callouts for tips, notes, and "good to know" asides inside long-form documentation.
+- Promote `CalloutTitle` to a heading (`as="h3"`) when the callout introduces a new section.
+- Combine `variant="outline"` with `colorScheme="neutral"` for a quiet "note" treatment.
+- Reserve a single callout colour per page so the visual rhythm stays calm.

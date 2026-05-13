@@ -1,4 +1,5 @@
 import { render } from '@testing-library/react';
+import { useRef } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { useHotkeys } from '../useHotkeys.js';
 
@@ -146,5 +147,50 @@ describe('useHotkeys', () => {
     render(<Custom />);
     target.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }));
     expect(onHit).toHaveBeenCalled();
+  });
+
+  it('attaches to a RefObject target', () => {
+    const onHit = vi.fn();
+    function RefTarget() {
+      const ref = useRef<HTMLDivElement>(null);
+      useHotkeys('escape', onHit, { target: ref });
+      return <div ref={ref} data-testid="ref-target" tabIndex={-1} />;
+    }
+    render(<RefTarget />);
+    const el = document.querySelector('[data-testid="ref-target"]') as HTMLElement;
+    el.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    expect(onHit).toHaveBeenCalled();
+  });
+
+  it('is a no-op when target is explicitly null', () => {
+    const onHit = vi.fn();
+    function NullTarget() {
+      useHotkeys('escape', onHit, { target: null });
+      return null;
+    }
+    expect(() => render(<NullTarget />)).not.toThrow();
+    expect(onHit).not.toHaveBeenCalled();
+  });
+
+  it('normalizes "return" alias to Enter', () => {
+    const onHit = vi.fn();
+    function ReturnAlias() {
+      useHotkeys('return', onHit);
+      return null;
+    }
+    render(<ReturnAlias />);
+    dispatchKey({ key: 'Enter' });
+    expect(onHit).toHaveBeenCalled();
+  });
+
+  it('normalizes "del" alias to Delete', () => {
+    const onDel = vi.fn();
+    function DelAlias() {
+      useHotkeys('del', onDel);
+      return null;
+    }
+    render(<DelAlias />);
+    dispatchKey({ key: 'Delete' });
+    expect(onDel).toHaveBeenCalled();
   });
 });

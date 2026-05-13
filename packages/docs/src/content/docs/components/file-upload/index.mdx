@@ -1,0 +1,75 @@
+---
+title: FileUpload
+description: Drag-and-drop file picker with accept/size/count validation, four trigger variants, and a built-in list with image thumbnails or file-type badges.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Wraps a native <input type="file">; the drop zone exposes role="button" with full keyboard activation (Enter/Space) and an aria-describedby hint when accept is set.
+bundleSize: "—"
+tags: [forms, upload]
+---
+import LivePreview from "@/components/LivePreview/LivePreview.astro";
+import PropsTable from "@/components/PropsTable.astro";
+import StatusBadge from "@/components/StatusBadge.astro";
+import BundleSizePill from "@/components/BundleSizePill.astro";
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="FileUpload" /></div>
+
+<LivePreview example="file-upload/basic" />
+
+## Usage
+
+```tsx
+import { FileUpload } from "@arshad-shah/cynosure-react";
+
+<FileUpload onFilesChange={(files) => console.log(files)} />
+```
+
+The default render is `FileUploadTrigger` + `FileUploadList` — pass `children` to compose your own layout.
+
+## Variants
+
+`default` (the main affordance), `card`, `compact`, and `minimal` change the trigger's visual treatment.
+
+<LivePreview example="file-upload/variants" />
+
+## Multiple files
+
+`multiple` enables multi-select and cumulative drops. `maxCount` caps the list size.
+
+<LivePreview example="file-upload/multiple" />
+
+## Accept and size limits
+
+Restrict by MIME type, extension, or wildcard via `accept`. Cap individual file bytes with `maxSize`; the `onError` callback fires for rejected files with a `reason` of `"type"`, `"size"`, or `"count"`.
+
+<LivePreview example="file-upload/accept" />
+
+## Composition
+
+Drop in just the trigger or just the list when you need a custom layout — both read from the FileUpload context.
+
+<LivePreview example="file-upload/composition" />
+
+## Disabled
+
+<LivePreview example="file-upload/disabled" />
+
+## API
+
+<PropsTable component="FileUpload" />
+
+## Accessibility
+
+- The hidden `<input type="file">` carries the canonical `accept` / `multiple` / `disabled` flags so OS file dialogs behave correctly.
+- The drop zone exposes `role="button"` and `tabIndex=0` so it's reachable by keyboard; Enter and Space open the file dialog.
+- When `accept` is set, the trigger announces the accepted types via `aria-describedby` so screen-reader users know the constraint up front.
+- The file list is a `<ul>` with `aria-live="polite"` so additions and removals are announced without interrupting the user.
+- Each remove / preview action is an `IconButton` with a per-file `aria-label` ("Remove avatar.png") to keep the action unambiguous.
+
+## Recipes
+
+- Use `variant="minimal"` inside toolbars and chat composers where space is tight.
+- Pass `onError` to surface validation feedback in your own toast or `ErrorText`.
+- Provide `renderItem` on `FileUploadList` for fully-custom rows, or `onPreview` to add a preview button before the remove button.
+- Pair with `name` to participate in a native `<form>` — the underlying input is submitted as a real file field.

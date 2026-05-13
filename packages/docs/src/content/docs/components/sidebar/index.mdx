@@ -1,0 +1,111 @@
+---
+title: Sidebar
+description: A collapsible side navigation column with header, body, footer, grouped items, and automatic mobile-drawer behaviour.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Renders an aside containing a labelled nav landmark; items expose aria-current; tooltips replace labels when collapsed to the icon rail; the mobile drawer is fully focus-trapped.
+bundleSize: "—"
+tags: [navigation, sidebar, accessible]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+import StatusBadge from '@/components/StatusBadge.astro';
+import BundleSizePill from '@/components/BundleSizePill.astro';
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="Sidebar" /></div>
+
+<LivePreview example="sidebar/basic" />
+
+## Usage
+
+```tsx
+import {
+  Sidebar,
+  SidebarProvider,
+  SidebarHeader,
+  SidebarBody,
+  SidebarFooter,
+  SidebarNav,
+  SidebarGroup,
+  SidebarItem,
+  SidebarSeparator,
+  SidebarTrigger,
+} from "@arshad-shah/cynosure-react";
+
+<SidebarProvider>
+  <Sidebar>
+    <SidebarHeader>App</SidebarHeader>
+    <SidebarBody>
+      <SidebarNav aria-label="Primary">
+        <SidebarGroup label="Workspace">
+          <SidebarItem icon={<DashboardIcon />} label="Dashboard" isActive />
+          <SidebarItem icon={<InboxIcon />} label="Inbox" badge="12" />
+        </SidebarGroup>
+      </SidebarNav>
+    </SidebarBody>
+    <SidebarFooter>v1.0.0</SidebarFooter>
+  </Sidebar>
+</SidebarProvider>
+```
+
+`SidebarProvider` owns collapsed and mobile-open state. On viewports matching `mobileQuery` (default `(max-width: 47.99em)`) the sidebar renders inside a `Drawer` automatically; on desktop it collapses to an icon rail when `collapsible="icon"` (the default).
+
+## Variants
+
+### Collapsible icon rail
+
+Use `SidebarTrigger` anywhere to toggle the collapsed state. When collapsed, item labels are hidden but tooltips reveal them on hover.
+
+<LivePreview example="sidebar/collapsible" />
+
+### Groups with collapsible sections
+
+Pass `collapsible` to `SidebarGroup` (with optional `defaultOpen`) for accordion-style sections. An `action` slot beside the label is useful for a "+" button.
+
+<LivePreview example="sidebar/groups" />
+
+### Sub-navigation
+
+Use `SidebarSubNav` to nest items under a parent. When the rail is collapsed, sub-navs automatically render as a flyout `Popover` triggered by the parent item.
+
+<LivePreview example="sidebar/sub-nav" />
+
+### Right-aligned sidebar
+
+Pass `side="right"` to `SidebarProvider` (or directly to `Sidebar`) to mirror the layout.
+
+<LivePreview example="sidebar/right-side" />
+
+### Variants — sidebar, floating, inset
+
+The `variant` prop on `SidebarProvider` adjusts the surface treatment: `"sidebar"` (default) sits flush, `"floating"` is detached with a shadow, `"inset"` is recessed inside the page background.
+
+<LivePreview example="sidebar/variants" />
+
+### With footer actions
+
+`SidebarFooter` is a free-form slot — use it for user menus, version pills, or upgrade prompts.
+
+<LivePreview example="sidebar/footer" />
+
+## API
+
+<PropsTable component="Sidebar" />
+
+## Accessibility
+
+- The sidebar renders as `<aside>` containing a `<nav>` (`SidebarNav`); pass `aria-label` to `SidebarNav` for an explicit landmark name.
+- `SidebarItem` carries `aria-current="page"` when `isActive` is set, and `aria-disabled="true"` when `disabled`.
+- A roving `tabindex` is implemented internally (`useRovingFocus`) so arrow keys move between sidebar items without trapping `Tab`.
+- When the rail is collapsed (icon-only mode), each `SidebarItem` is automatically wrapped in a `Tooltip` that announces its label.
+- On mobile, the sidebar renders inside a `Drawer` with a hidden title (`mobileTitle`, default `"Sidebar"`) so screen readers can identify the dialog.
+- `SidebarTrigger` toggles `aria-expanded` and `aria-pressed` and updates its accessible name (`"Expand"` / `"Collapse"` / `"Open"` / `"Close"`) automatically.
+
+## Recipes
+
+- Wrap your whole app in `SidebarProvider` so the collapsed state persists across routes.
+- Use `collapsible="offcanvas"` instead of `"icon"` when you want the desktop sidebar to slide away entirely rather than shrink to a rail.
+- Pair `SidebarItem asChild` with a router `<Link>` to keep client-side navigation while inheriting the styled chrome.
+- Set `tooltip={false}` on items that already have an obvious meaning when collapsed (e.g. avatars).
+- Use `variant="floating"` for marketing-style dashboards and `variant="inset"` when the sidebar should look set into the page background.

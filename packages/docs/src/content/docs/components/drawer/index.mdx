@@ -1,0 +1,97 @@
+---
+title: Drawer
+description: An edge-anchored overlay panel that slides in from any side of the viewport.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Uses role="dialog" aria-modal="true"; focus is trapped; Esc closes by default and restores focus to the trigger.
+bundleSize: "—"
+tags: [overlay, modal, accessible]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+import StatusBadge from '@/components/StatusBadge.astro';
+import BundleSizePill from '@/components/BundleSizePill.astro';
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="Drawer" /></div>
+
+<LivePreview example="drawer/basic" />
+
+## Usage
+
+```tsx
+import {
+  Button,
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@arshad-shah/cynosure-react";
+
+<Drawer>
+  <DrawerTrigger asChild>
+    <Button>Open</Button>
+  </DrawerTrigger>
+  <DrawerContent side="right">
+    <DrawerHeader>
+      <DrawerTitle>Filters</DrawerTitle>
+      <DrawerDescription>Refine your results</DrawerDescription>
+    </DrawerHeader>
+    <DrawerFooter>
+      <DrawerClose asChild>
+        <Button variant="ghost">Close</Button>
+      </DrawerClose>
+      <Button>Apply</Button>
+    </DrawerFooter>
+  </DrawerContent>
+</Drawer>
+```
+
+## Variants
+
+### Sides
+
+`DrawerContent` accepts `side="top" | "right" (default) | "bottom" | "left"`. Right is the canonical filter-panel placement; bottom is the canonical mobile sheet.
+
+<LivePreview example="drawer/sides" />
+
+### Sizes
+
+Pass `size="sm" | "md" (default) | "lg" | "xl" | "full"`. For `top` / `bottom`, size sets the height; for `left` / `right`, size sets the width.
+
+<LivePreview example="drawer/sizes" />
+
+### With form
+
+Embed a form inside `DrawerContent`. Submit closes the drawer; `DrawerClose` cancels.
+
+<LivePreview example="drawer/with-form" />
+
+### Controlled
+
+Drive the open state externally to coordinate with route changes or async work.
+
+<LivePreview example="drawer/controlled" />
+
+## API
+
+<PropsTable component="DrawerContent" />
+
+## Accessibility
+
+- `DrawerContent` renders with `role="dialog"` and `aria-modal="true"` via Radix Dialog.
+- Focus is trapped inside the drawer while open and returned to the trigger on close.
+- `Esc` closes by default (`closeOnEscape={true}`); suppress with `closeOnEscape={false}`.
+- Clicking the backdrop closes by default (`closeOnOverlayClick={true}`); suppress with `closeOnOverlayClick={false}`.
+- The built-in close icon button is labelled via `closeLabel` ("Close" by default); hide with `showCloseButton={false}`.
+
+## Recipes
+
+- Use `side="right"` for filter and detail panels; `side="bottom"` works well as a mobile sheet.
+- Pair with route-based open state so deep links restore the drawer on refresh.
+- Use `hideOverlay` when stacking a drawer on top of an already-modal surface.
+- For multi-step flows, prefer `Dialog` to keep a single focused task in view.

@@ -1,0 +1,76 @@
+---
+title: DatePicker
+description: Segmented date input with a calendar popover; backed by React Aria + @internationalized/date for locale-aware formatting and full keyboard control.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Each date segment is its own labelled spinbutton; popover is a labelled dialog with a roving-tabindex calendar grid.
+bundleSize: "—"
+tags: [forms, date]
+---
+import LivePreview from "@/components/LivePreview/LivePreview.astro";
+import PropsTable from "@/components/PropsTable.astro";
+import StatusBadge from "@/components/StatusBadge.astro";
+import BundleSizePill from "@/components/BundleSizePill.astro";
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="DatePicker" /></div>
+
+<LivePreview example="date-picker/basic" />
+
+## Usage
+
+```tsx
+import { DatePicker } from "@arshad-shah/cynosure-react";
+import { parseDate } from "@internationalized/date";
+
+<DatePicker label="Start date" defaultValue={parseDate("2026-04-17")} />
+```
+
+Values are `@internationalized/date` `DateValue`s — pair the picker with `parseDate` / `today(getLocalTimeZone())` from `@internationalized/date`.
+
+## Variants
+
+`outline` (default), `filled`, and `ghost` mirror the other form controls.
+
+<LivePreview example="date-picker/variants" />
+
+## Sizes
+
+`sm`, `md` (default), and `lg`.
+
+<LivePreview example="date-picker/sizes" />
+
+## States
+
+Disabled, read-only, invalid, and empty.
+
+<LivePreview example="date-picker/states" />
+
+## Min / max
+
+Constrain the selectable range with `minValue` and `maxValue`. The calendar disables out-of-range cells and the segments reject out-of-range entries.
+
+<LivePreview example="date-picker/min-max" />
+
+## Granularity
+
+`granularity` switches between day-only and time-aware segments (`hour`, `minute`, `second`).
+
+<LivePreview example="date-picker/granularity" />
+
+## API
+
+<PropsTable component="DatePicker" />
+
+## Accessibility
+
+- Each segment (year/month/day, plus time when applicable) is a labelled `spinbutton` — arrow keys nudge the value, type-ahead works for two-digit entry.
+- The calendar popover is a labelled dialog with a roving-tabindex `grid` for date navigation.
+- `invalid` toggles `aria-invalid` on the input group; the calendar respects `minValue` / `maxValue` and skips disabled cells.
+- Pass `aria-label` (or a string `label` prop) so the field has an accessible name in both states.
+
+## Recipes
+
+- Use `value` + `onChange` for controlled state; pass `null` to clear.
+- Combine with `FormField` + `FormMessage` to surface "required date" validation.
+- Wrap in `LocaleProvider` to switch the segment order and the calendar's first-day-of-week.

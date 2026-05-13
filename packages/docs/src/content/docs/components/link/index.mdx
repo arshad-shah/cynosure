@@ -1,0 +1,75 @@
+---
+title: Link
+description: Anchor primitive with token-driven styling, underline behaviour, and safe defaults for external destinations.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Renders a native `<a>`; `external` adds `rel="noopener noreferrer"` and `target="_blank"` plus an `aria-hidden` indicator icon so screen readers aren't double-announced.
+bundleSize: "—"
+tags: [typography, navigation]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+import StatusBadge from '@/components/StatusBadge.astro';
+import BundleSizePill from '@/components/BundleSizePill.astro';
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="Link" /></div>
+
+<LivePreview example="link/basic" />
+
+## Usage
+
+```tsx
+import { Link } from '@arshad-shah/cynosure-react';
+
+<Link href="/docs">Read more</Link>
+```
+
+## Variants
+
+Three visual variants tune emphasis without changing semantics: `default`, `subtle` (for muted body links), and `emphasis` (for hero or callout links).
+
+<LivePreview example="link/variants" />
+
+## Underline
+
+`underline` controls underline behaviour — `hover` (default), `always`, or `none`. Pick the option that matches how prominent the link should look in flow.
+
+<LivePreview example="link/underline" />
+
+## External
+
+Pass `external` to automatically set `target="_blank"`, append `rel="noopener noreferrer"`, and render a decorative indicator icon. Caller-provided `rel` and `target` merge cleanly with the safe defaults.
+
+<LivePreview example="link/external" />
+
+## Inline usage
+
+Drop a `Link` inside a `Text` to keep paragraph flow while remaining keyboard accessible.
+
+<LivePreview example="link/inline" />
+
+## Disabled
+
+`disabled` cancels navigation, sets `aria-disabled`, and applies the muted style — use sparingly since disabled links are easy to miss.
+
+<LivePreview example="link/disabled" />
+
+## API
+
+<PropsTable component="Link" />
+
+## Accessibility
+
+- Always write link text that stands on its own — avoid bare "click here" or "read more" copy.
+- `external` adds `rel="noopener noreferrer"` automatically so `target="_blank"` never leaks `window.opener`.
+- The external indicator icon is `aria-hidden`; the link text alone carries meaning for screen readers.
+- `disabled` sets `aria-disabled="true"` and blocks the click handler, but the anchor remains in the tab order — prefer hiding or replacing the link when it has no destination.
+- Underline + colour together carry the link signal so colour-blind users aren't dependent on hue alone.
+
+## Recipes
+
+- Use `underline="always"` for body links that must stand out against long-form prose.
+- Drop `Link asChild` over a framework router link to inherit Cynosure styling without losing client-side navigation: `<Link asChild><NextLink href="/next">Next</NextLink></Link>`.
+- Combine `variant="subtle"` with breadcrumbs or footer rows where many links sit close together.
+- Pair `external` with descriptive copy ("View on GitHub") so the destination is obvious before the click.

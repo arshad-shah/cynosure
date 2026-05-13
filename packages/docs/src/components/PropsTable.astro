@@ -12,8 +12,59 @@ if (!record) {
   throw new Error(`PropsTable: component "${component}" not found in props.json. Run 'pnpm generate:props'.`);
 }
 
-function formatType(t: string): string {
-  return t.split(/\s*\|\s*/).join('__PIPE__');
+// Aliases that get linked to the /reference/types page so the table stays
+// legible instead of dumping the full literal union into the cell. Must match
+// the compression rules in scripts/generate-props.ts.
+const TYPE_ALIASES = new Set([
+  'SpaceToken',
+  'SizeValue',
+  'LengthValue',
+  'Display',
+  'Responsive',
+  'ColorToken',
+  'RadiusToken',
+  'ShadowToken',
+  'DurationToken',
+  'ZIndexToken',
+  'Breakpoint',
+]);
+const ALIAS_PATTERN = new RegExp(`\\b(${[...TYPE_ALIASES].join('|')})\\b`, 'g');
+
+function aliasAnchor(name: string): string {
+  return `/reference/types/#${name.toLowerCase()}`;
+}
+
+function splitTopLevelUnion(s: string): string[] {
+  const parts: string[] = [];
+  let depth = 0;
+  let last = 0;
+  for (let i = 0; i < s.length; i++) {
+    const c = s[i];
+    if (c === '<' || c === '(' || c === '{' || c === '[') depth++;
+    else if (c === '>' || c === ')' || c === '}' || c === ']') depth--;
+    else if (c === '|' && depth === 0) {
+      parts.push(s.slice(last, i).trim());
+      last = i + 1;
+    }
+  }
+  parts.push(s.slice(last).trim());
+  return parts.filter(Boolean);
+}
+
+interface Segment { kind: 'alias' | 'text'; value: string; href?: string }
+
+function tokenize(part: string): Segment[] {
+  const out: Segment[] = [];
+  let last = 0;
+  for (const m of part.matchAll(ALIAS_PATTERN)) {
+    const idx = m.index ?? 0;
+    const name = m[1] ?? '';
+    if (idx > last) out.push({ kind: 'text', value: part.slice(last, idx) });
+    out.push({ kind: 'alias', value: name, href: aliasAnchor(name) });
+    last = idx + name.length;
+  }
+  if (last < part.length) out.push({ kind: 'text', value: part.slice(last) });
+  return out;
 }
 ---
 <div data-props>
@@ -21,7 +72,7 @@ function formatType(t: string): string {
     <span>Prop</span><span>Type</span><span>Default</span><span>Description</span>
   </div>
   {record.props.map((p) => {
-    const parts = formatType(p.type).split('__PIPE__');
+    const parts = splitTopLevelUnion(p.type);
     return (
       <div data-props-row>
         <div data-props-name>
@@ -31,7 +82,13 @@ function formatType(t: string): string {
           {parts.map((part, i) => (
             <>
               {i > 0 && <span class="t-sep">|</span>}
-              {part}
+              {tokenize(part).map((seg) =>
+                seg.kind === 'alias' ? (
+                  <a class="t-alias" href={seg.href}>{seg.value}</a>
+                ) : (
+                  <>{seg.value}</>
+                ),
+              )}
             </>
           ))}
         </div>

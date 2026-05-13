@@ -1,0 +1,68 @@
+---
+title: TimePicker
+description: Time field with segmented hour/minute editing and an optional wheel popover; built on React Aria TimeField.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Each segment is role="spinbutton" with aria-valuemin/max/now; arrows adjust the focused segment.
+bundleSize: "—"
+tags: [forms]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+import StatusBadge from '@/components/StatusBadge.astro';
+import BundleSizePill from '@/components/BundleSizePill.astro';
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="TimePicker" /></div>
+
+<LivePreview example="time-picker/basic" />
+
+## Usage
+
+```tsx
+import { TimePicker } from "@arshad-shah/cynosure-react";
+import { Time } from "@internationalized/date";
+
+<TimePicker aria-label="Meeting time" defaultValue={new Time(9, 30)} />
+```
+
+`TimePicker` accepts a `Time` value from `@internationalized/date`. The trigger opens a popover with a wheel picker for hours and minutes.
+
+## Hour cycle
+
+Use `hourCycle` to switch between 12-hour (`12`) and 24-hour (`24`) display.
+
+<LivePreview example="time-picker/hour-cycle" />
+
+## Minute step
+
+Set `minuteStep` to constrain the wheel's minute column (e.g. 5-minute or 15-minute intervals).
+
+<LivePreview example="time-picker/minute-step" />
+
+## Controlled
+
+Drive the value from parent state with `value` and `onChange`.
+
+<LivePreview example="time-picker/controlled" />
+
+## States
+
+<LivePreview example="time-picker/states" />
+
+## API
+
+<PropsTable component="TimePicker" />
+
+## Accessibility
+
+- Hour and minute segments are individual `spinbutton`s with `aria-valuemin`/`aria-valuemax`/`aria-valuenow`.
+- Arrow Up/Down change the focused segment; Arrow Left/Right move between segments.
+- The trigger button carries `aria-label="Open time picker"` and opens a `Dialog` with the wheel.
+- Provide an `aria-label` (or pass a `label`) so the whole field is announced as a time picker.
+
+## Recipes
+
+- Pair with `DatePicker` for full date-and-time entry.
+- Use `hourCycle={24}` for backend-facing forms; `hourCycle={12}` for end-user scheduling.
+- Set `minuteStep={15}` for booking flows to keep slots aligned to common intervals.

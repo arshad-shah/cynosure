@@ -26,6 +26,18 @@ describe('getThemeInitScript', () => {
     expect(script.includes('sessionStorage')).toBe(false);
   });
 
+  it('includes the allowlist when `themes` is provided', () => {
+    const script = getThemeInitScript({ themes: ['light', 'dark', 'forest'] });
+    expect(script.includes('"forest"')).toBe(true);
+    expect(script.includes('["light","dark","forest"]')).toBe(true);
+  });
+
+  it('disables matchMedia resolution when enableSystem is false', () => {
+    const script = getThemeInitScript({ defaultTheme: 'system', enableSystem: false });
+    // The compiled script encodes the enableSystem flag inline.
+    expect(script.includes('false&&window.matchMedia')).toBe(true);
+  });
+
   it('resolves to "light" when system theme is requested but matchMedia is missing', () => {
     const script = getThemeInitScript({ defaultTheme: 'system' });
     // Run the script in isolated globals to verify behaviour without window.matchMedia.

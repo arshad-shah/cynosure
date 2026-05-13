@@ -1,0 +1,72 @@
+---
+title: PinInput
+description: OTP-style code field — N single-character cells with auto-advance, paste distribution, and backspace transfer.
+category: components
+status: stable
+since: "0.1.0"
+a11y: First cell carries autocomplete="one-time-code"; ←/→/Home/End move focus; Backspace transfers to the previous cell.
+bundleSize: "—"
+tags: [forms, input]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+import StatusBadge from '@/components/StatusBadge.astro';
+import BundleSizePill from '@/components/BundleSizePill.astro';
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="PinInput" /></div>
+
+<LivePreview example="pin-input/basic" />
+
+## Usage
+
+```tsx
+import { PinInput } from "@arshad-shah/cynosure-react";
+
+<PinInput length={6} onComplete={(code) => console.log(code)} />
+```
+
+## Lengths
+
+Use `length` to size the OTP field. 4 cells for short PINs, 6 for typical OTPs.
+
+<LivePreview example="pin-input/lengths" />
+
+## Sizes
+
+Three sizes are available: `sm`, `md` (default), and `lg`.
+
+<LivePreview example="pin-input/sizes" />
+
+## Type
+
+Set `type` to `"numeric"` (default), `"alphanumeric"`, or `"alphabetic"` to restrict the accepted characters.
+
+<LivePreview example="pin-input/type" />
+
+## Masked
+
+Set `mask` to render bullets in place of the entered characters, like a password field.
+
+<LivePreview example="pin-input/mask" />
+
+## States
+
+<LivePreview example="pin-input/states" />
+
+## API
+
+<PropsTable component="PinInput" />
+
+## Accessibility
+
+- The cells are wrapped in `role="group"` with an `aria-label` (defaults to "Verification code").
+- Each cell has `aria-label="… digit N"`; the first carries `autoComplete="one-time-code"` so platform autofill works.
+- Numeric pins set `inputMode="numeric"` and `pattern="[0-9]*"` for mobile keyboards.
+- Arrow Left/Right, Home/End move focus; Backspace deletes and transfers focus to the previous cell.
+- Pasting a code distributes characters across the remaining cells.
+
+## Recipes
+
+- Use `onComplete` to auto-submit once the user fills all `length` cells.
+- Set `mask` for security codes you don't want shoulder-surfed.
+- Pair with a Resend control and a countdown timer for transactional flows.

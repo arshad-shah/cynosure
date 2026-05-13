@@ -1,0 +1,73 @@
+---
+title: BackToTop
+description: A portal-rendered floating button that reveals after the user scrolls past a threshold and returns to the top of the page when clicked.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Renders an IconButton with an accessible label; toggles a data attribute for visibility rather than removing from the tree.
+bundleSize: "—"
+tags: [navigation, scroll, accessible]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+import StatusBadge from '@/components/StatusBadge.astro';
+import BundleSizePill from '@/components/BundleSizePill.astro';
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="BackToTop" /></div>
+
+<LivePreview example="back-to-top/basic" />
+
+## Usage
+
+```tsx
+import { BackToTop } from "@arshad-shah/cynosure-react";
+
+<BackToTop showAfter={300} position="bottom-right" />
+```
+
+The button is rendered through a `Portal` so it floats above the rest of the page; pass `disablePortal` to render it inline (useful in tests).
+
+## Variants
+
+### Threshold
+
+`showAfter` controls how many pixels the page must scroll before the button appears. The default is `300`.
+
+<LivePreview example="back-to-top/threshold" />
+
+### Position
+
+Use `position` to anchor the button to one of three corners along the bottom edge.
+
+<LivePreview example="back-to-top/position" />
+
+### Custom icon
+
+Replace the default chevron with any `ReactNode` via the `icon` prop.
+
+<LivePreview example="back-to-top/custom-icon" />
+
+### Inline (no portal)
+
+Pass `disablePortal` to render the button at its current position in the tree.
+
+<LivePreview example="back-to-top/inline" />
+
+## API
+
+<PropsTable component="BackToTop" />
+
+## Accessibility
+
+- The underlying element is a `<button>` rendered via Cynosure's `IconButton`; the icon is hidden from assistive tech.
+- `label` (default `"Back to top"`) becomes the button's accessible name — override for localisation.
+- A `data-visible` attribute reflects the visible state so consumers can style the show/hide transition without re-mounting.
+- When `prefers-reduced-motion: reduce` is set, `smooth` is ignored and the page jumps instantly.
+- The button remains tab-focusable while hidden, but `data-visible="false"` lets CSS hide it from sight.
+
+## Recipes
+
+- Mount once at the root of your layout — it positions itself fixed via the `position` preset.
+- Lower `showAfter` (e.g. `120`) on shorter pages so the affordance appears sooner.
+- Set `disablePortal` inside unit tests where `document.body` doesn't exist yet.
+- Use `container` to portal into a scroll container other than `document.body` for scoped layouts.

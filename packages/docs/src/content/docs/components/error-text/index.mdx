@@ -1,0 +1,55 @@
+---
+title: ErrorText
+description: Inline error message paragraph for a form control; announces itself via role="alert" the moment it renders.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Renders a <p> with role="alert" by default so newly mounted text is announced to assistive tech.
+bundleSize: "—"
+tags: [forms, feedback]
+---
+import LivePreview from "@/components/LivePreview/LivePreview.astro";
+import PropsTable from "@/components/PropsTable.astro";
+import StatusBadge from "@/components/StatusBadge.astro";
+import BundleSizePill from "@/components/BundleSizePill.astro";
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="ErrorText" /></div>
+
+<LivePreview example="error-text/basic" />
+
+## Usage
+
+```tsx
+import { ErrorText } from "@arshad-shah/cynosure-react";
+
+<ErrorText>Please enter a valid email address.</ErrorText>
+```
+
+## Paired with an Input
+
+Render `ErrorText` conditionally below a field and reference it via `aria-describedby`. Set `invalid` on the field so the visual treatment stays in sync.
+
+<LivePreview example="error-text/with-input" />
+
+## Inside FormField
+
+Inside a `FormField`, prefer `FormMessage` — it auto-wires `aria-describedby` and renders an `ErrorText` only when the field is invalid.
+
+<LivePreview example="error-text/inside-form-field" />
+
+## API
+
+<PropsTable component="ErrorText" />
+
+## Accessibility
+
+- Defaults to `role="alert"` — assistive tech reads the message as soon as the element appears in the DOM.
+- Associate the error with its field by adding `aria-describedby={errorId}` on the input and a matching `id` on the `ErrorText`.
+- Keep messages short, specific, and actionable — "Email is required" beats "Invalid input".
+- Avoid mounting an empty `ErrorText`; render the element only while there's a message to announce.
+
+## Recipes
+
+- Render conditionally — mounting it is what triggers the announcement.
+- Pair with `HelperText` to keep persistent guidance separate from transient validation.
+- When using `FormField`, switch to `FormMessage` for automatic wiring.

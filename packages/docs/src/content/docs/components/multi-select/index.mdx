@@ -1,0 +1,73 @@
+---
+title: MultiSelect
+description: Tag-style multi-value combobox; selected values render as removable chips inside the trigger and typing filters the dropdown.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Listbox popup with role="option" and aria-multiselectable; Backspace on empty input removes the last tag.
+bundleSize: "—"
+tags: [forms, input]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+import StatusBadge from '@/components/StatusBadge.astro';
+import BundleSizePill from '@/components/BundleSizePill.astro';
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="MultiSelect" /></div>
+
+<LivePreview example="multi-select/basic" />
+
+## Usage
+
+```tsx
+import { MultiSelect } from "@arshad-shah/cynosure-react";
+
+<MultiSelect
+  aria-label="Frameworks"
+  items={[
+    { value: "react", label: "React" },
+    { value: "vue", label: "Vue" },
+  ]}
+  defaultValue={["react"]}
+/>
+```
+
+## Sizes
+
+Three sizes are available: `sm`, `md` (default), and `lg`.
+
+<LivePreview example="multi-select/sizes" />
+
+## Maximum selected
+
+Set `maxSelected` to cap how many values can be added. Items past the cap render as disabled in the listbox.
+
+<LivePreview example="multi-select/max-selected" />
+
+## Disabled
+
+<LivePreview example="multi-select/disabled" />
+
+## Invalid
+
+Set `invalid` to mark the field for validation feedback.
+
+<LivePreview example="multi-select/invalid" />
+
+## API
+
+<PropsTable component="MultiSelect" />
+
+## Accessibility
+
+- The popup uses `role="listbox"` with `aria-multiselectable="true"` and `role="option"` items.
+- The internal `<input>` keeps focus while typing filters the listbox.
+- `Backspace` on an empty input removes the most recently selected value.
+- `ArrowDown` opens the popover; `Escape` closes it without losing focus.
+- Each tag's remove button has an accessible label of the form `Remove {label}`.
+
+## Recipes
+
+- Provide an `aria-label` (or `label`) when the field has no visible caption.
+- Use `emptyState` to render a custom node when the filtered list is empty.
+- Set `maxSelected` for tag-limited filters; the listbox surfaces the cap via `aria-disabled`.

@@ -1,0 +1,81 @@
+---
+title: Carousel
+description: Swipeable, paginated slide container built on Embla — for hero sections, galleries, and feature tours.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Slides expose roving focus; previous/next controls are real buttons with aria-labels; ArrowLeft/Right (or Up/Down) navigates slides.
+bundleSize: "—"
+tags: [data-display, carousel, embla]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+import StatusBadge from '@/components/StatusBadge.astro';
+import BundleSizePill from '@/components/BundleSizePill.astro';
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="Carousel" /></div>
+
+<LivePreview example="carousel/basic" />
+
+## Usage
+
+```tsx
+import {
+  Carousel,
+  CarouselContainer,
+  CarouselDots,
+  CarouselNext,
+  CarouselPrevious,
+  CarouselSlide,
+  CarouselViewport,
+} from '@arshad-shah/cynosure-react';
+
+<Carousel>
+  <CarouselViewport>
+    <CarouselContainer>
+      <CarouselSlide>Slide 1</CarouselSlide>
+      <CarouselSlide>Slide 2</CarouselSlide>
+    </CarouselContainer>
+  </CarouselViewport>
+  <CarouselPrevious />
+  <CarouselNext />
+  <CarouselDots />
+</Carousel>
+```
+
+## Slides per view
+
+Pass a number to show several slides at once. Use a responsive object (`base`, `sm`, `md`, `lg`, `xl`) for breakpoint-aware gallery layouts.
+
+<LivePreview example="carousel/slides-per-view" />
+
+## Loop
+
+Set `loop` to wrap from the last slide back to the first. The previous/next buttons stay enabled at the bounds when looping is active.
+
+<LivePreview example="carousel/loop" />
+
+## Orientation
+
+Pass `orientation="vertical"` for a stacked carousel; `ArrowUp` / `ArrowDown` navigate between slides.
+
+<LivePreview example="carousel/vertical" />
+
+## API
+
+<PropsTable component="Carousel" />
+
+## Accessibility
+
+- The root region exposes `aria-roledescription="carousel"`.
+- Each `CarouselSlide` carries `role="group"` + `aria-roledescription="slide"`.
+- `CarouselPrevious` / `CarouselNext` are real `<button>` elements with descriptive `aria-label`s and are disabled at the bounds when `loop` is off.
+- Pagination dots use `role="tablist"` / `role="tab"` and reflect the active slide via `aria-selected`.
+- Arrow keys on the root scroll between slides — `ArrowLeft` / `ArrowRight` horizontally, `ArrowUp` / `ArrowDown` vertically.
+
+## Recipes
+
+- Pass `slidesPerView={{ base: 1, sm: 2, lg: 3 }}` for responsive multi-slide layouts.
+- Use the `plugins` prop to add Embla extensions like `embla-carousel-autoplay`.
+- Pass a custom `icon` to `CarouselPrevious` / `CarouselNext` to replace the default chevrons.
+- Use `setApi` to capture the Embla API for external "go to slide N" buttons or scroll-progress UI.
