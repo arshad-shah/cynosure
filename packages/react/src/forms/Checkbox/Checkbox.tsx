@@ -21,18 +21,27 @@ const INDICATOR_SIZE_PX: Record<'sm' | 'md' | 'lg', number> = {
 export type CheckboxColorScheme = keyof typeof checkboxColorScheme;
 export type CheckboxState = boolean | 'indeterminate';
 
+/** Props for `<Checkbox>`. Built on `@radix-ui/react-checkbox`. */
 export interface CheckboxProps extends BooleanFormControlBase {
   /**
    * Group value — only used when this `<Checkbox>` is a child of
    * `<CheckboxGroup>`. Mutually exclusive with `checked`/`onCheckedChange`.
    */
   value?: string;
+  /** Controlled checked state. `"indeterminate"` shows a dash glyph. */
   checked?: CheckboxState;
+  /** Uncontrolled initial checked state. */
   defaultChecked?: CheckboxState;
+  /** Fires with the next checked state on user toggle. */
   onCheckedChange?: (checked: CheckboxState) => void;
   /** Forces the visual indeterminate state. Equivalent to `checked="indeterminate"`. */
   indeterminate?: boolean;
+  /**
+   * Colour palette for the checked state.
+   * @default "accent"
+   */
   colorScheme?: CheckboxColorScheme;
+  /** Optional label content — when provided, the checkbox renders inside a `<label>`. */
   children?: ReactNode;
   className?: string;
   'aria-label'?: string;
@@ -40,6 +49,15 @@ export interface CheckboxProps extends BooleanFormControlBase {
   'aria-describedby'?: string;
 }
 
+/**
+ * `Checkbox` is a tri-state boolean control: unchecked, checked, or indeterminate.
+ *
+ * - Wraps `@radix-ui/react-checkbox` for ARIA semantics and keyboard support.
+ * - Inside `<CheckboxGroup>`, the `value` prop is used and parent-level state replaces `checked`.
+ * - Pass `children` to render an inline label tied to the same `<label>`.
+ *
+ * Fully keyboard accessible (Space toggles).
+ */
 export const Checkbox = forwardRef<HTMLButtonElement, CheckboxProps>(function Checkbox(props, ref) {
   const group = useContext(CheckboxGroupContext);
 

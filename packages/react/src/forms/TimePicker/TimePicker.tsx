@@ -38,14 +38,25 @@ const ChevronDownIcon = (): ReactElement => (
   <ChevronDown size={16} strokeWidth={2.25} aria-hidden />
 );
 
+/** Cynosure-specific props for `<TimePicker>`. */
 export interface TimePickerOwnProps {
+  /** Visible label, also used as the picker's accessible name when a string. */
   label?: ReactNode;
+  /** Accepted for API parity with other form controls. */
   size?: FormControlSize;
+  /**
+   * Visual treatment.
+   * @default "outline"
+   */
   variant?: FormControlVariant;
+  /** Renders the invalid state. */
   invalid?: boolean;
   className?: string;
   style?: CSSProperties;
-  /** Step in minutes for the wheel's minute column. Default `1`. */
+  /**
+   * Step in minutes for the wheel's minute column.
+   * @default 1
+   */
   minuteStep?: number;
 }
 
@@ -61,6 +72,11 @@ export type TimePickerProps<T extends TimeValue = TimeValue> = TimePickerOwnProp
     onChange?: (value: T | null) => void;
   };
 
+/**
+ * `TimePicker` is a segmented time input with a wheel-style popover for
+ * picking hour/minute (and AM/PM when the locale uses 12-hour cycle). Backed
+ * by React Aria's `TimeField`; fully keyboard accessible.
+ */
 export const TimePicker = forwardRef<HTMLDivElement, TimePickerProps>(
   function TimePicker(props, ref) {
     const {

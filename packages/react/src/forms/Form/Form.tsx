@@ -1,10 +1,12 @@
 import { type FormHTMLAttributes, forwardRef } from 'react';
 
+/** Props for `<Form>`. Extends every native `<form>` attribute. */
 export interface FormProps extends FormHTMLAttributes<HTMLFormElement> {
   /**
-   * Defaults to `true` — Cynosure renders its own validation messages via
-   * `FormMessage`, so the native browser bubbles conflict with our UI. Pass
-   * `noValidate={false}` if you specifically want the browser's validation UI.
+   * Skip native HTML validation bubbles. Cynosure renders its own validation
+   * messages via `FormMessage`, so the native bubbles usually conflict with
+   * our UI. Set to `false` if you specifically want the browser's UI.
+   * @default true
    */
   noValidate?: boolean;
 }

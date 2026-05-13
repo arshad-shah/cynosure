@@ -3,6 +3,7 @@ import { cn } from '../../utils/cn.js';
 import { circularProgressIndicator } from './CircularProgress.css.js';
 import { useCircularProgressContext } from './CircularProgressContext.js';
 
+/** Props for the {@link CircularProgressIndicator} `<circle>` — accepts any standard SVG circle attribute. */
 export type CircularProgressIndicatorProps = SVGAttributes<SVGCircleElement>;
 
 /**

@@ -44,21 +44,49 @@ const JUSTIFY_MAP: Record<StackJustify, string> = {
   evenly: 'space-evenly',
 };
 
+/**
+ * Props specific to `Stack`, layered on `LayoutProps` and `AsChildProps`.
+ */
 export interface StackOwnProps extends LayoutProps, AsChildProps {
+  /**
+   * Additional class names appended after Cynosure's base classes.
+   */
   className?: string;
+  /**
+   * Inline style overrides merged last.
+   */
   style?: CSSProperties;
+  /**
+   * Stack children.
+   */
   children?: ReactNode;
+  /**
+   * Vertical gap between children, from the spacing scale.
+   */
   gap?: Responsive<SpaceToken>;
+  /**
+   * Cross-axis alignment — maps to `align-items` on the flex container.
+   */
   align?: Responsive<StackAlign>;
+  /**
+   * Main-axis distribution — maps to `justify-content` on the flex container.
+   */
   justify?: Responsive<StackJustify>;
   /**
-   * When truthy, inserts a `<Divider/>` between children. Pass a custom node
-   * to use that instead.
+   * When `true`, inserts a `<Divider/>` between children. Pass a custom node
+   * (e.g. `<Divider variant="dashed" />`) to use that instead.
    */
   dividers?: boolean | ReactNode;
 }
 
+/**
+ * Full `Stack` props. Generic over the rendered element.
+ */
 export type StackProps<E extends ElementType = 'div'> = StackOwnProps & {
+  /**
+   * Rendered intrinsic element or component.
+   * @default "div"
+   */
   as?: E;
 } & Omit<React.ComponentPropsWithoutRef<E>, keyof StackOwnProps | 'as'>;
 

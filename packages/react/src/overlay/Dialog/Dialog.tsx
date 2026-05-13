@@ -36,22 +36,54 @@ export const DialogClose = RadixDialog.Close;
  */
 export const DialogPortal = RadixDialog.Portal;
 
+/**
+ * Props for the dialog content surface. Layers size, position, and
+ * dismissal controls over the Radix Dialog content primitive.
+ */
 export interface DialogContentProps
   extends Omit<ComponentPropsWithoutRef<typeof RadixDialog.Content>, 'asChild'> {
+  /**
+   * Visual size variant of the dialog. `md` works for most confirm/edit
+   * flows; `lg`/`xl` are for forms; `sm` for compact confirmations.
+   * @default "md"
+   */
   size?: OverlaySize;
+  /**
+   * Vertical placement of the dialog. `center` is the standard modal feel;
+   * `top` anchors near the top of the viewport for taller surfaces.
+   * @default "center"
+   */
   position?: 'center' | 'top';
-  /** Close when the backdrop is clicked. Default `true`. */
+  /**
+   * Close when the backdrop is clicked.
+   * @default true
+   */
   closeOnOverlayClick?: boolean;
-  /** Close when `Esc` is pressed. Default `true`. */
+  /**
+   * Close when `Esc` is pressed.
+   * @default true
+   */
   closeOnEscape?: boolean;
-  /** Render the built-in close button (top-right X). Default `true`. */
+  /**
+   * Render the built-in close button (top-right X). Disable when you want
+   * to drive dismissal exclusively from inside the dialog body.
+   * @default true
+   */
   showCloseButton?: boolean;
   /** Portal target — forwarded to Radix's `DialogPortal`. */
   container?: HTMLElement | (() => HTMLElement);
-  /** ARIA label for the built-in close button. */
+  /**
+   * Accessible label applied to the built-in close button.
+   * @default "Close"
+   */
   closeLabel?: string;
-  /** Skip rendering the backdrop (rare; use when stacking dialogs). */
+  /**
+   * Skip rendering the backdrop. Rare — useful when stacking dialogs or
+   * when the parent surface already provides a scrim.
+   * @default false
+   */
   hideOverlay?: boolean;
+  /** Dialog body — typically a header, content, and footer. */
   children?: ReactNode;
 }
 
@@ -128,7 +160,16 @@ export const DialogContent = forwardRef<ElementRef<typeof RadixDialog.Content>, 
   },
 );
 
+/**
+ * Props for the dialog header layout block. Inherits all standard `<div>`
+ * attributes.
+ */
 export interface DialogHeaderProps extends HTMLAttributes<HTMLDivElement> {}
+/**
+ * Layout slot for the title + description at the top of the dialog. Pure
+ * presentation — doesn't render any ARIA on its own; place a `DialogTitle`
+ * and `DialogDescription` inside.
+ */
 export const DialogHeader = forwardRef<HTMLDivElement, DialogHeaderProps>(function DialogHeader(
   { className, ...rest },
   ref,
@@ -136,7 +177,15 @@ export const DialogHeader = forwardRef<HTMLDivElement, DialogHeaderProps>(functi
   return <div ref={ref} className={cn(dialogHeader, className)} {...rest} />;
 });
 
+/**
+ * Props for the dialog footer layout block. Inherits all standard `<div>`
+ * attributes.
+ */
 export interface DialogFooterProps extends HTMLAttributes<HTMLDivElement> {}
+/**
+ * Layout slot for the action row (Cancel / Confirm buttons) at the bottom
+ * of the dialog.
+ */
 export const DialogFooter = forwardRef<HTMLDivElement, DialogFooterProps>(function DialogFooter(
   { className, ...rest },
   ref,
@@ -144,15 +193,32 @@ export const DialogFooter = forwardRef<HTMLDivElement, DialogFooterProps>(functi
   return <div ref={ref} className={cn(dialogFooter, className)} {...rest} />;
 });
 
+/**
+ * Props for the dialog title. Forwards to Radix's `Title`, which wires the
+ * heading as the dialog's accessible name (`aria-labelledby`).
+ */
 export interface DialogTitleProps extends ComponentPropsWithoutRef<typeof RadixDialog.Title> {}
+/**
+ * Accessible heading for the dialog. Required for assistive tech — Radix
+ * uses it as the `aria-labelledby` target. Provide a hidden one if the
+ * design has no visible title.
+ */
 export const DialogTitle = forwardRef<ElementRef<typeof RadixDialog.Title>, DialogTitleProps>(
   function DialogTitle({ className, ...rest }, ref) {
     return <RadixDialog.Title ref={ref} className={cn(dialogTitle, className)} {...rest} />;
   },
 );
 
+/**
+ * Props for the dialog description. Forwards to Radix's `Description`,
+ * which sets `aria-describedby` on the dialog.
+ */
 export interface DialogDescriptionProps
   extends ComponentPropsWithoutRef<typeof RadixDialog.Description> {}
+/**
+ * Supporting body copy beneath the title. Read aloud after the title in
+ * assistive tech.
+ */
 export const DialogDescription = forwardRef<
   ElementRef<typeof RadixDialog.Description>,
   DialogDescriptionProps

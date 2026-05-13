@@ -41,20 +41,58 @@ const JUSTIFY_MAP: Record<InlineJustify, string> = {
   evenly: 'space-evenly',
 };
 
+/**
+ * Props specific to `Inline`, layered on `LayoutProps` and `AsChildProps`.
+ */
 export interface InlineOwnProps extends LayoutProps, AsChildProps {
+  /**
+   * Additional class names appended after Cynosure's base classes.
+   */
   className?: string;
+  /**
+   * Inline style overrides merged last.
+   */
   style?: CSSProperties;
+  /**
+   * Inline children.
+   */
   children?: ReactNode;
+  /**
+   * Uniform gap in both axes. Falls back to `rowGap`/`columnGap` when set.
+   */
   gap?: Responsive<SpaceToken>;
+  /**
+   * Gap between wrapped rows. Overrides the row axis of `gap`.
+   */
   rowGap?: Responsive<SpaceToken>;
+  /**
+   * Gap between adjacent items on the inline axis. Overrides `gap`'s columns.
+   */
   columnGap?: Responsive<SpaceToken>;
+  /**
+   * Cross-axis alignment — maps to `align-items`. Supports `baseline` for
+   * text rows.
+   */
   align?: Responsive<InlineAlign>;
+  /**
+   * Main-axis distribution — maps to `justify-content`.
+   */
   justify?: Responsive<InlineJustify>;
-  /** Wrap children onto multiple lines. Defaults to `true`. */
+  /**
+   * Allow items to wrap onto multiple lines.
+   * @default true
+   */
   wrap?: Responsive<boolean>;
 }
 
+/**
+ * Full `Inline` props. Generic over the rendered element.
+ */
 export type InlineProps<E extends ElementType = 'div'> = InlineOwnProps & {
+  /**
+   * Rendered intrinsic element or component.
+   * @default "div"
+   */
   as?: E;
 } & Omit<React.ComponentPropsWithoutRef<E>, keyof InlineOwnProps | 'as'>;
 

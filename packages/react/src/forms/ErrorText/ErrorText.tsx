@@ -2,6 +2,7 @@ import { type HTMLAttributes, forwardRef } from 'react';
 import { cn } from '../../utils/cn.js';
 import { errorText } from './ErrorText.css.js';
 
+/** Props for `<ErrorText>` — accepts every native `<p>` attribute. `role` defaults to `"alert"`. */
 export interface ErrorTextProps extends HTMLAttributes<HTMLParagraphElement> {}
 
 /**

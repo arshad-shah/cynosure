@@ -52,22 +52,41 @@ export type { FileUploadVariant } from './context.js';
 
 export type FileUploadErrorReason = 'type' | 'size' | 'count';
 
+/** Detail object passed to `<FileUpload>`'s `onError` for a rejected file. */
 export interface FileUploadError {
+  /** Why the file was rejected. */
   reason: FileUploadErrorReason;
+  /** Human-readable error message. */
   message: string;
+  /** The rejected file, when applicable. `count`-reason errors omit it. */
   file?: File;
 }
 
+/** Props for `<FileUpload>`. */
 export interface FileUploadProps {
+  /** MIME type / extension filter, e.g. `"image/*,.pdf"`. */
   accept?: string;
+  /** Maximum allowed file size in bytes. Files exceeding it call `onError({ reason: "size" })`. */
   maxSize?: number;
   /** Hard cap on number of files; ignored when `multiple` is false. */
   maxCount?: number;
+  /**
+   * Allow selecting more than one file.
+   * @default false
+   */
   multiple?: boolean;
+  /**
+   * Disables the trigger and clears focus.
+   * @default false
+   */
   disabled?: boolean;
+  /** Controlled list of selected files. */
   value?: File[];
+  /** Uncontrolled initial files. */
   defaultValue?: File[];
+  /** Fires whenever the selected file list changes. */
   onFilesChange?: (files: File[]) => void;
+  /** Fires when a file is rejected (type/size/count). */
   onError?: (error: FileUploadError) => void;
   /**
    * Visual treatment for the default (un-customized) trigger.
@@ -75,12 +94,14 @@ export interface FileUploadProps {
    * - `card` — solid bordered surface, horizontal layout. Fits in settings pages.
    * - `compact` — single dashed row. For dense forms.
    * - `minimal` — button-shaped trigger only. For toolbars and chat composers.
+   * @default "default"
    */
   variant?: FileUploadVariant;
   id?: string;
   name?: string;
   className?: string;
   style?: CSSProperties;
+  /** Custom body content. When provided, replaces the default Trigger + List composition. */
   children?: ReactNode;
 }
 
@@ -98,6 +119,15 @@ const matchesAccept = (file: File, accept?: string): boolean => {
   });
 };
 
+/**
+ * `FileUpload` is a drag-and-drop + click-to-browse file picker.
+ *
+ * - Owns validation (accept, maxSize, maxCount) and surfaces rejections via `onError`.
+ * - Provides `FileUploadTrigger` and `FileUploadList` as composable sub-components.
+ * - Ships four visual variants (`default`/`card`/`compact`/`minimal`).
+ *
+ * Fully keyboard accessible (Enter/Space opens the file dialog).
+ */
 export const FileUpload = forwardRef<HTMLDivElement, FileUploadProps>(
   function FileUpload(props, ref) {
     const {
@@ -214,6 +244,7 @@ export const FileUpload = forwardRef<HTMLDivElement, FileUploadProps>(
   },
 );
 
+/** Props for the drop-zone / browse trigger. */
 export interface FileUploadTriggerProps {
   /**
    * Override the full trigger contents. When provided, the built-in variant
@@ -494,8 +525,10 @@ const formatSize = (bytes: number): string => {
   return `${(bytes / 1024 / 1024 / 1024).toFixed(2)} GB`;
 };
 
+/** Props for the file list rendered below the trigger. */
 export interface FileUploadListProps {
   className?: string;
+  /** Custom renderer for each file row. Replaces the default thumbnail/meta/remove layout. */
   renderItem?: (file: File, index: number) => ReactNode;
   /**
    * When provided, a preview `IconButton` is rendered before the remove button

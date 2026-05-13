@@ -16,6 +16,11 @@ import {
   navigationMenuViewportWrapper,
 } from './NavigationMenu.css.js';
 
+/**
+ * Props for the `NavigationMenu` root. Forwards everything accepted by
+ * Radix's `NavigationMenu.Root` (`value`/`defaultValue`/`onValueChange`,
+ * `orientation`, `dir`, `delayDuration`, `skipDelayDuration`).
+ */
 export interface NavigationMenuProps extends ComponentPropsWithoutRef<typeof Radix.Root> {}
 
 /**
@@ -33,8 +38,16 @@ export const NavigationMenu = forwardRef<ElementRef<typeof Radix.Root>, Navigati
   },
 );
 
+/**
+ * Props for the horizontal list of top-level menu items. Forwards all
+ * Radix `NavigationMenu.List` props.
+ */
 export interface NavigationMenuListProps extends ComponentPropsWithoutRef<typeof Radix.List> {}
 
+/**
+ * Container for the top-level `<NavigationMenuItem>`s. Renders as a
+ * horizontal `<ul>` with roving-tab-index focus handled by Radix.
+ */
 export const NavigationMenuList = forwardRef<
   ElementRef<typeof Radix.List>,
   NavigationMenuListProps
@@ -42,8 +55,17 @@ export const NavigationMenuList = forwardRef<
   return <Radix.List ref={ref} className={cn(navigationMenuList, className)} {...rest} />;
 });
 
+/**
+ * Props for a top-level menu cell. Forwards all Radix `NavigationMenu.Item`
+ * props (including the optional `value` used for controlled open state).
+ */
 export interface NavigationMenuItemProps extends ComponentPropsWithoutRef<typeof Radix.Item> {}
 
+/**
+ * Single cell in the top-level list. Hosts either a `NavigationMenuTrigger`
+ * + `NavigationMenuContent` pair (dropdown) or a flat `NavigationMenuLink`
+ * (no panel).
+ */
 export const NavigationMenuItem = forwardRef<
   ElementRef<typeof Radix.Item>,
   NavigationMenuItemProps
@@ -51,11 +73,24 @@ export const NavigationMenuItem = forwardRef<
   return <Radix.Item ref={ref} className={className} {...rest} />;
 });
 
+/**
+ * Props for the top-level trigger that opens a `NavigationMenuContent`
+ * panel.
+ */
 export interface NavigationMenuTriggerProps extends ComponentPropsWithoutRef<typeof Radix.Trigger> {
-  /** Suppress the built-in caret icon rendered at the right edge. */
+  /**
+   * Suppress the built-in caret icon rendered at the right edge of the
+   * trigger label.
+   * @default false
+   */
   hideChevron?: boolean;
 }
 
+/**
+ * Top-level menu trigger. Opens its `NavigationMenuContent` on hover (with
+ * hover-intent timing managed by Radix) or on `Enter`/`Space` for keyboard
+ * users.
+ */
 export const NavigationMenuTrigger = forwardRef<
   ElementRef<typeof Radix.Trigger>,
   NavigationMenuTriggerProps
@@ -72,6 +107,11 @@ export const NavigationMenuTrigger = forwardRef<
   );
 });
 
+/**
+ * Props for the floating panel rendered beneath a trigger. Forwards every
+ * Radix `NavigationMenu.Content` prop (incl. `forceMount`, `onPointer…`,
+ * collision-avoidance callbacks).
+ */
 export interface NavigationMenuContentProps
   extends ComponentPropsWithoutRef<typeof Radix.Content> {}
 
@@ -109,9 +149,18 @@ export const NavigationMenuContent = forwardRef<
   );
 });
 
+/**
+ * Props for a link rendered inside or outside a `NavigationMenuContent`
+ * panel.
+ */
 export interface NavigationMenuLinkProps extends ComponentPropsWithoutRef<typeof Radix.Link> {
-  /** Marks the link as the current page. Sets `aria-current="page"` + data flag. */
+  /**
+   * Mark the link as the current page. Sets `aria-current="page"` plus a
+   * `data-active="true"` hook for styling.
+   * @default false
+   */
   active?: boolean;
+  /** Link contents. */
   children?: ReactNode;
 }
 
@@ -131,6 +180,12 @@ export const NavigationMenuLink = forwardRef<
   );
 });
 
+/**
+ * Props for the active-trigger indicator (the small wedge that lines up
+ * underneath the open trigger). Forwards every Radix
+ * `NavigationMenu.Indicator` prop. Pass custom `children` to replace the
+ * default SVG wedge.
+ */
 export interface NavigationMenuIndicatorProps
   extends ComponentPropsWithoutRef<typeof Radix.Indicator> {}
 
@@ -168,6 +223,11 @@ export const NavigationMenuIndicator = forwardRef<
   );
 });
 
+/**
+ * Props for the shared viewport that hosts each open panel — Radix
+ * animates between trigger panels by sliding the viewport. Forwards every
+ * Radix `NavigationMenu.Viewport` prop.
+ */
 export interface NavigationMenuViewportProps
   extends ComponentPropsWithoutRef<typeof Radix.Viewport> {}
 

@@ -2,7 +2,9 @@ import type { HTMLAttributes, ReactElement, ReactNode } from 'react';
 import { cn } from '../../utils/cn.js';
 import { linearProgressHeader } from './LinearProgress.css.js';
 
+/** Props for the {@link LinearProgressHeader} flex row above the track. */
 export interface LinearProgressHeaderProps extends HTMLAttributes<HTMLDivElement> {
+  /** Header contents — typically a {@link LinearProgressLabel} followed by a {@link LinearProgressMeta}. */
   children?: ReactNode;
 }
 

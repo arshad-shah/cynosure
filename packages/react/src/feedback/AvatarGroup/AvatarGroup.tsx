@@ -13,9 +13,26 @@ import { avatarGroup, avatarGroupItem, avatarOverflow } from '../Avatar/Avatar.c
 import { Avatar, type AvatarProps, type AvatarShape, type AvatarSize } from '../Avatar/Avatar.js';
 import { AvatarGroupContext, type AvatarGroupContextValue } from './context.js';
 
+/**
+ * Props for the {@link AvatarGroup} component.
+ */
 export interface AvatarGroupProps extends HTMLAttributes<HTMLDivElement> {
+  /**
+   * Size applied to every child avatar via context. One of `xs`, `sm`, `md`,
+   * `lg`, `xl`, `2xl`.
+   * @default "md"
+   */
   size?: AvatarSize;
+  /**
+   * Shape applied to the overflow tile and used as the visual default. One of
+   * `circle`, `square`, `rounded`.
+   * @default "circle"
+   */
   shape?: AvatarShape;
+  /**
+   * Render a halo ring on each child avatar so overlap reads cleanly.
+   * @default true
+   */
   ring?: boolean;
   /**
    * Maximum number of child avatars to render inline. Excess avatars collapse
@@ -26,6 +43,12 @@ export interface AvatarGroupProps extends HTMLAttributes<HTMLDivElement> {
   renderOverflow?: (count: number) => ReactNode;
 }
 
+/**
+ * Renders a stack of overlapping {@link Avatar} elements with shared size and
+ * ring defaults. Use AvatarGroup to summarise a small collection of users in
+ * limited space; set `max` to collapse overflow into a `+N` tile that is
+ * accessibly labelled for screen readers.
+ */
 export const AvatarGroup = forwardRef<HTMLDivElement, AvatarGroupProps>(function AvatarGroup(
   { size = 'md', shape = 'circle', ring = true, max, renderOverflow, className, children, ...rest },
   ref,

@@ -23,17 +23,39 @@ import {
   breadcrumbSeparator,
 } from './Breadcrumb.css.js';
 
+/**
+ * Props for the breadcrumb trail root.
+ */
 export interface BreadcrumbProps extends HTMLAttributes<HTMLElement> {
-  /** Separator element rendered between items. Defaults to a chevron. */
+  /**
+   * Element rendered between items. Defaults to a small Lucide
+   * `ChevronRight` glyph.
+   */
   separator?: ReactNode;
-  /** Collapse middle items when the total exceeds this count. */
+  /**
+   * Collapse middle items when the total exceeds this count. Omit for an
+   * uncollapsed trail.
+   */
   maxItems?: number;
-  /** Items kept visible at the start of the trail (default 1). */
+  /**
+   * Items kept visible at the start of the trail when collapsing.
+   * @default 1
+   */
   itemsBeforeCollapse?: number;
-  /** Items kept visible at the end of the trail (default 2). */
+  /**
+   * Items kept visible at the end of the trail when collapsing.
+   * @default 2
+   */
   itemsAfterCollapse?: number;
-  /** Render a custom collapsed-items trigger (replaces the default Ellipsis). */
+  /**
+   * Custom collapsed-items trigger. Defaults to a `BreadcrumbEllipsis`
+   * button — replace with e.g. a `DropdownMenu` listing the hidden links.
+   */
   renderCollapsed?: (hiddenItems: ReactElement[]) => ReactNode;
+  /**
+   * Accessible label on the wrapping `<nav>`.
+   * @default "Breadcrumb"
+   */
   'aria-label'?: string;
 }
 
@@ -101,11 +123,23 @@ export const Breadcrumb = forwardRef<HTMLElement, BreadcrumbProps>(function Brea
   );
 });
 
+/**
+ * Props for a single breadcrumb trail entry (`<li>` wrapper).
+ */
 export interface BreadcrumbItemProps extends LiHTMLAttributes<HTMLLIElement> {
-  /** Mark the current page. Sets `aria-current="page"` on the wrapper. */
+  /**
+   * Mark this entry as the current page. Sets `aria-current="page"` on
+   * the `<li>` wrapper for assistive tech.
+   * @default false
+   */
   isCurrent?: boolean;
 }
 
+/**
+ * Single trail entry. Wraps either a `BreadcrumbLink` (intermediate steps)
+ * or a `BreadcrumbPage` (current page); pair `isCurrent` on this item with
+ * `BreadcrumbPage` inside so both layers announce the current page.
+ */
 export const BreadcrumbItem = forwardRef<HTMLLIElement, BreadcrumbItemProps>(
   function BreadcrumbItem({ className, isCurrent, children, ...rest }, ref) {
     return (
@@ -121,11 +155,21 @@ export const BreadcrumbItem = forwardRef<HTMLLIElement, BreadcrumbItemProps>(
   },
 );
 
+/**
+ * Props for the navigable anchor inside a breadcrumb entry.
+ */
 export interface BreadcrumbLinkProps extends AnchorHTMLAttributes<HTMLAnchorElement> {
-  /** If true, renders a `<span>` with the current-page styling (no anchor). */
+  /**
+   * Reserved for future slot composition. Currently a no-op — the component
+   * always renders an `<a>` element.
+   */
   asChild?: boolean;
 }
 
+/**
+ * Navigable anchor inside a `BreadcrumbItem`. Plain `<a>` underneath —
+ * pair with your router's `<Link>` via the `href`/`onClick` props.
+ */
 export const BreadcrumbLink = forwardRef<HTMLAnchorElement, BreadcrumbLinkProps>(
   function BreadcrumbLink({ className, children, ...rest }, ref) {
     return (
@@ -136,6 +180,10 @@ export const BreadcrumbLink = forwardRef<HTMLAnchorElement, BreadcrumbLinkProps>
   },
 );
 
+/**
+ * Props for the non-link current-page element. Inherits all standard
+ * `<span>` attributes.
+ */
 export interface BreadcrumbPageProps extends HTMLAttributes<HTMLSpanElement> {}
 
 /**
@@ -153,10 +201,21 @@ export const BreadcrumbPage = forwardRef<HTMLSpanElement, BreadcrumbPageProps>(
   },
 );
 
+/**
+ * Props for the separator element rendered between breadcrumb entries.
+ */
 export interface BreadcrumbSeparatorProps extends HTMLAttributes<HTMLLIElement> {
+  /**
+   * Custom separator glyph. Defaults to a small Lucide `ChevronRight`.
+   */
   children?: ReactNode;
 }
 
+/**
+ * Decorative separator between breadcrumb entries. Renders an
+ * `aria-hidden`, `role="presentation"` `<li>` so the trail still reads as
+ * a single ordered list to assistive tech.
+ */
 export const BreadcrumbSeparator = forwardRef<HTMLLIElement, BreadcrumbSeparatorProps>(
   function BreadcrumbSeparator({ className, children, ...rest }, ref) {
     return (
@@ -173,7 +232,15 @@ export const BreadcrumbSeparator = forwardRef<HTMLLIElement, BreadcrumbSeparator
   },
 );
 
+/**
+ * Props for the collapsed-items button rendered when `maxItems` is
+ * exceeded.
+ */
 export interface BreadcrumbEllipsisProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  /**
+   * Accessible label for the icon-only ellipsis button.
+   * @default "Show more"
+   */
   label?: string;
 }
 

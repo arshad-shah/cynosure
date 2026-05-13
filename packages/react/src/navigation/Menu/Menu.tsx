@@ -30,10 +30,23 @@ import {
   menuItemLabel,
 } from './Menu.css.js';
 
+/**
+ * Props for the vertical navigation menu root.
+ */
 export interface MenuProps extends HTMLAttributes<HTMLElement> {
+  /**
+   * Accessible label for the wrapping `<nav>` element. Required when the
+   * page contains more than one navigation region so assistive tech can
+   * disambiguate them.
+   */
   'aria-label'?: string;
 }
 
+/**
+ * Vertical navigation list — typically the contents of a sidebar. Renders
+ * a `<nav>` over a vertical `Stack`; semantics for individual items
+ * (`aria-current`, focus management) come from `MenuItem`/`MenuGroup`.
+ */
 export const Menu = forwardRef<HTMLElement, MenuProps>(function Menu(
   { className, 'aria-label': ariaLabel, children, ...rest },
   ref,
@@ -52,12 +65,25 @@ export const Menu = forwardRef<HTMLElement, MenuProps>(function Menu(
   );
 });
 
+/**
+ * Props for a grouping of related navigation items inside a `Menu`.
+ */
 export interface MenuGroupProps extends HTMLAttributes<HTMLDivElement> {
+  /** Visible section heading. */
   label?: ReactNode;
-  /** If true, the group renders a caret that toggles visibility. */
+  /**
+   * Render a caret + toggle that show/hide the group's items.
+   * @default false
+   */
   collapsible?: boolean;
+  /**
+   * Initial open state when `collapsible` is `true` and uncontrolled.
+   * @default true
+   */
   defaultOpen?: boolean;
+  /** Controlled open state when `collapsible` is `true`. */
   open?: boolean;
+  /** Change handler for the controlled open state. */
   onOpenChange?: (open: boolean) => void;
 }
 
@@ -138,25 +164,64 @@ export const MenuGroup = forwardRef<HTMLDivElement, MenuGroupProps>(function Men
   );
 });
 
+/**
+ * Component-specific props layered on top of the underlying button/anchor
+ * HTML attributes — exposed via `MenuItemProps`.
+ */
 export interface MenuItemOwnProps {
+  /** Leading-slot icon (typically a Lucide glyph at 16px). */
   icon?: ReactNode;
+  /** Trailing-slot icon — useful for chevrons on links to nested pages. */
   iconRight?: ReactNode;
+  /**
+   * Mark the item as the current page. Sets `aria-current="page"` and a
+   * `data-active="true"` hook for styling.
+   * @default false
+   */
   isActive?: boolean;
+  /**
+   * Disable interaction. Sets `aria-disabled` and (for the button variant)
+   * the native `disabled` attribute.
+   * @default false
+   */
   disabled?: boolean;
-  /** Visual indent level (0 default, 1, 2). */
+  /**
+   * Visual indent level — `1`–`3` add a left padding step per level for
+   * representing nested navigation. `0` is flush with the menu edge.
+   * @default 0
+   */
   indent?: 0 | 1 | 2 | 3;
+  /**
+   * Optional badge rendered between the label and trailing icon. Strings
+   * and numbers are auto-wrapped in a small neutral `Badge`.
+   */
   badge?: ReactNode;
+  /**
+   * Project the item chrome onto a consumer-provided element (e.g. a
+   * router `<Link>`). When `true`, the item renders via `Slot` and uses
+   * the child as the interactive element.
+   * @default false
+   */
   asChild?: boolean;
   className?: string;
   style?: CSSProperties;
   children?: ReactNode;
 }
 
+/**
+ * Polymorphic prop bag for `MenuItem`. Combines the component's own props
+ * with the underlying HTML attributes of either a `<button>` or `<a>` —
+ * the rendered element is picked from the presence of `href`.
+ */
 export type MenuItemProps = MenuItemOwnProps &
   Omit<
     ButtonHTMLAttributes<HTMLButtonElement> & AnchorHTMLAttributes<HTMLAnchorElement>,
     keyof MenuItemOwnProps | 'ref'
   > & {
+    /**
+     * If set, the item renders as an `<a>` element with this URL;
+     * otherwise it renders as a `<button>`.
+     */
     href?: string;
   };
 
@@ -293,6 +358,10 @@ export const MenuItem = forwardRef(MenuItemRender) as (
   props: MenuItemProps & { ref?: ForwardedRef<MenuItemElement> },
 ) => ReactElement;
 
+/**
+ * Props for the horizontal rule between groups of items. Inherits all
+ * standard `<hr>` attributes.
+ */
 export interface MenuDividerProps extends HTMLAttributes<HTMLHRElement> {}
 
 /**

@@ -16,17 +16,48 @@ export type BadgeColorScheme = FeedbackColorScheme;
 export type BadgeSize = 'xs' | 'sm' | 'md';
 export type BadgeShape = 'default' | 'pill' | 'square';
 
+/**
+ * Props for the {@link Badge} component.
+ */
 export interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
+  /**
+   * Visual style. `soft` reads as informational; `solid` draws more
+   * attention; `outline` is minimal; `ghost` is borderless.
+   * @default "soft"
+   */
   variant?: BadgeVariant;
+  /**
+   * Semantic palette. One of `neutral`, `accent`, `success`, `warning`,
+   * `danger`, `info`.
+   * @default "neutral"
+   */
   colorScheme?: BadgeColorScheme;
+  /**
+   * Pixel scale. One of `xs`, `sm`, `md`.
+   * @default "md"
+   */
   size?: BadgeSize;
+  /**
+   * Outline shape. `default` is gently rounded; `pill` is fully rounded;
+   * `square` has no corner rounding.
+   * @default "default"
+   */
   shape?: BadgeShape;
   /** Leading icon rendered before the children. */
   icon?: ReactNode;
-  /** Render as a bare coloured dot (no content). */
+  /**
+   * Render as a bare coloured dot (no content).
+   * @default false
+   */
   dot?: boolean;
 }
 
+/**
+ * Compact label for status, counts, or categorisation. Badge is purely
+ * presentational; pair it with surrounding text or an `aria-label` when the
+ * meaning is colour- or icon-dependent so it remains accessible to assistive
+ * technology.
+ */
 export const Badge = forwardRef<HTMLSpanElement, BadgeProps>(function Badge(
   {
     variant = 'soft',

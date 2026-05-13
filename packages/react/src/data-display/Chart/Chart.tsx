@@ -106,14 +106,31 @@ function useColorScheme(): SchemeName {
   return scheme;
 }
 
+/**
+ * Props shared by every Cynosure chart wrapper. Controls how the chart's
+ * sized container is laid out around the underlying SwiftChart canvas.
+ */
 interface BaseProps {
+  /** Additional class applied to the sized wrapper around the SwiftChart canvas. */
   className?: string;
+  /** Additional inline styles merged onto the wrapper. */
   style?: CSSProperties;
-  /** Aspect ratio for the wrapper. Accepts `"16 / 9"`, `1.78`, etc. Default `"16 / 9"`. */
+  /**
+   * Aspect ratio for the wrapper. Accepts any CSS `aspect-ratio` value (e.g.
+   * `"16 / 9"`, `"4/3"`) or a number (`1.78`). Ignored when `height` is set.
+   * @default "16 / 9"
+   */
   aspectRatio?: string | number;
-  /** Fixed pixel/CSS height. When set, takes precedence over `aspectRatio`. */
+  /**
+   * Fixed pixel/CSS height. When set, takes precedence over `aspectRatio`.
+   * Pass a number (interpreted as `px`) or any CSS length string.
+   */
   height?: number | string;
-  /** Minimum height — useful inside flex containers. Default `220`. */
+  /**
+   * Minimum height applied to the wrapper — keeps the canvas from collapsing
+   * inside flex/grid parents that don't define an intrinsic height.
+   * @default 220
+   */
   minHeight?: number | string;
 }
 
@@ -247,12 +264,25 @@ export const Sparkline: React.ForwardRefExoticComponent<
   SparklineProps & React.RefAttributes<ChartRef>
 > = SwiftSparkline;
 
-/** Convenience type for the SwiftChart-style data mapping object. */
+/**
+ * Convenience type for the SwiftChart-style `mapping` prop that tells a chart
+ * which fields of `data` to render. Each chart only consumes the keys that
+ * apply to its shape (`x`/`y` for cartesian, `labelField`/`valueField` for
+ * pie/donut/treemap).
+ */
 export type ChartDataMapping = {
+  /** Key in each datum to plot on the X axis (cartesian charts). */
   x?: string;
+  /**
+   * Key (or list of keys) in each datum to plot on the Y axis. Pass an array
+   * of field names for grouped/stacked series.
+   */
   y?: string | string[];
+  /** Key holding each slice's label (pie/donut/treemap). */
   labelField?: string;
+  /** Key holding each slice's numeric value (pie/donut/treemap/radar). */
   valueField?: string;
+  /** Friendly names used in the legend in place of raw field keys. */
   seriesNames?: string[];
 };
 
@@ -265,7 +295,11 @@ export type ChartHandle = ChartRef;
 /** The name of either Cynosure theme registered with SwiftChart. */
 export type CynosureChartTheme = typeof CYNOSURE_THEME_LIGHT | typeof CYNOSURE_THEME_DARK;
 
-/** No-op marker so existing call sites that imported a "container" component still type-check. */
+/**
+ * No-op marker so existing call sites that imported a "container" component
+ * still type-check. Each chart now provides its own sized container — there
+ * is no longer a wrapping `ChartContainer` element.
+ */
 export interface ChartContainerProps {
   /** @deprecated Each chart (`<LineChart>`, `<BarChart>` …) now manages its own container. */
   children?: ReactElement;

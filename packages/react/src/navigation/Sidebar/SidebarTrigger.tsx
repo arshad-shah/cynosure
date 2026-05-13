@@ -5,14 +5,38 @@ import { cn } from '../../utils/cn.js';
 import { sidebarTriggerButton, sidebarTriggerLabel } from './Sidebar.css.js';
 import { useSidebar } from './context.js';
 
+/**
+ * Props for the button that toggles a `Sidebar` collapsed / open. Reads
+ * the current mode from `SidebarProvider` so the icon + label auto-update.
+ */
 export interface SidebarTriggerProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  /** Accessible name and visible text (hidden when collapsed to icon rail). */
+  /**
+   * Accessible name and visible text. Defaults to a context-sensitive
+   * value (`"Open"` / `"Close"` on mobile, `"Expand"` / `"Collapse"` on
+   * desktop) derived from the current sidebar state.
+   */
   label?: string;
+  /**
+   * Override the auto-selected icon. Defaults to a Lucide
+   * `PanelLeftClose`/`PanelLeftOpen` pair on desktop and `Menu`/`X` on
+   * mobile.
+   */
   icon?: ReactNode;
-  /** Hide the visible text label; leave accessible name only. Default `false`. */
+  /**
+   * Hide the visible text label, keeping only the accessible name on the
+   * icon button.
+   * @default false
+   */
   hideLabel?: boolean;
 }
 
+/**
+ * Button that toggles the parent `Sidebar` open/closed. On desktop it
+ * collapses to / expands from the icon rail; on mobile it opens / closes
+ * the Drawer. Sets `aria-pressed` and `aria-expanded` to reflect the
+ * current state and auto-renders a tooltip with the label when the
+ * sidebar is collapsed to an icon-only rail.
+ */
 export const SidebarTrigger = forwardRef<HTMLButtonElement, SidebarTriggerProps>(
   function SidebarTrigger({ className, label, icon, hideLabel, onClick, type, ...rest }, ref) {
     const ctx = useSidebar();

@@ -21,13 +21,22 @@ import {
   valueLabel,
 } from './Slider.css.js';
 
+/** Single tick mark rendered along the slider track. */
 export interface SliderMark {
+  /** Position of the mark on the slider's value axis. */
   value: number;
+  /** Optional caption rendered below the dot. */
   label?: ReactNode;
 }
 
+/** Cynosure-specific props for `<Slider>` (excludes React Aria's internal props). */
 export interface SliderOwnProps {
+  /** Visible label rendered above the track. Also used as the thumb's accessible name when a string. */
   label?: ReactNode;
+  /**
+   * Track size.
+   * @default "md"
+   */
   size?: FormControlSize;
   /** Tick marks along the track. */
   marks?: ReadonlyArray<SliderMark>;
@@ -43,7 +52,11 @@ type NativeSliderProps = Omit<AriaSliderProps, 'className' | 'style' | 'children
 
 export type SliderProps = SliderOwnProps & NativeSliderProps;
 
-/** Single-thumb slider. Built on React Aria `Slider`. */
+/**
+ * `Slider` is a single-thumb numeric range input with optional tick marks
+ * and a live value readout. Locale-aware formatting via `formatOptions`.
+ * Built on React Aria's `Slider`; fully keyboard accessible.
+ */
 export const Slider = forwardRef<HTMLDivElement, SliderProps>(function Slider(props, ref) {
   const {
     label,

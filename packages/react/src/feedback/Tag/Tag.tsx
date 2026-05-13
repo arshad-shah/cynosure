@@ -11,20 +11,56 @@ export type TagColorScheme = FeedbackColorScheme;
 export type TagSize = 'xs' | 'sm' | 'md';
 export type TagShape = 'default' | 'pill' | 'square';
 
+/**
+ * Props for the {@link Tag} component.
+ */
 export interface TagProps extends Omit<HTMLAttributes<HTMLSpanElement>, 'onClick'> {
+  /**
+   * Visual style. One of `soft`, `solid`, `outline`, `ghost`.
+   * @default "soft"
+   */
   variant?: TagVariant;
+  /**
+   * Semantic palette. One of `neutral`, `accent`, `success`, `warning`,
+   * `danger`, `info`.
+   * @default "neutral"
+   */
   colorScheme?: TagColorScheme;
+  /**
+   * Pixel scale. One of `xs`, `sm`, `md`.
+   * @default "md"
+   */
   size?: TagSize;
+  /**
+   * Outline shape. `default` is gently rounded; `pill` is fully rounded;
+   * `square` has no corner rounding.
+   * @default "pill"
+   */
   shape?: TagShape;
+  /** Leading icon rendered before the children. */
   icon?: ReactNode;
+  /** Invoked when the user activates the trailing remove button. */
   onRemove?: () => void;
+  /** Invoked when the tag itself is activated (click or keyboard). */
   onClick?: () => void;
-  /** Label forwarded to the remove button for screen readers. */
+  /**
+   * Accessible label for the remove button. Defaults to `Remove {children}`
+   * when `children` is a string, otherwise `Remove`.
+   */
   removeLabel?: string;
+  /** Disables the tag and its remove button, removing it from tab order. */
   disabled?: boolean;
+  /** Tag label content. */
   children?: ReactNode;
 }
 
+/**
+ * Compact inline label, optionally interactive or removable. Tag is well
+ * suited for entity chips inside text fields, filter pills, and metadata
+ * lists. With `onRemove` it becomes a focusable group that responds to
+ * `Backspace` / `Delete` for keyboard dismissal; the remove button has its
+ * own accessible label so screen readers can target it directly.
+ */
 export const Tag = forwardRef<HTMLSpanElement, TagProps>(function Tag(
   {
     variant = 'soft',

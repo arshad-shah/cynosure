@@ -55,12 +55,41 @@ const useTabsContext = (): TabsContextValue => {
   return ctx;
 };
 
+/**
+ * Props for the `Tabs` root. Forwards every Radix `Tabs.Root` prop
+ * (`value`/`defaultValue`/`onValueChange`, `activationMode`, `dir`) plus
+ * Cynosure's visual variants.
+ */
 export interface TabsProps
   extends Omit<ComponentPropsWithoutRef<typeof RadixTabs.Root>, 'orientation'> {
+  /**
+   * Visual treatment for the trigger row. `line` underlines the active
+   * tab; `solid` fills the active tab; `enclosed` draws a notched tab
+   * sitting above a panel border; `soft` uses a tinted pill.
+   * @default "line"
+   */
   variant?: TabsVariant;
+  /**
+   * Size of the trigger row.
+   * @default "md"
+   */
   size?: TabsSize;
+  /**
+   * Active-state colour. `accent` uses the theme's accent ramp; `neutral`
+   * stays in the neutral palette (useful for secondary tab strips).
+   * @default "accent"
+   */
   colorScheme?: TabsColorScheme;
+  /**
+   * Layout direction. Drives Radix's keyboard navigation (←/→ for
+   * horizontal, ↑/↓ for vertical).
+   * @default "horizontal"
+   */
   orientation?: TabsOrientation;
+  /**
+   * Make each trigger flex to fill the row evenly.
+   * @default false
+   */
   fullWidth?: boolean;
 }
 
@@ -113,6 +142,10 @@ const variantListClass: Record<TabsVariant, string> = {
   soft: tabsListSoft,
 };
 
+/**
+ * Props for the trigger-row container. Forwards every Radix `Tabs.List`
+ * prop (incl. `loop`).
+ */
 export interface TabsListProps extends ComponentPropsWithoutRef<typeof RadixTabs.List> {}
 
 /**
@@ -156,8 +189,17 @@ const triggerVariantClass: Record<TabsVariant, string> = {
   soft: tabsTriggerSoft,
 };
 
+/**
+ * Props for a single tab trigger. Forwards every Radix `Tabs.Trigger`
+ * prop (incl. the required `value` linking to a matching `TabsContent`).
+ */
 export interface TabsTriggerProps extends ComponentPropsWithoutRef<typeof RadixTabs.Trigger> {}
 
+/**
+ * Single tab trigger. Pulls its visual variant from the parent `Tabs`
+ * context; keyboard activation (`Enter`/`Space`) and roving focus come
+ * from Radix.
+ */
 export const TabsTrigger = forwardRef<ElementRef<typeof RadixTabs.Trigger>, TabsTriggerProps>(
   function TabsTrigger({ className, ...rest }, ref) {
     const ctx = useTabsContext();
@@ -178,16 +220,30 @@ export const TabsTrigger = forwardRef<ElementRef<typeof RadixTabs.Trigger>, Tabs
   },
 );
 
+/**
+ * Props for a tab panel. Forwards every Radix `Tabs.Content` prop (incl.
+ * the matching `value` and the `forceMount` escape hatch).
+ */
 export interface TabsContentProps extends ComponentPropsWithoutRef<typeof RadixTabs.Content> {}
 
+/**
+ * Panel revealed when its matching `TabsTrigger` is active. Wired with
+ * `role="tabpanel"`, `aria-labelledby`, and focus management by Radix.
+ */
 export const TabsContent = forwardRef<ElementRef<typeof RadixTabs.Content>, TabsContentProps>(
   function TabsContent({ className, ...rest }, ref) {
     return <RadixTabs.Content ref={ref} className={cn(tabsContent, className)} {...rest} />;
   },
 );
 
+/**
+ * Props for the sliding active-tab indicator. Pure styling — geometry is
+ * measured from the live DOM, so there are no value / position inputs.
+ */
 export interface TabsIndicatorProps {
+  /** Forward a `className` for additional styling. */
   className?: string;
+  /** Inline styles merged with the JS-set CSS variables. */
   style?: CSSProperties;
 }
 

@@ -21,24 +21,50 @@ import { listbox, listboxEmpty, listboxItem, popover } from '../shared/popover.c
 import type { FormControlSize, FormControlVariant } from '../shared/types.js';
 import { inlineInput, tag, tagRemove, tagsRow } from './MultiSelect.css.js';
 
+/** Shape of a data-driven `<MultiSelect>` option. */
 export interface MultiSelectItemData<T extends string = string> {
+  /** Unique value submitted when selected. */
   value: T;
+  /** Visible label. */
   label: ReactNode;
+  /** Disables this option. */
   disabled?: boolean;
 }
 
+/** Props for `<MultiSelect>`. */
 export interface MultiSelectProps<T extends string = string> {
+  /** Controlled array of selected values. */
   value?: readonly T[];
+  /** Uncontrolled initial array of selected values. */
   defaultValue?: readonly T[];
+  /** Fires with the next array on every add/remove. */
   onValueChange?: (value: T[]) => void;
+  /** Options to choose from. */
   items: ReadonlyArray<MultiSelectItemData<T>>;
+  /** Visible label, also used as the trigger's accessible name. */
   label?: string;
+  /** Aria label when no visual label is available. */
   'aria-label'?: string;
+  /**
+   * Placeholder rendered when nothing is selected.
+   * @default "Add…"
+   */
   placeholder?: string;
+  /**
+   * Control size.
+   * @default "md"
+   */
   size?: FormControlSize;
+  /**
+   * Visual treatment.
+   * @default "outline"
+   */
   variant?: FormControlVariant;
+  /** Disables interaction. */
   disabled?: boolean;
+  /** Requires at least one selection for form submission. */
   required?: boolean;
+  /** Renders the invalid state and sets `aria-invalid`. */
   invalid?: boolean;
   /** Hard cap on how many items can be selected. */
   maxSelected?: number;

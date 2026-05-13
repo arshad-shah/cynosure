@@ -53,15 +53,51 @@ const useStepperContext = (): StepperContextValue => {
   return ctx;
 };
 
+/**
+ * Props for the `Stepper` root. Renders the surrounding `<ol>` and clones
+ * each child `Step` with its index for connector / status derivation.
+ */
 export interface StepperProps extends Omit<HTMLAttributes<HTMLOListElement>, 'onChange'> {
+  /**
+   * Zero-indexed currently-active step. Steps with `index < currentStep`
+   * default to `complete`; the matching index defaults to `active`; the
+   * rest default to `pending`.
+   */
   currentStep: number;
+  /**
+   * Visual treatment for the step marker. `numbered` shows 1-based
+   * numbers; `dots` collapses to small filled dots; `lines` shrinks to
+   * thin segments; `icons` defers to consumer `icon` props.
+   * @default "numbered"
+   */
   variant?: StepperVariant;
+  /**
+   * Size of markers and labels.
+   * @default "md"
+   */
   size?: StepperSize;
+  /**
+   * Layout direction. `horizontal` lines steps across the row; `vertical`
+   * stacks them with connectors running top-to-bottom.
+   * @default "horizontal"
+   */
   orientation?: StepperOrientation;
+  /**
+   * Allow clicking completed / active steps to jump back. Renders each
+   * step as a `<button>` and forwards clicks to `onStepChange`.
+   * @default false
+   */
   interactive?: boolean;
+  /** Fired with the clicked step's index when `interactive` is enabled. */
   onStepChange?: (step: number) => void;
 }
 
+/**
+ * Progress indicator for a multi-step flow. Renders an `<ol>` of steps
+ * with connector lines coloured based on completion. The active step
+ * carries `aria-current="step"`; in `interactive` mode each step is a
+ * button so keyboard users can jump back via `Tab` + `Enter`.
+ */
 export const Stepper = forwardRef<HTMLOListElement, StepperProps>(function Stepper(
   {
     currentStep,
@@ -119,19 +155,39 @@ export const Stepper = forwardRef<HTMLOListElement, StepperProps>(function Stepp
   );
 });
 
+/**
+ * Props for a single `Step` inside a `Stepper`.
+ */
 export interface StepProps extends Omit<HTMLAttributes<HTMLLIElement>, 'title'> {
+  /** Primary label for the step (rendered as a `<Text>` with `weight="semibold"`). */
   title?: ReactNode;
+  /** Optional secondary description shown under the title. */
   description?: ReactNode;
-  /** Overrides the default status derived from the index vs. currentStep. */
+  /**
+   * Override the default status. Without this, status is derived from the
+   * step's index vs. the parent `currentStep`: `complete` for indices
+   * below current, `active` for current, `pending` after.
+   */
   status?: StepStatus;
-  /** Overrides the default number/dot with a custom icon. */
+  /**
+   * Override the default marker content (number / dot / check / X) with a
+   * custom icon.
+   */
   icon?: ReactNode;
-  /** Populated by `<Stepper>` on clone — consumers should not pass these. */
+  /** Injected by `<Stepper>` on clone — consumers should not pass this. */
   index?: number;
+  /** Injected by `<Stepper>` on clone — consumers should not pass this. */
   isFirst?: boolean;
+  /** Injected by `<Stepper>` on clone — consumers should not pass this. */
   isLast?: boolean;
 }
 
+/**
+ * Single step in the `Stepper`. Renders a marker + optional title /
+ * description and connector arms that join the next/previous markers.
+ * Status is derived automatically from index unless `status` is set.
+ * Active steps announce as `aria-current="step"`.
+ */
 export const Step = forwardRef<HTMLLIElement, StepProps>(function Step(
   {
     title,

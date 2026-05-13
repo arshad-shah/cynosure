@@ -49,38 +49,95 @@ const CONTENT_MAP: Record<GridJustifyContent, string> = {
   evenly: 'space-evenly',
 };
 
+/**
+ * Props specific to `Grid`, layered on `LayoutProps` and `AsChildProps`.
+ */
 export interface GridOwnProps extends LayoutProps, AsChildProps {
+  /**
+   * Additional class names appended after Cynosure's base classes.
+   */
   className?: string;
+  /**
+   * Inline style overrides merged last.
+   */
   style?: CSSProperties;
+  /**
+   * Grid children. Use `LayoutProps.gridColumn`/`gridRow`/`gridArea` on
+   * children for placement.
+   */
   children?: ReactNode;
-  /** Shorthand for `repeat(N, minmax(0, 1fr))`. */
+  /**
+   * Column-count shorthand — emits `repeat(N, minmax(0, 1fr))`.
+   * Superseded by `templateColumns` when both are set.
+   */
   columns?: Responsive<number>;
-  /** Shorthand for `repeat(N, minmax(0, auto))`. */
+  /**
+   * Row-count shorthand — emits `repeat(N, minmax(0, auto))`.
+   * Superseded by `templateRows` when both are set.
+   */
   rows?: Responsive<number>;
-  /** Raw CSS `grid-template-columns` — use for mixed tracks like `"200px 1fr 200px"`. */
+  /**
+   * Raw `grid-template-columns` — use for mixed tracks like
+   * `"200px 1fr 200px"`. Wins over `columns`.
+   */
   templateColumns?: Responsive<string>;
-  /** Raw CSS `grid-template-rows`. */
+  /**
+   * Raw `grid-template-rows`. Wins over `rows`.
+   */
   templateRows?: Responsive<string>;
-  /** `grid-auto-flow` — direction new tracks are added (`row` default, `column`, or `dense`). */
+  /**
+   * `grid-auto-flow` — direction new tracks are added (`row`, `column`, or
+   * `dense` variants).
+   */
   autoFlow?: Responsive<GridAutoFlow>;
-  /** `grid-auto-columns` — size for implicitly-created columns. */
+  /**
+   * `grid-auto-columns` — size for implicitly-created columns.
+   */
   autoColumns?: Responsive<string>;
-  /** `grid-auto-rows` — size for implicitly-created rows. */
+  /**
+   * `grid-auto-rows` — size for implicitly-created rows.
+   */
   autoRows?: Responsive<string>;
+  /**
+   * Uniform gap in both axes. Falls back to `rowGap`/`columnGap` when set.
+   */
   gap?: Responsive<SpaceToken>;
+  /**
+   * Gap between columns. Overrides the column axis of `gap`.
+   */
   columnGap?: Responsive<SpaceToken>;
+  /**
+   * Gap between rows. Overrides the row axis of `gap`.
+   */
   rowGap?: Responsive<SpaceToken>;
-  /** `align-items` — how each item sits within its cell on the block axis. */
+  /**
+   * `align-items` — how each item sits within its cell on the block axis.
+   */
   align?: Responsive<GridAlignItems>;
-  /** `justify-items` — how each item sits within its cell on the inline axis. */
+  /**
+   * `justify-items` — how each item sits within its cell on the inline axis.
+   */
   justifyItems?: Responsive<GridAlignItems>;
-  /** `align-content` — how tracks are distributed when the grid is shorter than its container. */
+  /**
+   * `align-content` — how tracks are distributed when the grid is shorter
+   * than its container on the block axis.
+   */
   alignContent?: Responsive<GridJustifyContent>;
-  /** `justify-content` — how tracks are distributed along the inline axis. Matches Radix/Chakra semantics. */
+  /**
+   * `justify-content` — how tracks are distributed along the inline axis.
+   * Matches Radix/Chakra semantics.
+   */
   justify?: Responsive<GridJustifyContent>;
 }
 
+/**
+ * Full `Grid` props. Generic over the rendered element.
+ */
 export type GridProps<E extends ElementType = 'div'> = GridOwnProps & {
+  /**
+   * Rendered intrinsic element or component.
+   * @default "div"
+   */
   as?: E;
 } & Omit<React.ComponentPropsWithoutRef<E>, keyof GridOwnProps | 'as'>;
 

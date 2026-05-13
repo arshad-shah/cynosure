@@ -35,12 +35,35 @@ export type ListMarker =
   | 'lower-alpha'
   | 'upper-alpha';
 
+/**
+ * Shared props for every list variant (`List`, `OrderedList`, `DescriptionList`).
+ */
 export interface ListBaseProps extends LayoutProps, AsChildProps {
+  /**
+   * Vertical gap between list items, from the spacing scale.
+   * @default "2"
+   */
   spacing?: Responsive<SpaceToken>;
+  /**
+   * `list-style-type`. `List` defaults to `disc`; `OrderedList` defaults to
+   * `decimal`. Use `none` to hide markers entirely.
+   */
   marker?: Responsive<ListMarker>;
+  /**
+   * Colour for the marker glyph (`::marker`). Independent of text colour.
+   */
   markerColor?: ColorToken;
+  /**
+   * Additional class names appended after Cynosure's base classes.
+   */
   className?: string;
+  /**
+   * Inline style overrides merged last.
+   */
   style?: CSSProperties;
+  /**
+   * List items.
+   */
   children?: ReactNode;
 }
 
@@ -76,6 +99,10 @@ const buildListStyle = (
 
 // ── List (unordered) ─────────────────────────────────────────────────────
 
+/**
+ * Props for the unordered `<ul>` `List` — `ListBaseProps` plus remaining
+ * `<ul>` HTML attributes minus Cynosure-owned keys.
+ */
 export interface ListProps
   extends ListBaseProps,
     Omit<React.HTMLAttributes<HTMLUListElement>, keyof ListBaseProps | 'color'> {}
@@ -115,10 +142,20 @@ const ListRender = (props: AnyListProps, ref: ForwardedRef<HTMLUListElement>): R
   );
 };
 
+/**
+ * Unordered list. Renders `<ul>` with disc markers by default; pass
+ * `marker="none"` to hide bullets, or `marker="square"`/`"circle"` for the
+ * standard variants. Spacing is controlled by `spacing`, not by item margin,
+ * so dividers and other inserted content stay aligned.
+ */
 export const List = forwardRef<HTMLUListElement, ListProps>(ListRender as never);
 
 // ── OrderedList ──────────────────────────────────────────────────────────
 
+/**
+ * Props for the ordered `<ol>` `OrderedList` — `ListBaseProps` plus remaining
+ * `<ol>` HTML attributes (including `start`, `reversed`, `type`).
+ */
 export interface OrderedListProps
   extends ListBaseProps,
     Omit<React.OlHTMLAttributes<HTMLOListElement>, keyof ListBaseProps | 'color'> {}
@@ -172,18 +209,35 @@ const OrderedListRender = (
   );
 };
 
+/**
+ * Ordered list. Renders `<ol>` with decimal markers by default. Pass
+ * native `start`, `reversed`, or `type` for numbering tweaks, or override
+ * `marker` for alpha / roman styles.
+ */
 export const OrderedList = forwardRef<HTMLOListElement, OrderedListProps>(
   OrderedListRender as never,
 );
 
 // ── ListItem ─────────────────────────────────────────────────────────────
 
+/**
+ * Props for `<li>` items rendered inside `List` / `OrderedList`.
+ */
 export interface ListItemProps
   extends LayoutProps,
     AsChildProps,
     Omit<React.LiHTMLAttributes<HTMLLIElement>, keyof LayoutProps | 'color'> {
+  /**
+   * Additional class names appended after Cynosure's base classes.
+   */
   className?: string;
+  /**
+   * Inline style overrides merged last.
+   */
   style?: CSSProperties;
+  /**
+   * Item content.
+   */
   children?: ReactNode;
 }
 
@@ -215,10 +269,18 @@ const ListItemRender = (
   );
 };
 
+/**
+ * `<li>` row inside `List` or `OrderedList`. Pair with `LayoutProps` for
+ * per-item padding/background tweaks; the parent owns spacing and markers.
+ */
 export const ListItem = forwardRef<HTMLLIElement, ListItemProps>(ListItemRender as never);
 
 // ── DescriptionList ──────────────────────────────────────────────────────
 
+/**
+ * Props for the `<dl>` `DescriptionList` — `ListBaseProps` minus the marker
+ * (description lists don't have list markers) plus `<dl>` HTML attributes.
+ */
 export interface DescriptionListProps
   extends ListBaseProps,
     Omit<React.HTMLAttributes<HTMLDListElement>, keyof ListBaseProps | 'color'> {}
@@ -258,18 +320,36 @@ const DescriptionListRender = (
   );
 };
 
+/**
+ * Renders `<dl>` for term / definition pairs. Compose with
+ * `DescriptionTerm` (`<dt>`) and `DescriptionDetails` (`<dd>`). The `marker`
+ * prop is accepted for type compatibility with the base but is ignored —
+ * `<dl>` has no list-marker.
+ */
 export const DescriptionList = forwardRef<HTMLDListElement, DescriptionListProps>(
   DescriptionListRender as never,
 );
 
 // ── DescriptionTerm / DescriptionDetails ─────────────────────────────────
 
+/**
+ * Props for the `<dt>` term row inside a `DescriptionList`.
+ */
 export interface DescriptionTermProps
   extends LayoutProps,
     AsChildProps,
     Omit<React.HTMLAttributes<HTMLElement>, keyof LayoutProps | 'color'> {
+  /**
+   * Additional class names appended after Cynosure's base classes.
+   */
   className?: string;
+  /**
+   * Inline style overrides merged last.
+   */
   style?: CSSProperties;
+  /**
+   * Term label content.
+   */
   children?: ReactNode;
 }
 
@@ -301,16 +381,32 @@ const DescriptionTermRender = (
   );
 };
 
+/**
+ * `<dt>` term row used inside `DescriptionList`. Carries the term label that
+ * pairs with one or more `DescriptionDetails` siblings.
+ */
 export const DescriptionTerm = forwardRef<HTMLElement, DescriptionTermProps>(
   DescriptionTermRender as never,
 );
 
+/**
+ * Props for the `<dd>` description row inside a `DescriptionList`.
+ */
 export interface DescriptionDetailsProps
   extends LayoutProps,
     AsChildProps,
     Omit<React.HTMLAttributes<HTMLElement>, keyof LayoutProps | 'color'> {
+  /**
+   * Additional class names appended after Cynosure's base classes.
+   */
   className?: string;
+  /**
+   * Inline style overrides merged last.
+   */
   style?: CSSProperties;
+  /**
+   * Definition / detail content for the preceding term.
+   */
   children?: ReactNode;
 }
 
@@ -342,6 +438,10 @@ const DescriptionDetailsRender = (
   );
 };
 
+/**
+ * `<dd>` description row used inside `DescriptionList`. Carries the
+ * definition / detail content for the preceding `DescriptionTerm`.
+ */
 export const DescriptionDetails = forwardRef<HTMLElement, DescriptionDetailsProps>(
   DescriptionDetailsRender as never,
 );

@@ -9,6 +9,7 @@ import {
 } from './LinearProgress.css.js';
 import { useLinearProgressContext } from './LinearProgressContext.js';
 
+/** Props for the {@link LinearProgressIndicator} fill. The `style` prop is reserved for the internal transform. */
 export type LinearProgressIndicatorProps = Omit<HTMLAttributes<HTMLSpanElement>, 'style'>;
 
 /**

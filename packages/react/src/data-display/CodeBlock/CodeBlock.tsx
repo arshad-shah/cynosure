@@ -22,14 +22,25 @@ import {
 } from './CodeBlock.css.js';
 import { type CodeTheme, useCodeHighlight } from './highlight.js';
 
+/** Props for the {@link CodeBlock} syntax-highlighted source viewer. */
 export interface CodeBlockProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
-  /** Raw source code. */
+  /** Raw source code. Always required as the canonical content (clipboard copies this verbatim). */
   children: string;
-  /** Shiki language identifier. Default `text` (no highlighting). */
+  /**
+   * Shiki language identifier (e.g. `tsx`, `python`). Set to `text` to skip
+   * highlighting entirely.
+   * @default "text"
+   */
   language?: string;
-  /** Prefix every line with its number. */
+  /**
+   * Prefix every line with its 1-based number column.
+   * @default false
+   */
   showLineNumbers?: boolean;
-  /** Show a copy-to-clipboard button in the header. */
+  /**
+   * Render a copy-to-clipboard button in the header.
+   * @default false
+   */
   copyable?: boolean;
   /** 1-based line numbers to visually highlight. */
   highlightLines?: number[];
@@ -42,7 +53,7 @@ export interface CodeBlockProps extends Omit<HTMLAttributes<HTMLDivElement>, 'ch
    * emits dual-theme CSS variables that follow Cynosure's `data-theme`.
    */
   theme?: CodeTheme;
-  /** Override the filename shown in the header. */
+  /** Override the filename shown in the header (falls back to `language`). */
   filename?: ReactNode;
 }
 function splitLines(source: string): string[] {

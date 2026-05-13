@@ -18,10 +18,18 @@ import {
 } from '../Slider/Slider.css.js';
 import type { FormControlSize } from '../shared/types.js';
 
+/** Cynosure-specific props for `<RangeSlider>`. Inherits min/max/step from React Aria. */
 export interface RangeSliderOwnProps {
+  /** Visible label rendered above the track. */
   label?: ReactNode;
+  /**
+   * Track size.
+   * @default "md"
+   */
   size?: FormControlSize;
+  /** Renders the current `[start, end]` pair beside the label. */
   showValue?: boolean;
+  /** Intl format options for locale-aware display. */
   formatOptions?: Intl.NumberFormatOptions;
   className?: string;
   style?: CSSProperties;
@@ -38,6 +46,11 @@ type NativeSliderProps = Omit<
 
 export type RangeSliderProps = RangeSliderOwnProps & NativeSliderProps;
 
+/**
+ * `RangeSlider` is a two-thumb slider selecting an inclusive `[start, end]`
+ * pair. Shares styling and keyboard semantics with `<Slider>`. Built on React
+ * Aria's `Slider`; fully keyboard accessible.
+ */
 export const RangeSlider = forwardRef<HTMLDivElement, RangeSliderProps>(
   function RangeSlider(props, ref) {
     const {

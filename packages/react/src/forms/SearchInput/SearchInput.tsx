@@ -15,12 +15,24 @@ import { useMergedRef } from '../../hooks/useMergedRef.js';
 import { Input, type InputVariant } from '../Input/Input.js';
 import type { FormControlBase } from '../shared/types.js';
 
+/** Cynosure-specific props for `<SearchInput>`. */
 export interface SearchInputOwnProps extends Omit<FormControlBase<string>, 'variant'> {
+  /**
+   * Visual treatment forwarded to the underlying `<Input>`.
+   * @default "outline"
+   */
   variant?: InputVariant;
+  /**
+   * Placeholder text.
+   * @default "Search…"
+   */
   placeholder?: string;
   /** Debounced callback — fires `debounceMs` after the user stops typing. */
   onSearch?: (query: string) => void;
-  /** Debounce delay in milliseconds. Defaults to 200. */
+  /**
+   * Debounce delay in milliseconds for `onSearch`.
+   * @default 200
+   */
   debounceMs?: number;
   /** Submit handler — fires on Enter. */
   onSubmit?: (query: string) => void;

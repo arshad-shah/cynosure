@@ -3,6 +3,7 @@ import { cn } from '../../utils/cn.js';
 import { linearProgressBuffer } from './LinearProgress.css.js';
 import { clampProgress, useLinearProgressContext } from './LinearProgressContext.js';
 
+/** Props for the {@link LinearProgressBuffer} pre-load layer. The `style` prop is reserved for the internal transform. */
 export interface LinearProgressBufferProps extends Omit<HTMLAttributes<HTMLSpanElement>, 'style'> {
   /**
    * Buffered / preloaded progress — shown as a lighter bar behind the

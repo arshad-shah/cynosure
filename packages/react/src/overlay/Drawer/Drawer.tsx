@@ -25,25 +25,70 @@ export type DrawerSide = 'top' | 'right' | 'bottom' | 'left';
 export type DrawerSize = 'sm' | 'md' | 'lg' | 'xl' | 'full';
 
 /** Drawer is built on `@radix-ui/react-dialog` — it's general-purpose enough
- *  to cover every edge-anchored overlay pattern we need. */
+ *  to cover every edge-anchored overlay pattern we need. Inherits Radix's
+ *  focus trap, scroll lock, `Escape` handling, and `aria-modal="true"`
+ *  semantics. */
 export const Drawer = RadixDialog.Root;
 export const DrawerTrigger = RadixDialog.Trigger;
 export const DrawerClose = RadixDialog.Close;
 export const DrawerPortal = RadixDialog.Portal;
 
+/**
+ * Props for the edge-anchored drawer surface. Layers side, size, and
+ * dismissal controls over the Radix Dialog content primitive.
+ */
 export interface DrawerContentProps
   extends Omit<ComponentPropsWithoutRef<typeof RadixDialog.Content>, 'asChild'> {
+  /**
+   * Edge the drawer slides in from. `right` is the default for inspector /
+   * detail panels; `left` for navigation; `top` / `bottom` for sheet-style
+   * surfaces (e.g. notifications, mobile actions).
+   * @default "right"
+   */
   side?: DrawerSide;
+  /**
+   * Drawer breadth. For `left`/`right` it sets the width; for `top`/
+   * `bottom` it sets the height. `full` fills the matching viewport axis.
+   * @default "md"
+   */
   size?: DrawerSize;
+  /**
+   * Close when the backdrop is clicked.
+   * @default true
+   */
   closeOnOverlayClick?: boolean;
+  /**
+   * Close when `Esc` is pressed.
+   * @default true
+   */
   closeOnEscape?: boolean;
+  /**
+   * Render the built-in close button (top-right X).
+   * @default true
+   */
   showCloseButton?: boolean;
+  /**
+   * Accessible label applied to the built-in close button.
+   * @default "Close"
+   */
   closeLabel?: string;
+  /** Portal target — forwarded to Radix's `Portal`. */
   container?: HTMLElement | (() => HTMLElement);
+  /**
+   * Skip rendering the backdrop. Useful when stacking drawers or when the
+   * parent surface already provides a scrim.
+   * @default false
+   */
   hideOverlay?: boolean;
+  /** Drawer body. */
   children?: ReactNode;
 }
 
+/**
+ * Edge-anchored drawer surface. Portals into the document, paints the
+ * backdrop, traps focus, locks scroll, and renders `role="dialog"` with
+ * `aria-modal="true"` via Radix. `side`/`size` are visual-only variants.
+ */
 export const DrawerContent = forwardRef<ElementRef<typeof RadixDialog.Content>, DrawerContentProps>(
   function DrawerContent(
     {
@@ -114,18 +159,31 @@ export const DrawerContent = forwardRef<ElementRef<typeof RadixDialog.Content>, 
   },
 );
 
+/**
+ * Layout slot for the title + description at the top of the drawer. Pure
+ * presentation — place a `DrawerTitle` and (optionally) `DrawerDescription`
+ * inside for the ARIA wiring.
+ */
 export const DrawerHeader = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
   function DrawerHeader({ className, ...rest }, ref) {
     return <div ref={ref} className={cn(drawerHeader, className)} {...rest} />;
   },
 );
 
+/**
+ * Layout slot for the action row at the bottom of the drawer. Useful for
+ * Cancel / Save pairings on form drawers.
+ */
 export const DrawerFooter = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
   function DrawerFooter({ className, ...rest }, ref) {
     return <div ref={ref} className={cn(drawerFooter, className)} {...rest} />;
   },
 );
 
+/**
+ * Accessible heading for the drawer. Required — Radix uses it as the
+ * `aria-labelledby` target for the dialog.
+ */
 export const DrawerTitle = forwardRef<
   ElementRef<typeof RadixDialog.Title>,
   ComponentPropsWithoutRef<typeof RadixDialog.Title>
@@ -133,6 +191,10 @@ export const DrawerTitle = forwardRef<
   return <RadixDialog.Title ref={ref} className={cn(drawerTitle, className)} {...rest} />;
 });
 
+/**
+ * Supporting body copy beneath the title. Wires `aria-describedby` on the
+ * dialog via Radix.
+ */
 export const DrawerDescription = forwardRef<
   ElementRef<typeof RadixDialog.Description>,
   ComponentPropsWithoutRef<typeof RadixDialog.Description>

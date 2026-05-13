@@ -102,17 +102,51 @@ const ALIGN_VALUE: Record<HeadingAlign, string> = {
   end: 'end',
 };
 
+/**
+ * Props specific to `Heading`, layered on top of `LayoutProps` and `AsChildProps`.
+ */
 export interface HeadingOwnProps extends LayoutProps, AsChildProps {
+  /**
+   * Semantic heading level — renders `h1`..`h6` for document outline / SEO.
+   * Use this to fix the structural level; pair with `size` to tune visuals.
+   * @default 2
+   */
   level?: HeadingLevel;
+  /**
+   * Visual type-scale step. Decoupled from `level` so visual hierarchy can
+   * diverge from semantic hierarchy. Falls back to the level-matched token.
+   */
   size?: Responsive<HeadingSize>;
+  /**
+   * Override the level's default font weight.
+   */
   weight?: Responsive<HeadingWeight>;
+  /**
+   * Horizontal text alignment.
+   */
   align?: Responsive<HeadingAlign>;
+  /**
+   * `true` → single-line truncation; `number > 1` → multi-line line-clamp.
+   */
   truncate?: boolean | number;
+  /**
+   * Additional class names appended after Cynosure's base classes.
+   */
   className?: string;
+  /**
+   * Inline style overrides merged last.
+   */
   style?: CSSProperties;
+  /**
+   * Heading text content.
+   */
   children?: ReactNode;
 }
 
+/**
+ * Full `Heading` props — `HeadingOwnProps` plus remaining heading HTML
+ * attributes minus Cynosure-owned keys.
+ */
 export type HeadingProps = HeadingOwnProps &
   Omit<React.HTMLAttributes<HTMLHeadingElement>, keyof HeadingOwnProps | 'color'>;
 

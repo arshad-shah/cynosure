@@ -17,23 +17,51 @@ import {
   clampProgress,
 } from './LinearProgressContext.js';
 
+/** Props for the {@link LinearProgressRoot} compound primitive that holds bar state. */
 export interface LinearProgressRootProps extends Omit<HTMLAttributes<HTMLDivElement>, 'role'> {
-  /** Current progress value. Clamped to `[0, max]` internally. */
+  /**
+   * Current progress value. Clamped to `[0, max]` internally.
+   * @default 0
+   */
   value?: number;
+  /**
+   * Upper bound used to compute the filled percentage.
+   * @default 100
+   */
   max?: number;
+  /**
+   * Height/font preset for the bar.
+   * @default "md"
+   */
   size?: LinearProgressSize;
+  /**
+   * Colour role for the indicator fill.
+   * @default "accent"
+   */
   colorScheme?: LinearProgressColorScheme;
+  /**
+   * Visual treatment for the fill — `solid` or `striped`.
+   * @default "solid"
+   */
   variant?: LinearProgressVariant;
+  /**
+   * Render the looping indeterminate animation.
+   * @default false
+   */
   indeterminate?: boolean;
   /**
    * When `auto` (default), reaching `max` flips the indicator + value to a
    * "done" treatment. Set to `"none"` to keep the raw fill at 100%.
+   * @default "auto"
    */
   completionState?: LinearProgressCompletionState;
   /** Override the default `${pct}%` value formatter. */
   formatValue?: (value: number, max: number) => string;
+  /** Sub-primitives ({@link LinearProgressTrack}, {@link LinearProgressValue}, …). */
   children?: ReactNode;
+  /** Additional class applied to the root element. */
   className?: string;
+  /** Additional inline styles merged onto the root. */
   style?: CSSProperties;
 }
 

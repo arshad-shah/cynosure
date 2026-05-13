@@ -37,17 +37,26 @@ const ChevronDownIcon = (): React.ReactElement => (
   <ChevronDown size={16} strokeWidth={2.25} aria-hidden />
 );
 
+/** Cynosure-specific props for `<DatePicker>`. */
 export interface DatePickerOwnProps<T extends DateValue = DateValue> {
+  /** Visible label, also used as the picker's accessible name when a string. */
   label?: ReactNode;
   /** Accepted for API parity with other form controls; visual effect is minor in the punched design. */
   size?: FormControlSize;
-  /** Accepted for API parity with other form controls; visual effect is minor in the punched design. */
+  /**
+   * Accepted for API parity with other form controls; visual effect is minor in the punched design.
+   * @default "outline"
+   */
   variant?: FormControlVariant;
+  /** Renders the invalid state. */
   invalid?: boolean;
   className?: string;
   style?: CSSProperties;
+  /** Controlled date value. */
   value?: T | null;
+  /** Uncontrolled initial value. */
   defaultValue?: T | null;
+  /** Fires with the next value when the user picks a date or clears the input. */
   onChange?: (value: T | null) => void;
 }
 
@@ -59,7 +68,13 @@ type NativeDatePickerProps<T extends DateValue> = Omit<
 export type DatePickerProps<T extends DateValue = DateValue> = DatePickerOwnProps<T> &
   NativeDatePickerProps<T>;
 
-/** Single-date picker. Backed by React Aria `DatePicker` + `@internationalized/date`. */
+/**
+ * `DatePicker` is a single-date picker — segmented input with a popover
+ * calendar. Includes a "Go to today" footer affordance.
+ *
+ * Backed by React Aria's `DatePicker` and `@internationalized/date` for
+ * timezone- and locale-aware date handling. Fully keyboard accessible.
+ */
 export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(
   function DatePicker(props, ref) {
     const {

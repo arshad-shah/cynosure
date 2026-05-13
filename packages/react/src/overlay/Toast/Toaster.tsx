@@ -20,15 +20,29 @@ const DEFAULT_ICONS = {
 export type ToasterPosition = SonnerToasterProps['position'];
 export type ToasterTheme = NonNullable<SonnerToasterProps['theme']>;
 
+/**
+ * Props for the toast portal host. Inherits every Sonner `ToasterProps`
+ * field (position, theme, expand, hotkey, gap, etc.) except `toastOptions`,
+ * which is overridden so Cynosure's class names always win.
+ */
 export interface ToasterProps extends Omit<SonnerToasterProps, 'toastOptions'> {
-  /** Override `toastOptions` — merged with Cynosure's token-derived class names. */
+  /**
+   * Sonner `toastOptions`. Merged with Cynosure's token-derived class
+   * names — consumer `classNames` are applied on top of the defaults, so
+   * any key you set wins for that slot.
+   */
   toastOptions?: SonnerToasterProps['toastOptions'];
 }
 
 /**
  * Re-skinned `sonner` Toaster. Mount once at the app root. The `toast()`
  * function re-exported from this module can be called from anywhere to
- * enqueue a notification.
+ * enqueue a notification. Notifications are announced via Sonner's
+ * `aria-live` region with semantic icons mapped to success/error/warning/
+ * info/loading states.
+ *
+ * `position` defaults to `"bottom-right"`, `theme` to `"system"` (respects
+ * the user's `prefers-color-scheme`), and `closeButton` to `true`.
  */
 export function Toaster({
   position = 'bottom-right',

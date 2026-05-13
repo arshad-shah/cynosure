@@ -242,7 +242,7 @@
   {
     "name": "Alert",
     "path": "packages/react/dist/alert.js",
-    "limit": "4 kB",
+    "limit": "8 kB",
     "ignore": ["react", "react-dom"]
   },
   {

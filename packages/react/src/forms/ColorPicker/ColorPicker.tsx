@@ -40,19 +40,39 @@ import { SwatchGrid } from './parts/SwatchGrid.js';
 
 export type ColorPickerSize = 'sm' | 'md' | 'lg';
 
+/** Cynosure-specific props for `<ColorPicker>`. */
 export interface ColorPickerOwnProps {
+  /**
+   * Label rendered beside the swatch in popover mode.
+   * @default "Pick a color"
+   */
   label?: ReactNode;
   className?: string;
   style?: CSSProperties;
-  /** Size preset — affects panel width, area height, slider thickness, cell density. Default `md`. */
+  /**
+   * Size preset — affects panel width, area height, slider thickness, cell density.
+   * @default "md"
+   */
   size?: ColorPickerSize;
-  /** `popover` (default) renders a swatch trigger; `inline` drops the trigger and renders the body in place. */
+  /**
+   * `popover` renders a swatch trigger; `inline` drops the trigger and renders the body in place.
+   * @default "popover"
+   */
   variant?: 'popover' | 'inline';
-  /** Show an alpha slider + checker pattern under the hue slider. */
+  /**
+   * Show an alpha slider + checker pattern under the hue slider.
+   * @default false
+   */
   alpha?: boolean;
-  /** Show the browser eyedropper button when supported. Default `true`. */
+  /**
+   * Show the browser eyedropper button when supported.
+   * @default true
+   */
   eyedropper?: boolean;
-  /** Default format selected in the segmented control. */
+  /**
+   * Default format selected in the segmented control.
+   * @default "hex"
+   */
   defaultFormat?: ColorFormat;
   /** Controlled list of saved swatches (hex strings). */
   swatches?: string[];
@@ -87,6 +107,12 @@ function coerce(input: Color | string | undefined, fallback: string): Color | un
   return input;
 }
 
+/**
+ * `ColorPicker` is a 2D color area + hue/alpha sliders with a hex/rgb/hsl
+ * format field, optional eyedropper, and saveable swatch grid. Backed by
+ * React Aria's `ColorPicker`. Renders in a popover by default or inline via
+ * `variant="inline"`.
+ */
 export const ColorPicker = forwardRef<HTMLButtonElement, ColorPickerProps>(
   function ColorPicker(props, ref) {
     const {

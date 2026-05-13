@@ -26,10 +26,28 @@ import { kbdBase, kbdIcon, kbdSize } from './Kbd.css.js';
 
 export type KbdSize = 'sm' | 'md' | 'lg';
 
+/**
+ * Props specific to `Kbd`, layered on top of `LayoutProps` and `AsChildProps`.
+ */
 export interface KbdOwnProps extends LayoutProps, AsChildProps {
+  /**
+   * Keycap scale — adjusts padding, font-size, and inline-swapped icon size
+   * together so caps sit naturally alongside body text at the same step.
+   * @default "md"
+   */
   size?: KbdSize;
+  /**
+   * Additional class names appended after Cynosure's base classes.
+   */
   className?: string;
+  /**
+   * Inline style overrides merged last.
+   */
   style?: CSSProperties;
+  /**
+   * Keycap label. Strings are walked grapheme-by-grapheme so combined
+   * shortcuts (e.g. `"⌘R"`) swap known modifier glyphs for `lucide` icons.
+   */
   children?: ReactNode;
 }
 
