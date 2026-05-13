@@ -257,7 +257,10 @@ export function CommandShortcut({ children, className, ...rest }: CommandShortcu
       </span>
     );
   }
-  const keys = children.split(/\s*\+\s*|\s+/).filter(Boolean);
+  // Split on any run of whitespace and/or `+` characters. A single character
+  // class with `+` quantifier is linear-time, avoiding the polynomial
+  // back-tracking of the previous `\s*\+\s*|\s+` alternation (CodeQL #260).
+  const keys = children.split(/[\s+]+/).filter(Boolean);
   // Duplicate keys (e.g. "⌘ ⌘") are exceedingly rare in real shortcuts; track
   // occurrences so we can build a stable key without leaning on index position.
   const seen = new Map<string, number>();

@@ -3,7 +3,7 @@ title: Cynosure
 description: A React component library and design system. Accessible by default, themeable down to the radius.
 template: splash
 hero:
-  tagline: Accessible, tree-shakeable React components. Themed with design tokens. Zero runtime dependencies.
+  tagline: Accessible, tree-shakeable React components. Themed with design tokens. Built on Radix UI and React Aria.
   image:
     file: ../../assets/cynosure-mark.svg
   actions:
@@ -77,7 +77,7 @@ export function SignIn() {
     Dialog, Popover, Drawer, Toast, ContextMenu, CommandPalette — focus-managed, dismissible, RTL-aware.
   </Card>
   <Card title="Data display" icon="document">
-    Table, DataTable, Tree, Timeline, Chart, Carousel, ScrollArea — virtualised where it matters.
+    Table, DataTable, Tree, Timeline, Chart, Carousel, ScrollArea — keyboard-navigable, theme-aware.
   </Card>
   <Card title="Navigation" icon="bars">
     Tabs, Breadcrumb, Pagination, Sidebar, Stepper, NavigationMenu — keyboard-first.
@@ -94,10 +94,10 @@ export function SignIn() {
 
 <CardGrid>
   <Card title="Accessible by default" icon="approve-check">
-    Continuous axe-core and Playwright audits in CI. Focus management, ARIA, keyboard, reduced motion, and high contrast all wired up.
+    Built on Radix UI and React Aria for focus management, ARIA semantics, and keyboard handling. Every theme is contrast-audited for WCAG AA in CI; physical CSS properties are linted out so RTL stays correct.
   </Card>
   <Card title="Tree-shakeable" icon="puzzle">
-    Per-component entry points (`@arshad-shah/cynosure-react/button`) plus a `sideEffects: false` root barrel. Pull in only what you render.
+    Per-component entry points (`@arshad-shah/cynosure-react/button`) on top of a plain ESM root barrel. CSS is marked side-effectful so bundlers keep the stylesheets but drop unused JS.
   </Card>
   <Card title="Themed with tokens" icon="seti:json">
     A flat token surface — space, colour, radius, shadow, duration, z-index — drives every visual decision. Swap themes without recompiling.
