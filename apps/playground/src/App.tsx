@@ -119,7 +119,8 @@ export function App() {
     return () => window.removeEventListener('hashchange', onHash);
   }, []);
 
-  const current = PLAYGROUNDS.find((p) => p.id === active) ?? PLAYGROUNDS[0];
+  // biome-ignore lint/style/noNonNullAssertion: We guarantee above that there's always a valid `current`.
+  const current = PLAYGROUNDS.find((p) => p.id === active) ?? PLAYGROUNDS[0]!;
   const isDark = colorScheme === 'dark';
 
   // `collapsible="icon"` swaps the sidebar between full width and a narrow
