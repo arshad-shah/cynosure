@@ -1,6 +1,6 @@
 {
   "name": "@arshad-shah/cynosure-core",
-  "version": "1.1.0",
+  "version": "3.0.0",
   "description": "Cynosure UI — primitives, utilities, hooks",
   "license": "MIT",
   "homepage": "https://cynosure.arshadshah.com",
@@ -9,7 +9,9 @@
     "url": "git+https://github.com/arshad-shah/cynosure.git",
     "directory": "packages/core"
   },
-  "bugs": { "url": "https://github.com/arshad-shah/cynosure/issues" },
+  "bugs": {
+    "url": "https://github.com/arshad-shah/cynosure/issues"
+  },
   "keywords": ["cynosure", "design-system", "react", "primitives", "hooks", "utilities"],
   "type": "module",
   "sideEffects": ["**/*.css"],
