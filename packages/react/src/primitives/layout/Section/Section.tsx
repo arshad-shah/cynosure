@@ -17,7 +17,7 @@ import {
 } from '../shared/index.js';
 import { sectionBase, sectionSpace } from './Section.css.js';
 
-export type SectionSpace = keyof typeof sectionSpace;
+export type SectionSpace = 'sm' | 'md' | 'lg' | 'xl';
 export type SectionElement = 'section' | 'main' | 'article' | 'aside';
 
 /**

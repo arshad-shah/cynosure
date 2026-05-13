@@ -137,6 +137,23 @@ function compressUnionTopLevel(s: string): string {
   return bucket(parts).join(' | ');
 }
 
+interface DocgenTypeShape {
+  name?: string;
+  raw?: string;
+  value?: Array<{ value: string }>;
+}
+
+function resolveTypeName(t: DocgenTypeShape | undefined): string {
+  if (!t) return 'unknown';
+  // For string-union props, react-docgen-typescript names the type "enum"
+  // and lists each literal in `value[]`. Stitch them back into a real union
+  // so the PropsTable can display + bucket it.
+  if (t.name === 'enum' && Array.isArray(t.value) && t.value.length > 0) {
+    return t.value.map((v) => v.value).join(' | ');
+  }
+  return t.name ?? 'unknown';
+}
+
 export function compressType(raw: string): string {
   if (!raw) return raw;
   // Strip the noisiest react-docgen output — ref-forwarded components.
@@ -201,7 +218,12 @@ export function extractProps(opts: { tsconfigPath: string; sourceRoot: string })
         filePath: file.replace(`${REPO_ROOT}/`, ''),
         props: Object.entries(c.props).map(([name, p]) => ({
           name,
-          type: compressType(p.type?.name ?? 'unknown'),
+          // react-docgen-typescript returns the literal placeholder `"enum"`
+          // as `type.name` for every string union and stores the actual
+          // members in `type.value[]`. Without this fan-out the PropsTable
+          // would show a useless `enum` for every variant/size/colorScheme
+          // prop. Falls back to `.name` for non-enum types.
+          type: compressType(resolveTypeName(p.type)),
           description: p.description ?? '',
           required: p.required ?? false,
           defaultValue: p.defaultValue?.value ?? null,

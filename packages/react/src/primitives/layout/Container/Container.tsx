@@ -20,10 +20,15 @@ import {
 import { containerBase } from './Container.css.js';
 
 /**
+ * Container max-width preset.
+ */
+export type ContainerSize = 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'prose' | 'full';
+
+/**
  * Named container widths. Consumed via the `--cynosure-container-maxw-{bp}`
  * custom property chain so `size` can be responsive without switching classes.
  */
-const CONTAINER_MAX_WIDTHS = {
+const CONTAINER_MAX_WIDTHS: Record<ContainerSize, string> = {
   sm: '40rem', //  640px
   md: '48rem', //  768px
   lg: '64rem', // 1024px (default)
@@ -31,9 +36,7 @@ const CONTAINER_MAX_WIDTHS = {
   '2xl': '96rem', // 1536px
   prose: '65ch',
   full: '100%',
-} as const;
-
-export type ContainerSize = keyof typeof CONTAINER_MAX_WIDTHS;
+};
 
 /**
  * Props specific to `Container`, layered on `LayoutProps` and `AsChildProps`.

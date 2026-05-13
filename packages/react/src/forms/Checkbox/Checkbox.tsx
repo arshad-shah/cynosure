@@ -18,7 +18,7 @@ const INDICATOR_SIZE_PX: Record<'sm' | 'md' | 'lg', number> = {
   lg: 24,
 };
 
-export type CheckboxColorScheme = keyof typeof checkboxColorScheme;
+export type CheckboxColorScheme = 'accent' | 'success' | 'danger' | 'neutral';
 export type CheckboxState = boolean | 'indeterminate';
 
 /** Props for `<Checkbox>`. Built on `@radix-ui/react-checkbox`. */
