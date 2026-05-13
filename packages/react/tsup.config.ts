@@ -341,6 +341,26 @@ export default createConfig({
     }
     chunks.unshift(propertyDecls.join('\n'));
 
+    // Body reset — sets the default font family / text color / antialiasing
+    // on `<body>` so that raw `<p>`/`<span>`/text nodes inherit the Cynosure
+    // sans stack instead of the UA default (Times on macOS, Times New Roman
+    // on Windows). Cynosure components style their own elements, but plain
+    // markup that isn't wrapped in `<Text>`/`<Heading>` would otherwise look
+    // like an unstyled document. Kept minimal — only the things a consumer
+    // could never reasonably want different from the design system.
+    const baseReset = `
+/* @arshad-shah/cynosure-react — base reset */
+body {
+  font-family: var(--cynosure-font-family-sans);
+  color: var(--cynosure-color-foreground-default);
+  background-color: var(--cynosure-color-background-canvas);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+`;
+    chunks.push(baseReset);
+
     const stylesCss = chunks.join('\n');
     await writeFile(join(dist, 'styles.css'), stylesCss);
 
@@ -361,6 +381,13 @@ export default createConfig({
       stylesCss,
     ].join('\n');
     await writeFile(join(dist, 'all.css'), allCss);
+
+    // Emit `fonts.css`: opt-in webfont loader for the default theme
+    // (Geist + JetBrains Mono Variable). Kept separate from `all.css`
+    // because the woff2 payload is ~400 KB and many consumers ship their
+    // own font pipeline (next/font, self-hosted, CDN).
+    const fontsCss = await readFile(join(process.cwd(), 'src', 'fonts.css'), 'utf8');
+    await writeFile(join(dist, 'fonts.css'), fontsCss);
   },
   external: [
     'react',

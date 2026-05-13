@@ -34,6 +34,9 @@ One CSS import (includes tokens + dark + component styles), one provider:
 
 ```ts
 import '@arshad-shah/cynosure-react/all.css';
+// Optional — registers Geist + JetBrains Mono Variable.
+// Skip to fall through to system fonts.
+import '@arshad-shah/cynosure-react/fonts.css';
 ```
 
 ```tsx

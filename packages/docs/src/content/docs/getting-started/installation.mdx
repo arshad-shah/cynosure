@@ -40,6 +40,21 @@ import '@arshad-shah/cynosure-react/all.css';
 This single file bundles tokens (light + dark) and every component's CSS. For
 most apps it's the right choice.
 
+### Webfonts (optional)
+
+The default token font stacks resolve to **Geist Variable** (sans) and
+**JetBrains Mono Variable** (mono), falling through to system fonts when those
+families aren't loaded. Add one more import to bundle them:
+
+```ts
+import '@arshad-shah/cynosure-react/fonts.css';
+```
+
+Kept separate from `all.css` so you don't pay the ~400 KB woff2 cost if you
+have your own font pipeline (`next/font`, self-hosted, CDN). With `next/font`,
+skip this import and override `--cynosure-font-family-sans` / `-mono` with
+your font's CSS variable.
+
 ### The three-import way (granular control)
 
 If you want to load tokens and component styles separately — useful when you

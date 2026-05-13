@@ -409,12 +409,6 @@ importers:
       '@arshad-shah/swift-chart':
         specifier: 'catalog:'
         version: 1.3.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
-      '@fontsource-variable/geist':
-        specifier: 'catalog:'
-        version: 5.2.8
-      '@fontsource-variable/jetbrains-mono':
-        specifier: 'catalog:'
-        version: 5.2.8
       lucide-react:
         specifier: 'catalog:'
         version: 1.8.0(react@19.2.5)
@@ -605,6 +599,12 @@ importers:
       '@arshad-shah/swift-chart':
         specifier: 'catalog:'
         version: 1.3.0(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
+      '@fontsource-variable/geist':
+        specifier: 'catalog:'
+        version: 5.2.8
+      '@fontsource-variable/jetbrains-mono':
+        specifier: 'catalog:'
+        version: 5.2.8
       '@internationalized/date':
         specifier: 'catalog:'
         version: 3.12.1

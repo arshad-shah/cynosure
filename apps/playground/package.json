@@ -15,8 +15,6 @@
     "@arshad-shah/cynosure-themes": "workspace:*",
     "@arshad-shah/cynosure-tokens": "workspace:*",
     "@arshad-shah/swift-chart": "catalog:",
-    "@fontsource-variable/geist": "catalog:",
-    "@fontsource-variable/jetbrains-mono": "catalog:",
     "lucide-react": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:"
