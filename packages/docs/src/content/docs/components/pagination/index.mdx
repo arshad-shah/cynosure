@@ -1,0 +1,102 @@
+---
+title: Pagination
+description: Controls for moving through a paged collection one page at a time, with automatic ellipses and configurable sibling/boundary counts.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Renders inside a nav landmark with aria-label; current page button receives aria-current="page"; localisable labels via the labels prop.
+bundleSize: "—"
+tags: [navigation, pagination, accessible]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+import StatusBadge from '@/components/StatusBadge.astro';
+import BundleSizePill from '@/components/BundleSizePill.astro';
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="Pagination" /></div>
+
+<LivePreview example="pagination/basic" />
+
+## Usage
+
+```tsx
+import { Pagination } from "@arshad-shah/cynosure-react";
+import { useState } from "react";
+
+function Demo() {
+  const [page, setPage] = useState(1);
+  return <Pagination totalPages={10} currentPage={page} onPageChange={setPage} />;
+}
+```
+
+In the default prop-driven mode you only need `totalPages`, `currentPage`, and `onPageChange` — the component renders Prev / page list / Next for you. To take full control of layout, pass children:
+
+```tsx
+import {
+  Pagination,
+  PaginationFirst,
+  PaginationLast,
+  PaginationNext,
+  PaginationPages,
+  PaginationPrevious,
+} from "@arshad-shah/cynosure-react";
+
+<Pagination totalPages={10} currentPage={page} onPageChange={setPage}>
+  <PaginationFirst />
+  <PaginationPrevious />
+  <PaginationPages />
+  <PaginationNext />
+  <PaginationLast />
+</Pagination>
+```
+
+## Variants
+
+### Sizes
+
+Use `size="sm"`, `"md"` (default), or `"lg"` to match surrounding density.
+
+<LivePreview example="pagination/sizes" />
+
+### First and last buttons
+
+Set `showFirstLast` to render skip-to-first and skip-to-last buttons alongside Prev / Next.
+
+<LivePreview example="pagination/first-last" />
+
+### Sibling and boundary counts
+
+`siblingCount` (default `1`) controls how many pages render either side of the current page; `boundaryCount` (default `1`) controls how many pages stick to each end. Ellipses fill the gaps.
+
+<LivePreview example="pagination/sibling-boundary" />
+
+### Disabled
+
+Pass `disabled` to freeze the whole control (e.g. while loading the next page).
+
+<LivePreview example="pagination/disabled" />
+
+### Localised labels
+
+Use the `labels` prop to translate or rewrite each button's accessible name.
+
+<LivePreview example="pagination/labels" />
+
+## API
+
+<PropsTable component="Pagination" />
+
+## Accessibility
+
+- The root renders a `<nav>` landmark; pass `aria-label` (default `"Pagination"`) to name it.
+- Each page button receives a descriptive `aria-label` like `"Go to page 4"`; the current page is announced as `"Page 4, current page"`.
+- The current button carries `aria-current="page"` so screen readers identify the active position.
+- Prev / Next / First / Last buttons become `disabled` (and unfocusable) at the edges of the range rather than disappearing.
+- Ellipsis placeholders are `aria-hidden="true"` so they don't pollute announcements.
+
+## Recipes
+
+- Sync `currentPage` to a `?page=` URL search param so deep links survive refresh.
+- Lower `siblingCount` to `0` and raise `boundaryCount` to `2` for a compact "first … current … last" layout.
+- Pair with a `Select` for "items per page" controls in dense tables.
+- Customise `labels.page` to include the total count, e.g. `` (p) => `Go to page ${p} of 42` ``.

@@ -40,8 +40,21 @@ export type InputType = 'text' | 'email' | 'password' | 'tel' | 'url' | 'search'
 /** Local variant union — adds `'flat'` (legacy single-well escape hatch) to the shared FormControlVariant. */
 export type InputVariant = 'outline' | 'filled' | 'ghost' | 'flat';
 
+/** Cynosure-specific props for `<Input>` (excludes native attributes that the wrapper owns). */
 export interface InputOwnProps extends Omit<FormControlBase<string>, 'variant'> {
+  /**
+   * Native `<input type>` value. `password` automatically adds a show/hide
+   * toggle; `search`/`email`/`tel`/`url`/`number` keep their native
+   * keyboards on mobile.
+   * @default "text"
+   */
   type?: InputType;
+  /**
+   * Visual treatment. `outline` is the default bordered surface; `filled`
+   * uses a tinted background; `ghost` removes the surface entirely; `flat`
+   * is the legacy single-well layout (no multi-well slots).
+   * @default "outline"
+   */
   variant?: InputVariant;
   /** Single node or array. Strings/icons render as inert wells; buttons/onClick render as action wells. */
   leadingSlot?: ReactNode | ReactNode[];
@@ -85,6 +98,15 @@ function isActionNode(node: ReactNode): boolean {
   return false;
 }
 
+/**
+ * `Input` is Cynosure's single-line text field.
+ *
+ * - Supports the standard text-like HTML types plus auto-affordances for `password` (show/hide) and `clearable`.
+ * - Leading/trailing slots render either as inert decorations or interactive "action wells" depending on the child node.
+ * - Size and visual variant inherit Cynosure's shared form-control vocabulary.
+ *
+ * Built on the native `<input>` element. Fully keyboard accessible.
+ */
 export const Input = forwardRef<HTMLInputElement, InputProps>(function Input(props, ref) {
   const {
     id: idProp,

@@ -1,0 +1,63 @@
+---
+title: Skeleton
+description: Placeholder shapes that mimic content while it loads — text lines, rectangles, and circles with pulse or wave animation.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Marked aria-hidden so screen readers skip placeholders; pair with an aria-live region to announce when real content arrives.
+bundleSize: "—"
+tags: [data-display, loading, placeholder]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+import StatusBadge from '@/components/StatusBadge.astro';
+import BundleSizePill from '@/components/BundleSizePill.astro';
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="Skeleton" /></div>
+
+<LivePreview example="skeleton/basic" />
+
+## Usage
+
+```tsx
+import { Skeleton } from '@arshad-shah/cynosure-react';
+
+<Skeleton width={240} height={12} />
+```
+
+## Variants
+
+Three shape variants are available: `text` (default — line height-aware), `rect` (sharper corners for media tiles), and `circle` (avatars and icon placeholders).
+
+<LivePreview example="skeleton/variants" />
+
+## Animation
+
+Switch `animation` between `"pulse"` (default), `"wave"`, and `"none"`. The wave variant honours `prefers-reduced-motion` and falls back to a static state.
+
+<LivePreview example="skeleton/animation" />
+
+## Card placeholder
+
+Compose multiple skeletons into a card-shaped placeholder while a fetch is in flight.
+
+<LivePreview example="skeleton/card" />
+
+## API
+
+<PropsTable component="Skeleton" />
+
+## Accessibility
+
+- `aria-hidden="true"` by default so the placeholder is not announced.
+- Honours `prefers-reduced-motion` — falls back to a static state when animations are disabled.
+- Pair with an `aria-live="polite"` region (or a status message) that announces when real content arrives.
+- Use enough placeholder rows to match the inbound content's rough shape — sudden layout shifts hurt low-vision users most.
+- Skeletons carry `data-variant` on the host element so design tokens can theme each shape differently.
+
+## Recipes
+
+- Use `variant="text"` for line placeholders that inherit the surrounding type scale; pass a smaller `width` on the last line for natural ragged-edge text.
+- Use `variant="circle"` with equal `width` and `height` for avatar placeholders.
+- Pass `aspectRatio` (e.g. `"16 / 9"`) instead of `height` for responsive media tiles.
+- Set `animation="none"` inside infinite scrollers — many simultaneous wave animations get distracting fast.

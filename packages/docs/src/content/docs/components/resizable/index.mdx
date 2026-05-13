@@ -1,0 +1,71 @@
+---
+title: Resizable
+description: Split a layout into draggable, resizable panels — horizontal or vertical, with per-panel min and max sizes.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Handles are keyboard-operable separators (role="separator", aria-orientation, arrow keys to resize, Home/End to clamp).
+bundleSize: "—"
+tags: [data-display, layout, splitter]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+import StatusBadge from '@/components/StatusBadge.astro';
+import BundleSizePill from '@/components/BundleSizePill.astro';
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="Resizable" /></div>
+
+<LivePreview example="resizable/basic" />
+
+## Usage
+
+```tsx
+import {
+  Resizable,
+  ResizableHandle,
+  ResizablePanel,
+} from '@arshad-shah/cynosure-react';
+
+<Resizable direction="horizontal">
+  <ResizablePanel defaultSize={40}>Left</ResizablePanel>
+  <ResizableHandle withHandle />
+  <ResizablePanel defaultSize={60}>Right</ResizablePanel>
+</Resizable>
+```
+
+## Vertical split
+
+Pass `direction="vertical"` for a top/bottom split — the handle becomes a horizontal bar.
+
+<LivePreview example="resizable/vertical" />
+
+## Min / max size
+
+Each `ResizablePanel` accepts `minSize` and `maxSize` (in percent) to clamp how far the surrounding handles can drag.
+
+<LivePreview example="resizable/min-max" />
+
+## Nested layouts
+
+Compose horizontal and vertical groups for IDE-style layouts (sidebar + editor + preview).
+
+<LivePreview example="resizable/nested" />
+
+## API
+
+<PropsTable component="Resizable" />
+
+## Accessibility
+
+- Each handle is a `role="separator"` element with the correct `aria-orientation` for the group direction.
+- Arrow keys resize the surrounding panels; `Home` / `End` clamp to the min / max bounds.
+- Pointer and keyboard drags both honour each panel's `minSize` and `maxSize`.
+- The group itself is a `<div>` — wrap it in a `<section>` (or pass `aria-label`) when its purpose is ambiguous.
+- Pass children to `ResizableHandle` to render a custom grip while keeping the separator semantics.
+
+## Recipes
+
+- Nest a vertical `Resizable` inside a horizontal one for IDE-style layouts (sidebar + editor + preview).
+- Pass `withHandle` to render a visible grip on the separator without writing markup.
+- Set `defaultSize` (percent) on each panel so the initial split is predictable across reloads.
+- Pair `minSize` with a sensible `defaultSize` so a panel never collapses below readability.

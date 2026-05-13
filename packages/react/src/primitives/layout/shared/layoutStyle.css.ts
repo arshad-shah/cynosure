@@ -8,22 +8,38 @@ import { buildResponsiveRules } from './buildResponsive.js';
  * ultimately to `initial`), so `{ base: 2, md: 4 }` renders as `padding: 2`
  * on mobile and `padding: 4` from md upward.
  */
-const LAYOUT_PROPS: Array<[string, string]> = [
+// Every longhand entry that has a shorthand counterpart in the same rule
+// MUST declare its shorthand var base as the third tuple element. Without
+// it, setting only the shorthand prop (e.g. `padding="8"`) leaves the
+// longhand vars unset; with @property-registered vars, the longhand
+// `padding-top: var(--cynosure-lp-pt-base)` declaration then resolves to
+// "invalid at computed value time", reverts to padding-top's initial value
+// of 0, and overrides the shorthand. The shorthand fallback in `cascade()`
+// keeps the longhand's var() chain falling through to the parent shorthand
+// var so the cascade stays consistent in both directions.
+// Each longhand entry that shares a shorthand MUST chain its fallbacks in
+// CSS-shorthand hierarchy order: TLBR → inline/block → all-sides. Without
+// this, setting only `padding="2"` would emit `padding: 2rem` first, then
+// each longhand `padding-top: var(--pt-base)` etc. would resolve to IACVT,
+// revert to 0, and clobber the shorthand expansion. With the chain, an
+// unset `--pt-base` falls through to `--py-base`, then `--p-base`, so the
+// cascade stays consistent in both directions.
+const LAYOUT_PROPS: ReadonlyArray<readonly [string, string, ...string[]]> = [
   // spacing
   ['padding', 'cynosure-lp-p'],
-  ['padding-inline', 'cynosure-lp-px'],
-  ['padding-block', 'cynosure-lp-py'],
-  ['padding-top', 'cynosure-lp-pt'],
-  ['padding-right', 'cynosure-lp-pr'],
-  ['padding-bottom', 'cynosure-lp-pb'],
-  ['padding-left', 'cynosure-lp-pl'],
+  ['padding-inline', 'cynosure-lp-px', 'cynosure-lp-p'],
+  ['padding-block', 'cynosure-lp-py', 'cynosure-lp-p'],
+  ['padding-top', 'cynosure-lp-pt', 'cynosure-lp-py', 'cynosure-lp-p'],
+  ['padding-right', 'cynosure-lp-pr', 'cynosure-lp-px', 'cynosure-lp-p'],
+  ['padding-bottom', 'cynosure-lp-pb', 'cynosure-lp-py', 'cynosure-lp-p'],
+  ['padding-left', 'cynosure-lp-pl', 'cynosure-lp-px', 'cynosure-lp-p'],
   ['margin', 'cynosure-lp-m'],
-  ['margin-inline', 'cynosure-lp-mx'],
-  ['margin-block', 'cynosure-lp-my'],
-  ['margin-top', 'cynosure-lp-mt'],
-  ['margin-right', 'cynosure-lp-mr'],
-  ['margin-bottom', 'cynosure-lp-mb'],
-  ['margin-left', 'cynosure-lp-ml'],
+  ['margin-inline', 'cynosure-lp-mx', 'cynosure-lp-m'],
+  ['margin-block', 'cynosure-lp-my', 'cynosure-lp-m'],
+  ['margin-top', 'cynosure-lp-mt', 'cynosure-lp-my', 'cynosure-lp-m'],
+  ['margin-right', 'cynosure-lp-mr', 'cynosure-lp-mx', 'cynosure-lp-m'],
+  ['margin-bottom', 'cynosure-lp-mb', 'cynosure-lp-my', 'cynosure-lp-m'],
+  ['margin-left', 'cynosure-lp-ml', 'cynosure-lp-mx', 'cynosure-lp-m'],
   // size
   ['width', 'cynosure-lp-w'],
   ['height', 'cynosure-lp-h'],
@@ -41,8 +57,8 @@ const LAYOUT_PROPS: Array<[string, string]> = [
   ['box-shadow', 'cynosure-lp-sh'],
   ['opacity', 'cynosure-lp-op'],
   ['overflow', 'cynosure-lp-ov'],
-  ['overflow-x', 'cynosure-lp-ovx'],
-  ['overflow-y', 'cynosure-lp-ovy'],
+  ['overflow-x', 'cynosure-lp-ovx', 'cynosure-lp-ov'],
+  ['overflow-y', 'cynosure-lp-ovy', 'cynosure-lp-ov'],
   // display / position
   ['display', 'cynosure-lp-d'],
   ['position', 'cynosure-lp-pos'],
@@ -57,7 +73,8 @@ const LAYOUT_PROPS: Array<[string, string]> = [
   ['grid-area', 'cynosure-lp-ga'],
   // flex-child hints
   ['flex', 'cynosure-lp-flex'],
-  ['flex-grow', 'cynosure-lp-fg'],
+  // `cynosure-lp-grow`, not `lp-fg` — see resolveLayoutProps for context.
+  ['flex-grow', 'cynosure-lp-grow'],
   ['flex-shrink', 'cynosure-lp-fs'],
   ['flex-basis', 'cynosure-lp-fb'],
   ['align-self', 'cynosure-lp-as'],

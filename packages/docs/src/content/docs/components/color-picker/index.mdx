@@ -1,0 +1,76 @@
+---
+title: ColorPicker
+description: Color picker with HSB area, hue + optional alpha sliders, hex/RGB/HSL text fields, eyedropper, and saved swatches; renders as a popover or inline panel.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Built on React Aria ColorPicker — slider thumbs expose aria-valuenow and respond to arrow keys; format fields are labelled inputs.
+bundleSize: "—"
+tags: [forms, color]
+---
+import LivePreview from "@/components/LivePreview/LivePreview.astro";
+import PropsTable from "@/components/PropsTable.astro";
+import StatusBadge from "@/components/StatusBadge.astro";
+import BundleSizePill from "@/components/BundleSizePill.astro";
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="ColorPicker" /></div>
+
+<LivePreview example="color-picker/basic" />
+
+## Usage
+
+```tsx
+import { ColorPicker } from "@arshad-shah/cynosure-react";
+
+<ColorPicker label="Brand colour" defaultValue="#6366F1" />
+```
+
+`defaultValue` and `value` accept either a CSS color string or a React Aria `Color` instance.
+
+## Variants
+
+`popover` (default) renders a swatch trigger that opens the panel in a Popover. `inline` drops the trigger and renders the panel in place.
+
+<LivePreview example="color-picker/inline" />
+
+## Sizes
+
+`sm`, `md` (default), and `lg` scale the area, sliders, and panel.
+
+<LivePreview example="color-picker/sizes" />
+
+## With alpha
+
+Set `alpha` to add an alpha slider with a checker-pattern background and an `A` column in the text fields.
+
+<LivePreview example="color-picker/alpha" />
+
+## Format
+
+Pick the starting format with `defaultFormat` (`"hex"`, `"rgb"`, or `"hsl"`). Users can switch between them with the in-panel segmented control.
+
+<LivePreview example="color-picker/format" />
+
+## Saved swatches
+
+Pass a controlled `swatches` array plus `onSwatchesChange` to render a saved-colors grid; users can save the current color and re-pick any saved swatch.
+
+<LivePreview example="color-picker/swatches" />
+
+## API
+
+<PropsTable component="ColorPicker" />
+
+## Accessibility
+
+- Wraps React Aria's `ColorPicker`, `ColorArea`, and `ColorSlider` primitives — full keyboard support with arrow keys, Page Up/Down, and Home/End on each thumb.
+- The eyedropper button uses the browser's `EyeDropper` API when available; it's hidden automatically on unsupported browsers.
+- Each format text field is a labelled input — `aria-label` on the picker trigger defaults to the `label` prop when it's a string.
+- The trigger swatch reflects the current color including alpha when enabled.
+
+## Recipes
+
+- Use `variant="inline"` inside a settings panel where you don't want a separate trigger.
+- Cap saved-color history with `maxSwatches` so the grid doesn't grow unbounded.
+- Set `eyedropper={false}` when shipping to browsers that lack `EyeDropper` if you'd rather hide the slot than rely on auto-detection.
+- Pass a controlled `value` of type `Color` to read back any format via `color.toString("rgb")` / `color.toString("hex")`.

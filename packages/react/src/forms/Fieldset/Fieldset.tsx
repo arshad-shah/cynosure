@@ -2,6 +2,7 @@ import { type FieldsetHTMLAttributes, type ReactNode, forwardRef } from 'react';
 import { cn } from '../../utils/cn.js';
 import { fieldset, legend } from './Fieldset.css.js';
 
+/** Props for `<Fieldset>`. Extends native `<fieldset>` attributes (notably `disabled` and `name`). */
 export interface FieldsetProps
   extends Omit<FieldsetHTMLAttributes<HTMLFieldSetElement>, 'children'> {
   /** Optional legend. Rendered as the first child inside the fieldset. */

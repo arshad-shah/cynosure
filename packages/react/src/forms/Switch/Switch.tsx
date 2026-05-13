@@ -13,13 +13,23 @@ import {
   thumbLoader,
 } from './Switch.css.js';
 
+/** Props for `<Switch>`. Built on `@radix-ui/react-switch`. */
 export interface SwitchProps extends BooleanFormControlBase {
+  /** Controlled checked state. */
   checked?: boolean;
+  /** Uncontrolled initial checked state. */
   defaultChecked?: boolean;
+  /** Fires with the next checked state on toggle. */
   onCheckedChange?: (checked: boolean) => void;
+  /** Submitted value when checked. */
   value?: string;
-  /** Renders a spinner inside the thumb and blocks interaction while awaiting async work. */
+  /**
+   * Renders a spinner inside the thumb and blocks interaction while
+   * awaiting async work.
+   * @default false
+   */
   loading?: boolean;
+  /** Optional label rendered alongside the control. */
   children?: ReactNode;
   className?: string;
 }

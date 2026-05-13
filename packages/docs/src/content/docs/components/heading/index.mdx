@@ -1,0 +1,69 @@
+---
+title: Heading
+description: Semantic heading with decoupled level and visual size so document outline and typography scale independently.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Renders `<h1>`–`<h6>` based on the `level` prop; `size` is purely visual so structural hierarchy stays correct even when designs diverge from the heading scale.
+bundleSize: "—"
+tags: [typography, primitive]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+import StatusBadge from '@/components/StatusBadge.astro';
+import BundleSizePill from '@/components/BundleSizePill.astro';
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="Heading" /></div>
+
+<LivePreview example="heading/basic" />
+
+## Usage
+
+```tsx
+import { Heading } from '@arshad-shah/cynosure-react';
+
+<Heading level={1}>Welcome to Cynosure</Heading>
+```
+
+## Levels
+
+Use `level` to set the rendered tag (`1`–`6`). When `size` is omitted the visual scale defaults to the matching heading composite token, so a `level={2}` heading looks like an h2 out of the box.
+
+<LivePreview example="heading/levels" />
+
+## Sizes
+
+Nine sizes are exposed — `xs`, `sm`, `md`, `lg`, `xl`, `2xl`, `3xl`, `4xl`, `5xl`. Pair a small `size` with a high `level` to keep semantics intact while shrinking the type scale, or vice versa.
+
+<LivePreview example="heading/sizes" />
+
+## Weights
+
+Override the default weight from the heading token with `regular`, `medium`, `semibold`, or `bold`.
+
+<LivePreview example="heading/weights" />
+
+## Truncate
+
+Pass `truncate` for ellipsis on one line or a number for multi-line clamp — handy for card titles inside fixed layouts.
+
+<LivePreview example="heading/truncate" />
+
+## API
+
+<PropsTable component="Heading" />
+
+## Accessibility
+
+- `level` always controls the rendered element so the document outline stays correct for screen readers and SEO.
+- Decouple `size` from `level` to keep visual hierarchy flexible without skipping headings (don't jump from h1 to h4 just to shrink type).
+- One `h1` per page; reach for `level={2}` or deeper inside sections.
+- `truncate` hides overflow visually only — keep the full heading in the DOM so assistive tech receives it.
+- Maintain enough contrast between heading colour and background; large weights still need to pass WCAG large-text minimums.
+
+## Recipes
+
+- Pair `Heading` with `Text variant="lead"` directly underneath for a familiar title + lede pattern.
+- Use `align="center"` for hero headings and `align="start"` (default) for body sections.
+- Combine a small `Text variant="overline"` above a `Heading` for a section eyebrow without losing semantics.
+- Use `asChild` to project Heading typography onto a link wrapper for clickable card titles.

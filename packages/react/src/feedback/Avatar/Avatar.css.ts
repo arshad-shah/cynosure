@@ -1,13 +1,20 @@
 import { style, styleVariants } from '@vanilla-extract/css';
 import { vars } from '../../styles/vars.css.js';
 
+/*
+ * Avatar root deliberately does NOT clip its overflow. The status dot lives
+ * inside the root as an absolutely-positioned child anchored to the bounding
+ * box corner; with `overflow: hidden` here, the rounded-corner shape would
+ * clip the dot (and its 2px halo) almost entirely — only a thin sliver
+ * remained visible where the dot intersected the circle. The image and
+ * fallback children carry their own clipping below.
+ */
 export const avatarRoot = style({
   position: 'relative',
   display: 'inline-flex',
   alignItems: 'center',
   justifyContent: 'center',
   flex: '0 0 auto',
-  overflow: 'hidden',
   userSelect: 'none',
   verticalAlign: 'middle',
   fontFamily: 'var(--cynosure-font-body-md-family)',

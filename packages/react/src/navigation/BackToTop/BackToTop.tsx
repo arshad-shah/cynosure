@@ -8,19 +8,40 @@ import { backToTopButton, backToTopPosition } from './BackToTop.css.js';
 
 export type BackToTopPosition = 'bottom-right' | 'bottom-left' | 'bottom-center';
 
+/**
+ * Props for the `BackToTop` floating button. Inherits all standard
+ * `<button>` attributes except `onClick`, which is owned by the component.
+ */
 export interface BackToTopProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'onClick'> {
-  /** Scroll distance before showing. Default 300px. */
+  /**
+   * Scroll distance (in px) past which the button becomes visible.
+   * @default 300
+   */
   showAfter?: number;
-  /** Pre-set position presets. Default `bottom-right`. */
+  /**
+   * One of the corner / center positioning presets.
+   * @default "bottom-right"
+   */
   position?: BackToTopPosition;
-  /** Smooth scroll. Default `true`. Ignored under `prefers-reduced-motion`. */
+  /**
+   * Use smooth scrolling on click. Forced to `"auto"` under
+   * `prefers-reduced-motion: reduce`.
+   * @default true
+   */
   smooth?: boolean;
-  /** Override the default portal target. Defaults to `document.body`. */
+  /** Portal target. Defaults to `document.body`. */
   container?: Element | DocumentFragment | (() => Element | DocumentFragment | null | undefined);
-  /** Render inline (skip portal). Useful in tests. */
+  /**
+   * Render inline (skip portal). Useful in tests or when the parent scroll
+   * container isn't `document`.
+   */
   disablePortal?: boolean;
-  /** Replace the default arrow icon. */
+  /** Replace the default chevron-up icon. */
   icon?: ReactNode;
+  /**
+   * Accessible label for the icon-only button.
+   * @default "Back to top"
+   */
   label?: string;
 }
 /**

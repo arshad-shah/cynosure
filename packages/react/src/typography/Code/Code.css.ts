@@ -16,7 +16,11 @@ export const codeBase = style([
 ]);
 
 export const codeBlock = style({
-  display: 'block',
+  // Drive `display` through the layoutPropsStyle var that `codeBase`
+  // (paired with this variant on `<pre><code>`) composes. A literal
+  // `display: block` here loses to later layoutPropsStyle emissions in the
+  // bundled stylesheet — see `Flex.css.ts` for the full incident note.
+  vars: { '--cynosure-lp-d-base': 'block' },
   padding: 'var(--cynosure-space-3)',
   borderRadius: vars.radius.md,
   whiteSpace: 'pre',

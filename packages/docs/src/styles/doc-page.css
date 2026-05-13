@@ -116,44 +116,218 @@
   margin: 20px 0 24px;
   background: var(--docs-surface-1);
 }
+/* A single tool-height variable keeps the RTL button, the segmented theme
+ * picker, the separator, and the Open link on the same horizontal baseline. */
 [data-live-toolbar] {
+  --tool-h: 28px;
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 8px 12px;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 10px;
   background: var(--docs-surface-2);
   border-bottom: 1px solid var(--docs-line);
   font-family: var(--docs-type-mono);
   font-size: 11px;
   color: var(--docs-muted);
   letter-spacing: 0.06em;
+  min-height: 40px;
+  box-sizing: border-box;
 }
-[data-live-toolbar] [data-live-spacer] {
-  flex: 1;
+[data-live-toolbar] [data-live-label] {
+  display: inline-flex;
+  align-items: center;
+  height: var(--tool-h, 28px);
+  padding: 0 4px;
+  text-transform: uppercase;
+  font-weight: 500;
+  color: var(--docs-dim);
+}
+[data-live-controls] {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+[data-live-sep] {
+  align-self: center;
+  width: 1px;
+  height: 18px;
+  margin: 0 4px;
+  background: var(--docs-line);
 }
 [data-live-tool] {
-  padding: 4px 8px;
-  border-radius: 5px;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  height: var(--tool-h, 28px);
+  padding: 0 10px;
+  border-radius: 6px;
+  background: transparent;
+  border: 1px solid transparent;
   color: var(--docs-muted);
+  font: inherit;
+  font-size: 11px;
+  line-height: 1;
+  text-decoration: none;
   cursor: pointer;
+  transition: background-color 120ms ease, color 120ms ease, border-color 120ms ease;
+}
+[data-live-tool] svg {
+  display: block;
+  flex: none;
+  opacity: 0.85;
 }
 [data-live-tool]:hover {
   background: var(--docs-surface-3);
   color: var(--color-fg, canvastext);
+  border-color: var(--docs-line);
 }
-[data-live-tool][data-active] {
+[data-live-tool]:focus-visible {
+  outline: 2px solid var(--color-accent-solid);
+  outline-offset: 2px;
+}
+[data-live-tool][data-active],
+[data-live-tool][aria-pressed="true"] {
   color: var(--color-accent-solid);
   background: color-mix(in srgb, var(--color-accent-solid) 14%, transparent);
+  border-color: color-mix(in srgb, var(--color-accent-solid) 35%, transparent);
 }
+
 [data-live-stage] {
-  padding: 56px 32px;
+  /* The iframe sits flush against the stage; the iframe's own body padding
+   * (1.25rem) provides the breathing room around the rendered component. */
   display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
+  align-items: stretch;
+  justify-content: stretch;
+  background: var(--docs-surface-1);
   background-image: linear-gradient(var(--docs-grid-line) 1px, transparent 1px),
     linear-gradient(90deg, var(--docs-grid-line) 1px, transparent 1px);
   background-size: 20px 20px;
+}
+
+/* Code bar (toggle + lang + copy) sits between the stage and the optional
+ * code panel. Same height/baseline as the toolbar so the two strips read as
+ * a paired header/footer around the preview. */
+[data-live-code-bar] {
+  --tool-h: 28px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  background: var(--docs-surface-2);
+  border-top: 1px solid var(--docs-line);
+  font-family: var(--docs-type-mono);
+  font-size: 11px;
+  color: var(--color-fg, canvastext);
+  letter-spacing: 0.06em;
+  min-height: 40px;
+  box-sizing: border-box;
+}
+[data-live-code-bar] [data-live-code-lang] {
+  margin-left: auto;
+  color: var(--docs-dim);
+  text-transform: uppercase;
+  padding: 0 4px;
+}
+[data-live-code-bar] [data-live-code-toggle] {
+  border: 1px solid var(--docs-line);
+  background: var(--docs-surface-3);
+  color: var(--color-fg, canvastext);
+  font-weight: 500;
+}
+[data-live-code-bar] [data-live-code-toggle]:hover {
+  background: color-mix(in srgb, var(--color-accent-solid) 14%, var(--docs-surface-3));
+  border-color: color-mix(in srgb, var(--color-accent-solid) 40%, var(--docs-line));
+  color: var(--color-accent-solid);
+}
+[data-live-code-chevron] {
+  transition: transform 160ms ease;
+}
+[data-live][data-code-open] [data-live-code-chevron] {
+  transform: rotate(180deg);
+}
+[data-live-code-bar] [data-copy-button] {
+  position: static;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  height: var(--tool-h, 28px);
+  padding: 0 10px;
+  font-family: var(--docs-type-mono);
+  font-size: 11px;
+  line-height: 1;
+  border-radius: 6px;
+  background: var(--docs-surface-1);
+  color: var(--docs-muted);
+  border: 1px solid var(--docs-line);
+}
+[data-live-code-bar] [data-copy-button]:hover {
+  background: var(--docs-surface-3);
+  color: var(--color-fg, canvastext);
+}
+[data-live-code-bar] [data-copy-button] svg {
+  width: 12px;
+  height: 12px;
+}
+
+/* Code panel: Shiki output stripped of its default padding/background so it
+ * sits flush inside the preview card — no inner box, no extra border, just
+ * brighter tokens against the card's own surface. */
+[data-live-code] {
+  border-top: 1px solid var(--docs-line);
+  overflow-x: auto;
+  background: var(--docs-surface-1);
+}
+[data-live-code] pre,
+[data-live-code] pre.shiki {
+  margin: 0;
+  padding: 16px 18px;
+  background: transparent !important;
+  font-family: var(--docs-type-mono);
+  font-size: 12.5px;
+  line-height: 1.7;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+[data-live-code][hidden] {
+  display: none;
+}
+
+/* Shiki dual-theme: each token has both `--shiki-light` and `--shiki-dark`
+ * custom properties applied inline. Swap which one is active based on
+ * Starlight's `<html data-theme>` attribute so the code block is legible in
+ * both light and dark mode. */
+.shiki,
+.shiki span {
+  color: var(--shiki-light);
+  background-color: var(--shiki-light-bg);
+  font-style: var(--shiki-light-font-style);
+  font-weight: var(--shiki-light-font-weight);
+  text-decoration: var(--shiki-light-text-decoration);
+}
+:root[data-theme="dark"] .shiki,
+:root[data-theme="dark"] .shiki span {
+  color: var(--shiki-dark);
+  background-color: var(--shiki-dark-bg);
+  font-style: var(--shiki-dark-font-style);
+  font-weight: var(--shiki-dark-font-weight);
+  text-decoration: var(--shiki-dark-text-decoration);
+}
+/* Honour OS preference when Starlight has no explicit `data-theme` set. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) .shiki,
+  :root:not([data-theme]) .shiki span {
+    color: var(--shiki-dark);
+    background-color: var(--shiki-dark-bg);
+    font-style: var(--shiki-dark-font-style);
+    font-weight: var(--shiki-dark-font-weight);
+    text-decoration: var(--shiki-dark-text-decoration);
+  }
 }
 
 /* Demo buttons (mockup samples) */
@@ -289,14 +463,29 @@
 
 /* Props table */
 [data-props] {
+  --col-name: 1.3fr;
+  --col-type: 1.6fr;
+  --col-default: 1fr;
+  --col-desc: 2fr;
+  /* Light-mode-readable type colour; flipped via the data-theme rule below. */
+  --props-type-fg: #0369a1;
   margin: 24px 0;
   border: 1px solid var(--docs-line);
   border-radius: 10px;
   overflow: hidden;
+  background: var(--docs-surface-1);
+}
+:root[data-theme="dark"] [data-props] {
+  --props-type-fg: #7dd3fc;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) [data-props] {
+    --props-type-fg: #7dd3fc;
+  }
 }
 [data-props-head] {
   display: grid;
-  grid-template-columns: 1.3fr 1.6fr 1fr 2fr;
+  grid-template-columns: var(--col-name) var(--col-type) var(--col-default) var(--col-desc);
   padding: 10px 16px;
   background: var(--docs-surface-2);
   border-bottom: 1px solid var(--docs-line);
@@ -305,10 +494,11 @@
   letter-spacing: 0.1em;
   color: var(--docs-muted);
   text-transform: uppercase;
+  gap: 12px;
 }
 [data-props-row] {
   display: grid;
-  grid-template-columns: 1.3fr 1.6fr 1fr 2fr;
+  grid-template-columns: var(--col-name) var(--col-type) var(--col-default) var(--col-desc);
   padding: 14px 16px;
   border-bottom: 1px solid var(--docs-line);
   background: var(--docs-surface-1);
@@ -319,10 +509,25 @@
 [data-props-row]:last-child {
   border-bottom: none;
 }
+/* Starlight's prose CSS adds `margin-top: 1.5em` to most block descendants of
+ * `main`; zero it for everything inside the props rows so cells baseline-align
+ * cleanly with the row padding. */
+[data-props] [data-props-name],
+[data-props] [data-props-type],
+[data-props] [data-props-default],
+[data-props] [data-props-desc],
+[data-props] [data-props-name] *,
+[data-props] [data-props-type] *,
+[data-props] [data-props-default] *,
+[data-props] [data-props-desc] * {
+  margin-top: 0;
+  margin-bottom: 0;
+}
 [data-props-name] {
   font-family: var(--docs-type-mono);
   font-size: 13px;
   font-weight: 500;
+  color: var(--color-fg, canvastext);
 }
 [data-props-req] {
   color: var(--docs-danger);
@@ -332,17 +537,30 @@
 [data-props-type] {
   font-family: var(--docs-type-mono);
   font-size: 12px;
-  color: #7dd3fc;
+  color: var(--props-type-fg);
   line-height: 1.5;
+  word-break: break-word;
 }
 [data-props-type] .t-sep {
   color: var(--docs-dim);
   margin: 0 2px;
 }
+[data-props-type] .t-alias {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: color-mix(in oklab, currentColor 35%, transparent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+[data-props-type] .t-alias:hover {
+  text-decoration-color: currentColor;
+}
 [data-props-default] {
   font-family: var(--docs-type-mono);
   font-size: 12px;
-  color: var(--docs-dim);
+  color: var(--color-fg, canvastext);
+  opacity: 0.75;
 }
 [data-props-desc] {
   color: var(--docs-muted);

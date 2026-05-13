@@ -4,7 +4,11 @@ import CopyButton from './CopyButton.astro';
 
 interface Props { code: string; lang?: string; filename?: string }
 const { code, lang = 'tsx', filename } = Astro.props;
-const html = await codeToHtml(code, { lang, theme: 'github-dark-dimmed' });
+const html = await codeToHtml(code, {
+  lang,
+  themes: { light: 'github-light', dark: 'github-dark' },
+  defaultColor: false,
+});
 ---
 <div data-code-block>
   <div data-code-head>

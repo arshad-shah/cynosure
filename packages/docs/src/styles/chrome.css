@@ -151,11 +151,43 @@
   [data-doc-layout] {
     grid-template-columns: 1fr;
   }
+  /* Sidebar becomes an off-canvas drawer on mobile. Hidden by default;
+     toggled in by [data-sidebar-open] on <body> via MobileNavToggle.astro.
+     A pseudo-element backdrop catches outside clicks (handled by the
+     toggle's JS — click-outside listener). */
   [data-doc-layout] > [data-sidebar] {
-    display: none;
+    position: fixed;
+    top: 56px;
+    left: 0;
+    bottom: 0;
+    width: min(320px, 86vw);
+    z-index: 60;
+    background: var(--color-bg, canvas);
+    border-right: 1px solid var(--docs-line);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.18);
+    transform: translateX(-105%);
+    transition: transform 180ms ease-out;
+    overflow-y: auto;
+  }
+  body[data-sidebar-open] [data-doc-layout] > [data-sidebar] {
+    transform: translateX(0);
+  }
+  body[data-sidebar-open]::after {
+    content: "";
+    position: fixed;
+    inset: 56px 0 0 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 50;
   }
   [data-doc-layout] main {
     padding: 32px 24px 80px !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-doc-layout] > [data-sidebar],
+  [data-mobile-nav-toggle] {
+    transition: none !important;
   }
 }
 [data-topbar] {

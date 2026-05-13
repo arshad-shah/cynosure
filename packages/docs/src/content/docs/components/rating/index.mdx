@@ -1,0 +1,73 @@
+---
+title: Rating
+description: Star rating control with optional half-star precision and a hover preview.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Exposes role="slider" with aria-valuemin/max/now; arrow keys, Home, and End adjust the value.
+bundleSize: "—"
+tags: [forms]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+import StatusBadge from '@/components/StatusBadge.astro';
+import BundleSizePill from '@/components/BundleSizePill.astro';
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="Rating" /></div>
+
+<LivePreview example="rating/basic" />
+
+## Usage
+
+```tsx
+import { Rating } from "@arshad-shah/cynosure-react";
+
+<Rating label="Product rating" defaultValue={3} max={5} />
+```
+
+## Sizes
+
+Three sizes are available: `sm`, `md` (default), and `lg`.
+
+<LivePreview example="rating/sizes" />
+
+## Custom max
+
+Set `max` to the number of stars to display. 5 is the default.
+
+<LivePreview example="rating/counts" />
+
+## Half stars
+
+Set `allowHalf` to capture 0.5 increments — the click position within each star determines whether you commit a half or full.
+
+<LivePreview example="rating/half" />
+
+## Read-only and disabled
+
+Set `readOnly` to render the value statically. `disabled` removes the field from the tab order.
+
+<LivePreview example="rating/states" />
+
+## With a value label
+
+Use `renderValue` to render a trailing slot that reflects the current (or hovered) value.
+
+<LivePreview example="rating/with-value" />
+
+## API
+
+<PropsTable component="Rating" />
+
+## Accessibility
+
+- The root exposes `role="slider"` with `aria-valuemin={0}`, `aria-valuemax={max}`, and `aria-valuenow`.
+- Keyboard: Arrow Up/Right and Down/Left adjust by `step` (1 by default, 0.5 when `allowHalf`); Home/End jump to bounds.
+- `readOnly` sets `aria-readonly`; `disabled` sets `aria-disabled` and removes the field from the tab order.
+- Clicking the active value again clears the rating (sets it back to 0).
+
+## Recipes
+
+- Use `defaultValue` for review forms; switch to controlled (`value`/`onValueChange`) when the value lives in form state.
+- Provide a clear `label` or `aria-label` so screen readers announce what is being rated.
+- Use `renderValue` to surface a numeric readout (e.g. "4.5 / 5") next to the stars.

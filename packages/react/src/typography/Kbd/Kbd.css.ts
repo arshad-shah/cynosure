@@ -7,7 +7,9 @@ export const kbdBase = style([
   layoutPropsStyle,
   typographyBase,
   {
-    display: 'inline-flex',
+    // See `Flex.css.ts` — drive display through layoutPropsStyle's var so it
+    // survives duplicated emissions later in the bundled stylesheet.
+    vars: { '--cynosure-lp-d-base': 'inline-flex' },
     alignItems: 'center',
     justifyContent: 'center',
     gap: '0.2em',

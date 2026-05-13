@@ -49,9 +49,11 @@ describe('CommandPalette', () => {
   it('renders the description and shortcut chips inside an item', () => {
     render(<Flat />);
     expect(screen.getByText('Jump')).toBeInTheDocument();
-    // Shortcut splits "⌘ P" into two kbd chips.
-    expect(screen.getByText('⌘')).toBeInTheDocument();
+    // Shortcut splits "⌘ P" into two Kbd chips. The ⌘ glyph is rendered as a
+    // lucide SVG icon (aria-hidden) by `Kbd`, so we assert on the keycap +
+    // letter rather than the raw glyph.
     expect(screen.getByText('P')).toBeInTheDocument();
+    expect(document.querySelectorAll('kbd').length).toBeGreaterThanOrEqual(2);
   });
 
   it('filters items based on the search input and shows empty state', () => {

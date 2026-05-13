@@ -1,0 +1,94 @@
+---
+title: AlertDialog
+description: A focus-trapping modal that interrupts the user to confirm an important or destructive action.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Uses role="alertdialog" aria-modal="true"; focus is trapped; cannot be dismissed by Esc or backdrop click — only via AlertDialogAction or AlertDialogCancel.
+bundleSize: "—"
+tags: [overlay, modal, confirmation, accessible]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+import StatusBadge from '@/components/StatusBadge.astro';
+import BundleSizePill from '@/components/BundleSizePill.astro';
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="AlertDialog" /></div>
+
+<LivePreview example="alert-dialog/basic" />
+
+## Usage
+
+```tsx
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+  Button,
+} from "@arshad-shah/cynosure-react";
+
+<AlertDialog>
+  <AlertDialogTrigger asChild>
+    <Button variant="solid" colorScheme="danger">Delete</Button>
+  </AlertDialogTrigger>
+  <AlertDialogContent>
+    <AlertDialogHeader>
+      <AlertDialogTitle>Delete this item?</AlertDialogTitle>
+      <AlertDialogDescription>This cannot be undone.</AlertDialogDescription>
+    </AlertDialogHeader>
+    <AlertDialogFooter>
+      <AlertDialogCancel asChild>
+        <Button variant="ghost">Cancel</Button>
+      </AlertDialogCancel>
+      <AlertDialogAction asChild>
+        <Button variant="solid" colorScheme="danger">Delete</Button>
+      </AlertDialogAction>
+    </AlertDialogFooter>
+  </AlertDialogContent>
+</AlertDialog>
+```
+
+## Variants
+
+### Controlled
+
+Drive the open state externally with `open` / `onOpenChange` to gate confirmation on async work or to coordinate with other UI.
+
+<LivePreview example="alert-dialog/controlled" />
+
+### Sizes
+
+`AlertDialogContent` accepts the same six sizes as `Dialog`: `xs`, `sm` (default), `md`, `lg`, `xl`, `full`. Keep confirmations small — there is rarely a need to go beyond `sm`.
+
+<LivePreview example="alert-dialog/sizes" />
+
+### Top position
+
+Pass `position="top"` to anchor the panel near the top of the viewport — useful on long pages where the user may have scrolled far from the trigger.
+
+<LivePreview example="alert-dialog/position-top" />
+
+## API
+
+<PropsTable component="AlertDialogContent" />
+
+## Accessibility
+
+- `AlertDialogContent` renders with `role="alertdialog"` and `aria-modal="true"` via Radix.
+- Focus is trapped inside the dialog while open and returned to the trigger on close.
+- Backdrop clicks never dismiss; `Esc` is also suppressed — the user must hit `AlertDialogAction` or `AlertDialogCancel`.
+- `AlertDialogTitle` maps to `aria-labelledby`; `AlertDialogDescription` maps to `aria-describedby` — both are required for a complete accessible name.
+- Default focus lands on the cancel action, making accidental confirmation unlikely.
+
+## Recipes
+
+- Reserve `AlertDialog` for destructive or non-reversible choices. For everything else, use `Dialog`.
+- Pair the destructive action with `colorScheme="danger"` to reinforce the intent visually.
+- Keep the body copy short — one or two sentences naming the consequence.
+- Use the controlled pattern when the action is async — disable the button and close on success.

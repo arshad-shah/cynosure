@@ -3,9 +3,11 @@
 # Matches Arshad's existing arshadshah.com infra on Cloudflare.
 # See: https://developers.cloudflare.com/pages/configuration/build-configuration/
 #
-# The docs site is the built Storybook (`storybook-static/`), served as
-# plain static assets. No functions or workers are required.
+# The docs site is now the Starlight-built Astro docs at
+# `packages/docs/dist/`. The Storybook bundle ships at `dist/storybook/` (a
+# subpath of the same project) via the `bundle:storybook` step in the docs
+# `build` script. One Cloudflare project serves both at cynosure.arshadshah.com.
 
 name = "cynosure-docs"
-pages_build_output_dir = "./storybook-static"
+pages_build_output_dir = "./packages/docs/dist"
 compatibility_date = "2026-04-17"

@@ -18,10 +18,23 @@ import {
 
 export type ResizableDirection = 'horizontal' | 'vertical';
 
+/** Props for the {@link Resizable} panel group. Inherits the rest of `react-resizable-panels`' `Group` API. */
 export interface ResizableProps extends Omit<RRPGroupProps, 'orientation'> {
+  /**
+   * Layout axis. `horizontal` arranges panels side-by-side; `vertical` stacks
+   * them top-to-bottom.
+   * @default "horizontal"
+   */
   direction?: ResizableDirection;
 }
 
+/**
+ * Resizable is a split layout with drag-to-resize handles. Wraps
+ * `react-resizable-panels` Group and exposes `direction` as the friendlier
+ * cynosure prop name (mapped to the underlying `orientation`). Drop
+ * {@link ResizablePanel} children separated by {@link ResizableHandle} to
+ * build N-pane layouts. Handles are keyboard-resizable via arrow keys.
+ */
 export const Resizable = forwardRef<HTMLDivElement, ResizableProps>(function Resizable(
   { direction = 'horizontal', className, ...rest },
   _ref,
@@ -36,19 +49,30 @@ export const Resizable = forwardRef<HTMLDivElement, ResizableProps>(function Res
   );
 });
 
+/** Props for a single {@link ResizablePanel}. Inherits sizing props (`defaultSize`, `minSize`, `maxSize`) from `react-resizable-panels`. */
 export interface ResizablePanelProps extends RRPPanelProps {}
 
+/** One panel inside a {@link Resizable} group. Must be a direct child paired with {@link ResizableHandle}s between siblings. */
 export const ResizablePanel = forwardRef<HTMLDivElement, ResizablePanelProps>(
   function ResizablePanel({ className, ...rest }, _ref) {
     return <RRPPanel className={cn(resizablePanel, className)} {...rest} />;
   },
 );
 
+/** Props for the {@link ResizableHandle} draggable divider between panels. */
 export interface ResizableHandleProps extends RRPSeparatorProps {
-  /** Render a small drag-indicator grip in the middle. Default `false`. */
+  /**
+   * Render a small drag-indicator grip in the middle (Lucide `GripVertical`).
+   * @default false
+   */
   withHandle?: boolean;
 }
 
+/**
+ * Drag handle between two {@link ResizablePanel} siblings. Renders a focusable
+ * separator that responds to keyboard arrow keys; pass `withHandle` for a
+ * visible grip affordance.
+ */
 export const ResizableHandle = forwardRef<HTMLDivElement, ResizableHandleProps>(
   function ResizableHandle({ withHandle, className, children, ...rest }, _ref) {
     const content: ReactNode = children ?? (withHandle ? <GripVerticalIcon size={'14'} /> : null);

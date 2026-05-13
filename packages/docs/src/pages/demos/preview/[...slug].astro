@@ -1,7 +1,6 @@
 ---
 import type { ComponentType } from 'react';
 import PreviewDispatcher from '../../../components/LivePreview/PreviewDispatcher.tsx';
-import { getThemeInitScript } from '../../../lib/theme-init';
 import '../../../styles/site.css';
 
 type ExampleModule = { default: ComponentType };
@@ -24,7 +23,28 @@ if (typeof slug !== 'string') {
   throw new Error(`Invalid preview slug: ${String(slug)}`);
 }
 
-const initScript = getThemeInitScript();
+// The preview iframe is reloaded by the parent whenever the site theme flips
+// (the parent rewrites `?theme=` in the iframe src). The init script below
+// honours that URL param first, then falls back to the system colour scheme,
+// then to "light". It runs synchronously before paint so the body/component
+// surfaces never flash the wrong theme.
+const initScript = `
+(function(){
+  try {
+    var url = new URL(window.location.href);
+    var t = url.searchParams.get('theme');
+    var rtl = url.searchParams.get('rtl') === '1';
+    if (t !== 'light' && t !== 'dark') {
+      t = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)
+        ? 'dark' : 'light';
+    }
+    var d = document.documentElement;
+    d.setAttribute('data-theme', t);
+    d.style.colorScheme = t;
+    if (rtl) d.setAttribute('dir', 'rtl');
+  } catch (e) {}
+})();
+`.trim();
 const channel = `preview:${slug}`;
 ---
 <!doctype html>

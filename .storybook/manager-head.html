@@ -1,14 +1,17 @@
-<!-- Favicon chain for the Storybook manager UI -->
-<link rel="icon" type="image/svg+xml" href="/brand/cynosure-mark-favicon.svg" />
-<link rel="alternate icon" href="/brand/favicon.ico" />
-<link rel="apple-touch-icon" sizes="180x180" href="/brand/apple-touch-icon.png" />
+<!-- Favicon chain for the Storybook manager UI. Paths are relative so they
+     resolve correctly when the bundle is served from a subpath
+     (e.g. `cynosure.arshadshah.com/storybook/`) — Storybook copies the
+     `brand/` static dir into the build output. -->
+<link rel="icon" type="image/svg+xml" href="./brand/cynosure-mark-favicon.svg" />
+<link rel="alternate icon" href="./brand/favicon.ico" />
+<link rel="apple-touch-icon" sizes="180x180" href="./brand/apple-touch-icon.png" />
 
 <!-- Open Graph / Twitter share -->
 <meta property="og:title" content="Cynosure UI" />
 <meta property="og:description" content="A gorgeous, tiny, accessible React UI framework." />
-<meta property="og:image" content="/brand/og-image.png" />
+<meta property="og:image" content="./brand/og-image.png" />
 <meta property="og:type" content="website" />
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:image" content="/brand/og-image.png" />
+<meta name="twitter:image" content="./brand/og-image.png" />
 <meta name="twitter:title" content="Cynosure UI" />
 <meta name="twitter:description" content="A gorgeous, tiny, accessible React UI framework." />

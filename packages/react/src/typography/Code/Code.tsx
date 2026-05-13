@@ -14,13 +14,37 @@ export type CodeSize = 'sm' | 'md';
 export type CodeVariant = 'inline' | 'block';
 export type CodeColorScheme = 'neutral' | 'accent' | 'success' | 'danger';
 
+/**
+ * Props specific to `Code`, layered on top of `LayoutProps` and `AsChildProps`.
+ */
 export interface CodeOwnProps extends LayoutProps, AsChildProps {
+  /**
+   * Font-size step for the monospace glyphs.
+   * @default "md"
+   */
   size?: CodeSize;
-  /** `"block"` renders `<pre><code>` so multi-line snippets retain whitespace. */
+  /**
+   * `"inline"` renders a bare `<code>`; `"block"` wraps in `<pre><code>` so
+   * multi-line snippets preserve whitespace and line breaks.
+   * @default "inline"
+   */
   variant?: CodeVariant;
+  /**
+   * Background / foreground palette token for the chip.
+   * @default "neutral"
+   */
   colorScheme?: CodeColorScheme;
+  /**
+   * Additional class names appended after Cynosure's base classes.
+   */
   className?: string;
+  /**
+   * Inline style overrides merged last.
+   */
   style?: CSSProperties;
+  /**
+   * Code text content.
+   */
   children?: ReactNode;
 }
 

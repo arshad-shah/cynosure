@@ -9,11 +9,18 @@ import { TextareaFooter } from './TextareaFooter.js';
 import { TextareaResizeHandle } from './TextareaResizeHandle.js';
 import { TextareaRoot } from './TextareaRoot.js';
 
+/** Cynosure-specific props for the `<Textarea>` convenience wrapper. */
 export interface TextareaOwnProps extends FormControlBase<string> {
+  /** Initial visible row count. Honoured even when `autoResize` is enabled (acts as a minimum). */
   rows?: number;
+  /** Grow with the content up to `maxRows`. Disables the manual grip when active. */
   autoResize?: boolean;
+  /** Cap for `autoResize`. Past this row count, the field scrolls. */
   maxRows?: number;
-  /** Corner-grip resize axis. Default `"vertical"`; `"none"` removes the grip. */
+  /**
+   * Corner-grip resize axis. `none` removes the grip entirely.
+   * @default "vertical"
+   */
   resize?: TextareaResizeMode;
 
   /** Character limit. Soft — typing past it still works but the counter + `aria-invalid` flip. */

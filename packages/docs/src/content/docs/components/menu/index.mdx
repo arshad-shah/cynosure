@@ -1,0 +1,93 @@
+---
+title: Menu
+description: An inline vertical navigation menu with optional groups, dividers, indents, badges, and collapsible sections.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Renders inside a nav landmark with optional aria-label; collapsible groups expose aria-expanded/aria-controls via Collapsible; items expose aria-current for the active route.
+bundleSize: "—"
+tags: [navigation, menu, accessible]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+import StatusBadge from '@/components/StatusBadge.astro';
+import BundleSizePill from '@/components/BundleSizePill.astro';
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="Menu" /></div>
+
+<LivePreview example="menu/basic" />
+
+## Usage
+
+```tsx
+import {
+  Menu,
+  MenuGroup,
+  MenuItem,
+  MenuDivider,
+} from "@arshad-shah/cynosure-react";
+
+<Menu aria-label="Primary">
+  <MenuGroup label="Workspace">
+    <MenuItem href="/dashboard" isActive>Dashboard</MenuItem>
+    <MenuItem href="/inbox" badge="12">Inbox</MenuItem>
+  </MenuGroup>
+  <MenuDivider />
+  <MenuGroup label="Account">
+    <MenuItem href="/settings">Settings</MenuItem>
+  </MenuGroup>
+</Menu>
+```
+
+`Menu` renders a `<nav>` landmark. Each `MenuItem` is polymorphic: pass `href` to render an `<a>`, omit it for a `<button>`, or pass `asChild` to project the styling onto a router link.
+
+## Variants
+
+### With icons and badges
+
+`MenuItem` accepts an `icon` (leading slot), `iconRight` (trailing slot), and `badge` (a small badge rendered just before the trailing icon).
+
+<LivePreview example="menu/with-icons" />
+
+### Groups and dividers
+
+Use `MenuGroup` to title a cluster of items and `MenuDivider` to break unrelated sections apart.
+
+<LivePreview example="menu/groups" />
+
+### Collapsible groups
+
+Pass `collapsible` to `MenuGroup` (with optional `defaultOpen`) to show a caret that toggles the group's visibility. Use `open` / `onOpenChange` for controlled mode.
+
+<LivePreview example="menu/collapsible" />
+
+### Indent levels and active state
+
+Use `indent={1 | 2 | 3}` to communicate hierarchy and `isActive` to mark the current page (sets `aria-current="page"` and a data flag for styling).
+
+<LivePreview example="menu/indented" />
+
+### Disabled item
+
+Pass `disabled` to prevent interaction. The item exposes `aria-disabled="true"` and skips the `href` redirect.
+
+<LivePreview example="menu/disabled" />
+
+## API
+
+<PropsTable component="Menu" />
+
+## Accessibility
+
+- The root renders as a `<nav>`; pass `aria-label` so the landmark is named for assistive tech.
+- Each non-collapsible `MenuGroup` carries `role="group"` and links to its visible label via `aria-labelledby`.
+- Collapsible groups use Cynosure's `Collapsible` (Radix-backed) so the trigger automatically gets `aria-expanded` / `aria-controls` wiring.
+- Active items announce themselves with `aria-current="page"`.
+- Disabled items set `aria-disabled="true"` whether they render as a `<button>` or an `<a>` (the `href` is suppressed when disabled).
+
+## Recipes
+
+- Pair with React Router or TanStack Router via `asChild` so item styling projects onto a router-aware `<Link>`.
+- Use `badge` for unread counts or status labels — the badge renders inside a `ghost` `neutral` Badge automatically.
+- Combine `collapsible` with `defaultOpen={false}` for rarely-used sections that should start hidden.
+- Indent step is `1rem` per level — three levels of hierarchy still read comfortably without becoming a tree.

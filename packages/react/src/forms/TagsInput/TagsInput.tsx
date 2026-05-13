@@ -21,26 +21,52 @@ import {
 import { controlSize, controlWrapperBase, controlWrapperVariant } from '../shared/control.css.js';
 import type { FormControlSize, FormControlVariant } from '../shared/types.js';
 
+/** Props for `<TagsInput>` — free-form tag entry. */
 export interface TagsInputProps {
+  /** Controlled list of tags. */
   value?: readonly string[];
+  /** Uncontrolled initial list of tags. */
   defaultValue?: readonly string[];
+  /** Fires with the next array on every commit / remove. */
   onValueChange?: (tags: string[]) => void;
-  /** Characters that commit the current token. Defaults to Enter + comma. */
+  /**
+   * Keys that commit the current draft token.
+   * @default ["Enter", ","]
+   */
   commitKeys?: readonly string[];
+  /**
+   * Placeholder rendered when no tags are present.
+   * @default "Add tag…"
+   */
   placeholder?: string;
+  /**
+   * Control size.
+   * @default "md"
+   */
   size?: FormControlSize;
+  /**
+   * Visual treatment.
+   * @default "outline"
+   */
   variant?: FormControlVariant;
+  /** Disables interaction. */
   disabled?: boolean;
+  /** Renders tags but blocks editing. */
   readOnly?: boolean;
+  /** Renders the invalid state. */
   invalid?: boolean;
-  /** Optional suggestions rendered as pre-chosen tags. */
+  /** Optional suggestions rendered as a `<datalist>` for the inline input. */
   suggestions?: readonly string[];
-  /** Disallow duplicate tags (case-sensitive). Defaults to `true`. */
+  /**
+   * Disallow duplicate tags (case-sensitive).
+   * @default true
+   */
   unique?: boolean;
   /** Hard cap on tag count. */
   maxTags?: number;
-  /** Custom renderer for each tag. */
+  /** Custom renderer for each tag. Receives the tag string, its index, and a `remove` callback. */
   renderTag?: (tag: string, index: number, remove: () => void) => ReactNode;
+  /** Accessible label for the inline input. */
   label?: string;
   'aria-label'?: string;
   id?: string;

@@ -5,10 +5,42 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
-import toIco from 'to-ico';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const read = (name) => readFileSync(join(here, name));
+
+// Encode an ICO from PNG buffers. ICO supports embedded PNGs natively; the
+// container is a 6-byte ICONDIR + N × 16-byte ICONDIRENTRY + concatenated
+// image data. Inlining this drops the `to-ico` → jimp → jpeg-js/url-regex/
+// minimist transitive chain (5 high-severity advisories at last audit).
+function pngsToIco(pngs) {
+  const headerSize = 6 + 16 * pngs.length;
+  const totalSize = pngs.reduce((sum, p) => sum + p.length, headerSize);
+  const buf = Buffer.alloc(totalSize);
+  buf.writeUInt16LE(0, 0); // reserved
+  buf.writeUInt16LE(1, 2); // type: 1 = icon
+  buf.writeUInt16LE(pngs.length, 4); // image count
+
+  let offset = headerSize;
+  for (let i = 0; i < pngs.length; i++) {
+    const png = pngs[i];
+    // Read width/height from the PNG IHDR chunk (bytes 16-23 are width+height as uint32 BE).
+    const w = png.readUInt32BE(16);
+    const h = png.readUInt32BE(20);
+    const entry = 6 + i * 16;
+    buf.writeUInt8(w >= 256 ? 0 : w, entry); // width (0 means 256)
+    buf.writeUInt8(h >= 256 ? 0 : h, entry + 1); // height
+    buf.writeUInt8(0, entry + 2); // colour palette
+    buf.writeUInt8(0, entry + 3); // reserved
+    buf.writeUInt16LE(1, entry + 4); // colour planes
+    buf.writeUInt16LE(32, entry + 6); // bits per pixel
+    buf.writeUInt32LE(png.length, entry + 8); // image size
+    buf.writeUInt32LE(offset, entry + 12); // image offset
+    png.copy(buf, offset);
+    offset += png.length;
+  }
+  return buf;
+}
 
 async function buildFavicon() {
   const svg = read('cynosure-mark-favicon.svg');
@@ -18,7 +50,7 @@ async function buildFavicon() {
       sharp(svg, { density: 384 }).resize(s, s, { kernel: 'lanczos3' }).png().toBuffer(),
     ),
   );
-  const ico = await toIco(pngs);
+  const ico = pngsToIco(pngs);
   writeFileSync(join(here, 'favicon.ico'), ico);
   console.log('wrote favicon.ico (16 + 32 + 48)');
 }

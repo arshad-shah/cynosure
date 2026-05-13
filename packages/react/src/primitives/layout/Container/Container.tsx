@@ -20,10 +20,15 @@ import {
 import { containerBase } from './Container.css.js';
 
 /**
+ * Container max-width preset.
+ */
+export type ContainerSize = 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'prose' | 'full';
+
+/**
  * Named container widths. Consumed via the `--cynosure-container-maxw-{bp}`
  * custom property chain so `size` can be responsive without switching classes.
  */
-const CONTAINER_MAX_WIDTHS = {
+const CONTAINER_MAX_WIDTHS: Record<ContainerSize, string> = {
   sm: '40rem', //  640px
   md: '48rem', //  768px
   lg: '64rem', // 1024px (default)
@@ -31,22 +36,41 @@ const CONTAINER_MAX_WIDTHS = {
   '2xl': '96rem', // 1536px
   prose: '65ch',
   full: '100%',
-} as const;
+};
 
-export type ContainerSize = keyof typeof CONTAINER_MAX_WIDTHS;
-
+/**
+ * Props specific to `Container`, layered on `LayoutProps` and `AsChildProps`.
+ */
 export interface ContainerOwnProps extends LayoutProps, AsChildProps {
+  /**
+   * Additional class names appended after Cynosure's base classes.
+   */
   className?: string;
+  /**
+   * Inline style overrides merged last.
+   */
   style?: CSSProperties;
+  /**
+   * Container content.
+   */
   children?: ReactNode;
   /**
-   * Max-width preset: `sm`, `md`, `lg` (default), `xl`, `2xl`, `prose` (65ch),
-   * `full`. Accepts a responsive object too — e.g. `size={{ base: 'sm', md: 'lg' }}`.
+   * Max-width preset: `sm` (40rem), `md` (48rem), `lg` (64rem), `xl` (80rem),
+   * `2xl` (96rem), `prose` (65ch), `full` (100%). Accepts a responsive object,
+   * e.g. `size={{ base: 'sm', md: 'lg' }}`.
+   * @default "lg"
    */
   size?: Responsive<ContainerSize>;
 }
 
+/**
+ * Full `Container` props. Generic over the rendered element.
+ */
 export type ContainerProps<E extends ElementType = 'div'> = ContainerOwnProps & {
+  /**
+   * Rendered intrinsic element or component.
+   * @default "div"
+   */
   as?: E;
 } & Omit<React.ComponentPropsWithoutRef<E>, keyof ContainerOwnProps | 'as'>;
 

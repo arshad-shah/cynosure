@@ -4,8 +4,9 @@ import { cn } from '../../utils/cn.js';
 import { linearProgressValue, linearProgressValueComplete } from './LinearProgress.css.js';
 import { useLinearProgressContext } from './LinearProgressContext.js';
 
+/** Props for the {@link LinearProgressValue} formatted readout. */
 export interface LinearProgressValueProps extends HTMLAttributes<HTMLSpanElement> {
-  /** Override the default formatted output. Receives `(value, max)`. */
+  /** Override the default formatted output. Receives `(value, max)` and wins over the root's `formatValue`. */
   format?: (value: number, max: number) => string;
 }
 

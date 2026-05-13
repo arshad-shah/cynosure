@@ -1,0 +1,131 @@
+# Manual / on-release publishing fallback.
+#
+# The day-to-day release flow lives in `release.yml`: push to `main`,
+# changesets opens the Version PR, merging it triggers `release.yml` which
+# bumps versions and runs `pnpm release`. This file is the escape-hatch for
+# the cases that flow doesn't cover:
+#
+#   1. A maintainer cuts a GitHub Release manually (out-of-band hotfix, a
+#      changeset that landed without auto-publish, etc.). The
+#      `release:published` event fires this workflow.
+#
+#   2. A maintainer needs to re-publish from a known-good `main` SHA (e.g.
+#      npm publish flaked, package was unpublished and needs to be put back).
+#      `workflow_dispatch` lets them target the affected registries.
+#
+# OIDC Trusted Publishing is assumed to be configured for `@arshad-shah/*`
+# on npmjs.com — no NPM_TOKEN secret needed. GitHub Packages auth uses the
+# job's GITHUB_TOKEN automatically.
+#
+# Security: every interpolation below is a constrained value (event name,
+# typed `choice` input, or a built-in secret). No free-form user content
+# (issue titles, commit messages, etc.) ever reaches a `run:` step, so
+# there's nothing for a command-injection payload to ride.
+name: Publish
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      registry:
+        description: Where to publish
+        required: true
+        default: npm
+        type: choice
+        options:
+          - npm
+          - github
+          - both
+
+permissions:
+  contents: read
+
+jobs:
+  publish-npm:
+    name: Publish to npm
+    runs-on: ubuntu-latest
+    # Re-use the same gated environment as the changeset-driven release so
+    # the manual path can't bypass the required reviewer.
+    environment: npm-publish
+    if: >-
+      ${{
+        github.event_name == 'release' ||
+        github.event.inputs.registry == 'npm' ||
+        github.event.inputs.registry == 'both'
+      }}
+    permissions:
+      contents: read
+      # OIDC token mint — required by Trusted Publishing and provenance.
+      id-token: write
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: pnpm/action-setup@f40ffcd9367d9f12939873eb1018b921a783ffaa # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+          cache: pnpm
+          registry-url: https://registry.npmjs.org
+
+      # Trusted Publishing requires npm >= 11.5.1. Node 22 ships npm 10.
+      # Pinned (not @latest) so a bad npm release can't break our publish
+      # path — bump deliberately. Same version `release.yml` uses.
+      - name: Upgrade npm for Trusted Publishing
+        run: npm install -g npm@11.5.2
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+
+      # Gate the publish on the same validations the day-to-day release
+      # runs. `--no-git-checks` because we publish from the release tag,
+      # which is detached HEAD.
+      - run: pnpm typecheck
+      - run: pnpm test
+      - name: publint
+        run: |
+          pnpm exec publint packages/react --level warning
+          pnpm exec publint packages/themes --level warning
+      - name: attw
+        run: |
+          pnpm exec attw --pack packages/react --ignore-rules cjs-resolves-to-esm
+          pnpm exec attw --pack packages/themes --ignore-rules cjs-resolves-to-esm
+
+      - name: Publish public packages
+        # `pnpm publish -r` walks every workspace package that's not
+        # marked `private: true`, skipping ones whose version already
+        # exists on the registry — safe to re-run.
+        run: pnpm publish -r --access public --no-git-checks
+        env:
+          NPM_CONFIG_PROVENANCE: 'true'
+
+  publish-github-packages:
+    name: Publish to GitHub Packages
+    runs-on: ubuntu-latest
+    if: >-
+      ${{
+        github.event.inputs.registry == 'github' ||
+        github.event.inputs.registry == 'both'
+      }}
+    permissions:
+      contents: read
+      # Required to publish to npm.pkg.github.com.
+      packages: write
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: pnpm/action-setup@f40ffcd9367d9f12939873eb1018b921a783ffaa # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 22
+          cache: pnpm
+          registry-url: https://npm.pkg.github.com
+          scope: '@arshad-shah'
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - run: pnpm typecheck
+      - run: pnpm test
+
+      - name: Publish to GitHub Packages
+        run: pnpm publish -r --no-git-checks --access public --registry https://npm.pkg.github.com
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

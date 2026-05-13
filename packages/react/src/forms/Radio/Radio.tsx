@@ -4,13 +4,24 @@ import { cn } from '../../utils/cn.js';
 import type { FormControlSize } from '../shared/types.js';
 import { radioIndicator, radioLabel, radioRoot, radioSize } from './Radio.css.js';
 
+/** Props for `<Radio>`. Must be rendered inside `<RadioGroup>`. */
 export interface RadioProps {
+  /** Submitted value when this radio is selected. */
   value: string;
+  /** Disables only this radio. To disable the whole group, set `disabled` on `<RadioGroup>`. */
   disabled?: boolean;
+  /** Marks the field as required for form submission. */
   required?: boolean;
+  /** Element id — auto-generated when omitted. */
   id?: string;
+  /**
+   * Control size.
+   * @default "md"
+   */
   size?: FormControlSize;
+  /** Renders the invalid state and sets `aria-invalid`. */
   invalid?: boolean;
+  /** Optional label content — when provided, the radio renders inside a `<label>`. */
   children?: ReactNode;
   className?: string;
 }

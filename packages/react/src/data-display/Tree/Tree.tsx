@@ -17,22 +17,35 @@ import { treeGroup, treeItem, treeLabel, treeLeaf, treeRoot, treeRow } from './T
 
 export type TreeSelectionMode = 'none' | 'single' | 'multiple';
 
+/** Minimum shape of an item in a {@link Tree}. Extra keys are preserved and forwarded to the render prop. */
 export interface TreeNode {
+  /** Stable unique identifier — used as the React key and the selection/expansion key. */
   id: string;
+  /** Default rendered label when no `children` render prop is supplied. */
   label?: ReactNode;
+  /** Nested child nodes. Presence (length > 0) toggles the expander affordance. */
   children?: TreeNode[];
+  /** Disables click/keyboard interaction for this node and skips it from selection. */
   disabled?: boolean;
+  /** Optional leading glyph rendered next to the label (custom render only). */
   icon?: ReactNode;
   /** Arbitrary data payload, accessible via the render prop. */
   [key: string]: unknown;
 }
 
+/** Context passed to a {@link TreeRenderItem} for each node. */
 export interface TreeRenderContext<T extends TreeNode = TreeNode> {
+  /** The node being rendered. */
   item: T;
+  /** 0-based depth in the tree (root nodes are `0`). */
   depth: number;
+  /** Whether this node is currently expanded. */
   expanded: boolean;
+  /** Whether this node is currently selected. */
   selected: boolean;
+  /** Whether this node has roving-tabindex focus. */
   focused: boolean;
+  /** Whether the node is non-interactive. */
   disabled: boolean;
 }
 
@@ -40,19 +53,41 @@ export type TreeRenderItem<T extends TreeNode = TreeNode> = (
   ctx: TreeRenderContext<T>,
 ) => ReactNode;
 
+/** Props for the {@link Tree}. `T` is the concrete node type extending {@link TreeNode}. */
 export interface TreeProps<T extends TreeNode = TreeNode>
   extends Omit<HTMLAttributes<HTMLUListElement>, 'onSelect' | 'children'> {
+  /** Root nodes. Each may carry its own `children` for nesting. */
   items: T[];
+  /** Controlled set of expanded node ids. Omit with `defaultExpandedIds` for uncontrolled. */
   expandedIds?: string[];
+  /**
+   * Initial expanded node ids when uncontrolled.
+   * @default []
+   */
   defaultExpandedIds?: string[];
+  /** Fires whenever the expanded set changes (either mode). */
   onExpandedChange?: (ids: string[]) => void;
+  /** Controlled set of selected node ids. */
   selectedIds?: string[];
+  /**
+   * Initial selected node ids when uncontrolled.
+   * @default []
+   */
   defaultSelectedIds?: string[];
+  /** Fires whenever the selection changes. */
   onSelectionChange?: (ids: string[]) => void;
+  /**
+   * Selection behaviour: `none` disables selection; `single` keeps a single
+   * selected id; `multiple` toggles ids on ctrl/meta-click and exposes
+   * `aria-multiselectable`.
+   * @default "none"
+   */
   selectionMode?: TreeSelectionMode;
   /** Render each item. Receives the node + contextual flags. */
   children?: TreeRenderItem<T>;
+  /** Accessible label for the `role="tree"` host. */
   'aria-label'?: string;
+  /** id of a labelling element — alternative to `aria-label`. */
   'aria-labelledby'?: string;
 }
 
@@ -99,6 +134,16 @@ function collectIds<T extends TreeNode>(items: T[]): string[] {
   return result;
 }
 
+/**
+ * Tree renders a nested ARIA-compliant `role="tree"` widget with roving
+ * tabindex. Selection and expansion can be controlled or uncontrolled. The
+ * full WAI-ARIA APG keyboard map is implemented: Up/Down walk visible rows,
+ * Right expands (or moves into a child), Left collapses (or moves to the
+ * parent), Home/End jump to the first/last visible row, Enter/Space toggles
+ * expansion + selection, `*` expands all sibling branches at the current
+ * depth. The component is virtualisation-free — every visible row is in the
+ * DOM, so very large trees should be pre-pruned by the caller.
+ */
 export function Tree<T extends TreeNode = TreeNode>(props: TreeProps<T>): ReactElement {
   const {
     items,
@@ -340,7 +385,9 @@ export function Tree<T extends TreeNode = TreeNode>(props: TreeProps<T>): ReactE
  * `<Tree>` is the source of truth; these exist so consumers can restructure
  * their custom node content clearly.
  */
+/** Props for the passthrough {@link TreeItem} wrapper used inside the render prop. */
 export interface TreeItemProps extends HTMLAttributes<HTMLDivElement> {}
+/** Thin passthrough `<div>` for structuring custom node content rendered via {@link TreeProps.children}. */
 export const TreeItem = forwardRef<HTMLDivElement, TreeItemProps>(function TreeItem(
   { className, ...rest },
   ref,
@@ -348,10 +395,14 @@ export const TreeItem = forwardRef<HTMLDivElement, TreeItemProps>(function TreeI
   return <div ref={ref} className={className} {...rest} />;
 });
 
+/** Props for {@link TreeItemLabel} — the styled label slot for custom node content. */
 export interface TreeItemLabelProps extends HTMLAttributes<HTMLSpanElement> {
+  /** Depth hint for indentation-aware custom styling (positional only; passed through). */
   depth?: number;
+  /** Leading glyph rendered before the label. */
   icon?: ReactNode;
 }
+/** Styled label slot for use inside a {@link TreeProps.children} render function. */
 export const TreeItemLabel = forwardRef<HTMLSpanElement, TreeItemLabelProps>(function TreeItemLabel(
   { className, icon, children, ...rest },
   ref,

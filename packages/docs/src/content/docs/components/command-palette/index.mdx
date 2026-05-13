@@ -1,0 +1,96 @@
+---
+title: CommandPalette
+description: A keyboard-first command launcher (Cmd/Ctrl-K) for searching and running actions across the app.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Powered by cmdk; the dialog-hosted CommandMenu uses role="dialog" with an sr-only title; ArrowUp / ArrowDown navigate items; Enter runs the focused item; Esc closes.
+bundleSize: "—"
+tags: [overlay, search, command, accessible]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+import StatusBadge from '@/components/StatusBadge.astro';
+import BundleSizePill from '@/components/BundleSizePill.astro';
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="CommandPalette" /></div>
+
+<LivePreview example="command-palette/basic" />
+
+## Usage
+
+`CommandPalette` is the raw cmdk surface. For the common case — a dialog that opens on Cmd/Ctrl-K — drop in the pre-wired `CommandMenu`.
+
+```tsx
+import {
+  Button,
+  CommandEmpty,
+  CommandFooter,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandMenu,
+  CommandSeparator,
+} from "@arshad-shah/cynosure-react";
+import { useState } from "react";
+
+function App() {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <Button onClick={() => setOpen(true)}>Open palette</Button>
+      <CommandMenu open={open} onOpenChange={setOpen}>
+        <CommandInput />
+        <CommandList>
+          <CommandEmpty />
+          <CommandGroup heading="Actions">
+            <CommandItem onSelect={() => setOpen(false)}>Save</CommandItem>
+            <CommandItem onSelect={() => setOpen(false)}>Settings</CommandItem>
+          </CommandGroup>
+        </CommandList>
+        <CommandFooter />
+      </CommandMenu>
+    </>
+  );
+}
+```
+
+## Variants
+
+### Grouped with shortcuts
+
+Use `CommandGroup heading="…"` to label sections and `shortcut="⌘K"` on items to render Kbd chips on the right.
+
+<LivePreview example="command-palette/grouped" />
+
+### With icons and descriptions
+
+`CommandItem` accepts an `icon` slot and a `description` line shown under the label.
+
+<LivePreview example="command-palette/with-icons" />
+
+### Cmd/Ctrl-K shortcut
+
+`CommandMenu` registers a global Cmd/Ctrl-K listener while mounted. Press the keys to toggle.
+
+<LivePreview example="command-palette/keyboard" />
+
+## API
+
+<PropsTable component="CommandPalette" />
+
+## Accessibility
+
+- The dialog-hosted `CommandMenu` renders a screen-reader-only title via Radix Dialog for an accessible name.
+- ArrowUp / ArrowDown move focus through visible items; `Home` / `End` jump to the first / last.
+- `Enter` activates the focused item via its `onSelect` handler; `Esc` closes the dialog and returns focus to the trigger.
+- `CommandInput` is the only focusable text input — typing filters items by label and `keywords`.
+- The `CommandFooter` hints (`↵ select`, `Esc close`) are decorative; they do not steal keyboard focus.
+
+## Recipes
+
+- Pass `keywords={["new", "create"]}` on `CommandItem` to widen what the filter matches without changing the label.
+- Use `shouldFilter={false}` on `CommandMenu` when you fetch results asynchronously, and render `<CommandLoading />` while pending.
+- Group destructive items at the bottom under a separate `CommandGroup heading="Danger"` so they are never the first match.
+- Pair with `Kbd` in your own onboarding copy ("Press ⌘K to search") so the affordance is discoverable.

@@ -10,6 +10,7 @@ import {
   useEffect,
   useState,
 } from 'react';
+import { Kbd } from '../../typography/Kbd/Kbd.js';
 import { cn } from '../../utils/cn.js';
 import { overlayBackdrop } from '../shared/overlay.css.js';
 import {
@@ -29,7 +30,6 @@ import {
   paletteItemLabel,
   paletteItemShortcut,
   paletteKbdHint,
-  paletteKeyCap,
   paletteList,
   paletteLoading,
   paletteSeparator,
@@ -50,15 +50,30 @@ export const CommandPalette = CommandPrimitive as typeof CommandPrimitive & {
 };
 CommandPalette.displayName = 'CommandPalette';
 
+/**
+ * Props for the palette root. Forwards every prop accepted by `cmdk`'s
+ * `Command` (controlled value, `shouldFilter`, `label`, `loop`, etc.).
+ */
 export type CommandPaletteProps = ComponentPropsWithoutRef<typeof CommandPrimitive>;
 
+/**
+ * Props for the palette's search input row — owns the leading icon and the
+ * trailing kbd hint chip in addition to the underlying cmdk input.
+ */
 export interface CommandInputProps
   extends Omit<ComponentPropsWithoutRef<typeof CommandPrimitive.Input>, 'value'> {
   /** Controlled search value. */
   value?: string;
-  /** Leading icon slot — defaults to a Lucide search glyph. */
+  /**
+   * Leading icon slot. Falls back to a Lucide search glyph; pass any
+   * `ReactNode` to swap it.
+   */
   leading?: ReactNode;
-  /** Right-hand chip — defaults to an `Esc` hint. Pass `null` to hide. */
+  /**
+   * Right-hand chip. Defaults to the `"Esc"` keyboard hint; pass `null` to
+   * hide the chip entirely.
+   * @default "Esc"
+   */
   hint?: ReactNode;
 }
 
@@ -107,9 +122,17 @@ export const CommandEmpty = forwardRef<
   );
 });
 
+/**
+ * Props for the in-list loading row shown while async results are being
+ * fetched (typically paired with `shouldFilter={false}` on the palette).
+ */
 export interface CommandLoadingProps
   extends ComponentPropsWithoutRef<typeof CommandPrimitive.Loading> {
-  /** Visible text shown next to the spinner. Defaults to `"Loading…"`. */
+  /**
+   * Visible text shown next to the spinner. Doubles as the `aria-label`
+   * when no explicit `label` prop is passed.
+   * @default "Loading…"
+   */
   text?: ReactNode;
 }
 
@@ -162,12 +185,19 @@ export const CommandSeparator = forwardRef<
   );
 });
 
+/**
+ * Props for a selectable palette row. Forwards `value`, `keywords`,
+ * `disabled`, and `onSelect` to the underlying cmdk item.
+ */
 export interface CommandItemProps extends ComponentPropsWithoutRef<typeof CommandPrimitive.Item> {
   /** Leading icon slot. Optional — pass a Lucide icon or any node. */
   icon?: ReactNode;
-  /** Subtext shown under the label. */
+  /** Subtext shown beneath the label. Optional. */
   description?: ReactNode;
-  /** Right-aligned shortcut. Accepts a string ("⌘K", "Ctrl+Shift+P") or JSX. */
+  /**
+   * Right-aligned shortcut affordance. Accepts a string like `"⌘K"` /
+   * `"Ctrl+Shift+P"` (split into `<Kbd>` chips) or arbitrary JSX.
+   */
   shortcut?: ReactNode;
 }
 
@@ -202,8 +232,16 @@ export const CommandItem = forwardRef<ElementRef<typeof CommandPrimitive.Item>, 
   },
 );
 
+/**
+ * Props for the kbd-chip renderer used inside `CommandItem.shortcut` (and
+ * usable standalone).
+ */
 export interface CommandShortcutProps extends HTMLAttributes<HTMLSpanElement> {
-  /** Pass a string like "⌘K" or "Ctrl+Shift+P" — splits on `+` and renders each as a kbd. */
+  /**
+   * Pass a string like `"⌘K"` or `"Ctrl+Shift+P"` — split on `+` / whitespace
+   * and rendered as a series of `<Kbd>` chips. JSX children are rendered
+   * untouched.
+   */
   children?: ReactNode;
 }
 
@@ -219,7 +257,10 @@ export function CommandShortcut({ children, className, ...rest }: CommandShortcu
       </span>
     );
   }
-  const keys = children.split(/\s*\+\s*|\s+/).filter(Boolean);
+  // Split on any run of whitespace and/or `+` characters. A single character
+  // class with `+` quantifier is linear-time, avoiding the polynomial
+  // back-tracking of the previous `\s*\+\s*|\s+` alternation (CodeQL #260).
+  const keys = children.split(/[\s+]+/).filter(Boolean);
   // Duplicate keys (e.g. "⌘ ⌘") are exceedingly rare in real shortcuts; track
   // occurrences so we can build a stable key without leaning on index position.
   const seen = new Map<string, number>();
@@ -229,15 +270,19 @@ export function CommandShortcut({ children, className, ...rest }: CommandShortcu
         const n = seen.get(k) ?? 0;
         seen.set(k, n + 1);
         return (
-          <kbd key={n === 0 ? k : `${k}#${n}`} className={paletteKeyCap}>
+          <Kbd key={n === 0 ? k : `${k}#${n}`} size="sm">
             {k}
-          </kbd>
+          </Kbd>
         );
       })}
     </span>
   );
 }
 
+/**
+ * Props for the sticky footer hint row. Inherits all standard `<div>`
+ * attributes; pass `children` to replace the default `↵ / ↑↓ / Esc` hints.
+ */
 export interface CommandFooterProps extends HTMLAttributes<HTMLDivElement> {}
 
 /** Sticky bottom hints row — the `↵ select` / `Esc close` affordances. */
@@ -248,15 +293,15 @@ export function CommandFooter({ className, children, ...rest }: CommandFooterPro
         <>
           <span className={paletteFooterHints}>
             <span className={paletteFooterHint}>
-              <kbd className={paletteKeyCap}>↵</kbd> select
+              <Kbd size="sm">↵</Kbd> select
             </span>
             <span className={paletteFooterHint}>
-              <kbd className={paletteKeyCap}>↑</kbd>
-              <kbd className={paletteKeyCap}>↓</kbd> navigate
+              <Kbd size="sm">↑</Kbd>
+              <Kbd size="sm">↓</Kbd> navigate
             </span>
           </span>
           <span className={paletteFooterHint}>
-            <kbd className={paletteKeyCap}>Esc</kbd> close
+            <Kbd size="sm">Esc</Kbd> close
           </span>
         </>
       )}
@@ -268,16 +313,27 @@ export function CommandFooter({ className, children, ...rest }: CommandFooterPro
 /*  Dialog-hosted shortcut — the common case                           */
 /* ------------------------------------------------------------------ */
 
+/**
+ * Props for the pre-wired `CommandMenu` — a Radix Dialog hosting a
+ * `CommandPalette`, opened by ⌘K / Ctrl+K when uncontrolled.
+ */
 export interface CommandMenuProps extends CommandPaletteProps {
-  /** Controlled open state. */
+  /**
+   * Controlled open state. Pair with `onOpenChange` for controlled mode;
+   * omit for uncontrolled (toggled by ⌘K / Ctrl+K).
+   */
   open?: boolean;
   /** Change handler for the dialog open state. */
   onOpenChange?: (open: boolean) => void;
-  /** Optional trigger — e.g. a button that opens the palette. */
+  /** Optional trigger element — e.g. a button that opens the palette. */
   trigger?: ReactNode;
-  /** Portal target. */
+  /** Portal target. Forwarded to Radix's `Portal`. */
   container?: HTMLElement | (() => HTMLElement);
-  /** Accessible label for screen readers. Default `"Command menu"`. */
+  /**
+   * Accessible label for the dialog and the underlying cmdk palette.
+   * Announced by screen readers when the palette opens.
+   * @default "Command menu"
+   */
   label?: string;
 }
 

@@ -7,6 +7,89 @@ category: changelog
 
 # @arshad-shah/cynosure-react
 
+## 2.1.0
+
+### Minor Changes
+
+- [#43](https://github.com/arshad-shah/cynosure/pull/43) [`8cf2f7d`](https://github.com/arshad-shah/cynosure/commit/8cf2f7dcbe9be3e0fd20b73b588b1cb8fe506b64) Thanks [@arshad-shah](https://github.com/arshad-shah)! - Add four new components and dedupe existing code to reuse them.
+
+  **New components**
+  - `Calendar` / `RangeCalendar` (`@arshad-shah/cynosure-react/calendar`) — standalone
+    date grids built on React Aria. One-month or two-month layouts, an optional
+    `footer` slot for things like "Go to today" or keyboard hints, and the same
+    styling language as the pickers.
+  - `CommandPalette` + `CommandMenu` (`@arshad-shah/cynosure-react/command-palette`) —
+    ⌘K surface powered by `cmdk`. Composable parts (`CommandInput`, `CommandList`,
+    `CommandEmpty`, `CommandLoading`, `CommandGroup`, `CommandSeparator`,
+    `CommandItem` with `icon`/`description`/`shortcut`, `CommandShortcut`,
+    `CommandFooter`), plus a pre-wired `CommandMenu` that binds ⌘K/Ctrl+K out of
+    the box for the common dev-tooling case.
+  - `Carousel` (`@arshad-shah/cynosure-react/carousel`) — Embla wrapper with
+    `CarouselViewport`, `CarouselContainer`, `CarouselSlide`, `CarouselPrevious`,
+    `CarouselNext`, and `CarouselDots`. Responsive `slidesPerView`, horizontal or
+    vertical orientation, loop, keyboard nav, and drag-to-scroll.
+  - Chart primitives (`@arshad-shah/cynosure-react/chart`) — `ChartContainer`,
+    `ChartTooltip`/`ChartTooltipContent`, `ChartLegend`/`ChartLegendContent`, and
+    a `chartSeriesProps(config, key)` helper over Recharts. Series config drives
+    tooltip + legend labels and colours; themed SVG defaults (grid, axis, tick,
+    label, cursor) applied via CSS variables. Exported via the `/chart` subpath
+    only (like `CodeBlock` with Shiki) so Recharts stays out of the default
+    bundle graph.
+
+  **Dedupe**
+  - `DatePicker` and `DateRangePicker` now reuse `<Calendar>` / `<RangeCalendar>`
+    instead of open-coding `AriaCalendarGrid` + headers. The shared Calendar
+    stylesheet is the single source of truth for day cells, month grids, and the
+    dual-month layout.
+
+  **Dependencies (catalog)**
+  - `cmdk@1.1.1`, `embla-carousel-react@8.6.0`, `recharts@3.8.1` — all listed as
+    externals so tree-shakers keep them off the critical path unless the relevant
+    component is actually imported.
+
+## 2.0.0
+
+### Major Changes
+
+- [#41](https://github.com/arshad-shah/cynosure/pull/41) [`66f58c9`](https://github.com/arshad-shah/cynosure/commit/66f58c97f73a50fe2b60c895846453c2c3de7725) Thanks [@arshad-shah](https://github.com/arshad-shah)! - **Breaking:** `Progress` → `LinearProgress`, `ProgressCircle` → `CircularProgress`.
+
+  Both components are now split into their own folders with compound primitives
+  (`LinearProgressRoot` / `Track` / `Indicator` / `Buffer` / `Segment` / `Header` /
+  `Label` / `Meta` / `Value`, and `CircularProgressRoot` / `Track` / `Indicator` /
+  `Label`). The top-level convenience wrappers still cover the common case with
+  flat props.
+
+  New capabilities on `LinearProgress`:
+  - `buffer` — YouTube-style preload indicator behind the main bar
+  - `segments` — stacked multi-value bar
+  - `label` + `meta` — upload-style header row above the track
+  - Auto-detected completion state at 100% (opt out with `completionState="none"`)
+  - `variant="ticked"` — opt-in punch-card tick motif
+  - Richer two-bar indeterminate motion (MUI pattern) by default
+
+  Aesthetic: both components now render as "punched" wells matching the form
+  controls' look — deeper recessed track + gradient indicator with subtle glow.
+
+  Subpath exports have moved too:
+  - `@arshad-shah/cynosure-react/progress` → `@arshad-shah/cynosure-react/linear-progress`
+    and `@arshad-shah/cynosure-react/circular-progress`
+
+  **Migration:**
+
+  ```diff
+  - import { Progress, ProgressCircle } from '@arshad-shah/cynosure-react';
+  + import { LinearProgress, CircularProgress } from '@arshad-shah/cynosure-react';
+
+  - <Progress value={60} label="Uploading" />
+  + <LinearProgress value={60} label="Uploading" aria-label="Uploading" />
+
+  - <Progress striped animated />   // removed — replaced by the default gradient/glow treatment
+  + <LinearProgress value={60} />
+
+  - <ProgressCircle value={75} label="Loading" />
+  + <CircularProgress value={75} aria-label="Loading" />
+  ```
+
 ## 1.1.0
 
 ### Minor Changes

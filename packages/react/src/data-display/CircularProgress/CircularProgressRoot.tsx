@@ -19,17 +19,48 @@ import {
 const FIXED_RADIUS = 16;
 const FIXED_CIRCUMFERENCE = 2 * Math.PI * FIXED_RADIUS;
 
+/** Props for the {@link CircularProgressRoot} compound primitive that owns ring state and context. */
 export interface CircularProgressRootProps extends Omit<HTMLAttributes<HTMLDivElement>, 'role'> {
+  /**
+   * Current progress value (clamped between 0 and `max`).
+   * @default 0
+   */
   value?: number;
+  /**
+   * Upper bound used for the value/percentage calculations.
+   * @default 100
+   */
   max?: number;
+  /**
+   * Size token applied to the wrapper.
+   * @default "md"
+   */
   size?: CircularProgressSize;
+  /**
+   * Colour role for the indicator stroke.
+   * @default "accent"
+   */
   colorScheme?: CircularProgressColorScheme;
-  /** Ring stroke-width (SVG units). Default `4`. */
+  /**
+   * Ring stroke-width (SVG units).
+   * @default 4
+   */
   thickness?: number;
+  /**
+   * Switches into looping spinner mode; `aria-valuenow` is omitted.
+   * @default false
+   */
   indeterminate?: boolean;
+  /**
+   * `auto` flips to success once `value >= max`; `error` forces danger styling.
+   * @default "auto"
+   */
   completionState?: CircularProgressCompletionState;
+  /** Sub-primitives ({@link CircularProgressTrack}, {@link CircularProgressIndicator}, …). */
   children?: ReactNode;
+  /** Additional class applied to the root element. */
   className?: string;
+  /** Additional inline styles merged onto the root. */
   style?: CSSProperties;
 }
 

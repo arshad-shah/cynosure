@@ -26,7 +26,9 @@ export const listBase = style([
   layoutPropsStyle,
   typographyBase,
   {
-    display: 'flex',
+    // See `Flex.css.ts` — drive display through layoutPropsStyle's var so it
+    // survives duplicated emissions later in the bundled stylesheet.
+    vars: { '--cynosure-lp-d-base': 'flex' },
     flexDirection: 'column',
     paddingInlineStart: '1.25em',
     margin: 0,
@@ -62,7 +64,8 @@ export const descriptionListBase = style([
   layoutPropsStyle,
   typographyBase,
   {
-    display: 'grid',
+    // See `Flex.css.ts` for the rationale on driving display via the var.
+    vars: { '--cynosure-lp-d-base': 'grid' },
     gridTemplateColumns: 'auto 1fr',
     rowGap: 'var(--cynosure-list-spacing-base)',
     columnGap: 'var(--cynosure-space-4)',

@@ -18,17 +18,49 @@ import {
 } from './Sidebar.css.js';
 import { useSidebar } from './context.js';
 
+/**
+ * Props for a single navigation entry inside a Sidebar.
+ */
 export interface SidebarItemProps extends HTMLAttributes<HTMLElement> {
+  /** Leading-slot icon (typically a Lucide glyph). */
   icon?: ReactNode;
+  /** Visible label. Falls back to `children` if omitted. */
   label?: ReactNode;
+  /** Trailing badge (number / dot indicator). */
   badge?: ReactNode;
+  /**
+   * Mark the item as the current page. Sets `aria-current="page"` plus a
+   * `data-active="true"` styling hook.
+   * @default false
+   */
   isActive?: boolean;
+  /**
+   * Disable interaction. Sets `aria-disabled` and (for the `<button>`
+   * variant) the native `disabled` attribute.
+   * @default false
+   */
   disabled?: boolean;
+  /**
+   * Project the item chrome onto a consumer element (e.g. a router
+   * `<Link>`) via `Slot`.
+   * @default false
+   */
   asChild?: boolean;
-  /** Override or disable the auto-tooltip shown when the rail is collapsed. */
+  /**
+   * Override or disable the auto-tooltip shown when the rail is collapsed
+   * to icon-only mode. Pass `false` to suppress entirely; otherwise the
+   * tooltip falls back to `label`.
+   */
   tooltip?: ReactNode | false;
 }
 
+/**
+ * Single navigation entry inside a Sidebar. Renders a `<button>` (or
+ * projects onto a consumer element via `asChild`). When the sidebar is
+ * collapsed to an icon-only rail the label is replaced by an auto-mounted
+ * `Tooltip` on the opposite side, so the affordance stays discoverable
+ * for both pointer and keyboard users.
+ */
 export const SidebarItem = forwardRef<HTMLElement, SidebarItemProps>(function SidebarItem(
   {
     icon,

@@ -1,0 +1,80 @@
+---
+title: IconButton
+description: Square, icon-only button built on Button; takes an icon node and a required label that's applied as aria-label and enforces type="button" by default.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Requires a string label which is applied as aria-label; the icon child should be aria-hidden so screen readers only announce the label.
+bundleSize: "—"
+tags: [forms, button]
+---
+import LivePreview from "@/components/LivePreview/LivePreview.astro";
+import PropsTable from "@/components/PropsTable.astro";
+import StatusBadge from "@/components/StatusBadge.astro";
+import BundleSizePill from "@/components/BundleSizePill.astro";
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="IconButton" /></div>
+
+<LivePreview example="icon-button/basic" />
+
+## Usage
+
+```tsx
+import { IconButton } from "@arshad-shah/cynosure-react";
+
+<IconButton
+  label="Close"
+  icon={
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <line x1="18" y1="6" x2="6" y2="18" />
+      <line x1="6" y1="6" x2="18" y2="18" />
+    </svg>
+  }
+/>
+```
+
+## Variants
+
+`solid`, `soft`, `outline`, `ghost`, and `link` mirror the Button variants. `bare` opts out of the Button recipe entirely and renders a plain `<button>` — useful for close buttons on dialogs that own their own styling.
+
+<LivePreview example="icon-button/variants" />
+
+## Sizes
+
+`xs`, `sm`, `md` (default), `lg`, and `xl`.
+
+<LivePreview example="icon-button/sizes" />
+
+## Color schemes
+
+Pair `variant` with `colorScheme` (`accent`, `neutral`, `success`, `warning`, `danger`).
+
+<LivePreview example="icon-button/color-schemes" />
+
+## Shape
+
+`shape` defaults to `square` for IconButton — set `shape="pill"` for a circular icon button.
+
+<LivePreview example="icon-button/shape" />
+
+## Disabled
+
+<LivePreview example="icon-button/disabled" />
+
+## API
+
+<PropsTable component="IconButton" />
+
+## Accessibility
+
+- `label` is required and forwarded as `aria-label` — there is no visible text content, so the label is the control's accessible name.
+- The component enforces `type="button"` by default to prevent accidental form submission.
+- Mark the inner SVG `aria-hidden="true"` so screen readers don't announce a duplicate of the label.
+- `shape` defaults to `square`; the underlying Button still keeps a comfortable hit target at every size.
+- Pair with a `Tooltip` to surface the label on hover for sighted users while keeping it announced to assistive tech.
+
+## Recipes
+
+- Use `variant="bare"` for close / clear buttons inside dialogs and inputs where a parent recipe owns the styling.
+- Match the SVG stroke to `currentColor` so the icon picks up the button's contextual colour.
+- Drop `IconButton`s into a `ButtonGroup` for compact toolbars — variant and size flow through the group context.

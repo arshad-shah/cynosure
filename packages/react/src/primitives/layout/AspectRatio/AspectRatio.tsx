@@ -17,15 +17,37 @@ import {
 } from '../shared/index.js';
 import { aspectRatio } from './AspectRatio.css.js';
 
+/**
+ * Props specific to `AspectRatio`, layered on `LayoutProps` and `AsChildProps`.
+ */
 export interface AspectRatioOwnProps extends LayoutProps, AsChildProps {
+  /**
+   * Additional class names appended after Cynosure's base classes.
+   */
   className?: string;
+  /**
+   * Inline style overrides merged last.
+   */
   style?: CSSProperties;
+  /**
+   * Single child whose box is constrained to `ratio`.
+   */
   children?: ReactNode;
-  /** Ratio as a number (`16/9`) or a string (`"16 / 9"`). Defaults to `1`. */
+  /**
+   * Aspect ratio. Accepts a number (`16/9`) or a string (`"16 / 9"`).
+   * @default 1
+   */
   ratio?: number | string;
 }
 
+/**
+ * Full `AspectRatio` props. Generic over the rendered element.
+ */
 export type AspectRatioProps<E extends ElementType = 'div'> = AspectRatioOwnProps & {
+  /**
+   * Rendered intrinsic element or component.
+   * @default "div"
+   */
   as?: E;
 } & Omit<React.ComponentPropsWithoutRef<E>, keyof AspectRatioOwnProps | 'as'>;
 

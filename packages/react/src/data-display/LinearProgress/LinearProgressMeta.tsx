@@ -2,7 +2,9 @@ import type { HTMLAttributes, ReactElement, ReactNode } from 'react';
 import { cn } from '../../utils/cn.js';
 import { linearProgressMeta } from './LinearProgress.css.js';
 
+/** Props for the {@link LinearProgressMeta} trailing text. */
 export interface LinearProgressMetaProps extends HTMLAttributes<HTMLSpanElement> {
+  /** Meta content — typically a short throughput / ETA / counter string. */
   children?: ReactNode;
 }
 

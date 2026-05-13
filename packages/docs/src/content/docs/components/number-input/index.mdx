@@ -1,0 +1,71 @@
+---
+title: NumberInput
+description: Numeric input with stepper buttons; locale-aware parsing via React Aria's NumberField.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Built on React Aria NumberField — keyboard support for ↑/↓, PageUp/PageDown, Home/End and wheel; min/max are announced.
+bundleSize: "—"
+tags: [forms, input]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+import StatusBadge from '@/components/StatusBadge.astro';
+import BundleSizePill from '@/components/BundleSizePill.astro';
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="NumberInput" /></div>
+
+<LivePreview example="number-input/basic" />
+
+## Usage
+
+```tsx
+import { NumberInput } from "@arshad-shah/cynosure-react";
+
+<NumberInput aria-label="Quantity" defaultValue={1} minValue={0} maxValue={10} />
+```
+
+## Sizes
+
+Three sizes are available: `sm`, `md` (default), and `lg`.
+
+<LivePreview example="number-input/sizes" />
+
+## Range and step
+
+Use `minValue`, `maxValue`, and `step` to constrain the input. Stepper buttons disable at bounds.
+
+<LivePreview example="number-input/range" />
+
+## Prefix and suffix
+
+Use `prefix` and `suffix` to inline currency, units, or other muted affixes.
+
+<LivePreview example="number-input/affix" />
+
+## Formatting
+
+Pass `formatOptions` (forwarded to React Aria) to render currency, percent, or a fixed precision.
+
+<LivePreview example="number-input/format" />
+
+## States
+
+<LivePreview example="number-input/states" />
+
+## API
+
+<PropsTable component="NumberInput" />
+
+## Accessibility
+
+- Built on React Aria `NumberField` — values are parsed locale-correctly and clamped to `minValue`/`maxValue`.
+- Keyboard: `ArrowUp`/`ArrowDown` step, `PageUp`/`PageDown` step by a larger amount, `Home`/`End` jump to bounds.
+- The stepper container is `aria-hidden`; each button still exposes a localized label (`incrementLabel` / `decrementLabel`).
+- `aria-invalid` is mirrored from `invalid` (or `isInvalid`) on the underlying input.
+
+## Recipes
+
+- Use `formatOptions={{ style: "currency", currency: "USD" }}` for money fields — React Aria handles parsing and display.
+- Pass `step` together with `minValue`/`maxValue` to bound the field and ensure the steppers disable at the bounds.
+- Provide `incrementLabel`/`decrementLabel` to localize the stepper announcement.

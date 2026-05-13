@@ -26,6 +26,7 @@ const NON_COMPONENT_KEYS = new Set([
   './package.json',
   './styles.css',
   './all.css',
+  './fonts.css',
   './theme',
   './forms',
   './overlay',

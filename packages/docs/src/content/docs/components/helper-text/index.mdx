@@ -1,0 +1,55 @@
+---
+title: HelperText
+description: Small, subtle paragraph for persistent guidance under a form control — pair with an Input via aria-describedby.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Renders a styled <p>; reference its id from the related input via aria-describedby.
+bundleSize: "—"
+tags: [forms, feedback]
+---
+import LivePreview from "@/components/LivePreview/LivePreview.astro";
+import PropsTable from "@/components/PropsTable.astro";
+import StatusBadge from "@/components/StatusBadge.astro";
+import BundleSizePill from "@/components/BundleSizePill.astro";
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="HelperText" /></div>
+
+<LivePreview example="helper-text/basic" />
+
+## Usage
+
+```tsx
+import { HelperText } from "@arshad-shah/cynosure-react";
+
+<HelperText>Use at least 8 characters.</HelperText>
+```
+
+## Paired with an Input
+
+Wire the helper to its input by giving the `HelperText` a stable `id` and pointing the input's `aria-describedby` at it.
+
+<LivePreview example="helper-text/with-input" />
+
+## Inside FormField
+
+Inside a `FormField`, prefer `FormDescription` — it renders a `HelperText` and auto-registers its id on the control via `aria-describedby`.
+
+<LivePreview example="helper-text/inside-form-field" />
+
+## API
+
+<PropsTable component="HelperText" />
+
+## Accessibility
+
+- Renders a plain `<p>` — it carries no live-region semantics, which is the correct choice for persistent guidance.
+- Always associate it with the field via `aria-describedby` so the text is announced when focus enters the input.
+- Keep copy short and specific — long descriptions hurt readability for sighted and screen-reader users alike.
+- Use `ErrorText` (with `role="alert"`) for transient validation; `HelperText` is for guidance that's always true.
+
+## Recipes
+
+- Place directly under the input it describes — proximity matters as much as the aria wiring.
+- Within `Form`, swap `HelperText` for `FormDescription` so the wiring is automatic.
+- Reserve `ErrorText` for validation errors; keep `HelperText` for unconditional hints.

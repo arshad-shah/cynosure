@@ -4,9 +4,15 @@ import { type MenuNamespace, createMenuKit } from '../shared/createMenuKit.js';
 const kit = createMenuKit(Radix as unknown as MenuNamespace);
 
 /**
- * Right-click-triggered menu. Shares the visual contract with DropdownMenu and
- * MenuBar via the shared kit; the only behavioural difference is the trigger
- * event (contextmenu).
+ * Right-click-triggered menu. Shares the visual contract with `DropdownMenu`
+ * and `MenuBar` via the shared kit; the only behavioural difference is the
+ * trigger event (`contextmenu`). Radix manages focus trapping, type-ahead,
+ * arrow-key navigation, and `Escape`/outside-click dismissal.
+ *
+ * Compose with `ContextMenuTrigger` (the right-clickable area),
+ * `ContextMenuContent` (the menu surface), and item primitives such as
+ * `ContextMenuItem`, `ContextMenuCheckboxItem`, `ContextMenuRadioItem`, and
+ * `ContextMenuSubTrigger` / `ContextMenuSubContent` for nested menus.
  */
 export const ContextMenu = Radix.Root;
 export const ContextMenuTrigger = Radix.Trigger;

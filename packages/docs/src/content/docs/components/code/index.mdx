@@ -1,0 +1,68 @@
+---
+title: Code
+description: Inline or block code formatting for identifiers, expressions, and short snippets — semantic `<code>` with `<pre>` wrapping when needed.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Renders a native `<code>` (inline) or `<pre><code>` (block); assistive tech announces the content as code without extra ARIA wiring.
+bundleSize: "—"
+tags: [typography, code]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+import StatusBadge from '@/components/StatusBadge.astro';
+import BundleSizePill from '@/components/BundleSizePill.astro';
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="Code" /></div>
+
+<LivePreview example="code/basic" />
+
+## Usage
+
+```tsx
+import { Code } from '@arshad-shah/cynosure-react';
+
+<Code>const x = 1</Code>
+```
+
+## Variants
+
+Two variants: `inline` (default) renders a bare `<code>` and slots into prose; `block` wraps `<code>` inside `<pre>` so multi-line snippets retain whitespace.
+
+<LivePreview example="code/variants" />
+
+## Sizes
+
+Pick `sm` for dense inline usage or `md` (default) for body-aligned snippets.
+
+<LivePreview example="code/sizes" />
+
+## Color schemes
+
+`colorScheme` tints the surface and border — `neutral` (default), `accent`, `success`, and `danger` cover the common roles (e.g. red for deprecated identifiers, green for new APIs).
+
+<LivePreview example="code/color-schemes" />
+
+## Inline in prose
+
+`Code` slots cleanly inside a `Text` paragraph for identifiers and short expressions.
+
+<LivePreview example="code/inline" />
+
+## API
+
+<PropsTable component="Code" />
+
+## Accessibility
+
+- Renders the native `<code>` element so screen readers identify the content as code.
+- `variant="block"` wraps `<code>` in `<pre>` so newlines and indentation are preserved for both visual and assistive consumers.
+- Avoid color-only signals — pair `colorScheme="danger"` with descriptive surrounding copy.
+- For multi-line code with syntax highlighting reach for the dedicated `CodeBlock` component once available; `Code variant="block"` is intentionally style-only.
+
+## Recipes
+
+- Inline `Code` reads best wrapped inside a `Text` or paragraph element.
+- Keep inline snippets short — break longer code into a `variant="block"` snippet or a full code block.
+- Combine with `Kbd` to differentiate keyboard input from code output in tutorials.
+- Use `colorScheme="success"` or `"danger"` sparingly to flag newly added or deprecated APIs in changelogs.

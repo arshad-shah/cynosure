@@ -12,12 +12,31 @@ import { blockquoteAttribution, blockquoteBase, blockquoteVariant } from './Bloc
 
 export type BlockquoteVariant = 'default' | 'callout';
 
+/**
+ * Props specific to `Blockquote`, layered on `LayoutProps` and `AsChildProps`.
+ */
 export interface BlockquoteOwnProps extends LayoutProps, AsChildProps {
-  /** Rendered inside a `<cite>` below the quote body when provided. */
+  /**
+   * Source attribution. Rendered inside a `<cite>` below the quote body.
+   */
   attribution?: ReactNode;
+  /**
+   * Visual style — `default` is a quiet rule-flanked quote; `callout` picks
+   * up the accent palette for pull-quote emphasis.
+   * @default "default"
+   */
   variant?: BlockquoteVariant;
+  /**
+   * Additional class names appended after Cynosure's base classes.
+   */
   className?: string;
+  /**
+   * Inline style overrides merged last.
+   */
   style?: CSSProperties;
+  /**
+   * Quote body.
+   */
   children?: ReactNode;
 }
 

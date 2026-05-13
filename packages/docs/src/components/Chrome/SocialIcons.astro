@@ -1,0 +1,59 @@
+---
+// Starlight `SocialIcons` override. Renders the default social-icons row
+// (GitHub, configured in astro.config.mjs) and prepends a "Storybook" link
+// so consumers can jump from the docs into the Storybook subpath build that
+// ships alongside (`/storybook`). Keeping the Starlight default underneath
+// means future additions to `social: [...]` in the config still show up.
+import Default from '@astrojs/starlight/components/SocialIcons.astro';
+---
+<a href="/storybook/" aria-label="Open Storybook" class="sl-storybook-link">
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="20"
+    height="20"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    aria-hidden="true"
+    focusable="false"
+  >
+    <rect x="3" y="3" width="18" height="18" rx="2" />
+    <path d="M9 8h6" />
+    <path d="M9 12h6" />
+    <path d="M9 16h3" />
+  </svg>
+  <span class="sr-only">Storybook</span>
+</a>
+<Default {...Astro.props}><slot /></Default>
+
+<style>
+  .sl-storybook-link {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem;
+    color: var(--sl-color-text-accent);
+    border-radius: 0.25rem;
+  }
+  .sl-storybook-link:hover {
+    color: var(--sl-color-white);
+    background: var(--sl-color-gray-7);
+  }
+  .sl-storybook-link:focus-visible {
+    outline: 2px solid var(--sl-color-accent);
+    outline-offset: 2px;
+  }
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+</style>

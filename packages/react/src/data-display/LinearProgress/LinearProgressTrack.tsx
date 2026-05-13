@@ -15,7 +15,9 @@ import {
   useLinearProgressContext,
 } from './LinearProgressContext.js';
 
+/** Props for the {@link LinearProgressTrack} recessed well. */
 export interface LinearProgressTrackProps extends HTMLAttributes<HTMLDivElement> {
+  /** Sub-primitives painted on top of the track ({@link LinearProgressIndicator}, {@link LinearProgressBuffer}, {@link LinearProgressSegment}). */
   children?: ReactNode;
 }
 

@@ -7,7 +7,9 @@ export const linkBase = style([
   layoutPropsStyle,
   typographyBase,
   {
-    display: 'inline',
+    // See `Flex.css.ts` — drive display through layoutPropsStyle's var so it
+    // survives duplicated emissions later in the bundled stylesheet.
+    vars: { '--cynosure-lp-d-base': 'inline' },
     cursor: 'pointer',
     color: vars.color.accent.solid,
     textDecorationLine: 'none',

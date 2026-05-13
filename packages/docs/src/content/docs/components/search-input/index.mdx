@@ -1,0 +1,65 @@
+---
+title: SearchInput
+description: Search-shaped input built on Input — leading search icon, clear button, debounced onSearch, and Enter-to-submit.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Renders type="search"; Escape clears the field; clear button has an accessible label.
+bundleSize: "—"
+tags: [forms, input]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+import StatusBadge from '@/components/StatusBadge.astro';
+import BundleSizePill from '@/components/BundleSizePill.astro';
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="SearchInput" /></div>
+
+<LivePreview example="search-input/basic" />
+
+## Usage
+
+```tsx
+import { SearchInput } from "@arshad-shah/cynosure-react";
+
+<SearchInput aria-label="Search docs" onSearch={(q) => console.log(q)} />
+```
+
+## Sizes
+
+Three sizes are available: `sm`, `md` (default), and `lg`.
+
+<LivePreview example="search-input/sizes" />
+
+## Debounced search
+
+`onSearch` fires `debounceMs` (default `200`) after the user stops typing — useful for kicking off network calls without thrashing the server.
+
+<LivePreview example="search-input/debounced" />
+
+## Submit on Enter
+
+`onSubmit` fires when the user presses Enter.
+
+<LivePreview example="search-input/submit" />
+
+## States
+
+<LivePreview example="search-input/states" />
+
+## API
+
+<PropsTable component="SearchInput" />
+
+## Accessibility
+
+- Renders `type="search"` — assistive tech announces the field as a searchbox.
+- The clear button (rendered automatically when the field has a value) carries an accessible label and is keyboard reachable.
+- Pressing Escape clears the value and keeps focus on the input.
+- Provide an `aria-label` when there is no visible caption.
+
+## Recipes
+
+- Tune `debounceMs` for your latency budget — 150–300 ms is a good default range.
+- Use `onSubmit` to trigger an explicit search on Enter (e.g. navigation), while `onSearch` powers live filtering.
+- Place above a list and pipe the debounced query through your data fetching to filter results in place.

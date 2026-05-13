@@ -41,35 +41,97 @@ import {
 
 export type { ColumnDef } from '@tanstack/react-table';
 
+/** Pagination configuration passed to {@link DataTableProps.pagination}. */
 export interface DataTablePagination {
+  /**
+   * Initial number of rows per page.
+   * @default 20
+   */
   pageSize?: number;
+  /**
+   * Initial zero-based page index.
+   * @default 0
+   */
   pageIndex?: number;
+  /** Fires whenever the user changes page or page size. */
   onChange?: (state: { pageIndex: number; pageSize: number }) => void;
 }
 
+/** Global filter (search) configuration passed to {@link DataTableProps.filter}. */
 export interface DataTableFilter {
+  /** Current filter value applied across all column accessors. */
   global?: string;
+  /** Fires with the next filter value when the user types into the bound search input. */
   onGlobalFilterChange?: (value: string) => void;
 }
 
+/**
+ * Props for {@link DataTable}. `TData` is the row type; column accessors and
+ * cell renderers are typed against it via `@tanstack/react-table`'s ColumnDef.
+ */
 export interface DataTableProps<TData> extends Omit<HTMLAttributes<HTMLDivElement>, 'onSelect'> {
+  /** Row data. Each row is rendered once unless paginated; identity tracked by `getRowId`. */
   data: TData[];
+  /**
+   * Column definitions from `@tanstack/react-table`. Each `ColumnDef` provides
+   * an `accessorKey`/`accessorFn` that yields the cell value, a `header`, and
+   * an optional `cell` renderer. When `selectable` is true an internal
+   * `__select` column is prepended automatically.
+   */
   columns: ColumnDef<TData>[];
+  /**
+   * Enable click-to-sort on each column that hasn't opted out. Holding shift
+   * while clicking adds a secondary sort. Sorted columns expose
+   * `aria-sort="ascending|descending|none"` for assistive tech.
+   * @default false
+   */
   sortable?: boolean;
+  /**
+   * Enable a leading checkbox column for row selection. Header checkbox
+   * toggles the entire visible page.
+   * @default false
+   */
   selectable?: boolean;
+  /** Fires with the live array of selected rows whenever selection changes. */
   onSelectionChange?: (rows: TData[]) => void;
+  /**
+   * `true` enables pagination with defaults; pass a {@link DataTablePagination}
+   * to customise page size, initial index, or wire an external change
+   * listener. When enabled, the pagination footer renders below the table.
+   */
   pagination?: boolean | DataTablePagination;
+  /** Controlled global filter — leave undefined to disable filtering. */
   filter?: DataTableFilter;
-  /** Body rendered when `data.length === 0` (after filters applied). */
+  /**
+   * Body rendered when `data.length === 0` (after filters applied).
+   * @default "No results."
+   */
   emptyState?: ReactNode;
+  /**
+   * Render skeleton rows instead of data. Useful while waiting on async data.
+   * @default false
+   */
   loading?: boolean;
+  /**
+   * Number of skeleton rows shown while `loading` is true.
+   * @default 6
+   */
   loadingRows?: number;
-  /** Static `Table` visuals. */
+  /**
+   * Visual variant forwarded to the underlying {@link Table}.
+   * @default "line"
+   */
   tableVariant?: TableVariant;
+  /**
+   * Size token forwarded to the underlying {@link Table}.
+   * @default "md"
+   */
   tableSize?: TableSize;
+  /** Pin the table header to the scroll container's top edge while body scrolls. */
   stickyHeader?: boolean;
   /** Optional toolbar rendered above the table (e.g. the search input). */
   toolbar?: ReactNode;
+  /** Custom row identifier — used as the React key and the selection map key. */
   getRowId?: (row: TData, index: number) => string;
   /** Caption rendered inside the `<caption>` element for screen readers. */
   caption?: ReactNode;
@@ -94,6 +156,19 @@ const RowCheckbox = ({
   />
 );
 
+/**
+ * DataTable is a fully-featured tabular view built on `@tanstack/react-table`
+ * and the Cynosure {@link Table} primitives. Column accessors are typed
+ * against `TData`; cells render via TanStack's `flexRender`. Sorting is
+ * toggle-on-click (with shift-click for multi-sort) and surfaces
+ * `aria-sort` per header. Selection adds a leading checkbox column and a
+ * page-level toggle in the header. Filtering uses TanStack's global filter
+ * row model; pagination uses TanStack's pagination row model and renders the
+ * cynosure {@link Pagination} control in the footer. Loading shows
+ * deterministic-width Skeleton rows (stable across SSR/CSR). Note: the body
+ * is rendered eagerly — there is no virtualisation, so very large datasets
+ * should be paginated or sliced before being passed in.
+ */
 function DataTableInner<TData>(
   props: DataTableProps<TData>,
   ref: React.ForwardedRef<HTMLDivElement>,
@@ -263,7 +338,18 @@ function DataTableInner<TData>(
                   <TableRow key={`skeleton-${rowIdx.toString()}`}>
                     {Array.from({ length: leafColumnCount }).map((__, colIdx) => (
                       <TableCell key={`skeleton-${rowIdx.toString()}-${colIdx.toString()}`}>
-                        <Skeleton height="1em" width={`${(40 + Math.random() * 40).toFixed(0)}%`} />
+                        {/*
+                         * Width derived deterministically from the cell
+                         * coordinates so SSR and the first client render
+                         * produce the same markup. Using `Math.random()`
+                         * here would land a different value on each side of
+                         * hydration and trigger a React mismatch warning
+                         * plus a visible width-flash on mount.
+                         */}
+                        <Skeleton
+                          height="1em"
+                          width={`${(40 + ((rowIdx * 7 + colIdx * 13) % 40)).toString()}%`}
+                        />
                       </TableCell>
                     ))}
                   </TableRow>

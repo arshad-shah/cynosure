@@ -14,18 +14,42 @@ import { linkBase, linkDisabled, linkUnderline, linkVariant } from './Link.css.j
 export type LinkVariant = 'default' | 'subtle' | 'emphasis';
 export type LinkUnderline = 'always' | 'hover' | 'none';
 
+/**
+ * Props specific to `Link`, layered on top of `LayoutProps` and `AsChildProps`.
+ */
 export interface LinkOwnProps extends LayoutProps, AsChildProps {
+  /**
+   * Visual emphasis: `default` for primary links, `subtle` for tertiary
+   * navigation, `emphasis` for headline / hero CTAs.
+   * @default "default"
+   */
   variant?: LinkVariant;
+  /**
+   * When the underline is drawn — `always`, only on `hover`, or `none`.
+   * @default "hover"
+   */
   underline?: LinkUnderline;
   /**
-   * Marks the link as external: adds `rel="noopener noreferrer"`,
-   * `target="_blank"`, and a decorative icon after the text. The icon is
+   * Marks the link as external: forces `rel="noopener noreferrer"`,
+   * `target="_blank"`, and appends a decorative arrow icon. The icon is
    * `aria-hidden` so screen readers aren't double-announced.
    */
   external?: boolean;
+  /**
+   * Visually mutes the link and blocks `onClick`. Adds `aria-disabled`.
+   */
   disabled?: boolean;
+  /**
+   * Additional class names appended after Cynosure's base classes.
+   */
   className?: string;
+  /**
+   * Inline style overrides merged last.
+   */
   style?: CSSProperties;
+  /**
+   * Link content.
+   */
   children?: ReactNode;
 }
 

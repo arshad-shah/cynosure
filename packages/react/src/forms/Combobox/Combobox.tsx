@@ -14,28 +14,56 @@ import { cn } from '../../utils/cn.js';
 import { controlSize, controlWrapperBase, controlWrapperVariant } from '../shared/control.css.js';
 import { listbox, listboxEmpty, listboxItem, popover } from '../shared/popover.css.js';
 import type { FormControlSize, FormControlVariant } from '../shared/types.js';
+/** Shape of a data-driven `<Combobox>` option. */
 export interface ComboboxItemData<T extends string = string> {
+  /** Unique value submitted on selection. */
   value: T;
+  /** Visible label. */
   label: ReactNode;
+  /** Optional textual representation used for type-ahead/filtering when `label` is non-string. */
   textValue?: string;
+  /** Disables this option. */
   disabled?: boolean;
 }
 
+/** Props specific to `<Combobox>` (excludes React Aria's internal props). */
 export interface ComboboxOwnProps<T extends string = string> {
+  /** Controlled selected value. */
   value?: T | null;
+  /** Uncontrolled initial value. */
   defaultValue?: T | null;
+  /** Fires when the user selects an item (or clears the field, with `null`). */
   onValueChange?: (value: T | null) => void;
   /** Current text in the input — separate from the selected key. */
   inputValue?: string;
+  /** Uncontrolled initial input text. */
   defaultInputValue?: string;
+  /** Fires on every keystroke in the input. */
   onInputChange?: (value: string) => void;
+  /**
+   * Placeholder rendered when the input is empty.
+   * @default "Search…"
+   */
   placeholder?: string;
+  /** Visible label, also used as the trigger's accessible name when no aria-label is set. */
   label?: string;
+  /** Aria label when no visual label is available. */
   'aria-label'?: string;
+  /**
+   * Control size.
+   * @default "md"
+   */
   size?: FormControlSize;
+  /**
+   * Visual treatment.
+   * @default "outline"
+   */
   variant?: FormControlVariant;
+  /** Disables interaction. */
   disabled?: boolean;
+  /** Marks the field as required for form submission. */
   required?: boolean;
+  /** Renders the invalid state and sets `aria-invalid`. */
   invalid?: boolean;
   /** Allow values the user types that aren't in the list. */
   allowsCustomValue?: boolean;
@@ -73,7 +101,15 @@ export type ComboboxProps<T extends string = string> = ComboboxOwnProps<T> & Nat
 const stringify = (label: ReactNode): string | undefined =>
   typeof label === 'string' ? label : typeof label === 'number' ? String(label) : undefined;
 
-/** Autocomplete input with a filtered dropdown list. Wraps React Aria ComboBox. */
+/**
+ * `Combobox` is an autocomplete input — type to filter, click or arrow-down
+ * to open the list.
+ *
+ * - Use `items` for data-driven options or pass `<ComboboxItem>` children directly.
+ * - `allowsCustomValue` lets users commit text that isn't in the list.
+ *
+ * Built on React Aria's `ComboBox`. Fully keyboard accessible.
+ */
 export const Combobox = forwardRef<HTMLInputElement, ComboboxProps<string>>(
   function Combobox(props, ref) {
     const {
@@ -187,6 +223,7 @@ export const Combobox = forwardRef<HTMLInputElement, ComboboxProps<string>>(
   props: ComboboxProps<T> & { ref?: React.Ref<HTMLInputElement> },
 ) => React.ReactElement;
 
+/** Props for a single `<ComboboxItem>`. Inherits from React Aria's `ListBoxItemProps`. */
 export interface ComboboxItemProps extends Omit<ListBoxItemProps, 'className'> {
   className?: string;
   children?: ReactNode;
@@ -200,7 +237,12 @@ export function ComboboxItem({ className, children, ...rest }: ComboboxItemProps
   );
 }
 
+/** Props for the empty-state placeholder rendered inside a `<Combobox>` listbox. */
 export interface ComboboxEmptyProps {
+  /**
+   * Empty-state content.
+   * @default "No results"
+   */
   children?: ReactNode;
   className?: string;
 }

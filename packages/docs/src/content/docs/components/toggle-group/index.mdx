@@ -1,0 +1,75 @@
+---
+title: ToggleGroup
+description: Set of related toggle buttons that act together as a single, segmented control.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Built on Radix ToggleGroup — exposes roving focus, arrow-key navigation, and per-item `aria-pressed`. Provide an `aria-label` on the group so its purpose is announced.
+bundleSize: "—"
+tags: [feedback, control, segmented]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+import StatusBadge from '@/components/StatusBadge.astro';
+import BundleSizePill from '@/components/BundleSizePill.astro';
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="ToggleGroup" /></div>
+
+<LivePreview example="toggle-group/basic" />
+
+## Usage
+
+```tsx
+import { ToggleGroup, ToggleGroupItem } from '@arshad-shah/cynosure-react';
+
+<ToggleGroup type="single" defaultValue="left" aria-label="Text alignment">
+  <ToggleGroupItem value="left">Left</ToggleGroupItem>
+  <ToggleGroupItem value="center">Center</ToggleGroupItem>
+  <ToggleGroupItem value="right">Right</ToggleGroupItem>
+</ToggleGroup>
+```
+
+## Single vs multiple
+
+Pass `type="single"` for mutually exclusive options or `type="multiple"` for independent toggles.
+
+<LivePreview example="toggle-group/single" />
+
+<LivePreview example="toggle-group/multiple" />
+
+## Variants
+
+ToggleGroup ships three variants — `ghost` (default), `outline`, and `solid` — applied to every item via context.
+
+<LivePreview example="toggle-group/variants" />
+
+## Sizes
+
+Four sizes are available: `xs`, `sm`, `md` (default), and `lg`.
+
+<LivePreview example="toggle-group/sizes" />
+
+## Attached layout
+
+Set `attached` to render an attached pill-bar with shared borders — handy for segmented controls.
+
+<LivePreview example="toggle-group/attached" />
+
+## API
+
+<PropsTable component="ToggleGroup" />
+
+## Accessibility
+
+- Built on Radix ToggleGroup — items expose `aria-pressed` (multiple) or `aria-checked` (single) automatically.
+- Roving focus + arrow-key navigation moves between items; Home and End jump to ends.
+- Always provide an `aria-label` on `ToggleGroup` so screen readers can announce the group purpose.
+- `type="single"` enforces one active value; `type="multiple"` allows zero or more.
+- The shared size and variant cascade through context so individual items stay visually consistent.
+
+## Recipes
+
+- Use single-select groups for mutually exclusive options like text alignment.
+- Use multi-select groups for independent formatting toggles (bold, italic, underline).
+- Reach for `attached` when you want a segmented control look.
+- Keep groups to a small number of items (3–5) so they stay scannable.

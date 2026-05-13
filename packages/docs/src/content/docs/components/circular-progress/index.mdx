@@ -1,0 +1,71 @@
+---
+title: CircularProgress
+description: Ring-shaped progress indicator for uploads, downloads, and goal-completion states.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Renders an ARIA progressbar with min/max/now values; indeterminate state omits the value so assistive tech announces "loading".
+bundleSize: "—"
+tags: [data-display, progress, feedback]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+import StatusBadge from '@/components/StatusBadge.astro';
+import BundleSizePill from '@/components/BundleSizePill.astro';
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="CircularProgress" /></div>
+
+<LivePreview example="circular-progress/basic" />
+
+## Usage
+
+```tsx
+import { CircularProgress } from '@arshad-shah/cynosure-react';
+
+<CircularProgress value={60} />
+```
+
+For custom layouts (overlaid badges, multi-ring visualisations) compose with `CircularProgressRoot`, `CircularProgressTrack`, `CircularProgressIndicator`, and `CircularProgressLabel` directly.
+
+## Sizes
+
+Five sizes are available: `xs`, `sm`, `md` (default), `lg`, and `xl`.
+
+<LivePreview example="circular-progress/sizes" />
+
+## Color schemes
+
+Pick a scheme that matches the surrounding context: `accent`, `success`, `warning`, `danger`, or `neutral`.
+
+<LivePreview example="circular-progress/color-schemes" />
+
+## With label
+
+Pass children to render centered content — typically a percentage or a short label.
+
+<LivePreview example="circular-progress/with-label" />
+
+## Indeterminate
+
+Pass `indeterminate` for an unknown-duration loader. The ARIA value attributes are dropped so assistive tech announces an unspecified loading state.
+
+<LivePreview example="circular-progress/indeterminate" />
+
+## API
+
+<PropsTable component="CircularProgress" />
+
+## Accessibility
+
+- Renders `role="progressbar"` with `aria-valuenow`, `aria-valuemin`, and `aria-valuemax`.
+- Sets `aria-valuetext` to a formatted percentage so screen readers announce a human-readable value.
+- Omits the value when `indeterminate` is set so assistive tech reports "loading" instead.
+- Provide an `aria-label` when the ring is the only feedback on screen.
+- `data-complete` is exposed on the root once `value >= max` (unless `completionState="none"`), letting you style the finished state.
+
+## Recipes
+
+- Use `value` for deterministic progress (uploads, downloads); pass `indeterminate` for spinner-style loaders.
+- Tune `thickness` to make the ring beefier on dark surfaces or thinner inside dense dashboards.
+- Combine `colorScheme="success"` with the default `completionState="auto"` for a green finished-state at 100%.
+- Pair with `Stat` to render a metric inside the ring's centre via `CircularProgressLabel`.

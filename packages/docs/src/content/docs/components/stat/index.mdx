@@ -1,0 +1,67 @@
+---
+title: Stat
+description: Display a single metric with a label, value, supporting context, and an optional trend arrow.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Semantic label / value / help structure; StatArrow exposes an aria-label so the trend direction is announced.
+bundleSize: "—"
+tags: [data-display, metric, kpi]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+import StatusBadge from '@/components/StatusBadge.astro';
+import BundleSizePill from '@/components/BundleSizePill.astro';
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="Stat" /></div>
+
+<LivePreview example="stat/basic" />
+
+## Usage
+
+```tsx
+import { Stat, StatHelp, StatLabel, StatValue } from '@arshad-shah/cynosure-react';
+
+<Stat>
+  <StatLabel>Monthly revenue</StatLabel>
+  <StatValue>$48,290</StatValue>
+  <StatHelp>Up from $42,960 last month</StatHelp>
+</Stat>
+```
+
+## With trend arrow
+
+Use `StatArrow` to surface direction. `direction="increase"` (default) renders an upward chevron; `direction="decrease"` flips it. The arrow exposes an `aria-label` so screen readers announce the trend.
+
+<LivePreview example="stat/with-arrow" />
+
+## With help text
+
+`StatHelp` is the slot for comparison context — period-over-period deltas, percentages, or a short explanation.
+
+<LivePreview example="stat/with-help" />
+
+## Stat grid
+
+Group multiple `Stat`s in a CSS grid for KPI dashboards.
+
+<LivePreview example="stat/grid" />
+
+## API
+
+<PropsTable component="Stat" />
+
+## Accessibility
+
+- Label, value, and help text share a semantic relationship via DOM proximity — screen readers announce them together.
+- `StatArrow` carries an `aria-label` (`"Increased by"` / `"Decreased by"`) so the trend direction is announced even when colour alone is ignored.
+- Color is never the sole cue for direction — pair the arrow with a number or word.
+- The default icons are decorative (rendered by Lucide); pass `children` to override with your own glyph.
+- Use a heading or `aria-label` on the surrounding card / region when the metric needs more context.
+
+## Recipes
+
+- Group multiple `Stat`s in a `Grid` for KPI dashboards.
+- Use `StatHelp` for percentage changes or comparison context ("vs last week", "year to date").
+- Combine with `LinearProgress` for goal-tracking widgets — `Stat` reports the number, `LinearProgress` shows progress toward the goal.
+- Wrap a `Stat` inside a `Card` with `variant="elevated"` for a featured metric on a dashboard.

@@ -13,6 +13,11 @@ const STYLE: CSSProperties = {
   border: 0,
 };
 
+/**
+ * Props for `VisuallyHidden`. Accepts every standard `<span>` attribute —
+ * the component owns its visual style via inline CSS and merges any caller
+ * `style` on top.
+ */
 export interface VisuallyHiddenProps extends ComponentPropsWithoutRef<'span'> {}
 
 /**

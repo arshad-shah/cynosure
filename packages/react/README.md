@@ -34,6 +34,9 @@ One CSS import (includes tokens + dark + component styles), one provider:
 
 ```ts
 import '@arshad-shah/cynosure-react/all.css';
+// Optional — registers Geist + JetBrains Mono Variable.
+// Skip to fall through to system fonts.
+import '@arshad-shah/cynosure-react/fonts.css';
 ```
 
 ```tsx
@@ -106,7 +109,7 @@ This package works with React Server Components. Structural pieces (`Box`, `Stac
 
 **Data display** — `Card`, `Table`, `DataTable`, `Tree`, `Timeline`, `Stat`, `LinearProgress`, `CircularProgress`, `Skeleton`, `Spinner`, `Accordion`, `Collapsible`, `ScrollArea`, `Resizable`, `CodeBlock`
 
-**Feedback** — `Badge`, `Tag`, `Chip`, `Avatar`, `AvatarGroup`, `Alert`, `Banner`, `Notification`, `Callout`, `EmptyState`, `Toggle`, `ToggleGroup`
+**Feedback** — `Badge`, `Tag`, `Chip`, `Avatar`, `AvatarGroup`, `Alert`, `Notification`, `Callout`, `EmptyState`, `Toggle`, `ToggleGroup`
 
 **Form composition** — `Form`, `FormField`, `FormLabel`, `FormControl`, `FormDescription`, `FormMessage`, plus an RHF adapter at `@arshad-shah/cynosure-react/rhf`
 

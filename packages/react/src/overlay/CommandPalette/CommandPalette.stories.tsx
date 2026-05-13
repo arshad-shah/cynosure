@@ -3,6 +3,7 @@ import { ArrowRight, FileText, Hammer, Settings, Terminal, User } from 'lucide-r
 import { useState } from 'react';
 import { Button } from '../../forms/Button/Button.js';
 import { Stack } from '../../primitives/layout/Stack/Stack.js';
+import { Kbd } from '../../typography/Kbd/Kbd.js';
 import { Text } from '../../typography/Text/Text.js';
 import {
   CommandEmpty,
@@ -30,7 +31,7 @@ export const Default: Story = {
       return (
         <Stack gap="3">
           <Text size="sm" color="fg.muted">
-            Press <kbd>⌘K</kbd> / <kbd>Ctrl+K</kbd>, or click the button.
+            Press <Kbd>⌘K</Kbd> / <Kbd>Ctrl+K</Kbd>, or click the button.
           </Text>
           <div>
             <Button onClick={() => setOpen(true)}>Open palette</Button>

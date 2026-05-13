@@ -20,11 +20,34 @@ export type SpinnerColorScheme = 'accent' | 'neutral' | 'currentColor';
 export type SpinnerVariant = 'border' | 'dots' | 'ring';
 export type SpinnerSpeed = 'slow' | 'normal' | 'fast';
 
+/** Props for the {@link Spinner} loading indicator. */
 export interface SpinnerProps extends Omit<HTMLAttributes<HTMLSpanElement>, 'aria-label'> {
+  /**
+   * Diameter token (xs–xl).
+   * @default "md"
+   */
   size?: SpinnerSize;
+  /**
+   * Colour role: `accent` for brand emphasis, `neutral` for muted, or
+   * `currentColor` to inherit from the parent text colour.
+   * @default "currentColor"
+   */
   colorScheme?: SpinnerColorScheme;
+  /**
+   * Visual style. `border` is the spinning ring; `dots` is the pulsing
+   * three-dot cluster; `ring` is a tighter solid arc.
+   * @default "border"
+   */
   variant?: SpinnerVariant;
+  /**
+   * Rotation/cycle speed token.
+   * @default "normal"
+   */
   speed?: SpinnerSpeed;
+  /**
+   * Accessible label announced via `aria-label` on the `role="status"` host.
+   * @default "Loading"
+   */
   label?: string;
 }
 
@@ -40,6 +63,11 @@ const speedClass: Record<SpinnerSpeed, string> = {
   fast: speedFast,
 };
 
+/**
+ * Spinner is an indeterminate loading indicator. Renders inline (`<span>`) so
+ * it can sit inside buttons or alongside text. Carries `role="status"` /
+ * `aria-live="polite"` with a customisable label for screen readers.
+ */
 export const Spinner = forwardRef<HTMLSpanElement, SpinnerProps>(function Spinner(
   {
     size = 'md',

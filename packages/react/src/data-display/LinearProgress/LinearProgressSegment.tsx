@@ -14,10 +14,16 @@ import {
   useLinearProgressContext,
 } from './LinearProgressContext.js';
 
+/** Props for a single {@link LinearProgressSegment} slice in a stacked bar. */
 export interface LinearProgressSegmentProps extends Omit<HTMLAttributes<HTMLSpanElement>, 'style'> {
   /** Segment share of the total. Clamped to `[0, max]` via the root's `max`. */
   value: number;
+  /**
+   * Colour role for this slice.
+   * @default "accent"
+   */
   colorScheme?: LinearProgressColorScheme;
+  /** Accessible label announced for this slice. */
   label?: string;
 }
 

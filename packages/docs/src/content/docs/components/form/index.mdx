@@ -1,0 +1,94 @@
+---
+title: Form
+description: Composable form primitives — Form, FormField, FormLabel, FormControl, FormDescription, FormMessage — that auto-wire labels, descriptions, validation, and aria-invalid for every field.
+category: components
+status: stable
+since: "0.1.0"
+a11y: FormField generates a stable id, applies htmlFor on the label, and registers FormDescription / FormMessage ids on the control via aria-describedby; invalid state propagates aria-invalid.
+bundleSize: "—"
+tags: [forms]
+---
+import LivePreview from "@/components/LivePreview/LivePreview.astro";
+import PropsTable from "@/components/PropsTable.astro";
+import StatusBadge from "@/components/StatusBadge.astro";
+import BundleSizePill from "@/components/BundleSizePill.astro";
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="Form" /></div>
+
+<LivePreview example="form/basic" />
+
+## Usage
+
+```tsx
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormLabel,
+  FormMessage,
+  Input,
+} from "@arshad-shah/cynosure-react";
+
+<Form>
+  <FormField name="email" required>
+    <FormLabel>Email</FormLabel>
+    <FormControl>
+      <Input type="email" />
+    </FormControl>
+    <FormDescription>We will never share your address.</FormDescription>
+    <FormMessage />
+  </FormField>
+</Form>
+```
+
+`Form` is a thin `<form>` wrapper that sets `noValidate` to `true` by default so Cynosure's `FormMessage` becomes the single source of validation UX.
+
+## Composition
+
+`FormField` is the one stateful primitive — it generates the id, owns the `invalid` / `disabled` / `required` flags, and provides a context the other parts read from.
+
+<LivePreview example="form/composition" />
+
+## With validation
+
+Mark a field as `invalid` and render a `FormMessage` to show the error. `FormMessage` automatically registers its id on the control via `aria-describedby` and renders nothing when there's no message.
+
+<LivePreview example="form/validation" />
+
+## Every field type
+
+`FormControl` works with any Cynosure form control — Input, Textarea, Select, Checkbox, etc. — and forwards id, name, invalid, disabled, and required down to the child.
+
+<LivePreview example="form/all-fields" />
+
+## Disabled field
+
+Setting `disabled` on the `FormField` cascades to the inner control without disabling the label.
+
+<LivePreview example="form/disabled" />
+
+## API
+
+### `Form`
+
+<PropsTable component="Form" />
+
+### `FormField`
+
+<PropsTable component="FormField" />
+
+## Accessibility
+
+- `FormField` generates a stable id and applies `htmlFor` on `FormLabel` so the label and control are explicitly associated.
+- `FormDescription` and `FormMessage` register their ids on the control via `aria-describedby`, so screen readers announce both hints and errors.
+- `invalid` on `FormField` propagates `aria-invalid="true"` to the control and toggles a `data-invalid` attribute on the wrapper for CSS hooks.
+- `required` propagates `aria-required` (and the native `required` attribute when supported).
+- `Form` defaults `noValidate` to `true` — set `noValidate={false}` if you specifically want the browser's native validation bubbles back.
+
+## Recipes
+
+- Always wrap each control in a `FormField` so id wiring and `aria-describedby` propagation stays automatic.
+- Use `FormDescription` for persistent guidance and `FormMessage` for transient validation — they share the wiring but role-distinct semantics.
+- Child props win over `FormField` inheritance — pass `disabled={false}` on a specific input to keep it enabled inside a disabled field.
+- Pair with `react-hook-form` or any state library — `FormField` provides no state of its own.

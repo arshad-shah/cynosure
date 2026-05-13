@@ -1,0 +1,62 @@
+---
+title: Label
+description: Form-control label rendered as a native <label>; supports required indicator and disabled colouring.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Renders a native <label>; pair with an input via htmlFor; required marker is aria-hidden.
+bundleSize: "—"
+tags: [forms]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+import StatusBadge from '@/components/StatusBadge.astro';
+import BundleSizePill from '@/components/BundleSizePill.astro';
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="Label" /></div>
+
+<LivePreview example="label/basic" />
+
+## Usage
+
+```tsx
+import { Label, Input } from "@arshad-shah/cynosure-react";
+
+<Label htmlFor="email">Email</Label>
+<Input id="email" type="email" />
+```
+
+## Required indicator
+
+Set `required` to append a decorative red asterisk after the label text. The asterisk is `aria-hidden`; pair with `required` on the input for assistive tech.
+
+<LivePreview example="label/required" />
+
+## Disabled
+
+Set `disabled` to render the label in the disabled colour. Use this when the associated control is disabled.
+
+<LivePreview example="label/disabled" />
+
+## With a form control
+
+A Label, Input, and helper text laid out as a typical field.
+
+<LivePreview example="label/with-field" />
+
+## API
+
+<PropsTable component="Label" />
+
+## Accessibility
+
+- Renders a native `<label>` element; inherits all built-in semantics.
+- Use `htmlFor` to associate the label with its control by `id`.
+- Clicking the label transfers focus to the associated form field.
+- The required indicator is purely visual (`aria-hidden`); mirror the state on the input.
+
+## Recipes
+
+- Pair every input, select, or textarea with a Label for screen-reader users.
+- Use a visually hidden label when the visual design omits a caption.
+- When using `Fieldset` for a group, prefer its `legend` over a free-standing Label.

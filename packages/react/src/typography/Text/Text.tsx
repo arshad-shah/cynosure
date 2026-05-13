@@ -74,24 +74,69 @@ const ALIGN_VALUE: Record<TextAlign, string> = {
 
 export type TextAs = 'span' | 'p' | 'div' | 'label' | 'strong' | 'em';
 
+/**
+ * Props specific to `Text`, layered on top of `LayoutProps` and `AsChildProps`.
+ */
 export interface TextOwnProps extends LayoutProps, AsChildProps {
+  /**
+   * Body type scale step. Maps to the `body.*` composite typography tokens.
+   */
   size?: Responsive<TextSize>;
+  /**
+   * Font-weight token. Resolves to the matching `font-weight-*` CSS variable.
+   */
   weight?: Responsive<TextWeight>;
+  /**
+   * Horizontal text alignment.
+   */
   align?: Responsive<TextAlign>;
+  /**
+   * Semantic role atop the base size — e.g. `caption`, `overline`, `lead`.
+   */
   variant?: TextVariant;
-  /** `true` → single-line truncation; `number > 1` → multi-line clamp. */
+  /**
+   * `true` → single-line truncation; `number > 1` → multi-line line-clamp.
+   */
   truncate?: boolean | number;
+  /**
+   * Renders italic glyphs via `font-style: italic`.
+   */
   italic?: boolean;
+  /**
+   * Draws a `text-decoration: underline` line.
+   */
   underline?: boolean;
+  /**
+   * Draws a `text-decoration: line-through` line.
+   */
   strikethrough?: boolean;
-  /** Colour for `underline`/`strikethrough` decorations. */
+  /**
+   * Colour for `underline` / `strikethrough` decorations.
+   */
   decorationColor?: ColorToken;
+  /**
+   * Additional class names appended after Cynosure's base classes.
+   */
   className?: string;
+  /**
+   * Inline style overrides merged last; wins over Cynosure-computed style.
+   */
   style?: CSSProperties;
+  /**
+   * Rendered content.
+   */
   children?: ReactNode;
 }
 
+/**
+ * Full `Text` props — `TextOwnProps` plus an intrinsic-element `as` override
+ * and the remaining HTML attributes minus any Cynosure-owned keys.
+ */
 export type TextProps = TextOwnProps & {
+  /**
+   * Rendered intrinsic element. Restricted to inline-friendly tags.
+   * @default "span"
+   */
   as?: TextAs;
 } & Omit<React.HTMLAttributes<HTMLElement>, keyof TextOwnProps | 'color' | 'as'>;
 

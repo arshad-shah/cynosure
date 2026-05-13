@@ -1,0 +1,81 @@
+---
+title: Avatar
+description: Visual representation of a user or entity via image, initials, or fallback icon.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Renders an accessible image with alt text derived from `name`; falls back to initials or a labelled fallback when no image is available. Status dots are decorative (aria-hidden) — pair them with a textual label when status conveys meaning.
+bundleSize: "—"
+tags: [feedback, identity, user]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+import StatusBadge from '@/components/StatusBadge.astro';
+import BundleSizePill from '@/components/BundleSizePill.astro';
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="Avatar" /></div>
+
+<LivePreview example="avatar/basic" />
+
+## Usage
+
+```tsx
+import { Avatar } from '@arshad-shah/cynosure-react';
+
+<Avatar name="Jane Doe" />
+```
+
+## With image
+
+Provide an `src` to render an `<img>`. When the image fails or is still loading, Avatar gracefully falls back to initials derived from `name`.
+
+<LivePreview example="avatar/with-image" />
+
+## Sizes
+
+Avatar ships six sizes — `xs`, `sm`, `md` (default), `lg`, `xl`, and `2xl`.
+
+<LivePreview example="avatar/sizes" />
+
+## Shapes
+
+Pick between `circle` (default), `rounded`, and `square` shapes.
+
+<LivePreview example="avatar/shapes" />
+
+## Initials and color
+
+When `src` is missing, Avatar shows the initials derived from `name`. A deterministic colour from the built-in palette is auto-selected per name; override with `colorScheme` (`red`, `amber`, `green`, `blue`, `violet`, `pink`, `teal`, `orange`).
+
+<LivePreview example="avatar/initials" />
+
+## Status indicator
+
+Pass `status` (`online`, `offline`, `away`, `busy`) to render a presence dot. Use `statusPosition` to anchor it to `bottom-right` (default) or `top-right`.
+
+<LivePreview example="avatar/status" />
+
+## Ring
+
+Set `ring` to add a tokenised ring around the avatar — useful for stacked groups or highlighting the current user.
+
+<LivePreview example="avatar/ring" />
+
+## API
+
+<PropsTable component="Avatar" />
+
+## Accessibility
+
+- Provide a `name` so initials and `alt` text stay meaningful when the image is missing.
+- When the avatar is purely decorative, leave `name` empty and add `aria-hidden="true"` on the wrapping element.
+- Status dots render with `aria-hidden="true"` — pair them with an off-screen label or adjacent text when status conveys meaning.
+- The fallback waits 400ms before swapping in initials so users on fast networks see the image first.
+- Initials are rendered inside a Radix fallback element which exposes an `aria-label` when only a name (no derived initials) is available.
+
+## Recipes
+
+- Combine `src` with `name` so initials are ready as a graceful fallback.
+- Use `ring` on the current user's avatar to disambiguate them in a roster.
+- Override `colorScheme` only when brand colour matters — the deterministic palette keeps an avatar's colour stable across renders.
+- Compose multiple avatars inside `<AvatarGroup>` to represent collaborators with optional overflow.

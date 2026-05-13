@@ -1,0 +1,78 @@
+---
+title: List
+description: Semantic ordered, unordered, and description lists with token-driven spacing, marker style, and marker colour.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Renders native `<ul>`, `<ol>`, or `<dl>` with their matching item elements so assistive tech announces list length, position, and term/details pairings.
+bundleSize: "—"
+tags: [typography, structure]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+import StatusBadge from '@/components/StatusBadge.astro';
+import BundleSizePill from '@/components/BundleSizePill.astro';
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="List" /></div>
+
+<LivePreview example="list/basic" />
+
+## Usage
+
+```tsx
+import { List, ListItem, OrderedList } from '@arshad-shah/cynosure-react';
+
+<List>
+  <ListItem>One</ListItem>
+  <ListItem>Two</ListItem>
+</List>
+```
+
+## Ordered
+
+`OrderedList` renders a `<ol>` and defaults to a `decimal` marker. It accepts the native `start`, `reversed`, and `type` props so numbered procedures stay flexible.
+
+<LivePreview example="list/ordered" />
+
+## Markers
+
+`marker` accepts `disc`, `circle`, `square`, `none` for unordered lists and `decimal`, `lower-alpha`, `upper-alpha` for ordered lists. Use `markerColor` to tint the bullet from any colour token.
+
+<LivePreview example="list/markers" />
+
+## Spacing
+
+`spacing` accepts any space token and controls the gap between items. The default is `2` — bump it up for breathing room in long lists.
+
+<LivePreview example="list/spacing" />
+
+## Nested
+
+Nest a `List` (or `OrderedList`) inside a `ListItem` to express sub-points; spacing and markers can differ per level.
+
+<LivePreview example="list/nested" />
+
+## Description list
+
+`DescriptionList` pairs `DescriptionTerm` with `DescriptionDetails` for key-value content such as glossaries and metadata tables.
+
+<LivePreview example="list/description" />
+
+## API
+
+<PropsTable component="List" />
+
+## Accessibility
+
+- `List` always renders as `<ul>` and `OrderedList` as `<ol>` so screen readers announce the list length and item position; `DescriptionList` renders `<dl>` to communicate term/details pairings.
+- Use `OrderedList` whenever sequence matters — assistive tech announces position information that an unordered list does not.
+- Avoid mixing non-`ListItem` children inside `List` / `OrderedList`; the semantic structure relies on `<li>` children to stay intact.
+- Setting `marker="none"` hides the visual bullet but preserves list semantics, so an unordered visual layout still reads as a list to screen readers.
+- Don't pass `as` to list components — they are bound to their semantic element and warn in development if you try.
+
+## Recipes
+
+- Use `OrderedList` for procedural content like setup steps and checklists.
+- For key-value pairs, reach for `DescriptionList` with `DescriptionTerm` and `DescriptionDetails` rather than a two-column table.
+- Keep `ListItem` content concise; nest a `List` inside a `ListItem` when sub-points are needed.
+- Set `markerColor` to an accent token to tint bullets without changing the body colour.

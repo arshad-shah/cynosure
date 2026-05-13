@@ -21,22 +21,52 @@ const PATTERN_BY_TYPE: Record<PinInputType, RegExp> = {
   alphabetic: /[a-zA-Z]/,
 };
 
+/** Props for `<PinInput>` — OTP-style segmented entry. */
 export interface PinInputProps {
+  /**
+   * Number of cells to render.
+   * @default 6
+   */
   length?: number;
+  /** Controlled value (trimmed to `length`). */
   value?: string;
+  /** Uncontrolled initial value. */
   defaultValue?: string;
+  /** Fires on every cell change with the next value. */
   onChange?: (value: string) => void;
   /** Fires once the user has filled all `length` cells. */
   onComplete?: (value: string) => void;
+  /**
+   * Allowed character class. `numeric` enables the numeric mobile keyboard.
+   * @default "numeric"
+   */
   type?: PinInputType;
-  /** Mask the displayed characters (like a password). */
+  /**
+   * Mask the displayed characters (like a password).
+   * @default false
+   */
   mask?: boolean;
+  /**
+   * Control size.
+   * @default "md"
+   */
   size?: FormControlSize;
+  /**
+   * Disables every cell.
+   * @default false
+   */
   disabled?: boolean;
+  /** Renders the invalid state on every cell. */
   invalid?: boolean;
+  /** Focuses the first cell on mount. */
   autoFocus?: boolean;
+  /** Submitted form field name (renders a hidden input carrying the concatenated value). */
   name?: string;
   id?: string;
+  /**
+   * Accessible label for the group; individual cells append `digit N`.
+   * @default "Verification code"
+   */
   'aria-label'?: string;
   className?: string;
   style?: CSSProperties;

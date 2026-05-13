@@ -1,0 +1,84 @@
+---
+title: DateRangePicker
+description: Start/end date input with a paired calendar popover, quick-range presets, and locale-aware segments.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Start and end segments are independent spinbuttons; popover dialog wraps a labelled range calendar with full keyboard control.
+bundleSize: "—"
+tags: [forms, date]
+---
+import LivePreview from "@/components/LivePreview/LivePreview.astro";
+import PropsTable from "@/components/PropsTable.astro";
+import StatusBadge from "@/components/StatusBadge.astro";
+import BundleSizePill from "@/components/BundleSizePill.astro";
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="DateRangePicker" /></div>
+
+<LivePreview example="date-range-picker/basic" />
+
+## Usage
+
+```tsx
+import { DateRangePicker } from "@arshad-shah/cynosure-react";
+import { parseDate } from "@internationalized/date";
+
+<DateRangePicker
+  label="Stay"
+  defaultValue={{ start: parseDate("2026-04-17"), end: parseDate("2026-04-22") }}
+/>
+```
+
+## Variants
+
+`outline` (default), `filled`, and `ghost`.
+
+<LivePreview example="date-range-picker/variants" />
+
+## Sizes
+
+`sm`, `md` (default), and `lg`.
+
+<LivePreview example="date-range-picker/sizes" />
+
+## States
+
+Disabled, read-only, invalid, and empty.
+
+<LivePreview example="date-range-picker/states" />
+
+## Bounded range
+
+Use `minValue` / `maxValue` to bound either end of the range.
+
+<LivePreview example="date-range-picker/min-max" />
+
+## Presets
+
+`presets` renders a left rail of `DateRangePreset` entries inside the popover. Clicking a preset commits the range and closes the popover.
+
+<LivePreview example="date-range-picker/presets" />
+
+## Visible months
+
+Show one or two months side-by-side in the popover with `visibleMonths`. The popover collapses to one month below ~640px regardless.
+
+<LivePreview example="date-range-picker/visible-months" />
+
+## API
+
+<PropsTable component="DateRangePicker" />
+
+## Accessibility
+
+- Start and end date segments are independent labelled `spinbutton`s — arrow keys nudge each segment, Tab moves between them.
+- The popover is a dialog with a labelled range calendar; arrow keys traverse days, Enter selects.
+- `invalid` toggles `aria-invalid` on the input group; range presets carry a `data-active` flag for visual styling without altering semantics.
+- Pass `aria-label` (or a string `label`) so the field is announced even when no value is set.
+
+## Recipes
+
+- Pass `presets={[{ label, value: { start, end } }]}` for quick-range shortcuts like "Last 7 days".
+- For narrow surfaces, set `visibleMonths={1}` so the calendar fits in tight popovers.
+- Wrap in `LocaleProvider` to flip segment order and first-day-of-week.
+- Compose with `FormField` + `FormMessage` to surface "pick a range" validation.

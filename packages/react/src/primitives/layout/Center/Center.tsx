@@ -17,13 +17,33 @@ import {
 } from '../shared/index.js';
 import { center } from './Center.css.js';
 
+/**
+ * Props specific to `Center` — only `className`, `style`, and `children` on
+ * top of `LayoutProps` and `AsChildProps`.
+ */
 export interface CenterOwnProps extends LayoutProps, AsChildProps {
+  /**
+   * Additional class names appended after Cynosure's base classes.
+   */
   className?: string;
+  /**
+   * Inline style overrides merged last.
+   */
   style?: CSSProperties;
+  /**
+   * Content centred on both axes.
+   */
   children?: ReactNode;
 }
 
+/**
+ * Full `Center` props. Generic over the rendered element.
+ */
 export type CenterProps<E extends ElementType = 'div'> = CenterOwnProps & {
+  /**
+   * Rendered intrinsic element or component.
+   * @default "div"
+   */
   as?: E;
 } & Omit<React.ComponentPropsWithoutRef<E>, keyof CenterOwnProps | 'as'>;
 

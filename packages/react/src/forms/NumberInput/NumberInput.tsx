@@ -23,9 +23,19 @@ import {
 
 type BaseNumberFieldProps = Omit<NumberFieldProps, 'className' | 'style' | 'children'>;
 
+/** Cynosure-specific props for `<NumberInput>`. Extends React Aria's `NumberFieldProps` for parsing/formatting. */
 export interface NumberInputOwnProps extends BaseNumberFieldProps {
+  /**
+   * Control size.
+   * @default "md"
+   */
   size?: FormControlSize;
+  /**
+   * Visual treatment. Matches the shared form-control vocabulary.
+   * @default "outline"
+   */
   variant?: FormControlVariant;
+  /** Mirrors React Aria's `isInvalid` for parity with other Cynosure controls. */
   invalid?: boolean;
   className?: string;
   style?: CSSProperties;
@@ -33,8 +43,9 @@ export interface NumberInputOwnProps extends BaseNumberFieldProps {
   prefix?: ReactNode;
   /** Muted inline content after the value (e.g. `px`, `%`, `kg`). */
   suffix?: ReactNode;
-  /** Custom labels override the localized "Increment"/"Decrement" strings. */
+  /** Custom `aria-label` for the increment button. Overrides the localized default. */
   incrementLabel?: string;
+  /** Custom `aria-label` for the decrement button. Overrides the localized default. */
   decrementLabel?: string;
 }
 

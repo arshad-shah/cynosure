@@ -1,0 +1,64 @@
+---
+title: RadioGroup
+description: Coordinates a set of Radio children into a single-select group with roving tabindex.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Built on Radix RadioGroup — role="radiogroup" with arrow-key roving focus; Tab enters and leaves the group.
+bundleSize: "—"
+tags: [forms]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+import StatusBadge from '@/components/StatusBadge.astro';
+import BundleSizePill from '@/components/BundleSizePill.astro';
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="RadioGroup" /></div>
+
+<LivePreview example="radio-group/basic" />
+
+## Usage
+
+```tsx
+import { Radio, RadioGroup } from "@arshad-shah/cynosure-react";
+
+<RadioGroup defaultValue="pro" aria-label="Plan">
+  <Radio value="free">Free</Radio>
+  <Radio value="pro">Pro</Radio>
+</RadioGroup>
+```
+
+## Orientation
+
+Set `orientation` to `"horizontal"` to lay out radios in a row (default is `"vertical"`).
+
+<LivePreview example="radio-group/orientation" />
+
+## Controlled
+
+Pass `value` and `onValueChange` to drive the selection from parent state.
+
+<LivePreview example="radio-group/controlled" />
+
+## Disabled
+
+Disable the entire group with `disabled`.
+
+<LivePreview example="radio-group/disabled" />
+
+## API
+
+<PropsTable component="RadioGroup" />
+
+## Accessibility
+
+- Renders `role="radiogroup"` — supply an `aria-label` or `aria-labelledby` for assistive tech.
+- Arrow Up/Down (vertical) or Arrow Left/Right (horizontal) moves selection between radios.
+- Tab enters the group at the currently-selected (or first) radio and leaves on the next Tab.
+- Setting `required` on the group marks the field required for form submission.
+
+## Recipes
+
+- Use for mutually exclusive options like pricing tiers, shipping methods, or sort order.
+- For 5+ options or long labels, consider `Select` or `Combobox` instead.
+- Pair with a `Label` + `aria-labelledby` when you need a visible caption.

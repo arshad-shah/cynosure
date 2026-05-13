@@ -1,0 +1,79 @@
+---
+title: Chart
+description: Themed wrappers around SwiftChart — line, area, bar, pie, donut, scatter, and radar — that follow Cynosure tokens out of the box.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Charts render to Canvas; provide a descriptive aria-label and pair quantitative charts with a hidden data table for screen-reader users.
+bundleSize: "—"
+tags: [data-display, chart, visualization]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+import StatusBadge from '@/components/StatusBadge.astro';
+import BundleSizePill from '@/components/BundleSizePill.astro';
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="LineChart" /></div>
+
+<LivePreview example="chart/basic" />
+
+## Usage
+
+Each chart accepts a `data` array and a `mapping` object that declares which fields to read for the axes / series.
+
+```tsx
+import { LineChart } from '@arshad-shah/cynosure-react/chart';
+
+const data = [
+  { month: 'Jan', revenue: 1200 },
+  { month: 'Feb', revenue: 1600 },
+];
+
+<LineChart
+  data={data}
+  mapping={{ x: 'month', y: ['revenue'], seriesNames: ['Revenue'] }}
+  smooth
+  dots
+/>
+```
+
+## Bar chart
+
+`BarChart` renders vertical bars. Pass an array to `mapping.y` for grouped bars.
+
+<LivePreview example="chart/bar" />
+
+## Area chart
+
+`AreaChart` is equivalent to a line chart with a gradient fill — pass `smooth` for a softened curve.
+
+<LivePreview example="chart/area" />
+
+## Donut chart
+
+`DonutChart` and `PieChart` consume `labelField` / `valueField` instead of `x` / `y`.
+
+<LivePreview example="chart/donut" />
+
+## Sizing
+
+Each chart wraps in a sized container. Use `aspectRatio` for fluid responsive charts (default `"16 / 9"`), or pass an explicit `height` for fixed dashboards. `minHeight` (default `220`) keeps the chart usable inside flex containers.
+
+## API
+
+<PropsTable component="LineChart" />
+
+## Accessibility
+
+- Charts paint to a `<canvas>` — provide a descriptive `aria-label` (or a visible heading) so the chart's purpose is announced.
+- Pair quantitative charts with a hidden data table (or `<details>` block) so screen-reader users can access the raw values.
+- The default palette adapts to the active color scheme via the registered `cynosure-light` / `cynosure-dark` SwiftChart themes.
+- Tooltips fire on pointer move and on focus where supported.
+- Color alone never conveys meaning — series names are surfaced via the legend and tooltips.
+
+## Recipes
+
+- Use `aspectRatio="16 / 9"` for hero charts; set `height` for fixed-size dashboards.
+- Pass a custom `theme` to override the default light/dark theme registration.
+- Combine `smooth` + `dots` for a clean, readable trendline.
+- Use the named chart you need — `LineChart`, `BarChart`, `AreaChart`, `PieChart`, `DonutChart`, `RadarChart`, `ScatterChart`, `WaterfallChart`, `TreemapChart`, or `Sparkline`.

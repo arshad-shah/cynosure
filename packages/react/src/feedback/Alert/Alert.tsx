@@ -8,17 +8,11 @@ import {
   useMemo,
 } from 'react';
 import { IconButton } from '../../forms/IconButton/IconButton.js';
+import { Stack } from '../../primitives/layout/Stack/Stack.js';
+import { Text } from '../../typography/Text/Text.js';
 import { cn } from '../../utils/cn.js';
 import { CloseIcon, StatusIcon } from '../shared/icons.js';
-import {
-  surfaceClose,
-  surfaceContent,
-  surfaceDescription,
-  surfaceIcon,
-  surfaceRoot,
-  surfaceSize,
-  surfaceTitle,
-} from '../shared/surface.css.js';
+import { surfaceClose, surfaceIcon, surfaceRoot, surfaceSize } from '../shared/surface.css.js';
 import type { FeedbackStatus, FeedbackVariant } from '../shared/types.js';
 import { surfaceVariantClass } from '../shared/variants.js';
 
@@ -34,14 +28,37 @@ interface AlertContextValue {
 
 const AlertContext = createContext<AlertContextValue | null>(null);
 
+/**
+ * Props for the {@link Alert} root component.
+ */
 export interface AlertProps extends HTMLAttributes<HTMLDivElement> {
+  /**
+   * Semantic status that drives colour, default icon, and ARIA role. One of
+   * `info`, `success`, `warning`, `danger`, `neutral`.
+   * @default "info"
+   */
   status?: AlertStatus;
+  /**
+   * Visual style. `soft` reads as a tinted surface; `solid` is high-contrast;
+   * `outline` is bordered; `ghost` is borderless.
+   * @default "soft"
+   */
   variant?: AlertVariant;
+  /**
+   * Controls padding and typographic scale. One of `sm`, `md`, `lg`.
+   * @default "md"
+   */
   size?: AlertSize;
   /** Render custom icon; pass `false` to hide the default status icon. */
   icon?: ReactNode | false;
+  /** Show a trailing close button that triggers `onClose`. */
   closable?: boolean;
+  /** Invoked when the user activates the close button. */
   onClose?: () => void;
+  /**
+   * Accessible label for the close button.
+   * @default "Dismiss"
+   */
   closeLabel?: string;
   /**
    * ARIA role. Defaults to `alert` for danger/warning (interruptive) and
@@ -50,6 +67,13 @@ export interface AlertProps extends HTMLAttributes<HTMLDivElement> {
   role?: AlertRole;
 }
 
+/**
+ * Inline message that communicates the result of an action or the state of a
+ * region. Use Alert for non-blocking feedback like form-level errors, success
+ * confirmations, or contextual warnings. The default role is `status` for
+ * polite announcements and `alert` for danger/warning statuses so assistive
+ * tech interrupts the user appropriately.
+ */
 export const Alert = forwardRef<HTMLDivElement, AlertProps>(function Alert(
   {
     status = 'info',
@@ -99,7 +123,9 @@ export const Alert = forwardRef<HTMLDivElement, AlertProps>(function Alert(
         {...rest}
       >
         {showIcon ? <span className={surfaceIcon}>{iconNode}</span> : null}
-        <div className={surfaceContent}>{children}</div>
+        <Stack gap="1" style={{ flex: '1 1 auto', minWidth: 0 }}>
+          {children}
+        </Stack>
         {closable ? (
           <IconButton
             variant="bare"
@@ -114,37 +140,58 @@ export const Alert = forwardRef<HTMLDivElement, AlertProps>(function Alert(
   );
 });
 
-export interface AlertTitleProps extends HTMLAttributes<HTMLHeadingElement> {
+/**
+ * Props for the {@link AlertTitle} heading slot.
+ */
+export interface AlertTitleProps extends Omit<HTMLAttributes<HTMLElement>, 'color'> {
+  /**
+   * HTML element used to render the title. Choose a heading level that fits
+   * the document outline.
+   * @default "p"
+   */
   as?: 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'p';
 }
 
-export const AlertTitle = forwardRef<HTMLHeadingElement, AlertTitleProps>(function AlertTitle(
-  { as: As = 'p', className, id, ...rest },
+/**
+ * Heading slot for {@link Alert}. Renders semibold copy and is automatically
+ * referenced by the alert's `aria-labelledby` when present.
+ */
+export const AlertTitle = forwardRef<HTMLElement, AlertTitleProps>(function AlertTitle(
+  { as = 'p', id, children, ...rest },
   ref,
 ) {
   const ctx = useContext(AlertContext);
   return (
-    <As
+    <Text
       ref={ref as never}
+      as={as as never}
+      size="md"
+      weight="semibold"
       id={id ?? ctx?.titleId}
-      className={cn(surfaceTitle, className)}
       {...rest}
-    />
+    >
+      {children}
+    </Text>
   );
 });
 
-export interface AlertDescriptionProps extends HTMLAttributes<HTMLParagraphElement> {}
+/**
+ * Props for the {@link AlertDescription} body slot.
+ */
+export interface AlertDescriptionProps
+  extends Omit<HTMLAttributes<HTMLParagraphElement>, 'color'> {}
 
-export const AlertDescription = forwardRef<HTMLParagraphElement, AlertDescriptionProps>(
-  function AlertDescription({ className, id, ...rest }, ref) {
+/**
+ * Body copy slot for {@link Alert}. Renders at the small text size and is
+ * automatically referenced by the alert's `aria-describedby` when present.
+ */
+export const AlertDescription = forwardRef<HTMLElement, AlertDescriptionProps>(
+  function AlertDescription({ id, children, ...rest }, ref) {
     const ctx = useContext(AlertContext);
     return (
-      <p
-        ref={ref}
-        id={id ?? ctx?.descriptionId}
-        className={cn(surfaceDescription, className)}
-        {...rest}
-      />
+      <Text ref={ref as never} as="p" size="sm" id={id ?? ctx?.descriptionId} {...rest}>
+        {children}
+      </Text>
     );
   },
 );

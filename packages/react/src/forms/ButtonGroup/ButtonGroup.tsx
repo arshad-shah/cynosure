@@ -4,11 +4,21 @@ import type { ButtonColorScheme, ButtonSize, ButtonVariant } from '../Button/But
 import { buttonGroup, buttonGroupAttached } from './ButtonGroup.css.js';
 import { ButtonGroupContext } from './context.js';
 
+/** Props for the `ButtonGroup` wrapper. Pushes shared `variant`/`colorScheme`/`size` to every nested `<Button>`. */
 export interface ButtonGroupProps extends HTMLAttributes<HTMLDivElement> {
+  /**
+   * Shared visual style for every nested `<Button>`. Individual buttons can
+   * still override by passing their own `variant` prop.
+   */
   variant?: ButtonVariant;
+  /** Shared colour palette for every nested `<Button>`. */
   colorScheme?: ButtonColorScheme;
+  /** Shared size for every nested `<Button>`. */
   size?: ButtonSize;
-  /** When `true`, buttons render as a segmented control with shared borders. */
+  /**
+   * When `true`, buttons render as a segmented control with shared borders
+   * and no inter-button gap.
+   */
   attached?: boolean;
   children?: ReactNode;
 }

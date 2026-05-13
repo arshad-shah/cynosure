@@ -19,6 +19,11 @@ export const MenuBarGroup: typeof Radix.Group = Radix.Group;
 export const MenuBarSub: typeof Radix.Sub = Radix.Sub;
 export const MenuBarRadioGroup: typeof Radix.RadioGroup = Radix.RadioGroup;
 
+/**
+ * Top-level menu bar root. Renders the horizontal strip that hosts each
+ * `MenuBarMenu`. ARIA role and roving-tab-index focus management come from
+ * Radix.
+ */
 export const MenuBar = forwardRef<
   ElementRef<typeof Radix.Root>,
   ComponentPropsWithoutRef<typeof Radix.Root>
@@ -26,6 +31,11 @@ export const MenuBar = forwardRef<
   return <Radix.Root ref={ref} className={cn(menubarRoot, className)} {...rest} />;
 });
 
+/**
+ * Top-level menu name (e.g. "File", "Edit"). Opens its menu on click,
+ * `Enter`, `Space`, or `↓`; hover-opens once another top-level menu is
+ * already open.
+ */
 export const MenuBarTrigger = forwardRef<
   ElementRef<typeof Radix.Trigger>,
   ComponentPropsWithoutRef<typeof Radix.Trigger>

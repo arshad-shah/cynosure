@@ -1,0 +1,69 @@
+---
+title: Spinner
+description: Indeterminate loading indicator for buttons, panels, and overlays — three variants, five sizes, three speeds.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Renders with role="status" + aria-live="polite" and an accessible label so screen readers announce loading state.
+bundleSize: "—"
+tags: [data-display, loading, feedback]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+import StatusBadge from '@/components/StatusBadge.astro';
+import BundleSizePill from '@/components/BundleSizePill.astro';
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="Spinner" /></div>
+
+<LivePreview example="spinner/basic" />
+
+## Usage
+
+```tsx
+import { Spinner } from '@arshad-shah/cynosure-react';
+
+<Spinner />
+```
+
+## Variants
+
+Three visual variants are available — `border` (default), `dots`, and `ring`.
+
+<LivePreview example="spinner/variants" />
+
+## Sizes
+
+Five sizes are available: `xs`, `sm`, `md` (default), `lg`, and `xl`.
+
+<LivePreview example="spinner/sizes" />
+
+## Color schemes
+
+Three color schemes are available — `accent`, `neutral`, and `currentColor` (the default; inherits the surrounding text colour, useful inside buttons).
+
+<LivePreview example="spinner/color-schemes" />
+
+## Speed
+
+The `speed` prop controls the animation tempo: `slow`, `normal` (default), or `fast`.
+
+<LivePreview example="spinner/speed" />
+
+## API
+
+<PropsTable component="Spinner" />
+
+## Accessibility
+
+- Renders `role="status"` with `aria-live="polite"` so screen readers announce activity as it becomes available.
+- The `label` prop (default `"Loading"`) is forwarded as `aria-label`; pass a more specific string inside contextual loaders.
+- Honours `prefers-reduced-motion` — the animation slows or stops when the user requests it.
+- The visible icon / dots are `aria-hidden` — only the wrapper carries semantics.
+- Pair with `aria-busy="true"` on the surrounding region (e.g. a button or a card) for richer status semantics.
+
+## Recipes
+
+- Use `size="sm"` inside buttons and `size="lg"` for full-panel loaders.
+- Match `colorScheme` to the surrounding semantic action — `accent` for primary actions, `currentColor` to inherit the parent's foreground.
+- Use `variant="dots"` for chat-style typing indicators; `variant="ring"` for a softer treatment than the default `border`.
+- Pass a contextual `label` (e.g. `"Saving changes"`) so screen readers announce what is in flight.

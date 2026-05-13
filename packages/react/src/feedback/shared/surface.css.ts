@@ -2,7 +2,7 @@ import { style, styleVariants } from '@vanilla-extract/css';
 import { vars } from '../../styles/vars.css.js';
 
 /**
- * Shared "inline status surface" recipe used by Alert / Banner / Notification /
+ * Shared "inline status surface" recipe used by Alert / Notification /
  * Callout. Each component applies `surfaceRoot` + its own size/padding class +
  * one of the `surfaceVariant×Status` combinations for colour.
  */
@@ -26,28 +26,6 @@ export const surfaceIcon = style({
   marginTop: '0.125rem',
   fontSize: '1.125em',
   lineHeight: 0,
-});
-
-export const surfaceContent = style({
-  display: 'flex',
-  flexDirection: 'column',
-  gap: vars.space['1'],
-  flex: '1 1 auto',
-  minWidth: 0,
-});
-
-export const surfaceTitle = style({
-  margin: 0,
-  fontWeight: 'var(--cynosure-font-weight-semibold)',
-  fontSize: 'var(--cynosure-font-body-md-size)',
-  lineHeight: 'var(--cynosure-font-body-md-line-height)',
-});
-
-export const surfaceDescription = style({
-  margin: 0,
-  fontSize: 'var(--cynosure-font-body-sm-size)',
-  lineHeight: 'var(--cynosure-font-body-sm-line-height)',
-  color: 'inherit',
 });
 
 export const surfaceClose = style({

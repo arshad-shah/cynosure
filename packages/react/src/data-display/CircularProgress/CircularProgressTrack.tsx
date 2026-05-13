@@ -15,6 +15,7 @@ import {
   useCircularProgressContext,
 } from './CircularProgressContext.js';
 
+/** Props for the {@link CircularProgressTrack} background circle. Accepts any standard SVG circle attribute. */
 export type CircularProgressTrackProps = SVGAttributes<SVGCircleElement>;
 
 const colorClass: Record<CircularProgressColorScheme, string> = {

@@ -3,14 +3,24 @@ import { type ReactNode, forwardRef } from 'react';
 import { cn } from '../../utils/cn.js';
 import { radioGroupHorizontal, radioGroupRoot } from '../Radio/Radio.css.js';
 
+/** Props for `<RadioGroup>` — single-select radio container. */
 export interface RadioGroupProps {
+  /** Controlled selected radio value. */
   value?: string;
+  /** Uncontrolled initial selected value. */
   defaultValue?: string;
+  /** Fires with the next value on selection change. */
   onValueChange?: (value: string) => void;
+  /** Submitted form field name shared across every radio in the group. */
   name?: string;
+  /** Disables every radio in the group. */
   disabled?: boolean;
+  /** Marks the field as required for form submission. */
   required?: boolean;
-  /** Layout direction. Defaults to `vertical`. */
+  /**
+   * Layout direction. Affects arrow-key navigation.
+   * @default "vertical"
+   */
   orientation?: 'horizontal' | 'vertical';
   /** `aria-label` for the group when no visible label is provided. */
   'aria-label'?: string;

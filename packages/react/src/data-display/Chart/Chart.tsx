@@ -1,353 +1,306 @@
 import {
+  type ChartRef,
+  Area as SwiftArea,
+  Bar as SwiftBar,
+  Donut as SwiftDonut,
+  HBar as SwiftHBar,
+  Line as SwiftLine,
+  Pie as SwiftPie,
+  Radar as SwiftRadar,
+  Scatter as SwiftScatter,
+  SparklineComponent as SwiftSparkline,
+  StackedArea as SwiftStackedArea,
+  StackedBar as SwiftStackedBar,
+  Treemap as SwiftTreemap,
+  Waterfall as SwiftWaterfall,
+} from '@arshad-shah/swift-chart/react';
+import {
   type CSSProperties,
   type ComponentProps,
-  type HTMLAttributes,
   type ReactElement,
-  type ReactNode,
-  createContext,
+  type Ref,
   forwardRef,
-  useContext,
-  useId,
+  useEffect,
   useMemo,
+  useState,
 } from 'react';
-import {
-  Legend as RechartsLegend,
-  Tooltip as RechartsTooltip,
-  ResponsiveContainer,
-} from 'recharts';
 import { cn } from '../../utils/cn.js';
-import {
-  chartContainer,
-  chartLegend,
-  chartLegendItem,
-  chartLegendSwatch,
-  chartTooltip,
-  chartTooltipLabel,
-  chartTooltipName,
-  chartTooltipRow,
-  chartTooltipRows,
-  chartTooltipSwatch,
-  chartTooltipValue,
-} from './Chart.css.js';
+import { chartContainer } from './Chart.css.js';
+import { CYNOSURE_THEME_DARK, CYNOSURE_THEME_LIGHT, registerCynosureThemes } from './themes.js';
 
 /**
- * Configure the visual identity of each series in a chart once, at the
- * container level. Keys match the `dataKey` / series name Recharts emits.
+ * Cynosure ships two SwiftChart themes — `'cynosure-light'` and
+ * `'cynosure-dark'` — registered with SwiftChart's `addTheme` API at module
+ * load. Each chart wrapper picks one based on the active document color
+ * scheme so the canvas matches the rest of the page without any consumer
+ * configuration.
  *
- *   const config = {
- *     revenue: { label: 'Revenue', color: 'var(--cynosure-color-accent-solid)' },
- *     cost:    { label: 'Cost',    color: 'var(--cynosure-color-feedback-danger-solid)' },
- *   };
+ * The themes mirror the Cynosure design tokens (iris accent, surface +
+ * foreground neutrals, semantic feedback colours). Need a different palette?
+ * Pass `theme` directly — any value SwiftChart accepts (built-in name,
+ * registered name, or full `Theme` object) is forwarded untouched.
  */
-export interface ChartSeriesConfig {
-  /** Display name shown in tooltip + legend. Falls back to the data key. */
-  label?: ReactNode;
-  /** CSS color (hex / var / rgb). Used by tooltip dot, legend swatch, and default stroke/fill. */
-  color?: string;
-  /** Optional icon slot rendered next to the label in the legend. */
-  icon?: ReactNode;
-}
+registerCynosureThemes();
 
-export type ChartConfig = Record<string, ChartSeriesConfig>;
+/** Re-export the theme registration helpers for app-level `addTheme` extensions. */
+export {
+  CYNOSURE_THEME_DARK,
+  CYNOSURE_THEME_LIGHT,
+  cynosureChartThemes,
+  registerCynosureThemes,
+} from './themes.js';
 
-interface ChartContextValue {
-  config: ChartConfig;
-  id: string;
-}
+/** Re-export the SwiftChart imperative ref so consumers can call `.resize()` / `.toDataURL()`. */
+export type { ChartRef } from '@arshad-shah/swift-chart/react';
 
-const ChartContext = createContext<ChartContextValue | null>(null);
+type SchemeName = 'light' | 'dark';
 
-function useChartContext(): ChartContextValue {
-  const ctx = useContext(ChartContext);
-  if (!ctx) {
-    throw new Error('Chart primitives must be rendered inside <ChartContainer>.');
+/**
+ * Resolve the current color scheme from the document. We check, in order:
+ *   1. `<html data-theme="dark|light">` — Cynosure's `ThemeProvider` writes this.
+ *   2. The CSS `color-scheme` computed value on `<html>`.
+ *   3. The `prefers-color-scheme` media query.
+ */
+function readScheme(): SchemeName {
+  if (typeof document === 'undefined') return 'light';
+  const root = document.documentElement;
+  const dataTheme = root.dataset.theme;
+  if (dataTheme === 'dark' || dataTheme === 'light') return dataTheme;
+  const computed = getComputedStyle(root).colorScheme;
+  if (computed?.includes('dark') && !computed.includes('light')) return 'dark';
+  if (typeof matchMedia !== 'undefined' && matchMedia('(prefers-color-scheme: dark)').matches) {
+    return 'dark';
   }
-  return ctx;
+  return 'light';
 }
 
-export interface ChartContainerProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
-  /** Series config keyed by dataKey. Drives tooltip/legend labels + colors. */
-  config: ChartConfig;
+/**
+ * Subscribe to color-scheme changes from any of the sources `readScheme`
+ * checks. The component re-renders when the scheme flips, which prompts
+ * SwiftChart to repaint with the new theme.
+ */
+function useColorScheme(): SchemeName {
+  const [scheme, setScheme] = useState<SchemeName>(() => readScheme());
+
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    const update = () => setScheme(readScheme());
+
+    // 1. `data-theme` flips on <html>.
+    const observer = new MutationObserver(update);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-theme', 'class', 'style'],
+    });
+
+    // 2. System preference change.
+    const mq = matchMedia('(prefers-color-scheme: dark)');
+    mq.addEventListener('change', update);
+
+    return () => {
+      observer.disconnect();
+      mq.removeEventListener('change', update);
+    };
+  }, []);
+
+  return scheme;
+}
+
+/**
+ * Props shared by every Cynosure chart wrapper. Controls how the chart's
+ * sized container is laid out around the underlying SwiftChart canvas.
+ */
+interface BaseProps {
+  /** Additional class applied to the sized wrapper around the SwiftChart canvas. */
+  className?: string;
+  /** Additional inline styles merged onto the wrapper. */
+  style?: CSSProperties;
   /**
-   * Aspect ratio for the responsive container. Accepts `"16 / 9"`, `"1 / 1"`,
-   * or a number like `1.78`. Default `"16 / 9"`.
+   * Aspect ratio for the wrapper. Accepts any CSS `aspect-ratio` value (e.g.
+   * `"16 / 9"`, `"4/3"`) or a number (`1.78`). Ignored when `height` is set.
+   * @default "16 / 9"
    */
   aspectRatio?: string | number;
-  /** Fixed height instead of aspect ratio. Takes precedence when set. */
-  height?: number | string;
-  /** Minimum height — useful inside flex containers. Default `220`. */
-  minHeight?: number | string;
   /**
-   * The Recharts chart (`<LineChart>`, `<BarChart>`, etc.). Must be a single
-   * element so `ResponsiveContainer` can clone it with measured dimensions.
+   * Fixed pixel/CSS height. When set, takes precedence over `aspectRatio`.
+   * Pass a number (interpreted as `px`) or any CSS length string.
    */
-  children: ReactElement;
+  height?: number | string;
+  /**
+   * Minimum height applied to the wrapper — keeps the canvas from collapsing
+   * inside flex/grid parents that don't define an intrinsic height.
+   * @default 220
+   */
+  minHeight?: number | string;
 }
 
-/**
- * Themed wrapper for a Recharts chart. Provides series config via context,
- * applies CSS variables for stroke/fill defaults, and renders the chart
- * inside a `ResponsiveContainer` so it fills its parent.
- */
-export const ChartContainer = forwardRef<HTMLDivElement, ChartContainerProps>(
-  function ChartContainer(
-    {
-      config,
-      aspectRatio = '16 / 9',
-      height,
-      minHeight = 220,
-      className,
-      style,
-      children,
-      ...rest
-    },
-    ref,
-  ) {
-    const id = useId();
-    const contextValue = useMemo(() => ({ config, id }), [config, id]);
-
-    const colorVars = useMemo<CSSProperties>(() => {
-      const vars: Record<string, string> = {};
-      for (const [key, series] of Object.entries(config)) {
-        if (series.color) {
-          vars[`--cynosure-chart-series-${key}`] = series.color;
-        }
-      }
-      return vars as CSSProperties;
-    }, [config]);
-
-    const sizingStyle: CSSProperties =
+function useWrapperStyle({
+  aspectRatio = '16 / 9',
+  height,
+  minHeight = 220,
+  style,
+}: BaseProps): CSSProperties {
+  return useMemo<CSSProperties>(
+    () =>
       height !== undefined
-        ? { height, minHeight }
+        ? { height, minHeight, ...style }
         : {
             aspectRatio: typeof aspectRatio === 'number' ? String(aspectRatio) : aspectRatio,
             minHeight,
-          };
+            ...style,
+          },
+    [aspectRatio, height, minHeight, style],
+  );
+}
+
+/**
+ * Wraps a SwiftChart React component in a sized container. Defaults `theme`
+ * to one of SwiftChart's built-ins based on the active color scheme; consumer
+ * `theme` always wins.
+ */
+function createChart<P extends { theme?: unknown }>(
+  Component: React.ForwardRefExoticComponent<P & React.RefAttributes<ChartRef>>,
+) {
+  return forwardRef<ChartRef, P & BaseProps>(function ThemedChart(props, ref) {
+    const { className, style, aspectRatio, height, minHeight, theme, ...rest } = props as P &
+      BaseProps;
+
+    const scheme = useColorScheme();
+    const wrapperStyle = useWrapperStyle({ aspectRatio, height, minHeight, style });
+
+    const resolvedTheme: unknown =
+      theme ?? (scheme === 'dark' ? CYNOSURE_THEME_DARK : CYNOSURE_THEME_LIGHT);
+
+    // Re-key on theme so SwiftChart fully repaints when the scheme flips
+    // (re-using the same canvas would draw the old colors over the new).
+    const key = typeof resolvedTheme === 'string' ? resolvedTheme : 'custom';
+
+    const merged = {
+      ...rest,
+      theme: resolvedTheme,
+      width: '100%',
+      height: '100%',
+    } as unknown as P & React.RefAttributes<ChartRef>;
 
     return (
-      <ChartContext.Provider value={contextValue}>
-        <div
-          ref={ref}
-          data-chart={id}
-          className={cn(chartContainer, className)}
-          style={{ ...sizingStyle, ...colorVars, ...style }}
-          {...rest}
-        >
-          <ResponsiveContainer width="100%" height="100%">
-            {children}
-          </ResponsiveContainer>
-        </div>
-      </ChartContext.Provider>
-    );
-  },
-);
-
-/**
- * Helper: pull the resolved color for a series. Falls back to a neutral if
- * nothing is configured.
- */
-export function useChartSeriesColor(key: string, fallback = 'currentColor'): string {
-  const { config } = useChartContext();
-  return config[key]?.color ?? fallback;
-}
-
-/**
- * Helper: build the `stroke` / `fill` props for a Recharts series element
- * from the container config. Lets you write
- * `<Line dataKey="revenue" {...chartSeriesProps('revenue')} />`.
- */
-export function chartSeriesProps(
-  config: ChartConfig,
-  key: string,
-): {
-  stroke: string;
-  fill: string;
-  name?: string;
-} {
-  const series = config[key];
-  const color = series?.color ?? 'var(--cynosure-color-foreground-muted)';
-  return {
-    stroke: color,
-    fill: color,
-    name: typeof series?.label === 'string' ? series.label : undefined,
-  };
-}
-
-/* ------------------------------------------------------------------ */
-/*  Tooltip                                                            */
-/* ------------------------------------------------------------------ */
-
-type TooltipPayload = {
-  name?: string;
-  value?: number | string | Array<number | string>;
-  dataKey?: string | number;
-  color?: string;
-  payload?: unknown;
-};
-
-export interface ChartTooltipContentProps {
-  active?: boolean;
-  payload?: TooltipPayload[];
-  label?: ReactNode;
-  /** Format the series value. Default `Intl.NumberFormat`. */
-  formatter?: (value: number | string, name: string) => ReactNode;
-  /** Format the header label. Default identity. */
-  labelFormatter?: (label: ReactNode) => ReactNode;
-  /** Hide the header label row. */
-  hideLabel?: boolean;
-  /** Hide the coloured swatch. */
-  hideIndicator?: boolean;
-  className?: string;
-}
-
-const defaultFormatter = (value: number | string): ReactNode => {
-  if (typeof value === 'number') return new Intl.NumberFormat().format(value);
-  return value;
-};
-
-/**
- * Content slot for Recharts' `<Tooltip>`. Wire it up as:
- *
- *   <Tooltip content={<ChartTooltipContent />} />
- *
- * or use the pre-wired `<ChartTooltip />` below.
- */
-export function ChartTooltipContent({
-  active,
-  payload,
-  label,
-  formatter = defaultFormatter,
-  labelFormatter = (l) => l,
-  hideLabel,
-  hideIndicator,
-  className,
-}: ChartTooltipContentProps): ReactElement | null {
-  const { config } = useChartContext();
-
-  if (!active || !payload || payload.length === 0) return null;
-
-  return (
-    <div className={cn(chartTooltip, className)}>
-      {!hideLabel && label != null ? (
-        <div className={chartTooltipLabel}>{labelFormatter(label)}</div>
-      ) : null}
-      <div className={chartTooltipRows}>
-        {payload.map((entry) => {
-          const key = typeof entry.dataKey === 'string' ? entry.dataKey : String(entry.dataKey);
-          const series = config[key];
-          const name = series?.label ?? entry.name ?? key;
-          const color = series?.color ?? entry.color ?? 'currentColor';
-          const value = Array.isArray(entry.value) ? entry.value.join(' – ') : (entry.value ?? '');
-          return (
-            <div className={chartTooltipRow} key={key}>
-              <span className={chartTooltipName}>
-                {!hideIndicator ? (
-                  <span className={chartTooltipSwatch} style={{ background: color }} aria-hidden />
-                ) : null}
-                {name}
-              </span>
-              <span className={chartTooltipValue}>
-                {formatter(value as number | string, String(name))}
-              </span>
-            </div>
-          );
-        })}
+      <div className={cn(chartContainer, className)} style={wrapperStyle}>
+        <Component key={key} ref={ref as Ref<ChartRef>} {...merged} />
       </div>
-    </div>
-  );
+    );
+  });
 }
 
-export type ChartTooltipProps = Omit<ComponentProps<typeof RechartsTooltip>, 'content'> & {
-  /** Override the rendered content. Defaults to `<ChartTooltipContent />`. */
-  content?: ComponentProps<typeof RechartsTooltip>['content'];
+// Re-export each component's props (sans ref) under a Cynosure-flavoured name
+// + the shared `BaseProps`. TS otherwise refuses to emit the .d.ts because the
+// inferred wrapper-props reference unexported names from `@arshad-shah/swift-chart/react`.
+export type LineChartProps = ComponentProps<typeof SwiftLine> & BaseProps;
+export type AreaChartProps = ComponentProps<typeof SwiftArea> & BaseProps;
+export type BarChartProps = ComponentProps<typeof SwiftBar> & BaseProps;
+export type HBarChartProps = ComponentProps<typeof SwiftHBar> & BaseProps;
+export type StackedBarChartProps = ComponentProps<typeof SwiftStackedBar> & BaseProps;
+export type StackedAreaChartProps = ComponentProps<typeof SwiftStackedArea> & BaseProps;
+export type PieChartProps = ComponentProps<typeof SwiftPie> & BaseProps;
+export type DonutChartProps = ComponentProps<typeof SwiftDonut> & BaseProps;
+export type ScatterChartProps = ComponentProps<typeof SwiftScatter> & BaseProps;
+export type RadarChartProps = ComponentProps<typeof SwiftRadar> & BaseProps;
+export type WaterfallChartProps = ComponentProps<typeof SwiftWaterfall> & BaseProps;
+export type TreemapChartProps = ComponentProps<typeof SwiftTreemap> & BaseProps;
+export type SparklineProps = ComponentProps<typeof SwiftSparkline>;
+
+/** Line chart. Forwards every SwiftChart `<Line>` prop (`smooth`, `dots`, `area`, …). */
+export const LineChart: React.ForwardRefExoticComponent<
+  LineChartProps & React.RefAttributes<ChartRef>
+> = createChart(SwiftLine);
+/** Area chart. Equivalent to `<LineChart area />` with a gradient fill. */
+export const AreaChart: React.ForwardRefExoticComponent<
+  AreaChartProps & React.RefAttributes<ChartRef>
+> = createChart(SwiftArea);
+/** Vertical bar chart. Pass `mapping.y` as a `string[]` for grouped bars. */
+export const BarChart: React.ForwardRefExoticComponent<
+  BarChartProps & React.RefAttributes<ChartRef>
+> = createChart(SwiftBar);
+/** Horizontal bar chart. */
+export const HBarChart: React.ForwardRefExoticComponent<
+  HBarChartProps & React.RefAttributes<ChartRef>
+> = createChart(SwiftHBar);
+/** Stacked bar chart. Pass `percent` for 100 %-stacked bars. */
+export const StackedBarChart: React.ForwardRefExoticComponent<
+  StackedBarChartProps & React.RefAttributes<ChartRef>
+> = createChart(SwiftStackedBar);
+/** Stacked area chart. */
+export const StackedAreaChart: React.ForwardRefExoticComponent<
+  StackedAreaChartProps & React.RefAttributes<ChartRef>
+> = createChart(SwiftStackedArea);
+/** Pie chart. Use {@link DonutChart} for the ring variant. */
+export const PieChart: React.ForwardRefExoticComponent<
+  PieChartProps & React.RefAttributes<ChartRef>
+> = createChart(SwiftPie);
+/** Donut chart. Tune `donutWidth` (0–1) for ring thickness. */
+export const DonutChart: React.ForwardRefExoticComponent<
+  DonutChartProps & React.RefAttributes<ChartRef>
+> = createChart(SwiftDonut);
+/** Scatter / bubble chart. Map `groupField` for colour, `sizeField` for radius. */
+export const ScatterChart: React.ForwardRefExoticComponent<
+  ScatterChartProps & React.RefAttributes<ChartRef>
+> = createChart(SwiftScatter);
+/** Radar / spider chart for multi-axis comparison. */
+export const RadarChart: React.ForwardRefExoticComponent<
+  RadarChartProps & React.RefAttributes<ChartRef>
+> = createChart(SwiftRadar);
+/** Waterfall chart for incremental positive/negative changes. */
+export const WaterfallChart: React.ForwardRefExoticComponent<
+  WaterfallChartProps & React.RefAttributes<ChartRef>
+> = createChart(SwiftWaterfall);
+/** Treemap (squarified rectangles, area ∝ value). */
+export const TreemapChart: React.ForwardRefExoticComponent<
+  TreemapChartProps & React.RefAttributes<ChartRef>
+> = createChart(SwiftTreemap);
+
+/**
+ * Inline sparkline. SparklineComponent has its own minimal prop surface
+ * (no axes / legend / tooltip) and is intentionally forwarded as-is.
+ */
+export const Sparkline: React.ForwardRefExoticComponent<
+  SparklineProps & React.RefAttributes<ChartRef>
+> = SwiftSparkline;
+
+/**
+ * Convenience type for the SwiftChart-style `mapping` prop that tells a chart
+ * which fields of `data` to render. Each chart only consumes the keys that
+ * apply to its shape (`x`/`y` for cartesian, `labelField`/`valueField` for
+ * pie/donut/treemap).
+ */
+export type ChartDataMapping = {
+  /** Key in each datum to plot on the X axis (cartesian charts). */
+  x?: string;
+  /**
+   * Key (or list of keys) in each datum to plot on the Y axis. Pass an array
+   * of field names for grouped/stacked series.
+   */
+  y?: string | string[];
+  /** Key holding each slice's label (pie/donut/treemap). */
+  labelField?: string;
+  /** Key holding each slice's numeric value (pie/donut/treemap/radar). */
+  valueField?: string;
+  /** Friendly names used in the legend in place of raw field keys. */
+  seriesNames?: string[];
 };
 
-/** Pre-wired tooltip — drop inside any chart and it picks up the config via context. */
-export function ChartTooltip({
-  content = <ChartTooltipContent />,
-  cursor = true,
-  ...rest
-}: ChartTooltipProps): ReactElement {
-  return <RechartsTooltip content={content} cursor={cursor} {...rest} />;
+/** Convenience type for a typed row of arbitrary chart data. */
+export type ChartDatum = Record<string, unknown>;
+
+/** Render-prop ref shape kept for backwards-compatibility with consumers using imperative API. */
+export type ChartHandle = ChartRef;
+
+/** The name of either Cynosure theme registered with SwiftChart. */
+export type CynosureChartTheme = typeof CYNOSURE_THEME_LIGHT | typeof CYNOSURE_THEME_DARK;
+
+/**
+ * No-op marker so existing call sites that imported a "container" component
+ * still type-check. Each chart now provides its own sized container — there
+ * is no longer a wrapping `ChartContainer` element.
+ */
+export interface ChartContainerProps {
+  /** @deprecated Each chart (`<LineChart>`, `<BarChart>` …) now manages its own container. */
+  children?: ReactElement;
 }
-
-/* ------------------------------------------------------------------ */
-/*  Legend                                                             */
-/* ------------------------------------------------------------------ */
-
-type LegendPayload = {
-  value?: string;
-  dataKey?: string | number;
-  color?: string;
-  inactive?: boolean;
-  payload?: unknown;
-};
-
-export interface ChartLegendContentProps {
-  payload?: LegendPayload[];
-  /** Called with the series key when an item is clicked. */
-  onItemClick?: (key: string) => void;
-  /** Map of key → hidden state for interactive toggles. */
-  hidden?: Record<string, boolean>;
-  className?: string;
-}
-
-/** Content slot for Recharts' `<Legend>`. Themed swatches + configurable labels. */
-export function ChartLegendContent({
-  payload,
-  onItemClick,
-  hidden,
-  className,
-}: ChartLegendContentProps): ReactElement | null {
-  const { config } = useChartContext();
-  if (!payload || payload.length === 0) return null;
-  return (
-    <div className={cn(chartLegend, className)}>
-      {payload.map((entry, i) => {
-        const key =
-          typeof entry.dataKey === 'string'
-            ? entry.dataKey
-            : typeof entry.value === 'string'
-              ? entry.value
-              : `legend-${i}`;
-        const series = config[key];
-        const label = series?.label ?? entry.value ?? key;
-        const color = series?.color ?? entry.color ?? 'currentColor';
-        const isHidden = hidden?.[key] ?? entry.inactive ?? false;
-        const interactive = Boolean(onItemClick);
-        return (
-          <button
-            key={key}
-            type="button"
-            disabled={!interactive}
-            data-interactive={interactive || undefined}
-            data-hidden={isHidden || undefined}
-            className={chartLegendItem}
-            onClick={interactive ? () => onItemClick?.(key) : undefined}
-            style={{ background: 'transparent', border: 'none', padding: 0 }}
-          >
-            {series?.icon ?? (
-              <span className={chartLegendSwatch} style={{ background: color }} aria-hidden />
-            )}
-            <span>{label}</span>
-          </button>
-        );
-      })}
-    </div>
-  );
-}
-
-export type ChartLegendProps = Omit<ComponentProps<typeof RechartsLegend>, 'content'> & {
-  content?: ComponentProps<typeof RechartsLegend>['content'];
-};
-
-/** Pre-wired legend. Horizontal, bottom-aligned, picks labels/colors from context. */
-export function ChartLegend({
-  content = <ChartLegendContent />,
-  verticalAlign = 'bottom',
-  ...rest
-}: ChartLegendProps): ReactElement {
-  return <RechartsLegend content={content} verticalAlign={verticalAlign} {...rest} />;
-}
-
-export { useChartContext };

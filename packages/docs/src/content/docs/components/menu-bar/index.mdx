@@ -1,0 +1,83 @@
+---
+title: MenuBar
+description: A persistent horizontal bar of top-level menus modelled on desktop application menus.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Uses role="menubar" / role="menu" / role="menuitem"; arrow keys traverse menus and items; Esc closes; focus returns to the active trigger.
+bundleSize: "—"
+tags: [overlay, menu, accessible]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+import StatusBadge from '@/components/StatusBadge.astro';
+import BundleSizePill from '@/components/BundleSizePill.astro';
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="MenuBar" /></div>
+
+<LivePreview example="menu-bar/basic" />
+
+## Usage
+
+```tsx
+import {
+  MenuBar,
+  MenuBarContent,
+  MenuBarItem,
+  MenuBarMenu,
+  MenuBarSeparator,
+  MenuBarShortcut,
+  MenuBarTrigger,
+} from "@arshad-shah/cynosure-react";
+
+<MenuBar>
+  <MenuBarMenu>
+    <MenuBarTrigger>File</MenuBarTrigger>
+    <MenuBarContent>
+      <MenuBarItem>New <MenuBarShortcut>⌘N</MenuBarShortcut></MenuBarItem>
+      <MenuBarItem>Open <MenuBarShortcut>⌘O</MenuBarShortcut></MenuBarItem>
+      <MenuBarSeparator />
+      <MenuBarItem>Save <MenuBarShortcut>⌘S</MenuBarShortcut></MenuBarItem>
+    </MenuBarContent>
+  </MenuBarMenu>
+</MenuBar>
+```
+
+## Variants
+
+### With shortcuts
+
+Use `MenuBarShortcut` to render trailing kbd-chip hints — they are decorative and not announced.
+
+<LivePreview example="menu-bar/with-shortcuts" />
+
+### With submenus
+
+Nest `MenuBarSub` + `MenuBarSubTrigger` + `MenuBarSubContent` for hierarchical actions like "Open recent".
+
+<LivePreview example="menu-bar/with-submenu" />
+
+### Checkbox and radio items
+
+Toggle view settings with `MenuBarCheckboxItem`; pick exclusive options with `MenuBarRadioItem` inside a `MenuBarRadioGroup`.
+
+<LivePreview example="menu-bar/checkbox-radio" />
+
+## API
+
+<PropsTable component="MenuBarContent" />
+
+## Accessibility
+
+- The root exposes `role="menubar"`; each menu content exposes `role="menu"`; items expose `role="menuitem"`.
+- Left / Right arrow keys cycle between top-level menus; Up / Down move within an open menu; type-ahead selects matching items.
+- Pressing `Esc` closes the currently open menu and returns focus to its trigger.
+- `MenuBarCheckboxItem` carries `role="menuitemcheckbox"`; `MenuBarRadioItem` carries `role="menuitemradio"`.
+- `MenuBarShortcut` is `aria-hidden="true"` — visible only as a hint.
+
+## Recipes
+
+- Mirror desktop conventions: `File`, `Edit`, `View`, `Help` from left to right.
+- Prefer `disabled` items over removing them so the menu's shape is stable between states.
+- Pair with `CommandPalette` so power users can reach the same actions via keyboard search.
+- Keep top-level triggers short — single words read fastest at a glance.

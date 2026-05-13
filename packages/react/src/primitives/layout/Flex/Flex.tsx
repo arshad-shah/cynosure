@@ -44,23 +44,72 @@ const JUSTIFY_MAP: Record<FlexJustify, string> = {
   evenly: 'space-evenly',
 };
 
+/**
+ * Props specific to `Flex`, layered on `LayoutProps` and `AsChildProps`.
+ */
 export interface FlexOwnProps extends LayoutProps, AsChildProps {
+  /**
+   * Additional class names appended after Cynosure's base classes.
+   */
   className?: string;
+  /**
+   * Inline style overrides merged last.
+   */
   style?: CSSProperties;
+  /**
+   * Flex children.
+   */
   children?: ReactNode;
+  /**
+   * Main-axis direction — `row`, `column`, or their reversed variants.
+   */
   direction?: Responsive<FlexDirection>;
+  /**
+   * `flex-wrap` setting. Use `wrap-reverse` to wrap in the opposite direction.
+   */
   wrap?: Responsive<FlexWrap>;
+  /**
+   * `flex-grow` applied to *this* container (not its children).
+   */
   grow?: Responsive<number | `${number}`>;
+  /**
+   * `flex-shrink` applied to *this* container (not its children).
+   */
   shrink?: Responsive<number | `${number}`>;
+  /**
+   * `flex-basis` applied to *this* container.
+   */
   basis?: Responsive<SpaceToken | 'auto' | `${number}px` | `${number}%`>;
+  /**
+   * Uniform gap in both axes. Falls back to `rowGap`/`columnGap` when set.
+   */
   gap?: Responsive<SpaceToken>;
+  /**
+   * Gap between wrapped rows. Overrides the row axis of `gap`.
+   */
   rowGap?: Responsive<SpaceToken>;
+  /**
+   * Gap between adjacent items on the inline axis. Overrides `gap`'s columns.
+   */
   columnGap?: Responsive<SpaceToken>;
+  /**
+   * Cross-axis alignment — maps to `align-items`. Supports `baseline`.
+   */
   align?: Responsive<FlexAlign>;
+  /**
+   * Main-axis distribution — maps to `justify-content`.
+   */
   justify?: Responsive<FlexJustify>;
 }
 
+/**
+ * Full `Flex` props. Generic over the rendered element.
+ */
 export type FlexProps<E extends ElementType = 'div'> = FlexOwnProps & {
+  /**
+   * Rendered intrinsic element or component.
+   * @default "div"
+   */
   as?: E;
 } & Omit<React.ComponentPropsWithoutRef<E>, keyof FlexOwnProps | 'as'>;
 
@@ -95,7 +144,11 @@ const FlexRender = (props: AnyProps, ref: ForwardedRef<Element>): ReactElement =
     toResponsiveVars(grow, 'cynosure-flex-grow', (v) => String(v)),
     toResponsiveVars(shrink, 'cynosure-flex-shrink', (v) => String(v)),
     toResponsiveVars(basis, 'cynosure-flex-basis', (v) => resolveSize(v)),
-    toResponsiveVars(gap, 'cynosure-flex-gap', (v) => resolveSpace(v)),
+    // `gap` writes to both longhand vars so the column/row-gap CSS rules in
+    // Flex.css.ts always have a value to resolve. See Grid.tsx for the
+    // shorthand-vs-longhand cascade incident note.
+    toResponsiveVars(gap, 'cynosure-flex-row-gap', (v) => resolveSpace(v)),
+    toResponsiveVars(gap, 'cynosure-flex-col-gap', (v) => resolveSpace(v)),
     toResponsiveVars(rowGap, 'cynosure-flex-row-gap', (v) => resolveSpace(v)),
     toResponsiveVars(columnGap, 'cynosure-flex-col-gap', (v) => resolveSpace(v)),
     toResponsiveVars(align, 'cynosure-flex-align', (v) => ALIGN_MAP[v]),

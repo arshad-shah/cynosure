@@ -1,0 +1,34 @@
+---
+title: Migrating from 0.x to 1.0
+description: Migration guide for the v1.0 release.
+---
+
+# Migrating from 0.x to 1.0
+
+There's nothing to migrate. v1.0 is the first public release — prior
+`0.x` versions existed only in development. If you were consuming Cynosure
+from source or a local alias, install the npm package:
+
+```bash
+pnpm add @arshad-shah/cynosure-react @arshad-shah/cynosure-tokens
+```
+
+…and remove any workspace / local path references.
+
+## What v1.0 ships
+
+- Every component catalogued in the
+  [Component inventory](https://github.com/arshad-shah/cynosure/blob/main/README.md#component-inventory-what-every-single-component-means).
+- Every foundation documented (tokens, theming, accessibility, RTL,
+  motion).
+- Eight priority recipes.
+- `@arshad-shah/cynosure-react`, `@arshad-shah/cynosure-tokens`, `@arshad-shah/cynosure-themes`, `@arshad-shah/cynosure-core`, and
+  `@arshad-shah/cynosure-icons` all released at the same semver, via linked changesets.
+
+## Semver policy from here
+
+- **Patch** — bug fixes, no API changes.
+- **Minor** — new components, new props (additive), new variants. No
+  breaking changes.
+- **Major** — breaking changes. Requires a migration guide. Deprecations
+  are announced at least one minor cycle before removal.

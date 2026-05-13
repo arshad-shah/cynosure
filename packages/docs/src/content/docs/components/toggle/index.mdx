@@ -1,0 +1,67 @@
+---
+title: Toggle
+description: Two-state button that switches a single option on or off. Built on Radix Toggle.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Built on Radix Toggle — exposes `aria-pressed` for the on/off state, native keyboard activation (Enter/Space), and focus styles driven by design tokens.
+bundleSize: "—"
+tags: [feedback, control, action]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+import StatusBadge from '@/components/StatusBadge.astro';
+import BundleSizePill from '@/components/BundleSizePill.astro';
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="Toggle" /></div>
+
+<LivePreview example="toggle/basic" />
+
+## Usage
+
+```tsx
+import { Toggle } from '@arshad-shah/cynosure-react';
+
+<Toggle aria-label="Bold">B</Toggle>
+```
+
+## Variants
+
+Toggle ships three variants — `ghost` (default), `outline`, and `solid`.
+
+<LivePreview example="toggle/variants" />
+
+## Sizes
+
+Four sizes are available: `xs`, `sm`, `md` (default), and `lg`.
+
+<LivePreview example="toggle/sizes" />
+
+## Controlled
+
+Use `pressed` and `onPressedChange` (from Radix Toggle) to control the toggled state.
+
+<LivePreview example="toggle/controlled" />
+
+## Disabled
+
+<LivePreview example="toggle/disabled" />
+
+## API
+
+<PropsTable component="Toggle" />
+
+## Accessibility
+
+- Built on Radix Toggle — exposes `aria-pressed` for the on/off state.
+- Native keyboard activation: Space and Enter toggle the pressed state.
+- Always include a visible label or an `aria-label` describing what is being toggled (`<Toggle aria-label="Bold">B</Toggle>`).
+- Pressed state is communicated through `aria-pressed`, not colour alone — the variant styling layers on top of accessible semantics.
+- Focus outline uses the token-driven focus ring; never removed.
+
+## Recipes
+
+- Use toggles for formatting controls (bold, italic, underline).
+- Group related toggles inside a `ToggleGroup` to share size and variant via context.
+- Pair an icon with `aria-label` for icon-only toolbar controls.
+- Use `variant="solid"` for emphasis when the toggle reflects a primary state.

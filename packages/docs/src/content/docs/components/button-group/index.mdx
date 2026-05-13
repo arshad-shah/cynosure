@@ -1,0 +1,65 @@
+---
+title: ButtonGroup
+description: Shares variant, colorScheme, and size across child Buttons; optionally renders them as a single attached segmented surface.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Renders a div with role="group"; child buttons keep their own labels and remain individually focusable.
+bundleSize: "—"
+tags: [forms, button]
+---
+import LivePreview from "@/components/LivePreview/LivePreview.astro";
+import PropsTable from "@/components/PropsTable.astro";
+import StatusBadge from "@/components/StatusBadge.astro";
+import BundleSizePill from "@/components/BundleSizePill.astro";
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="ButtonGroup" /></div>
+
+<LivePreview example="button-group/basic" />
+
+## Usage
+
+```tsx
+import { Button, ButtonGroup } from "@arshad-shah/cynosure-react";
+
+<ButtonGroup aria-label="Text alignment">
+  <Button>Left</Button>
+  <Button>Center</Button>
+  <Button>Right</Button>
+</ButtonGroup>
+```
+
+## Attached
+
+Set `attached` to render the group as a single segmented surface with shared borders.
+
+<LivePreview example="button-group/attached" />
+
+## Shared variant and size
+
+`variant`, `colorScheme`, and `size` on the group flow to every child Button through context so a toolbar stays visually consistent with one declaration.
+
+<LivePreview example="button-group/shared-variant" />
+
+## Per-button overrides
+
+Props on a child Button always win over the group context — handy for highlighting the active item in a segmented control.
+
+<LivePreview example="button-group/overrides" />
+
+## API
+
+<PropsTable component="ButtonGroup" />
+
+## Accessibility
+
+- Wrapper is a `div` with `role="group"`; pass `aria-label` so assistive tech can describe what the group is for.
+- Children remain native `<button>` elements with their own focus, activation, and labels.
+- Use `aria-pressed` on child Buttons when emulating a segmented control with selection state.
+- `attached` is purely visual — it does not change keyboard or focus semantics.
+
+## Recipes
+
+- Pair `attached` with `variant="outline"` to get a classic segmented-control look.
+- Mix in `IconButton` children for compact toolbars without breaking the shared variant.
+- For mutually exclusive selection, drive state in the parent and flip the active child's `variant`.

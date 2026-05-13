@@ -2,6 +2,7 @@ import { type CSSProperties, type LabelHTMLAttributes, type ReactNode, forwardRe
 import { cn } from '../../utils/cn.js';
 import { label, labelRequiredIndicator } from './Label.css.js';
 
+/** Props for `<Label>`. Extends native `<label>` attributes. */
 export interface LabelProps extends Omit<LabelHTMLAttributes<HTMLLabelElement>, 'children'> {
   /** Appends a red `*` after the label text. Purely decorative (`aria-hidden`). */
   required?: boolean;

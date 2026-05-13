@@ -134,7 +134,10 @@ export const resolveLayoutProps = (props: LayoutProps): CSSProperties | undefine
     emit(props.gridArea, 'cynosure-lp-ga', passthrough as never),
     // flex/grid child hints
     emit(props.flex, 'cynosure-lp-flex', passthrough as never),
-    emit(props.flexGrow, 'cynosure-lp-fg', passthrough as never),
+    // `cynosure-lp-grow`, not `lp-fg` — the `fg` slug already carries `color`
+    // (foreground), and reusing it for `flex-grow` would silently override one
+    // of the two whenever a consumer set both `color` and `grow`.
+    emit(props.flexGrow, 'cynosure-lp-grow', passthrough as never),
     emit(props.flexShrink, 'cynosure-lp-fs', passthrough as never),
     emit(props.flexBasis, 'cynosure-lp-fb', flexBasisResolver as never),
     emit(props.alignSelf, 'cynosure-lp-as', alignSelfResolver as never),

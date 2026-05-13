@@ -92,15 +92,49 @@ const variantClass: Record<ButtonVariant, Record<ButtonColorScheme, string>> = {
   },
 };
 
+/** Cynosure-specific Button props (excludes native `<button>` attributes). */
 export interface ButtonOwnProps {
+  /**
+   * Visual style. `solid` for primary actions; `soft`/`outline`/`ghost` for
+   * less prominent ones; `link` to render as inline text.
+   * @default "solid"
+   */
   variant?: ButtonVariant;
+  /**
+   * Colour palette. `accent` is the brand colour; semantic schemes carry
+   * meaning (`danger` for destructive actions, `success` for confirmations).
+   * @default "accent"
+   */
   colorScheme?: ButtonColorScheme;
+  /**
+   * Control size — affects height, padding, font size, and icon size.
+   * Available: `xs`, `sm`, `md`, `lg`, `xl`.
+   * @default "md"
+   */
   size?: ButtonSize;
+  /**
+   * Geometry preset. `square` removes horizontal padding for icon-only
+   * buttons; `pill` rounds the corners to a fully-rounded radius.
+   * @default "default"
+   */
   shape?: ButtonShape;
+  /** Stretches the button to fill its container's inline size. */
   fullWidth?: boolean;
+  /**
+   * Renders a spinner inside the button and blocks interaction. The
+   * `disabled` and `aria-busy` attributes are set automatically.
+   * @default false
+   */
   loading?: boolean;
+  /** Icon rendered before the label. */
   leftIcon?: ReactNode;
+  /** Icon rendered after the label. */
   rightIcon?: ReactNode;
+  /**
+   * When `true`, merges props onto the immediate child (Radix `Slot` pattern)
+   * instead of rendering a `<button>`. Useful for rendering `<Link>`s that
+   * look like buttons.
+   */
   asChild?: boolean;
   className?: string;
   style?: CSSProperties;
@@ -112,6 +146,15 @@ export type ButtonProps = ButtonOwnProps &
 
 const TinySpinner = (): ReactElement => <span aria-hidden="true" className={buttonSpinner} />;
 
+/**
+ * `Button` is the primary interactive trigger across Cynosure.
+ *
+ * - Inherits `variant` / `colorScheme` / `size` from an ancestor `<ButtonGroup>` when present.
+ * - Built-in `loading` state owns the disabled + `aria-busy` semantics.
+ * - `asChild` lets you render a Link or other element with Button's styling and behaviour.
+ *
+ * Renders a real `<button type="button">` by default. Fully keyboard accessible.
+ */
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
   props,
   ref: ForwardedRef<HTMLButtonElement>,

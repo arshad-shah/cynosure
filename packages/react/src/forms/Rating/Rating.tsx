@@ -13,19 +13,48 @@ import { cn } from '../../utils/cn.js';
 import type { FormControlSize } from '../shared/types.js';
 import { fillLayer, halfClip, root, star, starSize, valueSlot } from './Rating.css.js';
 
+/** Props for `<Rating>` — star rating control. */
 export interface RatingProps {
+  /** Controlled current value, 0..`max`. */
   value?: number;
+  /** Uncontrolled initial value. */
   defaultValue?: number;
+  /** Fires when the user clicks or keys to a new value. */
   onValueChange?: (value: number) => void;
+  /**
+   * Maximum number of stars.
+   * @default 5
+   */
   max?: number;
-  /** Allow half-star increments. */
+  /**
+   * Allow half-star increments.
+   * @default false
+   */
   allowHalf?: boolean;
+  /**
+   * Control size.
+   * @default "md"
+   */
   size?: FormControlSize;
+  /**
+   * Disables interaction and removes the control from the tab order.
+   * @default false
+   */
   disabled?: boolean;
+  /**
+   * Renders stars but blocks user interaction.
+   * @default false
+   */
   readOnly?: boolean;
+  /** Marks the field as required for form submission. */
   required?: boolean;
+  /** Submitted form field name (renders a hidden input). */
   name?: string;
   id?: string;
+  /**
+   * Accessible label.
+   * @default "Rating"
+   */
   label?: string;
   'aria-label'?: string;
   /**

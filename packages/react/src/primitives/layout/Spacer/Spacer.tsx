@@ -2,10 +2,24 @@ import { type CSSProperties, type ForwardedRef, forwardRef } from 'react';
 import { cn } from '../../../utils/cn.js';
 import { spacer } from './Spacer.css.js';
 
+/**
+ * Props for `Spacer`. Spacer is decorative-only and intentionally omits the
+ * `LayoutProps` surface — it has no rendered content to lay out.
+ */
 export interface SpacerProps {
+  /**
+   * Additional class names appended after Cynosure's base classes.
+   */
   className?: string;
+  /**
+   * Inline style overrides merged last.
+   */
   style?: CSSProperties;
-  /** Accessible label — Spacer renders `aria-hidden` by default but can be overridden. */
+  /**
+   * Override the implicit `aria-hidden="true"` if Spacer participates in a
+   * meaningful layout that assistive tech should observe.
+   * @default true
+   */
   'aria-hidden'?: boolean;
 }
 

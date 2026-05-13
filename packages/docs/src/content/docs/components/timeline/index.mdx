@@ -1,0 +1,84 @@
+---
+title: Timeline
+description: Vertical or horizontal sequence of events with dots, connectors, and per-event colour and icon options.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Renders as an ordered list so screen readers announce position and total count; dots and connectors are aria-hidden.
+bundleSize: "—"
+tags: [data-display, timeline, activity]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+import StatusBadge from '@/components/StatusBadge.astro';
+import BundleSizePill from '@/components/BundleSizePill.astro';
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="Timeline" /></div>
+
+<LivePreview example="timeline/basic" />
+
+## Usage
+
+```tsx
+import {
+  Timeline,
+  TimelineConnector,
+  TimelineContent,
+  TimelineDot,
+  TimelineItem,
+  TimelineSeparator,
+} from '@arshad-shah/cynosure-react';
+
+<Timeline>
+  <TimelineItem>
+    <TimelineSeparator>
+      <TimelineDot />
+      <TimelineConnector />
+    </TimelineSeparator>
+    <TimelineContent>Signed up</TimelineContent>
+  </TimelineItem>
+</Timeline>
+```
+
+## Sizes
+
+Three sizes are available: `sm`, `md` (default), and `lg`.
+
+<LivePreview example="timeline/sizes" />
+
+## Color schemes
+
+Each `TimelineDot` accepts a `colorScheme` — `accent`, `neutral`, `success`, `warning`, `danger`, or `info` — to signal event semantics.
+
+<LivePreview example="timeline/color-schemes" />
+
+## With custom icons
+
+Pass `icon` (or `children`) to `TimelineDot` to render a glyph inside the marker.
+
+<LivePreview example="timeline/with-icons" />
+
+## Horizontal orientation
+
+Pass `orientation="horizontal"` for a step-tracker layout — connectors run left-to-right and items wrap onto multiple lines when narrow.
+
+<LivePreview example="timeline/horizontal" />
+
+## API
+
+<PropsTable component="Timeline" />
+
+## Accessibility
+
+- Renders as a semantic `<ol>` so screen readers announce position and total count.
+- Each `TimelineItem` is an `<li>`; the last item carries `data-last="true"` so the trailing connector can be hidden.
+- `TimelineSeparator`, `TimelineDot`, and `TimelineConnector` are `aria-hidden` — they're purely decorative.
+- Provide a heading or `aria-label` on the `<Timeline>` itself when its purpose isn't clear from surrounding context.
+- Colour is never the sole carrier of meaning — pair `colorScheme` with a textual cue in `TimelineContent`.
+
+## Recipes
+
+- Switch `orientation` to `"horizontal"` for onboarding step trackers and progress checklists.
+- Use `TimelineDot` `variant="outline"` for "pending" events; `variant="solid"` for completed ones.
+- Pass an `icon` to `TimelineDot` (e.g. a checkmark SVG) to signal event type at a glance.
+- Compose `TimelineContent` with `Card` or `Stat` for dense activity feeds.

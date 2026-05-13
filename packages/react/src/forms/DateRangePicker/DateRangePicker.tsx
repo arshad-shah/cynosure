@@ -50,16 +50,27 @@ const ChevronDownIcon = (): ReactElement => (
 
 export type { DateRangePreset };
 
+/** Cynosure-specific props for `<DateRangePicker>`. */
 export interface DateRangePickerOwnProps {
+  /** Visible label, also used as the picker's accessible name when a string. */
   label?: ReactNode;
+  /** Accepted for API parity with other form controls. */
   size?: FormControlSize;
+  /**
+   * Visual treatment.
+   * @default "outline"
+   */
   variant?: FormControlVariant;
+  /** Renders the invalid state. */
   invalid?: boolean;
   className?: string;
   style?: CSSProperties;
   /** Quick-range presets rendered in the left rail. Rail is hidden when omitted. */
   presets?: DateRangePreset[];
-  /** How many months to show side-by-side. Collapses to 1 below 640px regardless. Default 2. */
+  /**
+   * How many months to show side-by-side. Collapses to 1 below 640px regardless.
+   * @default 2
+   */
   visibleMonths?: 1 | 2;
 }
 
@@ -71,6 +82,11 @@ type NativeDateRangePickerProps<T extends DateValue> = Omit<
 export type DateRangePickerProps<T extends DateValue = DateValue> = DateRangePickerOwnProps &
   NativeDateRangePickerProps<T>;
 
+/**
+ * `DateRangePicker` selects a start/end date pair with an optional preset rail
+ * (Last 7 days, This month, …). Backed by React Aria `DateRangePicker` and
+ * `@internationalized/date`. Fully keyboard accessible.
+ */
 export const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>(
   function DateRangePicker(props, ref) {
     const {

@@ -22,10 +22,14 @@ import {
 } from './Calendar.css.js';
 import { CalendarHeader } from './CalendarHeader.js';
 
+/** Shared layout props consumed by `<Calendar>` and `<RangeCalendar>`. */
 export interface CalendarBaseProps {
   className?: string;
   style?: CSSProperties;
-  /** Number of months shown side by side. Default `1`. Use `2` for range-heavy UIs. */
+  /**
+   * Number of months shown side by side. Use `2` for range-heavy UIs.
+   * Default `1` for `<Calendar>`, `2` for `<RangeCalendar>`.
+   */
   visibleMonths?: 1 | 2;
   /** Footer rendered below the grid — e.g. "Go to today" or keyboard hints. */
   footer?: ReactNode;

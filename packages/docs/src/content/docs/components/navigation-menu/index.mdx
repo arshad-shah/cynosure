@@ -1,0 +1,88 @@
+---
+title: NavigationMenu
+description: A horizontal site-level navigation bar with rich popover panels for nested sections, built on Radix Navigation Menu.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Renders inside a nav landmark; triggers expose aria-expanded / aria-controls; arrow keys traverse top-level items; Esc closes any open panel.
+bundleSize: "—"
+tags: [navigation, menu, accessible]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+import StatusBadge from '@/components/StatusBadge.astro';
+import BundleSizePill from '@/components/BundleSizePill.astro';
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="NavigationMenu" /></div>
+
+<LivePreview example="navigation-menu/basic" />
+
+## Usage
+
+```tsx
+import {
+  NavigationMenu,
+  NavigationMenuList,
+  NavigationMenuItem,
+  NavigationMenuTrigger,
+  NavigationMenuContent,
+  NavigationMenuLink,
+} from "@arshad-shah/cynosure-react";
+
+<NavigationMenu>
+  <NavigationMenuList>
+    <NavigationMenuItem>
+      <NavigationMenuTrigger>Products</NavigationMenuTrigger>
+      <NavigationMenuContent>
+        <NavigationMenuLink href="/web">Web</NavigationMenuLink>
+        <NavigationMenuLink href="/mobile">Mobile</NavigationMenuLink>
+      </NavigationMenuContent>
+    </NavigationMenuItem>
+  </NavigationMenuList>
+</NavigationMenu>
+```
+
+## Variants
+
+### Rich content panels
+
+Each `NavigationMenuContent` renders inside an elevated `Card` — fill it with any layout you like (grids, columns, banners).
+
+<LivePreview example="navigation-menu/rich-content" />
+
+### Hide the trigger chevron
+
+Pass `hideChevron` to `NavigationMenuTrigger` when the label is self-explanatory or you want to provide your own affordance.
+
+<LivePreview example="navigation-menu/hide-chevron" />
+
+### Active link
+
+Mark a `NavigationMenuLink` with `active` to set `aria-current="page"` plus a `data-active` flag.
+
+<LivePreview example="navigation-menu/active-link" />
+
+### With indicator
+
+Render `NavigationMenuIndicator` inside the list to show a small arrow pointing from the open trigger to its panel. Use this with `NavigationMenuViewport` for the shared-panel animation pattern.
+
+<LivePreview example="navigation-menu/with-indicator" />
+
+## API
+
+<PropsTable component="NavigationMenu" />
+
+## Accessibility
+
+- The root renders inside a `<nav>` so screen readers identify it as primary navigation.
+- Triggers expose `aria-expanded` / `aria-controls` linking to their `NavigationMenuContent` panel (handled by Radix).
+- Left and right arrow keys move between top-level triggers; pressing `Enter`, `Space`, or `↓` opens the focused trigger's panel.
+- `Esc` closes any open panel and returns focus to its trigger.
+- `NavigationMenuLink` with `active` sets `aria-current="page"` so the current route is announced.
+
+## Recipes
+
+- Use `NavigationMenuViewport` once at the end of the list when you want a single shared panel that animates between triggers.
+- Use `NavigationMenuSub` for nested sub-panels (rare, but exposed for parity with Radix).
+- Swap to a `Drawer` or `Sidebar` below the tablet breakpoint where horizontal space runs out.
+- Wrap `NavigationMenuLink` with `asChild` to compose with a router-aware `<Link>`.

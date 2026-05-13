@@ -1,9 +1,7 @@
-@import "../../../../packages/tokens/dist/css/base.css";
-@import "../../../../packages/react/dist/styles.css";
+@import "@arshad-shah/cynosure-react/all.css";
 @import "./fonts.css";
 @import "./tokens-surfaces.css";
 @import "./chrome.css";
-@import "./home.css";
 @import "./doc-page.css";
 
 :root {

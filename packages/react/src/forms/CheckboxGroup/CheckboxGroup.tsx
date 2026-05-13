@@ -2,11 +2,17 @@ import { type HTMLAttributes, type ReactNode, forwardRef, useCallback, useMemo }
 import { useControllableState } from '../../hooks/useControllableState.js';
 import { CheckboxGroupContext } from './context.js';
 
+/** Props for `<CheckboxGroup>` — owns the array of selected values. */
 export interface CheckboxGroupProps extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange'> {
+  /** Controlled array of selected checkbox values. */
   value?: string[];
+  /** Uncontrolled initial array of selected values. */
   defaultValue?: string[];
+  /** Fires with the next array on every toggle. */
   onChange?: (value: string[]) => void;
+  /** Shared submit name for every checkbox in the group. Individual `name` overrides take precedence. */
   name?: string;
+  /** Disables every checkbox in the group. */
   disabled?: boolean;
   /** A11y label for the group — resolves to `aria-label` on the wrapper. */
   'aria-label'?: string;

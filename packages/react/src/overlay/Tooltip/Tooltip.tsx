@@ -10,28 +10,58 @@ import { tooltipArrow, tooltipContent } from './Tooltip.css.js';
  */
 export const TooltipProvider = RadixTooltip.Provider;
 
+/**
+ * Props for the thin `Tooltip` wrapper around Radix's tooltip primitive.
+ */
 export interface TooltipProps {
-  /** The tip body. Plain string or arbitrary ReactNode. */
+  /** The tip body. Plain string or arbitrary `ReactNode`. */
   content: ReactNode;
-  /** The trigger — must be a single React element. */
+  /** The trigger — must be a single React element. Wrapped with `asChild`. */
   children: ReactElement;
+  /**
+   * Preferred placement relative to the trigger. Radix flips to the
+   * opposite side if there's not enough room.
+   * @default "top"
+   */
   side?: 'top' | 'right' | 'bottom' | 'left';
+  /**
+   * Alignment along the chosen side.
+   * @default "center"
+   */
   align?: 'start' | 'center' | 'end';
+  /**
+   * Distance (in px) between the trigger and the tooltip surface.
+   * @default 6
+   */
   sideOffset?: number;
+  /** Offset (in px) along the alignment axis. */
   alignOffset?: number;
-  /** Open delay in ms; default 300. */
+  /**
+   * Open delay in ms — time the pointer must rest on the trigger before
+   * the tooltip appears.
+   * @default 300
+   */
   delayMs?: number;
-  /** Disables the tooltip — renders the child unwrapped. */
+  /**
+   * Disable the tooltip and render the child unwrapped (no Radix wiring,
+   * no portal).
+   * @default false
+   */
   disabled?: boolean;
-  /** Controlled open state. */
+  /** Controlled open state; pair with `onOpenChange`. */
   open?: boolean;
+  /** Initial open state in uncontrolled mode. */
   defaultOpen?: boolean;
+  /** Change handler for the open state. */
   onOpenChange?: (open: boolean) => void;
-  /** Show the caret arrow pointing at the trigger. Default `true`. */
+  /**
+   * Render the caret arrow pointing at the trigger.
+   * @default true
+   */
   withArrow?: boolean;
-  /** Forward a className onto the content element. */
+  /** Forward a `className` onto the content element. */
   className?: string;
-  /** Custom portal container. */
+  /** Portal target — forwarded to Radix's `Portal`. */
   container?: HTMLElement | (() => HTMLElement);
 }
 

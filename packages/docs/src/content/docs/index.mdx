@@ -1,0 +1,119 @@
+---
+title: Cynosure
+description: A React component library and design system. Accessible by default, themeable down to the radius.
+template: splash
+hero:
+  tagline: Accessible, tree-shakeable React components. Themed with design tokens. Built on Radix UI and React Aria.
+  image:
+    file: ../../assets/cynosure-mark.svg
+  actions:
+    - text: Get started
+      link: /getting-started/installation
+      icon: right-arrow
+      variant: primary
+    - text: Browse components
+      link: /components/button
+      icon: external
+    - text: GitHub
+      link: https://github.com/arshad-shah/cynosure
+      icon: external
+      variant: minimal
+---
+
+import { Tabs, TabItem, CardGrid, Card, LinkCard } from '@astrojs/starlight/components';
+
+## Install
+
+Pick your package manager. The Cynosure stylesheet is imported once at app entry.
+
+<Tabs syncKey="pm">
+  <TabItem label="npm">
+    ```sh
+    npm install @arshad-shah/cynosure-react
+    ```
+  </TabItem>
+  <TabItem label="pnpm">
+    ```sh
+    pnpm add @arshad-shah/cynosure-react
+    ```
+  </TabItem>
+  <TabItem label="yarn">
+    ```sh
+    yarn add @arshad-shah/cynosure-react
+    ```
+  </TabItem>
+  <TabItem label="bun">
+    ```sh
+    bun add @arshad-shah/cynosure-react
+    ```
+  </TabItem>
+</Tabs>
+
+## Compose, don't configure
+
+Every component is a small, focused primitive. Stack them with the layout primitives and you have a screen — no theme objects, no render props, no opinionated layouts to fight.
+
+```tsx
+import { Stack, Input, Button } from '@arshad-shah/cynosure-react';
+
+export function SignIn() {
+  return (
+    <Stack gap="4">
+      <Input label="Email" type="email" />
+      <Input label="Password" type="password" />
+      <Button colorScheme="accent">Sign in</Button>
+    </Stack>
+  );
+}
+```
+
+## What's in the box
+
+<CardGrid>
+  <Card title="Forms" icon="pencil">
+    Inputs, selects, date and time pickers, sliders, file upload — 31 components covering every form field you'll need.
+  </Card>
+  <Card title="Overlays" icon="rocket">
+    Dialog, Popover, Drawer, Toast, ContextMenu, CommandPalette — focus-managed, dismissible, RTL-aware.
+  </Card>
+  <Card title="Data display" icon="document">
+    Table, DataTable, Tree, Timeline, Chart, Carousel, ScrollArea — keyboard-navigable, theme-aware.
+  </Card>
+  <Card title="Navigation" icon="bars">
+    Tabs, Breadcrumb, Pagination, Sidebar, Stepper, NavigationMenu — keyboard-first.
+  </Card>
+  <Card title="Layout" icon="setting">
+    Box, Stack, Inline, Flex, Grid, SimpleGrid, Wrap, Container — every spacing prop is responsive and tokenised.
+  </Card>
+  <Card title="Theming" icon="seti:css">
+    CSS variables only. Override `--cynosure-*` to reskin; switch themes at runtime; SSR-safe with no FOUC.
+  </Card>
+</CardGrid>
+
+## Built for the long haul
+
+<CardGrid>
+  <Card title="Accessible by default" icon="approve-check">
+    Built on Radix UI and React Aria for focus management, ARIA semantics, and keyboard handling. Every theme is contrast-audited for WCAG AA in CI; physical CSS properties are linted out so RTL stays correct.
+  </Card>
+  <Card title="Tree-shakeable" icon="puzzle">
+    Per-component entry points (`@arshad-shah/cynosure-react/button`) on top of a plain ESM root barrel. CSS is marked side-effectful so bundlers keep the stylesheets but drop unused JS.
+  </Card>
+  <Card title="Themed with tokens" icon="seti:json">
+    A flat token surface — space, colour, radius, shadow, duration, z-index — drives every visual decision. Swap themes without recompiling.
+  </Card>
+  <Card title="RTL and i18n ready" icon="translate">
+    Logical-property layout. `DirectionProvider` + `LocaleProvider` carry direction and locale through the tree.
+  </Card>
+</CardGrid>
+
+## Start somewhere
+
+<CardGrid>
+  <LinkCard title="Quickstart" description="Wire up the provider, import a component, ship a screen — in five minutes." href="/getting-started/quickstart" />
+  <LinkCard title="Design tokens" description="The token surface: what's there, what each token controls, how to override." href="/foundations/design-tokens" />
+  <LinkCard title="Theming overview" description="Light, dark, custom — and how to ship your own theme as a package." href="/foundations/theming-overview" />
+  <LinkCard title="Accessibility" description="The guarantees we make and how we verify them in CI." href="/foundations/accessibility" />
+  <LinkCard title="Type reference" description="The token aliases the PropsTable links to — SpaceToken, ColorToken, Responsive." href="/reference/types" />
+  <LinkCard title="Component browser" description="Every component, with live previews and a complete API surface." href="/components/button" />
+</CardGrid>

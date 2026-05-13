@@ -1,0 +1,68 @@
+---
+title: Kbd
+description: Faux keycap rendered as a native `<kbd>` with auto-swapped glyphs for modifier keys, arrows, return, and backspace.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Uses the native `<kbd>` element so keyboard input is announced distinctly; swapped-in glyph icons are `aria-hidden` so the keycap text remains the spoken label.
+bundleSize: "—"
+tags: [typography, shortcut]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+import StatusBadge from '@/components/StatusBadge.astro';
+import BundleSizePill from '@/components/BundleSizePill.astro';
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="Kbd" /></div>
+
+<LivePreview example="kbd/basic" />
+
+## Usage
+
+```tsx
+import { Kbd } from '@arshad-shah/cynosure-react';
+
+<Kbd>Cmd</Kbd> + <Kbd>K</Kbd>
+```
+
+## Sizes
+
+Three sizes — `sm`, `md` (default), and `lg` — scale padding, font-size, and icon glyphs together so a keycap sits cleanly next to body text of the matching size.
+
+<LivePreview example="kbd/sizes" />
+
+## Modifier glyphs
+
+Pass macOS-style glyphs (`⌘`, `⇧`, `⌥`, `⌃`, `⌫`, `↵`, arrows) and Kbd auto-swaps them for rendered Lucide icons inside the keycap — never a bare Unicode character.
+
+<LivePreview example="kbd/glyphs" />
+
+## Shortcut combinations
+
+Compose multi-key shortcuts by chaining `<Kbd>` elements with a literal `+` separator so the combination reads naturally when styling is unavailable.
+
+<LivePreview example="kbd/combinations" />
+
+## Inline in prose
+
+`Kbd` slots into a `Text` paragraph for shortcut hints in onboarding or help copy.
+
+<LivePreview example="kbd/inline" />
+
+## API
+
+<PropsTable component="Kbd" />
+
+## Accessibility
+
+- Renders the semantic `<kbd>` element so keyboard input is announced distinctly from surrounding prose.
+- Swapped-in glyph icons (`⌘`, `⇧`, arrows, etc.) are marked `aria-hidden` — the keycap's text content is what assistive tech reads, so prefer including a readable label like `<Kbd>Cmd</Kbd>` over `<Kbd>⌘</Kbd>` when the audience may use a non-Mac keyboard.
+- Use the casing the user sees on their keyboard so the rendered hint matches the physical key.
+- Pair shortcut hints with the action they trigger; never rely on the keycap alone to convey the available command.
+
+## Recipes
+
+- Pair with `Text` for inline hints: `Press <Kbd>Esc</Kbd> to close.`
+- Group `Kbd` elements inside command menus and tooltips to teach shortcuts contextually.
+- Use `size="sm"` next to a `Text size="sm"` line so keycaps don't dominate dense rows.
+- Keep keycap content short — single keys or modifier names work best; combinations should be split across multiple `<Kbd>` elements.

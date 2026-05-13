@@ -13,6 +13,11 @@ type BareProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children'> & {
   style?: CSSProperties;
 };
 
+/**
+ * Props for `IconButton`. Discriminated by `variant`:
+ * - `variant !== "bare"` (default): all `<Button>` props are available; `shape` defaults to `"square"`.
+ * - `variant === "bare"`: skip Cynosure styling and render a minimal `<button>` (used for clear/close affordances inside other controls).
+ */
 export type IconButtonProps = (StyledProps | BareProps) & {
   /** The icon element — typically a Cynosure icon or an inline SVG. */
   icon: ReactNode;

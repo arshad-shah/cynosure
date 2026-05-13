@@ -1,0 +1,30 @@
+{
+  "name": "@arshad-shah/cynosure-playground",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "description": "Manual + visual validation playground for the Cynosure component library. Loads every primitive against light/dark themes so we can eyeball regressions without reaching for Storybook.",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@arshad-shah/cynosure-react": "workspace:*",
+    "@arshad-shah/cynosure-themes": "workspace:*",
+    "@arshad-shah/cynosure-tokens": "workspace:*",
+    "@arshad-shah/swift-chart": "catalog:",
+    "lucide-react": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:"
+  },
+  "devDependencies": {
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "@vanilla-extract/vite-plugin": "catalog:",
+    "@vitejs/plugin-react": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:"
+  }
+}

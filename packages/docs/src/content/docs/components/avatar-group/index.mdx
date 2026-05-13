@@ -1,0 +1,72 @@
+---
+title: AvatarGroup
+description: Stack of avatars representing a collection of users, with optional overflow tile and shared sizing.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Renders a `<div>` wrapper around child avatars; each `Avatar` retains its own `name` for screen readers. The overflow tile uses `aria-label` to announce hidden members.
+bundleSize: "—"
+tags: [feedback, identity, user]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+import StatusBadge from '@/components/StatusBadge.astro';
+import BundleSizePill from '@/components/BundleSizePill.astro';
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="AvatarGroup" /></div>
+
+<LivePreview example="avatar-group/basic" />
+
+## Usage
+
+```tsx
+import { Avatar, AvatarGroup } from '@arshad-shah/cynosure-react';
+
+<AvatarGroup>
+  <Avatar name="Jane Doe" />
+  <Avatar name="John Smith" />
+  <Avatar name="Ada Lovelace" />
+</AvatarGroup>
+```
+
+## With overflow
+
+Use `max` to cap how many avatars render inline. Excess avatars collapse into a `+N` overflow tile that is automatically labelled for assistive tech.
+
+<LivePreview example="avatar-group/with-overflow" />
+
+## Sizes
+
+The group's `size` cascades to every child avatar (children may still override individually).
+
+<LivePreview example="avatar-group/sizes" />
+
+## Ring and shape
+
+`ring` is on by default to separate stacked avatars; pass `ring={false}` to disable. Use `shape` to switch between `circle` (default), `rounded`, and `square` tiles.
+
+<LivePreview example="avatar-group/shapes" />
+
+## Custom overflow
+
+`renderOverflow` lets you swap the default `+N` tile for a fully custom node — useful for buttons that open a member list.
+
+<LivePreview example="avatar-group/render-overflow" />
+
+## API
+
+<PropsTable component="AvatarGroup" />
+
+## Accessibility
+
+- Each child `Avatar` should carry a `name` so screen readers can announce membership individually.
+- The overflow tile sets `aria-label="{N} more"` so assistive tech reports the hidden count.
+- Avoid stacking more than a handful of avatars without a `max` — long stacks become noisy to navigate.
+- When the group represents a list, wrap it in a labelled landmark (`<section aria-label="Collaborators">`).
+
+## Recipes
+
+- Use `max={3}` or `max={5}` to keep dense rosters compact.
+- Pair each avatar with a `Tooltip` so full names are accessible on hover and focus.
+- Pass `renderOverflow={(n) => <button>+{n}</button>}` to make the overflow tile open a member dialog.
+- Set `ring={false}` on backgrounds where the default ring colour blends in.

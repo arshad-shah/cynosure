@@ -23,25 +23,55 @@ import {
   toResponsiveVars,
 } from '../shared/index.js';
 
+/**
+ * Props specific to `SimpleGrid`, layered on `LayoutProps` and `AsChildProps`.
+ */
 export interface SimpleGridOwnProps extends LayoutProps, AsChildProps {
+  /**
+   * Additional class names appended after Cynosure's base classes.
+   */
   className?: string;
+  /**
+   * Inline style overrides merged last.
+   */
   style?: CSSProperties;
+  /**
+   * Grid children.
+   */
   children?: ReactNode;
-  /** Fixed column count — renders `repeat(N, minmax(0, 1fr))`. */
+  /**
+   * Fixed column count — emits `repeat(N, minmax(0, 1fr))`. Ignored when
+   * `minChildWidth` is set.
+   */
   columns?: Responsive<number>;
   /**
    * Minimum width each child should occupy before a new column is added.
-   * Renders `repeat(auto-fit, minmax(<minChildWidth>, 1fr))`, giving a
-   * fluid grid that reflows without breakpoints. Takes precedence over
-   * `columns` when both are provided.
+   * Emits `repeat(auto-fit, minmax(<minChildWidth>, 1fr))` for a fluid grid
+   * that reflows without breakpoints. Wins over `columns`.
    */
   minChildWidth?: Responsive<SizeValue>;
+  /**
+   * Uniform gap in both axes.
+   */
   gap?: Responsive<SpaceToken>;
+  /**
+   * Gap between columns. Overrides the column axis of `gap`.
+   */
   columnGap?: Responsive<SpaceToken>;
+  /**
+   * Gap between rows. Overrides the row axis of `gap`.
+   */
   rowGap?: Responsive<SpaceToken>;
 }
 
+/**
+ * Full `SimpleGrid` props. Generic over the rendered element.
+ */
 export type SimpleGridProps<E extends ElementType = 'div'> = SimpleGridOwnProps & {
+  /**
+   * Rendered intrinsic element or component.
+   * @default "div"
+   */
   as?: E;
 } & Omit<React.ComponentPropsWithoutRef<E>, keyof SimpleGridOwnProps | 'as'>;
 

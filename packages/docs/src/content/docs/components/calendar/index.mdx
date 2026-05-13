@@ -1,0 +1,68 @@
+---
+title: Calendar
+description: Standalone month-grid date picker backed by React Aria; supports single-date and range selection across one or two months.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Built on React Aria Calendar / RangeCalendar — full keyboard support, arrow-key date traversal, and labelled prev/next navigation.
+bundleSize: "—"
+tags: [forms, date]
+---
+import LivePreview from "@/components/LivePreview/LivePreview.astro";
+import PropsTable from "@/components/PropsTable.astro";
+import StatusBadge from "@/components/StatusBadge.astro";
+import BundleSizePill from "@/components/BundleSizePill.astro";
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="Calendar" /></div>
+
+<LivePreview example="calendar/basic" />
+
+## Usage
+
+```tsx
+import { Calendar } from "@arshad-shah/cynosure-react/calendar";
+import { parseDate } from "@internationalized/date";
+
+<Calendar aria-label="Event date" defaultValue={parseDate("2026-04-17")} />
+```
+
+## Controlled
+
+Drive selection from state by passing `value` + `onChange`. Values are `@internationalized/date` `DateValue`s.
+
+<LivePreview example="calendar/controlled" />
+
+## Dual month
+
+Use `visibleMonths={2}` to render two adjacent month grids — useful in dense scheduling UIs.
+
+<LivePreview example="calendar/dual-month" />
+
+## Range selection
+
+`RangeCalendar` selects a start / end pair. It defaults to two visible months.
+
+<LivePreview example="calendar/range" />
+
+## With footer
+
+Pass any node to `footer` to slot a "Go to today" link, keyboard hints, or a clear button below the grid.
+
+<LivePreview example="calendar/footer" />
+
+## API
+
+<PropsTable component="Calendar" />
+
+## Accessibility
+
+- Built on React Aria — exposes proper `role="grid"` semantics and full keyboard traversal (arrows, Home/End, PageUp/PageDown).
+- The header's previous / next buttons carry `aria-label="Previous month"` / `"Next month"`.
+- Always pass `aria-label` (or visible labelling) on `Calendar` and `RangeCalendar` so screen readers can announce what the date is for.
+- Disabled and unavailable dates from React Aria are respected and skipped during keyboard navigation.
+
+## Recipes
+
+- Use `minValue` / `maxValue` to clamp the selectable range.
+- For range pickers in narrow layouts, set `visibleMonths={1}` to drop down to a single grid.
+- Use `focusedValue` + `onFocusChange` to programmatically jump back to today.

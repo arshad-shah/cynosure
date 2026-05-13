@@ -55,47 +55,75 @@ function useCarousel(): CarouselContextValue {
   return ctx;
 }
 
+/** Props for the {@link Carousel} root that configures the underlying Embla engine. */
 export interface CarouselProps
   extends Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'onSelect'> {
   /**
    * How many slides fit in the viewport. `1` is a classic full-bleed carousel;
    * larger values create a "peek" layout for gallery/card decks.
    * Accepts a number or a responsive `{ base, sm, md, lg, xl }` object.
+   * @default 1
    */
   slidesPerView?: number | ResponsiveSlides;
-  /** Scroll direction. Default `horizontal`. */
+  /**
+   * Scroll axis. `horizontal` maps to Embla's `x` axis, `vertical` to `y`.
+   * @default "horizontal"
+   */
   orientation?: CarouselOrientation;
-  /** Loop back to the first slide after the last. Default `false`. */
+  /**
+   * Loop back to the first slide after the last (and vice versa).
+   * @default false
+   */
   loop?: boolean;
-  /** Align slides to `start` / `center` / `end` of the viewport. Default `start`. */
+  /**
+   * Where each slide snaps inside the viewport.
+   * @default "start"
+   */
   align?: 'start' | 'center' | 'end';
-  /** How many slides advance per ⌘Next. Default `1`. */
+  /**
+   * How many slides advance per next/prev. `auto` snaps a full viewport's
+   * worth at a time.
+   * @default 1
+   */
   slidesToScroll?: number | 'auto';
-  /** Enable drag-to-scroll on pointer devices. Default `true`. */
+  /**
+   * Enable drag-to-scroll via pointer/touch.
+   * @default true
+   */
   draggable?: boolean;
   /** Full Embla options bag — overrides any of the convenience props above. */
   options?: EmblaOptions;
-  /** Embla plugins (autoplay, auto-scroll, etc.). */
+  /** Embla plugins (autoplay, auto-scroll, class-name toggle, etc.). */
   plugins?: EmblaPlugins;
-  /** Fires with the Embla API once it's ready. Use to drive external UI. */
+  /** Fires once Embla initialises with the live API; use to drive external UI. */
   setApi?: (api: EmblaApi) => void;
-  /** Fires when the selected slide index changes. */
+  /** Fires whenever the selected slide index changes (initial + on user/programmatic scroll). */
   onSelect?: (index: number) => void;
+  /** Carousel parts ({@link CarouselViewport}, controls, dots, …). */
   children?: ReactNode;
 }
 
+/** Responsive `slidesPerView` map — each key maps to the matching cynosure breakpoint. */
 export type ResponsiveSlides = {
+  /** Default slide count below the `sm` breakpoint. */
   base?: number;
+  /** Override at the `sm` breakpoint. */
   sm?: number;
+  /** Override at the `md` breakpoint. */
   md?: number;
+  /** Override at the `lg` breakpoint. */
   lg?: number;
+  /** Override at the `xl` breakpoint. */
   xl?: number;
 };
 
 /**
  * Carousel root. Wraps Embla and exposes the API (plus derived state like
  * "can scroll prev/next" and the active index) via context so subcomponents
- * stay declarative.
+ * stay declarative. Handles arrow-key navigation on the root section and
+ * announces itself via `aria-roledescription="carousel"`. Compose with
+ * `CarouselViewport`, `CarouselContainer`, `CarouselSlide`,
+ * `CarouselPrevious`, `CarouselNext`, and `CarouselDots`.
  */
 export const Carousel = forwardRef<HTMLDivElement, CarouselProps>(function Carousel(
   {
@@ -225,6 +253,7 @@ export const Carousel = forwardRef<HTMLDivElement, CarouselProps>(function Carou
   );
 });
 
+/** Props for the {@link CarouselViewport} overflow-clip window. */
 export interface CarouselViewportProps extends HTMLAttributes<HTMLDivElement> {}
 
 /** Overflow-clip window. Parent of `CarouselContainer`. */
@@ -247,6 +276,7 @@ export const CarouselViewport = forwardRef<HTMLDivElement, CarouselViewportProps
   },
 );
 
+/** Props for the {@link CarouselContainer} flex track that holds slides. */
 export interface CarouselContainerProps extends HTMLAttributes<HTMLDivElement> {}
 
 /** Flex track that holds slides. */
@@ -256,6 +286,7 @@ export const CarouselContainer = forwardRef<HTMLDivElement, CarouselContainerPro
   },
 );
 
+/** Props for a single {@link CarouselSlide}; renders with `role="group"` / `aria-roledescription="slide"`. */
 export interface CarouselSlideProps extends HTMLAttributes<HTMLDivElement> {}
 
 /** One slide. Drop images, cards, or any content inside. */
@@ -278,8 +309,9 @@ export const CarouselSlide = forwardRef<HTMLDivElement, CarouselSlideProps>(func
   );
 });
 
+/** Shared props for {@link CarouselPrevious} and {@link CarouselNext} controls. */
 export interface CarouselControlProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  /** Override the default chevron icon. */
+  /** Override the default chevron icon (renders Lucide `ChevronLeft`/`ChevronRight` at 18px). */
   icon?: ReactNode;
 }
 
@@ -323,8 +355,12 @@ export const CarouselNext = forwardRef<HTMLButtonElement, CarouselControlProps>(
   },
 );
 
+/** Props for the {@link CarouselDots} pagination strip. */
 export interface CarouselDotsProps extends HTMLAttributes<HTMLDivElement> {
-  /** Custom label renderer for each dot. Default renders `"Go to slide N"`. */
+  /**
+   * Custom `aria-label` renderer per dot. Receives the 0-based index.
+   * @default index => `Go to slide ${index + 1}`
+   */
   dotLabel?: (index: number) => string;
 }
 

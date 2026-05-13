@@ -9,13 +9,33 @@ import {
 import { cn } from '../../utils/cn.js';
 import { anchorHeading, anchorLink, anchorWrapper } from './Anchor.css.js';
 
+/**
+ * Props for `Anchor` — a heading with a permalink that copies a URL with
+ * `#id` to the clipboard on click.
+ */
 export interface AnchorProps extends Omit<HTMLAttributes<HTMLElement>, 'id'> {
+  /** Required — used as the heading `id` and the URL fragment. */
   id: string;
+  /**
+   * Which heading tag is rendered (`h1`–`h6`). Pick to match the section's
+   * place in the document outline.
+   * @default 2
+   */
   level?: 1 | 2 | 3 | 4 | 5 | 6;
-  /** Sticky-header offset applied when scrolling into view. Accepts any CSS length. */
+  /**
+   * Sticky-header offset applied via `scroll-margin-top` when scrolling
+   * the heading into view. Accepts any CSS length (`number` is treated as
+   * px). Set this when a fixed top bar would otherwise cover the heading.
+   */
   offsetTop?: number | string;
+  /** Fired after the URL has been (best-effort) copied to the clipboard. */
   onCopy?: () => void;
+  /**
+   * Accessible label for the copy-link icon button.
+   * @default "Copy link to section"
+   */
   label?: string;
+  /** The visible heading text. */
   children?: ReactNode;
 }
 

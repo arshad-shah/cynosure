@@ -1,0 +1,100 @@
+/*
+ * Cynosure theme overrides for Starlight.
+ *
+ * Re-maps Starlight's `--sl-*` design-token slots to the cynosure docs palette
+ * defined in `tokens-surfaces.css`. Importing this file via `customCss` in
+ * `astro.config.mjs` lets Starlight provide all the shell + behaviour while
+ * keeping the cynosure dark-mode look intact (deep slate background, the same
+ * mono code typography, accent ring, etc.).
+ *
+ * The cynosure palette is the source of truth — anything not listed here
+ * inherits Starlight's defaults.
+ */
+
+@import "./tokens-surfaces.css";
+
+:root {
+  /* Base surfaces */
+  --sl-color-bg: var(--docs-bg);
+  --sl-color-bg-sidebar: var(--docs-bg);
+  --sl-color-bg-inline-code: var(--docs-surface-2);
+  --sl-color-bg-nav: var(--docs-bg-translucent);
+  --sl-color-bg-accent: var(--docs-surface-3);
+
+  /* Foreground hierarchy */
+  --sl-color-white: var(--docs-fg);
+  --sl-color-text: var(--docs-fg);
+  --sl-color-text-accent: var(--docs-fg);
+  --sl-color-text-invert: var(--docs-bg);
+
+  /* Muted text */
+  --sl-color-gray-1: #f1f3f6;
+  --sl-color-gray-2: #c8d0db;
+  --sl-color-gray-3: var(--docs-muted);
+  --sl-color-gray-4: var(--docs-dim);
+  --sl-color-gray-5: #2a2f37;
+  --sl-color-gray-6: var(--docs-surface-2);
+  --sl-color-gray-7: var(--docs-surface-1);
+
+  /* Hairlines */
+  --sl-color-hairline: var(--docs-line);
+  --sl-color-hairline-light: var(--docs-line);
+  --sl-color-hairline-shade: var(--docs-line-strong);
+
+  /* Accent — pull from cynosure-tokens at runtime so dark/light theme swaps
+     of the cynosure accent (set on <html data-cynosure-theme>) also re-tint
+     Starlight chrome. Falls back to a neutral cynosure violet. */
+  --sl-color-accent: var(--cynosure-color-accent-solid, #7c5cff);
+  --sl-color-accent-high: var(--cynosure-color-accent-solid, #7c5cff);
+  --sl-color-accent-low: color-mix(in srgb, var(--sl-color-accent) 22%, transparent);
+
+  /* Typography — keep cynosure's variable fonts */
+  --sl-font: var(--cynosure-font-family-sans, ui-sans-serif, system-ui, sans-serif);
+  --sl-font-mono: var(--docs-type-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+
+  /* Sizing tweaks so the content column lines up with cynosure's existing
+     air. Starlight's defaults are a bit tight by comparison. */
+  --sl-content-width: 56rem;
+  --sl-sidebar-width: 18rem;
+  --sl-text-code: 0.8125rem;
+  --sl-line-height-headings: 1.15;
+}
+
+/* Light-theme overrides — cynosure's palette already swaps via
+   `tokens-surfaces.css` under `[data-theme="light"]`, so we just need to flip
+   the inversion tokens Starlight uses to pick a foreground on bright surfaces. */
+[data-theme="light"] {
+  --sl-color-bg: var(--docs-bg);
+  --sl-color-text: var(--docs-fg);
+  --sl-color-text-invert: #fff;
+  --sl-color-gray-1: #0f1115;
+  --sl-color-gray-2: #2a2f37;
+  --sl-color-gray-3: var(--docs-muted);
+  --sl-color-gray-4: var(--docs-dim);
+  --sl-color-gray-5: #c8d0db;
+  --sl-color-gray-6: var(--docs-surface-1);
+  --sl-color-gray-7: var(--docs-surface-2);
+}
+
+/* Slightly tighter sidebar item rhythm so the long Components list reads
+   like a single panel, matching the original cynosure-docs layout density. */
+.sidebar-pane {
+  font-size: 0.875rem;
+}
+
+/* Status badges from frontmatter render via `<StarlightBadge>` — give them
+   the same uppercase mono treatment the original docs used for status pills. */
+.sl-badge {
+  font-family: var(--sl-font-mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-size: 0.6875rem;
+}
+
+/* Smooth scrolling for in-page heading anchors — Starlight ships those, we
+   just want the scroll motion to honour reduced-motion. */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}

@@ -2,6 +2,7 @@ import { type HTMLAttributes, forwardRef } from 'react';
 import { cn } from '../../utils/cn.js';
 import { helperText } from './HelperText.css.js';
 
+/** Props for `<HelperText>` — accepts every native `<p>` attribute. */
 export interface HelperTextProps extends HTMLAttributes<HTMLParagraphElement> {}
 
 /**

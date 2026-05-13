@@ -1,0 +1,70 @@
+---
+title: Collapsible
+description: Show or hide a region of content with a controlled trigger — the primitive behind disclosures, FAQs, and inline expandables.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Trigger toggles aria-expanded and aria-controls; content stays in the DOM with hidden toggled so screen readers can re-announce it.
+bundleSize: "—"
+tags: [data-display, disclosure, radix]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+import StatusBadge from '@/components/StatusBadge.astro';
+import BundleSizePill from '@/components/BundleSizePill.astro';
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="Collapsible" /></div>
+
+<LivePreview example="collapsible/basic" />
+
+## Usage
+
+```tsx
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@arshad-shah/cynosure-react';
+
+<Collapsible>
+  <CollapsibleTrigger>Show more</CollapsibleTrigger>
+  <CollapsibleContent>Hidden details go here.</CollapsibleContent>
+</Collapsible>
+```
+
+## Default open
+
+Pass `defaultOpen` to render the content expanded on first paint without controlling state yourself.
+
+<LivePreview example="collapsible/default-open" />
+
+## Controlled
+
+Pair `open` with `onOpenChange` to drive the state from the outside — handy when an external button or query param decides the open/close.
+
+<LivePreview example="collapsible/controlled" />
+
+## Disabled
+
+Pass `disabled` on `Collapsible` to freeze the current open state and prevent the trigger from firing.
+
+<LivePreview example="collapsible/disabled" />
+
+## API
+
+<PropsTable component="Collapsible" />
+
+## Accessibility
+
+- The trigger sets `aria-expanded` and points `aria-controls` at the content region.
+- Content stays in the DOM with `hidden` toggled so assistive tech can re-announce it on every open.
+- `Enter` / `Space` on the focused trigger toggles the panel.
+- `disabled` propagates to the underlying `<button>` and ARIA — keyboard users skip past it.
+- The trigger renders as a real `<button>` (or your `asChild` host) so it inherits focus styles for free.
+
+## Recipes
+
+- Use `asChild` on `CollapsibleTrigger` to wrap a `Button` and inherit Cynosure styling without losing the toggle behaviour.
+- Use `defaultOpen` for uncontrolled state; pair `open` + `onOpenChange` to control externally.
+- The `Disclosure` / `DisclosureTrigger` / `DisclosureContent` aliases point at the same component when the semantic name fits better (e.g. FAQs).
+- Animate the open/close transition with the `data-state="open"` and `data-state="closed"` attributes on `CollapsibleContent`.

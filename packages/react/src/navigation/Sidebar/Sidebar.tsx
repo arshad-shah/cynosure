@@ -20,20 +20,61 @@ import { sidebarRoot, sidebarVariant } from './Sidebar.css.js';
 import { SidebarContext, type SidebarContextValue } from './context.js';
 import { useIsMobile } from './useIsMobile.js';
 
+/**
+ * Props for the `SidebarProvider`. Hosts collapse / mobile-open state for
+ * every `Sidebar`, `SidebarTrigger`, and `useSidebar()` consumer below it.
+ */
 export interface SidebarProviderProps {
+  /**
+   * Initial collapsed state in uncontrolled mode.
+   * @default false
+   */
   defaultCollapsed?: boolean;
+  /** Controlled collapsed state; pair with `onCollapsedChange`. */
   collapsed?: boolean;
+  /** Change handler for the controlled collapsed state. */
   onCollapsedChange?: (value: boolean) => void;
+  /**
+   * Initial mobile open state in uncontrolled mode (i.e. when the
+   * `mobileQuery` matches).
+   * @default false
+   */
   defaultMobileOpen?: boolean;
+  /** Controlled mobile open state; pair with `onMobileOpenChange`. */
   mobileOpen?: boolean;
+  /** Change handler for the controlled mobile open state. */
   onMobileOpenChange?: (value: boolean) => void;
+  /**
+   * Media query that flips the sidebar into mobile (Drawer) mode.
+   * @default "(max-width: 47.99em)"
+   */
   mobileQuery?: string;
+  /**
+   * Which edge the sidebar is anchored to.
+   * @default "left"
+   */
   side?: 'left' | 'right';
+  /**
+   * Visual variant. `sidebar` is the standard flush rail; `floating`
+   * renders an inset elevated surface; `inset` reserves a gutter for the
+   * main content area.
+   * @default "sidebar"
+   */
   variant?: 'sidebar' | 'floating' | 'inset';
+  /**
+   * Collapse behaviour. `icon` keeps a narrow icon-only rail; `offcanvas`
+   * slides the sidebar off-screen; `none` disables collapse entirely.
+   * @default "icon"
+   */
   collapsible?: 'icon' | 'offcanvas' | 'none';
   children?: ReactNode;
 }
 
+/**
+ * Context provider for the sidebar's collapse + mobile-open state. Place
+ * once at the top of your app shell. Also mounts a `TooltipProvider` with
+ * a short delay so collapsed icon-rail tooltips appear quickly.
+ */
 export function SidebarProvider({
   defaultCollapsed = false,
   collapsed: collapsedProp,
@@ -106,9 +147,25 @@ export function SidebarProvider({
   );
 }
 
+/**
+ * Props for the `Sidebar` element. Renders an `<aside>` on desktop and
+ * automatically reflows into a `Drawer` when the provider's `mobileQuery`
+ * matches.
+ */
 export interface SidebarProps extends HTMLAttributes<HTMLElement> {
+  /**
+   * Override the provider's `side`. Useful when a single layout has both a
+   * left and a right sidebar.
+   */
   side?: 'left' | 'right';
+  /**
+   * Visually-hidden title used as the mobile Drawer's accessible name.
+   * @default "Sidebar"
+   */
   mobileTitle?: ReactNode;
+  /**
+   * Visually-hidden description for the mobile Drawer (`aria-describedby`).
+   */
   mobileDescription?: ReactNode;
 }
 
@@ -120,6 +177,12 @@ const visuallyHidden = {
   clip: 'rect(0 0 0 0)',
 } as const;
 
+/**
+ * Edge-anchored navigation panel. Renders an `<aside>` on desktop and an
+ * accessible Drawer (focus-trapped, scroll-locked, dismissible by
+ * `Escape` / outside click) on mobile. Reads collapse / mobile-open state
+ * from `SidebarProvider`; pair with `SidebarTrigger` to expose a toggle.
+ */
 export const Sidebar = forwardRef<HTMLElement, SidebarProps>(function Sidebar(
   { className, children, side: sideProp, mobileTitle = 'Sidebar', mobileDescription, ...rest },
   ref,

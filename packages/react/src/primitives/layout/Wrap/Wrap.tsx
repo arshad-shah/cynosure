@@ -41,19 +41,52 @@ const JUSTIFY_MAP: Record<WrapJustify, string> = {
   evenly: 'space-evenly',
 };
 
+/**
+ * Props specific to `Wrap`, layered on `LayoutProps` and `AsChildProps`.
+ */
 export interface WrapOwnProps extends LayoutProps, AsChildProps {
+  /**
+   * Additional class names appended after Cynosure's base classes.
+   */
   className?: string;
+  /**
+   * Inline style overrides merged last.
+   */
   style?: CSSProperties;
+  /**
+   * Wrapped items.
+   */
   children?: ReactNode;
-  /** Uniform gap in both axes. Falls back to `rowGap`/`columnGap` when set. */
+  /**
+   * Uniform gap in both axes. Falls back to `rowGap`/`columnGap` when set.
+   */
   gap?: Responsive<SpaceToken>;
+  /**
+   * Gap between wrapped rows. Overrides the row axis of `gap`.
+   */
   rowGap?: Responsive<SpaceToken>;
+  /**
+   * Gap between adjacent items on the inline axis. Overrides `gap`'s columns.
+   */
   columnGap?: Responsive<SpaceToken>;
+  /**
+   * Cross-axis alignment — maps to `align-items`. Supports `baseline`.
+   */
   align?: Responsive<WrapAlign>;
+  /**
+   * Main-axis distribution — maps to `justify-content`.
+   */
   justify?: Responsive<WrapJustify>;
 }
 
+/**
+ * Full `Wrap` props. Generic over the rendered element.
+ */
 export type WrapProps<E extends ElementType = 'div'> = WrapOwnProps & {
+  /**
+   * Rendered intrinsic element or component.
+   * @default "div"
+   */
   as?: E;
 } & Omit<React.ComponentPropsWithoutRef<E>, keyof WrapOwnProps | 'as'>;
 

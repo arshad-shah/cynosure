@@ -1,0 +1,73 @@
+---
+title: HoverCard
+description: A non-modal floating panel that surfaces a rich preview when the user hovers or focuses a trigger.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Opens on pointer hover and on keyboard focus; content is supplementary — primary info should also be reachable from the trigger.
+bundleSize: "—"
+tags: [overlay, preview, accessible]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+import StatusBadge from '@/components/StatusBadge.astro';
+import BundleSizePill from '@/components/BundleSizePill.astro';
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="HoverCard" /></div>
+
+<LivePreview example="hover-card/basic" />
+
+## Usage
+
+```tsx
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@arshad-shah/cynosure-react";
+
+<HoverCard>
+  <HoverCardTrigger asChild>
+    <a href="/users/jane">@jane</a>
+  </HoverCardTrigger>
+  <HoverCardContent>Profile preview</HoverCardContent>
+</HoverCard>
+```
+
+## Variants
+
+### Delays
+
+Tune the hover-in and hover-out behaviour with `openDelay` (default 700 ms) and `closeDelay` (default 300 ms). Shorter values feel snappier; longer values prevent the card from flickering on accidental hovers.
+
+<LivePreview example="hover-card/delays" />
+
+### With arrow
+
+Add `HoverCardArrow` inside `HoverCardContent` to render a directional pointer toward the trigger.
+
+<LivePreview example="hover-card/with-arrow" />
+
+### Profile preview
+
+A typical layout pairs an avatar, name, handle, and a short bio.
+
+<LivePreview example="hover-card/profile" />
+
+## API
+
+<PropsTable component="HoverCardContent" />
+
+## Accessibility
+
+- Opens on `pointerenter` and on keyboard `focus`, giving keyboard users parity with mouse users.
+- The hover card is non-modal — focus is not trapped and the rest of the page remains interactive.
+- Treat the content as supplementary. Primary actions and identifying information must also live in the trigger so touch users (who never hover) still see them.
+- `openDelay` and `closeDelay` adjust the timing of show / hide without affecting accessibility semantics.
+
+## Recipes
+
+- Use for user profile cards, link previews, footnotes, and definition popovers.
+- Combine with `Avatar` and `Anchor` to build a recognisable mention preview.
+- Prefer `Tooltip` for short text-only hints and `Popover` for click-triggered content with focusable controls.
+- Anchor it to inline text by wrapping a `HoverCardTrigger asChild` around the link element itself.

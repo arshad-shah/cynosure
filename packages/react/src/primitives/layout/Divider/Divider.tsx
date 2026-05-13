@@ -21,9 +21,25 @@ export type DividerThickness = '1' | '2';
 export type DividerTone = 'default' | 'subtle';
 export type DividerLabelAlign = 'start' | 'center' | 'end';
 
+/**
+ * Props for the `Divider` separator (rendered as `<hr>` or labelled `<div>`).
+ */
 export interface DividerProps {
+  /**
+   * Rule axis. Vertical dividers must sit inside a container with an
+   * explicit height to be visible.
+   * @default "horizontal"
+   */
   orientation?: DividerOrientation;
+  /**
+   * Line style — `solid`, `dashed`, or `dotted`.
+   * @default "solid"
+   */
   variant?: DividerVariant;
+  /**
+   * Line thickness in pixels.
+   * @default "1"
+   */
   thickness?: DividerThickness;
   /**
    * Explicit cross-axis length. For `horizontal`, sets the width;
@@ -38,24 +54,38 @@ export interface DividerProps {
    */
   spacing?: SpaceToken;
   /**
-   * Line color tone. Defaults to `subtle` (thematic rule). Use `default` when
-   * you want a stronger rule (e.g. matching input borders).
+   * Colour intensity — `subtle` for a thematic rule, `default` for a
+   * stronger rule (e.g. matching input borders).
+   * @default "subtle"
    */
   tone?: DividerTone;
-  /** Fade the rule toward its ends via `mask-image`. */
+  /**
+   * Fade the rule toward its ends via `mask-image`.
+   * @default false
+   */
   soft?: boolean;
   /**
    * Inline label rendered between two rules. Horizontal orientation only —
-   * ignored with `orientation="vertical"`.
+   * ignored (with a dev warning) when `orientation="vertical"`.
    */
   children?: ReactNode;
-  /** Alignment for `children`. Defaults to `center`. */
+  /**
+   * Alignment for the inline `children` label between the two rules.
+   * @default "center"
+   */
   labelAlign?: DividerLabelAlign;
+  /**
+   * Additional class names appended after Cynosure's base classes.
+   */
   className?: string;
+  /**
+   * Inline style overrides merged last.
+   */
   style?: CSSProperties;
   /**
-   * When `decorative` (default), the divider is hidden from assistive tech.
-   * Set `decorative={false}` to expose it as a meaningful separator.
+   * When `true`, the divider is hidden from assistive tech. Set to `false`
+   * to expose it as a meaningful `role="separator"`.
+   * @default true
    */
   decorative?: boolean;
 }

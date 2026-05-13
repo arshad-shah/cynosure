@@ -3,6 +3,25 @@
   "version": "2.1.0",
   "description": "Cynosure UI — React component library",
   "license": "MIT",
+  "homepage": "https://cynosure.arshadshah.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/arshad-shah/cynosure.git",
+    "directory": "packages/react"
+  },
+  "bugs": { "url": "https://github.com/arshad-shah/cynosure/issues" },
+  "keywords": [
+    "cynosure",
+    "design-system",
+    "react",
+    "components",
+    "ui",
+    "vanilla-extract",
+    "radix",
+    "accessible",
+    "a11y",
+    "headless"
+  ],
   "type": "module",
   "sideEffects": ["**/*.css"],
   "exports": {
@@ -17,6 +36,10 @@
     "./all.css": {
       "types": "./all.css.d.ts",
       "default": "./dist/all.css"
+    },
+    "./fonts.css": {
+      "types": "./fonts.css.d.ts",
+      "default": "./dist/fonts.css"
     },
     "./theme": {
       "types": "./dist/theme/index.d.ts",
@@ -394,10 +417,6 @@
       "types": "./dist/alert.d.ts",
       "import": "./dist/alert.js"
     },
-    "./banner": {
-      "types": "./dist/banner.d.ts",
-      "import": "./dist/banner.js"
-    },
     "./notification": {
       "types": "./dist/notification.d.ts",
       "import": "./dist/notification.js"
@@ -539,7 +558,6 @@
     "avatar",
     "avatar-group",
     "alert",
-    "banner",
     "notification",
     "callout",
     "empty-state",
@@ -552,6 +570,7 @@
     "chart",
     "styles.css.d.ts",
     "all.css.d.ts",
+    "fonts.css.d.ts",
     "README.md",
     "CHANGELOG.md"
   ],
@@ -579,6 +598,8 @@
     "@internationalized/date": "catalog:",
     "@arshad-shah/cynosure-core": "workspace:*",
     "@arshad-shah/cynosure-tokens": "workspace:*",
+    "@fontsource-variable/geist": "catalog:",
+    "@fontsource-variable/jetbrains-mono": "catalog:",
     "@radix-ui/react-accordion": "catalog:",
     "@radix-ui/react-alert-dialog": "catalog:",
     "@radix-ui/react-avatar": "catalog:",
@@ -609,7 +630,7 @@
     "lucide-react": "catalog:",
     "react-aria-components": "catalog:",
     "react-resizable-panels": "catalog:",
-    "recharts": "catalog:",
+    "@arshad-shah/swift-chart": "catalog:",
     "shiki": "catalog:",
     "sonner": "catalog:"
   },

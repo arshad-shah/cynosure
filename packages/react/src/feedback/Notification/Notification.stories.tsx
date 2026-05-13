@@ -70,7 +70,7 @@ const IconCheck = (): React.ReactElement => (
 export const Playground: Story = {
   args: {
     title: 'New comment on your PR',
-    description: 'Grace Hopper left 2 comments on "feat: add Banner component".',
+    description: 'Grace Hopper left 2 comments on "feat: polish Alert component".',
     timestamp: '2m ago',
     unread: true,
   },

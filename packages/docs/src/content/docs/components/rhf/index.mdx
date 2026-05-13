@@ -1,0 +1,75 @@
+---
+title: RHFField
+description: React Hook Form adapter that wires useController through Cynosure's FormField scaffolding — label, error, aria-invalid, and message in one component.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Inherits the underlying control's a11y; surfaces validation errors via aria-describedby and aria-invalid.
+bundleSize: "—"
+tags: [forms]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+import StatusBadge from '@/components/StatusBadge.astro';
+import BundleSizePill from '@/components/BundleSizePill.astro';
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="RHFField" /></div>
+
+<LivePreview example="rhf/basic" />
+
+## Usage
+
+`RHFField` accepts the `control` from `useForm()` plus a `name` and `label`, and clones its single child to inject `value`, `onChange`, `onBlur`, and `ref` from `useController`.
+
+```tsx
+import { useForm } from "react-hook-form";
+import { RHFField, Input } from "@arshad-shah/cynosure-react/rhf";
+
+function MyForm() {
+  const { control, handleSubmit } = useForm({ defaultValues: { email: "" } });
+
+  return (
+    <form onSubmit={handleSubmit(console.log)}>
+      <RHFField control={control} name="email" label="Email">
+        <Input type="email" />
+      </RHFField>
+    </form>
+  );
+}
+```
+
+`react-hook-form` is declared as an **optional peer dependency** — consumers that never import `RHFField` don't need it installed.
+
+## With validation
+
+Pass `rules` (RHF's `RegisterOptions`) to validate the field; the error message is announced via `FormMessage`.
+
+<LivePreview example="rhf/validation" />
+
+## With description
+
+Supply `description` to render helper copy below the control.
+
+<LivePreview example="rhf/description" />
+
+## Required and disabled
+
+The `required` prop marks the Label and propagates to the inner control; `disabled` is forwarded as well.
+
+<LivePreview example="rhf/required-disabled" />
+
+## API
+
+<PropsTable component="RHFField" />
+
+## Accessibility
+
+- The `label` prop renders inside `FormLabel`, wired by `htmlFor` to the cloned input child.
+- Validation errors are announced via `FormMessage` and linked through `aria-describedby` and `aria-invalid` on the input.
+- The single child must forward `ref`, `value`, and `onChange` — all native and Cynosure inputs do.
+
+## Recipes
+
+- For non-input controls (Slider, RadioGroup, Select), wrap with the same pattern — `RHFField` injects `value`/`onChange`/`onBlur`/`ref`, which they all consume.
+- Group multiple `RHFField`s under a single `useForm` and submit via `handleSubmit`.
+- Pass `rules={{ required: "…" }}` to drive both required marking and inline messaging in one place.

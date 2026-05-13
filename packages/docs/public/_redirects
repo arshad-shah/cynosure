@@ -1,5 +1,9 @@
 /docs                      /getting-started/introduction   301
 /docs/*                    /:splat                          301
-/?path=/docs/*             /:splat                          301
-/?path=/story/*            /:splat                          301
 /iframe.html               /                                301
+
+# Storybook bundle ships at /storybook/. Its index.html uses *relative*
+# asset paths (`./sb-addons/…`, `./favicon.svg`) which only resolve
+# correctly when the URL has a trailing slash. Force `/storybook` → `/storybook/`
+# so visitors who type the bare path still get a working bundle.
+/storybook                 /storybook/                      301

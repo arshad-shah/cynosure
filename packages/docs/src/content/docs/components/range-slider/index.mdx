@@ -1,0 +1,76 @@
+---
+title: RangeSlider
+description: Two-thumb slider for picking a numeric range; built on React Aria's Slider.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Each thumb is role="slider" with aria-valuemin/max/now; arrow keys move thumbs by step.
+bundleSize: "—"
+tags: [forms]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+import StatusBadge from '@/components/StatusBadge.astro';
+import BundleSizePill from '@/components/BundleSizePill.astro';
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="RangeSlider" /></div>
+
+<LivePreview example="range-slider/basic" />
+
+## Usage
+
+```tsx
+import { RangeSlider } from "@arshad-shah/cynosure-react";
+
+<RangeSlider
+  label="Price"
+  defaultValue={[20, 80]}
+  minValue={0}
+  maxValue={100}
+/>
+```
+
+## Sizes
+
+Three track sizes are available: `sm`, `md` (default), and `lg`.
+
+<LivePreview example="range-slider/sizes" />
+
+## With label and value
+
+Set `label` for a visible caption and `showValue` to render the formatted range next to it.
+
+<LivePreview example="range-slider/with-value" />
+
+## Step
+
+Use `step` to constrain motion to discrete increments.
+
+<LivePreview example="range-slider/step" />
+
+## Formatted
+
+Pass `formatOptions` to render currency, percent, or unit-aware values.
+
+<LivePreview example="range-slider/formatted" />
+
+## Disabled
+
+<LivePreview example="range-slider/disabled" />
+
+## API
+
+<PropsTable component="RangeSlider" />
+
+## Accessibility
+
+- Each thumb exposes `role="slider"` with `aria-valuemin`, `aria-valuemax`, and `aria-valuenow`.
+- Arrow Left/Right (or Up/Down) move the focused thumb by `step`; Page Up/Down move by a larger increment.
+- Home/End jump to the bounds; thumbs cannot cross each other.
+- When `label` is a string, both thumbs receive descriptive `aria-label`s (`{label} (min)` / `{label} (max)`).
+
+## Recipes
+
+- Use for price ranges, numeric filters, or date windows where both ends matter.
+- Provide `formatOptions` for localized currency or percent rendering.
+- Combine with helper text below the slider to describe the unit when not implied by `formatOptions`.

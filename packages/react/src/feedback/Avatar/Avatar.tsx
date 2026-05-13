@@ -32,18 +32,47 @@ export type AvatarShape = 'circle' | 'square' | 'rounded';
 export type AvatarStatus = 'online' | 'offline' | 'away' | 'busy';
 export type AvatarStatusPosition = 'top-right' | 'bottom-right';
 
+/**
+ * Props for the {@link Avatar} component.
+ */
 export interface AvatarProps
   extends Omit<ComponentPropsWithoutRef<typeof RadixAvatar.Root>, 'children'> {
+  /** Image source URL. When omitted or failed to load, the fallback renders. */
   src?: string;
+  /** User's display name, used to derive initials and a deterministic colour. */
   name?: string;
+  /** `alt` text for the image; falls back to `name`. */
   alt?: string;
+  /** Custom fallback node rendered when the image is unavailable. */
   fallback?: ReactNode;
+  /** Icon shown when neither image nor initials are available. */
   icon?: ReactNode;
+  /**
+   * Pixel scale. One of `xs`, `sm`, `md`, `lg`, `xl`, `2xl`.
+   * @default "md"
+   */
   size?: AvatarSize;
+  /**
+   * Outline shape. One of `circle`, `square`, `rounded`.
+   * @default "circle"
+   */
   shape?: AvatarShape;
+  /**
+   * Palette token for the fallback background. When omitted, a colour is
+   * derived deterministically from `name`.
+   */
   colorScheme?: AvatarPaletteKey;
+  /** Presence indicator. One of `online`, `offline`, `away`, `busy`. */
   status?: AvatarStatus;
+  /**
+   * Where the presence dot sits relative to the avatar.
+   * @default "bottom-right"
+   */
   statusPosition?: AvatarStatusPosition;
+  /**
+   * Render a halo ring around the avatar; useful for stacking in groups.
+   * @default false
+   */
   ring?: boolean;
   /** Overrides the initials derived from `name`. */
   initials?: string;
@@ -52,6 +81,12 @@ export interface AvatarProps
 const isPaletteKey = (value: string | undefined): value is AvatarPaletteKey =>
   typeof value === 'string' && (AVATAR_PALETTE as readonly string[]).includes(value);
 
+/**
+ * Compact visual representation of a user, organisation, or entity. Avatar
+ * resolves a graceful fallback chain: image, then initials derived from
+ * `name`, then a provided icon. It can display a presence dot for status and
+ * inherits size/ring defaults from a surrounding `AvatarGroup`.
+ */
 export const Avatar = forwardRef<ElementRef<typeof RadixAvatar.Root>, AvatarProps>(
   function Avatar(props, ref) {
     const group = useContext(AvatarGroupContext);

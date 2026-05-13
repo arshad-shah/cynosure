@@ -1,0 +1,69 @@
+---
+title: Anchor
+description: A heading paired with an in-page anchor link that copies the URL fragment when clicked.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Renders a semantic heading with a visually-hidden anchor link revealed on hover/focus; respects prefers-reduced-motion when scrolling.
+bundleSize: "—"
+tags: [navigation, anchor, accessible]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+import StatusBadge from '@/components/StatusBadge.astro';
+import BundleSizePill from '@/components/BundleSizePill.astro';
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="Anchor" /></div>
+
+<LivePreview example="anchor/basic" />
+
+## Usage
+
+```tsx
+import { Anchor } from "@arshad-shah/cynosure-react";
+
+<Anchor id="introduction" level={2}>
+  Introduction
+</Anchor>
+```
+
+The `id` is required — it is applied to the heading element so URL fragments can target it directly. Clicking the icon scrolls to the heading and copies the absolute URL (origin + path + `#id`) to the clipboard.
+
+## Variants
+
+### Heading levels
+
+Use the `level` prop to render `h1` through `h6`. Visual styling stays consistent; only the underlying tag changes for document outline.
+
+<LivePreview example="anchor/levels" />
+
+### Sticky-header offset
+
+Pass `offsetTop` (a number in pixels or any CSS length string) when a fixed header would otherwise overlap the scrolled-into-view heading. The value is exposed as `--cynosure-anchor-offset` on the wrapper.
+
+<LivePreview example="anchor/offset-top" />
+
+### Copy callback
+
+The `onCopy` handler fires after the URL fragment is written to the clipboard — useful for a toast confirmation.
+
+<LivePreview example="anchor/on-copy" />
+
+## API
+
+<PropsTable component="Anchor" />
+
+## Accessibility
+
+- The wrapping element is a real `<h1>`–`<h6>` so it appears in the document outline.
+- The reveal link carries a descriptive `aria-label` (`"Copy link to section"` by default); override via the `label` prop for localisation.
+- The link is keyboard-focusable; tabbing onto it reveals it just like a hover.
+- When `prefers-reduced-motion: reduce` is set the scroll behaviour falls back from `smooth` to `auto`.
+- Clipboard failures are swallowed silently — the hash still updates so the URL remains shareable.
+
+## Recipes
+
+- Pair with a top-of-page `BackToTop` button so long-form pages get both forward (jump-to-section) and backward (return-to-top) affordances.
+- Use the `onCopy` callback to surface a Toast confirming the URL was copied.
+- Set `offsetTop` to the height of any sticky page header so the scrolled heading clears it.
+- Wrap inline `<Code>` inside the heading children to render code-decorated section titles.

@@ -1,0 +1,72 @@
+---
+title: CheckboxGroup
+description: Manages a set of Checkbox children as a single multi-select value array; works controlled or uncontrolled.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Wrapper has role="group"; child Checkbox inputs keep their native role and labels.
+bundleSize: "—"
+tags: [forms, input]
+---
+import LivePreview from "@/components/LivePreview/LivePreview.astro";
+import PropsTable from "@/components/PropsTable.astro";
+import StatusBadge from "@/components/StatusBadge.astro";
+import BundleSizePill from "@/components/BundleSizePill.astro";
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="CheckboxGroup" /></div>
+
+<LivePreview example="checkbox-group/basic" />
+
+## Usage
+
+```tsx
+import { Checkbox, CheckboxGroup } from "@arshad-shah/cynosure-react";
+
+<CheckboxGroup defaultValue={["en"]} aria-label="Languages">
+  <Checkbox value="en">English</Checkbox>
+  <Checkbox value="fr">French</Checkbox>
+</CheckboxGroup>
+```
+
+Each child `Checkbox` must carry a `value` — the group's value is the array of currently-checked values.
+
+## Controlled
+
+Drive selection from state via `value` + `onChange`. Individual `checked` / `onCheckedChange` props on the children are ignored once they're inside a group.
+
+<LivePreview example="checkbox-group/controlled" />
+
+## Layout
+
+The group renders a plain wrapper — wrap children in any layout primitive (Stack for vertical, Inline for horizontal).
+
+<LivePreview example="checkbox-group/horizontal" />
+
+## Disabled
+
+Setting `disabled` on the group cascades to every child. Children can also be disabled individually.
+
+<LivePreview example="checkbox-group/disabled" />
+
+## With Fieldset
+
+For a visible legend, wrap the group in `<Fieldset>`.
+
+<LivePreview example="checkbox-group/with-fieldset" />
+
+## API
+
+<PropsTable component="CheckboxGroup" />
+
+## Accessibility
+
+- Wrapper uses `role="group"` — pair with `aria-label` or a `<Fieldset legend="…">` so the group has an accessible name.
+- Each child `Checkbox` keeps its native `role="checkbox"` and individual label, so screen-reader counting ("3 of 5") works.
+- `disabled` on the group is propagated to every child, including their `aria-disabled` state.
+- Selection lives in a single value array — there is no separate `checked` to keep in sync per item.
+
+## Recipes
+
+- Pass `name` so each checked item submits as a repeated form value inside a native `<form>`.
+- Combine with `FormField` + `FormMessage` to drive "pick at least one" validation messaging.
+- Keep `value` items primitive strings — they round-trip cleanly through URLs and `FormData`.

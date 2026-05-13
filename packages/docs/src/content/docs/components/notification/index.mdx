@@ -1,0 +1,69 @@
+---
+title: Notification
+description: Inline message card for system events, with optional icon, timestamp, actions, and dismiss control.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Notification renders a `<div>` card and lets the surrounding app decide on live-region semantics. The dismiss button is rendered via `IconButton` and labelled by `dismissLabel` (defaults to `Dismiss notification`).
+bundleSize: "—"
+tags: [feedback, notification, status]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+import StatusBadge from '@/components/StatusBadge.astro';
+import BundleSizePill from '@/components/BundleSizePill.astro';
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="Notification" /></div>
+
+<LivePreview example="notification/basic" />
+
+## Usage
+
+```tsx
+import { Notification } from '@arshad-shah/cynosure-react';
+
+<Notification title="Saved" description="Your changes have been saved." />
+```
+
+## With icon and timestamp
+
+Pass any node to `icon` for a leading glyph and a string or node to `timestamp` for an aligned trailing time.
+
+<LivePreview example="notification/with-icon" />
+
+## Unread state
+
+Pass `unread` to render the unread indicator dot. The optional `onRead` callback fires when the card is clicked so consumers can mark the notification as read.
+
+<LivePreview example="notification/unread" />
+
+## With actions
+
+The `actions` slot accepts any node — typically a row of `Button`s for inline responses.
+
+<LivePreview example="notification/with-actions" />
+
+## Dismissable
+
+Set `onDismiss` to render the close `IconButton`. Use `dismissLabel` to override the default `"Dismiss notification"` label.
+
+<LivePreview example="notification/dismissable" />
+
+## API
+
+<PropsTable component="Notification" />
+
+## Accessibility
+
+- The card itself is not a live region — wrap a stack of notifications in `role="status"` or `role="log"` when announcements are needed.
+- The dismiss control is an `IconButton` whose label is `dismissLabel` — defaults to `"Dismiss notification"`.
+- The unread dot is decorative (`aria-hidden="true"`); pair it with a visible label such as "Unread" when state matters.
+- Clicking the card triggers `onRead` when `unread` is set, so non-pointer users should also be able to mark items read via an explicit control.
+- Use a heading element inside `title` (or nest your own heading) when the notification sits at the top of a region.
+
+## Recipes
+
+- Stack notifications inside a fixed-position container to build a notification centre.
+- Auto-dismiss informational notifications after a few seconds; keep dangerous ones manual.
+- Pair a primary action with a "Mark as read" secondary button inside `actions`.
+- Use a leading `Avatar` as the `icon` for activity feeds.

@@ -1,15 +1,25 @@
 import { type ReactNode, useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 
+/**
+ * Props for the SSR-safe `Portal` wrapper around `react-dom`'s `createPortal`.
+ */
 export interface PortalProps {
   /**
-   * DOM element (or lazy getter returning one) to portal into. Defaults to
-   * `document.body`. The getter form is preferred so the lookup happens once
-   * the portal mounts — before then the target element may not yet exist.
+   * DOM element (or lazy getter returning one) to portal into. The getter
+   * form is preferred so the lookup happens once the portal mounts — before
+   * then the target element may not yet exist.
+   * @default document.body
    */
   container?: Element | DocumentFragment | (() => Element | DocumentFragment | null | undefined);
-  /** When `true`, renders children inline instead of portalling (useful in tests). */
+  /**
+   * When `true`, renders children inline instead of portalling — useful for
+   * tests, SSR-only flows, or temporarily disabling the portal hop.
+   */
   disabled?: boolean;
+  /**
+   * Subtree to render at the resolved container.
+   */
   children: ReactNode;
 }
 

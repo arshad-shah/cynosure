@@ -15,18 +15,46 @@ import {
   notificationUnreadDot,
 } from './Notification.css.js';
 
+/**
+ * Props for the {@link Notification} component.
+ */
 export interface NotificationProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'> {
+  /** Leading icon node. */
   icon?: ReactNode;
+  /** Headline content. Mutually composes with `description` and `timestamp`. */
   title?: ReactNode;
+  /** Supporting body content rendered below the title. */
   description?: ReactNode;
+  /** Right-aligned timestamp shown next to the title. */
   timestamp?: ReactNode;
+  /** Inline action row rendered beneath the description. */
   actions?: ReactNode;
+  /**
+   * Marks the notification as unread; renders an accent dot and triggers
+   * `onRead` on the next click.
+   * @default false
+   */
   unread?: boolean;
+  /** Invoked when an unread notification is clicked. */
   onRead?: () => void;
+  /**
+   * Invoked when the user activates the dismiss control. When omitted, no
+   * dismiss button is rendered.
+   */
   onDismiss?: () => void;
+  /**
+   * Accessible label for the dismiss button.
+   * @default "Dismiss notification"
+   */
   dismissLabel?: string;
 }
 
+/**
+ * Item in a notification list — for inbox-style surfaces, activity feeds, or
+ * a popover from a bell icon. Notification handles read/unread visual state,
+ * exposes a dismiss action, and stops dismiss click propagation so list-level
+ * `onClick` handlers do not fire when removing an item.
+ */
 export const Notification = forwardRef<HTMLDivElement, NotificationProps>(function Notification(
   {
     icon,

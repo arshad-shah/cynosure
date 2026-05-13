@@ -1,0 +1,76 @@
+---
+title: TagsInput
+description: Free-form chip entry — Enter or comma commits the current token; Backspace on empty removes the last tag.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Each tag's remove control has an accessible name (Remove {tag}); Backspace on empty removes the trailing tag.
+bundleSize: "—"
+tags: [forms, input]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+import StatusBadge from '@/components/StatusBadge.astro';
+import BundleSizePill from '@/components/BundleSizePill.astro';
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="TagsInput" /></div>
+
+<LivePreview example="tags-input/basic" />
+
+## Usage
+
+```tsx
+import { TagsInput } from "@arshad-shah/cynosure-react";
+
+<TagsInput
+  aria-label="Topics"
+  defaultValue={["design", "systems"]}
+  placeholder="Add tag…"
+/>
+```
+
+## Sizes
+
+Three sizes are available: `sm`, `md` (default), and `lg`.
+
+<LivePreview example="tags-input/sizes" />
+
+## Max tags
+
+Set `maxTags` to cap how many tags can be added.
+
+<LivePreview example="tags-input/max-tags" />
+
+## Commit keys
+
+Override `commitKeys` to change which keys commit the current token. Defaults to `Enter` and `,`.
+
+<LivePreview example="tags-input/commit-keys" />
+
+## Suggestions
+
+Pass `suggestions` to expose a `<datalist>` of pre-filled options to the input.
+
+<LivePreview example="tags-input/suggestions" />
+
+## States
+
+<LivePreview example="tags-input/states" />
+
+## API
+
+<PropsTable component="TagsInput" />
+
+## Accessibility
+
+- Each rendered tag has a remove button with the accessible name `Remove {tag}`.
+- Backspace on an empty input removes the most recent tag.
+- The inline input forwards `aria-invalid` from `invalid` and uses the `label` / `aria-label` you supply.
+- Blurring with a draft value commits the tag automatically.
+- Duplicate tags are blocked by default; set `unique={false}` to allow them.
+
+## Recipes
+
+- Normalize entries inside `onValueChange` (e.g. lower-casing or trimming).
+- Use `maxTags` for filter-style inputs to keep queries predictable.
+- Use `renderTag` to render branded chips or include extra metadata per tag.

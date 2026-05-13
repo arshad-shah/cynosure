@@ -1,0 +1,155 @@
+---
+title: Type reference
+description: Token-shaped string aliases the layout primitives accept. The PropsTable links here from any prop whose type collapses to one of these names.
+---
+
+The layout primitives (`Box`, `Stack`, `Flex`, `Grid`, `SimpleGrid`, `Wrap`, …) and the typography primitives accept short token names for spacing, sizing, colour, and display. The PropsTable in component docs renders these names verbatim and links them here so the table stays readable. The underlying CSS resolves through `var(--cynosure-…)`.
+
+## SpaceToken
+
+Every spacing-style prop (`padding`, `paddingX`, `paddingY`, `paddingTop` / `Right` / `Bottom` / `Left`, `margin*`, `gap`, `rowGap`, `columnGap`) and inset prop (`top`, `right`, `bottom`, `left`) accepts a `SpaceToken`.
+
+```ts
+type SpaceToken =
+  | "0" | "0.5" | "1" | "1.5" | "2" | "3" | "4" | "5" | "6"
+  | "8" | "10" | "12" | "16" | "20" | "24" | "32" | "40" | "48" | "64";
+```
+
+Each token resolves to `var(--cynosure-space-<token>)`. The numeric scale is unit-less: `"4"` is `var(--cynosure-space-4)` (typically `1rem` in the default theme), `"0.5"` is the half-step. The scale is shared with the design-tokens package, so swapping themes shifts every spacing-driven layout consistently.
+
+## LengthValue
+
+Any prop that accepts a raw CSS length.
+
+```ts
+type PxValue      = `${number}px`;
+type PercentValue = `${number}%`;
+type RemValue     = `${number}rem`;
+type ChValue      = `${number}ch`;
+type LengthValue  = PxValue | PercentValue | RemValue | ChValue;
+```
+
+Use `LengthValue` to opt out of the spacing scale for one-off measurements — e.g. `width="320px"`, `maxWidth="65ch"`.
+
+## SizeValue
+
+Width / height / min- / max- props compose `SpaceToken`, named aliases, and `LengthValue`.
+
+```ts
+type SizeValue =
+  | SpaceToken
+  | "full"   // 100%
+  | "auto"   // auto
+  | "fit"    // fit-content
+  | "screen" // 100vh
+  | "prose"  // 65ch
+  | LengthValue;
+```
+
+## MarginValue
+
+Margin props accept the spacing scale plus `"auto"` for centring.
+
+```ts
+type MarginValue = SpaceToken | "auto";
+```
+
+## InsetValue
+
+Inset props (`top`, `right`, `bottom`, `left`) accept the spacing scale, `"0"`, `"auto"`, or a raw `LengthValue`.
+
+```ts
+type InsetValue = SpaceToken | "0" | "auto" | LengthValue;
+```
+
+## Display
+
+The `display` prop on Box-like primitives.
+
+```ts
+type Display =
+  | "block" | "inline" | "inline-block"
+  | "flex"  | "inline-flex"
+  | "grid"  | "inline-grid"
+  | "contents" | "none";
+```
+
+## Position
+
+The `position` prop. Pair with [`InsetValue`](#insetvalue) props (`top`, `right`, …) for placement.
+
+```ts
+type Position = "static" | "relative" | "absolute" | "fixed" | "sticky";
+```
+
+## Overflow
+
+How content that exceeds the box is handled. The `overflowX` / `overflowY` props accept the same set independently.
+
+```ts
+type Overflow = "visible" | "hidden" | "auto" | "scroll";
+```
+
+## BorderStyle / BorderWidth
+
+Border styling props.
+
+```ts
+type BorderStyle = "solid" | "dashed" | "dotted" | "none";
+type BorderWidth = "0" | "1" | "2" | "4";   // resolves to var(--cynosure-border-<n>)
+```
+
+## AlignSelf / JustifySelf
+
+Single-child overrides for the flex / grid alignment axes.
+
+```ts
+type AlignSelf   = "auto" | "start" | "center" | "end" | "stretch" | "baseline";
+type JustifySelf = "auto" | "start" | "center" | "end" | "stretch";  // no baseline
+```
+
+## Responsive\<T\>
+
+Every responsive-aware prop is wrapped in `Responsive<T>`. Pass a single value to apply at every breakpoint, or an object keyed by `Breakpoint` to vary across viewports.
+
+```ts
+type Breakpoint = "base" | "sm" | "md" | "lg" | "xl";
+type Responsive<T> = T | Partial<Record<Breakpoint, T>>;
+```
+
+```tsx
+// Same padding everywhere
+<Box padding="4" />
+
+// Tighter on mobile, looser on lg+
+<Box padding={{ base: "2", md: "4", lg: "8" }} />
+```
+
+The `base` key is the default applied below the first named breakpoint. Unspecified keys inherit the closest smaller defined value.
+
+## RadiusToken / ShadowToken / DurationToken / ZIndexToken
+
+Token-named aliases for the matching design-token category. Each resolves to `var(--cynosure-radius-…)`, `var(--cynosure-shadow-…)`, `var(--cynosure-duration-…)`, `var(--cynosure-z-…)` respectively. The exact keys come from the active theme — see [Design tokens](/foundations/design-tokens) for the full enumerations.
+
+## ColorToken
+
+Colour-bearing props (`backgroundColor`, `color`, `borderColor`, …) accept a dotted token path.
+
+```ts
+type ColorToken =
+  | `bg.${keyof Background}`
+  | `fg.${keyof Foreground}`
+  | `border.${keyof Border}`
+  | `accent.${keyof Accent}`
+  | `feedback.${'success' | 'warning' | 'danger' | 'info'}.${'solid' | 'soft' | 'border' | 'text'}`;
+```
+
+Examples: `"bg.surface"`, `"fg.muted"`, `"accent.solid"`, `"feedback.danger.solid"`. Tokens map directly to CSS custom properties on the active theme — swapping themes re-resolves the values without recompilation.
+
+## FlexDirection / FlexWrap / FlexAlign / FlexJustify
+
+Standard flexbox enumerations. `FlexAlign` and `FlexJustify` cover the values supported by the underlying `align-items` and `justify-content`/`justify-items` properties.
+
+## ComponentType
+
+Where a prop accepts an arbitrary forward-ref React component (rather than an element type), the table shows `React.ComponentType`. The real type is the full `React.ForwardRefExoticComponent<…>` returned by `React.forwardRef` — the alias keeps the table legible.

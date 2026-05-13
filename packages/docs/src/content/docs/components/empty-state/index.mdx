@@ -1,0 +1,76 @@
+---
+title: EmptyState
+description: Placeholder layout shown when a view has no data, with guidance and next actions.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Compound parts compose into a labelled heading + description. `EmptyStateIcon` is decorative (`aria-hidden="true"`); `EmptyStateTitle` defaults to a `<h3>` and should be the primary label inside the empty region.
+bundleSize: "—"
+tags: [feedback, empty, onboarding]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+import StatusBadge from '@/components/StatusBadge.astro';
+import BundleSizePill from '@/components/BundleSizePill.astro';
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="EmptyState" /></div>
+
+<LivePreview example="empty-state/basic" />
+
+## Usage
+
+```tsx
+import {
+  EmptyState,
+  EmptyStateIcon,
+  EmptyStateTitle,
+  EmptyStateDescription,
+  EmptyStateActions,
+} from '@arshad-shah/cynosure-react';
+
+<EmptyState>
+  <EmptyStateIcon>{/* decorative svg */}</EmptyStateIcon>
+  <EmptyStateTitle>No items yet</EmptyStateTitle>
+  <EmptyStateDescription>Create your first item to get started.</EmptyStateDescription>
+  <EmptyStateActions>
+    <Button>New item</Button>
+  </EmptyStateActions>
+</EmptyState>
+```
+
+## Sizes
+
+EmptyState ships four sizes — `sm`, `md` (default), `lg`, and `xl`. Bigger sizes are intended for first-run, full-page empty views; smaller sizes fit inline panels.
+
+<LivePreview example="empty-state/sizes" />
+
+## Variants
+
+The `subtle` variant softens the surface for inline empty regions inside cards and panels. The default `default` variant stands on its own.
+
+<LivePreview example="empty-state/subtle" />
+
+## With actions
+
+Compose primary and secondary actions inside `EmptyStateActions` to direct the user toward the next step.
+
+<LivePreview example="empty-state/with-actions" />
+
+## API
+
+<PropsTable component="EmptyState" />
+
+## Accessibility
+
+- `EmptyStateTitle` renders as `<h3>` by default — override with `as="h2"` or `as="h4"` so the heading level matches the surrounding outline.
+- `EmptyStateIcon` is wrapped in a span with `aria-hidden="true"` — illustrations should not be announced.
+- Use `EmptyStateDescription` to give an action-oriented next step, not just a restatement of the empty status.
+- `EmptyStateActions` is a `<div>` — wrap focusable controls so they remain in document tab order.
+- Keep the entire region focusable in scroll order so keyboard users encounter it the same way as sighted users.
+
+## Recipes
+
+- Show an empty state on first sign-up to explain the feature without data.
+- Pair a primary `Button` with a secondary link inside `EmptyStateActions`.
+- Reserve the `xl` size for full-page zero-data screens; use `sm` inside compact panels.
+- Use the `subtle` variant inside cards to avoid stacking heavy surfaces.
