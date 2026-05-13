@@ -153,6 +153,38 @@ docs(recipes): add notification-center recipe
 
 ---
 
+## Publishing
+
+Releases run from `.github/workflows/release.yml` via Changesets. The job
+publishes to npm using **OIDC Trusted Publishing** — there is no
+`NPM_TOKEN` secret.
+
+Trusted Publishing is configured **per package** on npmjs.com. When you
+add a new public package under `@arshad-shah/`, configure its trusted
+publisher **before the first release runs**, or that one package will
+404 on publish while every sibling in the same release succeeds.
+
+For each new public package:
+
+1. Sign in to npmjs.com as the package owner.
+2. Visit `https://www.npmjs.com/package/<scope>/<name>/access` →
+   **Trusted Publishers** → **Add trusted publisher**.
+3. Match the existing packages:
+   - Publisher: GitHub Actions
+   - Organization/Owner: `arshad-shah`
+   - Repository: `cynosure`
+   - Workflow filename: `release.yml`
+   - Environment: `production`
+
+If a publish fails with `E404 Not Found - PUT … - Not found` for a
+single package while the rest of the release succeeds, missing TP config
+is almost always the cause. Add the trusted publisher, then re-run the
+manual `Publish` workflow (`workflow_dispatch`) — `pnpm publish -r`
+skips versions already on the registry, so it republishes only the
+missing one.
+
+---
+
 ## Security
 
 If you find a security issue, **do not open a public issue**. Follow the
