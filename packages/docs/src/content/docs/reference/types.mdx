@@ -46,6 +46,22 @@ type SizeValue =
   | LengthValue;
 ```
 
+## MarginValue
+
+Margin props accept the spacing scale plus `"auto"` for centring.
+
+```ts
+type MarginValue = SpaceToken | "auto";
+```
+
+## InsetValue
+
+Inset props (`top`, `right`, `bottom`, `left`) accept the spacing scale, `"0"`, `"auto"`, or a raw `LengthValue`.
+
+```ts
+type InsetValue = SpaceToken | "0" | "auto" | LengthValue;
+```
+
 ## Display
 
 The `display` prop on Box-like primitives.
@@ -56,6 +72,40 @@ type Display =
   | "flex"  | "inline-flex"
   | "grid"  | "inline-grid"
   | "contents" | "none";
+```
+
+## Position
+
+The `position` prop. Pair with [`InsetValue`](#insetvalue) props (`top`, `right`, …) for placement.
+
+```ts
+type Position = "static" | "relative" | "absolute" | "fixed" | "sticky";
+```
+
+## Overflow
+
+How content that exceeds the box is handled. The `overflowX` / `overflowY` props accept the same set independently.
+
+```ts
+type Overflow = "visible" | "hidden" | "auto" | "scroll";
+```
+
+## BorderStyle / BorderWidth
+
+Border styling props.
+
+```ts
+type BorderStyle = "solid" | "dashed" | "dotted" | "none";
+type BorderWidth = "0" | "1" | "2" | "4";   // resolves to var(--cynosure-border-<n>)
+```
+
+## AlignSelf / JustifySelf
+
+Single-child overrides for the flex / grid alignment axes.
+
+```ts
+type AlignSelf   = "auto" | "start" | "center" | "end" | "stretch" | "baseline";
+type JustifySelf = "auto" | "start" | "center" | "end" | "stretch";  // no baseline
 ```
 
 ## Responsive\<T\>

@@ -52,6 +52,14 @@ const ZINDEX_LITERALS = [
   '"toast"',
   '"tooltip"',
 ];
+const POSITION_LITERALS = ['"static"', '"relative"', '"absolute"', '"fixed"', '"sticky"'];
+const OVERFLOW_LITERALS = ['"visible"', '"hidden"', '"auto"', '"scroll"'];
+const BORDER_STYLE_LITERALS = ['"solid"', '"dashed"', '"dotted"', '"none"'];
+const BORDER_WIDTH_LITERALS = ['"0"', '"1"', '"2"', '"4"'];
+const ALIGN_SELF_LITERALS = ['"auto"', '"start"', '"center"', '"end"', '"stretch"', '"baseline"'];
+const JUSTIFY_SELF_LITERALS = ['"auto"', '"start"', '"center"', '"end"', '"stretch"'];
+const RADIUS_LITERALS = ['"none"', '"xs"', '"sm"', '"md"', '"lg"', '"xl"', '"2xl"', '"full"'];
+const SHADOW_LITERALS = ['"xs"', '"sm"', '"md"', '"lg"', '"xl"', '"2xl"', '"focusRing"'];
 
 function splitTopLevelUnion(s: string): string[] {
   const parts: string[] = [];
@@ -83,6 +91,17 @@ function bucket(parts: string[]): string[] {
   collapse(SPACE_LITERALS, 'SpaceToken');
   collapse(DISPLAY_LITERALS, 'Display');
   collapse(ZINDEX_LITERALS, 'ZIndexToken');
+  collapse(POSITION_LITERALS, 'Position');
+  collapse(OVERFLOW_LITERALS, 'Overflow');
+  collapse(BORDER_STYLE_LITERALS, 'BorderStyle');
+  collapse(BORDER_WIDTH_LITERALS, 'BorderWidth');
+  collapse(RADIUS_LITERALS, 'RadiusToken');
+  collapse(SHADOW_LITERALS, 'ShadowToken');
+  // AlignSelf has six values, JustifySelf has five. Always try AlignSelf
+  // first — it is a strict superset, so a partial match (5/6) would let the
+  // narrower alias swallow the wrong tokens otherwise.
+  collapse(ALIGN_SELF_LITERALS, 'AlignSelf');
+  collapse(JUSTIFY_SELF_LITERALS, 'JustifySelf');
 
   // SizeValue subsumes SpaceToken + LengthValue + the five named aliases.
   if (set.has('SpaceToken') && set.has('LengthValue') && SIZE_EXTRAS.every((p) => set.has(p))) {
@@ -90,6 +109,23 @@ function bucket(parts: string[]): string[] {
     set.delete('LengthValue');
     for (const p of SIZE_EXTRAS) set.delete(p);
     set.add('SizeValue');
+  }
+
+  // MarginValue: SpaceToken | "auto". Recognised after SpaceToken is folded.
+  if (set.has('SpaceToken') && set.has('"auto"') && !set.has('LengthValue')) {
+    set.delete('SpaceToken');
+    set.delete('"auto"');
+    set.add('MarginValue');
+  }
+
+  // InsetValue: SpaceToken | "0" | "auto" | LengthValue. ("0" survives the
+  // SpaceToken collapse because the inset type explicitly re-adds it.)
+  if (set.has('SpaceToken') && set.has('LengthValue') && set.has('"auto"') && set.has('"0"')) {
+    set.delete('SpaceToken');
+    set.delete('LengthValue');
+    set.delete('"auto"');
+    set.delete('"0"');
+    set.add('InsetValue');
   }
 
   return [...set];
