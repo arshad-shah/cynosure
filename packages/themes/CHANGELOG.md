@@ -1,5 +1,16 @@
 # @arshad-shah/cynosure-themes
 
+## 3.0.0
+
+### Patch Changes
+
+- [#63](https://github.com/arshad-shah/cynosure/pull/63) [`f972e95`](https://github.com/arshad-shah/cynosure/commit/f972e958a122c68a6f93daaceb3314a3ac208c86) Thanks [@arshad-shah](https://github.com/arshad-shah)! - Add `homepage`, `repository`, `bugs`, and `keywords` to all publishable
+  packages so the npm package pages render the GitHub source link, issue
+  tracker, and Storybook URL (`https://cynosure.arshadshah.com`) in their
+  sidebars. Pure metadata — no runtime or API changes.
+- Updated dependencies [[`f972e95`](https://github.com/arshad-shah/cynosure/commit/f972e958a122c68a6f93daaceb3314a3ac208c86)]:
+  - @arshad-shah/cynosure-tokens@3.0.0
+
 ## 1.0.1
 
 ### Patch Changes
