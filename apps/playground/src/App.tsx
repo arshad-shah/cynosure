@@ -16,11 +16,13 @@ import {
   Stack,
   Text,
   useColorScheme,
+  useSidebar,
   useTheme,
 } from '@arshad-shah/cynosure-react';
 import {
   BarChart3,
   Bell,
+  Compass,
   Layers,
   Moon,
   Pilcrow,
@@ -33,6 +35,7 @@ import { ChartsPlayground } from './playgrounds/ChartsPlayground.js';
 import { DataDisplayPlayground } from './playgrounds/DataDisplayPlayground.js';
 import { FeedbackPlayground } from './playgrounds/FeedbackPlayground.js';
 import { FormsPlayground } from './playgrounds/FormsPlayground.js';
+import { NavigationPlayground } from './playgrounds/NavigationPlayground.js';
 import { OverlaysPlayground } from './playgrounds/OverlaysPlayground.js';
 import { TypographyPlayground } from './playgrounds/TypographyPlayground.js';
 
@@ -88,6 +91,13 @@ const PLAYGROUNDS: PlaygroundEntry[] = [
     icon: <Pilcrow size={18} aria-hidden />,
     render: () => <TypographyPlayground />,
   },
+  {
+    id: 'navigation',
+    label: 'Navigation',
+    description: 'Tabs, breadcrumbs, pagination, menus, steppers, and anchored navigation.',
+    icon: <Compass size={18} aria-hidden />,
+    render: () => <NavigationPlayground />,
+  },
 ];
 
 export function App() {
@@ -109,15 +119,84 @@ export function App() {
     return () => window.removeEventListener('hashchange', onHash);
   }, []);
 
-  const current = PLAYGROUNDS.find((p) => p.id === active) ?? PLAYGROUNDS[0]!;
+  const current = PLAYGROUNDS.find((p) => p.id === active) ?? PLAYGROUNDS[0];
   const isDark = colorScheme === 'dark';
 
   // `collapsible="icon"` swaps the sidebar between full width and a narrow
   // icon rail when SidebarTrigger fires — the labels move into tooltips
   // automatically while the rail stays focusable. On `(max-width: 47.99em)`
-  // viewports it switches to an offcanvas Drawer.
+  // viewports `useSidebar().isMobile` flips true; we then drop the Sidebar
+  // entirely and render a fixed bottom-nav (Compose-style) instead.
   return (
     <SidebarProvider collapsible="icon">
+      <Shell
+        active={active}
+        setActive={setActive}
+        current={current}
+        isDark={isDark}
+        onToggleTheme={() => setTheme(isDark ? 'light' : 'dark')}
+      />
+    </SidebarProvider>
+  );
+}
+
+interface ShellProps {
+  active: string;
+  setActive: (id: string) => void;
+  current: PlaygroundEntry;
+  isDark: boolean;
+  onToggleTheme: () => void;
+}
+
+function Shell({ active, setActive, current, isDark, onToggleTheme }: ShellProps) {
+  const { isMobile } = useSidebar();
+
+  const header = (
+    <Inline
+      as="header"
+      align="center"
+      justify="between"
+      paddingX="8"
+      paddingY="4"
+      background="bg.raised"
+    >
+      <Inline align="center" gap="3">
+        <Text weight="semibold">Cynosure · playground</Text>
+      </Inline>
+      <IconButton
+        variant="ghost"
+        size="md"
+        label={`Switch to ${isDark ? 'light' : 'dark'} theme`}
+        icon={isDark ? <Sun size={16} aria-hidden /> : <Moon size={16} aria-hidden />}
+        onClick={onToggleTheme}
+      />
+    </Inline>
+  );
+
+  const main = (
+    <Box
+      as="main"
+      flex="1"
+      overflowY="auto"
+      padding={isMobile ? '4' : '8'}
+      paddingBottom={isMobile ? '24' : '8'}
+    >
+      <Container size="lg">
+        <Stack gap="6">
+          <Stack gap="2">
+            <Heading level={1} size="2xl">
+              {current.label}
+            </Heading>
+            <Text color="fg.muted">{current.description}</Text>
+          </Stack>
+          {current.render()}
+        </Stack>
+      </Container>
+    </Box>
+  );
+
+  if (isMobile) {
+    return (
       <Flex
         direction="column"
         position="fixed"
@@ -128,73 +207,118 @@ export function App() {
         background="bg.canvas"
         color="fg.default"
       >
-        <Inline
-          as="header"
-          align="center"
-          justify="between"
-          paddingX="8"
-          paddingY="4"
-          background="bg.raised"
-        >
-          <Inline align="center" gap="3">
-            <Text weight="semibold">Cynosure · playground</Text>
-          </Inline>
-          <IconButton
-            variant="ghost"
-            size="md"
-            label={`Switch to ${isDark ? 'light' : 'dark'} theme`}
-            icon={isDark ? <Sun size={16} aria-hidden /> : <Moon size={16} aria-hidden />}
-            onClick={() => setTheme(isDark ? 'light' : 'dark')}
-          />
-        </Inline>
+        {header}
         <Divider />
-
-        {/*
-         * `minHeight="0"` is required: without it, the default
-         * `min-height: auto` on flex items lets this row stretch to its
-         * children's intrinsic size, the Sidebar's `height: 100%` then
-         * resolves against that stretched height, and SidebarFooter ends
-         * up below the viewport.
-         */}
-        <Flex direction="row" flex="1" minHeight="0">
-          <Sidebar aria-label="Playground sections">
-            <SidebarBody>
-              <SidebarNav aria-label="Playground sections">
-                {PLAYGROUNDS.map((p) => (
-                  <SidebarItem
-                    key={p.id}
-                    asChild
-                    icon={p.icon}
-                    label={p.label}
-                    isActive={p.id === active}
-                  >
-                    <a href={`#${p.id}`} onClick={() => setActive(p.id)}>
-                      {p.label}
-                    </a>
-                  </SidebarItem>
-                ))}
-              </SidebarNav>
-            </SidebarBody>
-            <SidebarFooter>
-              <SidebarTrigger />
-            </SidebarFooter>
-          </Sidebar>
-
-          <Box as="main" flex="1" overflowY="auto" padding="8">
-            <Container size="lg">
-              <Stack gap="6">
-                <Stack gap="2">
-                  <Heading level={1} size="2xl">
-                    {current.label}
-                  </Heading>
-                  <Text color="fg.muted">{current.description}</Text>
-                </Stack>
-                {current.render()}
-              </Stack>
-            </Container>
-          </Box>
+        <Flex direction="column" flex="1" minHeight="0">
+          {main}
         </Flex>
+        <MobileBottomNav active={active} setActive={setActive} />
       </Flex>
-    </SidebarProvider>
+    );
+  }
+
+  return (
+    <Flex
+      direction="column"
+      position="fixed"
+      top="0"
+      right="0"
+      bottom="0"
+      left="0"
+      background="bg.canvas"
+      color="fg.default"
+    >
+      {header}
+      <Divider />
+
+      {/*
+       * `minHeight="0"` is required: without it, the default
+       * `min-height: auto` on flex items lets this row stretch to its
+       * children's intrinsic size, the Sidebar's `height: 100%` then
+       * resolves against that stretched height, and SidebarFooter ends
+       * up below the viewport.
+       */}
+      <Flex direction="row" flex="1" minHeight="0">
+        <Sidebar aria-label="Playground sections">
+          <SidebarBody>
+            <SidebarNav aria-label="Playground sections">
+              {PLAYGROUNDS.map((p) => (
+                <SidebarItem
+                  key={p.id}
+                  asChild
+                  icon={p.icon}
+                  label={p.label}
+                  isActive={p.id === active}
+                >
+                  <a href={`#${p.id}`} onClick={() => setActive(p.id)}>
+                    {p.label}
+                  </a>
+                </SidebarItem>
+              ))}
+            </SidebarNav>
+          </SidebarBody>
+          <SidebarFooter>
+            <SidebarTrigger />
+          </SidebarFooter>
+        </Sidebar>
+
+        {main}
+      </Flex>
+    </Flex>
+  );
+}
+
+interface MobileBottomNavProps {
+  active: string;
+  setActive: (id: string) => void;
+}
+
+// Compose-style NavigationBar: fixed strip at the bottom of the viewport,
+// one slot per top-level destination, icon over short label, active slot
+// gets a tinted pill behind the icon. Renders only when
+// `useSidebar().isMobile` is true.
+function MobileBottomNav({ active, setActive }: MobileBottomNavProps) {
+  return (
+    <Box
+      as="nav"
+      aria-label="Playground sections"
+      background="bg.raised"
+      borderColor="border.subtle"
+      style={{ borderTopWidth: 1, borderTopStyle: 'solid' }}
+    >
+      <Inline align="stretch" justify="between" paddingX="2" paddingY="2" gap="0">
+        {PLAYGROUNDS.map((p) => {
+          const isActive = p.id === active;
+          return (
+            <Box
+              key={p.id}
+              as="a"
+              href={`#${p.id}`}
+              onClick={() => setActive(p.id)}
+              flex="1"
+              aria-current={isActive ? 'page' : undefined}
+              style={{ textDecoration: 'none', color: 'inherit' }}
+            >
+              <Stack align="center" gap="1" paddingY="1">
+                <Inline
+                  align="center"
+                  justify="center"
+                  paddingX="3"
+                  paddingY="1"
+                  borderRadius="full"
+                  background={isActive ? 'accent.soft' : undefined}
+                  color={isActive ? 'accent.solid' : 'fg.muted'}
+                >
+                  {p.icon}
+                </Inline>
+                <Text size="xs" color={isActive ? 'fg.default' : 'fg.muted'}>
+                  {p.label}
+                </Text>
+              </Stack>
+            </Box>
+          );
+        })}
+      </Inline>
+    </Box>
   );
 }
