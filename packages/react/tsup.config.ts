@@ -146,7 +146,6 @@ const feedbackComponents = [
   'Avatar',
   'AvatarGroup',
   'Alert',
-  'Banner',
   'Notification',
   'Callout',
   'EmptyState',

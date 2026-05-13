@@ -46,21 +46,63 @@ jobs:
             echo "present=true" >> "$GITHUB_OUTPUT"
           fi
 
+      # Coarse path filter — skip install/build/Storybook on changes that
+      # can't affect rendered output (markdown, changesets, playground app,
+      # other workflows). Pushes to main always run so the baseline stays
+      # current. chromaui/action still drives per-story TurboSnap inside
+      # the run via onlyChanged: true below.
+      - name: Detect Storybook-relevant changes
+        id: changes
+        if: steps.token.outputs.present == 'true' && github.event_name == 'pull_request'
+        uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # v3.0.2
+        with:
+          filters: |
+            stories:
+              - 'packages/react/**'
+              - 'packages/themes/**'
+              - 'packages/tokens/**'
+              - 'packages/icons/**'
+              - 'packages/core/**'
+              - 'docs/foundations/**'
+              - 'docs/recipes/**'
+              - '.storybook/**'
+              - '.github/workflows/chromatic.yml'
+              - 'pnpm-lock.yaml'
+              - 'pnpm-workspace.yaml'
+
+      - name: Compute should-run
+        id: gate
+        env:
+          TOKEN_PRESENT: ${{ steps.token.outputs.present }}
+          EVENT_NAME: ${{ github.event_name }}
+          STORIES_CHANGED: ${{ steps.changes.outputs.stories }}
+        run: |
+          if [ "$TOKEN_PRESENT" != "true" ]; then
+            echo "should=false" >> "$GITHUB_OUTPUT"
+          elif [ "$EVENT_NAME" = "push" ]; then
+            echo "should=true" >> "$GITHUB_OUTPUT"
+          elif [ "$STORIES_CHANGED" = "true" ]; then
+            echo "should=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Skipping Chromatic - no story-relevant files changed."
+            echo "should=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Install dependencies
-        if: steps.token.outputs.present == 'true'
+        if: steps.gate.outputs.should == 'true'
         run: pnpm install --frozen-lockfile
       - name: Build packages
-        if: steps.token.outputs.present == 'true'
+        if: steps.gate.outputs.should == 'true'
         run: pnpm build
       # Pre-build Storybook here rather than letting chromaui/action run it
-      # internally — the action's internal build spawns `npm run …` which
+      # internally - the action's internal build spawns npm run ... which
       # doesn't play well with the pnpm workspace; pre-building and pointing
-      # the action at `storybook-static` side-steps that class of failure.
+      # the action at storybook-static side-steps that class of failure.
       - name: Build Storybook
-        if: steps.token.outputs.present == 'true'
+        if: steps.gate.outputs.should == 'true'
         run: pnpm build-storybook
       - name: Publish to Chromatic
-        if: steps.token.outputs.present == 'true'
+        if: steps.gate.outputs.should == 'true'
         # Non-blocking while the baseline is still being established.
         # Once Chromatic has accepted a baseline on main, remove this
         # line so the check starts gating merges on real regressions.

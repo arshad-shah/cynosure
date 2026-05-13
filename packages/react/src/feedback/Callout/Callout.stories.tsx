@@ -87,7 +87,7 @@ export const InlineInProse: Story = {
         <CalloutContent>
           <Text size="sm">
             Reach for <code>Callout</code> inside documentation or MDX — for UI surfaces use
-            <code> Alert</code> or <code>Banner</code> instead.
+            <code> Alert</code> instead.
           </Text>
         </CalloutContent>
       </Callout>

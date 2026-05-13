@@ -5,9 +5,6 @@ import {
   Avatar,
   AvatarGroup,
   Badge,
-  Banner,
-  BannerActions,
-  BannerContent,
   Button,
   Callout,
   CalloutContent,
@@ -177,38 +174,6 @@ function FavoriteToggle(): React.ReactElement {
   );
 }
 
-function DismissibleBanner(): React.ReactElement {
-  const [open, setOpen] = useState(true);
-  if (!open) {
-    return (
-      <Inline gap="2" align="center">
-        <Text size="sm" color="fg.muted">
-          Banner dismissed.
-        </Text>
-        <Button size="sm" variant="outline" onClick={() => setOpen(true)}>
-          Bring it back
-        </Button>
-      </Inline>
-    );
-  }
-  return (
-    <Banner status="warning" closable onClose={() => setOpen(false)}>
-      <BannerContent>
-        <Text weight="semibold">Your free trial ends in 3 days</Text>
-        <Text size="sm">Upgrade now to keep advanced features.</Text>
-      </BannerContent>
-      <BannerActions>
-        <Button size="sm" variant="ghost">
-          Later
-        </Button>
-        <Button size="sm" colorScheme="warning">
-          Upgrade
-        </Button>
-      </BannerActions>
-    </Banner>
-  );
-}
-
 export function FeedbackPlayground(): React.ReactElement {
   return (
     <Stack gap="3">
@@ -343,25 +308,6 @@ export function FeedbackPlayground(): React.ReactElement {
                 </AlertDescription>
               </Alert>
             ))}
-          </Stack>
-        </CardBody>
-      </Card>
-
-      <Card variant="outlined">
-        <CardHeader>
-          <Heading level={3} size="md">
-            Banner
-          </Heading>
-        </CardHeader>
-        <CardBody>
-          <Stack gap="3">
-            <Banner status="info">
-              <BannerContent>
-                <Text weight="semibold">We have updated our terms of service</Text>
-                <Text size="sm">Please review the changes by August 30.</Text>
-              </BannerContent>
-            </Banner>
-            <DismissibleBanner />
           </Stack>
         </CardBody>
       </Card>

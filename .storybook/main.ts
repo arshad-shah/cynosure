@@ -33,6 +33,15 @@ const config: StorybookConfig = {
   },
   docs: { autodocs: 'tag' },
   staticDirs: [{ from: '../brand', to: '/brand' }],
+  // When the static Storybook build is meant to be served from a subpath of
+  // the docs site (`cynosure.arshadshah.com/storybook/`), set the env var
+  // `STORYBOOK_BASE_PATH=/storybook/` before running `storybook build`. The
+  // dev server keeps the default `/` base, so local DX is unchanged.
+  async viteFinal(config) {
+    const base = process.env.STORYBOOK_BASE_PATH;
+    if (base) config.base = base;
+    return config;
+  },
 };
 
 export default config;

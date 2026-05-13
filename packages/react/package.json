@@ -3,6 +3,25 @@
   "version": "2.1.0",
   "description": "Cynosure UI — React component library",
   "license": "MIT",
+  "homepage": "https://cynosure.arshadshah.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/arshad-shah/cynosure.git",
+    "directory": "packages/react"
+  },
+  "bugs": { "url": "https://github.com/arshad-shah/cynosure/issues" },
+  "keywords": [
+    "cynosure",
+    "design-system",
+    "react",
+    "components",
+    "ui",
+    "vanilla-extract",
+    "radix",
+    "accessible",
+    "a11y",
+    "headless"
+  ],
   "type": "module",
   "sideEffects": ["**/*.css"],
   "exports": {
@@ -398,10 +417,6 @@
       "types": "./dist/alert.d.ts",
       "import": "./dist/alert.js"
     },
-    "./banner": {
-      "types": "./dist/banner.d.ts",
-      "import": "./dist/banner.js"
-    },
     "./notification": {
       "types": "./dist/notification.d.ts",
       "import": "./dist/notification.js"
@@ -543,7 +558,6 @@
     "avatar",
     "avatar-group",
     "alert",
-    "banner",
     "notification",
     "callout",
     "empty-state",

@@ -4,7 +4,7 @@ import { Inline } from '../../primitives/layout/Inline/Inline.js';
 import { Stack } from '../../primitives/layout/Stack/Stack.js';
 import { Heading } from '../../typography/Heading/Heading.js';
 import { Text } from '../../typography/Text/Text.js';
-import { Tabs, TabsContent, TabsIndicator, TabsList, TabsTrigger } from './Tabs.js';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from './Tabs.js';
 
 const meta: Meta<typeof Tabs> = {
   title: 'Navigation/Tabs',
@@ -139,7 +139,7 @@ export const Sizes: Story = {
           <Text size="sm" color="fg.muted">
             size="{size}"
           </Text>
-          <Tabs defaultValue="a" size={size}>
+          <Tabs defaultValue="a" size={size} variant="soft">
             <TabsList>
               <TabsTrigger value="a">Alpha</TabsTrigger>
               <TabsTrigger value="b">Beta</TabsTrigger>
@@ -158,15 +158,15 @@ export const WithIcons: Story = {
       <TabsList>
         <TabsTrigger value="profile">
           <IconUser />
-          <span style={{ marginLeft: 8 }}>Profile</span>
+          Profile
         </TabsTrigger>
         <TabsTrigger value="notifications">
           <IconBell />
-          <span style={{ marginLeft: 8 }}>Notifications</span>
+          Notifications
         </TabsTrigger>
         <TabsTrigger value="security">
           <IconLock />
-          <span style={{ marginLeft: 8 }}>Security</span>
+          Security
         </TabsTrigger>
       </TabsList>
       <TabsContent value="profile">
@@ -193,7 +193,6 @@ export const ManyTabs: Story = {
               Tab {i + 1}
             </TabsTrigger>
           ))}
-          <TabsIndicator />
         </TabsList>
         {Array.from({ length: 12 }).map((_, i) => (
           <TabsContent key={`tc-${i.toString()}`} value={`tab-${(i + 1).toString()}`}>
@@ -207,7 +206,7 @@ export const ManyTabs: Story = {
 
 export const DisabledTab: Story = {
   render: () => (
-    <Tabs defaultValue="draft">
+    <Tabs defaultValue="draft" variant="soft">
       <TabsList>
         <TabsTrigger value="draft">Draft</TabsTrigger>
         <TabsTrigger value="review">In review</TabsTrigger>
@@ -258,17 +257,6 @@ export const Controlled: Story = {
               <Text>3 drafts saved locally.</Text>
             </TabsContent>
           </Tabs>
-          <Inline gap="2">
-            <button type="button" onClick={() => setValue('inbox')}>
-              → Inbox
-            </button>
-            <button type="button" onClick={() => setValue('sent')}>
-              → Sent
-            </button>
-            <button type="button" onClick={() => setValue('drafts')}>
-              → Drafts
-            </button>
-          </Inline>
         </Stack>
       );
     }
@@ -279,66 +267,31 @@ export const Controlled: Story = {
 export const VerticalOrientation: Story = {
   render: () => (
     <Tabs defaultValue="general" orientation="vertical" variant="soft">
-      <Inline gap="4" align="start" wrap={false}>
-        <TabsList style={{ flexDirection: 'column', minWidth: 160 }}>
-          <TabsTrigger value="general">
-            <IconHome />
-            <span style={{ marginLeft: 8 }}>General</span>
-          </TabsTrigger>
-          <TabsTrigger value="profile">
-            <IconUser />
-            <span style={{ marginLeft: 8 }}>Profile</span>
-          </TabsTrigger>
-          <TabsTrigger value="security">
-            <IconLock />
-            <span style={{ marginLeft: 8 }}>Security</span>
-          </TabsTrigger>
-          <TabsIndicator />
-        </TabsList>
-        <div style={{ flex: 1 }}>
-          <TabsContent value="general">
-            <Text>Workspace preferences apply to every project you belong to.</Text>
-          </TabsContent>
-          <TabsContent value="profile">
-            <Text>Profile changes propagate instantly.</Text>
-          </TabsContent>
-          <TabsContent value="security">
-            <Text>Rotate credentials and review recent sign-ins.</Text>
-          </TabsContent>
-        </div>
-      </Inline>
-    </Tabs>
-  ),
-};
-
-export const AnimatedIndicator: Story = {
-  name: 'With animated indicator',
-  render: () => (
-    <Tabs defaultValue="overview" variant="line">
-      <TabsList>
-        <TabsTrigger value="overview">Overview</TabsTrigger>
-        <TabsTrigger value="analytics">Analytics</TabsTrigger>
-        <TabsTrigger value="reports">Reports</TabsTrigger>
-        <TabsTrigger value="notifications">Notifications</TabsTrigger>
-        <TabsIndicator />
+      <TabsList style={{ minWidth: 160 }}>
+        <TabsTrigger value="general">
+          <IconHome />
+          General
+        </TabsTrigger>
+        <TabsTrigger value="profile">
+          <IconUser />
+          Profile
+        </TabsTrigger>
+        <TabsTrigger value="security">
+          <IconLock />
+          Security
+        </TabsTrigger>
       </TabsList>
-      <TabsContent value="overview">
-        <Stack gap="2">
-          <Heading level={4}>Overview</Heading>
-          <Text color="fg.muted">
-            Watch the underline glide between triggers as you switch tabs.
-          </Text>
-        </Stack>
-      </TabsContent>
-      <TabsContent value="analytics">
-        <Text>Top sources, funnels, and retention.</Text>
-      </TabsContent>
-      <TabsContent value="reports">
-        <Text>Scheduled exports live here.</Text>
-      </TabsContent>
-      <TabsContent value="notifications">
-        <Text>Review recent alerts.</Text>
-      </TabsContent>
+      <div style={{ flex: 1 }}>
+        <TabsContent value="general">
+          <Text>Workspace preferences apply to every project you belong to.</Text>
+        </TabsContent>
+        <TabsContent value="profile">
+          <Text>Profile changes propagate instantly.</Text>
+        </TabsContent>
+        <TabsContent value="security">
+          <Text>Rotate credentials and review recent sign-ins.</Text>
+        </TabsContent>
+      </div>
     </Tabs>
   ),
 };
@@ -364,4 +317,105 @@ export const FullWidth: Story = {
       </Tabs>
     </div>
   ),
+};
+
+export const SettingsUseCase: Story = {
+  name: 'Use case — settings card',
+  render: () => (
+    <div
+      style={{
+        maxWidth: 720,
+        border: '1px solid var(--cynosure-color-border-subtle, #e5e7eb)',
+        borderRadius: 'var(--cynosure-radius-lg, 12px)',
+        padding: 'var(--cynosure-space-6, 24px)',
+        background: 'var(--cynosure-color-background-surface, #fff)',
+      }}
+    >
+      <Tabs defaultValue="profile" variant="soft">
+        <Stack gap="4">
+          <Stack gap="1">
+            <Heading level={3}>Account</Heading>
+            <Text color="fg.muted">Manage how the workspace knows you.</Text>
+          </Stack>
+          <TabsList>
+            <TabsTrigger value="profile">
+              <IconUser />
+              Profile
+            </TabsTrigger>
+            <TabsTrigger value="notifications">
+              <IconBell />
+              Notifications
+            </TabsTrigger>
+            <TabsTrigger value="security">
+              <IconLock />
+              Security
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="profile">
+            <Stack gap="2">
+              <Heading level={4} size="md">
+                Profile
+              </Heading>
+              <Text color="fg.muted">
+                Your name, avatar, and pronouns show up everywhere we mention you.
+              </Text>
+            </Stack>
+          </TabsContent>
+          <TabsContent value="notifications">
+            <Stack gap="2">
+              <Heading level={4} size="md">
+                Notifications
+              </Heading>
+              <Text color="fg.muted">
+                Pick which events email you and which only show up in-app.
+              </Text>
+            </Stack>
+          </TabsContent>
+          <TabsContent value="security">
+            <Stack gap="2">
+              <Heading level={4} size="md">
+                Security
+              </Heading>
+              <Text color="fg.muted">
+                Passwords, two-factor codes, and active sessions live here.
+              </Text>
+            </Stack>
+          </TabsContent>
+        </Stack>
+      </Tabs>
+    </div>
+  ),
+};
+
+export const AllVariantsComparison: Story = {
+  name: 'All variants — side by side',
+  render: () => {
+    function Demo(): ReactElement {
+      const [value, setValue] = useState('analytics');
+      return (
+        <Stack gap="8">
+          {(['line', 'solid', 'enclosed', 'soft'] as const).map((variant) => (
+            <Stack key={variant} gap="3">
+              <Text size="sm" weight="semibold" color="fg.muted">
+                variant="{variant}"
+              </Text>
+              <Tabs value={value} onValueChange={setValue} variant={variant}>
+                <TabsList>
+                  <TabsTrigger value="overview">Overview</TabsTrigger>
+                  <TabsTrigger value="analytics">Analytics</TabsTrigger>
+                  <TabsTrigger value="reports">Reports</TabsTrigger>
+                  <TabsTrigger value="notifications">Notifications</TabsTrigger>
+                </TabsList>
+              </Tabs>
+            </Stack>
+          ))}
+          <Text size="sm" color="fg.muted">
+            All four variants share the same active state — click around and watch the indicator
+            slide.
+          </Text>
+        </Stack>
+      );
+    }
+    return <Demo />;
+  },
 };

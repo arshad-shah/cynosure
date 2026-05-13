@@ -49,28 +49,39 @@ function NavigationPlaygroundInner() {
           </Heading>
         </CardHeader>
         <CardBody>
-          <Tabs defaultValue="overview">
-            <TabsList>
-              <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="activity">Activity</TabsTrigger>
-              <TabsTrigger value="settings">Settings</TabsTrigger>
-            </TabsList>
-            <TabsContent value="overview">
-              <Text>
-                Snapshot of workspace health, recent deployments, and outstanding review requests.
-              </Text>
-            </TabsContent>
-            <TabsContent value="activity">
-              <Text>
-                14 commits, 3 merged pull requests, and 2 incident reports in the last 24 hours.
-              </Text>
-            </TabsContent>
-            <TabsContent value="settings">
-              <Text>
-                Manage workspace name, default branch, and the people who can invite collaborators.
-              </Text>
-            </TabsContent>
-          </Tabs>
+          <Stack gap="5">
+            {(['line', 'solid', 'enclosed', 'soft'] as const).map((variant) => (
+              <Stack key={variant} gap="2">
+                <Text size="sm" color="fg.muted">
+                  variant="{variant}"
+                </Text>
+                <Tabs defaultValue="overview" variant={variant}>
+                  <TabsList>
+                    <TabsTrigger value="overview">Overview</TabsTrigger>
+                    <TabsTrigger value="activity">Activity</TabsTrigger>
+                    <TabsTrigger value="settings">Settings</TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="overview">
+                    <Text size="sm" color="fg.muted">
+                      Snapshot of workspace health, recent deployments, and outstanding review
+                      requests.
+                    </Text>
+                  </TabsContent>
+                  <TabsContent value="activity">
+                    <Text size="sm" color="fg.muted">
+                      14 commits, 3 merged pull requests, and 2 incident reports in the last 24
+                      hours.
+                    </Text>
+                  </TabsContent>
+                  <TabsContent value="settings">
+                    <Text size="sm" color="fg.muted">
+                      Manage workspace name, default branch, and collaborator permissions.
+                    </Text>
+                  </TabsContent>
+                </Tabs>
+              </Stack>
+            ))}
+          </Stack>
         </CardBody>
       </Card>
 

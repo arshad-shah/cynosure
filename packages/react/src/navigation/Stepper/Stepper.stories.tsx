@@ -160,34 +160,71 @@ export const Interactive: Story = {
   name: 'Interactive — click to jump back',
   render: () => {
     function Demo(): ReactElement {
+      const steps = [
+        {
+          title: 'Cart',
+          description: 'Items ready',
+          body: 'Review the items in your cart and apply any promo codes before continuing.',
+        },
+        {
+          title: 'Shipping',
+          description: 'Address captured',
+          body: 'Confirm the shipping address and pick a delivery speed.',
+        },
+        {
+          title: 'Payment',
+          description: 'Enter card details',
+          body: 'Add a payment method. You won’t be charged until you confirm the order.',
+        },
+        {
+          title: 'Review',
+          description: 'Confirm and place order',
+          body: 'Double-check the order summary, then submit to charge your card.',
+        },
+      ];
       const [step, setStep] = useState(2);
+      const isLast = step === steps.length - 1;
+      const isFirst = step === 0;
       return (
-        <Stack gap="4">
+        <Stack gap="6" style={{ maxWidth: 720 }}>
           <Stepper currentStep={step} interactive onStepChange={setStep}>
-            <Step title="Cart" description="Items ready" />
-            <Step title="Shipping" description="Address captured" />
-            <Step title="Payment" description="Enter card details" />
-            <Step title="Review" description="Confirm and place order" />
+            {steps.map((s) => (
+              <Step key={s.title} title={s.title} description={s.description} />
+            ))}
           </Stepper>
-          <Inline gap="2">
+          <Stack
+            gap="2"
+            style={{
+              padding: 'var(--cynosure-space-5, 20px)',
+              border: '1px solid var(--cynosure-color-border-subtle, #e5e7eb)',
+              borderRadius: 'var(--cynosure-radius-md, 8px)',
+              minHeight: 140,
+            }}
+          >
+            <Inline align="center" justify="between">
+              <Text size="lg" weight="semibold">
+                {steps[step].title}
+              </Text>
+              <Text size="sm" color="fg.muted">
+                Step {step + 1} of {steps.length}
+              </Text>
+            </Inline>
+            <Text color="fg.muted">{steps[step].body}</Text>
+          </Stack>
+          <Inline gap="2" justify="end">
             <Button
-              size="sm"
               variant="outline"
               onClick={() => setStep((s) => Math.max(0, s - 1))}
-              disabled={step === 0}
+              disabled={isFirst}
             >
               Back
             </Button>
             <Button
-              size="sm"
-              onClick={() => setStep((s) => Math.min(3, s + 1))}
-              disabled={step === 3}
+              onClick={() => setStep((s) => Math.min(steps.length - 1, s + 1))}
+              disabled={isLast}
             >
-              Continue
+              {isLast ? 'Place order' : 'Continue'}
             </Button>
-            <Text size="sm" color="fg.muted">
-              Step {step + 1} of 4
-            </Text>
           </Inline>
         </Stack>
       );

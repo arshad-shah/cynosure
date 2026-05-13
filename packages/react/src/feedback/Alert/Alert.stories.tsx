@@ -196,9 +196,9 @@ export const LongContent: Story = {
     <Alert status="info" style={{ width: 520 }}>
       <AlertTitle>About this release</AlertTitle>
       <AlertDescription>
-        This release introduces a brand-new Feedback module with Alert, Banner, Notification,
-        Callout, EmptyState, Toggle, ToggleGroup, Avatar, AvatarGroup, Badge, Tag, and Chip
-        components — all themable via vanilla-extract tokens and accessible by default.
+        This release introduces a brand-new Feedback module with Alert, Notification, Callout,
+        EmptyState, Toggle, ToggleGroup, Avatar, AvatarGroup, Badge, Tag, and Chip components — all
+        themable via vanilla-extract tokens and accessible by default.
       </AlertDescription>
     </Alert>
   ),

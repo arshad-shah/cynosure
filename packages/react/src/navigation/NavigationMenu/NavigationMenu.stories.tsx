@@ -94,12 +94,14 @@ const LinkList = ({ items }: { items: LinkItem[] }): ReactElement => (
             color: 'inherit',
           }}
         >
-          <Text weight="semibold" size="sm">
-            {item.title}
-          </Text>
-          <Text size="sm" color="fg.muted">
-            {item.description}
-          </Text>
+          <Stack gap="0.5">
+            <Text weight="semibold" size="sm">
+              {item.title}
+            </Text>
+            <Text size="sm" color="fg.muted">
+              {item.description}
+            </Text>
+          </Stack>
         </NavigationMenuLink>
       </li>
     ))}
@@ -216,12 +218,14 @@ export const MegaMenu: Story = {
                     textDecoration: 'none',
                   }}
                 >
-                  <Heading level={4} size="md" style={{ color: '#fff' }}>
-                    Cynosure Platform
-                  </Heading>
-                  <Text size="sm" style={{ color: '#fff' }}>
-                    Everything you need to ship a polished UI.
-                  </Text>
+                  <Stack gap="1">
+                    <Heading level={4} size="md" style={{ color: '#fff' }}>
+                      Cynosure Platform
+                    </Heading>
+                    <Text size="sm" style={{ color: '#fff' }}>
+                      Everything you need to ship a polished UI.
+                    </Text>
+                  </Stack>
                 </NavigationMenuLink>
                 <LinkList items={features} />
               </div>

@@ -1,0 +1,33 @@
+---
+title: Cynosure
+description: A React component library and design system.
+template: splash
+hero:
+  tagline: A React component library and design system. Accessible by default. Themable down to the radius.
+  actions:
+    - text: Get started
+      link: /getting-started/installation
+      icon: right-arrow
+      variant: primary
+    - text: Components
+      link: /components/button
+      icon: external
+    - text: View on GitHub
+      link: https://github.com/arshad-shah/cynosure
+      icon: external
+      variant: minimal
+---
+
+import Hero from '../../components/Home/Hero.astro';
+import ComponentGallery from '../../components/Home/ComponentGallery.astro';
+import ThemingPlayground from '../../components/Home/ThemingPlayground.astro';
+import A11yStrip from '../../components/Home/A11yStrip.astro';
+import CodeInContext from '../../components/Home/CodeInContext.astro';
+import BigCTA from '../../components/Home/BigCTA.astro';
+
+<Hero />
+<ComponentGallery />
+<ThemingPlayground />
+<A11yStrip />
+<CodeInContext />
+<BigCTA />

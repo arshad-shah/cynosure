@@ -5,7 +5,7 @@ import type { FeedbackStatus } from './types.js';
 /** Decorative close icon used by dismissible feedback components. */
 export const CloseIcon = (): ReactElement => <XIcon size="0.875em" aria-hidden="true" />;
 
-/** Decorative SVG icon shared by Alert / Banner / Notification status dots. */
+/** Decorative SVG icon shared by Alert / Notification status dots. */
 export const StatusIcon = ({ status }: { status: FeedbackStatus }): ReactElement => {
   switch (status) {
     case 'success':

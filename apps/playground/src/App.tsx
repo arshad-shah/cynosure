@@ -80,7 +80,7 @@ const PLAYGROUNDS: PlaygroundEntry[] = [
   {
     id: 'feedback',
     label: 'Feedback',
-    description: 'Alerts, banners, callouts, and toast notifications.',
+    description: 'Alerts, callouts, and toast notifications.',
     icon: <Bell size={18} aria-hidden />,
     render: () => <FeedbackPlayground />,
   },

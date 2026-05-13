@@ -1,10 +1,12 @@
 import * as RadixTabs from '@radix-ui/react-tabs';
 import {
   type CSSProperties,
+  Children,
   type ComponentPropsWithoutRef,
   type ElementRef,
   createContext,
   forwardRef,
+  isValidElement,
   useCallback,
   useContext,
   useEffect,
@@ -26,7 +28,6 @@ import {
   tabsTriggerBase,
   tabsTriggerEnclosed,
   tabsTriggerLine,
-  tabsTriggerLineFallback,
   tabsTriggerNeutral,
   tabsTriggerSize,
   tabsTriggerSoft,
@@ -44,9 +45,6 @@ interface TabsContextValue {
   colorScheme: TabsColorScheme;
   orientation: TabsOrientation;
   fullWidth: boolean;
-  /** Set by `<TabsList>` when it mounts; lets `<TabsIndicator>` skip measuring. */
-  hasIndicator: boolean;
-  setHasIndicator: (value: boolean) => void;
 }
 
 const TabsContext = createContext<TabsContextValue | null>(null);
@@ -67,9 +65,11 @@ export interface TabsProps
 }
 
 /**
- * Tabs root — thin wrapper around `@radix-ui/react-tabs`. Keyboard
- * navigation, RTL handling, and activation mode all come from Radix; we layer
- * Cynosure visual variants and an animated underline indicator on top.
+ * Tabs root — thin wrapper around `@radix-ui/react-tabs`. Keyboard navigation,
+ * RTL handling, and activation mode all come from Radix; we layer the Cynosure
+ * visual variants and the animated sliding indicator on top. The indicator
+ * is auto-mounted inside `<TabsList>` so consumers don't need to wire it up
+ * by hand.
  */
 export const Tabs = forwardRef<ElementRef<typeof RadixTabs.Root>, TabsProps>(function Tabs(
   {
@@ -84,8 +84,6 @@ export const Tabs = forwardRef<ElementRef<typeof RadixTabs.Root>, TabsProps>(fun
   },
   ref,
 ) {
-  const [hasIndicator, setHasIndicator] = useState(false);
-
   return (
     <TabsContext.Provider
       value={{
@@ -94,8 +92,6 @@ export const Tabs = forwardRef<ElementRef<typeof RadixTabs.Root>, TabsProps>(fun
         colorScheme,
         orientation,
         fullWidth,
-        hasIndicator,
-        setHasIndicator,
       }}
     >
       <RadixTabs.Root
@@ -120,12 +116,20 @@ const variantListClass: Record<TabsVariant, string> = {
 export interface TabsListProps extends ComponentPropsWithoutRef<typeof RadixTabs.List> {}
 
 /**
- * Container for triggers. Tracks the active trigger's position via a
- * ResizeObserver so `<TabsIndicator>` can animate between tabs smoothly.
+ * Container for triggers. Auto-mounts the animated indicator (overridable
+ * by passing `<TabsIndicator />` as a child if a consumer wants to position
+ * it differently).
  */
 export const TabsList = forwardRef<ElementRef<typeof RadixTabs.List>, TabsListProps>(
   function TabsList({ className, children, ...rest }, ref) {
     const ctx = useTabsContext();
+    // Detect whether the consumer has supplied their own indicator; if not,
+    // append one. This lets the API stay implicit for 99% of cases while
+    // still letting power users place the indicator manually.
+    const hasIndicator = Children.toArray(children).some(
+      (child) => isValidElement(child) && child.type === TabsIndicator,
+    );
+
     return (
       <RadixTabs.List
         ref={ref}
@@ -139,6 +143,7 @@ export const TabsList = forwardRef<ElementRef<typeof RadixTabs.List>, TabsListPr
         {...rest}
       >
         {children}
+        {hasIndicator ? null : <TabsIndicator />}
       </RadixTabs.List>
     );
   },
@@ -156,10 +161,6 @@ export interface TabsTriggerProps extends ComponentPropsWithoutRef<typeof RadixT
 export const TabsTrigger = forwardRef<ElementRef<typeof RadixTabs.Trigger>, TabsTriggerProps>(
   function TabsTrigger({ className, ...rest }, ref) {
     const ctx = useTabsContext();
-    const baseVariantClass = triggerVariantClass[ctx.variant];
-    // When variant="line" has no animated indicator rendered, fall back to a
-    // static active border on the trigger so the UI stays readable.
-    const needsFallback = ctx.variant === 'line' && !ctx.hasIndicator;
     return (
       <RadixTabs.Trigger
         ref={ref}
@@ -167,8 +168,7 @@ export const TabsTrigger = forwardRef<ElementRef<typeof RadixTabs.Trigger>, Tabs
         className={cn(
           tabsTriggerBase,
           tabsTriggerSize[ctx.size],
-          baseVariantClass,
-          needsFallback ? tabsTriggerLineFallback : undefined,
+          triggerVariantClass[ctx.variant],
           ctx.colorScheme === 'neutral' ? tabsTriggerNeutral : undefined,
           className,
         )}
@@ -199,10 +199,12 @@ interface IndicatorMetrics {
 }
 
 /**
- * Absolutely-positioned underline (or right-rule, in vertical mode) that
- * animates between the active trigger's bounding box. The effect is
- * opt-in — only renders if the consumer includes `<TabsIndicator />` inside
- * `<TabsList />`. Falls back to a static trigger border when omitted.
+ * The sliding indicator. Auto-mounted by `<TabsList>` — consumers only ever
+ * need to render it explicitly when they want it elsewhere in the tree
+ * (e.g. positioned in a separate scroll container). The shape is driven by
+ * the parent variant via `data-cynosure-variant`; only the geometry (left /
+ * top / width / height) is set from JS, so motion stays cheap and
+ * GPU-compositable.
  */
 export const TabsIndicator = forwardRef<HTMLSpanElement, TabsIndicatorProps>(function TabsIndicator(
   { className, style },
@@ -210,14 +212,7 @@ export const TabsIndicator = forwardRef<HTMLSpanElement, TabsIndicatorProps>(fun
 ) {
   const ctx = useTabsContext();
   const [metrics, setMetrics] = useState<IndicatorMetrics | null>(null);
-  const pendingRef = useRef(true);
   const nodeRef = useRef<HTMLSpanElement | null>(null);
-
-  // Tell the root we're mounted so triggers drop their fallback border.
-  useEffect(() => {
-    ctx.setHasIndicator(true);
-    return () => ctx.setHasIndicator(false);
-  }, [ctx.setHasIndicator]);
 
   const measure = useCallback(() => {
     const node = nodeRef.current;
@@ -227,12 +222,10 @@ export const TabsIndicator = forwardRef<HTMLSpanElement, TabsIndicatorProps>(fun
     const active = list.querySelector<HTMLElement>('[role="tab"][data-state="active"]');
     if (!active) {
       setMetrics(null);
-      pendingRef.current = true;
       return;
     }
     const listBox = list.getBoundingClientRect();
     const activeBox = active.getBoundingClientRect();
-    pendingRef.current = false;
     setMetrics({
       left: activeBox.left - listBox.left + list.scrollLeft,
       top: activeBox.top - listBox.top + list.scrollTop,
@@ -241,7 +234,7 @@ export const TabsIndicator = forwardRef<HTMLSpanElement, TabsIndicatorProps>(fun
     });
   }, []);
 
-  // Re-measure on mount + whenever any trigger flips `data-state`.
+  // Re-measure on mount and whenever any trigger flips `data-state`.
   useLayoutEffect(() => {
     measure();
   }, [measure]);
@@ -293,6 +286,7 @@ export const TabsIndicator = forwardRef<HTMLSpanElement, TabsIndicatorProps>(fun
         else if (ref) ref.current = node;
       }}
       aria-hidden="true"
+      data-cynosure-variant={ctx.variant}
       data-orientation={ctx.orientation}
       data-pending={metrics ? 'false' : 'true'}
       className={cn(tabsIndicator, className)}

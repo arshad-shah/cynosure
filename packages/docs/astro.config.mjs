@@ -3,19 +3,164 @@ import { fileURLToPath } from 'node:url';
 import mdx from '@astrojs/mdx';
 import react from '@astrojs/react';
 import sitemap from '@astrojs/sitemap';
+import starlight from '@astrojs/starlight';
 import { defineConfig } from 'astro/config';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(__dirname, '../..');
 
+// Starlight ships Expressive Code, search (pagefind), sidebar, TOC, mobile
+// nav, skip-link, prefers-reduced-motion, dark/light theme, keyboard nav, and
+// scroll-spy out of the box — matching how the swiftchart docs are built.
+// Cynosure's custom palette/typography is preserved by `customCss` overriding
+// Starlight's `--sl-*` CSS variables (see styles/starlight-theme.css).
 export default defineConfig({
   site: 'https://cynosure.arshadshah.com',
-  output: 'static',
-  trailingSlash: 'never',
-  integrations: [mdx(), react(), sitemap()],
-  markdown: {
-    shikiConfig: { theme: 'github-dark-dimmed', wrap: true },
-  },
+  integrations: [
+    starlight({
+      title: 'Cynosure',
+      description: 'A React component library and design system.',
+      favicon: '/favicon.svg',
+      // Brand mark in the top-left replaces the plain-text title. Using the
+      // mark + lockup gives parity with the Storybook manager UI (which
+      // already brands with `cynosure-lockup.svg`).
+      logo: {
+        src: './src/assets/cynosure-mark.svg',
+        replacesTitle: false,
+        alt: 'Cynosure',
+      },
+      social: [
+        { icon: 'github', label: 'GitHub', href: 'https://github.com/arshad-shah/cynosure' },
+      ],
+      customCss: [
+        './src/styles/fonts.css',
+        './src/styles/starlight-theme.css',
+        // `site.css` / `home.css` carry the visual chrome the cynosure
+        // homepage was built against (Hero / ComponentGallery / ThemingPlayground
+        // / A11yStrip / CodeInContext / BigCTA). Loading them via Starlight's
+        // customCss keeps the existing landing visuals intact under the new
+        // shell. `doc-page.css` rules are scoped to `[data-doc-layout]` —
+        // a Starlight build never matches that selector, so loading it is a
+        // no-op everywhere except inside the old preview iframe routes.
+        './src/styles/site.css',
+        './src/styles/home.css',
+      ],
+      // Drop the built-in Pagefind invocation — our existing build script
+      // already runs `pagefind --site dist` and syncs the bundle in. Starlight
+      // detects the index by file path either way.
+      pagefind: true,
+      head: [
+        {
+          tag: 'meta',
+          attrs: {
+            property: 'og:image',
+            content: 'https://cynosure.arshadshah.com/og-image.png',
+          },
+        },
+        { tag: 'meta', attrs: { property: 'og:image:width', content: '1200' } },
+        { tag: 'meta', attrs: { property: 'og:image:height', content: '630' } },
+        { tag: 'meta', attrs: { name: 'twitter:card', content: 'summary_large_image' } },
+        // Top-right Storybook link, slotted via Starlight's `SocialIcons`
+        // override below would replace the GitHub link — instead inject a
+        // direct anchor into <head> as a fallback. The actual nav link comes
+        // from the custom override component (./src/components/Header.astro).
+      ],
+      components: {
+        // Custom Header overrides Starlight's default header so we can slot
+        // a `Storybook` link next to the social-icons row. Everything else
+        // (logo, search, mobile-nav, theme-switcher) stays Starlight default.
+        SocialIcons: './src/components/Chrome/SocialIcons.astro',
+      },
+      sidebar: [
+        {
+          label: 'Getting started',
+          items: [
+            { label: 'Introduction', slug: 'getting-started/introduction' },
+            { label: 'Installation', slug: 'getting-started/installation' },
+            { label: 'Quickstart', slug: 'getting-started/quickstart' },
+            { label: 'RSC', slug: 'getting-started/rsc' },
+            { label: 'RTL', slug: 'getting-started/rtl' },
+          ],
+        },
+        {
+          label: 'Foundations',
+          items: [
+            { label: 'Design principles', slug: 'foundations/design-principles' },
+            { label: 'Design tokens', slug: 'foundations/design-tokens' },
+            { label: 'Theming overview', slug: 'foundations/theming-overview' },
+            { label: 'Dark mode', slug: 'foundations/dark-mode' },
+            { label: 'Custom themes', slug: 'foundations/custom-themes' },
+            { label: 'Terminal theme recipe', slug: 'foundations/terminal-theme-recipe' },
+            { label: 'Accessibility', slug: 'foundations/accessibility' },
+          ],
+        },
+        {
+          label: 'Primitives',
+          items: [{ label: 'Button', slug: 'components/button' }],
+        },
+        {
+          label: 'Forms',
+          items: [
+            { label: 'Input', slug: 'components/input' },
+            { label: 'Textarea', slug: 'components/textarea' },
+            { label: 'Checkbox', slug: 'components/checkbox' },
+            { label: 'Radio', slug: 'components/radio' },
+            { label: 'Switch', slug: 'components/switch' },
+            { label: 'Select', slug: 'components/select' },
+            { label: 'Combobox', slug: 'components/combobox' },
+          ],
+        },
+        {
+          label: 'Feedback',
+          items: [
+            { label: 'Badge', slug: 'components/badge' },
+            { label: 'Alert', slug: 'components/alert' },
+          ],
+        },
+        {
+          label: 'Overlays',
+          items: [
+            { label: 'Dialog', slug: 'components/dialog' },
+            { label: 'Tooltip', slug: 'components/tooltip' },
+            { label: 'DropdownMenu', slug: 'components/dropdown-menu' },
+          ],
+        },
+        {
+          label: 'Navigation',
+          items: [{ label: 'Tabs', slug: 'components/tabs' }],
+        },
+        {
+          label: 'Data display',
+          items: [
+            { label: 'Card', slug: 'components/card' },
+            { label: 'Accordion', slug: 'components/accordion' },
+            { label: 'Table', slug: 'components/table' },
+            { label: 'DataTable', slug: 'components/data-table', badge: 'beta' },
+          ],
+        },
+        {
+          label: 'Recipes',
+          items: [
+            { label: 'Index', slug: 'recipes' },
+            { label: 'Command palette', slug: 'recipes/command-palette' },
+            { label: 'Dashboard layout', slug: 'recipes/dashboard-layout' },
+            { label: 'Data table with filters', slug: 'recipes/data-table-with-filters' },
+            { label: 'Login form', slug: 'recipes/login-form' },
+            { label: 'Multi-step wizard', slug: 'recipes/multi-step-wizard' },
+            { label: 'Notification center', slug: 'recipes/notification-center' },
+            { label: 'Settings page', slug: 'recipes/settings-page' },
+          ],
+        },
+        {
+          label: 'Changelog',
+          items: [{ label: 'Releases', slug: 'changelog' }],
+        },
+      ],
+    }),
+    mdx(),
+    react(),
+    sitemap(),
+  ],
   vite: {
     resolve: {
       alias: {
@@ -30,11 +175,6 @@ export default defineConfig({
         '@arshad-shah/cynosure-tokens',
         '@arshad-shah/cynosure-themes',
       ],
-    },
-    build: {
-      rollupOptions: {
-        external: ['/pagefind/pagefind.js'],
-      },
     },
   },
 });

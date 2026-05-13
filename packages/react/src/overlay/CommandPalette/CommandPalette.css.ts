@@ -234,23 +234,6 @@ export const paletteItemShortcut = style({
   fontSize: '0.75rem',
 });
 
-/** Monospace kbd chip used both in the header hint and inside shortcuts. */
-export const paletteKeyCap = style({
-  display: 'inline-flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  minWidth: '1.125rem',
-  padding: '0 4px',
-  height: '1.125rem',
-  borderRadius: vars.radius.xs,
-  background: vars.color.background.subtle,
-  border: `1px solid ${vars.color.border.default}`,
-  fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace',
-  fontSize: '0.6875rem',
-  fontWeight: 600,
-  color: vars.color.foreground.muted,
-});
-
 export const paletteSeparator = style({
   height: 1,
   margin: `${vars.space['2']} 0`,

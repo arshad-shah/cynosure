@@ -1,5 +1,5 @@
 {
-  "total": 101,
+  "total": 100,
   "categories": {
     "forms": {
       "label": "Forms",
@@ -80,13 +80,12 @@
     },
     "feedback": {
       "label": "Feedback",
-      "count": 13,
+      "count": 12,
       "names": [
         "Alert",
         "Avatar",
         "AvatarGroup",
         "Badge",
-        "Banner",
         "Callout",
         "Chip",
         "EmptyState",

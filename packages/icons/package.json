@@ -3,6 +3,14 @@
   "version": "1.1.0",
   "description": "Cynosure UI — Lucide React re-exports with tree-shaken bundles",
   "license": "MIT",
+  "homepage": "https://cynosure.arshadshah.com",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/arshad-shah/cynosure.git",
+    "directory": "packages/icons"
+  },
+  "bugs": { "url": "https://github.com/arshad-shah/cynosure/issues" },
+  "keywords": ["cynosure", "design-system", "icons", "lucide", "react", "svg"],
   "type": "module",
   "sideEffects": false,
   "exports": {

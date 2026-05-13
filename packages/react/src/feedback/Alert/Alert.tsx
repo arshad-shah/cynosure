@@ -8,17 +8,11 @@ import {
   useMemo,
 } from 'react';
 import { IconButton } from '../../forms/IconButton/IconButton.js';
+import { Stack } from '../../primitives/layout/Stack/Stack.js';
+import { Text } from '../../typography/Text/Text.js';
 import { cn } from '../../utils/cn.js';
 import { CloseIcon, StatusIcon } from '../shared/icons.js';
-import {
-  surfaceClose,
-  surfaceContent,
-  surfaceDescription,
-  surfaceIcon,
-  surfaceRoot,
-  surfaceSize,
-  surfaceTitle,
-} from '../shared/surface.css.js';
+import { surfaceClose, surfaceIcon, surfaceRoot, surfaceSize } from '../shared/surface.css.js';
 import type { FeedbackStatus, FeedbackVariant } from '../shared/types.js';
 import { surfaceVariantClass } from '../shared/variants.js';
 
@@ -99,7 +93,9 @@ export const Alert = forwardRef<HTMLDivElement, AlertProps>(function Alert(
         {...rest}
       >
         {showIcon ? <span className={surfaceIcon}>{iconNode}</span> : null}
-        <div className={surfaceContent}>{children}</div>
+        <Stack gap="1" style={{ flex: '1 1 auto', minWidth: 0 }}>
+          {children}
+        </Stack>
         {closable ? (
           <IconButton
             variant="bare"
@@ -114,37 +110,39 @@ export const Alert = forwardRef<HTMLDivElement, AlertProps>(function Alert(
   );
 });
 
-export interface AlertTitleProps extends HTMLAttributes<HTMLHeadingElement> {
+export interface AlertTitleProps extends Omit<HTMLAttributes<HTMLElement>, 'color'> {
   as?: 'h2' | 'h3' | 'h4' | 'h5' | 'h6' | 'p';
 }
 
-export const AlertTitle = forwardRef<HTMLHeadingElement, AlertTitleProps>(function AlertTitle(
-  { as: As = 'p', className, id, ...rest },
+export const AlertTitle = forwardRef<HTMLElement, AlertTitleProps>(function AlertTitle(
+  { as = 'p', id, children, ...rest },
   ref,
 ) {
   const ctx = useContext(AlertContext);
   return (
-    <As
+    <Text
       ref={ref as never}
+      as={as as never}
+      size="md"
+      weight="semibold"
       id={id ?? ctx?.titleId}
-      className={cn(surfaceTitle, className)}
       {...rest}
-    />
+    >
+      {children}
+    </Text>
   );
 });
 
-export interface AlertDescriptionProps extends HTMLAttributes<HTMLParagraphElement> {}
+export interface AlertDescriptionProps
+  extends Omit<HTMLAttributes<HTMLParagraphElement>, 'color'> {}
 
-export const AlertDescription = forwardRef<HTMLParagraphElement, AlertDescriptionProps>(
-  function AlertDescription({ className, id, ...rest }, ref) {
+export const AlertDescription = forwardRef<HTMLElement, AlertDescriptionProps>(
+  function AlertDescription({ id, children, ...rest }, ref) {
     const ctx = useContext(AlertContext);
     return (
-      <p
-        ref={ref}
-        id={id ?? ctx?.descriptionId}
-        className={cn(surfaceDescription, className)}
-        {...rest}
-      />
+      <Text ref={ref as never} as="p" size="sm" id={id ?? ctx?.descriptionId} {...rest}>
+        {children}
+      </Text>
     );
   },
 );

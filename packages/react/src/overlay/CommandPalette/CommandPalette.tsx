@@ -10,6 +10,7 @@ import {
   useEffect,
   useState,
 } from 'react';
+import { Kbd } from '../../typography/Kbd/Kbd.js';
 import { cn } from '../../utils/cn.js';
 import { overlayBackdrop } from '../shared/overlay.css.js';
 import {
@@ -29,7 +30,6 @@ import {
   paletteItemLabel,
   paletteItemShortcut,
   paletteKbdHint,
-  paletteKeyCap,
   paletteList,
   paletteLoading,
   paletteSeparator,
@@ -229,9 +229,9 @@ export function CommandShortcut({ children, className, ...rest }: CommandShortcu
         const n = seen.get(k) ?? 0;
         seen.set(k, n + 1);
         return (
-          <kbd key={n === 0 ? k : `${k}#${n}`} className={paletteKeyCap}>
+          <Kbd key={n === 0 ? k : `${k}#${n}`} size="sm">
             {k}
-          </kbd>
+          </Kbd>
         );
       })}
     </span>
@@ -248,15 +248,15 @@ export function CommandFooter({ className, children, ...rest }: CommandFooterPro
         <>
           <span className={paletteFooterHints}>
             <span className={paletteFooterHint}>
-              <kbd className={paletteKeyCap}>↵</kbd> select
+              <Kbd size="sm">↵</Kbd> select
             </span>
             <span className={paletteFooterHint}>
-              <kbd className={paletteKeyCap}>↑</kbd>
-              <kbd className={paletteKeyCap}>↓</kbd> navigate
+              <Kbd size="sm">↑</Kbd>
+              <Kbd size="sm">↓</Kbd> navigate
             </span>
           </span>
           <span className={paletteFooterHint}>
-            <kbd className={paletteKeyCap}>Esc</kbd> close
+            <Kbd size="sm">Esc</Kbd> close
           </span>
         </>
       )}
