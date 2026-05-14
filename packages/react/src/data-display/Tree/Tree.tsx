@@ -34,7 +34,7 @@ export interface TreeNode {
 }
 
 /** Context passed to a {@link TreeRenderItem} for each node. */
-export interface TreeRenderContext<T extends TreeNode = TreeNode> {
+export interface TreeRenderContext<T = TreeNode> {
   /** The node being rendered. */
   item: T;
   /** 0-based depth in the tree (root nodes are `0`). */
@@ -49,15 +49,38 @@ export interface TreeRenderContext<T extends TreeNode = TreeNode> {
   disabled: boolean;
 }
 
-export type TreeRenderItem<T extends TreeNode = TreeNode> = (
-  ctx: TreeRenderContext<T>,
-) => ReactNode;
+export type TreeRenderItem<T = TreeNode> = (ctx: TreeRenderContext<T>) => ReactNode;
 
-/** Props for the {@link Tree}. `T` is the concrete node type extending {@link TreeNode}. */
-export interface TreeProps<T extends TreeNode = TreeNode>
+/**
+ * Props for the {@link Tree}. `T` is the concrete node type — defaults to
+ * {@link TreeNode}, but any shape works when paired with the accessor props
+ * (`getId`, `getLabel`, `getChildren`, `getDisabled`, `getIcon`).
+ */
+export interface TreeProps<T = TreeNode>
   extends Omit<HTMLAttributes<HTMLUListElement>, 'onSelect' | 'children'> {
   /** Root nodes. Each may carry its own `children` for nesting. */
   items: T[];
+  /**
+   * Override how the tree reads a node's stable id. Defaults to `(item) => item.id`.
+   * Use this when your data uses a different field (e.g. `uuid`, `slug`).
+   */
+  getId?: (item: T) => string;
+  /**
+   * Override how the tree reads a node's default label. Defaults to `(item) => item.label`.
+   * Only consulted when no `children` render prop is supplied.
+   */
+  getLabel?: (item: T) => ReactNode;
+  /**
+   * Override how the tree reads a node's nested children. Defaults to
+   * `(item) => item.children`. Map your own field (e.g. `subItems`, `nodes`)
+   * without rebuilding the data into the {@link TreeNode} shape.
+   */
+  getChildren?: (item: T) => T[] | undefined;
+  /**
+   * Override how the tree reads a node's disabled flag. Defaults to
+   * `(item) => item.disabled`.
+   */
+  getDisabled?: (item: T) => boolean | undefined;
   /** Controlled set of expanded node ids. Omit with `defaultExpandedIds` for uncontrolled. */
   expandedIds?: string[];
   /**
@@ -91,45 +114,78 @@ export interface TreeProps<T extends TreeNode = TreeNode>
   'aria-labelledby'?: string;
 }
 
+/** Default accessor bound to the {@link TreeNode} shape. */
+const defaultGetId = <T,>(item: T): string => (item as TreeNode).id;
+const defaultGetLabel = <T,>(item: T): ReactNode => (item as TreeNode).label;
+const defaultGetChildren = <T,>(item: T): T[] | undefined =>
+  (item as TreeNode).children as T[] | undefined;
+const defaultGetDisabled = <T,>(item: T): boolean | undefined => (item as TreeNode).disabled;
+
 /**
  * Build a flat list of [node, depth, parentId] in DFS order, respecting
  * expanded state — so keyboard navigation can walk visible items.
  */
-function flatten<T extends TreeNode>(
+function flatten<T>(
   items: T[],
   expanded: Set<string>,
+  getId: (item: T) => string,
+  getChildren: (item: T) => T[] | undefined,
   depth = 0,
   parent: string | null = null,
   out: Array<{ node: T; depth: number; parent: string | null }> = [],
 ): Array<{ node: T; depth: number; parent: string | null }> {
   for (const node of items) {
     out.push({ node, depth, parent });
-    const children = node.children as T[] | undefined;
-    if (children && children.length > 0 && expanded.has(node.id)) {
-      flatten(children, expanded, depth + 1, node.id, out);
+    const children = getChildren(node);
+    const id = getId(node);
+    if (children && children.length > 0 && expanded.has(id)) {
+      flatten(children, expanded, getId, getChildren, depth + 1, id, out);
     }
   }
   return out;
 }
 
+/**
+ * Walk a tree and return the first node whose id matches. Uses the default
+ * `TreeNode` shape — for custom shapes, pass through a helper that closes over
+ * your own accessors.
+ */
 function findNode<T extends TreeNode>(items: T[], id: string): T | undefined {
+  return findNodeWith(items, id, defaultGetId, defaultGetChildren);
+}
+
+function findNodeWith<T>(
+  items: T[],
+  id: string,
+  getId: (item: T) => string,
+  getChildren: (item: T) => T[] | undefined,
+): T | undefined {
   for (const item of items) {
-    if (item.id === id) return item;
-    const children = item.children as T[] | undefined;
+    if (getId(item) === id) return item;
+    const children = getChildren(item);
     if (children) {
-      const found = findNode(children, id);
+      const found = findNodeWith(children, id, getId, getChildren);
       if (found) return found;
     }
   }
   return undefined;
 }
 
+/** Collect every id under the given items in DFS order. */
 function collectIds<T extends TreeNode>(items: T[]): string[] {
+  return collectIdsWith(items, defaultGetId, defaultGetChildren);
+}
+
+function collectIdsWith<T>(
+  items: T[],
+  getId: (item: T) => string,
+  getChildren: (item: T) => T[] | undefined,
+): string[] {
   const result: string[] = [];
   for (const node of items) {
-    result.push(node.id);
-    const children = node.children as T[] | undefined;
-    if (children) result.push(...collectIds(children));
+    result.push(getId(node));
+    const children = getChildren(node);
+    if (children) result.push(...collectIdsWith(children, getId, getChildren));
   }
   return result;
 }
@@ -144,9 +200,13 @@ function collectIds<T extends TreeNode>(items: T[]): string[] {
  * depth. The component is virtualisation-free — every visible row is in the
  * DOM, so very large trees should be pre-pruned by the caller.
  */
-export function Tree<T extends TreeNode = TreeNode>(props: TreeProps<T>): ReactElement {
+export function Tree<T = TreeNode>(props: TreeProps<T>): ReactElement {
   const {
     items,
+    getId = defaultGetId as (item: T) => string,
+    getLabel = defaultGetLabel as (item: T) => ReactNode,
+    getChildren = defaultGetChildren as (item: T) => T[] | undefined,
+    getDisabled = defaultGetDisabled as (item: T) => boolean | undefined,
     expandedIds,
     defaultExpandedIds,
     onExpandedChange,
@@ -175,7 +235,10 @@ export function Tree<T extends TreeNode = TreeNode>(props: TreeProps<T>): ReactE
   const expanded = useMemo(() => new Set(expandedList ?? []), [expandedList]);
   const selected = useMemo(() => new Set(selectedList ?? []), [selectedList]);
 
-  const flat = useMemo(() => flatten(items, expanded), [items, expanded]);
+  const flat = useMemo(
+    () => flatten(items, expanded, getId, getChildren),
+    [items, expanded, getId, getChildren],
+  );
 
   const [focusedId, setFocusedId] = useState<string | null>(null);
 
@@ -224,35 +287,37 @@ export function Tree<T extends TreeNode = TreeNode>(props: TreeProps<T>): ReactE
 
   const onKeyDown = useCallback(
     (event: KeyboardEvent<HTMLElement>, node: T, depth: number) => {
-      const idx = flat.findIndex((f) => f.node.id === node.id);
+      const id = getId(node);
+      const idx = flat.findIndex((f) => getId(f.node) === id);
       if (idx < 0) return;
-      const hasChildren = (node.children as T[] | undefined)?.length ?? 0;
-      const isOpen = expanded.has(node.id);
+      const hasChildren = (getChildren(node)?.length ?? 0) > 0;
+      const isOpen = expanded.has(id);
+      const nodeDisabled = !!getDisabled(node);
       switch (event.key) {
         case 'ArrowDown': {
           event.preventDefault();
           const next = flat[idx + 1];
-          if (next) focusRow(next.node.id);
+          if (next) focusRow(getId(next.node));
           break;
         }
         case 'ArrowUp': {
           event.preventDefault();
           const prev = flat[idx - 1];
-          if (prev) focusRow(prev.node.id);
+          if (prev) focusRow(getId(prev.node));
           break;
         }
         case 'ArrowRight': {
           event.preventDefault();
-          if (hasChildren && !isOpen) toggleExpanded(node.id, true);
+          if (hasChildren && !isOpen) toggleExpanded(id, true);
           else if (hasChildren && isOpen) {
             const next = flat[idx + 1];
-            if (next) focusRow(next.node.id);
+            if (next) focusRow(getId(next.node));
           }
           break;
         }
         case 'ArrowLeft': {
           event.preventDefault();
-          if (hasChildren && isOpen) toggleExpanded(node.id, false);
+          if (hasChildren && isOpen) toggleExpanded(id, false);
           else {
             // move to parent
             const parentId = flat[idx]?.parent;
@@ -263,20 +328,20 @@ export function Tree<T extends TreeNode = TreeNode>(props: TreeProps<T>): ReactE
         case 'Home': {
           event.preventDefault();
           const first = flat[0];
-          if (first) focusRow(first.node.id);
+          if (first) focusRow(getId(first.node));
           break;
         }
         case 'End': {
           event.preventDefault();
           const last = flat[flat.length - 1];
-          if (last) focusRow(last.node.id);
+          if (last) focusRow(getId(last.node));
           break;
         }
         case ' ':
         case 'Enter': {
           event.preventDefault();
-          if (hasChildren) toggleExpanded(node.id);
-          if (!node.disabled) toggleSelected(node.id, event.ctrlKey || event.metaKey);
+          if (hasChildren) toggleExpanded(id);
+          if (!nodeDisabled) toggleSelected(id, event.ctrlKey || event.metaKey);
           break;
         }
         case '*': {
@@ -285,23 +350,35 @@ export function Tree<T extends TreeNode = TreeNode>(props: TreeProps<T>): ReactE
           const siblings = flat.filter((f) => f.depth === depth && f.parent === flat[idx]?.parent);
           const next = new Set(expanded);
           for (const s of siblings) {
-            const kids = (s.node.children as T[] | undefined)?.length ?? 0;
-            if (kids > 0) next.add(s.node.id);
+            const kids = getChildren(s.node)?.length ?? 0;
+            if (kids > 0) next.add(getId(s.node));
           }
           setExpandedList(Array.from(next));
           break;
         }
       }
     },
-    [flat, expanded, focusRow, setExpandedList, toggleExpanded, toggleSelected],
+    [
+      flat,
+      expanded,
+      focusRow,
+      setExpandedList,
+      toggleExpanded,
+      toggleSelected,
+      getId,
+      getChildren,
+      getDisabled,
+    ],
   );
 
   const renderNode = (node: T, depth: number): ReactElement => {
-    const children = node.children as T[] | undefined;
+    const id = getId(node);
+    const children = getChildren(node);
     const hasChildren = !!(children && children.length > 0);
-    const isExpanded = expanded.has(node.id);
-    const isSelected = selected.has(node.id);
-    const isFocused = focusedId === node.id;
+    const isExpanded = expanded.has(id);
+    const isSelected = selected.has(id);
+    const isFocused = focusedId === id;
+    const nodeDisabled = !!getDisabled(node);
 
     const style: CSSProperties = { paddingInlineStart: `calc(${depth.toString()} * 1rem)` };
 
@@ -312,38 +389,40 @@ export function Tree<T extends TreeNode = TreeNode>(props: TreeProps<T>): ReactE
           expanded: isExpanded,
           selected: isSelected,
           focused: isFocused,
-          disabled: !!node.disabled,
+          disabled: nodeDisabled,
         })
-      : (node.label ?? node.id);
+      : (getLabel(node) ?? id);
+
+    const firstFlatId = flat[0] ? getId(flat[0].node) : undefined;
 
     return (
       <li
-        key={node.id}
+        key={id}
         role="treeitem"
         aria-expanded={hasChildren ? isExpanded : undefined}
         aria-selected={selectionMode !== 'none' ? isSelected : undefined}
         aria-level={depth + 1}
-        aria-disabled={node.disabled || undefined}
+        aria-disabled={nodeDisabled || undefined}
         data-expanded={isExpanded ? 'true' : 'false'}
-        data-tree-id={node.id}
+        data-tree-id={id}
         className={treeItem}
-        tabIndex={isFocused || (!focusedId && depth === 0 && flat[0]?.node.id === node.id) ? 0 : -1}
+        tabIndex={isFocused || (!focusedId && depth === 0 && firstFlatId === id) ? 0 : -1}
         onKeyDown={(e) => onKeyDown(e, node, depth)}
-        onFocus={() => setFocusedId(node.id)}
+        onFocus={() => setFocusedId(id)}
       >
         {/* biome-ignore lint/a11y/useKeyWithClickEvents: parent treeitem handles keyboard via onKeyDown */}
         <div
           data-slot="row"
           data-selected={isSelected ? 'true' : 'false'}
           data-focused={isFocused ? 'true' : undefined}
-          data-disabled={node.disabled ? 'true' : undefined}
+          data-disabled={nodeDisabled ? 'true' : undefined}
           className={treeRow}
           style={style}
           onClick={(e) => {
-            if (node.disabled) return;
-            if (hasChildren) toggleExpanded(node.id);
-            toggleSelected(node.id, e.ctrlKey || e.metaKey);
-            focusRow(node.id);
+            if (nodeDisabled) return;
+            if (hasChildren) toggleExpanded(id);
+            toggleSelected(id, e.ctrlKey || e.metaKey);
+            focusRow(id);
           }}
         >
           {hasChildren ? (

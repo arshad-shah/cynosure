@@ -302,3 +302,74 @@ export const DeepNesting: Story = {
     );
   },
 };
+
+interface ApiCollectionItem {
+  uuid: string;
+  name: string;
+  kind: 'collection' | 'request';
+  items?: ApiCollectionItem[];
+}
+
+const API_DATA: ApiCollectionItem[] = [
+  {
+    uuid: 'col-1',
+    name: 'Auth',
+    kind: 'collection',
+    items: [
+      { uuid: 'req-1', name: 'POST /login', kind: 'request' },
+      { uuid: 'req-2', name: 'POST /logout', kind: 'request' },
+    ],
+  },
+  {
+    uuid: 'col-2',
+    name: 'Users',
+    kind: 'collection',
+    items: [
+      { uuid: 'req-3', name: 'GET /users', kind: 'request' },
+      {
+        uuid: 'col-3',
+        name: 'Profile',
+        kind: 'collection',
+        items: [{ uuid: 'req-4', name: 'PATCH /users/:id', kind: 'request' }],
+      },
+    ],
+  },
+];
+
+export const CustomDataShape: Story = {
+  name: 'Custom data shape via accessor props',
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'When your data does not match the `{ id, label, children }` shape, point at your own fields with `getId` / `getLabel` / `getChildren` — no remapping required. Useful when consuming an API response that uses different field names (here: `uuid`, `name`, `items`).',
+      },
+    },
+  },
+  render: () => (
+    <div style={{ maxWidth: 360 }}>
+      <Tree<ApiCollectionItem>
+        items={API_DATA}
+        getId={(n) => n.uuid}
+        getLabel={(n) => n.name}
+        getChildren={(n) => n.items}
+        defaultExpandedIds={['col-1', 'col-2']}
+        selectionMode="single"
+        aria-label="API collections"
+      >
+        {({ item, expanded }) => (
+          <Inline gap="2" align="center">
+            <Text size="sm" weight={item.kind === 'collection' ? 'medium' : 'regular'}>
+              {item.name}
+            </Text>
+            {item.kind === 'collection' ? (
+              <Text size="xs" color="fg.muted">
+                {expanded ? '(open)' : '(closed)'}
+              </Text>
+            ) : null}
+          </Inline>
+        )}
+      </Tree>
+    </div>
+  ),
+};
