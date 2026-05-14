@@ -5,17 +5,36 @@ import { vanillaExtractPlugin } from '@vanilla-extract/esbuild-plugin';
 import { componentEntries } from '../../components.config.mjs';
 
 /**
- * Walk a CSS string at brace depth 0 to split it into top-level "items":
- * comments, at-rules (e.g. `@media (...) { ... }`), and ordinary rules
- * (`.foo { ... }`). Returns the items in source order so deduplication can
- * skip subsequent identical occurrences while preserving the cascade.
+ * Strip CSS block comments from a built CSS string. Authors keep comments in
+ * `.css.ts` sources for readability; production consumers ship none of them.
+ *
+ * Two categories pile up in the unprocessed output:
+ * 1. esbuild's `/* vanilla-extract-css-ns:<file>?source=#<base64> *\/` marker
+ *    that it prepends to every concatenated virtual CSS file. Each marker is
+ *    a base64-encoded gzipped sourcemap (~3 KB) referenced only by the dev
+ *    runtime; in the bundled output ~120 chunks contribute ~440 KB raw /
+ *    ~225 KB gzip of dead payload to `styles.css`.
+ * 2. Author doc comments (`/* …purpose… *\/`) preserved by esbuild.
+ *
+ * License banners (`/*! … *\/`) are preserved so attribution requirements
+ * stay intact.
  */
-function dedupeCssRules(css: string): string {
-  type Item = { kind: 'block' | 'comment' | 'whitespace'; text: string };
-  const items: Item[] = [];
+function stripCssComments(css: string): string {
+  return css.replace(/\/\*(?!!)[\s\S]*?\*\//g, '');
+}
+
+type CssItem = { kind: 'block' | 'comment' | 'whitespace'; text: string };
+
+/**
+ * Walk a CSS string at brace depth 0 and split it into top-level items:
+ * comments, at-rules (`@media (...) { ... }`), and ordinary rules
+ * (`.foo { ... }`). Items are returned in source order so callers can
+ * dedupe or extract while preserving the cascade.
+ */
+function splitTopLevelCssItems(css: string): CssItem[] {
+  const items: CssItem[] = [];
   let i = 0;
   while (i < css.length) {
-    // Whitespace run.
     if (/\s/.test(css[i] ?? '')) {
       let j = i;
       while (j < css.length && /\s/.test(css[j] ?? '')) j++;
@@ -23,7 +42,6 @@ function dedupeCssRules(css: string): string {
       i = j;
       continue;
     }
-    // /* comment */
     if (css[i] === '/' && css[i + 1] === '*') {
       const end = css.indexOf('*/', i + 2);
       if (end === -1) {
@@ -34,10 +52,8 @@ function dedupeCssRules(css: string): string {
       i = end + 2;
       continue;
     }
-    // A rule or at-rule that ends at the next matching `}` at depth 0. A
-    // simple brace-balance walk is sufficient because vanilla-extract's
-    // output is well-formed and never embeds `{`/`}` inside string
-    // literals at the top level.
+    // Rule or at-rule. Brace-balance walk; vanilla-extract output never
+    // embeds `{`/`}` in top-level string literals.
     let depth = 0;
     let j = i;
     let started = false;
@@ -56,25 +72,113 @@ function dedupeCssRules(css: string): string {
       j++;
     }
     if (!started) {
-      // No more braces — bail and dump the remainder verbatim.
       items.push({ kind: 'block', text: css.slice(i) });
       break;
     }
     items.push({ kind: 'block', text: css.slice(i, j) });
     i = j;
   }
+  return items;
+}
 
+const normalizeBlock = (text: string): string => text.replace(/\s+/g, ' ').trim();
+
+/**
+ * Drop subsequent identical block occurrences from a single CSS string.
+ * Preserves the cascade by keeping the first occurrence in place.
+ */
+function dedupeCssRules(css: string): string {
+  const items = splitTopLevelCssItems(css);
   const seen = new Set<string>();
   const out: string[] = [];
   for (const item of items) {
     if (item.kind === 'block') {
-      const key = item.text.replace(/\s+/g, ' ').trim();
+      const key = normalizeBlock(item.text);
       if (seen.has(key)) continue;
       seen.add(key);
     }
     out.push(item.text);
   }
   return out.join('');
+}
+
+/**
+ * Cross-file extraction. Given per-component CSS chunk contents keyed by
+ * filename, identify rule blocks that appear in 2+ files and pull them
+ * into a single shared chunk. Returns:
+ * - `shared`: the concatenated shared CSS, in the order each block was
+ *   first seen across the alphabetically-sorted files.
+ * - `slimmed`: the per-file CSS with shared blocks removed.
+ *
+ * Why: per-component imports (`@arshad-shah/cynosure-react/text`,
+ * `…/heading`, etc.) each carry their own copy of `layoutPropsStyle`,
+ * `typographyBase`, control sizes, focus rings, etc. The full duplication
+ * cost is ~960 KB raw across ~28 chunks. Hoisting them into `core.css`
+ * — which the per-component JS chunks import alongside their own
+ * stylesheet — lets bundlers dedupe to a single copy at the consumer's
+ * end, while the monolithic `styles.css` path is unaffected because it
+ * still concatenates everything.
+ *
+ * Identification: a block is "shared" iff its byte-identical (whitespace-
+ * normalised) text appears in 2+ files. Comments and whitespace items are
+ * neither counted nor moved.
+ */
+function extractSharedBlocks(perFile: ReadonlyArray<{ file: string; css: string }>): {
+  shared: string;
+  slimmed: Map<string, string>;
+} {
+  const fileItems = new Map<string, CssItem[]>();
+  for (const { file, css } of perFile) {
+    fileItems.set(file, splitTopLevelCssItems(css));
+  }
+  // Count distinct files each normalized block appears in.
+  const occurrences = new Map<string, number>();
+  for (const items of fileItems.values()) {
+    const localSeen = new Set<string>();
+    for (const it of items) {
+      if (it.kind !== 'block') continue;
+      const k = normalizeBlock(it.text);
+      if (!k || localSeen.has(k)) continue;
+      localSeen.add(k);
+      occurrences.set(k, (occurrences.get(k) ?? 0) + 1);
+    }
+  }
+  const isShared = (key: string) => (occurrences.get(key) ?? 0) >= 2;
+
+  // Emit shared blocks in first-occurrence order across the input file
+  // list — which is alphabetical, matching how `styles.css` concatenates.
+  // This keeps cascade-sensitive rule pairs (e.g. a shared base followed
+  // by a same-specificity refinement) in the same relative order as they
+  // appear in the monolithic bundle.
+  const sharedOut: string[] = [];
+  const sharedSeen = new Set<string>();
+  for (const { file } of perFile) {
+    const items = fileItems.get(file) ?? [];
+    for (const it of items) {
+      if (it.kind !== 'block') continue;
+      const k = normalizeBlock(it.text);
+      if (!isShared(k) || sharedSeen.has(k)) continue;
+      sharedSeen.add(k);
+      sharedOut.push(it.text);
+    }
+  }
+
+  const slimmed = new Map<string, string>();
+  for (const { file } of perFile) {
+    const items = fileItems.get(file) ?? [];
+    const kept: string[] = [];
+    for (const it of items) {
+      if (it.kind === 'block' && isShared(normalizeBlock(it.text))) continue;
+      // Drop whitespace runs adjacent to extracted blocks; keeping them
+      // would leave the per-component chunks scattered with leading/
+      // trailing newlines that gzip handles fine but raw bytes don't.
+      if (it.kind === 'whitespace') continue;
+      kept.push(it.text);
+    }
+    slimmed.set(file, kept.join(''));
+  }
+
+  return { shared: sharedOut.join(''), slimmed };
 }
 
 const hookEntries = (): Record<string, string> => {
@@ -107,21 +211,117 @@ export default createConfig({
     // itself.
     ...(componentEntries() as Record<string, string>),
   },
-  esbuildPlugins: [vanillaExtractPlugin()],
+  esbuildPlugins: [
+    vanillaExtractPlugin({
+      // Hash classes/vars with 1–2 char identifiers instead of the
+      // verbose `<File>_<exportName>__<7charHash>` debug names. Cuts the
+      // average hashed-classname length from ~33 chars to ~3, which shrinks
+      // both `styles.css` and per-component chunks meaningfully (gzip
+      // savings compound because the names are referenced many times).
+      identifiers: 'short',
+    }),
+  ],
   loader: { '.css': 'copy' },
   async onSuccess() {
-    const { readdir, readFile, writeFile } = await import('node:fs/promises');
-    const { join } = await import('node:path');
+    const { readdir, readFile, writeFile, stat } = await import('node:fs/promises');
+    const { join, relative, dirname } = await import('node:path');
     const { createRequire } = await import('node:module');
     const dist = join(process.cwd(), 'dist');
-    const files = (await readdir(dist))
-      .filter((f) => f.endsWith('.css') && f !== 'styles.css' && f !== 'all.css')
-      .sort();
-    const chunks: string[] = [];
-    for (const file of files) {
-      chunks.push(`/* ${file} */`);
-      chunks.push(await readFile(join(dist, file), 'utf8'));
+
+    // Discover every emitted `.css` file (top-level + barrel subdirs). The
+    // tsup entry map produces both per-component leaves at the root
+    // (`button.css`) and category barrels in subdirs (`forms/index.css`).
+    const cssFiles: string[] = [];
+    const walk = async (dir: string) => {
+      for (const entry of await readdir(dir)) {
+        const full = join(dir, entry);
+        const st = await stat(full);
+        if (st.isDirectory()) await walk(full);
+        else if (entry.endsWith('.css')) cssFiles.push(full);
+      }
+    };
+    await walk(dist);
+
+    const RESERVED = new Set(['styles.css', 'all.css', 'fonts.css', 'core.css']);
+    // Strip vanilla-extract debug markers + author doc comments from every
+    // emitted `.css` chunk in place. esbuild prepends a
+    // `/* vanilla-extract-css-ns:src/…?source=#<base64> */` marker when it
+    // concatenates virtual CSS files into each chunk (3 KB per shared
+    // module). Without scrubbing, every per-component chunk and the
+    // monolithic `styles.css` ship hundreds of KB of dead source-map noise.
+    for (const full of cssFiles) {
+      if (RESERVED.has(relative(dist, full))) continue;
+      const raw = await readFile(full, 'utf8');
+      const cleaned = stripCssComments(raw);
+      if (cleaned.length !== raw.length) await writeFile(full, cleaned);
     }
+
+    // Classify: leaves are per-component `.css` at the root (e.g.
+    // `button.css`). Barrels are aggregate chunks — the top-level
+    // `index.css` and every `*/index.css` — which contain the union of
+    // their members' rules. Shared-extraction only counts occurrences
+    // across LEAVES so that a Button-specific rule appearing in both
+    // `button.css` and the top-level barrel doesn't get falsely classified
+    // as shared (it'd then be hoisted out of `button.css` even though only
+    // Button uses it).
+    const isBarrel = (path: string) => {
+      const rel = relative(dist, path);
+      return rel === 'index.css' || rel.endsWith('/index.css');
+    };
+    const componentLeaves = cssFiles
+      .filter(
+        (f) =>
+          !RESERVED.has(relative(dist, f)) && !isBarrel(f) && relative(dist, f).indexOf('/') === -1,
+      )
+      .sort();
+    const barrels = cssFiles.filter((f) => isBarrel(f)).sort();
+
+    // Identify rule blocks shared across ≥2 component leaves and pull
+    // them into a single `core.css`. Per-component imports
+    // (`@arshad-shah/cynosure-react/text`, …) then carry only their own
+    // chunk's specific rules and a one-line `import './core.css'` (added
+    // below); bundlers dedupe `core.css` to a single load across N
+    // per-component imports. Saves ~960 KB raw (gzip ~25 KB) of
+    // `layoutPropsStyle`/`typographyBase`/etc. dupes across ~28 chunks.
+    const leafCss = await Promise.all(
+      componentLeaves.map(async (full) => ({
+        file: relative(dist, full),
+        css: await readFile(full, 'utf8'),
+      })),
+    );
+    const { shared, slimmed } = extractSharedBlocks(leafCss);
+
+    // Slim each leaf in place.
+    for (const full of componentLeaves) {
+      const rel = relative(dist, full);
+      await writeFile(full, slimmed.get(rel) ?? '');
+    }
+    // Slim each barrel too — they contain the union of member rules and
+    // therefore re-state every extracted block. Same `splitTopLevelCssItems`
+    // pass identifies and removes them.
+    const sharedKeys = new Set<string>();
+    for (const item of splitTopLevelCssItems(shared)) {
+      if (item.kind === 'block') sharedKeys.add(normalizeBlock(item.text));
+    }
+    for (const full of barrels) {
+      const raw = await readFile(full, 'utf8');
+      const slim = splitTopLevelCssItems(raw)
+        .filter((it) => {
+          if (it.kind === 'whitespace') return false;
+          if (it.kind === 'block' && sharedKeys.has(normalizeBlock(it.text))) return false;
+          return true;
+        })
+        .map((it) => it.text)
+        .join('');
+      await writeFile(full, slim);
+    }
+
+    // Collect every leaf's slimmed CSS for the monolithic `styles.css`
+    // bundle later. core.css + these = the full stylesheet (barrels are
+    // by construction the union of their members, so excluded).
+    const slimmedLeaves: string[] = componentLeaves.map(
+      (full) => slimmed.get(relative(dist, full)) ?? '',
+    );
 
     // Prepend `@property` declarations for every layout custom property so
     // none of them inherit. Without this, setting e.g. `position="fixed"` on
@@ -189,11 +389,7 @@ export default createConfig({
       'cynosure-lp-order',
     ];
     const BREAKPOINTS = ['base', 'sm', 'md', 'lg', 'xl', '2xl'];
-    const propertyDecls: string[] = [
-      '/* @property declarations — element-scoped layout custom properties.',
-      ' * Generated by tsup.config.ts; keeps positional / sizing vars from',
-      ' * inheriting onto descendants. */',
-    ];
+    const propertyDecls: string[] = [];
     // dedupe — some bases collide (e.g. flex-grow's `lp-fg` vs foreground's
     // `lp-fg`, though they're different aliases). The Set guards against
     // emitting duplicate @property rules which CSS treats as the same.
@@ -211,42 +407,75 @@ export default createConfig({
         );
       }
     }
-    chunks.unshift(propertyDecls.join('\n'));
+    const baseReset =
+      'body{font-family:var(--cynosure-font-family-sans);color:var(--cynosure-color-foreground-default);background-color:var(--cynosure-color-background-canvas);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility}';
 
-    // Body reset — sets the default font family / text color / antialiasing
-    // on `<body>` so that raw `<p>`/`<span>`/text nodes inherit the Cynosure
-    // sans stack instead of the UA default (Times on macOS, Times New Roman
-    // on Windows). Cynosure components style their own elements, but plain
-    // markup that isn't wrapped in `<Text>`/`<Heading>` would otherwise look
-    // like an unstyled document. Kept minimal — only the things a consumer
-    // could never reasonably want different from the design system.
-    const baseReset = `
-/* @arshad-shah/cynosure-react — base reset */
-body {
-  font-family: var(--cynosure-font-family-sans);
-  color: var(--cynosure-color-foreground-default);
-  background-color: var(--cynosure-color-background-canvas);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;
-}
-`;
-    chunks.push(baseReset);
+    // `core.css` carries everything a per-component import needs in
+    // addition to its own chunk: the @property declarations (must be
+    // element-scoped before any layout var is read), the body reset, and
+    // every block shared across ≥2 component leaves. Per-component JS
+    // chunks `import './core.css'` at the top (added below), so consumers
+    // using subpath imports get one deduped copy regardless of how many
+    // components they pull.
+    const coreCss = [propertyDecls.join(''), baseReset, shared].join('');
+    await writeFile(join(dist, 'core.css'), coreCss);
 
-    // Deduplicate identical rule blocks across the concatenated component
-    // CSS. Every tsup chunk that imports a shared vanilla-extract style
-    // (e.g. `layoutPropsStyle`, `typographyBase`) re-emits that rule into
-    // its own `.css` output. Concatenating them naively produces six+
-    // copies of the same rule near the end of `styles.css`. Because the
-    // last identical-specificity rule wins the cascade, those late copies
-    // override `background-color` set by a component's variant rule
-    // earlier in the file (variants like `Mark variant="marker"` rely on
-    // setting `background-color`, but `layoutPropsStyle` re-asserts
-    // `background-color: var(--cynosure-lp-bg-base)` from a later
-    // position, which the browser resolves to `transparent` when no
-    // override is present). One copy at the first occurrence preserves
-    // the rule without re-asserting it later.
-    const stylesCss = dedupeCssRules(chunks.join('\n'));
+    // Wire per-component JS to its CSS: prepend `import './core.css'` and
+    // `import './<name>.css'` at the top of every emitted entry-point JS
+    // file. Without this, `import { Button } from '@…/button'` returns
+    // the component but no styles — consumers have to remember to load
+    // `styles.css` or every per-component CSS file manually. By turning
+    // each subpath into a side-effectful CSS import (already covered by
+    // the package's `sideEffects: ["**/*.css"]` whitelist), bundlers
+    // automatically include the CSS for the components actually used and
+    // tree-shake the rest.
+    const jsFiles = await readdir(dist);
+    for (const file of jsFiles) {
+      if (!file.endsWith('.js')) continue;
+      if (file.startsWith('chunk-')) continue; // internal shared chunks have no public CSS
+      const base = file.replace(/\.js$/, '');
+      const cssPath = join(dist, `${base}.css`);
+      let hasCss = false;
+      try {
+        await stat(cssPath);
+        hasCss = true;
+      } catch {
+        /* no per-entry CSS — pure JS entry (hooks, utils) */
+      }
+      if (!hasCss) continue;
+      const jsPath = join(dist, file);
+      const body = await readFile(jsPath, 'utf8');
+      // Idempotent — re-run safe.
+      if (body.startsWith(`import './core.css';`)) continue;
+      const prefix = `import './core.css';\nimport './${base}.css';\n`;
+      await writeFile(jsPath, prefix + body);
+    }
+    // Same treatment for category barrels (forms/index.js, overlay/index.js, …).
+    for (const barrel of barrels) {
+      const rel = relative(dist, barrel); // e.g. "forms/index.css"
+      const jsRel = rel.replace(/\.css$/, '.js');
+      const jsPath = join(dist, jsRel);
+      try {
+        const body = await readFile(jsPath, 'utf8');
+        if (body.startsWith(`import '`)) {
+          // peek for our own marker — `import './core.css'` may not be
+          // first if esbuild emitted other relative imports first
+          if (body.includes(`'../core.css'`) || body.includes(`'./core.css'`)) continue;
+        }
+        const depth = dirname(jsRel).split('/').length;
+        const upTo = '../'.repeat(depth);
+        const prefix = `import '${upTo}core.css';\nimport './index.css';\n`;
+        await writeFile(jsPath, prefix + body);
+      } catch {
+        /* no JS pair for this CSS barrel — skip */
+      }
+    }
+
+    // Build `styles.css` (monolithic single-import path): core (already
+    // contains @property + baseReset + every shared block) + every
+    // slimmed leaf. dedupe defends against any accidental block
+    // repetition.
+    const stylesCss = stripCssComments(dedupeCssRules([coreCss, ...slimmedLeaves].join('\n')));
     await writeFile(join(dist, 'styles.css'), stylesCss);
 
     // Additionally emit `all.css`: a single-import bundle that includes design
@@ -257,14 +486,59 @@ body {
     const tokensDist = join(tokensPkgJson, '..', 'dist', 'css');
     const baseCss = await readFile(join(tokensDist, 'base.css'), 'utf8');
     const darkCss = await readFile(join(tokensDist, 'dark.css'), 'utf8');
-    const allCss = [
-      '/* @arshad-shah/cynosure-tokens/css (base) */',
-      baseCss,
-      '/* @arshad-shah/cynosure-tokens/css/dark */',
-      darkCss,
-      '/* @arshad-shah/cynosure-react/styles.css */',
-      stylesCss,
-    ].join('\n');
+    // Tokens are emitted by Style Dictionary as a full palette (~280 named
+    // custom properties); React components only reference a semantic subset
+    // (~128). The 152 unused tokens are mostly raw color ramps
+    // (--cynosure-color-{gray,blue,…}-{50…950}). Filter `base.css` and
+    // `dark.css` to declarations actually referenced from `stylesCss` so the
+    // zero-config `all.css` bundle doesn't ship unused vars. The standalone
+    // `@arshad-shah/cynosure-tokens/css` export keeps the full palette for
+    // consumers who want it.
+    const trimTokens = (tokenCss: string): string => {
+      const referenced = new Set<string>();
+      const refRe = /var\(\s*(--[a-zA-Z0-9_-]+)/g;
+      for (const m of stylesCss.matchAll(refRe)) referenced.add(m[1]);
+      // Iteratively expand: a referenced token's value may itself reference
+      // another token; keep both so the resolved value chain stays intact.
+      let added = true;
+      while (added) {
+        added = false;
+        const lineRe = /(--[a-zA-Z0-9_-]+):\s*([^;]+);/g;
+        for (const m of tokenCss.matchAll(lineRe)) {
+          if (!referenced.has(m[1])) continue;
+          for (const r of m[2].matchAll(refRe)) {
+            if (!referenced.has(r[1])) {
+              referenced.add(r[1]);
+              added = true;
+            }
+          }
+        }
+      }
+      // Rebuild the stylesheet: keep every rule head, but inside each
+      // declaration block drop lines whose property isn't referenced.
+      return splitTopLevelCssItems(tokenCss)
+        .map((it) => {
+          if (it.kind !== 'block') return it.text;
+          const m = it.text.match(/^([^{]+)\{([\s\S]*)\}\s*$/);
+          if (!m) return it.text;
+          const head = m[1];
+          const body = m[2];
+          const kept = body
+            .split(/;\s*/)
+            .filter((decl) => {
+              const dm = decl.match(/^\s*(--[a-zA-Z0-9_-]+)\s*:/);
+              if (!dm) return decl.trim().length > 0;
+              return referenced.has(dm[1]);
+            })
+            .join(';');
+          if (!kept.trim()) return '';
+          return `${head}{${kept.endsWith(';') ? kept : `${kept};`}}`;
+        })
+        .join('');
+    };
+    const allCss = stripCssComments(
+      [trimTokens(baseCss), trimTokens(darkCss), stylesCss].join('\n'),
+    );
     await writeFile(join(dist, 'all.css'), allCss);
 
     // Emit `fonts.css`: opt-in webfont loader for the default theme

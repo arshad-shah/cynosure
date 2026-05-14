@@ -35,6 +35,10 @@
       "types": "./styles.css.d.ts",
       "default": "./dist/styles.css"
     },
+    "./core.css": {
+      "types": "./all.css.d.ts",
+      "default": "./dist/core.css"
+    },
     "./all.css": {
       "types": "./all.css.d.ts",
       "default": "./dist/all.css"
