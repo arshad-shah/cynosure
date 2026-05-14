@@ -1,4 +1,3 @@
-import { DirectionProvider as RadixDirectionProvider } from '@radix-ui/react-direction';
 import { createContext, useContext, useMemo } from 'react';
 import { useIsomorphicLayoutEffect } from './hooks/useIsomorphicLayoutEffect.js';
 import type { DirectionContextValue, DirectionProviderProps } from './types.js';
@@ -26,11 +25,7 @@ export function DirectionProvider({
 
   const value = useMemo<DirectionContextValue>(() => ({ dir }), [dir]);
 
-  return (
-    <DirectionContext.Provider value={value}>
-      <RadixDirectionProvider dir={dir}>{children}</RadixDirectionProvider>
-    </DirectionContext.Provider>
-  );
+  return <DirectionContext.Provider value={value}>{children}</DirectionContext.Provider>;
 }
 
 export const DirectionContextInternal = DirectionContext;

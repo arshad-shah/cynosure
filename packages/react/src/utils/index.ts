@@ -6,5 +6,3 @@ export { composeRefs } from './composeRefs.js';
 export { createContext } from './createContext.js';
 export type { ContextProvider } from './createContext.js';
 export { getOwnerDocument } from './getOwnerDocument.js';
-export { cva, cx } from './variants.js';
-export type { VariantProps } from './variants.js';

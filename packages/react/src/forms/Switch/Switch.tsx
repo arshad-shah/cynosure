@@ -1,6 +1,6 @@
-import * as RadixSwitch from '@radix-ui/react-switch';
 import { Check, Loader2 } from 'lucide-react';
 import { type ReactNode, forwardRef } from 'react';
+import { useControllableState } from '../../hooks/useControllableState.js';
 import { cn } from '../../utils/cn.js';
 import type { BooleanFormControlBase } from '../shared/types.js';
 import {
@@ -13,7 +13,7 @@ import {
   thumbLoader,
 } from './Switch.css.js';
 
-/** Props for `<Switch>`. Built on `@radix-ui/react-switch`. */
+/** Props for `<Switch>`. */
 export interface SwitchProps extends BooleanFormControlBase {
   /** Controlled checked state. */
   checked?: boolean;
@@ -38,11 +38,17 @@ export interface SwitchProps extends BooleanFormControlBase {
  * Toggle switch. Semantically conveys an "on/off setting that takes effect
  * immediately" — prefer over `<Checkbox>` when the action has no explicit
  * Save button. Pass `children` to render the label alongside.
+ *
+ * Implemented natively as a `role="switch"` button paired with a hidden
+ * `<input type="checkbox">` for form participation. The hidden checkbox
+ * carries `name`/`value`/`required` so the control submits identically to
+ * a plain checkbox while the visible button handles all keyboard /
+ * pointer interaction.
  */
 export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(function Switch(props, ref) {
   const {
     size = 'md',
-    checked,
+    checked: checkedProp,
     defaultChecked,
     onCheckedChange,
     disabled,
@@ -50,35 +56,49 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(function Switch
     invalid,
     name,
     id,
-    value,
+    value = 'on',
     autoFocus,
     loading = false,
     children,
     className,
   } = props;
 
+  const [checked, setChecked] = useControllableState<boolean>({
+    value: checkedProp,
+    defaultValue: defaultChecked ?? false,
+    onChange: onCheckedChange,
+  });
+
   const showIcon = size !== 'sm';
   const iconPx = size === 'lg' ? 14 : 12;
   const effectiveDisabled = disabled || loading;
+  const state = checked ? 'checked' : 'unchecked';
+
+  const handleClick = () => {
+    if (effectiveDisabled) return;
+    setChecked(!checked);
+  };
 
   const control = (
-    <RadixSwitch.Root
+    <button
       ref={ref}
-      checked={checked}
-      defaultChecked={defaultChecked}
-      onCheckedChange={onCheckedChange}
-      disabled={effectiveDisabled}
-      required={required}
-      name={name}
-      id={id}
-      value={value}
-      autoFocus={autoFocus}
+      type="button"
+      role="switch"
+      aria-checked={checked}
+      aria-required={required || undefined}
       aria-busy={loading || undefined}
+      data-state={state}
+      data-disabled={effectiveDisabled || undefined}
       data-invalid={invalid || undefined}
       data-loading={loading || undefined}
+      disabled={effectiveDisabled}
+      id={id}
+      // biome-ignore lint/a11y/noAutofocus: Switch parity with Radix — consumers opt in explicitly and tests rely on it.
+      autoFocus={autoFocus}
+      onClick={handleClick}
       className={cn(switchRoot, switchSize[size], children ? undefined : className)}
     >
-      <RadixSwitch.Thumb className={switchThumb}>
+      <span className={switchThumb} data-state={state}>
         {loading ? (
           <Loader2 className={thumbLoader} size={iconPx} aria-hidden="true" />
         ) : showIcon ? (
@@ -89,14 +109,38 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(function Switch
             aria-hidden="true"
           />
         ) : null}
-      </RadixSwitch.Thumb>
-    </RadixSwitch.Root>
+      </span>
+      {name ? (
+        <input
+          type="checkbox"
+          name={name}
+          value={value}
+          checked={checked}
+          required={required}
+          disabled={effectiveDisabled}
+          aria-hidden="true"
+          tabIndex={-1}
+          // Native form submission only — the visible button drives all
+          // user interaction. Keep onChange to silence React's controlled-
+          // input warning; the visible click handler is the source of truth.
+          onChange={() => {}}
+          style={{
+            position: 'absolute',
+            pointerEvents: 'none',
+            opacity: 0,
+            margin: 0,
+            width: 0,
+            height: 0,
+          }}
+        />
+      ) : null}
+    </button>
   );
 
   if (children === undefined) return control;
 
   return (
-    // biome-ignore lint/a11y/noLabelWithoutControl: `control` renders a Radix switch root as a direct child.
+    // biome-ignore lint/a11y/noLabelWithoutControl: `control` renders the switch button as a direct child.
     <label className={cn(switchLabel, className)} data-disabled={disabled || undefined}>
       {control}
       <span>{children}</span>
