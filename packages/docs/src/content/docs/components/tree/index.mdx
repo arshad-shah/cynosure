@@ -53,6 +53,61 @@ Pass a render function as the `children` prop to fully customise each row — re
 
 <LivePreview example="tree/custom-render" />
 
+## Data shape & adapters
+
+`Tree` accepts an array of `TreeNode`-shaped items by default — `{ id, label?, children?, disabled?, icon? }`. If your data already matches, drop it in directly.
+
+```tsx
+const items: TreeNode[] = [
+  { id: 'a', label: 'A', children: [{ id: 'a/1', label: 'A1' }] },
+];
+
+<Tree items={items} aria-label="Files" />
+```
+
+### Your data doesn't match? Use accessor props
+
+When the consumer's data has different field names (`uuid`, `name`, `subItems`, …), point at them with `getId` / `getLabel` / `getChildren` / `getDisabled` instead of rebuilding the array.
+
+```tsx
+interface ApiCollectionItem {
+  uuid: string;
+  name: string;
+  items?: ApiCollectionItem[];
+  locked?: boolean;
+}
+
+<Tree<ApiCollectionItem>
+  items={apiData}
+  getId={(n) => n.uuid}
+  getLabel={(n) => n.name}
+  getChildren={(n) => n.items}
+  getDisabled={(n) => n.locked}
+  aria-label="API collections"
+/>
+```
+
+The render prop's `item` argument is fully typed as `ApiCollectionItem`, so you can read your own fields directly without casts.
+
+### Prefer a one-shot transform? Use `mapToTreeNodes`
+
+If you'd rather normalise once at the data boundary and reuse the result elsewhere, the same accessors are accepted by the `mapToTreeNodes` helper:
+
+```tsx
+import { Tree, mapToTreeNodes } from '@arshad-shah/cynosure-react';
+
+const items = mapToTreeNodes(apiData, {
+  getId: (n) => n.uuid,
+  getLabel: (n) => n.name,
+  getChildren: (n) => n.items,
+  getDisabled: (n) => n.locked,
+});
+
+<Tree items={items} aria-label="API collections" />
+```
+
+Pick whichever fits the call site — both paths produce identical behaviour.
+
 ## API
 
 <PropsTable component="Tree" />

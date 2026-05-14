@@ -231,6 +231,8 @@ export default defineConfig({
         {
           label: 'Guides',
           items: [
+            { label: 'Intent → component map', slug: 'guides/intent-map' },
+            { label: 'Layout primitives', slug: 'guides/layout-primitives' },
             { label: 'Using with frameworks', slug: 'guides/frameworks' },
             { label: 'Tree-shaking & bundle size', slug: 'guides/tree-shaking' },
           ],

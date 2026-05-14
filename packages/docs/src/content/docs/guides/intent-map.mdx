@@ -1,0 +1,91 @@
+---
+title: Intent → component map
+description: A reverse lookup keyed by what you're trying to do, not by component name.
+---
+
+# Intent → component map
+
+Cynosure ships ~90 components. Most consumer-side friction isn't missing
+capability — it's not knowing which component answers a given intent. The
+table below is a reverse lookup keyed by "I need to …" instead of by
+component name.
+
+Use this page when you'd otherwise reach for an inline `style={{ display: 'flex' }}`,
+manual recursion, or a hand-rolled overflow container — odds are there's a primitive that already covers it.
+
+## Containers & overflow
+
+| I need to… | Reach for | Skip the workaround |
+|---|---|---|
+| Constrain page width with safe padding | [`Container`](/components/container) | `<div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 1rem' }}>` |
+| Make a region scroll without breaking native scroll | [`ScrollArea`](/components/scroll-area) | `<div style={{ height: 400, overflow: 'auto' }}>` |
+| Center content (flex centering, vertically & horizontally) | [`Center`](/components/center) | `<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>` |
+| Hold a fixed aspect ratio (video, image, embed) | `AspectRatio` | `position: relative; padding-top: 56.25%` hacks |
+| Open a side panel | [`Drawer`](/components/drawer) | Custom `position: fixed` slide-in |
+
+## Layout primitives
+
+| I need to… | Reach for | Skip the workaround |
+|---|---|---|
+| Stack things vertically with consistent gap | `Stack` | `flex-direction: column; gap: 8px` |
+| Lay things in a row with consistent gap | `Inline` | `display: flex; gap: 8px; align-items: center` |
+| Two-axis arbitrary flex layout | `Flex` | Raw `display: flex` |
+| Grid layout (equal columns, named areas, etc.) | `Grid` | Raw `display: grid; grid-template-columns: …` |
+| Position one child in a grid cell | `Box` (or any layout child) with `gridColumn` / `gridRow` props | Inline `style={{ gridColumn: '…' }}` |
+| Push siblings apart in a flex row | `Spacer` | `flex: 1 1 auto` hack |
+
+See [Layout primitives](/guides/layout-primitives) for the full raw-CSS → Cynosure cheat-sheet.
+
+## Reveal & collapse
+
+| I need to… | Reach for |
+|---|---|
+| Toggle a section in-place | [`Collapsible`](/components/collapsible) |
+| Multi-section toggle list | [`Accordion`](/components/accordion) |
+| Side sheet | [`Drawer`](/components/drawer) |
+| Modal / lightbox | [`Dialog`](/components/dialog) / [`AlertDialog`](/components/alert-dialog) |
+| Anchored bubble (click) | [`Popover`](/components/popover) |
+| Anchored bubble (hover, with delay & a11y) | [`HoverCard`](/components/hover-card) |
+
+## Hierarchical & tabular data
+
+| I need to… | Reach for |
+|---|---|
+| Nested folder/file-style data | [`Tree`](/components/tree) — supports custom data shapes via `getId` / `getLabel` / `getChildren` accessor props |
+| Sortable / filterable data grid | [`DataTable`](/components/data-table) |
+| Plain static table | [`Table`](/components/table) |
+| Ordered list of events | [`Timeline`](/components/timeline) |
+| Plain list | [`List`](/components/list) |
+
+## Choice & search
+
+| I need to… | Reach for |
+|---|---|
+| Pick one from a short list | [`Select`](/components/select) |
+| Pick one with type-ahead / async | [`Combobox`](/components/combobox) |
+| Pick many | [`MultiSelect`](/components/multi-select) |
+| Pick one from a *huge* list with keyboard navigation | [`CommandPalette`](/components/command-palette) |
+| Search box (with clear, loading, voice) | [`SearchInput`](/components/search-input) |
+
+## Feedback
+
+| I need to… | Reach for |
+|---|---|
+| Inline status message in a form | [`Alert`](/components/alert) / [`Callout`](/components/callout) |
+| Transient pop message | [`Toast`](/components/toast) — `import { Toaster, toast } from '@arshad-shah/cynosure-react'` (re-exports `sonner` with Cynosure theme tokens; don't import from `sonner` directly) |
+| Persistent banner in a list | [`Notification`](/components/notification) |
+| "Nothing here yet" placeholder | [`EmptyState`](/components/empty-state) |
+| Loading shimmer | [`Skeleton`](/components/skeleton) |
+
+## Typography
+
+| I need to… | Reach for |
+|---|---|
+| Page / section title | [`Heading`](/components/heading) — `color` prop accepts tokens like `fg.muted`; no need to drop to `style={{ color }}` |
+| Body text | [`Text`](/components/text) |
+| Inline code | [`Code`](/components/code) |
+| Keyboard shortcut hint | [`Kbd`](/components/kbd) |
+
+---
+
+If you reached for `style={{ display: 'flex' }}` or `style={{ overflow: 'auto' }}` recently, you probably wanted one of these. The CSS still works — Cynosure primitives just thread tokens (spacing, colour, breakpoints) through them automatically.

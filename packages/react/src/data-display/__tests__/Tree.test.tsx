@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
-import { Tree, type TreeNode } from '../Tree/index.js';
+import { Tree, type TreeNode, mapToTreeNodes } from '../Tree/index.js';
 
 const data: TreeNode[] = [
   {
@@ -156,6 +156,67 @@ describe('Tree', () => {
     expect(screen.getByText('A')).toBeInTheDocument();
   });
 
+  it('reads node fields through accessor props when provided', () => {
+    interface ApiNode {
+      uuid: string;
+      name: string;
+      subItems?: ApiNode[];
+      locked?: boolean;
+    }
+    const apiData: ApiNode[] = [
+      {
+        uuid: 'root',
+        name: 'Root',
+        subItems: [
+          { uuid: 'a', name: 'A' },
+          { uuid: 'b', name: 'B', locked: true },
+        ],
+      },
+    ];
+    const onSelectionChange = vi.fn();
+    render(
+      <Tree<ApiNode>
+        items={apiData}
+        getId={(n) => n.uuid}
+        getLabel={(n) => n.name}
+        getChildren={(n) => n.subItems}
+        getDisabled={(n) => n.locked}
+        defaultExpandedIds={['root']}
+        selectionMode="single"
+        onSelectionChange={onSelectionChange}
+      />,
+    );
+    expect(screen.getByText('Root')).toBeInTheDocument();
+    expect(screen.getByText('A')).toBeInTheDocument();
+    const items = screen.getAllByRole('treeitem');
+    const b = items.find((el) => el.getAttribute('data-tree-id') === 'b');
+    if (!b) throw new Error('missing node B');
+    expect(b).toHaveAttribute('aria-disabled', 'true');
+    fireEvent.click(b.querySelector('[data-slot="row"]') as HTMLElement);
+    expect(onSelectionChange).not.toHaveBeenCalled();
+  });
+
+  it('forwards arbitrary T into the render function', () => {
+    interface ApiNode {
+      uuid: string;
+      name: string;
+      subItems?: ApiNode[];
+    }
+    const apiData: ApiNode[] = [{ uuid: 'x', name: 'X', subItems: [{ uuid: 'y', name: 'Y' }] }];
+    render(
+      <Tree<ApiNode>
+        items={apiData}
+        getId={(n) => n.uuid}
+        getChildren={(n) => n.subItems}
+        defaultExpandedIds={['x']}
+      >
+        {({ item }) => <span data-testid={`n-${item.uuid}`}>{item.name.toUpperCase()}</span>}
+      </Tree>,
+    );
+    expect(screen.getByTestId('n-x')).toHaveTextContent('X');
+    expect(screen.getByTestId('n-y')).toHaveTextContent('Y');
+  });
+
   it('marks disabled nodes and skips selection on click', () => {
     const onSelectionChange = vi.fn();
     render(
@@ -170,5 +231,66 @@ describe('Tree', () => {
     fireEvent.click(a.querySelector('[data-slot="row"]') as HTMLElement);
     expect(onSelectionChange).not.toHaveBeenCalled();
     expect(a).toHaveAttribute('aria-disabled', 'true');
+  });
+});
+
+describe('mapToTreeNodes', () => {
+  interface ApiNode {
+    uuid: string;
+    name: string;
+    subItems?: ApiNode[];
+    locked?: boolean;
+  }
+
+  it('maps a foreign shape into TreeNode form', () => {
+    const apiData: ApiNode[] = [
+      {
+        uuid: 'root',
+        name: 'Root',
+        subItems: [
+          { uuid: 'a', name: 'A' },
+          { uuid: 'b', name: 'B', locked: true },
+        ],
+      },
+    ];
+    const mapped = mapToTreeNodes(apiData, {
+      getId: (n) => n.uuid,
+      getLabel: (n) => n.name,
+      getChildren: (n) => n.subItems,
+      getDisabled: (n) => n.locked,
+    });
+    expect(mapped).toEqual([
+      {
+        id: 'root',
+        label: 'Root',
+        children: [
+          { id: 'a', label: 'A' },
+          { id: 'b', label: 'B', disabled: true },
+        ],
+      },
+    ]);
+  });
+
+  it('omits children when the source has none', () => {
+    const result = mapToTreeNodes([{ uuid: 'x', name: 'X' } as ApiNode], {
+      getId: (n) => n.uuid,
+      getLabel: (n) => n.name,
+      getChildren: (n) => n.subItems,
+    });
+    expect(result[0]).not.toHaveProperty('children');
+  });
+
+  it('feeds mapped data straight into <Tree>', () => {
+    const apiData: ApiNode[] = [
+      { uuid: 'root', name: 'Root', subItems: [{ uuid: 'a', name: 'A' }] },
+    ];
+    const mapped = mapToTreeNodes(apiData, {
+      getId: (n) => n.uuid,
+      getLabel: (n) => n.name,
+      getChildren: (n) => n.subItems,
+    });
+    render(<Tree items={mapped} defaultExpandedIds={['root']} />);
+    expect(screen.getByText('Root')).toBeInTheDocument();
+    expect(screen.getByText('A')).toBeInTheDocument();
   });
 });

@@ -14,3 +14,5 @@ export type {
   TreeRenderItem,
   TreeSelectionMode,
 } from './Tree.js';
+export { mapToTreeNodes } from './adapters.js';
+export type { MapToTreeNodesOptions } from './adapters.js';
