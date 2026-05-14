@@ -1,0 +1,170 @@
+---
+title: Layout primitives
+description: Stack, Inline, Flex, Grid, Center, Container, ScrollArea — what each one is, and the raw-CSS pattern it replaces.
+---
+
+# Layout primitives
+
+Cynosure exposes a small set of layout primitives that wrap the most common
+flex / grid / overflow patterns. Each one threads design tokens (spacing
+scale, breakpoints, RTL direction, colour) through standard CSS, so you keep
+the mental model of CSS while picking up consistent spacing and responsive
+prop syntax for free.
+
+The table below pairs the raw CSS most devs reach for with the Cynosure
+primitive that already covers it. Use whichever reads more clearly at the
+call site — the primitives compile down to the same CSS, just with token
+plumbing and responsive variants attached.
+
+## Stack — vertical layout
+
+Vertical spacing with a single `gap` prop. Drops the need for direction +
+gap on every flex container that holds rows.
+
+```tsx
+// Raw CSS                              // Cynosure
+<div style={{                            <Stack gap="3">
+  display: 'flex',                         <p>One</p>
+  flexDirection: 'column',                 <p>Two</p>
+  gap: '0.75rem',                        </Stack>
+}}>
+  <p>One</p>
+  <p>Two</p>
+</div>
+```
+
+`gap` accepts the spacing scale (`"1"` through `"12"` and beyond) and
+responsive objects (`gap={{ base: '2', md: '4' }}`).
+
+## Inline — horizontal layout
+
+Horizontal layout with `gap`, `align` (cross axis), and `justify` (main
+axis). The default `align="center"` saves the most common flex-row dance.
+
+```tsx
+// Raw CSS                              // Cynosure
+<div style={{                            <Inline gap="2" align="center">
+  display: 'flex',                         <Icon />
+  gap: '0.5rem',                           <span>Label</span>
+  alignItems: 'center',                  </Inline>
+}}>
+  <Icon />
+  <span>Label</span>
+</div>
+```
+
+## Flex — arbitrary flex layout
+
+Use `Flex` when `Stack` / `Inline` don't fit (mixed direction by
+breakpoint, `wrap`, custom main/cross axis combinations).
+
+```tsx
+// Raw CSS                              // Cynosure
+<div style={{                            <Flex
+  display: 'flex',                         direction={{ base: 'column', md: 'row' }}
+  flexDirection: 'row',                    gap="4"
+  gap: '1rem',                             wrap="wrap"
+  flexWrap: 'wrap',                      >
+}}>                                         …
+  …                                      </Flex>
+</div>
+```
+
+## Grid — CSS Grid
+
+Concise wrapper over `display: grid`. Place children with `gridColumn` /
+`gridRow` props directly on the layout child — no inline style needed.
+
+```tsx
+// Raw CSS                              // Cynosure
+<div style={{                            <Grid columns={3} gap="4">
+  display: 'grid',                         <Box gridColumn="span 2">Wide</Box>
+  gridTemplateColumns: 'repeat(3, 1fr)',   <Box>Narrow</Box>
+  gap: '1rem',                           </Grid>
+}}>
+  <div style={{ gridColumn: 'span 2' }}>Wide</div>
+  <div>Narrow</div>
+</div>
+```
+
+`columns` accepts an integer (equal tracks) or a string for arbitrary
+templates. Grid children pick up `gridColumn`, `gridRow`, and `gridArea`
+props from `LayoutProps` (any Cynosure primitive — `Box`, `Stack`, `Text`,
+etc.).
+
+## Center — perfect centering
+
+Single-purpose flex container that centers its child on both axes. The
+clearest name for what is otherwise the third-most-googled CSS recipe.
+
+```tsx
+// Raw CSS                              // Cynosure
+<div style={{                            <Center minHeight="100vh">
+  display: 'flex',                         <Spinner />
+  alignItems: 'center',                  </Center>
+  justifyContent: 'center',
+  minHeight: '100vh',
+}}>
+  <Spinner />
+</div>
+```
+
+## Container — max-width page wrapper
+
+Caps content width and applies symmetric horizontal padding. Drop one of
+these around `main` content and forget about responsive page padding.
+
+```tsx
+// Raw CSS                              // Cynosure
+<div style={{                            <Container size="lg">
+  maxWidth: 1024,                          <Outlet />
+  marginInline: 'auto',                  </Container>
+  paddingInline: '1.5rem',
+}}>
+  <Outlet />
+</div>
+```
+
+## ScrollArea — themed overflow container
+
+Themed, cross-browser scroll container. Reach for it whenever you'd write
+`height: X; overflow: auto` — the scrollbar tracks pick up Cynosure's
+colour tokens, RTL flips, and reduced-motion preferences.
+
+```tsx
+// Raw CSS                              // Cynosure
+<div style={{                            <ScrollArea height={320}>
+  height: 320,                             {largeJsonBlob}
+  overflow: 'auto',                      </ScrollArea>
+}}>
+  {largeJsonBlob}
+</div>
+```
+
+## LayoutProps — the shared prop set
+
+Every layout primitive (and every primitive built on `Box`) accepts the
+same set of style props: spacing (`padding*`, `margin*`, `gap`), sizing
+(`width`, `height`, `min*`, `max*`), colour (`color`, `background`,
+`borderColor`), display / position, and grid-child / flex-child hints
+(`gridColumn`, `flexGrow`, `alignSelf`, …). All accept responsive objects.
+
+That means you almost never need to drop to inline `style={{ … }}` for
+layout — pass the prop, and the value resolves through design tokens
+instead of being a magic number.
+
+```tsx
+// Inline style                         // Cynosure LayoutProps
+<div style={{                            <Box
+  padding: '1rem',                         padding="4"
+  marginBlockEnd: '0.5rem',                marginBottom="2"
+  background: '#f5f5f5',                   background="surface.subtle"
+  borderRadius: 8,                         borderRadius="md"
+}}>                                      >
+  …                                        …
+</div>                                   </Box>
+```
+
+If you find yourself reaching for `style={{ display: 'flex' }}` again,
+the [intent map](/guides/intent-map) is the fastest way back into the
+component set.
