@@ -295,8 +295,8 @@ export const cellSlot = style([
     padding: 0,
     minWidth: 0,
     minHeight: 0,
-    width: '0.75rem',
-    flex: '0 0 0.75rem',
+    width: '1em',
+    flex: '0 0 1em',
     justifyContent: 'center',
     overflow: 'visible',
   },
@@ -308,7 +308,8 @@ export const cellInput = style({
   boxShadow: 'none',
   minHeight: 0,
   paddingInline: 0,
-  textAlign: 'center',
+  textAlign: 'left',
+  fontWeight: 600,
   fontFeatureSettings: '"tnum" 1',
 });
 
@@ -326,10 +327,10 @@ export const cellFieldWell = style({
 
 export const cellGlyph = style({
   fontFamily: 'var(--cynosure-font-mono-md-family, monospace)',
-  fontSize: '1em',
-  fontWeight: 600,
+  fontSize: '0.85em',
+  fontWeight: 700,
   textTransform: 'uppercase',
-  color: vars.color.foreground.subtle,
+  color: vars.color.foreground.muted,
 });
 
 /* ---------- swatches ---------- */
