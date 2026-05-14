@@ -150,4 +150,17 @@ describe('ColorPicker', () => {
     const tile = screen.getByRole('button', { name: /use color #10b981/i });
     expect(tile).toHaveAttribute('data-active', 'true');
   });
+
+  it('renders an icon-only trigger when label is explicitly null', () => {
+    render(<ColorPicker label={null} defaultValue="#6c8cff" />);
+    const trigger = screen.getByRole('button', { name: /pick a color/i });
+    expect(trigger).toBeInTheDocument();
+    expect(trigger.textContent ?? '').toBe('');
+  });
+
+  it('keeps the default "Pick a color" label when label is not passed', () => {
+    render(<ColorPicker defaultValue="#6c8cff" />);
+    const trigger = screen.getByRole('button', { name: /pick a color/i });
+    expect(trigger).toHaveTextContent(/pick a color/i);
+  });
 });
