@@ -10,20 +10,8 @@ tags: [forms, input]
 ---
 import LivePreview from '@/components/LivePreview/LivePreview.astro';
 import PropsTable from '@/components/PropsTable.astro';
-import StatusBadge from '@/components/StatusBadge.astro';
-import BundleSizePill from '@/components/BundleSizePill.astro';
-
-<div><StatusBadge status="stable" /> <BundleSizePill name="SearchInput" /></div>
 
 <LivePreview example="search-input/basic" />
-
-## Usage
-
-```tsx
-import { SearchInput } from "@arshad-shah/cynosure-react";
-
-<SearchInput aria-label="Search docs" onSearch={(q) => console.log(q)} />
-```
 
 ## Sizes
 

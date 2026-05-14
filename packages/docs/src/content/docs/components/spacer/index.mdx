@@ -1,0 +1,30 @@
+---
+title: Spacer
+description: A flex-grow filler — inserts elastic empty space between siblings inside a flex container so you don't have to reach for `justify-content`.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Empty `<div>` with `aria-hidden="true"`; never receives focus and never carries readable content.
+bundleSize: "—"
+tags: [primitive, layout, flex]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+
+<LivePreview example="spacer/basic" />
+
+## Multiple spacers
+
+Drop more than one Spacer to distribute leftover space evenly between groups. Reads better than `justify="space-between"` when group counts vary or when the structure is dynamic.
+
+<LivePreview example="spacer/multiple" />
+
+## API
+
+<PropsTable component="Spacer" />
+
+## Recipes
+
+- Toolbar with logo / nav / actions: `<Inline align="center"><Logo /><Spacer /><Nav /><Spacer /><Actions /></Inline>`.
+- Pin a footer to the bottom inside a column flex: `<Stack flex="1"><Content /><Spacer /><Footer /></Stack>`.
+- Spacer is for flex layouts only — outside a flex parent it has no effect; use margin or token-sized `Box` instead.

@@ -10,22 +10,8 @@ tags: [data-display, scroll, radix]
 ---
 import LivePreview from '@/components/LivePreview/LivePreview.astro';
 import PropsTable from '@/components/PropsTable.astro';
-import StatusBadge from '@/components/StatusBadge.astro';
-import BundleSizePill from '@/components/BundleSizePill.astro';
-
-<div><StatusBadge status="stable" /> <BundleSizePill name="ScrollArea" /></div>
 
 <LivePreview example="scroll-area/basic" />
-
-## Usage
-
-```tsx
-import { ScrollArea } from '@arshad-shah/cynosure-react';
-
-<ScrollArea height={240}>
-  Long content goes here…
-</ScrollArea>
-```
 
 ## Horizontal
 

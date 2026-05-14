@@ -10,27 +10,8 @@ tags: [data-display, disclosure, radix]
 ---
 import LivePreview from '@/components/LivePreview/LivePreview.astro';
 import PropsTable from '@/components/PropsTable.astro';
-import StatusBadge from '@/components/StatusBadge.astro';
-import BundleSizePill from '@/components/BundleSizePill.astro';
-
-<div><StatusBadge status="stable" /> <BundleSizePill name="Collapsible" /></div>
 
 <LivePreview example="collapsible/basic" />
-
-## Usage
-
-```tsx
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '@arshad-shah/cynosure-react';
-
-<Collapsible>
-  <CollapsibleTrigger>Show more</CollapsibleTrigger>
-  <CollapsibleContent>Hidden details go here.</CollapsibleContent>
-</Collapsible>
-```
 
 ## Default open
 

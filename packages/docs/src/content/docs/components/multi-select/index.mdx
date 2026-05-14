@@ -10,27 +10,8 @@ tags: [forms, input]
 ---
 import LivePreview from '@/components/LivePreview/LivePreview.astro';
 import PropsTable from '@/components/PropsTable.astro';
-import StatusBadge from '@/components/StatusBadge.astro';
-import BundleSizePill from '@/components/BundleSizePill.astro';
-
-<div><StatusBadge status="stable" /> <BundleSizePill name="MultiSelect" /></div>
 
 <LivePreview example="multi-select/basic" />
-
-## Usage
-
-```tsx
-import { MultiSelect } from "@arshad-shah/cynosure-react";
-
-<MultiSelect
-  aria-label="Frameworks"
-  items={[
-    { value: "react", label: "React" },
-    { value: "vue", label: "Vue" },
-  ]}
-  defaultValue={["react"]}
-/>
-```
 
 ## Sizes
 

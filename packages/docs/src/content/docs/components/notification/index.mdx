@@ -10,20 +10,8 @@ tags: [feedback, notification, status]
 ---
 import LivePreview from '@/components/LivePreview/LivePreview.astro';
 import PropsTable from '@/components/PropsTable.astro';
-import StatusBadge from '@/components/StatusBadge.astro';
-import BundleSizePill from '@/components/BundleSizePill.astro';
-
-<div><StatusBadge status="stable" /> <BundleSizePill name="Notification" /></div>
 
 <LivePreview example="notification/basic" />
-
-## Usage
-
-```tsx
-import { Notification } from '@arshad-shah/cynosure-react';
-
-<Notification title="Saved" description="Your changes have been saved." />
-```
 
 ## With icon and timestamp
 

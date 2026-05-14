@@ -10,25 +10,8 @@ tags: [forms]
 ---
 import LivePreview from '@/components/LivePreview/LivePreview.astro';
 import PropsTable from '@/components/PropsTable.astro';
-import StatusBadge from '@/components/StatusBadge.astro';
-import BundleSizePill from '@/components/BundleSizePill.astro';
-
-<div><StatusBadge status="stable" /> <BundleSizePill name="RangeSlider" /></div>
 
 <LivePreview example="range-slider/basic" />
-
-## Usage
-
-```tsx
-import { RangeSlider } from "@arshad-shah/cynosure-react";
-
-<RangeSlider
-  label="Price"
-  defaultValue={[20, 80]}
-  minValue={0}
-  maxValue={100}
-/>
-```
 
 ## Sizes
 

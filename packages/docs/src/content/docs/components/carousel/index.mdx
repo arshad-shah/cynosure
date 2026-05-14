@@ -10,38 +10,8 @@ tags: [data-display, carousel, embla]
 ---
 import LivePreview from '@/components/LivePreview/LivePreview.astro';
 import PropsTable from '@/components/PropsTable.astro';
-import StatusBadge from '@/components/StatusBadge.astro';
-import BundleSizePill from '@/components/BundleSizePill.astro';
-
-<div><StatusBadge status="stable" /> <BundleSizePill name="Carousel" /></div>
 
 <LivePreview example="carousel/basic" />
-
-## Usage
-
-```tsx
-import {
-  Carousel,
-  CarouselContainer,
-  CarouselDots,
-  CarouselNext,
-  CarouselPrevious,
-  CarouselSlide,
-  CarouselViewport,
-} from '@arshad-shah/cynosure-react';
-
-<Carousel>
-  <CarouselViewport>
-    <CarouselContainer>
-      <CarouselSlide>Slide 1</CarouselSlide>
-      <CarouselSlide>Slide 2</CarouselSlide>
-    </CarouselContainer>
-  </CarouselViewport>
-  <CarouselPrevious />
-  <CarouselNext />
-  <CarouselDots />
-</Carousel>
-```
 
 ## Slides per view
 

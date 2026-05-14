@@ -10,29 +10,8 @@ tags: [overlay, preview, accessible]
 ---
 import LivePreview from '@/components/LivePreview/LivePreview.astro';
 import PropsTable from '@/components/PropsTable.astro';
-import StatusBadge from '@/components/StatusBadge.astro';
-import BundleSizePill from '@/components/BundleSizePill.astro';
-
-<div><StatusBadge status="stable" /> <BundleSizePill name="HoverCard" /></div>
 
 <LivePreview example="hover-card/basic" />
-
-## Usage
-
-```tsx
-import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from "@arshad-shah/cynosure-react";
-
-<HoverCard>
-  <HoverCardTrigger asChild>
-    <a href="/users/jane">@jane</a>
-  </HoverCardTrigger>
-  <HoverCardContent>Profile preview</HoverCardContent>
-</HoverCard>
-```
 
 ## Variants
 

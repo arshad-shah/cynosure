@@ -10,25 +10,8 @@ tags: [forms]
 ---
 import LivePreview from "@/components/LivePreview/LivePreview.astro";
 import PropsTable from "@/components/PropsTable.astro";
-import StatusBadge from "@/components/StatusBadge.astro";
-import BundleSizePill from "@/components/BundleSizePill.astro";
-
-<div><StatusBadge status="stable" /> <BundleSizePill name="Fieldset" /></div>
 
 <LivePreview example="fieldset/basic" />
-
-## Usage
-
-```tsx
-import { Fieldset, Input, Label, Stack } from "@arshad-shah/cynosure-react";
-
-<Fieldset legend="Contact details">
-  <Stack gap="3">
-    <Label htmlFor="email">Email</Label>
-    <Input id="email" type="email" />
-  </Stack>
-</Fieldset>
-```
 
 ## With legend
 

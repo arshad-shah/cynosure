@@ -10,33 +10,8 @@ tags: [feedback, empty, onboarding]
 ---
 import LivePreview from '@/components/LivePreview/LivePreview.astro';
 import PropsTable from '@/components/PropsTable.astro';
-import StatusBadge from '@/components/StatusBadge.astro';
-import BundleSizePill from '@/components/BundleSizePill.astro';
-
-<div><StatusBadge status="stable" /> <BundleSizePill name="EmptyState" /></div>
 
 <LivePreview example="empty-state/basic" />
-
-## Usage
-
-```tsx
-import {
-  EmptyState,
-  EmptyStateIcon,
-  EmptyStateTitle,
-  EmptyStateDescription,
-  EmptyStateActions,
-} from '@arshad-shah/cynosure-react';
-
-<EmptyState>
-  <EmptyStateIcon>{/* decorative svg */}</EmptyStateIcon>
-  <EmptyStateTitle>No items yet</EmptyStateTitle>
-  <EmptyStateDescription>Create your first item to get started.</EmptyStateDescription>
-  <EmptyStateActions>
-    <Button>New item</Button>
-  </EmptyStateActions>
-</EmptyState>
-```
 
 ## Sizes
 

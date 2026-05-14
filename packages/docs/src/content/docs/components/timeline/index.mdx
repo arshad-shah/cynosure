@@ -10,35 +10,8 @@ tags: [data-display, timeline, activity]
 ---
 import LivePreview from '@/components/LivePreview/LivePreview.astro';
 import PropsTable from '@/components/PropsTable.astro';
-import StatusBadge from '@/components/StatusBadge.astro';
-import BundleSizePill from '@/components/BundleSizePill.astro';
-
-<div><StatusBadge status="stable" /> <BundleSizePill name="Timeline" /></div>
 
 <LivePreview example="timeline/basic" />
-
-## Usage
-
-```tsx
-import {
-  Timeline,
-  TimelineConnector,
-  TimelineContent,
-  TimelineDot,
-  TimelineItem,
-  TimelineSeparator,
-} from '@arshad-shah/cynosure-react';
-
-<Timeline>
-  <TimelineItem>
-    <TimelineSeparator>
-      <TimelineDot />
-      <TimelineConnector />
-    </TimelineSeparator>
-    <TimelineContent>Signed up</TimelineContent>
-  </TimelineItem>
-</Timeline>
-```
 
 ## Sizes
 

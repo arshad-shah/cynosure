@@ -10,28 +10,8 @@ tags: [forms, button]
 ---
 import LivePreview from "@/components/LivePreview/LivePreview.astro";
 import PropsTable from "@/components/PropsTable.astro";
-import StatusBadge from "@/components/StatusBadge.astro";
-import BundleSizePill from "@/components/BundleSizePill.astro";
-
-<div><StatusBadge status="stable" /> <BundleSizePill name="IconButton" /></div>
 
 <LivePreview example="icon-button/basic" />
-
-## Usage
-
-```tsx
-import { IconButton } from "@arshad-shah/cynosure-react";
-
-<IconButton
-  label="Close"
-  icon={
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <line x1="18" y1="6" x2="6" y2="18" />
-      <line x1="6" y1="6" x2="18" y2="18" />
-    </svg>
-  }
-/>
-```
 
 ## Variants
 

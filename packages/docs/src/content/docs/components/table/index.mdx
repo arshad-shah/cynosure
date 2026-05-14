@@ -11,40 +11,8 @@ tags: [data-display, table, accessible]
 ---
 import LivePreview from '@/components/LivePreview/LivePreview.astro';
 import PropsTable from '@/components/PropsTable.astro';
-import StatusBadge from '@/components/StatusBadge.astro';
-import BundleSizePill from '@/components/BundleSizePill.astro';
-
-<div><StatusBadge status="stable" /> <BundleSizePill name="Table" /></div>
 
 <LivePreview example="table/basic" />
-
-## Usage
-
-```tsx
-import {
-  Table,
-  TableHead,
-  TableBody,
-  TableRow,
-  TableHeader,
-  TableCell,
-} from '@arshad-shah/cynosure-react';
-
-<Table>
-  <TableHead>
-    <TableRow>
-      <TableHeader>Name</TableHeader>
-      <TableHeader>Role</TableHeader>
-    </TableRow>
-  </TableHead>
-  <TableBody>
-    <TableRow>
-      <TableCell>Alice</TableCell>
-      <TableCell>Engineer</TableCell>
-    </TableRow>
-  </TableBody>
-</Table>
-```
 
 ## Variants
 

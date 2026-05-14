@@ -10,20 +10,8 @@ tags: [forms]
 ---
 import LivePreview from '@/components/LivePreview/LivePreview.astro';
 import PropsTable from '@/components/PropsTable.astro';
-import StatusBadge from '@/components/StatusBadge.astro';
-import BundleSizePill from '@/components/BundleSizePill.astro';
-
-<div><StatusBadge status="stable" /> <BundleSizePill name="Rating" /></div>
 
 <LivePreview example="rating/basic" />
-
-## Usage
-
-```tsx
-import { Rating } from "@arshad-shah/cynosure-react";
-
-<Rating label="Product rating" defaultValue={3} max={5} />
-```
 
 ## Sizes
 

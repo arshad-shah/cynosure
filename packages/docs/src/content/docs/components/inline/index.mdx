@@ -1,0 +1,40 @@
+---
+title: Inline
+description: Horizontal layout primitive — a wrapping flex row with token-driven `gap`, `align`, and `justify`. Reach for it whenever you need things to flow left-to-right (RTL-safe — flows right-to-left under `dir="rtl"`) with consistent spacing.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Plain `<div>`; the visual ordering matches DOM order so screen readers and keyboard tab-stops follow what you see. Wraps cleanly under `dir="rtl"`.
+bundleSize: "—"
+tags: [primitive, layout, flex]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+
+<LivePreview example="inline/basic" />
+
+## Gap
+
+`gap` accepts any space token (or a responsive map). Use `rowGap` / `columnGap` independently when the row distance should differ from the column distance after wrapping.
+
+## Align and justify
+
+`align` is the cross-axis (vertical) alignment, `justify` is the main-axis (horizontal) distribution. Use `justify="between"` for toolbar-style "left items / right items" rows.
+
+<LivePreview example="inline/justify" />
+
+## Wrapping
+
+By default `wrap="wrap"` lets children flow onto a new line when the row overflows. Switch to `wrap="nowrap"` to force a single row that scrolls or clips.
+
+<LivePreview example="inline/wrap" />
+
+## API
+
+<PropsTable component="Inline" />
+
+## Recipes
+
+- Toolbar / header bar: `<Inline justify="between" align="center" />` with `<Spacer />` between groups.
+- Tag clouds: see `Wrap` — it's the wrap-first variant of `Inline` tuned for variable-width chips.
+- For vertical flow inside an Inline (e.g. label above value pairs), nest a `<Stack>` for each pair.

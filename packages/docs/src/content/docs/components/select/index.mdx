@@ -11,23 +11,8 @@ tags: [form, input]
 ---
 import LivePreview from '@/components/LivePreview/LivePreview.astro';
 import PropsTable from '@/components/PropsTable.astro';
-import StatusBadge from '@/components/StatusBadge.astro';
-import BundleSizePill from '@/components/BundleSizePill.astro';
-
-<div><StatusBadge status="stable" /> <BundleSizePill name="Select" /></div>
 
 <LivePreview example="select/basic" />
-
-## Usage
-
-```tsx
-import { Select } from '@arshad-shah/cynosure-react';
-
-<Select
-  aria-label="Country"
-  items={[{ value: 'ie', label: 'Ireland' }, { value: 'uk', label: 'UK' }]}
-/>
-```
 
 ## Grouped options
 

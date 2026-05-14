@@ -1,0 +1,42 @@
+---
+title: Indicator
+description: A small dot or pill that decorates another element — unread counts on icons, status dots on avatars, "new" markers on nav items. Wraps any single child without changing its layout.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Pass `aria-label` (e.g. `"3 unread messages"`) when the indicator conveys information not present elsewhere in the DOM. The wrapped child stays the primary interactive target.
+bundleSize: "—"
+tags: [feedback, status]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+
+<LivePreview example="indicator/basic" />
+
+## Dot variant
+
+Set `dot` to drop the content and render a small filled dot — the right fit for "has activity" / online-status decorations on avatars and nav icons.
+
+<LivePreview example="indicator/dot" />
+
+## Colour schemes
+
+`colorScheme` accepts `accent`, `success`, `warning`, `danger`, `info`, `neutral`. Pair semantics with colour: `danger` for unread / critical, `success` for online, `warning` for attention, `accent` for new / featured.
+
+<LivePreview example="indicator/colors" />
+
+## Placement
+
+`placement` accepts `top-start`, `top-end` (default), `bottom-start`, `bottom-end`. Use `offset` to nudge the indicator inward when it should sit inside the child rather than spilling over the edge.
+
+<LivePreview example="indicator/placement" />
+
+## API
+
+<PropsTable component="Indicator" />
+
+## Recipes
+
+- Unread count on an icon button: `<Indicator content={count} colorScheme="danger" hideOn={(c) => !c}><IconButton ... /></Indicator>` — the `hideOn` predicate keeps the indicator off the DOM when the count is zero.
+- Avatar online status: `<Indicator dot colorScheme="success" placement="bottom-end"><Avatar ... /></Indicator>`.
+- Always pair counts with an `aria-label` describing the meaning so AT users get more than just the number.

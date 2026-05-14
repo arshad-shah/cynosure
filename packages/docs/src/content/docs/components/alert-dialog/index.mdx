@@ -10,49 +10,8 @@ tags: [overlay, modal, confirmation, accessible]
 ---
 import LivePreview from '@/components/LivePreview/LivePreview.astro';
 import PropsTable from '@/components/PropsTable.astro';
-import StatusBadge from '@/components/StatusBadge.astro';
-import BundleSizePill from '@/components/BundleSizePill.astro';
-
-<div><StatusBadge status="stable" /> <BundleSizePill name="AlertDialog" /></div>
 
 <LivePreview example="alert-dialog/basic" />
-
-## Usage
-
-```tsx
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-  Button,
-} from "@arshad-shah/cynosure-react";
-
-<AlertDialog>
-  <AlertDialogTrigger asChild>
-    <Button variant="solid" colorScheme="danger">Delete</Button>
-  </AlertDialogTrigger>
-  <AlertDialogContent>
-    <AlertDialogHeader>
-      <AlertDialogTitle>Delete this item?</AlertDialogTitle>
-      <AlertDialogDescription>This cannot be undone.</AlertDialogDescription>
-    </AlertDialogHeader>
-    <AlertDialogFooter>
-      <AlertDialogCancel asChild>
-        <Button variant="ghost">Cancel</Button>
-      </AlertDialogCancel>
-      <AlertDialogAction asChild>
-        <Button variant="solid" colorScheme="danger">Delete</Button>
-      </AlertDialogAction>
-    </AlertDialogFooter>
-  </AlertDialogContent>
-</AlertDialog>
-```
 
 ## Variants
 

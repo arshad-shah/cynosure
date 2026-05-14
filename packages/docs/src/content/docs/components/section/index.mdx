@@ -1,0 +1,36 @@
+---
+title: Section
+description: A semantic `<section>` with a `space` preset for vertical padding. Pairs naturally with `Container` to compose evenly-spaced page sections without bespoke padding math.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Renders the native `<section>` element so each section is a landmark for AT. Always provide a label — `aria-labelledby` pointing at the section's heading is the most accessible option, or `aria-label` when there is no heading.
+bundleSize: "—"
+tags: [primitive, layout]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+
+<LivePreview example="section/basic" />
+
+## Space presets
+
+`space` controls the section's vertical padding: `sm`, `md` (default), `lg`, `xl`. Use `lg` or `xl` for marketing pages; `sm` for compact tools.
+
+<LivePreview example="section/space" />
+
+## Nesting with Container
+
+The canonical composition is `<Section><Container>...</Container></Section>`: Section owns vertical rhythm, Container owns horizontal measure. Together they produce the standard "padded, centered" page section.
+
+<LivePreview example="section/with-container" />
+
+## API
+
+<PropsTable component="Section" />
+
+## Recipes
+
+- Landing-page sections: `<Section space="xl" aria-labelledby="cta-heading"><Container size="lg">...</Container></Section>`.
+- Dashboard panels: `<Section space="sm">` keeps panels visually distinct without inflating the page.
+- Alternate background colours per section via `background="bg.subtle"` to delineate without dividers.

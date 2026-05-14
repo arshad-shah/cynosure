@@ -10,24 +10,8 @@ tags: [data-display, metric, kpi]
 ---
 import LivePreview from '@/components/LivePreview/LivePreview.astro';
 import PropsTable from '@/components/PropsTable.astro';
-import StatusBadge from '@/components/StatusBadge.astro';
-import BundleSizePill from '@/components/BundleSizePill.astro';
-
-<div><StatusBadge status="stable" /> <BundleSizePill name="Stat" /></div>
 
 <LivePreview example="stat/basic" />
-
-## Usage
-
-```tsx
-import { Stat, StatHelp, StatLabel, StatValue } from '@arshad-shah/cynosure-react';
-
-<Stat>
-  <StatLabel>Monthly revenue</StatLabel>
-  <StatValue>$48,290</StatValue>
-  <StatHelp>Up from $42,960 last month</StatHelp>
-</Stat>
-```
 
 ## With trend arrow
 

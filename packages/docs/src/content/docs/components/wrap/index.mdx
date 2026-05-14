@@ -1,0 +1,36 @@
+---
+title: Wrap
+description: Wrapping inline layout. Like `Inline` but each child gets uniform `gap` whether or not lines wrap — the right fit for tag clouds, chip rows, and lists of variable-width buttons.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Plain `<div>`; preserves child semantics. The visual ordering matches DOM order so keyboard tab-stops follow what you see.
+bundleSize: "—"
+tags: [primitive, layout, flex]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+
+<LivePreview example="wrap/basic" />
+
+## Independent row + column gap
+
+`gap` controls both axes equally. Use `rowGap` and `columnGap` independently when the row distance should differ from the column distance after wrapping — common in tag clouds where a tighter column gap and a looser row gap reads cleanly.
+
+<LivePreview example="wrap/row-column-gap" />
+
+## Align and justify
+
+`align` controls cross-axis alignment of items within a row; `justify` distributes items along the main axis. `align="center"` keeps mixed-height chips visually centered after wrapping.
+
+<LivePreview example="wrap/justify" />
+
+## API
+
+<PropsTable component="Wrap" />
+
+## Recipes
+
+- Tag list: `<Wrap gap="2">{tags.map((t) => <Chip key={t}>{t}</Chip>)}</Wrap>`.
+- Filter bar: combine `Wrap` with `Chip` + `Checkbox` items so the bar reflows naturally on narrow viewports.
+- For predictable column layouts (cards in a grid), prefer `SimpleGrid` — Wrap is for variable-width items where the column count is data-driven.

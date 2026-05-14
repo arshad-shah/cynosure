@@ -7,6 +7,190 @@ category: changelog
 
 # @arshad-shah/cynosure-react
 
+## 3.0.0
+
+### Major Changes
+
+- [#63](https://github.com/arshad-shah/cynosure/pull/63) [`f972e95`](https://github.com/arshad-shah/cynosure/commit/f972e958a122c68a6f93daaceb3314a3ac208c86) Thanks [@arshad-shah](https://github.com/arshad-shah)! - Remove `Banner`, `BannerContent`, and `BannerActions`. Banner duplicated `Alert` —
+  same status surface recipe, same dismissal model, same content/actions slots — and
+  the dual API created confusion about which to reach for. Migrate to `Alert` (with
+  `AlertTitle` / `AlertDescription`); for the full-bleed look, wrap an `Alert` in a
+  container with `border-radius: 0` and full width.
+
+  The `@arshad-shah/cynosure-react/banner` subpath export and the
+  `clearBannerDismissal` helper are also removed.
+
+### Minor Changes
+
+- [#63](https://github.com/arshad-shah/cynosure/pull/63) [`f972e95`](https://github.com/arshad-shah/cynosure/commit/f972e958a122c68a6f93daaceb3314a3ac208c86) Thanks [@arshad-shah](https://github.com/arshad-shah)! - Polish `ColorPicker` into a fully-featured form component. Adds:
+  - `size="sm" | "md" | "lg"` — drives panel width, area height, slider
+    thickness, thumb size, and channel-cell density, so the same component
+    covers compact toolbars, default forms, and prominent design surfaces.
+  - `variant="popover" | "inline"` — popover stays the default; inline drops
+    the trigger and renders the picker body in place inside a bordered surface.
+  - `alpha` — opt-in alpha slider; uses RAC's `defaultStyle` render-prop so the
+    color gradient composes with a checker layer correctly.
+  - `swatches` + `onSwatchesChange` — controlled saved-color palette with a
+    "save current" affordance (capped by `maxSwatches`).
+  - Segmented HEX / RGB / HSL toggle now drives **slot-based channel cells**
+    instead of one text input: hex mode shows `#` + value, RGB/HSL split across
+    one tiny numeric cell per channel (with alpha cell when enabled). Each cell
+    is a Cynosure-styled well with a mono glyph + per-channel `ColorField`, so
+    invalid input snaps back on blur and `aria-label` per channel is correct.
+  - `defaultFormat` — pick which format the toggle starts on.
+  - Browser eyedropper (`eyedropper`, default `true`), feature-detected via
+    `window.EyeDropper`; copy-to-clipboard with a transient check icon — both
+    now sit in a right-aligned toolbar next to the format toggle.
+  - SB area gets `cursor: crosshair`, area + slider thumbs get
+    `cursor: grab` / `[data-dragging]` → `grabbing` for parity.
+
+  Internals now compose `IconButton`, `ToggleGroup`, `Inline`, `Text`,
+  `ColorSwatch`, and per-channel `ColorField`s instead of emitting raw DOM, so
+  token/style changes flow through the rest of the library. The existing
+  `children` escape hatch and all previous props are preserved.
+
+  Value props now also accept a string (e.g. `value="#6366F1"`) in addition to
+  a RAC `Color`, parsed internally.
+
+- [#63](https://github.com/arshad-shah/cynosure/pull/63) [`f972e95`](https://github.com/arshad-shah/cynosure/commit/f972e958a122c68a6f93daaceb3314a3ac208c86) Thanks [@arshad-shah](https://github.com/arshad-shah)! - Add `@arshad-shah/cynosure-react/fonts.css` — a one-line, opt-in webfont
+  loader that registers Geist Variable (sans) and JetBrains Mono Variable
+  (mono), the families the default token font stacks resolve to.
+
+  ```ts
+  import "@arshad-shah/cynosure-react/all.css";
+  import "@arshad-shah/cynosure-react/fonts.css"; // optional
+  ```
+
+  Kept separate from `all.css` so consumers with their own font pipeline
+  (`next/font`, self-hosted, CDN) don't pay the ~400 KB woff2 cost. The
+  token font stacks still fall through to system fonts when the import is
+  omitted.
+
+### Patch Changes
+
+- [#63](https://github.com/arshad-shah/cynosure/pull/63) [`f972e95`](https://github.com/arshad-shah/cynosure/commit/f972e958a122c68a6f93daaceb3314a3ac208c86) Thanks [@arshad-shah](https://github.com/arshad-shah)! - Refactor `Alert` to compose from Cynosure primitives instead of bespoke CSS.
+  The body slot now uses `Stack` for column layout/gap, and `AlertTitle` /
+  `AlertDescription` render through `Text` (with `size="md" weight="semibold"`
+  and `size="sm"` respectively), so typography stays on-token without each
+  component re-encoding font weight/size/line-height. Drops the
+  now-unused `surfaceContent`, `surfaceTitle`, and `surfaceDescription` styles
+  from the shared feedback surface recipe. No public API changes.
+
+- [#63](https://github.com/arshad-shah/cynosure/pull/63) [`f972e95`](https://github.com/arshad-shah/cynosure/commit/f972e958a122c68a6f93daaceb3314a3ac208c86) Thanks [@arshad-shah](https://github.com/arshad-shah)! - Fix `padding`, `margin`, `overflow`, and `gap` props silently resolving to
+  zero on every layout primitive that composes `layoutPropsStyle`.
+
+  When the `@property` fix made layout vars non-inheriting, an unset var
+  started resolving to "invalid at computed value time" → revert to the
+  property's initial value. The shared `layoutPropsStyle` rule sets the
+  shorthand (`padding: var(--cynosure-lp-p-base)`) followed by every
+  longhand (`padding-inline`, `padding-top`, …) bound to its own var. When
+  a consumer set only `padding="8"`, the longhand vars were unset, each
+  longhand declaration reverted to 0, and clobbered the shorthand expansion.
+  `Grid`, `Flex`, `Inline` had the same bug for `gap` ↔ `column-gap` /
+  `row-gap`.
+  - Longhand declarations in `layoutPropsStyle` now fall back through the
+    CSS shorthand hierarchy: `padding-top → padding-block → padding`,
+    `padding-right → padding-inline → padding`, and the mirror for margin.
+    `overflow-x` / `overflow-y` fall back to `overflow`.
+  - `Grid`, `Flex`, `Inline` drop their `gap` shorthand CSS rule entirely;
+    the `gap` prop now writes both longhand vars from the component so the
+    remaining `row-gap` / `column-gap` declarations always have a value to
+    resolve to.
+  - `flex` shorthand vs `flex-grow` / `flex-shrink` / `flex-basis` longhands
+    remains unresolved — the shorthand string ("1 0 auto") can't substitute
+    as a fallback for the individual numeric longhands. Use one or the
+    other on the same element for now; a follow-up will runtime-split
+    `flex` into individual longhand var emissions.
+
+- [#63](https://github.com/arshad-shah/cynosure/pull/63) [`f972e95`](https://github.com/arshad-shah/cynosure/commit/f972e958a122c68a6f93daaceb3314a3ac208c86) Thanks [@arshad-shah](https://github.com/arshad-shah)! - Fix `DataTable` loading-state hydration mismatch. The skeleton cells used
+  `Math.random()` at render time to vary their widths, so the server and
+  client rendered different markup — React logged a hydration warning and
+  the widths visibly snapped on mount. Widths are now derived
+  deterministically from each cell's `(rowIdx, colIdx)`, so SSR and the
+  first client paint match.
+
+- [#63](https://github.com/arshad-shah/cynosure/pull/63) [`f972e95`](https://github.com/arshad-shah/cynosure/commit/f972e958a122c68a6f93daaceb3314a3ac208c86) Thanks [@arshad-shah](https://github.com/arshad-shah)! - Fix `color` and `grow` props on layout primitives clobbering each other.
+  Both were emitting to the same custom property (`--cynosure-lp-fg`), so
+  `<Box color="fg.muted" grow="1">` only applied whichever was emitted last.
+  `flex-grow` now uses `--cynosure-lp-grow-{bp}`; `color` keeps `--cynosure-lp-fg`.
+
+- [#63](https://github.com/arshad-shah/cynosure/pull/63) [`f972e95`](https://github.com/arshad-shah/cynosure/commit/f972e958a122c68a6f93daaceb3314a3ac208c86) Thanks [@arshad-shah](https://github.com/arshad-shah)! - Fix `position`/`top`/`right`/`bottom`/`left`/`width`/etc. on layout primitives
+  leaking onto descendants. Layout props are driven by CSS custom properties,
+  which inherit by default; setting `<Flex position="fixed" top="0">` on a
+  shell was silently applying the same `position: fixed; top: 0` to every
+  descendant, collapsing the whole subtree to one rectangle. The build now
+  emits `@property … { inherits: false }` for every layout var so each one is
+  element-scoped.
+
+  Also fixes the layout primitives' `display` defaults (`Flex`, `Stack`,
+  `Inline`, `Grid`, `Center`, `Section`) being silently reverted by duplicated
+  `layoutPropsStyle` emissions later in the bundled stylesheet. Display is now
+  driven through the shared `--cynosure-lp-d-*` variable so the per-primitive
+  default survives the cascade.
+
+- [#63](https://github.com/arshad-shah/cynosure/pull/63) [`f972e95`](https://github.com/arshad-shah/cynosure/commit/f972e958a122c68a6f93daaceb3314a3ac208c86) Thanks [@arshad-shah](https://github.com/arshad-shah)! - Rebuild `Menu` internally on top of Cynosure primitives — public API and
+  visual surface unchanged.
+  - `Menu` and `MenuGroup` layouts now use `Stack` / `Inline` instead of
+    hand-rolled `display: flex` blocks.
+  - `MenuGroup` collapse is delegated to `Collapsible` (Radix), so
+    `aria-expanded`, `aria-controls`, and `data-state` are wired automatically
+    and stay in lockstep with the trigger.
+  - `MenuDivider` delegates to `Divider`, picking up consistent tone / spacing /
+    dark-mode rules.
+  - `MenuItem`'s `badge` slot renders through `<Badge variant="ghost"
+colorScheme="neutral" size="xs">`, so menu badges follow the same
+    size / shape / theming rules as every other badge in the library.
+  - Group bodies expose `role="group"` + `aria-labelledby` when a `label` is
+    set, so screen readers announce the group as named.
+  - `MenuItem` `aria-disabled` is now always emitted alongside the native
+    `disabled` attribute.
+  - Focus rings switched from a hand-rolled 2px box-shadow to the
+    `vars.shadow.focusRing` token, matching `Link` / `Button`.
+  - Fixed `MenuItem asChild`: now uses the `Slot` + `Slottable` pattern (same as
+    `Button`), so the consumer-provided element (e.g. a router `<a>`) becomes
+    the item and `icon` / `badge` / `iconRight` render as siblings instead of
+    being nested inside the label span.
+
+- [#63](https://github.com/arshad-shah/cynosure/pull/63) [`f972e95`](https://github.com/arshad-shah/cynosure/commit/f972e958a122c68a6f93daaceb3314a3ac208c86) Thanks [@arshad-shah](https://github.com/arshad-shah)! - `NavigationMenu`: fix layering bug, animate content panels even without a
+  shared viewport, and tighten visual chrome — public API unchanged.
+  - **Fix `z-index: NaN`.** `NavigationMenuContent` was emitting `z-index: NaN`
+    (invalid; browsers rejected the declaration). Content panels effectively had
+    `z-index: auto` and could disappear under sticky headers or sibling
+    overlays. The CSS var is now passed through directly so the panel sits on
+    the `--cynosure-z-dropdown` layer like the rest of the dropdown family.
+  - **Animate without a viewport.** Open/close animations were gated on
+    `data-motion`, which Radix only emits when a `<NavigationMenuViewport>` is
+    mounted. Panels without a viewport flashed open. The selectors now key off
+    `data-state="open" | "closed"`, so both configurations animate.
+  - **Trigger sizing.** `ChevronDown` was rendering at its default 24 px,
+    inflating the trigger to 41 px tall. Sized to 14 px; trigger settles to
+    ~33 px with the chevron centered on the cap height.
+  - **Token-consistent focus.** Trigger / link focus rings replaced hand-rolled
+    `0 0 0 2px accent.ring` with `vars.shadow.focusRing`, matching `Link`,
+    `Button`, and the rest of the library.
+  - **Smooth hover.** Added `transition: background-color, color` (duration
+    `vars.duration.fast`, suppressed under `[data-cynosure-reduced-motion]`) to
+    trigger and link.
+  - **Focus on the panel.** `NavigationMenuContent` now shows a focus ring when
+    it receives focus (Radix moves focus into the panel on open); keyboard users
+    previously had no indicator on the panel itself.
+
+- [#63](https://github.com/arshad-shah/cynosure/pull/63) [`f972e95`](https://github.com/arshad-shah/cynosure/commit/f972e958a122c68a6f93daaceb3314a3ac208c86) Thanks [@arshad-shah](https://github.com/arshad-shah)! - Add `homepage`, `repository`, `bugs`, and `keywords` to all publishable
+  packages so the npm package pages render the GitHub source link, issue
+  tracker, and Storybook URL (`https://cynosure.arshadshah.com`) in their
+  sidebars. Pure metadata — no runtime or API changes.
+
+- [#63](https://github.com/arshad-shah/cynosure/pull/63) [`f972e95`](https://github.com/arshad-shah/cynosure/commit/f972e958a122c68a6f93daaceb3314a3ac208c86) Thanks [@arshad-shah](https://github.com/arshad-shah)! - Fix `Kbd`, `Code` (block variant), `Link`, `Blockquote` (attribution), and
+  `List` (ordered/unordered + description) silently reverting to their UA
+  default `display` when the bundled stylesheet emitted a duplicated
+  `layoutPropsStyle` rule after their class. Each now drives `display` through
+  the same `--cynosure-lp-d-*` variable used by `Flex`/`Stack`/`Inline`/etc.,
+  so the per-primitive default survives the cascade and user `display="…"`
+  overrides still win via inline style.
+- Updated dependencies [[`f972e95`](https://github.com/arshad-shah/cynosure/commit/f972e958a122c68a6f93daaceb3314a3ac208c86)]:
+  - @arshad-shah/cynosure-core@3.0.0
+  - @arshad-shah/cynosure-tokens@3.0.0
+
 ## 2.1.0
 
 ### Minor Changes

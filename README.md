@@ -8,8 +8,8 @@ Cynosure is a headless-at-the-core, themed-on-top component library built around
 [![license](https://img.shields.io/npm/l/@arshad-shah/cynosure-react.svg)](./LICENSE)
 [![bundle](https://img.shields.io/bundlephobia/minzip/@arshad-shah/cynosure-react.svg?label=minzip)](https://bundlephobia.com/package/@arshad-shah/cynosure-react)
 [![types](https://img.shields.io/npm/types/@arshad-shah/cynosure-react.svg)](https://www.npmjs.com/package/@arshad-shah/cynosure-react)
-[![react](https://img.shields.io/badge/react-18%20%7C%2019-61dafb?logo=react&logoColor=white)](./docs/foundations/rsc.mdx)
-[![a11y](https://img.shields.io/badge/WCAG-2.2%20AA-0b8043)](./docs/foundations/accessibility.mdx)
+[![react](https://img.shields.io/badge/react-18%20%7C%2019-61dafb?logo=react&logoColor=white)](https://cynosure.arshadshah.com/getting-started/rsc/)
+[![a11y](https://img.shields.io/badge/WCAG-2.2%20AA-0b8043)](https://cynosure.arshadshah.com/foundations/accessibility/)
 
 ---
 
@@ -52,7 +52,7 @@ Peer requirements: **React 18 or 19** (`react`, `react-dom`). `react-hook-form` 
 
 ## Why Cynosure
 
-- **90+ components** across layout, typography, forms, overlays, navigation, data display, and feedback — all pre-styled, all themeable.
+- **102 components** with dedicated subpath exports across layout, typography, forms, overlays, navigation, data display, and feedback — all pre-styled, all themeable. Full inventory in [`components.config.mjs`](./components.config.mjs).
 - **Zero-config DX.** One CSS import, one provider, works out of the box with Next.js App Router, Vite, Remix, and CRA.
 - **WCAG 2.2 AA** across every component. Every story is locked to axe-passing. RTL-safe, keyboard complete, reduced-motion honoured.
 - **Pay for what you import.** Per-component ESM entries (`@arshad-shah/cynosure-react/button`) and per-component CSS — your bundler keeps the rest.
@@ -87,7 +87,7 @@ Run `pnpm size` locally to verify against current master.
 
 Cynosure is RSC-aware. Structural components (`Box`, `Stack`, `Card`, `Text`, `Heading`, `Badge`, `Alert`, …) render inside Server Components. Interactive components (`Button`, form controls, overlays, menus) go inside a `'use client'` boundary — usually a tiny `providers.tsx` at the root.
 
-Full [compatibility matrix and Next.js App Router recipe →](./docs/foundations/rsc.mdx)
+Full [compatibility matrix and Next.js App Router recipe →](https://cynosure.arshadshah.com/getting-started/rsc/)
 
 ---
 
@@ -114,40 +114,39 @@ import { CynosureProvider } from '@arshad-shah/cynosure-react';
 </CynosureProvider>
 ```
 
-Flip themes at runtime by setting `data-theme` on `<html>`. Authoring a custom theme is one CSS file — see [`custom-themes.mdx`](./docs/foundations/custom-themes.mdx).
+Flip themes at runtime by setting `data-theme` on `<html>`. Authoring a custom theme is one CSS file — see [Custom themes](https://cynosure.arshadshah.com/foundations/custom-themes/).
 
 ---
 
 ## Documentation
 
-Full docs live in Storybook:
+The full docs site (interactive playgrounds, MDX recipes, props tables, type reference) lives at **[cynosure.arshadshah.com](https://cynosure.arshadshah.com)**. Source lives under [`packages/docs/src/content/docs/`](./packages/docs/src/content/docs/).
 
-- [**Live docs**](https://cynosure.arshadshah.com) (once deployed)
-- Run locally with `pnpm storybook`
-
-In-repo:
-
-| Area | Where |
+| Area | Live link |
 | --- | --- |
-| Installation & quick start | [`docs/foundations/installation.mdx`](./docs/foundations/installation.mdx) |
-| Server Components / SSR | [`docs/foundations/rsc.mdx`](./docs/foundations/rsc.mdx) |
-| Theming & custom themes | [`docs/foundations/theming-overview.mdx`](./docs/foundations/theming-overview.mdx) |
-| Accessibility | [`docs/foundations/accessibility.mdx`](./docs/foundations/accessibility.mdx) |
-| RTL support | [`docs/foundations/rtl-support.mdx`](./docs/foundations/rtl-support.mdx) |
-| Recipes (login, dashboard, data table, …) | [`docs/recipes/`](./docs/recipes/) |
-| Architecture deep dives | [`docs/specs/`](./docs/specs/) |
+| Installation & quickstart | [Quickstart](https://cynosure.arshadshah.com/getting-started/quickstart/) |
+| Server Components / SSR | [RSC guide](https://cynosure.arshadshah.com/getting-started/rsc/) |
+| Theming & custom themes | [Theming overview](https://cynosure.arshadshah.com/foundations/theming-overview/) |
+| Accessibility | [Accessibility](https://cynosure.arshadshah.com/foundations/accessibility/) |
+| RTL support | [RTL](https://cynosure.arshadshah.com/getting-started/rtl/) |
+| Recipes (login, dashboard, data table, …) | [Recipes](https://cynosure.arshadshah.com/recipes/) |
+| Storybook playgrounds | [`pnpm storybook`](https://cynosure.arshadshah.com/storybook/) |
+
+### Adding a new component
+
+Component names are centralised in [`components.config.mjs`](./components.config.mjs). Add one entry there, run `pnpm --filter @arshad-shah/cynosure-react sync:components`, and the tsup entries, package.json subpath exports, per-component proxy dirs, and docs sidebar all update from that single source.
 
 ---
 
 ## Status
 
-Cynosure is **v1.0.1** — released and stable. All 14 build phases shipped (foundation, tokens, theming, primitives, typography, forms, overlays, navigation, data display, feedback, form composition, quality hardening). Phases 15–16 (hosted docs site, post-1.0 polish) are in progress.
+Cynosure is **v1.0.1** — released and stable.
 
 ---
 
 ## Contributing
 
-See [`CONTRIBUTING.md`](./CONTRIBUTING.md) for the phase-based workflow, commit conventions, and how to run tests locally.
+See [`CONTRIBUTING.md`](./CONTRIBUTING.md) for the workflow, commit conventions, and how to run tests locally.
 
 - Code of conduct: [`CODE_OF_CONDUCT.md`](./CODE_OF_CONDUCT.md)
 - Security disclosure: [`SECURITY.md`](./SECURITY.md)

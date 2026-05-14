@@ -1,0 +1,36 @@
+---
+title: SimpleGrid
+description: Uniform-column grid driven by `columns` (a number or breakpoint map) and `gap`. The 90% path that doesn't need `Grid`'s full template surface.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Plain `<div>` — identical semantics to `Grid`. Pair items with semantic children (cards, list items) when they represent content.
+bundleSize: "—"
+tags: [primitive, layout, grid]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+
+<LivePreview example="simple-grid/basic" />
+
+## Responsive columns
+
+Pass a breakpoint map to `columns` so the grid reflows naturally — the most common pattern is a 1-column phone layout that climbs to 4 columns on the widest viewports.
+
+<LivePreview example="simple-grid/responsive" />
+
+## `minChildWidth`
+
+When the column count should be driven by space rather than by you, pass `minChildWidth` and let the grid pick the column count automatically. New columns appear whenever the container can fit another `minChildWidth`-wide track.
+
+<LivePreview example="simple-grid/min-child-width" />
+
+## API
+
+<PropsTable component="SimpleGrid" />
+
+## Recipes
+
+- Card grids: `<SimpleGrid columns={{ base: 1, sm: 2, lg: 3 }} gap="4" />` covers most product / blog / team layouts.
+- Auto-flow gallery: `<SimpleGrid minChildWidth="200px" gap="3" />` adapts to any container width without a media-query map.
+- For non-uniform columns or named areas, reach for [`Grid`](/components/grid) instead.

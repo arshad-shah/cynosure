@@ -1,5 +1,5 @@
 {
-  "total": 100,
+  "total": 101,
   "categories": {
     "forms": {
       "label": "Forms",
@@ -113,7 +113,7 @@
     },
     "typography": {
       "label": "Typography",
-      "count": 7,
+      "count": 8,
       "names": [
         "Blockquote",
         "Code",
@@ -121,6 +121,7 @@
         "Kbd",
         "Link",
         "List",
+        "Mark",
         "Text"
       ]
     },

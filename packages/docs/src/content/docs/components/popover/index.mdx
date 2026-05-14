@@ -10,30 +10,8 @@ tags: [overlay, popover, accessible]
 ---
 import LivePreview from '@/components/LivePreview/LivePreview.astro';
 import PropsTable from '@/components/PropsTable.astro';
-import StatusBadge from '@/components/StatusBadge.astro';
-import BundleSizePill from '@/components/BundleSizePill.astro';
-
-<div><StatusBadge status="stable" /> <BundleSizePill name="Popover" /></div>
 
 <LivePreview example="popover/basic" />
-
-## Usage
-
-```tsx
-import {
-  Button,
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@arshad-shah/cynosure-react";
-
-<Popover>
-  <PopoverTrigger asChild>
-    <Button>Show</Button>
-  </PopoverTrigger>
-  <PopoverContent>Hello from inside the popover.</PopoverContent>
-</Popover>
-```
 
 ## Variants
 

@@ -10,20 +10,8 @@ tags: [forms, feedback]
 ---
 import LivePreview from "@/components/LivePreview/LivePreview.astro";
 import PropsTable from "@/components/PropsTable.astro";
-import StatusBadge from "@/components/StatusBadge.astro";
-import BundleSizePill from "@/components/BundleSizePill.astro";
-
-<div><StatusBadge status="stable" /> <BundleSizePill name="ErrorText" /></div>
 
 <LivePreview example="error-text/basic" />
-
-## Usage
-
-```tsx
-import { ErrorText } from "@arshad-shah/cynosure-react";
-
-<ErrorText>Please enter a valid email address.</ErrorText>
-```
 
 ## Paired with an Input
 

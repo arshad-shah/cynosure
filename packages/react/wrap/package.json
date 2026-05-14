@@ -1,0 +1,9 @@
+{
+  "name": "@arshad-shah/cynosure-react/wrap",
+  "private": true,
+  "type": "module",
+  "main": "../dist/wrap.js",
+  "module": "../dist/wrap.js",
+  "types": "../dist/wrap.d.ts",
+  "sideEffects": ["*.css"]
+}

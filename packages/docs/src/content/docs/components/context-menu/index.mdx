@@ -10,37 +10,8 @@ tags: [overlay, menu, accessible]
 ---
 import LivePreview from '@/components/LivePreview/LivePreview.astro';
 import PropsTable from '@/components/PropsTable.astro';
-import StatusBadge from '@/components/StatusBadge.astro';
-import BundleSizePill from '@/components/BundleSizePill.astro';
-
-<div><StatusBadge status="stable" /> <BundleSizePill name="ContextMenu" /></div>
 
 <LivePreview example="context-menu/basic" />
-
-## Usage
-
-```tsx
-import {
-  ContextMenu,
-  ContextMenuContent,
-  ContextMenuItem,
-  ContextMenuSeparator,
-  ContextMenuShortcut,
-  ContextMenuTrigger,
-} from "@arshad-shah/cynosure-react";
-
-<ContextMenu>
-  <ContextMenuTrigger asChild>
-    <div>Right-click me</div>
-  </ContextMenuTrigger>
-  <ContextMenuContent>
-    <ContextMenuItem>Cut <ContextMenuShortcut>⌘X</ContextMenuShortcut></ContextMenuItem>
-    <ContextMenuItem>Copy <ContextMenuShortcut>⌘C</ContextMenuShortcut></ContextMenuItem>
-    <ContextMenuSeparator />
-    <ContextMenuItem variant="danger">Delete</ContextMenuItem>
-  </ContextMenuContent>
-</ContextMenu>
-```
 
 ## Variants
 

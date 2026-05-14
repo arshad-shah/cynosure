@@ -10,21 +10,8 @@ tags: [forms]
 ---
 import LivePreview from '@/components/LivePreview/LivePreview.astro';
 import PropsTable from '@/components/PropsTable.astro';
-import StatusBadge from '@/components/StatusBadge.astro';
-import BundleSizePill from '@/components/BundleSizePill.astro';
-
-<div><StatusBadge status="stable" /> <BundleSizePill name="Label" /></div>
 
 <LivePreview example="label/basic" />
-
-## Usage
-
-```tsx
-import { Label, Input } from "@arshad-shah/cynosure-react";
-
-<Label htmlFor="email">Email</Label>
-<Input id="email" type="email" />
-```
 
 ## Required indicator
 

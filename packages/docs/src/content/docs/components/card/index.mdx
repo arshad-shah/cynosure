@@ -11,25 +11,8 @@ tags: [layout, container, surface]
 ---
 import LivePreview from '@/components/LivePreview/LivePreview.astro';
 import PropsTable from '@/components/PropsTable.astro';
-import StatusBadge from '@/components/StatusBadge.astro';
-import BundleSizePill from '@/components/BundleSizePill.astro';
-
-<div><StatusBadge status="stable" /> <BundleSizePill name="Card" /></div>
 
 <LivePreview example="card/basic" />
-
-## Usage
-
-```tsx
-import { Card, CardBody, CardTitle, CardDescription } from '@arshad-shah/cynosure-react';
-
-<Card>
-  <CardBody>
-    <CardTitle>Title</CardTitle>
-    <CardDescription>Description text</CardDescription>
-  </CardBody>
-</Card>
-```
 
 ## With header and footer
 

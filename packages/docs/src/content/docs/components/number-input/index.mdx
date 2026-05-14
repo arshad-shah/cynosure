@@ -10,20 +10,8 @@ tags: [forms, input]
 ---
 import LivePreview from '@/components/LivePreview/LivePreview.astro';
 import PropsTable from '@/components/PropsTable.astro';
-import StatusBadge from '@/components/StatusBadge.astro';
-import BundleSizePill from '@/components/BundleSizePill.astro';
-
-<div><StatusBadge status="stable" /> <BundleSizePill name="NumberInput" /></div>
 
 <LivePreview example="number-input/basic" />
-
-## Usage
-
-```tsx
-import { NumberInput } from "@arshad-shah/cynosure-react";
-
-<NumberInput aria-label="Quantity" defaultValue={1} minValue={0} maxValue={10} />
-```
 
 ## Sizes
 

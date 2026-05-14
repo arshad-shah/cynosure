@@ -1,0 +1,36 @@
+---
+title: Flex
+description: General-purpose flex container — `direction`, `align`, `justify`, `wrap`, `gap`, plus `grow`/`shrink`/`basis` as props. The escape hatch when `Stack`/`Inline` don't quite fit.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Plain `<div>` by default (polymorphic via `as`). No semantics beyond what the children carry; pair with `<nav>`, `<main>`, `<header>` via `as` when the flex container is itself a landmark.
+bundleSize: "—"
+tags: [primitive, layout, flex]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+
+<LivePreview example="flex/basic" />
+
+## Direction
+
+`direction` accepts `row` (default), `column`, and the matching `*-reverse` variants. All four accept a responsive map — a common pattern is `direction={{ base: 'column', md: 'row' }}` for "stack on mobile, side-by-side on desktop".
+
+<LivePreview example="flex/direction" />
+
+## Grow, shrink, basis
+
+The `grow`, `shrink`, and `basis` props are flex-item hints. They apply to the **child** Boxes (Box, Stack, Inline, Flex, Grid all forward these), letting a child claim or yield space inside a Flex parent without writing custom CSS.
+
+<LivePreview example="flex/grow" />
+
+## API
+
+<PropsTable component="Flex" />
+
+## Recipes
+
+- For most row/column layouts prefer `Inline` or `Stack` — they're `Flex` with fewer knobs and clearer intent.
+- "Stack on mobile, side-by-side on desktop": `<Flex direction={{ base: 'column', md: 'row' }} gap="4" />`.
+- App shell main area: `<Flex direction="column" flex="1" minHeight="0" />` so a nested scroll area can claim the remaining height.

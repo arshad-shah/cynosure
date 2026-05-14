@@ -10,38 +10,8 @@ tags: [overlay, menu, accessible]
 ---
 import LivePreview from '@/components/LivePreview/LivePreview.astro';
 import PropsTable from '@/components/PropsTable.astro';
-import StatusBadge from '@/components/StatusBadge.astro';
-import BundleSizePill from '@/components/BundleSizePill.astro';
-
-<div><StatusBadge status="stable" /> <BundleSizePill name="MenuBar" /></div>
 
 <LivePreview example="menu-bar/basic" />
-
-## Usage
-
-```tsx
-import {
-  MenuBar,
-  MenuBarContent,
-  MenuBarItem,
-  MenuBarMenu,
-  MenuBarSeparator,
-  MenuBarShortcut,
-  MenuBarTrigger,
-} from "@arshad-shah/cynosure-react";
-
-<MenuBar>
-  <MenuBarMenu>
-    <MenuBarTrigger>File</MenuBarTrigger>
-    <MenuBarContent>
-      <MenuBarItem>New <MenuBarShortcut>⌘N</MenuBarShortcut></MenuBarItem>
-      <MenuBarItem>Open <MenuBarShortcut>⌘O</MenuBarShortcut></MenuBarItem>
-      <MenuBarSeparator />
-      <MenuBarItem>Save <MenuBarShortcut>⌘S</MenuBarShortcut></MenuBarItem>
-    </MenuBarContent>
-  </MenuBarMenu>
-</MenuBar>
-```
 
 ## Variants
 

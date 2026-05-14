@@ -10,28 +10,8 @@ tags: [data-display, layout, splitter]
 ---
 import LivePreview from '@/components/LivePreview/LivePreview.astro';
 import PropsTable from '@/components/PropsTable.astro';
-import StatusBadge from '@/components/StatusBadge.astro';
-import BundleSizePill from '@/components/BundleSizePill.astro';
-
-<div><StatusBadge status="stable" /> <BundleSizePill name="Resizable" /></div>
 
 <LivePreview example="resizable/basic" />
-
-## Usage
-
-```tsx
-import {
-  Resizable,
-  ResizableHandle,
-  ResizablePanel,
-} from '@arshad-shah/cynosure-react';
-
-<Resizable direction="horizontal">
-  <ResizablePanel defaultSize={40}>Left</ResizablePanel>
-  <ResizableHandle withHandle />
-  <ResizablePanel defaultSize={60}>Right</ResizablePanel>
-</Resizable>
-```
 
 ## Vertical split
 

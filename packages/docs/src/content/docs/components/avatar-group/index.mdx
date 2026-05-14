@@ -10,24 +10,8 @@ tags: [feedback, identity, user]
 ---
 import LivePreview from '@/components/LivePreview/LivePreview.astro';
 import PropsTable from '@/components/PropsTable.astro';
-import StatusBadge from '@/components/StatusBadge.astro';
-import BundleSizePill from '@/components/BundleSizePill.astro';
-
-<div><StatusBadge status="stable" /> <BundleSizePill name="AvatarGroup" /></div>
 
 <LivePreview example="avatar-group/basic" />
-
-## Usage
-
-```tsx
-import { Avatar, AvatarGroup } from '@arshad-shah/cynosure-react';
-
-<AvatarGroup>
-  <Avatar name="Jane Doe" />
-  <Avatar name="John Smith" />
-  <Avatar name="Ada Lovelace" />
-</AvatarGroup>
-```
 
 ## With overflow
 

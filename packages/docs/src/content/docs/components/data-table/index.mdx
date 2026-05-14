@@ -11,33 +11,8 @@ tags: [data-display, table, sortable, filterable, pagination]
 ---
 import LivePreview from '@/components/LivePreview/LivePreview.astro';
 import PropsTable from '@/components/PropsTable.astro';
-import StatusBadge from '@/components/StatusBadge.astro';
-import BundleSizePill from '@/components/BundleSizePill.astro';
-
-<div><StatusBadge status="beta" /> <BundleSizePill name="DataTable" /></div>
 
 <LivePreview example="data-table/basic" />
-
-## Usage
-
-```tsx
-import { DataTable, type ColumnDef } from '@arshad-shah/cynosure-react';
-
-type User = { id: number; name: string; status: string };
-
-const columns: ColumnDef<User>[] = [
-  { accessorKey: 'id', header: 'ID' },
-  { accessorKey: 'name', header: 'Name' },
-  { accessorKey: 'status', header: 'Status' },
-];
-
-const data: User[] = [
-  { id: 1, name: 'Alice', status: 'Active' },
-  { id: 2, name: 'Bob', status: 'Inactive' },
-];
-
-<DataTable data={data} columns={columns} />
-```
 
 ## Variants
 

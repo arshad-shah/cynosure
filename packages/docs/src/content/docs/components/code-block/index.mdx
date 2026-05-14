@@ -10,20 +10,8 @@ tags: [data-display, code, shiki]
 ---
 import LivePreview from '@/components/LivePreview/LivePreview.astro';
 import PropsTable from '@/components/PropsTable.astro';
-import StatusBadge from '@/components/StatusBadge.astro';
-import BundleSizePill from '@/components/BundleSizePill.astro';
-
-<div><StatusBadge status="stable" /> <BundleSizePill name="CodeBlock" /></div>
 
 <LivePreview example="code-block/basic" />
-
-## Usage
-
-```tsx
-import { CodeBlock } from '@arshad-shah/cynosure-react/code-block';
-
-<CodeBlock language="tsx">{`const x = 42;`}</CodeBlock>
-```
 
 ## Language
 

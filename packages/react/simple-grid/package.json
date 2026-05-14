@@ -1,0 +1,9 @@
+{
+  "name": "@arshad-shah/cynosure-react/simple-grid",
+  "private": true,
+  "type": "module",
+  "main": "../dist/simplegrid.js",
+  "module": "../dist/simplegrid.js",
+  "types": "../dist/simplegrid.d.ts",
+  "sideEffects": ["*.css"]
+}

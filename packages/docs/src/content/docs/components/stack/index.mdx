@@ -1,0 +1,41 @@
+---
+title: Stack
+description: Vertical layout primitive — a flex column with token-driven `gap`, `align`, and `justify`. The right reach when children should flow top-to-bottom with consistent spacing.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Renders a single `<div>` (or polymorphic `as`). No list semantics; wrap in `<ul>`/`<ol>` when items belong to a logical list so SR users get an enumeration.
+bundleSize: "—"
+tags: [primitive, layout, flex]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+
+<LivePreview example="stack/basic" />
+
+## Gap
+
+`gap` accepts any space token (or a responsive map). Cynosure stack-rhythm is built from this single prop — no per-child margins, no `:not(:last-child)` adjustments. Children always sit at the requested distance.
+
+## Align and justify
+
+`align` controls cross-axis (horizontal) alignment, `justify` controls main-axis (vertical) distribution. Both accept the standard `start | center | end | stretch` set plus `space-between` / `space-around` / `space-evenly` for `justify`.
+
+<LivePreview example="stack/align" />
+
+## Dividers between children
+
+Pass any node to `dividers` and Stack inserts a copy between every pair of children — typically a `<Divider />` but any thin element works.
+
+<LivePreview example="stack/dividers" />
+
+## API
+
+<PropsTable component="Stack" />
+
+## Recipes
+
+- Drop a `Stack` inside a `Container` for the canonical "stacked content column" pattern — see most foundation pages on this site.
+- Set `align="stretch"` (the default) to fill the cross-axis; switch to `align="center"` for centered cards on a wide canvas.
+- For horizontal flow, reach for `Inline` or `Flex direction="row"` — Stack is locked to column.
+- Pair `dividers={<Divider />}` with `gap="0"` to render an undivided list where the rules carry all of the visual rhythm.

@@ -10,20 +10,8 @@ tags: [forms, input]
 ---
 import LivePreview from '@/components/LivePreview/LivePreview.astro';
 import PropsTable from '@/components/PropsTable.astro';
-import StatusBadge from '@/components/StatusBadge.astro';
-import BundleSizePill from '@/components/BundleSizePill.astro';
-
-<div><StatusBadge status="stable" /> <BundleSizePill name="PinInput" /></div>
 
 <LivePreview example="pin-input/basic" />
-
-## Usage
-
-```tsx
-import { PinInput } from "@arshad-shah/cynosure-react";
-
-<PinInput length={6} onComplete={(code) => console.log(code)} />
-```
 
 ## Lengths
 
