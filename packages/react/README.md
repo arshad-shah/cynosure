@@ -6,7 +6,7 @@
 [![license](https://img.shields.io/npm/l/@arshad-shah/cynosure-react.svg)](../../LICENSE)
 [![bundle](https://img.shields.io/bundlephobia/minzip/@arshad-shah/cynosure-react.svg?label=minzip)](https://bundlephobia.com/package/@arshad-shah/cynosure-react)
 [![types](https://img.shields.io/npm/types/@arshad-shah/cynosure-react.svg)](https://www.npmjs.com/package/@arshad-shah/cynosure-react)
-[![react](https://img.shields.io/badge/react-18%20%7C%2019-61dafb?logo=react&logoColor=white)](../../docs/foundations/rsc.mdx)
+[![react](https://img.shields.io/badge/react-18%20%7C%2019-61dafb?logo=react&logoColor=white)](https://cynosure.arshadshah.com/getting-started/rsc/)
 
 Every component ships as its own ESM entry point with its own CSS, so bundlers keep only what you use. Behaviour is a hybrid of Radix primitives and React Aria for accessibility; styling is driven by W3C DTCG design tokens from [`@arshad-shah/cynosure-tokens`](https://www.npmjs.com/package/@arshad-shah/cynosure-tokens).
 
@@ -91,7 +91,7 @@ Enforced by `pnpm size` in CI.
 
 ## Server Components
 
-This package works with React Server Components. Structural pieces (`Box`, `Stack`, `Card`, `Text`, …) render inside Server Components; stateful pieces (`Button`, form controls, overlays) go inside a `'use client'` boundary. See the [RSC compatibility matrix](../../docs/foundations/rsc.mdx) for the full breakdown and a Next.js App Router recipe.
+This package works with React Server Components. Structural pieces (`Box`, `Stack`, `Card`, `Text`, …) render inside Server Components; stateful pieces (`Button`, form controls, overlays) go inside a `'use client'` boundary. See the [RSC compatibility matrix](https://cynosure.arshadshah.com/getting-started/rsc/) for the full breakdown and a Next.js App Router recipe.
 
 ---
 
@@ -99,21 +99,23 @@ This package works with React Server Components. Structural pieces (`Box`, `Stac
 
 **Layout primitives** — `Box`, `Stack`, `Inline`, `Flex`, `Grid`, `Center`, `Spacer`, `Divider`, `AspectRatio`, `Container`, `Section`
 
-**Typography** — `Text`, `Heading`, `Code`, `Kbd`, `Link`, `Blockquote`, `List`
+**Typography** — `Text`, `Heading`, `Code`, `Kbd`, `Link`, `Blockquote`, `List`, `Mark` (+ `HighlightedText`)
 
-**Forms** — `Input`, `Textarea`, `NumberInput`, `Checkbox`, `Radio`, `Switch`, `Select`, `Combobox`, `MultiSelect`, `Slider`, `RangeSlider`, `DatePicker`, `DateRangePicker`, `TimePicker`, `ColorPicker`, `FileUpload`, `SearchInput`, `PinInput`, `TagsInput`, `Rating`
+**Buttons** — `Button`, `IconButton`, `ButtonGroup`, `Toggle`, `ToggleGroup`
 
-**Overlays** — `Dialog`, `AlertDialog`, `Drawer`, `Popover`, `HoverCard`, `Tooltip`, `Toast`, `DropdownMenu`, `ContextMenu`, `MenuBar`
+**Forms** — `Input`, `Textarea`, `NumberInput`, `SearchInput`, `PinInput`, `TagsInput`, `Checkbox`, `CheckboxGroup`, `Radio`, `RadioGroup`, `Switch`, `Select`, `MultiSelect`, `Combobox`, `Slider`, `RangeSlider`, `Rating`, `Calendar`, `DatePicker`, `DateRangePicker`, `TimePicker`, `ColorPicker`, `FileUpload`, `Label`, `HelperText`, `ErrorText`, `Fieldset`
+
+**Overlays** — `Dialog`, `AlertDialog`, `Drawer`, `Popover`, `HoverCard`, `Tooltip`, `Toast`, `DropdownMenu`, `ContextMenu`, `MenuBar`, `CommandPalette`
 
 **Navigation** — `Tabs`, `Breadcrumb`, `Pagination`, `Menu`, `NavigationMenu`, `Sidebar`, `Stepper`, `Anchor`, `BackToTop`
 
-**Data display** — `Card`, `Table`, `DataTable`, `Tree`, `Timeline`, `Stat`, `LinearProgress`, `CircularProgress`, `Skeleton`, `Spinner`, `Accordion`, `Collapsible`, `ScrollArea`, `Resizable`, `CodeBlock`
+**Data display** — `Card`, `Table`, `DataTable`, `Tree`, `Timeline`, `Stat`, `LinearProgress`, `CircularProgress`, `Skeleton`, `Spinner`, `Accordion`, `Collapsible`, `ScrollArea`, `Resizable`, `CodeBlock`, `Carousel`, `Chart`
 
-**Feedback** — `Badge`, `Tag`, `Chip`, `Avatar`, `AvatarGroup`, `Alert`, `Notification`, `Callout`, `EmptyState`, `Toggle`, `ToggleGroup`
+**Feedback** — `Badge`, `Tag`, `Chip`, `Avatar`, `AvatarGroup`, `Alert`, `Notification`, `Callout`, `EmptyState`
 
 **Form composition** — `Form`, `FormField`, `FormLabel`, `FormControl`, `FormDescription`, `FormMessage`, plus an RHF adapter at `@arshad-shah/cynosure-react/rhf`
 
-The full inventory, props reference, and live examples live in the Storybook docs site.
+> The list above is hand-curated for readability. The machine-readable, always-up-to-date inventory lives at the repo root in [`components.config.mjs`](https://github.com/arshad-shah/cynosure/blob/main/components.config.mjs) — every published subpath export is one row there. Props references and live examples live at **[cynosure.arshadshah.com](https://cynosure.arshadshah.com)**.
 
 ---
 
@@ -126,15 +128,16 @@ import '@arshad-shah/cynosure-themes/terminal';
 import '@arshad-shah/cynosure-themes/high-contrast';
 ```
 
-Or build your own by overriding the token CSS variables — see [`custom-themes`](https://github.com/arshad-shah/cynosure/blob/main/docs/foundations/custom-themes.mdx).
+Or build your own by overriding the token CSS variables — see [Custom themes](https://cynosure.arshadshah.com/foundations/custom-themes/).
 
 ---
 
 ## Links
 
+- [Docs site](https://cynosure.arshadshah.com) — interactive playgrounds, props tables, recipes
 - [Main repo](https://github.com/arshad-shah/cynosure) — source, issues, contributor guide
-- [Server Components guide](https://github.com/arshad-shah/cynosure/blob/main/docs/foundations/rsc.mdx)
-- [Migration guide (0.x → 1.0)](https://github.com/arshad-shah/cynosure/blob/main/docs/reference/migration-to-v1.mdx)
+- [Server Components guide](https://cynosure.arshadshah.com/getting-started/rsc/)
+- [Migration to v1](https://cynosure.arshadshah.com/reference/migration-to-v1/)
 - [Changelog](./CHANGELOG.md)
 
 ## License
