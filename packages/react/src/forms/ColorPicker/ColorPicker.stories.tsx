@@ -117,12 +117,76 @@ export const StartingFormat: Story = {
 };
 
 export const Sizes: Story = {
-  name: 'Sizes (sm / md / lg)',
+  name: 'All sizes',
   render: () => (
-    <Inline gap="4" align="start">
-      <ColorPicker variant="inline" size="sm" defaultValue="#6366F1" />
-      <ColorPicker variant="inline" size="md" defaultValue="#10B981" />
-      <ColorPicker variant="inline" size="lg" defaultValue="#EC4899" alpha />
+    <Stack gap="6">
+      <Stack gap="2">
+        <Text size="sm" color="fg.muted">
+          size="sm"
+        </Text>
+        <ColorPicker
+          size="sm"
+          variant="inline"
+          defaultValue="#6366F1"
+          swatches={['#ef4444', '#f59e0b', '#10b981', '#0ea5e9', '#6366f1', '#ec4899']}
+          onSwatchesChange={() => {}}
+        />
+      </Stack>
+      <Stack gap="2">
+        <Text size="sm" color="fg.muted">
+          size="md" (default)
+        </Text>
+        <ColorPicker
+          size="md"
+          variant="inline"
+          defaultValue="#6366F1"
+          swatches={['#ef4444', '#f59e0b', '#10b981', '#0ea5e9', '#6366f1', '#ec4899']}
+          onSwatchesChange={() => {}}
+        />
+      </Stack>
+      <Stack gap="2">
+        <Text size="sm" color="fg.muted">
+          size="lg" + alpha
+        </Text>
+        <ColorPicker
+          size="lg"
+          variant="inline"
+          defaultValue="#6366F1"
+          alpha
+          swatches={['#ef4444', '#f59e0b', '#10b981', '#0ea5e9', '#6366f1', '#ec4899']}
+          onSwatchesChange={() => {}}
+        />
+      </Stack>
+    </Stack>
+  ),
+};
+
+export const IconOnlyTrigger: Story = {
+  name: 'Icon-only trigger',
+  render: () => (
+    <Inline gap="3" alignItems="center">
+      <ColorPicker label={null} defaultValue="#6366F1" />
+      <ColorPicker label={null} defaultValue="#10b981" />
+      <ColorPicker label={null} defaultValue="#ef4444" alpha />
+      <Text size="sm" color="fg.muted">
+        label={'{null}'} = icon-only
+      </Text>
     </Inline>
+  ),
+};
+
+export const DarkTheme: Story = {
+  name: 'Dark theme check',
+  parameters: { backgrounds: { default: 'dark' }, theme: 'dark' },
+  render: () => (
+    <div data-theme="dark" style={{ padding: 24, background: '#0c0d11', borderRadius: 12 }}>
+      <ColorPicker
+        variant="inline"
+        defaultValue="#8a9bff"
+        alpha
+        swatches={['#8a9bff', '#10b981', '#ff7b63', '#f59e0b', '#a855f7']}
+        onSwatchesChange={() => {}}
+      />
+    </div>
   ),
 };
