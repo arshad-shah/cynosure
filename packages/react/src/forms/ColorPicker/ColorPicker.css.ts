@@ -289,10 +289,11 @@ export const cellSlot = style({
   border: 'none',
   background: 'transparent',
   boxShadow: 'none',
-  paddingInline: 0,
+  padding: 0,
   minWidth: 0,
   minHeight: 0,
-  flex: '0 0 0.6em',
+  width: '0.75rem',
+  flex: '0 0 0.75rem',
   justifyContent: 'center',
   overflow: 'visible',
 });
