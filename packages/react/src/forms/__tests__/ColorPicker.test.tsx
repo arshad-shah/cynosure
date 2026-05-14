@@ -116,4 +116,38 @@ describe('ColorPicker', () => {
       /rgba\(108,\s*140,\s*255,\s*1\)/,
     );
   });
+
+  it('shows a labelled saved-colors section with count', () => {
+    render(
+      <ColorPicker
+        variant="inline"
+        defaultValue="#ef4444"
+        swatches={['#ef4444', '#10b981']}
+        onSwatchesChange={() => {}}
+      />,
+    );
+    expect(screen.getByText(/saved colors · 2 of 12/i)).toBeInTheDocument();
+  });
+
+  it('renders the save-current affordance inside the swatch grid', () => {
+    render(
+      <ColorPicker
+        variant="inline"
+        defaultValue="#123456"
+        swatches={['#ef4444', '#10b981']}
+        onSwatchesChange={() => {}}
+      />,
+    );
+    expect(
+      screen.getByRole('button', { name: /save current color to swatches/i }),
+    ).toBeInTheDocument();
+  });
+
+  it('marks the active swatch tile when current colour matches', () => {
+    render(
+      <ColorPicker variant="inline" defaultValue="#10b981" swatches={['#ef4444', '#10b981']} />,
+    );
+    const tile = screen.getByRole('button', { name: /use color #10b981/i });
+    expect(tile).toHaveAttribute('data-active', 'true');
+  });
 });
