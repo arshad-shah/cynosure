@@ -1,0 +1,93 @@
+---
+title: Mark
+description: Inline text highlighting for search hits, regex matches, syntax tokens, and diff hunks — a semantic `<mark>` that flows with surrounding prose and wraps cleanly across lines.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Renders the native `<mark>` element so assistive tech announces the content as highlighted. Falls back to system `Mark`/`MarkText` colours under `forced-colors`.
+bundleSize: "—"
+tags: [typography, mark, highlight]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+import StatusBadge from '@/components/StatusBadge.astro';
+import BundleSizePill from '@/components/BundleSizePill.astro';
+
+<div><StatusBadge status="stable" /> <BundleSizePill name="Mark" /></div>
+
+<LivePreview example="mark/basic" />
+
+## Usage
+
+```tsx
+import { Mark } from '@arshad-shah/cynosure-react';
+
+<Mark>highlighted text</Mark>
+```
+
+`Mark` is a thin inline-flow primitive — reach for it instead of `Badge`/`Code` when you need to highlight a substring inside flowing text without breaking baseline alignment or vertical rhythm.
+
+## Variants
+
+Four visual treatments. `marker` (default) paints a soft highlighter-pen background; `underline` lays a thick rule under the text; `chip` flows a pill inline; `bold` colours and bolds the text with no decoration.
+
+<LivePreview example="mark/variants" />
+
+## Color schemes
+
+Six token palettes: `accent`, `success`, `warning` (default), `danger`, `info`, `neutral`. All track light/dark themes automatically — no hand-rolled CSS variables required.
+
+<LivePreview example="mark/color-schemes" />
+
+## Intensities
+
+`subtle` (default) uses the soft surface token; `solid` switches to the saturated solid + on-solid pair for stronger emphasis.
+
+<LivePreview example="mark/intensities" />
+
+## Wraps across lines
+
+`Mark` sets `box-decoration-break: clone` so the background, padding, and corner radius repaint on each wrapped line. No bookkeeping required.
+
+<LivePreview example="mark/multi-line" />
+
+## HighlightedText
+
+For the common "highlight these ranges inside this string" case, `HighlightedText` takes a `text` plus an array of `{ start, length }` (or `{ start, end }`) ranges and renders them as `Mark` spans interleaved with the surrounding text. Overlapping ranges are merged; out-of-range indices are clamped; empty ranges are dropped.
+
+<LivePreview example="mark/highlighted-text" />
+
+```tsx
+import { HighlightedText } from '@arshad-shah/cynosure-react';
+
+<HighlightedText
+  text={input}
+  ranges={matches.map((m) => ({ start: m.index, length: m[0].length }))}
+  variant="marker"
+  colorScheme="warning"
+/>
+```
+
+## API
+
+### Mark
+
+<PropsTable component="Mark" />
+
+### HighlightedText
+
+<PropsTable component="HighlightedText" />
+
+## Accessibility
+
+- Renders a native `<mark>` by default — assistive tech announces the content as highlighted. Pass `as="span"` when the highlight is purely decorative and the surrounding context already conveys meaning.
+- Pair colour with copy: never rely on the highlight alone to communicate meaning (e.g. "deprecated" highlights should still include a textual indicator).
+- Pass a `title` for the common tooltip case (`title="Match #3"`).
+- Under `forced-colors` (Windows High Contrast and similar) `Mark` falls back to the system `Mark`/`MarkText` colour pair so highlights stay visible when the token palette is overridden.
+
+## Recipes
+
+- **Search hits** — feed regex match ranges into `HighlightedText` to highlight every occurrence in a snippet.
+- **Diff hunks** — `variant="chip"` with `colorScheme="success"` / `colorScheme="danger"` reads as add/remove without needing a full diff viewer.
+- **Form validation** — point at the invalid slice of an input with `variant="underline"` and `colorScheme="danger"`; surface a `title` for the rule that fired.
+- **Inline syntax** — `variant="bold"` colours keywords/numbers in a one-liner without dragging in a syntax-highlighting dependency.

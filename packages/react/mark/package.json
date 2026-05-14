@@ -1,0 +1,9 @@
+{
+  "name": "@arshad-shah/cynosure-react/mark",
+  "private": true,
+  "type": "module",
+  "main": "../dist/mark.js",
+  "module": "../dist/mark.js",
+  "types": "../dist/mark.d.ts",
+  "sideEffects": ["*.css"]
+}

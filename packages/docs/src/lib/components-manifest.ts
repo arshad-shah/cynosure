@@ -48,6 +48,7 @@ export const EXPECTED_COMPONENT_SLUGS = [
   'linear-progress',
   'link',
   'list',
+  'mark',
   'menu',
   'menu-bar',
   'multi-select',

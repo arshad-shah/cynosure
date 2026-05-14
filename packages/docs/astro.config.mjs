@@ -102,6 +102,7 @@ export default defineConfig({
             { label: 'Kbd', slug: 'components/kbd' },
             { label: 'Link', slug: 'components/link' },
             { label: 'List', slug: 'components/list' },
+            { label: 'Mark', slug: 'components/mark' },
             { label: 'Text', slug: 'components/text' },
           ],
         },

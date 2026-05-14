@@ -45,6 +45,7 @@ const typographyComponents = [
   'Link',
   'Blockquote',
   'List',
+  'Mark',
 ] as const;
 
 const typographyEntries = (): Record<string, string> => {

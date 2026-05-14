@@ -119,6 +119,10 @@
       "types": "./dist/list.d.ts",
       "import": "./dist/list.js"
     },
+    "./mark": {
+      "types": "./dist/mark.d.ts",
+      "import": "./dist/mark.js"
+    },
     "./button": {
       "types": "./dist/button.d.ts",
       "import": "./dist/button.js"
@@ -485,6 +489,7 @@
     "link",
     "blockquote",
     "list",
+    "mark",
     "button",
     "icon-button",
     "button-group",
