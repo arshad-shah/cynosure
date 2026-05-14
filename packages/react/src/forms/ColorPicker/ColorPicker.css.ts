@@ -261,7 +261,7 @@ export const cellsRow = style({
 export const cellsRowCols = styleVariants({
   1: { gridTemplateColumns: '1fr' },
   3: { gridTemplateColumns: 'repeat(3, 1fr)' },
-  4: { gridTemplateColumns: 'repeat(3, 1fr) 1.35fr' },
+  4: { gridTemplateColumns: 'repeat(4, 1fr)' },
 });
 
 export const cellRoot = style({
@@ -299,6 +299,24 @@ export const cellSlot = style([
     flex: '0 0 1.25em',
     justifyContent: 'flex-start',
     paddingInline: vars.space[1],
+    overflow: 'visible',
+  },
+]);
+
+/** Trailing unit-suffix slot — narrower than the leading glyph slot. */
+export const cellSuffixSlot = style([
+  inertWell,
+  {
+    border: 'none',
+    background: 'transparent',
+    boxShadow: 'none',
+    padding: 0,
+    minWidth: 0,
+    minHeight: 0,
+    width: '0.85em',
+    flex: '0 0 0.85em',
+    justifyContent: 'flex-end',
+    paddingRight: '2px',
     overflow: 'visible',
   },
 ]);

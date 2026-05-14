@@ -9,6 +9,7 @@ import {
   cellRoot,
   cellSize,
   cellSlot,
+  cellSuffixSlot,
   cellsRow,
   cellsRowCols,
 } from '../ColorPicker.css.js';
@@ -213,7 +214,7 @@ function ChannelCell({
       </span>
       {spec.suffix ? (
         <span className={slotGroup}>
-          <span className={cn(cellSlot, cellGlyph)} data-slot-kind="inert">
+          <span className={cn(cellSuffixSlot, cellGlyph)} data-slot-kind="inert">
             {spec.suffix}
           </span>
         </span>
