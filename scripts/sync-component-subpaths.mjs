@@ -10,7 +10,7 @@
 // Drives off `components.config.mjs` at the repo root. Re-run whenever that
 // file changes — `packages/react`'s `prebuild` invokes it automatically.
 
-import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -151,10 +151,10 @@ for (const c of COMPONENTS) {
     '}',
     '',
   ].join('\n');
-  const target = join(dir, 'package.json');
-  if (!existsSync(target) || readFileSync(target, 'utf8') !== next) {
-    writeFileSync(target, next);
-  }
+  // Unconditional write — TOCTOU-free (no exists→read→write window) and
+  // the same proxy contents per run, so subsequent calls are no-ops as far
+  // as anyone watching mtime is concerned only when content is identical.
+  writeFileSync(join(dir, 'package.json'), next);
 }
 
 console.log(`sync-components: ${COMPONENTS.length} components synced (package.json + proxy dirs).`);

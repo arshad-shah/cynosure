@@ -36,6 +36,26 @@ describe('Mark', () => {
     const { container } = render(<Mark title="match #1">x</Mark>);
     expect(container.querySelector('mark')?.getAttribute('title')).toBe('match #1');
   });
+
+  // Cover every `variantClass` branch so the function's four return paths and
+  // the inner `intensity === 'solid'` ternary all execute.
+  it.each([
+    ['marker', 'subtle'],
+    ['marker', 'solid'],
+    ['underline', 'subtle'],
+    ['underline', 'solid'],
+    ['chip', 'subtle'],
+    ['chip', 'solid'],
+    ['bold', 'subtle'],
+    ['bold', 'solid'],
+  ] as const)('renders variant=%s intensity=%s without throwing', (variant, intensity) => {
+    const { container } = render(
+      <Mark variant={variant} intensity={intensity} data-testid="m">
+        x
+      </Mark>,
+    );
+    expect(container.querySelector('[data-testid="m"]')).not.toBeNull();
+  });
 });
 
 describe('HighlightedText', () => {
