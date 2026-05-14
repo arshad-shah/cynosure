@@ -93,4 +93,27 @@ describe('ColorPicker', () => {
     await user.click(screen.getByRole('button', { name: /pick a color/i }));
     expect(await screen.findByTestId('custom-content')).toBeInTheDocument();
   });
+
+  it('renders the hex value in the hero strip (inline variant)', () => {
+    render(<ColorPicker variant="inline" defaultValue="#6c8cff" />);
+    expect(screen.getByTestId('color-picker-hero-hex')).toHaveTextContent('#6C8CFF');
+  });
+
+  it('updates the hero readout when the format changes to RGB', async () => {
+    const user = userEvent.setup();
+    render(<ColorPicker variant="inline" defaultValue="#6c8cff" />);
+    await user.click(screen.getByRole('radio', { name: /rgb/i }));
+    expect(screen.getByTestId('color-picker-hero-readout')).toHaveTextContent(
+      /rgb\(108,\s*140,\s*255\)/,
+    );
+  });
+
+  it('shows rgba in the hero readout when alpha is enabled', async () => {
+    const user = userEvent.setup();
+    render(<ColorPicker variant="inline" defaultValue="#6c8cff" alpha />);
+    await user.click(screen.getByRole('radio', { name: /rgb/i }));
+    expect(screen.getByTestId('color-picker-hero-readout')).toHaveTextContent(
+      /rgba\(108,\s*140,\s*255,\s*1\)/,
+    );
+  });
 });

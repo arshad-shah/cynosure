@@ -36,6 +36,7 @@ import {
 } from './ColorPicker.css.js';
 import { EyedropperButton } from './parts/EyedropperButton.js';
 import { type ColorFormat, FormatField } from './parts/FormatField.js';
+import { HeroStrip } from './parts/HeroStrip.js';
 import { SwatchGrid } from './parts/SwatchGrid.js';
 
 export type ColorPickerSize = 'sm' | 'md' | 'lg';
@@ -143,6 +144,7 @@ export const ColorPicker = forwardRef<HTMLButtonElement, ColorPickerProps>(
 
     const body = children ?? (
       <>
+        <HeroStrip color={color} format={format} size={size} alpha={alpha} />
         <AriaColorArea
           colorSpace="hsb"
           xChannel="saturation"
