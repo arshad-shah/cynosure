@@ -261,7 +261,7 @@ export const cellsRow = style({
 export const cellsRowCols = styleVariants({
   1: { gridTemplateColumns: '1fr' },
   3: { gridTemplateColumns: 'repeat(3, 1fr)' },
-  4: { gridTemplateColumns: 'repeat(4, 1fr)' },
+  4: { gridTemplateColumns: 'repeat(3, 1fr) 1.35fr' },
 });
 
 export const cellRoot = style({
