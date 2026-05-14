@@ -33,9 +33,11 @@ import {
   sliderThumbBySize,
   swatch,
   triggerButton,
+  triggerIconOnly,
 } from './ColorPicker.css.js';
 import { EyedropperButton } from './parts/EyedropperButton.js';
 import { type ColorFormat, FormatField } from './parts/FormatField.js';
+import { HeroStrip } from './parts/HeroStrip.js';
 import { SwatchGrid } from './parts/SwatchGrid.js';
 
 export type ColorPickerSize = 'sm' | 'md' | 'lg';
@@ -44,9 +46,10 @@ export type ColorPickerSize = 'sm' | 'md' | 'lg';
 export interface ColorPickerOwnProps {
   /**
    * Label rendered beside the swatch in popover mode.
+   * Pass `null` for an icon-only trigger.
    * @default "Pick a color"
    */
-  label?: ReactNode;
+  label?: ReactNode | null;
   className?: string;
   style?: CSSProperties;
   /**
@@ -143,6 +146,7 @@ export const ColorPicker = forwardRef<HTMLButtonElement, ColorPickerProps>(
 
     const body = children ?? (
       <>
+        <HeroStrip color={color} format={format} size={size} alpha={alpha} />
         <AriaColorArea
           colorSpace="hsb"
           xChannel="saturation"
@@ -207,12 +211,12 @@ export const ColorPicker = forwardRef<HTMLButtonElement, ColorPickerProps>(
         <AriaDialogTrigger>
           <AriaButton
             ref={ref}
-            className={cn(triggerButton, className)}
+            className={cn(triggerButton, label === null && triggerIconOnly, className)}
             style={style}
             aria-label={typeof label === 'string' ? label : 'Pick a color'}
           >
             <AriaColorSwatch className={swatch} />
-            {label ? <span>{label}</span> : null}
+            {label !== null && label !== undefined ? <span>{label}</span> : null}
           </AriaButton>
           <AriaPopover className={popover} placement="bottom start">
             <AriaDialog className={bodyClass} aria-label="Color picker">
