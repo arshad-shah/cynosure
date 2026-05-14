@@ -1,7 +1,7 @@
 {
   "name": "@arshad-shah/cynosure-playground",
   "private": true,
-  "version": "3.0.0",
+  "version": "3.1.0",
   "type": "module",
   "description": "Manual + visual validation playground for the Cynosure component library. Loads every primitive against light/dark themes so we can eyeball regressions without reaching for Storybook.",
   "scripts": {
