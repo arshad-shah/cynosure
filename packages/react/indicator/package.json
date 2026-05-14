@@ -1,0 +1,9 @@
+{
+  "name": "@arshad-shah/cynosure-react/indicator",
+  "private": true,
+  "type": "module",
+  "main": "../dist/indicator.js",
+  "module": "../dist/indicator.js",
+  "types": "../dist/indicator.d.ts",
+  "sideEffects": ["*.css"]
+}

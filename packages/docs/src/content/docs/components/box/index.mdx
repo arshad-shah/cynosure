@@ -1,0 +1,48 @@
+---
+title: Box
+description: The zero-opinion layout primitive — a `<div>` (or any element via `as`) wired up to the full `LayoutProps` surface. Every other primitive composes `Box`.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Polymorphic via `as`, so semantics travel with the component. `asChild` defers rendering to a child component while merging Box's layout class and inline style.
+bundleSize: "—"
+tags: [primitive, layout]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+
+<LivePreview example="box/basic" />
+
+## LayoutProps
+
+Every spacing, sizing, colour, position, and flex/grid prop exposed by the layout system lives on `Box`. Each accepts a token value, a raw CSS length, or a responsive map keyed by breakpoint. The same prop surface is composed into `Stack`, `Inline`, `Flex`, `Grid`, and every Cynosure component that derives from `Box`.
+
+<LivePreview example="box/layout-props" />
+
+## Polymorphic via `as`
+
+Render any intrinsic element (or React component) while keeping the `LayoutProps` surface. The component's TypeScript type follows `as` so attribute autocomplete stays accurate — `as="a"` gives you `href`, `as="button"` gives you `type`, and so on.
+
+<LivePreview example="box/as" />
+
+## `asChild`
+
+Pass the layout class + style straight onto a single child — useful when wrapping a third-party component, an `<a>` from a router, or another Cynosure primitive that you want to extend without an extra wrapper element.
+
+<LivePreview example="box/as-child" />
+
+## Responsive props
+
+Every layout prop accepts a `{ base, sm, md, lg, xl, 2xl }` map. Values cascade upward (a `md` value applies from the `md` breakpoint until overridden), so you typically only set the breakpoints that change.
+
+<LivePreview example="box/responsive" />
+
+## API
+
+<PropsTable component="Box" />
+
+## Recipes
+
+- Reach for `Box` whenever you need a styled wrapper but don't want to think about flex / grid direction. For row/column flow, prefer `Inline` or `Stack`; for centered single children, prefer `Center`.
+- Use `as` to keep semantics tight: `as="section"` for landmark regions, `as="article"` for self-contained cards, `as="aside"` for complementary content.
+- Combine `asChild` with `Link` from your router to inherit Box's layout props without adding an extra DOM node.

@@ -1,0 +1,30 @@
+---
+title: Container
+description: Centers its content horizontally and caps `max-width` at a readable measure. The canonical wrapper for page content — wrap your `<main>` in one and every page lays out the same way.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Plain `<div>` by default (polymorphic via `as`). Pair with `as="main"` so the wrapper is a navigable landmark for AT.
+bundleSize: "—"
+tags: [primitive, layout]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+
+<LivePreview example="container/basic" />
+
+## Sizes
+
+`size` accepts `sm` (40rem), `md` (48rem), `lg` (default, 64rem), `xl` (80rem), `2xl` (96rem), `prose` (65ch for reading copy), or `full` (no cap).
+
+<LivePreview example="container/sizes" />
+
+## API
+
+<PropsTable component="Container" />
+
+## Recipes
+
+- App content: `<Container as="main" size="lg" />` for tools and dashboards; `<Container size="prose" />` for long-form reading.
+- Pair with `Section` for vertically-padded sections: `<Section><Container>...</Container></Section>`.
+- Use a responsive `size` to tighten the column on mobile and relax it on wide viewports: `size={{ base: 'sm', md: 'lg' }}`.

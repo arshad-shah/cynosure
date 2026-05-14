@@ -111,6 +111,14 @@
       "types": "./dist/section.d.ts",
       "import": "./dist/section.js"
     },
+    "./simple-grid": {
+      "types": "./dist/simplegrid.d.ts",
+      "import": "./dist/simplegrid.js"
+    },
+    "./wrap": {
+      "types": "./dist/wrap.d.ts",
+      "import": "./dist/wrap.js"
+    },
     "./blockquote": {
       "types": "./dist/blockquote.d.ts",
       "import": "./dist/blockquote.js"
@@ -307,6 +315,10 @@
       "types": "./dist/empty-state.d.ts",
       "import": "./dist/empty-state.js"
     },
+    "./indicator": {
+      "types": "./dist/indicator.d.ts",
+      "import": "./dist/indicator.js"
+    },
     "./notification": {
       "types": "./dist/notification.d.ts",
       "import": "./dist/notification.js"
@@ -487,6 +499,8 @@
     "aspect-ratio",
     "container",
     "section",
+    "simple-grid",
+    "wrap",
     "blockquote",
     "code",
     "heading",
@@ -536,6 +550,7 @@
     "callout",
     "chip",
     "empty-state",
+    "indicator",
     "notification",
     "tag",
     "alert-dialog",

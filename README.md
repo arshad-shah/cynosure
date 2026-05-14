@@ -52,7 +52,7 @@ Peer requirements: **React 18 or 19** (`react`, `react-dom`). `react-hook-form` 
 
 ## Why Cynosure
 
-- **~100 components** across layout, typography, forms, overlays, navigation, data display, and feedback — all pre-styled, all themeable. Full inventory in [`components.config.mjs`](./components.config.mjs).
+- **102 components** with dedicated subpath exports across layout, typography, forms, overlays, navigation, data display, and feedback — all pre-styled, all themeable. Full inventory in [`components.config.mjs`](./components.config.mjs).
 - **Zero-config DX.** One CSS import, one provider, works out of the box with Next.js App Router, Vite, Remix, and CRA.
 - **WCAG 2.2 AA** across every component. Every story is locked to axe-passing. RTL-safe, keyboard complete, reduced-motion honoured.
 - **Pay for what you import.** Per-component ESM entries (`@arshad-shah/cynosure-react/button`) and per-component CSS — your bundler keeps the rest.

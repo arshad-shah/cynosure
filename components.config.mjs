@@ -37,6 +37,7 @@
 
 /** Sidebar group order — matches the docs sidebar top-to-bottom. */
 export const SIDEBAR_GROUPS = /** @type {const} */ ([
+  'Layout',
   'Typography',
   'Buttons',
   'Forms',
@@ -59,7 +60,7 @@ const CATEGORY_DIR = /** @type {const} */ ({
 
 /** Default sidebar group per category. `null` skips the sidebar. */
 const DEFAULT_SIDEBAR_GROUP = /** @type {const} */ ({
-  layout: null,
+  layout: 'Layout',
   typography: 'Typography',
   forms: 'Forms',
   overlay: 'Overlays',
@@ -82,6 +83,8 @@ export const COMPONENTS = [
   { name: 'AspectRatio', slug: 'aspect-ratio', entry: 'aspectratio', category: 'layout' },
   { name: 'Container', slug: 'container', entry: 'container', category: 'layout' },
   { name: 'Section', slug: 'section', entry: 'section', category: 'layout' },
+  { name: 'SimpleGrid', slug: 'simple-grid', entry: 'simplegrid', category: 'layout' },
+  { name: 'Wrap', slug: 'wrap', entry: 'wrap', category: 'layout' },
 
   // ── Typography ────────────────────────────────────────────────────
   { name: 'Blockquote', slug: 'blockquote', entry: 'blockquote', category: 'typography' },
@@ -183,6 +186,7 @@ export const COMPONENTS = [
   { name: 'Callout', slug: 'callout', entry: 'callout', category: 'feedback' },
   { name: 'Chip', slug: 'chip', entry: 'chip', category: 'feedback' },
   { name: 'EmptyState', slug: 'empty-state', entry: 'empty-state', category: 'feedback' },
+  { name: 'Indicator', slug: 'indicator', entry: 'indicator', category: 'feedback' },
   { name: 'Notification', slug: 'notification', entry: 'notification', category: 'feedback' },
   { name: 'Tag', slug: 'tag', entry: 'tag', category: 'feedback' },
 
@@ -315,7 +319,9 @@ export function componentEntries() {
 /** Every published subpath slug (`./<slug>` exports). */
 export const COMPONENT_SLUGS = COMPONENTS.map((c) => c.slug);
 
-/** Slugs that have a docs page under `components/<slug>` (excludes layout). */
-export const DOC_COMPONENT_SLUGS = COMPONENTS.filter((c) => c.category !== 'layout').map(
-  (c) => c.slug,
-);
+/**
+ * Slugs that ship a docs page under `src/content/docs/components/<slug>`.
+ * Every manifest entry has a page — layout primitives included — so the
+ * sidebar surfaces the full inventory.
+ */
+export const DOC_COMPONENT_SLUGS = COMPONENTS.map((c) => c.slug);

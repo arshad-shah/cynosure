@@ -1,0 +1,30 @@
+---
+title: AspectRatio
+description: Locks its child to a fixed aspect ratio — `<img>`, `<video>`, `<iframe>`, or any media wrapper that needs to keep its proportions while the canvas resizes.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Plain `<div>`; preserves whatever semantics the child carries. Provide `alt` text on image children (and a `<title>` on iframes) as you normally would.
+bundleSize: "—"
+tags: [primitive, layout, media]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+
+<LivePreview example="aspect-ratio/basic" />
+
+## Common ratios
+
+Accepts a number or a string. `16/9`, `4/3`, `1/1`, `21/9` are the most common video / photo / square / cinema ratios respectively.
+
+<LivePreview example="aspect-ratio/ratios" />
+
+## API
+
+<PropsTable component="AspectRatio" />
+
+## Recipes
+
+- Wrap responsive media: `<AspectRatio ratio={16/9}><img src={src} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /></AspectRatio>`.
+- Skeleton placeholders: nest a `<Skeleton />` inside `AspectRatio` so the placeholder reserves the right space before the image loads.
+- Embed iframes (YouTube, Vimeo): set `ratio={16/9}` and stretch the iframe to 100% height/width.

@@ -1,0 +1,30 @@
+---
+title: Center
+description: Centers its child both horizontally and vertically. The shortest path between "I want this thing in the middle" and a working layout.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Plain `<div>` (polymorphic via `as`); preserves the child's semantics.
+bundleSize: "—"
+tags: [primitive, layout]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+
+<LivePreview example="center/basic" />
+
+## With a height floor
+
+Center needs a non-zero height to do anything meaningful in the vertical axis. Set `minHeight` (token or raw value) so the canvas has room to center within.
+
+<LivePreview example="center/min-height" />
+
+## API
+
+<PropsTable component="Center" />
+
+## Recipes
+
+- Loading state inside a card: `<Center minHeight="120px"><Spinner /></Center>`.
+- Empty state placeholder: pair `Center` with `EmptyState`. Set `flex="1"` on the Center when it sits inside a flex parent so it claims the remaining space.
+- For the entire viewport: nest a `Center` inside a `Box minHeight="100vh"` (or use the `screen` size token on `minHeight`).

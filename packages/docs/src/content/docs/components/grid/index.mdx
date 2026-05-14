@@ -1,0 +1,37 @@
+---
+title: Grid
+description: CSS Grid container — `columns`, `rows`, `gap`, `templateColumns`, `templateRows`, and the rest of the grid API as token-aware props. The right reach when you need explicit row × column placement.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Plain `<div>`. Grid layout has no implicit semantics — pair with semantic children (`<article>`, headings) when grid items represent content; otherwise leave a Grid as a layout-only wrapper.
+bundleSize: "—"
+tags: [primitive, layout, grid]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+
+<LivePreview example="grid/basic" />
+
+## Columns (responsive)
+
+The shortcut `columns={n}` produces an evenly-divided n-column track. Pass a responsive map to shift column count per breakpoint — the most common dashboard / card-grid pattern.
+
+<LivePreview example="grid/columns" />
+
+## Explicit tracks
+
+`templateColumns` accepts a raw `grid-template-columns` string (or a responsive map) when you need non-uniform tracks — e.g. `"240px 1fr"` for a sidebar + main shell. Combine with `gridColumn` / `gridRow` on children to span tracks.
+
+<LivePreview example="grid/template-columns" />
+
+## API
+
+<PropsTable component="Grid" />
+
+## Recipes
+
+- Card grids: `<Grid columns={{ base: 1, sm: 2, lg: 3, xl: 4 }} gap="4" />` is the canonical responsive card layout.
+- For uniform columns without writing the responsive map, reach for `SimpleGrid` — it's `Grid` tuned for the 90% case.
+- App shells with sidebar + main: `templateColumns="240px 1fr"` keeps the sidebar pinned and the main column responsive in one prop.
+- `Box` and every layout primitive expose `gridArea`, `gridColumn`, `gridRow` so a Grid child can claim a span without a wrapper.

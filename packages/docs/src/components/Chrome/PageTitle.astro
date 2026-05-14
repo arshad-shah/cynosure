@@ -1,30 +1,43 @@
 ---
-// Overrides Starlight's default <PageTitle /> so every component / guide
-// page renders its frontmatter `description` as a visible lede paragraph
-// immediately under the H1. The original Starlight component only renders
-// the title; without this you have to scroll past the live preview before
-// finding a one-line "what is this" — exactly what we want at-a-glance for
-// fast component lookup.
+// Overrides Starlight's default `<PageTitle />` so every component / guide
+// page renders its full frontmatter block below the H1:
+//
+//   1. Lede — the `description` field, with backtick spans rendered as
+//      `<code>` so prop / component references aren't leaked as markdown.
+//   2. Meta row — `status` pill, `since v…`, `bundleSize`, and `tags`.
+//   3. Accessibility note — the `a11y` line as a muted footnote.
+//
+// Sourcing everything from frontmatter means a component page only needs
+// its `---` block to look correct on landing — no manual `<StatusBadge>` /
+// `<BundleSizePill>` markup in the MDX body.
 //
 // `_top` is Starlight's internal page-title anchor id (see
 // `@astrojs/starlight/constants` — not a public export, but the value has
-// been stable since Starlight 0.x and is referenced by the in-page TOC link.
-// Inlining sidesteps a deep-import that Vite refuses to resolve.
+// been stable since Starlight 0.x and is referenced by the in-page ToC
+// link). Inlining sidesteps a deep-import that Vite refuses to resolve.
 const PAGE_TITLE_ID = '_top';
 
 const { entry } = Astro.locals.starlightRoute;
-const description = entry.data.description?.trim();
+const data = entry.data;
+const description = data.description?.trim();
+const status = data.status;
+const since = data.since?.trim();
+const bundleSize = data.bundleSize?.trim();
+const a11y = data.a11y?.trim();
+const tags = (data.tags ?? []).filter((t): t is string => typeof t === 'string' && t.length > 0);
 
-// Tiny inline-markdown renderer: backtick spans become `<code>` so frontmatter
-// descriptions can reference component / prop names (e.g. `` `Badge` ``,
-// `` `mark` ``) without leaking the markdown source. HTML-escape everything
-// else so descriptions can't smuggle markup.
+// Hide the placeholder em-dash that many component pages set as a "size
+// not yet measured" sentinel — a real number would be more useful, but
+// `—` looks broken in the meta row.
+const visibleBundleSize = bundleSize && bundleSize !== '—' ? bundleSize : null;
+
+// Tiny inline-markdown renderer: backtick spans become `<code>` so
+// frontmatter descriptions can reference component / prop names
+// (e.g. `` `Badge` ``) without leaking the markdown source. HTML-escape
+// everything else so descriptions can't smuggle markup.
 function renderLedeHtml(input: string): string {
   const escape = (s: string): string =>
-    s
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;');
+    s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   const parts: string[] = [];
   const re = /`([^`]+)`/g;
   let cursor = 0;
@@ -38,10 +51,49 @@ function renderLedeHtml(input: string): string {
   if (cursor < input.length) parts.push(escape(input.slice(cursor)));
   return parts.join('');
 }
+
+const hasMetaRow = Boolean(status || since || visibleBundleSize || tags.length);
 ---
 
-<h1 id={PAGE_TITLE_ID}>{entry.data.title}</h1>
+<h1 id={PAGE_TITLE_ID}>{data.title}</h1>
+
 {description ? <p class="sl-page-lede" set:html={renderLedeHtml(description)} /> : null}
+
+{
+  hasMetaRow ? (
+    <ul class="sl-page-meta" aria-label="Component metadata">
+      {status ? (
+        <li class="sl-page-meta-item">
+          <span data-status-pill data-status={status}>{status}</span>
+        </li>
+      ) : null}
+      {since ? (
+        <li class="sl-page-meta-item sl-page-meta-text">since v{since.replace(/^v/, '')}</li>
+      ) : null}
+      {visibleBundleSize ? (
+        <li class="sl-page-meta-item">
+          <span class="sl-page-meta-pill" title="Minified + brotli bundle budget">
+            {visibleBundleSize}
+          </span>
+        </li>
+      ) : null}
+      {tags.map((tag) => (
+        <li class="sl-page-meta-item">
+          <span class="sl-page-meta-tag">{tag}</span>
+        </li>
+      ))}
+    </ul>
+  ) : null
+}
+
+{
+  a11y ? (
+    <p class="sl-page-a11y">
+      <span class="sl-page-a11y-label" aria-hidden="true">A11y</span>
+      <span set:html={renderLedeHtml(a11y)} />
+    </p>
+  ) : null
+}
 
 <style>
   @layer starlight.core {
@@ -53,20 +105,122 @@ function renderLedeHtml(input: string): string {
       color: var(--sl-color-white);
     }
   }
-  /* Lede sits in its own layer above Starlight's content reset so it isn't
-   * styled like a normal body paragraph (no top margin collision with the
-   * H1, slightly larger size, muted colour). */
+
+  /* Lede sits above Starlight's content reset so it stays a subtitle rather
+   * than getting styled like a regular body paragraph (no top-margin clash
+   * with the H1, slightly larger size, muted colour). */
   .sl-page-lede {
     margin: 0.5rem 0 0;
     font-size: 1.0625rem;
     line-height: 1.55;
     color: var(--sl-color-gray-2);
-    max-width: 60ch;
+    max-width: 64ch;
   }
   .sl-page-lede code {
     font-family: var(--sl-font-mono, ui-monospace, monospace);
     font-size: 0.95em;
     padding: 0 0.25em;
+    border-radius: 0.25em;
+    background: var(--sl-color-gray-6, rgba(255, 255, 255, 0.06));
+  }
+
+  /* Meta row — horizontal flow of status pill + since + bundle size + tags.
+   * Wraps on narrow viewports. Uses unstyled list semantics so SR users get
+   * an enumeration but visual users see chips. */
+  .sl-page-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 1rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .sl-page-meta-item {
+    display: inline-flex;
+    align-items: center;
+  }
+  .sl-page-meta-text {
+    color: var(--sl-color-gray-3);
+    font-size: 0.8125rem;
+  }
+  .sl-page-meta-pill,
+  .sl-page-meta-tag {
+    display: inline-block;
+    padding: 0.15em 0.6em;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    line-height: 1;
+    letter-spacing: 0.02em;
+    border: 1px solid var(--sl-color-gray-5, color-mix(in srgb, currentColor 15%, transparent));
+    color: var(--sl-color-gray-2);
+    background: transparent;
+  }
+  .sl-page-meta-tag {
+    text-transform: lowercase;
+  }
+
+  /* Status pill — uses the same token palette as `<StatusBadge />` so the
+   * appearance is identical to what existing pages used to render inline. */
+  [data-status-pill] {
+    display: inline-block;
+    padding: 0.15em 0.6em;
+    border-radius: 9999px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    line-height: 1;
+    border: 1px solid transparent;
+  }
+  [data-status-pill][data-status='stable'] {
+    color: var(--cynosure-color-feedback-success-foreground, #166534);
+    background: var(--cynosure-color-feedback-success-soft, #dcfce7);
+  }
+  [data-status-pill][data-status='beta'] {
+    color: var(--cynosure-color-feedback-warning-foreground, #92400e);
+    background: var(--cynosure-color-feedback-warning-soft, #fef3c7);
+  }
+  [data-status-pill][data-status='alpha'] {
+    color: var(--cynosure-color-feedback-danger-foreground, #991b1b);
+    background: var(--cynosure-color-feedback-danger-soft, #fee2e2);
+  }
+  [data-status-pill][data-status='experimental'] {
+    color: var(--cynosure-color-accent-solid, #4f46e5);
+    background: var(--cynosure-color-accent-soft, #eef2ff);
+  }
+  [data-status-pill][data-status='deprecated'] {
+    color: var(--cynosure-color-foreground-muted, #52525b);
+    background: var(--cynosure-color-background-subtle, #f4f4f5);
+  }
+
+  /* Accessibility footnote — a single-line summary of how the component
+   * behaves for assistive tech, sourced from the `a11y` frontmatter field.
+   * Sits below the meta row and is muted so it doesn't fight the lede. */
+  .sl-page-a11y {
+    margin: 0.75rem 0 0;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: var(--sl-color-gray-3);
+    max-width: 72ch;
+  }
+  .sl-page-a11y-label {
+    display: inline-block;
+    margin-right: 0.4em;
+    padding: 0.1em 0.4em;
+    font-size: 0.7em;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-radius: 0.25em;
+    background: var(--sl-color-gray-6, rgba(255, 255, 255, 0.06));
+    color: var(--sl-color-gray-1);
+    vertical-align: middle;
+  }
+  .sl-page-a11y code {
+    font-family: var(--sl-font-mono, ui-monospace, monospace);
+    font-size: 0.95em;
+    padding: 0 0.2em;
     border-radius: 0.25em;
     background: var(--sl-color-gray-6, rgba(255, 255, 255, 0.06));
   }

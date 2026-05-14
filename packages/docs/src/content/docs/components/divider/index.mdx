@@ -1,0 +1,36 @@
+---
+title: Divider
+description: A thin horizontal or vertical rule for separating sections. Horizontal renders as a semantic `<hr>`; vertical renders as a `<div role="separator">` with `aria-orientation`.
+category: components
+status: stable
+since: "0.1.0"
+a11y: Decorative by default. Set `decorative={false}` when the rule conveys a meaningful section break so AT announces the separator. `labelAlign` + `children` exposes an inline label that AT reads instead.
+bundleSize: "—"
+tags: [primitive, layout]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+
+<LivePreview example="divider/basic" />
+
+## Orientation
+
+Use `orientation="vertical"` inside an `Inline`/`Flex` row for column dividers. Set `length` for an explicit height (or width, horizontally) — defaults to the container's cross-axis size.
+
+<LivePreview example="divider/vertical" />
+
+## With a label
+
+Pass children to render an inline label that splits the rule. `labelAlign` controls where the label sits (`start`, `center`, `end`).
+
+<LivePreview example="divider/label" />
+
+## API
+
+<PropsTable component="Divider" />
+
+## Recipes
+
+- `Stack dividers={<Divider />}` inserts a divider between every pair of children — see [`Stack`](/components/stack#dividers-between-children).
+- Use `variant="dashed"` for a softer break that still reads as a separator.
+- For purely visual breathing room with no semantics, prefer a `Box` with `marginY` or a `Spacer` inside a flex row.
