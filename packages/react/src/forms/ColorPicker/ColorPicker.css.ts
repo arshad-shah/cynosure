@@ -290,3 +290,17 @@ export const swatchGrid = style({
   flexWrap: 'wrap',
   gap: vars.space['1.5'],
 });
+
+/**
+ * Shared focus visual for picker controls. Apply as an additional class so the
+ * element's own border/background stays under its control.
+ */
+export const focusRing = style({
+  outline: 'none',
+  selectors: {
+    '&:focus-visible, &[data-focus-visible]': {
+      boxShadow: `0 0 0 2px ${vars.color.accent.ring}`,
+      borderColor: vars.color.border.focus,
+    },
+  },
+});
