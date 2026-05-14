@@ -1,13 +1,7 @@
 import { useEffect, useId, useState } from 'react';
 import { type Color, type ColorChannel, type ColorSpace, parseColor } from 'react-aria-components';
 import { cn } from '../../../utils/cn.js';
-import {
-  fieldWell,
-  inertWell,
-  inputElement,
-  multiWellRoot,
-  slotGroup,
-} from '../../Input/Input.css.js';
+import { fieldWell, inputElement, multiWellRoot, slotGroup } from '../../Input/Input.css.js';
 import {
   cellFieldWell,
   cellGlyph,
@@ -178,7 +172,7 @@ function ChannelCell({
       onMouseLeave={() => setHover(false)}
     >
       <span className={slotGroup}>
-        <span className={cn(inertWell, cellSlot, cellGlyph)} data-slot-kind="inert">
+        <span className={cn(cellSlot, cellGlyph)} data-slot-kind="inert">
           {spec.glyph}
         </span>
       </span>
@@ -219,7 +213,7 @@ function ChannelCell({
       </span>
       {spec.suffix ? (
         <span className={slotGroup}>
-          <span className={cn(inertWell, cellSlot, cellGlyph)} data-slot-kind="inert">
+          <span className={cn(cellSlot, cellGlyph)} data-slot-kind="inert">
             {spec.suffix}
           </span>
         </span>
@@ -276,7 +270,7 @@ function HexCell({
       onMouseLeave={() => setHover(false)}
     >
       <span className={slotGroup}>
-        <span className={cn(inertWell, cellSlot, cellGlyph)} data-slot-kind="inert">
+        <span className={cn(cellSlot, cellGlyph)} data-slot-kind="inert">
           {spec.glyph}
         </span>
       </span>

@@ -1,5 +1,6 @@
 import { style, styleVariants } from '@vanilla-extract/css';
 import { vars } from '../../styles/vars.css.js';
+import { inertWell } from '../Input/Input.css.js';
 
 const checkerBg = `
   linear-gradient(45deg, ${vars.color.border.subtle} 25%, transparent 25%),
@@ -285,18 +286,21 @@ export const cellSize = styleVariants({
   lg: { minHeight: '2.125rem', fontSize: '0.875rem' },
 });
 
-export const cellSlot = style({
-  border: 'none',
-  background: 'transparent',
-  boxShadow: 'none',
-  padding: 0,
-  minWidth: 0,
-  minHeight: 0,
-  width: '0.75rem',
-  flex: '0 0 0.75rem',
-  justifyContent: 'center',
-  overflow: 'visible',
-});
+export const cellSlot = style([
+  inertWell,
+  {
+    border: 'none',
+    background: 'transparent',
+    boxShadow: 'none',
+    padding: 0,
+    minWidth: 0,
+    minHeight: 0,
+    width: '0.75rem',
+    flex: '0 0 0.75rem',
+    justifyContent: 'center',
+    overflow: 'visible',
+  },
+]);
 
 export const cellInput = style({
   border: 'none',
