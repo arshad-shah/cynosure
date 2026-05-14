@@ -17,18 +17,6 @@ import BundleSizePill from '@/components/BundleSizePill.astro';
 
 <LivePreview example="stat/basic" />
 
-## Usage
-
-```tsx
-import { Stat, StatHelp, StatLabel, StatValue } from '@arshad-shah/cynosure-react';
-
-<Stat>
-  <StatLabel>Monthly revenue</StatLabel>
-  <StatValue>$48,290</StatValue>
-  <StatHelp>Up from $42,960 last month</StatHelp>
-</Stat>
-```
-
 ## With trend arrow
 
 Use `StatArrow` to surface direction. `direction="increase"` (default) renders an upward chevron; `direction="decrease"` flips it. The arrow exposes an `aria-label` so screen readers announce the trend.

@@ -17,31 +17,6 @@ import BundleSizePill from '@/components/BundleSizePill.astro';
 
 <LivePreview example="context-menu/basic" />
 
-## Usage
-
-```tsx
-import {
-  ContextMenu,
-  ContextMenuContent,
-  ContextMenuItem,
-  ContextMenuSeparator,
-  ContextMenuShortcut,
-  ContextMenuTrigger,
-} from "@arshad-shah/cynosure-react";
-
-<ContextMenu>
-  <ContextMenuTrigger asChild>
-    <div>Right-click me</div>
-  </ContextMenuTrigger>
-  <ContextMenuContent>
-    <ContextMenuItem>Cut <ContextMenuShortcut>⌘X</ContextMenuShortcut></ContextMenuItem>
-    <ContextMenuItem>Copy <ContextMenuShortcut>⌘C</ContextMenuShortcut></ContextMenuItem>
-    <ContextMenuSeparator />
-    <ContextMenuItem variant="danger">Delete</ContextMenuItem>
-  </ContextMenuContent>
-</ContextMenu>
-```
-
 ## Variants
 
 ### With submenu

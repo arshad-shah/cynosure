@@ -1,6 +1,6 @@
 ---
 title: Mark
-description: Inline text highlighting for search hits, regex matches, syntax tokens, and diff hunks — a semantic `<mark>` that flows with surrounding prose and wraps cleanly across lines.
+description: A thin inline-flow primitive — reach for it instead of `Badge`/`Code` when you need to highlight a substring inside flowing text without breaking baseline alignment or vertical rhythm.
 category: components
 status: stable
 since: "0.1.0"
@@ -16,16 +16,6 @@ import BundleSizePill from '@/components/BundleSizePill.astro';
 <div><StatusBadge status="stable" /> <BundleSizePill name="Mark" /></div>
 
 <LivePreview example="mark/basic" />
-
-## Usage
-
-```tsx
-import { Mark } from '@arshad-shah/cynosure-react';
-
-<Mark>highlighted text</Mark>
-```
-
-`Mark` is a thin inline-flow primitive — reach for it instead of `Badge`/`Code` when you need to highlight a substring inside flowing text without breaking baseline alignment or vertical rhythm.
 
 ## Variants
 

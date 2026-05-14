@@ -17,15 +17,6 @@ import BundleSizePill from "@/components/BundleSizePill.astro";
 
 <LivePreview example="calendar/basic" />
 
-## Usage
-
-```tsx
-import { Calendar } from "@arshad-shah/cynosure-react/calendar";
-import { parseDate } from "@internationalized/date";
-
-<Calendar aria-label="Event date" defaultValue={parseDate("2026-04-17")} />
-```
-
 ## Controlled
 
 Drive selection from state by passing `value` + `onChange`. Values are `@internationalized/date` `DateValue`s.

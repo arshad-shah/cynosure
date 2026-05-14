@@ -17,18 +17,6 @@ import BundleSizePill from '@/components/BundleSizePill.astro';
 
 <LivePreview example="tree/basic" />
 
-## Usage
-
-```tsx
-import { Tree, type TreeNode } from '@arshad-shah/cynosure-react';
-
-const items: TreeNode[] = [
-  { id: 'a', label: 'Folder', children: [{ id: 'a/1', label: 'File.tsx' }] },
-];
-
-<Tree items={items} aria-label="Files" />
-```
-
 ## Default expanded
 
 Pass `defaultExpandedIds` to open a set of branches on first paint without controlling state.

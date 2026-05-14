@@ -1,0 +1,73 @@
+---
+// Overrides Starlight's default <PageTitle /> so every component / guide
+// page renders its frontmatter `description` as a visible lede paragraph
+// immediately under the H1. The original Starlight component only renders
+// the title; without this you have to scroll past the live preview before
+// finding a one-line "what is this" — exactly what we want at-a-glance for
+// fast component lookup.
+//
+// `_top` is Starlight's internal page-title anchor id (see
+// `@astrojs/starlight/constants` — not a public export, but the value has
+// been stable since Starlight 0.x and is referenced by the in-page TOC link.
+// Inlining sidesteps a deep-import that Vite refuses to resolve.
+const PAGE_TITLE_ID = '_top';
+
+const { entry } = Astro.locals.starlightRoute;
+const description = entry.data.description?.trim();
+
+// Tiny inline-markdown renderer: backtick spans become `<code>` so frontmatter
+// descriptions can reference component / prop names (e.g. `` `Badge` ``,
+// `` `mark` ``) without leaking the markdown source. HTML-escape everything
+// else so descriptions can't smuggle markup.
+function renderLedeHtml(input: string): string {
+  const escape = (s: string): string =>
+    s
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;');
+  const parts: string[] = [];
+  const re = /`([^`]+)`/g;
+  let cursor = 0;
+  let match: RegExpExecArray | null;
+  // biome-ignore lint/suspicious/noAssignInExpressions: standard regex iteration.
+  while ((match = re.exec(input)) != null) {
+    if (match.index > cursor) parts.push(escape(input.slice(cursor, match.index)));
+    parts.push(`<code>${escape(match[1] ?? '')}</code>`);
+    cursor = match.index + match[0].length;
+  }
+  if (cursor < input.length) parts.push(escape(input.slice(cursor)));
+  return parts.join('');
+}
+---
+
+<h1 id={PAGE_TITLE_ID}>{entry.data.title}</h1>
+{description ? <p class="sl-page-lede" set:html={renderLedeHtml(description)} /> : null}
+
+<style>
+  @layer starlight.core {
+    h1 {
+      margin-top: 1rem;
+      font-size: var(--sl-text-h1);
+      line-height: var(--sl-line-height-headings);
+      font-weight: 600;
+      color: var(--sl-color-white);
+    }
+  }
+  /* Lede sits in its own layer above Starlight's content reset so it isn't
+   * styled like a normal body paragraph (no top margin collision with the
+   * H1, slightly larger size, muted colour). */
+  .sl-page-lede {
+    margin: 0.5rem 0 0;
+    font-size: 1.0625rem;
+    line-height: 1.55;
+    color: var(--sl-color-gray-2);
+    max-width: 60ch;
+  }
+  .sl-page-lede code {
+    font-family: var(--sl-font-mono, ui-monospace, monospace);
+    font-size: 0.95em;
+    padding: 0 0.25em;
+    border-radius: 0.25em;
+    background: var(--sl-color-gray-6, rgba(255, 255, 255, 0.06));
+  }
+</style>

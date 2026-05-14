@@ -4,6 +4,79 @@ import { createConfig } from '@arshad-shah/cynosure-config/tsup.config.base';
 import { vanillaExtractPlugin } from '@vanilla-extract/esbuild-plugin';
 import { componentEntries } from '../../components.config.mjs';
 
+/**
+ * Walk a CSS string at brace depth 0 to split it into top-level "items":
+ * comments, at-rules (e.g. `@media (...) { ... }`), and ordinary rules
+ * (`.foo { ... }`). Returns the items in source order so deduplication can
+ * skip subsequent identical occurrences while preserving the cascade.
+ */
+function dedupeCssRules(css: string): string {
+  type Item = { kind: 'block' | 'comment' | 'whitespace'; text: string };
+  const items: Item[] = [];
+  let i = 0;
+  while (i < css.length) {
+    // Whitespace run.
+    if (/\s/.test(css[i] ?? '')) {
+      let j = i;
+      while (j < css.length && /\s/.test(css[j] ?? '')) j++;
+      items.push({ kind: 'whitespace', text: css.slice(i, j) });
+      i = j;
+      continue;
+    }
+    // /* comment */
+    if (css[i] === '/' && css[i + 1] === '*') {
+      const end = css.indexOf('*/', i + 2);
+      if (end === -1) {
+        items.push({ kind: 'comment', text: css.slice(i) });
+        break;
+      }
+      items.push({ kind: 'comment', text: css.slice(i, end + 2) });
+      i = end + 2;
+      continue;
+    }
+    // A rule or at-rule that ends at the next matching `}` at depth 0. A
+    // simple brace-balance walk is sufficient because vanilla-extract's
+    // output is well-formed and never embeds `{`/`}` inside string
+    // literals at the top level.
+    let depth = 0;
+    let j = i;
+    let started = false;
+    while (j < css.length) {
+      const c = css[j];
+      if (c === '{') {
+        depth++;
+        started = true;
+      } else if (c === '}') {
+        depth--;
+        if (started && depth === 0) {
+          j++;
+          break;
+        }
+      }
+      j++;
+    }
+    if (!started) {
+      // No more braces — bail and dump the remainder verbatim.
+      items.push({ kind: 'block', text: css.slice(i) });
+      break;
+    }
+    items.push({ kind: 'block', text: css.slice(i, j) });
+    i = j;
+  }
+
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const item of items) {
+    if (item.kind === 'block') {
+      const key = item.text.replace(/\s+/g, ' ').trim();
+      if (seen.has(key)) continue;
+      seen.add(key);
+    }
+    out.push(item.text);
+  }
+  return out.join('');
+}
+
 const hookEntries = (): Record<string, string> => {
   const dir = join(process.cwd(), 'src/hooks');
   const entries: Record<string, string> = {};
@@ -160,7 +233,20 @@ body {
 `;
     chunks.push(baseReset);
 
-    const stylesCss = chunks.join('\n');
+    // Deduplicate identical rule blocks across the concatenated component
+    // CSS. Every tsup chunk that imports a shared vanilla-extract style
+    // (e.g. `layoutPropsStyle`, `typographyBase`) re-emits that rule into
+    // its own `.css` output. Concatenating them naively produces six+
+    // copies of the same rule near the end of `styles.css`. Because the
+    // last identical-specificity rule wins the cascade, those late copies
+    // override `background-color` set by a component's variant rule
+    // earlier in the file (variants like `Mark variant="marker"` rely on
+    // setting `background-color`, but `layoutPropsStyle` re-asserts
+    // `background-color: var(--cynosure-lp-bg-base)` from a later
+    // position, which the browser resolves to `transparent` when no
+    // override is present). One copy at the first occurrence preserves
+    // the rule without re-asserting it later.
+    const stylesCss = dedupeCssRules(chunks.join('\n'));
     await writeFile(join(dist, 'styles.css'), stylesCss);
 
     // Additionally emit `all.css`: a single-import bundle that includes design

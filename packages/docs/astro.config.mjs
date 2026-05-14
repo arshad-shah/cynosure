@@ -82,6 +82,10 @@ export default defineConfig({
         // a `Storybook` link next to the social-icons row. Everything else
         // (logo, search, mobile-nav, theme-switcher) stays Starlight default.
         SocialIcons: './src/components/Chrome/SocialIcons.astro',
+        // Renders the frontmatter `description` as a lede paragraph under
+        // each page's H1 so a visitor lands and immediately sees what the
+        // component is for — no scrolling past the live preview required.
+        PageTitle: './src/components/Chrome/PageTitle.astro',
       },
       sidebar: [
         {

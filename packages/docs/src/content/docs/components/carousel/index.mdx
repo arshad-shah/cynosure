@@ -17,32 +17,6 @@ import BundleSizePill from '@/components/BundleSizePill.astro';
 
 <LivePreview example="carousel/basic" />
 
-## Usage
-
-```tsx
-import {
-  Carousel,
-  CarouselContainer,
-  CarouselDots,
-  CarouselNext,
-  CarouselPrevious,
-  CarouselSlide,
-  CarouselViewport,
-} from '@arshad-shah/cynosure-react';
-
-<Carousel>
-  <CarouselViewport>
-    <CarouselContainer>
-      <CarouselSlide>Slide 1</CarouselSlide>
-      <CarouselSlide>Slide 2</CarouselSlide>
-    </CarouselContainer>
-  </CarouselViewport>
-  <CarouselPrevious />
-  <CarouselNext />
-  <CarouselDots />
-</Carousel>
-```
-
 ## Slides per view
 
 Pass a number to show several slides at once. Use a responsive object (`base`, `sm`, `md`, `lg`, `xl`) for breakpoint-aware gallery layouts.

@@ -17,40 +17,6 @@ import BundleSizePill from '@/components/BundleSizePill.astro';
 
 <LivePreview example="drawer/basic" />
 
-## Usage
-
-```tsx
-import {
-  Button,
-  Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerDescription,
-  DrawerFooter,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "@arshad-shah/cynosure-react";
-
-<Drawer>
-  <DrawerTrigger asChild>
-    <Button>Open</Button>
-  </DrawerTrigger>
-  <DrawerContent side="right">
-    <DrawerHeader>
-      <DrawerTitle>Filters</DrawerTitle>
-      <DrawerDescription>Refine your results</DrawerDescription>
-    </DrawerHeader>
-    <DrawerFooter>
-      <DrawerClose asChild>
-        <Button variant="ghost">Close</Button>
-      </DrawerClose>
-      <Button>Apply</Button>
-    </DrawerFooter>
-  </DrawerContent>
-</Drawer>
-```
-
 ## Variants
 
 ### Sides
