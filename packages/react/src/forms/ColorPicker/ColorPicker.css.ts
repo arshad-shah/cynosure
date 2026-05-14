@@ -316,7 +316,7 @@ export const cellSuffixSlot = style([
     width: '0.85em',
     flex: '0 0 0.85em',
     justifyContent: 'flex-end',
-    paddingRight: '2px',
+    paddingInlineEnd: '2px',
     overflow: 'visible',
   },
 ]);
