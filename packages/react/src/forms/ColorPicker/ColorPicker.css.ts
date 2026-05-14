@@ -295,9 +295,10 @@ export const cellSlot = style([
     padding: 0,
     minWidth: 0,
     minHeight: 0,
-    width: '1em',
-    flex: '0 0 1em',
-    justifyContent: 'center',
+    width: '1.25em',
+    flex: '0 0 1.25em',
+    justifyContent: 'flex-start',
+    paddingInline: vars.space[1],
     overflow: 'visible',
   },
 ]);
@@ -327,7 +328,7 @@ export const cellFieldWell = style({
 
 export const cellGlyph = style({
   fontFamily: 'var(--cynosure-font-mono-md-family, monospace)',
-  fontSize: '0.85em',
+  fontSize: '0.95em',
   fontWeight: 700,
   textTransform: 'uppercase',
   color: vars.color.foreground.muted,
