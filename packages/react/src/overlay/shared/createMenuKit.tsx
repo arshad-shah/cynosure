@@ -1,4 +1,3 @@
-import * as RadixRadioGroup from '@radix-ui/react-radio-group';
 import { ChevronRight } from 'lucide-react';
 import {
   type ComponentPropsWithoutRef,
@@ -11,6 +10,7 @@ import {
 } from 'react';
 import { Checkbox } from '../../forms/Checkbox/Checkbox.js';
 import { Radio } from '../../forms/Radio/Radio.js';
+import { RadioGroup as CynRadioGroup } from '../../forms/RadioGroup/RadioGroup.js';
 import { Kbd } from '../../typography/Kbd/Kbd.js';
 import { cn } from '../../utils/cn.js';
 import {
@@ -283,13 +283,13 @@ export function createMenuKit<N extends MenuNamespace>(Radix: N): MenuKit<N> {
         <MenuItemContent
           leading={
             <span className={menuFormIndicator} aria-hidden="true">
-              <RadixRadioGroup.Root value="" className={menuFormIndicatorGroup}>
+              <CynRadioGroup value="" className={menuFormIndicatorGroup}>
                 <Radio value="on" size="sm" />
-              </RadixRadioGroup.Root>
+              </CynRadioGroup>
               <RadixItemIndicator className={menuFormIndicatorOverlay}>
-                <RadixRadioGroup.Root value="on" className={menuFormIndicatorGroup}>
+                <CynRadioGroup value="on" className={menuFormIndicatorGroup}>
                   <Radio value="on" size="sm" />
-                </RadixRadioGroup.Root>
+                </CynRadioGroup>
               </RadixItemIndicator>
             </span>
           }

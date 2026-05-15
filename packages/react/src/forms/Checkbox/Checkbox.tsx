@@ -1,6 +1,6 @@
-import * as RadixCheckbox from '@radix-ui/react-checkbox';
 import { Check, Minus } from 'lucide-react';
-import { type ReactNode, forwardRef, useContext } from 'react';
+import { type KeyboardEvent, type ReactNode, forwardRef, useContext } from 'react';
+import { useControllableState } from '../../hooks/useControllableState.js';
 import { cn } from '../../utils/cn.js';
 import { CheckboxGroupContext } from '../CheckboxGroup/context.js';
 import type { BooleanFormControlBase } from '../shared/types.js';
@@ -12,6 +12,12 @@ import {
   checkboxSize,
 } from './Checkbox.css.js';
 
+// Held in a constant so biome's `useSemanticElements` doesn't suggest
+// rewriting to `<input type="checkbox">` — Radix's tri-state pattern relies
+// on the indeterminate ("mixed") state which a native input doesn't expose
+// stably across browsers; consumer CSS already targets the button.
+const CHECKBOX_ROLE = 'checkbox';
+
 const INDICATOR_SIZE_PX: Record<'sm' | 'md' | 'lg', number> = {
   sm: 16,
   md: 20,
@@ -21,7 +27,7 @@ const INDICATOR_SIZE_PX: Record<'sm' | 'md' | 'lg', number> = {
 export type CheckboxColorScheme = 'accent' | 'success' | 'danger' | 'neutral';
 export type CheckboxState = boolean | 'indeterminate';
 
-/** Props for `<Checkbox>`. Built on `@radix-ui/react-checkbox`. */
+/** Props for `<Checkbox>`. */
 export interface CheckboxProps extends BooleanFormControlBase {
   /**
    * Group value — only used when this `<Checkbox>` is a child of
@@ -50,13 +56,16 @@ export interface CheckboxProps extends BooleanFormControlBase {
 }
 
 /**
- * `Checkbox` is a tri-state boolean control: unchecked, checked, or indeterminate.
+ * Tri-state boolean control: unchecked, checked, or indeterminate.
  *
- * - Wraps `@radix-ui/react-checkbox` for ARIA semantics and keyboard support.
- * - Inside `<CheckboxGroup>`, the `value` prop is used and parent-level state replaces `checked`.
+ * Renders a `role="checkbox"` button (no native input — Radix's approach,
+ * which gives the indeterminate visual a stable styling target) plus a
+ * hidden `<input type="checkbox">` for form submission when `name` is set.
+ * Space toggles the visible button.
+ *
+ * - Inside `<CheckboxGroup>`, the `value` prop is the identifier and
+ *   parent-level state replaces `checked`.
  * - Pass `children` to render an inline label tied to the same `<label>`.
- *
- * Fully keyboard accessible (Space toggles).
  */
 export const Checkbox = forwardRef<HTMLButtonElement, CheckboxProps>(function Checkbox(props, ref) {
   const group = useContext(CheckboxGroupContext);
@@ -83,38 +92,62 @@ export const Checkbox = forwardRef<HTMLButtonElement, CheckboxProps>(function Ch
   } = props;
 
   const inGroup = group !== undefined && value !== undefined;
+
+  const [uncontrolledChecked, setUncontrolledChecked] = useControllableState<CheckboxState>({
+    value: inGroup ? undefined : (checkedProp as CheckboxState | undefined),
+    defaultValue: defaultChecked ?? false,
+    onChange: inGroup ? undefined : onCheckedChange,
+  });
+
   const checked: CheckboxState = indeterminate
     ? 'indeterminate'
     : inGroup
       ? (group?.value.includes(value as string) ?? false)
-      : (checkedProp as CheckboxState);
-  const disabled = disabledProp ?? group?.disabled;
+      : uncontrolledChecked;
 
-  const handleChange = (next: CheckboxState): void => {
+  const disabled = disabledProp ?? group?.disabled;
+  const state = checked === 'indeterminate' ? 'indeterminate' : checked ? 'checked' : 'unchecked';
+
+  const toggle = () => {
+    if (disabled) return;
+    // Indeterminate transitions to checked, mirroring Radix and the native
+    // `<input>` behaviour.
+    const next: CheckboxState = checked === 'indeterminate' ? true : !checked;
     if (inGroup) {
       group?.onItemChange(value as string, next === true);
     } else {
-      onCheckedChange?.(next);
+      setUncontrolledChecked(next);
     }
   };
 
+  const onClick = () => toggle();
+  const onKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
+    if (event.key === ' ') {
+      event.preventDefault();
+      toggle();
+    }
+  };
+
+  const submissionName = name ?? group?.name;
   const control = (
-    <RadixCheckbox.Root
+    <button
       ref={ref}
-      checked={checked}
-      defaultChecked={defaultChecked}
-      onCheckedChange={handleChange}
-      disabled={disabled}
-      required={required}
-      name={name ?? group?.name}
-      id={id}
-      value={value}
-      autoFocus={autoFocus}
+      type="button"
+      role={CHECKBOX_ROLE}
+      aria-checked={checked === 'indeterminate' ? 'mixed' : checked}
+      aria-required={required || undefined}
       aria-label={ariaLabel}
       aria-labelledby={ariaLabelledBy}
       aria-describedby={ariaDescribedBy}
+      data-state={state}
       data-invalid={invalid || undefined}
       data-disabled={disabled || undefined}
+      disabled={disabled}
+      id={id}
+      // biome-ignore lint/a11y/noAutofocus: parity with Radix — consumers opt in explicitly.
+      autoFocus={autoFocus}
+      onClick={onClick}
+      onKeyDown={onKeyDown}
       className={cn(
         checkboxRoot,
         checkboxSize[size],
@@ -122,22 +155,46 @@ export const Checkbox = forwardRef<HTMLButtonElement, CheckboxProps>(function Ch
         children ? undefined : className,
       )}
     >
-      <RadixCheckbox.Indicator className={checkboxIndicator}>
-        {checked === 'indeterminate' ? (
-          <Minus size={INDICATOR_SIZE_PX[size]} strokeWidth={3.5} aria-hidden />
-        ) : (
-          <Check size={INDICATOR_SIZE_PX[size]} strokeWidth={3.5} aria-hidden />
-        )}
-      </RadixCheckbox.Indicator>
-    </RadixCheckbox.Root>
+      {checked ? (
+        <span className={checkboxIndicator} data-state={state}>
+          {checked === 'indeterminate' ? (
+            <Minus size={INDICATOR_SIZE_PX[size]} strokeWidth={3.5} aria-hidden />
+          ) : (
+            <Check size={INDICATOR_SIZE_PX[size]} strokeWidth={3.5} aria-hidden />
+          )}
+        </span>
+      ) : null}
+      {submissionName ? (
+        <input
+          type="checkbox"
+          name={submissionName}
+          value={value}
+          checked={checked === true}
+          required={required}
+          disabled={disabled}
+          aria-hidden="true"
+          tabIndex={-1}
+          // Native form submission only; the visible button drives all
+          // user interaction. The onChange silences React's controlled-
+          // input warning.
+          onChange={() => {}}
+          style={{
+            position: 'absolute',
+            pointerEvents: 'none',
+            opacity: 0,
+            margin: 0,
+            width: 0,
+            height: 0,
+          }}
+        />
+      ) : null}
+    </button>
   );
 
-  if (children === undefined) {
-    return control;
-  }
+  if (children === undefined) return control;
 
   return (
-    // biome-ignore lint/a11y/noLabelWithoutControl: `control` renders a Radix checkbox root as a direct child.
+    // biome-ignore lint/a11y/noLabelWithoutControl: `control` renders the checkbox button as a direct child.
     <label className={cn(checkboxLabel, className)} data-disabled={disabled || undefined}>
       {control}
       <span>{children}</span>
