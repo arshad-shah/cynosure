@@ -422,17 +422,25 @@ export default createConfig({
 
     // Wire per-component JS to its CSS: prepend `import './core.css'` and
     // `import './<name>.css'` at the top of every emitted entry-point JS
-    // file. Without this, `import { Button } from '@…/button'` returns
-    // the component but no styles — consumers have to remember to load
-    // `styles.css` or every per-component CSS file manually. By turning
-    // each subpath into a side-effectful CSS import (already covered by
-    // the package's `sideEffects: ["**/*.css"]` whitelist), bundlers
-    // automatically include the CSS for the components actually used and
-    // tree-shake the rest.
+    // file. `core.css` carries the shared rules used by ≥2 components
+    // (layoutPropsStyle, typography base, control sizes, focus ring…),
+    // extracted once via `extractSharedBlocks` above. Bundlers dedupe
+    // `core.css` to a single copy regardless of how many components a
+    // consumer imports, so the per-component .js + .css chunks stay
+    // lean. Without the auto-import, a `import { Button } from
+    // '…/button'` would pull JS but not the shared layout cascade —
+    // visuals would silently break for consumers that don't separately
+    // load `styles.css`.
+    //
+    // For `size-limit` to report accurate per-component JS sizes (rather
+    // than inflating each by the shared core.css), configure the budget
+    // entries with `modifyEsbuildConfig: (c) => ({ ...c, loader: { ...,
+    // '.css': 'empty' } })` so CSS imports compile to no bytes. The
+    // separate `Core CSS chunk` entry measures core.css standalone.
     const jsFiles = await readdir(dist);
     for (const file of jsFiles) {
       if (!file.endsWith('.js')) continue;
-      if (file.startsWith('chunk-')) continue; // internal shared chunks have no public CSS
+      if (file.startsWith('chunk-')) continue;
       const base = file.replace(/\.js$/, '');
       const cssPath = join(dist, `${base}.css`);
       let hasCss = false;
@@ -440,26 +448,23 @@ export default createConfig({
         await stat(cssPath);
         hasCss = true;
       } catch {
-        /* no per-entry CSS — pure JS entry (hooks, utils) */
+        /* pure JS entry (hooks, utils) */
       }
       if (!hasCss) continue;
       const jsPath = join(dist, file);
       const body = await readFile(jsPath, 'utf8');
-      // Idempotent — re-run safe.
       if (body.startsWith(`import './core.css';`)) continue;
       const prefix = `import './core.css';\nimport './${base}.css';\n`;
       await writeFile(jsPath, prefix + body);
     }
     // Same treatment for category barrels (forms/index.js, overlay/index.js, …).
     for (const barrel of barrels) {
-      const rel = relative(dist, barrel); // e.g. "forms/index.css"
+      const rel = relative(dist, barrel);
       const jsRel = rel.replace(/\.css$/, '.js');
       const jsPath = join(dist, jsRel);
       try {
         const body = await readFile(jsPath, 'utf8');
         if (body.startsWith(`import '`)) {
-          // peek for our own marker — `import './core.css'` may not be
-          // first if esbuild emitted other relative imports first
           if (body.includes(`'../core.css'`) || body.includes(`'./core.css'`)) continue;
         }
         const depth = dirname(jsRel).split('/').length;
@@ -556,15 +561,12 @@ export default createConfig({
     '@radix-ui/react-context-menu',
     '@radix-ui/react-dialog',
     '@radix-ui/react-dropdown-menu',
-    '@radix-ui/react-hover-card',
     '@radix-ui/react-menubar',
     '@radix-ui/react-navigation-menu',
     '@radix-ui/react-popover',
-    '@radix-ui/react-tooltip',
     'react-aria-components',
     '@internationalized/date',
     'sonner',
-    '@radix-ui/react-scroll-area',
     '@tanstack/react-table',
     'react-resizable-panels',
     'shiki',
