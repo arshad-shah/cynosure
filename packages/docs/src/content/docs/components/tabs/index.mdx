@@ -40,7 +40,7 @@ Pass `disabled` to any `TabsTrigger` to prevent selection.
 
 ## Accessibility
 
-- The tab list carries `role="tablist"`; each trigger carries `role="tab"` with `aria-selected` and `aria-controls` managed by Radix UI.
+- The tab list carries `role="tablist"`; each trigger carries `role="tab"` with `aria-selected` and `aria-controls` wired by the component.
 - Arrow keys cycle between tabs within the list; `Home` / `End` jump to first / last tab.
 - `TabsContent` carries `role="tabpanel"` and is linked to its trigger via `aria-labelledby`.
 - `TabsIndicator` is `aria-hidden="true"` — purely decorative.

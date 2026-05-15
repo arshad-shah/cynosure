@@ -76,7 +76,7 @@ describe('Avatar', () => {
 
   it('renders Image element when src is provided', () => {
     const { container } = render(<Avatar name="A" src="/x.png" alt="A pic" />);
-    // Image renders inside Radix; alt should be passed through
+    // Image renders inside the avatar root; alt should be passed through
     expect(container.querySelector('span')).not.toBeNull();
   });
 

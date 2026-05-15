@@ -5,7 +5,7 @@ order: 5
 category: components
 status: stable
 since: 0.1.0
-a11y: Built on Radix UI radio-group; roving tabindex managed by the group; role="radio" with aria-checked.
+a11y: Roving tabindex managed by the group; role="radio" with aria-checked.
 bundleSize: "10 kB"
 tags: [form, input]
 ---
@@ -30,7 +30,7 @@ Use `RadioGroup` to manage selection and keyboard navigation across items.
 
 ## Accessibility
 
-- Built on Radix UI radio-group — manages roving tabindex so only the selected item is in the tab order.
+- The enclosing `RadioGroup` manages roving tabindex so only the selected item is in the tab order.
 - Each item exposes `role="radio"` with `aria-checked` reflecting the current value.
 - Arrow keys move selection within the group; Space/Enter select the focused item.
 

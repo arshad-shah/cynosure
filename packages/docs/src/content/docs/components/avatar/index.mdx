@@ -59,7 +59,7 @@ Set `ring` to add a tokenised ring around the avatar — useful for stacked grou
 - When the avatar is purely decorative, leave `name` empty and add `aria-hidden="true"` on the wrapping element.
 - Status dots render with `aria-hidden="true"` — pair them with an off-screen label or adjacent text when status conveys meaning.
 - The fallback waits 400ms before swapping in initials so users on fast networks see the image first.
-- Initials are rendered inside a Radix fallback element which exposes an `aria-label` when only a name (no derived initials) is available.
+- Initials are rendered inside a fallback element which exposes an `aria-label` when only a name (no derived initials) is available.
 
 ## Recipes
 

@@ -18,7 +18,8 @@ pnpm add @arshad-shah/cynosure-react @arshad-shah/cynosure-tokens
 ## Wire the providers
 
 `ThemeProvider` owns the theme state and toggles `data-theme` on `<html>`.
-`TooltipProvider` deduplicates Radix tooltips. `DirectionProvider` lets you
+`TooltipProvider` deduplicates the shared overlay-positioning context so
+nested tooltips don't double-mount listeners. `DirectionProvider` lets you
 render in RTL without re-mounting the tree.
 
 ```tsx

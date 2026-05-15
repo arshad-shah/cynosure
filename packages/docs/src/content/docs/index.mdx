@@ -3,7 +3,7 @@ title: Cynosure
 description: A React component library and design system. Accessible by default, themeable down to the radius.
 template: splash
 hero:
-  tagline: Accessible, tree-shakeable React components. Themed with design tokens. Built on Radix UI and React Aria.
+  tagline: Accessible, tree-shakeable React components. Themed with design tokens.
   image:
     file: ../../assets/cynosure-mark.svg
   actions:
@@ -94,7 +94,7 @@ export function SignIn() {
 
 <CardGrid>
   <Card title="Accessible by default" icon="approve-check">
-    Built on Radix UI and React Aria for focus management, ARIA semantics, and keyboard handling. Every theme is contrast-audited for WCAG AA in CI; physical CSS properties are linted out so RTL stays correct.
+    Every primitive owns its own focus, roving tabindex, and ARIA contract — keyboards and screen readers are first-class everywhere. Every theme is contrast-audited for WCAG AA in CI; physical CSS properties are linted out so RTL stays correct.
   </Card>
   <Card title="Tree-shakeable" icon="puzzle">
     Per-component entry points (`@arshad-shah/cynosure-react/button`) on top of a plain ESM root barrel. CSS is marked side-effectful so bundlers keep the stylesheets but drop unused JS.

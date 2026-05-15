@@ -1,11 +1,11 @@
 ---
 title: Switch
-description: Toggle switch for on/off settings that take effect immediately, without a Save step. Built on Radix UI.
+description: Toggle switch for on/off settings that take effect immediately, without a Save step.
 order: 6
 category: components
 status: stable
 since: 0.1.0
-a11y: Uses Radix UI switch root; role="switch" with aria-checked; aria-busy set during loading state.
+a11y: role="switch" button with aria-checked; aria-busy set during loading state.
 bundleSize: "10 kB"
 tags: [form, input]
 ---
@@ -30,7 +30,7 @@ Three sizes are available: `sm`, `md` (default), and `lg`.
 
 ## Accessibility
 
-- Built on Radix UI switch — exposes `role="switch"` with `aria-checked` reflecting on/off state.
+- Renders a `role="switch"` button with `aria-checked` reflecting on/off state.
 - `loading` sets `aria-busy="true"` and blocks all interaction while async work completes.
 - Space key toggles the switch; focus ring follows design tokens.
 

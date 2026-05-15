@@ -153,7 +153,7 @@ export const BrokenImage: Story = {
     <Inline gap="3" align="center">
       <Avatar src="https://invalid.example/does-not-exist.jpg" name="Ada Lovelace" size="lg" />
       <Text size="sm" color="fg.muted">
-        After a short delay, Radix reveals the fallback.
+        When the image fails to load, the fallback reveals automatically.
       </Text>
     </Inline>
   ),

@@ -2,7 +2,7 @@
 
 > A gorgeous, tiny, customisable, accessible React UI framework — designed for production.
 
-Cynosure is a headless-at-the-core, themed-on-top component library built around a tiny set of layout primitives, W3C DTCG design tokens, and hybrid Radix + React Aria behaviour. Every component ships as its own ESM entry point with its own CSS, so consumers pay only for what they import.
+Cynosure is a headless-at-the-core, themed-on-top component library built around a tiny set of layout primitives and W3C DTCG design tokens. Most behaviour — toggles, accordions, tabs, the form controls, the layout cascade — is first-party in-tree; calendars and other locale-aware controls lean on `react-aria-components`, and a handful of overlay primitives still wrap Radix. Every component ships as its own ESM entry point with its own CSS, so consumers pay only for what they import.
 
 [![npm](https://img.shields.io/npm/v/@arshad-shah/cynosure-react.svg?label=%40arshad-shah%2Fcynosure-react)](https://www.npmjs.com/package/@arshad-shah/cynosure-react)
 [![license](https://img.shields.io/npm/l/@arshad-shah/cynosure-react.svg)](./LICENSE)

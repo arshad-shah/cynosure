@@ -47,8 +47,7 @@ export interface ToggleProps
 
 /**
  * Two-state button that flips between on and off. Renders a `<button>` with
- * `aria-pressed` and `data-state="on"|"off"` for styling hooks — same
- * contract Radix Toggle exposed, owned in-tree to drop the dep.
+ * `aria-pressed` and `data-state="on"|"off"` for styling hooks.
  */
 export const Toggle = forwardRef<HTMLButtonElement, ToggleProps>(function Toggle(
   {

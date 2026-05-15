@@ -91,9 +91,7 @@ type ImageState = 'idle' | 'loading' | 'loaded' | 'error';
 /**
  * Drive a fallback-vs-image race in a single state machine. The image
  * fires `load`/`error` events; we flip to `loaded`/`error` accordingly,
- * and render the fallback in any non-loaded state. Radix shipped its own
- * `Avatar.Image` purely to encapsulate this — owning it removes a 1.4 KB
- * gzip dep.
+ * and render the fallback in any non-loaded state.
  */
 function useImageLoad(src: string | undefined): ImageState {
   const [state, setState] = useState<ImageState>(src ? 'loading' : 'idle');

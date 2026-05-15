@@ -8,7 +8,7 @@
 [![types](https://img.shields.io/npm/types/@arshad-shah/cynosure-react.svg)](https://www.npmjs.com/package/@arshad-shah/cynosure-react)
 [![react](https://img.shields.io/badge/react-18%20%7C%2019-61dafb?logo=react&logoColor=white)](https://cynosure.arshadshah.com/getting-started/rsc/)
 
-Every component ships as its own ESM entry point with its own CSS, so bundlers keep only what you use. Behaviour is a hybrid of Radix primitives and React Aria for accessibility; styling is driven by W3C DTCG design tokens from [`@arshad-shah/cynosure-tokens`](https://www.npmjs.com/package/@arshad-shah/cynosure-tokens).
+Every component ships as its own ESM entry point with its own CSS, so bundlers keep only what you use. Toggles, switches, accordions, tabs, collapsibles, checkboxes, radios, avatars, `Slot`/`asChild`, and the direction provider are owned in-tree; calendars and other locale-aware controls lean on `react-aria-components`; the remaining overlay primitives (Dialog, Drawer, Popover, HoverCard, the menu family, Tooltip, ScrollArea) currently wrap Radix. Styling is driven by W3C DTCG design tokens from [`@arshad-shah/cynosure-tokens`](https://www.npmjs.com/package/@arshad-shah/cynosure-tokens).
 
 ---
 
