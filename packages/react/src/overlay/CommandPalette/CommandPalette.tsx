@@ -1,4 +1,3 @@
-import * as RadixDialog from '@radix-ui/react-dialog';
 import { Command as CommandPrimitive } from 'cmdk';
 import { Loader2, Search } from 'lucide-react';
 import {
@@ -12,7 +11,12 @@ import {
 } from 'react';
 import { Kbd } from '../../typography/Kbd/Kbd.js';
 import { cn } from '../../utils/cn.js';
-import { overlayBackdrop } from '../shared/overlay.css.js';
+import {
+  Dialog as CynDialog,
+  DialogContent as CynDialogContent,
+  DialogTitle as CynDialogTitle,
+  DialogTrigger as CynDialogTrigger,
+} from '../Dialog/Dialog.js';
 import {
   paletteContent,
   paletteEmpty,
@@ -375,20 +379,22 @@ export function CommandMenu({
   const resolvedContainer = typeof container === 'function' ? container() : container;
 
   return (
-    <RadixDialog.Root open={effectiveOpen} onOpenChange={setOpen}>
-      {trigger ? <RadixDialog.Trigger asChild>{trigger}</RadixDialog.Trigger> : null}
-      <RadixDialog.Portal container={resolvedContainer}>
-        <RadixDialog.Overlay className={overlayBackdrop} />
-        <RadixDialog.Content className={paletteContent} aria-label={label}>
-          <RadixDialog.Title className="sr-only" style={srOnly}>
-            {label}
-          </RadixDialog.Title>
-          <CommandPalette label={label} {...paletteProps}>
-            {children}
-          </CommandPalette>
-        </RadixDialog.Content>
-      </RadixDialog.Portal>
-    </RadixDialog.Root>
+    <CynDialog open={effectiveOpen} onOpenChange={setOpen}>
+      {trigger ? <CynDialogTrigger asChild>{trigger}</CynDialogTrigger> : null}
+      <CynDialogContent
+        container={resolvedContainer}
+        className={paletteContent}
+        showCloseButton={false}
+        aria-label={label}
+      >
+        <CynDialogTitle className="sr-only" style={srOnly}>
+          {label}
+        </CynDialogTitle>
+        <CommandPalette label={label} {...paletteProps}>
+          {children}
+        </CommandPalette>
+      </CynDialogContent>
+    </CynDialog>
   );
 }
 

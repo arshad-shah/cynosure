@@ -7,4 +7,10 @@ export {
   PopoverPortal,
   PopoverTrigger,
 } from './Popover.js';
-export type { PopoverArrowProps, PopoverContentProps } from './Popover.js';
+export type {
+  PopoverCloseProps,
+  PopoverContentProps,
+  PopoverPortalProps,
+  PopoverProps,
+  PopoverTriggerProps,
+} from './Popover.js';

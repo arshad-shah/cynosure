@@ -1,11 +1,25 @@
 ---
-import sizeLimit from '@repo/.size-limit.json';
+import { createRequire } from 'node:module';
 
-interface Props { name: string }
+interface Props {
+  name: string;
+}
+interface SizeLimitEntry {
+  name: string;
+  limit: string;
+  path: string;
+}
+
+// The size-limit config moved from `.size-limit.json` to `.size-limit.cjs`
+// so each entry can pass `modifyEsbuildConfig` (a function value, which
+// JSON can't express) that drops CSS imports from the JS measurement.
+// Astro's static import resolves JSON but not CJS, so we route through
+// `createRequire` to load the authoritative budget list from the exact
+// same module size-limit reads at CI time.
+const require = createRequire(import.meta.url);
+const entries = require('../../../../.size-limit.cjs') as SizeLimitEntry[];
+
 const { name } = Astro.props;
-
-interface SizeLimitEntry { name: string; limit: string; path: string }
-const entries = sizeLimit as SizeLimitEntry[];
 const entry = entries.find((e) => e.name === name);
 ---
 {entry ? (
