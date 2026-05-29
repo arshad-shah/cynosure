@@ -22,7 +22,7 @@
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { brotliCompressSync, constants } from 'node:zlib';
+import { constants, brotliCompressSync } from 'node:zlib';
 
 import { COMPONENTS } from '../components.config.mjs';
 
@@ -36,7 +36,8 @@ const chunkFiles = new Set(
   readdirSync(distRoot).filter((f) => f.startsWith('chunk-') && f.endsWith('.js')),
 );
 
-const IMPORT_RE = /(?:^|\n)\s*(?:import|export\s+\{[^}]*\}\s+from)\s+['"]\.\/(chunk-[A-Z0-9]+\.js)['"];?/g;
+const IMPORT_RE =
+  /(?:^|\n)\s*(?:import|export\s+\{[^}]*\}\s+from)\s+['"]\.\/(chunk-[A-Z0-9]+\.js)['"];?/g;
 
 /** Walk a component's chunk graph; return the deduped JS payload. */
 function gatherChunkPayload(entryFile) {

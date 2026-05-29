@@ -150,21 +150,31 @@ export const PopoverTrigger = forwardRef<HTMLElement, PopoverTriggerProps>(funct
  * Optional explicit anchor element. When provided, positioning is
  * relative to this element rather than the trigger button (useful when
  * the visual anchor is somewhere other than the trigger).
+ *
+ * The `asChild` prop is accepted for Radix-API parity but is the
+ * default behaviour — `PopoverAnchor` always composes its ref onto a
+ * single React element child rather than rendering its own wrapper.
  */
-export const PopoverAnchor = forwardRef<HTMLElement, { children: ReactElement }>(
-  function PopoverAnchor({ children }, ref) {
-    const ctx = usePopoverCtx();
-    if (!isValidElement(children)) {
-      throw new Error('PopoverAnchor expects a single React element child');
-    }
-    const childProps = (children as unknown as { props: AnyProps }).props;
-    const existingRef = (childProps.ref as never) ?? (children as unknown as { ref?: unknown }).ref;
-    const composedRef = composeRefs<HTMLElement>(ref as never, existingRef as never, (node) =>
-      ctx.setAnchor(node),
-    );
-    return cloneElement(children, { ref: composedRef } as AnyProps);
-  },
-);
+export interface PopoverAnchorProps {
+  children: ReactElement;
+  /** Accepted for parity; the anchor always composes onto the child. */
+  asChild?: boolean;
+}
+export const PopoverAnchor = forwardRef<HTMLElement, PopoverAnchorProps>(function PopoverAnchor(
+  { children },
+  ref,
+) {
+  const ctx = usePopoverCtx();
+  if (!isValidElement(children)) {
+    throw new Error('PopoverAnchor expects a single React element child');
+  }
+  const childProps = (children as unknown as { props: AnyProps }).props;
+  const existingRef = (childProps.ref as never) ?? (children as unknown as { ref?: unknown }).ref;
+  const composedRef = composeRefs<HTMLElement>(ref as never, existingRef as never, (node) =>
+    ctx.setAnchor(node),
+  );
+  return cloneElement(children, { ref: composedRef } as AnyProps);
+});
 
 /**
  * Closes the popover when activated. Default renders a `<button>`;
