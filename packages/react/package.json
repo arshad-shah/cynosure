@@ -36,7 +36,7 @@
       "default": "./dist/styles.css"
     },
     "./core.css": {
-      "types": "./all.css.d.ts",
+      "types": "./core.css.d.ts",
       "default": "./dist/core.css"
     },
     "./all.css": {
@@ -595,6 +595,7 @@
     "timeline",
     "tree",
     "styles.css.d.ts",
+    "core.css.d.ts",
     "all.css.d.ts",
     "fonts.css.d.ts",
     "README.md",
