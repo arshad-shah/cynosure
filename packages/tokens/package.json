@@ -1,6 +1,6 @@
 {
   "name": "@arshad-shah/cynosure-tokens",
-  "version": "3.0.0",
+  "version": "3.3.0",
   "description": "Cynosure UI — design tokens (DTCG JSON + generated CSS/TS)",
   "license": "MIT",
   "homepage": "https://cynosure.arshadshah.com",

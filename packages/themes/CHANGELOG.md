@@ -1,5 +1,12 @@
 # @arshad-shah/cynosure-themes
 
+## 3.3.0
+
+### Patch Changes
+
+- Updated dependencies [[`1ef49c0`](https://github.com/arshad-shah/cynosure/commit/1ef49c0e6bc238570e3fc3cecf9ea12f913bfa34)]:
+  - @arshad-shah/cynosure-tokens@3.3.0
+
 ## 3.0.0
 
 ### Patch Changes
