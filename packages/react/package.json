@@ -19,7 +19,6 @@
     "components",
     "ui",
     "vanilla-extract",
-    "radix",
     "accessible",
     "a11y",
     "headless"
@@ -629,10 +628,6 @@
     "@arshad-shah/cynosure-tokens": "workspace:*",
     "@fontsource-variable/geist": "catalog:",
     "@fontsource-variable/jetbrains-mono": "catalog:",
-    "@radix-ui/react-context-menu": "catalog:",
-    "@radix-ui/react-dropdown-menu": "catalog:",
-    "@radix-ui/react-menubar": "catalog:",
-    "@radix-ui/react-navigation-menu": "catalog:",
     "@tanstack/react-table": "catalog:",
     "@vanilla-extract/css": "catalog:",
     "@vanilla-extract/recipes": "catalog:",

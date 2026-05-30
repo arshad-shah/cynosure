@@ -1,34 +1,36 @@
-import * as Radix from '@radix-ui/react-menubar';
-import { type ComponentPropsWithoutRef, type ElementRef, forwardRef } from 'react';
+import { forwardRef } from 'react';
 import { cn } from '../../utils/cn.js';
 import { type MenuNamespace, createMenuKit } from '../shared/createMenuKit.js';
 import { menubarRoot, menubarTrigger } from '../shared/menu.css.js';
+import {
+  type MenubarRootProps,
+  type MenubarTriggerProps,
+  createMenubarComponents,
+} from '../shared/menubarEngine.js';
 
-const kit = createMenuKit(Radix as unknown as MenuNamespace);
+const Menu = createMenubarComponents();
+const kit = createMenuKit(Menu as unknown as MenuNamespace);
 
 /**
  * Application-style menu bar. Keyboard: arrow ←/→ moves between top-level
- * menus, ↓ opens, Esc closes. All semantics come from Radix; item visuals
- * come from the shared menu kit.
+ * menus, ↓ opens, Esc closes. All behaviour comes from the first-party menu
+ * engine; item visuals come from the shared menu kit.
  */
-// Re-export Radix's compound parts. Explicit type annotations keep TypeScript
-// from inlining a non-portable path to the internal `react-context` module.
-export const MenuBarMenu: typeof Radix.Menu = Radix.Menu;
-export const MenuBarPortal: typeof Radix.Portal = Radix.Portal;
-export const MenuBarGroup: typeof Radix.Group = Radix.Group;
-export const MenuBarSub: typeof Radix.Sub = Radix.Sub;
-export const MenuBarRadioGroup: typeof Radix.RadioGroup = Radix.RadioGroup;
+export const MenuBarMenu = Menu.Menu;
+export const MenuBarPortal = Menu.Portal;
+export const MenuBarGroup = Menu.Group;
+export const MenuBarSub = Menu.Sub;
+export const MenuBarRadioGroup = Menu.RadioGroup;
 
 /**
  * Top-level menu bar root. Renders the horizontal strip that hosts each
- * `MenuBarMenu`. ARIA role and roving-tab-index focus management come from
- * Radix.
+ * `MenuBarMenu`, with `role="menubar"` and roving-tab-index focus management.
  */
-export const MenuBar = forwardRef<
-  ElementRef<typeof Radix.Root>,
-  ComponentPropsWithoutRef<typeof Radix.Root>
->(function MenuBar({ className, ...rest }, ref) {
-  return <Radix.Root ref={ref} className={cn(menubarRoot, className)} {...rest} />;
+export const MenuBar = forwardRef<HTMLDivElement, MenubarRootProps>(function MenuBar(
+  { className, ...rest },
+  ref,
+) {
+  return <Menu.Root ref={ref} className={cn(menubarRoot, className)} {...rest} />;
 });
 
 /**
@@ -36,12 +38,11 @@ export const MenuBar = forwardRef<
  * `Enter`, `Space`, or `↓`; hover-opens once another top-level menu is
  * already open.
  */
-export const MenuBarTrigger = forwardRef<
-  ElementRef<typeof Radix.Trigger>,
-  ComponentPropsWithoutRef<typeof Radix.Trigger>
->(function MenuBarTrigger({ className, ...rest }, ref) {
-  return <Radix.Trigger ref={ref} className={cn(menubarTrigger, className)} {...rest} />;
-});
+export const MenuBarTrigger = forwardRef<HTMLButtonElement, MenubarTriggerProps>(
+  function MenuBarTrigger({ className, ...rest }, ref) {
+    return <Menu.Trigger ref={ref} className={cn(menubarTrigger, className)} {...rest} />;
+  },
+);
 
 export const MenuBarContent = kit.Content;
 export const MenuBarSubContent = kit.SubContent;

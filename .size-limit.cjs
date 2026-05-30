@@ -66,7 +66,7 @@ const COMPONENTS = [
   ['Popover', 'popover.js', '21 kB'],
   ['Tooltip', 'tooltip.js', '3 kB'],
   ['Toast', 'toast.js', '11 kB'],
-  ['DropdownMenu', 'dropdownmenu.js', '32 kB'],
+  ['DropdownMenu', 'dropdownmenu.js', '13 kB'],
 
   // Navigation
   ['Tabs', 'tabs.js', '3 kB'],
