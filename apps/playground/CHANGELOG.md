@@ -1,5 +1,12 @@
 # @arshad-shah/cynosure-playground
 
+## 3.2.0
+
+### Patch Changes
+
+- Updated dependencies [[`73e2300`](https://github.com/arshad-shah/cynosure/commit/73e2300785f630575586bbc86b19e4c13f9bde30), [`73e2300`](https://github.com/arshad-shah/cynosure/commit/73e2300785f630575586bbc86b19e4c13f9bde30), [`73e2300`](https://github.com/arshad-shah/cynosure/commit/73e2300785f630575586bbc86b19e4c13f9bde30)]:
+  - @arshad-shah/cynosure-react@3.2.0
+
 ## 3.1.0
 
 ### Patch Changes
