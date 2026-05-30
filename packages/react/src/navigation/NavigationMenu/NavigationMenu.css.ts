@@ -126,10 +126,10 @@ export const navigationMenuContent = style({
       marginBlockStart: 0,
     },
     '&[data-state="open"]': {
-      animation: `${enter} ${vars.duration.fast} ease-out`,
+      animation: `${enter} ${vars.duration.fast} ${vars.easing.easeOut}`,
     },
     '&[data-state="closed"]': {
-      animation: `${exit} ${vars.duration.fast} ease-in`,
+      animation: `${exit} ${vars.duration.fast} ${vars.easing.easeIn}`,
     },
     '&:focus-visible': {
       outline: 'none',

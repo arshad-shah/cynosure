@@ -1,4 +1,5 @@
 import { style, styleVariants } from '@vanilla-extract/css';
+import { focusRing } from '../../styles/focusRing.js';
 import { vars } from '../../styles/vars.css.js';
 
 const dropZoneBase = style({
@@ -15,7 +16,7 @@ const dropZoneBase = style({
     },
     '&:focus-visible': {
       borderColor: vars.color.border.focus,
-      boxShadow: `0 0 0 2px ${vars.color.accent.ring}`,
+      boxShadow: focusRing,
     },
     '&[data-disabled="true"]': {
       cursor: 'not-allowed',
@@ -139,8 +140,11 @@ export const list = style({
   padding: 0,
 });
 
-// Row wrapper — richer border, hover lift.
+// Row wrapper — richer border, hover lift. `width: 100%` makes the `<li>`
+// fill the list (the underlying `Inline` is inline-flex and would otherwise
+// shrink to its content, leaving the actions hugging the text on the left).
 export const row = style({
+  width: '100%',
   border: `1px solid ${vars.color.border.subtle}`,
   borderRadius: vars.radius.md,
   background: vars.color.background.surface,
@@ -150,6 +154,12 @@ export const row = style({
       borderColor: vars.color.border.default,
     },
   },
+});
+
+// Trailing action cluster (preview / remove) — pinned to the inline-end edge
+// so it sits at the right of the row regardless of the middle column's growth.
+export const rowActions = style({
+  marginInlineStart: 'auto',
 });
 
 export const thumbnail = style({

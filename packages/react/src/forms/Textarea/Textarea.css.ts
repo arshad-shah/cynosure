@@ -1,4 +1,5 @@
 import { globalStyle, style, styleVariants } from '@vanilla-extract/css';
+import { focusRing } from '../../styles/focusRing.js';
 import { vars } from '../../styles/vars.css.js';
 
 /**
@@ -27,7 +28,7 @@ export const textareaRoot = style({
     '&[data-focus-within="true"]:not([data-invalid="true"])': {
       background: vars.color.background.surface,
       borderColor: vars.color.border.focus,
-      boxShadow: `0 0 0 2px ${vars.color.accent.ring}`,
+      boxShadow: focusRing,
     },
     '&[data-invalid="true"]': {
       borderColor: vars.color.feedback.danger.border,
@@ -71,7 +72,7 @@ export const textareaRootVariant = styleVariants({
       },
       '&[data-focus-within="true"]': {
         background: vars.color.background.surface,
-        boxShadow: `0 0 0 2px ${vars.color.accent.ring}`,
+        boxShadow: focusRing,
       },
     },
   },
@@ -215,7 +216,7 @@ export const clearButton = style({
   background: vars.color.background.muted,
   color: vars.color.foreground.muted,
   cursor: 'pointer',
-  transition: `opacity 100ms linear, background-color ${vars.duration.fast}, color ${vars.duration.fast}`,
+  transition: `opacity ${vars.duration.fast} ${vars.easing.linear}, background-color ${vars.duration.fast}, color ${vars.duration.fast}`,
   selectors: {
     '&:hover': {
       background: vars.color.background.subtle,

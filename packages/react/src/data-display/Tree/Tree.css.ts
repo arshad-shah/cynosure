@@ -1,4 +1,5 @@
 import { style } from '@vanilla-extract/css';
+import { focusRingInset } from '../../styles/focusRing.js';
 import { vars } from '../../styles/vars.css.js';
 
 export const treeRoot = style({
@@ -38,7 +39,7 @@ export const treeRow = style({
       background: vars.color.accent.soft,
     },
     '&:focus-visible': {
-      boxShadow: `inset 0 0 0 2px ${vars.color.accent.ring}`,
+      boxShadow: focusRingInset,
     },
     '&[data-selected="true"]': {
       background: vars.color.accent.soft,
@@ -60,7 +61,7 @@ export const treeChevron = style({
   width: '1rem',
   height: '1rem',
   color: vars.color.foreground.muted,
-  transition: `transform ${vars.duration.fast} ease`,
+  transition: `transform ${vars.duration.fast} ${vars.easing.easeInOut}`,
   selectors: {
     '[data-expanded="true"] > [data-slot="row"] > &': {
       transform: 'rotate(90deg)',

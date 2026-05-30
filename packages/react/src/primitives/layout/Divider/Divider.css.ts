@@ -12,6 +12,7 @@ export const dividerBase = style({
 export const dividerTone = styleVariants({
   subtle: { color: vars.color.border.subtle },
   default: { color: vars.color.border.default },
+  strong: { color: vars.color.border.strong },
 });
 
 export const dividerHorizontal = style({

@@ -18,16 +18,16 @@ export const tooltipContent = style({
   borderRadius: vars.radius.sm,
   fontSize: 'var(--cynosure-font-body-sm-size)',
   lineHeight: 'var(--cynosure-font-body-sm-line-height)',
-  maxWidth: '20rem',
+  maxWidth: 'min(20rem, calc(100vw - 1rem))',
   boxShadow: vars.shadow.md,
   zIndex: Number(vars.z.tooltip),
   userSelect: 'none',
   selectors: {
     '&[data-state="delayed-open"], &[data-state="instant-open"]': {
-      animation: `${tooltipIn} ${vars.duration.fast} ease-out`,
+      animation: `${tooltipIn} ${vars.duration.fast} ${vars.easing.easeOut}`,
     },
     '&[data-state="closed"]': {
-      animation: `${tooltipOut} ${vars.duration.fast} ease-in`,
+      animation: `${tooltipOut} ${vars.duration.fast} ${vars.easing.easeIn}`,
     },
   },
 });

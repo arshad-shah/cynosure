@@ -1,4 +1,5 @@
 import { globalStyle, keyframes, style, styleVariants } from '@vanilla-extract/css';
+import { focusRing } from '../../styles/focusRing.js';
 import { vars } from '../../styles/vars.css.js';
 
 const spin = keyframes({
@@ -23,16 +24,29 @@ export const buttonBase = style({
   cursor: 'pointer',
   userSelect: 'none',
   whiteSpace: 'nowrap',
-  transitionProperty: 'background-color, border-color, color, box-shadow, opacity',
+  transitionProperty: 'background-color, border-color, color, box-shadow, opacity, transform',
   transitionDuration: vars.duration.fast,
+  transitionTimingFunction: vars.easing.easeOut,
   outline: 'none',
   selectors: {
+    '&:hover:not(:disabled):not([aria-disabled="true"]):not([data-loading="true"])': {
+      transform: 'translateY(-1px)',
+    },
+    '&:active:not(:disabled):not([aria-disabled="true"]):not([data-loading="true"])': {
+      transform: 'translateY(0) scale(0.97)',
+      transitionDuration: vars.duration.instant,
+    },
     '&:focus-visible': {
-      boxShadow: `0 0 0 2px ${vars.color.accent.ring}`,
+      boxShadow: focusRing,
     },
     '&:disabled, &[aria-disabled="true"], &[data-loading="true"]': {
       cursor: 'not-allowed',
       opacity: 0.6,
+    },
+  },
+  '@media': {
+    '(prefers-reduced-motion: reduce)': {
+      transitionProperty: 'background-color, border-color, color, box-shadow, opacity',
     },
   },
 });
@@ -274,6 +288,10 @@ export const linkVariant = style({
   selectors: {
     '&:hover:not(:disabled):not([data-loading="true"])': {
       textDecorationThickness: '2px',
+      transform: 'none',
+    },
+    '&:active:not(:disabled):not([data-loading="true"])': {
+      transform: 'none',
     },
   },
 });

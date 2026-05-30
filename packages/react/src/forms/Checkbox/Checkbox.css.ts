@@ -1,4 +1,5 @@
 import { keyframes, style, styleVariants } from '@vanilla-extract/css';
+import { focusRing } from '../../styles/focusRing.js';
 import { vars } from '../../styles/vars.css.js';
 
 const popIn = keyframes({
@@ -46,7 +47,7 @@ export const checkboxRoot = style({
     },
     '&:focus-visible': {
       outline: 'none',
-      boxShadow: `0 0 0 3px ${vars.color.accent.ring}`,
+      boxShadow: focusRing,
     },
     '&:active:not([data-disabled="true"])': {
       transform: 'scale(0.94)',
@@ -73,7 +74,7 @@ export const checkboxIndicator = style({
   justifyContent: 'center',
   color: 'currentColor',
   lineHeight: 0,
-  animation: `${popIn} ${vars.duration.fast} cubic-bezier(0.2, 0.9, 0.3, 1.4)`,
+  animation: `${popIn} ${vars.duration.fast} ${vars.easing.spring}`,
 });
 
 /** Colour override per scheme — only solid/checked state needs re-colouring. */

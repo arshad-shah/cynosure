@@ -19,10 +19,10 @@ export const collapsibleContent = style({
   overflow: 'hidden',
   selectors: {
     '&[data-state="open"]': {
-      animation: `${slideDown} ${vars.duration.normal} ease`,
+      animation: `${slideDown} ${vars.duration.normal} ${vars.easing.easeInOut}`,
     },
     '&[data-state="closed"]': {
-      animation: `${slideUp} ${vars.duration.normal} ease`,
+      animation: `${slideUp} ${vars.duration.normal} ${vars.easing.easeInOut}`,
     },
   },
   '@media': {

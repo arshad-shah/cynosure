@@ -1,4 +1,5 @@
 import { globalStyle, keyframes, style, styleVariants } from '@vanilla-extract/css';
+import { focusRingInset } from '../../styles/focusRing.js';
 import { vars } from '../../styles/vars.css.js';
 
 const slideDown = keyframes({
@@ -62,12 +63,12 @@ export const accordionTrigger = style({
   color: vars.color.foreground.default,
   cursor: 'pointer',
   textAlign: 'start',
-  transition: `background ${vars.duration.fast} ease`,
+  transition: `background ${vars.duration.fast} ${vars.easing.easeInOut}`,
   selectors: {
     '&:hover': { background: vars.color.background.subtle },
     '&:focus-visible': {
       outline: 'none',
-      boxShadow: `inset 0 0 0 2px ${vars.color.accent.ring}`,
+      boxShadow: focusRingInset,
     },
     '&[data-disabled]': { opacity: 0.5, cursor: 'not-allowed' },
   },
@@ -80,7 +81,7 @@ export const accordionTrigger = style({
 
 export const accordionChevron = style({
   display: 'inline-flex',
-  transition: `transform ${vars.duration.fast} ease`,
+  transition: `transform ${vars.duration.fast} ${vars.easing.easeInOut}`,
   '@media': {
     '(prefers-reduced-motion: reduce)': {
       transition: 'none',
@@ -88,7 +89,7 @@ export const accordionChevron = style({
   },
 });
 
-globalStyle(`${accordionTrigger}[data-state="open"] [data-slot="chevron"]`, {
+globalStyle(`${accordionTrigger}[data-state="open"] ${accordionChevron}`, {
   transform: 'rotate(180deg)',
 });
 
@@ -98,10 +99,10 @@ export const accordionContent = style({
   color: vars.color.foreground.default,
   selectors: {
     '&[data-state="open"]': {
-      animation: `${slideDown} ${vars.duration.normal} ease`,
+      animation: `${slideDown} ${vars.duration.normal} ${vars.easing.easeInOut}`,
     },
     '&[data-state="closed"]': {
-      animation: `${slideUp} ${vars.duration.normal} ease`,
+      animation: `${slideUp} ${vars.duration.normal} ${vars.easing.easeInOut}`,
     },
   },
   '@media': {

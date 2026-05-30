@@ -7,6 +7,12 @@ export const blockquoteBase = style([
   layoutPropsStyle,
   typographyBase,
   {
+    // Force block display through the layout-prop var. Without this, the
+    // duplicated `layoutPropsStyle` emission later in the bundle leaves
+    // `--cynosure-lp-d-base` unset → invalid-at-computed-value-time → reverts
+    // to `inline`, which collapses the start-border onto the first wrapped
+    // line only (same workaround as `blockquoteAttribution`).
+    vars: { '--cynosure-lp-d-base': 'block' },
     fontFamily: 'var(--cynosure-font-family-serif)',
     fontSize: 'var(--cynosure-font-body-lg-size)',
     lineHeight: 'var(--cynosure-font-body-lg-line-height)',

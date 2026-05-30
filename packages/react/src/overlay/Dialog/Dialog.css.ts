@@ -15,7 +15,7 @@ export const dialogContent = style({
   flexDirection: 'column',
   gap: vars.space['4'],
   width: '100%',
-  maxHeight: 'calc(100vh - 2rem)',
+  maxHeight: 'calc(100dvh - 2rem)',
   background: vars.color.background.surface,
   color: vars.color.foreground.default,
   border: `1px solid ${vars.color.border.default}`,
@@ -27,23 +27,26 @@ export const dialogContent = style({
   zIndex: Number(vars.z.modal),
   selectors: {
     '&[data-state="open"]': {
-      animation: `${overlayZoomIn} ${vars.duration.fast} ease-out`,
+      animation: `${overlayZoomIn} ${vars.duration.fast} ${vars.easing.easeOut}`,
     },
     '&[data-state="closed"]': {
-      animation: `${overlayZoomOut} ${vars.duration.fast} ease-in`,
+      animation: `${overlayZoomOut} ${vars.duration.fast} ${vars.easing.easeIn}`,
     },
   },
 });
 
+// Each size caps to the viewport via `min()` so the dialog never overflows a
+// narrow (mobile) screen — a 32rem `md` dialog on a 360px phone clamps to the
+// available width minus a 1rem gutter on each side.
 export const dialogSize = styleVariants({
-  xs: { maxWidth: '20rem' },
-  sm: { maxWidth: '24rem' },
-  md: { maxWidth: '32rem' },
-  lg: { maxWidth: '40rem' },
-  xl: { maxWidth: '56rem' },
+  xs: { maxWidth: 'min(20rem, calc(100vw - 2rem))' },
+  sm: { maxWidth: 'min(24rem, calc(100vw - 2rem))' },
+  md: { maxWidth: 'min(32rem, calc(100vw - 2rem))' },
+  lg: { maxWidth: 'min(40rem, calc(100vw - 2rem))' },
+  xl: { maxWidth: 'min(56rem, calc(100vw - 2rem))' },
   full: {
     maxWidth: 'calc(100vw - 2rem)',
-    maxHeight: 'calc(100vh - 2rem)',
+    maxHeight: 'calc(100dvh - 2rem)',
     width: 'calc(100vw - 2rem)',
   },
 });

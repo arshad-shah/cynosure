@@ -59,7 +59,7 @@ export const codeBlockCopyButton = style({
   cursor: 'pointer',
   fontSize: 'var(--cynosure-font-body-xs-size, 0.75rem)',
   fontWeight: 500,
-  transition: `background-color ${vars.duration.fast} ease, color ${vars.duration.fast} ease`,
+  transition: `background-color ${vars.duration.fast} ease, color ${vars.duration.fast} ${vars.easing.easeInOut}`,
   selectors: {
     '&:hover': {
       background: vars.color.background.muted,

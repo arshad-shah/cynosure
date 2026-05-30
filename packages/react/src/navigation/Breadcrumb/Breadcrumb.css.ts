@@ -1,4 +1,5 @@
 import { style } from '@vanilla-extract/css';
+import { focusRing } from '../../styles/focusRing.js';
 import { vars } from '../../styles/vars.css.js';
 
 export const breadcrumbRoot = style({
@@ -36,7 +37,7 @@ export const breadcrumbLink = style({
     },
     '&:focus-visible': {
       outline: 'none',
-      boxShadow: `0 0 0 2px ${vars.color.accent.ring}`,
+      boxShadow: focusRing,
     },
   },
 });
@@ -71,7 +72,7 @@ export const breadcrumbEllipsisButton = style({
     },
     '&:focus-visible': {
       outline: 'none',
-      boxShadow: `0 0 0 2px ${vars.color.accent.ring}`,
+      boxShadow: focusRing,
     },
   },
 });

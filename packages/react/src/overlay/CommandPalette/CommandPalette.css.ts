@@ -23,7 +23,7 @@ export const paletteContent = style({
   transform: 'translate(-50%, -50%)',
   width: 'calc(100vw - 2rem)',
   maxWidth: '40rem',
-  maxHeight: 'min(70vh, 32rem)',
+  maxHeight: 'min(70dvh, 32rem)',
   background: vars.color.background.raised,
   color: vars.color.foreground.default,
   border: `1px solid ${vars.color.border.default}`,
@@ -36,10 +36,10 @@ export const paletteContent = style({
   zIndex: Number(vars.z.modal),
   selectors: {
     '&[data-state="open"]': {
-      animation: `${paletteIn} ${vars.duration.fast} ease-out`,
+      animation: `${paletteIn} ${vars.duration.fast} ${vars.easing.easeOut}`,
     },
     '&[data-state="closed"]': {
-      animation: `${paletteOut} ${vars.duration.fast} ease-in`,
+      animation: `${paletteOut} ${vars.duration.fast} ${vars.easing.easeIn}`,
     },
   },
   '@media': {

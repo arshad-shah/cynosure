@@ -50,6 +50,34 @@ describe('Slider extras', () => {
     const { container } = render(<Slider aria-label="Volume" defaultValue={20} isDisabled />);
     expect(container.querySelector('[data-disabled="true"]')).not.toBeNull();
   });
+
+  it('positions each tick mark at its own offset along the track', () => {
+    const { container } = render(
+      <Slider
+        aria-label="Zoom"
+        minValue={0}
+        maxValue={100}
+        defaultValue={50}
+        marks={[
+          { value: 0, label: '0' },
+          { value: 50, label: '50' },
+          { value: 100, label: '100' },
+        ]}
+      />,
+    );
+    // Each mark wrapper carries its own inline offset so they spread across the
+    // track instead of bunching at the start (regression guard).
+    const wrappers = Array.from(
+      container.querySelectorAll<HTMLElement>('[style*="inset-inline-start"]'),
+    ).filter((el) => el.style.getPropertyValue('inset-inline-start').endsWith('%'));
+    const offsets = wrappers.map((el) => el.style.getPropertyValue('inset-inline-start'));
+    expect(offsets).toEqual(expect.arrayContaining(['0%', '50%', '100%']));
+    // The offset is only honored because the wrapper is positioned — without a
+    // positioning class the marks collapse to the track's start.
+    for (const el of wrappers) {
+      expect(el.className).not.toBe('');
+    }
+  });
 });
 
 describe('RangeSlider', () => {

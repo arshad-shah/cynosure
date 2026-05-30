@@ -1,4 +1,5 @@
 import { style, styleVariants } from '@vanilla-extract/css';
+import { focusRing } from '../../styles/focusRing.js';
 import { vars } from '../../styles/vars.css.js';
 
 export const root = style({
@@ -60,7 +61,7 @@ export const thumb = style({
       cursor: 'grabbing',
     },
     '&[data-focus-visible]': {
-      boxShadow: `0 0 0 4px ${vars.color.accent.ring}`,
+      boxShadow: focusRing,
     },
     '&[data-disabled]': {
       cursor: 'not-allowed',
@@ -72,6 +73,17 @@ export const marksRow = style({
   position: 'relative',
   width: '100%',
   height: '0.75rem',
+});
+
+/**
+ * Per-mark wrapper. Absolutely positioned at the mark's percentage along the
+ * track (`insetInlineStart` set inline); the dot + label center on its origin
+ * via `translateX(-50%)`. Without `position: absolute` here the inline offset
+ * is ignored and every mark collapses to the track's start.
+ */
+export const markWrap = style({
+  position: 'absolute',
+  top: 0,
 });
 
 export const markDot = style({

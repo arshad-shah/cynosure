@@ -64,8 +64,12 @@ export const drawerSide = styleVariants({
     right: 0,
     borderBottomWidth: '1px',
     selectors: {
-      '&[data-state="open"]': { animation: `${slideInFromTop} ${vars.duration.normal} ease-out` },
-      '&[data-state="closed"]': { animation: `${slideOutToTop} ${vars.duration.normal} ease-in` },
+      '&[data-state="open"]': {
+        animation: `${slideInFromTop} ${vars.duration.normal} ${vars.easing.easeOut}`,
+      },
+      '&[data-state="closed"]': {
+        animation: `${slideOutToTop} ${vars.duration.normal} ${vars.easing.easeIn}`,
+      },
     },
   },
   right: {
@@ -74,9 +78,11 @@ export const drawerSide = styleVariants({
     bottom: 0,
     borderLeftWidth: '1px',
     selectors: {
-      '&[data-state="open"]': { animation: `${slideInFromRight} ${vars.duration.normal} ease-out` },
+      '&[data-state="open"]': {
+        animation: `${slideInFromRight} ${vars.duration.normal} ${vars.easing.easeOut}`,
+      },
       '&[data-state="closed"]': {
-        animation: `${slideOutToRight} ${vars.duration.normal} ease-in`,
+        animation: `${slideOutToRight} ${vars.duration.normal} ${vars.easing.easeIn}`,
       },
     },
   },
@@ -87,10 +93,10 @@ export const drawerSide = styleVariants({
     borderTopWidth: '1px',
     selectors: {
       '&[data-state="open"]': {
-        animation: `${slideInFromBottom} ${vars.duration.normal} ease-out`,
+        animation: `${slideInFromBottom} ${vars.duration.normal} ${vars.easing.easeOut}`,
       },
       '&[data-state="closed"]': {
-        animation: `${slideOutToBottom} ${vars.duration.normal} ease-in`,
+        animation: `${slideOutToBottom} ${vars.duration.normal} ${vars.easing.easeIn}`,
       },
     },
   },
@@ -100,8 +106,12 @@ export const drawerSide = styleVariants({
     bottom: 0,
     borderRightWidth: '1px',
     selectors: {
-      '&[data-state="open"]': { animation: `${slideInFromLeft} ${vars.duration.normal} ease-out` },
-      '&[data-state="closed"]': { animation: `${slideOutToLeft} ${vars.duration.normal} ease-in` },
+      '&[data-state="open"]': {
+        animation: `${slideInFromLeft} ${vars.duration.normal} ${vars.easing.easeOut}`,
+      },
+      '&[data-state="closed"]': {
+        animation: `${slideOutToLeft} ${vars.duration.normal} ${vars.easing.easeIn}`,
+      },
     },
   },
 });
@@ -115,12 +125,14 @@ export const drawerSizeHorizontal = styleVariants({
   full: { width: '100vw' },
 });
 
+// `dvh` (dynamic viewport height) so top/bottom drawers respect the mobile
+// browser's collapsing chrome and never run off-screen.
 export const drawerSizeVertical = styleVariants({
-  sm: { height: '18vh', maxHeight: '100vh' },
-  md: { height: '32vh', maxHeight: '100vh' },
-  lg: { height: '48vh', maxHeight: '100vh' },
-  xl: { height: '72vh', maxHeight: '100vh' },
-  full: { height: '100vh' },
+  sm: { height: '18dvh', maxHeight: '100dvh' },
+  md: { height: '32dvh', maxHeight: '100dvh' },
+  lg: { height: '48dvh', maxHeight: '100dvh' },
+  xl: { height: '72dvh', maxHeight: '100dvh' },
+  full: { height: '100dvh' },
 });
 
 export const drawerHeader = style({

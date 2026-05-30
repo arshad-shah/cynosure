@@ -53,6 +53,10 @@ export default defineConfig({
         // vanilla-extract files compile to CSS at build time; the .ts source
         // has no runtime code paths to cover.
         'src/**/*.css.ts',
+        // Build-time style foundation (focus-ring composition) — consumed only
+        // by `.css.ts` files during the vanilla-extract transform, so it never
+        // executes in the test runtime. Same rationale as `*.css.ts` above.
+        'src/styles/focusRing.ts',
         // Type-only files (named `types.ts` / `polymorphic.ts` across the
         // tree) are pure type declarations with no runtime to exercise.
         'src/**/types.ts',

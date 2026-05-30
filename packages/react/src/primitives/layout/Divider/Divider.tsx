@@ -18,7 +18,7 @@ import {
 export type DividerOrientation = 'horizontal' | 'vertical';
 export type DividerVariant = 'solid' | 'dashed' | 'dotted';
 export type DividerThickness = '1' | '2';
-export type DividerTone = 'default' | 'subtle';
+export type DividerTone = 'default' | 'subtle' | 'strong';
 export type DividerLabelAlign = 'start' | 'center' | 'end';
 
 /**
@@ -54,9 +54,9 @@ export interface DividerProps {
    */
   spacing?: SpaceToken;
   /**
-   * Colour intensity — `subtle` for a thematic rule, `default` for a
-   * stronger rule (e.g. matching input borders).
-   * @default "subtle"
+   * Colour intensity — `subtle` for a faint thematic rule, `default` for the
+   * standard visible rule (matches input borders), `strong` for emphasis.
+   * @default "default"
    */
   tone?: DividerTone;
   /**
@@ -108,7 +108,7 @@ export const Divider = forwardRef<HTMLElement, DividerProps>(function Divider(
     thickness = '1',
     length,
     spacing,
-    tone = 'subtle',
+    tone = 'default',
     soft = false,
     children,
     labelAlign = 'center',

@@ -100,7 +100,7 @@ export const linearProgressIndicator = style({
     0 1px 2px ${glowVar}
   `,
   transformOrigin: 'left center',
-  transition: `transform ${vars.duration.slow} cubic-bezier(0.2, 0.8, 0.2, 1)`,
+  transition: `transform ${vars.duration.slow} ${vars.easing.easeOut}`,
   zIndex: 2,
   selectors: {
     '[dir="rtl"] &': { transformOrigin: 'right center' },
@@ -120,7 +120,7 @@ export const linearProgressIndicatorComplete = style({
   animationName: completePulse,
   animationDuration: '1.8s',
   animationIterationCount: 2,
-  animationTimingFunction: 'ease-out',
+  animationTimingFunction: vars.easing.easeOut,
   '@media': {
     '(prefers-reduced-motion: reduce)': { animation: 'none' },
   },
@@ -140,7 +140,7 @@ export const linearProgressBuffer = style({
   background: indicatorGradient,
   opacity: 0.28,
   transformOrigin: 'left center',
-  transition: `transform ${vars.duration.slow} cubic-bezier(0.2, 0.8, 0.2, 1)`,
+  transition: `transform ${vars.duration.slow} ${vars.easing.easeOut}`,
   zIndex: 1,
   selectors: {
     '[dir="rtl"] &': { transformOrigin: 'right center' },
@@ -160,7 +160,7 @@ export const linearProgressSegment = style({
   height: '100%',
   minWidth: 0,
   background: indicatorGradient,
-  transition: `flex-basis ${vars.duration.slow} cubic-bezier(0.2, 0.8, 0.2, 1)`,
+  transition: `flex-basis ${vars.duration.slow} ${vars.easing.easeOut}`,
   boxShadow: `
     inset 0 1px 0 rgba(255,255,255,0.28),
     inset 0 -1px 0 rgba(0,0,0,0.12)
@@ -235,7 +235,7 @@ export const linearProgressIndeterminateBar1 = style([
   {
     animationName: indeterminate1,
     animationDuration: '2.1s',
-    animationTimingFunction: 'cubic-bezier(0.65, 0.815, 0.735, 0.395)',
+    animationTimingFunction: vars.easing.easeIn,
     animationIterationCount: 'infinite',
   },
 ]);
@@ -245,7 +245,7 @@ export const linearProgressIndeterminateBar2 = style([
   {
     animationName: indeterminate2,
     animationDuration: '2.1s',
-    animationTimingFunction: 'cubic-bezier(0.165, 0.84, 0.44, 1)',
+    animationTimingFunction: vars.easing.easeOut,
     animationIterationCount: 'infinite',
     animationDelay: '1.15s',
   },

@@ -1,4 +1,5 @@
 import { style, styleVariants } from '@vanilla-extract/css';
+import { focusRing } from '../../styles/focusRing.js';
 import { vars } from '../../styles/vars.css.js';
 
 export const root = style({
@@ -8,7 +9,7 @@ export const root = style({
   outline: 'none',
   selectors: {
     '&:focus-visible': {
-      boxShadow: `0 0 0 2px ${vars.color.accent.ring}`,
+      boxShadow: focusRing,
       borderRadius: vars.radius.sm,
     },
   },

@@ -212,7 +212,7 @@ export const tabsIndicator = style({
   pointerEvents: 'none',
   transitionProperty: 'transform, width, height, opacity, background-color',
   transitionDuration: vars.duration.normal,
-  transitionTimingFunction: 'cubic-bezier(0.4, 0, 0.2, 1)',
+  transitionTimingFunction: vars.easing.easeInOut,
   // Default geometry — overridden per variant below.
   width: 'var(--cynosure-tabs-indicator-width, 0)',
   height: 'var(--cynosure-tabs-indicator-height, 0)',

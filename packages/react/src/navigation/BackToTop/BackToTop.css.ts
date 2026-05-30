@@ -1,4 +1,5 @@
 import { style, styleVariants } from '@vanilla-extract/css';
+import { focusRing } from '../../styles/focusRing.js';
 import { vars } from '../../styles/vars.css.js';
 
 export const backToTopButton = style({
@@ -17,7 +18,7 @@ export const backToTopButton = style({
   cursor: 'pointer',
   transitionProperty: 'opacity, transform',
   transitionDuration: vars.duration.fast,
-  transitionTimingFunction: 'ease-out',
+  transitionTimingFunction: vars.easing.easeOut,
   zIndex: Number(vars.z.sticky),
   opacity: 1,
   transform: 'translateY(0)',
@@ -32,7 +33,7 @@ export const backToTopButton = style({
     },
     '&:focus-visible': {
       outline: 'none',
-      boxShadow: `${vars.shadow.lg}, 0 0 0 3px ${vars.color.accent.ring}`,
+      boxShadow: `${vars.shadow.lg}, ${focusRing}`,
     },
     '[data-cynosure-reduced-motion] &': {
       transitionDuration: '0s',

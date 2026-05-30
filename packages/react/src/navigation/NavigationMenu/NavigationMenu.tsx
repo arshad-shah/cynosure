@@ -1,8 +1,20 @@
-import * as Radix from '@radix-ui/react-navigation-menu';
 import { ChevronDown } from 'lucide-react';
-import { type ComponentPropsWithoutRef, type ElementRef, type ReactNode, forwardRef } from 'react';
+import {
+  type ComponentPropsWithoutRef,
+  type ReactNode,
+  createContext,
+  forwardRef,
+  useCallback,
+  useContext,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { Card } from '../../data-display/Card/Card.js';
-import { cn } from '../../utils/cn.js';
+import { useControllableState } from '../../hooks/useControllableState.js';
+import { useId } from '../../hooks/useId.js';
+import { composeRefs } from '../../utils/composeRefs.js';
 import {
   navigationMenuCaret,
   navigationMenuContent,
@@ -12,235 +24,411 @@ import {
   navigationMenuList,
   navigationMenuRoot,
   navigationMenuTrigger,
-  navigationMenuViewport,
-  navigationMenuViewportWrapper,
 } from './NavigationMenu.css.js';
 
-/**
- * Props for the `NavigationMenu` root. Forwards everything accepted by
- * Radix's `NavigationMenu.Root` (`value`/`defaultValue`/`onValueChange`,
- * `orientation`, `dir`, `delayDuration`, `skipDelayDuration`).
+/*
+ * First-party navigation menu. Replaces `@radix-ui/react-navigation-menu` with
+ * an in-tree implementation: a single open "value" identifies the active
+ * top-level item, triggers open on hover/focus/click, and panels render in
+ * place beneath their trigger (the default, non-viewport layout the CSS
+ * targets). `<NavigationMenuViewport>` is kept as a compatibility no-op so
+ * existing compositions keep type-checking.
  */
-export interface NavigationMenuProps extends ComponentPropsWithoutRef<typeof Radix.Root> {}
+
+type AnyProps = Record<string, unknown>;
+const HOVER_OPEN_DELAY = 150;
+const HOVER_CLOSE_DELAY = 150;
+
+interface NavRootContextValue {
+  value: string | null;
+  open: (value: string) => void;
+  close: (value: string) => void;
+  /** Schedule a hover-intent open/close that a sibling interaction can cancel. */
+  scheduleOpen: (value: string) => void;
+  scheduleClose: () => void;
+  cancelSchedule: () => void;
+  registerTrigger: (value: string, el: HTMLElement | null) => void;
+  activeTriggerEl: HTMLElement | null;
+}
+
+const NavRootContext = createContext<NavRootContextValue | null>(null);
+const NavItemContext = createContext<{ value: string } | null>(null);
+
+function useNavRoot(): NavRootContextValue {
+  const ctx = useContext(NavRootContext);
+  if (!ctx) throw new Error('NavigationMenu parts must be rendered inside <NavigationMenu>.');
+  return ctx;
+}
+
+export interface NavigationMenuProps extends Omit<ComponentPropsWithoutRef<'nav'>, 'onChange'> {
+  value?: string;
+  defaultValue?: string;
+  onValueChange?: (value: string) => void;
+  /** Reserved for API parity. */
+  orientation?: 'horizontal' | 'vertical';
+  dir?: 'ltr' | 'rtl';
+  delayDuration?: number;
+  skipDelayDuration?: number;
+}
 
 /**
- * Horizontal top-nav pattern with rich hover-to-reveal panels. Radix
- * handles hover intent, keyboard navigation, and focus management; we
- * layer Cynosure visuals via vanilla-extract recipes.
+ * Horizontal top-nav with hover-to-reveal panels. The active item is tracked
+ * by a single `value`; opening one panel closes the others.
  */
-export const NavigationMenu = forwardRef<ElementRef<typeof Radix.Root>, NavigationMenuProps>(
-  function NavigationMenu({ className, children, ...rest }, ref) {
+export const NavigationMenu = forwardRef<HTMLElement, NavigationMenuProps>(function NavigationMenu(
+  {
+    className,
+    children,
+    value: valueProp,
+    defaultValue,
+    onValueChange,
+    orientation: _orientation,
+    dir: _dir,
+    delayDuration: _delayDuration,
+    skipDelayDuration: _skipDelayDuration,
+    onPointerLeave,
+    ...rest
+  },
+  ref,
+) {
+  const [value, setValue] = useControllableState<string | null>({
+    value: valueProp,
+    defaultValue: defaultValue ?? null,
+    onChange: (next) => {
+      if (next != null) onValueChange?.(next);
+    },
+  });
+  const triggersRef = useRef<Map<string, HTMLElement>>(new Map());
+  const [activeTriggerEl, setActiveTriggerEl] = useState<HTMLElement | null>(null);
+  const timerRef = useRef<number>(0);
+
+  const cancelSchedule = useCallback(() => {
+    if (timerRef.current) window.clearTimeout(timerRef.current);
+    timerRef.current = 0;
+  }, []);
+
+  const open = useCallback(
+    (next: string) => {
+      cancelSchedule();
+      setValue(next);
+      setActiveTriggerEl(triggersRef.current.get(next) ?? null);
+    },
+    [cancelSchedule, setValue],
+  );
+
+  const close = useCallback(
+    (which: string) => {
+      cancelSchedule();
+      setValue((prev) => (prev === which ? (null as unknown as string) : prev));
+    },
+    [cancelSchedule, setValue],
+  );
+
+  const scheduleOpen = useCallback(
+    (next: string) => {
+      cancelSchedule();
+      timerRef.current = window.setTimeout(() => open(next), HOVER_OPEN_DELAY);
+    },
+    [cancelSchedule, open],
+  );
+
+  const scheduleClose = useCallback(() => {
+    cancelSchedule();
+    timerRef.current = window.setTimeout(
+      () => setValue(null as unknown as string),
+      HOVER_CLOSE_DELAY,
+    );
+  }, [cancelSchedule, setValue]);
+
+  const registerTrigger = useCallback(
+    (triggerValue: string, el: HTMLElement | null) => {
+      if (el) triggersRef.current.set(triggerValue, el);
+      else triggersRef.current.delete(triggerValue);
+      if (value === triggerValue) setActiveTriggerEl(el);
+    },
+    [value],
+  );
+
+  const ctx = useMemo<NavRootContextValue>(
+    () => ({
+      value,
+      open,
+      close,
+      scheduleOpen,
+      scheduleClose,
+      cancelSchedule,
+      registerTrigger,
+      activeTriggerEl,
+    }),
+    [
+      value,
+      open,
+      close,
+      scheduleOpen,
+      scheduleClose,
+      cancelSchedule,
+      registerTrigger,
+      activeTriggerEl,
+    ],
+  );
+
+  return (
+    <nav
+      {...(rest as AnyProps)}
+      ref={ref}
+      className={cnJoin(navigationMenuRoot, className)}
+      data-state={value ? 'open' : 'closed'}
+      onPointerLeave={(event) => {
+        onPointerLeave?.(event);
+        ctx.scheduleClose();
+      }}
+    >
+      <NavRootContext.Provider value={ctx}>{children}</NavRootContext.Provider>
+    </nav>
+  );
+});
+
+// Local join helper — avoids importing the generic `cn` for this leaf module's
+// two-argument calls while keeping `undefined`/`false` class names out.
+function cnJoin(...classes: Array<string | false | null | undefined>): string {
+  return classes.filter(Boolean).join(' ');
+}
+
+export interface NavigationMenuListProps extends ComponentPropsWithoutRef<'ul'> {}
+
+/** Horizontal `<ul>` of top-level `<NavigationMenuItem>`s. */
+export const NavigationMenuList = forwardRef<HTMLUListElement, NavigationMenuListProps>(
+  function NavigationMenuList({ className, ...rest }, ref) {
+    return <ul {...rest} ref={ref} className={cnJoin(navigationMenuList, className)} />;
+  },
+);
+
+export interface NavigationMenuItemProps extends ComponentPropsWithoutRef<'li'> {
+  value?: string;
+}
+
+/**
+ * Single top-level cell. Hosts either a `NavigationMenuTrigger` +
+ * `NavigationMenuContent` pair or a flat `NavigationMenuLink`.
+ */
+export const NavigationMenuItem = forwardRef<HTMLLIElement, NavigationMenuItemProps>(
+  function NavigationMenuItem({ className, value: valueProp, children, ...rest }, ref) {
+    const generatedId = useId();
+    const value = valueProp ?? generatedId;
+    const itemCtx = useMemo(() => ({ value }), [value]);
     return (
-      <Radix.Root ref={ref} className={cn(navigationMenuRoot, className)} {...rest}>
-        {children}
-      </Radix.Root>
+      <li
+        {...(rest as AnyProps)}
+        ref={ref}
+        className={className}
+        style={{ position: 'relative', ...((rest as { style?: React.CSSProperties }).style ?? {}) }}
+      >
+        <NavItemContext.Provider value={itemCtx}>{children}</NavItemContext.Provider>
+      </li>
     );
   },
 );
 
-/**
- * Props for the horizontal list of top-level menu items. Forwards all
- * Radix `NavigationMenu.List` props.
- */
-export interface NavigationMenuListProps extends ComponentPropsWithoutRef<typeof Radix.List> {}
-
-/**
- * Container for the top-level `<NavigationMenuItem>`s. Renders as a
- * horizontal `<ul>` with roving-tab-index focus handled by Radix.
- */
-export const NavigationMenuList = forwardRef<
-  ElementRef<typeof Radix.List>,
-  NavigationMenuListProps
->(function NavigationMenuList({ className, ...rest }, ref) {
-  return <Radix.List ref={ref} className={cn(navigationMenuList, className)} {...rest} />;
-});
-
-/**
- * Props for a top-level menu cell. Forwards all Radix `NavigationMenu.Item`
- * props (including the optional `value` used for controlled open state).
- */
-export interface NavigationMenuItemProps extends ComponentPropsWithoutRef<typeof Radix.Item> {}
-
-/**
- * Single cell in the top-level list. Hosts either a `NavigationMenuTrigger`
- * + `NavigationMenuContent` pair (dropdown) or a flat `NavigationMenuLink`
- * (no panel).
- */
-export const NavigationMenuItem = forwardRef<
-  ElementRef<typeof Radix.Item>,
-  NavigationMenuItemProps
->(function NavigationMenuItem({ className, ...rest }, ref) {
-  return <Radix.Item ref={ref} className={className} {...rest} />;
-});
-
-/**
- * Props for the top-level trigger that opens a `NavigationMenuContent`
- * panel.
- */
-export interface NavigationMenuTriggerProps extends ComponentPropsWithoutRef<typeof Radix.Trigger> {
-  /**
-   * Suppress the built-in caret icon rendered at the right edge of the
-   * trigger label.
-   * @default false
-   */
+export interface NavigationMenuTriggerProps extends ComponentPropsWithoutRef<'button'> {
+  /** Suppress the built-in caret icon at the trigger's trailing edge. */
   hideChevron?: boolean;
 }
 
 /**
- * Top-level menu trigger. Opens its `NavigationMenuContent` on hover (with
- * hover-intent timing managed by Radix) or on `Enter`/`Space` for keyboard
- * users.
+ * Top-level trigger. Opens its panel on hover (with hover-intent timing),
+ * focus, or `Enter`/`Space`/`↓`.
  */
-export const NavigationMenuTrigger = forwardRef<
-  ElementRef<typeof Radix.Trigger>,
-  NavigationMenuTriggerProps
->(function NavigationMenuTrigger({ className, children, hideChevron, ...rest }, ref) {
-  return (
-    <Radix.Trigger ref={ref} className={cn(navigationMenuTrigger, className)} {...rest}>
-      {children}
-      {hideChevron ? null : (
-        <span className={navigationMenuCaret} aria-hidden="true">
-          <ChevronDown size={14} />
-        </span>
-      )}
-    </Radix.Trigger>
-  );
-});
+export const NavigationMenuTrigger = forwardRef<HTMLButtonElement, NavigationMenuTriggerProps>(
+  function NavigationMenuTrigger(
+    { className, children, hideChevron, onClick, onKeyDown, onPointerEnter, onFocus, ...rest },
+    ref,
+  ) {
+    const root = useNavRoot();
+    const item = useContext(NavItemContext);
+    const value = item?.value ?? '';
+    const isOpen = root.value === value;
 
-/**
- * Props for the floating panel rendered beneath a trigger. Forwards every
- * Radix `NavigationMenu.Content` prop (incl. `forceMount`, `onPointer…`,
- * collision-avoidance callbacks).
- */
-export interface NavigationMenuContentProps
-  extends ComponentPropsWithoutRef<typeof Radix.Content> {}
+    const setRef = useCallback(
+      (node: HTMLElement | null) => root.registerTrigger(value, node),
+      [root, value],
+    );
 
-/**
- * Floating panel that opens beneath a `<NavigationMenuTrigger>`. The surface
- * (background / border / radius / shadow) is delegated to `<Card variant=
- * "elevated">` so the popup matches every other elevated surface in the
- * library; this component only owns positioning, the dropdown z-layer, and
- * the open/close animation.
- *
- * Card is rendered **as a child of** `Radix.Content` rather than projected
- * via `asChild`. Radix observes the Content node itself with a
- * ResizeObserver to drive `--radix-navigation-menu-viewport-{width,height}`
- * for the `<Viewport>` mode; projecting onto Card interferes with that ref
- * pipeline and leaves the Viewport collapsed to its parent's width. Keeping
- * Card as an inner child lets Radix measure correctly while the visible
- * surface is still our shared Card variant.
- *
- * `width: 'fit-content'` on the Card lets it size to its contents inside an
- * absolutely-positioned `Radix.Content`. The panel intentionally adds no
- * internal padding — consumers typically fill it with their own padded
- * layout (a grid of cards, a `<ul>`, a custom mega-menu split), so an extra
- * inner gutter would double-up and crowd the items out.
- */
-export const NavigationMenuContent = forwardRef<
-  ElementRef<typeof Radix.Content>,
-  NavigationMenuContentProps
->(function NavigationMenuContent({ className, children, ...rest }, ref) {
-  return (
-    <Radix.Content ref={ref} className={cn(navigationMenuContent, className)} {...rest}>
-      <Card variant="elevated" style={{ overflow: 'visible' }}>
+    return (
+      <button
+        {...(rest as AnyProps)}
+        ref={composeRefs(ref as React.Ref<HTMLElement>, setRef)}
+        type="button"
+        className={cnJoin(navigationMenuTrigger, className)}
+        aria-expanded={isOpen}
+        data-state={isOpen ? 'open' : 'closed'}
+        onClick={(event) => {
+          onClick?.(event);
+          if (event.defaultPrevented) return;
+          if (isOpen) root.close(value);
+          else root.open(value);
+        }}
+        onPointerEnter={(event) => {
+          onPointerEnter?.(event);
+          // If a sibling panel is open, switch immediately; otherwise hover-open.
+          if (root.value != null) root.open(value);
+          else root.scheduleOpen(value);
+        }}
+        onFocus={(event) => {
+          onFocus?.(event);
+          root.open(value);
+        }}
+        onKeyDown={(event) => {
+          onKeyDown?.(event);
+          if (event.defaultPrevented) return;
+          if (event.key === 'ArrowDown' || event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            root.open(value);
+          } else if (event.key === 'Escape') {
+            root.close(value);
+          }
+        }}
+      >
         {children}
-      </Card>
-    </Radix.Content>
-  );
-});
+        {hideChevron ? null : (
+          <span className={navigationMenuCaret} aria-hidden="true">
+            <ChevronDown size={14} />
+          </span>
+        )}
+      </button>
+    );
+  },
+);
+
+export interface NavigationMenuContentProps extends ComponentPropsWithoutRef<'div'> {
+  /** Accepted for API parity; the panel always mounts only while open. */
+  forceMount?: boolean;
+}
 
 /**
- * Props for a link rendered inside or outside a `NavigationMenuContent`
- * panel.
+ * Floating panel rendered beneath its trigger while the item is open. The
+ * surface is delegated to `<Card variant="elevated">`; this component owns
+ * positioning, the dropdown z-layer, and the open/close animation.
  */
-export interface NavigationMenuLinkProps extends ComponentPropsWithoutRef<typeof Radix.Link> {
-  /**
-   * Mark the link as the current page. Sets `aria-current="page"` plus a
-   * `data-active="true"` hook for styling.
-   * @default false
-   */
+export const NavigationMenuContent = forwardRef<HTMLDivElement, NavigationMenuContentProps>(
+  function NavigationMenuContent(
+    { className, children, forceMount: _forceMount, onPointerEnter, onPointerLeave, ...rest },
+    ref,
+  ) {
+    const root = useNavRoot();
+    const item = useContext(NavItemContext);
+    const value = item?.value ?? '';
+    if (root.value !== value) return null;
+    return (
+      <div
+        {...(rest as AnyProps)}
+        ref={ref}
+        className={cnJoin(navigationMenuContent, className)}
+        data-state="open"
+        onPointerEnter={(event) => {
+          onPointerEnter?.(event);
+          root.cancelSchedule();
+        }}
+        onPointerLeave={(event) => {
+          onPointerLeave?.(event);
+          root.scheduleClose();
+        }}
+      >
+        <Card variant="elevated" style={{ overflow: 'visible' }}>
+          {children}
+        </Card>
+      </div>
+    );
+  },
+);
+
+export interface NavigationMenuLinkProps extends ComponentPropsWithoutRef<'a'> {
+  /** Mark as the current page: sets `aria-current="page"` + `data-active`. */
   active?: boolean;
-  /** Link contents. */
   children?: ReactNode;
 }
 
-export const NavigationMenuLink = forwardRef<
-  ElementRef<typeof Radix.Link>,
-  NavigationMenuLinkProps
->(function NavigationMenuLink({ className, active, ...rest }, ref) {
-  return (
-    <Radix.Link
-      ref={ref}
-      active={active}
-      aria-current={active ? 'page' : undefined}
-      data-active={active ? 'true' : undefined}
-      className={cn(navigationMenuLink, className)}
-      {...rest}
-    />
-  );
-});
+export const NavigationMenuLink = forwardRef<HTMLAnchorElement, NavigationMenuLinkProps>(
+  function NavigationMenuLink({ className, active, ...rest }, ref) {
+    return (
+      <a
+        {...(rest as AnyProps)}
+        ref={ref}
+        aria-current={active ? 'page' : undefined}
+        data-active={active ? 'true' : undefined}
+        className={cnJoin(navigationMenuLink, className)}
+      />
+    );
+  },
+);
+
+export interface NavigationMenuIndicatorProps extends ComponentPropsWithoutRef<'div'> {}
 
 /**
- * Props for the active-trigger indicator (the small wedge that lines up
- * underneath the open trigger). Forwards every Radix
- * `NavigationMenu.Indicator` prop. Pass custom `children` to replace the
- * default SVG wedge.
+ * Caret that lines up under the active trigger. Tracks the open trigger's
+ * horizontal position via a layout effect.
  */
-export interface NavigationMenuIndicatorProps
-  extends ComponentPropsWithoutRef<typeof Radix.Indicator> {}
+export const NavigationMenuIndicator = forwardRef<HTMLDivElement, NavigationMenuIndicatorProps>(
+  function NavigationMenuIndicator({ className, children, style, ...rest }, ref) {
+    const root = useNavRoot();
+    const visible = root.value != null && root.activeTriggerEl != null;
+    const [offset, setOffset] = useState<{ left: number; width: number }>({ left: 0, width: 0 });
 
-export const NavigationMenuIndicator = forwardRef<
-  ElementRef<typeof Radix.Indicator>,
-  NavigationMenuIndicatorProps
->(function NavigationMenuIndicator({ className, children, ...rest }, ref) {
-  return (
-    <Radix.Indicator ref={ref} className={cn(navigationMenuIndicator, className)} {...rest}>
-      {children ?? (
-        // SVG triangle. The fill picks up the panel's surface colour (white
-        // in light mode), and the stroke pulls a token-driven border line so
-        // the wedge reads against any page background. The `viewBox` covers
-        // both the upper triangle and a 1-px slice below it that lines up
-        // with the panel's top edge, so the bottom stroke gets clipped
-        // behind the panel and the upward V remains.
-        <svg
-          aria-hidden="true"
-          className={navigationMenuIndicatorArrow}
-          width="14"
-          height="8"
-          viewBox="0 0 14 8"
-          fill="none"
-        >
-          <path
-            d="M0.5 7.5 L7 1 L13.5 7.5"
-            fill="currentColor"
-            stroke="var(--cynosure-color-border-default)"
-            strokeWidth="1"
-            strokeLinejoin="round"
-          />
-        </svg>
-      )}
-    </Radix.Indicator>
-  );
-});
+    useLayoutEffect(() => {
+      const el = root.activeTriggerEl;
+      if (!el) return;
+      setOffset({ left: el.offsetLeft, width: el.offsetWidth });
+    }, [root.activeTriggerEl]);
+
+    if (!visible) return null;
+    return (
+      <div
+        {...(rest as AnyProps)}
+        ref={ref}
+        className={cnJoin(navigationMenuIndicator, className)}
+        data-state="visible"
+        style={{
+          width: offset.width,
+          transform: `translateX(${offset.left}px)`,
+          ...(style ?? {}),
+        }}
+      >
+        {children ?? (
+          <svg
+            aria-hidden="true"
+            className={navigationMenuIndicatorArrow}
+            width="14"
+            height="8"
+            viewBox="0 0 14 8"
+            fill="none"
+          >
+            <path
+              d="M0.5 7.5 L7 1 L13.5 7.5"
+              fill="currentColor"
+              stroke="var(--cynosure-color-border-default)"
+              strokeWidth="1"
+              strokeLinejoin="round"
+            />
+          </svg>
+        )}
+      </div>
+    );
+  },
+);
+
+export interface NavigationMenuViewportProps extends ComponentPropsWithoutRef<'div'> {}
 
 /**
- * Props for the shared viewport that hosts each open panel — Radix
- * animates between trigger panels by sliding the viewport. Forwards every
- * Radix `NavigationMenu.Viewport` prop.
+ * Compatibility no-op. The first-party engine renders each panel in place
+ * beneath its trigger, so a shared viewport isn't required; this component is
+ * retained so existing `<NavigationMenuViewport />` compositions keep working.
  */
-export interface NavigationMenuViewportProps
-  extends ComponentPropsWithoutRef<typeof Radix.Viewport> {}
-
-export const NavigationMenuViewport = forwardRef<
-  ElementRef<typeof Radix.Viewport>,
-  NavigationMenuViewportProps
->(function NavigationMenuViewport({ className, ...rest }, ref) {
-  return (
-    <div className={navigationMenuViewportWrapper}>
-      <Radix.Viewport ref={ref} className={cn(navigationMenuViewport, className)} {...rest} />
-    </div>
-  );
-});
+export const NavigationMenuViewport = forwardRef<HTMLDivElement, NavigationMenuViewportProps>(
+  function NavigationMenuViewport() {
+    return null;
+  },
+);
 
 /** Sub-navigation for nested panels (rarely needed, exposed for parity). */
-export const NavigationMenuSub: typeof Radix.Sub = Radix.Sub;
+export function NavigationMenuSub({ children }: { children?: ReactNode }) {
+  return <>{children}</>;
+}

@@ -211,7 +211,7 @@ export const PinInput = forwardRef<HTMLDivElement, PinInputProps>(function PinIn
       {name ? <input type="hidden" name={name} id={id} value={value} /> : null}
       {Array.from({ length }).map((_, index) => {
         const raw = padVal[index] ?? ' ';
-        const display = raw === ' ' ? '' : mask ? '•' : raw;
+        const display = raw === ' ' ? '' : mask ? '●' : raw;
         return (
           <input
             // Cells are positional — index is stable across renders (length is fixed).

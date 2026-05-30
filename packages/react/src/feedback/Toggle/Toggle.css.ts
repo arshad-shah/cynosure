@@ -1,4 +1,5 @@
 import { globalStyle, style, styleVariants } from '@vanilla-extract/css';
+import { focusRing } from '../../styles/focusRing.js';
 import { vars } from '../../styles/vars.css.js';
 
 export const toggleRoot = style({
@@ -22,7 +23,7 @@ export const toggleRoot = style({
   selectors: {
     '&:hover': { background: vars.color.background.muted },
     '&:focus-visible': {
-      boxShadow: `0 0 0 2px ${vars.color.accent.ring}`,
+      boxShadow: focusRing,
     },
     '&[data-state="on"]': {
       background: vars.color.accent.soft,

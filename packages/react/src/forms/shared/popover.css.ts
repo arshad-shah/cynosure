@@ -1,4 +1,5 @@
 import { keyframes, style } from '@vanilla-extract/css';
+import { focusRingInset } from '../../styles/focusRing.js';
 import { vars } from '../../styles/vars.css.js';
 
 const popoverIn = keyframes({
@@ -14,7 +15,10 @@ const popoverOut = keyframes({
 /** Shared popover shell for Select / Combobox / MultiSelect / DatePicker. */
 export const popover = style({
   minWidth: 'var(--trigger-width)',
-  maxHeight: 'min(60vh, 20rem)',
+  // Stay within the viewport on small screens (gutter on each side); scroll
+  // the listbox rather than overflowing. `dvh` accounts for mobile chrome.
+  maxWidth: 'calc(100vw - 1rem)',
+  maxHeight: 'min(60dvh, 20rem)',
   background: vars.color.background.raised,
   color: vars.color.foreground.default,
   border: `1px solid ${vars.color.border.strong}`,
@@ -25,10 +29,10 @@ export const popover = style({
   zIndex: Number(vars.z.popover),
   selectors: {
     '&[data-entering]': {
-      animation: `${popoverIn} ${vars.duration.fast} ease-out`,
+      animation: `${popoverIn} ${vars.duration.fast} ${vars.easing.easeOut}`,
     },
     '&[data-exiting]': {
-      animation: `${popoverOut} ${vars.duration.fast} ease-in`,
+      animation: `${popoverOut} ${vars.duration.fast} ${vars.easing.easeIn}`,
     },
   },
 });
@@ -68,7 +72,7 @@ export const listboxItem = style({
       color: vars.color.accent.onSolid,
     },
     '&[data-focus-visible]': {
-      boxShadow: `inset 0 0 0 2px ${vars.color.accent.ring}`,
+      boxShadow: focusRingInset,
     },
     '&[data-disabled]': {
       opacity: 0.5,

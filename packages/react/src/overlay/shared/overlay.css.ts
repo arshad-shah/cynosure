@@ -50,10 +50,10 @@ export const overlayBackdrop = style({
   zIndex: Number(vars.z.overlay),
   selectors: {
     '&[data-state="open"]': {
-      animation: `${overlayFadeIn} ${vars.duration.fast} ease-out`,
+      animation: `${overlayFadeIn} ${vars.duration.fast} ${vars.easing.easeOut}`,
     },
     '&[data-state="closed"]': {
-      animation: `${overlayFadeOut} ${vars.duration.fast} ease-in`,
+      animation: `${overlayFadeOut} ${vars.duration.fast} ${vars.easing.easeIn}`,
     },
   },
 });

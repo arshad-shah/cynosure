@@ -1,4 +1,5 @@
 import { keyframes, style } from '@vanilla-extract/css';
+import { focusRing } from '../../styles/focusRing.js';
 import { vars } from '../../styles/vars.css.js';
 
 const menuIn = keyframes({
@@ -14,12 +15,15 @@ const menuOut = keyframes({
 /** Shared content shell — DropdownMenu, ContextMenu, MenuBar, sub-menus. */
 export const menuContent = style({
   minWidth: '12rem',
-  maxHeight: 'min(60vh, 20rem)',
+  // Cap to the viewport on small screens so wide items never overflow the
+  // edge; scroll instead. `dvh` tracks the mobile visual viewport.
+  maxWidth: 'calc(100vw - 1rem)',
+  maxHeight: 'min(60dvh, 20rem)',
   background: vars.color.background.surface,
   color: vars.color.foreground.default,
   border: `1px solid ${vars.color.border.default}`,
   borderRadius: vars.radius.md,
-  boxShadow: '0 1px 2px rgba(0,0,0,0.08), 0 12px 32px -8px rgba(0,0,0,0.18)',
+  boxShadow: vars.shadow.lg,
   overflow: 'auto',
   padding: vars.space['1.5'],
   zIndex: Number(vars.z.dropdown),
@@ -30,10 +34,10 @@ export const menuContent = style({
     '&[data-side="left"]': { transformOrigin: 'center right' },
     '&[data-side="right"]': { transformOrigin: 'center left' },
     '&[data-state="open"]': {
-      animation: `${menuIn} ${vars.duration.fast} ease-out`,
+      animation: `${menuIn} ${vars.duration.normal} ${vars.easing.spring}`,
     },
     '&[data-state="closed"]': {
-      animation: `${menuOut} ${vars.duration.fast} ease-in`,
+      animation: `${menuOut} ${vars.duration.fast} ${vars.easing.easeIn}`,
     },
   },
   '@media': {
@@ -58,7 +62,7 @@ export const menuItem = style({
   outline: 'none',
   fontSize: 'var(--cynosure-font-body-md-size)',
   lineHeight: 'var(--cynosure-font-body-md-line-height)',
-  transition: 'background-color 120ms ease, color 120ms ease',
+  transition: `background-color ${vars.duration.fast} ${vars.easing.easeInOut}, color ${vars.duration.fast} ${vars.easing.easeInOut}`,
   selectors: {
     '&[data-highlighted]': {
       background: vars.color.accent.soft,
@@ -161,7 +165,7 @@ export const menubarTrigger = style({
       background: vars.color.accent.soft,
     },
     '&:focus-visible': {
-      boxShadow: `0 0 0 2px ${vars.color.accent.ring}`,
+      boxShadow: focusRing,
     },
   },
 });

@@ -1,4 +1,5 @@
 import { style } from '@vanilla-extract/css';
+import { focusRing } from '../../styles/focusRing.js';
 import { vars } from '../../styles/vars.css.js';
 import { fieldWellBase } from '../shared/control.css.js';
 
@@ -80,7 +81,7 @@ export const segsWell = style([
       '&:focus-within': {
         background: vars.color.background.surface,
         borderColor: vars.color.border.focus,
-        boxShadow: `0 0 0 2px ${vars.color.accent.ring}`,
+        boxShadow: focusRing,
       },
       [`${pickerRoot}[data-invalid="true"] &:focus-within`]: {
         borderColor: vars.color.feedback.danger.border,
@@ -90,7 +91,7 @@ export const segsWell = style([
       [`${pickerRoot}[data-variant="ghost"] &:focus-within`]: {
         background: vars.color.background.surface,
         borderColor: vars.color.border.focus,
-        boxShadow: `0 0 0 2px ${vars.color.accent.ring}`,
+        boxShadow: focusRing,
       },
     },
   },
@@ -121,7 +122,7 @@ export const triggerWell = style([
       },
       '&:focus-visible': {
         borderColor: vars.color.border.focus,
-        boxShadow: `0 0 0 2px ${vars.color.accent.ring}`,
+        boxShadow: focusRing,
       },
       '&:disabled, &[data-disabled]': {
         cursor: 'not-allowed',
@@ -183,10 +184,13 @@ export const calendarPopover = style({
   border: `1px solid ${vars.color.border.default}`,
   borderRadius: vars.radius.lg,
   boxShadow: vars.shadow.xl,
-  overflow: 'hidden',
+  // Scroll the calendar rather than overflowing a short viewport, and never
+  // exceed the screen width on a narrow phone.
+  overflow: 'auto',
   padding: 0,
   minWidth: 'unset',
-  maxHeight: 'unset',
+  maxWidth: 'calc(100vw - 1rem)',
+  maxHeight: 'calc(100dvh - 1rem)',
   width: '18rem',
 });
 
@@ -228,7 +232,7 @@ export const goToTodayLink = style({
     },
     '&:focus-visible': {
       outline: 'none',
-      boxShadow: `0 0 0 2px ${vars.color.accent.ring}`,
+      boxShadow: focusRing,
     },
   },
 });

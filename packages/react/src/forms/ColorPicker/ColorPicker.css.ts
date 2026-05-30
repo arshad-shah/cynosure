@@ -1,4 +1,5 @@
 import { style, styleVariants } from '@vanilla-extract/css';
+import { focusRing as focusRingShadow } from '../../styles/focusRing.js';
 import { vars } from '../../styles/vars.css.js';
 import { inertWell } from '../Input/Input.css.js';
 
@@ -16,7 +17,7 @@ export const focusRing = style({
   outline: 'none',
   selectors: {
     '&:focus-visible, &[data-focus-visible]': {
-      boxShadow: `0 0 0 2px ${vars.color.accent.ring}`,
+      boxShadow: focusRingShadow,
       borderColor: vars.color.border.focus,
     },
   },
@@ -38,7 +39,7 @@ export const triggerButton = style({
     '&:hover': { borderColor: vars.color.border.strong },
     '&:focus-visible, &[data-focus-visible]': {
       borderColor: vars.color.border.focus,
-      boxShadow: `0 0 0 2px ${vars.color.accent.ring}`,
+      boxShadow: focusRingShadow,
     },
   },
 });
@@ -162,7 +163,7 @@ export const areaThumb = style({
   cursor: 'grab',
   selectors: {
     '&[data-focus-visible]': {
-      boxShadow: `0 0 0 2px ${vars.color.accent.ring}, 0 1px 3px rgba(0,0,0,0.3)`,
+      boxShadow: `${focusRingShadow}, 0 1px 3px rgba(0,0,0,0.3)`,
     },
     '&[data-dragging]': { cursor: 'grabbing' },
   },
@@ -200,7 +201,7 @@ export const sliderThumb = style({
   cursor: 'grab',
   selectors: {
     '&[data-focus-visible]': {
-      boxShadow: `0 0 0 2px ${vars.color.accent.ring}, 0 1px 3px rgba(0,0,0,0.25)`,
+      boxShadow: `${focusRingShadow}, 0 1px 3px rgba(0,0,0,0.25)`,
     },
     '&[data-dragging]': { cursor: 'grabbing' },
   },
@@ -227,7 +228,7 @@ export const field = style({
   selectors: {
     '&:focus': {
       borderColor: vars.color.border.focus,
-      boxShadow: `0 0 0 2px ${vars.color.accent.ring}`,
+      boxShadow: focusRingShadow,
     },
   },
 });
@@ -270,12 +271,12 @@ export const cellRoot = style({
   borderRadius: vars.radius.sm,
   background: vars.color.background.surface,
   overflow: 'hidden',
-  transition: 'border-color 120ms, box-shadow 120ms',
+  transition: `border-color ${vars.duration.fast}, box-shadow ${vars.duration.fast}`,
   selectors: {
     '&[data-hover="true"]': { borderColor: vars.color.border.strong },
     '&:focus-within': {
       borderColor: vars.color.border.focus,
-      boxShadow: `0 0 0 2px ${vars.color.accent.ring}`,
+      boxShadow: focusRingShadow,
     },
   },
 });
@@ -390,7 +391,7 @@ export const swatchTile = style({
   selectors: {
     '&:hover': { borderColor: vars.color.border.strong },
     '&:focus-visible': {
-      boxShadow: `0 0 0 2px ${vars.color.accent.ring}`,
+      boxShadow: focusRingShadow,
       borderColor: vars.color.border.focus,
     },
   },
@@ -398,7 +399,7 @@ export const swatchTile = style({
 
 export const swatchTileActive = style({
   borderColor: vars.color.accent.solid,
-  boxShadow: `0 0 0 2px ${vars.color.accent.ring}`,
+  boxShadow: focusRingShadow,
 });
 
 export const swatchTileBySize = styleVariants({
@@ -422,7 +423,7 @@ export const swatchAddTile = style({
   selectors: {
     '&:hover': { borderColor: vars.color.border.strong, color: vars.color.foreground.default },
     '&:focus-visible': {
-      boxShadow: `0 0 0 2px ${vars.color.accent.ring}`,
+      boxShadow: focusRingShadow,
       borderColor: vars.color.border.focus,
     },
   },
