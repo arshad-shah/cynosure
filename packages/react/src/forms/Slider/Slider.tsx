@@ -13,6 +13,7 @@ import {
   headerRow,
   markDot,
   markLabel,
+  markWrap,
   marksRow,
   root,
   thumb,
@@ -118,7 +119,11 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(function Slider(pr
               {marks.map((mark) => {
                 const percent = ((mark.value - minValue) / (maxValue - minValue)) * 100;
                 return (
-                  <div key={mark.value} style={{ insetInlineStart: `${percent}%` }}>
+                  <div
+                    key={mark.value}
+                    className={markWrap}
+                    style={{ insetInlineStart: `${percent}%` }}
+                  >
                     <span className={markDot} style={{ insetInlineStart: 0 }} />
                     {mark.label ? (
                       <span className={markLabel} style={{ insetInlineStart: 0 }}>
