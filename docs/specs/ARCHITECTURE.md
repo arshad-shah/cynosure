@@ -75,8 +75,10 @@ The component file:
 ```tsx
 // Button.tsx
 import { forwardRef } from 'react';
-import { Slot } from '@radix-ui/react-slot';
-import { cva, type VariantProps } from 'cva';
+import { Slot } from '../../primitives/Slot.js';
+// `cva` from class-variance-authority used to live here; the variant
+// surface is small enough that we just compose `cn(styles.base, styles.size[size], …)`
+// inline instead of pulling a 1 KB dep.
 import { cn } from '../../utils/cn';
 import * as styles from './Button.css';
 
@@ -216,10 +218,16 @@ export type { ButtonProps } from './Button';
 | `@arshad-shah/cynosure-tokens`, `@arshad-shah/cynosure-core`          | —     | `workspace:*`       | Internal deps; pnpm resolves from workspace.       |
 
 Direct deps we bring:
-- `@radix-ui/react-*` — the specific primitives we use.
+- `@radix-ui/react-*` — only the menu family
+  (`react-dropdown-menu`, `react-context-menu`, `react-menubar`,
+  `react-navigation-menu`). All other overlays — Dialog, Drawer,
+  AlertDialog, Popover, HoverCard, Tooltip, ScrollArea — plus toggles,
+  switches, accordions, tabs, collapsibles, checkboxes, radios, avatars,
+  `Slot`, and the direction context are first-party in `src/`, sharing
+  two in-tree kits: `overlay/shared/useFloatingPosition` for anchored
+  surfaces and `overlay/shared/useDialog` for modal focus-trap + scroll
+  lock.
 - `react-aria-components`, `@internationalized/date` — for advanced form controls only (Select, Combobox, DatePicker, Slider, ColorPicker).
-- `cva` — variants.
-- `@radix-ui/react-slot` — composition.
 - `sonner` — toast.
 - `react-resizable-panels` — Resizable.
 - `shiki` — only for `CodeBlock`, lazy-loaded language packs.
@@ -282,10 +290,10 @@ Initial ceilings; treat as sacred:
 
 Before opening a PR for a new component, ask:
 
-- [ ] Does this compose layout primitives and Radix/React-Aria bases? (No raw `<div>`, `<span>`, `<ul>`, etc.)
+- [ ] Does this compose layout primitives, first-party base components, or a vetted external primitive (`react-aria-components`, the remaining Radix overlay packages)? (No raw `<div>`, `<span>`, `<ul>`, etc.)
 - [ ] Does it expose `asChild` where there's a single root element?
-- [ ] Does it support controlled + uncontrolled?
-- [ ] Are variants, sizes, and colour schemes typed via `cva`?
+- [ ] Does it support controlled + uncontrolled via `useControllableState`?
+- [ ] Are variants, sizes, and colour schemes mapped through `cn(...)` over `styleVariants` tables?
 - [ ] Are all values sourced from `vars.*` (tokens)?
 - [ ] Is there a per-component tsup entry and `exports` map entry?
 - [ ] Stories cover: default, all variants, all sizes, all states, RTL, `asChild`?

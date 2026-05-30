@@ -6,7 +6,7 @@ category: components
 status: stable
 since: "0.1.0"
 a11y: Uses role="tablist" / role="tab" / role="tabpanel"; keyboard navigable with arrow keys; animated indicator via TabsIndicator.
-bundleSize: "14 kB"
+bundleSize: "2.6 kB"
 tags: [navigation, tabs, accessible]
 ---
 import LivePreview from '@/components/LivePreview/LivePreview.astro';
@@ -40,7 +40,7 @@ Pass `disabled` to any `TabsTrigger` to prevent selection.
 
 ## Accessibility
 
-- The tab list carries `role="tablist"`; each trigger carries `role="tab"` with `aria-selected` and `aria-controls` managed by Radix UI.
+- The tab list carries `role="tablist"`; each trigger carries `role="tab"` with `aria-selected` and `aria-controls` wired by the component.
 - Arrow keys cycle between tabs within the list; `Home` / `End` jump to first / last tab.
 - `TabsContent` carries `role="tabpanel"` and is linked to its trigger via `aria-labelledby`.
 - `TabsIndicator` is `aria-hidden="true"` — purely decorative.

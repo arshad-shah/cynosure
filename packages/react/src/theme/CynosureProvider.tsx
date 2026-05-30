@@ -1,5 +1,5 @@
-import { Provider as RadixTooltipProvider } from '@radix-ui/react-tooltip';
 import type { ReactNode } from 'react';
+import { TooltipProvider } from '../overlay/Tooltip/Tooltip.js';
 import { DirectionProvider } from './DirectionProvider.js';
 import { LocaleProvider } from './LocaleProvider.js';
 import { ThemeProvider } from './ThemeProvider.js';
@@ -19,8 +19,6 @@ export interface CynosureProviderProps {
     delayDuration?: number;
     /** Time after leaving one tooltip during which the next opens instantly. Default 500. */
     skipDelayDuration?: number;
-    /** Disable the hoverable content behaviour across all tooltips. */
-    disableHoverableContent?: boolean;
   };
 }
 
@@ -56,13 +54,12 @@ export function CynosureProvider({
     <ThemeProvider {...theme}>
       <DirectionProvider {...directionProps}>
         <LocaleProvider locale={locale}>
-          <RadixTooltipProvider
+          <TooltipProvider
             delayDuration={tooltip?.delayDuration ?? 300}
             skipDelayDuration={tooltip?.skipDelayDuration ?? 500}
-            disableHoverableContent={tooltip?.disableHoverableContent}
           >
             {children}
-          </RadixTooltipProvider>
+          </TooltipProvider>
         </LocaleProvider>
       </DirectionProvider>
     </ThemeProvider>

@@ -1,30 +1,24 @@
-import * as RadixScrollArea from '@radix-ui/react-scroll-area';
-import { type ComponentPropsWithoutRef, type ElementRef, type ReactNode, forwardRef } from 'react';
+import { type CSSProperties, type HTMLAttributes, type ReactNode, forwardRef } from 'react';
 import { cn } from '../../utils/cn.js';
-import {
-  scrollAreaCorner,
-  scrollAreaRoot,
-  scrollAreaScrollbar,
-  scrollAreaThumb,
-  scrollAreaViewport,
-} from './ScrollArea.css.js';
+import { scrollAreaRoot, scrollAreaViewport } from './ScrollArea.css.js';
 
-export type ScrollAreaType = 'auto' | 'always' | 'scroll' | 'hover';
+export type ScrollAreaType = 'auto' | 'always' | 'hover';
 
-/** Props for the {@link ScrollArea}. Inherits the rest of Radix `ScrollArea.Root`'s API. */
-export interface ScrollAreaProps
-  extends Omit<ComponentPropsWithoutRef<typeof RadixScrollArea.Root>, 'type'> {
+/** Props for the {@link ScrollArea}. */
+export interface ScrollAreaProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
   /**
-   * When the scrollbars are visible — see Radix `ScrollArea.Root`'s `type`.
-   * `hover` shows scrollbars on pointer-over / scroll; `always` keeps them.
-   * @default "hover"
+   * When scrollbars are visible.
+   * - `auto` (default): browser default — scrollbar appears when content overflows.
+   * - `always`: reserved gutter even when no overflow.
+   * - `hover`: scrollbars become visible on pointer over via CSS.
+   * @default "auto"
    */
   type?: ScrollAreaType;
   /** Convenience for the viewport height (number is converted to `px`). */
   height?: number | string;
   /** Convenience for the viewport width (number is converted to `px`). */
   width?: number | string;
-  /** Scrollable content rendered inside the Radix `Viewport`. */
+  /** Scrollable content. */
   children?: ReactNode;
   /**
    * Which scrollbars to render — useful to suppress the orthogonal axis.
@@ -36,42 +30,49 @@ export interface ScrollAreaProps
 const toCss = (value: number | string | undefined): string | undefined =>
   value === undefined ? undefined : typeof value === 'number' ? `${value.toString()}px` : value;
 
+const overflowFor = (
+  scrollbars: 'vertical' | 'horizontal' | 'both',
+  type: ScrollAreaType,
+): CSSProperties => {
+  // `auto`/`hover` use overflow:auto so scrollbars only render when content
+  // overflows; `always` uses overflow:scroll to reserve gutter unconditionally.
+  const value = type === 'always' ? 'scroll' : 'auto';
+  const hidden = 'hidden';
+  if (scrollbars === 'both') return { overflow: value };
+  if (scrollbars === 'vertical') return { overflowY: value, overflowX: hidden };
+  return { overflowY: hidden, overflowX: value };
+};
+
 /**
- * ScrollArea is a custom-styled scroll container built on Radix Scroll Area.
- * Replaces native scrollbars with cynosure-styled thumbs that match across
- * platforms. Use when you need a constrained scrolling region inside a card,
- * panel, or popover. Native focus / keyboard scroll (arrow keys, Page Up/Down,
- * Home/End) still works because the viewport is the actual scroll element.
+ * Custom-styled scroll container. Uses native scrolling (so focus, keyboard
+ * navigation, and screen-reader scroll-into-view all work for free) with
+ * token-driven scrollbar styling via the `scrollbar-color` /
+ * `scrollbar-width` CSS properties. Older browsers fall back to the OS
+ * default scrollbar — visually different, behaviour identical.
+ *
+ * `type="hover"` fades the scrollbar in on hover via CSS (`scrollbar-color`
+ * toggles between transparent and the token colour).
  */
-export const ScrollArea = forwardRef<ElementRef<typeof RadixScrollArea.Root>, ScrollAreaProps>(
-  function ScrollArea(
-    { type = 'hover', height, width, scrollbars = 'both', className, style, children, ...rest },
-    ref,
-  ) {
-    const mergedStyle = { width: toCss(width), height: toCss(height), ...style };
-    return (
-      <RadixScrollArea.Root
-        ref={ref}
-        type={type}
-        className={cn(scrollAreaRoot, className)}
-        style={mergedStyle}
-        {...rest}
-      >
-        <RadixScrollArea.Viewport className={scrollAreaViewport}>
-          {children}
-        </RadixScrollArea.Viewport>
-        {scrollbars !== 'horizontal' ? (
-          <RadixScrollArea.Scrollbar orientation="vertical" className={scrollAreaScrollbar}>
-            <RadixScrollArea.Thumb className={scrollAreaThumb} />
-          </RadixScrollArea.Scrollbar>
-        ) : null}
-        {scrollbars !== 'vertical' ? (
-          <RadixScrollArea.Scrollbar orientation="horizontal" className={scrollAreaScrollbar}>
-            <RadixScrollArea.Thumb className={scrollAreaThumb} />
-          </RadixScrollArea.Scrollbar>
-        ) : null}
-        <RadixScrollArea.Corner className={scrollAreaCorner} />
-      </RadixScrollArea.Root>
-    );
-  },
-);
+export const ScrollArea = forwardRef<HTMLDivElement, ScrollAreaProps>(function ScrollArea(
+  { type = 'auto', height, width, scrollbars = 'both', className, style, children, ...rest },
+  ref,
+) {
+  const merged: CSSProperties = {
+    width: toCss(width),
+    height: toCss(height),
+    ...overflowFor(scrollbars, type),
+    ...style,
+  };
+  return (
+    <div
+      ref={ref}
+      data-scroll-type={type}
+      data-scrollbars={scrollbars}
+      className={cn(scrollAreaRoot, scrollAreaViewport, className)}
+      style={merged}
+      {...rest}
+    >
+      {children}
+    </div>
+  );
+});

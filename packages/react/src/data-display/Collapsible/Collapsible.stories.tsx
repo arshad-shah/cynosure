@@ -47,7 +47,10 @@ export const Basic: Story = {
               This content only exists in the DOM while the Collapsible is open — perfect for
               revealing supplementary detail without cluttering the default view.
             </Text>
-            <Text>It animates height using Radix&rsquo;s state-driven CSS variables.</Text>
+            <Text>
+              It animates height by measuring the panel and writing the result to a CSS custom
+              property.
+            </Text>
           </Stack>
         </CollapsibleContent>
       </Collapsible>

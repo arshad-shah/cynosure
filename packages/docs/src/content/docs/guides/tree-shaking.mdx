@@ -21,6 +21,35 @@ tree-shakes with modern bundlers, but per-component imports are a
 guarantee: no matter which bundler version you're on, you only pull in
 the subpath you reach for.
 
+## CSS rides along automatically
+
+Every per-component JS entry imports its own CSS at the top:
+
+```js
+// dist/button.js
+import './core.css';
+import './button.css';
+export { Button } from './chunk-….js';
+```
+
+So `import { Button } from '@arshad-shah/cynosure-react/button'` pulls in
+exactly the rules Button needs. `core.css` carries the shared rules used
+by 2+ components (layout-prop cascade, typography base, focus ring, the
+`@property` registrations) — your bundler deduplicates it across any
+number of per-component imports.
+
+Footprint at the consumer's bundler:
+
+- **Monolithic path**: `import '@arshad-shah/cynosure-react/styles.css'`
+  → 31 KB gzip for every Cynosure rule in the library.
+- **One component only**: ~20 KB gzip (`core.css` + that component's
+  rules, which are typically &lt;1 KB on their own).
+- **Many components**: 20 KB + the per-component rules you actually use.
+
+For a single bundled file (one `<link>` tag, no imports to wire up),
+`@arshad-shah/cynosure-react/all.css` ships tokens + components together
+(33 KB gzip).
+
 ## `sideEffects`
 
 Cynosure packages declare `sideEffects: ["**/*.css"]`. Bundlers drop any JS
@@ -48,6 +77,9 @@ grew and by how much.
 
 ## Dedup
 
-Cynosure's peers (`react`, `react-dom`, Radix, React Aria) must exist once in
-your graph. If you see duplicated copies, run `pnpm why <pkg>` and align
-the version via your package manager's hoisting / catalog.
+Cynosure's peers (`react`, `react-dom`, `react-aria-components`, and
+the four remaining Radix menu packages —
+`@radix-ui/react-{dropdown-menu,context-menu,menubar,navigation-menu}`)
+must exist once in your graph. If you see duplicated copies, run
+`pnpm why <pkg>` and align the version via your package manager's
+hoisting / catalog.

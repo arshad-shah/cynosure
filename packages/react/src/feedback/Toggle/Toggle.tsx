@@ -1,11 +1,5 @@
-import * as RadixToggle from '@radix-ui/react-toggle';
-import {
-  type ComponentPropsWithoutRef,
-  type ElementRef,
-  createContext,
-  forwardRef,
-  useContext,
-} from 'react';
+import { type ButtonHTMLAttributes, createContext, forwardRef, useContext } from 'react';
+import { useControllableState } from '../../hooks/useControllableState.js';
 import { cn } from '../../utils/cn.js';
 import { toggleRoot, toggleSize, toggleVariantOutline, toggleVariantSolid } from './Toggle.css.js';
 
@@ -28,7 +22,14 @@ const variantClass: Record<ToggleVariant, string | undefined> = {
 /**
  * Props for the {@link Toggle} component.
  */
-export interface ToggleProps extends ComponentPropsWithoutRef<typeof RadixToggle.Root> {
+export interface ToggleProps
+  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'value' | 'onChange'> {
+  /** Controlled pressed state. */
+  pressed?: boolean;
+  /** Uncontrolled initial pressed state. */
+  defaultPressed?: boolean;
+  /** Fires with the next pressed state when toggled. */
+  onPressedChange?: (pressed: boolean) => void;
   /**
    * Pixel scale. One of `xs`, `sm`, `md`, `lg`. Inherits from a parent
    * `ToggleGroup` when unset.
@@ -45,23 +46,49 @@ export interface ToggleProps extends ComponentPropsWithoutRef<typeof RadixToggle
 }
 
 /**
- * Two-state button that flips between on and off. Built on Radix Toggle, so
- * it exposes `aria-pressed` and supports controlled and uncontrolled
- * pressed-state APIs. Use Toggle for single binary actions like bold/italic
- * formatting controls; for mutually exclusive choices, prefer `ToggleGroup`.
+ * Two-state button that flips between on and off. Renders a `<button>` with
+ * `aria-pressed` and `data-state="on"|"off"` for styling hooks.
  */
-export const Toggle = forwardRef<ElementRef<typeof RadixToggle.Root>, ToggleProps>(function Toggle(
-  { size, variant, className, ...rest },
+export const Toggle = forwardRef<HTMLButtonElement, ToggleProps>(function Toggle(
+  {
+    pressed: pressedProp,
+    defaultPressed,
+    onPressedChange,
+    size,
+    variant,
+    className,
+    onClick,
+    disabled,
+    type = 'button',
+    ...rest
+  },
   ref,
 ) {
   const context = useContext(ToggleContext);
   const resolvedSize = size ?? context?.size ?? 'md';
   const resolvedVariant = variant ?? context?.variant ?? 'ghost';
 
+  const [pressed, setPressed] = useControllableState<boolean>({
+    value: pressedProp,
+    defaultValue: defaultPressed ?? false,
+    onChange: onPressedChange,
+  });
+
   return (
-    <RadixToggle.Root
+    <button
       ref={ref}
+      type={type}
+      aria-pressed={pressed}
+      data-state={pressed ? 'on' : 'off'}
+      data-disabled={disabled || undefined}
+      disabled={disabled}
       className={cn(toggleRoot, toggleSize[resolvedSize], variantClass[resolvedVariant], className)}
+      onClick={(event) => {
+        onClick?.(event);
+        if (event.defaultPrevented) return;
+        if (disabled) return;
+        setPressed(!pressed);
+      }}
       {...rest}
     />
   );

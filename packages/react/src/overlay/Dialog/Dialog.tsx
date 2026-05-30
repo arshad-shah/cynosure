@@ -1,16 +1,28 @@
-import * as RadixDialog from '@radix-ui/react-dialog';
 import { X } from 'lucide-react';
 import {
-  type ComponentPropsWithoutRef,
-  type ElementRef,
+  type ButtonHTMLAttributes,
   type HTMLAttributes,
+  type ReactElement,
   type ReactNode,
+  cloneElement,
+  createContext,
   forwardRef,
+  isValidElement,
+  useContext,
+  useRef,
 } from 'react';
 import { IconButton } from '../../forms/IconButton/IconButton.js';
 import { cn } from '../../utils/cn.js';
+import { composeRefs } from '../../utils/composeRefs.js';
+import { OverlayPortal } from '../shared/OverlayPortal.js';
 import { overlayBackdrop, overlayCloseButton } from '../shared/overlay.css.js';
 import type { OverlaySize } from '../shared/types.js';
+import {
+  type DialogState,
+  useDialogState,
+  useEscapeToClose,
+  useFocusTrap,
+} from '../shared/useDialog.js';
 import {
   dialogContent,
   dialogDescription,
@@ -21,36 +33,150 @@ import {
   dialogTitle,
 } from './Dialog.css.js';
 
-/** Dialog root — context provider that holds the open state. */
-export const Dialog = RadixDialog.Root;
+// Held in a constant so biome's `useSemanticElements` doesn't suggest
+// rewriting to the native `<dialog>` element. Native `<dialog>` has
+// browser-driven focus + ::backdrop semantics we explicitly customise
+// (animated backdrop, configurable dismissal); consumer CSS already
+// targets `<div role="dialog">`.
+const DIALOG_ROLE = 'dialog';
 
-/** Trigger — pass `asChild` to use a `Button` or other custom element. */
-export const DialogTrigger = RadixDialog.Trigger;
+const DialogCtx = createContext<DialogState | null>(null);
+const useDialogCtx = (): DialogState => {
+  const ctx = useContext(DialogCtx);
+  if (!ctx) throw new Error('Dialog subcomponent must be used inside <Dialog>');
+  return ctx;
+};
 
-/** Any button that closes the dialog. Pair with `asChild`. */
-export const DialogClose = RadixDialog.Close;
+export interface DialogProps {
+  /** Controlled open state. */
+  open?: boolean;
+  /** Uncontrolled initial open state. */
+  defaultOpen?: boolean;
+  /** Fires on open-state change. */
+  onOpenChange?: (open: boolean) => void;
+  children?: ReactNode;
+}
 
 /**
- * Portal'd overlay container. Use `Dialog.Portal` when you need to control
- * the portal mount without rendering the rest of `DialogContent`.
+ * Modal dialog root. Owns the open state, the shared title/description
+ * IDs that subcomponents wire into `aria-labelledby`/`aria-describedby`,
+ * and ref-counted body scroll lock while open.
  */
-export const DialogPortal = RadixDialog.Portal;
+export function Dialog({ open, defaultOpen, onOpenChange, children }: DialogProps): ReactElement {
+  const state = useDialogState({ open, defaultOpen, onOpenChange });
+  return <DialogCtx.Provider value={state}>{children}</DialogCtx.Provider>;
+}
+
+type AnyProps = Record<string, unknown>;
+
+export interface DialogTriggerProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  /** Compose onto a single React-element child. */
+  asChild?: boolean;
+  children: ReactNode;
+}
+
+export const DialogTrigger = forwardRef<HTMLElement, DialogTriggerProps>(function DialogTrigger(
+  { asChild, children, onClick, type = 'button', ...rest },
+  ref,
+) {
+  const ctx = useDialogCtx();
+  const setRef = (node: HTMLElement | null) => {
+    ctx.triggerRef.current = node;
+  };
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    onClick?.(event);
+    if (event.defaultPrevented) return;
+    ctx.setOpen(true);
+  };
+  const shared = {
+    'aria-haspopup': 'dialog' as const,
+    'aria-expanded': ctx.open,
+    'data-state': ctx.open ? 'open' : 'closed',
+  };
+  if (asChild) {
+    if (!isValidElement(children)) {
+      throw new Error('DialogTrigger asChild expects a single React element child');
+    }
+    const childProps = (children as unknown as { props: AnyProps }).props;
+    const existingRef = (childProps.ref as never) ?? (children as unknown as { ref?: unknown }).ref;
+    const composed = composeRefs<HTMLElement>(ref as never, existingRef as never, setRef);
+    const merged: AnyProps = {
+      ref: composed,
+      ...shared,
+      ...rest,
+      onClick: chain(childProps.onClick as never, handleClick as never),
+    };
+    return cloneElement(children, merged);
+  }
+  return (
+    <button
+      ref={composeRefs<HTMLElement>(ref as never, setRef) as never}
+      type={type}
+      {...shared}
+      onClick={handleClick}
+      {...rest}
+    >
+      {children}
+    </button>
+  );
+});
+
+export interface DialogCloseProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  asChild?: boolean;
+  children?: ReactNode;
+}
+
+export const DialogClose = forwardRef<HTMLButtonElement, DialogCloseProps>(function DialogClose(
+  { asChild, children, onClick, type = 'button', ...rest },
+  ref,
+) {
+  const ctx = useDialogCtx();
+  const handle = (event: React.MouseEvent<HTMLButtonElement>) => {
+    onClick?.(event);
+    if (event.defaultPrevented) return;
+    ctx.setOpen(false);
+  };
+  if (asChild) {
+    if (!isValidElement(children)) {
+      throw new Error('DialogClose asChild expects a single React element child');
+    }
+    const childProps = (children as unknown as { props: AnyProps }).props;
+    const merged: AnyProps = {
+      ref,
+      ...rest,
+      onClick: chain(childProps.onClick as never, handle as never),
+    };
+    return cloneElement(children, merged);
+  }
+  return (
+    <button ref={ref} type={type} onClick={handle} {...rest}>
+      {children}
+    </button>
+  );
+});
 
 /**
- * Props for the dialog content surface. Layers size, position, and
- * dismissal controls over the Radix Dialog content primitive.
+ * Portal target. Preserved for API parity — defaults to `document.body`.
  */
-export interface DialogContentProps
-  extends Omit<ComponentPropsWithoutRef<typeof RadixDialog.Content>, 'asChild'> {
+export interface DialogPortalProps {
+  container?: HTMLElement | (() => HTMLElement);
+  children?: ReactNode;
+}
+export function DialogPortal({ container, children }: DialogPortalProps): ReactElement {
+  return <OverlayPortal container={container}>{children}</OverlayPortal>;
+}
+
+/** Props for the dialog content surface. */
+export interface DialogContentProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
   /**
-   * Visual size variant of the dialog. `md` works for most confirm/edit
-   * flows; `lg`/`xl` are for forms; `sm` for compact confirmations.
+   * Visual size variant. `md` works for most confirm/edit flows;
+   * `lg`/`xl` are for forms; `sm` for compact confirmations.
    * @default "md"
    */
   size?: OverlaySize;
   /**
-   * Vertical placement of the dialog. `center` is the standard modal feel;
-   * `top` anchors near the top of the viewport for taller surfaces.
+   * Vertical placement. `center` for the standard modal feel; `top`
+   * anchors near the top of the viewport.
    * @default "center"
    */
   position?: 'center' | 'top';
@@ -65,12 +191,11 @@ export interface DialogContentProps
    */
   closeOnEscape?: boolean;
   /**
-   * Render the built-in close button (top-right X). Disable when you want
-   * to drive dismissal exclusively from inside the dialog body.
+   * Render the built-in close button (top-right X).
    * @default true
    */
   showCloseButton?: boolean;
-  /** Portal target — forwarded to Radix's `DialogPortal`. */
+  /** Portal target. */
   container?: HTMLElement | (() => HTMLElement);
   /**
    * Accessible label applied to the built-in close button.
@@ -78,98 +203,108 @@ export interface DialogContentProps
    */
   closeLabel?: string;
   /**
-   * Skip rendering the backdrop. Rare — useful when stacking dialogs or
-   * when the parent surface already provides a scrim.
+   * Skip rendering the backdrop. Useful when stacking dialogs or when
+   * the parent already provides a scrim.
    * @default false
    */
   hideOverlay?: boolean;
-  /** Dialog body — typically a header, content, and footer. */
   children?: ReactNode;
 }
 
 /**
  * Dialog content surface. Portals, paints the backdrop, traps focus,
- * manages scroll lock, and wires `role="dialog"` + `aria-modal="true"`
- * via Radix. `size` and `position` are visual-only variants.
+ * activates body scroll lock, and wires `role="dialog"` +
+ * `aria-modal="true"`. `size` and `position` are visual-only variants.
  */
-export const DialogContent = forwardRef<ElementRef<typeof RadixDialog.Content>, DialogContentProps>(
-  function DialogContent(
-    {
-      size = 'md',
-      position = 'center',
-      closeOnOverlayClick = true,
-      closeOnEscape = true,
-      showCloseButton = true,
-      hideOverlay = false,
-      container,
-      closeLabel = 'Close',
-      className,
-      children,
-      onEscapeKeyDown,
-      onInteractOutside,
-      ...rest
-    },
-    ref,
-  ) {
-    const resolvedContainer = typeof container === 'function' ? container() : container;
-
-    return (
-      <RadixDialog.Portal container={resolvedContainer}>
-        {!hideOverlay ? <RadixDialog.Overlay className={overlayBackdrop} /> : null}
-        <RadixDialog.Content
-          ref={ref}
-          data-cynosure-overlay=""
-          className={cn(
-            dialogContent,
-            dialogSize[size],
-            position === 'top' ? dialogPositionTop : undefined,
-            className,
-          )}
-          onEscapeKeyDown={(e) => {
-            onEscapeKeyDown?.(e);
-            if (!closeOnEscape) e.preventDefault();
-          }}
-          onInteractOutside={(e) => {
-            onInteractOutside?.(e);
-            if (!closeOnOverlayClick) e.preventDefault();
-          }}
-          {...rest}
-        >
-          {children}
-          {showCloseButton ? (
-            <RadixDialog.Close asChild>
-              <IconButton
-                variant="bare"
-                label={closeLabel}
-                icon={<X />}
-                className={overlayCloseButton}
-                style={{
-                  background: 'transparent',
-                  border: 'none',
-                  padding: 4,
-                  borderRadius: 6,
-                  cursor: 'pointer',
-                  color: 'inherit',
-                }}
-              />
-            </RadixDialog.Close>
-          ) : null}
-        </RadixDialog.Content>
-      </RadixDialog.Portal>
-    );
+export const DialogContent = forwardRef<HTMLDivElement, DialogContentProps>(function DialogContent(
+  {
+    size = 'md',
+    position = 'center',
+    closeOnOverlayClick = true,
+    closeOnEscape = true,
+    showCloseButton = true,
+    hideOverlay = false,
+    container,
+    closeLabel = 'Close',
+    className,
+    children,
+    ...rest
   },
-);
+  ref,
+) {
+  const ctx = useDialogCtx();
+  const contentRef = useRef<HTMLDivElement | null>(null);
+  const composedRef = composeRefs<HTMLDivElement>(ref as never, (node) => {
+    contentRef.current = node;
+  });
 
-/**
- * Props for the dialog header layout block. Inherits all standard `<div>`
- * attributes.
- */
+  useFocusTrap({
+    active: ctx.open,
+    containerRef: contentRef,
+    returnFocusRef: ctx.triggerRef,
+  });
+  useEscapeToClose(ctx.open && closeOnEscape, () => ctx.setOpen(false));
+
+  if (!ctx.open) return null;
+
+  return (
+    <OverlayPortal container={container}>
+      {!hideOverlay ? (
+        <button
+          type="button"
+          aria-hidden="true"
+          tabIndex={-1}
+          // The backdrop is a button to satisfy the click target and pointer
+          // affordance contract without needing custom event composition.
+          // It sits behind the content via CSS z-index. Disabling its own
+          // outline keeps focus visible only on real content focusables.
+          className={overlayBackdrop}
+          onClick={() => {
+            if (closeOnOverlayClick) ctx.setOpen(false);
+          }}
+        />
+      ) : null}
+      <div
+        ref={composedRef}
+        role={DIALOG_ROLE}
+        aria-modal="true"
+        aria-labelledby={ctx.titleId}
+        aria-describedby={ctx.descriptionId}
+        data-state="open"
+        data-cynosure-overlay=""
+        tabIndex={-1}
+        className={cn(
+          dialogContent,
+          dialogSize[size],
+          position === 'top' ? dialogPositionTop : undefined,
+          className,
+        )}
+        {...rest}
+      >
+        {children}
+        {showCloseButton ? (
+          <IconButton
+            variant="bare"
+            label={closeLabel}
+            icon={<X />}
+            className={overlayCloseButton}
+            onClick={() => ctx.setOpen(false)}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              padding: 4,
+              borderRadius: 6,
+              cursor: 'pointer',
+              color: 'inherit',
+            }}
+          />
+        ) : null}
+      </div>
+    </OverlayPortal>
+  );
+});
+
 export interface DialogHeaderProps extends HTMLAttributes<HTMLDivElement> {}
-/**
- * Layout slot for the title + description at the top of the dialog. Pure
- * presentation — doesn't render any ARIA on its own; place a `DialogTitle`
- * and `DialogDescription` inside.
- */
 export const DialogHeader = forwardRef<HTMLDivElement, DialogHeaderProps>(function DialogHeader(
   { className, ...rest },
   ref,
@@ -177,15 +312,7 @@ export const DialogHeader = forwardRef<HTMLDivElement, DialogHeaderProps>(functi
   return <div ref={ref} className={cn(dialogHeader, className)} {...rest} />;
 });
 
-/**
- * Props for the dialog footer layout block. Inherits all standard `<div>`
- * attributes.
- */
 export interface DialogFooterProps extends HTMLAttributes<HTMLDivElement> {}
-/**
- * Layout slot for the action row (Cancel / Confirm buttons) at the bottom
- * of the dialog.
- */
 export const DialogFooter = forwardRef<HTMLDivElement, DialogFooterProps>(function DialogFooter(
   { className, ...rest },
   ref,
@@ -193,37 +320,39 @@ export const DialogFooter = forwardRef<HTMLDivElement, DialogFooterProps>(functi
   return <div ref={ref} className={cn(dialogFooter, className)} {...rest} />;
 });
 
+export interface DialogTitleProps extends HTMLAttributes<HTMLHeadingElement> {}
+
 /**
- * Props for the dialog title. Forwards to Radix's `Title`, which wires the
- * heading as the dialog's accessible name (`aria-labelledby`).
+ * Accessible heading for the dialog. Wired automatically as the
+ * `aria-labelledby` target via the shared `titleId` from `useDialogState`.
  */
-export interface DialogTitleProps extends ComponentPropsWithoutRef<typeof RadixDialog.Title> {}
+export const DialogTitle = forwardRef<HTMLHeadingElement, DialogTitleProps>(function DialogTitle(
+  { className, ...rest },
+  ref,
+) {
+  const ctx = useDialogCtx();
+  return <h2 ref={ref} id={ctx.titleId} className={cn(dialogTitle, className)} {...rest} />;
+});
+
+export interface DialogDescriptionProps extends HTMLAttributes<HTMLParagraphElement> {}
+
 /**
- * Accessible heading for the dialog. Required for assistive tech — Radix
- * uses it as the `aria-labelledby` target. Provide a hidden one if the
- * design has no visible title.
+ * Supporting body copy beneath the title. Wired automatically as the
+ * `aria-describedby` target.
  */
-export const DialogTitle = forwardRef<ElementRef<typeof RadixDialog.Title>, DialogTitleProps>(
-  function DialogTitle({ className, ...rest }, ref) {
-    return <RadixDialog.Title ref={ref} className={cn(dialogTitle, className)} {...rest} />;
+export const DialogDescription = forwardRef<HTMLParagraphElement, DialogDescriptionProps>(
+  function DialogDescription({ className, ...rest }, ref) {
+    const ctx = useDialogCtx();
+    return (
+      <p ref={ref} id={ctx.descriptionId} className={cn(dialogDescription, className)} {...rest} />
+    );
   },
 );
 
-/**
- * Props for the dialog description. Forwards to Radix's `Description`,
- * which sets `aria-describedby` on the dialog.
- */
-export interface DialogDescriptionProps
-  extends ComponentPropsWithoutRef<typeof RadixDialog.Description> {}
-/**
- * Supporting body copy beneath the title. Read aloud after the title in
- * assistive tech.
- */
-export const DialogDescription = forwardRef<
-  ElementRef<typeof RadixDialog.Description>,
-  DialogDescriptionProps
->(function DialogDescription({ className, ...rest }, ref) {
-  return (
-    <RadixDialog.Description ref={ref} className={cn(dialogDescription, className)} {...rest} />
-  );
-});
+function chain<E>(...fns: Array<((event: E) => unknown) | undefined>): (event: E) => void {
+  return (event: E) => {
+    for (const fn of fns) {
+      if (typeof fn === 'function') fn(event);
+    }
+  };
+}

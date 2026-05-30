@@ -31,9 +31,11 @@ import { DirectionProvider } from '@arshad-shah/cynosure-react';
 </DirectionProvider>
 ```
 
-This sets `dir="rtl"` on the wrapping element and also seeds Radix's own
-`DirectionProvider` so Radix-backed primitives (Tabs, NavigationMenu,
-menus, etc.) render in RTL without extra wiring.
+This sets `dir="rtl"` on the wrapping element and exposes a
+`useDirectionContext()` hook every Cynosure component reads. Arrow-key
+navigation in `Tabs`, `RadioGroup`, `ToggleGroup`, the menu family, and
+`NavigationMenu` swaps the next/prev semantics so visual "right" always
+matches the reading order.
 
 ## Mix LTR + RTL on the same page
 

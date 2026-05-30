@@ -19,8 +19,18 @@ The whole library is built on three ideas:
 2. **Themes are data.** Visual decisions live in W3C DTCG JSON tokens. CSS
    custom properties are generated from those tokens, and consumers theme by
    flipping `data-theme` on `<html>`.
-3. **Behaviour comes from Radix + React Aria.** Cynosure re-skins battle-tested
-   primitives rather than re-deriving focus traps, typeaheads, or calendars.
+3. **Behaviour is owned in-tree where the contract is small.** Toggles,
+   switches, accordions, tabs, collapsibles, checkboxes, radios, avatars,
+   the `Slot`/`asChild` composer, the direction provider, scroll area,
+   tooltip, hover card, popover, dialog, drawer, and alert dialog are
+   all first-party — backed by two small shared kits
+   (`useFloatingPosition` for anchored overlays and `useDialog` for
+   modal focus-trap + scroll lock). Calendars, date pickers, color
+   pickers, comboboxes, sliders, and form-typed inputs lean on
+   `react-aria-components` so we don't re-derive locale-aware date
+   math or rich keyboard models. The menu family (DropdownMenu,
+   ContextMenu, MenuBar, NavigationMenu) is the last remaining
+   Radix-backed surface; the migration is in flight.
 
 ## Why Cynosure
 

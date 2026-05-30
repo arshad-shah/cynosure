@@ -5,7 +5,7 @@ category: components
 status: stable
 since: "0.1.0"
 a11y: Renders an accessible image with alt text derived from `name`; falls back to initials or a labelled fallback when no image is available. Status dots are decorative (aria-hidden) — pair them with a textual label when status conveys meaning.
-bundleSize: "—"
+bundleSize: "1.56 kB"
 tags: [feedback, identity, user]
 ---
 import LivePreview from '@/components/LivePreview/LivePreview.astro';
@@ -59,7 +59,7 @@ Set `ring` to add a tokenised ring around the avatar — useful for stacked grou
 - When the avatar is purely decorative, leave `name` empty and add `aria-hidden="true"` on the wrapping element.
 - Status dots render with `aria-hidden="true"` — pair them with an off-screen label or adjacent text when status conveys meaning.
 - The fallback waits 400ms before swapping in initials so users on fast networks see the image first.
-- Initials are rendered inside a Radix fallback element which exposes an `aria-label` when only a name (no derived initials) is available.
+- Initials are rendered inside a fallback element which exposes an `aria-label` when only a name (no derived initials) is available.
 
 ## Recipes
 

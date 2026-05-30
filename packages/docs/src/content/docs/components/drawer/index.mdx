@@ -5,7 +5,7 @@ category: components
 status: stable
 since: "0.1.0"
 a11y: Uses role="dialog" aria-modal="true"; focus is trapped; Esc closes by default and restores focus to the trigger.
-bundleSize: "—"
+bundleSize: "3.8 kB"
 tags: [overlay, modal, accessible]
 ---
 import LivePreview from '@/components/LivePreview/LivePreview.astro';
@@ -45,7 +45,7 @@ Drive the open state externally to coordinate with route changes or async work.
 
 ## Accessibility
 
-- `DrawerContent` renders with `role="dialog"` and `aria-modal="true"` via Radix Dialog.
+- `DrawerContent` renders with `role="dialog"` and `aria-modal="true"`, sharing the same focus-trap + scroll-lock kit as `Dialog`.
 - Focus is trapped inside the drawer while open and returned to the trigger on close.
 - `Esc` closes by default (`closeOnEscape={true}`); suppress with `closeOnEscape={false}`.
 - Clicking the backdrop closes by default (`closeOnOverlayClick={true}`); suppress with `closeOnOverlayClick={false}`.

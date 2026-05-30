@@ -29,6 +29,7 @@ const STATIC_EXPORT_KEYS = new Set([
   '.',
   './package.json',
   './styles.css',
+  './core.css',
   './all.css',
   './fonts.css',
   './theme',

@@ -1,12 +1,12 @@
 ---
 title: Checkbox
-description: Toggle a boolean value or participate in a multi-select group. Built on Radix UI with full keyboard and screen-reader support.
+description: Toggle a boolean value or participate in a multi-select group. Full keyboard and screen-reader support.
 order: 4
 category: components
 status: stable
 since: 0.1.0
-a11y: Uses Radix UI checkbox root; role="checkbox" with aria-checked including indeterminate; focus ring follows tokens.
-bundleSize: "10 kB"
+a11y: role="checkbox" button with aria-checked (mixed for indeterminate); focus ring follows tokens.
+bundleSize: "2.01 kB"
 tags: [form, input]
 ---
 import LivePreview from '@/components/LivePreview/LivePreview.astro';
@@ -40,9 +40,9 @@ Use `CheckboxGroup` to manage a set of checkboxes as a multi-select value array.
 
 ## Accessibility
 
-- Built on Radix UI checkbox — exposes `role="checkbox"` with proper `aria-checked` including `"mixed"` for indeterminate.
+- Exposes `role="checkbox"` with proper `aria-checked` including `"mixed"` for indeterminate.
 - Focus ring is token-driven; keyboard activation works via Space key natively.
-- `disabled` is forwarded to the Radix root, blocking both pointer and keyboard interaction.
+- `disabled` blocks both pointer and keyboard interaction.
 
 ## Recipes
 

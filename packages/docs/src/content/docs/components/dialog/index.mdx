@@ -6,7 +6,7 @@ category: components
 status: stable
 since: "0.1.0"
 a11y: Uses role="dialog" aria-modal="true"; focus is trapped inside; Esc closes by default; backdrop click closes by default.
-bundleSize: "18 kB"
+bundleSize: "3.5 kB"
 tags: [overlay, modal, accessible]
 ---
 import LivePreview from '@/components/LivePreview/LivePreview.astro';
@@ -40,7 +40,7 @@ Six sizes are available: `xs`, `sm`, `md` (default), `lg`, `xl`, and `full`. Eac
 
 ## Accessibility
 
-- `DialogContent` sets `role="dialog"` and `aria-modal="true"` automatically via Radix.
+- `DialogContent` sets `role="dialog"` and `aria-modal="true"` automatically, and wires `aria-labelledby` / `aria-describedby` from the `DialogTitle` and `DialogDescription` IDs.
 - Focus is trapped inside the dialog while it is open; it returns to the trigger on close.
 - Pressing `Esc` closes the dialog by default (`closeOnEscape={true}`); suppress with `closeOnEscape={false}`.
 - Clicking the backdrop closes the dialog by default (`closeOnOverlayClick={true}`); suppress with `closeOnOverlayClick={false}`.
