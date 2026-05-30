@@ -1,5 +1,6 @@
 // packages/react/src/navigation/Sidebar/Sidebar.css.ts
 import { style, styleVariants } from '@vanilla-extract/css';
+import { focusRing } from '../../styles/focusRing.js';
 import { vars } from '../../styles/vars.css.js';
 
 export const sidebarRoot = style({
@@ -115,7 +116,7 @@ export const sidebarTriggerButton = style({
     '&:hover': { background: vars.color.accent.soft },
     '&:focus-visible': {
       outline: 'none',
-      boxShadow: `0 0 0 2px ${vars.color.accent.ring}`,
+      boxShadow: focusRing,
     },
     [`${sidebarRoot}[data-collapsed="true"][data-collapsible="icon"] &`]: {
       width: '2.25rem',
@@ -190,7 +191,7 @@ export const sidebarGroupToggle = style({
   selectors: {
     '&:focus-visible': {
       outline: 'none',
-      boxShadow: `0 0 0 2px ${vars.color.accent.ring}`,
+      boxShadow: focusRing,
     },
   },
 });
@@ -252,7 +253,7 @@ export const sidebarItemRoot = style({
     },
     '&:focus-visible': {
       outline: 'none',
-      boxShadow: `0 0 0 2px ${vars.color.accent.ring}`,
+      boxShadow: focusRing,
     },
     '&[data-active="true"]': {
       background: vars.color.accent.soft,
@@ -390,7 +391,7 @@ export const sidebarSubItem = style({
     },
     '&:focus-visible': {
       outline: 'none',
-      boxShadow: `0 0 0 2px ${vars.color.accent.ring}`,
+      boxShadow: focusRing,
     },
     '&[data-active="true"]': {
       color: vars.color.accent.solid,

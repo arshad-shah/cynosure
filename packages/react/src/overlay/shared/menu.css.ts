@@ -1,4 +1,5 @@
 import { keyframes, style } from '@vanilla-extract/css';
+import { focusRing } from '../../styles/focusRing.js';
 import { vars } from '../../styles/vars.css.js';
 
 const menuIn = keyframes({
@@ -19,7 +20,7 @@ export const menuContent = style({
   color: vars.color.foreground.default,
   border: `1px solid ${vars.color.border.default}`,
   borderRadius: vars.radius.md,
-  boxShadow: '0 1px 2px rgba(0,0,0,0.08), 0 12px 32px -8px rgba(0,0,0,0.18)',
+  boxShadow: vars.shadow.lg,
   overflow: 'auto',
   padding: vars.space['1.5'],
   zIndex: Number(vars.z.dropdown),
@@ -161,7 +162,7 @@ export const menubarTrigger = style({
       background: vars.color.accent.soft,
     },
     '&:focus-visible': {
-      boxShadow: `0 0 0 2px ${vars.color.accent.ring}`,
+      boxShadow: focusRing,
     },
   },
 });

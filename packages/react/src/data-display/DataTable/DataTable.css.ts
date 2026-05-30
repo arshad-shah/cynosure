@@ -1,4 +1,5 @@
 import { style } from '@vanilla-extract/css';
+import { focusRingInset } from '../../styles/focusRing.js';
 import { vars } from '../../styles/vars.css.js';
 
 export const dataTableWrap = style({
@@ -42,7 +43,7 @@ export const sortableHeader = style({
   selectors: {
     '&:focus-visible': {
       outline: 'none',
-      boxShadow: `inset 0 0 0 2px ${vars.color.accent.ring}`,
+      boxShadow: focusRingInset,
       borderRadius: vars.radius.sm,
     },
   },

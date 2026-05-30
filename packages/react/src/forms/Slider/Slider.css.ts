@@ -1,4 +1,5 @@
 import { style, styleVariants } from '@vanilla-extract/css';
+import { focusRing } from '../../styles/focusRing.js';
 import { vars } from '../../styles/vars.css.js';
 
 export const root = style({
@@ -60,7 +61,7 @@ export const thumb = style({
       cursor: 'grabbing',
     },
     '&[data-focus-visible]': {
-      boxShadow: `0 0 0 4px ${vars.color.accent.ring}`,
+      boxShadow: focusRing,
     },
     '&[data-disabled]': {
       cursor: 'not-allowed',

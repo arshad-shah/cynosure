@@ -1,4 +1,5 @@
 import { globalStyle, keyframes, style, styleVariants } from '@vanilla-extract/css';
+import { focusRingInset } from '../../styles/focusRing.js';
 import { vars } from '../../styles/vars.css.js';
 
 const slideDown = keyframes({
@@ -67,7 +68,7 @@ export const accordionTrigger = style({
     '&:hover': { background: vars.color.background.subtle },
     '&:focus-visible': {
       outline: 'none',
-      boxShadow: `inset 0 0 0 2px ${vars.color.accent.ring}`,
+      boxShadow: focusRingInset,
     },
     '&[data-disabled]': { opacity: 0.5, cursor: 'not-allowed' },
   },

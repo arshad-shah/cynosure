@@ -1,4 +1,5 @@
 import { globalStyle, keyframes, style, styleVariants } from '@vanilla-extract/css';
+import { focusRing } from '../../styles/focusRing.js';
 import { vars } from '../../styles/vars.css.js';
 
 const spin = keyframes({
@@ -36,7 +37,7 @@ export const buttonBase = style({
       transitionDuration: vars.duration.instant,
     },
     '&:focus-visible': {
-      boxShadow: `0 0 0 2px ${vars.color.accent.ring}`,
+      boxShadow: focusRing,
     },
     '&:disabled, &[aria-disabled="true"], &[data-loading="true"]': {
       cursor: 'not-allowed',

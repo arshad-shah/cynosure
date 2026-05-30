@@ -1,4 +1,5 @@
 import { style } from '@vanilla-extract/css';
+import { focusRing } from '../../styles/focusRing.js';
 import { vars } from '../../styles/vars.css.js';
 
 /**
@@ -82,7 +83,7 @@ const controlBase = style({
       color: vars.color.accent.solid,
     },
     '&:focus-visible': {
-      boxShadow: `0 0 0 2px ${vars.color.accent.ring}, ${vars.shadow.md}`,
+      boxShadow: `${focusRing}, ${vars.shadow.md}`,
     },
     '&:disabled': {
       opacity: 0.4,
@@ -158,7 +159,7 @@ export const carouselDot = style({
       width: '1.25rem',
     },
     '&:focus-visible': {
-      boxShadow: `0 0 0 2px ${vars.color.accent.ring}`,
+      boxShadow: focusRing,
     },
     '&:hover:not([data-active="true"])': {
       background: vars.color.foreground.muted,

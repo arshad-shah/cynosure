@@ -1,4 +1,5 @@
 import { style } from '@vanilla-extract/css';
+import { focusRing } from '../../styles/focusRing.js';
 import { vars } from '../../styles/vars.css.js';
 
 export const tagsRow = style({
@@ -52,7 +53,7 @@ export const tagRemove = style({
     '&:focus-visible': {
       outline: 'none',
       opacity: 1,
-      boxShadow: `0 0 0 2px ${vars.color.accent.ring}`,
+      boxShadow: focusRing,
     },
     '&:disabled': {
       cursor: 'not-allowed',

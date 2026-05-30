@@ -1,4 +1,5 @@
 import { style } from '@vanilla-extract/css';
+import { focusRing } from '../../styles/focusRing.js';
 import { vars } from '../../styles/vars.css.js';
 
 /** Standalone Calendar surface — no chrome when nested inside a popover. */
@@ -69,7 +70,7 @@ export const calendarNavButton = style({
     },
     '&:focus-visible': {
       outline: 'none',
-      boxShadow: `0 0 0 2px ${vars.color.accent.ring}`,
+      boxShadow: focusRing,
     },
     '&:disabled': {
       opacity: 0.4,
@@ -128,7 +129,7 @@ export const calendarCell = style({
       color: vars.color.accent.solidHover,
     },
     '&[data-focused]': {
-      boxShadow: `0 0 0 2px ${vars.color.accent.ring}`,
+      boxShadow: focusRing,
     },
     '&[data-today]:not([data-selected])': {
       color: vars.color.accent.solid,

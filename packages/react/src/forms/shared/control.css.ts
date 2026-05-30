@@ -1,4 +1,5 @@
 import { globalStyle, style, styleVariants } from '@vanilla-extract/css';
+import { focusRing } from '../../styles/focusRing.js';
 import { vars } from '../../styles/vars.css.js';
 
 /**
@@ -53,7 +54,7 @@ export const controlWrapperBase = style({
     '&[data-focus-within="true"]:not([data-invalid="true"])': {
       background: vars.color.background.surface,
       borderColor: vars.color.border.focus,
-      boxShadow: `0 0 0 2px ${vars.color.accent.ring}`,
+      boxShadow: focusRing,
     },
     '&[data-invalid="true"]': {
       borderColor: vars.color.feedback.danger.border,
@@ -100,7 +101,7 @@ export const controlWrapperVariant = styleVariants({
       },
       '&[data-focus-within="true"]': {
         background: vars.color.background.surface,
-        boxShadow: `0 0 0 2px ${vars.color.accent.ring}`,
+        boxShadow: focusRing,
       },
     },
   },

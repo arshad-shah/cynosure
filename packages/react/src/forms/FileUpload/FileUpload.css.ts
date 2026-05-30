@@ -1,4 +1,5 @@
 import { style, styleVariants } from '@vanilla-extract/css';
+import { focusRing } from '../../styles/focusRing.js';
 import { vars } from '../../styles/vars.css.js';
 
 const dropZoneBase = style({
@@ -15,7 +16,7 @@ const dropZoneBase = style({
     },
     '&:focus-visible': {
       borderColor: vars.color.border.focus,
-      boxShadow: `0 0 0 2px ${vars.color.accent.ring}`,
+      boxShadow: focusRing,
     },
     '&[data-disabled="true"]': {
       cursor: 'not-allowed',

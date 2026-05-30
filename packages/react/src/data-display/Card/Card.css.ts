@@ -1,4 +1,5 @@
 import { style, styleVariants } from '@vanilla-extract/css';
+import { focusRing } from '../../styles/focusRing.js';
 import { vars } from '../../styles/vars.css.js';
 
 export const cardRoot = style({
@@ -63,7 +64,7 @@ export const cardInteractive = style({
     },
     '&:focus-visible': {
       outline: 'none',
-      boxShadow: `0 0 0 3px ${vars.color.accent.ring}`,
+      boxShadow: focusRing,
     },
     '&:active': {
       transform: 'translateY(0) scale(0.99)',

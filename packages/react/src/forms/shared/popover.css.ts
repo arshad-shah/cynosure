@@ -1,4 +1,5 @@
 import { keyframes, style } from '@vanilla-extract/css';
+import { focusRingInset } from '../../styles/focusRing.js';
 import { vars } from '../../styles/vars.css.js';
 
 const popoverIn = keyframes({
@@ -68,7 +69,7 @@ export const listboxItem = style({
       color: vars.color.accent.onSolid,
     },
     '&[data-focus-visible]': {
-      boxShadow: `inset 0 0 0 2px ${vars.color.accent.ring}`,
+      boxShadow: focusRingInset,
     },
     '&[data-disabled]': {
       opacity: 0.5,

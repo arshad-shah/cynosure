@@ -1,4 +1,5 @@
 import { style } from '@vanilla-extract/css';
+import { focusRing } from '../../styles/focusRing.js';
 import { vars } from '../../styles/vars.css.js';
 
 export const tagInteractive = style({
@@ -8,7 +9,7 @@ export const tagInteractive = style({
   selectors: {
     '&:focus-visible': {
       outline: 'none',
-      boxShadow: `0 0 0 2px ${vars.color.accent.ring}`,
+      boxShadow: focusRing,
     },
     '&:hover': {
       filter: 'brightness(0.97)',
@@ -48,7 +49,7 @@ export const tagRemoveButton = style({
     '&:focus-visible': {
       outline: 'none',
       opacity: 1,
-      boxShadow: `0 0 0 2px ${vars.color.accent.ring}`,
+      boxShadow: focusRing,
     },
   },
   '@media': {
@@ -68,7 +69,7 @@ export const tagGroupTrigger = style({
   padding: 0,
   selectors: {
     '&:focus-visible': {
-      boxShadow: `0 0 0 2px ${vars.color.accent.ring}`,
+      boxShadow: focusRing,
     },
   },
 });

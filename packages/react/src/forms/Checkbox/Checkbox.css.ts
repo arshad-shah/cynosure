@@ -1,4 +1,5 @@
 import { keyframes, style, styleVariants } from '@vanilla-extract/css';
+import { focusRing } from '../../styles/focusRing.js';
 import { vars } from '../../styles/vars.css.js';
 
 const popIn = keyframes({
@@ -46,7 +47,7 @@ export const checkboxRoot = style({
     },
     '&:focus-visible': {
       outline: 'none',
-      boxShadow: `0 0 0 3px ${vars.color.accent.ring}`,
+      boxShadow: focusRing,
     },
     '&:active:not([data-disabled="true"])': {
       transform: 'scale(0.94)',

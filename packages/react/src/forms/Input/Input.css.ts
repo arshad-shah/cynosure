@@ -1,4 +1,5 @@
 import { globalStyle, style, styleVariants } from '@vanilla-extract/css';
+import { focusRing } from '../../styles/focusRing.js';
 import { vars } from '../../styles/vars.css.js';
 import { fieldWellBase } from '../shared/control.css.js';
 
@@ -82,7 +83,7 @@ export const actionWell = style([
       },
       '&:focus-within': {
         borderColor: vars.color.border.focus,
-        boxShadow: `0 0 0 2px ${vars.color.accent.ring}`,
+        boxShadow: focusRing,
       },
       [`${multiWellRoot}[data-variant="filled"] &`]: {
         background: vars.color.background.muted,
@@ -124,7 +125,7 @@ export const fieldWell = style([
       '&:focus-within': {
         background: vars.color.background.surface,
         borderColor: vars.color.border.focus,
-        boxShadow: `0 0 0 2px ${vars.color.accent.ring}`,
+        boxShadow: focusRing,
       },
       [`${multiWellRoot}[data-variant="filled"] &`]: {
         background: vars.color.background.muted,

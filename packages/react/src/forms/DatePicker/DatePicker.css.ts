@@ -1,4 +1,5 @@
 import { style } from '@vanilla-extract/css';
+import { focusRing } from '../../styles/focusRing.js';
 import { vars } from '../../styles/vars.css.js';
 import { fieldWellBase } from '../shared/control.css.js';
 
@@ -80,7 +81,7 @@ export const segsWell = style([
       '&:focus-within': {
         background: vars.color.background.surface,
         borderColor: vars.color.border.focus,
-        boxShadow: `0 0 0 2px ${vars.color.accent.ring}`,
+        boxShadow: focusRing,
       },
       [`${pickerRoot}[data-invalid="true"] &:focus-within`]: {
         borderColor: vars.color.feedback.danger.border,
@@ -90,7 +91,7 @@ export const segsWell = style([
       [`${pickerRoot}[data-variant="ghost"] &:focus-within`]: {
         background: vars.color.background.surface,
         borderColor: vars.color.border.focus,
-        boxShadow: `0 0 0 2px ${vars.color.accent.ring}`,
+        boxShadow: focusRing,
       },
     },
   },
@@ -121,7 +122,7 @@ export const triggerWell = style([
       },
       '&:focus-visible': {
         borderColor: vars.color.border.focus,
-        boxShadow: `0 0 0 2px ${vars.color.accent.ring}`,
+        boxShadow: focusRing,
       },
       '&:disabled, &[data-disabled]': {
         cursor: 'not-allowed',
@@ -228,7 +229,7 @@ export const goToTodayLink = style({
     },
     '&:focus-visible': {
       outline: 'none',
-      boxShadow: `0 0 0 2px ${vars.color.accent.ring}`,
+      boxShadow: focusRing,
     },
   },
 });
