@@ -274,30 +274,41 @@ function chain<E>(...fns: Array<((event: E) => unknown) | undefined>): (event: E
   };
 }
 
-// 10×5 caret matching the original Radix arrow geometry, positioned along
-// the active side via the parent's data-side attribute.
+// Per-side caret with explicit geometry (no rotation hacks, which mis-sized
+// the left/right beak). The triangle points outward toward the trigger and
+// overlaps the tooltip edge by its full depth so it reads as attached.
 function TooltipArrowSvg({ side }: { side: 'top' | 'right' | 'bottom' | 'left' }) {
-  const flip = side === 'top' ? 1 : -1;
-  // For left/right placement, the caret rotates 90 degrees.
-  const sideline =
+  const horizontal = side === 'left' || side === 'right';
+  const long = 12; // base length along the tooltip edge
+  const depth = 6; // how far the beak pokes toward the trigger
+  const w = horizontal ? depth : long;
+  const h = horizontal ? long : depth;
+  const path =
     side === 'top'
-      ? { bottom: -5, left: '50%', transform: 'translateX(-50%)' }
+      ? `M0 0 L${long / 2} ${depth} L${long} 0 Z` // points down
       : side === 'bottom'
-        ? { top: -5, left: '50%', transform: 'translateX(-50%) scaleY(-1)' }
+        ? `M0 ${depth} L${long / 2} 0 L${long} ${depth} Z` // points up
         : side === 'left'
-          ? { right: -5, top: '50%', transform: 'translateY(-50%) rotate(-90deg)' }
-          : { left: -5, top: '50%', transform: 'translateY(-50%) rotate(90deg)' };
-  void flip;
+          ? `M0 0 L${depth} ${long / 2} L0 ${long} Z` // points right
+          : `M${depth} 0 L0 ${long / 2} L${depth} ${long} Z`; // (right) points left
+  const place: React.CSSProperties =
+    side === 'top'
+      ? { bottom: -depth, left: '50%', transform: 'translateX(-50%)' }
+      : side === 'bottom'
+        ? { top: -depth, left: '50%', transform: 'translateX(-50%)' }
+        : side === 'left'
+          ? { right: -depth, top: '50%', transform: 'translateY(-50%)' }
+          : { left: -depth, top: '50%', transform: 'translateY(-50%)' };
   return (
     <svg
       aria-hidden="true"
-      width={10}
-      height={5}
-      viewBox="0 0 10 5"
+      width={w}
+      height={h}
+      viewBox={`0 0 ${w} ${h}`}
       className={tooltipArrow}
-      style={{ position: 'absolute', ...sideline }}
+      style={{ position: 'absolute', ...place }}
     >
-      <path d="M0 0 L5 5 L10 0 Z" />
+      <path d={path} />
     </svg>
   );
 }
