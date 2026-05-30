@@ -223,7 +223,7 @@ export default createConfig({
   ],
   loader: { '.css': 'copy' },
   async onSuccess() {
-    const { readdir, readFile, writeFile, stat } = await import('node:fs/promises');
+    const { readdir, readFile, writeFile, stat, rm } = await import('node:fs/promises');
     const { join, relative, dirname } = await import('node:path');
     const { createRequire } = await import('node:module');
     const dist = join(process.cwd(), 'dist');
@@ -441,6 +441,22 @@ export default createConfig({
     for (const file of jsFiles) {
       if (!file.endsWith('.js')) continue;
       if (file.startsWith('chunk-')) continue;
+      // Skip the root barrel (`index.js`). Its CSS pair is `index.css`,
+      // which — alongside `core.css` — is the *entire* component stylesheet
+      // (`core.css` + `index.css` ≈ `styles.css`). The barrel is the
+      // monolithic-path entry: consumers import it for components and bring
+      // the stylesheet themselves via `@arshad-shah/cynosure-react/all.css`
+      // or `/styles.css` (required regardless, since design tokens live in a
+      // separate package the barrel can't inject). Auto-injecting here would
+      // load every rule twice for that documented setup — and the second,
+      // re-injected `core.css` lands *after* the component-specific rules
+      // from the manual stylesheet, so equal-specificity shared rules
+      // (layoutPropsStyle, typography base, focus ring…) clobber the
+      // component overrides that should win → silent visual regressions.
+      // Per-component leaves and category barrels still auto-inject below;
+      // the tree-shaking guide only promises CSS-rides-along for *those*
+      // subpath entries, not the barrel.
+      if (file === 'index.js') continue;
       const base = file.replace(/\.js$/, '');
       const cssPath = join(dist, `${base}.css`);
       let hasCss = false;
@@ -458,8 +474,13 @@ export default createConfig({
       await writeFile(jsPath, prefix + body);
     }
     // Same treatment for category barrels (forms/index.js, overlay/index.js, …).
+    // The root barrel (`index.css` → `index.js`) is deliberately excluded —
+    // see the `file === 'index.js'` skip above. It's the monolithic-path
+    // entry, so it must not auto-inject `core.css` + `index.css` (the whole
+    // stylesheet) on top of the consumer's manual `styles.css`/`all.css`.
     for (const barrel of barrels) {
       const rel = relative(dist, barrel);
+      if (rel === 'index.css') continue;
       const jsRel = rel.replace(/\.css$/, '.js');
       const jsPath = join(dist, jsRel);
       try {
@@ -475,6 +496,15 @@ export default createConfig({
         /* no JS pair for this CSS barrel — skip */
       }
     }
+
+    // Drop the now-orphaned root barrel stylesheet. `index.css` only ever
+    // existed as `index.js`'s auto-import target; with the barrel no longer
+    // injecting it (it's the monolithic path — consumers bring `styles.css`/
+    // `all.css`), the file is dead. It isn't in the `exports` map, so leaving
+    // it published would only risk a deep import (`…/dist/index.css`) that
+    // re-creates the full-stylesheet duplication this change removes. Nothing
+    // below reads it — `styles.css` is built from `coreCss` + slimmed leaves.
+    await rm(join(dist, 'index.css'), { force: true });
 
     // Build `styles.css` (monolithic single-import path): core (already
     // contains @property + baseReset + every shared block) + every
