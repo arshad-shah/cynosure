@@ -42,6 +42,7 @@ import {
   orDivider,
   removeButton,
   row,
+  rowActions,
   thumbnail,
   thumbnailDoc,
   thumbnailIcon,
@@ -596,7 +597,7 @@ export function FileUploadList({ className, renderItem, onPreview }: FileUploadL
                 </Text>
               </Inline>
             </Stack>
-            <Inline gap="1" align="center" wrap={false}>
+            <Inline gap="1" align="center" wrap={false} className={rowActions}>
               {onPreview ? (
                 <IconButton
                   size="xs"

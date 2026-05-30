@@ -86,8 +86,8 @@ describe('PinInput', () => {
   it('masks display when mask is true', () => {
     render(<PinInput length={3} aria-label="OTP" mask defaultValue="12" />);
     const cells = getCells();
-    expect(at(cells, 0).value).toBe('•');
-    expect(at(cells, 1).value).toBe('•');
+    expect(at(cells, 0).value).toBe('●');
+    expect(at(cells, 1).value).toBe('●');
   });
 
   it('emits a hidden input when name is provided', () => {

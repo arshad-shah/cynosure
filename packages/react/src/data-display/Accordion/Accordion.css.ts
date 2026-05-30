@@ -89,7 +89,7 @@ export const accordionChevron = style({
   },
 });
 
-globalStyle(`${accordionTrigger}[data-state="open"] [data-slot="chevron"]`, {
+globalStyle(`${accordionTrigger}[data-state="open"] ${accordionChevron}`, {
   transform: 'rotate(180deg)',
 });
 

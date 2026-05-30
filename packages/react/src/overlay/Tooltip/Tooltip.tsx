@@ -240,11 +240,14 @@ export function Tooltip({
             data-align={positioning.align}
             data-cynosure-overlay=""
             className={cn(tooltipContent, className)}
+            // Position via top/left rather than `transform` — the entrance
+            // keyframe animates `transform: scale()`, which would otherwise
+            // override a translate-based offset and snap the tooltip from the
+            // top-left origin to its anchor once the animation ends.
             style={{
               position: 'fixed',
-              top: 0,
-              left: 0,
-              transform: `translate3d(${positioning.x}px, ${positioning.y}px, 0)`,
+              top: positioning.y,
+              left: positioning.x,
               visibility: positioning.ready ? 'visible' : 'hidden',
               pointerEvents: 'none',
             }}
