@@ -14,7 +14,7 @@ const meta: Meta<typeof Divider> = {
     orientation: { control: 'select', options: ['horizontal', 'vertical'] },
     variant: { control: 'select', options: ['solid', 'dashed', 'dotted'] },
     thickness: { control: 'select', options: ['1', '2'] },
-    tone: { control: 'select', options: ['subtle', 'default'] },
+    tone: { control: 'select', options: ['subtle', 'default', 'strong'] },
     labelAlign: { control: 'select', options: ['start', 'center', 'end'] },
     soft: { control: 'boolean' },
     decorative: { control: 'boolean' },
@@ -40,7 +40,7 @@ export const Playground: Story = {
     orientation: 'horizontal',
     variant: 'solid',
     thickness: '1',
-    tone: 'subtle',
+    tone: 'default',
     soft: false,
     labelAlign: 'center',
     decorative: true,
@@ -87,11 +87,14 @@ export const Variants: Story = {
 export const ToneAndSoft: Story = {
   render: () => (
     <Stack gap="5" width="420px">
-      <Row label='tone="subtle" (default)'>
+      <Row label='tone="subtle"'>
+        <Divider tone="subtle" />
+      </Row>
+      <Row label='tone="default" (default)'>
         <Divider />
       </Row>
-      <Row label='tone="default"'>
-        <Divider tone="default" />
+      <Row label='tone="strong"'>
+        <Divider tone="strong" />
       </Row>
       <Row label="soft edges">
         <Divider soft />
