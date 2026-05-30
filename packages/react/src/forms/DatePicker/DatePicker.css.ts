@@ -184,10 +184,13 @@ export const calendarPopover = style({
   border: `1px solid ${vars.color.border.default}`,
   borderRadius: vars.radius.lg,
   boxShadow: vars.shadow.xl,
-  overflow: 'hidden',
+  // Scroll the calendar rather than overflowing a short viewport, and never
+  // exceed the screen width on a narrow phone.
+  overflow: 'auto',
   padding: 0,
   minWidth: 'unset',
-  maxHeight: 'unset',
+  maxWidth: 'calc(100vw - 1rem)',
+  maxHeight: 'calc(100dvh - 1rem)',
   width: '18rem',
 });
 

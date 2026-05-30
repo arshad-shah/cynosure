@@ -15,7 +15,10 @@ const menuOut = keyframes({
 /** Shared content shell — DropdownMenu, ContextMenu, MenuBar, sub-menus. */
 export const menuContent = style({
   minWidth: '12rem',
-  maxHeight: 'min(60vh, 20rem)',
+  // Cap to the viewport on small screens so wide items never overflow the
+  // edge; scroll instead. `dvh` tracks the mobile visual viewport.
+  maxWidth: 'calc(100vw - 1rem)',
+  maxHeight: 'min(60dvh, 20rem)',
   background: vars.color.background.surface,
   color: vars.color.foreground.default,
   border: `1px solid ${vars.color.border.default}`,

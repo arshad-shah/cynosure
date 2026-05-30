@@ -125,12 +125,14 @@ export const drawerSizeHorizontal = styleVariants({
   full: { width: '100vw' },
 });
 
+// `dvh` (dynamic viewport height) so top/bottom drawers respect the mobile
+// browser's collapsing chrome and never run off-screen.
 export const drawerSizeVertical = styleVariants({
-  sm: { height: '18vh', maxHeight: '100vh' },
-  md: { height: '32vh', maxHeight: '100vh' },
-  lg: { height: '48vh', maxHeight: '100vh' },
-  xl: { height: '72vh', maxHeight: '100vh' },
-  full: { height: '100vh' },
+  sm: { height: '18dvh', maxHeight: '100dvh' },
+  md: { height: '32dvh', maxHeight: '100dvh' },
+  lg: { height: '48dvh', maxHeight: '100dvh' },
+  xl: { height: '72dvh', maxHeight: '100dvh' },
+  full: { height: '100dvh' },
 });
 
 export const drawerHeader = style({

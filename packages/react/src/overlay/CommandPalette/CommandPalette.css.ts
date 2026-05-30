@@ -23,7 +23,7 @@ export const paletteContent = style({
   transform: 'translate(-50%, -50%)',
   width: 'calc(100vw - 2rem)',
   maxWidth: '40rem',
-  maxHeight: 'min(70vh, 32rem)',
+  maxHeight: 'min(70dvh, 32rem)',
   background: vars.color.background.raised,
   color: vars.color.foreground.default,
   border: `1px solid ${vars.color.border.default}`,

@@ -18,7 +18,7 @@ export const tooltipContent = style({
   borderRadius: vars.radius.sm,
   fontSize: 'var(--cynosure-font-body-sm-size)',
   lineHeight: 'var(--cynosure-font-body-sm-line-height)',
-  maxWidth: '20rem',
+  maxWidth: 'min(20rem, calc(100vw - 1rem))',
   boxShadow: vars.shadow.md,
   zIndex: Number(vars.z.tooltip),
   userSelect: 'none',

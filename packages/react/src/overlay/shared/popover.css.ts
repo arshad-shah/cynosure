@@ -18,7 +18,14 @@ const popoverOut = keyframes({
  */
 export const popoverContent = style({
   minWidth: '12rem',
-  maxWidth: '28rem',
+  // Never exceed the viewport on small screens. Collision-shifting can keep an
+  // element on-screen but can't rescue one that's wider/taller than the
+  // viewport, so cap both axes to the available space (minus an 8px gutter on
+  // each side) and let the body scroll. `dvh` tracks the mobile visual
+  // viewport so browser chrome never clips the panel.
+  maxWidth: 'min(28rem, calc(100vw - 1rem))',
+  maxHeight: 'calc(100dvh - 1rem)',
+  overflow: 'auto',
   background: vars.color.background.surface,
   color: vars.color.foreground.default,
   border: `1px solid ${vars.color.border.default}`,

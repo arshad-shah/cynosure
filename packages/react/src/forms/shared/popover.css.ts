@@ -15,7 +15,10 @@ const popoverOut = keyframes({
 /** Shared popover shell for Select / Combobox / MultiSelect / DatePicker. */
 export const popover = style({
   minWidth: 'var(--trigger-width)',
-  maxHeight: 'min(60vh, 20rem)',
+  // Stay within the viewport on small screens (gutter on each side); scroll
+  // the listbox rather than overflowing. `dvh` accounts for mobile chrome.
+  maxWidth: 'calc(100vw - 1rem)',
+  maxHeight: 'min(60dvh, 20rem)',
   background: vars.color.background.raised,
   color: vars.color.foreground.default,
   border: `1px solid ${vars.color.border.strong}`,
