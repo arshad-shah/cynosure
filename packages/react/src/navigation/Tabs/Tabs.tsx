@@ -162,11 +162,14 @@ export const Tabs = forwardRef<HTMLDivElement, TabsProps>(function Tabs(
       .map(({ node }) => node);
     if (enabled.length === 0) return;
     const idx = enabled.indexOf(from);
-    let next = idx;
-    if (target === 'first') next = 0;
-    else if (target === 'last') next = enabled.length - 1;
-    else if (target === 'next') next = (idx + 1) % enabled.length;
-    else next = (idx - 1 + enabled.length) % enabled.length;
+    const next =
+      target === 'first'
+        ? 0
+        : target === 'last'
+          ? enabled.length - 1
+          : target === 'next'
+            ? (idx + 1) % enabled.length
+            : (idx - 1 + enabled.length) % enabled.length;
     enabled[next]?.focus();
   }, []);
 

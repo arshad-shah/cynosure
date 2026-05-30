@@ -109,17 +109,23 @@ export const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(function R
       const enabled = itemsRef.current.filter(({ node }) => !node.disabled).map((entry) => entry);
       if (enabled.length === 0) return;
       const idx = enabled.findIndex(({ node }) => node === from);
-      let next = idx;
-      if (target === 'first') next = 0;
-      else if (target === 'last') next = enabled.length - 1;
-      else if (target === 'next') next = (idx + 1) % enabled.length;
-      else next = (idx - 1 + enabled.length) % enabled.length;
-      if (isRtl && orientation === 'horizontal' && (target === 'next' || target === 'prev')) {
-        next =
-          target === 'next'
+      const base =
+        target === 'first'
+          ? 0
+          : target === 'last'
+            ? enabled.length - 1
+            : target === 'next'
+              ? (idx + 1) % enabled.length
+              : (idx - 1 + enabled.length) % enabled.length;
+      // RTL horizontal swap flips next/prev semantics so visual "right"
+      // still tracks reading order; Home/End and the vertical axis are
+      // direction-agnostic.
+      const next =
+        isRtl && orientation === 'horizontal' && (target === 'next' || target === 'prev')
+          ? target === 'next'
             ? (idx - 1 + enabled.length) % enabled.length
-            : (idx + 1) % enabled.length;
-      }
+            : (idx + 1) % enabled.length
+          : base;
       const targetEntry = enabled[next];
       if (!targetEntry) return;
       targetEntry.node.focus();
