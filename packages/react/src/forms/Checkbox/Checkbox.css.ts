@@ -73,7 +73,7 @@ export const checkboxIndicator = style({
   justifyContent: 'center',
   color: 'currentColor',
   lineHeight: 0,
-  animation: `${popIn} ${vars.duration.fast} cubic-bezier(0.2, 0.9, 0.3, 1.4)`,
+  animation: `${popIn} ${vars.duration.fast} ${vars.easing.spring}`,
 });
 
 /** Colour override per scheme — only solid/checked state needs re-colouring. */

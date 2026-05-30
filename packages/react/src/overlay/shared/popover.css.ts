@@ -29,10 +29,10 @@ export const popoverContent = style({
   zIndex: Number(vars.z.popover),
   selectors: {
     '&[data-state="open"]': {
-      animation: `${popoverIn} ${vars.duration.fast} ease-out`,
+      animation: `${popoverIn} ${vars.duration.fast} ${vars.easing.easeOut}`,
     },
     '&[data-state="closed"]': {
-      animation: `${popoverOut} ${vars.duration.fast} ease-in`,
+      animation: `${popoverOut} ${vars.duration.fast} ${vars.easing.easeIn}`,
     },
   },
 });

@@ -37,7 +37,7 @@ export const skeletonAnimationPulse = style({
   animationName: pulse,
   animationDuration: '1.6s',
   animationIterationCount: 'infinite',
-  animationTimingFunction: 'ease-in-out',
+  animationTimingFunction: vars.easing.easeInOut,
   '@media': {
     '(prefers-reduced-motion: reduce)': {
       animation: 'none',
@@ -51,7 +51,7 @@ export const skeletonAnimationWave = style({
   animationName: wave,
   animationDuration: '1.6s',
   animationIterationCount: 'infinite',
-  animationTimingFunction: 'linear',
+  animationTimingFunction: vars.easing.linear,
   '@media': {
     '(prefers-reduced-motion: reduce)': {
       animation: 'none',

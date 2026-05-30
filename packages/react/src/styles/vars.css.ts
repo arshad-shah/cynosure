@@ -115,6 +115,14 @@ export const vars = createGlobalThemeContract(
       slow: '',
       slower: '',
     },
+    easing: {
+      linear: '',
+      easeIn: '',
+      easeOut: '',
+      easeInOut: '',
+      spring: '',
+      bounce: '',
+    },
     z: {
       hide: '',
       base: '',

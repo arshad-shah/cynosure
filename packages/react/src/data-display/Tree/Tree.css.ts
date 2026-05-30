@@ -60,7 +60,7 @@ export const treeChevron = style({
   width: '1rem',
   height: '1rem',
   color: vars.color.foreground.muted,
-  transition: `transform ${vars.duration.fast} ease`,
+  transition: `transform ${vars.duration.fast} ${vars.easing.easeInOut}`,
   selectors: {
     '[data-expanded="true"] > [data-slot="row"] > &': {
       transform: 'rotate(90deg)',

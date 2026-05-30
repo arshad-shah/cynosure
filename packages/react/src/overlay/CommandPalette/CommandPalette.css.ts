@@ -36,10 +36,10 @@ export const paletteContent = style({
   zIndex: Number(vars.z.modal),
   selectors: {
     '&[data-state="open"]': {
-      animation: `${paletteIn} ${vars.duration.fast} ease-out`,
+      animation: `${paletteIn} ${vars.duration.fast} ${vars.easing.easeOut}`,
     },
     '&[data-state="closed"]': {
-      animation: `${paletteOut} ${vars.duration.fast} ease-in`,
+      animation: `${paletteOut} ${vars.duration.fast} ${vars.easing.easeIn}`,
     },
   },
   '@media': {

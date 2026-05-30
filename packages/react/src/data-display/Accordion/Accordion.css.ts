@@ -62,7 +62,7 @@ export const accordionTrigger = style({
   color: vars.color.foreground.default,
   cursor: 'pointer',
   textAlign: 'start',
-  transition: `background ${vars.duration.fast} ease`,
+  transition: `background ${vars.duration.fast} ${vars.easing.easeInOut}`,
   selectors: {
     '&:hover': { background: vars.color.background.subtle },
     '&:focus-visible': {
@@ -80,7 +80,7 @@ export const accordionTrigger = style({
 
 export const accordionChevron = style({
   display: 'inline-flex',
-  transition: `transform ${vars.duration.fast} ease`,
+  transition: `transform ${vars.duration.fast} ${vars.easing.easeInOut}`,
   '@media': {
     '(prefers-reduced-motion: reduce)': {
       transition: 'none',
@@ -98,10 +98,10 @@ export const accordionContent = style({
   color: vars.color.foreground.default,
   selectors: {
     '&[data-state="open"]': {
-      animation: `${slideDown} ${vars.duration.normal} ease`,
+      animation: `${slideDown} ${vars.duration.normal} ${vars.easing.easeInOut}`,
     },
     '&[data-state="closed"]': {
-      animation: `${slideUp} ${vars.duration.normal} ease`,
+      animation: `${slideUp} ${vars.duration.normal} ${vars.easing.easeInOut}`,
     },
   },
   '@media': {

@@ -19,7 +19,7 @@ export const resizablePanel = style({
 export const resizableHandle = style({
   position: 'relative',
   background: vars.color.border.subtle,
-  transition: `background ${vars.duration.fast} ease`,
+  transition: `background ${vars.duration.fast} ${vars.easing.easeInOut}`,
   flex: '0 0 auto',
   selectors: {
     '&:hover, &[data-resize-handle-active]': {

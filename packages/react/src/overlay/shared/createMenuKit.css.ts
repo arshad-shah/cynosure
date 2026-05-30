@@ -82,7 +82,7 @@ export const menuFormIndicatorGroup = style({
 export const triggerChevron = style({
   display: 'inline-flex',
   alignItems: 'center',
-  transition: 'transform 160ms cubic-bezier(0.2, 0, 0, 1)',
+  transition: `transform ${vars.duration.normal} ${vars.easing.easeOut}`,
   selectors: {
     '[data-state="open"] &': {
       transform: 'rotate(180deg)',

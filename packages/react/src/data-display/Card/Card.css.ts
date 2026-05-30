@@ -52,18 +52,22 @@ export const cardPaddingSize = styleVariants({
 
 export const cardInteractive = style({
   cursor: 'pointer',
-  transition: `box-shadow ${vars.duration.fast} ease, transform ${vars.duration.fast} ease, border-color ${vars.duration.fast} ease, background ${vars.duration.fast} ease`,
+  transitionProperty: 'box-shadow, transform, border-color, background',
+  transitionDuration: vars.duration.normal,
+  transitionTimingFunction: vars.easing.easeOut,
   selectors: {
     '&:hover': {
       boxShadow: vars.shadow.lg,
       borderColor: vars.color.border.strong,
+      transform: 'translateY(-2px)',
     },
     '&:focus-visible': {
       outline: 'none',
       boxShadow: `0 0 0 3px ${vars.color.accent.ring}`,
     },
     '&:active': {
-      transform: 'translateY(1px)',
+      transform: 'translateY(0) scale(0.99)',
+      transitionDuration: vars.duration.fast,
     },
   },
   '@media': {

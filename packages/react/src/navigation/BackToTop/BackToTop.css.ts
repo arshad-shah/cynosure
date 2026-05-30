@@ -17,7 +17,7 @@ export const backToTopButton = style({
   cursor: 'pointer',
   transitionProperty: 'opacity, transform',
   transitionDuration: vars.duration.fast,
-  transitionTimingFunction: 'ease-out',
+  transitionTimingFunction: vars.easing.easeOut,
   zIndex: Number(vars.z.sticky),
   opacity: 1,
   transform: 'translateY(0)',

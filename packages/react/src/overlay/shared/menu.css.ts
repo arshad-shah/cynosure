@@ -30,10 +30,10 @@ export const menuContent = style({
     '&[data-side="left"]': { transformOrigin: 'center right' },
     '&[data-side="right"]': { transformOrigin: 'center left' },
     '&[data-state="open"]': {
-      animation: `${menuIn} ${vars.duration.fast} ease-out`,
+      animation: `${menuIn} ${vars.duration.normal} ${vars.easing.spring}`,
     },
     '&[data-state="closed"]': {
-      animation: `${menuOut} ${vars.duration.fast} ease-in`,
+      animation: `${menuOut} ${vars.duration.fast} ${vars.easing.easeIn}`,
     },
   },
   '@media': {
@@ -58,7 +58,7 @@ export const menuItem = style({
   outline: 'none',
   fontSize: 'var(--cynosure-font-body-md-size)',
   lineHeight: 'var(--cynosure-font-body-md-line-height)',
-  transition: 'background-color 120ms ease, color 120ms ease',
+  transition: `background-color ${vars.duration.fast} ${vars.easing.easeInOut}, color ${vars.duration.fast} ${vars.easing.easeInOut}`,
   selectors: {
     '&[data-highlighted]': {
       background: vars.color.accent.soft,

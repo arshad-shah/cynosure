@@ -270,7 +270,7 @@ export const cellRoot = style({
   borderRadius: vars.radius.sm,
   background: vars.color.background.surface,
   overflow: 'hidden',
-  transition: 'border-color 120ms, box-shadow 120ms',
+  transition: `border-color ${vars.duration.fast}, box-shadow ${vars.duration.fast}`,
   selectors: {
     '&[data-hover="true"]': { borderColor: vars.color.border.strong },
     '&:focus-within': {

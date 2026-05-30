@@ -39,7 +39,7 @@ export const circularProgressSvgIndeterminate = style({
   animationName: indeterminateRotate,
   animationDuration: '1.2s',
   animationIterationCount: 'infinite',
-  animationTimingFunction: 'linear',
+  animationTimingFunction: vars.easing.linear,
   transformOrigin: 'center',
   '@media': {
     '(prefers-reduced-motion: reduce)': { animation: 'none' },
@@ -62,7 +62,7 @@ export const circularProgressIndicator = style({
   stroke: solidVar,
   strokeLinecap: 'round',
   filter: `drop-shadow(0 0 2px color-mix(in oklab, ${solidVar} 35%, transparent))`,
-  transition: `stroke-dashoffset ${vars.duration.slow} cubic-bezier(0.2, 0.8, 0.2, 1), stroke ${vars.duration.normal} ease`,
+  transition: `stroke-dashoffset ${vars.duration.slow} ${vars.easing.easeOut}, stroke ${vars.duration.normal} ${vars.easing.easeInOut}`,
   '@media': {
     '(prefers-reduced-motion: reduce)': { transition: 'none' },
   },

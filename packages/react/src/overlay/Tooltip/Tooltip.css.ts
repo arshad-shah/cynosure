@@ -24,10 +24,10 @@ export const tooltipContent = style({
   userSelect: 'none',
   selectors: {
     '&[data-state="delayed-open"], &[data-state="instant-open"]': {
-      animation: `${tooltipIn} ${vars.duration.fast} ease-out`,
+      animation: `${tooltipIn} ${vars.duration.fast} ${vars.easing.easeOut}`,
     },
     '&[data-state="closed"]': {
-      animation: `${tooltipOut} ${vars.duration.fast} ease-in`,
+      animation: `${tooltipOut} ${vars.duration.fast} ${vars.easing.easeIn}`,
     },
   },
 });

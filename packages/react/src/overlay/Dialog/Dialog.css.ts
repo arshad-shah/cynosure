@@ -27,10 +27,10 @@ export const dialogContent = style({
   zIndex: Number(vars.z.modal),
   selectors: {
     '&[data-state="open"]': {
-      animation: `${overlayZoomIn} ${vars.duration.fast} ease-out`,
+      animation: `${overlayZoomIn} ${vars.duration.fast} ${vars.easing.easeOut}`,
     },
     '&[data-state="closed"]': {
-      animation: `${overlayZoomOut} ${vars.duration.fast} ease-in`,
+      animation: `${overlayZoomOut} ${vars.duration.fast} ${vars.easing.easeIn}`,
     },
   },
 });

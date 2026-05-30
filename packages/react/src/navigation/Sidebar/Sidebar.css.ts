@@ -14,7 +14,7 @@ export const sidebarRoot = style({
   borderInlineEnd: `1px solid ${vars.color.border.subtle}`,
   transitionProperty: 'width, min-width',
   transitionDuration: vars.duration.normal,
-  transitionTimingFunction: 'cubic-bezier(0.22, 1, 0.36, 1)',
+  transitionTimingFunction: vars.easing.easeOut,
   selectors: {
     '&[data-side="right"]': {
       borderInlineEnd: 'none',
@@ -134,7 +134,7 @@ export const sidebarTriggerLabel = style({
   opacity: 1,
   transitionProperty: 'opacity',
   transitionDuration: vars.duration.fast,
-  transitionTimingFunction: 'ease-out',
+  transitionTimingFunction: vars.easing.easeOut,
   selectors: {
     [`${sidebarRoot}[data-collapsed="true"][data-collapsible="icon"] &`]: {
       display: 'none',

@@ -25,10 +25,10 @@ export const popover = style({
   zIndex: Number(vars.z.popover),
   selectors: {
     '&[data-entering]': {
-      animation: `${popoverIn} ${vars.duration.fast} ease-out`,
+      animation: `${popoverIn} ${vars.duration.fast} ${vars.easing.easeOut}`,
     },
     '&[data-exiting]': {
-      animation: `${popoverOut} ${vars.duration.fast} ease-in`,
+      animation: `${popoverOut} ${vars.duration.fast} ${vars.easing.easeIn}`,
     },
   },
 });

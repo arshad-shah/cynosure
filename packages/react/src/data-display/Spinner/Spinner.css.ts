@@ -35,7 +35,7 @@ export const spinnerLucide = style({
   height: '100%',
   animationName: spin,
   animationIterationCount: 'infinite',
-  animationTimingFunction: 'linear',
+  animationTimingFunction: vars.easing.linear,
   transformOrigin: 'center',
   '@media': {
     '(prefers-reduced-motion: reduce)': {
@@ -61,7 +61,7 @@ export const spinnerDot = style({
   background: 'currentColor',
   animationName: dotPulse,
   animationIterationCount: 'infinite',
-  animationTimingFunction: 'ease-in-out',
+  animationTimingFunction: vars.easing.easeInOut,
   '@media': {
     '(prefers-reduced-motion: reduce)': {
       animation: 'none',

@@ -1,8 +1,6 @@
 import { keyframes, style, styleVariants } from '@vanilla-extract/css';
 import { vars } from '../../styles/vars.css.js';
 
-const SLIDE_EASE = 'cubic-bezier(0.2, 0.8, 0.2, 1)';
-
 const spin = keyframes({
   '0%': { transform: 'rotate(0deg)' },
   '100%': { transform: 'rotate(360deg)' },
@@ -35,7 +33,7 @@ export const switchRoot = style({
   cursor: 'pointer',
   transitionProperty: 'background-color, border-color, box-shadow, transform',
   transitionDuration: vars.duration.fast,
-  transitionTimingFunction: SLIDE_EASE,
+  transitionTimingFunction: vars.easing.easeOut,
   selectors: {
     '&::before': {
       content: '""',
@@ -121,8 +119,8 @@ export const switchThumb = style({
   borderRadius: vars.radius.full,
   boxShadow: vars.shadow.sm,
   transitionProperty: 'transform',
-  transitionDuration: vars.duration.fast,
-  transitionTimingFunction: SLIDE_EASE,
+  transitionDuration: vars.duration.normal,
+  transitionTimingFunction: vars.easing.spring,
   transform: 'translateX(0)',
   willChange: 'transform',
   selectors: {
