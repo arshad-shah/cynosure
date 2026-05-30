@@ -78,7 +78,7 @@ Use `CommandGroup heading="…"` to label sections and `shortcut="⌘K"` on item
 
 ## Accessibility
 
-- The dialog-hosted `CommandMenu` renders a screen-reader-only title via Radix Dialog for an accessible name.
+- The dialog-hosted `CommandMenu` renders a screen-reader-only `DialogTitle` for an accessible name.
 - ArrowUp / ArrowDown move focus through visible items; `Home` / `End` jump to the first / last.
 - `Enter` activates the focused item via its `onSelect` handler; `Esc` closes the dialog and returns focus to the trigger.
 - `CommandInput` is the only focusable text input — typing filters items by label and `keywords`.

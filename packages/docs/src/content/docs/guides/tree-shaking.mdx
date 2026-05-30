@@ -77,7 +77,9 @@ grew and by how much.
 
 ## Dedup
 
-Cynosure's peers (`react`, `react-dom`, `react-aria-components`, the
-remaining `@radix-ui/react-*` overlay packages) must exist once in your
-graph. If you see duplicated copies, run `pnpm why <pkg>` and align the
-version via your package manager's hoisting / catalog.
+Cynosure's peers (`react`, `react-dom`, `react-aria-components`, and
+the four remaining Radix menu packages —
+`@radix-ui/react-{dropdown-menu,context-menu,menubar,navigation-menu}`)
+must exist once in your graph. If you see duplicated copies, run
+`pnpm why <pkg>` and align the version via your package manager's
+hoisting / catalog.

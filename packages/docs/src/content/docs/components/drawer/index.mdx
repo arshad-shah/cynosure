@@ -45,7 +45,7 @@ Drive the open state externally to coordinate with route changes or async work.
 
 ## Accessibility
 
-- `DrawerContent` renders with `role="dialog"` and `aria-modal="true"` via Radix Dialog.
+- `DrawerContent` renders with `role="dialog"` and `aria-modal="true"`, sharing the same focus-trap + scroll-lock kit as `Dialog`.
 - Focus is trapped inside the drawer while open and returned to the trigger on close.
 - `Esc` closes by default (`closeOnEscape={true}`); suppress with `closeOnEscape={false}`.
 - Clicking the backdrop closes by default (`closeOnOverlayClick={true}`); suppress with `closeOnOverlayClick={false}`.

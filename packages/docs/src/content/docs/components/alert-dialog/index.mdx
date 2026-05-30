@@ -39,7 +39,7 @@ Pass `position="top"` to anchor the panel near the top of the viewport — usefu
 
 ## Accessibility
 
-- `AlertDialogContent` renders with `role="alertdialog"` and `aria-modal="true"` via Radix.
+- `AlertDialogContent` renders with `role="alertdialog"` and `aria-modal="true"`, sharing the same focus-trap + scroll-lock kit as `Dialog`.
 - Focus is trapped inside the dialog while open and returned to the trigger on close.
 - Backdrop clicks never dismiss; `Esc` is also suppressed — the user must hit `AlertDialogAction` or `AlertDialogCancel`.
 - `AlertDialogTitle` maps to `aria-labelledby`; `AlertDialogDescription` maps to `aria-describedby` — both are required for a complete accessible name.

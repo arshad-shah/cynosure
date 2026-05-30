@@ -218,12 +218,15 @@ export type { ButtonProps } from './Button';
 | `@arshad-shah/cynosure-tokens`, `@arshad-shah/cynosure-core`          | —     | `workspace:*`       | Internal deps; pnpm resolves from workspace.       |
 
 Direct deps we bring:
-- `@radix-ui/react-*` — only the overlay/portal/positioning primitives that
-  haven't migrated to the platform yet (Dialog, Drawer, AlertDialog,
-  Popover, HoverCard, ContextMenu, DropdownMenu, MenuBar, NavigationMenu,
-  Tooltip, ScrollArea). Toggles, switches, accordions, tabs, collapsibles,
-  checkboxes, radios, avatars, `Slot`, and the direction context are
-  first-party in `src/`.
+- `@radix-ui/react-*` — only the menu family
+  (`react-dropdown-menu`, `react-context-menu`, `react-menubar`,
+  `react-navigation-menu`). All other overlays — Dialog, Drawer,
+  AlertDialog, Popover, HoverCard, Tooltip, ScrollArea — plus toggles,
+  switches, accordions, tabs, collapsibles, checkboxes, radios, avatars,
+  `Slot`, and the direction context are first-party in `src/`, sharing
+  two in-tree kits: `overlay/shared/useFloatingPosition` for anchored
+  surfaces and `overlay/shared/useDialog` for modal focus-trap + scroll
+  lock.
 - `react-aria-components`, `@internationalized/date` — for advanced form controls only (Select, Combobox, DatePicker, Slider, ColorPicker).
 - `sonner` — toast.
 - `react-resizable-panels` — Resizable.
