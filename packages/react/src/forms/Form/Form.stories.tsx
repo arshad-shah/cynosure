@@ -15,7 +15,7 @@ import { FormLabel } from './FormLabel.js';
 import { FormMessage } from './FormMessage.js';
 
 const meta: Meta<typeof FormField> = {
-  title: 'Forms/Form composition',
+  title: 'Forms/Form',
   component: FormField,
   parameters: { layout: 'padded' },
 };

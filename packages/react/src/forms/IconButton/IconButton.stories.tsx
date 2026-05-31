@@ -4,7 +4,7 @@ import { Stack } from '../../primitives/layout/Stack/Stack.js';
 import { IconButton } from './IconButton.js';
 
 const meta: Meta<typeof IconButton> = {
-  title: 'Forms/IconButton',
+  title: 'Buttons/IconButton',
   component: IconButton,
   parameters: { layout: 'padded' },
   argTypes: {

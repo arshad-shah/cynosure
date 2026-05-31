@@ -8,7 +8,7 @@ import { Text } from '../../typography/Text/Text.js';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './Accordion.js';
 
 const meta: Meta<typeof Accordion> = {
-  title: 'Data Display/Accordion',
+  title: 'Data display/Accordion',
   component: Accordion,
   parameters: { layout: 'padded' },
   argTypes: {

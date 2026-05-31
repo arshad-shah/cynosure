@@ -7,7 +7,7 @@ import { Card, CardBody, CardFooter, CardHeader } from '../Card/Card.js';
 import { Skeleton } from './Skeleton.js';
 
 const meta: Meta<typeof Skeleton> = {
-  title: 'Data Display/Skeleton',
+  title: 'Data display/Skeleton',
   component: Skeleton,
   parameters: { layout: 'padded' },
   argTypes: {

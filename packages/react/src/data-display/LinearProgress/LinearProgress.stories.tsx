@@ -16,7 +16,7 @@ import { LinearProgressTrack } from './LinearProgressTrack.js';
 import { LinearProgressValue } from './LinearProgressValue.js';
 
 const meta: Meta<typeof LinearProgress> = {
-  title: 'Data Display/LinearProgress',
+  title: 'Data display/LinearProgress',
   component: LinearProgress,
   parameters: { layout: 'padded' },
   argTypes: {

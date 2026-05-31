@@ -15,7 +15,7 @@ import {
 } from './Table.js';
 
 const meta: Meta<typeof Table> = {
-  title: 'Data Display/Table',
+  title: 'Data display/Table',
   component: Table,
   parameters: { layout: 'padded' },
   argTypes: {

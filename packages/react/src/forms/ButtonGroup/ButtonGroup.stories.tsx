@@ -6,7 +6,7 @@ import { Button } from '../Button/Button.js';
 import { ButtonGroup } from './ButtonGroup.js';
 
 const meta: Meta<typeof ButtonGroup> = {
-  title: 'Forms/ButtonGroup',
+  title: 'Buttons/ButtonGroup',
   component: ButtonGroup,
   parameters: { layout: 'padded' },
 };

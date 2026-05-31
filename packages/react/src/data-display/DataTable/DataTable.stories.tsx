@@ -159,7 +159,7 @@ const USERS: User[] = [
 ];
 
 const meta: Meta<typeof DataTable> = {
-  title: 'Data Display/DataTable',
+  title: 'Data display/DataTable',
   component: DataTable,
   parameters: { layout: 'padded' },
 };

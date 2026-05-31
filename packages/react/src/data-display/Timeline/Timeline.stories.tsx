@@ -12,7 +12,7 @@ import {
 } from './Timeline.js';
 
 const meta: Meta<typeof Timeline> = {
-  title: 'Data Display/Timeline',
+  title: 'Data display/Timeline',
   component: Timeline,
   parameters: { layout: 'padded' },
   argTypes: {

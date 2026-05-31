@@ -4,7 +4,7 @@ import { Text } from '../../typography/Text/Text.js';
 import { CodeBlock } from './CodeBlock.js';
 
 const meta: Meta<typeof CodeBlock> = {
-  title: 'Data Display/CodeBlock',
+  title: 'Data display/CodeBlock',
   component: CodeBlock,
   parameters: { layout: 'padded' },
   argTypes: {

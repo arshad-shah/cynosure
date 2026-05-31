@@ -6,7 +6,7 @@ import { Text } from '../../typography/Text/Text.js';
 import { Toggle } from './Toggle.js';
 
 const meta: Meta<typeof Toggle> = {
-  title: 'Feedback/Toggle',
+  title: 'Buttons/Toggle',
   component: Toggle,
   parameters: { layout: 'padded' },
   argTypes: {

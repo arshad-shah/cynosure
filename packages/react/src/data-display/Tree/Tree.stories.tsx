@@ -7,7 +7,7 @@ import type { TreeNode } from './Tree.js';
 import { Tree, treeCollectIds } from './Tree.js';
 
 const meta: Meta<typeof Tree> = {
-  title: 'Data Display/Tree',
+  title: 'Data display/Tree',
   component: Tree,
   parameters: { layout: 'padded' },
 };

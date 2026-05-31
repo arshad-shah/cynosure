@@ -7,7 +7,7 @@ import { Skeleton } from '../Skeleton/Skeleton.js';
 import { Stat, StatArrow, StatHelp, StatLabel, StatValue } from './Stat.js';
 
 const meta: Meta<typeof Stat> = {
-  title: 'Data Display/Stat',
+  title: 'Data display/Stat',
   component: Stat,
   parameters: { layout: 'padded' },
 };

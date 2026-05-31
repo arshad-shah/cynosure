@@ -7,7 +7,7 @@ import { Text } from '../../typography/Text/Text.js';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './Collapsible.js';
 
 const meta: Meta<typeof Collapsible> = {
-  title: 'Data Display/Collapsible',
+  title: 'Data display/Collapsible',
   component: Collapsible,
   parameters: { layout: 'padded' },
 };

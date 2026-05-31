@@ -6,7 +6,7 @@ import { Text } from '../../typography/Text/Text.js';
 import { ScrollArea } from './ScrollArea.js';
 
 const meta: Meta<typeof ScrollArea> = {
-  title: 'Data Display/ScrollArea',
+  title: 'Data display/ScrollArea',
   component: ScrollArea,
   parameters: { layout: 'padded' },
   argTypes: {

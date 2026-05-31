@@ -6,7 +6,7 @@ import { Text } from '../../typography/Text/Text.js';
 import { Button } from './Button.js';
 
 const meta: Meta<typeof Button> = {
-  title: 'Forms/Button',
+  title: 'Buttons/Button',
   component: Button,
   parameters: { layout: 'padded' },
   argTypes: {

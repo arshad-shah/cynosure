@@ -9,7 +9,7 @@ import { Text } from '../../typography/Text/Text.js';
 import { Resizable, ResizableHandle, ResizablePanel } from './Resizable.js';
 
 const meta: Meta<typeof Resizable> = {
-  title: 'Data Display/Resizable',
+  title: 'Data display/Resizable',
   component: Resizable,
   parameters: { layout: 'padded' },
   argTypes: {
