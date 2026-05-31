@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import { expect, userEvent, within } from 'storybook/test';
 import { Inline } from '../../primitives/layout/Inline/Inline.js';
 import { Stack } from '../../primitives/layout/Stack/Stack.js';
 import { IconButton } from './IconButton.js';
@@ -132,12 +133,28 @@ export const States: Story = {
   ),
 };
 
-export const Toolbar: Story = {
-  render: () => (
-    <Inline gap="1" padding="2" background="bg.subtle" borderRadius="md">
-      <IconButton icon={<Pencil />} label="Edit" variant="ghost" />
-      <IconButton icon={<Search />} label="Search" variant="ghost" />
-      <IconButton icon={<Trash />} label="Delete" variant="ghost" colorScheme="danger" />
-    </Inline>
-  ),
+export const Interaction: Story = {
+  name: 'Interaction · exposes accessible name + fires handler',
+  render: () => {
+    let count = 0;
+    return (
+      <IconButton
+        icon={<Search />}
+        label="Search"
+        variant="ghost"
+        onClick={(e) => {
+          count += 1;
+          e.currentTarget.setAttribute('data-clicks', String(count));
+        }}
+      />
+    );
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    // Icon-only button is reachable by its `label` (aria-label).
+    const button = canvas.getByRole('button', { name: 'Search' });
+    await expect(button).not.toHaveAttribute('data-clicks');
+    await userEvent.click(button);
+    await expect(button).toHaveAttribute('data-clicks', '1');
+  },
 };

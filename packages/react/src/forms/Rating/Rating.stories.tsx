@@ -1,16 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { useState } from 'react';
+import { expect, userEvent, within } from 'storybook/test';
 import { Inline } from '../../primitives/layout/Inline/Inline.js';
 import { Stack } from '../../primitives/layout/Stack/Stack.js';
 import { Text } from '../../typography/Text/Text.js';
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormLabel,
-  FormMessage,
-} from '../Form/index.js';
 import { Rating } from './Rating.js';
 
 const meta: Meta<typeof Rating> = {
@@ -116,131 +108,22 @@ export const States: Story = {
   ),
 };
 
-export const Controlled: Story = {
-  render: () => {
-    function ControlledDemo(): React.ReactElement {
-      const [value, setValue] = useState<number>(0);
-      const label =
-        value === 0
-          ? 'No rating'
-          : value <= 2
-            ? 'Needs work'
-            : value <= 3
-              ? 'Average'
-              : value <= 4
-                ? 'Good'
-                : 'Excellent';
-      return (
-        <Stack gap="3">
-          <Rating value={value} onValueChange={setValue} allowHalf label="Feedback" />
-          <Text size="sm">
-            {value} / 5 — <strong>{label}</strong>
-          </Text>
-        </Stack>
-      );
-    }
-    return <ControlledDemo />;
-  },
-};
-
-export const WithRenderValue: Story = {
-  name: 'renderValue — hover-aware trailing label',
-  render: () => (
-    <Stack gap="3">
-      <Rating
-        allowHalf
-        defaultValue={3.5}
-        label="Hover to preview"
-        renderValue={(v, m, preview) => (
-          <Text size="sm" color="fg.muted">
-            {(preview ?? v).toFixed(1)} / {m}
-          </Text>
-        )}
-      />
-      <Rating
-        defaultValue={4}
-        label="Descriptive"
-        renderValue={(v, _m, preview) => {
-          const shown = preview ?? v;
-          const labels = ['No rating', 'Needs work', 'Average', 'Good', 'Great', 'Excellent'];
-          return (
-            <Text size="sm" color="fg.muted">
-              {labels[Math.round(shown)]}
-            </Text>
-          );
-        }}
-      />
-    </Stack>
-  ),
-};
-
-export const ClearOnRepeatClick: Story = {
-  name: 'Click the current star again to clear',
-  render: () => {
-    function Demo(): React.ReactElement {
-      const [value, setValue] = useState<number>(3);
-      return (
-        <Stack gap="3">
-          <Rating value={value} onValueChange={setValue} label="Clear by clicking selected star" />
-          <Text size="sm" color="fg.muted">
-            Current: <strong>{value}</strong>
-          </Text>
-        </Stack>
-      );
-    }
-    return <Demo />;
-  },
-};
-
-export const Uncontrolled: Story = {
-  render: () => <Rating defaultValue={4} label="Uncontrolled" />,
-};
-
-export const WithLabel: Story = {
-  name: 'Accessible label',
-  render: () => (
-    <Stack gap="3">
-      <Rating label="Food quality" defaultValue={5} />
-      <Rating label="Service" defaultValue={3} />
-      <Rating label="Value" defaultValue={4} />
-    </Stack>
-  ),
-};
-
-export const KeyboardDemo: Story = {
-  name: 'Keyboard navigation',
-  render: () => (
-    <Stack gap="3">
-      <Rating allowHalf defaultValue={3} label="Focus me and try ←/→/Home/End" />
-      <Text size="sm" color="fg.muted">
-        <code>←</code>/<code>↓</code> decrement, <code>→</code>/<code>↑</code> increment,{' '}
-        <code>Home</code>/<code>End</code> jump to 0 / max.
-      </Text>
-    </Stack>
-  ),
-};
-
-export const InsideFormField: Story = {
-  name: 'Composed with FormField',
-  render: () => {
-    function Demo(): React.ReactElement {
-      const [value, setValue] = useState<number>(0);
-      const invalid = value === 0;
-      return (
-        <Form>
-          <Stack gap="4" width="340px">
-            <FormField name="score" invalid={invalid} required>
-              <FormLabel>How was your experience?</FormLabel>
-              <FormControl>
-                <Rating value={value} onValueChange={setValue} allowHalf label="Score" />
-              </FormControl>
-              <FormDescription>Rate 0.5 – 5 stars.</FormDescription>
-              <FormMessage>{invalid ? 'Please leave a rating.' : undefined}</FormMessage>
-            </FormField>
-          </Stack>
-        </Form>
-      );
-    }
-    return <Demo />;
+export const Interaction: Story = {
+  name: 'Interaction · keyboard changes aria-valuenow',
+  render: () => <Rating defaultValue={3} label="Score" />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const rating = canvas.getByRole('slider', { name: 'Score' });
+    await expect(rating).toHaveAttribute('aria-valuenow', '3');
+    rating.focus();
+    await expect(rating).toHaveFocus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(rating).toHaveAttribute('aria-valuenow', '4');
+    await userEvent.keyboard('{ArrowLeft}{ArrowLeft}');
+    await expect(rating).toHaveAttribute('aria-valuenow', '2');
+    await userEvent.keyboard('{Home}');
+    await expect(rating).toHaveAttribute('aria-valuenow', '0');
+    await userEvent.keyboard('{End}');
+    await expect(rating).toHaveAttribute('aria-valuenow', '5');
   },
 };

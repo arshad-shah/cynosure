@@ -1,10 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
+import { expect, userEvent, within } from 'storybook/test';
 import { Button } from '../../forms/Button/Button.js';
 import { Inline } from '../../primitives/layout/Inline/Inline.js';
 import { Stack } from '../../primitives/layout/Stack/Stack.js';
 import { Text } from '../../typography/Text/Text.js';
-import { Avatar } from '../Avatar/Avatar.js';
 import { Notification } from './Notification.js';
 
 const meta: Meta<typeof Notification> = {
@@ -124,40 +124,6 @@ export const WithActions: Story = {
   ),
 };
 
-export const WithTimestamp: Story = {
-  render: () => (
-    <Stack gap="3" width="420px">
-      <Notification
-        icon={<IconBell />}
-        title="Weekly digest"
-        description="17 merged PRs, 42 comments, 5 new discussions."
-        timestamp="Mon 9:00"
-      />
-      <Notification icon={<IconBell />} title="Yesterday's standup notes" timestamp="Tue 9:00" />
-    </Stack>
-  ),
-};
-
-export const WithAvatar: Story = {
-  render: () => (
-    <Stack gap="3" width="420px">
-      <Notification
-        unread
-        icon={<Avatar name="Grace Hopper" size="sm" />}
-        title="Grace Hopper followed you"
-        description="You have 3 new followers this week."
-        timestamp="10m ago"
-      />
-      <Notification
-        icon={<Avatar name="Alan Turing" size="sm" />}
-        title="Alan Turing commented"
-        description="“LGTM, let's ship it.”"
-        timestamp="yesterday"
-      />
-    </Stack>
-  ),
-};
-
 export const Dismissable: Story = {
   name: 'Dismissable — onDismiss removes from list',
   render: () => {
@@ -220,56 +186,36 @@ export const Dismissable: Story = {
   },
 };
 
-export const InboxList: Story = {
-  name: 'Realistic — inbox list with mixed types',
-  render: () => (
-    <Stack gap="2" width="480px">
-      <Notification
-        unread
-        icon={<Avatar name="Barbara Liskov" size="sm" />}
-        title="Barbara Liskov requested your review"
-        description="feat(feedback): add Callout component"
-        timestamp="2m ago"
-        actions={
-          <Inline gap="2">
-            <Button size="sm">Review</Button>
-          </Inline>
-        }
-      />
-      <Notification
-        unread
-        icon={<IconCheck />}
-        title="Build #4821 passed"
-        description="All checks green on feat/callout."
-        timestamp="5m ago"
-      />
-      <Notification
-        icon={<Avatar name="Donald Knuth" size="sm" />}
-        title="Donald Knuth commented"
-        description="“Consider using a different font for code samples.”"
-        timestamp="1h ago"
-      />
-      <Notification
-        icon={<IconBell />}
-        title="Weekly digest"
-        description="17 merged PRs, 42 comments, 5 new discussions."
-        timestamp="Mon"
-      />
-    </Stack>
-  ),
-};
-
-export const LongContent: Story = {
-  name: 'Edge case — long description',
-  render: () => (
-    <div style={{ width: 420 }}>
-      <Notification
-        unread
-        icon={<IconComment />}
-        title="Very long notification title that might wrap onto multiple lines when there is not enough room"
-        description="And the description too can be pretty long; it should wrap cleanly and remain readable even when the content spans several lines, without the layout breaking or overflowing the card."
-        timestamp="now"
-      />
-    </div>
-  ),
+export const Interaction: Story = {
+  name: 'Interaction · dismiss removes the notification',
+  render: () => {
+    function Demo(): React.ReactElement {
+      const [open, setOpen] = useState(true);
+      return (
+        <div style={{ width: 420 }}>
+          {open ? (
+            <Notification
+              icon={<IconBell />}
+              title="Deployment succeeded"
+              description="main → production."
+              timestamp="1m ago"
+              onDismiss={() => setOpen(false)}
+            />
+          ) : (
+            <Text size="sm" color="fg.muted">
+              Dismissed.
+            </Text>
+          )}
+        </div>
+      );
+    }
+    return <Demo />;
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByText('Deployment succeeded')).toBeInTheDocument();
+    await userEvent.click(canvas.getByRole('button', { name: 'Dismiss notification' }));
+    await expect(canvas.queryByText('Deployment succeeded')).not.toBeInTheDocument();
+    await expect(canvas.getByText('Dismissed.')).toBeInTheDocument();
+  },
 };

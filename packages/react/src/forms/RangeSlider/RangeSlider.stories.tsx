@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { useState } from 'react';
+import { expect, userEvent, within } from 'storybook/test';
 import { Stack } from '../../primitives/layout/Stack/Stack.js';
-import { Text } from '../../typography/Text/Text.js';
 import { RangeSlider } from './RangeSlider.js';
 
 const meta: Meta<typeof RangeSlider> = {
@@ -58,54 +57,6 @@ export const States: Story = {
   ),
 };
 
-export const StepAndBounds: Story = {
-  name: 'Custom min / max / step',
-  render: () => (
-    <Stack gap="4" width="420px">
-      <RangeSlider
-        label="0 → 1 (step 0.01)"
-        minValue={0}
-        maxValue={1}
-        step={0.01}
-        defaultValue={[0.2, 0.8]}
-        showValue
-      />
-      <RangeSlider
-        label="Years"
-        minValue={1900}
-        maxValue={2026}
-        step={1}
-        defaultValue={[1970, 2000]}
-        showValue
-      />
-    </Stack>
-  ),
-};
-
-export const MinGap: Story = {
-  name: 'Enforced minimum gap (controlled)',
-  render: () => {
-    function Demo(): React.ReactElement {
-      const MIN_GAP = 10;
-      const [value, setValue] = useState<[number, number]>([30, 70]);
-      const handle = (next: [number, number]) => {
-        const [lo, hi] = next;
-        if (hi - lo < MIN_GAP) return;
-        setValue(next);
-      };
-      return (
-        <Stack gap="3" width="420px">
-          <RangeSlider label="Min gap 10" value={value} onChange={handle} showValue />
-          <Text size="sm" color="fg.muted">
-            Gap: <strong>{value[1] - value[0]}</strong> (min {MIN_GAP})
-          </Text>
-        </Stack>
-      );
-    }
-    return <Demo />;
-  },
-};
-
 export const FormattedValue: Story = {
   name: 'formatOptions — currency + percent',
   render: () => (
@@ -132,39 +83,24 @@ export const FormattedValue: Story = {
   ),
 };
 
-export const Controlled: Story = {
-  render: () => {
-    function Controlled(): React.ReactElement {
-      const [value, setValue] = useState<[number, number]>([10, 40]);
-      return (
-        <Stack gap="3" width="420px">
-          <RangeSlider label="Window" value={value} onChange={setValue} showValue />
-          <Text size="sm">
-            Current: <strong>{value.join(' → ')}</strong>
-          </Text>
-        </Stack>
-      );
-    }
-    return <Controlled />;
+export const Interaction: Story = {
+  name: 'Interaction · arrow keys move the start thumb',
+  render: () => (
+    <div style={{ width: '420px' }}>
+      <RangeSlider label="Price" defaultValue={[25, 75]} showValue />
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const minThumb = canvas.getByRole('slider', { name: 'Price (min)' });
+    const maxThumb = canvas.getByRole('slider', { name: 'Price (max)' });
+    await expect(minThumb).toHaveAttribute('aria-valuenow', '25');
+    await expect(maxThumb).toHaveAttribute('aria-valuenow', '75');
+    minThumb.focus();
+    await expect(minThumb).toHaveFocus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(minThumb).toHaveAttribute('aria-valuenow', '26');
+    // The max thumb is untouched.
+    await expect(maxThumb).toHaveAttribute('aria-valuenow', '75');
   },
-};
-
-export const Uncontrolled: Story = {
-  render: () => (
-    <div style={{ width: '420px' }}>
-      <RangeSlider label="Uncontrolled" defaultValue={[30, 60]} showValue />
-    </div>
-  ),
-};
-
-export const LongLabel: Story = {
-  render: () => (
-    <div style={{ width: '420px' }}>
-      <RangeSlider
-        label="Filter your results by an unusually descriptive numeric range"
-        defaultValue={[20, 80]}
-        showValue
-      />
-    </div>
-  ),
 };

@@ -1,16 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
+import { expect, userEvent, within } from 'storybook/test';
 import { Inline } from '../../primitives/layout/Inline/Inline.js';
 import { Stack } from '../../primitives/layout/Stack/Stack.js';
 import { Text } from '../../typography/Text/Text.js';
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormLabel,
-  FormMessage,
-} from '../Form/index.js';
 import { Switch } from './Switch.js';
 
 const meta: Meta<typeof Switch> = {
@@ -67,17 +60,6 @@ export const States: Story = {
   ),
 };
 
-export const WithoutLabel: Story = {
-  name: 'Without children — bare control',
-  render: () => (
-    <Inline gap="3" align="center">
-      <Switch aria-label="Wifi" />
-      <Switch aria-label="Wifi" defaultChecked />
-      <Switch aria-label="Wifi" disabled />
-    </Inline>
-  ),
-};
-
 export const Controlled: Story = {
   render: () => {
     function Controlled(): React.ReactElement {
@@ -94,44 +76,6 @@ export const Controlled: Story = {
       );
     }
     return <Controlled />;
-  },
-};
-
-export const Settings: Story = {
-  name: 'Example — settings list',
-  render: () => (
-    <Stack gap="3" width="360px">
-      <Switch defaultChecked>Enable two-factor auth</Switch>
-      <Switch defaultChecked>Email notifications</Switch>
-      <Switch>Push notifications</Switch>
-      <Switch>Share anonymous usage data</Switch>
-    </Stack>
-  ),
-};
-
-export const InsideFormField: Story = {
-  name: 'Composed with FormField',
-  render: () => {
-    function Demo(): React.ReactElement {
-      const [on, setOn] = useState(false);
-      return (
-        <Form>
-          <Stack gap="4" width="360px">
-            <FormField name="marketing">
-              <FormLabel>Marketing emails</FormLabel>
-              <FormControl>
-                <Switch checked={on} onCheckedChange={setOn}>
-                  Receive product updates and offers
-                </Switch>
-              </FormControl>
-              <FormDescription>You can unsubscribe at any time.</FormDescription>
-              <FormMessage />
-            </FormField>
-          </Stack>
-        </Form>
-      );
-    }
-    return <Demo />;
   },
 };
 
@@ -163,13 +107,17 @@ export const Loading: Story = {
   },
 };
 
-export const LongLabel: Story = {
-  render: () => (
-    <Stack gap="3" width="360px">
-      <Switch defaultChecked>
-        Automatically back up my data every night at 3 AM to the selected cloud provider, using
-        end-to-end encryption.
-      </Switch>
-    </Stack>
-  ),
+export const Interaction: Story = {
+  name: 'Interaction · click toggles aria-checked',
+  render: () => <Switch>Notifications</Switch>,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const sw = canvas.getByRole('switch');
+    await expect(sw).toHaveAttribute('aria-checked', 'false');
+    await userEvent.click(sw);
+    await expect(sw).toHaveAttribute('aria-checked', 'true');
+    await expect(sw).toHaveAttribute('data-state', 'checked');
+    await userEvent.click(sw);
+    await expect(sw).toHaveAttribute('aria-checked', 'false');
+  },
 };

@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { useState } from 'react';
+import { expect, userEvent, within } from 'storybook/test';
 import { Inline } from '../../primitives/layout/Inline/Inline.js';
 import { Stack } from '../../primitives/layout/Stack/Stack.js';
 import { Text } from '../../typography/Text/Text.js';
@@ -70,12 +70,6 @@ const IconUnderline = (): React.ReactElement => (
   </svg>
 );
 
-const IconStar = (): React.ReactElement => (
-  <svg aria-hidden="true" width="1em" height="1em" viewBox="0 0 24 24" fill="currentColor">
-    <polygon points="12 2 15 9 22 10 17 15 18 22 12 18 6 22 7 15 2 10 9 9 12 2" />
-  </svg>
-);
-
 export const Playground: Story = {
   args: { size: 'md', variant: 'ghost' },
   render: (args) => (
@@ -96,23 +90,6 @@ export const Default: Story = {
       </Toggle>
       <Toggle aria-label="Toggle underline">
         <IconUnderline />
-      </Toggle>
-    </Inline>
-  ),
-};
-
-export const IconOnly: Story = {
-  name: 'Icon only — requires aria-label',
-  render: () => (
-    <Inline gap="3">
-      <Toggle aria-label="Toggle favorite">
-        <IconStar />
-      </Toggle>
-      <Toggle aria-label="Toggle favorite" variant="outline">
-        <IconStar />
-      </Toggle>
-      <Toggle aria-label="Toggle favorite" variant="solid">
-        <IconStar />
       </Toggle>
     </Inline>
   ),
@@ -160,46 +137,6 @@ export const Variants: Story = {
   ),
 };
 
-export const Matrix: Story = {
-  name: 'Matrix — sizes x variants',
-  render: () => (
-    <Stack gap="3">
-      {(['ghost', 'outline', 'solid'] as const).map((variant) => (
-        <Inline key={variant} gap="3" align="center">
-          <Text size="sm" color="fg.muted" style={{ width: 72 }}>
-            {variant}
-          </Text>
-          {(['xs', 'sm', 'md', 'lg'] as const).map((size) => (
-            <Toggle key={size} size={size} variant={variant} aria-label={`Toggle ${size}`}>
-              <IconBold />
-            </Toggle>
-          ))}
-        </Inline>
-      ))}
-    </Stack>
-  ),
-};
-
-export const Controlled: Story = {
-  name: 'Controlled — pressed + onPressedChange',
-  render: () => {
-    function Demo(): React.ReactElement {
-      const [pressed, setPressed] = useState(false);
-      return (
-        <Stack gap="3">
-          <Toggle pressed={pressed} onPressedChange={setPressed} aria-label="Toggle favorite">
-            <IconStar />
-          </Toggle>
-          <Text size="sm" color="fg.muted">
-            pressed = <code>{String(pressed)}</code>
-          </Text>
-        </Stack>
-      );
-    }
-    return <Demo />;
-  },
-};
-
 export const Disabled: Story = {
   render: () => (
     <Inline gap="3">
@@ -214,4 +151,24 @@ export const Disabled: Story = {
       </Toggle>
     </Inline>
   ),
+};
+
+export const Interaction: Story = {
+  name: 'Interaction · click toggles aria-pressed',
+  render: () => (
+    <Toggle aria-label="Toggle bold">
+      <IconBold />
+    </Toggle>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const toggle = canvas.getByRole('button', { name: 'Toggle bold' });
+    await expect(toggle).toHaveAttribute('aria-pressed', 'false');
+    await expect(toggle).toHaveAttribute('data-state', 'off');
+    await userEvent.click(toggle);
+    await expect(toggle).toHaveAttribute('aria-pressed', 'true');
+    await expect(toggle).toHaveAttribute('data-state', 'on');
+    await userEvent.click(toggle);
+    await expect(toggle).toHaveAttribute('aria-pressed', 'false');
+  },
 };

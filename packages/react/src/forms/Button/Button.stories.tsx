@@ -1,8 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { useState } from 'react';
+import { expect, userEvent, within } from 'storybook/test';
 import { Inline } from '../../primitives/layout/Inline/Inline.js';
 import { Stack } from '../../primitives/layout/Stack/Stack.js';
-import { Text } from '../../typography/Text/Text.js';
 import { Button } from './Button.js';
 
 const meta: Meta<typeof Button> = {
@@ -189,48 +188,6 @@ export const States: Story = {
   ),
 };
 
-export const Loading: Story = {
-  render: () => {
-    function LoadingDemo(): React.ReactElement {
-      const [loading, setLoading] = useState(false);
-      return (
-        <Inline gap="3">
-          <Button
-            loading={loading}
-            onClick={() => {
-              setLoading(true);
-              setTimeout(() => setLoading(false), 1500);
-            }}
-          >
-            Save changes
-          </Button>
-          <Button variant="outline" loading={loading}>
-            Save changes
-          </Button>
-          <Text size="sm" color="fg.muted">
-            Click to trigger a 1.5s loading state.
-          </Text>
-        </Inline>
-      );
-    }
-    return <LoadingDemo />;
-  },
-};
-
-export const FullWidth: Story = {
-  render: () => (
-    <Stack gap="3" width="320px">
-      <Button fullWidth>Continue</Button>
-      <Button fullWidth variant="outline" leftIcon={<IconDownload />}>
-        Download report
-      </Button>
-      <Button fullWidth variant="soft" colorScheme="danger">
-        Delete account
-      </Button>
-    </Stack>
-  ),
-};
-
 export const AsChildLink: Story = {
   name: 'asChild — renders an <a>',
   render: () => (
@@ -247,29 +204,28 @@ export const AsChildLink: Story = {
   ),
 };
 
-export const SubmitButton: Story = {
-  render: () => (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        alert('Submitted');
-      }}
-    >
-      <Inline gap="3">
-        <Button type="submit">Save</Button>
-        <Button type="button" variant="ghost">
-          Cancel
-        </Button>
-      </Inline>
-    </form>
-  ),
-};
-
-export const LongText: Story = {
-  render: () => (
-    <Stack gap="3" width="200px">
-      <Button>A regular label</Button>
-      <Button>A much longer label that should wrap onto multiple lines gracefully</Button>
-    </Stack>
-  ),
+export const Interaction: Story = {
+  name: 'Interaction · click fires handler',
+  render: () => {
+    let count = 0;
+    return (
+      <Button
+        onClick={(e) => {
+          count += 1;
+          e.currentTarget.setAttribute('data-clicks', String(count));
+        }}
+      >
+        Continue
+      </Button>
+    );
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const button = canvas.getByRole('button', { name: 'Continue' });
+    await expect(button).not.toHaveAttribute('data-clicks');
+    await userEvent.click(button);
+    await expect(button).toHaveAttribute('data-clicks', '1');
+    await userEvent.click(button);
+    await expect(button).toHaveAttribute('data-clicks', '2');
+  },
 };
