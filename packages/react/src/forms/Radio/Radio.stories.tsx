@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import { expect, userEvent, within } from 'storybook/test';
 import { Inline } from '../../primitives/layout/Inline/Inline.js';
 import { Stack } from '../../primitives/layout/Stack/Stack.js';
-import { Text } from '../../typography/Text/Text.js';
 import { RadioGroup } from '../RadioGroup/RadioGroup.js';
 import { Radio } from './Radio.js';
 
@@ -75,19 +75,6 @@ export const States: Story = {
   ),
 };
 
-export const WithoutLabel: Story = {
-  name: 'Bare control (no children)',
-  render: () => (
-    <RadioGroup defaultValue="b" aria-label="Bare">
-      <Inline gap="3" align="center">
-        <Radio value="a" aria-label="A" />
-        <Radio value="b" aria-label="B" />
-        <Radio value="c" aria-label="C" />
-      </Inline>
-    </RadioGroup>
-  ),
-};
-
 export const DisabledMix: Story = {
   render: () => (
     <RadioGroup defaultValue="b" aria-label="Plan">
@@ -102,28 +89,24 @@ export const DisabledMix: Story = {
   ),
 };
 
-export const LongLabel: Story = {
+export const Interaction: Story = {
+  name: 'Interaction · clicking a radio selects it',
   render: () => (
-    <RadioGroup defaultValue="y" aria-label="Backup">
-      <Stack gap="3" width="360px">
-        <Radio value="n">Never back up</Radio>
-        <Radio value="y">
-          Back up automatically every night at 03:00 — this is the recommended option for most users
-          and can be changed later.
-        </Radio>
+    <RadioGroup defaultValue="off" aria-label="Power">
+      <Stack gap="3">
+        <Radio value="off">Off</Radio>
+        <Radio value="on">On</Radio>
       </Stack>
     </RadioGroup>
   ),
-};
-
-export const Tip: Story = {
-  name: 'Tip — Radios must live inside a RadioGroup',
-  render: () => (
-    <Stack gap="2">
-      <Text size="sm" color="fg.muted">
-        See <strong>Forms/RadioGroup</strong> stories for orientation, controlled state, and
-        FormField composition.
-      </Text>
-    </Stack>
-  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const off = canvas.getByRole('radio', { name: 'Off' });
+    const on = canvas.getByRole('radio', { name: 'On' });
+    await expect(off).toHaveAttribute('aria-checked', 'true');
+    await expect(on).toHaveAttribute('aria-checked', 'false');
+    await userEvent.click(on);
+    await expect(on).toHaveAttribute('aria-checked', 'true');
+    await expect(off).toHaveAttribute('aria-checked', 'false');
+  },
 };

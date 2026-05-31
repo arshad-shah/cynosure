@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { useState } from 'react';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { Button } from '../../forms/Button/Button.js';
-import { Input } from '../../forms/Input/Input.js';
 import { Inline } from '../../primitives/layout/Inline/Inline.js';
 import { Stack } from '../../primitives/layout/Stack/Stack.js';
 import { Text } from '../../typography/Text/Text.js';
@@ -54,33 +53,6 @@ export const DeleteConfirmation: Story = {
   ),
 };
 
-export const SessionTimeout: Story = {
-  name: 'Session timeout warning',
-  render: () => (
-    <AlertDialog defaultOpen>
-      <AlertDialogTrigger asChild>
-        <Button variant="outline">Show session warning</Button>
-      </AlertDialogTrigger>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Your session is about to expire</AlertDialogTitle>
-          <AlertDialogDescription>
-            For your security, you will be signed out in 1 minute. Would you like to stay signed in?
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel asChild>
-            <Button variant="ghost">Sign out</Button>
-          </AlertDialogCancel>
-          <AlertDialogAction asChild>
-            <Button>Stay signed in</Button>
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
-  ),
-};
-
 export const IrreversibleWarning: Story = {
   name: 'Irreversible action',
   render: () => (
@@ -109,98 +81,6 @@ export const IrreversibleWarning: Story = {
       </AlertDialogContent>
     </AlertDialog>
   ),
-};
-
-export const AsyncAction: Story = {
-  name: 'Async confirmation (loading)',
-  render: () => {
-    function Async(): React.ReactElement {
-      const [open, setOpen] = useState(false);
-      const [loading, setLoading] = useState(false);
-
-      async function confirm(): Promise<void> {
-        setLoading(true);
-        await new Promise((r) => setTimeout(r, 1600));
-        setLoading(false);
-        setOpen(false);
-      }
-
-      return (
-        <Stack gap="3">
-          <Button variant="soft" colorScheme="danger" onClick={() => setOpen(true)}>
-            Archive workspace
-          </Button>
-          <AlertDialog open={open} onOpenChange={(next) => (loading ? null : setOpen(next))}>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Archive workspace?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  The workspace will be archived and made read-only. This can take a moment.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel asChild>
-                  <Button variant="ghost" disabled={loading}>
-                    Cancel
-                  </Button>
-                </AlertDialogCancel>
-                {/* Not AlertDialogAction — we don't want it to auto-close while loading. */}
-                <Button colorScheme="danger" loading={loading} onClick={confirm}>
-                  Archive
-                </Button>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        </Stack>
-      );
-    }
-    return <Async />;
-  },
-};
-
-export const TypeToConfirm: Story = {
-  name: 'Type-to-confirm',
-  render: () => {
-    function Type(): React.ReactElement {
-      const required = 'DELETE';
-      const [value, setValue] = useState('');
-      const matches = value.trim() === required;
-      return (
-        <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <Button variant="soft" colorScheme="danger">
-              Delete database
-            </Button>
-          </AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Delete production database?</AlertDialogTitle>
-              <AlertDialogDescription>
-                Type <strong>{required}</strong> below to confirm. This cannot be undone.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <Stack gap="2" paddingX="5" paddingBottom="3">
-              <Input placeholder={`Type ${required}`} value={value} onChange={setValue} autoFocus />
-              <Text size="xs" color="fg.muted">
-                {matches ? 'Confirmation matches.' : 'Confirmation does not match.'}
-              </Text>
-            </Stack>
-            <AlertDialogFooter>
-              <AlertDialogCancel asChild>
-                <Button variant="ghost">Cancel</Button>
-              </AlertDialogCancel>
-              <AlertDialogAction asChild>
-                <Button colorScheme="danger" disabled={!matches}>
-                  Delete database
-                </Button>
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-      );
-    }
-    return <Type />;
-  },
 };
 
 export const CannotDismissByOverlay: Story = {
@@ -235,4 +115,47 @@ export const CannotDismissByOverlay: Story = {
       </Inline>
     </Stack>
   ),
+};
+
+export const Interaction: Story = {
+  name: 'Interaction · Escape is ignored, Cancel closes',
+  render: () => (
+    <AlertDialog>
+      <AlertDialogTrigger asChild>
+        <Button variant="soft" colorScheme="danger">
+          Delete account
+        </Button>
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Delete your account?</AlertDialogTitle>
+          <AlertDialogDescription>This action cannot be undone.</AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel asChild>
+            <Button variant="ghost">Cancel</Button>
+          </AlertDialogCancel>
+          <AlertDialogAction asChild>
+            <Button colorScheme="danger">Yes, delete account</Button>
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const trigger = canvas.getByRole('button', { name: 'Delete account' });
+    await userEvent.click(trigger);
+    // Content portals to document.body; AlertDialog uses role="alertdialog".
+    const dialog = await within(document.body).findByRole('alertdialog');
+    await expect(dialog).toBeInTheDocument();
+    // Escape is suppressed — the dialog must stay open.
+    await userEvent.keyboard('{Escape}');
+    await expect(within(document.body).queryByRole('alertdialog')).toBeInTheDocument();
+    // Only Cancel / Action close it.
+    await userEvent.click(within(document.body).getByRole('button', { name: 'Cancel' }));
+    await waitFor(() =>
+      expect(within(document.body).queryByRole('alertdialog')).not.toBeInTheDocument(),
+    );
+  },
 };

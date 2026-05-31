@@ -1,10 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { Stack } from '../../primitives/layout/Stack/Stack.js';
-import { Text } from '../../typography/Text/Text.js';
 import { CodeBlock } from './CodeBlock.js';
 
 const meta: Meta<typeof CodeBlock> = {
-  title: 'Data Display/CodeBlock',
+  title: 'Data display/CodeBlock',
   component: CodeBlock,
   parameters: { layout: 'padded' },
   argTypes: {
@@ -63,15 +63,6 @@ export const WithLanguageLabel: Story = {
   ),
 };
 
-export const WithFilename: Story = {
-  name: 'With custom filename',
-  render: () => (
-    <CodeBlock language="tsx" filename="src/utils/greet.ts" copyable>
-      {TS_SNIPPET}
-    </CodeBlock>
-  ),
-};
-
 export const WithLineNumbers: Story = {
   name: 'With line numbers',
   render: () => (
@@ -108,45 +99,24 @@ export const MaxHeight: Story = {
   ),
 };
 
-export const PreRenderedHtml: Story = {
-  name: 'Pre-rendered html (Shiki-shaped)',
-  render: () => {
-    // Minimal hand-written Shiki-shaped HTML — in real usage this comes from
-    // `shiki.codeToHtml`. The tokens below exercise the `.line` selector and
-    // the `highlightLines` attribute pass.
-    const html =
-      '<pre class="shiki"><code>' +
-      `<span class="line"><span style="color:#c678dd">const</span> <span style="color:#61afef">greet</span> = (<span style="color:#e06c75">name</span>) =&gt; \`Hello, \${name}!\`;</span>\n` +
-      '<span class="line"><span style="color:#c678dd">export</span> <span style="color:#c678dd">default</span> greet;</span>' +
-      '</code></pre>';
-    return (
-      <Stack gap="2">
-        <Text size="sm" color="fg.muted">
-          Passing pre-rendered HTML bypasses the plain renderer.
-        </Text>
-        <CodeBlock language="ts" html={html} highlightLines={[1]} copyable>
-          {'const greet = (name) => `Hello, ${name}!`;\nexport default greet;'}
-        </CodeBlock>
-      </Stack>
-    );
-  },
-};
-
-export const InlineComposition: Story = {
-  name: 'In-context usage',
+export const Interaction: Story = {
+  name: 'Interaction · copy button copies the source',
   render: () => (
-    <Stack gap="3" style={{ maxWidth: 640 }}>
-      <Text>
-        Install the package and import whatever primitives you need — every entry point is
-        tree-shake friendly.
-      </Text>
-      <CodeBlock language="sh" copyable>
-        {'pnpm add @arshad-shah/cynosure-react'}
-      </CodeBlock>
-      <Text>Then use the components directly:</Text>
-      <CodeBlock language="tsx" filename="App.tsx" copyable showLineNumbers>
-        {`import { Button } from '@arshad-shah/cynosure-react';\n\nexport default function App() {\n  return <Button>Click me</Button>;\n}\n`}
-      </CodeBlock>
-    </Stack>
+    <CodeBlock language="js" copyable>
+      {JS_SNIPPET}
+    </CodeBlock>
   ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const copyButton = canvas.getByRole('button', { name: 'Copy code' });
+    await expect(copyButton).toBeInTheDocument();
+
+    await userEvent.click(copyButton);
+    // A successful copy flips the button's label to "Copied".
+    await waitFor(() => {
+      expect(canvas.getByRole('button', { name: 'Copied' })).toBeInTheDocument();
+    });
+    // The clipboard holds the verbatim snippet.
+    await expect(await navigator.clipboard.readText()).toBe(JS_SNIPPET);
+  },
 };

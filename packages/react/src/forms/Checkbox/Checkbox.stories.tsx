@@ -4,14 +4,6 @@ import { expect, userEvent, within } from 'storybook/test';
 import { Inline } from '../../primitives/layout/Inline/Inline.js';
 import { Stack } from '../../primitives/layout/Stack/Stack.js';
 import { Text } from '../../typography/Text/Text.js';
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormLabel,
-  FormMessage,
-} from '../Form/index.js';
 import { Checkbox, type CheckboxState } from './Checkbox.js';
 
 const meta: Meta<typeof Checkbox> = {
@@ -93,17 +85,6 @@ export const States: Story = {
   ),
 };
 
-export const WithoutLabel: Story = {
-  name: 'Without children — bare control',
-  render: () => (
-    <Inline gap="3" align="center">
-      <Checkbox aria-label="Accept" />
-      <Checkbox aria-label="Accept" defaultChecked />
-      <Checkbox aria-label="Accept" indeterminate />
-    </Inline>
-  ),
-};
-
 export const Controlled: Story = {
   render: () => {
     function Controlled(): React.ReactElement {
@@ -123,85 +104,8 @@ export const Controlled: Story = {
   },
 };
 
-export const IndeterminateParent: Story = {
-  name: 'Indeterminate parent with children',
-  render: () => {
-    function Demo(): React.ReactElement {
-      const [items, setItems] = useState<boolean[]>([true, false, true]);
-      const allChecked = items.every(Boolean);
-      const noneChecked = items.every((x) => !x);
-      const parentState: CheckboxState = allChecked ? true : noneChecked ? false : 'indeterminate';
-
-      const toggleAll = (next: CheckboxState): void => {
-        setItems(items.map(() => next === true));
-      };
-
-      return (
-        <Stack gap="2">
-          <Checkbox checked={parentState} onCheckedChange={toggleAll}>
-            Select all
-          </Checkbox>
-          <Stack gap="2" paddingLeft="5">
-            {items.map((item, i) => (
-              <Checkbox
-                // biome-ignore lint/suspicious/noArrayIndexKey: static demo list.
-                key={i}
-                checked={item}
-                onCheckedChange={(next) => {
-                  setItems((prev) => prev.map((v, idx) => (idx === i ? next === true : v)));
-                }}
-              >
-                Item {i + 1}
-              </Checkbox>
-            ))}
-          </Stack>
-        </Stack>
-      );
-    }
-    return <Demo />;
-  },
-};
-
-export const InsideFormField: Story = {
-  name: 'Composed with FormField',
-  render: () => {
-    function Demo(): React.ReactElement {
-      const [accepted, setAccepted] = useState(false);
-      const invalid = !accepted;
-      return (
-        <Form>
-          <Stack gap="4" width="360px">
-            <FormField name="terms" invalid={invalid} required>
-              <FormLabel>Terms</FormLabel>
-              <FormControl>
-                <Checkbox checked={accepted} onCheckedChange={(c) => setAccepted(c === true)}>
-                  I agree to the terms of service
-                </Checkbox>
-              </FormControl>
-              <FormDescription>You must accept the terms to continue.</FormDescription>
-              <FormMessage>{invalid ? 'Please accept the terms.' : undefined}</FormMessage>
-            </FormField>
-          </Stack>
-        </Form>
-      );
-    }
-    return <Demo />;
-  },
-};
-
-export const LongLabel: Story = {
-  render: () => (
-    <Stack gap="3" width="360px">
-      <Checkbox defaultChecked>
-        I have read and agree to the terms of service, privacy policy, and the data processing
-        agreement that will be sent to my registered email address.
-      </Checkbox>
-    </Stack>
-  ),
-};
-
-export const ClickToggles: Story = {
-  name: 'Interaction · click toggles state',
+export const Interaction: Story = {
+  name: 'Interaction · click and Space toggle state',
   render: () => <Checkbox>Click me</Checkbox>,
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -209,20 +113,10 @@ export const ClickToggles: Story = {
     await expect(cb).toHaveAttribute('data-state', 'unchecked');
     await userEvent.click(cb);
     await expect(cb).toHaveAttribute('data-state', 'checked');
-    await userEvent.click(cb);
-    await expect(cb).toHaveAttribute('data-state', 'unchecked');
-  },
-};
-
-export const KeyboardToggles: Story = {
-  name: 'Interaction · space toggles focused control',
-  render: () => <Checkbox>Focus me then press space</Checkbox>,
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const cb = canvas.getByRole('checkbox');
+    // Keyboard parity: focus + Space toggles back.
     cb.focus();
     await expect(cb).toHaveFocus();
     await userEvent.keyboard(' ');
-    await expect(cb).toHaveAttribute('data-state', 'checked');
+    await expect(cb).toHaveAttribute('data-state', 'unchecked');
   },
 };

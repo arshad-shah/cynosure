@@ -44,7 +44,6 @@
     "@fontsource-variable/jetbrains-mono": "catalog:",
     "@size-limit/preset-small-lib": "catalog:",
     "@storybook/addon-a11y": "catalog:",
-    "@storybook/addon-docs": "catalog:",
     "@storybook/addon-themes": "catalog:",
     "@storybook/addon-vitest": "catalog:",
     "@storybook/react": "catalog:",

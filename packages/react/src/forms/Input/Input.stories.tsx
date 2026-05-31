@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
+import { expect, userEvent, within } from 'storybook/test';
 import { Stack } from '../../primitives/layout/Stack/Stack.js';
 import { Text } from '../../typography/Text/Text.js';
 import {
@@ -73,20 +74,6 @@ export const Sizes: Story = {
   ),
 };
 
-export const Types: Story = {
-  render: () => (
-    <Stack gap="3" width="320px">
-      <Input type="text" placeholder="Text" />
-      <Input type="email" placeholder="you@example.com" />
-      <Input type="password" defaultValue="hunter2" />
-      <Input type="tel" placeholder="+353…" />
-      <Input type="url" placeholder="https://…" />
-      <Input type="search" placeholder="Search…" />
-      <Input type="number" placeholder="42" />
-    </Stack>
-  ),
-};
-
 export const States: Story = {
   render: () => (
     <Stack gap="3" width="320px">
@@ -108,18 +95,6 @@ export const Slots: Story = {
       <Input leadingSlot="https://" trailingSlot=".com" placeholder="example" />
       <Input leadingSlot={<SearchIcon />} placeholder="Search…" />
       <Input leadingSlot={<Dollar />} trailingSlot={<span>USD</span>} placeholder="0.00" />
-    </Stack>
-  ),
-};
-
-export const MultipleSlots: Story = {
-  name: 'Slots — multiple on a side',
-  render: () => (
-    <Stack gap="3" width="360px">
-      <Input
-        leadingSlot={[<SearchIcon key="i" />, <span key="t">Search</span>]}
-        placeholder="Filtered search…"
-      />
     </Stack>
   ),
 };
@@ -153,15 +128,16 @@ export const Password: Story = {
   render: () => <Input type="password" defaultValue="hunter2" placeholder="Password" />,
 };
 
-export const Flat: Story = {
-  name: 'Flat variant (dense layouts)',
-  render: () => (
-    <Stack gap="3" width="320px">
-      <Input variant="flat" placeholder="Flat, plain" />
-      <Input variant="flat" leadingSlot="https://" placeholder="example.com" />
-      <Input variant="flat" clearable defaultValue="Clear me" placeholder="Flat, clearable" />
-    </Stack>
-  ),
+export const Interaction: Story = {
+  name: 'Interaction · type updates value',
+  render: () => <Input placeholder="Type here" aria-label="Demo input" />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const input = canvas.getByRole('textbox', { name: 'Demo input' });
+    await expect(input).toHaveValue('');
+    await userEvent.type(input, 'hello world');
+    await expect(input).toHaveValue('hello world');
+  },
 };
 
 export const Controlled: Story = {

@@ -1,8 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
+import { expect, userEvent, within } from 'storybook/test';
 import { Inline } from '../../primitives/layout/Inline/Inline.js';
-import { Stack } from '../../primitives/layout/Stack/Stack.js';
-import { Text } from '../../typography/Text/Text.js';
 import { Tag } from './Tag.js';
 
 const meta: Meta<typeof Tag> = {
@@ -85,178 +84,44 @@ export const Sizes: Story = {
   ),
 };
 
-export const Interactive: Story = {
-  name: 'Interactive — whole tag becomes a button via onClick',
-  render: () => {
-    function Demo(): React.ReactElement {
-      const [last, setLast] = useState<string | null>(null);
-      const items = ['design', 'engineering', 'marketing', 'sales'];
-      return (
-        <Stack gap="3">
-          <Inline gap="2">
-            {items.map((item) => (
-              <Tag
-                key={item}
-                colorScheme={item === last ? 'accent' : 'neutral'}
-                variant={item === last ? 'solid' : 'soft'}
-                onClick={() => setLast(item)}
-              >
-                {item}
-              </Tag>
-            ))}
-          </Inline>
-          <Text size="sm" color="fg.muted">
-            Last clicked: <strong>{last ?? '(none)'}</strong>
-          </Text>
-        </Stack>
-      );
-    }
-    return <Demo />;
-  },
-};
-
-export const Removable: Story = {
-  name: 'Removable — onRemove renders the × button',
-  render: () => {
-    function Demo(): React.ReactElement {
-      const [tags, setTags] = useState([
-        'typescript',
-        'react',
-        'vanilla-extract',
-        'radix',
-        'storybook',
-      ]);
-      const remove = (t: string): void => setTags((xs) => xs.filter((x) => x !== t));
-      return (
-        <Stack gap="3">
-          <Inline gap="2">
-            {tags.map((t) => (
-              <Tag
-                key={t}
-                colorScheme="accent"
-                variant="soft"
-                onRemove={() => remove(t)}
-                removeLabel={`Remove ${t} tag`}
-              >
-                {t}
-              </Tag>
-            ))}
-          </Inline>
-          {tags.length === 0 ? (
-            <Text size="sm" color="fg.muted">
-              All tags removed. Refresh the story to reset.
-            </Text>
-          ) : null}
-        </Stack>
-      );
-    }
-    return <Demo />;
-  },
-};
-
-export const KeyboardRemoval: Story = {
-  name: 'Keyboard removal — focus a tag and press Backspace / Delete',
-  render: () => {
-    function Demo(): React.ReactElement {
-      const [tags, setTags] = useState(['alpha', 'beta', 'gamma', 'delta', 'epsilon']);
-      const remove = (t: string): void => setTags((xs) => xs.filter((x) => x !== t));
-      return (
-        <Stack gap="3">
-          <Text size="sm" color="fg.muted">
-            Tip: Tab to a tag, then press Backspace or Delete.
-          </Text>
-          <Inline gap="2">
-            {tags.map((t) => (
-              <Tag key={t} colorScheme="neutral" variant="outline" onRemove={() => remove(t)}>
-                {t}
-              </Tag>
-            ))}
-          </Inline>
-        </Stack>
-      );
-    }
-    return <Demo />;
-  },
-};
-
-export const ClickAndRemove: Story = {
-  name: 'Click + remove — label is a button, × is a second button',
-  render: () => {
-    function Demo(): React.ReactElement {
-      const [selected, setSelected] = useState<string | null>(null);
-      const [tags, setTags] = useState(['Sarah', 'Jordan', 'Alex', 'Priya']);
-      const remove = (t: string): void => {
-        setTags((xs) => xs.filter((x) => x !== t));
-        if (selected === t) setSelected(null);
-      };
-      return (
-        <Stack gap="3">
-          <Inline gap="2">
-            {tags.map((t) => (
-              <Tag
-                key={t}
-                variant={selected === t ? 'solid' : 'soft'}
-                colorScheme={selected === t ? 'accent' : 'neutral'}
-                onClick={() => setSelected(t)}
-                onRemove={() => remove(t)}
-              >
-                {t}
-              </Tag>
-            ))}
-          </Inline>
-          <Text size="sm">
-            Selected: <strong>{selected ?? '(none)'}</strong>
-          </Text>
-        </Stack>
-      );
-    }
-    return <Demo />;
-  },
-};
-
 export const Disabled: Story = {
   render: () => (
     <Inline gap="2">
       <Tag disabled>static disabled</Tag>
-      <Tag disabled onClick={() => alert('should not fire')}>
+      <Tag disabled onClick={() => undefined}>
         click disabled
       </Tag>
-      <Tag disabled onRemove={() => alert('should not fire')}>
+      <Tag disabled onRemove={() => undefined}>
         remove disabled
       </Tag>
     </Inline>
   ),
 };
 
-export const ManyItems: Story = {
-  name: 'Many items — wraps onto multiple lines',
+export const Interaction: Story = {
+  name: 'Interaction · remove button removes the tag',
   render: () => {
-    const items = [
-      'typescript',
-      'react',
-      'storybook',
-      'vanilla-extract',
-      'radix',
-      'a11y',
-      'theming',
-      'tokens',
-      'tests',
-      'monorepo',
-      'pnpm',
-      'biome',
-      'vite',
-      'docs',
-      'ssr',
-      'hooks',
-    ];
-    return (
-      <Inline gap="2" wrap>
-        {items.map((t) => (
-          <Tag key={t} variant="soft" colorScheme="neutral">
-            {t}
-          </Tag>
-        ))}
-      </Inline>
-    );
+    function Demo(): React.ReactElement {
+      const [tags, setTags] = useState(['react', 'typescript']);
+      const remove = (t: string): void => setTags((xs) => xs.filter((x) => x !== t));
+      return (
+        <Inline gap="2">
+          {tags.map((t) => (
+            <Tag key={t} colorScheme="accent" onRemove={() => remove(t)}>
+              {t}
+            </Tag>
+          ))}
+        </Inline>
+      );
+    }
+    return <Demo />;
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    // onRemove makes the tag a role="group" with a focusable × button.
+    await expect(canvas.getByRole('group', { name: 'react' })).toBeInTheDocument();
+    await userEvent.click(canvas.getByRole('button', { name: 'Remove react' }));
+    await expect(canvas.queryByRole('group', { name: 'react' })).not.toBeInTheDocument();
+    await expect(canvas.getByRole('group', { name: 'typescript' })).toBeInTheDocument();
   },
 };

@@ -47,7 +47,10 @@ export const surfaceClose = style({
   transitionProperty: 'opacity, background-color, box-shadow',
   transitionDuration: vars.duration.fast,
   selectors: {
-    '&:hover': { opacity: 1, background: 'rgba(0,0,0,0.06)' },
+    '&:hover': {
+      opacity: 1,
+      background: `color-mix(in oklab, ${vars.color.foreground.default} 6%, transparent)`,
+    },
     '&:focus-visible': {
       outline: 'none',
       opacity: 1,

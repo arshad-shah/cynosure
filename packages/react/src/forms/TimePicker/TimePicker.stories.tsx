@@ -2,17 +2,9 @@ import { Time, parseTime } from '@internationalized/date';
 import type { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
 import type { TimeValue } from 'react-aria-components';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { Stack } from '../../primitives/layout/Stack/Stack.js';
-import { LocaleProvider } from '../../theme/index.js';
 import { Text } from '../../typography/Text/Text.js';
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormLabel,
-  FormMessage,
-} from '../Form/index.js';
 import { TimePicker } from './TimePicker.js';
 
 const meta: Meta<typeof TimePicker> = {
@@ -116,52 +108,33 @@ export const Controlled: Story = {
   },
 };
 
-export const Uncontrolled: Story = {
-  render: () => (
-    <div style={{ width: '240px' }}>
-      <TimePicker label="Uncontrolled" defaultValue={new Time(14, 15)} />
-    </div>
-  ),
-};
-
-export const Locales: Story = {
-  name: 'Locale-aware hour cycle',
-  render: () => (
-    <Stack gap="3" width="260px">
-      <LocaleProvider locale="en-US">
-        <TimePicker label="en-US (12h by default)" defaultValue={new Time(14, 45)} />
-      </LocaleProvider>
-      <LocaleProvider locale="en-GB">
-        <TimePicker label="en-GB (24h by default)" defaultValue={new Time(14, 45)} />
-      </LocaleProvider>
-      <LocaleProvider locale="ja-JP">
-        <TimePicker label="ja-JP" defaultValue={new Time(14, 45)} />
-      </LocaleProvider>
-    </Stack>
-  ),
-};
-
-export const InsideFormField: Story = {
-  name: 'Composed with FormField',
+export const Interaction: Story = {
+  name: 'Interaction · arrow keys change the time',
   render: () => {
     function Demo(): React.ReactElement {
-      const [value, setValue] = useState<TimeValue | null>(null);
-      const invalid = value === null;
+      const [value, setValue] = useState<TimeValue | null>(new Time(9, 30));
       return (
-        <Form>
-          <Stack gap="4" width="280px">
-            <FormField name="time" invalid={invalid} required>
-              <FormLabel>Preferred time</FormLabel>
-              <FormControl>
-                <TimePicker value={value} onChange={setValue} aria-label="Preferred time" />
-              </FormControl>
-              <FormDescription>Type into the segments or use arrow keys.</FormDescription>
-              <FormMessage>{invalid ? 'Pick a time.' : undefined}</FormMessage>
-            </FormField>
-          </Stack>
-        </Form>
+        <Stack gap="3" width="260px">
+          <TimePicker label="Meeting time" value={value} onChange={setValue} hourCycle={24} />
+          <Text size="sm" color="fg.muted">
+            Value: <span data-testid="value">{value ? value.toString() : 'null'}</span>
+          </Text>
+        </Stack>
       );
     }
     return <Demo />;
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByTestId('value')).toHaveTextContent('09:30');
+
+    // The hour segment is an editable spinbutton; arrow keys step its value.
+    const hour = canvas.getByRole('spinbutton', { name: /hour/i });
+    hour.focus();
+    await userEvent.keyboard('{ArrowUp}');
+    await waitFor(() => {
+      // 09 → 10, minutes unchanged.
+      expect(canvas.getByTestId('value')).toHaveTextContent('10:30');
+    });
   },
 };

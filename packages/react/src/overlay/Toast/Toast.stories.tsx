@@ -1,10 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { Button } from '../../forms/Button/Button.js';
 import { Inline } from '../../primitives/layout/Inline/Inline.js';
 import { Stack } from '../../primitives/layout/Stack/Stack.js';
 import { Heading } from '../../typography/Heading/Heading.js';
-import { Text } from '../../typography/Text/Text.js';
 import { Toaster, type ToasterPosition, toast } from './Toaster.js';
 
 const meta: Meta<typeof Toaster> = {
@@ -76,20 +76,6 @@ export const Variants: Story = {
         </Button>
       </Inline>
     </Stack>
-  ),
-};
-
-export const WithDescription: Story = {
-  render: () => (
-    <Button
-      onClick={() => {
-        toast.success('Invite sent', {
-          description: 'alex@cynosure.app will receive an email shortly.',
-        });
-      }}
-    >
-      Send invite
-    </Button>
   ),
 };
 
@@ -215,86 +201,23 @@ export const Positions: Story = {
   },
 };
 
-export const RichContent: Story = {
+export const Interaction: Story = {
+  name: 'Interaction · trigger shows a toast',
   render: () => (
     <Button
       onClick={() => {
-        toast.message(
-          <Stack gap="1">
-            <Text size="sm" weight="semibold">
-              Deployment succeeded
-            </Text>
-            <Text size="xs" color="fg.muted">
-              Deployed <code>cynosure-app@1.20.0</code> to production in 34s.
-            </Text>
-          </Stack>,
-        );
+        toast.success('Changes saved');
       }}
     >
-      Show rich toast
+      Save changes
     </Button>
   ),
-};
-
-export const LongContent: Story = {
-  render: () => (
-    <Button
-      onClick={() => {
-        toast.info(
-          'The new schema migration requires a brief read-only window. During this window users can still browse, but writes will be paused for up to two minutes.',
-          {
-            duration: 6000,
-          },
-        );
-      }}
-    >
-      Long toast
-    </Button>
-  ),
-};
-
-export const ManualDismiss: Story = {
-  name: 'Manual dismiss by id',
-  render: () => {
-    function Manual(): React.ReactElement {
-      const [id, setId] = useState<string | number | null>(null);
-      return (
-        <Inline gap="3">
-          <Button
-            onClick={() => {
-              const toastId = toast.loading('Saving…', { duration: Number.POSITIVE_INFINITY });
-              setId(toastId);
-            }}
-          >
-            Start loading
-          </Button>
-          <Button
-            variant="outline"
-            disabled={id === null}
-            onClick={() => {
-              if (id !== null) {
-                toast.success('Saved', { id });
-                setId(null);
-              }
-            }}
-          >
-            Resolve
-          </Button>
-          <Button
-            variant="ghost"
-            disabled={id === null}
-            onClick={() => {
-              if (id !== null) {
-                toast.dismiss(id);
-                setId(null);
-              }
-            }}
-          >
-            Dismiss
-          </Button>
-        </Inline>
-      );
-    }
-    return <Manual />;
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByRole('button', { name: 'Save changes' }));
+    // Sonner renders toasts in a portal at the document root.
+    await waitFor(() =>
+      expect(within(document.body).getByText('Changes saved')).toBeInTheDocument(),
+    );
   },
 };

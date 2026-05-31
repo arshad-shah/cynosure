@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { Badge } from '../../feedback/Badge/Badge.js';
 import { Button } from '../../forms/Button/Button.js';
-import { IconButton } from '../../forms/IconButton/IconButton.js';
 import { SearchInput } from '../../forms/SearchInput/SearchInput.js';
 import { Inline } from '../../primitives/layout/Inline/Inline.js';
 import { Stack } from '../../primitives/layout/Stack/Stack.js';
@@ -159,7 +159,7 @@ const USERS: User[] = [
 ];
 
 const meta: Meta<typeof DataTable> = {
-  title: 'Data Display/DataTable',
+  title: 'Data display/DataTable',
   component: DataTable,
   parameters: { layout: 'padded' },
 };
@@ -305,216 +305,50 @@ export const EmptyState: Story = {
   ),
 };
 
-export const RowClick: Story = {
-  name: 'Row click handler',
+export const Interaction: Story = {
+  name: 'Interaction · sort a column and select a row',
   render: () => {
-    function RowClickDemo(): React.ReactElement {
-      const [lastClicked, setLastClicked] = useState<string | null>(null);
-      const columns = useMemo<ColumnDef<User>[]>(
-        () => [
-          {
-            accessorKey: 'name',
-            header: 'Name',
-            cell: ({ row }) => (
-              <button
-                type="button"
-                onClick={() => setLastClicked(row.original.name)}
-                style={{
-                  background: 'none',
-                  border: 0,
-                  padding: 0,
-                  cursor: 'pointer',
-                  color: 'var(--cynosure-color-accent-solid)',
-                  textDecoration: 'underline',
-                  font: 'inherit',
-                }}
-              >
-                {row.original.name}
-              </button>
-            ),
-          },
-          { accessorKey: 'email', header: 'Email' },
-          { accessorKey: 'role', header: 'Role' },
-        ],
-        [],
-      );
-      return (
-        <Stack gap="3">
-          <Text size="sm" color="fg.muted">
-            Last clicked: <strong>{lastClicked ?? '(none)'}</strong>
-          </Text>
-          <DataTable<User> data={USERS.slice(0, 6)} columns={columns} />
-        </Stack>
-      );
-    }
-    return <RowClickDemo />;
-  },
-};
-
-export const CustomCellRenderers: Story = {
-  name: 'Custom cell renderers',
-  render: () => {
-    const Edit = (): React.ReactElement => (
-      <svg
-        width="14"
-        height="14"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        aria-hidden="true"
-      >
-        <path d="M12 20h9" />
-        <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
-      </svg>
-    );
-    const Trash = (): React.ReactElement => (
-      <svg
-        width="14"
-        height="14"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        aria-hidden="true"
-      >
-        <polyline points="3 6 5 6 21 6" />
-        <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
-      </svg>
-    );
-
-    const columns: ColumnDef<User>[] = [
-      {
-        id: 'avatar',
-        header: '',
-        cell: ({ row }) => {
-          const initials = row.original.name
-            .split(' ')
-            .map((p) => p[0])
-            .join('')
-            .slice(0, 2);
-          return (
-            <span
-              aria-hidden="true"
-              style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: 28,
-                height: 28,
-                borderRadius: '50%',
-                background: 'var(--cynosure-color-accent-muted)',
-                color: 'var(--cynosure-color-accent-solid)',
-                fontSize: 12,
-                fontWeight: 600,
-              }}
-            >
-              {initials}
-            </span>
-          );
-        },
-      },
-      {
-        accessorKey: 'name',
-        header: 'User',
-        cell: ({ row }) => (
-          <Stack gap="0">
-            <Text weight="medium">{row.original.name}</Text>
-            <Text size="sm" color="fg.muted">
-              {row.original.email}
-            </Text>
-          </Stack>
-        ),
-      },
-      {
-        accessorKey: 'role',
-        header: 'Role',
-        cell: ({ row }) => (
-          <Badge variant="soft" size="sm">
-            {row.original.role}
-          </Badge>
-        ),
-      },
-      {
-        accessorKey: 'status',
-        header: 'Status',
-        cell: ({ row }) => (
-          <Badge colorScheme={statusScheme(row.original.status)} size="sm">
-            {row.original.status}
-          </Badge>
-        ),
-      },
-      {
-        id: 'actions',
-        header: '',
-        cell: () => (
-          <Inline gap="1" justify="end">
-            <IconButton icon={<Edit />} label="Edit" size="sm" variant="ghost" />
-            <IconButton
-              icon={<Trash />}
-              label="Delete"
-              size="sm"
-              variant="ghost"
-              colorScheme="danger"
-            />
-          </Inline>
-        ),
-      },
-    ];
-
-    return <DataTable<User> data={USERS.slice(0, 8)} columns={columns} sortable />;
-  },
-};
-
-export const Kitchen: Story = {
-  name: 'All features combined',
-  render: () => {
-    function Kitchen(): React.ReactElement {
-      const [query, setQuery] = useState('');
+    function Demo(): React.ReactElement {
       const [selected, setSelected] = useState<User[]>([]);
       return (
         <Stack gap="3">
-          {selected.length > 0 ? (
-            <Inline
-              gap="3"
-              align="center"
-              justify="between"
-              style={{
-                padding: 'var(--cynosure-space-3)',
-                background: 'var(--cynosure-color-accent-muted)',
-                borderRadius: 'var(--cynosure-radius-md)',
-              }}
-            >
-              <Text weight="medium">{selected.length} selected</Text>
-              <Button size="sm" variant="soft" colorScheme="danger">
-                Remove
-              </Button>
-            </Inline>
-          ) : null}
+          <Text size="sm" color="fg.muted">
+            Selected: <strong>{selected.length}</strong>
+          </Text>
           <DataTable<User>
-            data={USERS}
+            data={USERS.slice(0, 4)}
             columns={baseColumns}
             sortable
             selectable
             onSelectionChange={setSelected}
-            pagination={{ pageSize: 5 }}
-            filter={{ global: query, onGlobalFilterChange: setQuery }}
-            stickyHeader
-            toolbar={
-              <Inline gap="3" align="center" justify="between">
-                <SearchInput
-                  value={query}
-                  onChange={setQuery}
-                  placeholder="Search…"
-                  style={{ maxWidth: 280 }}
-                />
-                <Button size="sm">Invite user</Button>
-              </Inline>
-            }
           />
         </Stack>
       );
     }
-    return <Kitchen />;
+    return <Demo />;
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const nameHeader = canvas.getByRole('button', { name: /Name/ });
+    const headerCell = nameHeader.closest('th');
+    await expect(headerCell).toHaveAttribute('aria-sort', 'none');
+
+    const firstDataCell = () => canvas.getAllByRole('row')[1];
+
+    // First click sorts ascending (Ava … already first), second click descending.
+    await userEvent.click(nameHeader);
+    await expect(headerCell).toHaveAttribute('aria-sort', 'ascending');
+    await userEvent.click(nameHeader);
+    await expect(headerCell).toHaveAttribute('aria-sort', 'descending');
+    await waitFor(() => {
+      // Descending by name puts "Sara Park" at the top of the body.
+      expect(within(firstDataCell()).getByText('Sara Park')).toBeInTheDocument();
+    });
+
+    // Selecting a row checkbox marks it checked and reports the selection up.
+    const rowCheckbox = canvas.getAllByRole('checkbox', { name: 'Select row' })[0];
+    await userEvent.click(rowCheckbox);
+    await expect(rowCheckbox).toBeChecked();
+    await expect(canvas.getByText('Selected:').parentElement).toHaveTextContent('Selected: 1');
   },
 };

@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { Inline } from '../../primitives/layout/Inline/Inline.js';
 import { Stack } from '../../primitives/layout/Stack/Stack.js';
 import { Text } from '../../typography/Text/Text.js';
@@ -11,7 +12,7 @@ import {
   FormLabel,
   FormMessage,
 } from '../Form/index.js';
-import { Select, SelectItem, type SelectItemData, SelectSection } from './Select.js';
+import { Select, SelectItem, type SelectItemData } from './Select.js';
 
 const meta: Meta<typeof Select> = {
   title: 'Forms/Select',
@@ -118,20 +119,30 @@ export const Grouped: Story = {
   ),
 };
 
-export const GroupedWithChildren: Story = {
-  name: 'Grouped via SelectSection children',
+export const Interaction: Story = {
+  name: 'Interaction · open listbox, pick an option',
   render: () => (
-    <Select placeholder="Pick a plan" aria-label="Plan" style={{ width: '280px' }}>
-      <SelectSection title="Personal">
-        <SelectItem id="free">Free</SelectItem>
-        <SelectItem id="pro">Pro</SelectItem>
-      </SelectSection>
-      <SelectSection title="Business">
-        <SelectItem id="team">Team</SelectItem>
-        <SelectItem id="enterprise">Enterprise</SelectItem>
-      </SelectSection>
-    </Select>
+    <Select
+      placeholder="Pick a fruit"
+      items={fruits}
+      aria-label="Fruit"
+      style={{ width: '280px' }}
+    />
   ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const trigger = canvas.getByRole('button', { name: /Pick a fruit/i });
+    await userEvent.click(trigger);
+    // The listbox portals to document.body.
+    const listbox = await within(document.body).findByRole('listbox');
+    await expect(listbox).toBeInTheDocument();
+    // Picking an option closes the popover and updates the trigger label.
+    await userEvent.click(within(document.body).getByRole('option', { name: 'Banana' }));
+    await waitFor(() =>
+      expect(within(document.body).queryByRole('listbox')).not.toBeInTheDocument(),
+    );
+    await expect(trigger).toHaveTextContent('Banana');
+  },
 };
 
 export const Controlled: Story = {
@@ -156,35 +167,6 @@ export const Controlled: Story = {
       );
     }
     return <ControlledDemo />;
-  },
-};
-
-export const Uncontrolled: Story = {
-  render: () => (
-    <Select
-      defaultValue="apple"
-      items={fruits}
-      aria-label="Fruit"
-      placeholder="Pick"
-      style={{ width: '280px' }}
-    />
-  ),
-};
-
-export const LongOptions: Story = {
-  render: () => {
-    const many: ReadonlyArray<SelectItemData> = Array.from({ length: 80 }).map((_, i) => ({
-      value: `option-${i}`,
-      label: `Option ${i + 1} — lorem ipsum dolor sit amet, consectetur`,
-    }));
-    return (
-      <Select
-        placeholder="Pick one of many"
-        items={many}
-        aria-label="Many options"
-        style={{ width: '320px' }}
-      />
-    );
   },
 };
 

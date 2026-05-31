@@ -1,11 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { type ReactElement, useState } from 'react';
+import { expect, userEvent, within } from 'storybook/test';
 import { Inline } from '../../primitives/layout/Inline/Inline.js';
 import { Stack } from '../../primitives/layout/Stack/Stack.js';
-import { Code } from '../../typography/Code/Code.js';
-import { Heading } from '../../typography/Heading/Heading.js';
 import { Text } from '../../typography/Text/Text.js';
-import { paginationRange } from '../shared/paginationRange.js';
 import { Pagination } from './Pagination.js';
 
 const meta: Meta<typeof Pagination> = {
@@ -72,31 +70,6 @@ export const LargeSetWithEllipsis: Story = {
   },
 };
 
-export const BoundaryBehavior: Story = {
-  name: 'Boundary behavior — first & last pages',
-  render: () => {
-    function Demo(): ReactElement {
-      const [page, setPage] = useState(1);
-      return (
-        <Stack gap="4">
-          <Text size="sm" color="fg.muted">
-            Click Prev / Next to watch the window slide along the ends.
-          </Text>
-          <Pagination totalPages={25} currentPage={page} onPageChange={setPage} showFirstLast />
-          <Inline gap="2">
-            {[1, 2, 12, 13, 24, 25].map((p) => (
-              <button key={p} type="button" onClick={() => setPage(p)}>
-                Jump to {p}
-              </button>
-            ))}
-          </Inline>
-        </Stack>
-      );
-    }
-    return <Demo />;
-  },
-};
-
 export const ShowFirstLast: Story = {
   name: 'showFirstLast — extra nav buttons',
   render: () => {
@@ -109,32 +82,6 @@ export const ShowFirstLast: Story = {
           </Text>
           <Pagination totalPages={20} currentPage={page} onPageChange={setPage} showFirstLast />
         </Stack>
-      );
-    }
-    return <Demo />;
-  },
-};
-
-export const CustomLabels: Story = {
-  name: 'Accessible labels — i18n',
-  render: () => {
-    function Demo(): ReactElement {
-      const [page, setPage] = useState(2);
-      return (
-        <Pagination
-          totalPages={10}
-          currentPage={page}
-          onPageChange={setPage}
-          aria-label="Pagination du tableau"
-          labels={{
-            previous: 'Page précédente',
-            next: 'Page suivante',
-            first: 'Première page',
-            last: 'Dernière page',
-            page: (p) => `Aller à la page ${p.toString()}`,
-            current: (p) => `Page ${p.toString()}, page actuelle`,
-          }}
-        />
       );
     }
     return <Demo />;
@@ -169,82 +116,32 @@ export const Controlled: Story = {
   },
 };
 
-export const SinglePage: Story = {
-  name: 'Edge — single page (buttons disabled)',
-  render: () => (
-    <Pagination totalPages={1} currentPage={1} onPageChange={() => undefined} showFirstLast />
-  ),
-};
-
-export const PaginationRangeHelper: Story = {
-  name: 'paginationRange helper',
-  render: () => {
-    const examples = [
-      { total: 5, current: 3, siblingCount: 1, boundaryCount: 1 },
-      { total: 20, current: 1, siblingCount: 1, boundaryCount: 1 },
-      { total: 20, current: 10, siblingCount: 1, boundaryCount: 1 },
-      { total: 20, current: 20, siblingCount: 1, boundaryCount: 1 },
-      { total: 40, current: 15, siblingCount: 2, boundaryCount: 2 },
-      { total: 100, current: 50, siblingCount: 1, boundaryCount: 1 },
-    ];
-    return (
-      <Stack gap="3">
-        <Heading level={4}>paginationRange() examples</Heading>
-        <Text size="sm" color="fg.muted">
-          The helper returns the visible page buttons with <code>'ellipsis-start'</code> and{' '}
-          <code>'ellipsis-end'</code> markers — use it if you want to render the paginator yourself.
-        </Text>
-        <Stack gap="2">
-          {examples.map((ex) => (
-            <Inline
-              key={`${ex.total.toString()}-${ex.current.toString()}-${ex.siblingCount.toString()}-${ex.boundaryCount.toString()}`}
-              gap="3"
-              align="baseline"
-            >
-              <Text size="sm" width="340px">
-                total=<strong>{ex.total}</strong>, current=<strong>{ex.current}</strong>, siblings=
-                {ex.siblingCount}, boundary={ex.boundaryCount}
-              </Text>
-              <Code>
-                [
-                {paginationRange({
-                  totalPages: ex.total,
-                  currentPage: ex.current,
-                  siblingCount: ex.siblingCount,
-                  boundaryCount: ex.boundaryCount,
-                })
-                  .map((item) => (typeof item === 'number' ? item.toString() : `'${item}'`))
-                  .join(', ')}
-                ]
-              </Code>
-            </Inline>
-          ))}
-        </Stack>
-      </Stack>
-    );
-  },
-};
-
-export const TableFooter: Story = {
-  name: 'Use case — table footer paginator',
+export const Interaction: Story = {
+  name: 'Interaction · clicking a page updates aria-current',
   render: () => {
     function Demo(): ReactElement {
-      const pageSize = 10;
-      const total = 137;
-      const [page, setPage] = useState(3);
-      const totalPages = Math.ceil(total / pageSize);
-      const start = (page - 1) * pageSize + 1;
-      const end = Math.min(page * pageSize, total);
-      return (
-        <Inline align="center" justify="between" gap="3">
-          <Text size="sm" color="fg.muted">
-            Showing <strong>{start}</strong>–<strong>{end}</strong> of <strong>{total}</strong>{' '}
-            records
-          </Text>
-          <Pagination totalPages={totalPages} currentPage={page} onPageChange={setPage} size="sm" />
-        </Inline>
-      );
+      const [page, setPage] = useState(1);
+      return <Pagination totalPages={5} currentPage={page} onPageChange={setPage} />;
     }
     return <Demo />;
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const page1 = canvas.getByRole('button', { name: 'Page 1, current page' });
+    await expect(page1).toHaveAttribute('aria-current', 'page');
+
+    await userEvent.click(canvas.getByRole('button', { name: 'Go to page 3' }));
+    const page3 = canvas.getByRole('button', { name: 'Page 3, current page' });
+    await expect(page3).toHaveAttribute('aria-current', 'page');
+    // The previously-current button drops aria-current once page 3 is active.
+    await expect(canvas.getByRole('button', { name: 'Go to page 1' })).not.toHaveAttribute(
+      'aria-current',
+    );
+
+    await userEvent.click(canvas.getByRole('button', { name: 'Next page' }));
+    await expect(canvas.getByRole('button', { name: 'Page 4, current page' })).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
   },
 };

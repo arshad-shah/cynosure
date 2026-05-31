@@ -1,12 +1,11 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { useState } from 'react';
+import { expect, userEvent, within } from 'storybook/test';
 import { Stack } from '../../primitives/layout/Stack/Stack.js';
-import { Text } from '../../typography/Text/Text.js';
 import { Button } from '../Button/Button.js';
 import { ButtonGroup } from './ButtonGroup.js';
 
 const meta: Meta<typeof ButtonGroup> = {
-  title: 'Forms/ButtonGroup',
+  title: 'Buttons/ButtonGroup',
   component: ButtonGroup,
   parameters: { layout: 'padded' },
 };
@@ -62,44 +61,33 @@ export const SharedVariant: Story = {
   ),
 };
 
-export const Segmented: Story = {
-  name: 'Segmented control pattern',
+export const Interaction: Story = {
+  name: 'Interaction · group exposes role and clickable buttons',
   render: () => {
-    function Segmented(): React.ReactElement {
-      const [active, setActive] = useState<'list' | 'grid' | 'board'>('list');
-      return (
-        <Stack gap="2">
-          <ButtonGroup attached variant="outline">
-            {(['list', 'grid', 'board'] as const).map((key) => (
-              <Button
-                key={key}
-                variant={active === key ? 'solid' : 'outline'}
-                onClick={() => setActive(key)}
-                aria-pressed={active === key}
-              >
-                {key}
-              </Button>
-            ))}
-          </ButtonGroup>
-          <Text size="sm" color="fg.muted">
-            Active: <strong>{active}</strong>
-          </Text>
-        </Stack>
-      );
-    }
-    return <Segmented />;
+    let last = '';
+    return (
+      <ButtonGroup aria-label="Clipboard">
+        {['Copy', 'Paste', 'Cut'].map((label) => (
+          <Button
+            key={label}
+            onClick={(e) => {
+              last = label;
+              e.currentTarget.closest('[role="group"]')?.setAttribute('data-last', last);
+            }}
+          >
+            {label}
+          </Button>
+        ))}
+      </ButtonGroup>
+    );
   },
-};
-
-export const Overrides: Story = {
-  name: 'Per-button overrides win over group context',
-  render: () => (
-    <ButtonGroup variant="soft" colorScheme="neutral">
-      <Button>Inherits soft/neutral</Button>
-      <Button colorScheme="success">Overrides color</Button>
-      <Button variant="outline" colorScheme="danger">
-        Overrides both
-      </Button>
-    </ButtonGroup>
-  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const group = canvas.getByRole('group', { name: 'Clipboard' });
+    await expect(group).toBeInTheDocument();
+    await userEvent.click(canvas.getByRole('button', { name: 'Paste' }));
+    await expect(group).toHaveAttribute('data-last', 'Paste');
+    await userEvent.click(canvas.getByRole('button', { name: 'Cut' }));
+    await expect(group).toHaveAttribute('data-last', 'Cut');
+  },
 };

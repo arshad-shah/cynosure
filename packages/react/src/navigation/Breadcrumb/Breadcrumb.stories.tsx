@@ -1,15 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import type { ReactElement } from 'react';
+import { expect, userEvent, within } from 'storybook/test';
 import { Stack } from '../../primitives/layout/Stack/Stack.js';
 import { Text } from '../../typography/Text/Text.js';
-import {
-  Breadcrumb,
-  BreadcrumbEllipsis,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from './Breadcrumb.js';
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbPage } from './Breadcrumb.js';
 
 const meta: Meta<typeof Breadcrumb> = {
   title: 'Navigation/Breadcrumb',
@@ -115,85 +109,14 @@ export const WithIcons: Story = {
   ),
 };
 
-export const CurrentPage: Story = {
-  name: 'Current page vs. link styles',
-  render: () => (
-    <Stack gap="4">
-      <Text size="sm" color="fg.muted">
-        Links remain underlined on hover; the last item uses <code>BreadcrumbPage</code>.
-      </Text>
-      <Breadcrumb>
-        <BreadcrumbItem>
-          <BreadcrumbLink href="/">Dashboard</BreadcrumbLink>
-        </BreadcrumbItem>
-        <BreadcrumbItem>
-          <BreadcrumbLink href="/billing">Billing</BreadcrumbLink>
-        </BreadcrumbItem>
-        <BreadcrumbItem>
-          <BreadcrumbLink href="/billing/invoices">Invoices</BreadcrumbLink>
-        </BreadcrumbItem>
-        <BreadcrumbItem isCurrent>
-          <BreadcrumbPage>Q3 2025</BreadcrumbPage>
-        </BreadcrumbItem>
-      </Breadcrumb>
-    </Stack>
-  ),
-};
-
 export const MaxItemsCollapse: Story = {
   name: 'maxItems — collapse middle items',
   render: () => (
     <Stack gap="4">
       <Text size="sm" color="fg.muted">
-        Without <code>maxItems</code>:
-      </Text>
-      <Breadcrumb>
-        <BreadcrumbItem>
-          <BreadcrumbLink href="/">Home</BreadcrumbLink>
-        </BreadcrumbItem>
-        <BreadcrumbItem>
-          <BreadcrumbLink href="/a">Org</BreadcrumbLink>
-        </BreadcrumbItem>
-        <BreadcrumbItem>
-          <BreadcrumbLink href="/a/b">Team</BreadcrumbLink>
-        </BreadcrumbItem>
-        <BreadcrumbItem>
-          <BreadcrumbLink href="/a/b/c">Projects</BreadcrumbLink>
-        </BreadcrumbItem>
-        <BreadcrumbItem>
-          <BreadcrumbLink href="/a/b/c/d">Storefront</BreadcrumbLink>
-        </BreadcrumbItem>
-        <BreadcrumbItem isCurrent>
-          <BreadcrumbPage>Checkout</BreadcrumbPage>
-        </BreadcrumbItem>
-      </Breadcrumb>
-      <Text size="sm" color="fg.muted">
         With <code>maxItems=&#123;4&#125;</code> — middle items fold into an ellipsis button:
       </Text>
       <Breadcrumb maxItems={4}>
-        <BreadcrumbItem>
-          <BreadcrumbLink href="/">Home</BreadcrumbLink>
-        </BreadcrumbItem>
-        <BreadcrumbItem>
-          <BreadcrumbLink href="/a">Org</BreadcrumbLink>
-        </BreadcrumbItem>
-        <BreadcrumbItem>
-          <BreadcrumbLink href="/a/b">Team</BreadcrumbLink>
-        </BreadcrumbItem>
-        <BreadcrumbItem>
-          <BreadcrumbLink href="/a/b/c">Projects</BreadcrumbLink>
-        </BreadcrumbItem>
-        <BreadcrumbItem>
-          <BreadcrumbLink href="/a/b/c/d">Storefront</BreadcrumbLink>
-        </BreadcrumbItem>
-        <BreadcrumbItem isCurrent>
-          <BreadcrumbPage>Checkout</BreadcrumbPage>
-        </BreadcrumbItem>
-      </Breadcrumb>
-      <Text size="sm" color="fg.muted">
-        <code>itemsBeforeCollapse=&#123;2&#125; itemsAfterCollapse=&#123;1&#125;</code>:
-      </Text>
-      <Breadcrumb maxItems={4} itemsBeforeCollapse={2} itemsAfterCollapse={1}>
         <BreadcrumbItem>
           <BreadcrumbLink href="/">Home</BreadcrumbLink>
         </BreadcrumbItem>
@@ -220,9 +143,6 @@ export const MaxItemsCollapse: Story = {
 export const CustomSeparator: Story = {
   render: () => (
     <Stack gap="4">
-      <Text size="sm" color="fg.muted">
-        Slashes:
-      </Text>
       <Breadcrumb separator={<span aria-hidden>/</span>}>
         <BreadcrumbItem>
           <BreadcrumbLink href="/">Docs</BreadcrumbLink>
@@ -234,23 +154,6 @@ export const CustomSeparator: Story = {
           <BreadcrumbPage>Theming</BreadcrumbPage>
         </BreadcrumbItem>
       </Breadcrumb>
-      <Text size="sm" color="fg.muted">
-        Bullet:
-      </Text>
-      <Breadcrumb separator={<span aria-hidden>•</span>}>
-        <BreadcrumbItem>
-          <BreadcrumbLink href="/">Blog</BreadcrumbLink>
-        </BreadcrumbItem>
-        <BreadcrumbItem>
-          <BreadcrumbLink href="/2026">2026</BreadcrumbLink>
-        </BreadcrumbItem>
-        <BreadcrumbItem isCurrent>
-          <BreadcrumbPage>April</BreadcrumbPage>
-        </BreadcrumbItem>
-      </Breadcrumb>
-      <Text size="sm" color="fg.muted">
-        Arrow:
-      </Text>
       <Breadcrumb separator={<span aria-hidden>→</span>}>
         <BreadcrumbItem>
           <BreadcrumbLink href="/">Shop</BreadcrumbLink>
@@ -266,109 +169,35 @@ export const CustomSeparator: Story = {
   ),
 };
 
-export const CustomCollapsedTrigger: Story = {
-  name: 'renderCollapsed — custom trigger',
+export const Interaction: Story = {
+  name: 'Interaction · links resolve, current page marked',
   render: () => (
-    <Breadcrumb
-      maxItems={3}
-      renderCollapsed={(hidden) => (
-        <BreadcrumbEllipsis label={`Show ${hidden.length.toString()} hidden items`} />
-      )}
-    >
+    <Breadcrumb>
       <BreadcrumbItem>
         <BreadcrumbLink href="/">Home</BreadcrumbLink>
       </BreadcrumbItem>
       <BreadcrumbItem>
-        <BreadcrumbLink href="/docs">Docs</BreadcrumbLink>
-      </BreadcrumbItem>
-      <BreadcrumbItem>
-        <BreadcrumbLink href="/docs/ref">Reference</BreadcrumbLink>
-      </BreadcrumbItem>
-      <BreadcrumbItem>
-        <BreadcrumbLink href="/docs/ref/nav">Navigation</BreadcrumbLink>
+        <BreadcrumbLink href="/library">Library</BreadcrumbLink>
       </BreadcrumbItem>
       <BreadcrumbItem isCurrent>
-        <BreadcrumbPage>Breadcrumb</BreadcrumbPage>
+        <BreadcrumbPage>Data</BreadcrumbPage>
       </BreadcrumbItem>
     </Breadcrumb>
   ),
-};
-
-export const ManualSeparators: Story = {
-  name: 'Manual separators (opt-out of auto-interleave)',
-  render: () => (
-    <Breadcrumb>
-      <BreadcrumbItem>
-        <BreadcrumbLink href="/">Root</BreadcrumbLink>
-      </BreadcrumbItem>
-      <BreadcrumbSeparator>|</BreadcrumbSeparator>
-      <BreadcrumbItem>
-        <BreadcrumbLink href="/assets">Assets</BreadcrumbLink>
-      </BreadcrumbItem>
-      <BreadcrumbSeparator>|</BreadcrumbSeparator>
-      <BreadcrumbItem isCurrent>
-        <BreadcrumbPage>Branding</BreadcrumbPage>
-      </BreadcrumbItem>
-    </Breadcrumb>
-  ),
-};
-
-export const ECommerce: Story = {
-  name: 'Use case — e-commerce trail',
-  render: () => (
-    <Stack gap="3">
-      <Breadcrumb aria-label="Category trail">
-        <BreadcrumbItem>
-          <BreadcrumbLink href="/">
-            <IconHome />
-          </BreadcrumbLink>
-        </BreadcrumbItem>
-        <BreadcrumbItem>
-          <BreadcrumbLink href="/women">Women</BreadcrumbLink>
-        </BreadcrumbItem>
-        <BreadcrumbItem>
-          <BreadcrumbLink href="/women/shoes">Shoes</BreadcrumbLink>
-        </BreadcrumbItem>
-        <BreadcrumbItem>
-          <BreadcrumbLink href="/women/shoes/sneakers">Sneakers</BreadcrumbLink>
-        </BreadcrumbItem>
-        <BreadcrumbItem isCurrent>
-          <BreadcrumbPage>Air Runner 2</BreadcrumbPage>
-        </BreadcrumbItem>
-      </Breadcrumb>
-      <Text size="sm" color="fg.muted">
-        Customers expect the last crumb to match the `&lt;h1&gt;` of the page.
-      </Text>
-    </Stack>
-  ),
-};
-
-export const LongLabels: Story = {
-  name: 'Edge — long labels & deep trail',
-  render: () => (
-    <div style={{ maxWidth: 480 }}>
-      <Breadcrumb maxItems={5}>
-        <BreadcrumbItem>
-          <BreadcrumbLink href="/">Marketing</BreadcrumbLink>
-        </BreadcrumbItem>
-        <BreadcrumbItem>
-          <BreadcrumbLink href="/q3">Q3 Planning Session Notes</BreadcrumbLink>
-        </BreadcrumbItem>
-        <BreadcrumbItem>
-          <BreadcrumbLink href="/q3/field">Field enablement artifacts</BreadcrumbLink>
-        </BreadcrumbItem>
-        <BreadcrumbItem>
-          <BreadcrumbLink href="/q3/field/assets">Design system collaborations</BreadcrumbLink>
-        </BreadcrumbItem>
-        <BreadcrumbItem>
-          <BreadcrumbLink href="/q3/field/assets/ds">
-            Component library migration status
-          </BreadcrumbLink>
-        </BreadcrumbItem>
-        <BreadcrumbItem isCurrent>
-          <BreadcrumbPage>Breadcrumb revamp — RFC draft v2 (open)</BreadcrumbPage>
-        </BreadcrumbItem>
-      </Breadcrumb>
-    </div>
-  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const home = canvas.getByRole('link', { name: 'Home' });
+    const library = canvas.getByRole('link', { name: 'Library' });
+    await expect(home).toHaveAttribute('href', '/');
+    await expect(library).toHaveAttribute('href', '/library');
+    // The current page renders as a non-link element carrying aria-current.
+    const current = canvas.getByText('Data');
+    await expect(current).toHaveAttribute('aria-current', 'page');
+    await expect(canvas.queryByRole('link', { name: 'Data' })).not.toBeInTheDocument();
+    // Intermediate links are keyboard-focusable.
+    await userEvent.tab();
+    await expect(home).toHaveFocus();
+    await userEvent.tab();
+    await expect(library).toHaveFocus();
+  },
 };

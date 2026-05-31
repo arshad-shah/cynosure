@@ -6,7 +6,7 @@ import { Text } from '../../typography/Text/Text.js';
 import { Spinner } from './Spinner.js';
 
 const meta: Meta<typeof Spinner> = {
-  title: 'Data Display/Spinner',
+  title: 'Data display/Spinner',
   component: Spinner,
   parameters: { layout: 'padded' },
   argTypes: {

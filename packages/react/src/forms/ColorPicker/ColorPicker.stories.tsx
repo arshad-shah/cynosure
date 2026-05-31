@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
 import { type Color, parseColor } from 'react-aria-components';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { Inline } from '../../primitives/layout/Inline/Inline.js';
 import { Stack } from '../../primitives/layout/Stack/Stack.js';
 import { Text } from '../../typography/Text/Text.js';
@@ -97,23 +98,25 @@ export const Controlled: Story = {
   },
 };
 
-export const Uncontrolled: Story = {
-  render: () => (
-    <Inline gap="3">
-      <ColorPicker label="Primary" defaultValue="#6366F1" />
-      <ColorPicker label="Secondary" defaultValue="#EC4899" />
-      <ColorPicker label="Tertiary" defaultValue="#10B981" />
-    </Inline>
-  ),
-};
-
-export const StartingFormat: Story = {
-  name: 'Starts on RGB',
-  render: () => (
-    <div style={{ width: 320 }}>
-      <ColorPicker variant="inline" defaultValue="#6366F1" defaultFormat="rgb" />
-    </div>
-  ),
+export const Interaction: Story = {
+  name: 'Interaction · open picker, Escape closes',
+  render: () => <ColorPicker label="Brand colour" defaultValue="#6366F1" />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const trigger = canvas.getByRole('button', { name: 'Brand colour' });
+    await userEvent.click(trigger);
+    // The picker body renders inside a dialog that portals to document.body.
+    const dialog = await within(document.body).findByRole('dialog', { name: 'Color picker' });
+    await expect(dialog).toBeInTheDocument();
+    // The 2D color area exposes slider semantics inside the dialog.
+    await expect(within(dialog).getAllByRole('slider').length).toBeGreaterThan(0);
+    await userEvent.keyboard('{Escape}');
+    await waitFor(() =>
+      expect(
+        within(document.body).queryByRole('dialog', { name: 'Color picker' }),
+      ).not.toBeInTheDocument(),
+    );
+  },
 };
 
 export const Sizes: Story = {
@@ -172,21 +175,5 @@ export const IconOnlyTrigger: Story = {
         label={'{null}'} = icon-only
       </Text>
     </Inline>
-  ),
-};
-
-export const DarkTheme: Story = {
-  name: 'Dark theme check',
-  parameters: { backgrounds: { default: 'dark' }, theme: 'dark' },
-  render: () => (
-    <div data-theme="dark" style={{ padding: 24, background: '#0c0d11', borderRadius: 12 }}>
-      <ColorPicker
-        variant="inline"
-        defaultValue="#8a9bff"
-        alpha
-        swatches={['#8a9bff', '#10b981', '#ff7b63', '#f59e0b', '#a855f7']}
-        onSwatchesChange={() => {}}
-      />
-    </div>
   ),
 };

@@ -1,16 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
+import { expect, userEvent, within } from 'storybook/test';
 import { Stack } from '../../primitives/layout/Stack/Stack.js';
 import { Text } from '../../typography/Text/Text.js';
-import { Fieldset } from '../Fieldset/Fieldset.js';
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormLabel,
-  FormMessage,
-} from '../Form/index.js';
 import { Radio } from '../Radio/Radio.js';
 import { RadioGroup } from './RadioGroup.js';
 
@@ -109,60 +101,37 @@ export const DisabledGroup: Story = {
   ),
 };
 
-export const PartiallyDisabled: Story = {
-  render: () => (
-    <RadioGroup defaultValue="free" aria-label="Plan">
-      <Radio value="free">Free</Radio>
-      <Radio value="pro">Pro</Radio>
-      <Radio value="team" disabled>
-        Team (contact sales)
-      </Radio>
-    </RadioGroup>
-  ),
-};
-
-export const InsideFieldset: Story = {
-  name: 'With <Fieldset> + legend',
-  render: () => (
-    <Fieldset legend="Choose your plan">
-      <RadioGroup defaultValue="pro">
-        {PLANS.map((p) => (
-          <Radio key={p.value} value={p.value}>
-            {p.label}
-          </Radio>
-        ))}
-      </RadioGroup>
-    </Fieldset>
-  ),
-};
-
-export const InsideFormField: Story = {
-  name: 'Composed with FormField',
+export const Interaction: Story = {
+  name: 'Interaction · select changes the group value',
   render: () => {
     function Demo(): React.ReactElement {
-      const [value, setValue] = useState<string>('');
-      const invalid = value === '';
+      const [value, setValue] = useState('free');
       return (
-        <Form>
-          <Stack gap="4" width="360px">
-            <FormField name="plan" invalid={invalid} required>
-              <FormLabel>Plan</FormLabel>
-              <FormControl>
-                <RadioGroup value={value} onValueChange={setValue}>
-                  {PLANS.map((p) => (
-                    <Radio key={p.value} value={p.value}>
-                      {p.label}
-                    </Radio>
-                  ))}
-                </RadioGroup>
-              </FormControl>
-              <FormDescription>You can upgrade later.</FormDescription>
-              <FormMessage>{invalid ? 'Pick a plan to continue.' : undefined}</FormMessage>
-            </FormField>
-          </Stack>
-        </Form>
+        <Stack gap="3">
+          <RadioGroup value={value} onValueChange={setValue} aria-label="Plan">
+            {PLANS.map((p) => (
+              <Radio key={p.value} value={p.value}>
+                {p.label}
+              </Radio>
+            ))}
+          </RadioGroup>
+          <Text size="sm" data-testid="value">
+            {value}
+          </Text>
+        </Stack>
       );
     }
     return <Demo />;
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const out = canvas.getByTestId('value');
+    await expect(out).toHaveTextContent('free');
+    await userEvent.click(canvas.getByRole('radio', { name: 'Pro' }));
+    await expect(out).toHaveTextContent('pro');
+    await expect(canvas.getByRole('radio', { name: 'Pro' })).toHaveAttribute(
+      'aria-checked',
+      'true',
+    );
   },
 };

@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { Inline } from '../../primitives/layout/Inline/Inline.js';
 import { Stack } from '../../primitives/layout/Stack/Stack.js';
 import { Text } from '../../typography/Text/Text.js';
@@ -7,7 +8,7 @@ import type { TreeNode } from './Tree.js';
 import { Tree, treeCollectIds } from './Tree.js';
 
 const meta: Meta<typeof Tree> = {
-  title: 'Data Display/Tree',
+  title: 'Data display/Tree',
   component: Tree,
   parameters: { layout: 'padded' },
 };
@@ -228,148 +229,44 @@ export const WithDisabledNode: Story = {
   ),
 };
 
-export const CustomLabels: Story = {
-  name: 'Custom labels (render prop)',
-  render: () => (
-    <div style={{ maxWidth: 360 }}>
-      <Tree
-        items={FILE_TREE}
-        defaultExpandedIds={['src', 'src/components']}
-        selectionMode="single"
-        aria-label="Files with counts"
-      >
-        {({ item }) => {
-          const count = (item.children as TreeNode[] | undefined)?.length;
-          return (
-            <Inline gap="2" align="center" justify="between" style={{ width: '100%' }}>
-              <Inline gap="2" align="center">
-                {item.children ? <FolderIcon /> : <FileIcon />}
-                <span>{item.label as React.ReactNode}</span>
-              </Inline>
-              {count !== undefined ? (
-                <Text size="xs" color="fg.muted">
-                  {count}
-                </Text>
-              ) : null}
-            </Inline>
-          );
-        }}
-      </Tree>
-    </div>
-  ),
-};
-
-const LARGE_TREE: TreeNode[] = Array.from({ length: 6 }, (_, topIdx) => ({
-  id: `group-${topIdx.toString()}`,
-  label: `Group ${(topIdx + 1).toString()}`,
-  children: Array.from({ length: 4 }, (_, midIdx) => ({
-    id: `group-${topIdx.toString()}-sub-${midIdx.toString()}`,
-    label: `Section ${(topIdx + 1).toString()}.${(midIdx + 1).toString()}`,
-    children: Array.from({ length: 3 }, (_, leafIdx) => ({
-      id: `group-${topIdx.toString()}-sub-${midIdx.toString()}-item-${leafIdx.toString()}`,
-      label: `Item ${(topIdx + 1).toString()}.${(midIdx + 1).toString()}.${(leafIdx + 1).toString()}`,
-    })),
-  })),
-}));
-
-export const LargeTree: Story = {
-  name: 'Large tree (72 nodes)',
-  render: () => (
-    <div style={{ maxWidth: 360, maxHeight: 420, overflow: 'auto' }}>
-      <Tree items={LARGE_TREE} defaultExpandedIds={['group-0']} aria-label="Large tree">
-        {renderFileNode}
-      </Tree>
-    </div>
-  ),
-};
-
-export const DeepNesting: Story = {
-  name: 'Deep nesting',
+export const Interaction: Story = {
+  name: 'Interaction · expand a node, then select it',
   render: () => {
-    const deep = (depth: number, prefix = 'root'): TreeNode => ({
-      id: prefix,
-      label: `Level ${depth.toString()}`,
-      children: depth > 0 ? [deep(depth - 1, `${prefix}/child`)] : undefined,
+    function Demo(): React.ReactElement {
+      const [selected, setSelected] = useState<string[]>([]);
+      return (
+        <div style={{ maxWidth: 360 }}>
+          <Tree
+            items={FILE_TREE}
+            selectionMode="single"
+            selectedIds={selected}
+            onSelectionChange={setSelected}
+            aria-label="Files"
+          >
+            {renderFileNode}
+          </Tree>
+        </div>
+      );
+    }
+    return <Demo />;
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    // "public" starts collapsed, so its children are not rendered.
+    const publicItem = canvas.getByText('public').closest('[role="treeitem"]');
+    await expect(publicItem).toHaveAttribute('aria-expanded', 'false');
+    await expect(canvas.queryByText('favicon.ico')).not.toBeInTheDocument();
+
+    // Clicking the folder row expands it and reveals the children.
+    await userEvent.click(canvas.getByText('public'));
+    await expect(publicItem).toHaveAttribute('aria-expanded', 'true');
+    await waitFor(() => {
+      expect(canvas.getByText('favicon.ico')).toBeInTheDocument();
     });
-    return (
-      <div style={{ maxWidth: 360 }}>
-        <Tree
-          items={[deep(8)]}
-          defaultExpandedIds={treeCollectIds([deep(8)])}
-          aria-label="Deep tree"
-        />
-      </div>
-    );
-  },
-};
 
-interface ApiCollectionItem {
-  uuid: string;
-  name: string;
-  kind: 'collection' | 'request';
-  items?: ApiCollectionItem[];
-}
-
-const API_DATA: ApiCollectionItem[] = [
-  {
-    uuid: 'col-1',
-    name: 'Auth',
-    kind: 'collection',
-    items: [
-      { uuid: 'req-1', name: 'POST /login', kind: 'request' },
-      { uuid: 'req-2', name: 'POST /logout', kind: 'request' },
-    ],
+    // Selecting a leaf marks it aria-selected.
+    await userEvent.click(canvas.getByText('favicon.ico'));
+    const leaf = canvas.getByText('favicon.ico').closest('[role="treeitem"]');
+    await expect(leaf).toHaveAttribute('aria-selected', 'true');
   },
-  {
-    uuid: 'col-2',
-    name: 'Users',
-    kind: 'collection',
-    items: [
-      { uuid: 'req-3', name: 'GET /users', kind: 'request' },
-      {
-        uuid: 'col-3',
-        name: 'Profile',
-        kind: 'collection',
-        items: [{ uuid: 'req-4', name: 'PATCH /users/:id', kind: 'request' }],
-      },
-    ],
-  },
-];
-
-export const CustomDataShape: Story = {
-  name: 'Custom data shape via accessor props',
-  parameters: {
-    docs: {
-      description: {
-        story:
-          'When your data does not match the `{ id, label, children }` shape, point at your own fields with `getId` / `getLabel` / `getChildren` — no remapping required. Useful when consuming an API response that uses different field names (here: `uuid`, `name`, `items`).',
-      },
-    },
-  },
-  render: () => (
-    <div style={{ maxWidth: 360 }}>
-      <Tree<ApiCollectionItem>
-        items={API_DATA}
-        getId={(n) => n.uuid}
-        getLabel={(n) => n.name}
-        getChildren={(n) => n.items}
-        defaultExpandedIds={['col-1', 'col-2']}
-        selectionMode="single"
-        aria-label="API collections"
-      >
-        {({ item, expanded }) => (
-          <Inline gap="2" align="center">
-            <Text size="sm" weight={item.kind === 'collection' ? 'medium' : 'regular'}>
-              {item.name}
-            </Text>
-            {item.kind === 'collection' ? (
-              <Text size="xs" color="fg.muted">
-                {expanded ? '(open)' : '(closed)'}
-              </Text>
-            ) : null}
-          </Inline>
-        )}
-      </Tree>
-    </div>
-  ),
 };

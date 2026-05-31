@@ -1,5 +1,6 @@
 import { vanillaExtractPlugin } from '@vanilla-extract/vite-plugin';
 import react from '@vitejs/plugin-react';
+import { playwright } from '@vitest/browser-playwright';
 import { defineConfig } from 'vitest/config';
 
 /**
@@ -30,7 +31,9 @@ export default defineConfig({
       ? {
           browser: {
             enabled: true,
-            provider: 'playwright',
+            // Vitest 4 takes a provider factory, not the legacy string —
+            // mirrors the root vitest.config.ts storybook project.
+            provider: playwright({}),
             headless: true,
             instances: ciBrowsers.map((browser) => ({ browser })),
           },

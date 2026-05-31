@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { Button } from '../../forms/Button/Button.js';
 import { Inline } from '../../primitives/layout/Inline/Inline.js';
 import { Stack } from '../../primitives/layout/Stack/Stack.js';
@@ -7,7 +8,7 @@ import { Text } from '../../typography/Text/Text.js';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from './Collapsible.js';
 
 const meta: Meta<typeof Collapsible> = {
-  title: 'Data Display/Collapsible',
+  title: 'Data display/Collapsible',
   component: Collapsible,
   parameters: { layout: 'padded' },
 };
@@ -120,74 +121,43 @@ export const WithChevron: Story = {
   },
 };
 
-export const NestedDetails: Story = {
-  name: 'Nested inside a card row',
+export const Interaction: Story = {
+  name: 'Interaction · trigger toggles content visibility',
   render: () => (
-    <div
-      style={{
-        maxWidth: 480,
-        padding: 'var(--cynosure-space-4)',
-        border: '1px solid var(--cynosure-color-border-default)',
-        borderRadius: 'var(--cynosure-radius-md)',
-      }}
-    >
-      <Stack gap="3">
-        <Inline justify="between" align="center">
-          <Stack gap="0">
-            <Text weight="semibold">Beta features</Text>
-            <Text size="sm" color="fg.muted">
-              3 enabled
-            </Text>
-          </Stack>
-          <Collapsible>
-            <CollapsibleTrigger asChild>
-              <Button size="sm" variant="ghost">
-                Manage
-              </Button>
-            </CollapsibleTrigger>
-            <CollapsibleContent />
-          </Collapsible>
-        </Inline>
-        <Collapsible defaultOpen>
-          <CollapsibleContent>
-            <Stack
-              gap="2"
-              style={{
-                paddingTop: 'var(--cynosure-space-2)',
-                borderTop: '1px solid var(--cynosure-color-border-subtle)',
-              }}
-            >
-              <Text size="sm">• AI drafts</Text>
-              <Text size="sm">• Real-time cursors</Text>
-              <Text size="sm">• Offline edits</Text>
-            </Stack>
-          </CollapsibleContent>
-        </Collapsible>
-      </Stack>
-    </div>
-  ),
-};
-
-export const LongContent: Story = {
-  name: 'Edge case — long content',
-  render: () => (
-    <div style={{ maxWidth: 480 }}>
+    <div style={{ maxWidth: 420 }}>
       <Collapsible>
         <CollapsibleTrigger asChild>
-          <Button variant="outline">Read full changelog</Button>
+          <Button variant="outline">Show more</Button>
         </CollapsibleTrigger>
         <CollapsibleContent>
           <Stack gap="2" style={{ paddingTop: 'var(--cynosure-space-3)' }}>
-            {Array.from({ length: 6 }, (_, i) => (
-              <Text key={`p-${i.toString()}`}>
-                v1.{(12 - i).toString()} — bugfixes, performance improvements, and a renewed focus
-                on accessibility across the overlay primitives. This release also lands the new
-                DataTable selection API plus minor polish to Tree keyboard handling.
-              </Text>
-            ))}
+            <Text>Supplementary detail revealed on demand.</Text>
           </Stack>
         </CollapsibleContent>
       </Collapsible>
     </div>
   ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const trigger = canvas.getByRole('button', { name: 'Show more' });
+    await expect(trigger).toHaveAttribute('aria-expanded', 'false');
+    // Content unmounts while closed.
+    await expect(
+      canvas.queryByText('Supplementary detail revealed on demand.'),
+    ).not.toBeInTheDocument();
+
+    await userEvent.click(trigger);
+    await expect(trigger).toHaveAttribute('aria-expanded', 'true');
+    await waitFor(() => {
+      expect(canvas.getByText('Supplementary detail revealed on demand.')).toBeVisible();
+    });
+
+    await userEvent.click(trigger);
+    await expect(trigger).toHaveAttribute('aria-expanded', 'false');
+    await waitFor(() => {
+      expect(
+        canvas.queryByText('Supplementary detail revealed on demand.'),
+      ).not.toBeInTheDocument();
+    });
+  },
 };

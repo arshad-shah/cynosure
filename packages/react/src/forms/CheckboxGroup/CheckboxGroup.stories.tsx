@@ -1,18 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
-import { Inline } from '../../primitives/layout/Inline/Inline.js';
+import { expect, userEvent, within } from 'storybook/test';
 import { Stack } from '../../primitives/layout/Stack/Stack.js';
 import { Text } from '../../typography/Text/Text.js';
 import { Checkbox } from '../Checkbox/Checkbox.js';
-import { Fieldset } from '../Fieldset/Fieldset.js';
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormLabel,
-  FormMessage,
-} from '../Form/index.js';
 import { CheckboxGroup } from './CheckboxGroup.js';
 
 const meta: Meta<typeof CheckboxGroup> = {
@@ -91,20 +82,6 @@ export const Controlled: Story = {
   },
 };
 
-export const HorizontalLayout: Story = {
-  render: () => (
-    <CheckboxGroup defaultValue={['en']} aria-label="Languages">
-      <Inline gap="4">
-        {LANGUAGES.map((l) => (
-          <Checkbox key={l.value} value={l.value}>
-            {l.label}
-          </Checkbox>
-        ))}
-      </Inline>
-    </CheckboxGroup>
-  ),
-};
-
 export const DisabledGroup: Story = {
   render: () => (
     <CheckboxGroup defaultValue={['en']} disabled aria-label="Languages">
@@ -119,67 +96,42 @@ export const DisabledGroup: Story = {
   ),
 };
 
-export const IndividuallyDisabled: Story = {
-  render: () => (
-    <CheckboxGroup defaultValue={['fr']} aria-label="Languages">
-      <Stack gap="2">
-        <Checkbox value="en">English</Checkbox>
-        <Checkbox value="fr">French</Checkbox>
-        <Checkbox value="de" disabled>
-          German (unavailable)
-        </Checkbox>
-        <Checkbox value="es">Spanish</Checkbox>
-      </Stack>
-    </CheckboxGroup>
-  ),
-};
-
-export const InsideFieldset: Story = {
-  name: 'With <Fieldset> + legend',
-  render: () => (
-    <Fieldset legend="Pick your languages">
-      <CheckboxGroup defaultValue={['en']}>
-        <Stack gap="2">
-          {LANGUAGES.map((l) => (
-            <Checkbox key={l.value} value={l.value}>
-              {l.label}
-            </Checkbox>
-          ))}
-        </Stack>
-      </CheckboxGroup>
-    </Fieldset>
-  ),
-};
-
-export const InsideFormField: Story = {
-  name: 'Composed with FormField',
+export const Interaction: Story = {
+  name: 'Interaction · toggling a box changes the group value',
   render: () => {
     function Demo(): React.ReactElement {
-      const [value, setValue] = useState<string[]>([]);
-      const invalid = value.length === 0;
+      const [value, setValue] = useState<string[]>(['en']);
       return (
-        <Form>
-          <Stack gap="4" width="360px">
-            <FormField name="langs" invalid={invalid} required>
-              <FormLabel>Languages you speak</FormLabel>
-              <FormControl>
-                <CheckboxGroup value={value} onChange={setValue}>
-                  <Stack gap="2">
-                    {LANGUAGES.map((l) => (
-                      <Checkbox key={l.value} value={l.value}>
-                        {l.label}
-                      </Checkbox>
-                    ))}
-                  </Stack>
-                </CheckboxGroup>
-              </FormControl>
-              <FormDescription>Pick one or more.</FormDescription>
-              <FormMessage>{invalid ? 'Pick at least one language.' : undefined}</FormMessage>
-            </FormField>
-          </Stack>
-        </Form>
+        <Stack gap="3">
+          <CheckboxGroup value={value} onChange={setValue} aria-label="Languages">
+            <Stack gap="2">
+              {LANGUAGES.map((l) => (
+                <Checkbox key={l.value} value={l.value}>
+                  {l.label}
+                </Checkbox>
+              ))}
+            </Stack>
+          </CheckboxGroup>
+          <Text size="sm" data-testid="value">
+            {value.join(',')}
+          </Text>
+        </Stack>
       );
     }
     return <Demo />;
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const out = canvas.getByTestId('value');
+    await expect(out).toHaveTextContent('en');
+    // English starts checked; French does not.
+    const [english, french] = canvas.getAllByRole('checkbox');
+    await expect(english).toHaveAttribute('data-state', 'checked');
+    await expect(french).toHaveAttribute('data-state', 'unchecked');
+    await userEvent.click(french);
+    await expect(french).toHaveAttribute('data-state', 'checked');
+    await expect(out).toHaveTextContent('en,fr');
+    await userEvent.click(english);
+    await expect(out).toHaveTextContent('fr');
   },
 };

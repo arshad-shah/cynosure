@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import { expect, within } from 'storybook/test';
 import { Stack } from '../../primitives/layout/Stack/Stack.js';
 import { Text } from '../../typography/Text/Text.js';
 import { Callout, CalloutContent, CalloutTitle } from './Callout.js';
@@ -36,24 +37,6 @@ const IconInfo = (): React.ReactElement => (
   </svg>
 );
 
-const IconBulb = (): React.ReactElement => (
-  <svg
-    aria-hidden="true"
-    width="1em"
-    height="1em"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="1.75"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <path d="M9 18h6" />
-    <path d="M10 22h4" />
-    <path d="M12 2a7 7 0 0 0-4 12.7c.8.8 1.2 1.5 1.2 2.3V18h5.6v-1c0-.8.4-1.5 1.2-2.3A7 7 0 0 0 12 2Z" />
-  </svg>
-);
-
 const COLOR_SCHEMES = ['accent', 'neutral', 'success', 'warning', 'danger'] as const;
 
 export const Playground: Story = {
@@ -70,32 +53,6 @@ export const Playground: Story = {
         </Text>
       </CalloutContent>
     </Callout>
-  ),
-};
-
-export const InlineInProse: Story = {
-  name: 'Inline in prose — as you would use it in MDX',
-  render: () => (
-    <div style={{ maxWidth: 640 }}>
-      <Text as="p">
-        Cynosure UI is a themable component system built on vanilla-extract. It ships accessible
-        primitives for forms, feedback, navigation, and overlays. Tokens are mirrored in CSS custom
-        properties so you can mix it with plain CSS freely.
-      </Text>
-      <Callout colorScheme="accent" icon={<IconBulb />}>
-        <CalloutTitle>Tip</CalloutTitle>
-        <CalloutContent>
-          <Text size="sm">
-            Reach for <code>Callout</code> inside documentation or MDX — for UI surfaces use
-            <code> Alert</code> instead.
-          </Text>
-        </CalloutContent>
-      </Callout>
-      <Text as="p">
-        Every component forwards refs, accepts <code>className</code>, and spreads native props.
-        Composition is preferred over magic props.
-      </Text>
-    </div>
   ),
 };
 
@@ -151,33 +108,23 @@ export const NoIcon: Story = {
   ),
 };
 
-export const TitleOnly: Story = {
-  name: 'Edge case — title only, no content',
+export const Interaction: Story = {
+  name: 'Interaction · renders title, body, and color scheme',
   render: () => (
-    <Stack gap="3" width="520px">
-      <Callout colorScheme="success" icon={<IconInfo />}>
-        <CalloutTitle>All systems operational.</CalloutTitle>
-      </Callout>
-      <Callout colorScheme="warning" variant="outline" icon={<IconInfo />}>
-        <CalloutTitle>Remember to save before you close this tab.</CalloutTitle>
-      </Callout>
-    </Stack>
-  ),
-};
-
-export const LongContent: Story = {
-  name: 'Edge case — long prose wraps',
-  render: () => (
-    <Callout colorScheme="accent" icon={<IconBulb />} style={{ maxWidth: 640 }}>
-      <CalloutTitle>Why vanilla-extract?</CalloutTitle>
+    <Callout colorScheme="success" icon={<IconInfo />} data-testid="callout">
+      <CalloutTitle>All systems operational</CalloutTitle>
       <CalloutContent>
-        <Text size="sm">
-          vanilla-extract gives us the ergonomics of CSS-in-JS at build time — zero runtime
-          overhead, atomic CSS extraction, full IDE support, and complete type safety from token to
-          selector. It plays nicely with SSR, streams cleanly, and scales to a system of hundreds of
-          primitives without the usual runtime tax.
-        </Text>
+        <Text size="sm">Everything is running smoothly.</Text>
       </CalloutContent>
     </Callout>
   ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const callout = canvas.getByTestId('callout');
+    // Callout is a passive surface — it exposes its semantic palette rather
+    // than a live-region role (use Alert for announcements).
+    await expect(callout).toHaveAttribute('data-color-scheme', 'success');
+    await expect(canvas.getByText('All systems operational')).toBeInTheDocument();
+    await expect(canvas.getByText('Everything is running smoothly.')).toBeInTheDocument();
+  },
 };

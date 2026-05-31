@@ -1,8 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
+import { expect, userEvent, within } from 'storybook/test';
 import { Inline } from '../../primitives/layout/Inline/Inline.js';
-import { Stack } from '../../primitives/layout/Stack/Stack.js';
-import { Text } from '../../typography/Text/Text.js';
 import { Chip } from './Chip.js';
 
 const meta: Meta<typeof Chip> = {
@@ -80,91 +79,6 @@ export const Playground: Story = {
   },
 };
 
-export const BasicToggle: Story = {
-  name: 'Basic toggle — uncontrolled selected state',
-  render: () => {
-    function Demo(): React.ReactElement {
-      const [selected, setSelected] = useState(false);
-      return (
-        <Stack gap="3">
-          <Chip
-            selected={selected}
-            onSelectedChange={setSelected}
-            colorScheme="accent"
-            variant={selected ? 'solid' : 'soft'}
-            leftIcon={selected ? <IconCheck /> : null}
-          >
-            {selected ? 'Selected' : 'Select me'}
-          </Chip>
-          <Text size="sm" color="fg.muted">
-            aria-pressed = <code>{String(selected)}</code>
-          </Text>
-        </Stack>
-      );
-    }
-    return <Demo />;
-  },
-};
-
-export const FilterGroup: Story = {
-  name: 'Filter chip group — multi-select filter',
-  render: () => {
-    type Filter = 'design' | 'eng' | 'marketing' | 'sales' | 'ops';
-    function Demo(): React.ReactElement {
-      const [selected, setSelected] = useState<Set<Filter>>(new Set(['eng']));
-      const toggle = (key: Filter): void => {
-        setSelected((prev) => {
-          const next = new Set(prev);
-          if (next.has(key)) {
-            next.delete(key);
-          } else {
-            next.add(key);
-          }
-          return next;
-        });
-      };
-      const options: { value: Filter; label: string }[] = [
-        { value: 'design', label: 'Design' },
-        { value: 'eng', label: 'Engineering' },
-        { value: 'marketing', label: 'Marketing' },
-        { value: 'sales', label: 'Sales' },
-        { value: 'ops', label: 'Operations' },
-      ];
-      return (
-        <Stack gap="3">
-          <Inline gap="2" align="center">
-            <IconFilter />
-            <Text weight="medium">Teams</Text>
-          </Inline>
-          <Inline gap="2" wrap>
-            {options.map((opt) => {
-              const isOn = selected.has(opt.value);
-              return (
-                <Chip
-                  key={opt.value}
-                  selected={isOn}
-                  onSelectedChange={() => toggle(opt.value)}
-                  variant={isOn ? 'solid' : 'outline'}
-                  colorScheme={isOn ? 'accent' : 'neutral'}
-                  leftIcon={isOn ? <IconCheck /> : null}
-                >
-                  {opt.label}
-                </Chip>
-              );
-            })}
-          </Inline>
-          <Text size="sm" color="fg.muted">
-            {selected.size
-              ? `Filtering by: ${Array.from(selected).join(', ')}`
-              : 'No filters applied.'}
-          </Text>
-        </Stack>
-      );
-    }
-    return <Demo />;
-  },
-};
-
 export const WithIcons: Story = {
   name: 'With leftIcon / rightIcon',
   render: () => (
@@ -180,46 +94,6 @@ export const WithIcons: Story = {
       </Chip>
     </Inline>
   ),
-};
-
-export const Removable: Story = {
-  name: 'Removable — chip with onRemove also supports onSelectedChange',
-  render: () => {
-    type Item = { id: string; label: string; selected: boolean };
-    function Demo(): React.ReactElement {
-      const [items, setItems] = useState<Item[]>([
-        { id: '1', label: 'React', selected: true },
-        { id: '2', label: 'TypeScript', selected: false },
-        { id: '3', label: 'Storybook', selected: false },
-        { id: '4', label: 'vanilla-extract', selected: false },
-      ]);
-      return (
-        <Stack gap="3">
-          <Inline gap="2" wrap>
-            {items.map((item) => (
-              <Chip
-                key={item.id}
-                selected={item.selected}
-                onSelectedChange={(sel) =>
-                  setItems((xs) => xs.map((x) => (x.id === item.id ? { ...x, selected: sel } : x)))
-                }
-                onRemove={() => setItems((xs) => xs.filter((x) => x.id !== item.id))}
-                variant={item.selected ? 'solid' : 'soft'}
-                colorScheme={item.selected ? 'accent' : 'neutral'}
-                leftIcon={item.selected ? <IconCheck /> : null}
-              >
-                {item.label}
-              </Chip>
-            ))}
-          </Inline>
-          <Text size="sm" color="fg.muted">
-            Click the chip to toggle; click the × to remove it.
-          </Text>
-        </Stack>
-      );
-    }
-    return <Demo />;
-  },
 };
 
 export const Sizes: Story = {
@@ -257,4 +131,37 @@ export const Disabled: Story = {
       </Chip>
     </Inline>
   ),
+};
+
+export const Interaction: Story = {
+  name: 'Interaction · toggle pressed and remove fires',
+  render: () => {
+    function Demo(): React.ReactElement {
+      const [selected, setSelected] = useState(false);
+      const [open, setOpen] = useState(true);
+      if (!open) return <span>Removed</span>;
+      return (
+        <Chip
+          selected={selected}
+          onSelectedChange={setSelected}
+          onRemove={() => setOpen(false)}
+          colorScheme="accent"
+        >
+          React
+        </Chip>
+      );
+    }
+    return <Demo />;
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    // Removable chip splits into a main toggle button + a remove button.
+    const toggle = canvas.getByRole('button', { name: 'React' });
+    await expect(toggle).toHaveAttribute('aria-pressed', 'false');
+    await userEvent.click(toggle);
+    await expect(toggle).toHaveAttribute('aria-pressed', 'true');
+    await userEvent.click(canvas.getByRole('button', { name: 'Remove React' }));
+    await expect(canvas.queryByRole('button', { name: 'React' })).not.toBeInTheDocument();
+    await expect(canvas.getByText('Removed')).toBeInTheDocument();
+  },
 };

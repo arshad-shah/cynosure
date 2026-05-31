@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { Inline } from '../../primitives/layout/Inline/Inline.js';
 import { Stack } from '../../primitives/layout/Stack/Stack.js';
 import { Text } from '../../typography/Text/Text.js';
@@ -149,49 +150,30 @@ export const Controlled: Story = {
   },
 };
 
-export const AsyncOptions: Story = {
-  name: 'Async loading options',
-  render: () => {
-    function AsyncDemo(): React.ReactElement {
-      const [input, setInput] = useState('');
-      const [items, setItems] = useState<ReadonlyArray<ComboboxItemData>>([]);
-      const [loading, setLoading] = useState(false);
-
-      useEffect(() => {
-        let cancelled = false;
-        setLoading(true);
-        const timer = setTimeout(() => {
-          if (cancelled) return;
-          const filter = input.trim().toLowerCase();
-          const next = frameworks.filter((f) =>
-            filter === '' ? true : String(f.label).toLowerCase().includes(filter),
-          );
-          setItems(next);
-          setLoading(false);
-        }, 400);
-        return () => {
-          cancelled = true;
-          clearTimeout(timer);
-        };
-      }, [input]);
-
-      return (
-        <Stack gap="3" width="320px">
-          <Combobox
-            inputValue={input}
-            onInputChange={setInput}
-            items={items}
-            placeholder="Search (simulated network)…"
-            aria-label="Async"
-            emptyState={<ComboboxEmpty>{loading ? 'Loading…' : 'No matches'}</ComboboxEmpty>}
-          />
-          <Text size="sm" color="fg.muted">
-            Debounced 400 ms; results: <strong>{items.length}</strong>
-          </Text>
-        </Stack>
-      );
-    }
-    return <AsyncDemo />;
+export const Interaction: Story = {
+  name: 'Interaction · type to filter, pick an option',
+  render: () => (
+    <Combobox
+      items={frameworks}
+      placeholder="Search frameworks…"
+      aria-label="Framework"
+      style={{ width: '320px' }}
+    />
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const input = canvas.getByRole('combobox', { name: 'Framework' });
+    // Typing opens and filters the listbox (portals to document.body).
+    await userEvent.type(input, 'Sv');
+    const listbox = await within(document.body).findByRole('listbox');
+    await expect(listbox).toBeInTheDocument();
+    const option = within(document.body).getByRole('option', { name: 'Svelte' });
+    await userEvent.click(option);
+    // Selection commits to the input and closes the listbox.
+    await expect(input).toHaveValue('Svelte');
+    await waitFor(() =>
+      expect(within(document.body).queryByRole('listbox')).not.toBeInTheDocument(),
+    );
   },
 };
 
@@ -213,23 +195,6 @@ export const JSXChildren: Story = {
       </ComboboxItem>
     </Combobox>
   ),
-};
-
-export const ManyOptions: Story = {
-  render: () => {
-    const many: ReadonlyArray<ComboboxItemData> = Array.from({ length: 120 }).map((_, i) => ({
-      value: `item-${i}`,
-      label: `Item ${i + 1}`,
-    }));
-    return (
-      <Combobox
-        items={many}
-        placeholder="Search 120 items…"
-        aria-label="Many"
-        style={{ width: '320px' }}
-      />
-    );
-  },
 };
 
 export const InsideFormField: Story = {

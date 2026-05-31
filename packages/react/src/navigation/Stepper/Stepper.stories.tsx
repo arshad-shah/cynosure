@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { type ReactElement, useState } from 'react';
+import { expect, userEvent, within } from 'storybook/test';
 import { Button } from '../../forms/Button/Button.js';
 import { Inline } from '../../primitives/layout/Inline/Inline.js';
 import { Stack } from '../../primitives/layout/Stack/Stack.js';
@@ -145,17 +146,6 @@ export const Vertical: Story = {
   ),
 };
 
-export const WithDescriptions: Story = {
-  render: () => (
-    <Stepper currentStep={1}>
-      <Step title="Choose plan" description="Free, Pro, or Enterprise" />
-      <Step title="Add payment" description="Card or invoice" />
-      <Step title="Invite teammates" description="Up to 5 on Pro" />
-      <Step title="All set!" description="You're ready to go" />
-    </Stepper>
-  ),
-};
-
 export const Interactive: Story = {
   name: 'Interactive — click to jump back',
   render: () => {
@@ -233,85 +223,32 @@ export const Interactive: Story = {
   },
 };
 
-export const IconsVariant: Story = {
-  name: 'Icons — custom marker per step',
-  render: () => (
-    <Stepper currentStep={1} variant="icons">
-      <Step title="Cart" icon={<IconCart />} description="3 items" />
-      <Step title="Payment" icon={<IconCard />} description="Visa ••• 4242" />
-      <Step title="Done" icon={<IconCheck />} description="Order placed" />
-    </Stepper>
-  ),
-};
-
-export const CheckoutUseCase: Story = {
-  name: 'Use case — multi-step form',
+export const Interaction: Story = {
+  name: 'Interaction · click a completed step to jump back',
   render: () => {
     function Demo(): ReactElement {
-      const [step, setStep] = useState(0);
-      const steps = ['Details', 'Address', 'Payment', 'Review'];
+      const [step, setStep] = useState(2);
+      const steps = ['Cart', 'Shipping', 'Payment', 'Review'];
       return (
-        <Stack gap="4">
-          <Stepper currentStep={step} interactive onStepChange={setStep}>
-            {steps.map((s) => (
-              <Step key={s} title={s} />
-            ))}
-          </Stepper>
-          <div
-            style={{
-              minHeight: 120,
-              padding: 16,
-              border: '1px solid var(--cynosure-color-border-subtle, #e5e7eb)',
-              borderRadius: 8,
-            }}
-          >
-            <Text size="lg" weight="semibold">
-              {steps[step]}
-            </Text>
-            <Text color="fg.muted">Form fields for "{steps[step]}" would go here.</Text>
-          </div>
-          <Inline gap="2" justify="end">
-            <Button
-              variant="outline"
-              onClick={() => setStep((s) => Math.max(0, s - 1))}
-              disabled={step === 0}
-            >
-              Back
-            </Button>
-            <Button
-              onClick={() => setStep((s) => Math.min(steps.length - 1, s + 1))}
-              disabled={step === steps.length - 1}
-            >
-              {step === steps.length - 1 ? 'Submit' : 'Continue'}
-            </Button>
-          </Inline>
-        </Stack>
+        <Stepper currentStep={step} interactive onStepChange={setStep}>
+          {steps.map((s) => (
+            <Step key={s} title={s} />
+          ))}
+        </Stepper>
       );
     }
     return <Demo />;
   },
-};
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    // Step 3 (Payment) starts active.
+    const payment = canvas.getByText('Payment').closest('li');
+    await expect(payment).toHaveAttribute('aria-current', 'step');
 
-export const LongLabels: Story = {
-  name: 'Edge — long labels, vertical stepper',
-  render: () => (
-    <div style={{ maxWidth: 360 }}>
-      <Stepper currentStep={2} orientation="vertical">
-        <Step
-          title="Initial consultation call"
-          description="Understand the goals and validate the scope"
-        />
-        <Step
-          title="Contract, statement of work, and kick-off logistics"
-          description="Legal review + finance approval"
-          status="complete"
-        />
-        <Step
-          title="Discovery phase — stakeholder interviews"
-          description="Three two-week cycles with design critiques at the end of each"
-        />
-        <Step title="Pilot rollout across the initial cohort" />
-      </Stepper>
-    </div>
-  ),
+    // Completed steps are rendered as buttons; click "Cart" to jump back.
+    await userEvent.click(canvas.getByRole('button', { name: 'Cart' }));
+    const cart = canvas.getByText('Cart').closest('li');
+    await expect(cart).toHaveAttribute('aria-current', 'step');
+    await expect(payment).not.toHaveAttribute('aria-current');
+  },
 };

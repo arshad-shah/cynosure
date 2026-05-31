@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { Stack } from '../../primitives/layout/Stack/Stack.js';
-import { Heading } from '../../typography/Heading/Heading.js';
 import { Text } from '../../typography/Text/Text.js';
 import {
   MenuBar,
@@ -190,62 +190,6 @@ export const SimpleMenus: Story = {
   ),
 };
 
-export const DisabledItems: Story = {
-  render: () => (
-    <MenuBar>
-      <MenuBarMenu>
-        <MenuBarTrigger>Edit</MenuBarTrigger>
-        <MenuBarContent>
-          <MenuBarItem>Undo</MenuBarItem>
-          <MenuBarItem disabled>Redo</MenuBarItem>
-          <MenuBarSeparator />
-          <MenuBarItem>Cut</MenuBarItem>
-          <MenuBarItem>Copy</MenuBarItem>
-          <MenuBarItem disabled>Paste (clipboard empty)</MenuBarItem>
-        </MenuBarContent>
-      </MenuBarMenu>
-    </MenuBar>
-  ),
-};
-
-export const KeyboardNavigation: Story = {
-  name: 'Keyboard navigation',
-  render: () => (
-    <Stack gap="3">
-      <Heading level={3} size="md">
-        Keyboard support
-      </Heading>
-      <Text size="sm" color="fg.muted">
-        Focus the menubar with <kbd>Tab</kbd>, then use <kbd>←</kbd>/<kbd>→</kbd> to switch menus
-        and <kbd>↓</kbd> to open.
-      </Text>
-      <MenuBar>
-        <MenuBarMenu>
-          <MenuBarTrigger>One</MenuBarTrigger>
-          <MenuBarContent>
-            <MenuBarItem>Item A</MenuBarItem>
-            <MenuBarItem>Item B</MenuBarItem>
-          </MenuBarContent>
-        </MenuBarMenu>
-        <MenuBarMenu>
-          <MenuBarTrigger>Two</MenuBarTrigger>
-          <MenuBarContent>
-            <MenuBarItem>Item C</MenuBarItem>
-            <MenuBarItem>Item D</MenuBarItem>
-          </MenuBarContent>
-        </MenuBarMenu>
-        <MenuBarMenu>
-          <MenuBarTrigger>Three</MenuBarTrigger>
-          <MenuBarContent>
-            <MenuBarItem>Item E</MenuBarItem>
-            <MenuBarItem>Item F</MenuBarItem>
-          </MenuBarContent>
-        </MenuBarMenu>
-      </MenuBar>
-    </Stack>
-  ),
-};
-
 export const NestedSubmenus: Story = {
   render: () => (
     <MenuBar>
@@ -281,21 +225,40 @@ export const NestedSubmenus: Story = {
   ),
 };
 
-export const Destructive: Story = {
+export const Interaction: Story = {
+  name: 'Interaction · click opens a menu, arrow switches, Escape closes',
   render: () => (
     <MenuBar>
       <MenuBarMenu>
-        <MenuBarTrigger>Project</MenuBarTrigger>
+        <MenuBarTrigger>File</MenuBarTrigger>
         <MenuBarContent>
-          <MenuBarItem>Rename</MenuBarItem>
-          <MenuBarItem>Archive</MenuBarItem>
-          <MenuBarSeparator />
-          <MenuBarItem variant="danger">
-            Delete project
-            <MenuBarShortcut>⇧⌫</MenuBarShortcut>
-          </MenuBarItem>
+          <MenuBarItem>New file</MenuBarItem>
+          <MenuBarItem>Open…</MenuBarItem>
+        </MenuBarContent>
+      </MenuBarMenu>
+      <MenuBarMenu>
+        <MenuBarTrigger>Edit</MenuBarTrigger>
+        <MenuBarContent>
+          <MenuBarItem>Undo</MenuBarItem>
+          <MenuBarItem>Redo</MenuBarItem>
         </MenuBarContent>
       </MenuBarMenu>
     </MenuBar>
   ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const fileTrigger = canvas.getByRole('menuitem', { name: 'File' });
+    await expect(fileTrigger).toHaveAttribute('aria-expanded', 'false');
+    await userEvent.click(fileTrigger);
+    await expect(fileTrigger).toHaveAttribute('aria-expanded', 'true');
+    // The opened menu portals to document.body with its own items.
+    const menu = await within(document.body).findByRole('menu');
+    await expect(within(menu).getByRole('menuitem', { name: 'New file' })).toBeInTheDocument();
+    // ArrowRight moves to the next top-level menu and opens it.
+    await userEvent.keyboard('{ArrowRight}');
+    const editTrigger = canvas.getByRole('menuitem', { name: 'Edit' });
+    await waitFor(() => expect(editTrigger).toHaveAttribute('aria-expanded', 'true'));
+    await userEvent.keyboard('{Escape}');
+    await waitFor(() => expect(within(document.body).queryByRole('menu')).not.toBeInTheDocument());
+  },
 };

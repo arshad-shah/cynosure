@@ -17,7 +17,7 @@ import {
 } from './Card.js';
 
 const meta: Meta<typeof Card> = {
-  title: 'Data Display/Card',
+  title: 'Data display/Card',
   component: Card,
   parameters: { layout: 'padded' },
   argTypes: {

@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { useState } from 'react';
+import { expect, userEvent, within } from 'storybook/test';
 import { Stack } from '../../primitives/layout/Stack/Stack.js';
-import { Text } from '../../typography/Text/Text.js';
 import { Slider, type SliderMark } from './Slider.js';
 
 const meta: Meta<typeof Slider> = {
@@ -52,38 +51,6 @@ export const States: Story = {
   ),
 };
 
-export const StepAndRange: Story = {
-  name: 'Custom min / max / step',
-  render: () => (
-    <Stack gap="4" width="360px">
-      <Slider
-        label="0 → 1 (step 0.01)"
-        minValue={0}
-        maxValue={1}
-        step={0.01}
-        defaultValue={0.4}
-        showValue
-      />
-      <Slider
-        label="0 → 10 (step 1)"
-        minValue={0}
-        maxValue={10}
-        step={1}
-        defaultValue={3}
-        showValue
-      />
-      <Slider
-        label="-100 → 100 (step 10)"
-        minValue={-100}
-        maxValue={100}
-        step={10}
-        defaultValue={0}
-        showValue
-      />
-    </Stack>
-  ),
-};
-
 export const WithMarks: Story = {
   render: () => {
     const marks: ReadonlyArray<SliderMark> = [
@@ -127,50 +94,22 @@ export const FormattedValue: Story = {
   ),
 };
 
-export const Controlled: Story = {
-  render: () => {
-    function ControlledDemo(): React.ReactElement {
-      const [value, setValue] = useState<number>(25);
-      return (
-        <Stack gap="3" width="360px">
-          <Slider
-            label="Opacity"
-            minValue={0}
-            maxValue={100}
-            value={value}
-            onChange={(next) => setValue(next as number)}
-            showValue
-          />
-          <Text size="sm" color="fg.muted">
-            Controlled value: <strong>{value}</strong>
-          </Text>
-        </Stack>
-      );
-    }
-    return <ControlledDemo />;
+export const Interaction: Story = {
+  name: 'Interaction · arrow keys change aria-valuenow',
+  render: () => (
+    <div style={{ width: '360px' }}>
+      <Slider label="Volume" defaultValue={40} showValue />
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const thumb = canvas.getByRole('slider');
+    await expect(thumb).toHaveAttribute('aria-valuenow', '40');
+    thumb.focus();
+    await expect(thumb).toHaveFocus();
+    await userEvent.keyboard('{ArrowRight}');
+    await expect(thumb).toHaveAttribute('aria-valuenow', '41');
+    await userEvent.keyboard('{ArrowLeft}{ArrowLeft}');
+    await expect(thumb).toHaveAttribute('aria-valuenow', '39');
   },
-};
-
-export const Uncontrolled: Story = {
-  render: () => (
-    <div style={{ width: '360px' }}>
-      <Slider label="Uncontrolled" defaultValue={55} showValue />
-    </div>
-  ),
-};
-
-export const Vertical: Story = {
-  render: () => (
-    <div style={{ height: '220px' }}>
-      <Slider label="Vertical" orientation="vertical" defaultValue={40} showValue />
-    </div>
-  ),
-};
-
-export const TooltipOnly: Story = {
-  render: () => (
-    <div style={{ width: '360px' }}>
-      <Slider label="Drag the thumb" defaultValue={60} showValue="tooltip" />
-    </div>
-  ),
 };

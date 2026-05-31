@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { Bold, Code as CodeIcon, Italic, Link2, Paperclip, Send } from 'lucide-react';
+import { Bold, Code as CodeIcon, Italic, Link2, Paperclip } from 'lucide-react';
 import { useState } from 'react';
+import { expect, userEvent, within } from 'storybook/test';
 import { Stack } from '../../primitives/layout/Stack/Stack.js';
 import { Text } from '../../typography/Text/Text.js';
 import {
@@ -13,13 +14,6 @@ import {
 } from '../Form/index.js';
 import { IconButton } from '../IconButton/IconButton.js';
 import { Textarea } from './Textarea.js';
-import { TextareaActions } from './TextareaActions.js';
-import { TextareaClearButton } from './TextareaClearButton.js';
-import { TextareaCounter } from './TextareaCounter.js';
-import { TextareaField } from './TextareaField.js';
-import { TextareaFooter } from './TextareaFooter.js';
-import { TextareaResizeHandle } from './TextareaResizeHandle.js';
-import { TextareaRoot } from './TextareaRoot.js';
 
 const meta: Meta<typeof Textarea> = {
   title: 'Forms/Textarea',
@@ -195,28 +189,6 @@ export const ResizeAxes: Story = {
   ),
 };
 
-export const AutoResize: Story = {
-  name: 'Auto-resize — grows with content',
-  render: () => {
-    function Demo(): React.ReactElement {
-      const [value, setValue] = useState(
-        'Try typing (or pasting) multi-line content — the field grows to fit.\n\nAdd more lines…',
-      );
-      return (
-        <Stack gap="3" width="420px">
-          <Textarea autoResize maxRows={8} value={value} onChange={setValue} />
-          <Text size="sm" color="fg.muted">
-            Uses native <code>field-sizing: content</code> in Chromium; falls back to a JS resizer
-            elsewhere.
-            <code>maxRows</code> caps growth based on the actual resolved line-height.
-          </Text>
-        </Stack>
-      );
-    }
-    return <Demo />;
-  },
-};
-
 export const Controlled: Story = {
   render: () => {
     function Controlled(): React.ReactElement {
@@ -271,50 +243,18 @@ export const InsideFormField: Story = {
   },
 };
 
-export const CompoundPrimitives: Story = {
-  name: 'Compound primitives — custom layout',
-  render: () => {
-    function Demo(): React.ReactElement {
-      const [value, setValue] = useState('');
-      return (
-        <Stack gap="2" width="480px">
-          <Text size="sm" color="fg.muted">
-            Drop down to the primitives to build a custom layout — here the counter is moved to the
-            left and a send button sits on the right of the footer.
-          </Text>
-          <TextareaRoot value={value} onChange={setValue} limit={500} resize="vertical">
-            <TextareaField placeholder="Custom composition…" rows={4} />
-            <TextareaClearButton />
-            <TextareaFooter>
-              <TextareaCounter />
-              <TextareaActions>
-                <IconButton
-                  size="sm"
-                  variant="ghost"
-                  icon={<Paperclip size={15} />}
-                  label="Attach"
-                />
-                <IconButton size="sm" variant="solid" icon={<Send size={15} />} label="Send" />
-              </TextareaActions>
-            </TextareaFooter>
-            <TextareaResizeHandle />
-          </TextareaRoot>
-        </Stack>
-      );
-    }
-    return <Demo />;
-  },
-};
-
-export const LongText: Story = {
+export const Interaction: Story = {
+  name: 'Interaction · type updates value and counter',
   render: () => (
-    <Stack gap="3" width="420px">
-      <Textarea
-        rows={6}
-        clearable
-        limit={2000}
-        defaultValue={`${'Lorem ipsum dolor sit amet, consectetur adipiscing elit. '.repeat(20)}`}
-      />
-    </Stack>
+    <Textarea aria-label="Message" rows={3} limit={100} placeholder="Type a message…" />
   ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const textarea = canvas.getByRole('textbox', { name: 'Message' });
+    await expect(textarea).toHaveValue('');
+    await userEvent.type(textarea, 'Hello');
+    await expect(textarea).toHaveValue('Hello');
+    // The character counter reflects the typed length.
+    await expect(canvas.getByTestId('textarea-counter')).toHaveTextContent('5');
+  },
 };

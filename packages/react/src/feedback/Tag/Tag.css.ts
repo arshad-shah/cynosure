@@ -45,7 +45,10 @@ export const tagRemoveButton = style({
   transitionProperty: 'opacity, background-color, box-shadow',
   transitionDuration: vars.duration.fast,
   selectors: {
-    '&:hover': { opacity: 1, background: 'rgba(0,0,0,0.08)' },
+    '&:hover': {
+      opacity: 1,
+      background: `color-mix(in oklab, ${vars.color.foreground.default} 8%, transparent)`,
+    },
     '&:focus-visible': {
       outline: 'none',
       opacity: 1,

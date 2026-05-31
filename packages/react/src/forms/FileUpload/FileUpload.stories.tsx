@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { Inline } from '../../primitives/layout/Inline/Inline.js';
 import { Stack } from '../../primitives/layout/Stack/Stack.js';
 import { Text } from '../../typography/Text/Text.js';
@@ -41,43 +42,7 @@ export const Playground: Story = {
   ),
 };
 
-export const VariantDefault: Story = {
-  name: 'variant="default"',
-  render: () => (
-    <div style={{ width: '460px' }}>
-      <FileUpload multiple accept="image/*,application/pdf" />
-    </div>
-  ),
-};
-
-export const VariantCard: Story = {
-  name: 'variant="card"',
-  render: () => (
-    <div style={{ width: '460px' }}>
-      <FileUpload multiple variant="card" accept="image/*,application/pdf" />
-    </div>
-  ),
-};
-
-export const VariantCompact: Story = {
-  name: 'variant="compact"',
-  render: () => (
-    <div style={{ width: '460px' }}>
-      <FileUpload multiple variant="compact" accept="image/*,application/pdf" />
-    </div>
-  ),
-};
-
-export const VariantMinimal: Story = {
-  name: 'variant="minimal"',
-  render: () => (
-    <div style={{ width: '460px' }}>
-      <FileUpload multiple variant="minimal" />
-    </div>
-  ),
-};
-
-export const AllVariants: Story = {
+export const Variants: Story = {
   name: 'All variants side-by-side',
   render: () => (
     <Stack gap="5" width="520px">
@@ -128,22 +93,6 @@ export const WithPreview: Story = {
     }
     return <Demo />;
   },
-};
-
-export const SingleFile: Story = {
-  render: () => (
-    <div style={{ width: '420px' }}>
-      <FileUpload />
-    </div>
-  ),
-};
-
-export const AcceptImagesOnly: Story = {
-  render: () => (
-    <div style={{ width: '420px' }}>
-      <FileUpload multiple accept="image/*" />
-    </div>
-  ),
 };
 
 export const MaxCountAndSize: Story = {
@@ -231,43 +180,28 @@ export const Controlled: Story = {
   },
 };
 
-export const CustomRenderItem: Story = {
-  name: 'Custom list renderItem',
+export const Interaction: Story = {
+  name: 'Interaction · drop zone + file input present, browse opens dialog',
   render: () => (
-    <div style={{ width: '460px' }}>
-      <FileUpload multiple>
-        <FileUploadTrigger>Drop any files, then see the custom rendering below</FileUploadTrigger>
-        <FileUploadList
-          renderItem={(file, i) => (
-            <li
-              key={`${file.name}-${i}`}
-              style={{
-                padding: '6px 10px',
-                border: '1px dashed rgba(0,0,0,0.15)',
-                borderRadius: 6,
-                marginTop: 6,
-              }}
-            >
-              #{i + 1} — <code>{file.name}</code> ({file.type || 'unknown type'})
-            </li>
-          )}
-        />
-      </FileUpload>
+    <div style={{ width: '420px' }}>
+      <FileUpload multiple accept="image/*,application/pdf" />
     </div>
   ),
-};
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    // The keyboard-accessible drop zone is exposed as a button.
+    const dropZone = canvas.getByRole('button');
+    await expect(dropZone).toHaveAttribute('aria-controls');
 
-export const WithDefaultValue: Story = {
-  name: 'Preloaded files (defaultValue)',
-  render: () => {
-    const seed = [
-      new File(['hello'], 'hello.txt', { type: 'text/plain' }),
-      new File(['world'], 'notes.md', { type: 'text/markdown' }),
-    ];
-    return (
-      <div style={{ width: '420px' }}>
-        <FileUpload multiple defaultValue={seed} />
-      </div>
-    );
+    // The hidden native file input backs the drop zone.
+    const input = canvasElement.querySelector<HTMLInputElement>('input[type="file"]');
+    await expect(input).not.toBeNull();
+    await expect(input).toHaveAttribute('accept', 'image/*,application/pdf');
+    await expect(input).toHaveAttribute('multiple');
+
+    // Choosing a file through the input surfaces it in the list.
+    const file = new File(['hello'], 'photo.png', { type: 'image/png' });
+    await userEvent.upload(input as HTMLInputElement, file);
+    await waitFor(() => expect(canvas.getByText('photo.png')).toBeInTheDocument());
   },
 };

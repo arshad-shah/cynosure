@@ -7,7 +7,7 @@ import { Text } from '../../typography/Text/Text.js';
 import { CircularProgress } from './CircularProgress.js';
 
 const meta: Meta<typeof CircularProgress> = {
-  title: 'Data Display/CircularProgress',
+  title: 'Data display/CircularProgress',
   component: CircularProgress,
   parameters: { layout: 'padded' },
   argTypes: {

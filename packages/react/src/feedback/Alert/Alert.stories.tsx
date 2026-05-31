@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
+import { expect, userEvent, within } from 'storybook/test';
 import { Button } from '../../forms/Button/Button.js';
 import { Inline } from '../../primitives/layout/Inline/Inline.js';
 import { Stack } from '../../primitives/layout/Stack/Stack.js';
@@ -19,12 +20,6 @@ const meta: Meta<typeof Alert> = {
 };
 export default meta;
 type Story = StoryObj<typeof Alert>;
-
-const SparkleIcon = (): React.ReactElement => (
-  <svg aria-hidden="true" width="1em" height="1em" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M12 2l2.4 5.6L20 10l-5.6 2.4L12 18l-2.4-5.6L4 10l5.6-2.4L12 2Z" />
-  </svg>
-);
 
 const STATUSES = ['info', 'success', 'warning', 'danger'] as const;
 const VARIANTS = ['solid', 'soft', 'outline', 'ghost'] as const;
@@ -73,29 +68,6 @@ export const Variants: Story = {
   ),
 };
 
-export const Matrix: Story = {
-  name: 'Full matrix — statuses x variants',
-  render: () => (
-    <Stack gap="4" width="640px">
-      {VARIANTS.map((variant) => (
-        <Stack key={variant} gap="2">
-          <Text size="sm" color="fg.muted" weight="medium">
-            {variant}
-          </Text>
-          {STATUSES.map((status) => (
-            <Alert key={status} variant={variant} status={status}>
-              <AlertTitle>{status}</AlertTitle>
-              <AlertDescription>
-                A {variant} {status} alert with title and description.
-              </AlertDescription>
-            </Alert>
-          ))}
-        </Stack>
-      ))}
-    </Stack>
-  ),
-};
-
 export const Sizes: Story = {
   render: () => (
     <Stack gap="3" width="520px">
@@ -110,26 +82,6 @@ export const Sizes: Story = {
       <Alert size="lg" status="success">
         <AlertTitle>Large</AlertTitle>
         <AlertDescription>A spacious alert for important announcements.</AlertDescription>
-      </Alert>
-    </Stack>
-  ),
-};
-
-export const CustomIcon: Story = {
-  name: 'Icon customization — custom icon or none',
-  render: () => (
-    <Stack gap="3" width="520px">
-      <Alert status="info" icon={<SparkleIcon />}>
-        <AlertTitle>Custom icon</AlertTitle>
-        <AlertDescription>
-          Pass any <code>ReactNode</code> via the <code>icon</code> prop.
-        </AlertDescription>
-      </Alert>
-      <Alert status="success" icon={false}>
-        <AlertTitle>No icon</AlertTitle>
-        <AlertDescription>
-          Pass <code>icon={'{false}'}</code> to hide the default status icon.
-        </AlertDescription>
       </Alert>
     </Stack>
   ),
@@ -164,42 +116,32 @@ export const Closable: Story = {
   },
 };
 
-export const SuccessToast: Story = {
-  name: 'Realistic — success toast pattern',
-  render: () => (
-    <Alert status="success" variant="soft" style={{ width: 420 }}>
-      <AlertTitle>Changes saved</AlertTitle>
-      <AlertDescription>
-        Your profile was updated just now. Refresh to see the latest.
-      </AlertDescription>
-    </Alert>
-  ),
-};
-
-export const TitleOnly: Story = {
-  name: 'Edge case — title only, no description',
-  render: () => (
-    <Stack gap="3" width="520px">
-      <Alert status="info">
-        <AlertTitle>No description here — just a terse heads-up.</AlertTitle>
-      </Alert>
-      <Alert status="danger" closable>
-        <AlertTitle>Action required</AlertTitle>
-      </Alert>
-    </Stack>
-  ),
-};
-
-export const LongContent: Story = {
-  name: 'Edge case — long description wraps',
-  render: () => (
-    <Alert status="info" style={{ width: 520 }}>
-      <AlertTitle>About this release</AlertTitle>
-      <AlertDescription>
-        This release introduces a brand-new Feedback module with Alert, Notification, Callout,
-        EmptyState, Toggle, ToggleGroup, Avatar, AvatarGroup, Badge, Tag, and Chip components — all
-        themable via vanilla-extract tokens and accessible by default.
-      </AlertDescription>
-    </Alert>
-  ),
+export const Interaction: Story = {
+  name: 'Interaction · status role + dismiss removes the alert',
+  render: () => {
+    function Demo(): React.ReactElement {
+      const [open, setOpen] = useState(true);
+      return open ? (
+        <Alert status="success" closable onClose={() => setOpen(false)}>
+          <AlertTitle>Changes saved</AlertTitle>
+          <AlertDescription>Your profile was updated.</AlertDescription>
+        </Alert>
+      ) : (
+        <Text size="sm" color="fg.muted">
+          Dismissed.
+        </Text>
+      );
+    }
+    return <Demo />;
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    // Success alerts announce politely via role="status".
+    const alert = canvas.getByRole('status');
+    await expect(alert).toBeInTheDocument();
+    await expect(alert).toHaveAttribute('data-status', 'success');
+    await userEvent.click(canvas.getByRole('button', { name: 'Dismiss' }));
+    await expect(canvas.queryByRole('status')).not.toBeInTheDocument();
+    await expect(canvas.getByText('Dismissed.')).toBeInTheDocument();
+  },
 };
