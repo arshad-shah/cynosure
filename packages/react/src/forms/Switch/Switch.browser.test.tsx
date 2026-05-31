@@ -1,5 +1,5 @@
-import { fireEvent, render, screen } from '@testing-library/react';
-import { expect, test, waitFor } from 'vitest';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { expect, test } from 'vitest';
 import { switchThumb } from './Switch.css.js';
 import { Switch } from './Switch.js';
 
