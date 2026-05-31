@@ -1,0 +1,69 @@
+---
+/**
+ * PackageManagerTabs — the single, reusable way to show a package-manager
+ * command across npm / pnpm / yarn / bun. Built on Starlight's synced tabs
+ * (`syncKey="pm"`), so the manager a reader picks is remembered site-wide.
+ *
+ * Usage:
+ *   <PackageManagerTabs command="@arshad-shah/cynosure-react" />
+ *   <PackageManagerTabs command="@arshad-shah/cynosure-react @arshad-shah/cynosure-tokens" />
+ *   <PackageManagerTabs command="@arshad-shah/cynosure-cli init" kind="dlx" />
+ *
+ * `command` is the argument *after* the verb — never include `npm install` /
+ * `pnpm add` yourself. The component derives each manager's syntax from `kind`.
+ */
+import { Code, TabItem, Tabs } from '@astrojs/starlight/components';
+
+type Kind = 'install' | 'install-dev' | 'dlx' | 'create';
+
+interface Props {
+  /** The package(s) / args after the verb, e.g. "@arshad-shah/cynosure-react". */
+  command: string;
+  /**
+   * Command family:
+   * - `install` (default) — add runtime dependencies.
+   * - `install-dev` — add dev dependencies.
+   * - `dlx` — run a package binary without installing (npx / pnpm dlx / bunx).
+   * - `create` — scaffolding (`npm create`, `pnpm create`, …).
+   */
+  kind?: Kind;
+}
+
+const { command, kind = 'install' } = Astro.props;
+
+const MATRIX: Record<Kind, { npm: string; pnpm: string; yarn: string; bun: string }> = {
+  install: {
+    npm: `npm install ${command}`,
+    pnpm: `pnpm add ${command}`,
+    yarn: `yarn add ${command}`,
+    bun: `bun add ${command}`,
+  },
+  'install-dev': {
+    npm: `npm install -D ${command}`,
+    pnpm: `pnpm add -D ${command}`,
+    yarn: `yarn add -D ${command}`,
+    bun: `bun add -d ${command}`,
+  },
+  dlx: {
+    npm: `npx ${command}`,
+    pnpm: `pnpm dlx ${command}`,
+    yarn: `yarn dlx ${command}`,
+    bun: `bunx ${command}`,
+  },
+  create: {
+    npm: `npm create ${command}`,
+    pnpm: `pnpm create ${command}`,
+    yarn: `yarn create ${command}`,
+    bun: `bun create ${command}`,
+  },
+};
+
+const cmds = MATRIX[kind];
+---
+
+<Tabs syncKey="pm">
+  <TabItem label="npm"><Code code={cmds.npm} lang="sh" /></TabItem>
+  <TabItem label="pnpm"><Code code={cmds.pnpm} lang="sh" /></TabItem>
+  <TabItem label="yarn"><Code code={cmds.yarn} lang="sh" /></TabItem>
+  <TabItem label="bun"><Code code={cmds.bun} lang="sh" /></TabItem>
+</Tabs>

@@ -4,6 +4,7 @@ description: Render your first Cynosure components in under five minutes.
 order: 3
 category: getting-started
 ---
+import PackageManagerTabs from '@/components/PackageManagerTabs.astro';
 
 # Quickstart
 
@@ -11,9 +12,12 @@ A minimal end-to-end Cynosure app.
 
 ## Install
 
-```bash
-pnpm add @arshad-shah/cynosure-react @arshad-shah/cynosure-tokens
-```
+<PackageManagerTabs command="@arshad-shah/cynosure-react @arshad-shah/cynosure-tokens" />
+
+Prefer automation? The CLI detects your framework, writes the CSS import, and
+wires up the provider:
+
+<PackageManagerTabs command="@arshad-shah/cynosure-cli init" kind="dlx" />
 
 ## Wire the providers
 
