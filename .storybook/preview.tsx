@@ -205,7 +205,6 @@ const preview: Preview = {
     },
   },
   decorators: [withProviders],
-  tags: ['autodocs'],
 };
 
 export default preview;
