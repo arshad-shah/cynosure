@@ -9,6 +9,7 @@ export * from './CheckboxGroup/index.js';
 export * from './Radio/index.js';
 export * from './RadioGroup/index.js';
 export * from './Switch/index.js';
+export * from './ThemeToggle/index.js';
 export * from './Label/index.js';
 export * from './HelperText/index.js';
 export * from './ErrorText/index.js';

@@ -1,0 +1,106 @@
+---
+title: ThemeToggle
+description: A drop-in theme switcher — icon, switch, segmented, or menu — wired to ThemeProvider out of the box.
+category: components
+status: stable
+since: "3.4.0"
+a11y: Each variant exposes a labelled, keyboard-operable control (button, switch, radio group, or menu). Decorative icons are `aria-hidden`; provide a `label` for icon-only variants.
+tags: [theme, dark-mode, control, toggle]
+---
+import LivePreview from '@/components/LivePreview/LivePreview.astro';
+import PropsTable from '@/components/PropsTable.astro';
+
+`ThemeToggle` is a ready-made theme switcher composed from Cynosure components
+(`IconButton`, `Switch`, `ToggleGroup`, `DropdownMenu`, and `Tooltip`). It reads
+and writes the active theme through [`useTheme()`](/foundations/dark-mode/), so
+it must render inside a [`ThemeProvider`](/foundations/dark-mode/) — and the
+selection persists through the provider's storage like any other `setTheme()`
+call.
+
+<LivePreview example="theme-toggle/basic" />
+
+## Variants
+
+Pick the `variant` that fits the surface:
+
+- **`icon`** (default) — a compact icon button that cycles through `modes` on click. Ideal for app headers.
+- **`switch`** — a sun/moon switch for a binary light ↔ dark choice.
+- **`segmented`** — an attached segmented control with one button per mode.
+- **`menu`** — an icon button that opens a dropdown of mode options.
+
+<LivePreview example="theme-toggle/variants" />
+
+### Switch
+
+The `switch` variant is always binary (light ↔ dark) and reflects the resolved
+colour scheme, so it shows "on" whenever the active theme renders dark — even
+under `system`.
+
+<LivePreview example="theme-toggle/switch" />
+
+### Segmented
+
+The segmented control shows every mode at once. Set `showLabels` to render the
+text label beside each icon.
+
+<LivePreview example="theme-toggle/segmented" />
+
+### Menu
+
+The menu variant keeps a small footprint and lists the options in a
+`DropdownMenu` radio group.
+
+<LivePreview example="theme-toggle/menu" />
+
+## Sizes
+
+Three sizes — `sm`, `md` (default), and `lg` — scale the control and its icons.
+
+<LivePreview example="theme-toggle/sizes" />
+
+## Without the system option
+
+The default modes are `['light', 'dark', 'system']`. If your `ThemeProvider`
+sets `enableSystem={false}`, pass `modes={['light', 'dark']}` so the toggle
+doesn't offer a `system` choice that would fall back to the default theme.
+
+<LivePreview example="theme-toggle/without-system" />
+
+## Customising icons and labels
+
+Override the per-mode `icons` and `labels` to match your brand or copy:
+
+```tsx
+import { MonitorSmartphone, MoonStar, SunMedium } from 'lucide-react';
+
+<ThemeToggle
+  variant="menu"
+  icons={{ light: <SunMedium size={18} />, dark: <MoonStar size={18} />, system: <MonitorSmartphone size={18} /> }}
+  labels={{ system: 'Match device' }}
+/>;
+```
+
+## Flash-free on first paint
+
+`ThemeToggle` only changes the theme at runtime. To avoid a light-then-dark
+flash on reload, render the init script from `getThemeInitScript()` in your
+document `<head>` as described in [Dark mode](/foundations/dark-mode/). The
+toggle then reflects whatever the script resolved.
+
+## API
+
+<PropsTable component="ThemeToggle" />
+
+## Accessibility
+
+- Every variant renders a labelled, keyboard-operable control: the `icon` and `menu` variants use an `IconButton` whose `label` becomes the `aria-label`; `segmented` is a `role="radiogroup"` with arrow-key navigation; `switch` is a `role="switch"`.
+- Mode icons are decorative (`aria-hidden`). For icon-only variants the accessible name comes from `label` (icon/menu) or each item's mode label (segmented).
+- The `icon` variant pairs with a `Tooltip` that names the current theme.
+- Because the control mutates the document theme, keep a single primary `ThemeToggle` per view so screen-reader users aren't presented with competing controls.
+
+## Recipes
+
+- Reach for `variant="icon"` in a dense top bar; it cycles light → dark → system.
+- Use `variant="segmented"` with `showLabels` in a settings panel where all options should be visible.
+- Use `variant="menu"` when header space is tight but you still want explicit options.
+- Drop `'system'` from `modes` whenever the provider has `enableSystem={false}`.
