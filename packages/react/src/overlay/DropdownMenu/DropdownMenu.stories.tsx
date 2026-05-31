@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
-import { Button } from '../../forms/Button/Button.js';
-import { Inline } from '../../primitives/layout/Inline/Inline.js';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { Stack } from '../../primitives/layout/Stack/Stack.js';
 import { Text } from '../../typography/Text/Text.js';
 import {
@@ -17,7 +16,6 @@ import {
   DropdownMenuSub,
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
-  DropdownMenuTrigger,
   DropdownMenuTriggerButton,
 } from './DropdownMenu.js';
 
@@ -94,30 +92,6 @@ export const WithIconsAndShortcuts: Story = {
         <DropdownMenuItem icon={<IconTrash />} variant="danger">
           Delete
           <DropdownMenuShortcut>⌫</DropdownMenuShortcut>
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
-  ),
-};
-
-export const WithDescriptions: Story = {
-  render: () => (
-    <DropdownMenu>
-      <DropdownMenuTriggerButton variant="outline">Project</DropdownMenuTriggerButton>
-      <DropdownMenuContent>
-        <DropdownMenuItem icon={<IconEdit />} description="Change the project title">
-          Rename
-        </DropdownMenuItem>
-        <DropdownMenuItem icon={<IconCopy />} description="Create a copy in the same workspace">
-          Duplicate
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem
-          icon={<IconTrash />}
-          variant="danger"
-          description="This action cannot be undone"
-        >
-          Delete permanently
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
@@ -213,57 +187,32 @@ export const RadioItems: Story = {
   },
 };
 
-export const Disabled: Story = {
+export const Interaction: Story = {
+  name: 'Interaction · opens menu, Escape closes',
   render: () => (
     <DropdownMenu>
-      <DropdownMenuTriggerButton variant="outline">Edit</DropdownMenuTriggerButton>
+      <DropdownMenuTriggerButton variant="outline">Actions</DropdownMenuTriggerButton>
       <DropdownMenuContent>
-        <DropdownMenuItem>Undo</DropdownMenuItem>
-        <DropdownMenuItem disabled>Redo</DropdownMenuItem>
+        <DropdownMenuItem>Profile</DropdownMenuItem>
+        <DropdownMenuItem>Billing</DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>Cut</DropdownMenuItem>
-        <DropdownMenuItem>Copy</DropdownMenuItem>
-        <DropdownMenuItem disabled>Paste</DropdownMenuItem>
+        <DropdownMenuItem>Sign out</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   ),
-};
-
-export const CustomTrigger: Story = {
-  render: () => (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost">Custom (no chevron)</Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent>
-        <DropdownMenuItem>First</DropdownMenuItem>
-        <DropdownMenuItem>Second</DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
-  ),
-};
-
-export const Controlled: Story = {
-  render: () => {
-    function Controlled(): React.ReactElement {
-      const [open, setOpen] = useState(false);
-      return (
-        <Inline gap="3" align="center">
-          <Button onClick={() => setOpen((o) => !o)}>Toggle menu</Button>
-          <DropdownMenu open={open} onOpenChange={setOpen}>
-            <DropdownMenuTriggerButton variant="outline">Controlled</DropdownMenuTriggerButton>
-            <DropdownMenuContent>
-              <DropdownMenuItem>First</DropdownMenuItem>
-              <DropdownMenuItem>Second</DropdownMenuItem>
-              <DropdownMenuItem>Third</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <Text size="sm" color="fg.muted">
-            open: <strong>{String(open)}</strong>
-          </Text>
-        </Inline>
-      );
-    }
-    return <Controlled />;
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const trigger = canvas.getByRole('button', { name: /Actions/ });
+    await expect(trigger).toHaveAttribute('aria-expanded', 'false');
+    await userEvent.click(trigger);
+    // Menu content portals to document.body.
+    const menu = await within(document.body).findByRole('menu');
+    await expect(menu).toBeInTheDocument();
+    await expect(trigger).toHaveAttribute('aria-expanded', 'true');
+    await expect(
+      within(document.body).getByRole('menuitem', { name: 'Profile' }),
+    ).toBeInTheDocument();
+    await userEvent.keyboard('{Escape}');
+    await waitFor(() => expect(within(document.body).queryByRole('menu')).not.toBeInTheDocument());
   },
 };

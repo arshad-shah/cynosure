@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { Stack } from '../../primitives/layout/Stack/Stack.js';
 import { Text } from '../../typography/Text/Text.js';
 import {
@@ -121,61 +122,6 @@ export const DebouncedSearch: Story = {
   },
 };
 
-export const LoadingResults: Story = {
-  name: 'Async results (simulated)',
-  render: () => {
-    function AsyncDemo(): React.ReactElement {
-      const [query, setQuery] = useState('');
-      const [results, setResults] = useState<string[]>([]);
-      const [loading, setLoading] = useState(false);
-
-      useEffect(() => {
-        if (query === '') {
-          setResults([]);
-          return;
-        }
-        setLoading(true);
-        const id = setTimeout(() => {
-          setResults(Array.from({ length: 3 }).map((_, i) => `Result ${i + 1} for "${query}"`));
-          setLoading(false);
-        }, 500);
-        return () => clearTimeout(id);
-      }, [query]);
-
-      return (
-        <Stack gap="3" width="380px">
-          <SearchInput
-            onSearch={setQuery}
-            debounceMs={250}
-            placeholder="Search products…"
-            aria-label="Products"
-          />
-          {loading ? (
-            <Text size="sm" color="fg.muted">
-              Loading…
-            </Text>
-          ) : (
-            <Stack gap="1">
-              {results.length === 0 ? (
-                <Text size="sm" color="fg.muted">
-                  {query === '' ? 'Type to search.' : 'No results.'}
-                </Text>
-              ) : (
-                results.map((r) => (
-                  <Text key={r} size="sm">
-                    • {r}
-                  </Text>
-                ))
-              )}
-            </Stack>
-          )}
-        </Stack>
-      );
-    }
-    return <AsyncDemo />;
-  },
-};
-
 export const OnSubmitEnter: Story = {
   name: 'onSubmit — fires on Enter',
   render: () => {
@@ -198,12 +144,33 @@ export const OnSubmitEnter: Story = {
   },
 };
 
-export const Uncontrolled: Story = {
-  render: () => (
-    <div style={{ width: '360px' }}>
-      <SearchInput defaultValue="hello" aria-label="Uncontrolled" />
-    </div>
-  ),
+export const Interaction: Story = {
+  name: 'Interaction · type, debounced onSearch, Escape clears',
+  render: () => {
+    function Demo(): React.ReactElement {
+      const [debounced, setDebounced] = useState('');
+      return (
+        <Stack gap="3" width="360px">
+          <SearchInput onSearch={setDebounced} debounceMs={50} aria-label="Search" />
+          <Text size="sm" color="fg.muted">
+            Debounced: <code data-testid="debounced">{debounced}</code>
+          </Text>
+        </Stack>
+      );
+    }
+    return <Demo />;
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const input = canvas.getByRole('searchbox', { name: 'Search' });
+    await userEvent.type(input, 'query');
+    await expect(input).toHaveValue('query');
+    // Debounced onSearch fires after the typing settles.
+    await waitFor(() => expect(canvas.getByTestId('debounced')).toHaveTextContent('query'));
+    // Escape clears a non-empty field.
+    await userEvent.keyboard('{Escape}');
+    await expect(input).toHaveValue('');
+  },
 };
 
 export const InsideFormField: Story = {

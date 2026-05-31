@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
+import { expect, userEvent, within } from 'storybook/test';
 import { Inline } from '../../primitives/layout/Inline/Inline.js';
 import { Stack } from '../../primitives/layout/Stack/Stack.js';
 import { Text } from '../../typography/Text/Text.js';
@@ -129,10 +130,6 @@ export const States: Story = {
   ),
 };
 
-export const AutoFocus: Story = {
-  render: () => <PinInput length={6} autoFocus aria-label="Auto-focused" />,
-};
-
 export const Controlled: Story = {
   render: () => {
     function ControlledDemo(): React.ReactElement {
@@ -183,18 +180,19 @@ export const OnComplete: Story = {
   },
 };
 
-export const PasteDistribution: Story = {
-  name: 'Paste distributes across cells',
-  render: () => (
-    <Stack gap="3">
-      <PinInput length={6} aria-label="Paste code" />
-      <Text size="sm" color="fg.muted">
-        Copy <code>123456</code>, click the first cell and paste — characters fill every cell.
-      </Text>
-    </Stack>
-  ),
-};
+export const Interaction: Story = {
+  name: 'Interaction · typing fills cells in order',
+  render: () => <PinInput length={4} aria-label="Code" />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const first = canvas.getByRole('textbox', { name: 'Code digit 1' });
+    const second = canvas.getByRole('textbox', { name: 'Code digit 2' });
 
-export const Uncontrolled: Story = {
-  render: () => <PinInput length={6} defaultValue="42" aria-label="Uncontrolled" />,
+    first.focus();
+    await userEvent.keyboard('12');
+    // Digits land in successive cells; focus advances.
+    await expect(first).toHaveValue('1');
+    await expect(second).toHaveValue('2');
+    await expect(second).toHaveFocus();
+  },
 };

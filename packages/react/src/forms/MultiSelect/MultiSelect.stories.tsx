@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { Inline } from '../../primitives/layout/Inline/Inline.js';
 import { Stack } from '../../primitives/layout/Stack/Stack.js';
 import { Text } from '../../typography/Text/Text.js';
@@ -178,43 +179,30 @@ export const Controlled: Story = {
   },
 };
 
-export const Uncontrolled: Story = {
+export const Interaction: Story = {
+  name: 'Interaction · open listbox, pick adds a tag',
   render: () => (
     <MultiSelect
       items={tags}
-      defaultValue={['engineering', 'design']}
-      placeholder="Add more…"
+      placeholder="Add department…"
       aria-label="Departments"
       style={{ width: '360px' }}
     />
   ),
-};
-
-export const CustomEmptyState: Story = {
-  render: () => (
-    <MultiSelect
-      items={tags}
-      placeholder="Try typing 'zzz'"
-      aria-label="Empty state"
-      emptyState="Nothing matches. Try a different term."
-      style={{ width: '360px' }}
-    />
-  ),
-};
-
-export const ManyItems: Story = {
-  render: () => {
-    const many: ReadonlyArray<MultiSelectItemData> = Array.from({ length: 80 }).map((_, i) => ({
-      value: `tag-${i}`,
-      label: `Tag ${i + 1}`,
-    }));
-    return (
-      <MultiSelect
-        items={many}
-        placeholder="Pick tags (80 total)…"
-        aria-label="Many tags"
-        style={{ width: '380px' }}
-      />
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const input = canvas.getByRole('textbox', { name: 'Departments' });
+    // Focus opens the listbox (portals to document.body).
+    input.focus();
+    const listbox = await within(document.body).findByRole('listbox');
+    await expect(listbox).toBeInTheDocument();
+    // Selecting an option adds it as a removable tag and removes it from the list.
+    await userEvent.click(within(document.body).getByRole('option', { name: 'Engineering' }));
+    await expect(canvas.getByRole('button', { name: 'Remove Engineering' })).toBeInTheDocument();
+    await waitFor(() =>
+      expect(
+        within(document.body).queryByRole('option', { name: 'Engineering' }),
+      ).not.toBeInTheDocument(),
     );
   },
 };

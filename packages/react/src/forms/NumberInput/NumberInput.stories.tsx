@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
+import { expect, userEvent, within } from 'storybook/test';
 import { Stack } from '../../primitives/layout/Stack/Stack.js';
 import { Text } from '../../typography/Text/Text.js';
 import {
@@ -81,39 +82,6 @@ export const Affixes: Story = {
   ),
 };
 
-export const Formatted: Story = {
-  name: 'Format — currency / percent / units',
-  render: () => (
-    <Stack gap="3" width="240px">
-      <NumberInput
-        defaultValue={49.99}
-        step={0.01}
-        formatOptions={{ style: 'currency', currency: 'EUR' }}
-        aria-label="Price"
-      />
-      <NumberInput
-        defaultValue={0.25}
-        step={0.01}
-        minValue={0}
-        maxValue={1}
-        formatOptions={{ style: 'percent', maximumFractionDigits: 0 }}
-        aria-label="Percent"
-      />
-      <NumberInput
-        defaultValue={1024}
-        step={128}
-        formatOptions={{ style: 'unit', unit: 'megabyte' }}
-        aria-label="Memory"
-      />
-      <NumberInput
-        defaultValue={1234567}
-        formatOptions={{ useGrouping: true, maximumFractionDigits: 0 }}
-        aria-label="Population"
-      />
-    </Stack>
-  ),
-};
-
 export const States: Story = {
   render: () => (
     <Stack gap="3" width="240px">
@@ -148,20 +116,25 @@ export const Controlled: Story = {
   },
 };
 
-export const CustomStepperLabels: Story = {
-  render: () => (
-    <Stack gap="3" width="240px">
-      <NumberInput
-        defaultValue={1}
-        incrementLabel="Plus one"
-        decrementLabel="Minus one"
-        aria-label="Quantity"
-      />
-      <Text size="sm" color="fg.muted">
-        Stepper aria-labels customised for screen readers.
-      </Text>
-    </Stack>
-  ),
+export const Interaction: Story = {
+  name: 'Interaction · steppers and arrow keys change value',
+  render: () => <NumberInput defaultValue={5} step={1} aria-label="Quantity" />,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const field = canvas.getByRole('spinbutton', { name: 'Quantity' });
+    await expect(field).toHaveValue('5');
+
+    // Stepper buttons.
+    await userEvent.click(canvas.getByRole('button', { name: 'Increment' }));
+    await expect(field).toHaveValue('6');
+    await userEvent.click(canvas.getByRole('button', { name: 'Decrement' }));
+    await expect(field).toHaveValue('5');
+
+    // Arrow keys on the focused field.
+    field.focus();
+    await userEvent.keyboard('{ArrowUp}{ArrowUp}');
+    await expect(field).toHaveValue('7');
+  },
 };
 
 export const InsideFormField: Story = {

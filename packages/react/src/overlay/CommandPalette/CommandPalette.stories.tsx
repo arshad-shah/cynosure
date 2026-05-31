@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { ArrowRight, FileText, Hammer, Settings, Terminal, User } from 'lucide-react';
 import { useState } from 'react';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { Button } from '../../forms/Button/Button.js';
 import { Stack } from '../../primitives/layout/Stack/Stack.js';
 import { Kbd } from '../../typography/Kbd/Kbd.js';
@@ -91,5 +92,51 @@ export const Default: Story = {
       );
     }
     return <Demo />;
+  },
+};
+
+export const Interaction: Story = {
+  name: 'Interaction · open, type to filter',
+  render: () => {
+    function Demo(): React.ReactElement {
+      const [open, setOpen] = useState(false);
+      return (
+        <div>
+          <Button onClick={() => setOpen(true)}>Open palette</Button>
+          <CommandMenu open={open} onOpenChange={setOpen}>
+            <CommandInput />
+            <CommandList>
+              <CommandEmpty />
+              <CommandGroup heading="Navigation">
+                <CommandItem icon={<FileText size={16} />}>Open file</CommandItem>
+                <CommandItem icon={<User size={16} />}>Go to profile</CommandItem>
+              </CommandGroup>
+              <CommandGroup heading="Actions">
+                <CommandItem icon={<Terminal size={16} />}>Open terminal</CommandItem>
+              </CommandGroup>
+            </CommandList>
+          </CommandMenu>
+        </div>
+      );
+    }
+    return <Demo />;
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByRole('button', { name: 'Open palette' }));
+    // CommandMenu wraps a Dialog that portals to document.body.
+    const body = within(document.body);
+    const dialog = await body.findByRole('dialog');
+    await expect(dialog).toBeInTheDocument();
+    await expect(body.getByText('Open terminal')).toBeInTheDocument();
+    // Typing filters the list down to matching items.
+    const input = body.getByPlaceholderText('Type a command or search…');
+    await userEvent.type(input, 'terminal');
+    await waitFor(() => expect(body.queryByText('Open file')).not.toBeInTheDocument());
+    await expect(body.getByText('Open terminal')).toBeInTheDocument();
+    // A non-matching query shows the empty state.
+    await userEvent.clear(input);
+    await userEvent.type(input, 'zzzznope');
+    await waitFor(() => expect(body.getByText('No results found.')).toBeInTheDocument());
   },
 };
