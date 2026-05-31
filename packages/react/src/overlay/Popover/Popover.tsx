@@ -381,9 +381,15 @@ export const PopoverContent = forwardRef<HTMLDivElement, PopoverContentProps>(
           className={cn(popoverContent, className)}
           style={{
             position: 'fixed',
-            top: 0,
-            left: 0,
-            transform: `translate3d(${positioning.x}px, ${positioning.y}px, 0)`,
+            // Position via top/left, not `transform: translate3d`. The entrance
+            // keyframe (`popoverIn`) animates `transform`, and a running CSS
+            // animation overrides the element's inline `transform` for its whole
+            // duration — so a translate-based offset gets clobbered, painting the
+            // popover at the (0,0) origin until the animation ends and then
+            // snapping it to the anchor. top/left aren't animated, so the
+            // position holds while the keyframe only slides + fades it in.
+            top: positioning.y,
+            left: positioning.x,
             // Stay in the a11y tree even before the first measurement —
             // `visibility: hidden` would hide the popover from screen
             // readers and testing-library's getByRole. Position computes

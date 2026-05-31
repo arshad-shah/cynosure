@@ -191,7 +191,13 @@ export const calendarPopover = style({
   minWidth: 'unset',
   maxWidth: 'calc(100vw - 1rem)',
   maxHeight: 'calc(100dvh - 1rem)',
-  width: '18rem',
+  // Size to the calendar's intrinsic width instead of pinning a fixed `18rem`.
+  // The month grid is 7 fixed 2.25rem cells + 3px border-spacing + side padding
+  // (~19rem), so a hard `18rem` was ~12px too narrow and the `overflow: auto`
+  // surfaced a permanent horizontal scrollbar. `fit-content` hugs the grid (and
+  // the wider dual-month layout) exactly, while `maxWidth` still caps it on a
+  // narrow phone where `overflow: auto` legitimately takes over.
+  width: 'fit-content',
 });
 
 /** "Today is …" footer row below the calendar. */

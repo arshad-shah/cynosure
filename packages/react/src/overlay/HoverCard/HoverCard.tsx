@@ -256,9 +256,13 @@ export const HoverCardContent = forwardRef<HTMLDivElement, HoverCardContentProps
           className={cn(popoverContent, className)}
           style={{
             position: 'fixed',
-            top: 0,
-            left: 0,
-            transform: `translate3d(${positioning.x}px, ${positioning.y}px, 0)`,
+            // Position via top/left, not `transform: translate3d`: the shared
+            // `popoverContent` entrance keyframe animates `transform`, which
+            // overrides an inline translate for the animation's duration and
+            // would paint the card at the (0,0) origin before snapping to the
+            // anchor. top/left aren't animated, so the position stays put.
+            top: positioning.y,
+            left: positioning.x,
             visibility: positioning.ready ? 'visible' : 'hidden',
             ...style,
           }}

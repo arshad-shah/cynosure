@@ -61,9 +61,9 @@ const COMPONENTS = [
   ['Slider', 'slider.js', '14 kB'],
 
   // Overlay
-  ['Dialog', 'dialog.js', '14 kB'],
-  ['Drawer', 'drawer.js', '14 kB'],
-  ['Popover', 'popover.js', '21 kB'],
+  ['Dialog', 'dialog.js', '5.5 kB'],
+  ['Drawer', 'drawer.js', '5.5 kB'],
+  ['Popover', 'popover.js', '3.5 kB'],
   ['Tooltip', 'tooltip.js', '3 kB'],
   ['Toast', 'toast.js', '11 kB'],
   ['DropdownMenu', 'dropdownmenu.js', '13 kB'],
@@ -72,7 +72,7 @@ const COMPONENTS = [
   ['Tabs', 'tabs.js', '3 kB'],
   ['Breadcrumb', 'breadcrumb.js', '3.5 kB'],
   ['Pagination', 'pagination.js', '2.75 kB'],
-  ['Sidebar', 'sidebar.js', '28 kB'],
+  ['Sidebar', 'sidebar.js', '11 kB'],
 
   // Data display
   ['Card', 'card.js', '1.75 kB'],
@@ -106,6 +106,25 @@ entries.push({
   limit: '2 kB',
   ...jsOnly(['react-hook-form']),
 });
+
+// Components that lean on a heavy externalised dependency (kept out of the
+// bundle via `tsup.config.ts#external`). Ignore that dep so the budget tracks
+// the marginal in-tree JS — the same thing every other entry measures —
+// rather than the (huge, externalised) syntax-highlighter / charting lib.
+entries.push(
+  {
+    name: 'CodeBlock',
+    path: 'packages/react/dist/code-block.js',
+    limit: '4.5 kB',
+    ...jsOnly(['shiki']),
+  },
+  {
+    name: 'Chart',
+    path: 'packages/react/dist/chart.js',
+    limit: '1.5 kB',
+    ...jsOnly(['@arshad-shah/swift-chart', '@arshad-shah/swift-chart/react']),
+  },
+);
 
 entries.push({
   name: 'Full barrel (warning-only)',

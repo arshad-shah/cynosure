@@ -17,7 +17,7 @@ export const textareaRoot = style({
   background: vars.color.background.subtle,
   color: vars.color.foreground.default,
   border: `1px solid ${vars.color.border.default}`,
-  boxShadow: 'inset 0 1px 0 rgba(24, 24, 27, 0.04)',
+  boxShadow: `inset 0 1px 0 color-mix(in oklab, ${vars.color.foreground.default} 4%, transparent)`,
   transitionProperty: 'border-color, box-shadow, background-color',
   transitionDuration: vars.duration.fast,
   overflow: 'hidden',

@@ -46,8 +46,12 @@ const isVertical = (side: FloatingSide): boolean => side === 'top' || side === '
 /**
  * Compute viewport-fixed coordinates for `anchorRect`-relative placement on
  * `side`+`align`. Pure function so it's trivially unit-testable.
+ *
+ * Exported for unit testing — this is the geometry every overlay (Popover,
+ * Tooltip, HoverCard, menus) positions against, so it's covered directly
+ * rather than only through jsdom render tests that can't measure layout.
  */
-function computePoint(
+export function computePoint(
   anchorRect: DOMRect,
   floatRect: { width: number; height: number },
   side: FloatingSide,

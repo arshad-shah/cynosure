@@ -158,12 +158,12 @@ export const areaBySize = styleVariants({
 export const areaThumb = style({
   border: `2px solid ${vars.color.background.surface}`,
   borderRadius: vars.radius.full,
-  boxShadow: `0 0 0 1px ${vars.color.border.strong}, 0 1px 3px rgba(0,0,0,0.3)`,
+  boxShadow: `0 0 0 1px ${vars.color.border.strong}, 0 1px 3px color-mix(in oklab, ${vars.color.foreground.default} 30%, transparent)`,
   outline: 'none',
   cursor: 'grab',
   selectors: {
     '&[data-focus-visible]': {
-      boxShadow: `${focusRingShadow}, 0 1px 3px rgba(0,0,0,0.3)`,
+      boxShadow: `${focusRingShadow}, 0 1px 3px color-mix(in oklab, ${vars.color.foreground.default} 30%, transparent)`,
     },
     '&[data-dragging]': { cursor: 'grabbing' },
   },
@@ -195,13 +195,13 @@ export const sliderThumb = style({
   top: '50%',
   border: `2px solid ${vars.color.background.surface}`,
   borderRadius: vars.radius.full,
-  boxShadow: `0 0 0 1px ${vars.color.border.strong}, 0 1px 3px rgba(0,0,0,0.25)`,
+  boxShadow: `0 0 0 1px ${vars.color.border.strong}, 0 1px 3px color-mix(in oklab, ${vars.color.foreground.default} 25%, transparent)`,
   background: vars.color.background.surface,
   outline: 'none',
   cursor: 'grab',
   selectors: {
     '&[data-focus-visible]': {
-      boxShadow: `${focusRingShadow}, 0 1px 3px rgba(0,0,0,0.25)`,
+      boxShadow: `${focusRingShadow}, 0 1px 3px color-mix(in oklab, ${vars.color.foreground.default} 25%, transparent)`,
     },
     '&[data-dragging]': { cursor: 'grabbing' },
   },
