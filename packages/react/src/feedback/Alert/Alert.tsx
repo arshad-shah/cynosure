@@ -24,7 +24,14 @@ export type AlertRole = 'alert' | 'status' | 'none';
 interface AlertContextValue {
   titleId: string;
   descriptionId: string;
+  size: AlertSize;
 }
+
+// Scale the title / description text with the alert size so `sm`, `md`, and
+// `lg` are visibly distinct (previously every size rendered identical
+// typography, so the size prop had almost no effect).
+const TITLE_SIZE: Record<AlertSize, 'sm' | 'md' | 'lg'> = { sm: 'sm', md: 'md', lg: 'lg' };
+const DESCRIPTION_SIZE: Record<AlertSize, 'xs' | 'sm' | 'md'> = { sm: 'xs', md: 'sm', lg: 'md' };
 
 const AlertContext = createContext<AlertContextValue | null>(null);
 
@@ -95,8 +102,8 @@ export const Alert = forwardRef<HTMLDivElement, AlertProps>(function Alert(
   const titleId = useId();
   const descriptionId = useId();
   const context = useMemo<AlertContextValue>(
-    () => ({ titleId, descriptionId }),
-    [titleId, descriptionId],
+    () => ({ titleId, descriptionId, size }),
+    [titleId, descriptionId, size],
   );
 
   const resolvedRole: AlertRole =
@@ -165,7 +172,7 @@ export const AlertTitle = forwardRef<HTMLElement, AlertTitleProps>(function Aler
     <Text
       ref={ref as never}
       as={as as never}
-      size="md"
+      size={TITLE_SIZE[ctx?.size ?? 'md']}
       weight="semibold"
       id={id ?? ctx?.titleId}
       {...rest}
@@ -189,7 +196,13 @@ export const AlertDescription = forwardRef<HTMLElement, AlertDescriptionProps>(
   function AlertDescription({ id, children, ...rest }, ref) {
     const ctx = useContext(AlertContext);
     return (
-      <Text ref={ref as never} as="p" size="sm" id={id ?? ctx?.descriptionId} {...rest}>
+      <Text
+        ref={ref as never}
+        as="p"
+        size={DESCRIPTION_SIZE[ctx?.size ?? 'md']}
+        id={id ?? ctx?.descriptionId}
+        {...rest}
+      >
         {children}
       </Text>
     );

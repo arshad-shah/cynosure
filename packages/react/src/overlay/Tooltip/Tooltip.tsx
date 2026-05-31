@@ -14,6 +14,7 @@ import {
 } from 'react';
 import { cn } from '../../utils/cn.js';
 import { composeRefs } from '../../utils/composeRefs.js';
+import { OverlayArrow } from '../shared/OverlayArrow.js';
 import { OverlayPortal } from '../shared/OverlayPortal.js';
 import { useFloatingPosition } from '../shared/useFloatingPosition.js';
 import { tooltipArrow, tooltipContent } from './Tooltip.css.js';
@@ -253,7 +254,13 @@ export function Tooltip({
             }}
           >
             {content}
-            {withArrow ? <TooltipArrowSvg side={positioning.side} /> : null}
+            {withArrow ? (
+              <OverlayArrow
+                side={positioning.side}
+                offset={positioning.arrowOffset}
+                className={tooltipArrow}
+              />
+            ) : null}
           </div>
         </OverlayPortal>
       ) : null}
@@ -272,43 +279,4 @@ function chain<E>(...fns: Array<((event: E) => unknown) | undefined>): (event: E
       if (typeof fn === 'function') fn(event);
     }
   };
-}
-
-// Per-side caret with explicit geometry (no rotation hacks, which mis-sized
-// the left/right beak). The triangle points outward toward the trigger and
-// overlaps the tooltip edge by its full depth so it reads as attached.
-function TooltipArrowSvg({ side }: { side: 'top' | 'right' | 'bottom' | 'left' }) {
-  const horizontal = side === 'left' || side === 'right';
-  const long = 12; // base length along the tooltip edge
-  const depth = 6; // how far the beak pokes toward the trigger
-  const w = horizontal ? depth : long;
-  const h = horizontal ? long : depth;
-  const path =
-    side === 'top'
-      ? `M0 0 L${long / 2} ${depth} L${long} 0 Z` // points down
-      : side === 'bottom'
-        ? `M0 ${depth} L${long / 2} 0 L${long} ${depth} Z` // points up
-        : side === 'left'
-          ? `M0 0 L${depth} ${long / 2} L0 ${long} Z` // points right
-          : `M${depth} 0 L0 ${long / 2} L${depth} ${long} Z`; // (right) points left
-  const place: React.CSSProperties =
-    side === 'top'
-      ? { bottom: -depth, left: '50%', transform: 'translateX(-50%)' }
-      : side === 'bottom'
-        ? { top: -depth, left: '50%', transform: 'translateX(-50%)' }
-        : side === 'left'
-          ? { right: -depth, top: '50%', transform: 'translateY(-50%)' }
-          : { left: -depth, top: '50%', transform: 'translateY(-50%)' };
-  return (
-    <svg
-      aria-hidden="true"
-      width={w}
-      height={h}
-      viewBox={`0 0 ${w} ${h}`}
-      className={tooltipArrow}
-      style={{ position: 'absolute', ...place }}
-    >
-      <path d={path} />
-    </svg>
-  );
 }

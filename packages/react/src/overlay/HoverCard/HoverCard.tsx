@@ -15,8 +15,9 @@ import {
 } from 'react';
 import { cn } from '../../utils/cn.js';
 import { composeRefs } from '../../utils/composeRefs.js';
+import { OverlayArrow } from '../shared/OverlayArrow.js';
 import { OverlayPortal } from '../shared/OverlayPortal.js';
-import { popoverArrow, popoverContent } from '../shared/popover.css.js';
+import { popoverArrow, popoverContent, popoverViewport } from '../shared/popover.css.js';
 import { useFloatingPosition } from '../shared/useFloatingPosition.js';
 
 // Held in a constant so biome's `useSemanticElements` doesn't suggest
@@ -206,6 +207,12 @@ export interface HoverCardContentProps extends Omit<HTMLAttributes<HTMLDivElemen
   collisionPadding?: number;
   /** Portal target — defaults to `document.body`. */
   container?: HTMLElement | (() => HTMLElement);
+  /**
+   * Render a caret pointing at the trigger. The caret is side-aware and stays
+   * aimed at the trigger when the card flips or shifts.
+   * @default true
+   */
+  withArrow?: boolean;
   /** Card body. */
   children?: ReactNode;
 }
@@ -226,6 +233,7 @@ export const HoverCardContent = forwardRef<HTMLDivElement, HoverCardContentProps
       alignOffset = 0,
       collisionPadding = 8,
       container,
+      withArrow = true,
       children,
       style,
       ...rest
@@ -270,32 +278,35 @@ export const HoverCardContent = forwardRef<HTMLDivElement, HoverCardContentProps
           onPointerLeave={() => ctx.scheduleClose()}
           {...rest}
         >
-          {children}
+          <div className={popoverViewport}>{children}</div>
+          {withArrow ? (
+            <OverlayArrow
+              side={positioning.side}
+              offset={positioning.arrowOffset}
+              className={popoverArrow}
+            />
+          ) : null}
         </div>
       </OverlayPortal>
     );
   },
 );
 
-/** Optional caret pointing at the trigger. */
-export const HoverCardArrow = forwardRef<
-  SVGSVGElement,
-  HTMLAttributes<SVGSVGElement> & { width?: number; height?: number }
->(function HoverCardArrow({ className, width = 12, height = 6, ...rest }, ref) {
-  return (
-    <svg
-      ref={ref}
-      aria-hidden="true"
-      width={width}
-      height={height}
-      viewBox={`0 0 ${width} ${height}`}
-      className={cn(popoverArrow, className)}
-      {...rest}
-    >
-      <path d={`M0 0 L${width / 2} ${height} L${width} 0 Z`} />
-    </svg>
-  );
-});
+/**
+ * @deprecated The caret is now rendered by `HoverCardContent` itself (enabled
+ * by default via its `withArrow` prop) so it can sit outside the scroll
+ * viewport and reorient/aim itself like the Tooltip caret. This component
+ * renders nothing and is retained only so existing imports keep type-checking;
+ * remove it from your `HoverCardContent` and use `withArrow={false}` to opt
+ * out.
+ */
+export function HoverCardArrow(_props: {
+  className?: string;
+  width?: number;
+  height?: number;
+}): ReactElement | null {
+  return null;
+}
 
 function chain<E>(...fns: Array<((event: E) => unknown) | undefined>): (event: E) => void {
   return (event: E) => {

@@ -116,13 +116,18 @@ export const drawerSide = styleVariants({
   },
 });
 
-/** Width for left/right, height for top/bottom. */
+/*
+ * Width for left/right drawers. `min(<size>, calc(100dvw - <gutter>))` so the
+ * drawer shrinks to fit narrow screens (leaving a small gutter on the open
+ * edge) instead of overflowing and clipping its content. `full` spans the
+ * viewport. `dvw` tracks the mobile visual viewport.
+ */
 export const drawerSizeHorizontal = styleVariants({
-  sm: { width: '18rem', maxWidth: '100vw' },
-  md: { width: '24rem', maxWidth: '100vw' },
-  lg: { width: '32rem', maxWidth: '100vw' },
-  xl: { width: '48rem', maxWidth: '100vw' },
-  full: { width: '100vw' },
+  sm: { width: 'min(18rem, calc(100dvw - 3rem))' },
+  md: { width: 'min(24rem, calc(100dvw - 3rem))' },
+  lg: { width: 'min(32rem, calc(100dvw - 3rem))' },
+  xl: { width: 'min(48rem, calc(100dvw - 3rem))' },
+  full: { width: '100dvw' },
 });
 
 // `dvh` (dynamic viewport height) so top/bottom drawers respect the mobile

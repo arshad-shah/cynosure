@@ -6,7 +6,7 @@ import { Stack } from '../../primitives/layout/Stack/Stack.js';
 import { Heading } from '../../typography/Heading/Heading.js';
 import { Link } from '../../typography/Link/Link.js';
 import { Text } from '../../typography/Text/Text.js';
-import { HoverCard, HoverCardArrow, HoverCardContent, HoverCardTrigger } from './HoverCard.js';
+import { HoverCard, HoverCardContent, HoverCardTrigger } from './HoverCard.js';
 
 const meta: Meta<typeof HoverCard> = {
   title: 'Overlays/HoverCard',
@@ -128,15 +128,15 @@ export const WithArrow: Story = {
         <Button variant="outline">With arrow</Button>
       </HoverCardTrigger>
       <HoverCardContent>
-        <Stack gap="2" padding="4" minWidth="220px">
+        <Stack gap="2" minWidth="220px">
           <Text size="sm" weight="medium">
             Arrowed hover card
           </Text>
           <Text size="xs" color="fg.muted">
-            <code>HoverCardArrow</code> anchors a caret to the trigger.
+            <code>HoverCardContent</code> renders a side-aware caret aimed at the trigger by default
+            (<code>withArrow</code>).
           </Text>
         </Stack>
-        <HoverCardArrow />
       </HoverCardContent>
     </HoverCard>
   ),

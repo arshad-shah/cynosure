@@ -6,7 +6,7 @@ import { Inline } from '../../primitives/layout/Inline/Inline.js';
 import { Stack } from '../../primitives/layout/Stack/Stack.js';
 import { Heading } from '../../typography/Heading/Heading.js';
 import { Text } from '../../typography/Text/Text.js';
-import { Popover, PopoverArrow, PopoverClose, PopoverContent, PopoverTrigger } from './Popover.js';
+import { Popover, PopoverClose, PopoverContent, PopoverTrigger } from './Popover.js';
 
 const meta: Meta<typeof Popover> = {
   title: 'Overlays/Popover',
@@ -118,15 +118,15 @@ export const WithArrow: Story = {
         <Button variant="outline">With arrow</Button>
       </PopoverTrigger>
       <PopoverContent>
-        <Stack gap="2" padding="4" minWidth="220px">
+        <Stack gap="2" minWidth="220px">
           <Text size="sm" weight="medium">
             Pointer arrow
           </Text>
           <Text size="xs" color="fg.muted">
-            The <code>PopoverArrow</code> renders a caret anchored to the trigger.
+            <code>PopoverContent</code> renders a side-aware caret aimed at the trigger by default (
+            <code>withArrow</code>).
           </Text>
         </Stack>
-        <PopoverArrow />
       </PopoverContent>
     </Popover>
   ),

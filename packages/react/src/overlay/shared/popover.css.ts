@@ -17,21 +17,23 @@ const popoverOut = keyframes({
  * to stay simple (the slight y-offset reads as "appear from trigger").
  */
 export const popoverContent = style({
+  // Outer surface: owns the visual shell (background/border/shadow) and acts
+  // as the positioning containing block. Overflow is kept `visible` so the
+  // caret can poke past the edge toward the trigger; the inner viewport
+  // (`popoverViewport`) owns scrolling instead.
+  position: 'fixed',
   minWidth: '12rem',
   // Never exceed the viewport on small screens. Collision-shifting can keep an
   // element on-screen but can't rescue one that's wider/taller than the
-  // viewport, so cap both axes to the available space (minus an 8px gutter on
-  // each side) and let the body scroll. `dvh` tracks the mobile visual
-  // viewport so browser chrome never clips the panel.
+  // viewport, so cap the width to the available space (minus an 8px gutter on
+  // each side); the inner viewport caps height and scrolls.
   maxWidth: 'min(28rem, calc(100vw - 1rem))',
-  maxHeight: 'calc(100dvh - 1rem)',
-  overflow: 'auto',
+  overflow: 'visible',
   background: vars.color.background.surface,
   color: vars.color.foreground.default,
   border: `1px solid ${vars.color.border.default}`,
   borderRadius: vars.radius.md,
   boxShadow: vars.shadow.lg,
-  padding: vars.space['4'],
   outline: 'none',
   zIndex: Number(vars.z.popover),
   selectors: {
@@ -42,6 +44,20 @@ export const popoverContent = style({
       animation: `${popoverOut} ${vars.duration.fast} ${vars.easing.easeIn}`,
     },
   },
+});
+
+/**
+ * Inner scroll viewport. Holds the padding and caps height so tall content
+ * scrolls without clipping the caret rendered as a sibling on the outer
+ * surface. `dvh` tracks the mobile visual viewport so browser chrome never
+ * clips the panel. `borderRadius: inherit` keeps scrolled content rounded to
+ * match the surface.
+ */
+export const popoverViewport = style({
+  maxHeight: 'calc(100dvh - 1rem)',
+  overflow: 'auto',
+  padding: vars.space['4'],
+  borderRadius: 'inherit',
 });
 
 /** Small caret pointing at the trigger. Fill with the surface colour. */

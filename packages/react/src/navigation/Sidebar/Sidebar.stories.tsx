@@ -33,13 +33,28 @@ const ShellLayout = ({ children }: { children: ReactNode }): ReactElement => (
   <div
     style={{
       display: 'flex',
+      flexDirection: 'column',
       minHeight: 420,
       border: '1px solid var(--cynosure-color-border-subtle, #e5e7eb)',
       borderRadius: 12,
       overflow: 'hidden',
     }}
   >
-    {children}
+    {/* App bar with a trigger that lives OUTSIDE the Sidebar so it stays
+        reachable on mobile (where the Sidebar collapses into a Drawer). */}
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 8,
+        padding: '8px 12px',
+        borderBottom: '1px solid var(--cynosure-color-border-subtle, #e5e7eb)',
+      }}
+    >
+      <SidebarTrigger hideLabel />
+      <Text weight="semibold">Acme</Text>
+    </div>
+    <div style={{ display: 'flex', flex: 1, minHeight: 0 }}>{children}</div>
   </div>
 );
 

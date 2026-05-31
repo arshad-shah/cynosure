@@ -20,6 +20,7 @@ export const wheelColumns = style({
   padding: vars.space['1'],
 });
 
+export const wheelColumnsFour = style([wheelColumns, { gridTemplateColumns: '1fr 1fr 1fr 1fr' }]);
 export const wheelColumnsThree = style([wheelColumns, { gridTemplateColumns: '1fr 1fr 1fr' }]);
 export const wheelColumnsTwo = style([wheelColumns, { gridTemplateColumns: '1fr 1fr' }]);
 

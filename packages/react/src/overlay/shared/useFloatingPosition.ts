@@ -30,9 +30,24 @@ export interface FloatingState {
   side: FloatingSide;
   /** The alignment actually used. */
   align: FloatingAlign;
+  /**
+   * Cross-axis coordinate (px, relative to the floating element's own box)
+   * at which an arrow should point so it stays aimed at the anchor's centre
+   * even when alignment or collision-shifting moves the surface. For
+   * top/bottom sides this is a horizontal offset; for left/right it's
+   * vertical. Clamped so the arrow never escapes the surface's rounded
+   * corners.
+   */
+  arrowOffset: number;
   /** Whether layout has been computed at least once. */
   ready: boolean;
 }
+
+/** Keep the arrow inside the surface's rounded corners. */
+const ARROW_INSET = 14;
+
+const clamp = (value: number, min: number, max: number): number =>
+  Math.min(Math.max(value, min), max);
 
 const OPPOSITE: Record<FloatingSide, FloatingSide> = {
   top: 'bottom',
@@ -105,6 +120,7 @@ export function useFloatingPosition(options: FloatingOptions): FloatingState & {
     y: 0,
     side: preferredSide,
     align: preferredAlign,
+    arrowOffset: 0,
     ready: false,
   });
   const floatingRef = useRef<HTMLElement | null>(null);
@@ -167,17 +183,39 @@ export function useFloatingPosition(options: FloatingOptions): FloatingState & {
       }
     }
 
+    // Aim the arrow at the anchor's centre, projected onto the floating
+    // element's cross-axis and clamped within its rounded corners. This keeps
+    // the caret pointing at the trigger even when alignment or collision-shift
+    // slides the surface off-centre.
+    let arrowOffset: number;
+    if (isVertical(side)) {
+      const anchorCenterX = anchorRect.left + anchorRect.width / 2;
+      arrowOffset = clamp(
+        anchorCenterX - x,
+        ARROW_INSET,
+        Math.max(ARROW_INSET, floatRect.width - ARROW_INSET),
+      );
+    } else {
+      const anchorCenterY = anchorRect.top + anchorRect.height / 2;
+      arrowOffset = clamp(
+        anchorCenterY - y,
+        ARROW_INSET,
+        Math.max(ARROW_INSET, floatRect.height - ARROW_INSET),
+      );
+    }
+
     setState((prev) => {
       if (
         prev.x === x &&
         prev.y === y &&
         prev.side === side &&
         prev.align === align &&
+        prev.arrowOffset === arrowOffset &&
         prev.ready
       ) {
         return prev;
       }
-      return { x, y, side, align, ready: true };
+      return { x, y, side, align, arrowOffset, ready: true };
     });
   }, [
     anchor,

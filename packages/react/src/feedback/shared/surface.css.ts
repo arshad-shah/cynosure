@@ -10,7 +10,7 @@ import { vars } from '../../styles/vars.css.js';
 export const surfaceRoot = style({
   display: 'flex',
   alignItems: 'flex-start',
-  gap: vars.space['3'],
+  gap: vars.space['2'],
   borderRadius: vars.radius.md,
   fontFamily: 'var(--cynosure-font-body-md-family)',
   color: vars.color.foreground.default,
@@ -64,10 +64,14 @@ export const surfaceClose = style({
   },
 });
 
+// Each size sets the root font-size so the `em`-based icon scales with the
+// alert, and pairs it with proportional padding. The slot typography (title /
+// description) is scaled in the component via context so all three sizes read
+// as visibly distinct.
 export const surfaceSize = styleVariants({
   sm: { padding: vars.space['2'], fontSize: 'var(--cynosure-font-body-sm-size)' },
-  md: { padding: vars.space['3'] },
-  lg: { padding: vars.space['4'] },
+  md: { padding: vars.space['3'], fontSize: 'var(--cynosure-font-body-md-size)' },
+  lg: { padding: vars.space['4'], fontSize: 'var(--cynosure-font-body-lg-size)' },
 });
 
 // soft: tinted fill + foreground tokens per status.

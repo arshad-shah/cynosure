@@ -4,7 +4,11 @@ import { vars } from '../../styles/vars.css.js';
 export const timelineRoot = style({
   display: 'flex',
   flexDirection: 'column',
-  gap: vars.space['3'],
+  // Zero gap so each item's connector abuts the next item's dot and the line
+  // reads as one continuous run (matching Stepper). Inter-item spacing is
+  // supplied by the content block's trailing padding instead of a flex gap,
+  // which would otherwise break the line between items.
+  gap: 0,
   listStyle: 'none',
   margin: 0,
   padding: 0,
@@ -105,10 +109,14 @@ export const timelineConnector = style({
 export const timelineContent = style({
   flex: '1 1 auto',
   minWidth: 0,
-  paddingBottom: vars.space['3'],
+  // Supplies the inter-item spacing now that the root no longer uses a flex
+  // gap. The trailing connector stretches through this padding, keeping the
+  // line continuous down to the next item's dot.
+  paddingBottom: vars.space['5'],
   selectors: {
     '[data-orientation="horizontal"] &': {
       paddingBottom: 0,
+      paddingInlineEnd: vars.space['5'],
     },
   },
 });

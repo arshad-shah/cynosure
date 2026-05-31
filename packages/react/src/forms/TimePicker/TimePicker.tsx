@@ -90,11 +90,16 @@ export const TimePicker = forwardRef<HTMLDivElement, TimePickerProps>(
       isReadOnly,
       minuteStep,
       hourCycle,
+      granularity,
       value,
       defaultValue,
       onChange,
       ...rest
     } = props;
+
+    // `granularity="second"` surfaces a seconds segment in the field; mirror it
+    // in the wheel so the popover can pick seconds too.
+    const withSeconds = granularity === 'second';
 
     const isControlled = value !== undefined;
     const [internal, setInternal] = useState<TimeValue | null>(defaultValue ?? null);
@@ -113,6 +118,7 @@ export const TimePicker = forwardRef<HTMLDivElement, TimePickerProps>(
         {...rest}
         ref={ref}
         hourCycle={hourCycle}
+        granularity={granularity}
         isDisabled={isDisabled}
         isReadOnly={isReadOnly}
         isInvalid={invalid}
@@ -149,6 +155,7 @@ export const TimePicker = forwardRef<HTMLDivElement, TimePickerProps>(
                   onChange={(t: Time) => commit(t as unknown as TimeValue)}
                   hourCycle={hourCycle}
                   minuteStep={minuteStep}
+                  withSeconds={withSeconds}
                 />
               </AriaDialog>
             </AriaPopover>
