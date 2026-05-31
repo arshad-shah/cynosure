@@ -2,6 +2,7 @@
 title: Migrating from 0.x to 1.0
 description: Migration guide for the v1.0 release.
 ---
+import PackageManagerTabs from '@/components/PackageManagerTabs.astro';
 
 # Migrating from 0.x to 1.0
 
@@ -9,9 +10,7 @@ There's nothing to migrate. v1.0 is the first public release — prior
 `0.x` versions existed only in development. If you were consuming Cynosure
 from source or a local alias, install the npm package:
 
-```bash
-pnpm add @arshad-shah/cynosure-react @arshad-shah/cynosure-tokens
-```
+<PackageManagerTabs command="@arshad-shah/cynosure-react @arshad-shah/cynosure-tokens" />
 
 …and remove any workspace / local path references.
 
