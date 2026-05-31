@@ -1,5 +1,52 @@
 # @arshad-shah/cynosure-react
 
+## 3.3.1
+
+### Patch Changes
+
+- [#98](https://github.com/arshad-shah/cynosure/pull/98) [`a688905`](https://github.com/arshad-shah/cynosure/commit/a688905e3bd3a26248ca90e00b0e3b3e3d4d1013) Thanks [@arshad-shah](https://github.com/arshad-shah)! - **Fix duplicated component CSS when importing from the package barrel.** The
+  per-component CSS auto-link added in the last release was also being prepended
+  to the root barrel (`dist/index.js`), so `import … from '@arshad-shah/cynosure-react'`
+  silently injected `core.css` + `index.css` — the entire component stylesheet.
+  For the documented setup (barrel import **plus** a manual
+  `@arshad-shah/cynosure-react/all.css` or `/styles.css`, which is required
+  anyway since design tokens ship in a separate package), every rule loaded
+  twice. Worse, the re-injected `core.css` landed _after_ the component-specific
+  rules from the manual stylesheet, so equal-specificity shared rules
+  (`layoutPropsStyle`, typography base, focus ring) clobbered the component
+  overrides that should win — causing subtle visual regressions.
+
+  The root barrel is the monolithic-path entry and no longer auto-injects CSS;
+  consumers bring the stylesheet themselves (as the docs already instruct).
+  Per-component subpath imports (`@arshad-shah/cynosure-react/button`) and
+  category barrels (`/forms`, `/overlay`, …) still wire up their CSS
+  automatically. The now-orphaned `dist/index.css` is no longer emitted.
+
+- [#98](https://github.com/arshad-shah/cynosure/pull/98) [`a688905`](https://github.com/arshad-shah/cynosure/commit/a688905e3bd3a26248ca90e00b0e3b3e3d4d1013) Thanks [@arshad-shah](https://github.com/arshad-shah)! - Fix overlay positioning flash, DatePicker calendar horizontal scroll, and
+  theme-blind hardcoded colors.
+  - **Popover & HoverCard**: position the floating surface with `top`/`left`
+    instead of `transform: translate3d(...)`. The shared `popoverContent`
+    entrance keyframe animates `transform`, and a running CSS animation overrides
+    an element's inline `transform` for its whole duration — so the surface was
+    painting at the (0,0) origin during the animation and snapping to the anchor
+    when it ended. This is the same fix already applied to Tooltip.
+  - **DatePicker**: the calendar popover was pinned to `width: 18rem`, ~12px
+    narrower than the month grid's intrinsic width, so `overflow: auto` surfaced a
+    permanent horizontal scrollbar (and the fixed width couldn't fit the
+    dual-month layout). It now sizes to the calendar via `width: fit-content`,
+    still capped by `maxWidth` on narrow screens.
+  - **Theme-aware colors**: replaced hardcoded color literals that ignored the
+    active theme with `color-mix(…)` over foundation tokens, so they adapt to
+    dark/high-contrast themes. Affects the inset sheen on every form control
+    (Input, Textarea, Select, …), the dismiss-button / Tag hover wash, and the
+    ColorPicker area/slider thumb shadows.
+
+- [#98](https://github.com/arshad-shah/cynosure/pull/98) [`a688905`](https://github.com/arshad-shah/cynosure/commit/a688905e3bd3a26248ca90e00b0e3b3e3d4d1013) Thanks [@arshad-shah](https://github.com/arshad-shah)! - Fix the Textarea corner resize grip not working with touch/mobile drag. The
+  grip is driven by pointer events, but without `touch-action: none` the browser
+  claimed a finger-drag as a scroll/pan and fired `pointercancel`, so resizing
+  only worked with a mouse. The grip now sets `touch-action: none` and the drag
+  handler also tears down on `pointercancel`.
+
 ## 3.3.0
 
 ### Minor Changes

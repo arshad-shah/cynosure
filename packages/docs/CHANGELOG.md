@@ -1,5 +1,12 @@
 # @arshad-shah/cynosure-docs
 
+## 3.3.1
+
+### Patch Changes
+
+- Updated dependencies [[`a688905`](https://github.com/arshad-shah/cynosure/commit/a688905e3bd3a26248ca90e00b0e3b3e3d4d1013), [`a688905`](https://github.com/arshad-shah/cynosure/commit/a688905e3bd3a26248ca90e00b0e3b3e3d4d1013), [`a688905`](https://github.com/arshad-shah/cynosure/commit/a688905e3bd3a26248ca90e00b0e3b3e3d4d1013)]:
+  - @arshad-shah/cynosure-react@3.3.1
+
 ## 3.3.0
 
 ### Patch Changes
