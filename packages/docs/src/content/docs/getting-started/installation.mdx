@@ -4,18 +4,18 @@ description: How to add Cynosure to a Next.js, Vite, Remix, or CRA project.
 order: 2
 category: getting-started
 ---
+import PackageManagerTabs from '@/components/PackageManagerTabs.astro';
 
 # Installation
 
 ## Zero-config
 
-```bash
-npx cynosure init
-```
+<PackageManagerTabs command="@arshad-shah/cynosure-cli init" kind="dlx" />
 
 Detects your framework (Next.js App Router, Next.js Pages, Vite, CRA, Remix),
-installs the right packages, writes the single CSS import, and adds
-`CynosureProvider`. Add `--dry-run` to preview.
+prints the exact install command for your package manager, writes the single
+CSS import, and wires up `CynosureProvider` (for the Next.js App Router it also
+scaffolds a `providers.tsx`). Add `--dry-run` to preview.
 
 ## Requirements
 
@@ -26,10 +26,7 @@ installs the right packages, writes the single CSS import, and adds
 
 ## Manual install
 
-```bash
-pnpm add @arshad-shah/cynosure-react @arshad-shah/cynosure-tokens
-# or: npm install … · yarn add … · bun add …
-```
+<PackageManagerTabs command="@arshad-shah/cynosure-react @arshad-shah/cynosure-tokens" />
 
 ## Import the CSS — the one-line way
 

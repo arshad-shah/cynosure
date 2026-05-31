@@ -218,6 +218,10 @@
       "types": "./dist/switch.d.ts",
       "import": "./dist/switch.js"
     },
+    "./theme-toggle": {
+      "types": "./dist/theme-toggle.d.ts",
+      "import": "./dist/theme-toggle.js"
+    },
     "./select": {
       "types": "./dist/select.d.ts",
       "import": "./dist/select.js"
@@ -528,6 +532,7 @@
     "radio",
     "radio-group",
     "switch",
+    "theme-toggle",
     "select",
     "multi-select",
     "combobox",
@@ -593,8 +598,8 @@
     "table",
     "timeline",
     "tree",
-    "styles.css.d.ts",
     "core.css.d.ts",
+    "styles.css.d.ts",
     "all.css.d.ts",
     "fonts.css.d.ts",
     "README.md",

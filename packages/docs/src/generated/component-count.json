@@ -1,9 +1,9 @@
 {
-  "total": 101,
+  "total": 102,
   "categories": {
     "forms": {
       "label": "Forms",
-      "count": 31,
+      "count": 32,
       "names": [
         "Button",
         "ButtonGroup",
@@ -35,6 +35,7 @@
         "Switch",
         "TagsInput",
         "Textarea",
+        "ThemeToggle",
         "TimePicker"
       ]
     },

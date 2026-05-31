@@ -317,13 +317,53 @@ export const NavigationMenuContent = forwardRef<HTMLDivElement, NavigationMenuCo
     const root = useNavRoot();
     const item = useContext(NavItemContext);
     const value = item?.value ?? '';
-    if (root.value !== value) return null;
+    const isOpen = root.value === value;
+
+    // The panel is anchored to the trigger's leading edge; on small screens a
+    // trigger near the viewport edge would push a wide panel off-screen and
+    // clip its content. Measure once open and shift it back inside the viewport
+    // (collision avoidance). Applied via `margin-inline-start` rather than a
+    // transform so it doesn't fight the transform-based entrance animation.
+    const panelRef = useRef<HTMLDivElement | null>(null);
+    const shiftRef = useRef(0);
+    const [shift, setShift] = useState(0);
+
+    useLayoutEffect(() => {
+      if (!isOpen) {
+        shiftRef.current = 0;
+        setShift(0);
+        return undefined;
+      }
+      const measure = () => {
+        const el = panelRef.current;
+        if (!el) return;
+        const prev = shiftRef.current;
+        const rect = el.getBoundingClientRect();
+        // Edges with the current shift removed, so re-measuring is idempotent.
+        const left = rect.left - prev;
+        const right = rect.right - prev;
+        const pad = 8;
+        let dx = 0;
+        if (right > window.innerWidth - pad) dx = window.innerWidth - pad - right;
+        if (left + dx < pad) dx = pad - left;
+        shiftRef.current = dx;
+        setShift(dx);
+      };
+      measure();
+      window.addEventListener('resize', measure);
+      return () => window.removeEventListener('resize', measure);
+    }, [isOpen]);
+
+    if (!isOpen) return null;
     return (
       <div
         {...(rest as AnyProps)}
-        ref={ref}
+        ref={composeRefs(ref as React.Ref<HTMLElement>, (node) => {
+          panelRef.current = node as HTMLDivElement | null;
+        })}
         className={cnJoin(navigationMenuContent, className)}
         data-state="open"
+        style={{ marginInlineStart: shift || undefined }}
         onPointerEnter={(event) => {
           onPointerEnter?.(event);
           root.cancelSchedule();

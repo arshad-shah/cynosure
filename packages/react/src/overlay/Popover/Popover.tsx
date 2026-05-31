@@ -16,8 +16,9 @@ import {
 import { useControllableState } from '../../hooks/useControllableState.js';
 import { cn } from '../../utils/cn.js';
 import { composeRefs } from '../../utils/composeRefs.js';
+import { OverlayArrow } from '../shared/OverlayArrow.js';
 import { OverlayPortal } from '../shared/OverlayPortal.js';
-import { popoverArrow, popoverContent } from '../shared/popover.css.js';
+import { popoverArrow, popoverContent, popoverViewport } from '../shared/popover.css.js';
 import { useFloatingPosition } from '../shared/useFloatingPosition.js';
 
 // Held in a constant so biome's `useSemanticElements` doesn't suggest
@@ -246,6 +247,12 @@ export interface PopoverContentProps extends Omit<HTMLAttributes<HTMLDivElement>
   closeOnEscape?: boolean;
   /** Whether outside clicks close the popover. */
   closeOnOutsideClick?: boolean;
+  /**
+   * Render a caret pointing at the trigger. The caret is side-aware and stays
+   * aimed at the trigger when the panel flips or shifts.
+   * @default true
+   */
+  withArrow?: boolean;
   /** Body content. */
   children?: ReactNode;
 }
@@ -274,6 +281,7 @@ export const PopoverContent = forwardRef<HTMLDivElement, PopoverContentProps>(
       closeOnOutsideClick = true,
       initialFocus = 'first',
       trapFocus = true,
+      withArrow = true,
       children,
       style,
       onKeyDown,
@@ -401,32 +409,34 @@ export const PopoverContent = forwardRef<HTMLDivElement, PopoverContentProps>(
           onKeyDown={onKeyDown}
           {...rest}
         >
-          {children}
+          <div className={popoverViewport}>{children}</div>
+          {withArrow ? (
+            <OverlayArrow
+              side={positioning.side}
+              offset={positioning.arrowOffset}
+              className={popoverArrow}
+            />
+          ) : null}
         </div>
       </OverlayPortal>
     );
   },
 );
 
-/** Optional caret pointing at the trigger. */
-export const PopoverArrow = forwardRef<
-  SVGSVGElement,
-  HTMLAttributes<SVGSVGElement> & { width?: number; height?: number }
->(function PopoverArrow({ className, width = 12, height = 6, ...rest }, ref) {
-  return (
-    <svg
-      ref={ref}
-      aria-hidden="true"
-      width={width}
-      height={height}
-      viewBox={`0 0 ${width} ${height}`}
-      className={cn(popoverArrow, className)}
-      {...rest}
-    >
-      <path d={`M0 0 L${width / 2} ${height} L${width} 0 Z`} />
-    </svg>
-  );
-});
+/**
+ * @deprecated The caret is now rendered by `PopoverContent` itself (enabled by
+ * default via its `withArrow` prop) so it can sit outside the scroll viewport
+ * and reorient/aim itself like the Tooltip caret. This component renders
+ * nothing and is retained only so existing imports keep type-checking; remove
+ * it from your `PopoverContent` and use `withArrow={false}` to opt out.
+ */
+export function PopoverArrow(_props: {
+  className?: string;
+  width?: number;
+  height?: number;
+}): ReactElement | null {
+  return null;
+}
 
 function chain<E>(...fns: Array<((event: E) => unknown) | undefined>): (event: E) => void {
   return (event: E) => {

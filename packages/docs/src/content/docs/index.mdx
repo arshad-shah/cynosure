@@ -20,34 +20,18 @@ hero:
       variant: minimal
 ---
 
-import { Tabs, TabItem, CardGrid, Card, LinkCard } from '@astrojs/starlight/components';
+import { CardGrid, Card, LinkCard } from '@astrojs/starlight/components';
+import PackageManagerTabs from '@/components/PackageManagerTabs.astro';
 
 ## Install
 
 Pick your package manager. The Cynosure stylesheet is imported once at app entry.
 
-<Tabs syncKey="pm">
-  <TabItem label="npm">
-    ```sh
-    npm install @arshad-shah/cynosure-react
-    ```
-  </TabItem>
-  <TabItem label="pnpm">
-    ```sh
-    pnpm add @arshad-shah/cynosure-react
-    ```
-  </TabItem>
-  <TabItem label="yarn">
-    ```sh
-    yarn add @arshad-shah/cynosure-react
-    ```
-  </TabItem>
-  <TabItem label="bun">
-    ```sh
-    bun add @arshad-shah/cynosure-react
-    ```
-  </TabItem>
-</Tabs>
+<PackageManagerTabs command="@arshad-shah/cynosure-react" />
+
+Already have a project? Let the CLI wire it up for you:
+
+<PackageManagerTabs command="@arshad-shah/cynosure-cli init" kind="dlx" />
 
 ## Compose, don't configure
 

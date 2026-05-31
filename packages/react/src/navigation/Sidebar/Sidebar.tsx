@@ -204,6 +204,10 @@ export const Sidebar = forwardRef<HTMLElement, SidebarProps>(function Sidebar(
             data-collapsible="none"
             data-collapsed="false"
             className={cn(sidebarRoot, sidebarVariant[ctx.variant], className)}
+            // Inside the mobile Drawer the rail must fill the available width
+            // rather than force its fixed desktop width (which the Drawer would
+            // clip on narrow screens), so it honors the screen size.
+            style={{ width: '100%', minWidth: 0, maxWidth: '100%' }}
             {...rest}
           >
             {children}

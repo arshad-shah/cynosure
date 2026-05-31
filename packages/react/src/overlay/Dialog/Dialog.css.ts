@@ -48,6 +48,7 @@ export const dialogSize = styleVariants({
     maxWidth: 'calc(100vw - 2rem)',
     maxHeight: 'calc(100dvh - 2rem)',
     width: 'calc(100vw - 2rem)',
+    height: 'calc(100dvh - 2rem)',
   },
 });
 

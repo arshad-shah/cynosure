@@ -139,6 +139,7 @@ export const COMPONENTS = [
   { name: 'Radio', slug: 'radio', entry: 'radio', category: 'forms' },
   { name: 'RadioGroup', slug: 'radio-group', entry: 'radiogroup', category: 'forms' },
   { name: 'Switch', slug: 'switch', entry: 'switch', category: 'forms' },
+  { name: 'ThemeToggle', slug: 'theme-toggle', entry: 'theme-toggle', category: 'forms' },
   { name: 'Select', slug: 'select', entry: 'select', category: 'forms' },
   { name: 'MultiSelect', slug: 'multi-select', entry: 'multiselect', category: 'forms' },
   { name: 'Combobox', slug: 'combobox', entry: 'combobox', category: 'forms' },

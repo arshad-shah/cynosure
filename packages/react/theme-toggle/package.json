@@ -1,0 +1,9 @@
+{
+  "name": "@arshad-shah/cynosure-react/theme-toggle",
+  "private": true,
+  "type": "module",
+  "main": "../dist/theme-toggle.js",
+  "module": "../dist/theme-toggle.js",
+  "types": "../dist/theme-toggle.d.ts",
+  "sideEffects": ["*.css"]
+}

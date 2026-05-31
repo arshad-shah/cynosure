@@ -19,8 +19,8 @@ ${c.bold('Options for init')}
   --cwd <path>        Target directory (default: current working directory)
 
 ${c.bold('Examples')}
-  npx cynosure init
-  npx cynosure init --dry-run
+  npx @arshad-shah/cynosure-cli init
+  npx @arshad-shah/cynosure-cli init --dry-run
 `;
 
 function parseArgs(argv: string[]): { command: string; flags: Record<string, string | boolean> } {

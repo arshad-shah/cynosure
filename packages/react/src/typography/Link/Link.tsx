@@ -9,7 +9,7 @@ import {
 import { Box } from '../../primitives/layout/Box/Box.js';
 import type { AsChildProps, LayoutProps } from '../../primitives/layout/shared/index.js';
 import { cn } from '../../utils/cn.js';
-import { linkBase, linkDisabled, linkUnderline, linkVariant } from './Link.css.js';
+import { externalIcon, linkBase, linkDisabled, linkUnderline, linkVariant } from './Link.css.js';
 
 export type LinkVariant = 'default' | 'subtle' | 'emphasis';
 export type LinkUnderline = 'always' | 'hover' | 'none';
@@ -121,7 +121,7 @@ const LinkRender = (props: AnyProps, ref: ForwardedRef<HTMLAnchorElement>): Reac
       {external ? (
         <>
           {children}
-          <ExternalLink />
+          <ExternalLink className={externalIcon} aria-hidden="true" focusable={false} />
         </>
       ) : (
         children

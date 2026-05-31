@@ -4,6 +4,7 @@ import { useLocale } from 'react-aria-components';
 import type { TimeValue } from 'react-aria-components';
 import {
   wheelColumn,
+  wheelColumnsFour,
   wheelColumnsThree,
   wheelColumnsTwo,
   wheelItem,
@@ -18,14 +19,19 @@ export interface TimePickerWheelProps {
   hourCycle?: 12 | 24;
   /** Step between minute values. Defaults to `1`. */
   minuteStep?: number;
+  /** Render an additional seconds column. */
+  withSeconds?: boolean;
 }
 
-/** Three-column scroll-snap wheel UI for picking an hour/minute/period. */
+const COLUMN_LAYOUT = [wheelColumnsTwo, wheelColumnsThree, wheelColumnsFour] as const;
+
+/** Scroll-snap wheel UI for picking an hour/minute(/second)(/period). */
 export function TimePickerWheel({
   value,
   onChange,
   hourCycle,
   minuteStep = 1,
+  withSeconds = false,
 }: TimePickerWheelProps): ReactElement {
   const { locale } = useLocale();
 
@@ -54,6 +60,8 @@ export function TimePickerWheel({
     return out;
   }, [minuteStep]);
 
+  const seconds = useMemo(() => Array.from({ length: 60 }, (_, i) => i), []);
+
   const currentPeriod: 'AM' | 'PM' = current.hour < 12 ? 'AM' : 'PM';
   const currentDisplayHour = is24 ? current.hour : current.hour % 12 === 0 ? 12 : current.hour % 12;
 
@@ -70,6 +78,10 @@ export function TimePickerWheel({
     onChange(new Time(current.hour, m, current.second));
   }
 
+  function onPickSecond(s: number): void {
+    onChange(new Time(current.hour, current.minute, s));
+  }
+
   function onPickPeriod(p: 'AM' | 'PM'): void {
     if (p === currentPeriod) return;
     const nextHour = p === 'AM' ? current.hour - 12 : current.hour + 12;
@@ -79,8 +91,11 @@ export function TimePickerWheel({
   const step = Math.max(1, Math.floor(minuteStep));
   const snappedMinute = current.minute - (current.minute % step);
 
+  const columnCount = 2 + (withSeconds ? 1 : 0) + (is24 ? 0 : 1);
+  const columnsClass = COLUMN_LAYOUT[columnCount - 2];
+
   return (
-    <div className={is24 ? wheelColumnsTwo : wheelColumnsThree}>
+    <div className={columnsClass}>
       <WheelColumn
         label="Hour"
         items={hours}
@@ -95,6 +110,15 @@ export function TimePickerWheel({
         format={(n) => String(n).padStart(2, '0')}
         onPick={onPickMinute}
       />
+      {withSeconds ? (
+        <WheelColumn
+          label="Second"
+          items={seconds}
+          selected={current.second}
+          format={(n) => String(n).padStart(2, '0')}
+          onPick={onPickSecond}
+        />
+      ) : null}
       {is24 ? null : (
         <WheelColumn<'AM' | 'PM'>
           label="Period"

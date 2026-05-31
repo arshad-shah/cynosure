@@ -1,5 +1,5 @@
 import { Command as CommandPrimitive } from 'cmdk';
-import { Loader2, Search } from 'lucide-react';
+import { ArrowDown, ArrowUp, CornerDownLeft, Loader2, Search } from 'lucide-react';
 import {
   type ComponentPropsWithoutRef,
   type ElementRef,
@@ -9,6 +9,7 @@ import {
   useEffect,
   useState,
 } from 'react';
+import { kbdIcon } from '../../typography/Kbd/Kbd.css.js';
 import { Kbd } from '../../typography/Kbd/Kbd.js';
 import { cn } from '../../utils/cn.js';
 import {
@@ -285,11 +286,12 @@ export function CommandShortcut({ children, className, ...rest }: CommandShortcu
 
 /**
  * Props for the sticky footer hint row. Inherits all standard `<div>`
- * attributes; pass `children` to replace the default `↵ / ↑↓ / Esc` hints.
+ * attributes; pass `children` to replace the default Enter / arrows / Esc
+ * hints.
  */
 export interface CommandFooterProps extends HTMLAttributes<HTMLDivElement> {}
 
-/** Sticky bottom hints row — the `↵ select` / `Esc close` affordances. */
+/** Sticky bottom hints row — the "Enter select" / "Esc close" affordances. */
 export function CommandFooter({ className, children, ...rest }: CommandFooterProps) {
   return (
     <div className={cn(paletteFooter, className)} {...rest}>
@@ -297,11 +299,19 @@ export function CommandFooter({ className, children, ...rest }: CommandFooterPro
         <>
           <span className={paletteFooterHints}>
             <span className={paletteFooterHint}>
-              <Kbd size="sm">↵</Kbd> select
+              <Kbd size="sm">
+                <CornerDownLeft className={kbdIcon} size={12} aria-hidden="true" />
+              </Kbd>{' '}
+              select
             </span>
             <span className={paletteFooterHint}>
-              <Kbd size="sm">↑</Kbd>
-              <Kbd size="sm">↓</Kbd> navigate
+              <Kbd size="sm">
+                <ArrowUp className={kbdIcon} size={12} aria-hidden="true" />
+              </Kbd>
+              <Kbd size="sm">
+                <ArrowDown className={kbdIcon} size={12} aria-hidden="true" />
+              </Kbd>{' '}
+              navigate
             </span>
           </span>
           <span className={paletteFooterHint}>
