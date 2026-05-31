@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { useState } from 'react';
+import { expect, userEvent, within } from 'storybook/test';
 import { Button } from '../../forms/Button/Button.js';
 import { Input } from '../../forms/Input/Input.js';
 import { Inline } from '../../primitives/layout/Inline/Inline.js';
@@ -34,37 +34,6 @@ export const Default: Story = {
       </PopoverContent>
     </Popover>
   ),
-};
-
-export const Controlled: Story = {
-  render: () => {
-    function Controlled(): React.ReactElement {
-      const [open, setOpen] = useState(false);
-      return (
-        <Stack gap="3" align="start">
-          <Text size="sm" color="fg.muted">
-            open: <strong>{String(open)}</strong>
-          </Text>
-          <Popover open={open} onOpenChange={setOpen}>
-            <PopoverTrigger asChild>
-              <Button>Controlled popover</Button>
-            </PopoverTrigger>
-            <PopoverContent>
-              <Stack gap="3" padding="4" minWidth="240px">
-                <Text size="sm">This popover&rsquo;s open state is external.</Text>
-                <Inline gap="2" justify="end">
-                  <Button size="sm" variant="ghost" onClick={() => setOpen(false)}>
-                    Close
-                  </Button>
-                </Inline>
-              </Stack>
-            </PopoverContent>
-          </Popover>
-        </Stack>
-      );
-    }
-    return <Controlled />;
-  },
 };
 
 export const WithForm: Story = {
@@ -163,69 +132,35 @@ export const WithArrow: Story = {
   ),
 };
 
-export const SharePopover: Story = {
-  name: 'Use case — share link',
+export const Interaction: Story = {
+  name: 'Interaction · click opens, Escape closes',
   render: () => (
     <Popover>
       <PopoverTrigger asChild>
-        <Button>Share</Button>
+        <Button variant="outline">Open popover</Button>
       </PopoverTrigger>
       <PopoverContent>
-        <Stack gap="3" padding="4" minWidth="320px">
-          <Stack gap="1">
-            <Heading level={4} size="sm">
-              Share this document
-            </Heading>
-            <Text size="xs" color="fg.muted">
-              Anyone with the link can view.
-            </Text>
-          </Stack>
-          <Inline gap="2">
-            <Input readOnly defaultValue="https://cynosure.app/d/abc" />
-            <Button variant="outline">Copy</Button>
-          </Inline>
-          <Inline gap="2" justify="end">
-            <PopoverClose asChild>
-              <Button variant="ghost" size="sm">
-                Done
-              </Button>
-            </PopoverClose>
-          </Inline>
+        <Stack gap="2" padding="4" minWidth="240px">
+          <Heading level={4} size="sm">
+            Quick info
+          </Heading>
+          <Text size="sm" color="fg.muted">
+            Popovers float next to their trigger and trap focus while open.
+          </Text>
         </Stack>
       </PopoverContent>
     </Popover>
   ),
-};
-
-export const Nested: Story = {
-  name: 'Nested popovers',
-  render: () => (
-    <Popover>
-      <PopoverTrigger asChild>
-        <Button>Open parent</Button>
-      </PopoverTrigger>
-      <PopoverContent>
-        <Stack gap="3" padding="4" minWidth="240px">
-          <Text size="sm">Parent popover. Nested popovers are allowed.</Text>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button size="sm" variant="outline">
-                Open nested
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent>
-              <Stack gap="2" padding="3" minWidth="200px">
-                <Text size="sm" weight="medium">
-                  Nested popover
-                </Text>
-                <Text size="xs" color="fg.muted">
-                  Esc closes this one first.
-                </Text>
-              </Stack>
-            </PopoverContent>
-          </Popover>
-        </Stack>
-      </PopoverContent>
-    </Popover>
-  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const trigger = canvas.getByRole('button', { name: 'Open popover' });
+    await expect(trigger).toHaveAttribute('aria-expanded', 'false');
+    await userEvent.click(trigger);
+    // Content portals to document.body, so query the whole screen.
+    const dialog = await within(document.body).findByRole('dialog');
+    await expect(dialog).toBeInTheDocument();
+    await expect(trigger).toHaveAttribute('aria-expanded', 'true');
+    await userEvent.keyboard('{Escape}');
+    await expect(within(document.body).queryByRole('dialog')).not.toBeInTheDocument();
+  },
 };

@@ -1,10 +1,9 @@
-import { parseDate, today } from '@internationalized/date';
+import { parseDate } from '@internationalized/date';
 import type { Meta, StoryObj } from '@storybook/react';
 import { useState } from 'react';
 import type { DateValue } from 'react-aria-components';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { Stack } from '../../primitives/layout/Stack/Stack.js';
-import { LocaleProvider } from '../../theme/index.js';
-import { Text } from '../../typography/Text/Text.js';
 import {
   Form,
   FormControl,
@@ -30,9 +29,6 @@ const meta: Meta<typeof DatePicker> = {
 };
 export default meta;
 type Story = StoryObj<typeof DatePicker>;
-
-const TZ = 'UTC';
-const TODAY = today(TZ);
 
 export const Playground: Story = {
   args: {
@@ -80,20 +76,6 @@ export const States: Story = {
   ),
 };
 
-export const MinMax: Story = {
-  name: 'minValue / maxValue',
-  render: () => (
-    <div style={{ width: '320px' }}>
-      <DatePicker
-        label="Must fall within the next 30 days"
-        minValue={TODAY}
-        maxValue={TODAY.add({ days: 30 })}
-        defaultValue={TODAY.add({ days: 7 })}
-      />
-    </div>
-  ),
-};
-
 export const Granularity: Story = {
   name: 'granularity (day / minute)',
   render: () => (
@@ -104,49 +86,22 @@ export const Granularity: Story = {
   ),
 };
 
-export const Controlled: Story = {
-  render: () => {
-    function Controlled(): React.ReactElement {
-      const [value, setValue] = useState<DateValue | null>(parseDate('2026-04-17'));
-      return (
-        <Stack gap="3" width="320px">
-          <DatePicker label="Pick a date" value={value} onChange={setValue} />
-          <Text size="sm" color="fg.muted">
-            Value: <code>{value ? value.toString() : 'null'}</code>
-          </Text>
-        </Stack>
-      );
-    }
-    return <Controlled />;
-  },
-};
-
-export const Uncontrolled: Story = {
+export const Interaction: Story = {
+  name: 'Interaction · open calendar, Escape closes',
   render: () => (
     <div style={{ width: '320px' }}>
-      <DatePicker label="Uncontrolled" defaultValue={parseDate('2026-04-17')} />
+      <DatePicker label="Start date" defaultValue={parseDate('2026-04-17')} />
     </div>
   ),
-};
-
-export const Locales: Story = {
-  name: 'Locale-aware formatting',
-  render: () => (
-    <Stack gap="4" width="360px">
-      <LocaleProvider locale="en-IE">
-        <DatePicker label="en-IE (Ireland)" defaultValue={parseDate('2026-04-17')} />
-      </LocaleProvider>
-      <LocaleProvider locale="en-US">
-        <DatePicker label="en-US (United States)" defaultValue={parseDate('2026-04-17')} />
-      </LocaleProvider>
-      <LocaleProvider locale="de-DE">
-        <DatePicker label="de-DE (Germany)" defaultValue={parseDate('2026-04-17')} />
-      </LocaleProvider>
-      <LocaleProvider locale="ja-JP">
-        <DatePicker label="ja-JP (Japan)" defaultValue={parseDate('2026-04-17')} />
-      </LocaleProvider>
-    </Stack>
-  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await userEvent.click(canvas.getByRole('button', { name: 'Open calendar' }));
+    // The calendar (react-aria grid) portals out, so query the whole document.
+    const grid = await within(document.body).findByRole('grid');
+    await expect(grid).toBeInTheDocument();
+    await userEvent.keyboard('{Escape}');
+    await waitFor(() => expect(within(document.body).queryByRole('grid')).not.toBeInTheDocument());
+  },
 };
 
 export const InsideFormField: Story = {

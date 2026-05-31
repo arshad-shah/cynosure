@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { Button } from '../../forms/Button/Button.js';
 import { Inline } from '../../primitives/layout/Inline/Inline.js';
 import { Stack } from '../../primitives/layout/Stack/Stack.js';
@@ -89,41 +90,6 @@ export const UserMention: Story = {
   ),
 };
 
-export const ProductPreview: Story = {
-  name: 'Product preview card',
-  render: () => (
-    <Inline gap="3">
-      <HoverCard>
-        <HoverCardTrigger asChild>
-          <Button variant="outline">LM Studio Pro</Button>
-        </HoverCardTrigger>
-        <HoverCardContent>
-          <Stack gap="3" padding="4" minWidth="320px">
-            <Stack gap="1">
-              <Heading level={4} size="sm">
-                LM Studio Pro
-              </Heading>
-              <Text size="xs" color="fg.muted">
-                Team plan · 20 seats
-              </Text>
-            </Stack>
-            <Text size="sm">
-              Local model evaluation, production-grade prompt caching, and organisation-wide
-              analytics.
-            </Text>
-            <Inline gap="3" justify="between" align="center">
-              <Text size="md" weight="semibold">
-                $199/mo
-              </Text>
-              <Button size="sm">Upgrade</Button>
-            </Inline>
-          </Stack>
-        </HoverCardContent>
-      </HoverCard>
-    </Inline>
-  ),
-};
-
 export const Placements: Story = {
   render: () => (
     <Stack gap="4">
@@ -176,40 +142,34 @@ export const WithArrow: Story = {
   ),
 };
 
-export const DelayedOpen: Story = {
-  name: 'Custom open / close delay',
+export const Interaction: Story = {
+  name: 'Interaction · hover opens, unhover closes',
   render: () => (
-    <Inline gap="3">
-      <HoverCard openDelay={0} closeDelay={0}>
-        <HoverCardTrigger asChild>
-          <Button variant="outline">Instant</Button>
-        </HoverCardTrigger>
-        <HoverCardContent>
-          <Stack gap="1" padding="3" minWidth="180px">
-            <Text size="sm" weight="medium">
-              openDelay = 0
-            </Text>
-            <Text size="xs" color="fg.muted">
-              Appears immediately on hover.
-            </Text>
-          </Stack>
-        </HoverCardContent>
-      </HoverCard>
-      <HoverCard openDelay={700}>
-        <HoverCardTrigger asChild>
-          <Button variant="outline">Long press (700ms)</Button>
-        </HoverCardTrigger>
-        <HoverCardContent>
-          <Stack gap="1" padding="3" minWidth="180px">
-            <Text size="sm" weight="medium">
-              openDelay = 700
-            </Text>
-            <Text size="xs" color="fg.muted">
-              Only shows after sustained hover.
-            </Text>
-          </Stack>
-        </HoverCardContent>
-      </HoverCard>
-    </Inline>
+    <HoverCard openDelay={0} closeDelay={0}>
+      <HoverCardTrigger asChild>
+        <Button variant="outline">Hover me</Button>
+      </HoverCardTrigger>
+      <HoverCardContent>
+        <Stack gap="1" padding="3" minWidth="180px">
+          <Text size="sm" weight="medium">
+            Revealed on hover
+          </Text>
+          <Text size="xs" color="fg.muted">
+            Pointer-driven, non-modal context.
+          </Text>
+        </Stack>
+      </HoverCardContent>
+    </HoverCard>
   ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const trigger = canvas.getByRole('button', { name: 'Hover me' });
+    await userEvent.hover(trigger);
+    const card = await within(document.body).findByRole('dialog');
+    await expect(card).toBeInTheDocument();
+    await userEvent.unhover(trigger);
+    await waitFor(() =>
+      expect(within(document.body).queryByRole('dialog')).not.toBeInTheDocument(),
+    );
+  },
 };
