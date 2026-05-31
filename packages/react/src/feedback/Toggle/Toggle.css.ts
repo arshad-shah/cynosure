@@ -118,6 +118,24 @@ globalStyle(`${toggleGroupAttached} ${toggleRoot}:last-child`, {
   borderInlineEnd: 'none',
 });
 
+// Round the outer corners of the end items so a selected item's fill follows
+// the group's rounded border instead of poking square corners past it. We
+// round the items rather than clipping the wrapper with `overflow: hidden`,
+// which would crop the items' focus-ring box-shadow. The inner radius is the
+// wrapper radius minus its 1px border so the corner nests exactly.
+const attachedRadius = `calc(${vars.radius.md} - 1px)`;
+
+// Horizontal (default): first item rounds its leading edge, last its trailing.
+globalStyle(`${toggleGroupAttached} ${toggleRoot}:first-child`, {
+  borderStartStartRadius: attachedRadius,
+  borderEndStartRadius: attachedRadius,
+});
+
+globalStyle(`${toggleGroupAttached} ${toggleRoot}:last-child`, {
+  borderStartEndRadius: attachedRadius,
+  borderEndEndRadius: attachedRadius,
+});
+
 globalStyle(`${toggleGroupAttached}[data-orientation="vertical"] ${toggleRoot}`, {
   borderInlineEnd: 'none',
   borderBlockEnd: `1px solid ${vars.color.border.subtle}`,
@@ -125,4 +143,18 @@ globalStyle(`${toggleGroupAttached}[data-orientation="vertical"] ${toggleRoot}`,
 
 globalStyle(`${toggleGroupAttached}[data-orientation="vertical"] ${toggleRoot}:last-child`, {
   borderBlockEnd: 'none',
+});
+
+// Vertical: first item rounds its top edge, last its bottom edge — and the
+// inline-axis corners the horizontal rules set above are reset to 0.
+globalStyle(`${toggleGroupAttached}[data-orientation="vertical"] ${toggleRoot}:first-child`, {
+  borderStartStartRadius: attachedRadius,
+  borderStartEndRadius: attachedRadius,
+  borderEndStartRadius: 0,
+});
+
+globalStyle(`${toggleGroupAttached}[data-orientation="vertical"] ${toggleRoot}:last-child`, {
+  borderEndStartRadius: attachedRadius,
+  borderEndEndRadius: attachedRadius,
+  borderStartEndRadius: 0,
 });
