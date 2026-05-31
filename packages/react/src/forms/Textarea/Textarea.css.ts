@@ -369,6 +369,10 @@ export const resizeGrip = style({
   background: 'transparent',
   color: vars.color.foreground.subtle,
   cursor: 'nwse-resize',
+  // Claim the drag gesture on touch devices. Without this the browser treats
+  // a finger-drag on the grip as a scroll/pan, firing `pointercancel` and
+  // killing the resize — so the grip only worked with a mouse.
+  touchAction: 'none',
   transition: `color ${vars.duration.fast}, transform ${vars.duration.fast}`,
   selectors: {
     '&:hover': { color: vars.color.foreground.muted },

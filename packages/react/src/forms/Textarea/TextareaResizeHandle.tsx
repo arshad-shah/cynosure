@@ -71,9 +71,11 @@ export function TextareaResizeHandle({
       const onUp = (): void => {
         window.removeEventListener('pointermove', onMove);
         window.removeEventListener('pointerup', onUp);
+        window.removeEventListener('pointercancel', onUp);
       };
       window.addEventListener('pointermove', onMove);
       window.addEventListener('pointerup', onUp);
+      window.addEventListener('pointercancel', onUp);
     },
     [ctx.fieldRef, ctx.rootRef, ctx.resize],
   );
