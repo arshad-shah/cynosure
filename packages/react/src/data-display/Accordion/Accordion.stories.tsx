@@ -1,9 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { useState } from 'react';
-import { Button } from '../../forms/Button/Button.js';
-import { Inline } from '../../primitives/layout/Inline/Inline.js';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { Stack } from '../../primitives/layout/Stack/Stack.js';
-import { List, ListItem } from '../../typography/List/List.js';
 import { Text } from '../../typography/Text/Text.js';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './Accordion.js';
 
@@ -135,43 +132,6 @@ export const Sizes: Story = {
   ),
 };
 
-export const Controlled: Story = {
-  render: () => {
-    function Controlled(): React.ReactElement {
-      const [value, setValue] = useState<string>('');
-      return (
-        <Stack gap="3" style={{ maxWidth: 520 }}>
-          <Inline gap="2">
-            <Button size="sm" variant="outline" onClick={() => setValue('shipping')}>
-              Open shipping
-            </Button>
-            <Button size="sm" variant="outline" onClick={() => setValue('warranty')}>
-              Open warranty
-            </Button>
-            <Button size="sm" variant="ghost" onClick={() => setValue('')}>
-              Close all
-            </Button>
-          </Inline>
-          <Accordion type="single" collapsible value={value} onValueChange={setValue}>
-            {FAQ_ITEMS.map((item) => (
-              <AccordionItem key={item.value} value={item.value}>
-                <AccordionTrigger>{item.q}</AccordionTrigger>
-                <AccordionContent>
-                  <Text>{item.a}</Text>
-                </AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
-          <Text size="sm" color="fg.muted">
-            Active: <code>{value || '(none)'}</code>
-          </Text>
-        </Stack>
-      );
-    }
-    return <Controlled />;
-  },
-};
-
 export const DisabledItem: Story = {
   name: 'Disabled item',
   render: () => (
@@ -200,80 +160,35 @@ export const DisabledItem: Story = {
   ),
 };
 
-export const RichContent: Story = {
-  name: 'Rich content (lists, images)',
+export const Interaction: Story = {
+  name: 'Interaction · toggle expands and collapses a panel',
   render: () => (
-    <div style={{ maxWidth: 560 }}>
-      <Accordion type="multiple" defaultValue={['checklist']}>
-        <AccordionItem value="checklist">
-          <AccordionTrigger>Launch checklist</AccordionTrigger>
-          <AccordionContent>
-            <List>
-              <ListItem>Audit accessibility with axe-core</ListItem>
-              <ListItem>Write migration guide for 2.x consumers</ListItem>
-              <ListItem>Verify all components render under dark mode</ListItem>
-              <ListItem>Publish release notes to the changelog</ListItem>
-            </List>
-          </AccordionContent>
-        </AccordionItem>
-        <AccordionItem value="preview">
-          <AccordionTrigger>Preview image</AccordionTrigger>
-          <AccordionContent>
-            <Stack gap="2">
-              <img
-                src="https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=640&q=60"
-                alt="Developer workstation"
-                style={{
-                  width: '100%',
-                  borderRadius: 'var(--cynosure-radius-md)',
-                  display: 'block',
-                }}
-              />
-              <Text size="sm" color="fg.muted">
-                A typical developer setup.
-              </Text>
-            </Stack>
-          </AccordionContent>
-        </AccordionItem>
-        <AccordionItem value="cta">
-          <AccordionTrigger>Ready to go?</AccordionTrigger>
-          <AccordionContent>
-            <Stack gap="3">
-              <Text>Kick off the release once all items above are green.</Text>
-              <Inline gap="2">
-                <Button size="sm">Ship it</Button>
-                <Button size="sm" variant="ghost">
-                  Not yet
-                </Button>
-              </Inline>
-            </Stack>
-          </AccordionContent>
-        </AccordionItem>
+    <div style={{ maxWidth: 520 }}>
+      <Accordion type="single" collapsible>
+        {FAQ_ITEMS.slice(0, 3).map((item) => (
+          <AccordionItem key={item.value} value={item.value}>
+            <AccordionTrigger>{item.q}</AccordionTrigger>
+            <AccordionContent>
+              <Text>{item.a}</Text>
+            </AccordionContent>
+          </AccordionItem>
+        ))}
       </Accordion>
     </div>
   ),
-};
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const shipping = canvas.getByRole('button', { name: FAQ_ITEMS[0].q });
+    await expect(shipping).toHaveAttribute('aria-expanded', 'false');
 
-export const LongContent: Story = {
-  name: 'Edge case — long content',
-  render: () => (
-    <div style={{ maxWidth: 560 }}>
-      <Accordion type="single" collapsible defaultValue="terms">
-        <AccordionItem value="terms">
-          <AccordionTrigger>Terms of service</AccordionTrigger>
-          <AccordionContent>
-            <Stack gap="2">
-              {Array.from({ length: 4 }, (_, i) => (
-                <Text key={`p-${i.toString()}`}>
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at suscipit metus,
-                  ac lobortis nunc. Integer ornare pharetra orci, sit amet vehicula libero pulvinar
-                  vel. Nulla facilisi. Cras sed ante quis nibh convallis bibendum.
-                </Text>
-              ))}
-            </Stack>
-          </AccordionContent>
-        </AccordionItem>
-      </Accordion>
-    </div>
-  ),
+    await userEvent.click(shipping);
+    await expect(shipping).toHaveAttribute('aria-expanded', 'true');
+    await waitFor(() => {
+      expect(canvas.getByText(FAQ_ITEMS[0].a)).toBeVisible();
+    });
+
+    // Collapsible single mode lets the open item close again.
+    await userEvent.click(shipping);
+    await expect(shipping).toHaveAttribute('aria-expanded', 'false');
+  },
 };

@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { useRef } from 'react';
 import type { PanelImperativeHandle } from 'react-resizable-panels';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { Button } from '../../forms/Button/Button.js';
 import { Inline } from '../../primitives/layout/Inline/Inline.js';
 import { Stack } from '../../primitives/layout/Stack/Stack.js';
@@ -90,63 +91,6 @@ export const VerticalSplit: Story = {
   ),
 };
 
-export const IDELayout: Story = {
-  name: 'Three-pane IDE layout',
-  render: () => (
-    <div style={{ ...CONTAINER_STYLE, height: 420 }}>
-      <Resizable direction="horizontal">
-        <ResizablePanel defaultSize={22} minSize={15} maxSize={40}>
-          <Pane label="Files" accent>
-            <Stack gap="1">
-              <Text size="sm">▸ src</Text>
-              <Text size="sm">▸ tests</Text>
-              <Text size="sm">README.md</Text>
-              <Text size="sm">package.json</Text>
-            </Stack>
-          </Pane>
-        </ResizablePanel>
-        <ResizableHandle withHandle />
-        <ResizablePanel defaultSize={58}>
-          <Resizable direction="vertical">
-            <ResizablePanel defaultSize={70}>
-              <Pane label="Editor">
-                <pre
-                  style={{
-                    margin: 0,
-                    fontFamily: 'var(--cynosure-font-mono)',
-                    fontSize: 12,
-                    lineHeight: 1.6,
-                  }}
-                >
-                  {'function sum(a: number, b: number) {\n  return a + b;\n}\n'}
-                </pre>
-              </Pane>
-            </ResizablePanel>
-            <ResizableHandle withHandle />
-            <ResizablePanel defaultSize={30}>
-              <Pane label="Terminal">
-                <Text size="sm" style={{ fontFamily: 'var(--cynosure-font-mono)' }}>
-                  $ pnpm test — 42 passing
-                </Text>
-              </Pane>
-            </ResizablePanel>
-          </Resizable>
-        </ResizablePanel>
-        <ResizableHandle withHandle />
-        <ResizablePanel defaultSize={20} minSize={15} maxSize={35}>
-          <Pane label="Outline">
-            <Stack gap="1">
-              <Text size="sm">function sum</Text>
-              <Text size="sm">const add</Text>
-              <Text size="sm">export default</Text>
-            </Stack>
-          </Pane>
-        </ResizablePanel>
-      </Resizable>
-    </div>
-  ),
-};
-
 export const MinMaxConstraints: Story = {
   name: 'Min / max size constraints',
   render: () => (
@@ -208,19 +152,55 @@ export const CollapsiblePanel: Story = {
   },
 };
 
-export const NoHandleIndicator: Story = {
-  name: 'Minimal (no grip)',
-  render: () => (
-    <div style={CONTAINER_STYLE}>
-      <Resizable direction="horizontal">
-        <ResizablePanel defaultSize={50}>
-          <Pane label="One" />
-        </ResizablePanel>
-        <ResizableHandle />
-        <ResizablePanel defaultSize={50}>
-          <Pane label="Two" accent />
-        </ResizablePanel>
-      </Resizable>
-    </div>
-  ),
+export const Interaction: Story = {
+  name: 'Interaction · separator present, panel collapses',
+  render: () => {
+    function Demo(): React.ReactElement {
+      const sidebarRef = useRef<PanelImperativeHandle | null>(null);
+      return (
+        <Stack gap="3">
+          <Inline gap="2">
+            <Button size="sm" onClick={() => sidebarRef.current?.collapse()}>
+              Collapse sidebar
+            </Button>
+            <Button size="sm" variant="outline" onClick={() => sidebarRef.current?.expand()}>
+              Expand sidebar
+            </Button>
+          </Inline>
+          <div style={CONTAINER_STYLE}>
+            <Resizable direction="horizontal">
+              <ResizablePanel
+                panelRef={sidebarRef}
+                defaultSize={25}
+                minSize={15}
+                maxSize={40}
+                collapsible
+                collapsedSize={4}
+              >
+                <Pane label="Sidebar" accent />
+              </ResizablePanel>
+              <ResizableHandle withHandle />
+              <ResizablePanel defaultSize={75}>
+                <Pane label="Content" />
+              </ResizablePanel>
+            </Resizable>
+          </div>
+        </Stack>
+      );
+    }
+    return <Demo />;
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    // The draggable handle is a focusable ARIA separator tracking the boundary.
+    const handle = canvas.getByRole('separator');
+    await expect(handle).toBeInTheDocument();
+    await expect(Number(handle.getAttribute('aria-valuenow'))).toBeGreaterThan(20);
+
+    await userEvent.click(canvas.getByRole('button', { name: 'Collapse sidebar' }));
+    await waitFor(() => {
+      // Collapsing snaps the sidebar to its collapsedSize (4%).
+      expect(Number(handle.getAttribute('aria-valuenow'))).toBeLessThan(10);
+    });
+  },
 };

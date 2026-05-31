@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import { expect, waitFor, within } from 'storybook/test';
 import { Inline } from '../../primitives/layout/Inline/Inline.js';
 import { Stack } from '../../primitives/layout/Stack/Stack.js';
 import { Heading } from '../../typography/Heading/Heading.js';
@@ -101,64 +102,36 @@ export const TypeAlways: Story = {
   ),
 };
 
-export const LongList: Story = {
-  name: 'Long formatted list',
+export const Interaction: Story = {
+  name: 'Interaction · content scrolls vertically',
   render: () => (
-    <ScrollArea height={320} width={360} style={BOX_STYLE}>
-      <Stack gap="2" style={{ padding: 'var(--cynosure-space-4)' }} dividers>
-        {Array.from({ length: 25 }, (_, i) => (
-          <Inline key={`user-${i.toString()}`} gap="3" align="center">
-            <div
-              aria-hidden="true"
-              style={{
-                width: 32,
-                height: 32,
-                borderRadius: '50%',
-                background: 'var(--cynosure-color-accent-muted)',
-                color: 'var(--cynosure-color-accent-solid)',
-                display: 'grid',
-                placeItems: 'center',
-                fontSize: 12,
-                fontWeight: 600,
-              }}
-            >
-              {(i + 1).toString().padStart(2, '0')}
-            </div>
-            <Stack gap="0" style={{ flex: 1 }}>
-              <Text size="sm" weight="medium">
-                User {(i + 1).toString()}
-              </Text>
-              <Text size="xs" color="fg.muted">
-                user{(i + 1).toString()}@example.com
-              </Text>
-            </Stack>
-          </Inline>
+    <ScrollArea
+      data-testid="scroller"
+      height={200}
+      width={320}
+      style={BOX_STYLE}
+      scrollbars="vertical"
+    >
+      <Stack gap="2" style={{ padding: 'var(--cynosure-space-3)' }}>
+        {Array.from({ length: 40 }, (_, i) => (
+          <Text key={`line-${i.toString()}`} size="sm">
+            Item #{(i + 1).toString().padStart(2, '0')}
+          </Text>
         ))}
       </Stack>
     </ScrollArea>
   ),
-};
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const scroller = canvas.getByTestId('scroller');
+    // Content overflows its fixed height, so there is room to scroll.
+    await expect(scroller.scrollHeight).toBeGreaterThan(scroller.clientHeight);
+    await expect(scroller.scrollTop).toBe(0);
 
-export const CodeBlockContainer: Story = {
-  name: 'Containing a long code snippet',
-  render: () => (
-    <ScrollArea width={520} height={240} style={BOX_STYLE}>
-      <pre
-        style={{
-          margin: 0,
-          padding: 'var(--cynosure-space-4)',
-          fontFamily: 'var(--cynosure-font-mono)',
-          fontSize: 13,
-          lineHeight: 1.6,
-          whiteSpace: 'pre',
-        }}
-      >
-        {Array.from(
-          { length: 30 },
-          (_, i) =>
-            `${(i + 1).toString().padStart(2, '0')}  const value_${i.toString()} = compute(${i.toString()});`,
-        ).join('\n')}
-      </pre>
-    </ScrollArea>
-  ),
+    scroller.scrollTop = 150;
+    scroller.dispatchEvent(new Event('scroll'));
+    await waitFor(() => {
+      expect(scroller.scrollTop).toBeGreaterThan(0);
+    });
+  },
 };

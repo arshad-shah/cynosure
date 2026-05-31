@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import { expect, within } from 'storybook/test';
 import { Badge } from '../../feedback/Badge/Badge.js';
 import { Stack } from '../../primitives/layout/Stack/Stack.js';
 import { Heading } from '../../typography/Heading/Heading.js';
@@ -186,46 +187,6 @@ export const WithStatusBadges: Story = {
   ),
 };
 
-export const NumericAlignment: Story = {
-  name: 'Numeric alignment',
-  render: () => (
-    <Table variant="grid">
-      <TableHead>
-        <TableRow>
-          <TableHeader>Metric</TableHeader>
-          <TableHeader align="end">Q1</TableHeader>
-          <TableHeader align="end">Q2</TableHeader>
-          <TableHeader align="end">Q3</TableHeader>
-          <TableHeader align="end">Q4</TableHeader>
-        </TableRow>
-      </TableHead>
-      <TableBody>
-        <TableRow>
-          <TableCell>Revenue</TableCell>
-          <TableCell numeric>{currency(124_000)}</TableCell>
-          <TableCell numeric>{currency(138_500)}</TableCell>
-          <TableCell numeric>{currency(149_100)}</TableCell>
-          <TableCell numeric>{currency(162_400)}</TableCell>
-        </TableRow>
-        <TableRow>
-          <TableCell>Expenses</TableCell>
-          <TableCell numeric>{currency(78_200)}</TableCell>
-          <TableCell numeric>{currency(81_400)}</TableCell>
-          <TableCell numeric>{currency(85_900)}</TableCell>
-          <TableCell numeric>{currency(91_000)}</TableCell>
-        </TableRow>
-        <TableRow>
-          <TableCell>Profit</TableCell>
-          <TableCell numeric>{currency(45_800)}</TableCell>
-          <TableCell numeric>{currency(57_100)}</TableCell>
-          <TableCell numeric>{currency(63_200)}</TableCell>
-          <TableCell numeric>{currency(71_400)}</TableCell>
-        </TableRow>
-      </TableBody>
-    </Table>
-  ),
-};
-
 export const StickyHeader: Story = {
   name: 'Sticky header (scrollable)',
   render: () => (
@@ -265,37 +226,6 @@ export const StickyHeader: Story = {
   ),
 };
 
-export const DenseWithCaption: Story = {
-  name: 'Dense with caption',
-  render: () => (
-    <Table variant="line" size="sm">
-      <TableCaption>
-        <Text size="sm" color="fg.muted">
-          Invoices received in the last 30 days.
-        </Text>
-      </TableCaption>
-      <TableHead>
-        <TableRow>
-          <TableHeader>Invoice</TableHeader>
-          <TableHeader>Customer</TableHeader>
-          <TableHeader>Method</TableHeader>
-          <TableHeader align="end">Amount</TableHeader>
-        </TableRow>
-      </TableHead>
-      <TableBody>
-        {INVOICES.map((row) => (
-          <TableRow key={row.id}>
-            <TableCell>{row.id}</TableCell>
-            <TableCell>{row.customer}</TableCell>
-            <TableCell>{row.method}</TableCell>
-            <TableCell numeric>{currency(row.amount)}</TableCell>
-          </TableRow>
-        ))}
-      </TableBody>
-    </Table>
-  ),
-};
-
 export const EmptyState: Story = {
   name: 'Empty state',
   render: () => (
@@ -321,4 +251,47 @@ export const EmptyState: Story = {
       </TableBody>
     </Table>
   ),
+};
+
+export const Interaction: Story = {
+  name: 'Interaction · renders semantic table structure',
+  render: () => (
+    <Table>
+      <TableCaption>Recent invoices</TableCaption>
+      <TableHead>
+        <TableRow>
+          <TableHeader>Invoice</TableHeader>
+          <TableHeader>Customer</TableHeader>
+          <TableHeader align="end">Amount</TableHeader>
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        {INVOICES.slice(0, 3).map((row) => (
+          <TableRow key={row.id}>
+            <TableCell>{row.id}</TableCell>
+            <TableCell>{row.customer}</TableCell>
+            <TableCell numeric>{currency(row.amount)}</TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    // The semantic table exposes a name from its caption.
+    const table = canvas.getByRole('table', { name: 'Recent invoices' });
+    await expect(table).toBeInTheDocument();
+
+    // Three column headers, scoped to their column for assistive tech.
+    const headers = canvas.getAllByRole('columnheader');
+    await expect(headers).toHaveLength(3);
+    await expect(headers[0]).toHaveAttribute('scope', 'col');
+
+    // Body rows: 3 data rows + 1 header row = 4 total.
+    await expect(canvas.getAllByRole('row')).toHaveLength(4);
+
+    // Numeric cells are right-aligned via data-align.
+    const amountCell = canvas.getByText('$250.00').closest('td');
+    await expect(amountCell).toHaveAttribute('data-align', 'end');
+  },
 };

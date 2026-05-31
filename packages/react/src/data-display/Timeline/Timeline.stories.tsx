@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import { expect, within } from 'storybook/test';
 import { Stack } from '../../primitives/layout/Stack/Stack.js';
 import { Heading } from '../../typography/Heading/Heading.js';
 import { Text } from '../../typography/Text/Text.js';
@@ -323,64 +324,50 @@ export const Horizontal: Story = {
   ),
 };
 
-export const LongDescriptions: Story = {
-  name: 'Edge case — long descriptions',
+export const Interaction: Story = {
+  name: 'Interaction · renders ordered list of events',
   render: () => (
     <Timeline>
       <TimelineItem>
         <TimelineSeparator>
-          <TimelineDot colorScheme="accent" icon={<IconCommit />} />
+          <TimelineDot />
           <TimelineConnector />
         </TimelineSeparator>
         <TimelineContent>
-          <Text weight="semibold">Release candidate shipped</Text>
-          <Text size="sm" color="fg.muted">
-            This release candidate bundles every user-facing change from the last two sprints. It
-            includes a redesigned Tree component, a new DataTable selection API, and overhauled
-            keyboard handling across every overlay primitive. Full notes are attached below along
-            with a migration guide for breaking changes in the theme layer.
-          </Text>
+          <Text weight="semibold">Signed up</Text>
         </TimelineContent>
       </TimelineItem>
       <TimelineItem>
         <TimelineSeparator>
-          <TimelineDot colorScheme="success" icon={<IconCheck />} />
+          <TimelineDot />
+          <TimelineConnector />
         </TimelineSeparator>
         <TimelineContent>
-          <Text weight="semibold">QA sign-off received</Text>
-          <Text size="sm" color="fg.muted">
-            QA signed off on the full suite after completing a 48-hour regression pass. No new
-            critical issues were uncovered; two minor visual regressions were filed and will be
-            addressed in a follow-up patch release.
-          </Text>
+          <Text weight="semibold">Upgraded to Pro</Text>
+        </TimelineContent>
+      </TimelineItem>
+      <TimelineItem>
+        <TimelineSeparator>
+          <TimelineDot />
+        </TimelineSeparator>
+        <TimelineContent>
+          <Text weight="semibold">Invited teammates</Text>
         </TimelineContent>
       </TimelineItem>
     </Timeline>
   ),
-};
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    // The timeline is a semantic ordered list of events.
+    const list = canvas.getByRole('list');
+    await expect(list.tagName).toBe('OL');
+    const items = canvas.getAllByRole('listitem');
+    await expect(items).toHaveLength(3);
 
-export const Many: Story = {
-  name: 'Edge case — many items',
-  render: () => (
-    <div style={{ maxHeight: 420, overflow: 'auto' }}>
-      <Timeline>
-        {Array.from({ length: 20 }, (_, i) => (
-          <TimelineItem key={`item-${i.toString()}`}>
-            <TimelineSeparator>
-              <TimelineDot
-                colorScheme={i % 3 === 0 ? 'accent' : i % 3 === 1 ? 'success' : 'neutral'}
-              />
-              <TimelineConnector />
-            </TimelineSeparator>
-            <TimelineContent>
-              <Text weight="medium">Event {(i + 1).toString()}</Text>
-              <Text size="sm" color="fg.muted">
-                {new Date(2026, 3, i + 1).toDateString()}
-              </Text>
-            </TimelineContent>
-          </TimelineItem>
-        ))}
-      </Timeline>
-    </div>
-  ),
+    // Events appear in document order, and the last item is flagged.
+    await expect(items[0]).toHaveTextContent('Signed up');
+    await expect(items[2]).toHaveTextContent('Invited teammates');
+    await expect(items[2]).toHaveAttribute('data-last', 'true');
+    await expect(items[0]).not.toHaveAttribute('data-last');
+  },
 };

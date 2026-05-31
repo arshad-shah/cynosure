@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { type ReactElement, useState } from 'react';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { Stack } from '../../primitives/layout/Stack/Stack.js';
 import { Code } from '../../typography/Code/Code.js';
 import { Text } from '../../typography/Text/Text.js';
@@ -48,40 +49,6 @@ export const AllLevels: Story = {
       </Anchor>
       <Anchor id="h6-example" level={6}>
         Heading 6
-      </Anchor>
-    </Stack>
-  ),
-};
-
-export const HoverReveal: Story = {
-  name: 'Hover / focus reveal',
-  render: () => (
-    <Stack gap="3">
-      <Text size="sm" color="fg.muted">
-        The link stays hidden until you hover the heading or tab through to it via keyboard.
-      </Text>
-      <Anchor id="reveal-demo" level={2}>
-        Getting started
-      </Anchor>
-      <Text size="sm" color="fg.muted">
-        Tab ↹ the page to see the link focus-revealed.
-      </Text>
-    </Stack>
-  ),
-};
-
-export const InsideCodeBlock: Story = {
-  name: 'Heading with inline code',
-  render: () => (
-    <Stack gap="4">
-      <Anchor id="installation" level={2}>
-        Installation with <Code>pnpm</Code>
-      </Anchor>
-      <Anchor id="use-theme-hook" level={3}>
-        The <Code>useTheme()</Code> hook
-      </Anchor>
-      <Anchor id="button-api" level={3}>
-        <Code>&lt;Button&gt;</Code> props
       </Anchor>
     </Stack>
   ),
@@ -136,62 +103,22 @@ export const OnCopyCallback: Story = {
   },
 };
 
-export const LongHeading: Story = {
-  name: 'Edge — very long heading wraps',
-  render: () => (
-    <div style={{ maxWidth: 520 }}>
-      <Anchor id="long-heading" level={2}>
-        A long heading that wraps onto multiple lines while keeping the copy-link icon aligned with
-        the text flow
-      </Anchor>
-    </div>
-  ),
-};
+export const Interaction: Story = {
+  name: 'Interaction · link href + clicking sets the hash',
+  render: () => <Anchor id="introduction">Introduction</Anchor>,
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    // The heading carries the id used as the fragment target.
+    const heading = canvas.getByRole('heading', { name: /Introduction/ });
+    await expect(heading).toHaveAttribute('id', 'introduction');
 
-export const DocsUseCase: Story = {
-  name: 'Use case — docs page',
-  render: () => (
-    <Stack gap="5" style={{ maxWidth: 640 }}>
-      <Anchor id="overview" level={1}>
-        Tabs
-      </Anchor>
-      <Text>
-        A set of layered sections of content—known as tab panels—that are displayed one at a time.
-      </Text>
-      <Anchor id="installation" level={2}>
-        Installation
-      </Anchor>
-      <Text>
-        Install the package with your preferred package manager and import the components.
-      </Text>
-      <Anchor id="anatomy" level={2}>
-        Anatomy
-      </Anchor>
-      <Text>Import all parts and piece them together.</Text>
-      <Anchor id="accessibility" level={2}>
-        Accessibility
-      </Anchor>
-      <Text>Adheres to the Tabs WAI-ARIA design pattern.</Text>
-      <Anchor id="api-reference" level={2}>
-        API reference
-      </Anchor>
-      <Anchor id="api-root" level={3}>
-        Root
-      </Anchor>
-      <Anchor id="api-list" level={3}>
-        List
-      </Anchor>
-      <Anchor id="api-trigger" level={3}>
-        Trigger
-      </Anchor>
-    </Stack>
-  ),
-};
+    const link = canvas.getByRole('link', { name: 'Copy link to section' });
+    await expect(link).toHaveAttribute('href', '#introduction');
 
-export const CustomLabel: Story = {
-  render: () => (
-    <Anchor id="custom-label" level={2} label="Kopiëren van sectielink">
-      Een sectie met een Nederlandse label (i18n)
-    </Anchor>
-  ),
+    await userEvent.click(link);
+    // Clicking pushes the fragment into the address bar without a full nav.
+    await waitFor(() => {
+      expect(window.location.hash).toBe('#introduction');
+    });
+  },
 };
