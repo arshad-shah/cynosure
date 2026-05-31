@@ -1,5 +1,13 @@
 # @arshad-shah/cynosure-react
 
+## 3.4.0
+
+### Minor Changes
+
+- [#101](https://github.com/arshad-shah/cynosure/pull/101) [`26f2740`](https://github.com/arshad-shah/cynosure/commit/26f2740fbac1cef6b376a5d5af68acd405082962) Thanks [@arshad-shah](https://github.com/arshad-shah)! - Add `ThemeToggle` — a drop-in theme switcher wired to `ThemeProvider`, with `icon`, `switch`, `segmented`, and `menu` variants, configurable `modes`/`labels`/`icons`, and three sizes.
+
+  Also: the `CommandPalette` footer hints now render keyboard keys as icon components rather than relying on raw Unicode glyph strings.
+
 ## 3.3.1
 
 ### Patch Changes
