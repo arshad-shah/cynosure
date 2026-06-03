@@ -41,7 +41,7 @@ catalog:
   "@vitest/browser-playwright": 4.1.4
   "@vitest/coverage-v8": 4.1.4
   ajv: 8.18.0
-  chromatic: 16.3.0
+  chromatic: 17.2.0
   cmdk: 1.1.1
   "colorjs.io": 0.5.2
   cross-env: 10.1.0
