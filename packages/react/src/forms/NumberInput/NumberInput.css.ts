@@ -18,7 +18,9 @@ export const numberInputTrack = style({
   width: '100%',
   boxSizing: 'border-box',
   border: '1px solid transparent',
-  background: vars.color.background.muted,
+  // Default (outline) well — a light tint. `filled` deepens it, `ghost` clears
+  // it (see `numberInputTrackVariant`).
+  background: vars.color.background.subtle,
   transitionProperty: 'border-color, box-shadow, background-color',
   transitionDuration: vars.duration.fast,
   selectors: {
@@ -33,7 +35,7 @@ export const numberInputTrack = style({
       boxShadow: `0 0 0 2px ${vars.color.feedback.danger.border}`,
     },
     '&[data-readonly="true"]': {
-      background: vars.color.background.subtle,
+      background: vars.color.background.muted,
     },
     '&[data-disabled="true"]': {
       opacity: 0.6,
@@ -47,12 +49,12 @@ export const numberInputTrack = style({
 
 /** Track tinting per variant — structure stays constant, only the well changes. */
 export const numberInputTrackVariant = styleVariants({
-  /** Tinted well + hairline border. */
+  /** Light tinted well + hairline border (the base look). */
   outline: { borderColor: vars.color.border.subtle },
-  /** Solid tint, no border. */
-  filled: { background: vars.color.background.muted },
+  /** Deeper solid tint, no border — reads as a stronger pocket. */
+  filled: { background: vars.color.background.muted, borderColor: 'transparent' },
   /** No well at rest — track is transparent, segments stay flat until hover. */
-  ghost: { background: 'transparent' },
+  ghost: { background: 'transparent', borderColor: 'transparent' },
 });
 
 /** Track padding / gap / outer radius / font scale. */
@@ -90,7 +92,8 @@ const segmentBase = style({
   justifyContent: 'center',
   boxSizing: 'border-box',
   border: 'none',
-  background: vars.color.background.canvas,
+  // Raised white tile so each segment pops off the tinted track.
+  background: vars.color.background.raised,
   color: vars.color.foreground.default,
   boxShadow: vars.shadow.xs,
   transitionProperty: 'background-color, box-shadow, color',
@@ -122,9 +125,11 @@ export const numberInputStepButton = style([
     color: vars.color.foreground.muted,
     outline: 'none',
     selectors: {
+      // Hover tints toward the accent so the raised white tile shows a clear
+      // affordance (matches the segmented-control language elsewhere).
       '&[data-hover="true"]': {
-        background: vars.color.background.surface,
-        color: vars.color.foreground.default,
+        background: vars.color.accent.soft,
+        color: vars.color.accent.solid,
       },
       // Pressed feedback — depress into the accent. Mouse, touch, and pen all
       // surface `data-pressed` via react-aria's press handling.
@@ -144,7 +149,7 @@ export const numberInputStepButton = style([
       },
       // Ghost: flat until hover, then borrow the raised surface.
       '[data-variant="ghost"] &[data-hover="true"]': {
-        background: vars.color.background.surface,
+        background: vars.color.accent.soft,
         boxShadow: vars.shadow.xs,
       },
     },
@@ -171,10 +176,11 @@ export const numberInputValueSegment = style([
   },
 ]);
 
-/** Inner flex line inside the value segment: prefix · input · suffix. */
+/** Inner flex line inside the value segment: prefix · input · suffix, centered. */
 export const numberInputField = style({
   display: 'flex',
   alignItems: 'center',
+  justifyContent: 'center',
   width: '100%',
   height: '100%',
   gap: vars.space['1'],
@@ -207,6 +213,7 @@ export const numberInputInput = style({
   color: 'inherit',
   font: 'inherit',
   fontVariantNumeric: 'tabular-nums',
+  textAlign: 'center',
   padding: 0,
   selectors: {
     '&::placeholder': {

@@ -1,6 +1,6 @@
 ---
 title: NumberInput
-description: Numeric input with stepper buttons; locale-aware parsing via React Aria's NumberField.
+description: Segmented numeric input — [ − ][ value ][ + ] — with locale-aware parsing via React Aria's NumberField.
 category: components
 status: stable
 since: "0.1.0"
@@ -11,7 +11,21 @@ tags: [forms, input]
 import LivePreview from '@/components/LivePreview/LivePreview.astro';
 import PropsTable from '@/components/PropsTable.astro';
 
+A **segmented** numeric control — a tinted track wrapping three raised segments,
+`[ − ][ value ][ + ]`. The centre segment is a real, editable field (type into
+it, or use the keyboard), and the large `−` / `+` buttons give touch-friendly
+targets (~44px tall at `md`). Parsing, formatting, clamping, and keyboard
+behaviour come from React Aria's `NumberField`.
+
 <LivePreview example="number-input/basic" />
+
+## Variants
+
+`variant` tints the track without changing the segmented structure: `outline`
+(default — light well + hairline border), `filled` (deeper solid tint, no
+border), and `ghost` (no well; segments stay flat until hover).
+
+<LivePreview example="number-input/variants" />
 
 ## Sizes
 
@@ -41,6 +55,20 @@ Pass `formatOptions` (forwarded to React Aria) to render currency, percent, or a
 
 <LivePreview example="number-input/states" />
 
+## Touch interactions
+
+- **Hold to repeat.** Press and hold `−` / `+` to step continuously — it waits a
+  short delay, then repeats on an accelerating interval, and stops at the
+  min/max bound. This is React Aria's built-in press-and-hold, so it works for
+  mouse, touch, and pen.
+- **Pressed feedback.** The `−` / `+` segments visibly depress into the accent
+  colour on press.
+- **Long-press to clear.** Opt in with `clearOnLongPress` — a ~500ms long-press
+  on the value segment clears it to `minValue` (or empty when no minimum is
+  set). Off by default.
+
+<LivePreview example="number-input/clear-on-long-press" />
+
 ## API
 
 <PropsTable component="NumberInput" />
@@ -48,12 +76,14 @@ Pass `formatOptions` (forwarded to React Aria) to render currency, percent, or a
 ## Accessibility
 
 - Built on React Aria `NumberField` — values are parsed locale-correctly and clamped to `minValue`/`maxValue`.
-- Keyboard: `ArrowUp`/`ArrowDown` step, `PageUp`/`PageDown` step by a larger amount, `Home`/`End` jump to bounds.
-- The stepper container is `aria-hidden`; each button still exposes a localized label (`incrementLabel` / `decrementLabel`).
+- Keyboard: `ArrowUp`/`ArrowDown` step, `PageUp`/`PageDown` step by a larger amount, `Home`/`End` jump to bounds. Hold-to-repeat is pointer-only; keyboard repeat is the OS key-repeat as before.
+- The editable value is a real `role="spinbutton"` input with `aria-valuenow/min/max`. The `−` / `+` segments are real buttons with localized labels (`incrementLabel` / `decrementLabel`); affixes are decorative (`aria-hidden`).
 - `aria-invalid` is mirrored from `invalid` (or `isInvalid`) on the underlying input.
+- The focus ring is drawn on the track and honours `:focus-visible`; the acceleration / press transitions respect `prefers-reduced-motion`.
 
 ## Recipes
 
 - Use `formatOptions={{ style: "currency", currency: "USD" }}` for money fields — React Aria handles parsing and display.
 - Pass `step` together with `minValue`/`maxValue` to bound the field and ensure the steppers disable at the bounds.
 - Provide `incrementLabel`/`decrementLabel` to localize the stepper announcement.
+- Enable `clearOnLongPress` for touch-first quantity fields where a quick reset to the minimum is handy.
