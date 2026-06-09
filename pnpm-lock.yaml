@@ -100,8 +100,8 @@ catalogs:
       specifier: 8.18.0
       version: 8.18.0
     chromatic:
-      specifier: 16.3.0
-      version: 16.3.0
+      specifier: 17.2.0
+      version: 17.2.0
     cmdk:
       specifier: 1.1.1
       version: 1.1.1
@@ -276,7 +276,7 @@ importers:
         version: 4.1.4(@vitest/browser@4.1.4)(vitest@4.1.4)
       chromatic:
         specifier: 'catalog:'
-        version: 16.3.0
+        version: 17.2.0
       colorjs.io:
         specifier: 'catalog:'
         version: 0.5.2
@@ -2957,8 +2957,9 @@ packages:
     resolution: {integrity: sha512-TQMmc3w+5AxjpL8iIiwebF73dRDF4fBIieAqGn9RGCWaEVwQ6Fb2cGe31Yns0RRIzii5goJ1Y7xbMwo1TxMplw==}
     engines: {node: '>= 20.19.0'}
 
-  chromatic@16.3.0:
-    resolution: {integrity: sha512-PvXUpXP3l8p2NxLEYhMgo4kGNNBQgCgbslMu+O4Bb37ujiiDWk8QExX/Jk7JeHUewNgK2wg98rtw3gdfz3U+Kg==}
+  chromatic@17.2.0:
+    resolution: {integrity: sha512-jxuFtNNMuxbVcM2oAAPsa1fDuygt5e1SVJpvTmvSPkVXFQGylFvApsbhDP9a94qI8QMJeUMmts4bXMqrBotWjg==}
+    engines: {node: '>=22.0.0'}
     hasBin: true
     peerDependencies:
       '@chromatic-com/cypress': ^0.*.* || ^1.0.0
@@ -8621,7 +8622,9 @@ snapshots:
     dependencies:
       readdirp: 5.0.0
 
-  chromatic@16.3.0: {}
+  chromatic@17.2.0:
+    dependencies:
+      semver: 7.7.4
 
   ci-info@3.9.0: {}
 
