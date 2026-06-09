@@ -1,5 +1,193 @@
 # @arshad-shah/cynosure-react
 
+## 3.5.0
+
+### Minor Changes
+
+- [#119](https://github.com/arshad-shah/cynosure/pull/119) [`1130f08`](https://github.com/arshad-shah/cynosure/commit/1130f087660cd88909672a7db4bc275f508cc2b8) Thanks [@arshad-shah](https://github.com/arshad-shah)! - Rework `MultiSelect` for a fixed-height trigger and a better overflow story.
+  - The trigger no longer grows as you select — chips sit on a single row and
+    any that don't fit collapse into a `+N` overflow badge (measured against the
+    available width and re-measured on resize).
+  - Every option stays reachable: the dropdown now lists **all** items (with a
+    search field at the top and a checkmark on selected rows) and toggles on
+    click, instead of removing chosen items from the list. This also fixes a bug
+    where, as the old trigger expanded, the popover could overlap it and make
+    lower options unclickable.
+  - The trigger is now a `role="combobox"` element; selected values still submit
+    via hidden inputs when `name` is set. New `searchPlaceholder` prop.
+
+  Breaking: the forwarded `ref` now points at the trigger element
+  (`HTMLDivElement`) rather than an inner text input, and the trigger exposes
+  `role="combobox"` (was a `textbox`). `TagsInput` (free-form entry) keeps its
+  own wrapping, inline-input layout.
+
+- [#119](https://github.com/arshad-shah/cynosure/pull/119) [`1130f08`](https://github.com/arshad-shah/cynosure/commit/1130f087660cd88909672a7db4bc275f508cc2b8) Thanks [@arshad-shah](https://github.com/arshad-shah)! - Redesign `NumberInput` as a segmented control and remove the native focus outline on pointer press across all clickable components.
+
+  **NumberInput** — the cramped vertical ▲/▼ stepper column is replaced by a horizontal segmented control, `[ − ][ value ][ + ]`, inside a tinted track. Large, touch-friendly targets (~44px tall at `md`), pressed-segment feedback, hold-to-repeat stepping (via React Aria's press-and-hold), and an opt-in `clearOnLongPress` to clear the value on a long-press. The public API is a superset of before — existing usage (`value`/`onChange`, `minValue`/`maxValue`/`step`, `formatOptions`, `prefix`/`suffix`, `size`/`variant`, invalid/disabled/read-only) is unchanged. **Breaking (visual/DOM only):** the rendered class names and DOM shape changed; consumers depending on internal NumberInput CSS classes or the old vertical-column layout will need updates.
+
+  **Global focus reset** — the browser's native (sharp, blue) focus outline is now suppressed on pointer presses (`:focus:not(:focus-visible)`), and the mobile tap-highlight is cleared on clickable elements. Keyboard `:focus-visible` rings are unchanged, so keyboard accessibility is preserved.
+
+- [#119](https://github.com/arshad-shah/cynosure/pull/119) [`1130f08`](https://github.com/arshad-shah/cynosure/commit/1130f087660cd88909672a7db4bc275f508cc2b8) Thanks [@arshad-shah](https://github.com/arshad-shah)! - Rework `PinInput`. Cells are now raised, rounded tiles with a clear
+  lift-on-focus active state (scale + accent ring + soft glow) and an
+  accent-tinted filled state, replacing the flat generic boxes.
+
+  Paste/autofill is more robust: pasting a full code into any cell distributes
+  it across the cells (skipping non-matching characters like spaces or dashes),
+  and a multi-character value from iOS SMS one-time-code autofill is handled the
+  same way (previously only the last character was kept). New `separator` prop
+  renders a divider at the midpoint for a `123–456` grouping.
+
+- [#119](https://github.com/arshad-shah/cynosure/pull/119) [`1130f08`](https://github.com/arshad-shah/cynosure/commit/1130f087660cd88909672a7db4bc275f508cc2b8) Thanks [@arshad-shah](https://github.com/arshad-shah)! - Redesign the `Resizable` handle. The dotted grip icon is replaced by a thick,
+  rounded line centered on the divider — neutral at rest, firming up on hover,
+  and growing while it turns the accent colour as you drag (the divider line
+  turns accent too). The divider also gains an enlarged invisible grab zone
+  (a few px either side) so it's easy to grab anywhere along the border. Works
+  for both `horizontal` and `vertical` splits and respects
+  `prefers-reduced-motion`. `withHandle` now shows this line (no Lucide icon);
+  pass `children` to render a custom grip.
+
+- [#119](https://github.com/arshad-shah/cynosure/pull/119) [`1130f08`](https://github.com/arshad-shah/cynosure/commit/1130f087660cd88909672a7db4bc275f508cc2b8) Thanks [@arshad-shah](https://github.com/arshad-shah)! - Unify every segmented control behind the shared **segmented track** container
+  introduced with the NumberInput redesign: a tinted, padded well (light `subtle`
+  tint, hairline border, 4px padding/gap) with raised tiles floating inside it.
+  - **Input** (and `SearchInput`): the multi-well row — addon slots, field,
+    action wells — now sits inside the track; wells render as raised tiles and
+    the focus ring lights up the track. `filled` / `ghost` tint the track, not
+    the individual wells.
+  - **DatePicker / DateRangePicker / TimePicker**: the picker root is now the
+    track; the lead icon, segments, and trigger pockets render as raised tiles.
+  - **ToggleGroup `attached`** (and `ThemeToggle`'s `segmented` variant): the
+    attached bar is now the track; the selected item renders as a raised tile.
+  - **ButtonGroup `attached`**: buttons float as tiles in the track instead of
+    merging borders.
+
+  No API changes — `attached`, `variant`, `size`, and state props all behave as
+  before. Visual-only: rendered DOM class names and the exact geometry change
+  (attached groups now show a 4px gap between segments instead of shared 1px
+  borders). Textarea keeps its single-card layout (it is not a segmented
+  control).
+
+- [#119](https://github.com/arshad-shah/cynosure/pull/119) [`1130f08`](https://github.com/arshad-shah/cynosure/commit/1130f087660cd88909672a7db4bc275f508cc2b8) Thanks [@arshad-shah](https://github.com/arshad-shah)! - Bring the dropdown triggers and the Switch into the segmented design language,
+  and stop clicks from painting a text-selection highlight.
+  - **Select & Combobox** now render as a segmented track — a tinted, padded
+    well wrapping a raised value tile and a **separate chevron tile** — matching
+    `NumberInput` / `Input` / the pickers. The focus ring lives on the track and
+    `variant` (`outline` / `filled` / `ghost`) tints it. No API change; the
+    shared trigger styles live in `forms/shared/segmentedTrigger.css.ts`.
+  - **Switch** gets a Material-You-style thumb: small when off, growing to fill
+    the track as it slides on (and swelling while pressed). New `checkedIcon` /
+    `uncheckedIcon` props put a custom glyph in the thumb (the on-state default
+    stays a checkmark) — e.g. a sun/moon for a theme toggle.
+  - **Click highlight**: interactive controls (`button`, `summary`, and the
+    `button`/`tab`/`option`/`menuitem`/`switch`/`radio`/`checkbox` roles) no
+    longer show a blue text-selection highlight when clicked or double-clicked.
+    Components that re-base with `all: unset` (Accordion, Tag) opt back out
+    explicitly.
+
+- [#119](https://github.com/arshad-shah/cynosure/pull/119) [`1130f08`](https://github.com/arshad-shah/cynosure/commit/1130f087660cd88909672a7db4bc275f508cc2b8) Thanks [@arshad-shah](https://github.com/arshad-shah)! - Polish the `Switch` and add an async toggle flow.
+  - **Async `onCheckedChange`**: when the handler returns a `Promise`, the switch
+    flips optimistically to the new state, shows the spinner while pending,
+    **commits** on resolve, and **reverts** on reject — no manual `loading`
+    wiring needed (the `loading` prop still works for externally managed spinners).
+  - **More visible border** on the track (a `border.strong` hairline) so the
+    off state reads clearly on any surface.
+  - **Reworked geometry** (absolute, RTL-aware thumb): the resting thumb sits a
+    balanced gap from the leading edge instead of hugging the border, the `sm`
+    size is larger and better-proportioned, and the off thumb is no longer
+    cramped.
+
+### Patch Changes
+
+- [#119](https://github.com/arshad-shah/cynosure/pull/119) [`1130f08`](https://github.com/arshad-shah/cynosure/commit/1130f087660cd88909672a7db4bc275f508cc2b8) Thanks [@arshad-shah](https://github.com/arshad-shah)! - `MultiSelect` now uses the shared segmented track like the other inputs: the
+  chips sit in a raised value tile and the chevron in its own slot tile inside
+  the tinted track. Also fixes the dropdown list rendering with a large gap to
+  the left of each row — the `<ul role="listbox">` was inheriting the browser's
+  default list padding; the shared listbox style now resets it.
+
+- [#119](https://github.com/arshad-shah/cynosure/pull/119) [`1130f08`](https://github.com/arshad-shah/cynosure/commit/1130f087660cd88909672a7db4bc275f508cc2b8) Thanks [@arshad-shah](https://github.com/arshad-shah)! - `MultiSelect`'s dropdown search now uses the Cynosure `SearchInput` (search
+  icon, clearable, consistent styling) and stays pinned to the top of the
+  popover while only the option list scrolls.
+
+- [#119](https://github.com/arshad-shah/cynosure/pull/119) [`1130f08`](https://github.com/arshad-shah/cynosure/commit/1130f087660cd88909672a7db4bc275f508cc2b8) Thanks [@arshad-shah](https://github.com/arshad-shah)! - Slim per-component CSS for subpath imports. Previously every subpath import
+  (`@arshad-shah/cynosure-react/badge`) pulled the entire shared `core.css`
+  baseline (~20 kB brotli), even though a single component used only ~40% of it
+  — the rest was rules shared by _other_ components (e.g. the Select/Combobox
+  listbox or DatePicker/DateRangePicker calendar styles).
+
+  Shared rules are now split into per-owner-set chunks under `dist/shared/`, and
+  each component imports only the chunks it actually shares. `core.css` is now
+  just the universal scaffolding (`@property` layout-var declarations + body
+  reset, ~0.7 kB brotli). A single-component CSS payload drops from ~20 kB to
+  ~1.5–3 kB brotli (6–10× smaller); importing several components still dedupes to
+  one copy of each shared chunk.
+
+  No API or markup change. The monolithic `styles.css` / `all.css` single-import
+  paths are byte-identical, and category-barrel imports (`…/forms`) load the same
+  total CSS as before. Empty per-component stylesheets (whose rules were entirely
+  shared) are no longer emitted or imported.
+
+- [#119](https://github.com/arshad-shah/cynosure/pull/119) [`1130f08`](https://github.com/arshad-shah/cynosure/commit/1130f087660cd88909672a7db4bc275f508cc2b8) Thanks [@arshad-shah](https://github.com/arshad-shah)! - Drop the unused `@arshad-shah/cynosure-core` runtime dependency. The package
+  never exported anything beyond a `VERSION` constant and was not imported by
+  any source file in this package — removing the edge stops consumers from
+  pulling an empty package transitively.
+
+  The `@arshad-shah/cynosure-core` package itself has been retired from the
+  workspace. The npm package will be deprecated separately so existing
+  installs surface a one-line notice instead of breaking. Headless primitives
+  (hooks, focus-trap helpers, polymorphic typings) continue to live inside
+  this package; should a second framework adapter ever materialise, those
+  will be extracted into a fresh package at that point rather than kept
+  alive as an empty namespace squat in the interim.
+
+- [#119](https://github.com/arshad-shah/cynosure/pull/119) [`1130f08`](https://github.com/arshad-shah/cynosure/commit/1130f087660cd88909672a7db4bc275f508cc2b8) Thanks [@arshad-shah](https://github.com/arshad-shah)! - Retire `@arshad-shah/cynosure-icons` from the workspace. The package was a
+  passthrough re-export of `lucide-react` intended to give the ecosystem a
+  single version-pinned icon source, but in practice no internal source file
+  ever imported it — `cynosure-react` has always called `lucide-react`
+  directly (53 call sites across forms, overlays, navigation, etc.). With
+  two providers in flight and no consumer in the middle, the indirection was
+  pure overhead.
+
+  Consumers wanting the same icons should import from `lucide-react`
+  directly:
+
+  ```ts
+  // before
+  import { ChevronRight } from "@arshad-shah/cynosure-icons";
+
+  // after
+  import { ChevronRight } from "lucide-react";
+  ```
+
+  Tree-shaking is identical: `lucide-react` ships `sideEffects: false` and
+  every Cynosure component already uses named imports, so bundlers
+  (Vite / Rollup / Webpack ≥ 5) drop unused icons exactly as before. No
+  change to per-component bundle sizes.
+
+  The npm package will be deprecated separately so existing installs surface
+  a one-line notice instead of breaking.
+
+- [#119](https://github.com/arshad-shah/cynosure/pull/119) [`1130f08`](https://github.com/arshad-shah/cynosure/commit/1130f087660cd88909672a7db4bc275f508cc2b8) Thanks [@arshad-shah](https://github.com/arshad-shah)! - Fix the `Switch` loading spinner being clipped by the small off-state thumb.
+  While loading, the thumb now stays full-size at whichever position it's
+  settling toward — so the spinner fits even when toggling _off_ — and shrinks
+  back to the small resting thumb only once loading ends. The spinner is also
+  sized to sit comfortably inside the thumb at every control size.
+
+- [#119](https://github.com/arshad-shah/cynosure/pull/119) [`1130f08`](https://github.com/arshad-shah/cynosure/commit/1130f087660cd88909672a7db4bc275f508cc2b8) Thanks [@arshad-shah](https://github.com/arshad-shah)! - Use one chevron across the library. Every dropdown/disclosure indicator now
+  renders lucide's `ChevronDown` (the icon `Combobox` already used) at a
+  consistent size — replacing the mix of the `ChevronDownIcon` alias, three
+  per-picker inline-SVG wrappers (DatePicker / DateRangePicker / TimePicker),
+  and the default-24px renders in Select/Combobox. Form-control triggers
+  (Select, Combobox, MultiSelect, DatePicker, DateRangePicker, TimePicker) all
+  use `<ChevronDown size={16} aria-hidden />`; Accordion uses the same icon,
+  sized for its header. Decorative inline-SVG icons in the Chip/Collapsible
+  stories were also swapped for lucide icons.
+
+- [#119](https://github.com/arshad-shah/cynosure/pull/119) [`1130f08`](https://github.com/arshad-shah/cynosure/commit/1130f087660cd88909672a7db4bc275f508cc2b8) Thanks [@arshad-shah](https://github.com/arshad-shah)! - Kill the native blue tap/click highlight everywhere. The previous reset only
+  cleared `-webkit-tap-highlight-color` on a hand-listed set of tags, so it still
+  showed on elements like MultiSelect list options, the dropdown chevron, and
+  Accordion headers. It's now set on the document root — an inherited property —
+  so every element is covered and components rely on their own pressed/hover
+  feedback instead.
+
 ## 3.4.0
 
 ### Minor Changes

@@ -1,5 +1,12 @@
 # @arshad-shah/cynosure-playground
 
+## 3.5.0
+
+### Patch Changes
+
+- Updated dependencies [[`1130f08`](https://github.com/arshad-shah/cynosure/commit/1130f087660cd88909672a7db4bc275f508cc2b8), [`1130f08`](https://github.com/arshad-shah/cynosure/commit/1130f087660cd88909672a7db4bc275f508cc2b8), [`1130f08`](https://github.com/arshad-shah/cynosure/commit/1130f087660cd88909672a7db4bc275f508cc2b8), [`1130f08`](https://github.com/arshad-shah/cynosure/commit/1130f087660cd88909672a7db4bc275f508cc2b8), [`1130f08`](https://github.com/arshad-shah/cynosure/commit/1130f087660cd88909672a7db4bc275f508cc2b8), [`1130f08`](https://github.com/arshad-shah/cynosure/commit/1130f087660cd88909672a7db4bc275f508cc2b8), [`1130f08`](https://github.com/arshad-shah/cynosure/commit/1130f087660cd88909672a7db4bc275f508cc2b8), [`1130f08`](https://github.com/arshad-shah/cynosure/commit/1130f087660cd88909672a7db4bc275f508cc2b8), [`1130f08`](https://github.com/arshad-shah/cynosure/commit/1130f087660cd88909672a7db4bc275f508cc2b8), [`1130f08`](https://github.com/arshad-shah/cynosure/commit/1130f087660cd88909672a7db4bc275f508cc2b8), [`1130f08`](https://github.com/arshad-shah/cynosure/commit/1130f087660cd88909672a7db4bc275f508cc2b8), [`1130f08`](https://github.com/arshad-shah/cynosure/commit/1130f087660cd88909672a7db4bc275f508cc2b8), [`1130f08`](https://github.com/arshad-shah/cynosure/commit/1130f087660cd88909672a7db4bc275f508cc2b8), [`1130f08`](https://github.com/arshad-shah/cynosure/commit/1130f087660cd88909672a7db4bc275f508cc2b8), [`1130f08`](https://github.com/arshad-shah/cynosure/commit/1130f087660cd88909672a7db4bc275f508cc2b8)]:
+  - @arshad-shah/cynosure-react@3.5.0
+
 ## 3.4.0
 
 ### Patch Changes
