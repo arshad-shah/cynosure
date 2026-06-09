@@ -1,4 +1,4 @@
-import { Check, ChevronDownIcon } from 'lucide-react';
+import { Check, ChevronDown } from 'lucide-react';
 import { type CSSProperties, type ReactNode, forwardRef } from 'react';
 import {
   Button as AriaButton,
@@ -207,7 +207,7 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps<string>>(
             aria-hidden="true"
           >
             <span className={triggerChevronIcon}>
-              <ChevronDownIcon />
+              <ChevronDown size={16} aria-hidden />
             </span>
           </span>
         </AriaButton>

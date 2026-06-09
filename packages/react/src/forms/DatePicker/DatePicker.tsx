@@ -33,10 +33,6 @@ import {
 const CalendarIcon = (): React.ReactElement => (
   <CalendarDays size={16} strokeWidth={2} aria-hidden />
 );
-const ChevronDownIcon = (): React.ReactElement => (
-  <ChevronDown size={16} strokeWidth={2.25} aria-hidden />
-);
-
 /** Cynosure-specific props for `<DatePicker>`. */
 export interface DatePickerOwnProps<T extends DateValue = DateValue> {
   /** Visible label, also used as the picker's accessible name when a string. */
@@ -120,7 +116,7 @@ export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(
             {(seg) => <AriaDateSegment segment={seg} className={segment} />}
           </AriaDateInput>
           <AriaButton className={triggerWell} aria-label="Open calendar">
-            <ChevronDownIcon />
+            <ChevronDown size={16} aria-hidden />
           </AriaButton>
         </AriaGroup>
         <AriaPopover className={calendarPopover} placement="bottom start">

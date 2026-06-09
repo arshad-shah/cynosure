@@ -1,4 +1,4 @@
-import { ChevronDownIcon } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import { type CSSProperties, type ReactNode, forwardRef } from 'react';
 import {
   Button as AriaButton,
@@ -191,7 +191,7 @@ export const Combobox = forwardRef<HTMLInputElement, ComboboxProps<string>>(
             aria-label="Open options"
           >
             <span className={triggerChevronIcon}>
-              <ChevronDownIcon />
+              <ChevronDown size={16} aria-hidden />
             </span>
           </AriaButton>
         </div>

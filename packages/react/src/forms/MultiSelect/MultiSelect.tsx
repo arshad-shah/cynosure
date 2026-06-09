@@ -418,7 +418,7 @@ export const MultiSelect = forwardRef<HTMLDivElement, MultiSelectProps<string>>(
             aria-hidden="true"
           >
             <span className={triggerChevronIcon}>
-              <ChevronDown size={16} />
+              <ChevronDown size={16} aria-hidden />
             </span>
           </span>
 
