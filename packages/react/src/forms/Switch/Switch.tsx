@@ -1,5 +1,5 @@
 import { Check, Loader2 } from 'lucide-react';
-import { type ReactNode, forwardRef } from 'react';
+import { type ReactNode, forwardRef, useState } from 'react';
 import { useControllableState } from '../../hooks/useControllableState.js';
 import { cn } from '../../utils/cn.js';
 import type { BooleanFormControlBase } from '../shared/types.js';
@@ -20,13 +20,19 @@ export interface SwitchProps extends BooleanFormControlBase {
   checked?: boolean;
   /** Uncontrolled initial checked state. */
   defaultChecked?: boolean;
-  /** Fires with the next checked state on toggle. */
-  onCheckedChange?: (checked: boolean) => void;
+  /**
+   * Fires with the next checked state on toggle. May return a `Promise`: the
+   * switch then flips optimistically to the new state, shows a spinner while
+   * the promise is pending, **commits** on resolve, and **reverts** on reject.
+   */
+  // biome-ignore lint/suspicious/noConfusingVoidType: the handler may return nothing or a Promise — both are intended and drive the async flow.
+  onCheckedChange?: (checked: boolean) => void | Promise<unknown>;
   /** Submitted value when checked. */
   value?: string;
   /**
-   * Renders a spinner inside the thumb and blocks interaction while
-   * awaiting async work.
+   * Forces the loading spinner and blocks interaction. Use for externally
+   * managed async work; when `onCheckedChange` returns a promise the spinner
+   * is shown automatically and you don't need this.
    * @default false
    */
   loading?: boolean;
@@ -77,15 +83,24 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(function Switch
     className,
   } = props;
 
+  // Internal value is managed directly (not via the controllable `onChange`)
+  // so we can read `onCheckedChange`'s return value to drive the async flow.
   const [checked, setChecked] = useControllableState<boolean>({
     value: checkedProp,
     defaultValue: defaultChecked ?? false,
-    onChange: onCheckedChange,
   });
 
+  // While an async `onCheckedChange` is in flight, `pending` holds the
+  // optimistic target shown to the user; cleared (committed or reverted) when
+  // the promise settles.
+  const [pending, setPending] = useState<boolean | null>(null);
+
+  const displayed = pending ?? checked;
+  const busy = loading || pending !== null;
+  const effectiveDisabled = disabled || busy;
+  const state = displayed ? 'checked' : 'unchecked';
+
   const iconPx = size === 'lg' ? 14 : 12;
-  const effectiveDisabled = disabled || loading;
-  const state = checked ? 'checked' : 'unchecked';
 
   // The on-state glyph defaults to a checkmark (suppressed at `sm`, where the
   // thumb is tiny); `checkedIcon={null}` opts out, any node customizes it.
@@ -96,11 +111,25 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(function Switch
       <Check size={iconPx} strokeWidth={3} aria-hidden="true" />
     );
   // An unchecked icon keeps the resting thumb full-size so the glyph fits.
-  const keepThumb = uncheckedIcon != null;
+  const keepThumb = uncheckedIcon != null && !displayed;
 
   const handleClick = () => {
     if (effectiveDisabled) return;
-    setChecked(!checked);
+    const next = !displayed;
+    const result = onCheckedChange?.(next);
+    if (result != null && typeof (result as PromiseLike<unknown>).then === 'function') {
+      // Optimistically flip + spin; commit on success, revert on failure.
+      setPending(next);
+      Promise.resolve(result).then(
+        () => {
+          setChecked(next);
+          setPending(null);
+        },
+        () => setPending(null),
+      );
+    } else {
+      setChecked(next);
+    }
   };
 
   const control = (
@@ -108,13 +137,13 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(function Switch
       ref={ref}
       type="button"
       role="switch"
-      aria-checked={checked}
+      aria-checked={displayed}
       aria-required={required || undefined}
-      aria-busy={loading || undefined}
+      aria-busy={busy || undefined}
       data-state={state}
       data-disabled={effectiveDisabled || undefined}
       data-invalid={invalid || undefined}
-      data-loading={loading || undefined}
+      data-loading={busy || undefined}
       disabled={effectiveDisabled}
       id={id}
       // biome-ignore lint/a11y/noAutofocus: Switch parity with Radix — consumers opt in explicitly and tests rely on it.
@@ -123,9 +152,9 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(function Switch
       className={cn(switchRoot, switchSize[size], children ? undefined : className)}
     >
       <span className={switchThumb} data-state={state} data-keep-thumb={keepThumb || undefined}>
-        {loading ? (
+        {busy ? (
           <Loader2 className={thumbLoader} size={iconPx} aria-hidden="true" />
-        ) : checked ? (
+        ) : displayed ? (
           resolvedCheckedIcon ? (
             <span className={cn(thumbIcon, thumbIconChecked)} aria-hidden="true">
               {resolvedCheckedIcon}
