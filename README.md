@@ -98,8 +98,6 @@ Full [compatibility matrix and Next.js App Router recipe →](https://cynosure.a
 | [`@arshad-shah/cynosure-react`](./packages/react) | The component library — primitives, typography, forms, overlays, nav, data, feedback. |
 | [`@arshad-shah/cynosure-tokens`](./packages/tokens) | W3C DTCG design tokens; compiled CSS (`:root` + dark) and typed TS constants. |
 | [`@arshad-shah/cynosure-themes`](./packages/themes) | Prebuilt alternative themes (terminal, high-contrast) as side-effect CSS. |
-| [`@arshad-shah/cynosure-icons`](./packages/icons) | Tree-shaken Lucide re-exports. |
-| [`@arshad-shah/cynosure-core`](./packages/core) | Framework-agnostic primitives (reserved for cross-framework reuse). |
 | [`@arshad-shah/cynosure-cli`](./packages/cli) | `npx cynosure init` scaffolding CLI. |
 
 ---

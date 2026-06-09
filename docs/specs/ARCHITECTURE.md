@@ -215,7 +215,7 @@ export type { ButtonProps } from './Button';
 | `react-hook-form`                       | Optional | `>=7.0.0`       | Only needed if using `@arshad-shah/cynosure-react/rhf`.          |
 | `@tanstack/react-table`                 | Optional | `>=8.0.0`       | Only needed if using `DataTable`.                  |
 | `lucide-react`                          | ✅    | `>=0.400.0`         | Our icon set.                                      |
-| `@arshad-shah/cynosure-tokens`, `@arshad-shah/cynosure-core`          | —     | `workspace:*`       | Internal deps; pnpm resolves from workspace.       |
+| `@arshad-shah/cynosure-tokens`          | —     | `workspace:*`       | Internal dep; pnpm resolves from workspace.        |
 
 Direct deps we bring:
 - `@radix-ui/react-*` — only the menu family

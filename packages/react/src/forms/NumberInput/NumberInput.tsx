@@ -1,24 +1,33 @@
-import { ChevronDown, ChevronUp } from 'lucide-react';
-import { type CSSProperties, type ReactNode, forwardRef } from 'react';
+import { Minus, Plus } from 'lucide-react';
+import {
+  type CSSProperties,
+  type ReactNode,
+  type PointerEvent as ReactPointerEvent,
+  forwardRef,
+  useCallback,
+  useContext,
+  useRef,
+} from 'react';
 import {
   Button as AriaButton,
   Group as AriaGroup,
   Input as AriaInput,
   NumberField,
   type NumberFieldProps,
+  NumberFieldStateContext,
 } from 'react-aria-components';
 import { cn } from '../../utils/cn.js';
-import { controlSize, controlWrapperBase, controlWrapperVariant } from '../shared/control.css.js';
 import type { FormControlSize, FormControlVariant } from '../shared/types.js';
 import {
   numberInputAffix,
-  numberInputField,
   numberInputInput,
   numberInputStepper,
   numberInputStepperSize,
-  numberInputSteppers,
-  numberInputSteppersSize,
-  numberInputWrapper,
+  numberInputTrack,
+  numberInputTrackSize,
+  numberInputTrackVariant,
+  numberInputValue,
+  numberInputValueSize,
 } from './NumberInput.css.js';
 
 type BaseNumberFieldProps = Omit<NumberFieldProps, 'className' | 'style' | 'children'>;
@@ -31,7 +40,8 @@ export interface NumberInputOwnProps extends BaseNumberFieldProps {
    */
   size?: FormControlSize;
   /**
-   * Visual treatment. Matches the shared form-control vocabulary.
+   * Visual treatment. Tints the segmented track; the `− / value / +`
+   * structure is constant.
    * @default "outline"
    */
   variant?: FormControlVariant;
@@ -47,17 +57,95 @@ export interface NumberInputOwnProps extends BaseNumberFieldProps {
   incrementLabel?: string;
   /** Custom `aria-label` for the decrement button. Overrides the localized default. */
   decrementLabel?: string;
+  /**
+   * Long-press the value segment (~500ms) to clear it — to `minValue` if set,
+   * otherwise empty. Opt-in so an accidental hold never wipes a value.
+   * @default false
+   */
+  clearOnLongPress?: boolean;
 }
 
 export type NumberInputProps = NumberInputOwnProps;
 
-const ICON_SIZE: Record<FormControlSize, number> = { sm: 11, md: 12, lg: 14 };
+const ICON_SIZE: Record<FormControlSize, number> = { sm: 14, md: 16, lg: 18 };
+
+const LONG_PRESS_MS = 500;
 
 /**
- * Numeric input with stepper buttons. Delegates to React Aria's `NumberField`
- * for locale-correct parsing, keyboard support (↑/↓, page up/down, home/end),
- * and wheel/scroll handling. We own the visuals: the group reuses the shared
- * `controlWrapper*` recipe so focus/invalid/disabled states match `<Input>`.
+ * The editable middle segment. Pulled into its own component so it can read the
+ * `NumberFieldStateContext` for the opt-in long-press-to-clear gesture, which
+ * needs the live state to reset the value.
+ */
+function NumberInputValueSegment({
+  className,
+  prefix,
+  suffix,
+  clearOnLongPress,
+}: {
+  className: string;
+  prefix?: ReactNode;
+  suffix?: ReactNode;
+  clearOnLongPress?: boolean;
+}): React.ReactElement {
+  const state = useContext(NumberFieldStateContext);
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const cancel = useCallback(() => {
+    if (timer.current !== null) {
+      clearTimeout(timer.current);
+      timer.current = null;
+    }
+  }, []);
+
+  const onPointerDown = useCallback(
+    (e: ReactPointerEvent) => {
+      if (!clearOnLongPress || !state) return;
+      // Ignore secondary mouse buttons; let normal text interaction proceed.
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      cancel();
+      timer.current = setTimeout(() => {
+        if (state.minValue !== undefined) {
+          state.setNumberValue(state.minValue);
+        } else {
+          state.setInputValue('');
+          state.commit('');
+        }
+      }, LONG_PRESS_MS);
+    },
+    [clearOnLongPress, state, cancel],
+  );
+
+  return (
+    <div
+      className={className}
+      onPointerDown={clearOnLongPress ? onPointerDown : undefined}
+      onPointerUp={clearOnLongPress ? cancel : undefined}
+      onPointerLeave={clearOnLongPress ? cancel : undefined}
+      onPointerCancel={clearOnLongPress ? cancel : undefined}
+    >
+      {prefix !== undefined && prefix !== null ? (
+        <span className={numberInputAffix} aria-hidden="true">
+          {prefix}
+        </span>
+      ) : null}
+      <AriaInput className={numberInputInput} />
+      {suffix !== undefined && suffix !== null ? (
+        <span className={numberInputAffix} aria-hidden="true">
+          {suffix}
+        </span>
+      ) : null}
+    </div>
+  );
+}
+
+/**
+ * Numeric input rendered as a segmented `[ − ][ value ][ + ]` control inside a
+ * tinted track. Delegates to React Aria's `NumberField` for locale-correct
+ * parsing, keyboard support (↑/↓, page up/down, home/end), wheel handling, and
+ * built-in press-and-hold repeat on the stepper buttons (with acceleration and
+ * a touch-aware initial delay). `variant` tints the track; the segmented
+ * structure stays constant. The track owns the focus ring so it surrounds the
+ * whole control.
  */
 export const NumberInput = forwardRef<HTMLDivElement, NumberInputProps>(
   function NumberInput(props, ref) {
@@ -71,6 +159,7 @@ export const NumberInput = forwardRef<HTMLDivElement, NumberInputProps>(
       suffix,
       incrementLabel,
       decrementLabel,
+      clearOnLongPress,
       isDisabled,
       isReadOnly,
       isInvalid,
@@ -78,15 +167,14 @@ export const NumberInput = forwardRef<HTMLDivElement, NumberInputProps>(
     } = props;
 
     const invalidFlag = invalid ?? isInvalid;
-    const wrapperClass = cn(
-      controlWrapperBase,
-      controlWrapperVariant[variant],
-      controlSize[size],
-      numberInputWrapper,
+    const trackClass = cn(
+      numberInputTrack,
+      numberInputTrackVariant[variant],
+      numberInputTrackSize[size],
       className,
     );
     const stepperClass = cn(numberInputStepper, numberInputStepperSize[size]);
-    const steppersClass = cn(numberInputSteppers, numberInputSteppersSize[size]);
+    const valueClass = cn(numberInputValue, numberInputValueSize[size]);
     const iconSize = ICON_SIZE[size];
 
     return (
@@ -98,41 +186,33 @@ export const NumberInput = forwardRef<HTMLDivElement, NumberInputProps>(
         isInvalid={invalidFlag}
       >
         <AriaGroup
-          className={wrapperClass}
+          className={trackClass}
+          data-variant={variant}
           data-disabled={isDisabled || undefined}
           data-readonly={isReadOnly || undefined}
           data-invalid={invalidFlag || undefined}
           style={style}
         >
-          <div className={numberInputField}>
-            {prefix !== undefined && prefix !== null ? (
-              <span className={numberInputAffix} aria-hidden="true">
-                {prefix}
-              </span>
-            ) : null}
-            <AriaInput className={numberInputInput} />
-            {suffix !== undefined && suffix !== null ? (
-              <span className={numberInputAffix} aria-hidden="true">
-                {suffix}
-              </span>
-            ) : null}
-          </div>
-          <div className={steppersClass} aria-hidden="true">
-            <AriaButton
-              slot="increment"
-              aria-label={incrementLabel ?? 'Increment'}
-              className={stepperClass}
-            >
-              <ChevronUp size={iconSize} strokeWidth={2.4} aria-hidden />
-            </AriaButton>
-            <AriaButton
-              slot="decrement"
-              aria-label={decrementLabel ?? 'Decrement'}
-              className={stepperClass}
-            >
-              <ChevronDown size={iconSize} strokeWidth={2.4} aria-hidden />
-            </AriaButton>
-          </div>
+          <AriaButton
+            slot="decrement"
+            aria-label={decrementLabel ?? 'Decrement'}
+            className={stepperClass}
+          >
+            <Minus size={iconSize} strokeWidth={2.4} aria-hidden />
+          </AriaButton>
+          <NumberInputValueSegment
+            className={valueClass}
+            prefix={prefix}
+            suffix={suffix}
+            clearOnLongPress={clearOnLongPress}
+          />
+          <AriaButton
+            slot="increment"
+            aria-label={incrementLabel ?? 'Increment'}
+            className={stepperClass}
+          >
+            <Plus size={iconSize} strokeWidth={2.4} aria-hidden />
+          </AriaButton>
         </AriaGroup>
       </NumberField>
     );

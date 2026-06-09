@@ -26,6 +26,7 @@ const meta: Meta<typeof NumberInput> = {
     isDisabled: { control: 'boolean' },
     isReadOnly: { control: 'boolean' },
     invalid: { control: 'boolean' },
+    clearOnLongPress: { control: 'boolean' },
   },
 };
 export default meta;
@@ -114,6 +115,32 @@ export const Controlled: Story = {
     }
     return <Controlled />;
   },
+};
+
+export const HoldToRepeat: Story = {
+  name: 'Hold to repeat',
+  render: () => (
+    <Stack gap="3" width="240px">
+      <NumberInput defaultValue={0} step={1} aria-label="Hold the + or − button" />
+      <Text size="sm">
+        Press and hold <strong>−</strong> or <strong>+</strong>. After a short delay the value
+        repeats and accelerates (React Aria's built-in stepper behavior).
+      </Text>
+    </Stack>
+  ),
+};
+
+export const LongPressClear: Story = {
+  name: 'Long-press to clear',
+  render: () => (
+    <Stack gap="3" width="240px">
+      <NumberInput defaultValue={42} minValue={0} clearOnLongPress aria-label="Long-press clears" />
+      <Text size="sm">
+        With <code>clearOnLongPress</code>, hold the value for ~500ms to reset it (to{' '}
+        <code>minValue</code> when set, otherwise empty).
+      </Text>
+    </Stack>
+  ),
 };
 
 export const Interaction: Story = {

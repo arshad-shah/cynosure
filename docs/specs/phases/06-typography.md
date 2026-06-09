@@ -139,7 +139,7 @@ interface LinkProps extends LayoutProps, Omit<React.AnchorHTMLAttributes<HTMLAnc
 }
 ```
 
-`external` appends a small arrow icon (from `@arshad-shah/cynosure-icons`) after the text **unless the link's children include `VisuallyHidden` instructing otherwise** — keeps a11y for screen readers (icon is `aria-hidden`).
+`external` appends a small inlined arrow SVG after the text **unless the link's children include `VisuallyHidden` instructing otherwise** — keeps a11y for screen readers (icon is `aria-hidden`). The SVG is inlined rather than imported so the typography bundle stays free of a runtime icon dependency.
 
 **asChild is the expected pattern** when consumers use framework-level routing:
 
