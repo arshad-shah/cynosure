@@ -102,83 +102,127 @@ function dedupeCssRules(css: string): string {
   return out.join('');
 }
 
-/**
- * Cross-file extraction. Given per-component CSS chunk contents keyed by
- * filename, identify rule blocks that appear in 2+ files and pull them
- * into a single shared chunk. Returns:
- * - `shared`: the concatenated shared CSS, in the order each block was
- *   first seen across the alphabetically-sorted files.
- * - `slimmed`: the per-file CSS with shared blocks removed.
- *
- * Why: per-component imports (`@arshad-shah/cynosure-react/text`,
- * `…/heading`, etc.) each carry their own copy of `layoutPropsStyle`,
- * `typographyBase`, control sizes, focus rings, etc. The full duplication
- * cost is ~960 KB raw across ~28 chunks. Hoisting them into `core.css`
- * — which the per-component JS chunks import alongside their own
- * stylesheet — lets bundlers dedupe to a single copy at the consumer's
- * end, while the monolithic `styles.css` path is unaffected because it
- * still concatenates everything.
- *
- * Identification: a block is "shared" iff its byte-identical (whitespace-
- * normalised) text appears in 2+ files. Comments and whitespace items are
- * neither counted nor moved.
- */
-function extractSharedBlocks(perFile: ReadonlyArray<{ file: string; css: string }>): {
-  shared: string;
+interface SharedBlock {
+  key: string;
+  text: string;
+}
+interface SharingChunk {
+  /** Sorted leaf filenames that contain every block in this chunk. */
+  owners: string[];
+  /** Blocks, in canonical (first-seen) order. */
+  blocks: SharedBlock[];
+}
+interface Partition {
+  /** Per-leaf CSS with all shared blocks removed (unique blocks only). */
   slimmed: Map<string, string>;
-} {
+  /**
+   * Every shared block in canonical (first-seen, alphabetical-leaf) order —
+   * the exact sequence the monolithic `styles.css` concatenates. Kept whole
+   * so that path stays byte-identical regardless of how blocks are chunked.
+   */
+  sharedCanon: string;
+  /** One entry per distinct owner set, keyed by the joined owner signature. */
+  chunks: Map<string, SharingChunk>;
+  /** Canonical order index per normalized block (drives import ordering). */
+  indexOf: Map<string, number>;
+}
+
+/**
+ * Partition the per-leaf CSS into **sharing-set chunks**.
+ *
+ * A rule block that appears in ≥2 component leaves is "shared". Rather than
+ * pile every shared block into one monolithic `core.css` — which a single
+ * component's subpath import would then pull in full, even though most of it
+ * belongs to *other* components — group shared blocks by their exact *owner
+ * set* (the set of leaves that contain them). Each distinct owner set becomes
+ * one chunk file, and a component imports only the chunks whose owner set
+ * includes it. The CSS a subpath import loads is then exactly its own blocks,
+ * no more: `Badge` no longer drags in the `{Select,Combobox}` listbox rules or
+ * the `{DatePicker,DateRangePicker}` calendar rules it never uses.
+ *
+ * Blocks unique to a single leaf (owner set size 1) stay in that leaf. The
+ * monolithic path is unaffected: `sharedCanon` preserves the original
+ * first-seen ordering so `styles.css` concatenates byte-for-byte as before.
+ *
+ * Identification is byte-identical (whitespace-normalised) text, as before —
+ * comments and whitespace are neither counted nor moved.
+ */
+function partitionSharedBlocks(perFile: ReadonlyArray<{ file: string; css: string }>): Partition {
   const fileItems = new Map<string, CssItem[]>();
   for (const { file, css } of perFile) {
     fileItems.set(file, splitTopLevelCssItems(css));
   }
-  // Count distinct files each normalized block appears in.
-  const occurrences = new Map<string, number>();
-  for (const items of fileItems.values()) {
+
+  // Owner set per normalized block: which leaves contain it.
+  const owners = new Map<string, Set<string>>();
+  for (const [file, items] of fileItems) {
     const localSeen = new Set<string>();
     for (const it of items) {
       if (it.kind !== 'block') continue;
       const k = normalizeBlock(it.text);
       if (!k || localSeen.has(k)) continue;
       localSeen.add(k);
-      occurrences.set(k, (occurrences.get(k) ?? 0) + 1);
+      let set = owners.get(k);
+      if (!set) {
+        set = new Set<string>();
+        owners.set(k, set);
+      }
+      set.add(file);
     }
   }
-  const isShared = (key: string) => (occurrences.get(key) ?? 0) >= 2;
+  const isShared = (key: string) => (owners.get(key)?.size ?? 0) >= 2;
 
-  // Emit shared blocks in first-occurrence order across the input file
-  // list — which is alphabetical, matching how `styles.css` concatenates.
-  // This keeps cascade-sensitive rule pairs (e.g. a shared base followed
-  // by a same-specificity refinement) in the same relative order as they
-  // appear in the monolithic bundle.
-  const sharedOut: string[] = [];
-  const sharedSeen = new Set<string>();
+  // Canonical first-seen order across the alphabetically-sorted leaves. This
+  // is the cascade order the monolithic bundle relies on; both `sharedCanon`
+  // and each chunk's block list follow it so same-specificity pairs keep their
+  // relative order.
+  const canon: SharedBlock[] = [];
+  const seen = new Set<string>();
   for (const { file } of perFile) {
-    const items = fileItems.get(file) ?? [];
-    for (const it of items) {
+    for (const it of fileItems.get(file) ?? []) {
       if (it.kind !== 'block') continue;
       const k = normalizeBlock(it.text);
-      if (!isShared(k) || sharedSeen.has(k)) continue;
-      sharedSeen.add(k);
-      sharedOut.push(it.text);
+      if (!k || seen.has(k)) continue;
+      seen.add(k);
+      canon.push({ key: k, text: it.text });
     }
   }
+  const indexOf = new Map<string, number>();
+  canon.forEach((b, i) => indexOf.set(b.key, i));
 
   const slimmed = new Map<string, string>();
   for (const { file } of perFile) {
-    const items = fileItems.get(file) ?? [];
     const kept: string[] = [];
-    for (const it of items) {
-      if (it.kind === 'block' && isShared(normalizeBlock(it.text))) continue;
-      // Drop whitespace runs adjacent to extracted blocks; keeping them
-      // would leave the per-component chunks scattered with leading/
-      // trailing newlines that gzip handles fine but raw bytes don't.
+    for (const it of fileItems.get(file) ?? []) {
+      // Drop whitespace runs adjacent to extracted blocks; keeping them would
+      // scatter the per-component chunks with leading/trailing newlines.
       if (it.kind === 'whitespace') continue;
+      if (it.kind === 'block' && isShared(normalizeBlock(it.text))) continue;
       kept.push(it.text);
     }
     slimmed.set(file, kept.join(''));
   }
 
-  return { shared: sharedOut.join(''), slimmed };
+  const sharedCanon = canon
+    .filter((b) => isShared(b.key))
+    .map((b) => b.text)
+    .join('');
+
+  const chunks = new Map<string, SharingChunk>();
+  for (const b of canon) {
+    if (!isShared(b.key)) continue;
+    const set = owners.get(b.key) as Set<string>;
+    const sortedOwners = [...set].sort();
+    const sig = sortedOwners.join('|');
+    let chunk = chunks.get(sig);
+    if (!chunk) {
+      chunk = { owners: sortedOwners, blocks: [] };
+      chunks.set(sig, chunk);
+    }
+    chunk.blocks.push(b);
+  }
+
+  return { slimmed, sharedCanon, chunks, indexOf };
 }
 
 const hookEntries = (): Record<string, string> => {
@@ -223,9 +267,10 @@ export default createConfig({
   ],
   loader: { '.css': 'copy' },
   async onSuccess() {
-    const { readdir, readFile, writeFile, stat, rm } = await import('node:fs/promises');
+    const { readdir, readFile, writeFile, stat, rm, mkdir } = await import('node:fs/promises');
     const { join, relative, dirname } = await import('node:path');
     const { createRequire } = await import('node:module');
+    const { createHash } = await import('node:crypto');
     const dist = join(process.cwd(), 'dist');
 
     // Discover every emitted `.css` file (top-level + barrel subdirs). The
@@ -289,7 +334,7 @@ export default createConfig({
         css: await readFile(full, 'utf8'),
       })),
     );
-    const { shared, slimmed } = extractSharedBlocks(leafCss);
+    const { slimmed, sharedCanon, chunks, indexOf } = partitionSharedBlocks(leafCss);
 
     // Slim each leaf in place. A leaf whose slimmed body is empty had *all*
     // its rules hoisted into `core.css` (every block was shared across ≥2
@@ -313,7 +358,7 @@ export default createConfig({
     // therefore re-state every extracted block. Same `splitTopLevelCssItems`
     // pass identifies and removes them.
     const sharedKeys = new Set<string>();
-    for (const item of splitTopLevelCssItems(shared)) {
+    for (const item of splitTopLevelCssItems(sharedCanon)) {
       if (item.kind === 'block') sharedKeys.add(normalizeBlock(item.text));
     }
     for (const full of barrels) {
@@ -423,15 +468,52 @@ export default createConfig({
     const baseReset =
       'body{font-family:var(--cynosure-font-family-sans);color:var(--cynosure-color-foreground-default);background-color:var(--cynosure-color-background-canvas);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility}';
 
-    // `core.css` carries everything a per-component import needs in
-    // addition to its own chunk: the @property declarations (must be
-    // element-scoped before any layout var is read), the body reset, and
-    // every block shared across ≥2 component leaves. Per-component JS
-    // chunks `import './core.css'` at the top (added below), so consumers
-    // using subpath imports get one deduped copy regardless of how many
-    // components they pull.
-    const coreCss = [propertyDecls.join(''), baseReset, shared].join('');
+    // `core.css` is the universal scaffolding every component needs first:
+    // the @property declarations (must be element-scoped before any layout var
+    // is read) and the body reset. The shared *rules* no longer live here —
+    // they're split into per-owner-set chunks below so a single-component
+    // subpath import pulls only the chunks it actually shares, not the union
+    // of every component's shared CSS. Per-component JS `import './core.css'`
+    // first (added below).
+    const coreCss = [propertyDecls.join(''), baseReset].join('');
     await writeFile(join(dist, 'core.css'), coreCss);
+
+    // Emit one CSS file per distinct owner set under `shared/`. The filename
+    // is a stable hash of the owner signature so it's deterministic across
+    // builds (and only churns when a block's sharing set genuinely changes).
+    // Build a leaf → chunks index plus a global chunk list (for barrels).
+    await mkdir(join(dist, 'shared'), { recursive: true });
+    interface ChunkMeta {
+      rel: string;
+      minIndex: number;
+      size: number;
+    }
+    const chunksForLeaf = new Map<string, ChunkMeta[]>();
+    const allChunks: ChunkMeta[] = [];
+    for (const [sig, group] of chunks) {
+      const hash = createHash('sha256').update(sig).digest('hex').slice(0, 8);
+      const rel = `shared/${hash}.css`;
+      await writeFile(join(dist, rel), stripCssComments(group.blocks.map((b) => b.text).join('')));
+      const meta: ChunkMeta = {
+        rel,
+        minIndex: Math.min(...group.blocks.map((b) => indexOf.get(b.key) ?? 0)),
+        size: group.owners.length,
+      };
+      allChunks.push(meta);
+      for (const leaf of group.owners) {
+        const list = chunksForLeaf.get(leaf) ?? [];
+        list.push(meta);
+        chunksForLeaf.set(leaf, list);
+      }
+    }
+    // Import order: broadest owner set first (base rules shared by many),
+    // then canonical order — so widely-shared bases load before narrower
+    // specialisations, mirroring the cascade the monolithic bundle encodes.
+    // The component's own leaf css (most specific) is appended last.
+    const byBreadthThenOrder = (a: ChunkMeta, b: ChunkMeta) =>
+      b.size - a.size || a.minIndex - b.minIndex;
+    for (const list of chunksForLeaf.values()) list.sort(byBreadthThenOrder);
+    allChunks.sort(byBreadthThenOrder);
 
     // Wire per-component JS to its CSS: prepend `import './core.css'` and
     // `import './<name>.css'` at the top of every emitted entry-point JS
@@ -487,13 +569,14 @@ export default createConfig({
       const jsPath = join(dist, file);
       const body = await readFile(jsPath, 'utf8');
       if (body.startsWith(`import './core.css';`)) continue;
-      // Components with their own chunk import core + own; emptied leaves
-      // (all rules now in core.css) import core only — no dead `.css` import.
-      const prefix =
-        ownCssBytes > 0
-          ? `import './core.css';\nimport './${base}.css';\n`
-          : `import './core.css';\n`;
-      await writeFile(jsPath, prefix + body);
+      // core.css (scaffolding) → the owner-set chunks this component shares
+      // (broadest first) → its own unique leaf css (if any), most specific
+      // last. Together these are exactly this component's blocks and nothing
+      // else.
+      const lines = [`import './core.css';`];
+      for (const c of chunksForLeaf.get(`${base}.css`) ?? []) lines.push(`import './${c.rel}';`);
+      if (ownCssBytes > 0) lines.push(`import './${base}.css';`);
+      await writeFile(jsPath, `${lines.join('\n')}\n${body}`);
     }
     // Same treatment for category barrels (forms/index.js, overlay/index.js, …).
     // The root barrel (`index.css` → `index.js`) is deliberately excluded —
@@ -521,11 +604,14 @@ export default createConfig({
         }
         const depth = dirname(jsRel).split('/').length;
         const upTo = '../'.repeat(depth);
-        const prefix =
-          barrelBytes > 0
-            ? `import '${upTo}core.css';\nimport './index.css';\n`
-            : `import '${upTo}core.css';\n`;
-        await writeFile(jsPath, prefix + body);
+        // A category barrel bundles every member, so it needs the union of
+        // their shared chunks — i.e. all of them (the same total CSS the old
+        // single core.css carried). Order broad-first, then the barrel's own
+        // unique-rules leaf last.
+        const lines = [`import '${upTo}core.css';`];
+        for (const c of allChunks) lines.push(`import '${upTo}${c.rel}';`);
+        if (barrelBytes > 0) lines.push(`import './index.css';`);
+        await writeFile(jsPath, `${lines.join('\n')}\n${body}`);
       } catch {
         /* no JS pair for this CSS barrel — skip */
       }
@@ -540,11 +626,14 @@ export default createConfig({
     // below reads it — `styles.css` is built from `coreCss` + slimmed leaves.
     await rm(join(dist, 'index.css'), { force: true });
 
-    // Build `styles.css` (monolithic single-import path): core (already
-    // contains @property + baseReset + every shared block) + every
-    // slimmed leaf. dedupe defends against any accidental block
-    // repetition.
-    const stylesCss = stripCssComments(dedupeCssRules([coreCss, ...slimmedLeaves].join('\n')));
+    // Build `styles.css` (monolithic single-import path): core scaffolding
+    // (@property + baseReset) + every shared block in canonical order + every
+    // slimmed leaf. Using `sharedCanon` (not the chunk files) keeps this path
+    // byte-identical to before regardless of how the shared rules are chunked.
+    // dedupe defends against any accidental block repetition.
+    const stylesCss = stripCssComments(
+      dedupeCssRules([coreCss, sharedCanon, ...slimmedLeaves].join('\n')),
+    );
     await writeFile(join(dist, 'styles.css'), stylesCss);
 
     // Additionally emit `all.css`: a single-import bundle that includes design
