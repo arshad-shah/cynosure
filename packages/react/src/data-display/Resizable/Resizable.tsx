@@ -1,5 +1,4 @@
-import { GripVerticalIcon } from 'lucide-react';
-import { type ReactNode, forwardRef } from 'react';
+import { forwardRef } from 'react';
 import {
   Group as RRPGroup,
   type GroupProps as RRPGroupProps,
@@ -62,7 +61,8 @@ export const ResizablePanel = forwardRef<HTMLDivElement, ResizablePanelProps>(
 /** Props for the {@link ResizableHandle} draggable divider between panels. */
 export interface ResizableHandleProps extends RRPSeparatorProps {
   /**
-   * Render a small drag-indicator grip in the middle (Lucide `GripVertical`).
+   * Show a visible grip — a thick rounded line centered on the divider that
+   * grows and turns the accent colour while dragging.
    * @default false
    */
   withHandle?: boolean;
@@ -71,14 +71,19 @@ export interface ResizableHandleProps extends RRPSeparatorProps {
 /**
  * Drag handle between two {@link ResizablePanel} siblings. Renders a focusable
  * separator that responds to keyboard arrow keys; pass `withHandle` for a
- * visible grip affordance.
+ * visible grip affordance. The whole divider (plus a few px either side) is
+ * grabbable, and the line turns the accent colour while held.
  */
 export const ResizableHandle = forwardRef<HTMLDivElement, ResizableHandleProps>(
   function ResizableHandle({ withHandle, className, children, ...rest }, _ref) {
-    const content: ReactNode = children ?? (withHandle ? <GripVerticalIcon size={'14'} /> : null);
+    const showGrip = withHandle || children != null;
     return (
       <RRPSeparator className={cn(resizableHandle, className)} {...rest}>
-        {content !== null ? <span className={resizableHandleGrip}>{content}</span> : null}
+        {showGrip ? (
+          <span className={resizableHandleGrip} aria-hidden="true">
+            {children}
+          </span>
+        ) : null}
       </RRPSeparator>
     );
   },

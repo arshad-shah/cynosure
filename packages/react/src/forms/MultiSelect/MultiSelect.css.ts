@@ -102,23 +102,6 @@ export const tagRemove = style({
   },
 });
 
-/** Trailing chevron in the trigger. */
-export const triggerChevron = style({
-  flex: '0 0 auto',
-  display: 'inline-flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  color: vars.color.foreground.muted,
-  marginInlineStart: vars.space['1'],
-  transitionProperty: 'transform, color',
-  transitionDuration: vars.duration.fast,
-  selectors: {
-    '[data-open="true"] &': {
-      transform: 'rotate(180deg)',
-    },
-  },
-});
-
 /** Search field pinned to the top of the popover. */
 export const searchWrap = style({
   display: 'flex',

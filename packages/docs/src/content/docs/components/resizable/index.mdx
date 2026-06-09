@@ -46,6 +46,6 @@ Compose horizontal and vertical groups for IDE-style layouts (sidebar + editor +
 ## Recipes
 
 - Nest a vertical `Resizable` inside a horizontal one for IDE-style layouts (sidebar + editor + preview).
-- Pass `withHandle` to render a visible grip on the separator without writing markup.
+- Pass `withHandle` to show the grip — a thick rounded line centered on the divider that grows and turns the accent colour while you drag. The divider has an enlarged invisible grab zone, so it's easy to grab anywhere along the border.
 - Set `defaultSize` (percent) on each panel so the initial split is predictable across reloads.
 - Pair `minSize` with a sensible `defaultSize` so a panel never collapses below readability.

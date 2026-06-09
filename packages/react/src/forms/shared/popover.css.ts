@@ -43,6 +43,12 @@ export const listbox = style({
   display: 'flex',
   flexDirection: 'column',
   gap: '1px',
+  // Reset UA `<ul>` chrome — MultiSelect renders a real `<ul role="listbox">`,
+  // which otherwise inherits the browser's 40px `padding-inline-start` (and
+  // bullets), pushing every row in from the left.
+  margin: 0,
+  padding: 0,
+  listStyle: 'none',
 });
 
 /** One option inside a listbox (ListBoxItem / ComboboxItem / SelectItem). */

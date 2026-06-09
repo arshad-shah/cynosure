@@ -17,8 +17,16 @@ import { useControllableState } from '../../hooks/useControllableState.js';
 import { useMergedRef } from '../../hooks/useMergedRef.js';
 import { useResizeObserver } from '../../hooks/useResizeObserver.js';
 import { cn } from '../../utils/cn.js';
-import { controlSize, controlWrapperBase, controlWrapperVariant } from '../shared/control.css.js';
 import { listbox, listboxEmpty, popover } from '../shared/popover.css.js';
+import {
+  triggerChevronIcon,
+  triggerChevronSize,
+  triggerChevronTile,
+  triggerTileSize,
+  triggerTrack,
+  triggerTrackSize,
+  triggerValueTile,
+} from '../shared/segmentedTrigger.css.js';
 import type { FormControlSize, FormControlVariant } from '../shared/types.js';
 import {
   option,
@@ -32,7 +40,6 @@ import {
   tagLabel,
   tagRemove,
   tagsRow,
-  triggerChevron,
 } from './MultiSelect.css.js';
 
 /** Shape of a data-driven `<MultiSelect>` option. */
@@ -335,12 +342,7 @@ export const MultiSelect = forwardRef<HTMLDivElement, MultiSelectProps<string>>(
       }
     };
 
-    const wrapperClass = cn(
-      controlWrapperBase,
-      controlWrapperVariant[variant],
-      controlSize[size],
-      className,
-    );
+    const trackClass = cn(triggerTrack, triggerTrackSize[size], className);
 
     const renderChip = (v: string) => (
       <span key={v} className={tag} data-chip="">
@@ -375,7 +377,8 @@ export const MultiSelect = forwardRef<HTMLDivElement, MultiSelectProps<string>>(
           aria-required={required || undefined}
           aria-disabled={disabled || undefined}
           tabIndex={disabled ? -1 : 0}
-          className={wrapperClass}
+          className={trackClass}
+          data-variant={variant}
           data-open={open || undefined}
           data-disabled={disabled || undefined}
           data-invalid={invalid || undefined}
@@ -388,22 +391,29 @@ export const MultiSelect = forwardRef<HTMLDivElement, MultiSelectProps<string>>(
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
         >
-          <div ref={tagsRowRef} className={tagsRow}>
-            {value.length === 0 ? (
-              <span className={placeholderClass}>{placeholder}</span>
-            ) : (
-              <>
-                {visibleValues.map((v) => renderChip(v))}
-                {hiddenCount > 0 ? (
-                  <span className={overflowBadge} aria-label={`${hiddenCount} more selected`}>
-                    +{hiddenCount}
-                  </span>
-                ) : null}
-              </>
-            )}
-          </div>
-          <span className={triggerChevron} aria-hidden="true">
-            <ChevronDown size={16} />
+          <span className={cn(triggerValueTile, triggerTileSize[size])}>
+            <div ref={tagsRowRef} className={tagsRow}>
+              {value.length === 0 ? (
+                <span className={placeholderClass}>{placeholder}</span>
+              ) : (
+                <>
+                  {visibleValues.map((v) => renderChip(v))}
+                  {hiddenCount > 0 ? (
+                    <span className={overflowBadge} aria-label={`${hiddenCount} more selected`}>
+                      +{hiddenCount}
+                    </span>
+                  ) : null}
+                </>
+              )}
+            </div>
+          </span>
+          <span
+            className={cn(triggerChevronTile, triggerTileSize[size], triggerChevronSize[size])}
+            aria-hidden="true"
+          >
+            <span className={triggerChevronIcon}>
+              <ChevronDown size={16} />
+            </span>
           </span>
 
           {/* Hidden inputs so selected values submit with the form. */}
