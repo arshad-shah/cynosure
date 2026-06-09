@@ -1,4 +1,4 @@
-import { Check, ChevronDown, Search, X } from 'lucide-react';
+import { Check, ChevronDown, X } from 'lucide-react';
 import {
   type CSSProperties,
   type KeyboardEvent,
@@ -17,7 +17,8 @@ import { useControllableState } from '../../hooks/useControllableState.js';
 import { useMergedRef } from '../../hooks/useMergedRef.js';
 import { useResizeObserver } from '../../hooks/useResizeObserver.js';
 import { cn } from '../../utils/cn.js';
-import { listbox, listboxEmpty, popover } from '../shared/popover.css.js';
+import { SearchInput } from '../SearchInput/SearchInput.js';
+import { listboxEmpty } from '../shared/popover.css.js';
 import {
   triggerChevronIcon,
   triggerChevronSize,
@@ -29,13 +30,14 @@ import {
 } from '../shared/segmentedTrigger.css.js';
 import type { FormControlSize, FormControlVariant } from '../shared/types.js';
 import {
+  multiSelectList,
+  multiSelectPopover,
   option,
   optionCheck,
   optionLabel,
   overflowBadge,
   placeholder as placeholderClass,
-  searchInput,
-  searchWrap,
+  searchHeader,
   tag,
   tagLabel,
   tagRemove,
@@ -329,8 +331,12 @@ export const MultiSelect = forwardRef<HTMLDivElement, MultiSelectProps<string>>(
           break;
         }
         case 'Escape':
-          event.preventDefault();
-          closeAndFocusTrigger();
+          // SearchInput clears a non-empty query on Escape; only close the
+          // dropdown once the search is already empty (two-step Escape).
+          if (query === '') {
+            event.preventDefault();
+            closeAndFocusTrigger();
+          }
           break;
         case 'Backspace':
           if (query === '' && value.length > 0) {
@@ -424,7 +430,7 @@ export const MultiSelect = forwardRef<HTMLDivElement, MultiSelectProps<string>>(
           ? createPortal(
               <div
                 ref={popoverRef}
-                className={popover}
+                className={multiSelectPopover}
                 style={{
                   position: 'absolute',
                   top: popoverRect.top,
@@ -432,13 +438,10 @@ export const MultiSelect = forwardRef<HTMLDivElement, MultiSelectProps<string>>(
                   width: popoverRect.width,
                 }}
               >
-                <div className={searchWrap}>
-                  <Search size={16} aria-hidden />
-                  <input
+                <div className={searchHeader}>
+                  <SearchInput
                     ref={searchRef}
-                    className={searchInput}
-                    type="text"
-                    autoComplete="off"
+                    size="sm"
                     placeholder={searchPlaceholder}
                     aria-label={`Search ${label ?? props['aria-label'] ?? 'options'}`}
                     aria-controls={listboxId}
@@ -446,14 +449,22 @@ export const MultiSelect = forwardRef<HTMLDivElement, MultiSelectProps<string>>(
                       filtered[activeIndex] ? `${id}-opt-${filtered[activeIndex].value}` : undefined
                     }
                     value={query}
-                    onChange={(e) => setQuery(e.target.value)}
+                    onChange={setQuery}
                     onKeyDown={handleSearchKeyDown}
                   />
                 </div>
-                {/* biome-ignore lint/a11y/useFocusableInteractive: focus stays on the search input; options use the aria-activedescendant pattern. */}
-                {/* biome-ignore lint/a11y/noNoninteractiveElementToInteractiveRole: composite listbox widget — option role is correct here. */}
-                {/* biome-ignore lint/a11y/useSemanticElements: there is no native multi-select listbox equivalent. */}
-                <ul id={listboxId} role="listbox" className={listbox} aria-multiselectable="true">
+                <ul
+                  id={listboxId}
+                  // Focus stays on the search input; options use the
+                  // aria-activedescendant pattern. tabIndex=-1 keeps the
+                  // listbox out of the tab order while satisfying a11y tooling.
+                  tabIndex={-1}
+                  // biome-ignore lint/a11y/noNoninteractiveElementToInteractiveRole: composite listbox widget — option role is correct here.
+                  // biome-ignore lint/a11y/useSemanticElements: there is no native multi-select listbox equivalent.
+                  role="listbox"
+                  className={multiSelectList}
+                  aria-multiselectable="true"
+                >
                   {filtered.length === 0 ? (
                     <li className={listboxEmpty} role="presentation">
                       {emptyState ?? 'No results'}

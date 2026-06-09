@@ -14,9 +14,10 @@ import PropsTable from '@/components/PropsTable.astro';
 Rendered as a segmented control — chips sit in a raised value tile and the
 chevron in its own slot inside the tinted track, matching the other inputs.
 The trigger keeps a **fixed height**: chips that don't fit collapse into a
-`+N` badge instead of wrapping. Opening it reveals a search field and the full
-option list; every item stays in the list (marked with a checkmark) and toggles
-on click, so nothing becomes unreachable.
+`+N` badge instead of wrapping. Opening it reveals a search field — the Cynosure `SearchInput`, pinned to the
+top while the list scrolls — and the full option list; every item stays in the
+list (marked with a checkmark) and toggles on click, so nothing becomes
+unreachable.
 
 <LivePreview example="multi-select/basic" />
 

@@ -50,7 +50,7 @@ describe('MultiSelect', () => {
   it('filters via the in-dropdown search field', () => {
     render(<MultiSelect aria-label="Skills" items={items} />);
     fireEvent.click(screen.getByRole('combobox', { name: /skills/i }));
-    const search = screen.getByRole('textbox', { name: /search/i });
+    const search = screen.getByRole('searchbox', { name: /search/i });
     fireEvent.change(search, { target: { value: 'go' } });
     expect(screen.getByRole('option', { name: 'Go' })).toBeInTheDocument();
     expect(screen.queryByRole('option', { name: 'Rust' })).not.toBeInTheDocument();
@@ -65,7 +65,7 @@ describe('MultiSelect', () => {
     };
     render(<Harness />);
     fireEvent.click(screen.getByRole('combobox', { name: /skills/i }));
-    const search = screen.getByRole('textbox', { name: /search/i });
+    const search = screen.getByRole('searchbox', { name: /search/i });
     fireEvent.keyDown(search, { key: 'Backspace' });
     // The Rust chip (its remove button) is gone; Rust remains in the list as a
     // selectable option, so we assert on the chip rather than the label text.
@@ -78,7 +78,7 @@ describe('MultiSelect', () => {
     const trigger = screen.getByRole('combobox', { name: /skills/i });
     trigger.focus();
     fireEvent.keyDown(trigger, { key: 'ArrowDown' });
-    const search = screen.getByRole('textbox', { name: /search/i });
+    const search = screen.getByRole('searchbox', { name: /search/i });
     expect(screen.getByRole('listbox')).toBeInTheDocument();
     fireEvent.keyDown(search, { key: 'Escape' });
     expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
@@ -87,7 +87,7 @@ describe('MultiSelect', () => {
   it('shows a custom empty state when nothing matches', () => {
     render(<MultiSelect aria-label="Skills" items={items} emptyState={<span>No matches</span>} />);
     fireEvent.click(screen.getByRole('combobox', { name: /skills/i }));
-    const search = screen.getByRole('textbox', { name: /search/i });
+    const search = screen.getByRole('searchbox', { name: /search/i });
     fireEvent.change(search, { target: { value: 'zzz' } });
     expect(screen.getByText('No matches')).toBeInTheDocument();
   });

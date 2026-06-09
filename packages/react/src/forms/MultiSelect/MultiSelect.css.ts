@@ -1,6 +1,7 @@
 import { style } from '@vanilla-extract/css';
 import { focusRing } from '../../styles/focusRing.js';
 import { vars } from '../../styles/vars.css.js';
+import { listbox, popover } from '../shared/popover.css.js';
 
 /**
  * Selected-chips row inside the trigger. Single line, never wraps — the
@@ -102,31 +103,39 @@ export const tagRemove = style({
   },
 });
 
-/** Search field pinned to the top of the popover. */
-export const searchWrap = style({
-  display: 'flex',
-  alignItems: 'center',
-  gap: vars.space['2'],
-  paddingInline: vars.space['2'],
-  paddingBlock: vars.space['1'],
-  marginBottom: vars.space['1'],
+/**
+ * MultiSelect popover: a flex column so the search header stays pinned at the
+ * top while only the option list scrolls. Composes the shared popover shell
+ * but drops its padding/auto-overflow (the inner sections own those).
+ */
+export const multiSelectPopover = style([
+  popover,
+  {
+    padding: 0,
+    overflow: 'hidden',
+    display: 'flex',
+    flexDirection: 'column',
+  },
+]);
+
+/** Sticky search header — never scrolls; holds the Cynosure SearchInput. */
+export const searchHeader = style({
+  flex: '0 0 auto',
+  padding: vars.space['1'],
   borderBottom: `1px solid ${vars.color.border.subtle}`,
-  color: vars.color.foreground.muted,
+  background: vars.color.background.raised,
 });
 
-export const searchInput = style({
-  flex: 1,
-  minWidth: 0,
-  border: 'none',
-  outline: 'none',
-  background: 'transparent',
-  color: vars.color.foreground.default,
-  font: 'inherit',
-  padding: 0,
-  selectors: {
-    '&::placeholder': { color: vars.color.foreground.subtle },
+/** The scrolling option list below the fixed header. */
+export const multiSelectList = style([
+  listbox,
+  {
+    overflowY: 'auto',
+    flex: 1,
+    minHeight: 0,
+    padding: vars.space['1'],
   },
-});
+]);
 
 /** One option row in the dropdown — shows a check when selected. */
 export const option = style({
