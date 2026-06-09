@@ -88,7 +88,10 @@ function NumberInputValueSegment({
   clearOnLongPress?: boolean;
 }): React.ReactElement {
   const state = useContext(NumberFieldStateContext);
+  const inputRef = useRef<HTMLInputElement>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const origin = useRef<{ x: number; y: number } | null>(null);
+  const fired = useRef(false);
 
   const cancel = useCallback(() => {
     if (timer.current !== null) {
@@ -99,27 +102,63 @@ function NumberInputValueSegment({
 
   const onPointerDown = useCallback(
     (e: ReactPointerEvent) => {
-      if (!clearOnLongPress || !state) return;
+      if (!state) return;
       // Ignore secondary mouse buttons; let normal text interaction proceed.
       if (e.pointerType === 'mouse' && e.button !== 0) return;
+      fired.current = false;
+      origin.current = { x: e.clientX, y: e.clientY };
+      // On touch/pen, suppress the default press behavior so the press does
+      // not immediately focus the input and pop the soft keyboard — we focus
+      // on release instead (see onPointerUp) when it turns out to be a tap,
+      // not a hold. Mouse keeps native focus since it has no keyboard to pop.
+      if (e.pointerType !== 'mouse') e.preventDefault();
       cancel();
       timer.current = setTimeout(() => {
+        fired.current = true;
+        timer.current = null;
         if (state.minValue !== undefined) {
           state.setNumberValue(state.minValue);
         } else {
           state.setInputValue('');
           state.commit('');
         }
+        // Dismiss any soft keyboard the press may have surfaced.
+        inputRef.current?.blur();
       }, LONG_PRESS_MS);
     },
-    [clearOnLongPress, state, cancel],
+    [state, cancel],
+  );
+
+  const onPointerMove = useCallback(
+    (e: ReactPointerEvent) => {
+      if (timer.current === null || origin.current === null) return;
+      const dx = e.clientX - origin.current.x;
+      const dy = e.clientY - origin.current.y;
+      // A drag (scroll / selection) past ~10px is not a long-press.
+      if (dx * dx + dy * dy > 100) cancel();
+    },
+    [cancel],
+  );
+
+  const onPointerUp = useCallback(
+    (e: ReactPointerEvent) => {
+      const wasPending = timer.current !== null;
+      cancel();
+      // A short tap on touch/pen still needs to focus the field for editing,
+      // since we suppressed the native focus on press-down.
+      if (e.pointerType !== 'mouse' && wasPending && !fired.current) {
+        inputRef.current?.focus();
+      }
+    },
+    [cancel],
   );
 
   return (
     <div
       className={className}
       onPointerDown={clearOnLongPress ? onPointerDown : undefined}
-      onPointerUp={clearOnLongPress ? cancel : undefined}
+      onPointerMove={clearOnLongPress ? onPointerMove : undefined}
+      onPointerUp={clearOnLongPress ? onPointerUp : undefined}
       onPointerLeave={clearOnLongPress ? cancel : undefined}
       onPointerCancel={clearOnLongPress ? cancel : undefined}
     >
@@ -128,7 +167,7 @@ function NumberInputValueSegment({
           {prefix}
         </span>
       ) : null}
-      <AriaInput className={numberInputInput} />
+      <AriaInput ref={inputRef} className={numberInputInput} />
       {suffix !== undefined && suffix !== null ? (
         <span className={numberInputAffix} aria-hidden="true">
           {suffix}

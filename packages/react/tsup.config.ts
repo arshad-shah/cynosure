@@ -408,7 +408,7 @@ export default createConfig({
       }
     }
     const baseReset =
-      'body{font-family:var(--cynosure-font-family-sans);color:var(--cynosure-color-foreground-default);background-color:var(--cynosure-color-background-canvas);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility}';
+      'body{font-family:var(--cynosure-font-family-sans);color:var(--cynosure-color-foreground-default);background-color:var(--cynosure-color-background-canvas);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeLegibility;-webkit-tap-highlight-color:transparent}';
 
     // `core.css` carries everything a per-component import needs in
     // addition to its own chunk: the @property declarations (must be

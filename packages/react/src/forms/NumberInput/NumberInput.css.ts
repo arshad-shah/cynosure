@@ -17,7 +17,8 @@ export const numberInputTrack = style({
   width: '100%',
   boxSizing: 'border-box',
   background: vars.color.background.subtle,
-  border: `1px solid ${vars.color.border.subtle}`,
+  border: `1px solid ${vars.color.border.default}`,
+  boxShadow: `inset 0 1px 0 color-mix(in oklab, ${vars.color.foreground.default} 4%, transparent)`,
   transitionProperty: 'border-color, box-shadow, background-color',
   transitionDuration: vars.duration.fast,
   selectors: {
@@ -63,6 +64,7 @@ export const numberInputTrackVariant = styleVariants({
   ghost: {
     background: 'transparent',
     borderColor: 'transparent',
+    boxShadow: 'none',
     selectors: {
       '&[data-hover="true"]:not([data-disabled="true"]):not([data-readonly="true"])': {
         background: vars.color.background.subtle,
