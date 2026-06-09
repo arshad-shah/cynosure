@@ -144,6 +144,17 @@ export const switchThumb = style({
       height: 'var(--cyn-sw-on)',
       insetInlineStart: 'calc(100% - var(--cyn-sw-on) - 2px)',
     },
+    // While loading, the thumb stays full-size at whichever position it's
+    // settling toward, so the spinner always fits — even when toggling *off*,
+    // where the resting thumb would normally be too small for the loader. It
+    // shrinks back to the small off thumb once loading ends.
+    '&[data-loading="true"]': {
+      width: 'var(--cyn-sw-on)',
+      height: 'var(--cyn-sw-on)',
+    },
+    '&[data-loading="true"][data-state="unchecked"]': {
+      insetInlineStart: '2px',
+    },
     // Press feedback (Material-You): the resting thumb swells toward full size
     // while the switch is held, driven by the root's active state.
     [`${switchRoot}:active:not([data-disabled]):not([data-loading="true"]) &[data-state="unchecked"]`]:

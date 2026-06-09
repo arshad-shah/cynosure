@@ -101,6 +101,9 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(function Switch
   const state = displayed ? 'checked' : 'unchecked';
 
   const iconPx = size === 'lg' ? 14 : 12;
+  // Spinner sits inside the (full-size) thumb while loading — a touch smaller
+  // than the on-thumb so it never touches the edges.
+  const loaderPx = size === 'lg' ? 13 : size === 'sm' ? 9 : 11;
 
   // The on-state glyph defaults to a checkmark (suppressed at `sm`, where the
   // thumb is tiny); `checkedIcon={null}` opts out, any node customizes it.
@@ -151,9 +154,14 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(function Switch
       onClick={handleClick}
       className={cn(switchRoot, switchSize[size], children ? undefined : className)}
     >
-      <span className={switchThumb} data-state={state} data-keep-thumb={keepThumb || undefined}>
+      <span
+        className={switchThumb}
+        data-state={state}
+        data-keep-thumb={keepThumb || undefined}
+        data-loading={busy || undefined}
+      >
         {busy ? (
-          <Loader2 className={thumbLoader} size={iconPx} aria-hidden="true" />
+          <Loader2 className={thumbLoader} size={loaderPx} aria-hidden="true" />
         ) : displayed ? (
           resolvedCheckedIcon ? (
             <span className={cn(thumbIcon, thumbIconChecked)} aria-hidden="true">

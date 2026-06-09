@@ -105,6 +105,19 @@ export const Masked: Story = {
   ),
 };
 
+export const Separator: Story = {
+  name: 'Separator — grouped halves',
+  render: () => (
+    <Stack gap="3">
+      <PinInput length={6} separator="–" defaultValue="123" aria-label="Grouped code" />
+      <Text size="sm" color="fg.muted">
+        Pass <code>separator</code> to split the cells into two halves (e.g. <code>123–456</code>).
+        Pasting or SMS-autofilling a full code still distributes across all cells.
+      </Text>
+    </Stack>
+  ),
+};
+
 export const States: Story = {
   render: () => (
     <Stack gap="3">
