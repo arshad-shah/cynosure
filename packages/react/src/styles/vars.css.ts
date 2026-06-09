@@ -173,3 +173,28 @@ globalStyle(':focus:not(:focus-visible)', {
 globalStyle('a, button, [role="button"], summary, input, select, textarea, label', {
   WebkitTapHighlightColor: 'transparent',
 });
+
+// Clicking (or double-/drag-clicking) an interactive control shouldn't paint a
+// blue text-selection highlight over its label — you can't usefully select the
+// text of a button, tab, or option. Components built on a native `<button>`
+// already opt out, but those that re-base with `all: unset` (which resets
+// user-select back to `text`) set it themselves; this covers the rest.
+globalStyle(
+  [
+    'button',
+    'summary',
+    '[role="button"]',
+    '[role="tab"]',
+    '[role="option"]',
+    '[role="menuitem"]',
+    '[role="menuitemcheckbox"]',
+    '[role="menuitemradio"]',
+    '[role="switch"]',
+    '[role="radio"]',
+    '[role="checkbox"]',
+  ].join(', '),
+  {
+    WebkitUserSelect: 'none',
+    userSelect: 'none',
+  },
+);

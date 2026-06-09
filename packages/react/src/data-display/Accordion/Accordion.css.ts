@@ -62,6 +62,7 @@ export const accordionTrigger = style({
   fontWeight: 600,
   color: vars.color.foreground.default,
   cursor: 'pointer',
+  userSelect: 'none',
   textAlign: 'start',
   transition: `background ${vars.duration.fast} ${vars.easing.easeInOut}`,
   selectors: {

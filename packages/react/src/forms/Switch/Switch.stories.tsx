@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import { Moon, Sun } from 'lucide-react';
 import { useState } from 'react';
 import { expect, userEvent, within } from 'storybook/test';
 import { Inline } from '../../primitives/layout/Inline/Inline.js';
@@ -99,6 +100,33 @@ export const Loading: Story = {
           </Switch>
           <Text size="sm" color="fg.muted">
             {pending ? 'Saving…' : on ? 'Enabled' : 'Disabled'}
+          </Text>
+        </Stack>
+      );
+    }
+    return <Demo />;
+  },
+};
+
+export const CustomIcons: Story = {
+  name: 'Custom thumb icons',
+  render: () => {
+    function Demo(): React.ReactElement {
+      const [dark, setDark] = useState(true);
+      return (
+        <Stack gap="3" width="320px">
+          <Switch
+            size="lg"
+            checked={dark}
+            onCheckedChange={setDark}
+            checkedIcon={<Moon size={14} />}
+            uncheckedIcon={<Sun size={14} />}
+          >
+            Dark mode
+          </Switch>
+          <Text size="sm" color="fg.muted">
+            Pass <code>checkedIcon</code> / <code>uncheckedIcon</code> to put a glyph in the thumb;
+            an unchecked icon keeps the resting thumb full-size.
           </Text>
         </Stack>
       );

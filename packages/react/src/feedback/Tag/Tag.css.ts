@@ -68,6 +68,7 @@ export const tagGroupTrigger = style({
   alignItems: 'center',
   gap: vars.space['1'],
   cursor: 'pointer',
+  userSelect: 'none',
   borderRadius: 'inherit',
   padding: 0,
   selectors: {

@@ -66,9 +66,6 @@ export const switchRoot = style({
     '&[data-invalid="true"]:focus-visible': {
       boxShadow: `0 0 0 2px ${vars.color.feedback.danger.border}`,
     },
-    '&:active:not([data-disabled]):not([data-loading="true"])': {
-      transform: 'scale(0.96)',
-    },
   },
 });
 
@@ -85,74 +82,100 @@ export const switchRoot = style({
  */
 export const switchSize = styleVariants({
   sm: {
-    width: '1.75rem', // 28 — content 24×12, thumb 12, translate 12
+    width: '1.75rem', // 28 — content 24×12
     height: '1rem',
     vars: {
-      ['--cynosure-switch-thumb-size' as string]: '0.75rem',
-      ['--cynosure-switch-translate' as string]: '0.75rem',
+      ['--cyn-sw-on' as string]: '0.75rem', // 12 — fills content height
+      ['--cyn-sw-off' as string]: '0.5rem', // 8  — Material-style small rest thumb
+      ['--cyn-sw-translate' as string]: '0.75rem', // 12 = content-w(24) − on(12)
     },
   },
   md: {
-    width: '2.25rem', // 36 — content 32×16, thumb 16, translate 16
+    width: '2.25rem', // 36 — content 32×16
     height: '1.25rem',
     vars: {
-      ['--cynosure-switch-thumb-size' as string]: '1rem',
-      ['--cynosure-switch-translate' as string]: '1rem',
+      ['--cyn-sw-on' as string]: '1rem', // 16
+      ['--cyn-sw-off' as string]: '0.625rem', // 10
+      ['--cyn-sw-translate' as string]: '1rem', // 16 = 32 − 16
     },
   },
   lg: {
-    width: '2.75rem', // 44 — content 40×20, thumb 20, translate 20
+    width: '2.75rem', // 44 — content 40×20
     height: '1.5rem',
     vars: {
-      ['--cynosure-switch-thumb-size' as string]: '1.25rem',
-      ['--cynosure-switch-translate' as string]: '1.25rem',
+      ['--cyn-sw-on' as string]: '1.25rem', // 20
+      ['--cyn-sw-off' as string]: '0.8125rem', // 13
+      ['--cyn-sw-translate' as string]: '1.25rem', // 20 = 40 − 20
     },
   },
 });
 
+/**
+ * Material-You-style thumb: small when off, grows to fill the track when on
+ * while sliding to the far end (a combined grow + slide). Set
+ * `data-keep-thumb` (when an unchecked icon needs room) to opt out of the
+ * shrink so the off thumb stays full size.
+ */
 export const switchThumb = style({
   display: 'grid',
   placeItems: 'center',
   boxSizing: 'border-box',
-  width: 'var(--cynosure-switch-thumb-size)',
-  height: 'var(--cynosure-switch-thumb-size)',
+  width: 'var(--cyn-sw-off)',
+  height: 'var(--cyn-sw-off)',
   background: vars.color.background.surface,
   borderRadius: vars.radius.full,
   boxShadow: vars.shadow.sm,
-  transitionProperty: 'transform',
+  transitionProperty: 'transform, width, height',
   transitionDuration: vars.duration.normal,
   transitionTimingFunction: vars.easing.spring,
   transform: 'translateX(0)',
-  willChange: 'transform',
+  willChange: 'transform, width, height',
   selectors: {
+    '&[data-keep-thumb="true"]': {
+      width: 'var(--cyn-sw-on)',
+      height: 'var(--cyn-sw-on)',
+    },
     '&[data-state="checked"]': {
-      transform: 'translateX(var(--cynosure-switch-translate))',
+      width: 'var(--cyn-sw-on)',
+      height: 'var(--cyn-sw-on)',
+      transform: 'translateX(var(--cyn-sw-translate))',
     },
     '[dir="rtl"] &[data-state="checked"]': {
-      transform: 'translateX(calc(-1 * var(--cynosure-switch-translate)))',
+      transform: 'translateX(calc(-1 * var(--cyn-sw-translate)))',
     },
+    // Press feedback (Material-You): the resting thumb swells toward full size
+    // while the switch is held, driven by the root's active state.
+    [`${switchRoot}:active:not([data-disabled]):not([data-loading="true"]) &[data-state="unchecked"]`]:
+      {
+        width: 'var(--cyn-sw-on)',
+        height: 'var(--cyn-sw-on)',
+      },
+  },
+  '@media': {
+    '(prefers-reduced-motion: reduce)': { transitionDuration: '0s' },
   },
 });
 
-export const thumbCheck = style({
-  display: 'block',
+/** Icon shown inside the thumb. Centered, scales its glyph to the thumb. */
+export const thumbIcon = style({
+  display: 'grid',
+  placeItems: 'center',
+  lineHeight: 0,
+});
+
+/** On-state glyph colour (accent), tinted to danger when invalid. */
+export const thumbIconChecked = style({
   color: vars.color.accent.solid,
-  opacity: 0,
-  transitionProperty: 'opacity',
-  transitionDuration: vars.duration.fast,
   selectors: {
-    [`${switchThumb}[data-state="checked"] &`]: {
-      opacity: 1,
-    },
-  },
-});
-
-export const thumbCheckInvalid = style({
-  selectors: {
-    [`${switchThumb}[data-state="checked"] &`]: {
+    [`${switchRoot}[data-invalid="true"] &`]: {
       color: vars.color.feedback.danger.solid,
     },
   },
+});
+
+/** Off-state glyph colour — muted, recedes against the white thumb. */
+export const thumbIconUnchecked = style({
+  color: vars.color.foreground.muted,
 });
 
 export const thumbLoader = style({
