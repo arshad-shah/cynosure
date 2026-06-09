@@ -291,10 +291,23 @@ export default createConfig({
     );
     const { shared, slimmed } = extractSharedBlocks(leafCss);
 
-    // Slim each leaf in place.
+    // Slim each leaf in place. A leaf whose slimmed body is empty had *all*
+    // its rules hoisted into `core.css` (every block was shared across ≥2
+    // components), so the chunk would be a 0-byte file. Drop it entirely and
+    // record the base name — the JS entry below imports `core.css` only,
+    // skipping the dead `import './<name>.css'` that would otherwise resolve
+    // to nothing (an extra module/request for every bundler downstream).
+    const originalLeafBases = new Set(
+      componentLeaves.map((full) => relative(dist, full).replace(/\.css$/, '')),
+    );
     for (const full of componentLeaves) {
       const rel = relative(dist, full);
-      await writeFile(full, slimmed.get(rel) ?? '');
+      const slim = slimmed.get(rel) ?? '';
+      if (slim.trim().length === 0) {
+        await rm(full, { force: true });
+      } else {
+        await writeFile(full, slim);
+      }
     }
     // Slim each barrel too — they contain the union of member rules and
     // therefore re-state every extracted block. Same `splitTopLevelCssItems`
@@ -459,18 +472,27 @@ export default createConfig({
       if (file === 'index.js') continue;
       const base = file.replace(/\.js$/, '');
       const cssPath = join(dist, `${base}.css`);
-      let hasCss = false;
+      // `-1` = no `.css` file. A leaf whose chunk was fully hoisted into
+      // `core.css` had its file dropped above, so it reads as `-1` here even
+      // though it still needs `core.css`.
+      let ownCssBytes = -1;
       try {
-        await stat(cssPath);
-        hasCss = true;
+        ownCssBytes = (await stat(cssPath)).size;
       } catch {
-        /* pure JS entry (hooks, utils) */
+        /* css file absent — pure JS entry, or an emptied leaf (see below) */
       }
-      if (!hasCss) continue;
+      const hadLeaf = originalLeafBases.has(base);
+      // Pure JS entry (hooks, utils) — never had a CSS leaf, nothing to wire.
+      if (!hadLeaf && ownCssBytes <= 0) continue;
       const jsPath = join(dist, file);
       const body = await readFile(jsPath, 'utf8');
       if (body.startsWith(`import './core.css';`)) continue;
-      const prefix = `import './core.css';\nimport './${base}.css';\n`;
+      // Components with their own chunk import core + own; emptied leaves
+      // (all rules now in core.css) import core only — no dead `.css` import.
+      const prefix =
+        ownCssBytes > 0
+          ? `import './core.css';\nimport './${base}.css';\n`
+          : `import './core.css';\n`;
       await writeFile(jsPath, prefix + body);
     }
     // Same treatment for category barrels (forms/index.js, overlay/index.js, …).
@@ -483,6 +505,15 @@ export default createConfig({
       if (rel === 'index.css') continue;
       const jsRel = rel.replace(/\.css$/, '.js');
       const jsPath = join(dist, jsRel);
+      // A barrel slimmed to nothing (every member rule was shared → core.css)
+      // is dropped too, and its JS imports core.css only.
+      let barrelBytes = 0;
+      try {
+        barrelBytes = (await stat(barrel)).size;
+      } catch {
+        /* already absent */
+      }
+      if (barrelBytes === 0) await rm(barrel, { force: true });
       try {
         const body = await readFile(jsPath, 'utf8');
         if (body.startsWith(`import '`)) {
@@ -490,7 +521,10 @@ export default createConfig({
         }
         const depth = dirname(jsRel).split('/').length;
         const upTo = '../'.repeat(depth);
-        const prefix = `import '${upTo}core.css';\nimport './index.css';\n`;
+        const prefix =
+          barrelBytes > 0
+            ? `import '${upTo}core.css';\nimport './index.css';\n`
+            : `import '${upTo}core.css';\n`;
         await writeFile(jsPath, prefix + body);
       } catch {
         /* no JS pair for this CSS barrel — skip */
