@@ -1,4 +1,4 @@
-import { createGlobalThemeContract } from '@vanilla-extract/css';
+import { createGlobalThemeContract, globalStyle } from '@vanilla-extract/css';
 
 /**
  * Typed mirror of the `@arshad-shah/cynosure-tokens` CSS custom properties.
@@ -140,3 +140,36 @@ export const vars = createGlobalThemeContract(
 );
 
 export type Vars = typeof vars;
+
+/**
+ * Global focus/press reset, shared by every component.
+ *
+ * Cynosure draws its own rounded, on-brand focus ring — a box-shadow keyed to
+ * `:focus-visible` (see `focusRing`). The browser's *native* focus outline is a
+ * separate, sharp-cornered rectangle (blue in Blink/WebKit) that UAs paint on
+ * plain `:focus`, so it flashes whenever a clickable element is pressed with a
+ * mouse, pen, or touch — duplicating and clashing with the design-system ring.
+ *
+ * These rules drop that native artefact on *pointer* interaction while leaving
+ * keyboard accessibility intact:
+ *
+ * - `:focus:not(:focus-visible)` matches focus the UA decided is **not**
+ *   keyboard-driven (i.e. a press). Removing the outline only there keeps a
+ *   visible focus indicator for keyboard users, so WCAG 2.4.7 still holds.
+ * - The WebKit/Blink tap-highlight is the translucent blue/grey wash painted
+ *   over a tapped control on touch; each component supplies its own pressed
+ *   feedback, so the default wash is cleared.
+ *
+ * Lives here (rather than a standalone reset module) because `vars.css.ts` is
+ * imported by virtually every component stylesheet and is always retained by
+ * tree-shaking — so these `globalStyle` rules reliably dedupe into the shared
+ * `core.css` baseline that every component entry imports, with no per-component
+ * opt-in.
+ */
+globalStyle(':focus:not(:focus-visible)', {
+  outline: 'none',
+});
+
+globalStyle('a, button, [role="button"], summary, input, select, textarea, label', {
+  WebkitTapHighlightColor: 'transparent',
+});
