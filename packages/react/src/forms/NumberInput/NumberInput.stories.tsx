@@ -124,7 +124,7 @@ export const Interaction: Story = {
     const field = canvas.getByRole('spinbutton', { name: 'Quantity' });
     await expect(field).toHaveValue('5');
 
-    // Stepper buttons.
+    // Segmented stepper buttons.
     await userEvent.click(canvas.getByRole('button', { name: 'Increment' }));
     await expect(field).toHaveValue('6');
     await userEvent.click(canvas.getByRole('button', { name: 'Decrement' }));
@@ -134,6 +134,45 @@ export const Interaction: Story = {
     field.focus();
     await userEvent.keyboard('{ArrowUp}{ArrowUp}');
     await expect(field).toHaveValue('7');
+  },
+};
+
+export const HoldToRepeat: Story = {
+  name: 'Hold to repeat',
+  render: () => (
+    <Stack gap="3" width="280px">
+      <NumberInput defaultValue={0} minValue={0} maxValue={100} aria-label="Hold to step" />
+      <Text size="sm" color="fg.muted">
+        Press and hold − or + to step continuously — the rate accelerates the longer you hold, and
+        stops at the min/max bound.
+      </Text>
+    </Stack>
+  ),
+};
+
+export const LongPressToClear: Story = {
+  name: 'Long-press to clear',
+  render: () => {
+    function Demo(): React.ReactElement {
+      const [value, setValue] = useState<number>(1280);
+      return (
+        <Stack gap="3" width="280px">
+          <NumberInput
+            value={value}
+            onChange={setValue}
+            minValue={0}
+            prefix="$"
+            clearOnLongPress
+            aria-label="Budget"
+          />
+          <Text size="sm" color="fg.muted">
+            Long-press the value (~500ms) to clear it to the minimum. Current:{' '}
+            <strong>{Number.isNaN(value) ? '—' : value}</strong>
+          </Text>
+        </Stack>
+      );
+    }
+    return <Demo />;
   },
 };
 

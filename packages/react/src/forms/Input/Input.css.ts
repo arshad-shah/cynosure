@@ -2,23 +2,46 @@ import { globalStyle, style, styleVariants } from '@vanilla-extract/css';
 import { focusRing } from '../../styles/focusRing.js';
 import { vars } from '../../styles/vars.css.js';
 import { fieldWellBase } from '../shared/control.css.js';
+import { segmentedTrack } from '../shared/segmented.css.js';
 
 /**
- * Multi-well root — a flex row of wells with a gap between each tile.
+ * Multi-well root — the shared segmented track (tinted `subtle` well +
+ * hairline border, 4px padding/gap) wrapping the row of raised well tiles.
  * State is expressed on this root via `data-*` so every descendant well
- * reacts in lockstep (matches DatePicker's pattern).
+ * reacts in lockstep (matches DatePicker's pattern); the focus ring and
+ * invalid tint live on the track, like `NumberInput`.
  */
-export const multiWellRoot = style({
-  display: 'inline-flex',
-  alignItems: 'stretch',
-  width: '100%',
-  boxSizing: 'border-box',
-  gap: vars.space[1],
-  color: vars.color.foreground.default,
-  selectors: {
-    '&[data-disabled="true"]': { opacity: 0.6, cursor: 'not-allowed' },
+export const multiWellRoot = style([
+  segmentedTrack,
+  {
+    width: '100%',
+    color: vars.color.foreground.default,
+    selectors: {
+      // Variants first, states after — equal specificity, so source order
+      // lets the focus/invalid borders win over the variant's border reset.
+      '&[data-variant="filled"]': {
+        background: vars.color.background.muted,
+        borderColor: 'transparent',
+      },
+      '&[data-variant="ghost"]': {
+        background: 'transparent',
+        borderColor: 'transparent',
+      },
+      '&[data-focus-within="true"]:not([data-invalid="true"])': {
+        borderColor: vars.color.border.focus,
+        boxShadow: focusRing,
+      },
+      '&[data-invalid="true"]': {
+        borderColor: vars.color.feedback.danger.border,
+      },
+      '&[data-invalid="true"][data-focus-within="true"]': {
+        boxShadow: `0 0 0 2px ${vars.color.feedback.danger.border}`,
+      },
+      '&[data-readonly="true"]': { background: vars.color.background.muted },
+      '&[data-disabled="true"]': { opacity: 0.6, cursor: 'not-allowed' },
+    },
   },
-});
+]);
 
 /** Container for a group of leading or trailing slots — zero-sized if empty. */
 export const slotGroup = style({
@@ -43,20 +66,13 @@ export const inertWell = style([
     cursor: 'default',
     pointerEvents: 'none',
     selectors: {
-      [`${multiWellRoot}[data-variant="filled"] &`]: {
-        background: vars.color.background.muted,
-        borderColor: 'transparent',
-      },
+      // Ghost track: tiles sit flat until the control is interacted with.
       [`${multiWellRoot}[data-variant="ghost"] &`]: {
         background: 'transparent',
-        borderColor: 'transparent',
         boxShadow: 'none',
       },
       [`${multiWellRoot}[data-invalid="true"] &`]: {
         borderColor: vars.color.feedback.danger.border,
-      },
-      [`${multiWellRoot}[data-readonly="true"] &`]: {
-        background: vars.color.background.muted,
       },
     },
   },
@@ -76,6 +92,11 @@ export const actionWell = style([
     cursor: 'pointer',
     color: vars.color.foreground.muted,
     selectors: {
+      // Ghost track: flat until hover, then borrow the raised surface.
+      [`${multiWellRoot}[data-variant="ghost"] &`]: {
+        background: 'transparent',
+        boxShadow: 'none',
+      },
       '&:hover': {
         background: vars.color.accent.soft,
         borderColor: vars.color.accent.solid,
@@ -85,30 +106,19 @@ export const actionWell = style([
         borderColor: vars.color.border.focus,
         boxShadow: focusRing,
       },
-      [`${multiWellRoot}[data-variant="filled"] &`]: {
-        background: vars.color.background.muted,
-        borderColor: 'transparent',
-      },
-      [`${multiWellRoot}[data-variant="ghost"] &`]: {
-        background: 'transparent',
-        borderColor: 'transparent',
-        boxShadow: 'none',
-      },
       [`${multiWellRoot}[data-invalid="true"] &`]: {
         borderColor: vars.color.feedback.danger.border,
         background: vars.color.feedback.danger.soft,
         color: vars.color.feedback.danger.foreground,
-      },
-      [`${multiWellRoot}[data-readonly="true"] &`]: {
-        background: vars.color.background.muted,
       },
     },
   },
 ]);
 
 /**
- * The field well — the one that wraps the `<input>`. Flexes to fill, and is
- * the only well that lifts to `background.surface` on focus-within.
+ * The field well — the raised tile that wraps the `<input>`. Flexes to fill.
+ * The focus ring lives on the track (`multiWellRoot`), like `NumberInput`;
+ * the tile itself only tints its border on hover / invalid.
  */
 export const fieldWell = style([
   fieldWellBase,
@@ -118,32 +128,21 @@ export const fieldWell = style([
     paddingInline: vars.space[3],
     cursor: 'text',
     selectors: {
+      // Ghost track: the tile is flat at rest and raises while editing.
+      [`${multiWellRoot}[data-variant="ghost"] &`]: {
+        background: 'transparent',
+        boxShadow: 'none',
+      },
+      [`${multiWellRoot}[data-variant="ghost"] &:focus-within`]: {
+        background: vars.color.background.raised,
+        boxShadow: vars.shadow.xs,
+      },
       [`${multiWellRoot}[data-hover="true"]:not([data-disabled="true"]):not([data-readonly="true"]) &`]:
         {
           borderColor: vars.color.border.strong,
         },
-      '&:focus-within': {
-        background: vars.color.background.surface,
-        borderColor: vars.color.border.focus,
-        boxShadow: focusRing,
-      },
-      [`${multiWellRoot}[data-variant="filled"] &`]: {
-        background: vars.color.background.muted,
-        borderColor: 'transparent',
-      },
-      [`${multiWellRoot}[data-variant="ghost"] &`]: {
-        background: 'transparent',
-        borderColor: 'transparent',
-        boxShadow: 'none',
-      },
       [`${multiWellRoot}[data-invalid="true"] &`]: {
         borderColor: vars.color.feedback.danger.border,
-      },
-      [`${multiWellRoot}[data-invalid="true"] &:focus-within`]: {
-        boxShadow: `0 0 0 2px ${vars.color.feedback.danger.border}`,
-      },
-      [`${multiWellRoot}[data-readonly="true"] &`]: {
-        background: vars.color.background.muted,
       },
     },
   },

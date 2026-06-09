@@ -25,12 +25,12 @@ export const switchLabel = style({
 export const switchRoot = style({
   position: 'relative',
   flexShrink: 0,
-  display: 'inline-flex',
-  alignItems: 'center',
+  display: 'inline-block',
+  boxSizing: 'border-box',
   background: vars.color.background.muted,
-  border: `1px solid ${vars.color.border.default}`,
+  // A clearly visible hairline so the off-state track reads on any surface.
+  border: `1px solid ${vars.color.border.strong}`,
   borderRadius: vars.radius.full,
-  padding: '1px',
   cursor: 'pointer',
   transitionProperty: 'background-color, border-color, box-shadow, transform',
   transitionDuration: vars.duration.fast,
@@ -66,93 +66,129 @@ export const switchRoot = style({
     '&[data-invalid="true"]:focus-visible': {
       boxShadow: `0 0 0 2px ${vars.color.feedback.danger.border}`,
     },
-    '&:active:not([data-disabled]):not([data-loading="true"])': {
-      transform: 'scale(0.96)',
-    },
   },
 });
 
 /**
- * Sizing — width ≈ 2× height so the thumb has room to slide. Each size
- * publishes `--cynosure-switch-thumb-size` and `--cynosure-switch-translate` so a
- * single `switchThumb` rule can read them, keeping the per-size cost a few
- * custom properties rather than a full recipe × 3.
- */
-/**
- * Sizing — border-box geometry (project-wide default). Outer = `width`/`height`.
- * Content = outer − 2px border − 2px padding. Thumb fills content; the 1px
- * padding reads as a hairline gap around the thumb. Translate = content − thumb.
+ * Sizing. Border-box outer `width`/`height` (1px border). The thumb is
+ * absolutely positioned, so each size only needs to publish:
+ *  - `--cyn-sw-on`  — on-thumb diameter (fills the track minus a 2px gap)
+ *  - `--cyn-sw-off` — off-thumb diameter (Material-style smaller rest thumb)
+ *  - `--cyn-sw-off-inset` — the off thumb's leading gap, balanced so it never
+ *    hugs the border (equal to its vertical margin)
+ * The on-thumb's resting position is derived in `switchThumb` as
+ * `calc(100% - on - 2px)`, so it always sits a 2px gap from the trailing edge.
  */
 export const switchSize = styleVariants({
   sm: {
-    width: '1.75rem', // 28 — content 24×12, thumb 12, translate 12
-    height: '1rem',
+    width: '2rem', // 32 — padding-box 30×16
+    height: '1.125rem', // 18
     vars: {
-      ['--cynosure-switch-thumb-size' as string]: '0.75rem',
-      ['--cynosure-switch-translate' as string]: '0.75rem',
+      ['--cyn-sw-on' as string]: '0.75rem', // 12
+      ['--cyn-sw-off' as string]: '0.5625rem', // 9
+      ['--cyn-sw-off-inset' as string]: '0.21875rem', // 3.5 = (16 − 9) / 2
     },
   },
   md: {
-    width: '2.25rem', // 36 — content 32×16, thumb 16, translate 16
-    height: '1.25rem',
+    width: '2.25rem', // 36 — padding-box 34×18
+    height: '1.25rem', // 20
     vars: {
-      ['--cynosure-switch-thumb-size' as string]: '1rem',
-      ['--cynosure-switch-translate' as string]: '1rem',
+      ['--cyn-sw-on' as string]: '0.875rem', // 14
+      ['--cyn-sw-off' as string]: '0.625rem', // 10
+      ['--cyn-sw-off-inset' as string]: '0.25rem', // 4 = (18 − 10) / 2
     },
   },
   lg: {
-    width: '2.75rem', // 44 — content 40×20, thumb 20, translate 20
-    height: '1.5rem',
+    width: '2.75rem', // 44 — padding-box 42×22
+    height: '1.5rem', // 24
     vars: {
-      ['--cynosure-switch-thumb-size' as string]: '1.25rem',
-      ['--cynosure-switch-translate' as string]: '1.25rem',
+      ['--cyn-sw-on' as string]: '1.125rem', // 18
+      ['--cyn-sw-off' as string]: '0.875rem', // 14
+      ['--cyn-sw-off-inset' as string]: '0.25rem', // 4 = (22 − 14) / 2
     },
   },
 });
 
+/**
+ * Material-You-style thumb: small when off, growing to fill the track as it
+ * slides on. Absolutely positioned and centered vertically; `inset-inline-start`
+ * drives the horizontal travel (auto-flipping in RTL). At rest it sits a
+ * balanced gap (`--cyn-sw-off-inset`) from the leading edge — never jammed
+ * against the border. `data-keep-thumb` keeps it full-size (for an off icon).
+ */
 export const switchThumb = style({
+  position: 'absolute',
+  top: '50%',
+  insetInlineStart: 'var(--cyn-sw-off-inset)',
   display: 'grid',
   placeItems: 'center',
   boxSizing: 'border-box',
-  width: 'var(--cynosure-switch-thumb-size)',
-  height: 'var(--cynosure-switch-thumb-size)',
-  background: vars.color.background.surface,
+  width: 'var(--cyn-sw-off)',
+  height: 'var(--cyn-sw-off)',
+  background: vars.color.background.raised,
   borderRadius: vars.radius.full,
   boxShadow: vars.shadow.sm,
-  transitionProperty: 'transform',
+  transform: 'translateY(-50%)',
+  transitionProperty: 'inset-inline-start, width, height',
   transitionDuration: vars.duration.normal,
   transitionTimingFunction: vars.easing.spring,
-  transform: 'translateX(0)',
-  willChange: 'transform',
+  willChange: 'inset-inline-start, width, height',
   selectors: {
+    '&[data-keep-thumb="true"]': {
+      width: 'var(--cyn-sw-on)',
+      height: 'var(--cyn-sw-on)',
+      insetInlineStart: '2px',
+    },
     '&[data-state="checked"]': {
-      transform: 'translateX(var(--cynosure-switch-translate))',
+      width: 'var(--cyn-sw-on)',
+      height: 'var(--cyn-sw-on)',
+      insetInlineStart: 'calc(100% - var(--cyn-sw-on) - 2px)',
     },
-    '[dir="rtl"] &[data-state="checked"]': {
-      transform: 'translateX(calc(-1 * var(--cynosure-switch-translate)))',
+    // While loading, the thumb stays full-size at whichever position it's
+    // settling toward, so the spinner always fits — even when toggling *off*,
+    // where the resting thumb would normally be too small for the loader. It
+    // shrinks back to the small off thumb once loading ends.
+    '&[data-loading="true"]': {
+      width: 'var(--cyn-sw-on)',
+      height: 'var(--cyn-sw-on)',
     },
+    '&[data-loading="true"][data-state="unchecked"]': {
+      insetInlineStart: '2px',
+    },
+    // Press feedback (Material-You): the resting thumb swells toward full size
+    // while the switch is held, driven by the root's active state.
+    [`${switchRoot}:active:not([data-disabled]):not([data-loading="true"]) &[data-state="unchecked"]`]:
+      {
+        width: 'var(--cyn-sw-on)',
+        height: 'var(--cyn-sw-on)',
+        insetInlineStart: '2px',
+      },
+  },
+  '@media': {
+    '(prefers-reduced-motion: reduce)': { transitionDuration: '0s' },
   },
 });
 
-export const thumbCheck = style({
-  display: 'block',
+/** Icon shown inside the thumb. Centered, scales its glyph to the thumb. */
+export const thumbIcon = style({
+  display: 'grid',
+  placeItems: 'center',
+  lineHeight: 0,
+});
+
+/** On-state glyph colour (accent), tinted to danger when invalid. */
+export const thumbIconChecked = style({
   color: vars.color.accent.solid,
-  opacity: 0,
-  transitionProperty: 'opacity',
-  transitionDuration: vars.duration.fast,
   selectors: {
-    [`${switchThumb}[data-state="checked"] &`]: {
-      opacity: 1,
-    },
-  },
-});
-
-export const thumbCheckInvalid = style({
-  selectors: {
-    [`${switchThumb}[data-state="checked"] &`]: {
+    [`${switchRoot}[data-invalid="true"] &`]: {
       color: vars.color.feedback.danger.solid,
     },
   },
+});
+
+/** Off-state glyph colour — muted, recedes against the white thumb. */
+export const thumbIconUnchecked = style({
+  color: vars.color.foreground.muted,
 });
 
 export const thumbLoader = style({

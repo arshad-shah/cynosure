@@ -33,18 +33,15 @@ import {
 const CalendarIcon = (): React.ReactElement => (
   <CalendarDays size={16} strokeWidth={2} aria-hidden />
 );
-const ChevronDownIcon = (): React.ReactElement => (
-  <ChevronDown size={16} strokeWidth={2.25} aria-hidden />
-);
-
 /** Cynosure-specific props for `<DatePicker>`. */
 export interface DatePickerOwnProps<T extends DateValue = DateValue> {
   /** Visible label, also used as the picker's accessible name when a string. */
   label?: ReactNode;
-  /** Accepted for API parity with other form controls; visual effect is minor in the punched design. */
+  /** Accepted for API parity with other form controls; visual effect is minor in the segmented design. */
   size?: FormControlSize;
   /**
-   * Accepted for API parity with other form controls; visual effect is minor in the punched design.
+   * Tints the segmented track: `outline` (light well + hairline border),
+   * `filled` (deeper solid tint), `ghost` (transparent; tiles flat at rest).
    * @default "outline"
    */
   variant?: FormControlVariant;
@@ -119,7 +116,7 @@ export const DatePicker = forwardRef<HTMLDivElement, DatePickerProps>(
             {(seg) => <AriaDateSegment segment={seg} className={segment} />}
           </AriaDateInput>
           <AriaButton className={triggerWell} aria-label="Open calendar">
-            <ChevronDownIcon />
+            <ChevronDown size={16} aria-hidden />
           </AriaButton>
         </AriaGroup>
         <AriaPopover className={calendarPopover} placement="bottom start">

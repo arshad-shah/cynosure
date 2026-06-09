@@ -1,6 +1,6 @@
 ---
 title: PinInput
-description: OTP-style code field — N single-character cells with auto-advance, paste distribution, and backspace transfer.
+description: OTP-style code field — raised cells with a lift-on-focus active state, auto-advance, paste / SMS-autofill distribution, and backspace transfer.
 category: components
 status: stable
 since: "0.1.0"
@@ -54,6 +54,9 @@ Set `mask` to render bullets in place of the entered characters, like a password
 - Pasting a code distributes characters across the remaining cells.
 
 ## Recipes
+
+- Paste a full code into any cell — it's distributed across the cells (non-matching characters like spaces or dashes are skipped). iOS SMS one-time-code autofill is handled the same way.
+- Pass `separator` (e.g. `"–"`) to visually group the cells into halves.
 
 - Use `onComplete` to auto-submit once the user fills all `length` cells.
 - Set `mask` for security codes you don't want shoulder-surfed.

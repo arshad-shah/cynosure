@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import { Moon, Sun } from 'lucide-react';
 import { useState } from 'react';
 import { expect, userEvent, within } from 'storybook/test';
 import { Inline } from '../../primitives/layout/Inline/Inline.js';
@@ -99,6 +100,70 @@ export const Loading: Story = {
           </Switch>
           <Text size="sm" color="fg.muted">
             {pending ? 'Saving…' : on ? 'Enabled' : 'Disabled'}
+          </Text>
+        </Stack>
+      );
+    }
+    return <Demo />;
+  },
+};
+
+export const AsyncToggle: Story = {
+  name: 'Async — optimistic, reverts on failure',
+  render: () => {
+    function Demo(): React.ReactElement {
+      const [on, setOn] = useState(false);
+      const [note, setNote] = useState('Toggle me — it succeeds ~60% of the time.');
+      // Returning a promise from onCheckedChange makes the Switch flip
+      // optimistically, spin while pending, commit on resolve, revert on reject.
+      const save = (next: boolean) =>
+        new Promise<void>((resolve, reject) => {
+          setNote('Saving…');
+          setTimeout(() => {
+            if (Math.random() > 0.4) {
+              setOn(next);
+              setNote(next ? 'Saved: enabled' : 'Saved: disabled');
+              resolve();
+            } else {
+              setNote('Failed — reverted');
+              reject(new Error('network'));
+            }
+          }, 1200);
+        });
+      return (
+        <Stack gap="3" width="320px">
+          <Switch checked={on} onCheckedChange={save}>
+            Enable backups
+          </Switch>
+          <Text size="sm" color="fg.muted">
+            {note}
+          </Text>
+        </Stack>
+      );
+    }
+    return <Demo />;
+  },
+};
+
+export const CustomIcons: Story = {
+  name: 'Custom thumb icons',
+  render: () => {
+    function Demo(): React.ReactElement {
+      const [dark, setDark] = useState(true);
+      return (
+        <Stack gap="3" width="320px">
+          <Switch
+            size="lg"
+            checked={dark}
+            onCheckedChange={setDark}
+            checkedIcon={<Moon size={14} />}
+            uncheckedIcon={<Sun size={14} />}
+          >
+            Dark mode
+          </Switch>
+          <Text size="sm" color="fg.muted">
+            Pass <code>checkedIcon</code> / <code>uncheckedIcon</code> to put a glyph in the thumb;
+            an unchecked icon keeps the resting thumb full-size.
           </Text>
         </Stack>
       );

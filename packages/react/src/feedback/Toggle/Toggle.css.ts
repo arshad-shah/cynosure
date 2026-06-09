@@ -1,4 +1,5 @@
 import { globalStyle, style, styleVariants } from '@vanilla-extract/css';
+import { segmentedTrack } from '../../forms/shared/segmented.css.js';
 import { focusRing } from '../../styles/focusRing.js';
 import { vars } from '../../styles/vars.css.js';
 
@@ -100,61 +101,31 @@ export const toggleGroupRoot = style({
   },
 });
 
-export const toggleGroupAttached = style({
-  gap: 0,
-  background: vars.color.background.surface,
-  border: `1px solid ${vars.color.border.default}`,
-  borderRadius: vars.radius.md,
-  padding: 0,
-});
+/**
+ * Attached mode — the shared segmented-track container (tinted `subtle` well,
+ * hairline border, 4px padding/gap) that `NumberInput` and `ButtonGroup`
+ * also use, so every segmented control reads the same. `gap` and `background`
+ * are re-asserted because `toggleGroupRoot` (declared above, later in the
+ * cascade than the shared recipe) would otherwise win with its own values.
+ */
+export const toggleGroupAttached = style([
+  segmentedTrack,
+  {
+    gap: vars.space['1'],
+    background: vars.color.background.subtle,
+  },
+]);
 
+// Items float inside the track as tiles: flat at rest, raised when selected.
+// The descendant selector (0,3,0 with the attribute) outweighs the item's own
+// variant rules, so attached items render consistently across `ghost` /
+// `outline` / `solid` item variants.
 globalStyle(`${toggleGroupAttached} ${toggleRoot}`, {
-  borderRadius: 0,
   border: 'none',
-  borderInlineEnd: `1px solid ${vars.color.border.subtle}`,
 });
 
-globalStyle(`${toggleGroupAttached} ${toggleRoot}:last-child`, {
-  borderInlineEnd: 'none',
-});
-
-// Round the outer corners of the end items so a selected item's fill follows
-// the group's rounded border instead of poking square corners past it. We
-// round the items rather than clipping the wrapper with `overflow: hidden`,
-// which would crop the items' focus-ring box-shadow. The inner radius is the
-// wrapper radius minus its 1px border so the corner nests exactly.
-const attachedRadius = `calc(${vars.radius.md} - 1px)`;
-
-// Horizontal (default): first item rounds its leading edge, last its trailing.
-globalStyle(`${toggleGroupAttached} ${toggleRoot}:first-child`, {
-  borderStartStartRadius: attachedRadius,
-  borderEndStartRadius: attachedRadius,
-});
-
-globalStyle(`${toggleGroupAttached} ${toggleRoot}:last-child`, {
-  borderStartEndRadius: attachedRadius,
-  borderEndEndRadius: attachedRadius,
-});
-
-globalStyle(`${toggleGroupAttached}[data-orientation="vertical"] ${toggleRoot}`, {
-  borderInlineEnd: 'none',
-  borderBlockEnd: `1px solid ${vars.color.border.subtle}`,
-});
-
-globalStyle(`${toggleGroupAttached}[data-orientation="vertical"] ${toggleRoot}:last-child`, {
-  borderBlockEnd: 'none',
-});
-
-// Vertical: first item rounds its top edge, last its bottom edge — and the
-// inline-axis corners the horizontal rules set above are reset to 0.
-globalStyle(`${toggleGroupAttached}[data-orientation="vertical"] ${toggleRoot}:first-child`, {
-  borderStartStartRadius: attachedRadius,
-  borderStartEndRadius: attachedRadius,
-  borderEndStartRadius: 0,
-});
-
-globalStyle(`${toggleGroupAttached}[data-orientation="vertical"] ${toggleRoot}:last-child`, {
-  borderEndStartRadius: attachedRadius,
-  borderEndEndRadius: attachedRadius,
-  borderStartEndRadius: 0,
+globalStyle(`${toggleGroupAttached} ${toggleRoot}[data-state="on"]`, {
+  background: vars.color.background.raised,
+  boxShadow: vars.shadow.xs,
+  color: vars.color.accent.solid,
 });

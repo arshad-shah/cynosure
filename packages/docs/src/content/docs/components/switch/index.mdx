@@ -14,6 +14,8 @@ import PropsTable from '@/components/PropsTable.astro';
 
 <LivePreview example="switch/basic" />
 
+The thumb is small at rest and grows to fill the track as it slides on (a Material-You-style grow + slide). Use `checkedIcon` / `uncheckedIcon` to place a glyph in the thumb — e.g. a sun/moon for a theme toggle.
+
 ## Sizes
 
 Three sizes are available: `sm`, `md` (default), and `lg`.
@@ -37,4 +39,5 @@ Three sizes are available: `sm`, `md` (default), and `lg`.
 ## Recipes
 
 - Prefer `<Switch>` over `<Checkbox>` when the action takes effect immediately (e.g. enabling a feature flag).
-- Use `loading` when toggling requires an async API call — it prevents double-toggling and communicates progress.
+- For async toggles, **return a promise from `onCheckedChange`**: the switch flips optimistically to the new state, shows a spinner while pending, keeps the change on success, and reverts on rejection. (The `loading` prop is still available for externally managed spinners.) The thumb stays full-size while the spinner shows — even when toggling *off* — then shrinks back once it settles.
+- Pass `checkedIcon` / `uncheckedIcon` to put a glyph in the thumb — e.g. a sun/moon for a theme toggle.

@@ -1,4 +1,4 @@
-import { Check, ChevronDownIcon } from 'lucide-react';
+import { Check, ChevronDown } from 'lucide-react';
 import { type CSSProperties, type ReactNode, forwardRef } from 'react';
 import {
   Button as AriaButton,
@@ -13,7 +13,6 @@ import {
   type ListBoxItemProps,
 } from 'react-aria-components';
 import { cn } from '../../utils/cn.js';
-import { controlSize, controlWrapperBase, controlWrapperVariant } from '../shared/control.css.js';
 import {
   listbox,
   listboxEmpty,
@@ -22,8 +21,18 @@ import {
   listboxSectionHeader,
   popover,
 } from '../shared/popover.css.js';
+import {
+  triggerChevronIcon,
+  triggerChevronSize,
+  triggerChevronTile,
+  triggerTileSize,
+  triggerTrack,
+  triggerTrackSize,
+  triggerValueText,
+  triggerValueTile,
+} from '../shared/segmentedTrigger.css.js';
 import type { FormControlSize, FormControlVariant } from '../shared/types.js';
-import { itemCheck, trigger, triggerIcon, triggerValue } from './Select.css.js';
+import { itemCheck } from './Select.css.js';
 
 /** Shape of a data-driven `<Select>` option. */
 export interface SelectItemData<T extends string = string> {
@@ -162,12 +171,7 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps<string>>(
 
     const body = items ? renderItemsGroupedBySection(items) : children;
 
-    const wrapperClass = cn(
-      controlWrapperBase,
-      controlWrapperVariant[variant],
-      controlSize[size],
-      className,
-    );
+    const trackClass = cn(triggerTrack, triggerTrackSize[size], className);
 
     return (
       <AriaSelect
@@ -185,19 +189,25 @@ export const Select = forwardRef<HTMLButtonElement, SelectProps<string>>(
       >
         <AriaButton
           ref={ref}
-          className={wrapperClass}
+          className={trackClass}
+          data-variant={variant}
           data-disabled={disabled || undefined}
           data-invalid={invalid || undefined}
           style={style}
         >
-          <span className={trigger}>
-            <AriaSelectValue className={triggerValue}>
+          <span className={cn(triggerValueTile, triggerTileSize[size])}>
+            <AriaSelectValue className={triggerValueText}>
               {({ isPlaceholder, selectedText }) =>
                 isPlaceholder ? placeholder : (selectedText ?? '')
               }
             </AriaSelectValue>
-            <span className={triggerIcon} aria-hidden="true">
-              <ChevronDownIcon />
+          </span>
+          <span
+            className={cn(triggerChevronTile, triggerTileSize[size], triggerChevronSize[size])}
+            aria-hidden="true"
+          >
+            <span className={triggerChevronIcon}>
+              <ChevronDown size={16} aria-hidden />
             </span>
           </span>
         </AriaButton>

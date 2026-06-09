@@ -154,6 +154,24 @@ export const MaxSelected: Story = {
   },
 };
 
+export const Overflow: Story = {
+  name: 'Overflow — chips collapse to +N',
+  render: () => (
+    <Stack gap="3" width="260px">
+      <MultiSelect
+        items={tags}
+        defaultValue={['design', 'engineering', 'marketing', 'support', 'sales']}
+        aria-label="Many selected"
+        placeholder="Pick teams…"
+      />
+      <Text size="sm" color="fg.muted">
+        The trigger stays one row tall — chips that don't fit collapse into a<strong> +N</strong>{' '}
+        badge.
+      </Text>
+    </Stack>
+  ),
+};
+
 export const Controlled: Story = {
   render: () => {
     function Demo(): React.ReactElement {
@@ -180,7 +198,7 @@ export const Controlled: Story = {
 };
 
 export const Interaction: Story = {
-  name: 'Interaction · open listbox, pick adds a tag',
+  name: 'Interaction · open dropdown, pick toggles a chip',
   render: () => (
     <MultiSelect
       items={tags}
@@ -191,18 +209,20 @@ export const Interaction: Story = {
   ),
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const input = canvas.getByRole('textbox', { name: 'Departments' });
-    // Focus opens the listbox (portals to document.body).
-    input.focus();
+    const trigger = canvas.getByRole('combobox', { name: 'Departments' });
+    // Clicking the trigger opens the dropdown (portals to document.body).
+    await userEvent.click(trigger);
     const listbox = await within(document.body).findByRole('listbox');
     await expect(listbox).toBeInTheDocument();
-    // Selecting an option adds it as a removable tag and removes it from the list.
+    // Selecting an option adds it as a removable chip; the option stays in the
+    // list marked selected, so it remains reachable to toggle off.
     await userEvent.click(within(document.body).getByRole('option', { name: 'Engineering' }));
     await expect(canvas.getByRole('button', { name: 'Remove Engineering' })).toBeInTheDocument();
     await waitFor(() =>
-      expect(
-        within(document.body).queryByRole('option', { name: 'Engineering' }),
-      ).not.toBeInTheDocument(),
+      expect(within(document.body).getByRole('option', { name: 'Engineering' })).toHaveAttribute(
+        'aria-selected',
+        'true',
+      ),
     );
   },
 };
@@ -227,7 +247,9 @@ export const InsideFormField: Story = {
                   aria-label="Departments"
                 />
               </FormControl>
-              <FormDescription>Backspace with an empty input removes the last tag.</FormDescription>
+              <FormDescription>
+                Open to search and toggle; Backspace in the empty search removes the last chip.
+              </FormDescription>
               <FormMessage>{invalid ? 'Pick at least one department.' : undefined}</FormMessage>
             </FormField>
           </Stack>

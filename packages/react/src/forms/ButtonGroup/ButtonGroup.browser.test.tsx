@@ -4,11 +4,12 @@ import { Button } from '../Button/Button.js';
 import { ButtonGroup } from './ButtonGroup.js';
 
 /**
- * Real-browser test: the `attached` segmented layout collapses inter-button
- * gaps and overlaps borders, which only resolves with a real layout engine —
- * jsdom reports zeroed boxes. Here we assert the buttons sit on the same row
- * (equal `top`) and butt up against each other, plus that clicks still route
- * to the right button. Runs across Chromium/Firefox/WebKit in CI.
+ * Real-browser test: the `attached` segmented layout places the buttons as
+ * tiles inside a padded track with a small fixed gap, which only resolves
+ * with a real layout engine — jsdom reports zeroed boxes. Here we assert the
+ * buttons sit on the same row (equal `top`) and are separated by the track's
+ * segment gap, plus that clicks still route to the right button. Runs across
+ * Chromium/Firefox/WebKit in CI.
  */
 test('attached ButtonGroup lays its buttons on a single row and routes clicks', () => {
   const clicked: string[] = [];
@@ -27,8 +28,10 @@ test('attached ButtonGroup lays its buttons on a single row and routes clicks', 
 
   // Same row.
   expect(Math.abs(dayRect.top - weekRect.top)).toBeLessThanOrEqual(2);
-  // Attached: the next button starts where the previous ends (borders overlap).
-  expect(Math.abs(weekRect.left - dayRect.right)).toBeLessThanOrEqual(2);
+  // Segmented track: the next tile starts a small gap (4px) after the previous.
+  const gap = weekRect.left - dayRect.right;
+  expect(gap).toBeGreaterThanOrEqual(0);
+  expect(gap).toBeLessThanOrEqual(8);
 
   fireEvent.click(screen.getByRole('button', { name: 'Month' }));
   expect(clicked).toEqual(['Month']);

@@ -2,7 +2,9 @@ import {
   type CSSProperties,
   type ChangeEvent,
   type ClipboardEvent,
+  Fragment,
   type KeyboardEvent,
+  type ReactNode,
   forwardRef,
   useCallback,
   useEffect,
@@ -11,7 +13,7 @@ import {
 import { useControllableState } from '../../hooks/useControllableState.js';
 import { cn } from '../../utils/cn.js';
 import type { FormControlSize } from '../shared/types.js';
-import { cell, cellSize, root } from './PinInput.css.js';
+import { cell, cellSize, root, separatorClass } from './PinInput.css.js';
 
 export type PinInputType = 'numeric' | 'alphanumeric' | 'alphabetic';
 
@@ -60,6 +62,11 @@ export interface PinInputProps {
   invalid?: boolean;
   /** Focuses the first cell on mount. */
   autoFocus?: boolean;
+  /**
+   * Visual separator rendered at the midpoint of the cells (e.g. a dash for a
+   * `123–456` grouping). Omitted by default.
+   */
+  separator?: ReactNode;
   /** Submitted form field name (renders a hidden input carrying the concatenated value). */
   name?: string;
   id?: string;
@@ -89,6 +96,7 @@ export const PinInput = forwardRef<HTMLDivElement, PinInputProps>(function PinIn
     disabled = false,
     invalid,
     autoFocus,
+    separator,
     name,
     id,
     className,
@@ -123,23 +131,47 @@ export const PinInput = forwardRef<HTMLDivElement, PinInputProps>(function PinIn
 
   const padded = useCallback((v: string) => v.padEnd(length, ' ').slice(0, length), [length]);
 
+  /**
+   * Distribute a string across cells starting at `from`, keeping only chars
+   * that match the type (so `"123-456"` or a spaced code pastes cleanly), and
+   * land focus on the next empty cell. Shared by paste and the multi-char
+   * change path (OS SMS autofill drops the whole code into one cell's value).
+   */
+  const fill = useCallback(
+    (text: string, from: number) => {
+      const chars = padded(value).split('');
+      let cursor = from;
+      for (const ch of text) {
+        if (cursor >= length) break;
+        if (!pattern.test(ch)) continue;
+        chars[cursor] = ch;
+        cursor += 1;
+      }
+      setValue(chars.join('').trimEnd());
+      cellsRef.current[Math.min(cursor, length - 1)]?.focus();
+    },
+    [padded, value, length, pattern, setValue],
+  );
+
   const handleChange = (index: number) => (event: ChangeEvent<HTMLInputElement>) => {
     const raw = event.target.value;
-    const char = raw.slice(-1);
+    // Multi-char value = paste-into-field or OS one-time-code autofill — spread
+    // it across the cells instead of keeping a single character.
+    if (raw.length > 1) {
+      fill(raw, index);
+      return;
+    }
+    const char = raw;
     if (char === '') {
-      const next = padded(value);
-      const chars = next.split('');
+      const chars = padded(value).split('');
       chars[index] = ' ';
-      const trimmed = chars.join('').trimEnd();
-      setValue(trimmed);
+      setValue(chars.join('').trimEnd());
       return;
     }
     if (!pattern.test(char)) return;
-    const normalized = type === 'alphabetic' || type === 'alphanumeric' ? char : char;
     const chars = padded(value).split('');
-    chars[index] = normalized;
-    const joined = chars.join('').trimEnd();
-    setValue(joined);
+    chars[index] = char;
+    setValue(chars.join('').trimEnd());
     if (index < length - 1) cellsRef.current[index + 1]?.focus();
   };
 
@@ -183,18 +215,7 @@ export const PinInput = forwardRef<HTMLDivElement, PinInputProps>(function PinIn
   const handlePaste = (index: number) => (event: ClipboardEvent<HTMLInputElement>) => {
     event.preventDefault();
     const text = event.clipboardData.getData('text').trim();
-    if (!text) return;
-    const chars = padded(value).split('');
-    let cursor = index;
-    for (const ch of text) {
-      if (cursor >= length) break;
-      if (!pattern.test(ch)) continue;
-      chars[cursor] = ch;
-      cursor += 1;
-    }
-    const joined = chars.join('').trimEnd();
-    setValue(joined);
-    cellsRef.current[Math.min(cursor, length - 1)]?.focus();
+    if (text) fill(text, index);
   };
 
   const padVal = padded(value);
@@ -212,31 +233,39 @@ export const PinInput = forwardRef<HTMLDivElement, PinInputProps>(function PinIn
       {Array.from({ length }).map((_, index) => {
         const raw = padVal[index] ?? ' ';
         const display = raw === ' ' ? '' : mask ? '●' : raw;
+        // A separator splits the cells into two halves at the midpoint.
+        const showSeparator = separator != null && index === Math.floor(length / 2) && length > 1;
         return (
-          <input
-            // Cells are positional — index is stable across renders (length is fixed).
-            // biome-ignore lint/suspicious/noArrayIndexKey: each cell is tied to its positional index.
-            key={index}
-            ref={(el) => {
-              cellsRef.current[index] = el;
-            }}
-            type="text"
-            inputMode={type === 'numeric' ? 'numeric' : 'text'}
-            pattern={type === 'numeric' ? '[0-9]*' : undefined}
-            maxLength={1}
-            autoComplete={index === 0 ? 'one-time-code' : 'off'}
-            aria-label={`${ariaLabel} digit ${index + 1}`}
-            aria-invalid={invalid || undefined}
-            className={cn(cell, cellSize[size])}
-            value={display}
-            disabled={disabled}
-            data-filled={display !== '' || undefined}
-            data-invalid={invalid || undefined}
-            onChange={handleChange(index)}
-            onKeyDown={handleKeyDown(index)}
-            onPaste={handlePaste(index)}
-            onFocus={(e) => e.target.select()}
-          />
+          // Cells are positional — index is stable across renders (length is fixed).
+          // biome-ignore lint/suspicious/noArrayIndexKey: each cell is tied to its positional index.
+          <Fragment key={index}>
+            {showSeparator ? (
+              <span className={separatorClass} aria-hidden="true">
+                {separator}
+              </span>
+            ) : null}
+            <input
+              ref={(el) => {
+                cellsRef.current[index] = el;
+              }}
+              type="text"
+              inputMode={type === 'numeric' ? 'numeric' : 'text'}
+              pattern={type === 'numeric' ? '[0-9]*' : undefined}
+              maxLength={1}
+              autoComplete={index === 0 ? 'one-time-code' : 'off'}
+              aria-label={`${ariaLabel} digit ${index + 1}`}
+              aria-invalid={invalid || undefined}
+              className={cn(cell, cellSize[size])}
+              value={display}
+              disabled={disabled}
+              data-filled={display !== '' || undefined}
+              data-invalid={invalid || undefined}
+              onChange={handleChange(index)}
+              onKeyDown={handleKeyDown(index)}
+              onPaste={handlePaste(index)}
+              onFocus={(e) => e.target.select()}
+            />
+          </Fragment>
         );
       })}
     </div>

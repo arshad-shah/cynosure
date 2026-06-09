@@ -34,9 +34,6 @@ import { timePopover } from './TimePicker.css.js';
 import { TimePickerWheel } from './TimePickerWheel.js';
 
 const ClockIcon = (): ReactElement => <Clock size={16} strokeWidth={2} aria-hidden />;
-const ChevronDownIcon = (): ReactElement => (
-  <ChevronDown size={16} strokeWidth={2.25} aria-hidden />
-);
 
 /** Cynosure-specific props for `<TimePicker>`. */
 export interface TimePickerOwnProps {
@@ -146,7 +143,7 @@ export const TimePicker = forwardRef<HTMLDivElement, TimePickerProps>(
               aria-label="Open time picker"
               isDisabled={isDisabled || isReadOnly}
             >
-              <ChevronDownIcon />
+              <ChevronDown size={16} aria-hidden />
             </AriaButton>
             <AriaPopover className={timePopover} placement="bottom end">
               <AriaDialog>

@@ -44,9 +44,6 @@ import { DateRangePickerPresets, type DateRangePreset } from './DateRangePickerP
 
 const CalendarIcon = (): ReactElement => <CalendarDays size={16} strokeWidth={2} aria-hidden />;
 const Arrow = (): ReactElement => <ArrowRight size={14} strokeWidth={2} aria-hidden />;
-const ChevronDownIcon = (): ReactElement => (
-  <ChevronDown size={16} strokeWidth={2.25} aria-hidden />
-);
 
 export type { DateRangePreset };
 
@@ -133,7 +130,7 @@ export const DateRangePicker = forwardRef<HTMLDivElement, DateRangePickerProps>(
             {(seg) => <AriaDateSegment segment={seg} className={segment} />}
           </AriaDateInput>
           <AriaButton className={triggerWell} aria-label="Open calendar">
-            <ChevronDownIcon />
+            <ChevronDown size={16} aria-hidden />
           </AriaButton>
         </AriaGroup>
         <AriaPopover className={rangePopover} placement="bottom start">

@@ -59,8 +59,6 @@ cynosure/
 │   ├── react/     @arshad-shah/cynosure-react — main component library
 │   ├── tokens/    @arshad-shah/cynosure-tokens — DTCG tokens + CSS + TS
 │   ├── themes/    @arshad-shah/cynosure-themes — prebuilt alternative themes
-│   ├── core/      @arshad-shah/cynosure-core — framework-agnostic primitives
-│   ├── icons/     @arshad-shah/cynosure-icons — Lucide re-exports
 │   └── config/    internal — shared tsconfig/tsup/biome presets
 ├── docs/
 │   ├── foundations/     public-facing foundations (MDX)

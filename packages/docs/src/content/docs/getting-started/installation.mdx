@@ -72,15 +72,17 @@ If you import per-component, your bundler wires up the CSS automatically:
 import { Button } from '@arshad-shah/cynosure-react/button';
 ```
 
-Every per-component JS entry prepends `import './core.css'; import
-'./<name>.css';` so subpath imports never need a manual stylesheet
-include. `core.css` carries the layout-prop cascade, the body reset, and
-every rule shared by 2+ components — your bundler deduplicates it across
-any number of per-component imports, so an app pulling 20 components
-loads `core.css` once.
+Every per-component JS entry prepends its CSS imports, so subpath imports
+never need a manual stylesheet include. Each component imports `core.css`
+(the universal scaffolding — the layout-prop `@property` declarations and
+the body reset) followed by only the shared chunks under `shared/` that it
+participates in, then its own rules. Shared rules are split by which
+components use them, so a single-component import pulls just that
+component's CSS (~1.5–3 kB brotli) rather than the whole shared baseline —
+and importing many components still deduplicates each chunk to one copy.
 
-If you're code-splitting and want to preload the shared rules yourself,
-the chunk is also reachable directly:
+If you're code-splitting and want to preload the universal scaffolding
+yourself, it's reachable directly:
 
 ```ts
 import '@arshad-shah/cynosure-react/core.css';

@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import { Check, ChevronDown, Filter } from 'lucide-react';
 import { useState } from 'react';
 import { expect, userEvent, within } from 'storybook/test';
 import { Inline } from '../../primitives/layout/Inline/Inline.js';
@@ -21,53 +22,9 @@ const meta: Meta<typeof Chip> = {
 export default meta;
 type Story = StoryObj<typeof Chip>;
 
-const IconCheck = (): React.ReactElement => (
-  <svg
-    aria-hidden="true"
-    width="12"
-    height="12"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="3"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <polyline points="20 6 9 17 4 12" />
-  </svg>
-);
-
-const IconChevron = (): React.ReactElement => (
-  <svg
-    aria-hidden="true"
-    width="12"
-    height="12"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <polyline points="6 9 12 15 18 9" />
-  </svg>
-);
-
-const IconFilter = (): React.ReactElement => (
-  <svg
-    aria-hidden="true"
-    width="12"
-    height="12"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
-  </svg>
-);
+const IconCheck = (): React.ReactElement => <Check size={12} strokeWidth={3} aria-hidden />;
+const IconChevron = (): React.ReactElement => <ChevronDown size={12} aria-hidden />;
+const IconFilter = (): React.ReactElement => <Filter size={12} aria-hidden />;
 
 export const Playground: Story = {
   args: {

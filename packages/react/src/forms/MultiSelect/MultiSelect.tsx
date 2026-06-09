@@ -1,4 +1,4 @@
-import { X } from 'lucide-react';
+import { Check, ChevronDown, X } from 'lucide-react';
 import {
   type CSSProperties,
   type KeyboardEvent,
@@ -15,11 +15,34 @@ import {
 import { createPortal } from 'react-dom';
 import { useControllableState } from '../../hooks/useControllableState.js';
 import { useMergedRef } from '../../hooks/useMergedRef.js';
+import { useResizeObserver } from '../../hooks/useResizeObserver.js';
 import { cn } from '../../utils/cn.js';
-import { controlSize, controlWrapperBase, controlWrapperVariant } from '../shared/control.css.js';
-import { listbox, listboxEmpty, listboxItem, popover } from '../shared/popover.css.js';
+import { SearchInput } from '../SearchInput/SearchInput.js';
+import { listboxEmpty } from '../shared/popover.css.js';
+import {
+  triggerChevronIcon,
+  triggerChevronSize,
+  triggerChevronTile,
+  triggerTileSize,
+  triggerTrack,
+  triggerTrackSize,
+  triggerValueTile,
+} from '../shared/segmentedTrigger.css.js';
 import type { FormControlSize, FormControlVariant } from '../shared/types.js';
-import { inlineInput, tag, tagRemove, tagsRow } from './MultiSelect.css.js';
+import {
+  multiSelectList,
+  multiSelectPopover,
+  option,
+  optionCheck,
+  optionLabel,
+  overflowBadge,
+  placeholder as placeholderClass,
+  searchHeader,
+  tag,
+  tagLabel,
+  tagRemove,
+  tagsRow,
+} from './MultiSelect.css.js';
 
 /** Shape of a data-driven `<MultiSelect>` option. */
 export interface MultiSelectItemData<T extends string = string> {
@@ -47,9 +70,14 @@ export interface MultiSelectProps<T extends string = string> {
   'aria-label'?: string;
   /**
    * Placeholder rendered when nothing is selected.
-   * @default "Add…"
+   * @default "Select…"
    */
   placeholder?: string;
+  /**
+   * Placeholder for the in-dropdown search field.
+   * @default "Search…"
+   */
+  searchPlaceholder?: string;
   /**
    * Control size.
    * @default "md"
@@ -76,12 +104,16 @@ export interface MultiSelectProps<T extends string = string> {
   id?: string;
 }
 
+const RESERVED_BADGE_WIDTH = 44; // px reserved for the "+N" chip when overflowing.
+
 /**
- * Tag-based multi-select. Selected values render as removable tags inside the
- * trigger; typing filters the dropdown; Backspace removes the last tag when
- * the input is empty.
+ * Tag-based multi-select with a fixed-height trigger. Selected values render
+ * as removable chips on a single row; chips that don't fit collapse into a
+ * `+N` overflow badge (so the control never grows as you select). Opening the
+ * dropdown reveals a search field and the full option list — every item stays
+ * reachable and toggles on click, with a checkmark marking the selected ones.
  */
-export const MultiSelect = forwardRef<HTMLInputElement, MultiSelectProps<string>>(
+export const MultiSelect = forwardRef<HTMLDivElement, MultiSelectProps<string>>(
   function MultiSelect(props, ref) {
     const {
       value: valueProp,
@@ -89,7 +121,8 @@ export const MultiSelect = forwardRef<HTMLInputElement, MultiSelectProps<string>
       onValueChange,
       items,
       label,
-      placeholder = 'Add…',
+      placeholder = 'Select…',
+      searchPlaceholder = 'Search…',
       size = 'md',
       variant = 'outline',
       disabled,
@@ -105,6 +138,7 @@ export const MultiSelect = forwardRef<HTMLInputElement, MultiSelectProps<string>
 
     const fallbackId = useId();
     const id = idProp ?? fallbackId;
+    const listboxId = `${id}-listbox`;
 
     const [value, setValue] = useControllableState<string[]>({
       value: valueProp as string[] | undefined,
@@ -114,9 +148,13 @@ export const MultiSelect = forwardRef<HTMLInputElement, MultiSelectProps<string>
 
     const [query, setQuery] = useState('');
     const [open, setOpen] = useState(false);
-    const inputNodeRef = useRef<HTMLInputElement | null>(null);
-    const mergedRef = useMergedRef(ref, inputNodeRef);
-    const wrapperRef = useRef<HTMLDivElement | null>(null);
+    const [focused, setFocused] = useState(false);
+    const [activeIndex, setActiveIndex] = useState(0);
+
+    const triggerRef = useRef<HTMLDivElement | null>(null);
+    const mergedRef = useMergedRef(ref, triggerRef);
+    const tagsRowRef = useRef<HTMLDivElement | null>(null);
+    const searchRef = useRef<HTMLInputElement | null>(null);
     const popoverRef = useRef<HTMLDivElement | null>(null);
     const [popoverRect, setPopoverRect] = useState<{
       top: number;
@@ -124,10 +162,71 @@ export const MultiSelect = forwardRef<HTMLInputElement, MultiSelectProps<string>
       width: number;
     } | null>(null);
 
+    const labelMap = useMemo(() => {
+      const map = new Map<string, ReactNode>();
+      for (const item of items) map.set(item.value, item.label);
+      return map;
+    }, [items]);
+
+    const labelText = useCallback(
+      (v: string): string => {
+        const l = labelMap.get(v);
+        return typeof l === 'string' ? l : v;
+      },
+      [labelMap],
+    );
+
+    // ---- Overflow: how many chips fit on the single row before "+N". ----
+    // We measure the *real* chips rather than a hidden mirror: each time the
+    // value / size / width changes we render every chip (measuring pass), read
+    // their widths in a layout effect (before paint, so no flicker), then
+    // collapse the overflow into a "+N" badge.
+    const [visibleCount, setVisibleCount] = useState(value.length);
+    const measuringRef = useRef(true);
+    const rowEntry = useResizeObserver(tagsRowRef);
+
+    // biome-ignore lint/correctness/useExhaustiveDependencies: rowEntry (resize), size, and labelText are intentional re-measure triggers, not values read here.
+    useLayoutEffect(() => {
+      measuringRef.current = true;
+      setVisibleCount(value.length);
+    }, [value, rowEntry, size, labelText]);
+
+    useLayoutEffect(() => {
+      if (!measuringRef.current) return;
+      measuringRef.current = false;
+      const row = tagsRowRef.current;
+      const avail = row?.clientWidth ?? 0;
+      const chips = Array.from(row?.querySelectorAll<HTMLElement>('[data-chip]') ?? []);
+      if (avail === 0 || chips.length === 0) return;
+      const gap = 6;
+      let used = 0;
+      let count = 0;
+      for (let i = 0; i < chips.length; i += 1) {
+        const chip = chips[i];
+        if (!chip) break;
+        const w = chip.getBoundingClientRect().width + (i > 0 ? gap : 0);
+        // Every chip but the last must leave room for the "+N" badge in case
+        // the following chips don't fit.
+        const reserve = i < chips.length - 1 ? gap + RESERVED_BADGE_WIDTH : 0;
+        if (used + w + reserve <= avail) {
+          used += w;
+          count += 1;
+        } else {
+          break;
+        }
+      }
+      if (count !== value.length) setVisibleCount(count);
+    });
+
+    const measuring = measuringRef.current;
+    const hiddenCount = measuring ? 0 : Math.max(0, value.length - visibleCount);
+    const visibleValues = hiddenCount > 0 ? value.slice(0, visibleCount) : value;
+
+    // ---- Popover placement (portalled, anchored under the trigger). ----
     useLayoutEffect(() => {
       if (!open) return;
       const measure = () => {
-        const el = wrapperRef.current;
+        const el = triggerRef.current;
         if (!el) return;
         const rect = el.getBoundingClientRect();
         setPopoverRect({
@@ -145,12 +244,13 @@ export const MultiSelect = forwardRef<HTMLInputElement, MultiSelectProps<string>
       };
     }, [open]);
 
+    // Close on outside pointer-down.
     useEffect(() => {
       if (!open) return;
       const handlePointerDown = (event: PointerEvent) => {
         const target = event.target as Node | null;
         if (!target) return;
-        if (wrapperRef.current?.contains(target)) return;
+        if (triggerRef.current?.contains(target)) return;
         if (popoverRef.current?.contains(target)) return;
         setOpen(false);
       };
@@ -158,122 +258,179 @@ export const MultiSelect = forwardRef<HTMLInputElement, MultiSelectProps<string>
       return () => document.removeEventListener('pointerdown', handlePointerDown, true);
     }, [open]);
 
-    const filtered = useMemo(() => {
-      const selected = new Set(value);
-      const q = query.trim().toLowerCase();
-      return items.filter((item) => {
-        if (selected.has(item.value)) return false;
-        if (q === '') return true;
-        const text = typeof item.label === 'string' ? item.label : item.value;
-        return text.toLowerCase().includes(q);
-      });
-    }, [items, query, value]);
-
-    const canAdd = maxSelected === undefined || value.length < maxSelected;
-
-    const addValue = useCallback(
-      (next: string) => {
-        if (!canAdd) return;
-        if (value.includes(next)) return;
-        setValue([...value, next]);
+    // Focus the search field when opening; reset query/active when closing.
+    useEffect(() => {
+      if (open) {
+        searchRef.current?.focus();
+      } else {
         setQuery('');
+        setActiveIndex(0);
+      }
+    }, [open]);
+
+    const filtered = useMemo(() => {
+      const q = query.trim().toLowerCase();
+      if (q === '') return items;
+      return items.filter((item) => labelText(item.value).toLowerCase().includes(q));
+    }, [items, query, labelText]);
+
+    // Keep the active option index in range as the filtered list changes.
+    useEffect(() => {
+      setActiveIndex((i) => Math.min(Math.max(0, i), Math.max(0, filtered.length - 1)));
+    }, [filtered.length]);
+
+    const selectedSet = useMemo(() => new Set(value), [value]);
+    const atMax = maxSelected !== undefined && value.length >= maxSelected;
+
+    const toggleValue = useCallback(
+      (target: string) => {
+        if (selectedSet.has(target)) {
+          setValue(value.filter((v) => v !== target));
+        } else {
+          if (atMax) return;
+          setValue([...value, target]);
+        }
       },
-      [canAdd, setValue, value],
+      [atMax, selectedSet, setValue, value],
     );
 
     const removeValue = useCallback(
-      (target: string) => {
-        setValue(value.filter((v) => v !== target));
-      },
+      (target: string) => setValue(value.filter((v) => v !== target)),
       [setValue, value],
     );
 
-    const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
-      if (event.key === 'Backspace' && query === '' && value.length > 0) {
-        event.preventDefault();
-        const last = value[value.length - 1];
-        if (last !== undefined) removeValue(last);
-        return;
-      }
-      if (event.key === 'ArrowDown' && !open) {
+    const closeAndFocusTrigger = useCallback(() => {
+      setOpen(false);
+      triggerRef.current?.focus();
+    }, []);
+
+    const handleTriggerKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+      if (disabled) return;
+      if (event.key === 'ArrowDown' || event.key === 'Enter' || event.key === ' ') {
         event.preventDefault();
         setOpen(true);
       }
-      if (event.key === 'Escape') {
-        setOpen(false);
+    };
+
+    const handleSearchKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+      switch (event.key) {
+        case 'ArrowDown':
+          event.preventDefault();
+          setActiveIndex((i) => Math.min(i + 1, filtered.length - 1));
+          break;
+        case 'ArrowUp':
+          event.preventDefault();
+          setActiveIndex((i) => Math.max(i - 1, 0));
+          break;
+        case 'Enter': {
+          event.preventDefault();
+          const item = filtered[activeIndex];
+          if (item && !item.disabled && !(atMax && !selectedSet.has(item.value))) {
+            toggleValue(item.value);
+          }
+          break;
+        }
+        case 'Escape':
+          // SearchInput clears a non-empty query on Escape; only close the
+          // dropdown once the search is already empty (two-step Escape).
+          if (query === '') {
+            event.preventDefault();
+            closeAndFocusTrigger();
+          }
+          break;
+        case 'Backspace':
+          if (query === '' && value.length > 0) {
+            event.preventDefault();
+            const last = value[value.length - 1];
+            if (last !== undefined) removeValue(last);
+          }
+          break;
       }
     };
 
-    const labelMap = useMemo(() => {
-      const map = new Map<string, ReactNode>();
-      for (const item of items) map.set(item.value, item.label);
-      return map;
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [items]);
+    const trackClass = cn(triggerTrack, triggerTrackSize[size], className);
 
-    const wrapperClass = cn(
-      controlWrapperBase,
-      controlWrapperVariant[variant],
-      controlSize[size],
-      className,
+    const renderChip = (v: string) => (
+      <span key={v} className={tag} data-chip="">
+        <span className={tagLabel}>{labelMap.get(v) ?? v}</span>
+        <button
+          type="button"
+          className={tagRemove}
+          aria-label={`Remove ${labelText(v)}`}
+          onClick={(e) => {
+            e.stopPropagation();
+            removeValue(v);
+          }}
+          disabled={disabled}
+        >
+          <X size={12} strokeWidth={3} aria-hidden />
+        </button>
+      </span>
     );
 
     return (
       <>
         <div
-          ref={wrapperRef}
-          className={wrapperClass}
+          ref={mergedRef}
+          id={id}
+          // biome-ignore lint/a11y/useSemanticElements: the combobox trigger wraps removable chip <button>s, so it can't be a native form control.
+          role="combobox"
+          aria-haspopup="listbox"
+          aria-expanded={open}
+          aria-controls={open ? listboxId : undefined}
+          aria-label={label ?? props['aria-label']}
+          aria-invalid={invalid || undefined}
+          aria-required={required || undefined}
+          aria-disabled={disabled || undefined}
+          tabIndex={disabled ? -1 : 0}
+          className={trackClass}
+          data-variant={variant}
+          data-open={open || undefined}
           data-disabled={disabled || undefined}
           data-invalid={invalid || undefined}
+          data-focus-within={open || focused || undefined}
           style={style}
-          onClick={() => inputNodeRef.current?.focus()}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') e.preventDefault();
+          onClick={() => {
+            if (!disabled) setOpen((o) => !o);
           }}
+          onKeyDown={handleTriggerKeyDown}
+          onFocus={() => setFocused(true)}
+          onBlur={() => setFocused(false)}
         >
-          <div className={tagsRow}>
-            {value.map((v) => (
-              <span key={v} className={tag}>
-                <span>{labelMap.get(v) ?? v}</span>
-                <button
-                  type="button"
-                  className={tagRemove}
-                  aria-label={`Remove ${typeof labelMap.get(v) === 'string' ? labelMap.get(v) : v}`}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    removeValue(v);
-                  }}
-                  disabled={disabled}
-                >
-                  <X size={12} strokeWidth={3} aria-hidden />
-                </button>
-              </span>
-            ))}
-            <input
-              ref={mergedRef}
-              id={id}
-              name={name}
-              className={inlineInput}
-              aria-label={label ?? props['aria-label']}
-              placeholder={value.length === 0 ? placeholder : undefined}
-              value={query}
-              disabled={disabled}
-              required={required && value.length === 0}
-              aria-invalid={invalid || undefined}
-              onChange={(e) => {
-                setQuery(e.target.value);
-                if (!open) setOpen(true);
-              }}
-              onKeyDown={handleKeyDown}
-              onFocus={() => setOpen(true)}
-            />
-          </div>
+          <span className={cn(triggerValueTile, triggerTileSize[size])}>
+            <div ref={tagsRowRef} className={tagsRow}>
+              {value.length === 0 ? (
+                <span className={placeholderClass}>{placeholder}</span>
+              ) : (
+                <>
+                  {visibleValues.map((v) => renderChip(v))}
+                  {hiddenCount > 0 ? (
+                    <span className={overflowBadge} aria-label={`${hiddenCount} more selected`}>
+                      +{hiddenCount}
+                    </span>
+                  ) : null}
+                </>
+              )}
+            </div>
+          </span>
+          <span
+            className={cn(triggerChevronTile, triggerTileSize[size], triggerChevronSize[size])}
+            aria-hidden="true"
+          >
+            <span className={triggerChevronIcon}>
+              <ChevronDown size={16} aria-hidden />
+            </span>
+          </span>
+
+          {/* Hidden inputs so selected values submit with the form. */}
+          {name ? value.map((v) => <input key={v} type="hidden" name={name} value={v} />) : null}
         </div>
+
         {open && !disabled && popoverRect
           ? createPortal(
               <div
                 ref={popoverRef}
-                className={popover}
+                className={multiSelectPopover}
                 style={{
                   position: 'absolute',
                   top: popoverRect.top,
@@ -281,35 +438,69 @@ export const MultiSelect = forwardRef<HTMLInputElement, MultiSelectProps<string>
                   width: popoverRect.width,
                 }}
               >
-                {/* biome-ignore lint/a11y/useFocusableInteractive: the listbox is announced via the trigger's aria-activedescendant pattern; the input keeps the actual focus. */}
-                {/* biome-ignore lint/a11y/noNoninteractiveElementToInteractiveRole: composite widget — listbox/option is the correct WAI-ARIA pattern here. */}
-                {/* biome-ignore lint/a11y/useSemanticElements: there is no native equivalent for a multi-select listbox. */}
-                <ul role="listbox" className={listbox} aria-multiselectable="true">
+                <div className={searchHeader}>
+                  <SearchInput
+                    ref={searchRef}
+                    size="sm"
+                    placeholder={searchPlaceholder}
+                    aria-label={`Search ${label ?? props['aria-label'] ?? 'options'}`}
+                    aria-controls={listboxId}
+                    aria-activedescendant={
+                      filtered[activeIndex] ? `${id}-opt-${filtered[activeIndex].value}` : undefined
+                    }
+                    value={query}
+                    onChange={setQuery}
+                    onKeyDown={handleSearchKeyDown}
+                  />
+                </div>
+                <ul
+                  id={listboxId}
+                  // Focus stays on the search input; options use the
+                  // aria-activedescendant pattern. tabIndex=-1 keeps the
+                  // listbox out of the tab order while satisfying a11y tooling.
+                  tabIndex={-1}
+                  // biome-ignore lint/a11y/noNoninteractiveElementToInteractiveRole: composite listbox widget — option role is correct here.
+                  // biome-ignore lint/a11y/useSemanticElements: there is no native multi-select listbox equivalent.
+                  role="listbox"
+                  className={multiSelectList}
+                  aria-multiselectable="true"
+                >
                   {filtered.length === 0 ? (
                     <li className={listboxEmpty} role="presentation">
                       {emptyState ?? 'No results'}
                     </li>
                   ) : (
-                    filtered.map((item) => (
-                      <li
-                        key={item.value}
-                        // biome-ignore lint/a11y/noNoninteractiveElementToInteractiveRole: listbox/option is the correct WAI-ARIA composite widget pattern.
-                        // biome-ignore lint/a11y/useSemanticElements: no native HTML equivalent preserves the option role inside a custom listbox.
-                        role="option"
-                        aria-selected={false}
-                        aria-disabled={item.disabled || !canAdd}
-                        className={listboxItem}
-                        tabIndex={-1}
-                        onMouseDown={(e) => {
-                          e.preventDefault();
-                          if (item.disabled || !canAdd) return;
-                          addValue(item.value);
-                          inputNodeRef.current?.focus();
-                        }}
-                      >
-                        <span>{item.label}</span>
-                      </li>
-                    ))
+                    filtered.map((item, index) => {
+                      const selected = selectedSet.has(item.value);
+                      const blocked = item.disabled || (atMax && !selected);
+                      return (
+                        <li
+                          key={item.value}
+                          id={`${id}-opt-${item.value}`}
+                          // biome-ignore lint/a11y/noNoninteractiveElementToInteractiveRole: listbox/option composite widget pattern.
+                          // biome-ignore lint/a11y/useSemanticElements: no native HTML option preserves the role inside a custom listbox.
+                          role="option"
+                          aria-selected={selected}
+                          aria-disabled={blocked || undefined}
+                          className={option}
+                          data-selected={selected || undefined}
+                          data-active={index === activeIndex || undefined}
+                          tabIndex={-1}
+                          onMouseEnter={() => setActiveIndex(index)}
+                          onMouseDown={(e) => {
+                            e.preventDefault();
+                            if (blocked) return;
+                            toggleValue(item.value);
+                            searchRef.current?.focus();
+                          }}
+                        >
+                          <span className={optionCheck} aria-hidden="true">
+                            {selected ? <Check size={12} strokeWidth={3} /> : null}
+                          </span>
+                          <span className={optionLabel}>{item.label}</span>
+                        </li>
+                      );
+                    })
                   )}
                 </ul>
               </div>,
@@ -320,5 +511,5 @@ export const MultiSelect = forwardRef<HTMLInputElement, MultiSelectProps<string>
     );
   },
 ) as <T extends string = string>(
-  props: MultiSelectProps<T> & { ref?: React.Ref<HTMLInputElement> },
+  props: MultiSelectProps<T> & { ref?: React.Ref<HTMLDivElement> },
 ) => React.ReactElement;

@@ -11,11 +11,15 @@ tags: [forms, date]
 import LivePreview from "@/components/LivePreview/LivePreview.astro";
 import PropsTable from "@/components/PropsTable.astro";
 
+Rendered as a segmented control — the calendar icon, the start/end date
+segments, and the chevron sit as raised tiles inside a tinted track, matching
+the other inputs. The focus ring lives on the track.
+
 <LivePreview example="date-range-picker/basic" />
 
 ## Variants
 
-`outline` (default), `filled`, and `ghost`.
+`outline` (default), `filled`, and `ghost` tint the segmented track — the same vocabulary as the other form controls.
 
 <LivePreview example="date-range-picker/variants" />
 

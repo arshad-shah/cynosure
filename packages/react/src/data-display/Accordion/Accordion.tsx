@@ -1,4 +1,4 @@
-import { ChevronDownIcon } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import {
   type ButtonHTMLAttributes,
   type CSSProperties,
@@ -324,7 +324,7 @@ export const AccordionTrigger = forwardRef<HTMLButtonElement, AccordionTriggerPr
           {...rest}
         >
           <span>{children}</span>
-          {!hideIndicator ? <ChevronDownIcon className={accordionChevron} /> : null}
+          {!hideIndicator ? <ChevronDown className={accordionChevron} aria-hidden /> : null}
         </button>
       </h3>
     );

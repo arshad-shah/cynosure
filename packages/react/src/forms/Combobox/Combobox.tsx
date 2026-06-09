@@ -1,4 +1,4 @@
-import { ChevronDownIcon } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import { type CSSProperties, type ReactNode, forwardRef } from 'react';
 import {
   Button as AriaButton,
@@ -11,8 +11,17 @@ import {
   type ListBoxItemProps,
 } from 'react-aria-components';
 import { cn } from '../../utils/cn.js';
-import { controlSize, controlWrapperBase, controlWrapperVariant } from '../shared/control.css.js';
 import { listbox, listboxEmpty, listboxItem, popover } from '../shared/popover.css.js';
+import {
+  triggerChevronIcon,
+  triggerChevronSize,
+  triggerChevronTile,
+  triggerInput,
+  triggerTileSize,
+  triggerTrack,
+  triggerTrackSize,
+  triggerValueTile,
+} from '../shared/segmentedTrigger.css.js';
 import type { FormControlSize, FormControlVariant } from '../shared/types.js';
 /** Shape of a data-driven `<Combobox>` option. */
 export interface ComboboxItemData<T extends string = string> {
@@ -135,12 +144,7 @@ export const Combobox = forwardRef<HTMLInputElement, ComboboxProps<string>>(
       ...rest
     } = props;
 
-    const wrapperClass = cn(
-      controlWrapperBase,
-      controlWrapperVariant[variant],
-      controlSize[size],
-      className,
-    );
+    const trackClass = cn(triggerTrack, triggerTrackSize[size], className);
 
     const body = items
       ? items.map((item) => (
@@ -173,39 +177,22 @@ export const Combobox = forwardRef<HTMLInputElement, ComboboxProps<string>>(
         allowsCustomValue={allowsCustomValue}
       >
         <div
-          className={wrapperClass}
+          className={trackClass}
+          data-variant={variant}
           data-disabled={disabled || undefined}
           data-invalid={invalid || undefined}
           style={style}
         >
-          <AriaInput
-            ref={ref}
-            placeholder={placeholder}
-            style={{
-              flex: 1,
-              minWidth: 0,
-              border: 'none',
-              outline: 'none',
-              background: 'transparent',
-              color: 'inherit',
-              font: 'inherit',
-              padding: 0,
-            }}
-          />
+          <span className={cn(triggerValueTile, triggerTileSize[size])}>
+            <AriaInput ref={ref} placeholder={placeholder} className={triggerInput} />
+          </span>
           <AriaButton
-            style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              background: 'transparent',
-              border: 'none',
-              cursor: 'pointer',
-              color: 'currentColor',
-              padding: '0 0.5rem',
-            }}
+            className={cn(triggerChevronTile, triggerTileSize[size], triggerChevronSize[size])}
             aria-label="Open options"
           >
-            <ChevronDownIcon />
+            <span className={triggerChevronIcon}>
+              <ChevronDown size={16} aria-hidden />
+            </span>
           </AriaButton>
         </div>
         <AriaPopover className={popover} style={{ width: 'var(--trigger-width)' }}>

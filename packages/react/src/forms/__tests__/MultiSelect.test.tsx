@@ -10,13 +10,13 @@ const items = [
 ];
 
 describe('MultiSelect', () => {
-  it('renders selected values as tags', () => {
+  it('renders selected values as chips', () => {
     render(<MultiSelect aria-label="Skills" items={items} defaultValue={['ts', 'rust']} />);
     expect(screen.getByText('TypeScript')).toBeInTheDocument();
     expect(screen.getByText('Rust')).toBeInTheDocument();
   });
 
-  it('removes a tag when the remove button is clicked', () => {
+  it('removes a chip when its remove button is clicked', () => {
     const onValueChange = vi.fn();
     render(
       <MultiSelect
@@ -30,7 +30,33 @@ describe('MultiSelect', () => {
     expect(onValueChange).toHaveBeenCalledWith([]);
   });
 
-  it('removes the last tag on Backspace when the input is empty', () => {
+  it('opens the dropdown on trigger click and toggles an option', () => {
+    const onValueChange = vi.fn();
+    render(<MultiSelect aria-label="Skills" items={items} onValueChange={onValueChange} />);
+    fireEvent.click(screen.getByRole('combobox', { name: /skills/i }));
+    fireEvent.mouseDown(screen.getByRole('option', { name: 'Go' }));
+    expect(onValueChange).toHaveBeenCalledWith(['go']);
+  });
+
+  it('keeps selected options in the list, marked selected', () => {
+    render(<MultiSelect aria-label="Skills" items={items} defaultValue={['ts']} />);
+    fireEvent.click(screen.getByRole('combobox', { name: /skills/i }));
+    expect(screen.getByRole('option', { name: 'TypeScript' })).toHaveAttribute(
+      'aria-selected',
+      'true',
+    );
+  });
+
+  it('filters via the in-dropdown search field', () => {
+    render(<MultiSelect aria-label="Skills" items={items} />);
+    fireEvent.click(screen.getByRole('combobox', { name: /skills/i }));
+    const search = screen.getByRole('searchbox', { name: /search/i });
+    fireEvent.change(search, { target: { value: 'go' } });
+    expect(screen.getByRole('option', { name: 'Go' })).toBeInTheDocument();
+    expect(screen.queryByRole('option', { name: 'Rust' })).not.toBeInTheDocument();
+  });
+
+  it('removes the last chip on Backspace when the search is empty', () => {
     const Harness = () => {
       const [value, setValue] = useState<string[]>(['ts', 'rust']);
       return (
@@ -38,36 +64,31 @@ describe('MultiSelect', () => {
       );
     };
     render(<Harness />);
-    const input = screen.getByRole('textbox', { name: /skills/i });
-    fireEvent.keyDown(input, { key: 'Backspace' });
-    expect(screen.queryByText('Rust')).not.toBeInTheDocument();
-  });
-
-  it('opens the popover when typing and lets the user pick an option', () => {
-    const onValueChange = vi.fn();
-    render(<MultiSelect aria-label="Skills" items={items} onValueChange={onValueChange} />);
-    const input = screen.getByRole('textbox', { name: /skills/i });
-    fireEvent.focus(input);
-    fireEvent.change(input, { target: { value: 'go' } });
-    const option = screen.getByRole('option', { name: /go/i });
-    fireEvent.mouseDown(option);
-    expect(onValueChange).toHaveBeenCalledWith(['go']);
+    fireEvent.click(screen.getByRole('combobox', { name: /skills/i }));
+    const search = screen.getByRole('searchbox', { name: /search/i });
+    fireEvent.keyDown(search, { key: 'Backspace' });
+    // The Rust chip (its remove button) is gone; Rust remains in the list as a
+    // selectable option, so we assert on the chip rather than the label text.
+    expect(screen.queryByRole('button', { name: /remove rust/i })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /remove typescript/i })).toBeInTheDocument();
   });
 
   it('opens via ArrowDown when closed and closes on Escape', () => {
     render(<MultiSelect aria-label="Skills" items={items} />);
-    const input = screen.getByRole('textbox', { name: /skills/i });
-    input.focus();
-    fireEvent.keyDown(input, { key: 'ArrowDown' });
+    const trigger = screen.getByRole('combobox', { name: /skills/i });
+    trigger.focus();
+    fireEvent.keyDown(trigger, { key: 'ArrowDown' });
+    const search = screen.getByRole('searchbox', { name: /search/i });
     expect(screen.getByRole('listbox')).toBeInTheDocument();
-    fireEvent.keyDown(input, { key: 'Escape' });
+    fireEvent.keyDown(search, { key: 'Escape' });
+    expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
   });
 
   it('shows a custom empty state when nothing matches', () => {
     render(<MultiSelect aria-label="Skills" items={items} emptyState={<span>No matches</span>} />);
-    const input = screen.getByRole('textbox', { name: /skills/i });
-    fireEvent.focus(input);
-    fireEvent.change(input, { target: { value: 'zzz' } });
+    fireEvent.click(screen.getByRole('combobox', { name: /skills/i }));
+    const search = screen.getByRole('searchbox', { name: /search/i });
+    fireEvent.change(search, { target: { value: 'zzz' } });
     expect(screen.getByText('No matches')).toBeInTheDocument();
   });
 
@@ -85,13 +106,16 @@ describe('MultiSelect', () => {
       );
     };
     render(<Harness />);
-    const input = screen.getByRole('textbox', { name: /skills/i });
-    fireEvent.focus(input);
-    const rust = screen.getByRole('option', { name: /rust/i });
-    expect(rust).toHaveAttribute('aria-disabled', 'true');
+    fireEvent.click(screen.getByRole('combobox', { name: /skills/i }));
+    // The selected one stays togglable; unselected ones are blocked at the cap.
+    expect(screen.getByRole('option', { name: 'Rust' })).toHaveAttribute('aria-disabled', 'true');
+    expect(screen.getByRole('option', { name: 'TypeScript' })).not.toHaveAttribute(
+      'aria-disabled',
+      'true',
+    );
   });
 
-  it('marks the wrapper as invalid and disabled', () => {
+  it('marks the trigger as invalid and disabled', () => {
     const { container, rerender } = render(
       <MultiSelect aria-label="Skills" items={items} invalid />,
     );
@@ -102,6 +126,6 @@ describe('MultiSelect', () => {
 
   it('exposes required while no values are selected', () => {
     render(<MultiSelect aria-label="Skills" items={items} required />);
-    expect(screen.getByRole('textbox', { name: /skills/i })).toBeRequired();
+    expect(screen.getByRole('combobox', { name: /skills/i })).toBeRequired();
   });
 });

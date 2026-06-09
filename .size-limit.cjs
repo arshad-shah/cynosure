@@ -135,8 +135,19 @@ entries.push({
 
 // Shared CSS chunks: measured directly so the consumer-side per-import
 // CSS cost is visible in CI even though it's hidden from the JS budgets.
+//
+// `core.css` is now just the universal scaffolding (@property layout-var
+// declarations + body reset) every component imports first. The shared
+// component *rules* are split into per-owner-set chunks under `dist/shared/`,
+// so a single-component subpath import pulls only the chunks it shares
+// (~1.5–3 kB brotli) rather than the whole baseline. The realistic ceiling
+// for the full set of shared rules — what a category-barrel or the monolithic
+// import loads, bundled and compressed together — stays bounded by
+// `styles.css` below; a glob over the individually-compressed chunk files
+// would overcount (per-file brotli overhead, no cross-file dedup) and isn't a
+// meaningful transfer figure, so it's intentionally not budgeted here.
 entries.push(
-  { name: 'core.css (shared baseline)', path: 'packages/react/dist/core.css', limit: '16 kB' },
+  { name: 'core.css (scaffolding)', path: 'packages/react/dist/core.css', limit: '2 kB' },
   { name: 'styles.css (monolithic CSS)', path: 'packages/react/dist/styles.css', limit: '24 kB' },
   { name: 'all.css (tokens + styles)', path: 'packages/react/dist/all.css', limit: '25 kB' },
 );

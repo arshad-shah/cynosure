@@ -1,15 +1,23 @@
 ---
 title: MultiSelect
-description: Tag-style multi-value combobox; selected values render as removable chips inside the trigger and typing filters the dropdown.
+description: Multi-value picker with a fixed-height segmented trigger; selected values render as removable chips that collapse to a +N badge, and the dropdown lists every option with a search field.
 category: components
 status: stable
 since: "0.1.0"
-a11y: Listbox popup with role="option" and aria-multiselectable; Backspace on empty input removes the last tag.
+a11y: role="combobox" trigger with an aria-multiselectable listbox; options stay in the list marked selected; Backspace in the empty search removes the last chip.
 bundleSize: "3.06 kB"
 tags: [forms, input]
 ---
 import LivePreview from '@/components/LivePreview/LivePreview.astro';
 import PropsTable from '@/components/PropsTable.astro';
+
+Rendered as a segmented control — chips sit in a raised value tile and the
+chevron in its own slot inside the tinted track, matching the other inputs.
+The trigger keeps a **fixed height**: chips that don't fit collapse into a
+`+N` badge instead of wrapping. Opening it reveals a search field — the Cynosure `SearchInput`, pinned to the
+top while the list scrolls — and the full option list; every item stays in the
+list (marked with a checkmark) and toggles on click, so nothing becomes
+unreachable.
 
 <LivePreview example="multi-select/basic" />
 
