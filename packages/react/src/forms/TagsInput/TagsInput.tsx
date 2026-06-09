@@ -12,14 +12,10 @@ import {
 import { useControllableState } from '../../hooks/useControllableState.js';
 import { useMergedRef } from '../../hooks/useMergedRef.js';
 import { cn } from '../../utils/cn.js';
-import {
-  inlineInput,
-  tag as tagClass,
-  tagRemove,
-  tagsRow,
-} from '../MultiSelect/MultiSelect.css.js';
+import { tag as tagClass, tagRemove } from '../MultiSelect/MultiSelect.css.js';
 import { controlSize, controlWrapperBase, controlWrapperVariant } from '../shared/control.css.js';
 import type { FormControlSize, FormControlVariant } from '../shared/types.js';
+import { inlineInput, tagsRow } from './TagsInput.css.js';
 
 /** Props for `<TagsInput>` — free-form tag entry. */
 export interface TagsInputProps {
