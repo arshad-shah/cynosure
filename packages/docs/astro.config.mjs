@@ -168,5 +168,15 @@ export default defineConfig({
         '@arshad-shah/cynosure-themes',
       ],
     },
+    // `cynosure-react`'s `CodeBlock` does `await import('shiki')` lazily so
+    // Shiki stays out of the default bundle graph. Vite serves the workspace
+    // package's pre-built `dist/*.js` as-is (no bare-specifier rewrite), so
+    // without this include the browser throws "Failed to resolve module
+    // specifier 'shiki'" inside the demo iframes and CodeBlock falls back to
+    // unhighlighted plain rendering. Pre-bundling shiki gives the dynamic
+    // import a resolvable URL in both dev and prod.
+    optimizeDeps: {
+      include: ['shiki'],
+    },
   },
 });

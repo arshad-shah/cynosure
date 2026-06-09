@@ -17,19 +17,41 @@
 // link). Inlining sidesteps a deep-import that Vite refuses to resolve.
 const PAGE_TITLE_ID = '_top';
 
-const { entry } = Astro.locals.starlightRoute;
+import componentSizes from '../../generated/component-sizes.json';
+
+const { entry, id: routeId } = Astro.locals.starlightRoute;
 const data = entry.data;
 const description = data.description?.trim();
 const status = data.status;
 const since = data.since?.trim();
-const bundleSize = data.bundleSize?.trim();
 const a11y = data.a11y?.trim();
 const tags = (data.tags ?? []).filter((t): t is string => typeof t === 'string' && t.length > 0);
 
-// Hide the placeholder em-dash that many component pages set as a "size
-// not yet measured" sentinel — a real number would be more useful, but
-// `—` looks broken in the meta row.
-const visibleBundleSize = bundleSize && bundleSize !== '—' ? bundleSize : null;
+// Resolve the live bundle size from the generated manifest. The component
+// page slug (e.g. `components/accordion`) carries the same `accordion`
+// slug used as the dist-file basename and the manifest key, so we strip
+// the leading `components/` and any trailing `/index` to look it up.
+//
+// Falls back to the frontmatter `bundleSize` string when no manifest entry
+// exists yet — useful for non-component pages (guides, foundations) that
+// still want to display a hand-set figure. Frontmatter `bundleSize` is no
+// longer the source of truth for component pages.
+type SizeEntry = { js: { raw: number; gz: number } | null; css: { raw: number; gz: number } | null };
+type ManifestShape = { components: Record<string, SizeEntry> };
+const slug = routeId.replace(/^components\//, '').replace(/\/index$/, '');
+const manifestEntry = (componentSizes as ManifestShape).components[slug];
+function formatBytes(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  return `${(bytes / 1024).toFixed(bytes < 10240 ? 2 : 1)} KB`;
+}
+let visibleBundleSize: string | null = null;
+if (manifestEntry) {
+  const total = (manifestEntry.js?.gz ?? 0) + (manifestEntry.css?.gz ?? 0);
+  if (total > 0) visibleBundleSize = `${formatBytes(total)} gz`;
+} else {
+  const fmFallback = data.bundleSize?.trim();
+  if (fmFallback && fmFallback !== '—') visibleBundleSize = fmFallback;
+}
 
 // Tiny inline-markdown renderer: backtick spans become `<code>` so
 // frontmatter descriptions can reference component / prop names
@@ -72,7 +94,7 @@ const hasMetaRow = Boolean(status || since || visibleBundleSize || tags.length);
       ) : null}
       {visibleBundleSize ? (
         <li class="sl-page-meta-item">
-          <span class="sl-page-meta-pill" title="Minified + brotli bundle budget">
+          <span class="sl-page-meta-pill" title="Built JS + CSS transfer size (gzip)">
             {visibleBundleSize}
           </span>
         </li>

@@ -1,13 +1,73 @@
 ---
-import sizeLimit from '@repo/.size-limit.json';
+// Renders the actual built CSS + JS size for a single component, looked up
+// in the generated manifest at `src/generated/component-sizes.json`. The
+// manifest is produced by `scripts/component-sizes.mjs` during the docs
+// build, which copies `packages/react/dist/sizes.json` (emitted by the
+// react package's tsup `onSuccess`). One source of truth, automatically
+// refreshed on every build.
+//
+// Frontmatter / MDX usage:
+//   <BundleSizePill slug="accordion" />
+//   <BundleSizePill slug="accordion" kind="css" />   {/* css-only */}
+//   <BundleSizePill slug="accordion" kind="js" />    {/* js-only   */}
+//
+// `kind` defaults to `total` — the sum of the component's JS + CSS gzip
+// transfer size, which is what consumers care about when deciding whether
+// to deep-import a component versus pulling `index`. Each entry in the
+// manifest has `{ raw, gz }` for both `js` and `css` (or `null` when the
+// component ships no CSS of its own).
 
-interface Props { name: string }
-const { name } = Astro.props;
+import manifest from '../generated/component-sizes.json';
 
-interface SizeLimitEntry { name: string; limit: string; path: string }
-const entries = sizeLimit as SizeLimitEntry[];
-const entry = entries.find((e) => e.name === name);
+interface Props {
+  slug: string;
+  kind?: 'total' | 'js' | 'css';
+}
+
+interface SizePair {
+  raw: number;
+  gz: number;
+}
+interface Entry {
+  js: SizePair | null;
+  css: SizePair | null;
+}
+interface Manifest {
+  generatedAt: string;
+  components: Record<string, Entry>;
+  bundles: Record<string, Entry>;
+}
+
+const { slug, kind = 'total' } = Astro.props;
+const entry = (manifest as Manifest).components[slug];
+
+// Format gzip bytes as a short, scannable size string. Threshold at 1024
+// because anything sub-1 KB is interesting (most layout primitives) and
+// rendering "0.7 KB" reads better than "718 B" in a docs pill.
+function formatBytes(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`;
+  return `${(bytes / 1024).toFixed(bytes < 10240 ? 2 : 1)} KB`;
+}
+
+let label: string | null = null;
+if (entry) {
+  if (kind === 'js' && entry.js) label = `${formatBytes(entry.js.gz)} gz`;
+  else if (kind === 'css' && entry.css) label = `${formatBytes(entry.css.gz)} gz`;
+  else if (kind === 'total') {
+    const total = (entry.js?.gz ?? 0) + (entry.css?.gz ?? 0);
+    if (total > 0) label = `${formatBytes(total)} gz`;
+  }
+}
 ---
-{entry ? (
-  <span data-bundle-size>{entry.limit}</span>
-) : null}
+
+{
+  label ? (
+    <span
+      data-bundle-size
+      data-bundle-kind={kind}
+      title={`Built ${kind === 'total' ? 'JS + CSS' : kind.toUpperCase()} transfer size (gzip)`}
+    >
+      {label}
+    </span>
+  ) : null
+}

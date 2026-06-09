@@ -5,10 +5,16 @@ import { vanillaExtractPlugin } from '@vanilla-extract/esbuild-plugin';
 import { componentEntries } from '../../components.config.mjs';
 
 /**
- * Walk a CSS string at brace depth 0 to split it into top-level "items":
- * comments, at-rules (e.g. `@media (...) { ... }`), and ordinary rules
- * (`.foo { ... }`). Returns the items in source order so deduplication can
- * skip subsequent identical occurrences while preserving the cascade.
+ * Cascade-preserving "keep-first" dedupe at brace depth 0. Lightning CSS's
+ * minifier dedupes identical adjacent rules but does not preserve
+ * first-occurrence ordering across an entire concatenated bundle — and that
+ * ordering is load-bearing here. vanilla-extract re-emits the shared
+ * `layoutPropsStyle`/`typographyBase` rules into every component's CSS;
+ * naive concat puts a late copy after each component's own variant rules,
+ * so e.g. `Mark variant="marker"`'s `background-color` is overridden by a
+ * `layoutPropsStyle` reassertion that comes later in the file. Keeping only
+ * the first copy moves the shared rule above every variant rule in the
+ * cascade and makes the variant win.
  */
 function dedupeCssRules(css: string): string {
   type Item = { kind: 'block' | 'comment' | 'whitespace'; text: string };
@@ -113,6 +119,7 @@ export default createConfig({
     const { readdir, readFile, writeFile } = await import('node:fs/promises');
     const { join } = await import('node:path');
     const { createRequire } = await import('node:module');
+    const { gzipSync } = await import('node:zlib');
     const dist = join(process.cwd(), 'dist');
     const files = (await readdir(dist))
       .filter((f) => f.endsWith('.css') && f !== 'styles.css' && f !== 'all.css')
@@ -249,6 +256,19 @@ body {
     const stylesCss = dedupeCssRules(chunks.join('\n'));
     await writeFile(join(dist, 'styles.css'), stylesCss);
 
+    // Minify every emitted CSS bundle with Lightning CSS. Cuts the wire size
+    // by ~60% on the big bundles (styles.css/all.css go from ~800 KB raw to
+    // ~310 KB; gzip drops from ~265 KB to ~36 KB) by collapsing whitespace,
+    // merging longhand → shorthand, and removing redundant rules. Run after
+    // dedupeCssRules so the cascade-preserving dedupe still sees readable
+    // input. JS bundles are intentionally left unminified.
+    const { transform } = await import('lightningcss');
+    const minifyCss = async (path: string) => {
+      const src = await readFile(path);
+      const out = transform({ filename: path, code: src, minify: true });
+      await writeFile(path, out.code);
+    };
+
     // Additionally emit `all.css`: a single-import bundle that includes design
     // tokens (light + dark overrides) alongside every component's CSS. This is
     // the zero-config path — consumers import one file instead of three.
@@ -273,6 +293,59 @@ body {
     // own font pipeline (next/font, self-hosted, CDN).
     const fontsCss = await readFile(join(process.cwd(), 'src', 'fonts.css'), 'utf8');
     await writeFile(join(dist, 'fonts.css'), fontsCss);
+
+    // Minify every CSS in dist (per-component bundles + styles.css + all.css
+    // + fonts.css). Done last so all writes above are already on disk.
+    const allCssFiles = (await readdir(dist)).filter((f) => f.endsWith('.css'));
+    await Promise.all(allCssFiles.map((f) => minifyCss(join(dist, f))));
+
+    // Emit `sizes.json` — the canonical bundle-size manifest. Keyed by the
+    // same `entry` field as `components.config.mjs`, plus a few well-known
+    // bundles (`styles`, `all`, `index`, `fonts`). The docs site reads this
+    // straight from `packages/react/dist/sizes.json` to populate the size
+    // pill on every component page; size-limit.json stays for CI budgets.
+    // Sizes are measured *after* all minification + dedupe so the numbers
+    // match what consumers actually ship.
+    const sizeOf = async (file: string) => {
+      try {
+        const buf = await readFile(join(dist, file));
+        return { raw: buf.byteLength, gz: gzipSync(buf).byteLength };
+      } catch (err) {
+        if ((err as NodeJS.ErrnoException).code === 'ENOENT') return null;
+        throw err;
+      }
+    };
+
+    const { COMPONENTS } = await import('../../components.config.mjs');
+    type SizePair = { raw: number; gz: number };
+    type Entry = { js: SizePair | null; css: SizePair | null };
+    const components: Record<string, Entry> = {};
+    for (const c of COMPONENTS as Array<{ slug: string; entry: string }>) {
+      components[c.slug] = {
+        js: await sizeOf(`${c.entry}.js`),
+        css: await sizeOf(`${c.entry}.css`),
+      };
+    }
+    const bundles: Record<string, Entry> = {};
+    for (const [key, entry] of [
+      ['styles', 'styles'],
+      ['all', 'all'],
+      ['index', 'index'],
+      ['fonts', 'fonts'],
+    ] as const) {
+      bundles[key] = {
+        js: await sizeOf(`${entry}.js`),
+        css: await sizeOf(`${entry}.css`),
+      };
+    }
+    await writeFile(
+      join(dist, 'sizes.json'),
+      `${JSON.stringify(
+        { generatedAt: new Date().toISOString(), components, bundles },
+        null,
+        2,
+      )}\n`,
+    );
   },
   external: [
     'react',
@@ -297,8 +370,6 @@ body {
     'react-aria-components',
     '@internationalized/date',
     'sonner',
-    '@radix-ui/react-accordion',
-    '@radix-ui/react-collapsible',
     '@radix-ui/react-scroll-area',
     '@tanstack/react-table',
     '@radix-ui/react-avatar',

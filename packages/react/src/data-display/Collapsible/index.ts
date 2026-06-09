@@ -6,4 +6,8 @@ export {
   DisclosureContent,
   DisclosureTrigger,
 } from './Collapsible.js';
-export type { CollapsibleContentProps, CollapsibleProps } from './Collapsible.js';
+export type {
+  CollapsibleContentProps,
+  CollapsibleProps,
+  CollapsibleTriggerProps,
+} from './Collapsible.js';

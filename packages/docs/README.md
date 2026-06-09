@@ -43,5 +43,6 @@ Each build regenerates:
 - Props tables (from current `packages/react/**` types via `react-docgen-typescript`)
 - Version pill (from `packages/react/package.json`)
 - Changelog page (from `packages/react/CHANGELOG.md`)
-- Bundle-size pills (from `.size-limit.json`)
+- Component-count tiles (from the source tree under `packages/react/src/`)
+- Bundle-size pills (from `packages/react/dist/sizes.json`, emitted by the react package's `tsup onSuccess` and copied into `src/generated/component-sizes.json` by `scripts/component-sizes.mjs`). The hand-maintained `.size-limit.json` is still in the tree but is now used only for CI budget enforcement, not for display.
 - Page-coverage gate (fails build if a new export lacks docs)

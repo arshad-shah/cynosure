@@ -1,4 +1,3 @@
-import { GripVerticalIcon } from 'lucide-react';
 import { type ReactNode, forwardRef } from 'react';
 import {
   Group as RRPGroup,
@@ -11,6 +10,7 @@ import {
 import { cn } from '../../utils/cn.js';
 import {
   resizableHandle,
+  resizableHandleDot,
   resizableHandleGrip,
   resizablePanel,
   resizableRoot,
@@ -62,7 +62,9 @@ export const ResizablePanel = forwardRef<HTMLDivElement, ResizablePanelProps>(
 /** Props for the {@link ResizableHandle} draggable divider between panels. */
 export interface ResizableHandleProps extends RRPSeparatorProps {
   /**
-   * Render a small drag-indicator grip in the middle (Lucide `GripVertical`).
+   * Render a three-dot grip affordance in the middle of the handle. The grip
+   * is always present (so users can spot it without hovering) and lifts to
+   * the accent colour on hover, keyboard focus, and during active drag.
    * @default false
    */
   withHandle?: boolean;
@@ -70,19 +72,30 @@ export interface ResizableHandleProps extends RRPSeparatorProps {
 
 /**
  * Drag handle between two {@link ResizablePanel} siblings. Renders a focusable
- * separator that responds to keyboard arrow keys; pass `withHandle` for a
- * visible grip affordance.
+ * separator with an 8px hit target, a 1px accent line centered on the edge
+ * (which thickens and turns accent on hover, focus, and active drag) and an
+ * optional three-dot grip.
  */
 export const ResizableHandle = forwardRef<HTMLDivElement, ResizableHandleProps>(
   function ResizableHandle({ withHandle, className, children, ...rest }, _ref) {
-    const content: ReactNode = children ?? (withHandle ? <GripVerticalIcon size={'14'} /> : null);
+    const content: ReactNode = children ?? (withHandle ? <ThreeDotGrip /> : null);
     return (
       <RRPSeparator className={cn(resizableHandle, className)} {...rest}>
-        {content !== null ? <span className={resizableHandleGrip}>{content}</span> : null}
+        {content}
       </RRPSeparator>
     );
   },
 );
+
+function ThreeDotGrip(): React.ReactElement {
+  return (
+    <span className={resizableHandleGrip} aria-hidden>
+      <span className={resizableHandleDot} />
+      <span className={resizableHandleDot} />
+      <span className={resizableHandleDot} />
+    </span>
+  );
+}
 
 /** Semantic alias of Resizable for design systems that prefer the name. */
 export const Splitter = Resizable;

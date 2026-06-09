@@ -5,7 +5,7 @@ order: 16
 category: components
 status: stable
 since: "0.1.0"
-a11y: Uses role="region" + aria-expanded on triggers; keyboard navigable with Enter/Space; focus managed by Radix UI.
+a11y: Uses role="region" + aria-expanded on triggers; keyboard navigable with Enter/Space and Up/Down/Home/End between headers.
 bundleSize: "14 kB"
 tags: [disclosure, accordion, accessible]
 ---
@@ -34,11 +34,11 @@ Pass `disabled` to any `AccordionItem` to prevent it from being expanded.
 
 ## Accessibility
 
-- Each `AccordionTrigger` is a `<button>` with `aria-expanded` managed by Radix UI.
+- Each `AccordionTrigger` is a real `<button>` wrapped in a heading, with `aria-expanded` and `aria-controls` wired to its content panel.
 - The content region carries `role="region"` and is linked to its trigger via `aria-labelledby`.
-- `Enter` or `Space` toggles the focused item; `Tab` moves focus between triggers.
-- Disabled items carry `aria-disabled="true"` and are skipped by keyboard navigation.
-- The chevron icon is `aria-hidden="true"` — it is purely decorative.
+- `Enter` or `Space` toggles the focused item; `Up`/`Down` move focus between triggers, `Home` jumps to the first and `End` to the last.
+- Disabled items receive `data-disabled` and are skipped by keyboard navigation.
+- The chevron icon is `aria-hidden` — it is purely decorative and rotates on open.
 
 ## Recipes
 

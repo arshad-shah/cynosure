@@ -40,15 +40,15 @@ From there, every CSS variable is available:
 
 ### As a JavaScript consumer
 
-Tokens are also exported as a typed object for places CSS variables don't reach (canvas, React Native, animation values):
+Tokens are also exported as typed objects for places CSS variables don't reach (canvas, React Native, animation values). The base palette is `baseTokens`; dark-mode overrides live in `darkTokens`:
 
 ```ts
-import { tokens } from '@arshad-shah/cynosure-tokens';
+import { baseTokens } from '@arshad-shah/cynosure-tokens';
 
 chart.colors = [
-  tokens.color.accent[500],
-  tokens.color.danger[500],
-  tokens.color.success[500],
+  baseTokens.color.accent.solid,
+  baseTokens.color.feedback.danger.solid,
+  baseTokens.color.feedback.success.solid,
 ];
 ```
 
@@ -60,7 +60,8 @@ Override any token at a scoping ancestor — the variables cascade like any othe
 
 ```css
 [data-theme="brand"] {
-  --cynosure-color-accent-500: oklch(64% 0.18 284);
+  --cynosure-color-accent-solid: oklch(64% 0.18 284);
+  --cynosure-color-accent-solid-hover: oklch(60% 0.18 284);
   --cynosure-radius-md: 12px;
 }
 ```
@@ -71,10 +72,10 @@ See the [custom-themes guide](https://github.com/arshad-shah/cynosure/blob/main/
 
 ## What's inside
 
-- **Colours** — semantic scales (accent, neutral, danger, warning, success, info) plus surface, text, and border aliases
-- **Spacing** — 8-point grid, `0` through `20`
+- **Colours** — palette scales (`gray`, `blue`, `green`, `red`, `amber`, `violet`, `iris`) plus semantic aliases: `accent` (solid / soft / ring / onSolid + hover/active variants), `feedback` (danger, warning, success, info — each with the same role set), and `background` / `foreground` / `border` aliases for surfaces and text
+- **Spacing** — quarter-step scale: `0, 0.5, 1, 1.5, 2, 3, 4, 5, 6, 8, 10, 12, 16, 20, 24, 32, 40, 48, 64`, plus the component aliases (`component-xs`, `-sm`, `-md`, `-lg`)
 - **Typography** — font families, sizes, weights, line-heights, letter-spacing
-- **Radius** — none, sm, md, lg, xl, full
+- **Radius** — `none, xs, sm, md, lg, xl, 2xl, full`
 - **Elevation** — shadow scale with ambient + directional layers
 - **Motion** — duration and easing (cubic-bezier) tokens
 - **Z-index** — layered scale for overlays, dropdowns, toasts, modals

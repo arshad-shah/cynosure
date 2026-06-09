@@ -7,6 +7,29 @@ category: changelog
 
 # @arshad-shah/cynosure-react
 
+## 3.1.0
+
+### Minor Changes
+
+- [#75](https://github.com/arshad-shah/cynosure/pull/75) [`2a72943`](https://github.com/arshad-shah/cynosure/commit/2a72943167861c1ce29a8fcfc8ba65e65efd0902) Thanks [@arshad-shah](https://github.com/arshad-shah)! - **ColorPicker redesign** — distinctive hero-preview composition, theme-correct chrome, and an icon-only trigger.
+  - Adds a hero strip at the top of the popover/inline panel: preview chip (checker-backed for transparency) + bold hex + format-aware secondary readout that updates with the format toggle.
+  - Replaces hardcoded `2px solid white` thumb borders with `background.surface` so slider/area thumbs stay visible in dark and brand themes. All chrome now routes through `vars.color.*`, `vars.radius.*`, `vars.space.*`.
+  - Saved-colours grid gains an uppercase section label with `N of MAX` count, an inline `+` save tile (replaces the floating IconButton), and an `accent.solid` highlight on the active tile.
+  - New `label={null}` on the popover trigger renders an icon-only swatch button (default `label="Pick a color"` is unchanged — fully additive).
+  - Storybook gains `All sizes`, `Icon-only trigger`, and `Dark theme check` stories.
+
+  Public API is unchanged. Consumers passing custom `children` continue to work; the legacy `colorFieldClassName` re-export is retained and marked `@deprecated`.
+
+- [#73](https://github.com/arshad-shah/cynosure/pull/73) [`709f454`](https://github.com/arshad-shah/cynosure/commit/709f454027bac8fb047b92279ebdbca9c5ae5bf5) Thanks [@arshad-shah](https://github.com/arshad-shah)! - Add `Mark` and `HighlightedText` components for inline text highlighting.
+
+  `Mark` is a thin inline-flow primitive that wraps text in a semantic `<mark>` (or opt-in `<span>`) styled with Cynosure tokens. It supports four variants (`marker`, `underline`, `chip`, `bold`), six colour schemes, and two intensities, and wraps cleanly across lines via `box-decoration-break: clone`. `HighlightedText` is the companion helper for the common "highlight these ranges in this string" case — feed it a source string and an array of `{ start, length }` ranges and it handles the segment bookkeeping.
+
+- [#72](https://github.com/arshad-shah/cynosure/pull/72) [`96c9b92`](https://github.com/arshad-shah/cynosure/commit/96c9b9274d2ba1011daf05ea36a7327cd161afd3) Thanks [@arshad-shah](https://github.com/arshad-shah)! - `Tree`: add accessor props (`getId`, `getLabel`, `getChildren`, `getDisabled`)
+  so consumers can plug in their own data shape without remapping. Default
+  behaviour is unchanged — accessors fall back to the original `TreeNode` shape.
+  Ships a companion `mapToTreeNodes(items, { getId, getLabel, getChildren, … })`
+  helper for callers who prefer a one-shot transform.
+
 ## 3.0.0
 
 ### Major Changes

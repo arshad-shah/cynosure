@@ -75,17 +75,7 @@ The subpath entry imports only that component's code and CSS — no barrel-file 
 
 ## Bundle sizes
 
-Brotli-compressed per-component budgets (full table in root [`README.md`](../../README.md#bundle-sizes)):
-
-| Component | Size | Component | Size |
-| --- | ---: | --- | ---: |
-| `Box`, `Stack`, `Flex`, `Grid` | 3 kB | `Button` | 6 kB |
-| `Text`, `Heading` | 4 kB | `Input`, `Textarea` | 8 kB |
-| `Dialog`, `Tooltip`, `Drawer` | 18 kB | `Tabs` | 14 kB |
-| `Select` | 55 kB | `Combobox` | 58 kB |
-| `DatePicker` | 70 kB | `DataTable` | 60 kB |
-
-Enforced by `pnpm size` in CI.
+Every component page on [cynosure.arshadshah.com](https://cynosure.arshadshah.com) shows its **actual** built JS + CSS transfer size (gzip). Numbers come from `dist/sizes.json`, emitted by this package's build and regenerated on every docs build — so the displayed figures never drift from what's published. Hard ceilings are enforced separately in CI via `pnpm size` against [`.size-limit.json`](../../.size-limit.json).
 
 ---
 

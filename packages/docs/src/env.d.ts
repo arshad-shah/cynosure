@@ -9,6 +9,9 @@
 declare namespace App {
   interface Locals {
     starlightRoute: {
+      // Slug of the current route, e.g. `components/accordion`. Used by
+      // `PageTitle` to look up sizes in the generated manifest.
+      id: string;
       entry: {
         data: {
           title: string;

@@ -1,15 +1,5 @@
-import { globalStyle, keyframes, style, styleVariants } from '@vanilla-extract/css';
+import { globalStyle, style, styleVariants } from '@vanilla-extract/css';
 import { vars } from '../../styles/vars.css.js';
-
-const slideDown = keyframes({
-  from: { height: 0 },
-  to: { height: 'var(--radix-accordion-content-height)' },
-});
-
-const slideUp = keyframes({
-  from: { height: 'var(--radix-accordion-content-height)' },
-  to: { height: 0 },
-});
 
 export const accordionRoot = style({
   display: 'flex',
@@ -96,21 +86,10 @@ export const accordionContent = style({
   overflow: 'hidden',
   fontSize: 'var(--cynosure-font-body-md-size)',
   color: vars.color.foreground.default,
-  selectors: {
-    '&[data-state="open"]': {
-      animation: `${slideDown} ${vars.duration.normal} ease`,
-    },
-    '&[data-state="closed"]': {
-      animation: `${slideUp} ${vars.duration.normal} ease`,
-    },
-  },
+  transition: `height ${vars.duration.normal} ease`,
   '@media': {
     '(prefers-reduced-motion: reduce)': {
-      selectors: {
-        '&[data-state="open"], &[data-state="closed"]': {
-          animation: 'none',
-        },
-      },
+      transition: 'none',
     },
   },
 });
