@@ -2,55 +2,70 @@ import { style } from '@vanilla-extract/css';
 import { focusRing } from '../../styles/focusRing.js';
 import { vars } from '../../styles/vars.css.js';
 import { fieldWellBase } from '../shared/control.css.js';
+import { segmentedTrack } from '../shared/segmented.css.js';
 
 /**
- * The "punched card" root for DatePicker / DateRangePicker / TimePicker. No
- * border or background itself — each inner piece is its own inset well, so
- * the field reads as a set of slots stamped into the host surface.
+ * The segmented-track root for DatePicker / DateRangePicker / TimePicker —
+ * the shared tinted track (subtle well, hairline border, 4px padding/gap)
+ * wrapping the raised well tiles, the same container `NumberInput` and
+ * `Input` use. The focus ring and invalid tint live here on the track;
+ * variants retint the track only.
  */
-export const pickerRoot = style({
-  display: 'inline-flex',
-  alignItems: 'stretch',
-  width: '100%',
-  boxSizing: 'border-box',
-  gap: vars.space['2'],
-  color: vars.color.foreground.default,
-  fontSize: 'var(--cynosure-font-body-md-size)',
-  lineHeight: 'var(--cynosure-font-body-md-line-height)',
-  selectors: {
-    '&[data-disabled="true"]': {
-      opacity: 0.6,
-      cursor: 'not-allowed',
+export const pickerRoot = style([
+  segmentedTrack,
+  {
+    width: '100%',
+    color: vars.color.foreground.default,
+    fontSize: 'var(--cynosure-font-body-md-size)',
+    lineHeight: 'var(--cynosure-font-body-md-line-height)',
+    selectors: {
+      // Variants first, states after — equal specificity, so source order
+      // lets the focus/invalid borders win over the variant's border reset.
+      '&[data-variant="filled"]': {
+        background: vars.color.background.muted,
+        borderColor: 'transparent',
+      },
+      '&[data-variant="ghost"]': {
+        background: 'transparent',
+        borderColor: 'transparent',
+      },
+      '&:focus-within:not([data-invalid="true"])': {
+        borderColor: vars.color.border.focus,
+        boxShadow: focusRing,
+      },
+      '&[data-invalid="true"]': {
+        borderColor: vars.color.feedback.danger.border,
+      },
+      '&[data-invalid="true"]:focus-within': {
+        boxShadow: `0 0 0 2px ${vars.color.feedback.danger.border}`,
+      },
+      '&[data-readonly="true"]': {
+        background: vars.color.background.muted,
+      },
+      '&[data-disabled="true"]': {
+        opacity: 0.6,
+        cursor: 'not-allowed',
+      },
     },
   },
-});
+]);
 
 /**
- * DatePicker-local well composition: the shared tile + DatePicker's
+ * DatePicker-local well composition: the shared raised tile + DatePicker's
  * parent-scoped state selectors. Tile chrome is shared with Input.
  */
 const wellBase = style([
   fieldWellBase,
   {
     selectors: {
-      // variant: filled — deeper recess, border recedes
-      [`${pickerRoot}[data-variant="filled"] &`]: {
-        background: vars.color.background.muted,
-        borderColor: 'transparent',
-      },
-      // variant: ghost — minimal, no inset shadow, subtle borderless rest state
+      // variant: ghost — tiles sit flat on the transparent track
       [`${pickerRoot}[data-variant="ghost"] &`]: {
         background: 'transparent',
-        borderColor: 'transparent',
         boxShadow: 'none',
       },
       // invalid — danger border on every well
       [`${pickerRoot}[data-invalid="true"] &`]: {
         borderColor: vars.color.feedback.danger.border,
-      },
-      // readonly — slightly deeper well surface
-      [`${pickerRoot}[data-readonly="true"] &`]: {
-        background: vars.color.background.muted,
       },
     },
   },
@@ -69,7 +84,11 @@ export const leadWell = style([
   },
 ]);
 
-/** The date-segment pocket — flexes to fill, lifts on focus. */
+/**
+ * The date-segment tile — flexes to fill. The focus ring lives on the track
+ * (`pickerRoot:focus-within`), like `NumberInput`; the ghost variant raises
+ * the tile back up while editing.
+ */
 export const segsWell = style([
   wellBase,
   {
@@ -78,20 +97,9 @@ export const segsWell = style([
     paddingInline: vars.space['3'],
     cursor: 'text',
     selectors: {
-      '&:focus-within': {
-        background: vars.color.background.surface,
-        borderColor: vars.color.border.focus,
-        boxShadow: focusRing,
-      },
-      [`${pickerRoot}[data-invalid="true"] &:focus-within`]: {
-        borderColor: vars.color.feedback.danger.border,
-        boxShadow: `0 0 0 2px ${vars.color.feedback.danger.border}`,
-      },
-      // ghost variant: the well appears only on focus
       [`${pickerRoot}[data-variant="ghost"] &:focus-within`]: {
-        background: vars.color.background.surface,
-        borderColor: vars.color.border.focus,
-        boxShadow: focusRing,
+        background: vars.color.background.raised,
+        boxShadow: vars.shadow.xs,
       },
     },
   },

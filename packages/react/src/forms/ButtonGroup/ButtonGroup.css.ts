@@ -1,5 +1,6 @@
-import { globalStyle, style } from '@vanilla-extract/css';
+import { style } from '@vanilla-extract/css';
 import { vars } from '../../styles/vars.css.js';
+import { segmentedTrack } from '../shared/segmented.css.js';
 
 export const buttonGroup = style({
   display: 'inline-flex',
@@ -7,28 +8,10 @@ export const buttonGroup = style({
 });
 
 /**
- * Attached mode squishes buttons into a visually joined segmented control.
- * Each middle button loses its rounded sides; non-first buttons pull their
- * borders in by `-1px` so adjacent borders merge into one. vanilla-extract
- * rejects descendant selectors in `selectors`, so the children are styled
- * via `globalStyle` scoped to the attached class.
+ * Attached mode renders the buttons inside the shared segmented-track
+ * container (tinted `subtle` well, hairline border, 4px padding/gap) used by
+ * `NumberInput` and `ToggleGroup`'s attached bar, so every segmented control
+ * in the library reads the same. Buttons keep their own radius and variant
+ * surface — they float in the track as raised tiles.
  */
-export const buttonGroupAttached = style({
-  display: 'inline-flex',
-  gap: 0,
-});
-
-globalStyle(`${buttonGroupAttached} > *:not(:first-child):not(:last-child)`, {
-  borderRadius: 0,
-});
-globalStyle(`${buttonGroupAttached} > *:first-child:not(:last-child)`, {
-  borderStartEndRadius: 0,
-  borderEndEndRadius: 0,
-});
-globalStyle(`${buttonGroupAttached} > *:last-child:not(:first-child)`, {
-  borderStartStartRadius: 0,
-  borderEndStartRadius: 0,
-});
-globalStyle(`${buttonGroupAttached} > *:not(:first-child)`, {
-  marginInlineStart: '-1px',
-});
+export const buttonGroupAttached = style([segmentedTrack]);

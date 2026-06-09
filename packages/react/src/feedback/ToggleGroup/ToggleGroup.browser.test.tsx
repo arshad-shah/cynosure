@@ -3,11 +3,11 @@ import { expect, test } from 'vitest';
 import { ToggleGroup, ToggleGroupItem } from './ToggleGroup.js';
 
 /**
- * Real-browser test: the attached group renders a segmented bar whose items
- * share borders and sit on one row — geometry that only resolves with a real
- * layout engine (jsdom reports zeroed boxes). We also drive roving-tabindex
- * arrow navigation, which needs a real focus engine. Runs across the
- * Chromium/Firefox/WebKit matrix in CI.
+ * Real-browser test: the attached group renders a segmented track whose items
+ * float as tiles with a small fixed gap on one row — geometry that only
+ * resolves with a real layout engine (jsdom reports zeroed boxes). We also
+ * drive roving-tabindex arrow navigation, which needs a real focus engine.
+ * Runs across the Chromium/Firefox/WebKit matrix in CI.
  */
 test('attached single-select ToggleGroup lays items in a row and changes selection', () => {
   render(
@@ -29,9 +29,11 @@ test('attached single-select ToggleGroup lays items in a row and changes selecti
   const leftRect = left.getBoundingClientRect();
   const centerRect = center.getBoundingClientRect();
 
-  // Same row, attached (next item butts up to the previous).
+  // Same row; segmented track separates items by a small gap (4px).
   expect(Math.abs(leftRect.top - centerRect.top)).toBeLessThanOrEqual(2);
-  expect(Math.abs(centerRect.left - leftRect.right)).toBeLessThanOrEqual(2);
+  const gap = centerRect.left - leftRect.right;
+  expect(gap).toBeGreaterThanOrEqual(0);
+  expect(gap).toBeLessThanOrEqual(8);
 
   expect(left).toHaveAttribute('aria-checked', 'true');
   fireEvent.click(center);

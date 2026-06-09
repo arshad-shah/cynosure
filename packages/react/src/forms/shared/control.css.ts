@@ -170,9 +170,12 @@ globalStyle(`${controlElement} button`, { pointerEvents: 'auto' });
 globalStyle(`${controlElement} [role="button"]`, { pointerEvents: 'auto' });
 
 /**
- * The "punched well" tile used as the tactile unit across multi-well form
- * controls (DatePicker, Input, and any future ones). Subtly recessed against
- * the host surface with a hairline inner highlight and the token border.
+ * The raised segment tile used as the tactile unit across multi-well form
+ * controls (DatePicker, Input, and any future ones). A white `raised` surface
+ * with a hairline shadow that floats inside the shared segmented track —
+ * the same language as `NumberInput`'s `[ − ][ value ][ + ]` segments. The
+ * transparent 1px border keeps layout stable while letting consumers tint
+ * `borderColor` for hover / focus / invalid states.
  *
  * This is a bare tile — consumers pair it with a data-driven parent
  * (`[data-variant]`, `[data-invalid]`, `[data-readonly]`, `[data-disabled]`)
@@ -183,10 +186,10 @@ export const fieldWellBase = style({
   display: 'inline-flex',
   alignItems: 'center',
   minHeight: '2.5rem',
-  background: vars.color.background.subtle,
-  border: `1px solid ${vars.color.border.default}`,
+  background: vars.color.background.raised,
+  border: '1px solid transparent',
   borderRadius: vars.radius.md,
-  boxShadow: `inset 0 1px 0 color-mix(in oklab, ${vars.color.foreground.default} 4%, transparent)`,
+  boxShadow: vars.shadow.xs,
   transitionProperty: 'background-color, border-color, box-shadow, color',
   transitionDuration: vars.duration.fast,
   color: vars.color.foreground.default,

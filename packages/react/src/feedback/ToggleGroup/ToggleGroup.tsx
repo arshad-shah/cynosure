@@ -81,7 +81,11 @@ export type ToggleGroupProps = (Single | Multiple) & {
    * @default "ghost"
    */
   variant?: ToggleVariant;
-  /** Render children in an attached pill-bar layout with shared borders. */
+  /**
+   * Render children as a segmented control: items float inside a tinted,
+   * padded track (the same container `NumberInput` and `ButtonGroup` use),
+   * with the selected item raised.
+   */
   attached?: boolean;
 };
 

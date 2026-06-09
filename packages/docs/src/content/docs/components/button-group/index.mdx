@@ -15,7 +15,7 @@ import PropsTable from "@/components/PropsTable.astro";
 
 ## Attached
 
-Set `attached` to render the group as a single segmented surface with shared borders.
+Set `attached` to render the group as a segmented control — the buttons float as tiles inside a tinted, padded track (the same container `NumberInput` and `ToggleGroup` use).
 
 <LivePreview example="button-group/attached" />
 
@@ -44,6 +44,6 @@ Props on a child Button always win over the group context — handy for highligh
 
 ## Recipes
 
-- Pair `attached` with `variant="outline"` to get a classic segmented-control look.
+- Pair `attached` with `variant="outline"` for a classic segmented-control look; the track supplies the frame, so buttons keep their own surface.
 - Mix in `IconButton` children for compact toolbars without breaking the shared variant.
 - For mutually exclusive selection, drive state in the parent and flip the active child's `variant`.

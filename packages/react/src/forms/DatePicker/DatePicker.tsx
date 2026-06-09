@@ -41,10 +41,11 @@ const ChevronDownIcon = (): React.ReactElement => (
 export interface DatePickerOwnProps<T extends DateValue = DateValue> {
   /** Visible label, also used as the picker's accessible name when a string. */
   label?: ReactNode;
-  /** Accepted for API parity with other form controls; visual effect is minor in the punched design. */
+  /** Accepted for API parity with other form controls; visual effect is minor in the segmented design. */
   size?: FormControlSize;
   /**
-   * Accepted for API parity with other form controls; visual effect is minor in the punched design.
+   * Tints the segmented track: `outline` (light well + hairline border),
+   * `filled` (deeper solid tint), `ghost` (transparent; tiles flat at rest).
    * @default "outline"
    */
   variant?: FormControlVariant;

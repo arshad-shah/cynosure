@@ -16,8 +16,9 @@ export interface ButtonGroupProps extends HTMLAttributes<HTMLDivElement> {
   /** Shared size for every nested `<Button>`. */
   size?: ButtonSize;
   /**
-   * When `true`, buttons render as a segmented control with shared borders
-   * and no inter-button gap.
+   * When `true`, buttons render as a segmented control: tiles floating inside
+   * a tinted, padded track (the same container `NumberInput` and
+   * `ToggleGroup`'s attached bar use).
    */
   attached?: boolean;
   children?: ReactNode;

@@ -1,6 +1,7 @@
 import { style, styleVariants } from '@vanilla-extract/css';
 import { focusRing } from '../../styles/focusRing.js';
 import { vars } from '../../styles/vars.css.js';
+import { segmentedTrack } from '../shared/segmented.css.js';
 
 /**
  * Segmented `NumberInput` styles: a tinted **track** wraps three raised
@@ -11,46 +12,40 @@ import { vars } from '../../styles/vars.css.js';
  * mirror the field state so every segment reacts in lockstep.
  */
 
-/** Tinted container. Padded so the raised segments float inside a rounded well. */
-export const numberInputTrack = style({
-  display: 'inline-flex',
-  alignItems: 'stretch',
-  width: '100%',
-  boxSizing: 'border-box',
-  border: '1px solid transparent',
-  // Default (outline) well — a light tint. `filled` deepens it, `ghost` clears
-  // it (see `numberInputTrackVariant`).
-  background: vars.color.background.subtle,
-  transitionProperty: 'border-color, box-shadow, background-color',
-  transitionDuration: vars.duration.fast,
-  selectors: {
-    '&[data-focus-within="true"]:not([data-invalid="true"])': {
-      borderColor: vars.color.border.focus,
-      boxShadow: focusRing,
-    },
-    '&[data-invalid="true"]': {
-      borderColor: vars.color.feedback.danger.border,
-    },
-    '&[data-invalid="true"][data-focus-within="true"]': {
-      boxShadow: `0 0 0 2px ${vars.color.feedback.danger.border}`,
-    },
-    '&[data-readonly="true"]': {
-      background: vars.color.background.muted,
-    },
-    '&[data-disabled="true"]': {
-      opacity: 0.6,
-      cursor: 'not-allowed',
+/**
+ * Tinted container — the shared `segmentedTrack` recipe (light `subtle` well +
+ * hairline border) plus NumberInput's full-width layout and field states.
+ */
+export const numberInputTrack = style([
+  segmentedTrack,
+  {
+    width: '100%',
+    selectors: {
+      '&[data-focus-within="true"]:not([data-invalid="true"])': {
+        borderColor: vars.color.border.focus,
+        boxShadow: focusRing,
+      },
+      '&[data-invalid="true"]': {
+        borderColor: vars.color.feedback.danger.border,
+      },
+      '&[data-invalid="true"][data-focus-within="true"]': {
+        boxShadow: `0 0 0 2px ${vars.color.feedback.danger.border}`,
+      },
+      '&[data-readonly="true"]': {
+        background: vars.color.background.muted,
+      },
+      '&[data-disabled="true"]': {
+        opacity: 0.6,
+        cursor: 'not-allowed',
+      },
     },
   },
-  '@media': {
-    '(prefers-reduced-motion: reduce)': { transitionDuration: '0s' },
-  },
-});
+]);
 
 /** Track tinting per variant — structure stays constant, only the well changes. */
 export const numberInputTrackVariant = styleVariants({
-  /** Light tinted well + hairline border (the base look). */
-  outline: { borderColor: vars.color.border.subtle },
+  /** Light tinted well + hairline border (the shared base look). */
+  outline: {},
   /** Deeper solid tint, no border — reads as a stronger pocket. */
   filled: { background: vars.color.background.muted, borderColor: 'transparent' },
   /** No well at rest — track is transparent, segments stay flat until hover. */
