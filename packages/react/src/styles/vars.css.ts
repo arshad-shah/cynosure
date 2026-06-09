@@ -170,7 +170,12 @@ globalStyle(':focus:not(:focus-visible)', {
   outline: 'none',
 });
 
-globalStyle('a, button, [role="button"], summary, input, select, textarea, label', {
+// Kill the WebKit/Blink tap-highlight wash *everywhere*. It's an inherited
+// property, so setting it on the root covers every element — list options,
+// accordion headers, chevron buttons, table rows, etc. — not just a hand-listed
+// set of tags. Components supply their own pressed/hover/active feedback, so the
+// default blue/grey flash on click or tap is never wanted.
+globalStyle('html', {
   WebkitTapHighlightColor: 'transparent',
 });
 
