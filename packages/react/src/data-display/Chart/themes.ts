@@ -3,120 +3,168 @@ import { addTheme } from '@arshad-shah/swift-chart';
 /**
  * Cynosure-flavoured SwiftChart themes.
  *
- * SwiftChart paints onto Canvas 2D, which can't resolve `var(--…)` references.
- * Instead of routing CSS custom properties at draw time, we materialise two
- * concrete `Theme` objects from the design tokens, then register them with
- * SwiftChart so consumers can reference them by name (`'cynosure-light'`,
- * `'cynosure-dark'`) anywhere SwiftChart accepts a theme.
+ * SwiftChart paints onto Canvas 2D, which can't resolve `var(--…)` references
+ * at draw time. There are two layers here:
  *
- * The palette is brand-led: the leading slots are the Cynosure iris/violet
- * harmony you'll recognise from the logo (`#c77dff` → `#8b9dff`), with the
- * semantic colours (success/warning/danger) sitting at the back of the
- * series so they don't compete with the brand identity. The neutral
- * surface/foreground colours mirror `--cynosure-color-{background,foreground,
- * border}-*` exactly — same source the rest of the library reads from
- * `@arshad-shah/cynosure-tokens`. If those tokens move, we move with them.
+ *  1. **Live resolution (preferred).** {@link resolveChartTheme} reads the
+ *     `--cynosure-chart-*` custom properties off a chart's container with
+ *     `getComputedStyle` and builds a concrete `Theme`. Those properties are
+ *     declared in `Chart.css.ts` as references to Cynosure tokens, so the
+ *     chart automatically follows whatever theme is active — light, dark,
+ *     `terminal`, `high-contrast`, or a consumer's own custom theme. Override
+ *     a single slot (e.g. `--cynosure-chart-3`) on any ancestor and the chart
+ *     picks it up on the next repaint.
+ *
+ *  2. **Static fallback.** When computed styles aren't available — server
+ *     rendering, the first paint before the stylesheet applies, or a slot the
+ *     consumer hasn't defined — we fall back to the two materialised `Theme`
+ *     objects below. They're also registered with SwiftChart's `addTheme` API
+ *     as `'cynosure-light'` / `'cynosure-dark'` so they can be referenced by
+ *     name anywhere SwiftChart accepts a theme.
+ *
+ * The static values mirror the resolved default-theme tokens exactly, so the
+ * fallback is visually identical to the live read for the built-in themes.
  */
 
-/* Surface + foreground tokens. Hex values copied verbatim from
- * `tokens/dist/css/{base,dark}.css` so a designer can grep for them in either
- * place and get a hit. */
-const tokens = {
-  light: {
-    /** Transparent so the chart inherits whichever Cynosure surface (page,
-     *  card, drawer) it's embedded in — same behaviour as the rest of the
-     *  data-display primitives. */
-    bg: 'rgba(0,0,0,0)',
-    surface: 'rgba(0,0,0,0)',
-    grid: '#e4e4e7', // border-default (gray-200)
-    text: '#18181b', // foreground-default (gray-900)
-    textMuted: '#52525b', // foreground-muted (gray-600)
-    axis: '#a1a1aa', // border-strong shifted ½ stop for legibility (gray-400)
-    positive: '#16a34a', // feedback-success-solid (green-600)
-    negative: '#dc2626', // feedback-danger-solid (red-600)
-    onAccent: '#ffffff', // accent-on-solid
-  },
-  dark: {
-    bg: 'rgba(0,0,0,0)',
-    surface: 'rgba(0,0,0,0)',
-    grid: '#27272a', // border-default (gray-800)
-    text: '#fafafa', // foreground-default (gray-50)
-    textMuted: '#d4d4d8', // foreground-muted (gray-300)
-    axis: '#52525b', // bumped from border-strong (gray-700) for tick legibility
-    positive: '#22c55e', // green-500
-    negative: '#ef4444', // red-500
-    onAccent: '#ffffff',
-  },
-};
+type Scheme = 'light' | 'dark';
+
+/** SwiftChart `Theme`-shaped object. Kept local to avoid a type import churn. */
+export interface ChartThemeObject {
+  bg: string;
+  surface: string;
+  grid: string;
+  text: string;
+  textMuted: string;
+  axis: string;
+  positive: string;
+  negative: string;
+  onAccent: string;
+  colors: string[];
+  tooltipBg: string;
+  tooltipBorder: string;
+  tooltipText: string;
+}
 
 /**
- * Series palette, brand-led. Order matters — chart series are coloured by
- * index, so the first series in any chart picks up the Cynosure accent.
- *
- * Slot 0–2 are the brand harmony (iris → violet → magenta) the logo uses.
- * Slots 3–4 are blue/cyan tints that feel related. The semantic colours
- * (positive green, warning amber, danger red) sit at the tail so they
- * never accidentally override the `positive`/`negative` semantics in
- * Waterfall / Candlestick charts.
- *
- * Light mode picks 600-weights for AA contrast against white surfaces.
- * Dark mode picks 400-weights for AA contrast against gray-900.
+ * Series palette, brand-led — mirrors `--cynosure-color-chart-{1..8}`. Order
+ * matters: chart series are coloured by index, so the first series picks up the
+ * Cynosure iris accent. Light mode uses 600-weights for AA contrast on white;
+ * dark mode uses 400-weights for AA contrast on gray-900. The semantic
+ * green/amber/red sit at the tail so they never override the `positive` /
+ * `negative` semantics used by waterfall / candlestick charts.
  */
-const palette = {
-  light: [
-    '#5663e6', // iris-600 — Cynosure accent (matches `--cynosure-color-accent-solid`)
-    '#7c3aed', // violet-600
-    '#c77dff', // brand magenta (logo accent dot)
-    '#2563eb', // blue-600
-    '#0891b2', // cyan-600
-    '#16a34a', // green-600
-    '#d97706', // amber-600
-    '#dc2626', // red-600
-  ],
-  dark: [
-    '#8b9dff', // iris-400 — brand iris (logo)
-    '#a78bfa', // violet-400
-    '#c77dff', // brand magenta — readable on both light and dark
-    '#60a5fa', // blue-400
-    '#22d3ee', // cyan-400
-    '#4ade80', // green-400
-    '#fbbf24', // amber-400
-    '#f87171', // red-400
-  ],
+const palette: Record<Scheme, string[]> = {
+  light: ['#5663e6', '#7c3aed', '#c77dff', '#2563eb', '#0891b2', '#16a34a', '#d97706', '#dc2626'],
+  dark: ['#8b9dff', '#a78bfa', '#c77dff', '#60a5fa', '#22d3ee', '#4ade80', '#fbbf24', '#f87171'],
 };
 
-const cynosureLight = {
-  bg: tokens.light.bg,
-  surface: tokens.light.surface,
-  grid: tokens.light.grid,
-  text: tokens.light.text,
-  textMuted: tokens.light.textMuted,
-  axis: tokens.light.axis,
-  positive: tokens.light.positive,
-  negative: tokens.light.negative,
-  onAccent: tokens.light.onAccent,
+const cynosureLight: ChartThemeObject = {
+  // Transparent so the chart inherits whichever Cynosure surface (page, card,
+  // drawer) it's embedded in — same behaviour as the rest of data-display.
+  bg: 'rgba(0,0,0,0)',
+  surface: 'rgba(0,0,0,0)',
+  grid: '#e4e4e7', // border-default (gray-200)
+  text: '#18181b', // foreground-default (gray-900)
+  textMuted: '#52525b', // foreground-muted (gray-600)
+  axis: '#d4d4d8', // border-strong (gray-300)
+  positive: '#16a34a', // feedback-success-solid (green-600)
+  negative: '#dc2626', // feedback-danger-solid (red-600)
+  onAccent: '#ffffff', // foreground-on-accent
   colors: palette.light,
+  tooltipBg: '#ffffff', // background-raised
+  tooltipBorder: '#e4e4e7', // border-default
+  tooltipText: '#18181b', // foreground-default
 };
 
-const cynosureDark = {
-  bg: tokens.dark.bg,
-  surface: tokens.dark.surface,
-  grid: tokens.dark.grid,
-  text: tokens.dark.text,
-  textMuted: tokens.dark.textMuted,
-  axis: tokens.dark.axis,
-  positive: tokens.dark.positive,
-  negative: tokens.dark.negative,
-  onAccent: tokens.dark.onAccent,
+const cynosureDark: ChartThemeObject = {
+  bg: 'rgba(0,0,0,0)',
+  surface: 'rgba(0,0,0,0)',
+  grid: '#27272a', // border-default (gray-800)
+  text: '#fafafa', // foreground-default (gray-50)
+  textMuted: '#d4d4d8', // foreground-muted (gray-300)
+  axis: '#3f3f46', // border-strong (gray-700)
+  positive: '#22c55e', // feedback-success-solid (green-500)
+  negative: '#ef4444', // feedback-danger-solid (red-500)
+  onAccent: '#ffffff',
   colors: palette.dark,
+  tooltipBg: '#27272a', // background-raised (gray-800)
+  tooltipBorder: '#27272a', // border-default (gray-800)
+  tooltipText: '#fafafa', // foreground-default (gray-50)
 };
+
+const fallback: Record<Scheme, ChartThemeObject> = {
+  light: cynosureLight,
+  dark: cynosureDark,
+};
+
+/** Single-value `--cynosure-chart-*` slots, mapped to their `Theme` field. */
+const SCALAR_SLOTS = [
+  ['bg', '--cynosure-chart-bg'],
+  ['surface', '--cynosure-chart-surface'],
+  ['grid', '--cynosure-chart-grid'],
+  ['axis', '--cynosure-chart-axis'],
+  ['text', '--cynosure-chart-text'],
+  ['textMuted', '--cynosure-chart-text-muted'],
+  ['positive', '--cynosure-chart-positive'],
+  ['negative', '--cynosure-chart-negative'],
+  ['onAccent', '--cynosure-chart-on-accent'],
+  ['tooltipBg', '--cynosure-chart-tooltip-bg'],
+  ['tooltipBorder', '--cynosure-chart-tooltip-border'],
+  ['tooltipText', '--cynosure-chart-tooltip-text'],
+] as const satisfies ReadonlyArray<readonly [keyof ChartThemeObject, string]>;
+
+/** Series palette property names, in paint order. */
+const SERIES_SLOTS = [
+  '--cynosure-chart-1',
+  '--cynosure-chart-2',
+  '--cynosure-chart-3',
+  '--cynosure-chart-4',
+  '--cynosure-chart-5',
+  '--cynosure-chart-6',
+  '--cynosure-chart-7',
+  '--cynosure-chart-8',
+] as const;
+
+/**
+ * Build a concrete SwiftChart `Theme` from the `--cynosure-chart-*` custom
+ * properties on `element` (falling back to `<html>`), so the chart matches the
+ * live theme. Any slot the platform can't resolve falls back to the static
+ * `scheme` theme, so the result is always complete.
+ */
+export function resolveChartTheme(
+  element: Element | null | undefined,
+  scheme: Scheme,
+): ChartThemeObject {
+  const base = fallback[scheme];
+  if (typeof window === 'undefined' || typeof getComputedStyle === 'undefined') return base;
+
+  const target = element ?? document.documentElement;
+  const cs = getComputedStyle(target);
+  const read = (name: string): string => {
+    // Prefer the resolved computed value; fall back to an inline override on
+    // the element (the path real browsers won't need, but keeps things robust
+    // where computed custom-property resolution is unavailable).
+    const computed = cs.getPropertyValue(name).trim();
+    if (computed) return computed;
+    const inline = (target as HTMLElement).style?.getPropertyValue?.(name)?.trim();
+    return inline ?? '';
+  };
+
+  const out = { ...base } as ChartThemeObject;
+  for (const [field, varName] of SCALAR_SLOTS) {
+    const value = read(varName);
+    if (value) (out[field] as string) = value;
+  }
+  out.colors = SERIES_SLOTS.map((varName, i) => read(varName) || base.colors[i] || '#888888');
+  return out;
+}
 
 let registered = false;
 
 /**
- * Register both Cynosure themes with SwiftChart. Safe to call repeatedly —
- * SwiftChart's `addTheme` is just a map-set under the hood and we no-op
- * after the first call to keep the work off the render path.
+ * Register both static Cynosure themes with SwiftChart. Safe to call
+ * repeatedly — `addTheme` is a map-set, and we no-op after the first call to
+ * keep the work off the render path.
  */
 export function registerCynosureThemes(): void {
   if (registered) return;
@@ -129,7 +177,7 @@ export function registerCynosureThemes(): void {
 export const CYNOSURE_THEME_LIGHT = 'cynosure-light';
 export const CYNOSURE_THEME_DARK = 'cynosure-dark';
 
-/** The materialised `Theme` objects, in case a consumer wants to extend them. */
+/** The materialised static `Theme` objects, in case a consumer wants to extend them. */
 export const cynosureChartThemes = {
   light: cynosureLight,
   dark: cynosureDark,

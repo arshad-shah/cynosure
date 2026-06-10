@@ -2,11 +2,23 @@ import {
   type ChartRef,
   Area as SwiftArea,
   Bar as SwiftBar,
+  Boxplot as SwiftBoxplot,
+  Bubble as SwiftBubble,
+  Bullet as SwiftBullet,
+  Candlestick as SwiftCandlestick,
+  Combo as SwiftCombo,
   Donut as SwiftDonut,
+  Funnel as SwiftFunnel,
+  Gauge as SwiftGauge,
   HBar as SwiftHBar,
+  Heatmap as SwiftHeatmap,
   Line as SwiftLine,
+  Marimekko as SwiftMarimekko,
+  Network as SwiftNetwork,
   Pie as SwiftPie,
   Radar as SwiftRadar,
+  RadialBar as SwiftRadialBar,
+  Sankey as SwiftSankey,
   Scatter as SwiftScatter,
   SparklineComponent as SwiftSparkline,
   StackedArea as SwiftStackedArea,
@@ -22,23 +34,31 @@ import {
   forwardRef,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react';
+import { useIsomorphicLayoutEffect } from '../../hooks/useIsomorphicLayoutEffect.js';
 import { cn } from '../../utils/cn.js';
 import { chartContainer } from './Chart.css.js';
-import { CYNOSURE_THEME_DARK, CYNOSURE_THEME_LIGHT, registerCynosureThemes } from './themes.js';
+import {
+  CYNOSURE_THEME_DARK,
+  CYNOSURE_THEME_LIGHT,
+  registerCynosureThemes,
+  resolveChartTheme,
+} from './themes.js';
 
 /**
- * Cynosure ships two SwiftChart themes — `'cynosure-light'` and
- * `'cynosure-dark'` — registered with SwiftChart's `addTheme` API at module
- * load. Each chart wrapper picks one based on the active document color
- * scheme so the canvas matches the rest of the page without any consumer
- * configuration.
+ * Cynosure charts follow the active Cynosure theme automatically. Each wrapper
+ * reads the `--cynosure-chart-*` custom properties (declared in `Chart.css.ts`
+ * as references to Cynosure tokens) off its container and materialises a
+ * SwiftChart `Theme` from them — so light, dark, `terminal`, `high-contrast`
+ * and consumer custom themes all flow through to the canvas with no extra
+ * configuration. Before the stylesheet resolves (SSR / first paint) the
+ * statically-registered `'cynosure-light'` / `'cynosure-dark'` themes stand in.
  *
- * The themes mirror the Cynosure design tokens (iris accent, surface +
- * foreground neutrals, semantic feedback colours). Need a different palette?
- * Pass `theme` directly — any value SwiftChart accepts (built-in name,
- * registered name, or full `Theme` object) is forwarded untouched.
+ * Need a completely different palette? Pass `theme` directly — any value
+ * SwiftChart accepts (built-in name, registered name, or full `Theme` object)
+ * is forwarded untouched and always wins over the auto-resolved theme.
  */
 registerCynosureThemes();
 
@@ -48,6 +68,7 @@ export {
   CYNOSURE_THEME_LIGHT,
   cynosureChartThemes,
   registerCynosureThemes,
+  resolveChartTheme,
 } from './themes.js';
 
 /** Re-export the SwiftChart imperative ref so consumers can call `.resize()` / `.toDataURL()`. */
@@ -74,19 +95,26 @@ function readScheme(): SchemeName {
   return 'light';
 }
 
+interface ThemeSignal {
+  scheme: SchemeName;
+  /** Bumped on every theme-affecting mutation so consumers re-resolve even
+   *  when a theme swap keeps the same light/dark scheme (e.g. `terminal`). */
+  version: number;
+}
+
 /**
- * Subscribe to color-scheme changes from any of the sources `readScheme`
- * checks. The component re-renders when the scheme flips, which prompts
- * SwiftChart to repaint with the new theme.
+ * Track theme changes from every source `readScheme` checks. Unlike a plain
+ * scheme subscription, `version` increments on *any* observed change — so a
+ * custom theme swap that keeps the same scheme still triggers a re-resolve.
  */
-function useColorScheme(): SchemeName {
-  const [scheme, setScheme] = useState<SchemeName>(() => readScheme());
+function useThemeSignal(): ThemeSignal {
+  const [signal, setSignal] = useState<ThemeSignal>(() => ({ scheme: readScheme(), version: 0 }));
 
   useEffect(() => {
     if (typeof document === 'undefined') return;
-    const update = () => setScheme(readScheme());
+    const update = () => setSignal((prev) => ({ scheme: readScheme(), version: prev.version + 1 }));
 
-    // 1. `data-theme` flips on <html>.
+    // 1. `data-theme` / `class` / inline `--cynosure-chart-*` flips on <html>.
     const observer = new MutationObserver(update);
     observer.observe(document.documentElement, {
       attributes: true,
@@ -103,7 +131,33 @@ function useColorScheme(): SchemeName {
     };
   }, []);
 
-  return scheme;
+  return signal;
+}
+
+/**
+ * Resolve the SwiftChart theme for a chart. An explicit `theme` always wins.
+ * Otherwise we start from the statically-registered named theme (SSR-safe) and,
+ * once mounted, swap to a concrete `Theme` materialised from the container's
+ * live `--cynosure-chart-*` custom properties.
+ */
+function useResolvedTheme(
+  containerRef: React.RefObject<HTMLElement | null>,
+  theme: unknown,
+): unknown {
+  const { scheme, version } = useThemeSignal();
+  const [resolved, setResolved] = useState<unknown>(
+    () => theme ?? (readScheme() === 'dark' ? CYNOSURE_THEME_DARK : CYNOSURE_THEME_LIGHT),
+  );
+
+  useIsomorphicLayoutEffect(() => {
+    if (theme !== undefined) {
+      setResolved(theme);
+      return;
+    }
+    setResolved(resolveChartTheme(containerRef.current, scheme));
+  }, [theme, scheme, version, containerRef]);
+
+  return resolved;
 }
 
 /**
@@ -154,9 +208,22 @@ function useWrapperStyle({
 }
 
 /**
- * Wraps a SwiftChart React component in a sized container. Defaults `theme`
- * to one of SwiftChart's built-ins based on the active color scheme; consumer
- * `theme` always wins.
+ * A short, stable key for a resolved theme so SwiftChart fully repaints when
+ * the theme changes (re-using the same canvas would draw new colours over old).
+ */
+function themeKey(theme: unknown): string {
+  if (typeof theme === 'string') return theme;
+  if (theme && typeof theme === 'object') {
+    const t = theme as { colors?: unknown[]; text?: string };
+    return `obj:${t.text ?? ''}:${(t.colors ?? []).join(',')}`;
+  }
+  return 'custom';
+}
+
+/**
+ * Wraps a SwiftChart React component in a sized container that exposes the
+ * `--cynosure-chart-*` theme contract, then feeds back the resolved Cynosure
+ * theme. Consumer `theme` always wins.
  */
 function createChart<P extends { theme?: unknown }>(
   Component: React.ForwardRefExoticComponent<P & React.RefAttributes<ChartRef>>,
@@ -165,15 +232,9 @@ function createChart<P extends { theme?: unknown }>(
     const { className, style, aspectRatio, height, minHeight, theme, ...rest } = props as P &
       BaseProps;
 
-    const scheme = useColorScheme();
+    const containerRef = useRef<HTMLDivElement>(null);
     const wrapperStyle = useWrapperStyle({ aspectRatio, height, minHeight, style });
-
-    const resolvedTheme: unknown =
-      theme ?? (scheme === 'dark' ? CYNOSURE_THEME_DARK : CYNOSURE_THEME_LIGHT);
-
-    // Re-key on theme so SwiftChart fully repaints when the scheme flips
-    // (re-using the same canvas would draw the old colors over the new).
-    const key = typeof resolvedTheme === 'string' ? resolvedTheme : 'custom';
+    const resolvedTheme = useResolvedTheme(containerRef, theme);
 
     const merged = {
       ...rest,
@@ -183,8 +244,8 @@ function createChart<P extends { theme?: unknown }>(
     } as unknown as P & React.RefAttributes<ChartRef>;
 
     return (
-      <div className={cn(chartContainer, className)} style={wrapperStyle}>
-        <Component key={key} ref={ref as Ref<ChartRef>} {...merged} />
+      <div ref={containerRef} className={cn(chartContainer, className)} style={wrapperStyle}>
+        <Component key={themeKey(resolvedTheme)} ref={ref as Ref<ChartRef>} {...merged} />
       </div>
     );
   });
@@ -202,9 +263,21 @@ export type StackedAreaChartProps = ComponentProps<typeof SwiftStackedArea> & Ba
 export type PieChartProps = ComponentProps<typeof SwiftPie> & BaseProps;
 export type DonutChartProps = ComponentProps<typeof SwiftDonut> & BaseProps;
 export type ScatterChartProps = ComponentProps<typeof SwiftScatter> & BaseProps;
+export type BubbleChartProps = ComponentProps<typeof SwiftBubble> & BaseProps;
 export type RadarChartProps = ComponentProps<typeof SwiftRadar> & BaseProps;
 export type WaterfallChartProps = ComponentProps<typeof SwiftWaterfall> & BaseProps;
 export type TreemapChartProps = ComponentProps<typeof SwiftTreemap> & BaseProps;
+export type GaugeChartProps = ComponentProps<typeof SwiftGauge> & BaseProps;
+export type RadialBarChartProps = ComponentProps<typeof SwiftRadialBar> & BaseProps;
+export type FunnelChartProps = ComponentProps<typeof SwiftFunnel> & BaseProps;
+export type HeatmapChartProps = ComponentProps<typeof SwiftHeatmap> & BaseProps;
+export type CandlestickChartProps = ComponentProps<typeof SwiftCandlestick> & BaseProps;
+export type BoxplotChartProps = ComponentProps<typeof SwiftBoxplot> & BaseProps;
+export type BulletChartProps = ComponentProps<typeof SwiftBullet> & BaseProps;
+export type ComboChartProps = ComponentProps<typeof SwiftCombo> & BaseProps;
+export type MarimekkoChartProps = ComponentProps<typeof SwiftMarimekko> & BaseProps;
+export type NetworkChartProps = ComponentProps<typeof SwiftNetwork> & BaseProps;
+export type SankeyChartProps = ComponentProps<typeof SwiftSankey> & BaseProps;
 export type SparklineProps = ComponentProps<typeof SwiftSparkline>;
 
 /** Line chart. Forwards every SwiftChart `<Line>` prop (`smooth`, `dots`, `area`, …). */
@@ -239,10 +312,14 @@ export const PieChart: React.ForwardRefExoticComponent<
 export const DonutChart: React.ForwardRefExoticComponent<
   DonutChartProps & React.RefAttributes<ChartRef>
 > = createChart(SwiftDonut);
-/** Scatter / bubble chart. Map `groupField` for colour, `sizeField` for radius. */
+/** Scatter chart. Map `groupField` for colour. */
 export const ScatterChart: React.ForwardRefExoticComponent<
   ScatterChartProps & React.RefAttributes<ChartRef>
 > = createChart(SwiftScatter);
+/** Bubble chart — scatter with a third dimension mapped to point radius. */
+export const BubbleChart: React.ForwardRefExoticComponent<
+  BubbleChartProps & React.RefAttributes<ChartRef>
+> = createChart(SwiftBubble);
 /** Radar / spider chart for multi-axis comparison. */
 export const RadarChart: React.ForwardRefExoticComponent<
   RadarChartProps & React.RefAttributes<ChartRef>
@@ -255,6 +332,50 @@ export const WaterfallChart: React.ForwardRefExoticComponent<
 export const TreemapChart: React.ForwardRefExoticComponent<
   TreemapChartProps & React.RefAttributes<ChartRef>
 > = createChart(SwiftTreemap);
+/** Radial gauge for a single value against a range (KPIs, scores, utilisation). */
+export const GaugeChart: React.ForwardRefExoticComponent<
+  GaugeChartProps & React.RefAttributes<ChartRef>
+> = createChart(SwiftGauge);
+/** Radial bar chart — bars wrapped around a polar axis. */
+export const RadialBarChart: React.ForwardRefExoticComponent<
+  RadialBarChartProps & React.RefAttributes<ChartRef>
+> = createChart(SwiftRadialBar);
+/** Funnel chart for stage-to-stage conversion / drop-off. */
+export const FunnelChart: React.ForwardRefExoticComponent<
+  FunnelChartProps & React.RefAttributes<ChartRef>
+> = createChart(SwiftFunnel);
+/** Heatmap / matrix chart — colour-encoded 2-D grid (calendars, cohorts). */
+export const HeatmapChart: React.ForwardRefExoticComponent<
+  HeatmapChartProps & React.RefAttributes<ChartRef>
+> = createChart(SwiftHeatmap);
+/** Candlestick (OHLC) chart for financial / price-range series. */
+export const CandlestickChart: React.ForwardRefExoticComponent<
+  CandlestickChartProps & React.RefAttributes<ChartRef>
+> = createChart(SwiftCandlestick);
+/** Box-and-whisker plot for distribution / quartile summaries. */
+export const BoxplotChart: React.ForwardRefExoticComponent<
+  BoxplotChartProps & React.RefAttributes<ChartRef>
+> = createChart(SwiftBoxplot);
+/** Bullet chart — a measure against a target plus qualitative ranges (KPIs). */
+export const BulletChart: React.ForwardRefExoticComponent<
+  BulletChartProps & React.RefAttributes<ChartRef>
+> = createChart(SwiftBullet);
+/** Combo chart — overlay multiple series types (e.g. bars + a trend line). */
+export const ComboChart: React.ForwardRefExoticComponent<
+  ComboChartProps & React.RefAttributes<ChartRef>
+> = createChart(SwiftCombo);
+/** Marimekko / mosaic chart — variable-width stacked bars (share × magnitude). */
+export const MarimekkoChart: React.ForwardRefExoticComponent<
+  MarimekkoChartProps & React.RefAttributes<ChartRef>
+> = createChart(SwiftMarimekko);
+/** Network / node-link graph for relationships and topology. */
+export const NetworkChart: React.ForwardRefExoticComponent<
+  NetworkChartProps & React.RefAttributes<ChartRef>
+> = createChart(SwiftNetwork);
+/** Sankey diagram for flows between nodes (traffic, energy, budgets). */
+export const SankeyChart: React.ForwardRefExoticComponent<
+  SankeyChartProps & React.RefAttributes<ChartRef>
+> = createChart(SwiftSankey);
 
 /**
  * Inline sparkline. SparklineComponent has its own minimal prop surface
@@ -292,7 +413,7 @@ export type ChartDatum = Record<string, unknown>;
 /** Render-prop ref shape kept for backwards-compatibility with consumers using imperative API. */
 export type ChartHandle = ChartRef;
 
-/** The name of either Cynosure theme registered with SwiftChart. */
+/** The name of either statically-registered Cynosure theme. */
 export type CynosureChartTheme = typeof CYNOSURE_THEME_LIGHT | typeof CYNOSURE_THEME_DARK;
 
 /**

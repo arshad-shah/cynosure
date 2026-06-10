@@ -67,6 +67,18 @@ export const vars = createGlobalThemeContract(
         warning: { solid: '', soft: '', foreground: '', border: '', onSolid: '' },
         info: { solid: '', soft: '', foreground: '', border: '', onSolid: '' },
       },
+      // Categorical series palette for charts. Indexed 1–8; SwiftChart cycles
+      // modulo length for series beyond the eighth.
+      chart: {
+        '1': '',
+        '2': '',
+        '3': '',
+        '4': '',
+        '5': '',
+        '6': '',
+        '7': '',
+        '8': '',
+      },
     },
     space: {
       '0': '',

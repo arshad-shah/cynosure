@@ -1,4 +1,5 @@
 import { render } from '@testing-library/react';
+import type { CSSProperties } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
 // SwiftChart paints to <canvas> via a ResizeObserver; jsdom has neither layout
@@ -19,14 +20,23 @@ vi.mock('@arshad-shah/swift-chart/react', () => {
         className?: string;
         style?: React.CSSProperties;
         theme?: unknown;
-      }) => (
-        <div
-          data-swift={label}
-          data-theme={typeof theme === 'string' ? theme : 'custom'}
-          className={className}
-          style={style}
-        />
-      ),
+      }) => {
+        const colors =
+          theme &&
+          typeof theme === 'object' &&
+          Array.isArray((theme as { colors?: unknown }).colors)
+            ? (theme as { colors: string[] }).colors.join(',')
+            : '';
+        return (
+          <div
+            data-swift={label}
+            data-theme={typeof theme === 'string' ? theme : 'object'}
+            data-colors={colors}
+            className={className}
+            style={style}
+          />
+        );
+      },
       { displayName: `Swift${label}` },
     );
   return {
@@ -39,14 +49,26 @@ vi.mock('@arshad-shah/swift-chart/react', () => {
     Pie: stub('Pie'),
     Donut: stub('Donut'),
     Scatter: stub('Scatter'),
+    Bubble: stub('Bubble'),
     Radar: stub('Radar'),
     Waterfall: stub('Waterfall'),
     Treemap: stub('Treemap'),
+    Gauge: stub('Gauge'),
+    RadialBar: stub('RadialBar'),
+    Funnel: stub('Funnel'),
+    Heatmap: stub('Heatmap'),
+    Candlestick: stub('Candlestick'),
+    Boxplot: stub('Boxplot'),
+    Bullet: stub('Bullet'),
+    Combo: stub('Combo'),
+    Marimekko: stub('Marimekko'),
+    Network: stub('Network'),
+    Sankey: stub('Sankey'),
     SparklineComponent: stub('Sparkline'),
   };
 });
 
-const { LineChart, BarChart, DonutChart, PieChart } = await import('../Chart/index.js');
+const { LineChart, BarChart, DonutChart, PieChart, GaugeChart } = await import('../Chart/index.js');
 
 const data = [
   { month: 'Jan', revenue: 1200 },
@@ -96,22 +118,41 @@ describe('Chart wrappers', () => {
     expect(wrapper.className).toContain('custom-card');
   });
 
-  it('defaults to the cynosure-light theme in light mode', () => {
+  it('exposes the newly-wrapped chart types', () => {
+    const { container } = render(<GaugeChart data={data} mapping={{ x: 'month', y: 'revenue' }} />);
+    expect(container.querySelector('[data-swift="Gauge"]')).not.toBeNull();
+  });
+
+  it('resolves a concrete theme object from the light palette by default', () => {
     document.documentElement.dataset.theme = 'light';
     const { container } = render(<LineChart data={data} mapping={{ x: 'month', y: 'revenue' }} />);
     const inner = container.querySelector('[data-swift="Line"]') as HTMLElement;
-    expect(inner.dataset.theme).toBe('cynosure-light');
+    expect(inner.dataset.theme).toBe('object');
+    // Falls back to the static light series palette (iris-600 leads).
+    expect(inner.dataset.colors?.split(',')[0]).toBe('#5663e6');
   });
 
-  it('defaults to the cynosure-dark theme in dark mode', () => {
+  it('resolves the dark palette in dark mode', () => {
     document.documentElement.dataset.theme = 'dark';
     const { container } = render(<LineChart data={data} mapping={{ x: 'month', y: 'revenue' }} />);
     const inner = container.querySelector('[data-swift="Line"]') as HTMLElement;
-    expect(inner.dataset.theme).toBe('cynosure-dark');
+    expect(inner.dataset.colors?.split(',')[0]).toBe('#8b9dff');
     delete document.documentElement.dataset.theme;
   });
 
-  it('honours an explicit theme prop over the auto-picked default', () => {
+  it('lets a consumer override a single series colour via --cynosure-chart-* ', () => {
+    const { container } = render(
+      <LineChart
+        data={data}
+        mapping={{ x: 'month', y: 'revenue' }}
+        style={{ '--cynosure-chart-1': '#abcdef' } as CSSProperties}
+      />,
+    );
+    const inner = container.querySelector('[data-swift="Line"]') as HTMLElement;
+    expect(inner.dataset.colors?.split(',')[0]).toBe('#abcdef');
+  });
+
+  it('honours an explicit theme prop over the auto-resolved default', () => {
     const { container } = render(
       <LineChart data={data} mapping={{ x: 'month', y: 'revenue' }} theme="midnight" />,
     );

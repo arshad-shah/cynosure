@@ -121,7 +121,10 @@ entries.push(
   {
     name: 'Chart',
     path: 'packages/react/dist/chart.js',
-    limit: '1.5 kB',
+    // 25 themed chart wrappers + live `--cynosure-chart-*` theme resolution.
+    // SwiftChart itself stays externalised (see `jsOnly`), so this tracks only
+    // the marginal in-tree wrapper/theming JS.
+    limit: '2 kB',
     ...jsOnly(['@arshad-shah/swift-chart', '@arshad-shah/swift-chart/react']),
   },
 );
