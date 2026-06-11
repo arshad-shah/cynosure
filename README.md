@@ -91,7 +91,7 @@ Run `pnpm size` locally to verify against current master.
 
 ## Server Components (RSC)
 
-Cynosure is RSC-aware. Structural components (`Box`, `Stack`, `Card`, `Text`, `Heading`, `Badge`, `Alert`, …) render inside Server Components. Interactive components (`Button`, form controls, overlays, menus) go inside a `'use client'` boundary — usually a tiny `providers.tsx` at the root.
+Cynosure is RSC-ready. Every component ships the `'use client'` directive, so you can import any of them directly into a Next.js App Router Server Component without hand-rolling a client boundary — Next puts them in the client graph for you. Mount `CynosureProvider` once (in a `providers.tsx` client boundary at the root) and you're set; it also loads the design tokens, so there's no stylesheet import in your server `layout.tsx`.
 
 Full [compatibility matrix and Next.js App Router recipe →](https://cynosure.arshadshah.com/getting-started/rsc/)
 

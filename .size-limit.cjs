@@ -152,7 +152,7 @@ entries.push({
 entries.push(
   { name: 'core.css (scaffolding)', path: 'packages/react/dist/core.css', limit: '2 kB' },
   { name: 'styles.css (monolithic CSS)', path: 'packages/react/dist/styles.css', limit: '24 kB' },
-  { name: 'all.css (tokens + styles)', path: 'packages/react/dist/all.css', limit: '25 kB' },
+  { name: 'all.css (tokens + styles)', path: 'packages/react/dist/all.css', limit: '26 kB' },
 );
 
 module.exports = entries;

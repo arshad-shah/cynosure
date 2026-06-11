@@ -705,6 +705,47 @@ export default createConfig({
     // own font pipeline (next/font, self-hosted, CDN).
     const fontsCss = await readFile(join(process.cwd(), 'src', 'fonts.css'), 'utf8');
     await writeFile(join(dist, 'fonts.css'), fontsCss);
+
+    // Mark every entry as a React Client Component. Cynosure components use
+    // hooks / `forwardRef` (neither is valid in a React Server Component), so
+    // they must live in the client graph. esbuild strips source-level
+    // `'use client'`, so we prepend the directive to each emitted entry here —
+    // this is what makes `import { Button } from '…/button'` work inside a
+    // Next.js App Router Server Component (Next marks the imported module's
+    // exports as client references). Shared `chunk-*.js` files need no directive
+    // (they're pulled into whichever graph imports them); `utils/index.js` is
+    // pure, side-effect-free helpers (e.g. `cn`) and stays universal so Server
+    // Components can use it too.
+    const DIRECTIVE = "'use client';\n";
+    const isEntryJs = (rel: string): boolean =>
+      rel.endsWith('.js') &&
+      !/(^|\/)chunk-[^/]+\.js$/.test(rel) &&
+      !rel.startsWith('shared/') &&
+      rel !== 'utils/index.js';
+    const walkJs = async (dir: string): Promise<string[]> => {
+      const out: string[] = [];
+      for (const ent of await readdir(dir, { withFileTypes: true })) {
+        const abs = join(dir, ent.name);
+        if (ent.isDirectory()) out.push(...(await walkJs(abs)));
+        else if (ent.name.endsWith('.js')) out.push(abs);
+      }
+      return out;
+    };
+    let clientEntries = 0;
+    for (const abs of await walkJs(dist)) {
+      const rel = relative(dist, abs).split('\\').join('/');
+      if (!isEntryJs(rel)) continue;
+      const code = await readFile(abs, 'utf8');
+      if (code.startsWith("'use client'") || code.startsWith('"use client"')) continue;
+      await writeFile(abs, DIRECTIVE + code);
+      clientEntries++;
+    }
+    // Sanity check: a known interactive entry must carry the directive.
+    const buttonJs = await readFile(join(dist, 'button.js'), 'utf8');
+    if (!buttonJs.startsWith("'use client'") && !buttonJs.startsWith('"use client"')) {
+      throw new Error("tsup: 'use client' directive was not applied to button.js");
+    }
+    console.log(`✔ Prepended 'use client' to ${clientEntries} entries`);
   },
   external: [
     'react',
