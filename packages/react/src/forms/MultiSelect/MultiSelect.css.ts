@@ -148,8 +148,8 @@ export const option = style({
   cursor: 'pointer',
   userSelect: 'none',
   color: vars.color.foreground.default,
-  fontSize: 'var(--cynosure-font-body-md-size)',
-  lineHeight: 'var(--cynosure-font-body-md-line-height)',
+  fontSize: vars.font.body.md.size,
+  lineHeight: vars.font.body.md.lineHeight,
   transitionProperty: 'background-color, color',
   transitionDuration: vars.duration.fast,
   selectors: {

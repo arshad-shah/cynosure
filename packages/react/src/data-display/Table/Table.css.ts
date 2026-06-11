@@ -5,8 +5,8 @@ export const tableRoot = style({
   width: '100%',
   borderCollapse: 'collapse',
   borderSpacing: 0,
-  fontFamily: 'var(--cynosure-font-body-md-family)',
-  fontSize: 'var(--cynosure-font-body-sm-size)',
+  fontFamily: vars.font.body.md.family,
+  fontSize: vars.font.body.sm.size,
   color: vars.color.foreground.default,
   selectors: {
     '&[data-layout="fixed"]': {
@@ -121,6 +121,6 @@ export const tableCaption = style({
   captionSide: 'bottom',
   color: vars.color.foreground.muted,
   padding: vars.space['2'],
-  fontSize: 'var(--cynosure-font-body-sm-size)',
+  fontSize: vars.font.body.sm.size,
   textAlign: 'start',
 });

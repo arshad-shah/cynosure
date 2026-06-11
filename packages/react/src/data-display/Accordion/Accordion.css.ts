@@ -57,8 +57,8 @@ export const accordionTrigger = style({
   gap: vars.space['2'],
   paddingBlock: `var(--cynosure-acc-pad-y, ${vars.space['3']})`,
   paddingInline: `var(--cynosure-acc-pad-x, ${vars.space['4']})`,
-  fontFamily: 'var(--cynosure-font-body-md-family)',
-  fontSize: 'var(--cynosure-font-body-md-size)',
+  fontFamily: vars.font.body.md.family,
+  fontSize: vars.font.body.md.size,
   fontWeight: 600,
   color: vars.color.foreground.default,
   cursor: 'pointer',
@@ -96,7 +96,7 @@ globalStyle(`${accordionTrigger}[data-state="open"] ${accordionChevron}`, {
 
 export const accordionContent = style({
   overflow: 'hidden',
-  fontSize: 'var(--cynosure-font-body-md-size)',
+  fontSize: vars.font.body.md.size,
   color: vars.color.foreground.default,
   selectors: {
     '&[data-state="open"]': {

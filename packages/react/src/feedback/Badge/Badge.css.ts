@@ -7,8 +7,8 @@ export const badgeRoot = style({
   gap: vars.space['1'],
   whiteSpace: 'nowrap',
   verticalAlign: 'middle',
-  fontFamily: 'var(--cynosure-font-body-md-family)',
-  fontWeight: 'var(--cynosure-font-weight-medium)',
+  fontFamily: vars.font.body.md.family,
+  fontWeight: vars.font.weight.medium,
   lineHeight: 1,
   userSelect: 'none',
   border: '1px solid transparent',
@@ -16,19 +16,19 @@ export const badgeRoot = style({
 
 export const badgeSize = styleVariants({
   xs: {
-    fontSize: 'var(--cynosure-font-body-xs-size)',
+    fontSize: vars.font.body.xs.size,
     paddingInline: vars.space['1'],
     paddingBlock: '0.125rem',
     minHeight: '1rem',
   },
   sm: {
-    fontSize: 'var(--cynosure-font-body-xs-size)',
+    fontSize: vars.font.body.xs.size,
     paddingInline: vars.space['1.5'],
     paddingBlock: '0.1875rem',
     minHeight: '1.25rem',
   },
   md: {
-    fontSize: 'var(--cynosure-font-body-sm-size)',
+    fontSize: vars.font.body.sm.size,
     paddingInline: vars.space['2'],
     paddingBlock: vars.space['0.5'],
     minHeight: '1.5rem',

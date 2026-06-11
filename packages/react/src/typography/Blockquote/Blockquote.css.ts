@@ -13,9 +13,9 @@ export const blockquoteBase = style([
     // to `inline`, which collapses the start-border onto the first wrapped
     // line only (same workaround as `blockquoteAttribution`).
     vars: { '--cynosure-lp-d-base': 'block' },
-    fontFamily: 'var(--cynosure-font-family-serif)',
-    fontSize: 'var(--cynosure-font-body-lg-size)',
-    lineHeight: 'var(--cynosure-font-body-lg-line-height)',
+    fontFamily: vars.font.family.serif,
+    fontSize: vars.font.body.lg.size,
+    lineHeight: vars.font.body.lg.lineHeight,
     color: vars.color.foreground.default,
   },
 ]);
@@ -45,8 +45,8 @@ export const blockquoteAttribution = style({
   // layoutPropsStyle emissions later in the bundle.
   vars: { '--cynosure-lp-d-base': 'block' },
   marginBlockStart: vars.space[2],
-  fontFamily: 'var(--cynosure-font-body-md-family)',
-  fontSize: 'var(--cynosure-font-body-sm-size)',
+  fontFamily: vars.font.body.md.family,
+  fontSize: vars.font.body.sm.size,
   fontStyle: 'normal',
   color: vars.color.foreground.muted,
   selectors: {

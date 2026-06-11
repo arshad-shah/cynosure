@@ -11,8 +11,8 @@ export const switchLabel = style({
   display: 'inline-flex',
   alignItems: 'center',
   gap: vars.space['2'],
-  fontSize: 'var(--cynosure-font-body-md-size)',
-  lineHeight: 'var(--cynosure-font-body-md-line-height)',
+  fontSize: vars.font.body.md.size,
+  lineHeight: vars.font.body.md.lineHeight,
   color: vars.color.foreground.default,
   cursor: 'pointer',
   selectors: {

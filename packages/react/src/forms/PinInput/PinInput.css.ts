@@ -23,7 +23,7 @@ export const cell = style({
   width: '2.75rem',
   height: '3rem',
   textAlign: 'center',
-  fontSize: 'var(--cynosure-font-body-lg-size)',
+  fontSize: vars.font.body.lg.size,
   fontWeight: 600,
   fontVariantNumeric: 'tabular-nums',
   border: `1px solid ${vars.color.border.strong}`,
@@ -81,9 +81,9 @@ export const cell = style({
 });
 
 export const cellSize = styleVariants({
-  sm: { width: '2.25rem', height: '2.5rem', fontSize: 'var(--cynosure-font-body-md-size)' },
-  md: { width: '2.75rem', height: '3rem', fontSize: 'var(--cynosure-font-body-lg-size)' },
-  lg: { width: '3.25rem', height: '3.5rem', fontSize: 'var(--cynosure-font-heading-xs-size)' },
+  sm: { width: '2.25rem', height: '2.5rem', fontSize: vars.font.body.md.size },
+  md: { width: '2.75rem', height: '3rem', fontSize: vars.font.body.lg.size },
+  lg: { width: '3.25rem', height: '3.5rem', fontSize: vars.font.heading['5'].size },
 });
 
 /** Midpoint separator (e.g. a dash) between the two halves of the code. */

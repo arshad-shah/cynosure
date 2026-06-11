@@ -11,22 +11,22 @@ export const controlSize = styleVariants({
   sm: {
     minHeight: '2rem',
     paddingInline: vars.space[2],
-    fontSize: 'var(--cynosure-font-body-sm-size)',
-    lineHeight: 'var(--cynosure-font-body-sm-line-height)',
+    fontSize: vars.font.body.sm.size,
+    lineHeight: vars.font.body.sm.lineHeight,
     borderRadius: vars.radius.sm,
   },
   md: {
     minHeight: '2.5rem',
     paddingInline: vars.space[3],
-    fontSize: 'var(--cynosure-font-body-md-size)',
-    lineHeight: 'var(--cynosure-font-body-md-line-height)',
+    fontSize: vars.font.body.md.size,
+    lineHeight: vars.font.body.md.lineHeight,
     borderRadius: vars.radius.md,
   },
   lg: {
     minHeight: '3rem',
     paddingInline: vars.space[4],
-    fontSize: 'var(--cynosure-font-body-lg-size)',
-    lineHeight: 'var(--cynosure-font-body-lg-line-height)',
+    fontSize: vars.font.body.lg.size,
+    lineHeight: vars.font.body.lg.lineHeight,
     borderRadius: vars.radius.md,
   },
 });

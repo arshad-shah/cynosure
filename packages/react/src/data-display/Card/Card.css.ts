@@ -110,16 +110,16 @@ export const cardFooter = style({
 
 export const cardTitle = style({
   margin: 0,
-  fontFamily: 'var(--cynosure-font-heading-3-family)',
-  fontSize: 'var(--cynosure-font-heading-3-size)',
-  fontWeight: 'var(--cynosure-font-heading-3-weight)',
-  lineHeight: 'var(--cynosure-font-heading-3-line-height)',
+  fontFamily: vars.font.heading['3'].family,
+  fontSize: vars.font.heading['3'].size,
+  fontWeight: vars.font.heading['3'].weight,
+  lineHeight: vars.font.heading['3'].lineHeight,
   color: vars.color.foreground.default,
 });
 
 export const cardDescription = style({
   margin: 0,
-  fontSize: 'var(--cynosure-font-body-sm-size)',
+  fontSize: vars.font.body.sm.size,
   color: vars.color.foreground.muted,
 });
 

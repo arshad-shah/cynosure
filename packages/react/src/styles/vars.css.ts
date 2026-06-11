@@ -1,151 +1,61 @@
+import { baseTokens } from '@arshad-shah/cynosure-tokens';
 import { createGlobalThemeContract, globalStyle } from '@vanilla-extract/css';
 import { toCssName } from './tokenPath.js';
 
 /**
  * Typed mirror of the `@arshad-shah/cynosure-tokens` CSS custom properties.
  *
- * The contract only types the names — consumers must import
- * `@arshad-shah/cynosure-tokens/css` (and optionally `@arshad-shah/cynosure-tokens/css/dark`) at runtime for
- * the values. Every leaf is the CSS variable name (sans the leading `--`),
- * so referring to e.g. `vars.color.accent.solid` inside a `.css.ts` file
- * emits `var(--cynosure-color-accent-solid)` at build time.
+ * The contract is **generated from the published token tree** (`baseTokens`)
+ * rather than hand-maintained, so it can never drift: every `--cynosure-*`
+ * custom property the tokens package emits is typed here, and nothing else.
+ * (`vars.parity.test.ts` guards the invariant.) The contract types only the
+ * names — consumers import `@arshad-shah/cynosure-tokens/css` for the values
+ * (the provider does this for you). Referencing e.g. `vars.color.accent.solid`
+ * inside a `.css.ts` file emits `var(--cynosure-color-accent-solid)` at build
+ * time.
  *
- * The key shape here mirrors the token tree *logically*. The shared `toCssName`
- * mapper (`./tokenPath`) performs the camelCase → kebab-case and `.` → `-`
- * transforms that Style Dictionary performs for the actual CSS custom property
- * names, so the contract stays a faithful reflection of the token CSS — and the
- * `defineTheme` authoring helper resolves identical names.
+ * The shared `toCssName` mapper (`./tokenPath`) reproduces Style Dictionary's
+ * `name/kebab` transform exactly — walking `baseTokens` reproduces all the
+ * generated var names with zero diff — so the contract stays a faithful
+ * reflection of the token CSS, and `defineTheme` resolves identical names.
  */
 
+/** Kebab token key → camelCase JS accessor (`ease-in` → `easeIn`). */
+type CamelKey<S extends string> = S extends `${infer H}-${infer T}`
+  ? `${H}${Capitalize<CamelKey<T>>}`
+  : S;
+
+/**
+ * The token tree with every leaf replaced by `''` and every kebab key
+ * camelCased for ergonomic access — preserving shape. Camel-casing keys is
+ * cosmetic for JS (`vars.easing.easeIn`): it never changes the emitted var
+ * name, because `toCssName` re-expands camelCase back to the original kebab.
+ */
+type LeafString<T> = T extends readonly unknown[]
+  ? string
+  : T extends object
+    ? { [K in keyof T as CamelKey<K & string>]: LeafString<T[K]> }
+    : string;
+
+const camelKey = (key: string): string => key.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
+
+const emptyLeaves = <T>(node: T): LeafString<T> => {
+  if (node && typeof node === 'object' && !Array.isArray(node)) {
+    const out: Record<string, unknown> = {};
+    for (const key of Object.keys(node as object)) {
+      out[camelKey(key)] = emptyLeaves((node as Record<string, unknown>)[key]);
+    }
+    return out as LeafString<T>;
+  }
+  return '' as LeafString<T>;
+};
+
 export const vars = createGlobalThemeContract(
-  {
-    color: {
-      background: {
-        canvas: '',
-        surface: '',
-        subtle: '',
-        muted: '',
-        raised: '',
-        overlay: '',
-        inverse: '',
-      },
-      foreground: {
-        default: '',
-        muted: '',
-        subtle: '',
-        disabled: '',
-        inverse: '',
-        onAccent: '',
-      },
-      border: {
-        default: '',
-        subtle: '',
-        strong: '',
-        focus: '',
-        disabled: '',
-      },
-      accent: {
-        solid: '',
-        solidHover: '',
-        solidActive: '',
-        soft: '',
-        softHover: '',
-        softActive: '',
-        ring: '',
-        onSolid: '',
-      },
-      feedback: {
-        success: { solid: '', soft: '', foreground: '', border: '', onSolid: '' },
-        danger: { solid: '', soft: '', foreground: '', border: '', onSolid: '' },
-        warning: { solid: '', soft: '', foreground: '', border: '', onSolid: '' },
-        info: { solid: '', soft: '', foreground: '', border: '', onSolid: '' },
-      },
-      // Categorical series palette for charts. Indexed 1–8; SwiftChart cycles
-      // modulo length for series beyond the eighth.
-      chart: {
-        '1': '',
-        '2': '',
-        '3': '',
-        '4': '',
-        '5': '',
-        '6': '',
-        '7': '',
-        '8': '',
-      },
-    },
-    space: {
-      '0': '',
-      '0.5': '',
-      '1': '',
-      '1.5': '',
-      '2': '',
-      '3': '',
-      '4': '',
-      '5': '',
-      '6': '',
-      '8': '',
-      '10': '',
-      '12': '',
-      '16': '',
-      '20': '',
-      '24': '',
-      '32': '',
-      '40': '',
-      '48': '',
-      '64': '',
-    },
-    radius: {
-      none: '',
-      xs: '',
-      sm: '',
-      md: '',
-      lg: '',
-      xl: '',
-      '2xl': '',
-      full: '',
-    },
-    shadow: {
-      xs: '',
-      sm: '',
-      md: '',
-      lg: '',
-      xl: '',
-      '2xl': '',
-      focusRing: '',
-    },
-    duration: {
-      instant: '',
-      fast: '',
-      normal: '',
-      slow: '',
-      slower: '',
-    },
-    easing: {
-      linear: '',
-      easeIn: '',
-      easeOut: '',
-      easeInOut: '',
-      spring: '',
-      bounce: '',
-    },
-    z: {
-      hide: '',
-      base: '',
-      docked: '',
-      dropdown: '',
-      sticky: '',
-      overlay: '',
-      modal: '',
-      popover: '',
-      toast: '',
-      tooltip: '',
-    },
-  },
+  emptyLeaves(baseTokens),
   (_value, path) => `cynosure-${toCssName(path as string[])}`,
 );
 
 export type Vars = typeof vars;
-
 /**
  * Global focus/press reset, shared by every component.
  *

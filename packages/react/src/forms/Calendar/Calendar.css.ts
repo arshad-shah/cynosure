@@ -81,7 +81,7 @@ export const calendarNavButton = style({
 
 export const calendarTitle = style({
   fontWeight: 600,
-  fontSize: 'var(--cynosure-font-body-md-size)',
+  fontSize: vars.font.body.md.size,
   color: vars.color.foreground.default,
   letterSpacing: '-0.01em',
 });
@@ -109,7 +109,7 @@ export const calendarCell = style({
   justifyContent: 'center',
   width: '2.25rem',
   height: '2.25rem',
-  fontSize: 'var(--cynosure-font-body-sm-size)',
+  fontSize: vars.font.body.sm.size,
   fontVariantNumeric: 'tabular-nums',
   fontWeight: 500,
   borderRadius: vars.radius.sm,

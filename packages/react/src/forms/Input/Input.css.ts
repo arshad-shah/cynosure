@@ -153,20 +153,20 @@ export const wellSize = styleVariants({
   sm: {
     minHeight: '2rem',
     borderRadius: vars.radius.sm,
-    fontSize: 'var(--cynosure-font-body-sm-size)',
-    lineHeight: 'var(--cynosure-font-body-sm-line-height)',
+    fontSize: vars.font.body.sm.size,
+    lineHeight: vars.font.body.sm.lineHeight,
   },
   md: {
     minHeight: '2.5rem',
     borderRadius: vars.radius.md,
-    fontSize: 'var(--cynosure-font-body-md-size)',
-    lineHeight: 'var(--cynosure-font-body-md-line-height)',
+    fontSize: vars.font.body.md.size,
+    lineHeight: vars.font.body.md.lineHeight,
   },
   lg: {
     minHeight: '3rem',
     borderRadius: vars.radius.md,
-    fontSize: 'var(--cynosure-font-body-lg-size)',
-    lineHeight: 'var(--cynosure-font-body-lg-line-height)',
+    fontSize: vars.font.body.lg.size,
+    lineHeight: vars.font.body.lg.lineHeight,
   },
 });
 

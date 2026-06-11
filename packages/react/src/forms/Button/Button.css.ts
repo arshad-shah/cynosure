@@ -18,8 +18,8 @@ export const buttonBase = style({
   gap: vars.space['2'],
   border: '1px solid transparent',
   borderRadius: vars.radius.md,
-  fontFamily: 'var(--cynosure-font-body-md-family)',
-  fontWeight: 'var(--cynosure-font-weight-medium)',
+  fontFamily: vars.font.body.md.family,
+  fontWeight: vars.font.weight.medium,
   lineHeight: 1,
   cursor: 'pointer',
   userSelect: 'none',
@@ -60,29 +60,29 @@ export const buttonSize = styleVariants({
   xs: {
     minHeight: '1.5rem',
     paddingInline: vars.space['2'],
-    fontSize: 'var(--cynosure-font-body-xs-size)',
+    fontSize: vars.font.body.xs.size,
     borderRadius: vars.radius.sm,
   },
   sm: {
     minHeight: '2rem',
     paddingInline: vars.space['3'],
-    fontSize: 'var(--cynosure-font-body-sm-size)',
+    fontSize: vars.font.body.sm.size,
     borderRadius: vars.radius.sm,
   },
   md: {
     minHeight: '2.5rem',
     paddingInline: vars.space['4'],
-    fontSize: 'var(--cynosure-font-body-md-size)',
+    fontSize: vars.font.body.md.size,
   },
   lg: {
     minHeight: '3rem',
     paddingInline: vars.space['5'],
-    fontSize: 'var(--cynosure-font-body-lg-size)',
+    fontSize: vars.font.body.lg.size,
   },
   xl: {
     minHeight: '3.5rem',
     paddingInline: vars.space['6'],
-    fontSize: 'var(--cynosure-font-body-lg-size)',
+    fontSize: vars.font.body.lg.size,
   },
 });
 

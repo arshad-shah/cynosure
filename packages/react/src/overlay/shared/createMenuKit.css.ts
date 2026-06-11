@@ -34,8 +34,8 @@ export const menuLabelText = style({
 
 /** Muted second-line description. */
 export const menuDescription = style({
-  fontSize: 'var(--cynosure-font-body-xs-size)',
-  lineHeight: 'var(--cynosure-font-body-xs-line-height)',
+  fontSize: vars.font.body.xs.size,
+  lineHeight: vars.font.body.xs.lineHeight,
   color: vars.color.foreground.muted,
 });
 

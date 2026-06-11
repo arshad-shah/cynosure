@@ -10,8 +10,8 @@ export const calloutRoot = style({
   borderInlineStart: `3px solid ${vars.color.accent.solid}`,
   background: vars.color.background.subtle,
   color: vars.color.foreground.default,
-  fontFamily: 'var(--cynosure-font-body-md-family)',
-  lineHeight: 'var(--cynosure-font-body-md-line-height)',
+  fontFamily: vars.font.body.md.family,
+  lineHeight: vars.font.body.md.lineHeight,
 });
 
 export const calloutVariantOutline = style({
@@ -88,12 +88,12 @@ export const calloutBody = style({
 
 export const calloutTitle = style({
   margin: 0,
-  fontWeight: 'var(--cynosure-font-weight-semibold)',
-  fontSize: 'var(--cynosure-font-body-md-size)',
+  fontWeight: vars.font.weight.semibold,
+  fontSize: vars.font.body.md.size,
 });
 
 export const calloutContent = style({
   margin: 0,
-  fontSize: 'var(--cynosure-font-body-md-size)',
+  fontSize: vars.font.body.md.size,
   color: 'inherit',
 });
