@@ -1,22 +1,13 @@
-import {
-  type CSSProperties,
-  type ElementType,
-  type ForwardedRef,
-  type ReactElement,
-  type ReactNode,
-  forwardRef,
-} from 'react';
-import { cn } from '../../../utils/cn.js';
-import { Slot } from '../../Slot.js';
+import type { CSSProperties, ElementType, ReactNode } from 'react';
 import {
   type AsChildProps,
   type LayoutProps,
+  type PolymorphicProps,
   type Responsive,
   type SpaceToken,
+  createLayoutComponent,
   mergeStyles,
-  resolveLayoutProps,
   resolveSpace,
-  splitLayoutProps,
   toResponsiveVars,
 } from '../shared/index.js';
 import { inline } from './Inline.css.js';
@@ -88,69 +79,27 @@ export interface InlineOwnProps extends LayoutProps, AsChildProps {
 /**
  * Full `Inline` props. Generic over the rendered element.
  */
-export type InlineProps<E extends ElementType = 'div'> = InlineOwnProps & {
-  /**
-   * Rendered intrinsic element or component.
-   * @default "div"
-   */
-  as?: E;
-} & Omit<React.ComponentPropsWithoutRef<E>, keyof InlineOwnProps | 'as'>;
-
-type AnyProps = InlineOwnProps & { as?: ElementType; [key: string]: unknown };
-
-const InlineRender = (props: AnyProps, ref: ForwardedRef<Element>): ReactElement => {
-  const {
-    as,
-    asChild,
-    className,
-    style,
-    children,
-    gap,
-    rowGap,
-    columnGap,
-    align,
-    justify,
-    wrap,
-    ...rest
-  } = props;
-
-  const { layoutProps, rest: domProps } = splitLayoutProps(rest as InlineOwnProps);
-
-  const layoutStyle = resolveLayoutProps(layoutProps);
-  const inlineStyle = mergeStyles(
-    // `gap` writes both longhand vars so the column/row-gap CSS rules in
-    // Inline.css.ts always resolve. See Grid.tsx for the rationale.
-    toResponsiveVars(gap, 'cynosure-inline-row-gap', (v) => resolveSpace(v)),
-    toResponsiveVars(gap, 'cynosure-inline-col-gap', (v) => resolveSpace(v)),
-    toResponsiveVars(rowGap, 'cynosure-inline-row-gap', (v) => resolveSpace(v)),
-    toResponsiveVars(columnGap, 'cynosure-inline-col-gap', (v) => resolveSpace(v)),
-    toResponsiveVars(align, 'cynosure-inline-align', (v) => ALIGN_MAP[v]),
-    toResponsiveVars(justify, 'cynosure-inline-justify', (v) => JUSTIFY_MAP[v]),
-    toResponsiveVars(wrap, 'cynosure-inline-wrap', (v) => (v ? 'wrap' : 'nowrap')),
-  );
-  const mergedStyle = mergeStyles(layoutStyle, inlineStyle, style);
-
-  const Comp: ElementType = asChild ? Slot : (as ?? 'div');
-
-  return (
-    <Comp
-      ref={ref}
-      className={cn(inline, className)}
-      style={mergedStyle}
-      {...(domProps as Record<string, unknown>)}
-    >
-      {children}
-    </Comp>
-  );
-};
+export type InlineProps<E extends ElementType = 'div'> = PolymorphicProps<E, InlineOwnProps>;
 
 /**
  * Horizontal flex container that wraps by default. Use for toolbars, chip
  * rows, button groups — anywhere a row of items needs consistent `gap` +
  * graceful reflow. Pass `wrap={false}` to keep items on a single line.
  */
-export const Inline = forwardRef<Element, AnyProps>(InlineRender) as <
-  E extends ElementType = 'div',
->(
-  props: InlineProps<E> & { ref?: ForwardedRef<Element> },
-) => ReactElement | null;
+export const Inline = createLayoutComponent<InlineOwnProps>({
+  base: inline,
+  displayName: 'Inline',
+  ownKeys: ['gap', 'rowGap', 'columnGap', 'align', 'justify', 'wrap'],
+  resolveStyle: ({ gap, rowGap, columnGap, align, justify, wrap }) =>
+    mergeStyles(
+      // `gap` writes both longhand vars so the column/row-gap CSS rules in
+      // Inline.css.ts always resolve. See Grid.tsx for the rationale.
+      toResponsiveVars(gap, 'cynosure-inline-row-gap', (v) => resolveSpace(v)),
+      toResponsiveVars(gap, 'cynosure-inline-col-gap', (v) => resolveSpace(v)),
+      toResponsiveVars(rowGap, 'cynosure-inline-row-gap', (v) => resolveSpace(v)),
+      toResponsiveVars(columnGap, 'cynosure-inline-col-gap', (v) => resolveSpace(v)),
+      toResponsiveVars(align, 'cynosure-inline-align', (v) => ALIGN_MAP[v]),
+      toResponsiveVars(justify, 'cynosure-inline-justify', (v) => JUSTIFY_MAP[v]),
+      toResponsiveVars(wrap, 'cynosure-inline-wrap', (v) => (v ? 'wrap' : 'nowrap')),
+    ),
+});
