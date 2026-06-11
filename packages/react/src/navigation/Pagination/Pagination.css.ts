@@ -26,7 +26,7 @@ const paginationButtonBase = style({
   color: vars.color.foreground.muted,
   border: '1px solid transparent',
   borderRadius: vars.radius.sm,
-  fontFamily: 'var(--cynosure-font-body-md-family)',
+  fontFamily: vars.font.body.md.family,
   fontVariantNumeric: 'tabular-nums',
   cursor: 'pointer',
   selectors: {
@@ -59,15 +59,15 @@ export const paginationButton = paginationButtonBase;
 export const paginationSize = styleVariants({
   sm: {
     minWidth: '1.75rem',
-    fontSize: 'var(--cynosure-font-body-sm-size)',
+    fontSize: vars.font.body.sm.size,
     padding: vars.space['0.5'],
   },
   md: {
-    fontSize: 'var(--cynosure-font-body-md-size)',
+    fontSize: vars.font.body.md.size,
   },
   lg: {
     minWidth: '2.75rem',
-    fontSize: 'var(--cynosure-font-body-lg-size)',
+    fontSize: vars.font.body.lg.size,
     padding: vars.space['2'],
   },
 });

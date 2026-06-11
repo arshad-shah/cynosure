@@ -89,7 +89,7 @@ export const circularProgressLabel = style({
   justifyContent: 'center',
   lineHeight: 1,
   fontWeight: 600,
-  fontSize: 'var(--cynosure-font-body-sm-size)',
+  fontSize: vars.font.body.sm.size,
   fontVariantNumeric: 'tabular-nums',
   color: vars.color.foreground.default,
 });

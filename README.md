@@ -19,7 +19,7 @@ Cynosure is a headless-at-the-core, themed-on-top component library built around
 npx cynosure init
 ```
 
-One command: detects your framework (Next.js App Router, Next.js Pages, Vite, CRA, Remix), installs the right packages, wires the single CSS import, and adds `CynosureProvider` for you.
+One command: detects your framework (Next.js App Router, Next.js Pages, Vite, CRA, Remix), installs the right packages, and adds `CynosureProvider` for you. **No CSS import to wire** — the provider loads the design tokens, and each component's CSS comes along when you import it.
 
 ### Or install manually
 
@@ -27,13 +27,9 @@ One command: detects your framework (Next.js App Router, Next.js Pages, Vite, CR
 pnpm add @arshad-shah/cynosure-react @arshad-shah/cynosure-tokens
 ```
 
-```ts
-// one CSS import covers tokens (light + dark) + every component
-import '@arshad-shah/cynosure-react/all.css';
-```
-
 ```tsx
-import { CynosureProvider, Button } from '@arshad-shah/cynosure-react';
+import { CynosureProvider } from '@arshad-shah/cynosure-react';
+import { Button } from '@arshad-shah/cynosure-react/button';
 
 export default function App() {
   return (
@@ -44,19 +40,29 @@ export default function App() {
 }
 ```
 
+That's it — **no stylesheet import required.** `CynosureProvider` pulls in the
+design tokens (the `--cynosure-*` custom properties, light + dark) automatically,
+and every component's own CSS auto-loads when you import the component. Import
+components from their **subpaths** (`@arshad-shah/cynosure-react/button`) so your
+bundler ships only what you use.
+
 Peer requirements: **React 18 or 19** (`react`, `react-dom`). `react-hook-form` is an optional peer for the forms adapter.
 
-> **Upgrading?** The older three-import setup (`tokens/css`, `tokens/css/dark`, `react/styles.css`) still works — `all.css` and `CynosureProvider` are additive.
+> **Not using the provider?** (plain HTML, email, non-React, or a component used
+> outside `CynosureProvider`.) Import the tokens once yourself — either the
+> all-in-one `import '@arshad-shah/cynosure-react/all.css'` or just
+> `import '@arshad-shah/cynosure-tokens/css'` (+ `/css/dark`). In dev, the
+> provider warns if it can't find the tokens at runtime.
 
 ---
 
 ## Why Cynosure
 
 - **102 components** with dedicated subpath exports across layout, typography, forms, overlays, navigation, data display, and feedback — all pre-styled, all themeable. Full inventory in [`components.config.mjs`](./components.config.mjs).
-- **Zero-config DX.** One CSS import, one provider, works out of the box with Next.js App Router, Vite, Remix, and CRA.
+- **Zero-config DX.** Just one provider — it loads the design tokens for you; component CSS auto-loads on import. No stylesheet to wire. Works out of the box with Next.js App Router, Vite, Remix, and CRA.
 - **WCAG 2.2 AA** across every component. Every story is locked to axe-passing. RTL-safe, keyboard complete, reduced-motion honoured.
 - **Pay for what you import.** Per-component ESM entries (`@arshad-shah/cynosure-react/button`) and per-component CSS — your bundler keeps the rest.
-- **Theming that is data.** Six built-in themes (light, dark, terminal, high-contrast) or roll your own by overriding CSS custom properties. No CSS-in-JS runtime.
+- **Theming that is data.** Built-in light, dark, terminal, and high-contrast themes — or author your own **type-safe** theme with `defineTheme` (autocompleted tokens, no stylesheet to wire). No CSS-in-JS runtime.
 - **Forms that auto-wire.** `Form` + `FormField` + `FormControl` wire `id`, `aria-describedby`, `aria-invalid`, `name`, `required`, `disabled` for you. Drop-in `react-hook-form` adapter.
 - **Ships with a docs site.** Interactive Storybook playgrounds, MDX recipes, and Chromatic visual regression in CI.
 
@@ -64,7 +70,7 @@ Peer requirements: **React 18 or 19** (`react`, `react-dom`). `react-hook-form` 
 
 ## Bundle sizes
 
-Minified + brotli, per [`size-limit`](./.size-limit.json) budgets enforced in CI:
+Minified + brotli, per [`size-limit`](./.size-limit.cjs) budgets enforced in CI:
 
 | Component | Size | Component | Size |
 | --- | ---: | --- | ---: |
@@ -85,7 +91,7 @@ Run `pnpm size` locally to verify against current master.
 
 ## Server Components (RSC)
 
-Cynosure is RSC-aware. Structural components (`Box`, `Stack`, `Card`, `Text`, `Heading`, `Badge`, `Alert`, …) render inside Server Components. Interactive components (`Button`, form controls, overlays, menus) go inside a `'use client'` boundary — usually a tiny `providers.tsx` at the root.
+Cynosure is RSC-ready. Every component ships the `'use client'` directive, so you can import any of them directly into a Next.js App Router Server Component without hand-rolling a client boundary — Next puts them in the client graph for you. Mount `CynosureProvider` once (in a `providers.tsx` client boundary at the root) and you're set; it also loads the design tokens, so there's no stylesheet import in your server `layout.tsx`.
 
 Full [compatibility matrix and Next.js App Router recipe →](https://cynosure.arshadshah.com/getting-started/rsc/)
 
@@ -102,7 +108,7 @@ Full [compatibility matrix and Next.js App Router recipe →](https://cynosure.a
 
 ---
 
-## Theming in two lines
+## Theming
 
 ```tsx
 import { CynosureProvider } from '@arshad-shah/cynosure-react';
@@ -112,7 +118,23 @@ import { CynosureProvider } from '@arshad-shah/cynosure-react';
 </CynosureProvider>
 ```
 
-Flip themes at runtime by setting `data-theme` on `<html>`. Authoring a custom theme is one CSS file — see [Custom themes](https://cynosure.arshadshah.com/foundations/custom-themes/).
+Switch themes at runtime with `useTheme().setTheme(name)`. **Authoring your own theme is type-safe** — describe the tokens you want to change with `defineTheme` (autocomplete on every slot, a typo is a compile error) and hand it to the provider; it injects the CSS for you (SSR-safe) and registers the name:
+
+```tsx
+import { CynosureProvider, defineTheme } from '@arshad-shah/cynosure-react';
+
+const ocean = defineTheme(
+  'ocean',
+  { color: { accent: { solid: '#0ea5e9' }, background: { canvas: '#0b1220' } } },
+  { colorScheme: 'dark' },
+);
+
+<CynosureProvider theme={{ customThemes: [ocean], defaultTheme: 'ocean' }}>
+  {children}
+</CynosureProvider>;
+```
+
+You override only what differs — everything else cascades from the base tokens. See [Custom themes](https://cynosure.arshadshah.com/foundations/custom-themes/).
 
 ---
 

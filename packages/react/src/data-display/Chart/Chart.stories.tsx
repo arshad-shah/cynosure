@@ -4,11 +4,23 @@ import { Heading } from '../../typography/Heading/Heading.js';
 import {
   AreaChart,
   BarChart,
+  BoxplotChart,
+  BubbleChart,
+  BulletChart,
+  CandlestickChart,
+  ComboChart,
   DonutChart,
+  FunnelChart,
+  GaugeChart,
   HBarChart,
+  HeatmapChart,
   LineChart,
+  MarimekkoChart,
+  NetworkChart,
   PieChart,
   RadarChart,
+  RadialBarChart,
+  SankeyChart,
   ScatterChart,
   Sparkline,
   StackedAreaChart,
@@ -254,6 +266,264 @@ export const Sparkline_: Story = {
         Mini trend
       </Heading>
       <Sparkline data={[12, 14, 13, 18, 22, 24, 21, 26, 30, 32, 28, 35]} height={48} filled />
+    </Stack>
+  ),
+};
+
+export const Combo_: Story = {
+  name: 'Combo (bar + line)',
+  render: () => (
+    <Stack gap="2" style={{ width: '40rem' }}>
+      <Heading as="h3" size="sm">
+        Revenue with cost trend
+      </Heading>
+      <ComboChart
+        data={revenueData}
+        mapping={{ x: 'month', y: ['revenue', 'cost'], seriesNames: ['Revenue', 'Cost'] }}
+        lineSeries={['Cost']}
+        aspectRatio="16 / 9"
+      />
+    </Stack>
+  ),
+};
+
+export const Gauge_: Story = {
+  name: 'Gauge',
+  render: () => (
+    <Stack gap="2" style={{ width: '24rem' }}>
+      <Heading as="h3" size="sm">
+        SLA attainment
+      </Heading>
+      <GaugeChart value={86} min={0} max={100} aspectRatio="2 / 1" />
+    </Stack>
+  ),
+};
+
+export const RadialBar_: Story = {
+  name: 'Radial bar',
+  render: () => (
+    <Stack gap="2" style={{ width: '24rem' }}>
+      <Heading as="h3" size="sm">
+        Traffic by source
+      </Heading>
+      <RadialBarChart
+        data={trafficData}
+        mapping={{ x: 'source', y: 'visits' }}
+        innerRadius={0.35}
+        aspectRatio="1 / 1"
+      />
+    </Stack>
+  ),
+};
+
+const funnelData = [
+  { stage: 'Visited', value: 12000 },
+  { stage: 'Signed up', value: 5200 },
+  { stage: 'Activated', value: 3100 },
+  { stage: 'Subscribed', value: 1450 },
+];
+
+export const Funnel_: Story = {
+  name: 'Funnel',
+  render: () => (
+    <Stack gap="2" style={{ width: '32rem' }}>
+      <Heading as="h3" size="sm">
+        Activation funnel
+      </Heading>
+      <FunnelChart data={funnelData} mapping={{ x: 'stage', y: 'value' }} aspectRatio="4 / 3" />
+    </Stack>
+  ),
+};
+
+const bubbleData = Array.from({ length: 18 }, (_, i) => ({
+  x: Math.round(Math.random() * 100),
+  y: Math.round(Math.random() * 100),
+  size: Math.round(Math.random() * 40 + 5),
+  group: i % 3 === 0 ? 'A' : i % 3 === 1 ? 'B' : 'C',
+}));
+
+export const Bubble_: Story = {
+  name: 'Bubble',
+  render: () => (
+    <Stack gap="2" style={{ width: '40rem' }}>
+      <Heading as="h3" size="sm">
+        Accounts by size & engagement
+      </Heading>
+      <BubbleChart
+        data={bubbleData}
+        mapping={{ x: 'x', y: 'y', sizeField: 'size', groupField: 'group' }}
+        aspectRatio="16 / 9"
+      />
+    </Stack>
+  ),
+};
+
+export const Bullet_: Story = {
+  name: 'Bullet',
+  render: () => (
+    <Stack gap="2" style={{ width: '32rem' }}>
+      <Heading as="h3" size="sm">
+        KPIs vs. target
+      </Heading>
+      <BulletChart
+        data={[
+          { label: 'Revenue', value: 84 },
+          { label: 'Signups', value: 62 },
+          { label: 'NPS', value: 47 },
+        ]}
+        mapping={{ x: 'label', y: 'value' }}
+        aspectRatio="2 / 1"
+      />
+    </Stack>
+  ),
+};
+
+const heatmapData = [
+  { day: 'Mon', morning: 4, afternoon: 9, evening: 6 },
+  { day: 'Tue', morning: 6, afternoon: 12, evening: 5 },
+  { day: 'Wed', morning: 8, afternoon: 14, evening: 7 },
+  { day: 'Thu', morning: 5, afternoon: 11, evening: 9 },
+  { day: 'Fri', morning: 9, afternoon: 16, evening: 12 },
+];
+
+export const Heatmap_: Story = {
+  name: 'Heatmap',
+  render: () => (
+    <Stack gap="2" style={{ width: '32rem' }}>
+      <Heading as="h3" size="sm">
+        Sessions by day & time
+      </Heading>
+      <HeatmapChart
+        data={heatmapData}
+        mapping={{ x: 'day', y: ['morning', 'afternoon', 'evening'] }}
+        showValues
+        aspectRatio="16 / 9"
+      />
+    </Stack>
+  ),
+};
+
+const ohlcData = Array.from({ length: 14 }, (_, i) => {
+  const open = 100 + Math.round(Math.sin(i / 2) * 10);
+  const close = open + Math.round((Math.random() - 0.5) * 12);
+  return {
+    day: `D${i + 1}`,
+    open,
+    high: Math.max(open, close) + Math.round(Math.random() * 6),
+    low: Math.min(open, close) - Math.round(Math.random() * 6),
+    close,
+  };
+});
+
+export const Candlestick_: Story = {
+  name: 'Candlestick',
+  render: () => (
+    <Stack gap="2" style={{ width: '40rem' }}>
+      <Heading as="h3" size="sm">
+        Price (OHLC)
+      </Heading>
+      <CandlestickChart
+        data={ohlcData}
+        mapping={{ x: 'day', y: ['open', 'high', 'low', 'close'] }}
+        aspectRatio="16 / 9"
+      />
+    </Stack>
+  ),
+};
+
+const boxplotData = [
+  { group: 'API', low: 20, q1: 45, median: 60, q3: 80, high: 120 },
+  { group: 'Web', low: 30, q1: 55, median: 72, q3: 95, high: 150 },
+  { group: 'Worker', low: 10, q1: 25, median: 38, q3: 52, high: 90 },
+];
+
+export const Boxplot_: Story = {
+  name: 'Boxplot',
+  render: () => (
+    <Stack gap="2" style={{ width: '32rem' }}>
+      <Heading as="h3" size="sm">
+        Latency distribution
+      </Heading>
+      <BoxplotChart
+        data={boxplotData}
+        mapping={{ x: 'group', y: ['low', 'q1', 'median', 'q3', 'high'] }}
+        aspectRatio="16 / 9"
+      />
+    </Stack>
+  ),
+};
+
+export const Marimekko_: Story = {
+  name: 'Marimekko',
+  render: () => (
+    <Stack gap="2" style={{ width: '40rem' }}>
+      <Heading as="h3" size="sm">
+        Revenue mix by segment
+      </Heading>
+      <MarimekkoChart
+        data={[
+          { segment: 'Enterprise', value: 5200 },
+          { segment: 'Mid-market', value: 3100 },
+          { segment: 'SMB', value: 1800 },
+          { segment: 'Self-serve', value: 900 },
+        ]}
+        mapping={{ x: 'segment', y: 'value' }}
+        aspectRatio="16 / 9"
+      />
+    </Stack>
+  ),
+};
+
+export const Sankey_: Story = {
+  name: 'Sankey',
+  render: () => (
+    <Stack gap="2" style={{ width: '40rem' }}>
+      <Heading as="h3" size="sm">
+        Traffic flow
+      </Heading>
+      <SankeyChart
+        nodes={[
+          { id: 'visit', label: 'Visit' },
+          { id: 'signup', label: 'Sign up' },
+          { id: 'bounce', label: 'Bounce' },
+          { id: 'paid', label: 'Paid' },
+          { id: 'churn', label: 'Churn' },
+        ]}
+        links={[
+          { source: 'visit', target: 'signup', value: 520 },
+          { source: 'visit', target: 'bounce', value: 680 },
+          { source: 'signup', target: 'paid', value: 310 },
+          { source: 'signup', target: 'churn', value: 210 },
+        ]}
+        aspectRatio="16 / 9"
+      />
+    </Stack>
+  ),
+};
+
+export const Network_: Story = {
+  name: 'Network',
+  render: () => (
+    <Stack gap="2" style={{ width: '32rem' }}>
+      <Heading as="h3" size="sm">
+        Service dependencies
+      </Heading>
+      <NetworkChart
+        nodes={[
+          { id: 'web', group: 'frontend' },
+          { id: 'api', group: 'backend' },
+          { id: 'auth', group: 'backend' },
+          { id: 'db', group: 'data' },
+          { id: 'cache', group: 'data' },
+        ]}
+        links={[
+          { source: 'web', target: 'api' },
+          { source: 'api', target: 'auth' },
+          { source: 'api', target: 'db' },
+          { source: 'api', target: 'cache' },
+        ]}
+        aspectRatio="1 / 1"
+      />
     </Stack>
   ),
 };

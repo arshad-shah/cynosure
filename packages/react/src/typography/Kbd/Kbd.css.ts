@@ -13,8 +13,8 @@ export const kbdBase = style([
     alignItems: 'center',
     justifyContent: 'center',
     gap: '0.2em',
-    fontFamily: 'var(--cynosure-font-family-mono)',
-    fontWeight: 'var(--cynosure-font-weight-medium)',
+    fontFamily: vars.font.family.mono,
+    fontWeight: vars.font.weight.medium,
     lineHeight: 1,
     color: vars.color.foreground.default,
     backgroundColor: vars.color.background.subtle,
@@ -40,21 +40,21 @@ export const kbdIcon = style({
 
 export const kbdSize = styleVariants({
   sm: {
-    fontSize: 'var(--cynosure-font-body-xs-size)',
+    fontSize: vars.font.body.xs.size,
     paddingInline: '0.35em',
     paddingBlock: '0.1em',
     minWidth: '1.5em',
     minHeight: '1.5em',
   },
   md: {
-    fontSize: 'var(--cynosure-font-body-sm-size)',
+    fontSize: vars.font.body.sm.size,
     paddingInline: '0.45em',
     paddingBlock: '0.15em',
     minWidth: '1.75em',
     minHeight: '1.75em',
   },
   lg: {
-    fontSize: 'var(--cynosure-font-body-md-size)',
+    fontSize: vars.font.body.md.size,
     paddingInline: '0.55em',
     paddingBlock: '0.2em',
     minWidth: '2em',

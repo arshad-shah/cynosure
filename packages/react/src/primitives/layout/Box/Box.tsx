@@ -1,19 +1,9 @@
-import {
-  type CSSProperties,
-  type ElementType,
-  type ForwardedRef,
-  type ReactElement,
-  type ReactNode,
-  forwardRef,
-} from 'react';
-import { cn } from '../../../utils/cn.js';
-import { Slot } from '../../Slot.js';
+import type { CSSProperties, ElementType, ReactNode } from 'react';
 import {
   type AsChildProps,
   type LayoutProps,
-  mergeStyles,
-  resolveLayoutProps,
-  splitLayoutProps,
+  type PolymorphicProps,
+  createLayoutComponent,
 } from '../shared/index.js';
 import { box } from './Box.css.js';
 
@@ -40,40 +30,7 @@ export interface BoxOwnProps extends LayoutProps, AsChildProps {
  * Full `Box` props. Generic over the rendered element so `BoxProps<"a">`
  * carries `<a>`-specific attributes (`href`, etc.) alongside Cynosure props.
  */
-export type BoxProps<E extends ElementType = 'div'> = BoxOwnProps & {
-  /**
-   * Rendered intrinsic element or component.
-   * @default "div"
-   */
-  as?: E;
-} & Omit<React.ComponentPropsWithoutRef<E>, keyof BoxOwnProps | 'as'>;
-
-type AnyProps = BoxOwnProps & {
-  as?: ElementType;
-  [key: string]: unknown;
-};
-
-const BoxRender = (props: AnyProps, ref: ForwardedRef<Element>): ReactElement => {
-  const { as, asChild, className, style, children, ...rest } = props;
-
-  const { layoutProps, rest: domProps } = splitLayoutProps(rest as BoxOwnProps);
-
-  const layoutStyle = resolveLayoutProps(layoutProps);
-  const mergedStyle = mergeStyles(layoutStyle, style);
-
-  const Comp: ElementType = asChild ? Slot : (as ?? 'div');
-
-  return (
-    <Comp
-      ref={ref}
-      className={cn(box, className)}
-      style={mergedStyle}
-      {...(domProps as Record<string, unknown>)}
-    >
-      {children}
-    </Comp>
-  );
-};
+export type BoxProps<E extends ElementType = 'div'> = PolymorphicProps<E, BoxOwnProps>;
 
 /**
  * The zero-opinion layout primitive. Renders a `<div>` by default; accepts
@@ -83,6 +40,7 @@ const BoxRender = (props: AnyProps, ref: ForwardedRef<Element>): ReactElement =>
  * element — useful for composing layout on top of an `<a>`, `<button>`, or
  * other library component.
  */
-export const Box = forwardRef<Element, AnyProps>(BoxRender) as <E extends ElementType = 'div'>(
-  props: BoxProps<E> & { ref?: ForwardedRef<Element> },
-) => ReactElement | null;
+export const Box = createLayoutComponent<BoxOwnProps>({
+  base: box,
+  displayName: 'Box',
+});

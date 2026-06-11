@@ -1,22 +1,13 @@
-import {
-  type CSSProperties,
-  type ElementType,
-  type ForwardedRef,
-  type ReactElement,
-  type ReactNode,
-  forwardRef,
-} from 'react';
-import { cn } from '../../../utils/cn.js';
-import { Slot } from '../../Slot.js';
+import type { CSSProperties, ElementType, ReactNode } from 'react';
 import {
   type AsChildProps,
   type LayoutProps,
+  type PolymorphicProps,
   type Responsive,
   type SpaceToken,
+  createLayoutComponent,
   mergeStyles,
-  resolveLayoutProps,
   resolveSpace,
-  splitLayoutProps,
   toResponsiveVars,
 } from '../shared/index.js';
 import { grid } from './Grid.css.js';
@@ -133,26 +124,38 @@ export interface GridOwnProps extends LayoutProps, AsChildProps {
 /**
  * Full `Grid` props. Generic over the rendered element.
  */
-export type GridProps<E extends ElementType = 'div'> = GridOwnProps & {
-  /**
-   * Rendered intrinsic element or component.
-   * @default "div"
-   */
-  as?: E;
-} & Omit<React.ComponentPropsWithoutRef<E>, keyof GridOwnProps | 'as'>;
-
-type AnyProps = GridOwnProps & { as?: ElementType; [key: string]: unknown };
+export type GridProps<E extends ElementType = 'div'> = PolymorphicProps<E, GridOwnProps>;
 
 const columnsTemplate = (n: number): string => `repeat(${n}, minmax(0, 1fr))`;
 const rowsTemplate = (n: number): string => `repeat(${n}, minmax(0, auto))`;
 
-const GridRender = (props: AnyProps, ref: ForwardedRef<Element>): ReactElement => {
-  const {
-    as,
-    asChild,
-    className,
-    style,
-    children,
+/**
+ * CSS Grid container. Pass `columns={N}` for `repeat(N, minmax(0, 1fr))` or
+ * `templateColumns="200px 1fr 200px"` for explicit tracks. `justify` controls
+ * `justify-content` (track distribution); use `justifyItems` for per-cell
+ * alignment. Children control placement through `LayoutProps.gridColumn` /
+ * `gridRow` / `gridArea`.
+ */
+export const Grid = createLayoutComponent<GridOwnProps>({
+  base: grid,
+  displayName: 'Grid',
+  ownKeys: [
+    'columns',
+    'rows',
+    'templateColumns',
+    'templateRows',
+    'autoFlow',
+    'autoColumns',
+    'autoRows',
+    'gap',
+    'columnGap',
+    'rowGap',
+    'align',
+    'justifyItems',
+    'alignContent',
+    'justify',
+  ],
+  resolveStyle: ({
     columns,
     rows,
     templateColumns,
@@ -167,64 +170,34 @@ const GridRender = (props: AnyProps, ref: ForwardedRef<Element>): ReactElement =
     justifyItems,
     alignContent,
     justify,
-    ...rest
-  } = props;
-
-  const { layoutProps, rest: domProps } = splitLayoutProps(rest as GridOwnProps);
-
-  const layoutStyle = resolveLayoutProps(layoutProps);
-  // Explicit templates win over the `columns`/`rows` shorthands.
-  const colsValue = templateColumns ?? (columns !== undefined ? columns : undefined);
-  const rowsValue = templateRows ?? (rows !== undefined ? rows : undefined);
-
-  const gridStyle = mergeStyles(
-    toResponsiveVars(colsValue, 'cynosure-grid-cols', (v) =>
-      typeof v === 'number' ? columnsTemplate(v) : (v as string),
-    ),
-    toResponsiveVars(rowsValue, 'cynosure-grid-rows', (v) =>
-      typeof v === 'number' ? rowsTemplate(v) : (v as string),
-    ),
-    toResponsiveVars(autoFlow, 'cynosure-grid-flow', (v) => v),
-    toResponsiveVars(autoColumns, 'cynosure-grid-auto-cols', (v) => v),
-    toResponsiveVars(autoRows, 'cynosure-grid-auto-rows', (v) => v),
-    // `gap` writes to both longhand vars so the `column-gap` / `row-gap`
-    // CSS declarations in `Grid.css.ts` always have a value to resolve to;
-    // writing only the `cynosure-grid-gap` var would leave the longhands
-    // invalid and revert to `normal`. `columnGap` / `rowGap` props are
-    // merged after (later keys in `Object.assign` win), so they override
-    // the individual axis as expected.
-    toResponsiveVars(gap, 'cynosure-grid-col-gap', (v) => resolveSpace(v)),
-    toResponsiveVars(gap, 'cynosure-grid-row-gap', (v) => resolveSpace(v)),
-    toResponsiveVars(columnGap, 'cynosure-grid-col-gap', (v) => resolveSpace(v)),
-    toResponsiveVars(rowGap, 'cynosure-grid-row-gap', (v) => resolveSpace(v)),
-    toResponsiveVars(align, 'cynosure-grid-align', (v) => ITEMS_MAP[v]),
-    toResponsiveVars(justifyItems, 'cynosure-grid-justify-items', (v) => ITEMS_MAP[v]),
-    toResponsiveVars(alignContent, 'cynosure-grid-align-content', (v) => CONTENT_MAP[v]),
-    toResponsiveVars(justify, 'cynosure-grid-justify', (v) => CONTENT_MAP[v]),
-  );
-  const mergedStyle = mergeStyles(layoutStyle, gridStyle, style);
-
-  const Comp: ElementType = asChild ? Slot : (as ?? 'div');
-
-  return (
-    <Comp
-      ref={ref}
-      className={cn(grid, className)}
-      style={mergedStyle}
-      {...(domProps as Record<string, unknown>)}
-    >
-      {children}
-    </Comp>
-  );
-};
-
-/**
- * CSS Grid container. Pass `columns={N}` for `repeat(N, minmax(0, 1fr))` or
- * `templateColumns="200px 1fr 200px"` for explicit tracks. `justify` controls
- * `justify-content` (track distribution); use `justifyItems` for per-cell
- * alignment. Children control placement through `LayoutProps.gridColumn` /
- * `gridRow` / `gridArea`.
- */
-export const Grid = forwardRef<Element, AnyProps>(GridRender) as <E extends ElementType = 'div'>(
-  props: GridProps<E> & { ref?: ForwardedRef<Element> },
-) => ReactElement | null;
+  }) => {
+    // Explicit templates win over the `columns`/`rows` shorthands.
+    const colsValue = templateColumns ?? (columns !== undefined ? columns : undefined);
+    const rowsValue = templateRows ?? (rows !== undefined ? rows : undefined);
+    return mergeStyles(
+      toResponsiveVars(colsValue, 'cynosure-grid-cols', (v) =>
+        typeof v === 'number' ? columnsTemplate(v) : (v as string),
+      ),
+      toResponsiveVars(rowsValue, 'cynosure-grid-rows', (v) =>
+        typeof v === 'number' ? rowsTemplate(v) : (v as string),
+      ),
+      toResponsiveVars(autoFlow, 'cynosure-grid-flow', (v) => v),
+      toResponsiveVars(autoColumns, 'cynosure-grid-auto-cols', (v) => v),
+      toResponsiveVars(autoRows, 'cynosure-grid-auto-rows', (v) => v),
+      // `gap` writes to both longhand vars so the `column-gap` / `row-gap`
+      // CSS declarations in `Grid.css.ts` always have a value to resolve to;
+      // writing only the `cynosure-grid-gap` var would leave the longhands
+      // invalid and revert to `normal`. `columnGap` / `rowGap` props are
+      // merged after (later keys in `Object.assign` win), so they override
+      // the individual axis as expected.
+      toResponsiveVars(gap, 'cynosure-grid-col-gap', (v) => resolveSpace(v)),
+      toResponsiveVars(gap, 'cynosure-grid-row-gap', (v) => resolveSpace(v)),
+      toResponsiveVars(columnGap, 'cynosure-grid-col-gap', (v) => resolveSpace(v)),
+      toResponsiveVars(rowGap, 'cynosure-grid-row-gap', (v) => resolveSpace(v)),
+      toResponsiveVars(align, 'cynosure-grid-align', (v) => ITEMS_MAP[v]),
+      toResponsiveVars(justifyItems, 'cynosure-grid-justify-items', (v) => ITEMS_MAP[v]),
+      toResponsiveVars(alignContent, 'cynosure-grid-align-content', (v) => CONTENT_MAP[v]),
+      toResponsiveVars(justify, 'cynosure-grid-justify', (v) => CONTENT_MAP[v]),
+    );
+  },
+});

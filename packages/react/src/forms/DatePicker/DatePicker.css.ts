@@ -16,8 +16,8 @@ export const pickerRoot = style([
   {
     width: '100%',
     color: vars.color.foreground.default,
-    fontSize: 'var(--cynosure-font-body-md-size)',
-    lineHeight: 'var(--cynosure-font-body-md-line-height)',
+    fontSize: vars.font.body.md.size,
+    lineHeight: vars.font.body.md.lineHeight,
     selectors: {
       // Variants first, states after — equal specificity, so source order
       // lets the focus/invalid borders win over the variant's border reset.

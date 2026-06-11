@@ -63,6 +63,16 @@
         "border": { "$type": "color", "$value": "{color.blue.200}" },
         "onSolid": { "$type": "color", "$value": "#ffffff" }
       }
+    },
+    "chart": {
+      "1": { "$type": "color", "$value": "{color.iris.600}" },
+      "2": { "$type": "color", "$value": "{color.violet.600}" },
+      "3": { "$type": "color", "$value": "#c77dff" },
+      "4": { "$type": "color", "$value": "{color.blue.600}" },
+      "5": { "$type": "color", "$value": "#0891b2" },
+      "6": { "$type": "color", "$value": "{color.green.600}" },
+      "7": { "$type": "color", "$value": "{color.amber.600}" },
+      "8": { "$type": "color", "$value": "{color.red.600}" }
     }
   }
 }

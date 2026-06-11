@@ -123,13 +123,13 @@ export const heroHex = style({
 });
 
 export const heroHexBySize = styleVariants({
-  sm: { fontSize: 'var(--cynosure-font-body-sm-size)' },
-  md: { fontSize: 'var(--cynosure-font-body-md-size)' },
-  lg: { fontSize: 'var(--cynosure-font-body-lg-size)' },
+  sm: { fontSize: vars.font.body.sm.size },
+  md: { fontSize: vars.font.body.md.size },
+  lg: { fontSize: vars.font.body.lg.size },
 });
 
 export const heroReadout = style({
-  fontSize: 'var(--cynosure-font-body-sm-size)',
+  fontSize: vars.font.body.sm.size,
   color: vars.color.foreground.muted,
   fontVariantNumeric: 'tabular-nums',
   marginTop: '2px',
@@ -223,7 +223,7 @@ export const field = style({
   background: vars.color.background.surface,
   color: vars.color.foreground.default,
   font: 'inherit',
-  fontFamily: 'var(--cynosure-font-body-md-family)',
+  fontFamily: vars.font.body.md.family,
   outline: 'none',
   selectors: {
     '&:focus': {

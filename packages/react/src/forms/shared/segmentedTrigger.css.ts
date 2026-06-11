@@ -49,9 +49,9 @@ export const triggerTrack = style([
 
 /** Track font + outer radius per size (mirrors NumberInput's track scale). */
 export const triggerTrackSize = styleVariants({
-  sm: { borderRadius: vars.radius.md, fontSize: 'var(--cynosure-font-body-sm-size)' },
-  md: { borderRadius: vars.radius.lg, fontSize: 'var(--cynosure-font-body-md-size)' },
-  lg: { borderRadius: vars.radius.lg, fontSize: 'var(--cynosure-font-body-lg-size)' },
+  sm: { borderRadius: vars.radius.md, fontSize: vars.font.body.sm.size },
+  md: { borderRadius: vars.radius.lg, fontSize: vars.font.body.md.size },
+  lg: { borderRadius: vars.radius.lg, fontSize: vars.font.body.lg.size },
 });
 
 /** Base raised tile shared by the value and chevron segments. */
@@ -122,17 +122,17 @@ export const triggerTileSize = styleVariants({
   sm: {
     minHeight: '2rem',
     borderRadius: vars.radius.sm,
-    fontSize: 'var(--cynosure-font-body-sm-size)',
+    fontSize: vars.font.body.sm.size,
   },
   md: {
     minHeight: '2.5rem',
     borderRadius: vars.radius.md,
-    fontSize: 'var(--cynosure-font-body-md-size)',
+    fontSize: vars.font.body.md.size,
   },
   lg: {
     minHeight: '3rem',
     borderRadius: vars.radius.md,
-    fontSize: 'var(--cynosure-font-body-lg-size)',
+    fontSize: vars.font.body.lg.size,
   },
 });
 

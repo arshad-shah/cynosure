@@ -74,8 +74,8 @@ export const paletteInput = style({
   background: 'transparent',
   color: vars.color.foreground.default,
   font: 'inherit',
-  fontSize: 'var(--cynosure-font-body-lg-size)',
-  lineHeight: 'var(--cynosure-font-body-lg-line-height)',
+  fontSize: vars.font.body.lg.size,
+  lineHeight: vars.font.body.lg.lineHeight,
   padding: 0,
   '::placeholder': {
     color: vars.color.foreground.subtle,
@@ -117,7 +117,7 @@ export const paletteEmpty = style({
   gap: vars.space['1'],
   padding: `${vars.space['10']} ${vars.space['4']}`,
   color: vars.color.foreground.muted,
-  fontSize: 'var(--cynosure-font-body-md-size)',
+  fontSize: vars.font.body.md.size,
   textAlign: 'center',
 });
 
@@ -128,7 +128,7 @@ export const paletteLoading = style({
   gap: vars.space['2'],
   padding: `${vars.space['6']} ${vars.space['4']}`,
   color: vars.color.foreground.muted,
-  fontSize: 'var(--cynosure-font-body-sm-size)',
+  fontSize: vars.font.body.sm.size,
 });
 
 export const paletteGroup = style({
@@ -168,8 +168,8 @@ export const paletteItem = style({
   borderRadius: vars.radius.md,
   cursor: 'pointer',
   color: vars.color.foreground.default,
-  fontSize: 'var(--cynosure-font-body-md-size)',
-  lineHeight: 'var(--cynosure-font-body-md-line-height)',
+  fontSize: vars.font.body.md.size,
+  lineHeight: vars.font.body.md.lineHeight,
   userSelect: 'none',
   transitionProperty: 'background-color, color',
   transitionDuration: vars.duration.fast,
@@ -218,7 +218,7 @@ export const paletteItemLabel = style({
 });
 
 export const paletteItemDescription = style({
-  fontSize: 'var(--cynosure-font-body-sm-size)',
+  fontSize: vars.font.body.sm.size,
   color: vars.color.foreground.muted,
   overflow: 'hidden',
   textOverflow: 'ellipsis',

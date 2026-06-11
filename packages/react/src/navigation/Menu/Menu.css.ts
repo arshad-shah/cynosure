@@ -22,8 +22,8 @@ export const menuItemBase = style({
   borderRadius: vars.radius.sm,
   cursor: 'pointer',
   textAlign: 'left',
-  fontSize: 'var(--cynosure-font-body-md-size)',
-  fontFamily: 'var(--cynosure-font-body-md-family)',
+  fontSize: vars.font.body.md.size,
+  fontFamily: vars.font.body.md.family,
   fontWeight: 500,
   width: '100%',
   selectors: {
@@ -69,7 +69,7 @@ export const menuItemLabel = style({
 
 export const menuGroupLabel = style({
   flex: '1 1 auto',
-  fontSize: 'var(--cynosure-font-body-sm-size)',
+  fontSize: vars.font.body.sm.size,
   fontWeight: 600,
   color: vars.color.foreground.muted,
   textTransform: 'uppercase',

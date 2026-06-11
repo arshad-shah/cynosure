@@ -1,6 +1,6 @@
 ---
 title: React Server Components
-description: Using Cynosure with React Server Components and Next.js App Router — where to place the "use client" boundary.
+description: Using Cynosure with React Server Components and Next.js App Router — every component ships "use client", so there's no boundary to wire.
 order: 4
 category: getting-started
 ---
@@ -8,23 +8,37 @@ category: getting-started
 # Server Components & SSR
 
 Cynosure works with **Next.js App Router**, **Remix**, and any other framework
-that supports React Server Components. Every component is also safe to render
-on the server (SSR) — hydration is deterministic as long as the theme attribute
-is set before the first paint.
+that supports React Server Components.
 
-## The rule of thumb
+## Every component ships `'use client'`
 
-- **Presentational / structural** components are safe inside Server Components. They render pure markup.
-- **Interactive** components need to live in a Client Component (`'use client'`) because they use state, event handlers, refs, portals, or React Context.
+Cynosure components use hooks, refs, and (for interactive ones) state, event
+handlers, portals, and Context — none of which are valid in a React **Server
+Component**. So every published component entry ships the `'use client'`
+directive. In practice that means:
 
-That's it. Every Cynosure import works in both environments; the boundary is
-where _your_ component uses it.
+- **You can import any component directly into a Server Component** — including
+  your root `layout.tsx` or a `page.tsx` — with **no `'use client'` wrapper file
+  of your own.** Next.js sees the directive and places the component in the
+  client graph for you.
+- Components still **server-render (SSR) and hydrate** normally. "Client
+  component" means it ships a little JS and hydrates — not that it's skipped on
+  the server.
+- Only **your own** components that use state/hooks/handlers still need their own
+  `'use client'` — that's a rule about your code, not Cynosure's.
+
+> Trade-off: because structural primitives (`Box`, `Text`, `Card`, …) are client
+> components, they ship their (tiny) JS to the browser rather than rendering to
+> zero-JS server markup. We consider that a fair price for "import anything,
+> anywhere, with no boundary to manage" — and the per-component JS is a few
+> hundred bytes.
 
 ## Setup (Next.js App Router)
 
-`CynosureProvider` uses React Context, `useState`, and `useEffect`, so it has
-to live in a Client Component. The canonical pattern is a dedicated
-`providers.tsx`:
+`CynosureProvider` holds app-wide Context (theme, direction, locale, tooltip
+timing) and **loads the design tokens**, so mount it once near the root. It's a
+client component (it ships `'use client'`), and the cleanest place for it is a
+small `providers.tsx`:
 
 ```tsx
 // app/providers.tsx
@@ -37,8 +51,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
 ```
 
 ```tsx
-// app/layout.tsx  —  stays a Server Component
-import '@arshad-shah/cynosure-react/all.css';
+// app/layout.tsx  —  stays a Server Component, no CSS import needed
 import { Providers } from './providers';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -52,31 +65,21 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 }
 ```
 
-> **Why a wrapper file?** React Server Components disallow importing client hooks directly into server modules. Pulling the provider into `providers.tsx` keeps the root layout streamable and the provider tree a single client leaf.
-
-## Compatibility matrix
-
-| Component | Server Component? | Notes |
-| --- | :---: | --- |
-| **Layout primitives** — `Box`, `Stack`, `Inline`, `Flex`, `Grid`, `Center`, `Spacer`, `Divider`, `AspectRatio`, `Container`, `Section` | Yes | Pure markup. Render server-side. |
-| **Typography** — `Text`, `Heading`, `Link`, `Code`, `Kbd`, `Blockquote`, `List`, `OrderedList` | Yes | Pure markup. |
-| **Static feedback** — `Badge`, `Tag`, `Chip`, `Avatar`, `AvatarGroup`, `Alert`, `Banner`, `Callout`, `EmptyState`, `Skeleton`, `Spinner` | Yes | No interactivity. |
-| **Static data display** — `Card`, `Table`, `Stat`, `Progress`, `ProgressCircle`, `Timeline`, `CodeBlock` | Yes | Pure markup. |
-| **Button / IconButton / ButtonGroup** | Client | Forwards event handlers — use inside a `'use client'` file. |
-| **Form controls** — `Input`, `Textarea`, `NumberInput`, `Checkbox`, `Radio`, `Switch`, `Select`, `Combobox`, `MultiSelect`, `Slider`, `DatePicker`, `FileUpload` | Client | State, keyboard nav, portals. |
-| **Form composition** — `Form`, `FormField`, `FormControl`, `FormMessage`, RHF adapter | Client | Uses React Context. |
-| **Overlays** — `Dialog`, `AlertDialog`, `Drawer`, `Popover`, `HoverCard`, `Tooltip`, `Toast`, `DropdownMenu`, `ContextMenu`, `MenuBar` | Client | Portals + focus management. |
-| **Navigation** — `Tabs`, `NavigationMenu`, `Menu`, `Sidebar`, `Stepper`, `BackToTop` | Client | Stateful. `Breadcrumb`, `Pagination`, `Anchor` are safe server-side when rendered statically. |
-| **Interactive data display** — `DataTable`, `Tree`, `Accordion`, `Collapsible`, `ScrollArea`, `Resizable`, `Toggle`, `ToggleGroup` | Client | State, refs, event handlers. |
-| **Providers** — `CynosureProvider`, `ThemeProvider`, `DirectionProvider`, `LocaleProvider`, `TooltipProvider` | Client | Wrap once in a client boundary (usually the root layout). |
+There's **no stylesheet import** in `layout.tsx`: `CynosureProvider` loads the
+design tokens, and each component's CSS auto-loads when you import the component.
 
 ## Patterns
 
-### Render a static card from a Server Component
+### Use components directly in a Server Component
+
+No wrapper file required — import and render:
 
 ```tsx
 // app/page.tsx  —  Server Component
-import { Card, Heading, Text, Stack } from '@arshad-shah/cynosure-react';
+import { Card } from '@arshad-shah/cynosure-react/card';
+import { Heading } from '@arshad-shah/cynosure-react/heading';
+import { Text } from '@arshad-shah/cynosure-react/text';
+import { Stack } from '@arshad-shah/cynosure-react/stack';
 
 export default async function Page() {
   const data = await fetchData(); // safe server-side work
@@ -91,32 +94,31 @@ export default async function Page() {
 }
 ```
 
-### Put interactivity in its own file
+### Your own stateful code still needs `'use client'`
+
+The directive Cynosure ships covers *its* components. A component **you** write
+that holds state or handlers is a client component and needs its own directive:
 
 ```tsx
 // app/contact-form.tsx
 'use client';
-import { Form, FormField, Input, Button } from '@arshad-shah/cynosure-react';
+import { useState } from 'react';
+import { Form, FormField } from '@arshad-shah/cynosure-react/form';
+import { Input } from '@arshad-shah/cynosure-react/input';
+import { Button } from '@arshad-shah/cynosure-react/button';
 
 export function ContactForm() {
-  // state / handlers
-}
-```
-
-```tsx
-// app/page.tsx  —  still a Server Component
-import { ContactForm } from './contact-form';
-export default function Page() {
-  return <ContactForm />;
+  const [value, setValue] = useState('');
+  // …
 }
 ```
 
 ## Streaming, Suspense & `loading.tsx`
 
-Every Cynosure component is pure with respect to render output — no
-module-level side effects, no `typeof window` branching, no localStorage
-access outside `useEffect`. You can suspend at any point and use `<Skeleton>`
-/ `<Spinner>` inside `loading.tsx` without warnings.
+Cynosure components are pure with respect to render output — no module-level side
+effects, no `typeof window` branching at render, no `localStorage` access outside
+`useEffect`. You can suspend at any point and use `<Skeleton>` / `<Spinner>`
+inside `loading.tsx` without warnings.
 
 ## React 18 vs React 19
 
@@ -125,15 +127,20 @@ Cynosure supports **React 18 and 19**. RSC works on both — Next.js 13 / 14
 
 ## FAQ
 
+**Do I need a `'use client'` wrapper to use a Cynosure component in a Server Component?**
+No. Every Cynosure component already ships the directive, so you can import and
+render it directly in a Server Component.
+
 **Do I need `suppressHydrationWarning` on `<html>`?**
 Only if you toggle themes before hydration via the theme init script. The
 attribute change is intentional and React would otherwise warn.
 
 **Can I import from a sub-path inside a Server Component?**
-Yes — `import { Card } from '@arshad-shah/cynosure-react/card'` works
-identically. Sub-path imports just keep the bundle smaller for that leaf.
+Yes — `import { Card } from '@arshad-shah/cynosure-react/card'` works identically
+and keeps the bundle smaller for that leaf. Prefer sub-path imports.
 
-**Do I need `'use client'` on my entire page to use one button?**
-No. Put the interactive piece in its own file with `'use client'` at the top,
-import that file from the Server Component. That keeps the rest of the tree
-on the server.
+**Do I still need to import a stylesheet?**
+No — mounting `CynosureProvider` loads the design tokens, and component CSS
+auto-loads on import. (Provider-less or non-React surfaces can import
+`@arshad-shah/cynosure-react/all.css` or `@arshad-shah/cynosure-tokens/css`
+manually.)

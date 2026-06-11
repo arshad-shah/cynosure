@@ -1,6 +1,6 @@
 ---
 title: Chart
-description: Themed wrappers around SwiftChart — line, area, bar, pie, donut, scatter, and radar — that follow Cynosure tokens out of the box.
+description: 25 themed wrappers around SwiftChart — from line, bar and pie to gauge, funnel, heatmap, candlestick and sankey — that follow Cynosure tokens out of the box.
 category: components
 status: stable
 since: "0.1.0"
@@ -51,6 +51,46 @@ const data = [
 
 <LivePreview example="chart/donut" />
 
+## Chart catalogue
+
+Cynosure wraps every chart type SwiftChart ships, each pre-themed and exported from `@arshad-shah/cynosure-react/chart`:
+
+| Category | Charts |
+| --- | --- |
+| Trends | `LineChart`, `AreaChart`, `StackedAreaChart`, `Sparkline` |
+| Comparison | `BarChart`, `HBarChart`, `StackedBarChart`, `ComboChart`, `MarimekkoChart`, `RadarChart` |
+| Part-to-whole | `PieChart`, `DonutChart`, `TreemapChart`, `FunnelChart`, `RadialBarChart` |
+| KPI & gauges | `GaugeChart`, `BulletChart` |
+| Distribution | `ScatterChart`, `BubbleChart`, `BoxplotChart`, `HeatmapChart` |
+| Finance | `CandlestickChart`, `WaterfallChart` |
+| Flow & graph | `SankeyChart`, `NetworkChart` |
+
+`SankeyChart` and `NetworkChart` take `nodes` + `links` instead of `data` + `mapping`.
+
+## Theming
+
+Charts paint to a `<canvas>`, which can't read CSS variables at draw time — so each wrapper reads a small set of `--cynosure-chart-*` custom properties off its container and materialises a SwiftChart theme from them. Those properties map straight to Cynosure tokens, so **a chart automatically follows whatever theme is active** — light, dark, `terminal`, `high-contrast`, or your own custom theme. Switch the theme at runtime and the charts repaint to match.
+
+Recolour a single series — or the whole palette — by overriding the contract on any ancestor (or via the chart's `style` prop); no JavaScript required:
+
+```css
+:root {
+  /* Categorical series palette (indexed 1–8, cycles beyond) */
+  --cynosure-chart-1: #5663e6;
+  --cynosure-chart-2: #0891b2;
+  /* Structural slots also available: --cynosure-chart-grid, -axis, -text,
+     -text-muted, -positive, -negative, -tooltip-bg, -tooltip-border, … */
+}
+```
+
+```tsx
+// One-off override, scoped to this chart only
+<BarChart data={data} mapping={{ x: 'month', y: 'revenue' }}
+  style={{ '--cynosure-chart-1': '#16a34a' }} />
+```
+
+Need a wholly different look? Pass `theme` directly — any value SwiftChart accepts (a built-in name, a name you registered with `addTheme`, or a full `Theme` object) is forwarded untouched and wins over the auto-resolved theme.
+
 ## Sizing
 
 Each chart wraps in a sized container. Use `aspectRatio` for fluid responsive charts (default `"16 / 9"`), or pass an explicit `height` for fixed dashboards. `minHeight` (default `220`) keeps the chart usable inside flex containers.
@@ -63,13 +103,13 @@ Each chart wraps in a sized container. Use `aspectRatio` for fluid responsive ch
 
 - Charts paint to a `<canvas>` — provide a descriptive `aria-label` (or a visible heading) so the chart's purpose is announced.
 - Pair quantitative charts with a hidden data table (or `<details>` block) so screen-reader users can access the raw values.
-- The default palette adapts to the active color scheme via the registered `cynosure-light` / `cynosure-dark` SwiftChart themes.
+- The palette and surface colours adapt to the active theme automatically via the `--cynosure-chart-*` token contract (see [Theming](#theming)).
 - Tooltips fire on pointer move and on focus where supported.
 - Color alone never conveys meaning — series names are surfaced via the legend and tooltips.
 
 ## Recipes
 
 - Use `aspectRatio="16 / 9"` for hero charts; set `height` for fixed-size dashboards.
-- Pass a custom `theme` to override the default light/dark theme registration.
+- Override `--cynosure-chart-*` (see [Theming](#theming)) to recolour series without touching JS; pass a custom `theme` only when you need a wholly different look.
 - Combine `smooth` + `dots` for a clean, readable trendline.
-- Use the named chart you need — `LineChart`, `BarChart`, `AreaChart`, `PieChart`, `DonutChart`, `RadarChart`, `ScatterChart`, `WaterfallChart`, `TreemapChart`, or `Sparkline`.
+- Reach for the chart that fits the data — see the [chart catalogue](#chart-catalogue) for all 25.

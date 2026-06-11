@@ -40,19 +40,19 @@ export const stepperRootSize = styleVariants({
   sm: {
     vars: {
       '--cynosure-stepper-marker': '1.5rem',
-      '--cynosure-stepper-marker-font': 'var(--cynosure-font-body-xs-size)',
+      '--cynosure-stepper-marker-font': vars.font.body.xs.size,
     },
   },
   md: {
     vars: {
       '--cynosure-stepper-marker': '1.75rem',
-      '--cynosure-stepper-marker-font': 'var(--cynosure-font-body-sm-size)',
+      '--cynosure-stepper-marker-font': vars.font.body.sm.size,
     },
   },
   lg: {
     vars: {
       '--cynosure-stepper-marker': '2.25rem',
-      '--cynosure-stepper-marker-font': 'var(--cynosure-font-body-md-size)',
+      '--cynosure-stepper-marker-font': vars.font.body.md.size,
     },
   },
 });
@@ -197,7 +197,7 @@ export const stepperMarker = style({
   border: `1px solid ${vars.color.border.default}`,
   background: vars.color.background.surface,
   color: vars.color.foreground.muted,
-  fontFamily: 'var(--cynosure-font-body-sm-family)',
+  fontFamily: vars.font.body.sm.family,
   fontSize: 'var(--cynosure-stepper-marker-font, var(--cynosure-font-body-sm-size))',
   fontWeight: 600,
   fontVariantNumeric: 'tabular-nums',
@@ -230,8 +230,8 @@ export const stepperMarker = style({
 });
 
 export const stepperTitle = style({
-  fontFamily: 'var(--cynosure-font-body-md-family)',
-  fontSize: 'var(--cynosure-font-body-md-size)',
+  fontFamily: vars.font.body.md.family,
+  fontSize: vars.font.body.md.size,
   fontWeight: 600,
   color: vars.color.foreground.default,
   margin: 0,
@@ -248,7 +248,7 @@ export const stepperTitle = style({
 });
 
 export const stepperDescription = style({
-  fontSize: 'var(--cynosure-font-body-sm-size)',
+  fontSize: vars.font.body.sm.size,
   color: vars.color.foreground.muted,
   margin: 0,
   lineHeight: 1.4,

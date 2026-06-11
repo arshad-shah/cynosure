@@ -17,8 +17,8 @@ export const avatarRoot = style({
   flex: '0 0 auto',
   userSelect: 'none',
   verticalAlign: 'middle',
-  fontFamily: 'var(--cynosure-font-body-md-family)',
-  fontWeight: 'var(--cynosure-font-weight-medium)',
+  fontFamily: vars.font.body.md.family,
+  fontWeight: vars.font.weight.medium,
   background: vars.color.background.muted,
   color: vars.color.foreground.default,
 });

@@ -52,6 +52,17 @@
   --cynosure-color-feedback-info-foreground: #0040c0;
   --cynosure-color-feedback-info-border: #0040c0;
 
+  /* Chart series palette — fully saturated, dark, maximally distinct hues that
+     each clear AA against the white canvas. */
+  --cynosure-color-chart-1: #0040c0;
+  --cynosure-color-chart-2: #7a00cc;
+  --cynosure-color-chart-3: #b00000;
+  --cynosure-color-chart-4: #006400;
+  --cynosure-color-chart-5: #8a5a00;
+  --cynosure-color-chart-6: #006d77;
+  --cynosure-color-chart-7: #c71585;
+  --cynosure-color-chart-8: #303030;
+
   --cynosure-shadow-component-focus: 0 0 0 3px #0040c0;
 }
 
@@ -85,6 +96,17 @@
   --cynosure-color-accent-soft-active: #2a2a2a;
   --cynosure-color-accent-ring: #ffd400;
   --cynosure-color-accent-on-solid: #000000;
+
+  /* Chart series palette — bright, maximally distinct hues that each clear AA
+     against the black canvas. */
+  --cynosure-color-chart-1: #4da3ff;
+  --cynosure-color-chart-2: #c08bff;
+  --cynosure-color-chart-3: #ff6b6b;
+  --cynosure-color-chart-4: #4ade80;
+  --cynosure-color-chart-5: #ffd400;
+  --cynosure-color-chart-6: #2dd4bf;
+  --cynosure-color-chart-7: #ff8ad6;
+  --cynosure-color-chart-8: #e4e4e7;
 
   --cynosure-shadow-component-focus: 0 0 0 3px #ffd400;
 }

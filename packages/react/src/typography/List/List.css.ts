@@ -1,6 +1,7 @@
 import { style } from '@vanilla-extract/css';
 import { MEDIA_QUERIES } from '../../primitives/layout/shared/breakpoints.js';
 import { layoutPropsStyle } from '../../primitives/layout/shared/layoutStyle.css.js';
+import { vars } from '../../styles/vars.css.js';
 import { typographyBase } from '../shared/shared.css.js';
 
 const cascade = (base: string, bps: string[]): string => {
@@ -92,7 +93,7 @@ export const descriptionListBase = style([
 
 export const descriptionTerm = style({
   margin: 0,
-  fontWeight: 'var(--cynosure-font-weight-semibold)',
+  fontWeight: vars.font.weight.semibold,
 });
 
 export const descriptionDetails = style({

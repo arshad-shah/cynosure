@@ -92,7 +92,7 @@ export const tabsTriggerBase = style({
   border: 'none',
   background: 'transparent',
   color: 'inherit',
-  fontFamily: 'var(--cynosure-font-body-md-family)',
+  fontFamily: vars.font.body.md.family,
   fontWeight: 500,
   cursor: 'pointer',
   outline: 'none',
@@ -119,19 +119,19 @@ export const tabsTriggerSize = styleVariants({
   sm: {
     paddingBlock: vars.space['1'],
     paddingInline: vars.space['2'],
-    fontSize: 'var(--cynosure-font-body-sm-size)',
+    fontSize: vars.font.body.sm.size,
     minHeight: '1.75rem',
   },
   md: {
     paddingBlock: vars.space['1.5'],
     paddingInline: vars.space['3'],
-    fontSize: 'var(--cynosure-font-body-md-size)',
+    fontSize: vars.font.body.md.size,
     minHeight: '2.25rem',
   },
   lg: {
     paddingBlock: vars.space['2'],
     paddingInline: vars.space['4'],
-    fontSize: 'var(--cynosure-font-body-lg-size)',
+    fontSize: vars.font.body.lg.size,
     minHeight: '2.75rem',
   },
 });

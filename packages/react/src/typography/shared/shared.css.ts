@@ -87,29 +87,29 @@ export type BodySize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
  */
 export const bodySize: Record<BodySize, string> = styleVariants({
   xs: {
-    fontFamily: 'var(--cynosure-font-body-xs-family)',
-    fontSize: 'var(--cynosure-font-body-xs-size)',
-    lineHeight: 'var(--cynosure-font-body-xs-line-height)',
+    fontFamily: vars.font.body.xs.family,
+    fontSize: vars.font.body.xs.size,
+    lineHeight: vars.font.body.xs.lineHeight,
   },
   sm: {
-    fontFamily: 'var(--cynosure-font-body-sm-family)',
-    fontSize: 'var(--cynosure-font-body-sm-size)',
-    lineHeight: 'var(--cynosure-font-body-sm-line-height)',
+    fontFamily: vars.font.body.sm.family,
+    fontSize: vars.font.body.sm.size,
+    lineHeight: vars.font.body.sm.lineHeight,
   },
   md: {
-    fontFamily: 'var(--cynosure-font-body-md-family)',
-    fontSize: 'var(--cynosure-font-body-md-size)',
-    lineHeight: 'var(--cynosure-font-body-md-line-height)',
+    fontFamily: vars.font.body.md.family,
+    fontSize: vars.font.body.md.size,
+    lineHeight: vars.font.body.md.lineHeight,
   },
   lg: {
-    fontFamily: 'var(--cynosure-font-body-lg-family)',
-    fontSize: 'var(--cynosure-font-body-lg-size)',
-    lineHeight: 'var(--cynosure-font-body-lg-line-height)',
+    fontFamily: vars.font.body.lg.family,
+    fontSize: vars.font.body.lg.size,
+    lineHeight: vars.font.body.lg.lineHeight,
   },
   xl: {
-    fontFamily: 'var(--cynosure-font-body-lg-family)',
+    fontFamily: vars.font.body.lg.family,
     fontSize: 'var(--cynosure-font-font-size-xl, var(--cynosure-font-size-xl))',
-    lineHeight: 'var(--cynosure-font-body-lg-line-height)',
+    lineHeight: vars.font.body.lg.lineHeight,
   },
 });
 
@@ -122,10 +122,10 @@ export type WeightVariant = 'regular' | 'medium' | 'semibold' | 'bold';
  * Overrides applied per font-weight token. Keeps weight orthogonal to size.
  */
 export const weightClass: Record<WeightVariant, string> = styleVariants({
-  regular: { fontWeight: 'var(--cynosure-font-weight-regular)' },
-  medium: { fontWeight: 'var(--cynosure-font-weight-medium)' },
-  semibold: { fontWeight: 'var(--cynosure-font-weight-semibold)' },
-  bold: { fontWeight: 'var(--cynosure-font-weight-bold)' },
+  regular: { fontWeight: vars.font.weight.regular },
+  medium: { fontWeight: vars.font.weight.medium },
+  semibold: { fontWeight: vars.font.weight.semibold },
+  bold: { fontWeight: vars.font.weight.bold },
 });
 
 /**
@@ -144,18 +144,18 @@ export const textVariant: Record<TextVariant, string> = styleVariants({
   body: {},
   caption: {
     color: vars.color.foreground.muted,
-    letterSpacing: 'var(--cynosure-letter-spacing-normal)',
+    letterSpacing: vars.letter.spacing.normal,
   },
   overline: {
     textTransform: 'uppercase',
-    letterSpacing: 'var(--cynosure-letter-spacing-wide)',
-    fontWeight: 'var(--cynosure-font-weight-semibold)',
+    letterSpacing: vars.letter.spacing.wide,
+    fontWeight: vars.font.weight.semibold,
     color: vars.color.foreground.muted,
   },
   lead: {
     color: vars.color.foreground.muted,
-    fontWeight: 'var(--cynosure-font-weight-regular)',
-    lineHeight: 'var(--cynosure-line-height-relaxed)',
+    fontWeight: vars.font.weight.regular,
+    lineHeight: vars.line.height.relaxed,
   },
 });
 
@@ -173,61 +173,61 @@ export type HeadingSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | '3xl' | '4x
  */
 export const headingSize: Record<HeadingSize, string> = styleVariants({
   xs: {
-    fontFamily: 'var(--cynosure-font-body-xs-family)',
-    fontSize: 'var(--cynosure-font-body-xs-size)',
-    lineHeight: 'var(--cynosure-font-body-xs-line-height)',
+    fontFamily: vars.font.body.xs.family,
+    fontSize: vars.font.body.xs.size,
+    lineHeight: vars.font.body.xs.lineHeight,
   },
   sm: {
-    fontFamily: 'var(--cynosure-font-body-sm-family)',
-    fontSize: 'var(--cynosure-font-body-sm-size)',
-    lineHeight: 'var(--cynosure-font-body-sm-line-height)',
+    fontFamily: vars.font.body.sm.family,
+    fontSize: vars.font.body.sm.size,
+    lineHeight: vars.font.body.sm.lineHeight,
   },
   md: {
-    fontFamily: 'var(--cynosure-font-body-md-family)',
-    fontSize: 'var(--cynosure-font-body-md-size)',
-    lineHeight: 'var(--cynosure-font-body-md-line-height)',
+    fontFamily: vars.font.body.md.family,
+    fontSize: vars.font.body.md.size,
+    lineHeight: vars.font.body.md.lineHeight,
   },
   lg: {
-    fontFamily: 'var(--cynosure-font-heading-6-family)',
-    fontSize: 'var(--cynosure-font-heading-6-size)',
-    lineHeight: 'var(--cynosure-font-heading-6-line-height)',
-    fontWeight: 'var(--cynosure-font-heading-6-weight)',
-    letterSpacing: 'var(--cynosure-font-heading-6-letter-spacing)',
+    fontFamily: vars.font.heading['6'].family,
+    fontSize: vars.font.heading['6'].size,
+    lineHeight: vars.font.heading['6'].lineHeight,
+    fontWeight: vars.font.heading['6'].weight,
+    letterSpacing: vars.font.heading['6'].letterSpacing,
   },
   xl: {
-    fontFamily: 'var(--cynosure-font-heading-5-family)',
-    fontSize: 'var(--cynosure-font-heading-5-size)',
-    lineHeight: 'var(--cynosure-font-heading-5-line-height)',
-    fontWeight: 'var(--cynosure-font-heading-5-weight)',
-    letterSpacing: 'var(--cynosure-font-heading-5-letter-spacing)',
+    fontFamily: vars.font.heading['5'].family,
+    fontSize: vars.font.heading['5'].size,
+    lineHeight: vars.font.heading['5'].lineHeight,
+    fontWeight: vars.font.heading['5'].weight,
+    letterSpacing: vars.font.heading['5'].letterSpacing,
   },
   '2xl': {
-    fontFamily: 'var(--cynosure-font-heading-4-family)',
-    fontSize: 'var(--cynosure-font-heading-4-size)',
-    lineHeight: 'var(--cynosure-font-heading-4-line-height)',
-    fontWeight: 'var(--cynosure-font-heading-4-weight)',
-    letterSpacing: 'var(--cynosure-font-heading-4-letter-spacing)',
+    fontFamily: vars.font.heading['4'].family,
+    fontSize: vars.font.heading['4'].size,
+    lineHeight: vars.font.heading['4'].lineHeight,
+    fontWeight: vars.font.heading['4'].weight,
+    letterSpacing: vars.font.heading['4'].letterSpacing,
   },
   '3xl': {
-    fontFamily: 'var(--cynosure-font-heading-3-family)',
-    fontSize: 'var(--cynosure-font-heading-3-size)',
-    lineHeight: 'var(--cynosure-font-heading-3-line-height)',
-    fontWeight: 'var(--cynosure-font-heading-3-weight)',
-    letterSpacing: 'var(--cynosure-font-heading-3-letter-spacing)',
+    fontFamily: vars.font.heading['3'].family,
+    fontSize: vars.font.heading['3'].size,
+    lineHeight: vars.font.heading['3'].lineHeight,
+    fontWeight: vars.font.heading['3'].weight,
+    letterSpacing: vars.font.heading['3'].letterSpacing,
   },
   '4xl': {
-    fontFamily: 'var(--cynosure-font-heading-2-family)',
-    fontSize: 'var(--cynosure-font-heading-2-size)',
-    lineHeight: 'var(--cynosure-font-heading-2-line-height)',
-    fontWeight: 'var(--cynosure-font-heading-2-weight)',
-    letterSpacing: 'var(--cynosure-font-heading-2-letter-spacing)',
+    fontFamily: vars.font.heading['2'].family,
+    fontSize: vars.font.heading['2'].size,
+    lineHeight: vars.font.heading['2'].lineHeight,
+    fontWeight: vars.font.heading['2'].weight,
+    letterSpacing: vars.font.heading['2'].letterSpacing,
   },
   '5xl': {
-    fontFamily: 'var(--cynosure-font-heading-1-family)',
-    fontSize: 'var(--cynosure-font-heading-1-size)',
-    lineHeight: 'var(--cynosure-font-heading-1-line-height)',
-    fontWeight: 'var(--cynosure-font-heading-1-weight)',
-    letterSpacing: 'var(--cynosure-font-heading-1-letter-spacing)',
+    fontFamily: vars.font.heading['1'].family,
+    fontSize: vars.font.heading['1'].size,
+    lineHeight: vars.font.heading['1'].lineHeight,
+    fontWeight: vars.font.heading['1'].weight,
+    letterSpacing: vars.font.heading['1'].letterSpacing,
   },
 });
 

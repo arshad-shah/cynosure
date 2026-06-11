@@ -12,7 +12,7 @@ export const surfaceRoot = style({
   alignItems: 'flex-start',
   gap: vars.space['2'],
   borderRadius: vars.radius.md,
-  fontFamily: 'var(--cynosure-font-body-md-family)',
+  fontFamily: vars.font.body.md.family,
   color: vars.color.foreground.default,
   boxSizing: 'border-box',
   position: 'relative',
@@ -69,9 +69,9 @@ export const surfaceClose = style({
 // description) is scaled in the component via context so all three sizes read
 // as visibly distinct.
 export const surfaceSize = styleVariants({
-  sm: { padding: vars.space['2'], fontSize: 'var(--cynosure-font-body-sm-size)' },
-  md: { padding: vars.space['3'], fontSize: 'var(--cynosure-font-body-md-size)' },
-  lg: { padding: vars.space['4'], fontSize: 'var(--cynosure-font-body-lg-size)' },
+  sm: { padding: vars.space['2'], fontSize: vars.font.body.sm.size },
+  md: { padding: vars.space['3'], fontSize: vars.font.body.md.size },
+  lg: { padding: vars.space['4'], fontSize: vars.font.body.lg.size },
 });
 
 // soft: tinted fill + foreground tokens per status.

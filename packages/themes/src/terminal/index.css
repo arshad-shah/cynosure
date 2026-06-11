@@ -60,6 +60,17 @@
   --cynosure-color-feedback-info-foreground: #79c0ff;
   --cynosure-color-feedback-info-border: rgba(56, 139, 253, 0.4);
 
+  /* Chart series palette — GitHub-dark categorical hues that stay legible on
+     the near-black canvas. Consumed by `<LineChart>` & friends. */
+  --cynosure-color-chart-1: #58a6ff;
+  --cynosure-color-chart-2: #a371f7;
+  --cynosure-color-chart-3: #db61a2;
+  --cynosure-color-chart-4: #3fb950;
+  --cynosure-color-chart-5: #d29922;
+  --cynosure-color-chart-6: #39c5cf;
+  --cynosure-color-chart-7: #ff7b72;
+  --cynosure-color-chart-8: #bc8cff;
+
   /* Typography — JetBrains Mono everywhere */
   --cynosure-font-family-sans: "JetBrains Mono", "SF Mono", ui-monospace, monospace;
   --cynosure-font-family-mono: "JetBrains Mono", "SF Mono", ui-monospace, monospace;

@@ -10,7 +10,7 @@ export const emptyStateRoot = style({
   maxWidth: '60ch',
   marginInline: 'auto',
   color: vars.color.foreground.default,
-  fontFamily: 'var(--cynosure-font-body-md-family)',
+  fontFamily: vars.font.body.md.family,
 });
 
 export const emptyStateVariant = styleVariants({
@@ -43,17 +43,17 @@ export const emptyStateIcon = style({
 
 export const emptyStateTitle = style({
   margin: 0,
-  fontFamily: 'var(--cynosure-font-heading-3-family)',
-  fontSize: 'var(--cynosure-font-heading-4-size)',
-  fontWeight: 'var(--cynosure-font-heading-4-weight)',
-  lineHeight: 'var(--cynosure-font-heading-4-line-height)',
+  fontFamily: vars.font.heading['3'].family,
+  fontSize: vars.font.heading['4'].size,
+  fontWeight: vars.font.heading['4'].weight,
+  lineHeight: vars.font.heading['4'].lineHeight,
   color: vars.color.foreground.default,
 });
 
 export const emptyStateDescription = style({
   margin: 0,
-  fontSize: 'var(--cynosure-font-body-md-size)',
-  lineHeight: 'var(--cynosure-font-body-md-line-height)',
+  fontSize: vars.font.body.md.size,
+  lineHeight: vars.font.body.md.lineHeight,
   color: vars.color.foreground.muted,
 });
 

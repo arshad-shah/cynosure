@@ -107,7 +107,7 @@ const chipBase = {
   paddingInline: '0.4em',
   paddingBlock: '0.05em',
   borderRadius: vars.radius.sm,
-  fontWeight: 'var(--cynosure-font-weight-medium)',
+  fontWeight: vars.font.weight.medium,
 } as const;
 
 export const chipSubtle = styleVariants({
@@ -226,42 +226,42 @@ export const underlineSolid = styleVariants({
     color: vars.color.accent.solid,
     textDecorationColor: vars.color.accent.solid,
     textDecorationThickness: '0.18em',
-    fontWeight: 'var(--cynosure-font-weight-medium)',
+    fontWeight: vars.font.weight.medium,
   },
   success: {
     ...underlineBase,
     color: vars.color.feedback.success.foreground,
     textDecorationColor: vars.color.feedback.success.solid,
     textDecorationThickness: '0.18em',
-    fontWeight: 'var(--cynosure-font-weight-medium)',
+    fontWeight: vars.font.weight.medium,
   },
   warning: {
     ...underlineBase,
     color: vars.color.feedback.warning.foreground,
     textDecorationColor: vars.color.feedback.warning.solid,
     textDecorationThickness: '0.18em',
-    fontWeight: 'var(--cynosure-font-weight-medium)',
+    fontWeight: vars.font.weight.medium,
   },
   danger: {
     ...underlineBase,
     color: vars.color.feedback.danger.foreground,
     textDecorationColor: vars.color.feedback.danger.solid,
     textDecorationThickness: '0.18em',
-    fontWeight: 'var(--cynosure-font-weight-medium)',
+    fontWeight: vars.font.weight.medium,
   },
   info: {
     ...underlineBase,
     color: vars.color.feedback.info.foreground,
     textDecorationColor: vars.color.feedback.info.solid,
     textDecorationThickness: '0.18em',
-    fontWeight: 'var(--cynosure-font-weight-medium)',
+    fontWeight: vars.font.weight.medium,
   },
   neutral: {
     ...underlineBase,
     color: vars.color.foreground.default,
     textDecorationColor: vars.color.foreground.muted,
     textDecorationThickness: '0.18em',
-    fontWeight: 'var(--cynosure-font-weight-medium)',
+    fontWeight: vars.font.weight.medium,
   },
 });
 
@@ -270,53 +270,53 @@ export const underlineSolid = styleVariants({
 export const boldSubtle = styleVariants({
   accent: {
     color: vars.color.accent.solid,
-    fontWeight: 'var(--cynosure-font-weight-semibold)',
+    fontWeight: vars.font.weight.semibold,
   },
   success: {
     color: vars.color.feedback.success.foreground,
-    fontWeight: 'var(--cynosure-font-weight-semibold)',
+    fontWeight: vars.font.weight.semibold,
   },
   warning: {
     color: vars.color.feedback.warning.foreground,
-    fontWeight: 'var(--cynosure-font-weight-semibold)',
+    fontWeight: vars.font.weight.semibold,
   },
   danger: {
     color: vars.color.feedback.danger.foreground,
-    fontWeight: 'var(--cynosure-font-weight-semibold)',
+    fontWeight: vars.font.weight.semibold,
   },
   info: {
     color: vars.color.feedback.info.foreground,
-    fontWeight: 'var(--cynosure-font-weight-semibold)',
+    fontWeight: vars.font.weight.semibold,
   },
   neutral: {
     color: vars.color.foreground.default,
-    fontWeight: 'var(--cynosure-font-weight-semibold)',
+    fontWeight: vars.font.weight.semibold,
   },
 });
 
 export const boldSolid = styleVariants({
   accent: {
     color: vars.color.accent.solid,
-    fontWeight: 'var(--cynosure-font-weight-bold)',
+    fontWeight: vars.font.weight.bold,
   },
   success: {
     color: vars.color.feedback.success.solid,
-    fontWeight: 'var(--cynosure-font-weight-bold)',
+    fontWeight: vars.font.weight.bold,
   },
   warning: {
     color: vars.color.feedback.warning.solid,
-    fontWeight: 'var(--cynosure-font-weight-bold)',
+    fontWeight: vars.font.weight.bold,
   },
   danger: {
     color: vars.color.feedback.danger.solid,
-    fontWeight: 'var(--cynosure-font-weight-bold)',
+    fontWeight: vars.font.weight.bold,
   },
   info: {
     color: vars.color.feedback.info.solid,
-    fontWeight: 'var(--cynosure-font-weight-bold)',
+    fontWeight: vars.font.weight.bold,
   },
   neutral: {
     color: vars.color.foreground.muted,
-    fontWeight: 'var(--cynosure-font-weight-bold)',
+    fontWeight: vars.font.weight.bold,
   },
 });

@@ -89,18 +89,18 @@ export const textareaRootVariant = styleVariants({
 export const textareaRootSize = styleVariants({
   sm: {
     borderRadius: vars.radius.sm,
-    fontSize: 'var(--cynosure-font-body-sm-size)',
-    lineHeight: 'var(--cynosure-font-body-sm-line-height)',
+    fontSize: vars.font.body.sm.size,
+    lineHeight: vars.font.body.sm.lineHeight,
   },
   md: {
     borderRadius: vars.radius.md,
-    fontSize: 'var(--cynosure-font-body-md-size)',
-    lineHeight: 'var(--cynosure-font-body-md-line-height)',
+    fontSize: vars.font.body.md.size,
+    lineHeight: vars.font.body.md.lineHeight,
   },
   lg: {
     borderRadius: vars.radius.lg,
-    fontSize: 'var(--cynosure-font-body-lg-size)',
-    lineHeight: 'var(--cynosure-font-body-lg-line-height)',
+    fontSize: vars.font.body.lg.size,
+    lineHeight: vars.font.body.lg.lineHeight,
   },
 });
 

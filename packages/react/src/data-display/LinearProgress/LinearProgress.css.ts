@@ -27,8 +27,8 @@ export const linearProgressHeader = style({
   alignItems: 'baseline',
   justifyContent: 'space-between',
   gap: vars.space['3'],
-  fontSize: 'var(--cynosure-font-body-sm-size)',
-  lineHeight: 'var(--cynosure-font-body-sm-line-height)',
+  fontSize: vars.font.body.sm.size,
+  lineHeight: vars.font.body.sm.lineHeight,
 });
 
 export const linearProgressLabel = style({
@@ -257,7 +257,7 @@ export const linearProgressValue = style({
   display: 'inline-flex',
   alignItems: 'center',
   gap: vars.space['1'],
-  fontSize: 'var(--cynosure-font-body-sm-size)',
+  fontSize: vars.font.body.sm.size,
   fontWeight: 600,
   color: vars.color.foreground.default,
   fontVariantNumeric: 'tabular-nums',

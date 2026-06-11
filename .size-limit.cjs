@@ -121,7 +121,10 @@ entries.push(
   {
     name: 'Chart',
     path: 'packages/react/dist/chart.js',
-    limit: '1.5 kB',
+    // 25 themed chart wrappers + live `--cynosure-chart-*` theme resolution.
+    // SwiftChart itself stays externalised (see `jsOnly`), so this tracks only
+    // the marginal in-tree wrapper/theming JS.
+    limit: '2 kB',
     ...jsOnly(['@arshad-shah/swift-chart', '@arshad-shah/swift-chart/react']),
   },
 );
@@ -149,7 +152,7 @@ entries.push({
 entries.push(
   { name: 'core.css (scaffolding)', path: 'packages/react/dist/core.css', limit: '2 kB' },
   { name: 'styles.css (monolithic CSS)', path: 'packages/react/dist/styles.css', limit: '24 kB' },
-  { name: 'all.css (tokens + styles)', path: 'packages/react/dist/all.css', limit: '25 kB' },
+  { name: 'all.css (tokens + styles)', path: 'packages/react/dist/all.css', limit: '26 kB' },
 );
 
 module.exports = entries;

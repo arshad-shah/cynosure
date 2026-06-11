@@ -28,6 +28,12 @@ pnpm install
 # Build every package (Turbo-cached)
 pnpm build
 
+# Fast inner-loop build of the React package — skips the slow .d.ts pass
+# (~3s vs ~75s). Pair with `pnpm --filter @arshad-shah/cynosure-react typecheck`
+# for type errors. `pnpm --filter @arshad-shah/cynosure-react dev` watches the
+# same way.
+pnpm --filter @arshad-shah/cynosure-react build:fast
+
 # Run the Storybook dev server
 pnpm storybook
 

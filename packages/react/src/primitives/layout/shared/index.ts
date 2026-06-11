@@ -1,6 +1,8 @@
 export { BREAKPOINTS, MEDIA_QUERIES } from './breakpoints.js';
 export type { Breakpoint, Responsive } from './breakpoints.js';
 export { mergeStyles, normaliseResponsive, toResponsiveVars } from './responsive.js';
+export { createLayoutComponent } from './createLayoutComponent.js';
+export type { LayoutComponentConfig } from './createLayoutComponent.js';
 export type { AsChildProps, PolymorphicComponent, PolymorphicProps } from './polymorphic.js';
 export {
   LAYOUT_PROP_KEYS,

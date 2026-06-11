@@ -13,9 +13,11 @@ import PackageManagerTabs from '@/components/PackageManagerTabs.astro';
 <PackageManagerTabs command="@arshad-shah/cynosure-cli init" kind="dlx" />
 
 Detects your framework (Next.js App Router, Next.js Pages, Vite, CRA, Remix),
-prints the exact install command for your package manager, writes the single
-CSS import, and wires up `CynosureProvider` (for the Next.js App Router it also
-scaffolds a `providers.tsx`). Add `--dry-run` to preview.
+prints the exact install command for your package manager, and wires up
+`CynosureProvider` (for the Next.js App Router it also scaffolds a
+`providers.tsx`). There's **no CSS import to wire** — the provider loads the
+design tokens and each component's CSS auto-loads on import. Add `--dry-run` to
+preview.
 
 ## Requirements
 
@@ -28,14 +30,41 @@ scaffolds a `providers.tsx`). Add `--dry-run` to preview.
 
 <PackageManagerTabs command="@arshad-shah/cynosure-react @arshad-shah/cynosure-tokens" />
 
-## Import the CSS — the one-line way
+## Styling: nothing to import
+
+Cynosure splits styling into two layers, and both load themselves:
+
+- **Design tokens** — the global `:root { --cynosure-* }` custom properties
+  (light + dark) that every component reads. These are loaded for you by
+  **`CynosureProvider`** (see [Wrap your app](#wrap-your-app)). Mount the
+  provider once and the tokens are present app-wide — no stylesheet import.
+- **Component CSS** — each component's own rules. Every per-component JS entry
+  prepends its CSS imports, so your bundler wires them up automatically when you
+  `import { Button } from '@arshad-shah/cynosure-react/button'`. See
+  [Per-component CSS](#per-component-css).
+
+So the happy path is: **install → wrap in `CynosureProvider` → import components.**
+No `all.css`, no manual token import.
+
+### When you still need a manual CSS import
+
+Import the tokens yourself only when there's **no `CynosureProvider`** in the
+tree — e.g. plain HTML, email, a non-React surface, or a component rendered
+outside the provider. Either grab the all-in-one bundle:
 
 ```ts
-import '@arshad-shah/cynosure-react/all.css';
+import '@arshad-shah/cynosure-react/all.css'; // tokens (light + dark) + every component's CSS
 ```
 
-This single file bundles tokens (light + dark) and every component's CSS. For
-most apps it's the right choice.
+…or just the tokens (component CSS still auto-loads per import):
+
+```ts
+import '@arshad-shah/cynosure-tokens/css';      // design tokens, light
+import '@arshad-shah/cynosure-tokens/css/dark';  // dark overrides
+```
+
+In development the provider warns in the console if it can't find the tokens at
+runtime, so a misconfigured bundler won't fail silently.
 
 ### Webfonts (optional)
 
@@ -51,18 +80,6 @@ Kept separate from `all.css` so you don't pay the ~400 KB woff2 cost if you
 have your own font pipeline (`next/font`, self-hosted, CDN). With `next/font`,
 skip this import and override `--cynosure-font-family-sans` / `-mono` with
 your font's CSS variable.
-
-### The three-import way (granular control)
-
-If you want to load tokens and component styles separately — useful when you
-want to inline critical CSS, ship dark overrides conditionally, or control
-cascade order yourself:
-
-```ts
-import '@arshad-shah/cynosure-tokens/css';          // design tokens, light theme
-import '@arshad-shah/cynosure-tokens/css/dark';     // dark overrides (optional)
-import '@arshad-shah/cynosure-react/styles.css';    // component styles barrel
-```
 
 ### Per-component CSS
 
@@ -90,7 +107,7 @@ import '@arshad-shah/cynosure-react/core.css';
 
 ## Wrap your app
 
-`CynosureProvider` composes `ThemeProvider`, `DirectionProvider`, `LocaleProvider`, and the global `TooltipProvider` in a single wrapper:
+`CynosureProvider` composes `ThemeProvider`, `DirectionProvider`, `LocaleProvider`, and the global `TooltipProvider` in a single wrapper — and **loads the design tokens** so you don't import any stylesheet:
 
 ```tsx
 import { CynosureProvider } from '@arshad-shah/cynosure-react';
@@ -120,8 +137,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
 ```
 
 ```tsx
-// app/layout.tsx
-import '@arshad-shah/cynosure-react/all.css';
+// app/layout.tsx — no CSS import; <Providers> loads the tokens
 import { Providers } from './providers';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -139,7 +155,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
 ```tsx
 // pages/_app.tsx
-import '@arshad-shah/cynosure-react/all.css';
 import type { AppProps } from 'next/app';
 import { CynosureProvider } from '@arshad-shah/cynosure-react';
 
@@ -156,9 +171,6 @@ export default function MyApp({ Component, pageProps }: AppProps) {
 
 ```tsx
 // src/main.tsx
-import '@arshad-shah/cynosure-tokens/css';
-import '@arshad-shah/cynosure-tokens/css/dark';
-import '@arshad-shah/cynosure-react/styles.css';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { CynosureProvider } from '@arshad-shah/cynosure-react';
@@ -177,7 +189,6 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 
 ```tsx
 // app/root.tsx
-import '@arshad-shah/cynosure-react/all.css';
 import { CynosureProvider } from '@arshad-shah/cynosure-react';
 import { Outlet } from '@remix-run/react';
 
@@ -194,7 +205,6 @@ export default function App() {
 
 ```tsx
 // src/index.tsx
-import '@arshad-shah/cynosure-react/all.css';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { CynosureProvider } from '@arshad-shah/cynosure-react';

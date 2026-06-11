@@ -22,7 +22,7 @@ export const codeBlockRoot = style({
   border: `1px solid ${vars.color.border.subtle}`,
   borderRadius: vars.radius.md,
   overflow: 'hidden',
-  fontSize: 'var(--cynosure-font-body-sm-size)',
+  fontSize: vars.font.body.sm.size,
 });
 
 /* ---------- Header (filename / language + copy) ---------- */

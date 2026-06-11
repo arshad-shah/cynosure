@@ -7,7 +7,7 @@ export const codeBase = style([
   layoutPropsStyle,
   typographyBase,
   {
-    fontFamily: 'var(--cynosure-font-family-mono)',
+    fontFamily: vars.font.family.mono,
     borderRadius: vars.radius.sm,
     paddingInline: '0.25em',
     paddingBlock: '0.1em',
@@ -25,12 +25,12 @@ export const codeBlock = style({
   borderRadius: vars.radius.md,
   whiteSpace: 'pre',
   overflowX: 'auto',
-  fontFamily: 'var(--cynosure-font-family-mono)',
+  fontFamily: vars.font.family.mono,
 });
 
 export const codeSize = styleVariants({
-  sm: { fontSize: 'var(--cynosure-font-body-xs-size)' },
-  md: { fontSize: 'var(--cynosure-font-body-sm-size)' },
+  sm: { fontSize: vars.font.body.xs.size },
+  md: { fontSize: vars.font.body.sm.size },
 });
 
 export const codeColorScheme = styleVariants({

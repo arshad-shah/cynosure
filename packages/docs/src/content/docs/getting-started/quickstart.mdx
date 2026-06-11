@@ -21,37 +21,31 @@ wires up the provider:
 
 ## Wire the providers
 
-`ThemeProvider` owns the theme state and toggles `data-theme` on `<html>`.
-`TooltipProvider` deduplicates the shared overlay-positioning context so
-nested tooltips don't double-mount listeners. `DirectionProvider` lets you
-render in RTL without re-mounting the tree.
+`CynosureProvider` is the one wrapper every app mounts. It composes
+`ThemeProvider` (owns theme state and toggles `data-theme` on `<html>`),
+`TooltipProvider`, `DirectionProvider`, and `LocaleProvider` — and it **loads the
+design tokens for you**, so there's no stylesheet to import. Each component's CSS
+auto-loads when you import the component.
 
 ```tsx
 // src/main.tsx
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import {
-  DirectionProvider,
-  ThemeProvider,
-  TooltipProvider,
-} from '@arshad-shah/cynosure-react';
-import '@arshad-shah/cynosure-tokens/css';
-import '@arshad-shah/cynosure-tokens/css/dark';
-import '@arshad-shah/cynosure-react/styles.css';
+import { CynosureProvider } from '@arshad-shah/cynosure-react';
 import App from './App';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <ThemeProvider defaultTheme="system">
-      <DirectionProvider dir="ltr">
-        <TooltipProvider>
-          <App />
-        </TooltipProvider>
-      </DirectionProvider>
-    </ThemeProvider>
+    <CynosureProvider theme={{ defaultTheme: 'system' }}>
+      <App />
+    </CynosureProvider>
   </React.StrictMode>,
 );
 ```
+
+> Prefer to compose the providers yourself? `ThemeProvider`,
+> `DirectionProvider`, `LocaleProvider`, and `TooltipProvider` are all exported
+> individually — `ThemeProvider` is the one that loads the tokens.
 
 ## Your first button
 

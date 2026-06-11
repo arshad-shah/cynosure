@@ -79,6 +79,6 @@ export const paginationFooter = style({
 });
 
 export const selectionSummary = style({
-  fontSize: 'var(--cynosure-font-body-sm-size)',
+  fontSize: vars.font.body.sm.size,
   color: vars.color.foreground.muted,
 });
