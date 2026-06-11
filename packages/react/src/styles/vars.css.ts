@@ -1,4 +1,5 @@
 import { createGlobalThemeContract, globalStyle } from '@vanilla-extract/css';
+import { toCssName } from './tokenPath.js';
 
 /**
  * Typed mirror of the `@arshad-shah/cynosure-tokens` CSS custom properties.
@@ -9,20 +10,12 @@ import { createGlobalThemeContract, globalStyle } from '@vanilla-extract/css';
  * so referring to e.g. `vars.color.accent.solid` inside a `.css.ts` file
  * emits `var(--cynosure-color-accent-solid)` at build time.
  *
- * The key shape here mirrors the token tree *logically*. The `path` mapper
- * below performs the camelCase → kebab-case and `.` → `-` transforms that
- * Style Dictionary performs for the actual CSS custom property names, so the
- * contract stays a faithful reflection of the token CSS.
+ * The key shape here mirrors the token tree *logically*. The shared `toCssName`
+ * mapper (`./tokenPath`) performs the camelCase → kebab-case and `.` → `-`
+ * transforms that Style Dictionary performs for the actual CSS custom property
+ * names, so the contract stays a faithful reflection of the token CSS — and the
+ * `defineTheme` authoring helper resolves identical names.
  */
-const toCssName = (path: string[]): string =>
-  path
-    .map((seg) =>
-      seg
-        .replace(/([a-z])([A-Z])/g, '$1-$2')
-        .replace(/\./g, '-')
-        .toLowerCase(),
-    )
-    .join('-');
 
 export const vars = createGlobalThemeContract(
   {

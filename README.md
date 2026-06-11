@@ -62,7 +62,7 @@ Peer requirements: **React 18 or 19** (`react`, `react-dom`). `react-hook-form` 
 - **Zero-config DX.** Just one provider — it loads the design tokens for you; component CSS auto-loads on import. No stylesheet to wire. Works out of the box with Next.js App Router, Vite, Remix, and CRA.
 - **WCAG 2.2 AA** across every component. Every story is locked to axe-passing. RTL-safe, keyboard complete, reduced-motion honoured.
 - **Pay for what you import.** Per-component ESM entries (`@arshad-shah/cynosure-react/button`) and per-component CSS — your bundler keeps the rest.
-- **Theming that is data.** Six built-in themes (light, dark, terminal, high-contrast) or roll your own by overriding CSS custom properties. No CSS-in-JS runtime.
+- **Theming that is data.** Built-in light, dark, terminal, and high-contrast themes — or author your own **type-safe** theme with `defineTheme` (autocompleted tokens, no stylesheet to wire). No CSS-in-JS runtime.
 - **Forms that auto-wire.** `Form` + `FormField` + `FormControl` wire `id`, `aria-describedby`, `aria-invalid`, `name`, `required`, `disabled` for you. Drop-in `react-hook-form` adapter.
 - **Ships with a docs site.** Interactive Storybook playgrounds, MDX recipes, and Chromatic visual regression in CI.
 
@@ -108,7 +108,7 @@ Full [compatibility matrix and Next.js App Router recipe →](https://cynosure.a
 
 ---
 
-## Theming in two lines
+## Theming
 
 ```tsx
 import { CynosureProvider } from '@arshad-shah/cynosure-react';
@@ -118,7 +118,23 @@ import { CynosureProvider } from '@arshad-shah/cynosure-react';
 </CynosureProvider>
 ```
 
-Flip themes at runtime by setting `data-theme` on `<html>`. Authoring a custom theme is one CSS file — see [Custom themes](https://cynosure.arshadshah.com/foundations/custom-themes/).
+Switch themes at runtime with `useTheme().setTheme(name)`. **Authoring your own theme is type-safe** — describe the tokens you want to change with `defineTheme` (autocomplete on every slot, a typo is a compile error) and hand it to the provider; it injects the CSS for you (SSR-safe) and registers the name:
+
+```tsx
+import { CynosureProvider, defineTheme } from '@arshad-shah/cynosure-react';
+
+const ocean = defineTheme(
+  'ocean',
+  { color: { accent: { solid: '#0ea5e9' }, background: { canvas: '#0b1220' } } },
+  { colorScheme: 'dark' },
+);
+
+<CynosureProvider theme={{ customThemes: [ocean], defaultTheme: 'ocean' }}>
+  {children}
+</CynosureProvider>;
+```
+
+You override only what differs — everything else cascades from the base tokens. See [Custom themes](https://cynosure.arshadshah.com/foundations/custom-themes/).
 
 ---
 

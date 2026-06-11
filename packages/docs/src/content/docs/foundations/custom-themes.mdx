@@ -1,112 +1,141 @@
 ---
 title: Custom Themes
-description: How to author a custom Cynosure theme by overriding semantic CSS tokens for a data-theme selector.
+description: Author a type-safe Cynosure theme with defineTheme — override design tokens with autocomplete and no stylesheet to wire.
 order: 5
 category: foundations
 ---
 
 # Authoring a custom theme
 
-A Cynosure theme is a CSS file that overrides the semantic tokens for a
-`data-theme` selector. That's the whole API.
+The easiest way to build a theme is **`defineTheme`** — a typed helper. You
+describe the tokens you want to change as a plain object; your editor
+autocompletes every overridable slot, a typo is a *compile error* (not a
+silently-ignored CSS property), and the result drops straight into
+`CynosureProvider` with no separate stylesheet to import or wire up.
 
-## Define the overrides
-
-Create `src/themes/brand.css`:
-
-```css
-[data-theme='brand'] {
-  /* Accent family — buttons, links, focus rings. */
-  --cynosure-color-accent-solid: #0f766e;
-  --cynosure-color-accent-solid-hover: #115e59;
-  --cynosure-color-accent-soft: rgba(15 118 110 / 0.12);
-  --cynosure-color-accent-soft-hover: rgba(15 118 110 / 0.2);
-  --cynosure-color-accent-fg: #0f766e;
-
-  /* Surface family — backgrounds, cards, inputs. */
-  --cynosure-color-surface-default: #ffffff;
-  --cynosure-color-surface-subtle: #f6fbfa;
-  --cynosure-color-surface-muted: #ecf5f3;
-
-  /* Foreground family — body text, headings, borders. */
-  --cynosure-color-fg-default: #042f2e;
-  --cynosure-color-fg-muted: #134e4a;
-  --cynosure-color-fg-subtle: #5eead4;
-  --cynosure-color-border-default: #d6e4e1;
-
-  /* Optional: signal the browser colour-scheme so native controls match. */
-  color-scheme: light;
-}
-```
-
-Only override what you need. Unset tokens inherit from `base.css`.
-
-## Ship it as a side-effect import
-
-If you're authoring a theme package:
-
-```json
-{
-  "name": "my-brand-theme",
-  "exports": {
-    "./cynosure": "./dist/cynosure.css"
-  },
-  "sideEffects": ["./dist/*.css"]
-}
-```
-
-Consumers import it once:
-
-```ts
-import 'my-brand-theme/cynosure';
-```
-
-## Enable the theme
-
-Add the theme name to your `ThemeProvider`:
+## `defineTheme` — the typed way
 
 ```tsx
-<ThemeProvider themes={['light', 'dark', 'brand']} defaultTheme="brand">
-  {children}
-</ThemeProvider>
+import { CynosureProvider, defineTheme } from '@arshad-shah/cynosure-react';
+
+const ocean = defineTheme(
+  'ocean',
+  {
+    color: {
+      accent: { solid: '#0ea5e9', solidHover: '#0284c7', onSolid: '#ffffff' },
+      background: { canvas: '#0b1220', surface: '#0f1b2d' },
+      foreground: { default: '#e2e8f0', muted: '#94a3b8' },
+      border: { default: '#1e293b' },
+    },
+    radius: { component: { md: '10px' } },
+  },
+  { colorScheme: 'dark' }, // sets the root color-scheme for native controls
+);
+
+export function Providers({ children }: { children: React.ReactNode }) {
+  return (
+    <CynosureProvider theme={{ customThemes: [ocean], defaultTheme: 'ocean' }}>
+      {children}
+    </CynosureProvider>
+  );
+}
 ```
 
-`ThemeProvider` sets `data-theme="brand"` on `<html>`, and the override
-CSS takes effect.
+That's the whole setup. Passing the theme via `customThemes`:
 
-## Suggested coverage
+- **injects its CSS as a server-rendered `<style>`** — styled on first paint, no
+  flash, SSR-safe;
+- **registers the name** automatically, so `setTheme('ocean')` (and persistence)
+  just work — no need to also list it in `themes`;
+- **applies the declared `colorScheme`**, so native form controls, scrollbars,
+  and `prefers-color-scheme`-derived UA styling match.
 
-Minimum tokens you probably want to override:
+You only override what differs — every other token cascades from the base
+`:root`, so a polished theme is often just a handful of colours. The token shape
+mirrors the [design tokens](/foundations/design-tokens) exactly: `color.*`,
+`radius.*`, `shadow.*`, `space.*`, and so on. Let autocomplete guide you.
 
-| Family      | Tokens                                                              |
-| ----------- | ------------------------------------------------------------------- |
-| Accent      | `*-solid`, `*-solid-hover`, `*-soft`, `*-soft-hover`, `*-fg`       |
-| Surface     | `*-default`, `*-subtle`, `*-muted`                                  |
-| Foreground  | `*-default`, `*-muted`, `*-subtle`                                  |
-| Border      | `*-default`, `*-muted`                                              |
-| Feedback    | `success.solid`, `warning.solid`, `danger.solid`                    |
-| Focus       | `shadow-focus-ring`                                                 |
+### It's just data
 
-## Testing a custom theme
+`defineTheme` returns `{ name, colorScheme, css }`. If you'd rather not inject at
+runtime, write the generated CSS to a file at build time:
 
-Cynosure ships a contrast audit script that walks compiled CSS and asserts
-WCAG 2.1 AA pairs. Add your theme to `scripts/audit-contrast.mjs` to
-run the check against CI:
+```ts
+import { writeFileSync } from 'node:fs';
+writeFileSync('ocean.css', ocean.css); // [data-theme="ocean"]{ … }
+```
 
-```bash
-pnpm audit:contrast
+…and import that `.css` yourself. Same output, your choice of delivery.
+
+## Toggling themes
+
+Any registered theme — built-in or custom — switches at runtime via `useTheme`:
+
+```tsx
+import { useTheme } from '@arshad-shah/cynosure-react';
+
+function ThemeMenu() {
+  const { theme, themes, setTheme } = useTheme();
+  return (
+    <select value={theme} onChange={(e) => setTheme(e.target.value)}>
+      {themes.map((name) => (
+        <option key={name} value={name}>{name}</option>
+      ))}
+    </select>
+  );
+}
 ```
 
 ## Scope to a subtree, not the whole page
 
-Sometimes you want a theme only inside a specific container (for example a
-"preview" area). Set `data-theme` on an element other than `<html>`:
+`CynosureProvider` activates the theme by setting `data-theme` on `<html>`. To
+theme just one container (a preview pane, an embedded widget), set `data-theme`
+on any element — the custom-property cascade handles the rest:
 
 ```tsx
-<div data-theme="brand">
-  {/* children here render with the brand palette */}
+<div data-theme="ocean">
+  {/* renders with the ocean palette */}
 </div>
 ```
 
-All Cynosure components read CSS custom properties through normal cascade, so
-scoping "just works".
+(The `ocean` theme's `<style>` still needs to be present — keep it in
+`customThemes` on the provider, or import its `.css`.)
+
+## Advanced: hand-authored CSS
+
+`defineTheme` is a thin wrapper over the underlying contract: **a theme is just
+a `[data-theme="name"]` block that overrides `--cynosure-*` custom properties.**
+If you're shipping a theme as a standalone CSS package (no React, no provider),
+write it directly:
+
+```css
+[data-theme='brand'] {
+  /* Accent — buttons, links, focus rings */
+  --cynosure-color-accent-solid: #0f766e;
+  --cynosure-color-accent-solid-hover: #115e59;
+  --cynosure-color-accent-on-solid: #ffffff;
+
+  /* Surfaces & foreground */
+  --cynosure-color-background-canvas: #f6fbfa;
+  --cynosure-color-background-surface: #ffffff;
+  --cynosure-color-foreground-default: #042f2e;
+  --cynosure-color-foreground-muted: #134e4a;
+  --cynosure-color-border-default: #d6e4e1;
+
+  color-scheme: light;
+}
+```
+
+Use the exact token names from the [design-tokens reference](/foundations/design-tokens)
+— that's precisely the lookup `defineTheme` does for you. Ship it as a
+side-effect CSS export and let consumers `import 'my-brand-theme/cynosure'`, then
+add `'brand'` to `ThemeProvider`'s `themes`.
+
+## Testing a custom theme
+
+Cynosure ships a contrast audit that walks compiled CSS and asserts WCAG 2.1 AA
+pairs. Add your theme to `scripts/audit-contrast.mjs` to run it in CI:
+
+```bash
+pnpm audit:contrast
+```

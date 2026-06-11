@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import type { CynosureTheme } from './defineTheme.js';
 
 export type ColorScheme = 'light' | 'dark';
 
@@ -14,6 +15,13 @@ export interface ThemeProviderProps {
   defaultTheme?: string;
   /** Allowed theme names. If provided, an unknown value falls back to defaultTheme. */
   themes?: readonly string[];
+  /**
+   * Custom themes authored with {@link defineTheme}. Their CSS is injected as an
+   * SSR-safe `<style>` and their names are added to the allowed `themes` list
+   * automatically — so `setTheme('<name>')` just works with no separate
+   * stylesheet to wire up.
+   */
+  customThemes?: readonly CynosureTheme[];
   /** HTML attribute used for the theme selector. Defaults to "data-theme". */
   attribute?: `data-${string}`;
   /** Storage strategy. `null` disables persistence entirely. */

@@ -4,6 +4,8 @@ export { LocaleProvider, useLocale } from './LocaleProvider.js';
 export type { LocaleProviderProps } from './LocaleProvider.js';
 export { CynosureProvider } from './CynosureProvider.js';
 export type { CynosureProviderProps } from './CynosureProvider.js';
+export { defineTheme } from './defineTheme.js';
+export type { CynosureTheme, DefineThemeOptions, ThemeTokens } from './defineTheme.js';
 export { getThemeInitScript } from './getThemeInitScript.js';
 export type { ThemeInitScriptOptions } from './getThemeInitScript.js';
 export { useTheme } from './hooks/useTheme.js';

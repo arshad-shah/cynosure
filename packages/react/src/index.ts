@@ -12,6 +12,7 @@ export * from './utils/index.js';
 
 export {
   CynosureProvider,
+  defineTheme,
   DirectionProvider,
   LocaleProvider,
   ThemeProvider,
@@ -24,6 +25,8 @@ export type {
   Breakpoint,
   ColorScheme,
   CynosureProviderProps,
+  CynosureTheme,
+  DefineThemeOptions,
   Direction,
   DirectionContextValue,
   DirectionProviderProps,
@@ -33,4 +36,5 @@ export type {
   ThemeContextValue,
   ThemeInitScriptOptions,
   ThemeProviderProps,
+  ThemeTokens,
 } from './theme/index.js';
