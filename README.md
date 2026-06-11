@@ -19,7 +19,7 @@ Cynosure is a headless-at-the-core, themed-on-top component library built around
 npx cynosure init
 ```
 
-One command: detects your framework (Next.js App Router, Next.js Pages, Vite, CRA, Remix), installs the right packages, wires the single CSS import, and adds `CynosureProvider` for you.
+One command: detects your framework (Next.js App Router, Next.js Pages, Vite, CRA, Remix), installs the right packages, and adds `CynosureProvider` for you. **No CSS import to wire** — the provider loads the design tokens, and each component's CSS comes along when you import it.
 
 ### Or install manually
 
@@ -27,13 +27,9 @@ One command: detects your framework (Next.js App Router, Next.js Pages, Vite, CR
 pnpm add @arshad-shah/cynosure-react @arshad-shah/cynosure-tokens
 ```
 
-```ts
-// one CSS import covers tokens (light + dark) + every component
-import '@arshad-shah/cynosure-react/all.css';
-```
-
 ```tsx
-import { CynosureProvider, Button } from '@arshad-shah/cynosure-react';
+import { CynosureProvider } from '@arshad-shah/cynosure-react';
+import { Button } from '@arshad-shah/cynosure-react/button';
 
 export default function App() {
   return (
@@ -44,16 +40,26 @@ export default function App() {
 }
 ```
 
+That's it — **no stylesheet import required.** `CynosureProvider` pulls in the
+design tokens (the `--cynosure-*` custom properties, light + dark) automatically,
+and every component's own CSS auto-loads when you import the component. Import
+components from their **subpaths** (`@arshad-shah/cynosure-react/button`) so your
+bundler ships only what you use.
+
 Peer requirements: **React 18 or 19** (`react`, `react-dom`). `react-hook-form` is an optional peer for the forms adapter.
 
-> **Upgrading?** The older three-import setup (`tokens/css`, `tokens/css/dark`, `react/styles.css`) still works — `all.css` and `CynosureProvider` are additive.
+> **Not using the provider?** (plain HTML, email, non-React, or a component used
+> outside `CynosureProvider`.) Import the tokens once yourself — either the
+> all-in-one `import '@arshad-shah/cynosure-react/all.css'` or just
+> `import '@arshad-shah/cynosure-tokens/css'` (+ `/css/dark`). In dev, the
+> provider warns if it can't find the tokens at runtime.
 
 ---
 
 ## Why Cynosure
 
 - **102 components** with dedicated subpath exports across layout, typography, forms, overlays, navigation, data display, and feedback — all pre-styled, all themeable. Full inventory in [`components.config.mjs`](./components.config.mjs).
-- **Zero-config DX.** One CSS import, one provider, works out of the box with Next.js App Router, Vite, Remix, and CRA.
+- **Zero-config DX.** Just one provider — it loads the design tokens for you; component CSS auto-loads on import. No stylesheet to wire. Works out of the box with Next.js App Router, Vite, Remix, and CRA.
 - **WCAG 2.2 AA** across every component. Every story is locked to axe-passing. RTL-safe, keyboard complete, reduced-motion honoured.
 - **Pay for what you import.** Per-component ESM entries (`@arshad-shah/cynosure-react/button`) and per-component CSS — your bundler keeps the rest.
 - **Theming that is data.** Six built-in themes (light, dark, terminal, high-contrast) or roll your own by overriding CSS custom properties. No CSS-in-JS runtime.
@@ -64,7 +70,7 @@ Peer requirements: **React 18 or 19** (`react`, `react-dom`). `react-hook-form` 
 
 ## Bundle sizes
 
-Minified + brotli, per [`size-limit`](./.size-limit.json) budgets enforced in CI:
+Minified + brotli, per [`size-limit`](./.size-limit.cjs) budgets enforced in CI:
 
 | Component | Size | Component | Size |
 | --- | ---: | --- | ---: |

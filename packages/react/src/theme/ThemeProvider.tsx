@@ -1,3 +1,13 @@
+// Side-effect imports of the design tokens. These are the `:root{ --cynosure-* }`
+// custom-property definitions every component reads via `var(--cynosure-*)`.
+// Unlike per-component CSS (which each component's JS auto-imports), the tokens
+// are global and must be loaded exactly once — so we attach them to the provider
+// that every app already mounts. They're static imports, so the consumer's
+// bundler extracts them into a real <head> stylesheet at build time (no FOUC,
+// SSR-safe). Apps no longer need a manual `import '.../all.css'`. Provider-less
+// or non-React consumers can still import the standalone CSS exports directly.
+import '@arshad-shah/cynosure-tokens/css';
+import '@arshad-shah/cynosure-tokens/css/dark';
 import {
   createContext,
   useCallback,
@@ -17,6 +27,20 @@ import type {
 } from './types.js';
 
 const ThemeContext = createContext<ThemeContextValue | null>(null);
+
+// Don't pull in `@types/node` just to read NODE_ENV — widen `process` locally
+// and guard with a `typeof` check so builds work outside Node.
+declare const process: { env?: { NODE_ENV?: string } } | undefined;
+const isDev = (): boolean => {
+  try {
+    return typeof process !== 'undefined' && process?.env?.NODE_ENV !== 'production';
+  } catch {
+    return false;
+  }
+};
+
+// Fire the "tokens not detected" dev warning at most once per session.
+let tokensWarned = false;
 
 const SYSTEM = 'system';
 const DEFAULT_THEMES = ['light', 'dark'] as const;
@@ -106,6 +130,25 @@ export function ThemeProvider({
     if (disableTransitionOnChange) flushTransitionDisable(nonce);
     applyTheme(attribute, resolvedTheme, colorScheme);
   }, [attribute, resolvedTheme, colorScheme, disableTransitionOnChange, nonce]);
+
+  // Dev-only safety net: the tokens are imported above, but a misconfigured
+  // bundler (one that drops side-effect CSS imports, or doesn't process CSS at
+  // all) could strip them, leaving every `var(--cynosure-*)` empty. Warn once if
+  // the canvas token isn't resolvable after mount. Stripped in production.
+  useEffect(() => {
+    if (tokensWarned || !isDev() || typeof window === 'undefined') return;
+    const token = getComputedStyle(document.documentElement)
+      .getPropertyValue('--cynosure-color-background-canvas')
+      .trim();
+    if (!token) {
+      tokensWarned = true;
+      console.warn(
+        '[cynosure] Design tokens not detected. The CynosureProvider loads them ' +
+          'automatically, but your bundler may have dropped the CSS import — import ' +
+          "'@arshad-shah/cynosure-tokens/css' (and '/css/dark') manually as a fallback.",
+      );
+    }
+  }, []);
 
   const setTheme = useCallback(
     (next: string) => {

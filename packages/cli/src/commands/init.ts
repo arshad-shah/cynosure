@@ -9,8 +9,6 @@ export interface InitOptions {
   dryRun?: boolean;
 }
 
-const CSS_IMPORT = "import '@arshad-shah/cynosure-react/all.css';";
-
 const DEPENDENCIES = ['@arshad-shah/cynosure-react', '@arshad-shah/cynosure-tokens'];
 
 export async function init(options: InitOptions = {}): Promise<number> {
@@ -42,7 +40,7 @@ export async function init(options: InitOptions = {}): Promise<number> {
   log.step('1. Install');
   log.plain(`  ${c.cyan(installCommand(project.packageManager, DEPENDENCIES))}`);
 
-  log.step('2. Wire up styles + provider');
+  log.step('2. Wire up the provider');
   const entry = project.entryCandidates[0];
   if (!entry) {
     log.warn('No entry file found.');
@@ -88,9 +86,11 @@ export async function init(options: InitOptions = {}): Promise<number> {
   }
 
   log.step('3. Next steps');
-  log.hint('Start your dev server and import any component:');
+  log.hint('Start your dev server and import components from their subpaths:');
   log.plain(
-    c.dim(`    import { Button } from '@arshad-shah/cynosure-react';\n    <Button>Hello</Button>`),
+    c.dim(
+      `    import { Button } from '@arshad-shah/cynosure-react/button';\n    <Button>Hello</Button>`,
+    ),
   );
   log.plain('');
   log.hint('Docs: https://github.com/arshad-shah/cynosure');
@@ -101,10 +101,8 @@ export async function init(options: InitOptions = {}): Promise<number> {
 function patchEntry(source: string, framework: ProjectInfo['framework']): string {
   let next = source;
 
-  if (!next.includes('@arshad-shah/cynosure-react/all.css')) {
-    next = prependImport(next, CSS_IMPORT);
-  }
-
+  // No CSS import needed: `CynosureProvider` loads the design tokens itself, and
+  // each component's CSS auto-loads when imported. We only wire up the provider.
   if (framework === 'next-app') {
     next = addNextAppProviders(next);
   } else if (!next.includes('CynosureProvider')) {
@@ -208,12 +206,12 @@ function diffPreview(before: string, after: string): string {
 function printManualSteps(project: ProjectInfo) {
   log.step('Manual setup');
   log.plain(`  1. ${c.cyan(installCommand(project.packageManager, DEPENDENCIES))}`);
-  log.plain("  2. Add one line to your app's entry file:");
-  log.plain(c.dim(`       ${CSS_IMPORT}`));
-  log.plain('  3. Wrap your root component:');
+  log.plain('  2. Wrap your root component (this also loads the design tokens):');
   log.plain(
     c.dim(
       `       import { CynosureProvider } from '@arshad-shah/cynosure-react';\n       <CynosureProvider>{children}</CynosureProvider>`,
     ),
   );
+  log.plain('  3. Import components from their subpaths:');
+  log.plain(c.dim(`       import { Button } from '@arshad-shah/cynosure-react/button';`));
 }

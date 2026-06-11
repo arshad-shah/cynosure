@@ -13,7 +13,9 @@ export const createConfig = (overrides: Partial<Options> = {}): Options =>
     format: ['esm'],
     target: 'es2022',
     dts: true,
-    sourcemap: true,
+    // No source maps in the published build: consumers never use a library's
+    // maps, and they were ~half the tarball (6.6 MB of `.map` files).
+    sourcemap: false,
     clean: true,
     splitting: true,
     treeshake: true,

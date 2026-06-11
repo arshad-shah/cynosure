@@ -722,6 +722,11 @@ export default createConfig({
     'embla-carousel',
     '@arshad-shah/swift-chart',
     '@arshad-shah/swift-chart/react',
+    // Keep the provider's token-CSS side-effect imports as pass-through specifiers
+    // so the consumer's bundler resolves them (enabling dedupe against a manual
+    // `all.css` import) instead of esbuild inlining the tokens into our own CSS.
+    '@arshad-shah/cynosure-tokens/css',
+    '@arshad-shah/cynosure-tokens/css/dark',
     'react-is',
   ],
 });
