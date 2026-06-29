@@ -26,7 +26,7 @@
     "@astrojs/check": "0.9.9",
     "@astrojs/mdx": "5.0.4",
     "@astrojs/react": "5.0.4",
-    "@astrojs/sitemap": "3.7.2",
+    "@astrojs/sitemap": "3.7.3",
     "@astrojs/starlight": "0.39.2",
     "@fontsource-variable/geist": "catalog:",
     "@fontsource-variable/jetbrains-mono": "catalog:",
