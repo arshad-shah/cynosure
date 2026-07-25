@@ -67,7 +67,7 @@
     "publint": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:",
-    "sharp": "^0.34.5",
+    "sharp": "^0.35.0",
     "simple-git-hooks": "catalog:",
     "size-limit": "catalog:",
     "storybook": "catalog:",
