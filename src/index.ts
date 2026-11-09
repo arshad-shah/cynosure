@@ -18,6 +18,15 @@ export { Kbd, type KbdProps } from "./components/Kbd/index.js";
 export { Link, type LinkProps } from "./components/Link/index.js";
 export { LoadingDots, type LoadingDotsProps } from "./components/LoadingDots/index.js";
 export {
+  Menu,
+  type MenuEntry,
+  type MenuItem,
+  type MenuProps,
+  type MenuSection,
+  type MenuTokens,
+  type MenuTriggerProps,
+} from "./components/Menu/index.js";
+export {
   Popover,
   type PopoverProps,
   type PopoverTokens,

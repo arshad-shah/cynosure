@@ -177,14 +177,12 @@ export const TextFieldsKeepTheirArrowKeys: Story = {
 function Growing() {
   const [extra, setExtra] = useState(false);
   return (
-    <>
-      <Toolbar label="Growing">
-        <Button size="sm" onClick={() => setExtra(true)}>
-          Add
-        </Button>
-        {extra && <Button size="sm">Added</Button>}
-      </Toolbar>
-    </>
+    <Toolbar label="Growing">
+      <Button size="sm" onClick={() => setExtra(true)}>
+        Add
+      </Button>
+      {extra && <Button size="sm">Added</Button>}
+    </Toolbar>
   );
 }
 

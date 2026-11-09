@@ -176,7 +176,7 @@ describe("cy new component", () => {
     ).toContain("ScaffoldProbe (JS + CSS)");
     expect(new Set(rules(root))).toEqual(new Set(["scaffold-todo"]));
     execFileSync(join(repo, "node_modules/.bin/tsc"), ["-p", root], { stdio: "pipe" });
-  });
+  }, 30_000); // runs a full typecheck of a sandbox copy of the repo
   it("scaffolds a foundation under src/foundations", () => {
     const root = sandbox();
     scaffoldComponent(root, "SliderBase", "foundation");

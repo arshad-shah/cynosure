@@ -215,5 +215,11 @@
     "path": ["dist/overlay/dismiss.js", "dist/overlay/position.js", "dist/overlay/use-anchored-position.js"],
     "limit": "2 kB",
     "gzip": true
+  },
+  {
+    "name": "Menu",
+    "path": ["dist/components/Menu/Menu.js", "dist/styles/menu.css"],
+    "limit": "3 kB",
+    "gzip": true
   }
 ]

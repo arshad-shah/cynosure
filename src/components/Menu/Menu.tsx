@@ -1,0 +1,216 @@
+import {
+  type CSSProperties,
+  Fragment,
+  type KeyboardEvent,
+  type ReactNode,
+  type Ref,
+  useCallback,
+  useId,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
+import { ButtonBase } from "../../foundations/ButtonBase/ButtonBase.js";
+import { Icon } from "../../foundations/Icon/Icon.js";
+import { useRovingFocus } from "../../foundations/roving-focus.js";
+import { check } from "../../icons/check.js";
+import type { IconData } from "../../icons/types.js";
+import { useDismiss } from "../../overlay/dismiss.js";
+import type { Placement } from "../../overlay/position.js";
+import { useAnchoredPosition } from "../../overlay/use-anchored-position.js";
+import type { Tone } from "../../tokens/schema.js";
+import { Kbd } from "../Kbd/Kbd.js";
+
+export interface MenuTokens {
+  minWidth: string;
+  maxWidth: string;
+  radius: string;
+  rowHeight: string;
+}
+
+declare module "../../tokens/schema.js" {
+  interface ComponentTokens {
+    menu: MenuTokens;
+  }
+}
+
+export interface MenuItem {
+  value: string;
+  label: string;
+  icon?: IconData;
+  /** Keys shown at the end of the row and exposed as aria-keyshortcuts, e.g. ["Ctrl", "E"]. */
+  shortcut?: string[];
+  disabled?: boolean;
+  tone?: Extract<Tone, "neutral" | "danger">;
+  /** Checkable item: a toggle (`checkbox`) or one of a set (`radio`). Checkable items keep the menu open. */
+  kind?: "checkbox" | "radio";
+  checked?: boolean;
+}
+
+export interface MenuSection {
+  /** Group name (shown and announced). */
+  label: string;
+  items: MenuItem[];
+}
+
+export type MenuEntry = MenuItem | MenuSection;
+
+/** Spread onto the trigger (a Button or IconButton). */
+export interface MenuTriggerProps {
+  ref: Ref<HTMLButtonElement>;
+  onClick: () => void;
+  onKeyDown: (event: KeyboardEvent<HTMLButtonElement>) => void;
+  "aria-expanded": boolean;
+  "aria-controls": string;
+  "aria-haspopup": "menu";
+}
+
+export interface MenuProps {
+  /** Render the trigger: `(props) => <Button {...props}>Actions</Button>`. */
+  trigger: (props: MenuTriggerProps) => ReactNode;
+  /** Accessible name of the menu. */
+  label: string;
+  items: MenuEntry[];
+  onSelect: (value: string) => void;
+  placement?: Placement;
+  className?: string;
+  /** Layout only, applied to the panel. */
+  style?: CSSProperties;
+}
+
+type PanelEl = HTMLDivElement & { showPopover?: () => void; hidePopover?: () => void };
+const ITEM = '[role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"]';
+const KEY_NAMES: Record<string, string> = { Ctrl: "Control", Cmd: "Meta", Opt: "Alt", Option: "Alt" };
+const isSection = (entry: MenuEntry): entry is MenuSection => "items" in entry;
+
+/** APG menu button: commands in a top-layer list with arrow keys, type-ahead, sections and checkable items. */
+export function Menu({ trigger, label, items, onSelect, placement = "bottom", className, style }: MenuProps) {
+  const id = useId();
+  const [open, setOpen] = useState(false);
+  const focusOn = useRef<"first" | "last">("first");
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const panel = useRef<PanelEl>(null);
+  const typed = useRef({ text: "", at: 0 });
+  const show = useCallback((at: "first" | "last") => {
+    focusOn.current = at;
+    setOpen(true);
+  }, []);
+
+  useLayoutEffect(() => {
+    const el = panel.current;
+    if (!el?.showPopover) return;
+    if (open && !el.matches(":popover-open")) {
+      el.showPopover();
+      const enabled = [...el.querySelectorAll<HTMLElement>(ITEM)].filter(
+        (i) => i.getAttribute("aria-disabled") !== "true",
+      );
+      (focusOn.current === "last" ? enabled[enabled.length - 1] : enabled[0])?.focus({ preventScroll: true });
+    }
+    if (!open && el.matches(":popover-open")) el.hidePopover?.();
+  }, [open]);
+  useAnchoredPosition(triggerRef, panel, open, placement, 4, "start");
+  useRovingFocus(panel, { orientation: "vertical", selector: ITEM });
+  useDismiss({ open, onClose: () => setOpen(false), inside: [triggerRef, panel], returnFocus: triggerRef });
+
+  const choose = (item: MenuItem) => {
+    if (item.disabled) return;
+    onSelect(item.value);
+    if (!item.kind) setOpen(false);
+  };
+
+  const onPanelKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    // Tab leaves the menu like leaving the button: close and let focus move on.
+    if (event.key === "Tab") {
+      setOpen(false);
+      return;
+    }
+    if (event.key.length !== 1 || event.ctrlKey || event.metaKey || event.altKey || event.key === " ") return;
+    const now = Date.now();
+    typed.current = {
+      text: now - typed.current.at > 500 ? event.key : typed.current.text + event.key,
+      at: now,
+    };
+    const list = [...event.currentTarget.querySelectorAll<HTMLElement>(ITEM)].filter(
+      (i) => i.getAttribute("aria-disabled") !== "true",
+    );
+    const from = list.indexOf(event.target as HTMLElement);
+    const ordered = [...list.slice(from + 1), ...list.slice(0, from + 1)];
+    const find = (text: string) =>
+      ordered.find((i) => (i.dataset.label ?? "").toLowerCase().startsWith(text.toLowerCase()));
+    (find(typed.current.text) ?? find(event.key))?.focus();
+  };
+
+  const row = (item: MenuItem) => (
+    <ButtonBase
+      key={item.value}
+      role={item.kind ? (item.kind === "checkbox" ? "menuitemcheckbox" : "menuitemradio") : "menuitem"}
+      aria-checked={item.kind ? !!item.checked : undefined}
+      aria-disabled={item.disabled || undefined}
+      aria-keyshortcuts={item.shortcut?.map((k) => KEY_NAMES[k] ?? k).join("+")}
+      tabIndex={-1}
+      className="cy-menu-item"
+      data-tone={item.tone}
+      data-label={item.label}
+      onClick={() => choose(item)}
+    >
+      {item.kind && (
+        <span className="cy-menu-check" aria-hidden="true">
+          {item.checked && <Icon icon={check} />}
+        </span>
+      )}
+      {item.icon && <Icon icon={item.icon} className="cy-menu-icon" />}
+      <span className="cy-menu-label">{item.label}</span>
+      {item.shortcut && (
+        <span className="cy-menu-shortcut" aria-hidden="true">
+          <Kbd keys={item.shortcut} size="sm" />
+        </span>
+      )}
+    </ButtonBase>
+  );
+
+  return (
+    <>
+      {trigger({
+        ref: triggerRef,
+        onClick: () => (open ? setOpen(false) : show("first")),
+        onKeyDown: (event) => {
+          if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+            event.preventDefault();
+            show(event.key === "ArrowUp" ? "last" : "first");
+          }
+        },
+        "aria-expanded": open,
+        "aria-controls": `${id}-menu`,
+        "aria-haspopup": "menu",
+      })}
+      <div
+        ref={panel}
+        id={`${id}-menu`}
+        role="menu"
+        aria-label={label}
+        aria-orientation="vertical"
+        {...{ popover: "manual" }}
+        className={className ? `cy-menu ${className}` : "cy-menu"}
+        style={style}
+        onKeyDown={onPanelKeyDown}
+      >
+        {items.map((entry, i) =>
+          isSection(entry) ? (
+            <Fragment key={`section-${entry.label}`}>
+              {i > 0 && <hr className="cy-menu-separator" />}
+              {/* biome-ignore lint/a11y/useSemanticElements: APG menus group items with role="group"; a fieldset is for forms */}
+              <div role="group" aria-label={entry.label} className="cy-menu-group">
+                <span className="cy-menu-group-label" aria-hidden="true">
+                  {entry.label}
+                </span>
+                {entry.items.map(row)}
+              </div>
+            </Fragment>
+          ) : (
+            row(entry)
+          ),
+        )}
+      </div>
+    </>
+  );
+}

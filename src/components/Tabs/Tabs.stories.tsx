@@ -283,8 +283,11 @@ export const OverflowInRightToLeft: Story = {
   ),
   play: async ({ canvas, userEvent }) => {
     const listEl = canvas.getByRole("tablist");
-    await waitFor(() => expect(listEl).toHaveAttribute("data-more-end"));
-    await expect(listEl).not.toHaveAttribute("data-more-start");
+    // Settled state (Firefox updates the two edges a frame apart).
+    await waitFor(() => {
+      expect(listEl).toHaveAttribute("data-more-end");
+      expect(listEl).not.toHaveAttribute("data-more-start");
+    });
     await userEvent.tab();
     await userEvent.keyboard("{End}");
     const last = canvas.getByRole("tab", { name: "Section 10" });
