@@ -147,7 +147,7 @@
   margin: auto;
   inline-size: 1.1em;
   block-size: 1.1em;
-  border: 2px solid currentColor;
+  border: calc(var(--cy-border-width) * 2) solid currentColor;
   border-inline-end-color: transparent;
   border-radius: 50%;
   animation: cy-button-spin 0.7s linear infinite;

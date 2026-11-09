@@ -1,0 +1,141 @@
+import { execFileSync } from "node:child_process";
+import { cpSync, existsSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join, resolve } from "node:path";
+import { afterEach, describe, expect, it } from "vitest";
+import { check } from "../../../tools/cli/lib/check";
+import { readProgress } from "../../../tools/cli/lib/progress";
+import { addComponentToken, scaffoldComponent, scaffoldIcon } from "../../../tools/cli/lib/scaffold";
+
+const repo = resolve(__dirname, "../../..");
+const temps: string[] = [];
+function sandbox(): string {
+  const dir = mkdtempSync(join(tmpdir(), "cy-cli-"));
+  temps.push(dir);
+  for (const p of ["src", "tsconfig.json", ".size-limit.json"])
+    cpSync(join(repo, p), join(dir, p), { recursive: true });
+  symlinkSync(join(repo, "node_modules"), join(dir, "node_modules"));
+  return dir;
+}
+afterEach(() => {
+  for (const d of temps.splice(0)) rmSync(d, { recursive: true, force: true });
+});
+const write = (root: string, file: string, text: string) => writeFileSync(join(root, file), text);
+const rules = (root: string) => check(root).map((v) => v.rule);
+
+describe("cy check", () => {
+  it("passes on the real repo", () => {
+    expect(check(repo)).toEqual([]);
+  });
+  it("flags a native button in a composite with file and line", () => {
+    const root = sandbox();
+    write(
+      root,
+      "src/components/Button/Bad.tsx",
+      'export const Bad = () => (\n  <button type="button">x</button>\n);\n',
+    );
+    const found = check(root).find((v) => v.rule === "native-elements");
+    expect(found).toMatchObject({ file: "src/components/Button/Bad.tsx", line: 2 });
+  });
+  it("flags an emoji or text glyph used as an icon", () => {
+    const root = sandbox();
+    write(root, "src/components/Button/Glyph.tsx", "export const G = () => <span>✓ Saved</span>;\n");
+    expect(rules(root)).toContain("glyphs");
+  });
+  it("flags title= attributes", () => {
+    const root = sandbox();
+    write(root, "src/components/Button/T.tsx", 'export const T = () => <span title="Saved">x</span>;\n');
+    expect(rules(root)).toContain("title-attr");
+  });
+  it("flags hex and px literals in component CSS but allows var() fallbacks", () => {
+    const root = sandbox();
+    write(
+      root,
+      "src/components/Button/extra.css",
+      ".x { color: #ff0000; padding: 4px; gap: var(--cy-gap, 8px); }\n",
+    );
+    const lits = check(root).filter((v) => v.rule === "literals");
+    expect(lits).toHaveLength(2);
+  });
+  it("requires a play test and a Used by section for every component", () => {
+    const root = sandbox();
+    rmSync(join(root, "src/components/IconButton/README.md"));
+    expect(rules(root)).toContain("structure");
+  });
+});
+
+describe("cy new component", () => {
+  it("scaffolds a composite that typechecks and only reports its TODO(cy) markers", () => {
+    const root = sandbox();
+    scaffoldComponent(root, "Badge", "composite");
+    for (const f of ["Badge.tsx", "badge.css", "Badge.stories.tsx", "README.md", "index.ts"])
+      expect(existsSync(join(root, "src/components/Badge", f))).toBe(true);
+    expect(readFileSync(join(root, "src/index.ts"), "utf8")).toContain(
+      'export { Badge, type BadgeProps } from "./components/Badge";',
+    );
+    expect(
+      JSON.parse(readFileSync(join(root, ".size-limit.json"), "utf8")).map((e: { name: string }) => e.name),
+    ).toContain("Badge (JS + CSS)");
+    expect(new Set(rules(root))).toEqual(new Set(["scaffold-todo"]));
+    execFileSync(join(repo, "node_modules/.bin/tsc"), ["-p", root], { stdio: "pipe" });
+  });
+  it("scaffolds a foundation under src/foundations", () => {
+    const root = sandbox();
+    scaffoldComponent(root, "InputBase", "foundation");
+    expect(existsSync(join(root, "src/foundations/InputBase/InputBase.tsx"))).toBe(true);
+  });
+  it("refuses an existing name and non-PascalCase names", () => {
+    const root = sandbox();
+    expect(() => scaffoldComponent(root, "Button", "composite")).toThrow(/exists/);
+    expect(() => scaffoldComponent(root, "badge", "composite")).toThrow(/PascalCase/);
+  });
+});
+
+describe("cy new token", () => {
+  it("adds a typed component token and documents it", () => {
+    const root = sandbox();
+    addComponentToken(root, "button.ringColor", "Colour of the focus ring");
+    expect(readFileSync(join(root, "src/components/Button/Button.tsx"), "utf8")).toMatch(
+      /interface ButtonTokens \{\n {2}ringColor: string;/,
+    );
+    expect(readFileSync(join(root, "src/components/Button/README.md"), "utf8")).toContain(
+      "`--cy-button-ring-color`: Colour of the focus ring",
+    );
+  });
+});
+
+describe("cy new icon", () => {
+  it("converts an SVG into a validated icon module and exports it", () => {
+    const root = sandbox();
+    const svg =
+      '<svg viewBox="0 0 24 24"><path d="M4 12h16"/><rect x="3" y="3" width="3" height="3" rx=".8" fill="currentColor"/></svg>';
+    scaffoldIcon(root, "flat-line", svg);
+    const mod = readFileSync(join(root, "src/icons/flat-line.ts"), "utf8");
+    expect(mod).toContain('name: "flat-line"');
+    expect(mod).toContain("star: { x: 3, y: 3 }");
+    expect(readFileSync(join(root, "src/icons/index.ts"), "utf8")).toContain(
+      'export { flatLine } from "./flat-line";',
+    );
+  });
+  it("rejects an SVG with text", () => {
+    const root = sandbox();
+    expect(() => scaffoldIcon(root, "bad", '<svg viewBox="0 0 24 24"><text>A</text></svg>')).toThrow(/text/);
+  });
+});
+
+describe("cy progress", () => {
+  it("returns the current task and next step", () => {
+    const root = sandbox();
+    write(
+      root,
+      "PROGRESS.md",
+      "# P\n## Status\nok\n## Current task\nT7\n## Next step\nT8\n## Plans\n- x\n## Blockers\nnone\n## Decision log\n- d\n## Verification\n- v\n## How to resume\npnpm i\n",
+    );
+    expect(readProgress(join(root, "PROGRESS.md"))).toEqual({ current: "T7", next: "T8" });
+  });
+  it("fails when the Next step section is missing", () => {
+    const root = sandbox();
+    write(root, "PROGRESS.md", "# P\n## Status\nok\n## Current task\nT7\n");
+    expect(() => readProgress(join(root, "PROGRESS.md"))).toThrow(/Next step/);
+  });
+});
