@@ -19,18 +19,18 @@ declare module "../../tokens/schema.js" {
 
 export interface FieldProps {
   label: ReactNode;
-  description?: ReactNode;
+  description?: ReactNode | undefined;
   /** Shown below the control, announced, and marks the control invalid. */
-  error?: ReactNode;
+  error?: ReactNode | undefined;
   /** Draws the required marker; pass `required` to the control too. */
-  required?: boolean;
-  size?: Size;
+  required?: boolean | undefined;
+  size?: Size | undefined;
   /** Label a group of controls (radio groups) instead of one control. */
-  group?: boolean;
-  id?: string;
-  className?: string;
+  group?: boolean | undefined;
+  id?: string | undefined;
+  className?: string | undefined;
   /** Layout only. */
-  style?: CSSProperties;
+  style?: CSSProperties | undefined;
   children: (field: FieldRender) => ReactNode;
 }
 

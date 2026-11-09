@@ -2,6 +2,8 @@ export { Button, type ButtonProps, type ButtonTokens } from "./components/Button
 export { Field, type FieldProps } from "./components/Field/index.js";
 export { IconButton, type IconButtonProps } from "./components/IconButton/index.js";
 export { LoadingDots, type LoadingDotsProps } from "./components/LoadingDots/index.js";
+export { SearchField, type SearchFieldProps } from "./components/SearchField/index.js";
+export { TextField, type TextFieldProps } from "./components/TextField/index.js";
 export { ButtonBase, type ButtonBaseProps } from "./foundations/ButtonBase/ButtonBase.js";
 export { ChoiceBase, type ChoiceBaseProps } from "./foundations/ChoiceBase/ChoiceBase.js";
 export { type FieldRender, useField } from "./foundations/field.js";

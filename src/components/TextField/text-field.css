@@ -1,0 +1,98 @@
+/* TextField: the shell draws border, background and focus; the native input inside is unstyled. */
+.cy-text-field-input.cy-text-field-input {
+  box-sizing: border-box !important;
+  flex: 1;
+  min-inline-size: 0;
+  block-size: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: var(--cy-color-ink);
+  font: inherit;
+  font-family: var(--cy-font-sans);
+  font-size: inherit;
+  font-weight: var(--cy-font-weight-regular);
+  line-height: normal;
+  letter-spacing: normal;
+  text-transform: none;
+  appearance: none;
+  &::placeholder {
+    color: var(--cy-color-muted);
+    opacity: 1;
+  }
+  &:disabled {
+    cursor: not-allowed;
+  }
+}
+
+.cy-text-field-icon {
+  color: var(--cy-color-muted);
+}
+.cy-text-field .cy-button.cy-text-field-clear {
+  margin-inline-end: calc(var(--cy-space-2) * -1);
+}
+
+.cy-text-field.cy-text-field {
+  --_h: var(--cy-text-field-height-md, var(--cy-control-height-md));
+  --_hit: var(--cy-hit-min, 24px);
+  box-sizing: border-box !important;
+  margin: 0;
+  letter-spacing: normal;
+  text-transform: none;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--cy-space-3);
+  block-size: var(--_h);
+  min-block-size: max(var(--_h), var(--_hit));
+  padding: 0 var(--cy-text-field-padding-inline, var(--cy-space-5));
+  border: var(--cy-border-width) solid var(--cy-text-field-border, var(--cy-color-line));
+  border-radius: var(--cy-text-field-radius, calc(var(--_h) * var(--cy-radius-factor)));
+  background: var(--cy-text-field-bg, var(--cy-color-surface));
+  color: var(--cy-color-ink);
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-font-size-md);
+  cursor: text;
+  transition:
+    border-color var(--cy-motion-fast) var(--cy-motion-ease),
+    box-shadow var(--cy-motion-fast) var(--cy-motion-ease);
+
+  &[data-size="sm"] {
+    --_h: var(--cy-text-field-height-sm, var(--cy-control-height-sm));
+    font-size: var(--cy-font-size-sm);
+  }
+  &[data-size="lg"] {
+    --_h: var(--cy-text-field-height-lg, var(--cy-control-height-lg));
+    font-size: var(--cy-font-size-lg);
+  }
+  &[data-variant="soft"] {
+    background: var(--cy-text-field-soft-bg, var(--cy-color-soft));
+    border-color: transparent;
+  }
+  &:hover:not([data-disabled]) {
+    border-color: color-mix(in oklab, var(--cy-color-ink) 30%, var(--cy-color-line));
+  }
+  &:focus-within {
+    border-color: var(--cy-color-accent);
+    box-shadow: 0 0 0 var(--cy-border-focus) var(--cy-color-ring);
+    outline: var(--cy-border-focus) solid transparent;
+  }
+  &[data-invalid] {
+    border-color: var(--cy-color-danger);
+  }
+  &[data-invalid]:focus-within {
+    box-shadow: 0 0 0 var(--cy-border-focus) color-mix(in oklab, var(--cy-color-danger) 28%, transparent);
+  }
+  &[data-disabled] {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+}
+
+@media (pointer: coarse) {
+  .cy-text-field.cy-text-field {
+    --_hit: var(--cy-hit-coarse, 44px);
+  }
+}
