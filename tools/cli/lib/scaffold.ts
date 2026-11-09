@@ -178,19 +178,13 @@ export function addComponentToken(root: string, path: string, doc: string): void
 
 const num = (v: string | undefined) => Number.parseFloat(v ?? "0");
 
-/** Parses the subset of SVG Facet icons use. The star is the one filled rect of 2.5–3 units. */
+/** Parses the subset of SVG Facet icons use: stroked paths, rects and circles; no fills, no text. */
 export function svgToIcon(name: string, svg: string): IconData {
   if (/<text[\s>]/i.test(svg)) throw new Error("SVG contains <text>: icons are drawn, never typed");
   const body: IconNode[] = [];
-  let star: IconData["star"];
   for (const [, tag, attrText = ""] of svg.matchAll(/<(path|rect|circle)\b([^>]*)\/?>/g)) {
     const a = Object.fromEntries([...attrText.matchAll(/([\w-]+)="([^"]*)"/g)].map((m) => [m[1], m[2]]));
-    const filled = a.fill && a.fill !== "none";
-    if (tag === "rect" && filled && num(a.width) <= 3) {
-      star = { x: num(a.x), y: num(a.y), ...(num(a.width) !== 3 ? { size: num(a.width) } : {}) };
-      continue;
-    }
-    if (filled) throw new Error(`${tag} has a fill: only the star may be filled`);
+    if (a.fill && a.fill !== "none") throw new Error(`${tag} has a fill: Facet icons are stroke only`);
     if (tag === "path") body.push(["path", { d: a.d ?? "" }]);
     if (tag === "rect")
       body.push([
@@ -205,7 +199,7 @@ export function svgToIcon(name: string, svg: string): IconData {
       ]);
     if (tag === "circle") body.push(["circle", { cx: num(a.cx), cy: num(a.cy), r: num(a.r) }]);
   }
-  return { name, body, ...(star ? { star } : {}) };
+  return { name, body };
 }
 
 const literal = (v: unknown): string =>
@@ -227,7 +221,7 @@ export function scaffoldIcon(root: string, name: string, svg: string): string {
   const id = camel(name);
   writeFileSync(
     file,
-    `import type { IconData } from "./types";\n\nexport const ${id}: IconData = {\n  name: ${JSON.stringify(name)},\n  body: ${literal(icon.body)},\n${icon.star ? `  star: ${literal(icon.star)},\n` : ""}};\n`,
+    `import type { IconData } from "./types.js";\n\nexport const ${id}: IconData = {\n  name: ${JSON.stringify(name)},\n  body: ${literal(icon.body)},\n};\n`,
   );
   const index = join(root, "src/icons/index.ts");
   writeFileSync(index, sortExports(`${readFileSync(index, "utf8")}export { ${id} } from "./${name}.js";\n`));

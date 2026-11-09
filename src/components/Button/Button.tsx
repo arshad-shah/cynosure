@@ -2,6 +2,8 @@ import { type CSSProperties, forwardRef, type ReactNode } from "react";
 import { ButtonBase, type ButtonBaseProps } from "../../foundations/ButtonBase/ButtonBase.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
 import type { IconData } from "../../icons/types.js";
+import type { Size, Tone } from "../../tokens/schema.js";
+import { LoadingDots } from "../LoadingDots/LoadingDots.js";
 
 export interface ButtonTokens {
   heightSm: string;
@@ -12,17 +14,13 @@ export interface ButtonTokens {
   gap: string;
   fontWeight: string;
   maxWidth: string;
-  primaryBg: string;
-  primaryInk: string;
-  primaryHover: string;
-  primaryShadow: string;
-  secondaryBg: string;
-  secondaryInk: string;
-  secondaryBorder: string;
-  hoverBg: string;
+  /** Inset highlight + drop shadow on solid buttons. */
+  solidShadow: string;
+  /** Tint strength of soft buttons (percentage of the tone mixed into the surface). */
+  softMix: string;
+  /** Border strength of outline buttons (percentage of the tone mixed into the line colour). */
+  outlineMix: string;
   pressScale: string;
-  starRotate: string;
-  starScale: string;
 }
 
 declare module "../../tokens/schema.js" {
@@ -31,13 +29,21 @@ declare module "../../tokens/schema.js" {
   }
 }
 
-export interface ButtonProps extends Omit<ButtonBaseProps, "children" | "className" | "style"> {
-  variant?: "primary" | "secondary" | "ghost" | "danger";
-  size?: "sm" | "md" | "lg";
-  icon?: IconData;
-  iconEnd?: IconData;
-  /** Shows a spinner, sets aria-busy and ignores activation while keeping the button's width. */
+export type ButtonVariant = "solid" | "soft" | "outline" | "ghost";
+
+export interface ButtonProps extends Omit<ButtonBaseProps, "children" | "className" | "style" | "color"> {
+  /** Fill style. */
+  variant?: ButtonVariant;
+  /** Semantic colour. */
+  tone?: Tone;
+  size?: Size;
+  /** Leading icon (inline-start, RTL aware). */
+  icon?: IconData | undefined;
+  /** Trailing icon (inline-end). */
+  iconEnd?: IconData | undefined;
+  /** Shows LoadingDots, sets aria-busy and ignores activation while keeping the button's width. */
   loading?: boolean;
+  /** Stretch to the container's width. */
   fullWidth?: boolean;
   className?: string;
   /** Layout only. Restyle through `--cy-button-*` tokens. */
@@ -48,7 +54,8 @@ export interface ButtonProps extends Omit<ButtonBaseProps, "children" | "classNa
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
   {
-    variant = "secondary",
+    variant = "outline",
+    tone = "neutral",
     size = "md",
     icon,
     iconEnd,
@@ -61,12 +68,14 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
   },
   ref,
 ) {
+  const iconSize = size === "lg" ? "lg" : "md";
   return (
     <ButtonBase
       ref={ref}
       {...rest}
       className={`cy-button cy-motion-trigger${className ? ` ${className}` : ""}`}
       data-variant={variant}
+      data-tone={tone}
       data-size={size}
       data-full={fullWidth ? "" : undefined}
       data-loading={loading ? "" : undefined}
@@ -75,11 +84,11 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       onClick={loading ? (e) => e.preventDefault() : onClick}
     >
       <span className="cy-reset cy-button-content">
-        {icon && <Icon icon={icon} size={size === "lg" ? "lg" : "md"} />}
+        {icon && <Icon icon={icon} size={iconSize} />}
         <span className="cy-reset cy-button-label">{children}</span>
-        {iconEnd && <Icon icon={iconEnd} size={size === "lg" ? "lg" : "md"} />}
+        {iconEnd && <Icon icon={iconEnd} size={iconSize} />}
       </span>
-      {loading && <span className="cy-reset cy-button-spinner" aria-hidden="true" />}
+      {loading && <LoadingDots className="cy-button-loading" />}
     </ButtonBase>
   );
 });

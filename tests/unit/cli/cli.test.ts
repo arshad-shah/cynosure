@@ -130,14 +130,24 @@ describe("cy new icon", () => {
   it("converts an SVG into a validated icon module and exports it", () => {
     const root = sandbox();
     const svg =
-      '<svg viewBox="0 0 24 24"><path d="M4 12h16"/><rect x="3" y="3" width="3" height="3" rx=".8" fill="currentColor"/></svg>';
+      '<svg viewBox="0 0 24 24"><path d="M4 12h16"/><rect x="3" y="3" width="6" height="6" rx="1.5"/></svg>';
     scaffoldIcon(root, "flat-line", svg);
     const mod = readFileSync(join(root, "src/icons/flat-line.ts"), "utf8");
     expect(mod).toContain('name: "flat-line"');
-    expect(mod).toContain("star: { x: 3, y: 3 }");
+    expect(mod).toContain('["rect", { x: 3, y: 3, width: 6, height: 6, rx: 1.5 }]');
     expect(readFileSync(join(root, "src/icons/index.ts"), "utf8")).toContain(
       'export { flatLine } from "./flat-line.js";',
     );
+  });
+  it("rejects filled shapes (stroke only)", () => {
+    const root = sandbox();
+    expect(() =>
+      scaffoldIcon(
+        root,
+        "blob",
+        '<svg viewBox="0 0 24 24"><rect x="3" y="3" width="3" height="3" fill="red"/></svg>',
+      ),
+    ).toThrow(/stroke only/);
   });
   it("rejects an SVG with text", () => {
     const root = sandbox();

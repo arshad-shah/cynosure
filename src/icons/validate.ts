@@ -20,7 +20,7 @@ export function validateIcon(icon: IconData): string[] {
       continue;
     }
     for (const key of Object.keys(attrs)) {
-      if (key === "fill") errors.push(`${tag} has a fill: only the star may be filled`);
+      if (key === "fill") errors.push(`${tag} has a fill: Facet icons are stroke only`);
       else if (!ALLOWED[tag]?.has(key)) errors.push(`${tag} has unsupported attribute "${key}"`);
     }
     const a = attrs as unknown as Record<string, unknown>;
@@ -43,12 +43,6 @@ export function validateIcon(icon: IconData): string[] {
       errors.push("circle is outside the 24 grid");
     if (tag === "path" && !/^[MmLlHhVvCcSsQqTtAaZz0-9.,\s-]+$/.test(String(a.d)))
       errors.push("path data has invalid characters");
-  }
-  if (icon.star) {
-    const size = icon.star.size ?? 3;
-    if (size < 2.5 || size > 3) errors.push(`star size ${size} must be 2.5–3`);
-    if (!inGrid(icon.star.x) || !inGrid(icon.star.y) || icon.star.x + size > 24 || icon.star.y + size > 24)
-      errors.push("star is outside the 24 grid");
   }
   return errors;
 }

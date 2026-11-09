@@ -7,11 +7,7 @@ describe("themeProperties", () => {
     expect(props["--cy-control-height-md"]).toBe("32px");
     expect(props["--cy-motion-base"]).toBe("200ms");
     expect(props["--cy-radius-factor"]).toBe("0.3");
-    expect(props["--cy-star-visible"]).toBe("1");
     expect(props["--cy-button-radius"]).toBe("4px");
-  });
-  it("emits 0 for a hidden star", () => {
-    expect(themeProperties(createTheme({ star: false }))["--cy-star-visible"]).toBe("0");
   });
   it("swaps in the high-contrast palettes", () => {
     const props = themeProperties(createTheme(), { contrast: true });

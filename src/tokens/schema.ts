@@ -1,6 +1,8 @@
 /** The complete Cynosure token schema. Every visual property of every component resolves to one of these. */
 
 export type Size = "sm" | "md" | "lg";
+/** Semantic colour shared by every component prop named `tone`. */
+export type Tone = "accent" | "neutral" | "danger" | "success" | "warning" | "info";
 export type Scale = "compact" | "comfortable" | "spacious" | number;
 export type PaletteName = "light" | "dark" | "light-contrast" | "dark-contrast";
 
@@ -26,6 +28,12 @@ export interface ColorTokens {
   onDanger: string;
   info: string;
   onInfo: string;
+  /** Text versions of each tone, readable (≥ 4.5:1) on the surface and on the tone's soft tint. */
+  accentText: string;
+  dangerText: string;
+  successText: string;
+  warningText: string;
+  infoText: string;
 }
 
 export interface MotionTokens {
@@ -56,7 +64,6 @@ export interface GlobalTokens {
   shadow: { sm: string; md: string; lg: string; lit: string };
   motion: MotionTokens;
   z: { dropdown: number; overlay: number; toast: number; tooltip: number };
-  star: { visible: boolean; size: number };
   hit: { min: number; coarse: number };
 }
 
@@ -77,7 +84,6 @@ export interface ThemeInput {
   /** Multiplier on the Facet radius factor (1 = default, 0 = square). */
   radius?: number;
   font?: Partial<Record<"sans" | "mono" | "display", string>>;
-  star?: boolean | { size: number };
   motion?: "reduced" | Partial<MotionTokens>;
   tokens?: DeepPartial<GlobalTokens>;
   palettes?: Partial<Record<PaletteName, Partial<ColorTokens>>>;

@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { expect, fn, waitFor } from "storybook/test";
+import * as icons from "../../icons/index.js";
 import { check, chevronDown, copy, download, trash } from "../../icons/index.js";
 import { createStyleSheet } from "../../styles/inline.js";
 import { computeUnderHostileHost } from "../../test/hostile.js";
@@ -9,10 +10,28 @@ import { CynosureTheme } from "../../theme/index.js";
 import { createTheme } from "../../tokens/index.js";
 import { Button } from "./Button.js";
 
+const iconMapping: Record<string, unknown> = { none: undefined };
+for (const value of Object.values(icons))
+  if (typeof value === "object" && value && "body" in value) iconMapping[value.name] = value;
+const iconNames = Object.keys(iconMapping).filter((n) => n !== "none");
+
 const meta = {
   title: "Components/Button",
   component: Button,
-  args: { children: "Export", onClick: fn() },
+  args: { children: "Export", onClick: fn(), variant: "outline", tone: "neutral", size: "md" },
+  argTypes: {
+    variant: { control: "inline-radio", options: ["solid", "soft", "outline", "ghost"] },
+    tone: { control: "select", options: ["accent", "neutral", "danger", "success", "warning", "info"] },
+    size: { control: "inline-radio", options: ["sm", "md", "lg"] },
+    icon: { control: "select", options: ["none", ...iconNames], mapping: iconMapping },
+    iconEnd: { control: "select", options: ["none", ...iconNames], mapping: iconMapping },
+    loading: { control: "boolean" },
+    pressed: { control: "boolean" },
+    disabled: { control: "boolean" },
+    fullWidth: { control: "boolean" },
+    children: { control: "text" },
+    type: { control: "inline-radio", options: ["button", "submit", "reset"] },
+  },
 } satisfies Meta<typeof Button>;
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -24,21 +43,25 @@ const pseudo = (el: Element) => {
 
 export const Primary: Story = {
   tags: ["visual"],
-  args: { variant: "primary", icon: download },
+  args: { variant: "solid", tone: "accent", icon: download },
   play: async ({ canvas, args, userEvent }) => {
     await userEvent.click(canvas.getByRole("button", { name: "Export" }));
     await expect(args.onClick).toHaveBeenCalledTimes(1);
   },
 };
 
-export const Secondary: Story = {
+export const Outline: Story = {
   tags: ["visual"],
-  args: { variant: "secondary", icon: copy, children: "Copy path" },
+  args: { variant: "outline", icon: copy, children: "Copy path" },
+};
+export const Soft: Story = {
+  tags: ["visual"],
+  args: { variant: "soft", tone: "accent", icon: copy, children: "Copy path" },
 };
 export const Ghost: Story = { tags: ["visual"], args: { variant: "ghost", children: "Cancel" } };
 export const Danger: Story = {
   tags: ["visual"],
-  args: { variant: "danger", icon: trash, children: "Delete" },
+  args: { variant: "soft", tone: "danger", icon: trash, children: "Delete" },
 };
 
 export const Sizes: Story = {
@@ -127,7 +150,7 @@ export const HitTargetCoarsePointer: Story = {
 
 export const Loading: Story = {
   tags: ["visual"],
-  args: { variant: "primary", icon: download },
+  args: { variant: "solid", tone: "accent", icon: download },
   render: (args) => (
     <div style={{ display: "flex", gap: 12 }}>
       <Button {...args} loading data-testid="busy" />
@@ -140,6 +163,12 @@ export const Loading: Story = {
     await expect(busy).toHaveAccessibleName("Export");
     await userEvent.click(busy);
     await expect(args.onClick).not.toHaveBeenCalled();
+    const dots = busy.querySelector(".cy-loading-dots") as HTMLElement;
+    await expect(dots).toHaveAttribute("aria-hidden", "true");
+    const b = busy.getBoundingClientRect();
+    const d = dots.getBoundingClientRect();
+    await expect(Math.abs(d.left + d.width / 2 - (b.left + b.width / 2))).toBeLessThan(1);
+    await expect(Math.abs(d.top + d.height / 2 - (b.top + b.height / 2))).toBeLessThan(1);
     const idle = canvas.getByTestId("idle");
     await expect(busy.getBoundingClientRect().width).toBeCloseTo(idle.getBoundingClientRect().width, 0);
   },
@@ -195,21 +224,6 @@ export const SubmitsWhenTypeSubmit: Story = {
   },
 };
 
-export const PrimaryStarSpinsOnHover: Story = {
-  render: (args) => (
-    <CynosureTheme theme={createTheme({ motion: "reduced" })}>
-      <Button {...args} variant="primary" icon={check} />
-    </CynosureTheme>
-  ),
-  play: async ({ canvasElement }) => {
-    const button = canvasElement.querySelector("button") as HTMLElement;
-    const star = canvasElement.querySelector(".cy-icon-star") as SVGElement;
-    await expect(getComputedStyle(star).transform).toBe("none");
-    button.setAttribute("data-active", "");
-    await waitFor(() => expect(getComputedStyle(star).transform).not.toBe("none"));
-  },
-};
-
 export const LongLabelTruncates: Story = {
   args: {
     icon: download,
@@ -251,7 +265,7 @@ const STABLE = [
 ];
 
 export const StableUnderHostileHost: Story = {
-  args: { variant: "primary", icon: download },
+  args: { variant: "solid", tone: "accent", icon: download },
   play: async ({ canvasElement }) => {
     const button = computeUnderHostileHost(canvasElement, "button", STABLE);
     await expect(button.hostile).toEqual(button.clean);
@@ -277,14 +291,14 @@ function ShadowButton() {
     const mount = document.createElement("div");
     root.append(mount);
     createRoot(mount).render(
-      <Button variant="primary" icon={download}>
+      <Button variant="solid" tone="accent" icon={download}>
         Export
       </Button>,
     );
   }, []);
   return (
     <div>
-      <Button variant="primary" icon={download}>
+      <Button variant="solid" tone="accent" icon={download}>
         Export
       </Button>
       <div data-testid="host" ref={host} />
@@ -298,9 +312,9 @@ export const InsideShadowRoot: Story = {
     const host = await canvas.findByTestId("host");
     await waitFor(() => expect(host.shadowRoot?.querySelector("button")).toBeTruthy());
     const inside = getComputedStyle(host.shadowRoot?.querySelector("button") as Element);
-    const page = getComputedStyle(canvasElement.querySelector("button") as Element);
+    const onPage = getComputedStyle(canvasElement.querySelector("button") as Element);
     for (const p of ["height", "border-radius", "padding-inline-start", "font-size", "font-weight"])
-      await expect(inside.getPropertyValue(p)).toBe(page.getPropertyValue(p));
+      await expect(inside.getPropertyValue(p)).toBe(onPage.getPropertyValue(p));
   },
 };
 
@@ -342,5 +356,87 @@ export const FullWidth: Story = {
   ),
   play: async ({ canvas }) => {
     await expect(canvas.getByRole("button").getBoundingClientRect().width).toBe(480);
+  },
+};
+
+export const DangerIsDistinctFromPrimary: Story = {
+  render: () => (
+    <div style={{ display: "flex", gap: 12 }}>
+      <Button variant="solid" tone="accent" data-testid="primary">
+        Save
+      </Button>
+      <Button variant="soft" tone="danger" data-testid="danger" icon={trash}>
+        Delete
+      </Button>
+    </div>
+  ),
+  play: async ({ canvas }) => {
+    const primary = getComputedStyle(canvas.getByTestId("primary"));
+    const danger = getComputedStyle(canvas.getByTestId("danger"));
+    // Soft danger is a crimson tint with crimson text: never a second solid accent.
+    await expect(danger.backgroundColor).not.toBe(primary.backgroundColor);
+    await expect(danger.backgroundColor).not.toBe("rgba(0, 0, 0, 0)");
+    await expect(danger.color).not.toBe(primary.color);
+  },
+};
+
+/** Resolves any CSS colour (rgb, oklab, color-mix results…) to sRGB by painting one pixel. */
+function rgb(value: string): [number, number, number] {
+  const ctx = document.createElement("canvas").getContext("2d") as CanvasRenderingContext2D;
+  ctx.fillStyle = value;
+  ctx.fillRect(0, 0, 1, 1);
+  const [r = 0, g = 0, bl = 0] = ctx.getImageData(0, 0, 1, 1).data;
+  return [r, g, bl];
+}
+
+function contrast(a: string, b: string): number {
+  const lum = (c: string) => {
+    const [r, g, bl] = rgb(c).map((v) => {
+      const s = v / 255;
+      return s <= 0.04045 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+    }) as [number, number, number];
+    return 0.2126 * r + 0.7152 * g + 0.0722 * bl;
+  };
+  const [hi, lo] = [lum(a), lum(b)].sort((x, y) => y - x) as [number, number];
+  return (hi + 0.05) / (lo + 0.05);
+}
+
+/** The first non-transparent background behind an element. */
+function backdrop(el: Element | null): string {
+  for (let e = el; e; e = e.parentElement) {
+    const bg = getComputedStyle(e).backgroundColor;
+    if (bg !== "rgba(0, 0, 0, 0)" && bg !== "transparent") return bg;
+  }
+  return "rgb(255, 255, 255)";
+}
+
+const VARIANTS = ["solid", "soft", "outline", "ghost"] as const;
+const TONES = ["accent", "neutral", "danger", "success", "warning", "info"] as const;
+
+export const VariantsAndTones: Story = {
+  tags: ["visual"],
+  render: () => (
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(4, max-content)", gap: 12 }}>
+      {TONES.flatMap((tone) =>
+        VARIANTS.map((variant) => (
+          <Button key={`${tone}-${variant}`} variant={variant} tone={tone} data-testid={`${tone}-${variant}`}>
+            {tone} {variant}
+          </Button>
+        )),
+      )}
+    </div>
+  ),
+  play: async ({ canvas }) => {
+    for (const tone of TONES) {
+      const looks = new Set<string>();
+      for (const variant of VARIANTS) {
+        const button = canvas.getByTestId(`${tone}-${variant}`);
+        const style = getComputedStyle(button);
+        looks.add(`${style.backgroundColor}|${style.borderTopColor}|${style.color}`);
+        const ratio = contrast(style.color, backdrop(button));
+        await expect({ tone, variant, readable: ratio >= 4.5 }).toEqual({ tone, variant, readable: true });
+      }
+      await expect(looks.size).toBe(VARIANTS.length);
+    }
   },
 };

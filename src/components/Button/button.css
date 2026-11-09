@@ -1,4 +1,5 @@
-/* Button. Every visual property reads a --cy-button-* token with a global fallback. */
+/* Button: variant (fill style) × tone (semantic colour) × size. Every visual value reads a --cy-button-* token
+   with a global fallback. Inner parts first (lower specificity), root last. */
 .cy-button-content {
   display: inline-flex;
   align-items: center;
@@ -14,26 +15,32 @@
   min-inline-size: 0;
 }
 
-.cy-button-spinner {
+/* LoadingDots overlay, centred over the (transparent) content so the button keeps its width. */
+.cy-button .cy-loading-dots.cy-button-loading {
   position: absolute;
   inset: 0;
   margin: auto;
-  inline-size: 1.1em;
-  block-size: 1.1em;
-  border: calc(var(--cy-border-width) * 2) solid currentColor;
-  border-inline-end-color: transparent;
-  border-radius: 50%;
-  animation: cy-button-spin 0.7s linear infinite;
+  inline-size: fit-content;
 }
 
 /* Root selector is doubled so host type/attribute rules (e.g. Tailwind v3 [type=button]) never win. */
 .cy-button.cy-button {
+  /* Tone: the semantic colour, its text colour and its pressed shade. */
+  --_tone: var(--cy-color-ink);
+  --_tone-text: var(--cy-color-ink);
+  --_on: var(--cy-color-bg);
+  --_tone-hover: color-mix(in oklab, var(--_tone) 86%, var(--cy-color-bg));
+  --_soft: var(--cy-button-soft-mix, 14%);
+  --_outline: var(--cy-button-outline-mix, 55%);
   --_h: var(--cy-button-height-md, var(--cy-control-height-md));
-  --_bg: var(--cy-button-secondary-bg, var(--cy-color-surface));
-  --_ink: var(--cy-button-secondary-ink, var(--cy-color-ink));
-  --_border: var(--cy-button-secondary-border, var(--cy-color-line));
-  --_hover: var(--cy-button-hover-bg, var(--cy-color-soft));
   --_hit: var(--cy-hit-min, 24px);
+
+  /* Variant defaults (outline): computed from the tone. */
+  --_bg: var(--cy-color-surface);
+  --_fg: var(--_tone-text);
+  --_border: color-mix(in oklab, var(--_tone) var(--_outline), var(--cy-color-line));
+  --_hover: color-mix(in oklab, var(--_tone) var(--_soft), var(--cy-color-surface));
+
   /* Root reset (component roots never carry .cy-reset, so nothing competes with these rules). */
   box-sizing: border-box !important;
   margin: 0;
@@ -53,7 +60,7 @@
   border-radius: var(--cy-button-radius, calc(var(--_h) * var(--cy-radius-factor)));
   background: var(--_bg);
   background-image: none;
-  color: var(--_ink);
+  color: var(--_fg);
   font-family: var(--cy-font-sans);
   font-size: var(--cy-font-size-md);
   font-weight: var(--cy-button-font-weight, var(--cy-font-weight-medium));
@@ -82,6 +89,60 @@
     block-size: max(100%, var(--_hit));
   }
 
+  /* Tones */
+  &[data-tone="accent"] {
+    --_tone: var(--cy-color-accent);
+    --_tone-text: var(--cy-color-accent-text);
+    --_on: var(--cy-color-on-accent);
+    --_tone-hover: var(--cy-color-accent-hover);
+  }
+  &[data-tone="danger"] {
+    --_tone: var(--cy-color-danger);
+    --_tone-text: var(--cy-color-danger-text);
+    --_on: var(--cy-color-on-danger);
+  }
+  &[data-tone="success"] {
+    --_tone: var(--cy-color-success);
+    --_tone-text: var(--cy-color-success-text);
+    --_on: var(--cy-color-on-success);
+  }
+  &[data-tone="warning"] {
+    --_tone: var(--cy-color-warning);
+    --_tone-text: var(--cy-color-warning-text);
+    --_on: var(--cy-color-on-warning);
+  }
+  &[data-tone="info"] {
+    --_tone: var(--cy-color-info);
+    --_tone-text: var(--cy-color-info-text);
+    --_on: var(--cy-color-on-info);
+  }
+
+  /* Variants */
+  &[data-variant="solid"] {
+    --_bg: var(--_tone);
+    --_fg: var(--_on);
+    --_border: transparent;
+    --_hover: var(--_tone-hover);
+    box-shadow: var(--cy-button-solid-shadow, var(--cy-shadow-lit));
+  }
+  &[data-variant="soft"] {
+    --_bg: color-mix(in oklab, var(--_tone) var(--_soft), var(--cy-color-surface));
+    --_border: transparent;
+    --_hover: color-mix(in oklab, var(--_tone) calc(var(--_soft) * 1.7), var(--cy-color-surface));
+  }
+  &[data-variant="ghost"] {
+    --_bg: transparent;
+    --_border: transparent;
+  }
+  &[data-tone="neutral"]:is([data-variant="soft"], [data-variant="ghost"], [data-variant="outline"]) {
+    --_fg: var(--cy-color-ink);
+  }
+  &[data-tone="neutral"][data-variant="outline"] {
+    --_border: var(--cy-color-line);
+    --_hover: var(--cy-color-soft);
+  }
+
+  /* Sizes */
   &[data-size="sm"] {
     --_h: var(--cy-button-height-sm, var(--cy-control-height-sm));
     font-size: var(--cy-font-size-sm);
@@ -90,37 +151,12 @@
     --_h: var(--cy-button-height-lg, var(--cy-control-height-lg));
     font-size: var(--cy-font-size-lg);
   }
-
-  &[data-variant="primary"] {
-    --_bg: var(--cy-button-primary-bg, var(--cy-color-accent));
-    --_ink: var(--cy-button-primary-ink, var(--cy-color-on-accent));
-    --_border: transparent;
-    --_hover: var(--cy-button-primary-hover, var(--cy-color-accent-hover));
-    --cy-icon-star: var(--_ink);
-    box-shadow: var(--cy-button-primary-shadow, var(--cy-shadow-lit));
-    & .cy-icon-star {
-      transition: transform var(--cy-motion-slow) var(--cy-motion-ease);
-    }
-    &:is(:hover, [data-active]) .cy-icon-star {
-      transform: rotate(var(--cy-button-star-rotate, 45deg)) scale(var(--cy-button-star-scale, 1.3));
-    }
-  }
-  &[data-variant="ghost"] {
-    --_bg: transparent;
-    --_border: transparent;
-  }
-  &[data-variant="danger"] {
-    --_bg: var(--cy-color-danger);
-    --_ink: var(--cy-color-on-danger);
-    --_border: transparent;
-    --_hover: color-mix(in oklab, var(--cy-color-danger) 88%, black);
-    --cy-icon-star: var(--_ink);
-  }
   &[data-full] {
     inline-size: 100%;
     max-inline-size: none;
   }
 
+  /* States */
   &:hover:not(:disabled, [aria-disabled="true"]) {
     background: var(--_hover);
   }
@@ -128,8 +164,8 @@
     transform: scale(var(--cy-button-press-scale, 0.97));
   }
   &[data-pressed] {
-    --_bg: var(--cy-color-accent-soft);
-    --_border: var(--cy-color-accent);
+    --_bg: color-mix(in oklab, var(--_tone) var(--_soft), var(--cy-color-surface));
+    --_border: var(--_tone);
   }
   &:focus-visible {
     outline: var(--cy-border-focus) solid transparent;
@@ -152,11 +188,5 @@
 @media (pointer: coarse) {
   .cy-button.cy-button {
     --_hit: var(--cy-hit-coarse, 44px);
-  }
-}
-
-@keyframes cy-button-spin {
-  to {
-    rotate: 1turn;
   }
 }

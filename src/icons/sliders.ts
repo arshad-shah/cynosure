@@ -7,6 +7,5 @@ export const sliders: IconData = {
     ["rect", { x: 12, y: 5, width: 6, height: 4, rx: 1.3, animate: true }],
     ["rect", { x: 6, y: 15, width: 6, height: 4, rx: 1.3 }],
   ],
-  star: { x: 7.5, y: 15.5 },
   motion: "slide",
 };

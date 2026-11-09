@@ -23,7 +23,10 @@ export const Default: Story = {
   },
 };
 
-export const Danger: Story = { tags: ["visual"], args: { icon: trash, label: "Delete", variant: "danger" } };
+export const Danger: Story = {
+  tags: ["visual"],
+  args: { icon: trash, label: "Delete", variant: "soft", tone: "danger" },
+};
 
 export const TooltipShowsAndDismisses: Story = {
   play: async ({ canvas, userEvent }) => {

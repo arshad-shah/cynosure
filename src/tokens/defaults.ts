@@ -1,7 +1,8 @@
 import type { ColorTokens, GlobalTokens } from "./schema.js";
 
 /** Placeholder brand accent; final value is signed off in Storybook (spec §15). */
-export const DEFAULT_ACCENT = "#d0612a";
+/** Cynosure ember: the brand accent (white text passes AA on rest, hover and active). */
+export const DEFAULT_ACCENT = "#c2410c";
 
 export const SCALES = { compact: 0.875, comfortable: 1, spacious: 1.2 } as const;
 
@@ -19,7 +20,7 @@ export const BASE_PALETTES: Record<"light" | "dark", BasePalette & Status> = {
     line: "#dcd6cb",
     success: "#2f7d4a",
     warning: "#a8650f",
-    danger: "#c0392b",
+    danger: "#b4235a",
     info: "#2f66b0",
   },
   dark: {
@@ -32,7 +33,7 @@ export const BASE_PALETTES: Record<"light" | "dark", BasePalette & Status> = {
     line: "#34302a",
     success: "#5cc282",
     warning: "#e3a548",
-    danger: "#f07563",
+    danger: "#ff6b8f",
     info: "#77a6ec",
   },
 };
@@ -66,6 +67,5 @@ export const BASE_GLOBAL: Omit<GlobalTokens, "scale"> = {
     easeInOut: "cubic-bezier(.65,0,.35,1)",
   },
   z: { dropdown: 1000, overlay: 1100, toast: 1200, tooltip: 1300 },
-  star: { visible: true, size: 3 },
   hit: { min: 24, coarse: 44 },
 };

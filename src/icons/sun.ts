@@ -12,6 +12,5 @@ export const sun: IconData = {
       },
     ],
   ],
-  star: { x: 10.5, y: 10.5 },
   motion: "spin",
 };

@@ -1,4 +1,4 @@
-/* Icon foundation. Component tokens: --cy-icon-size-{sm,md,lg}, --cy-icon-stroke, --cy-icon-star. */
+/* Icon foundation. Component tokens: --cy-icon-size-{sm,md,lg}, --cy-icon-stroke. */
 .cy-icon {
   --_size: var(--cy-icon-size, var(--cy-icon-size-md, calc(16px * var(--cy-scale, 1))));
   display: inline-block;
@@ -17,6 +17,27 @@
   &[data-size="sm"] {
     --_size: var(--cy-icon-size-sm, calc(14px * var(--cy-scale, 1)));
   }
+  &[data-tone="accent"] {
+    color: var(--cy-color-accent);
+  }
+  &[data-tone="neutral"] {
+    color: var(--cy-color-ink);
+  }
+  &[data-tone="muted"] {
+    color: var(--cy-color-muted);
+  }
+  &[data-tone="danger"] {
+    color: var(--cy-color-danger);
+  }
+  &[data-tone="success"] {
+    color: var(--cy-color-success);
+  }
+  &[data-tone="warning"] {
+    color: var(--cy-color-warning);
+  }
+  &[data-tone="info"] {
+    color: var(--cy-color-info);
+  }
   &[data-size="lg"] {
     --_size: var(--cy-icon-size-lg, calc(20px * var(--cy-scale, 1)));
   }
@@ -24,20 +45,12 @@
     transform-box: fill-box;
     transform-origin: center;
   }
-  & .cy-icon-star {
-    fill: var(--cy-icon-star, var(--cy-color-accent));
-    stroke: none;
-    display: var(--cy-icon-star-display, inline);
-  }
 }
 
 /* Micro-animations play when an ancestor .cy-motion-trigger is hovered, keyboard-focused or [data-active]. */
 .cy-motion-trigger:is(:hover, :focus-visible, [data-active]) .cy-icon {
   --_d: var(--cy-motion-slow, 350ms);
   --_e: var(--cy-motion-ease, cubic-bezier(0.2, 0.9, 0.2, 1));
-  & .cy-icon-star {
-    animation: cy-icon-spark var(--_d) var(--_e);
-  }
   &[data-motion="tilt"] .cy-icon-animate,
   &[data-motion="tilt"] > * {
     animation: cy-icon-tilt var(--_d) var(--_e) both;
@@ -72,14 +85,6 @@
   }
 }
 
-@keyframes cy-icon-spark {
-  40% {
-    transform: scale(1.6) rotate(45deg);
-  }
-  to {
-    transform: rotate(90deg);
-  }
-}
 @keyframes cy-icon-tilt {
   to {
     transform: rotate(-14deg) scale(1.05);

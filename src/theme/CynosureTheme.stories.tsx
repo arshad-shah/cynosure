@@ -65,11 +65,18 @@ export const SystemMode: Story = {
 };
 
 export const ContrastMore: Story = {
-  args: { theme: createTheme(), mode: "light", contrast: "more", children: <Swatch id="contrast" /> },
+  args: {
+    theme: createTheme(),
+    mode: "light",
+    contrast: "more",
+    children: (
+      <p data-testid="ink" style={{ color: "var(--cy-color-ink)" }}>
+        High-contrast ink
+      </p>
+    ),
+  },
   play: async ({ canvas }) => {
-    const swatch = await canvas.findByTestId("contrast");
-    swatch.style.color = "var(--cy-color-ink)";
-    await expect(getComputedStyle(swatch).color).toBe("rgb(0, 0, 0)");
+    await expect(getComputedStyle(await canvas.findByTestId("ink")).color).toBe("rgb(0, 0, 0)");
   },
 };
 

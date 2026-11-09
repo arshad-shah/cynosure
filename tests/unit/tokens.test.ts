@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { CynosureThemeError, contrastRatio, createTheme, themeToCss } from "../../src/tokens";
+import { mix, parseColor, rgbToOklch } from "../../src/tokens/color";
 
 describe("default palettes (approved Facet values)", () => {
   it("light palette matches", () => {
@@ -154,10 +155,6 @@ describe("colour input formats", () => {
 });
 
 describe("theme options", () => {
-  it("star accepts a boolean or a size", () => {
-    expect(createTheme({ star: false }).global.star.visible).toBe(false);
-    expect(createTheme({ star: { size: 2.5 } }).global.star).toEqual({ visible: true, size: 2.5 });
-  });
   it("font families and partial motion override defaults", () => {
     const t = createTheme({ font: { sans: "Hanken Grotesk, system-ui" }, motion: { base: 90 } });
     expect(t.global.font.sans).toBe("Hanken Grotesk, system-ui");
@@ -184,4 +181,40 @@ describe("themeToCss with a custom selector", () => {
     expect(css).toContain('.app[data-cy-mode="dark"]{color-scheme:dark}');
     expect(css).toContain('@media (prefers-contrast:more){.app[data-cy-contrast="system"]{');
   });
+});
+
+describe("readability and distinct roles", () => {
+  it("prefers white on-accent text whenever it passes 4.5:1 on every fill", () => {
+    for (const accent of [undefined, "#c2410c", "#2563eb", "#be123c"]) {
+      const p = createTheme(accent ? { accent } : {}).palettes.light;
+      expect(p.onAccent).toBe("#ffffff");
+    }
+  });
+  it("keeps dark text where white would fail", () => {
+    expect(createTheme({ accent: "#d4a843" }).palettes.light.onAccent).not.toBe("#ffffff");
+  });
+  it("danger is a clearly different hue from the default accent", () => {
+    const { light, dark } = createTheme().palettes;
+    for (const p of [light, dark]) {
+      const hue = (hex: string) => rgbToOklch(parseColor(hex))[2];
+      const diff = Math.abs(hue(p.danger) - hue(p.accent));
+      expect(Math.min(diff, 360 - diff)).toBeGreaterThanOrEqual(25);
+    }
+  });
+});
+
+describe("tone text roles", () => {
+  const tones = ["accent", "danger", "success", "warning", "info"] as const;
+  it.each(["#c2410c", "#e8462e", "#d4a843", "#14b8a6", "#2563eb"])(
+    "tone text reaches 4.5:1 on its strongest soft tint and on the surface for accent %s",
+    (accent) => {
+      for (const p of [createTheme({ accent }).palettes.light, createTheme({ accent }).palettes.dark]) {
+        for (const tone of tones) {
+          const text = p[`${tone}Text`];
+          expect(contrastRatio(text, mix(p[tone], p.surface, 0.24))).toBeGreaterThanOrEqual(4.5);
+          expect(contrastRatio(text, p.surface)).toBeGreaterThanOrEqual(4.5);
+        }
+      }
+    },
+  );
 });

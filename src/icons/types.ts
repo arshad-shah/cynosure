@@ -1,4 +1,4 @@
-/** Facet icons: 24×24 grid, 1.75 round stroke, softened-square geometry, one optional accent star. */
+/** Facet icons: 24×24 grid, 1.75 round stroke, softened-square geometry, stroke only. */
 
 export type IconMotion =
   | "tilt"
@@ -25,7 +25,5 @@ export interface IconData {
   /** kebab-case, unique. */
   name: string;
   body: IconNode[];
-  /** Top-left of the accent star square (3×3, radius 0.8, unless `size` given: 2.5–3). */
-  star?: { x: number; y: number; size?: number };
   motion?: IconMotion;
 }

@@ -10,9 +10,22 @@ const all = Object.values(icons).filter(
   (v): v is IconData => typeof v === "object" && v !== null && "body" in v,
 );
 
-const meta = { title: "Foundations/Icon", component: Icon, args: { icon: icons.search } } satisfies Meta<
-  typeof Icon
->;
+const mapping = Object.fromEntries(all.map((i) => [i.name, i]));
+const meta = {
+  title: "Foundations/Icon",
+  component: Icon,
+  args: { icon: icons.search, size: "lg", tone: "inherit" },
+  argTypes: {
+    icon: { control: "select", options: Object.keys(mapping), mapping },
+    size: { control: "inline-radio", options: ["sm", "md", "lg"] },
+    tone: {
+      control: "select",
+      options: ["inherit", "accent", "neutral", "muted", "danger", "success", "warning", "info"],
+    },
+    color: { control: "color" },
+    label: { control: "text" },
+  },
+} satisfies Meta<typeof Icon>;
 export default meta;
 type Story = StoryObj<typeof meta>;
 
@@ -73,18 +86,6 @@ export const Sizes: Story = {
   },
 };
 
-export const StarTakesAccent: Story = {
-  render: () => (
-    <CynosureTheme theme={createTheme({ accent: "#14b8a6" })}>
-      <Icon icon={icons.check} size="lg" />
-    </CynosureTheme>
-  ),
-  play: async ({ canvasElement }) => {
-    const star = canvasElement.querySelector(".cy-icon-star") as SVGElement;
-    await expect(getComputedStyle(star).fill).toBe("rgb(20, 184, 166)");
-  },
-};
-
 export const MotionOnActive: Story = {
   render: () => (
     <div className="cy-motion-trigger" data-active="" data-testid="trigger">
@@ -130,5 +131,21 @@ export const LayoutClassName: Story = {
     const svg = canvasElement.querySelector("svg.cy-icon") as SVGElement;
     await expect(svg).toHaveClass("cy-icon", "nav-icon");
     await expect(getComputedStyle(svg).marginInlineEnd).toBe("6px");
+  },
+};
+
+export const TonesAndColour: Story = {
+  render: () => (
+    <div style={{ display: "flex", gap: 12 }}>
+      <Icon icon={icons.check} tone="success" size="lg" />
+      <Icon icon={icons.warning} tone="warning" size="lg" />
+      <Icon icon={icons.trash} tone="danger" size="lg" />
+      <Icon icon={icons.info} color="rgb(0, 128, 0)" size="lg" />
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const colours = [...canvasElement.querySelectorAll("svg.cy-icon")].map((s) => getComputedStyle(s).color);
+    await expect(new Set(colours.slice(0, 3)).size).toBe(3);
+    await expect(colours[3]).toBe("rgb(0, 128, 0)");
   },
 };

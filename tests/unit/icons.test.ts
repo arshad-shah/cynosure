@@ -44,22 +44,18 @@ describe("Facet icon set", () => {
 });
 
 describe("validateIcon", () => {
-  const ok: IconData = { name: "ok", body: [["path", { d: "M4 4h16" }]], star: { x: 3, y: 3 } };
+  const ok: IconData = { name: "ok", body: [["path", { d: "M4 4h16" }]] };
   it("accepts a minimal valid icon", () => expect(validateIcon(ok)).toEqual([]));
   it("rejects text nodes", () => {
     expect(validateIcon({ ...ok, body: [["text" as "path", { d: "A" }]] }).join()).toMatch(/text/);
   });
-  it("rejects fills other than the star", () => {
+  it("rejects fills (Facet icons are stroke only)", () => {
     expect(
       validateIcon({
         ...ok,
         body: [["rect", { x: 2, y: 2, width: 4, height: 4, fill: "red" } as never]],
       }).join(),
     ).toMatch(/fill/);
-  });
-  it("rejects an off-grid or wrongly sized star", () => {
-    expect(validateIcon({ ...ok, star: { x: 23, y: 3 } }).join()).toMatch(/star/);
-    expect(validateIcon({ ...ok, star: { x: 3, y: 3, size: 6 } }).join()).toMatch(/star/);
   });
   it("rejects rects outside the grid and invalid path data", () => {
     expect(validateIcon({ ...ok, body: [["rect", { x: 20, y: 2, width: 8, height: 4 }]] }).join()).toMatch(

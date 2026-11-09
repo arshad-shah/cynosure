@@ -32,7 +32,7 @@ const component = defineCommand({
 
 const icon = defineCommand({
   name: "icon",
-  description: "Add a Facet icon from an SVG (24 grid, stroke only, one filled 3×3 star)",
+  description: "Add a Facet icon from an SVG (24 grid, stroke only)",
   positionals: [{ name: "name", description: "kebab-case name", required: true }],
   args: { from: { type: "string", required: true, description: "path to the source SVG" } },
   handler: ({ args }) => {

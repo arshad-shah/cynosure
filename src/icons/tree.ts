@@ -7,6 +7,5 @@ export const tree: IconData = {
     ["rect", { x: 14.5, y: 15, width: 6, height: 5, rx: 1.5, animate: true }],
     ["path", { d: "M6.5 9v8.5h8" }],
   ],
-  star: { x: 16, y: 5.5 },
   motion: "slide",
 };

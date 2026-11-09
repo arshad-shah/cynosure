@@ -126,3 +126,32 @@ export function bestContrast(background: string, candidates: readonly string[]):
     (x, y) => contrastRatio(y, background) - contrastRatio(x, background),
   )[0] as string;
 }
+
+const toLab = (rgb: Rgb): [number, number, number] => {
+  const [L, C, H] = rgbToOklch(rgb);
+  const h = (H * Math.PI) / 180;
+  return [L, C * Math.cos(h), C * Math.sin(h)];
+};
+
+/** Mixes `a` into `b` in OKLab (`amount` of `a`), matching CSS `color-mix(in oklab, a amount, b)`. */
+export function mix(a: string, b: string, amount: number): string {
+  const [l1, a1, b1] = toLab(parseColor(a));
+  const [l2, a2, b2] = toLab(parseColor(b));
+  const L = l1 * amount + l2 * (1 - amount);
+  const A = a1 * amount + a2 * (1 - amount);
+  const B = b1 * amount + b2 * (1 - amount);
+  return toHex(oklchToRgb(L, Math.hypot(A, B), ((Math.atan2(B, A) * 180) / Math.PI + 360) % 360));
+}
+
+/** Shifts `color` darker (light UI) or lighter (dark UI) until it reaches `ratio` against every background. */
+export function readableOn(
+  color: string,
+  backgrounds: readonly string[],
+  dark: boolean,
+  ratio = 4.5,
+): string {
+  let out = toHex(parseColor(color));
+  for (let i = 0; i < 40 && backgrounds.some((bg) => contrastRatio(out, bg) < ratio); i++)
+    out = shiftLightness(out, dark ? 0.02 : -0.02);
+  return out;
+}

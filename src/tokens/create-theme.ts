@@ -2,7 +2,9 @@ import {
   bestContrast,
   CynosureThemeError,
   contrastRatio,
+  mix,
   parseColor,
+  readableOn,
   shiftLightness,
   toHex,
 } from "./color.js";
@@ -45,9 +47,6 @@ function buildGlobal(input: ThemeInput): GlobalTokens {
     g.radius[k] = Math.round(g.control.height[k] * factor * 100) / 100;
   if (input.radius === 0) g.radius.card = 0;
   Object.assign(g.font, input.font);
-  if (input.star !== undefined)
-    g.star =
-      typeof input.star === "boolean" ? { ...g.star, visible: input.star } : { visible: true, ...input.star };
   if (input.motion === "reduced") g.motion = { ...g.motion, fast: 0, base: 0, slow: 0 };
   else if (input.motion) g.motion = { ...g.motion, ...input.motion };
   return merge({ ...g, scale }, input.tokens);
@@ -66,7 +65,9 @@ function accentRoles(
     const score = Math.min(contrastRatio(on, hex), contrastRatio(on, hover), contrastRatio(on, active));
     return { on, hover, active, score };
   });
-  const best = options.reduce((a, b) => (b.score > a.score ? b : a));
+  // White reads best on saturated accents: use it whenever it passes AA on every fill; otherwise the strongest option.
+  const white = options.find((o) => o.on === "#ffffff" && o.score >= 4.5);
+  const best = white ?? options.reduce((a, b) => (b.score > a.score ? b : a));
   return {
     accent: hex,
     accentHover: best.hover,
@@ -112,13 +113,22 @@ export function createTheme(input: ThemeInput = {}): Theme {
   const palette = (name: "light" | "dark"): ColorTokens => {
     const base = BASE_PALETTES[name];
     const status = (k: "success" | "warning" | "danger" | "info") => bestContrast(base[k], ON_CANDIDATES);
+    const roles = accentRoles(accent, base.surface);
+    // The strongest tint components use is ~24% of the tone over the surface (soft hover).
+    const text = (tone: string) =>
+      readableOn(tone, [base.surface, mix(tone, base.surface, 0.24)], name === "dark");
     return {
       ...base,
-      ...accentRoles(accent, base.surface),
+      ...roles,
       onSuccess: status("success"),
       onWarning: status("warning"),
       onDanger: status("danger"),
       onInfo: status("info"),
+      accentText: text(roles.accent),
+      dangerText: text(base.danger),
+      successText: text(base.success),
+      warningText: text(base.warning),
+      infoText: text(base.info),
     };
   };
   const light = palette("light");

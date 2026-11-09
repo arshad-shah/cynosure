@@ -11,6 +11,5 @@ export const folder: IconData = {
       },
     ],
   ],
-  star: { x: 15.5, y: 12.5 },
   motion: "lift",
 };

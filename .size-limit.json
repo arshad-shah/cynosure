@@ -14,5 +14,11 @@
     ],
     "limit": "3 kB",
     "gzip": true
+  },
+  {
+    "name": "LoadingDots (JS + CSS)",
+    "path": ["dist/components/LoadingDots/LoadingDots.js", "dist/styles/loading-dots.css"],
+    "limit": "3 kB",
+    "gzip": true
   }
 ]
