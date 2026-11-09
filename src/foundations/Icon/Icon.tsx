@@ -1,5 +1,5 @@
 import { type CSSProperties, createElement } from "react";
-import type { IconData } from "../../icons/types";
+import type { IconData } from "../../icons/types.js";
 
 export interface IconProps {
   icon: IconData;

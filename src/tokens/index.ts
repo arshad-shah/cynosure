@@ -1,6 +1,6 @@
-export { CynosureThemeError, contrastRatio } from "./color";
-export { createTheme } from "./create-theme";
-export { DEFAULT_ACCENT } from "./defaults";
+export { CynosureThemeError, contrastRatio } from "./color.js";
+export { createTheme } from "./create-theme.js";
+export { DEFAULT_ACCENT } from "./defaults.js";
 export type {
   ColorTokens,
   ComponentTokens,
@@ -11,5 +11,5 @@ export type {
   Size,
   Theme,
   ThemeInput,
-} from "./schema";
-export { DEFAULT_SELECTOR, themeProperties, themeToCss } from "./to-css";
+} from "./schema.js";
+export { DEFAULT_SELECTOR, themeProperties, themeToCss } from "./to-css.js";

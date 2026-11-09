@@ -104,6 +104,21 @@ function literalRules(root: string, file: string, out: Violation[]) {
   });
 }
 
+const RELATIVE_IMPORT = /(?:from\s*|import\s*\(\s*|import\s+)["'](\.{1,2}\/[^"']+)["']/g;
+
+/** Relative imports in shipped source need explicit .js extensions so emitted .d.ts files resolve under Node ESM. */
+function importRules(root: string, file: string, out: Violation[]) {
+  const text = readFileSync(file, "utf8");
+  for (const m of text.matchAll(RELATIVE_IMPORT))
+    if (!/\.(js|css|json|mdx|svg)$/.test(m[1] ?? ""))
+      out.push({
+        rule: "import-extensions",
+        file: relative(root, file),
+        line: lineOf(text, m.index ?? 0),
+        message: `import "${m[1]}" needs a .js extension (or /index.js)`,
+      });
+}
+
 function structureRules(root: string, out: Violation[]) {
   for (const group of ["src/components", "src/foundations"]) {
     const dir = join(root, group);
@@ -170,6 +185,13 @@ export function check(root: string): Violation[] {
       !rel.startsWith("src/test/")
     )
       tsxRules(root, file, out);
+    if (
+      /\.tsx?$/.test(file) &&
+      !isStory(file) &&
+      !rel.startsWith("src/docs/") &&
+      !rel.startsWith("src/test/")
+    )
+      importRules(root, file, out);
     if (
       rel.startsWith("src/components/") &&
       (file.endsWith(".css") || (file.endsWith(".tsx") && !isStory(file)))

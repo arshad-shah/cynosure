@@ -1,4 +1,4 @@
-import type { ColorTokens, GlobalTokens } from "./schema";
+import type { ColorTokens, GlobalTokens } from "./schema.js";
 
 /** Placeholder brand accent; final value is signed off in Storybook (spec §15). */
 export const DEFAULT_ACCENT = "#d0612a";

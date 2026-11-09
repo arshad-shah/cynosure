@@ -1,7 +1,7 @@
 import { forwardRef, useEffect, useState } from "react";
-import { Icon } from "../../foundations/Icon/Icon";
-import type { IconData } from "../../icons/types";
-import { Button, type ButtonProps } from "../Button/Button";
+import { Icon } from "../../foundations/Icon/Icon.js";
+import type { IconData } from "../../icons/types.js";
+import { Button, type ButtonProps } from "../Button/Button.js";
 
 export interface IconButtonProps extends Omit<ButtonProps, "children" | "icon" | "iconEnd" | "fullWidth"> {
   icon: IconData;

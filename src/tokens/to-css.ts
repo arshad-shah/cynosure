@@ -1,4 +1,4 @@
-import type { ColorTokens, Theme } from "./schema";
+import type { ColorTokens, Theme } from "./schema.js";
 
 export const DEFAULT_SELECTOR = ":where(:root,:host,.cy-theme)";
 

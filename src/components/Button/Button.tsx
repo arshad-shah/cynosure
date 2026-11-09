@@ -1,7 +1,7 @@
 import { type CSSProperties, forwardRef, type ReactNode } from "react";
-import { ButtonBase, type ButtonBaseProps } from "../../foundations/ButtonBase/ButtonBase";
-import { Icon } from "../../foundations/Icon/Icon";
-import type { IconData } from "../../icons/types";
+import { ButtonBase, type ButtonBaseProps } from "../../foundations/ButtonBase/ButtonBase.js";
+import { Icon } from "../../foundations/Icon/Icon.js";
+import type { IconData } from "../../icons/types.js";
 
 export interface ButtonTokens {
   heightSm: string;
@@ -25,7 +25,7 @@ export interface ButtonTokens {
   starScale: string;
 }
 
-declare module "../../tokens/schema" {
+declare module "../../tokens/schema.js" {
   interface ComponentTokens {
     button: ButtonTokens;
   }

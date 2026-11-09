@@ -2,12 +2,12 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { expect, fn, waitFor } from "storybook/test";
-import { check, chevronDown, copy, download, trash } from "../../icons";
-import { createStyleSheet } from "../../styles/inline";
-import { computeUnderHostileHost } from "../../test/hostile";
-import { CynosureTheme } from "../../theme";
-import { createTheme } from "../../tokens";
-import { Button } from "./Button";
+import { check, chevronDown, copy, download, trash } from "../../icons/index.js";
+import { createStyleSheet } from "../../styles/inline.js";
+import { computeUnderHostileHost } from "../../test/hostile.js";
+import { CynosureTheme } from "../../theme/index.js";
+import { createTheme } from "../../tokens/index.js";
+import { Button } from "./Button.js";
 
 const meta = {
   title: "Components/Button",

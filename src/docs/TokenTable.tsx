@@ -1,4 +1,4 @@
-import { createTheme, themeProperties } from "../tokens";
+import { createTheme, themeProperties } from "../tokens/index.js";
 
 /** Renders every default token with a swatch for colours. Docs-only helper. */
 export function TokenTable() {

@@ -25,7 +25,7 @@ export interface ${Name}Tokens {
   gap: string;
 }
 
-declare module "${kind === "foundation" ? "../../tokens/schema" : "../../tokens/schema"}" {
+declare module "../../tokens/schema.js" {
   interface ComponentTokens {
     ${lowerFirst(Name)}: ${Name}Tokens;
   }
@@ -68,8 +68,8 @@ const stories = (
   group: string,
 ) => `import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect } from "storybook/test";
-import { computeUnderHostileHost } from "../../test/hostile";
-import { ${Name} } from "./${Name}";
+import { computeUnderHostileHost } from "../../test/hostile.js";
+import { ${Name} } from "./${Name}.js";
 
 const meta = { title: "${group}/${Name}", component: ${Name}, args: { children: "${Name}" } } satisfies Meta<typeof ${Name}>;
 export default meta;
@@ -130,14 +130,14 @@ export function scaffoldComponent(root: string, Name: string, kind: "foundation"
     [`${k}.css`]: css(k),
     [`${Name}.stories.tsx`]: stories(Name, k, kind === "foundation" ? "Foundations" : "Components"),
     "README.md": readme(Name, k, kind),
-    "index.ts": `export { ${Name}, type ${Name}Props, type ${Name}Tokens } from "./${Name}";\n`,
+    "index.ts": `export { ${Name}, type ${Name}Props, type ${Name}Tokens } from "./${Name}.js";\n`,
   };
   for (const [file, text] of Object.entries(files)) writeFileSync(join(dir, file), text);
   const index = join(root, "src/index.ts");
   writeFileSync(
     index,
     sortExports(
-      `${readFileSync(index, "utf8")}export { ${Name}, type ${Name}Props } from "./${group}/${Name}";\n`,
+      `${readFileSync(index, "utf8")}export { ${Name}, type ${Name}Props } from "./${group}/${Name}/index.js";\n`,
     ),
   );
   const sizes = join(root, ".size-limit.json");
@@ -231,6 +231,6 @@ export function scaffoldIcon(root: string, name: string, svg: string): string {
     `import type { IconData } from "./types";\n\nexport const ${id}: IconData = {\n  name: ${JSON.stringify(name)},\n  body: ${literal(icon.body)},\n${icon.star ? `  star: ${literal(icon.star)},\n` : ""}};\n`,
   );
   const index = join(root, "src/icons/index.ts");
-  writeFileSync(index, sortExports(`${readFileSync(index, "utf8")}export { ${id} } from "./${name}";\n`));
+  writeFileSync(index, sortExports(`${readFileSync(index, "utf8")}export { ${id} } from "./${name}.js";\n`));
   return file;
 }

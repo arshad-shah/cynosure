@@ -2,9 +2,9 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { expect, waitFor } from "storybook/test";
-import { createStyleSheet } from "../styles/inline";
-import { createTheme } from "../tokens";
-import { CynosureTheme } from "./CynosureTheme";
+import { createStyleSheet } from "../styles/inline.js";
+import { createTheme } from "../tokens/index.js";
+import { CynosureTheme } from "./CynosureTheme.js";
 
 const meta = { title: "Foundations/CynosureTheme", component: CynosureTheme } satisfies Meta<
   typeof CynosureTheme

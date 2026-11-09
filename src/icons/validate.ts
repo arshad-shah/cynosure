@@ -1,4 +1,4 @@
-import type { IconData } from "./types";
+import type { IconData } from "./types.js";
 
 const NAME = /^[a-z][a-z0-9]*(-[a-z0-9]+)*$/;
 const TAGS = new Set(["path", "rect", "circle"]);

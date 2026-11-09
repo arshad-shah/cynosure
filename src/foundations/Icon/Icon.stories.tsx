@@ -1,10 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect } from "storybook/test";
-import * as icons from "../../icons";
-import type { IconData } from "../../icons/types";
-import { CynosureTheme } from "../../theme";
-import { createTheme } from "../../tokens";
-import { Icon } from "./Icon";
+import * as icons from "../../icons/index.js";
+import type { IconData } from "../../icons/types.js";
+import { CynosureTheme } from "../../theme/index.js";
+import { createTheme } from "../../tokens/index.js";
+import { Icon } from "./Icon.js";
 
 const all = Object.values(icons).filter(
   (v): v is IconData => typeof v === "object" && v !== null && "body" in v,
@@ -113,7 +113,7 @@ export const ReducedMotion: Story = {
 
 export const StableUnderHostileHost: Story = {
   play: async ({ canvasElement }) => {
-    const { computeUnderHostileHost } = await import("../../test/hostile");
+    const { computeUnderHostileHost } = await import("../../test/hostile.js");
     const { clean, hostile } = computeUnderHostileHost(canvasElement, "svg.cy-icon", [
       "width",
       "height",

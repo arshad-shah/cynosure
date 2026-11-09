@@ -42,6 +42,18 @@ describe("cy check", () => {
     write(root, "src/components/Button/Glyph.tsx", "export const G = () => <span>✓ Saved</span>;\n");
     expect(rules(root)).toContain("glyphs");
   });
+  it("requires .js extensions on relative imports in shipped source", () => {
+    const root = sandbox();
+    write(
+      root,
+      "src/components/Button/Ext.ts",
+      'import { Icon } from "../../foundations/Icon/Icon";\nexport { Icon };\n',
+    );
+    expect(check(root).find((v) => v.rule === "import-extensions")).toMatchObject({
+      file: "src/components/Button/Ext.ts",
+      line: 1,
+    });
+  });
   it("flags title= attributes", () => {
     const root = sandbox();
     write(root, "src/components/Button/T.tsx", 'export const T = () => <span title="Saved">x</span>;\n');
@@ -81,7 +93,7 @@ describe("cy new component", () => {
     for (const f of ["Badge.tsx", "badge.css", "Badge.stories.tsx", "README.md", "index.ts"])
       expect(existsSync(join(root, "src/components/Badge", f))).toBe(true);
     expect(readFileSync(join(root, "src/index.ts"), "utf8")).toContain(
-      'export { Badge, type BadgeProps } from "./components/Badge";',
+      'export { Badge, type BadgeProps } from "./components/Badge/index.js";',
     );
     expect(
       JSON.parse(readFileSync(join(root, ".size-limit.json"), "utf8")).map((e: { name: string }) => e.name),
@@ -124,7 +136,7 @@ describe("cy new icon", () => {
     expect(mod).toContain('name: "flat-line"');
     expect(mod).toContain("star: { x: 3, y: 3 }");
     expect(readFileSync(join(root, "src/icons/index.ts"), "utf8")).toContain(
-      'export { flatLine } from "./flat-line";',
+      'export { flatLine } from "./flat-line.js";',
     );
   });
   it("rejects an SVG with text", () => {

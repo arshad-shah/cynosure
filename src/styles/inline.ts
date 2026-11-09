@@ -1,4 +1,4 @@
-import generated from "./generated-css";
+import generated from "./generated-css.js";
 
 /** All Cynosure CSS as a string, for shadow roots and extension `getStyle()` hooks. */
 export const css: string = generated;

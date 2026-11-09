@@ -1,4 +1,4 @@
-import type { IconData } from "./types";
+import type { IconData } from "./types.js";
 
 export const external: IconData = {
   name: "external",

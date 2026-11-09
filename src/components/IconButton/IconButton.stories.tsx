@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, fn, waitFor } from "storybook/test";
-import { copy, trash } from "../../icons";
-import { IconButton } from "./IconButton";
+import { copy, trash } from "../../icons/index.js";
+import { IconButton } from "./IconButton.js";
 
 const meta = {
   title: "Components/IconButton",

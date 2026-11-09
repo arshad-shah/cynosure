@@ -1,5 +1,5 @@
 import { type CSSProperties, type ReactNode, useLayoutEffect, useMemo, useSyncExternalStore } from "react";
-import { type Theme, themeProperties } from "../tokens";
+import { type Theme, themeProperties } from "../tokens/index.js";
 
 export interface CynosureThemeProps {
   /** A theme from `createTheme()`. Omit to inherit tokens from the surrounding stylesheet or theme. */

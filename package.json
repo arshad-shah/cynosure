@@ -31,16 +31,17 @@
     "format": "biome check --write .",
     "test": "vitest run --project unit --project preact",
     "test:stories": "pnpm css && vitest run --project stories --project touch",
-    "test:visual": "pnpm css && CY_VISUAL=1 vitest run --project stories",
+    "test:visual": "pnpm css && VITE_CY_VISUAL=1 CY_BROWSERS=chromium vitest run --project stories",
     "storybook": "pnpm css && storybook dev -p 6006 --no-open",
     "build-storybook": "pnpm css && storybook build",
     "size": "size-limit",
     "cy": "node --import tsx tools/cli/index.ts",
     "check": "node --import tsx tools/cli/index.ts check",
-    "verify": "pnpm check && pnpm lint && pnpm typecheck && pnpm test && pnpm test:stories && pnpm build && publint && attw --pack . --profile esm-only && pnpm size",
+    "verify": "pnpm check && pnpm lint && pnpm typecheck && pnpm test && pnpm test:stories && pnpm build && publint && pnpm attw && pnpm size",
     "changeset": "changeset",
     "prepare": "git config --worktree core.hooksPath .githooks 2>/dev/null || git config core.hooksPath .githooks",
-    "css": "node --import tsx tools/build-css.ts"
+    "css": "node --import tsx tools/build-css.ts",
+    "attw": "attw --pack . --profile esm-only --exclude-entrypoints styles.css 'styles/*.css'"
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.0",

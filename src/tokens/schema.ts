@@ -62,7 +62,7 @@ export interface GlobalTokens {
 
 /**
  * Per-component tokens. Each component augments this interface:
- * `declare module "../../tokens/schema" { interface ComponentTokens { button: ButtonTokens } }`.
+ * `declare module "../../tokens/schema.js" { interface ComponentTokens { button: ButtonTokens } }`.
  * Values are CSS strings; defaults live in the component's CSS as `var()` fallbacks.
  */
 // biome-ignore lint/suspicious/noEmptyInterface: augmented by components via declaration merging

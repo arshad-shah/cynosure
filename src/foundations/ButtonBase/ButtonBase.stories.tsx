@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, fn } from "storybook/test";
-import { ButtonBase } from "./ButtonBase";
+import { ButtonBase } from "./ButtonBase.js";
 
 const meta = {
   title: "Foundations/ButtonBase",

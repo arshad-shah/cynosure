@@ -1,6 +1,13 @@
-import { bestContrast, CynosureThemeError, contrastRatio, parseColor, shiftLightness, toHex } from "./color";
-import { BASE_GLOBAL, BASE_PALETTES, DEFAULT_ACCENT, SCALES } from "./defaults";
-import type { ColorTokens, GlobalTokens, PaletteName, Theme, ThemeInput } from "./schema";
+import {
+  bestContrast,
+  CynosureThemeError,
+  contrastRatio,
+  parseColor,
+  shiftLightness,
+  toHex,
+} from "./color.js";
+import { BASE_GLOBAL, BASE_PALETTES, DEFAULT_ACCENT, SCALES } from "./defaults.js";
+import type { ColorTokens, GlobalTokens, PaletteName, Theme, ThemeInput } from "./schema.js";
 
 const ON_CANDIDATES = ["#ffffff", "#16120f", "#000000"] as const;
 
