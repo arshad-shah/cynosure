@@ -5,7 +5,13 @@ import { join, resolve } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { check } from "../../../tools/cli/lib/check";
 import { readProgress } from "../../../tools/cli/lib/progress";
-import { addComponentToken, iconId, scaffoldComponent, scaffoldIcon } from "../../../tools/cli/lib/scaffold";
+import {
+  addComponentToken,
+  iconId,
+  scaffoldComponent,
+  scaffoldIcon,
+  sortExports,
+} from "../../../tools/cli/lib/scaffold";
 
 const repo = resolve(__dirname, "../../..");
 const temps: string[] = [];
@@ -110,6 +116,16 @@ describe("cy new component", () => {
     const root = sandbox();
     expect(() => scaffoldComponent(root, "Button", "composite")).toThrow(/exists/);
     expect(() => scaffoldComponent(root, "badge", "composite")).toThrow(/PascalCase/);
+  });
+});
+
+describe("sortExports", () => {
+  it("keeps multi-line export statements intact while sorting", () => {
+    const input =
+      'export { Zed } from "./z.js";\nexport {\n  Alpha,\n  type AlphaProps,\n} from "./a.js";\nexport * from "./theme/index.js";\n';
+    expect(sortExports(input)).toBe(
+      'export {\n  Alpha,\n  type AlphaProps,\n} from "./a.js";\nexport { Zed } from "./z.js";\nexport * from "./theme/index.js";\n',
+    );
   });
 });
 

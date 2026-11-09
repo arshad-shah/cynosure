@@ -178,3 +178,37 @@
     --_sh: var(--cy-switch-height-lg, calc(24px * var(--cy-scale, 1)));
   }
 }
+
+.cy-radio.cy-radio {
+  box-sizing: border-box !important;
+  position: relative;
+  flex: none;
+  inline-size: var(--_box);
+  block-size: var(--_box);
+  margin: 0;
+  margin-block-start: calc((1lh - var(--_box)) / 2);
+  border: calc(var(--cy-border-width) * 1.5) solid
+    var(--cy-checkbox-border, color-mix(in oklab, var(--cy-color-ink) 45%, var(--cy-color-line)));
+  border-radius: 50%;
+  background: var(--cy-color-surface);
+  transition: border-color var(--cy-motion-fast) var(--cy-motion-ease);
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 22%;
+    border-radius: 50%;
+    background: var(--_tone);
+    transform: scale(0);
+    transition: transform var(--cy-motion-fast) var(--cy-motion-ease);
+  }
+  &:has(> input:checked) {
+    border-color: var(--_tone);
+  }
+  &:has(> input:checked)::after {
+    transform: scale(1);
+  }
+  &:has(> input:focus-visible) {
+    box-shadow: 0 0 0 var(--cy-border-focus) var(--cy-color-ring);
+    outline: var(--cy-border-focus) solid transparent;
+  }
+}

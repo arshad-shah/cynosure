@@ -51,10 +51,12 @@ const RESERVED = new Set([
 export const iconId = (name: string) => (RESERVED.has(camel(name)) ? `${camel(name)}Icon` : camel(name));
 const lowerFirst = (s: string) => s.charAt(0).toLowerCase() + s.slice(1);
 
-function sortExports(text: string): string {
-  const lines = text.trimEnd().split("\n");
-  const named = lines.filter((l) => l.startsWith("export {")).sort();
-  const rest = lines.filter((l) => !l.startsWith("export {"));
+/** Sorts whole `export { … } from "…";` statements (they may span several lines once formatted). */
+export function sortExports(text: string): string {
+  const statements = text.match(/export[\s\S]*?;\s*(?:\n|$)/g) ?? [];
+  const clean = statements.map((s) => s.trim());
+  const named = clean.filter((s) => s.startsWith("export {")).sort((a, b) => a.localeCompare(b));
+  const rest = clean.filter((s) => !s.startsWith("export {"));
   return `${[...named, ...rest].join("\n")}\n`;
 }
 

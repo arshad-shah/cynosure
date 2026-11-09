@@ -38,7 +38,7 @@ export function ChoiceRow({
   className,
   style,
   ...input
-}: ChoiceRowProps & { kind: "checkbox" | "switch"; indeterminate?: boolean | undefined }) {
+}: ChoiceRowProps & { kind: "checkbox" | "switch" | "radio"; indeterminate?: boolean | undefined }) {
   const field = useField({ id, description });
   return (
     <label
@@ -49,11 +49,11 @@ export function ChoiceRow({
       data-disabled={input.disabled ? "" : undefined}
       style={style}
     >
-      <span className={kind === "switch" ? "cy-switch" : "cy-checkbox"}>
+      <span className={`cy-${kind}`}>
         <ChoiceBase
           {...input}
           id={field.id}
-          type="checkbox"
+          type={kind === "radio" ? "radio" : "checkbox"}
           role={kind === "switch" ? "switch" : undefined}
           indeterminate={indeterminate ?? false}
           aria-labelledby={field.labelId}
@@ -66,9 +66,9 @@ export function ChoiceRow({
             <Icon icon={check} className="cy-checkbox-mark" />
             <Icon icon={minus} className="cy-checkbox-dash" />
           </>
-        ) : (
+        ) : kind === "switch" ? (
           <span className="cy-switch-thumb" />
-        )}
+        ) : null}
       </span>
       <span className="cy-choice-text">
         <span id={field.labelId} className="cy-choice-label">

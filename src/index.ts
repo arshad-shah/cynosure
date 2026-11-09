@@ -4,7 +4,13 @@ export { Field, type FieldProps } from "./components/Field/index.js";
 export { IconButton, type IconButtonProps } from "./components/IconButton/index.js";
 export { Link, type LinkProps } from "./components/Link/index.js";
 export { LoadingDots, type LoadingDotsProps } from "./components/LoadingDots/index.js";
+export { RadioGroup, type RadioGroupProps, type RadioOption } from "./components/RadioGroup/index.js";
 export { SearchField, type SearchFieldProps } from "./components/SearchField/index.js";
+export {
+  SegmentedControl,
+  type SegmentedControlProps,
+  type SegmentOption,
+} from "./components/SegmentedControl/index.js";
 export { Switch, type SwitchProps } from "./components/Switch/index.js";
 export { TextArea, type TextAreaProps } from "./components/TextArea/index.js";
 export { TextField, type TextFieldProps } from "./components/TextField/index.js";
