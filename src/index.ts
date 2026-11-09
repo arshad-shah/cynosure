@@ -1,7 +1,9 @@
+export { Badge, type BadgeProps } from "./components/Badge/index.js";
 export { Button, type ButtonProps, type ButtonTokens } from "./components/Button/index.js";
 export { Checkbox, type CheckboxProps } from "./components/Checkbox/index.js";
 export { Field, type FieldProps } from "./components/Field/index.js";
 export { IconButton, type IconButtonProps } from "./components/IconButton/index.js";
+export { Kbd, type KbdProps } from "./components/Kbd/index.js";
 export { Link, type LinkProps } from "./components/Link/index.js";
 export { LoadingDots, type LoadingDotsProps } from "./components/LoadingDots/index.js";
 export { RadioGroup, type RadioGroupProps, type RadioOption } from "./components/RadioGroup/index.js";
@@ -15,6 +17,7 @@ export { Select, type SelectOption, type SelectProps } from "./components/Select
 export { Switch, type SwitchProps } from "./components/Switch/index.js";
 export { TextArea, type TextAreaProps } from "./components/TextArea/index.js";
 export { TextField, type TextFieldProps } from "./components/TextField/index.js";
+export { ThemeToggle, type ThemeToggleProps } from "./components/ThemeToggle/index.js";
 export { Tooltip, type TooltipProps } from "./components/Tooltip/index.js";
 export { ButtonBase, type ButtonBaseProps } from "./foundations/ButtonBase/ButtonBase.js";
 export { ChoiceBase, type ChoiceBaseProps } from "./foundations/ChoiceBase/ChoiceBase.js";

@@ -1,0 +1,65 @@
+.cy-badge.cy-badge {
+  --_tone: var(--cy-color-ink);
+  --_text: var(--cy-color-ink);
+  --_on: var(--cy-color-bg);
+  --_mix: var(--cy-badge-soft-mix, 16%);
+  box-sizing: border-box !important;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cy-space-2);
+  margin: 0;
+  padding: var(--cy-space-2) var(--cy-space-3);
+  border: var(--cy-border-width) solid transparent;
+  border-radius: var(--cy-badge-radius, calc(var(--cy-radius-sm) * 0.6));
+  background: color-mix(in oklab, var(--_tone) var(--_mix), var(--cy-color-surface));
+  color: var(--_text);
+  font-family: var(--cy-font-mono);
+  font-size: var(--cy-font-eyebrow-size);
+  font-weight: var(--cy-font-weight-bold);
+  line-height: 1;
+  letter-spacing: var(--cy-badge-tracking, var(--cy-font-eyebrow-tracking));
+  text-transform: uppercase;
+  white-space: nowrap;
+  vertical-align: middle;
+  &[data-size="sm"] {
+    font-size: calc(var(--cy-font-eyebrow-size) * 0.9);
+    padding: var(--cy-space-1) var(--cy-space-2);
+  }
+  &[data-size="lg"] {
+    font-size: var(--cy-font-size-sm);
+    padding: var(--cy-space-3) var(--cy-space-4);
+  }
+  &[data-tone="accent"] {
+    --_tone: var(--cy-color-accent);
+    --_text: var(--cy-color-accent-text);
+    --_on: var(--cy-color-on-accent);
+  }
+  &[data-tone="danger"] {
+    --_tone: var(--cy-color-danger);
+    --_text: var(--cy-color-danger-text);
+    --_on: var(--cy-color-on-danger);
+  }
+  &[data-tone="success"] {
+    --_tone: var(--cy-color-success);
+    --_text: var(--cy-color-success-text);
+    --_on: var(--cy-color-on-success);
+  }
+  &[data-tone="warning"] {
+    --_tone: var(--cy-color-warning);
+    --_text: var(--cy-color-warning-text);
+    --_on: var(--cy-color-on-warning);
+  }
+  &[data-tone="info"] {
+    --_tone: var(--cy-color-info);
+    --_text: var(--cy-color-info-text);
+    --_on: var(--cy-color-on-info);
+  }
+  &[data-variant="solid"] {
+    background: var(--_tone);
+    color: var(--_on);
+  }
+  &[data-variant="outline"] {
+    background: var(--cy-color-surface);
+    border-color: color-mix(in oklab, var(--_tone) 55%, var(--cy-color-line));
+  }
+}

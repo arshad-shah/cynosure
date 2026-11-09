@@ -40,9 +40,9 @@ export interface SegmentedControlProps {
   size?: Size;
   /** Colour of the active segment's content. */
   tone?: Tone;
-  className?: string;
+  className?: string | undefined;
   /** Layout only. */
-  style?: CSSProperties;
+  style?: CSSProperties | undefined;
 }
 
 /** A compact single choice (view switchers, modes) on native radios. */

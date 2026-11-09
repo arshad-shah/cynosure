@@ -95,15 +95,21 @@ describe("cy check", () => {
 describe("cy new component", () => {
   it("scaffolds a composite that typechecks and only reports its TODO(cy) markers", () => {
     const root = sandbox();
-    scaffoldComponent(root, "Badge", "composite");
-    for (const f of ["Badge.tsx", "badge.css", "Badge.stories.tsx", "README.md", "index.ts"])
-      expect(existsSync(join(root, "src/components/Badge", f))).toBe(true);
+    scaffoldComponent(root, "ScaffoldProbe", "composite");
+    for (const f of [
+      "ScaffoldProbe.tsx",
+      "scaffold-probe.css",
+      "ScaffoldProbe.stories.tsx",
+      "README.md",
+      "index.ts",
+    ])
+      expect(existsSync(join(root, "src/components/ScaffoldProbe", f))).toBe(true);
     expect(readFileSync(join(root, "src/index.ts"), "utf8")).toContain(
-      'export { Badge, type BadgeProps } from "./components/Badge/index.js";',
+      'export { ScaffoldProbe, type ScaffoldProbeProps } from "./components/ScaffoldProbe/index.js";',
     );
     expect(
       JSON.parse(readFileSync(join(root, ".size-limit.json"), "utf8")).map((e: { name: string }) => e.name),
-    ).toContain("Badge (JS + CSS)");
+    ).toContain("ScaffoldProbe (JS + CSS)");
     expect(new Set(rules(root))).toEqual(new Set(["scaffold-todo"]));
     execFileSync(join(repo, "node_modules/.bin/tsc"), ["-p", root], { stdio: "pipe" });
   });
