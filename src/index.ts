@@ -10,6 +10,7 @@ export { Badge, type BadgeProps } from "./components/Badge/index.js";
 export { Button, type ButtonProps, type ButtonTokens } from "./components/Button/index.js";
 export { Card, type CardProps } from "./components/Card/index.js";
 export { Checkbox, type CheckboxProps } from "./components/Checkbox/index.js";
+export { CopyButton, type CopyButtonLabels, type CopyButtonProps } from "./components/CopyButton/index.js";
 export { Dialog, type DialogLabels, type DialogProps, type DialogTokens } from "./components/Dialog/index.js";
 export { Disclosure, type DisclosureProps, type DisclosureTokens } from "./components/Disclosure/index.js";
 export { EmptyState, type EmptyStateProps, type EmptyStateTokens } from "./components/EmptyState/index.js";

@@ -261,5 +261,11 @@
     "path": ["dist/components/EmptyState/EmptyState.js", "dist/styles/empty-state.css"],
     "limit": "1.25 kB",
     "gzip": true
+  },
+  {
+    "name": "CopyButton",
+    "path": ["dist/components/CopyButton/CopyButton.js", "dist/styles/copy-button.css"],
+    "limit": "1.25 kB",
+    "gzip": true
   }
 ]
