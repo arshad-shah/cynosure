@@ -1,0 +1,73 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./Accordion.stories";
+
+<Meta of={Stories} />
+
+# Accordion
+
+A stack of collapsible sections that share state: one open at a time, or any number. Each section is a [Disclosure](?path=/docs/components-disclosure--docs).
+
+<Canvas of={Stories.SingleClosesTheOthers} />
+
+## When to use
+
+- **Settings and FAQs** split into named sections people scan by title.
+- **`type="single"`:** focus on one section at a time. Add `collapsible` to allow closing it again.
+- **`type="multiple"`:** people compare or fill in several sections.
+
+**Use something else when:**
+- there is only one section: [Disclosure](?path=/docs/components-disclosure--docs)
+- the sections are alternative views of one thing: [Tabs](?path=/docs/components-tabs--docs)
+- everything should be readable at once: headings in a [Stack](?path=/docs/components-stack--docs)
+
+## Usage
+
+```tsx
+import { Accordion, AccordionItem } from "@arshad-shah/cynosure";
+
+<Accordion type="single" defaultValue="format" collapsible onValueChange={setSection}>
+  <AccordionItem value="format" summary="Formatting">…</AccordionItem>
+  <AccordionItem value="validate" summary="Validation">…</AccordionItem>
+</Accordion>
+
+<Accordion type="multiple" defaultValue={["format"]} variant="card">…</Accordion>
+```
+
+## Several open
+
+<Canvas of={Stories.MultipleOpensSeveral} />
+
+## Cards
+
+<Canvas of={Stories.CardVariant} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+`AccordionItem`: `value` (unique), `summary` (header text), `children`.
+
+## Behaviour and accessibility
+
+| Input | Result |
+| --- | --- |
+| Click, tap, <kbd>Enter</kbd>, <kbd>Space</kbd> | Opens a section (closes the others in `single`) |
+| <kbd>Tab</kbd> | Next header or open content (every header is a Tab stop) |
+| <kbd>Down</kbd> <kbd>Up</kbd> arrows | Next / previous header, wrapping |
+| <kbd>Home</kbd> <kbd>End</kbd> | First / last header |
+
+- **Headings:** each header sits in a heading (`headingLevel`, default 3), so sections appear in the page outline.
+- **Regions:** open sections are regions labelled by their header. Pass `regions={false}` for long lists, where many landmarks get noisy.
+- **Non-collapsible:** in `single` mode without `collapsible`, the open header is `aria-disabled`, because pressing it would do nothing.
+
+## Touch
+
+Headers are the full width and at least 44px tall on coarse pointers.
+
+## Theming
+
+`--cy-accordion-gap` spaces the `card` variant. Everything else uses the [Disclosure](?path=/docs/components-disclosure--docs) tokens.
+
+## Related
+
+[Disclosure](?path=/docs/components-disclosure--docs) · [Tabs](?path=/docs/components-tabs--docs)

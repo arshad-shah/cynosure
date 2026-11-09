@@ -14,3 +14,14 @@ describe("Tabs parts", () => {
     quiet.mockRestore();
   });
 });
+
+describe("AccordionItem", () => {
+  it("explains when used outside <Accordion>", async () => {
+    const { AccordionItem } = await import("../../src/components/Accordion/Accordion");
+    const quiet = vi.spyOn(console, "error").mockImplementation(() => {});
+    expect(() => render(<AccordionItem value="a" summary="A" />)).toThrow(
+      "<AccordionItem> must be inside <Accordion>",
+    );
+    quiet.mockRestore();
+  });
+});

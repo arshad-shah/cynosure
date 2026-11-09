@@ -1,7 +1,16 @@
+export {
+  Accordion,
+  AccordionItem,
+  type AccordionItemProps,
+  type AccordionMultipleProps,
+  type AccordionProps,
+  type AccordionSingleProps,
+} from "./components/Accordion/index.js";
 export { Badge, type BadgeProps } from "./components/Badge/index.js";
 export { Button, type ButtonProps, type ButtonTokens } from "./components/Button/index.js";
 export { Card, type CardProps } from "./components/Card/index.js";
 export { Checkbox, type CheckboxProps } from "./components/Checkbox/index.js";
+export { Disclosure, type DisclosureProps, type DisclosureTokens } from "./components/Disclosure/index.js";
 export { Field, type FieldProps } from "./components/Field/index.js";
 export { IconButton, type IconButtonProps } from "./components/IconButton/index.js";
 export { Inline, type InlineProps } from "./components/Inline/index.js";

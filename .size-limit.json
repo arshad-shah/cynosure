@@ -186,5 +186,22 @@
     "path": ["dist/components/Tabs/Tabs.js", "dist/foundations/roving-focus.js", "dist/styles/tabs.css"],
     "limit": "4.5 kB",
     "gzip": true
+  },
+  {
+    "name": "Disclosure",
+    "path": ["dist/components/Disclosure/Disclosure.js", "dist/styles/disclosure.css"],
+    "limit": "2 kB",
+    "gzip": true
+  },
+  {
+    "name": "Accordion",
+    "path": [
+      "dist/components/Accordion/Accordion.js",
+      "dist/components/Disclosure/Disclosure.js",
+      "dist/styles/disclosure.css",
+      "dist/styles/accordion.css"
+    ],
+    "limit": "3.25 kB",
+    "gzip": true
   }
 ]
