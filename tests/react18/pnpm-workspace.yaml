@@ -1,0 +1,2 @@
+# Its own root, so the fixture keeps React 18 apart from the library's dev React. Same install rule as the repo.
+minimumReleaseAge: 20160 # 14 days

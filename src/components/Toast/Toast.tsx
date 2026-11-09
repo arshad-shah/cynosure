@@ -225,6 +225,11 @@ function ToastItem({ item, collapsed, paused, dismissLabel, onDismiss, onRemoved
     return () => clearTimeout(t);
   }, []);
 
+  // Collapsed and leaving toasts cannot be focused or clicked. Set as a property: React 18 drops `inert={true}`.
+  useLayoutEffect(() => {
+    if (el.current) el.current.inert = collapsed || leaving;
+  }, [collapsed, leaving]);
+
   // Auto-dismiss, keeping the time already spent across pauses.
   useEffect(() => {
     if (paused || collapsed || leaving || !Number.isFinite(duration) || duration <= 0) return;
@@ -265,7 +270,6 @@ function ToastItem({ item, collapsed, paused, dismissLabel, onDismiss, onRemoved
       data-tone={tone}
       data-collapsed={collapsed || undefined}
       data-leaving={leaving || undefined}
-      inert={collapsed || leaving || undefined}
       onPointerDown={(event) => {
         if (event.pointerType !== "touch") return;
         drag.current = { x: event.clientX, pointer: event.pointerId };

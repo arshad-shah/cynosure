@@ -22,12 +22,21 @@ setProjectAnnotations([
       // Dark mode: flip the decorator's theme wrapper (light-dark() tokens follow color-scheme), then restore.
       const theme = canvasElement.querySelector(".cy-theme");
       if (!theme) return;
-      const previous = theme.getAttribute("data-cy-mode");
+      // Then dark with more contrast (the contrast global's override block), the combination most likely to regress.
+      const previous = {
+        mode: theme.getAttribute("data-cy-mode"),
+        contrast: theme.getAttribute("data-cy-contrast"),
+      };
+      const restore = (attr: string, value: string | null) =>
+        value === null ? theme.removeAttribute(attr) : theme.setAttribute(attr, value);
       theme.setAttribute("data-cy-mode", "dark");
       await new Promise((r) => setTimeout(r, 400));
       await expect.element(page.elementLocator(canvasElement)).toMatchScreenshot(`${id}-dark`);
-      if (previous === null) theme.removeAttribute("data-cy-mode");
-      else theme.setAttribute("data-cy-mode", previous);
+      theme.setAttribute("data-cy-contrast", "more");
+      await new Promise((r) => setTimeout(r, 400));
+      await expect.element(page.elementLocator(canvasElement)).toMatchScreenshot(`${id}-dark-contrast`);
+      restore("data-cy-mode", previous.mode);
+      restore("data-cy-contrast", previous.contrast);
     },
   },
 ]);

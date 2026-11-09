@@ -22,6 +22,8 @@ jobs:
       - run: pnpm exec playwright install --with-deps chromium firefox webkit
       - name: Conventions, lint, types, unit
         run: pnpm check && pnpm lint && pnpm typecheck && pnpm test
+      - name: React 18 smoke (oldest supported peer)
+        run: pnpm test:react18
       - name: Stories (Chromium, Firefox, WebKit, touch)
         run: pnpm test:stories
       - name: Coverage floor (95%)
