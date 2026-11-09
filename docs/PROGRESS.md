@@ -138,3 +138,14 @@ None. Npm publish and deprecating the old packages wait for Arshad's authorisati
   - real extension contexts (Prism and Aperture shadow roots under MV3 CSP)
   - Safari and Edge outside the Playwright engines
   - the React 18 runtime (Task 12)
+
+## How to resume
+
+```bash
+git clone https://github.com/arshad-shah/cynosure.git && cd cynosure && git checkout next
+nvm use && corepack enable && pnpm install
+pnpm exec playwright install chromium firefox webkit
+pnpm cy progress && pnpm verify
+pnpm storybook
+```
+Then continue at "Current task" above, following `AGENTS.md`.
