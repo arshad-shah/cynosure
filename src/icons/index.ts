@@ -95,6 +95,7 @@ export { plus } from "./plus.js";
 export { power } from "./power.js";
 export { record } from "./record.js";
 export { redo } from "./redo.js";
+export { resizeCorner } from "./resize-corner.js";
 export { retry } from "./retry.js";
 export { ruler } from "./ruler.js";
 export { save } from "./save.js";

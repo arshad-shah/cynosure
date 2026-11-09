@@ -132,3 +132,88 @@ export const ControlledWithDefaultCounter: Story = {
     await expect(area).toBeRequired();
   },
 };
+
+const drag = (grip: Element, dy: number, pointerType = "mouse") => {
+  const r = grip.getBoundingClientRect();
+  const x = r.left + r.width / 2;
+  const y = r.top + r.height / 2;
+  const init = { bubbles: true, pointerId: 7, pointerType, clientX: x, button: 0, buttons: 1 };
+  grip.dispatchEvent(new PointerEvent("pointerdown", { ...init, clientY: y }));
+  grip.dispatchEvent(new PointerEvent("pointermove", { ...init, clientY: y + dy / 2 }));
+  grip.dispatchEvent(new PointerEvent("pointermove", { ...init, clientY: y + dy }));
+  grip.dispatchEvent(new PointerEvent("pointerup", { ...init, clientY: y + dy, buttons: 0 }));
+};
+const grip = (root: HTMLElement) => root.querySelector(".cy-text-area-grip") as HTMLElement;
+
+export const ResizesByDraggingTheGrip: Story = {
+  args: { label: "Notes", rows: 3, defaultValue: "" },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const area = canvas.getByRole("textbox", { name: "Notes" });
+    const handle = grip(canvasElement);
+    await expect(handle).toBeTruthy();
+    // A pointer convenience: hidden from assistive tech and not a Tab stop (content growth covers keyboard users).
+    await expect(handle).toHaveAttribute("aria-hidden", "true");
+    await expect(handle.tabIndex).toBe(-1);
+    const start = area.getBoundingClientRect().height;
+    drag(handle, 60);
+    await expect(Math.round(area.getBoundingClientRect().height)).toBe(Math.round(start + 60));
+    // The chosen height is kept while typing short text.
+    await userEvent.type(area, "hi");
+    await expect(Math.round(area.getBoundingClientRect().height)).toBe(Math.round(start + 60));
+    // Never smaller than `rows`.
+    drag(handle, -400);
+    await expect(Math.round(area.getBoundingClientRect().height)).toBe(Math.round(start));
+  },
+};
+
+export const GrowsPastTheChosenHeightWithContent: Story = {
+  args: { label: "Notes", rows: 2, maxRows: 20, defaultValue: "" },
+  play: async ({ canvas, canvasElement }) => {
+    const area = canvas.getByRole("textbox", { name: "Notes" }) as HTMLTextAreaElement;
+    drag(grip(canvasElement), 20);
+    const chosen = area.getBoundingClientRect().height;
+    area.focus();
+    area.setRangeText("1\n2\n3\n4\n5\n6\n7\n8");
+    area.dispatchEvent(new Event("input", { bubbles: true }));
+    await expect(area.getBoundingClientRect().height).toBeGreaterThan(chosen + 40);
+  },
+};
+
+export const NotResizableWhenAskedOrDisabled: Story = {
+  render: () => (
+    <>
+      <TextArea label="Fixed" resizable={false} />
+      <TextArea label="Off" disabled />
+    </>
+  ),
+  play: async ({ canvasElement }) => {
+    await expect(canvasElement.querySelector(".cy-text-area-grip")).toBeNull();
+  },
+};
+
+export const TouchDragResizes: Story = {
+  tags: ["touch"],
+  args: { label: "Notes", rows: 3 },
+  play: async ({ canvas, canvasElement }) => {
+    const area = canvas.getByRole("textbox", { name: "Notes" });
+    const handle = grip(canvasElement);
+    const box = handle.getBoundingClientRect();
+    await expect(Math.min(box.width, box.height)).toBeGreaterThanOrEqual(24);
+    await expect(getComputedStyle(handle).touchAction).toBe("none");
+    const start = area.getBoundingClientRect().height;
+    drag(handle, 40, "touch");
+    await expect(Math.round(area.getBoundingClientRect().height)).toBe(Math.round(start + 40));
+  },
+};
+
+export const GripSitsInTheBoxCornerClearOfTheCounter: Story = {
+  args: { label: "Notes", showCount: true, maxLength: 40, defaultValue: "hello" },
+  play: async ({ canvas, canvasElement }) => {
+    const area = canvas.getByRole("textbox", { name: "Notes" }).getBoundingClientRect();
+    const g = grip(canvasElement).getBoundingClientRect();
+    const count = (canvasElement.querySelector(".cy-text-area-count") as HTMLElement).getBoundingClientRect();
+    await expect(g.bottom).toBeLessThanOrEqual(area.bottom);
+    await expect(g.right).toBeLessThanOrEqual(area.right);
+    await expect(g.bottom <= count.top || g.top >= count.bottom).toBe(true);
+  },
+};

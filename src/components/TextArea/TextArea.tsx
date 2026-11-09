@@ -9,7 +9,9 @@ import {
   useRef,
   useState,
 } from "react";
+import { Icon } from "../../foundations/Icon/Icon.js";
 import { TextAreaBase } from "../../foundations/TextAreaBase/TextAreaBase.js";
+import { resizeCorner } from "../../icons/resize-corner.js";
 import type { Size } from "../../tokens/schema.js";
 import { Field } from "../Field/Field.js";
 
@@ -42,6 +44,8 @@ export interface TextAreaProps extends NativeArea {
   value?: string;
   defaultValue?: string;
   onChange?: (value: string) => void;
+  /** Show a corner grip to drag the height (pointer and touch). Content growth still applies. */
+  resizable?: boolean;
   /** Minimum visible rows. */
   rows?: number;
   /** Auto-grow cap; content beyond scrolls. */
@@ -70,6 +74,7 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(function 
     onChange,
     rows = 3,
     maxRows = 12,
+    resizable = true,
     showCount = false,
     size = "md",
     variant = "outline",
@@ -86,6 +91,9 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(function 
 ) {
   const inner = useRef<HTMLTextAreaElement | null>(null);
   const [count, setCount] = useState((value ?? defaultValue ?? "").length);
+  // Height chosen with the grip: becomes the floor (and lifts the cap) for content-driven sizing.
+  const manual = useRef(0);
+  const dragFrom = useRef<{ y: number; height: number } | null>(null);
   const ref = useCallback(
     (node: HTMLTextAreaElement | null) => {
       inner.current = node;
@@ -105,8 +113,8 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(function 
       Number.parseFloat(cs.paddingBottom) +
       Number.parseFloat(cs.borderTopWidth) +
       Number.parseFloat(cs.borderBottomWidth);
-    const min = rows * line + chrome;
-    const max = Math.max(rows, maxRows) * line + chrome;
+    const min = Math.max(rows * line + chrome, manual.current);
+    const max = Math.max(Math.max(rows, maxRows) * line + chrome, manual.current);
     area.style.height = "auto";
     const wanted =
       area.scrollHeight + Number.parseFloat(cs.borderTopWidth) + Number.parseFloat(cs.borderBottomWidth);
@@ -154,24 +162,57 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(function 
             data-variant={variant}
             data-disabled={disabled ? "" : undefined}
           >
-            <TextAreaBase
-              ref={ref}
-              {...rest}
-              id={field.id}
-              className="cy-text-area-input"
-              rows={rows}
-              maxLength={maxLength}
-              required={required}
-              disabled={disabled}
-              invalid={field.invalid}
-              aria-describedby={describedBy}
-              {...(value !== undefined ? { value } : { defaultValue })}
-              onChange={(e) => {
-                setCount(e.currentTarget.value.length);
-                resize();
-                onChange?.(e.currentTarget.value);
-              }}
-            />
+            <div className="cy-text-area-box">
+              <TextAreaBase
+                ref={ref}
+                {...rest}
+                id={field.id}
+                className="cy-text-area-input"
+                rows={rows}
+                maxLength={maxLength}
+                required={required}
+                disabled={disabled}
+                invalid={field.invalid}
+                aria-describedby={describedBy}
+                {...(value !== undefined ? { value } : { defaultValue })}
+                onChange={(e) => {
+                  setCount(e.currentTarget.value.length);
+                  resize();
+                  onChange?.(e.currentTarget.value);
+                }}
+              />
+              {resizable && !disabled && (
+                <span
+                  className="cy-text-area-grip"
+                  aria-hidden="true"
+                  onPointerDown={(e) => {
+                    if (e.button !== 0 || !inner.current) return;
+                    e.preventDefault();
+                    try {
+                      e.currentTarget.setPointerCapture(e.pointerId);
+                    } catch {
+                      // Synthetic events have no active pointer to capture.
+                    }
+                    dragFrom.current = { y: e.clientY, height: inner.current.getBoundingClientRect().height };
+                  }}
+                  onPointerMove={(e) => {
+                    if (!dragFrom.current) return;
+                    manual.current = dragFrom.current.height + e.clientY - dragFrom.current.y;
+                    resize();
+                    // Below the row minimum the floor wins: remember what is actually shown.
+                    manual.current = inner.current?.getBoundingClientRect().height ?? manual.current;
+                  }}
+                  onPointerUp={() => {
+                    dragFrom.current = null;
+                  }}
+                  onPointerCancel={() => {
+                    dragFrom.current = null;
+                  }}
+                >
+                  <Icon icon={resizeCorner} />
+                </span>
+              )}
+            </div>
             {showCount && (
               <span id={countId} className="cy-text-area-count" aria-live="polite">
                 {(labels?.count ?? defaultCount)(count, maxLength)}

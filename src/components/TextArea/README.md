@@ -21,6 +21,8 @@ Works in native forms (`FormData`, reset restores value, count and height, `requ
 
 - `--cy-text-area-{radius,padding-inline,padding-block,bg,border,soft-bg}`
 
+Drag the corner grip (pointer or touch) to set a height; the box keeps it and still grows with content up to `maxRows` (or the chosen height, if taller). `resizable={false}` removes the grip; disabled areas have none. The grip is a hand-made, `aria-hidden` pointer affordance: keyboard users get content growth instead.
+
 ## Used by
 
 Planr (task notes), Aperture (CSS editor notes), Verql (query notes), Stepframe (problem input), session-recorder (annotations).
