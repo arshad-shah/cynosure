@@ -103,8 +103,8 @@ describe("cy new component", () => {
   });
   it("scaffolds a foundation under src/foundations", () => {
     const root = sandbox();
-    scaffoldComponent(root, "InputBase", "foundation");
-    expect(existsSync(join(root, "src/foundations/InputBase/InputBase.tsx"))).toBe(true);
+    scaffoldComponent(root, "SliderBase", "foundation");
+    expect(existsSync(join(root, "src/foundations/SliderBase/SliderBase.tsx"))).toBe(true);
   });
   it("refuses an existing name and non-PascalCase names", () => {
     const root = sandbox();
