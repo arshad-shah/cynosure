@@ -1,1 +1,18 @@
-[{ "name": "all CSS", "path": "dist/styles.css", "limit": "30 kB", "gzip": true }]
+[
+  {
+    "name": "all CSS",
+    "path": "dist/styles.css",
+    "limit": "30 kB",
+    "gzip": true
+  },
+  {
+    "name": "Button (JS + CSS)",
+    "path": [
+      "dist/components/Button/Button.js",
+      "dist/foundations/ButtonBase/ButtonBase.js",
+      "dist/styles/button.css"
+    ],
+    "limit": "3 kB",
+    "gzip": true
+  }
+]

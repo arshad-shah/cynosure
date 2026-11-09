@@ -16,8 +16,8 @@ importers:
       "@changesets/cli":
         specifier: ^3.0.0
         version: 3.0.3
-      "@size-limit/preset-small-lib":
-        specifier: ^14.0.0
+      "@size-limit/file":
+        specifier: ^14.3.0
         version: 14.3.0(size-limit@14.3.0)
       "@storybook/addon-a11y":
         specifier: ^10.6.4
@@ -61,6 +61,9 @@ importers:
       playwright:
         specifier: ^1.64.1
         version: 1.64.1
+      preact:
+        specifier: ^10.29.8
+        version: 10.29.8
       publint:
         specifier: ^0.3.0
         version: 0.3.25
@@ -1480,23 +1483,6 @@ packages:
     peerDependencies:
       size-limit: 14.3.0
 
-  "@size-limit/preset-small-lib@14.3.0":
-    resolution:
-      {
-        integrity: sha512-nvCyY+o26aOIdZxm81nlebE9+9lVf9UMKi19hyjE5DjO5kSaOTtnrZSeHzV9JTN5djt/hqGserT1mecoGXLTNw==,
-      }
-    peerDependencies:
-      size-limit: 14.3.0
-
-  "@size-limit/rolldown@14.3.0":
-    resolution:
-      {
-        integrity: sha512-u4qTH1R5gAonGYYEBLb4UHOUpWhiwVOATpV/wvKCzGTcrwziYdWzvK2S4PuUKGSj9C8/NU2d1KqhFJZy5Mw3XA==,
-      }
-    engines: { node: ^22.19.0 || ^24.5.0 || >=26.0.0 }
-    peerDependencies:
-      size-limit: 14.3.0
-
   "@storybook/addon-a11y@10.6.4":
     resolution:
       {
@@ -2894,6 +2880,17 @@ packages:
       }
     engines: { node: ^10 || ^12 || >=14 }
 
+  preact@10.29.8:
+    resolution:
+      {
+        integrity: sha512-ej2aVZ+vZ8WO7tvlQWRM9N63A0KzF9q4mWJfDUHgYaIofWY9hu74QdnQrjoPMmZi2/nZ5gN0bJCQF49xQqx09Q==,
+      }
+    peerDependencies:
+      preact-render-to-string: ">=5"
+    peerDependenciesMeta:
+      preact-render-to-string:
+        optional: true
+
   pretty-format@27.5.1:
     resolution:
       {
@@ -4277,17 +4274,6 @@ snapshots:
     dependencies:
       size-limit: 14.3.0
 
-  "@size-limit/preset-small-lib@14.3.0(size-limit@14.3.0)":
-    dependencies:
-      "@size-limit/file": 14.3.0(size-limit@14.3.0)
-      "@size-limit/rolldown": 14.3.0(size-limit@14.3.0)
-      size-limit: 14.3.0
-
-  "@size-limit/rolldown@14.3.0(size-limit@14.3.0)":
-    dependencies:
-      rolldown: 1.2.15
-      size-limit: 14.3.0
-
   "@storybook/addon-a11y@10.6.4(storybook@10.6.4(@types/react@19.3.0)(react@19.3.1))":
     dependencies:
       "@storybook/global": 5.0.0
@@ -5107,6 +5093,8 @@ snapshots:
       nanoid: 3.3.20
       picocolors: 1.1.1
       source-map-js: 1.2.2
+
+  preact@10.29.8: {}
 
   pretty-format@27.5.1:
     dependencies:

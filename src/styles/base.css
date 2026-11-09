@@ -20,11 +20,15 @@
   line-height: var(--cy-font-line-height);
 }
 
-/* Component-local reset: every Cynosure element starts from known values whatever the host CSS says. */
+/*
+ * Inner-element reset: inner parts of components start from known values whatever the host CSS says.
+ * Never put .cy-reset on a component root; roots declare these properties themselves, so rule order never matters.
+ */
 .cy-reset,
 .cy-reset::before,
 .cy-reset::after {
-  box-sizing: border-box;
+  /* !important only here: hosts commonly force box-sizing with !important on * */
+  box-sizing: border-box !important;
   margin: 0;
   font: inherit;
   letter-spacing: normal;
