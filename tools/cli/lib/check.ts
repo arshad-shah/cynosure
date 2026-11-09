@@ -255,6 +255,7 @@ export const AGENT_FOLDERS = [
   "tools/cli",
   ".storybook",
   "docs",
+  "src/overlay",
 ] as const;
 
 function agentRules(root: string, out: Violation[]) {

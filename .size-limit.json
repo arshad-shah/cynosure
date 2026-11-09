@@ -203,5 +203,17 @@
     ],
     "limit": "3.25 kB",
     "gzip": true
+  },
+  {
+    "name": "Popover",
+    "path": ["dist/components/Popover/Popover.js", "dist/styles/popover.css"],
+    "limit": "2 kB",
+    "gzip": true
+  },
+  {
+    "name": "Overlay core",
+    "path": ["dist/overlay/dismiss.js", "dist/overlay/position.js", "dist/overlay/use-anchored-position.js"],
+    "limit": "2 kB",
+    "gzip": true
   }
 ]

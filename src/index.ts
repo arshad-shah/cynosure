@@ -17,6 +17,12 @@ export { Inline, type InlineProps } from "./components/Inline/index.js";
 export { Kbd, type KbdProps } from "./components/Kbd/index.js";
 export { Link, type LinkProps } from "./components/Link/index.js";
 export { LoadingDots, type LoadingDotsProps } from "./components/LoadingDots/index.js";
+export {
+  Popover,
+  type PopoverProps,
+  type PopoverTokens,
+  type PopoverTriggerProps,
+} from "./components/Popover/index.js";
 export { RadioGroup, type RadioGroupProps, type RadioOption } from "./components/RadioGroup/index.js";
 export { SearchField, type SearchFieldProps } from "./components/SearchField/index.js";
 export {
@@ -52,5 +58,6 @@ export { InputBase, type InputBaseProps } from "./foundations/InputBase/InputBas
 export { LinkBase, type LinkBaseProps } from "./foundations/LinkBase/LinkBase.js";
 export { type RovingOptions, useRovingFocus } from "./foundations/roving-focus.js";
 export { TextAreaBase, type TextAreaBaseProps } from "./foundations/TextAreaBase/TextAreaBase.js";
+export { type DismissOptions, type DismissReason, useDismiss } from "./overlay/dismiss.js";
 export * from "./theme/index.js";
 export * from "./tokens/index.js";

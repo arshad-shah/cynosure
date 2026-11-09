@@ -9,6 +9,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { useDismiss } from "../../overlay/dismiss.js";
 import type { Placement } from "../../overlay/position.js";
 import { useAnchoredPosition } from "../../overlay/use-anchored-position.js";
 
@@ -67,12 +68,8 @@ export function Tooltip({ content, children, placement = "top", delay = 300 }: T
     if (open && !el.matches(":popover-open")) el.showPopover();
     if (!open && el.matches(":popover-open")) el.hidePopover?.();
   });
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [open]);
+  // Escape closes the tooltip first when it sits inside a Popover, Menu or Dialog (shared layer stack).
+  useDismiss({ open, onClose: () => setOpen(false), inside: [triggerRef, tip], outside: false });
   useAnchoredPosition(triggerRef, tip, open, placement);
 
   return (

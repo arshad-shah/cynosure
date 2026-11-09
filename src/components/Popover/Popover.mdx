@@ -1,0 +1,73 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./Popover.stories";
+
+<Meta of={Stories} />
+
+# Popover
+
+A small floating panel attached to a button, for options and details that belong to that button: filters, view settings, a quick form. It sits in the browser's top layer, so no parent can clip it.
+
+<Canvas of={Stories.OpensFocusesAndReturnsFocus} />
+
+## When to use
+
+- **A few related controls** that would clutter the page if always visible (filters, display options).
+- **Extra detail** about one item, with links or buttons in it.
+
+**Use something else when:**
+- it is a short text hint with no controls: [Tooltip](?path=/docs/components-tooltip--docs)
+- it is a list of commands: Menu (coming next)
+- the person must finish or cancel before continuing: Dialog
+- the content is long or is a whole task: a page or a Sheet
+
+## Usage
+
+```tsx
+import { Button, Checkbox, Popover, Stack } from "@arshad-shah/cynosure";
+
+<Popover label="Filters" trigger={(props) => <Button {...props}>Filters</Button>}>
+  <Stack gap="4">
+    <Checkbox label="Only errors" />
+    <Button variant="solid" tone="accent">Apply</Button>
+  </Stack>
+</Popover>
+```
+
+`trigger` is a render prop: spread the props it receives onto your [Button](?path=/docs/components-button--docs) or [IconButton](?path=/docs/components-iconbutton--docs). They carry the ref, the click handler and the ARIA wiring (`aria-expanded`, `aria-controls`, `aria-haspopup`).
+
+## Layers
+
+Popovers nest, and Escape closes one layer at a time: an inner popover first, then the outer one. A [Tooltip](?path=/docs/components-tooltip--docs) shown inside a popover also closes before the popover does.
+
+<Canvas of={Stories.NestedCloseOneAtATime} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+| Input | Result |
+| --- | --- |
+| Click, tap, <kbd>Enter</kbd>, <kbd>Space</kbd> on the trigger | Opens or closes |
+| <kbd>Escape</kbd> | Closes the topmost layer and returns focus to its trigger |
+| Pointer down outside | Closes it |
+| <kbd>Tab</kbd> with `modal` | Cycles inside the panel |
+
+- **Focus:** on open, focus moves to the first control inside, or to the panel itself when it has none, so screen readers land in it. On close, focus returns to the trigger unless you already moved it somewhere else.
+- **Role:** the panel is a dialog named by `label`. With `modal` it is `aria-modal` and keeps Tab inside.
+- **Position:** the panel prefers `placement`, flips to the other side when there is no room, and stays inside the viewport. `start` and `end` follow the reading direction.
+- **Shadow DOM:** works inside shadow roots (extension content scripts).
+- **Motion:** a short fade and scale, removed under reduced motion.
+
+## Theming
+
+Tokens: `--cy-popover-padding`, `--cy-popover-radius` and `--cy-popover-width-{sm,md,lg}`.
+
+```ts
+createTheme({ components: { popover: { radius: "10px", widthMd: "360px" } } });
+```
+
+## Related
+
+[Tooltip](?path=/docs/components-tooltip--docs) · [Button](?path=/docs/components-button--docs) · [Toolbar](?path=/docs/components-toolbar--docs)
