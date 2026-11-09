@@ -41,6 +41,9 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  :where([class*="cy-"]),
+  :where([class*="cy-"])::before,
+  :where([class*="cy-"])::after,
   .cy-reset,
   .cy-reset *,
   .cy-reset::before,

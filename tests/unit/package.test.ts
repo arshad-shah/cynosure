@@ -37,4 +37,9 @@ describe("CSS build", () => {
     expect(existsSync(join(out, "fonts", "hanken-grotesk-latin-wght-normal.woff2"))).toBe(true);
     expect(read(join(out, "fonts", "hanken.css"), "utf8")).toContain("Hanken Grotesk");
   });
+  it("M13: OS reduced motion reaches every Cynosure element, including component roots", () => {
+    const out = mkdtempSync(join(tmpdir(), "cy-build-"));
+    const css = buildCss("src", out);
+    expect(css).toMatch(/@media \(prefers-reduced-motion:reduce\)\{:where\(\[class\*=cy-\]\)/);
+  });
 });

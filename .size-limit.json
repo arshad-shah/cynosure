@@ -6,6 +6,23 @@
     "gzip": true
   },
   {
+    "name": "createTheme + themeToCss",
+    "path": [
+      "dist/tokens/create-theme.js",
+      "dist/tokens/color.js",
+      "dist/tokens/defaults.js",
+      "dist/tokens/to-css.js"
+    ],
+    "limit": "6 kB",
+    "gzip": true
+  },
+  {
+    "name": "Icon",
+    "path": ["dist/foundations/Icon/Icon.js", "dist/styles/icon.css"],
+    "limit": "1.5 kB",
+    "gzip": true
+  },
+  {
     "name": "Button (JS + CSS)",
     "path": [
       "dist/components/Button/Button.js",
@@ -16,9 +33,118 @@
     "gzip": true
   },
   {
-    "name": "LoadingDots (JS + CSS)",
+    "name": "IconButton",
+    "path": ["dist/components/IconButton/IconButton.js", "dist/styles/iconbutton.css"],
+    "limit": "1 kB",
+    "gzip": true
+  },
+  {
+    "name": "LoadingDots",
     "path": ["dist/components/LoadingDots/LoadingDots.js", "dist/styles/loading-dots.css"],
+    "limit": "1.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "Field",
+    "path": ["dist/components/Field/Field.js", "dist/foundations/field.js", "dist/styles/field.css"],
     "limit": "3 kB",
+    "gzip": true
+  },
+  {
+    "name": "TextField",
+    "path": [
+      "dist/components/TextField/TextField.js",
+      "dist/foundations/InputBase/InputBase.js",
+      "dist/styles/text-field.css"
+    ],
+    "limit": "3 kB",
+    "gzip": true
+  },
+  {
+    "name": "SearchField",
+    "path": ["dist/components/SearchField/SearchField.js", "dist/styles/search-field.css"],
+    "limit": "1 kB",
+    "gzip": true
+  },
+  {
+    "name": "TextArea",
+    "path": [
+      "dist/components/TextArea/TextArea.js",
+      "dist/foundations/TextAreaBase/TextAreaBase.js",
+      "dist/styles/text-area.css"
+    ],
+    "limit": "3 kB",
+    "gzip": true
+  },
+  {
+    "name": "Link",
+    "path": ["dist/components/Link/Link.js", "dist/foundations/LinkBase/LinkBase.js", "dist/styles/link.css"],
+    "limit": "3 kB",
+    "gzip": true
+  },
+  {
+    "name": "Checkbox + Switch",
+    "path": [
+      "dist/components/Checkbox/Checkbox.js",
+      "dist/components/Checkbox/ChoiceRow.js",
+      "dist/components/Switch/Switch.js",
+      "dist/foundations/ChoiceBase/ChoiceBase.js",
+      "dist/styles/checkbox.css",
+      "dist/styles/choice.css"
+    ],
+    "limit": "3.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "RadioGroup",
+    "path": ["dist/components/RadioGroup/RadioGroup.js", "dist/styles/radio-group.css"],
+    "limit": "1.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "SegmentedControl",
+    "path": ["dist/components/SegmentedControl/SegmentedControl.js", "dist/styles/segmented-control.css"],
+    "limit": "3 kB",
+    "gzip": true
+  },
+  {
+    "name": "Tooltip",
+    "path": [
+      "dist/components/Tooltip/Tooltip.js",
+      "dist/overlay/position.js",
+      "dist/overlay/use-anchored-position.js",
+      "dist/styles/tooltip.css"
+    ],
+    "limit": "3 kB",
+    "gzip": true
+  },
+  {
+    "name": "Select",
+    "path": [
+      "dist/components/Select/Select.js",
+      "dist/foundations/HiddenValue/HiddenValue.js",
+      "dist/styles/select.css",
+      "dist/styles/hidden-value.css"
+    ],
+    "limit": "5 kB",
+    "gzip": true
+  },
+  {
+    "name": "Badge",
+    "path": ["dist/components/Badge/Badge.js", "dist/styles/badge.css"],
+    "limit": "1.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "Kbd",
+    "path": ["dist/components/Kbd/Kbd.js", "dist/styles/kbd.css"],
+    "limit": "1.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "ThemeToggle",
+    "path": ["dist/components/ThemeToggle/ThemeToggle.js"],
+    "limit": "1 kB",
     "gzip": true
   }
 ]

@@ -1,5 +1,6 @@
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
+import { clientBanner } from "./tools/banner";
 
 /** Library build: one ESM module per source module so consumers tree-shake. CSS is built by tools/build-css.ts. */
 export default defineConfig({
@@ -7,7 +8,8 @@ export default defineConfig({
   build: {
     emptyOutDir: false,
     target: "es2023",
-    minify: false,
+    minify: "esbuild",
+    sourcemap: true,
     lib: {
       formats: ["es"],
       entry: {
@@ -19,7 +21,12 @@ export default defineConfig({
     },
     rollupOptions: {
       external: [/^react($|\/)/, /^react-dom($|\/)/, /^node:/],
-      output: { preserveModules: true, preserveModulesRoot: "src", entryFileNames: "[name].js" },
+      output: {
+        preserveModules: true,
+        preserveModulesRoot: "src",
+        entryFileNames: "[name].js",
+        banner: (chunk) => clientBanner(chunk.name),
+      },
     },
   },
 });
