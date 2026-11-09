@@ -1,0 +1,12 @@
+import type { IconData } from "./types";
+
+export const tree: IconData = {
+  name: "tree",
+  body: [
+    ["rect", { x: 3.5, y: 4, width: 6, height: 5, rx: 1.5 }],
+    ["rect", { x: 14.5, y: 15, width: 6, height: 5, rx: 1.5, animate: true }],
+    ["path", { d: "M6.5 9v8.5h8" }],
+  ],
+  star: { x: 16, y: 5.5 },
+  motion: "slide",
+};

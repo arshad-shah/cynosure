@@ -1,0 +1,8 @@
+import type { IconData } from "./types";
+
+export const check: IconData = {
+  name: "check",
+  body: [["path", { d: "M5 12.5l4.5 4.5L19 7.5", animate: true }]],
+  star: { x: 18, y: 2.5 },
+  motion: "draw",
+};
