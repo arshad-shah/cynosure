@@ -56,3 +56,18 @@ describe("computePosition", () => {
     expect(computePosition(rect(400, 590, 40, 8), tip, viewport, "end", 6, "ltr").y).toBe(600 - 30 - 8);
   });
 });
+
+describe("computePosition alignment", () => {
+  it("aligns bottom placements to the anchor's start edge when asked", () => {
+    expect(
+      computePosition(rect(200, 100, 220), { width: 320, height: 200 }, viewport, "bottom", 4, "ltr", "start")
+        .x,
+    ).toBe(200);
+  });
+  it("aligns to the end edge in RTL", () => {
+    expect(
+      computePosition(rect(200, 100, 220), { width: 320, height: 200 }, viewport, "bottom", 4, "rtl", "start")
+        .x,
+    ).toBe(420 - 320);
+  });
+});

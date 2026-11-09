@@ -56,7 +56,7 @@ export interface SelectProps {
   disabled?: boolean;
   size?: Size;
   variant?: "outline" | "soft";
-  labels?: { placeholder?: string; empty?: string };
+  labels?: { placeholder?: string; empty?: string; required?: string };
   className?: string;
   /** Layout only. */
   style?: CSSProperties;
@@ -91,6 +91,8 @@ export function Select({
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(-1);
   const typed = useRef({ text: "", at: 0 });
+  // Shown after a blocked submit: the hidden input cannot be focused or explained, so the trigger is.
+  const [missing, setMissing] = useState(false);
 
   const enabled = (i: number) => i >= 0 && i < options.length && !options[i]?.disabled;
   const step = (from: number, delta: number) => {
@@ -111,6 +113,7 @@ export function Select({
       const option = options[index];
       if (!option || option.disabled) return;
       if (value === undefined) setInner(option.value);
+      setMissing(false);
       if (option.value !== current) onChange?.(option.value);
     },
     [options, value, current, onChange],
@@ -129,12 +132,15 @@ export function Select({
     const el = list.current as (HTMLElement & { showPopover?: () => void; hidePopover?: () => void }) | null;
     if (!el?.showPopover) return;
     if (open && !el.matches(":popover-open")) {
-      el.style.minInlineSize = `${trigger.current?.offsetWidth ?? 0}px`;
+      const width = trigger.current?.offsetWidth ?? 0;
+      // As wide as the trigger, never wider than max(trigger, 20rem): long labels truncate instead of overflowing.
+      el.style.minInlineSize = `${width}px`;
+      el.style.maxInlineSize = `${Math.max(width, 320)}px`;
       el.showPopover();
     }
     if (!open && el.matches(":popover-open")) el.hidePopover?.();
   });
-  useAnchoredPosition(trigger, list, open, "bottom", 4);
+  useAnchoredPosition(trigger, list, open, "bottom", 4, "start");
   useEffect(() => {
     if (!open || active < 0) return;
     list.current?.querySelector(`[data-index="${active}"]`)?.scrollIntoView({ block: "nearest" });
@@ -204,7 +210,7 @@ export function Select({
     <Field
       label={label}
       description={description}
-      error={error}
+      error={error ?? (missing && !current ? (labels?.required ?? "Please choose a value.") : undefined)}
       required={required}
       size={size}
       className={className}
@@ -288,7 +294,17 @@ export function Select({
             name={name}
             value={current}
             required={required}
-            onReset={() => value === undefined && setInner(defaultValue)}
+            disabled={disabled}
+            requiredMessage={labels?.required ?? "Please choose a value."}
+            onReset={() => {
+              if (value === undefined) setInner(defaultValue);
+              setMissing(false);
+            }}
+            onInvalid={(event) => {
+              event.preventDefault();
+              setMissing(true);
+              trigger.current?.focus();
+            }}
           />
         </div>
       )}

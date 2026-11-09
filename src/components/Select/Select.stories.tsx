@@ -239,3 +239,73 @@ export const EmptyOptionsShowsEmptyLabel: Story = {
     await expect(list(canvasElement)).toHaveTextContent("Nothing to pick");
   },
 };
+
+export const DisabledNeitherSubmitsNorBlocks: Story = {
+  render: (args) => (
+    <form data-testid="form">
+      <Select {...args} name="fruit" required disabled defaultValue="" />
+      <Select {...args} label="Kept" name="kept" disabled defaultValue="apple" />
+    </form>
+  ),
+  play: async ({ canvas }) => {
+    const form = canvas.getByTestId("form") as HTMLFormElement;
+    await expect(form.checkValidity()).toBe(true);
+    await expect(new FormData(form).has("kept")).toBe(false);
+  },
+};
+
+export const InvalidSubmitFocusesTheTriggerAndExplains: Story = {
+  render: (args) => (
+    <form data-testid="form" onSubmit={(e) => e.preventDefault()}>
+      <Select {...args} name="fruit" required defaultValue="" labels={{ required: "Choose a fruit." }} />
+    </form>
+  ),
+  play: async ({ canvas }) => {
+    (canvas.getByTestId("form") as HTMLFormElement).requestSubmit();
+    const trigger = canvas.getByRole("combobox", { name: "Fruit" });
+    await waitFor(() => expect(trigger).toHaveFocus());
+    await expect(canvas.getByRole("alert")).toHaveTextContent("Choose a fruit.");
+    await expect(trigger).toHaveAttribute("aria-invalid", "true");
+  },
+};
+
+export const NarrowTriggerLongLabels: Story = {
+  args: {
+    options: Array.from({ length: 5 }, (_, i) => ({
+      value: `long-${i}`,
+      label: `Option ${i + 1}: a deliberately long label that keeps going well past any sensible list width`,
+    })),
+    defaultValue: "long-0",
+  },
+  render: (args) => (
+    <div style={{ width: 220, marginInlineStart: 200 }}>
+      <Select {...args} />
+    </div>
+  ),
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const trigger = canvas.getByRole("combobox");
+    await userEvent.click(trigger);
+    await waitFor(() => expect(isOpen(list(canvasElement))).toBe(true));
+    const l = list(canvasElement).getBoundingClientRect();
+    const t = trigger.getBoundingClientRect();
+    await expect(Math.abs(l.left - t.left)).toBeLessThan(1);
+    await expect(l.width).toBeLessThanOrEqual(Math.max(t.width, 320) + 1);
+    const label = canvasElement.querySelector(".cy-select-option-label") as HTMLElement;
+    await expect(label.scrollWidth).toBeGreaterThan(label.clientWidth);
+  },
+};
+
+export const SpaceOpensAndStaysOpen: Story = {
+  args: { defaultValue: "apple" },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const trigger = canvas.getByRole("combobox");
+    trigger.focus();
+    await userEvent.keyboard(" ");
+    await new Promise((r) => setTimeout(r, 150));
+    await expect(isOpen(list(canvasElement))).toBe(true);
+    await userEvent.keyboard("{ArrowDown} ");
+    await expect(trigger).toHaveTextContent("Banana");
+    await new Promise((r) => setTimeout(r, 150));
+    await expect(isOpen(list(canvasElement))).toBe(false);
+  },
+};

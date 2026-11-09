@@ -49,6 +49,8 @@
   border: 0;
   font-weight: var(--cy-font-weight-regular);
   display: grid;
+  /* Never let a long value widen the field past its container. */
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--cy-field-gap, var(--cy-space-3));
   min-inline-size: 0;
   color: var(--cy-color-ink);

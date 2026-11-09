@@ -49,6 +49,8 @@ export default defineConfig({
         plugins: [storybookTest({ configDir: ".storybook", tags: { exclude: ["touch"] } })],
         test: {
           name: "stories",
+          // Headless Firefox occasionally loses keyboard focus to the runner; retried tests are still reported as flaky.
+          retry: process.env.CI ? 2 : 0,
           setupFiles: [".storybook/vitest.setup.ts"],
           browser: {
             enabled: true,

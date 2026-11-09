@@ -30,7 +30,7 @@
     "lint": "biome check .",
     "format": "biome check --write .",
     "test": "pnpm css && vitest run --project unit --project preact",
-    "test:stories": "pnpm css && vitest run --project stories --project touch",
+    "test:stories": "pnpm css && CY_BROWSERS=chromium,webkit vitest run --project stories --project touch && CY_BROWSERS=firefox vitest run --project stories",
     "test:visual": "pnpm css && VITE_CY_VISUAL=1 CY_BROWSERS=chromium vitest run --project stories",
     "storybook": "pnpm css && storybook dev -p 6006 --no-open",
     "build-storybook": "pnpm css && storybook build",

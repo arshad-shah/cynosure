@@ -1,4 +1,8 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+
+// Layout effect on the client (no flash), plain effect on the server (no warning).
+const useClientLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
+const CHANGE = "cy-color-mode-change";
 
 export type ColorMode = "light" | "dark" | "system";
 
@@ -34,16 +38,16 @@ export function useColorMode(options: { storage?: ColorModeStorage; key?: string
   const storageRef = useRef(options.storage ?? localStorageAdapter);
   storageRef.current = options.storage ?? localStorageAdapter;
   const touched = useRef(false);
-  const [mode, setState] = useState<ColorMode>(() => {
-    const initial = read(storageRef.current, key);
-    return initial instanceof Promise ? "system" : initial;
-  });
-  const [systemDark, setSystemDark] = useState(prefersDark);
+  // Server and first client render agree on "system"; storage is read after mount (hydration-safe).
+  const [mode, setState] = useState<ColorMode>("system");
+  const [systemDark, setSystemDark] = useState(false);
 
-  useEffect(() => {
+  useClientLayoutEffect(() => {
     touched.current = false;
+    setSystemDark(prefersDark());
     const initial = read(storageRef.current, key);
-    if (initial instanceof Promise) {
+    if (!(initial instanceof Promise)) setState(initial);
+    else {
       let live = true;
       // A user choice made while the read was pending always wins.
       initial.then((m) => live && !touched.current && setState(m));
@@ -60,10 +64,23 @@ export function useColorMode(options: { storage?: ColorModeStorage; key?: string
     return () => query?.removeEventListener("change", update);
   }, []);
 
+  // Other hooks on the page (e.g. an uncontrolled ThemeToggle) announce changes; follow them.
+  useEffect(() => {
+    const follow = (e: Event) => {
+      const detail = (e as CustomEvent<{ key: string; mode: ColorMode }>).detail;
+      if (detail.key !== key) return;
+      touched.current = true;
+      setState(detail.mode);
+    };
+    window.addEventListener(CHANGE, follow);
+    return () => window.removeEventListener(CHANGE, follow);
+  }, [key]);
+
   const setMode = useCallback(
     (next: ColorMode) => {
       touched.current = true;
       setState(next);
+      window.dispatchEvent(new CustomEvent(CHANGE, { detail: { key, mode: next } }));
       try {
         void Promise.resolve(storageRef.current.set(key, next)).catch(() => {});
       } catch {

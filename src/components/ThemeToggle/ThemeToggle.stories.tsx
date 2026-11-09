@@ -1,5 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect, fn } from "storybook/test";
+import { expect, fn, waitFor } from "storybook/test";
+import { CynosureTheme } from "../../theme/CynosureTheme.js";
+import { useColorMode } from "../../theme/use-color-mode.js";
 import { ThemeToggle } from "./ThemeToggle.js";
 
 const memory = () => {
@@ -41,5 +43,29 @@ export const KeyboardAndLabels: Story = {
     await userEvent.keyboard("{ArrowRight}");
     await expect(args.onChange).toHaveBeenCalledWith("dark");
     await expect(canvas.getByRole("radio", { name: "Sombre" })).toBeInTheDocument();
+  },
+};
+
+const pageStore = memory();
+
+function Page() {
+  const { mode } = useColorMode({ storage: pageStore.storage });
+  return (
+    <CynosureTheme mode={mode}>
+      <span data-testid="page" data-mode={mode}>
+        page
+      </span>
+      <ThemeToggle storage={pageStore.storage} />
+    </CynosureTheme>
+  );
+}
+
+export const UncontrolledToggleDrivesThePage: Story = {
+  render: () => <Page />,
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole("radio", { name: "Dark" }));
+    await waitFor(() => expect(canvas.getByTestId("page")).toHaveAttribute("data-mode", "dark"));
+    await userEvent.click(canvas.getByRole("radio", { name: "Light" }));
+    await waitFor(() => expect(canvas.getByTestId("page")).toHaveAttribute("data-mode", "light"));
   },
 };

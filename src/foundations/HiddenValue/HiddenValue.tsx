@@ -10,9 +10,16 @@ export interface HiddenValueProps {
   requiredMessage?: string;
   /** Called when the owning form is reset, so the widget can restore its default. */
   onReset?: (() => void) | undefined;
+  /** Disabled values are neither submitted nor validated (like native disabled controls). */
+  disabled?: boolean | undefined;
+  /**
+   * Called when validation fails. Call `event.preventDefault()` to stop the browser reporting on this hidden input,
+   * then focus and explain on the widget's visible control instead.
+   */
+  onInvalid?: ((event: Event) => void) | undefined;
 }
 
-/** Foundation: lets custom widgets (Select) take part in native forms: FormData, reset and required. */
+/** Foundation: lets custom widgets (Select) take part in native forms: FormData, reset, required and disabled. */
 export function HiddenValue({
   name,
   value,
@@ -20,11 +27,19 @@ export function HiddenValue({
   required,
   requiredMessage = "Please choose a value.",
   onReset,
+  disabled,
+  onInvalid,
 }: HiddenValueProps) {
   const ref = useRef<HTMLInputElement>(null);
   useEffect(() => {
     ref.current?.setCustomValidity(required && !value ? requiredMessage : "");
   }, [required, value, requiredMessage]);
+  useEffect(() => {
+    const input = ref.current;
+    if (!input || !onInvalid) return;
+    input.addEventListener("invalid", onInvalid);
+    return () => input.removeEventListener("invalid", onInvalid);
+  }, [onInvalid]);
   useEffect(() => {
     const owner = ref.current?.form;
     if (!owner || !onReset) return;
@@ -39,6 +54,7 @@ export function HiddenValue({
       name={name}
       form={form}
       value={value}
+      disabled={disabled}
       onChange={() => {}}
       tabIndex={-1}
       aria-hidden="true"

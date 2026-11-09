@@ -90,6 +90,8 @@
 .cy-select-option-text {
   font-size: inherit;
   line-height: inherit;
+  flex: 1;
+  grid-template-columns: minmax(0, 1fr);
   display: grid;
   min-inline-size: 0;
 }

@@ -1,6 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { useEffect, useRef } from "react";
+import { createRoot } from "react-dom/client";
 import { expect, waitFor } from "storybook/test";
 import { download } from "../../icons/index.js";
+import { createStyleSheet } from "../../styles/inline.js";
 import { Button } from "../Button/Button.js";
 import { Tooltip } from "./Tooltip.js";
 
@@ -49,9 +52,9 @@ export const FocusShowsAndEscapeHides: Story = {
     await userEvent.tab();
     await waitFor(() => expect(isOpen(tooltip(canvasElement))).toBe(true));
     await userEvent.keyboard("{Escape}");
-    await expect(isOpen(tooltip(canvasElement))).toBe(false);
+    await waitFor(() => expect(isOpen(tooltip(canvasElement))).toBe(false));
     await userEvent.tab();
-    await expect(isOpen(tooltip(canvasElement))).toBe(false);
+    await waitFor(() => expect(isOpen(tooltip(canvasElement))).toBe(false));
   },
 };
 
@@ -111,5 +114,38 @@ export const FollowsTriggerOnScroll: Story = {
     await waitFor(() =>
       expect(tooltip(canvasElement).getBoundingClientRect().top).toBeCloseTo(before - 40, 0),
     );
+  },
+};
+
+function ShadowTooltip() {
+  const host = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = host.current;
+    if (!el || el.shadowRoot) return;
+    const root = el.attachShadow({ mode: "open" });
+    root.adoptedStyleSheets = [createStyleSheet()];
+    const mount = document.createElement("div");
+    root.append(mount);
+    createRoot(mount).render(
+      <Tooltip content="Inside shadow" delay={0}>
+        <Button>Shadow</Button>
+      </Tooltip>,
+    );
+  }, []);
+  return <div data-testid="host" ref={host} style={{ paddingTop: 120 }} />;
+}
+
+export const WorksInsideAShadowRoot: Story = {
+  render: () => <ShadowTooltip />,
+  play: async ({ canvas, userEvent }) => {
+    const host = await canvas.findByTestId("host");
+    await waitFor(() => expect(host.shadowRoot?.querySelector("button")).toBeTruthy());
+    const button = host.shadowRoot?.querySelector("button") as HTMLElement;
+    const tip = host.shadowRoot?.querySelector(".cy-tooltip") as HTMLElement;
+    await userEvent.hover(button);
+    await waitFor(() => expect(tip.matches(":popover-open")).toBe(true));
+    await expect(tip.getBoundingClientRect().bottom).toBeLessThanOrEqual(button.getBoundingClientRect().top);
+    // Let the fade-in finish so the accessibility scan measures the final colours.
+    await waitFor(() => expect(getComputedStyle(tip).opacity).toBe("1"));
   },
 };

@@ -8,6 +8,7 @@ export function useAnchoredPosition(
   open: boolean,
   placement: Placement,
   offset = 6,
+  align: "center" | "start" = "center",
   onPlace?: (placement: Placement) => void,
 ) {
   useLayoutEffect(() => {
@@ -25,6 +26,7 @@ export function useAnchoredPosition(
         placement,
         offset,
         dir,
+        align,
       );
       f.style.left = `${pos.x}px`;
       f.style.top = `${pos.y}px`;
@@ -43,5 +45,5 @@ export function useAnchoredPosition(
       window.removeEventListener("scroll", schedule, true);
       window.removeEventListener("resize", schedule);
     };
-  }, [anchor, floating, open, placement, offset, onPlace]);
+  }, [anchor, floating, open, placement, offset, align, onPlace]);
 }
