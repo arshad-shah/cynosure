@@ -114,6 +114,16 @@ describe("untrusted-looking theme input", () => {
     expect(() => createTheme({ components: { "bad name;": { radius: "2px" } } })).toThrow(CynosureThemeError);
     expect(() => createTheme({ font: { sans: "x;}*{color:red" } })).toThrow(CynosureThemeError);
   });
+  it("validates every path into the theme, including generic token overrides and key names", () => {
+    expect(() => createTheme({ tokens: { motion: { ease: "x;}*{color:red" } } })).toThrow(CynosureThemeError);
+    expect(() => createTheme({ motion: { ease: "</style>" } })).toThrow(CynosureThemeError);
+    expect(() => createTheme({ tokens: { "bad;key": 1 } as never })).toThrow(CynosureThemeError);
+    expect(() => createTheme({ palettes: { light: { "evil}": "#fff" } as never } })).toThrow(
+      CynosureThemeError,
+    );
+    expect(() => createTheme({ palettes: { weird: { bg: "#fff" } } as never })).toThrow(CynosureThemeError);
+    expect(() => createTheme({ font: { "x;y": "serif" } as never })).toThrow(CynosureThemeError);
+  });
   it("validates every palette override as a colour", () => {
     expect(() => createTheme({ palettes: { light: { bg: "red;}" } } })).toThrow(CynosureThemeError);
     expect(createTheme({ palettes: { light: { bg: "rgb(10 20 30)" } } }).palettes.light.bg).toBe("#0a141e");

@@ -70,6 +70,7 @@ function contrastPalette(p: ColorTokens, dark: boolean): ColorTokens {
 }
 
 const SAFE_NAME = /^[a-z][a-z0-9-]*$/i;
+const SAFE_KEY = /^[a-z0-9][a-z0-9-]*$/i;
 const UNSAFE_VALUE = /[;{}<>\\\n\r]|\/\*/;
 
 /** Rejects values that could escape a declaration or a <style> block when serialised. */
@@ -77,6 +78,16 @@ function safeValue(where: string, value: string): string {
   if (UNSAFE_VALUE.test(value))
     throw new CynosureThemeError(`Cynosure token ${where} has an unsafe value "${value}".`);
   return value;
+}
+
+/** Walks the finished theme: every key must be a safe token name and every string a safe value. */
+function assertSafe(node: unknown, path: string): void {
+  if (typeof node === "string") safeValue(path, node);
+  else if (node && typeof node === "object")
+    for (const [k, v] of Object.entries(node)) {
+      if (!SAFE_KEY.test(k)) throw new CynosureThemeError(`Cynosure token name "${path}.${k}" is not valid.`);
+      assertSafe(v, `${path}.${k}`);
+    }
 }
 
 /** Builds a complete theme from a product's partial input. Throws CynosureThemeError for invalid colours. */
@@ -103,6 +114,7 @@ export function createTheme(input: ThemeInput = {}): Theme {
     "dark-contrast": contrastPalette(dark, true),
   };
   for (const [name, patch] of Object.entries(input.palettes ?? {}) as [PaletteName, Partial<ColorTokens>][]) {
+    if (!(name in palettes)) throw new CynosureThemeError(`Cynosure has no palette named "${name}".`);
     const clean: Partial<ColorTokens> = {};
     for (const [k, v] of Object.entries(patch) as [keyof ColorTokens, string][])
       clean[k] = toHex(parseColor(v));
@@ -121,6 +133,7 @@ export function createTheme(input: ThemeInput = {}): Theme {
     }
     components[name] = clean;
   }
-  for (const [k, v] of Object.entries(input.font ?? {})) safeValue(`font.${k}`, String(v));
-  return { global: buildGlobal(input), palettes, components };
+  const theme: Theme = { global: buildGlobal(input), palettes, components };
+  assertSafe(theme, "theme");
+  return theme;
 }
