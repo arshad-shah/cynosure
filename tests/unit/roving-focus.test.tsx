@@ -83,3 +83,41 @@ describe("useRovingFocus", () => {
     expect(focused()).toBe("Two");
   });
 });
+
+function Native({ extra = false }: { extra?: boolean }) {
+  const ref = useRef<HTMLDivElement>(null);
+  useRovingFocus(ref, { selector: "button, input" });
+  return (
+    <div ref={ref}>
+      <button type="button">A</button>
+      <button type="button" disabled>
+        B
+      </button>
+      <input aria-label="Text" />
+      {extra && <button type="button">C</button>}
+    </div>
+  );
+}
+
+describe("useRovingFocus with native controls", () => {
+  it("skips natively disabled controls", () => {
+    const { getByRole } = render(<Native />);
+    act(() => getByRole("button", { name: "A" }).focus());
+    key("ArrowRight");
+    expect(document.activeElement).toBe(getByRole("textbox"));
+  });
+  it("leaves arrow, Home and End keys to text inputs", () => {
+    const { getByRole } = render(<Native />);
+    act(() => getByRole("textbox").focus());
+    key("ArrowRight");
+    key("Home");
+    expect(document.activeElement).toBe(getByRole("textbox"));
+  });
+  it("gives items added later a tabIndex of -1", async () => {
+    const { getByRole, rerender } = render(<Native />);
+    rerender(<Native extra />);
+    await act(async () => {});
+    expect(getByRole("button", { name: "C" }).tabIndex).toBe(-1);
+    expect(getByRole("button", { name: "A" }).tabIndex).toBe(0);
+  });
+});

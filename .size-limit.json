@@ -162,12 +162,22 @@
   {
     "name": "useRovingFocus",
     "path": ["dist/foundations/roving-focus.js"],
-    "limit": "1 kB",
+    "limit": "1.25 kB",
     "gzip": true
   },
   {
     "name": "Card",
     "path": ["dist/components/Card/Card.js", "dist/styles/card.css"],
+    "limit": "2 kB",
+    "gzip": true
+  },
+  {
+    "name": "Toolbar",
+    "path": [
+      "dist/components/Toolbar/Toolbar.js",
+      "dist/foundations/roving-focus.js",
+      "dist/styles/toolbar.css"
+    ],
     "limit": "2 kB",
     "gzip": true
   }

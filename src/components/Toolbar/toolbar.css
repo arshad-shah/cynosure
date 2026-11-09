@@ -1,0 +1,17 @@
+.cy-toolbar.cy-toolbar {
+  box-sizing: border-box !important;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--cy-toolbar-gap, var(--cy-space-2));
+  margin: 0;
+  padding: var(--cy-toolbar-padding, var(--cy-space-1));
+  min-inline-size: 0;
+  font-size: var(--cy-font-size-md);
+  line-height: var(--cy-font-line-height);
+  &[aria-orientation="vertical"] {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: stretch;
+  }
+}

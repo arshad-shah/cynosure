@@ -10,6 +10,13 @@ export interface RovingOptions {
 const enabled = (el: HTMLElement) =>
   el.getAttribute("aria-disabled") !== "true" && !(el as HTMLButtonElement).disabled;
 
+const TEXT_INPUT = /^(?:text|search|email|url|tel|password|number|date|time|datetime-local|month|week)$/;
+/** Text entry keeps its own caret keys (arrows, Home, End). */
+const ownsArrowKeys = (el: HTMLElement) =>
+  el instanceof HTMLTextAreaElement ||
+  el.isContentEditable ||
+  (el instanceof HTMLInputElement && TEXT_INPUT.test(el.type));
+
 /**
  * Roving tabindex (WAI-ARIA APG): one tab stop; arrows move focus between items, skipping disabled ones;
  * Home and End jump; horizontal arrows follow the reading direction (RTL aware).
@@ -23,20 +30,36 @@ export function useRovingFocus(container: RefObject<HTMLElement | null>, options
     const setStop = (target: HTMLElement) => {
       for (const item of items()) item.tabIndex = item === target ? 0 : -1;
     };
-    const initial =
+    let stop: HTMLElement | undefined =
       items().find(
         (el) => el.getAttribute("aria-selected") === "true" || el.getAttribute("aria-checked") === "true",
       ) ?? items().find(enabled);
-    if (initial) setStop(initial);
+    const sync = () => {
+      // Keep the current stop if it is still here; otherwise fall back to the first enabled item.
+      if (!stop || !root.contains(stop) || !enabled(stop)) stop = items().find(enabled);
+      if (stop) setStop(stop);
+    };
+    sync();
+    // Items added, removed or disabled later join (or leave) the roving group.
+    const observer = new MutationObserver(sync);
+    observer.observe(root, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ["disabled", "aria-disabled"],
+    });
 
     const onFocusIn = (e: FocusEvent) => {
       const item = (e.target as HTMLElement).closest<HTMLElement>(selector);
-      if (item && root.contains(item)) setStop(item);
+      if (item && root.contains(item)) {
+        stop = item;
+        setStop(item);
+      }
     };
     const onKeyDown = (e: KeyboardEvent) => {
       const list = items().filter(enabled);
       const current = (e.target as HTMLElement).closest<HTMLElement>(selector);
-      if (!current || !list.length) return;
+      if (!current || !list.length || e.defaultPrevented || ownsArrowKeys(current)) return;
       const rtl = getComputedStyle(root).direction === "rtl";
       const horizontal = orientation !== "vertical";
       const vertical = orientation !== "horizontal";
@@ -52,12 +75,14 @@ export function useRovingFocus(container: RefObject<HTMLElement | null>, options
       else return;
       e.preventDefault();
       const next = list[index] as HTMLElement;
+      stop = next;
       setStop(next);
       next.focus();
     };
     root.addEventListener("focusin", onFocusIn);
     root.addEventListener("keydown", onKeyDown);
     return () => {
+      observer.disconnect();
       root.removeEventListener("focusin", onFocusIn);
       root.removeEventListener("keydown", onKeyDown);
     };
