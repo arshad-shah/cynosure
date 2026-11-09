@@ -1,0 +1,73 @@
+.cy-text-area-count {
+  justify-self: end;
+  margin: 0;
+  font-family: var(--cy-font-mono);
+  font-size: var(--cy-font-size-xs);
+  font-weight: var(--cy-font-weight-regular);
+  letter-spacing: normal;
+  text-transform: none;
+  color: var(--cy-color-muted);
+}
+
+.cy-text-area-input.cy-text-area-input {
+  box-sizing: border-box !important;
+  display: block;
+  inline-size: 100%;
+  margin: 0;
+  padding: var(--cy-text-area-padding-block, var(--cy-space-4))
+    var(--cy-text-area-padding-inline, var(--cy-space-5));
+  border: var(--cy-border-width) solid var(--cy-text-area-border, var(--cy-color-line));
+  border-radius: var(--cy-text-area-radius, var(--cy-radius-md));
+  background: var(--cy-text-area-bg, var(--cy-color-surface));
+  color: var(--cy-color-ink);
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-font-size-md);
+  font-weight: var(--cy-font-weight-regular);
+  line-height: var(--cy-font-line-height);
+  letter-spacing: normal;
+  text-transform: none;
+  resize: none;
+  outline: none;
+  overflow-y: hidden;
+  appearance: none;
+  transition:
+    border-color var(--cy-motion-fast) var(--cy-motion-ease),
+    box-shadow var(--cy-motion-fast) var(--cy-motion-ease);
+  &::placeholder {
+    color: var(--cy-color-muted);
+    opacity: 1;
+  }
+  &:hover:not(:disabled) {
+    border-color: color-mix(in oklab, var(--cy-color-ink) 30%, var(--cy-color-line));
+  }
+  &:focus-visible,
+  &:focus {
+    border-color: var(--cy-color-accent);
+    box-shadow: 0 0 0 var(--cy-border-focus) var(--cy-color-ring);
+    outline: var(--cy-border-focus) solid transparent;
+  }
+  &[aria-invalid="true"] {
+    border-color: var(--cy-color-danger);
+  }
+  &:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+}
+
+.cy-text-area.cy-text-area {
+  box-sizing: border-box !important;
+  margin: 0;
+  display: grid;
+  gap: var(--cy-space-2);
+  &[data-size="sm"] .cy-text-area-input {
+    font-size: var(--cy-font-size-sm);
+  }
+  &[data-size="lg"] .cy-text-area-input {
+    font-size: var(--cy-font-size-lg);
+  }
+  &[data-variant="soft"] .cy-text-area-input {
+    background: var(--cy-text-area-soft-bg, var(--cy-color-soft));
+    border-color: transparent;
+  }
+}

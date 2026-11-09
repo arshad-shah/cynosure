@@ -3,8 +3,9 @@ import { useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { expect, fn, waitFor } from "storybook/test";
 import * as icons from "../../icons/index.js";
-import { check, chevronDown, copy, download, trash } from "../../icons/index.js";
+import { chevronDown, copy, download, trash } from "../../icons/index.js";
 import { createStyleSheet } from "../../styles/inline.js";
+import { backdrop, contrast } from "../../test/color.js";
 import { computeUnderHostileHost } from "../../test/hostile.js";
 import { CynosureTheme } from "../../theme/index.js";
 import { createTheme } from "../../tokens/index.js";
@@ -379,36 +380,6 @@ export const DangerIsDistinctFromPrimary: Story = {
     await expect(danger.color).not.toBe(primary.color);
   },
 };
-
-/** Resolves any CSS colour (rgb, oklab, color-mix results…) to sRGB by painting one pixel. */
-function rgb(value: string): [number, number, number] {
-  const ctx = document.createElement("canvas").getContext("2d") as CanvasRenderingContext2D;
-  ctx.fillStyle = value;
-  ctx.fillRect(0, 0, 1, 1);
-  const [r = 0, g = 0, bl = 0] = ctx.getImageData(0, 0, 1, 1).data;
-  return [r, g, bl];
-}
-
-function contrast(a: string, b: string): number {
-  const lum = (c: string) => {
-    const [r, g, bl] = rgb(c).map((v) => {
-      const s = v / 255;
-      return s <= 0.04045 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
-    }) as [number, number, number];
-    return 0.2126 * r + 0.7152 * g + 0.0722 * bl;
-  };
-  const [hi, lo] = [lum(a), lum(b)].sort((x, y) => y - x) as [number, number];
-  return (hi + 0.05) / (lo + 0.05);
-}
-
-/** The first non-transparent background behind an element. */
-function backdrop(el: Element | null): string {
-  for (let e = el; e; e = e.parentElement) {
-    const bg = getComputedStyle(e).backgroundColor;
-    if (bg !== "rgba(0, 0, 0, 0)" && bg !== "transparent") return bg;
-  }
-  return "rgb(255, 255, 255)";
-}
 
 const VARIANTS = ["solid", "soft", "outline", "ghost"] as const;
 const TONES = ["accent", "neutral", "danger", "success", "warning", "info"] as const;

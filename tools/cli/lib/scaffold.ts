@@ -1,7 +1,7 @@
 /** Generators behind `cy new …`. Deterministic: same input, same files; refuses to overwrite. */
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { ICON_CATEGORIES, type IconCategory, type IconData, type IconNode } from "../../../src/icons/types";
+import type { IconCategory, IconData, IconNode } from "../../../src/icons/types";
 import { validateIcon } from "../../../src/icons/validate";
 
 const kebab = (s: string) => s.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase();

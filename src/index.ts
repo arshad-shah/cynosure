@@ -1,8 +1,10 @@
 export { Button, type ButtonProps, type ButtonTokens } from "./components/Button/index.js";
 export { Field, type FieldProps } from "./components/Field/index.js";
 export { IconButton, type IconButtonProps } from "./components/IconButton/index.js";
+export { Link, type LinkProps } from "./components/Link/index.js";
 export { LoadingDots, type LoadingDotsProps } from "./components/LoadingDots/index.js";
 export { SearchField, type SearchFieldProps } from "./components/SearchField/index.js";
+export { TextArea, type TextAreaProps } from "./components/TextArea/index.js";
 export { TextField, type TextFieldProps } from "./components/TextField/index.js";
 export { ButtonBase, type ButtonBaseProps } from "./foundations/ButtonBase/ButtonBase.js";
 export { ChoiceBase, type ChoiceBaseProps } from "./foundations/ChoiceBase/ChoiceBase.js";
