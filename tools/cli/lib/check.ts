@@ -132,6 +132,32 @@ function structureRules(root: string, out: Violation[]) {
   }
 }
 
+/** Folders that must carry an AGENTS.md with their local rules and recipes. */
+export const AGENT_FOLDERS = [
+  "src/tokens",
+  "src/foundations",
+  "src/components",
+  "src/icons",
+  "src/theme",
+  "src/adapters",
+  "tools/cli",
+  ".storybook",
+  "docs",
+] as const;
+
+function agentRules(root: string, out: Violation[]) {
+  if (!existsSync(join(root, "AGENTS.md")))
+    out.push({ rule: "agents", file: ".", line: 1, message: "root AGENTS.md is missing" });
+  for (const folder of AGENT_FOLDERS)
+    if (existsSync(join(root, folder)) && !existsSync(join(root, folder, "AGENTS.md")))
+      out.push({
+        rule: "agents",
+        file: folder,
+        line: 1,
+        message: "needs an AGENTS.md with this folder's rules",
+      });
+}
+
 export function check(root: string): Violation[] {
   const out: Violation[] = [];
   const files = walk(join(root, "src"));
@@ -149,7 +175,7 @@ export function check(root: string): Violation[] {
       (file.endsWith(".css") || (file.endsWith(".tsx") && !isStory(file)))
     )
       literalRules(root, file, out);
-    if (/\.(tsx?|css|md)$/.test(file)) {
+    if (/\.(tsx?|css|md)$/.test(file) && !file.endsWith("AGENTS.md")) {
       const text = readFileSync(file, "utf8");
       for (const m of text.matchAll(/TODO\(cy\)/g))
         out.push({
@@ -161,5 +187,6 @@ export function check(root: string): Violation[] {
     }
   }
   structureRules(root, out);
+  agentRules(root, out);
   return out;
 }

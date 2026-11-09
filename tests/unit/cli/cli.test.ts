@@ -12,7 +12,7 @@ const temps: string[] = [];
 function sandbox(): string {
   const dir = mkdtempSync(join(tmpdir(), "cy-cli-"));
   temps.push(dir);
-  for (const p of ["src", "tsconfig.json", ".size-limit.json"])
+  for (const p of ["src", "tsconfig.json", ".size-limit.json", "AGENTS.md", "tools", ".storybook", "docs"])
     cpSync(join(repo, p), join(dir, p), { recursive: true });
   symlinkSync(join(repo, "node_modules"), join(dir, "node_modules"));
   return dir;
@@ -56,6 +56,16 @@ describe("cy check", () => {
     );
     const lits = check(root).filter((v) => v.rule === "literals");
     expect(lits).toHaveLength(2);
+  });
+  it("requires an AGENTS.md in every documented folder", () => {
+    const root = sandbox();
+    expect(check(root).filter((v) => v.rule === "agents")).toEqual([]);
+    rmSync(join(root, "src/components/AGENTS.md"));
+    expect(
+      check(root)
+        .filter((v) => v.rule === "agents")
+        .map((v) => v.file),
+    ).toEqual(["src/components"]);
   });
   it("requires a play test and a Used by section for every component", () => {
     const root = sandbox();
