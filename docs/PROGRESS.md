@@ -2,19 +2,19 @@
 
 ## Status
 
-Plan 1 (Foundation) in progress on branch `next`: tokens, theme, Storybook harness, Facet icons, Button/IconButton and the `cy` CLI are done and tested; docs and agent files done; CI and GitHub Pages next.
+Plan 1 (Foundation) complete on `next` and green in CI (all engines, touch, coverage ≥ 95%, visual regression). Storybook live at https://arshad-shah.github.io/cynosure/.
 
 ## Current task
 
-Plan 1, Task 9: CI workflows, visual baselines, GitHub Pages deploy, push `next`.
+None in progress. Plan 1 finished and reviewed.
 
 ## Next step
 
-Write Plan 2 (Milestone 1 controls: Link, TextField, SearchField, TextArea, Select, SegmentedControl, Switch, Checkbox, RadioGroup, Tooltip, Badge, Kbd, Spinner, ThemeToggle, plus the real Vite adapter and optional Hanken font).
+Write Plan 2 (Milestone 1 controls: Link, TextField, SearchField, TextArea, Select, SegmentedControl, Switch, Checkbox, RadioGroup, Tooltip, Badge, Kbd, Spinner, ThemeToggle; the real Vite adapter; optional Hanken font; dark and contrast visual baselines). Fold in the deferred review minors listed under Decision log.
 
 ## Plans
 
-- [ ] Plan 1: Foundation (`docs/superpowers/plans/2026-11-09-cynosure-foundation.md`), Tasks 1–8 done, Task 9 in progress
+- [x] Plan 1: Foundation (`docs/superpowers/plans/2026-11-09-cynosure-foundation.md`)
 - [ ] Plan 2: Milestone 1 controls (not written)
 - [ ] Plan 3: Milestone 2 structure and overlays (not written)
 - [ ] Plan 4: Milestone 3 and product migration issues (not written)
@@ -31,13 +31,15 @@ None. Npm publish and deprecating old packages wait for Arshad's authorisation.
 - 2026-11-09: Theme input validated centrally (security review); gamut mapping bounded.
 - 2026-11-09: Component roots never carry `.cy-reset` (found by hostile-host and shadow-root tests).
 - 2026-11-09: No AI attribution in commits, PRs or issues.
+- 2026-11-09: Final review fixes: component roots use doubled selectors (Tailwind v3 `[type=button]`), tokens only on `:root`/`:host` (nested themes inherit), no `color-scheme` on host `<html>`, hover/active move away from on-accent text, transparent focus outline for forced colors, coverage floor 95%.
+- 2026-11-09: Visual baselines: Chromium on Linux; refresh by pushing a commit to `next` containing `[baselines]` (dispatch needs the workflow on `main`).
+- Deferred review minors for Plan 2: colour error messages for garbage input, alpha handling, scale validation, radius re-derivation on height overrides, selector lists in themeToCss, async storage race, cy check gaps (named colours, foundations CSS, createElement, glyph strings, budgets/exports rules, title prop false positive), danger tokens, "use client" and React 18 smoke test, budgets for Icon and createTheme, stronger shadow-root tests, OS reduced motion on component roots, document-target unmount restoring host attributes, SSR CSP for inline styles, clif --help with required positionals.
 
 ## Verification
 
-- `pnpm test`: unit, CLI and Preact suites green.
-- `pnpm test:stories`: all stories green on Chromium, Firefox, WebKit, plus the touch project.
-- `pnpm check`, `pnpm lint`, `pnpm typecheck`, `pnpm build`: green. Size: all CSS 3.0 kB gzip, Button 2.1 kB.
-- Not yet verified: CI on Linux, visual baselines, GitHub Pages deploy.
+- CI (GitHub Actions, Linux) green: conventions, lint, types, unit, stories on Chromium/Firefox/WebKit + touch, coverage (97% branches, 100% lines), visual regression, build, publint, attw, size.
+- Size: all CSS 3.1 kB gzip, Button 2.1 kB.
+- Not verified: real extension contexts (Prism/Aperture shadow roots under MV3 CSP), Safari/Edge outside Playwright engines.
 
 ## How to resume
 
