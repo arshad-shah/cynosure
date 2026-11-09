@@ -1,0 +1,28 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+<Meta title="Introduction" />
+
+# Cynosure
+
+One small, themeable, accessible UI system for every product. Same feel and layout everywhere; each product changes its accent, its scale, and any token it needs.
+
+```bash
+pnpm add @arshad-shah/cynosure
+```
+
+```tsx
+import "@arshad-shah/cynosure/styles.css";
+import { CynosureTheme, createTheme, Button } from "@arshad-shah/cynosure";
+
+const theme = createTheme({ accent: "#e8462e", scale: "compact" });
+
+<CynosureTheme theme={theme} mode="system">
+  <Button variant="primary">Export</Button>
+</CynosureTheme>;
+```
+
+**Use the toolbar** to switch mode, contrast, scale and product accent on every story, and to render under a **hostile host** stylesheet (Tailwind preflight plus aggressive globals). Cynosure must look identical either way.
+
+- Works on a page, inside a shadow root (`@arshad-shah/cynosure/styles.inline`), and in extension popups.
+- No runtime dependencies, no CSS-in-JS, no writes to `<html>`, `<head>` or `<body>`.
+- Facet icons: drawn from the Cynosure mark, one accent star each.
