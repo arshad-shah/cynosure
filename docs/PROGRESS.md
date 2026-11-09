@@ -2,7 +2,7 @@
 
 ## Status
 
-Plan 3 (Milestone 2 structure and overlays) in progress on `next`: Tasks 1–7 done. Plans 1 and 2 complete. Storybook live at https://arshad-shah.github.io/cynosure/.
+Plan 3 (Milestone 2 structure and overlays) in progress on `next`: Tasks 1–8 done. Plans 1 and 2 complete. Storybook live at https://arshad-shah.github.io/cynosure/.
 
 Done in Plan 3:
 
@@ -13,6 +13,7 @@ Done in Plan 3:
 - **Task 5:** Disclosure and Accordion. The height animates without script; headers are headings and open sections are regions.
 - **Task 6:** Popover and `useDismiss`. One layer stack: Escape closes the topmost layer, outside clicks close, and focus returns. Tooltip joined the stack.
 - **Task 7:** Menu, with arrows, type-ahead, sections, checkable items and shortcuts.
+- **Task 8:** DialogBase (foundation for `<dialog>`), Dialog and Sheet. Native modal (`showModal`), focus in and back, Escape and backdrop through the shared layer stack, bottom sheet in narrow containers, no writes to `body`, shadow-root safe.
 
 Also shipped in this stretch:
 
@@ -28,29 +29,27 @@ Also shipped in this stretch:
 
 ## Current task
 
-Plan 3 Task 8: DialogBase (foundation wrapping `<dialog>`), Dialog and Sheet. Not started.
+Plan 3 Task 9: Toast. Not started.
 
 ## Next step
 
-Continue Plan 3 at Task 8 (`docs/superpowers/plans/2026-11-09-cynosure-structure.md`):
+Continue Plan 3 at Task 9 (`docs/superpowers/plans/2026-11-09-cynosure-structure.md`):
 
-1. **Dialog:** write the DialogBase, Dialog and Sheet stories first. Cover:
-   - focus trapped and returned
-   - Escape closes unless `dismissible={false}`
-   - a backdrop click closes it
-   - inner content scrolls
-   - narrow container becomes a bottom sheet
-   - a nested Menu closes first
-   - no writes to `body`
-   - works in a shadow root
-2. **Implement on the shared layer:** use `useDismiss` from `src/overlay/dismiss.ts`, and use `showModal` for the top layer.
+1. **Toast:** write the stories first. Cover:
+   - shows and auto-dismisses; timers pause on hover and focus, then resume
+   - max visible, older toasts collapse
+   - the action button works
+   - announced once (`aria-live` polite, assertive for danger)
+   - reduced motion
+   - swipe to dismiss (touch tag)
+2. **Implement** `<Toaster position max>` with a per-Toaster `toast()` store from context (no globals), in the top layer (`popover="manual"`).
 3. **Remaining tasks:**
-   - **Task 9:** Toast
    - **Task 10:** Notice and EmptyState
    - **Task 11:** CopyButton
    - **Task 12:** carry-overs: React 18 fixture smoke test, dark-contrast baselines
    - **Task 13:** docs, PROGRESS and push
 4. **Final whole-branch review** for Plan 3, then Plan 4.
+5. **Before merging this work into `next`:** run the Dialog, Sheet and DialogBase stories on Firefox and WebKit (not run in the session that built them; see Verification).
 
 The resume ledger lives in `.superpowers/sdd/2026-11-09-cynosure-structure/progress.md` (git-ignored, local only). Rulings are also summarised below.
 
@@ -58,7 +57,7 @@ The resume ledger lives in `.superpowers/sdd/2026-11-09-cynosure-structure/progr
 
 - [x] Plan 1: Foundation (`docs/superpowers/plans/2026-11-09-cynosure-foundation.md`)
 - [x] Plan 2: Milestone 1 controls (`docs/superpowers/plans/2026-11-09-cynosure-controls.md`)
-- [ ] Plan 3: Milestone 2 structure and overlays (`docs/superpowers/plans/2026-11-09-cynosure-structure.md`). Tasks 1–7 done, Task 8 next.
+- [ ] Plan 3: Milestone 2 structure and overlays (`docs/superpowers/plans/2026-11-09-cynosure-structure.md`). Tasks 1–8 done, Task 9 next.
 - [ ] Plan 4: Milestone 3 and product migration issues (not written)
 
 ## Plan 3 rulings so far
@@ -77,6 +76,15 @@ The resume ledger lives in `.superpowers/sdd/2026-11-09-cynosure-structure/progr
 - **Overlay budget:** the overlay core is budgeted once at 2 kB.
 - **Menu:** checkable items keep it open, and disabled items are skipped by arrows.
 - **Docs:** no autodocs, hand-written MDX per component, and words instead of arrow glyphs.
+- **Dialog:**
+  - the `<dialog>` fills the viewport and is the scrim and the size container; the panel sits inside. A pointer down on the dialog itself is a backdrop click.
+  - below a container width of 36rem it docks to the bottom (container query on the dialog; container queries cannot use tokens, so the threshold is a rem literal).
+  - Escape goes through `useDismiss` (its `preventDefault` on keydown stops the native cancel); `DialogBase` also prevents `cancel` (Android back) and reports uncancelable closes through `onClose`.
+  - `useDismiss` `outside` can be a function; then only the topmost layer closes, so a backdrop click with a Menu open closes just the Menu.
+  - focus: first control in the content, else the first action, else the dialog itself (focusing the close button would pop its tooltip). Focus to return to is read while rendering, before `showModal` moves it.
+  - `dismissible={false}` hides the close button and ignores Escape and the backdrop.
+  - no scroll lock (it would write to `body`); the content uses `overscroll-behavior: contain`.
+- **Sheet:** the same `DialogFrame` with `side` (`bottom` default, `end`). `size` sets the width of an end sheet.
 
 ## Feedback round (2026-11-09, after Plan 1)
 
@@ -132,12 +140,15 @@ None. Npm publish and deprecating the old packages wait for Arshad's authorisati
 
 ## Verification
 
-- **Local `pnpm verify`** (latest): 283 unit tests, 477 story runs (Chromium, WebKit, touch) and 233 Firefox runs; coverage ≥ 95% branches.
-- **CI:** GitHub Actions on Linux runs conventions, lint, types, unit tests, stories on all three engines plus touch, coverage, visual regression, build, publint, attw and size. The status of the latest push is not yet confirmed.
+- **Local `pnpm verify`** (Plan 3 Tasks 1–7, earlier machine): 283 unit tests, 477 story runs (Chromium, WebKit, touch) and 233 Firefox runs; coverage ≥ 95% branches.
+- **Task 8 session (cloud container):** `cy check`, lint, typecheck, unit and Preact tests, every story on Chromium plus the touch project (268 runs), coverage (95.19% branches), build, publint, attw and size all pass. The Dialog and Sheet were also checked visually (centred, bottom sheet at phone width, scrolling body, end sheet in RTL).
+  - **Not run:** Firefox and WebKit. The container could not download them (`cdn.playwright.dev` is blocked), and CI only runs on `next`, `main` and pull requests, not on the session branch.
+- **CI:** GitHub Actions on Linux runs conventions, lint, types, unit tests, stories on all three engines plus touch, coverage, visual regression, build, publint, attw and size.
 - **Not verified:**
   - real extension contexts (Prism and Aperture shadow roots under MV3 CSP)
   - Safari and Edge outside the Playwright engines
   - the React 18 runtime (Task 12)
+  - Dialog, Sheet and DialogBase on Firefox and WebKit
 
 ## How to resume
 

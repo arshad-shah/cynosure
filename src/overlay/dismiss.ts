@@ -9,8 +9,12 @@ export interface DismissOptions {
   inside: RefObject<HTMLElement | null>[];
   /** Where focus goes after closing, if it was inside the layer or lost (on the body). */
   returnFocus?: RefObject<HTMLElement | null>;
-  /** Close on a pointer down outside (default true). */
-  outside?: boolean;
+  /**
+   * Close on a pointer down outside (default true). A function decides instead (a modal dialog passes "the pointer went
+   * down on its backdrop"); then only the topmost layer closes, so a click on a dialog's backdrop with a Menu open inside
+   * closes just the Menu.
+   */
+  outside?: boolean | ((event: PointerEvent) => boolean);
 }
 
 interface Layer {
@@ -52,14 +56,22 @@ export function useDismiss({ open, onClose, inside, returnFocus, outside = true 
   close.current = onClose;
   const insideRef = useRef(inside);
   insideRef.current = inside;
+  const outsideRef = useRef(outside);
+  outsideRef.current = outside;
 
   useEffect(() => {
     if (!open) return;
     const layer: Layer = { inside: insideRef.current, close: (reason) => close.current(reason) };
     layers.push(layer);
     if (layers.length === 1) document.addEventListener("keydown", onKeyDown);
+    // Registered when the layer opens, so an outer layer hears a pointer down before the layers nested in it.
     const onPointerDown = (event: PointerEvent) => {
-      if (!outside) return;
+      const rule = outsideRef.current;
+      if (typeof rule === "function") {
+        if (rule(event) && topmost() === layer) layer.close("outside");
+        return;
+      }
+      if (!rule) return;
       const path = event.composedPath();
       if (els(layer).some((el) => path.includes(el))) return;
       layer.close("outside");
@@ -78,5 +90,5 @@ export function useDismiss({ open, onClose, inside, returnFocus, outside = true 
       const back = target?.current;
       if ((lost || within) && back?.isConnected) back.focus();
     };
-  }, [open, outside, returnFocus]);
+  }, [open, returnFocus]);
 }

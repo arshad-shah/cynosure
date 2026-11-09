@@ -10,16 +10,18 @@ function Layer({
   name,
   onClose,
   open = true,
+  outside,
   children,
 }: {
   name: string;
   onClose: (r: string) => void;
   open?: boolean;
+  outside?: boolean | ((event: PointerEvent) => boolean);
   children?: React.ReactNode;
 }) {
   const trigger = useRef<HTMLButtonElement>(null);
   const panel = useRef<HTMLDivElement>(null);
-  useDismiss({ open, onClose, inside: [trigger, panel], returnFocus: trigger });
+  useDismiss({ open, onClose, inside: [trigger, panel], returnFocus: trigger, outside: outside ?? true });
   return (
     <div>
       <button type="button" ref={trigger}>
@@ -88,6 +90,34 @@ describe("useDismiss", () => {
     expect(close).not.toHaveBeenCalled();
     fireEvent.pointerDown(getByText("elsewhere"));
     expect(close).toHaveBeenCalledWith("outside");
+  });
+
+  it("an outside rule closes only the topmost layer (a dialog backdrop with a menu open inside)", () => {
+    const outer = vi.fn();
+    const onBackdrop = (event: PointerEvent) => (event.target as HTMLElement).dataset.backdrop === "";
+    function Nested({ inner }: { inner: boolean }) {
+      return (
+        <Layer name="outer" onClose={outer} outside={onBackdrop}>
+          <span data-backdrop="">backdrop</span>
+          <Layer name="inner" open={inner} onClose={() => {}} />
+        </Layer>
+      );
+    }
+    const { getByText, rerender } = render(<Nested inner />);
+    fireEvent.pointerDown(getByText("backdrop"));
+    expect(outer).not.toHaveBeenCalled();
+    rerender(<Nested inner={false} />);
+    fireEvent.pointerDown(getByText("outer inner"));
+    expect(outer).not.toHaveBeenCalled();
+    fireEvent.pointerDown(getByText("backdrop"));
+    expect(outer).toHaveBeenCalledWith("outside");
+  });
+
+  it("outside={false} ignores pointer downs", () => {
+    const close = vi.fn();
+    render(<Layer name="one" onClose={close} outside={false} />);
+    fireEvent.pointerDown(document.body);
+    expect(close).not.toHaveBeenCalled();
   });
 
   it("returns focus to the trigger when closing with focus inside", async () => {

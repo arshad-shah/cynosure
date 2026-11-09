@@ -1,0 +1,47 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./DialogBase.stories";
+
+<Meta of={Stories} />
+
+# DialogBase
+
+The native `<dialog>` for Cynosure, and the only module allowed to render one. It is a foundation: thin, unstyled, and meant to be built on by components rather than used in product code.
+
+## Who uses it
+
+[Dialog](?path=/docs/components-dialog--docs) and [Sheet](?path=/docs/components-sheet--docs).
+
+## When to use it directly
+
+Only when you are building a new overlay that needs a native dialog with behaviour of its own and neither Dialog nor Sheet fits.
+
+<Canvas of={Stories.OpenPropDrivesShowModalAndClose} />
+
+## Usage
+
+```tsx
+import { DialogBase } from "@arshad-shah/cynosure";
+
+<DialogBase open={open} onCancel={() => setOpen(false)} onClose={() => setOpen(false)} aria-label="Preview">
+  …
+</DialogBase>
+```
+
+## Props
+
+It accepts every native dialog attribute except `open`, `onCancel` and `onClose`, which it owns.
+
+<ArgTypes of={Stories} />
+
+## Guarantees
+
+- `open` drives `showModal()` (or `show()` with `modal={false}`) and `close()`; never the `open` attribute.
+- A `cancel` event (Escape, the Android back gesture) has its default prevented and calls `onCancel`, so your state decides.
+- If the browser closes the dialog anyway (a close request it will not let the page cancel), `onClose` is called so your state can follow. A close you asked for is not reported.
+- The ref reaches the native `<dialog>`. No styling.
+
+<Canvas of={Stories.CancelBecomesOnCancelAndStaysOpen} />
+
+## Related
+
+[Dialog](?path=/docs/components-dialog--docs) · [Sheet](?path=/docs/components-sheet--docs)

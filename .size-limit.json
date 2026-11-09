@@ -221,5 +221,27 @@
     "path": ["dist/components/Menu/Menu.js", "dist/styles/menu.css"],
     "limit": "3 kB",
     "gzip": true
+  },
+  {
+    "name": "DialogBase",
+    "path": ["dist/foundations/DialogBase/DialogBase.js"],
+    "limit": "0.75 kB",
+    "gzip": true
+  },
+  {
+    "name": "Dialog (with DialogBase)",
+    "path": [
+      "dist/components/Dialog/Dialog.js",
+      "dist/foundations/DialogBase/DialogBase.js",
+      "dist/styles/dialog.css"
+    ],
+    "limit": "3 kB",
+    "gzip": true
+  },
+  {
+    "name": "Sheet",
+    "path": ["dist/components/Sheet/Sheet.js", "dist/styles/sheet.css"],
+    "limit": "0.75 kB",
+    "gzip": true
   }
 ]

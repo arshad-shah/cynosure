@@ -10,6 +10,7 @@ export { Badge, type BadgeProps } from "./components/Badge/index.js";
 export { Button, type ButtonProps, type ButtonTokens } from "./components/Button/index.js";
 export { Card, type CardProps } from "./components/Card/index.js";
 export { Checkbox, type CheckboxProps } from "./components/Checkbox/index.js";
+export { Dialog, type DialogLabels, type DialogProps, type DialogTokens } from "./components/Dialog/index.js";
 export { Disclosure, type DisclosureProps, type DisclosureTokens } from "./components/Disclosure/index.js";
 export { Field, type FieldProps } from "./components/Field/index.js";
 export { IconButton, type IconButtonProps } from "./components/IconButton/index.js";
@@ -40,6 +41,7 @@ export {
   type SegmentOption,
 } from "./components/SegmentedControl/index.js";
 export { Select, type SelectOption, type SelectProps } from "./components/Select/index.js";
+export { Sheet, type SheetProps, type SheetTokens } from "./components/Sheet/index.js";
 export { Stack, type StackProps } from "./components/Stack/index.js";
 export { Switch, type SwitchProps } from "./components/Switch/index.js";
 export {
@@ -60,6 +62,7 @@ export { Toolbar, type ToolbarProps } from "./components/Toolbar/index.js";
 export { Tooltip, type TooltipProps } from "./components/Tooltip/index.js";
 export { ButtonBase, type ButtonBaseProps } from "./foundations/ButtonBase/ButtonBase.js";
 export { ChoiceBase, type ChoiceBaseProps } from "./foundations/ChoiceBase/ChoiceBase.js";
+export { DialogBase, type DialogBaseProps } from "./foundations/DialogBase/index.js";
 export { type FieldRender, useField } from "./foundations/field.js";
 export { HiddenValue, type HiddenValueProps } from "./foundations/HiddenValue/HiddenValue.js";
 export { Icon, type IconProps } from "./foundations/Icon/Icon.js";

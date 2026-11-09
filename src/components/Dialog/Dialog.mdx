@@ -1,0 +1,92 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./Dialog.stories";
+
+<Meta of={Stories} />
+
+# Dialog
+
+A modal window over the page for a task the person must finish or cancel before going on: confirm a destructive action, fill in a short form. The page behind is inert until it closes. In a narrow container (a phone, an extension popup) it becomes a bottom sheet.
+
+<Canvas of={Stories.OpensModalMovesFocusInAndReturnsIt} />
+
+## When to use
+
+- **A decision that blocks the work:** "Discard changes?", "Delete 3 files?".
+- **A short, focused form** that belongs to the current page (rename, edit details).
+
+**Use something else when:**
+- the content belongs next to a button and can stay open while working: [Popover](?path=/docs/components-popover--docs)
+- it is a list of commands: [Menu](?path=/docs/components-menu--docs)
+- it is a side panel or a phone-style drawer: [Sheet](?path=/docs/components-sheet--docs)
+- it is a message that needs no answer: a Notice or a Toast
+
+## Usage
+
+```tsx
+import { Button, Dialog, TextField } from "@arshad-shah/cynosure";
+
+const [open, setOpen] = useState(false);
+
+<Button onClick={() => setOpen(true)}>Edit profile</Button>
+<Dialog
+  open={open}
+  onOpenChange={setOpen}
+  title="Edit profile"
+  description="Changes are saved to your account."
+  actions={
+    <>
+      <Button onClick={() => setOpen(false)}>Cancel</Button>
+      <Button variant="solid" tone="accent" onClick={save}>Save</Button>
+    </>
+  }
+>
+  <TextField label="Name" />
+</Dialog>
+```
+
+Put Cancel first and the main action last. The content scrolls between the title and the actions, so long forms keep both in view.
+
+<Canvas of={Stories.ContentScrollsInside} />
+
+## Confirmations
+
+With `dismissible={false}` there is no close button and Escape and the backdrop do nothing: the person must pick one of your actions. Focus starts on the first action, so put the safe one first.
+
+<Canvas of={Stories.NotDismissible} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+| Input | Result |
+| --- | --- |
+| <kbd>Escape</kbd> | Closes the topmost layer: a Menu, Select or Tooltip inside first, then the dialog |
+| <kbd>Tab</kbd>, <kbd>Shift</kbd> + <kbd>Tab</kbd> | Move through the dialog only; the page behind is inert |
+| Pointer down on the backdrop | Closes it (only a nested Menu when one is open) |
+| Close button | Closes it |
+| Android back gesture | Closes it |
+
+- **Focus:** on open, focus moves to the first control in the content, else the first action, else the dialog itself. On close it returns to where it was, usually the button that opened it.
+- **Role:** a native modal `<dialog>`, named by `title` (an `h2`) and described by `description`.
+- **Narrow containers:** below 36rem wide, the dialog docks to the bottom edge at full width.
+- **Isolation:** it never writes to `<html>` or `<body>`. There is no scroll lock; the content uses `overscroll-behavior: contain` so scrolling it does not move the page.
+- **Shadow DOM:** works inside shadow roots (extension content scripts).
+- **Motion:** a short fade and scale (a slide as a sheet), removed under reduced motion.
+
+## Touch
+
+The close button keeps a 44px hit area on coarse pointers. A tap on the backdrop closes the dialog, and the bottom-sheet actions stay above the home indicator.
+
+## Theming
+
+Tokens: `--cy-dialog-radius`, `--cy-dialog-padding`, `--cy-dialog-width-{sm,md,lg}` and `--cy-dialog-scrim`.
+
+```ts
+createTheme({ components: { dialog: { radius: "10px", widthMd: "520px", scrim: "rgb(0 0 0 / 0.6)" } } });
+```
+
+## Related
+
+[Sheet](?path=/docs/components-sheet--docs) · [Popover](?path=/docs/components-popover--docs) · [Menu](?path=/docs/components-menu--docs) · [DialogBase](?path=/docs/foundations-dialogbase--docs)

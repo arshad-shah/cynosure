@@ -1,0 +1,63 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./Sheet.stories";
+
+<Meta of={Stories} />
+
+# Sheet
+
+A [Dialog](?path=/docs/components-dialog--docs) docked to an edge of the screen: a drawer from the bottom, or a full-height panel at the inline end. It behaves exactly like a Dialog (focus, Escape, backdrop, labels) and slides in from its side.
+
+<Canvas of={Stories.BottomSheetDocksAndCloses} />
+
+## When to use
+
+- **Settings or filters on a phone:** a bottom sheet keeps them within thumb reach.
+- **An inspector or detail panel** beside the content: `side="end"`.
+
+**Use something else when:**
+- it is a short decision or form in the middle of the page: [Dialog](?path=/docs/components-dialog--docs) (which turns into a bottom sheet on its own in narrow containers)
+- it should stay open while the person works on the page: a layout panel, not an overlay
+
+## Usage
+
+```tsx
+import { Sheet, Switch } from "@arshad-shah/cynosure";
+
+<Sheet open={open} onOpenChange={setOpen} side="end" title="Settings">
+  <Switch label="Compact rows" />
+</Sheet>
+```
+
+<Canvas of={Stories.EndSheetDocksToTheInlineEnd} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+| Input | Result |
+| --- | --- |
+| <kbd>Escape</kbd> | Closes the topmost layer, then the sheet |
+| <kbd>Tab</kbd> | Moves through the sheet only; the page behind is inert |
+| Tap or click on the backdrop | Closes it |
+
+- **Sides:** `bottom` is full width and up to 85% of the height; `end` is full height and docks to the right, or to the left in right-to-left text.
+- **Size:** `size` sets the width of an `end` sheet.
+- Everything else (focus, roles, shadow DOM, no writes to `<body>`) is the same as [Dialog](?path=/docs/components-dialog--docs).
+
+## Touch
+
+Bottom-sheet actions stay above the home indicator (`safe-area-inset-bottom`), and a tap on the backdrop closes it.
+
+## Theming
+
+Tokens: `--cy-sheet-radius`, `--cy-sheet-width-{sm,md,lg}` and `--cy-sheet-max-height`, plus the Dialog tokens for padding and scrim.
+
+```ts
+createTheme({ components: { sheet: { widthMd: "440px", maxHeight: "90%" } } });
+```
+
+## Related
+
+[Dialog](?path=/docs/components-dialog--docs) · [Popover](?path=/docs/components-popover--docs)
