@@ -3,6 +3,7 @@ export { Button, type ButtonProps, type ButtonTokens } from "./components/Button
 export { Checkbox, type CheckboxProps } from "./components/Checkbox/index.js";
 export { Field, type FieldProps } from "./components/Field/index.js";
 export { IconButton, type IconButtonProps } from "./components/IconButton/index.js";
+export { Inline, type InlineProps } from "./components/Inline/index.js";
 export { Kbd, type KbdProps } from "./components/Kbd/index.js";
 export { Link, type LinkProps } from "./components/Link/index.js";
 export { LoadingDots, type LoadingDotsProps } from "./components/LoadingDots/index.js";
@@ -14,6 +15,7 @@ export {
   type SegmentOption,
 } from "./components/SegmentedControl/index.js";
 export { Select, type SelectOption, type SelectProps } from "./components/Select/index.js";
+export { Stack, type StackProps } from "./components/Stack/index.js";
 export { Switch, type SwitchProps } from "./components/Switch/index.js";
 export { TextArea, type TextAreaProps } from "./components/TextArea/index.js";
 export { TextField, type TextFieldProps } from "./components/TextField/index.js";
@@ -26,6 +28,7 @@ export { HiddenValue, type HiddenValueProps } from "./foundations/HiddenValue/Hi
 export { Icon, type IconProps } from "./foundations/Icon/Icon.js";
 export { InputBase, type InputBaseProps } from "./foundations/InputBase/InputBase.js";
 export { LinkBase, type LinkBaseProps } from "./foundations/LinkBase/LinkBase.js";
+export { type RovingOptions, useRovingFocus } from "./foundations/roving-focus.js";
 export { TextAreaBase, type TextAreaBaseProps } from "./foundations/TextAreaBase/TextAreaBase.js";
 export * from "./theme/index.js";
 export * from "./tokens/index.js";

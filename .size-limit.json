@@ -146,5 +146,23 @@
     "path": ["dist/components/ThemeToggle/ThemeToggle.js"],
     "limit": "1 kB",
     "gzip": true
+  },
+  {
+    "name": "Stack",
+    "path": ["dist/components/Stack/Stack.js", "dist/styles/stack.css"],
+    "limit": "1 kB",
+    "gzip": true
+  },
+  {
+    "name": "Inline",
+    "path": ["dist/components/Inline/Inline.js", "dist/styles/stack.css"],
+    "limit": "1 kB",
+    "gzip": true
+  },
+  {
+    "name": "useRovingFocus",
+    "path": ["dist/foundations/roving-focus.js"],
+    "limit": "1 kB",
+    "gzip": true
   }
 ]
