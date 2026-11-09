@@ -37,37 +37,113 @@ function walk(dir: string, out: string[] = []): string[] {
 const isStory = (f: string) => f.endsWith(".stories.tsx");
 const lineOf = (text: string, index: number) => text.slice(0, index).split("\n").length;
 
-function tsxRules(root: string, file: string, out: Violation[]) {
+/** Classes whose own rule declares a font size (so a host `* { font-size }` cannot change them). */
+function fontClasses(root: string): Set<string> {
+  const found = new Set<string>();
+  for (const file of walk(join(root, "src")).filter((f) => f.endsWith(".css"))) {
+    const css = readFileSync(file, "utf8").replace(/\/\*[\s\S]*?\*\//g, "");
+    const stack: { selector: string; own: string }[] = [];
+    let buffer = "";
+    for (const ch of css) {
+      if (ch === "{") {
+        stack.push({ selector: buffer.trim(), own: "" });
+        buffer = "";
+      } else if (ch === "}") {
+        const block = stack.pop();
+        if (block && /(^|[;\s])font(-size)?\s*:/.test(`${block.own};${buffer}`))
+          for (const part of block.selector.split(",")) {
+            const classes = part.match(/\.cy-[a-z0-9-]+/g);
+            const last = classes?.at(-1);
+            if (last && !part.trim().startsWith("&")) found.add(last.slice(1));
+          }
+        buffer = "";
+      } else if (ch === ";" && stack.length) {
+        (stack.at(-1) as { own: string }).own += `${buffer};`;
+        buffer = "";
+      } else buffer += ch;
+    }
+  }
+  return found;
+}
+
+/** Hidden or structural classes that never render text, so they cannot leak a host font size. */
+const INHERIT_EXEMPT = new Set([
+  "cy-visually-hidden",
+  "cy-hidden-value",
+  "cy-choice-input",
+  "cy-motion-trigger",
+]);
+
+function staticClassText(node: ts.JsxAttribute, source: ts.SourceFile): string {
+  const init = node.initializer;
+  if (!init) return "";
+  if (ts.isStringLiteral(init)) return init.text;
+  if (ts.isJsxExpression(init) && init.expression) {
+    const e = init.expression;
+    if (ts.isStringLiteral(e) || ts.isNoSubstitutionTemplateLiteral(e)) return e.text;
+    if (ts.isTemplateExpression(e))
+      return [e.head.text, ...e.templateSpans.map((t) => t.literal.text)].join(" ");
+    return (
+      e
+        .getText(source)
+        .match(/cy-[a-z0-9-]+/g)
+        ?.join(" ") ?? ""
+    );
+  }
+  return "";
+}
+
+function tsxRules(root: string, file: string, out: Violation[], fonts: Set<string>) {
   const rel = relative(root, file);
   const text = readFileSync(file, "utf8");
   const source = ts.createSourceFile(file, text, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
   const inFoundations = rel.startsWith("src/foundations/");
   const at = (node: ts.Node) => source.getLineAndCharacterOfPosition(node.getStart()).line + 1;
+  const push = (rule: string, node: ts.Node, message: string) =>
+    out.push({ rule, file: rel, line: at(node), message });
   const visit = (node: ts.Node) => {
     if (ts.isJsxOpeningElement(node) || ts.isJsxSelfClosingElement(node)) {
       const tag = node.tagName.getText(source);
+      const intrinsic = /^[a-z]/.test(tag);
       if (!inFoundations && NATIVE.has(tag))
-        out.push({
-          rule: "native-elements",
-          file: rel,
-          line: at(node),
-          message: `<${tag}> outside src/foundations; use the Cynosure component`,
-        });
+        push("native-elements", node, `<${tag}> outside src/foundations; use the Cynosure component`);
+      for (const attr of node.attributes.properties) {
+        if (!ts.isJsxAttribute(attr)) continue;
+        const name = attr.name.getText(source);
+        if (intrinsic && name === "title")
+          push("title-attr", attr, "title= creates a native tooltip; use Tooltip or a label");
+        if (intrinsic && name === "className") {
+          const classes = staticClassText(attr, source)
+            .split(/\s+/)
+            .filter((c) => c.startsWith("cy-") && !c.endsWith("-"));
+          const safe = classes.some((c) => c === "cy-reset" || fonts.has(c) || INHERIT_EXEMPT.has(c));
+          if (classes.length && !safe)
+            push(
+              "inherit-chain",
+              attr,
+              `.${classes[0]} must carry cy-reset or declare font-size (host * rules would resize it)`,
+            );
+        }
+      }
     }
-    if (ts.isJsxAttribute(node) && node.name.getText(source) === "title")
-      out.push({
-        rule: "title-attr",
-        file: rel,
-        line: at(node),
-        message: "title= creates a native tooltip; use Tooltip or a label",
-      });
+    if (
+      !inFoundations &&
+      ts.isCallExpression(node) &&
+      node.expression.getText(source).endsWith("createElement") &&
+      node.arguments[0] &&
+      ts.isStringLiteral(node.arguments[0]) &&
+      NATIVE.has(node.arguments[0].text)
+    )
+      push("native-elements", node, `createElement("${node.arguments[0].text}") outside src/foundations`);
     if (ts.isJsxText(node) && GLYPHS.test(node.getText(source)))
-      out.push({
-        rule: "glyphs",
-        file: rel,
-        line: at(node),
-        message: "text or emoji glyph used as an icon; use <Icon>",
-      });
+      push("glyphs", node, "text or emoji glyph used as an icon; use <Icon>");
+    if (
+      ts.isJsxExpression(node) &&
+      node.expression &&
+      (ts.isStringLiteral(node.expression) || ts.isNoSubstitutionTemplateLiteral(node.expression)) &&
+      GLYPHS.test(node.expression.text)
+    )
+      push("glyphs", node, "text or emoji glyph used as an icon; use <Icon>");
     ts.forEachChild(node, visit);
   };
   visit(source);
@@ -175,6 +251,7 @@ function agentRules(root: string, out: Violation[]) {
 
 export function check(root: string): Violation[] {
   const out: Violation[] = [];
+  const fonts = fontClasses(root);
   const files = walk(join(root, "src"));
   for (const file of files) {
     const rel = relative(root, file);
@@ -184,7 +261,7 @@ export function check(root: string): Violation[] {
       !rel.startsWith("src/docs/") &&
       !rel.startsWith("src/test/")
     )
-      tsxRules(root, file, out);
+      tsxRules(root, file, out, fonts);
     if (
       /\.tsx?$/.test(file) &&
       !isStory(file) &&
@@ -193,7 +270,7 @@ export function check(root: string): Violation[] {
     )
       importRules(root, file, out);
     if (
-      rel.startsWith("src/components/") &&
+      (rel.startsWith("src/components/") || rel.startsWith("src/foundations/")) &&
       (file.endsWith(".css") || (file.endsWith(".tsx") && !isStory(file)))
     )
       literalRules(root, file, out);

@@ -5,6 +5,8 @@
   --_c: currentColor;
   box-sizing: border-box !important;
   margin: 0;
+  font-size: inherit;
+  line-height: inherit;
   display: inline-flex;
   align-items: center;
   gap: var(--cy-loading-dots-gap, 0.3em);

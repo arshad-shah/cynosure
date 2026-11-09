@@ -56,7 +56,7 @@ export function Kbd({ keys, size = "md", label, className, style }: KbdProps) {
       <span aria-hidden="true" className="cy-reset cy-kbd-keys">
         {keys.map((key, i) => (
           <Fragment key={`${key}-${i}`}>
-            {i > 0 && <span className="cy-kbd-join" />}
+            {i > 0 && <span className="cy-reset cy-kbd-join" />}
             <kbd className="cy-kbd-key">{key}</kbd>
           </Fragment>
         ))}

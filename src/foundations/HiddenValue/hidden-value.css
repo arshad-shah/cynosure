@@ -1,7 +1,7 @@
 .cy-hidden-value.cy-hidden-value {
   position: absolute;
-  inline-size: 1px;
-  block-size: 1px;
+  inline-size: var(--cy-border-width);
+  block-size: var(--cy-border-width);
   padding: 0;
   margin: 0;
   border: 0;

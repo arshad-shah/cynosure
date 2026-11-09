@@ -68,6 +68,8 @@
 }
 
 .cy-select.cy-select {
+  font-size: inherit;
+  line-height: inherit;
   box-sizing: border-box !important;
   position: relative;
   margin: 0;
@@ -86,6 +88,8 @@
 }
 
 .cy-select-option-text {
+  font-size: inherit;
+  line-height: inherit;
   display: grid;
   min-inline-size: 0;
 }
@@ -102,6 +106,8 @@
   color: var(--cy-color-muted);
 }
 .cy-select-empty {
+  font-size: inherit;
+  line-height: inherit;
   padding: var(--cy-space-4) var(--cy-space-5);
   color: var(--cy-color-muted);
 }

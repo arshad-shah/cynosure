@@ -1,4 +1,6 @@
 .cy-tooltip-anchor {
+  font-size: inherit;
+  line-height: inherit;
   display: inline-flex;
   vertical-align: middle;
 }

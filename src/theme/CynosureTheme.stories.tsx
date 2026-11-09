@@ -194,3 +194,32 @@ export const TargetDocumentWithoutModeLeavesAttributes: Story = {
     await expect(html.hasAttribute("data-cy-contrast")).toBe(false);
   },
 };
+
+function MountToggle() {
+  const [on, setOn] = useState(false);
+  return (
+    <div>
+      <button type="button" data-testid="toggle" onClick={() => setOn(!on)}>
+        toggle
+      </button>
+      {on && <CynosureTheme theme={createTheme({ accent: "#4f7bd9" })} mode="dark" target="document" />}
+    </div>
+  );
+}
+
+export const TargetDocumentRestoresHostAttributes: Story = {
+  args: { children: null },
+  render: () => <MountToggle />,
+  play: async ({ canvas, userEvent }) => {
+    const html = document.documentElement;
+    html.setAttribute("data-cy-mode", "light");
+    html.style.setProperty("--cy-color-accent", "#111111");
+    await userEvent.click(canvas.getByTestId("toggle"));
+    await waitFor(() => expect(html.getAttribute("data-cy-mode")).toBe("dark"));
+    await userEvent.click(canvas.getByTestId("toggle"));
+    await waitFor(() => expect(html.getAttribute("data-cy-mode")).toBe("light"));
+    await expect(html.style.getPropertyValue("--cy-color-accent")).toBe("#111111");
+    html.removeAttribute("data-cy-mode");
+    html.style.removeProperty("--cy-color-accent");
+  },
+};

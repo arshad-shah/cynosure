@@ -26,8 +26,11 @@ export function parseColor(input: string): Rgb {
   const parts = fn?.[2]?.split(/[\s,/]+/).filter(Boolean) ?? [];
   if (fn && parts.length >= 3) {
     const [a, b, c] = parts as [string, string, string];
-    if (fn[1] === "rgb") return [num(a, 255), num(b, 255), num(c, 255)].map((v) => clamp(v / 255)) as Rgb;
-    if (fn[1] === "hsl") return hslToRgb(Number.parseFloat(a), num(b, 1), num(c, 1));
+    const finite = (values: number[]) => values.every(Number.isFinite);
+    const rgbParts = [num(a, 255), num(b, 255), num(c, 255)];
+    if (fn[1] === "rgb" && finite(rgbParts)) return rgbParts.map((v) => clamp(v / 255)) as Rgb;
+    const hslParts = [Number.parseFloat(a), num(b, 1), num(c, 1)];
+    if (fn[1] === "hsl" && finite(hslParts)) return hslToRgb(...(hslParts as [number, number, number]));
     const values = [num(a, 1), num(b, 0.4), Number.parseFloat(c)];
     if (values.every(Number.isFinite)) return oklchToRgb(...(values as [number, number, number]));
   }

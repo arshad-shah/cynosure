@@ -60,6 +60,52 @@ describe("cy check", () => {
       line: 1,
     });
   });
+  it("checks literals in foundations CSS too", () => {
+    const root = sandbox();
+    write(root, "src/foundations/Icon/extra.css", ".x { color: #ff0000; }\n");
+    expect(check(root).find((v) => v.rule === "literals")?.file).toBe("src/foundations/Icon/extra.css");
+  });
+  it("flags createElement of native interactive tags outside foundations", () => {
+    const root = sandbox();
+    write(
+      root,
+      "src/components/Button/Ce.tsx",
+      'import { createElement } from "react";\nexport const C = () => createElement("button", null, "x");\n',
+    );
+    expect(check(root).find((v) => v.rule === "native-elements")?.file).toBe("src/components/Button/Ce.tsx");
+  });
+  it("flags glyphs inside JSX string expressions", () => {
+    const root = sandbox();
+    write(
+      root,
+      "src/components/Button/G2.tsx",
+      'export const G = () => <span className="cy-reset">{"✓"}</span>;\n',
+    );
+    expect(rules(root)).toContain("glyphs");
+  });
+  it("allows a title prop on Cynosure components but not on DOM elements", () => {
+    const root = sandbox();
+    write(
+      root,
+      "src/components/Button/T2.tsx",
+      'const Card = (p: { title: string }) => null;\nexport const T = () => <Card title="Summary" />;\n',
+    );
+    expect(rules(root)).not.toContain("title-attr");
+  });
+  it("inherit-chain: flags a cy- element that neither resets nor declares its font size", () => {
+    const root = sandbox();
+    write(
+      root,
+      "src/components/Button/Part.tsx",
+      'export const P = () => <span className="cy-probe-part">x</span>;\n',
+    );
+    write(root, "src/components/Button/part.css", ".cy-probe-part { display: block; }\n");
+    expect(check(root).find((v) => v.rule === "inherit-chain")).toMatchObject({
+      file: "src/components/Button/Part.tsx",
+    });
+    write(root, "src/components/Button/part.css", ".cy-probe-part { display: block; font-size: inherit; }\n");
+    expect(rules(root)).not.toContain("inherit-chain");
+  });
   it("flags title= attributes", () => {
     const root = sandbox();
     write(root, "src/components/Button/T.tsx", 'export const T = () => <span title="Saved">x</span>;\n');

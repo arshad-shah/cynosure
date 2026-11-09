@@ -56,6 +56,8 @@
 }
 
 .cy-text-area.cy-text-area {
+  font-size: inherit;
+  line-height: inherit;
   box-sizing: border-box !important;
   margin: 0;
   display: grid;

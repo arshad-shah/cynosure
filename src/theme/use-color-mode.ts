@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 export type ColorMode = "light" | "dark" | "system";
 
@@ -29,23 +29,29 @@ const prefersDark = () => globalThis.matchMedia?.("(prefers-color-scheme: dark)"
 
 /** The user's colour mode, persisted through `storage` (localStorage by default). Never throws. */
 export function useColorMode(options: { storage?: ColorModeStorage; key?: string } = {}) {
-  const { storage = localStorageAdapter, key = "cy-color-mode" } = options;
+  const { key = "cy-color-mode" } = options;
+  // The storage object may be recreated on every render (inline literal); keep the latest without re-reading.
+  const storageRef = useRef(options.storage ?? localStorageAdapter);
+  storageRef.current = options.storage ?? localStorageAdapter;
+  const touched = useRef(false);
   const [mode, setState] = useState<ColorMode>(() => {
-    const initial = read(storage, key);
+    const initial = read(storageRef.current, key);
     return initial instanceof Promise ? "system" : initial;
   });
   const [systemDark, setSystemDark] = useState(prefersDark);
 
   useEffect(() => {
-    const initial = read(storage, key);
+    touched.current = false;
+    const initial = read(storageRef.current, key);
     if (initial instanceof Promise) {
       let live = true;
-      initial.then((m) => live && setState(m));
+      // A user choice made while the read was pending always wins.
+      initial.then((m) => live && !touched.current && setState(m));
       return () => {
         live = false;
       };
     }
-  }, [storage, key]);
+  }, [key]);
 
   useEffect(() => {
     const query = globalThis.matchMedia?.("(prefers-color-scheme: dark)");
@@ -56,14 +62,15 @@ export function useColorMode(options: { storage?: ColorModeStorage; key?: string
 
   const setMode = useCallback(
     (next: ColorMode) => {
+      touched.current = true;
       setState(next);
       try {
-        void Promise.resolve(storage.set(key, next)).catch(() => {});
+        void Promise.resolve(storageRef.current.set(key, next)).catch(() => {});
       } catch {
         /* storage unavailable: keep the in-memory value */
       }
     },
-    [storage, key],
+    [key],
   );
 
   const resolved: "light" | "dark" = mode === "system" ? (systemDark ? "dark" : "light") : mode;

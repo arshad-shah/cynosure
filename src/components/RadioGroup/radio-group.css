@@ -1,4 +1,6 @@
 .cy-radio-group.cy-radio-group {
+  font-size: inherit;
+  line-height: inherit;
   box-sizing: border-box !important;
   margin: 0;
   display: flex;

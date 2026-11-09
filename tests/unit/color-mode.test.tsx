@@ -96,6 +96,25 @@ describe("useColorMode", () => {
     expect(result.current.mode).toBe("system");
   });
 
+  it("M6: a slow storage read never overwrites a newer user choice", async () => {
+    let resolve: (v: string) => void = () => {};
+    const storage = { get: () => new Promise<string>((r) => (resolve = r)), set: () => {} };
+    const { result } = renderHook(() => useColorMode({ storage }));
+    act(() => result.current.setMode("dark"));
+    await act(async () => resolve("light"));
+    expect(result.current.mode).toBe("dark");
+  });
+
+  it("M6: an inline storage object does not re-read on every render", () => {
+    let reads = 0;
+    const { rerender } = renderHook(() =>
+      useColorMode({ storage: { get: () => (reads++, "dark"), set: () => {} } }),
+    );
+    rerender();
+    rerender();
+    expect(reads).toBeLessThanOrEqual(2);
+  });
+
   it("ignores stored garbage", () => {
     const storage = { get: () => "purple", set: () => {} };
     const { result } = renderHook(() => useColorMode({ storage }));

@@ -67,7 +67,7 @@ export function ChoiceRow({
             <Icon icon={minus} className="cy-checkbox-dash" />
           </>
         ) : kind === "switch" ? (
-          <span className="cy-switch-thumb" />
+          <span className="cy-reset cy-switch-thumb" />
         ) : null}
       </span>
       <span className="cy-choice-text">

@@ -27,7 +27,12 @@ function merge<T>(base: T, patch: unknown): T {
 }
 
 function scaleOf(input: ThemeInput["scale"]): number {
-  return typeof input === "number" ? input : SCALES[input ?? "comfortable"];
+  const scale = typeof input === "number" ? input : SCALES[input ?? "comfortable"];
+  if (!Number.isFinite(scale) || scale < 0.5 || scale > 3)
+    throw new CynosureThemeError(
+      `Cynosure scale must be a number between 0.5 and 3, or compact/comfortable/spacious: got "${String(input)}".`,
+    );
+  return scale;
 }
 
 function buildGlobal(input: ThemeInput): GlobalTokens {
@@ -49,7 +54,13 @@ function buildGlobal(input: ThemeInput): GlobalTokens {
   Object.assign(g.font, input.font);
   if (input.motion === "reduced") g.motion = { ...g.motion, fast: 0, base: 0, slow: 0 };
   else if (input.motion) g.motion = { ...g.motion, ...input.motion };
-  return merge({ ...g, scale }, input.tokens);
+  const merged = merge({ ...g, scale }, input.tokens);
+  // Radius follows the final control heights (the Facet rule) unless radii were overridden explicitly.
+  const explicit = input.tokens?.radius ?? {};
+  for (const k of ["sm", "md", "lg"] as const)
+    if (explicit[k] === undefined)
+      merged.radius[k] = Math.round(merged.control.height[k] * merged.radius.factor * 100) / 100;
+  return merged;
 }
 
 function accentRoles(

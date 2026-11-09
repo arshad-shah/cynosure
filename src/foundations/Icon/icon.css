@@ -110,16 +110,16 @@
 }
 @keyframes cy-icon-lift {
   to {
-    transform: translateY(-2px) rotate(-10deg);
+    transform: translateY(-0.125em) rotate(-10deg);
   }
 }
 @keyframes cy-icon-drop {
   from {
-    transform: translateY(-3px);
+    transform: translateY(-0.1875em);
     opacity: 0;
   }
   60% {
-    transform: translateY(1px);
+    transform: translateY(0.0625em);
     opacity: 1;
   }
 }
@@ -135,11 +135,11 @@
 }
 @keyframes cy-icon-nudge {
   to {
-    transform: translate(-2px, -2px);
+    transform: translate(-0.125em, -0.125em);
   }
 }
 @keyframes cy-icon-slide {
   50% {
-    transform: translateX(3px);
+    transform: translateX(0.1875em);
   }
 }

@@ -218,3 +218,25 @@ describe("tone text roles", () => {
     },
   );
 });
+
+describe("review minors", () => {
+  it("M1: garbage inside rgb()/hsl() names the original input", () => {
+    expect(() => createTheme({ accent: "rgb(x y z)" })).toThrow(/rgb\(x y z\)/);
+    expect(() => createTheme({ accent: "hsl(foo, 10%, 10%)" })).toThrow(/hsl\(foo/);
+  });
+  it("M3: scale must be a finite number between 0.5 and 3", () => {
+    for (const scale of [Number.NaN, -1, 0, 10, Number.POSITIVE_INFINITY])
+      expect(() => createTheme({ scale })).toThrow(CynosureThemeError);
+    expect(createTheme({ scale: 0.5 }).global.control.height.md).toBe(16);
+  });
+  it("M4: radius follows overridden control heights", () => {
+    const t = createTheme({ tokens: { control: { height: { md: 40 } } } });
+    expect(t.global.control.height.md).toBe(40);
+    expect(t.global.radius.md).toBeCloseTo(12);
+  });
+  it("M5: selector lists stay valid in scoped mode and contrast rules", () => {
+    const css = themeToCss(createTheme(), ".a, .b");
+    expect(css).toContain(':is(.a, .b)[data-cy-mode="dark"]{color-scheme:dark}');
+    expect(css).not.toContain('.b[data-cy-mode="dark"]');
+  });
+});

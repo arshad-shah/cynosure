@@ -45,13 +45,21 @@ export function CynosureTheme({
     if (target !== "document") return;
     const html = document.documentElement;
     const names = Object.keys(properties);
+    // Remember what the host had so unmounting restores it instead of deleting it.
+    const previousProps = names.map((name) => [name, html.style.getPropertyValue(name)] as const);
+    const previousAttrs = (["data-cy-mode", "data-cy-contrast"] as const).map(
+      (a) => [a, html.getAttribute(a)] as const,
+    );
     for (const name of names) html.style.setProperty(name, properties[name] as string);
     if (mode) html.setAttribute("data-cy-mode", mode);
     if (contrast) html.setAttribute("data-cy-contrast", contrast);
     return () => {
-      for (const name of names) html.style.removeProperty(name);
-      html.removeAttribute("data-cy-mode");
-      html.removeAttribute("data-cy-contrast");
+      for (const [name, value] of previousProps)
+        if (value) html.style.setProperty(name, value);
+        else html.style.removeProperty(name);
+      for (const [attr, value] of previousAttrs)
+        if (value === null) html.removeAttribute(attr);
+        else html.setAttribute(attr, value);
     };
   }, [target, properties, mode, contrast]);
 

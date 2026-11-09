@@ -60,7 +60,9 @@ export function themeToCss(theme: Theme, selector: string = DEFAULT_SELECTOR): s
     ),
   ];
   const contrast = decl(colorPairs(theme.palettes["light-contrast"], theme.palettes["dark-contrast"]));
-  const scoped = (attr: string) => (selector === DEFAULT_SELECTOR ? `:where(${attr})` : `${selector}${attr}`);
+  // Selector lists are wrapped in :is() so attribute qualifiers apply to every selector in the list.
+  const host = selector.includes(",") ? `:is(${selector})` : selector;
+  const scoped = (attr: string) => (selector === DEFAULT_SELECTOR ? `:where(${attr})` : `${host}${attr}`);
   const isDefault = selector === DEFAULT_SELECTOR;
   return [
     `${selector}{${decl(base)}}`,
