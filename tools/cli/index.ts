@@ -1,6 +1,7 @@
 /** `cy`: Cynosure's repo CLI. Generators and the convention checker, so nobody guesses how things are made. */
 import { readFileSync } from "node:fs";
 import { createCLI, defineCommand, dim, log, red } from "@arshad-shah/clif";
+import { ICON_CATEGORIES, type IconCategory } from "../../src/icons/types";
 import { check } from "./lib/check";
 import { readProgress } from "./lib/progress";
 import { addComponentToken, scaffoldComponent, scaffoldIcon } from "./lib/scaffold";
@@ -34,13 +35,18 @@ const icon = defineCommand({
   name: "icon",
   description: "Add a Facet icon from an SVG (24 grid, stroke only)",
   positionals: [{ name: "name", description: "kebab-case name", required: true }],
-  args: { from: { type: "string", required: true, description: "path to the source SVG" } },
+  args: {
+    from: { type: "string", required: true, description: "path to the source SVG" },
+    category: { type: "string", required: true, choices: ICON_CATEGORIES, description: "gallery category" },
+  },
   handler: ({ args }) => {
     log.success(
-      scaffoldIcon(root, String(args.values.name), readFileSync(String(args.flags.from), "utf8")).replace(
-        `${root}/`,
-        "",
-      ),
+      scaffoldIcon(
+        root,
+        String(args.values.name),
+        readFileSync(String(args.flags.from), "utf8"),
+        args.flags.category as IconCategory,
+      ).replace(`${root}/`, ""),
     );
   },
 });

@@ -2,6 +2,7 @@ import type { IconData } from "./types.js";
 
 export const folder: IconData = {
   name: "folder",
+  category: "files",
   body: [
     [
       "path",

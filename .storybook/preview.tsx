@@ -45,7 +45,8 @@ const withCynosure: Decorator = (Story, { globals }) => {
           background: "var(--cy-color-bg)",
           color: "var(--cy-color-ink)",
           padding: 24,
-          minHeight: "100%",
+          minHeight: "100vh",
+          boxSizing: "border-box",
         }}
       >
         <Story />

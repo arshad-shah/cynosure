@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect } from "storybook/test";
 import * as icons from "../../icons/index.js";
 import type { IconData } from "../../icons/types.js";
+import { ICON_CATEGORIES } from "../../icons/types.js";
 import { CynosureTheme } from "../../theme/index.js";
 import { createTheme } from "../../tokens/index.js";
 import { Icon } from "./Icon.js";
@@ -30,27 +31,84 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Gallery: Story = {
+  parameters: { layout: "fullscreen" },
   render: () => (
-    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(120px, 1fr))", gap: 8 }}>
-      {all.map((icon) => (
-        <div
-          key={icon.name}
-          className="cy-motion-trigger"
-          style={{
-            display: "flex",
-            gap: 8,
-            alignItems: "center",
-            padding: 12,
-            borderRadius: 10,
-            background: "var(--cy-color-surface)",
-          }}
-        >
-          <Icon icon={icon} size="lg" />
-          <span style={{ fontFamily: "var(--cy-font-mono)", fontSize: 12 }}>{icon.name}</span>
-        </div>
-      ))}
+    <div style={{ display: "grid", gap: 28, maxWidth: 1080 }}>
+      {ICON_CATEGORIES.map((category) => {
+        const items = all.filter((i) => i.category === category);
+        return (
+          <section key={category} aria-labelledby={`cat-${category}`} data-category={category}>
+            <h2
+              id={`cat-${category}`}
+              style={{
+                margin: "0 0 10px",
+                font: "600 11px/1 var(--cy-font-mono)",
+                letterSpacing: ".08em",
+                textTransform: "uppercase",
+                color: "var(--cy-color-muted)",
+              }}
+            >
+              {category} · {items.length}
+            </h2>
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(auto-fill, minmax(104px, 1fr))",
+                gap: 8,
+              }}
+            >
+              {items.map((icon) => (
+                <figure
+                  key={icon.name}
+                  className="cy-motion-trigger"
+                  data-icon={icon.name}
+                  style={{
+                    margin: 0,
+                    display: "grid",
+                    justifyItems: "center",
+                    gap: 10,
+                    padding: "16px 8px 12px",
+                    borderRadius: 12,
+                    border: "1px solid var(--cy-color-line)",
+                    background: "var(--cy-color-surface)",
+                    color: "var(--cy-color-ink)",
+                  }}
+                >
+                  <Icon icon={icon} size={24} />
+                  <figcaption
+                    style={{
+                      font: "11px/1.3 var(--cy-font-mono)",
+                      color: "var(--cy-color-muted)",
+                      textAlign: "center",
+                    }}
+                  >
+                    {icon.name}
+                  </figcaption>
+                </figure>
+              ))}
+            </div>
+          </section>
+        );
+      })}
     </div>
   ),
+  play: async ({ canvasElement }) => {
+    const tiles = [...canvasElement.querySelectorAll("[data-icon]")];
+    await expect(tiles).toHaveLength(all.length);
+    await expect(new Set(tiles.map((t) => t.getAttribute("data-icon"))).size).toBe(all.length);
+    for (const category of ICON_CATEGORIES) {
+      const section = canvasElement.querySelector(`[data-category="${category}"]`) as HTMLElement;
+      for (const tile of section.querySelectorAll("[data-icon]")) {
+        const icon = all.find((i) => i.name === tile.getAttribute("data-icon"));
+        await expect(icon?.category).toBe(category);
+      }
+    }
+    // Every glyph renders at the requested size with visible strokes.
+    for (const svg of canvasElement.querySelectorAll("svg.cy-icon")) {
+      await expect(svg.getBoundingClientRect().width).toBe(24);
+      await expect((svg as SVGGraphicsElement).getBBox().width).toBeGreaterThan(0);
+    }
+  },
 };
 
 export const Decorative: Story = {

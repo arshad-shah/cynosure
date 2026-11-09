@@ -2,6 +2,7 @@ import type { IconData } from "./types.js";
 
 export const sun: IconData = {
   name: "sun",
+  category: "design",
   body: [
     ["rect", { x: 8, y: 8, width: 8, height: 8, rx: 2.5 }],
     [

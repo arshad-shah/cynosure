@@ -7,7 +7,8 @@ One small, themeable, accessible UI system for every Arshad Shah product: browse
 - **Tiny and tree-shaken**: zero runtime dependencies, one module per component and icon.
 - **Looks identical anywhere**: pages, iframes, extension popups and shadow roots; host CSS can't break it.
 - **Every property is a token**: `createTheme({ accent, scale, radius, font, tokens, components })`.
-- **Facet icons**: drawn from the Cynosure mark, one accent star each.
+- **Facet icons**: 136 stroke icons in 15 categories, softened-square geometry, built-in micro-animations.
+- **One prop vocabulary**: `size`, `tone`, `variant`, `color` on every component, so control is consistent.
 - **Tested in real browsers**: every story is a behavioural, accessibility and touch test on Chromium, Firefox and WebKit.
 
 ```bash
@@ -23,7 +24,7 @@ const theme = createTheme({ accent: "#e8462e", scale: "compact" });
 
 export const App = () => (
   <CynosureTheme theme={theme} mode="system">
-    <Button variant="primary" icon={download}>
+    <Button variant="solid" tone="accent" icon={download}>
       Export
     </Button>
   </CynosureTheme>

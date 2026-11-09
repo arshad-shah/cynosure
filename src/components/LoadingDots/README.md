@@ -12,7 +12,7 @@ import { LoadingDots } from "@arshad-shah/cynosure";
 
 | Prop                  | Default   | Notes                                                                                            |
 | --------------------- | --------- | ------------------------------------------------------------------------------------------------ |
-| `size`                | `inherit` | `inherit` follows the font size; `sm` 10, `md` 14, `lg` 20 px (× scale)                          |
+| `size`                | `inherit` | `inherit` follows the font size; `sm` 12, `md` 16, `lg` 24 px (× scale)                          |
 | `tone`                | `inherit` | `accent`, `neutral`, `muted`, `danger`, `success`, `warning`, `info`, or the current text colour |
 | `color`               | –         | Any CSS colour for one-off cases; prefer tones or tokens                                         |
 | `speed`               | `normal`  | `slow`, `normal`, `fast`                                                                         |
@@ -23,8 +23,8 @@ Reduced motion (OS setting or `createTheme({ motion: "reduced" })`) shows three 
 
 ## Tokens
 
-- `--cy-loading-dots-dot-size`: dot diameter (default 0.36em)
-- `--cy-loading-dots-gap`: space between dots (default 0.28em)
+- `--cy-loading-dots-dot-size`: dot diameter (default 0.5em)
+- `--cy-loading-dots-gap`: space between dots (default 0.3em)
 - `--cy-loading-dots-color`: dot colour (default: tone or currentColor)
 - `--cy-loading-dots-duration`: one pulse cycle (default 6 × motion base)
 - `--cy-loading-dots-size-{sm,md,lg}`: font size for each fixed size

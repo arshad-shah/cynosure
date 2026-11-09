@@ -1,12 +1,34 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, fn, waitFor } from "storybook/test";
+import * as icons from "../../icons/index.js";
 import { copy, trash } from "../../icons/index.js";
 import { IconButton } from "./IconButton.js";
+
+const iconMapping: Record<string, unknown> = {};
+for (const value of Object.values(icons))
+  if (typeof value === "object" && value && "body" in value) iconMapping[value.name] = value;
 
 const meta = {
   title: "Components/IconButton",
   component: IconButton,
-  args: { icon: copy, label: "Copy document", onClick: fn() },
+  args: {
+    icon: copy,
+    label: "Copy document",
+    onClick: fn(),
+    variant: "outline",
+    tone: "neutral",
+    size: "md",
+  },
+  argTypes: {
+    icon: { control: "select", options: Object.keys(iconMapping), mapping: iconMapping },
+    variant: { control: "inline-radio", options: ["solid", "soft", "outline", "ghost"] },
+    tone: { control: "select", options: ["accent", "neutral", "danger", "success", "warning", "info"] },
+    size: { control: "inline-radio", options: ["sm", "md", "lg"] },
+    label: { control: "text" },
+    loading: { control: "boolean" },
+    pressed: { control: "boolean" },
+    disabled: { control: "boolean" },
+  },
 } satisfies Meta<typeof IconButton>;
 export default meta;
 type Story = StoryObj<typeof meta>;

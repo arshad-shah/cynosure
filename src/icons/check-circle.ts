@@ -1,0 +1,11 @@
+import type { IconData } from "./types.js";
+
+export const checkCircle: IconData = {
+  name: "check-circle",
+  category: "status",
+  body: [
+    ["circle", { cx: 12, cy: 12, r: 8.5 }],
+    ["path", { d: "M8.5 12.5l2.5 2.5 4.5-5", animate: true }],
+  ],
+  motion: "draw",
+};

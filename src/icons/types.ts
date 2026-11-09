@@ -1,5 +1,25 @@
 /** Facet icons: 24×24 grid, 1.75 round stroke, softened-square geometry, stroke only. */
 
+/** Gallery and documentation grouping. Every icon belongs to exactly one category. */
+export const ICON_CATEGORIES = [
+  "arrows",
+  "navigation",
+  "actions",
+  "editing",
+  "files",
+  "data",
+  "media",
+  "communication",
+  "status",
+  "time",
+  "security",
+  "people",
+  "devices",
+  "design",
+  "layout",
+] as const;
+export type IconCategory = (typeof ICON_CATEGORIES)[number];
+
 export type IconMotion =
   | "tilt"
   | "rotate"
@@ -24,6 +44,7 @@ export type IconNode =
 export interface IconData {
   /** kebab-case, unique. */
   name: string;
+  category: IconCategory;
   body: IconNode[];
   motion?: IconMotion;
 }

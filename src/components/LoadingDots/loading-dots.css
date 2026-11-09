@@ -7,19 +7,19 @@
   margin: 0;
   display: inline-flex;
   align-items: center;
-  gap: var(--cy-loading-dots-gap, 0.28em);
+  gap: var(--cy-loading-dots-gap, 0.3em);
   block-size: 1em;
   vertical-align: middle;
   letter-spacing: normal;
 
   &[data-size="sm"] {
-    font-size: var(--cy-loading-dots-size-sm, calc(10px * var(--cy-scale, 1)));
+    font-size: var(--cy-loading-dots-size-sm, calc(12px * var(--cy-scale, 1)));
   }
   &[data-size="md"] {
-    font-size: var(--cy-loading-dots-size-md, calc(14px * var(--cy-scale, 1)));
+    font-size: var(--cy-loading-dots-size-md, calc(16px * var(--cy-scale, 1)));
   }
   &[data-size="lg"] {
-    font-size: var(--cy-loading-dots-size-lg, calc(20px * var(--cy-scale, 1)));
+    font-size: var(--cy-loading-dots-size-lg, calc(24px * var(--cy-scale, 1)));
   }
 
   &[data-tone="accent"] {
@@ -54,8 +54,8 @@
 
 .cy-loading-dots-dot {
   display: block;
-  inline-size: var(--cy-loading-dots-dot-size, 0.36em);
-  block-size: var(--cy-loading-dots-dot-size, 0.36em);
+  inline-size: var(--cy-loading-dots-dot-size, 0.5em);
+  block-size: var(--cy-loading-dots-dot-size, 0.5em);
   border-radius: 50%;
   background: var(--cy-loading-dots-color, var(--_c));
   animation: cy-loading-dots-pulse var(--_d) var(--cy-motion-ease-in-out, ease-in-out) infinite both;
@@ -74,7 +74,7 @@
     opacity: 1;
   }
   40% {
-    transform: scale(0.55);
-    opacity: 0.35;
+    transform: scale(0.6);
+    opacity: 0.4;
   }
 }

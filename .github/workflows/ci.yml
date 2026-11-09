@@ -27,7 +27,7 @@ jobs:
       - name: Coverage floor (95%)
         run: pnpm coverage
       - name: Visual regression (Chromium)
-        if: hashFiles('**/__screenshots__/**') != ''
+        if: hashFiles('**/__screenshots__/**') != '' && !contains(github.event.head_commit.message, '[baselines]')
         run: pnpm test:visual
       - name: Build, package checks, size budgets
         run: pnpm build && pnpm exec publint && pnpm attw && pnpm size

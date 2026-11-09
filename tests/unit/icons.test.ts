@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import * as icons from "../../src/icons";
-import type { IconData } from "../../src/icons/types";
+import { ICON_CATEGORIES, type IconData } from "../../src/icons/types";
 import { validateIcon } from "../../src/icons/validate";
 
 const shipped = Object.values(icons).filter(
@@ -8,35 +8,10 @@ const shipped = Object.values(icons).filter(
 );
 
 describe("Facet icon set", () => {
-  it("ships the starting set", () => {
-    expect(shipped.map((i) => i.name).sort()).toEqual(
-      [
-        "arrow-down",
-        "arrow-up",
-        "check",
-        "chevron-down",
-        "chevron-right",
-        "close",
-        "code",
-        "collapse",
-        "copy",
-        "download",
-        "expand",
-        "external",
-        "folder",
-        "info",
-        "menu",
-        "moon",
-        "plus",
-        "retry",
-        "search",
-        "sliders",
-        "sun",
-        "trash",
-        "tree",
-        "warning",
-      ].sort(),
-    );
+  it("ships a broad set covering every category with unique names", () => {
+    expect(shipped.length).toBeGreaterThanOrEqual(120);
+    expect(new Set(shipped.map((i) => i.name)).size).toBe(shipped.length);
+    expect(new Set(shipped.map((i) => i.category))).toEqual(new Set(ICON_CATEGORIES));
   });
   it.each(shipped.map((i) => [i.name, i] as const))("%s passes validateIcon", (_name, icon) => {
     expect(validateIcon(icon)).toEqual([]);
@@ -44,8 +19,11 @@ describe("Facet icon set", () => {
 });
 
 describe("validateIcon", () => {
-  const ok: IconData = { name: "ok", body: [["path", { d: "M4 4h16" }]] };
+  const ok: IconData = { name: "ok", category: "actions", body: [["path", { d: "M4 4h16" }]] };
   it("accepts a minimal valid icon", () => expect(validateIcon(ok)).toEqual([]));
+  it("rejects an unknown category", () => {
+    expect(validateIcon({ ...ok, category: "misc" as never }).join()).toMatch(/category/);
+  });
   it("rejects text nodes", () => {
     expect(validateIcon({ ...ok, body: [["text" as "path", { d: "A" }]] }).join()).toMatch(/text/);
   });

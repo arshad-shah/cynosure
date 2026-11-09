@@ -19,6 +19,15 @@ Write Plan 2 (Milestone 1 controls: Link, TextField, SearchField, TextArea, Sele
 - [ ] Plan 3: Milestone 2 structure and overlays (not written)
 - [ ] Plan 4: Milestone 3 and product migration issues (not written)
 
+## Feedback round (2026-11-09, after Plan 1)
+
+- LoadingDots component (three pulsing dots; size, tone, colour, speed; visible under reduced motion); Button reuses it.
+- Button API is `variant` (solid, soft, outline, ghost) × `tone` (accent, neutral, danger, success, warning, info); every pair tested distinct and ≥ 4.5:1.
+- Ember brand accent `#c2410c` with white text; crimson danger (`#b4235a` / `#ff6b8f`); per-tone text roles.
+- Logo and lockup recoloured to ember; wordmark readable on light backgrounds; PNG and ICO regenerated.
+- Facet icons are stroke only (accent dot removed); 136 icons in 15 categories with a categorised gallery.
+- Shared prop vocabulary (`size`, `tone`, `variant`, `color`) in `docs/conventions.md` and the `cy new component` template; Storybook controls for every prop.
+
 ## Blockers
 
 None. Npm publish and deprecating old packages wait for Arshad's authorisation.
@@ -26,6 +35,7 @@ None. Npm publish and deprecating old packages wait for Arshad's authorisation.
 ## Decision log
 
 - 2026-11-09: Single package `@arshad-shah/cynosure` on branch `next`; Facet icons and Facet look approved; English strings with `labels` overrides.
+- 2026-11-09: Arshad: remove the accent dot from icons (stroke only); one prop vocabulary across components; loading indicator is its own component (three pulsing dots).
 - 2026-11-09: React components (Preact via compat), plain modern CSS, tokens in TS → CSS; no web components (content-script registry).
 - 2026-11-09: Toolchain Vite 8, Vitest 5, Storybook 10.6, TypeScript 5.9 (not 7: tooling uses the TS API); pnpm refuses packages younger than 14 days.
 - 2026-11-09: Theme input validated centrally (security review); gamut mapping bounded.

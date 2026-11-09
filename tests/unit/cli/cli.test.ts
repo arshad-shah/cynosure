@@ -5,7 +5,7 @@ import { join, resolve } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
 import { check } from "../../../tools/cli/lib/check";
 import { readProgress } from "../../../tools/cli/lib/progress";
-import { addComponentToken, scaffoldComponent, scaffoldIcon } from "../../../tools/cli/lib/scaffold";
+import { addComponentToken, iconId, scaffoldComponent, scaffoldIcon } from "../../../tools/cli/lib/scaffold";
 
 const repo = resolve(__dirname, "../../..");
 const temps: string[] = [];
@@ -131,9 +131,10 @@ describe("cy new icon", () => {
     const root = sandbox();
     const svg =
       '<svg viewBox="0 0 24 24"><path d="M4 12h16"/><rect x="3" y="3" width="6" height="6" rx="1.5"/></svg>';
-    scaffoldIcon(root, "flat-line", svg);
+    scaffoldIcon(root, "flat-line", svg, "actions");
     const mod = readFileSync(join(root, "src/icons/flat-line.ts"), "utf8");
     expect(mod).toContain('name: "flat-line"');
+    expect(mod).toContain('category: "actions"');
     expect(mod).toContain('["rect", { x: 3, y: 3, width: 6, height: 6, rx: 1.5 }]');
     expect(readFileSync(join(root, "src/icons/index.ts"), "utf8")).toContain(
       'export { flatLine } from "./flat-line.js";',
@@ -146,12 +147,22 @@ describe("cy new icon", () => {
         root,
         "blob",
         '<svg viewBox="0 0 24 24"><rect x="3" y="3" width="3" height="3" fill="red"/></svg>',
+        "actions",
       ),
     ).toThrow(/stroke only/);
   });
+  it("suffixes reserved-word icon names so the export is valid", () => {
+    expect([iconId("package"), iconId("delete"), iconId("arrow-left")]).toEqual([
+      "packageIcon",
+      "deleteIcon",
+      "arrowLeft",
+    ]);
+  });
   it("rejects an SVG with text", () => {
     const root = sandbox();
-    expect(() => scaffoldIcon(root, "bad", '<svg viewBox="0 0 24 24"><text>A</text></svg>')).toThrow(/text/);
+    expect(() =>
+      scaffoldIcon(root, "bad", '<svg viewBox="0 0 24 24"><text>A</text></svg>', "actions"),
+    ).toThrow(/text/);
   });
 });
 

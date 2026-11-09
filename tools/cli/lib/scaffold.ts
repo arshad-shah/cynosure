@@ -1,11 +1,54 @@
 /** Generators behind `cy new …`. Deterministic: same input, same files; refuses to overwrite. */
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import type { IconData, IconNode } from "../../../src/icons/types";
+import { ICON_CATEGORIES, type IconCategory, type IconData, type IconNode } from "../../../src/icons/types";
 import { validateIcon } from "../../../src/icons/validate";
 
 const kebab = (s: string) => s.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase();
 const camel = (s: string) => s.replace(/-(\w)/g, (_, c: string) => c.toUpperCase());
+const RESERVED = new Set([
+  "package",
+  "delete",
+  "new",
+  "default",
+  "import",
+  "export",
+  "function",
+  "class",
+  "interface",
+  "public",
+  "private",
+  "static",
+  "let",
+  "yield",
+  "await",
+  "enum",
+  "case",
+  "switch",
+  "return",
+  "var",
+  "void",
+  "with",
+  "in",
+  "of",
+  "do",
+  "if",
+  "for",
+  "while",
+  "try",
+  "catch",
+  "finally",
+  "throw",
+  "typeof",
+  "instanceof",
+  "this",
+  "super",
+  "null",
+  "true",
+  "false",
+]);
+/** Export identifier for an icon name; reserved words get an `Icon` suffix (`package` → `packageIcon`). */
+export const iconId = (name: string) => (RESERVED.has(camel(name)) ? `${camel(name)}Icon` : camel(name));
 const lowerFirst = (s: string) => s.charAt(0).toLowerCase() + s.slice(1);
 
 function sortExports(text: string): string {
@@ -19,6 +62,7 @@ const tsx = (
   Name: string,
   k: string,
 ) => `import { type CSSProperties, forwardRef, type ReactNode } from "react";
+import type { Size, Tone } from "../../tokens/schema.js";
 
 export interface ${Name}Tokens {
   gap: string;
@@ -31,6 +75,10 @@ declare module "../../tokens/schema.js" {
 }
 
 export interface ${Name}Props {
+  /** Physical size (shared vocabulary: docs/conventions.md). */
+  size?: Size;
+  /** Semantic colour. */
+  tone?: Tone;
   className?: string;
   /** Layout only. Restyle through --cy-${k}-* tokens. */
   style?: CSSProperties;
@@ -38,9 +86,18 @@ export interface ${Name}Props {
 }
 
 /** TODO(cy): one line on what ${Name} is for. Compose Cynosure components; native elements only in foundations. */
-export const ${Name} = forwardRef<HTMLDivElement, ${Name}Props>(function ${Name}({ className, style, children }, ref) {
+export const ${Name} = forwardRef<HTMLDivElement, ${Name}Props>(function ${Name}(
+  { size = "md", tone = "neutral", className, style, children },
+  ref,
+) {
   return (
-    <div ref={ref} className={\`cy-${k}\${className ? \` \${className}\` : ""}\`} style={style}>
+    <div
+      ref={ref}
+      className={\`cy-${k}\${className ? \` \${className}\` : ""}\`}
+      data-size={size}
+      data-tone={tone}
+      style={style}
+    >
       {children}
     </div>
   );
@@ -50,14 +107,24 @@ export const ${Name} = forwardRef<HTMLDivElement, ${Name}Props>(function ${Name}
 const css = (
   k: string,
 ) => `/* ${k}: every visual property reads a --cy-${k}-* token with a global fallback. Root never carries .cy-reset. */
-.cy-${k} {
+.cy-${k}.cy-${k} {
+  --_tone: var(--cy-color-ink);
   box-sizing: border-box !important;
   margin: 0;
+  letter-spacing: normal;
+  text-transform: none;
   display: flex;
   gap: var(--cy-${k}-gap, var(--cy-space-4));
-  color: var(--cy-color-ink);
+  color: var(--_tone);
   font-family: var(--cy-font-sans);
   font-size: var(--cy-font-size-md);
+  &[data-size="sm"] { font-size: var(--cy-font-size-sm); }
+  &[data-size="lg"] { font-size: var(--cy-font-size-lg); }
+  &[data-tone="accent"] { --_tone: var(--cy-color-accent-text); }
+  &[data-tone="danger"] { --_tone: var(--cy-color-danger-text); }
+  &[data-tone="success"] { --_tone: var(--cy-color-success-text); }
+  &[data-tone="warning"] { --_tone: var(--cy-color-warning-text); }
+  &[data-tone="info"] { --_tone: var(--cy-color-info-text); }
 }
 `;
 
@@ -70,7 +137,15 @@ import { expect } from "storybook/test";
 import { computeUnderHostileHost } from "../../test/hostile.js";
 import { ${Name} } from "./${Name}.js";
 
-const meta = { title: "${group}/${Name}", component: ${Name}, args: { children: "${Name}" } } satisfies Meta<typeof ${Name}>;
+const meta = {
+  title: "${group}/${Name}",
+  component: ${Name},
+  args: { children: "${Name}", size: "md", tone: "neutral" },
+  argTypes: {
+    size: { control: "inline-radio", options: ["sm", "md", "lg"] },
+    tone: { control: "select", options: ["accent", "neutral", "danger", "success", "warning", "info"] },
+  },
+} satisfies Meta<typeof ${Name}>;
 export default meta;
 type Story = StoryObj<typeof meta>;
 
@@ -106,6 +181,8 @@ import { ${Name} } from "@arshad-shah/cynosure";
 
 | Prop | Default | Notes |
 |---|---|---|
+| \`size\` | \`md\` | \`sm\` · \`md\` · \`lg\` |
+| \`tone\` | \`neutral\` | \`accent\` · \`neutral\` · \`danger\` · \`success\` · \`warning\` · \`info\` |
 | \`className\` / \`style\` | – | Layout only |
 
 ## Tokens
@@ -179,7 +256,7 @@ export function addComponentToken(root: string, path: string, doc: string): void
 const num = (v: string | undefined) => Number.parseFloat(v ?? "0");
 
 /** Parses the subset of SVG Facet icons use: stroked paths, rects and circles; no fills, no text. */
-export function svgToIcon(name: string, svg: string): IconData {
+export function svgToIcon(name: string, svg: string, category: IconCategory): IconData {
   if (/<text[\s>]/i.test(svg)) throw new Error("SVG contains <text>: icons are drawn, never typed");
   const body: IconNode[] = [];
   for (const [, tag, attrText = ""] of svg.matchAll(/<(path|rect|circle)\b([^>]*)\/?>/g)) {
@@ -199,7 +276,7 @@ export function svgToIcon(name: string, svg: string): IconData {
       ]);
     if (tag === "circle") body.push(["circle", { cx: num(a.cx), cy: num(a.cy), r: num(a.r) }]);
   }
-  return { name, body };
+  return { name, category, body };
 }
 
 const literal = (v: unknown): string =>
@@ -212,16 +289,16 @@ const literal = (v: unknown): string =>
       : JSON.stringify(v);
 
 /** `cy new icon <name> --from file.svg` */
-export function scaffoldIcon(root: string, name: string, svg: string): string {
-  const icon = svgToIcon(name, svg);
+export function scaffoldIcon(root: string, name: string, svg: string, category: IconCategory): string {
+  const icon = svgToIcon(name, svg, category);
   const errors = validateIcon(icon);
   if (errors.length) throw new Error(`Icon "${name}" is not a valid Facet icon:\n- ${errors.join("\n- ")}`);
   const file = join(root, "src/icons", `${name}.ts`);
   if (existsSync(file)) throw new Error(`Icon ${name} already exists`);
-  const id = camel(name);
+  const id = iconId(name);
   writeFileSync(
     file,
-    `import type { IconData } from "./types.js";\n\nexport const ${id}: IconData = {\n  name: ${JSON.stringify(name)},\n  body: ${literal(icon.body)},\n};\n`,
+    `import type { IconData } from "./types.js";\n\nexport const ${id}: IconData = {\n  name: ${JSON.stringify(name)},\n  category: ${JSON.stringify(category)},\n  body: ${literal(icon.body)},\n};\n`,
   );
   const index = join(root, "src/icons/index.ts");
   writeFileSync(index, sortExports(`${readFileSync(index, "utf8")}export { ${id} } from "./${name}.js";\n`));

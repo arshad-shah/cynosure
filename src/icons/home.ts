@@ -1,0 +1,11 @@
+import type { IconData } from "./types.js";
+
+export const home: IconData = {
+  name: "home",
+  category: "navigation",
+  body: [
+    ["path", { d: "M4 10.5L12 4l8 6.5V19a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 19z", animate: true }],
+    ["path", { d: "M9.5 20.5v-6h5v6" }],
+  ],
+  motion: "lift",
+};
