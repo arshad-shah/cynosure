@@ -243,5 +243,11 @@
     "path": ["dist/components/Sheet/Sheet.js", "dist/styles/sheet.css"],
     "limit": "0.75 kB",
     "gzip": true
+  },
+  {
+    "name": "Toast",
+    "path": ["dist/components/Toast/Toast.js", "dist/styles/toast.css"],
+    "limit": "3.25 kB",
+    "gzip": true
   }
 ]

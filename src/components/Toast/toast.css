@@ -1,0 +1,158 @@
+/*
+ * toast: the Toaster region is a top-layer strip along one edge (pointer events pass through it); toasts stack in it,
+ * newest nearest the edge. Collapsed (older than `max`) toasts fold to nothing but stay in the DOM, so a toast is
+ * announced once even when it comes back into view.
+ */
+.cy-toaster.cy-toaster {
+  box-sizing: border-box !important;
+  position: fixed;
+  inset: auto 0;
+  inline-size: auto;
+  block-size: auto;
+  max-block-size: 100vh;
+  margin: 0;
+  padding: var(--cy-space-6);
+  border: 0;
+  overflow: visible;
+  background: transparent;
+  color: var(--cy-color-ink);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--cy-toast-gap, var(--cy-space-4));
+  pointer-events: none;
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-font-size-md);
+  font-weight: var(--cy-font-weight-regular);
+  line-height: var(--cy-font-line-height);
+  letter-spacing: normal;
+  text-align: start;
+  text-transform: none;
+  &:not(:popover-open) {
+    display: none;
+  }
+  &[data-position^="bottom"] {
+    inset-block-end: 0;
+    justify-content: flex-end;
+  }
+  &[data-position^="top"] {
+    inset-block-start: 0;
+    flex-direction: column-reverse;
+    justify-content: flex-end;
+  }
+  &[data-position$="start"] {
+    align-items: flex-start;
+  }
+  &[data-position$="center"] {
+    align-items: center;
+  }
+}
+
+.cy-toast.cy-toast {
+  --_tone: var(--cy-color-muted);
+  box-sizing: border-box !important;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--cy-space-4);
+  inline-size: min(var(--cy-toast-width, 360px), 100%);
+  max-block-size: 40vh;
+  margin: 0;
+  padding: var(--cy-toast-padding, var(--cy-space-5));
+  overflow: hidden;
+  border: var(--cy-border-width) solid var(--cy-color-line);
+  border-inline-start: calc(3 * var(--cy-border-width)) solid var(--_tone);
+  border-radius: var(--cy-toast-radius, var(--cy-radius-card));
+  background: var(--cy-color-surface);
+  color: var(--cy-color-ink);
+  box-shadow: var(--cy-shadow-lg);
+  font-size: var(--cy-font-size-md);
+  letter-spacing: normal;
+  text-transform: none;
+  pointer-events: auto;
+  touch-action: pan-y;
+  opacity: 1;
+  translate: var(--_dx, 0) 0;
+  transition:
+    opacity var(--cy-motion-base) var(--cy-motion-ease),
+    translate var(--cy-motion-base) var(--cy-motion-ease),
+    max-block-size var(--cy-motion-base) var(--cy-motion-ease),
+    padding var(--cy-motion-base) var(--cy-motion-ease),
+    margin var(--cy-motion-base) var(--cy-motion-ease);
+  @starting-style {
+    opacity: 0;
+    translate: 0 var(--cy-space-4);
+  }
+  &[data-swiping] {
+    transition: none;
+  }
+  &[data-leaving] {
+    opacity: 0;
+  }
+  &[data-collapsed],
+  &[data-leaving] {
+    max-block-size: 0;
+    padding-block: 0;
+    border-block-width: 0;
+    margin-block-end: calc(-1 * var(--cy-toast-gap, var(--cy-space-4)));
+  }
+  &[data-collapsed] {
+    opacity: 0;
+  }
+  &[data-tone="success"] {
+    --_tone: var(--cy-color-success);
+  }
+  &[data-tone="danger"] {
+    --_tone: var(--cy-color-danger);
+  }
+  &[data-tone="warning"] {
+    --_tone: var(--cy-color-warning);
+  }
+  &[data-tone="info"] {
+    --_tone: var(--cy-color-info);
+  }
+}
+.cy-toaster[data-position^="top"] .cy-toast.cy-toast {
+  @starting-style {
+    translate: 0 calc(-1 * var(--cy-space-4));
+  }
+}
+
+.cy-toast-icon.cy-toast-icon {
+  flex: none;
+  margin-block-start: var(--cy-space-1);
+  color: var(--_tone);
+}
+.cy-toast-text.cy-toast-text {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: var(--cy-space-1);
+  min-inline-size: 0;
+  padding-block: var(--cy-space-1);
+  font-size: var(--cy-font-size-md);
+  overflow-wrap: anywhere;
+}
+.cy-toast-title.cy-toast-title {
+  color: var(--cy-color-ink);
+  font-size: var(--cy-font-size-md);
+  font-weight: var(--cy-font-weight-medium);
+}
+.cy-toast-description.cy-toast-description {
+  color: var(--cy-color-muted);
+  font-size: var(--cy-font-size-sm);
+}
+.cy-toast > .cy-button,
+.cy-toast > .cy-tooltip-anchor {
+  flex: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cy-toast.cy-toast {
+    transition: none;
+  }
+}
+@media (forced-colors: active) {
+  .cy-toast.cy-toast {
+    border-color: CanvasText;
+  }
+}

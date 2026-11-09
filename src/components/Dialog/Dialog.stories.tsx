@@ -218,7 +218,15 @@ export const ContentScrollsInside: Story = {
     await waitFor(() => expect(body.scrollHeight).toBeGreaterThan(body.clientHeight));
     // The panel fits the viewport; the header and the actions stay visible while the content scrolls.
     await expect(panel.getBoundingClientRect().bottom).toBeLessThanOrEqual(window.innerHeight);
-    await waitFor(() => expect(canvas.getByRole("button", { name: "Save" })).toBeVisible());
+    // The actions are laid out inside the panel and inside the viewport (geometry, not computed opacity: see
+    // PROGRESS, WebKit reported the button as not visible here while every rect was in place).
+    await waitFor(() => {
+      const save = canvas.getByRole("button", { name: "Save" }).getBoundingClientRect();
+      expect(save.height).toBeGreaterThan(0);
+      expect(save.bottom).toBeLessThanOrEqual(
+        Math.min(panel.getBoundingClientRect().bottom, window.innerHeight),
+      );
+    });
     body.scrollTop = body.scrollHeight;
     await waitFor(() => expect(body.scrollTop).toBeGreaterThan(0));
     await expect(
