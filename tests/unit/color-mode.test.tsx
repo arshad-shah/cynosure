@@ -108,7 +108,15 @@ describe("useColorMode", () => {
   it("M6: an inline storage object does not re-read on every render", () => {
     let reads = 0;
     const { rerender } = renderHook(() =>
-      useColorMode({ storage: { get: () => (reads++, "dark"), set: () => {} } }),
+      useColorMode({
+        storage: {
+          get: () => {
+            reads++;
+            return "dark";
+          },
+          set: () => {},
+        },
+      }),
     );
     rerender();
     rerender();
