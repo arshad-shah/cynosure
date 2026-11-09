@@ -1,10 +1,14 @@
 name: Update visual baselines
 on:
   workflow_dispatch:
+  # Dispatch only works once this file is on the default branch; until then a commit on `next` containing [baselines] triggers it.
+  push:
+    branches: [next]
 permissions:
   contents: write
 jobs:
   baselines:
+    if: github.event_name == 'workflow_dispatch' || contains(github.event.head_commit.message, '[baselines]')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
