@@ -243,7 +243,17 @@ export function Select({
             className="cy-select-list"
             {...{ popover: "manual" }}
           >
-            {options.length === 0 && <div className="cy-select-empty">{labels?.empty ?? "No options"}</div>}
+            {options.length === 0 && (
+              <div
+                role="option"
+                aria-disabled="true"
+                aria-selected="false"
+                tabIndex={-1}
+                className="cy-select-empty"
+              >
+                {labels?.empty ?? "No options"}
+              </div>
+            )}
             {options.map((option, index) => (
               <div
                 key={option.value}

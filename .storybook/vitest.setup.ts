@@ -14,6 +14,15 @@ setProjectAnnotations([
     afterEach: async ({ tags, canvasElement, id }) => {
       if (!visual || !tags.includes("visual")) return;
       await expect.element(page.elementLocator(canvasElement)).toMatchScreenshot(id);
+      // Dark mode: flip the decorator's theme wrapper (light-dark() tokens follow color-scheme), then restore.
+      const theme = canvasElement.querySelector(".cy-theme");
+      if (!theme) return;
+      const previous = theme.getAttribute("data-cy-mode");
+      theme.setAttribute("data-cy-mode", "dark");
+      await new Promise((r) => setTimeout(r, 400));
+      await expect.element(page.elementLocator(canvasElement)).toMatchScreenshot(`${id}-dark`);
+      if (previous === null) theme.removeAttribute("data-cy-mode");
+      else theme.setAttribute("data-cy-mode", previous);
     },
   },
 ]);

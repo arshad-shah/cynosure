@@ -2,20 +2,20 @@
 
 ## Status
 
-Plan 1 (Foundation) complete on `next` and green in CI (all engines, touch, coverage ≥ 95%, visual regression). Storybook live at https://arshad-shah.github.io/cynosure/.
+Plan 2 (Milestone 1 controls) complete on `next`: form foundations, Field, TextField, SearchField, TextArea, Link, Checkbox, Switch, RadioGroup, SegmentedControl, Tooltip (Popover API), Select, Badge, Kbd, ThemeToggle, Vite adapter, optional Hanken font, and the deferred review minors. Storybook live at https://arshad-shah.github.io/cynosure/.
 
 ## Current task
 
-None in progress. Plan 1 finished and reviewed.
+None in progress. Plan 2 finished; final whole-branch review pending results.
 
 ## Next step
 
-Write Plan 2 (Milestone 1 controls: Link, TextField, SearchField, TextArea, Select, SegmentedControl, Switch, Checkbox, RadioGroup, Tooltip, Badge, Kbd, Spinner, ThemeToggle; the real Vite adapter; optional Hanken font; dark and contrast visual baselines). Fold in the deferred review minors listed under Decision log.
+Write Plan 3 (Milestone 2 structure and overlays: Card, Toolbar, Tabs, Disclosure/Accordion, Popover, Menu, Dialog/Sheet, Toast, Notice/Alert, EmptyState, Stack/Inline, CopyButton). Carry over: React 18 smoke test via an isolated fixture install, dark-contrast visual baselines.
 
 ## Plans
 
 - [x] Plan 1: Foundation (`docs/superpowers/plans/2026-11-09-cynosure-foundation.md`)
-- [ ] Plan 2: Milestone 1 controls (not written)
+- [x] Plan 2: Milestone 1 controls (`docs/superpowers/plans/2026-11-09-cynosure-controls.md`)
 - [ ] Plan 3: Milestone 2 structure and overlays (not written)
 - [ ] Plan 4: Milestone 3 and product migration issues (not written)
 
@@ -27,6 +27,13 @@ Write Plan 2 (Milestone 1 controls: Link, TextField, SearchField, TextArea, Sele
 - Logo and lockup recoloured to ember; wordmark readable on light backgrounds; PNG and ICO regenerated.
 - Facet icons are stroke only (accent dot removed); 136 icons in 15 categories with a categorised gallery.
 - Shared prop vocabulary (`size`, `tone`, `variant`, `color`) in `docs/conventions.md` and the `cy new component` template; Storybook controls for every prop.
+
+## Plan 2 notes (2026-11-09)
+
+- New `cy check` rule `inherit-chain`: every element with a `cy-` class carries `.cy-reset` or declares its font size (found 10 real host-CSS leaks).
+- Tooltip and Select use the Popover API (top layer) with a shared positioner (`src/overlay`), so overlays work in shadow roots and never clip.
+- Library ships minified ESM with sourcemaps and `"use client"` on interactive modules only.
+- Deferred: React 18 smoke test (pnpm resolves react-dom@18's peer to React 19; needs an isolated fixture), dark-contrast visual baselines.
 
 ## Blockers
 

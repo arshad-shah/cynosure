@@ -11,7 +11,6 @@ function flatten(obj: object, prefix: string, out: [string, string][]): [string,
   for (const [k, v] of Object.entries(obj)) {
     const name = prefix ? `${prefix}-${kebab(k)}` : kebab(k);
     if (v && typeof v === "object") flatten(v, name, out);
-    else if (typeof v === "boolean") out.push([name, v ? "1" : "0"]);
     else if (typeof v === "number")
       out.push([name, MS.has(name) ? `${v}ms` : UNITLESS.test(name) ? `${v}` : `${v}px`]);
     else out.push([name, String(v)]);

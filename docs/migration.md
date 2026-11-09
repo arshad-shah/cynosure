@@ -7,6 +7,8 @@ Tracked as one issue per product repo (opened after Milestone 2). Order of work 
 3. Replace product components with Cynosure ones; replace icons with Facet icons; delete native controls.
 4. Anything missing goes into Cynosure (with tests), never back into the product.
 
+Available now: Button, IconButton, Link, TextField, SearchField, TextArea, Select, Checkbox, Switch, RadioGroup, SegmentedControl, ThemeToggle, Tooltip, LoadingDots, Badge, Kbd, Field, 136 Facet icons. Coming in Plan 3: Card, Tabs, Dialog/Sheet, Menu, Popover, Toast, Notice, EmptyState.
+
 | Scope          | Products                                                                                                                                                      |
 | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Full           | prism, aperture-css, smart-audio-capture, request-interceptor, session-recorder, snapforge, algo-visual (Stepframe), algosnap, whetstone, planr, exposure-map |

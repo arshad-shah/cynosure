@@ -21,7 +21,9 @@ export const SubmitsOnEnter: Story = {
   play: async ({ canvas, args, userEvent }) => {
     const box = canvas.getByRole("searchbox", { name: "Search documents" });
     await expect(box.closest(".cy-text-field")?.querySelector(".cy-icon")).toBeTruthy();
-    await userEvent.type(box, "invoices{Enter}");
+    await userEvent.type(box, "invoices");
+    await expect(box).toHaveValue("invoices");
+    await userEvent.keyboard("{Enter}");
     await expect(args.onSubmit).toHaveBeenCalledWith("invoices");
   },
 };

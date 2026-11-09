@@ -206,3 +206,36 @@ export const StableUnderHostileHost: Story = {
     await expect(hostile).toEqual(clean);
   },
 };
+
+export const ArrowUpOpensAtLastAndTypingWhileClosedJumps: Story = {
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const trigger = canvas.getByRole("combobox");
+    trigger.focus();
+    await userEvent.keyboard("{ArrowUp}");
+    await expect(active(canvasElement)).toBe("Date");
+    await userEvent.keyboard("{ArrowUp}{Home}{PageDown}");
+    await expect(active(canvasElement)).toBe("Date");
+    await userEvent.keyboard("{PageUp}{Escape}");
+    await userEvent.keyboard("c");
+    await waitFor(() => expect(isOpen(list(canvasElement))).toBe(true));
+    await expect(active(canvasElement)).toBe("Cherry");
+  },
+};
+
+export const AllDisabledHasNoActiveOption: Story = {
+  args: { options: [{ value: "x", label: "Only", disabled: true }], labels: { empty: "Nothing" } },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    await userEvent.click(canvas.getByRole("combobox"));
+    await expect(active(canvasElement)).toBeNull();
+    await userEvent.keyboard("{ArrowDown}{Enter}");
+    await expect(canvas.getByRole("combobox")).toHaveTextContent("Pick one");
+  },
+};
+
+export const EmptyOptionsShowsEmptyLabel: Story = {
+  args: { options: [], labels: { empty: "Nothing to pick" } },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    await userEvent.click(canvas.getByRole("combobox"));
+    await expect(list(canvasElement)).toHaveTextContent("Nothing to pick");
+  },
+};

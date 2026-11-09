@@ -240,3 +240,22 @@ describe("review minors", () => {
     expect(css).not.toContain('.b[data-cy-mode="dark"]');
   });
 });
+
+describe("remaining theme branches", () => {
+  it("explicit radius overrides are kept even when heights change", () => {
+    const t = createTheme({ tokens: { control: { height: { md: 40 } }, radius: { md: 3 } } });
+    expect(t.global.radius.md).toBe(3);
+    expect(t.global.radius.lg).toBeCloseTo(12);
+  });
+  it("undefined values in overrides keep the defaults", () => {
+    const t = createTheme({
+      tokens: { space: { "4": undefined } },
+      components: { button: undefined },
+    } as never);
+    expect(t.global.space["4"]).toBe(8);
+    expect(t.components).toEqual({});
+  });
+  it("uses dark on-accent text when white fails on any fill", () => {
+    expect(createTheme({ accent: "#f5d90a" }).palettes.light.onAccent).not.toBe("#ffffff");
+  });
+});

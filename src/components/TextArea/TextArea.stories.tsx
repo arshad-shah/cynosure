@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { useState } from "react";
 import { expect, fn } from "storybook/test";
 import { computeUnderHostileHost } from "../../test/hostile.js";
 import { TextArea } from "./TextArea.js";
@@ -103,5 +104,31 @@ export const StableUnderHostileHost: Story = {
       "height",
     ]);
     await expect(hostile).toEqual(clean);
+  },
+};
+
+function ControlledArea() {
+  const [value, setValue] = useState("abc");
+  return (
+    <TextArea
+      label="Notes"
+      value={value}
+      onChange={(v) => setValue(v.toUpperCase())}
+      showCount
+      disabled={false}
+      required
+    />
+  );
+}
+
+export const ControlledWithDefaultCounter: Story = {
+  render: () => <ControlledArea />,
+  play: async ({ canvas, userEvent }) => {
+    const area = canvas.getByRole("textbox", { name: "Notes" });
+    await expect(canvasElementCounter(area)).toHaveTextContent("3 characters");
+    await userEvent.type(area, "de");
+    await expect(area).toHaveValue("ABCDE");
+    await expect(canvasElementCounter(area)).toHaveTextContent("5 characters");
+    await expect(area).toBeRequired();
   },
 };

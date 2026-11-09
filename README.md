@@ -33,4 +33,11 @@ export const App = () => (
 
 **Storybook:** https://arshad-shah.github.io/cynosure/ · **Contributing:** see [AGENTS.md](AGENTS.md) and [docs/](docs/).
 
+## Components
+
+**Foundations:** ButtonBase, LinkBase, InputBase, TextAreaBase, ChoiceBase, HiddenValue, Icon (136 Facet icons).
+**Controls:** Button, IconButton, Link, TextField, SearchField, TextArea, Select, Checkbox, Switch, RadioGroup, SegmentedControl, ThemeToggle.
+**Feedback and display:** Tooltip, LoadingDots, Badge, Kbd, Field. **Theme:** CynosureTheme, useColorMode, createTheme.
+**Build:** optional Vite adapter (`@arshad-shah/cynosure/vite`) and self-hosted Hanken Grotesk (`fonts/hanken.css`).
+
 > Status: pre-release (`0.x`) on branch `next`. Not yet published to npm.

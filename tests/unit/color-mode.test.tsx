@@ -115,6 +115,14 @@ describe("useColorMode", () => {
     expect(reads).toBeLessThanOrEqual(2);
   });
 
+  it("async storage returning garbage falls back to system", async () => {
+    const { result } = renderHook(() =>
+      useColorMode({ storage: { get: async () => "purple", set: () => {} } }),
+    );
+    await act(async () => {});
+    expect(result.current.mode).toBe("system");
+  });
+
   it("ignores stored garbage", () => {
     const storage = { get: () => "purple", set: () => {} };
     const { result } = renderHook(() => useColorMode({ storage }));
