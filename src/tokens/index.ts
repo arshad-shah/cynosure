@@ -12,4 +12,4 @@ export type {
   Theme,
   ThemeInput,
 } from "./schema";
-export { DEFAULT_SELECTOR, themeToCss } from "./to-css";
+export { DEFAULT_SELECTOR, themeProperties, themeToCss } from "./to-css";

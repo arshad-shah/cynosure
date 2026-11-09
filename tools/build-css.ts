@@ -7,6 +7,7 @@
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { basename, join } from "node:path";
 import { transform } from "lightningcss";
+import { createTheme, themeToCss } from "../src/tokens";
 
 /** Latest evergreen engines (spec: no down-levelling for old browsers). Lightning CSS encodes major << 16. */
 const TARGETS = { chrome: 130 << 16, edge: 130 << 16, firefox: 133 << 16, safari: 18 << 16 };
@@ -37,7 +38,9 @@ export function buildCss(root = "src", out = "dist"): string {
     writeFileSync(join(out, "styles", basename(file)), css);
     return css;
   });
-  const all = parts.join("");
+  const tokens = themeToCss(createTheme());
+  writeFileSync(join(out, "styles", "tokens.css"), tokens);
+  const all = tokens + parts.join("");
   writeFileSync(join(out, "styles.css"), all);
   writeFileSync(join(root, "styles", "generated-css.ts"), `export default ${JSON.stringify(all)};\n`);
   return all;

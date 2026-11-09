@@ -28,6 +28,24 @@ function colorPairs(a: ColorTokens, b: ColorTokens): [string, string][] {
 }
 
 /**
+ * The theme as custom-property pairs (`--cy-*` → value), for applying on an element.
+ * `contrast: true` swaps in the high-contrast palettes.
+ */
+export function themeProperties(theme: Theme, options: { contrast?: boolean } = {}): Record<string, string> {
+  const [a, b] = options.contrast
+    ? [theme.palettes["light-contrast"], theme.palettes["dark-contrast"]]
+    : [theme.palettes.light, theme.palettes.dark];
+  const pairs: [string, string][] = [
+    ...flatten(theme.global, "", []),
+    ...colorPairs(a, b),
+    ...Object.entries(theme.components).flatMap(([c, t]) =>
+      Object.entries(t).map(([k, v]) => [`${c}-${kebab(k)}`, v] as [string, string]),
+    ),
+  ];
+  return Object.fromEntries(pairs.map(([k, v]) => [`--cy-${k}`, v]));
+}
+
+/**
  * Serialises a theme to CSS. The base block holds global, component and light/dark colour tokens
  * (via light-dark()); modes switch through `color-scheme`, contrast through an override block.
  */
