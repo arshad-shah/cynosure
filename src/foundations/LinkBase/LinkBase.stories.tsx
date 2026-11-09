@@ -25,3 +25,32 @@ export const DropsJavascriptHrefs: Story = {
     await expect(anchor.hasAttribute("href")).toBe(false);
   },
 };
+
+export const AllowsOnlySafeSchemes: Story = {
+  render: () => (
+    <div>
+      {[
+        ["tab", "java\tscript:alert(1)"],
+        ["newline", "java\nscript:alert(1)"],
+        ["control", "\u0001javascript:alert(1)"],
+        ["entity-like", "JaVaScRiPt:alert(1)"],
+        ["data", "data:text/html,<script>alert(1)</script>"],
+        ["relative", "/docs/start"],
+        ["hash", "#top"],
+        ["https", "https://example.com/a"],
+        ["mailto", "mailto:hi@example.com"],
+        ["tel", "tel:+353000000"],
+      ].map(([id, href]) => (
+        <LinkBase key={id} data-testid={id} href={href}>
+          {id}
+        </LinkBase>
+      ))}
+    </div>
+  ),
+  play: async ({ canvas }) => {
+    for (const id of ["tab", "newline", "control", "entity-like", "data"])
+      await expect(canvas.getByTestId(id).hasAttribute("href")).toBe(false);
+    for (const id of ["relative", "hash", "https", "mailto", "tel"])
+      await expect(canvas.getByTestId(id).hasAttribute("href")).toBe(true);
+  },
+};

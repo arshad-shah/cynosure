@@ -25,7 +25,7 @@
 }
 
 /*
- * Inner-element reset: inner parts of components start from known values whatever the host CSS says.
+ * Inner-element reset for parts that set none of these properties themselves (icons, label spans). A part that sets its own font or colour declares the reset properties instead of carrying .cy-reset.
  * Never put .cy-reset on a component root; roots declare these properties themselves, so rule order never matters.
  */
 .cy-reset,

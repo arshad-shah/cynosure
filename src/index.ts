@@ -1,4 +1,5 @@
 export { Button, type ButtonProps, type ButtonTokens } from "./components/Button/index.js";
+export { Field, type FieldProps } from "./components/Field/index.js";
 export { IconButton, type IconButtonProps } from "./components/IconButton/index.js";
 export { LoadingDots, type LoadingDotsProps } from "./components/LoadingDots/index.js";
 export { ButtonBase, type ButtonBaseProps } from "./foundations/ButtonBase/ButtonBase.js";

@@ -1,0 +1,63 @@
+/* Field: label above, description and error below. Required marker is a drawn shape, not a glyph. */
+.cy-field-label {
+  margin: 0;
+  font-family: var(--cy-font-sans);
+  letter-spacing: normal;
+  text-transform: none;
+  line-height: var(--cy-font-line-height);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cy-space-2);
+  font-size: var(--cy-font-size-sm);
+  font-weight: var(--cy-field-label-weight, var(--cy-font-weight-medium));
+  color: var(--cy-field-label-color, var(--cy-color-ink));
+  &[data-required]::after {
+    content: "";
+    inline-size: var(--cy-space-2);
+    block-size: var(--cy-space-2);
+    border-radius: calc(var(--cy-space-2) * 0.3);
+    background: var(--cy-field-required-color, var(--cy-color-danger));
+  }
+}
+.cy-field-description {
+  margin: 0;
+  font-family: var(--cy-font-sans);
+  letter-spacing: normal;
+  text-transform: none;
+  line-height: var(--cy-font-line-height);
+  font-weight: var(--cy-font-weight-regular);
+  font-size: var(--cy-font-size-sm);
+  color: var(--cy-field-description-color, var(--cy-color-muted));
+}
+.cy-field-error {
+  margin: 0;
+  font-family: var(--cy-font-sans);
+  letter-spacing: normal;
+  text-transform: none;
+  line-height: var(--cy-font-line-height);
+  font-weight: var(--cy-font-weight-regular);
+  font-size: var(--cy-font-size-sm);
+  color: var(--cy-field-error-color, var(--cy-color-danger-text));
+}
+
+.cy-field.cy-field {
+  box-sizing: border-box !important;
+  margin: 0;
+  letter-spacing: normal;
+  text-transform: none;
+  padding: 0;
+  border: 0;
+  font-weight: var(--cy-font-weight-regular);
+  display: grid;
+  gap: var(--cy-field-gap, var(--cy-space-3));
+  min-inline-size: 0;
+  color: var(--cy-color-ink);
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-font-size-md);
+  &[data-size="sm"] .cy-field-label {
+    font-size: var(--cy-font-size-xs);
+  }
+  &[data-size="lg"] .cy-field-label {
+    font-size: var(--cy-font-size-md);
+  }
+}
