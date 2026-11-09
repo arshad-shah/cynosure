@@ -1,0 +1,72 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./Card.stories";
+
+<Meta of={Stories} />
+
+# Card
+
+A content container. Give it `href` or `onClick` and the whole card becomes one link or one button. For a plain grouping with no surface, use [Stack](?path=/docs/components-stack--docs).
+
+<Canvas of={Stories.VariantsAndTones} />
+
+## When to use
+
+- **`surface` (default):** a raised panel for settings sections, dashboard tiles, plan options.
+- **`outline`:** border only, for lower emphasis or crowded layouts.
+- **`soft`:** a tone-tinted fill to highlight a state (info, warning).
+- **`href` / `onClick`:** the whole card is one target, such as a plan picker or a list of destinations.
+
+**Use something else when:**
+- the card holds its own buttons, links or inputs → use a static Card (no `href`/`onClick`) and put those controls inside
+- you only need spacing between items → [Stack](?path=/docs/components-stack--docs) or [Inline](?path=/docs/components-inline--docs)
+
+## Usage
+
+```tsx
+import { Card } from "@arshad-shah/cynosure";
+
+<Card variant="outline" padding="lg" as="section">…</Card>
+<Card href="/settings">Whole card is one link</Card>
+<Card onClick={choose}>Whole card is one button</Card>
+<Card variant="soft" tone="info">Heads up</Card>
+```
+
+## Padding
+
+`padding` is `none`, `sm`, `md` (default) or `lg`, and uses space tokens.
+
+<Canvas of={Stories.PaddingUsesSpaceTokens} />
+
+## Interactive cards
+
+With `href` the card renders as a link; unsafe URL schemes are not linked. With `onClick` it renders as a button and supports `disabled`. Keep the content non-interactive: one card, one target. When a card is interactive, `as` is ignored.
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+| Input | Result |
+| --- | --- |
+| Click, <kbd>Enter</kbd> | Follows the link (`href`) or fires `onClick` |
+| <kbd>Space</kbd> | Fires `onClick` on a button card |
+| <kbd>Tab</kbd> | Moves focus to an interactive card |
+
+- **Static cards:** choose the element with `as` (`div`, `section`, `article`, `li`, `aside`).
+- **Names:** add `aria-label` when the card's content doesn't give a clear name.
+- **Ref:** the ref points at the rendered element.
+
+## Theming
+
+Tokens: `--cy-card-bg`, `--cy-card-border`, `--cy-card-radius`, `--cy-card-shadow` and `--cy-card-soft-mix`.
+
+```ts
+createTheme({ components: { card: { radius: "12px", shadow: "none" } } });
+```
+
+`className` and `style` are for layout only.
+
+## Related
+
+[Stack](?path=/docs/components-stack--docs) · [Inline](?path=/docs/components-inline--docs) · [Link](?path=/docs/components-link--docs) · [Button](?path=/docs/components-button--docs)

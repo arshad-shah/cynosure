@@ -1,0 +1,76 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./Checkbox.stories";
+
+<Meta of={Stories} />
+
+# Checkbox
+
+A checkbox with a label, for choices that are independent of each other. It is a native input under a drawn box, so forms, reset and keyboard work as the browser does them. For a setting that takes effect immediately, use [Switch](?path=/docs/components-switch--docs).
+
+<Canvas of={Stories.CheckedShowsMark} />
+
+## When to use
+
+- Several options where any number can be on.
+- A single agreement or preference saved with a form.
+- A "select all" row with `indeterminate` when only some items are chosen.
+
+**Use something else when:**
+- the change applies immediately → [Switch](?path=/docs/components-switch--docs)
+- exactly one option may be chosen → [RadioGroup](?path=/docs/components-radiogroup--docs)
+- it triggers an action → [Button](?path=/docs/components-button--docs)
+
+## Usage
+
+```tsx
+import { Checkbox } from "@arshad-shah/cynosure";
+
+<Checkbox label="Email me updates" name="updates" value="yes" />
+<Checkbox label="Select all" checked={all} indeterminate={some} onChange={toggleAll} />
+<Checkbox label="Remember me" description="Keeps you signed in on this device." defaultChecked />
+```
+
+`onChange` receives the new `checked` boolean. Use `checked` for controlled and `defaultChecked` for uncontrolled. `name`, `value`, `required` and `disabled` are passed to the native input.
+
+## Label and description
+
+`label` is required. An optional `description` sits below it and is linked with `aria-describedby`. `size` is `sm`, `md` or `lg` and `tone` sets the fill when checked (default `accent`).
+
+<Canvas of={Stories.ClickSpaceAndLabelToggle} />
+
+## Indeterminate
+
+`indeterminate` shows a dash and is announced as "mixed". It is a display state only: you decide what the next click does.
+
+<Canvas of={Stories.IndeterminateIsMixed} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+| Input | Result |
+| --- | --- |
+| Click or tap the box or label | Toggles |
+| <kbd>Space</kbd> | Toggles |
+| <kbd>Tab</kbd> | Focus with a visible ring |
+
+- **Forms:** values reach `FormData`, form reset restores the initial state, and `required` is enforced by the browser.
+- **Whole row:** the label and description are part of the click target.
+
+## Touch
+
+The hit area is at least 24px, growing to 44px on coarse pointers without changing the visible size.
+
+## Theming
+
+Tokens: `--cy-checkbox-size`, `--cy-checkbox-radius` and `--cy-checkbox-border`. The `sm` and `lg` sizes use `--cy-checkbox-size-sm` and `--cy-checkbox-size-lg`.
+
+```ts
+createTheme({ components: { checkbox: { radius: "50%" } } });
+```
+
+## Related
+
+[Switch](?path=/docs/components-switch--docs) · [RadioGroup](?path=/docs/components-radiogroup--docs) · [Field](?path=/docs/components-field--docs)

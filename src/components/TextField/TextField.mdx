@@ -1,0 +1,76 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./TextField.stories";
+
+<Meta of={Stories} />
+
+# TextField
+
+Single-line text input with a label, description, error, optional icons and an optional clear button. For several lines use [TextArea](?path=/docs/components-textarea--docs); for search use [SearchField](?path=/docs/components-searchfield--docs).
+
+<Canvas of={Stories.Uncontrolled} />
+
+## When to use
+
+- Names, emails, URLs, phone numbers, passwords and numbers.
+- Any form field that needs a visible label with help or error text.
+
+**Use something else when:**
+- the text runs over several lines → [TextArea](?path=/docs/components-textarea--docs)
+- the field is a search box → [SearchField](?path=/docs/components-searchfield--docs)
+- the user picks from a list → [Select](?path=/docs/components-select--docs)
+
+## Usage
+
+```tsx
+import { TextField } from "@arshad-shah/cynosure";
+import { mail } from "@arshad-shah/cynosure/icons";
+
+<TextField label="Email" type="email" name="email" required iconStart={mail} clearable />
+<TextField label="Name" value={name} onChange={setName} error={nameError} />
+<TextField label="Token" type="password" description="Stored locally" />
+```
+
+`onChange` receives the string value. Use `value` for controlled state or `defaultValue` for uncontrolled. `type` is one of `text` (default), `email`, `url`, `tel`, `password`, `number` or `search`.
+
+## Clear button
+
+`clearable` shows a clear button while the field has a value. It is hidden when the field is disabled. Change its accessible name with `labels.clear`.
+
+<Canvas of={Stories.ClearButton} />
+
+## Errors and disabled
+
+`error` marks the field invalid (`aria-invalid`) and shows the message with the field. `description` adds help text.
+
+<Canvas of={Stories.ErrorAndDisabled} />
+
+## Options
+
+- **`variant`:** `outline` (default) or `soft` (tinted, borderless until focus).
+- **`size`:** `sm`, `md` or `lg`. Heights match Button and Select.
+- **`iconStart` and `iconEnd`:** icons at either edge, flipped in right-to-left layouts.
+- **`labelHidden`:** hides the label visually while it still names the field. Prefer a visible label.
+- Native input attributes such as `name`, `required`, `readOnly`, `maxLength`, `autoComplete` and `inputMode` pass through.
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+- **Label, description and error** are linked to the input through `Field`.
+- **Forms:** works with `FormData`, `form.reset()` and `required` validation. The clear button syncs after reset.
+- **Clear button:** an [IconButton](?path=/docs/components-iconbutton--docs) that clears the value and returns focus to the input.
+- **Refs:** the ref points at the input element.
+
+## Theming
+
+Tokens: `--cy-text-field-{height-sm,height-md,height-lg,radius,padding-inline,bg,border,soft-bg}`.
+
+```ts
+createTheme({ components: { textField: { radius: "10px", paddingInline: "14px" } } });
+```
+
+## Related
+
+[SearchField](?path=/docs/components-searchfield--docs) · [TextArea](?path=/docs/components-textarea--docs) · [Select](?path=/docs/components-select--docs) · [IconButton](?path=/docs/components-iconbutton--docs)

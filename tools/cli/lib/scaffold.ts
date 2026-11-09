@@ -194,6 +194,49 @@ import { ${Name} } from "@arshad-shah/cynosure";
 TODO(cy): list the products that use ${Name} (two or more, or one essential use).
 `;
 
+const docsPage = (
+  Name: string,
+  k: string,
+) => `import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./${Name}.stories";
+
+<Meta of={Stories} />
+
+# ${Name}
+
+TODO(cy): what ${Name} is, in one or two sentences, and what to use instead when it is the wrong fit.
+
+<Canvas of={Stories.Default} />
+
+## When to use
+
+TODO(cy): when to reach for ${Name}, and "Use something else when" with links to the alternatives.
+
+## Usage
+
+\`\`\`tsx
+import { ${Name} } from "@arshad-shah/cynosure";
+
+<${Name}>…</${Name}>
+\`\`\`
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+TODO(cy): keyboard table, focus, announcements, touch. Only what the stories prove.
+
+## Theming
+
+Tokens: \`--cy-${k}-gap\`.
+
+## Related
+
+TODO(cy): links to related components.
+`;
+
 /** `cy new component <Name> --kind foundation|composite` */
 export function scaffoldComponent(root: string, Name: string, kind: "foundation" | "composite"): string[] {
   if (!/^[A-Z][A-Za-z0-9]+$/.test(Name)) throw new Error(`Component names are PascalCase: got "${Name}"`);
@@ -208,6 +251,7 @@ export function scaffoldComponent(root: string, Name: string, kind: "foundation"
     [`${k}.css`]: css(k),
     [`${Name}.stories.tsx`]: stories(Name, k, kind === "foundation" ? "Foundations" : "Components"),
     "README.md": readme(Name, k, kind),
+    [`${Name}.mdx`]: docsPage(Name, k),
     "index.ts": `export { ${Name}, type ${Name}Props, type ${Name}Tokens } from "./${Name}.js";\n`,
   };
   for (const [file, text] of Object.entries(files)) writeFileSync(join(dir, file), text);

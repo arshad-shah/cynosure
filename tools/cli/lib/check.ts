@@ -219,6 +219,14 @@ function structureRules(root: string, out: Violation[]) {
           line: 1,
           message: "needs a README.md with a '## Used by' section",
         });
+      const page = join(folder, `${name}.mdx`);
+      if (!existsSync(page) || !readFileSync(page, "utf8").includes("<Meta of={Stories}"))
+        out.push({
+          rule: "docs",
+          file: rel,
+          line: 1,
+          message: `needs a hand-written ${name}.mdx docs page with <Meta of={Stories} /> (what it is, when to use it, examples, props, accessibility, tokens)`,
+        });
     }
   }
 }
@@ -274,7 +282,7 @@ export function check(root: string): Violation[] {
       (file.endsWith(".css") || (file.endsWith(".tsx") && !isStory(file)))
     )
       literalRules(root, file, out);
-    if (/\.(tsx?|css|md)$/.test(file) && !file.endsWith("AGENTS.md")) {
+    if (/\.(tsx?|css|mdx?)$/.test(file) && !file.endsWith("AGENTS.md")) {
       const text = readFileSync(file, "utf8");
       for (const m of text.matchAll(/TODO\(cy\)/g))
         out.push({

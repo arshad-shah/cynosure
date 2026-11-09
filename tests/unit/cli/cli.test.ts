@@ -136,6 +136,13 @@ describe("cy check", () => {
     rmSync(join(root, "src/components/IconButton/README.md"));
     expect(rules(root)).toContain("structure");
   });
+  it("requires a hand-written docs page attached to the stories for every component", () => {
+    const root = sandbox();
+    rmSync(join(root, "src/components/Button/Button.mdx"));
+    write(root, "src/foundations/LinkBase/LinkBase.mdx", "# LinkBase\n\nNo Meta here.\n");
+    const docs = check(root).filter((v) => v.rule === "docs");
+    expect(docs.map((v) => v.file).sort()).toEqual(["src/components/Button", "src/foundations/LinkBase"]);
+  });
 });
 
 describe("cy new component", () => {
@@ -147,9 +154,13 @@ describe("cy new component", () => {
       "scaffold-probe.css",
       "ScaffoldProbe.stories.tsx",
       "README.md",
+      "ScaffoldProbe.mdx",
       "index.ts",
     ])
       expect(existsSync(join(root, "src/components/ScaffoldProbe", f))).toBe(true);
+    expect(readFileSync(join(root, "src/components/ScaffoldProbe/ScaffoldProbe.mdx"), "utf8")).toContain(
+      "<Meta of={Stories} />",
+    );
     expect(readFileSync(join(root, "src/index.ts"), "utf8")).toContain(
       'export { ScaffoldProbe, type ScaffoldProbeProps } from "./components/ScaffoldProbe/index.js";',
     );

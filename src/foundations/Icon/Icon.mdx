@@ -1,0 +1,82 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./Icon.stories";
+
+<Meta of={Stories} />
+
+# Icon
+
+Renders a Facet icon as inline SVG. It is a foundation, and the one that has visual opinions: stroke only, `currentColor`, sized and toned through tokens.
+
+## Who uses it
+
+[Button](?path=/docs/components-button--docs), [IconButton](?path=/docs/components-iconbutton--docs), [Link](?path=/docs/components-link--docs), [Badge](?path=/docs/components-badge--docs), [TextField](?path=/docs/components-textfield--docs), [TextArea](?path=/docs/components-textarea--docs), [Select](?path=/docs/components-select--docs), [SegmentedControl](?path=/docs/components-segmentedcontrol--docs), [Checkbox](?path=/docs/components-checkbox--docs) rows and [Toolbar](?path=/docs/components-toolbar--docs) content, among others.
+
+## When to use it directly
+
+Product code can use Icon directly for a standalone glyph next to text or in your own layout. Most of the time you pass an icon to a component's `icon` prop instead.
+
+**Use a component instead when** the icon is the control: [IconButton](?path=/docs/components-iconbutton--docs) requires a label and shows it as a tooltip.
+
+<Canvas of={Stories.Sizes} />
+
+## Usage
+
+```tsx
+import { Icon } from "@arshad-shah/cynosure";
+import { search } from "@arshad-shah/cynosure/icons";
+
+<Icon icon={search} />                              // decorative (aria-hidden)
+<Icon icon={search} label="Search" />               // role="img" with a name
+<Icon icon={search} size="lg" tone="accent" />      // sm 14 · md 16 · lg 20 · or px
+<Icon icon={search} color="#14b8a6" />              // one-off colour
+```
+
+Import icons by name so unused ones are tree-shaken. Reserved words get an `Icon` suffix (`packageIcon`).
+
+## Props
+
+<ArgTypes of={Stories} />
+
+- **`size`:** `sm` 14, `md` 16 (default), `lg` 20 (all times `--cy-scale`), or a number in px.
+- **`tone`:** `inherit` (default, the current text colour), `accent`, `neutral`, `muted`, `danger`, `success`, `warning` or `info`.
+- **`color`:** any CSS colour; overrides `tone` for one-off cases.
+- **`style`:** layout only.
+
+<Canvas of={Stories.TonesAndColour} />
+
+## Accessibility
+
+Icons are decorative by default (`aria-hidden`). Pass `label` to give one `role="img"` and that accessible name.
+
+<Canvas of={Stories.Decorative} />
+<Canvas of={Stories.Labelled} />
+
+## The icon registry
+
+Facet icons share one grammar: a 24 grid, a 1.75 round stroke, softened-square geometry and stroke only (no fills). Each icon is one file in `src/icons` and has a `category` from `ICON_CATEGORIES`: arrows, navigation, actions, editing, files, data, media, communication, status, time, security, people, devices, design and layout.
+
+The Gallery below shows every icon by category. Hover a tile to see its motion.
+
+<Canvas of={Stories.Gallery} />
+
+## Motion
+
+Some icons animate a moving part. The animation plays when an ancestor has `.cy-motion-trigger` and is hovered, keyboard-focused or `[data-active]`. Durations follow `--cy-motion-slow`, and reduced motion turns it off. The shared motions are `tilt`, `rotate`, `flip`, `draw`, `lift`, `drop`, `spin`, `pop`, `nudge` and `slide`.
+
+<Canvas of={Stories.MotionOnActive} />
+
+## Adding an icon
+
+1. Draw it on a 24 grid with strokes only (no fills, no text, no accent dot) and export the SVG.
+2. Run `pnpm cy new icon <name> --from icon.svg --category <category>`.
+3. In the generated file, set `motion` and mark the moving part with `animate: true`.
+
+`validateIcon` (run by the tests and the generator) rejects text, any fill, unknown categories, off-grid geometry and bad names. See `docs/icons.md` and `src/icons/AGENTS.md`.
+
+## Theming
+
+Tokens: `--cy-icon-size-{sm,md,lg}` and `--cy-icon-stroke` (default 1.75).
+
+## Related
+
+[IconButton](?path=/docs/components-iconbutton--docs) · [Button](?path=/docs/components-button--docs)

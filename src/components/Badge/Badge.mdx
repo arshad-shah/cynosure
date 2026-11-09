@@ -1,0 +1,57 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./Badge.stories";
+
+<Meta of={Stories} />
+
+# Badge
+
+A small status or category label in the mono "eyebrow" style. It only labels; it does nothing when clicked. For an action use [Button](?path=/docs/components-button--docs).
+
+<Canvas of={Stories.EveryToneAndVariantIsReadable} />
+
+## When to use
+
+- **Status:** Saved, Failed, Pending.
+- **Category or type:** node kinds, column types, plan names.
+- **`soft` (default):** the quiet choice for lists and tables.
+- **`solid`:** a status that must stand out. **`outline`:** a label in busy or tinted surroundings.
+
+**Use something else when:**
+- it can be clicked or dismissed → [Button](?path=/docs/components-button--docs)
+- it navigates → [Link](?path=/docs/components-link--docs)
+- it shows progress → [LoadingDots](?path=/docs/components-loadingdots--docs)
+
+## Usage
+
+```tsx
+import { Badge } from "@arshad-shah/cynosure";
+import { check } from "@arshad-shah/cynosure/icons";
+
+<Badge tone="success" icon={check}>Saved</Badge>
+<Badge tone="danger" variant="solid">Failed</Badge>
+<Badge size="sm" variant="outline">Beta</Badge>
+```
+
+## Tone, variant and size
+
+`tone` is `accent`, `neutral` (default), `danger`, `success`, `warning` or `info`. `variant` is `soft`, `solid` or `outline`. `size` is `sm`, `md` or `lg`. An optional `icon` sits before the text. Every tone and variant keeps text at 4.5:1 or better (tested).
+
+Tone carries meaning, but keep the text meaningful too: don't rely on colour alone to say "failed".
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Theming
+
+Tokens: `--cy-badge-radius`, `--cy-badge-tracking` and `--cy-badge-soft-mix`.
+
+```ts
+createTheme({ components: { badge: { radius: "999px", tracking: "0.04em" } } });
+```
+
+`className` and `style` are for layout only.
+
+## Related
+
+[Button](?path=/docs/components-button--docs) · [Link](?path=/docs/components-link--docs) · [Inline](?path=/docs/components-inline--docs)

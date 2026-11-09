@@ -1,0 +1,50 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./ButtonBase.stories";
+
+<Meta of={Stories} />
+
+# ButtonBase
+
+The native `<button>` for Cynosure, and the only module allowed to render one. It is a foundation: thin, unstyled, and meant to be built on by components rather than used in product code.
+
+## Who uses it
+
+[Button](?path=/docs/components-button--docs), [IconButton](?path=/docs/components-iconbutton--docs), [Card](?path=/docs/components-card--docs) (when interactive) and [Select](?path=/docs/components-select--docs) build on it, along with other composites that need a clickable control.
+
+## When to use it directly
+
+Only when you are building a new composite that needs a button with behaviour of its own and none of the existing components fit. Style it with your own classes; ButtonBase adds none.
+
+**Use a component instead when** you want a normal button ([Button](?path=/docs/components-button--docs)) or an icon-only action with a label and tooltip ([IconButton](?path=/docs/components-iconbutton--docs)).
+
+<Canvas of={Stories.DefaultsToTypeButton} />
+
+## Usage
+
+```tsx
+import { ButtonBase } from "@arshad-shah/cynosure";
+
+<ButtonBase className="my-toggle" pressed={on} onClick={() => setOn(!on)}>
+  Bold
+</ButtonBase>
+<ButtonBase type="submit">Send</ButtonBase>
+```
+
+## Props
+
+It accepts every native button attribute except `type`, which is narrowed to `"button" | "submit" | "reset"`.
+
+<ArgTypes of={Stories} />
+
+## Guarantees
+
+- `type` defaults to `"button"`, so it never submits a form by accident. Pass `type="submit"` to submit.
+- `pressed` is mirrored to `aria-pressed` and `data-pressed`.
+- The ref reaches the native `<button>`.
+- No styling: components add their own classes.
+
+<Canvas of={Stories.MirrorsPressed} />
+
+## Related
+
+[Button](?path=/docs/components-button--docs) · [IconButton](?path=/docs/components-iconbutton--docs)

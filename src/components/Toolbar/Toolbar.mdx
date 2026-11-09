@@ -1,0 +1,87 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./Toolbar.stories";
+
+<Meta of={Stories} />
+
+# Toolbar
+
+Groups related controls into one named bar with a single Tab stop, following the WAI-ARIA toolbar pattern. Arrow keys move between the controls. For one standalone action, use [Button](?path=/docs/components-button--docs).
+
+<Canvas of={Stories.OneTabStopArrowsHomeEnd} />
+
+## When to use
+
+- Three or more related controls in a row: editor actions, tree actions, table headers, popup chrome.
+- Mixed controls that should share one Tab stop (buttons, a [SegmentedControl](?path=/docs/components-segmentedcontrol--docs), a search field).
+
+**Use something else when:**
+- you have one or two actions → place [Button](?path=/docs/components-button--docs)s directly
+- the controls are page navigation → links in a navigation landmark
+
+## Usage
+
+```tsx
+import { IconButton, SearchField, SegmentedControl, Toolbar } from "@arshad-shah/cynosure";
+import { code, edit, tree } from "@arshad-shah/cynosure/icons";
+
+<Toolbar label="Document actions">
+  <IconButton icon={edit} label="Edit" />
+  <SegmentedControl
+    label="View"
+    defaultValue="tree"
+    options={[
+      { value: "tree", label: "Tree", icon: tree },
+      { value: "raw", label: "Raw", icon: code },
+    ]}
+  />
+  <SearchField label="Search" labelHidden />
+</Toolbar>
+```
+
+`label` is required: a toolbar must have an accessible name.
+
+## Fields in a toolbar
+
+Text fields keep their own arrow, Home and End keys, so typing still works. Fields sit level with the buttons.
+
+<Canvas of={Stories.FieldsSitLevelWithButtons} />
+
+## Vertical toolbars
+
+Set `orientation="vertical"` to use Up and Down instead of Left and Right.
+
+<Canvas of={Stories.VerticalUsesUpAndDown} />
+
+`loop` (default `true`) wraps from the last control to the first. Set `loop={false}` to stop at the ends.
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+| Input | Result |
+| --- | --- |
+| <kbd>Tab</kbd> | Enters the toolbar on one control, then leaves it. Returning lands on the last focused control |
+| Left and Right arrows | Move focus (flipped in right-to-left layouts) |
+| Up and Down arrows | Move focus in a vertical toolbar |
+| <kbd>Home</kbd>, <kbd>End</kbd> | Jump to the first or last control |
+
+- **Disabled controls** are skipped.
+- **Radios** inside (SegmentedControl) are separate stops: arrows move focus and <kbd>Space</kbd> selects, as in the APG toolbar pattern.
+- **Late additions:** controls added after render join the group automatically.
+- **Role:** `role="toolbar"` with `aria-label` and `aria-orientation`.
+
+## Theming
+
+Tokens: `--cy-toolbar-gap` and `--cy-toolbar-padding`.
+
+```ts
+createTheme({ components: { toolbar: { gap: "4px", padding: "6px" } } });
+```
+
+`className` and `style` are for layout only.
+
+## Related
+
+[Button](?path=/docs/components-button--docs) · [IconButton](?path=/docs/components-iconbutton--docs) · [SegmentedControl](?path=/docs/components-segmentedcontrol--docs) · [SearchField](?path=/docs/components-searchfield--docs)

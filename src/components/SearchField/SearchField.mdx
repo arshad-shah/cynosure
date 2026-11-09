@@ -1,0 +1,63 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./SearchField.stories";
+
+<Meta of={Stories} />
+
+# SearchField
+
+A [TextField](?path=/docs/components-textfield--docs) preset for search: it has a search icon, is clearable, and submits on Enter. For a plain text input, use TextField.
+
+<Canvas of={Stories.SubmitsOnEnter} />
+
+## When to use
+
+- A search or filter box above a list, table or document.
+- Search inside a [Toolbar](?path=/docs/components-toolbar--docs).
+
+**Use something else when:**
+- the input is not a search → [TextField](?path=/docs/components-textfield--docs)
+- the user picks from a fixed list → [Select](?path=/docs/components-select--docs)
+
+## Usage
+
+```tsx
+import { SearchField } from "@arshad-shah/cynosure";
+
+<SearchField label="Search documents" onChange={setQuery} onSubmit={runSearch} />
+<SearchField label="Search" labelHidden size="sm" />
+```
+
+## Submit and clear
+
+`onSubmit(value)` runs on Enter. It is ignored while an IME composition is active, so confirming a candidate never submits early. The clear button shows while the field has a value; set `clearable={false}` to remove it.
+
+<Canvas of={Stories.EscapeClearsThenBlurs} />
+
+## Props
+
+SearchField takes every [TextField](?path=/docs/components-textfield--docs) prop except `type` and `iconStart`, plus `onSubmit`.
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+| Input | Result |
+| --- | --- |
+| <kbd>Enter</kbd> | Calls `onSubmit` with the current value (not during IME composition) |
+| <kbd>Escape</kbd> | Clears the field if it has a value; when empty, blurs it |
+
+- **Role:** it is a native `type="search"` input, exposed as a search box.
+- **Label:** a visible label is preferred. `labelHidden` hides it visually but it still names the field.
+- **Refs:** the ref points at the input element.
+
+## Theming
+
+SearchField has no tokens of its own. It uses the TextField tokens: `--cy-text-field-{height-sm,height-md,height-lg,radius,padding-inline,bg,border,soft-bg}`.
+
+```ts
+createTheme({ components: { textField: { radius: "999px" } } });
+```
+
+## Related
+
+[TextField](?path=/docs/components-textfield--docs) · [IconButton](?path=/docs/components-iconbutton--docs) · [Toolbar](?path=/docs/components-toolbar--docs)

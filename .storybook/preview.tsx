@@ -31,7 +31,7 @@ function HostileHost() {
   return null;
 }
 
-const withCynosure: Decorator = (Story, { globals }) => {
+const withCynosure: Decorator = (Story, { globals, viewMode }) => {
   const accent = ACCENTS[globals.accent as string];
   const theme = createTheme({
     ...(accent ? { accent } : {}),
@@ -45,7 +45,8 @@ const withCynosure: Decorator = (Story, { globals }) => {
           background: "var(--cy-color-bg)",
           color: "var(--cy-color-ink)",
           padding: 24,
-          minHeight: "100vh",
+          // Full height on a story page; natural height inside a docs page so examples stay compact.
+          minHeight: viewMode === "docs" ? undefined : "100vh",
           boxSizing: "border-box",
         }}
       >
@@ -62,7 +63,6 @@ const choice = (title: string, items: string[], icon?: string) => ({
 const preview: Preview = {
   decorators: [withCynosure],
   parameters: { a11y: { test: "error" }, layout: "fullscreen" },
-  tags: ["autodocs"],
   globalTypes: {
     mode: choice("Mode", ["light", "dark", "system"], "mirror"),
     contrast: choice("Contrast", ["normal", "more"], "contrast"),

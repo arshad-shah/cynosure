@@ -1,0 +1,85 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./SegmentedControl.stories";
+
+<Meta of={Stories} />
+
+# SegmentedControl
+
+A compact single choice for view switchers and modes, such as Tree or Raw. Segments sit side by side and exactly one is active. For a longer list of options use [RadioGroup](?path=/docs/components-radiogroup--docs) or [Select](?path=/docs/components-select--docs).
+
+<Canvas of={Stories.ArrowKeysSelect} />
+
+## When to use
+
+- Switching how the same content is shown (Tree / Raw, List / Grid).
+- A small set of modes where all options should stay visible.
+- Icon-only switches in toolbars, such as [ThemeToggle](?path=/docs/components-themetoggle--docs).
+
+**Use something else when:**
+- options need descriptions or there are many → [RadioGroup](?path=/docs/components-radiogroup--docs) or [Select](?path=/docs/components-select--docs)
+- it is one on/off setting → [Switch](?path=/docs/components-switch--docs)
+- it navigates between pages → [Link](?path=/docs/components-link--docs)
+
+## Usage
+
+```tsx
+import { SegmentedControl } from "@arshad-shah/cynosure";
+import { code, tree } from "@arshad-shah/cynosure/icons";
+
+<SegmentedControl
+  label="View"
+  defaultValue="tree"
+  onChange={setView}
+  options={[
+    { value: "tree", label: "Tree", icon: tree },
+    { value: "raw", label: "Raw", icon: code },
+  ]}
+/>
+```
+
+`label` names the group for assistive technology. Use `value` and `onChange(value)` for controlled state, or `defaultValue` for uncontrolled.
+
+## Icon-only segments
+
+With `iconOnly`, only the icons show. Each option's `label` stays as its accessible name, so it is still required.
+
+<Canvas of={Stories.IconOnlySegmentsAreNamed} />
+
+## Options
+
+- **`fullWidth`:** stretches the control to fill its container.
+- **`size`:** `sm`, `md` or `lg`.
+- **`tone`:** colours the active segment's content (default `neutral`).
+- **`disabled`:** on the control or on a single option.
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+| Input | Result |
+| --- | --- |
+| <kbd>Tab</kbd> | Moves focus into the group |
+| Arrow keys | Move and select the next or previous segment |
+| Click, tap | Selects the segment |
+
+- **Native radios:** the control is a `radiogroup` of native radios, so forms and reset work.
+- **No duplicate events:** activating the current segment again never fires `onChange`.
+- **Names:** every segment is named by its `label`, including icon-only ones.
+
+## Touch
+
+On coarse pointers (phones and tablets) segments grow to a larger hit area without changing the visible layout.
+
+## Theming
+
+Tokens: `--cy-segmented-control-{radius,track-bg,active-bg,padding}`.
+
+```ts
+createTheme({ components: { segmentedControl: { radius: "999px", padding: "3px" } } });
+```
+
+## Related
+
+[ThemeToggle](?path=/docs/components-themetoggle--docs) · [RadioGroup](?path=/docs/components-radiogroup--docs) · [Select](?path=/docs/components-select--docs) · [Toolbar](?path=/docs/components-toolbar--docs)
