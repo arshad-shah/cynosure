@@ -153,7 +153,7 @@ export const Variants: Story = {
 };
 
 export const TouchTarget: Story = {
-  tags: ["touch"],
+  tags: ["touch", "!dev"],
   play: async ({ canvas, userEvent }) => {
     const trigger = canvas.getByRole("button", { name: "Advanced options" });
     await expect(trigger.getBoundingClientRect().height).toBeGreaterThanOrEqual(44);

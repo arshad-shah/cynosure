@@ -296,6 +296,18 @@ export function check(root: string): Violation[] {
       (file.endsWith(".css") || (file.endsWith(".tsx") && !isStory(file)))
     )
       literalRules(root, file, out);
+    if (isStory(file)) {
+      // Touch stories only pass under the touch project's emulation; on the published Storybook they would fail.
+      const text = readFileSync(file, "utf8");
+      for (const m of text.matchAll(/tags:\s*\[([^\]]*)\]/g))
+        if (/["']touch["']/.test(m[1] ?? "") && !/["']!dev["']/.test(m[1] ?? ""))
+          out.push({
+            rule: "touch-hidden",
+            file: rel,
+            line: lineOf(text, m.index ?? 0),
+            message: 'a story tagged "touch" also needs "!dev" (it only passes under touch emulation)',
+          });
+    }
     if (/\.(tsx?|css|mdx?)$/.test(file) && !file.endsWith("AGENTS.md")) {
       const text = readFileSync(file, "utf8");
       for (const m of text.matchAll(/TODO\(cy\)/g))

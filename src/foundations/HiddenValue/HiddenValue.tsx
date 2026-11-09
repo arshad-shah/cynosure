@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useLayoutEffect, useRef } from "react";
 
 export interface HiddenValueProps {
   name?: string | undefined;
@@ -31,16 +31,16 @@ export function HiddenValue({
   onInvalid,
 }: HiddenValueProps) {
   const ref = useRef<HTMLInputElement>(null);
-  useEffect(() => {
+  useLayoutEffect(() => {
     ref.current?.setCustomValidity(required && !value ? requiredMessage : "");
   }, [required, value, requiredMessage]);
-  useEffect(() => {
+  useLayoutEffect(() => {
     const input = ref.current;
     if (!input || !onInvalid) return;
     input.addEventListener("invalid", onInvalid);
     return () => input.removeEventListener("invalid", onInvalid);
   }, [onInvalid]);
-  useEffect(() => {
+  useLayoutEffect(() => {
     const owner = ref.current?.form;
     if (!owner || !onReset) return;
     owner.addEventListener("reset", onReset);

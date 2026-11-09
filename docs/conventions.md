@@ -10,6 +10,7 @@ The rules in `AGENTS.md` are enforced by `pnpm check`:
 | `literals`        | hex or px literals in component CSS/TSX outside `var()` fallbacks                           |
 | `structure`       | a component without a stories file containing `play:` or a README with `## Used by`         |
 | `docs`            | a component or foundation without a hand-written `<Name>.mdx` using `<Meta of={Stories} />` |
+| `touch-hidden`    | a story tagged `touch` without `!dev` (it would fail on the published Storybook)            |
 | `scaffold-todo`   | an unfinished `TODO(cy)` from a generator                                                   |
 | `agents`          | a documented folder without `AGENTS.md`                                                     |
 

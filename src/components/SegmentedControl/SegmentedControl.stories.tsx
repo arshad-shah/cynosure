@@ -88,7 +88,7 @@ export const IndicatorFollowsSelectionAndResets: Story = {
 };
 
 export const CoarsePointerSegments: Story = {
-  tags: ["touch"],
+  tags: ["touch", "!dev"],
   play: async ({ canvasElement }) => {
     for (const s of canvasElement.querySelectorAll(".cy-segment"))
       await expect(s.getBoundingClientRect().height).toBeGreaterThanOrEqual(44);

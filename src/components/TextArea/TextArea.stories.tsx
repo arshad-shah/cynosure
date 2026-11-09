@@ -192,7 +192,7 @@ export const NotResizableWhenAskedOrDisabled: Story = {
 };
 
 export const TouchDragResizes: Story = {
-  tags: ["touch"],
+  tags: ["touch", "!dev"],
   args: { label: "Notes", rows: 3 },
   play: async ({ canvas, canvasElement }) => {
     const area = canvas.getByRole("textbox", { name: "Notes" });

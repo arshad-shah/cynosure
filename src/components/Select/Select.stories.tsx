@@ -186,7 +186,7 @@ export const FlipsAboveNearTheBottom: Story = {
 };
 
 export const CoarsePointerRows: Story = {
-  tags: ["touch"],
+  tags: ["touch", "!dev"],
   play: async ({ canvas, userEvent }) => {
     await userEvent.click(canvas.getByRole("combobox"));
     for (const option of canvas.getAllByRole("option"))

@@ -161,8 +161,8 @@ export function TabList({ label, className, children }: TabListProps) {
   const { size, variant, value } = useTabs("TabList");
   const ref = useRef<HTMLDivElement>(null);
   useRovingFocus(ref, { selector: '[role="tab"]' });
-  // Keep the selected (or focused) tab fully visible and clear of the faded edges. The target is absolute (from
-  // offsets, not live rects), so repeated key presses during a smooth scroll still land in the right place.
+  // Keep the selected (or focused) tab fully visible and clear of the faded edges. The target is a position in the
+  // content (not relative to the current scroll), so repeated key presses during a smooth scroll still land right.
   const reveal = useCallback((tab: HTMLElement | null) => {
     const list = ref.current;
     if (!list || !tab || !list.contains(tab)) return;
@@ -172,8 +172,11 @@ export function TabList({ label, className, children }: TabListProps) {
     const rtl = getComputedStyle(list).direction === "rtl";
     // Physical position from the left edge of the scrollable content (RTL scrollLeft runs from 0 down to -max).
     const current = rtl ? list.scrollLeft + max : list.scrollLeft;
-    const left = tab.offsetLeft;
-    const right = left + tab.offsetWidth;
+    // Where the tab starts in the scrollable content, measured from the list itself (offsetLeft depends on the offset
+    // parent and on how the engine handles right-to-left scrolling; rects read in the same frame do not).
+    const box = tab.getBoundingClientRect();
+    const left = box.left - list.getBoundingClientRect().left - list.clientLeft + current;
+    const right = left + box.width;
     let target = current;
     if (left - pad < current) target = left - pad;
     else if (right + pad > current + list.clientWidth) target = right + pad - list.clientWidth;

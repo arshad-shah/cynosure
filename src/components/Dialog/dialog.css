@@ -31,19 +31,22 @@
   text-align: start;
   text-transform: none;
   outline: none;
+  /* The fade runs on the dialog itself (scrim and panel together): WebKit does not reliably run @starting-style
+     transitions on descendants of an element entering the top layer. The panel only scales or slides. */
+  opacity: 1;
   transition:
-    background-color var(--cy-motion-base) var(--cy-motion-ease),
+    opacity var(--cy-motion-base) var(--cy-motion-ease),
     display var(--cy-motion-base) allow-discrete,
     overlay var(--cy-motion-base) allow-discrete;
   &[open] {
     display: grid;
   }
   &:not([open]) {
-    background-color: transparent;
+    opacity: 0;
   }
   @starting-style {
     &[open] {
-      background-color: transparent;
+      opacity: 0;
     }
   }
   &::backdrop {
@@ -76,22 +79,18 @@
   color: var(--cy-color-ink);
   box-shadow: var(--cy-shadow-lg);
   font-size: var(--cy-font-size-md);
-  opacity: 1;
   scale: 1;
   translate: 0 0;
   transition:
-    opacity var(--cy-motion-base) var(--cy-motion-ease),
     scale var(--cy-motion-base) var(--cy-motion-ease),
     translate var(--cy-motion-base) var(--cy-motion-ease);
 }
 .cy-dialog.cy-dialog:not([open]) .cy-dialog-panel {
-  opacity: 0;
   scale: var(--_from-scale);
   translate: var(--_from-translate);
 }
 @starting-style {
   .cy-dialog.cy-dialog[open] .cy-dialog-panel {
-    opacity: 0;
     scale: var(--_from-scale);
     translate: var(--_from-translate);
   }

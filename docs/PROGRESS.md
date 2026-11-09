@@ -137,6 +137,11 @@ None. Npm publish and deprecating the old packages wait for Arshad's authorisati
 - **2026-11-09 (visual baselines):** Chromium on Linux. Refresh by pushing a commit to `next` containing `[baselines]` (dispatch needs the workflow on `main`).
 - **2026-11-09 (Plan 2 review):** six Important findings fixed. The deferred minors are listed in the Plan 2 final review section of the controls ledger.
 - **2026-11-09 (Plan 3):** docs pages are hand-written. Firefox stories run in their own pass, with `window.focus()` before each story and no retries.
+- **2026-11-09 (published Storybook fixes, after the Dialog merge):**
+  - touch stories are tagged `["touch", "!dev"]`: they run in the touch project but stay off the published Storybook, where a desktop pointer fails them. `cy check` enforces it (`touch-hidden`).
+  - ChoiceBase (`indeterminate`) and HiddenValue (validity, invalid and reset listeners) use layout effects: production React runs passive effects after paint, so the mixed state flashed and validity was stale right after mount. Found by loading every story of the built Storybook.
+  - Dialog fades on the `<dialog>` itself, not the panel: WebKit left the panel at opacity 0 (CI failure).
+  - Tabs `reveal()` measures tabs from rects relative to the list, not `offsetLeft` (WebKit RTL CI failure).
 
 ## Verification
 

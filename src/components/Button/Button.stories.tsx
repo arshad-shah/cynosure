@@ -137,7 +137,7 @@ export const HitTargetCompact: Story = {
 };
 
 export const HitTargetCoarsePointer: Story = {
-  tags: ["touch"],
+  tags: ["touch", "!dev"],
   args: { size: "sm" },
   play: async ({ canvas, args, userEvent }) => {
     await expect(matchMedia("(pointer: coarse)").matches).toBe(true);

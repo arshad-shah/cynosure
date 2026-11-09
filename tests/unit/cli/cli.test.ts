@@ -106,6 +106,21 @@ describe("cy check", () => {
     write(root, "src/components/Button/part.css", ".cy-probe-part { display: block; font-size: inherit; }\n");
     expect(rules(root)).not.toContain("inherit-chain");
   });
+  it("touch-hidden: a touch story must also be tagged !dev", () => {
+    const root = sandbox();
+    write(
+      root,
+      "src/components/Button/T.stories.tsx",
+      'export const T = { tags: ["touch"], play: async () => {} };\n',
+    );
+    expect(rules(root)).toContain("touch-hidden");
+    write(
+      root,
+      "src/components/Button/T.stories.tsx",
+      'export const T = { tags: ["touch", "!dev"], play: async () => {} };\n',
+    );
+    expect(rules(root)).not.toContain("touch-hidden");
+  });
   it("flags title= attributes", () => {
     const root = sandbox();
     write(root, "src/components/Button/T.tsx", 'export const T = () => <span title="Saved">x</span>;\n');

@@ -216,7 +216,7 @@ export const RightToLeftFlipsArrows: Story = {
 };
 
 export const TouchTargets: Story = {
-  tags: ["touch"],
+  tags: ["touch", "!dev"],
   play: async ({ canvas, userEvent }) => {
     const bold = canvas.getByRole("button", { name: "Bold" });
     const hit = getComputedStyle(bold, "::before");

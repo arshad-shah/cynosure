@@ -1,4 +1,4 @@
-import { forwardRef, type InputHTMLAttributes, useCallback, useEffect, useRef } from "react";
+import { forwardRef, type InputHTMLAttributes, useCallback, useLayoutEffect, useRef } from "react";
 
 export interface ChoiceBaseProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "type"> {
   type: "checkbox" | "radio";
@@ -23,7 +23,7 @@ export const ChoiceBase = forwardRef<HTMLInputElement, ChoiceBaseProps>(function
     },
     [forwarded],
   );
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (inner.current) inner.current.indeterminate = indeterminate;
   }, [indeterminate]);
   return <input ref={ref} className={`cy-choice-input${className ? ` ${className}` : ""}`} {...rest} />;

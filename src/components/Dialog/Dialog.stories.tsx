@@ -418,7 +418,7 @@ export const StableUnderHostileHost: Story = {
 };
 
 export const TouchCloseTarget: Story = {
-  tags: ["touch"],
+  tags: ["touch", "!dev"],
   play: async ({ canvas, userEvent }) => {
     await userEvent.pointer({
       keys: "[TouchA]",

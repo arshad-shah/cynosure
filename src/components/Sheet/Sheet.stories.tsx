@@ -134,7 +134,7 @@ export const StableUnderHostileHost: Story = {
 };
 
 export const TouchOpensAndCloses: Story = {
-  tags: ["touch"],
+  tags: ["touch", "!dev"],
   play: async ({ canvas, userEvent }) => {
     await userEvent.pointer({ keys: "[TouchA]", target: canvas.getByRole("button", { name: "Settings" }) });
     const el = dialogEl();

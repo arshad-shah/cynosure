@@ -89,7 +89,7 @@ export const ControlledValue: Story = {
 };
 
 export const CoarsePointerRows: Story = {
-  tags: ["touch"],
+  tags: ["touch", "!dev"],
   play: async ({ canvasElement }) => {
     for (const row of canvasElement.querySelectorAll(".cy-choice"))
       await expect(row.getBoundingClientRect().height).toBeGreaterThanOrEqual(44);

@@ -237,7 +237,7 @@ export const RightToLeftFlipsArrows: Story = {
 };
 
 export const TouchSelects: Story = {
-  tags: ["touch"],
+  tags: ["touch", "!dev"],
   play: async ({ canvas, userEvent }) => {
     const raw = canvas.getByRole("tab", { name: "Raw" });
     const hit = getComputedStyle(raw, "::before");

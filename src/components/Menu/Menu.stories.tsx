@@ -203,7 +203,7 @@ export const InsideAPopoverClosesOnlyItself: Story = {
 };
 
 export const TouchRows: Story = {
-  tags: ["touch"],
+  tags: ["touch", "!dev"],
   play: async ({ args, canvas, userEvent }) => {
     await userEvent.pointer({ keys: "[TouchA]", target: canvas.getByRole("button", { name: "Actions" }) });
     await canvas.findByRole("menu");

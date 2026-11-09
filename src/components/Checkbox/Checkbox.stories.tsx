@@ -94,7 +94,7 @@ export const CheckedShowsMark: Story = {
 };
 
 export const CoarsePointerRow: Story = {
-  tags: ["touch"],
+  tags: ["touch", "!dev"],
   play: async ({ canvasElement, canvas, args, userEvent }) => {
     const row = canvasElement.querySelector(".cy-choice") as HTMLElement;
     await expect(row.getBoundingClientRect().height).toBeGreaterThanOrEqual(44);

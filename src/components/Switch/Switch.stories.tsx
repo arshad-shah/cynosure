@@ -73,7 +73,7 @@ export const FormAndReset: Story = {
 };
 
 export const CoarsePointerRow: Story = {
-  tags: ["touch"],
+  tags: ["touch", "!dev"],
   play: async ({ canvasElement }) => {
     await expect(
       (canvasElement.querySelector(".cy-choice") as HTMLElement).getBoundingClientRect().height,
