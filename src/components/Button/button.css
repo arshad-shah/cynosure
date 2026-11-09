@@ -1,4 +1,31 @@
 /* Button. Every visual property reads a --cy-button-* token with a global fallback. */
+.cy-button-content {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cy-button-gap, var(--cy-space-3));
+  min-inline-size: 0;
+  max-inline-size: 100%;
+}
+
+.cy-button-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-inline-size: 0;
+}
+
+.cy-button-spinner {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  inline-size: 1.1em;
+  block-size: 1.1em;
+  border: calc(var(--cy-border-width) * 2) solid currentColor;
+  border-inline-end-color: transparent;
+  border-radius: 50%;
+  animation: cy-button-spin 0.7s linear infinite;
+}
+
 .cy-button {
   --_h: var(--cy-button-height-md, var(--cy-control-height-md));
   --_bg: var(--cy-button-secondary-bg, var(--cy-color-surface));
@@ -124,33 +151,6 @@
   .cy-button {
     --_hit: var(--cy-hit-coarse, 44px);
   }
-}
-
-.cy-button-content {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--cy-button-gap, var(--cy-space-3));
-  min-inline-size: 0;
-  max-inline-size: 100%;
-}
-
-.cy-button-label {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  min-inline-size: 0;
-}
-
-.cy-button-spinner {
-  position: absolute;
-  inset: 0;
-  margin: auto;
-  inline-size: 1.1em;
-  block-size: 1.1em;
-  border: calc(var(--cy-border-width) * 2) solid currentColor;
-  border-inline-end-color: transparent;
-  border-radius: 50%;
-  animation: cy-button-spin 0.7s linear infinite;
 }
 
 @keyframes cy-button-spin {

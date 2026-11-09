@@ -13,7 +13,6 @@ export const ButtonBase = forwardRef<HTMLButtonElement, ButtonBaseProps>(functio
   ref,
 ) {
   return (
-    // biome-ignore lint/a11y/useButtonType: type is always set from the prop (default "button")
     <button ref={ref} type={type} aria-pressed={pressed} data-pressed={pressed ? "" : undefined} {...rest} />
   );
 });

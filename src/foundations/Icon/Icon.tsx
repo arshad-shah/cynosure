@@ -28,7 +28,6 @@ export function Icon({ icon, label, size = "md", className, style }: IconProps) 
       {...(label ? { role: "img", "aria-label": label } : { "aria-hidden": true })}
     >
       {icon.body.map(([tag, { animate, ...attrs }], i) =>
-        // biome-ignore lint/suspicious/noArrayIndexKey: icon parts are static and ordered
         createElement(tag, { key: i, ...attrs, className: animate ? "cy-icon-animate" : undefined }),
       )}
       {star && (

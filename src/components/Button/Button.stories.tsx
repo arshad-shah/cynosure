@@ -162,7 +162,13 @@ function PressedToggle(props: React.ComponentProps<typeof Button>) {
 
 export const NeverSubmitsByDefault: Story = {
   render: (args) => (
-    <form data-testid="form" onSubmit={(e) => (e.preventDefault(), args.onClick?.(e as never))}>
+    <form
+      data-testid="form"
+      onSubmit={(e) => {
+        e.preventDefault();
+        args.onClick?.(e as never);
+      }}
+    >
       <Button>Export</Button>
     </form>
   ),
@@ -174,7 +180,12 @@ export const NeverSubmitsByDefault: Story = {
 
 export const SubmitsWhenTypeSubmit: Story = {
   render: (args) => (
-    <form onSubmit={(e) => (e.preventDefault(), args.onClick?.(e as never))}>
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        args.onClick?.(e as never);
+      }}
+    >
       <Button type="submit">Save</Button>
     </form>
   ),

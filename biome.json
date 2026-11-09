@@ -10,7 +10,20 @@
       "!**/__screenshots__"
     ]
   },
-  "formatter": { "indentStyle": "space", "lineWidth": 110 },
-  "linter": { "enabled": true },
-  "assist": { "enabled": true }
+  "formatter": {
+    "indentStyle": "space",
+    "lineWidth": 110
+  },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "complexity": {
+        "noImportantStyles": "off"
+      }
+    }
+  },
+  "assist": {
+    "enabled": true
+  },
+  "overrides": []
 }

@@ -18,7 +18,6 @@ function sortExports(text: string): string {
 const tsx = (
   Name: string,
   k: string,
-  kind: string,
 ) => `import { type CSSProperties, forwardRef, type ReactNode } from "react";
 
 export interface ${Name}Tokens {
@@ -126,7 +125,7 @@ export function scaffoldComponent(root: string, Name: string, kind: "foundation"
   const k = kebab(Name);
   mkdirSync(dir, { recursive: true });
   const files: Record<string, string> = {
-    [`${Name}.tsx`]: tsx(Name, k, kind),
+    [`${Name}.tsx`]: tsx(Name, k),
     [`${k}.css`]: css(k),
     [`${Name}.stories.tsx`]: stories(Name, k, kind === "foundation" ? "Foundations" : "Components"),
     "README.md": readme(Name, k, kind),
