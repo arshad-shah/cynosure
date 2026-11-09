@@ -26,10 +26,10 @@
   },
   "scripts": {
     "build": "pnpm css && vite build && tsc -p tsconfig.build.json",
-    "typecheck": "tsc",
+    "typecheck": "pnpm css && tsc",
     "lint": "biome check .",
     "format": "biome check --write .",
-    "test": "vitest run --project unit --project preact",
+    "test": "pnpm css && vitest run --project unit --project preact",
     "test:stories": "pnpm css && vitest run --project stories --project touch",
     "test:visual": "pnpm css && VITE_CY_VISUAL=1 CY_BROWSERS=chromium vitest run --project stories",
     "storybook": "pnpm css && storybook dev -p 6006 --no-open",
