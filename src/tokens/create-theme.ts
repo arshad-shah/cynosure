@@ -1,4 +1,4 @@
-import { bestContrast, contrastRatio, parseColor, shiftLightness, toHex } from "./color";
+import { bestContrast, CynosureThemeError, contrastRatio, parseColor, shiftLightness, toHex } from "./color";
 import { BASE_GLOBAL, BASE_PALETTES, DEFAULT_ACCENT, SCALES } from "./defaults";
 import type { ColorTokens, GlobalTokens, PaletteName, Theme, ThemeInput } from "./schema";
 
@@ -69,6 +69,16 @@ function contrastPalette(p: ColorTokens, dark: boolean): ColorTokens {
   return { ...p, ink: dark ? "#ffffff" : "#000000", muted, line: muted };
 }
 
+const SAFE_NAME = /^[a-z][a-z0-9-]*$/i;
+const UNSAFE_VALUE = /[;{}<>\\\n\r]|\/\*/;
+
+/** Rejects values that could escape a declaration or a <style> block when serialised. */
+function safeValue(where: string, value: string): string {
+  if (UNSAFE_VALUE.test(value))
+    throw new CynosureThemeError(`Cynosure token ${where} has an unsafe value "${value}".`);
+  return value;
+}
+
 /** Builds a complete theme from a product's partial input. Throws CynosureThemeError for invalid colours. */
 export function createTheme(input: ThemeInput = {}): Theme {
   const accent = input.accent ?? DEFAULT_ACCENT;
@@ -93,11 +103,24 @@ export function createTheme(input: ThemeInput = {}): Theme {
     "dark-contrast": contrastPalette(dark, true),
   };
   for (const [name, patch] of Object.entries(input.palettes ?? {}) as [PaletteName, Partial<ColorTokens>][]) {
-    for (const v of Object.values(patch)) if (typeof v === "string" && v.startsWith("#")) parseColor(v);
-    palettes[name] = { ...palettes[name], ...patch };
+    const clean: Partial<ColorTokens> = {};
+    for (const [k, v] of Object.entries(patch) as [keyof ColorTokens, string][])
+      clean[k] = toHex(parseColor(v));
+    palettes[name] = { ...palettes[name], ...clean };
   }
   const components: Record<string, Record<string, string>> = {};
-  for (const [name, tokens] of Object.entries(input.components ?? {}))
-    if (tokens) components[name] = { ...tokens };
+  for (const [name, tokens] of Object.entries(input.components ?? {})) {
+    if (!tokens) continue;
+    if (!SAFE_NAME.test(name))
+      throw new CynosureThemeError(`Cynosure component name "${name}" is not a valid token name.`);
+    const clean: Record<string, string> = {};
+    for (const [k, v] of Object.entries(tokens)) {
+      if (!SAFE_NAME.test(k))
+        throw new CynosureThemeError(`Cynosure token name "${name}.${k}" is not valid.`);
+      clean[k] = safeValue(`${name}.${k}`, String(v));
+    }
+    components[name] = clean;
+  }
+  for (const [k, v] of Object.entries(input.font ?? {})) safeValue(`font.${k}`, String(v));
   return { global: buildGlobal(input), palettes, components };
 }

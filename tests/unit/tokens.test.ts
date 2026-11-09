@@ -102,3 +102,26 @@ describe("themeToCss", () => {
     expect(themeToCss(createTheme({ motion: "reduced" }))).toContain("--cy-motion-base:0ms");
   });
 });
+
+describe("untrusted-looking theme input", () => {
+  it("rejects token values that could break out of a style block", () => {
+    expect(() => createTheme({ components: { button: { radius: "2px}body{display:none" } } })).toThrow(
+      CynosureThemeError,
+    );
+    expect(() => createTheme({ components: { button: { radius: "</style><script>" } } })).toThrow(
+      CynosureThemeError,
+    );
+    expect(() => createTheme({ components: { "bad name;": { radius: "2px" } } })).toThrow(CynosureThemeError);
+    expect(() => createTheme({ font: { sans: "x;}*{color:red" } })).toThrow(CynosureThemeError);
+  });
+  it("validates every palette override as a colour", () => {
+    expect(() => createTheme({ palettes: { light: { bg: "red;}" } } })).toThrow(CynosureThemeError);
+    expect(createTheme({ palettes: { light: { bg: "rgb(10 20 30)" } } }).palettes.light.bg).toBe("#0a141e");
+  });
+  it("resolves extreme chroma quickly instead of looping", () => {
+    const started = performance.now();
+    const { light } = createTheme({ accent: "oklch(0.5 1000000000 0)" }).palettes;
+    expect(performance.now() - started).toBeLessThan(50);
+    expect(contrastRatio(light.onAccent, light.accent)).toBeGreaterThanOrEqual(4.5);
+  });
+});
