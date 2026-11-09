@@ -1,0 +1,180 @@
+/* Shared choice row (Checkbox, Switch, RadioGroup). The native input sits over the drawn control. */
+.cy-choice-text {
+  font-size: inherit;
+  line-height: inherit;
+  display: grid;
+  gap: var(--cy-space-1);
+  padding-block: var(--cy-space-1);
+}
+.cy-choice-label {
+  font-size: inherit;
+  line-height: inherit;
+  margin: 0;
+  font-family: var(--cy-font-sans);
+  font-weight: var(--cy-font-weight-medium);
+  letter-spacing: normal;
+  text-transform: none;
+  color: var(--cy-color-ink);
+}
+.cy-choice-description {
+  line-height: var(--cy-font-line-height);
+  margin: 0;
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-font-size-sm);
+  font-weight: var(--cy-font-weight-regular);
+  letter-spacing: normal;
+  text-transform: none;
+  color: var(--cy-color-muted);
+}
+
+.cy-choice.cy-choice {
+  --_tone: var(--cy-color-accent);
+  --_on: var(--cy-color-on-accent);
+  --_box: var(--cy-checkbox-size, calc(16px * var(--cy-scale, 1)));
+  --_hit: var(--cy-hit-min, 24px);
+  box-sizing: border-box !important;
+  margin: 0;
+  display: inline-flex;
+  align-items: flex-start;
+  gap: var(--cy-space-4);
+  min-block-size: var(--_hit);
+  color: var(--cy-color-ink);
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-font-size-md);
+  font-weight: var(--cy-font-weight-regular);
+  line-height: var(--cy-font-line-height);
+  letter-spacing: normal;
+  text-transform: none;
+  cursor: pointer;
+  user-select: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+
+  &[data-size="sm"] {
+    --_box: var(--cy-checkbox-size-sm, calc(14px * var(--cy-scale, 1)));
+    font-size: var(--cy-font-size-sm);
+  }
+  &[data-size="lg"] {
+    --_box: var(--cy-checkbox-size-lg, calc(20px * var(--cy-scale, 1)));
+    font-size: var(--cy-font-size-lg);
+  }
+  &[data-tone="neutral"] {
+    --_tone: var(--cy-color-ink);
+    --_on: var(--cy-color-bg);
+  }
+  &[data-tone="danger"] {
+    --_tone: var(--cy-color-danger);
+    --_on: var(--cy-color-on-danger);
+  }
+  &[data-tone="success"] {
+    --_tone: var(--cy-color-success);
+    --_on: var(--cy-color-on-success);
+  }
+  &[data-tone="warning"] {
+    --_tone: var(--cy-color-warning);
+    --_on: var(--cy-color-on-warning);
+  }
+  &[data-tone="info"] {
+    --_tone: var(--cy-color-info);
+    --_on: var(--cy-color-on-info);
+  }
+  &[data-disabled] {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+}
+
+@media (pointer: coarse) {
+  .cy-choice.cy-choice {
+    --_hit: var(--cy-hit-coarse, 44px);
+    align-items: center;
+  }
+}
+
+.cy-checkbox.cy-checkbox {
+  box-sizing: border-box !important;
+  position: relative;
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  inline-size: var(--_box);
+  block-size: var(--_box);
+  margin: 0;
+  margin-block-start: calc((1lh - var(--_box)) / 2);
+  border: calc(var(--cy-border-width) * 1.5) solid
+    var(--cy-checkbox-border, color-mix(in oklab, var(--cy-color-ink) 45%, var(--cy-color-line)));
+  border-radius: var(--cy-checkbox-radius, calc(var(--_box) * var(--cy-radius-factor)));
+  background: var(--cy-color-surface);
+  color: var(--_on);
+  transition:
+    background-color var(--cy-motion-fast) var(--cy-motion-ease),
+    border-color var(--cy-motion-fast) var(--cy-motion-ease);
+  & .cy-icon {
+    grid-area: 1 / 1;
+    --cy-icon-size: calc(var(--_box) * 0.8);
+    stroke-width: 2.5;
+    opacity: 0;
+    transform: scale(0.6);
+    transition:
+      opacity var(--cy-motion-fast) var(--cy-motion-ease),
+      transform var(--cy-motion-fast) var(--cy-motion-ease);
+  }
+  &:has(> input:checked:not(:indeterminate)) .cy-checkbox-mark,
+  &:has(> input:indeterminate) .cy-checkbox-dash {
+    opacity: 1;
+    transform: none;
+  }
+  &:has(> input:checked),
+  &:has(> input:indeterminate) {
+    background: var(--_tone);
+    border-color: var(--_tone);
+  }
+  &:has(> input:focus-visible) {
+    box-shadow: 0 0 0 var(--cy-border-focus) var(--cy-color-ring);
+    outline: var(--cy-border-focus) solid transparent;
+  }
+}
+
+.cy-switch-thumb {
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: calc(var(--cy-border-width) * 2);
+  inline-size: var(--cy-switch-thumb-size, calc(var(--_sh) - var(--cy-border-width) * 4));
+  block-size: var(--cy-switch-thumb-size, calc(var(--_sh) - var(--cy-border-width) * 4));
+  border-radius: calc(var(--_sh) * 0.32);
+  background: var(--cy-color-surface-raised);
+  box-shadow: var(--cy-shadow-sm);
+  translate: 0 -50%;
+  transition: inset-inline-start var(--cy-motion-base) var(--cy-motion-ease);
+  pointer-events: none;
+}
+
+.cy-switch.cy-switch {
+  --_sh: var(--cy-switch-height, calc(20px * var(--cy-scale, 1)));
+  box-sizing: border-box !important;
+  position: relative;
+  flex: none;
+  inline-size: var(--cy-switch-width, calc(var(--_sh) * 1.75));
+  block-size: var(--_sh);
+  margin: 0;
+  margin-block-start: calc((1lh - var(--_sh)) / 2);
+  border-radius: calc(var(--_sh) * 0.4);
+  background: var(--cy-switch-off-bg, color-mix(in oklab, var(--cy-color-ink) 28%, var(--cy-color-line)));
+  transition: background-color var(--cy-motion-base) var(--cy-motion-ease);
+  &:has(> input:checked) {
+    background: var(--_tone);
+  }
+  &:has(> input:checked) .cy-switch-thumb {
+    inset-inline-start: calc(100% - var(--_sh) + var(--cy-border-width) * 2);
+  }
+  &:has(> input:focus-visible) {
+    box-shadow: 0 0 0 var(--cy-border-focus) var(--cy-color-ring);
+    outline: var(--cy-border-focus) solid transparent;
+  }
+  .cy-choice[data-size="sm"] & {
+    --_sh: var(--cy-switch-height-sm, calc(16px * var(--cy-scale, 1)));
+  }
+  .cy-choice[data-size="lg"] & {
+    --_sh: var(--cy-switch-height-lg, calc(24px * var(--cy-scale, 1)));
+  }
+}
