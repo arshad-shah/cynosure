@@ -79,3 +79,19 @@ export const InlineAlignsAndJustifies: Story = {
     await expect([style.alignItems, style.justifyContent]).toEqual(["center", "space-between"]);
   },
 };
+
+export const DefaultsAndLayoutProps: Story = {
+  render: () => (
+    <Stack className="host-layout" style={{ maxWidth: 200 }} data-testid="stack">
+      <span>A</span>
+      <span>B</span>
+    </Stack>
+  ),
+  play: async ({ canvas }) => {
+    const stack = canvas.getByTestId("stack");
+    await expect(stack.tagName).toBe("DIV");
+    await expect(stack).toHaveClass("cy-stack", "host-layout");
+    await expect(getComputedStyle(stack).rowGap).toBe("8px");
+    await expect(getComputedStyle(stack).maxWidth).toBe("200px");
+  },
+};

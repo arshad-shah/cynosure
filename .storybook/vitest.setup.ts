@@ -11,6 +11,11 @@ setProjectAnnotations([
   a11y,
   project,
   {
+    // Firefox: element.focus() inside a test iframe does not make that frame the focused frame once a previous
+    // test's frame (which held focus) is gone, so keystrokes go elsewhere. Focus this frame before every story.
+    beforeEach: () => {
+      window.focus();
+    },
     afterEach: async ({ tags, canvasElement, id }) => {
       if (!visual || !tags.includes("visual")) return;
       await expect.element(page.elementLocator(canvasElement)).toMatchScreenshot(id);

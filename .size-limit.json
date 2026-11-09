@@ -164,5 +164,11 @@
     "path": ["dist/foundations/roving-focus.js"],
     "limit": "1 kB",
     "gzip": true
+  },
+  {
+    "name": "Card",
+    "path": ["dist/components/Card/Card.js", "dist/styles/card.css"],
+    "limit": "2 kB",
+    "gzip": true
   }
 ]

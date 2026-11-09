@@ -31,3 +31,20 @@ export const RowWithTokenGap: Story = {
     await expect([style.flexDirection, style.columnGap]).toEqual(["row", "6px"]);
   },
 };
+
+export const DefaultsAndLayoutProps: Story = {
+  render: () => (
+    <Inline className="host-row" style={{ maxWidth: 200 }} data-testid="row">
+      <span>A</span>
+      <span>B</span>
+    </Inline>
+  ),
+  play: async ({ canvas }) => {
+    const row = canvas.getByTestId("row");
+    await expect(row).toHaveClass("cy-inline", "host-row");
+    await expect(getComputedStyle(row).columnGap).toBe("6px");
+    await expect(getComputedStyle(row).flexWrap).toBe("nowrap");
+    await expect(getComputedStyle(row).alignItems).toBe("center");
+    await expect(getComputedStyle(row).maxWidth).toBe("200px");
+  },
+};
