@@ -4,7 +4,7 @@
  *  - dist/styles.css         all of them, in a fixed order
  *  - src/styles/generated-css.ts  the same CSS as a string for `styles.inline` (git-ignored)
  */
-import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { basename, join } from "node:path";
 import { transform } from "lightningcss";
 import { createTheme, themeToCss } from "../src/tokens";
@@ -38,6 +38,12 @@ export function buildCss(root = "src", out = "dist"): string {
     writeFileSync(join(out, "styles", basename(file)), css);
     return css;
   });
+  // Optional fonts (CSS + woff2 + licence) are copied verbatim; they are opt-in imports, not part of styles.css.
+  const fonts = join(root, "fonts");
+  if (existsSync(fonts)) {
+    mkdirSync(join(out, "fonts"), { recursive: true });
+    for (const file of readdirSync(fonts)) copyFileSync(join(fonts, file), join(out, "fonts", file));
+  }
   const tokens = themeToCss(createTheme());
   writeFileSync(join(out, "styles", "tokens.css"), tokens);
   const all = tokens + parts.join("");

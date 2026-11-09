@@ -41,7 +41,7 @@
     "changeset": "changeset",
     "prepare": "git config --worktree core.hooksPath .githooks 2>/dev/null || git config core.hooksPath .githooks",
     "css": "node --import tsx tools/build-css.ts",
-    "attw": "attw --pack . --profile esm-only --exclude-entrypoints styles.css 'styles/*.css'",
+    "attw": "attw --pack . --profile esm-only --exclude-entrypoints styles.css 'styles/*.css' 'fonts/*'",
     "coverage": "pnpm css && CY_BROWSERS=chromium vitest run --coverage --project unit --project preact --project stories --project touch"
   },
   "devDependencies": {
@@ -95,6 +95,7 @@
       "types": "./dist/adapters/vite/index.d.ts",
       "default": "./dist/adapters/vite/index.js"
     },
+    "./fonts/*": "./dist/fonts/*",
     "./package.json": "./package.json"
   }
 }

@@ -17,8 +17,24 @@ describe("package manifest", () => {
       "./styles/*.css",
       "./styles.inline",
       "./vite",
+      "./fonts/*",
       "./package.json",
     ]);
     expect(pkg.sideEffects).toEqual(["*.css"]);
+  });
+});
+
+import { existsSync, mkdtempSync, readFileSync as read } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { buildCss } from "../../tools/build-css";
+
+describe("CSS build", () => {
+  it("copies the optional font files next to the stylesheets", () => {
+    const out = mkdtempSync(join(tmpdir(), "cy-build-"));
+    buildCss("src", out);
+    expect(existsSync(join(out, "fonts", "hanken.css"))).toBe(true);
+    expect(existsSync(join(out, "fonts", "hanken-grotesk-latin-wght-normal.woff2"))).toBe(true);
+    expect(read(join(out, "fonts", "hanken.css"), "utf8")).toContain("Hanken Grotesk");
   });
 });
