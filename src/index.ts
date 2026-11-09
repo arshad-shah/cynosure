@@ -11,6 +11,7 @@ export {
   type SegmentedControlProps,
   type SegmentOption,
 } from "./components/SegmentedControl/index.js";
+export { Select, type SelectOption, type SelectProps } from "./components/Select/index.js";
 export { Switch, type SwitchProps } from "./components/Switch/index.js";
 export { TextArea, type TextAreaProps } from "./components/TextArea/index.js";
 export { TextField, type TextFieldProps } from "./components/TextField/index.js";
