@@ -1,0 +1,97 @@
+/* notice: tinted panel in the tone; the root is the size container so the action drops under the text when narrow. */
+.cy-notice.cy-notice {
+  --_tone: var(--cy-color-info);
+  --_text: var(--cy-color-info-text);
+  box-sizing: border-box !important;
+  container: cy-notice / inline-size;
+  margin: 0;
+  padding: var(--cy-notice-padding, var(--cy-space-5));
+  border: var(--cy-border-width) solid color-mix(in oklab, var(--_tone) 40%, var(--cy-color-line));
+  border-radius: var(--cy-notice-radius, var(--cy-radius-card));
+  background: color-mix(in oklab, var(--_tone) var(--cy-notice-soft-mix, 10%), var(--cy-color-surface));
+  color: var(--cy-color-ink);
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-font-size-md);
+  font-weight: var(--cy-font-weight-regular);
+  line-height: var(--cy-font-line-height);
+  letter-spacing: normal;
+  text-align: start;
+  text-transform: none;
+  &[data-tone="accent"] {
+    --_tone: var(--cy-color-accent);
+    --_text: var(--cy-color-accent-text);
+  }
+  &[data-tone="neutral"] {
+    --_tone: var(--cy-color-muted);
+    --_text: var(--cy-color-ink);
+  }
+  &[data-tone="success"] {
+    --_tone: var(--cy-color-success);
+    --_text: var(--cy-color-success-text);
+  }
+  &[data-tone="warning"] {
+    --_tone: var(--cy-color-warning);
+    --_text: var(--cy-color-warning-text);
+  }
+  &[data-tone="danger"] {
+    --_tone: var(--cy-color-danger);
+    --_text: var(--cy-color-danger-text);
+  }
+}
+.cy-notice-main.cy-notice-main {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--cy-space-4);
+  font-size: var(--cy-font-size-md);
+}
+.cy-notice-icon.cy-notice-icon {
+  flex: none;
+  margin-block-start: var(--cy-space-1);
+  color: var(--_text);
+}
+.cy-notice-text.cy-notice-text {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: var(--cy-space-1);
+  min-inline-size: 0;
+  padding-block: var(--cy-space-1);
+  font-size: var(--cy-font-size-md);
+  overflow-wrap: anywhere;
+}
+.cy-notice-title.cy-notice-title {
+  color: var(--_text);
+  font-size: var(--cy-font-size-md);
+  font-weight: var(--cy-font-weight-medium);
+}
+.cy-notice-body.cy-notice-body {
+  color: var(--cy-color-ink);
+  font-size: var(--cy-font-size-md);
+}
+.cy-notice-action.cy-notice-action {
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  gap: var(--cy-space-3);
+  font-size: var(--cy-font-size-md);
+}
+.cy-notice-main > .cy-tooltip-anchor {
+  flex: none;
+}
+@container cy-notice (inline-size < 26rem) {
+  .cy-notice-main.cy-notice-main {
+    flex-wrap: wrap;
+  }
+  .cy-notice-action.cy-notice-action {
+    order: 1;
+    flex-basis: 100%;
+  }
+  .cy-notice-icon ~ .cy-notice-action.cy-notice-action {
+    padding-inline-start: calc(var(--cy-icon-size-md, 16px) + var(--cy-space-4));
+  }
+}
+@media (forced-colors: active) {
+  .cy-notice.cy-notice {
+    border-color: CanvasText;
+  }
+}

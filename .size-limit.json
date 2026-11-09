@@ -249,5 +249,17 @@
     "path": ["dist/components/Toast/Toast.js", "dist/styles/toast.css"],
     "limit": "3.25 kB",
     "gzip": true
+  },
+  {
+    "name": "Notice",
+    "path": ["dist/components/Notice/Notice.js", "dist/styles/notice.css"],
+    "limit": "1.75 kB",
+    "gzip": true
+  },
+  {
+    "name": "EmptyState",
+    "path": ["dist/components/EmptyState/EmptyState.js", "dist/styles/empty-state.css"],
+    "limit": "1.25 kB",
+    "gzip": true
   }
 ]
