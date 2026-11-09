@@ -41,6 +41,8 @@ type NativeInput = Omit<
 
 export interface TextFieldProps extends NativeInput {
   label: ReactNode;
+  /** Visually hide the label (it still names the control). Prefer visible labels. */
+  labelHidden?: boolean | undefined;
   description?: ReactNode;
   error?: ReactNode;
   value?: string;
@@ -70,6 +72,7 @@ const setNativeValue = (input: HTMLInputElement, value: string) => {
 export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(function TextField(
   {
     label,
+    labelHidden,
     description,
     error,
     value,
@@ -123,6 +126,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(function T
   return (
     <Field
       label={label}
+      labelHidden={labelHidden}
       description={description}
       error={error}
       required={required}

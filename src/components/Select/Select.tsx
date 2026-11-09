@@ -44,6 +44,8 @@ export interface SelectOption {
 
 export interface SelectProps {
   label: ReactNode;
+  /** Visually hide the label (it still names the control). Prefer visible labels. */
+  labelHidden?: boolean | undefined;
   description?: ReactNode;
   error?: ReactNode;
   options: SelectOption[];
@@ -67,6 +69,7 @@ const PAGE = 10;
 /** Select-only combobox (WAI-ARIA APG): listbox in the top layer, typeahead, forms via HiddenValue. */
 export function Select({
   label,
+  labelHidden,
   description,
   error,
   options,
@@ -209,6 +212,7 @@ export function Select({
   return (
     <Field
       label={label}
+      labelHidden={labelHidden}
       description={description}
       error={error ?? (missing && !current ? (labels?.required ?? "Please choose a value.") : undefined)}
       required={required}

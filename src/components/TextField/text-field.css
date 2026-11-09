@@ -85,6 +85,11 @@
   &[data-invalid]:focus-within {
     box-shadow: 0 0 0 var(--cy-border-focus) color-mix(in oklab, var(--cy-color-danger) 28%, transparent);
   }
+  /* Read only: a sunken fill says "you can select and copy, not edit". */
+  &:has(input[readonly]) {
+    background: var(--cy-text-field-readonly-bg, var(--cy-color-soft));
+    border-color: transparent;
+  }
   &[data-disabled] {
     opacity: 0.55;
     cursor: not-allowed;

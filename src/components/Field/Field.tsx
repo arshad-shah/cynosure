@@ -25,6 +25,8 @@ export interface FieldProps {
   /** Draws the required marker; pass `required` to the control too. */
   required?: boolean | undefined;
   size?: Size | undefined;
+  /** Keep the label for assistive tech but take no space (toolbars, dense rows). Prefer visible labels. */
+  labelHidden?: boolean | undefined;
   /** Label a group of controls (radio groups) instead of one control. */
   group?: boolean | undefined;
   id?: string | undefined;
@@ -42,6 +44,7 @@ export function Field({
   required,
   size = "md",
   group,
+  labelHidden,
   id,
   className,
   style,
@@ -51,7 +54,12 @@ export function Field({
   const body = (
     <>
       {group ? (
-        <span id={field.labelId} className="cy-field-label" data-required={required ? "" : undefined}>
+        <span
+          id={field.labelId}
+          className="cy-field-label"
+          data-required={required ? "" : undefined}
+          data-hidden={labelHidden ? "" : undefined}
+        >
           {label}
         </span>
       ) : (
@@ -60,6 +68,7 @@ export function Field({
           htmlFor={field.id}
           className="cy-field-label"
           data-required={required ? "" : undefined}
+          data-hidden={labelHidden ? "" : undefined}
         >
           {label}
         </label>

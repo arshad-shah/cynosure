@@ -12,6 +12,8 @@ export interface RadioOption {
 
 export interface RadioGroupProps {
   label: ReactNode;
+  /** Visually hide the label (it still names the control). Prefer visible labels. */
+  labelHidden?: boolean | undefined;
   description?: ReactNode;
   error?: ReactNode;
   options: RadioOption[];
@@ -33,6 +35,7 @@ export interface RadioGroupProps {
 /** One choice from a list, on native radios: arrows, wrap, disabled skipping, RTL, forms and reset are native. */
 export function RadioGroup({
   label,
+  labelHidden,
   description,
   error,
   options,
@@ -54,6 +57,7 @@ export function RadioGroup({
     <Field
       group
       label={label}
+      labelHidden={labelHidden}
       description={description}
       error={error}
       required={required}

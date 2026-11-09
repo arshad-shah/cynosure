@@ -309,3 +309,14 @@ export const SpaceOpensAndStaysOpen: Story = {
     await expect(isOpen(list(canvasElement))).toBe(false);
   },
 };
+
+export const HiddenLabelStillNamesTheTrigger: Story = {
+  args: { labelHidden: true },
+  play: async ({ canvas, canvasElement }) => {
+    const trigger = canvas.getByRole("combobox", { name: "Fruit" });
+    const field = canvasElement.querySelector(".cy-field") as HTMLElement;
+    await expect(
+      Math.abs(trigger.getBoundingClientRect().top - field.getBoundingClientRect().top),
+    ).toBeLessThan(1);
+  },
+};

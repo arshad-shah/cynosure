@@ -84,6 +84,11 @@ export const VerticalUsesUpAndDown: Story = {
     const toolbar = canvas.getByRole("toolbar");
     await expect(toolbar).toHaveAttribute("aria-orientation", "vertical");
     await expect(getComputedStyle(toolbar).flexDirection).toBe("column");
+    // Items keep their natural width and line up on the start edge (no stretched text buttons beside square icons).
+    const lefts = [...toolbar.children].map((el) => Math.round(el.getBoundingClientRect().left));
+    await expect(new Set(lefts).size).toBe(1);
+    const width = (name: string) => canvas.getByRole("button", { name }).getBoundingClientRect().width;
+    await expect(width("Bold")).not.toBe(width("Strike"));
     await userEvent.tab();
     await userEvent.keyboard("{ArrowDown}");
     await expect(name()).toBe("Edit");
@@ -130,7 +135,7 @@ function Mixed() {
           { value: "grid", label: "Grid" },
         ]}
       />
-      <SearchField label="Search" size="sm" onSubmit={() => {}} />
+      <SearchField label="Search" labelHidden size="sm" onSubmit={() => {}} />
       <IconButton icon={download} label="Download" size="sm" />
       <span data-testid="view">{view}</span>
     </Toolbar>
@@ -220,5 +225,25 @@ export const TouchTargets: Story = {
     await expect(Math.max(rect.height, Number.parseFloat(hit.height) || 0)).toBeGreaterThanOrEqual(44);
     await userEvent.pointer({ keys: "[TouchA]", target: canvas.getByRole("button", { name: "Edit" }) });
     await expect(canvas.getByRole("button", { name: "Edit" }).tabIndex).toBe(0);
+  },
+};
+
+export const FieldsSitLevelWithButtons: Story = {
+  tags: ["visual"],
+  render: () => <Mixed />,
+  play: async ({ canvas }) => {
+    const centre = (el: Element) => {
+      const r = el.getBoundingClientRect();
+      return r.top + r.height / 2;
+    };
+    const button = centre(canvas.getByRole("button", { name: "Filter" }));
+    const field = centre(canvas.getByRole("searchbox").closest(".cy-text-field") as Element);
+    const segment = centre(canvas.getByRole("radiogroup"));
+    await expect(Math.abs(field - button)).toBeLessThan(1);
+    await expect(Math.abs(segment - button)).toBeLessThan(1);
+    // Same control height at the same size.
+    await expect(
+      (canvas.getByRole("searchbox").closest(".cy-text-field") as Element).getBoundingClientRect().height,
+    ).toBe(canvas.getByRole("button", { name: "Filter" }).getBoundingClientRect().height);
   },
 };

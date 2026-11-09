@@ -12,6 +12,6 @@
   &[aria-orientation="vertical"] {
     flex-direction: column;
     flex-wrap: nowrap;
-    align-items: stretch;
+    align-items: flex-start;
   }
 }

@@ -6,7 +6,7 @@ APG toolbar: a named `role="toolbar"` group with one Tab stop. Arrow keys move b
 <Toolbar label="Formatting">
   <IconButton icon={edit} label="Edit" />
   <SegmentedControl label="View" options={…} />
-  <SearchField label="Search" />
+  <SearchField label="Search" labelHidden />
 </Toolbar>
 ```
 

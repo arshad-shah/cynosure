@@ -35,6 +35,8 @@ type NativeArea = Omit<
 
 export interface TextAreaProps extends NativeArea {
   label: ReactNode;
+  /** Visually hide the label (it still names the control). Prefer visible labels. */
+  labelHidden?: boolean | undefined;
   description?: ReactNode;
   error?: ReactNode;
   value?: string;
@@ -60,6 +62,7 @@ const defaultCount = (n: number, max?: number) => (max ? `${n} / ${max}` : `${n}
 export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(function TextArea(
   {
     label,
+    labelHidden,
     description,
     error,
     value,
@@ -131,6 +134,7 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(function 
   return (
     <Field
       label={label}
+      labelHidden={labelHidden}
       description={description}
       error={error}
       required={required}

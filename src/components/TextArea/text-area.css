@@ -49,6 +49,11 @@
   &[aria-invalid="true"] {
     border-color: var(--cy-color-danger);
   }
+  /* Read only: a sunken fill says "you can select and copy, not edit". */
+  &[readonly] {
+    background: var(--cy-text-area-readonly-bg, var(--cy-color-soft));
+    border-color: transparent;
+  }
   &:disabled {
     opacity: 0.55;
     cursor: not-allowed;

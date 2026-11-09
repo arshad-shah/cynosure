@@ -146,3 +146,17 @@ export const StableUnderHostileHost: Story = {
     await expect(input.hostile).toEqual(input.clean);
   },
 };
+
+export const HiddenLabelStillNamesTheControl: Story = {
+  args: { label: "Email", labelHidden: true, description: undefined },
+  play: async ({ canvas, canvasElement }) => {
+    const input = canvas.getByRole("textbox", { name: "Email" });
+    const field = canvasElement.querySelector(".cy-field") as HTMLElement;
+    const label = canvasElement.querySelector(".cy-field-label") as HTMLElement;
+    await expect(label.getBoundingClientRect().height).toBeLessThanOrEqual(1);
+    const control = input.closest(".cy-text-field") as HTMLElement;
+    await expect(
+      Math.abs(control.getBoundingClientRect().top - field.getBoundingClientRect().top),
+    ).toBeLessThan(1);
+  },
+};
