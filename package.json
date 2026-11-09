@@ -37,11 +37,12 @@
     "size": "size-limit",
     "cy": "node --import tsx tools/cli/index.ts",
     "check": "node --import tsx tools/cli/index.ts check",
-    "verify": "pnpm check && pnpm lint && pnpm typecheck && pnpm test && pnpm test:stories && pnpm build && publint && pnpm attw && pnpm size",
+    "verify": "pnpm check && pnpm lint && pnpm typecheck && pnpm test && pnpm test:stories && pnpm coverage && pnpm build && publint && pnpm attw && pnpm size",
     "changeset": "changeset",
     "prepare": "git config --worktree core.hooksPath .githooks 2>/dev/null || git config core.hooksPath .githooks",
     "css": "node --import tsx tools/build-css.ts",
-    "attw": "attw --pack . --profile esm-only --exclude-entrypoints styles.css 'styles/*.css'"
+    "attw": "attw --pack . --profile esm-only --exclude-entrypoints styles.css 'styles/*.css'",
+    "coverage": "pnpm css && CY_BROWSERS=chromium vitest run --coverage --project unit --project preact --project stories --project touch"
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.0",
@@ -60,6 +61,7 @@
     "@vitejs/plugin-react": "^6.0.0",
     "@vitest/browser": "^5.0.5",
     "@vitest/browser-playwright": "^5.0.5",
+    "@vitest/coverage-istanbul": "^5.0.5",
     "jsdom": "^30.1.3",
     "lightningcss": "^1.30.0",
     "playwright": "^1.64.1",

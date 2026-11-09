@@ -2,7 +2,7 @@ import { type CSSProperties, type ReactNode, useLayoutEffect, useMemo, useSyncEx
 import { type Theme, themeProperties } from "../tokens/index.js";
 
 export interface CynosureThemeProps {
-  /** A theme from `createTheme()`. Omit to inherit tokens from the surrounding stylesheet or theme. */
+  /** A theme from `createTheme()`. Omit to inherit every token from the surrounding theme (or the default stylesheet). */
   theme?: Theme;
   /** Omit to inherit the surrounding mode. `system` follows the OS. */
   mode?: "light" | "dark" | "system";
@@ -18,11 +18,12 @@ export interface CynosureThemeProps {
 
 const CONTRAST_QUERY = "(prefers-contrast: more)";
 function subscribe(callback: () => void) {
-  const query = globalThis.matchMedia?.(CONTRAST_QUERY);
-  query?.addEventListener("change", callback);
-  return () => query?.removeEventListener("change", callback);
+  // Client-only: on the server useSyncExternalStore uses the server snapshot and never subscribes.
+  const query = matchMedia(CONTRAST_QUERY);
+  query.addEventListener("change", callback);
+  return () => query.removeEventListener("change", callback);
 }
-const prefersMore = () => globalThis.matchMedia?.(CONTRAST_QUERY).matches ?? false;
+const prefersMore = () => matchMedia(CONTRAST_QUERY).matches;
 
 /** Applies a Cynosure theme to its own wrapper (or, opt-in, to the document). Never writes to <head> or <body>. */
 export function CynosureTheme({
@@ -36,14 +37,15 @@ export function CynosureTheme({
   children,
 }: CynosureThemeProps) {
   const osMore = useSyncExternalStore(subscribe, prefersMore, () => false);
-  const more = contrast === "more" || (contrast === "system" && osMore);
+  // Undefined contrast follows the OS, like "system" (spec §6.4: system by default).
+  const more = contrast === "more" || (contrast !== "normal" && osMore);
   const properties = useMemo(() => (theme ? themeProperties(theme, { contrast: more }) : {}), [theme, more]);
 
   useLayoutEffect(() => {
     if (target !== "document") return;
     const html = document.documentElement;
     const names = Object.keys(properties);
-    for (const name of names) html.style.setProperty(name, properties[name] ?? null);
+    for (const name of names) html.style.setProperty(name, properties[name] as string);
     if (mode) html.setAttribute("data-cy-mode", mode);
     if (contrast) html.setAttribute("data-cy-contrast", contrast);
     return () => {

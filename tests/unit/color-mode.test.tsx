@@ -40,6 +40,62 @@ describe("useColorMode", () => {
     expect(result.current.mode).toBe("light");
   });
 
+  it("uses localStorage by default", () => {
+    localStorage.setItem("cy-color-mode", "dark");
+    const { result } = renderHook(() => useColorMode());
+    expect(result.current.mode).toBe("dark");
+    act(() => result.current.setMode("light"));
+    expect(localStorage.getItem("cy-color-mode")).toBe("light");
+    localStorage.clear();
+  });
+
+  it("resolves system mode from the OS and follows changes", () => {
+    let listener: (() => void) | undefined;
+    let dark = true;
+    const original = window.matchMedia;
+    window.matchMedia = ((query: string) => ({
+      get matches() {
+        return query.includes("dark") && dark;
+      },
+      addEventListener: (_: string, fn: () => void) => {
+        listener = fn;
+      },
+      removeEventListener: () => {},
+    })) as never;
+    try {
+      const storage = { get: () => null, set: () => {} };
+      const { result, unmount } = renderHook(() => useColorMode({ storage }));
+      expect(result.current.resolved).toBe("dark");
+      dark = false;
+      act(() => listener?.());
+      expect(result.current.resolved).toBe("light");
+      unmount();
+    } finally {
+      window.matchMedia = original;
+    }
+  });
+
+  it("falls back to system when async storage rejects", async () => {
+    const storage = {
+      get: () => Promise.reject(new Error("nope")),
+      set: () => Promise.reject(new Error("nope")),
+    };
+    const { result } = renderHook(() => useColorMode({ storage }));
+    await act(async () => {});
+    expect(result.current.mode).toBe("system");
+    await act(async () => result.current.setMode("dark"));
+    expect(result.current.mode).toBe("dark");
+  });
+
+  it("does not update state when unmounted before async storage resolves", async () => {
+    let resolve: (v: string) => void = () => {};
+    const storage = { get: () => new Promise<string>((r) => (resolve = r)), set: () => {} };
+    const { result, unmount } = renderHook(() => useColorMode({ storage }));
+    unmount();
+    await act(async () => resolve("dark"));
+    expect(result.current.mode).toBe("system");
+  });
+
   it("ignores stored garbage", () => {
     const storage = { get: () => "purple", set: () => {} };
     const { result } = renderHook(() => useColorMode({ storage }));

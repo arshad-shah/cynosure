@@ -81,7 +81,14 @@ function DocumentTarget() {
       <button type="button" data-testid="unmount" onClick={() => setOn(false)}>
         unmount
       </button>
-      {on && <CynosureTheme theme={createTheme({ accent: "#4f7bd9" })} mode="dark" target="document" />}
+      {on && (
+        <CynosureTheme
+          theme={createTheme({ accent: "#4f7bd9" })}
+          mode="dark"
+          contrast="more"
+          target="document"
+        />
+      )}
     </div>
   );
 }
@@ -93,8 +100,10 @@ export const TargetDocument: Story = {
     const html = document.documentElement;
     await waitFor(() => expect(html.getAttribute("data-cy-mode")).toBe("dark"));
     await expect(html.style.getPropertyValue("--cy-color-accent")).toBe("#4f7bd9");
+    await expect(html.getAttribute("data-cy-contrast")).toBe("more");
     await userEvent.click(canvas.getByTestId("unmount"));
     await waitFor(() => expect(html.hasAttribute("data-cy-mode")).toBe(false));
+    await expect(html.hasAttribute("data-cy-contrast")).toBe(false);
     await expect(html.style.getPropertyValue("--cy-color-accent")).toBe("");
   },
 };
@@ -122,5 +131,59 @@ export const InsideShadowRoot: Story = {
     const swatch = host.shadowRoot?.querySelector('[data-testid="shadow"]') as Element;
     await expect(token(swatch, "--cy-color-bg")).toBe("light-dark(#f4f1ea,#14120f)");
     await expect(getComputedStyle(swatch).backgroundColor).not.toBe("rgba(0, 0, 0, 0)");
+  },
+};
+
+export const NestedWithoutThemeInherits: Story = {
+  args: {
+    theme: createTheme({ accent: "#e8462e", scale: "compact" }),
+    mode: "light",
+    children: (
+      <CynosureTheme mode="dark">
+        <Swatch id="inherits" />
+      </CynosureTheme>
+    ),
+  },
+  play: async ({ canvas }) => {
+    const swatch = await canvas.findByTestId("inherits");
+    await expect(token(swatch, "--cy-color-accent")).toBe("#e8462e");
+    await expect(token(swatch, "--cy-control-height-md")).toBe("28px");
+    await expect(getComputedStyle(swatch).colorScheme).toBe("dark");
+  },
+};
+
+export const NeverTouchesHostColorScheme: Story = {
+  args: { children: <Swatch id="host" /> },
+  play: async () => {
+    await expect(getComputedStyle(document.documentElement).colorScheme).toBe("normal");
+  },
+};
+
+export const LayoutPropsAndSpanWrapper: Story = {
+  args: {
+    as: "span",
+    className: "app-root",
+    style: { display: "block", marginTop: 4 },
+    children: <Swatch id="span" />,
+  },
+  play: async ({ canvasElement }) => {
+    const wrapper = canvasElement.querySelector("span.cy-theme.app-root") as HTMLElement;
+    await expect(wrapper).toBeTruthy();
+    await expect(getComputedStyle(wrapper).marginTop).toBe("4px");
+  },
+};
+
+function BareDocumentTarget() {
+  return <CynosureTheme theme={createTheme({ accent: "#14b8a6" })} target="document" />;
+}
+
+export const TargetDocumentWithoutModeLeavesAttributes: Story = {
+  args: { children: null },
+  render: () => <BareDocumentTarget />,
+  play: async () => {
+    const html = document.documentElement;
+    await waitFor(() => expect(html.style.getPropertyValue("--cy-color-accent")).toBe("#14b8a6"));
+    await expect(html.hasAttribute("data-cy-mode")).toBe(false);
+    await expect(html.hasAttribute("data-cy-contrast")).toBe(false);
   },
 };

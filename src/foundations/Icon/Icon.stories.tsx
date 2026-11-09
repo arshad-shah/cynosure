@@ -123,3 +123,12 @@ export const StableUnderHostileHost: Story = {
     await expect(hostile).toEqual(clean);
   },
 };
+
+export const LayoutClassName: Story = {
+  args: { className: "nav-icon", style: { marginInlineEnd: 6 } },
+  play: async ({ canvasElement }) => {
+    const svg = canvasElement.querySelector("svg.cy-icon") as SVGElement;
+    await expect(svg).toHaveClass("cy-icon", "nav-icon");
+    await expect(getComputedStyle(svg).marginInlineEnd).toBe("6px");
+  },
+};

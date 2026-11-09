@@ -24,6 +24,8 @@ jobs:
         run: pnpm check && pnpm lint && pnpm typecheck && pnpm test
       - name: Stories (Chromium, Firefox, WebKit, touch)
         run: pnpm test:stories
+      - name: Coverage floor (95%)
+        run: pnpm coverage
       - name: Visual regression (Chromium)
         if: hashFiles('**/__screenshots__/**') != ''
         run: pnpm test:visual

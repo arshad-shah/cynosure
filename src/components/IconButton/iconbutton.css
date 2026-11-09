@@ -1,5 +1,5 @@
 /* IconButton: square Button plus a lightweight tooltip (replaced by Tooltip in a later plan). */
-.cy-icon-button {
+.cy-button.cy-button.cy-icon-button {
   inline-size: var(--_h);
   padding: 0;
   & .cy-button-label {

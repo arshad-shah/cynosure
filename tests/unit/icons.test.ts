@@ -61,6 +61,18 @@ describe("validateIcon", () => {
     expect(validateIcon({ ...ok, star: { x: 23, y: 3 } }).join()).toMatch(/star/);
     expect(validateIcon({ ...ok, star: { x: 3, y: 3, size: 6 } }).join()).toMatch(/star/);
   });
+  it("rejects rects outside the grid and invalid path data", () => {
+    expect(validateIcon({ ...ok, body: [["rect", { x: 20, y: 2, width: 8, height: 4 }]] }).join()).toMatch(
+      /grid/,
+    );
+    expect(validateIcon({ ...ok, body: [["path", { d: "M4 4 url(x)" }]] }).join()).toMatch(
+      /invalid characters/,
+    );
+    expect(validateIcon({ ...ok, body: [] }).join()).toMatch(/empty/);
+    expect(validateIcon({ ...ok, body: [["path", { d: "M1 1", stroke: "red" } as never]] }).join()).toMatch(
+      /unsupported/,
+    );
+  });
   it("rejects coordinates outside the 24 grid and bad names", () => {
     expect(validateIcon({ ...ok, body: [["circle", { cx: 30, cy: 12, r: 2 }]] }).join()).toMatch(/grid/);
     expect(validateIcon({ ...ok, name: "Bad Name" }).join()).toMatch(/name/);

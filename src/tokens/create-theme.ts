@@ -58,12 +58,21 @@ function accentRoles(
   surface: string,
 ): Pick<ColorTokens, "accent" | "accentHover" | "accentActive" | "accentSoft" | "onAccent" | "ring"> {
   const hex = toHex(parseColor(accent));
+  // Pick on-accent text against the rest, hover and active fills together; hover and active move away from the text.
+  const options = ON_CANDIDATES.map((on) => {
+    const away = contrastRatio(on, "#ffffff") > contrastRatio(on, "#000000") ? 0.05 : -0.05;
+    const hover = shiftLightness(hex, away);
+    const active = shiftLightness(hex, away * 2);
+    const score = Math.min(contrastRatio(on, hex), contrastRatio(on, hover), contrastRatio(on, active));
+    return { on, hover, active, score };
+  });
+  const best = options.reduce((a, b) => (b.score > a.score ? b : a));
   return {
     accent: hex,
-    accentHover: shiftLightness(hex, -0.05),
-    accentActive: shiftLightness(hex, -0.1),
+    accentHover: best.hover,
+    accentActive: best.active,
     accentSoft: `color-mix(in oklab, ${hex} 18%, ${surface})`,
-    onAccent: bestContrast(hex, ON_CANDIDATES),
+    onAccent: best.on,
     ring: `color-mix(in oklab, ${hex} 28%, transparent)`,
   };
 }
@@ -123,8 +132,10 @@ export function createTheme(input: ThemeInput = {}): Theme {
   for (const [name, patch] of Object.entries(input.palettes ?? {}) as [PaletteName, Partial<ColorTokens>][]) {
     if (!(name in palettes)) throw new CynosureThemeError(`Cynosure has no palette named "${name}".`);
     const clean: Partial<ColorTokens> = {};
-    for (const [k, v] of Object.entries(patch) as [keyof ColorTokens, string][])
+    for (const [k, v] of Object.entries(patch) as [keyof ColorTokens, string][]) {
+      if (!(k in light)) throw new CynosureThemeError(`Cynosure palettes have no colour named "${k}".`);
       clean[k] = toHex(parseColor(v));
+    }
     palettes[name] = { ...palettes[name], ...clean };
   }
   const components: Record<string, Record<string, string>> = {};

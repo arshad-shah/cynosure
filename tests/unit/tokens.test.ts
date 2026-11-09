@@ -53,15 +53,16 @@ describe("accent", () => {
       expect(contrastRatio(light.onAccent, light.accent)).toBeGreaterThanOrEqual(4.5);
     },
   );
-  it("derives a darker hover and active from the accent", () => {
-    const { light } = createTheme({ accent: "#4f7bd9" }).palettes;
-    expect(contrastRatio(light.accentHover, "#ffffff")).toBeGreaterThan(
-      contrastRatio(light.accent, "#ffffff"),
-    );
-    expect(contrastRatio(light.accentActive, "#ffffff")).toBeGreaterThan(
-      contrastRatio(light.accentHover, "#ffffff"),
-    );
-  });
+  it.each(["#e8462e", "#4f7bd9", "#808080", "#d0612a", "#d4a843", "#14b8a6"])(
+    "on-accent text keeps 4.5:1 on hover and active fills for %s",
+    (accent) => {
+      for (const p of [createTheme({ accent }).palettes.light, createTheme({ accent }).palettes.dark]) {
+        expect(contrastRatio(p.onAccent, p.accentHover)).toBeGreaterThanOrEqual(4.5);
+        expect(contrastRatio(p.onAccent, p.accentActive)).toBeGreaterThanOrEqual(4.5);
+        expect(p.accentHover).not.toBe(p.accent);
+      }
+    },
+  );
   it("invalid accent throws CynosureThemeError naming the input", () => {
     expect(() => createTheme({ accent: "nope" })).toThrow(CynosureThemeError);
     expect(() => createTheme({ accent: "nope" })).toThrow(/nope/);
@@ -72,7 +73,7 @@ describe("themeToCss", () => {
   const css = themeToCss(createTheme({ accent: "#14b8a6", components: { button: { radius: "2px" } } }));
   const firstBlock = css.slice(0, css.indexOf("}"));
   it("emits every token once in the base block under the default selector", () => {
-    expect(firstBlock.startsWith(":where(:root,:host,.cy-theme){")).toBe(true);
+    expect(firstBlock.startsWith(":where(:root,:host){")).toBe(true);
     const names = [...firstBlock.matchAll(/(--cy-[a-z0-9-]+):/g)].map((m) => m[1]);
     expect(new Set(names).size).toBe(names.length);
     expect(names).toContain("--cy-color-accent");
@@ -85,7 +86,7 @@ describe("themeToCss", () => {
     expect(css).toContain('[data-cy-contrast="more"]');
   });
   it("root follows the OS for mode and contrast when no attribute is set", () => {
-    expect(css).toContain(":where(:root,:host){color-scheme:light dark}");
+    expect(css).not.toMatch(/:root[^{]*\{color-scheme/);
     expect(css).toMatch(
       /@media \(prefers-contrast:more\)\{:where\(:root:not\(\[data-cy-contrast\]\),:host,\[data-cy-contrast="system"\]\)\{/,
     );
@@ -133,5 +134,54 @@ describe("untrusted-looking theme input", () => {
     const { light } = createTheme({ accent: "oklch(0.5 1000000000 0)" }).palettes;
     expect(performance.now() - started).toBeLessThan(50);
     expect(contrastRatio(light.onAccent, light.accent)).toBeGreaterThanOrEqual(4.5);
+  });
+});
+
+describe("colour input formats", () => {
+  it.each([
+    ["#f80", "#ff8800"],
+    ["#ff8800cc", "#ff8800"],
+    ["rgb(255 136 0)", "#ff8800"],
+    ["rgb(100%, 53.33%, 0%)", "#ff8800"],
+    ["hsl(32 100% 50%)", "#ff8800"],
+    ["rgba(255, 136, 0, 0.5)", "#ff8800"],
+  ])("reads %s as the accent", (input, hex) => {
+    expect(createTheme({ accent: input }).palettes.light.accent).toBe(hex);
+  });
+  it("reads oklch with percentage lightness", () => {
+    expect(createTheme({ accent: "oklch(70% 0.15 50)" }).palettes.light.accent).toMatch(/^#[0-9a-f]{6}$/);
+  });
+});
+
+describe("theme options", () => {
+  it("star accepts a boolean or a size", () => {
+    expect(createTheme({ star: false }).global.star.visible).toBe(false);
+    expect(createTheme({ star: { size: 2.5 } }).global.star).toEqual({ visible: true, size: 2.5 });
+  });
+  it("font families and partial motion override defaults", () => {
+    const t = createTheme({ font: { sans: "Hanken Grotesk, system-ui" }, motion: { base: 90 } });
+    expect(t.global.font.sans).toBe("Hanken Grotesk, system-ui");
+    expect([t.global.motion.base, t.global.motion.fast]).toEqual([90, 120]);
+  });
+  it("generic token overrides deep-merge", () => {
+    const t = createTheme({ tokens: { space: { "4": 10 }, z: { tooltip: 9 } } });
+    expect([t.global.space["4"], t.global.space["5"], t.global.z.tooltip]).toEqual([10, 12, 9]);
+  });
+  it("rejects invalid component token names", () => {
+    expect(() => createTheme({ components: { button: { "bad key": "1px" } as never } })).toThrow(/bad key/);
+  });
+  it("rejects oklch with non-numeric parts", () => {
+    expect(() => createTheme({ accent: "oklch(a b c)" })).toThrow(CynosureThemeError);
+  });
+  it("rejects unknown palette colours and palette names", () => {
+    expect(() => createTheme({ palettes: { light: { nope: "#fff" } as never } })).toThrow(/nope/);
+  });
+});
+
+describe("themeToCss with a custom selector", () => {
+  it("scopes mode and contrast rules to that selector", () => {
+    const css = themeToCss(createTheme(), ".app");
+    expect(css).toContain('.app[data-cy-mode="dark"]{color-scheme:dark}');
+    expect(css).toContain('@media (prefers-contrast:more){.app[data-cy-contrast="system"]{');
   });
 });

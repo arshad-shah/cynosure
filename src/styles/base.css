@@ -11,6 +11,10 @@
 :where([data-cy-mode="system"]) {
   color-scheme: light dark;
 }
+/* The outermost theme wrapper follows the OS by default. Cynosure never sets color-scheme on the host <html>. */
+:where(.cy-theme:not(.cy-theme *)):not([data-cy-mode]) {
+  color-scheme: light dark;
+}
 
 .cy-theme {
   display: contents;
@@ -31,6 +35,7 @@
   box-sizing: border-box !important;
   margin: 0;
   font: inherit;
+  color: inherit;
   letter-spacing: normal;
   text-transform: none;
 }

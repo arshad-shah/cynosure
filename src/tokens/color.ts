@@ -25,11 +25,11 @@ export function parseColor(input: string): Rgb {
   const fn = /^(rgb|hsl|oklch)a?\(([^)]+)\)$/.exec(value);
   const parts = fn?.[2]?.split(/[\s,/]+/).filter(Boolean) ?? [];
   if (fn && parts.length >= 3) {
-    const [a = "", b = "", c = ""] = parts;
+    const [a, b, c] = parts as [string, string, string];
     if (fn[1] === "rgb") return [num(a, 255), num(b, 255), num(c, 255)].map((v) => clamp(v / 255)) as Rgb;
     if (fn[1] === "hsl") return hslToRgb(Number.parseFloat(a), num(b, 1), num(c, 1));
     const values = [num(a, 1), num(b, 0.4), Number.parseFloat(c)];
-    if (values.every(Number.isFinite)) return oklchToRgb(values[0] ?? 0, values[1] ?? 0, values[2] ?? 0);
+    if (values.every(Number.isFinite)) return oklchToRgb(...(values as [number, number, number]));
   }
   throw new CynosureThemeError(
     `Cynosure cannot read the colour "${input}". Use hex, rgb(), hsl() or oklch().`,
@@ -86,9 +86,10 @@ const inGamut = (rgb: number[]) => rgb.every((v) => v >= -0.001 && v <= 1.001);
 
 /** sRGB from OKLCH, mapped into gamut by binary-searching chroma (bounded: 24 steps). */
 export function oklchToRgb(L: number, C: number, H: number): Rgb {
-  const l = clamp(Number.isFinite(L) ? L : 0);
-  const hue = Number.isFinite(H) ? H : 0;
-  let hi = clamp(Number.isFinite(C) ? C : 0, 0, 0.5);
+  // Inputs are finite: parseColor rejects non-numeric parts and rgbToOklch only produces numbers.
+  const l = clamp(L);
+  const hue = H;
+  let hi = clamp(C, 0, 0.5);
   if (inGamut(oklchRaw(l, hi, hue))) return oklchRaw(l, hi, hue).map((v) => clamp(v)) as Rgb;
   let lo = 0;
   for (let i = 0; i < 24; i++) {
@@ -121,8 +122,7 @@ export function contrastRatio(a: string, b: string): number {
 
 /** The candidate with the highest contrast against `background`. */
 export function bestContrast(background: string, candidates: readonly string[]): string {
-  return (
-    [...candidates].sort((x, y) => contrastRatio(y, background) - contrastRatio(x, background))[0] ??
-    "#000000"
-  );
+  return [...candidates].sort(
+    (x, y) => contrastRatio(y, background) - contrastRatio(x, background),
+  )[0] as string;
 }

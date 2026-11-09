@@ -26,7 +26,8 @@
   animation: cy-button-spin 0.7s linear infinite;
 }
 
-.cy-button {
+/* Root selector is doubled so host type/attribute rules (e.g. Tailwind v3 [type=button]) never win. */
+.cy-button.cy-button {
   --_h: var(--cy-button-height-md, var(--cy-control-height-md));
   --_bg: var(--cy-button-secondary-bg, var(--cy-color-surface));
   --_ink: var(--cy-button-secondary-ink, var(--cy-color-ink));
@@ -131,7 +132,8 @@
     --_border: var(--cy-color-accent);
   }
   &:focus-visible {
-    outline: none;
+    outline: var(--cy-border-focus) solid transparent;
+    outline-offset: 0;
     border-color: var(--cy-color-accent);
     box-shadow: 0 0 0 var(--cy-border-focus) var(--cy-color-ring);
   }
@@ -148,7 +150,7 @@
 }
 
 @media (pointer: coarse) {
-  .cy-button {
+  .cy-button.cy-button {
     --_hit: var(--cy-hit-coarse, 44px);
   }
 }

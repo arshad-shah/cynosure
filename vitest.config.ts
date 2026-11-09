@@ -10,6 +10,21 @@ const engines = (process.env.CY_BROWSERS ?? "chromium,firefox,webkit").split(","
 
 export default defineConfig({
   test: {
+    coverage: {
+      provider: "istanbul",
+      include: ["src/**/*.{ts,tsx}"],
+      exclude: [
+        "src/**/*.stories.tsx",
+        "src/docs/**",
+        "src/test/**",
+        "src/styles/generated-css.ts",
+        "src/**/index.ts",
+        "src/icons/types.ts",
+        "src/tokens/schema.ts",
+      ],
+      thresholds: { lines: 95, branches: 95, functions: 95, statements: 95 },
+      reporter: ["text-summary", "text"],
+    },
     projects: [
       { test: { name: "unit", include: ["tests/unit/**/*.test.{ts,tsx}"], environment: "node" } },
       {

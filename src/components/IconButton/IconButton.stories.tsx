@@ -44,3 +44,43 @@ export const TooltipShowsAndDismisses: Story = {
     await expect(button).not.toHaveAttribute("data-tip");
   },
 };
+
+export const ForwardsConsumerHandlersAndClassName: Story = {
+  args: {
+    className: "toolbar-action",
+    size: "lg",
+    onPointerEnter: fn(),
+    onPointerLeave: fn(),
+    onFocus: fn(),
+    onBlur: fn(),
+    onKeyDown: fn(),
+  },
+  play: async ({ canvas, args, userEvent }) => {
+    const button = canvas.getByRole("button", { name: "Copy document" });
+    await expect(button).toHaveClass("cy-icon-button", "toolbar-action");
+    await expect(button.getBoundingClientRect().width).toBe(40);
+    await userEvent.hover(button);
+    await userEvent.unhover(button);
+    await userEvent.tab();
+    await userEvent.keyboard("a");
+    await userEvent.tab();
+    for (const handler of [
+      args.onPointerEnter,
+      args.onPointerLeave,
+      args.onFocus,
+      args.onKeyDown,
+      args.onBlur,
+    ])
+      await expect(handler).toHaveBeenCalled();
+  },
+};
+
+export const MouseFocusDoesNotPinTooltip: Story = {
+  play: async ({ canvas, userEvent }) => {
+    const button = canvas.getByRole("button", { name: "Copy document" });
+    await userEvent.click(button);
+    await expect(button).toHaveFocus();
+    await userEvent.unhover(button);
+    await expect(button).not.toHaveAttribute("data-tip");
+  },
+};

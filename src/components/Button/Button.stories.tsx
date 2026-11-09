@@ -239,6 +239,7 @@ export const RightToLeft: Story = {
 };
 
 const STABLE = [
+  "color",
   "height",
   "padding-inline-start",
   "border-top-width",
@@ -260,6 +261,7 @@ export const StableUnderHostileHost: Story = {
       "font-weight",
       "text-transform",
       "letter-spacing",
+      "color",
     ]);
     await expect(label.hostile).toEqual(label.clean);
   },
@@ -299,5 +301,46 @@ export const InsideShadowRoot: Story = {
     const page = getComputedStyle(canvasElement.querySelector("button") as Element);
     for (const p of ["height", "border-radius", "padding-inline-start", "font-size", "font-weight"])
       await expect(inside.getPropertyValue(p)).toBe(page.getPropertyValue(p));
+  },
+};
+
+export const FocusVisibleInForcedColors: Story = {
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.tab();
+    const style = getComputedStyle(canvas.getByRole("button"));
+    // A transparent solid outline is what forced-colors mode turns into a visible focus ring.
+    await expect(style.outlineStyle).toBe("solid");
+    await expect(Number.parseFloat(style.outlineWidth)).toBeGreaterThan(0);
+  },
+};
+
+export const LargeWithTrailingIconAndLayoutProps: Story = {
+  args: {
+    size: "lg",
+    icon: download,
+    iconEnd: chevronDown,
+    className: "layout-hook",
+    style: { marginInlineStart: 12 },
+  },
+  play: async ({ canvas }) => {
+    const button = canvas.getByRole("button", { name: "Export" });
+    await expect(button.getBoundingClientRect().height).toBe(40);
+    await expect(button).toHaveClass("cy-button", "layout-hook");
+    await expect(getComputedStyle(button).marginInlineStart).toBe("12px");
+    const icons = button.querySelectorAll(".cy-icon");
+    await expect(icons).toHaveLength(2);
+    for (const icon of icons) await expect(icon.getBoundingClientRect().width).toBe(20);
+  },
+};
+
+export const FullWidth: Story = {
+  args: { fullWidth: true },
+  render: (args) => (
+    <div style={{ width: 480 }}>
+      <Button {...args} />
+    </div>
+  ),
+  play: async ({ canvas }) => {
+    await expect(canvas.getByRole("button").getBoundingClientRect().width).toBe(480);
   },
 };

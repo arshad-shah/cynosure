@@ -1,6 +1,7 @@
 import type { ColorTokens, Theme } from "./schema.js";
 
-export const DEFAULT_SELECTOR = ":where(:root,:host,.cy-theme)";
+/** Tokens live on the document root and shadow hosts only, so nested theme wrappers inherit from their ancestors. */
+export const DEFAULT_SELECTOR = ":where(:root,:host)";
 
 const kebab = (s: string) => s.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`);
 const MS = new Set(["motion-fast", "motion-base", "motion-slow"]);
@@ -63,7 +64,6 @@ export function themeToCss(theme: Theme, selector: string = DEFAULT_SELECTOR): s
   const isDefault = selector === DEFAULT_SELECTOR;
   return [
     `${selector}{${decl(base)}}`,
-    ...(isDefault ? [":where(:root,:host){color-scheme:light dark}"] : []),
     `${scoped('[data-cy-mode="light"]')}{color-scheme:light}`,
     `${scoped('[data-cy-mode="dark"]')}{color-scheme:dark}`,
     `${scoped('[data-cy-mode="system"]')}{color-scheme:light dark}`,
