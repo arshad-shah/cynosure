@@ -1,10 +1,10 @@
 // Generates brand/favicon.ico, brand/apple-touch-icon.png, and brand/og-image.png
 // from the SVG sources. Idempotent — safe to re-run. Outputs are committed so
 // contributors don't need to run this to build.
-import { readFileSync, writeFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
-import sharp from 'sharp';
+import { readFileSync, writeFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+import sharp from "sharp";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const read = (name) => readFileSync(join(here, name));
@@ -43,16 +43,14 @@ function pngsToIco(pngs) {
 }
 
 async function buildFavicon() {
-  const svg = read('cynosure-mark-favicon.svg');
+  const svg = read("cynosure-mark-favicon.svg");
   const sizes = [16, 32, 48];
   const pngs = await Promise.all(
-    sizes.map((s) =>
-      sharp(svg, { density: 384 }).resize(s, s, { kernel: 'lanczos3' }).png().toBuffer(),
-    ),
+    sizes.map((s) => sharp(svg, { density: 384 }).resize(s, s, { kernel: "lanczos3" }).png().toBuffer()),
   );
   const ico = pngsToIco(pngs);
-  writeFileSync(join(here, 'favicon.ico'), ico);
-  console.log('wrote favicon.ico (16 + 32 + 48)');
+  writeFileSync(join(here, "favicon.ico"), ico);
+  console.log("wrote favicon.ico (16 + 32 + 48)");
 }
 
 async function buildAppleTouch() {
@@ -89,8 +87,8 @@ async function buildAppleTouch() {
   await sharp(Buffer.from(composed), { density: 512 })
     .resize(180, 180)
     .png()
-    .toFile(join(here, 'apple-touch-icon.png'));
-  console.log('wrote apple-touch-icon.png (180×180)');
+    .toFile(join(here, "apple-touch-icon.png"));
+  console.log("wrote apple-touch-icon.png (180×180)");
 }
 
 async function buildOg() {
@@ -144,11 +142,8 @@ async function buildOg() {
       <text x="72" y="540" font-family="'Inter Tight', Inter, system-ui, sans-serif" font-weight="700" font-size="64" letter-spacing="-2" fill="#f5f6fa">React UI framework.</text>
       <text x="72" y="582" font-family="Inter, system-ui, sans-serif" font-weight="500" font-size="22" fill="#a1a6bf">90+ components · WCAG 2.2 AA · pay for what you import</text>
     </svg>`;
-  await sharp(Buffer.from(og), { density: 384 })
-    .resize(1200, 630)
-    .png()
-    .toFile(join(here, 'og-image.png'));
-  console.log('wrote og-image.png (1200×630)');
+  await sharp(Buffer.from(og), { density: 384 }).resize(1200, 630).png().toFile(join(here, "og-image.png"));
+  console.log("wrote og-image.png (1200×630)");
 }
 
 await buildFavicon();

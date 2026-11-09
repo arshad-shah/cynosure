@@ -29,11 +29,11 @@ pnpm add @arshad-shah/cynosure-react @arshad-shah/cynosure-tokens
 
 ```ts
 // one CSS import covers tokens (light + dark) + every component
-import '@arshad-shah/cynosure-react/all.css';
+import "@arshad-shah/cynosure-react/all.css";
 ```
 
 ```tsx
-import { CynosureProvider, Button } from '@arshad-shah/cynosure-react';
+import { CynosureProvider, Button } from "@arshad-shah/cynosure-react";
 
 export default function App() {
   return (
@@ -66,16 +66,16 @@ Peer requirements: **React 18 or 19** (`react`, `react-dom`). `react-hook-form` 
 
 Minified + brotli, per [`size-limit`](./.size-limit.json) budgets enforced in CI:
 
-| Component | Size | Component | Size |
-| --- | ---: | --- | ---: |
-| `Box`, `Stack`, `Flex`, `Grid` | **3 kB** | `Button` | **6 kB** |
-| `Text`, `Heading`, `Link` | **4 kB** | `Input`, `Textarea` | **8 kB** |
-| `Card`, `Badge`, `Alert` | **3–4 kB** | `Checkbox`, `Radio`, `Switch` | **10 kB** |
-| `Tooltip`, `Dialog`, `Drawer` | **18 kB** | `DropdownMenu` | **30 kB** |
-| `Tabs` | **14 kB** | `Accordion` | **14 kB** |
-| `Select` | **55 kB** | `Combobox` | **58 kB** |
-| `DatePicker` | **70 kB** | `DataTable` | **60 kB** |
-| `Form` | **6 kB** | RHF adapter | **8 kB** |
+| Component                      |       Size | Component                     |      Size |
+| ------------------------------ | ---------: | ----------------------------- | --------: |
+| `Box`, `Stack`, `Flex`, `Grid` |   **3 kB** | `Button`                      |  **6 kB** |
+| `Text`, `Heading`, `Link`      |   **4 kB** | `Input`, `Textarea`           |  **8 kB** |
+| `Card`, `Badge`, `Alert`       | **3–4 kB** | `Checkbox`, `Radio`, `Switch` | **10 kB** |
+| `Tooltip`, `Dialog`, `Drawer`  |  **18 kB** | `DropdownMenu`                | **30 kB** |
+| `Tabs`                         |  **14 kB** | `Accordion`                   | **14 kB** |
+| `Select`                       |  **55 kB** | `Combobox`                    | **58 kB** |
+| `DatePicker`                   |  **70 kB** | `DataTable`                   | **60 kB** |
+| `Form`                         |   **6 kB** | RHF adapter                   |  **8 kB** |
 
 The full barrel tops out at **260 kB** (warning-only). In practice you import per-component and never pay that.
 
@@ -93,23 +93,23 @@ Full [compatibility matrix and Next.js App Router recipe →](https://cynosure.a
 
 ## Packages
 
-| Package | What it ships |
-| --- | --- |
-| [`@arshad-shah/cynosure-react`](./packages/react) | The component library — primitives, typography, forms, overlays, nav, data, feedback. |
-| [`@arshad-shah/cynosure-tokens`](./packages/tokens) | W3C DTCG design tokens; compiled CSS (`:root` + dark) and typed TS constants. |
-| [`@arshad-shah/cynosure-themes`](./packages/themes) | Prebuilt alternative themes (terminal, high-contrast) as side-effect CSS. |
-| [`@arshad-shah/cynosure-cli`](./packages/cli) | `npx cynosure init` scaffolding CLI. |
+| Package                                             | What it ships                                                                         |
+| --------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| [`@arshad-shah/cynosure-react`](./packages/react)   | The component library — primitives, typography, forms, overlays, nav, data, feedback. |
+| [`@arshad-shah/cynosure-tokens`](./packages/tokens) | W3C DTCG design tokens; compiled CSS (`:root` + dark) and typed TS constants.         |
+| [`@arshad-shah/cynosure-themes`](./packages/themes) | Prebuilt alternative themes (terminal, high-contrast) as side-effect CSS.             |
+| [`@arshad-shah/cynosure-cli`](./packages/cli)       | `npx cynosure init` scaffolding CLI.                                                  |
 
 ---
 
 ## Theming in two lines
 
 ```tsx
-import { CynosureProvider } from '@arshad-shah/cynosure-react';
+import { CynosureProvider } from "@arshad-shah/cynosure-react";
 
-<CynosureProvider theme={{ themes: ['light', 'dark', 'terminal'], defaultTheme: 'system' }}>
+<CynosureProvider theme={{ themes: ["light", "dark", "terminal"], defaultTheme: "system" }}>
   {children}
-</CynosureProvider>
+</CynosureProvider>;
 ```
 
 Flip themes at runtime by setting `data-theme` on `<html>`. Authoring a custom theme is one CSS file — see [Custom themes](https://cynosure.arshadshah.com/foundations/custom-themes/).
@@ -120,15 +120,15 @@ Flip themes at runtime by setting `data-theme` on `<html>`. Authoring a custom t
 
 The full docs site (interactive playgrounds, MDX recipes, props tables, type reference) lives at **[cynosure.arshadshah.com](https://cynosure.arshadshah.com)**. Source lives under [`packages/docs/src/content/docs/`](./packages/docs/src/content/docs/).
 
-| Area | Live link |
-| --- | --- |
-| Installation & quickstart | [Quickstart](https://cynosure.arshadshah.com/getting-started/quickstart/) |
-| Server Components / SSR | [RSC guide](https://cynosure.arshadshah.com/getting-started/rsc/) |
-| Theming & custom themes | [Theming overview](https://cynosure.arshadshah.com/foundations/theming-overview/) |
-| Accessibility | [Accessibility](https://cynosure.arshadshah.com/foundations/accessibility/) |
-| RTL support | [RTL](https://cynosure.arshadshah.com/getting-started/rtl/) |
-| Recipes (login, dashboard, data table, …) | [Recipes](https://cynosure.arshadshah.com/recipes/) |
-| Storybook playgrounds | [`pnpm storybook`](https://cynosure.arshadshah.com/storybook/) |
+| Area                                      | Live link                                                                         |
+| ----------------------------------------- | --------------------------------------------------------------------------------- |
+| Installation & quickstart                 | [Quickstart](https://cynosure.arshadshah.com/getting-started/quickstart/)         |
+| Server Components / SSR                   | [RSC guide](https://cynosure.arshadshah.com/getting-started/rsc/)                 |
+| Theming & custom themes                   | [Theming overview](https://cynosure.arshadshah.com/foundations/theming-overview/) |
+| Accessibility                             | [Accessibility](https://cynosure.arshadshah.com/foundations/accessibility/)       |
+| RTL support                               | [RTL](https://cynosure.arshadshah.com/getting-started/rtl/)                       |
+| Recipes (login, dashboard, data table, …) | [Recipes](https://cynosure.arshadshah.com/recipes/)                               |
+| Storybook playgrounds                     | [`pnpm storybook`](https://cynosure.arshadshah.com/storybook/)                    |
 
 ### Adding a new component
 

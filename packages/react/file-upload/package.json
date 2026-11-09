@@ -1,9 +1,0 @@
-{
-  "name": "@arshad-shah/cynosure-react/file-upload",
-  "private": true,
-  "type": "module",
-  "main": "../dist/fileupload.js",
-  "module": "../dist/fileupload.js",
-  "types": "../dist/fileupload.d.ts",
-  "sideEffects": ["*.css"]
-}

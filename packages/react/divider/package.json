@@ -1,9 +1,0 @@
-{
-  "name": "@arshad-shah/cynosure-react/divider",
-  "private": true,
-  "type": "module",
-  "main": "../dist/divider.js",
-  "module": "../dist/divider.js",
-  "types": "../dist/divider.d.ts",
-  "sideEffects": ["*.css"]
-}

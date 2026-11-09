@@ -1,9 +1,0 @@
-{
-  "name": "@arshad-shah/cynosure-react/time-picker",
-  "private": true,
-  "type": "module",
-  "main": "../dist/timepicker.js",
-  "module": "../dist/timepicker.js",
-  "types": "../dist/timepicker.d.ts",
-  "sideEffects": ["*.css"]
-}

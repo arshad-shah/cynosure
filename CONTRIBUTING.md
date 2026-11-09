@@ -8,11 +8,11 @@ move with the same grain as the existing codebase.
 
 ## Prerequisites
 
-| Tool    | Version          | Notes                                                    |
-| ------- | ---------------- | -------------------------------------------------------- |
-| Node    | `>=22.0.0`       | `engines.node` enforces this. Use Volta / fnm / nvm.     |
-| pnpm    | `10.33.0`        | `packageManager` is pinned — do not bump casually.       |
-| Git     | recent           |                                                          |
+| Tool | Version    | Notes                                                |
+| ---- | ---------- | ---------------------------------------------------- |
+| Node | `>=22.0.0` | `engines.node` enforces this. Use Volta / fnm / nvm. |
+| pnpm | `10.33.0`  | `packageManager` is pinned — do not bump casually.   |
+| Git  | recent     |                                                      |
 
 Install dependencies:
 

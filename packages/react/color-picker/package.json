@@ -1,9 +1,0 @@
-{
-  "name": "@arshad-shah/cynosure-react/color-picker",
-  "private": true,
-  "type": "module",
-  "main": "../dist/colorpicker.js",
-  "module": "../dist/colorpicker.js",
-  "types": "../dist/colorpicker.d.ts",
-  "sideEffects": ["*.css"]
-}

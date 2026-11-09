@@ -1,9 +1,0 @@
-{
-  "name": "@arshad-shah/cynosure-react/radio",
-  "private": true,
-  "type": "module",
-  "main": "../dist/radio.js",
-  "module": "../dist/radio.js",
-  "types": "../dist/radio.d.ts",
-  "sideEffects": ["*.css"]
-}

@@ -24,7 +24,7 @@
 - Tests are behavioural only: no "renders without crashing" and no snapshot-only tests. Coverage floor 95% lines and branches for `src/`.
 - Targets are current evergreen Chrome, Edge, Firefox and Safari.
 - Never publish to npm or deprecate the old packages (needs Arshad's authorisation).
-- Commits end with `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`. Pushing uses the `arshad-shah` gh account: `gh auth switch -h github.com -u arshad-shah`, push, then switch back to `ShahA_hmh`.
+- Commits, PRs and issues carry no AI attribution (no Co-Authored-By or "Generated with" lines). Pushing uses the `arshad-shah` gh account: `gh auth switch -h github.com -u arshad-shah`, push, then switch back to `ShahA_hmh`.
 
 ## Review Focus
 

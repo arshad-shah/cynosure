@@ -1,9 +1,0 @@
-{
-  "name": "@arshad-shah/cynosure-react/navigation-menu",
-  "private": true,
-  "type": "module",
-  "main": "../dist/navigationmenu.js",
-  "module": "../dist/navigationmenu.js",
-  "types": "../dist/navigationmenu.d.ts",
-  "sideEffects": ["*.css"]
-}

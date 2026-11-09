@@ -217,18 +217,18 @@ which would break Aperture's in-page UI.
   accepts a `components` section that is typed per component. Component CSS may read only
   its own component tokens. `className` and `style` pass through to the root element for
   layout only (margin, grid placement, width). The docs say plainly that restyling goes
-  through tokens. *(Claude's call.)*
+  through tokens. _(Claude's call.)_
 - **Page-level mode and persistence.** `<CynosureTheme>` themes its own wrapper by
   default. `target="document"` is an explicit opt-in that applies the theme and mode to
   `<html>`, for apps that own the page; it is never used in content scripts. `ThemeToggle`
   is controlled (`value`/`onChange`). `useColorMode({ storage })` persists through a
   pluggable storage (`localStorage` by default, or extension storage). To avoid a flash on
   static sites, the Vite and Astro adapters emit a tiny **external** init script file,
-  never inline, so it stays CSP-safe. *(Claude's call.)*
+  never inline, so it stays CSP-safe. _(Claude's call.)_
 - **Contrast is a modifier, not a palette.** There are four palettes: light, dark,
   light-contrast and dark-contrast. `mode` is `light | dark | system`, and
   `contrast` is `normal | more | system`. Visual baselines cover light, dark and
-  dark-contrast. *(Claude's call.)*
+  dark-contrast. _(Claude's call.)_
 - Fonts: the default is the system stack (zero bytes, extension-safe). Hanken Grotesk
   (variable, woff2, OFL) ships in the package as an **optional** stylesheet,
   `@arshad-shah/cynosure/fonts/hanken.css`, and is never fetched from a CDN.
@@ -254,7 +254,7 @@ input that lets custom widgets such as Select and SegmentedControl submit), `Dia
 and `Icon`. **Forms:** every form control works in a native `<form>`: it submits through
 `FormData`, responds to form reset, and supports `required` and constraint validation.
 Interactive components need hydration; tokens, CSS and icons also work statically on
-non-hydrated Astro pages. *(Claude's call.)* Public
+non-hydrated Astro pages. _(Claude's call.)_ Public
 components such as `Button`, `IconButton`, `TextField`, `TextArea`, `Link` and `Dialog`
 wrap them. Composite components may use only other Cynosure components plus neutral
 layout elements (`div`, `span`, lists). This is enforced by a lint rule in `cy check`

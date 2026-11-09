@@ -1,9 +1,0 @@
-{
-  "name": "@arshad-shah/cynosure-react/spacer",
-  "private": true,
-  "type": "module",
-  "main": "../dist/spacer.js",
-  "module": "../dist/spacer.js",
-  "types": "../dist/spacer.d.ts",
-  "sideEffects": ["*.css"]
-}

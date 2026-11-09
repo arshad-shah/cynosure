@@ -1,9 +1,0 @@
-{
-  "name": "@arshad-shah/cynosure-react/search-input",
-  "private": true,
-  "type": "module",
-  "main": "../dist/searchinput.js",
-  "module": "../dist/searchinput.js",
-  "types": "../dist/searchinput.d.ts",
-  "sideEffects": ["*.css"]
-}

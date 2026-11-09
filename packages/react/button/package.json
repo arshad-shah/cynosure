@@ -1,9 +1,0 @@
-{
-  "name": "@arshad-shah/cynosure-react/button",
-  "private": true,
-  "type": "module",
-  "main": "../dist/button.js",
-  "module": "../dist/button.js",
-  "types": "../dist/button.d.ts",
-  "sideEffects": ["*.css"]
-}

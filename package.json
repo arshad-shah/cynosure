@@ -1,98 +1,84 @@
 {
-  "name": "cynosure",
-  "private": true,
-  "version": "0.0.0",
+  "name": "@arshad-shah/cynosure",
+  "version": "0.1.0",
+  "description": "Cynosure: one small, themeable, accessible UI system for every Arshad Shah product.",
+  "license": "MIT",
+  "author": "Arshad Shah",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/arshad-shah/cynosure.git"
+  },
+  "homepage": "https://arshad-shah.github.io/cynosure/",
+  "type": "module",
   "packageManager": "pnpm@10.33.0",
   "engines": {
-    "node": ">=22.18.0"
+    "node": ">=24"
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": [
+    "*.css"
+  ],
+  "peerDependencies": {
+    "react": ">=18 <20",
+    "react-dom": ">=18 <20"
   },
   "scripts": {
-    "build": "turbo run build",
-    "dev": "turbo run dev --parallel",
-    "docs": "pnpm --filter @arshad-shah/cynosure-docs dev",
-    "docs:build": "pnpm --filter @arshad-shah/cynosure-docs build",
-    "test": "turbo run test",
-    "test:watch": "turbo run test:watch --parallel",
+    "build": "node --import tsx tools/build-css.ts && vite build && tsc -p tsconfig.build.json",
+    "typecheck": "tsc",
     "lint": "biome check .",
-    "lint:fix": "biome check --write .",
-    "format": "biome format --write .",
-    "typecheck": "turbo run typecheck",
+    "format": "biome check --write .",
+    "test": "vitest run --project unit",
+    "test:stories": "vitest run --project stories",
+    "test:visual": "CY_VISUAL=1 vitest run --project stories",
     "storybook": "storybook dev -p 6006 --no-open",
-    "build-storybook": "storybook build --stats-json",
-    "changeset": "changeset",
-    "version-packages": "changeset version && pnpm install --lockfile-only",
-    "release": "turbo run build --filter=\"./packages/*\" && changeset publish",
-    "clean": "turbo run clean && rm -rf node_modules",
-    "prepare": "simple-git-hooks",
+    "build-storybook": "storybook build",
     "size": "size-limit",
-    "audit:contrast": "node scripts/audit-contrast.mjs",
-    "audit:rtl": "node scripts/audit-rtl.mjs",
-    "audit": "pnpm audit:rtl && pnpm audit:contrast",
-    "docs:changelog": "node scripts/build-changelog-page.mjs",
-    "chromatic": "chromatic --storybook-build-dir=storybook-static --exit-zero-on-changes",
-    "brand:generate": "node brand/generate.mjs"
+    "cy": "node --import tsx tools/cli/index.ts",
+    "check": "node --import tsx tools/cli/index.ts check",
+    "verify": "pnpm check && pnpm lint && pnpm typecheck && pnpm test && pnpm test:stories && pnpm build && publint && attw --pack . --profile esm-only && pnpm size",
+    "changeset": "changeset",
+    "prepare": "git config --worktree core.hooksPath .githooks 2>/dev/null || git config core.hooksPath .githooks"
   },
   "devDependencies": {
-    "@arethetypeswrong/cli": "catalog:",
-    "@arshad-shah/cynosure-react": "workspace:*",
-    "@arshad-shah/cynosure-themes": "workspace:*",
-    "@arshad-shah/cynosure-tokens": "workspace:*",
-    "@biomejs/biome": "catalog:",
-    "@changesets/changelog-github": "catalog:",
-    "@changesets/cli": "catalog:",
-    "@fontsource-variable/geist": "catalog:",
-    "@fontsource-variable/jetbrains-mono": "catalog:",
-    "@size-limit/preset-small-lib": "catalog:",
-    "@storybook/addon-a11y": "catalog:",
-    "@storybook/addon-themes": "catalog:",
-    "@storybook/addon-vitest": "catalog:",
-    "@storybook/react": "catalog:",
-    "@storybook/react-vite": "catalog:",
-    "@testing-library/dom": "catalog:",
-    "@testing-library/jest-dom": "catalog:",
-    "@testing-library/react": "catalog:",
-    "@testing-library/user-event": "catalog:",
-    "@types/react": "catalog:",
-    "@types/react-dom": "catalog:",
-    "@vanilla-extract/esbuild-plugin": "catalog:",
-    "@vanilla-extract/vite-plugin": "catalog:",
-    "@vitejs/plugin-react": "catalog:",
-    "@vitest/browser": "catalog:",
-    "@vitest/browser-playwright": "catalog:",
-    "@vitest/coverage-v8": "catalog:",
-    "chromatic": "catalog:",
-    "colorjs.io": "catalog:",
-    "lint-staged": "catalog:",
-    "playwright": "catalog:",
-    "publint": "catalog:",
-    "react": "catalog:",
-    "react-dom": "catalog:",
-    "sharp": "^0.34.5",
-    "simple-git-hooks": "catalog:",
-    "size-limit": "catalog:",
-    "storybook": "catalog:",
-    "tsup": "catalog:",
-    "turbo": "catalog:",
-    "typescript": "catalog:",
-    "vite": "catalog:",
-    "vitest": "catalog:"
+    "vitest": "^5.0.0",
+    "typescript": "~5.9.3",
+    "@types/node": "^24.0.0",
+    "vite": "^8.0.0",
+    "lightningcss": "^1.30.0",
+    "tsx": "^4.20.0",
+    "@biomejs/biome": "^2.0.0",
+    "@changesets/cli": "^3.0.0",
+    "publint": "^0.3.0",
+    "@arethetypeswrong/cli": "^0.18.0",
+    "size-limit": "^14.0.0",
+    "@size-limit/preset-small-lib": "^14.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^6.0.0"
   },
-  "simple-git-hooks": {
-    "pre-commit": "pnpm lint-staged",
-    "commit-msg": "node scripts/verify-commit-msg.mjs $1"
-  },
-  "lint-staged": {
-    "*.{ts,tsx,js,jsx,json,md}": ["biome check --write --no-errors-on-unmatched"]
-  },
-  "pnpm": {
-    "overrides": {
-      "yaml@<2.8.3": ">=2.8.3",
-      "esbuild@<0.25.0": ">=0.25.0",
-      "fast-uri@<3.1.2": ">=3.1.2"
-    }
-  },
-  "volta": {
-    "node": "24.15.0",
-    "pnpm": "10.33.0"
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./icons": {
+      "types": "./dist/icons/index.d.ts",
+      "default": "./dist/icons/index.js"
+    },
+    "./styles.css": "./dist/styles.css",
+    "./styles/*.css": "./dist/styles/*.css",
+    "./styles.inline": {
+      "types": "./dist/styles/inline.d.ts",
+      "default": "./dist/styles/inline.js"
+    },
+    "./vite": {
+      "types": "./dist/adapters/vite/index.d.ts",
+      "default": "./dist/adapters/vite/index.js"
+    },
+    "./package.json": "./package.json"
   }
 }

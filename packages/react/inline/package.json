@@ -1,9 +1,0 @@
-{
-  "name": "@arshad-shah/cynosure-react/inline",
-  "private": true,
-  "type": "module",
-  "main": "../dist/inline.js",
-  "module": "../dist/inline.js",
-  "types": "../dist/inline.d.ts",
-  "sideEffects": ["*.css"]
-}
