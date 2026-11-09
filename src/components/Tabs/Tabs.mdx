@@ -1,0 +1,91 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./Tabs.stories";
+
+<Meta of={Stories} />
+
+# Tabs
+
+Switches between views of the same thing, such as a document's tree, raw and schema views, while staying on one page. If the options filter or change a value rather than swapping whole panels, use [SegmentedControl](?path=/docs/components-segmentedcontrol--docs).
+
+<Canvas of={Stories.ArrowsSelectSkippingDisabled} />
+
+## When to use
+
+- **Two or more panels of related content** where only one is visible at a time.
+- **`variant="line"` (default):** page or panel level navigation with an underline indicator.
+- **`variant="soft"`:** compact switchers inside cards, toolbars and side panels.
+- **`activation="manual"`:** when showing a panel is expensive (network, large renders), so arrowing past a tab doesn't load it.
+
+**Use something else when:**
+- the choice is a setting or filter: [SegmentedControl](?path=/docs/components-segmentedcontrol--docs) or [RadioGroup](?path=/docs/components-radiogroup--docs)
+- each option goes to a different page: [Link](?path=/docs/components-link--docs)s in your navigation
+- the sections should be readable together: [Stack](?path=/docs/components-stack--docs) with headings
+
+## Usage
+
+```tsx
+import { Tab, TabList, TabPanel, Tabs } from "@arshad-shah/cynosure";
+import { code, list } from "@arshad-shah/cynosure/icons";
+
+<Tabs defaultValue="tree" onChange={setView}>
+  <TabList label="Document views">
+    <Tab value="tree" icon={list}>Tree</Tab>
+    <Tab value="raw" icon={code}>Raw</Tab>
+    <Tab value="schema" disabled>Schema</Tab>
+  </TabList>
+  <TabPanel value="tree"><Tree /></TabPanel>
+  <TabPanel value="raw"><Raw /></TabPanel>
+  <TabPanel value="schema"><Schema /></TabPanel>
+</Tabs>
+```
+
+`TabList` needs a `label`, which names the group for screen readers. Every `Tab` needs a unique `value`. A `TabPanel` with the same value is optional: tabs that drive routed content outside `Tabs` simply don't point at a panel.
+
+## Many tabs
+
+When tabs don't fit, the list scrolls sideways (with no visible scrollbar). Edges that hide tabs fade out, and the selected or focused tab is always scrolled clear of the fade. This also works right to left.
+
+<Canvas of={Stories.OverflowScrollsTheActiveTabIntoView} />
+
+## Changing tabs
+
+- **Controlled:** pass `value` and `onChange`. The Tab stop follows selections made from outside.
+- **Closing tabs:** when the selected tab is removed, the tab now in its place is selected (or the previous one if it was last), and `onChange` reports it.
+
+<Canvas of={Stories.RemovingTheSelectedTabSelectsTheNextOne} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+`Tab`: `value`, `icon`, `disabled`, `children`. `TabList`: `label`. `TabPanel`: `value`, `keepMounted` (keep the content mounted while hidden, preserving its state; by default only the selected panel renders its content).
+
+## Behaviour and accessibility
+
+| Input | Result |
+| --- | --- |
+| <kbd>Tab</kbd> | Focuses the selected tab (one Tab stop), then the panel |
+| <kbd>Left</kbd> <kbd>Right</kbd> arrows | Previous / next tab, wrapping, skipping disabled ones (flipped in RTL) |
+| <kbd>Home</kbd> <kbd>End</kbd> | First / last tab |
+| <kbd>Enter</kbd> <kbd>Space</kbd>, click, tap | Select (the only way to select with `activation="manual"`) |
+
+- **Roles:** `tablist` (named by `label`), `tab` with `aria-selected` and `aria-controls`, and `tabpanel` labelled by its tab.
+- **Hidden panels** stay in the DOM with `hidden`, so `aria-controls` always resolves.
+- **Panels are focusable** (`tabIndex=0`), so keyboard users can reach panels without interactive content.
+- **Forced colors:** the selected tab is outlined with the system highlight colour.
+
+## Touch
+
+Each tab has at least a 24px hit area, and 44px on coarse pointers, without changing its visible size. The list scrolls with a swipe.
+
+## Theming
+
+Tokens: `--cy-tabs-gap`, `--cy-tabs-indicator` (selected colour, default accent), `--cy-tabs-indicator-width` and `--cy-tabs-radius`.
+
+```ts
+createTheme({ components: { tabs: { indicator: "#2563eb", indicatorWidth: "3px" } } });
+```
+
+## Related
+
+[SegmentedControl](?path=/docs/components-segmentedcontrol--docs) · [Toolbar](?path=/docs/components-toolbar--docs) · [Card](?path=/docs/components-card--docs)

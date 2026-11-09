@@ -136,6 +136,13 @@ describe("cy check", () => {
     rmSync(join(root, "src/components/IconButton/README.md"));
     expect(rules(root)).toContain("structure");
   });
+  it("flags glyphs used as icons or arrows in docs pages", () => {
+    const root = sandbox();
+    const page = "src/components/Badge/Badge.mdx";
+    write(root, page, `${readFileSync(join(root, page), "utf8")}\n- it navigates \u2192 Link\n`);
+    const glyphs = check(root).filter((v) => v.rule === "glyphs");
+    expect(glyphs.map((v) => v.file)).toEqual([page]);
+  });
   it("requires a hand-written docs page attached to the stories for every component", () => {
     const root = sandbox();
     rmSync(join(root, "src/components/Button/Button.mdx"));

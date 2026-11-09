@@ -217,3 +217,23 @@ export const GripSitsInTheBoxCornerClearOfTheCounter: Story = {
     await expect(g.bottom <= count.top || g.top >= count.bottom).toBe(true);
   },
 };
+
+export const GripIgnoresOtherButtonsAndCancelledDrags: Story = {
+  args: { label: "Notes", rows: 3 },
+  play: async ({ canvas, canvasElement }) => {
+    const area = canvas.getByRole("textbox", { name: "Notes" });
+    const handle = grip(canvasElement);
+    const start = area.getBoundingClientRect().height;
+    const r = handle.getBoundingClientRect();
+    const at = { bubbles: true, pointerId: 9, clientX: r.left + 4, clientY: r.top + 4 };
+    // Right button: no drag.
+    handle.dispatchEvent(new PointerEvent("pointerdown", { ...at, button: 2, buttons: 2 }));
+    handle.dispatchEvent(new PointerEvent("pointermove", { ...at, clientY: at.clientY + 50, buttons: 2 }));
+    await expect(Math.round(area.getBoundingClientRect().height)).toBe(Math.round(start));
+    // Cancelled drag: later moves do nothing.
+    handle.dispatchEvent(new PointerEvent("pointerdown", { ...at, button: 0, buttons: 1 }));
+    handle.dispatchEvent(new PointerEvent("pointercancel", at));
+    handle.dispatchEvent(new PointerEvent("pointermove", { ...at, clientY: at.clientY + 50, buttons: 1 }));
+    await expect(Math.round(area.getBoundingClientRect().height)).toBe(Math.round(start));
+  },
+};

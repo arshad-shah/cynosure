@@ -180,5 +180,11 @@
     ],
     "limit": "2 kB",
     "gzip": true
+  },
+  {
+    "name": "Tabs",
+    "path": ["dist/components/Tabs/Tabs.js", "dist/foundations/roving-focus.js", "dist/styles/tabs.css"],
+    "limit": "4.5 kB",
+    "gzip": true
   }
 ]

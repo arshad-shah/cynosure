@@ -18,6 +18,17 @@ export {
 export { Select, type SelectOption, type SelectProps } from "./components/Select/index.js";
 export { Stack, type StackProps } from "./components/Stack/index.js";
 export { Switch, type SwitchProps } from "./components/Switch/index.js";
+export {
+  Tab,
+  TabList,
+  type TabListProps,
+  TabPanel,
+  type TabPanelProps,
+  type TabProps,
+  Tabs,
+  type TabsProps,
+  type TabsTokens,
+} from "./components/Tabs/index.js";
 export { TextArea, type TextAreaProps } from "./components/TextArea/index.js";
 export { TextField, type TextFieldProps } from "./components/TextField/index.js";
 export { ThemeToggle, type ThemeToggleProps } from "./components/ThemeToggle/index.js";

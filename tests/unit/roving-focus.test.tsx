@@ -121,3 +121,28 @@ describe("useRovingFocus with native controls", () => {
     expect(getByRole("button", { name: "A" }).tabIndex).toBe(0);
   });
 });
+
+function Selected({ selected }: { selected: number }) {
+  const ref = useRef<HTMLDivElement>(null);
+  useRovingFocus(ref, { selector: '[role="tab"]' });
+  return (
+    <div ref={ref}>
+      {["A", "B", "C"].map((label, i) => (
+        <span key={label} role="tab" tabIndex={-1} aria-selected={i === selected}>
+          {label}
+        </span>
+      ))}
+    </div>
+  );
+}
+
+describe("useRovingFocus follows the selection", () => {
+  it("moves the tab stop to a newly selected item while focus is outside the group", async () => {
+    const { getByText, rerender } = render(<Selected selected={0} />);
+    expect(getByText("A").tabIndex).toBe(0);
+    rerender(<Selected selected={2} />);
+    await act(async () => {});
+    expect(getByText("C").tabIndex).toBe(0);
+    expect(getByText("A").tabIndex).toBe(-1);
+  });
+});

@@ -203,7 +203,7 @@ export const ItemsAddedLaterJoinTheRovingGroup: Story = {
 export const RightToLeftFlipsArrows: Story = {
   render: (args) => (
     <div dir="rtl">
-      <Toolbar {...args}>
+      <Toolbar {...args} className="host-toolbar">
         <Button size="sm">Bold</Button>
         <Button size="sm">Italic</Button>
       </Toolbar>
@@ -213,6 +213,7 @@ export const RightToLeftFlipsArrows: Story = {
     await userEvent.tab();
     await userEvent.keyboard("{ArrowLeft}");
     await expect(name()).toBe("Italic");
+    await expect(document.querySelector(".cy-toolbar.host-toolbar")).toBeTruthy();
   },
 };
 

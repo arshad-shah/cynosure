@@ -220,6 +220,19 @@ function structureRules(root: string, out: Violation[]) {
           message: "needs a README.md with a '## Used by' section",
         });
       const page = join(folder, `${name}.mdx`);
+      // Docs pages follow the same rule as code: no text glyphs standing in for icons or arrows.
+      if (existsSync(page))
+        readFileSync(page, "utf8")
+          .split("\n")
+          .forEach((text, i) => {
+            if (GLYPHS.test(text))
+              out.push({
+                rule: "glyphs",
+                file: relative(root, page),
+                line: i + 1,
+                message: "text glyph in a docs page: write the word (Left arrow, use X) or show an Icon",
+              });
+          });
       if (!existsSync(page) || !readFileSync(page, "utf8").includes("<Meta of={Stories}"))
         out.push({
           rule: "docs",

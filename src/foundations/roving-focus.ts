@@ -30,12 +30,17 @@ export function useRovingFocus(container: RefObject<HTMLElement | null>, options
     const setStop = (target: HTMLElement) => {
       for (const item of items()) item.tabIndex = item === target ? 0 : -1;
     };
-    let stop: HTMLElement | undefined =
+    const selected = () =>
       items().find(
-        (el) => el.getAttribute("aria-selected") === "true" || el.getAttribute("aria-checked") === "true",
-      ) ?? items().find(enabled);
+        (el) =>
+          enabled(el) &&
+          (el.getAttribute("aria-selected") === "true" || el.getAttribute("aria-checked") === "true"),
+      );
+    let stop: HTMLElement | undefined = selected() ?? items().find(enabled);
     const sync = () => {
-      // Keep the current stop if it is still here; otherwise fall back to the first enabled item.
+      // While focus is elsewhere the stop follows the selection (APG tabs, radios); otherwise keep the current stop
+      // if it is still here, falling back to the first enabled item.
+      if (!root.contains(document.activeElement)) stop = selected() ?? stop;
       if (!stop || !root.contains(stop) || !enabled(stop)) stop = items().find(enabled);
       if (stop) setStop(stop);
     };
@@ -46,7 +51,7 @@ export function useRovingFocus(container: RefObject<HTMLElement | null>, options
       childList: true,
       subtree: true,
       attributes: true,
-      attributeFilter: ["disabled", "aria-disabled"],
+      attributeFilter: ["disabled", "aria-disabled", "aria-selected", "aria-checked"],
     });
 
     const onFocusIn = (e: FocusEvent) => {
