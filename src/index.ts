@@ -14,6 +14,7 @@ export {
 export { Switch, type SwitchProps } from "./components/Switch/index.js";
 export { TextArea, type TextAreaProps } from "./components/TextArea/index.js";
 export { TextField, type TextFieldProps } from "./components/TextField/index.js";
+export { Tooltip, type TooltipProps } from "./components/Tooltip/index.js";
 export { ButtonBase, type ButtonBaseProps } from "./foundations/ButtonBase/ButtonBase.js";
 export { ChoiceBase, type ChoiceBaseProps } from "./foundations/ChoiceBase/ChoiceBase.js";
 export { type FieldRender, useField } from "./foundations/field.js";

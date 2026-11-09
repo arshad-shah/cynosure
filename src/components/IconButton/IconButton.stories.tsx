@@ -51,22 +51,21 @@ export const Danger: Story = {
 };
 
 export const TooltipShowsAndDismisses: Story = {
-  play: async ({ canvas, userEvent }) => {
+  play: async ({ canvas, canvasElement, userEvent }) => {
     const button = canvas.getByRole("button", { name: "Copy document" });
-    const tip = button.querySelector(".cy-icon-button-tip") as HTMLElement;
-    await expect(tip).toHaveAttribute("aria-hidden", "true");
-    await expect(button).not.toHaveAttribute("data-tip");
+    const tip = canvasElement.querySelector(".cy-tooltip") as HTMLElement;
+    await expect(tip).toHaveTextContent("Copy document");
+    await expect(tip.matches(":popover-open")).toBe(false);
     await userEvent.hover(button);
-    await waitFor(() => expect(button).toHaveAttribute("data-tip", "open"));
-    await expect(tip.textContent).toBe("Copy document");
+    await waitFor(() => expect(tip.matches(":popover-open")).toBe(true));
     await userEvent.keyboard("{Escape}");
-    await expect(button).not.toHaveAttribute("data-tip");
+    await expect(tip.matches(":popover-open")).toBe(false);
     await userEvent.unhover(button);
     await userEvent.tab();
     await expect(button).toHaveFocus();
-    await waitFor(() => expect(button).toHaveAttribute("data-tip", "open"));
+    await waitFor(() => expect(tip.matches(":popover-open")).toBe(true));
     await userEvent.tab();
-    await expect(button).not.toHaveAttribute("data-tip");
+    await waitFor(() => expect(tip.matches(":popover-open")).toBe(false));
   },
 };
 
@@ -101,11 +100,12 @@ export const ForwardsConsumerHandlersAndClassName: Story = {
 };
 
 export const MouseFocusDoesNotPinTooltip: Story = {
-  play: async ({ canvas, userEvent }) => {
+  play: async ({ canvas, canvasElement, userEvent }) => {
     const button = canvas.getByRole("button", { name: "Copy document" });
+    const tip = canvasElement.querySelector(".cy-tooltip") as HTMLElement;
     await userEvent.click(button);
     await expect(button).toHaveFocus();
     await userEvent.unhover(button);
-    await expect(button).not.toHaveAttribute("data-tip");
+    await waitFor(() => expect(tip.matches(":popover-open")).toBe(false));
   },
 };

@@ -1,34 +1,8 @@
-/* IconButton: square Button plus a lightweight tooltip (replaced by Tooltip in a later plan). */
+/* IconButton: a square Button. Its label tooltip is the Tooltip component. */
 .cy-button.cy-button.cy-icon-button {
   inline-size: var(--_h);
   padding: 0;
   & .cy-button-label {
     display: contents;
-  }
-}
-
-.cy-icon-button-tip {
-  position: absolute;
-  inset-block-start: calc(100% + var(--cy-space-3));
-  left: 50%;
-  translate: -50% 0;
-  z-index: var(--cy-z-tooltip);
-  padding: var(--cy-space-2) var(--cy-space-4);
-  border-radius: calc(var(--cy-radius-sm) * 0.7);
-  background: var(--cy-color-ink);
-  color: var(--cy-color-bg);
-  font-size: var(--cy-font-size-sm);
-  font-weight: var(--cy-font-weight-regular);
-  white-space: nowrap;
-  pointer-events: none;
-  opacity: 0;
-  visibility: hidden;
-  transition:
-    opacity var(--cy-motion-fast) var(--cy-motion-ease),
-    visibility 0s linear var(--cy-motion-fast);
-  [data-tip="open"] > & {
-    opacity: 1;
-    visibility: visible;
-    transition: opacity var(--cy-motion-fast) var(--cy-motion-ease);
   }
 }
