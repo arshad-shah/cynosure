@@ -1,0 +1,66 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./SignaturePad.stories";
+
+<Meta of={Stories} />
+
+# SignaturePad
+
+A pad to draw a signature with a mouse, finger or pen.
+
+<Canvas of={Stories.DrawingAStroke} />
+
+## When to use
+
+- **Collecting a handwritten signature** for a document or a form.
+
+**Always offer another way.** Drawing needs a pointer and steady hands; it cannot be done from a keyboard or with most assistive technology. Put the pad beside a typed-name option and an upload option (for example as [Tabs](?path=/docs/components-tabs--docs) in a [Dialog](?path=/docs/components-dialog--docs)), and point to them with `aria-describedby`.
+
+## Usage
+
+```tsx
+import { SignaturePad } from "@arshad-shah/cynosure";
+
+const [strokes, setStrokes] = useState<InkStroke[]>([]);
+
+<SignaturePad label="Draw your signature" value={strokes} onChange={setStrokes} />
+```
+
+`onChange` is called once per finished stroke with the whole list. Undo and clear are yours: drop the last stroke, or empty the list.
+
+<Canvas of={Stories.UndoAndClearAreYours} />
+
+## Pens, fingers and palms
+
+- **Pens:** pressure (through a curve that lifts light writing) and tilt shape the line.
+- **Mouse and touch:** a steady line, like a ballpoint (speed-based pressure makes lines wobble).
+- **One stroke at a time:** a second finger, a right-click or a pen's barrel button never starts or replaces a stroke.
+- **Palm rejection:** touches are ignored for three seconds after a pen was last seen.
+
+## Keeping its shape
+
+Pass `space` to record strokes in a fixed coordinate space. The signature then keeps its shape and weight whatever size the pad is shown at (a phone, a large screen, a resize while drawing).
+
+<Canvas of={Stories.KeepsItsShapeAtAnySize} />
+
+## Saving
+
+`inkToSvg(strokes, { width, height, ink, weight })` returns a standalone SVG for saving or placing in a PDF. `inkPath(stroke, weight)` gives one stroke's path data using only M, C and Z, which canvases and PDF writers read alike.
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+- **Role:** the canvas is an image named by `label`; describe the other ways to sign with `aria-describedby`.
+- **Touch:** gestures on the pad draw instead of scrolling the page, and long-press menus are suppressed while drawing.
+- **Colour:** without `ink`, the ink token is used, so the line is dark on light and light on dark. In forced colours it uses the system text colour.
+- **Disabled:** `aria-disabled`, nothing draws.
+
+## Theming
+
+Tokens: `--cy-signature-pad-ink`, `--cy-signature-pad-background`, `--cy-signature-pad-height` and `--cy-signature-pad-guide`.
+
+## Related
+
+[FloatingToolbar](?path=/docs/components-floatingtoolbar--docs) · [FileDrop](?path=/docs/components-filedrop--docs) · [Dialog](?path=/docs/components-dialog--docs)

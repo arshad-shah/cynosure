@@ -415,5 +415,15 @@
     "path": ["dist/components/FloatingToolbar/FloatingToolbar.js", "dist/styles/floating-toolbar.css"],
     "limit": "3.5 kB",
     "gzip": true
+  },
+  {
+    "name": "SignaturePad (with ink)",
+    "path": [
+      "dist/components/SignaturePad/SignaturePad.js",
+      "dist/components/SignaturePad/ink.js",
+      "dist/styles/signature-pad.css"
+    ],
+    "limit": "3.5 kB",
+    "gzip": true
   }
 ]

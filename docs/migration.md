@@ -9,7 +9,7 @@ Tracked as one issue per product repo (opened after Milestone 2). Order of work 
 
 Available now (Milestones 1 and 2, and Milestone 3 as it lands):
 
-- **Controls:** Button, IconButton, CopyButton, Link, TextField, NumberField, SearchField, TextArea, Select, Combobox, TagInput, Checkbox, Switch, RadioGroup, SegmentedControl, Slider, ColorField, FileDrop, ThemeToggle.
+- **Controls:** Button, IconButton, CopyButton, Link, TextField, NumberField, SearchField, TextArea, Select, Combobox, TagInput, Checkbox, Switch, RadioGroup, SegmentedControl, Slider, ColorField, FileDrop, SignaturePad, ThemeToggle.
 - **Structure:** AppShell, Stack, Inline, Grid, SideNav, SplitPane, Card, Toolbar, Tabs, Disclosure, Accordion, Tree, SortableList.
 - **Overlays:** Tooltip, Popover, FloatingToolbar (`DockedToolbar`), Menu, ContextMenu, Dialog, Sheet, CommandPalette, Toast.
 - **Feedback and display:** Notice, EmptyState, ProgressBar, Steps, LoadingDots, Skeleton, DescriptionList, Table, Prose, CodeBlock, Announcer (`useAnnounce`), Badge, Kbd, Field.

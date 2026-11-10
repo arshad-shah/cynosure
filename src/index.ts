@@ -137,6 +137,22 @@ export {
   type SideNavProps,
   type SideNavTokens,
 } from "./components/SideNav/index.js";
+export {
+  INK_WEIGHTS,
+  type InkPoint,
+  type InkStroke,
+  type InkWeight,
+  inkOutline,
+  inkPath,
+  inkPoint,
+  inkToSvg,
+  outlineToPath,
+  penPressure,
+  SignaturePad,
+  type SignaturePadProps,
+  type SignaturePadTokens,
+  STEADY_PRESSURE,
+} from "./components/SignaturePad/index.js";
 export { Skeleton, type SkeletonProps, type SkeletonTokens } from "./components/Skeleton/index.js";
 export {
   Slider,
