@@ -52,6 +52,12 @@ At most `max` toasts show at once. Older ones fold away and come back as newer o
 
 <Canvas of={Stories.MaxVisibleOlderCollapse} />
 
+## Inside a Dialog
+
+Toasts raised while a Dialog is open appear above it, and carry on after it closes.
+
+<Canvas of={Stories.ToastsInsideADialogShowAboveIt} />
+
 ## Props
 
 <ArgTypes of={Stories} />
@@ -68,7 +74,7 @@ At most `max` toasts show at once. Older ones fold away and come back as newer o
 - **Announcements:** each toast is a live element: `role="status"` (polite), or `role="alert"` (assertive) for `tone="danger"`. Its text arrives once, after the live element exists, so it is announced once.
 - **Region:** toasts sit in a region named "Notifications" in the browser top layer, so no parent can clip them. Pointer events pass through the empty parts of the region.
 - **Hidden page:** timers also pause while the tab is hidden, so a toast is not missed.
-- **Modal dialogs (known limit):** a Dialog opened after the Toaster covers the toasts and makes them inert while it is open, so a toast raised from inside an open Dialog is neither seen nor announced until the dialog closes. Inside a Dialog, show the result in the dialog itself (a Notice, or CopyButton's own announcement).
+- **Modal dialogs:** while a [Dialog](?path=/docs/components-dialog--docs) or Sheet inside the Toaster is open, the toasts show inside it, above its backdrop, so they stay visible, clickable and announced (outside, the modal would make them inert). When the dialog closes they move back to the page with the time they had left, and are not announced a second time.
 - **Motion:** toasts slide and fade in and out, and do not move under reduced motion.
 
 ## Touch

@@ -1,11 +1,12 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { Component, type ReactNode } from "react";
+import { Component, type ReactNode, useState } from "react";
 import { expect, fn, waitFor } from "storybook/test";
 import { computeUnderHostileHost } from "../../test/hostile.js";
 import { shownFully } from "../../test/settle.js";
 import { CynosureTheme } from "../../theme/CynosureTheme.js";
 import { createTheme } from "../../tokens/index.js";
 import { Button } from "../Button/Button.js";
+import { Dialog } from "../Dialog/Dialog.js";
 import { Inline } from "../Inline/Inline.js";
 import { Toaster, type ToasterProps, type ToastOptions, useToast } from "./Toast.js";
 
@@ -319,5 +320,110 @@ export const TouchTargets: Story = {
     const close = canvas.getByRole("button", { name: "Dismiss" });
     const hit = getComputedStyle(close, "::before");
     await expect(Number.parseFloat(hit.blockSize || hit.height)).toBeGreaterThanOrEqual(44);
+  },
+};
+
+/** A Dialog with buttons that raise toasts while it is open. */
+function DialogRaisingToasts() {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <Button onClick={() => setOpen(true)}>Edit</Button>
+      <Dialog title="Edit" open={open} onOpenChange={setOpen}>
+        <Demo
+          options={{
+            Copy: { title: "Copied", duration: Number.POSITIVE_INFINITY },
+            Fail: { title: "Upload failed", tone: "danger", duration: Number.POSITIVE_INFINITY },
+            Timed: { title: "Timed", duration: 3000 },
+          }}
+        />
+      </Dialog>
+    </>
+  );
+}
+
+const dialogEl = () => document.querySelector("dialog.cy-dialog") as HTMLDialogElement;
+const regionEl = () => document.querySelector(".cy-toaster") as HTMLElement;
+const openDialog = async (
+  canvas: { getByRole: (r: string, o: object) => HTMLElement },
+  click: (e: Element) => unknown,
+) => {
+  await click(canvas.getByRole("button", { name: "Edit" }));
+  await waitFor(() => expect(dialogEl().open).toBe(true));
+};
+const closeDialog = async (press: (keys: string) => unknown) => {
+  await press("{Escape}");
+  await waitFor(() => expect(dialogEl().open).toBe(false));
+};
+
+export const ToastsInsideADialogShowAboveIt: Story = {
+  render: (args) => (
+    <Toaster {...args}>
+      <DialogRaisingToasts />
+    </Toaster>
+  ),
+  play: async ({ canvas, userEvent }) => {
+    await openDialog(canvas, (e) => userEvent.click(e));
+    await userEvent.click(canvas.getByRole("button", { name: "Copy" }));
+    const toast = await canvas.findByRole("status");
+    await waitFor(() => expect(toast).toHaveTextContent("Copied"));
+    // The region moved inside the open dialog (so the modal does not make it inert) and sits on top of it.
+    await expect(dialogEl().contains(regionEl())).toBe(true);
+    await expect(regionEl().matches(":popover-open")).toBe(true);
+    await shownFully(toast);
+    const box = toast.getBoundingClientRect();
+    await expect(
+      toast.contains(document.elementFromPoint(box.left + box.width / 2, box.top + box.height / 2)),
+    ).toBe(true);
+    // Its buttons work while the dialog is open.
+    await userEvent.click(canvas.getByRole("button", { name: "Dismiss" }));
+    await waitFor(() => expect(toast.isConnected).toBe(false), { timeout: 3000 });
+    await expect(dialogEl().open).toBe(true);
+  },
+};
+
+export const ToastsOutliveTheDialogWithoutAnnouncingAgain: Story = {
+  render: (args) => (
+    <Toaster {...args}>
+      <DialogRaisingToasts />
+    </Toaster>
+  ),
+  play: async ({ canvas, userEvent }) => {
+    await openDialog(canvas, (e) => userEvent.click(e));
+    await userEvent.click(canvas.getByRole("button", { name: "Fail" }));
+    await waitFor(() => expect(canvas.getByRole("alert")).toHaveTextContent("Upload failed"));
+    // Escape closes the dialog, not the toast; the toast moves back to the page region.
+    await closeDialog((k) => userEvent.keyboard(k));
+    await waitFor(() => expect(dialogEl().contains(regionEl())).toBe(false));
+    await expect(regionEl().matches(":popover-open")).toBe(true);
+    const moved = await canvas.findByText("Upload failed", { selector: ".cy-toast-title" });
+    const toast = moved.closest(".cy-toast") as HTMLElement;
+    // Already announced as an alert: it comes back as a status with its text in place, so nothing is announced again.
+    await expect(toast).toHaveAttribute("role", "status");
+    await expect(canvas.queryByRole("alert")).toBeNull();
+    await shownFully(toast);
+  },
+};
+
+export const ToastsKeepTheirTimeWhenTheDialogCloses: Story = {
+  render: (args) => (
+    <Toaster {...args}>
+      <DialogRaisingToasts />
+    </Toaster>
+  ),
+  play: async ({ canvas, userEvent }) => {
+    await openDialog(canvas, (e) => userEvent.click(e));
+    await userEvent.click(canvas.getByRole("button", { name: "Timed" }));
+    await waitFor(() => expect(canvas.getByRole("status")).toHaveTextContent("Timed"));
+    // Spend most of its 3s (the pointer is on the dialog's button, not the toast), then close the dialog.
+    await sleep(2000);
+    await closeDialog((k) => userEvent.keyboard(k));
+    const closedAt = Date.now();
+    const toast = (await canvas.findByText("Timed", { selector: ".cy-toast-title" })).closest(
+      ".cy-toast",
+    ) as HTMLElement;
+    await waitFor(() => expect(toast.isConnected).toBe(false), { timeout: 4000 });
+    // It finished its remaining second or so, rather than starting a fresh 3s.
+    await expect(Date.now() - closedAt).toBeLessThan(2500);
   },
 };

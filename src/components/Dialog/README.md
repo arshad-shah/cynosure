@@ -33,6 +33,7 @@ A modal dialog in the browser top layer, built on the `DialogBase` foundation (n
 - Focus moves to the first control in the content (else the first action, else the dialog) and returns to where it was.
 - The page behind is inert (native modal). Escape closes the topmost layer only: a Menu, Select or Tooltip inside closes first. A pointer down on the backdrop closes it, unless a nested layer is open.
 - The content scrolls between a fixed header and actions. Below a container width of 36rem the dialog docks to the bottom edge.
+- Inside a Toaster, toasts raised while it is open show above it and move back to the page when it closes.
 - Never writes to `<html>` or `<body>` (no scroll lock; the content uses `overscroll-behavior: contain`). Works inside shadow roots.
 
 Tokens: `--cy-dialog-radius`, `--cy-dialog-padding`, `--cy-dialog-width-{sm,md,lg}`, `--cy-dialog-scrim`.

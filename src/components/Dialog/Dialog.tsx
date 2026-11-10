@@ -1,8 +1,9 @@
-import { type CSSProperties, type ReactNode, useCallback, useId, useRef, useState } from "react";
+import { type CSSProperties, type ReactNode, useCallback, useContext, useId, useRef, useState } from "react";
 import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js";
 import { DialogBase } from "../../foundations/DialogBase/DialogBase.js";
 import { close as closeIcon } from "../../icons/close.js";
 import { useDismiss } from "../../overlay/dismiss.js";
+import { ToastHostContext } from "../../overlay/toast-host.js";
 import type { Size } from "../../tokens/schema.js";
 import { IconButton } from "../IconButton/IconButton.js";
 
@@ -98,6 +99,8 @@ export function DialogFrame({
   const [inner, setInner] = useState(defaultOpen);
   const isOpen = open ?? inner;
   const dialog = useRef<HTMLDialogElement>(null);
+  const toastHost = useContext(ToastHostContext);
+  const toasts = useRef<HTMLDivElement>(null);
   const body = useRef<HTMLDivElement>(null);
   const footer = useRef<HTMLDivElement>(null);
   const returnTo = useRef<HTMLElement | null>(null);
@@ -117,6 +120,13 @@ export function DialogFrame({
   };
 
   // On close, before useDismiss returns focus: make sure the remembered element can still take it.
+  // Inside a Toaster, lend it a container while open: toasts raised now show above this dialog instead of under its
+  // scrim, where the modal would make them inert. Runs after DialogBase has called showModal.
+  useClientLayoutEffect(() => {
+    if (!isOpen || !toastHost || !toasts.current) return;
+    return toastHost.register(toasts.current);
+  }, [isOpen, toastHost]);
+
   useClientLayoutEffect(() => {
     if (!isOpen) return;
     return () => {
@@ -196,6 +206,7 @@ export function DialogFrame({
           </div>
         )}
       </div>
+      {toastHost && <div ref={toasts} className="cy-dialog-toasts" />}
     </DialogBase>
   );
 }

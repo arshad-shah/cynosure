@@ -43,15 +43,15 @@ After Plan 3 (fixes from Arshad's checks of the published Storybook, 2026-11-10)
 
 ## Current task
 
-Plan 4 Task 1: toasts inside modal dialogs (the open Plan 3 question). Not started.
+Plan 4 Task 2: ProgressBar. Task 1 (toasts inside modal dialogs) is done.
 
 ## Next step
 
 Build Plan 4 (`docs/superpowers/plans/2026-11-10-cynosure-evidence.md`) task by task, stories first:
 
-1. **Task 1:** toasts inside modal dialogs: a toast host inside each open Dialog; `useToast()` prefers the nearest open modal host; live toasts move to the page Toaster when the dialog closes.
+1. **Task 1:** done. Toasts raised inside an open Dialog show above it; they move back to the page with their remaining time and are not announced again.
 2. **Tasks 2–7:** ProgressBar, Slider (single and range), Combobox, Tree, CommandPalette, ColorField. The product evidence for each is in the plan.
-3. **Task 8:** carry-overs: confirm the keyframe entrances on WebKit in CI, check Prism for Tree, add Slider and Combobox to the React 18 smoke tests.
+3. **Task 8:** carry-overs: check Prism for Tree, add Slider and Combobox to the React 18 smoke tests. (The keyframe entrances are confirmed on WebKit: in CI run 387 Dialog, Popover, Menu, Tooltip and Select passed their `shownFully` checks; the only failure was a Toast test race, fixed.)
 4. **Task 9:** draft one migration issue per product repo in `docs/migration/issues/`. Open them only after Arshad reviews the drafts.
 5. **Task 10:** docs, independent review, `pnpm verify`, CI green, push.
 
@@ -69,14 +69,14 @@ An independent review of the Plan 3 Tasks 8–12 code found nine issues. Fixed (
 - New layout effects use `useClientLayoutEffect` (no React 18 SSR warnings).
 - Notice docs overstated announcements of a status Notice that mounts filled: corrected.
 
-**Open (design decision for Plan 4):** a toast raised while a modal Dialog is open sits under the dialog and is inert (not clickable, not announced), because the Toaster's region is outside the modal. Options: a Toaster region inside each Dialog that `useToast()` prefers while the dialog is open, or re-showing the region inside the topmost modal. Documented in the Toast docs until then.
+**Resolved in Plan 4 Task 1:** a toast raised while a modal Dialog was open sat under the dialog and was inert. An open Dialog now lends the Toaster a container (`src/overlay/toast-host.ts`) and the region renders there.
 
 ## Plans
 
 - [x] Plan 1: Foundation (`docs/superpowers/plans/2026-11-09-cynosure-foundation.md`)
 - [x] Plan 2: Milestone 1 controls (`docs/superpowers/plans/2026-11-09-cynosure-controls.md`)
 - [x] Plan 3: Milestone 2 structure and overlays (`docs/superpowers/plans/2026-11-09-cynosure-structure.md`). Tasks 1–13 and the final review done.
-- [ ] Plan 4: Milestone 3 and product migration issues (`docs/superpowers/plans/2026-11-10-cynosure-evidence.md`). Written; Task 1 next.
+- [ ] Plan 4: Milestone 3 and product migration issues (`docs/superpowers/plans/2026-11-10-cynosure-evidence.md`). Task 1 done; Task 2 next.
 
 ## Plan 3 rulings so far
 
@@ -103,11 +103,15 @@ An independent review of the Plan 3 Tasks 8–12 code found nine issues. Fixed (
   - `dismissible={false}` hides the close button and ignores Escape and the backdrop.
   - no scroll lock (it would write to `body`); the content uses `overscroll-behavior: contain`.
 - **Sheet:** the same `DialogFrame` with `side` (`bottom` default, `end`). `size` sets the width of an end sheet.
-- **Toast:** the region (`<section aria-label>`, `popover="manual"`) is shown for the Toaster's whole life so live elements exist before text. Each toast is its own live element whose text arrives 50ms after it mounts. Collapsed toasts stay in the DOM (folded, inert) so they are never re-announced. A modal Dialog opened later covers the toasts and makes them inert. Budget 3.5 kB (Dialog 3.25 kB).
+- **Toast:** the region (`<section aria-label>`, `popover="manual"`) is shown for the Toaster's whole life so live elements exist before text. Each toast is its own live element whose text arrives 50ms after it mounts. Collapsed toasts stay in the DOM (folded, inert) so they are never re-announced. While a Dialog inside the Toaster is open, the region is portalled into it (Plan 4 Task 1). Budget 3.75 kB (Dialog 3.25 kB).
 - **Notice:** `role="alert"` only for danger. Uncontrolled dismiss hides itself; with `onDismiss` the parent decides.
 - **EmptyState:** transparent; contrast is measured on the page background.
 - **CopyButton:** the live `role="status"` is always rendered (empty until a result). The button's name follows the state.
 - **React 18:** set `inert` as a DOM property, never as a prop (React 18 drops `inert={true}`).
+
+## Plan 4 rulings so far
+
+- **Toasts in dialogs (Task 1):** an open Dialog (or Sheet) inside a Toaster registers a container through `ToastHostContext` (`src/overlay/toast-host.ts`, separate so Dialog never imports Toast). The Toaster portals its region into the latest container and shows it again, which puts it above the dialog and outside the modal's inert area. Moving re-creates the toast elements, so each toast keeps a small memory in the Toaster: whether it was announced (then its text renders at once, and a danger toast comes back as `status`, not `alert`) and its remaining time (read when the timer starts, after the old element saved it).
 
 ## Feedback round (2026-11-09, after Plan 1)
 
@@ -180,7 +184,7 @@ None. Npm publish and deprecating the old packages wait for Arshad's authorisati
 ## Verification
 
 - **Latest local run (cloud container, 2026-11-10):** `cy check`, lint, typecheck, unit and Preact tests (287), the React 18 smoke tests (4), every story on Chromium plus the touch project (about 600 runs in the coverage pass), coverage (≥ 95% branches), build, publint, attw and size budgets pass. The changed components (Notice, TextArea, Dialog, Card) were also checked by screenshot, TextArea in phone emulation.
-- **Firefox and WebKit:** cannot be downloaded in the cloud container (`cdn.playwright.dev` is blocked); CI on `next` runs them. The last complete CI runs: all green on `0e81324`; later runs failed only on WebKit (Card colour timing, then the Dialog stuck at opacity 0 that led to the keyframe entrances). Check the run after the latest push (Next step 1).
+- **Firefox and WebKit:** cannot be downloaded in the cloud container (`cdn.playwright.dev` is blocked); CI on `next` runs them. The last complete CI runs: all green on `0e81324`; later runs failed only on WebKit (Card colour timing, the Dialog stuck at opacity 0 that led to the keyframe entrances, then a Toast test race). Each is fixed; check the CI run after the latest push. Check the run after the latest push (Next step 1).
 - **Published Storybook:** every story and docs page of a production build was loaded under `/cynosure/` in Chromium with no load or render errors; the stale-deploy reload was tested by swapping builds under an open tab.
 - **CI on `next`:** conventions, lint, types, unit, React 18, stories on all three engines plus touch, coverage, visual regression, build, publint, attw and size.
 - **Not verified:**

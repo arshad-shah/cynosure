@@ -11,6 +11,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { createPortal } from "react-dom";
 import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
 import { checkCircle } from "../../icons/check-circle.js";
@@ -19,6 +20,7 @@ import { info } from "../../icons/info.js";
 import type { IconData } from "../../icons/types.js";
 import { warning } from "../../icons/warning.js";
 import { xCircle } from "../../icons/x-circle.js";
+import { ToastHostContext, type ToastHostRegistry } from "../../overlay/toast-host.js";
 import type { Tone } from "../../tokens/schema.js";
 import { Button } from "../Button/Button.js";
 import { IconButton } from "../IconButton/IconButton.js";
@@ -110,6 +112,13 @@ export function useToast(): ToastApi {
 
 type RegionEl = HTMLElement & { showPopover?: () => void; hidePopover?: () => void };
 
+/** What a toast keeps when its element is re-created (the region moved into or out of a Dialog). */
+interface Memory {
+  announced: boolean;
+  remaining?: number;
+}
+type MemoryMap = Map<string, Memory>;
+
 /**
  * Hosts toasts for everything inside it: a region in the top layer, a store per Toaster (no globals), timers that pause
  * while the pointer or focus is on a toast, and polite or assertive announcements.
@@ -130,8 +139,24 @@ export function Toaster({
   const [focused, setFocused] = useState(false);
   const [hidden, setHidden] = useState(false);
   const region = useRef<RegionEl>(null);
+  const memory = useRef<MemoryMap>(new Map());
+  // Containers lent by open modal Dialogs; the latest one hosts the region.
+  const [hosts, setHosts] = useState<HTMLElement[]>([]);
+  const registry = useMemo<ToastHostRegistry>(
+    () => ({
+      register: (el) => {
+        setHosts((list) => [...list, el]);
+        return () => setHosts((list) => list.filter((h) => h !== el));
+      },
+    }),
+    [],
+  );
+  const host = hosts.at(-1) ?? null;
 
-  const remove = useCallback((id: string) => setItems((list) => list.filter((t) => t.id !== id)), []);
+  const remove = useCallback((id: string) => {
+    memory.current.delete(id);
+    setItems((list) => list.filter((t) => t.id !== id));
+  }, []);
   const dismiss = useCallback((id?: string) => {
     // Closing the toast that holds focus (its close button, from the keyboard): hand focus to the next toast's close
     // button, or let the region stop pausing if there is none.
@@ -165,13 +190,14 @@ export function Toaster({
   const api = useMemo<ToastApi>(() => ({ toast, dismiss }), [toast, dismiss]);
 
   // The region lives in the top layer for as long as the Toaster is mounted, so live regions exist before content.
+  // It is re-created when it moves into or out of a Dialog; showing it again puts it on top of that dialog.
   useClientLayoutEffect(() => {
     const el = region.current;
     el?.showPopover?.();
     return () => {
       if (el?.matches(":popover-open")) el.hidePopover?.();
     };
-  }, []);
+  }, [host]);
   useEffect(() => {
     const onVisibility = () => setHidden(document.visibilityState === "hidden");
     document.addEventListener("visibilitychange", onVisibility);
@@ -186,35 +212,40 @@ export function Toaster({
   const shown = new Set(live.slice(-max).map((t) => t.id));
   const paused = hovered || focused || hidden;
 
+  const regionEl = (
+    <section
+      ref={region}
+      aria-label={text.region}
+      {...{ popover: "manual" }}
+      className={className ? `cy-toaster ${className}` : "cy-toaster"}
+      data-position={position}
+      style={style}
+      onPointerEnter={() => setHovered(true)}
+      onPointerLeave={() => setHovered(false)}
+      onFocus={() => setFocused(true)}
+      onBlur={(e) => {
+        if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setFocused(false);
+      }}
+    >
+      {items.map((item) => (
+        <ToastItem
+          key={item.id}
+          item={item}
+          collapsed={!item.leaving && !shown.has(item.id)}
+          paused={paused}
+          dismissLabel={text.dismiss}
+          onDismiss={dismiss}
+          onRemoved={remove}
+          memory={memory.current}
+        />
+      ))}
+    </section>
+  );
+
   return (
     <ToastContext.Provider value={api}>
-      {children}
-      <section
-        ref={region}
-        aria-label={text.region}
-        {...{ popover: "manual" }}
-        className={className ? `cy-toaster ${className}` : "cy-toaster"}
-        data-position={position}
-        style={style}
-        onPointerEnter={() => setHovered(true)}
-        onPointerLeave={() => setHovered(false)}
-        onFocus={() => setFocused(true)}
-        onBlur={(e) => {
-          if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setFocused(false);
-        }}
-      >
-        {items.map((item) => (
-          <ToastItem
-            key={item.id}
-            item={item}
-            collapsed={!item.leaving && !shown.has(item.id)}
-            paused={paused}
-            dismissLabel={text.dismiss}
-            onDismiss={dismiss}
-            onRemoved={remove}
-          />
-        ))}
-      </section>
+      <ToastHostContext.Provider value={registry}>{children}</ToastHostContext.Provider>
+      {host ? createPortal(regionEl, host) : regionEl}
     </ToastContext.Provider>
   );
 }
@@ -226,36 +257,50 @@ interface ToastItemProps {
   dismissLabel: string;
   onDismiss: (id: string) => void;
   onRemoved: (id: string) => void;
+  memory: MemoryMap;
 }
 
-function ToastItem({ item, collapsed, paused, dismissLabel, onDismiss, onRemoved }: ToastItemProps) {
+function ToastItem({ item, collapsed, paused, dismissLabel, onDismiss, onRemoved, memory }: ToastItemProps) {
   const { id, title, description, tone = "neutral", action, duration = 5000, leaving = false } = item;
   const el = useRef<HTMLDivElement>(null);
-  const remaining = useRef(duration);
+  // Survives the element being re-created (region moved into or out of a Dialog).
+  const [mem] = useState<Memory>(() => {
+    const found = memory.get(id) ?? { announced: false };
+    memory.set(id, found);
+    return found;
+  });
+  const [announcedBefore] = useState(mem.announced);
   const drag = useRef<{ x: number; pointer: number } | null>(null);
   // The live element exists (empty) first and its text arrives a moment later: screen readers announce text added to
   // a live region, and the text is added once, so the toast is announced once.
-  const [ready, setReady] = useState(false);
+  // Already announced (re-created after a move): show the text at once, so nothing is inserted to announce again.
+  const [ready, setReady] = useState(mem.announced);
   useEffect(() => {
-    const t = setTimeout(() => setReady(true), 50);
+    if (ready) return;
+    const t = setTimeout(() => {
+      mem.announced = true;
+      setReady(true);
+    }, 50);
     return () => clearTimeout(t);
-  }, []);
+  }, [ready, mem]);
 
   // Collapsed and leaving toasts cannot be focused or clicked. Set as a property: React 18 drops `inert={true}`.
   useClientLayoutEffect(() => {
     if (el.current) el.current.inert = collapsed || leaving;
   }, [collapsed, leaving]);
 
-  // Auto-dismiss, keeping the time already spent across pauses.
+  // Auto-dismiss, keeping the time already spent across pauses and moves. The time left lives in `mem`, read when the
+  // timer starts: a re-created toast's effects run after the old one has saved it.
   useEffect(() => {
     if (paused || collapsed || leaving || !Number.isFinite(duration) || duration <= 0) return;
     const started = Date.now();
-    const t = setTimeout(() => onDismiss(id), Math.max(remaining.current, 0));
+    const left = mem.remaining ?? duration;
+    const t = setTimeout(() => onDismiss(id), Math.max(left, 0));
     return () => {
       clearTimeout(t);
-      remaining.current -= Date.now() - started;
+      mem.remaining = left - (Date.now() - started);
     };
-  }, [paused, collapsed, leaving, duration, id, onDismiss]);
+  }, [paused, collapsed, leaving, duration, id, onDismiss, mem]);
 
   // Leaving: play the exit transition (none under reduced motion), then drop it from the store.
   useEffect(() => {
@@ -280,7 +325,8 @@ function ToastItem({ item, collapsed, paused, dismissLabel, onDismiss, onRemoved
   return (
     <div
       ref={el}
-      role={tone === "danger" ? "alert" : "status"}
+      // An alert announces whenever it appears; one already announced comes back as a status.
+      role={tone === "danger" && !announcedBefore ? "alert" : "status"}
       aria-atomic="true"
       className="cy-toast"
       data-id={id}

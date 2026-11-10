@@ -72,6 +72,7 @@ With `dismissible={false}` there is no close button and Escape and the backdrop 
 - **Role:** a native modal `<dialog>`, named by `title` (an `h2`) and described by `description`.
 - **Narrow containers:** below 36rem wide, the dialog docks to the bottom edge at full width.
 - **Isolation:** it never writes to `<html>` or `<body>`. There is no scroll lock; the content uses `overscroll-behavior: contain` so scrolling it does not move the page.
+- **Toasts:** inside a [Toaster](?path=/docs/components-toast--docs), toasts raised while the dialog is open show above it (not under its backdrop), and move back to the page when it closes.
 - **Shadow DOM:** works inside shadow roots (extension content scripts).
 - **Motion:** a short fade and scale (a slide as a sheet), removed under reduced motion.
 

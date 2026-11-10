@@ -35,7 +35,7 @@ function SaveButton() {
 - Timers pause while the pointer is over the toasts, while focus is inside them and while the page is hidden.
 - On touch, a horizontal swipe of 64px dismisses; a shorter one springs back. Every close button has a 44px hit area on coarse pointers.
 - No motion under reduced motion. Never writes to `<html>` or `<body>`.
-- A modal Dialog opened after the Toaster sits above the toasts and makes them inert until it closes.
+- Inside an open Dialog or Sheet (within the Toaster), toasts show in the dialog, above its backdrop, instead of under it where the modal would make them inert. When it closes they move back to the page with their remaining time, and are not announced again.
 
 Tokens: `--cy-toast-width`, `--cy-toast-radius`, `--cy-toast-padding`, `--cy-toast-gap`.
 

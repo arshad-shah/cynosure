@@ -88,6 +88,12 @@
   animation: cy-dialog-panel-in var(--cy-motion-base) var(--cy-motion-ease);
 }
 
+/* Where a Toaster's region lives while this dialog is open (the region itself is a top-layer popover). */
+.cy-dialog-toasts {
+  display: contents;
+  font-size: var(--cy-font-size-md);
+}
+
 .cy-dialog-header.cy-dialog-header {
   display: flex;
   align-items: flex-start;
