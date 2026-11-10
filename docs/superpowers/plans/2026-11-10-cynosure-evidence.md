@@ -104,6 +104,15 @@ Record the evidence in each component's README under `## Used by`. Prism is not 
 - **Prism evidence:** confirm Tree (and anything else Prism needs) in the Prism repo; update `## Used by`.
 - **React 18 smoke:** add Slider and Combobox to `tests/react18`.
 
+### Task 8b: Cross-product completeness audit (Arshad's request, 2026-11-10)
+
+After Task 7, before drafting migration issues, check that Cynosure covers every product, not just the components the spec listed.
+
+- **Inventory:** clone each product repo from spec §14 read-only (code search misses some, Prism for one). List every UI piece it renders: its own components, native controls, third-party UI libraries, icons, overlays and layout primitives.
+- **Map:** match each piece to a Cynosure component, a composition of components, or tokens only.
+- **Gaps:** anything with no match is either built (with the same story-first standard, admitted by spec §8's two-products rule) or explicitly ruled out with a reason. Product-specific widgets (Prism's JSON row, Aperture's colour wheel) stay in the product, built from Cynosure parts.
+- **Output:** `docs/migration/coverage.md`, a table per product (piece, where it lives, Cynosure replacement, status). Each migration issue in Task 9 links its product's table, so every issue starts complete.
+
 ### Task 9: Product migration issues (needs Arshad's go-ahead to open)
 
 - **Draft first, in this repo:** one Markdown issue body per product in `docs/migration/issues/<repo>.md`. Each body gives the scope from spec §14 (full, adopt at start, partial, archive), the components that product uses, the order of work from `docs/migration.md`, and how to check it (hostile host, shadow root for extensions).

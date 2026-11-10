@@ -56,8 +56,9 @@ Build Plan 4 (`docs/superpowers/plans/2026-11-10-cynosure-evidence.md`) task by 
 5. **Task 5:** done. Tree: APG tree view, single and multiple selection, lazy children with retry, `virtual` for 100k rows, `renderLabel` (Prism's JSON tree needs both).
 6. **Tasks 6–7:** CommandPalette, ColorField. The product evidence for each is in the plan.
 7. **Task 8:** carry-overs: Prism checked (it has a virtual JSON tree; Tree covers it). Slider and Combobox are already in the React 18 smoke tests. Remaining: anything the final review turns up. (The keyframe entrances are confirmed on WebKit: in CI run 387 Dialog, Popover, Menu, Tooltip and Select passed their `shownFully` checks; the only failure was a Toast test race, fixed.)
-8. **Task 9:** draft one migration issue per product repo in `docs/migration/issues/`. Open them only after Arshad reviews the drafts.
-9. **Task 10:** docs, independent review, `pnpm verify`, CI green, push.
+8. **Task 8b (Arshad's request):** once all components are done, audit every product repo (cloned read-only) for UI pieces Cynosure does not yet cover; build or rule out each gap; write `docs/migration/coverage.md` with a table per product.
+9. **Task 9:** draft one migration issue per product repo in `docs/migration/issues/`. Open them only after Arshad reviews the drafts.
+10. **Task 10:** docs, independent review, `pnpm verify`, CI green, push.
 
 ## Plan 3 final review
 
@@ -80,7 +81,7 @@ An independent review of the Plan 3 Tasks 8–12 code found nine issues. Fixed (
 - [x] Plan 1: Foundation (`docs/superpowers/plans/2026-11-09-cynosure-foundation.md`)
 - [x] Plan 2: Milestone 1 controls (`docs/superpowers/plans/2026-11-09-cynosure-controls.md`)
 - [x] Plan 3: Milestone 2 structure and overlays (`docs/superpowers/plans/2026-11-09-cynosure-structure.md`). Tasks 1–13 and the final review done.
-- [ ] Plan 4: Milestone 3 and product migration issues (`docs/superpowers/plans/2026-11-10-cynosure-evidence.md`). Tasks 1–5 done; Task 6 next.
+- [ ] Plan 4: Milestone 3 and product migration issues (`docs/superpowers/plans/2026-11-10-cynosure-evidence.md`). Tasks 1–5 done; Task 6 next; a cross-product audit (8b) added before the migration issues.
 
 ## Plan 3 rulings so far
 
