@@ -1,4 +1,4 @@
-import { type CSSProperties, type KeyboardEvent, useCallback, useId, useRef } from "react";
+import { type CSSProperties, type KeyboardEvent, type ReactNode, useCallback, useId, useRef } from "react";
 import { useControllableState } from "../../foundations/controllable.js";
 import { isRtl } from "../../foundations/dir.js";
 import { useDrag } from "../../foundations/drag.js";
@@ -23,12 +23,15 @@ declare module "../../tokens/schema.js" {
   }
 }
 
-export type SliderValue = number | [number, number];
+/** One number, or several: `[from, to]` for a range, or more (gradient stops), one thumb each. */
+export type SliderValue = number | number[];
 
 export interface SliderLabels {
   /** Names of the two thumbs of a range, added to the label ("Price, minimum"). */
   minimum: string;
   maximum: string;
+  /** Names of the thumbs when there are more than two, added to the label. Default "stop 3". */
+  thumb: (index: number, count: number) => string;
   /** Text for a value, shown with `showValue` and read by screen readers. Default: the number. */
   value: (value: number) => string;
 }
@@ -43,7 +46,7 @@ export interface SliderProps {
   /** Accessible name, shown above the slider unless `labelHidden`. */
   label: string;
   labelHidden?: boolean;
-  /** A number, or `[from, to]` for a range with two thumbs. */
+  /** A number, `[from, to]` for a range, or more numbers for more thumbs (each stays between its neighbours). */
   value?: SliderValue;
   defaultValue?: SliderValue;
   /** Every change while dragging or pressing keys. */
@@ -57,6 +60,11 @@ export interface SliderProps {
   largeStep?: number;
   orientation?: "horizontal" | "vertical";
   marks?: SliderMark[];
+  /**
+   * Your own drawing of the track (a gradient, a histogram, a waveform), filling it under the thumbs. The accent fill
+   * is not drawn then.
+   */
+  trackContent?: ReactNode;
   /** Show the current value (or range) at the end of the label row. */
   showValue?: boolean;
   /** Form field name; a range submits two values under it. */
@@ -69,7 +77,12 @@ export interface SliderProps {
   style?: CSSProperties;
 }
 
-const DEFAULT_LABELS: SliderLabels = { minimum: "minimum", maximum: "maximum", value: (v) => String(v) };
+const DEFAULT_LABELS: SliderLabels = {
+  minimum: "minimum",
+  maximum: "maximum",
+  thumb: (index) => `stop ${index + 1}`,
+  value: (v) => String(v),
+};
 const decimals = (n: number) => (String(n).split(".")[1] ?? "").length;
 
 /** Picks a number (or a range) by dragging or with the keyboard: APG slider, with pointer, touch and forms. */
@@ -92,6 +105,7 @@ export function Slider({
   largeStep,
   orientation = "horizontal",
   marks,
+  trackContent,
   showValue = false,
   name,
   disabled = false,
@@ -119,11 +133,12 @@ export function Slider({
     },
     [min, max, step],
   );
-  /** New value with thumb `index` moved to `v`; range thumbs stop at each other instead of crossing. */
+  /** New value with thumb `index` moved to `v`; thumbs stop at their neighbours instead of crossing. */
   const withThumb = (index: number, v: number): SliderValue => {
     if (!range) return snap(v);
-    const [from, to] = values as [number, number];
-    return index === 0 ? [Math.min(snap(v), to), to] : [from, Math.max(snap(v), from)];
+    const next = [...values];
+    next[index] = clamp(snap(v), values[index - 1] ?? min, values[index + 1] ?? max);
+    return next;
   };
   const set = (next: SliderValue, commit: boolean) => {
     const same = Array.isArray(next) ? next.every((n, i) => n === values[i]) : next === values[0];
@@ -147,11 +162,12 @@ export function Slider({
     onStart: ({ point }) => {
       if (disabled) return false;
       const v = fromPoint(point);
-      // The nearest thumb takes the press (for a range); on a tie, the one that can still move that way.
+      // The nearest thumb takes the press; among thumbs on one spot, the one that can still move that way.
       const distances = values.map((n) => Math.abs(n - v));
-      let index = distances.indexOf(Math.min(...distances));
-      if (range && values[0] === values[1]) index = v < (values[0] as number) ? 0 : 1;
-      drag.current = { index, from: range ? (values as [number, number]) : (values[0] as number) };
+      const nearest = Math.min(...distances);
+      const tied = distances.flatMap((d, i) => (d === nearest ? [i] : []));
+      const index = (v < (values[tied[0] as number] as number) ? tied[0] : tied[tied.length - 1]) as number;
+      drag.current = { index, from: range ? [...values] : (values[0] as number) };
       thumbs.current[index]?.focus({ preventScroll: true });
       set(withThumb(index, v), false);
     },
@@ -173,10 +189,14 @@ export function Slider({
   };
 
   const position = (v: number) => `${((v - min) / (max - min || 1)) * 100}%`;
-  const valueText = range ? values.map(text.value).join(" – ") : text.value(values[0] as number);
+  const valueText = range
+    ? values.map(text.value).join(values.length === 2 ? " – " : ", ")
+    : text.value(values[0] as number);
   const fill = range
-    ? { "--_from": position(values[0] as number), "--_to": position(values[1] as number) }
+    ? { "--_from": position(values[0] as number), "--_to": position(values[values.length - 1] as number) }
     : { "--_from": "0%", "--_to": position(values[0] as number) };
+  const thumbName = (index: number) =>
+    values.length === 2 ? (index === 0 ? text.minimum : text.maximum) : text.thumb(index, values.length);
 
   return (
     <div
@@ -205,8 +225,19 @@ export function Slider({
           )}
         </div>
       )}
-      <div ref={track} className="cy-slider-track cy-reset" style={fill as CSSProperties}>
-        <div className="cy-slider-fill cy-reset" />
+      <div
+        ref={track}
+        className="cy-slider-track cy-reset"
+        style={fill as CSSProperties}
+        data-custom={trackContent !== undefined ? "" : undefined}
+      >
+        {trackContent !== undefined ? (
+          <div className="cy-slider-drawing cy-reset" aria-hidden="true">
+            {trackContent}
+          </div>
+        ) : (
+          <div className="cy-slider-fill cy-reset" />
+        )}
         {marks?.map((mark) => (
           <span
             key={mark.value}
@@ -228,13 +259,13 @@ export function Slider({
             tabIndex={disabled ? undefined : 0}
             className="cy-slider-thumb cy-reset"
             aria-orientation={orientation}
-            aria-valuemin={range && index === 1 ? (values[0] as number) : min}
-            aria-valuemax={range && index === 0 ? (values[1] as number) : max}
+            aria-valuemin={values[index - 1] ?? min}
+            aria-valuemax={values[index + 1] ?? max}
             aria-valuenow={v}
             aria-valuetext={text.value(v)}
             aria-disabled={disabled || undefined}
             {...(range
-              ? { "aria-label": `${label}, ${index === 0 ? text.minimum : text.maximum}` }
+              ? { "aria-label": `${label}, ${thumbName(index)}` }
               : labelHidden
                 ? { "aria-label": label }
                 : { "aria-labelledby": `${id}-label` })}

@@ -36,6 +36,21 @@ Pass `[from, to]` for two thumbs. Each thumb is limited by the other, so they ca
 
 <Canvas of={Stories.RangeThumbsNeverCross} />
 
+## More thumbs, and your own track
+
+Give three or more numbers for as many thumbs, each held between its neighbours: gradient stops, or the cut points of a timeline. `trackContent` draws your own track (a gradient, a histogram) under the thumbs, in place of the accent fill; it is as tall as a thumb.
+
+```tsx
+<Slider
+  label="Gradient"
+  value={stops}
+  onChange={setStops}
+  trackContent={<span style={{ background: `linear-gradient(to right, ${colours})` }} />}
+/>
+```
+
+<Canvas of={Stories.GradientStops} />
+
 ## Marks and value text
 
 `marks` draws ticks along the track, with optional text under it. `labels.value` turns a number into words, used for `showValue` and read by screen readers.

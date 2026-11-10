@@ -76,6 +76,32 @@
     background: var(--cy-slider-track, color-mix(in oklab, var(--cy-color-ink) 14%, var(--cy-color-surface)));
   }
 }
+/* trackContent: the product's drawing takes the bar's place, as tall as a thumb, under the thumbs. */
+.cy-slider-track.cy-slider-track[data-custom]::before {
+  content: none;
+}
+.cy-slider-drawing.cy-slider-drawing {
+  position: absolute;
+  inset-inline: calc(var(--_thumb) / -2);
+  inset-block-start: calc(50% - var(--_thumb) / 2);
+  block-size: var(--_thumb);
+  overflow: hidden;
+  border-radius: var(--cy-radius-full);
+  font-size: var(--cy-font-size-md);
+  pointer-events: none;
+  & > * {
+    display: block;
+    inline-size: 100%;
+    block-size: 100%;
+  }
+}
+.cy-slider[data-orientation="vertical"] .cy-slider-drawing.cy-slider-drawing {
+  inset-inline: auto;
+  inset-inline-start: calc(50% - var(--_thumb) / 2);
+  inset-block: calc(var(--_thumb) / -2);
+  inline-size: var(--_thumb);
+  block-size: auto;
+}
 /* Disabled: the control fades, the label stays readable. */
 .cy-slider[data-disabled] .cy-slider-track.cy-slider-track {
   opacity: 0.55;

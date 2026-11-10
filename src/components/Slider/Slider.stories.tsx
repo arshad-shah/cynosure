@@ -293,6 +293,62 @@ export const ControlledStaysWithTheParent: Story = {
   },
 };
 
+export const GradientStops: Story = {
+  args: {
+    label: "Gradient",
+    defaultValue: [0, 40, 100],
+    showValue: false,
+    trackContent: <span style={{ background: "linear-gradient(to right, teal, gold, crimson)" }} />,
+  },
+  play: async ({ args, canvas, canvasElement, userEvent }) => {
+    const [first, middle, last] = canvas.getAllByRole("slider") as [HTMLElement, HTMLElement, HTMLElement];
+    await expect(canvas.getByRole("group", { name: "Gradient" })).toBeVisible();
+    await expect(middle).toHaveAccessibleName("Gradient, stop 2");
+    // Each stop is held between its neighbours.
+    await expect(middle).toHaveAttribute("aria-valuemin", "0");
+    await expect(middle).toHaveAttribute("aria-valuemax", "100");
+    await expect(first).toHaveAttribute("aria-valuemax", "40");
+    await expect(last).toHaveAttribute("aria-valuemin", "40");
+    middle.focus();
+    await userEvent.keyboard("{End}");
+    await expect(args.onChange).toHaveBeenLastCalledWith([0, 100, 100]);
+    await userEvent.keyboard("{Home}");
+    await expect(args.onChange).toHaveBeenLastCalledWith([0, 0, 100]);
+    // A press goes to the nearest stop; between two on one spot, to the one that can move that way.
+    dragTrack(canvasElement, 0.3, 0.3);
+    await waitFor(() => expect(args.onCommit).toHaveBeenLastCalledWith([0, 30, 100]));
+    await userEvent.keyboard("{Home}");
+    dragTrack(canvasElement, 0.0, 0.1);
+    await waitFor(() => expect(args.onCommit).toHaveBeenLastCalledWith([0, 10, 100]));
+    // The drawing replaces the fill, under the thumbs, and is as wide as the bar.
+    const drawing = canvasElement.querySelector(".cy-slider-drawing") as HTMLElement;
+    await expect(drawing).toHaveAttribute("aria-hidden", "true");
+    await expect(canvasElement.querySelector(".cy-slider-fill")).toBeNull();
+    await expect((drawing.firstElementChild as HTMLElement).getBoundingClientRect().width).toBeGreaterThan(
+      trackOf(canvasElement).getBoundingClientRect().width,
+    );
+  },
+};
+
+export const StopLabelsAndVerticalDrawing: Story = {
+  args: {
+    label: "Stops",
+    orientation: "vertical",
+    defaultValue: [10, 50, 60, 90],
+    showValue: true,
+    labels: { thumb: (i, n) => `${i + 1} of ${n}` },
+    trackContent: <span style={{ background: "linear-gradient(to top, navy, white)" }} />,
+  },
+  play: async ({ canvas, canvasElement }) => {
+    await expect(canvas.getAllByRole("slider")[2]).toHaveAccessibleName("Stops, 3 of 4");
+    await expect(canvasElement.querySelector(".cy-slider-value")).toHaveTextContent("10, 50, 60, 90");
+    const drawing = (
+      canvasElement.querySelector(".cy-slider-drawing") as HTMLElement
+    ).getBoundingClientRect();
+    await expect(drawing.height).toBeGreaterThan(drawing.width);
+  },
+};
+
 export const StableUnderHostileHost: Story = {
   play: async ({ canvasElement }) => {
     for (const selector of [".cy-slider", ".cy-slider-track", ".cy-slider-thumb", ".cy-slider-label"]) {
