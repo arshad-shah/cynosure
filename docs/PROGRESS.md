@@ -43,7 +43,7 @@ After Plan 3 (fixes from Arshad's checks of the published Storybook, 2026-11-10)
 
 ## Current task
 
-Plan 5 (`docs/superpowers/plans/2026-11-10-cynosure-coverage.md`): the generic components and icons the cross-product audit asked for. Tasks 1–7 (Facet icons, Skeleton, Grid, Steps, DescriptionList, Announcer/`useAnnounce`, `themeInitScript`, Prose) are done; Task 9 (Menu point anchor) is next.
+Plan 5 (`docs/superpowers/plans/2026-11-10-cynosure-coverage.md`): the generic components and icons the cross-product audit asked for. Tasks 1–7 (Facet icons, Skeleton, Grid, Steps, DescriptionList, Announcer/`useAnnounce`, `themeInitScript`, Prose, ContextMenu) are done; Task 10 (navigation and app shell) is next.
 
 ## Next step
 
@@ -84,7 +84,7 @@ An independent review of the Plan 3 Tasks 8–12 code found nine issues. Fixed (
 - [x] Plan 2: Milestone 1 controls (`docs/superpowers/plans/2026-11-09-cynosure-controls.md`)
 - [x] Plan 3: Milestone 2 structure and overlays (`docs/superpowers/plans/2026-11-09-cynosure-structure.md`). Tasks 1–13 and the final review done.
 - [ ] Plan 4: Milestone 3 and product migration issues (`docs/superpowers/plans/2026-11-10-cynosure-evidence.md`). Tasks 1–7 and 8b done; Tasks 9–10 after Plan 5.
-- [ ] Plan 5: coverage components and icons (`docs/superpowers/plans/2026-11-10-cynosure-coverage.md`). Tasks 1–8 done.
+- [ ] Plan 5: coverage components and icons (`docs/superpowers/plans/2026-11-10-cynosure-coverage.md`). Tasks 1–9 done.
 
 ## Plan 3 rulings so far
 
@@ -120,6 +120,7 @@ An independent review of the Plan 3 Tasks 8–12 code found nine issues. Fixed (
 ## Plan 4 rulings so far
 
 - **Toasts in dialogs (Task 1):** an open Dialog (or Sheet) inside a Toaster registers a container through `ToastHostContext` (`src/overlay/toast-host.ts`, separate so Dialog never imports Toast). The Toaster portals its region into the latest container and shows it again, which puts it above the dialog and outside the modal's inert area. Moving re-creates the toast elements, so each toast keeps a small memory in the Toaster: whether it was announced (then its text renders at once, and a danger toast comes back as `status`, not `alert`) and its remaining time (read when the timer starts, after the old element saved it).
+- **ContextMenu (Plan 5 Task 9):** Menu's panel became an internal `MenuPanel` shared by Menu and ContextMenu; `useAnchoredPosition` accepts a `VirtualAnchor` (a point rectangle). Right-click anchors at the pointer, Shift+F10 / ContextMenu key at the target, and a 500ms touch press (10px slop) at the finger because iOS sends no `contextmenu`. Budgets: ContextMenu 2.5 kB (2.07 kB with the panel and menu.css); Menu raised to 3.25 kB (3.01 kB after the panel split).
 - **Prose (Plan 5 Task 8):** first use of `@scope (.cy-prose) to ([class^="cy-"]…)`: rules stop at Cynosure components. Selectors are `:where()`-flat, so scope proximity beats host tag resets while product classes win. Code blocks wrap (`pre-wrap`): axe flags an overflowing `<pre>` as an unreachable scroll region, and Prose cannot add `tabindex` to product markup.
 - **themeInitScript (Plan 5 Task 7):** returns script text only (Cynosure injects nothing); validates the saved mode, swallows storage errors, escapes `<` so it can be inlined. Unit-tested in `tests/unit/theme-init-script.test.ts`.
 - **Announcer (Plan 5 Task 6):** `<Announcer>` renders a polite `status` and an assertive `alert` region where it is placed (never in `<body>`); `useAnnounce()` uses the nearest one, and without one warns once and does nothing. Each message is a keyed node so repeats are read; messages clear after `clearAfter` (5 s).

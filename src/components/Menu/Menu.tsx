@@ -4,6 +4,7 @@ import {
   type KeyboardEvent,
   type ReactNode,
   type Ref,
+  type RefObject,
   useCallback,
   useId,
   useLayoutEffect,
@@ -17,7 +18,7 @@ import { check } from "../../icons/check.js";
 import type { IconData } from "../../icons/types.js";
 import { useDismiss } from "../../overlay/dismiss.js";
 import type { Placement } from "../../overlay/position.js";
-import { useAnchoredPosition } from "../../overlay/use-anchored-position.js";
+import { useAnchoredPosition, type VirtualAnchor } from "../../overlay/use-anchored-position.js";
 import type { Tone } from "../../tokens/schema.js";
 import { Kbd } from "../Kbd/Kbd.js";
 
@@ -83,18 +84,45 @@ const ITEM = '[role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio
 const KEY_NAMES: Record<string, string> = { Ctrl: "Control", Cmd: "Meta", Opt: "Alt", Option: "Alt" };
 const isSection = (entry: MenuEntry): entry is MenuSection => "items" in entry;
 
-/** APG menu button: commands in a top-layer list with arrow keys, type-ahead, sections and checkable items. */
-export function Menu({ trigger, label, items, onSelect, placement = "bottom", className, style }: MenuProps) {
-  const id = useId();
-  const [open, setOpen] = useState(false);
-  const focusOn = useRef<"first" | "last">("first");
-  const triggerRef = useRef<HTMLButtonElement>(null);
+export interface MenuPanelProps {
+  id: string;
+  label: string;
+  items: MenuEntry[];
+  onSelect: (value: string) => void;
+  open: boolean;
+  onClose: () => void;
+  /** Which item takes focus when the panel opens. */
+  focusOn: "first" | "last";
+  /** What the panel is placed against: the trigger, or a point (context menus). */
+  anchor: RefObject<HTMLElement | VirtualAnchor | null>;
+  placement: Placement;
+  offset: number;
+  /** Elements that count as inside (clicking them does not dismiss). */
+  inside: RefObject<HTMLElement | null>[];
+  returnFocus: RefObject<HTMLElement | null>;
+  className?: string | undefined;
+  style?: CSSProperties | undefined;
+}
+
+/** Internal: the menu list in the top layer, shared by Menu and ContextMenu. */
+export function MenuPanel({
+  id,
+  label,
+  items,
+  onSelect,
+  open,
+  onClose,
+  focusOn,
+  anchor,
+  placement,
+  offset,
+  inside,
+  returnFocus,
+  className,
+  style,
+}: MenuPanelProps) {
   const panel = useRef<PanelEl>(null);
   const typed = useRef({ text: "", at: 0 });
-  const show = useCallback((at: "first" | "last") => {
-    focusOn.current = at;
-    setOpen(true);
-  }, []);
 
   useLayoutEffect(() => {
     const el = panel.current;
@@ -104,24 +132,24 @@ export function Menu({ trigger, label, items, onSelect, placement = "bottom", cl
       const enabled = [...el.querySelectorAll<HTMLElement>(ITEM)].filter(
         (i) => i.getAttribute("aria-disabled") !== "true",
       );
-      (focusOn.current === "last" ? enabled[enabled.length - 1] : enabled[0])?.focus({ preventScroll: true });
+      (focusOn === "last" ? enabled[enabled.length - 1] : enabled[0])?.focus({ preventScroll: true });
     }
     if (!open && el.matches(":popover-open")) el.hidePopover?.();
-  }, [open]);
-  useAnchoredPosition(triggerRef, panel, open, placement, 4, "start");
+  }, [open, focusOn]);
+  useAnchoredPosition(anchor, panel, open, placement, offset, "start");
   useRovingFocus(panel, { orientation: "vertical", selector: ITEM });
-  useDismiss({ open, onClose: () => setOpen(false), inside: [triggerRef, panel], returnFocus: triggerRef });
+  useDismiss({ open, onClose, inside: [...inside, panel], returnFocus });
 
   const choose = (item: MenuItem) => {
     if (item.disabled) return;
     onSelect(item.value);
-    if (!item.kind) setOpen(false);
+    if (!item.kind) onClose();
   };
 
   const onPanelKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     // Tab leaves the menu like leaving the button: close and let focus move on.
     if (event.key === "Tab") {
-      setOpen(false);
+      onClose();
       return;
     }
     if (event.key.length !== 1 || event.ctrlKey || event.metaKey || event.altKey || event.key === " ") return;
@@ -169,6 +197,50 @@ export function Menu({ trigger, label, items, onSelect, placement = "bottom", cl
   );
 
   return (
+    <div
+      ref={panel}
+      id={`${id}-menu`}
+      role="menu"
+      aria-label={label}
+      aria-orientation="vertical"
+      {...{ popover: "manual" }}
+      className={className ? `cy-menu ${className}` : "cy-menu"}
+      style={style}
+      onKeyDown={onPanelKeyDown}
+    >
+      {items.map((entry, i) =>
+        isSection(entry) ? (
+          <Fragment key={`section-${entry.label}`}>
+            {i > 0 && <hr className="cy-menu-separator" />}
+            {/* biome-ignore lint/a11y/useSemanticElements: APG menus group items with role="group"; a fieldset is for forms */}
+            <div role="group" aria-label={entry.label} className="cy-menu-group">
+              <span className="cy-menu-group-label" aria-hidden="true">
+                {entry.label}
+              </span>
+              {entry.items.map(row)}
+            </div>
+          </Fragment>
+        ) : (
+          row(entry)
+        ),
+      )}
+    </div>
+  );
+}
+
+/** APG menu button: commands in a top-layer list with arrow keys, type-ahead, sections and checkable items. */
+export function Menu({ trigger, label, items, onSelect, placement = "bottom", className, style }: MenuProps) {
+  const id = useId();
+  const [open, setOpen] = useState(false);
+  const [focusOn, setFocusOn] = useState<"first" | "last">("first");
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const show = useCallback((at: "first" | "last") => {
+    setFocusOn(at);
+    setOpen(true);
+  }, []);
+  const close = useCallback(() => setOpen(false), []);
+
+  return (
     <>
       {trigger({
         ref: triggerRef,
@@ -183,34 +255,22 @@ export function Menu({ trigger, label, items, onSelect, placement = "bottom", cl
         "aria-controls": `${id}-menu`,
         "aria-haspopup": "menu",
       })}
-      <div
-        ref={panel}
-        id={`${id}-menu`}
-        role="menu"
-        aria-label={label}
-        aria-orientation="vertical"
-        {...{ popover: "manual" }}
-        className={className ? `cy-menu ${className}` : "cy-menu"}
+      <MenuPanel
+        id={id}
+        label={label}
+        items={items}
+        onSelect={onSelect}
+        open={open}
+        onClose={close}
+        focusOn={focusOn}
+        anchor={triggerRef}
+        placement={placement}
+        offset={4}
+        inside={[triggerRef]}
+        returnFocus={triggerRef}
+        className={className}
         style={style}
-        onKeyDown={onPanelKeyDown}
-      >
-        {items.map((entry, i) =>
-          isSection(entry) ? (
-            <Fragment key={`section-${entry.label}`}>
-              {i > 0 && <hr className="cy-menu-separator" />}
-              {/* biome-ignore lint/a11y/useSemanticElements: APG menus group items with role="group"; a fieldset is for forms */}
-              <div role="group" aria-label={entry.label} className="cy-menu-group">
-                <span className="cy-menu-group-label" aria-hidden="true">
-                  {entry.label}
-                </span>
-                {entry.items.map(row)}
-              </div>
-            </Fragment>
-          ) : (
-            row(entry)
-          ),
-        )}
-      </div>
+      />
     </>
   );
 }

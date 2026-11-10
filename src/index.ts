@@ -39,6 +39,11 @@ export {
   type CommandPaletteProps,
   type CommandPaletteTokens,
 } from "./components/CommandPalette/index.js";
+export {
+  ContextMenu,
+  type ContextMenuProps,
+  type ContextMenuTargetProps,
+} from "./components/ContextMenu/index.js";
 export { CopyButton, type CopyButtonLabels, type CopyButtonProps } from "./components/CopyButton/index.js";
 export {
   type DescriptionItem,

@@ -11,7 +11,7 @@ Available now (Milestones 1 and 2, and Milestone 3 as it lands):
 
 - **Controls:** Button, IconButton, CopyButton, Link, TextField, SearchField, TextArea, Select, Combobox, Checkbox, Switch, RadioGroup, SegmentedControl, Slider, ColorField, ThemeToggle.
 - **Structure:** Stack, Inline, Grid, Card, Toolbar, Tabs, Disclosure, Accordion, Tree.
-- **Overlays:** Tooltip, Popover, Menu, Dialog, Sheet, CommandPalette, Toast.
+- **Overlays:** Tooltip, Popover, Menu, ContextMenu, Dialog, Sheet, CommandPalette, Toast.
 - **Feedback and display:** Notice, EmptyState, ProgressBar, Steps, LoadingDots, Skeleton, DescriptionList, Prose, Announcer (`useAnnounce`), Badge, Kbd, Field.
 - **Icons:** 184 Facet icons.
 

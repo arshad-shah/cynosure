@@ -219,7 +219,7 @@
   {
     "name": "Menu",
     "path": ["dist/components/Menu/Menu.js", "dist/styles/menu.css"],
-    "limit": "3 kB",
+    "limit": "3.25 kB",
     "gzip": true
   },
   {
@@ -342,6 +342,12 @@
     "name": "Prose",
     "path": ["dist/components/Prose/Prose.js", "dist/styles/prose.css"],
     "limit": "1.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "ContextMenu (with Menu)",
+    "path": ["dist/components/ContextMenu/ContextMenu.js", "dist/styles/menu.css"],
+    "limit": "2.5 kB",
     "gzip": true
   }
 ]
