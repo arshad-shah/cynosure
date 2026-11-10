@@ -14,6 +14,11 @@
   stroke-linecap: round;
   stroke-linejoin: round;
   overflow: visible;
+  /* Brand marks: filled, exactly as published; no stroke and no motion. */
+  &[data-fill] {
+    fill: currentColor;
+    stroke: none;
+  }
   &[data-size="sm"] {
     --_size: var(--cy-icon-size-sm, calc(14px * var(--cy-scale, 1)));
   }

@@ -87,6 +87,14 @@
       "types": "./dist/icons/index.d.ts",
       "default": "./dist/icons/index.js"
     },
+    "./brands": {
+      "types": "./dist/brands/index.d.ts",
+      "default": "./dist/brands/index.js"
+    },
+    "./tokens": {
+      "types": "./dist/entries/tokens.d.ts",
+      "default": "./dist/entries/tokens.js"
+    },
     "./styles.css": "./dist/styles.css",
     "./styles/*.css": "./dist/styles/*.css",
     "./styles.inline": {
@@ -102,5 +110,9 @@
   },
   "dependencies": {
     "@arshad-shah/detent": "^0.3.1"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
   }
 }

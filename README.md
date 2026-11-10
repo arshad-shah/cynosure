@@ -7,7 +7,7 @@ One small, themeable, accessible UI system for every Arshad Shah product: browse
 - **Tiny and tree-shaken**: one module per component and icon, and one small runtime dependency ([Detent](https://github.com/arshad-shah/detent), for dragging).
 - **Looks identical anywhere**: pages, iframes, extension popups and shadow roots; host CSS can't break it.
 - **Every property is a token**: `createTheme({ accent, scale, radius, font, tokens, components })`.
-- **Facet icons**: 184 stroke icons in 15 categories, softened-square geometry, built-in micro-animations.
+- **Icons**: 240 Facet stroke icons in 16 categories (softened-square geometry, built-in micro-animations), 97 official brand marks, and `iconToSvg` for pages without React.
 - **One prop vocabulary**: `size`, `tone`, `variant`, `color` on every component, so control is consistent.
 - **Tested in real browsers**: every story is a behavioural, accessibility and touch test on Chromium, Firefox and WebKit.
 
@@ -31,15 +31,29 @@ export const App = () => (
 );
 ```
 
-**Storybook:** https://arshad-shah.github.io/cynosure/ · **Contributing:** see [AGENTS.md](AGENTS.md) and [docs/](docs/).
+**Storybook:** https://arshad-shah.github.io/cynosure/ (every component with live examples, its props and its keyboard behaviour).
+
+## Docs
+
+| Read this                                                      | For                                                                |
+| -------------------------------------------------------------- | ------------------------------------------------------------------ |
+| [Theming](docs/theming.md)                                     | Accent, scale, radius, fonts, light and dark, per-component tokens |
+| [Icons](docs/icons.md)                                         | Facet icons, brand marks and how brands allow them to be used      |
+| [Without React](docs/without-react.md)                         | Tokens and icons in Astro pages, static sites and plain TypeScript |
+| [Build adapters](docs/adapters.md)                             | The Vite adapter and shadow roots (`styles.inline`)                |
+| [Migrating a product](docs/migration.md)                       | The order of work to move a product onto Cynosure                  |
+| [Architecture](docs/architecture.md)                           | How the package is put together                                    |
+| [Conventions](docs/conventions.md), [Testing](docs/testing.md) | The rules `pnpm check` enforces, and how components are tested     |
+| [Release](docs/release.md)                                     | How versions are published to npm                                  |
+| [AGENTS.md](AGENTS.md)                                         | Rules for anyone (person or agent) changing Cynosure               |
 
 ## Components
 
-**Foundations:** ButtonBase, LinkBase, InputBase, FileInputBase, TextAreaBase, ChoiceBase, HiddenValue, DialogBase, Icon (184 Facet icons); hooks `useRovingFocus`, `useDismiss`.
+**Foundations:** ButtonBase, LinkBase, InputBase, FileInputBase, TextAreaBase, ChoiceBase, HiddenValue, DialogBase, Icon (240 Facet icons and 97 brand marks); hooks `useRovingFocus`, `useDismiss`.
 **Controls:** Button, IconButton, CopyButton, Link, TextField, NumberField, SearchField, TextArea, Select, Combobox, TagInput, Checkbox, Switch, RadioGroup, SegmentedControl, Slider, ColorField, ColorSwatches, KeyValueEditor, FileDrop, SignaturePad, SelectionFrame, CompareSlider, ThemeToggle.
 **Structure:** AppShell, Stack, Inline, Grid, SideNav, SplitPane, Card, Toolbar, Tabs, Disclosure, Accordion, Tree, SortableList, VirtualList, DocumentViewport, PanZoomCanvas, ZoomControls.
-**Overlays:** Tooltip, HoverCard, Popover, FloatingToolbar (`DockedToolbar`), Menu, ContextMenu, Dialog, Sheet, CommandPalette (`useHotkey`), Toast (`Toaster`, `useToast`).
+**Overlays:** Tooltip, HoverCard, Popover, FloatingToolbar (`DockedToolbar`), Menu, ContextMenu, Dialog, ProgressOverlay, Sheet, CommandPalette (`useHotkey`), Toast (`Toaster`, `useToast`).
 **Feedback and display:** Notice, EmptyState, ProgressBar, Steps, LoadingDots, Skeleton, DescriptionList, Table, Prose, CodeBlock, Announcer (`useAnnounce`), Badge, Kbd, Field. **Theme:** CynosureTheme, useColorMode, themeInitScript, createTheme.
-**Build:** optional Vite adapter (`@arshad-shah/cynosure/vite`) and self-hosted Hanken Grotesk (`fonts/hanken.css`).
+**Build:** optional Vite adapter (`@arshad-shah/cynosure/vite`), React-free tokens (`@arshad-shah/cynosure/tokens`) and self-hosted Hanken Grotesk (`fonts/hanken.css`).
 
-> Status: pre-release (`0.x`) on branch `next`. Not yet published to npm.
+> Status: pre-release (`0.x`), developed on `next`. Releases publish to npm from `main` through GitHub Actions (see [Release](docs/release.md)).

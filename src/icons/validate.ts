@@ -13,7 +13,11 @@ const inGrid = (n: number) => Number.isFinite(n) && n >= 0 && n <= 24;
 export function validateIcon(icon: IconData): string[] {
   const errors: string[] = [];
   if (!NAME.test(icon.name)) errors.push(`name "${icon.name}" must be kebab-case`);
-  if (!ICON_CATEGORIES.includes(icon.category))
+  if (icon.category === "brands" || icon.fill || icon.brand)
+    errors.push(
+      "brand marks (filled, owned by their brand) are not Facet icons: add them with tools/brands.ts",
+    );
+  else if (!ICON_CATEGORIES.includes(icon.category))
     errors.push(`category "${icon.category}" must be one of ${ICON_CATEGORIES.join(", ")}`);
   if (!icon.body.length) errors.push("body is empty");
   for (const [tag, attrs] of icon.body) {

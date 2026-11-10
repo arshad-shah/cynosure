@@ -6,6 +6,7 @@ import { validateIcon } from "../../src/icons/validate";
 const shipped = Object.values(icons).filter(
   (v): v is IconData => typeof v === "object" && v !== null && "body" in v,
 );
+// (`iconToSvg` is a function and so is left out above.)
 
 describe("Facet icon set", () => {
   it("ships a broad set covering every category with unique names", () => {

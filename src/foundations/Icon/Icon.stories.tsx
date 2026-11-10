@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect } from "storybook/test";
+import * as brands from "../../brands/index.js";
 import * as icons from "../../icons/index.js";
 import type { IconData } from "../../icons/types.js";
 import { ICON_CATEGORIES } from "../../icons/types.js";
@@ -205,5 +206,46 @@ export const TonesAndColour: Story = {
     const colours = [...canvasElement.querySelectorAll("svg.cy-icon")].map((s) => getComputedStyle(s).color);
     await expect(new Set(colours.slice(0, 3)).size).toBe(3);
     await expect(colours[3]).toBe("rgb(0, 128, 0)");
+  },
+};
+
+const marks = Object.values(brands) as IconData[];
+
+/** Brand marks from `@arshad-shah/cynosure/brands`: filled, unaltered, in currentColor or their owner's colour. */
+export const BrandMarks: Story = {
+  render: () => (
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(7.5rem, 1fr))", gap: 12 }}>
+      {marks.map((m) => (
+        <figure key={m.name} style={{ margin: 0, display: "grid", justifyItems: "center", gap: 6 }}>
+          <Icon icon={m} size="lg" color="brand" label={m.brand?.title as string} />
+          <figcaption style={{ fontSize: 12, color: "var(--cy-color-muted)" }}>{m.name}</figcaption>
+        </figure>
+      ))}
+    </div>
+  ),
+  play: async ({ canvas, canvasElement }) => {
+    const github = canvas.getByRole("img", { name: "GitHub" });
+    // Filled, not stroked; in the brand's own colour when asked.
+    await expect(getComputedStyle(github).fill).not.toBe("none");
+    await expect(
+      getComputedStyle(github).strokeWidth === "0px" || getComputedStyle(github).stroke === "none",
+    ).toBe(true);
+    await expect(getComputedStyle(canvas.getByRole("img", { name: "Spotify" })).color).toBe(
+      "rgb(30, 215, 96)",
+    );
+    await expect(canvasElement.querySelectorAll("svg[data-fill]").length).toBe(marks.length);
+  },
+};
+
+export const BrandMarksInTextColour: Story = {
+  render: () => (
+    <p style={{ color: "rgb(10, 20, 30)", display: "flex", gap: 8 }}>
+      <Icon icon={brands.github} label="GitHub" />
+      <Icon icon={brands.npm} tone="muted" label="npm" />
+    </p>
+  ),
+  play: async ({ canvas }) => {
+    // Without `color="brand"` a mark follows the text colour (the one-colour version brands allow).
+    await expect(getComputedStyle(canvas.getByRole("img", { name: "GitHub" })).color).toBe("rgb(10, 20, 30)");
   },
 };

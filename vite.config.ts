@@ -15,6 +15,8 @@ export default defineConfig({
       entry: {
         index: "src/index.ts",
         "icons/index": "src/icons/index.ts",
+        "brands/index": "src/brands/index.ts",
+        "entries/tokens": "src/entries/tokens.ts",
         "styles/inline": "src/styles/inline.ts",
         "adapters/vite/index": "src/adapters/vite/index.ts",
       },

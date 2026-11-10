@@ -17,6 +17,7 @@ export const ICON_CATEGORIES = [
   "devices",
   "design",
   "layout",
+  "maths",
 ] as const;
 export type IconCategory = (typeof ICON_CATEGORIES)[number];
 
@@ -41,10 +42,27 @@ export type IconNode =
   | ["rect", Part & { x: number; y: number; width: number; height: number; rx?: number }]
   | ["circle", Part & { cx: number; cy: number; r: number }];
 
+/** Where a brand mark comes from and how its owner allows it to be used. */
+export interface BrandInfo {
+  /** The brand's own name, as it writes it. */
+  title: string;
+  /** The brand's colour (hex without #), for `color="brand"`. */
+  hex: string;
+  /** The brand's guidelines for using its mark, where it publishes them. */
+  guidelines?: string;
+  /** Where the mark was taken from. */
+  source: string;
+}
+
 export interface IconData {
   /** kebab-case, unique. */
   name: string;
-  category: IconCategory;
+  /** Facet icons have a category; brand marks (from `@arshad-shah/cynosure/brands`) are "brands". */
+  category: IconCategory | "brands";
   body: IconNode[];
   motion?: IconMotion;
+  /** A filled shape (brand marks) rather than Facet's stroke. */
+  fill?: true;
+  /** Set on brand marks: they are drawn exactly as their owner publishes them, never restyled. */
+  brand?: BrandInfo;
 }
