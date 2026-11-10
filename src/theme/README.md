@@ -27,6 +27,12 @@ export function App() {
 
 `useColorMode({ storage, key })` accepts any `{ get, set }` storage, sync or async (e.g. `chrome.storage`).
 
+`themeInitScript({ key, selector })` returns the text of a tiny script that applies the mode saved in localStorage before the first paint, so dark-mode visitors never see a light flash. Cynosure injects nothing: place it early in the page yourself (inline in `<head>`, or written to a file when the content security policy forbids inline scripts). It marks `<html>` by default (apps that own the page) or the element matching `selector`. It reads localStorage only, so async storage such as `chrome.storage` cannot use it.
+
+```astro
+<script is:inline set:html={themeInitScript()} />
+```
+
 ## Used by
 
 All products (theme root).

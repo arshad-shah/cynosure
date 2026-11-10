@@ -92,6 +92,21 @@ const { mode, setMode, resolved } = useColorMode({ storage, key });
 - The first render is always `system` and storage is read after mount, so it is safe for server rendering and hydration.
 - Several hooks with the same `key` on one page stay in sync.
 
+## No flash on load
+
+`useColorMode` reads storage after the first render, so a server-rendered or static page shows the default mode for a moment. `themeInitScript()` returns the text of a tiny script that applies the saved mode before the first paint. Cynosure never injects it: place it early in the page yourself.
+
+```tsx
+import { themeInitScript } from "@arshad-shah/cynosure";
+
+// In the document <head> (React server rendering, Astro, a plain HTML template):
+<script dangerouslySetInnerHTML={{ __html: themeInitScript() }} />
+```
+
+- `key` must match `useColorMode({ key })`; `selector` marks an app root instead of `<html>`.
+- It contains no `<`, so it is safe to inline. For a content security policy without inline scripts, write the text to a file at build time and load that.
+- It reads localStorage only; async storage (such as `chrome.storage`) cannot be read before paint.
+
 ## Related
 
 [ThemeToggle](?path=/docs/components-themetoggle--docs)
