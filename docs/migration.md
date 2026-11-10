@@ -13,7 +13,7 @@ Available now (Milestones 1 and 2, and Milestone 3 as it lands):
 - **Structure:** Stack, Inline, Card, Toolbar, Tabs, Disclosure, Accordion, Tree.
 - **Overlays:** Tooltip, Popover, Menu, Dialog, Sheet, CommandPalette, Toast.
 - **Feedback and display:** Notice, EmptyState, ProgressBar, LoadingDots, Badge, Kbd, Field.
-- **Icons:** 136 Facet icons.
+- **Icons:** 183 Facet icons.
 
 Milestone 2 is the point at which the per-product migration issues open (Plan 4). Anything a product needs that is still missing goes into Cynosure first.
 

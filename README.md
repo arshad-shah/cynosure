@@ -7,7 +7,7 @@ One small, themeable, accessible UI system for every Arshad Shah product: browse
 - **Tiny and tree-shaken**: zero runtime dependencies, one module per component and icon.
 - **Looks identical anywhere**: pages, iframes, extension popups and shadow roots; host CSS can't break it.
 - **Every property is a token**: `createTheme({ accent, scale, radius, font, tokens, components })`.
-- **Facet icons**: 136 stroke icons in 15 categories, softened-square geometry, built-in micro-animations.
+- **Facet icons**: 183 stroke icons in 15 categories, softened-square geometry, built-in micro-animations.
 - **One prop vocabulary**: `size`, `tone`, `variant`, `color` on every component, so control is consistent.
 - **Tested in real browsers**: every story is a behavioural, accessibility and touch test on Chromium, Firefox and WebKit.
 
@@ -35,7 +35,7 @@ export const App = () => (
 
 ## Components
 
-**Foundations:** ButtonBase, LinkBase, InputBase, TextAreaBase, ChoiceBase, HiddenValue, DialogBase, Icon (136 Facet icons); hooks `useRovingFocus`, `useDismiss`.
+**Foundations:** ButtonBase, LinkBase, InputBase, TextAreaBase, ChoiceBase, HiddenValue, DialogBase, Icon (183 Facet icons); hooks `useRovingFocus`, `useDismiss`.
 **Controls:** Button, IconButton, CopyButton, Link, TextField, SearchField, TextArea, Select, Combobox, Checkbox, Switch, RadioGroup, SegmentedControl, Slider, ColorField, ThemeToggle.
 **Structure:** Stack, Inline, Card, Toolbar, Tabs, Disclosure, Accordion, Tree.
 **Overlays:** Tooltip, Popover, Menu, Dialog, Sheet, CommandPalette (`useHotkey`), Toast (`Toaster`, `useToast`).

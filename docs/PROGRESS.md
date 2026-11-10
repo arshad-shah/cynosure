@@ -43,7 +43,7 @@ After Plan 3 (fixes from Arshad's checks of the published Storybook, 2026-11-10)
 
 ## Current task
 
-Plan 4 Task 8b: cross-product completeness audit. Tasks 1–7 (every Milestone 3 component) are done.
+Plan 5 (`docs/superpowers/plans/2026-11-10-cynosure-coverage.md`): the generic components and icons the cross-product audit asked for. Task 1 (46 Facet icons) is done; Task 2 (Skeleton) is next.
 
 ## Next step
 
@@ -57,9 +57,10 @@ Build Plan 4 (`docs/superpowers/plans/2026-11-10-cynosure-evidence.md`) task by 
 6. **Task 6:** done. CommandPalette: Ctrl/Command+K from anywhere (shadow roots too), word search over labels and keywords, groups, recent commands, wrapping arrows; `useHotkey` exported.
 7. **Task 7:** done. ColorField: any CSS colour as text (names through the browser's parser), hex, rgb or oklch output, saturation area, hue and opacity Sliders, EyeDropper where supported, forms.
 8. **Task 8:** carry-overs: Prism checked (it has a virtual JSON tree; Tree covers it). Slider and Combobox are already in the React 18 smoke tests. Remaining: anything the final review turns up. (The keyframe entrances are confirmed on WebKit: in CI run 387 Dialog, Popover, Menu, Tooltip and Select passed their `shownFully` checks; the only failure was a Toast test race, fixed.)
-9. **Task 8b (Arshad's request):** once all components are done, audit every product repo (cloned read-only) for UI pieces Cynosure does not yet cover; build or rule out each gap; write `docs/migration/coverage.md` with a table per product.
-10. **Task 9:** draft one migration issue per product repo in `docs/migration/issues/`. Open them only after Arshad reviews the drafts.
-11. **Task 10:** docs, independent review, `pnpm verify`, CI green, push.
+9. **Task 8b:** done. The cross-product audit ran against read-only clones of the product repos. Its results stay **outside this public repo** (Arshad has the files); only the generic build list below comes from it.
+10. **Plan 5:** in progress (see Current task). The non-React path for Astro and vanilla sites, and a Starlight bridge, are deferred by Arshad.
+11. **Task 9:** draft one migration issue per product repo, kept outside this repo. Open them only after Arshad reviews the drafts.
+12. **Task 10:** docs, independent review, `pnpm verify`, CI green, push.
 
 ## Plan 3 final review
 
@@ -82,7 +83,8 @@ An independent review of the Plan 3 Tasks 8–12 code found nine issues. Fixed (
 - [x] Plan 1: Foundation (`docs/superpowers/plans/2026-11-09-cynosure-foundation.md`)
 - [x] Plan 2: Milestone 1 controls (`docs/superpowers/plans/2026-11-09-cynosure-controls.md`)
 - [x] Plan 3: Milestone 2 structure and overlays (`docs/superpowers/plans/2026-11-09-cynosure-structure.md`). Tasks 1–13 and the final review done.
-- [ ] Plan 4: Milestone 3 and product migration issues (`docs/superpowers/plans/2026-11-10-cynosure-evidence.md`). Tasks 1–7 done; Task 8b (audit) next; a cross-product audit (8b) added before the migration issues.
+- [ ] Plan 4: Milestone 3 and product migration issues (`docs/superpowers/plans/2026-11-10-cynosure-evidence.md`). Tasks 1–7 and 8b done; Tasks 9–10 after Plan 5.
+- [ ] Plan 5: coverage components and icons (`docs/superpowers/plans/2026-11-10-cynosure-coverage.md`). Task 1 done.
 
 ## Plan 3 rulings so far
 
@@ -131,7 +133,7 @@ An independent review of the Plan 3 Tasks 8–12 code found nine issues. Fixed (
 - **Button API:** `variant` (solid, soft, outline, ghost) × `tone` (accent, neutral, danger, success, warning, info). Every pair is tested distinct and ≥ 4.5:1.
 - **Colours:** ember brand accent `#c2410c` with white text, crimson danger (`#b4235a` / `#ff6b8f`), and per-tone text roles.
 - **Brand:** logo and lockup recoloured to ember; wordmark readable on light backgrounds; PNG and ICO regenerated.
-- **Icons:** Facet icons are stroke only (accent dot removed). 136 icons in 15 categories with a categorised gallery.
+- **Icons:** Facet icons are stroke only (accent dot removed). 183 icons in 15 categories with a categorised gallery.
 - **Props:** shared prop vocabulary (`size`, `tone`, `variant`, `color`) in `docs/conventions.md` and the `cy new component` template, with Storybook controls for every prop.
 
 ## Feedback round (2026-11-09, during Plan 3)
@@ -212,4 +214,5 @@ pnpm exec playwright install chromium firefox webkit   # blocked in Claude cloud
 pnpm --dir tests/react18 install && pnpm cy progress && pnpm verify
 pnpm storybook
 ```
+
 Then continue at "Current task" above, following `AGENTS.md`.
