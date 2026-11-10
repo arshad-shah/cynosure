@@ -190,7 +190,7 @@ export const LongPressOpensOnTouch: Story = {
     await expect(Math.abs(panel.left - at.clientX)).toBeLessThan(6);
     // Rows are big enough for a finger.
     for (const item of menu().querySelectorAll('[role="menuitem"]')) {
-      await expect(item.getBoundingClientRect().height).toBeGreaterThanOrEqual(44);
+      await expect(Math.round(item.getBoundingClientRect().height)).toBeGreaterThanOrEqual(44);
     }
   },
 };

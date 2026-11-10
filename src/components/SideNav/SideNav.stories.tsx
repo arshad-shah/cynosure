@@ -170,6 +170,7 @@ export const CollapsedToARail: Story = {
     const tip = canvasElement.ownerDocument.getElementById(
       homeLink.getAttribute("aria-describedby") as string,
     );
+    await waitFor(() => expect((tip as HTMLElement).matches(":popover-open")).toBe(true));
     await shownFully(tip as HTMLElement);
     await expect(tip).toHaveTextContent("Home");
     // Groups do not open inside the rail: they ask for the full navigation.
