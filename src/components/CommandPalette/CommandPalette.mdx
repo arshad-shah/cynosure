@@ -1,0 +1,83 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./CommandPalette.stories";
+
+<Meta of={Stories} />
+
+# CommandPalette
+
+A search box over every command in the product. Press Ctrl+K (Command+K on a Mac), type a few letters, press Enter. It is the fastest way to reach an action without hunting through menus.
+
+<Canvas of={Stories.KeywordsGroupsAndWrappingArrows} />
+
+## When to use
+
+- **Products with many actions** spread across menus and panels: inspectors, editors, database tools.
+
+**Use something else when:**
+- the actions belong to one button: a [Menu](?path=/docs/components-menu--docs)
+- people pick a value for a field: a [Combobox](?path=/docs/components-combobox--docs)
+
+## Usage
+
+```tsx
+import { CommandPalette } from "@arshad-shah/cynosure";
+
+<CommandPalette
+  commands={[
+    { id: "save", label: "Save file", group: "File", shortcut: ["Ctrl", "S"], keywords: ["write", "disk"] },
+    { id: "preview", label: "Toggle preview", group: "View" },
+  ]}
+  onRun={(id) => actions[id]()}
+/>
+```
+
+Mount it once near the root. It listens for its shortcut (`mod+k` by default) anywhere on the page, shadow roots included. A command's `shortcut` is only shown in the row; bind those keys with `useHotkey`.
+
+## Finding commands
+
+Every typed word must appear in the label or the `keywords`, in any order, and commands whose label starts with the first word come first. Before anything is typed, the commands run most recently come first under "Recent".
+
+<Canvas of={Stories.RecentCommandsComeFirst} />
+
+## Shortcuts with useHotkey
+
+```tsx
+import { useHotkey } from "@arshad-shah/cynosure";
+
+useHotkey("mod+s", save);
+useHotkey("/", focusSearch); // plain keys are ignored while typing in a field
+```
+
+Shortcuts with Ctrl, Command or Alt work everywhere, text fields included. Plain keys are ignored in fields, so "/" still types a slash. Add `data-cy-hotkeys="off"` to a subtree (a code editor with its own bindings) to opt it out.
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+| Input | Result |
+| --- | --- |
+| <kbd>Ctrl</kbd> / <kbd>Command</kbd> + <kbd>K</kbd> | Opens or closes it from anywhere |
+| Typing | Filters the commands |
+| <kbd>Down</kbd> / <kbd>Up</kbd> | Next / previous command, wrapping around; disabled ones are skipped |
+| <kbd>Enter</kbd> or a click | Runs the command and closes |
+| <kbd>Escape</kbd> or the backdrop | Closes; focus returns to where it was |
+
+- **Roles:** a modal `dialog` named by `labels.title`, holding a `combobox` search field and a `listbox` of `option`s in named `group`s. The active command is `aria-activedescendant`, so focus stays in the search field.
+- **Fresh each time:** the search field is empty whenever it opens.
+- **Shadow DOM:** works inside shadow roots (extensions), including the shortcut.
+
+<Canvas of={Stories.ShortcutOpensSearchRunsAndReturnsFocus} />
+
+## Touch
+
+Command rows are at least 44px tall on coarse pointers. On narrow screens the panel spans the width.
+
+## Theming
+
+Tokens: `--cy-command-palette-width`, `--cy-command-palette-offset` (distance from the top) and `--cy-command-palette-list-max-height`. The backdrop uses `--cy-dialog-scrim`.
+
+## Related
+
+[Menu](?path=/docs/components-menu--docs) · [Combobox](?path=/docs/components-combobox--docs) · [Kbd](?path=/docs/components-kbd--docs) · [Dialog](?path=/docs/components-dialog--docs)

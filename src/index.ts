@@ -17,6 +17,13 @@ export {
   type ComboboxProps,
   type ComboboxTokens,
 } from "./components/Combobox/index.js";
+export {
+  type Command,
+  CommandPalette,
+  type CommandPaletteLabels,
+  type CommandPaletteProps,
+  type CommandPaletteTokens,
+} from "./components/CommandPalette/index.js";
 export { CopyButton, type CopyButtonLabels, type CopyButtonProps } from "./components/CopyButton/index.js";
 export { Dialog, type DialogLabels, type DialogProps, type DialogTokens } from "./components/Dialog/index.js";
 export { Disclosure, type DisclosureProps, type DisclosureTokens } from "./components/Disclosure/index.js";
@@ -107,6 +114,7 @@ export { ChoiceBase, type ChoiceBaseProps } from "./foundations/ChoiceBase/Choic
 export { DialogBase, type DialogBaseProps } from "./foundations/DialogBase/index.js";
 export { type FieldRender, useField } from "./foundations/field.js";
 export { HiddenValue, type HiddenValueProps } from "./foundations/HiddenValue/HiddenValue.js";
+export { isApple, matchesHotkey, useHotkey } from "./foundations/hotkey.js";
 export { Icon, type IconProps } from "./foundations/Icon/Icon.js";
 export { InputBase, type InputBaseProps } from "./foundations/InputBase/InputBase.js";
 export { LinkBase, type LinkBaseProps } from "./foundations/LinkBase/LinkBase.js";

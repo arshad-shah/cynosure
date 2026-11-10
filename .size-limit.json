@@ -291,5 +291,15 @@
     "path": ["dist/components/Tree/Tree.js", "dist/styles/tree.css"],
     "limit": "4.5 kB",
     "gzip": true
+  },
+  {
+    "name": "CommandPalette (with useHotkey)",
+    "path": [
+      "dist/components/CommandPalette/CommandPalette.js",
+      "dist/foundations/hotkey.js",
+      "dist/styles/command-palette.css"
+    ],
+    "limit": "4.5 kB",
+    "gzip": true
   }
 ]
