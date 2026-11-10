@@ -301,5 +301,11 @@
     ],
     "limit": "4.5 kB",
     "gzip": true
+  },
+  {
+    "name": "ColorField",
+    "path": ["dist/components/ColorField/ColorField.js", "dist/styles/color-field.css"],
+    "limit": "4 kB",
+    "gzip": true
   }
 ]
