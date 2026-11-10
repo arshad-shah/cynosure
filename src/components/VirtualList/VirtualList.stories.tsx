@@ -1,8 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { expect, fn, waitFor } from "storybook/test";
 import { computeUnderHostileHost } from "../../test/hostile.js";
-import { moveItems, VirtualList, type VirtualListProps } from "./VirtualList.js";
+import { Button } from "../Button/Button.js";
+import { moveItems, VirtualList, type VirtualListHandle, type VirtualListProps } from "./VirtualList.js";
 
 interface Entry {
   id: string;
@@ -389,6 +390,136 @@ export const DraggingNearAnEdgeScrolls: Story = {
       window.dispatchEvent(new PointerEvent("pointermove", { ...init, clientX: r.left + 20, clientY: edge }));
     await waitFor(() => expect(box.scrollTop).toBeGreaterThan(0));
     window.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true, cancelable: true }));
+  },
+};
+
+/** A request log, as the tools app shows one: wrapped lines, new entries arriving, a button to jump back. */
+function Log() {
+  const [lines, setLines] = useState<Entry[]>(() =>
+    Array.from({ length: 60 }, (_, i) => ({
+      id: `l${i}`,
+      name:
+        i % 7 === 3
+          ? `GET /api/items/${i} 200 ${"with a long query string that wraps ".repeat(4)}`
+          : `GET /api/items/${i} 200`,
+    })),
+  );
+  const handle = useRef<VirtualListHandle>(null);
+  return (
+    <div style={{ display: "grid", gap: 8, inlineSize: 360 }}>
+      <VirtualList
+        label="Requests"
+        items={lines}
+        getKey={(e) => e.id}
+        renderItem={(e) => e.name}
+        selectionMode="none"
+        wrap
+        follow
+        handle={handle}
+      />
+      <div style={{ display: "flex", gap: 8 }}>
+        <Button
+          size="sm"
+          onClick={() =>
+            setLines((all) => [...all, { id: `l${all.length}`, name: `GET /api/items/${all.length} 201` }])
+          }
+        >
+          Add a line
+        </Button>
+        <Button size="sm" onClick={() => handle.current?.scrollToIndex(3, "start")}>
+          Show line 4
+        </Button>
+        <Button size="sm" onClick={() => handle.current?.scrollToEnd()}>
+          Latest
+        </Button>
+      </div>
+    </div>
+  );
+}
+const rowAt = (el: Element, i: number) => el.querySelector(`[data-index="${i}"]`) as HTMLElement | null;
+
+export const WrappedRowsTakeTheirHeight: Story = {
+  render: () => <Log />,
+  play: async ({ canvasElement }) => {
+    const el = list(canvasElement);
+    // It opens at the end (it follows); go back to the top.
+    await waitFor(() => expect(el.scrollTop).toBeGreaterThan(0));
+    el.scrollTop = 0;
+    await waitFor(() => expect(rowAt(canvasElement, 3)).not.toBeNull());
+    // A long line wraps and is taller than a short one, and the next row starts right below it.
+    const tall = rowAt(canvasElement, 3) as HTMLElement;
+    const short = rowAt(canvasElement, 2) as HTMLElement;
+    await waitFor(() => expect(tall.offsetHeight).toBeGreaterThan(short.offsetHeight * 2));
+    await waitFor(() =>
+      expect((rowAt(canvasElement, 4) as HTMLElement).offsetTop).toBe(tall.offsetTop + tall.offsetHeight),
+    );
+    await expect(el.scrollHeight).toBeGreaterThan(60 * short.offsetHeight);
+  },
+};
+
+export const FollowsNewRowsAtTheEnd: Story = {
+  render: () => <Log />,
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const el = list(canvasElement);
+    const atEnd = () => el.scrollTop + el.clientHeight >= el.scrollHeight - 2;
+    // It starts at the end, and stays there as lines arrive.
+    await waitFor(() => expect(atEnd()).toBe(true));
+    await userEvent.click(canvas.getByRole("button", { name: "Add a line" }));
+    await waitFor(() => expect(rowAt(canvasElement, 60)).not.toBeNull());
+    await waitFor(() => expect(atEnd()).toBe(true));
+    // Scrolled back to read, new lines leave it where it is.
+    await userEvent.click(canvas.getByRole("button", { name: "Show line 4" }));
+    await waitFor(() => expect(el.scrollTop).toBe((rowAt(canvasElement, 3) as HTMLElement).offsetTop));
+    el.dispatchEvent(new Event("scroll"));
+    const where = el.scrollTop;
+    await userEvent.click(canvas.getByRole("button", { name: "Add a line" }));
+    await new Promise((res) => setTimeout(res, 50));
+    await expect(el.scrollTop).toBe(where);
+    // The handle jumps to the latest.
+    await userEvent.click(canvas.getByRole("button", { name: "Latest" }));
+    await waitFor(() => expect(atEnd()).toBe(true));
+  },
+};
+
+const DAYS: Entry[] = ["Today", "Yesterday", "Last week"].flatMap((day, d) => [
+  { id: `h${d}`, name: day },
+  ...Array.from({ length: 20 }, (_, i) => ({ id: `${d}-${i}`, name: `${day}: file ${i + 1}` })),
+]);
+
+export const SectionHeadingsStayPinned: Story = {
+  render: () => (
+    <Files
+      items={DAYS}
+      isHeader={(e) => e.id.startsWith("h")}
+      isDisabled={() => false}
+      onSelectionChange={fn()}
+    />
+  ),
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const el = list(canvasElement);
+    // Headings are rows that cannot be focused or chosen: the first stop is the first file.
+    await userEvent.tab();
+    await expect(canvas.getByRole("option", { name: "Today: file 1" })).toHaveFocus();
+    await userEvent.keyboard("{Home}");
+    await expect(canvas.getByRole("option", { name: "Today: file 1" })).toHaveFocus();
+    await expect(canvas.getByRole("option", { name: "Today" })).toHaveAttribute("aria-disabled", "true");
+    // Arrows step over a heading.
+    el.scrollTop = 0;
+    for (let i = 0; i < 20; i++) await userEvent.keyboard("{ArrowDown}");
+    await expect(canvas.getByRole("option", { name: "Yesterday: file 1" })).toHaveFocus();
+    // Scrolled into a section, its heading stays at the top (a copy, hidden from screen readers).
+    const pinned = () => canvasElement.querySelector(".cy-virtual-list-pinned") as HTMLElement | null;
+    el.scrollTop = (rowAt(canvasElement, 21) as HTMLElement).offsetTop + 60;
+    el.dispatchEvent(new Event("scroll"));
+    await waitFor(() => expect(pinned()).toHaveTextContent("Yesterday"));
+    await expect(pinned()).toHaveAttribute("aria-hidden", "true");
+    await expect(pinned()?.getBoundingClientRect().top).toBeCloseTo(
+      el.getBoundingClientRect().top + el.clientTop,
+      0,
+    );
+    el.scrollTop = 0;
+    el.dispatchEvent(new Event("scroll"));
+    await waitFor(() => expect(pinned()).toBeNull());
   },
 };
 

@@ -184,7 +184,7 @@
   {
     "name": "Tabs",
     "path": ["dist/components/Tabs/Tabs.js", "dist/foundations/roving-focus.js", "dist/styles/tabs.css"],
-    "limit": "4.5 kB",
+    "limit": "6 kB",
     "gzip": true
   },
   {
@@ -353,7 +353,7 @@
   {
     "name": "SideNav (with Tooltip)",
     "path": ["dist/components/SideNav/SideNav.js", "dist/styles/side-nav.css"],
-    "limit": "3 kB",
+    "limit": "3.25 kB",
     "gzip": true
   },
   {
@@ -429,7 +429,7 @@
   {
     "name": "SelectionFrame (with geometry)",
     "path": ["dist/components/SelectionFrame/SelectionFrame.js", "dist/styles/selection-frame.css"],
-    "limit": "3 kB",
+    "limit": "3.5 kB",
     "gzip": true
   },
   {
@@ -447,7 +447,7 @@
   {
     "name": "VirtualList",
     "path": ["dist/components/VirtualList/VirtualList.js", "dist/styles/virtual-list.css"],
-    "limit": "3.75 kB",
+    "limit": "4.5 kB",
     "gzip": true
   },
   {

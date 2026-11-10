@@ -1,4 +1,12 @@
-import { type CSSProperties, type KeyboardEvent, type ReactNode, useRef, useState } from "react";
+import {
+  type CSSProperties,
+  type KeyboardEvent,
+  type ReactNode,
+  type Ref,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from "react";
 import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js";
 import { useControllableState } from "../../foundations/controllable.js";
 import { useDrag } from "../../foundations/drag.js";
@@ -28,14 +36,33 @@ export interface VirtualItemState {
   disabled: boolean;
 }
 
+/** What `handle` gives you: scroll a row into view from outside (a search hit, a "jump to latest" button). */
+export interface VirtualListHandle {
+  /** Scrolls row `index` into view: `nearest` (default, the least scrolling), `start` or `center`. */
+  scrollToIndex: (index: number, align?: "nearest" | "start" | "center") => void;
+  /** Scrolls to the last row. */
+  scrollToEnd: () => void;
+}
+
 export interface VirtualListProps<T> {
   /** Accessible name of the list. */
   label: string;
   items: readonly T[];
   /** A stable, unique key per item. */
   getKey: (item: T, index: number) => string;
-  /** The content of one row. Rows share one height: keep it to a line or a fixed layout. */
+  /** The content of one row. Rows share one height unless `wrap` is set. */
   renderItem: (item: T, state: VirtualItemState) => ReactNode;
+  /** Rows wrap their text and take the height they need (log lines, messages); each is measured as it renders. */
+  wrap?: boolean;
+  /** Keep the end in view as rows are added, while the list is scrolled to the end (a log, a live feed). */
+  follow?: boolean;
+  /**
+   * Rows that head a section (a date, a group). They cannot be focused or selected, and the current section's heading
+   * stays pinned at the top while its rows scroll under it.
+   */
+  isHeader?: (item: T) => boolean;
+  /** `scrollToIndex` and `scrollToEnd`, for scrolling from outside the list. */
+  handle?: Ref<VirtualListHandle>;
   isDisabled?: (item: T) => boolean;
   /** "none" (a list to act on), "single" (default) or "multiple". */
   selectionMode?: "none" | "single" | "multiple";
@@ -88,6 +115,10 @@ export function VirtualList<T>({
   onSelectionChange,
   onAction,
   onMove,
+  wrap = false,
+  follow = false,
+  isHeader,
+  handle,
   empty,
   labels,
   size = "md",
@@ -110,17 +141,80 @@ export function VirtualList<T>({
   };
 
   const keys = items.map((item, i) => getKey(item, i));
-  const off = (i: number) => !!isDisabled?.(items[i] as T);
+  const header = (i: number) => !!isHeader?.(items[i] as T);
+  const off = (i: number) => !!isDisabled?.(items[i] as T) || header(i);
   const firstEnabled = keys.findIndex((_, i) => !off(i));
   const focusIndex = focusKey === null ? -1 : keys.indexOf(focusKey);
   const pickedIndex = keys.findIndex((k, i) => picked.includes(k) && !off(i));
   const stop = focusIndex >= 0 ? focusIndex : pickedIndex >= 0 ? pickedIndex : firstEnabled;
 
+  // Wrapped rows are measured as they render; rows not yet seen are guessed at the height of one line.
+  const [measured, setMeasured] = useState<ReadonlyMap<string, number>>(() => new Map());
+  const [line, setLine] = useState(0);
+  const sizes = wrap ? keys.map((k) => measured.get(k) ?? line) : undefined;
   const win = useVirtualWindow(root, {
     count: items.length,
     rowSelector: ".cy-virtual-list-row",
     keep: stop,
+    ...(sizes && line ? { sizes } : {}),
   });
+  useClientLayoutEffect(() => {
+    if (!wrap) return;
+    const rows = root.current?.querySelectorAll<HTMLElement>(".cy-virtual-list-row") ?? [];
+    let next: Map<string, number> | null = null;
+    for (const row of rows) {
+      const key = keys[Number(row.dataset.index)] as string;
+      const h = row.offsetHeight;
+      if (h && measured.get(key) !== h) {
+        next ??= new Map(measured);
+        next.set(key, h);
+      }
+    }
+    if (next) setMeasured(next);
+    // One line: the smallest row, so unseen rows are never guessed taller than they can be.
+    if (!line && rows.length) setLine(Math.min(...[...rows].map((row) => row.offsetHeight || win.rowSize)));
+  });
+  const top = (i: number) => (wrap && line ? win.offsetOf(i) : i * win.rowSize);
+  /** The gap (0 to the row count) nearest to `y`, in content pixels. */
+  const gapAt = (y: number) => {
+    if (!(wrap && line)) return clamp(Math.round(y / win.rowSize), 0, keys.length);
+    let i = 0;
+    while (i < keys.length && top(i) + win.sizeOf(i) / 2 < y) i++;
+    return i;
+  };
+
+  // Following: while the list sits at its end, new rows keep it there.
+  const atEnd = useRef(true);
+  const scrollToEnd = () => {
+    const el = root.current;
+    if (el) el.scrollTop = el.scrollHeight;
+  };
+  useClientLayoutEffect(() => {
+    if (follow && atEnd.current) scrollToEnd();
+  }, [follow, items.length, win.total]);
+  useImperativeHandle(handle, () => ({
+    scrollToEnd,
+    scrollToIndex: (index, align = "nearest") => {
+      const el = root.current;
+      const i = clamp(index, 0, keys.length - 1);
+      if (!el) return;
+      if (align === "nearest") win.reveal(i);
+      else el.scrollTop = align === "start" ? top(i) : top(i) + win.sizeOf(i) / 2 - el.clientHeight / 2;
+    },
+  }));
+
+  // The heading pinned at the top: the last header at or above the first row in view.
+  let pinned = -1;
+  if (isHeader) {
+    const first = win.indices.length
+      ? Math.min(...win.indices.filter((i) => top(i) + win.sizeOf(i) > win.view.top))
+      : -1;
+    for (let i = Math.min(first, keys.length - 1); i >= 0; i--)
+      if (header(i)) {
+        pinned = i;
+        break;
+      }
+  }
 
   useClientLayoutEffect(() => {
     if (!moveFocus.current) return;
@@ -190,7 +284,7 @@ export function VirtualList<T>({
       // Near an edge, scroll toward it so a drop far away is reachable.
       if (point.y < box.top + win.rowSize) el.scrollTop -= win.rowSize / 2;
       else if (point.y > box.bottom - win.rowSize) el.scrollTop += win.rowSize / 2;
-      const gap = clamp(Math.round((point.y - box.top + el.scrollTop) / win.rowSize), 0, keys.length);
+      const gap = gapAt(point.y - box.top + el.scrollTop);
       setDrag({ ...(dragRef.current as { block: string[]; gap: number }), gap });
     },
     onEnd: (_, cancelled) => {
@@ -289,15 +383,25 @@ export function VirtualList<T>({
         aria-multiselectable={selectionMode === "multiple" || undefined}
         className={rootClass}
         data-size={size}
+        data-wrap={wrap ? "" : undefined}
         style={style}
         onKeyDown={onKeyDown}
-        onScroll={(e) => win.onScroll(e.currentTarget.scrollTop)}
+        onScroll={(e) => {
+          const el = e.currentTarget;
+          atEnd.current = el.scrollTop + el.clientHeight >= el.scrollHeight - 2;
+          win.onScroll(el.scrollTop);
+        }}
       >
+        {pinned >= 0 && win.view.top > top(pinned) && (
+          <div className="cy-virtual-list-pinned cy-reset" aria-hidden="true">
+            {renderItem(items[pinned] as T, { index: pinned, selected: false, disabled: true })}
+          </div>
+        )}
         <div className="cy-virtual-list-space cy-reset" style={{ blockSize: win.total }} aria-hidden="true" />
         {drag && (
           <div
             className="cy-virtual-list-drop cy-reset"
-            style={{ insetBlockStart: drag.gap * win.rowSize }}
+            style={{ insetBlockStart: drag.gap < keys.length ? top(drag.gap) : win.total }}
             aria-hidden="true"
           />
         )}
@@ -318,7 +422,8 @@ export function VirtualList<T>({
               tabIndex={i === stop ? 0 : -1}
               className="cy-virtual-list-row cy-reset"
               data-moving={drag?.block.includes(key) ? "" : undefined}
-              style={{ insetBlockStart: i * win.rowSize }}
+              data-header={header(i) ? "" : undefined}
+              style={{ insetBlockStart: top(i) }}
               onClick={() => onRowClick(i)}
               // Focus can arrive without our keys (a screen reader, a script): keys then act from here.
               onFocus={() => focusKey !== key && setFocusKey(key)}

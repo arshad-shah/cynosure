@@ -73,6 +73,43 @@
     }
   }
 }
+/* wrap: rows take the height their text needs (each is measured). */
+.cy-virtual-list.cy-virtual-list[data-wrap] .cy-virtual-list-row {
+  align-items: flex-start;
+  block-size: auto;
+  min-block-size: max(var(--_row), var(--_hit));
+  padding-block: var(--cy-space-2);
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+/* Section headings, and the copy of the current one pinned to the top (it takes no space in the flow). */
+.cy-virtual-list-row.cy-virtual-list-row[data-header],
+.cy-virtual-list-pinned.cy-virtual-list-pinned {
+  color: var(--cy-color-muted);
+  font-size: var(--cy-font-size-sm);
+  font-weight: var(--cy-font-weight-medium);
+  cursor: default;
+  &:hover {
+    background: transparent;
+  }
+}
+.cy-virtual-list-pinned.cy-virtual-list-pinned {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: var(--cy-space-3);
+  box-sizing: border-box;
+  block-size: max(var(--_row), var(--_hit));
+  margin-block-end: calc(-1 * max(var(--_row), var(--_hit)));
+  padding-inline: var(--cy-space-4);
+  overflow: hidden;
+  border-block-end: var(--cy-border-width) solid var(--cy-color-line);
+  background: var(--cy-color-surface);
+  white-space: nowrap;
+  pointer-events: none;
+}
 .cy-virtual-list-empty.cy-virtual-list-empty {
   display: grid;
   place-items: center;

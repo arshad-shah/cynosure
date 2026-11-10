@@ -54,6 +54,22 @@ Give `onMove` to let people reorder, such as the pages of a document. Alt+Up/Dow
 
 <Canvas of={Stories.AltArrowsMoveTheSelection} />
 
+## Logs and sections
+
+`wrap` lets rows wrap and grow (each row is measured), and `follow` keeps the end in view as rows arrive while people are reading the latest. `handle` scrolls from outside: `scrollToIndex(index, "start" | "center" | "nearest")` and `scrollToEnd()`.
+
+```tsx
+const log = useRef<VirtualListHandle>(null);
+<VirtualList label="Requests" items={lines} getKey={(l) => l.id} renderItem={(l) => l.text} selectionMode="none" wrap follow handle={log} />
+<Button onClick={() => log.current?.scrollToEnd()}>Latest</Button>
+```
+
+<Canvas of={Stories.FollowsNewRowsAtTheEnd} />
+
+`isHeader` marks rows that head a section (a date, a folder). They cannot be focused or chosen, and the current section's heading stays pinned at the top while its rows scroll under it.
+
+<Canvas of={Stories.SectionHeadingsStayPinned} />
+
 ## Props
 
 <ArgTypes of={Stories} />
