@@ -116,6 +116,23 @@ export const ActionDropsUnderTheTextWhenNarrow: Story = {
     await waitFor(() => expect(narrow.action.top).toBeGreaterThanOrEqual(narrow.text.bottom));
     // Nothing spills sideways.
     await expect(narrow.root.scrollWidth).toBeLessThanOrEqual(narrow.root.clientWidth);
+    // At both widths the icon, the title and the close button share the first line; nothing stacks vertically.
+    for (const id of ["wide", "narrow"]) {
+      const root = canvas.getByTestId(id);
+      const title = (root.querySelector(".cy-notice-title") as HTMLElement).getBoundingClientRect();
+      const mid = title.top + title.height / 2;
+      for (const part of [".cy-notice-icon", '[aria-label="Dismiss"] svg']) {
+        const box = (root.querySelector(part) as Element).getBoundingClientRect();
+        await expect({ id, part, centred: Math.abs(box.top + box.height / 2 - mid) <= 2 }).toEqual({
+          id,
+          part,
+          centred: true,
+        });
+      }
+      // The action lines up with the text, not the icon.
+      const text = (root.querySelector(".cy-notice-text") as HTMLElement).getBoundingClientRect();
+      if (id === "narrow") await expect(Math.round(narrow.action.left)).toBe(Math.round(text.left));
+    }
   },
 };
 
