@@ -1,7 +1,8 @@
-import { type CSSProperties, type DragEvent, type ReactNode, useId, useRef, useState } from "react";
+import { type CSSProperties, type ReactNode, useEffect, useId, useRef, useState } from "react";
 import { FileInputBase, setInputFiles } from "../../foundations/FileInputBase/FileInputBase.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
 import { upload } from "../../icons/upload.js";
+import { usePopover } from "../../overlay/floating.js";
 import type { Size } from "../../tokens/schema.js";
 import { Button } from "../Button/Button.js";
 
@@ -10,6 +11,8 @@ export interface FileDropTokens {
   radius: string;
   /** Background while files are dragged over it. */
   activeBackground: string;
+  /** Behind the whole-window overlay (`target="window"`). */
+  overlayBackground: string;
 }
 
 declare module "../../tokens/schema.js" {
@@ -46,6 +49,11 @@ export interface FileDropProps {
   maxSize?: number | undefined;
   /** Most files in one go (with `multiple`). */
   maxFiles?: number | undefined;
+  /**
+   * `zone` (default): files are dropped on the zone. `window`: files dropped anywhere in the window are taken, and an
+   * overlay covers the page while they are dragged in (for an app whose whole page is a drop target).
+   */
+  target?: "zone" | "window";
   /** Shown under the prompt, e.g. "PNG or JPG, up to 5 MB". */
   hint?: ReactNode;
   name?: string | undefined;
@@ -96,6 +104,7 @@ export function FileDrop({
   maxSize,
   maxFiles,
   hint,
+  target = "zone",
   name,
   form,
   required,
@@ -131,11 +140,55 @@ export function FileDrop({
     if (rejected.length) onReject?.(rejected);
   };
 
-  const dragging = (event: DragEvent<HTMLElement>) => [...event.dataTransfer.types].includes("Files");
+  const dragging = (event: { dataTransfer: DataTransfer | null }) =>
+    [...(event.dataTransfer?.types ?? [])].includes("Files");
   const reset = () => {
     depth.current = 0;
     setOver(false);
   };
+  const latest = useRef(take);
+  latest.current = take;
+  const whole = target === "window";
+  const overlay = useRef<HTMLDivElement>(null);
+  usePopover(overlay, whole && over);
+
+  // A whole-window target listens on the window: the page under the files is not ours, so nothing is attached to it.
+  useEffect(() => {
+    if (!whole || disabled) return;
+    const enter = (event: globalThis.DragEvent) => {
+      if (!dragging(event)) return;
+      event.preventDefault();
+      depth.current += 1;
+      setOver(true);
+    };
+    const move = (event: globalThis.DragEvent) => {
+      if (!dragging(event) || !event.dataTransfer) return;
+      event.preventDefault();
+      event.dataTransfer.dropEffect = "copy";
+    };
+    const leave = () => {
+      depth.current -= 1;
+      if (depth.current <= 0) reset();
+    };
+    const drop = (event: globalThis.DragEvent) => {
+      if (!dragging(event) || !event.dataTransfer) return;
+      event.preventDefault();
+      reset();
+      latest.current([...event.dataTransfer.files], true);
+    };
+    const all = [
+      ["dragenter", enter],
+      ["dragover", move],
+      ["dragleave", leave],
+      ["drop", drop],
+    ] as const;
+    for (const [type, fn] of all) window.addEventListener(type, fn);
+    return () => {
+      for (const [type, fn] of all) window.removeEventListener(type, fn);
+      reset();
+    };
+  }, [whole, disabled]);
+  const local = !whole;
 
   return (
     // biome-ignore lint/a11y/noStaticElementInteractions: drag and drop target; the button inside is the accessible way in
@@ -147,22 +200,23 @@ export function FileDrop({
       data-invalid={problems.length ? "" : undefined}
       style={style}
       onDragEnter={(event) => {
-        if (disabled || !dragging(event)) return;
+        if (!local || disabled || !dragging(event)) return;
         event.preventDefault();
         depth.current += 1;
         setOver(true);
       }}
       onDragOver={(event) => {
-        if (disabled || !dragging(event)) return;
+        if (!local || disabled || !dragging(event)) return;
         event.preventDefault();
         event.dataTransfer.dropEffect = "copy";
       }}
       onDragLeave={() => {
+        if (!local) return;
         depth.current -= 1;
         if (depth.current <= 0) reset();
       }}
       onDrop={(event) => {
-        if (disabled) return;
+        if (!local || disabled) return;
         event.preventDefault();
         reset();
         take([...event.dataTransfer.files], true);
@@ -201,6 +255,18 @@ export function FileDrop({
       <span className="cy-file-drop-status cy-reset" role="status">
         {status}
       </span>
+      {whole && (
+        <div
+          ref={overlay}
+          className="cy-file-drop-overlay cy-reset"
+          aria-hidden="true"
+          data-size={size}
+          {...{ popover: "manual" }}
+        >
+          <Icon icon={upload} size="lg" />
+          <span className="cy-reset">{text.dragging}</span>
+        </div>
+      )}
       <FileInputBase
         ref={input}
         className="cy-file-drop-input"

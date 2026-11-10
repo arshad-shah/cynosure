@@ -99,13 +99,62 @@
   opacity: 0;
   font-size: inherit;
 }
+/* The whole-window target's overlay: shown in the top layer only while files are dragged into the window. */
+.cy-file-drop-overlay.cy-file-drop-overlay {
+  box-sizing: border-box !important;
+  position: fixed;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  max-inline-size: none;
+  max-block-size: none;
+  margin: 0;
+  padding: var(--cy-space-8);
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--cy-space-4);
+  border: calc(2 * var(--cy-border-width)) dashed var(--cy-color-accent);
+  border-radius: 0;
+  background: var(
+    --cy-file-drop-overlay-background,
+    color-mix(in oklab, var(--cy-color-accent-soft) 92%, transparent)
+  );
+  color: var(--cy-color-accent-text);
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-font-size-lg);
+  font-weight: var(--cy-font-weight-medium);
+  line-height: var(--cy-font-line-height);
+  letter-spacing: normal;
+  text-align: center;
+  text-transform: none;
+  opacity: 1;
+  transition:
+    opacity var(--cy-motion-fast) var(--cy-motion-ease),
+    display var(--cy-motion-fast) allow-discrete,
+    overlay var(--cy-motion-fast) allow-discrete;
+  &:popover-open {
+    display: flex;
+  }
+  &::backdrop {
+    background: transparent;
+  }
+}
+@starting-style {
+  .cy-file-drop-overlay.cy-file-drop-overlay:popover-open {
+    opacity: 0;
+  }
+}
 @media (prefers-reduced-motion: reduce) {
-  .cy-file-drop.cy-file-drop {
+  .cy-file-drop.cy-file-drop,
+  .cy-file-drop-overlay.cy-file-drop-overlay {
     transition: none;
   }
 }
 @media (forced-colors: active) {
-  .cy-file-drop.cy-file-drop[data-over] {
+  .cy-file-drop.cy-file-drop[data-over],
+  .cy-file-drop-overlay.cy-file-drop-overlay {
     border-color: Highlight;
   }
 }

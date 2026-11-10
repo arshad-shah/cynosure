@@ -88,6 +88,71 @@ export const DraggingAwayOrNonFiles: Story = {
   },
 };
 
+const overlayOf = (el: Element) => el.querySelector(".cy-file-drop-overlay") as HTMLElement;
+
+export const WholeWindowTarget: Story = {
+  args: { target: "window" },
+  play: async ({ args, canvas, canvasElement }) => {
+    const overlay = overlayOf(canvasElement);
+    await expect(overlay).not.toBeVisible();
+    // Files dragged in anywhere on the page cover it with the overlay; the zone lights up too.
+    const elsewhere = canvasElement.ownerDocument.documentElement;
+    const files = [file("a.png", "image/png")];
+    drag(elsewhere, files);
+    await waitFor(() => expect(overlay).toBeVisible());
+    await expect(overlay).toHaveTextContent("Drop to add");
+    await expect(overlay).toHaveAttribute("aria-hidden", "true");
+    await expect(zone(canvasElement)).toHaveAttribute("data-over");
+    // The overlay covers the viewport.
+    const box = overlay.getBoundingClientRect();
+    await expect(box.width).toBeCloseTo(window.innerWidth, -1);
+    // Dropping on it takes the files once (the zone itself does not take them a second time).
+    const data = new DataTransfer();
+    for (const f of files) data.items.add(f);
+    overlay.dispatchEvent(new DragEvent("drop", { bubbles: true, cancelable: true, dataTransfer: data }));
+    await waitFor(() => expect(overlay).not.toBeVisible());
+    await expect(args.onFiles).toHaveBeenCalledTimes(1);
+    await expect(args.onFiles).toHaveBeenLastCalledWith(files);
+    await expect(canvas.getByRole("status")).toHaveTextContent("1 file added");
+    await expect(submitted(canvasElement)).toEqual(["a.png"]);
+  },
+};
+
+export const WholeWindowLeaveAndNonFiles: Story = {
+  args: { target: "window" },
+  play: async ({ args, canvasElement }) => {
+    const overlay = overlayOf(canvasElement);
+    const page = canvasElement.ownerDocument.documentElement;
+    const leave = drag(page, [file("a.png", "image/png")], "dragleave");
+    await waitFor(() => expect(overlay).toBeVisible());
+    leave();
+    await waitFor(() => expect(overlay).not.toBeVisible());
+    // Text dragged over the page, and dropped, is left to the page.
+    const data = new DataTransfer();
+    data.setData("text/plain", "hello");
+    const enter = new DragEvent("dragenter", { bubbles: true, cancelable: true, dataTransfer: data });
+    page.dispatchEvent(enter);
+    await expect(enter.defaultPrevented).toBe(false);
+    const over = new DragEvent("dragover", { bubbles: true, cancelable: true, dataTransfer: data });
+    page.dispatchEvent(over);
+    await expect(over.defaultPrevented).toBe(false);
+    const drop = new DragEvent("drop", { bubbles: true, cancelable: true, dataTransfer: data });
+    page.dispatchEvent(drop);
+    await expect(drop.defaultPrevented).toBe(false);
+    await expect(overlay).not.toBeVisible();
+    await expect(args.onFiles).not.toHaveBeenCalled();
+  },
+};
+
+export const WholeWindowDisabled: Story = {
+  args: { target: "window", disabled: true },
+  play: async ({ args, canvasElement }) => {
+    drag(canvasElement.ownerDocument.documentElement, [file("a.png", "image/png")])();
+    await expect(overlayOf(canvasElement)).not.toBeVisible();
+    await expect(args.onFiles).not.toHaveBeenCalled();
+  },
+};
+
 export const ChecksTypeSizeAndCount: Story = {
   args: { accept: ".png,application/pdf", maxSize: 10, maxFiles: 2 },
   play: async ({ args, canvas, canvasElement }) => {

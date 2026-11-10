@@ -32,6 +32,14 @@ import { FileDrop } from "@arshad-shah/cynosure";
 
 <Canvas of={Stories.ChecksTypeSizeAndCount} />
 
+## The whole window
+
+With `target="window"`, files dropped anywhere in the window are taken, for an app that opens whatever is dropped on it. An overlay covers the page while files are dragged in; text and links dragged over the page are left alone.
+
+```tsx
+<FileDrop target="window" accept=".har,.json" onFiles={open} />
+```
+
 ## Forms
 
 With `name`, the form submits the accepted files, whether they were dropped or picked: FileDrop keeps its native file input in step.
