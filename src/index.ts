@@ -75,6 +75,15 @@ export {
   type FileDropTokens,
   type FileRejection,
 } from "./components/FileDrop/index.js";
+export {
+  DockedToolbar,
+  type DockedToolbarProps,
+  FloatingToolbar,
+  type FloatingToolbarProps,
+  type FloatingToolbarTokens,
+  type ToolbarAnchor,
+  useSelectionAnchor,
+} from "./components/FloatingToolbar/index.js";
 export { Grid, GridItem, type GridItemProps, type GridProps } from "./components/Grid/index.js";
 export { IconButton, type IconButtonProps } from "./components/IconButton/index.js";
 export { Inline, type InlineProps } from "./components/Inline/index.js";

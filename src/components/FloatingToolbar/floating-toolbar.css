@@ -1,0 +1,91 @@
+/*
+ * floating-toolbar: a top-layer popover holding a Toolbar. The floating form sits beside its anchor (placed by
+ * useAnchoredPosition); the docked form spans the bottom of the visible viewport, lifted by the on-screen keyboard
+ * (--_inset), and its row scrolls sideways instead of wrapping.
+ */
+.cy-floating-toolbar.cy-floating-toolbar,
+.cy-docked-toolbar.cy-docked-toolbar {
+  --_offset: var(--cy-floating-toolbar-offset, var(--cy-space-4));
+  box-sizing: border-box !important;
+  position: fixed;
+  margin: 0;
+  padding: var(--cy-space-1);
+  border: var(--cy-border-width) solid var(--cy-color-line);
+  background: var(--cy-floating-toolbar-background, var(--cy-color-surface-raised));
+  color: var(--cy-color-ink);
+  box-shadow: var(--cy-shadow-md);
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-font-size-md);
+  line-height: var(--cy-font-line-height);
+  letter-spacing: normal;
+  text-transform: none;
+  overflow: visible;
+  &:not(:popover-open) {
+    display: none;
+  }
+}
+.cy-floating-toolbar.cy-floating-toolbar {
+  inset: auto;
+  inline-size: max-content;
+  max-inline-size: calc(100vw - 2 * var(--cy-space-4));
+  border-radius: var(--cy-floating-toolbar-radius, var(--cy-radius-lg));
+  & > .cy-toolbar.cy-toolbar {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+  }
+}
+.cy-docked-toolbar.cy-docked-toolbar {
+  inset: auto 0 var(--_inset, 0) 0;
+  display: flex;
+  align-items: center;
+  gap: var(--cy-space-2);
+  inline-size: 100%;
+  max-inline-size: none;
+  padding-block-end: max(var(--cy-space-1), env(safe-area-inset-bottom));
+  border-inline: 0;
+  border-block-end: 0;
+  border-radius: 0;
+}
+.cy-docked-toolbar-row.cy-docked-toolbar-row.cy-docked-toolbar-row {
+  flex: 1;
+  flex-wrap: nowrap;
+  min-inline-size: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+  /* Controls keep their size and the row scrolls, instead of squeezing them. */
+  & > *,
+  & > * > * {
+    flex-shrink: 0;
+  }
+}
+.cy-docked-toolbar-room.cy-docked-toolbar-room {
+  display: block;
+  margin: 0;
+  padding: 0;
+  font-size: inherit;
+}
+.cy-docked-toolbar-trailing.cy-docked-toolbar-trailing {
+  display: flex;
+  flex: none;
+  align-items: center;
+  padding-inline-start: var(--cy-space-2);
+  border-inline-start: var(--cy-border-width) solid var(--cy-color-line);
+  font-size: inherit;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .cy-floating-toolbar.cy-floating-toolbar:popover-open {
+    animation: cy-floating-toolbar-in var(--cy-motion-fast) var(--cy-motion-ease);
+  }
+}
+@keyframes cy-floating-toolbar-in {
+  from {
+    opacity: 0;
+    translate: 0 var(--cy-space-2);
+  }
+}
+@media (forced-colors: active) {
+  .cy-floating-toolbar.cy-floating-toolbar,
+  .cy-docked-toolbar.cy-docked-toolbar {
+    border-color: CanvasText;
+  }
+}

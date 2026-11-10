@@ -409,5 +409,11 @@
     "path": ["dist/components/Table/Table.js", "dist/styles/table.css"],
     "limit": "4 kB",
     "gzip": true
+  },
+  {
+    "name": "FloatingToolbar (with Toolbar and positioning)",
+    "path": ["dist/components/FloatingToolbar/FloatingToolbar.js", "dist/styles/floating-toolbar.css"],
+    "limit": "3.5 kB",
+    "gzip": true
   }
 ]
