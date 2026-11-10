@@ -1,15 +1,9 @@
-import {
-  type CSSProperties,
-  type KeyboardEvent,
-  type PointerEvent,
-  useCallback,
-  useId,
-  useRef,
-  useState,
-} from "react";
+import { type CSSProperties, type KeyboardEvent, useCallback, useId, useRef, useState } from "react";
 import { isRtl } from "../../foundations/dir.js";
+import { useDrag } from "../../foundations/drag.js";
 import { HiddenValue } from "../../foundations/HiddenValue/HiddenValue.js";
 import { stepKey } from "../../foundations/keys.js";
+import { clamp } from "../../foundations/math.js";
 import type { Size } from "../../tokens/schema.js";
 
 export interface SliderTokens {
@@ -78,6 +72,12 @@ const DEFAULT_LABELS: SliderLabels = { minimum: "minimum", maximum: "maximum", v
 const decimals = (n: number) => (String(n).split(".")[1] ?? "").length;
 
 /** Picks a number (or a range) by dragging or with the keyboard: APG slider, with pointer, touch and forms. */
+/** The thumb being dragged, and the value to go back to if the drag is cancelled. */
+interface Drag {
+  index: number;
+  from: SliderValue;
+}
+
 export function Slider({
   label,
   labelHidden = false,
@@ -108,7 +108,7 @@ export function Slider({
   const values: number[] = range ? [...current] : [current];
   const track = useRef<HTMLDivElement>(null);
   const thumbs = useRef<(HTMLDivElement | null)[]>([]);
-  const drag = useRef<{ index: number; pointer: number } | null>(null);
+  const drag = useRef<Drag | null>(null);
   const big = largeStep ?? Math.max(step, (max - min) / 10);
   const vertical = orientation === "vertical";
 
@@ -134,41 +134,35 @@ export function Slider({
     if (commit) onCommit?.(next);
   };
 
-  const fromPointer = (event: PointerEvent) => {
+  const fromPoint = (point: { x: number; y: number }) => {
     const box = (track.current as HTMLDivElement).getBoundingClientRect();
     const rtl = !vertical && isRtl(track.current as HTMLDivElement);
-    let ratio = vertical ? (box.bottom - event.clientY) / box.height : (event.clientX - box.left) / box.width;
+    let ratio = vertical ? (box.bottom - point.y) / box.height : (point.x - box.left) / box.width;
     if (rtl) ratio = 1 - ratio;
-    return min + Math.min(Math.max(ratio, 0), 1) * (max - min);
+    return min + clamp(ratio) * (max - min);
   };
-  const onPointerDown = (event: PointerEvent<HTMLDivElement>) => {
-    if (disabled || event.button !== 0) return;
-    event.preventDefault();
-    const v = fromPointer(event);
-    // The nearest thumb takes the press (for a range); on a tie, the one that can still move that way.
-    const distances = values.map((n) => Math.abs(n - v));
-    let index = distances.indexOf(Math.min(...distances));
-    if (range && values[0] === values[1]) index = v < (values[0] as number) ? 0 : 1;
-    drag.current = { index, pointer: event.pointerId };
-    try {
-      event.currentTarget.setPointerCapture(event.pointerId);
-    } catch {
-      // Synthetic events have no active pointer to capture.
-    }
-    thumbs.current[index]?.focus({ preventScroll: true });
-    set(withThumb(index, v), false);
-  };
-  const onPointerMove = (event: PointerEvent<HTMLDivElement>) => {
-    const d = drag.current;
-    if (!d || d.pointer !== event.pointerId) return;
-    set(withThumb(d.index, fromPointer(event)), false);
-  };
-  const onPointerEnd = (event: PointerEvent<HTMLDivElement>) => {
-    const d = drag.current;
-    if (!d || d.pointer !== event.pointerId) return;
-    drag.current = null;
-    set(withThumb(d.index, fromPointer(event)), true);
-  };
+  // Dragging through detent: the press moves the nearest thumb there, a drag follows, Escape puts it back.
+  useDrag(track, {
+    // The track's CSS keeps pan-y (pan-x when vertical), so a swipe across it still scrolls the page.
+    touchAction: "css",
+    onStart: ({ point }) => {
+      if (disabled) return false;
+      const v = fromPoint(point);
+      // The nearest thumb takes the press (for a range); on a tie, the one that can still move that way.
+      const distances = values.map((n) => Math.abs(n - v));
+      let index = distances.indexOf(Math.min(...distances));
+      if (range && values[0] === values[1]) index = v < (values[0] as number) ? 0 : 1;
+      drag.current = { index, from: range ? (values as [number, number]) : (values[0] as number) };
+      thumbs.current[index]?.focus({ preventScroll: true });
+      set(withThumb(index, v), false);
+    },
+    onMove: ({ point }) => set(withThumb((drag.current as Drag).index, fromPoint(point)), false),
+    onEnd: ({ point }, cancelled) => {
+      const d = drag.current as Drag;
+      drag.current = null;
+      set(cancelled ? d.from : withThumb(d.index, fromPoint(point)), true);
+    },
+  });
 
   const onKeyDown = (index: number) => (event: KeyboardEvent<HTMLDivElement>) => {
     const now = values[index] as number;
@@ -212,15 +206,7 @@ export function Slider({
           )}
         </div>
       )}
-      <div
-        ref={track}
-        className="cy-slider-track cy-reset"
-        onPointerDown={onPointerDown}
-        onPointerMove={onPointerMove}
-        onPointerUp={onPointerEnd}
-        onPointerCancel={onPointerEnd}
-        style={fill as CSSProperties}
-      >
+      <div ref={track} className="cy-slider-track cy-reset" style={fill as CSSProperties}>
         <div className="cy-slider-fill cy-reset" />
         {marks?.map((mark) => (
           <span

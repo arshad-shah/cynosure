@@ -111,6 +111,13 @@ export const ClickOrDragWithThePointer: Story = {
     );
     await waitFor(() => expect(divider).toHaveAttribute("aria-valuenow", "30"));
     await expect(divider).toHaveFocus();
+    // Escape mid-drag puts it back.
+    target.dispatchEvent(
+      new PointerEvent("pointerdown", { ...init, clientX: box.left + box.width * 0.6, clientY: y }),
+    );
+    await waitFor(() => expect(divider).toHaveAttribute("aria-valuenow", "60"));
+    window.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true, cancelable: true }));
+    await waitFor(() => expect(divider).toHaveAttribute("aria-valuenow", "30"));
   },
 };
 
@@ -168,7 +175,8 @@ export const TouchDivider: Story = {
     const divider = canvas.getByRole("slider");
     // The divider's hit area is at least 44px wide on touch screens.
     await expect(Number.parseFloat(getComputedStyle(divider, "::before").width)).toBeGreaterThanOrEqual(44);
-    // A quick tap jumps the divider (a held finger drags it).
+    // A sideways finger drags at once and a vertical swipe scrolls the page; a tap jumps the divider.
+    await expect(getComputedStyle(root(canvasElement)).touchAction).toBe("pan-y");
     const box = root(canvasElement).getBoundingClientRect();
     await userEvent.pointer({
       keys: "[TouchA]",

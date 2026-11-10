@@ -36,9 +36,9 @@ import { CompareSlider } from "@arshad-shah/cynosure";
 ## Behaviour and accessibility
 
 - **Role:** the divider is a slider named "Comparison", read as "40% before". Rename it and the tags with `labels`.
-- **Pointer:** drag anywhere on the picture; a click jumps the divider there and focuses it.
+- **Pointer:** press anywhere on the picture to jump the divider there (and focus it), then drag; Escape mid-drag puts it back.
 - **Keyboard:** arrows move 1%, Shift+arrows and Page Up/Down 10%, Home and End go to the ends.
-- **Touch:** hold briefly, then drag (a quick swipe scrolls the page); tap to jump. The divider's hit area is 44px on touch screens.
+- **Touch:** a sideways drag moves the divider at once and a tap jumps it; an upward or downward swipe scrolls the page. The divider's hit area is 44px on touch screens.
 
 <Canvas of={Stories.KeyboardMovesTheDivider} />
 

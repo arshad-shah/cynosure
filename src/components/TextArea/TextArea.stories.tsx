@@ -133,15 +133,23 @@ export const ControlledWithDefaultCounter: Story = {
   },
 };
 
-const drag = (grip: Element, dy: number, pointerType = "mouse") => {
+const drag = (grip: Element, dy: number, pointerType = "mouse", release = true) => {
   const r = grip.getBoundingClientRect();
   const x = r.left + r.width / 2;
   const y = r.top + r.height / 2;
-  const init = { bubbles: true, pointerId: 7, pointerType, clientX: x, button: 0, buttons: 1 };
+  const init = {
+    bubbles: true,
+    pointerId: 7,
+    pointerType,
+    isPrimary: true,
+    clientX: x,
+    button: 0,
+    buttons: 1,
+  };
   grip.dispatchEvent(new PointerEvent("pointerdown", { ...init, clientY: y }));
   grip.dispatchEvent(new PointerEvent("pointermove", { ...init, clientY: y + dy / 2 }));
   grip.dispatchEvent(new PointerEvent("pointermove", { ...init, clientY: y + dy }));
-  grip.dispatchEvent(new PointerEvent("pointerup", { ...init, clientY: y + dy, buttons: 0 }));
+  if (release) grip.dispatchEvent(new PointerEvent("pointerup", { ...init, clientY: y + dy, buttons: 0 }));
 };
 const grip = (root: HTMLElement) => root.querySelector(".cy-text-area-grip") as HTMLElement;
 
@@ -162,6 +170,11 @@ export const ResizesByDraggingTheGrip: Story = {
     await expect(Math.round(area.getBoundingClientRect().height)).toBe(Math.round(start + 60));
     // Never smaller than `rows`.
     drag(handle, -400);
+    await expect(Math.round(area.getBoundingClientRect().height)).toBe(Math.round(start));
+    // Escape before letting go puts the height back.
+    drag(handle, 80, "mouse", false);
+    await expect(Math.round(area.getBoundingClientRect().height)).toBe(Math.round(start + 80));
+    window.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true, cancelable: true }));
     await expect(Math.round(area.getBoundingClientRect().height)).toBe(Math.round(start));
   },
 };

@@ -15,7 +15,7 @@ import { CompareSlider } from "@arshad-shah/cynosure";
 | `showTags`            | `true`  | The "Before" and "After" tags in the corners                                |
 | `labels`              | –       | `divider`, `position(percent)`, `before`, `after`                           |
 | `className` / `style` | –       | Layout only                                                                 |
-- Drag anywhere with a mouse or pen, or a held finger (a quick swipe still scrolls the page); a click or tap jumps the divider.
+- Press anywhere to jump the divider there and drag to follow, with a mouse, pen or finger. A finger moving sideways drags at once; an upward swipe still scrolls the page. Escape mid-drag puts it back.
 - Keyboard on the divider: arrows ±1, Shift+arrows and Page Up/Down ±10, Home and End.
 - The divider's hit area is at least 24px, 44px on touch screens. The split stays left-to-right in RTL pages, like the pictures.
 

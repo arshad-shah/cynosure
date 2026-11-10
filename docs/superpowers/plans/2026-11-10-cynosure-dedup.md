@@ -20,7 +20,7 @@
   - Covers Slider, CompareSlider, SplitPane, ColorField's area and NumberField (Up/Down only).
   - NumberField keeps its own Up/Down/Page handling: it snaps to the step and has no Home/End without a bound, so it is a spinbutton, not a slider.
   - Every slider gets the same keys: ±step, Shift ±big, Page ±big, Home/End, and arrows that follow RTL. CompareSlider stays LTR on purpose.
-- [ ] **Task 3: Pointer drags through detent `bindPointer`** (rule 7).
+- [x] **Task 3: Pointer drags through detent `bindPointer`** (rule 7), via the new `useDrag` (`src/foundations/drag.ts`), which CompareSlider now uses too. Every drag now puts the value back on Escape or a browser cancel. CompareSlider moved from a 200 ms touch hold under `touch-action: none` (a swipe could not scroll anyway) to `pan-y` with no hold.
   - Covers Slider, SplitPane (pointer only; its separator keeps its keys), ColorField's area and TextArea's resize grip.
   - Fixes the drift: ColorField missed pointercancel and pointer-id checks. All four gain Escape-to-cancel and touch-versus-scroll handling.
   - SignaturePad (raw pressure and tilt, palm rejection) and Toast's swipe (browser pointercancel on scroll) stay as they are, for the reasons in their files.

@@ -258,6 +258,7 @@ export const PointerEdgeCases: Story = {
           cancelable: true,
           pointerId: 9,
           pointerType: "mouse",
+          isPrimary: true,
           ...extra,
         }),
       );
@@ -266,13 +267,19 @@ export const PointerEdgeCases: Story = {
     fire("pointermove", at(0.3));
     await expect(divider).toHaveAttribute("aria-valuenow", "50");
     await expect(root(canvasElement)).not.toHaveAttribute("data-dragging");
-    // A cancelled drag (the browser took the gesture) stops following the pointer.
+    // A cancelled drag (the browser took the gesture) goes back where it began and stops following the pointer.
     fire("pointerdown", { button: 0, ...at(0.5) });
     fire("pointermove", at(0.7));
     await waitFor(() => expect(divider).toHaveAttribute("aria-valuenow", "70"));
     fire("pointercancel", {});
     fire("pointermove", at(0.3));
-    await expect(divider).toHaveAttribute("aria-valuenow", "70");
+    await waitFor(() => expect(divider).toHaveAttribute("aria-valuenow", "50"));
+    // So does Escape.
+    fire("pointerdown", { button: 0, ...at(0.5) });
+    fire("pointermove", at(0.3));
+    await waitFor(() => expect(divider).toHaveAttribute("aria-valuenow", "30"));
+    window.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true, cancelable: true }));
+    await waitFor(() => expect(divider).toHaveAttribute("aria-valuenow", "50"));
     await expect(root(canvasElement)).not.toHaveAttribute("data-dragging");
   },
 };

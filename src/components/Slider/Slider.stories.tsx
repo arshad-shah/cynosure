@@ -35,7 +35,13 @@ const trackOf = (canvasElement: HTMLElement) =>
   canvasElement.querySelector(".cy-slider-track") as HTMLElement;
 
 /** Presses, moves and releases a pointer on the track at fractions of its length (0 = start, 1 = end). */
-function dragTrack(canvasElement: HTMLElement, from: number, to: number, pointerType = "mouse") {
+function dragTrack(
+  canvasElement: HTMLElement,
+  from: number,
+  to: number,
+  pointerType = "mouse",
+  release = true,
+) {
   const track = trackOf(canvasElement);
   const box = track.getBoundingClientRect();
   const vertical = canvasElement.querySelector('[data-orientation="vertical"]');
@@ -55,8 +61,20 @@ function dragTrack(canvasElement: HTMLElement, from: number, to: number, pointer
   track.dispatchEvent(new PointerEvent("pointerdown", { ...init, ...at(from) }));
   track.dispatchEvent(new PointerEvent("pointermove", { ...init, ...at((from + to) / 2) }));
   track.dispatchEvent(new PointerEvent("pointermove", { ...init, ...at(to) }));
-  track.dispatchEvent(new PointerEvent("pointerup", { ...init, ...at(to), buttons: 0 }));
+  if (release) track.dispatchEvent(new PointerEvent("pointerup", { ...init, ...at(to), buttons: 0 }));
 }
+
+export const EscapeCancelsADrag: Story = {
+  play: async ({ args, canvas, canvasElement }) => {
+    const thumb = canvas.getByRole("slider", { name: "Volume" });
+    dragTrack(canvasElement, 0.4, 0.9, "mouse", false);
+    await waitFor(() => expect(thumb).toHaveAttribute("aria-valuenow", "90"));
+    // Escape before letting go puts it back where the drag began.
+    window.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true, cancelable: true }));
+    await waitFor(() => expect(thumb).toHaveAttribute("aria-valuenow", "40"));
+    await expect(args.onCommit).toHaveBeenLastCalledWith(40);
+  },
+};
 
 export const KeyboardFollowsTheApgSlider: Story = {
   play: async ({ args, canvas, userEvent }) => {

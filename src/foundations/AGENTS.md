@@ -14,4 +14,5 @@ Shared helpers (use these instead of writing your own; a second copy is a review
 - `dir.ts`: `isRtl(el)`.
 - `keys.ts`: `isComposing(event)` (IME, including Safari's keyCode 229) and `stepKey(event, options)`, the slider keys (arrows, Shift and Page ±big, Home/End, RTL, one axis or both). Slider, SplitPane, CompareSlider and ColorField's area use it.
 - `listbox.ts`: `seekEnabled` (next usable index), `isTypeaheadKey` and `useTypeahead` (the 500 ms word buffer, cycling on one letter). Select, Menu, Tree and VirtualList use them.
+- `drag.ts`: `useDrag(ref, { onStart, onMove, onEnd })`, detent's `bindPointer` bound once with fresh handlers, re-bound when the element changes; Escape and browser cancels arrive as `onEnd(session, true)`, so put the value back. `touchAction: "css"` leaves `touch-action` to the stylesheet (e.g. `pan-y`). Slider, SplitPane, CompareSlider, ColorField's area and TextArea's grip use it.
 - `src/overlay/floating.ts`: `usePopover`, `useFloatingAnchor`, `useFloatingOffset`.

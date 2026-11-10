@@ -1,14 +1,8 @@
-import {
-  type CSSProperties,
-  type KeyboardEvent,
-  type PointerEvent,
-  type ReactNode,
-  useId,
-  useRef,
-  useState,
-} from "react";
+import { type CSSProperties, type KeyboardEvent, type ReactNode, useId, useRef, useState } from "react";
 import { isRtl } from "../../foundations/dir.js";
+import { useDrag } from "../../foundations/drag.js";
 import { stepKey } from "../../foundations/keys.js";
+import { clamp } from "../../foundations/math.js";
 
 export interface SplitPaneTokens {
   /** Thickness of the visible divider line. */
@@ -73,29 +67,38 @@ export function SplitPane({
   const [own, setOwn] = useState(defaultSize);
   const [dragging, setDragging] = useState(false);
   const restore = useRef<number | null>(null);
-  const drag = useRef<number | null>(null);
+  const divider = useRef<HTMLDivElement>(null);
+  const dragFrom = useRef(0);
   const controlled = size !== undefined;
   const current = controlled ? size : own;
   const vertical = orientation === "vertical";
 
   const set = (next: number, allowCollapse = false) => {
-    const value = round(allowCollapse && next === 0 ? 0 : Math.min(max, Math.max(min, next)));
+    const value = round(allowCollapse && next === 0 ? 0 : clamp(next, min, max));
     if (value === current) return;
     if (!controlled) setOwn(value);
     onSizeChange?.(value);
   };
 
-  const fromPointer = (event: PointerEvent<HTMLElement>) => {
-    const box = root.current?.getBoundingClientRect();
-    if (!box) return;
-    const rtl = !vertical && isRtl(event.currentTarget);
-    const offset = vertical
-      ? event.clientY - box.top
-      : rtl
-        ? box.right - event.clientX
-        : event.clientX - box.left;
+  const fromPoint = (point: { x: number; y: number }) => {
+    const box = (root.current as HTMLDivElement).getBoundingClientRect();
+    const rtl = !vertical && isRtl(root.current as HTMLDivElement);
+    const offset = vertical ? point.y - box.top : rtl ? box.right - point.x : point.x - box.left;
     set(((vertical ? offset / box.height : offset / box.width) || 0) * 100);
   };
+  // Dragging the divider through detent; Escape puts it back where the drag began.
+  useDrag(divider, {
+    onStart: () => {
+      dragFrom.current = current;
+      divider.current?.focus({ preventScroll: true });
+      setDragging(true);
+    },
+    onMove: ({ point }) => fromPoint(point),
+    onEnd: (_, cancelled) => {
+      if (cancelled) set(dragFrom.current, true);
+      setDragging(false);
+    },
+  });
 
   const onKeyDown = (event: KeyboardEvent<HTMLElement>) => {
     const target = stepKey(event, {
@@ -150,31 +153,9 @@ export function SplitPane({
         aria-valuemin={collapsible ? 0 : min}
         aria-valuemax={max}
         aria-valuetext={`${Math.round(current)}%`}
+        ref={divider}
         className="cy-split-pane-divider cy-reset"
         onKeyDown={onKeyDown}
-        onPointerDown={(event) => {
-          if (event.button !== 0) return;
-          event.preventDefault();
-          drag.current = event.pointerId;
-          try {
-            event.currentTarget.setPointerCapture(event.pointerId);
-          } catch {
-            // Synthetic events have no active pointer to capture.
-          }
-          event.currentTarget.focus({ preventScroll: true });
-          setDragging(true);
-        }}
-        onPointerMove={(event) => {
-          if (drag.current === event.pointerId) fromPointer(event);
-        }}
-        onPointerUp={() => {
-          drag.current = null;
-          setDragging(false);
-        }}
-        onPointerCancel={() => {
-          drag.current = null;
-          setDragging(false);
-        }}
       />
       <div className="cy-split-pane-pane cy-reset" data-pane="end">
         {end}

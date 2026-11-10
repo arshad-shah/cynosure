@@ -19,6 +19,7 @@
   font-size: var(--cy-font-size-sm);
   user-select: none;
   cursor: ew-resize;
+  touch-action: pan-y;
 }
 .cy-compare-slider-layer.cy-compare-slider-layer {
   grid-area: 1 / 1;

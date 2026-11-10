@@ -1,12 +1,5 @@
-import {
-  type CSSProperties,
-  type KeyboardEvent,
-  type PointerEvent,
-  type ReactNode,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { type CSSProperties, type KeyboardEvent, type ReactNode, useEffect, useRef, useState } from "react";
+import { useDrag } from "../../foundations/drag.js";
 import { HiddenValue } from "../../foundations/HiddenValue/HiddenValue.js";
 import { InputBase } from "../../foundations/InputBase/InputBase.js";
 import { stepKey } from "../../foundations/keys.js";
@@ -167,7 +160,7 @@ export function ColorField({
   const [draft, setDraft] = useState<string | null>(null);
   const [invalid, setInvalid] = useState(false);
   const area = useRef<HTMLDivElement>(null);
-  const dragging = useRef(false);
+  const dragFrom = useRef<Hsva | null>(null);
   const [dropper, setDropper] = useState(false);
   useEffect(() => setDropper(typeof window !== "undefined" && "EyeDropper" in window), []);
 
@@ -186,14 +179,26 @@ export function ColorField({
     else setInvalid(true);
   };
 
-  const fromPointer = (event: PointerEvent<HTMLDivElement>) => {
-    const box = event.currentTarget.getBoundingClientRect();
+  const fromPoint = (point: { x: number; y: number }) => {
+    const box = (area.current as HTMLDivElement).getBoundingClientRect();
     set({
       ...color,
-      s: clamp((event.clientX - box.left) / box.width),
-      v: 1 - clamp((event.clientY - box.top) / box.height),
+      s: clamp((point.x - box.left) / box.width),
+      v: 1 - clamp((point.y - box.top) / box.height),
     });
   };
+  // Dragging in the area through detent; Escape puts the colour back.
+  useDrag(area, {
+    onStart: ({ point }) => {
+      dragFrom.current = color;
+      area.current?.focus();
+      fromPoint(point);
+    },
+    onMove: ({ point }) => fromPoint(point),
+    onEnd: (_, cancelled) => {
+      if (cancelled) set(dragFrom.current as Hsva);
+    },
+  });
   const onAreaKey = (event: KeyboardEvent<HTMLDivElement>) => {
     // Saturation along x, brightness along y; Shift for bigger steps.
     const axis = { min: 0, max: 1, step: 0.01, arrowsOnly: true };
@@ -275,21 +280,6 @@ export function ColorField({
                   } as CSSProperties
                 }
                 onKeyDown={onAreaKey}
-                onPointerDown={(e) => {
-                  if (e.button !== 0) return;
-                  dragging.current = true;
-                  try {
-                    e.currentTarget.setPointerCapture(e.pointerId);
-                  } catch {
-                    // Synthetic events have no active pointer to capture.
-                  }
-                  e.currentTarget.focus();
-                  fromPointer(e);
-                }}
-                onPointerMove={(e) => dragging.current && fromPointer(e)}
-                onPointerUp={() => {
-                  dragging.current = false;
-                }}
               >
                 <span className="cy-color-field-area-thumb cy-reset" />
               </div>

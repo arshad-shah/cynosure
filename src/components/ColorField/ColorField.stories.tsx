@@ -97,11 +97,12 @@ export const PickerAreaAndHue: Story = {
         bubbles: true,
         button: 0,
         pointerId: 3,
+        isPrimary: true,
         clientX: box.left - 200,
         clientY: box.bottom + 200,
       }),
     );
-    area.dispatchEvent(new PointerEvent("pointerup", { bubbles: true, pointerId: 3 }));
+    area.dispatchEvent(new PointerEvent("pointerup", { bubbles: true, pointerId: 3, isPrimary: true }));
     await waitFor(() => expect(input).toHaveValue("#000000"));
     // Hue: back to a full colour, then turn the hue to green.
     area.dispatchEvent(
@@ -109,11 +110,12 @@ export const PickerAreaAndHue: Story = {
         bubbles: true,
         button: 0,
         pointerId: 3,
+        isPrimary: true,
         clientX: box.right + 200,
         clientY: box.top - 200,
       }),
     );
-    area.dispatchEvent(new PointerEvent("pointerup", { bubbles: true, pointerId: 3 }));
+    area.dispatchEvent(new PointerEvent("pointerup", { bubbles: true, pointerId: 3, isPrimary: true }));
     const hue = canvas.getByRole("slider", { name: "Hue" });
     // The hue track is thick enough to read as a colour strip.
     const strip = getComputedStyle(hue.closest(".cy-slider-track") as Element, "::before");
@@ -282,7 +284,14 @@ export const FormatsWithAlphaControlledAndDrag: Story = {
     const box = area.getBoundingClientRect();
     const at = (type: string, x: number, y: number, button = 0) =>
       area.dispatchEvent(
-        new PointerEvent(type, { bubbles: true, button, pointerId: 4, clientX: x, clientY: y }),
+        new PointerEvent(type, {
+          bubbles: true,
+          button,
+          pointerId: 4,
+          isPrimary: true,
+          clientX: x,
+          clientY: y,
+        }),
       );
     at("pointerdown", box.left + box.width / 2, box.top + box.height / 2, 2);
     await expect(input).toHaveValue("rgb(255 0 0)");
@@ -291,6 +300,11 @@ export const FormatsWithAlphaControlledAndDrag: Story = {
     at("pointerdown", box.right + 50, box.top - 50);
     at("pointermove", box.left - 50, box.bottom + 50);
     at("pointerup", box.left - 50, box.bottom + 50);
+    await waitFor(() => expect(input).toHaveValue("rgb(0 0 0)"));
+    // Escape before letting go puts the colour back.
+    at("pointerdown", box.right + 50, box.top - 50);
+    await waitFor(() => expect(input).toHaveValue("rgb(255 0 0)"));
+    window.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true, cancelable: true }));
     await waitFor(() => expect(input).toHaveValue("rgb(0 0 0)"));
   },
 };

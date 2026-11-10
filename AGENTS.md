@@ -24,13 +24,13 @@ Node 24 (`.nvmrc`), pnpm via `packageManager` (installs refuse versions younger 
 
 ## Non-negotiable rules
 
-1. **Native interactive elements only in `src/foundations/`.** Composites use `Button`, `IconButton`, `TextField`… never `<button>`, `<a>`, `<input>`, `<select>`, `<details>`, `<dialog>`. Once a component exists, every other component reuses it.
+1. **Native interactive elements only in `src/foundations/`.** Composites use `Button`, `IconButton`, `TextField`… never `<button>`, `<a>`, `<input>`, `<select>`, `<details>`, `<dialog>`. Once a component exists, every other component reuses it. **No duplication:** before adding a component, check whether an existing one can take a prop instead; before writing behaviour (drag, slider keys, type-ahead, popover show/hide, clamp…), use the shared helper listed in `src/foundations/AGENTS.md`.
 2. **No `title=`, no text or emoji glyphs as icons.** Icons are Facet SVGs via `<Icon>`.
 3. **Every visual value is a token.** Component CSS reads `--cy-<component>-*` with a global `--cy-*` fallback. No hex or px literals outside `var()` fallbacks.
 4. **Isolation.** Never write to `<html>`, `<head>` or `<body>` (except `CynosureTheme target="document"`). No inline `<script>`, no runtime style injection, no CSS imported from JS. Component roots never carry `.cy-reset`; they declare their own reset properties.
 5. **Behavioural tests only.** Every story has play tests that fail when the behaviour breaks: pointer, keyboard, touch, focus, values, disabled, a11y, hostile host. No "renders" or snapshot-only tests. Write the failing test first.
 6. **Touch and a11y.** Hit area ≥ 24px always, ≥ 44px on coarse pointers. WAI-ARIA APG patterns. Built-in strings are English and overridable through a typed `labels` prop.
-7. **One runtime dependency: `@arshad-shah/detent`** (Arshad's own zero-dependency drag, reorder and resize library) for pointer dragging; use it instead of hand-written drag code. Ask before adding any other.
+7. **One runtime dependency: `@arshad-shah/detent`** (Arshad's own zero-dependency drag, reorder and resize library) for pointer dragging; use it (through `useDrag` in `src/foundations/drag.ts`) instead of hand-written drag code. Ask before adding any other.
 8. **Docs move with code.** Every component has a README with `## Used by`; every folder rule lives in that folder's `AGENTS.md`.
 
 ## Git, branches and publishing

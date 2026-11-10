@@ -1,5 +1,5 @@
-import { bindPointer } from "@arshad-shah/detent";
-import { type CSSProperties, type KeyboardEvent, type ReactNode, useEffect, useRef, useState } from "react";
+import { type CSSProperties, type KeyboardEvent, type ReactNode, useRef, useState } from "react";
+import { useDrag } from "../../foundations/drag.js";
 import { stepKey } from "../../foundations/keys.js";
 import { clamp } from "../../foundations/math.js";
 
@@ -76,25 +76,25 @@ export function CompareSlider({
     if (!controlled) setOwn(v);
     onChange?.(v);
   };
-  const latest = useRef(set);
-  latest.current = set;
   const fromX = (x: number) => {
     const box = (area.current as HTMLDivElement).getBoundingClientRect();
     return ((x - box.left) / box.width) * 100;
   };
 
-  // Dragging through detent: mouse and pen start at once, a finger after a short hold (a swipe still scrolls).
-  useEffect(() => {
-    const bound = bindPointer(area.current as HTMLDivElement, {
-      distance: 0,
-      onStart: ({ point }) => {
-        divider.current?.focus({ preventScroll: true });
-        latest.current(fromX(point.x));
-      },
-      onMove: ({ point }) => latest.current(fromX(point.x)),
-    });
-    return () => bound.destroy();
-  }, []);
+  // Dragging through detent: the press jumps the divider there and a drag follows. The picture keeps touch-action
+  // pan-y, so a sideways finger drags at once and an upward swipe still scrolls the page (the browser then cancels the
+  // drag, which puts the divider back, as Escape does).
+  const dragFrom = useRef(position);
+  useDrag(area, {
+    touchAction: "css",
+    onStart: ({ point }) => {
+      dragFrom.current = position;
+      divider.current?.focus({ preventScroll: true });
+      set(fromX(point.x));
+    },
+    onMove: ({ point }) => set(fromX(point.x)),
+    onEnd: (_, cancelled) => cancelled && set(dragFrom.current),
+  });
 
   const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     // The pictures do not mirror in RTL, so neither do the keys.
@@ -106,12 +106,10 @@ export function CompareSlider({
 
   const shown = Math.round(position);
   return (
-    // biome-ignore lint/a11y/noStaticElementInteractions lint/a11y/useKeyWithClickEvents: clicking the picture jumps the divider; the divider itself is the keyboard control
     <div
       ref={area}
       className={className ? `cy-compare-slider ${className}` : "cy-compare-slider"}
       style={{ "--_pos": `${position}%`, ...style } as CSSProperties}
-      onClick={(event) => set(fromX(event.clientX))}
     >
       <div className="cy-compare-slider-layer cy-reset" data-side="after">
         {after}

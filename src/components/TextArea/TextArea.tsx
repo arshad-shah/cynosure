@@ -9,6 +9,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { useDrag } from "../../foundations/drag.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
 import { TextAreaBase } from "../../foundations/TextAreaBase/TextAreaBase.js";
 import { resizeCorner } from "../../icons/resize-corner.js";
@@ -93,7 +94,8 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(function 
   const [count, setCount] = useState((value ?? defaultValue ?? "").length);
   // Height chosen with the grip: becomes the floor (and lifts the cap) for content-driven sizing.
   const manual = useRef(0);
-  const dragFrom = useRef<{ y: number; height: number } | null>(null);
+  const grip = useRef<HTMLSpanElement>(null);
+  const dragFrom = useRef({ height: 0, manual: 0 });
   const ref = useCallback(
     (node: HTMLTextAreaElement | null) => {
       inner.current = node;
@@ -122,6 +124,27 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(function 
     area.style.height = `${height}px`;
     area.style.overflowY = wanted > max ? "auto" : "hidden";
   }, [rows, maxRows]);
+
+  // The grip drags through detent; Escape puts the height back.
+  useDrag(grip, {
+    onStart: () => {
+      dragFrom.current = {
+        height: (inner.current as HTMLTextAreaElement).getBoundingClientRect().height,
+        manual: manual.current,
+      };
+    },
+    onMove: ({ delta }) => {
+      manual.current = dragFrom.current.height + delta.y;
+      resize();
+      // Below the row minimum the floor wins: remember what is actually shown.
+      manual.current = inner.current?.getBoundingClientRect().height ?? manual.current;
+    },
+    onEnd: (_, cancelled) => {
+      if (!cancelled) return;
+      manual.current = dragFrom.current.manual;
+      resize();
+    },
+  });
 
   useLayoutEffect(resize, [resize, value]);
   useEffect(() => {
@@ -182,33 +205,7 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(function 
                 }}
               />
               {resizable && !disabled && (
-                <span
-                  className="cy-text-area-grip"
-                  aria-hidden="true"
-                  onPointerDown={(e) => {
-                    if (e.button !== 0 || !inner.current) return;
-                    e.preventDefault();
-                    try {
-                      e.currentTarget.setPointerCapture(e.pointerId);
-                    } catch {
-                      // Synthetic events have no active pointer to capture.
-                    }
-                    dragFrom.current = { y: e.clientY, height: inner.current.getBoundingClientRect().height };
-                  }}
-                  onPointerMove={(e) => {
-                    if (!dragFrom.current) return;
-                    manual.current = dragFrom.current.height + e.clientY - dragFrom.current.y;
-                    resize();
-                    // Below the row minimum the floor wins: remember what is actually shown.
-                    manual.current = inner.current?.getBoundingClientRect().height ?? manual.current;
-                  }}
-                  onPointerUp={() => {
-                    dragFrom.current = null;
-                  }}
-                  onPointerCancel={() => {
-                    dragFrom.current = null;
-                  }}
-                >
+                <span ref={grip} className="cy-text-area-grip" aria-hidden="true">
                   <Icon icon={resizeCorner} />
                 </span>
               )}
