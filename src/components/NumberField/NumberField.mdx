@@ -1,0 +1,72 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./NumberField.stories";
+
+<Meta of={Stories} />
+
+# NumberField
+
+A field for numbers. People type in their own format or step the value with the keyboard or the − and + buttons; your code gets a number.
+
+<Canvas of={Stories.SpinButtonWithItsValue} />
+
+## When to use
+
+- **Quantities, amounts, limits, measurements**: values people may want to nudge up and down.
+
+**Use something else when:**
+- the value is picked on a scale and the exact number matters less: [Slider](?path=/docs/components-slider--docs)
+- it is digits that are not a quantity (a phone number, a code, a card number): [TextField](?path=/docs/components-textfield--docs) with `inputMode="numeric"`
+
+## Usage
+
+```tsx
+import { NumberField } from "@arshad-shah/cynosure";
+
+<NumberField label="Seats" value={seats} onChange={setSeats} min={1} max={50} />
+```
+
+`onChange` fires when a value is committed: on each step, on Enter, and when leaving the field after typing. It receives a number, or `null` when the field is emptied.
+
+## Formats and locales
+
+Numbers are read and written with `Intl.NumberFormat` for `locale` (default: the browser's) and `formatOptions`: currencies, percents, units, fixed digits. People can type group separators, the local decimal mark and a typographic minus. Percents are typed as people say them: 20 means 20%, stored as 0.2.
+
+<Canvas of={Stories.CurrencyAndPercent} />
+
+<Canvas of={Stories.TypingInYourOwnFormat} />
+
+## Forms
+
+With `name`, the form receives the plain number ("1234.5"), whatever the text shows. Reset restores `defaultValue`; disabled fields are not submitted; `required` makes an empty field invalid.
+
+<Canvas of={Stories.FormsGetThePlainNumber} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+- **Role:** `role="spinbutton"`, named by its label, with `aria-valuenow`, `aria-valuemin`, `aria-valuemax` and the formatted value as `aria-valuetext`.
+- **Keyboard:**
+
+| Key                    | Action                                      |
+| ---------------------- | ------------------------------------------- |
+| Arrow Up / Arrow Down  | One `step` up or down                       |
+| Page Up / Page Down    | `largeStep` (10 steps) up or down           |
+| Home / End             | To `min` / `max` (when set)                 |
+| Enter                  | Commit the typed text                       |
+
+- **Stepping:** stepped values snap to `step`, counted from `min`, and never pick up floating-point noise (0.1 + 0.2 is 0.3). The steppers are disabled at the limits.
+- **Typing:** unreadable text goes back to the last value; values outside `min` and `max` are clamped.
+- **Steppers:** not tab stops (the field is one stop, as in the APG pattern); their hit areas are at least 24px, 44px on touch screens; pressing one keeps focus in the field.
+- **Mobile keyboards:** `inputmode` is `numeric` for whole non-negative numbers and `decimal` otherwise.
+- **Labels:** "Decrease" and "Increase" are in `labels`.
+
+## Theming
+
+NumberField uses TextField's tokens (`--cy-text-field-*`); digits are tabular so columns of numbers line up.
+
+## Related
+
+[TextField](?path=/docs/components-textfield--docs) · [Slider](?path=/docs/components-slider--docs) · [Field](?path=/docs/components-field--docs)

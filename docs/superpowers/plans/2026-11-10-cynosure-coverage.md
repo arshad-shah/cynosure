@@ -24,7 +24,7 @@ Smallest first, then the larger pieces.
 - [x] **Task 8: Prose.** Typography for rendered Markdown and long text, all tokens.
 - [x] **Task 9: Menu point anchor.** Built as `ContextMenu` on a shared `MenuPanel`. Open Menu at a pointer position (context menus), with keyboard opening at the focused item.
 - [x] **Task 10: Navigation and app shell.** Built as `SideNav` and `AppShell` (plus `side="start"` for Sheet). Side navigation, top bar and a responsive shell that collapses to a Sheet on small screens.
-- [ ] **Task 11: NumberField.** Built on TextField: steppers, min, max, step, locale-aware parsing, forms.
+- [x] **Task 11: NumberField.** Built on TextField: steppers, min, max, step, locale-aware parsing, forms.
 - [ ] **Task 12: FileDrop.** A file input foundation first, then a drop zone with keyboard and touch picking, accept and size checks.
 - [ ] **Task 13: SplitPane.** Resizable panes with an APG window-splitter handle (keyboard, pointer, touch).
 - [ ] **Task 14: TagInput.** Free and suggested tags, built on TextField and Combobox patterns.

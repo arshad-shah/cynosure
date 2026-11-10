@@ -361,5 +361,11 @@
     "path": ["dist/components/AppShell/AppShell.js", "dist/styles/app-shell.css"],
     "limit": "2.25 kB",
     "gzip": true
+  },
+  {
+    "name": "NumberField (with TextField)",
+    "path": ["dist/components/NumberField/NumberField.js", "dist/styles/number-field.css"],
+    "limit": "4 kB",
+    "gzip": true
   }
 ]

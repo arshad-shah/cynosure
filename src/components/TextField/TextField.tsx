@@ -56,6 +56,8 @@ export interface TextFieldProps extends NativeInput {
   iconEnd?: IconData | undefined;
   /** Shows a clear button while the field has a value. */
   clearable?: boolean;
+  /** Controls inside the field's end, after the input (NumberField's steppers). */
+  addonEnd?: ReactNode;
   labels?: { clear?: string };
   className?: string;
   /** Layout only. */
@@ -84,6 +86,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(function T
     iconStart,
     iconEnd,
     clearable = false,
+    addonEnd,
     labels,
     required,
     disabled,
@@ -172,6 +175,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(function T
             />
           )}
           {iconEnd && <Icon icon={iconEnd} className="cy-text-field-icon" />}
+          {addonEnd}
         </div>
       )}
     </Field>

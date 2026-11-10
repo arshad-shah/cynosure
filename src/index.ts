@@ -78,6 +78,12 @@ export {
 } from "./components/Menu/index.js";
 export { Notice, type NoticeLabels, type NoticeProps, type NoticeTokens } from "./components/Notice/index.js";
 export {
+  NumberField,
+  type NumberFieldLabels,
+  type NumberFieldProps,
+  parseNumber,
+} from "./components/NumberField/index.js";
+export {
   Popover,
   type PopoverProps,
   type PopoverTokens,
