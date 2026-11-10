@@ -12,8 +12,7 @@ import {
 import { HiddenValue } from "../../foundations/HiddenValue/HiddenValue.js";
 import { isComposing } from "../../foundations/keys.js";
 import { close } from "../../icons/close.js";
-import { useDismiss } from "../../overlay/dismiss.js";
-import { useAnchoredPosition } from "../../overlay/use-anchored-position.js";
+import { useListboxLayer } from "../../overlay/listbox-layer.js";
 import type { Size } from "../../tokens/schema.js";
 import { IconButton } from "../IconButton/IconButton.js";
 import { TextField } from "../TextField/TextField.js";
@@ -82,8 +81,6 @@ const DEFAULT_LABELS: TagInputLabels = {
   empty: "No suggestions",
 };
 
-type ListEl = HTMLDivElement & { showPopover?: () => void; hidePopover?: () => void };
-
 /**
  * Several short values in one field: type and press Enter (or a comma), pick a suggestion, or paste a list. Tags can
  * be removed with their buttons, Backspace, or the arrow keys. Each tag is submitted under `name`.
@@ -125,7 +122,7 @@ export function TagInput({
   const [active, setActive] = useState(0);
   const input = useRef<HTMLInputElement>(null);
   const anchor = useRef<HTMLElement | null>(null);
-  const list = useRef<ListEl>(null);
+  const list = useRef<HTMLDivElement>(null);
   const chips = useRef<HTMLUListElement>(null);
 
   const same = (a: string, b: string) => a.toLocaleLowerCase() === b.toLocaleLowerCase();
@@ -179,18 +176,11 @@ export function TagInput({
   const split = (s: string) =>
     [...separators, "\n"].reduce<string[]>((parts, sep) => parts.flatMap((p) => p.split(sep)), [s]);
 
+  // The list drops from the whole field (chips and input), found before the layer shows.
   useLayoutEffect(() => {
     anchor.current = input.current?.closest<HTMLElement>(".cy-text-field") ?? null;
-    const el = list.current;
-    if (!el) return;
-    if (listOpen && !el.matches(":popover-open")) {
-      el.style.minInlineSize = `${anchor.current?.offsetWidth ?? 0}px`;
-      el.showPopover?.();
-    }
-    if (!listOpen && el.matches(":popover-open")) el.hidePopover?.();
   });
-  useAnchoredPosition(anchor, list, listOpen, "bottom", 4, "start");
-  useDismiss({ open: listOpen, onClose: () => setOpen(false), inside: [anchor, list] });
+  useListboxLayer({ anchor, list, open: listOpen, onClose: () => setOpen(false) });
   useEffect(() => {
     if (active >= matches.length) setActive(Math.max(0, matches.length - 1));
   }, [active, matches.length]);

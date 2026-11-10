@@ -12,8 +12,7 @@ import { HiddenValue } from "../../foundations/HiddenValue/HiddenValue.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
 import { isComposing } from "../../foundations/keys.js";
 import type { IconData } from "../../icons/types.js";
-import { useDismiss } from "../../overlay/dismiss.js";
-import { useAnchoredPosition } from "../../overlay/use-anchored-position.js";
+import { useListboxLayer } from "../../overlay/listbox-layer.js";
 import type { Size } from "../../tokens/schema.js";
 import { TextField } from "../TextField/TextField.js";
 
@@ -85,7 +84,6 @@ const DEFAULT_LABELS: ComboboxLabels = {
 };
 const contains = (option: ComboboxOption, text: string) =>
   option.label.toLowerCase().includes(text.trim().toLowerCase());
-type ListEl = HTMLDivElement & { showPopover?: () => void; hidePopover?: () => void };
 
 /** Editable combobox with a list popup (WAI-ARIA APG): type to filter, arrows to choose, async options, forms. */
 export function Combobox({
@@ -127,7 +125,7 @@ export function Combobox({
   const [missing, setMissing] = useState(false);
   const input = useRef<HTMLInputElement>(null);
   const anchor = useRef<HTMLElement | null>(null);
-  const list = useRef<ListEl>(null);
+  const list = useRef<HTMLDivElement>(null);
 
   const match = filter === false ? null : (filter ?? contains);
   const visible = match && typing ? options.filter((o) => match(o, typedText)) : options;
@@ -174,18 +172,11 @@ export function Combobox({
     if (!enabled.some((o) => o.value === activeValue)) setActiveValue(enabled[0]?.value ?? null);
   });
 
+  // The list drops from the whole field (input and any end buttons), found before the layer shows.
   useLayoutEffect(() => {
     anchor.current = (input.current as HTMLInputElement).closest<HTMLElement>(".cy-text-field");
-    // Optional calls: test environments without the Popover API (jsdom) still render and filter.
-    const el = list.current as ListEl;
-    if (open && !el.matches(":popover-open")) {
-      el.style.minInlineSize = `${(anchor.current as HTMLElement).offsetWidth}px`;
-      el.showPopover?.();
-    }
-    if (!open && el.matches(":popover-open")) el.hidePopover?.();
   });
-  useAnchoredPosition(anchor, list, open, "bottom", 4, "start");
-  useDismiss({ open, onClose: () => setOpen(false), inside: [anchor, list] });
+  useListboxLayer({ anchor, list, open, onClose: () => setOpen(false) });
   useEffect(() => {
     if (open && activeIndex >= 0)
       list.current?.querySelector(`#${listId}-${activeIndex}`)?.scrollIntoView?.({ block: "nearest" });

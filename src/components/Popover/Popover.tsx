@@ -5,11 +5,11 @@ import {
   type Ref,
   useCallback,
   useId,
-  useLayoutEffect,
   useRef,
   useState,
 } from "react";
 import { useDismiss } from "../../overlay/dismiss.js";
+import { usePopover } from "../../overlay/floating.js";
 import type { Placement } from "../../overlay/position.js";
 import { useAnchoredPosition } from "../../overlay/use-anchored-position.js";
 import type { Size } from "../../tokens/schema.js";
@@ -60,8 +60,6 @@ export interface PopoverProps {
 const FOCUSABLE =
   'button:not([disabled]), [href], input:not([disabled]):not([type="hidden"]):not([aria-hidden="true"]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
-type PopoverEl = HTMLDivElement & { showPopover?: () => void; hidePopover?: () => void };
-
 /** Floating panel in the top layer, anchored to its trigger. Escape, outside clicks and focus return are shared. */
 export function Popover({
   trigger,
@@ -80,7 +78,7 @@ export function Popover({
   const [inner, setInner] = useState(defaultOpen);
   const isOpen = open ?? inner;
   const triggerRef = useRef<HTMLButtonElement>(null);
-  const panel = useRef<PopoverEl>(null);
+  const panel = useRef<HTMLDivElement>(null);
   const setOpen = useCallback(
     (next: boolean) => {
       if (open === undefined) setInner(next);
@@ -90,16 +88,10 @@ export function Popover({
   );
 
   // Show before positioning (the panel must be laid out to be measured), then move focus inside.
-  useLayoutEffect(() => {
-    const el = panel.current;
-    if (!el?.showPopover) return;
-    if (isOpen && !el.matches(":popover-open")) {
-      el.showPopover();
-      const first = el.querySelector<HTMLElement>(FOCUSABLE);
-      (first ?? el).focus({ preventScroll: true });
-    }
-    if (!isOpen && el.matches(":popover-open")) el.hidePopover?.();
-  }, [isOpen]);
+  usePopover(panel, isOpen, (el) => {
+    const first = el.querySelector<HTMLElement>(FOCUSABLE);
+    (first ?? el).focus({ preventScroll: true });
+  });
   useAnchoredPosition(triggerRef, panel, isOpen, placement, 6, "start");
   useDismiss({
     open: isOpen,

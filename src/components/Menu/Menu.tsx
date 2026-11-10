@@ -7,7 +7,6 @@ import {
   type RefObject,
   useCallback,
   useId,
-  useLayoutEffect,
   useRef,
   useState,
 } from "react";
@@ -19,6 +18,7 @@ import { useRovingFocus } from "../../foundations/roving-focus.js";
 import { check } from "../../icons/check.js";
 import type { IconData } from "../../icons/types.js";
 import { useDismiss } from "../../overlay/dismiss.js";
+import { usePopover } from "../../overlay/floating.js";
 import type { Placement } from "../../overlay/position.js";
 import { useAnchoredPosition, type VirtualAnchor } from "../../overlay/use-anchored-position.js";
 import type { Tone } from "../../tokens/schema.js";
@@ -84,7 +84,6 @@ export interface MenuProps {
   style?: CSSProperties;
 }
 
-type PanelEl = HTMLDivElement & { showPopover?: () => void; hidePopover?: () => void };
 const ITEM = '[role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"]';
 const isSection = (entry: MenuEntry): entry is MenuSection => "items" in entry;
 
@@ -126,21 +125,15 @@ export function MenuPanel({
   style,
 }: MenuPanelProps) {
   const apple = useApple();
-  const panel = useRef<PanelEl>(null);
+  const panel = useRef<HTMLDivElement>(null);
   const typeTo = useTypeahead();
 
-  useLayoutEffect(() => {
-    const el = panel.current;
-    if (!el?.showPopover) return;
-    if (open && !el.matches(":popover-open")) {
-      el.showPopover();
-      const enabled = [...el.querySelectorAll<HTMLElement>(ITEM)].filter(
-        (i) => i.getAttribute("aria-disabled") !== "true",
-      );
-      (focusOn === "last" ? enabled[enabled.length - 1] : enabled[0])?.focus({ preventScroll: true });
-    }
-    if (!open && el.matches(":popover-open")) el.hidePopover?.();
-  }, [open, focusOn]);
+  usePopover(panel, open, (el) => {
+    const enabled = [...el.querySelectorAll<HTMLElement>(ITEM)].filter(
+      (i) => i.getAttribute("aria-disabled") !== "true",
+    );
+    (focusOn === "last" ? enabled[enabled.length - 1] : enabled[0])?.focus({ preventScroll: true });
+  });
   useAnchoredPosition(anchor, panel, open, placement, offset, "start");
   useRovingFocus(panel, { orientation: "vertical", selector: ITEM });
   useDismiss({ open, onClose, inside: [...inside, panel], returnFocus });

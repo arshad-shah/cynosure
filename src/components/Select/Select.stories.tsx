@@ -3,6 +3,8 @@ import { useState } from "react";
 import { expect, fn, waitFor } from "storybook/test";
 import { computeUnderHostileHost } from "../../test/hostile.js";
 import { shownFully } from "../../test/settle.js";
+import { Button } from "../Button/Button.js";
+import { Popover } from "../Popover/Popover.js";
 import { Select } from "./Select.js";
 
 const fruits = [
@@ -159,6 +161,32 @@ export const ControlledValue: Story = {
     await userEvent.click(canvas.getByRole("combobox"));
     await userEvent.click(canvas.getByRole("option", { name: "Apple" }));
     await expect(canvas.getByTestId("out")).toHaveTextContent("apple");
+  },
+};
+
+export const InsideAPopover: Story = {
+  render: (args) => (
+    <Popover label="Filters" trigger={(p) => <Button {...p}>Filters</Button>}>
+      <Select {...args} />
+      <p>Choose a fruit to filter by.</p>
+    </Popover>
+  ),
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole("button", { name: "Filters" }));
+    const popover = await canvas.findByRole("dialog", { name: "Filters" });
+    await userEvent.click(canvas.getByRole("combobox", { name: "Fruit" }));
+    await canvas.findByRole("listbox");
+    // A press elsewhere in the popover closes only the list; Escape closes the list first, then the popover.
+    await userEvent.click(canvas.getByText("Choose a fruit to filter by."));
+    await waitFor(() => expect(canvas.queryByRole("listbox")).toBeNull());
+    await expect(popover).toBeVisible();
+    await userEvent.click(canvas.getByRole("combobox", { name: "Fruit" }));
+    await canvas.findByRole("listbox");
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() => expect(canvas.queryByRole("listbox")).toBeNull());
+    await expect(popover).toBeVisible();
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() => expect(canvas.queryByRole("dialog", { name: "Filters" })).toBeNull());
   },
 };
 

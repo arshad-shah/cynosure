@@ -11,12 +11,24 @@ export type FloatingAnchor = RefObject<HTMLElement | VirtualAnchor | null> | Vir
 const isRef = (a: FloatingAnchor): a is RefObject<HTMLElement | VirtualAnchor | null> =>
   a !== null && "current" in a;
 
-/** Shows or hides a manual popover with the Popover API (optional calls: jsdom has none). */
-export function usePopover(el: RefObject<PopoverEl | null>, open: boolean) {
+/**
+ * Shows or hides a manual popover with the Popover API, before paint. `onShow` runs right after it is shown, still
+ * before paint and before `useAnchoredPosition` measures it (size it, move focus in). Environments without the API
+ * (jsdom) skip it.
+ */
+export function usePopover(
+  el: RefObject<HTMLElement | null>,
+  open: boolean,
+  onShow?: (el: HTMLElement) => void,
+) {
   useClientLayoutEffect(() => {
-    const node = el.current as PopoverEl;
+    const node = el.current as PopoverEl | null;
+    if (!node?.showPopover) return;
     const shown = node.matches(":popover-open");
-    if (open && !shown) node.showPopover?.();
+    if (open && !shown) {
+      node.showPopover();
+      onShow?.(node);
+    }
     if (!open && shown) node.hidePopover?.();
   });
 }

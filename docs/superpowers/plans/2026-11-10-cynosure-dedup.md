@@ -24,7 +24,7 @@
   - Covers Slider, SplitPane (pointer only; its separator keeps its keys), ColorField's area and TextArea's resize grip.
   - Fixes the drift: ColorField missed pointercancel and pointer-id checks. All four gain Escape-to-cancel and touch-versus-scroll handling.
   - SignaturePad (raw pressure and tilt, palm rejection) and Toast's swipe (browser pointercancel on scroll) stay as they are, for the reasons in their files.
-- [ ] **Task 4: Overlays.**
+- [x] **Task 4: Overlays.** Done: `usePopover(el, open, onShow)` in Popover, Menu, Tooltip, FloatingToolbar and HoverCard; `useListboxLayer` (`src/overlay/listbox-layer.ts`) in Select, Combobox and TagInput. Toast keeps its own: its region stays in the top layer for the Toaster's whole life, not open and closed. Correction to the audit: `useDismiss` closes every open layer on a press outside them all (only a modal backdrop closes just the topmost), so Select joining it unifies the code rather than changing what a click does.
   - `usePopover` (with `onShow`) everywhere a manual popover is shown or hidden: Popover, Menu, Select, Combobox, TagInput, Tooltip, Toast. One `PopoverEl` type.
   - `useAnchoredListbox` for the Combobox, TagInput and Select list layer.
   - Select joins `useDismiss`, so it closes in layer order like Menu and Combobox.

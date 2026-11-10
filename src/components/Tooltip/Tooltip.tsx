@@ -10,6 +10,7 @@ import {
   useState,
 } from "react";
 import { useDismiss } from "../../overlay/dismiss.js";
+import { usePopover } from "../../overlay/floating.js";
 import type { Placement } from "../../overlay/position.js";
 import { useAnchoredPosition } from "../../overlay/use-anchored-position.js";
 
@@ -63,11 +64,8 @@ export function Tooltip({ content, children, placement = "top", delay = 300 }: T
   useEffect(() => () => clearTimeout(timer.current), []);
   useLayoutEffect(() => {
     triggerRef.current = trigger();
-    const el = tip.current as (HTMLElement & { showPopover?: () => void; hidePopover?: () => void }) | null;
-    if (!el?.showPopover) return;
-    if (open && !el.matches(":popover-open")) el.showPopover();
-    if (!open && el.matches(":popover-open")) el.hidePopover?.();
   });
+  usePopover(tip, open);
   // Escape closes the tooltip first when it sits inside a Popover, Menu or Dialog (shared layer stack).
   useDismiss({ open, onClose: () => setOpen(false), inside: [triggerRef, tip], outside: false });
   useAnchoredPosition(triggerRef, tip, open, placement);

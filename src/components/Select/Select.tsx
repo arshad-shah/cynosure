@@ -5,7 +5,6 @@ import {
   useCallback,
   useEffect,
   useId,
-  useLayoutEffect,
   useRef,
   useState,
 } from "react";
@@ -16,7 +15,7 @@ import { isComposing } from "../../foundations/keys.js";
 import { isTypeaheadKey, seekEnabled, useTypeahead } from "../../foundations/listbox.js";
 import { chevronDown } from "../../icons/chevron-down.js";
 import type { IconData } from "../../icons/types.js";
-import { useAnchoredPosition } from "../../overlay/use-anchored-position.js";
+import { useListboxLayer } from "../../overlay/listbox-layer.js";
 import type { Size } from "../../tokens/schema.js";
 import { Field } from "../Field/Field.js";
 
@@ -124,33 +123,12 @@ export function Select({
     setOpen(true);
   };
 
-  useLayoutEffect(() => {
-    const el = list.current as (HTMLElement & { showPopover?: () => void; hidePopover?: () => void }) | null;
-    if (!el?.showPopover) return;
-    if (open && !el.matches(":popover-open")) {
-      const width = trigger.current?.offsetWidth ?? 0;
-      // As wide as the trigger, never wider than max(trigger, 20rem): long labels truncate instead of overflowing.
-      el.style.minInlineSize = `${width}px`;
-      el.style.maxInlineSize = `${Math.max(width, 320)}px`;
-      el.showPopover();
-    }
-    if (!open && el.matches(":popover-open")) el.hidePopover?.();
-  });
-  useAnchoredPosition(trigger, list, open, "bottom", 4, "start");
+  // As wide as the trigger, never wider than max(trigger, 20rem): long labels truncate instead of overflowing.
+  useListboxLayer({ anchor: trigger, list, open, onClose: () => close(false), capWidth: true });
   useEffect(() => {
     if (!open || active < 0) return;
     list.current?.querySelector(`[data-index="${active}"]`)?.scrollIntoView({ block: "nearest" });
   }, [open, active]);
-  useEffect(() => {
-    if (!open) return;
-    const away = (e: PointerEvent) => {
-      const path = e.composedPath();
-      if (!path.includes(trigger.current as EventTarget) && !path.includes(list.current as EventTarget))
-        close(false);
-    };
-    document.addEventListener("pointerdown", away, true);
-    return () => document.removeEventListener("pointerdown", away, true);
-  });
 
   const typeahead = (key: string) => {
     const hit = typeTo(
