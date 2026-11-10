@@ -385,5 +385,11 @@
     "path": ["dist/components/SplitPane/SplitPane.js", "dist/styles/split-pane.css"],
     "limit": "2.25 kB",
     "gzip": true
+  },
+  {
+    "name": "TagInput (with TextField and the Combobox list styles)",
+    "path": ["dist/components/TagInput/TagInput.js", "dist/styles/tag-input.css", "dist/styles/combobox.css"],
+    "limit": "4.5 kB",
+    "gzip": true
   }
 ]

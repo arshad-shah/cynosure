@@ -36,7 +36,7 @@ export const App = () => (
 ## Components
 
 **Foundations:** ButtonBase, LinkBase, InputBase, FileInputBase, TextAreaBase, ChoiceBase, HiddenValue, DialogBase, Icon (184 Facet icons); hooks `useRovingFocus`, `useDismiss`.
-**Controls:** Button, IconButton, CopyButton, Link, TextField, NumberField, SearchField, TextArea, Select, Combobox, Checkbox, Switch, RadioGroup, SegmentedControl, Slider, ColorField, FileDrop, ThemeToggle.
+**Controls:** Button, IconButton, CopyButton, Link, TextField, NumberField, SearchField, TextArea, Select, Combobox, TagInput, Checkbox, Switch, RadioGroup, SegmentedControl, Slider, ColorField, FileDrop, ThemeToggle.
 **Structure:** AppShell, Stack, Inline, Grid, SideNav, SplitPane, Card, Toolbar, Tabs, Disclosure, Accordion, Tree.
 **Overlays:** Tooltip, Popover, Menu, ContextMenu, Dialog, Sheet, CommandPalette (`useHotkey`), Toast (`Toaster`, `useToast`).
 **Feedback and display:** Notice, EmptyState, ProgressBar, Steps, LoadingDots, Skeleton, DescriptionList, Prose, Announcer (`useAnnounce`), Badge, Kbd, Field. **Theme:** CynosureTheme, useColorMode, themeInitScript, createTheme.

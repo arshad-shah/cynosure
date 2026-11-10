@@ -153,6 +153,12 @@ export {
   type TabsProps,
   type TabsTokens,
 } from "./components/Tabs/index.js";
+export {
+  TagInput,
+  type TagInputLabels,
+  type TagInputProps,
+  type TagInputTokens,
+} from "./components/TagInput/index.js";
 export { TextArea, type TextAreaProps } from "./components/TextArea/index.js";
 export { TextField, type TextFieldProps } from "./components/TextField/index.js";
 export { ThemeToggle, type ThemeToggleProps } from "./components/ThemeToggle/index.js";

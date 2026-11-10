@@ -27,7 +27,7 @@ Smallest first, then the larger pieces.
 - [x] **Task 11: NumberField.** Built on TextField: steppers, min, max, step, locale-aware parsing, forms.
 - [x] **Task 12: FileDrop.** A file input foundation first, then a drop zone with keyboard and touch picking, accept and size checks.
 - [x] **Task 13: SplitPane.** Resizable panes with an APG window-splitter handle (keyboard, pointer, touch).
-- [ ] **Task 14: TagInput.** Free and suggested tags, built on TextField and Combobox patterns.
+- [x] **Task 14: TagInput.** Free and suggested tags, built on TextField and Combobox patterns.
 - [ ] **Task 15: CodeBlock.** Code display with copy (CopyButton) and a highlighter slot; no highlighter bundled.
 - [ ] **Task 16: SortableList.** Reorder by pointer, touch and keyboard, with announcements.
 - [ ] **Task 17: Table.** Semantic table with sorting, selection and sticky header.

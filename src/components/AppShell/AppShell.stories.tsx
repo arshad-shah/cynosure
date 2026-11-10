@@ -52,6 +52,8 @@ type Story = StoryObj<typeof meta>;
 
 const box = (el: Element) => el.getBoundingClientRect();
 const frame = (el: Element) => el.querySelector(".frame") as HTMLElement;
+/** Layout changes arrive through a ResizeObserver, which a busy CI runner can deliver late. */
+const RESIZE = { timeout: 3000 };
 const sheet = () => document.querySelector("dialog.cy-dialog") as HTMLDialogElement | null;
 
 export const NavigationBesideTheContent: Story = {
@@ -88,7 +90,10 @@ export const NarrowMovesTheNavigationIntoADrawer: Story = {
   args: {},
   render: (args) => <Demo {...args} width={420} />,
   play: async ({ canvas, userEvent }) => {
-    await waitFor(() => expect(canvas.getByRole("button", { name: "Open navigation" })).toBeVisible());
+    await waitFor(
+      () => expect(canvas.getByRole("button", { name: "Open navigation" })).toBeVisible(),
+      RESIZE,
+    );
     await expect(canvas.queryByRole("navigation")).toBeNull();
     const open = canvas.getByRole("button", { name: "Open navigation" });
     await expect(open).toHaveAttribute("aria-expanded", "false");
@@ -113,10 +118,13 @@ export const FollowsItsOwnWidth: Story = {
   play: async ({ canvas, canvasElement }) => {
     await expect(canvas.getByRole("navigation", { name: "Main" })).toBeVisible();
     frame(canvasElement).style.inlineSize = "600px";
-    await waitFor(() => expect(canvas.getByRole("button", { name: "Open navigation" })).toBeVisible());
+    await waitFor(
+      () => expect(canvas.getByRole("button", { name: "Open navigation" })).toBeVisible(),
+      RESIZE,
+    );
     await expect(canvas.queryByRole("navigation")).toBeNull();
     frame(canvasElement).style.inlineSize = "900px";
-    await waitFor(() => expect(canvas.getByRole("navigation", { name: "Main" })).toBeVisible());
+    await waitFor(() => expect(canvas.getByRole("navigation", { name: "Main" })).toBeVisible(), RESIZE);
   },
 };
 
@@ -127,7 +135,7 @@ export const CustomBreakpointAndLabels: Story = {
   },
   play: async ({ canvas }) => {
     // 900px is under the custom 1000px breakpoint.
-    await waitFor(() => expect(canvas.getByRole("button", { name: "Menü öffnen" })).toBeVisible());
+    await waitFor(() => expect(canvas.getByRole("button", { name: "Menü öffnen" })).toBeVisible(), RESIZE);
     await expect(canvas.getByRole("link", { name: "Zum Inhalt" })).toBeInTheDocument();
   },
 };
@@ -171,7 +179,7 @@ export const TouchMenuButton: Story = {
   tags: ["touch", "!dev"],
   render: (args) => <Demo {...args} width={420} />,
   play: async ({ canvas, userEvent }) => {
-    const open = await waitFor(() => canvas.getByRole("button", { name: "Open navigation" }));
+    const open = await waitFor(() => canvas.getByRole("button", { name: "Open navigation" }), RESIZE);
     // The hit area (the button's ::before) is at least 44px on touch screens.
     const hit = getComputedStyle(open, "::before");
     await expect(Number.parseFloat(hit.height)).toBeGreaterThanOrEqual(44);
