@@ -86,3 +86,21 @@
     outline: calc(2 * var(--cy-border-width)) solid Highlight;
   }
 }
+/* Grid: tiles wrap into as many columns as fit; the grip sits at the tile's top start, the content fills it. */
+.cy-sortable-list.cy-sortable-list[data-layout="grid"] {
+  & > .cy-sortable-list-items.cy-sortable-list-items {
+    display: grid;
+    grid-template-columns: repeat(
+        auto-fill,
+        minmax(min(100%, var(--cy-sortable-list-tile-min, calc(8 * var(--cy-space-6)))), 1fr)
+      );
+  }
+  & .cy-sortable-list-item.cy-sortable-list-item {
+    flex-direction: column;
+    align-items: stretch;
+    padding: var(--cy-space-2);
+  }
+  & .cy-sortable-list-handle.cy-sortable-list-handle {
+    align-self: flex-start;
+  }
+}

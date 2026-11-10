@@ -33,6 +33,12 @@ Focus a handle, press Space (or Enter) to pick the row up, move it with the arro
 
 <Canvas of={Stories.KeyboardPicksUpMovesAndDrops} />
 
+## Grids
+
+`layout="grid"` wraps the items into as many columns as fit (`--cy-sortable-list-tile-min` sets the smallest tile), for file grids and page thumbnails. Dragging works across rows; with the keyboard, Left and Right move a tile one place (following the reading direction) and Up and Down move it a whole row.
+
+<Canvas of={Stories.AGridOfTiles} />
+
 ## Props
 
 <ArgTypes of={Stories} />

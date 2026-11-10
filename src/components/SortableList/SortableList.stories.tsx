@@ -267,6 +267,111 @@ export const LabelsOverride: Story = {
   },
 };
 
+const FILES: SortableItem[] = ["a", "b", "c", "d", "e", "f", "g"].map((id) => ({
+  id,
+  label: `Page ${id.toUpperCase()}`,
+  content: (
+    <div style={{ blockSize: 72, display: "grid", placeItems: "center", background: "var(--cy-color-soft)" }}>
+      Page {id.toUpperCase()}
+    </div>
+  ),
+}));
+const gridOf = (dir?: "rtl") =>
+  function Grid(args: Story["args"]) {
+    return (
+      <div dir={dir} style={{ inlineSize: 520 }}>
+        <SortableList
+          {...args}
+          label="Pages"
+          defaultItems={FILES}
+          layout="grid"
+          style={{ "--cy-sortable-list-tile-min": "9rem" } as React.CSSProperties}
+        />
+      </div>
+    );
+  };
+const columnsOf = (el: HTMLElement) => {
+  const tiles = [...el.querySelectorAll("li")];
+  return tiles.filter((t) => t.offsetTop === (tiles[0] as HTMLElement).offsetTop).length;
+};
+
+export const AGridOfTiles: Story = {
+  tags: ["visual"],
+  decorators: [(Story) => <>{Story()}</>],
+  render: (args) => gridOf()(args),
+  play: async ({ canvas, canvasElement }) => {
+    await expect(canvas.getByRole("list", { name: "Pages" })).toBeVisible();
+    // Tiles wrap into as many columns as fit.
+    await expect(columnsOf(canvasElement)).toBeGreaterThanOrEqual(3);
+  },
+};
+
+export const GridKeysMoveAcrossAndBetweenRows: Story = {
+  decorators: [(Story) => <>{Story()}</>],
+  render: (args) => gridOf()(args),
+  play: async ({ args, canvas, canvasElement, userEvent }) => {
+    const cols = columnsOf(canvasElement);
+    canvas.getByRole("button", { name: "Move Page A" }).focus();
+    await userEvent.keyboard(" {ArrowRight}");
+    await expect(order(canvasElement).slice(0, 2)).toEqual(["b", "a"]);
+    // Down moves a whole row.
+    await userEvent.keyboard("{ArrowDown}");
+    await expect(order(canvasElement).indexOf("a")).toBe(1 + cols);
+    await userEvent.keyboard("{ArrowLeft}{ArrowUp} ");
+    await expect(order(canvasElement)).toEqual(["a", "b", "c", "d", "e", "f", "g"]);
+    await expect(args.onReorder).not.toHaveBeenCalled();
+    await userEvent.keyboard(" {End} ");
+    await expect(order(canvasElement).at(-1)).toBe("a");
+    await expect(args.onReorder).toHaveBeenCalledTimes(1);
+  },
+};
+
+export const GridFollowsTheReadingDirection: Story = {
+  decorators: [(Story) => <>{Story()}</>],
+  render: (args) => gridOf("rtl")(args),
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    canvas.getByRole("button", { name: "Move Page B" }).focus();
+    // In right-to-left text, Left moves forward.
+    await userEvent.keyboard(" {ArrowLeft} ");
+    await expect(order(canvasElement).slice(0, 3)).toEqual(["a", "c", "b"]);
+  },
+};
+
+export const GridDragWithThePointer: Story = {
+  decorators: [(Story) => <>{Story()}</>],
+  render: (args) => gridOf()(args),
+  play: async ({ args, canvasElement }) => {
+    const handle = canvasElement.querySelector('[aria-label="Move Page A"]') as HTMLElement;
+    const tiles = [...canvasElement.querySelectorAll("li")];
+    const from = handle.getBoundingClientRect();
+    const to = (tiles[2] as HTMLElement).getBoundingClientRect();
+    const init = {
+      bubbles: true,
+      cancelable: true,
+      pointerId: 6,
+      pointerType: "mouse",
+      isPrimary: true,
+      button: 0,
+      buttons: 1,
+    };
+    const at = (x: number, y: number) => ({ clientX: x, clientY: y });
+    handle.dispatchEvent(new PointerEvent("pointerdown", { ...init, ...at(from.left + 4, from.top + 4) }));
+    // Across to the far side of the third tile, on the same row.
+    for (const f of [0.25, 0.5, 0.75, 1])
+      handle.dispatchEvent(
+        new PointerEvent("pointermove", {
+          ...init,
+          ...at(from.left + (to.right - 4 - from.left) * f, to.top + to.height / 2),
+        }),
+      );
+    handle.dispatchEvent(
+      new PointerEvent("pointerup", { ...init, buttons: 0, ...at(to.right - 4, to.top + to.height / 2) }),
+    );
+    await waitFor(() => expect(order(canvasElement).slice(0, 3)).toEqual(["b", "c", "a"]));
+    await expect(args.onReorder).toHaveBeenCalledTimes(1);
+  },
+};
+
 export const StableUnderHostileHost: Story = {
   play: async ({ canvasElement }) => {
     const props = [

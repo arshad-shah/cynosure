@@ -15,15 +15,16 @@ import { SortableList } from "@arshad-shah/cynosure";
 | `items` / `defaultItems` | – / `[]` | `{ id, label, content? }`: `label` is plain text for announcements; `content` is what shows                  |
 | `onReorder`              | –        | Called with the items in their new order when a move is dropped (not while it is moving)                     |
 | `disabled`               | `false`  | Handles are disabled                                                                                         |
+| `layout`                 | `list`   | `list` (rows) or `grid` (tiles that wrap: file grids, page thumbnails)                                       |
 | `size`                   | `md`     | `sm` · `md` · `lg`                                                                                           |
 | `labels`                 | –        | `handle(label)`, `instructions`, `pickedUp`, `moved`, `dropped` (label, position, total), `cancelled(label)` |
-- Keyboard: Space or Enter picks a row up and drops it; Arrow Up/Down move it; Home/End move it to the ends; Escape cancels and puts it back; Tab drops it where it is.
+- Keyboard: Space or Enter picks a row up and drops it; Arrow Up/Down move it (in a grid, Left/Right move one place, following the reading direction, and Up/Down a whole row); Home/End move it to the ends; Escape cancels and puts it back; Tab drops it where it is.
 - Each handle is a "Move …" button described by the instructions; `aria-pressed` shows the row being moved; picks, moves, drops and cancels are announced politely.
 - Dragging uses [detent](https://detent.arshadshah.com) (pointer, touch and pen in one path, animated with FLIP, auto-scrolling long lists); touch dragging on a handle does not scroll the page; handles have a 44px hit area on touch screens.
 
 ## Tokens
 
-- `--cy-sortable-list-item-background`, `--cy-sortable-list-radius`
+- `--cy-sortable-list-item-background`, `--cy-sortable-list-radius`, `--cy-sortable-list-tile-min` (smallest tile width in a grid)
 
 ## Used by
 

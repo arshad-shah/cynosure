@@ -2,6 +2,7 @@ import { sortable } from "@arshad-shah/detent";
 import { type CSSProperties, type KeyboardEvent, type ReactNode, useId, useRef, useState } from "react";
 import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js";
 import { useControllableState } from "../../foundations/controllable.js";
+import { isRtl } from "../../foundations/dir.js";
 import { grip } from "../../icons/grip.js";
 import type { Size } from "../../tokens/schema.js";
 import { IconButton } from "../IconButton/IconButton.js";
@@ -11,6 +12,8 @@ export interface SortableListTokens {
   itemBackground: string;
   /** Corner radius of a row. */
   radius: string;
+  /** Smallest tile width in the grid layout. */
+  tileMin: string;
 }
 
 declare module "../../tokens/schema.js" {
@@ -46,6 +49,8 @@ export interface SortableListProps {
   /** Called with the items in their new order after a move is dropped. */
   onReorder?: ((items: SortableItem[]) => void) | undefined;
   disabled?: boolean;
+  /** `list` (rows, default) or `grid` (tiles that wrap: file grids, page thumbnails). */
+  layout?: "list" | "grid";
   size?: Size;
   labels?: Partial<SortableListLabels>;
   className?: string;
@@ -79,6 +84,7 @@ export function SortableList({
   defaultItems = [],
   onReorder,
   disabled = false,
+  layout = "list",
   size = "md",
   labels,
   className,
@@ -140,6 +146,13 @@ export function SortableList({
     setPreview(null);
     setMoving(null);
   };
+  /** Tiles in one row of the grid, measured from the layout (1 for a list). */
+  const columns = () => {
+    const tiles = [...(list.current as HTMLUListElement).children] as HTMLElement[];
+    const top = tiles[0]?.offsetTop;
+    const n = tiles.findIndex((t) => t.offsetTop !== top);
+    return n < 0 ? tiles.length : n;
+  };
   const shift = (delta: number) => {
     const moving = movingRef.current as Moving;
     const preview = previewRef.current as SortableItem[];
@@ -163,9 +176,13 @@ export function SortableList({
       return;
     }
     if (!active) return;
+    // In a grid, Left and Right move one place (following the reading direction) and Up and Down a whole row.
+    const across = isRtl(event.currentTarget) ? -1 : 1;
+    const row = layout === "grid" ? columns() : 1;
     const moves: Record<string, () => void> = {
-      ArrowUp: () => shift(-1),
-      ArrowDown: () => shift(1),
+      ArrowUp: () => shift(-row),
+      ArrowDown: () => shift(row),
+      ...(layout === "grid" ? { ArrowLeft: () => shift(-across), ArrowRight: () => shift(across) } : {}),
       Home: () => shift(-total),
       End: () => shift(total),
       Escape: cancel,
@@ -188,7 +205,7 @@ export function SortableList({
       latest.current.committed.find((i) => i.id === node.dataset.id) as SortableItem;
     const bound = sortable(el, {
       handle: ".cy-sortable-list-handle",
-      direction: "y",
+      direction: layout === "grid" ? "grid" : "y",
       keyboard: false,
       // The grip is a dedicated handle that never scrolls the page, so touch needs no press-and-hold.
       delay: 0,
@@ -228,12 +245,13 @@ export function SortableList({
       },
     });
     return () => bound.destroy();
-  }, []);
+  }, [layout]);
 
   return (
     <div
       className={className ? `cy-sortable-list ${className}` : "cy-sortable-list"}
       data-size={size}
+      data-layout={layout}
       style={style}
     >
       <ul ref={list} className="cy-sortable-list-items cy-reset" aria-label={label}>
