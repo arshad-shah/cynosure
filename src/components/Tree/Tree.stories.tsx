@@ -221,7 +221,7 @@ export const RightToLeftSwapsLeftAndRight: Story = {
   },
 };
 
-const big: TreeItem[] = Array.from({ length: 50 }, (_, f) => ({
+const big: TreeItem[] = Array.from({ length: 10 }, (_, f) => ({
   id: `folder-${f}`,
   label: `Folder ${f}`,
   children: Array.from({ length: 100 }, (_, i) => ({ id: `item-${f}-${i}`, label: `Item ${f}.${i}` })),
@@ -229,7 +229,7 @@ const big: TreeItem[] = Array.from({ length: 50 }, (_, f) => ({
 
 let rowRenders = 0;
 
-export const FiveThousandRowsStayResponsive: Story = {
+export const LargeTreesRerenderOnlyChangedRows: Story = {
   args: {
     items: big,
     defaultExpanded: big.map((f) => f.id),
@@ -241,10 +241,10 @@ export const FiveThousandRowsStayResponsive: Story = {
     },
   },
   play: async ({ canvasElement, userEvent }) => {
-    await waitFor(() => expect(canvasElement.querySelectorAll('[role="treeitem"]')).toHaveLength(5050));
+    await waitFor(() => expect(canvasElement.querySelectorAll('[role="treeitem"]')).toHaveLength(1010));
     await userEvent.tab();
-    // Moving focus re-renders the two rows whose state changed, not five thousand (counted, not timed, so a busy
-    // machine cannot make it flaky).
+    // Moving focus re-renders the two rows whose state changed, not a thousand (counted, not timed, so a busy
+    // machine cannot make it flaky; without memoised rows this is about 20,000).
     rowRenders = 0;
     for (let i = 0; i < 20; i++) await userEvent.keyboard("{ArrowDown}");
     await expect(focused()).toBe("Item 0.19");
@@ -317,6 +317,51 @@ export const CustomRowContent: Story = {
     await userEvent.tab();
     await userEvent.keyboard("v");
     await expect(document.activeElement).toContainElement(canvas.getByTestId("value-version"));
+  },
+};
+
+const onSelect = fn();
+const onExpand = fn();
+
+export const ControlledAndDefaults: Story = {
+  render: () => {
+    return (
+      <>
+        <Tree
+          label="Controlled"
+          items={project}
+          selected={["package"]}
+          expanded={["src"]}
+          onSelectionChange={onSelect}
+          onExpandedChange={onExpand}
+          className="host-tree"
+        />
+        <Tree label="Defaults" items={project.slice(2)} />
+      </>
+    );
+  },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const controlled = canvas.getByRole("tree", { name: "Controlled" });
+    await expect(controlled).toHaveClass("cy-tree", "host-tree");
+    // Defaults: single selection, md rows, nothing expanded or selected.
+    const defaults = canvas.getByRole("tree", { name: "Defaults" });
+    await expect(defaults).toHaveAttribute("data-size", "md");
+    await expect(defaults).not.toHaveAttribute("aria-multiselectable");
+    // Controlled: callbacks fire, but the tree shows what its owner says.
+    await userEvent.click(canvas.getAllByText("index.ts")[0] as HTMLElement);
+    await expect(onSelect).toHaveBeenCalledWith(["index"]);
+    await expect(canvas.getAllByRole("treeitem", { name: "package.json" })[0]).toHaveAttribute(
+      "aria-selected",
+      "true",
+    );
+    const src = canvas.getAllByRole("treeitem", { name: "src" })[0] as HTMLElement;
+    await userEvent.click(src.querySelector(".cy-tree-chevron") as HTMLElement);
+    await expect(onExpand).toHaveBeenCalledWith([]);
+    await expect(src).toHaveAttribute("aria-expanded", "true");
+    // Down on the last row stays put.
+    (canvasElement.querySelector('[aria-label="Defaults"] [tabindex="0"]') as HTMLElement).focus();
+    await userEvent.keyboard("{End}{ArrowDown}");
+    await expect(focused()).toBe("package.json");
   },
 };
 

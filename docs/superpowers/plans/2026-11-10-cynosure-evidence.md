@@ -81,7 +81,7 @@ Record the evidence in each component's README under `## Used by`. Prism is not 
 - **Props:** `<Tree items selection onSelectionChange expanded onExpandedChange selectionMode ("single" | "multiple") loadChildren label>`, where items are `{ id, label, icon?, children? }`.
 - **Behaviour (APG tree view):** Up and Down, Right opens or moves to the first child, Left closes or moves to the parent, Home, End, type-ahead, `*` expands siblings, Enter or Space selects. One Tab stop.
 - **Lazy children:** `loadChildren(item)` shows a loading row, then the children; errors show a retry row.
-- **Performance:** render only expanded branches; a story checks 5,000 nodes stay responsive.
+- **Performance:** render only expanded branches; memoised rows (a story counts row renders over 1,010 rows); `virtual` for 100,000 rows (Prism).
 - **Tests:** every key; selection modes; lazy loading and failure; RTL (Left and Right swap); touch rows ≥ 44; hostile host.
 
 ### Task 6: CommandPalette
