@@ -61,6 +61,14 @@ export { Dialog, type DialogLabels, type DialogProps, type DialogTokens } from "
 export { Disclosure, type DisclosureProps, type DisclosureTokens } from "./components/Disclosure/index.js";
 export { EmptyState, type EmptyStateProps, type EmptyStateTokens } from "./components/EmptyState/index.js";
 export { Field, type FieldProps } from "./components/Field/index.js";
+export {
+  acceptsFile,
+  FileDrop,
+  type FileDropLabels,
+  type FileDropProps,
+  type FileDropTokens,
+  type FileRejection,
+} from "./components/FileDrop/index.js";
 export { Grid, GridItem, type GridItemProps, type GridProps } from "./components/Grid/index.js";
 export { IconButton, type IconButtonProps } from "./components/IconButton/index.js";
 export { Inline, type InlineProps } from "./components/Inline/index.js";
@@ -170,6 +178,7 @@ export {
 export { ButtonBase, type ButtonBaseProps } from "./foundations/ButtonBase/ButtonBase.js";
 export { ChoiceBase, type ChoiceBaseProps } from "./foundations/ChoiceBase/ChoiceBase.js";
 export { DialogBase, type DialogBaseProps } from "./foundations/DialogBase/index.js";
+export { FileInputBase, type FileInputBaseProps, setInputFiles } from "./foundations/FileInputBase/index.js";
 export { type FieldRender, useField } from "./foundations/field.js";
 export { HiddenValue, type HiddenValueProps } from "./foundations/HiddenValue/HiddenValue.js";
 export { isApple, matchesHotkey, useHotkey } from "./foundations/hotkey.js";

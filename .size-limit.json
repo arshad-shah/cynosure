@@ -367,5 +367,17 @@
     "path": ["dist/components/NumberField/NumberField.js", "dist/styles/number-field.css"],
     "limit": "4 kB",
     "gzip": true
+  },
+  {
+    "name": "FileInputBase",
+    "path": ["dist/foundations/FileInputBase/FileInputBase.js"],
+    "limit": "500 B",
+    "gzip": true
+  },
+  {
+    "name": "FileDrop (with Button)",
+    "path": ["dist/components/FileDrop/FileDrop.js", "dist/styles/file-drop.css"],
+    "limit": "3 kB",
+    "gzip": true
   }
 ]

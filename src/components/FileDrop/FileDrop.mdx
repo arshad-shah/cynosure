@@ -1,0 +1,59 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./FileDrop.stories";
+
+<Meta of={Stories} />
+
+# FileDrop
+
+A place to add files: drop them on it, or press its button to pick them. It checks each file and explains what it turned away.
+
+<Canvas of={Stories.ButtonOpensThePicker} />
+
+## When to use
+
+- **Uploads, imports and attachments**, especially where people may drag files from their desktop.
+
+**Use something else when:**
+- a single button is enough (a small toolbar action): a [Button](?path=/docs/components-button--docs) that opens a [FileInputBase](?path=/docs/foundations-fileinputbase--docs)
+
+## Usage
+
+```tsx
+import { FileDrop } from "@arshad-shah/cynosure";
+
+<FileDrop multiple accept=".pdf,image/*" maxSize={5_000_000} hint="PDF or images, up to 5 MB" onFiles={upload} />
+```
+
+`onFiles` receives the files that passed. Without `multiple` only the first file is taken.
+
+## Checks
+
+`accept` (extensions, MIME types and `type/*`), `maxSize` (bytes) and `maxFiles` decide what is taken. Each refusal is listed in the zone and passed to `onReject` with its reason: `type`, `size` or `count`.
+
+<Canvas of={Stories.ChecksTypeSizeAndCount} />
+
+## Forms
+
+With `name`, the form submits the accepted files, whether they were dropped or picked: FileDrop keeps its native file input in step.
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+- **The button is the way in.** Keyboard, touch and screen reader users pick files with it; dropping is a shortcut for pointer users. The native input is hidden and out of the tab order.
+- **Hint:** read as the button's description.
+- **Announcements:** "2 files added" is announced politely; refusals are announced as an alert.
+- **Dragging:** the zone lights up only for files (not dragged text or links) and says "Drop to add".
+- **Touch:** the button's hit area is at least 44px on touch screens.
+- **Contrast:** the prompt and hint keep 4.5:1 in light and dark modes.
+- All built-in text is in `labels`.
+
+## Theming
+
+Tokens: `--cy-file-drop-radius` and `--cy-file-drop-active-background`.
+
+## Related
+
+[FileInputBase](?path=/docs/foundations-fileinputbase--docs) · [ProgressBar](?path=/docs/components-progressbar--docs) · [Notice](?path=/docs/components-notice--docs)
