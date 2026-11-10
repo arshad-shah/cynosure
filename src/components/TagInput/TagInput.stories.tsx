@@ -21,12 +21,13 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-/** Fires a paste of `text` (Firefox ignores `clipboardData` in the ClipboardEvent constructor, so attach it). */
+/**
+ * Fires a paste of `text`. Browsers protect clipboard data on synthetic events (Firefox ignores the constructor's
+ * `clipboardData` and will not read it back), so the event carries its own readable data, as a real paste does.
+ */
 function paste(input: HTMLElement, text: string) {
-  const data = new DataTransfer();
-  data.setData("text/plain", text);
-  const event = new ClipboardEvent("paste", { bubbles: true, cancelable: true, clipboardData: data });
-  if (!event.clipboardData) Object.defineProperty(event, "clipboardData", { value: data });
+  const event = new ClipboardEvent("paste", { bubbles: true, cancelable: true });
+  Object.defineProperty(event, "clipboardData", { value: { getData: () => text } });
   input.dispatchEvent(event);
 }
 
