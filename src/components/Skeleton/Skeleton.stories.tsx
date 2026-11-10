@@ -164,8 +164,9 @@ export const SweepsWithTheTextDirection: Story = {
   play: async ({ canvasElement }) => {
     const direction = (name: string) =>
       getComputedStyle(bones(canvasElement.querySelector(name) as Element)[0] as Element).animationDirection;
-    await expect(direction(".ltr")).toBe("normal");
-    await expect(direction(".rtl")).toBe("reverse");
+    // Wait for style to settle: right after a visual story's screenshot Chromium can report the previous value once.
+    await waitFor(() => expect(direction(".ltr")).toBe("normal"));
+    await waitFor(() => expect(direction(".rtl")).toBe("reverse"));
   },
 };
 
