@@ -35,6 +35,6 @@
   - Zoom out, a Menu of fit and percent choices showing the current percent, and Zoom in.
   - Built from IconButton, Button and Menu.
   - Takes the same `ZoomSetting`.
-- [ ] Later: the diagram canvas (free pan in both directions, nodes placed in canvas units) on the same core.
+- [x] **Task 5: PanZoomCanvas** (Arshad chose a pan/zoom surface only, 2026-11-10): free pan in both directions, zoom around the pointer, fit, centre, an optional minimap, on the same core (`useZoomGestures` gained `onPan`). Products keep their diagram layout, cards and export.
 
 Each task ends with the gates, a PROGRESS update, a commit and a push.

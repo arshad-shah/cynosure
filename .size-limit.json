@@ -479,5 +479,11 @@
     "path": ["dist/components/ZoomControls/ZoomControls.js", "dist/styles/zoom-controls.css"],
     "limit": "1.5 kB",
     "gzip": true
+  },
+  {
+    "name": "PanZoomCanvas",
+    "path": ["dist/components/PanZoomCanvas/PanZoomCanvas.js", "dist/styles/pan-zoom-canvas.css"],
+    "limit": "3 kB",
+    "gzip": true
   }
 ]

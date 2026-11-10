@@ -37,7 +37,7 @@ export const App = () => (
 
 **Foundations:** ButtonBase, LinkBase, InputBase, FileInputBase, TextAreaBase, ChoiceBase, HiddenValue, DialogBase, Icon (184 Facet icons); hooks `useRovingFocus`, `useDismiss`.
 **Controls:** Button, IconButton, CopyButton, Link, TextField, NumberField, SearchField, TextArea, Select, Combobox, TagInput, Checkbox, Switch, RadioGroup, SegmentedControl, Slider, ColorField, ColorSwatches, KeyValueEditor, FileDrop, SignaturePad, SelectionFrame, CompareSlider, ThemeToggle.
-**Structure:** AppShell, Stack, Inline, Grid, SideNav, SplitPane, Card, Toolbar, Tabs, Disclosure, Accordion, Tree, SortableList, VirtualList, DocumentViewport, ZoomControls.
+**Structure:** AppShell, Stack, Inline, Grid, SideNav, SplitPane, Card, Toolbar, Tabs, Disclosure, Accordion, Tree, SortableList, VirtualList, DocumentViewport, PanZoomCanvas, ZoomControls.
 **Overlays:** Tooltip, HoverCard, Popover, FloatingToolbar (`DockedToolbar`), Menu, ContextMenu, Dialog, Sheet, CommandPalette (`useHotkey`), Toast (`Toaster`, `useToast`).
 **Feedback and display:** Notice, EmptyState, ProgressBar, Steps, LoadingDots, Skeleton, DescriptionList, Table, Prose, CodeBlock, Announcer (`useAnnounce`), Badge, Kbd, Field. **Theme:** CynosureTheme, useColorMode, themeInitScript, createTheme.
 **Build:** optional Vite adapter (`@arshad-shah/cynosure/vite`) and self-hosted Hanken Grotesk (`fonts/hanken.css`).

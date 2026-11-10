@@ -9,6 +9,12 @@ export interface ZoomGestureOptions {
   /** The percent shown now. */
   percent: number;
   onZoom: (percent: number, anchor: ZoomAnchor) => void;
+  /**
+   * Pan something other than the element's scroll position (a canvas's transform), by a step in pixels. Then the wheel
+   * pans too, one finger pans on touch, and a press on the element itself (its empty background, not what is drawn on
+   * it) pans without Space.
+   */
+  onPan?: ((dx: number, dy: number) => void) | undefined;
 }
 
 /**
@@ -18,13 +24,16 @@ export interface ZoomGestureOptions {
  * - Space+drag pans with a mouse or pen (through detent);
  * - Ctrl/Cmd and =, - or 0 zoom in, out and to 100% while focus is inside.
  * Spread the returned handlers on the viewport; `panning` is true while Space is held (show a grab cursor).
+ * With `onPan` (a canvas rather than a scroller) the pans go to it instead, and more gestures pan; see `onPan`.
  */
 export function useZoomGestures(
   scroller: RefObject<HTMLElement | null>,
-  { percent, onZoom }: ZoomGestureOptions,
+  { percent, onZoom, onPan }: ZoomGestureOptions,
 ) {
-  const latest = useRef({ percent, onZoom });
-  latest.current = { percent, onZoom };
+  const latest = useRef({ percent, onZoom, onPan });
+  latest.current = { percent, onZoom, onPan };
+  /** True while two fingers are down: the first one's drag must not pan meanwhile. */
+  const pinching = useRef(false);
   const [panning, setPanning] = useState(false);
   const panningRef = useRef(false);
   const setPan = (on: boolean) => {
@@ -44,7 +53,13 @@ export function useZoomGestures(
       if (p !== latest.current.percent) latest.current.onZoom(p, anchor);
     };
     const onWheel = (e: WheelEvent) => {
-      if (!e.ctrlKey && !e.metaKey) return;
+      if (!e.ctrlKey && !e.metaKey) {
+        const pan = latest.current.onPan;
+        if (!pan) return;
+        e.preventDefault();
+        pan(-e.deltaX, -e.deltaY);
+        return;
+      }
       // The browser's own page zoom must not happen on top of ours.
       e.preventDefault();
       zoomTo(latest.current.percent * Math.exp(-e.deltaY * 0.0015), at(e.clientX, e.clientY));
@@ -59,7 +74,10 @@ export function useZoomGestures(
     const onDown = (e: PointerEvent) => {
       if (e.pointerType !== "touch") return;
       touches.set(e.pointerId, { x: e.clientX, y: e.clientY });
-      if (touches.size === 2) pinch = { distance: spread().distance || 1, percent: latest.current.percent };
+      if (touches.size === 2) {
+        pinch = { distance: spread().distance || 1, percent: latest.current.percent };
+        pinching.current = true;
+      }
     };
     const onMove = (e: PointerEvent) => {
       if (!touches.has(e.pointerId)) return;
@@ -71,6 +89,7 @@ export function useZoomGestures(
     const onUp = (e: PointerEvent) => {
       touches.delete(e.pointerId);
       if (touches.size < 2) pinch = null;
+      if (touches.size === 0) pinching.current = false;
     };
     el.addEventListener("wheel", onWheel, { passive: false });
     el.addEventListener("pointerdown", onDown);
@@ -86,19 +105,29 @@ export function useZoomGestures(
     };
   }, [scroller]);
 
-  // Space+drag pans. A finger pans natively (the viewport keeps touch-action pan-x pan-y).
-  const from = useRef({ left: 0, top: 0 });
+  // Space+drag pans with a mouse or pen; a scroller's finger pans natively (it keeps touch-action pan-x pan-y). With
+  // `onPan`, a press on the element's own background pans too, and so does a finger.
+  const last = useRef({ x: 0, y: 0 });
   useDrag(scroller, {
     touchAction: "css",
-    onStart: ({ pointerType }) => {
-      if (!panningRef.current || pointerType === "touch") return false;
-      const el = scroller.current as HTMLElement;
-      from.current = { left: el.scrollLeft, top: el.scrollTop };
+    onStart: ({ pointerType, path }) => {
+      const custom = !!latest.current.onPan;
+      const background = custom && path[0] === scroller.current;
+      if (pointerType === "touch" ? !background : !panningRef.current && !background) return false;
+      last.current = { x: 0, y: 0 };
     },
     onMove: ({ delta }) => {
-      const el = scroller.current as HTMLElement;
-      el.scrollLeft = from.current.left - delta.x;
-      el.scrollTop = from.current.top - delta.y;
+      const dx = delta.x - last.current.x;
+      const dy = delta.y - last.current.y;
+      last.current = { x: delta.x, y: delta.y };
+      if (pinching.current) return;
+      const pan = latest.current.onPan;
+      if (pan) pan(dx, dy);
+      else {
+        const el = scroller.current as HTMLElement;
+        el.scrollLeft -= dx;
+        el.scrollTop -= dy;
+      }
     },
   });
 
