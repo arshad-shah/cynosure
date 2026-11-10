@@ -34,7 +34,7 @@ export interface ContextMenuProps {
   items: MenuEntry[];
   onSelect: (value: string) => void;
   /** Called when the menu opens or closes, e.g. to highlight the row it belongs to. */
-  onOpenChange?: (open: boolean) => void;
+  onOpenChange?: ((open: boolean) => void) | undefined;
   /** The browser's own menu shows instead. */
   disabled?: boolean;
   className?: string;

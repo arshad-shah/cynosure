@@ -195,6 +195,35 @@ export const LongPressOpensOnTouch: Story = {
   },
 };
 
+export const MouseMovesAndCallbacksAreOptional: Story = {
+  render: ({ onOpenChange: _onOpenChange, ...args }) => (
+    <ContextMenu {...args}>
+      {(props) => (
+        <div
+          {...props}
+          ref={props.ref as Ref<HTMLDivElement>}
+          data-testid="target"
+          style={{ inlineSize: 320, blockSize: 120 }}
+        >
+          report.pdf
+        </div>
+      )}
+    </ContextMenu>
+  ),
+  play: async ({ canvas, userEvent }) => {
+    const target = canvas.getByTestId("target");
+    // Ordinary mouse movement and clicks over the target do nothing.
+    await userEvent.hover(target);
+    await userEvent.click(target);
+    await expect(isOpen()).toBe(false);
+    // Without onOpenChange the menu still opens and closes.
+    await userEvent.pointer({ keys: "[MouseRight]", target });
+    await shownFully(menu());
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() => expect(isOpen()).toBe(false));
+  },
+};
+
 export const StableUnderHostileHost: Story = {
   play: async ({ canvas, userEvent }) => {
     await userEvent.pointer({ keys: "[MouseRight]", target: canvas.getByTestId("target") });

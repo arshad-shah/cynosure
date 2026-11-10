@@ -267,6 +267,33 @@ export const ReadableInLightAndDark: Story = {
   },
 };
 
+export const DefaultsAndLayout: Story = {
+  render: () => (
+    <Stack gap="4">
+      <Prose className="host-prose" style={{ marginInline: "auto" }}>
+        <p>Plain</p>
+      </Prose>
+      <Prose size="sm" className="small">
+        <p>Small</p>
+      </Prose>
+      <Prose size="lg" as="section" className="large">
+        <p>Large</p>
+      </Prose>
+    </Stack>
+  ),
+  play: async ({ canvasElement }) => {
+    const plain = q(canvasElement, ".host-prose");
+    // A div at the medium size by default; className and style are for layout.
+    await expect(plain.tagName).toBe("DIV");
+    await expect(plain).toHaveAttribute("data-size", "md");
+    await expect(css(plain).marginLeft).toBe(css(plain).marginRight);
+    await expect(q(canvasElement, ".large").tagName).toBe("SECTION");
+    const size = (sel: string) => px(css(q(canvasElement, `${sel} p`)).fontSize);
+    await expect(size(".small")).toBeLessThan(size(".host-prose"));
+    await expect(size(".host-prose")).toBeLessThan(size(".large"));
+  },
+};
+
 export const StableUnderHostileHost: Story = {
   play: async ({ canvasElement }) => {
     const props = [
