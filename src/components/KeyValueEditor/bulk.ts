@@ -9,6 +9,8 @@ export interface KeyValuePair {
   enabled?: boolean;
   /** Masked like a password. */
   secret?: boolean;
+  /** With `allowFiles`: the row's value is this file (a multipart form field). `value` then holds its name. */
+  file?: File | undefined;
 }
 
 let made = 0;
@@ -21,9 +23,17 @@ export const pairName = (pair: KeyValuePair, index: number, row: (position: numb
 
 const OFF = "# ";
 
-/** One line per pair. Secret values are written in plain text: the text view is something people choose to open. */
+/** Marks a file row's value in the text view: `avatar: @photo.png`. */
+const FILE = "@";
+
+/**
+ * One line per pair. Secret values are written in plain text: the text view is something people choose to open. A file
+ * row is written as `key: @name`; the file itself cannot be typed, so it is kept only while its line is left as it is.
+ */
 export const toBulkText = (pairs: readonly KeyValuePair[]) =>
-  pairs.map((p) => `${p.enabled === false ? OFF : ""}${p.key}: ${p.value}`).join("\n");
+  pairs
+    .map((p) => `${p.enabled === false ? OFF : ""}${p.key}: ${p.file ? FILE + p.file.name : p.value}`)
+    .join("\n");
 
 function parseLine(line: string): Omit<KeyValuePair, "id"> {
   let text = line.trim();
@@ -51,7 +61,13 @@ export function fromBulkText(
     .filter((line) => line.trim() !== "")
     .map((line, i) => {
       const parsed = parseLine(line);
-      const pair = { id: previous[i]?.id ?? newPairId(), ...parsed };
+      const before = previous[i];
+      const pair: KeyValuePair = { id: before?.id ?? newPairId(), ...parsed };
+      // A file survives the text view while its line still names it.
+      if (before?.file && parsed.value === FILE + before.file.name) {
+        pair.value = before.file.name;
+        pair.file = before.file;
+      }
       return secretKeys.has(parsed.key) ? { ...pair, secret: true } : pair;
     });
 }

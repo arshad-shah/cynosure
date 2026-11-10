@@ -1,6 +1,9 @@
 import { type CSSProperties, useRef, useState } from "react";
 import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js";
 import { useControllableState } from "../../foundations/controllable.js";
+import { FileInputBase } from "../../foundations/FileInputBase/FileInputBase.js";
+import { close } from "../../icons/close.js";
+import { paperclip } from "../../icons/paperclip.js";
 import { plus } from "../../icons/plus.js";
 import { trash } from "../../icons/trash.js";
 import type { Size } from "../../tokens/schema.js";
@@ -38,6 +41,10 @@ export interface KeyValueEditorLabels {
   remove: (name: string) => string;
   /** On/off checkbox. Default "Use Authorization". */
   enable: (name: string) => string;
+  /** With `allowFiles`: the button that picks a file for a row. Default "Attach a file to avatar". */
+  attach: (name: string) => string;
+  /** With `allowFiles`: the button that takes a row's file away. Default "Remove the file from avatar". */
+  detach: (name: string) => string;
   /** Toggle to the text view. Default "Edit as text". */
   bulk: string;
   /** The text view's field. Default "Headers as text: one key: value per line, # turns a line off". */
@@ -54,6 +61,10 @@ export interface KeyValueEditorProps {
   toggleable?: boolean;
   /** A toggle to edit every pair as `key: value` lines (paste a block of headers). Default true. */
   bulkEdit?: boolean;
+  /** A button per row to make its value a file instead of text (multipart form fields). `accept` limits the types. */
+  allowFiles?: boolean;
+  /** File types for `allowFiles`, as for `<input accept>`. */
+  accept?: string | undefined;
   disabled?: boolean;
   size?: Size;
   labels?: Partial<KeyValueEditorLabels>;
@@ -69,6 +80,8 @@ const DEFAULT_LABELS: KeyValueEditorLabels = {
   add: "Add",
   remove: (name) => `Remove ${name}`,
   enable: (name) => `Use ${name}`,
+  attach: (name) => `Attach a file to ${name}`,
+  detach: (name) => `Remove the file from ${name}`,
   bulk: "Edit as text",
   bulkField: (label) => `${label} as text: one key: value per line, # turns a line off`,
 };
@@ -85,6 +98,8 @@ export function KeyValueEditor({
   onChange,
   toggleable = true,
   bulkEdit = true,
+  allowFiles = false,
+  accept,
   disabled = false,
   size = "md",
   labels,
@@ -99,6 +114,9 @@ export function KeyValueEditor({
   const root = useRef<HTMLDivElement>(null);
   /** Where focus goes after the rows change: a row's key field, or the Add button. */
   const focusNext = useRef<string | null>(null);
+  /** The row a file is being picked for. One hidden file input serves every row. */
+  const picking = useRef<string | null>(null);
+  const picker = useRef<HTMLInputElement>(null);
 
   useClientLayoutEffect(() => {
     const id = focusNext.current;
@@ -154,16 +172,51 @@ export function KeyValueEditor({
             size={size}
             onChange={(key) => update(pair.id, { key })}
           />
-          <TextField
-            label={`${text.value} (${name})`}
-            labelHidden
-            placeholder={text.value}
-            type={pair.secret ? "password" : "text"}
-            value={pair.value}
-            disabled={disabled}
-            size={size}
-            onChange={(value) => update(pair.id, { value })}
-          />
+          {pair.file ? (
+            <TextField
+              label={`${text.value} (${name})`}
+              labelHidden
+              readOnly
+              iconStart={paperclip}
+              value={pair.file.name}
+              disabled={disabled}
+              size={size}
+            />
+          ) : (
+            <TextField
+              label={`${text.value} (${name})`}
+              labelHidden
+              placeholder={text.value}
+              type={pair.secret ? "password" : "text"}
+              value={pair.value}
+              disabled={disabled}
+              size={size}
+              onChange={(value) => update(pair.id, { value })}
+            />
+          )}
+          {allowFiles &&
+            (pair.file ? (
+              <IconButton
+                icon={close}
+                label={text.detach(name)}
+                variant="ghost"
+                size={size}
+                disabled={disabled}
+                onClick={() => update(pair.id, { file: undefined, value: "" })}
+              />
+            ) : (
+              <IconButton
+                icon={paperclip}
+                label={text.attach(name)}
+                variant="ghost"
+                size={size}
+                disabled={disabled}
+                onClick={() => {
+                  picking.current = pair.id;
+                  picker.current?.click();
+                }}
+              />
+            ))}
           <IconButton
             icon={trash}
             label={text.remove(name)}
@@ -206,6 +259,21 @@ export function KeyValueEditor({
           onChange={(next) => {
             setBulk(next);
             setRows(fromBulkText(next, rows, secretKeys.current));
+          }}
+        />
+      )}
+      {allowFiles && (
+        <FileInputBase
+          ref={picker}
+          className="cy-key-value-editor-picker"
+          tabIndex={-1}
+          aria-hidden="true"
+          accept={accept}
+          onFiles={([file]) => {
+            const id = picking.current;
+            picking.current = null;
+            if (id && file) update(id, { file, value: file.name, secret: false });
+            if (picker.current) picker.current.value = "";
           }}
         />
       )}

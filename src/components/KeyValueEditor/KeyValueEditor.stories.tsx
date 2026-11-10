@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
-import { expect, fn, waitFor } from "storybook/test";
+import { expect, fn, spyOn, waitFor } from "storybook/test";
 import { computeUnderHostileHost } from "../../test/hostile.js";
 import { KeyValueEditor, type KeyValuePair } from "./KeyValueEditor.js";
 
@@ -169,6 +169,70 @@ export const LabelsAndUncontrolled: Story = {
     await expect(canvas.getByRole("button", { name: "A entfernen" })).toBeVisible();
     await userEvent.click(canvas.getByRole("button", { name: "Als Text" }));
     await expect(canvas.getByRole("textbox", { name: "Kopfzeilen als Text" })).toHaveValue("A: ");
+  },
+};
+
+/** A multipart form's fields: a row's value can be a file. */
+function FormFields() {
+  const [pairs, setPairs] = useState<KeyValuePair[]>([
+    { id: "n", key: "name", value: "Ada" },
+    { id: "f", key: "avatar", value: "" },
+  ]);
+  return (
+    <>
+      <KeyValueEditor label="Form fields" pairs={pairs} onChange={setPairs} allowFiles accept="image/*" />
+      <output data-testid="pairs">
+        {JSON.stringify(pairs.map((p) => [p.key, p.value, p.file ? p.file.name : null]))}
+      </output>
+    </>
+  );
+}
+
+export const FileValuedRows: Story = {
+  render: () => <FormFields />,
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const picker = canvasElement.querySelector('input[type="file"]') as HTMLInputElement;
+    await expect(picker).toHaveAttribute("accept", "image/*");
+    await expect(picker).toHaveAttribute("tabindex", "-1");
+    const open = spyOn(picker, "click").mockImplementation(() => {});
+    await userEvent.click(canvas.getByRole("button", { name: "Attach a file to avatar" }));
+    await expect(open).toHaveBeenCalledTimes(1);
+    open.mockRestore();
+    const photo = new File(["x"], "photo.png", { type: "image/png" });
+    await userEvent.upload(picker, photo);
+    // The row now holds the file: its value shows the name and cannot be typed into.
+    await waitFor(() => expect(state(canvasElement)[1]).toEqual(["avatar", "photo.png", "photo.png"]));
+    const value = canvas.getByRole("textbox", { name: "Value (avatar)" });
+    await expect(value).toHaveValue("photo.png");
+    await expect(value).toHaveAttribute("readonly");
+    // The text view writes it as @name, and keeps the file while that line is left alone.
+    await userEvent.click(canvas.getByRole("button", { name: "Edit as text" }));
+    const area = canvas.getByRole("textbox");
+    await expect(area).toHaveValue("name: Ada\navatar: @photo.png");
+    await userEvent.type(area, "!", { initialSelectionStart: 9, initialSelectionEnd: 9 });
+    await userEvent.click(canvas.getByRole("button", { name: "Edit as text" }));
+    await expect(state(canvasElement)).toEqual([
+      ["name", "Ada!", null],
+      ["avatar", "photo.png", "photo.png"],
+    ]);
+    // Taking the file away gives the row a text value again, and focus stays in the row.
+    // A file picked without an attach button pressed (no row waiting for it) goes nowhere.
+    await userEvent.upload(picker, photo);
+    await expect(state(canvasElement)[0]).toEqual(["name", "Ada!", null]);
+    await userEvent.click(canvas.getByRole("button", { name: "Remove the file from avatar" }));
+    await expect(state(canvasElement)[1]).toEqual(["avatar", "", null]);
+    await expect(canvas.getByRole("textbox", { name: "Value (avatar)" })).not.toHaveAttribute("readonly");
+    await expect(canvas.getByRole("button", { name: "Attach a file to avatar" })).toBeVisible();
+    // Retyping a file's line in the text view turns it back into text.
+    const again = spyOn(picker, "click").mockImplementation(() => {});
+    await userEvent.click(canvas.getByRole("button", { name: "Attach a file to avatar" }));
+    again.mockRestore();
+    await userEvent.upload(picker, photo);
+    await waitFor(() => expect(state(canvasElement)[1]).toContain("photo.png"));
+    await userEvent.click(canvas.getByRole("button", { name: "Edit as text" }));
+    await userEvent.type(canvas.getByRole("textbox"), "x");
+    await userEvent.click(canvas.getByRole("button", { name: "Edit as text" }));
+    await expect(state(canvasElement)[1]).toEqual(["avatar", "@photo.pngx", null]);
   },
 };
 

@@ -4,6 +4,7 @@
  */
 .cy-key-value-editor.cy-key-value-editor {
   box-sizing: border-box !important;
+  position: relative;
   display: grid;
   gap: var(--cy-space-3);
   margin: 0;
@@ -37,4 +38,16 @@
   flex-wrap: wrap;
   gap: var(--cy-space-2);
   font-size: inherit;
+}
+/* The one hidden file input behind every row's attach button. */
+.cy-key-value-editor-picker.cy-key-value-editor-picker {
+  position: absolute;
+  inline-size: var(--cy-border-width);
+  block-size: var(--cy-border-width);
+  margin: calc(var(--cy-border-width) * -1);
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  border: 0;
+  opacity: 0;
 }

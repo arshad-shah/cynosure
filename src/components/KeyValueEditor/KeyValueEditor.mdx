@@ -32,6 +32,16 @@ Each pair is `{ id, key, value, enabled?, secret? }`. Give new pairs from your d
 
 <Canvas of={Stories.EditAsText} />
 
+## Files as values
+
+For multipart form fields, `allowFiles` adds a button to each row that picks a file for its value (`accept` limits the types). The pair gets `file`, and `value` holds the file's name.
+
+```tsx
+<KeyValueEditor label="Form fields" pairs={fields} onChange={setFields} allowFiles accept="image/*" />
+```
+
+<Canvas of={Stories.FileValuedRows} />
+
 ## Props
 
 <ArgTypes of={Stories} />
