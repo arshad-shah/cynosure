@@ -103,6 +103,13 @@ export { HoverCard, type HoverCardProps, type HoverCardTokens } from "./componen
 export { IconButton, type IconButtonProps } from "./components/IconButton/index.js";
 export { Inline, type InlineProps } from "./components/Inline/index.js";
 export { Kbd, type KbdProps } from "./components/Kbd/index.js";
+export {
+  KeyValueEditor,
+  type KeyValueEditorLabels,
+  type KeyValueEditorProps,
+  type KeyValueEditorTokens,
+  type KeyValuePair,
+} from "./components/KeyValueEditor/index.js";
 export { Link, type LinkProps } from "./components/Link/index.js";
 export { LoadingDots, type LoadingDotsProps } from "./components/LoadingDots/index.js";
 export {

@@ -461,5 +461,11 @@
     "path": ["dist/components/ProgressOverlay/ProgressOverlay.js", "dist/styles/progress-overlay.css"],
     "limit": "6 kB",
     "gzip": true
+  },
+  {
+    "name": "KeyValueEditor",
+    "path": ["dist/components/KeyValueEditor/KeyValueEditor.js", "dist/styles/key-value-editor.css"],
+    "limit": "2.5 kB",
+    "gzip": true
   }
 ]

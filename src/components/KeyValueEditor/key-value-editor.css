@@ -1,0 +1,40 @@
+/*
+ * key-value-editor: SortableList rows holding an on/off checkbox, key and value fields and a remove button, then the
+ * Add and Edit-as-text buttons. The rows' fields share the width; a switched-off row is dimmed.
+ */
+.cy-key-value-editor.cy-key-value-editor {
+  box-sizing: border-box !important;
+  display: grid;
+  gap: var(--cy-space-3);
+  margin: 0;
+  color: var(--cy-color-ink);
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-font-size-md);
+  line-height: var(--cy-font-line-height);
+  letter-spacing: normal;
+  text-transform: none;
+}
+.cy-key-value-editor-row.cy-key-value-editor-row {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: var(--cy-key-value-editor-gap, var(--cy-space-3));
+  min-inline-size: 0;
+  font-size: inherit;
+  & > .cy-text-field {
+    flex: 1 1 0;
+    min-inline-size: 0;
+  }
+  & > .cy-choice {
+    flex: none;
+  }
+  &[data-off] > .cy-text-field {
+    opacity: 0.55;
+  }
+}
+.cy-key-value-editor-actions.cy-key-value-editor-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--cy-space-2);
+  font-size: inherit;
+}
