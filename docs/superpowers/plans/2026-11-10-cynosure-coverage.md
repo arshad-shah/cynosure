@@ -29,7 +29,7 @@ Smallest first, then the larger pieces.
 - [x] **Task 13: SplitPane.** Resizable panes with an APG window-splitter handle (keyboard, pointer, touch).
 - [x] **Task 14: TagInput.** Free and suggested tags, built on TextField and Combobox patterns.
 - [x] **Task 15: CodeBlock.** Code display with copy (CopyButton) and a highlighter slot; no highlighter bundled.
-- [ ] **Task 16: SortableList.** Reorder by pointer, touch and keyboard, with announcements.
+- [x] **Task 16: SortableList.** Reorder by pointer, touch and keyboard, with announcements.
 - [ ] **Task 17: Table.** Semantic table with sorting, selection and sticky header.
 
 Each task ends with the gates (`pnpm verify`), a PROGRESS update, a commit and a push.

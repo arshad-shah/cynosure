@@ -6,7 +6,7 @@ export interface VirtualAnchor {
   getBoundingClientRect(): DOMRect;
 }
 
-/** Keeps a fixed-position floating element anchored to `anchor` while `open` (scroll and resize aware). */
+/** Keeps a fixed-position floating element anchored to `anchor` while `open` (follows scrolls, resizes and anchor moves). */
 export function useAnchoredPosition(
   anchor: RefObject<HTMLElement | VirtualAnchor | null>,
   floating: RefObject<HTMLElement | null>,
@@ -19,14 +19,18 @@ export function useAnchoredPosition(
   useLayoutEffect(() => {
     if (!open) return;
     let frame = 0;
+    let watch = 0;
+    let last = "";
     const update = () => {
       const a = anchor.current;
       const f = floating.current;
       if (!a || !f) return;
+      const r = a.getBoundingClientRect();
+      last = `${r.x},${r.y},${r.width},${r.height}`;
       // A virtual anchor has no direction of its own: use the floating element's.
       const dir = getComputedStyle(a instanceof Element ? a : f).direction === "rtl" ? "rtl" : "ltr";
       const pos = computePosition(
-        a.getBoundingClientRect(),
+        r,
         { width: f.offsetWidth, height: f.offsetHeight },
         { width: window.innerWidth, height: window.innerHeight },
         placement,
@@ -43,11 +47,19 @@ export function useAnchoredPosition(
       cancelAnimationFrame(frame);
       frame = requestAnimationFrame(update);
     };
+    // Anchors also move without a scroll or resize (a list row reordered, content above growing): follow them.
+    const follow = () => {
+      const r = anchor.current?.getBoundingClientRect();
+      if (r && `${r.x},${r.y},${r.width},${r.height}` !== last) update();
+      watch = requestAnimationFrame(follow);
+    };
     update();
+    watch = requestAnimationFrame(follow);
     window.addEventListener("scroll", schedule, true);
     window.addEventListener("resize", schedule);
     return () => {
       cancelAnimationFrame(frame);
+      cancelAnimationFrame(watch);
       window.removeEventListener("scroll", schedule, true);
       window.removeEventListener("resize", schedule);
     };

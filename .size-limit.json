@@ -397,5 +397,11 @@
     "path": ["dist/components/CodeBlock/CodeBlock.js", "dist/styles/code-block.css"],
     "limit": "3 kB",
     "gzip": true
+  },
+  {
+    "name": "SortableList (with IconButton)",
+    "path": ["dist/components/SortableList/SortableList.js", "dist/styles/sortable-list.css"],
+    "limit": "3.5 kB",
+    "gzip": true
   }
 ]

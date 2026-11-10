@@ -137,6 +137,13 @@ export {
   type SliderTokens,
   type SliderValue,
 } from "./components/Slider/index.js";
+export {
+  type SortableItem,
+  SortableList,
+  type SortableListLabels,
+  type SortableListProps,
+  type SortableListTokens,
+} from "./components/SortableList/index.js";
 export { SplitPane, type SplitPaneProps, type SplitPaneTokens } from "./components/SplitPane/index.js";
 export { Stack, type StackProps } from "./components/Stack/index.js";
 export {
