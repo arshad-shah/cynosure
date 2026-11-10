@@ -51,7 +51,7 @@ Focus a handle, press Space (or Enter) to pick the row up, move it with the arro
 | Tab                 | Drop the row where it is and move on           |
 
 - **Announcements:** "Docs picked up. Position 2 of 4.", "moved to position 3 of 4", "dropped at…" and "Move cancelled…" are announced politely (all in `labels`).
-- **Pointer and touch:** drag a handle; rows swap as the pointer passes a neighbour's middle. Touch dragging does not scroll the page; handles have a 44px hit area on touch screens.
+- **Pointer and touch:** drag a handle; the other rows slide out of the way (detent, animated unless motion is reduced) and a long list scrolls near its edges. Touch dragging does not scroll the page; handles have a 44px hit area on touch screens.
 - **Changes:** `onReorder` is called once, on drop, and only if the order changed.
 
 ## Theming

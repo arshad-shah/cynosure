@@ -1,12 +1,6 @@
-import {
-  type CSSProperties,
-  type KeyboardEvent,
-  type PointerEvent,
-  type ReactNode,
-  useId,
-  useRef,
-  useState,
-} from "react";
+import { sortable } from "@arshad-shah/detent";
+import { type CSSProperties, type KeyboardEvent, type ReactNode, useId, useRef, useState } from "react";
+import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js";
 import { grip } from "../../icons/grip.js";
 import type { Size } from "../../tokens/schema.js";
 import { IconButton } from "../IconButton/IconButton.js";
@@ -98,7 +92,7 @@ export function SortableList({
    * While moving: the order being previewed, and the row being moved. Kept in refs too, so events that arrive before
    * React re-renders (a fast drag's move and release) always see the latest values.
    */
-  type Moving = { id: string; by: "keyboard" | "pointer"; pointer?: number };
+  type Moving = { id: string; by: "keyboard" | "pointer" };
   const [preview, setPreviewState] = useState<SortableItem[] | null>(null);
   const [moving, setMovingState] = useState<Moving | null>(null);
   const previewRef = useRef<SortableItem[] | null>(null);
@@ -121,9 +115,9 @@ export function SortableList({
       `[data-id="${CSS.escape(itemId)}"] .cy-sortable-list-handle`,
     );
 
-  const start = (item: SortableItem, by: "keyboard" | "pointer", pointer?: number) => {
+  const start = (item: SortableItem) => {
     setPreview(committed);
-    setMoving({ id: item.id, by, ...(pointer === undefined ? {} : { pointer }) });
+    setMoving({ id: item.id, by: "keyboard" });
     setSaid(text.pickedUp(item.label, committed.indexOf(item) + 1, committed.length));
   };
   // drop, cancel and shift run only while a row is moving (their callers check), so the refs are set.
@@ -167,7 +161,7 @@ export function SortableList({
     if (event.key === " " || event.key === "Enter") {
       event.preventDefault();
       if (active) drop();
-      else if (!moving) start(item, "keyboard");
+      else if (!moving) start(item);
       return;
     }
     if (!active) return;
@@ -185,36 +179,59 @@ export function SortableList({
     move();
   };
 
-  const onPointerDown = (item: SortableItem) => (event: PointerEvent<HTMLButtonElement>) => {
-    if (disabled || event.button !== 0 || movingRef.current) return;
-    event.preventDefault();
-    try {
-      event.currentTarget.setPointerCapture(event.pointerId);
-    } catch {
-      // Synthetic events have no active pointer to capture.
-    }
-    event.currentTarget.focus({ preventScroll: true });
-    start(item, "pointer", event.pointerId);
-  };
-  const onPointerMove = (event: PointerEvent<HTMLButtonElement>) => {
-    const moving = movingRef.current;
-    const preview = previewRef.current;
-    if (moving?.by !== "pointer" || moving.pointer !== event.pointerId || !preview) return;
-    // The row goes where the pointer is: past the middle of a neighbour, they swap.
-    const rows = [...(list.current as HTMLUListElement).children] as HTMLElement[];
-    const from = preview.findIndex((i) => i.id === moving.id);
-    let to = rows.findIndex((row) => {
-      const box = row.getBoundingClientRect();
-      return event.clientY < box.top + box.height / 2;
+  // Pointer, touch and pen dragging come from detent (one input path, FLIP animation, auto-scroll). Its own keyboard
+  // mode stays off: Cynosure's keyboard mode above has labelled, overridable announcements inside the app.
+  const latest = useRef({ committed, controlled, onReorder, text, disabled });
+  latest.current = { committed, controlled, onReorder, text, disabled };
+  useClientLayoutEffect(() => {
+    const el = list.current as HTMLUListElement;
+    let sorted = false;
+    const itemOf = (node: HTMLElement) =>
+      latest.current.committed.find((i) => i.id === node.dataset.id) as SortableItem;
+    const bound = sortable(el, {
+      handle: ".cy-sortable-list-handle",
+      direction: "y",
+      keyboard: false,
+      // The grip is a dedicated handle that never scrolls the page, so touch needs no press-and-hold.
+      delay: 0,
+      get animation() {
+        const reduced = globalThis.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+        const base = Number.parseFloat(getComputedStyle(el).getPropertyValue("--cy-motion-slow"));
+        return reduced ? 0 : Number.isFinite(base) ? base : 180;
+      },
+      get disabled() {
+        return latest.current.disabled;
+      },
+      onStart: (node, from) => {
+        if (movingRef.current) return false;
+        const item = itemOf(node);
+        sorted = false;
+        setMoving({ id: item.id, by: "pointer" });
+        setSaid(latest.current.text.pickedUp(item.label, from.index + 1, latest.current.committed.length));
+      },
+      onSort: ({ item: node, from, to }) => {
+        sorted = true;
+        // Put the node back where React rendered it, then let React apply the new order: React stays the DOM's owner.
+        node.remove();
+        el.insertBefore(node, el.children[from.index] ?? null);
+        const { committed: now, controlled: isControlled, onReorder: report, text: words } = latest.current;
+        const next = moveItem(now, from.index, to.index);
+        setSaid(words.dropped((now[from.index] as SortableItem).label, to.index + 1, next.length));
+        if (!isControlled) setOwn(next);
+        report?.(next);
+      },
+      onEnd: (node, cancelled) => {
+        const item = itemOf(node);
+        setMoving(null);
+        if (cancelled) setSaid(latest.current.text.cancelled(item.label));
+        else if (!sorted) {
+          const at = latest.current.committed.indexOf(item);
+          setSaid(latest.current.text.dropped(item.label, at + 1, latest.current.committed.length));
+        }
+      },
     });
-    if (to === -1) to = rows.length - 1;
-    else if (to > from) to -= 1;
-    if (to !== from) shift(to - from);
-  };
-  const onPointerEnd = (event: PointerEvent<HTMLButtonElement>) => {
-    const moving = movingRef.current;
-    if (moving?.by === "pointer" && moving.pointer === event.pointerId) drop();
-  };
+    return () => bound.destroy();
+  }, []);
 
   return (
     <div
@@ -242,10 +259,6 @@ export function SortableList({
               aria-pressed={moving?.id === item.id}
               tooltipPlacement="start"
               onKeyDown={onKeyDown(item)}
-              onPointerDown={onPointerDown(item)}
-              onPointerMove={onPointerMove}
-              onPointerUp={onPointerEnd}
-              onPointerCancel={onPointerEnd}
             />
             <div className="cy-sortable-list-content cy-reset">{item.content ?? item.label}</div>
           </li>

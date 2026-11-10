@@ -11,7 +11,7 @@ src/adapters     optional build-tool adapters (vite first)
 tools/           build-css.ts (Lightning CSS) · cli (cy)
 ```
 
-**Package:** one ESM package, zero runtime dependencies, React `>=18 <20` peer (Preact via `preact/compat`). Vite library build with `preserveModules`, so consumers tree-shake per module. CSS is built separately: `dist/styles.css` (tokens + base + every component), `dist/styles/<name>.css`, and the same CSS as a string in `styles.inline`.
+**Package:** one ESM package with one runtime dependency, `@arshad-shah/detent` (drag, reorder and resize; zero dependencies of its own), React `>=18 <20` peer (Preact via `preact/compat`). Vite library build with `preserveModules`, so consumers tree-shake per module. CSS is built separately: `dist/styles.css` (tokens + base + every component), `dist/styles/<name>.css`, and the same CSS as a string in `styles.inline`.
 
 **Isolation:** prefixed classes (`cy-*`), data-attribute variants, component roots declaring their own reset properties, inner parts carrying `.cy-reset`, and `box-sizing` forced with `!important` (hosts often force it on `*`). Proven by the hostile-host stories.
 

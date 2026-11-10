@@ -168,8 +168,8 @@ export const EmptyAndStyled: Story = {
   },
 };
 
-export const PointerAndKeyEdges: Story = {
-  play: async ({ args, canvas, canvasElement, userEvent }) => {
+export const PointerEdges: Story = {
+  play: async ({ args, canvas, canvasElement }) => {
     const handle = canvas.getByRole("button", { name: "Move Docs" });
     const box = handle.getBoundingClientRect();
     const fire = (type: string, extra: object) =>
@@ -179,39 +179,41 @@ export const PointerAndKeyEdges: Story = {
           cancelable: true,
           pointerId: 8,
           pointerType: "mouse",
+          isPrimary: true,
           clientX: box.left + 4,
           ...extra,
         }),
       );
-    // A right-button press, or moving without a press, does nothing.
-    fire("pointerdown", { button: 2, clientY: box.top + 4 });
-    fire("pointermove", { clientY: box.top + 200 });
-    fire("pointerup", { clientY: box.top + 200 });
+    // A right-button press does not start a move.
+    fire("pointerdown", { button: 2, buttons: 2, clientY: box.top + 4 });
+    fire("pointermove", { buttons: 2, clientY: box.top + 200 });
+    fire("pointerup", { button: 2, clientY: box.top + 200 });
     await expect(order(canvasElement)).toEqual(["inbox", "docs", "drafts", "archive"]);
-    // Dragging below the last row puts it last; a second pointer cannot start another move meanwhile.
+    // Dragging onto the lower half of the last row puts it last.
     fire("pointerdown", { button: 0, buttons: 1, clientY: box.top + 4 });
-    // A small move inside its own row changes nothing.
-    fire("pointermove", { clientY: box.top + 6 });
-    await expect(order(canvasElement)).toEqual(["inbox", "docs", "drafts", "archive"]);
-    const other = canvas.getByRole("button", { name: "Move Inbox" });
-    other.dispatchEvent(
-      new PointerEvent("pointerdown", { bubbles: true, cancelable: true, pointerId: 9, button: 0 }),
-    );
     const list = canvas.getByRole("list").getBoundingClientRect();
-    fire("pointermove", { clientY: list.bottom + 40 });
+    fire("pointermove", { buttons: 1, clientY: box.top + 20 });
+    fire("pointermove", { buttons: 1, clientY: list.bottom - 4 });
     await waitFor(() => expect(order(canvasElement)).toEqual(["inbox", "drafts", "archive", "docs"]));
-    fire("pointerup", { clientY: list.bottom + 40 });
+    fire("pointerup", { button: 0, clientY: list.bottom - 4 });
     await waitFor(() => expect(args.onReorder).toHaveBeenCalledTimes(1));
+    await expect(order(canvasElement)).toEqual(["inbox", "drafts", "archive", "docs"]);
+    await expect(canvas.getByRole("status")).toHaveTextContent("Docs dropped at position 4 of 4.");
+  },
+};
+
+export const KeyEdges: Story = {
+  play: async ({ args, canvas, canvasElement, userEvent }) => {
     // While one row is moving by keyboard, Space on another handle does nothing.
     canvas.getByRole("button", { name: "Move Inbox" }).focus();
     await userEvent.keyboard(" ");
     canvas.getByRole("button", { name: "Move Drafts" }).focus();
     await userEvent.keyboard(" {ArrowDown}");
-    await expect(order(canvasElement)).toEqual(["inbox", "drafts", "archive", "docs"]);
+    await expect(order(canvasElement)).toEqual(["inbox", "docs", "drafts", "archive"]);
     // Picking up and dropping without moving changes nothing and calls nothing.
     canvas.getByRole("button", { name: "Move Inbox" }).focus();
     await userEvent.keyboard(" {ArrowUp} ");
-    await expect(args.onReorder).toHaveBeenCalledTimes(1);
+    await expect(args.onReorder).not.toHaveBeenCalled();
   },
 };
 

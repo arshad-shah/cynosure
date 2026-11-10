@@ -6,6 +6,10 @@ settings:
 
 importers:
   .:
+    dependencies:
+      "@arshad-shah/detent":
+        specifier: 0.3.1
+        version: 0.3.1
     devDependencies:
       "@arethetypeswrong/cli":
         specifier: ^0.18.0
@@ -135,6 +139,12 @@ packages:
         integrity: sha512-cC5FOlYjs2pF76VzzbVoC/WBZpDFkcuQ9DOiu+Xrzd2pRKOQppAVdr+xmcxvSs2Hghw7M9QM8d1+Xahxs9lnfA==,
       }
     engines: { node: ">=22.12.0" }
+
+  "@arshad-shah/detent@0.3.1":
+    resolution:
+      {
+        integrity: sha512-LT0QFpWtb0+WTGO0Sgw2ESnjt/JDKv/k4zi/hd9HYOM63wspN4K1FFt9OTteXhrxNXVhyShyAzVJB3S81BkU1A==,
+      }
 
   "@asamuzakjp/css-color@7.1.9":
     resolution:
@@ -4197,6 +4207,8 @@ snapshots:
       validate-npm-package-name: 5.0.1
 
   "@arshad-shah/clif@1.4.0": {}
+
+  "@arshad-shah/detent@0.3.1": {}
 
   "@asamuzakjp/css-color@7.1.9":
     dependencies:

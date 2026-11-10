@@ -99,5 +99,8 @@
     },
     "./fonts/*": "./dist/fonts/*",
     "./package.json": "./package.json"
+  },
+  "dependencies": {
+    "@arshad-shah/detent": "^0.3.1"
   }
 }
