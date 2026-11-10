@@ -2,7 +2,59 @@
 
 ## Status
 
-Plans 1, 2 and 3 complete on `next` (Milestones 1 and 2). Plan 4 (Milestone 3 and product migration) is written and next to build. Storybook live at https://arshad-shah.github.io/cynosure/ (deploys on every push to `next`). Not published to npm.
+Plans 1–3 and 5–9 are complete on `next`. Plan 4 is complete except Task 10 (the final review). Storybook is live at https://arshad-shah.github.io/cynosure/ and deploys on every push to `next`. Not yet on npm: publishing is set up (`.github/workflows/release.yml`) and runs when `next` is merged to `main`, which waits for Arshad.
+
+Plan 9 (`docs/superpowers/plans/2026-11-10-cynosure-migrations.md`, tracked in issue #149) built what the product migrations asked for, as props on existing components wherever one fitted:
+
+- **Icons:** 56 more Facet icons (240 in 16 categories, `maths` new), 97 brand marks (`@arshad-shah/cynosure/brands`), `iconToSvg` for pages without React, and `color="brand"`.
+- **Without React:** `@arshad-shah/cynosure/tokens` (no React in it) and `docs/without-react.md`.
+- **Props:** Badge `color` and `dot`; ProgressBar `segments` and `marker`; Button `href`, `confirm` and `keepFocus`; TextField `revealable`; ThemeToggle `variant="cycle"`; Card `actions`; CodeBlock `activeLines`; Select option groups; Tree `onAction` and revealing an outside selection; SplitPane `unit="px"`; Popover `anchor` (a point or element); NumberField `scrub`; FileDrop `target="window"`; KeyValueEditor `allowFiles`; PanZoomCanvas `renderScreen`; AppShell `tabs` with SideNav `layout="bar"`; SelectionFrame `draw`; Tabs `onClose` and TabList `onReorder`; VirtualList `wrap`, `follow`, `isHeader` and `handle`; Slider with any number of thumbs and `trackContent`.
+- **New components** (nothing existing covered them): Calendar, DateField, TimeField.
+- **Exports:** `useDrag` and `useControllableState`; `moveItems` moved to `src/foundations/reorder.ts`, shared by VirtualList and Tabs.
+- **Migration issues:** one per product repo (20, opened 2026-11-10); see "Waiting on Arshad".
+
+## Current task
+
+Plan 4 Task 10: the final review. Docs, an independent review of Plans 6–9, `pnpm verify`, CI green on all three engines, push.
+
+## Next step
+
+1. Check CI on the latest push to `next` (all three engines, touch, coverage, visual regression). New visual stories (Calendar, DateField, TimeField) get their baselines from the `[baselines]` commit.
+2. Final review (Plan 4 Task 10), then report to Arshad.
+3. When detent releases its new options (detent issues #89 and #90), open a Cynosure issue to update the dependency and drop the workarounds: `useDrag` clearing detent's inline `touch-action`, and detent's `user-select` lock on `<body>` (see the detent ruling below).
+
+## Waiting on Arshad
+
+- **Publishing:** merge `next` into `main` when ready. The release workflow needs an `NPM_TOKEN` repository secret (or npm trusted publishing for the repo) and Actions allowed to create pull requests; it then opens a version pull request, and merging that publishes with provenance. See `docs/release.md`.
+- **CodeMirror theme** (decision 3): not answered. Nothing was added; products keep their own CodeMirror theme reading `--cy-*` tokens.
+- **Old packages:** the `cynosure-*` packages are not deprecated (needs his go-ahead).
+
+## Plans
+
+- [x] Plan 1: Foundation (`docs/superpowers/plans/2026-11-09-cynosure-foundation.md`)
+- [x] Plan 2: Milestone 1 controls (`docs/superpowers/plans/2026-11-09-cynosure-controls.md`)
+- [x] Plan 3: Milestone 2 structure and overlays (`docs/superpowers/plans/2026-11-09-cynosure-structure.md`). Tasks 1–13 and the final review done.
+- [ ] Plan 4: Milestone 3 and product migration issues (`docs/superpowers/plans/2026-11-10-cynosure-evidence.md`). Tasks 1–9 done; Task 10 (final review) left.
+- [x] Plan 5: coverage components and icons (`docs/superpowers/plans/2026-11-10-cynosure-coverage.md`). All 17 tasks done.
+- [x] Plan 6: the tools repo's shared UI (`docs/superpowers/plans/2026-11-10-cynosure-tools.md`).
+- [x] Plan 7: the duplication clean-up (`docs/superpowers/plans/2026-11-10-cynosure-dedup.md`). Sheet kept.
+- [x] Plan 8: the pan/zoom document viewport (`docs/superpowers/plans/2026-11-10-cynosure-viewport.md`).
+- [x] Plan 9: what the product migrations need (`docs/superpowers/plans/2026-11-10-cynosure-migrations.md`, issue #149).
+- Later: a data grid, a code editor surface and charts.
+
+## Plan 9 rulings
+
+- **Arshad's answers (2026-11-10):** publish through GitHub Actions; migrate portfolio-v6 and nimaz-web, keep for-spogmay's look and give it tokens usable outside React; ship brand marks the way brands allow; Stepframe moves onto Cynosure (one design system), and algosnap is archived in favour of Stepframe's block view; detent gets issues only (no code), and tells Cynosure when its release is out; ui-library is archived.
+- **Brand marks:** taken unmodified from Simple Icons (CC0), filled, never restyled; `color="brand"` uses the owner's colour. Brands that ask icon sets not to carry their marks are left out and their kits linked instead (LinkedIn, Slack, OpenAI, CodePen, AWS, Microsoft, Azure). See `docs/icons.md`.
+- **No new component where a prop fits:** the phone tab bar is SideNav `layout="bar"` placed by AppShell `tabs`; document tabs are Tabs props; region select is SelectionFrame `draw`; gradient stops are Slider thumbs. Calendar, DateField and TimeField are new because nothing covered dates.
+- **Dates** are `YYYY-MM-DD` strings and times 24-hour `HH:MM`, whatever the locale: no time zones to shift a picked date, one unambiguous written form. Month and day names come from `Intl`; the week starts where the locale starts it (Monday when the browser does not say).
+- **Calendar names:** each day's accessible name is its full date as visually hidden text, not `aria-label`, so `renderDay` content stays part of the name (axe flagged the label/content mismatch).
+- **VirtualList `follow`:** stays a listbox rather than `role="log"`, which would read every new line aloud.
+- **Tabs close button:** sits beside the tab (a tab is a button) inside an `aria-hidden` wrapper with `tabindex="-1"`; Delete is the keyboard's way, advertised with `aria-keyshortcuts`. Reordering uses detent's `sortable` as SortableList does; the status message sits outside the tablist because every child of the list is sortable.
+- **Size budgets** had been checked against a stale build for a while; after a fresh build Tabs (6 kB), SelectionFrame (3.5 kB), VirtualList (4.5 kB), SideNav (3.25 kB) and Calendar (3.25 kB) were raised to fit what they now do.
+- **Baselines bot:** the visual-baselines workflow commits to `next`, so pull before pushing after a `[baselines]` commit; a rejected push to `next` is easy to miss when the push output is filtered.
+
+## Plan 3 summary
 
 Done in Plan 3:
 
@@ -41,13 +93,9 @@ After Plan 3 (fixes from Arshad's checks of the published Storybook, 2026-11-10)
 - **Overlay entrances (WebKit bug):** CI showed an open Dialog stuck at opacity 0 on WebKit, from `@starting-style` nested inside rules. Dialog, Popover, Menu, Tooltip, Select's list and Toast now enter with `@keyframes` animations, which always end in the normal visible style. Their stories assert the overlay is fully opaque once its entrance has finished (`src/test/settle.ts`).
 - **CI flakes on WebKit:** the Card focus-border colour and the Dialog content-scroll story now wait for animations and transitions to settle.
 
-## Current task
+## Plan 4 tasks
 
-Plan 5 (`docs/superpowers/plans/2026-11-10-cynosure-coverage.md`): the generic components and icons the cross-product audit asked for. Tasks 1–7 (Facet icons, Skeleton, Grid, Steps, DescriptionList, Announcer/`useAnnounce`, `themeInitScript`, Prose, ContextMenu, SideNav, AppShell, NumberField, FileDrop, SplitPane, TagInput, CodeBlock, SortableList, Table) are done: Plan 5 is complete, and SortableList now drags with detent. Plan 6 (`docs/superpowers/plans/2026-11-10-cynosure-tools.md`) is complete: Tasks 1–7 done (FloatingToolbar/DockedToolbar/useSelectionAnchor, SignaturePad, SelectionFrame, ColorSwatches + ColorField `swatches`, CompareSlider, VirtualList; then Kbd shortcut strings, HoverCard, ProgressOverlay, DockedToolbar `edge`/`floating` and KeyValueEditor). Task 8 done: SortableList `layout="grid"`, and multi-select reordering on VirtualList (`onMove`, `moveItems`), as Arshad chose, so the library keeps one selection model (VirtualList budget 3 → 3.75 kB for it). Plan 6 is complete except the later, larger items. Plan 8 (`docs/superpowers/plans/2026-11-10-cynosure-viewport.md`), the pan/zoom document viewport, is done: the zoom core in foundations (`zoom.ts`, `zoom-gestures.ts`), variable-size windowing, DocumentViewport, ZoomControls and PanZoomCanvas (a pan/zoom surface only, as Arshad chose; products keep their diagram engines). Still later: the data grid, code editor surface and charts. Plan 7, the duplication clean-up (`docs/superpowers/plans/2026-11-10-cynosure-dedup.md`), is complete; Sheet was kept. Plan 4 Task 9: the migration issue drafts (one per product, 20) are written and kept outside this repo for Arshad's review; none is opened. Next: Arshad's decisions on them (npm publish, icons without React, a CodeMirror theme, brand icons), then a Plan 9 of the Cynosure additions they share, then Task 10 (final review).
-
-## Next step
-
-Build Plan 4 (`docs/superpowers/plans/2026-11-10-cynosure-evidence.md`) task by task, stories first:
+Plan 4 (`docs/superpowers/plans/2026-11-10-cynosure-evidence.md`), stories first:
 
 1. **Task 1:** done. Toasts raised inside an open Dialog show above it; they move back to the page with their remaining time and are not announced again.
 2. **Task 2:** done. ProgressBar: determinate and indeterminate, labelled `role="progressbar"`, value text through `labels.value`.
@@ -58,8 +106,8 @@ Build Plan 4 (`docs/superpowers/plans/2026-11-10-cynosure-evidence.md`) task by 
 7. **Task 7:** done. ColorField: any CSS colour as text (names through the browser's parser), hex, rgb or oklch output, saturation area, hue and opacity Sliders, EyeDropper where supported, forms.
 8. **Task 8:** carry-overs: Prism checked (it has a virtual JSON tree; Tree covers it). Slider and Combobox are already in the React 18 smoke tests. Remaining: anything the final review turns up. (The keyframe entrances are confirmed on WebKit: in CI run 387 Dialog, Popover, Menu, Tooltip and Select passed their `shownFully` checks; the only failure was a Toast test race, fixed.)
 9. **Task 8b:** done. The cross-product audit ran against read-only clones of the product repos. Its results stay **outside this public repo** (Arshad has the files); only the generic build list below comes from it.
-10. **Plan 5:** in progress (see Current task). The non-React path for Astro and vanilla sites, and a Starlight bridge, are deferred by Arshad.
-11. **Task 9:** draft one migration issue per product repo, kept outside this repo. Open them only after Arshad reviews the drafts.
+10. **Plan 5:** done. The non-React path for Astro and vanilla sites, and a Starlight bridge, are deferred by Arshad.
+11. **Task 9:** done. Arshad reviewed the drafts; one issue per product repo was opened on 2026-11-10 (ui-library was already archived, so it has none). Their shared needs became Plan 9.
 12. **Task 10:** docs, independent review, `pnpm verify`, CI green, push.
 
 ## Plan 3 final review
@@ -77,14 +125,6 @@ An independent review of the Plan 3 Tasks 8–12 code found nine issues. Fixed (
 - Notice docs overstated announcements of a status Notice that mounts filled: corrected.
 
 **Resolved in Plan 4 Task 1:** a toast raised while a modal Dialog was open sat under the dialog and was inert. An open Dialog now lends the Toaster a container (`src/overlay/toast-host.ts`) and the region renders there.
-
-## Plans
-
-- [x] Plan 1: Foundation (`docs/superpowers/plans/2026-11-09-cynosure-foundation.md`)
-- [x] Plan 2: Milestone 1 controls (`docs/superpowers/plans/2026-11-09-cynosure-controls.md`)
-- [x] Plan 3: Milestone 2 structure and overlays (`docs/superpowers/plans/2026-11-09-cynosure-structure.md`). Tasks 1–13 and the final review done.
-- [ ] Plan 4: Milestone 3 and product migration issues (`docs/superpowers/plans/2026-11-10-cynosure-evidence.md`). Tasks 1–7 and 8b done; Tasks 9–10 after Plan 5.
-- [x] Plan 5: coverage components and icons (`docs/superpowers/plans/2026-11-10-cynosure-coverage.md`). All 17 tasks done.
 
 ## Plan 3 rulings so far
 
@@ -187,7 +227,7 @@ An independent review of the Plan 3 Tasks 8–12 code found nine issues. Fixed (
 
 ## Blockers
 
-None. Npm publish and deprecating the old packages wait for Arshad's authorisation.
+None. Publishing waits for Arshad to merge to `main` and add the npm credential; deprecating the old packages waits for his go-ahead (see "Waiting on Arshad").
 
 ## Decision log
 
@@ -227,8 +267,8 @@ None. Npm publish and deprecating the old packages wait for Arshad's authorisati
 
 ## Verification
 
-- **Latest local run (cloud container, 2026-11-10):** `cy check`, lint, typecheck, unit and Preact tests (287), the React 18 smoke tests (4), every story on Chromium plus the touch project (about 600 runs in the coverage pass), coverage (≥ 95% branches), build, publint, attw and size budgets pass. The changed components (Notice, TextArea, Dialog, Card) were also checked by screenshot, TextArea in phone emulation.
-- **Firefox and WebKit:** cannot be downloaded in the cloud container (`cdn.playwright.dev` is blocked); CI on `next` runs them. The last complete CI runs: all green on `0e81324`; later runs failed only on WebKit (Card colour timing, the Dialog stuck at opacity 0 that led to the keyframe entrances, then a Toast test race). Each is fixed: CI run 389 on `1d670d5` passed every step on all three engines, visual regression included. Check the run after the latest push (Next step 1).
+- **Latest local run (cloud container, 2026-11-10, after Plan 9):** `cy check`, lint, typecheck, unit and Preact tests, the React 18 smoke tests (6), every story on Chromium plus the touch project (1228 tests in the coverage pass), coverage (95.1% branches, floor 95%), build, publint, attw and size budgets pass. New and changed views were checked by screenshot (AppShell tab bar at 390px, closable Tabs, Calendar and its month of plans).
+- **Firefox and WebKit:** cannot be downloaded in the cloud container (`cdn.playwright.dev` is blocked); CI on `next` runs them. Runs 436 and 437 passed on all three engines; later runs were superseded by newer pushes before finishing. Check the run after the latest push (Next step 1).
 - **Published Storybook:** every story and docs page of a production build was loaded under `/cynosure/` in Chromium with no load or render errors; the stale-deploy reload was tested by swapping builds under an open tab.
 - **CI on `next`:** conventions, lint, types, unit, React 18, stories on all three engines plus touch, coverage, visual regression, build, publint, attw and size.
 - **Not verified:**

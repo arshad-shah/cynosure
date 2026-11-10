@@ -71,12 +71,18 @@ export const KeysMoveByDayWeekMonthAndYear: Story = {
 };
 
 export const MonthEndsAreKept: Story = {
-  args: { defaultFocusedDate: "2027-01-31" },
+  args: { defaultFocusedDate: "2027-01-31", className: "mine", style: { padding: 4 } },
   play: async ({ canvasElement, userEvent }) => {
+    await expect(canvasElement.querySelector(".cy-calendar.mine")).not.toBeNull();
     day(canvasElement, "2027-01-31").focus();
-    // 31 January plus a month is the last day of February.
+    // 31 January plus a month is the last day of February; Shift moves a year.
     await userEvent.keyboard("{PageDown}");
     await waitFor(() => expect(focusedDate()).toBe("2027-02-28"));
+    await userEvent.keyboard("{Shift>}{PageDown}{/Shift}");
+    await waitFor(() => expect(focusedDate()).toBe("2028-02-28"));
+    // Other keys leave the grid alone.
+    await userEvent.keyboard("a");
+    await expect(focusedDate()).toBe("2028-02-28");
   },
 };
 

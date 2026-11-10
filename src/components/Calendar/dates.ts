@@ -47,9 +47,12 @@ export const clampDate = (iso: string, min?: string, max?: string) =>
 /** The weekday a week starts on in `locale` (0 Sunday to 6 Saturday), where the browser knows it; else Monday. */
 export function firstDayOfWeek(locale?: string): number {
   try {
-    const info = (
-      new Intl.Locale(locale ?? navigator.language) as Intl.Locale & { weekInfo?: { firstDay: number } }
-    ).weekInfo;
+    // `getWeekInfo()` is the standard; `weekInfo` is the older accessor some engines still have.
+    const loc = new Intl.Locale(locale ?? navigator.language) as Intl.Locale & {
+      getWeekInfo?: () => { firstDay: number };
+      weekInfo?: { firstDay: number };
+    };
+    const info = loc.getWeekInfo?.() ?? loc.weekInfo;
     if (info) return info.firstDay % 7;
   } catch {
     // An unknown locale falls through to Monday.

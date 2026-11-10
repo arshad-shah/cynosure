@@ -156,6 +156,28 @@ export const LabelsOverride: Story = {
   },
 };
 
+export const HiddenLabelDescriptionAndOwnError: Story = {
+  args: {
+    labelHidden: true,
+    description: "Shown under the field",
+    error: "Your own message",
+    className: "mine",
+    style: { maxInlineSize: 200 },
+  },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const field = canvas.getByRole("textbox", { name: "Due date" });
+    // The label still names it; your error replaces the field's own, even after a mistake.
+    await expect(
+      (canvasElement.querySelector("label") as HTMLElement).getBoundingClientRect().width,
+    ).toBeLessThanOrEqual(1);
+    await expect(field).toHaveAccessibleDescription(/Your own message/);
+    await userEvent.type(field, "nonsense{Enter}");
+    await expect(field).toHaveAccessibleDescription(/Your own message/);
+    await expect(field).not.toHaveAccessibleDescription(/Enter a/);
+    await expect(canvasElement.querySelector(".mine")).not.toBeNull();
+  },
+};
+
 export const StableUnderHostileHost: Story = {
   play: async ({ canvasElement }) => {
     const { clean, hostile } = computeUnderHostileHost(canvasElement, ".cy-text-field-input", [
