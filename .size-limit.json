@@ -425,5 +425,11 @@
     ],
     "limit": "3.5 kB",
     "gzip": true
+  },
+  {
+    "name": "SelectionFrame (with geometry)",
+    "path": ["dist/components/SelectionFrame/SelectionFrame.js", "dist/styles/selection-frame.css"],
+    "limit": "3 kB",
+    "gzip": true
   }
 ]
