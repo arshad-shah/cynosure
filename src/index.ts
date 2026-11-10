@@ -14,6 +14,12 @@ export {
   type Politeness,
   useAnnounce,
 } from "./components/Announcer/index.js";
+export {
+  AppShell,
+  type AppShellLabels,
+  type AppShellProps,
+  type AppShellTokens,
+} from "./components/AppShell/index.js";
 export { Badge, type BadgeProps } from "./components/Badge/index.js";
 export { Button, type ButtonProps, type ButtonTokens } from "./components/Button/index.js";
 export { Card, type CardProps } from "./components/Card/index.js";

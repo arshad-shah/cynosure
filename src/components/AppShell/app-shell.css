@@ -1,0 +1,105 @@
+/*
+ * app-shell: a grid of header (full width), nav (auto width) and main (the rest). It fills its container's height;
+ * the nav and main scroll on their own. Narrow: the nav column goes (it lives in a start Sheet instead).
+ */
+.cy-app-shell.cy-app-shell {
+  --_line: var(--cy-app-shell-border, var(--cy-color-line));
+  box-sizing: border-box !important;
+  position: relative;
+  display: grid;
+  grid-template:
+    "header header" auto
+    "nav main" minmax(0, 1fr)
+    / auto minmax(0, 1fr);
+  block-size: 100%;
+  min-block-size: 0;
+  margin: 0;
+  padding: 0;
+  background: var(--cy-color-bg);
+  color: var(--cy-color-ink);
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-font-size-md);
+  font-weight: var(--cy-font-weight-regular);
+  line-height: var(--cy-font-line-height);
+  letter-spacing: normal;
+  text-transform: none;
+  &[data-narrow],
+  &:not([data-nav]) {
+    grid-template:
+      "header" auto
+      "main" minmax(0, 1fr)
+      / minmax(0, 1fr);
+  }
+}
+.cy-app-shell-skip.cy-app-shell-skip {
+  position: absolute;
+  z-index: 1;
+  inset-block-start: var(--cy-space-2);
+  inset-inline-start: var(--cy-space-2);
+  padding: var(--cy-space-3) var(--cy-space-5);
+  border-radius: var(--cy-radius-md);
+  background: var(--cy-color-surface-raised);
+  color: var(--cy-color-accent-text);
+  font-size: inherit;
+  font-weight: var(--cy-font-weight-medium);
+  text-decoration: underline;
+  &:not(:focus) {
+    inline-size: var(--cy-border-width);
+    block-size: var(--cy-border-width);
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  &:focus-visible {
+    outline: var(--cy-border-focus) solid var(--cy-color-ring);
+  }
+}
+.cy-app-shell-header.cy-app-shell-header {
+  grid-area: header;
+  display: flex;
+  align-items: center;
+  gap: var(--cy-space-4);
+  min-inline-size: 0;
+  min-block-size: calc(var(--cy-control-height-lg) + 2 * var(--cy-space-4));
+  padding: var(--cy-space-4) var(--cy-space-6);
+  border-block-end: var(--cy-border-width) solid var(--_line);
+  background: var(--cy-app-shell-header-background, var(--cy-color-surface));
+  font-size: inherit;
+}
+.cy-app-shell-bar.cy-app-shell-bar {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: var(--cy-space-4);
+  min-inline-size: 0;
+  font-size: inherit;
+}
+.cy-app-shell-nav.cy-app-shell-nav {
+  grid-area: nav;
+  min-block-size: 0;
+  overflow-y: auto;
+  border-inline-end: var(--cy-border-width) solid var(--_line);
+  background: var(--cy-app-shell-nav-background, var(--cy-color-surface));
+  font-size: inherit;
+  overscroll-behavior: contain;
+}
+.cy-app-shell-main.cy-app-shell-main {
+  grid-area: main;
+  display: block;
+  min-inline-size: 0;
+  min-block-size: 0;
+  overflow-y: auto;
+  font-size: inherit;
+  &:focus {
+    outline: none;
+  }
+}
+/* In the drawer the navigation takes the full width of the sheet. */
+.cy-app-shell-drawer.cy-app-shell-drawer {
+  margin-inline: calc(-1 * var(--cy-space-4));
+  font-size: inherit;
+  & > .cy-side-nav {
+    inline-size: auto;
+  }
+}

@@ -41,7 +41,7 @@ const meta = {
     ),
   },
   argTypes: {
-    side: { control: "inline-radio", options: ["bottom", "end"] },
+    side: { control: "inline-radio", options: ["bottom", "end", "start"] },
     size: { control: "inline-radio", options: ["sm", "md", "lg"] },
     dismissible: { control: "boolean" },
     title: { control: "text" },
@@ -114,6 +114,42 @@ export const EndSheetInRightToLeft: Story = {
     const el = dialogEl();
     await waitFor(() => expect(el.open).toBe(true));
     await waitFor(() => expect(Math.round(panelEl().getBoundingClientRect().left)).toBe(0));
+  },
+};
+
+export const StartSheetDocksToTheInlineStart: Story = {
+  args: { side: "start", size: "sm" },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole("button", { name: "Settings" }));
+    const el = dialogEl();
+    await waitFor(() => expect(el.open).toBe(true));
+    // A navigation drawer: full height on the left, as wide as the small size.
+    await waitFor(() => {
+      const box = panelEl().getBoundingClientRect();
+      expect(Math.round(box.left)).toBe(0);
+      expect(Math.round(box.height)).toBe(window.innerHeight);
+      expect(box.width).toBeLessThan(window.innerWidth);
+    });
+    await userEvent.keyboard("{Escape}");
+    await settledClosed(el);
+  },
+};
+
+export const StartSheetInRightToLeft: Story = {
+  args: { side: "start", defaultOpen: true },
+  render: (args) => (
+    <div dir="rtl">
+      <Page {...args} />
+    </div>
+  ),
+  play: async () => {
+    const el = dialogEl();
+    await waitFor(() => expect(el.open).toBe(true));
+    await waitFor(() =>
+      expect(Math.round(panelEl().getBoundingClientRect().right)).toBe(
+        Math.round(el.getBoundingClientRect().right),
+      ),
+    );
   },
 };
 

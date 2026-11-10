@@ -13,6 +13,7 @@ A [Dialog](?path=/docs/components-dialog--docs) docked to an edge of the screen:
 
 - **Settings or filters on a phone:** a bottom sheet keeps them within thumb reach.
 - **An inspector or detail panel** beside the content: `side="end"`.
+- **A navigation drawer** on small screens: `side="start"` ([AppShell](?path=/docs/components-appshell--docs) uses one).
 
 **Use something else when:**
 - it is a short decision or form in the middle of the page: [Dialog](?path=/docs/components-dialog--docs) (which turns into a bottom sheet on its own in narrow containers)
@@ -30,6 +31,8 @@ import { Sheet, Switch } from "@arshad-shah/cynosure";
 
 <Canvas of={Stories.EndSheetDocksToTheInlineEnd} />
 
+<Canvas of={Stories.StartSheetDocksToTheInlineStart} />
+
 ## Props
 
 <ArgTypes of={Stories} />
@@ -42,8 +45,8 @@ import { Sheet, Switch } from "@arshad-shah/cynosure";
 | <kbd>Tab</kbd> | Moves through the sheet only; the page behind is inert |
 | Tap or click on the backdrop | Closes it |
 
-- **Sides:** `bottom` is full width and up to 85% of the height; `end` is full height and docks to the right, or to the left in right-to-left text.
-- **Size:** `size` sets the width of an `end` sheet.
+- **Sides:** `bottom` is full width and up to 85% of the height; `end` is full height and docks to the right (left in right-to-left text); `start` is full height and docks to the left (right in right-to-left text).
+- **Size:** `size` sets the width of an `end` or `start` sheet.
 - Everything else (focus, roles, shadow DOM, no writes to `<body>`) is the same as [Dialog](?path=/docs/components-dialog--docs).
 
 ## Touch

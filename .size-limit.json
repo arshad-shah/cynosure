@@ -355,5 +355,11 @@
     "path": ["dist/components/SideNav/SideNav.js", "dist/styles/side-nav.css"],
     "limit": "3 kB",
     "gzip": true
+  },
+  {
+    "name": "AppShell",
+    "path": ["dist/components/AppShell/AppShell.js", "dist/styles/app-shell.css"],
+    "limit": "2.25 kB",
+    "gzip": true
   }
 ]

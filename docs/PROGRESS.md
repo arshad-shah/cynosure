@@ -43,7 +43,7 @@ After Plan 3 (fixes from Arshad's checks of the published Storybook, 2026-11-10)
 
 ## Current task
 
-Plan 5 (`docs/superpowers/plans/2026-11-10-cynosure-coverage.md`): the generic components and icons the cross-product audit asked for. Tasks 1–7 (Facet icons, Skeleton, Grid, Steps, DescriptionList, Announcer/`useAnnounce`, `themeInitScript`, Prose, ContextMenu) are done; Task 10 (navigation and app shell) is in progress: SideNav done, AppShell next (with a `start` side for Sheet).
+Plan 5 (`docs/superpowers/plans/2026-11-10-cynosure-coverage.md`): the generic components and icons the cross-product audit asked for. Tasks 1–7 (Facet icons, Skeleton, Grid, Steps, DescriptionList, Announcer/`useAnnounce`, `themeInitScript`, Prose, ContextMenu, SideNav, AppShell) are done; Task 11 (NumberField) is next.
 
 ## Next step
 
@@ -84,7 +84,7 @@ An independent review of the Plan 3 Tasks 8–12 code found nine issues. Fixed (
 - [x] Plan 2: Milestone 1 controls (`docs/superpowers/plans/2026-11-09-cynosure-controls.md`)
 - [x] Plan 3: Milestone 2 structure and overlays (`docs/superpowers/plans/2026-11-09-cynosure-structure.md`). Tasks 1–13 and the final review done.
 - [ ] Plan 4: Milestone 3 and product migration issues (`docs/superpowers/plans/2026-11-10-cynosure-evidence.md`). Tasks 1–7 and 8b done; Tasks 9–10 after Plan 5.
-- [ ] Plan 5: coverage components and icons (`docs/superpowers/plans/2026-11-10-cynosure-coverage.md`). Tasks 1–9 done.
+- [ ] Plan 5: coverage components and icons (`docs/superpowers/plans/2026-11-10-cynosure-coverage.md`). Tasks 1–10 done.
 
 ## Plan 3 rulings so far
 
@@ -120,6 +120,7 @@ An independent review of the Plan 3 Tasks 8–12 code found nine issues. Fixed (
 ## Plan 4 rulings so far
 
 - **Toasts in dialogs (Task 1):** an open Dialog (or Sheet) inside a Toaster registers a container through `ToastHostContext` (`src/overlay/toast-host.ts`, separate so Dialog never imports Toast). The Toaster portals its region into the latest container and shows it again, which puts it above the dialog and outside the modal's inert area. Moving re-creates the toast elements, so each toast keeps a small memory in the Toaster: whether it was announced (then its text renders at once, and a danger toast comes back as `status`, not `alert`) and its remaining time (read when the timer starts, after the old element saved it).
+- **AppShell (Plan 5 Task 10b):** grid of header, nav and `<main>`; a ResizeObserver on the shell (not the window) switches below `collapseBelow` (768px) to a menu button plus a `start` Sheet (new Sheet side). Drawer clicks on links or buttons without `aria-expanded` close it. Skip link focuses `<main>` without touching the URL. Under the hostile host only row heights move, because the product's bar text grows.
 - **SideNav (Plan 5 Task 10a):** `<nav>` with sections as lists named by their headings; links via `renderLink` (routers) or LinkBase, buttons for items without `href`; groups expand (and open on the way to `current`). The collapsed rail hides labels visually (still the names, shown in Tooltips), hides nested lists, and a group asks `onCollapsedChange(false)`. Budget 3 kB (2.77 kB with Tooltip's JS).
 - **ContextMenu (Plan 5 Task 9):** Menu's panel became an internal `MenuPanel` shared by Menu and ContextMenu; `useAnchoredPosition` accepts a `VirtualAnchor` (a point rectangle). Right-click anchors at the pointer, Shift+F10 / ContextMenu key at the target, and a 500ms touch press (10px slop) at the finger because iOS sends no `contextmenu`. Budgets: ContextMenu 2.5 kB (2.07 kB with the panel and menu.css); Menu raised to 3.25 kB (3.01 kB after the panel split).
 - **Prose (Plan 5 Task 8):** first use of `@scope (.cy-prose) to ([class^="cy-"]…)`: rules stop at Cynosure components. Selectors are `:where()`-flat, so scope proximity beats host tag resets while product classes win. Code blocks wrap (`pre-wrap`): axe flags an overflowing `<pre>` as an unreachable scroll region, and Prose cannot add `tabindex` to product markup.

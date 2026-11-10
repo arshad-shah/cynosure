@@ -50,7 +50,7 @@ export interface DialogProps {
 
 /** Internal: a Sheet is the same dialog docked to an edge. */
 export interface DialogFrameProps extends DialogProps {
-  side?: "bottom" | "end";
+  side?: "bottom" | "end" | "start";
 }
 
 const DEFAULT_LABELS: DialogLabels = { close: "Close" };

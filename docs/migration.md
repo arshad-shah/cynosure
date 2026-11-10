@@ -10,7 +10,7 @@ Tracked as one issue per product repo (opened after Milestone 2). Order of work 
 Available now (Milestones 1 and 2, and Milestone 3 as it lands):
 
 - **Controls:** Button, IconButton, CopyButton, Link, TextField, SearchField, TextArea, Select, Combobox, Checkbox, Switch, RadioGroup, SegmentedControl, Slider, ColorField, ThemeToggle.
-- **Structure:** Stack, Inline, Grid, SideNav, Card, Toolbar, Tabs, Disclosure, Accordion, Tree.
+- **Structure:** AppShell, Stack, Inline, Grid, SideNav, Card, Toolbar, Tabs, Disclosure, Accordion, Tree.
 - **Overlays:** Tooltip, Popover, Menu, ContextMenu, Dialog, Sheet, CommandPalette, Toast.
 - **Feedback and display:** Notice, EmptyState, ProgressBar, Steps, LoadingDots, Skeleton, DescriptionList, Prose, Announcer (`useAnnounce`), Badge, Kbd, Field.
 - **Icons:** 184 Facet icons.

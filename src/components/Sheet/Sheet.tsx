@@ -15,8 +15,11 @@ declare module "../../tokens/schema.js" {
 }
 
 export interface SheetProps extends DialogProps {
-  /** Edge it docks to: the bottom (full width) or the inline end (full height; left in right-to-left text). */
-  side?: "bottom" | "end";
+  /**
+   * Edge it docks to: the bottom (full width), the inline end (full height; left in right-to-left text) or the inline
+   * start (full height; a navigation drawer; right in right-to-left text).
+   */
+  side?: "bottom" | "end" | "start";
 }
 
 /** A Dialog docked to an edge: same focus, Escape, backdrop and labels behaviour, sliding in from its side. */
