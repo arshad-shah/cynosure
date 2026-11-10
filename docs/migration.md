@@ -12,7 +12,7 @@ Available now (Milestones 1 and 2, and Milestone 3 as it lands):
 - **Controls:** Button, IconButton, CopyButton, Link, TextField, NumberField, SearchField, TextArea, Select, Combobox, TagInput, Checkbox, Switch, RadioGroup, SegmentedControl, Slider, ColorField, FileDrop, ThemeToggle.
 - **Structure:** AppShell, Stack, Inline, Grid, SideNav, SplitPane, Card, Toolbar, Tabs, Disclosure, Accordion, Tree, SortableList.
 - **Overlays:** Tooltip, Popover, Menu, ContextMenu, Dialog, Sheet, CommandPalette, Toast.
-- **Feedback and display:** Notice, EmptyState, ProgressBar, Steps, LoadingDots, Skeleton, DescriptionList, Prose, CodeBlock, Announcer (`useAnnounce`), Badge, Kbd, Field.
+- **Feedback and display:** Notice, EmptyState, ProgressBar, Steps, LoadingDots, Skeleton, DescriptionList, Table, Prose, CodeBlock, Announcer (`useAnnounce`), Badge, Kbd, Field.
 - **Icons:** 184 Facet icons.
 
 Milestone 2 is the point at which the per-product migration issues open (Plan 4). Anything a product needs that is still missing goes into Cynosure first.

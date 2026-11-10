@@ -156,6 +156,15 @@ export {
 } from "./components/Steps/index.js";
 export { Switch, type SwitchProps } from "./components/Switch/index.js";
 export {
+  type SortDirection,
+  Table,
+  type TableColumn,
+  type TableLabels,
+  type TableProps,
+  type TableSort,
+  type TableTokens,
+} from "./components/Table/index.js";
+export {
   Tab,
   TabList,
   type TabListProps,

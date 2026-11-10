@@ -403,5 +403,11 @@
     "path": ["dist/components/SortableList/SortableList.js", "dist/styles/sortable-list.css"],
     "limit": "3.5 kB",
     "gzip": true
+  },
+  {
+    "name": "Table (with Checkbox)",
+    "path": ["dist/components/Table/Table.js", "dist/styles/table.css"],
+    "limit": "4 kB",
+    "gzip": true
   }
 ]

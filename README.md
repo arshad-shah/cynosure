@@ -39,7 +39,7 @@ export const App = () => (
 **Controls:** Button, IconButton, CopyButton, Link, TextField, NumberField, SearchField, TextArea, Select, Combobox, TagInput, Checkbox, Switch, RadioGroup, SegmentedControl, Slider, ColorField, FileDrop, ThemeToggle.
 **Structure:** AppShell, Stack, Inline, Grid, SideNav, SplitPane, Card, Toolbar, Tabs, Disclosure, Accordion, Tree, SortableList.
 **Overlays:** Tooltip, Popover, Menu, ContextMenu, Dialog, Sheet, CommandPalette (`useHotkey`), Toast (`Toaster`, `useToast`).
-**Feedback and display:** Notice, EmptyState, ProgressBar, Steps, LoadingDots, Skeleton, DescriptionList, Prose, CodeBlock, Announcer (`useAnnounce`), Badge, Kbd, Field. **Theme:** CynosureTheme, useColorMode, themeInitScript, createTheme.
+**Feedback and display:** Notice, EmptyState, ProgressBar, Steps, LoadingDots, Skeleton, DescriptionList, Table, Prose, CodeBlock, Announcer (`useAnnounce`), Badge, Kbd, Field. **Theme:** CynosureTheme, useColorMode, themeInitScript, createTheme.
 **Build:** optional Vite adapter (`@arshad-shah/cynosure/vite`) and self-hosted Hanken Grotesk (`fonts/hanken.css`).
 
 > Status: pre-release (`0.x`) on branch `next`. Not yet published to npm.
