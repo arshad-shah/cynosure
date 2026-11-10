@@ -2,7 +2,7 @@
 
 ## Status
 
-Plan 3 (Milestone 2 structure and overlays) in progress on `next`: Tasks 1–8 done. Plans 1 and 2 complete. Storybook live at https://arshad-shah.github.io/cynosure/.
+Plan 3 (Milestone 2 structure and overlays): complete on `next`, including the final review (one open design question, below). Plans 1 and 2 complete. Storybook live at https://arshad-shah.github.io/cynosure/.
 
 Done in Plan 3:
 
@@ -14,6 +14,11 @@ Done in Plan 3:
 - **Task 6:** Popover and `useDismiss`. One layer stack: Escape closes the topmost layer, outside clicks close, and focus returns. Tooltip joined the stack.
 - **Task 7:** Menu, with arrows, type-ahead, sections, checkable items and shortcuts.
 - **Task 8:** DialogBase (foundation for `<dialog>`), Dialog and Sheet. Native modal (`showModal`), focus in and back, Escape and backdrop through the shared layer stack, bottom sheet in narrow containers, no writes to `body`, shadow-root safe.
+- **Task 9:** Toast: `<Toaster position max>` and `useToast()` with a store per Toaster (no globals). Announced once (`status`, or `alert` for danger, text inserted once into an existing live element); timers pause on hover, focus and a hidden page; older toasts collapse in place; swipe to dismiss on touch.
+- **Task 10:** Notice (status or alert by tone, action drops under the text below 26rem, 4.5:1 in every tone and mode) and EmptyState (real heading at a chosen level, `sm` for panels).
+- **Task 11:** CopyButton: injectable `copy` writer, announced result, failed state for a missing clipboard, a refused permission or a throwing writer; never throws.
+- **Task 12:** React 18 smoke fixture (`tests/react18`, own React 18.3.1, aliases force the library onto it; in `verify` and CI) and dark + more-contrast visual snapshots in the visual hook.
+- **Task 13:** README, Introduction and migration coverage list Milestone 2.
 
 Also shipped in this stretch:
 
@@ -29,35 +34,36 @@ Also shipped in this stretch:
 
 ## Current task
 
-Plan 3 Task 9: Toast. Not started.
+Plan 3 is complete on `next` (Tasks 1–13 and the final review). Next: Plan 4.
 
 ## Next step
 
-Continue Plan 3 at Task 9 (`docs/superpowers/plans/2026-11-09-cynosure-structure.md`):
+1. **Plan 3 review:** done; one finding is open (toasts under a modal Dialog, see "Plan 3 final review"). Decide its design at the start of Plan 4.
+2. **Visual baselines:** the `[baselines]` commit regenerates Chromium baselines, including the new `-dark-contrast` snapshots and the new components. Check the "Update visual baselines" run and the CI run after it on `next`.
+3. **WebKit check:** on a machine with WebKit, open `components-dialog--content-scrolls-inside` and find out why jest-dom called the Save button "not visible" there while its geometry was correct. The story now checks geometry instead.
+4. **Write Plan 4** (Milestone 3 and the product migration issues): `docs/superpowers/plans/`, following the spec §8. The migration issues (one per product repo, see `docs/migration.md`) open once Plan 4 is agreed with Arshad.
 
-1. **Toast:** write the stories first. Cover:
-   - shows and auto-dismisses; timers pause on hover and focus, then resume
-   - max visible, older toasts collapse
-   - the action button works
-   - announced once (`aria-live` polite, assertive for danger)
-   - reduced motion
-   - swipe to dismiss (touch tag)
-2. **Implement** `<Toaster position max>` with a per-Toaster `toast()` store from context (no globals), in the top layer (`popover="manual"`).
-3. **Remaining tasks:**
-   - **Task 10:** Notice and EmptyState
-   - **Task 11:** CopyButton
-   - **Task 12:** carry-overs: React 18 fixture smoke test, dark-contrast baselines
-   - **Task 13:** docs, PROGRESS and push
-4. **Final whole-branch review** for Plan 3, then Plan 4.
-5. **Before merging this work into `next`:** run the Dialog, Sheet and DialogBase stories on Firefox and WebKit (not run in the session that built them; see Verification).
+## Plan 3 final review
 
-The resume ledger lives in `.superpowers/sdd/2026-11-09-cynosure-structure/progress.md` (git-ignored, local only). Rulings are also summarised below.
+An independent review of the Plan 3 Tasks 8–12 code found nine issues. Fixed (each with a story or unit test):
+
+- Dialog read `document` during render: guarded for server rendering.
+- A Tooltip inside a Dialog swallowed the first backdrop click: pointer-down topmost checks skip layers that ignore pointer downs (`useDismiss`).
+- A Dialog opened from a Menu item lost focus on close: focus goes to the button controlling the closed popover.
+- Dismissing a toast from the keyboard dropped focus on the body: it moves to the next toast's close button, or the region stops pausing.
+- CopyButton could reject when `value()` threw, and a second copy was not announced: both fixed.
+- DialogBase: a late `close` event could close a reopened dialog: ignored when the dialog is open again.
+- Toast: a cancelled swipe (the browser took the gesture) springs back instead of dismissing.
+- New layout effects use `useClientLayoutEffect` (no React 18 SSR warnings).
+- Notice docs overstated announcements of a status Notice that mounts filled: corrected.
+
+**Open (design decision for Plan 4):** a toast raised while a modal Dialog is open sits under the dialog and is inert (not clickable, not announced), because the Toaster's region is outside the modal. Options: a Toaster region inside each Dialog that `useToast()` prefers while the dialog is open, or re-showing the region inside the topmost modal. Documented in the Toast docs until then.
 
 ## Plans
 
 - [x] Plan 1: Foundation (`docs/superpowers/plans/2026-11-09-cynosure-foundation.md`)
 - [x] Plan 2: Milestone 1 controls (`docs/superpowers/plans/2026-11-09-cynosure-controls.md`)
-- [ ] Plan 3: Milestone 2 structure and overlays (`docs/superpowers/plans/2026-11-09-cynosure-structure.md`). Tasks 1–8 done, Task 9 next.
+- [x] Plan 3: Milestone 2 structure and overlays (`docs/superpowers/plans/2026-11-09-cynosure-structure.md`). Tasks 1–13 and the final review done.
 - [ ] Plan 4: Milestone 3 and product migration issues (not written)
 
 ## Plan 3 rulings so far
@@ -85,6 +91,11 @@ The resume ledger lives in `.superpowers/sdd/2026-11-09-cynosure-structure/progr
   - `dismissible={false}` hides the close button and ignores Escape and the backdrop.
   - no scroll lock (it would write to `body`); the content uses `overscroll-behavior: contain`.
 - **Sheet:** the same `DialogFrame` with `side` (`bottom` default, `end`). `size` sets the width of an end sheet.
+- **Toast:** the region (`<section aria-label>`, `popover="manual"`) is shown for the Toaster's whole life so live elements exist before text. Each toast is its own live element whose text arrives 50ms after it mounts. Collapsed toasts stay in the DOM (folded, inert) so they are never re-announced. A modal Dialog opened later covers the toasts and makes them inert. Budget 3.5 kB (Dialog 3.25 kB).
+- **Notice:** `role="alert"` only for danger. Uncontrolled dismiss hides itself; with `onDismiss` the parent decides.
+- **EmptyState:** transparent; contrast is measured on the page background.
+- **CopyButton:** the live `role="status"` is always rendered (empty until a result). The button's name follows the state.
+- **React 18:** set `inert` as a DOM property, never as a prop (React 18 drops `inert={true}`).
 
 ## Feedback round (2026-11-09, after Plan 1)
 
@@ -145,15 +156,12 @@ None. Npm publish and deprecating the old packages wait for Arshad's authorisati
 
 ## Verification
 
-- **Local `pnpm verify`** (Plan 3 Tasks 1–7, earlier machine): 283 unit tests, 477 story runs (Chromium, WebKit, touch) and 233 Firefox runs; coverage ≥ 95% branches.
-- **Task 8 session (cloud container):** `cy check`, lint, typecheck, unit and Preact tests, every story on Chromium plus the touch project (268 runs), coverage (95.19% branches), build, publint, attw and size all pass. The Dialog and Sheet were also checked visually (centred, bottom sheet at phone width, scrolling body, end sheet in RTL).
-  - **Not run:** Firefox and WebKit. The container could not download them (`cdn.playwright.dev` is blocked), and CI only runs on `next`, `main` and pull requests, not on the session branch.
-- **CI:** GitHub Actions on Linux runs conventions, lint, types, unit tests, stories on all three engines plus touch, coverage, visual regression, build, publint, attw and size.
+- **Plan 3 Tasks 9–13 (cloud container):** `cy check`, lint, typecheck, unit and Preact tests, the React 18 smoke tests, every story on Chromium plus the touch project, coverage (≥ 95% branches), build and size budgets pass locally. Firefox and WebKit cannot be downloaded in the container (`cdn.playwright.dev` is blocked); CI on `next` runs them.
+- **Published Storybook:** every story and docs page of a production build was loaded under `/cynosure/` in Chromium; no load or render errors. Touch-only stories are hidden from the site (`!dev`).
+- **CI on `next`:** conventions, lint, types, unit, React 18, stories on all three engines plus touch, coverage, visual regression, build, publint, attw and size.
 - **Not verified:**
   - real extension contexts (Prism and Aperture shadow roots under MV3 CSP)
   - Safari and Edge outside the Playwright engines
-  - the React 18 runtime (Task 12)
-  - Dialog, Sheet and DialogBase on Firefox and WebKit
 
 ## How to resume
 
@@ -161,7 +169,7 @@ None. Npm publish and deprecating the old packages wait for Arshad's authorisati
 git clone https://github.com/arshad-shah/cynosure.git && cd cynosure && git checkout next
 nvm use && corepack enable && pnpm install
 pnpm exec playwright install chromium firefox webkit
-pnpm cy progress && pnpm verify
+pnpm --dir tests/react18 install && pnpm cy progress && pnpm verify
 pnpm storybook
 ```
 Then continue at "Current task" above, following `AGENTS.md`.

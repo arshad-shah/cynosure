@@ -138,3 +138,13 @@ export const StableUnderHostileHost: Story = {
     }
   },
 };
+
+export const Defaults: Story = {
+  render: () => <EmptyState title="Nothing here" className="host-empty" />,
+  play: async ({ canvas, canvasElement }) => {
+    // Level 3 heading and the md size unless told otherwise; className is for layout.
+    await expect(canvas.getByRole("heading", { level: 3, name: "Nothing here" })).toBeVisible();
+    await expect(canvasElement.querySelector(".cy-empty-state")).toHaveAttribute("data-size", "md");
+    await expect(canvasElement.querySelector(".cy-empty-state")).toHaveClass("host-empty");
+  },
+};

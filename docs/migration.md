@@ -7,7 +7,15 @@ Tracked as one issue per product repo (opened after Milestone 2). Order of work 
 3. Replace product components with Cynosure ones; replace icons with Facet icons; delete native controls.
 4. Anything missing goes into Cynosure (with tests), never back into the product.
 
-Available now: Button, IconButton, Link, TextField, SearchField, TextArea, Select, Checkbox, Switch, RadioGroup, SegmentedControl, ThemeToggle, Tooltip, LoadingDots, Badge, Kbd, Field, 136 Facet icons. Coming in Plan 3: Card, Tabs, Dialog/Sheet, Menu, Popover, Toast, Notice, EmptyState.
+Available now (Milestones 1 and 2):
+
+- **Controls:** Button, IconButton, CopyButton, Link, TextField, SearchField, TextArea, Select, Checkbox, Switch, RadioGroup, SegmentedControl, ThemeToggle.
+- **Structure:** Stack, Inline, Card, Toolbar, Tabs, Disclosure, Accordion.
+- **Overlays:** Tooltip, Popover, Menu, Dialog, Sheet, Toast.
+- **Feedback and display:** Notice, EmptyState, LoadingDots, Badge, Kbd, Field.
+- **Icons:** 136 Facet icons.
+
+Milestone 2 is the point at which the per-product migration issues open (Plan 4). Anything a product needs that is still missing goes into Cynosure first.
 
 | Scope          | Products                                                                                                                                                      |
 | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |

@@ -20,6 +20,8 @@ export interface DismissOptions {
 interface Layer {
   inside: RefObject<HTMLElement | null>[];
   close: (reason: DismissReason) => void;
+  /** Never closes on a pointer down (a Tooltip): it does not stand between a click and the layer under it. */
+  passive: () => boolean;
 }
 
 const layers: Layer[] = [];
@@ -29,11 +31,15 @@ const els = (layer: Layer) => layer.inside.map((r) => r.current).filter((e): e i
 const holds = (outer: Layer, inner: Layer) =>
   els(outer).some((o) => els(inner).some((i) => o !== i && o.contains(i)));
 
-/** The layer Escape belongs to: the most recently opened one that has no other open layer nested inside it. */
-function topmost(): Layer | undefined {
-  for (let i = layers.length - 1; i >= 0; i--) {
-    const layer = layers[i] as Layer;
-    if (!layers.some((other) => other !== layer && holds(layer, other))) return layer;
+/**
+ * The layer Escape belongs to: the most recently opened one that has no other open layer nested inside it. For pointer
+ * downs, layers that ignore them (`passive`) are left out.
+ */
+function topmost(pointer = false): Layer | undefined {
+  const open = pointer ? layers.filter((l) => !l.passive()) : layers;
+  for (let i = open.length - 1; i >= 0; i--) {
+    const layer = open[i] as Layer;
+    if (!open.some((other) => other !== layer && holds(layer, other))) return layer;
   }
   return undefined;
 }
@@ -61,14 +67,18 @@ export function useDismiss({ open, onClose, inside, returnFocus, outside = true 
 
   useEffect(() => {
     if (!open) return;
-    const layer: Layer = { inside: insideRef.current, close: (reason) => close.current(reason) };
+    const layer: Layer = {
+      inside: insideRef.current,
+      close: (reason) => close.current(reason),
+      passive: () => outsideRef.current === false,
+    };
     layers.push(layer);
     if (layers.length === 1) document.addEventListener("keydown", onKeyDown);
     // Registered when the layer opens, so an outer layer hears a pointer down before the layers nested in it.
     const onPointerDown = (event: PointerEvent) => {
       const rule = outsideRef.current;
       if (typeof rule === "function") {
-        if (rule(event) && topmost() === layer) layer.close("outside");
+        if (rule(event) && topmost(true) === layer) layer.close("outside");
         return;
       }
       if (!rule) return;

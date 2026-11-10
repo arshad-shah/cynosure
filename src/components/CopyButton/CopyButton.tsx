@@ -78,12 +78,16 @@ export function CopyButton({
   };
 
   const run = async () => {
-    const content = typeof value === "function" ? value() : value;
+    // Clear the live region first, so copying again while it still says "Copied" is announced again.
+    setMessage("");
     try {
+      const content = typeof value === "function" ? value() : value;
       await copy(content);
+      await new Promise((resolve) => setTimeout(resolve));
       settle("copied");
       onCopy?.(content);
     } catch (error) {
+      await new Promise((resolve) => setTimeout(resolve));
       settle("failed");
       onError?.(error);
     }

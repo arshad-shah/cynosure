@@ -68,7 +68,7 @@ At most `max` toasts show at once. Older ones fold away and come back as newer o
 - **Announcements:** each toast is a live element: `role="status"` (polite), or `role="alert"` (assertive) for `tone="danger"`. Its text arrives once, after the live element exists, so it is announced once.
 - **Region:** toasts sit in a region named "Notifications" in the browser top layer, so no parent can clip them. Pointer events pass through the empty parts of the region.
 - **Hidden page:** timers also pause while the tab is hidden, so a toast is not missed.
-- **Modal dialogs:** a Dialog opened after the Toaster covers the toasts and makes them inert while it is open.
+- **Modal dialogs (known limit):** a Dialog opened after the Toaster covers the toasts and makes them inert while it is open, so a toast raised from inside an open Dialog is neither seen nor announced until the dialog closes. Inside a Dialog, show the result in the dialog itself (a Notice, or CopyButton's own announcement).
 - **Motion:** toasts slide and fade in and out, and do not move under reduced motion.
 
 ## Touch

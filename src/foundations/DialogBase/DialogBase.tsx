@@ -1,4 +1,5 @@
-import { type DialogHTMLAttributes, forwardRef, useImperativeHandle, useLayoutEffect, useRef } from "react";
+import { type DialogHTMLAttributes, forwardRef, useImperativeHandle, useRef } from "react";
+import { useClientLayoutEffect } from "../client-layout-effect.js";
 
 export interface DialogBaseProps
   extends Omit<DialogHTMLAttributes<HTMLDialogElement>, "open" | "onCancel" | "onClose"> {
@@ -25,20 +26,21 @@ export const DialogBase = forwardRef<HTMLDialogElement, DialogBaseProps>(functio
   const latest = useRef({ open, onCancel, onClose });
   latest.current = { open, onCancel, onClose };
 
-  useLayoutEffect(() => {
+  useClientLayoutEffect(() => {
     const dialog = el.current as HTMLDialogElement;
     if (open && !dialog.open) modal ? dialog.showModal() : dialog.show();
     if (!open && dialog.open) dialog.close();
   }, [open, modal]);
 
-  useLayoutEffect(() => {
+  useClientLayoutEffect(() => {
     const dialog = el.current as HTMLDialogElement;
     const cancel = (event: Event) => {
       event.preventDefault();
       latest.current.onCancel?.();
     };
+    // `close` is queued as a task: a late event for a dialog that was closed and reopened since must not close it.
     const close = () => {
-      if (latest.current.open) latest.current.onClose?.();
+      if (latest.current.open && !dialog.open) latest.current.onClose?.();
     };
     dialog.addEventListener("cancel", cancel);
     dialog.addEventListener("close", close);

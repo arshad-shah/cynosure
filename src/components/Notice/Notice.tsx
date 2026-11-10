@@ -27,7 +27,10 @@ export interface NoticeLabels {
 }
 
 export interface NoticeProps {
-  /** Colour and icon. `danger` is announced assertively (`role="alert"`); the others politely (`role="status"`). */
+  /**
+   * Colour and icon. `danger` is `role="alert"` (announced even when it mounts filled); the others are `role="status"`,
+   * whose content changes are announced politely.
+   */
   tone?: Tone;
   title?: ReactNode;
   /** One or two Buttons; they move under the text in narrow containers. */

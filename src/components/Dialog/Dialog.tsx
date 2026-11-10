@@ -1,12 +1,5 @@
-import {
-  type CSSProperties,
-  type ReactNode,
-  useCallback,
-  useId,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from "react";
+import { type CSSProperties, type ReactNode, useCallback, useId, useRef, useState } from "react";
+import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js";
 import { DialogBase } from "../../foundations/DialogBase/DialogBase.js";
 import { close as closeIcon } from "../../icons/close.js";
 import { useDismiss } from "../../overlay/dismiss.js";
@@ -65,9 +58,24 @@ const FOCUSABLE =
 
 /** The focused element, looking inside shadow roots (document.activeElement stops at the host). */
 function deepActive(): HTMLElement | null {
+  if (typeof document === "undefined") return null; // server render
   let active = document.activeElement;
   while (active?.shadowRoot?.activeElement) active = active.shadowRoot.activeElement;
   return active as HTMLElement | null;
+}
+
+/**
+ * Where focus can actually go back to. A Dialog opened from a Menu item remembers that item, but the menu has closed
+ * (hidden, still in the DOM): fall back to the button that controls the hidden popover.
+ */
+function reachable(el: HTMLElement | null): HTMLElement | null {
+  if (!el) return null;
+  // A closed popover can still be fading out (displayed), so ask the popover, not only the layout.
+  const popover = el.closest<HTMLElement>("[popover][id]");
+  const closed = popover ? !popover.matches(":popover-open") : el.checkVisibility?.() === false;
+  if (!closed) return el;
+  const root = el.getRootNode() as Document | ShadowRoot;
+  return (popover && root.querySelector<HTMLElement>(`[aria-controls="${CSS.escape(popover.id)}"]`)) ?? el;
 }
 
 export function DialogFrame({
@@ -108,9 +116,17 @@ export function DialogFrame({
     if (dismissible) setOpen(false);
   };
 
+  // On close, before useDismiss returns focus: make sure the remembered element can still take it.
+  useClientLayoutEffect(() => {
+    if (!isOpen) return;
+    return () => {
+      returnTo.current = reachable(returnTo.current);
+    };
+  }, [isOpen]);
+
   // DialogBase has opened it; move focus to the first control in the content, else the first action, else the
   // dialog itself (so the close button's tooltip does not pop up on open).
-  useLayoutEffect(() => {
+  useClientLayoutEffect(() => {
     if (!isOpen) return;
     const first =
       body.current?.querySelector<HTMLElement>(FOCUSABLE) ??

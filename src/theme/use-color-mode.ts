@@ -1,7 +1,6 @@
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useClientLayoutEffect } from "../foundations/client-layout-effect.js";
 
-// Layout effect on the client (no flash), plain effect on the server (no warning).
-const useClientLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
 const CHANGE = "cy-color-mode-change";
 
 export type ColorMode = "light" | "dark" | "system";

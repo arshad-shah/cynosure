@@ -2,9 +2,11 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { expect, fn, waitFor } from "storybook/test";
+import { copy as copyIcon } from "../../icons/copy.js";
 import { createStyleSheet } from "../../styles/inline.js";
 import { computeUnderHostileHost } from "../../test/hostile.js";
 import { Button } from "../Button/Button.js";
+import { IconButton } from "../IconButton/IconButton.js";
 import { Menu } from "../Menu/Menu.js";
 import { Stack } from "../Stack/Stack.js";
 import { TextField } from "../TextField/TextField.js";
@@ -298,6 +300,53 @@ export const NestedMenuClosesFirst: Story = {
     await waitFor(() => expect(menu.matches(":popover-open")).toBe(false));
     await expect(el.open).toBe(true);
     await userEvent.keyboard("{Escape}");
+    await settledClosed(el);
+  },
+};
+
+function MenuOpensDialog() {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      {/* Before the Menu in the tree, so showModal runs while the menu item still has focus. */}
+      <Dialog title="Rename" open={open} onOpenChange={setOpen}>
+        {form}
+      </Dialog>
+      <Menu
+        label="File"
+        trigger={(p) => <Button {...p}>File</Button>}
+        items={[{ value: "rename", label: "Rename" }]}
+        onSelect={() => setOpen(true)}
+      />
+    </>
+  );
+}
+
+export const FocusReturnsToTheMenuButtonAfterAMenuItemOpenedIt: Story = {
+  render: () => <MenuOpensDialog />,
+  play: async ({ canvas, userEvent }) => {
+    const file = canvas.getByRole("button", { name: "File" });
+    await userEvent.click(file);
+    await userEvent.click(await canvas.findByRole("menuitem", { name: "Rename" }));
+    const el = dialogEl();
+    await waitFor(() => expect(el.open).toBe(true));
+    await userEvent.keyboard("{Escape}");
+    await settledClosed(el);
+    // The menu item it came from is hidden now; focus lands on the button that opened the menu.
+    await waitFor(() => expect(file).toHaveFocus());
+  },
+};
+
+export const TooltipInsideDoesNotSwallowTheBackdropClick: Story = {
+  args: { children: <IconButton icon={copyIcon} label="Copy link" /> },
+  play: async ({ canvas, userEvent }) => {
+    const el = await openWith(canvas, (e) => userEvent.click(e));
+    // Keyboard focus on an IconButton opens its tooltip (a layer that ignores pointer downs).
+    await waitFor(() => expect(canvas.getByRole("button", { name: "Copy link" })).toHaveFocus());
+    await userEvent.tab({ shift: true });
+    await userEvent.tab();
+    await waitFor(() => expect(document.querySelector(".cy-tooltip:popover-open")).not.toBeNull());
+    await userEvent.click(el);
     await settledClosed(el);
   },
 };

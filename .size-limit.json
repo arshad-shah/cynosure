@@ -235,7 +235,7 @@
       "dist/foundations/DialogBase/DialogBase.js",
       "dist/styles/dialog.css"
     ],
-    "limit": "3 kB",
+    "limit": "3.25 kB",
     "gzip": true
   },
   {
@@ -247,7 +247,7 @@
   {
     "name": "Toast",
     "path": ["dist/components/Toast/Toast.js", "dist/styles/toast.css"],
-    "limit": "3.25 kB",
+    "limit": "3.5 kB",
     "gzip": true
   },
   {

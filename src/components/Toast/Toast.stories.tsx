@@ -134,6 +134,30 @@ export const MaxVisibleOlderCollapse: Story = {
 
 const undo = fn();
 
+export const KeyboardDismissKeepsFocusInTheStack: Story = {
+  render: (args) =>
+    withToaster(
+      {
+        One: { title: "One", duration: Number.POSITIVE_INFINITY },
+        Two: { title: "Two", duration: Number.POSITIVE_INFINITY },
+      },
+      args,
+    ),
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole("button", { name: "One" }));
+    await userEvent.click(canvas.getByRole("button", { name: "Two" }));
+    await waitFor(() => expect(toasts()).toHaveLength(2));
+    const [one, two] = toasts() as [HTMLElement, HTMLElement];
+    (two.querySelector('[aria-label="Dismiss"]') as HTMLElement).focus();
+    await userEvent.keyboard("{Enter}");
+    await gone(two);
+    // Focus moved to the remaining toast's close button instead of falling to the page.
+    await expect(one.querySelector('[aria-label="Dismiss"]')).toHaveFocus();
+    await userEvent.keyboard("{Enter}");
+    await gone(one);
+  },
+};
+
 export const ActionButton: Story = {
   render: (args) =>
     withToaster(

@@ -7,11 +7,11 @@ import {
   useContext,
   useEffect,
   useId,
-  useLayoutEffect,
   useMemo,
   useRef,
   useState,
 } from "react";
+import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
 import { checkCircle } from "../../icons/check-circle.js";
 import { close as closeIcon } from "../../icons/close.js";
@@ -132,11 +132,27 @@ export function Toaster({
   const region = useRef<RegionEl>(null);
 
   const remove = useCallback((id: string) => setItems((list) => list.filter((t) => t.id !== id)), []);
-  const dismiss = useCallback(
-    (id?: string) =>
-      setItems((list) => list.map((t) => (id === undefined || t.id === id ? { ...t, leaving: true } : t))),
-    [],
-  );
+  const dismiss = useCallback((id?: string) => {
+    // Closing the toast that holds focus (its close button, from the keyboard): hand focus to the next toast's close
+    // button, or let the region stop pausing if there is none.
+    const active = region.current?.ownerDocument.activeElement;
+    const holder = active?.closest<HTMLElement>(".cy-toast");
+    if (holder && region.current?.contains(holder) && (id === undefined || holder.dataset.id === id)) {
+      const others = [
+        ...region.current.querySelectorAll<HTMLElement>(
+          ".cy-toast:not([data-collapsed]):not([data-leaving])",
+        ),
+      ];
+      const next = id === undefined ? undefined : others.find((t) => t !== holder);
+      const button = next ? [...next.querySelectorAll<HTMLElement>("button")].at(-1) : undefined;
+      if (button) button.focus();
+      else {
+        (active as HTMLElement).blur();
+        setFocused(false);
+      }
+    }
+    setItems((list) => list.map((t) => (id === undefined || t.id === id ? { ...t, leaving: true } : t)));
+  }, []);
   const toast = useCallback(
     (options: ToastOptions) => {
       count.current += 1;
@@ -149,7 +165,7 @@ export function Toaster({
   const api = useMemo<ToastApi>(() => ({ toast, dismiss }), [toast, dismiss]);
 
   // The region lives in the top layer for as long as the Toaster is mounted, so live regions exist before content.
-  useLayoutEffect(() => {
+  useClientLayoutEffect(() => {
     const el = region.current;
     el?.showPopover?.();
     return () => {
@@ -226,7 +242,7 @@ function ToastItem({ item, collapsed, paused, dismissLabel, onDismiss, onRemoved
   }, []);
 
   // Collapsed and leaving toasts cannot be focused or clicked. Set as a property: React 18 drops `inert={true}`.
-  useLayoutEffect(() => {
+  useClientLayoutEffect(() => {
     if (el.current) el.current.inert = collapsed || leaving;
   }, [collapsed, leaving]);
 
@@ -267,6 +283,7 @@ function ToastItem({ item, collapsed, paused, dismissLabel, onDismiss, onRemoved
       role={tone === "danger" ? "alert" : "status"}
       aria-atomic="true"
       className="cy-toast"
+      data-id={id}
       data-tone={tone}
       data-collapsed={collapsed || undefined}
       data-leaving={leaving || undefined}
@@ -281,7 +298,12 @@ function ToastItem({ item, collapsed, paused, dismissLabel, onDismiss, onRemoved
         event.currentTarget.style.setProperty("--_dx", `${event.clientX - start.x}px`);
       }}
       onPointerUp={endSwipe}
-      onPointerCancel={endSwipe}
+      onPointerCancel={(event) => {
+        // The browser took the gesture (a scroll): spring back, never dismiss.
+        drag.current = null;
+        delete event.currentTarget.dataset.swiping;
+        event.currentTarget.style.removeProperty("--_dx");
+      }}
     >
       {icon && <Icon icon={icon} className="cy-toast-icon" />}
       <div className="cy-toast-text cy-reset">

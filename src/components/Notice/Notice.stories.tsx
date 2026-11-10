@@ -159,3 +159,15 @@ export const TouchDismiss: Story = {
     await expect(canvas.queryByRole("status")).toBeNull();
   },
 };
+
+export const Defaults: Story = {
+  render: () => <Notice className="host-notice">Saved on this device.</Notice>,
+  play: async ({ canvas, canvasElement }) => {
+    // Info tone (polite, with its icon), no close button, className for layout.
+    const notice = canvas.getByRole("status");
+    await expect(notice).toHaveAttribute("data-tone", "info");
+    await expect(notice).toHaveClass("host-notice");
+    await expect(canvasElement.querySelector(".cy-notice-icon")).not.toBeNull();
+    await expect(canvas.queryByRole("button")).toBeNull();
+  },
+};

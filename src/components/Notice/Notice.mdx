@@ -47,7 +47,8 @@ The Notice measures its own width. Below 26rem the actions move under the text, 
 | --- | --- |
 | Close button | Hides it (or calls `onDismiss`) |
 
-- **Role:** `role="alert"` for `tone="danger"`, so it is announced at once; `role="status"` for every other tone. A Notice rendered with the page is read in place; one added later is announced.
+- **Role:** `role="alert"` for `tone="danger"`, which screen readers announce even when it appears already filled. Every other tone is `role="status"`: changes to its content are announced politely, but a status Notice that mounts with its text already in it is usually only read in place.
+- **To announce a non-danger message** that appears later, keep the Notice mounted and change its content, or use a [Toast](?path=/docs/components-toast--docs), which is built to be announced once.
 - **Icon:** decorative; the tone is also carried by the words.
 - **Contrast:** title and body are at least 4.5:1 in every tone, in light and dark modes.
 

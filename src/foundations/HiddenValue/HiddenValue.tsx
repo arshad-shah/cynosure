@@ -1,4 +1,5 @@
-import { useLayoutEffect, useRef } from "react";
+import { useRef } from "react";
+import { useClientLayoutEffect } from "../client-layout-effect.js";
 
 export interface HiddenValueProps {
   name?: string | undefined;
@@ -31,16 +32,16 @@ export function HiddenValue({
   onInvalid,
 }: HiddenValueProps) {
   const ref = useRef<HTMLInputElement>(null);
-  useLayoutEffect(() => {
+  useClientLayoutEffect(() => {
     ref.current?.setCustomValidity(required && !value ? requiredMessage : "");
   }, [required, value, requiredMessage]);
-  useLayoutEffect(() => {
+  useClientLayoutEffect(() => {
     const input = ref.current;
     if (!input || !onInvalid) return;
     input.addEventListener("invalid", onInvalid);
     return () => input.removeEventListener("invalid", onInvalid);
   }, [onInvalid]);
-  useLayoutEffect(() => {
+  useClientLayoutEffect(() => {
     const owner = ref.current?.form;
     if (!owner || !onReset) return;
     owner.addEventListener("reset", onReset);

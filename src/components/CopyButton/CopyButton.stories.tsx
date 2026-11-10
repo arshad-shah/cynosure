@@ -88,6 +88,35 @@ export const SynchronousThrowShowsFailure: Story = {
   },
 };
 
+export const ThrowingValueShowsFailure: Story = {
+  args: {
+    value: () => {
+      throw new Error("editor not ready");
+    },
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole("button", { name: "Copy" }));
+    await waitFor(() => expect(canvas.getByRole("status")).toHaveTextContent("Could not copy"));
+    await expect(args.copy).not.toHaveBeenCalled();
+    await expect(args.onError).toHaveBeenCalledTimes(1);
+  },
+};
+
+export const RepeatedCopyIsAnnouncedAgain: Story = {
+  args: { timeout: 2000 },
+  play: async ({ canvas, userEvent }) => {
+    const status = canvas.getByRole("status");
+    const seen: string[] = [];
+    const watch = new MutationObserver(() => seen.push(status.textContent ?? ""));
+    watch.observe(status, { childList: true, characterData: true, subtree: true });
+    await userEvent.click(canvas.getByRole("button", { name: "Copy" }));
+    await waitFor(() => expect(status).toHaveTextContent("Copied"));
+    await userEvent.click(canvas.getByRole("button", { name: "Copied" }));
+    await waitFor(() => expect(seen.filter((t) => t === "Copied")).toHaveLength(2));
+    watch.disconnect();
+  },
+};
+
 /** Swaps navigator.clipboard for the duration of a story. */
 async function withClipboard(clipboard: unknown, run: () => Promise<void>) {
   const original = Object.getOwnPropertyDescriptor(Navigator.prototype, "clipboard");
@@ -157,5 +186,22 @@ export const TouchCopies: Story = {
     await expect(Number.parseFloat(hit.blockSize || hit.height)).toBeGreaterThanOrEqual(44);
     await userEvent.pointer({ keys: "[TouchA]", target: button });
     await expect(args.copy).toHaveBeenCalledTimes(1);
+  },
+};
+
+export const Defaults: Story = {
+  render: () => (
+    <CopyButton value="x" copy={async () => {}} className="host-copy" tooltipPlacement="bottom" />
+  ),
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const button = canvas.getByRole("button", { name: "Copy" });
+    await expect(button).toHaveAttribute("data-size", "md");
+    await expect(button).toHaveAttribute("data-variant", "ghost");
+    await expect(canvasElement.querySelector(".cy-copy-button")).toHaveClass("host-copy");
+    // The default timeout keeps the result for two seconds.
+    await userEvent.click(button);
+    await waitFor(() => expect(button).toHaveAccessibleName("Copied"));
+    await new Promise((r) => setTimeout(r, 1000));
+    await expect(button).toHaveAccessibleName("Copied");
   },
 };

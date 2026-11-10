@@ -113,6 +113,19 @@ describe("useDismiss", () => {
     expect(outer).toHaveBeenCalledWith("outside");
   });
 
+  it("a layer that ignores pointer downs (a tooltip) does not block the backdrop rule under it", () => {
+    const outer = vi.fn();
+    const onBackdrop = (event: PointerEvent) => (event.target as HTMLElement).dataset.backdrop === "";
+    const { getByText } = render(
+      <Layer name="outer" onClose={outer} outside={onBackdrop}>
+        <span data-backdrop="">backdrop</span>
+        <Layer name="tip" onClose={() => {}} outside={false} />
+      </Layer>,
+    );
+    fireEvent.pointerDown(getByText("backdrop"));
+    expect(outer).toHaveBeenCalledWith("outside");
+  });
+
   it("outside={false} ignores pointer downs", () => {
     const close = vi.fn();
     render(<Layer name="one" onClose={close} outside={false} />);
