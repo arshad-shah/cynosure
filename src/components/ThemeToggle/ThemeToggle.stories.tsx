@@ -61,6 +61,22 @@ function Page() {
   );
 }
 
+export const CycleLabels: Story = {
+  args: {
+    variant: "cycle",
+    value: "dark",
+    labels: {
+      light: "Hell",
+      dark: "Dunkel",
+      system: "System",
+      cycle: (c, n) => `Modus ${c}, weiter zu ${n}`,
+    },
+  },
+  play: async ({ canvas }) => {
+    await expect(canvas.getByRole("button", { name: "Modus Dunkel, weiter zu System" })).toBeVisible();
+  },
+};
+
 export const OneButtonCycle: Story = {
   args: { variant: "cycle" },
   render: (args) => {

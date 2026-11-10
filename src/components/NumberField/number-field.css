@@ -11,3 +11,10 @@
   color: inherit;
   font-size: inherit;
 }
+
+/* Scrubbing: the label is a horizontal drag handle. Vertical swipes still scroll the page. */
+.cy-number-field label[data-scrub] {
+  cursor: ew-resize;
+  touch-action: pan-y;
+  user-select: none;
+}

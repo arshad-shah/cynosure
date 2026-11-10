@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { expect, fn, waitFor } from "storybook/test";
 import { filter } from "../../icons/index.js";
@@ -9,6 +9,7 @@ import { Button } from "../Button/Button.js";
 import { Checkbox } from "../Checkbox/Checkbox.js";
 import { IconButton } from "../IconButton/IconButton.js";
 import { Stack } from "../Stack/Stack.js";
+import { TextField } from "../TextField/TextField.js";
 import { Popover } from "./Popover.js";
 
 const meta = {
@@ -215,5 +216,81 @@ export const WorksInsideAShadowRoot: Story = {
     await expect(isOpen(dialog)).toBe(true);
     await userEvent.keyboard("{Escape}");
     await settledClosed(dialog);
+  },
+};
+
+export const AnchoredToAnElement: Story = {
+  render: () => {
+    function Beside() {
+      const [target, setTarget] = useState<HTMLElement | null>(null);
+      return (
+        <>
+          <div
+            ref={setTarget}
+            data-testid="target"
+            style={{ inlineSize: 120, blockSize: 40, background: "var(--cy-color-soft)" }}
+          />
+          <Popover label="Details" anchor={target ?? undefined} open={target !== null} placement="end">
+            <p>Beside the box</p>
+          </Popover>
+        </>
+      );
+    }
+    return <Beside />;
+  },
+  play: async ({ canvas }) => {
+    const dialog = await canvas.findByRole("dialog", { name: "Details" });
+    await shownFully(dialog);
+    await expect(dialog.getBoundingClientRect().left).toBeGreaterThanOrEqual(
+      canvas.getByTestId("target").getBoundingClientRect().right,
+    );
+  },
+};
+
+export const OpenAtAPoint: Story = {
+  render: () => {
+    function Canvas() {
+      const [at, setAt] = useState<{ x: number; y: number } | null>(null);
+      return (
+        <>
+          {/* biome-ignore lint/a11y/noStaticElementInteractions lint/a11y/useKeyWithClickEvents: a stand-in for a drawing canvas that opens a popover where it is pressed */}
+          <div
+            tabIndex={-1}
+            data-testid="canvas"
+            style={{ inlineSize: 400, blockSize: 240, background: "var(--cy-color-soft)" }}
+            onClick={(e) => setAt({ x: e.clientX, y: e.clientY })}
+          />
+          <Popover
+            label="Add a note"
+            anchor={at ?? undefined}
+            open={at !== null}
+            onOpenChange={(o) => !o && setAt(null)}
+          >
+            <TextField label="Note" />
+          </Popover>
+        </>
+      );
+    }
+    return <Canvas />;
+  },
+  play: async ({ canvas, userEvent }) => {
+    const area = canvas.getByTestId("canvas");
+    area.focus();
+    const r = area.getBoundingClientRect();
+    await userEvent.pointer({
+      keys: "[MouseLeft]",
+      target: area,
+      coords: { clientX: r.left + 120, clientY: r.top + 80 },
+    });
+    const dialog = await canvas.findByRole("dialog", { name: "Add a note" });
+    await shownFully(dialog);
+    // Placed just below the point, starting at it; focus moves inside.
+    await waitFor(() => expect(dialog.getBoundingClientRect().top).toBeGreaterThanOrEqual(r.top + 80));
+    await expect(Math.abs(dialog.getBoundingClientRect().left - (r.left + 120))).toBeLessThan(2);
+    await expect(canvas.getByRole("textbox", { name: "Note" })).toHaveFocus();
+    // Escape closes it and focus goes back to where it was.
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() => expect(canvas.queryByRole("dialog")).toBeNull());
+    await expect(area).toHaveFocus();
   },
 };

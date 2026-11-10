@@ -291,6 +291,44 @@ export const TouchSteppers: Story = {
   },
 };
 
+export const ScrubTheLabel: Story = {
+  args: { label: "Width", defaultValue: 100, min: 0, max: 500, step: 1, scrub: true },
+  play: async ({ canvas, canvasElement }) => {
+    const field = canvas.getByRole("spinbutton", { name: "Width" });
+    const label = canvasElement.querySelector("label[data-scrub]") as HTMLElement;
+    await expect(getComputedStyle(label).cursor).toBe("ew-resize");
+    const r = label.getBoundingClientRect();
+    const init = {
+      bubbles: true,
+      cancelable: true,
+      pointerId: 9,
+      pointerType: "mouse",
+      isPrimary: true,
+      button: 0,
+      buttons: 1,
+    };
+    const at = (x: number, extra: object = {}) => ({
+      ...init,
+      clientX: r.left + x,
+      clientY: r.top + 4,
+      ...extra,
+    });
+    // Forty pixels right is ten steps.
+    label.dispatchEvent(new PointerEvent("pointerdown", at(5)));
+    window.dispatchEvent(new PointerEvent("pointermove", at(25)));
+    window.dispatchEvent(new PointerEvent("pointermove", at(45)));
+    window.dispatchEvent(new PointerEvent("pointerup", at(45, { buttons: 0 })));
+    await waitFor(() => expect(field).toHaveAttribute("aria-valuenow", "110"));
+    await expect(field).toHaveFocus();
+    // Shift moves ten times as far; Escape puts it back.
+    label.dispatchEvent(new PointerEvent("pointerdown", at(5)));
+    window.dispatchEvent(new PointerEvent("pointermove", at(25, { shiftKey: true })));
+    await waitFor(() => expect(field).toHaveAttribute("aria-valuenow", "160"));
+    window.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true, cancelable: true }));
+    await waitFor(() => expect(field).toHaveAttribute("aria-valuenow", "110"));
+  },
+};
+
 export const StableUnderHostileHost: Story = {
   play: async ({ canvasElement }) => {
     const props = ["height", "font-size", "font-variant-numeric", "color", "padding-left", "box-sizing"];

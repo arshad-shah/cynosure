@@ -216,6 +216,17 @@ export const MarkedLines: Story = {
   },
 };
 
+export const SeveralMarkedLines: Story = {
+  args: { code: "a\nb\nc", activeLines: [1, 2, 9] },
+  play: async ({ canvasElement }) => {
+    // Lines that do not exist are ignored; the rest are read out together.
+    await expect(canvasElement.querySelectorAll(".cy-code-block-mark")).toHaveLength(2);
+    await expect(canvasElement.querySelector(".cy-visually-hidden")).toHaveTextContent(
+      "Lines 1, 2 highlighted",
+    );
+  },
+};
+
 export const StableUnderHostileHost: Story = {
   args: { lineNumbers: true },
   play: async ({ canvasElement }) => {

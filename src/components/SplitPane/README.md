@@ -29,6 +29,8 @@ import { SplitPane } from "@arshad-shah/cynosure";
 - Its hit area is at least 24px wide, 44px on touch screens, while the line stays thin.
 - The SplitPane fills its container; give the container a height.
 
+- `unit="px"`: the start pane has a fixed size in pixels (a sidebar that keeps its width as the window grows). Defaults then are 240 wide, between 120 and 600, moving 16 per arrow key; the divider reads "240 pixels".
+
 ## Tokens
 
 - `--cy-split-pane-divider-size`: line thickness

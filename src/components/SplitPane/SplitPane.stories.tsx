@@ -284,6 +284,60 @@ export const PointerEdgeCases: Story = {
   },
 };
 
+export const SizedInPixels: Story = {
+  args: { unit: "px", defaultSize: 200, min: 160, max: 320, step: 20 },
+  decorators: [(Story) => <div style={{ inlineSize: 600, blockSize: 200 }}>{Story()}</div>],
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const divider = canvas.getByRole("separator");
+    const start = startPane(canvasElement);
+    await expect(divider).toHaveAttribute("aria-valuetext", "200 pixels");
+    await expect(start.getBoundingClientRect().width).toBeCloseTo(
+      200 - divider.getBoundingClientRect().width / 2,
+      0,
+    );
+    divider.focus();
+    await userEvent.keyboard("{ArrowRight}{End}");
+    await expect(divider).toHaveAttribute("aria-valuenow", "320");
+    // Dragging follows the pointer in pixels.
+    const box = root(canvasElement).getBoundingClientRect();
+    const init = {
+      bubbles: true,
+      cancelable: true,
+      pointerId: 6,
+      pointerType: "mouse",
+      isPrimary: true,
+      button: 0,
+      buttons: 1,
+    };
+    const d = divider.getBoundingClientRect();
+    divider.dispatchEvent(
+      new PointerEvent("pointerdown", { ...init, clientX: d.left + 2, clientY: d.top + 10 }),
+    );
+    window.dispatchEvent(
+      new PointerEvent("pointermove", { ...init, clientX: box.left + 180, clientY: d.top + 10 }),
+    );
+    window.dispatchEvent(
+      new PointerEvent("pointerup", { ...init, buttons: 0, clientX: box.left + 180, clientY: d.top + 10 }),
+    );
+    await waitFor(() => expect(divider).toHaveAttribute("aria-valuenow", "180"));
+  },
+};
+
+export const PixelDefaults: Story = {
+  args: { unit: "px", defaultSize: undefined },
+  decorators: [(Story) => <div style={{ inlineSize: 800, blockSize: 200 }}>{Story()}</div>],
+  play: async ({ canvas, userEvent }) => {
+    const divider = canvas.getByRole("separator");
+    // 240 wide, between 120 and 600, 16 per arrow key.
+    await expect(divider).toHaveAttribute("aria-valuenow", "240");
+    await expect(divider).toHaveAttribute("aria-valuemin", "120");
+    await expect(divider).toHaveAttribute("aria-valuemax", "600");
+    divider.focus();
+    await userEvent.keyboard("{ArrowRight}");
+    await expect(divider).toHaveAttribute("aria-valuenow", "256");
+  },
+};
+
 export const StableUnderHostileHost: Story = {
   play: async ({ canvasElement }) => {
     const props = [

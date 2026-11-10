@@ -237,6 +237,15 @@ export const AMarkerOnAPlainBar: Story = {
   },
 };
 
+export const SegmentsTakeTheBarsTone: Story = {
+  args: { label: "Steps", tone: "success", max: 10, segments: [{ value: 4, label: "Done" }] },
+  play: async ({ canvas, canvasElement }) => {
+    const part = canvasElement.querySelector(".cy-progress-bar-segment") as HTMLElement;
+    await expect(part).toHaveAttribute("data-tone", "success");
+    await expect(canvas.getByRole("progressbar")).toHaveAttribute("aria-valuetext", "Done 4");
+  },
+};
+
 export const StableUnderHostileHost: Story = {
   play: async ({ canvasElement }) => {
     for (const selector of [".cy-progress-bar", ".cy-progress-bar-label", ".cy-progress-bar-track"]) {

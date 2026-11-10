@@ -47,6 +47,10 @@ describe("iconToSvg", () => {
       react(icons.check, { className: "x", color: "red" }),
     );
   });
+  it("ignores color=brand on an icon that is not a brand mark", () => {
+    expect(icons.iconToSvg(icons.check, { color: "brand" })).toBe(react(icons.check, { color: "brand" }));
+    expect(icons.iconToSvg(icons.check, { color: "brand" })).not.toContain("style=");
+  });
   it("escapes what it is given", () => {
     expect(icons.iconToSvg(icons.check, { label: '"><script>' })).toContain(
       'aria-label="&quot;&gt;&lt;script&gt;"',

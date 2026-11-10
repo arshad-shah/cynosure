@@ -35,11 +35,20 @@ export interface CardProps {
   "data-testid"?: string;
 }
 
-const withoutStyle = <T extends { style?: CSSProperties }>({ style: _, ...props }: T) => props;
-
 /** Content container. With `href` or `onClick` the whole card is one link or button (no nested controls). */
-export const Card = forwardRef<HTMLElement, CardProps>(function CardRender(
-  {
+export const Card = forwardRef<HTMLElement, CardProps>(function CardRender(props, ref) {
+  // With actions, the card itself stays one target and the actions are its siblings in a shared frame. Layout
+  // (`style`) goes on the frame; the card fills it.
+  if (props.actions !== undefined && (props.href !== undefined || props.onClick)) {
+    const { actions, style, ...card } = props;
+    return (
+      <div className="cy-card-frame cy-reset" style={style}>
+        <Card ref={ref} {...card} />
+        <div className="cy-card-actions cy-reset">{actions}</div>
+      </div>
+    );
+  }
+  const {
     variant = "surface",
     padding = "md",
     tone = "neutral",
@@ -52,32 +61,7 @@ export const Card = forwardRef<HTMLElement, CardProps>(function CardRender(
     className,
     children,
     ...rest
-  },
-  ref,
-) {
-  if (actions !== undefined && (href !== undefined || onClick)) {
-    // The card itself stays one target; the actions are its siblings in a shared frame.
-    return (
-      // Layout (`style`) goes on the frame; the card fills it.
-      <div className="cy-card-frame cy-reset" style={rest.style}>
-        <Card
-          ref={ref}
-          {...withoutStyle(rest)}
-          variant={variant}
-          padding={padding}
-          tone={tone}
-          {...(href !== undefined ? { href } : {})}
-          {...(target !== undefined ? { target } : {})}
-          {...(onClick ? { onClick } : {})}
-          {...(disabled !== undefined ? { disabled } : {})}
-          {...(className ? { className } : {})}
-        >
-          {children}
-        </Card>
-        <div className="cy-card-actions cy-reset">{actions}</div>
-      </div>
-    );
-  }
+  } = props;
   const common = {
     ...rest,
     className: className ? `cy-card ${className}` : "cy-card",

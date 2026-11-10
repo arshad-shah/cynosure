@@ -28,6 +28,8 @@ Also takes TextField's `label`, `labelHidden`, `description`, `error`, `placehol
 - Percent values are typed as people say them (20 means 20%) and stored as fractions (0.2).
 - The steppers are not tab stops; their hit areas are at least 24px, 44px on touch screens.
 
+- `scrub`: drag the label sideways to change the value, as design tools do: one `step` every 4 pixels, Shift for ten; Escape mid-drag puts it back. A vertical swipe still scrolls on touch screens.
+
 ## Tokens
 
 Uses TextField's tokens (`--cy-text-field-*`).

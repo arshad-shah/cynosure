@@ -26,14 +26,19 @@ export interface SplitPaneProps {
   label: string;
   /** `horizontal`: panes side by side. `vertical`: stacked. */
   orientation?: "horizontal" | "vertical";
-  /** Size of the start pane, in percent of the whole. */
+  /**
+   * `percent` (default): sizes are percent of the whole. `px`: the start pane has a fixed width (or height) in pixels,
+   * such as a sidebar that keeps its size as the window grows.
+   */
+  unit?: "percent" | "px";
+  /** Size of the start pane, in `unit`. */
   size?: number | undefined;
-  defaultSize?: number;
+  defaultSize?: number | undefined;
   onSizeChange?: ((size: number) => void) | undefined;
-  /** Limits for the start pane, in percent. Defaults: 10 and 90. */
+  /** Limits for the start pane, in `unit`. Defaults: 10 and 90 percent, or 120 and 600 pixels. */
   min?: number;
   max?: number;
-  /** Arrow keys move by this many percent. Default 5. */
+  /** Arrow keys move by this much, in `unit`. Default 5 percent, or 16 pixels. */
   step?: number;
   /** Enter collapses the start pane to 0 and restores it. */
   collapsible?: boolean;
@@ -53,23 +58,29 @@ export function SplitPane({
   end,
   label,
   orientation = "horizontal",
+  unit = "percent",
   size,
-  defaultSize = 50,
+  defaultSize,
   onSizeChange,
-  min = 10,
-  max = 90,
-  step = 5,
+  min: minProp,
+  max: maxProp,
+  step: stepProp,
   collapsible = false,
   className,
   style,
 }: SplitPaneProps) {
+  const px = unit === "px";
+  const min = minProp ?? (px ? 120 : 10);
+  const max = maxProp ?? (px ? 600 : 90);
+  const step = stepProp ?? (px ? 16 : 5);
   const id = useId();
   const root = useRef<HTMLDivElement>(null);
   const [dragging, setDragging] = useState(false);
   const restore = useRef<number | null>(null);
   const divider = useRef<HTMLDivElement>(null);
   const dragFrom = useRef(0);
-  const [current, setCurrent] = useControllableState(size, defaultSize, onSizeChange);
+  const initial = defaultSize ?? (px ? 240 : 50);
+  const [current, setCurrent] = useControllableState(size, initial, onSizeChange);
   const vertical = orientation === "vertical";
 
   const set = (next: number, allowCollapse = false) => {
@@ -81,7 +92,7 @@ export function SplitPane({
     const box = (root.current as HTMLDivElement).getBoundingClientRect();
     const rtl = !vertical && isRtl(root.current as HTMLDivElement);
     const offset = vertical ? point.y - box.top : rtl ? box.right - point.x : point.x - box.left;
-    set(((vertical ? offset / box.height : offset / box.width) || 0) * 100);
+    set(px ? offset : ((vertical ? offset / box.height : offset / box.width) || 0) * 100);
   };
   // Dragging the divider through detent; Escape puts it back where the drag began.
   useDrag(divider, {
@@ -111,7 +122,7 @@ export function SplitPane({
     if (target !== undefined) moves[event.key] = () => set(target);
     if (collapsible)
       moves.Enter = () => {
-        if (current === 0) set(restore.current ?? defaultSize);
+        if (current === 0) set(restore.current ?? initial);
         else {
           restore.current = current;
           set(0, true);
@@ -129,7 +140,7 @@ export function SplitPane({
       className={className ? `cy-split-pane ${className}` : "cy-split-pane"}
       data-orientation={orientation}
       data-dragging={dragging ? "" : undefined}
-      style={{ "--_size": `${current}%`, ...style } as CSSProperties}
+      style={{ "--_size": px ? `${current}px` : `${current}%`, ...style } as CSSProperties}
     >
       <div
         id={`${id}-start`}
@@ -149,7 +160,7 @@ export function SplitPane({
         aria-valuenow={current}
         aria-valuemin={collapsible ? 0 : min}
         aria-valuemax={max}
-        aria-valuetext={`${Math.round(current)}%`}
+        aria-valuetext={px ? `${Math.round(current)} pixels` : `${Math.round(current)}%`}
         ref={divider}
         className="cy-split-pane-divider cy-reset"
         onKeyDown={onKeyDown}

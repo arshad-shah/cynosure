@@ -3,7 +3,7 @@ import { useControllableState } from "../../foundations/controllable.js";
 import { useDismiss } from "../../overlay/dismiss.js";
 import { usePopover } from "../../overlay/floating.js";
 import type { Placement } from "../../overlay/position.js";
-import { useAnchoredPosition } from "../../overlay/use-anchored-position.js";
+import { useAnchoredPosition, type VirtualAnchor } from "../../overlay/use-anchored-position.js";
 import type { Size } from "../../tokens/schema.js";
 
 export interface PopoverTokens {
@@ -30,8 +30,16 @@ export interface PopoverTriggerProps {
 }
 
 export interface PopoverProps {
-  /** Render the trigger: `(props) => <Button {...props}>Filters</Button>`. */
-  trigger: (props: PopoverTriggerProps) => ReactNode;
+  /**
+   * Render the trigger: `(props) => <Button {...props}>Filters</Button>`. Optional with `anchor`: a popover opened
+   * at a point (a canvas click) has no trigger, and is controlled with `open`.
+   */
+  trigger?: ((props: PopoverTriggerProps) => ReactNode) | undefined;
+  /**
+   * Place it at a point (`{ x, y }` in viewport pixels, such as where a canvas was clicked) or beside any element or
+   * virtual anchor, instead of the trigger. Focus goes back to where it was when it closes.
+   */
+  anchor?: { x: number; y: number } | VirtualAnchor | undefined;
   /** Accessible name of the panel (a non-modal dialog). */
   label: string;
   open?: boolean;
@@ -55,6 +63,7 @@ const FOCUSABLE =
 /** Floating panel in the top layer, anchored to its trigger. Escape, outside clicks and focus return are shared. */
 export function Popover({
   trigger,
+  anchor,
   label,
   open,
   defaultOpen = false,
@@ -70,18 +79,33 @@ export function Popover({
   const [isOpen, setOpen] = useControllableState(open, defaultOpen, onOpenChange);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const panel = useRef<HTMLDivElement>(null);
+  // An `anchor` replaces the trigger as what the panel is placed against.
+  const placed = useRef<HTMLElement | VirtualAnchor | null>(null);
+  placed.current = !anchor
+    ? triggerRef.current
+    : "getBoundingClientRect" in anchor
+      ? anchor
+      : { getBoundingClientRect: () => new DOMRect(anchor.x, anchor.y, 0, 0) };
+  // Without a trigger, focus returns to whatever had it when the panel opened.
+  const before = useRef<HTMLElement | null>(null);
+  const wasOpen = useRef(false);
+  if (isOpen && !wasOpen.current && typeof document !== "undefined")
+    before.current = document.activeElement as HTMLElement | null;
+  wasOpen.current = isOpen;
+  const returnTo = useRef<HTMLElement | null>(null);
+  returnTo.current = trigger ? triggerRef.current : before.current;
 
   // Show before positioning (the panel must be laid out to be measured), then move focus inside.
   usePopover(panel, isOpen, (el) => {
     const first = el.querySelector<HTMLElement>(FOCUSABLE);
     (first ?? el).focus({ preventScroll: true });
   });
-  useAnchoredPosition(triggerRef, panel, isOpen, placement, 6, "start");
+  useAnchoredPosition(anchor ? placed : triggerRef, panel, isOpen, placement, 6, "start");
   useDismiss({
     open: isOpen,
     onClose: () => setOpen(false),
     inside: [triggerRef, panel],
-    returnFocus: triggerRef,
+    returnFocus: returnTo,
   });
 
   const trap = (event: KeyboardEvent<HTMLDivElement>) => {
@@ -102,7 +126,7 @@ export function Popover({
 
   return (
     <>
-      {trigger({
+      {trigger?.({
         ref: triggerRef,
         onClick: () => setOpen(!isOpen),
         "aria-expanded": isOpen,

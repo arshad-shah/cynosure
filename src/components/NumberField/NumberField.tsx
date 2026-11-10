@@ -1,5 +1,7 @@
 import { type CSSProperties, type KeyboardEvent, type ReactNode, useMemo, useRef, useState } from "react";
+import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js";
 import { useControllableState } from "../../foundations/controllable.js";
+import { useDrag } from "../../foundations/drag.js";
 import { HiddenValue } from "../../foundations/HiddenValue/HiddenValue.js";
 import { clamp } from "../../foundations/math.js";
 import { minus } from "../../icons/minus.js";
@@ -45,6 +47,11 @@ export interface NumberFieldProps {
   size?: Size;
   variant?: "outline" | "soft";
   labels?: Partial<NumberFieldLabels>;
+  /**
+   * Drag the label sideways to change the value, as design tools do: one `step` every few pixels, Shift for ten. Escape
+   * mid-drag puts it back. The keys and the steppers still work as before.
+   */
+  scrub?: boolean;
   className?: string;
   /** Layout only. */
   style?: CSSProperties;
@@ -106,6 +113,7 @@ export function NumberField({
   size = "md",
   variant = "outline",
   labels,
+  scrub = false,
   className,
   style,
 }: NumberFieldProps) {
@@ -162,6 +170,36 @@ export function NumberField({
     if (event.key !== "Enter") event.preventDefault();
     move();
   };
+
+  // Scrubbing: the field's own <label> is the handle.
+  const handle = useRef<HTMLElement | null>(null);
+  useClientLayoutEffect(() => {
+    const el =
+      scrub && !disabled && !readOnly
+        ? ((input.current?.labels?.[0] as HTMLElement | undefined) ?? null)
+        : null;
+    if (handle.current && handle.current !== el) delete handle.current.dataset.scrub;
+    if (el) el.dataset.scrub = "";
+    handle.current = el;
+  });
+  const scrubFrom = useRef<number | null>(null);
+  useDrag(handle, {
+    distance: 3,
+    touchAction: "css",
+    onStart: () => {
+      scrubFrom.current = current;
+    },
+    onMove: ({ delta, event }) => {
+      const steps = Math.round(delta.x / 4) * (event.shiftKey ? 10 : 1);
+      const from = scrubFrom.current ?? min ?? 0;
+      const digits = Math.max(places(step), places(min ?? 0));
+      commit(limit(Number((from + steps * step).toFixed(digits))));
+    },
+    onEnd: (_, cancelled) => {
+      if (cancelled) commit(scrubFrom.current);
+      input.current?.focus({ preventScroll: true });
+    },
+  });
 
   const atMin = current !== null && min !== undefined && current <= min;
   const atMax = current !== null && max !== undefined && current >= max;

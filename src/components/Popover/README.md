@@ -22,6 +22,8 @@ A floating panel (non-modal dialog) anchored to its trigger, in the browser top 
 
 Tokens: `--cy-popover-padding`, `--cy-popover-radius`, `--cy-popover-width-{sm,md,lg}`.
 
+- `anchor`: place it at a point (`{ x, y }` in viewport pixels, such as where a canvas was clicked) or beside any element or virtual anchor. `trigger` is then optional; control it with `open`, and focus goes back to where it was when it closes.
+
 ## Used by
 
 Prism (filters, view options), Aperture (inspectors), extension popups.
