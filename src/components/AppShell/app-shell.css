@@ -30,6 +30,22 @@
       "main" minmax(0, 1fr)
       / minmax(0, 1fr);
   }
+  &[data-tabs] {
+    grid-template:
+      "header" auto
+      "main" minmax(0, 1fr)
+      "tabs" auto
+      / minmax(0, 1fr);
+  }
+}
+/* The phone tab bar: under main, clear of the home indicator. */
+.cy-app-shell-tabs.cy-app-shell-tabs {
+  grid-area: tabs;
+  min-inline-size: 0;
+  padding-block-end: env(safe-area-inset-bottom, 0);
+  border-block-start: var(--cy-border-width) solid var(--_line);
+  background: var(--cy-app-shell-header-background, var(--cy-color-surface));
+  font-size: inherit;
 }
 .cy-app-shell-skip.cy-app-shell-skip {
   position: absolute;

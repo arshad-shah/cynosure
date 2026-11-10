@@ -16,8 +16,21 @@ const ITEMS: NavEntry[] = [
   { id: "team", label: "Team", icon: users, items: [{ id: "members", label: "Members" }] },
 ];
 
-function Demo({ width = 900, ...props }: { width?: number } & Parameters<typeof AppShell>[0]) {
+function Demo({
+  width = 900,
+  withTabs = false,
+  ...props
+}: { width?: number; withTabs?: boolean } & Parameters<typeof AppShell>[0]) {
   const [current, setCurrent] = useState("home");
+  const tabs = withTabs ? (
+    <SideNav
+      label="Sections"
+      layout="bar"
+      items={ITEMS}
+      current={current}
+      onNavigate={(id) => setCurrent(id)}
+    />
+  ) : undefined;
   return (
     <div
       className="frame"
@@ -30,6 +43,7 @@ function Demo({ width = 900, ...props }: { width?: number } & Parameters<typeof 
       <AppShell
         header={<strong>Acme</strong>}
         nav={<SideNav label="Main" items={ITEMS} current={current} onNavigate={(id) => setCurrent(id)} />}
+        {...(tabs ? { tabs } : {})}
         {...props}
       >
         <div style={{ padding: 16 }}>
@@ -111,6 +125,45 @@ export const NarrowMovesTheNavigationIntoADrawer: Story = {
     await waitFor(() => expect(dialog.open).toBe(false));
     await expect(canvas.getByRole("heading", { name: "inbox" })).toBeVisible();
     await waitFor(() => expect(open).toHaveFocus());
+  },
+};
+
+export const TabBarOnPhones: Story = {
+  tags: ["visual"],
+  render: (args) => <Demo {...args} width={390} withTabs />,
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const tabs = await canvas.findByRole("navigation", { name: "Sections" }, RESIZE);
+    const main = canvas.getByRole("main");
+    // The bar runs along the bottom of the shell, under the content, one row of items.
+    await expect(box(tabs).top).toBeGreaterThanOrEqual(box(main).bottom - 1);
+    await expect(box(tabs).bottom).toBeCloseTo(box(frame(canvasElement)).bottom - 1, 0);
+    const links = within(tabs).getAllByRole("button");
+    await expect(links).toHaveLength(3);
+    const tops = new Set(links.map((l) => Math.round(box(l).top)));
+    await expect(tops.size).toBe(1);
+    for (const l of links) await expect(box(l).height).toBeGreaterThanOrEqual(24);
+    // The current section is marked; choosing another goes there.
+    await expect(within(tabs).getByRole("button", { name: "Home" })).toHaveAttribute("aria-current", "page");
+    await userEvent.click(within(tabs).getByRole("button", { name: "Inbox" }));
+    await expect(canvas.getByRole("heading")).toHaveTextContent("inbox");
+    await expect(within(tabs).getByRole("button", { name: "Inbox" })).toHaveAttribute("aria-current", "page");
+    // A group is one item in a bar: it navigates to itself rather than opening.
+    const team = within(tabs).getByRole("button", { name: "Team" });
+    await expect(team).not.toHaveAttribute("aria-expanded");
+    await userEvent.click(team);
+    await expect(canvas.getByRole("heading")).toHaveTextContent("team");
+    // The drawer is still there for the full navigation.
+    await expect(canvas.getByRole("button", { name: "Open navigation" })).toBeVisible();
+  },
+};
+
+export const TabBarOnlyWhenNarrow: Story = {
+  render: (args) => <Demo {...args} withTabs />,
+  play: async ({ canvas, canvasElement }) => {
+    await expect(canvas.getByRole("navigation", { name: "Main" })).toBeVisible();
+    await expect(canvas.queryByRole("navigation", { name: "Sections" })).toBeNull();
+    frame(canvasElement).style.inlineSize = "390px";
+    await canvas.findByRole("navigation", { name: "Sections" }, RESIZE);
   },
 };
 

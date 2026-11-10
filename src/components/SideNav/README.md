@@ -35,6 +35,7 @@ import { SideNav } from "@arshad-shah/cynosure";
 | `renderLink`      | plain link | Render links with your router; spread the props it receives                                                 |
 | `collapsed`       | `false`    | Icon rail: labels in tooltips (still the accessible names); groups call `onCollapsedChange(false)`          |
 | `defaultExpanded` | `[]`       | Group ids open at first                                                                                     |
+| `layout`          | `column`   | `bar`: one row of top-level items, icon over label, for AppShell's phone `tabs`                             |
 | `size`            | `md`       | `sm` · `md` · `lg`                                                                                          |
 - A `<nav>` landmark; each section is a list named by its heading. Items without `href` are buttons.
 - Keyboard: Tab moves between items, Enter follows a link or toggles a group (Space too for buttons).

@@ -188,6 +188,50 @@
     display: none;
   }
 }
+/* The bar: one row of equal items, icon over a small label; the current item is drawn in the accent, without a fill. */
+.cy-side-nav.cy-side-nav[data-layout="bar"] {
+  inline-size: 100%;
+  padding: var(--cy-space-1) var(--cy-space-2);
+  & .cy-side-nav-list {
+    flex-direction: row;
+    gap: 0;
+  }
+  & .cy-side-nav-item {
+    flex: 1 1 0;
+    min-inline-size: 0;
+  }
+  & .cy-side-nav-link {
+    flex-direction: column;
+    justify-content: center;
+    gap: var(--cy-space-1);
+    min-block-size: max(calc(var(--_h) + var(--cy-space-6)), var(--_hit));
+    padding: var(--cy-space-2) var(--cy-space-1);
+    color: var(--cy-color-muted);
+    text-align: center;
+    &[aria-current="page"] {
+      background: transparent;
+      color: var(--cy-color-accent-text);
+      &::before {
+        inset-block: 0 auto;
+        inset-inline: 30%;
+        inline-size: auto;
+        block-size: calc(3 * var(--cy-border-width));
+      }
+    }
+  }
+  & .cy-side-nav-label {
+    flex: none;
+    max-inline-size: 100%;
+    font-size: var(--cy-font-size-xs);
+  }
+  & .cy-side-nav-badge {
+    position: absolute;
+    inset-block-start: var(--cy-space-1);
+    inset-inline-start: calc(50% + var(--_icon) / 4);
+    scale: 0.8;
+    line-height: 1;
+  }
+}
 @media (pointer: coarse) {
   .cy-side-nav.cy-side-nav {
     --_hit: var(--cy-hit-coarse, 44px);

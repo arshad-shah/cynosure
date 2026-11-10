@@ -34,6 +34,11 @@ export interface AppShellProps {
   header?: ReactNode;
   /** The navigation, usually a `SideNav`. Beside the content when wide; in a drawer when narrow. */
   nav?: ReactNode;
+  /**
+   * A bottom tab bar on narrow screens, usually `<SideNav layout="bar">` with the app's three to five main sections.
+   * Hidden when wide, where `nav` shows instead.
+   */
+  tabs?: ReactNode;
   /** The page content, rendered in `<main>`. */
   children?: ReactNode;
   /**
@@ -60,6 +65,7 @@ const DEFAULT_LABELS: AppShellLabels = {
 export function AppShell({
   header,
   nav,
+  tabs,
   children,
   collapseBelow = 768,
   labels,
@@ -96,6 +102,7 @@ export function AppShell({
       className={className ? `cy-app-shell ${className}` : "cy-app-shell"}
       data-narrow={narrow ? "" : undefined}
       data-nav={nav ? "" : undefined}
+      data-tabs={tabs && narrow ? "" : undefined}
       style={style}
     >
       <LinkBase
@@ -129,6 +136,7 @@ export function AppShell({
       <main ref={main} id={`${id}-main`} tabIndex={-1} className="cy-app-shell-main cy-reset">
         {children}
       </main>
+      {tabs && narrow && <div className="cy-app-shell-tabs cy-reset">{tabs}</div>}
       {nav && narrow && (
         <Sheet open={drawer} onOpenChange={setDrawer} side="start" size="sm" title={text.nav}>
           {/* biome-ignore lint/a11y/noStaticElementInteractions: delegated click from the links and buttons inside */}

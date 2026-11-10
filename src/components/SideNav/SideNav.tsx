@@ -78,6 +78,12 @@ export interface SideNavProps {
   onCollapsedChange?: (collapsed: boolean) => void;
   /** Group ids expanded at first (groups holding `current` always are). */
   defaultExpanded?: string[];
+  /**
+   * `column` (default): the vertical navigation. `bar`: one row of top-level items, icon over label, for a phone's
+   * bottom tab bar (AppShell's `tabs`). Section headings are left out, and a group is one item that calls `onNavigate`
+   * with its id (a bar has no room to open it). Give a bar three to five items, each with an icon.
+   */
+  layout?: "column" | "bar";
   size?: Size;
   className?: string;
   /** Layout only. Restyle through --cy-side-nav-* tokens. */
@@ -109,11 +115,13 @@ export function SideNav({
   collapsed = false,
   onCollapsedChange,
   defaultExpanded = [],
+  layout = "column",
   size = "md",
   className,
   style,
 }: SideNavProps) {
   const id = useId();
+  const bar = layout === "bar";
   const all = items.flatMap((entry) => (isSection(entry) ? entry.items : [entry]));
   const [expanded, setExpanded] = useState(
     () => new Set([...defaultExpanded, ...(ancestors(all, current) ?? [])]),
@@ -139,13 +147,13 @@ export function SideNav({
       {item.icon && <Icon icon={item.icon} className="cy-side-nav-icon" />}
       <span className="cy-side-nav-label cy-reset">{item.label}</span>
       {item.badge != null && <span className="cy-side-nav-badge cy-reset">{item.badge}</span>}
-      {group && <Icon icon={chevronDown} className="cy-side-nav-chevron" />}
+      {group && !bar && <Icon icon={chevronDown} className="cy-side-nav-chevron" />}
     </>
   );
 
   const control = (item: NavItem): ReactElement<Record<string, unknown>> => {
     const isCurrent = item.id === current;
-    if (item.items) {
+    if (item.items && !bar) {
       const open = expanded.has(item.id);
       return (
         <ButtonBase
@@ -209,7 +217,7 @@ export function SideNav({
     >
       {entries.map((item) => (
         <li key={item.id} className="cy-side-nav-item cy-reset">
-          {collapsed ? (
+          {collapsed && !bar ? (
             <Tooltip content={item.label} placement="end">
               {control(item)}
             </Tooltip>
@@ -218,6 +226,7 @@ export function SideNav({
           )}
           {item.items &&
             !collapsed &&
+            !bar &&
             list(item.items, depth + 1, `${id}-${item.id}`, !expanded.has(item.id))}
         </li>
       ))}
@@ -226,19 +235,22 @@ export function SideNav({
 
   // Consecutive plain items share one list; each section gets its own heading and list.
   const blocks: ({ section: NavSection } | { items: NavItem[] })[] = [];
-  for (const entry of items) {
-    const last = blocks[blocks.length - 1];
-    if (isSection(entry)) blocks.push({ section: entry });
-    else if (last && "items" in last) last.items.push(entry);
-    else blocks.push({ items: [entry] });
-  }
+  if (bar) blocks.push({ items: all });
+  else
+    for (const entry of items) {
+      const last = blocks[blocks.length - 1];
+      if (isSection(entry)) blocks.push({ section: entry });
+      else if (last && "items" in last) last.items.push(entry);
+      else blocks.push({ items: [entry] });
+    }
 
   return (
     <nav
       className={className ? `cy-side-nav ${className}` : "cy-side-nav"}
       aria-label={label}
       data-size={size}
-      data-collapsed={collapsed ? "" : undefined}
+      data-collapsed={collapsed && !bar ? "" : undefined}
+      data-layout={layout}
       style={style}
     >
       {blocks.map((block, i) =>

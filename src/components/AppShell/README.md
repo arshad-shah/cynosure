@@ -15,12 +15,14 @@ import { AppShell, SideNav } from "@arshad-shah/cynosure";
 | `header`              | –       | Top bar content (brand, search, account)                                                          |
 | `nav`                 | –       | The navigation, usually a `SideNav`                                                               |
 | `children`            | –       | The page, rendered in `<main>`                                                                    |
+| `tabs`                | –       | A bottom tab bar when narrow: `<SideNav layout="bar">` with the main sections                     |
 | `collapseBelow`       | `768`   | Shell width (px) below which the navigation moves into a drawer                                   |
 | `labels`              | –       | `openNav` ("Open navigation"), `nav` ("Navigation", the drawer title), `skip` ("Skip to content") |
 | `className` / `style` | –       | Layout only                                                                                       |
 - Fills its container's height; the content and the navigation scroll on their own while the bar stays.
 - Responds to its own width, not the window's, so it works in side panels and embedded views.
 - In the drawer, choosing a link or item closes it (group toggles do not) and focus returns to the menu button.
+- With `tabs`, a narrow shell also gets a tab bar along the bottom (clear of the home indicator); the drawer still holds the full navigation.
 - The skip link appears on the first Tab and moves focus to `<main>` without changing the URL.
 
 ## Tokens

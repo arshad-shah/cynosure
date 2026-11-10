@@ -39,6 +39,19 @@ Below `collapseBelow` (768px of the shell's own width) the navigation leaves the
 
 <Canvas of={Stories.NarrowMovesTheNavigationIntoADrawer} />
 
+### A tab bar on phones
+
+`tabs` adds a bottom tab bar while the shell is narrow, for an app's three to five main sections. Pass a [SideNav](?path=/docs/components-sidenav--docs) with `layout="bar"` and the same `current`; the drawer still holds the full navigation. The bar keeps clear of the phone's home indicator.
+
+```tsx
+<AppShell
+  nav={<SideNav label="Main" items={items} current={page} onNavigate={go} />}
+  tabs={<SideNav label="Sections" layout="bar" items={sections} current={page} onNavigate={go} />}
+>
+```
+
+<Canvas of={Stories.TabBarOnPhones} />
+
 ## Props
 
 <ArgTypes of={Stories} />
