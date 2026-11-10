@@ -208,11 +208,13 @@ export const PanZoomCanvas = forwardRef<PanZoomCanvasHandle, PanZoomCanvasProps>
 
   // The minimap: `bounds` scaled to its width, with the view drawn on it. Dragging it (or pressing) moves the view.
   const map = useRef<HTMLDivElement>(null);
-  const mapWidth = useRef(160);
+  // Measured into state (not a ref), so the view box is redrawn once the minimap's real width is known.
+  const [mapWidth, setMapWidth] = useState(160);
   useClientLayoutEffect(() => {
-    if (map.current) mapWidth.current = map.current.clientWidth;
+    const w = map.current?.clientWidth;
+    if (w && w !== mapWidth) setMapWidth(w);
   });
-  const k = bounds ? mapWidth.current / bounds.width : 1;
+  const k = bounds ? mapWidth / bounds.width : 1;
   const seen = {
     x: (-current.x / current.scale - (bounds?.x ?? 0)) * k,
     y: (-current.y / current.scale - (bounds?.y ?? 0)) * k,
