@@ -385,6 +385,33 @@ export const DragToReorder: Story = {
   },
 };
 
+export const RightToLeftReorderAndBackspace: Story = {
+  render: () => (
+    <div dir="rtl">
+      <OpenFiles />
+    </div>
+  ),
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    await userEvent.tab();
+    // In right-to-left text, Left moves a tab toward the end.
+    await userEvent.keyboard("{Control>}{Shift>}{ArrowLeft}{/Shift}{/Control}");
+    await expect(orderOf(canvasElement)).toBe("b.ts,a.ts,c.ts");
+    // With nothing but Ctrl (or only Shift), arrows only move focus.
+    await userEvent.keyboard("{Shift>}{ArrowLeft}{/Shift}");
+    await expect(orderOf(canvasElement)).toBe("b.ts,a.ts,c.ts");
+    await userEvent.keyboard("{Control>}{Shift>}{Home}{/Shift}{/Control}");
+    await expect(orderOf(canvasElement)).toBe("b.ts,a.ts,c.ts");
+    // Backspace closes too, like Delete.
+    canvas.getByRole("tab", { name: "a.ts" }).focus();
+    await userEvent.keyboard("{Backspace}");
+    await expect(orderOf(canvasElement)).toBe("b.ts,c.ts");
+    await waitFor(() => expect(canvas.getByRole("tab", { name: "c.ts" })).toHaveFocus());
+    // Other keys on a closable tab do nothing to it.
+    await userEvent.keyboard("x");
+    await expect(orderOf(canvasElement)).toBe("b.ts,c.ts");
+  },
+};
+
 export const CloseLabelsOverride: Story = {
   render: () => (
     <Tabs defaultValue="x" labels={{ close: (n) => `Fermer ${n}` }}>

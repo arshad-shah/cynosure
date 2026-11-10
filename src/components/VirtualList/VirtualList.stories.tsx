@@ -447,13 +447,13 @@ export const WrappedRowsTakeTheirHeight: Story = {
     el.scrollTop = 0;
     await waitFor(() => expect(rowAt(canvasElement, 3)).not.toBeNull());
     // A long line wraps and is taller than a short one, and the next row starts right below it.
-    const tall = rowAt(canvasElement, 3) as HTMLElement;
-    const short = rowAt(canvasElement, 2) as HTMLElement;
-    await waitFor(() => expect(tall.offsetHeight).toBeGreaterThan(short.offsetHeight * 2));
+    // Rows are looked up each time: they are placed again as their heights settle.
+    const h = (i: number) => rowAt(canvasElement, i)?.offsetHeight ?? 0;
+    await waitFor(() => expect(h(3)).toBeGreaterThan(h(2) * 2));
     await waitFor(() =>
-      expect((rowAt(canvasElement, 4) as HTMLElement).offsetTop).toBe(tall.offsetTop + tall.offsetHeight),
+      expect(rowAt(canvasElement, 4)?.offsetTop).toBe((rowAt(canvasElement, 3)?.offsetTop ?? 0) + h(3)),
     );
-    await expect(el.scrollHeight).toBeGreaterThan(60 * short.offsetHeight);
+    await expect(el.scrollHeight).toBeGreaterThan(60 * h(2));
   },
 };
 
@@ -478,6 +478,45 @@ export const FollowsNewRowsAtTheEnd: Story = {
     // The handle jumps to the latest.
     await userEvent.click(canvas.getByRole("button", { name: "Latest" }));
     await waitFor(() => expect(atEnd()).toBe(true));
+  },
+};
+
+export const DragWrappedRows: Story = {
+  render: () => {
+    const [items, setItems] = useState(
+      FEW.map((e, i) => (i === 1 ? { ...e, name: `${e.name} ${"wraps ".repeat(30)}`.trim() } : e)),
+    );
+    return (
+      <div style={{ inlineSize: 240 }}>
+        <VirtualList
+          {...(base as VirtualListProps<Entry>)}
+          items={items}
+          isDisabled={() => false}
+          wrap
+          onMove={(keys, to) => setItems((all) => moveItems(all, keys, to, (e) => e.id))}
+        />
+        <span data-testid="wrapped-order" hidden>
+          {items.map((e) => e.id).join(",")}
+        </span>
+      </div>
+    );
+  },
+  play: async ({ canvasElement }) => {
+    const order = () =>
+      (canvasElement.querySelector('[data-testid="wrapped-order"]') as HTMLElement).textContent;
+    // Rows of different heights: the drop lands in the gap the pointer is nearest, measured row by row.
+    await waitFor(() =>
+      expect(rowAt(canvasElement, 1)?.offsetHeight ?? 0).toBeGreaterThan(
+        rowAt(canvasElement, 0)?.offsetHeight ?? 0,
+      ),
+    );
+    await waitFor(() =>
+      expect(rowAt(canvasElement, 2)?.offsetTop).toBe(
+        (rowAt(canvasElement, 1)?.offsetTop ?? 0) + (rowAt(canvasElement, 1)?.offsetHeight ?? 0),
+      ),
+    );
+    dragRows(canvasElement, "Alpha", "Delta");
+    await waitFor(() => expect(order()).toBe("b,c,a,d,e"));
   },
 };
 
