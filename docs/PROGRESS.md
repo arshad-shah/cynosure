@@ -2,7 +2,7 @@
 
 ## Status
 
-Plans 1, 2 and 3 complete on `next` (Milestones 1 and 2). Plan 4 is not written yet. Storybook live at https://arshad-shah.github.io/cynosure/ (deploys on every push to `next`). Not published to npm.
+Plans 1, 2 and 3 complete on `next` (Milestones 1 and 2). Plan 4 (Milestone 3 and product migration) is written and next to build. Storybook live at https://arshad-shah.github.io/cynosure/ (deploys on every push to `next`). Not published to npm.
 
 Done in Plan 3:
 
@@ -43,14 +43,17 @@ After Plan 3 (fixes from Arshad's checks of the published Storybook, 2026-11-10)
 
 ## Current task
 
-None in progress. Plan 3 and the follow-up fixes are on `next`. Waiting for Arshad's go-ahead to write Plan 4.
+Plan 4 Task 1: toasts inside modal dialogs (the open Plan 3 question). Not started.
 
 ## Next step
 
-1. **Check CI on `next`** (the latest push is a `[baselines]` commit: the TextArea grip change moves pixels in its visual stories, so the "Update visual baselines" workflow regenerates them and pushes `test(visual): update Chromium baselines`). The CI run after that bot commit must be green on all three engines, including visual regression.
-2. **Decide the open design question** (toasts under a modal Dialog, see "Plan 3 final review") at the start of Plan 4.
-3. **Write Plan 4** (Milestone 3 and the product migration issues) in `docs/superpowers/plans/`, following the spec §8. The migration issues (one per product repo, see `docs/migration.md`) open only once Plan 4 is agreed with Arshad.
-4. **WebKit:** confirm on CI that the overlay stories pass with the keyframe entrances (`shownFully` checks). If a WebKit-only failure comes back, debug it on a machine with WebKit; it cannot be downloaded in the cloud container.
+Build Plan 4 (`docs/superpowers/plans/2026-11-10-cynosure-evidence.md`) task by task, stories first:
+
+1. **Task 1:** toasts inside modal dialogs: a toast host inside each open Dialog; `useToast()` prefers the nearest open modal host; live toasts move to the page Toaster when the dialog closes.
+2. **Tasks 2–7:** ProgressBar, Slider (single and range), Combobox, Tree, CommandPalette, ColorField. The product evidence for each is in the plan.
+3. **Task 8:** carry-overs: confirm the keyframe entrances on WebKit in CI, check Prism for Tree, add Slider and Combobox to the React 18 smoke tests.
+4. **Task 9:** draft one migration issue per product repo in `docs/migration/issues/`. Open them only after Arshad reviews the drafts.
+5. **Task 10:** docs, independent review, `pnpm verify`, CI green, push.
 
 ## Plan 3 final review
 
@@ -73,7 +76,7 @@ An independent review of the Plan 3 Tasks 8–12 code found nine issues. Fixed (
 - [x] Plan 1: Foundation (`docs/superpowers/plans/2026-11-09-cynosure-foundation.md`)
 - [x] Plan 2: Milestone 1 controls (`docs/superpowers/plans/2026-11-09-cynosure-controls.md`)
 - [x] Plan 3: Milestone 2 structure and overlays (`docs/superpowers/plans/2026-11-09-cynosure-structure.md`). Tasks 1–13 and the final review done.
-- [ ] Plan 4: Milestone 3 and product migration issues (not written)
+- [ ] Plan 4: Milestone 3 and product migration issues (`docs/superpowers/plans/2026-11-10-cynosure-evidence.md`). Written; Task 1 next.
 
 ## Plan 3 rulings so far
 
