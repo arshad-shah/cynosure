@@ -22,6 +22,11 @@ export interface CardProps {
   /** Makes the whole card a button. */
   onClick?: MouseEventHandler<HTMLElement>;
   disabled?: boolean;
+  /**
+   * Buttons that sit on the card but act on their own (a game card's 2-player mode, a file card's menu). They are placed
+   * over the card's top end, outside its one link or button, so nothing interactive is nested.
+   */
+  actions?: ReactNode;
   className?: string;
   /** Layout only. */
   style?: CSSProperties;
@@ -30,8 +35,10 @@ export interface CardProps {
   "data-testid"?: string;
 }
 
+const withoutStyle = <T extends { style?: CSSProperties }>({ style: _, ...props }: T) => props;
+
 /** Content container. With `href` or `onClick` the whole card is one link or button (no nested controls). */
-export const Card = forwardRef<HTMLElement, CardProps>(function Card(
+export const Card = forwardRef<HTMLElement, CardProps>(function CardRender(
   {
     variant = "surface",
     padding = "md",
@@ -41,12 +48,36 @@ export const Card = forwardRef<HTMLElement, CardProps>(function Card(
     target,
     onClick,
     disabled,
+    actions,
     className,
     children,
     ...rest
   },
   ref,
 ) {
+  if (actions !== undefined && (href !== undefined || onClick)) {
+    // The card itself stays one target; the actions are its siblings in a shared frame.
+    return (
+      // Layout (`style`) goes on the frame; the card fills it.
+      <div className="cy-card-frame cy-reset" style={rest.style}>
+        <Card
+          ref={ref}
+          {...withoutStyle(rest)}
+          variant={variant}
+          padding={padding}
+          tone={tone}
+          {...(href !== undefined ? { href } : {})}
+          {...(target !== undefined ? { target } : {})}
+          {...(onClick ? { onClick } : {})}
+          {...(disabled !== undefined ? { disabled } : {})}
+          {...(className ? { className } : {})}
+        >
+          {children}
+        </Card>
+        <div className="cy-card-actions cy-reset">{actions}</div>
+      </div>
+    );
+  }
   const common = {
     ...rest,
     className: className ? `cy-card ${className}` : "cy-card",
@@ -77,6 +108,8 @@ export const Card = forwardRef<HTMLElement, CardProps>(function Card(
   return (
     <Tag ref={ref} {...common}>
       {children}
+      {actions !== undefined && <div className="cy-card-actions cy-reset">{actions}</div>}
     </Tag>
   );
 });
+Card.displayName = "Card";

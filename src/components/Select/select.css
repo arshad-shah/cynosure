@@ -193,3 +193,14 @@
     --_hit: var(--cy-hit-coarse, 44px);
   }
 }
+
+/* A group heading inside the list: small, muted, not an option (arrow keys pass over it). */
+.cy-select-group.cy-select-group {
+  padding: var(--cy-space-3) var(--cy-space-4) var(--cy-space-1);
+  color: var(--cy-color-muted);
+  font-family: var(--cy-font-mono);
+  font-size: var(--cy-font-eyebrow-size);
+  font-weight: var(--cy-font-weight-bold);
+  letter-spacing: var(--cy-font-eyebrow-tracking);
+  text-transform: uppercase;
+}

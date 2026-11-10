@@ -28,6 +28,10 @@ Every variant × tone pair is distinct and keeps text at ≥ 4.5:1 (tested). Sof
 
 **Accessibility and touch:** hit area ≥ 24px always and ≥ 44px on coarse pointers; Enter and Space activate; visible focus ring (also in forced-colors mode); long labels truncate with an ellipsis.
 
+- `href` (with `target`): a real link styled as a button; only safe URLs are linked.
+- `confirm`: ask before acting, in place. The first press shows this text ("Press again to delete"); a second press within 4 seconds acts; Escape, leaving or the timeout disarms it.
+- `keepFocus`: a pointer press leaves focus where it was, for on-screen keypads beside a field.
+
 ## Used by
 
 Every product (all action buttons).

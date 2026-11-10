@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, fn, waitFor } from "storybook/test";
 import { computeUnderHostileHost } from "../../test/hostile.js";
+import { Button } from "../Button/Button.js";
 import { Card } from "./Card.js";
 
 /** Any CSS colour as painted sRGB plus alpha, so "oklab(… / 0.5)" mid-transition never equals the settled colour. */
@@ -136,6 +137,31 @@ export const DisabledButtonCardDoesNothing: Story = {
     canvas.getByRole("button").click();
     await userEvent.keyboard("{Enter}");
     await expect(args.onClick).not.toHaveBeenCalled();
+  },
+};
+
+export const ActionsBesideTheTarget: Story = {
+  render: () => (
+    <Card onClick={fn()} actions={<Button size="sm">2 players</Button>} style={{ inlineSize: 280 }}>
+      <strong>Snake</strong>
+      <p>Eat, grow, don't bite yourself.</p>
+    </Card>
+  ),
+  play: async ({ canvas, userEvent }) => {
+    const card = canvas.getByRole("button", { name: /^Snake/ });
+    const two = canvas.getByRole("button", { name: "2 players" });
+    // Two separate controls: the action is not inside the card's button.
+    await expect(card.contains(two)).toBe(false);
+    await userEvent.tab();
+    await expect(card).toHaveFocus();
+    await userEvent.tab();
+    await expect(two).toHaveFocus();
+    // It sits over the card's top end.
+    const c = card.getBoundingClientRect();
+    const t = two.getBoundingClientRect();
+    await expect(t.top).toBeGreaterThanOrEqual(c.top);
+    await expect(t.right).toBeLessThanOrEqual(c.right);
+    await expect(t.right).toBeGreaterThan(c.right - 80);
   },
 };
 

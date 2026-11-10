@@ -20,7 +20,12 @@ declare module "../../tokens/schema.js" {
 export interface CodeBlockLabels extends CopyButtonLabels {
   /** Name of the scrollable code region when there is no `title` or `language`. Default: "Code". */
   region: string;
+  /** Read after the code when lines are marked. Default: "Line 3 highlighted" / "Lines 3, 4 highlighted". */
+  active: (lines: readonly number[]) => string;
 }
+
+const defaultActive = (lines: readonly number[]) =>
+  `${lines.length === 1 ? "Line" : "Lines"} ${lines.join(", ")} highlighted`;
 
 export interface CodeBlockProps {
   code: string;
@@ -34,6 +39,8 @@ export interface CodeBlockProps {
    */
   highlight?: ((code: string, language?: string) => ReactNode) | undefined;
   lineNumbers?: boolean;
+  /** Lines to mark (1-based), such as the line a debugger is on. Marked behind the text and read out. */
+  activeLines?: readonly number[] | undefined;
   /** Wrap long lines instead of scrolling sideways (line numbers are then left out, as they would not line up). */
   wrap?: boolean;
   /** Show the copy button. Default true. */
@@ -57,6 +64,7 @@ export function CodeBlock({
   title,
   highlight,
   lineNumbers = false,
+  activeLines,
   wrap = false,
   copyable = true,
   copy,
@@ -72,6 +80,7 @@ export function CodeBlock({
   const name = typeof title === "string" ? title : (language ?? labels?.region ?? "Code");
   const heading = title ?? language;
   const numbered = lineNumbers && !wrap;
+  const marked = !wrap && activeLines?.length ? activeLines.filter((n) => n >= 1 && n <= lines.length) : [];
   const body = (
     <code className="cy-code-block-code cy-reset" data-language={language}>
       {highlight ? highlight(shown, language) : shown}
@@ -107,7 +116,7 @@ export function CodeBlock({
         {numbered && (
           <span className="cy-code-block-gutter cy-reset" aria-hidden="true">
             {lines.map((_, i) => (
-              <span key={i} className="cy-reset">
+              <span key={i} className="cy-reset" data-active={marked.includes(i + 1) ? "" : undefined}>
                 {i + 1}
               </span>
             ))}
@@ -119,10 +128,21 @@ export function CodeBlock({
           // A scrolling region must be reachable by keyboard: it is focusable and named.
           // biome-ignore lint/a11y/noNoninteractiveTabindex lint/a11y/useSemanticElements: the scrolling pre itself is the focusable, named region
           <pre className="cy-code-block-pre cy-reset" tabIndex={0} role="region" aria-label={name}>
+            {marked.map((n) => (
+              <span
+                key={n}
+                className="cy-code-block-mark cy-reset"
+                style={{ "--_line": n - 1 } as CSSProperties}
+                aria-hidden="true"
+              />
+            ))}
             {body}
           </pre>
         )}
       </div>
+      {marked.length > 0 && (
+        <span className="cy-visually-hidden">{(labels?.active ?? defaultActive)(marked)}</span>
+      )}
     </figure>
   );
 }

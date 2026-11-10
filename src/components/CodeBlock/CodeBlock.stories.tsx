@@ -193,6 +193,29 @@ export const ReadableInLightAndDark: Story = {
   },
 };
 
+export const MarkedLines: Story = {
+  args: {
+    code: "let i = 0;\nwhile (i < 3) {\n  i++;\n}",
+    language: "ts",
+    lineNumbers: true,
+    activeLines: [3],
+  },
+  play: async ({ canvasElement }) => {
+    const mark = canvasElement.querySelector(".cy-code-block-mark") as HTMLElement;
+    const pre = canvasElement.querySelector(".cy-code-block-pre") as HTMLElement;
+    // The band covers the third line: two line heights below the top padding, one line tall.
+    const line = Number.parseFloat(getComputedStyle(pre).lineHeight);
+    const pad = Number.parseFloat(getComputedStyle(pre).paddingTop);
+    await expect(mark.getBoundingClientRect().top - pre.getBoundingClientRect().top).toBeCloseTo(
+      pad + 2 * line,
+      0,
+    );
+    await expect(mark.getBoundingClientRect().height).toBeCloseTo(line, 0);
+    await expect(canvasElement.querySelector("[data-active]")).toHaveTextContent("3");
+    await expect(canvasElement.querySelector(".cy-visually-hidden")).toHaveTextContent("Line 3 highlighted");
+  },
+};
+
 export const StableUnderHostileHost: Story = {
   args: { lineNumbers: true },
   play: async ({ canvasElement }) => {

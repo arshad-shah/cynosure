@@ -9,6 +9,7 @@ import { backdrop, contrast } from "../../test/color.js";
 import { computeUnderHostileHost } from "../../test/hostile.js";
 import { CynosureTheme } from "../../theme/index.js";
 import { createTheme } from "../../tokens/index.js";
+import { TextField } from "../TextField/TextField.js";
 import { Button } from "./Button.js";
 
 const iconMapping: Record<string, unknown> = { none: undefined };
@@ -264,6 +265,80 @@ const STABLE = [
   "line-height",
   "box-sizing",
 ];
+
+export const ALinkThatLooksLikeAButton: Story = {
+  render: () => (
+    <div style={{ display: "flex", gap: 8 }}>
+      <Button href="/docs" variant="solid" tone="accent">
+        Read the docs
+      </Button>
+      <Button href="https://example.com" target="_blank">
+        Example
+      </Button>
+      {/* biome-ignore lint/security/noScriptUrl: the story checks that an unsafe URL is not linked */}
+      <Button href="javascript:alert(1)">Unsafe</Button>
+    </div>
+  ),
+  play: async ({ canvas }) => {
+    const docs = canvas.getByRole("link", { name: "Read the docs" });
+    await expect(docs).toHaveAttribute("href", "/docs");
+    await expect(docs).toHaveAttribute("data-variant", "solid");
+    await expect(canvas.getByRole("link", { name: "Example" })).toHaveAttribute("rel", "noopener noreferrer");
+    // Only safe URLs are linked.
+    await expect(canvas.getByText("Unsafe").closest("a")).not.toHaveAttribute("href");
+  },
+};
+
+export const ConfirmInPlace: Story = {
+  args: { children: "Delete", confirm: "Press again to delete", tone: "danger", onClick: fn() },
+  play: async ({ args, canvas, userEvent }) => {
+    const button = canvas.getByRole("button", { name: "Delete" });
+    await userEvent.click(button);
+    await expect(args.onClick).not.toHaveBeenCalled();
+    await expect(button).toHaveAccessibleName("Press again to delete");
+    await userEvent.click(button);
+    await expect(args.onClick).toHaveBeenCalledTimes(1);
+    await expect(button).toHaveAccessibleName("Delete");
+    // Escape disarms it, and so does leaving it.
+    await userEvent.click(button);
+    await userEvent.keyboard("{Escape}");
+    await expect(button).toHaveAccessibleName("Delete");
+    await userEvent.click(button);
+    await userEvent.tab();
+    await expect(button).toHaveAccessibleName("Delete");
+    await expect(args.onClick).toHaveBeenCalledTimes(1);
+  },
+};
+
+export const KeepFocusForKeypads: Story = {
+  render: () => {
+    function Keypad() {
+      const [text, setText] = useState("");
+      return (
+        <div style={{ display: "grid", gap: 8, inlineSize: 240 }}>
+          <TextField label="Answer" value={text} onChange={setText} />
+          <div style={{ display: "flex", gap: 4 }}>
+            {["7", "8", "9"].map((k) => (
+              <Button key={k} keepFocus onClick={() => setText((t) => t + k)}>
+                {k}
+              </Button>
+            ))}
+          </div>
+        </div>
+      );
+    }
+    return <Keypad />;
+  },
+  play: async ({ canvas, userEvent }) => {
+    const field = canvas.getByRole("textbox", { name: "Answer" });
+    await userEvent.click(field);
+    await userEvent.click(canvas.getByRole("button", { name: "8" }));
+    await userEvent.click(canvas.getByRole("button", { name: "9" }));
+    // The keys type into the field and the field keeps focus.
+    await expect(field).toHaveValue("89");
+    await expect(field).toHaveFocus();
+  },
+};
 
 export const StableUnderHostileHost: Story = {
   args: { variant: "solid", tone: "accent", icon: download },

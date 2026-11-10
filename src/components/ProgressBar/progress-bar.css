@@ -114,3 +114,48 @@
     background: Highlight;
   }
 }
+
+/* Segments: parts placed end to end from an offset (timing and waterfall bars). A hairline of track shows between them. */
+.cy-progress-bar-segment.cy-progress-bar-segment {
+  --_seg: var(--_tone);
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: var(--_from);
+  inline-size: calc(var(--_to) - var(--_from));
+  box-shadow: inset calc(-1 * var(--cy-border-width)) 0 0 var(--cy-color-surface);
+  background: var(--_seg);
+  &[data-tone="accent"] {
+    --_seg: var(--cy-color-accent-text);
+  }
+  &[data-tone="success"] {
+    --_seg: var(--cy-color-success-text);
+  }
+  &[data-tone="warning"] {
+    --_seg: var(--cy-color-warning-text);
+  }
+  &[data-tone="danger"] {
+    --_seg: var(--cy-color-danger-text);
+  }
+  &[data-tone="info"] {
+    --_seg: var(--cy-color-info-text);
+  }
+  &[data-tone="neutral"] {
+    --_seg: var(--cy-color-ink);
+  }
+}
+.cy-progress-bar-marker.cy-progress-bar-marker {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: var(--_at);
+  inline-size: calc(var(--cy-border-width) * 2);
+  margin-inline-start: calc(var(--cy-border-width) * -1);
+  background: var(--cy-color-ink);
+}
+@media (forced-colors: active) {
+  .cy-progress-bar-segment.cy-progress-bar-segment {
+    background: Highlight;
+  }
+  .cy-progress-bar-marker.cy-progress-bar-marker {
+    background: CanvasText;
+  }
+}

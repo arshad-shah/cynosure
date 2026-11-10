@@ -1,5 +1,6 @@
 import {
   type CSSProperties,
+  Fragment,
   type KeyboardEvent,
   type ReactNode,
   useCallback,
@@ -42,6 +43,8 @@ export interface SelectOption {
   description?: string;
   icon?: IconData;
   disabled?: boolean;
+  /** Options next to each other with the same `group` are listed under that heading. */
+  group?: string;
 }
 
 export interface SelectProps {
@@ -69,6 +72,21 @@ export interface SelectProps {
 const PAGE = 10;
 
 /** Select-only combobox (WAI-ARIA APG): listbox in the top layer, typeahead, forms via HiddenValue. */
+/** Consecutive options that share a group, in order (ungrouped runs have no group). */
+function groupsOf(options: SelectOption[]) {
+  const runs: {
+    group: string | undefined;
+    start: number;
+    items: { option: SelectOption; index: number }[];
+  }[] = [];
+  options.forEach((option, index) => {
+    const last = runs[runs.length - 1];
+    if (last && last.group === option.group) last.items.push({ option, index });
+    else runs.push({ group: option.group, start: index, items: [{ option, index }] });
+  });
+  return runs;
+}
+
 export function Select({
   label,
   labelHidden,
@@ -233,35 +251,48 @@ export function Select({
                 {labels?.empty ?? "No options"}
               </div>
             )}
-            {options.map((option, index) => (
-              <div
-                key={option.value}
-                id={`${listId}-${index}`}
-                role="option"
-                data-index={index}
-                aria-selected={option.value === current}
-                aria-disabled={option.disabled || undefined}
-                data-active={index === active ? "" : undefined}
-                className="cy-select-option"
-                tabIndex={-1}
-                onPointerMove={() => enabled(index) && setActive(index)}
-                onPointerDown={(e) => e.preventDefault()}
-                onClick={() => {
-                  if (!enabled(index)) return;
-                  choose(index);
-                  close();
-                }}
-                onKeyDown={() => {}}
-              >
-                {option.icon && <Icon icon={option.icon} />}
-                <span className="cy-select-option-text">
-                  <span className="cy-select-option-label">{option.label}</span>
-                  {option.description && (
-                    <span className="cy-select-option-description">{option.description}</span>
-                  )}
-                </span>
-              </div>
-            ))}
+            {groupsOf(options).map((run) => {
+              const rows = run.items.map(({ option, index }) => (
+                <div
+                  key={option.value}
+                  id={`${listId}-${index}`}
+                  role="option"
+                  data-index={index}
+                  aria-selected={option.value === current}
+                  aria-disabled={option.disabled || undefined}
+                  data-active={index === active ? "" : undefined}
+                  className="cy-select-option"
+                  tabIndex={-1}
+                  onPointerMove={() => enabled(index) && setActive(index)}
+                  onPointerDown={(e) => e.preventDefault()}
+                  onClick={() => {
+                    if (!enabled(index)) return;
+                    choose(index);
+                    close();
+                  }}
+                  onKeyDown={() => {}}
+                >
+                  {option.icon && <Icon icon={option.icon} />}
+                  <span className="cy-select-option-text">
+                    <span className="cy-select-option-label">{option.label}</span>
+                    {option.description && (
+                      <span className="cy-select-option-description">{option.description}</span>
+                    )}
+                  </span>
+                </div>
+              ));
+              return run.group === undefined ? (
+                <Fragment key={`run-${run.start}`}>{rows}</Fragment>
+              ) : (
+                // biome-ignore lint/a11y/useSemanticElements: a group of options inside a listbox; a fieldset is a form control
+                <div key={`group-${run.start}`} role="group" aria-labelledby={`${listId}-g${run.start}`}>
+                  <div id={`${listId}-g${run.start}`} className="cy-select-group" role="presentation">
+                    {run.group}
+                  </div>
+                  {rows}
+                </div>
+              );
+            })}
           </div>
           <HiddenValue
             name={name}

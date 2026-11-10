@@ -20,6 +20,15 @@ export interface ProgressBarLabels {
   value: (value: number, max: number) => string;
 }
 
+export interface ProgressSegment {
+  value: number;
+  /** Read out with the value ("Connect 30"). */
+  label: string;
+  tone?: Exclude<Tone, "neutral"> | "neutral";
+  /** A category colour (any CSS colour); overrides `tone`. */
+  color?: string;
+}
+
 export interface ProgressBarProps {
   /** Accessible name, shown above the bar unless `labelHidden`. */
   label: string;
@@ -31,6 +40,17 @@ export interface ProgressBarProps {
   indeterminate?: boolean;
   /** Show the value text at the end of the label row. */
   showValue?: boolean;
+  /**
+   * Parts drawn end to end instead of one fill, from `offset`: a request's timing (DNS, connect, wait, download) or a
+   * waterfall row. Each has a `label` (read out) and a `tone` or category `color`.
+   */
+  segments?: ProgressSegment[] | undefined;
+  /** Where the first segment starts, in the same units as `max`. Default 0. */
+  offset?: number;
+  /** A thin mark across the track at this value (a target, a second position). */
+  marker?: number | undefined;
+  /** Read with the value when there is a marker. Default "marker at 75%". */
+  markerLabel?: string | undefined;
   tone?: Exclude<Tone, "neutral"> | "neutral";
   /** Bar thickness. */
   size?: Size;
@@ -50,6 +70,10 @@ export function ProgressBar({
   max = 100,
   indeterminate = false,
   showValue = false,
+  segments,
+  offset = 0,
+  marker,
+  markerLabel,
   tone = "accent",
   size = "md",
   labels,
@@ -60,13 +84,26 @@ export function ProgressBar({
   const top = max > 0 ? max : 100;
   const unknown = indeterminate || value === undefined || Number.isNaN(value);
   const now = unknown ? 0 : Math.min(Math.max(value, 0), top);
-  const text = unknown ? "" : (labels?.value ?? percent)(now, top);
+  const parts = segments?.length ? segments : null;
+  const total = parts ? offset + parts.reduce((sum, p) => sum + Math.max(0, p.value), 0) : 0;
+  const unknownBar = parts ? false : unknown;
+  const shownNow = parts ? Math.min(total, top) : now;
+  const at = (v: number) => `${(Math.min(Math.max(v, 0), top) / top) * 100}%`;
+  const text = parts
+    ? parts.map((p) => `${p.label} ${p.value}`).join(", ")
+    : unknown
+      ? ""
+      : (labels?.value ?? percent)(now, top);
+  const spoken =
+    marker === undefined
+      ? text
+      : [text, markerLabel ?? `marker at ${percent(marker, top)}`].filter(Boolean).join(", ");
   return (
     <div
       className={className ? `cy-progress-bar ${className}` : "cy-progress-bar"}
       data-size={size}
       data-tone={tone}
-      data-indeterminate={unknown || undefined}
+      data-indeterminate={unknownBar || undefined}
       style={style}
     >
       {(!labelHidden || (showValue && !unknown)) && (
@@ -76,7 +113,7 @@ export function ProgressBar({
               {label}
             </span>
           )}
-          {showValue && !unknown && (
+          {showValue && !unknownBar && (
             <span className="cy-progress-bar-value cy-reset" aria-hidden="true">
               {text}
             </span>
@@ -89,12 +126,35 @@ export function ProgressBar({
         {...(labelHidden ? { "aria-label": label } : { "aria-labelledby": `${id}-label` })}
         aria-valuemin={0}
         aria-valuemax={top}
-        aria-valuenow={unknown ? undefined : now}
-        aria-valuetext={unknown ? undefined : text}
-        aria-busy={unknown || undefined}
-        style={{ "--_fill": unknown ? undefined : `${(now / top) * 100}%` } as CSSProperties}
+        aria-valuenow={unknownBar ? undefined : shownNow}
+        aria-valuetext={unknownBar ? undefined : spoken}
+        aria-busy={unknownBar || undefined}
+        style={{ "--_fill": unknownBar || parts ? undefined : `${(now / top) * 100}%` } as CSSProperties}
       >
-        <div className="cy-progress-bar-fill cy-reset" />
+        {parts ? (
+          parts.map((p, i) => {
+            const start = offset + parts.slice(0, i).reduce((sum, q) => sum + Math.max(0, q.value), 0);
+            return (
+              <div
+                key={`${p.label}-${i}`}
+                className="cy-progress-bar-segment cy-reset"
+                data-tone={p.color ? undefined : (p.tone ?? tone)}
+                style={
+                  {
+                    "--_from": at(start),
+                    "--_to": at(start + Math.max(0, p.value)),
+                    ...(p.color ? { "--_seg": p.color } : {}),
+                  } as CSSProperties
+                }
+              />
+            );
+          })
+        ) : (
+          <div className="cy-progress-bar-fill cy-reset" />
+        )}
+        {marker !== undefined && (
+          <div className="cy-progress-bar-marker cy-reset" style={{ "--_at": at(marker) } as CSSProperties} />
+        )}
       </div>
     </div>
   );

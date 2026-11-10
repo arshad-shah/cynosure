@@ -21,6 +21,8 @@ Single-line input with label, description, error, icons and an optional clear bu
 
 Works in native forms: `FormData`, `form.reset()` and `required` validation.
 
+- `revealable` (with `type="password"`): a Show/Hide button for API keys, tokens and passwords (`labels.show`, `labels.hide`).
+
 ## Tokens
 
 - `--cy-text-field-{height-sm,height-md,height-lg,radius,padding-inline,bg,border,soft-bg}`

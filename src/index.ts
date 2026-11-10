@@ -159,6 +159,7 @@ export {
   type ProgressBarLabels,
   type ProgressBarProps,
   type ProgressBarTokens,
+  type ProgressSegment,
 } from "./components/ProgressBar/index.js";
 export {
   ProgressOverlay,
@@ -305,7 +306,9 @@ export {
 } from "./components/ZoomControls/index.js";
 export { ButtonBase, type ButtonBaseProps } from "./foundations/ButtonBase/ButtonBase.js";
 export { ChoiceBase, type ChoiceBaseProps } from "./foundations/ChoiceBase/ChoiceBase.js";
+export { useControllableState } from "./foundations/controllable.js";
 export { DialogBase, type DialogBaseProps } from "./foundations/DialogBase/index.js";
+export { type DragOptions, type DragSession, useDrag } from "./foundations/drag.js";
 export { FileInputBase, type FileInputBaseProps, setInputFiles } from "./foundations/FileInputBase/index.js";
 export { type FieldRender, useField } from "./foundations/field.js";
 export { HiddenValue, type HiddenValueProps } from "./foundations/HiddenValue/HiddenValue.js";

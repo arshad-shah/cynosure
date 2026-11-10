@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { useState } from "react";
 import { expect, fn, waitFor } from "storybook/test";
 import { CynosureTheme } from "../../theme/CynosureTheme.js";
 import { useColorMode } from "../../theme/use-color-mode.js";
@@ -59,6 +60,32 @@ function Page() {
     </CynosureTheme>
   );
 }
+
+export const OneButtonCycle: Story = {
+  args: { variant: "cycle" },
+  render: (args) => {
+    function Cycle() {
+      const [mode, setMode] = useState<"light" | "dark" | "system">("light");
+      return (
+        <ThemeToggle
+          variant="cycle"
+          value={mode}
+          onChange={setMode}
+          {...(args.size ? { size: args.size } : {})}
+        />
+      );
+    }
+    return <Cycle />;
+  },
+  play: async ({ canvas, userEvent }) => {
+    const button = canvas.getByRole("button", { name: "Colour mode: Light. Switch to Dark" });
+    await userEvent.click(button);
+    await expect(canvas.getByRole("button", { name: "Colour mode: Dark. Switch to System" })).toBeVisible();
+    await userEvent.click(canvas.getByRole("button"));
+    await userEvent.click(canvas.getByRole("button"));
+    await expect(canvas.getByRole("button", { name: "Colour mode: Light. Switch to Dark" })).toBeVisible();
+  },
+};
 
 export const UncontrolledToggleDrivesThePage: Story = {
   render: () => <Page />,

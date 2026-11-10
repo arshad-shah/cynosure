@@ -96,3 +96,22 @@
     border-color: CanvasText;
   }
 }
+
+/* Actions: over the card's top end, outside its one target. */
+.cy-card-frame.cy-card-frame {
+  position: relative;
+  display: grid;
+  font-size: inherit;
+}
+.cy-card-actions.cy-card-actions {
+  position: absolute;
+  inset-block-start: var(--cy-space-3);
+  inset-inline-end: var(--cy-space-3);
+  z-index: 1;
+  display: flex;
+  gap: var(--cy-space-2);
+  font-size: inherit;
+}
+.cy-card.cy-card:has(> .cy-card-actions) {
+  position: relative;
+}

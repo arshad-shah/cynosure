@@ -72,6 +72,7 @@
   user-select: none;
 }
 .cy-code-block-pre.cy-code-block-pre {
+  position: relative;
   grid-column: -2;
   min-inline-size: 0;
   margin: 0;
@@ -99,5 +100,26 @@
 @media (forced-colors: active) {
   .cy-code-block-pre.cy-code-block-pre:focus-visible {
     outline-color: Highlight;
+  }
+}
+
+/* Marked lines: a band behind the text, one line tall, at that line (the code is one block of highlighted text). */
+.cy-code-block-mark.cy-code-block-mark {
+  position: absolute;
+  inset-inline: 0;
+  inset-block-start: calc(var(--cy-space-5) + var(--_line) * 1lh);
+  block-size: 1lh;
+  background: color-mix(in oklab, var(--cy-color-accent) 16%, transparent);
+  box-shadow: inset calc(var(--cy-border-width) * 2) 0 0 var(--cy-color-accent);
+  pointer-events: none;
+}
+.cy-code-block-gutter.cy-code-block-gutter > [data-active] {
+  color: var(--cy-color-accent-text);
+  font-weight: var(--cy-font-weight-bold);
+}
+@media (forced-colors: active) {
+  .cy-code-block-mark.cy-code-block-mark {
+    background: transparent;
+    box-shadow: inset calc(var(--cy-border-width) * 2) 0 0 Highlight;
   }
 }

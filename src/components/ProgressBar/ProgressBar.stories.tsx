@@ -187,6 +187,56 @@ export const SizesChangeThickness: Story = {
   },
 };
 
+export const SegmentsForTimings: Story = {
+  args: {
+    label: "Request timing",
+    labelHidden: true,
+    max: 200,
+    offset: 20,
+    marker: 150,
+    markerLabel: "budget 150 ms",
+    segments: [
+      { value: 12, label: "DNS", tone: "info" },
+      { value: 30, label: "Connect", color: "rgb(194 65 12)" },
+      { value: 80, label: "Wait", tone: "warning" },
+      { value: 18, label: "Download", tone: "success" },
+    ],
+  },
+  play: async ({ canvas, canvasElement }) => {
+    const bar = canvas.getByRole("progressbar", { name: "Request timing" });
+    // Read as its parts, with the marker; the value is where the last part ends.
+    await expect(bar).toHaveAttribute(
+      "aria-valuetext",
+      "DNS 12, Connect 30, Wait 80, Download 18, budget 150 ms",
+    );
+    await expect(bar).toHaveAttribute("aria-valuenow", "160");
+    const parts = [...canvasElement.querySelectorAll<HTMLElement>(".cy-progress-bar-segment")];
+    await expect(parts).toHaveLength(4);
+    const track = bar.getBoundingClientRect();
+    // The first part starts at the offset (20 of 200), and each starts where the last ended.
+    await expect((parts[0] as HTMLElement).getBoundingClientRect().left - track.left).toBeCloseTo(
+      track.width * 0.1,
+      0,
+    );
+    await expect((parts[1] as HTMLElement).getBoundingClientRect().left).toBeCloseTo(
+      (parts[0] as HTMLElement).getBoundingClientRect().right,
+      0,
+    );
+    await expect(getComputedStyle(parts[1] as HTMLElement).backgroundColor).toBe("rgb(194, 65, 12)");
+    const marker = canvasElement.querySelector(".cy-progress-bar-marker") as HTMLElement;
+    await expect(
+      marker.getBoundingClientRect().left + marker.getBoundingClientRect().width / 2 - track.left,
+    ).toBeCloseTo(track.width * 0.75, 0);
+  },
+};
+
+export const AMarkerOnAPlainBar: Story = {
+  args: { label: "Upload", value: 40, marker: 75 },
+  play: async ({ canvas }) => {
+    await expect(canvas.getByRole("progressbar")).toHaveAttribute("aria-valuetext", "40%, marker at 75%");
+  },
+};
+
 export const StableUnderHostileHost: Story = {
   play: async ({ canvasElement }) => {
     for (const selector of [".cy-progress-bar", ".cy-progress-bar-label", ".cy-progress-bar-track"]) {

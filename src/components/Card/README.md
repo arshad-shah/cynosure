@@ -12,6 +12,8 @@ Interactive cards render through `LinkBase` (`href`, unsafe schemes are not link
 
 Tokens: `--cy-card-bg`, `--cy-card-border`, `--cy-card-radius`, `--cy-card-shadow`, `--cy-card-soft-mix`.
 
+- `actions`: buttons on a clickable card that act on their own (a game card's 2-player mode). They sit over the card's top end, outside its one link or button, so nothing interactive is nested; `style` then goes on the shared frame.
+
 ## Used by
 
 Settings panels, plan pickers, dashboard tiles, extension popups.

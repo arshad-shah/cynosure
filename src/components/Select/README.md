@@ -24,6 +24,8 @@ A select-only combobox (WAI-ARIA APG): the trigger is a Cynosure button with `ro
 
 **Keyboard:** ArrowDown/Up, Enter or Space open; arrows, Home, End, PageUp, PageDown move (disabled skipped); Enter, Space or Tab select; Escape closes without change; typing jumps (ignored during IME composition). Coarse pointers get 44px rows.
 
+- Options with the same `group`, next to each other, are listed under that heading (`role="group"`); arrow keys move straight across headings.
+
 ## Tokens
 
 - `--cy-select-{radius,bg,border,list-bg,list-shadow,list-max-height,option-active-bg}`

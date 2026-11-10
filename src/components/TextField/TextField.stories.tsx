@@ -127,6 +127,22 @@ export const RightToLeft: Story = {
   },
 };
 
+export const RevealASecret: Story = {
+  args: { label: "API key", type: "password", revealable: true, defaultValue: "sk-123" },
+  play: async ({ canvas, userEvent }) => {
+    const field = canvas.getByLabelText("API key");
+    await expect(field).toHaveAttribute("type", "password");
+    const show = canvas.getByRole("button", { name: "Show" });
+    await expect(show).toHaveAttribute("aria-pressed", "false");
+    await userEvent.click(show);
+    await expect(field).toHaveAttribute("type", "text");
+    await expect(canvas.getByRole("button", { name: "Hide" })).toHaveAttribute("aria-pressed", "true");
+    await userEvent.click(canvas.getByRole("button", { name: "Hide" }));
+    await expect(field).toHaveAttribute("type", "password");
+    await expect(field).toHaveValue("sk-123");
+  },
+};
+
 export const StableUnderHostileHost: Story = {
   args: { iconStart: mail },
   play: async ({ canvasElement }) => {

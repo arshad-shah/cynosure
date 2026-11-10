@@ -190,6 +190,26 @@ export const InsideAPopover: Story = {
   },
 };
 
+export const GroupedOptions: Story = {
+  args: {
+    label: "Format",
+    options: [
+      { value: "png", label: "PNG", group: "Image" },
+      { value: "jpg", label: "JPEG", group: "Image" },
+      { value: "pdf", label: "PDF", group: "Document" },
+      { value: "docx", label: "Word", group: "Document" },
+    ],
+  },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole("combobox", { name: "Format" }));
+    const doc = await canvas.findByRole("group", { name: "Document" });
+    await expect(doc).toContainElement(canvas.getByRole("option", { name: "PDF" }));
+    // Arrow keys move over the headings, from one group into the next.
+    await userEvent.keyboard("{ArrowDown}{ArrowDown}{Enter}");
+    await expect(canvas.getByRole("combobox", { name: "Format" })).toHaveTextContent("PDF");
+  },
+};
+
 export const OutsideClickCloses: Story = {
   play: async ({ canvas, canvasElement, userEvent }) => {
     await userEvent.click(canvas.getByRole("combobox"));

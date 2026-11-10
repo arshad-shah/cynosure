@@ -1,7 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { useState } from "react";
 import { expect, fn, waitFor } from "storybook/test";
 import { file, folder } from "../../icons/index.js";
 import { computeUnderHostileHost } from "../../test/hostile.js";
+import { Button } from "../Button/Button.js";
 import { Tree, type TreeItem, type TreeProps } from "./Tree.js";
 
 const project: TreeItem[] = [
@@ -362,6 +364,62 @@ export const ControlledAndDefaults: Story = {
     (canvasElement.querySelector('[aria-label="Defaults"] [tabindex="0"]') as HTMLElement).focus();
     await userEvent.keyboard("{End}{ArrowDown}");
     await expect(focused()).toBe("package.json");
+  },
+};
+
+export const EnterActsAndDoubleClickActs: Story = {
+  args: { onAction: fn() },
+  play: async ({ args, canvas, userEvent }) => {
+    await userEvent.tab();
+    await userEvent.keyboard("{ArrowDown}{ArrowDown}");
+    await expect(canvas.getByRole("treeitem", { name: "index.ts" })).toHaveFocus();
+    // Enter runs the item's action; Space still selects.
+    await userEvent.keyboard("{Enter}");
+    await expect(args.onAction).toHaveBeenLastCalledWith(expect.objectContaining({ id: "index" }));
+    await userEvent.dblClick(canvas.getByRole("treeitem", { name: "package.json" }));
+    await expect(args.onAction).toHaveBeenLastCalledWith(expect.objectContaining({ id: "package" }));
+    await userEvent.dblClick(canvas.getByRole("treeitem", { name: "locked.bin" }));
+    await expect(args.onAction).toHaveBeenCalledTimes(2);
+  },
+};
+
+export const SearchMovesTheSelection: Story = {
+  render: () => {
+    function Search() {
+      const hits = huge.flatMap((n) =>
+        (n.children ?? []).filter((c) => c.label.endsWith(".5")).map((c) => c.id),
+      );
+      const [at, setAt] = useState(-1);
+      return (
+        <div style={{ display: "grid", gap: 8 }}>
+          <Button onClick={() => setAt((a) => Math.min(hits.length - 1, a + 400))}>Next match</Button>
+          <Tree
+            label="Document"
+            items={huge}
+            defaultExpanded={huge.map((n) => n.id)}
+            virtual
+            selected={at < 0 ? [] : [hits[at] as string]}
+            style={{ blockSize: 300 }}
+          />
+        </div>
+      );
+    }
+    return <Search />;
+  },
+  play: async ({ canvas, userEvent }) => {
+    const next = canvas.getByRole("button", { name: "Next match" });
+    await userEvent.click(next);
+    await userEvent.click(next);
+    // The selected match is scrolled into view far down the tree, and focus stays on the search control.
+    const row = await canvas.findByRole("treeitem", { name: "leaf 799.5" });
+    await expect(row).toHaveAttribute("aria-selected", "true");
+    const tree = canvas.getByRole("tree").getBoundingClientRect();
+    await expect(row.getBoundingClientRect().top).toBeGreaterThanOrEqual(tree.top - 1);
+    await expect(row.getBoundingClientRect().bottom).toBeLessThanOrEqual(tree.bottom + 1);
+    await expect(next).toHaveFocus();
+    // Tab goes to the match.
+    await userEvent.tab();
+    await expect(row).toHaveFocus();
   },
 };
 

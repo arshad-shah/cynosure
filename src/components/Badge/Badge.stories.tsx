@@ -51,6 +51,52 @@ export const EveryToneAndVariantIsReadable: Story = {
   },
 };
 
+export const CategoryColours: Story = {
+  render: () => (
+    <div style={{ display: "flex", gap: 8 }}>
+      <Badge color="rgb(47 125 74)">GET</Badge>
+      <Badge color="rgb(194 65 12)" variant="solid">
+        DELETE
+      </Badge>
+      <Badge color="rgb(47 102 176)" variant="outline">
+        PUT
+      </Badge>
+    </div>
+  ),
+  play: async ({ canvas }) => {
+    const get = canvas.getByText("GET");
+    const put = canvas.getByText("PUT");
+    // Each takes its own colour; text stays readable (darker than the raw colour on the tinted background).
+    await expect(getComputedStyle(get).backgroundColor).not.toBe(getComputedStyle(put).backgroundColor);
+    await expect(getComputedStyle(canvas.getByText("DELETE")).backgroundColor).toBe("rgb(194, 65, 12)");
+    await expect(get).not.toHaveAttribute("data-tone");
+  },
+};
+
+export const LiveAndSteadyDots: Story = {
+  render: () => (
+    <div style={{ display: "flex", gap: 8 }}>
+      <Badge tone="danger" dot="live">
+        Recording
+      </Badge>
+      <Badge tone="success" dot>
+        Connected
+      </Badge>
+    </div>
+  ),
+  play: async ({ canvas }) => {
+    const live = canvas.getByText("Recording").querySelector(".cy-badge-dot") as HTMLElement;
+    const steady = canvas.getByText("Connected").querySelector(".cy-badge-dot") as HTMLElement;
+    // The dot is decoration: the text says the state.
+    await expect(live).toHaveAttribute("aria-hidden", "true");
+    await expect(getComputedStyle(live).animationName).toBe("cy-badge-live");
+    await expect(getComputedStyle(steady).animationName).toBe("none");
+    await expect(getComputedStyle(live).backgroundColor).toBe(
+      getComputedStyle(canvas.getByText("Recording")).color,
+    );
+  },
+};
+
 export const StableUnderHostileHost: Story = {
   play: async ({ canvasElement }) => {
     const { clean, hostile } = computeUnderHostileHost(canvasElement, ".cy-badge", [

@@ -54,6 +54,11 @@
     --_text: var(--cy-color-info-text);
     --_on: var(--cy-color-on-info);
   }
+  /* A product's own category colour: the text leans to the ink so it stays readable on the tinted background. */
+  &[data-color] {
+    --_text: color-mix(in oklab, var(--_tone) 45%, var(--cy-color-ink));
+    --_on: var(--cy-color-bg);
+  }
   &[data-variant="solid"] {
     background: var(--_tone);
     color: var(--_on);
@@ -61,5 +66,32 @@
   &[data-variant="outline"] {
     background: var(--cy-color-surface);
     border-color: color-mix(in oklab, var(--_tone) 55%, var(--cy-color-line));
+  }
+}
+
+.cy-badge-dot.cy-badge-dot {
+  flex: none;
+  inline-size: 0.6em;
+  block-size: 0.6em;
+  border-radius: 50%;
+  background: currentColor;
+  &[data-live] {
+    animation: cy-badge-live 1.6s var(--cy-motion-ease) infinite;
+  }
+}
+@keyframes cy-badge-live {
+  50% {
+    opacity: 0.35;
+    scale: 0.8;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cy-badge-dot.cy-badge-dot[data-live] {
+    animation: none;
+  }
+}
+@media (forced-colors: active) {
+  .cy-badge-dot.cy-badge-dot {
+    background: CanvasText;
   }
 }

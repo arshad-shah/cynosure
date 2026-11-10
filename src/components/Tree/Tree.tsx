@@ -65,6 +65,8 @@ export interface TreeProps {
   loadChildren?: (item: TreeItem) => Promise<TreeItem[]>;
   /** Custom row content after the chevron (a value, a badge, a line number). `label` still drives type-ahead. */
   renderLabel?: (item: TreeItem) => ReactNode;
+  /** Enter (or a double-click) on an item: its default action, such as opening it or copying its path. Space selects. */
+  onAction?: ((item: TreeItem) => void) | undefined;
   /**
    * Render only the rows in view (for tens of thousands of rows). Give the tree a height (`style` or a class); rows
    * must share one height.
@@ -105,6 +107,7 @@ export function Tree({
   selectionMode = "single",
   loadChildren,
   renderLabel,
+  onAction,
   virtual = false,
   size = "md",
   labels,
@@ -169,6 +172,23 @@ export function Tree({
     keep: stopIndex,
   });
   const rowH = win.rowSize;
+
+  // A selection made from outside (search next/previous) moves the tab stop to it and scrolls it into view, without
+  // taking focus from where the person is (the search field).
+  const outside = selected?.[0];
+  const seenOutside = useRef(outside);
+  useLayoutEffect(() => {
+    if (outside === seenOutside.current) return;
+    seenOutside.current = outside;
+    const index = rows.findIndex((r) => r.key === outside);
+    if (outside === undefined || index < 0) return;
+    setFocusKey(outside);
+    if (virtual) win.reveal(index);
+    else
+      root.current
+        ?.querySelector(`[data-key="${CSS.escape(outside)}"]`)
+        ?.scrollIntoView?.({ block: "nearest" });
+  });
 
   useLayoutEffect(() => {
     if (!moveFocus.current || !tabStop) return;
@@ -253,6 +273,7 @@ export function Tree({
       case "Enter":
       case " ":
         if (row.kind === "failed") load(item);
+        else if (key === "Enter" && onAction && !item.disabled) onAction(item);
         else select(item, key === " " || event.ctrlKey || event.metaKey);
         break;
       case "*": {
@@ -315,6 +336,7 @@ export function Tree({
             busy={status[row.item.id] === "loading"}
             text={text}
             onClick={onRowClick}
+            onAction={onAction}
           />
         );
       })}
@@ -334,6 +356,7 @@ interface TreeRowProps {
   busy: boolean;
   text: TreeLabels;
   onClick: (row: Row, onChevron: boolean, additive: boolean) => void;
+  onAction: ((item: TreeItem) => void) | undefined;
 }
 
 /** Memoised so that moving focus or selection re-renders two rows, not the whole tree. */
@@ -348,6 +371,7 @@ const TreeRow = memo(function TreeRow({
   busy,
   text,
   onClick,
+  onAction,
 }: TreeRowProps) {
   const { item, level, kind } = row;
   const note = kind === "loading" ? text.loading : kind === "failed" ? text.failed : null;
@@ -371,6 +395,10 @@ const TreeRow = memo(function TreeRow({
       onClick={(e) => {
         const onChevron = (e.target as Element).closest(".cy-tree-chevron") !== null;
         onClick(row, onChevron, e.ctrlKey || e.metaKey);
+      }}
+      onDoubleClick={(e) => {
+        if (kind === "item" && !item.disabled && !(e.target as Element).closest(".cy-tree-chevron"))
+          onAction?.(item);
       }}
     >
       <span className="cy-tree-chevron cy-reset" data-open={open || undefined} aria-hidden="true">

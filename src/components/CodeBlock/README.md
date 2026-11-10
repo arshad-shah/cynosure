@@ -23,6 +23,8 @@ import { CodeBlock } from "@arshad-shah/cynosure";
 - The block is a figure named by its title. When it scrolls sideways, the code is a focusable region (a tab stop), so keyboard users can scroll it.
 - Tall code scrolls inside the block (`--cy-code-block-max-height`); line numbers scroll with it.
 
+- `activeLines` (1-based): mark lines, such as the line a debugger is on. A band sits behind the text, the gutter number is bold, and "Line 3 highlighted" is read out (`labels.active`).
+
 ## Tokens
 
 - `--cy-code-block-background`, `--cy-code-block-radius`, `--cy-code-block-max-height`

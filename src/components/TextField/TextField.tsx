@@ -12,6 +12,8 @@ import {
 import { Icon } from "../../foundations/Icon/Icon.js";
 import { InputBase } from "../../foundations/InputBase/InputBase.js";
 import { close } from "../../icons/close.js";
+import { eye } from "../../icons/eye.js";
+import { eyeOff } from "../../icons/eye-off.js";
 import type { IconData } from "../../icons/types.js";
 import type { Size } from "../../tokens/schema.js";
 import { Field } from "../Field/Field.js";
@@ -58,7 +60,9 @@ export interface TextFieldProps extends NativeInput {
   clearable?: boolean;
   /** Controls inside the field's end, after the input (NumberField's steppers). */
   addonEnd?: ReactNode;
-  labels?: { clear?: string };
+  labels?: { clear?: string; show?: string; hide?: string };
+  /** With `type="password"`: a button to show and hide the value (API keys, tokens, passwords). */
+  revealable?: boolean;
   className?: string;
   /** Layout only. */
   style?: CSSProperties;
@@ -86,6 +90,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(function T
     iconStart,
     iconEnd,
     clearable = false,
+    revealable = false,
     addonEnd,
     labels,
     required,
@@ -99,6 +104,8 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(function T
   forwarded,
 ) {
   const inner = useRef<HTMLInputElement | null>(null);
+  const [shown, setShown] = useState(false);
+  const secret = type === "password" && revealable;
   const [filled, setFilled] = useState(Boolean(value ?? defaultValue));
   const controlled = value !== undefined;
   useEffect(() => {
@@ -151,7 +158,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(function T
             ref={ref}
             {...rest}
             id={field.id}
-            type={type}
+            type={secret && shown ? "text" : type}
             className="cy-text-field-input"
             aria-describedby={field.describedBy}
             invalid={field.invalid}
@@ -171,6 +178,17 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(function T
               variant="ghost"
               size="sm"
               onClick={clear}
+              className="cy-text-field-clear"
+            />
+          )}
+          {secret && !disabled && (
+            <IconButton
+              icon={shown ? eyeOff : eye}
+              label={shown ? (labels?.hide ?? "Hide") : (labels?.show ?? "Show")}
+              aria-pressed={shown}
+              variant="ghost"
+              size="sm"
+              onClick={() => setShown(!shown)}
               className="cy-text-field-clear"
             />
           )}
