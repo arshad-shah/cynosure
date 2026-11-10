@@ -3,6 +3,14 @@ import { expect, fn, waitFor } from "storybook/test";
 import { computeUnderHostileHost } from "../../test/hostile.js";
 import { Card } from "./Card.js";
 
+/** Any CSS colour as painted sRGB plus alpha, so "oklab(… / 0.5)" mid-transition never equals the settled colour. */
+function rgba(value: string): number[] {
+  const ctx = document.createElement("canvas").getContext("2d") as CanvasRenderingContext2D;
+  ctx.fillStyle = value;
+  ctx.fillRect(0, 0, 1, 1);
+  return [...ctx.getImageData(0, 0, 1, 1).data];
+}
+
 const TONES = ["neutral", "accent", "danger", "success", "warning", "info"] as const;
 
 const meta = {
@@ -158,8 +166,11 @@ export const KeyboardFocusShowsAnAccentBorder: Story = {
     card.after(accent);
     await userEvent.tab();
     await expect(card).toHaveFocus();
-    // The border colour transitions; wait for it to settle.
-    await waitFor(() => expect(style(card).borderTopColor).toBe(style(accent).color));
+    // The border colour transitions; wait for it to settle (WebKit on a busy CI runner can take over a second).
+    // Compared as painted sRGB, since engines serialise the same colour differently (oklab vs rgb).
+    await waitFor(() => expect(rgba(style(card).borderTopColor)).toEqual(rgba(style(accent).color)), {
+      timeout: 3000,
+    });
     accent.remove();
   },
 };
