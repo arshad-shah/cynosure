@@ -36,6 +36,7 @@ export { Dialog, type DialogLabels, type DialogProps, type DialogTokens } from "
 export { Disclosure, type DisclosureProps, type DisclosureTokens } from "./components/Disclosure/index.js";
 export { EmptyState, type EmptyStateProps, type EmptyStateTokens } from "./components/EmptyState/index.js";
 export { Field, type FieldProps } from "./components/Field/index.js";
+export { Grid, GridItem, type GridItemProps, type GridProps } from "./components/Grid/index.js";
 export { IconButton, type IconButtonProps } from "./components/IconButton/index.js";
 export { Inline, type InlineProps } from "./components/Inline/index.js";
 export { Kbd, type KbdProps } from "./components/Kbd/index.js";

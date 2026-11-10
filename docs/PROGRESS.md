@@ -43,7 +43,7 @@ After Plan 3 (fixes from Arshad's checks of the published Storybook, 2026-11-10)
 
 ## Current task
 
-Plan 5 (`docs/superpowers/plans/2026-11-10-cynosure-coverage.md`): the generic components and icons the cross-product audit asked for. Tasks 1 (46 Facet icons) and 2 (Skeleton) are done; Task 3 (Grid) is next.
+Plan 5 (`docs/superpowers/plans/2026-11-10-cynosure-coverage.md`): the generic components and icons the cross-product audit asked for. Tasks 1–3 (46 Facet icons, Skeleton, Grid) are done; Task 4 (Steps) is next.
 
 ## Next step
 
@@ -84,7 +84,7 @@ An independent review of the Plan 3 Tasks 8–12 code found nine issues. Fixed (
 - [x] Plan 2: Milestone 1 controls (`docs/superpowers/plans/2026-11-09-cynosure-controls.md`)
 - [x] Plan 3: Milestone 2 structure and overlays (`docs/superpowers/plans/2026-11-09-cynosure-structure.md`). Tasks 1–13 and the final review done.
 - [ ] Plan 4: Milestone 3 and product migration issues (`docs/superpowers/plans/2026-11-10-cynosure-evidence.md`). Tasks 1–7 and 8b done; Tasks 9–10 after Plan 5.
-- [ ] Plan 5: coverage components and icons (`docs/superpowers/plans/2026-11-10-cynosure-coverage.md`). Tasks 1–2 done.
+- [ ] Plan 5: coverage components and icons (`docs/superpowers/plans/2026-11-10-cynosure-coverage.md`). Tasks 1–3 done.
 
 ## Plan 3 rulings so far
 
@@ -120,6 +120,7 @@ An independent review of the Plan 3 Tasks 8–12 code found nine issues. Fixed (
 ## Plan 4 rulings so far
 
 - **Toasts in dialogs (Task 1):** an open Dialog (or Sheet) inside a Toaster registers a container through `ToastHostContext` (`src/overlay/toast-host.ts`, separate so Dialog never imports Toast). The Toaster portals its region into the latest container and shows it again, which puts it above the dialog and outside the modal's inert area. Moving re-creates the toast elements, so each toast keeps a small memory in the Toaster: whether it was announced (then its text renders at once, and a danger toast comes back as `status`, not `alert`) and its remaining time (read when the timer starts, after the old element saved it).
+- **Grid (Plan 5 Task 3):** `columns` and/or `minItemWidth` (auto-fill, capped at `columns` with a `max()` term); `GridItem` spans, clamped with `min()` on fixed grids. Unset custom properties are reset to `initial` so nested grids never inherit their parent's columns. No tokens: gaps are space tokens.
 - **Skeleton (Plan 5 Task 2):** `aria-hidden` bones; the owning region carries `aria-busy`. Text lines are 0.8em with gaps that make up the line height, so a text skeleton is exactly as tall as its text. The fill is a translucent ink tint so it shows on any surface. Budget 1.25 kB.
 - **ProgressBar (Task 2):** the fill uses the tone's text colour (`--cy-color-<tone>-text`): the plain accent fell under 3:1 against the track in dark mode. No live region: completion is announced by the page (Notice or Toast). Budget 1.75 kB.
 - **Slider (Task 3):** thumbs are `role="slider"` divs (no native range input, so no foundation needed); the track is the pointer target. Values snap to `step` and are rounded to the step's decimals (no float drift). A press moves the nearest thumb; on a tie between equal range thumbs, the one that can move that way. RTL flips Left/Right for horizontal sliders. Hit areas grow on `::before` only. Disabled fades the track, not the label (axe contrast). A single slider's fill starts at the bar's start (half a thumb before the first value). Budget 3.5 kB.
