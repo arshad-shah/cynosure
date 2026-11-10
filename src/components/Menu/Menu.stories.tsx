@@ -11,7 +11,7 @@ const items: MenuEntry[] = [
   { value: "edit", label: "Edit", icon: edit, shortcut: ["Ctrl", "E"] },
   { value: "copy", label: "Copy path", icon: copy },
   { value: "download", label: "Download", icon: download, disabled: true },
-  { value: "archive", label: "Archive", icon: archive },
+  { value: "archive", label: "Archive", icon: archive, shortcut: "mod+shift+a" },
   {
     label: "Danger zone",
     items: [{ value: "delete", label: "Delete", icon: trash, tone: "danger" }],
@@ -97,6 +97,10 @@ export const PointerSelectsAndShowsStructure: Story = {
     await expect(canvas.getByRole("menuitem", { name: /Edit/ })).toHaveAttribute(
       "aria-keyshortcuts",
       "Control+E",
+    );
+    // A shortcut string gets this platform's modifier.
+    await expect(canvas.getByRole("menuitem", { name: /Archive/ }).getAttribute("aria-keyshortcuts")).toMatch(
+      /^(Control|Meta)\+Shift\+A$/,
     );
     await expect(canvas.getByRole("menuitem", { name: "Download" })).toHaveAttribute("aria-disabled", "true");
     const del = canvas.getByRole("menuitem", { name: "Delete" });

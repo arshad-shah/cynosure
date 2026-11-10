@@ -36,8 +36,8 @@ export interface Command {
   label: string;
   /** Heading the command is listed under. */
   group?: string;
-  /** Keys shown at the end of the row, e.g. ["Ctrl", "S"]. Display only: bind them yourself. */
-  shortcut?: string[];
+  /** Keys shown at the end of the row: ["Ctrl", "S"], or "mod+s" for this platform's names. Display only: bind them yourself. */
+  shortcut?: string[] | string;
   icon?: IconData;
   /** More words that find it ("save" also finds "Write to disk"). */
   keywords?: string[];

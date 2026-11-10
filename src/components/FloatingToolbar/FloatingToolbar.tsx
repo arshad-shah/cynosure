@@ -10,6 +10,13 @@ import {
 } from "react";
 import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js";
 import { useHotkey } from "../../foundations/hotkey.js";
+import {
+  type FloatingAnchor,
+  type PopoverEl,
+  useFloatingAnchor,
+  useFloatingOffset,
+  usePopover,
+} from "../../overlay/floating.js";
 import { useAnchoredPosition, type VirtualAnchor } from "../../overlay/use-anchored-position.js";
 import { Toolbar } from "../Toolbar/Toolbar.js";
 
@@ -28,21 +35,8 @@ declare module "../../tokens/schema.js" {
   }
 }
 
-type PopoverEl = HTMLDivElement & { showPopover?: () => void; hidePopover?: () => void };
-export type ToolbarAnchor = RefObject<HTMLElement | VirtualAnchor | null> | VirtualAnchor | null;
-
-const isRef = (a: ToolbarAnchor): a is RefObject<HTMLElement | VirtualAnchor | null> =>
-  a !== null && "current" in a;
-
-/** Shows or hides a manual popover with the Popover API (optional calls: jsdom has none). */
-function usePopover(el: RefObject<PopoverEl | null>, open: boolean) {
-  useClientLayoutEffect(() => {
-    const node = el.current as PopoverEl;
-    const shown = node.matches(":popover-open");
-    if (open && !shown) node.showPopover?.();
-    if (!open && shown) node.hidePopover?.();
-  });
-}
+/** What a floating toolbar sits beside. */
+export type ToolbarAnchor = FloatingAnchor;
 
 /**
  * Remembers where focus came from when it enters the bar; Escape inside the bar calls `onEscape` and returns focus
@@ -108,23 +102,11 @@ export function FloatingToolbar({
   style,
 }: FloatingToolbarProps) {
   const bar = useRef<PopoverEl>(null);
-  const virtual = useRef<HTMLElement | VirtualAnchor | null>(null);
-  // A ref is only attached after render, so the anchor is resolved in a layout effect (before paint).
-  const [hasAnchor, setHasAnchor] = useState(false);
-  useClientLayoutEffect(() => {
-    virtual.current = isRef(anchor) ? anchor.current : anchor;
-    setHasAnchor(virtual.current !== null);
-  });
-  const shown = (open ?? true) && hasAnchor;
+  const target = useFloatingAnchor(anchor);
+  const shown = (open ?? true) && target.present;
   usePopover(bar, shown);
-  const offset = useRef(8);
-  // The gap comes from the offset token (it always resolves: its fallback is a space token).
-  useClientLayoutEffect(() => {
-    offset.current = Number.parseFloat(
-      getComputedStyle(bar.current as PopoverEl).getPropertyValue("--_offset"),
-    );
-  });
-  useAnchoredPosition(virtual, bar, shown, side, offset.current, "start");
+  const offset = useFloatingOffset(bar);
+  useAnchoredPosition(target.ref, bar, shown, side, offset, "start");
   useHotkey(shown && hotkey, () => enter(bar.current));
   const focus = useReturnFocus(onEscape);
 

@@ -12,6 +12,7 @@ import {
   useState,
 } from "react";
 import { ButtonBase } from "../../foundations/ButtonBase/ButtonBase.js";
+import { ariaKeyShortcuts, shortcutKeys } from "../../foundations/hotkey.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
 import { useRovingFocus } from "../../foundations/roving-focus.js";
 import { check } from "../../icons/check.js";
@@ -20,7 +21,7 @@ import { useDismiss } from "../../overlay/dismiss.js";
 import type { Placement } from "../../overlay/position.js";
 import { useAnchoredPosition, type VirtualAnchor } from "../../overlay/use-anchored-position.js";
 import type { Tone } from "../../tokens/schema.js";
-import { Kbd } from "../Kbd/Kbd.js";
+import { Kbd, useApple } from "../Kbd/Kbd.js";
 
 export interface MenuTokens {
   minWidth: string;
@@ -39,8 +40,11 @@ export interface MenuItem {
   value: string;
   label: string;
   icon?: IconData;
-  /** Keys shown at the end of the row and exposed as aria-keyshortcuts, e.g. ["Ctrl", "E"]. */
-  shortcut?: string[];
+  /**
+   * Keys shown at the end of the row and exposed as aria-keyshortcuts: ["Ctrl", "E"], or "mod+e" for this platform's
+   * names (Cmd on Apple). Display only: bind them yourself (`useHotkey`).
+   */
+  shortcut?: string[] | string;
   disabled?: boolean;
   tone?: Extract<Tone, "neutral" | "danger">;
   /** Checkable item: a toggle (`checkbox`) or one of a set (`radio`). Checkable items keep the menu open. */
@@ -81,7 +85,6 @@ export interface MenuProps {
 
 type PanelEl = HTMLDivElement & { showPopover?: () => void; hidePopover?: () => void };
 const ITEM = '[role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"]';
-const KEY_NAMES: Record<string, string> = { Ctrl: "Control", Cmd: "Meta", Opt: "Alt", Option: "Alt" };
 const isSection = (entry: MenuEntry): entry is MenuSection => "items" in entry;
 
 export interface MenuPanelProps {
@@ -121,6 +124,7 @@ export function MenuPanel({
   className,
   style,
 }: MenuPanelProps) {
+  const apple = useApple();
   const panel = useRef<PanelEl>(null);
   const typed = useRef({ text: "", at: 0 });
 
@@ -174,7 +178,12 @@ export function MenuPanel({
       role={item.kind ? (item.kind === "checkbox" ? "menuitemcheckbox" : "menuitemradio") : "menuitem"}
       aria-checked={item.kind ? !!item.checked : undefined}
       aria-disabled={item.disabled || undefined}
-      aria-keyshortcuts={item.shortcut?.map((k) => KEY_NAMES[k] ?? k).join("+")}
+      aria-keyshortcuts={
+        item.shortcut &&
+        ariaKeyShortcuts(
+          typeof item.shortcut === "string" ? shortcutKeys(item.shortcut, apple) : item.shortcut,
+        )
+      }
       tabIndex={-1}
       className="cy-menu-item"
       data-tone={item.tone}

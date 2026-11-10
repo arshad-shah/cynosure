@@ -31,6 +31,36 @@ export const SpeaksSymbolNames: Story = {
   },
 };
 
+export const AShortcutForThisPlatform: Story = {
+  args: { keys: "mod+shift+k" },
+  play: async ({ canvasElement }) => {
+    const kbd = canvasElement.querySelector(".cy-kbd") as HTMLElement;
+    const caps = [...kbd.querySelectorAll(".cy-kbd-key")].map((k) => k.textContent);
+    // Cmd on Apple platforms, Ctrl elsewhere.
+    await expect(caps.join(" ")).toMatch(/^(Cmd|Ctrl) Shift K$/);
+    await expect(kbd.querySelector(".cy-visually-hidden")?.textContent).toMatch(
+      /^(Command|Control) plus Shift plus K$/,
+    );
+    await expect(kbd).toBeVisible();
+  },
+};
+
+export const ShortcutsHideOnTouchScreens: Story = {
+  tags: ["touch", "!dev"],
+  args: { keys: "mod+k" },
+  play: async ({ canvasElement }) => {
+    await expect(canvasElement.querySelector(".cy-kbd")).not.toBeVisible();
+  },
+};
+
+export const KeyListsStayOnTouchScreens: Story = {
+  tags: ["touch", "!dev"],
+  play: async ({ canvasElement }) => {
+    // Keys given as a list are content (a help page), not a hint: they stay.
+    await expect(canvasElement.querySelector(".cy-kbd")).toBeVisible();
+  },
+};
+
 export const StableUnderHostileHost: Story = {
   play: async ({ canvasElement }) => {
     const { clean, hostile } = computeUnderHostileHost(canvasElement, ".cy-kbd-key", [

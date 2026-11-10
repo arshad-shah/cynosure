@@ -299,7 +299,7 @@
       "dist/foundations/hotkey.js",
       "dist/styles/command-palette.css"
     ],
-    "limit": "4.5 kB",
+    "limit": "4.75 kB",
     "gzip": true
   },
   {
@@ -448,6 +448,18 @@
     "name": "VirtualList",
     "path": ["dist/components/VirtualList/VirtualList.js", "dist/styles/virtual-list.css"],
     "limit": "3 kB",
+    "gzip": true
+  },
+  {
+    "name": "HoverCard",
+    "path": ["dist/components/HoverCard/HoverCard.js", "dist/styles/hover-card.css"],
+    "limit": "2 kB",
+    "gzip": true
+  },
+  {
+    "name": "ProgressOverlay",
+    "path": ["dist/components/ProgressOverlay/ProgressOverlay.js", "dist/styles/progress-overlay.css"],
+    "limit": "6 kB",
     "gzip": true
   }
 ]

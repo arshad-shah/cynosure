@@ -44,3 +44,48 @@ export function useHotkey(combo: string | false, handler: (event: KeyboardEvent)
     return () => document.removeEventListener("keydown", onKeyDown);
   }, [combo]);
 }
+
+const CAPS: Record<string, [apple: string, other: string]> = {
+  mod: ["Cmd", "Ctrl"],
+  ctrl: ["Ctrl", "Ctrl"],
+  meta: ["Cmd", "Win"],
+  alt: ["Option", "Alt"],
+  shift: ["Shift", "Shift"],
+  escape: ["Esc", "Esc"],
+  esc: ["Esc", "Esc"],
+  space: ["Space", "Space"],
+  arrowup: ["Up", "Up"],
+  arrowdown: ["Down", "Down"],
+  arrowleft: ["Left", "Left"],
+  arrowright: ["Right", "Right"],
+};
+
+/**
+ * The key caps for a shortcut written as `useHotkey` writes it, named for the platform: "mod+shift+k" is
+ * ["Cmd", "Shift", "K"] on Apple platforms and ["Ctrl", "Shift", "K"] elsewhere.
+ */
+export function shortcutKeys(combo: string, apple = isApple()): string[] {
+  // "+" itself can be the key ("mod++"): split on a joining "+" only.
+  return combo.split(/\+(?=.)/).map((part) => {
+    const caps = CAPS[part.toLowerCase()];
+    if (caps) return apple ? caps[0] : caps[1];
+    if (part.length === 1 || /^f\d{1,2}$/i.test(part)) return part.toUpperCase();
+    return `${part.charAt(0).toUpperCase()}${part.slice(1)}`;
+  });
+}
+
+const ARIA_NAMES: Record<string, string> = {
+  Ctrl: "Control",
+  Cmd: "Meta",
+  Win: "Meta",
+  Opt: "Alt",
+  Option: "Alt",
+  Esc: "Escape",
+  Up: "ArrowUp",
+  Down: "ArrowDown",
+  Left: "ArrowLeft",
+  Right: "ArrowRight",
+};
+
+/** Key caps as an `aria-keyshortcuts` value: ["Ctrl", "E"] is "Control+E". */
+export const ariaKeyShortcuts = (keys: string[]) => keys.map((k) => ARIA_NAMES[k] ?? k).join("+");

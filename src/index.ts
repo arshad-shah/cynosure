@@ -97,6 +97,7 @@ export {
   useSelectionAnchor,
 } from "./components/FloatingToolbar/index.js";
 export { Grid, GridItem, type GridItemProps, type GridProps } from "./components/Grid/index.js";
+export { HoverCard, type HoverCardProps, type HoverCardTokens } from "./components/HoverCard/index.js";
 export { IconButton, type IconButtonProps } from "./components/IconButton/index.js";
 export { Inline, type InlineProps } from "./components/Inline/index.js";
 export { Kbd, type KbdProps } from "./components/Kbd/index.js";
@@ -130,6 +131,11 @@ export {
   type ProgressBarProps,
   type ProgressBarTokens,
 } from "./components/ProgressBar/index.js";
+export {
+  ProgressOverlay,
+  type ProgressOverlayLabels,
+  type ProgressOverlayProps,
+} from "./components/ProgressOverlay/index.js";
 export { Prose, type ProseProps, type ProseTokens } from "./components/Prose/index.js";
 export { RadioGroup, type RadioGroupProps, type RadioOption } from "./components/RadioGroup/index.js";
 export { SearchField, type SearchFieldProps } from "./components/SearchField/index.js";
@@ -267,7 +273,7 @@ export { DialogBase, type DialogBaseProps } from "./foundations/DialogBase/index
 export { FileInputBase, type FileInputBaseProps, setInputFiles } from "./foundations/FileInputBase/index.js";
 export { type FieldRender, useField } from "./foundations/field.js";
 export { HiddenValue, type HiddenValueProps } from "./foundations/HiddenValue/HiddenValue.js";
-export { isApple, matchesHotkey, useHotkey } from "./foundations/hotkey.js";
+export { ariaKeyShortcuts, isApple, matchesHotkey, shortcutKeys, useHotkey } from "./foundations/hotkey.js";
 export { Icon, type IconProps } from "./foundations/Icon/Icon.js";
 export { InputBase, type InputBaseProps } from "./foundations/InputBase/InputBase.js";
 export { LinkBase, type LinkBaseProps } from "./foundations/LinkBase/LinkBase.js";

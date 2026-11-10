@@ -1,0 +1,51 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./HoverCard.stories";
+
+<Meta of={Stories} />
+
+# HoverCard
+
+A passive preview beside its anchor, such as a larger thumbnail of the page under the pointer.
+
+<Canvas of={Stories.PreviewsTheHoveredItem} />
+
+## When to use
+
+- **A bigger look** at something small (a page thumbnail, an image, a colour) while it is hovered or focused.
+
+**Use something else when:**
+- the text describes a control: [Tooltip](?path=/docs/components-tooltip--docs)
+- people need to click or type in it: [Popover](?path=/docs/components-popover--docs)
+- it holds actions for a selection: [FloatingToolbar](?path=/docs/components-floatingtoolbar--docs)
+
+## Usage
+
+```tsx
+import { HoverCard } from "@arshad-shah/cynosure";
+
+<HoverCard open={hovered !== null} anchor={thumbRef}>
+  <img src={large} alt="" />
+</HoverCard>
+```
+
+You decide when it shows: open it on pointer enter and on focus, so keyboard users see the same preview.
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+- **Passive:** `aria-hidden`, inert and `pointer-events: none`. The pointer passes through it and focus never enters it; it repeats what the anchor already names, so nothing is lost to screen readers.
+- **Placement:** on the `placement` side, flipping when there is no room and sliding to stay inside the viewport.
+- **Isolation:** top layer through the Popover API, rendered in place, so it works in shadow roots and above any `z-index`.
+
+<Canvas of={Stories.FlipsWhenThereIsNoRoom} />
+
+## Theming
+
+Tokens: `--cy-hover-card-background`, `--cy-hover-card-radius`, `--cy-hover-card-padding` and `--cy-hover-card-offset`.
+
+## Related
+
+[Tooltip](?path=/docs/components-tooltip--docs) · [Popover](?path=/docs/components-popover--docs) · [FloatingToolbar](?path=/docs/components-floatingtoolbar--docs)

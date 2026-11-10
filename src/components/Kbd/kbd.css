@@ -44,3 +44,9 @@
     font-size: var(--cy-font-size-md);
   }
 }
+/* A shortcut means nothing on a touch-only screen. */
+@media (hover: none) and (pointer: coarse) {
+  .cy-kbd.cy-kbd[data-shortcut] {
+    display: none;
+  }
+}

@@ -1,0 +1,11 @@
+/* progress-overlay: a Dialog holding a ProgressBar and a status line; the Dialog draws the frame. */
+.cy-progress-overlay-status.cy-progress-overlay-status {
+  margin: var(--cy-space-3) 0 0;
+  color: var(--cy-color-muted);
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-font-size-sm);
+  line-height: var(--cy-font-line-height);
+  letter-spacing: normal;
+  text-transform: none;
+  font-variant-numeric: tabular-nums;
+}

@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { cleanup, fireEvent, render } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { matchesHotkey, useHotkey } from "../../src/foundations/hotkey";
+import { ariaKeyShortcuts, matchesHotkey, shortcutKeys, useHotkey } from "../../src/foundations/hotkey";
 
 afterEach(cleanup);
 
@@ -58,5 +58,24 @@ describe("useHotkey", () => {
     rerender(<Listen combo={false} onHit={hit} />);
     fireEvent.keyDown(target, { key: "k", ctrlKey: true });
     expect(hit).not.toHaveBeenCalled();
+  });
+});
+
+describe("shortcut key caps", () => {
+  it("names the keys for the platform", () => {
+    expect(shortcutKeys("mod+shift+k", true)).toEqual(["Cmd", "Shift", "K"]);
+    expect(shortcutKeys("mod+shift+k", false)).toEqual(["Ctrl", "Shift", "K"]);
+    expect(shortcutKeys("alt+f10", true)).toEqual(["Option", "F10"]);
+    expect(shortcutKeys("meta+arrowup", false)).toEqual(["Win", "Up"]);
+    expect(shortcutKeys("shift+?", false)).toEqual(["Shift", "?"]);
+    expect(shortcutKeys("mod++", false)).toEqual(["Ctrl", "+"]);
+    expect(shortcutKeys("escape", false)).toEqual(["Esc"]);
+    expect(shortcutKeys("pageDown", false)).toEqual(["PageDown"]);
+    // Without a platform given, it asks this one (jsdom is not Apple).
+    expect(shortcutKeys("mod+k")).toEqual(["Ctrl", "K"]);
+  });
+  it("writes caps as aria-keyshortcuts", () => {
+    expect(ariaKeyShortcuts(["Cmd", "Shift", "K"])).toBe("Meta+Shift+K");
+    expect(ariaKeyShortcuts(["Option", "Up"])).toBe("Alt+ArrowUp");
   });
 });
