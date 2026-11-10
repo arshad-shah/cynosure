@@ -8,6 +8,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { useControllableState } from "../../foundations/controllable.js";
 import { HiddenValue } from "../../foundations/HiddenValue/HiddenValue.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
 import { isComposing } from "../../foundations/keys.js";
@@ -113,11 +114,13 @@ export function Combobox({
 }: ComboboxProps) {
   const text = { ...DEFAULT_LABELS, ...labels };
   const listId = `cy-combobox-${useId().replace(/:/g, "")}`;
-  const [innerValue, setInnerValue] = useState(defaultValue);
-  const current = value ?? innerValue;
+  const [current, setCurrent, resetCurrent] = useControllableState(value, defaultValue, onChange);
   const labelOf = (v: string) => options.find((o) => o.value === v)?.label ?? (allowCustom ? v : "");
-  const [innerText, setInnerText] = useState(() => labelOf(defaultValue));
-  const typedText = inputValue ?? innerText;
+  const [typedText, setText, resetText] = useControllableState(
+    inputValue,
+    () => labelOf(defaultValue),
+    onInputChange,
+  );
   const [open, setOpen] = useState(false);
   // True once the person has typed since the last choice: only then does the text filter the list.
   const [typing, setTyping] = useState(false);
@@ -132,15 +135,10 @@ export function Combobox({
   const enabled = visible.filter((o) => !o.disabled);
   const activeIndex = visible.findIndex((o) => o.value === activeValue);
 
-  const setText = (next: string) => {
-    if (inputValue === undefined) setInnerText(next);
-    onInputChange?.(next);
-  };
   const setValue = (next: string) => {
     if (next === current) return;
-    if (value === undefined) setInnerValue(next);
     setMissing(false);
-    onChange?.(next);
+    setCurrent(next);
   };
   const choose = (option: ComboboxOption) => {
     if (option.disabled) return;
@@ -326,8 +324,8 @@ export function Combobox({
           input.current?.focus();
         }}
         onReset={() => {
-          if (value === undefined) setInnerValue(defaultValue);
-          if (inputValue === undefined) setInnerText(labelOf(defaultValue));
+          resetCurrent(defaultValue);
+          resetText(labelOf(defaultValue));
           setTyping(false);
           setOpen(false);
         }}

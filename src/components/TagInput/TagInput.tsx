@@ -9,6 +9,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { useControllableState } from "../../foundations/controllable.js";
 import { HiddenValue } from "../../foundations/HiddenValue/HiddenValue.js";
 import { isComposing } from "../../foundations/keys.js";
 import { close } from "../../icons/close.js";
@@ -112,9 +113,7 @@ export function TagInput({
   const text = { ...DEFAULT_LABELS, ...labels };
   const id = useId();
   const listId = `${id}-list`;
-  const controlled = value !== undefined;
-  const [own, setOwn] = useState(defaultValue);
-  const tags = controlled ? value : own;
+  const [tags, update, resetTags] = useControllableState(value, defaultValue, onChange);
   const [typed, setTyped] = useState("");
   const [problem, setProblem] = useState<string | null>(null);
   const [said, setSaid] = useState("");
@@ -131,11 +130,6 @@ export function TagInput({
     (s) => !tags.some((t) => same(t, s)) && s.toLocaleLowerCase().includes(query.toLocaleLowerCase()),
   );
   const listOpen = open && suggestions !== undefined && !disabled;
-
-  const update = (next: string[]) => {
-    if (!controlled) setOwn(next);
-    onChange?.(next);
-  };
 
   /** Adds each candidate that passes the checks; reports the first problem. Returns whether all were added. */
   const add = (candidates: string[]) => {
@@ -392,7 +386,7 @@ export function TagInput({
         onReset={() => {
           setTyped("");
           setProblem(null);
-          if (!controlled) setOwn(defaultValue);
+          resetTags(defaultValue);
         }}
       />
     </div>

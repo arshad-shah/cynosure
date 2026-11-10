@@ -2,7 +2,6 @@ import {
   type CSSProperties,
   Fragment,
   type KeyboardEvent,
-  useCallback,
   useEffect,
   useId,
   useMemo,
@@ -10,6 +9,7 @@ import {
   useState,
 } from "react";
 import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js";
+import { useControllableState } from "../../foundations/controllable.js";
 import { DialogBase } from "../../foundations/DialogBase/DialogBase.js";
 import { useHotkey } from "../../foundations/hotkey.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
@@ -106,8 +106,7 @@ export function CommandPalette({
 }: CommandPaletteProps) {
   const text = { ...DEFAULT_LABELS, ...labels };
   const id = useId().replace(/:/g, "");
-  const [inner, setInner] = useState(defaultOpen);
-  const isOpen = open ?? inner;
+  const [isOpen, setOpen] = useControllableState(open, defaultOpen, onOpenChange);
   const [query, setQuery] = useState("");
   const [recent, setRecent] = useState<string[]>([]);
   const [active, setActive] = useState(0);
@@ -116,13 +115,6 @@ export function CommandPalette({
   const list = useRef<HTMLDivElement>(null);
   const returnTo = useRef<HTMLElement | null>(null);
 
-  const setOpen = useCallback(
-    (next: boolean) => {
-      if (open === undefined) setInner(next);
-      onOpenChange?.(next);
-    },
-    [open, onOpenChange],
-  );
   useHotkey(shortcut, () => setOpen(!isOpen));
 
   // Rows: recent commands first while the query is empty, then the matches grouped by `group` in first-seen order.

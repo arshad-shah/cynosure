@@ -9,6 +9,7 @@ import {
   useState,
 } from "react";
 import { ButtonBase } from "../../foundations/ButtonBase/ButtonBase.js";
+import { useControllableState } from "../../foundations/controllable.js";
 import { HiddenValue } from "../../foundations/HiddenValue/HiddenValue.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
 import { isComposing } from "../../foundations/keys.js";
@@ -90,8 +91,7 @@ export function Select({
   const listId = `cy-select-${useId().replace(/:/g, "")}`;
   const trigger = useRef<HTMLButtonElement | null>(null);
   const list = useRef<HTMLDivElement | null>(null);
-  const [inner, setInner] = useState(defaultValue);
-  const current = value ?? inner;
+  const [current, setCurrent, resetCurrent] = useControllableState(value, defaultValue, onChange);
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(-1);
   const typeTo = useTypeahead();
@@ -107,11 +107,10 @@ export function Select({
     (index: number) => {
       const option = options[index];
       if (!option || option.disabled) return;
-      if (value === undefined) setInner(option.value);
       setMissing(false);
-      if (option.value !== current) onChange?.(option.value);
+      if (option.value !== current) setCurrent(option.value);
     },
-    [options, value, current, onChange],
+    [options, current, setCurrent],
   );
   const close = (focus = true) => {
     setOpen(false);
@@ -271,7 +270,7 @@ export function Select({
             disabled={disabled}
             requiredMessage={labels?.required ?? "Please choose a value."}
             onReset={() => {
-              if (value === undefined) setInner(defaultValue);
+              resetCurrent(defaultValue);
               setMissing(false);
             }}
             onInvalid={(event) => {

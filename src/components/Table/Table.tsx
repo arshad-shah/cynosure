@@ -1,5 +1,6 @@
-import { type CSSProperties, type ReactNode, useId, useMemo, useState } from "react";
+import { type CSSProperties, type ReactNode, useId, useMemo } from "react";
 import { ButtonBase } from "../../foundations/ButtonBase/ButtonBase.js";
+import { useControllableState } from "../../foundations/controllable.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
 import { arrowDown } from "../../icons/arrow-down.js";
 import { arrowUp } from "../../icons/arrow-up.js";
@@ -121,12 +122,9 @@ export function Table<Row>({
 }: TableProps<Row>) {
   const text = { ...DEFAULT_LABELS, ...labels };
   const id = useId();
-  const sortControlled = sort !== undefined;
-  const [ownSort, setOwnSort] = useState<TableSort | null>(defaultSort);
-  const currentSort = sortControlled ? sort : ownSort;
-  const selControlled = selected !== undefined;
-  const [ownSelected, setOwnSelected] = useState(defaultSelected);
-  const chosen = new Set(selControlled ? selected : ownSelected);
+  const [currentSort, setSort] = useControllableState<TableSort | null>(sort, defaultSort, onSortChange);
+  const [chosenIds, setChosen] = useControllableState(selected, defaultSelected, onSelectionChange);
+  const chosen = new Set(chosenIds);
   const headerColumn = columns.find((c) => c.rowHeader) ?? columns[0];
 
   const shown = useMemo(() => {
@@ -145,10 +143,6 @@ export function Table<Row>({
     });
   }, [rows, columns, currentSort, manualSort]);
 
-  const setSort = (next: TableSort | null) => {
-    if (!sortControlled) setOwnSort(next);
-    onSortChange?.(next);
-  };
   // Ascending, then descending, then unsorted.
   const cycle = (key: string) => {
     if (currentSort?.key !== key) setSort({ key, direction: "ascending" });
@@ -157,8 +151,7 @@ export function Table<Row>({
   };
   const setSelected = (next: Set<string>) => {
     const ids = rows.map(getRowId).filter((rowId) => next.has(rowId));
-    if (!selControlled) setOwnSelected(ids);
-    onSelectionChange?.(ids);
+    setChosen(ids);
   };
 
   const allIds = rows.map(getRowId);

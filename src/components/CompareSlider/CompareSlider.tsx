@@ -1,4 +1,5 @@
-import { type CSSProperties, type KeyboardEvent, type ReactNode, useRef, useState } from "react";
+import { type CSSProperties, type KeyboardEvent, type ReactNode, useRef } from "react";
+import { useControllableState } from "../../foundations/controllable.js";
 import { useDrag } from "../../foundations/drag.js";
 import { stepKey } from "../../foundations/keys.js";
 import { clamp } from "../../foundations/math.js";
@@ -68,13 +69,11 @@ export function CompareSlider({
   const text = { ...DEFAULT_LABELS, ...labels };
   const area = useRef<HTMLDivElement>(null);
   const divider = useRef<HTMLDivElement>(null);
-  const controlled = value !== undefined;
-  const [own, setOwn] = useState(defaultValue);
-  const position = clamp(controlled ? value : own, 0, 100);
+  const [own, setOwn] = useControllableState(value, defaultValue, onChange);
+  const position = clamp(own, 0, 100);
   const set = (next: number) => {
     const v = Math.round(clamp(next, 0, 100) * 10) / 10;
-    if (!controlled) setOwn(v);
-    onChange?.(v);
+    setOwn(v);
   };
   const fromX = (x: number) => {
     const box = (area.current as HTMLDivElement).getBoundingClientRect();

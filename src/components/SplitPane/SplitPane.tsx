@@ -1,4 +1,5 @@
 import { type CSSProperties, type KeyboardEvent, type ReactNode, useId, useRef, useState } from "react";
+import { useControllableState } from "../../foundations/controllable.js";
 import { isRtl } from "../../foundations/dir.js";
 import { useDrag } from "../../foundations/drag.js";
 import { stepKey } from "../../foundations/keys.js";
@@ -64,20 +65,16 @@ export function SplitPane({
 }: SplitPaneProps) {
   const id = useId();
   const root = useRef<HTMLDivElement>(null);
-  const [own, setOwn] = useState(defaultSize);
   const [dragging, setDragging] = useState(false);
   const restore = useRef<number | null>(null);
   const divider = useRef<HTMLDivElement>(null);
   const dragFrom = useRef(0);
-  const controlled = size !== undefined;
-  const current = controlled ? size : own;
+  const [current, setCurrent] = useControllableState(size, defaultSize, onSizeChange);
   const vertical = orientation === "vertical";
 
   const set = (next: number, allowCollapse = false) => {
     const value = round(allowCollapse && next === 0 ? 0 : clamp(next, min, max));
-    if (value === current) return;
-    if (!controlled) setOwn(value);
-    onSizeChange?.(value);
+    if (value !== current) setCurrent(value);
   };
 
   const fromPoint = (point: { x: number; y: number }) => {

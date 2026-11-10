@@ -28,7 +28,7 @@
   - `usePopover` (with `onShow`) everywhere a manual popover is shown or hidden: Popover, Menu, Select, Combobox, TagInput, Tooltip, Toast. One `PopoverEl` type.
   - `useAnchoredListbox` for the Combobox, TagInput and Select list layer.
   - Select joins `useDismiss`, so it closes in layer order like Menu and Combobox.
-- [ ] **Task 5: `useControllableState`** in the roughly 20 components that write the controlled and uncontrolled pattern by hand.
+- [x] **Task 5: `useControllableState`** (`src/foundations/controllable.ts`, unit-tested), now used by 17 components; ColorField keeps its own because its prop is a string and its state a parsed colour. Was: in the roughly 20 components that write the controlled and uncontrolled pattern by hand.
 - [ ] **Task 6: Small shares.**
   - `luminance` exported from `tokens/color.ts` and used by ColorSwatches.
   - One tone-to-icon map for Toast and Notice.

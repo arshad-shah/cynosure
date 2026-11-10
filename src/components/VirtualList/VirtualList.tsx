@@ -1,5 +1,6 @@
 import { type CSSProperties, type KeyboardEvent, type ReactNode, useRef, useState } from "react";
 import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js";
+import { useControllableState } from "../../foundations/controllable.js";
 import { seekEnabled } from "../../foundations/listbox.js";
 import { clamp } from "../../foundations/math.js";
 import { useVirtualWindow } from "../../foundations/virtual-window.js";
@@ -70,8 +71,7 @@ export function VirtualList<T>({
   style,
 }: VirtualListProps<T>) {
   const root = useRef<HTMLDivElement>(null);
-  const [own, setOwn] = useState(defaultSelectedKeys);
-  const picked = selectedKeys ?? own;
+  const [picked, choose] = useControllableState(selectedKeys, defaultSelectedKeys, onSelectionChange);
   const [focusKey, setFocusKey] = useState<string | null>(null);
   const moveFocus = useRef(false);
   const anchor = useRef<number | null>(null);
@@ -96,10 +96,6 @@ export function VirtualList<T>({
     root.current?.querySelector<HTMLElement>(`[data-index="${stop}"]`)?.focus({ preventScroll: true });
   });
 
-  const choose = (next: string[]) => {
-    if (selectedKeys === undefined) setOwn(next);
-    onSelectionChange?.(next);
-  };
   const toggle = (i: number) => {
     const key = keys[i] as string;
     if (selectionMode === "single") choose([key]);

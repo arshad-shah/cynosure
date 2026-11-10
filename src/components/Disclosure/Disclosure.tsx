@@ -1,5 +1,6 @@
-import { type CSSProperties, type KeyboardEvent, type ReactNode, useId, useState } from "react";
+import { type CSSProperties, type KeyboardEvent, type ReactNode, useId } from "react";
 import { ButtonBase } from "../../foundations/ButtonBase/ButtonBase.js";
+import { useControllableState } from "../../foundations/controllable.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
 import { chevronDown } from "../../icons/chevron-down.js";
 import type { Size } from "../../tokens/schema.js";
@@ -58,12 +59,10 @@ export function Disclosure({
   ...rest
 }: DisclosureProps) {
   const id = useId();
-  const [inner, setInner] = useState(defaultOpen);
-  const isOpen = open ?? inner;
+  const [isOpen, setOpen] = useControllableState(open, defaultOpen, onOpenChange);
   const toggle = () => {
     if (locked) return;
-    if (open === undefined) setInner(!isOpen);
-    onOpenChange?.(!isOpen);
+    setOpen(!isOpen);
   };
   const trigger = (
     <ButtonBase

@@ -1,5 +1,6 @@
-import { type CSSProperties, type ReactNode, useCallback, useContext, useId, useRef, useState } from "react";
+import { type CSSProperties, type ReactNode, useContext, useId, useRef } from "react";
 import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js";
+import { useControllableState } from "../../foundations/controllable.js";
 import { DialogBase } from "../../foundations/DialogBase/DialogBase.js";
 import { close as closeIcon } from "../../icons/close.js";
 import { useDismiss } from "../../overlay/dismiss.js";
@@ -96,8 +97,7 @@ export function DialogFrame({
 }: DialogFrameProps) {
   const id = useId();
   const text = { ...DEFAULT_LABELS, ...labels };
-  const [inner, setInner] = useState(defaultOpen);
-  const isOpen = open ?? inner;
+  const [isOpen, setOpen] = useControllableState(open, defaultOpen, onOpenChange);
   const dialog = useRef<HTMLDialogElement>(null);
   const toastHost = useContext(ToastHostContext);
   const toasts = useRef<HTMLDivElement>(null);
@@ -108,13 +108,6 @@ export function DialogFrame({
   // Where focus was before opening: read while rendering, because DialogBase's showModal moves it first.
   if (isOpen && !wasOpen.current) returnTo.current = deepActive();
   wasOpen.current = isOpen;
-  const setOpen = useCallback(
-    (next: boolean) => {
-      if (open === undefined) setInner(next);
-      onOpenChange?.(next);
-    },
-    [open, onOpenChange],
-  );
   const dismiss = () => {
     if (dismissible) setOpen(false);
   };

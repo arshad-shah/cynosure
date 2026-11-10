@@ -1,6 +1,7 @@
 import { sortable } from "@arshad-shah/detent";
 import { type CSSProperties, type KeyboardEvent, type ReactNode, useId, useRef, useState } from "react";
 import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js";
+import { useControllableState } from "../../foundations/controllable.js";
 import { grip } from "../../icons/grip.js";
 import type { Size } from "../../tokens/schema.js";
 import { IconButton } from "../IconButton/IconButton.js";
@@ -85,9 +86,7 @@ export function SortableList({
 }: SortableListProps) {
   const text = { ...DEFAULT_LABELS, ...labels };
   const id = useId();
-  const controlled = items !== undefined;
-  const [own, setOwn] = useState(defaultItems);
-  const committed = controlled ? items : own;
+  const [committed, setCommitted] = useControllableState(items, defaultItems, onReorder);
   /**
    * While moving: the order being previewed, and the row being moved. Kept in refs too, so events that arrive before
    * React re-renders (a fast drag's move and release) always see the latest values.
@@ -129,8 +128,7 @@ export function SortableList({
     const changed = preview.some((i, n) => i.id !== committed[n]?.id);
     setSaid(text.dropped(item.label, at + 1, preview.length));
     if (changed) {
-      if (!controlled) setOwn(preview);
-      onReorder?.(preview);
+      setCommitted(preview);
     }
     setPreview(null);
     setMoving(null);
@@ -181,8 +179,8 @@ export function SortableList({
 
   // Pointer, touch and pen dragging come from detent (one input path, FLIP animation, auto-scroll). Its own keyboard
   // mode stays off: Cynosure's keyboard mode above has labelled, overridable announcements inside the app.
-  const latest = useRef({ committed, controlled, onReorder, text, disabled });
-  latest.current = { committed, controlled, onReorder, text, disabled };
+  const latest = useRef({ committed, text, disabled });
+  latest.current = { committed, text, disabled };
   useClientLayoutEffect(() => {
     const el = list.current as HTMLUListElement;
     let sorted = false;
@@ -214,11 +212,10 @@ export function SortableList({
         // Put the node back where React rendered it, then let React apply the new order: React stays the DOM's owner.
         node.remove();
         el.insertBefore(node, el.children[from.index] ?? null);
-        const { committed: now, controlled: isControlled, onReorder: report, text: words } = latest.current;
+        const { committed: now, text: words } = latest.current;
         const next = moveItem(now, from.index, to.index);
         setSaid(words.dropped((now[from.index] as SortableItem).label, to.index + 1, next.length));
-        if (!isControlled) setOwn(next);
-        report?.(next);
+        setCommitted(next);
       },
       onEnd: (node, cancelled) => {
         const item = itemOf(node);

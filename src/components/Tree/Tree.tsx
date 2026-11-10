@@ -9,6 +9,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { useControllableState } from "../../foundations/controllable.js";
 import { isRtl } from "../../foundations/dir.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
 import { isTypeaheadKey, useTypeahead } from "../../foundations/listbox.js";
@@ -113,10 +114,8 @@ export function Tree({
   const loadingText = labels?.loading ?? DEFAULT_LABELS.loading;
   const failedText = labels?.failed ?? DEFAULT_LABELS.failed;
   const text = useMemo(() => ({ loading: loadingText, failed: failedText }), [loadingText, failedText]);
-  const [innerSelected, setInnerSelected] = useState(defaultSelected);
-  const [innerExpanded, setInnerExpanded] = useState(defaultExpanded);
-  const picked = selected ?? innerSelected;
-  const open = expanded ?? innerExpanded;
+  const [picked, setPicked] = useControllableState(selected, defaultSelected, onSelectionChange);
+  const [open, setOpen] = useControllableState(expanded, defaultExpanded, onExpandedChange);
   const [loaded, setLoaded] = useState<Record<string, TreeItem[]>>({});
   const [status, setStatus] = useState<Record<string, Status>>({});
   const [focusKey, setFocusKey] = useState<string | null>(null);
@@ -181,10 +180,6 @@ export function Tree({
       ?.focus({ preventScroll: virtual });
   });
 
-  const setOpen = (ids: string[]) => {
-    if (expanded === undefined) setInnerExpanded(ids);
-    onExpandedChange?.(ids);
-  };
   const load = (item: TreeItem) => {
     if (!loadChildren || item.children || loaded[item.id] || status[item.id] === "loading") return;
     setStatus((s) => ({ ...s, [item.id]: "loading" }));
@@ -210,8 +205,7 @@ export function Tree({
           ? picked.filter((id) => id !== item.id)
           : [...picked, item.id]
         : [item.id];
-    if (selected === undefined) setInnerSelected(next);
-    onSelectionChange?.(next);
+    setPicked(next);
   };
   const focusRow = (key: string | undefined) => {
     if (!key) return;

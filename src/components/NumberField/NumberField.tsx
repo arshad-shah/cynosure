@@ -1,4 +1,5 @@
 import { type CSSProperties, type KeyboardEvent, type ReactNode, useMemo, useRef, useState } from "react";
+import { useControllableState } from "../../foundations/controllable.js";
 import { HiddenValue } from "../../foundations/HiddenValue/HiddenValue.js";
 import { clamp } from "../../foundations/math.js";
 import { minus } from "../../icons/minus.js";
@@ -109,9 +110,11 @@ export function NumberField({
   style,
 }: NumberFieldProps) {
   const text = { ...DEFAULT_LABELS, ...labels };
-  const controlled = value !== undefined;
-  const [own, setOwn] = useState<number | null>(defaultValue);
-  const current = controlled ? value : own;
+  const [current, setCurrent, resetCurrent] = useControllableState<number | null>(
+    value,
+    defaultValue,
+    onChange,
+  );
   const [draft, setDraft] = useState<string | null>(null);
   const input = useRef<HTMLInputElement>(null);
   const format = useMemo(
@@ -123,9 +126,7 @@ export function NumberField({
   const limit = (n: number) => clamp(n, min ?? Number.NEGATIVE_INFINITY, max ?? Number.POSITIVE_INFINITY);
   const commit = (next: number | null) => {
     setDraft(null);
-    if (next === current) return;
-    if (!controlled) setOwn(next);
-    onChange?.(next);
+    if (next !== current) setCurrent(next);
   };
   const stepBy = (delta: number) => {
     if (disabled || readOnly) return;
@@ -234,7 +235,7 @@ export function NumberField({
         disabled={disabled}
         onReset={() => {
           setDraft(null);
-          if (!controlled) setOwn(defaultValue);
+          resetCurrent(defaultValue);
         }}
       />
     </>

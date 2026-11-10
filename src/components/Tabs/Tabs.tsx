@@ -10,6 +10,7 @@ import {
   useState,
 } from "react";
 import { ButtonBase } from "../../foundations/ButtonBase/ButtonBase.js";
+import { useControllableState } from "../../foundations/controllable.js";
 import { isRtl } from "../../foundations/dir.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
 import { useRovingFocus } from "../../foundations/roving-focus.js";
@@ -79,8 +80,7 @@ export function Tabs({
   children,
 }: TabsProps) {
   const base = useId();
-  const [inner, setInner] = useState(defaultValue);
-  const current = value ?? inner;
+  const [current, setCurrent] = useControllableState(value, defaultValue, onChange);
   const root = useRef<HTMLDivElement>(null);
   const lastIndex = useRef(0);
   const [panels, setPanels] = useState<ReadonlySet<string>>(() => new Set());
@@ -95,11 +95,9 @@ export function Tabs({
   }, []);
   const select = useCallback(
     (next: string) => {
-      if (next === current) return;
-      if (value === undefined) setInner(next);
-      onChange?.(next);
+      if (next !== current) setCurrent(next);
     },
-    [current, value, onChange],
+    [current, setCurrent],
   );
 
   // Keep a valid selection: default to the first enabled tab, and when the selected tab disappears pick the one now
@@ -124,9 +122,7 @@ export function Tabs({
           ? at
           : (usable.find((t) => tabs.indexOf(t) >= lastIndex.current) ?? usable[usable.length - 1]);
     const next = pick?.dataset.value;
-    if (next === undefined) return;
-    if (value === undefined) setInner(next);
-    onChange?.(next);
+    if (next !== undefined) setCurrent(next);
   });
 
   const safe = (v: string) => v.replace(/[^\w-]/g, "_");

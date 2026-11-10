@@ -1,13 +1,5 @@
-import {
-  type CSSProperties,
-  type KeyboardEvent,
-  type ReactNode,
-  type Ref,
-  useCallback,
-  useId,
-  useRef,
-  useState,
-} from "react";
+import { type CSSProperties, type KeyboardEvent, type ReactNode, type Ref, useId, useRef } from "react";
+import { useControllableState } from "../../foundations/controllable.js";
 import { useDismiss } from "../../overlay/dismiss.js";
 import { usePopover } from "../../overlay/floating.js";
 import type { Placement } from "../../overlay/position.js";
@@ -75,17 +67,9 @@ export function Popover({
   children,
 }: PopoverProps) {
   const id = useId();
-  const [inner, setInner] = useState(defaultOpen);
-  const isOpen = open ?? inner;
+  const [isOpen, setOpen] = useControllableState(open, defaultOpen, onOpenChange);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const panel = useRef<HTMLDivElement>(null);
-  const setOpen = useCallback(
-    (next: boolean) => {
-      if (open === undefined) setInner(next);
-      onOpenChange?.(next);
-    },
-    [open, onOpenChange],
-  );
 
   // Show before positioning (the panel must be laid out to be measured), then move focus inside.
   usePopover(panel, isOpen, (el) => {

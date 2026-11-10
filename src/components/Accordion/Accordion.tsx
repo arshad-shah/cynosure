@@ -1,11 +1,5 @@
-import {
-  type CSSProperties,
-  createContext,
-  type KeyboardEvent,
-  type ReactNode,
-  useContext,
-  useState,
-} from "react";
+import { type CSSProperties, createContext, type KeyboardEvent, type ReactNode, useContext } from "react";
+import { useControllableState } from "../../foundations/controllable.js";
 import type { Size } from "../../tokens/schema.js";
 import { Disclosure } from "../Disclosure/Disclosure.js";
 
@@ -67,26 +61,19 @@ export function Accordion(props: AccordionProps) {
     children,
   } = props;
   const multiple = props.type === "multiple";
-  const [inner, setInner] = useState<string[]>(() =>
-    multiple
-      ? ((props as AccordionMultipleProps).defaultValue ?? [])
-      : (props as AccordionSingleProps).defaultValue
-        ? [(props as AccordionSingleProps).defaultValue as string]
-        : [],
+  // Single mode holds one value (or none); both modes are kept as a list here.
+  const asList = (v: string | string[] | undefined) =>
+    v === undefined ? undefined : Array.isArray(v) ? v : [v];
+  const [open, commit] = useControllableState<string[]>(
+    asList(props.value),
+    () => asList(props.defaultValue) ?? [],
+    (next) =>
+      multiple
+        ? (props as AccordionMultipleProps).onValueChange?.(next)
+        : (props as AccordionSingleProps).onValueChange?.(next[0]),
   );
-  const controlled = props.value !== undefined;
-  const open: string[] = controlled
-    ? multiple
-      ? ((props as AccordionMultipleProps).value ?? [])
-      : [(props as AccordionSingleProps).value as string]
-    : inner;
   const collapsible = !multiple && (props as AccordionSingleProps).collapsible === true;
 
-  const commit = (next: string[]) => {
-    if (!controlled) setInner(next);
-    if (multiple) (props as AccordionMultipleProps).onValueChange?.(next);
-    else (props as AccordionSingleProps).onValueChange?.(next[0]);
-  };
   const ctx: Ctx = {
     isOpen: (v) => open.includes(v),
     locked: (v) => !multiple && !collapsible && open.includes(v),

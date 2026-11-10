@@ -1,4 +1,5 @@
-import { type CSSProperties, type KeyboardEvent, useCallback, useId, useRef, useState } from "react";
+import { type CSSProperties, type KeyboardEvent, useCallback, useId, useRef } from "react";
+import { useControllableState } from "../../foundations/controllable.js";
 import { isRtl } from "../../foundations/dir.js";
 import { useDrag } from "../../foundations/drag.js";
 import { HiddenValue } from "../../foundations/HiddenValue/HiddenValue.js";
@@ -102,8 +103,7 @@ export function Slider({
   const id = useId();
   const text = { ...DEFAULT_LABELS, ...labels };
   const initial = defaultValue ?? min;
-  const [inner, setInner] = useState<SliderValue>(initial);
-  const current = value ?? inner;
+  const [current, setCurrent, resetCurrent] = useControllableState<SliderValue>(value, initial, onChange);
   const range = Array.isArray(current);
   const values: number[] = range ? [...current] : [current];
   const track = useRef<HTMLDivElement>(null);
@@ -128,8 +128,7 @@ export function Slider({
   const set = (next: SliderValue, commit: boolean) => {
     const same = Array.isArray(next) ? next.every((n, i) => n === values[i]) : next === values[0];
     if (!same) {
-      if (value === undefined) setInner(next);
-      onChange?.(next);
+      setCurrent(next);
     }
     if (commit) onCommit?.(next);
   };
@@ -251,7 +250,7 @@ export function Slider({
           value={String(v)}
           disabled={disabled}
           onReset={() => {
-            if (value === undefined) setInner(initial);
+            resetCurrent(initial);
           }}
         />
       ))}
