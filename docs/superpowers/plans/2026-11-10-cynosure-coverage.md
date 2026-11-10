@@ -14,10 +14,10 @@
 
 Smallest first, then the larger pieces.
 
-- [x] **Task 1: Facet icons.** 46 new icons in the existing 15 categories (183 in all): settings, star, star-off, printer, compare, wrench, swap, book-open, message-plus, alert-circle, minus-circle, list-checks, locate, briefcase, calculator, compass, graduation-cap, headphones, target, scan-line, wifi-off, network, plug, puzzle, bot, activity, inbox, hard-drive, workflow, zap, bold, italic, underline, strikethrough, quote, align-center, align-right, align-justify, rotate, brush, paint-bucket, shadow, anchor, laptop, tablet, repeat.
+- [x] **Task 1: Facet icons.** 46 new icons in the existing 15 categories (184 in all, with `alert` added for Steps): settings, star, star-off, printer, compare, wrench, swap, book-open, message-plus, alert-circle, minus-circle, list-checks, locate, briefcase, calculator, compass, graduation-cap, headphones, target, scan-line, wifi-off, network, plug, puzzle, bot, activity, inbox, hard-drive, workflow, zap, bold, italic, underline, strikethrough, quote, align-center, align-right, align-justify, rotate, brush, paint-bucket, shadow, anchor, laptop, tablet, repeat.
 - [x] **Task 2: Skeleton.** Loading placeholders (text lines, block, circle); reduced motion stops the shimmer; hidden from assistive technology, with the busy state on the region that owns it.
 - [x] **Task 3: Grid.** Responsive layout primitive (columns or min item width, gap tokens).
-- [ ] **Task 4: Steps.** Ordered progress through a flow (`aria-current="step"`), horizontal and vertical, optional clickable steps.
+- [x] **Task 4: Steps.** Ordered progress through a flow (`aria-current="step"`), horizontal and vertical, optional clickable steps.
 - [ ] **Task 5: DescriptionList.** Term and detail pairs, stacked or side by side.
 - [ ] **Task 6: `useAnnounce`.** Polite or assertive live-region announcements without writing to `<body>`.
 - [ ] **Task 7: `themeInitScript()`.** Returns the text of a tiny script that sets the saved theme before first paint; products place it themselves (Cynosure injects nothing).

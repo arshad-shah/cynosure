@@ -1,4 +1,5 @@
 export { activity } from "./activity.js";
+export { alert } from "./alert.js";
 export { alertCircle } from "./alert-circle.js";
 export { alignCenter } from "./align-center.js";
 export { alignJustify } from "./align-justify.js";

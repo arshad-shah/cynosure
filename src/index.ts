@@ -83,6 +83,14 @@ export {
   type SliderValue,
 } from "./components/Slider/index.js";
 export { Stack, type StackProps } from "./components/Stack/index.js";
+export {
+  type StepItem,
+  type StepStatus,
+  Steps,
+  type StepsLabels,
+  type StepsProps,
+  type StepsTokens,
+} from "./components/Steps/index.js";
 export { Switch, type SwitchProps } from "./components/Switch/index.js";
 export {
   Tab,

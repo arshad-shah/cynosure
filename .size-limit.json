@@ -319,5 +319,11 @@
     "path": ["dist/components/Grid/Grid.js", "dist/styles/grid.css"],
     "limit": "1 kB",
     "gzip": true
+  },
+  {
+    "name": "Steps",
+    "path": ["dist/components/Steps/Steps.js", "dist/styles/steps.css"],
+    "limit": "2.5 kB",
+    "gzip": true
   }
 ]

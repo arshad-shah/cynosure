@@ -1,6 +1,6 @@
 # Icons (Facet)
 
-Facet icons share one grammar: 24 grid, 1.75 round stroke, softened-square geometry, stroke only (no fills). There are 183 icons in 15 categories (`ICON_CATEGORIES`): arrows, navigation, actions, editing, files, data, media, communication, status, time, security, people, devices, design, layout. Browse them in Storybook: **Foundations → Icon → Gallery** (hover a tile to see its motion).
+Facet icons share one grammar: 24 grid, 1.75 round stroke, softened-square geometry, stroke only (no fills). There are 184 icons in 15 categories (`ICON_CATEGORIES`): arrows, navigation, actions, editing, files, data, media, communication, status, time, security, people, devices, design, layout. Browse them in Storybook: **Foundations → Icon → Gallery** (hover a tile to see its motion).
 
 ```tsx
 import { Icon } from "@arshad-shah/cynosure";
