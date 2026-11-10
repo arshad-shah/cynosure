@@ -29,7 +29,7 @@
   - `useAnchoredListbox` for the Combobox, TagInput and Select list layer.
   - Select joins `useDismiss`, so it closes in layer order like Menu and Combobox.
 - [x] **Task 5: `useControllableState`** (`src/foundations/controllable.ts`, unit-tested), now used by 17 components; ColorField keeps its own because its prop is a string and its state a parsed colour. Was: in the roughly 20 components that write the controlled and uncontrolled pattern by hand.
-- [ ] **Task 6: Small shares.**
+- [x] **Task 6: Small shares.** Done: `luminance` exported from `tokens/color.ts` (ColorSwatches used a copy); `TONE_ICONS` in `src/foundations/tone-icons.ts` for Notice and Toast. Kept: the Select and Combobox fade keyframes, because each component's CSS ships alone and a shared keyframe would tie both to the base sheet loading first.
   - `luminance` exported from `tokens/color.ts` and used by ColorSwatches.
   - One tone-to-icon map for Toast and Notice.
   - One fade keyframe for Select and Combobox, if it can live where both bundles load it.

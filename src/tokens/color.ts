@@ -108,7 +108,8 @@ export function shiftLightness(color: string, delta: number): string {
   return toHex(oklchToRgb(clamp(L + delta), C, H));
 }
 
-function luminance(rgb: Rgb): number {
+/** WCAG relative luminance of an sRGB colour (0 for black, 1 for white). */
+export function luminance(rgb: Rgb): number {
   const [r, g, b] = rgb.map(toLinear) as Rgb;
   return 0.2126 * r + 0.7152 * g + 0.0722 * b;
 }

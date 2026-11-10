@@ -3,6 +3,7 @@ import { ButtonBase } from "../../foundations/ButtonBase/ButtonBase.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
 import { useRovingFocus } from "../../foundations/roving-focus.js";
 import { check } from "../../icons/check.js";
+import { luminance } from "../../tokens/color.js";
 import type { Size } from "../../tokens/schema.js";
 import { readColor } from "../ColorField/read-color.js";
 
@@ -46,15 +47,9 @@ const key = (text: string | undefined) => {
   return c ? `${c.rgb.map((n) => Math.round(n * 255)).join(",")}/${Math.round(c.a * 100)}` : text;
 };
 /** Relative luminance (sRGB), to pick a tick that shows on the swatch. */
-const luminance = (text: string) => {
+const lightness = (text: string) => {
   const c = readColor(text);
-  if (!c) return 1;
-  const [r, g, b] = c.rgb.map((v) => (v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4)) as [
-    number,
-    number,
-    number,
-  ];
-  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  return c ? luminance(c.rgb) : 1;
 };
 
 /**
@@ -96,7 +91,7 @@ export function ColorSwatches({
             disabled={disabled}
             data-roving=""
             className="cy-color-swatches-swatch cy-reset"
-            data-light={luminance(item.value) > 0.4 ? "" : undefined}
+            data-light={lightness(item.value) > 0.4 ? "" : undefined}
             style={{ "--_swatch": item.value } as CSSProperties}
             onClick={() => onChange(item.value)}
             // Arrow keys move focus (roving); in a radio group the focused swatch is chosen too, once one is.

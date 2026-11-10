@@ -1,11 +1,8 @@
 import { type CSSProperties, type ReactNode, useState } from "react";
 import { Icon } from "../../foundations/Icon/Icon.js";
-import { checkCircle } from "../../icons/check-circle.js";
+import { TONE_ICONS } from "../../foundations/tone-icons.js";
 import { close as closeIcon } from "../../icons/close.js";
-import { info } from "../../icons/info.js";
 import type { IconData } from "../../icons/types.js";
-import { warning } from "../../icons/warning.js";
-import { xCircle } from "../../icons/x-circle.js";
 import type { Tone } from "../../tokens/schema.js";
 import { IconButton } from "../IconButton/IconButton.js";
 
@@ -47,14 +44,6 @@ export interface NoticeProps {
   children?: ReactNode;
 }
 
-const ICONS: Partial<Record<Tone, IconData>> = {
-  info,
-  success: checkCircle,
-  warning,
-  danger: xCircle,
-  accent: info,
-};
-
 /** An inline message about part of the page: a status, a warning or an error that stays until it is resolved. */
 export function Notice({
   tone = "info",
@@ -70,7 +59,7 @@ export function Notice({
 }: NoticeProps) {
   const [hidden, setHidden] = useState(false);
   if (hidden) return null;
-  const glyph = icon === undefined ? ICONS[tone] : icon;
+  const glyph = icon === undefined ? TONE_ICONS[tone] : icon;
   return (
     <div
       role={tone === "danger" ? "alert" : "status"}

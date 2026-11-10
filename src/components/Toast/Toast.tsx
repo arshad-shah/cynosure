@@ -14,12 +14,8 @@ import {
 import { createPortal } from "react-dom";
 import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
-import { checkCircle } from "../../icons/check-circle.js";
+import { TONE_ICONS } from "../../foundations/tone-icons.js";
 import { close as closeIcon } from "../../icons/close.js";
-import { info } from "../../icons/info.js";
-import type { IconData } from "../../icons/types.js";
-import { warning } from "../../icons/warning.js";
-import { xCircle } from "../../icons/x-circle.js";
 import { ToastHostContext, type ToastHostRegistry } from "../../overlay/toast-host.js";
 import type { Tone } from "../../tokens/schema.js";
 import { Button } from "../Button/Button.js";
@@ -92,12 +88,6 @@ interface Item extends ToastOptions {
 }
 
 const DEFAULT_LABELS: ToastLabels = { region: "Notifications", dismiss: "Dismiss" };
-const ICONS: Partial<Record<ToastTone, IconData>> = {
-  success: checkCircle,
-  danger: xCircle,
-  warning,
-  info,
-};
 /** Horizontal distance a touch has to travel to swipe a toast away. */
 const SWIPE = 64;
 
@@ -321,7 +311,7 @@ function ToastItem({ item, collapsed, paused, dismissLabel, onDismiss, onRemoved
     else node.style.removeProperty("--_dx");
   };
 
-  const icon = ICONS[tone];
+  const icon = TONE_ICONS[tone];
   return (
     <div
       ref={el}
