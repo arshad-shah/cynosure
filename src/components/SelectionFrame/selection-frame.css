@@ -1,0 +1,96 @@
+/*
+ * selection-frame: an absolutely positioned outline over the selected object (place it in a positioned layer), with
+ * eight resize handles and a rotate handle above. Each handle's ::after widens its hit area (44px on touch screens).
+ */
+.cy-selection-frame.cy-selection-frame {
+  --_c: var(--cy-selection-frame-color, var(--cy-color-accent));
+  --_s: var(--cy-selection-frame-handle-size, calc(3 * var(--cy-space-3)));
+  --_hit: var(--cy-hit-min, 24px);
+  box-sizing: border-box !important;
+  position: absolute;
+  inset-block-start: var(--_y);
+  left: var(--_x);
+  inline-size: var(--_w);
+  block-size: var(--_h);
+  margin: 0;
+  padding: 0;
+  outline: calc(2 * var(--cy-border-width)) solid var(--_c);
+  rotate: var(--_r);
+  cursor: move;
+  touch-action: none;
+  font-size: var(--cy-font-size-md);
+  &:focus-visible {
+    box-shadow: 0 0 0 calc(var(--cy-border-focus) + 2 * var(--cy-border-width)) var(--cy-color-ring);
+  }
+}
+.cy-selection-frame-handle.cy-selection-frame-handle {
+  box-sizing: border-box !important;
+  position: absolute;
+  inline-size: var(--_s);
+  block-size: var(--_s);
+  margin: calc(var(--_s) / -2);
+  border: calc(2 * var(--cy-border-width)) solid var(--_c);
+  border-radius: var(--cy-radius-sm);
+  background: var(--cy-color-surface-raised);
+  touch-action: none;
+  font-size: inherit;
+  &::after {
+    content: "";
+    position: absolute;
+    /* Centred on the handle; the ::after sits inside the border, so the border is added back. */
+    inset: calc((var(--_s) - var(--_hit)) / 2 - 2 * var(--cy-border-width));
+  }
+  &:is([data-handle="nw"], [data-handle="n"], [data-handle="ne"]) {
+    top: 0;
+  }
+  &:is([data-handle="w"], [data-handle="e"]) {
+    top: 50%;
+  }
+  &:is([data-handle="sw"], [data-handle="s"], [data-handle="se"]) {
+    top: 100%;
+  }
+  &:is([data-handle="nw"], [data-handle="w"], [data-handle="sw"]) {
+    left: 0;
+  }
+  &:is([data-handle="n"], [data-handle="s"]) {
+    left: 50%;
+  }
+  &:is([data-handle="ne"], [data-handle="e"], [data-handle="se"]) {
+    left: 100%;
+  }
+  &[data-handle="nw"],
+  &[data-handle="se"] {
+    cursor: nwse-resize;
+  }
+  &[data-handle="ne"],
+  &[data-handle="sw"] {
+    cursor: nesw-resize;
+  }
+  &[data-handle="n"],
+  &[data-handle="s"] {
+    cursor: ns-resize;
+  }
+  &[data-handle="e"],
+  &[data-handle="w"] {
+    cursor: ew-resize;
+  }
+}
+.cy-selection-frame-rotate.cy-selection-frame-rotate {
+  top: calc(-1 * var(--cy-space-8));
+  left: 50%;
+  border-radius: var(--cy-radius-full);
+  cursor: grab;
+}
+@media (pointer: coarse) {
+  .cy-selection-frame.cy-selection-frame {
+    --_hit: var(--cy-hit-coarse, 44px);
+  }
+  .cy-selection-frame-rotate.cy-selection-frame-rotate {
+    top: calc(-1 * var(--cy-space-10) - var(--cy-space-4));
+  }
+}
+@media (forced-colors: active) {
+  .cy-selection-frame.cy-selection-frame {
+    --_c: Highlight;
+  }
+}

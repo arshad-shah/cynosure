@@ -127,6 +127,20 @@ export {
   type SegmentOption,
 } from "./components/SegmentedControl/index.js";
 export { Select, type SelectOption, type SelectProps } from "./components/Select/index.js";
+export {
+  angleFrom,
+  contain,
+  type FrameBox,
+  type FrameHandle,
+  type FrameLimits,
+  moveBy,
+  resizeBy,
+  resizeByKey,
+  SelectionFrame,
+  type SelectionFrameLabels,
+  type SelectionFrameProps,
+  type SelectionFrameTokens,
+} from "./components/SelectionFrame/index.js";
 export { Sheet, type SheetProps, type SheetTokens } from "./components/Sheet/index.js";
 export {
   type NavEntry,
