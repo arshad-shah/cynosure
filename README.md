@@ -39,7 +39,7 @@ export const App = () => (
 **Controls:** Button, IconButton, CopyButton, Link, TextField, SearchField, TextArea, Select, Checkbox, Switch, RadioGroup, SegmentedControl, ThemeToggle.
 **Structure:** Stack, Inline, Card, Toolbar, Tabs, Disclosure, Accordion.
 **Overlays:** Tooltip, Popover, Menu, Dialog, Sheet, Toast (`Toaster`, `useToast`).
-**Feedback and display:** Notice, EmptyState, LoadingDots, Badge, Kbd, Field. **Theme:** CynosureTheme, useColorMode, createTheme.
+**Feedback and display:** Notice, EmptyState, ProgressBar, LoadingDots, Badge, Kbd, Field. **Theme:** CynosureTheme, useColorMode, createTheme.
 **Build:** optional Vite adapter (`@arshad-shah/cynosure/vite`) and self-hosted Hanken Grotesk (`fonts/hanken.css`).
 
 > Status: pre-release (`0.x`) on branch `next`. Not yet published to npm.

@@ -43,17 +43,18 @@ After Plan 3 (fixes from Arshad's checks of the published Storybook, 2026-11-10)
 
 ## Current task
 
-Plan 4 Task 2: ProgressBar. Task 1 (toasts inside modal dialogs) is done.
+Plan 4 Task 3: Slider (single and range). Tasks 1 (toasts inside dialogs) and 2 (ProgressBar) are done.
 
 ## Next step
 
 Build Plan 4 (`docs/superpowers/plans/2026-11-10-cynosure-evidence.md`) task by task, stories first:
 
 1. **Task 1:** done. Toasts raised inside an open Dialog show above it; they move back to the page with their remaining time and are not announced again.
-2. **Tasks 2–7:** ProgressBar, Slider (single and range), Combobox, Tree, CommandPalette, ColorField. The product evidence for each is in the plan.
-3. **Task 8:** carry-overs: check Prism for Tree, add Slider and Combobox to the React 18 smoke tests. (The keyframe entrances are confirmed on WebKit: in CI run 387 Dialog, Popover, Menu, Tooltip and Select passed their `shownFully` checks; the only failure was a Toast test race, fixed.)
-4. **Task 9:** draft one migration issue per product repo in `docs/migration/issues/`. Open them only after Arshad reviews the drafts.
-5. **Task 10:** docs, independent review, `pnpm verify`, CI green, push.
+2. **Task 2:** done. ProgressBar: determinate and indeterminate, labelled `role="progressbar"`, value text through `labels.value`.
+3. **Tasks 3–7:** Slider (single and range), Combobox, Tree, CommandPalette, ColorField. The product evidence for each is in the plan.
+4. **Task 8:** carry-overs: check Prism for Tree, add Slider and Combobox to the React 18 smoke tests. (The keyframe entrances are confirmed on WebKit: in CI run 387 Dialog, Popover, Menu, Tooltip and Select passed their `shownFully` checks; the only failure was a Toast test race, fixed.)
+5. **Task 9:** draft one migration issue per product repo in `docs/migration/issues/`. Open them only after Arshad reviews the drafts.
+6. **Task 10:** docs, independent review, `pnpm verify`, CI green, push.
 
 ## Plan 3 final review
 
@@ -76,7 +77,7 @@ An independent review of the Plan 3 Tasks 8–12 code found nine issues. Fixed (
 - [x] Plan 1: Foundation (`docs/superpowers/plans/2026-11-09-cynosure-foundation.md`)
 - [x] Plan 2: Milestone 1 controls (`docs/superpowers/plans/2026-11-09-cynosure-controls.md`)
 - [x] Plan 3: Milestone 2 structure and overlays (`docs/superpowers/plans/2026-11-09-cynosure-structure.md`). Tasks 1–13 and the final review done.
-- [ ] Plan 4: Milestone 3 and product migration issues (`docs/superpowers/plans/2026-11-10-cynosure-evidence.md`). Task 1 done; Task 2 next.
+- [ ] Plan 4: Milestone 3 and product migration issues (`docs/superpowers/plans/2026-11-10-cynosure-evidence.md`). Tasks 1–2 done; Task 3 next.
 
 ## Plan 3 rulings so far
 
@@ -112,6 +113,7 @@ An independent review of the Plan 3 Tasks 8–12 code found nine issues. Fixed (
 ## Plan 4 rulings so far
 
 - **Toasts in dialogs (Task 1):** an open Dialog (or Sheet) inside a Toaster registers a container through `ToastHostContext` (`src/overlay/toast-host.ts`, separate so Dialog never imports Toast). The Toaster portals its region into the latest container and shows it again, which puts it above the dialog and outside the modal's inert area. Moving re-creates the toast elements, so each toast keeps a small memory in the Toaster: whether it was announced (then its text renders at once, and a danger toast comes back as `status`, not `alert`) and its remaining time (read when the timer starts, after the old element saved it).
+- **ProgressBar (Task 2):** the fill uses the tone's text colour (`--cy-color-<tone>-text`): the plain accent fell under 3:1 against the track in dark mode. No live region: completion is announced by the page (Notice or Toast). Budget 1.75 kB.
 
 ## Feedback round (2026-11-09, after Plan 1)
 
@@ -184,7 +186,7 @@ None. Npm publish and deprecating the old packages wait for Arshad's authorisati
 ## Verification
 
 - **Latest local run (cloud container, 2026-11-10):** `cy check`, lint, typecheck, unit and Preact tests (287), the React 18 smoke tests (4), every story on Chromium plus the touch project (about 600 runs in the coverage pass), coverage (≥ 95% branches), build, publint, attw and size budgets pass. The changed components (Notice, TextArea, Dialog, Card) were also checked by screenshot, TextArea in phone emulation.
-- **Firefox and WebKit:** cannot be downloaded in the cloud container (`cdn.playwright.dev` is blocked); CI on `next` runs them. The last complete CI runs: all green on `0e81324`; later runs failed only on WebKit (Card colour timing, the Dialog stuck at opacity 0 that led to the keyframe entrances, then a Toast test race). Each is fixed; check the CI run after the latest push. Check the run after the latest push (Next step 1).
+- **Firefox and WebKit:** cannot be downloaded in the cloud container (`cdn.playwright.dev` is blocked); CI on `next` runs them. The last complete CI runs: all green on `0e81324`; later runs failed only on WebKit (Card colour timing, the Dialog stuck at opacity 0 that led to the keyframe entrances, then a Toast test race). Each is fixed: CI run 389 on `1d670d5` passed every step on all three engines, visual regression included. Check the run after the latest push (Next step 1).
 - **Published Storybook:** every story and docs page of a production build was loaded under `/cynosure/` in Chromium with no load or render errors; the stale-deploy reload was tested by swapping builds under an open tab.
 - **CI on `next`:** conventions, lint, types, unit, React 18, stories on all three engines plus touch, coverage, visual regression, build, publint, attw and size.
 - **Not verified:**

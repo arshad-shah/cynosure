@@ -267,5 +267,11 @@
     "path": ["dist/components/CopyButton/CopyButton.js", "dist/styles/copy-button.css"],
     "limit": "1.25 kB",
     "gzip": true
+  },
+  {
+    "name": "ProgressBar",
+    "path": ["dist/components/ProgressBar/ProgressBar.js", "dist/styles/progress-bar.css"],
+    "limit": "1.75 kB",
+    "gzip": true
   }
 ]

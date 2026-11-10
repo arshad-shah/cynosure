@@ -1,0 +1,65 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./ProgressBar.stories";
+
+<Meta of={Stories} />
+
+# ProgressBar
+
+Shows how far a task has got: an upload, an export, the steps of a setup. When the amount is unknown it shows a moving segment instead.
+
+<Canvas of={Stories.ReportsItsValue} />
+
+## When to use
+
+- **A task with a measurable amount** (bytes, files, steps) that takes long enough to watch.
+- **A task in progress whose length is unknown**, shown in place of the result: `indeterminate`.
+
+**Use something else when:**
+- the wait is short and inside a button: the Button's `loading` state
+- a small inline busy indicator is enough: [LoadingDots](?path=/docs/components-loadingdots--docs)
+- the person sets the value: a Slider
+
+## Usage
+
+```tsx
+import { ProgressBar } from "@arshad-shah/cynosure";
+
+<ProgressBar label="Uploading 3 files" value={uploaded} max={total} showValue />
+<ProgressBar label="Preparing export" indeterminate />
+```
+
+Leave `value` out (or pass `indeterminate`) while the amount is unknown, then pass it once you know it. Values outside 0…`max` are clamped.
+
+<Canvas of={Stories.Indeterminate} />
+
+## Value text
+
+By default the value reads as a percentage. Pass `labels.value` to describe it in your own words; the same text is shown with `showValue` and read by screen readers.
+
+<Canvas of={Stories.LabelsAndHiddenLabel} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+- **Role:** `role="progressbar"`, named by `label`, with `aria-valuemin`, `aria-valuemax`, `aria-valuenow` and `aria-valuetext`. Indeterminate bars have no current value and are `aria-busy`.
+- **Announcements:** a progress bar is not a live region. To announce completion, say so in the page (a [Notice](?path=/docs/components-notice--docs) or a [Toast](?path=/docs/components-toast--docs)).
+- **Contrast:** the fill keeps at least 3:1 against its track in every tone, in light and dark modes.
+- **Direction:** fills from the inline start, so from the right in right-to-left text.
+- **Motion:** the fill eases between values; the indeterminate segment sweeps, and stands still in the middle under reduced motion.
+
+<Canvas of={Stories.VisibleInEveryToneAndMode} />
+
+## Theming
+
+Tokens: `--cy-progress-bar-height-{sm,md,lg}`, `--cy-progress-bar-radius` and `--cy-progress-bar-track`.
+
+```ts
+createTheme({ components: { progressBar: { heightMd: "6px", radius: "2px" } } });
+```
+
+## Related
+
+[LoadingDots](?path=/docs/components-loadingdots--docs) · [Toast](?path=/docs/components-toast--docs) · [Notice](?path=/docs/components-notice--docs)

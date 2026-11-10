@@ -36,6 +36,12 @@ export {
   type PopoverTokens,
   type PopoverTriggerProps,
 } from "./components/Popover/index.js";
+export {
+  ProgressBar,
+  type ProgressBarLabels,
+  type ProgressBarProps,
+  type ProgressBarTokens,
+} from "./components/ProgressBar/index.js";
 export { RadioGroup, type RadioGroupProps, type RadioOption } from "./components/RadioGroup/index.js";
 export { SearchField, type SearchFieldProps } from "./components/SearchField/index.js";
 export {

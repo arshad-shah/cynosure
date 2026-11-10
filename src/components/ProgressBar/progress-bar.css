@@ -1,0 +1,116 @@
+/*
+ * progress-bar: label row, then a track with a fill. The fill grows from the inline start (right in RTL). It uses the
+ * tone's text colour, which keeps 3:1 against the track in light and dark modes (the plain accent does not in dark).
+ */
+.cy-progress-bar.cy-progress-bar {
+  --_tone: var(--cy-color-accent-text);
+  --_h: var(--cy-progress-bar-height-md, 8px);
+  box-sizing: border-box !important;
+  display: grid;
+  gap: var(--cy-space-3);
+  inline-size: 100%;
+  margin: 0;
+  color: var(--cy-color-ink);
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-font-size-md);
+  font-weight: var(--cy-font-weight-regular);
+  line-height: var(--cy-font-line-height);
+  letter-spacing: normal;
+  text-transform: none;
+  &[data-size="sm"] {
+    --_h: var(--cy-progress-bar-height-sm, 4px);
+  }
+  &[data-size="lg"] {
+    --_h: var(--cy-progress-bar-height-lg, 12px);
+  }
+  &[data-tone="success"] {
+    --_tone: var(--cy-color-success-text);
+  }
+  &[data-tone="warning"] {
+    --_tone: var(--cy-color-warning-text);
+  }
+  &[data-tone="danger"] {
+    --_tone: var(--cy-color-danger-text);
+  }
+  &[data-tone="info"] {
+    --_tone: var(--cy-color-info-text);
+  }
+  &[data-tone="neutral"] {
+    --_tone: var(--cy-color-ink);
+  }
+}
+.cy-progress-bar-head.cy-progress-bar-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--cy-space-4);
+  font-size: var(--cy-font-size-md);
+}
+.cy-progress-bar-label.cy-progress-bar-label {
+  min-inline-size: 0;
+  color: var(--cy-color-ink);
+  font-size: var(--cy-font-size-md);
+  font-weight: var(--cy-font-weight-medium);
+  overflow-wrap: anywhere;
+}
+.cy-progress-bar-value.cy-progress-bar-value {
+  flex: none;
+  color: var(--cy-color-muted);
+  font-family: var(--cy-font-mono);
+  font-size: var(--cy-font-size-sm);
+  font-variant-numeric: tabular-nums;
+}
+.cy-progress-bar-track.cy-progress-bar-track {
+  position: relative;
+  block-size: var(--_h);
+  overflow: hidden;
+  border-radius: var(--cy-progress-bar-radius, var(--cy-radius-full));
+  background: var(
+    --cy-progress-bar-track,
+    color-mix(in oklab, var(--cy-color-ink) 12%, var(--cy-color-surface))
+  );
+  font-size: var(--cy-font-size-md);
+}
+.cy-progress-bar-fill.cy-progress-bar-fill {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  inline-size: var(--_fill, 0%);
+  border-radius: inherit;
+  background: var(--_tone);
+  font-size: var(--cy-font-size-md);
+  transition: inline-size var(--cy-motion-base) var(--cy-motion-ease);
+}
+/* Unknown amount: a segment sweeps along the track; under reduced motion it stays still in the middle. */
+.cy-progress-bar[data-indeterminate] .cy-progress-bar-fill.cy-progress-bar-fill {
+  inline-size: 35%;
+  inset-inline-start: 32.5%;
+  transition: none;
+  animation: cy-progress-sweep calc(6 * var(--cy-motion-slow)) var(--cy-motion-ease-in-out) infinite;
+}
+.cy-progress-bar[data-indeterminate]:dir(rtl) .cy-progress-bar-fill.cy-progress-bar-fill {
+  animation-direction: reverse;
+}
+@keyframes cy-progress-sweep {
+  from {
+    translate: -200% 0;
+  }
+  to {
+    translate: 200% 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cy-progress-bar-fill.cy-progress-bar-fill,
+  .cy-progress-bar[data-indeterminate] .cy-progress-bar-fill.cy-progress-bar-fill {
+    transition: none;
+    animation: none;
+  }
+}
+@media (forced-colors: active) {
+  .cy-progress-bar-track.cy-progress-bar-track {
+    outline: var(--cy-border-width) solid CanvasText;
+  }
+  .cy-progress-bar-fill.cy-progress-bar-fill {
+    background: Highlight;
+  }
+}
