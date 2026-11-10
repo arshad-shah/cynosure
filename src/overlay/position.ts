@@ -1,3 +1,4 @@
+import { clamp } from "../foundations/math.js";
 /** Pure overlay positioning: preferred side, flip when it does not fit, shift to stay inside the viewport. */
 
 export type Placement = "top" | "bottom" | "start" | "end";
@@ -12,7 +13,6 @@ interface Box {
 }
 
 const MARGIN = 8;
-const clamp = (v: number, lo: number, hi: number) => Math.min(Math.max(v, lo), Math.max(lo, hi));
 const OPPOSITE: Record<Placement, Placement> = { top: "bottom", bottom: "top", start: "end", end: "start" };
 
 export function computePosition(

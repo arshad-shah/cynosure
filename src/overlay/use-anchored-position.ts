@@ -1,4 +1,5 @@
 import { type RefObject, useLayoutEffect } from "react";
+import { isRtl } from "../foundations/dir.js";
 import { computePosition, type Placement } from "./position.js";
 
 /** Anything with a viewport rectangle: an element, or a point such as a right-click position. */
@@ -28,7 +29,7 @@ export function useAnchoredPosition(
       const r = a.getBoundingClientRect();
       last = `${r.x},${r.y},${r.width},${r.height}`;
       // A virtual anchor has no direction of its own: use the floating element's.
-      const dir = getComputedStyle(a instanceof Element ? a : f).direction === "rtl" ? "rtl" : "ltr";
+      const dir = isRtl(a instanceof Element ? a : f) ? "rtl" : "ltr";
       const pos = computePosition(
         r,
         { width: f.offsetWidth, height: f.offsetHeight },

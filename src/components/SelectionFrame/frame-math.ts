@@ -1,3 +1,4 @@
+import { clamp } from "../../foundations/math.js";
 /**
  * Geometry for SelectionFrame, in the frame's own units (page points, canvas pixels…). Pure functions, so the pointer
  * and keyboard paths agree and can be tested without a browser. Rotation is in degrees, clockwise, about the centre.
@@ -23,7 +24,6 @@ const rot = (x: number, y: number, deg: number): [number, number] => {
   const s = Math.sin(rad(deg));
   return [x * c - y * s, x * s + y * c];
 };
-const clamp = (v: number, lo: number, hi: number) => Math.min(Math.max(v, lo), Math.max(lo, hi));
 
 /** Keeps a box inside its bounds, moving it rather than shrinking it. */
 export function contain(box: FrameBox, limits: FrameLimits): FrameBox {

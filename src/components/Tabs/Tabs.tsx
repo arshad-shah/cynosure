@@ -10,6 +10,7 @@ import {
   useState,
 } from "react";
 import { ButtonBase } from "../../foundations/ButtonBase/ButtonBase.js";
+import { isRtl } from "../../foundations/dir.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
 import { useRovingFocus } from "../../foundations/roving-focus.js";
 import type { IconData } from "../../icons/types.js";
@@ -169,7 +170,7 @@ export function TabList({ label, className, children }: TabListProps) {
     const max = list.scrollWidth - list.clientWidth;
     if (max <= 0) return;
     const pad = Number.parseFloat(getComputedStyle(list).getPropertyValue("--cy-space-9")) || 0;
-    const rtl = getComputedStyle(list).direction === "rtl";
+    const rtl = isRtl(list);
     // Physical position from the left edge of the scrollable content (RTL scrollLeft runs from 0 down to -max).
     const current = rtl ? list.scrollLeft + max : list.scrollLeft;
     // Where the tab starts in the scrollable content, measured from the list itself (offsetLeft depends on the offset

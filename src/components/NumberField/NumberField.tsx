@@ -1,5 +1,6 @@
 import { type CSSProperties, type KeyboardEvent, type ReactNode, useMemo, useRef, useState } from "react";
 import { HiddenValue } from "../../foundations/HiddenValue/HiddenValue.js";
+import { clamp } from "../../foundations/math.js";
 import { minus } from "../../icons/minus.js";
 import { plus } from "../../icons/plus.js";
 import type { Size } from "../../tokens/schema.js";
@@ -119,8 +120,7 @@ export function NumberField({
   );
   const shown = (n: number | null) => (n === null ? "" : format.format(n));
 
-  const clamp = (n: number) =>
-    Math.min(max ?? Number.POSITIVE_INFINITY, Math.max(min ?? Number.NEGATIVE_INFINITY, n));
+  const limit = (n: number) => clamp(n, min ?? Number.NEGATIVE_INFINITY, max ?? Number.POSITIVE_INFINITY);
   const commit = (next: number | null) => {
     setDraft(null);
     if (next === current) return;
@@ -135,14 +135,14 @@ export function NumberField({
     // Snap onto the step grid (counted from min), then round away floating-point noise.
     const snapped = from === null ? start : Math.round((start - base + delta) / step) * step + base;
     const digits = Math.max(places(step), places(base));
-    commit(clamp(Number(snapped.toFixed(digits))));
+    commit(limit(Number(snapped.toFixed(digits))));
   };
   const commitDraft = () => {
     if (draft === null) return;
     if (draft.trim() === "") return commit(null);
     const parsed = parseNumber(draft, locale, formatOptions);
     // Unreadable text goes back to the last good value.
-    commit(parsed === null ? current : clamp(parsed));
+    commit(parsed === null ? current : limit(parsed));
   };
 
   const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {

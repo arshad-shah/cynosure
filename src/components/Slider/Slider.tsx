@@ -7,7 +7,9 @@ import {
   useRef,
   useState,
 } from "react";
+import { isRtl } from "../../foundations/dir.js";
 import { HiddenValue } from "../../foundations/HiddenValue/HiddenValue.js";
+import { stepKey } from "../../foundations/keys.js";
 import type { Size } from "../../tokens/schema.js";
 
 export interface SliderTokens {
@@ -134,7 +136,7 @@ export function Slider({
 
   const fromPointer = (event: PointerEvent) => {
     const box = (track.current as HTMLDivElement).getBoundingClientRect();
-    const rtl = !vertical && getComputedStyle(track.current as HTMLDivElement).direction === "rtl";
+    const rtl = !vertical && isRtl(track.current as HTMLDivElement);
     let ratio = vertical ? (box.bottom - event.clientY) / box.height : (event.clientX - box.left) / box.width;
     if (rtl) ratio = 1 - ratio;
     return min + Math.min(Math.max(ratio, 0), 1) * (max - min);
@@ -170,19 +172,8 @@ export function Slider({
 
   const onKeyDown = (index: number) => (event: KeyboardEvent<HTMLDivElement>) => {
     const now = values[index] as number;
-    const rtl = !vertical && getComputedStyle(event.currentTarget).direction === "rtl";
-    const forward = rtl ? -step : step;
-    const moves: Record<string, number> = {
-      ArrowUp: now + step,
-      ArrowDown: now - step,
-      ArrowRight: now + forward,
-      ArrowLeft: now - forward,
-      PageUp: now + big,
-      PageDown: now - big,
-      Home: min,
-      End: max,
-    };
-    const target = moves[event.key];
+    const rtl = !vertical && isRtl(event.currentTarget);
+    const target = stepKey(event, { value: now, min, max, step, big, rtl });
     if (target === undefined) return;
     event.preventDefault();
     set(withThumb(index, target), true);

@@ -1,4 +1,5 @@
 import { type RefObject, useEffect } from "react";
+import { isRtl } from "./dir.js";
 
 export interface RovingOptions {
   orientation?: "horizontal" | "vertical" | "both";
@@ -65,7 +66,7 @@ export function useRovingFocus(container: RefObject<HTMLElement | null>, options
       const list = items().filter(enabled);
       const current = (e.target as HTMLElement).closest<HTMLElement>(selector);
       if (!current || !list.length || e.defaultPrevented || ownsArrowKeys(current)) return;
-      const rtl = getComputedStyle(root).direction === "rtl";
+      const rtl = isRtl(root);
       const horizontal = orientation !== "vertical";
       const vertical = orientation !== "horizontal";
       const forward =

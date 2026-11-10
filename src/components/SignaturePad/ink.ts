@@ -1,3 +1,4 @@
+import { clamp } from "../../foundations/math.js";
 /**
  * Ink geometry for SignaturePad: pressure from the pen (constant for a mouse or finger), a filled, round-capped
  * outline per stroke, and SVG path data that a canvas (Path2D) and a PDF writer both read the same way. No
@@ -24,8 +25,6 @@ export const INK_WEIGHTS: Record<InkWeight, number> = { thin: 2.2, medium: 3.4, 
  * the line wobble as the hand speeds up and slows down, which no real pen does.
  */
 export const STEADY_PRESSURE = 0.5;
-
-const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v));
 
 /**
  * A pen's raw pressure through a response curve, eased against the last sample. Pens report light writing as

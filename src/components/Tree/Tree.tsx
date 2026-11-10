@@ -9,7 +9,9 @@ import {
   useRef,
   useState,
 } from "react";
+import { isRtl } from "../../foundations/dir.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
+import { isTypeaheadKey, useTypeahead } from "../../foundations/listbox.js";
 import { useVirtualWindow } from "../../foundations/virtual-window.js";
 import { chevronRight } from "../../icons/chevron-right.js";
 import type { IconData } from "../../icons/types.js";
@@ -120,7 +122,7 @@ export function Tree({
   const [focusKey, setFocusKey] = useState<string | null>(null);
   const moveFocus = useRef(false);
   const root = useRef<HTMLDivElement>(null);
-  const typed = useRef({ text: "", at: 0 });
+  const typeTo = useTypeahead();
 
   const childrenOf = useCallback((item: TreeItem) => item.children ?? loaded[item.id], [loaded]);
   const isBranch = useCallback((item: TreeItem) => Boolean(item.children?.length || item.hasChildren), []);
@@ -221,7 +223,7 @@ export function Tree({
     const at = rows.findIndex((r) => r.key === tabStop);
     const row = rows[at];
     if (!row) return;
-    const rtl = getComputedStyle(event.currentTarget).direction === "rtl";
+    const rtl = isRtl(event.currentTarget);
     const key =
       rtl && event.key === "ArrowLeft"
         ? "ArrowRight"
@@ -267,22 +269,9 @@ export function Tree({
       }
       default:
         handled = false;
-        if (
-          event.key.length === 1 &&
-          /\S/.test(event.key) &&
-          !event.ctrlKey &&
-          !event.metaKey &&
-          !event.altKey
-        ) {
-          const now = Date.now();
-          typed.current = {
-            text: now - typed.current.at > 500 ? event.key : typed.current.text + event.key,
-            at: now,
-          };
-          const query = typed.current.text.toLowerCase();
-          const order = [...focusable.slice(index + 1), ...focusable.slice(0, index + 1)];
-          const pool = query.length > 1 ? [...focusable.slice(index), ...focusable.slice(0, index)] : order;
-          focusRow(pool.find((r) => r.kind === "item" && r.item.label.toLowerCase().startsWith(query))?.key);
+        if (isTypeaheadKey(event)) {
+          const labels = focusable.map((r) => (r.kind === "item" ? r.item.label : null));
+          focusRow(focusable[typeTo(event.key, labels, index)]?.key);
           handled = true;
         }
     }

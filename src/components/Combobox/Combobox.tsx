@@ -10,6 +10,7 @@ import {
 } from "react";
 import { HiddenValue } from "../../foundations/HiddenValue/HiddenValue.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
+import { isComposing } from "../../foundations/keys.js";
 import type { IconData } from "../../icons/types.js";
 import { useDismiss } from "../../overlay/dismiss.js";
 import { useAnchoredPosition } from "../../overlay/use-anchored-position.js";
@@ -197,7 +198,7 @@ export function Combobox({
   };
 
   const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
-    if (event.nativeEvent.isComposing || event.keyCode === 229) return;
+    if (isComposing(event)) return;
     switch (event.key) {
       case "ArrowDown":
         event.preventDefault();

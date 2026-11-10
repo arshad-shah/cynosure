@@ -1,6 +1,5 @@
+import { clamp } from "../../foundations/math.js";
 import { parseColor, type Rgb } from "../../tokens/color.js";
-
-const clamp = (n: number, lo = 0, hi = 1) => Math.min(hi, Math.max(lo, n));
 
 /** Reads any CSS colour, alpha included. Named colours and other syntaxes go through the browser's own parser. */
 export function readColor(text: string): { rgb: Rgb; a: number } | null {

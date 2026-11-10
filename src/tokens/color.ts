@@ -1,3 +1,4 @@
+import { clamp } from "../foundations/math.js";
 /** Minimal colour maths for theme derivation: parse, OKLCH round-trip, WCAG contrast. No dependencies. */
 
 export class CynosureThemeError extends Error {
@@ -6,8 +7,6 @@ export class CynosureThemeError extends Error {
 
 /** Linear-free sRGB triple, each channel 0..1. */
 export type Rgb = [number, number, number];
-
-const clamp = (n: number, lo = 0, hi = 1) => Math.min(hi, Math.max(lo, n));
 
 function num(part: string, scale: number): number {
   const p = part.trim();

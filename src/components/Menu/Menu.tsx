@@ -14,6 +14,7 @@ import {
 import { ButtonBase } from "../../foundations/ButtonBase/ButtonBase.js";
 import { ariaKeyShortcuts, shortcutKeys } from "../../foundations/hotkey.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
+import { isTypeaheadKey, useTypeahead } from "../../foundations/listbox.js";
 import { useRovingFocus } from "../../foundations/roving-focus.js";
 import { check } from "../../icons/check.js";
 import type { IconData } from "../../icons/types.js";
@@ -126,7 +127,7 @@ export function MenuPanel({
 }: MenuPanelProps) {
   const apple = useApple();
   const panel = useRef<PanelEl>(null);
-  const typed = useRef({ text: "", at: 0 });
+  const typeTo = useTypeahead();
 
   useLayoutEffect(() => {
     const el = panel.current;
@@ -156,20 +157,18 @@ export function MenuPanel({
       onClose();
       return;
     }
-    if (event.key.length !== 1 || event.ctrlKey || event.metaKey || event.altKey || event.key === " ") return;
-    const now = Date.now();
-    typed.current = {
-      text: now - typed.current.at > 500 ? event.key : typed.current.text + event.key,
-      at: now,
-    };
+    if (!isTypeaheadKey(event)) return;
     const list = [...event.currentTarget.querySelectorAll<HTMLElement>(ITEM)].filter(
       (i) => i.getAttribute("aria-disabled") !== "true",
     );
     const from = list.indexOf(event.target as HTMLElement);
-    const ordered = [...list.slice(from + 1), ...list.slice(0, from + 1)];
-    const find = (text: string) =>
-      ordered.find((i) => (i.dataset.label ?? "").toLowerCase().startsWith(text.toLowerCase()));
-    (find(typed.current.text) ?? find(event.key))?.focus();
+    list[
+      typeTo(
+        event.key,
+        list.map((i) => i.dataset.label ?? ""),
+        from,
+      )
+    ]?.focus();
   };
 
   const row = (item: MenuItem) => (

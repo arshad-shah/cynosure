@@ -9,6 +9,8 @@ import {
 } from "react";
 import { HiddenValue } from "../../foundations/HiddenValue/HiddenValue.js";
 import { InputBase } from "../../foundations/InputBase/InputBase.js";
+import { stepKey } from "../../foundations/keys.js";
+import { clamp } from "../../foundations/math.js";
 import { droplet } from "../../icons/droplet.js";
 import { type Rgb, rgbToOklch, toHex } from "../../tokens/color.js";
 import { type ColorSwatch, ColorSwatches } from "../ColorSwatches/ColorSwatches.js";
@@ -89,7 +91,6 @@ interface Hsva {
   a: number;
 }
 
-const clamp = (n: number, lo = 0, hi = 1) => Math.min(hi, Math.max(lo, n));
 const round = (n: number, digits = 0) => Number(n.toFixed(digits));
 
 function rgbToHsv([r, g, b]: Rgb, hue = 0): Omit<Hsva, "a"> {
@@ -194,17 +195,13 @@ export function ColorField({
     });
   };
   const onAreaKey = (event: KeyboardEvent<HTMLDivElement>) => {
-    const step = event.shiftKey ? 0.1 : 0.01;
-    const moves: Record<string, Partial<Hsva>> = {
-      ArrowRight: { s: clamp(color.s + step) },
-      ArrowLeft: { s: clamp(color.s - step) },
-      ArrowUp: { v: clamp(color.v + step) },
-      ArrowDown: { v: clamp(color.v - step) },
-    };
-    const move = moves[event.key];
-    if (!move) return;
+    // Saturation along x, brightness along y; Shift for bigger steps.
+    const axis = { min: 0, max: 1, step: 0.01, arrowsOnly: true };
+    const s = stepKey(event, { ...axis, value: color.s, axis: "x" });
+    const v = stepKey(event, { ...axis, value: color.v, axis: "y" });
+    if (s === undefined && v === undefined) return;
     event.preventDefault();
-    set({ ...color, ...move });
+    set({ ...color, s: s ?? color.s, v: v ?? color.v });
   };
   const pickFromScreen = async () => {
     try {

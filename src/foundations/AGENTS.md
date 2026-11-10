@@ -8,3 +8,10 @@ The **only** modules allowed to render native interactive elements (`button`, `a
 - If a composite needs a native element that has no foundation, add the foundation here first; never inline the element in the composite (`cy check` fails with `native-elements`).
 
 Shared hooks also live here: `roving-focus.ts` (`useRovingFocus`), `field.ts` (`useField`), `client-layout-effect.ts` (`useClientLayoutEffect`), `virtual-window.ts` (`useVirtualWindow`: windowing for equal-height rows, sized by CSS and always rendering the focused row; used by Tree and VirtualList) and `hotkey.ts` (`useHotkey`: global shortcuts that work in shadow roots, skip plain keys in text fields, and honour `data-cy-hotkeys="off"`; unit-tested in `tests/unit/hotkey.test.tsx`).
+
+Shared helpers (use these instead of writing your own; a second copy is a review failure):
+- `math.ts`: `clamp(v, lo = 0, hi = 1)`, safe when `hi < lo`.
+- `dir.ts`: `isRtl(el)`.
+- `keys.ts`: `isComposing(event)` (IME, including Safari's keyCode 229) and `stepKey(event, options)`, the slider keys (arrows, Shift and Page ±big, Home/End, RTL, one axis or both). Slider, SplitPane, CompareSlider and ColorField's area use it.
+- `listbox.ts`: `seekEnabled` (next usable index), `isTypeaheadKey` and `useTypeahead` (the 500 ms word buffer, cycling on one letter). Select, Menu, Tree and VirtualList use them.
+- `src/overlay/floating.ts`: `usePopover`, `useFloatingAnchor`, `useFloatingOffset`.

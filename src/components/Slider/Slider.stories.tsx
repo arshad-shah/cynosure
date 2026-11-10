@@ -88,6 +88,9 @@ export const KeyboardFollowsTheApgSlider: Story = {
     await expect(args.onCommit).toHaveBeenLastCalledWith(0);
     // The value is shown next to the label.
     await expect(canvas.getByText("0", { selector: ".cy-slider-value" })).toBeVisible();
+    // Shift+arrows take the big step, like Page Up.
+    await userEvent.keyboard("{Shift>}{ArrowRight}{/Shift}");
+    await expect(thumb).toHaveAttribute("aria-valuenow", "10");
   },
 };
 

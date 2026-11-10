@@ -12,6 +12,8 @@ import {
 import { ButtonBase } from "../../foundations/ButtonBase/ButtonBase.js";
 import { HiddenValue } from "../../foundations/HiddenValue/HiddenValue.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
+import { isComposing } from "../../foundations/keys.js";
+import { isTypeaheadKey, seekEnabled, useTypeahead } from "../../foundations/listbox.js";
 import { chevronDown } from "../../icons/chevron-down.js";
 import type { IconData } from "../../icons/types.js";
 import { useAnchoredPosition } from "../../overlay/use-anchored-position.js";
@@ -93,21 +95,12 @@ export function Select({
   const current = value ?? inner;
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(-1);
-  const typed = useRef({ text: "", at: 0 });
+  const typeTo = useTypeahead();
   // Shown after a blocked submit: the hidden input cannot be focused or explained, so the trigger is.
   const [missing, setMissing] = useState(false);
 
   const enabled = (i: number) => i >= 0 && i < options.length && !options[i]?.disabled;
-  const step = (from: number, delta: number) => {
-    let i = from;
-    for (let n = 0; n < options.length; n++) {
-      const next = Math.min(Math.max(i + delta, 0), options.length - 1);
-      if (next === i) break;
-      i = next;
-      if (enabled(i)) return i;
-    }
-    return enabled(from) ? from : -1;
-  };
+  const step = (from: number, delta: 1 | -1) => seekEnabled(options.length, from, delta, enabled);
   const first = () => step(-1, 1);
   const last = () => step(options.length, -1);
 
@@ -160,26 +153,25 @@ export function Select({
   });
 
   const typeahead = (key: string) => {
-    const now = Date.now();
-    typed.current = { text: now - typed.current.at > 500 ? key : typed.current.text + key, at: now };
-    const query = typed.current.text.toLowerCase();
-    const start = Math.max(active, 0);
-    const order = [...options.keys()].map((n) => (start + n + (query.length === 1 ? 1 : 0)) % options.length);
-    const hit = order.find((i) => enabled(i) && options[i]?.label.toLowerCase().startsWith(query));
-    if (hit !== undefined) {
+    const hit = typeTo(
+      key,
+      options.map((o, i) => (enabled(i) ? o.label : null)),
+      active,
+    );
+    if (hit >= 0) {
       if (!open) openList(hit);
       else setActive(hit);
     }
   };
 
   const onKeyDown = (e: KeyboardEvent<HTMLButtonElement>) => {
-    if (e.nativeEvent.isComposing || e.keyCode === 229) return;
+    if (isComposing(e)) return;
     const { key } = e;
     if (!open) {
       if (["ArrowDown", "ArrowUp", "Enter", " "].includes(key)) {
         e.preventDefault();
         openList(key === "ArrowUp" ? last() : undefined);
-      } else if (key.length === 1 && /\S/.test(key)) typeahead(key);
+      } else if (isTypeaheadKey(e)) typeahead(key);
       return;
     }
     const moves: Record<string, () => number> = {
@@ -203,7 +195,7 @@ export function Select({
     } else if (key === "Tab") {
       choose(active);
       close(false);
-    } else if (key.length === 1 && /\S/.test(key)) typeahead(key);
+    } else if (isTypeaheadKey(e)) typeahead(key);
   };
 
   const selected = options.find((o) => o.value === current);

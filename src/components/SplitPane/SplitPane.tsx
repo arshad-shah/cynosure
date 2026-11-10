@@ -7,6 +7,8 @@ import {
   useRef,
   useState,
 } from "react";
+import { isRtl } from "../../foundations/dir.js";
+import { stepKey } from "../../foundations/keys.js";
 
 export interface SplitPaneTokens {
   /** Thickness of the visible divider line. */
@@ -86,7 +88,7 @@ export function SplitPane({
   const fromPointer = (event: PointerEvent<HTMLElement>) => {
     const box = root.current?.getBoundingClientRect();
     if (!box) return;
-    const rtl = !vertical && getComputedStyle(event.currentTarget).direction === "rtl";
+    const rtl = !vertical && isRtl(event.currentTarget);
     const offset = vertical
       ? event.clientY - box.top
       : rtl
@@ -96,15 +98,17 @@ export function SplitPane({
   };
 
   const onKeyDown = (event: KeyboardEvent<HTMLElement>) => {
-    const rtl = getComputedStyle(event.currentTarget).direction === "rtl";
-    const grow = vertical ? "ArrowDown" : rtl ? "ArrowLeft" : "ArrowRight";
-    const shrink = vertical ? "ArrowUp" : rtl ? "ArrowRight" : "ArrowLeft";
-    const moves: Record<string, () => void> = {
-      [grow]: () => set(current + step),
-      [shrink]: () => set(current - step),
-      Home: () => set(min),
-      End: () => set(max),
-    };
+    const target = stepKey(event, {
+      value: current,
+      min,
+      max,
+      step,
+      axis: vertical ? "y" : "x",
+      rtl: isRtl(event.currentTarget),
+      downAdds: true,
+    });
+    const moves: Record<string, () => void> = {};
+    if (target !== undefined) moves[event.key] = () => set(target);
     if (collapsible)
       moves.Enter = () => {
         if (current === 0) set(restore.current ?? defaultSize);

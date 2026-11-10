@@ -1,5 +1,7 @@
 import { bindPointer } from "@arshad-shah/detent";
 import { type CSSProperties, type KeyboardEvent, type ReactNode, useEffect, useRef, useState } from "react";
+import { stepKey } from "../../foundations/keys.js";
+import { clamp } from "../../foundations/math.js";
 
 export interface CompareSliderTokens {
   /** Colour of the divider line and grip. */
@@ -47,7 +49,6 @@ const DEFAULT_LABELS: CompareSliderLabels = {
   before: "Before",
   after: "After",
 };
-const clamp = (v: number) => Math.min(100, Math.max(0, v));
 
 /**
  * Before and after, one over the other, split by a divider people move: drag anywhere (mouse, pen or a held finger),
@@ -69,9 +70,9 @@ export function CompareSlider({
   const divider = useRef<HTMLDivElement>(null);
   const controlled = value !== undefined;
   const [own, setOwn] = useState(defaultValue);
-  const position = clamp(controlled ? value : own);
+  const position = clamp(controlled ? value : own, 0, 100);
   const set = (next: number) => {
-    const v = Math.round(clamp(next) * 10) / 10;
+    const v = Math.round(clamp(next, 0, 100) * 10) / 10;
     if (!controlled) setOwn(v);
     onChange?.(v);
   };
@@ -96,18 +97,8 @@ export function CompareSlider({
   }, []);
 
   const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    const big = event.shiftKey ? 10 : 1;
-    const moves: Record<string, number> = {
-      ArrowLeft: position - big,
-      ArrowDown: position - big,
-      ArrowRight: position + big,
-      ArrowUp: position + big,
-      PageDown: position - 10,
-      PageUp: position + 10,
-      Home: 0,
-      End: 100,
-    };
-    const next = moves[event.key];
+    // The pictures do not mirror in RTL, so neither do the keys.
+    const next = stepKey(event, { value: position, min: 0, max: 100, step: 1 });
     if (next === undefined) return;
     event.preventDefault();
     set(next);

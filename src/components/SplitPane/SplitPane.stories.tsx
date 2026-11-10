@@ -77,6 +77,13 @@ export const KeyboardResizes: Story = {
     await expect(args.onSizeChange).toHaveBeenLastCalledWith(55);
     await userEvent.keyboard("{ArrowLeft}{ArrowLeft}");
     await expect(divider).toHaveAttribute("aria-valuenow", "45");
+    // Shift+arrows and Page keys take big steps, as on every slider.
+    await userEvent.keyboard("{Shift>}{ArrowLeft}{/Shift}");
+    await expect(divider).toHaveAttribute("aria-valuenow", "10");
+    await userEvent.keyboard("{PageUp}");
+    await expect(divider).toHaveAttribute("aria-valuenow", "60");
+    await userEvent.keyboard("{PageDown}{ArrowRight>7/}");
+    await expect(divider).toHaveAttribute("aria-valuenow", "45");
     await expect(share(canvasElement)).toBeCloseTo(0.45, 1);
     await userEvent.keyboard("{End}");
     await expect(divider).toHaveAttribute("aria-valuenow", "90");

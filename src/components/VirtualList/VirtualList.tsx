@@ -1,5 +1,7 @@
 import { type CSSProperties, type KeyboardEvent, type ReactNode, useRef, useState } from "react";
 import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js";
+import { seekEnabled } from "../../foundations/listbox.js";
+import { clamp } from "../../foundations/math.js";
 import { useVirtualWindow } from "../../foundations/virtual-window.js";
 
 export interface VirtualListTokens {
@@ -110,12 +112,12 @@ export function VirtualList<T>({
   };
   /** The next enabled row from `from` in direction `step`, or `from` itself when there is none. */
   const seek = (from: number, step: 1 | -1) => {
-    for (let i = from + step; i >= 0 && i < keys.length; i += step) if (!off(i)) return i;
-    return from;
+    const i = seekEnabled(keys.length, from, step, (n) => !off(n));
+    return i < 0 ? from : i;
   };
   /** Row `i` (clamped), or the nearest enabled row to it, looking in direction `step` first. */
   const near = (i: number, step: 1 | -1) => {
-    const at = Math.min(keys.length - 1, Math.max(0, i));
+    const at = clamp(i, 0, keys.length - 1);
     if (!off(at)) return at;
     const ahead = seek(at, step);
     return ahead !== at ? ahead : seek(at, step === 1 ? -1 : 1);

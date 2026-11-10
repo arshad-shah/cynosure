@@ -14,6 +14,7 @@ import { DialogBase } from "../../foundations/DialogBase/DialogBase.js";
 import { useHotkey } from "../../foundations/hotkey.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
 import { InputBase } from "../../foundations/InputBase/InputBase.js";
+import { isComposing } from "../../foundations/keys.js";
 import { search } from "../../icons/search.js";
 import type { IconData } from "../../icons/types.js";
 import { useDismiss } from "../../overlay/dismiss.js";
@@ -174,7 +175,7 @@ export function CommandPalette({
     onRun(command.id);
   };
   const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
-    if (event.nativeEvent.isComposing) return;
+    if (isComposing(event)) return;
     const at = runnable.indexOf(active);
     if (event.key === "ArrowDown" || event.key === "ArrowUp") {
       event.preventDefault();

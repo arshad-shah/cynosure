@@ -1,4 +1,5 @@
 import { forwardRef, useRef } from "react";
+import { isComposing } from "../../foundations/keys.js";
 import { search } from "../../icons/search.js";
 import { TextField, type TextFieldProps } from "../TextField/TextField.js";
 
@@ -27,7 +28,7 @@ export const SearchField = forwardRef<HTMLInputElement, SearchFieldProps>(functi
       onKeyDown={(e) => {
         onKeyDown?.(e);
         const input = e.currentTarget;
-        if (e.key === "Enter" && !e.nativeEvent.isComposing && e.keyCode !== 229) {
+        if (e.key === "Enter" && !isComposing(e)) {
           e.preventDefault();
           onSubmit?.(input.value);
         }

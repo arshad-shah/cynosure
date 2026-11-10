@@ -10,6 +10,7 @@ import {
   useState,
 } from "react";
 import { HiddenValue } from "../../foundations/HiddenValue/HiddenValue.js";
+import { isComposing } from "../../foundations/keys.js";
 import { close } from "../../icons/close.js";
 import { useDismiss } from "../../overlay/dismiss.js";
 import { useAnchoredPosition } from "../../overlay/use-anchored-position.js";
@@ -197,7 +198,7 @@ export function TagInput({
   const removeButtons = () => [...(chips.current?.querySelectorAll<HTMLButtonElement>("button") ?? [])];
 
   const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
-    if (event.nativeEvent.isComposing || event.keyCode === 229) return;
+    if (isComposing(event)) return;
     const el = event.currentTarget;
     if (separators.includes(event.key)) {
       event.preventDefault();
