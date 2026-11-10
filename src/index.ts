@@ -38,6 +38,12 @@ export {
   readColor,
 } from "./components/ColorField/index.js";
 export {
+  type ColorSwatch,
+  ColorSwatches,
+  type ColorSwatchesProps,
+  type ColorSwatchesTokens,
+} from "./components/ColorSwatches/index.js";
+export {
   Combobox,
   type ComboboxLabels,
   type ComboboxOption,

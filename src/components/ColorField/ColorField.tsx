@@ -10,7 +10,12 @@ import {
 import { HiddenValue } from "../../foundations/HiddenValue/HiddenValue.js";
 import { InputBase } from "../../foundations/InputBase/InputBase.js";
 import { droplet } from "../../icons/droplet.js";
-import { parseColor, type Rgb, rgbToOklch, toHex } from "../../tokens/color.js";
+import { type Rgb, rgbToOklch, toHex } from "../../tokens/color.js";
+import { type ColorSwatch, ColorSwatches } from "../ColorSwatches/ColorSwatches.js";
+import { readColor } from "./read-color.js";
+
+export { readColor };
+
 import type { Size } from "../../tokens/schema.js";
 import { Button } from "../Button/Button.js";
 import { Field } from "../Field/Field.js";
@@ -36,6 +41,8 @@ export interface ColorFieldLabels {
   hue: string;
   alpha: string;
   eyedropper: string;
+  /** Name of the swatch group in the picker. Default: "Swatches". */
+  swatches: string;
   /** Error when the typed text is not a colour. */
   invalid: string;
 }
@@ -53,6 +60,8 @@ export interface ColorFieldProps {
   format?: "hex" | "rgb" | "oklch";
   /** Let people set opacity (adds an opacity slider and alpha to the value). */
   alpha?: boolean;
+  /** Colours offered in the picker: brand colours, presets, or recent colours you keep. */
+  swatches?: (ColorSwatch | string)[] | undefined;
   name?: string;
   required?: boolean;
   disabled?: boolean;
@@ -69,6 +78,7 @@ const DEFAULT_LABELS: ColorFieldLabels = {
   hue: "Hue",
   alpha: "Opacity",
   eyedropper: "Pick a colour from the screen",
+  swatches: "Swatches",
   invalid: "Enter a colour such as rgb(51 102 255), a hex code or a colour name.",
 };
 
@@ -99,42 +109,6 @@ function hsvToRgb({ h, s, v }: Hsva): Rgb {
     return v - v * s * Math.max(0, Math.min(k, 4 - k, 1));
   };
   return [f(5), f(3), f(1)];
-}
-
-/** Reads any CSS colour, alpha included. Named colours and other syntaxes go through the browser's own parser. */
-export function readColor(text: string): { rgb: Rgb; a: number } | null {
-  const value = text.trim();
-  if (!value) return null;
-  const alphaPart =
-    /\/\s*([\d.]+%?)\s*\)$/.exec(value) ?? /^(?:rgb|hsl)a\((?:[^,]+,){3}\s*([\d.]+%?)\s*\)$/.exec(value);
-  const hex8 = /^#(?:[0-9a-f]{4}|[0-9a-f]{8})$/i.test(value);
-  let a = 1;
-  if (alphaPart?.[1])
-    a = alphaPart[1].endsWith("%") ? Number.parseFloat(alphaPart[1]) / 100 : Number.parseFloat(alphaPart[1]);
-  if (hex8) {
-    const h = value.length === 5 ? (value[4] as string).repeat(2) : value.slice(7, 9);
-    a = Number.parseInt(h, 16) / 255;
-  }
-  try {
-    return { rgb: parseColor(hex8 ? value.slice(0, value.length === 5 ? 4 : 7) : value), a: clamp(a) };
-  } catch {
-    if (typeof document === "undefined") return null;
-    const ctx = document.createElement("canvas").getContext("2d", { willReadFrequently: true });
-    if (!ctx) return null;
-    // An invalid colour leaves fillStyle unchanged: try two sentinels so a real colour equal to one still reads.
-    for (const sentinel of ["rgb(1 2 3)", "rgb(4 5 6)"]) {
-      ctx.fillStyle = sentinel;
-      const before = ctx.fillStyle;
-      ctx.fillStyle = value;
-      if (ctx.fillStyle !== before) {
-        ctx.clearRect(0, 0, 1, 1);
-        ctx.fillRect(0, 0, 1, 1);
-        const [r = 0, g = 0, b = 0, alpha = 255] = ctx.getImageData(0, 0, 1, 1).data;
-        return { rgb: [r / 255, g / 255, b / 255], a: alpha / 255 };
-      }
-    }
-    return null;
-  }
 }
 
 function write(c: Hsva, format: ColorFieldProps["format"], withAlpha: boolean): string {
@@ -175,6 +149,7 @@ export function ColorField({
   onChange,
   format = "hex",
   alpha = false,
+  swatches,
   name,
   required,
   disabled,
@@ -347,6 +322,18 @@ export function ColorField({
                         .join(" ")})`,
                     } as CSSProperties
                   }
+                />
+              )}
+              {swatches && swatches.length > 0 && (
+                <ColorSwatches
+                  label={text.swatches}
+                  swatches={swatches}
+                  size="sm"
+                  value={current}
+                  onChange={(v) => {
+                    const next = fromText(v);
+                    if (next) set(next);
+                  }}
                 />
               )}
             </div>

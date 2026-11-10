@@ -431,5 +431,11 @@
     "path": ["dist/components/SelectionFrame/SelectionFrame.js", "dist/styles/selection-frame.css"],
     "limit": "3 kB",
     "gzip": true
+  },
+  {
+    "name": "ColorSwatches",
+    "path": ["dist/components/ColorSwatches/ColorSwatches.js", "dist/styles/color-swatches.css"],
+    "limit": "2.5 kB",
+    "gzip": true
   }
 ]

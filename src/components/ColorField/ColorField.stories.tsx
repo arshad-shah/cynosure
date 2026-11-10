@@ -295,6 +295,30 @@ export const FormatsWithAlphaControlledAndDrag: Story = {
   },
 };
 
+export const SwatchesInThePicker: Story = {
+  args: {
+    swatches: [
+      { value: "rgb(194 65 12)", label: "Ember" },
+      "rgb(47 102 176)",
+      { value: "rgb(29 27 24)", label: "Ink" },
+    ],
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole("button", { name: "Choose colour" }));
+    const panel = await canvas.findByRole("dialog", { name: "Choose colour" });
+    await shownFully(panel);
+    const group = canvas.getByRole("radiogroup", { name: "Swatches" });
+    await expect(group).toBeVisible();
+    // Picking a swatch sets the colour, in the field's format.
+    await userEvent.click(canvas.getByRole("radio", { name: "Ember" }));
+    await expect(args.onChange).toHaveBeenLastCalledWith("#c2410c");
+    await expect(canvas.getByRole("radio", { name: "Ember" })).toBeChecked();
+    // Arrow keys move along the swatches and choose.
+    await userEvent.keyboard("{ArrowRight}");
+    await expect(args.onChange).toHaveBeenLastCalledWith("#2f66b0");
+  },
+};
+
 export const StableUnderHostileHost: Story = {
   play: async ({ canvasElement }) => {
     for (const selector of [".cy-color-field", ".cy-color-field-swatch", ".cy-text-field-input"]) {
