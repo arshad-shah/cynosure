@@ -39,6 +39,17 @@ Place the frame in a positioned layer over your page. `box` is in your own units
 | Escape              | Cancel the key being held, or a drag, back to where it began  |
 | Enter               | Commit the key being held                                     |
 
+## Drawing a new box
+
+With `draw`, a drag anywhere on the layer draws a new box: a region select in a screenshot tool, a crop, an area on a grid. `box` starts as `null`. Before a box exists the layer is a focusable drawing area, and Enter places a box in its middle for keyboard users.
+
+```tsx
+const [region, setRegion] = useState<FrameBox | null>(null);
+<SelectionFrame label="Region" draw resizable box={region} bounds={page} onCommit={setRegion} />
+```
+
+<Canvas of={Stories.DrawANewBox} />
+
 ## Props
 
 <ArgTypes of={Stories} />

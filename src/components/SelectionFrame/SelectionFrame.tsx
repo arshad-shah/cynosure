@@ -1,7 +1,9 @@
 import { bindPointer } from "@arshad-shah/detent";
 import { type CSSProperties, type KeyboardEvent, useEffect, useRef, useState } from "react";
+import { useDrag } from "../../foundations/drag.js";
 import {
   angleFrom,
+  contain,
   type FrameBox,
   type FrameHandle,
   type FrameLimits,
@@ -26,13 +28,20 @@ declare module "../../tokens/schema.js" {
 export interface SelectionFrameLabels {
   /** How screen readers call the frame. Default: "selection". */
   roleDescription: string;
+  /** With `draw` and no box: how screen readers call the empty area. Default: "drawing area". */
+  drawArea: string;
 }
 
 export interface SelectionFrameProps {
   /** Accessible name, e.g. "Text box: Hello". Describe the keys nearby with `aria-describedby`. */
   label: string;
-  /** Where the object is, in your units (page points, canvas pixels). */
-  box: FrameBox;
+  /** Where the object is, in your units (page points, canvas pixels). `null` before one is drawn (with `draw`). */
+  box: FrameBox | null;
+  /**
+   * Draw a new box by dragging anywhere on the layer (a region select, a crop, a grid area). A press on the frame
+   * still moves it. With no box yet, the layer is focusable and Enter places one in the middle for the keyboard.
+   */
+  draw?: boolean;
   /** Degrees, clockwise. */
   rotate?: number;
   /** CSS pixels per unit (the zoom). Default 1. */
@@ -72,7 +81,8 @@ const ARROWS: Record<string, [number, number]> = {
 interface Live {
   box: FrameBox;
   rotate: number;
-  start: { box: FrameBox; rotate: number };
+  /** Where the change began; `box` is null while the first box is being drawn. */
+  start: { box: FrameBox | null; rotate: number };
 }
 
 /**
@@ -85,6 +95,7 @@ export function SelectionFrame({
   box,
   rotate = 0,
   scale = 1,
+  draw = false,
   resizable = false,
   rotatable = false,
   keepAspect = false,
@@ -101,6 +112,7 @@ export function SelectionFrame({
   style,
 }: SelectionFrameProps) {
   const frame = useRef<HTMLDivElement>(null);
+  const surface = useRef<HTMLDivElement>(null);
   const [live, setLive] = useState<Live | null>(null);
   const liveRef = useRef<Live | null>(null);
   // Pointer handlers are bound once; they read the latest props through this ref.
@@ -141,14 +153,71 @@ export function SelectionFrame({
     const current = liveRef.current;
     if (!current) return;
     set(null);
-    props.current.onChange?.(current.start.box, current.start.rotate);
+    if (current.start.box) props.current.onChange?.(current.start.box, current.start.rotate);
   };
 
-  // Pointer gestures through detent: the frame moves, each handle resizes or rotates. Escape cancels a drag.
+  // Drawing a new box: from where the press landed to where the pointer is, in units, kept inside `bounds`.
+  const units = (point: { x: number; y: number }) => {
+    const r = (surface.current as HTMLDivElement).getBoundingClientRect();
+    const k = props.current.scale;
+    const b = limitsRef.current.bounds;
+    const x = (point.x - r.left) / k;
+    const y = (point.y - r.top) / k;
+    return b ? { x: Math.min(Math.max(x, 0), b.width), y: Math.min(Math.max(y, 0), b.height) } : { x, y };
+  };
+  useDrag(surface, {
+    distance: 3,
+    onStart: () => {
+      if (!draw) return false;
+      set(null);
+    },
+    onMove: ({ origin, point }) => {
+      const a = units(origin);
+      const b = units(point);
+      const drawn = {
+        x: Math.min(a.x, b.x),
+        y: Math.min(a.y, b.y),
+        width: Math.abs(b.x - a.x),
+        height: Math.abs(b.y - a.y),
+      };
+      const start = liveRef.current?.start ?? latest.current;
+      const snapped = props.current.snap ? props.current.snap(drawn) : drawn;
+      set({ box: snapped, rotate: 0, start });
+      props.current.onChange?.(snapped, 0);
+    },
+    onEnd: (_, cancelled) => {
+      const current = liveRef.current;
+      // Too small to be a box (a slip of the pointer): drop it, like a cancel.
+      if (cancelled || !current || current.box.width < minSize || current.box.height < minSize) cancel();
+      else commit();
+    },
+  });
+  /** The keyboard's way to draw: a box half the area's size, in its middle. */
+  const place = () => {
+    const el = surface.current as HTMLDivElement;
+    const area = bounds ?? { width: el.clientWidth / scale, height: el.clientHeight / scale };
+    const placed = contain(
+      { x: area.width / 4, y: area.height / 4, width: area.width / 2, height: area.height / 2 },
+      limits,
+    );
+    focusFrame.current = true;
+    latest.current = { box: placed, rotate: 0 };
+    onCommit(placed, 0);
+  };
+  const focusFrame = useRef(false);
   useEffect(() => {
-    const el = frame.current as HTMLDivElement;
+    if (!focusFrame.current || !frame.current) return;
+    focusFrame.current = false;
+    frame.current.focus({ preventScroll: true });
+  });
+
+  // Pointer gestures through detent: the frame moves, each handle resizes or rotates. Escape cancels a drag.
+  const hasFrame = (live ?? box) !== null;
+  useEffect(() => {
+    const el = frame.current;
+    if (!el) return;
     const begin = () => {
-      const from = latest.current;
+      const from = latest.current as { box: FrameBox; rotate: number };
       set({ ...from, start: from });
       el.focus({ preventScroll: true });
     };
@@ -161,7 +230,10 @@ export function SelectionFrame({
           begin();
         },
         onMove: ({ delta }) => {
-          const { box: b0, rotate: r0 } = (liveRef.current as Live).start;
+          const { box: b0, rotate: r0 } = (liveRef.current as Live).start as {
+            box: FrameBox;
+            rotate: number;
+          };
           const k = props.current.scale;
           change(moveBy(b0, delta.x / k, delta.y / k, limitsRef.current), r0);
         },
@@ -173,7 +245,10 @@ export function SelectionFrame({
           delay: 0,
           onStart: () => begin(),
           onMove: ({ delta, point, event }) => {
-            const { box: b0, rotate: r0 } = (liveRef.current as Live).start;
+            const { box: b0, rotate: r0 } = (liveRef.current as Live).start as {
+              box: FrameBox;
+              rotate: number;
+            };
             const name = handle.dataset.handle as FrameHandle | "rotate";
             if (name === "rotate") {
               const r = el.getBoundingClientRect();
@@ -193,11 +268,11 @@ export function SelectionFrame({
       for (const b of bound) b.destroy();
     };
     // Rebind when the set of handles changes.
-  }, [resizable, rotatable]);
+  }, [resizable, rotatable, hasFrame]);
 
   const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     if (event.target !== event.currentTarget) return;
-    const current = liveRef.current ?? latest.current;
+    const current = (liveRef.current ?? latest.current) as { box: FrameBox; rotate: number };
     const by = event.shiftKey ? largeStep : step;
     if (event.key === "Escape" || event.key === "Enter") {
       if (!liveRef.current) return;
@@ -227,48 +302,72 @@ export function SelectionFrame({
     if (ARROWS[event.key] || event.key === "[" || event.key === "]") commit();
   };
 
-  const shown = live ?? { box, rotate };
-  return (
-    // biome-ignore lint/a11y/useSemanticElements: an object frame, not a group of form controls (fieldset)
+  const shown = live ?? (box ? { box, rotate } : null);
+  const area = draw && (
     <div
-      ref={frame}
-      role="group"
-      aria-label={label}
-      aria-roledescription={labels?.roleDescription ?? "selection"}
-      aria-describedby={describedBy}
-      // biome-ignore lint/a11y/noNoninteractiveTabindex: the frame is the keyboard handle for moving the object
-      tabIndex={0}
-      className={className ? `cy-selection-frame ${className}` : "cy-selection-frame"}
-      data-moving={live ? "" : undefined}
-      style={
-        {
-          "--_x": `${shown.box.x * scale}px`,
-          "--_y": `${shown.box.y * scale}px`,
-          "--_w": `${shown.box.width * scale}px`,
-          "--_h": `${shown.box.height * scale}px`,
-          "--_r": `${shown.rotate}deg`,
-          ...style,
-        } as CSSProperties
-      }
-      onKeyDown={onKeyDown}
-      onKeyUp={onKeyUp}
-    >
-      {resizable &&
-        HANDLES.map((name) => (
+      ref={surface}
+      className="cy-selection-frame-surface cy-reset"
+      {...(shown
+        ? { "aria-hidden": true }
+        : {
+            role: "group",
+            "aria-label": label,
+            "aria-roledescription": labels?.drawArea ?? "drawing area",
+            "aria-describedby": describedBy,
+            tabIndex: 0,
+            onKeyDown: (event: KeyboardEvent<HTMLDivElement>) => {
+              if (event.key !== "Enter" && event.key !== " ") return;
+              event.preventDefault();
+              place();
+            },
+          })}
+    />
+  );
+  if (!shown) return area || null;
+  return (
+    <>
+      {area}
+      {/* biome-ignore lint/a11y/useSemanticElements: an object frame, not a group of form controls (fieldset) */}
+      <div
+        ref={frame}
+        role="group"
+        aria-label={label}
+        aria-roledescription={labels?.roleDescription ?? "selection"}
+        aria-describedby={describedBy}
+        // biome-ignore lint/a11y/noNoninteractiveTabindex: the frame is the keyboard handle for moving the object
+        tabIndex={0}
+        className={className ? `cy-selection-frame ${className}` : "cy-selection-frame"}
+        data-moving={live ? "" : undefined}
+        style={
+          {
+            "--_x": `${shown.box.x * scale}px`,
+            "--_y": `${shown.box.y * scale}px`,
+            "--_w": `${shown.box.width * scale}px`,
+            "--_h": `${shown.box.height * scale}px`,
+            "--_r": `${shown.rotate}deg`,
+            ...style,
+          } as CSSProperties
+        }
+        onKeyDown={onKeyDown}
+        onKeyUp={onKeyUp}
+      >
+        {resizable &&
+          HANDLES.map((name) => (
+            <span
+              key={name}
+              data-handle={name}
+              className="cy-selection-frame-handle cy-reset"
+              aria-hidden="true"
+            />
+          ))}
+        {rotatable && (
           <span
-            key={name}
-            data-handle={name}
-            className="cy-selection-frame-handle cy-reset"
+            data-handle="rotate"
+            className="cy-selection-frame-handle cy-selection-frame-rotate cy-reset"
             aria-hidden="true"
           />
-        ))}
-      {rotatable && (
-        <span
-          data-handle="rotate"
-          className="cy-selection-frame-handle cy-selection-frame-rotate cy-reset"
-          aria-hidden="true"
-        />
-      )}
-    </div>
+        )}
+      </div>
+    </>
   );
 }

@@ -194,6 +194,119 @@ export const StaysInBoundsAndEscapeCancelsADrag: Story = {
   },
 };
 
+/** A region select, as a screenshot tool wires it: no box until one is drawn. */
+function Region(props: { start?: FrameBox; minSize?: number }) {
+  const [box, setBox] = useState<FrameBox | null>(props.start ?? null);
+  const [preview, setPreview] = useState<FrameBox | null>(null);
+  return (
+    <div className="page" style={{ position: "relative", inlineSize: 400, blockSize: 300 }}>
+      <SelectionFrame
+        label="Region"
+        draw
+        resizable
+        box={box}
+        bounds={{ width: 400, height: 300 }}
+        {...(props.minSize ? { minSize: props.minSize } : {})}
+        onChange={setPreview}
+        onCommit={(b) => {
+          setBox(b);
+          setPreview(null);
+        }}
+      />
+      <output data-testid="state" hidden>
+        {JSON.stringify(box)}
+      </output>
+      <output data-testid="preview" hidden>
+        {JSON.stringify(preview)}
+      </output>
+    </div>
+  );
+}
+const regionOf = (el: Element) =>
+  JSON.parse(
+    (el.querySelector('[data-testid="state"]') as HTMLElement).textContent as string,
+  ) as FrameBox | null;
+const surfaceOf = (el: Element) => el.querySelector(".cy-selection-frame-surface") as HTMLElement;
+/** Drags from one point of `target` to another (offsets from its top left), through detent's pointer path. */
+async function stroke(target: Element, from: [number, number], to: [number, number], end = true) {
+  const r = target.getBoundingClientRect();
+  const init = {
+    bubbles: true,
+    cancelable: true,
+    pointerId: 9,
+    pointerType: "mouse",
+    isPrimary: true,
+    button: 0,
+    buttons: 1,
+  };
+  const at = (f: number) => ({
+    clientX: r.left + from[0] + (to[0] - from[0]) * f,
+    clientY: r.top + from[1] + (to[1] - from[1]) * f,
+  });
+  target.dispatchEvent(new PointerEvent("pointerdown", { ...init, ...at(0) }));
+  for (const f of [0.25, 0.5, 0.75, 1])
+    target.dispatchEvent(new PointerEvent("pointermove", { ...init, ...at(f) }));
+  await new Promise((res) => requestAnimationFrame(() => res(null)));
+  if (end) target.dispatchEvent(new PointerEvent("pointerup", { ...init, buttons: 0, ...at(1) }));
+}
+
+export const DrawANewBox: Story = {
+  render: () => <Region />,
+  play: async ({ canvas, canvasElement }) => {
+    // Before anything is drawn, the area itself is the control.
+    const area = canvas.getByRole("group", { name: "Region" });
+    await expect(area).toHaveAttribute("aria-roledescription", "drawing area");
+    await expect(area).toHaveAttribute("tabindex", "0");
+    await expect(frame(canvasElement)).toBeNull();
+    await stroke(surfaceOf(canvasElement), [200, 180], [100, 100]);
+    // Drawn from either corner, the box is the same; the frame now takes over.
+    await waitFor(() => expect(regionOf(canvasElement)).toEqual({ x: 100, y: 100, width: 100, height: 80 }));
+    await expect(canvas.getByRole("group", { name: "Region" })).toHaveAttribute(
+      "aria-roledescription",
+      "selection",
+    );
+    await expect(surfaceOf(canvasElement)).toHaveAttribute("aria-hidden", "true");
+    await expect(surfaceOf(canvasElement)).not.toHaveAttribute("tabindex");
+    // A press on the frame moves it rather than drawing.
+    await stroke(frame(canvasElement), [50, 40], [80, 60]);
+    await waitFor(() => expect(regionOf(canvasElement)).toEqual({ x: 130, y: 120, width: 100, height: 80 }));
+    // A drag elsewhere draws a new one, kept inside the bounds.
+    await stroke(surfaceOf(canvasElement), [20, 20], [-50, 350]);
+    await waitFor(() => expect(regionOf(canvasElement)).toEqual({ x: 0, y: 20, width: 20, height: 280 }));
+  },
+};
+
+export const EscapeOrASlipDrawsNothing: Story = {
+  render: () => <Region start={{ x: 10, y: 10, width: 50, height: 50 }} minSize={8} />,
+  play: async ({ canvasElement }) => {
+    const preview = () => (canvasElement.querySelector('[data-testid="preview"]') as HTMLElement).textContent;
+    await stroke(surfaceOf(canvasElement), [200, 200], [300, 280], false);
+    await waitFor(() => expect(preview()).toBe(JSON.stringify({ x: 200, y: 200, width: 100, height: 80 })));
+    window.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true, cancelable: true }));
+    // Escape puts the old box back.
+    await waitFor(() => expect(preview()).toBe(JSON.stringify({ x: 10, y: 10, width: 50, height: 50 })));
+    await expect(regionOf(canvasElement)).toEqual({ x: 10, y: 10, width: 50, height: 50 });
+    // A drag smaller than minSize is a slip, not a box.
+    await stroke(surfaceOf(canvasElement), [200, 200], [205, 260]);
+    await new Promise((res) => setTimeout(res, 50));
+    await expect(regionOf(canvasElement)).toEqual({ x: 10, y: 10, width: 50, height: 50 });
+  },
+};
+
+export const EnterPlacesABox: Story = {
+  render: () => <Region />,
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    await userEvent.tab();
+    await expect(canvas.getByRole("group", { name: "Region" })).toHaveFocus();
+    await userEvent.keyboard("{Enter}");
+    // A box half the area's size, in its middle, focused so the arrows adjust it.
+    await waitFor(() => expect(regionOf(canvasElement)).toEqual({ x: 100, y: 75, width: 200, height: 150 }));
+    await waitFor(() => expect(frame(canvasElement)).toHaveFocus());
+    await userEvent.keyboard("{ArrowRight}");
+    await waitFor(() => expect(regionOf(canvasElement)?.x).toBe(101));
+  },
+};
+
 export const TouchHandlesAndDrag: Story = {
   tags: ["touch", "!dev"],
   play: async ({ canvasElement }) => {

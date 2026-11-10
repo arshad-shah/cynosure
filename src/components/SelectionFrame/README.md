@@ -23,7 +23,8 @@ import { SelectionFrame } from "@arshad-shah/cynosure";
 
 | Prop                      | Default    | Notes                                                                                       |
 | ------------------------- | ---------- | ------------------------------------------------------------------------------------------- |
-| `box` / `rotate`          | – / `0`    | In your units and degrees (clockwise)                                                       |
+| `box` / `rotate`          | – / `0`    | In your units and degrees (clockwise); `box` is `null` before one is drawn                  |
+| `draw`                    | `false`    | Drag anywhere on the layer to draw a new box (region select, crop, grid area)               |
 | `scale`                   | `1`        | CSS pixels per unit                                                                         |
 | `resizable` / `rotatable` | `false`    | Eight resize handles / a rotate handle above                                                |
 | `keepAspect`              | `false`    | Keep the ratio (Shift does it for one drag)                                                 |
@@ -31,9 +32,11 @@ import { SelectionFrame } from "@arshad-shah/cynosure";
 | `step` / `largeStep`      | `1` / `10` | Arrow-key amounts                                                                           |
 | `snap`                    | –          | Adjust each proposed box (grids, guides)                                                    |
 | `onChange` / `onCommit`   | – / –      | Preview while dragging or holding a key / the end of one change (pointer up, key up, Enter) |
-| `labels`                  | –          | `roleDescription` ("selection")                                                             |
+| `labels`                  | –          | `roleDescription` ("selection"), `drawArea` ("drawing area")                                |
 
 Keys: arrows move (Shift ×10), Alt+arrows resize the frame's own right and bottom edges, `[` and `]` rotate by 15°, Escape cancels a held key or a drag, Enter commits a held key. Each key press is one undo step.
+
+**Drawing a box.** With `draw`, a drag anywhere on the layer (the frame's positioned parent) draws a new box from corner to corner, kept inside `bounds` and passed through `snap`; `onChange` previews it and `onCommit` ends it. A press on the frame still moves it. A drag smaller than `minSize` is treated as a slip, and Escape puts the old box back. Before any box exists, the layer is a focusable "drawing area" and Enter places a box in its middle, then focus moves to the frame so the arrows adjust it.
 
 The geometry helpers are exported for your own tools: `moveBy`, `resizeBy`, `resizeByKey`, `contain`, `angleFrom`.
 
