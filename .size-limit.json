@@ -331,5 +331,11 @@
     "path": ["dist/components/DescriptionList/DescriptionList.js", "dist/styles/description-list.css"],
     "limit": "1.25 kB",
     "gzip": true
+  },
+  {
+    "name": "Announcer",
+    "path": ["dist/components/Announcer/Announcer.js", "dist/styles/announcer.css"],
+    "limit": "1 kB",
+    "gzip": true
   }
 ]

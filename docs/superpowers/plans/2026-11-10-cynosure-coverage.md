@@ -19,7 +19,7 @@ Smallest first, then the larger pieces.
 - [x] **Task 3: Grid.** Responsive layout primitive (columns or min item width, gap tokens).
 - [x] **Task 4: Steps.** Ordered progress through a flow (`aria-current="step"`), horizontal and vertical, optional clickable steps.
 - [x] **Task 5: DescriptionList.** Term and detail pairs, stacked or side by side.
-- [ ] **Task 6: `useAnnounce`.** Polite or assertive live-region announcements without writing to `<body>`.
+- [x] **Task 6: `useAnnounce`.** Built as `<Announcer>` plus `useAnnounce()`. Polite or assertive live-region announcements without writing to `<body>`.
 - [ ] **Task 7: `themeInitScript()`.** Returns the text of a tiny script that sets the saved theme before first paint; products place it themselves (Cynosure injects nothing).
 - [ ] **Task 8: Prose.** Typography for rendered Markdown and long text, all tokens.
 - [ ] **Task 9: Menu point anchor.** Open Menu at a pointer position (context menus), with keyboard opening at the focused item.

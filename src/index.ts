@@ -6,6 +6,14 @@ export {
   type AccordionProps,
   type AccordionSingleProps,
 } from "./components/Accordion/index.js";
+export {
+  type Announce,
+  type AnnounceOptions,
+  Announcer,
+  type AnnouncerProps,
+  type Politeness,
+  useAnnounce,
+} from "./components/Announcer/index.js";
 export { Badge, type BadgeProps } from "./components/Badge/index.js";
 export { Button, type ButtonProps, type ButtonTokens } from "./components/Button/index.js";
 export { Card, type CardProps } from "./components/Card/index.js";

@@ -43,7 +43,7 @@ After Plan 3 (fixes from Arshad's checks of the published Storybook, 2026-11-10)
 
 ## Current task
 
-Plan 5 (`docs/superpowers/plans/2026-11-10-cynosure-coverage.md`): the generic components and icons the cross-product audit asked for. Tasks 1–5 (Facet icons, Skeleton, Grid, Steps, DescriptionList) are done; Task 6 (`useAnnounce`) is next.
+Plan 5 (`docs/superpowers/plans/2026-11-10-cynosure-coverage.md`): the generic components and icons the cross-product audit asked for. Tasks 1–6 (Facet icons, Skeleton, Grid, Steps, DescriptionList, Announcer/`useAnnounce`) are done; Task 7 (`themeInitScript`) is next.
 
 ## Next step
 
@@ -84,7 +84,7 @@ An independent review of the Plan 3 Tasks 8–12 code found nine issues. Fixed (
 - [x] Plan 2: Milestone 1 controls (`docs/superpowers/plans/2026-11-09-cynosure-controls.md`)
 - [x] Plan 3: Milestone 2 structure and overlays (`docs/superpowers/plans/2026-11-09-cynosure-structure.md`). Tasks 1–13 and the final review done.
 - [ ] Plan 4: Milestone 3 and product migration issues (`docs/superpowers/plans/2026-11-10-cynosure-evidence.md`). Tasks 1–7 and 8b done; Tasks 9–10 after Plan 5.
-- [ ] Plan 5: coverage components and icons (`docs/superpowers/plans/2026-11-10-cynosure-coverage.md`). Tasks 1–5 done.
+- [ ] Plan 5: coverage components and icons (`docs/superpowers/plans/2026-11-10-cynosure-coverage.md`). Tasks 1–6 done.
 
 ## Plan 3 rulings so far
 
@@ -120,6 +120,7 @@ An independent review of the Plan 3 Tasks 8–12 code found nine issues. Fixed (
 ## Plan 4 rulings so far
 
 - **Toasts in dialogs (Task 1):** an open Dialog (or Sheet) inside a Toaster registers a container through `ToastHostContext` (`src/overlay/toast-host.ts`, separate so Dialog never imports Toast). The Toaster portals its region into the latest container and shows it again, which puts it above the dialog and outside the modal's inert area. Moving re-creates the toast elements, so each toast keeps a small memory in the Toaster: whether it was announced (then its text renders at once, and a danger toast comes back as `status`, not `alert`) and its remaining time (read when the timer starts, after the old element saved it).
+- **Announcer (Plan 5 Task 6):** `<Announcer>` renders a polite `status` and an assertive `alert` region where it is placed (never in `<body>`); `useAnnounce()` uses the nearest one, and without one warns once and does nothing. Each message is a keyed node so repeats are read; messages clear after `clearAfter` (5 s).
 - **DescriptionList (Plan 5 Task 5):** a `<dl>` in a container-query wrapper: `auto` is inline from 28rem of the list's own width. Rows are subgrids so terms share one `fit-content(40%)` column. Budget 1.25 kB.
 - **Steps (Plan 5 Task 4):** an `<ol>` with `aria-current="step"` and each state read after the label (visually hidden, overridable). `onStepSelect` turns steps into ButtonBase buttons; the current and disabled steps do nothing. Lines are absolutely placed from the marker. A new `alert` icon (exclamation without a circle) marks error steps. Budget 2.5 kB (2.22 kB with its icons and ButtonBase).
 - **Grid (Plan 5 Task 3):** `columns` and/or `minItemWidth` (auto-fill, capped at `columns` with a `max()` term); `GridItem` spans, clamped with `min()` on fixed grids. Unset custom properties are reset to `initial` so nested grids never inherit their parent's columns. No tokens: gaps are space tokens.
