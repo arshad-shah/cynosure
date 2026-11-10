@@ -1,0 +1,65 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./SplitPane.stories";
+
+<Meta of={Stories} />
+
+# SplitPane
+
+Two panes with a divider people can move, by dragging it or with the keyboard.
+
+<Canvas of={Stories.AWindowSplitter} />
+
+## When to use
+
+- **List and detail, editor and preview, code and output**: two regions whose balance depends on the task.
+
+**Use something else when:**
+- the side region is navigation: [AppShell](?path=/docs/components-appshell--docs)
+- the second region is temporary: a [Sheet](?path=/docs/components-sheet--docs)
+
+## Usage
+
+```tsx
+import { SplitPane } from "@arshad-shah/cynosure";
+
+<div style={{ blockSize: "100%" }}>
+  <SplitPane label="Resize the file list" start={<FileList />} end={<Preview />} defaultSize={30} />
+</div>
+```
+
+The SplitPane fills its container, so give the container a size. Each pane scrolls on its own. Remember the size by passing `size` and `onSizeChange`.
+
+## Stacked and collapsible
+
+`orientation="vertical"` stacks the panes. With `collapsible`, Enter on the divider collapses the start pane and restores it.
+
+<Canvas of={Stories.Vertical} />
+
+<Canvas of={Stories.CollapseAndRestore} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+- **Role:** the divider is a focusable `separator` named by `label`, with the start pane's size as `aria-valuenow` (percent) and `aria-controls` pointing at it.
+- **Keyboard:**
+
+| Key                         | Action                                         |
+| --------------------------- | ---------------------------------------------- |
+| Arrow Left / Right          | Shrink / grow the start pane (side by side; flipped in right-to-left text) |
+| Arrow Up / Down             | Shrink / grow the start pane (stacked)         |
+| Home / End                  | To `min` / `max`                               |
+| Enter                       | Collapse or restore (with `collapsible`)       |
+
+- **Pointer and touch:** drag the divider; it keeps focus afterwards so the keys can fine-tune. Its hit area is at least 24px wide, 44px on touch screens, and touch dragging does not scroll the page.
+- **Direction:** the start pane is on the right in right-to-left text.
+
+## Theming
+
+Tokens: `--cy-split-pane-divider-size` and `--cy-split-pane-divider`.
+
+## Related
+
+[AppShell](?path=/docs/components-appshell--docs) · [Slider](?path=/docs/components-slider--docs)

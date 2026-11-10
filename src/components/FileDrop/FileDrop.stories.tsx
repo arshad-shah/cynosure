@@ -168,6 +168,40 @@ export const LabelsOverride: Story = {
   },
 };
 
+export const PlainZoneAndNestedDrags: Story = {
+  render: () => (
+    <form data-testid="form" style={{ maxWidth: 420 }}>
+      <FileDrop className="host-drop" accept=".png" />
+    </form>
+  ),
+  play: async ({ canvas, canvasElement }) => {
+    const target = zone(canvasElement);
+    await expect(target).toHaveClass("host-drop");
+    // No hint: the button has no description. Without callbacks, drops still work and are explained.
+    await expect(canvas.getByRole("button", { name: "Choose a file" })).not.toHaveAttribute(
+      "aria-describedby",
+    );
+    // Moving between the zone's own children (enter twice, leave once) keeps it lit until the last leave.
+    const data = new DataTransfer();
+    data.items.add(file("a.png", "image/png"));
+    const fire = (type: string, el: Element) =>
+      el.dispatchEvent(new DragEvent(type, { bubbles: true, cancelable: true, dataTransfer: data }));
+    const button = canvas.getByRole("button", { name: "Choose a file" });
+    fire("dragenter", target);
+    fire("dragenter", button);
+    fire("dragleave", target);
+    await waitFor(() => expect(target).toHaveAttribute("data-over"));
+    fire("dragleave", button);
+    await waitFor(() => expect(target).not.toHaveAttribute("data-over"));
+    // Only refusals: nothing is announced as added.
+    const bad = new DataTransfer();
+    bad.items.add(file("a.txt", "text/plain"));
+    target.dispatchEvent(new DragEvent("drop", { bubbles: true, cancelable: true, dataTransfer: bad }));
+    await waitFor(() => expect(canvas.getByRole("alert")).toHaveTextContent("a.txt"));
+    await expect(canvas.getByRole("status")).toHaveTextContent("");
+  },
+};
+
 export const TouchButton: Story = {
   tags: ["touch", "!dev"],
   play: async ({ canvas, canvasElement, userEvent }) => {

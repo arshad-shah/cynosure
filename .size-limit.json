@@ -379,5 +379,11 @@
     "path": ["dist/components/FileDrop/FileDrop.js", "dist/styles/file-drop.css"],
     "limit": "3 kB",
     "gzip": true
+  },
+  {
+    "name": "SplitPane",
+    "path": ["dist/components/SplitPane/SplitPane.js", "dist/styles/split-pane.css"],
+    "limit": "2.25 kB",
+    "gzip": true
   }
 ]

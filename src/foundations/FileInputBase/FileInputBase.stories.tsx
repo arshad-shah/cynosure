@@ -57,6 +57,16 @@ export const DroppedFilesReachTheForm: Story = {
   },
 };
 
+export const WorksWithoutOnFiles: Story = {
+  render: ({ onFiles: _onFiles, ...args }) => <FileInputBase {...args} />,
+  play: async ({ canvas, userEvent }) => {
+    const input = canvas.getByLabelText("Attachment") as HTMLInputElement;
+    // Picking with no listener is fine; the input still holds the file.
+    await userEvent.upload(input, file("a.txt"));
+    await expect(input.files?.[0]?.name).toBe("a.txt");
+  },
+};
+
 export const DisabledPicksNothing: Story = {
   args: { disabled: true },
   play: async ({ args, canvas, userEvent }) => {
