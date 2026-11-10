@@ -43,7 +43,7 @@ After Plan 3 (fixes from Arshad's checks of the published Storybook, 2026-11-10)
 
 ## Current task
 
-Plan 5 (`docs/superpowers/plans/2026-11-10-cynosure-coverage.md`): the generic components and icons the cross-product audit asked for. Tasks 1–7 (Facet icons, Skeleton, Grid, Steps, DescriptionList, Announcer/`useAnnounce`, `themeInitScript`, Prose, ContextMenu, SideNav, AppShell, NumberField, FileDrop, SplitPane, TagInput) are done; Task 15 (CodeBlock) is next.
+Plan 5 (`docs/superpowers/plans/2026-11-10-cynosure-coverage.md`): the generic components and icons the cross-product audit asked for. Tasks 1–7 (Facet icons, Skeleton, Grid, Steps, DescriptionList, Announcer/`useAnnounce`, `themeInitScript`, Prose, ContextMenu, SideNav, AppShell, NumberField, FileDrop, SplitPane, TagInput, CodeBlock) are done; Task 16 (SortableList) is next.
 
 ## Next step
 
@@ -84,7 +84,7 @@ An independent review of the Plan 3 Tasks 8–12 code found nine issues. Fixed (
 - [x] Plan 2: Milestone 1 controls (`docs/superpowers/plans/2026-11-09-cynosure-controls.md`)
 - [x] Plan 3: Milestone 2 structure and overlays (`docs/superpowers/plans/2026-11-09-cynosure-structure.md`). Tasks 1–13 and the final review done.
 - [ ] Plan 4: Milestone 3 and product migration issues (`docs/superpowers/plans/2026-11-10-cynosure-evidence.md`). Tasks 1–7 and 8b done; Tasks 9–10 after Plan 5.
-- [ ] Plan 5: coverage components and icons (`docs/superpowers/plans/2026-11-10-cynosure-coverage.md`). Tasks 1–14 done.
+- [ ] Plan 5: coverage components and icons (`docs/superpowers/plans/2026-11-10-cynosure-coverage.md`). Tasks 1–15 done.
 
 ## Plan 3 rulings so far
 
@@ -120,6 +120,7 @@ An independent review of the Plan 3 Tasks 8–12 code found nine issues. Fixed (
 ## Plan 4 rulings so far
 
 - **Toasts in dialogs (Task 1):** an open Dialog (or Sheet) inside a Toaster registers a container through `ToastHostContext` (`src/overlay/toast-host.ts`, separate so Dialog never imports Toast). The Toaster portals its region into the latest container and shows it again, which puts it above the dialog and outside the modal's inert area. Moving re-creates the toast elements, so each toast keeps a small memory in the Toaster: whether it was announced (then its text renders at once, and a danger toast comes back as `status`, not `alert`) and its remaining time (read when the timer starts, after the old element saved it).
+- **CodeBlock (Plan 5 Task 15):** a figure named by its title (`aria-labelledby`, so the copy button's text is not part of the name). The body is a grid with `align-items: start` so the body scrolls vertically (gutter and code together) and the `<pre>` only sideways; a non-wrapping `<pre>` is a focusable named region. One trailing new line is dropped before highlighting and numbering.
 - **TagInput (Plan 5 Task 14):** TextField plus a chip list under it (not inside, so wrapping and focus stay simple); suggestions reuse Combobox's listbox markup and styles (`combobox.css` counted in its budget). Tags are not tab stops: Arrow Left at the start of the field enters them. Each tag is its own HiddenValue under `name`; one disabled HiddenValue only listens for reset. `required` sits on the visible input while there are no tags.
 - **SplitPane (Plan 5 Task 13):** a 3-track grid; the divider is a focusable `role="separator"` (APG window splitter) whose value is the start pane's percent. Drag state lives in a ref keyed by pointer id (not `hasPointerCapture`, which synthetic test events never get), as in Slider.
 - **FileDrop (Plan 5 Task 12):** new foundation `FileInputBase` (the only `<input type="file">`) with `setInputFiles` (a DataTransfer) so dropped files reach forms. FileDrop: the Button opens the hidden input; drag depth is counted so child elements do not flicker the state; only `Files` drags light it up; `acceptsFile` mirrors the browser's `accept` rules. Note for tests: user-event's `upload` fakes `input.files`, which FormData ignores; use `setInputFiles`.

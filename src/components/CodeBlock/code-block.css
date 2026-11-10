@@ -1,0 +1,103 @@
+/*
+ * code-block: a figure with a header (title, copy button) and a body (optional gutter of line numbers, then the code).
+ * The gutter and the code share font, size and line height so numbers line up; wrapping turns the gutter off.
+ */
+.cy-code-block.cy-code-block {
+  --_lh: 1.6;
+  box-sizing: border-box !important;
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: var(--cy-border-width) solid var(--cy-color-line);
+  border-radius: var(--cy-code-block-radius, var(--cy-radius-card));
+  background: var(--cy-code-block-background, var(--cy-color-soft));
+  color: var(--cy-color-ink);
+  font-family: var(--cy-font-mono);
+  font-size: var(--cy-font-size-sm);
+  line-height: var(--_lh);
+  letter-spacing: normal;
+  text-transform: none;
+  &[data-size="sm"] {
+    font-size: var(--cy-font-size-xs);
+  }
+  &[data-size="lg"] {
+    font-size: var(--cy-font-size-md);
+  }
+}
+.cy-code-block-header.cy-code-block-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--cy-space-4);
+  min-block-size: var(--cy-control-height-md);
+  padding-block: var(--cy-space-1);
+  padding-inline: var(--cy-space-5) var(--cy-space-2);
+  border-block-end: var(--cy-border-width) solid var(--cy-color-line);
+  background: var(--cy-color-surface);
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-font-size-sm);
+  line-height: var(--cy-font-line-height);
+}
+.cy-code-block-title.cy-code-block-title {
+  min-inline-size: 0;
+  overflow: hidden;
+  color: var(--cy-color-muted);
+  font-size: inherit;
+  font-weight: var(--cy-font-weight-medium);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cy-code-block-body.cy-code-block-body {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  min-inline-size: 0;
+  max-block-size: var(--cy-code-block-max-height, 32rem);
+  overflow-y: auto;
+  font-size: inherit;
+}
+.cy-code-block-gutter.cy-code-block-gutter {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  padding: var(--cy-space-5) var(--cy-space-3) var(--cy-space-5) var(--cy-space-5);
+  border-inline-end: var(--cy-border-width) solid var(--cy-color-line);
+  color: var(--cy-color-muted);
+  font-size: inherit;
+  font-variant-numeric: tabular-nums;
+  text-align: end;
+  user-select: none;
+}
+.cy-code-block-pre.cy-code-block-pre {
+  grid-column: -2;
+  min-inline-size: 0;
+  margin: 0;
+  padding: var(--cy-space-5);
+  overflow-x: auto;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  tab-size: 2;
+  white-space: pre;
+  &:focus-visible {
+    outline: var(--cy-border-focus) solid var(--cy-color-ring);
+    outline-offset: calc(-1 * var(--cy-border-focus));
+  }
+  [data-wrap] & {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+}
+.cy-code-block-code.cy-code-block-code {
+  font-family: inherit;
+  font-size: inherit;
+  background: none;
+}
+@media (forced-colors: active) {
+  .cy-code-block-pre.cy-code-block-pre:focus-visible {
+    outline-color: Highlight;
+  }
+}

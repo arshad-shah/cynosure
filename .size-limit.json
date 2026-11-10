@@ -391,5 +391,11 @@
     "path": ["dist/components/TagInput/TagInput.js", "dist/styles/tag-input.css", "dist/styles/combobox.css"],
     "limit": "4.5 kB",
     "gzip": true
+  },
+  {
+    "name": "CodeBlock (with CopyButton)",
+    "path": ["dist/components/CodeBlock/CodeBlock.js", "dist/styles/code-block.css"],
+    "limit": "3 kB",
+    "gzip": true
   }
 ]

@@ -25,6 +25,12 @@ export { Button, type ButtonProps, type ButtonTokens } from "./components/Button
 export { Card, type CardProps } from "./components/Card/index.js";
 export { Checkbox, type CheckboxProps } from "./components/Checkbox/index.js";
 export {
+  CodeBlock,
+  type CodeBlockLabels,
+  type CodeBlockProps,
+  type CodeBlockTokens,
+} from "./components/CodeBlock/index.js";
+export {
   ColorField,
   type ColorFieldLabels,
   type ColorFieldProps,
