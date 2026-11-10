@@ -1,0 +1,283 @@
+import {
+  type CSSProperties,
+  type KeyboardEvent,
+  type PointerEvent,
+  useCallback,
+  useId,
+  useRef,
+  useState,
+} from "react";
+import { HiddenValue } from "../../foundations/HiddenValue/HiddenValue.js";
+import type { Size } from "../../tokens/schema.js";
+
+export interface SliderTokens {
+  trackSm: string;
+  trackMd: string;
+  trackLg: string;
+  thumbSm: string;
+  thumbMd: string;
+  thumbLg: string;
+  track: string;
+}
+
+declare module "../../tokens/schema.js" {
+  interface ComponentTokens {
+    slider: SliderTokens;
+  }
+}
+
+export type SliderValue = number | [number, number];
+
+export interface SliderLabels {
+  /** Names of the two thumbs of a range, added to the label ("Price, minimum"). */
+  minimum: string;
+  maximum: string;
+  /** Text for a value, shown with `showValue` and read by screen readers. Default: the number. */
+  value: (value: number) => string;
+}
+
+export interface SliderMark {
+  value: number;
+  /** Short text under the track; marks without one are ticks. */
+  label?: string;
+}
+
+export interface SliderProps {
+  /** Accessible name, shown above the slider unless `labelHidden`. */
+  label: string;
+  labelHidden?: boolean;
+  /** A number, or `[from, to]` for a range with two thumbs. */
+  value?: SliderValue;
+  defaultValue?: SliderValue;
+  /** Every change while dragging or pressing keys. */
+  onChange?: (value: SliderValue) => void;
+  /** When a change is finished: pointer released, or after each key press. */
+  onCommit?: (value: SliderValue) => void;
+  min?: number;
+  max?: number;
+  step?: number;
+  /** Page Up and Page Down step (default a tenth of the range). */
+  largeStep?: number;
+  orientation?: "horizontal" | "vertical";
+  marks?: SliderMark[];
+  /** Show the current value (or range) at the end of the label row. */
+  showValue?: boolean;
+  /** Form field name; a range submits two values under it. */
+  name?: string;
+  disabled?: boolean;
+  size?: Size;
+  labels?: Partial<SliderLabels>;
+  className?: string;
+  /** Layout only. Restyle through --cy-slider-* tokens. */
+  style?: CSSProperties;
+}
+
+const DEFAULT_LABELS: SliderLabels = { minimum: "minimum", maximum: "maximum", value: (v) => String(v) };
+const decimals = (n: number) => (String(n).split(".")[1] ?? "").length;
+
+/** Picks a number (or a range) by dragging or with the keyboard: APG slider, with pointer, touch and forms. */
+export function Slider({
+  label,
+  labelHidden = false,
+  value,
+  defaultValue,
+  onChange,
+  onCommit,
+  min = 0,
+  max = 100,
+  step = 1,
+  largeStep,
+  orientation = "horizontal",
+  marks,
+  showValue = false,
+  name,
+  disabled = false,
+  size = "md",
+  labels,
+  className,
+  style,
+}: SliderProps) {
+  const id = useId();
+  const text = { ...DEFAULT_LABELS, ...labels };
+  const initial = defaultValue ?? min;
+  const [inner, setInner] = useState<SliderValue>(initial);
+  const current = value ?? inner;
+  const range = Array.isArray(current);
+  const values: number[] = range ? [...current] : [current];
+  const track = useRef<HTMLDivElement>(null);
+  const thumbs = useRef<(HTMLDivElement | null)[]>([]);
+  const drag = useRef<{ index: number; pointer: number } | null>(null);
+  const big = largeStep ?? Math.max(step, (max - min) / 10);
+  const vertical = orientation === "vertical";
+
+  const snap = useCallback(
+    (v: number) => {
+      const stepped = min + Math.round((v - min) / step) * step;
+      return Number(Math.min(Math.max(stepped, min), max).toFixed(decimals(step)));
+    },
+    [min, max, step],
+  );
+  /** New value with thumb `index` moved to `v`; range thumbs stop at each other instead of crossing. */
+  const withThumb = (index: number, v: number): SliderValue => {
+    if (!range) return snap(v);
+    const [from, to] = values as [number, number];
+    return index === 0 ? [Math.min(snap(v), to), to] : [from, Math.max(snap(v), from)];
+  };
+  const set = (next: SliderValue, commit: boolean) => {
+    const same = Array.isArray(next) ? next.every((n, i) => n === values[i]) : next === values[0];
+    if (!same) {
+      if (value === undefined) setInner(next);
+      onChange?.(next);
+    }
+    if (commit) onCommit?.(next);
+  };
+
+  const fromPointer = (event: PointerEvent) => {
+    const box = (track.current as HTMLDivElement).getBoundingClientRect();
+    const rtl = !vertical && getComputedStyle(track.current as HTMLDivElement).direction === "rtl";
+    let ratio = vertical ? (box.bottom - event.clientY) / box.height : (event.clientX - box.left) / box.width;
+    if (rtl) ratio = 1 - ratio;
+    return min + Math.min(Math.max(ratio, 0), 1) * (max - min);
+  };
+  const onPointerDown = (event: PointerEvent<HTMLDivElement>) => {
+    if (disabled || event.button !== 0) return;
+    event.preventDefault();
+    const v = fromPointer(event);
+    // The nearest thumb takes the press (for a range); on a tie, the one that can still move that way.
+    const distances = values.map((n) => Math.abs(n - v));
+    let index = distances.indexOf(Math.min(...distances));
+    if (range && values[0] === values[1]) index = v < (values[0] as number) ? 0 : 1;
+    drag.current = { index, pointer: event.pointerId };
+    try {
+      event.currentTarget.setPointerCapture(event.pointerId);
+    } catch {
+      // Synthetic events have no active pointer to capture.
+    }
+    thumbs.current[index]?.focus({ preventScroll: true });
+    set(withThumb(index, v), false);
+  };
+  const onPointerMove = (event: PointerEvent<HTMLDivElement>) => {
+    const d = drag.current;
+    if (!d || d.pointer !== event.pointerId) return;
+    set(withThumb(d.index, fromPointer(event)), false);
+  };
+  const onPointerEnd = (event: PointerEvent<HTMLDivElement>) => {
+    const d = drag.current;
+    if (!d || d.pointer !== event.pointerId) return;
+    drag.current = null;
+    set(withThumb(d.index, fromPointer(event)), true);
+  };
+
+  const onKeyDown = (index: number) => (event: KeyboardEvent<HTMLDivElement>) => {
+    const now = values[index] as number;
+    const rtl = !vertical && getComputedStyle(event.currentTarget).direction === "rtl";
+    const forward = rtl ? -step : step;
+    const moves: Record<string, number> = {
+      ArrowUp: now + step,
+      ArrowDown: now - step,
+      ArrowRight: now + forward,
+      ArrowLeft: now - forward,
+      PageUp: now + big,
+      PageDown: now - big,
+      Home: min,
+      End: max,
+    };
+    const target = moves[event.key];
+    if (target === undefined) return;
+    event.preventDefault();
+    set(withThumb(index, target), true);
+  };
+
+  const position = (v: number) => `${((v - min) / (max - min || 1)) * 100}%`;
+  const valueText = range ? values.map(text.value).join(" – ") : text.value(values[0] as number);
+  const fill = range
+    ? { "--_from": position(values[0] as number), "--_to": position(values[1] as number) }
+    : { "--_from": "0%", "--_to": position(values[0] as number) };
+
+  return (
+    <div
+      className={className ? `cy-slider ${className}` : "cy-slider"}
+      // A range is a group of two sliders named by the label; a single slider is named directly.
+      {...(range
+        ? { role: "group", ...(labelHidden ? { "aria-label": label } : { "aria-labelledby": `${id}-label` }) }
+        : {})}
+      data-orientation={orientation}
+      data-range={range || undefined}
+      data-size={size}
+      data-disabled={disabled || undefined}
+      style={style}
+    >
+      {(!labelHidden || showValue) && (
+        <div className="cy-slider-head cy-reset">
+          {!labelHidden && (
+            <span id={`${id}-label`} className="cy-slider-label cy-reset">
+              {label}
+            </span>
+          )}
+          {showValue && (
+            <span className="cy-slider-value cy-reset" aria-hidden="true">
+              {valueText}
+            </span>
+          )}
+        </div>
+      )}
+      <div
+        ref={track}
+        className="cy-slider-track cy-reset"
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerEnd}
+        onPointerCancel={onPointerEnd}
+        style={fill as CSSProperties}
+      >
+        <div className="cy-slider-fill cy-reset" />
+        {marks?.map((mark) => (
+          <span
+            key={mark.value}
+            className="cy-slider-mark cy-reset"
+            aria-hidden="true"
+            style={{ "--_pos": position(mark.value) } as CSSProperties}
+            data-label={mark.label ? "" : undefined}
+          >
+            {mark.label && <span className="cy-slider-mark-label cy-reset">{mark.label}</span>}
+          </span>
+        ))}
+        {values.map((v, index) => (
+          <div
+            key={index}
+            ref={(el) => {
+              thumbs.current[index] = el;
+            }}
+            role="slider"
+            tabIndex={disabled ? undefined : 0}
+            className="cy-slider-thumb cy-reset"
+            aria-orientation={orientation}
+            aria-valuemin={range && index === 1 ? (values[0] as number) : min}
+            aria-valuemax={range && index === 0 ? (values[1] as number) : max}
+            aria-valuenow={v}
+            aria-valuetext={text.value(v)}
+            aria-disabled={disabled || undefined}
+            {...(range
+              ? { "aria-label": `${label}, ${index === 0 ? text.minimum : text.maximum}` }
+              : labelHidden
+                ? { "aria-label": label }
+                : { "aria-labelledby": `${id}-label` })}
+            style={{ "--_pos": position(v) } as CSSProperties}
+            onKeyDown={disabled ? undefined : onKeyDown(index)}
+          />
+        ))}
+      </div>
+      {values.map((v, index) => (
+        <HiddenValue
+          key={index}
+          name={name}
+          value={String(v)}
+          disabled={disabled}
+          onReset={() => {
+            if (value === undefined) setInner(initial);
+          }}
+        />
+      ))}
+    </div>
+  );
+}

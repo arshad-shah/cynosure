@@ -36,7 +36,7 @@ Record the evidence in each component's README under `## Used by`. Re-check Pris
   - React 18 and Preact compatibility
   - no AI attribution
 - Overlays: entrances use `@keyframes` (never `@starting-style`), and stories call `shownFully()` after opening (`src/test/settle.ts`).
-- Size budgets: ≤ 3 kB JS + CSS gzip per component; Combobox, Tree and CommandPalette ≤ 4.5 kB each, ColorField ≤ 4 kB (Slider counted separately).
+- Size budgets: ≤ 3 kB JS + CSS gzip per component; Slider ≤ 3.5 kB (single and range, vertical, marks, forms); Combobox, Tree and CommandPalette ≤ 4.5 kB each, ColorField ≤ 4 kB (Slider counted separately).
 - Before telling Arshad the published Storybook is fine, build it and load every story under `/cynosure/` (`docs/testing.md`).
 
 ## Review Focus

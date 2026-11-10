@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { Button } from "../../src/components/Button/Button";
 import { Select } from "../../src/components/Select/Select";
+import { Slider } from "../../src/components/Slider/Slider";
 import { TextField } from "../../src/components/TextField/TextField";
 
 // React 18 only runs act() warnings-free when told it is in a test environment.
@@ -84,5 +85,22 @@ describe("Cynosure on React 18", () => {
     expect(trigger.getAttribute("aria-expanded")).toBe("false");
     const form = host.querySelector("form") as HTMLFormElement;
     expect(new FormData(form).get("fruit")).toBe("pear");
+  });
+
+  it("Slider moves with the keyboard and submits its value", () => {
+    const onChange = vi.fn();
+    const host = mount(
+      <form>
+        <Slider label="Volume" name="volume" defaultValue={40} onChange={onChange} />
+      </form>,
+    );
+    const thumb = host.querySelector('[role="slider"]') as HTMLElement;
+    expect(thumb.getAttribute("aria-valuenow")).toBe("40");
+    act(() => {
+      thumb.dispatchEvent(new KeyboardEvent("keydown", { key: "End", bubbles: true }));
+    });
+    expect(onChange).toHaveBeenCalledWith(100);
+    expect(thumb.getAttribute("aria-valuenow")).toBe("100");
+    expect(new FormData(host.querySelector("form") as HTMLFormElement).get("volume")).toBe("100");
   });
 });

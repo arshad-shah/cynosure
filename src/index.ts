@@ -51,6 +51,14 @@ export {
 } from "./components/SegmentedControl/index.js";
 export { Select, type SelectOption, type SelectProps } from "./components/Select/index.js";
 export { Sheet, type SheetProps, type SheetTokens } from "./components/Sheet/index.js";
+export {
+  Slider,
+  type SliderLabels,
+  type SliderMark,
+  type SliderProps,
+  type SliderTokens,
+  type SliderValue,
+} from "./components/Slider/index.js";
 export { Stack, type StackProps } from "./components/Stack/index.js";
 export { Switch, type SwitchProps } from "./components/Switch/index.js";
 export {
