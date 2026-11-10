@@ -1,5 +1,6 @@
 export {
   type CanvasRect,
+  type CanvasScreen,
   type CanvasView,
   PanZoomCanvas,
   type PanZoomCanvasHandle,

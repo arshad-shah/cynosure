@@ -1,9 +1,14 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { expect, waitFor } from "storybook/test";
 import { computeUnderHostileHost } from "../../test/hostile.js";
 import { Button } from "../Button/Button.js";
-import { type CanvasView, PanZoomCanvas, type PanZoomCanvasHandle } from "./PanZoomCanvas.js";
+import {
+  type CanvasScreen,
+  type CanvasView,
+  PanZoomCanvas,
+  type PanZoomCanvasHandle,
+} from "./PanZoomCanvas.js";
 
 const NODES = [
   { id: "A", x: 0, y: 0 },
@@ -120,6 +125,62 @@ function drag(
     new PointerEvent("pointerup", { ...init, buttons: 0, clientX: from.x + by.x, clientY: from.y + by.y }),
   );
 }
+
+/** An engine that paints the scene itself: one square at canvas (100, 100), 20 units wide. */
+function Painted({ view, width, height }: CanvasScreen) {
+  const el = useRef<HTMLCanvasElement>(null);
+  useEffect(() => {
+    const ctx = el.current?.getContext("2d");
+    if (!ctx) return;
+    ctx.clearRect(0, 0, width, height);
+    ctx.fillStyle = "rgb(255, 0, 0)";
+    ctx.fillRect(100 * view.scale + view.x, 100 * view.scale + view.y, 20 * view.scale, 20 * view.scale);
+  });
+  return <canvas ref={el} width={width} height={height} data-testid="painted" />;
+}
+const red = (el: HTMLCanvasElement, x: number, y: number) =>
+  (el.getContext("2d") as CanvasRenderingContext2D).getImageData(x, y, 1, 1).data[0] === 255;
+
+export const PaintedIntoACanvas: Story = {
+  render: () => {
+    const [view, setView] = useState<CanvasView>({ x: 0, y: 0, scale: 1 });
+    return (
+      <div style={{ blockSize: 300, inlineSize: 400 }}>
+        <PanZoomCanvas
+          label="Scene"
+          view={view}
+          onViewChange={setView}
+          renderScreen={(screen) => <Painted {...screen} />}
+        />
+        <output data-testid="view">{JSON.stringify(view)}</output>
+      </div>
+    );
+  },
+  play: async ({ canvas, canvasElement }) => {
+    const region = canvas.getByRole("region", { name: "Scene" });
+    const painted = (await canvas.findByTestId("painted")) as HTMLCanvasElement;
+    // The layer is the canvas's size, in screen pixels.
+    await expect(painted.width).toBe(region.clientWidth);
+    await expect(painted.height).toBe(region.clientHeight);
+    await waitFor(() => expect(red(painted, 110, 110)).toBe(true));
+    // Pressing the painted scene pans, like the background: the layer does not take the pointer.
+    const r = box(region);
+    await expect(document.elementFromPoint(r.left + 110, r.top + 110)).toBe(region);
+    drag(region, { x: r.left + 110, y: r.top + 110 }, { x: 50, y: 30 });
+    await waitFor(() => expect(viewOf(canvasElement)).toEqual({ x: 50, y: 30, scale: 1 }));
+    // Each view change is drawn: the square moved with the pan.
+    await waitFor(() => expect(red(painted, 160, 140)).toBe(true));
+    await expect(red(painted, 105, 105)).toBe(false);
+    // Zooming redraws at the new scale (Ctrl+= zooms around the centre).
+    region.focus();
+    region.dispatchEvent(
+      new KeyboardEvent("keydown", { key: "=", ctrlKey: true, bubbles: true, cancelable: true }),
+    );
+    await waitFor(() => expect(viewOf(canvasElement).scale).toBeGreaterThan(1));
+    const v = viewOf(canvasElement);
+    await waitFor(() => expect(red(painted, 110 * v.scale + v.x, 110 * v.scale + v.y)).toBe(true));
+  },
+};
 
 export const FitsItsContent: Story = {
   tags: ["visual"],

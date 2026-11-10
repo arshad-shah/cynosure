@@ -141,6 +141,7 @@ export {
 } from "./components/NumberField/index.js";
 export {
   type CanvasRect,
+  type CanvasScreen,
   type CanvasView,
   PanZoomCanvas,
   type PanZoomCanvasHandle,

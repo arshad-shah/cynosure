@@ -32,6 +32,14 @@
     user-select: none;
   }
 }
+/* renderScreen's layer: screen pixels, under the content, and transparent to the pointer so pressing it pans. */
+.cy-pan-zoom-canvas-screen.cy-pan-zoom-canvas-screen {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  font-size: inherit;
+}
 .cy-pan-zoom-canvas-content.cy-pan-zoom-canvas-content {
   position: absolute;
   inset-block-start: 0;

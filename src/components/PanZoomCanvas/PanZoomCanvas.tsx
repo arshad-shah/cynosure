@@ -51,6 +51,13 @@ export interface PanZoomCanvasHandle {
   centreOn: (rect: CanvasRect) => void;
 }
 
+/** What `renderScreen` draws from: the current view and the canvas's size in CSS pixels. */
+export interface CanvasScreen {
+  view: CanvasView;
+  width: number;
+  height: number;
+}
+
 export interface PanZoomCanvasLabels {
   /** Announced when the zoom changes. Default "Zoom 125%". */
   zoom: (percent: number) => string;
@@ -69,6 +76,12 @@ export interface PanZoomCanvasProps {
   minimap?: boolean;
   /** A small drawing of the content for the minimap, in canvas units (it is scaled down). */
   renderMinimap?: () => ReactNode;
+  /**
+   * A layer in screen pixels under the content, redrawn with every view change: for an engine that paints the whole
+   * scene into a `<canvas>` (a canvas point (x, y) is at (x * scale + view.x, y * scale + view.y)). It does not take
+   * the pointer, so pressing it pans like the background.
+   */
+  renderScreen?: (screen: CanvasScreen) => ReactNode;
   /** The content, placed in canvas units (absolutely positioned children). */
   children?: ReactNode;
   labels?: Partial<PanZoomCanvasLabels>;
@@ -98,6 +111,7 @@ export const PanZoomCanvas = forwardRef<PanZoomCanvasHandle, PanZoomCanvasProps>
     bounds,
     minimap = false,
     renderMinimap,
+    renderScreen,
     children,
     labels,
     className,
@@ -256,6 +270,11 @@ export const PanZoomCanvas = forwardRef<PanZoomCanvasHandle, PanZoomCanvasProps>
         onKeyUp={gestures.onKeyUp}
         onBlur={gestures.onBlur}
       >
+        {renderScreen && size.width > 0 && (
+          <div className="cy-pan-zoom-canvas-screen cy-reset">
+            {renderScreen({ view: current, width: size.width, height: size.height })}
+          </div>
+        )}
         <div
           className="cy-pan-zoom-canvas-content cy-reset"
           style={{ transform: `translate(${current.x}px, ${current.y}px) scale(${current.scale})` }}
