@@ -78,6 +78,7 @@ export {
   type ProgressBarProps,
   type ProgressBarTokens,
 } from "./components/ProgressBar/index.js";
+export { Prose, type ProseProps, type ProseTokens } from "./components/Prose/index.js";
 export { RadioGroup, type RadioGroupProps, type RadioOption } from "./components/RadioGroup/index.js";
 export { SearchField, type SearchFieldProps } from "./components/SearchField/index.js";
 export {

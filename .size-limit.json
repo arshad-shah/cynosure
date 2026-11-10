@@ -337,5 +337,11 @@
     "path": ["dist/components/Announcer/Announcer.js", "dist/styles/announcer.css"],
     "limit": "1 kB",
     "gzip": true
+  },
+  {
+    "name": "Prose",
+    "path": ["dist/components/Prose/Prose.js", "dist/styles/prose.css"],
+    "limit": "1.5 kB",
+    "gzip": true
   }
 ]

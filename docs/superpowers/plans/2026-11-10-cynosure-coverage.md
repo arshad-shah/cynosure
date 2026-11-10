@@ -21,7 +21,7 @@ Smallest first, then the larger pieces.
 - [x] **Task 5: DescriptionList.** Term and detail pairs, stacked or side by side.
 - [x] **Task 6: `useAnnounce`.** Built as `<Announcer>` plus `useAnnounce()`. Polite or assertive live-region announcements without writing to `<body>`.
 - [x] **Task 7: `themeInitScript()`.** Returns the text of a tiny script that sets the saved theme before first paint; products place it themselves (Cynosure injects nothing).
-- [ ] **Task 8: Prose.** Typography for rendered Markdown and long text, all tokens.
+- [x] **Task 8: Prose.** Typography for rendered Markdown and long text, all tokens.
 - [ ] **Task 9: Menu point anchor.** Open Menu at a pointer position (context menus), with keyboard opening at the focused item.
 - [ ] **Task 10: Navigation and app shell.** Side navigation, top bar and a responsive shell that collapses to a Sheet on small screens.
 - [ ] **Task 11: NumberField.** Built on TextField: steppers, min, max, step, locale-aware parsing, forms.
