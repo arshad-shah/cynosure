@@ -14,7 +14,7 @@
 - [x] **Task 2: SignaturePad.** Ink drawing with pen pressure (simulated from speed for mouse and touch), coalesced events, one pointer at a time, palm rejection, strokes stored in a fixed coordinate space; undo is the parent's. Keyboard users get the Type or Upload path of a signing dialog pattern (documented).
 - [x] **Task 3: SelectionFrame.** A move/resize/rotate box: handles by pointer (detent where it fits), arrows nudge, Alt+arrows resize, `[` and `]` rotate, Shift ×10, Escape cancels. Also the crop box.
 - [x] **Task 4: Colour.** ColorField gains swatches (a radiogroup), recent colours and OKLCH output.
-- [ ] **Task 5: CompareSlider.** Before/after divider (arrows 1%, Shift 10%).
+- [x] **Task 5: CompareSlider.** Before/after divider (arrows 1%, Shift 10%).
 - [ ] **Task 6: VirtualList.** Windowed list with ARIA roles and roving focus.
 - [ ] **Task 7: Smaller pieces.** ShortcutHint, ProgressOverlay, HoverCard, KeyValueEditor (SortableList rows), FloatingPalette/FloatingDock.
 - [ ] **Task 8: SortableList grid and multi-select modes** (page rails, file grids).

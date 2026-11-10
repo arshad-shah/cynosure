@@ -1,0 +1,103 @@
+/*
+ * compare-slider: two stacked layers; the before layer is clipped to the start of the divider (--_pos). The divider is
+ * a line with a round grip; its hit area spans the full height and at least 24px (44px on touch screens). The picture
+ * is a physical left-to-right comparison, so it does not mirror in right-to-left text.
+ */
+.cy-compare-slider.cy-compare-slider {
+  --_c: var(--cy-compare-slider-divider, white);
+  --_g: var(--cy-compare-slider-grip-size, var(--cy-control-height-md));
+  --_hit: var(--cy-hit-min, 24px);
+  box-sizing: border-box !important;
+  position: relative;
+  display: grid;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border-radius: var(--cy-radius-card);
+  direction: ltr;
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-font-size-sm);
+  user-select: none;
+  cursor: ew-resize;
+}
+.cy-compare-slider-layer.cy-compare-slider-layer {
+  grid-area: 1 / 1;
+  min-inline-size: 0;
+  font-size: inherit;
+  & > img,
+  & > video,
+  & > canvas {
+    display: block;
+    inline-size: 100%;
+    block-size: auto;
+    pointer-events: none;
+  }
+  &[data-side="before"] {
+    clip-path: inset(0 calc(100% - var(--_pos)) 0 0);
+  }
+}
+.cy-compare-slider-tag.cy-compare-slider-tag {
+  position: absolute;
+  inset-block-start: var(--cy-space-4);
+  padding: var(--cy-space-1) var(--cy-space-4);
+  border-radius: var(--cy-radius-full);
+  background: color-mix(in oklab, black 60%, transparent);
+  color: white;
+  font-size: var(--cy-font-size-xs);
+  font-weight: var(--cy-font-weight-medium);
+  pointer-events: none;
+  &[data-side="before"] {
+    left: var(--cy-space-4);
+  }
+  &[data-side="after"] {
+    right: var(--cy-space-4);
+  }
+}
+.cy-compare-slider-divider.cy-compare-slider-divider {
+  position: absolute;
+  inset-block: 0;
+  left: var(--_pos);
+  inline-size: calc(2 * var(--cy-border-width));
+  translate: -50% 0;
+  background: var(--_c);
+  box-shadow: 0 0 0 var(--cy-border-width) color-mix(in oklab, black 30%, transparent);
+  font-size: inherit;
+  &::before {
+    content: "";
+    position: absolute;
+    inset-block: 0;
+    left: 50%;
+    inline-size: var(--_hit);
+    translate: -50% 0;
+  }
+  &:focus-visible {
+    outline: none;
+    & > .cy-compare-slider-grip {
+      outline: var(--cy-border-focus) solid var(--cy-color-ring);
+    }
+  }
+}
+.cy-compare-slider-grip.cy-compare-slider-grip {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  inline-size: var(--_g);
+  block-size: var(--_g);
+  translate: -50% -50%;
+  border: calc(2 * var(--cy-border-width)) solid var(--_c);
+  border-radius: var(--cy-radius-full);
+  background: color-mix(in oklab, black 35%, transparent);
+  box-shadow: var(--cy-shadow-sm);
+  font-size: inherit;
+}
+@media (pointer: coarse) {
+  .cy-compare-slider.cy-compare-slider {
+    --_hit: var(--cy-hit-coarse, 44px);
+  }
+}
+@media (forced-colors: active) {
+  .cy-compare-slider-divider.cy-compare-slider-divider {
+    forced-color-adjust: none;
+    background: CanvasText;
+  }
+}

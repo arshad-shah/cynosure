@@ -437,5 +437,11 @@
     "path": ["dist/components/ColorSwatches/ColorSwatches.js", "dist/styles/color-swatches.css"],
     "limit": "2.5 kB",
     "gzip": true
+  },
+  {
+    "name": "CompareSlider",
+    "path": ["dist/components/CompareSlider/CompareSlider.js", "dist/styles/compare-slider.css"],
+    "limit": "2.5 kB",
+    "gzip": true
   }
 ]

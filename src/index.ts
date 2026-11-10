@@ -58,6 +58,12 @@ export {
   type CommandPaletteTokens,
 } from "./components/CommandPalette/index.js";
 export {
+  CompareSlider,
+  type CompareSliderLabels,
+  type CompareSliderProps,
+  type CompareSliderTokens,
+} from "./components/CompareSlider/index.js";
+export {
   ContextMenu,
   type ContextMenuProps,
   type ContextMenuTargetProps,
