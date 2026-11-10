@@ -181,7 +181,13 @@ export function DialogFrame({
             {description}
           </p>
         )}
-        <div ref={body} className="cy-dialog-body cy-reset">
+        {/* biome-ignore lint/a11y/noStaticElementInteractions: delegated focus listener for the controls inside */}
+        <div
+          ref={body}
+          className="cy-dialog-body cy-reset"
+          // A focused field low in the content (Tab, or the on-screen keyboard opening) is brought fully into view.
+          onFocus={(event) => event.target.scrollIntoView({ block: "nearest" })}
+        >
           {children}
         </div>
         {actions && (

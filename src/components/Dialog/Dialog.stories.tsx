@@ -217,6 +217,8 @@ export const ContentScrollsInside: Story = {
     const el = await openWith(canvas, (e) => userEvent.click(e));
     const body = el.querySelector(".cy-dialog-body") as HTMLElement;
     const panel = el.querySelector(".cy-dialog-panel") as HTMLElement;
+    // Let the opening transition finish before measuring.
+    await waitFor(() => expect(getComputedStyle(el).opacity).toBe("1"));
     await waitFor(() => expect(body.scrollHeight).toBeGreaterThan(body.clientHeight));
     // The panel fits the viewport; the header and the actions stay visible while the content scrolls.
     await expect(panel.getBoundingClientRect().bottom).toBeLessThanOrEqual(window.innerHeight);
@@ -229,17 +231,26 @@ export const ContentScrollsInside: Story = {
         Math.min(panel.getBoundingClientRect().bottom, window.innerHeight),
       );
     });
-    body.scrollTop = body.scrollHeight;
-    await waitFor(() => expect(body.scrollTop).toBeGreaterThan(0));
+    body.scrollTo({ top: body.scrollHeight, behavior: "instant" });
+    await waitFor(() => expect(body.scrollTop).toBeGreaterThan(0), { timeout: 2000 });
     await expect(
       canvas.getByRole("heading", { name: "Edit profile" }).getBoundingClientRect().top,
     ).toBeGreaterThanOrEqual(panel.getBoundingClientRect().top);
-    // Focusing a field low in the content scrolls it into view.
+    // Focusing a field low in the content brings it fully into view inside the scrolling body.
     canvas.getByRole("button", { name: "Save" }).focus();
-    body.scrollTop = 0;
-    await waitFor(() => expect(body.scrollTop).toBe(0));
-    canvas.getByRole("textbox", { name: "Signature" }).focus();
-    await waitFor(() => expect(body.scrollTop).toBeGreaterThan(0));
+    body.scrollTo({ top: 0, behavior: "instant" });
+    await waitFor(() => expect(body.scrollTop).toBe(0), { timeout: 2000 });
+    const signature = canvas.getByRole("textbox", { name: "Signature" });
+    signature.focus();
+    await waitFor(
+      () => {
+        const field = signature.getBoundingClientRect();
+        const view = body.getBoundingClientRect();
+        expect(field.top).toBeGreaterThanOrEqual(view.top - 1);
+        expect(field.bottom).toBeLessThanOrEqual(view.bottom + 1);
+      },
+      { timeout: 2000 },
+    );
   },
 };
 

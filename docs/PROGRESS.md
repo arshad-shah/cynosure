@@ -40,7 +40,7 @@ Plan 3 is complete on `next` (Tasks 1–13 and the final review). Next: Plan 4.
 
 1. **Plan 3 review:** done; one finding is open (toasts under a modal Dialog, see "Plan 3 final review"). Decide its design at the start of Plan 4.
 2. **Visual baselines:** the `[baselines]` commit regenerates Chromium baselines, including the new `-dark-contrast` snapshots and the new components. Check the "Update visual baselines" run and the CI run after it on `next`.
-3. **WebKit check:** on a machine with WebKit, open `components-dialog--content-scrolls-inside` and find out why jest-dom called the Save button "not visible" there while its geometry was correct. The story now checks geometry instead.
+3. **WebKit check:** `components-dialog--content-scrolls-inside` was flaky on WebKit only (once "Save not visible", once a scroll offset stuck at 0). The story now waits for the opening transition and checks geometry, and Dialog brings a focused field into view itself. If it flakes again, debug it on a machine with WebKit.
 4. **Write Plan 4** (Milestone 3 and the product migration issues): `docs/superpowers/plans/`, following the spec §8. The migration issues (one per product repo, see `docs/migration.md`) open once Plan 4 is agreed with Arshad.
 
 ## Plan 3 final review
