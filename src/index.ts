@@ -72,6 +72,7 @@ export {
 } from "./components/SegmentedControl/index.js";
 export { Select, type SelectOption, type SelectProps } from "./components/Select/index.js";
 export { Sheet, type SheetProps, type SheetTokens } from "./components/Sheet/index.js";
+export { Skeleton, type SkeletonProps, type SkeletonTokens } from "./components/Skeleton/index.js";
 export {
   Slider,
   type SliderLabels,

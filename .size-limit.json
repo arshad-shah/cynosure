@@ -307,5 +307,11 @@
     "path": ["dist/components/ColorField/ColorField.js", "dist/styles/color-field.css"],
     "limit": "4 kB",
     "gzip": true
+  },
+  {
+    "name": "Skeleton",
+    "path": ["dist/components/Skeleton/Skeleton.js", "dist/styles/skeleton.css"],
+    "limit": "1.25 kB",
+    "gzip": true
   }
 ]
