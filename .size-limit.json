@@ -285,5 +285,11 @@
     "path": ["dist/components/Combobox/Combobox.js", "dist/styles/combobox.css"],
     "limit": "3.5 kB",
     "gzip": true
+  },
+  {
+    "name": "Tree",
+    "path": ["dist/components/Tree/Tree.js", "dist/styles/tree.css"],
+    "limit": "4.5 kB",
+    "gzip": true
   }
 ]

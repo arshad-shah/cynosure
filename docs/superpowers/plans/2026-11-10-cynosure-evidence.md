@@ -21,7 +21,7 @@ Spec §8 admits a component only when two products use it, or one cannot work wi
 | CommandPalette | command palettes in aperture-css, verql (and verql-next)                | In                         |
 | ColorField     | `type="color"` in aperture-css (plus css-inspector)                     | In (essential to Aperture) |
 
-Record the evidence in each component's README under `## Used by`. Re-check Prism for Tree: the spec names it, but the search did not find `role="tree"` there.
+Record the evidence in each component's README under `## Used by`. Prism is not in the code-search index; a clone shows its tree in `src/ui/VirtualTree.tsx` (virtual, with custom rows), so Tree gained `virtual` and `renderLabel`.
 
 ## Global Constraints
 

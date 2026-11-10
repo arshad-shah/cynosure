@@ -1,0 +1,87 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./Tree.stories";
+
+<Meta of={Stories} />
+
+# Tree
+
+A hierarchical list people can open, close and select from: folders and files, a JSON or DOM tree, nested settings. It follows the WAI-ARIA tree view pattern, loads children on demand and can render hundreds of thousands of rows.
+
+<Canvas of={Stories.PointerSelectsAndChevronToggles} />
+
+## When to use
+
+- **Nested data** where the hierarchy matters: a file system, a document outline, an inspector.
+
+**Use something else when:**
+- there is only one level: a list or a [Menu](?path=/docs/components-menu--docs)
+- sections of content open and close: [Accordion](?path=/docs/components-accordion--docs)
+
+## Usage
+
+```tsx
+import { Tree } from "@arshad-shah/cynosure";
+
+<Tree label="Files" items={files} defaultExpanded={["src"]} onSelectionChange={([id]) => openFile(id)} />
+```
+
+Selection and expansion work controlled (`selected`, `expanded`) or uncontrolled (`defaultSelected`, `defaultExpanded`).
+
+## Children on demand
+
+Give an item `hasChildren` and no `children`, and pass `loadChildren`. The first time it opens, a loading row shows, then the children. If loading fails, a row says so and retries with Enter or a click.
+
+<Canvas of={Stories.LazyChildrenLoadFailAndRetry} />
+
+## Very large trees
+
+With `virtual`, only the rows in view are in the page, so a document with 100,000 visible rows stays fast. Give the tree a height; all rows must share one height. The focused row always stays mounted, so the keyboard keeps working after scrolling.
+
+<Canvas of={Stories.VirtualHundredThousandRows} />
+
+## Custom rows
+
+`renderLabel` replaces the row text, for a value next to a key, a badge or a count. Type-ahead still matches the plain `label`.
+
+<Canvas of={Stories.CustomRowContent} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+| Input | Result |
+| --- | --- |
+| <kbd>Down</kbd> / <kbd>Up</kbd> | Next / previous visible row (disabled and loading rows are skipped) |
+| <kbd>Right</kbd> | Opens a closed branch; on an open one, moves to its first child |
+| <kbd>Left</kbd> | Closes an open branch; otherwise moves to the parent |
+| <kbd>Home</kbd> / <kbd>End</kbd> | First / last visible row |
+| <kbd>Enter</kbd> | Selects the row (only that row); on a failure row, retries |
+| <kbd>Space</kbd> | Selects; with `selectionMode="multiple"`, toggles |
+| <kbd>*</kbd> | Opens every branch at the same level |
+| Letters | Jump to the next row whose label starts with them |
+| Click / chevron | Selects / opens or closes without selecting |
+
+- **Roles:** `role="tree"` (with `aria-multiselectable` in multiple mode) and `treeitem` rows with `aria-level`, `aria-posinset`, `aria-setsize`, `aria-expanded`, `aria-selected`, and `aria-busy` while children load.
+- **Focus:** one Tab stop; the focused row is the only one in the Tab order.
+- **Direction:** in right-to-left text, Left and Right swap, and closed chevrons point left.
+- **Performance:** only expanded branches are rendered, and rows are memoised, so moving focus re-renders two rows even in a tree of thousands.
+
+<Canvas of={Stories.KeyboardFollowsTheApgTree} />
+
+## Touch
+
+Rows are at least 44px tall on coarse pointers.
+
+## Theming
+
+Tokens: `--cy-tree-indent`, `--cy-tree-row-height` and `--cy-tree-selected-bg`.
+
+```ts
+createTheme({ components: { tree: { indent: "20px", rowHeight: "28px" } } });
+```
+
+## Related
+
+[Accordion](?path=/docs/components-accordion--docs) · [Menu](?path=/docs/components-menu--docs) · [Combobox](?path=/docs/components-combobox--docs)

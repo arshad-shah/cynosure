@@ -95,6 +95,13 @@ export {
 } from "./components/Toast/index.js";
 export { Toolbar, type ToolbarProps } from "./components/Toolbar/index.js";
 export { Tooltip, type TooltipProps } from "./components/Tooltip/index.js";
+export {
+  Tree,
+  type TreeItem,
+  type TreeLabels,
+  type TreeProps,
+  type TreeTokens,
+} from "./components/Tree/index.js";
 export { ButtonBase, type ButtonBaseProps } from "./foundations/ButtonBase/ButtonBase.js";
 export { ChoiceBase, type ChoiceBaseProps } from "./foundations/ChoiceBase/ChoiceBase.js";
 export { DialogBase, type DialogBaseProps } from "./foundations/DialogBase/index.js";

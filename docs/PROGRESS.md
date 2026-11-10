@@ -43,7 +43,7 @@ After Plan 3 (fixes from Arshad's checks of the published Storybook, 2026-11-10)
 
 ## Current task
 
-Plan 4 Task 5: Tree. Tasks 1 (toasts inside dialogs), 2 (ProgressBar), 3 (Slider) and 4 (Combobox) are done.
+Plan 4 Task 6: CommandPalette. Tasks 1 (toasts inside dialogs), 2 (ProgressBar), 3 (Slider), 4 (Combobox) and 5 (Tree) are done.
 
 ## Next step
 
@@ -53,10 +53,11 @@ Build Plan 4 (`docs/superpowers/plans/2026-11-10-cynosure-evidence.md`) task by 
 2. **Task 2:** done. ProgressBar: determinate and indeterminate, labelled `role="progressbar"`, value text through `labels.value`.
 3. **Task 3:** done. Slider: single or range (two thumbs that never cross), APG keys, pointer and touch dragging, vertical, marks, forms.
 4. **Task 4:** done. Combobox: editable APG combobox on TextField, default or custom filter, async options (`filter={false}`, `loading`), `allowCustom`, forms.
-5. **Tasks 5–7:** Tree, CommandPalette, ColorField. The product evidence for each is in the plan.
-6. **Task 8:** carry-overs: check Prism for Tree (Slider and Combobox are already in the React 18 smoke tests). (The keyframe entrances are confirmed on WebKit: in CI run 387 Dialog, Popover, Menu, Tooltip and Select passed their `shownFully` checks; the only failure was a Toast test race, fixed.)
-7. **Task 9:** draft one migration issue per product repo in `docs/migration/issues/`. Open them only after Arshad reviews the drafts.
-8. **Task 10:** docs, independent review, `pnpm verify`, CI green, push.
+5. **Task 5:** done. Tree: APG tree view, single and multiple selection, lazy children with retry, `virtual` for 100k rows, `renderLabel` (Prism's JSON tree needs both).
+6. **Tasks 6–7:** CommandPalette, ColorField. The product evidence for each is in the plan.
+7. **Task 8:** carry-overs: Prism checked (it has a virtual JSON tree; Tree covers it). Slider and Combobox are already in the React 18 smoke tests. Remaining: anything the final review turns up. (The keyframe entrances are confirmed on WebKit: in CI run 387 Dialog, Popover, Menu, Tooltip and Select passed their `shownFully` checks; the only failure was a Toast test race, fixed.)
+8. **Task 9:** draft one migration issue per product repo in `docs/migration/issues/`. Open them only after Arshad reviews the drafts.
+9. **Task 10:** docs, independent review, `pnpm verify`, CI green, push.
 
 ## Plan 3 final review
 
@@ -79,7 +80,7 @@ An independent review of the Plan 3 Tasks 8–12 code found nine issues. Fixed (
 - [x] Plan 1: Foundation (`docs/superpowers/plans/2026-11-09-cynosure-foundation.md`)
 - [x] Plan 2: Milestone 1 controls (`docs/superpowers/plans/2026-11-09-cynosure-controls.md`)
 - [x] Plan 3: Milestone 2 structure and overlays (`docs/superpowers/plans/2026-11-09-cynosure-structure.md`). Tasks 1–13 and the final review done.
-- [ ] Plan 4: Milestone 3 and product migration issues (`docs/superpowers/plans/2026-11-10-cynosure-evidence.md`). Tasks 1–4 done; Task 5 next.
+- [ ] Plan 4: Milestone 3 and product migration issues (`docs/superpowers/plans/2026-11-10-cynosure-evidence.md`). Tasks 1–5 done; Task 6 next.
 
 ## Plan 3 rulings so far
 
@@ -118,6 +119,7 @@ An independent review of the Plan 3 Tasks 8–12 code found nine issues. Fixed (
 - **ProgressBar (Task 2):** the fill uses the tone's text colour (`--cy-color-<tone>-text`): the plain accent fell under 3:1 against the track in dark mode. No live region: completion is announced by the page (Notice or Toast). Budget 1.75 kB.
 - **Slider (Task 3):** thumbs are `role="slider"` divs (no native range input, so no foundation needed); the track is the pointer target. Values snap to `step` and are rounded to the step's decimals (no float drift). A press moves the nearest thumb; on a tie between equal range thumbs, the one that can move that way. RTL flips Left/Right for horizontal sliders. Hit areas grow on `::before` only. Disabled fades the track, not the label (axe contrast). A single slider's fill starts at the bar's start (half a thumb before the first value). Budget 3.5 kB.
 - **Combobox (Task 4):** built on TextField (role, ARIA and handlers pass through to its input) plus a top-layer listbox; focus never leaves the input (`aria-activedescendant`), so late results cannot swallow keys. The text filters only after the person types (opening shows everything). Leaving with unmatched text restores the last choice unless `allowCustom`. Escape order: close list, clear text, then let it reach a Dialog. Option text sets `color: inherit` explicitly (hostile `* { color }` beats inheritance). Budget 3.5 kB.
+- **Tree (Task 5):** rows are a flat list of visible rows (`aria-level`, `aria-posinset`, `aria-setsize`), not nested groups, so a row's name is only its own text and only expanded branches cost anything. Rows are `memo`ised with a stable click handler (latest state through a ref). Disabled and loading rows have no `tabindex`. `virtual` places rows absolutely by index over a spacer and always renders the focused row; keyboard moves scroll it into view first. Prism's tree (found by cloning; code search does not index it) is virtual with custom rows, hence `virtual` and `renderLabel`. Budget 4.5 kB.
 
 ## Feedback round (2026-11-09, after Plan 1)
 
