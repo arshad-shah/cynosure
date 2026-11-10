@@ -255,6 +255,12 @@ export {
   type TreeProps,
   type TreeTokens,
 } from "./components/Tree/index.js";
+export {
+  type VirtualItemState,
+  VirtualList,
+  type VirtualListProps,
+  type VirtualListTokens,
+} from "./components/VirtualList/index.js";
 export { ButtonBase, type ButtonBaseProps } from "./foundations/ButtonBase/ButtonBase.js";
 export { ChoiceBase, type ChoiceBaseProps } from "./foundations/ChoiceBase/ChoiceBase.js";
 export { DialogBase, type DialogBaseProps } from "./foundations/DialogBase/index.js";

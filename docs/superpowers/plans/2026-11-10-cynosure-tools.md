@@ -15,7 +15,7 @@
 - [x] **Task 3: SelectionFrame.** A move/resize/rotate box: handles by pointer (detent where it fits), arrows nudge, Alt+arrows resize, `[` and `]` rotate, Shift ×10, Escape cancels. Also the crop box.
 - [x] **Task 4: Colour.** ColorField gains swatches (a radiogroup), recent colours and OKLCH output.
 - [x] **Task 5: CompareSlider.** Before/after divider (arrows 1%, Shift 10%).
-- [ ] **Task 6: VirtualList.** Windowed list with ARIA roles and roving focus.
+- [x] **Task 6: VirtualList.** Windowed list with ARIA roles and roving focus.
 - [ ] **Task 7: Smaller pieces.** ShortcutHint, ProgressOverlay, HoverCard, KeyValueEditor (SortableList rows), FloatingPalette/FloatingDock.
 - [ ] **Task 8: SortableList grid and multi-select modes** (page rails, file grids).
 - [ ] Later, larger: pan/zoom document viewport, data grid, code editor surface, charts.

@@ -10,6 +10,7 @@ import {
   useState,
 } from "react";
 import { Icon } from "../../foundations/Icon/Icon.js";
+import { useVirtualWindow } from "../../foundations/virtual-window.js";
 import { chevronRight } from "../../icons/chevron-right.js";
 import type { IconData } from "../../icons/types.js";
 import type { Size } from "../../tokens/schema.js";
@@ -157,46 +158,25 @@ export function Tree({
     focusable[0]?.key ??
     null;
 
-  // Virtual mode: measure one row and the viewport, then render the rows in view (plus a few either side). The
-  // focused row is always rendered, so keyboard focus survives scrolling it out of view.
-  const [view, setView] = useState({ top: 0, height: 0, row: 0 });
-  useLayoutEffect(() => {
-    const el = root.current;
-    if (!virtual || !el) return;
-    const measure = () => {
-      const row = el.querySelector<HTMLElement>(".cy-tree-row")?.offsetHeight || 32;
-      setView((v) =>
-        v.height === el.clientHeight && v.row === row ? v : { ...v, height: el.clientHeight, row },
-      );
-    };
-    measure();
-    const observer = new ResizeObserver(measure);
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [virtual]);
-  const onScroll = (top: number) => setView((v) => ({ ...v, top }));
-  const OVERSCAN = 6;
-  const rowH = view.row || 32;
-  const first = virtual ? Math.max(0, Math.floor(view.top / rowH) - OVERSCAN) : 0;
-  const last = virtual
-    ? Math.min(rows.length, Math.ceil((view.top + (view.height || rowH * 20)) / rowH) + OVERSCAN)
-    : rows.length;
+  // Virtual mode: render the rows in view (plus a few either side). The focused row is always rendered, so keyboard
+  // focus survives scrolling it out of view.
   const stopIndex = rows.findIndex((r) => r.key === tabStop);
-  const shown = rows.slice(first, last);
-  if (virtual && stopIndex >= 0 && (stopIndex < first || stopIndex >= last))
-    shown.push(rows[stopIndex] as Row);
+  const win = useVirtualWindow(root, {
+    count: rows.length,
+    enabled: virtual,
+    rowSelector: ".cy-tree-row",
+    keep: stopIndex,
+  });
+  const rowH = win.rowSize;
 
   useLayoutEffect(() => {
     if (!moveFocus.current || !tabStop) return;
     moveFocus.current = false;
-    const el = root.current;
-    if (virtual && el && stopIndex >= 0) {
-      // Bring the row into view first; it is rendered either way.
-      const top = stopIndex * rowH;
-      if (top < el.scrollTop) el.scrollTop = top;
-      else if (top + rowH > el.scrollTop + el.clientHeight) el.scrollTop = top + rowH - el.clientHeight;
-    }
-    el?.querySelector<HTMLElement>(`[data-key="${CSS.escape(tabStop)}"]`)?.focus({ preventScroll: virtual });
+    // Bring the row into view first; it is rendered either way.
+    if (stopIndex >= 0) win.reveal(stopIndex);
+    root.current
+      ?.querySelector<HTMLElement>(`[data-key="${CSS.escape(tabStop)}"]`)
+      ?.focus({ preventScroll: virtual });
   });
 
   const setOpen = (ids: string[]) => {
@@ -334,26 +314,27 @@ export function Tree({
       data-virtual={virtual || undefined}
       style={style}
       onKeyDown={onKeyDown}
-      onScroll={virtual ? (e) => onScroll(e.currentTarget.scrollTop) : undefined}
+      onScroll={virtual ? (e) => win.onScroll(e.currentTarget.scrollTop) : undefined}
     >
-      {virtual && (
-        <div className="cy-tree-space" style={{ blockSize: rows.length * rowH }} aria-hidden="true" />
-      )}
-      {shown.map((row) => (
-        <TreeRow
-          key={row.key}
-          row={row}
-          offset={virtual ? rows.indexOf(row) * rowH : undefined}
-          renderLabel={renderLabel}
-          branch={row.kind === "item" && isBranch(row.item)}
-          open={open.includes(row.item.id)}
-          selected={row.kind === "item" && picked.includes(row.item.id)}
-          tabbable={row.key === tabStop}
-          busy={status[row.item.id] === "loading"}
-          text={text}
-          onClick={onRowClick}
-        />
-      ))}
+      {virtual && <div className="cy-tree-space" style={{ blockSize: win.total }} aria-hidden="true" />}
+      {win.indices.map((i) => {
+        const row = rows[i] as Row;
+        return (
+          <TreeRow
+            key={row.key}
+            row={row}
+            offset={virtual ? i * rowH : undefined}
+            renderLabel={renderLabel}
+            branch={row.kind === "item" && isBranch(row.item)}
+            open={open.includes(row.item.id)}
+            selected={row.kind === "item" && picked.includes(row.item.id)}
+            tabbable={row.key === tabStop}
+            busy={status[row.item.id] === "loading"}
+            text={text}
+            onClick={onRowClick}
+          />
+        );
+      })}
     </div>
   );
 }

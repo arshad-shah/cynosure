@@ -1,0 +1,71 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./VirtualList.stories";
+
+<Meta of={Stories} />
+
+# VirtualList
+
+A list of thousands of rows that stays fast: only the rows in view are rendered.
+
+<Canvas of={Stories.TenThousandRowsRenderOnlyWhatIsInView} />
+
+## When to use
+
+- **Long lists** of files, log lines, search results or history, where people pick one or several rows or open one.
+
+**Use something else when:**
+- the list is short (under a few hundred rows): [Select](?path=/docs/components-select--docs), [RadioGroup](?path=/docs/components-radiogroup--docs) or a plain list
+- rows nest: [Tree](?path=/docs/components-tree--docs) (which windows the same way with `virtual`)
+- rows have columns: [Table](?path=/docs/components-table--docs)
+- people reorder rows: [SortableList](?path=/docs/components-sortablelist--docs)
+
+## Usage
+
+```tsx
+import { VirtualList } from "@arshad-shah/cynosure";
+
+<VirtualList
+  label="Files"
+  items={files}
+  getKey={(file) => file.id}
+  renderItem={(file) => file.name}
+  onAction={(file) => open(file)}
+/>
+```
+
+Rows share one height, set by CSS and measured, so keep each row to a line or a fixed layout. Set the list's height with `style={{ blockSize: … }}` or the `height` token.
+
+<Canvas of={Stories.MultipleSelection} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+- **Role:** a listbox named by `label`; rows are options with `aria-posinset` and `aria-setsize`, so a screen reader says "File 3, 3 of 10,000".
+- **Focus:** one tab stop, on the chosen row or the first. The focused row is always rendered, so focus survives scrolling.
+
+| Key | Does |
+| --- | --- |
+| Arrow Up / Down | Move (skipping disabled rows) |
+| Page Up / Down | Move a screenful |
+| Home / End | First / last row |
+| Space | Choose (toggle with `multiple`) |
+| Enter | `onAction`, or choose |
+| Shift+arrows | Extend the selection (`multiple`) |
+| Ctrl/Cmd+A | Choose all (`multiple`) |
+
+- **Pointer:** a click chooses (toggles with `multiple`); a double-click acts.
+- **Touch:** rows are 44px tall on touch screens; a tap chooses.
+- **Empty:** with no items the list shows `empty` and is no longer a listbox.
+
+<Canvas of={Stories.Empty} />
+
+## Theming
+
+Tokens: `--cy-virtual-list-height`, `--cy-virtual-list-row-height` and `--cy-virtual-list-selected-background`.
+
+## Related
+
+[Tree](?path=/docs/components-tree--docs) · [Table](?path=/docs/components-table--docs) · [SortableList](?path=/docs/components-sortablelist--docs)

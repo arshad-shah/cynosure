@@ -443,5 +443,11 @@
     "path": ["dist/components/CompareSlider/CompareSlider.js", "dist/styles/compare-slider.css"],
     "limit": "2.5 kB",
     "gzip": true
+  },
+  {
+    "name": "VirtualList",
+    "path": ["dist/components/VirtualList/VirtualList.js", "dist/styles/virtual-list.css"],
+    "limit": "3 kB",
+    "gzip": true
   }
 ]
