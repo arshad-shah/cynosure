@@ -1,0 +1,9 @@
+/* date-field: a TextField whose end holds the calendar button; the Calendar sits in a Popover. */
+.cy-date-field .cy-text-field-input.cy-text-field-input {
+  font-variant-numeric: tabular-nums;
+}
+.cy-date-field-calendar.cy-date-field-calendar {
+  display: flex;
+  justify-content: center;
+  font-size: var(--cy-font-size-md);
+}

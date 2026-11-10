@@ -22,6 +22,18 @@ export {
 } from "./components/AppShell/index.js";
 export { Badge, type BadgeProps } from "./components/Badge/index.js";
 export { Button, type ButtonProps, type ButtonTokens } from "./components/Button/index.js";
+export {
+  addDays,
+  addMonths,
+  Calendar,
+  type CalendarDayState,
+  type CalendarLabels,
+  type CalendarProps,
+  type CalendarTokens,
+  fromISODate,
+  isISODate,
+  toISODate,
+} from "./components/Calendar/index.js";
 export { Card, type CardProps } from "./components/Card/index.js";
 export { Checkbox, type CheckboxProps } from "./components/Checkbox/index.js";
 export {
@@ -69,6 +81,7 @@ export {
   type ContextMenuTargetProps,
 } from "./components/ContextMenu/index.js";
 export { CopyButton, type CopyButtonLabels, type CopyButtonProps } from "./components/CopyButton/index.js";
+export { DateField, type DateFieldLabels, type DateFieldProps } from "./components/DateField/index.js";
 export {
   type DescriptionItem,
   DescriptionList,
@@ -272,6 +285,13 @@ export {
 export { TextArea, type TextAreaProps } from "./components/TextArea/index.js";
 export { TextField, type TextFieldProps } from "./components/TextField/index.js";
 export { ThemeToggle, type ThemeToggleProps } from "./components/ThemeToggle/index.js";
+export {
+  formatTime,
+  parseTime,
+  TimeField,
+  type TimeFieldLabels,
+  type TimeFieldProps,
+} from "./components/TimeField/index.js";
 export {
   type ToastApi,
   Toaster,

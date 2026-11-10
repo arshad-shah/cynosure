@@ -1,0 +1,153 @@
+/*
+ * calendar: a title row with the month buttons, then a table of weeks. Each day is a square cell (never smaller than
+ * the hit area); the selected day is filled with the accent, today is ringed, days of the next and previous months are
+ * muted. With renderDay, cells grow to hold the product's content under the number.
+ */
+.cy-calendar.cy-calendar {
+  --_cell: max(var(--cy-calendar-cell-size, var(--cy-control-height-md)), var(--_hit));
+  --_hit: var(--cy-hit-min, 24px);
+  box-sizing: border-box !important;
+  display: inline-flex;
+  flex-direction: column;
+  gap: var(--cy-space-3);
+  max-inline-size: 100%;
+  margin: 0;
+  color: var(--cy-color-ink);
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-font-size-md);
+  font-weight: var(--cy-font-weight-regular);
+  line-height: var(--cy-font-line-height);
+  letter-spacing: normal;
+  text-transform: none;
+  &[data-size="sm"] {
+    --_cell: max(var(--cy-calendar-cell-size, var(--cy-control-height-sm)), var(--_hit));
+    font-size: var(--cy-font-size-sm);
+  }
+  &[data-size="lg"] {
+    --_cell: max(var(--cy-calendar-cell-size, var(--cy-control-height-lg)), var(--_hit));
+    font-size: var(--cy-font-size-lg);
+  }
+  &[data-days] {
+    display: flex;
+  }
+}
+@media (pointer: coarse) {
+  .cy-calendar.cy-calendar {
+    --_hit: var(--cy-hit-coarse, 44px);
+  }
+}
+.cy-calendar-head.cy-calendar-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--cy-space-3);
+  font-size: inherit;
+}
+.cy-calendar-title.cy-calendar-title {
+  font-size: inherit;
+  font-weight: var(--cy-font-weight-medium);
+}
+/* The month arrows point the way time runs in the reading direction. */
+.cy-calendar-flip.cy-calendar-flip:dir(rtl) .cy-icon {
+  scale: -1 1;
+}
+.cy-calendar-grid.cy-calendar-grid {
+  inline-size: auto;
+  margin: 0;
+  border: 0;
+  border-collapse: collapse;
+  border-spacing: 0;
+  table-layout: fixed;
+  font-size: inherit;
+  & thead,
+  & tbody,
+  & tr {
+    border: 0;
+    background: transparent;
+    font-size: inherit;
+  }
+}
+.cy-calendar-weekday.cy-calendar-weekday {
+  padding: 0 0 var(--cy-space-2);
+  border: 0;
+  color: var(--cy-color-muted);
+  font-size: var(--cy-font-size-xs);
+  font-weight: var(--cy-font-weight-medium);
+  text-align: center;
+}
+.cy-calendar-day.cy-calendar-day {
+  box-sizing: border-box;
+  position: relative;
+  inline-size: var(--_cell);
+  block-size: var(--_cell);
+  padding: 0;
+  border: 0;
+  border-radius: var(--cy-radius-md);
+  background: transparent;
+  color: var(--cy-color-ink);
+  font-size: inherit;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  vertical-align: middle;
+  cursor: pointer;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+  &:hover:not([aria-disabled="true"]) {
+    background: var(--cy-color-soft);
+  }
+  &:focus-visible {
+    box-shadow: inset 0 0 0 var(--cy-border-focus) var(--cy-color-ring);
+  }
+  &[data-outside] {
+    color: var(--cy-color-muted);
+  }
+  &[aria-current="date"] {
+    box-shadow: inset 0 0 0 var(--cy-border-width) var(--cy-color-accent);
+    font-weight: var(--cy-font-weight-medium);
+  }
+  &[aria-current="date"]:focus-visible {
+    box-shadow:
+      inset 0 0 0 var(--cy-border-focus) var(--cy-color-ring),
+      inset 0 0 0 calc(var(--cy-border-focus) + var(--cy-border-width)) var(--cy-color-accent);
+  }
+  &[aria-selected="true"] {
+    background: var(--cy-calendar-selected-background, var(--cy-color-accent));
+    color: var(--cy-color-on-accent);
+    &:hover {
+      background: var(--cy-calendar-selected-background, var(--cy-color-accent));
+    }
+  }
+  &[aria-disabled="true"] {
+    color: var(--cy-color-muted);
+    text-decoration: line-through;
+    cursor: not-allowed;
+  }
+}
+.cy-calendar-number.cy-calendar-number {
+  font-size: inherit;
+}
+/* With renderDay: the grid fills its container; taller cells, the number at the top start, the content below. */
+.cy-calendar.cy-calendar[data-days] .cy-calendar-grid {
+  inline-size: 100%;
+}
+.cy-calendar.cy-calendar[data-days] .cy-calendar-day {
+  inline-size: auto;
+  block-size: calc(2.5 * var(--_cell));
+  padding: var(--cy-space-2);
+  border: var(--cy-border-width) solid var(--cy-color-line);
+  border-radius: 0;
+  text-align: start;
+  vertical-align: top;
+}
+.cy-calendar-extra.cy-calendar-extra {
+  display: block;
+  margin-block-start: var(--cy-space-1);
+  overflow: hidden;
+  font-size: var(--cy-font-size-xs);
+}
+@media (forced-colors: active) {
+  .cy-calendar-day.cy-calendar-day[aria-selected="true"] {
+    outline: var(--cy-border-width) solid Highlight;
+    outline-offset: calc(-1 * var(--cy-border-width));
+  }
+}

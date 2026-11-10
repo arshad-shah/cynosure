@@ -485,5 +485,23 @@
     "path": ["dist/components/PanZoomCanvas/PanZoomCanvas.js", "dist/styles/pan-zoom-canvas.css"],
     "limit": "3 kB",
     "gzip": true
+  },
+  {
+    "name": "Calendar",
+    "path": ["dist/components/Calendar/Calendar.js", "dist/styles/calendar.css"],
+    "limit": "3.25 kB",
+    "gzip": true
+  },
+  {
+    "name": "DateField",
+    "path": ["dist/components/DateField/DateField.js", "dist/styles/date-field.css"],
+    "limit": "2 kB",
+    "gzip": true
+  },
+  {
+    "name": "TimeField",
+    "path": ["dist/components/TimeField/TimeField.js", "dist/styles/time-field.css"],
+    "limit": "2 kB",
+    "gzip": true
   }
 ]
