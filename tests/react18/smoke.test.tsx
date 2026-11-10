@@ -2,6 +2,7 @@ import { act, useState, version } from "react";
 import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { Button } from "../../src/components/Button/Button";
+import { Combobox } from "../../src/components/Combobox/Combobox";
 import { Select } from "../../src/components/Select/Select";
 import { Slider } from "../../src/components/Slider/Slider";
 import { TextField } from "../../src/components/TextField/TextField";
@@ -102,5 +103,32 @@ describe("Cynosure on React 18", () => {
     expect(onChange).toHaveBeenCalledWith(100);
     expect(thumb.getAttribute("aria-valuenow")).toBe("100");
     expect(new FormData(host.querySelector("form") as HTMLFormElement).get("volume")).toBe("100");
+  });
+
+  it("Combobox filters as you type and chooses with Enter", () => {
+    const onChange = vi.fn();
+    const host = mount(
+      <Combobox
+        label="Fruit"
+        onChange={onChange}
+        options={[
+          { value: "apple", label: "Apple" },
+          { value: "banana", label: "Banana" },
+        ]}
+      />,
+    );
+    const input = host.querySelector('[role="combobox"]') as HTMLInputElement;
+    act(() => {
+      Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")?.set?.call(input, "ban");
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+    expect(input.getAttribute("aria-expanded")).toBe("true");
+    const options = [...host.querySelectorAll('[role="option"]')].map((o) => o.textContent);
+    expect(options).toEqual(["Banana"]);
+    act(() => {
+      input.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+    });
+    expect(onChange).toHaveBeenCalledWith("banana");
+    expect(input.value).toBe("Banana");
   });
 });

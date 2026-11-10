@@ -9,7 +9,7 @@ Tracked as one issue per product repo (opened after Milestone 2). Order of work 
 
 Available now (Milestones 1 and 2, and Milestone 3 as it lands):
 
-- **Controls:** Button, IconButton, CopyButton, Link, TextField, SearchField, TextArea, Select, Checkbox, Switch, RadioGroup, SegmentedControl, Slider, ThemeToggle.
+- **Controls:** Button, IconButton, CopyButton, Link, TextField, SearchField, TextArea, Select, Combobox, Checkbox, Switch, RadioGroup, SegmentedControl, Slider, ThemeToggle.
 - **Structure:** Stack, Inline, Card, Toolbar, Tabs, Disclosure, Accordion.
 - **Overlays:** Tooltip, Popover, Menu, Dialog, Sheet, Toast.
 - **Feedback and display:** Notice, EmptyState, ProgressBar, LoadingDots, Badge, Kbd, Field.

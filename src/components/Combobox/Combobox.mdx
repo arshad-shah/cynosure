@@ -1,0 +1,84 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./Combobox.stories";
+
+<Meta of={Stories} />
+
+# Combobox
+
+A text input with a list of suggestions. People type to narrow the list, then pick with the arrow keys and Enter or with a click. Options can come from a server as they type.
+
+<Canvas of={Stories.TypeToFilterThenChooseWithEnter} />
+
+## When to use
+
+- **A long list** where typing is faster than scrolling: countries, fonts, tables, people.
+- **Results from a server** as people type.
+- **Free text with suggestions** (`allowCustom`): tags, labels.
+
+**Use something else when:**
+- there are only a handful of options and no need to type: [Select](?path=/docs/components-select--docs)
+- people search for commands or places to go: the CommandPalette
+- the text is free and needs no suggestions: [TextField](?path=/docs/components-textfield--docs)
+
+## Usage
+
+```tsx
+import { Combobox } from "@arshad-shah/cynosure";
+
+<Combobox label="Fruit" options={fruits} name="fruit" required />
+```
+
+By default an option matches when its label contains the typed text, ignoring case. Pass `filter` to match your way.
+
+## Options from a server
+
+Control the text with `inputValue` and `onInputChange`, fetch, and pass the results as `options` with `filter={false}`. While `loading`, the list says so. Focus never leaves the input, so results arriving late never swallow keystrokes; the first enabled result becomes active.
+
+<Canvas of={Stories.AsyncResultsArriveLateWithoutLosingKeys} />
+
+```tsx
+const [query, setQuery] = useState("");
+const { data, isLoading } = useSearch(query);
+
+<Combobox
+  label="User"
+  options={data}
+  inputValue={query}
+  onInputChange={setQuery}
+  filter={false}
+  loading={isLoading}
+/>
+```
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+| Input | Result |
+| --- | --- |
+| Typing | Filters and opens the list; the first match is active |
+| <kbd>Down</kbd> / <kbd>Up</kbd> | Opens on the first / last option, then moves (disabled options are skipped) |
+| <kbd>Enter</kbd> | Chooses the active option (with `allowCustom` and no active option, keeps the text) |
+| <kbd>Escape</kbd> | Closes the list; pressed again, clears the text and the value |
+| <kbd>Tab</kbd> or a click elsewhere | Closes the list and settles the value |
+
+- **Roles:** the input is `role="combobox"` with `aria-expanded`, `aria-controls`, `aria-autocomplete` and `aria-activedescendant`; the popup is a `listbox` of `option`s.
+- **Leaving the field:** text that matches no option goes back to the last choice (unless `allowCustom`); an empty field clears the value.
+- **Forms:** with `name`, the chosen value is submitted. With `required`, a blocked submit focuses the input and shows `labels.required`. Reset restores the default.
+- **Layers:** the list is in the top layer, so it works inside a [Dialog](?path=/docs/components-dialog--docs). Escape closes one thing at a time: the list, then the text, then the dialog.
+
+<Canvas of={Stories.InsideADialogEscapeClosesOneThingAtATime} />
+
+## Touch
+
+Option rows are at least 44px tall on coarse pointers.
+
+## Theming
+
+Tokens: `--cy-combobox-list-max-height`, `--cy-combobox-list-bg` and `--cy-combobox-option-active-bg`. The input uses the TextField tokens.
+
+## Related
+
+[Select](?path=/docs/components-select--docs) · [TextField](?path=/docs/components-textfield--docs) · [SearchField](?path=/docs/components-searchfield--docs)

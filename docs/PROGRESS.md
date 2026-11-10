@@ -43,7 +43,7 @@ After Plan 3 (fixes from Arshad's checks of the published Storybook, 2026-11-10)
 
 ## Current task
 
-Plan 4 Task 4: Combobox. Tasks 1 (toasts inside dialogs), 2 (ProgressBar) and 3 (Slider) are done.
+Plan 4 Task 5: Tree. Tasks 1 (toasts inside dialogs), 2 (ProgressBar), 3 (Slider) and 4 (Combobox) are done.
 
 ## Next step
 
@@ -52,10 +52,11 @@ Build Plan 4 (`docs/superpowers/plans/2026-11-10-cynosure-evidence.md`) task by 
 1. **Task 1:** done. Toasts raised inside an open Dialog show above it; they move back to the page with their remaining time and are not announced again.
 2. **Task 2:** done. ProgressBar: determinate and indeterminate, labelled `role="progressbar"`, value text through `labels.value`.
 3. **Task 3:** done. Slider: single or range (two thumbs that never cross), APG keys, pointer and touch dragging, vertical, marks, forms.
-4. **Tasks 4–7:** Combobox, Tree, CommandPalette, ColorField. The product evidence for each is in the plan.
-5. **Task 8:** carry-overs: check Prism for Tree, add Combobox to the React 18 smoke tests (Slider is already in). (The keyframe entrances are confirmed on WebKit: in CI run 387 Dialog, Popover, Menu, Tooltip and Select passed their `shownFully` checks; the only failure was a Toast test race, fixed.)
-6. **Task 9:** draft one migration issue per product repo in `docs/migration/issues/`. Open them only after Arshad reviews the drafts.
-7. **Task 10:** docs, independent review, `pnpm verify`, CI green, push.
+4. **Task 4:** done. Combobox: editable APG combobox on TextField, default or custom filter, async options (`filter={false}`, `loading`), `allowCustom`, forms.
+5. **Tasks 5–7:** Tree, CommandPalette, ColorField. The product evidence for each is in the plan.
+6. **Task 8:** carry-overs: check Prism for Tree (Slider and Combobox are already in the React 18 smoke tests). (The keyframe entrances are confirmed on WebKit: in CI run 387 Dialog, Popover, Menu, Tooltip and Select passed their `shownFully` checks; the only failure was a Toast test race, fixed.)
+7. **Task 9:** draft one migration issue per product repo in `docs/migration/issues/`. Open them only after Arshad reviews the drafts.
+8. **Task 10:** docs, independent review, `pnpm verify`, CI green, push.
 
 ## Plan 3 final review
 
@@ -78,7 +79,7 @@ An independent review of the Plan 3 Tasks 8–12 code found nine issues. Fixed (
 - [x] Plan 1: Foundation (`docs/superpowers/plans/2026-11-09-cynosure-foundation.md`)
 - [x] Plan 2: Milestone 1 controls (`docs/superpowers/plans/2026-11-09-cynosure-controls.md`)
 - [x] Plan 3: Milestone 2 structure and overlays (`docs/superpowers/plans/2026-11-09-cynosure-structure.md`). Tasks 1–13 and the final review done.
-- [ ] Plan 4: Milestone 3 and product migration issues (`docs/superpowers/plans/2026-11-10-cynosure-evidence.md`). Tasks 1–3 done; Task 4 next.
+- [ ] Plan 4: Milestone 3 and product migration issues (`docs/superpowers/plans/2026-11-10-cynosure-evidence.md`). Tasks 1–4 done; Task 5 next.
 
 ## Plan 3 rulings so far
 
@@ -116,6 +117,7 @@ An independent review of the Plan 3 Tasks 8–12 code found nine issues. Fixed (
 - **Toasts in dialogs (Task 1):** an open Dialog (or Sheet) inside a Toaster registers a container through `ToastHostContext` (`src/overlay/toast-host.ts`, separate so Dialog never imports Toast). The Toaster portals its region into the latest container and shows it again, which puts it above the dialog and outside the modal's inert area. Moving re-creates the toast elements, so each toast keeps a small memory in the Toaster: whether it was announced (then its text renders at once, and a danger toast comes back as `status`, not `alert`) and its remaining time (read when the timer starts, after the old element saved it).
 - **ProgressBar (Task 2):** the fill uses the tone's text colour (`--cy-color-<tone>-text`): the plain accent fell under 3:1 against the track in dark mode. No live region: completion is announced by the page (Notice or Toast). Budget 1.75 kB.
 - **Slider (Task 3):** thumbs are `role="slider"` divs (no native range input, so no foundation needed); the track is the pointer target. Values snap to `step` and are rounded to the step's decimals (no float drift). A press moves the nearest thumb; on a tie between equal range thumbs, the one that can move that way. RTL flips Left/Right for horizontal sliders. Hit areas grow on `::before` only. Disabled fades the track, not the label (axe contrast). A single slider's fill starts at the bar's start (half a thumb before the first value). Budget 3.5 kB.
+- **Combobox (Task 4):** built on TextField (role, ARIA and handlers pass through to its input) plus a top-layer listbox; focus never leaves the input (`aria-activedescendant`), so late results cannot swallow keys. The text filters only after the person types (opening shows everything). Leaving with unmatched text restores the last choice unless `allowCustom`. Escape order: close list, clear text, then let it reach a Dialog. Option text sets `color: inherit` explicitly (hostile `* { color }` beats inheritance). Budget 3.5 kB.
 
 ## Feedback round (2026-11-09, after Plan 1)
 

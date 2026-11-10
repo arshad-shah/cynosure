@@ -279,5 +279,11 @@
     "path": ["dist/components/Slider/Slider.js", "dist/styles/slider.css"],
     "limit": "3.5 kB",
     "gzip": true
+  },
+  {
+    "name": "Combobox",
+    "path": ["dist/components/Combobox/Combobox.js", "dist/styles/combobox.css"],
+    "limit": "3.5 kB",
+    "gzip": true
   }
 ]
