@@ -29,11 +29,8 @@
     opacity: 0;
     translate: 0 calc(-1 * var(--cy-space-2));
   }
-  @starting-style {
-    &:popover-open {
-      opacity: 0;
-      translate: 0 calc(-1 * var(--cy-space-2));
-    }
+  &:popover-open {
+    animation: cy-menu-in var(--cy-motion-fast) var(--cy-motion-ease);
   }
 }
 
@@ -151,10 +148,20 @@
 @media (prefers-reduced-motion: reduce) {
   .cy-menu.cy-menu {
     transition: none;
+    animation: none;
   }
 }
 @media (forced-colors: active) {
   .cy-menu-item.cy-menu-item:focus {
     outline: var(--cy-border-width) solid Highlight;
+  }
+}
+
+/* Entrance as a keyframe animation, not @starting-style: if an engine mishandles the animation, the element still
+   ends in its normal visible style (WebKit left nested @starting-style overlays at opacity 0). */
+@keyframes cy-menu-in {
+  from {
+    opacity: 0;
+    translate: 0 calc(-1 * var(--cy-space-2));
   }
 }

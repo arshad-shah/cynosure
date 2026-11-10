@@ -28,10 +28,23 @@
     opacity var(--cy-motion-fast) var(--cy-motion-ease),
     display var(--cy-motion-fast) allow-discrete,
     overlay var(--cy-motion-fast) allow-discrete;
-  @starting-style {
-    opacity: 0;
+  &:popover-open {
+    animation: cy-tooltip-in var(--cy-motion-fast) var(--cy-motion-ease);
   }
   &:not(:popover-open) {
     opacity: 0;
+  }
+}
+
+/* Entrance as a keyframe animation, not @starting-style: if an engine mishandles the animation, the element still
+   ends in its normal visible style (WebKit left nested @starting-style overlays at opacity 0). */
+@keyframes cy-tooltip-in {
+  from {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cy-tooltip.cy-tooltip {
+    animation: none;
   }
 }

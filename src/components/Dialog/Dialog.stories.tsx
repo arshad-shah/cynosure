@@ -5,6 +5,7 @@ import { expect, fn, waitFor } from "storybook/test";
 import { copy as copyIcon } from "../../icons/copy.js";
 import { createStyleSheet } from "../../styles/inline.js";
 import { computeUnderHostileHost } from "../../test/hostile.js";
+import { settled, shownFully } from "../../test/settle.js";
 import { Button } from "../Button/Button.js";
 import { IconButton } from "../IconButton/IconButton.js";
 import { Menu } from "../Menu/Menu.js";
@@ -95,6 +96,8 @@ export const OpensModalMovesFocusInAndReturnsIt: Story = {
     const trigger = canvas.getByRole("button", { name: "Edit profile" });
     const el = await openWith(canvas, (e) => userEvent.click(e));
     await expect(el.matches(":modal")).toBe(true);
+    // Really visible, not just open (WebKit once left the entrance at opacity 0).
+    await shownFully(el);
     const dialog = canvas.getByRole("dialog", { name: "Edit profile" });
     await expect(dialog).toHaveAccessibleDescription("Changes are saved to your account.");
     await waitFor(() =>
@@ -217,8 +220,8 @@ export const ContentScrollsInside: Story = {
     const el = await openWith(canvas, (e) => userEvent.click(e));
     const body = el.querySelector(".cy-dialog-body") as HTMLElement;
     const panel = el.querySelector(".cy-dialog-panel") as HTMLElement;
-    // Let the opening transition finish before measuring.
-    await waitFor(() => expect(getComputedStyle(el).opacity).toBe("1"));
+    // Let the entrance finish before measuring.
+    await shownFully(el);
     await waitFor(() => expect(body.scrollHeight).toBeGreaterThan(body.clientHeight));
     // The panel fits the viewport; the header and the actions stay visible while the content scrolls.
     await expect(panel.getBoundingClientRect().bottom).toBeLessThanOrEqual(window.innerHeight);
@@ -261,6 +264,7 @@ export const NarrowContainerBecomesBottomSheet: Story = {
     const el = dialogEl();
     await waitFor(() => expect(el.open).toBe(true));
     const panel = el.querySelector(".cy-dialog-panel") as HTMLElement;
+    await shownFully(el);
     const wide = el.getBoundingClientRect().width >= 576;
     if (wide) {
       // Centred with room around it.
@@ -270,6 +274,7 @@ export const NarrowContainerBecomesBottomSheet: Story = {
     }
     // Narrow the dialog's container (as an extension popup or a phone would) and it docks to the bottom edge.
     el.style.inlineSize = "360px";
+    await settled(el);
     await waitFor(() => {
       const box = panel.getBoundingClientRect();
       expect(Math.round(box.bottom)).toBe(Math.round(el.getBoundingClientRect().bottom));

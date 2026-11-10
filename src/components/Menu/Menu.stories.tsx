@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 import { expect, fn, waitFor } from "storybook/test";
 import { archive, copy, download, edit, trash } from "../../icons/index.js";
+import { shownFully } from "../../test/settle.js";
 import { Button } from "../Button/Button.js";
 import { Popover } from "../Popover/Popover.js";
 import { Menu, type MenuEntry } from "./Menu.js";
@@ -47,6 +48,7 @@ export const KeyboardOpensNavigatesAndSelects: Story = {
     trigger.focus();
     await userEvent.keyboard("{ArrowDown}");
     const menu = await canvas.findByRole("menu", { name: "File actions" });
+    await shownFully(menu);
     await waitFor(() => expect(canvas.getByRole("menuitem", { name: /Edit/ })).toHaveFocus());
     await userEvent.keyboard("{ArrowDown}");
     await expect(canvas.getByRole("menuitem", { name: "Copy path" })).toHaveFocus();

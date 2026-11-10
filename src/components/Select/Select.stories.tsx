@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 import { expect, fn, waitFor } from "storybook/test";
 import { computeUnderHostileHost } from "../../test/hostile.js";
+import { shownFully } from "../../test/settle.js";
 import { Select } from "./Select.js";
 
 const fruits = [
@@ -51,6 +52,7 @@ export const ClickToOpenAndSelect: Story = {
     await expect(trigger).toHaveTextContent("Pick one");
     await userEvent.click(trigger);
     await waitFor(() => expect(isOpen(list(canvasElement))).toBe(true));
+    await shownFully(list(canvasElement));
     await expect(trigger).toHaveAttribute("aria-expanded", "true");
     await userEvent.click(canvas.getByRole("option", { name: /Banana/ }));
     await expect(trigger).toHaveTextContent("Banana");

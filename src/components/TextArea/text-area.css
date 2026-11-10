@@ -68,8 +68,13 @@
   line-height: inherit;
 }
 
-/* Hand-made resize grip (bottom-end corner). Pointer and touch only; content growth covers keyboard users. */
+/*
+ * Hand-made resize grip (bottom-end corner). Pointer and touch only; content growth covers keyboard users.
+ * The visible grip is always the same small square tucked in the corner; on coarse pointers only its invisible hit
+ * area (::before) grows to 44px, so the grip never moves up into the text.
+ */
 .cy-text-area-grip.cy-text-area-grip {
+  --_box: var(--cy-hit-min, 24px);
   --_hit: var(--cy-hit-min, 24px);
   box-sizing: border-box !important;
   position: absolute;
@@ -77,8 +82,8 @@
   inset-inline-end: var(--cy-border-width);
   display: grid;
   place-items: center;
-  inline-size: var(--_hit);
-  block-size: var(--_hit);
+  inline-size: var(--_box);
+  block-size: var(--_box);
   margin: 0;
   padding: 0;
   color: var(--cy-color-muted);
@@ -91,6 +96,15 @@
   transition:
     opacity var(--cy-motion-fast) var(--cy-motion-ease),
     color var(--cy-motion-fast) var(--cy-motion-ease);
+  &::before {
+    content: "";
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-start: 50%;
+    inline-size: var(--_hit);
+    block-size: var(--_hit);
+    translate: -50% -50%;
+  }
   &:hover {
     opacity: 1;
     color: var(--cy-color-ink);
@@ -103,6 +117,10 @@
   .cy-text-area-grip.cy-text-area-grip {
     --_hit: var(--cy-hit-coarse, 44px);
   }
+}
+/* Keep the last line of text clear of the grip. */
+.cy-text-area-box:has(> .cy-text-area-grip) > .cy-text-area-input.cy-text-area-input {
+  padding-block-end: max(var(--cy-text-area-padding-block, var(--cy-space-4)), var(--cy-hit-min, 24px));
 }
 
 .cy-text-area.cy-text-area {

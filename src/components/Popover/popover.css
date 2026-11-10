@@ -32,11 +32,8 @@
     opacity: 0;
     scale: 0.97;
   }
-  @starting-style {
-    &:popover-open {
-      opacity: 0;
-      scale: 0.97;
-    }
+  &:popover-open {
+    animation: cy-popover-in var(--cy-motion-fast) var(--cy-motion-ease);
   }
   &[data-size="sm"] {
     --_w: var(--cy-popover-width-sm, 240px);
@@ -53,10 +50,20 @@
 @media (prefers-reduced-motion: reduce) {
   .cy-popover.cy-popover {
     transition: none;
+    animation: none;
   }
 }
 @media (forced-colors: active) {
   .cy-popover.cy-popover {
     border-color: CanvasText;
+  }
+}
+
+/* Entrance as a keyframe animation, not @starting-style: if an engine mishandles the animation, the element still
+   ends in its normal visible style (WebKit left nested @starting-style overlays at opacity 0). */
+@keyframes cy-popover-in {
+  from {
+    opacity: 0;
+    scale: 0.97;
   }
 }

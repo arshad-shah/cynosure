@@ -4,6 +4,7 @@ import { createRoot } from "react-dom/client";
 import { expect, fn, waitFor } from "storybook/test";
 import { filter } from "../../icons/index.js";
 import { createStyleSheet } from "../../styles/inline.js";
+import { shownFully } from "../../test/settle.js";
 import { Button } from "../Button/Button.js";
 import { Checkbox } from "../Checkbox/Checkbox.js";
 import { IconButton } from "../IconButton/IconButton.js";
@@ -55,6 +56,7 @@ export const OpensFocusesAndReturnsFocus: Story = {
     await userEvent.click(trigger);
     const dialog = await canvas.findByRole("dialog", { name: "Filters" });
     await waitFor(() => expect(isOpen(dialog)).toBe(true));
+    await shownFully(dialog);
     await expect(trigger).toHaveAttribute("aria-expanded", "true");
     await expect(trigger.getAttribute("aria-controls")).toBe(dialog.id);
     // Focus moves to the first control inside.

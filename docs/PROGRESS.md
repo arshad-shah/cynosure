@@ -2,7 +2,7 @@
 
 ## Status
 
-Plan 3 (Milestone 2 structure and overlays): complete on `next`, including the final review (one open design question, below). Plans 1 and 2 complete. Storybook live at https://arshad-shah.github.io/cynosure/.
+Plans 1, 2 and 3 complete on `next` (Milestones 1 and 2). Plan 4 is not written yet. Storybook live at https://arshad-shah.github.io/cynosure/ (deploys on every push to `next`). Not published to npm.
 
 Done in Plan 3:
 
@@ -32,16 +32,25 @@ Also shipped in this stretch:
   - Select list: aligned to the trigger, and long labels truncate.
 - **Firefox focus flakes:** root-caused (the test frame was not focused). Each story now calls `window.focus()` before it runs. Firefox runs in its own pass and there are no retries.
 
+After Plan 3 (fixes from Arshad's checks of the published Storybook, 2026-11-10):
+
+- **Published Storybook:** touch-only stories hidden from the site; the site reloads itself once when a deploy removed the chunks an open tab asks for ("Failed to fetch dynamically imported module").
+- **Notice:** grid layout (icon, text and close always on one row; only the action moves under the text when narrow), tone edge, more padding, bold title, icon centred on the title line.
+- **TextArea:** the grip stays a small square in the corner on touch screens (only its invisible hit area grows to 44px), and the text keeps a bottom margin so it never runs under the grip.
+- **Dialog:** a focused field in the scrolling content is brought into view by the Dialog itself.
+- **Overlay entrances (WebKit bug):** CI showed an open Dialog stuck at opacity 0 on WebKit, from `@starting-style` nested inside rules. Dialog, Popover, Menu, Tooltip, Select's list and Toast now enter with `@keyframes` animations, which always end in the normal visible style. Their stories assert the overlay is fully opaque once its entrance has finished (`src/test/settle.ts`).
+- **CI flakes on WebKit:** the Card focus-border colour and the Dialog content-scroll story now wait for animations and transitions to settle.
+
 ## Current task
 
-Plan 3 is complete on `next` (Tasks 1–13 and the final review). Next: Plan 4.
+None in progress. Plan 3 and the follow-up fixes are on `next`. Waiting for Arshad's go-ahead to write Plan 4.
 
 ## Next step
 
-1. **Plan 3 review:** done; one finding is open (toasts under a modal Dialog, see "Plan 3 final review"). Decide its design at the start of Plan 4.
-2. **Visual baselines:** the `[baselines]` commit regenerates Chromium baselines, including the new `-dark-contrast` snapshots and the new components. Check the "Update visual baselines" run and the CI run after it on `next`.
-3. **WebKit check:** `components-dialog--content-scrolls-inside` was flaky on WebKit only (once "Save not visible", once a scroll offset stuck at 0). The story now waits for the opening transition and checks geometry, and Dialog brings a focused field into view itself. If it flakes again, debug it on a machine with WebKit.
-4. **Write Plan 4** (Milestone 3 and the product migration issues): `docs/superpowers/plans/`, following the spec §8. The migration issues (one per product repo, see `docs/migration.md`) open once Plan 4 is agreed with Arshad.
+1. **Check CI on `next`** (the latest push is a `[baselines]` commit: the TextArea grip change moves pixels in its visual stories, so the "Update visual baselines" workflow regenerates them and pushes `test(visual): update Chromium baselines`). The CI run after that bot commit must be green on all three engines, including visual regression.
+2. **Decide the open design question** (toasts under a modal Dialog, see "Plan 3 final review") at the start of Plan 4.
+3. **Write Plan 4** (Milestone 3 and the product migration issues) in `docs/superpowers/plans/`, following the spec §8. The migration issues (one per product repo, see `docs/migration.md`) open only once Plan 4 is agreed with Arshad.
+4. **WebKit:** confirm on CI that the overlay stories pass with the keyframe entrances (`shownFully` checks). If a WebKit-only failure comes back, debug it on a machine with WebKit; it cannot be downloaded in the cloud container.
 
 ## Plan 3 final review
 
@@ -113,6 +122,12 @@ An independent review of the Plan 3 Tasks 8–12 code found nine issues. Fixed (
 - **TextArea:** must be resizable. It now has a hand-made grip.
 - **Tables:** markdown tables in docs rendered as raw text. Fixed with remark-gfm, and a test guards it.
 
+## Feedback round (2026-11-10, after Plan 3)
+
+- **Storybook errors on Pages:** loading every story of a production build found touch-only stories failing on a desktop pointer (now hidden, `cy check` rule `touch-hidden`) and two real timing bugs (ChoiceBase `indeterminate`, HiddenValue validity: now layout effects). "Failed to fetch dynamically imported module" was a tab from the previous deploy; the site now reloads once on its own.
+- **Notice:** looked thin and stacked vertically when narrow. Fixed with a grid and a stronger look; a story checks the alignment at two widths.
+- **TextArea on mobile:** the grip moved up into the text on touch screens. Fixed; the touch story checks the grip stays in the corner and the text stays clear of it.
+
 ## Plan 2 notes (2026-11-09)
 
 - **`inherit-chain` rule:** new `cy check` rule. Every element with a `cy-` class carries `.cy-reset` or declares its font size; it found 10 real host-CSS leaks.
@@ -153,11 +168,17 @@ None. Npm publish and deprecating the old packages wait for Arshad's authorisati
   - ChoiceBase (`indeterminate`) and HiddenValue (validity, invalid and reset listeners) use layout effects: production React runs passive effects after paint, so the mixed state flashed and validity was stale right after mount. Found by loading every story of the built Storybook.
   - Dialog fades on the `<dialog>` itself, not the panel: WebKit left the panel at opacity 0 (CI failure).
   - Tabs `reveal()` measures tabs from rects relative to the list, not `offsetLeft` (WebKit RTL CI failure).
+- **2026-11-10 (after Plan 3):**
+  - hit areas grow invisibly (`::before`), never the visible control: the TextArea grip kept moving into the text when its own box grew on touch.
+  - Storybook reloads once on `vite:preloadError` (`.storybook/stale-deploy.ts`), at most every 30 seconds.
+  - transition-dependent story assertions wait up to 3 seconds and compare colours as painted RGBA including alpha (WebKit on busy CI runners).
+  - no `@starting-style` for entrances: overlays use `@keyframes` (an engine that mishandles the animation still ends visible). Every overlay story checks `shownFully()` after opening.
 
 ## Verification
 
-- **Plan 3 Tasks 9–13 (cloud container):** `cy check`, lint, typecheck, unit and Preact tests, the React 18 smoke tests, every story on Chromium plus the touch project, coverage (≥ 95% branches), build and size budgets pass locally. Firefox and WebKit cannot be downloaded in the container (`cdn.playwright.dev` is blocked); CI on `next` runs them.
-- **Published Storybook:** every story and docs page of a production build was loaded under `/cynosure/` in Chromium; no load or render errors. Touch-only stories are hidden from the site (`!dev`).
+- **Latest local run (cloud container, 2026-11-10):** `cy check`, lint, typecheck, unit and Preact tests (287), the React 18 smoke tests (4), every story on Chromium plus the touch project (about 600 runs in the coverage pass), coverage (≥ 95% branches), build, publint, attw and size budgets pass. The changed components (Notice, TextArea, Dialog, Card) were also checked by screenshot, TextArea in phone emulation.
+- **Firefox and WebKit:** cannot be downloaded in the cloud container (`cdn.playwright.dev` is blocked); CI on `next` runs them. The last complete CI runs: all green on `0e81324`; later runs failed only on WebKit (Card colour timing, then the Dialog stuck at opacity 0 that led to the keyframe entrances). Check the run after the latest push (Next step 1).
+- **Published Storybook:** every story and docs page of a production build was loaded under `/cynosure/` in Chromium with no load or render errors; the stale-deploy reload was tested by swapping builds under an open tab.
 - **CI on `next`:** conventions, lint, types, unit, React 18, stories on all three engines plus touch, coverage, visual regression, build, publint, attw and size.
 - **Not verified:**
   - real extension contexts (Prism and Aperture shadow roots under MV3 CSP)
@@ -168,7 +189,7 @@ None. Npm publish and deprecating the old packages wait for Arshad's authorisati
 ```bash
 git clone https://github.com/arshad-shah/cynosure.git && cd cynosure && git checkout next
 nvm use && corepack enable && pnpm install
-pnpm exec playwright install chromium firefox webkit
+pnpm exec playwright install chromium firefox webkit   # blocked in Claude cloud containers: Chromium only there
 pnpm --dir tests/react18 install && pnpm cy progress && pnpm verify
 pnpm storybook
 ```

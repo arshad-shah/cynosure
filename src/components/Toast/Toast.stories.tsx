@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { Component, type ReactNode } from "react";
 import { expect, fn, waitFor } from "storybook/test";
 import { computeUnderHostileHost } from "../../test/hostile.js";
+import { shownFully } from "../../test/settle.js";
 import { CynosureTheme } from "../../theme/CynosureTheme.js";
 import { createTheme } from "../../tokens/index.js";
 import { Button } from "../Button/Button.js";
@@ -66,6 +67,7 @@ export const ShowsAndAutoDismisses: Story = {
     await userEvent.click(canvas.getByRole("button", { name: "Save" }));
     const toast = await canvas.findByRole("status");
     await waitFor(() => expect(toast).toHaveTextContent("SavedYour changes are live."));
+    await shownFully(toast);
     await expect(toast).toHaveAttribute("data-tone", "success");
     // It sits in a named region in the top layer.
     const region = canvas.getByRole("region", { name: "Notifications" });

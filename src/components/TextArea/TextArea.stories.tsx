@@ -198,7 +198,18 @@ export const TouchDragResizes: Story = {
     const area = canvas.getByRole("textbox", { name: "Notes" });
     const handle = grip(canvasElement);
     const box = handle.getBoundingClientRect();
-    await expect(Math.min(box.width, box.height)).toBeGreaterThanOrEqual(24);
+    const field = area.getBoundingClientRect();
+    // The tap target grows to 44px on touch, but invisibly: the grip itself stays small and tucked in the corner.
+    const hit = getComputedStyle(handle, "::before");
+    await expect(Number.parseFloat(hit.blockSize || hit.height)).toBeGreaterThanOrEqual(44);
+    await expect(Math.round(box.height)).toBe(24);
+    await expect(field.bottom - box.bottom).toBeLessThanOrEqual(2);
+    await expect(field.right - box.right).toBeLessThanOrEqual(2);
+    // Text stays clear of it: the content box ends above the grip.
+    const style = getComputedStyle(area);
+    const contentBottom =
+      field.bottom - Number.parseFloat(style.paddingBottom) - Number.parseFloat(style.borderBottomWidth);
+    await expect(contentBottom).toBeLessThanOrEqual(box.top + 1);
     await expect(getComputedStyle(handle).touchAction).toBe("none");
     const start = area.getBoundingClientRect().height;
     drag(handle, 40, "touch");
@@ -215,6 +226,12 @@ export const GripSitsInTheBoxCornerClearOfTheCounter: Story = {
     await expect(g.bottom).toBeLessThanOrEqual(area.bottom);
     await expect(g.right).toBeLessThanOrEqual(area.right);
     await expect(g.bottom <= count.top || g.top >= count.bottom).toBe(true);
+    // The last line of text ends above the grip.
+    const input = canvas.getByRole("textbox", { name: "Notes" });
+    const style = getComputedStyle(input);
+    await expect(
+      area.bottom - Number.parseFloat(style.paddingBottom) - Number.parseFloat(style.borderBottomWidth),
+    ).toBeLessThanOrEqual(g.top + 1);
   },
 };
 

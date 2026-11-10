@@ -4,6 +4,7 @@ import { createRoot } from "react-dom/client";
 import { expect, waitFor } from "storybook/test";
 import { download } from "../../icons/index.js";
 import { createStyleSheet } from "../../styles/inline.js";
+import { shownFully } from "../../test/settle.js";
 import { Button } from "../Button/Button.js";
 import { Tooltip } from "./Tooltip.js";
 
@@ -41,6 +42,7 @@ export const HoverShowsAfterDelay: Story = {
     await userEvent.hover(trigger);
     await expect(isOpen(tooltip(canvasElement))).toBe(false);
     await waitFor(() => expect(isOpen(tooltip(canvasElement))).toBe(true));
+    await shownFully(tooltip(canvasElement));
     await expect(trigger).toHaveAccessibleDescription("Download as JSON");
     await userEvent.unhover(trigger);
     await waitFor(() => expect(isOpen(tooltip(canvasElement))).toBe(false));

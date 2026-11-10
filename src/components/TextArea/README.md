@@ -21,7 +21,7 @@ Works in native forms (`FormData`, reset restores value, count and height, `requ
 
 - `--cy-text-area-{radius,padding-inline,padding-block,bg,border,soft-bg}`
 
-Drag the corner grip (pointer or touch) to set a height; the box keeps it and still grows with content up to `maxRows` (or the chosen height, if taller). `resizable={false}` removes the grip; disabled areas have none. The grip is a hand-made, `aria-hidden` pointer affordance: keyboard users get content growth instead.
+Drag the corner grip (pointer or touch) to set a height; the box keeps it and still grows with content up to `maxRows` (or the chosen height, if taller). `resizable={false}` removes the grip; disabled areas have none. The grip is a hand-made, `aria-hidden` pointer affordance: keyboard users get content growth instead. The grip stays a small square in the corner on every device; on touch screens only its invisible tap area grows to 44px, and the text keeps a bottom margin so it never runs under the grip.
 
 ## Used by
 

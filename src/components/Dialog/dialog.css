@@ -31,8 +31,7 @@
   text-align: start;
   text-transform: none;
   outline: none;
-  /* The fade runs on the dialog itself (scrim and panel together): WebKit does not reliably run @starting-style
-     transitions on descendants of an element entering the top layer. The panel only scales or slides. */
+  /* Fades as a whole (scrim and panel together); the panel only scales or slides. */
   opacity: 1;
   transition:
     opacity var(--cy-motion-base) var(--cy-motion-ease),
@@ -40,14 +39,10 @@
     overlay var(--cy-motion-base) allow-discrete;
   &[open] {
     display: grid;
+    animation: cy-dialog-in var(--cy-motion-base) var(--cy-motion-ease);
   }
   &:not([open]) {
     opacity: 0;
-  }
-  @starting-style {
-    &[open] {
-      opacity: 0;
-    }
   }
   &::backdrop {
     background: transparent;
@@ -89,11 +84,8 @@
   scale: var(--_from-scale);
   translate: var(--_from-translate);
 }
-@starting-style {
-  .cy-dialog.cy-dialog[open] .cy-dialog-panel {
-    scale: var(--_from-scale);
-    translate: var(--_from-translate);
-  }
+.cy-dialog.cy-dialog[open] .cy-dialog-panel {
+  animation: cy-dialog-panel-in var(--cy-motion-base) var(--cy-motion-ease);
 }
 
 .cy-dialog-header.cy-dialog-header {
@@ -165,12 +157,29 @@
 
 @media (prefers-reduced-motion: reduce) {
   .cy-dialog.cy-dialog,
+  .cy-dialog.cy-dialog[open],
+  .cy-dialog.cy-dialog[open] .cy-dialog-panel,
   .cy-dialog-panel.cy-dialog-panel {
     transition: none;
+    animation: none;
   }
 }
 @media (forced-colors: active) {
   .cy-dialog-panel.cy-dialog-panel {
     border-color: CanvasText;
+  }
+}
+
+/* Entrance as a keyframe animation, not @starting-style: if an engine mishandles the animation, the element still
+   ends in its normal visible style (WebKit left nested @starting-style overlays at opacity 0). */
+@keyframes cy-dialog-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes cy-dialog-panel-in {
+  from {
+    scale: var(--_from-scale);
+    translate: var(--_from-translate);
   }
 }

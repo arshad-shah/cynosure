@@ -78,10 +78,8 @@
     max-block-size var(--cy-motion-base) var(--cy-motion-ease),
     padding var(--cy-motion-base) var(--cy-motion-ease),
     margin var(--cy-motion-base) var(--cy-motion-ease);
-  @starting-style {
-    opacity: 0;
-    translate: 0 var(--cy-space-4);
-  }
+  --_enter-y: var(--cy-space-4);
+  animation: cy-toast-in var(--cy-motion-base) var(--cy-motion-ease);
   &[data-swiping] {
     transition: none;
   }
@@ -112,9 +110,7 @@
   }
 }
 .cy-toaster[data-position^="top"] .cy-toast.cy-toast {
-  @starting-style {
-    translate: 0 calc(-1 * var(--cy-space-4));
-  }
+  --_enter-y: calc(-1 * var(--cy-space-4));
 }
 
 .cy-toast-icon.cy-toast-icon {
@@ -149,10 +145,20 @@
 @media (prefers-reduced-motion: reduce) {
   .cy-toast.cy-toast {
     transition: none;
+    animation: none;
   }
 }
 @media (forced-colors: active) {
   .cy-toast.cy-toast {
     border-color: CanvasText;
+  }
+}
+
+/* Entrance as a keyframe animation, not @starting-style: if an engine mishandles the animation, the element still
+   ends in its normal visible style (WebKit left nested @starting-style overlays at opacity 0). */
+@keyframes cy-toast-in {
+  from {
+    opacity: 0;
+    translate: 0 var(--_enter-y);
   }
 }
