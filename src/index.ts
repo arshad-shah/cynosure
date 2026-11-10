@@ -88,7 +88,9 @@ export {
   type FileRejection,
 } from "./components/FileDrop/index.js";
 export {
+  type DockEdge,
   DockedToolbar,
+  type DockedToolbarLabels,
   type DockedToolbarProps,
   FloatingToolbar,
   type FloatingToolbarProps,

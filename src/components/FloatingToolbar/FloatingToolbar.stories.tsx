@@ -9,7 +9,8 @@ import { computeUnderHostileHost } from "../../test/hostile.js";
 import { shownFully } from "../../test/settle.js";
 import { Button } from "../Button/Button.js";
 import { IconButton } from "../IconButton/IconButton.js";
-import { DockedToolbar, FloatingToolbar, useSelectionAnchor } from "./FloatingToolbar.js";
+import { SegmentedControl } from "../SegmentedControl/SegmentedControl.js";
+import { type DockEdge, DockedToolbar, FloatingToolbar, useSelectionAnchor } from "./FloatingToolbar.js";
 
 const tools = (
   <>
@@ -266,6 +267,153 @@ export const DockedOpensAndCloses: Story = {
     canvas.getByRole("button", { name: "Edit" }).focus();
     await userEvent.keyboard("{Alt>}{F10}{/Alt}");
     await expect(canvas.getByRole("button", { name: "Edit" })).toHaveFocus();
+  },
+};
+
+/** A focused editor's tool palette on one side, as the tools app has it. */
+function Palette({ dir }: { dir?: "rtl" }) {
+  const [edge, setEdge] = useState<DockEdge>("start");
+  return (
+    <div dir={dir}>
+      <DockedToolbar label="Tools" edge={edge} onEdgeChange={setEdge}>
+        {tools}
+      </DockedToolbar>
+      <output data-testid="edge">{edge}</output>
+    </div>
+  );
+}
+const left = () => docked().getBoundingClientRect().left;
+const onLeft = () => left() < window.innerWidth / 2;
+const pressEscape = () =>
+  window.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true, cancelable: true }));
+function dragGrip(toX: number, pointerType = "mouse", release = true) {
+  const grip = docked().querySelector(".cy-docked-toolbar-grip") as HTMLElement;
+  const r = grip.getBoundingClientRect();
+  const init = {
+    bubbles: true,
+    cancelable: true,
+    pointerId: 5,
+    pointerType,
+    isPrimary: true,
+    button: 0,
+    buttons: 1,
+  };
+  const y = r.top + r.height / 2;
+  grip.dispatchEvent(new PointerEvent("pointerdown", { ...init, clientX: r.left + r.width / 2, clientY: y }));
+  grip.dispatchEvent(new PointerEvent("pointermove", { ...init, clientX: (r.left + toX) / 2, clientY: y }));
+  grip.dispatchEvent(new PointerEvent("pointermove", { ...init, clientX: toX, clientY: y }));
+  if (release)
+    grip.dispatchEvent(new PointerEvent("pointerup", { ...init, buttons: 0, clientX: toX, clientY: y }));
+}
+
+export const ASidePaletteThatMoves: Story = {
+  tags: ["visual"],
+  render: () => <Palette />,
+  play: async ({ canvas, userEvent }) => {
+    await waitFor(() => expect(docked().matches(":popover-open")).toBe(true));
+    const bar = canvas.getByRole("toolbar", { name: "Tools" });
+    await expect(bar).toHaveAttribute("aria-orientation", "vertical");
+    await expect(onLeft()).toBe(true);
+    // The grip flips it to the other edge.
+    await userEvent.click(canvas.getByRole("button", { name: "Move to the other side" }));
+    await expect(canvas.getByTestId("edge")).toHaveTextContent("end");
+    await waitFor(() => expect(onLeft()).toBe(false));
+    // Alt+Left from inside the bar brings it back; arrows alone still move between the tools.
+    canvas.getByRole("button", { name: "Bold" }).focus();
+    await userEvent.keyboard("{ArrowDown}");
+    await expect(canvas.getByRole("button", { name: "Italic" })).toHaveFocus();
+    await userEvent.keyboard("{Alt>}{ArrowLeft}{/Alt}");
+    await expect(canvas.getByTestId("edge")).toHaveTextContent("start");
+    await userEvent.keyboard("{Alt>}{ArrowLeft}{/Alt}");
+    await expect(canvas.getByTestId("edge")).toHaveTextContent("start");
+  },
+};
+
+export const DragTheGripToTheOtherHalf: Story = {
+  render: () => <Palette />,
+  play: async ({ canvas }) => {
+    await waitFor(() => expect(docked().matches(":popover-open")).toBe(true));
+    // Dragged past the middle, it snaps to the other edge.
+    dragGrip(window.innerWidth * 0.8);
+    await waitFor(() => expect(canvas.getByTestId("edge")).toHaveTextContent("end"));
+    // Not far enough: it stays.
+    dragGrip(window.innerWidth * 0.7);
+    await expect(canvas.getByTestId("edge")).toHaveTextContent("end");
+    // Escape mid-drag puts it back.
+    dragGrip(window.innerWidth * 0.1, "mouse", false);
+    await waitFor(() => expect(docked()).toHaveAttribute("data-moving"));
+    pressEscape();
+    await waitFor(() => expect(docked()).not.toHaveAttribute("data-moving"));
+    await expect(canvas.getByTestId("edge")).toHaveTextContent("end");
+  },
+};
+
+export const SidesFollowTheReadingDirection: Story = {
+  render: () => <Palette dir="rtl" />,
+  play: async ({ canvas, userEvent }) => {
+    await waitFor(() => expect(docked().matches(":popover-open")).toBe(true));
+    // In right-to-left text the start edge is on the right, and Alt+Left goes to the end edge.
+    await waitFor(() => expect(onLeft()).toBe(false));
+    canvas.getByRole("button", { name: "Bold" }).focus();
+    await userEvent.keyboard("{Alt>}{ArrowLeft}{/Alt}");
+    await expect(canvas.getByTestId("edge")).toHaveTextContent("end");
+    await waitFor(() => expect(onLeft()).toBe(true));
+  },
+};
+
+export const AFloatingPillForModes: Story = {
+  render: () => {
+    function Modes() {
+      const [mode, setMode] = useState("edit");
+      return (
+        <>
+          <DockedToolbar label="Mode" floating>
+            <SegmentedControl
+              label="Mode"
+              value={mode}
+              onChange={setMode}
+              options={[
+                { value: "edit", label: "Edit" },
+                { value: "sign", label: "Sign" },
+                { value: "review", label: "Review" },
+              ]}
+            />
+          </DockedToolbar>
+          <output data-testid="mode">{mode}</output>
+        </>
+      );
+    }
+    return <Modes />;
+  },
+  play: async ({ canvas, userEvent }) => {
+    await waitFor(() => expect(docked().matches(":popover-open")).toBe(true));
+    // Centred, its own width, lifted off the bottom edge.
+    const b = docked().getBoundingClientRect();
+    await expect(Math.abs(b.left - (window.innerWidth - b.right))).toBeLessThan(2);
+    await expect(b.width).toBeLessThan(window.innerWidth / 2);
+    await expect(b.bottom).toBeLessThan(window.innerHeight - 4);
+    await userEvent.click(canvas.getByRole("radio", { name: "Sign" }));
+    await expect(canvas.getByTestId("mode")).toHaveTextContent("sign");
+    // Inside a toolbar, arrows move between the controls and Space chooses (APG toolbar).
+    await userEvent.keyboard("{ArrowRight}");
+    await expect(canvas.getByRole("radio", { name: "Review" })).toHaveFocus();
+    await userEvent.keyboard(" ");
+    await expect(canvas.getByTestId("mode")).toHaveTextContent("review");
+  },
+};
+
+export const TouchFlipsAndDrags: Story = {
+  tags: ["touch", "!dev"],
+  render: () => <Palette />,
+  play: async ({ canvas }) => {
+    await waitFor(() => expect(docked().matches(":popover-open")).toBe(true));
+    const grip = docked().querySelector(".cy-docked-toolbar-grip") as HTMLElement;
+    await expect(Number.parseFloat(getComputedStyle(grip, "::before").width)).toBeGreaterThanOrEqual(44);
+    // A tap flips it; a drag snaps it.
+    dragGrip(grip.getBoundingClientRect().left + grip.getBoundingClientRect().width / 2, "touch");
+    await waitFor(() => expect(canvas.getByTestId("edge")).toHaveTextContent("end"));
+    dragGrip(window.innerWidth * 0.1, "touch");
+    await waitFor(() => expect(canvas.getByTestId("edge")).toHaveTextContent("start"));
   },
 };
 

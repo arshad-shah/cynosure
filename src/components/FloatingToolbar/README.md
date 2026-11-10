@@ -27,6 +27,11 @@ const anchor = useSelectionAnchor(editorRef);
 
 `DockedToolbar` takes `label`, `open`, `onEscape`, `hotkey`, `keepVisible` (a ref kept in view above the bar by scrolling the page) and `trailing` (pinned after the row).
 
+`DockedToolbar` also docks elsewhere, so products need no separate palette or dock component:
+
+- `edge="start"` or `"end"`: a vertical tool palette on that side of the screen. With `onEdgeChange`, a grip moves it to the other side (click or tap to flip, drag to the other half to snap there, Escape mid-drag to cancel), and so does Alt+Left/Right inside the bar. Sides follow the reading direction.
+- `floating`: at the bottom, a centred pill instead of a full-width bar. Put a SegmentedControl in it for a mode switcher.
+
 - Both live in the top layer through the Popover API where they are rendered (nothing is added to `<body>`) and use Toolbar inside: one tab stop, arrow keys between controls.
 - They never take focus by themselves; Alt+F10 moves in, Escape returns.
 - The floating bar stays on screen and moves with its anchor (scrolls, resizes, layout changes). The docked bar never wraps (it scrolls sideways) and leaves room at the end of the page so the last content can scroll above it.

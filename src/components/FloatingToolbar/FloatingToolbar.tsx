@@ -9,7 +9,10 @@ import {
   useState,
 } from "react";
 import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js";
+import { isRtl } from "../../foundations/dir.js";
+import { useDrag } from "../../foundations/drag.js";
 import { useHotkey } from "../../foundations/hotkey.js";
+import { grip as gripIcon } from "../../icons/grip.js";
 import {
   type FloatingAnchor,
   type PopoverEl,
@@ -18,6 +21,7 @@ import {
   usePopover,
 } from "../../overlay/floating.js";
 import { useAnchoredPosition, type VirtualAnchor } from "../../overlay/use-anchored-position.js";
+import { IconButton } from "../IconButton/IconButton.js";
 import { Toolbar } from "../Toolbar/Toolbar.js";
 
 export interface FloatingToolbarTokens {
@@ -138,10 +142,30 @@ export interface DockedToolbarProps {
   trailing?: ReactNode;
   /** Keyboard shortcut that moves focus into the bar while it is open. Default "alt+f10"; `false` for none. */
   hotkey?: string | false;
+  /**
+   * Where it docks: across the `bottom` of the visible viewport (the phone bar, default), or as a vertical palette on
+   * the `start` or `end` edge (the tools of a focused editor).
+   */
+  edge?: DockEdge;
+  /**
+   * Lets people move a side palette to the other edge: shows a grip (click or tap to flip, drag to the other half to
+   * snap there) and Alt+Left/Right inside the bar.
+   */
+  onEdgeChange?: ((edge: "start" | "end") => void) | undefined;
+  /** At the bottom: a centred pill above the edge instead of a full-width bar (a mode switcher). */
+  floating?: boolean;
+  labels?: Partial<DockedToolbarLabels>;
   children?: ReactNode;
   className?: string;
   /** Layout only. Restyle through --cy-floating-toolbar-* tokens. */
   style?: CSSProperties;
+}
+
+export type DockEdge = "bottom" | "start" | "end";
+
+export interface DockedToolbarLabels {
+  /** The grip that moves a side palette. Default "Move to the other side". */
+  move: string;
 }
 
 /** Height of the part of the layout viewport the on-screen keyboard (or browser chrome) covers at the bottom. */
@@ -163,9 +187,10 @@ function useKeyboardInset() {
 }
 
 /**
- * The phone form of a contextual toolbar: one row docked to the bottom of the visible viewport, so it rides just above
- * the on-screen keyboard. The row never wraps; it scrolls sideways. It keeps the box being worked on in view above
- * itself by scrolling the page.
+ * A toolbar docked to an edge of the visible viewport. At the bottom it is the phone form of a contextual toolbar: one
+ * row that rides just above the on-screen keyboard, scrolls sideways instead of wrapping, and keeps the box being
+ * worked on in view above itself. `floating` makes it a centred pill (a mode switcher). On the `start` or `end` edge it
+ * is a vertical palette that people can move to the other side.
  */
 export function DockedToolbar({
   label,
@@ -174,26 +199,60 @@ export function DockedToolbar({
   keepVisible,
   trailing,
   hotkey = "alt+f10",
+  edge = "bottom",
+  onEdgeChange,
+  floating = false,
+  labels,
   children,
   className,
   style,
 }: DockedToolbarProps) {
+  const text = { move: "Move to the other side", ...labels };
   const bar = useRef<PopoverEl>(null);
+  const grip = useRef<HTMLButtonElement>(null);
+  const side = edge !== "bottom";
   usePopover(bar, open);
   const inset = useKeyboardInset();
   useHotkey(open && hotkey, () => enter(bar.current));
-  // Room at the end of the page for the bar and the keyboard, so the last content can scroll above them.
+  // Room at the end of the page for a bottom bar and the keyboard, so the last content can scroll above them.
   const [room, setRoom] = useState(0);
   useClientLayoutEffect(() => {
-    const next = open ? (bar.current as PopoverEl).offsetHeight + inset : 0;
+    const next = open && !side ? (bar.current as PopoverEl).offsetHeight + inset : 0;
     setRoom((r) => (r === next ? r : next));
   });
   const focus = useReturnFocus(onEscape);
 
+  // Moving a side palette: the edge a physical side of the screen is, in this reading direction.
+  const edgeAt = (left: boolean) => (left !== isRtl(bar.current as PopoverEl) ? "start" : "end");
+  const flip = () => onEdgeChange?.(edge === "start" ? "end" : "start");
+  const [shift, setShift] = useState<{ x: number; y: number } | null>(null);
+  useDrag(grip, {
+    distance: 4,
+    onMove: ({ delta }) => setShift(delta),
+    onEnd: ({ point, delta }, cancelled) => {
+      setShift(null);
+      if (cancelled) return;
+      // A finger's tap starts a drag at once (and swallows the click): treat a tap as the click.
+      if (Math.hypot(delta.x, delta.y) < 4) return flip();
+      const to = edgeAt(point.x < window.innerWidth / 2);
+      if (to !== edge) onEdgeChange?.(to);
+    },
+  });
+  const onKeyDown = (event: KeyboardEvent<HTMLElement>) => {
+    if (side && onEdgeChange && event.altKey && (event.key === "ArrowLeft" || event.key === "ArrowRight")) {
+      // Alt+Left would otherwise go back in the browser's history.
+      event.preventDefault();
+      const to = edgeAt(event.key === "ArrowLeft");
+      if (to !== edge) onEdgeChange(to);
+      return;
+    }
+    focus.onKeyDown(event);
+  };
+
   useEffect(() => {
     const target = keepVisible?.current;
     const el = bar.current;
-    if (!open || !target || !el) return;
+    if (!open || side || !target || !el) return;
     // Measured on the next frame, once the bar and the page have their final layout.
     const frame = requestAnimationFrame(() => {
       const covered = target.getBoundingClientRect().bottom - el.getBoundingClientRect().top;
@@ -201,7 +260,7 @@ export function DockedToolbar({
       if (covered > -gap) window.scrollBy({ top: covered + gap, behavior: "instant" });
     });
     return () => cancelAnimationFrame(frame);
-  }, [open, inset, room, keepVisible]);
+  }, [open, side, inset, room, keepVisible]);
 
   return (
     <>
@@ -210,12 +269,37 @@ export function DockedToolbar({
       <div
         ref={bar}
         className={className ? `cy-docked-toolbar ${className}` : "cy-docked-toolbar"}
+        data-edge={edge}
+        data-floating={floating && !side ? "" : undefined}
+        data-moving={shift ? "" : undefined}
         {...{ popover: "manual" }}
-        style={{ "--_inset": `${inset}px`, ...style } as CSSProperties}
+        style={
+          {
+            "--_inset": `${inset}px`,
+            ...(shift ? { "--_dx": `${shift.x}px`, "--_dy": `${shift.y}px` } : {}),
+            ...style,
+          } as CSSProperties
+        }
         onFocus={focus.onFocus}
-        onKeyDown={focus.onKeyDown}
+        onKeyDown={onKeyDown}
       >
-        <Toolbar label={label} className="cy-docked-toolbar-row">
+        {side && onEdgeChange && (
+          <IconButton
+            ref={grip}
+            icon={gripIcon}
+            label={text.move}
+            variant="ghost"
+            size="sm"
+            className="cy-docked-toolbar-grip"
+            tooltipPlacement={edge === "start" ? "end" : "start"}
+            onClick={flip}
+          />
+        )}
+        <Toolbar
+          label={label}
+          orientation={side ? "vertical" : "horizontal"}
+          className="cy-docked-toolbar-row"
+        >
           {children}
         </Toolbar>
         {trailing != null && <div className="cy-docked-toolbar-trailing cy-reset">{trailing}</div>}

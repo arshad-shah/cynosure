@@ -42,6 +42,19 @@ import { FloatingToolbar } from "@arshad-shah/cynosure";
 
 <Canvas of={Stories.DockedAboveTheKeyboard} />
 
+## Palettes and docks
+
+The same `DockedToolbar` makes a vertical tool palette on the `start` or `end` edge. With `onEdgeChange`, people can move it: a grip flips it (click or tap) or snaps it to the half it is dragged to (Escape mid-drag cancels), and Alt+Left/Right inside the bar does the same. `floating` makes the bottom bar a centred pill, the place for a mode switcher.
+
+```tsx
+<DockedToolbar label="Tools" edge={edge} onEdgeChange={setEdge}>…</DockedToolbar>
+<DockedToolbar label="Mode" floating>
+  <SegmentedControl label="Mode" options={modes} value={mode} onChange={setMode} />
+</DockedToolbar>
+```
+
+<Canvas of={Stories.ASidePaletteThatMoves} />
+
 ## Props
 
 <ArgTypes of={Stories} />

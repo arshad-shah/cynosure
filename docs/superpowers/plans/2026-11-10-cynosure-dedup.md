@@ -33,9 +33,7 @@
   - `luminance` exported from `tokens/color.ts` and used by ColorSwatches.
   - One tone-to-icon map for Toast and Notice.
   - One fade keyframe for Select and Combobox, if it can live where both bundles load it.
-- [ ] **Task 7: Sheet.**
-  - Sheet is `<DialogFrame side>`. Give Dialog a `side` prop.
-  - Ask Arshad whether Sheet goes, or stays as a documented alias, before 1.0.
+- [x] **Task 7: Sheet.** Kept (Arshad, 2026-11-10). It is one line over the shared `DialogFrame` with its own tokens and a different job: a panel docked to an edge at every size (a filters or navigation drawer). Any Dialog still becomes a bottom sheet in a narrow container; that behaviour is Dialog's and stays.
 
 **Kept apart on purpose:**
 - Stack and Inline: a common design-system pair whose CSS is already shared.
