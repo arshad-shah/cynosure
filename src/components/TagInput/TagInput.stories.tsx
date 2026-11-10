@@ -21,6 +21,15 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+/** Fires a paste of `text` (Firefox ignores `clipboardData` in the ClipboardEvent constructor, so attach it). */
+function paste(input: HTMLElement, text: string) {
+  const data = new DataTransfer();
+  data.setData("text/plain", text);
+  const event = new ClipboardEvent("paste", { bubbles: true, cancelable: true, clipboardData: data });
+  if (!event.clipboardData) Object.defineProperty(event, "clipboardData", { value: data });
+  input.dispatchEvent(event);
+}
+
 const tagsOf = (canvasElement: HTMLElement) =>
   [...canvasElement.querySelectorAll(".cy-tag-input-text")].map((t) => t.textContent);
 
@@ -113,11 +122,7 @@ export const PastingAList: Story = {
   play: async ({ canvas, canvasElement }) => {
     const input = canvas.getByRole("textbox", { name: "Topics" });
     input.focus();
-    const data = new DataTransfer();
-    data.setData("text", "react, astro\npreact,react");
-    input.dispatchEvent(
-      new ClipboardEvent("paste", { bubbles: true, cancelable: true, clipboardData: data }),
-    );
+    paste(input, "react, astro\npreact,react");
     // Split on separators and lines; the repeated one is refused.
     await waitFor(() => expect(tagsOf(canvasElement)).toEqual(["react", "astro", "preact"]));
     await expect(input).toHaveAccessibleDescription("react is already added");
@@ -197,11 +202,7 @@ export const PlainFieldKeys: Story = {
     await expect(canvas.queryByRole("listbox")).toBeNull();
     await expect(tagsOf(canvasElement)).toEqual([]);
     // A pasted single word is typed normally (not split).
-    const data = new DataTransfer();
-    data.setData("text", "solo");
-    input.dispatchEvent(
-      new ClipboardEvent("paste", { bubbles: true, cancelable: true, clipboardData: data }),
-    );
+    paste(input, "solo");
     await expect(tagsOf(canvasElement)).toEqual([]);
   },
 };
