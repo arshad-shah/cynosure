@@ -1,0 +1,61 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./DocumentViewport.stories";
+
+<Meta of={Stories} />
+
+# DocumentViewport
+
+A scrolling, zoomable document of pages, rendering only the pages near the view.
+
+<Canvas of={Stories.PagesOneUnderAnother} />
+
+## When to use
+
+- **Documents of pages**: PDFs, scans, slides, where people read, zoom and work on a page.
+
+**Use something else when:**
+- it is one image to compare: [CompareSlider](?path=/docs/components-compareslider--docs)
+- it is a long list of rows: [VirtualList](?path=/docs/components-virtuallist--docs)
+
+## Usage
+
+```tsx
+<ZoomControls zoom={zoom} percent={scale * 100} onZoomChange={setZoom} />
+<DocumentViewport
+  label="Contract.pdf"
+  pages={pages}
+  zoom={zoom}
+  onZoomChange={setZoom}
+  onScaleChange={setScale}
+  renderPage={({ id, scale, visibleRect }) => <PageCanvas id={id} scale={scale} only={visibleRect} />}
+/>
+```
+
+`pages` are `{ id, width, height }` at 100%. `renderPage` draws a page at `scale`; for very large pages draw only `visibleRect`. Use `onCurrentPageChange` to keep a page rail in step, and `scrollTo` (with a new `nonce` each time) to go to a page or centre a spot on it.
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+- **Roles:** a named region and tab stop; each page is a group named "Page 3 of 12". Go-to-page with `scrollTo.focus` moves focus to the page.
+- **Zoom:** Ctrl/Cmd+wheel or a pinch zooms around the pointer; Ctrl/Cmd and =, - or 0 zoom in, out and to 100% while focus is inside. Changes are announced ("Zoom 125%").
+- **Pan:** hold Space and drag with a mouse or pen; one finger scrolls.
+
+| Key | Does |
+| --- | --- |
+| Arrow keys, Page Up/Down | Scroll |
+| Ctrl/Cmd + = / - | Zoom in / out a step |
+| Ctrl/Cmd + 0 | 100% |
+| Space (held) + drag | Pan |
+
+<Canvas of={Stories.CtrlWheelZoomsAroundThePointer} />
+
+## Theming
+
+Tokens: `--cy-document-viewport-background`, `--cy-document-viewport-gap` and `--cy-document-viewport-page-shadow`.
+
+## Related
+
+[ZoomControls](?path=/docs/components-zoomcontrols--docs) · [SelectionFrame](?path=/docs/components-selectionframe--docs) · [VirtualList](?path=/docs/components-virtuallist--docs)

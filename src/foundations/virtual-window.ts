@@ -1,4 +1,4 @@
-import { type RefObject, useState } from "react";
+import { type RefObject, useMemo, useState } from "react";
 import { useClientLayoutEffect } from "./client-layout-effect.js";
 
 export interface VirtualWindowOptions {
@@ -6,8 +6,15 @@ export interface VirtualWindowOptions {
   count: number;
   /** Off renders every row (and measures nothing). Default true. */
   enabled?: boolean;
-  /** A rendered row, measured for the row size. Rows are assumed to share one height. */
-  rowSelector: string;
+  /** A rendered row, measured for the row size when rows share one height (no `sizes`). */
+  rowSelector?: string;
+  /**
+   * Each row's size, when rows differ (pages of mixed sizes). Then nothing is measured but the viewport, and rows sit
+   * `gap` apart with `gap` before the first and after the last.
+   */
+  sizes?: readonly number[] | undefined;
+  /** Space between rows, and before the first and after the last, with `sizes`. Default 0. */
+  gap?: number;
   /** Row size before one has been measured, in CSS pixels. Default 32. */
   estimate?: number;
   /** Rows rendered either side of the view. Default 6. */
@@ -27,25 +34,41 @@ export interface VirtualWindow {
   onScroll: (top: number) => void;
   /** Scrolls the least distance that brings row `index` fully into view. */
   reveal: (index: number) => void;
+  /** Where row `index` starts, from the top of the content. */
+  offsetOf: (index: number) => number;
+  /** Row `index`'s size. */
+  sizeOf: (index: number) => number;
+  /** The viewport's scroll position and size, as last measured. */
+  view: { top: number; height: number; width: number };
 }
 
 /**
- * Windowing for a scrolling list of equal-height rows: measure one rendered row and the viewport, then render only the
- * rows in view plus a few either side. Heights come from CSS (tokens, touch hit areas), never from a prop, so a row
- * that grows to 44px on a touch screen is still placed right.
+ * Windowing for a scrolling list: render only the rows in view plus a few either side. Equal rows (lists, trees) are
+ * measured from one rendered row, so their height comes from CSS (tokens, touch hit areas) and a row that grows to
+ * 44px on a touch screen is still placed right. Rows of different sizes (document pages) pass `sizes` instead.
  */
 export function useVirtualWindow(
   scroller: RefObject<HTMLElement | null>,
-  { count, enabled = true, rowSelector, estimate = 32, overscan = 6, keep = -1 }: VirtualWindowOptions,
+  {
+    count,
+    enabled = true,
+    rowSelector,
+    sizes,
+    gap = 0,
+    estimate = 32,
+    overscan = 6,
+    keep = -1,
+  }: VirtualWindowOptions,
 ): VirtualWindow {
-  const [view, setView] = useState({ top: 0, height: 0, row: 0 });
+  const [view, setView] = useState({ top: 0, height: 0, width: 0, row: 0 });
   useClientLayoutEffect(() => {
     const el = scroller.current;
     if (!enabled || !el) return;
     const measure = () => {
-      const row = el.querySelector<HTMLElement>(rowSelector)?.offsetHeight || estimate;
+      const row = (rowSelector && el.querySelector<HTMLElement>(rowSelector)?.offsetHeight) || estimate;
+      const { clientHeight: height, clientWidth: width } = el;
       setView((v) =>
-        v.height === el.clientHeight && v.row === row ? v : { ...v, height: el.clientHeight, row },
+        v.height === height && v.width === width && v.row === row ? v : { ...v, height, width, row },
       );
     };
     measure();
@@ -55,10 +78,37 @@ export function useVirtualWindow(
   }, [enabled, rowSelector, estimate, count > 0]);
 
   const rowSize = view.row || estimate;
+  // With sizes: each row's start, `gap` apart.
+  const starts = useMemo(() => {
+    if (!sizes) return null;
+    const out: number[] = [];
+    let at = gap;
+    for (const size of sizes) {
+      out.push(at);
+      at += size + gap;
+    }
+    return out;
+  }, [sizes, gap]);
+  const offsetOf = (i: number) => (starts ? (starts[i] as number) : i * rowSize);
+  const sizeOf = (i: number) => (sizes ? (sizes[i] as number) : rowSize);
+  const total = starts ? (count ? offsetOf(count - 1) + sizeOf(count - 1) + gap : 0) : count * rowSize;
+  /** The first row that ends below `y`. */
+  const rowAt = (y: number) => {
+    if (!starts) return Math.floor(y / rowSize);
+    let lo = 0;
+    let hi = count;
+    while (lo < hi) {
+      const mid = (lo + hi) >> 1;
+      if (offsetOf(mid) + sizeOf(mid) <= y) lo = mid + 1;
+      else hi = mid;
+    }
+    return lo;
+  };
   let indices: number[];
   if (enabled) {
-    const first = Math.max(0, Math.floor(view.top / rowSize) - overscan);
-    const last = Math.min(count, Math.ceil((view.top + (view.height || rowSize * 20)) / rowSize) + overscan);
+    const height = view.height || rowSize * 20;
+    const first = Math.max(0, rowAt(view.top) - overscan);
+    const last = Math.min(count, rowAt(view.top + height - 1) + 1 + overscan);
     indices = Array.from({ length: Math.max(0, last - first) }, (_, i) => first + i);
     if (keep >= 0 && keep < count && (keep < first || keep >= last)) indices.push(keep);
   } else indices = Array.from({ length: count }, (_, i) => i);
@@ -66,14 +116,18 @@ export function useVirtualWindow(
   return {
     indices,
     rowSize,
-    total: count * rowSize,
+    total,
+    offsetOf,
+    sizeOf,
+    view: { top: view.top, height: view.height, width: view.width },
     onScroll: (top) => setView((v) => (v.top === top ? v : { ...v, top })),
     reveal: (index) => {
       const el = scroller.current;
       if (!enabled || !el) return;
-      const top = index * rowSize;
+      const top = offsetOf(index);
+      const size = sizeOf(index);
       if (top < el.scrollTop) el.scrollTop = top;
-      else if (top + rowSize > el.scrollTop + el.clientHeight) el.scrollTop = top + rowSize - el.clientHeight;
+      else if (top + size > el.scrollTop + el.clientHeight) el.scrollTop = top + size - el.clientHeight;
     },
   };
 }

@@ -27,7 +27,13 @@ export function useRovingFocus(container: RefObject<HTMLElement | null>, options
   useEffect(() => {
     const root = container.current;
     if (!root) return;
-    const items = () => [...root.querySelectorAll<HTMLElement>(selector)];
+    // Items inside a popover nested in the group (a Menu's panel rendered in place) belong to that popover.
+    const own = (el: HTMLElement) => {
+      for (let n = el.parentElement; n && n !== root; n = n.parentElement)
+        if (n.hasAttribute("popover")) return false;
+      return true;
+    };
+    const items = () => [...root.querySelectorAll<HTMLElement>(selector)].filter(own);
     const setStop = (target: HTMLElement) => {
       for (const item of items()) item.tabIndex = item === target ? 0 : -1;
     };

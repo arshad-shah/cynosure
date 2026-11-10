@@ -77,6 +77,17 @@ export {
 } from "./components/DescriptionList/index.js";
 export { Dialog, type DialogLabels, type DialogProps, type DialogTokens } from "./components/Dialog/index.js";
 export { Disclosure, type DisclosureProps, type DisclosureTokens } from "./components/Disclosure/index.js";
+export {
+  DocumentViewport,
+  type DocumentViewportLabels,
+  type DocumentViewportProps,
+  type DocumentViewportTokens,
+  type PageRect,
+  type RenderPageProps,
+  type ScrollRequest,
+  type ViewportPage,
+  type ZoomSetting,
+} from "./components/DocumentViewport/index.js";
 export { EmptyState, type EmptyStateProps, type EmptyStateTokens } from "./components/EmptyState/index.js";
 export { Field, type FieldProps } from "./components/Field/index.js";
 export {
@@ -278,6 +289,11 @@ export {
   type VirtualListProps,
   type VirtualListTokens,
 } from "./components/VirtualList/index.js";
+export {
+  ZoomControls,
+  type ZoomControlsLabels,
+  type ZoomControlsProps,
+} from "./components/ZoomControls/index.js";
 export { ButtonBase, type ButtonBaseProps } from "./foundations/ButtonBase/ButtonBase.js";
 export { ChoiceBase, type ChoiceBaseProps } from "./foundations/ChoiceBase/ChoiceBase.js";
 export { DialogBase, type DialogBaseProps } from "./foundations/DialogBase/index.js";

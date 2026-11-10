@@ -467,5 +467,17 @@
     "path": ["dist/components/KeyValueEditor/KeyValueEditor.js", "dist/styles/key-value-editor.css"],
     "limit": "2.5 kB",
     "gzip": true
+  },
+  {
+    "name": "DocumentViewport",
+    "path": ["dist/components/DocumentViewport/DocumentViewport.js", "dist/styles/document-viewport.css"],
+    "limit": "3 kB",
+    "gzip": true
+  },
+  {
+    "name": "ZoomControls",
+    "path": ["dist/components/ZoomControls/ZoomControls.js", "dist/styles/zoom-controls.css"],
+    "limit": "1.5 kB",
+    "gzip": true
   }
 ]

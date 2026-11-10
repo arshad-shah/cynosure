@@ -51,6 +51,8 @@ export interface MenuItem {
   /** Checkable item: a toggle (`checkbox`) or one of a set (`radio`). Checkable items keep the menu open. */
   kind?: "checkbox" | "radio";
   checked?: boolean;
+  /** Stay open after choosing. Default: true for checkable items (several toggles in a row), false otherwise. */
+  keepOpen?: boolean;
 }
 
 export interface MenuSection {
@@ -141,7 +143,7 @@ export function MenuPanel({
   const choose = (item: MenuItem) => {
     if (item.disabled) return;
     onSelect(item.value);
-    if (!item.kind) onClose();
+    if (!(item.keepOpen ?? !!item.kind)) onClose();
   };
 
   const onPanelKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {

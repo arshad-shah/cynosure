@@ -14,7 +14,7 @@ APG menu button: a list of commands in the top layer.
 />;
 ```
 
-Items: `value`, `label`, `icon`, `shortcut` (shown with Kbd, exposed as `aria-keyshortcuts`), `disabled`, `tone` (`neutral` or `danger`), `kind` (`checkbox` or `radio`) with `checked`. Sections (`{ label, items }`) render as a named group after a separator.
+Items: `value`, `label`, `icon`, `shortcut` (shown with Kbd, exposed as `aria-keyshortcuts`), `disabled`, `tone` (`neutral` or `danger`), `kind` (`checkbox` or `radio`) with `checked`, and `keepOpen` (checkable items keep the menu open by default, for several toggles in a row; `keepOpen: false` closes it, as for a zoom choice). Sections (`{ label, items }`) render as a named group after a separator.
 
 - Enter, Space, click or Down open on the first item; Up opens on the last.
 - Up, Down, Home and End move (wrapping, skipping disabled items); typing jumps to the next matching item.
