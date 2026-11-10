@@ -67,7 +67,6 @@ export const ShowsAndAutoDismisses: Story = {
     await userEvent.click(canvas.getByRole("button", { name: "Save" }));
     const toast = await canvas.findByRole("status");
     await waitFor(() => expect(toast).toHaveTextContent("SavedYour changes are live."));
-    await shownFully(toast);
     await expect(toast).toHaveAttribute("data-tone", "success");
     // It sits in a named region in the top layer.
     const region = canvas.getByRole("region", { name: "Notifications" });
@@ -189,6 +188,8 @@ export const AnnouncedOnceWithTheRightUrgency: Story = {
     await userEvent.click(canvas.getByRole("button", { name: "Note" }));
     const status = await canvas.findByRole("status");
     await waitFor(() => expect(status).toHaveTextContent("Sync paused"));
+    // Really visible once its entrance has finished (it stays until dismissed, so no race with the timer).
+    await shownFully(status);
     await expect(status).toHaveAttribute("aria-atomic", "true");
     // The live element existed before its text: the text is inserted once, into one live region.
     const title = status.querySelector(".cy-toast-title") as HTMLElement;
