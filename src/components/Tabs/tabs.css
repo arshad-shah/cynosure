@@ -117,7 +117,7 @@
     opacity: 0.45;
     cursor: not-allowed;
   }
-  [data-variant="line"] > & {
+  .cy-tab-list[data-variant="line"] & {
     border-end-start-radius: 0;
     border-end-end-radius: 0;
     &[aria-selected="true"] {
@@ -131,7 +131,7 @@
         inset 0 0 0 var(--cy-border-focus) var(--cy-color-ring);
     }
   }
-  [data-variant="soft"] > & {
+  .cy-tab-list[data-variant="soft"] & {
     &:hover:not(:disabled) {
       background: var(--cy-color-soft);
     }
@@ -146,6 +146,33 @@
         color-mix(in oklab, var(--cy-tabs-indicator, var(--cy-color-accent)) 30%, transparent);
     }
   }
+}
+
+/* A closable tab: the close button sits over the end of the tab's own padding, so the indicator spans both. */
+.cy-tab-slot.cy-tab-slot {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  font-size: inherit;
+  & > .cy-tab {
+    padding-inline-end: calc(var(--cy-control-height-sm) + var(--cy-space-1));
+  }
+  & > .cy-tab-close {
+    display: inline-flex;
+    position: absolute;
+    inset-inline-end: var(--cy-space-1);
+    top: 50%;
+    translate: 0 -50%;
+  }
+}
+@media (hover: hover) {
+  .cy-tab-slot.cy-tab-slot:not(:hover, :focus-within, [data-selected]) > .cy-tab-close {
+    opacity: 0;
+  }
+}
+.cy-tab-list.cy-tab-list[data-reorderable] .cy-tab {
+  user-select: none;
 }
 
 .cy-tab-icon.cy-tab-icon {

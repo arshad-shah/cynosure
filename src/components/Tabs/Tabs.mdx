@@ -54,11 +54,29 @@ When tabs don't fit, the list scrolls sideways (with no visible scrollbar). Edge
 
 <Canvas of={Stories.RemovingTheSelectedTabSelectsTheNextOne} />
 
+## Document tabs
+
+For open files or documents, a Tab with `onClose` gets a close button, and Delete closes the focused tab. A TabList with `onReorder` lets people drag tabs into a new order, or move the focused one with Ctrl+Shift (Cmd+Shift) and the arrows. You hold the list: remove the tab in `onClose` and render the order `onReorder` gives you.
+
+```tsx
+<Tabs value={current} onChange={setCurrent}>
+  <TabList label="Open files" onReorder={setFiles}>
+    {files.map((f) => (
+      <Tab key={f} value={f} onClose={() => closeFile(f)}>
+        {f}
+      </Tab>
+    ))}
+  </TabList>
+</Tabs>
+```
+
+<Canvas of={Stories.ReorderWithTheKeyboard} />
+
 ## Props
 
 <ArgTypes of={Stories} />
 
-`Tab`: `value`, `icon`, `disabled`, `children`. `TabList`: `label`. `TabPanel`: `value`, `keepMounted` (keep the content mounted while hidden, preserving its state; by default only the selected panel renders its content).
+`Tab`: `value`, `icon`, `disabled`, `onClose`, `children`. `TabList`: `label`, `onReorder`. `Tabs` also takes `labels`: `close(name)` and `moved(name, position, total)`. `TabPanel`: `value`, `keepMounted` (keep the content mounted while hidden, preserving its state; by default only the selected panel renders its content).
 
 ## Behaviour and accessibility
 
@@ -68,6 +86,8 @@ When tabs don't fit, the list scrolls sideways (with no visible scrollbar). Edge
 | <kbd>Left</kbd> <kbd>Right</kbd> arrows | Previous / next tab, wrapping, skipping disabled ones (flipped in RTL) |
 | <kbd>Home</kbd> <kbd>End</kbd> | First / last tab |
 | <kbd>Enter</kbd> <kbd>Space</kbd>, click, tap | Select (the only way to select with `activation="manual"`) |
+| <kbd>Delete</kbd> | Close the focused tab (with `onClose`) |
+| <kbd>Ctrl</kbd> or <kbd>Cmd</kbd> + <kbd>Shift</kbd> + Left / Right | Move the focused tab (with `onReorder`); announced |
 
 - **Roles:** `tablist` (named by `label`), `tab` with `aria-selected` and `aria-controls`, and `tabpanel` labelled by its tab.
 - **Hidden panels** stay in the DOM with `hidden`, so `aria-controls` always resolves.
@@ -76,7 +96,7 @@ When tabs don't fit, the list scrolls sideways (with no visible scrollbar). Edge
 
 ## Touch
 
-Each tab has at least a 24px hit area, and 44px on coarse pointers, without changing its visible size. The list scrolls with a swipe.
+Each tab has at least a 24px hit area, and 44px on coarse pointers, without changing its visible size. The list scrolls with a swipe; to drag a reorderable tab, hold it briefly first.
 
 ## Theming
 

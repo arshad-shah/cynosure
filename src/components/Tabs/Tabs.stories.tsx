@@ -259,6 +259,148 @@ export const SelectedTabIsMarkedVisually: Story = {
   },
 };
 
+/** An editor's open files: closable, reorderable document tabs. */
+function OpenFiles({ onClose }: { onClose?: (file: string) => void }) {
+  const [files, setFiles] = useState(["a.ts", "b.ts", "c.ts"]);
+  const [current, setCurrent] = useState("a.ts");
+  return (
+    <Tabs value={current} onChange={setCurrent}>
+      <TabList label="Open files" onReorder={setFiles}>
+        {files.map((f) => (
+          <Tab
+            key={f}
+            value={f}
+            onClose={() => {
+              onClose?.(f);
+              setFiles((all) => all.filter((x) => x !== f));
+            }}
+          >
+            {f}
+          </Tab>
+        ))}
+      </TabList>
+      {files.map((f) => (
+        <TabPanel key={f} value={f}>
+          Editing {f}
+        </TabPanel>
+      ))}
+      <span data-testid="order" hidden>
+        {files.join(",")}
+      </span>
+    </Tabs>
+  );
+}
+const orderOf = (el: Element) => (el.querySelector('[data-testid="order"]') as HTMLElement).textContent;
+const closeButton = (el: Element, name: string) =>
+  el.querySelector(`[aria-label="Close ${name}"]`) as HTMLElement;
+
+export const ClosableTabs: Story = {
+  render: () => {
+    const spy = fn();
+    (window as unknown as { tabsClosed: typeof spy }).tabsClosed = spy;
+    return <OpenFiles onClose={spy} />;
+  },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const closed = (window as unknown as { tabsClosed: ReturnType<typeof fn> }).tabsClosed;
+    const b = canvas.getByRole("tab", { name: "b.ts" });
+    await expect(b).toHaveAttribute("aria-keyshortcuts", "Delete");
+    // The close button is for the pointer: out of the tab order and the accessibility tree; Delete is the keyboard's.
+    await expect(closeButton(canvasElement, "b.ts").closest('[aria-hidden="true"]')).not.toBeNull();
+    await expect(closeButton(canvasElement, "b.ts")).toHaveAttribute("tabindex", "-1");
+    await userEvent.click(closeButton(canvasElement, "b.ts"));
+    await expect(closed).toHaveBeenLastCalledWith("b.ts");
+    await expect(orderOf(canvasElement)).toBe("a.ts,c.ts");
+    await expect(selected(canvas)).toBe("a.ts");
+    // Delete closes the focused tab; the one now in its place is selected and focused.
+    await userEvent.tab();
+    await expect(canvas.getByRole("tab", { name: "a.ts" })).toHaveFocus();
+    await userEvent.keyboard("{Delete}");
+    await expect(orderOf(canvasElement)).toBe("c.ts");
+    await waitFor(() => expect(canvas.getByRole("tab", { name: "c.ts" })).toHaveFocus());
+    await expect(selected(canvas)).toBe("c.ts");
+    await expect(canvas.getByRole("tabpanel")).toHaveTextContent("Editing c.ts");
+    // Tab still goes from the tabs to the panel, past the close button.
+    await userEvent.tab();
+    await expect(canvas.getByRole("tabpanel")).toHaveFocus();
+  },
+};
+
+export const ReorderWithTheKeyboard: Story = {
+  render: () => <OpenFiles />,
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    await userEvent.tab();
+    await userEvent.keyboard("{Control>}{Shift>}{ArrowRight}{/Shift}{/Control}");
+    await expect(orderOf(canvasElement)).toBe("b.ts,a.ts,c.ts");
+    await waitFor(() => expect(canvas.getByRole("tab", { name: "a.ts" })).toHaveFocus());
+    await expect(canvas.getByRole("status")).toHaveTextContent("Moved a.ts to position 2 of 3");
+    // Cmd works as Ctrl does; the ends stop it.
+    await userEvent.keyboard("{Meta>}{Shift>}{ArrowRight}{ArrowRight}{/Shift}{/Meta}");
+    await expect(orderOf(canvasElement)).toBe("b.ts,c.ts,a.ts");
+    await userEvent.keyboard("{Control>}{Shift>}{ArrowLeft}{/Shift}{/Control}");
+    await expect(orderOf(canvasElement)).toBe("b.ts,a.ts,c.ts");
+    // Plain arrows still move between tabs and do not reorder.
+    await userEvent.keyboard("{ArrowRight}");
+    await expect(canvas.getByRole("tab", { name: "c.ts" })).toHaveFocus();
+    await expect(orderOf(canvasElement)).toBe("b.ts,a.ts,c.ts");
+  },
+};
+
+export const DragToReorder: Story = {
+  render: () => <OpenFiles />,
+  play: async ({ canvas, canvasElement }) => {
+    const a = canvas.getByRole("tab", { name: "a.ts" });
+    const from = a.getBoundingClientRect();
+    const last = canvas.getByRole("tab", { name: "c.ts" }).getBoundingClientRect();
+    const init = {
+      bubbles: true,
+      cancelable: true,
+      pointerId: 6,
+      pointerType: "mouse",
+      isPrimary: true,
+      button: 0,
+      buttons: 1,
+    };
+    const y = from.top + from.height / 2;
+    a.dispatchEvent(new PointerEvent("pointerdown", { ...init, clientX: from.left + 6, clientY: y }));
+    for (const x of [from.left + 20, last.left + 10, last.right - 4])
+      a.dispatchEvent(new PointerEvent("pointermove", { ...init, clientX: x, clientY: y }));
+    a.dispatchEvent(
+      new PointerEvent("pointerup", { ...init, buttons: 0, clientX: last.right - 4, clientY: y }),
+    );
+    await waitFor(() => expect(orderOf(canvasElement)).toBe("b.ts,c.ts,a.ts"));
+    await expect(canvas.getByRole("status")).toHaveTextContent("Moved a.ts to position 3 of 3");
+    // A press on a close button closes, it does not start a drag.
+    const close = closeButton(canvasElement, "b.ts");
+    const c = close.getBoundingClientRect();
+    close.dispatchEvent(
+      new PointerEvent("pointerdown", { ...init, clientX: c.left + 2, clientY: c.top + 2 }),
+    );
+    close.dispatchEvent(
+      new PointerEvent("pointermove", { ...init, clientX: c.left + 80, clientY: c.top + 2 }),
+    );
+    close.dispatchEvent(
+      new PointerEvent("pointerup", { ...init, buttons: 0, clientX: c.left + 80, clientY: c.top + 2 }),
+    );
+    await expect(orderOf(canvasElement)).toBe("b.ts,c.ts,a.ts");
+  },
+};
+
+export const CloseLabelsOverride: Story = {
+  render: () => (
+    <Tabs defaultValue="x" labels={{ close: (n) => `Fermer ${n}` }}>
+      <TabList label="Fichiers">
+        <Tab value="x" onClose={() => {}}>
+          <strong>x.ts</strong>
+        </Tab>
+      </TabList>
+    </Tabs>
+  ),
+  play: async ({ canvasElement }) => {
+    // A label that is not plain text falls back to the tab's value.
+    await expect(canvasElement.querySelector('[aria-label="Fermer x"]')).not.toBeNull();
+  },
+};
+
 export const StableUnderHostileHost: Story = {
   play: async ({ canvasElement }) => {
     const props = ["height", "font-size", "padding-left", "border-top-width", "background-color", "color"];
