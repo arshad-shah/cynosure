@@ -325,5 +325,11 @@
     "path": ["dist/components/Steps/Steps.js", "dist/styles/steps.css"],
     "limit": "2.5 kB",
     "gzip": true
+  },
+  {
+    "name": "DescriptionList",
+    "path": ["dist/components/DescriptionList/DescriptionList.js", "dist/styles/description-list.css"],
+    "limit": "1.25 kB",
+    "gzip": true
   }
 ]

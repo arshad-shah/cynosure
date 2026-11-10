@@ -1,0 +1,68 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./DescriptionList.stories";
+
+<Meta of={Stories} />
+
+# DescriptionList
+
+Shows term and detail pairs, such as the facts about a record or a summary of settings. Terms sit beside their details when there is room and above them when the list is narrow.
+
+<Canvas of={Stories.TermsAndDetails} />
+
+## When to use
+
+- **Read-only facts with labels**: a profile, an order, a file's metadata, a review step before submitting.
+
+**Use something else when:**
+- the values can be edited in place: form fields ([TextField](?path=/docs/components-textfield--docs), [Field](?path=/docs/components-field--docs))
+- there are many records with the same fields: a table
+
+## Usage
+
+```tsx
+import { DescriptionList } from "@arshad-shah/cynosure";
+
+<DescriptionList
+  items={[
+    { term: "Name", detail: user.name },
+    { term: "Teams", detail: user.teams },
+  ]}
+/>
+```
+
+A `detail` can be any content, or an array for a term with several values. Give each item an `id` when its `term` is not a string.
+
+<Canvas of={Stories.Divided} />
+
+## Layout
+
+With `layout="auto"` (the default) terms sit beside their details while the list is at least 28rem wide and move above them when it is narrower. It follows the list's own width, so a list in a side panel stacks even on a wide screen. Fix it with `layout="inline"` or `layout="stacked"`.
+
+<Canvas of={Stories.LayoutCanBeFixed} />
+
+Inline terms share one column that grows to the widest term, up to 40% of the list; longer terms wrap.
+
+<Canvas of={Stories.LongTermsWrapWithinTheirColumn} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+- **Semantics:** a native `<dl>` with `<dt>` terms and `<dd>` details, grouped per row.
+- **Contrast:** terms use the muted colour and details the ink colour, both at least 4.5:1 in light and dark modes.
+- **Direction:** the term column is on the right in right-to-left text.
+- **Touch and keyboard:** nothing to press; links or buttons inside details behave as usual.
+
+## Theming
+
+Tokens: `--cy-description-list-term-width`, `--cy-description-list-column-gap` and `--cy-description-list-row-gap`.
+
+```ts
+createTheme({ components: { descriptionList: { termWidth: "12rem" } } });
+```
+
+## Related
+
+[Card](?path=/docs/components-card--docs) · [Badge](?path=/docs/components-badge--docs) · [Grid](?path=/docs/components-grid--docs)

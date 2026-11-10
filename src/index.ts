@@ -32,6 +32,12 @@ export {
   type CommandPaletteTokens,
 } from "./components/CommandPalette/index.js";
 export { CopyButton, type CopyButtonLabels, type CopyButtonProps } from "./components/CopyButton/index.js";
+export {
+  type DescriptionItem,
+  DescriptionList,
+  type DescriptionListProps,
+  type DescriptionListTokens,
+} from "./components/DescriptionList/index.js";
 export { Dialog, type DialogLabels, type DialogProps, type DialogTokens } from "./components/Dialog/index.js";
 export { Disclosure, type DisclosureProps, type DisclosureTokens } from "./components/Disclosure/index.js";
 export { EmptyState, type EmptyStateProps, type EmptyStateTokens } from "./components/EmptyState/index.js";
