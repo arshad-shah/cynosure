@@ -271,8 +271,10 @@ export {
   type TreeTokens,
 } from "./components/Tree/index.js";
 export {
+  moveItems,
   type VirtualItemState,
   VirtualList,
+  type VirtualListLabels,
   type VirtualListProps,
   type VirtualListTokens,
 } from "./components/VirtualList/index.js";

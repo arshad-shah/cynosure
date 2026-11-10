@@ -37,6 +37,23 @@ Rows share one height, set by CSS and measured, so keep each row to a line or a 
 
 <Canvas of={Stories.MultipleSelection} />
 
+## Reordering
+
+Give `onMove` to let people reorder, such as the pages of a document. Alt+Up/Down moves the chosen rows (or the focused row) one place; a mouse or pen drags them, with a line where they will land, scrolling near the edges, and Escape to cancel. Chosen rows move together. `moveItems` applies a move to your items.
+
+```tsx
+<VirtualList
+  label="Pages"
+  items={pages}
+  getKey={(p) => p.id}
+  renderItem={(p) => p.name}
+  selectionMode="multiple"
+  onMove={(keys, to) => setPages(moveItems(pages, keys, to, (p) => p.id))}
+/>
+```
+
+<Canvas of={Stories.AltArrowsMoveTheSelection} />
+
 ## Props
 
 <ArgTypes of={Stories} />
@@ -55,6 +72,7 @@ Rows share one height, set by CSS and measured, so keep each row to a line or a 
 | Enter | `onAction`, or choose |
 | Shift+arrows | Extend the selection (`multiple`) |
 | Ctrl/Cmd+A | Choose all (`multiple`) |
+| Alt+Up / Down | Move the chosen rows (with `onMove`) |
 
 - **Pointer:** a click chooses (toggles with `multiple`); a double-click acts.
 - **Touch:** rows are 44px tall on touch screens; a tap chooses.

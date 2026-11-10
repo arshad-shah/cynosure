@@ -29,6 +29,7 @@ import { VirtualList } from "@arshad-shah/cynosure";
 | `size`                               | `md`     | `sm` · `md`                                                              |
 | `className` / `style`                | –        | Layout only (`style={{ blockSize: … }}` sets the height)                 |
 - Keys: arrows move, Page Up/Down move a screenful, Home and End jump, Space chooses, Enter acts (or chooses). With `multiple`, Shift+arrows extend and Ctrl/Cmd+A chooses all.
+- With `onMove`, Alt+Up/Down moves the selection (or the focused row) one place, and a mouse or pen drags it; a line shows where it will land, the list scrolls near its edges, and Escape cancels. Chosen rows move together and close up. A finger scrolls the list as usual. Moves are announced.
 - The focused row is always rendered, so focus survives scrolling it far out of view; each row carries `aria-posinset` and `aria-setsize`.
 - Row height comes from CSS (the `rowHeight` token, and 44px on touch screens) and is measured, never passed in.
 

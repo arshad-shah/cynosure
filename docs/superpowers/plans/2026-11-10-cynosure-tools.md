@@ -17,7 +17,7 @@
 - [x] **Task 5: CompareSlider.** Before/after divider (arrows 1%, Shift 10%).
 - [x] **Task 6: VirtualList.** Windowed list with ARIA roles and roving focus.
 - [x] **Task 7: Smaller pieces**, without duplicating what exists (Arshad, 2026-11-10). ShortcutHint is not a component: Kbd `keys` takes a shortcut string ("mod+k"), named for the platform and hidden on touch-only screens; Menu and CommandPalette `shortcut` take it too. FloatingPalette and FloatingDock are not components: DockedToolbar gains `edge` (start/end side palette with a detent grip and Alt+arrows) and `floating` (a centred pill; a mode switcher is a SegmentedControl inside it). New: HoverCard (passive preview; shares `src/overlay/floating.ts` with FloatingToolbar), ProgressOverlay (Dialog + ProgressBar + Button), KeyValueEditor (SortableList rows). Done: Kbd shortcuts, HoverCard, ProgressOverlay, DockedToolbar `edge`/`onEdgeChange`/`floating`, KeyValueEditor (file-valued rows left out until a second product needs them).
-- [ ] **Task 8: SortableList grid and multi-select modes** (page rails, file grids). Grid done (`layout="grid"`). Multi-select: waiting on a design decision with Arshad (see PROGRESS).
+- [x] **Task 8: SortableList grid and multi-select modes** (page rails, file grids). Grid: SortableList `layout="grid"`. Multi-select moving went to VirtualList instead (Arshad, 2026-11-10), which already has a virtualised multi-select: `onMove(keys, to)` with Alt+Up/Down and mouse or pen dragging, and `moveItems` to apply it; one selection model in the library.
 - [ ] Later, larger: pan/zoom document viewport, data grid, code editor surface, charts.
 
 Each task ends with the gates, a PROGRESS update, a commit and a push.

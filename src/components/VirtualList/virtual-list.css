@@ -86,3 +86,17 @@
     outline-offset: calc(-1 * var(--cy-border-width));
   }
 }
+/* Reordering: the rows being dragged fade; a line shows where they will land. */
+.cy-virtual-list-row.cy-virtual-list-row[data-moving] {
+  opacity: 0.5;
+}
+.cy-virtual-list-drop.cy-virtual-list-drop {
+  position: absolute;
+  inset-inline: var(--cy-space-2);
+  z-index: 1;
+  block-size: var(--cy-border-focus);
+  margin-block-start: calc(var(--cy-border-focus) / -2);
+  border-radius: var(--cy-border-focus);
+  background: var(--cy-color-accent);
+  pointer-events: none;
+}

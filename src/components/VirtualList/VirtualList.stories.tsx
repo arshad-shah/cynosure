@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 import { expect, fn, waitFor } from "storybook/test";
 import { computeUnderHostileHost } from "../../test/hostile.js";
-import { VirtualList, type VirtualListProps } from "./VirtualList.js";
+import { moveItems, VirtualList, type VirtualListProps } from "./VirtualList.js";
 
 interface Entry {
   id: string;
@@ -249,6 +249,146 @@ export const TouchRows: Story = {
     );
     await userEvent.pointer({ keys: "[TouchA]", target: two });
     await expect(two).toHaveAttribute("aria-selected", "true");
+  },
+};
+
+const PAGES: Entry[] = Array.from({ length: 200 }, (_, i) => ({ id: `p${i + 1}`, name: `Page ${i + 1}` }));
+/** A page rail as the tools app has it: choose pages, then move them together. */
+function Rail() {
+  const [pages, setPages] = useState(PAGES);
+  return (
+    <>
+      <Files
+        label="Pages"
+        items={pages}
+        selectionMode="multiple"
+        onMove={(keys, to) => setPages(moveItems(pages, keys, to, (p) => p.id))}
+      />
+      <output data-testid="order">
+        {pages
+          .slice(0, 6)
+          .map((p) => p.id)
+          .join(",")}
+      </output>
+    </>
+  );
+}
+const order = (canvas: { getByTestId: (id: string) => HTMLElement }) =>
+  canvas.getByTestId("order").textContent;
+const said = (el: HTMLElement) => el.querySelector('[role="status"]')?.textContent;
+
+export const AltArrowsMoveTheSelection: Story = {
+  render: () => <Rail />,
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    await userEvent.click(canvas.getByRole("option", { name: "Page 3" }));
+    await userEvent.click(canvas.getByRole("option", { name: "Page 5" }));
+    // The chosen pages move together, closing up, and the move is announced.
+    await userEvent.keyboard("{Alt>}{ArrowUp}{/Alt}");
+    await expect(order(canvas)).toBe("p1,p3,p5,p2,p4,p6");
+    await expect(said(canvasElement)).toBe("Moved 2 rows to position 2 of 200");
+    await expect(canvas.getByRole("option", { name: "Page 5" })).toHaveFocus();
+    await userEvent.keyboard("{Alt>}{ArrowUp}{ArrowUp}{/Alt}");
+    await expect(order(canvas)).toBe("p3,p5,p1,p2,p4,p6");
+    await userEvent.keyboard("{Alt>}{ArrowDown}{/Alt}");
+    await expect(order(canvas)).toBe("p1,p3,p5,p2,p4,p6");
+    // A row that is not chosen moves alone.
+    canvas.getByRole("option", { name: "Page 4" }).focus();
+    await userEvent.keyboard("{ArrowDown}{Alt>}{ArrowUp}{/Alt}");
+    await expect(order(canvas)).toBe("p1,p3,p5,p2,p6,p4");
+  },
+};
+
+/** Presses on `from`, moves to the gap above `toRow` (or past the end), and releases unless told not to. */
+function dragRows(
+  canvasElement: HTMLElement,
+  from: string,
+  toRow: string,
+  pointerType = "mouse",
+  release = true,
+) {
+  const row = (name: string) =>
+    [...canvasElement.querySelectorAll<HTMLElement>('[role="option"]')].find(
+      (r) => r.textContent === name,
+    ) as HTMLElement;
+  const a = row(from).getBoundingClientRect();
+  const b = row(toRow).getBoundingClientRect();
+  const init = {
+    bubbles: true,
+    cancelable: true,
+    pointerId: 8,
+    pointerType,
+    isPrimary: true,
+    button: 0,
+    buttons: 1,
+  };
+  const x = a.left + 20;
+  row(from).dispatchEvent(
+    new PointerEvent("pointerdown", { ...init, clientX: x, clientY: a.top + a.height / 2 }),
+  );
+  for (const y of [a.top + a.height / 2 + 10, b.top + 2])
+    window.dispatchEvent(new PointerEvent("pointermove", { ...init, clientX: x, clientY: y }));
+  if (release)
+    window.dispatchEvent(
+      new PointerEvent("pointerup", { ...init, buttons: 0, clientX: x, clientY: b.top + 2 }),
+    );
+}
+
+export const DragTheSelection: Story = {
+  render: () => <Rail />,
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    // A row dragged on its own lands in the gap the pointer is over.
+    dragRows(canvasElement, "Page 1", "Page 5");
+    await waitFor(() => expect(order(canvas)).toBe("p2,p3,p4,p1,p5,p6"));
+    // Chosen rows drag together; a line shows where they will land.
+    await userEvent.click(canvas.getByRole("option", { name: "Page 2" }));
+    await userEvent.click(canvas.getByRole("option", { name: "Page 3" }));
+    dragRows(canvasElement, "Page 3", "Page 6", "mouse", false);
+    await waitFor(() => expect(canvasElement.querySelector(".cy-virtual-list-drop")).not.toBeNull());
+    await expect(canvasElement.querySelectorAll("[data-moving]")).toHaveLength(2);
+    window.dispatchEvent(new PointerEvent("pointerup", { bubbles: true, pointerId: 8, isPrimary: true }));
+    await waitFor(() => expect(order(canvas)).toBe("p4,p1,p5,p2,p3,p6"));
+    await expect(canvasElement.querySelector(".cy-virtual-list-drop")).toBeNull();
+  },
+};
+
+export const EscapeCancelsADragAndTouchScrolls: Story = {
+  render: () => <Rail />,
+  play: async ({ canvas, canvasElement }) => {
+    dragRows(canvasElement, "Page 1", "Page 4", "mouse", false);
+    await waitFor(() => expect(canvasElement.querySelector(".cy-virtual-list-drop")).not.toBeNull());
+    window.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true, cancelable: true }));
+    await waitFor(() => expect(canvasElement.querySelector(".cy-virtual-list-drop")).toBeNull());
+    await expect(order(canvas)).toBe("p1,p2,p3,p4,p5,p6");
+    // A finger scrolls the list instead of dragging rows.
+    dragRows(canvasElement, "Page 1", "Page 4", "touch");
+    await new Promise((r) => setTimeout(r, 50));
+    await expect(order(canvas)).toBe("p1,p2,p3,p4,p5,p6");
+  },
+};
+
+export const DraggingNearAnEdgeScrolls: Story = {
+  render: () => <Rail />,
+  play: async ({ canvasElement }) => {
+    const box = list(canvasElement);
+    const first = box.querySelector('[role="option"]') as HTMLElement;
+    const r = first.getBoundingClientRect();
+    const edge = box.getBoundingClientRect().bottom - 4;
+    const init = {
+      bubbles: true,
+      cancelable: true,
+      pointerId: 9,
+      pointerType: "mouse",
+      isPrimary: true,
+      button: 0,
+      buttons: 1,
+    };
+    first.dispatchEvent(
+      new PointerEvent("pointerdown", { ...init, clientX: r.left + 20, clientY: r.top + 5 }),
+    );
+    for (let n = 0; n < 6; n++)
+      window.dispatchEvent(new PointerEvent("pointermove", { ...init, clientX: r.left + 20, clientY: edge }));
+    await waitFor(() => expect(box.scrollTop).toBeGreaterThan(0));
+    window.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true, cancelable: true }));
   },
 };
 

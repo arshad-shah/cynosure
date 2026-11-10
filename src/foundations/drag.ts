@@ -16,7 +16,10 @@ export interface DragOptions {
    * horizontal slider so a vertical swipe still scrolls the page (the browser then cancels the drag).
    */
   touchAction?: "none" | "css";
-  /** Return false to refuse the drag (disabled, a right button). */
+  /**
+   * Return false to refuse the drag (disabled, nothing to drag here). `session.path` is the press's own path; by the
+   * time a drag starts after some travel, `session.event` is a move on the window.
+   */
   onStart?: (session: DragSession) => unknown;
   onMove?: (session: DragSession) => void;
   /** `cancelled` when Escape (or the browser) cancelled it: put things back. */
@@ -45,7 +48,10 @@ export function useDrag(ref: RefObject<HTMLElement | null>, options: DragOptions
       distance,
       delay,
       onStart: (session) => {
-        if (session.event.button > 0) return false;
+        // Only the main button drags (detent checks mice; this covers pens' barrel buttons too). The start event is the
+        // press itself, or a move after some travel, which reports the buttons held instead.
+        const e = session.event;
+        if (e.type === "pointerdown" ? e.button > 0 : e.buttons > 0 && (e.buttons & 1) === 0) return false;
         return latest.current.onStart?.(session) !== false;
       },
       onMove: (session) => latest.current.onMove?.(session),

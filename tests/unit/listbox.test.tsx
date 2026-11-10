@@ -38,3 +38,13 @@ describe("type-ahead", () => {
     vi.useRealTimers();
   });
 });
+
+describe("moving items", () => {
+  it("takes the moved items out and puts them back together", async () => {
+    const { moveItems } = await import("../../src/components/VirtualList/VirtualList");
+    const id = (s: string) => s;
+    expect(moveItems(["a", "b", "c", "d", "e"], ["b", "d"], 0, id)).toEqual(["b", "d", "a", "c", "e"]);
+    expect(moveItems(["a", "b", "c", "d", "e"], ["b", "d"], 3, id)).toEqual(["a", "c", "e", "b", "d"]);
+    expect(moveItems(["a", "b", "c"], ["c"], 1, id)).toEqual(["a", "c", "b"]);
+  });
+});
