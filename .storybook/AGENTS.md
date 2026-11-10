@@ -6,3 +6,4 @@ Storybook 10 (`@storybook/react-vite`) is the workbench and the browser test run
 - `vitest.setup.ts` applies project annotations for tests. `vitest.config.ts` defines the `stories` (3 engines, excludes `touch`) and `touch` (Chromium with touch + mobile, includes `touch`) projects.
 - `manager.ts`: Cynosure branding. Static `brand/` is served at `/brand`.
 - Docs pages live in `src/docs/*.mdx`.
+- `stale-deploy.ts` (loaded by `preview.tsx` and `manager.ts`): after a Pages deploy, an open or cached tab asks for chunks that no longer exist; on `vite:preloadError` the page reloads once (at most every 30s) onto the new deploy.

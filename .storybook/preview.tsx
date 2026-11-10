@@ -4,6 +4,9 @@ import "../src/styles/base.css";
 import { hostileHostCss } from "../src/test/hostile";
 import { CynosureTheme } from "../src/theme";
 import { createTheme, type Scale } from "../src/tokens";
+import { reloadOnStaleDeploy } from "./stale-deploy";
+
+reloadOnStaleDeploy();
 
 // Source CSS (HMR in dev). Default tokens come from the generated stylesheet (pnpm css).
 import.meta.glob(["../src/foundations/**/*.css", "../src/components/**/*.css", "../src/theme/*.css"], {
