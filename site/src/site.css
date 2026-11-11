@@ -37,3 +37,27 @@ body > astro-island {
   color: var(--cy-color-muted);
   font-size: var(--cy-font-size-sm);
 }
+.site-group {
+  margin: 0;
+  font-size: var(--cy-font-size-lg);
+  font-weight: var(--cy-font-weight-bold);
+}
+.site-card-title {
+  display: block;
+  margin-block-end: var(--cy-space-2);
+}
+.site-card-text {
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--cy-color-muted);
+  font-size: var(--cy-font-size-sm);
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+.site-before {
+  margin-block-end: var(--cy-space-6);
+}
+/* Markdown code: Astro's highlighter sets an inline background; Prose's code background should show instead. */
+.site-page pre.astro-code {
+  background-color: var(--cy-prose-code-background, var(--cy-color-soft)) !important;
+}

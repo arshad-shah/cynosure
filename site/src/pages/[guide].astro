@@ -1,0 +1,19 @@
+---
+import { getEntry, render } from "astro:content";
+import { firstParagraph } from "../describe";
+import Doc from "../layouts/Doc.astro";
+import { GUIDES } from "../routes";
+
+export function getStaticPaths() {
+  return GUIDES.map((g) => ({ params: { guide: g.file }, props: { label: g.label } }));
+}
+const { guide } = Astro.params;
+const { label } = Astro.props;
+const entry = await getEntry("guides", guide);
+if (!entry) throw new Error(`docs/${guide}.md was not loaded`);
+const { Content } = await render(entry);
+---
+
+<Doc title={label} description={firstParagraph(entry.body)} current={guide} source={`docs/${guide}.md`}>
+  <Content />
+</Doc>

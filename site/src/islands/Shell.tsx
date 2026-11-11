@@ -1,6 +1,6 @@
 import { AppShell, CynosureTheme, Link, SideNav, ThemeToggle, useColorMode } from "@arshad-shah/cynosure";
 import type { ReactNode } from "react";
-import { NAV } from "../site";
+import { NAV, TABS } from "../site";
 
 /**
  * The frame of every page: Cynosure's AppShell with the site map in a SideNav (a bottom tab bar on phones), and a
@@ -21,7 +21,7 @@ export default function Shell({ current, children }: { current: string; children
           </div>
         }
         nav={<SideNav label="Site" items={NAV} current={current} />}
-        tabs={<SideNav label="Sections" layout="bar" items={NAV} current={current} />}
+        tabs={<SideNav label="Sections" layout="bar" items={TABS} current={current} />}
       >
         <div className="site-page">{children}</div>
       </AppShell>
