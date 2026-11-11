@@ -15,25 +15,45 @@ Plan 9 (`docs/superpowers/plans/2026-11-10-cynosure-migrations.md`, tracked in i
 
 ## Current task
 
-**0.1.0 is published** (2026-11-11, `@arshad-shah/cynosure@0.1.0`, `latest`, with provenance). Now: the documentation site, issue #152.
+**0.1.0 is published** (2026-11-11). Now: the documentation site, issue #152, and the library fixes it turns up. Everything is on `next`, in pull request #158 into `main`.
 
-Milestone 1 of the site is built (`site/`, rules in `site/AGENTS.md`):
-- Astro with Cynosure 0.1.0 from npm, in a pnpm workspace; `minimumReleaseAgeExclude` lets our own packages install the day they publish.
-- The shell is one React island: AppShell, SideNav (a bottom tab bar on phones), ThemeToggle (cycle) with `useColorMode` driving `CynosureTheme target="document"`, and `themeInitScript` in the head.
-- A home page; `pnpm build:site` builds the site, then Storybook into `site/dist/storybook`; a `site` CI job (types and the build) joins the CI gate.
-- Checked in Chromium on desktop (light) and a 390-point phone (dark): no console errors, no sideways scroll.
+**The site was rebuilt as a template (2026-11-11, Arshad's direction).** Astro is gone. `site/` is now a data-driven documentation template built entirely from Cynosure components, to be reused for every product's docs. How it is managed and how it works: `site/README.md`; its rules: `site/AGENTS.md`.
 
-The release took four rounds, each fixed at its cause:
-- #151 brought the rebuild into `main`. It was squash-merged, so `next` was joined to `main`'s history afterwards with a merge that changes no files.
-- #155: a repository-wide `biome check --write` had broken every changeset's front matter. They were repaired, Biome now skips `.changeset`, and a unit test guards it.
-- #156: that test failed once the release had consumed every changeset (its commit runs the git hook). An empty `.changeset` now passes.
-- #157 (the version pull request) published. The run then failed only at pushing the `v0.1.0` tag, which `tools/publish.sh` had not created; the script now tags first.
+- **Engine:** Vite, React and `site/engine/`. `engine/build/scan.ts` reads the repository and infers pages, navigation, props, examples, changelog and search; `engine/app` renders that data with Cynosure; `engine/build/build.ts` writes every page as HTML. Per-product settings are `site/docs.config.ts` and `site/theme.css` only.
+- **Pages (88):** home, Getting started (root README), the guides in `docs/` (inferred; internal notes excluded), a catalogue, one page per component and foundation, and the changelog.
+- **Component pages** come from the hand-written docs pages (`<Name>.mdx`), not the READMEs: they carry the lead, "when to use", behaviour and theming. `<Canvas>` becomes a live canvas (the component's own stories, from source), `<ArgTypes>` the generated props table.
+- **Canvas:** width (desktop, tablet, phone), light or dark, code. The code is written from what the example renders (usage, not story source). Examples that open over the page wait behind a button.
+- **Shell:** AppShell, SideNav (drawer and tab bar on phones), CommandPalette search over pages and headings, ThemeToggle, version badge from the installed package.
+- **Checks:** `check` (types), `links`, and `sweep` (every page in Chromium at 1440 and 390 points: console errors, sideways scroll, second scrollbar, self-opening examples). All clean on 2026-11-11.
+- **Milestone 2** is complete: `docs/accessibility.md` is written and on the site.
+
+**Library fixes found by building the site (in #158, changesets included; the release will be 0.2.0):**
+- AppShell: hidden text (a Table's hidden caption) escaped the scrolling content and gave a second page scrollbar. The content and navigation areas are now positioning parents.
+- SegmentedControl: two controls with the same `name` shared one selection and had clashing ids. Segments are grouped under the control's own name; `name` submits through a hidden field. The small size is 26px tall like other small controls, with a 24px hit area.
+- Tests: the CommandPalette stories press the platform's shortcut and the Prose margin check allows sub-pixel rounding (both failed on macOS only).
 
 ## Next step
 
-1. The documentation site (#152): Milestone 1 (`site/` workspace package on the published package, the AppShell layout, `pnpm build:site` with Storybook, the CI job).
-2. Plan 4 Task 10, the final review.
-3. When detent releases its new options (detent #89 and #90), open a Cynosure issue to update the dependency and drop the workarounds.
+1. **After 0.2.0 publishes:** raise `@arshad-shah/cynosure` in `site/package.json`, delete the stand-in at the end of `site/engine/app/site.css` ("Until Cynosure 0.1.1"), rebuild and sweep.
+2. **Library gaps the site works around (fix in Cynosure, release, then use):**
+   - SideNav does not open the group holding `current` when `current` changes after mount (the site remounts it by key).
+   - EmptyState cannot be an `h1` (the not-found page writes its own heading).
+   - CommandPalette cannot take results from outside (needed for full-text search with Pagefind).
+   - RadioGroup has the same shared-`name` hazard SegmentedControl had.
+   - Candidates to become components: the page header (eyebrow, title, lead), "On this page", and the example canvas.
+3. **Milestone 3, rest:** the theme playground on Home and Theming (ColorField, SegmentedControl, Slider and ThemeToggle driving `createTheme`, with "Copy theme").
+4. **Milestone 4:** the icons gallery and brand marks page, the tokens reference, full-text search.
+5. **Milestone 5, launch:** axe and contrast in light, dark and high contrast; Lighthouse; redirects from the old site's addresses; Open Graph images; CSP headers.
+6. Plan 4 Task 10, the final review. When detent releases its new options (detent #89 and #90), update the dependency.
+
+## Site decisions (2026-11-11, Arshad)
+
+- **A template, not a framework:** copy `site/`, change `docs.config.ts` and `theme.css`.
+- **Inferred, not listed:** navigation and pages come from the files.
+- **Reading layout:** one reading column with "On this page" beside it (chosen over a tabbed workbench).
+- **Public site, private notes:** the migration guide and other working notes stay in the repository (`exclude`).
+- **No Storybook links on the site:** the site has its own live examples. Storybook is still built into `site/dist/storybook` by `pnpm build:site` (Cloudflare's command and CI are unchanged).
+- **One pull request:** the library fixes and the site go to `main` together from `next`.
 
 ## Waiting on Arshad
 
