@@ -46,7 +46,13 @@ async function write(route: string | null, file: string) {
     `<meta property="og:type" content="${page?.kind === "home" ? "website" : "article"}" />`,
     `<meta property="og:site_name" content="${escapeHtml(site.name)}" />`,
     address ? `<meta property="og:url" content="${address}" />` : "",
-    `<meta name="twitter:card" content="summary" />`,
+    site.brand.shareImage ? `<meta property="og:image" content="${site.url}${site.brand.shareImage}" />` : "",
+    `<meta name="twitter:card" content="${site.brand.shareImage ? "summary_large_image" : "summary"}" />`,
+    site.brand.favicon ? `<link rel="icon" href="${site.brand.favicon}" sizes="any" />` : "",
+    site.brand.mark?.endsWith(".svg")
+      ? `<link rel="icon" href="${site.brand.mark}" type="image/svg+xml" />`
+      : "",
+    site.brand.appleTouchIcon ? `<link rel="apple-touch-icon" href="${site.brand.appleTouchIcon}" />` : "",
     init,
   ]
     .filter(Boolean)

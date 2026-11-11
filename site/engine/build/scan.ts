@@ -5,7 +5,7 @@
  */
 import { execFileSync } from "node:child_process";
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
-import { join, relative, resolve } from "node:path";
+import { extname, join, relative, resolve } from "node:path";
 import type { List, RootContent } from "mdast";
 import { toString as textOf } from "mdast-util-to-string";
 import type { DocsConfig } from "../config.ts";
@@ -24,6 +24,8 @@ import { exportedNames, packageDir, propsOf } from "./props.ts";
 
 export interface Scanned {
   site: SiteData;
+  /** Artwork to serve: the address it is served at, and the file it is read from. */
+  assets: Record<string, string>;
   pages: PageData[];
   search: SearchEntry[];
   /** Stories files to load examples from, by key (absolute paths). */
@@ -481,6 +483,23 @@ export async function scan(config: DocsConfig, siteDir: string): Promise<Scanned
     }
   }
 
+  // The product's artwork, served from the site's root under plain names.
+  const assets: Record<string, string> = {};
+  const brand: SiteData["brand"] = {};
+  for (const [key, name] of [
+    ["mark", "logo"],
+    ["favicon", "favicon"],
+    ["appleTouchIcon", "apple-touch-icon"],
+    ["shareImage", "share"],
+  ] as const) {
+    const source = config.brand?.[key];
+    if (!source || !existsSync(join(root, source))) continue;
+    const address = `/${name}${extname(source)}`;
+    assets[address] = join(root, source);
+    brand[key] = address;
+    files.push(join(root, source));
+  }
+
   const commit = commitOf(root);
   const site: SiteData = {
     name: config.name,
@@ -494,6 +513,7 @@ export async function scan(config: DocsConfig, siteDir: string): Promise<Scanned
     ...(config.website ? { website: config.website } : {}),
     npm: `https://www.npmjs.com/package/${config.package}`,
     install: config.install ?? `pnpm add ${config.package}`,
+    brand,
     ...(commit ? { commit } : {}),
     nav,
     pages: pages.map(({ id, route, title, description, kind, section, group, source }) => ({
@@ -508,5 +528,5 @@ export async function scan(config: DocsConfig, siteDir: string): Promise<Scanned
     })),
     tabs: (config.tabs ?? ["home", "start", "components", "changelog"]).filter((id) => byId.has(id)),
   };
-  return { site, pages, search, stories, files: [...new Set(files)] };
+  return { site, assets, pages, search, stories, files: [...new Set(files)] };
 }

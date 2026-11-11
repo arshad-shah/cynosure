@@ -124,6 +124,8 @@ export interface SiteData {
   website?: string;
   npm: string;
   install: string;
+  /** Where the product's artwork is served from, for the files the config names. */
+  brand: { mark?: string; favicon?: string; appleTouchIcon?: string; shareImage?: string };
   /** The commit the site was built from, when git can say. */
   commit?: string;
   nav: NavNode[];

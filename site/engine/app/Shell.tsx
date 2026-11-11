@@ -115,6 +115,8 @@ export function Shell({ children }: { children: ReactNode }) {
             <div className="docs-bar">
               <div className="docs-bar-brand">
                 <Link href="/" tone="neutral" className="docs-brand">
+                  {/* Decorative: the name beside it is the link's text. */}
+                  {site.brand.mark && <img className="docs-logo" src={site.brand.mark} alt="" />}
                   {site.name}
                 </Link>
                 <Badge size="sm" tone="neutral" variant="outline">

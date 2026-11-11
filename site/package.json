@@ -1,11 +1,12 @@
 {
   "name": "@arshad-shah/cynosure-site",
+  "version": "0.0.0",
   "private": true,
   "type": "module",
   "description": "The Cynosure documentation site (cynosure.arshadshah.com): a data-driven docs template built with Cynosure from npm.",
   "scripts": {
-    "dev": "vite",
-    "build": "node engine/build/build.ts",
+    "dev": "pnpm -w css && vite",
+    "build": "pnpm -w css && node engine/build/build.ts",
     "preview": "vite preview --port 4321 --strictPort",
     "check": "tsc --noEmit",
     "links": "node engine/build/check-links.ts",

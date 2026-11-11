@@ -9,11 +9,20 @@
  *
  * In development it re-scans when a source file changes and reloads the page.
  */
+import { readFileSync } from "node:fs";
+import { extname } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { Plugin } from "vite";
 import type { DocsConfig } from "../config.ts";
 import { type Scanned, scan } from "./scan.ts";
 
+const TYPES: Record<string, string> = {
+  ".svg": "image/svg+xml",
+  ".png": "image/png",
+  ".ico": "image/x-icon",
+  ".jpg": "image/jpeg",
+  ".webp": "image/webp",
+};
 const PREFIX = "virtual:docs/";
 const RESOLVED = "\0virtual:docs/";
 
@@ -35,6 +44,21 @@ export function docs(config: DocsConfig, siteDir: string): Plugin {
         dedupe: ["react", "react-dom"],
       },
     }),
+    // The product's artwork: written into the build, and served as it is in development.
+    async generateBundle() {
+      if (this.environment.name !== "client") return;
+      const { assets } = await get();
+      for (const [address, file] of Object.entries(assets))
+        this.emitFile({ type: "asset", fileName: address.slice(1), source: readFileSync(file) });
+    },
+    configureServer(server) {
+      server.middlewares.use(async (request, response, next) => {
+        const file = (await get()).assets[request.url?.split("?")[0] ?? ""];
+        if (!file) return next();
+        response.setHeader("Content-Type", TYPES[extname(file)] ?? "application/octet-stream");
+        response.end(readFileSync(file));
+      });
+    },
     resolveId(id) {
       if (id.startsWith(PREFIX)) return RESOLVED + id.slice(PREFIX.length);
       return undefined;

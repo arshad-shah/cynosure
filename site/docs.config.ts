@@ -25,6 +25,13 @@ export default defineDocs({
   repo: "https://github.com/arshad-shah/cynosure",
   url: "https://cynosure.arshadshah.com",
 
+  brand: {
+    mark: "brand/cynosure-mark.svg",
+    favicon: "brand/favicon.ico",
+    appleTouchIcon: "brand/apple-touch-icon.png",
+    shareImage: "brand/og-image.png",
+  },
+
   docs: "docs",
   // Notes for people working on Cynosure and its products, not for people using it: these stay in the repository.
   exclude: [

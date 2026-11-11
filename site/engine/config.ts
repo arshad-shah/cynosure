@@ -65,6 +65,19 @@ export interface DocsConfig {
   /** Component documentation, for products that have components. */
   components?: ComponentsConfig;
 
+  /**
+   * The product's own artwork, as files relative to the repository root. The mark sits beside the name in the
+   * header and on the home page; the rest go in every page's head (browser tab, home-screen icon, share card).
+   */
+  brand?: {
+    /** A square logo, ideally SVG. */
+    mark?: string;
+    favicon?: string;
+    /** 180 by 180 PNG. */
+    appleTouchIcon?: string;
+    /** 1200 by 630 PNG, shown when a page is shared. */
+    shareImage?: string;
+  };
   /** Navigation labels that should differ from the file name, by page id: `{ adapters: "Build adapters" }`. */
   labels?: Record<string, string>;
   /** Icons for navigation entries, by page id (`start`, `theming`, `components`, `changelog`, a group's name…). */
