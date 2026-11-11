@@ -276,6 +276,7 @@ export async function scan(config: DocsConfig, siteDir: string): Promise<Scanned
     routeOf: (path) => routes.get(path) ?? null,
     blob: `${config.repo}/blob/${branch}`,
     hidden: (path) => hidden.has(path),
+    ...(config.url ? { site: config.url.replace(/\/$/, "") } : {}),
     // A docs page links to its neighbours by their Storybook address; here they are pages.
     storybook: (query) => {
       const [, id = "", rest = ""] = /^\?path=\/docs\/[a-z]+-([a-z0-9]+)--docs(.*)$/.exec(query) ?? [];

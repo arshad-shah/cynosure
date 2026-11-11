@@ -34,6 +34,8 @@ export interface LinkContext {
   blob: string;
   /** True for a repository file the site deliberately leaves out: rows and list items that lead to one are dropped. */
   hidden?: (repoPath: string) => boolean;
+  /** This site's own address, e.g. `https://docs.example.com`: a link to it is a link within the site. */
+  site?: string;
   /** Where a Storybook address (`?path=/docs/components-button--docs`) leads on the site, when it has a page. */
   storybook?: (query: string) => string | null;
 }
@@ -80,6 +82,8 @@ async function tokens(code: string, language: string | null | undefined): Promis
 /** A link written in a repository file, as the site should follow it. */
 export function rewriteLink(url: string, context: LinkContext): string {
   if (url.startsWith("?path=")) return context.storybook?.(url) ?? url;
+  // A full address of this site (a README read on GitHub needs one) is a path here, not another site.
+  if (context.site && url.startsWith(`${context.site}/`)) return url.slice(context.site.length);
   if (/^[a-z][a-z0-9+.-]*:|^\/\/|^#|^\?/i.test(url)) return url;
   if (url.startsWith("/")) return url;
   const [path = "", hash = ""] = url.split("#");
@@ -190,6 +194,10 @@ export async function parseMarkdown(markdown: string, context: LinkContext): Pro
     for (const child of node.children) prune(child);
   };
   for (const node of body) prune(node);
+  // A paragraph that sends the reader to this site ("Documentation: https://…" in a README) says nothing here.
+  const self = (url: string | undefined) =>
+    context.site !== undefined && url !== undefined && url.replace(/\/$/, "") === context.site;
+  body = body.filter((node) => !(node.type === "paragraph" && self(firstLink(node))));
 
   const slugger = new GithubSlugger();
   const toc: TocEntry[] = [];
