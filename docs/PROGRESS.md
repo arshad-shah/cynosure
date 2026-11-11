@@ -25,9 +25,12 @@ Plan 4 Task 10: the final review. Docs, an independent review of Plans 6–9, `p
 
 ## Waiting on Arshad
 
-- **Publishing:** merge `next` into `main` when ready. The release workflow needs an `NPM_TOKEN` repository secret (or npm trusted publishing for the repo) and Actions allowed to create pull requests; it then opens a version pull request, and merging that publishes with provenance. See `docs/release.md`.
-- **CodeMirror theme** (decision 3): not answered. Nothing was added; products keep their own CodeMirror theme reading `--cy-*` tokens.
-- **Old packages:** the `cynosure-*` packages are not deprecated (needs his go-ahead).
+Decided 2026-11-11: publishing is npm trusted publishing with provenance (no stored token; `release.yml` and `tools/publish.sh` switched); the old `@arshad-shah/cynosure-*` packages (react, core, themes, tokens, icons, cli) are to be deprecated once the new package is on npm (commands in `docs/release.md`); a code-editor theme comes from tokens so any editor can be styled; a new documentation site, built with Cynosure itself, hosts Storybook too and replaces GitHub Pages. Order: publish first, then the site.
+
+Still open:
+- **Merging `next` into `main`**, and setting up the trusted publisher on npmjs.com (repository `arshad-shah/cynosure`, workflow `release.yml`).
+- **The first version:** if npm only offers a trusted publisher once the package exists, `0.1.0` needs one publish another way.
+- **The documentation site:** where it is hosted and on which domain.
 
 ## Plans
 
