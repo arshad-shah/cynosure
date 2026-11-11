@@ -50,13 +50,15 @@ Plan 9 (`docs/superpowers/plans/2026-11-10-cynosure-migrations.md`, tracked in i
 
 **Storybook link on the site (2026-11-11).** `links` in `site/docs.config.ts` puts a Storybook button in the header; the engine now also lists `links` in every page's footer, because the header's link buttons are hidden on phones.
 
+**First CI run on #160 (2026-11-11):** two WebKit-only failures, both "popover is not visible". (1) Select `InsideAPopover` (untouched, green on `main`) asserted the popover visible while it was still fading in; it now waits. (2) TimeField `PickFromTheColumns` reopened the picker straight after closing it and it never became visible within a second; the story now waits for the close to finish first. **Unverified suspicion:** a Popover reopened inside its 120 ms fade-out may stay invisible in WebKit. WebKit is not installed on the machine that wrote this, so check it there if it matters.
+
 **Verification of the above (this machine has only Chromium 1243, not the pinned build, and no Firefox or WebKit):** `check`, `lint`, `typecheck`, `test`, `build` and `size` pass; all 793 stories pass in Chromium and the touch project through an untracked local config pointing at the installed browser; the site's `check` and `build` pass. **Not run here:** Firefox, WebKit, `test:react18`, `publint`, `attw`, the site's `links` and `sweep`. Visual tests cannot be trusted here: the untouched TimeField differs from its own committed baseline by 460 pixels in this browser. The new `the-day-track` baselines were made with it, so run the `visual-baselines` workflow before relying on CI's visual job.
 
 ## Next step
 
 0. **TimeField picker, prop descriptions, Storybook link:** open a pull request from `ccr-892a2583-3xxim5`, let CI run Firefox and WebKit, run the `visual-baselines` workflow, and confirm the TimeField size budget.
 
-1. **After 0.2.0 publishes:** raise `@arshad-shah/cynosure` in `site/package.json`, delete the stand-in at the end of `site/engine/app/site.css` ("Until Cynosure 0.1.1"), rebuild and sweep.
+1. **Done (2026-11-11, in #160):** the site installs `@arshad-shah/cynosure` 0.2.0 (its header and footer showed 0.1.0 beside a 0.2.0 changelog) and the "Until Cynosure 0.1.1" stand-in is deleted. After each release, raise the dependency in `site/package.json` again: the site shows the installed version.
 2. **Library gaps the site works around (fix in Cynosure, release, then use):**
    - SideNav does not open the group holding `current` when `current` changes after mount (the site remounts it by key).
    - EmptyState cannot be an `h1` (the not-found page writes its own heading).

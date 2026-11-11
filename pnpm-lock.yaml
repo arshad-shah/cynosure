@@ -109,8 +109,8 @@ importers:
   site:
     dependencies:
       '@arshad-shah/cynosure':
-        specifier: ^0.1.0
-        version: 0.1.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
+        specifier: ^0.2.0
+        version: 0.2.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1)
       react:
         specifier: ^19.3.1
         version: 19.3.1
@@ -182,8 +182,8 @@ packages:
     resolution: {integrity: sha512-cC5FOlYjs2pF76VzzbVoC/WBZpDFkcuQ9DOiu+Xrzd2pRKOQppAVdr+xmcxvSs2Hghw7M9QM8d1+Xahxs9lnfA==}
     engines: {node: '>=22.12.0'}
 
-  '@arshad-shah/cynosure@0.1.0':
-    resolution: {integrity: sha512-sMr97m2uGf1cKbh0SFPo82rvhZeRDyxSqHT6JBXkoRTLIJMqSnEtljRFf1fSCaGsvu/f1jchiaTLKoHjPp3c1A==}
+  '@arshad-shah/cynosure@0.2.0':
+    resolution: {integrity: sha512-3+B8HFTx49LZMQDehJktpCI5/99mllkicgy9ivT3BuViIYO2+BKX7XrsW+IpEbbCd82IojY2EaS3CmMO6Js9AQ==}
     engines: {node: '>=24'}
     peerDependencies:
       react: '>=18 <20'
@@ -2762,7 +2762,7 @@ snapshots:
 
   '@arshad-shah/clif@1.4.0': {}
 
-  '@arshad-shah/cynosure@0.1.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1)':
+  '@arshad-shah/cynosure@0.2.0(react-dom@19.3.1(react@19.3.1))(react@19.3.1)':
     dependencies:
       '@arshad-shah/detent': 0.3.1
       react: 19.3.1

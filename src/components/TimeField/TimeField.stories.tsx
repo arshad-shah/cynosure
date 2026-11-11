@@ -209,6 +209,9 @@ export const PickFromTheColumns: Story = {
     await userEvent.keyboard("{Enter}");
     await waitFor(() => expect(canvas.queryByRole("dialog")).toBeNull());
     await expect(canvas.getByRole("textbox", { name: "Start time" })).toHaveFocus();
+    // Reopen once it has finished closing (it fades out), as a person would.
+    const panel = hours.closest(".cy-popover") as HTMLElement;
+    await waitFor(() => expect(getComputedStyle(panel).display).toBe("none"));
     await openPicker(canvas, userEvent);
     await userEvent.keyboard("{Escape}");
     await waitFor(() => expect(canvas.queryByRole("dialog")).toBeNull());

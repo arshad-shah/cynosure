@@ -179,7 +179,8 @@ export const InsideAPopover: Story = {
     // A press elsewhere in the popover closes only the list; Escape closes the list first, then the popover.
     await userEvent.click(canvas.getByText("Choose a fruit to filter by."));
     await waitFor(() => expect(canvas.queryByRole("listbox")).toBeNull());
-    await expect(popover).toBeVisible();
+    // Waited for: the popover is still fading in when a fast run gets here, and reads as invisible until it has.
+    await waitFor(() => expect(popover).toBeVisible());
     await userEvent.click(canvas.getByRole("combobox", { name: "Fruit" }));
     await canvas.findByRole("listbox");
     await userEvent.keyboard("{Escape}");

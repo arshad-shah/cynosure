@@ -342,12 +342,3 @@ body {
     grid-template-columns: minmax(0, 1fr);
   }
 }
-
-/*
- * Until Cynosure 0.1.1 is installed: AppShell's content area must be the positioning parent of text hidden for
- * screen readers, or that text stretches the page into a second scrollbar. 0.1.1 does this itself; delete this rule
- * when the dependency is raised.
- */
-.docs-shell main {
-  position: relative;
-}
