@@ -1,5 +1,15 @@
 # @arshad-shah/cynosure
 
+## 0.2.0
+
+### Minor Changes
+
+- 98117b8: SegmentedControl: two controls given the same `name` no longer share one selection. The segments are grouped under a name of the control's own (with ids of its own), and `name` submits the value through a hidden field, so choosing in one control never clears another and a label never points at another control's segment. A form's reset still restores the default. The small size is now exactly as tall as other small controls (26px, was 28px); its segments keep a 24px hit area. In dark mode the active segment is now a visible pill: it used the raised surface, which on dark is as dark as the track, so only the text colour showed which segment was active.
+
+### Patch Changes
+
+- 98117b8: AppShell: text hidden for screen readers (a Table's hidden caption, Kbd and Calendar labels) inside the content or the navigation now scrolls with that area. Before, it escaped the scrolling area and stretched the shell's container, so a full-height shell showed a second, page-level scrollbar beside the content's own.
+
 ## 0.1.0
 
 ### Minor Changes
