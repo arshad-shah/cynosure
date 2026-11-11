@@ -67,7 +67,7 @@ export interface DocsConfig {
 
   /**
    * The product's own artwork, as files relative to the repository root. The mark sits beside the name in the
-   * header and on the home page; the rest go in every page's head (browser tab, home-screen icon, share card).
+   * header; the rest go in every page's head (browser tab, home-screen icon, share card).
    */
   brand?: {
     /** A square logo, ideally SVG. */

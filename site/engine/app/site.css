@@ -49,10 +49,6 @@ body {
   inline-size: var(--cy-space-8);
   block-size: var(--cy-space-8);
 }
-.docs-hero-logo {
-  inline-size: calc(var(--cy-space-10) * 1.6);
-  block-size: calc(var(--cy-space-10) * 1.6);
-}
 .docs-search-narrow.docs-search-narrow {
   display: none;
 }

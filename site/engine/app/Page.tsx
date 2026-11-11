@@ -354,7 +354,6 @@ function Home({ page }: { page: PageData }) {
     <div className="docs-page" data-wide>
       <article className="docs-article docs-home">
         <header className="docs-hero">
-          {site.brand.mark && <img className="docs-hero-logo" src={site.brand.mark} alt="" />}
           <Inline gap="3" align="center" wrap>
             <Badge tone="accent" dot>
               v{site.version}
