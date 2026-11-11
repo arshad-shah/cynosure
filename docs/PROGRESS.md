@@ -15,23 +15,27 @@ Plan 9 (`docs/superpowers/plans/2026-11-10-cynosure-migrations.md`, tracked in i
 
 ## Current task
 
-Releasing 0.1.0. `next` is merged into `main` through pull request #151 (a merge commit with `next`'s files and both histories as parents, because the two branches share no history; `main` only accepts pull requests). Once it is merged, the release workflow opens the version pull request; merging that publishes 0.1.0 with the one-run `NPM_TOKEN` (already added by Arshad). Then: delete the token, add the trusted publisher on npmjs.com.
+**0.1.0 is published** (2026-11-11, `@arshad-shah/cynosure@0.1.0`, `latest`, with provenance). Now: the documentation site, issue #152, Milestone 1.
+
+The release took four rounds, each fixed at its cause:
+- #151 brought the rebuild into `main`. It was squash-merged, so `next` was joined to `main`'s history afterwards with a merge that changes no files.
+- #155: a repository-wide `biome check --write` had broken every changeset's front matter. They were repaired, Biome now skips `.changeset`, and a unit test guards it.
+- #156: that test failed once the release had consumed every changeset (its commit runs the git hook). An empty `.changeset` now passes.
+- #157 (the version pull request) published. The run then failed only at pushing the `v0.1.0` tag, which `tools/publish.sh` had not created; the script now tags first.
 
 ## Next step
 
-1. Watch #151 and the version pull request through to 0.1.0 on npm.
-2. The documentation site, issue #152 (Astro with Cynosure islands in `site/`, examples from the stories through `composeStories`, Pagefind in a CommandPalette, the same `pnpm build:site` command and `site/dist` output Cloudflare already uses).
-3. Plan 4 Task 10, the final review.
-4. When detent releases its new options (detent #89 and #90), open a Cynosure issue to update the dependency and drop the workarounds.
+1. The documentation site (#152): Milestone 1 (`site/` workspace package on the published package, the AppShell layout, `pnpm build:site` with Storybook, the CI job).
+2. Plan 4 Task 10, the final review.
+3. When detent releases its new options (detent #89 and #90), open a Cynosure issue to update the dependency and drop the workarounds.
 
 ## Waiting on Arshad
 
-Done by Arshad (2026-11-11): Cloudflare Pages builds `main` with `pnpm install --frozen-lockfile && pnpm build:site` into `site/dist` (previews per branch at `<branch>.cynosure.pages.dev`); Actions may create pull requests; the `NPM_TOKEN` secret is added for the first publish; the six old `@arshad-shah/cynosure-*` packages are deprecated (with npm's default message, which does not name the new package: once 0.1.0 is out, `npm deprecate` with "Replaced by @arshad-shah/cynosure" would point people to it).
-
-Still open:
-- Merge #151, then the version pull request.
-- After 0.1.0: delete the npm token and add the trusted publisher (repository `arshad-shah/cynosure`, workflow `release.yml`).
-- Turn GitHub Pages off in the settings once the new site (#152) is live.
+- **After 0.1.0:** delete the `NPM_TOKEN` secret and revoke the token on npmjs.com, then add the trusted publisher for `@arshad-shah/cynosure` (GitHub Actions, repository `arshad-shah/cynosure`, workflow `release.yml`). Later versions publish through OIDC alone.
+- **Tag and GitHub release for 0.1.0:** run 52 published but could not push `v0.1.0`. Create the tag and release on `main`'s commit `f7b66c1` ("chore(release): version packages (#157)"). This session's credentials cannot push tags.
+- **Branches:** `main` deletes merged head branches, which removed `next` twice. `next` is recreated each time; turning off "Automatically delete head branches" (or protecting `next`) would stop it.
+- **Deprecation message:** the six old packages carry npm's default message; `npm deprecate "@arshad-shah/cynosure-<name>" "Replaced by @arshad-shah/cynosure"` would point people to the new one.
+- **GitHub Pages:** turn it off once the new site (#152) is live.
 
 ## Plans
 
