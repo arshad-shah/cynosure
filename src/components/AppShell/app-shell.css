@@ -93,6 +93,9 @@
 }
 .cy-app-shell-nav.cy-app-shell-nav {
   grid-area: nav;
+  /* Positioned, so absolutely placed descendants (text hidden for screen readers) scroll with it instead of
+     stretching the shell's container into a second scrollbar. */
+  position: relative;
   min-block-size: 0;
   overflow-y: auto;
   border-inline-end: var(--cy-border-width) solid var(--_line);
@@ -102,6 +105,7 @@
 }
 .cy-app-shell-main.cy-app-shell-main {
   grid-area: main;
+  position: relative;
   display: block;
   min-inline-size: 0;
   min-block-size: 0;
