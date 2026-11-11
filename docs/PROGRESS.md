@@ -30,7 +30,14 @@ Plan 9 (`docs/superpowers/plans/2026-11-10-cynosure-migrations.md`, tracked in i
 **Library fixes found by building the site (in #158, changesets included; the release will be 0.2.0):**
 - AppShell: hidden text (a Table's hidden caption) escaped the scrolling content and gave a second page scrollbar. The content and navigation areas are now positioning parents.
 - SegmentedControl: two controls with the same `name` shared one selection and had clashing ids. Segments are grouped under the control's own name; `name` submits through a hidden field. The small size is 26px tall like other small controls, with a 24px hit area.
+- SegmentedControl in dark mode: the active segment's pill was as dark as the track (contrast 1.04), so only the text colour showed the choice. The pill is now the track lifted towards the ink on dark.
 - Tests: the CommandPalette stories press the platform's shortcut and the Prose margin check allows sub-pixel rounding (both failed on macOS only).
+
+**Release tooling, fixed before it could bite (2026-11-11):** with `site/` in the workspace, Changesets could not find the library, the version step would have raised the site's dependency to an unpublished version, and the action would have pushed a tag nothing creates. Now: the root is in the workspace, `pnpm version-packages` restores `site/package.json`, and `tools/publish.sh` tags `v<version>` and makes the GitHub release (see `docs/release.md`). The version step was run in a throwaway copy: it produces 0.2.0, the changelog entry and nothing else. The publish step itself can only be proven by the real release.
+
+**GitHub releases:** `v0.1.0` is tagged on `f7b66c1` with its changelog as notes, and is the only release. The eleven releases and tags of the retired packages were removed (listed in `docs/release.md`).
+
+**Site:** the logo, favicon, home-screen icon and share image come from `brand/` through `brand` in `docs.config.ts`. `pnpm build:site` now generates the stylesheet module the stories need (a fresh checkout failed without it, which is what failed CI on the first push).
 
 ## Next step
 
@@ -58,7 +65,6 @@ Plan 9 (`docs/superpowers/plans/2026-11-10-cynosure-migrations.md`, tracked in i
 ## Waiting on Arshad
 
 - **After 0.1.0:** delete the `NPM_TOKEN` secret and revoke the token on npmjs.com, then add the trusted publisher for `@arshad-shah/cynosure` (GitHub Actions, repository `arshad-shah/cynosure`, workflow `release.yml`). Later versions publish through OIDC alone.
-- **Tag and GitHub release for 0.1.0:** run 52 published but could not push `v0.1.0`. Create the tag and release on `main`'s commit `f7b66c1` ("chore(release): version packages (#157)"). This session's credentials cannot push tags.
 - **Branches:** `main` deletes merged head branches, which removed `next` twice. `next` is recreated each time; turning off "Automatically delete head branches" (or protecting `next`) would stop it.
 - **Deprecation message:** the six old packages carry npm's default message; `npm deprecate "@arshad-shah/cynosure-<name>" "Replaced by @arshad-shah/cynosure"` would point people to the new one.
 - **GitHub Pages:** turn it off once the new site (#152) is live.
