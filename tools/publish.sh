@@ -10,5 +10,8 @@ if npm view "$name@$version" version >/dev/null 2>&1; then
   exit 0
 fi
 npm publish --access public --provenance
-# Changesets reads this line to tag the release on GitHub.
+# Changesets reads the "New tag" line, then pushes v<version> and makes the GitHub release from it; the tag has to exist
+# locally first (its own publish command creates it, this script replaces that command). Run 52 published 0.1.0 and then
+# failed at exactly this push.
+git tag "v$version"
 echo "New tag: $name@$version"
