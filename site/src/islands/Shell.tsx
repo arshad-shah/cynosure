@@ -1,4 +1,4 @@
-import { AppShell, CynosureTheme, SideNav, ThemeToggle, useColorMode } from "@arshad-shah/cynosure";
+import { AppShell, CynosureTheme, Link, SideNav, ThemeToggle, useColorMode } from "@arshad-shah/cynosure";
 import type { ReactNode } from "react";
 import { NAV } from "../site";
 
@@ -14,9 +14,9 @@ export default function Shell({ current, children }: { current: string; children
       <AppShell
         header={
           <div className="site-bar">
-            <a className="site-brand" href="/">
+            <Link href="/" tone="neutral" className="site-brand">
               Cynosure
-            </a>
+            </Link>
             <ThemeToggle variant="cycle" value={mode} onChange={setMode} />
           </div>
         }

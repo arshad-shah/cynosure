@@ -57,6 +57,8 @@ jobs:
         run: pnpm build:site
       - name: The build holds the site and Storybook
         run: test -f site/dist/index.html && test -f site/dist/storybook/index.html
+      - name: Every internal link resolves
+        run: pnpm --filter @arshad-shah/cynosure-site links
 
   # The one required status check on main's branch rules. It fans in to every job, so the rules never need touching
   # when jobs are added or renamed (a renamed job would otherwise make protection pass silently, or wait forever).

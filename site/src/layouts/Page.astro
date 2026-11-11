@@ -1,6 +1,7 @@
 ---
 import "@arshad-shah/cynosure/styles.css";
 import { themeInitScript } from "@arshad-shah/cynosure/tokens";
+import Footer from "../components/Footer";
 import Shell from "../islands/Shell";
 import "../site.css";
 
@@ -9,8 +10,10 @@ interface Props {
   description: string;
   /** The SideNav item this page belongs to. */
   current: string;
+  /** The file the page is made from, for "Edit this page" (repository path). */
+  source: string;
 }
-const { title, description, current } = Astro.props;
+const { title, description, current, source } = Astro.props;
 const fullTitle = title === "Cynosure" ? title : `${title} · Cynosure`;
 ---
 
@@ -28,6 +31,7 @@ const fullTitle = title === "Cynosure" ? title : `${title} · Cynosure`;
   <body>
     <Shell client:load current={current}>
       <slot />
+      <Footer source={source} />
     </Shell>
   </body>
 </html>
