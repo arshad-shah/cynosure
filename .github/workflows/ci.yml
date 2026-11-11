@@ -40,3 +40,25 @@ jobs:
           name: visual-diffs
           path: "**/__screenshots__/**"
           if-no-files-found: ignore
+  # The one required status check on main's branch rules. It fans in to every job, so the rules never need touching
+  # when jobs are added or renamed (a renamed job would otherwise make protection pass silently, or wait forever).
+  gate:
+    name: CI gate
+    needs: [verify]
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require every job green
+        env:
+          RESULTS: ${{ toJSON(needs) }}
+        run: |
+          set -euo pipefail
+          echo "$RESULTS" | python3 -c "
+          import json, sys
+          needs = json.load(sys.stdin)
+          bad = [name for name, meta in needs.items() if meta.get('result') not in ('success', 'skipped')]
+          if bad:
+              print(f'::error::Jobs not green: {bad}')
+              sys.exit(1)
+          print('Every job passed.')
+          "
