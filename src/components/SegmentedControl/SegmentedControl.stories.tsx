@@ -1,7 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect, fn } from "storybook/test";
+import { expect, fn, waitFor, within } from "storybook/test";
 import { code, moon, sun, tree } from "../../icons/index.js";
 import { computeUnderHostileHost } from "../../test/hostile.js";
+import { Button } from "../Button/Button.js";
 import { SegmentedControl } from "./SegmentedControl.js";
 
 const meta = {
@@ -82,8 +83,71 @@ export const IndicatorFollowsSelectionAndResets: Story = {
     await userEvent.click(canvas.getByText("Raw"));
     await expect(bg("Raw")).not.toBe(bg("Tree"));
     (canvas.getByTestId("form") as HTMLFormElement).reset();
-    await expect(canvas.getByRole("radio", { name: "Tree" })).toBeChecked();
+    await waitFor(() => expect(canvas.getByRole("radio", { name: "Tree" })).toBeChecked());
     await expect(canvasElement.querySelectorAll(".cy-segment")).toHaveLength(3);
+  },
+};
+
+export const SameNameTwiceKeepsEachSelection: Story = {
+  render: (args) => (
+    <div style={{ display: "grid", gap: 12, justifyItems: "start" }}>
+      <SegmentedControl {...args} label="First view" defaultValue="tree" />
+      <SegmentedControl {...args} label="Second view" defaultValue="raw" />
+    </div>
+  ),
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    // Two controls given the same `name` (two rows of a list, two panels) are still two groups: each keeps its
+    // own selection, and a click in one never moves the other.
+    const first = within(canvas.getByRole("radiogroup", { name: "First view" }));
+    const second = within(canvas.getByRole("radiogroup", { name: "Second view" }));
+    await expect(first.getByRole("radio", { name: "Tree" })).toBeChecked();
+    await expect(second.getByRole("radio", { name: "Raw" })).toBeChecked();
+    await userEvent.click(second.getByText("Tree"));
+    await expect(second.getByRole("radio", { name: "Tree" })).toBeChecked();
+    await expect(first.getByRole("radio", { name: "Tree" })).toBeChecked();
+    await userEvent.click(first.getByText("Raw"));
+    await expect(first.getByRole("radio", { name: "Raw" })).toBeChecked();
+    await expect(second.getByRole("radio", { name: "Tree" })).toBeChecked();
+    const ids = [...canvasElement.querySelectorAll("input[type=radio]")].map((input) => input.id);
+    await expect(new Set(ids).size).toBe(ids.length);
+  },
+};
+
+export const NameSubmitsTheValueWithItsForm: Story = {
+  render: (args) => (
+    <form data-testid="form">
+      <SegmentedControl {...args} />
+    </form>
+  ),
+  play: async ({ canvas, userEvent }) => {
+    const form = canvas.getByTestId("form") as HTMLFormElement;
+    const sent = () => new FormData(form).getAll("view");
+    await expect(sent()).toEqual(["tree"]);
+    // Only the given name is submitted, not the control's own grouping.
+    await expect([...new FormData(form).keys()]).toEqual(["view"]);
+    await userEvent.click(canvas.getByText("Raw"));
+    await expect(sent()).toEqual(["raw"]);
+    form.reset();
+    await waitFor(() => expect(sent()).toEqual(["tree"]));
+  },
+};
+
+export const SmallLinesUpWithOtherSmallControls: Story = {
+  args: { size: "sm" },
+  render: (args) => (
+    <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+      <SegmentedControl {...args} />
+      <Button size="sm">Beside it</Button>
+    </div>
+  ),
+  play: async ({ canvas, canvasElement }) => {
+    // A small control is as tall as every other small control, so a row of them lines up.
+    const group = canvas.getByRole("radiogroup", { name: "View" });
+    const button = canvas.getByRole("button", { name: "Beside it" });
+    await expect(group.getBoundingClientRect().height).toBe(button.getBoundingClientRect().height);
+    // The segment looks smaller than 24px there, so its hit area reaches past it.
+    const segment = canvasElement.querySelector(".cy-segment") as Element;
+    await expect(Number.parseFloat(getComputedStyle(segment, "::before").height)).toBeGreaterThanOrEqual(24);
   },
 };
 

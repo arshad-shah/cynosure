@@ -17,7 +17,7 @@
   justify-content: center;
   gap: var(--cy-space-2);
   flex: 1 0 auto;
-  min-block-size: max(calc(var(--_h) - var(--_pad) * 2), var(--_hit));
+  min-block-size: calc(var(--_h) - var(--_pad) * 2);
   margin: 0;
   padding: 0 var(--cy-space-5);
   font-size: inherit;
@@ -34,6 +34,15 @@
     background-color var(--cy-motion-fast) var(--cy-motion-ease),
     color var(--cy-motion-fast) var(--cy-motion-ease),
     box-shadow var(--cy-motion-fast) var(--cy-motion-ease);
+  /* Invisible hit area: a small segment looks smaller than --cy-hit-min, and is still that easy to press. */
+  &::before {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    top: 50%;
+    translate: 0 -50%;
+    block-size: max(100%, var(--_hit));
+  }
   &:hover:not([data-disabled]) {
     color: var(--cy-color-ink);
   }
@@ -104,8 +113,10 @@
   }
 }
 
+/* On touch screens the segments themselves grow to the coarse hit size. */
 @media (pointer: coarse) {
   .cy-segmented .cy-segment {
     --_hit: var(--cy-hit-coarse, 44px);
+    min-block-size: max(calc(var(--_h) - var(--_pad) * 2), var(--_hit));
   }
 }
