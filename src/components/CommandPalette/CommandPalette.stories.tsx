@@ -2,12 +2,16 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useEffect, useRef } from "react";
 import { createRoot } from "react-dom/client";
 import { expect, fn, waitFor } from "storybook/test";
+import { isApple } from "../../foundations/hotkey.js";
 import { copy, download, edit, eye, file } from "../../icons/index.js";
 import { createStyleSheet } from "../../styles/inline.js";
 import { computeUnderHostileHost } from "../../test/hostile.js";
 import { shownFully } from "../../test/settle.js";
 import { Button } from "../Button/Button.js";
 import { type Command, CommandPalette } from "./CommandPalette.js";
+
+/** The palette's shortcut as the platform running the test has it: Command+K on Apple platforms, Ctrl+K elsewhere. */
+const MOD_K = isApple() ? "{Meta>}k{/Meta}" : "{Control>}k{/Control}";
 
 const commands: Command[] = [
   { id: "new", label: "New file", group: "File", icon: file, shortcut: ["Ctrl", "N"] },
@@ -55,7 +59,7 @@ export const ShortcutOpensSearchRunsAndReturnsFocus: Story = {
     const before = canvas.getByRole("button", { name: "Somewhere on the page" });
     before.focus();
     // Ctrl+K (Command+K on Apple platforms) opens it from anywhere.
-    await userEvent.keyboard("{Control>}k{/Control}");
+    await userEvent.keyboard(MOD_K);
     const el = palette();
     await waitFor(() => expect(el.open).toBe(true));
     await shownFully(el);
@@ -99,10 +103,10 @@ export const KeywordsGroupsAndWrappingArrows: Story = {
 
 export const RecentCommandsComeFirst: Story = {
   play: async ({ canvas, userEvent }) => {
-    await userEvent.keyboard("{Control>}k{/Control}");
+    await userEvent.keyboard(MOD_K);
     await userEvent.keyboard("rename{Enter}");
     await settledClosed(palette());
-    await userEvent.keyboard("{Control>}k{/Control}");
+    await userEvent.keyboard(MOD_K);
     await waitFor(() => expect(palette().open).toBe(true));
     const recent = canvas.getByRole("group", { name: "Recent" });
     await expect(recent).toHaveTextContent("Rename");
@@ -128,28 +132,28 @@ export const NothingFound: Story = {
 
 export const EscapeBackdropAndShortcutClose: Story = {
   play: async ({ args, canvas, userEvent }) => {
-    await userEvent.keyboard("{Control>}k{/Control}");
+    await userEvent.keyboard(MOD_K);
     const el = palette();
     await waitFor(() => expect(el.open).toBe(true));
     await userEvent.keyboard("{Escape}");
     await settledClosed(el);
     await expect(args.onOpenChange).toHaveBeenLastCalledWith(false);
-    await userEvent.keyboard("{Control>}k{/Control}");
+    await userEvent.keyboard(MOD_K);
     await waitFor(() => expect(el.open).toBe(true));
     await userEvent.click(el);
     await settledClosed(el);
     // The shortcut toggles it closed, even from its own search field.
-    await userEvent.keyboard("{Control>}k{/Control}");
+    await userEvent.keyboard(MOD_K);
     await waitFor(() => expect(el.open).toBe(true));
     await waitFor(() => expect(canvas.getByRole("combobox")).toHaveFocus());
-    await userEvent.keyboard("{Control>}k{/Control}");
+    await userEvent.keyboard(MOD_K);
     await settledClosed(el);
     // A click on a command runs it.
-    await userEvent.keyboard("{Control>}k{/Control}");
+    await userEvent.keyboard(MOD_K);
     await userEvent.click(await canvas.findByRole("option", { name: /Copy path/ }));
     await expect(args.onRun).toHaveBeenCalledWith("copy-path");
     // Disabled commands do nothing.
-    await userEvent.keyboard("{Control>}k{/Control}");
+    await userEvent.keyboard(MOD_K);
     await userEvent.click(await canvas.findByRole("option", { name: /Export as PDF/ }));
     await expect(args.onRun).toHaveBeenCalledTimes(1);
   },
@@ -164,7 +168,7 @@ export const ShortcutCanBeChangedOrOff: Story = {
     </>
   ),
   play: async ({ canvas, userEvent }) => {
-    await userEvent.keyboard("{Control>}k{/Control}");
+    await userEvent.keyboard(MOD_K);
     await new Promise((r) => setTimeout(r, 100));
     await expect(canvas.queryByRole("dialog")).toBeNull();
     await userEvent.keyboard("{Shift>}?{/Shift}");
@@ -198,7 +202,7 @@ export const WorksInsideAShadowRoot: Story = {
     await waitFor(() => expect(host.shadowRoot?.querySelector("button")).toBeTruthy());
     const root = host.shadowRoot as ShadowRoot;
     (root.querySelector("button") as HTMLElement).focus();
-    await userEvent.keyboard("{Control>}k{/Control}");
+    await userEvent.keyboard(MOD_K);
     const el = palette(root);
     await waitFor(() => expect(el.open).toBe(true));
     const input = root.querySelector("input") as HTMLInputElement;
