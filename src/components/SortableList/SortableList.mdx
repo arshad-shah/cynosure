@@ -1,0 +1,69 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./SortableList.stories";
+
+<Meta of={Stories} />
+
+# SortableList
+
+A list people put in order, by dragging a row's handle or with the keyboard.
+
+<Canvas of={Stories.ARowPerItemWithAHandle} />
+
+## When to use
+
+- **Ordering a short list**: sidebar sections, favourites, steps, priorities.
+
+**Use something else when:**
+- the order comes from data (date, name): sort it, and let people pick the sort
+- the list is long: offer "Move to top" or position fields as well; dragging far is hard for everyone
+
+## Usage
+
+```tsx
+import { SortableList } from "@arshad-shah/cynosure";
+
+<SortableList label="Sidebar order" items={sections} onReorder={setSections} />
+```
+
+Each item has an `id`, a plain-text `label` (used in announcements and the handle's name) and optional `content` to show instead.
+
+## Keyboard
+
+Focus a handle, press Space (or Enter) to pick the row up, move it with the arrow keys, and press Space again to drop it. Escape puts it back.
+
+<Canvas of={Stories.KeyboardPicksUpMovesAndDrops} />
+
+## Grids
+
+`layout="grid"` wraps the items into as many columns as fit (`--cy-sortable-list-tile-min` sets the smallest tile), for file grids and page thumbnails. Dragging works across rows; with the keyboard, Left and Right move a tile one place (following the reading direction) and Up and Down move it a whole row.
+
+<Canvas of={Stories.AGridOfTiles} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+- **Handles:** each row's handle is a button named "Move …" and described by the instructions. While its row is moving it is `aria-pressed`.
+- **Keyboard:**
+
+| Key                 | Action                                          |
+| ------------------- | ----------------------------------------------- |
+| Space / Enter       | Pick up the row; again to drop it              |
+| Arrow Up / Down     | Move the row one place                          |
+| Home / End          | Move the row to the top / bottom               |
+| Escape              | Cancel: the row goes back where it was         |
+| Tab                 | Drop the row where it is and move on           |
+
+- **Announcements:** "Docs picked up. Position 2 of 4.", "moved to position 3 of 4", "dropped at…" and "Move cancelled…" are announced politely (all in `labels`).
+- **Pointer and touch:** drag a handle; the other rows slide out of the way (detent, animated unless motion is reduced) and a long list scrolls near its edges. Touch dragging does not scroll the page; handles have a 44px hit area on touch screens.
+- **Changes:** `onReorder` is called once, on drop, and only if the order changed.
+
+## Theming
+
+Tokens: `--cy-sortable-list-item-background` and `--cy-sortable-list-radius`.
+
+## Related
+
+[Tree](?path=/docs/components-tree--docs) · [Steps](?path=/docs/components-steps--docs)

@@ -6,10 +6,10 @@ While Cynosure is pre-v1.0.0, only the `main` branch receives fixes. Post-v1.0.0
 the latest major receives full support and the previous major receives
 security fixes for six months.
 
-| Version   | Supported |
-| --------- | --------- |
-| `0.x`     | main only |
-| `1.x`     | planned   |
+| Version | Supported |
+| ------- | --------- |
+| `0.x`   | main only |
+| `1.x`   | planned   |
 
 ## Reporting a vulnerability
 

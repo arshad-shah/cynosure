@@ -1,9 +1,0 @@
-{
-  "name": "@arshad-shah/cynosure-react/data-table",
-  "private": true,
-  "type": "module",
-  "main": "../dist/data-table.js",
-  "module": "../dist/data-table.js",
-  "types": "../dist/data-table.d.ts",
-  "sideEffects": ["*.css"]
-}

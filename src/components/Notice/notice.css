@@ -1,0 +1,112 @@
+/* notice: tinted panel in the tone; the root is the size container so the action drops under the text when narrow. */
+.cy-notice.cy-notice {
+  --_tone: var(--cy-color-info);
+  --_text: var(--cy-color-info-text);
+  box-sizing: border-box !important;
+  container: cy-notice / inline-size;
+  margin: 0;
+  padding: var(--cy-notice-padding, var(--cy-space-6));
+  border: var(--cy-border-width) solid color-mix(in oklab, var(--_tone) 45%, var(--cy-color-line));
+  border-inline-start: calc(3 * var(--cy-border-width)) solid var(--_tone);
+  border-radius: var(--cy-notice-radius, var(--cy-radius-card));
+  background: color-mix(in oklab, var(--_tone) var(--cy-notice-soft-mix, 12%), var(--cy-color-surface));
+  color: var(--cy-color-ink);
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-font-size-md);
+  font-weight: var(--cy-font-weight-regular);
+  line-height: var(--cy-font-line-height);
+  letter-spacing: normal;
+  text-align: start;
+  text-transform: none;
+  &[data-tone="accent"] {
+    --_tone: var(--cy-color-accent);
+    --_text: var(--cy-color-accent-text);
+  }
+  &[data-tone="neutral"] {
+    --_tone: var(--cy-color-muted);
+    --_text: var(--cy-color-ink);
+  }
+  &[data-tone="success"] {
+    --_tone: var(--cy-color-success);
+    --_text: var(--cy-color-success-text);
+  }
+  &[data-tone="warning"] {
+    --_tone: var(--cy-color-warning);
+    --_text: var(--cy-color-warning-text);
+  }
+  &[data-tone="danger"] {
+    --_tone: var(--cy-color-danger);
+    --_text: var(--cy-color-danger-text);
+  }
+}
+/*
+ * Grid, not wrapping flex: the icon, the text and the close button always share the first row; the action sits after
+ * the text, and moves under it (aligned with the text, not the icon) when the Notice is narrow.
+ */
+.cy-notice-main.cy-notice-main {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  grid-template-areas: "icon text action close";
+  align-items: start;
+  column-gap: var(--cy-space-5);
+  row-gap: var(--cy-space-5);
+  font-size: var(--cy-font-size-md);
+}
+.cy-notice-icon.cy-notice-icon {
+  grid-area: icon;
+  /* Centred on the title's first line. */
+  margin-block-start: calc((1lh - var(--_size)) / 2);
+  color: var(--_text);
+}
+.cy-notice-text.cy-notice-text {
+  grid-area: text;
+  display: flex;
+  flex-direction: column;
+  gap: var(--cy-space-2);
+  min-inline-size: 0;
+  font-size: var(--cy-font-size-md);
+  line-height: var(--cy-font-line-height);
+  overflow-wrap: anywhere;
+}
+.cy-notice-title.cy-notice-title {
+  color: var(--_text);
+  font-size: var(--cy-font-size-md);
+  font-weight: var(--cy-font-weight-bold);
+  line-height: var(--cy-font-line-height);
+}
+.cy-notice-body.cy-notice-body {
+  color: var(--cy-color-ink);
+  font-size: var(--cy-font-size-md);
+  line-height: var(--cy-font-line-height);
+}
+.cy-notice-action.cy-notice-action {
+  grid-area: action;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--cy-space-3);
+  align-self: center;
+  font-size: var(--cy-font-size-md);
+}
+.cy-notice-main > .cy-tooltip-anchor {
+  grid-area: close;
+  /* The close button's box is taller than a line of text; keep its icon on the title line. */
+  margin-block: calc((1lh - var(--cy-control-height-sm)) / 2) 0;
+  margin-inline-end: calc(-1 * var(--cy-space-3));
+}
+@container cy-notice (inline-size < 26rem) {
+  .cy-notice-main.cy-notice-main {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas:
+      "icon text close"
+      ". action action";
+  }
+  .cy-notice-action.cy-notice-action {
+    align-self: start;
+  }
+}
+@media (forced-colors: active) {
+  .cy-notice.cy-notice {
+    border-color: CanvasText;
+  }
+}

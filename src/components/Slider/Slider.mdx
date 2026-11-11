@@ -1,0 +1,95 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./Slider.stories";
+
+<Meta of={Stories} />
+
+# Slider
+
+Picks a number by dragging a thumb along a track, or a range with two thumbs. It works with the keyboard, pointer and touch, and submits with native forms.
+
+<Canvas of={Stories.PointerDragsAndCommitsOnRelease} />
+
+## When to use
+
+- **A value where the rough position matters more than the exact number:** volume, opacity, playback speed.
+- **A range:** a price band, a time window.
+
+**Use something else when:**
+- the exact number matters or the range is large: a [TextField](?path=/docs/components-textfield--docs) with `type="number"`
+- there are only a few named choices: a [SegmentedControl](?path=/docs/components-segmentedcontrol--docs) or [RadioGroup](?path=/docs/components-radiogroup--docs)
+- it shows progress rather than taking input: a [ProgressBar](?path=/docs/components-progressbar--docs)
+
+## Usage
+
+```tsx
+import { Slider } from "@arshad-shah/cynosure";
+
+<Slider label="Volume" value={volume} onChange={setVolume} showValue />
+<Slider label="Price" defaultValue={[20, 60]} name="price" onCommit={search} />
+```
+
+`onChange` follows every movement while dragging; `onCommit` fires once the change is finished, so expensive work (a search, a save) can wait for it.
+
+## Range
+
+Pass `[from, to]` for two thumbs. Each thumb is limited by the other, so they can meet but never cross. Each thumb has its own name ("Price, minimum" and "Price, maximum"), and the pair is a group named by the label.
+
+<Canvas of={Stories.RangeThumbsNeverCross} />
+
+## More thumbs, and your own track
+
+Give three or more numbers for as many thumbs, each held between its neighbours: gradient stops, or the cut points of a timeline. `trackContent` draws your own track (a gradient, a histogram) under the thumbs, in place of the accent fill; it is as tall as a thumb.
+
+```tsx
+<Slider
+  label="Gradient"
+  value={stops}
+  onChange={setStops}
+  trackContent={<span style={{ background: `linear-gradient(to right, ${colours})` }} />}
+/>
+```
+
+<Canvas of={Stories.GradientStops} />
+
+## Marks and value text
+
+`marks` draws ticks along the track, with optional text under it. `labels.value` turns a number into words, used for `showValue` and read by screen readers.
+
+<Canvas of={Stories.LabelsMarksAndHiddenLabel} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+| Input | Result |
+| --- | --- |
+| <kbd>Right</kbd> / <kbd>Up</kbd> | Up by `step` (in right-to-left text, <kbd>Right</kbd> lowers it) |
+| <kbd>Left</kbd> / <kbd>Down</kbd> | Down by `step` |
+| <kbd>Page Up</kbd> / <kbd>Page Down</kbd> | By `largeStep` (a tenth of the range by default) |
+| <kbd>Home</kbd> / <kbd>End</kbd> | To `min` / `max` |
+| Press or drag on the track | Moves the nearest thumb and keeps dragging |
+
+- **Roles:** each thumb is `role="slider"` with `aria-valuemin`, `aria-valuemax`, `aria-valuenow`, `aria-valuetext` and `aria-orientation`. A range is a `group`.
+- **Forms:** with `name`, the value is submitted (two values for a range) and a form reset restores the default. Disabled sliders are not submitted.
+- **Disabled:** thumbs leave the Tab order; the track fades but the label stays readable.
+- **Direction:** horizontal sliders start at the inline start (right in right-to-left text); vertical ones start at the bottom.
+
+<Canvas of={Stories.Vertical} />
+
+## Touch
+
+The thumb keeps its size, but its hit area is 44px on coarse pointers. Horizontal drags belong to the slider, so the page does not scroll sideways, while a vertical swipe over it still scrolls the page.
+
+## Theming
+
+Tokens: `--cy-slider-track-{sm,md,lg}`, `--cy-slider-thumb-{sm,md,lg}`, `--cy-slider-track` (the empty bar colour) and `--cy-slider-length` (vertical length).
+
+```ts
+createTheme({ components: { slider: { thumbMd: "18px", trackMd: "6px" } } });
+```
+
+## Related
+
+[ProgressBar](?path=/docs/components-progressbar--docs) · [SegmentedControl](?path=/docs/components-segmentedcontrol--docs) · [TextField](?path=/docs/components-textfield--docs)

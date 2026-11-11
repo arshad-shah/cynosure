@@ -1,0 +1,48 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./ProgressOverlay.stories";
+
+<Meta of={Stories} />
+
+# ProgressOverlay
+
+A modal progress dialog for long work the page has to wait for.
+
+<Canvas of={Stories.ShowsHowFarItHasGot} />
+
+## When to use
+
+- **Blocking work** that takes seconds or more: exporting, compressing, converting a document.
+
+**Use something else when:**
+- people can keep working meanwhile: a [ProgressBar](?path=/docs/components-progressbar--docs) in the page, or a [Toast](?path=/docs/components-toast--docs) when it is done
+- it takes under a second: [LoadingDots](?path=/docs/components-loadingdots--docs) or nothing
+
+## Usage
+
+```tsx
+import { ProgressOverlay } from "@arshad-shah/cynosure";
+
+<ProgressOverlay open={running} title="Compressing the PDF" value={page} max={pages} onCancel={stop} />
+```
+
+Leave `value` undefined while the amount is unknown. Give `onCancel` whenever the work can be stopped; without it the overlay cannot be closed.
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+- **Role:** a modal dialog named by `title`, holding a progress bar with the same name.
+- **Announcements:** the status line ("3 of 12", or your `status`) is a polite live region.
+- **Keyboard:** focus moves into the dialog and stays there; Escape cancels (only with `onCancel`); focus returns where it was when it closes.
+
+<Canvas of={Stories.UnknownAmount} />
+
+## Theming
+
+No tokens of its own: style it through the Dialog and ProgressBar tokens.
+
+## Related
+
+[Dialog](?path=/docs/components-dialog--docs) · [ProgressBar](?path=/docs/components-progressbar--docs)

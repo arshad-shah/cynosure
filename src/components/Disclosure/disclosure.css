@@ -1,0 +1,156 @@
+.cy-disclosure.cy-disclosure {
+  --_h: var(--cy-control-height-md);
+  --_pad: var(--cy-disclosure-padding-inline, var(--cy-space-0));
+  --_d: var(--cy-motion-base);
+  box-sizing: border-box !important;
+  display: block;
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+  border: 0 none;
+  color: var(--cy-color-ink);
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-font-size-md);
+  font-weight: var(--cy-font-weight-regular);
+  line-height: var(--cy-font-line-height);
+  &[data-size="sm"] {
+    --_h: var(--cy-control-height-sm);
+    font-size: var(--cy-font-size-sm);
+  }
+  &[data-size="lg"] {
+    --_h: var(--cy-control-height-lg);
+    font-size: var(--cy-font-size-lg);
+  }
+  &[data-variant="line"] {
+    border-block-end: var(--cy-border-width) solid var(--cy-color-line);
+  }
+  &[data-variant="card"] {
+    --_pad: var(--cy-disclosure-padding-inline, var(--cy-space-5));
+    border: var(--cy-border-width) solid var(--cy-color-line);
+    border-radius: var(--cy-disclosure-radius, var(--cy-radius-card));
+    background: var(--cy-color-surface);
+    overflow: clip;
+  }
+}
+
+.cy-disclosure-heading.cy-disclosure-heading {
+  margin: 0;
+  padding: 0;
+  font: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  letter-spacing: normal;
+}
+
+.cy-disclosure-trigger.cy-disclosure-trigger {
+  box-sizing: border-box !important;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--cy-disclosure-gap, var(--cy-space-4));
+  inline-size: 100%;
+  min-block-size: var(--_h);
+  margin: 0;
+  padding: var(--cy-space-2) var(--_pad);
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  font-weight: var(--cy-font-weight-medium);
+  letter-spacing: normal;
+  text-transform: none;
+  text-align: start;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  &:hover:not([aria-disabled="true"]) .cy-disclosure-chevron {
+    color: var(--cy-color-ink);
+  }
+  &:focus-visible {
+    outline: var(--cy-border-focus) solid transparent;
+    box-shadow: inset 0 0 0 var(--cy-border-focus) var(--cy-color-ring);
+  }
+  &[aria-disabled="true"] {
+    cursor: default;
+  }
+  /* No inner padding in plain and line: ring outside the trigger so it never touches the text. */
+  :is([data-variant="plain"], [data-variant="line"]) > &,
+  :is([data-variant="plain"], [data-variant="line"]) > .cy-disclosure-heading > & {
+    border-radius: var(--cy-radius-sm);
+    &:focus-visible {
+      box-shadow: none;
+      outline: var(--cy-border-focus) solid var(--cy-color-ring);
+      outline-offset: var(--cy-space-2);
+    }
+  }
+}
+
+.cy-disclosure-summary {
+  min-inline-size: 0;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+.cy-disclosure-chevron.cy-disclosure-chevron {
+  flex: none;
+  color: var(--cy-color-muted);
+  font-size: inherit;
+  transition:
+    rotate var(--_d) var(--cy-motion-ease),
+    color var(--cy-motion-fast) var(--cy-motion-ease);
+  [data-open] > .cy-disclosure-trigger > &,
+  [data-open] > .cy-disclosure-heading > .cy-disclosure-trigger > & {
+    rotate: 180deg;
+  }
+}
+
+/* Height animates by interpolating the grid row from 0fr to 1fr (all engines, no script). Visibility flips after the
+   collapse finishes, so closed content leaves the tab order and the accessibility tree. */
+.cy-disclosure-content.cy-disclosure-content {
+  display: grid;
+  grid-template-rows: 0fr;
+  visibility: hidden;
+  font-size: inherit;
+  line-height: inherit;
+  transition:
+    grid-template-rows var(--_d) var(--cy-motion-ease),
+    visibility 0s linear var(--_d);
+  [data-open] > & {
+    grid-template-rows: 1fr;
+    visibility: visible;
+    transition:
+      grid-template-rows var(--_d) var(--cy-motion-ease),
+      visibility 0s linear 0s;
+  }
+}
+
+.cy-disclosure-clip {
+  min-block-size: 0;
+  overflow: hidden;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+.cy-disclosure-body {
+  padding: var(--cy-space-2) var(--_pad) var(--cy-space-5);
+  font-size: inherit;
+  line-height: inherit;
+}
+
+@media (pointer: coarse) {
+  .cy-disclosure-trigger.cy-disclosure-trigger {
+    min-block-size: max(var(--_h), var(--cy-hit-coarse, 44px));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cy-disclosure.cy-disclosure {
+    --_d: 0s;
+  }
+}
+@media (forced-colors: active) {
+  .cy-disclosure-trigger.cy-disclosure-trigger:focus-visible {
+    outline-color: Highlight;
+  }
+}

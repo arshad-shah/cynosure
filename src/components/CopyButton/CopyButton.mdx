@@ -1,0 +1,64 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./CopyButton.stories";
+
+<Meta of={Stories} />
+
+# CopyButton
+
+An icon button that copies a value to the clipboard. It turns into a check for a moment and announces "Copied"; if the clipboard refuses, it shows an error instead and still never throws.
+
+<Canvas of={Stories.CopiesAnnouncesAndReverts} />
+
+## When to use
+
+- **Values people paste elsewhere:** install commands, links, IDs, code blocks.
+
+**Use something else when:** the copy is one step of a bigger action (copying while sharing a link), or the confirmation needs more than one word: call your own writer and show a [Toast](?path=/docs/components-toast--docs).
+
+## Usage
+
+```tsx
+import { CopyButton } from "@arshad-shah/cynosure";
+
+<CopyButton value="npm i @arshad-shah/cynosure" />
+<CopyButton value={() => editor.getValue()} labels={{ copy: "Copy code" }} />
+```
+
+### In extensions and tests
+
+The clipboard API is not available everywhere (an insecure page, some extension contexts). Pass `copy` to write another way, for example through an offscreen document:
+
+```tsx
+<CopyButton value={url} copy={(text) => chrome.runtime.sendMessage({ type: "copy", text })} />
+```
+
+Whatever `copy` does, a throw or a rejected promise shows the failed state.
+
+<Canvas of={Stories.RejectedClipboardShowsFailure} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+| Input | Result |
+| --- | --- |
+| Click, tap, <kbd>Enter</kbd>, <kbd>Space</kbd> | Copies |
+
+- **Name:** the button is named by `labels.copy`; after a copy its name and tooltip become `labels.copied` (or `labels.failed`) until `timeout` passes.
+- **Announcement:** a visually hidden `role="status"` exists from the start, and the result is written into it, so screen readers hear it once.
+- **Colour:** the icon takes the success or danger text colour while the result shows; the change is also in the icon shape and the words.
+- **Never throws:** a missing clipboard, a refused permission and a throwing writer all end in the failed state, and `onError` receives the error.
+
+## Touch
+
+The button keeps a 44px hit area on coarse pointers.
+
+## Theming
+
+It is an [IconButton](?path=/docs/components-iconbutton--docs): restyle it through the Button tokens.
+
+## Related
+
+[IconButton](?path=/docs/components-iconbutton--docs) · [Toast](?path=/docs/components-toast--docs)

@@ -1,0 +1,74 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./AppShell.stories";
+
+<Meta of={Stories} />
+
+# AppShell
+
+The frame of an app: a top bar, the navigation beside the content, and the main region. When there is not enough room, the navigation moves into a drawer opened from a menu button.
+
+<Canvas of={Stories.NavigationBesideTheContent} />
+
+## When to use
+
+- **The outer layout of an app** with a persistent navigation.
+
+**Use something else when:**
+- the page is a document or a marketing page: your own layout with [Prose](?path=/docs/components-prose--docs) and [Stack](?path=/docs/components-stack--docs)
+- you only need the navigation: [SideNav](?path=/docs/components-sidenav--docs)
+
+## Usage
+
+```tsx
+import { AppShell, SideNav } from "@arshad-shah/cynosure";
+
+<div style={{ blockSize: "100dvh" }}>
+  <AppShell header={<Brand />} nav={<SideNav label="Main" items={items} current={route.id} />}>
+    <Page />
+  </AppShell>
+</div>
+```
+
+The shell fills its container's height. The content and the navigation scroll on their own while the bar stays in place.
+
+<Canvas of={Stories.ContentScrollsOnItsOwn} />
+
+## Narrow screens
+
+Below `collapseBelow` (768px of the shell's own width) the navigation leaves the layout. A menu button appears at the start of the bar and opens it in a start-side [Sheet](?path=/docs/components-sheet--docs). Choosing a link or item closes the drawer; opening a group does not.
+
+<Canvas of={Stories.NarrowMovesTheNavigationIntoADrawer} />
+
+### A tab bar on phones
+
+`tabs` adds a bottom tab bar while the shell is narrow, for an app's three to five main sections. Pass a [SideNav](?path=/docs/components-sidenav--docs) with `layout="bar"` and the same `current`; the drawer still holds the full navigation. The bar keeps clear of the phone's home indicator.
+
+```tsx
+<AppShell
+  nav={<SideNav label="Main" items={items} current={page} onNavigate={go} />}
+  tabs={<SideNav label="Sections" layout="bar" items={sections} current={page} onNavigate={go} />}
+>
+```
+
+<Canvas of={Stories.TabBarOnPhones} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+- **Landmarks:** the bar is a `<header>` (banner), the navigation keeps its own `<nav>`, and the content is `<main>`.
+- **Skip link:** the first Tab shows "Skip to content"; Enter moves focus to `<main>` without changing the URL, so your router stays in charge.
+- **Drawer:** a modal Sheet named "Navigation" with focus trapping and Escape; focus returns to the menu button when it closes. The button reports `aria-expanded`.
+- **Touch:** the menu button's hit area is at least 44px on touch screens.
+- **Direction:** the navigation is on the right in right-to-left text, and the drawer slides from that side.
+- All built-in text is in `labels`.
+
+## Theming
+
+Tokens: `--cy-app-shell-nav-background`, `--cy-app-shell-header-background` and `--cy-app-shell-border`.
+
+## Related
+
+[SideNav](?path=/docs/components-sidenav--docs) · [Sheet](?path=/docs/components-sheet--docs) · [Toolbar](?path=/docs/components-toolbar--docs)

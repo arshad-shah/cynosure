@@ -1,0 +1,66 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./ContextMenu.stories";
+
+<Meta of={Stories} />
+
+# ContextMenu
+
+A menu of commands for one thing, opened where the person points: right-click with a mouse, a long press on a touch screen, or Shift+F10 on the keyboard.
+
+<Canvas of={Stories.RightClickOpensWhereYouPoint} />
+
+## When to use
+
+- **Shortcuts on an item**: a file row, a card, a node in a canvas or tree.
+
+**Use something else when:**
+- the commands have a visible button: [Menu](?path=/docs/components-menu--docs). A context menu is hidden, so every command in it must also be reachable another way.
+- the commands apply to the whole app: [CommandPalette](?path=/docs/components-commandpalette--docs)
+
+## Usage
+
+`children` is a function: spread the props it receives onto one element, and make that element focusable so keyboard users can open the menu.
+
+```tsx
+import { ContextMenu } from "@arshad-shah/cynosure";
+
+<ContextMenu label="File actions" items={items} onSelect={run}>
+  {(props) => (
+    <div {...props} tabIndex={0}>
+      report.pdf
+    </div>
+  )}
+</ContextMenu>
+```
+
+Items are the same as [Menu](?path=/docs/components-menu--docs)'s: icons, shortcuts, sections, disabled, danger and checkable items.
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+| Input                          | Action                                                    |
+| ------------------------------ | --------------------------------------------------------- |
+| Right-click                    | Opens with the menu's corner at the pointer               |
+| Shift+F10 / context menu key   | Opens under the focused target                            |
+| Long press (500ms) on touch    | Opens at the finger; a tap or a scroll does not           |
+| Arrow keys, Home, End, letters | Move through items (as in Menu)                           |
+| Enter / Space                  | Run the item and close                                    |
+| Escape, Tab, click outside     | Close; focus returns to the target                        |
+
+- The target gets `aria-keyshortcuts="Shift+F10"`. Mention the menu in the target's description if it holds commands found nowhere else.
+- Near the edges of the window the menu flips to stay on screen.
+- With `disabled`, the browser's own menu shows.
+- On touch screens, add `-webkit-touch-callout: none` and `user-select: none` to the target so the system callout does not compete with the menu.
+
+<Canvas of={Stories.KeyboardOpensAtTheTarget} />
+
+## Theming
+
+Shares Menu's tokens: `--cy-menu-min-width`, `--cy-menu-max-width`, `--cy-menu-radius` and `--cy-menu-row-height`.
+
+## Related
+
+[Menu](?path=/docs/components-menu--docs) · [CommandPalette](?path=/docs/components-commandpalette--docs) · [Tree](?path=/docs/components-tree--docs)

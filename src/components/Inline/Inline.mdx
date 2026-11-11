@@ -1,0 +1,45 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./Inline.stories";
+
+<Meta of={Stories} />
+
+# Inline
+
+Lays children out in a row with a gap from the space scale. For a column, use [Stack](?path=/docs/components-stack--docs).
+
+<Canvas of={Stories.RowWithTokenGap} />
+
+## When to use
+
+- Toolbars, button rows, badge lists, label-and-value pairs.
+- Use `wrap` when items may not fit on one line.
+
+## Usage
+
+```tsx
+import { Inline } from "@arshad-shah/cynosure";
+
+<Inline gap="4" align="center">
+  <Badge>Draft</Badge>
+  <Button>Publish</Button>
+</Inline>
+<Inline as="ul" gap="2" wrap justify="between">…</Inline>
+```
+
+`gap` is a space token from `"0"` to `"10"` (default `"3"`). `align` is `start`, `center`, `end`, `stretch` or `baseline`. `justify` is `start`, `center`, `end` or `between`. `as` picks a neutral element (`div`, `section`, `ul`, `ol`, `nav`, `aside`, `header`, `footer`, `span`).
+
+<Canvas of={Stories.DefaultsAndLayoutProps} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Notes
+
+- `as` never renders an interactive element.
+- `className` and `style` are for layout only.
+- The gap is a space token (`--cy-space-*`), so it follows the theme's spacing.
+
+## Related
+
+[Stack](?path=/docs/components-stack--docs) · [Card](?path=/docs/components-card--docs) · [Badge](?path=/docs/components-badge--docs)

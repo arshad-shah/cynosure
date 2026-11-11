@@ -1,0 +1,66 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./Switch.stories";
+
+<Meta of={Stories} />
+
+# Switch
+
+An on/off setting that takes effect straight away, such as "Auto-expand". It is built on a native checkbox with `role="switch"`. If the choice is confirmed later with a submit button, use [Checkbox](?path=/docs/components-checkbox--docs).
+
+<Canvas of={Stories.TogglesAsASwitch} />
+
+## When to use
+
+- A preference or feature that is on or off and applies immediately.
+- Settings lists with a short description under each label.
+
+**Use something else when:**
+- the value is part of a form that is submitted or confirmed: [Checkbox](?path=/docs/components-checkbox--docs)
+- the user picks one of several options: [RadioGroup](?path=/docs/components-radiogroup--docs) or [SegmentedControl](?path=/docs/components-segmentedcontrol--docs)
+- it is an action, not a setting: [Button](?path=/docs/components-button--docs)
+
+## Usage
+
+```tsx
+import { Switch } from "@arshad-shah/cynosure";
+
+<Switch label="Auto-expand" checked={auto} onChange={setAuto} />
+<Switch label="Notifications" description="Email me about new comments" defaultChecked />
+<Switch label="Beta features" tone="warning" disabled />
+```
+
+`onChange` receives the new boolean. Use `checked` for controlled state or `defaultChecked` for uncontrolled.
+
+## Options
+
+- **`description`:** supporting text under the label.
+- **`size`:** `sm`, `md` or `lg`.
+- **`tone`:** colours the track when on: `accent` (default), `neutral`, `danger`, `success`, `warning` or `info`.
+- **`name` and `value`:** native, so the switch submits with a form.
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+| Input | Result |
+| --- | --- |
+| Click, tap, <kbd>Space</kbd> | Toggles |
+| <kbd>Tab</kbd> | Focus with a visible ring |
+
+- **Native checkbox:** forms, reset, `required` and keyboard behaviour match [Checkbox](?path=/docs/components-checkbox--docs), without the mixed state.
+- **Role:** it is announced as a switch with its checked state.
+- **Motion:** the thumb slides, and stops animating under reduced motion.
+
+## Theming
+
+Tokens: `--cy-switch-{width,height,thumb-size,off-bg}`.
+
+```ts
+createTheme({ components: { switch: { width: "44px", offBg: "#cbd5e1" } } });
+```
+
+## Related
+
+[Checkbox](?path=/docs/components-checkbox--docs) · [RadioGroup](?path=/docs/components-radiogroup--docs) · [SegmentedControl](?path=/docs/components-segmentedcontrol--docs)

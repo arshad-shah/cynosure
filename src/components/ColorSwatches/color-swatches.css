@@ -1,0 +1,76 @@
+/*
+ * color-swatches: a wrapping row of colour buttons. Each shows its colour over a checkerboard (so transparent
+ * colours read as transparent) with a hairline so pale colours stand out from the page; the chosen one has a tick
+ * (dark on light colours, light on dark ones) and a ring.
+ */
+.cy-color-swatches.cy-color-swatches {
+  --_s: var(--cy-color-swatches-size, var(--cy-control-height-sm));
+  --_hit: var(--cy-hit-min, 24px);
+  box-sizing: border-box !important;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--cy-space-3);
+  margin: 0;
+  padding: 0;
+  font-size: var(--cy-font-size-md);
+  &[data-size="sm"] {
+    --_s: var(--cy-color-swatches-size, var(--cy-space-8));
+  }
+  &[data-size="lg"] {
+    --_s: var(--cy-color-swatches-size, var(--cy-control-height-md));
+  }
+}
+.cy-color-swatches-swatch.cy-color-swatches-swatch {
+  box-sizing: border-box !important;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: var(--_s);
+  block-size: var(--_s);
+  margin: 0;
+  padding: 0;
+  border: var(--cy-border-width) solid color-mix(in oklab, var(--cy-color-ink) 20%, transparent);
+  border-radius: var(--cy-color-swatches-radius, var(--cy-radius-sm));
+  background:
+    linear-gradient(var(--_swatch), var(--_swatch)),
+    repeating-conic-gradient(var(--cy-color-soft) 0 25%, var(--cy-color-surface) 0 50%) 0 0 / 50% 50%;
+  color: white;
+  font-size: inherit;
+  cursor: pointer;
+  &[data-light] {
+    color: black;
+  }
+  &::before {
+    content: "";
+    position: absolute;
+    inset: calc((var(--_s) - max(var(--_s), var(--_hit))) / 2 - var(--cy-border-width));
+  }
+  &[aria-checked="true"] {
+    box-shadow:
+      0 0 0 calc(2 * var(--cy-border-width)) var(--cy-color-surface),
+      0 0 0 calc(4 * var(--cy-border-width)) var(--cy-color-ink);
+  }
+  &:focus-visible {
+    outline: var(--cy-border-focus) solid var(--cy-color-ring);
+    outline-offset: calc(3 * var(--cy-border-width));
+  }
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+}
+@media (pointer: coarse) {
+  .cy-color-swatches.cy-color-swatches {
+    --_hit: var(--cy-hit-coarse, 44px);
+  }
+}
+@media (forced-colors: active) {
+  .cy-color-swatches-swatch.cy-color-swatches-swatch {
+    forced-color-adjust: none;
+    border-color: CanvasText;
+    &[aria-checked="true"] {
+      outline: calc(2 * var(--cy-border-width)) solid Highlight;
+    }
+  }
+}

@@ -1,0 +1,93 @@
+/*
+ * color-field: a TextField-styled control (reuses .cy-text-field) with a swatch button opening a picker: a
+ * saturation-brightness area, then hue and opacity Sliders whose tracks are painted with the colour.
+ */
+.cy-color-field.cy-color-field {
+  box-sizing: border-box !important;
+  margin: 0;
+  font-size: var(--cy-font-size-md);
+  letter-spacing: normal;
+  text-transform: none;
+}
+.cy-color-field-control.cy-color-field-control {
+  padding-inline-start: var(--cy-space-1);
+}
+.cy-color-field-trigger.cy-color-field-trigger {
+  flex: none;
+  padding: 0;
+  inline-size: auto;
+  aspect-ratio: 1;
+}
+.cy-color-field-swatch.cy-color-field-swatch {
+  display: block;
+  inline-size: var(--cy-color-field-swatch-size, 18px);
+  block-size: var(--cy-color-field-swatch-size, 18px);
+  border: var(--cy-border-width) solid var(--cy-color-muted);
+  border-radius: var(--cy-radius-sm);
+  background:
+    linear-gradient(var(--_c), var(--_c)),
+    repeating-conic-gradient(var(--cy-color-soft) 0 25%, var(--cy-color-surface) 0 50%) 50% /
+    var(--cy-space-4) var(--cy-space-4);
+  font-size: var(--cy-font-size-md);
+}
+.cy-color-field-picker.cy-color-field-picker {
+  display: grid;
+  gap: var(--cy-space-5);
+  /* The popover sizes to its content, and the area has no width of its own: give the picker one. */
+  inline-size: var(--cy-color-field-picker-width, 216px);
+  max-inline-size: 100%;
+  font-size: var(--cy-font-size-md);
+}
+.cy-color-field-area.cy-color-field-area {
+  position: relative;
+  block-size: var(--cy-color-field-area-height, 160px);
+  border-radius: var(--cy-radius-sm);
+  background: linear-gradient(to top, black, transparent), linear-gradient(to right, white, var(--_hue));
+  font-size: var(--cy-font-size-md);
+  cursor: crosshair;
+  touch-action: none;
+  outline: none;
+  &:focus-visible {
+    box-shadow: 0 0 0 var(--cy-border-focus) var(--cy-color-ring);
+  }
+}
+.cy-color-field-area-thumb.cy-color-field-area-thumb {
+  position: absolute;
+  /* Physical on purpose: the area's gradient runs left to right in every writing direction. */
+  left: var(--_x);
+  top: var(--_y);
+  inline-size: var(--cy-space-7);
+  block-size: var(--cy-space-7);
+  margin: calc(var(--cy-space-7) / -2);
+  border: calc(2 * var(--cy-border-width)) solid white;
+  border-radius: var(--cy-radius-full);
+  box-shadow:
+    0 0 0 var(--cy-border-width) rgb(0 0 0 / 0.5),
+    inset 0 0 0 var(--cy-border-width) rgb(0 0 0 / 0.3);
+  font-size: var(--cy-font-size-md);
+  pointer-events: none;
+}
+/* Hue and opacity tracks show the colours; the generic fill is hidden. */
+.cy-color-field-hue {
+  --cy-slider-track: linear-gradient(to right, red, yellow, lime, cyan, blue, magenta, red);
+}
+.cy-color-field-alpha {
+  --cy-slider-track:
+    linear-gradient(to right, transparent, var(--_c)),
+    repeating-conic-gradient(var(--cy-color-soft) 0 25%, var(--cy-color-surface) 0 50%) 50% /
+    var(--cy-space-3) var(--cy-space-3);
+}
+.cy-color-field-hue .cy-slider-fill,
+.cy-color-field-alpha .cy-slider-fill {
+  display: none;
+}
+.cy-color-field-hue .cy-slider-track.cy-slider-track::before,
+.cy-color-field-alpha .cy-slider-track.cy-slider-track::before {
+  block-size: var(--cy-space-5);
+  inset-block-start: calc(50% - var(--cy-space-5) / 2);
+}
+@media (forced-colors: active) {
+  .cy-color-field-swatch.cy-color-field-swatch {
+    forced-color-adjust: none;
+  }
+}

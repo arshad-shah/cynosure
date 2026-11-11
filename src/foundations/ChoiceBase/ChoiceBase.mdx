@@ -1,0 +1,48 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./ChoiceBase.stories";
+
+<Meta of={Stories} />
+
+# ChoiceBase
+
+A native checkbox or radio, visually hidden under a Cynosure skin but still focusable, clickable and form-associated. It is a foundation: it has no visual opinions, and the composite that uses it draws the visible control.
+
+## Who uses it
+
+[Checkbox](?path=/docs/components-checkbox--docs), [Switch](?path=/docs/components-switch--docs), [RadioGroup](?path=/docs/components-radiogroup--docs) and [SegmentedControl](?path=/docs/components-segmentedcontrol--docs).
+
+## When to use it directly
+
+Only when building a new choice-style composite (a custom checkbox, radio or toggle look) that must behave like a real form control.
+
+**Use a component instead when** you need a labelled control: [Checkbox](?path=/docs/components-checkbox--docs) or [Switch](?path=/docs/components-switch--docs) for on/off, [RadioGroup](?path=/docs/components-radiogroup--docs) for one of several, [SegmentedControl](?path=/docs/components-segmentedcontrol--docs) for a compact choice.
+
+<Canvas of={Stories.FocusableAndSubmits} />
+
+## Usage
+
+```tsx
+import { ChoiceBase } from "@arshad-shah/cynosure";
+
+<ChoiceBase type="checkbox" name="terms" value="yes" indeterminate={partial} />
+<ChoiceBase type="radio" name="size" value="md" />
+```
+
+## Props
+
+It accepts every native input attribute except `type`, which is required and must be `"checkbox"` or `"radio"`.
+
+<ArgTypes of={Stories} />
+
+## Guarantees
+
+- It stays focusable, clickable and form-associated (FormData, reset, required) without extra code.
+- `indeterminate` sets the mixed state on the underlying input. It applies to checkboxes only.
+- The ref reaches the native `<input>`.
+- It adds the `cy-choice-input` class, which hides it visually; any `className` you pass is kept alongside.
+
+<Canvas of={Stories.Indeterminate} />
+
+## Related
+
+[Checkbox](?path=/docs/components-checkbox--docs) · [Switch](?path=/docs/components-switch--docs) · [RadioGroup](?path=/docs/components-radiogroup--docs) · [SegmentedControl](?path=/docs/components-segmentedcontrol--docs)

@@ -1,0 +1,12 @@
+/* zoom-controls: a Toolbar of zoom out, the percent and zoom in; the percent keeps one width as it changes. */
+.cy-zoom-controls.cy-zoom-controls {
+  box-sizing: border-box !important;
+  margin: 0;
+  font-family: var(--cy-font-sans);
+  letter-spacing: normal;
+  text-transform: none;
+}
+.cy-zoom-controls-value.cy-zoom-controls-value {
+  min-inline-size: 6ch;
+  font-variant-numeric: tabular-nums;
+}

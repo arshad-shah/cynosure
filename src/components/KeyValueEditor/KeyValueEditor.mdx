@@ -1,0 +1,62 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./KeyValueEditor.stories";
+
+<Meta of={Stories} />
+
+# KeyValueEditor
+
+Editable key and value pairs, such as HTTP headers or environment variables, in rows or as text.
+
+<Canvas of={Stories.EditPairs} />
+
+## When to use
+
+- **A list of named values** people add to, edit, reorder and switch off: headers, query parameters, metadata.
+
+**Use something else when:**
+- the keys are fixed: a form of [TextField](?path=/docs/components-textfield--docs)s
+- the values are short tags without keys: [TagInput](?path=/docs/components-taginput--docs)
+- the pairs are only shown: [DescriptionList](?path=/docs/components-descriptionlist--docs)
+
+## Usage
+
+```tsx
+import { KeyValueEditor, type KeyValuePair } from "@arshad-shah/cynosure";
+
+<KeyValueEditor label="Headers" pairs={headers} onChange={setHeaders} />
+```
+
+Each pair is `{ id, key, value, enabled?, secret? }`. Give new pairs from your data a stable `id`; pairs added in the editor get one of their own. `secret: true` masks the value.
+
+"Edit as text" turns every pair into a `key: value` line (with `# ` in front of a pair that is switched off), so a block of headers can be pasted in at once.
+
+<Canvas of={Stories.EditAsText} />
+
+## Files as values
+
+For multipart form fields, `allowFiles` adds a button to each row that picks a file for its value (`accept` limits the types). The pair gets `file`, and `value` holds the file's name.
+
+```tsx
+<KeyValueEditor label="Form fields" pairs={fields} onChange={setFields} allowFiles accept="image/*" />
+```
+
+<Canvas of={Stories.FileValuedRows} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+- **Names:** every field is named for its row ("Value (Authorization)"), and so are the checkbox ("Use Authorization") and the remove button ("Remove Authorization").
+- **Reordering:** drag a row's grip, or focus it and press Space, the arrows, then Space (Escape cancels); moves are announced.
+- **Focus:** Add focuses the new row's key field; removing a row focuses the row that took its place, or Add.
+- **Touch:** grips and buttons have 44px hit areas on touch screens.
+
+## Theming
+
+Token: `--cy-key-value-editor-gap`. Rows, fields and buttons follow the SortableList, TextField and Button tokens.
+
+## Related
+
+[SortableList](?path=/docs/components-sortablelist--docs) · [TagInput](?path=/docs/components-taginput--docs) · [DescriptionList](?path=/docs/components-descriptionlist--docs)

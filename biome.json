@@ -1,59 +1,31 @@
 {
-  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
-  "vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
   "files": {
-    "ignore": [
-      "dist",
-      "storybook-static",
-      "coverage",
-      ".turbo",
-      "node_modules",
-      "*.md",
-      "pnpm-lock.yaml",
-      "**/src/generated",
-      "**/.astro",
-      "**/*.astro",
-      "packages/docs/public/pagefind"
+    "includes": [
+      "**",
+      "!dist",
+      "!storybook-static",
+      "!site/dist",
+      "!coverage",
+      "!src/styles/generated-css.ts",
+      "!**/__screenshots__",
+      "!.superpowers"
     ]
   },
   "formatter": {
-    "enabled": true,
     "indentStyle": "space",
-    "indentWidth": 2,
-    "lineWidth": 100,
-    "lineEnding": "lf"
-  },
-  "javascript": {
-    "formatter": {
-      "quoteStyle": "single",
-      "trailingCommas": "all",
-      "semicolons": "always"
-    }
+    "lineWidth": 110
   },
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": true,
-      "correctness": {
-        "noUnusedImports": "error",
-        "noUnusedVariables": "error",
-        "useExhaustiveDependencies": "warn"
-      },
-      "style": {
-        "noNonNullAssertion": "warn",
-        "useNodejsImportProtocol": "error",
-        "useImportType": "error"
-      },
-      "suspicious": {
-        "noExplicitAny": "warn",
-        "noConsole": {
-          "level": "warn",
-          "options": { "allow": ["warn", "error"] }
-        }
-      },
-      "a11y": { "recommended": true },
-      "performance": { "recommended": true }
+      "complexity": {
+        "noImportantStyles": "off"
+      }
     }
   },
-  "organizeImports": { "enabled": true }
+  "assist": {
+    "enabled": true
+  },
+  "overrides": []
 }

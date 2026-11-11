@@ -1,0 +1,77 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./Steps.stories";
+
+<Meta of={Stories} />
+
+# Steps
+
+Shows progress through an ordered flow, such as a setup wizard or a checkout: numbered steps, finished ones ticked, the current one marked.
+
+<Canvas of={Stories.ShowsWhereThePersonIs} />
+
+## When to use
+
+- **A flow of a few named steps** that the person moves through in order.
+
+**Use something else when:**
+- the progress is an amount (bytes, items): [ProgressBar](?path=/docs/components-progressbar--docs)
+- the sections can be visited in any order: [Tabs](?path=/docs/components-tabs--docs)
+
+## Usage
+
+```tsx
+import { Steps } from "@arshad-shah/cynosure";
+
+<Steps
+  steps={[
+    { id: "account", label: "Account", description: "Email and password" },
+    { id: "workspace", label: "Workspace" },
+    { id: "done", label: "Done" },
+  ]}
+  current={step}
+/>
+```
+
+Steps before `current` are complete and steps after it upcoming. Set a step's `status` to `error` to flag a problem, or to `complete` to mark it done out of order.
+
+<Canvas of={Stories.ErrorsAndOverrides} />
+
+## Choosing a step
+
+Pass `onStepSelect` and each step becomes a button that calls it with the step's `id`. The current step and steps with `disabled: true` do nothing when pressed. Which steps may be visited is your decision: disable the ones that are not ready.
+
+<Canvas of={Stories.GoingBackUpdatesTheSteps} />
+
+## Vertical
+
+<Canvas of={Stories.Vertical} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+- **Structure:** an ordered list named "Progress" (`labels.list`). The current step has `aria-current="step"`, and each step says its state after its label: "completed", "current step", "not started" or "has a problem" (all in `labels`).
+- **Keyboard** (with `onStepSelect`):
+
+| Key                 | Action                         |
+| ------------------- | ------------------------------ |
+| Tab / Shift+Tab     | Move between steps             |
+| Enter / Space       | Go to the focused step         |
+
+- **Touch:** steps are at least 44px square on touch screens (24px with a mouse).
+- **Contrast:** labels keep 4.5:1, markers 3:1 against the page, in light and dark modes.
+- **Direction:** steps run with the text direction.
+
+## Theming
+
+Tokens: `--cy-steps-marker-size`, `--cy-steps-line-width` and `--cy-steps-gap`. Colours come from the accent, danger, line and muted tokens.
+
+```ts
+createTheme({ components: { steps: { markerSize: "32px", lineWidth: "1px" } } });
+```
+
+## Related
+
+[ProgressBar](?path=/docs/components-progressbar--docs) · [Tabs](?path=/docs/components-tabs--docs)

@@ -1,0 +1,52 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./ColorSwatches.stories";
+
+<Meta of={Stories} />
+
+# ColorSwatches
+
+A palette of colours to choose from: brand colours, presets or recent colours.
+
+<Canvas of={Stories.ARadioGroupOfColours} />
+
+## When to use
+
+- **A short list of colours** people pick from, alone or next to a full picker.
+
+**Use something else when:**
+- any colour is allowed: [ColorField](?path=/docs/components-colorfield--docs), which shows swatches in its picker with its `swatches` prop
+
+## Usage
+
+```tsx
+import { ColorSwatches } from "@arshad-shah/cynosure";
+
+<ColorSwatches label="Brand colours" swatches={brand} value={colour} onChange={setColour} />
+```
+
+Swatches are any CSS colours, as strings or `{ value, label }`. Give brand colours a `label` so screen readers say "Ember" rather than "rgb(194 65 12)". Keep recent colours in your own state or storage and pass them in.
+
+The chosen colour is matched by colour, not spelling, so `#1D1B18` selects an `rgb(29 27 24)` swatch.
+
+<Canvas of={Stories.MatchesByColourNotSpelling} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+- **Role:** a radio group named by `label`; each swatch is a radio named by its label or value.
+- **Keyboard:** one tab stop; arrow keys move and choose (once a colour is chosen), Home and End jump.
+- **Visibility:** each swatch has a hairline so pale colours stand out from the page; transparent colours sit over a checkerboard; the chosen one has a ring and a tick that contrasts with it.
+- **Touch:** 44px hit areas on touch screens (24px with a mouse).
+
+<Canvas of={Stories.TickShowsOnLightAndDark} />
+
+## Theming
+
+Tokens: `--cy-color-swatches-size` and `--cy-color-swatches-radius`.
+
+## Related
+
+[ColorField](?path=/docs/components-colorfield--docs) · [SegmentedControl](?path=/docs/components-segmentedcontrol--docs)

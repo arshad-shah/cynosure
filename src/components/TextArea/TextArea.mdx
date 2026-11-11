@@ -1,0 +1,74 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./TextArea.stories";
+
+<Meta of={Stories} />
+
+# TextArea
+
+Multi-line text input. It starts at `rows`, grows with its content up to `maxRows`, then scrolls. For a single line, use [TextField](?path=/docs/components-textfield--docs).
+
+<Canvas of={Stories.GrowsThenScrolls} />
+
+## When to use
+
+- Notes, comments, descriptions and other free text longer than a line.
+- Input where a live character count helps (limits, annotations).
+
+**Use something else when:**
+- the value fits on one line: [TextField](?path=/docs/components-textfield--docs)
+- the user picks from a list: [Select](?path=/docs/components-select--docs)
+
+## Usage
+
+```tsx
+import { TextArea } from "@arshad-shah/cynosure";
+
+<TextArea label="Notes" name="notes" rows={3} maxRows={10} />
+<TextArea label="Bio" maxLength={280} showCount value={bio} onChange={setBio} />
+<TextArea label="Message" description="Plain text only" error={error} />
+```
+
+`onChange` receives the string value. Defaults are `rows={3}` and `maxRows={12}`.
+
+## Character counter
+
+`showCount` adds a live counter. With `maxLength` it reads "n / max", otherwise "n characters". Override the text with `labels.count(count, max)`.
+
+<Canvas of={Stories.CounterAndMaxLength} />
+
+## Resizing
+
+A grip in the bottom corner lets pointer and touch users drag the height. The box keeps the chosen height and still grows with content, up to `maxRows` (or the chosen height, if that is taller). Pass `resizable={false}` to remove the grip. Disabled areas have none.
+
+<Canvas of={Stories.ResizesByDraggingTheGrip} />
+<Canvas of={Stories.NotResizableWhenAskedOrDisabled} />
+
+## Options
+
+- **`variant`:** `outline` (default) or `soft`.
+- **`size`:** `sm`, `md` or `lg`.
+- **`labelHidden`:** hides the label visually while it still names the field. Prefer a visible label.
+- Native textarea attributes such as `name`, `required`, `disabled`, `readOnly` and `maxLength` pass through.
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+- **Label, description and error** are linked to the textarea through `Field`.
+- **Counter:** announced politely (`aria-live="polite"`) and linked with `aria-describedby`.
+- **Grip:** a pointer and touch affordance only. It is `aria-hidden`, so keyboard users get content growth instead. It stays tucked in the corner on every device, and the text keeps a bottom margin so the last line never runs under it.
+- **Forms:** works with `FormData`, `required`, and reset restores the value, the count and the height.
+
+## Theming
+
+Tokens: `--cy-text-area-{radius,padding-inline,padding-block,bg,border,soft-bg}`.
+
+```ts
+createTheme({ components: { textArea: { radius: "10px", paddingBlock: "10px" } } });
+```
+
+## Related
+
+[TextField](?path=/docs/components-textfield--docs) · [Select](?path=/docs/components-select--docs) · [SearchField](?path=/docs/components-searchfield--docs)

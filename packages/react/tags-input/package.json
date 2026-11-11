@@ -1,9 +1,0 @@
-{
-  "name": "@arshad-shah/cynosure-react/tags-input",
-  "private": true,
-  "type": "module",
-  "main": "../dist/tagsinput.js",
-  "module": "../dist/tagsinput.js",
-  "types": "../dist/tagsinput.d.ts",
-  "sideEffects": ["*.css"]
-}

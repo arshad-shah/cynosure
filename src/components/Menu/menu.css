@@ -1,0 +1,167 @@
+.cy-menu.cy-menu {
+  --_row: var(--cy-menu-row-height, var(--cy-control-height-md));
+  box-sizing: border-box !important;
+  position: fixed;
+  inset: auto;
+  margin: 0;
+  min-inline-size: var(--cy-menu-min-width, 200px);
+  max-inline-size: min(var(--cy-menu-max-width, 360px), calc(100vw - var(--cy-space-6)));
+  max-block-size: calc(100vh - var(--cy-space-6));
+  overflow: auto;
+  padding: var(--cy-space-2);
+  border: var(--cy-border-width) solid var(--cy-color-line);
+  border-radius: var(--cy-menu-radius, var(--cy-radius-md));
+  background: var(--cy-color-surface);
+  color: var(--cy-color-ink);
+  box-shadow: var(--cy-shadow-lg);
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-font-size-md);
+  font-weight: var(--cy-font-weight-regular);
+  line-height: var(--cy-font-line-height);
+  letter-spacing: normal;
+  text-align: start;
+  transition:
+    opacity var(--cy-motion-fast) var(--cy-motion-ease),
+    translate var(--cy-motion-fast) var(--cy-motion-ease),
+    display var(--cy-motion-fast) allow-discrete,
+    overlay var(--cy-motion-fast) allow-discrete;
+  &:not(:popover-open) {
+    opacity: 0;
+    translate: 0 calc(-1 * var(--cy-space-2));
+  }
+  &:popover-open {
+    animation: cy-menu-in var(--cy-motion-fast) var(--cy-motion-ease);
+  }
+}
+
+.cy-menu-item.cy-menu-item {
+  box-sizing: border-box !important;
+  display: flex;
+  align-items: center;
+  gap: var(--cy-space-4);
+  inline-size: 100%;
+  min-block-size: var(--_row);
+  margin: 0;
+  padding: 0 var(--cy-space-4);
+  border: 0;
+  border-radius: var(--cy-radius-sm);
+  background: transparent;
+  color: var(--cy-color-ink);
+  font: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  text-align: start;
+  text-transform: none;
+  letter-spacing: normal;
+  white-space: nowrap;
+  cursor: pointer;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+  &:hover:not([aria-disabled="true"]),
+  &:focus-visible,
+  &:focus {
+    background: var(--cy-color-soft);
+  }
+  &:focus-visible {
+    box-shadow: inset 0 0 0 var(--cy-border-width) var(--cy-color-ring);
+  }
+  &[data-tone="danger"] {
+    color: var(--cy-color-danger-text);
+    &:hover:not([aria-disabled="true"]),
+    &:focus {
+      background: color-mix(in oklab, var(--cy-color-danger) 12%, var(--cy-color-surface));
+    }
+  }
+  &[aria-disabled="true"] {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+}
+
+.cy-menu-check {
+  display: inline-grid;
+  place-items: center;
+  inline-size: 1em;
+  flex: none;
+  color: var(--cy-color-accent-text);
+  font-size: inherit;
+  line-height: inherit;
+}
+
+.cy-menu-icon.cy-menu-icon {
+  flex: none;
+  color: var(--cy-color-muted);
+  font-size: inherit;
+  [data-tone="danger"] > & {
+    color: inherit;
+  }
+}
+
+.cy-menu-label {
+  flex: 1;
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+.cy-menu-shortcut {
+  flex: none;
+  margin-inline-start: var(--cy-space-6);
+  color: var(--cy-color-muted);
+  font-size: inherit;
+  line-height: inherit;
+}
+
+.cy-menu-group {
+  display: grid;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+.cy-menu-group-label {
+  padding: var(--cy-space-3) var(--cy-space-4) var(--cy-space-1);
+  color: var(--cy-color-muted);
+  font-family: var(--cy-font-mono);
+  font-size: var(--cy-font-eyebrow-size);
+  font-weight: var(--cy-font-weight-bold);
+  letter-spacing: var(--cy-font-eyebrow-tracking);
+  line-height: var(--cy-font-line-height);
+  text-transform: uppercase;
+}
+
+.cy-menu-separator.cy-menu-separator {
+  box-sizing: border-box !important;
+  font-size: inherit;
+  border: 0;
+  block-size: var(--cy-border-width);
+  margin: var(--cy-space-2) calc(-1 * var(--cy-space-2));
+  background: var(--cy-color-line);
+}
+
+@media (pointer: coarse) {
+  .cy-menu.cy-menu {
+    --_row: max(var(--cy-menu-row-height, var(--cy-control-height-md)), var(--cy-hit-coarse, 44px));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cy-menu.cy-menu {
+    transition: none;
+    animation: none;
+  }
+}
+@media (forced-colors: active) {
+  .cy-menu-item.cy-menu-item:focus {
+    outline: var(--cy-border-width) solid Highlight;
+  }
+}
+
+/* Entrance as a keyframe animation, not @starting-style: if an engine mishandles the animation, the element still
+   ends in its normal visible style (WebKit left nested @starting-style overlays at opacity 0). */
+@keyframes cy-menu-in {
+  from {
+    opacity: 0;
+    translate: 0 calc(-1 * var(--cy-space-2));
+  }
+}

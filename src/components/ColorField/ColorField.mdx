@@ -1,0 +1,80 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./ColorField.stories";
+
+<Meta of={Stories} />
+
+# ColorField
+
+A colour input that takes any CSS colour as text, or lets people pick one from a saturation area, a hue slider, an opacity slider and, where the browser allows, the screen itself.
+
+<Canvas of={Stories.PickerAreaAndHue} />
+
+## When to use
+
+- **A colour setting:** an accent, a highlight, a fill.
+- **Inspecting and editing CSS colours** (Aperture), where people paste values in many syntaxes.
+
+**Use something else when:** the choice is one of a few named colours: a [SegmentedControl](?path=/docs/components-segmentedcontrol--docs) or [RadioGroup](?path=/docs/components-radiogroup--docs) of swatches.
+
+## Usage
+
+```tsx
+import { ColorField } from "@arshad-shah/cynosure";
+
+<ColorField label="Accent" value={accent} onChange={setAccent} />
+<ColorField label="Overlay" alpha format="rgb" name="overlay" />
+```
+
+The text accepts hex, `rgb()`, `hsl()`, `oklch()` and colour names, read on Enter or when leaving the field. Values come back in `format`.
+
+<Canvas of={Stories.OutputFormats} />
+
+## Invalid text
+
+Text that is not a colour is kept so it can be fixed, the field is marked invalid, and `labels.invalid` explains what is expected. Nothing changes until it is a colour.
+
+<Canvas of={Stories.InvalidTextIsExplained} />
+
+## Opacity
+
+With `alpha`, an opacity slider joins the picker and the value keeps opacity (`#0000ff80`, `rgb(0 0 255 / 0.5)`). Without it, opacity in typed text is dropped.
+
+<Canvas of={Stories.OpacityWithAlpha} />
+
+## Swatches
+
+`swatches` adds a group of colours to the picker: brand colours, presets, or recent colours you keep. Picking one sets the field, written in its `format`.
+
+<Canvas of={Stories.SwatchesInThePicker} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+| Input | Result |
+| --- | --- |
+| Typing, then <kbd>Enter</kbd> or leaving | Reads the colour |
+| Swatch button | Opens the picker (a dialog popover) |
+| Area: <kbd>Left</kbd> / <kbd>Right</kbd> | Saturation down / up (<kbd>Shift</kbd>: by ten) |
+| Area: <kbd>Up</kbd> / <kbd>Down</kbd> | Brightness up / down |
+| Hue and opacity sliders | Standard [Slider](?path=/docs/components-slider--docs) keys |
+| <kbd>Escape</kbd> | Closes the picker; focus returns to the swatch |
+
+- **Roles:** the input is a labelled text field; the area is a `slider` whose value text names both saturation and brightness; hue and opacity are Sliders.
+- **Swatch:** drawn over a checkerboard so opacity shows, with an outline that stays visible on any colour (at least 3:1 against the field).
+- **Eyedropper:** shown only where the browser offers the EyeDropper API; cancelling it changes nothing.
+- **Forms:** with `name`, the formatted value is submitted; reset restores the default.
+
+## Touch
+
+The swatch button keeps a 44px hit area on coarse pointers, and dragging on the area never scrolls the page.
+
+## Theming
+
+Tokens: `--cy-color-field-swatch-size`, `--cy-color-field-area-height` and `--cy-color-field-picker-width`. The field uses the TextField tokens.
+
+## Related
+
+[Slider](?path=/docs/components-slider--docs) · [TextField](?path=/docs/components-textfield--docs) · [Popover](?path=/docs/components-popover--docs)

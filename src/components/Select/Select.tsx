@@ -1,0 +1,317 @@
+import {
+  type CSSProperties,
+  Fragment,
+  type KeyboardEvent,
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useId,
+  useRef,
+  useState,
+} from "react";
+import { ButtonBase } from "../../foundations/ButtonBase/ButtonBase.js";
+import { useControllableState } from "../../foundations/controllable.js";
+import { HiddenValue } from "../../foundations/HiddenValue/HiddenValue.js";
+import { Icon } from "../../foundations/Icon/Icon.js";
+import { isComposing } from "../../foundations/keys.js";
+import { isTypeaheadKey, seekEnabled, useTypeahead } from "../../foundations/listbox.js";
+import { chevronDown } from "../../icons/chevron-down.js";
+import type { IconData } from "../../icons/types.js";
+import { useListboxLayer } from "../../overlay/listbox-layer.js";
+import type { Size } from "../../tokens/schema.js";
+import { Field } from "../Field/Field.js";
+
+export interface SelectTokens {
+  radius: string;
+  bg: string;
+  border: string;
+  listBg: string;
+  listShadow: string;
+  listMaxHeight: string;
+  optionActiveBg: string;
+}
+
+declare module "../../tokens/schema.js" {
+  interface ComponentTokens {
+    select: SelectTokens;
+  }
+}
+
+export interface SelectOption {
+  value: string;
+  label: string;
+  description?: string;
+  icon?: IconData;
+  disabled?: boolean;
+  /** Options next to each other with the same `group` are listed under that heading. */
+  group?: string;
+}
+
+export interface SelectProps {
+  label: ReactNode;
+  /** Visually hide the label (it still names the control). Prefer visible labels. */
+  labelHidden?: boolean | undefined;
+  description?: ReactNode;
+  error?: ReactNode;
+  options: SelectOption[];
+  value?: string;
+  defaultValue?: string;
+  onChange?: (value: string) => void;
+  placeholder?: string;
+  name?: string;
+  required?: boolean;
+  disabled?: boolean;
+  size?: Size;
+  variant?: "outline" | "soft";
+  labels?: { placeholder?: string; empty?: string; required?: string };
+  className?: string;
+  /** Layout only. */
+  style?: CSSProperties;
+}
+
+const PAGE = 10;
+
+/** Select-only combobox (WAI-ARIA APG): listbox in the top layer, typeahead, forms via HiddenValue. */
+/** Consecutive options that share a group, in order (ungrouped runs have no group). */
+function groupsOf(options: SelectOption[]) {
+  const runs: {
+    group: string | undefined;
+    start: number;
+    items: { option: SelectOption; index: number }[];
+  }[] = [];
+  options.forEach((option, index) => {
+    const last = runs[runs.length - 1];
+    if (last && last.group === option.group) last.items.push({ option, index });
+    else runs.push({ group: option.group, start: index, items: [{ option, index }] });
+  });
+  return runs;
+}
+
+export function Select({
+  label,
+  labelHidden,
+  description,
+  error,
+  options,
+  value,
+  defaultValue = "",
+  onChange,
+  placeholder,
+  name,
+  required,
+  disabled,
+  size = "md",
+  variant = "outline",
+  labels,
+  className,
+  style,
+}: SelectProps) {
+  const listId = `cy-select-${useId().replace(/:/g, "")}`;
+  const trigger = useRef<HTMLButtonElement | null>(null);
+  const list = useRef<HTMLDivElement | null>(null);
+  const [current, setCurrent, resetCurrent] = useControllableState(value, defaultValue, onChange);
+  const [open, setOpen] = useState(false);
+  const [active, setActive] = useState(-1);
+  const typeTo = useTypeahead();
+  // Shown after a blocked submit: the hidden input cannot be focused or explained, so the trigger is.
+  const [missing, setMissing] = useState(false);
+
+  const enabled = (i: number) => i >= 0 && i < options.length && !options[i]?.disabled;
+  const step = (from: number, delta: 1 | -1) => seekEnabled(options.length, from, delta, enabled);
+  const first = () => step(-1, 1);
+  const last = () => step(options.length, -1);
+
+  const choose = useCallback(
+    (index: number) => {
+      const option = options[index];
+      if (!option || option.disabled) return;
+      setMissing(false);
+      if (option.value !== current) setCurrent(option.value);
+    },
+    [options, current, setCurrent],
+  );
+  const close = (focus = true) => {
+    setOpen(false);
+    if (focus) trigger.current?.focus();
+  };
+  const openList = (at?: number) => {
+    const selected = options.findIndex((o) => o.value === current);
+    setActive(at ?? (enabled(selected) ? selected : first()));
+    setOpen(true);
+  };
+
+  // As wide as the trigger, never wider than max(trigger, 20rem): long labels truncate instead of overflowing.
+  useListboxLayer({ anchor: trigger, list, open, onClose: () => close(false), capWidth: true });
+  useEffect(() => {
+    if (!open || active < 0) return;
+    list.current?.querySelector(`[data-index="${active}"]`)?.scrollIntoView({ block: "nearest" });
+  }, [open, active]);
+
+  const typeahead = (key: string) => {
+    const hit = typeTo(
+      key,
+      options.map((o, i) => (enabled(i) ? o.label : null)),
+      active,
+    );
+    if (hit >= 0) {
+      if (!open) openList(hit);
+      else setActive(hit);
+    }
+  };
+
+  const onKeyDown = (e: KeyboardEvent<HTMLButtonElement>) => {
+    if (isComposing(e)) return;
+    const { key } = e;
+    if (!open) {
+      if (["ArrowDown", "ArrowUp", "Enter", " "].includes(key)) {
+        e.preventDefault();
+        openList(key === "ArrowUp" ? last() : undefined);
+      } else if (isTypeaheadKey(e)) typeahead(key);
+      return;
+    }
+    const moves: Record<string, () => number> = {
+      ArrowDown: () => step(active, 1),
+      ArrowUp: () => step(active, -1),
+      Home: first,
+      End: last,
+      PageDown: () => step(Math.min(active + PAGE - 1, options.length - 1), 1),
+      PageUp: () => step(Math.max(active - PAGE + 1, 0), -1),
+    };
+    if (moves[key]) {
+      e.preventDefault();
+      setActive(moves[key]());
+    } else if (key === "Enter" || key === " ") {
+      e.preventDefault();
+      choose(active);
+      close();
+    } else if (key === "Escape") {
+      e.preventDefault();
+      close();
+    } else if (key === "Tab") {
+      choose(active);
+      close(false);
+    } else if (isTypeaheadKey(e)) typeahead(key);
+  };
+
+  const selected = options.find((o) => o.value === current);
+  const placeholderText = placeholder ?? labels?.placeholder ?? "Select…";
+
+  return (
+    <Field
+      label={label}
+      labelHidden={labelHidden}
+      description={description}
+      error={error ?? (missing && !current ? (labels?.required ?? "Please choose a value.") : undefined)}
+      required={required}
+      size={size}
+      className={className}
+      style={style}
+    >
+      {(field) => (
+        <div className="cy-select" data-size={size} data-variant={variant}>
+          <ButtonBase
+            ref={trigger}
+            id={field.id}
+            role="combobox"
+            className="cy-select-trigger"
+            aria-labelledby={field.labelId}
+            aria-describedby={field.describedBy}
+            aria-invalid={field.invalid || undefined}
+            aria-required={required || undefined}
+            aria-haspopup="listbox"
+            aria-expanded={open}
+            aria-controls={listId}
+            aria-activedescendant={open && active >= 0 ? `${listId}-${active}` : undefined}
+            disabled={disabled}
+            onClick={() => (open ? close() : openList())}
+            onKeyDown={onKeyDown}
+          >
+            {selected?.icon && <Icon icon={selected.icon} />}
+            <span className="cy-select-value" data-placeholder={selected ? undefined : ""}>
+              {selected?.label ?? placeholderText}
+            </span>
+            <Icon icon={chevronDown} className="cy-select-chevron" />
+          </ButtonBase>
+          <div
+            ref={list}
+            id={listId}
+            role="listbox"
+            aria-labelledby={field.labelId}
+            className="cy-select-list"
+            {...{ popover: "manual" }}
+          >
+            {options.length === 0 && (
+              <div
+                role="option"
+                aria-disabled="true"
+                aria-selected="false"
+                tabIndex={-1}
+                className="cy-select-empty"
+              >
+                {labels?.empty ?? "No options"}
+              </div>
+            )}
+            {groupsOf(options).map((run) => {
+              const rows = run.items.map(({ option, index }) => (
+                <div
+                  key={option.value}
+                  id={`${listId}-${index}`}
+                  role="option"
+                  data-index={index}
+                  aria-selected={option.value === current}
+                  aria-disabled={option.disabled || undefined}
+                  data-active={index === active ? "" : undefined}
+                  className="cy-select-option"
+                  tabIndex={-1}
+                  onPointerMove={() => enabled(index) && setActive(index)}
+                  onPointerDown={(e) => e.preventDefault()}
+                  onClick={() => {
+                    if (!enabled(index)) return;
+                    choose(index);
+                    close();
+                  }}
+                  onKeyDown={() => {}}
+                >
+                  {option.icon && <Icon icon={option.icon} />}
+                  <span className="cy-select-option-text">
+                    <span className="cy-select-option-label">{option.label}</span>
+                    {option.description && (
+                      <span className="cy-select-option-description">{option.description}</span>
+                    )}
+                  </span>
+                </div>
+              ));
+              return run.group === undefined ? (
+                <Fragment key={`run-${run.start}`}>{rows}</Fragment>
+              ) : (
+                // biome-ignore lint/a11y/useSemanticElements: a group of options inside a listbox; a fieldset is a form control
+                <div key={`group-${run.start}`} role="group" aria-labelledby={`${listId}-g${run.start}`}>
+                  <div id={`${listId}-g${run.start}`} className="cy-select-group" role="presentation">
+                    {run.group}
+                  </div>
+                  {rows}
+                </div>
+              );
+            })}
+          </div>
+          <HiddenValue
+            name={name}
+            value={current}
+            required={required}
+            disabled={disabled}
+            requiredMessage={labels?.required ?? "Please choose a value."}
+            onReset={() => {
+              resetCurrent(defaultValue);
+              setMissing(false);
+            }}
+            onInvalid={(event) => {
+              event.preventDefault();
+              setMissing(true);
+              trigger.current?.focus();
+            }}
+          />
+        </div>
+      )}
+    </Field>
+  );
+}

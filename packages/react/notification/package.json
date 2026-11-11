@@ -1,9 +1,0 @@
-{
-  "name": "@arshad-shah/cynosure-react/notification",
-  "private": true,
-  "type": "module",
-  "main": "../dist/notification.js",
-  "module": "../dist/notification.js",
-  "types": "../dist/notification.d.ts",
-  "sideEffects": ["*.css"]
-}

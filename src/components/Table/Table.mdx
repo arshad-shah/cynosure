@@ -1,0 +1,69 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./Table.stories";
+
+<Meta of={Stories} />
+
+# Table
+
+Rows of data with headers. Columns can sort, rows can be selected, and the header can stay in view while the body scrolls.
+
+<Canvas of={Stories.ASemanticTable} />
+
+## When to use
+
+- **Records with the same fields**, read across and compared down: members, invoices, logs.
+
+**Use something else when:**
+- there is one record: [DescriptionList](?path=/docs/components-descriptionlist--docs)
+- items are visual or uneven: [Grid](?path=/docs/components-grid--docs) of [Card](?path=/docs/components-card--docs)s
+- the data is nested: [Tree](?path=/docs/components-tree--docs)
+
+## Usage
+
+```tsx
+import { Table } from "@arshad-shah/cynosure";
+
+<Table caption="Team members" rows={members} getRowId={(m) => m.id} columns={columns} />
+```
+
+A column shows `row[key]` unless it has a `cell` function. `align: "end"` lines numbers up.
+
+## Sorting
+
+Mark columns `sortable` and their headers become buttons: ascending, then descending, then the original order. Sorting compares `row[key]` (or `sortValue(row)`): text in the locale's order, numbers as numbers, empty values last. Sort on a server with `manualSort`: the table then shows and reports the sort through `onSortChange` without reordering.
+
+<Canvas of={Stories.SortingCyclesAndCompares} />
+
+## Selection
+
+`selectable` adds a checkbox to each row (named after the row header, "Select Grace") and a select-all that is mixed when some rows are selected. Selected ids are reported in the rows' own order.
+
+<Canvas of={Stories.SelectingRows} />
+
+## Sticky header
+
+With `stickyHeader` the body scrolls inside the table up to `--cy-table-max-height` and the header stays in view. The scroller is a focusable region named by the caption, so keyboard users can scroll it.
+
+<Canvas of={Stories.StickyHeaderScrolls} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+- **Semantics:** a native table with a caption; column headers, and a row header per row (the first column, or the one marked `rowHeader`), so screen readers announce context with every cell.
+- **Sorting:** sortable headers carry `aria-sort` and contain a button; Enter or Space sorts.
+- **Selection:** native checkboxes in the first column; Space toggles; the select-all reports "mixed".
+- **Empty:** one cell across all columns says so (`labels.empty`).
+- **Touch:** sort buttons have a 44px hit area on touch screens.
+- **Contrast:** headers, cells and selected rows keep 4.5:1 in light and dark modes.
+- **Direction:** columns follow the text direction; end-aligned cells sit at the inline end.
+
+## Theming
+
+Tokens: `--cy-table-header-background`, `--cy-table-selected-background` and `--cy-table-max-height`.
+
+## Related
+
+[DescriptionList](?path=/docs/components-descriptionlist--docs) · [Checkbox](?path=/docs/components-checkbox--docs) · [Badge](?path=/docs/components-badge--docs)

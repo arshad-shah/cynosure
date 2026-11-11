@@ -1,9 +1,0 @@
-{
-  "name": "@arshad-shah/cynosure-react/tooltip",
-  "private": true,
-  "type": "module",
-  "main": "../dist/tooltip.js",
-  "module": "../dist/tooltip.js",
-  "types": "../dist/tooltip.d.ts",
-  "sideEffects": ["*.css"]
-}

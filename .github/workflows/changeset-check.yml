@@ -1,4 +1,7 @@
 name: Changeset Check
+# Required by main's branch rules (job name "Require changeset or skip-changeset label"). Every pull request into main
+# adds a changeset (`pnpm changeset`) or carries the `skip-changeset` label; bot pull requests (Dependabot, the
+# Changesets "version packages" pull request) pass without one.
 on:
   pull_request:
     branches: [main]

@@ -1,0 +1,117 @@
+.cy-card.cy-card {
+  --_tone: var(--cy-color-ink);
+  --_pad: var(--cy-space-6);
+  box-sizing: border-box !important;
+  display: block;
+  inline-size: 100%;
+  min-inline-size: 0;
+  margin: 0;
+  padding: var(--_pad);
+  border: var(--cy-border-width) solid
+    var(--cy-card-border, color-mix(in oklab, var(--_tone) 14%, transparent));
+  border-radius: var(--cy-card-radius, var(--cy-radius-card));
+  background: var(--cy-card-bg, var(--cy-color-surface));
+  box-shadow: var(--cy-card-shadow, var(--cy-shadow-sm));
+  color: var(--cy-color-ink);
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-font-size-md);
+  font-weight: var(--cy-font-weight-regular);
+  line-height: var(--cy-font-line-height);
+  text-align: start;
+  text-decoration: none;
+  list-style: none;
+  &[data-padding="none"] {
+    --_pad: var(--cy-space-0);
+  }
+  &[data-padding="sm"] {
+    --_pad: var(--cy-space-4);
+  }
+  &[data-padding="lg"] {
+    --_pad: var(--cy-space-8);
+  }
+  &[data-tone="accent"] {
+    --_tone: var(--cy-color-accent);
+  }
+  &[data-tone="danger"] {
+    --_tone: var(--cy-color-danger);
+  }
+  &[data-tone="success"] {
+    --_tone: var(--cy-color-success);
+  }
+  &[data-tone="warning"] {
+    --_tone: var(--cy-color-warning);
+  }
+  &[data-tone="info"] {
+    --_tone: var(--cy-color-info);
+  }
+  &:not([data-tone="neutral"]) {
+    border-color: color-mix(in oklab, var(--_tone) 45%, transparent);
+  }
+  &[data-variant="outline"] {
+    background: transparent;
+    box-shadow: none;
+  }
+  &[data-variant="soft"] {
+    background: color-mix(in oklab, var(--_tone) var(--cy-card-soft-mix, 10%), var(--cy-color-surface));
+    box-shadow: none;
+  }
+  &[data-interactive] {
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition:
+      transform var(--cy-motion-fast) var(--cy-motion-ease),
+      border-color var(--cy-motion-fast) var(--cy-motion-ease),
+      box-shadow var(--cy-motion-fast) var(--cy-motion-ease);
+    &:hover {
+      border-color: color-mix(in oklab, var(--_tone) 60%, transparent);
+      box-shadow: var(--cy-shadow-md);
+    }
+    &:active {
+      transform: scale(0.99);
+    }
+    &:focus-visible {
+      outline: var(--cy-border-focus) solid transparent;
+      outline-offset: 0;
+      border-color: var(--cy-color-accent);
+      box-shadow: 0 0 0 var(--cy-border-focus) var(--cy-color-ring);
+    }
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.55;
+      transform: none;
+      box-shadow: none;
+    }
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cy-card.cy-card[data-interactive] {
+    transition: none;
+    &:active {
+      transform: none;
+    }
+  }
+}
+@media (forced-colors: active) {
+  .cy-card.cy-card {
+    border-color: CanvasText;
+  }
+}
+
+/* Actions: over the card's top end, outside its one target. */
+.cy-card-frame.cy-card-frame {
+  position: relative;
+  display: grid;
+  font-size: inherit;
+}
+.cy-card-actions.cy-card-actions {
+  position: absolute;
+  inset-block-start: var(--cy-space-3);
+  inset-inline-end: var(--cy-space-3);
+  z-index: 1;
+  display: flex;
+  gap: var(--cy-space-2);
+  font-size: inherit;
+}
+.cy-card.cy-card:has(> .cy-card-actions) {
+  position: relative;
+}

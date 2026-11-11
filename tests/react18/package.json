@@ -1,0 +1,10 @@
+{
+  "name": "cynosure-react18-smoke",
+  "private": true,
+  "type": "module",
+  "description": "Runs Cynosure source against React 18 (the oldest supported peer). Installed separately: pnpm --dir tests/react18 install.",
+  "dependencies": {
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  }
+}

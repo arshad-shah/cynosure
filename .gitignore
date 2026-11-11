@@ -22,3 +22,9 @@ tsup.config.bundled_*.mjs
 
 # Superpowers brainstorm scratch — per-session mockups.
 .superpowers/
+
+# Cynosure next
+dist/
+src/styles/generated-css.ts
+__screenshots__/**/__diff__/
+site/dist

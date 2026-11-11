@@ -1,0 +1,82 @@
+/* LoadingDots: sized in em, coloured by tone/currentColor. The resting keyframe is fully visible, so a zero
+   duration (reduced motion) leaves three solid dots instead of hiding them. */
+.cy-loading-dots.cy-loading-dots {
+  --_d: var(--cy-loading-dots-duration, calc(var(--cy-motion-base, 200ms) * 6));
+  --_c: currentColor;
+  box-sizing: border-box !important;
+  margin: 0;
+  font-size: inherit;
+  line-height: inherit;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cy-loading-dots-gap, 0.3em);
+  block-size: 1em;
+  vertical-align: middle;
+  letter-spacing: normal;
+
+  &[data-size="sm"] {
+    font-size: var(--cy-loading-dots-size-sm, calc(12px * var(--cy-scale, 1)));
+  }
+  &[data-size="md"] {
+    font-size: var(--cy-loading-dots-size-md, calc(16px * var(--cy-scale, 1)));
+  }
+  &[data-size="lg"] {
+    font-size: var(--cy-loading-dots-size-lg, calc(24px * var(--cy-scale, 1)));
+  }
+
+  &[data-tone="accent"] {
+    --_c: var(--cy-color-accent);
+  }
+  &[data-tone="neutral"] {
+    --_c: var(--cy-color-ink);
+  }
+  &[data-tone="muted"] {
+    --_c: var(--cy-color-muted);
+  }
+  &[data-tone="danger"] {
+    --_c: var(--cy-color-danger);
+  }
+  &[data-tone="success"] {
+    --_c: var(--cy-color-success);
+  }
+  &[data-tone="warning"] {
+    --_c: var(--cy-color-warning);
+  }
+  &[data-tone="info"] {
+    --_c: var(--cy-color-info);
+  }
+
+  &[data-speed="slow"] {
+    --_d: calc(var(--cy-loading-dots-duration, calc(var(--cy-motion-base, 200ms) * 6)) * 1.6);
+  }
+  &[data-speed="fast"] {
+    --_d: calc(var(--cy-loading-dots-duration, calc(var(--cy-motion-base, 200ms) * 6)) * 0.6);
+  }
+}
+
+.cy-loading-dots-dot {
+  display: block;
+  inline-size: var(--cy-loading-dots-dot-size, 0.5em);
+  block-size: var(--cy-loading-dots-dot-size, 0.5em);
+  border-radius: 50%;
+  background: var(--cy-loading-dots-color, var(--_c));
+  animation: cy-loading-dots-pulse var(--_d) var(--cy-motion-ease-in-out, ease-in-out) infinite both;
+  &:nth-child(2) {
+    animation-delay: calc(var(--_d) * 0.16);
+  }
+  &:nth-child(3) {
+    animation-delay: calc(var(--_d) * 0.32);
+  }
+}
+
+@keyframes cy-loading-dots-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  40% {
+    transform: scale(0.6);
+    opacity: 0.4;
+  }
+}

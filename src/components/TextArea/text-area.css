@@ -1,0 +1,143 @@
+.cy-text-area-count {
+  justify-self: end;
+  margin: 0;
+  font-family: var(--cy-font-mono);
+  font-size: var(--cy-font-size-xs);
+  font-weight: var(--cy-font-weight-regular);
+  letter-spacing: normal;
+  text-transform: none;
+  color: var(--cy-color-muted);
+}
+
+.cy-text-area-input.cy-text-area-input {
+  box-sizing: border-box !important;
+  display: block;
+  inline-size: 100%;
+  margin: 0;
+  padding: var(--cy-text-area-padding-block, var(--cy-space-4))
+    var(--cy-text-area-padding-inline, var(--cy-space-5));
+  border: var(--cy-border-width) solid var(--cy-text-area-border, var(--cy-color-line));
+  border-radius: var(--cy-text-area-radius, var(--cy-radius-md));
+  background: var(--cy-text-area-bg, var(--cy-color-surface));
+  color: var(--cy-color-ink);
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-font-size-md);
+  font-weight: var(--cy-font-weight-regular);
+  line-height: var(--cy-font-line-height);
+  letter-spacing: normal;
+  text-transform: none;
+  resize: none;
+  outline: none;
+  overflow-y: hidden;
+  appearance: none;
+  transition:
+    border-color var(--cy-motion-fast) var(--cy-motion-ease),
+    box-shadow var(--cy-motion-fast) var(--cy-motion-ease);
+  &::placeholder {
+    color: var(--cy-color-muted);
+    opacity: 1;
+  }
+  &:hover:not(:disabled) {
+    border-color: color-mix(in oklab, var(--cy-color-ink) 30%, var(--cy-color-line));
+  }
+  &:focus-visible,
+  &:focus {
+    border-color: var(--cy-color-accent);
+    box-shadow: 0 0 0 var(--cy-border-focus) var(--cy-color-ring);
+    outline: var(--cy-border-focus) solid transparent;
+  }
+  &[aria-invalid="true"] {
+    border-color: var(--cy-color-danger);
+  }
+  /* Read only: a sunken fill says "you can select and copy, not edit". */
+  &[readonly] {
+    background: var(--cy-text-area-readonly-bg, var(--cy-color-soft));
+    border-color: transparent;
+  }
+  &:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+}
+
+/* The textarea and its grip share a positioned box so the grip stays in the box corner, not the counter's. */
+.cy-text-area-box {
+  position: relative;
+  min-inline-size: 0;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+/*
+ * Hand-made resize grip (bottom-end corner). Pointer and touch only; content growth covers keyboard users.
+ * The visible grip is always the same small square tucked in the corner; on coarse pointers only its invisible hit
+ * area (::before) grows to 44px, so the grip never moves up into the text.
+ */
+.cy-text-area-grip.cy-text-area-grip {
+  --_box: var(--cy-hit-min, 24px);
+  --_hit: var(--cy-hit-min, 24px);
+  box-sizing: border-box !important;
+  position: absolute;
+  inset-block-end: var(--cy-border-width);
+  inset-inline-end: var(--cy-border-width);
+  display: grid;
+  place-items: center;
+  inline-size: var(--_box);
+  block-size: var(--_box);
+  margin: 0;
+  padding: 0;
+  color: var(--cy-color-muted);
+  font-size: var(--cy-font-size-sm);
+  line-height: 1;
+  cursor: ns-resize;
+  touch-action: none;
+  user-select: none;
+  opacity: 0.7;
+  transition:
+    opacity var(--cy-motion-fast) var(--cy-motion-ease),
+    color var(--cy-motion-fast) var(--cy-motion-ease);
+  &::before {
+    content: "";
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-start: 50%;
+    inline-size: var(--_hit);
+    block-size: var(--_hit);
+    translate: -50% -50%;
+  }
+  &:hover {
+    opacity: 1;
+    color: var(--cy-color-ink);
+  }
+  :dir(rtl) & {
+    transform: scaleX(-1);
+  }
+}
+@media (pointer: coarse) {
+  .cy-text-area-grip.cy-text-area-grip {
+    --_hit: var(--cy-hit-coarse, 44px);
+  }
+}
+/* Keep the last line of text clear of the grip. */
+.cy-text-area-box:has(> .cy-text-area-grip) > .cy-text-area-input.cy-text-area-input {
+  padding-block-end: max(var(--cy-text-area-padding-block, var(--cy-space-4)), var(--cy-hit-min, 24px));
+}
+
+.cy-text-area.cy-text-area {
+  font-size: inherit;
+  line-height: inherit;
+  box-sizing: border-box !important;
+  margin: 0;
+  display: grid;
+  gap: var(--cy-space-2);
+  &[data-size="sm"] .cy-text-area-input {
+    font-size: var(--cy-font-size-sm);
+  }
+  &[data-size="lg"] .cy-text-area-input {
+    font-size: var(--cy-font-size-lg);
+  }
+  &[data-variant="soft"] .cy-text-area-input {
+    background: var(--cy-text-area-soft-bg, var(--cy-color-soft));
+    border-color: transparent;
+  }
+}

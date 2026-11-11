@@ -1,0 +1,39 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./ZoomControls.stories";
+
+<Meta of={Stories} />
+
+# ZoomControls
+
+Zoom out, the current percent with a menu of choices, and zoom in.
+
+<Canvas of={Stories.StepsAndAMenu} />
+
+## When to use
+
+- **Beside a zoomable view**, such as a [DocumentViewport](?path=/docs/components-documentviewport--docs), so zoom does not depend on a wheel or a pinch.
+
+## Usage
+
+```tsx
+<ZoomControls zoom={zoom} percent={scale * 100} onZoomChange={setZoom} />
+```
+
+Pass the percent the view came to (DocumentViewport's `onScaleChange` times 100): fit modes depend on the viewport, so only the view knows it.
+
+<Canvas of={Stories.DrivesADocumentViewport} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+- **Role:** a toolbar named "Zoom": one tab stop; Left and Right move between zoom out, the menu and zoom in.
+- **Menu:** fit width, fit page and preset percents as a radio set; the current one is checked, and choosing closes the menu.
+- **Limits:** zoom in stops at 800% and zoom out at 25% (the buttons disable).
+- **Touch:** 44px hit areas on touch screens.
+
+## Related
+
+[DocumentViewport](?path=/docs/components-documentviewport--docs) · [Toolbar](?path=/docs/components-toolbar--docs) · [Menu](?path=/docs/components-menu--docs)

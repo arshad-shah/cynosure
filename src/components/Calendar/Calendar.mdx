@@ -1,0 +1,71 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./Calendar.stories";
+
+<Meta of={Stories} />
+
+# Calendar
+
+A month of days to pick one from, or to lay out a month's plans on.
+
+<Canvas of={Stories.PickADay} />
+
+## When to use
+
+- **Choosing a day** where seeing the month helps (a booking, a due date).
+- **A month view** of plans or events: `renderDay` puts your content in each day.
+
+**Use something else when:**
+- the date goes into a form field: [DateField](?path=/docs/components-datefield--docs), which types or picks
+- people pick a time of day: [TimeField](?path=/docs/components-timefield--docs)
+
+## Usage
+
+```tsx
+import { Calendar } from "@arshad-shah/cynosure";
+
+<Calendar value={date} onChange={setDate} min="2026-01-01" isDateDisabled={isFullyBooked} />
+```
+
+Dates are `YYYY-MM-DD` strings: no time and no time zone. Month and day names come from `Intl` in the `locale` you give (the browser's by default), and the week starts where that locale starts it.
+
+## Limits and unavailable days
+
+`min` and `max` stop focus and the month buttons. `isDateDisabled` marks days that can be focused (so people can hear about them) but not chosen.
+
+<Canvas of={Stories.LimitsAndUnavailableDays} />
+
+## A month of plans
+
+`renderDay(date, state)` adds your content under each day's number; the grid then fills its container. `onMonthChange` tells you which month to load.
+
+<Canvas of={Stories.AMonthOfPlans} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+| Key | Does |
+| --- | --- |
+| Left / Right | Previous / next day (flipped in right-to-left text) |
+| Up / Down | Same day of the previous / next week |
+| Home / End | First / last day of the week |
+| Page Up / Page Down | Same day of the previous / next month (Shift: year) |
+| Enter, Space | Choose the focused day |
+
+- **Roles:** a `grid` named by the month title, column headers with the full day name as `abbr`, and one Tab stop on the focused day.
+- **Names:** each day reads as its full date, then any `renderDay` content; today is `aria-current="date"`; unavailable days are `aria-disabled`.
+- **Announcements:** the month title is a polite live region.
+
+## Touch
+
+Days are at least 44px on touch screens. Tap a day to choose it; the month buttons have the same hit area.
+
+## Theming
+
+Tokens: `--cy-calendar-cell-size`, `--cy-calendar-selected-background`. The selected day uses the accent and its on-accent text colour.
+
+## Related
+
+[DateField](?path=/docs/components-datefield--docs) · [TimeField](?path=/docs/components-timefield--docs) · [Popover](?path=/docs/components-popover--docs)

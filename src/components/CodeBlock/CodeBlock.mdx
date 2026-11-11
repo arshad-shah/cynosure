@@ -1,0 +1,68 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./CodeBlock.stories";
+
+<Meta of={Stories} />
+
+# CodeBlock
+
+Shows code to read and copy, with a header naming the file or language and a copy button.
+
+<Canvas of={Stories.CodeWithAHeader} />
+
+## When to use
+
+- **Code samples, commands, configuration and output** that people read or copy.
+
+**Use something else when:**
+- the code is a few characters inside a sentence: `<code>` in [Prose](?path=/docs/components-prose--docs)
+- only a value needs copying: [CopyButton](?path=/docs/components-copybutton--docs) next to it
+
+## Usage
+
+```tsx
+import { CodeBlock } from "@arshad-shah/cynosure";
+
+<CodeBlock code={source} title="vite.config.ts" language="ts" />
+```
+
+## Highlighting
+
+Cynosure bundles no highlighter. Pass `highlight`, a function from the code and language to React nodes: Shiki, Prism or your own. Copying always copies the plain `code`.
+
+```tsx
+<CodeBlock
+  code={source}
+  language="ts"
+  highlight={(code, lang) => <span dangerouslySetInnerHTML={{ __html: highlighter.codeToHtml(code, { lang }) }} />}
+/>
+```
+
+<Canvas of={Stories.BringYourOwnHighlighter} />
+
+## Line numbers and wrapping
+
+`lineNumbers` adds a gutter that screen readers skip and selections leave out. `wrap` wraps long lines instead of scrolling sideways; line numbers are then left out because they could not line up.
+
+<Canvas of={Stories.LineNumbers} />
+
+<Canvas of={Stories.Wrapped} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+- **Structure:** a figure named by its `title` (or `language`). The copy button follows the title in the header.
+- **Scrolling:** code that scrolls sideways is a focusable region named like the block, so keyboard users can Tab to it and scroll with the arrow keys. Tall code scrolls inside the block, line numbers with it.
+- **Copy:** the button copies `code` and announces "Copied"; pass `copy` to copy through an extension's own channel.
+- **Contrast:** code, line numbers and the title keep 4.5:1 in light and dark modes (your highlighter's colours are yours to check).
+- All built-in text is in `labels`.
+
+## Theming
+
+Tokens: `--cy-code-block-background`, `--cy-code-block-radius` and `--cy-code-block-max-height`.
+
+## Related
+
+[CopyButton](?path=/docs/components-copybutton--docs) · [Prose](?path=/docs/components-prose--docs) · [Kbd](?path=/docs/components-kbd--docs)

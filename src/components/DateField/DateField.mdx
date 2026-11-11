@@ -1,0 +1,61 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./DateField.stories";
+
+<Meta of={Stories} />
+
+# DateField
+
+A date in a form: typed, stepped with the arrows, or picked from a calendar.
+
+<Canvas of={Stories.PickFromTheCalendar} />
+
+## When to use
+
+- **A date in a form or a filter**, where people may know the date (and type it) or want to see the month (and pick it).
+
+**Use something else when:**
+- the whole month should be on screen (a planner, a booking page): [Calendar](?path=/docs/components-calendar--docs)
+- it is a time of day: [TimeField](?path=/docs/components-timefield--docs)
+
+## Usage
+
+```tsx
+import { DateField } from "@arshad-shah/cynosure";
+
+<DateField label="Due date" name="due" value={due} onChange={setDue} min="2026-01-01" />
+```
+
+The value is a `YYYY-MM-DD` string or `null`. `onChange` reports only real, available dates: when typing is finished (blur or Enter), when the arrows step it, or when a day is picked.
+
+## Typing and mistakes
+
+Loose separators and single digits are tidied (`2026/1/5` becomes `2026-01-05`). Text that is not a date is kept for correcting and explained as the field's error; so is a date outside `min` and `max` or one `isDateDisabled` refuses.
+
+<Canvas of={Stories.ExplainsWhatItCannotTake} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+| Key | Does |
+| --- | --- |
+| Enter | Finish typing |
+| Up / Down | Next / previous day (Shift: month), within the limits |
+| In the calendar | Arrows, Home, End, Page Up and Down move; Enter or Space chooses; Escape closes |
+
+- **Picker:** a non-modal dialog named "Choose a date" that opens on the chosen day, as in the WAI-ARIA APG date picker. Choosing returns focus to the field.
+- **Errors** are the field's description and set `aria-invalid`.
+
+## Touch
+
+The calendar button and every day have 44px hit areas on touch screens. The field asks for the numeric keyboard.
+
+## Theming
+
+No tokens of its own; it follows TextField, Popover and Calendar.
+
+## Related
+
+[Calendar](?path=/docs/components-calendar--docs) · [TimeField](?path=/docs/components-timefield--docs) · [TextField](?path=/docs/components-textfield--docs)

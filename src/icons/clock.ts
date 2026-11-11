@@ -1,0 +1,11 @@
+import type { IconData } from "./types.js";
+
+export const clock: IconData = {
+  name: "clock",
+  category: "time",
+  body: [
+    ["circle", { cx: 12, cy: 12, r: 8.5 }],
+    ["path", { d: "M12 7.5V12l3 2", animate: true }],
+  ],
+  motion: "spin",
+};

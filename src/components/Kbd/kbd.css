@@ -1,0 +1,52 @@
+.cy-kbd-keys {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cy-space-2);
+}
+/* Drawn separator between keys (no "+" glyph). */
+.cy-kbd-join {
+  inline-size: var(--cy-space-2);
+  block-size: calc(var(--cy-border-width) * 1.5);
+  border-radius: var(--cy-border-width);
+  background: var(--cy-color-muted);
+}
+
+.cy-kbd-key.cy-kbd-key {
+  box-sizing: border-box !important;
+  display: inline-grid;
+  place-items: center;
+  min-inline-size: 2.1em;
+  margin: 0;
+  padding: var(--cy-space-1) var(--cy-space-3);
+  border: var(--cy-border-width) solid var(--cy-kbd-border, var(--cy-color-line));
+  border-block-end-width: calc(var(--cy-border-width) * 2);
+  border-radius: var(--cy-kbd-radius, calc(var(--cy-radius-sm) * 0.6));
+  background: var(--cy-kbd-bg, var(--cy-color-surface-raised));
+  color: var(--cy-color-ink);
+  font-family: var(--cy-font-mono);
+  font-size: inherit;
+  font-weight: var(--cy-font-weight-medium);
+  line-height: 1.2;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+.cy-kbd.cy-kbd {
+  box-sizing: border-box !important;
+  display: inline-flex;
+  margin: 0;
+  font-family: var(--cy-font-mono);
+  font-size: var(--cy-font-size-sm);
+  &[data-size="sm"] {
+    font-size: var(--cy-font-size-xs);
+  }
+  &[data-size="lg"] {
+    font-size: var(--cy-font-size-md);
+  }
+}
+/* A shortcut means nothing on a touch-only screen. */
+@media (hover: none) and (pointer: coarse) {
+  .cy-kbd.cy-kbd[data-shortcut] {
+    display: none;
+  }
+}

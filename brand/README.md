@@ -4,15 +4,15 @@ This directory contains the Cynosure UI brand mark and every derivative surface.
 
 ## Files
 
-| File | Use |
-|---|---|
-| `cynosure-mark.svg` | Master full-color mark. Default choice. |
-| `cynosure-mark-mono.svg` | `currentColor` monochrome — use on themed / colored / photographic backgrounds. |
-| `cynosure-mark-favicon.svg` | 5-token simplified variant for sizes < 32px. |
-| `cynosure-lockup.svg` | Horizontal mark + wordmark. Use wherever the mark appears next to other logos. |
-| `favicon.ico` | Multi-res ICO (16 + 32 + 48). |
-| `apple-touch-icon.png` | 180×180. iOS home-screen icon. |
-| `og-image.png` | 1200×630. Open Graph / Twitter share card. |
+| File                        | Use                                                                             |
+| --------------------------- | ------------------------------------------------------------------------------- |
+| `cynosure-mark.svg`         | Master full-color mark. Default choice.                                         |
+| `cynosure-mark-mono.svg`    | `currentColor` monochrome — use on themed / colored / photographic backgrounds. |
+| `cynosure-mark-favicon.svg` | 5-token simplified variant for sizes < 32px.                                    |
+| `cynosure-lockup.svg`       | Horizontal mark + wordmark. Use wherever the mark appears next to other logos.  |
+| `favicon.ico`               | Multi-res ICO (16 + 32 + 48).                                                   |
+| `apple-touch-icon.png`      | 180×180. iOS home-screen icon.                                                  |
+| `og-image.png`              | 1200×630. Open Graph / Twitter share card.                                      |
 
 ## Regenerating the binaries
 

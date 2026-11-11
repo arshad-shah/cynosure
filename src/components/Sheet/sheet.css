@@ -1,0 +1,58 @@
+/* sheet: a Dialog docked to an edge (see dialog.css for the frame, scrim and parts). */
+.cy-dialog[data-side] .cy-dialog-panel.cy-dialog-panel {
+  --_from-scale: 1;
+  margin: 0;
+  border-color: var(--cy-color-line);
+}
+.cy-dialog[data-side="bottom"] .cy-dialog-panel.cy-dialog-panel {
+  --_from-translate: 0 100%;
+  align-self: end;
+  inline-size: 100%;
+  max-block-size: var(--cy-sheet-max-height, 85%);
+  border-block-end: 0;
+  border-inline: 0;
+  border-radius: var(--cy-sheet-radius, var(--cy-radius-card)) var(--cy-sheet-radius, var(--cy-radius-card)) 0
+    0;
+}
+.cy-dialog[data-side="bottom"] .cy-dialog-actions.cy-dialog-actions {
+  padding-block-end: max(var(--cy-space-6), env(safe-area-inset-bottom));
+}
+.cy-dialog[data-side="end"] .cy-dialog-panel.cy-dialog-panel {
+  --_from-translate: 100% 0;
+  justify-self: end;
+  inline-size: min(var(--_w), 100%);
+  block-size: 100%;
+  max-block-size: 100%;
+  border-block: 0;
+  border-inline-end: 0;
+  border-radius: 0;
+  border-start-start-radius: var(--cy-sheet-radius, var(--cy-radius-card));
+  border-end-start-radius: var(--cy-sheet-radius, var(--cy-radius-card));
+}
+.cy-dialog[data-side="start"] .cy-dialog-panel.cy-dialog-panel {
+  --_from-translate: -100% 0;
+  justify-self: start;
+  inline-size: min(var(--_w), 100%);
+  block-size: 100%;
+  max-block-size: 100%;
+  border-block: 0;
+  border-inline-start: 0;
+  border-radius: 0;
+  border-start-end-radius: var(--cy-sheet-radius, var(--cy-radius-card));
+  border-end-end-radius: var(--cy-sheet-radius, var(--cy-radius-card));
+}
+.cy-dialog[data-side="end"]:dir(rtl) .cy-dialog-panel.cy-dialog-panel {
+  --_from-translate: -100% 0;
+}
+.cy-dialog[data-side="start"]:dir(rtl) .cy-dialog-panel.cy-dialog-panel {
+  --_from-translate: 100% 0;
+}
+.cy-dialog.cy-dialog:is([data-side="end"], [data-side="start"]) {
+  --_w: var(--cy-sheet-width-md, 400px);
+  &[data-size="sm"] {
+    --_w: var(--cy-sheet-width-sm, 320px);
+  }
+  &[data-size="lg"] {
+    --_w: var(--cy-sheet-width-lg, 560px);
+  }
+}

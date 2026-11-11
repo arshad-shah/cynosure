@@ -1,0 +1,41 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./FileInputBase.stories";
+
+<Meta of={Stories} />
+
+# FileInputBase
+
+The native `<input type="file">` for Cynosure, and the only module allowed to render one. It is a foundation: no visual opinions, so composites style or hide it.
+
+## Who uses it
+
+[FileDrop](?path=/docs/components-filedrop--docs).
+
+## When to use it directly
+
+Only when building a new composite that picks files.
+
+**Use a component instead when** you want people to add files: [FileDrop](?path=/docs/components-filedrop--docs) gives a drop zone, a picker button, checks and messages.
+
+<Canvas of={Stories.PickingCallsOnFiles} />
+
+## Usage
+
+```tsx
+import { FileInputBase, setInputFiles } from "@arshad-shah/cynosure";
+
+<FileInputBase name="attachment" accept="image/*" multiple onFiles={(files) => …} />
+
+// Files that arrived another way (a drop) can be put into the input, so forms submit them:
+setInputFiles(input, droppedFiles);
+```
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour
+
+- `onFiles` receives an array of `File`s; an empty array when the selection is cleared.
+- `setInputFiles` replaces the input's files, so `FormData` and form submission include them.
+- A disabled input picks nothing and is not submitted.

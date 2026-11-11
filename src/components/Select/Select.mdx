@@ -1,0 +1,92 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./Select.stories";
+
+<Meta of={Stories} />
+
+# Select
+
+Picks one option from a list that opens on demand. The trigger is a Cynosure button and the list opens in the top layer, so it is never clipped. For a short list that should stay visible, use [RadioGroup](?path=/docs/components-radiogroup--docs).
+
+<Canvas of={Stories.ClickToOpenAndSelect} />
+
+## When to use
+
+- Five or more options, or a list that would take too much room as radios.
+- A value that is submitted with a form (a country, a language, a database).
+- Options that benefit from a description or an icon.
+
+**Use something else when:**
+- there are only a few options: [RadioGroup](?path=/docs/components-radiogroup--docs) or [SegmentedControl](?path=/docs/components-segmentedcontrol--docs)
+- the user types free text: [TextField](?path=/docs/components-textfield--docs)
+
+## Usage
+
+```tsx
+import { Select } from "@arshad-shah/cynosure";
+
+<Select
+  label="Fruit"
+  name="fruit"
+  placeholder="Choose a fruit"
+  options={[
+    { value: "apple", label: "Apple" },
+    { value: "pear", label: "Pear", description: "Seasonal" },
+    { value: "plum", label: "Plum", disabled: true },
+  ]}
+  onChange={setFruit}
+/>
+```
+
+## Controlled use
+
+Pass `value` and `onChange(value)` to own the state, or `defaultValue` to start with a selection.
+
+<Canvas of={Stories.ControlledValue} />
+
+## Long lists and labels
+
+The list has a maximum height and scrolls. Long labels truncate with an ellipsis in the trigger and the list. The list opens above the trigger when there is no room below.
+
+<Canvas of={Stories.ManyOptionsScrollAndTruncate} />
+
+## Options and states
+
+- **`variant`:** `outline` (default) or `soft`.
+- **`size`:** `sm`, `md` or `lg`.
+- **`error` and `description`:** shown under the field and linked to the trigger.
+- **`labels`:** override `placeholder`, `empty` (no options) and `required` (validation message).
+- **`labelHidden`:** hides the label visually while it still names the trigger. Prefer a visible label.
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+| Input | Result |
+| --- | --- |
+| Click, <kbd>Enter</kbd>, <kbd>Space</kbd>, <kbd>ArrowDown</kbd>, <kbd>ArrowUp</kbd> | Opens the list |
+| Arrow keys, <kbd>Home</kbd>, <kbd>End</kbd>, <kbd>PageUp</kbd>, <kbd>PageDown</kbd> | Move through options, skipping disabled ones |
+| <kbd>Enter</kbd>, <kbd>Space</kbd>, <kbd>Tab</kbd> | Select the active option |
+| <kbd>Escape</kbd> | Closes without changing the value |
+| Typing | Jumps to a matching option (ignored during IME composition) |
+
+- **Pattern:** a select-only combobox following the WAI-ARIA authoring practices, with a `listbox` of `option`s.
+- **Forms:** a hidden input carries `name` and the value, so `FormData`, reset and `required` validation work.
+- **Outside click:** closes the list.
+
+## Touch
+
+On coarse pointers (phones and tablets) option rows grow to 44px.
+
+## Theming
+
+Tokens: `--cy-select-{radius,bg,border,list-bg,list-shadow,list-max-height,option-active-bg}`.
+
+```ts
+createTheme({ components: { select: { radius: "10px", listMaxHeight: "240px" } } });
+```
+
+## Related
+
+[RadioGroup](?path=/docs/components-radiogroup--docs) · [SegmentedControl](?path=/docs/components-segmentedcontrol--docs) · [TextField](?path=/docs/components-textfield--docs)

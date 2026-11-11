@@ -1,0 +1,112 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./CynosureTheme.stories";
+
+<Meta of={Stories} />
+
+# CynosureTheme
+
+Applies a product theme to a subtree. It is the theme root: wrap your app (or one part of it) in it and every component below picks up the theme's tokens. By default it only themes its own wrapper and never touches `<html>`, `<head>` or `<body>`.
+
+## Who uses it
+
+Every product, as its theme root. [ThemeToggle](?path=/docs/components-themetoggle--docs) works with the colour mode it provides.
+
+## When to use it directly
+
+- once at the root of an app, with a theme from `createTheme()`
+- around a section that needs a different accent, scale or mode (themes nest, and an omitted prop inherits from the surrounding theme)
+- with `target="document"` only when your app owns the whole page. Never use that in content scripts.
+
+<Canvas of={Stories.OwnWrapperOnly} />
+
+## Usage
+
+```tsx
+import { CynosureTheme, createTheme, useColorMode } from "@arshad-shah/cynosure";
+
+const theme = createTheme({ accent: "#e8462e", scale: "compact" });
+
+export function App() {
+  const { mode } = useColorMode(); // persisted; never throws
+  return (
+    <CynosureTheme theme={theme} mode={mode}>
+      …
+    </CynosureTheme>
+  );
+}
+```
+
+## Props
+
+<ArgTypes of={Stories} />
+
+- **`theme`:** the result of `createTheme()`. Omit to inherit every token from the surrounding theme (or the default stylesheet).
+- **`mode`:** `light`, `dark` or `system` (follows the OS). Omit to inherit.
+- **`contrast`:** `normal`, `more` or `system`. When omitted it follows the OS, like `system`.
+- **`target`:** `self` (default) themes only the wrapper; `document` themes `<html>`.
+- **`as`:** `div` (default) or `span`. The wrapper uses `display: contents`, so it does not affect layout.
+- **`style`:** layout only (margin, placement). Restyle through tokens.
+
+## Nesting and modes
+
+<Canvas of={Stories.Nested} />
+<Canvas of={Stories.SystemMode} />
+<Canvas of={Stories.ContrastMore} />
+
+## Guarantees
+
+- Never writes to `<head>` or `<body>`, and never injects `<style>`. Properties go through React's style object, so it is CSP-safe.
+- Mode switching uses `data-cy-mode`, `color-scheme` and `light-dark()` tokens; contrast swaps the contrast palettes.
+- With `target="document"`, unmounting restores whatever the host page had on `<html>` instead of deleting it.
+
+## createTheme
+
+`createTheme` builds a theme from a few options.
+
+```ts
+const theme = createTheme({
+  accent: "#e8462e", // any hex, rgb(), hsl(), oklch()
+  scale: "compact", // compact 0.875 · comfortable 1 · spacious 1.2 · or a number
+  radius: 1, // multiplier on the Facet radius (0.3 × control height)
+  font: { sans: "Hanken Grotesk, system-ui" },
+  motion: "reduced", // or partial durations/easings
+  tokens: { space: { "4": 10 } }, // any global token
+  palettes: { dark: { bg: "#0f0e0c" } }, // any colour, per palette
+  components: { button: { radius: "4px" } }, // any component token
+});
+```
+
+It derives accent hover and active (OKLCH), soft and ring mixes, and on-accent text with WCAG contrast of at least 4.5:1. Invalid colours or unsafe values throw `CynosureThemeError`.
+
+Besides `<CynosureTheme>`, a theme can be applied at build time with `themeToCss(theme)`, or in a shadow root with `styles.inline` plus `themeToCss(theme, ":host")`.
+
+## useColorMode
+
+```tsx
+const { mode, setMode, resolved } = useColorMode({ storage, key });
+```
+
+- `mode` is `light`, `dark` or `system`; `resolved` is the actual `light` or `dark` after applying the OS preference.
+- The choice is persisted through `storage` (localStorage by default) under `key` (default `cy-color-mode`). `storage` is any `{ get, set }` object, sync or async, for example `chrome.storage`.
+- It never throws: unavailable or invalid storage falls back to `system`, and a failed write keeps the in-memory value.
+- The first render is always `system` and storage is read after mount, so it is safe for server rendering and hydration.
+- Several hooks with the same `key` on one page stay in sync.
+
+## No flash on load
+
+`useColorMode` reads storage after the first render, so a server-rendered or static page shows the default mode for a moment. `themeInitScript()` returns the text of a tiny script that applies the saved mode before the first paint. Cynosure never injects it: place it early in the page yourself.
+
+```tsx
+import { themeInitScript } from "@arshad-shah/cynosure";
+
+// In the document <head> (React server rendering, Astro, a plain HTML template):
+<script dangerouslySetInnerHTML={{ __html: themeInitScript() }} />
+```
+
+- `key` must match `useColorMode({ key })`; `selector` marks an app root instead of `<html>`.
+- It contains no `<`, so it is safe to inline. For a content security policy without inline scripts, write the text to a file at build time and load that.
+- It reads localStorage only; async storage (such as `chrome.storage`) cannot be read before paint.
+
+## Related
+
+[ThemeToggle](?path=/docs/components-themetoggle--docs)

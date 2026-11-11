@@ -1,0 +1,73 @@
+/*
+ * tag-input: a TextField, then the tags as a wrapping list of chips (text and a remove button). The suggestion list
+ * reuses Combobox's listbox styles (combobox.css).
+ */
+.cy-tag-input.cy-tag-input {
+  box-sizing: border-box !important;
+  display: flex;
+  flex-direction: column;
+  gap: var(--cy-space-3);
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+  color: var(--cy-color-ink);
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-font-size-md);
+  line-height: var(--cy-font-line-height);
+  letter-spacing: normal;
+  text-transform: none;
+  &[data-size="sm"] {
+    font-size: var(--cy-font-size-sm);
+  }
+  &[data-size="lg"] {
+    font-size: var(--cy-font-size-lg);
+  }
+}
+.cy-tag-input-tags.cy-tag-input-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--cy-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: inherit;
+}
+.cy-tag-input-tag.cy-tag-input-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cy-space-1);
+  max-inline-size: 100%;
+  min-block-size: var(--cy-control-height-sm);
+  margin: 0;
+  padding-block: 0;
+  padding-inline: var(--cy-space-4) var(--cy-space-1);
+  border-radius: var(--cy-tag-input-tag-radius, var(--cy-radius-full));
+  background: var(--cy-tag-input-tag-background, var(--cy-color-soft));
+  color: var(--cy-color-ink);
+  font-size: var(--cy-font-size-sm);
+  &:has(> .cy-tag-input-text:only-child) {
+    padding-inline-end: var(--cy-space-4);
+  }
+}
+.cy-tag-input-text.cy-tag-input-text {
+  min-inline-size: 0;
+  overflow: hidden;
+  font-size: inherit;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cy-tag-input-status.cy-tag-input-status {
+  position: absolute;
+  inline-size: var(--cy-border-width);
+  block-size: var(--cy-border-width);
+  margin: calc(var(--cy-border-width) * -1);
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  font-size: inherit;
+}
+@media (forced-colors: active) {
+  .cy-tag-input-tag.cy-tag-input-tag {
+    outline: var(--cy-border-width) solid CanvasText;
+  }
+}

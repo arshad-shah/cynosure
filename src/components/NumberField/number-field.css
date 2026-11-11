@@ -1,0 +1,20 @@
+/* number-field: a TextField whose end holds the − and + steppers; digits line up in tables of numbers. */
+.cy-number-field .cy-text-field-input.cy-text-field-input {
+  font-variant-numeric: tabular-nums;
+}
+.cy-number-field-steppers.cy-number-field-steppers {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: var(--cy-space-1);
+  margin-inline-end: calc(var(--cy-space-2) * -1);
+  color: inherit;
+  font-size: inherit;
+}
+
+/* Scrubbing: the label is a horizontal drag handle. Vertical swipes still scroll the page. */
+.cy-number-field label[data-scrub] {
+  cursor: ew-resize;
+  touch-action: pan-y;
+  user-select: none;
+}

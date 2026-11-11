@@ -1,0 +1,8 @@
+/* IconButton: a square Button. Its label tooltip is the Tooltip component. */
+.cy-button.cy-button.cy-icon-button {
+  inline-size: var(--_h);
+  padding: 0;
+  & .cy-button-label {
+    display: contents;
+  }
+}

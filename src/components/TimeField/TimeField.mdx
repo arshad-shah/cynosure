@@ -1,0 +1,56 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./TimeField.stories";
+
+<Meta of={Stories} />
+
+# TimeField
+
+A time of day in a form: typed loosely, reported as 24-hour `HH:MM`.
+
+<Canvas of={Stories.ArrowsStepThePartUnderTheCaret} />
+
+## When to use
+
+- **A time of day** in a form or filter: an opening hour, a reminder, a schedule.
+
+**Use something else when:**
+- it is a date: [DateField](?path=/docs/components-datefield--docs)
+- it is a duration or a count of minutes: [NumberField](?path=/docs/components-numberfield--docs)
+
+## Usage
+
+```tsx
+import { TimeField } from "@arshad-shah/cynosure";
+
+<TimeField label="Start time" value={start} onChange={setStart} min="09:00" max="17:30" step={15} />
+```
+
+The value is `HH:MM` (or `HH:MM:SS` with `seconds`) or `null`. `930`, `9:30 pm` and `12am` are understood; anything that is not a time is kept for correcting and explained.
+
+<Canvas of={Stories.ExplainsWhatItCannotTake} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+| Key | Does |
+| --- | --- |
+| Enter | Finish typing |
+| Up / Down | Step the part the caret is in: hours, minutes (by `step`) or seconds; Shift: ten times as far |
+
+- **Errors** are the field's description and set `aria-invalid`.
+- **Limits:** `min` and `max` stop the arrows; typed times outside them are explained.
+
+## Touch
+
+The field asks for the numeric keyboard.
+
+## Theming
+
+No tokens of its own; it follows TextField.
+
+## Related
+
+[DateField](?path=/docs/components-datefield--docs) · [Calendar](?path=/docs/components-calendar--docs) · [NumberField](?path=/docs/components-numberfield--docs)

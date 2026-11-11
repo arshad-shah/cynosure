@@ -1,0 +1,49 @@
+.cy-stack.cy-stack,
+.cy-inline.cy-inline {
+  box-sizing: border-box !important;
+  display: flex;
+  gap: var(--_gap);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: inherit;
+  line-height: inherit;
+  min-inline-size: 0;
+  &[data-align="start"] {
+    align-items: flex-start;
+  }
+  &[data-align="center"] {
+    align-items: center;
+  }
+  &[data-align="end"] {
+    align-items: flex-end;
+  }
+  &[data-align="stretch"] {
+    align-items: stretch;
+  }
+  &[data-align="baseline"] {
+    align-items: baseline;
+  }
+  &[data-justify="start"] {
+    justify-content: flex-start;
+  }
+  &[data-justify="center"] {
+    justify-content: center;
+  }
+  &[data-justify="end"] {
+    justify-content: flex-end;
+  }
+  &[data-justify="between"] {
+    justify-content: space-between;
+  }
+}
+.cy-stack.cy-stack {
+  flex-direction: column;
+}
+.cy-inline.cy-inline {
+  flex-direction: row;
+  align-items: center;
+  &[data-wrap] {
+    flex-wrap: wrap;
+  }
+}

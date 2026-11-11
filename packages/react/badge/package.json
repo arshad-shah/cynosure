@@ -1,9 +1,0 @@
-{
-  "name": "@arshad-shah/cynosure-react/badge",
-  "private": true,
-  "type": "module",
-  "main": "../dist/badge.js",
-  "module": "../dist/badge.js",
-  "types": "../dist/badge.d.ts",
-  "sideEffects": ["*.css"]
-}

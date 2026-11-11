@@ -1,0 +1,164 @@
+/*
+ * table: a scroll wrapper around a native table. Rows are separated by lines; the header has its own background and,
+ * with data-sticky, stays at the top while the wrapper scrolls (the wrapper is then a focusable region).
+ */
+.cy-table.cy-table {
+  --_pad-y: var(--cy-space-4);
+  --_pad-x: var(--cy-space-5);
+  box-sizing: border-box !important;
+  display: block;
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+  border: var(--cy-border-width) solid var(--cy-color-line);
+  border-radius: var(--cy-radius-card);
+  background: var(--cy-color-surface);
+  color: var(--cy-color-ink);
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-font-size-md);
+  font-weight: var(--cy-font-weight-regular);
+  line-height: var(--cy-font-line-height);
+  letter-spacing: normal;
+  text-transform: none;
+  overflow: hidden;
+  &[data-size="sm"] {
+    --_pad-y: var(--cy-space-2);
+    --_pad-x: var(--cy-space-4);
+    font-size: var(--cy-font-size-sm);
+  }
+  &[data-size="lg"] {
+    --_pad-y: var(--cy-space-5);
+    --_pad-x: var(--cy-space-6);
+    font-size: var(--cy-font-size-lg);
+  }
+}
+.cy-table-scroll.cy-table-scroll {
+  overflow: auto;
+  font-size: inherit;
+  [data-sticky] > & {
+    max-block-size: var(--cy-table-max-height, 24rem);
+  }
+  &:focus-visible {
+    outline: var(--cy-border-focus) solid var(--cy-color-ring);
+    outline-offset: calc(-1 * var(--cy-border-focus));
+  }
+}
+.cy-table-table.cy-table-table {
+  inline-size: 100%;
+  margin: 0;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: inherit;
+  font-variant-numeric: tabular-nums;
+}
+.cy-table-caption.cy-table-caption {
+  padding: var(--_pad-y) var(--_pad-x);
+  font-size: inherit;
+  font-weight: var(--cy-font-weight-bold);
+  text-align: start;
+  caption-side: top;
+  &[data-hidden] {
+    position: absolute;
+    padding: 0;
+    inline-size: var(--cy-border-width);
+    block-size: var(--cy-border-width);
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+.cy-table-th.cy-table-th,
+.cy-table-td.cy-table-td {
+  padding: var(--_pad-y) var(--_pad-x);
+  border: 0;
+  border-block-end: var(--cy-border-width) solid var(--cy-color-line);
+  font-size: inherit;
+  text-align: start;
+  vertical-align: middle;
+  &[data-align="end"] {
+    text-align: end;
+  }
+}
+.cy-table-th.cy-table-th {
+  background: var(--cy-table-header-background, var(--cy-color-soft));
+  color: var(--cy-color-muted);
+  font-size: var(--cy-font-size-sm);
+  font-weight: var(--cy-font-weight-medium);
+  white-space: nowrap;
+  [data-sticky] & {
+    position: sticky;
+    inset-block-start: 0;
+    z-index: 1;
+  }
+}
+.cy-table-rowheader.cy-table-rowheader {
+  color: var(--cy-color-ink);
+  font-weight: var(--cy-font-weight-medium);
+}
+.cy-table-row.cy-table-row {
+  &:last-child > * {
+    border-block-end: 0;
+  }
+  &[data-selected] > * {
+    background: var(--cy-table-selected-background, var(--cy-color-accent-soft));
+  }
+}
+.cy-table-select.cy-table-select {
+  inline-size: var(--cy-border-width);
+  padding-inline-end: 0;
+}
+.cy-table-sort.cy-table-sort {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cy-space-2);
+  min-block-size: var(--cy-hit-min, 24px);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--cy-radius-sm);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: inherit;
+  letter-spacing: normal;
+  text-transform: none;
+  cursor: pointer;
+  [data-align="end"] > & {
+    flex-direction: row-reverse;
+  }
+  &:hover {
+    color: var(--cy-color-ink);
+  }
+  &:focus-visible {
+    outline: var(--cy-border-focus) solid var(--cy-color-ring);
+    outline-offset: var(--cy-space-1);
+  }
+  [aria-sort="ascending"] > &,
+  [aria-sort="descending"] > & {
+    color: var(--cy-color-ink);
+  }
+}
+.cy-table-empty.cy-table-empty {
+  padding-block: var(--cy-space-8);
+  color: var(--cy-color-muted);
+  text-align: center;
+}
+.cy-table-hidden.cy-table-hidden {
+  position: absolute;
+  inline-size: var(--cy-border-width);
+  block-size: var(--cy-border-width);
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  font-size: inherit;
+}
+@media (pointer: coarse) {
+  .cy-table-sort.cy-table-sort {
+    min-block-size: var(--cy-hit-coarse, 44px);
+  }
+}
+@media (forced-colors: active) {
+  .cy-table-row.cy-table-row[data-selected] > * {
+    outline: var(--cy-border-width) solid Highlight;
+  }
+}

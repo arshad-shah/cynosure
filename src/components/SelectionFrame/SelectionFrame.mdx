@@ -1,0 +1,71 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./SelectionFrame.stories";
+
+<Meta of={Stories} />
+
+# SelectionFrame
+
+Move, resize and rotate one selected object with a mouse, pen, finger or the keyboard.
+
+<Canvas of={Stories.DragHandlesToResizeAndRotate} />
+
+## When to use
+
+- **Placing things on a page or canvas**: form fields on a PDF, images, shapes, a crop area.
+
+**Use something else when:**
+- people reorder items in a list: [SortableList](?path=/docs/components-sortablelist--docs)
+- people resize panes of a layout: [SplitPane](?path=/docs/components-splitpane--docs)
+
+## Usage
+
+```tsx
+import { SelectionFrame } from "@arshad-shah/cynosure";
+
+<SelectionFrame label="Image" box={box} scale={zoom} resizable onChange={setPreview} onCommit={save} />
+```
+
+Place the frame in a positioned layer over your page. `box` is in your own units and `scale` maps them to CSS pixels, so the same geometry works at any zoom. `onChange` previews each step of a drag or held key; `onCommit` marks the end of one change, which is one undo step. `snap` can adjust every proposed box.
+
+## Keyboard
+
+<Canvas of={Stories.KeysMoveResizeAndRotate} />
+
+| Keys                | Action                                                        |
+| ------------------- | ------------------------------------------------------------- |
+| Arrows              | Move by `step` (Shift: `largeStep`)                           |
+| Alt + arrows        | Resize its own right and bottom edges (with `resizable`)      |
+| `[` and `]`         | Rotate 15° (with `rotatable`)                                 |
+| Escape              | Cancel the key being held, or a drag, back to where it began  |
+| Enter               | Commit the key being held                                     |
+
+## Drawing a new box
+
+With `draw`, a drag anywhere on the layer draws a new box: a region select in a screenshot tool, a crop, an area on a grid. `box` starts as `null`. Before a box exists the layer is a focusable drawing area, and Enter places a box in its middle for keyboard users.
+
+```tsx
+const [region, setRegion] = useState<FrameBox | null>(null);
+<SelectionFrame label="Region" draw resizable box={region} bounds={page} onCommit={setRegion} />
+```
+
+<Canvas of={Stories.DrawANewBox} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+- **Role:** a focusable group named by `label`, described to screen readers as a "selection" (`labels.roleDescription`). Describe the keys nearby with `aria-describedby`.
+- **Pointer, pen and touch:** through detent's pointer path; a finger held briefly drags, a quick swipe still scrolls the page; Escape cancels a drag.
+- **Rotation:** handles turn with the object, and a drag is read in the object's own axes so the opposite edge stays where it is. Shift snaps rotation to 15°.
+- **Bounds:** with `bounds`, moving stops at the edges and resizing an unrotated object stops its grabbed edge there.
+- **Touch:** handles have a 44px hit area on touch screens; the rotate handle sits further out.
+
+## Theming
+
+Tokens: `--cy-selection-frame-color` and `--cy-selection-frame-handle-size`.
+
+## Related
+
+[FloatingToolbar](?path=/docs/components-floatingtoolbar--docs) · [SignaturePad](?path=/docs/components-signaturepad--docs)

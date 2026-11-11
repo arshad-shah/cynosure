@@ -1,0 +1,61 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./Announcer.stories";
+
+<Meta of={Stories} />
+
+# Announcer
+
+Tells screen reader users about changes that happen without moving focus, such as "Draft saved" or "12 results". `<Announcer>` renders two hidden live regions inside your app; `useAnnounce()` speaks through the nearest one.
+
+<Canvas of={Stories.AnnouncesPolitely} />
+
+## When to use
+
+- **A change with no visible message**, or with one somewhere the person is not looking: a save finished, a filter changed the result count, an item was copied.
+
+**Use something else when:**
+- a visible message suits everyone: [Toast](?path=/docs/components-toast--docs) or [Notice](?path=/docs/components-notice--docs) (both announce themselves)
+- focus moves to the new content anyway: moving focus is its own announcement
+
+## Usage
+
+Render one `Announcer` near the root of your app, inside your `CynosureTheme`:
+
+```tsx
+import { Announcer, useAnnounce } from "@arshad-shah/cynosure";
+
+<Announcer>
+  <App />
+</Announcer>
+
+function Results({ count }: { count: number }) {
+  const announce = useAnnounce();
+  useEffect(() => announce(`${count} results`), [count, announce]);
+  …
+}
+```
+
+`announce(message)` is polite: the screen reader finishes what it is saying first. Pass `{ politeness: "assertive" }` to interrupt; keep that for errors.
+
+<Canvas of={Stories.AnnouncesErrorsAssertively} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+- **Regions:** a `role="status"` region (polite) and a `role="alert"` region (assertive), both atomic and visually hidden but present for assistive technology.
+- **Repeats:** each announcement is a new text node, so the same message twice is read twice.
+- **Clearing:** messages are removed after `clearAfter` milliseconds (5000), so they do not linger for someone browsing the page later.
+- **Isolation:** the regions render where the `Announcer` is. Nothing is appended to `<body>`.
+- **Nesting:** `useAnnounce()` uses the nearest `Announcer`; an extension can give each mounted panel its own.
+- **Missing provider:** without an `Announcer` above it, `announce` does nothing and warns once in the console.
+
+## Theming
+
+No tokens: the regions are never seen.
+
+## Related
+
+[Toast](?path=/docs/components-toast--docs) · [Notice](?path=/docs/components-notice--docs) · [ProgressBar](?path=/docs/components-progressbar--docs)
