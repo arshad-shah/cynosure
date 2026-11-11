@@ -43,7 +43,7 @@ Deprecating keeps every version installable; npm only warns. It can be undone wi
 
 The documentation site (`site/`) is a second package in the pnpm workspace. That changes two things Changesets does, and the release is set up around both:
 
-- **The version step** (`pnpm version-packages`) is plain `changeset version`. The site depends on the library as `workspace:*`, which Changesets leaves alone (rehearsed on 2026-11-11: the version becomes 0.3.0 and `site/package.json` is untouched).
+- **The version step** (`pnpm version-packages`) runs `changeset version` and then formats `CHANGELOG.md` with Biome. A changeset with more than one paragraph makes Changesets write a line of trailing spaces, which Biome rejects, and the commit of the version pull request runs the lint hook: on 2026-11-11 that failed the Release run after #160 and no version pull request was opened. Rehearsed in a throwaway copy: without the format step lint fails, with it the result is 0.3.0 and clean. The site depends on the library as `workspace:*`, which Changesets leaves alone.
 - **Tags and releases:** in a workspace the Changesets action expects tags named `<package>@<version>`. This repository's tags are `v<version>`, so the action's own releases are off (`createGithubReleases: false`) and `tools/publish.sh` makes the tag and the release.
 
 The root is listed in `pnpm-workspace.yaml` (`- .`) so Changesets finds the library in the workspace; the site is in `ignore` in `.changeset/config.json`.

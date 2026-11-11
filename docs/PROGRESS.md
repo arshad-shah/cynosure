@@ -87,6 +87,8 @@ Size budgets raised to what the build measures: Calendar 3.25 to 4.75 kB (the mo
 
 **Verification (this machine: Chromium only, and not the pinned build):** `check`, `lint`, `typecheck`, 464 unit tests, `build`, `size`; all 1058 stories in Chromium and touch, run alone; coverage 98.8% statements, 95.76% branches, 99.66% lines; the site builds 99 pages, types and links pass, and a browser sweep of all 89 component pages at 1440 and 390 points found no console errors, no empty prop descriptions, no sideways scroll. **Not run here:** Firefox, WebKit, `test:react18`, `publint`, `attw`. **Visual baselines are missing for every new `visual` story:** run the `visual-baselines` workflow on the branch before trusting CI's visual job.
 
+**The Release run after #160 failed (2026-11-11), so there is no "version packages" pull request yet.** The version step wrote a `CHANGELOG.md` that Biome rejects (a multi-paragraph changeset leaves a line of trailing spaces) and the commit hook stopped it. Fixed in #161: `pnpm version-packages` formats the changelog after `changeset version`. Nothing was published and nothing is broken on npm; the next push to `main` runs the release again.
+
 **Open, for Arshad:** `monthPicker` on by default (and in DateField)? Is unmounting closed dialogs by default right? The docs site still hand-writes its page head (`.docs-title`, `.docs-eyebrow`, `.docs-lead`); moving it to PageHeader changes its look slightly (the eyebrow becomes mono and bold), so it was left alone. Each README's "Used by" names intended uses, not verified call sites.
 
 ## Next step
