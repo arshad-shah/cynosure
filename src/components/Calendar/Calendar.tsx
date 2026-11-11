@@ -38,7 +38,9 @@ export interface CalendarLabels {
 export interface CalendarProps {
   /** The selected date, `YYYY-MM-DD`, or null for none. */
   value?: string | null;
+  /** The date selected at first, when uncontrolled. */
   defaultValue?: string | null;
+  /** Called when a day is chosen, with its date as `YYYY-MM-DD`. */
   onChange?: (date: string) => void;
   /** The date focus starts on when nothing is selected. Default: today. */
   defaultFocusedDate?: string;
@@ -46,6 +48,7 @@ export interface CalendarProps {
   onMonthChange?: (firstDay: string) => void;
   /** Earliest and latest dates that can be reached and chosen. */
   min?: string | undefined;
+  /** Latest date (`YYYY-MM-DD`) that can be reached and chosen. */
   max?: string | undefined;
   /** Dates that can be focused but not chosen (fully booked, weekends). */
   isDateDisabled?: ((date: string) => boolean) | undefined;
@@ -57,8 +60,11 @@ export interface CalendarProps {
   today?: string | undefined;
   /** Extra content inside a day, under its number: a dot for events, a planner's items. */
   renderDay?: ((date: string, state: CalendarDayState) => ReactNode) | undefined;
+  /** Replace the built-in English text: the previous and next month buttons. */
   labels?: Partial<CalendarLabels>;
+  /** Size of the day cells and text. Default "md". */
   size?: Size;
+  /** Added to the root element, for layout. */
   className?: string;
   /** Layout only. Restyle through --cy-calendar-* tokens. */
   style?: CSSProperties;

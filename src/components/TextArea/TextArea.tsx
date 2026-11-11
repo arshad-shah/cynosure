@@ -37,13 +37,19 @@ type NativeArea = Omit<
 >;
 
 export interface TextAreaProps extends NativeArea {
+  /** The field's label and accessible name. */
   label: ReactNode;
   /** Visually hide the label (it still names the control). Prefer visible labels. */
   labelHidden?: boolean | undefined;
+  /** Help text shown below the field. */
   description?: ReactNode;
+  /** Error message shown below the field; it is announced and marks the field invalid. */
   error?: ReactNode;
+  /** The text (controlled). */
   value?: string;
+  /** Starting text when uncontrolled. */
   defaultValue?: string;
+  /** Called with the new text on every edit. */
   onChange?: (value: string) => void;
   /** Show a corner grip to drag the height (pointer and touch). Content growth still applies. */
   resizable?: boolean;
@@ -53,9 +59,13 @@ export interface TextAreaProps extends NativeArea {
   maxRows?: number;
   /** Shows a live character counter. */
   showCount?: boolean;
+  /** Text size of the field and its label. Default "md". */
   size?: Size;
+  /** `outline` or `soft` (tinted, borderless until focus). Default "outline". */
   variant?: "outline" | "soft";
+  /** Replace the built-in English text: the character counter. */
   labels?: { count?: (count: number, max?: number) => string };
+  /** Added to the root element, for layout. */
   className?: string;
   /** Layout only. */
   style?: CSSProperties;

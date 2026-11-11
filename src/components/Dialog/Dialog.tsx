@@ -29,8 +29,11 @@ export interface DialogLabels {
 }
 
 export interface DialogProps {
+  /** Whether the dialog is open, when you control it. */
   open?: boolean;
+  /** Open on first render when uncontrolled. */
   defaultOpen?: boolean;
+  /** Called with `false` when the dialog closes itself: Escape, the backdrop or the close button. */
   onOpenChange?: (open: boolean) => void;
   /** Heading of the dialog; also its accessible name. */
   title: ReactNode;
@@ -42,10 +45,13 @@ export interface DialogProps {
   size?: Size;
   /** Escape, the backdrop and the close button close it (default). `false` leaves only your actions. */
   dismissible?: boolean;
+  /** Replace the built-in English text: the close button's name. */
   labels?: Partial<DialogLabels>;
+  /** Added to the panel, for layout. */
   className?: string;
   /** Layout only, applied to the panel. Restyle through --cy-dialog-* tokens. */
   style?: CSSProperties;
+  /** The content; it scrolls when it is taller than the dialog. */
   children?: ReactNode;
 }
 

@@ -35,6 +35,7 @@ export interface HoverCardProps {
   placement?: Placement;
   /** The preview (a larger thumbnail, a summary). Nothing in it can be clicked or focused. */
   children?: ReactNode;
+  /** Added to the root element, for layout. */
   className?: string;
   /** Layout only. Restyle through --cy-hover-card-* tokens. */
   style?: CSSProperties;

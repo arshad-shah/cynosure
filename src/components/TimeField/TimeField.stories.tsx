@@ -6,7 +6,8 @@ import { TimeField } from "./TimeField.js";
 const meta = {
   title: "Components/TimeField",
   component: TimeField,
-  args: { label: "Start time", onChange: fn() },
+  // Stories pin the 24-hour form; `FollowsThePersonsLocale` covers the default.
+  args: { label: "Start time", hourCycle: 24, onChange: fn() },
   argTypes: { size: { control: "inline-radio", options: ["sm", "md", "lg"] } },
   decorators: [(Story) => <div style={{ maxInlineSize: 240 }}>{Story()}</div>],
 } satisfies Meta<typeof TimeField>;
@@ -145,16 +146,19 @@ export const FormsReadOnlyAndLabels: Story = {
   render: (args) => (
     <form data-testid="form">
       <TimeField {...args} name="start" defaultValue="09:15" />
-      <TimeField label="Ends" readOnly defaultValue="10:00" />
-      <TimeField label="Heure" labels={{ invalid: "Heure au format HH:MM", open: "Choisir une heure" }} />
-      <TimeField label="Typed only" picker={false} />
+      <TimeField label="Ends" hourCycle={24} picker readOnly defaultValue="10:00" />
+      <TimeField
+        label="Heure"
+        hourCycle={24}
+        picker
+        labels={{ invalid: "Heure au format HH:MM", open: "Choisir une heure" }}
+      />
     </form>
   ),
   play: async ({ canvas, userEvent }) => {
     await expect(new FormData(canvas.getByTestId("form") as HTMLFormElement).get("start")).toBe("09:15");
-    // Read-only and `picker={false}` fields have no button; the others name theirs from `labels`.
+    // Only a field with `picker` that can be changed has the button, named from `labels`.
     await expect(canvas.getAllByRole("button").map((b) => b.getAttribute("aria-label"))).toEqual([
-      "Choose a time",
       "Choisir une heure",
     ]);
     // Read-only: the arrows do not change it.
@@ -169,7 +173,7 @@ export const FormsReadOnlyAndLabels: Story = {
 };
 
 export const PickFromTheColumns: Story = {
-  args: { defaultValue: "09:30", step: 15 },
+  args: { picker: true, defaultValue: "09:30", step: 15 },
   play: async ({ args, canvas, userEvent }) => {
     const picker = await openPicker(canvas, userEvent);
     const hours = picker.getByRole("listbox", { name: "Hours" });
@@ -212,7 +216,7 @@ export const PickFromTheColumns: Story = {
 };
 
 export const ThePickerFollowsWhatIsTyped: Story = {
-  args: { step: 5 },
+  args: { picker: true, step: 5 },
   play: async ({ args, canvas, userEvent }) => {
     // Empty: nothing is chosen yet.
     let picker = await openPicker(canvas, userEvent);
@@ -231,7 +235,7 @@ export const ThePickerFollowsWhatIsTyped: Story = {
 };
 
 export const LimitsInThePicker: Story = {
-  args: { defaultValue: "16:45", min: "09:00", max: "17:30", step: 15 },
+  args: { picker: true, defaultValue: "16:45", min: "09:00", max: "17:30", step: 15 },
   play: async ({ args, canvas, userEvent }) => {
     const picker = await openPicker(canvas, userEvent);
     const hours = picker.getByRole("listbox", { name: "Hours" });
@@ -255,7 +259,7 @@ export const LimitsInThePicker: Story = {
 };
 
 export const ScrollingAColumnChooses: Story = {
-  args: { defaultValue: "09:30", min: "06:00" },
+  args: { picker: true, defaultValue: "09:30", min: "06:00" },
   play: async ({ args, canvas, userEvent }) => {
     const picker = await openPicker(canvas, userEvent);
     const hours = picker.getByRole("listbox", { name: "Hours" });
@@ -276,7 +280,7 @@ export const ScrollingAColumnChooses: Story = {
 };
 
 export const TwelveHour: Story = {
-  args: { hourCycle: 12, defaultValue: "21:30", name: "start", step: 5 },
+  args: { picker: true, hourCycle: 12, defaultValue: "21:30", name: "start", step: 5 },
   render: (args) => (
     <form data-testid="form">
       <TimeField {...args} />
@@ -323,7 +327,7 @@ export const TwelveHour: Story = {
 };
 
 export const AHalfOutsideTheLimits: Story = {
-  args: { hourCycle: 12, defaultValue: "09:00", min: "08:00", max: "11:30" },
+  args: { picker: true, hourCycle: 12, defaultValue: "09:00", min: "08:00", max: "11:30" },
   play: async ({ args, canvas, userEvent }) => {
     const picker = await openPicker(canvas, userEvent);
     await expect(picker.getByRole("radio", { name: "PM" })).toBeDisabled();
@@ -335,7 +339,7 @@ export const AHalfOutsideTheLimits: Story = {
 
 export const TheDayTrack: Story = {
   tags: ["visual"],
-  args: { defaultValue: "09:30", step: 15, min: "09:00", max: "17:30" },
+  args: { picker: true, defaultValue: "09:30", step: 15, min: "09:00", max: "17:30" },
   play: async ({ args, canvas, userEvent }) => {
     const picker = await openPicker(canvas, userEvent);
     const track = picker.getByRole("slider", { name: "Time of day" });
@@ -363,7 +367,7 @@ export const TheDayTrack: Story = {
 };
 
 export const WithoutTheDayTrackAndWithSeconds: Story = {
-  args: { dayTrack: false, seconds: true, defaultValue: "08:00:05" },
+  args: { picker: true, dayTrack: false, seconds: true, defaultValue: "08:00:05" },
   play: async ({ args, canvas, userEvent }) => {
     const picker = await openPicker(canvas, userEvent);
     await expect(picker.queryByRole("slider")).toBeNull();
@@ -376,6 +380,7 @@ export const WithoutTheDayTrackAndWithSeconds: Story = {
 
 export const NowAndLabels: Story = {
   args: {
+    picker: true,
     step: 5,
     labels: {
       open: "Choisir une heure",
@@ -405,7 +410,7 @@ export const NowIsNotOfferedOutsideTheLimits: Story = {
     // A window of one minute, twelve hours from now.
     const far = new Date(Date.now() + 12 * 3600 * 1000);
     const at = `${String(far.getHours()).padStart(2, "0")}:${String(far.getMinutes()).padStart(2, "0")}`;
-    return { min: at, max: at };
+    return { picker: true, min: at, max: at };
   })(),
   play: async ({ canvas, userEvent }) => {
     const picker = await openPicker(canvas, userEvent);
@@ -413,8 +418,33 @@ export const NowIsNotOfferedOutsideTheLimits: Story = {
   },
 };
 
+export const FollowsThePersonsLocale: Story = {
+  render: (args) => (
+    <>
+      <TimeField {...args} label="Their own" hourCycle="auto" defaultValue="21:30" />
+      <TimeField {...args} label="United States" hourCycle="auto" locale="en-US" defaultValue="21:30" />
+      <TimeField {...args} label="Germany" hourCycle="auto" locale="de-DE" defaultValue="21:30" />
+      <TimeField {...args} label="Pinned" hourCycle={12} locale="de-DE" defaultValue="21:30" />
+    </>
+  ),
+  play: async ({ args, canvas, userEvent }) => {
+    // By default the field follows the browser; a `locale` overrides the browser, and a number overrides both.
+    const own = new Intl.DateTimeFormat(undefined, { hour: "numeric" }).resolvedOptions().hour12;
+    await expect(canvas.getByRole("textbox", { name: "Their own" })).toHaveValue(own ? "9:30 PM" : "21:30");
+    await expect(canvas.getByRole("textbox", { name: "United States" })).toHaveValue("9:30 PM");
+    await expect(canvas.getByRole("textbox", { name: "Germany" })).toHaveValue("21:30");
+    await expect(canvas.getByRole("textbox", { name: "Pinned" })).toHaveValue("9:30 PM");
+    // However it is shown, what is reported is 24-hour.
+    const us = canvas.getByRole("textbox", { name: "United States" });
+    await userEvent.clear(us);
+    await userEvent.type(us, "7:05 pm{Enter}");
+    await expect(args.onChange).toHaveBeenLastCalledWith("19:05");
+    await expect(us).toHaveValue("7:05 PM");
+  },
+};
+
 export const RightToLeft: Story = {
-  args: { defaultValue: "09:30" },
+  args: { picker: true, defaultValue: "09:30" },
   decorators: [(Story) => <div dir="rtl">{Story()}</div>],
   play: async ({ canvas, userEvent }) => {
     const picker = await openPicker(canvas, userEvent);
@@ -429,7 +459,7 @@ export const RightToLeft: Story = {
 
 export const TouchRows: Story = {
   tags: ["touch", "!dev"],
-  args: { defaultValue: "09:30", hourCycle: 12 },
+  args: { picker: true, defaultValue: "09:30", hourCycle: 12 },
   play: async ({ args, canvas, userEvent }) => {
     await userEvent.pointer({
       keys: "[TouchA]",
@@ -470,6 +500,7 @@ export const HiddenLabelDescriptionAndOwnError: Story = {
 };
 
 export const StableUnderHostileHost: Story = {
+  args: { picker: true },
   play: async ({ canvasElement }) => {
     const { clean, hostile } = computeUnderHostileHost(canvasElement, ".cy-text-field-input", [
       "height",

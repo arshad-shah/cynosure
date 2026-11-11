@@ -21,6 +21,7 @@ export type Announce = (message: string, options?: AnnounceOptions) => void;
 export interface AnnouncerProps {
   /** Milliseconds before an announcement is cleared from the hidden region. Default: 5000. */
   clearAfter?: number;
+  /** Your app. Anything inside can announce through `useAnnounce()`. */
   children?: ReactNode;
 }
 

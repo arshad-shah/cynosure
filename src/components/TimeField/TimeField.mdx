@@ -5,9 +5,9 @@ import * as Stories from "./TimeField.stories";
 
 # TimeField
 
-A time of day in a form: typed loosely or picked from columns that roll under a lens, and reported as 24-hour `HH:MM`.
+A time of day in a form: typed loosely, or with `picker` chosen from columns that roll under a lens, and reported as 24-hour `HH:MM`.
 
-<Canvas of={Stories.PickFromTheColumns} />
+<Canvas of={Stories.ArrowsStepThePartUnderTheCaret} />
 
 ## When to use
 
@@ -22,16 +22,26 @@ A time of day in a form: typed loosely or picked from columns that roll under a 
 ```tsx
 import { TimeField } from "@arshad-shah/cynosure";
 
-<TimeField label="Start time" value={start} onChange={setStart} min="09:00" max="17:30" step={15} />
+<TimeField label="Start time" value={start} onChange={setStart} min="09:00" max="17:30" step={15} picker />
 ```
 
 The value is `HH:MM` (or `HH:MM:SS` with `seconds`) or `null`. `930`, `9:30 pm` and `12am` are understood; anything that is not a time is kept for correcting and explained.
 
 <Canvas of={Stories.ExplainsWhatItCannotTake} />
 
-### 12-hour display
+### The picker
 
-`hourCycle={12}` shows `9:30 PM` and adds an AM/PM switch to the picker. The value, `min`, `max` and what a form receives stay 24-hour.
+`picker` adds a clock button at the end of the field. It opens columns for hours and minutes; the chosen time sits in the lens and applies at once.
+
+<Canvas of={Stories.PickFromTheColumns} />
+
+### 12-hour and 24-hour
+
+By default the field follows the person's own language and region: `9:30 PM` where AM and PM are used, `21:30` elsewhere. `locale` names the region for them; `hourCycle={12}` or `hourCycle={24}` fixes the form for everyone. The value, `min`, `max` and what a form receives stay 24-hour.
+
+<Canvas of={Stories.FollowsThePersonsLocale} />
+
+With 12-hour display the picker gains an AM/PM switch.
 
 <Canvas of={Stories.TwelveHour} />
 
@@ -41,9 +51,9 @@ The strip under the columns is the whole day: click or drag to jump to a time. T
 
 <Canvas of={Stories.TheDayTrack} />
 
-### Typed only
+### Without the day track, with seconds
 
-`picker={false}` leaves a plain field; `dayTrack={false}` keeps the columns without the strip.
+`dayTrack={false}` keeps the columns without the strip; `seconds` adds a third column.
 
 <Canvas of={Stories.WithoutTheDayTrackAndWithSeconds} />
 
@@ -60,7 +70,7 @@ In the field:
 | Enter | Finish typing |
 | Up / Down | Step the part the caret is in: hours, minutes (by `step`), seconds, or AM/PM; Shift: ten times as far |
 
-In the picker:
+In the picker (with `picker`):
 
 | Key | Does |
 | --- | --- |
@@ -68,7 +78,7 @@ In the picker:
 | Home / End | First and last allowed row |
 | Left / Right | The column before or after |
 | Digits | Seek in the column: `1` then `4` is 14 |
-| A / P | Morning or afternoon, with `hourCycle={12}` |
+| A / P | Morning or afternoon, when the time is shown as 12-hour |
 | Enter | Close the picker and return to the field |
 | Escape | Close the picker |
 | Arrows, Page Up / Down on the day track | Move by `step`, or by an hour |
@@ -81,7 +91,7 @@ In the picker:
 
 ## Touch
 
-The field asks for the numeric keyboard (the full one with `hourCycle={12}`, to type AM and PM). In the picker, rows are at least 44px tall on coarse pointers and a column is rolled with a finger.
+The field asks for the numeric keyboard (the full one when the time is shown as 12-hour, to type AM and PM). In the picker, rows are at least 44px tall on coarse pointers and a column is rolled with a finger.
 
 ## Theming
 

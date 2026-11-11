@@ -27,6 +27,7 @@ export interface SkeletonProps {
   width?: string | undefined;
   /** Any CSS length. Default: one line of text (block) or the circle's diameter (circle). */
   height?: string | undefined;
+  /** Added to the root element, for layout. */
   className?: string;
   /** Layout only. Restyle through --cy-skeleton-* tokens. */
   style?: CSSProperties;

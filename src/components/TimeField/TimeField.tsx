@@ -58,36 +58,57 @@ export interface TimeFieldLabels {
 }
 
 export interface TimeFieldProps {
+  /** The field's visible label, and its accessible name. */
   label: ReactNode;
+  /** Hide the label visually; it still names the field. */
   labelHidden?: boolean;
+  /** Help text under the field, read with it by screen readers. */
   description?: ReactNode;
   /** Your own error; it replaces the field's own messages. */
   error?: ReactNode;
   /** `HH:MM` (or `HH:MM:SS` with `seconds`), 24-hour whatever `hourCycle` shows, or null when empty. */
   value?: string | null;
+  /** The starting time when `value` is not given, in the same form. */
   defaultValue?: string | null;
   /** A valid time (or null when cleared), when typing is finished, the arrows step it or the picker chooses it. */
   onChange?: (time: string | null) => void;
-  /** Earliest and latest times, in the same form. */
+  /** The earliest time allowed, in the same form. Earlier times are explained and not reported. */
   min?: string | undefined;
+  /** The latest time allowed, in the same form. Later times are explained and not reported. */
   max?: string | undefined;
   /** Minutes between the picker's minutes, and what the arrows move the minutes by. Default 1 (Shift: ten steps). */
   step?: number;
   /** Include seconds. */
   seconds?: boolean;
-  /** How the time is shown: `24` (default) as `21:30`, `12` as `9:30 PM` with an AM/PM switch in the picker. */
-  hourCycle?: 12 | 24;
-  /** The button and popup that pick the time from columns. `false` leaves a field that is only typed in. */
+  /**
+   * How the time is shown: `24` as `21:30`, `12` as `9:30 PM` (with an AM/PM switch in the picker), or `"auto"` to
+   * follow the person's own language and region. The value is 24-hour either way. Default "auto".
+   */
+  hourCycle?: 12 | 24 | "auto";
+  /** The language and region `hourCycle="auto"` follows, such as `en-GB`. Default: the browser's. */
+  locale?: string | undefined;
+  /**
+   * Add a clock button that opens a picker: columns for hours and minutes that roll under one lens. Without it the
+   * field is only typed in.
+   */
   picker?: boolean;
-  /** The strip of the whole day under the picker's columns: click or drag to jump to a time. */
+  /** With `picker`: the strip of the whole day under the columns, to click or drag to a time. Default `true`. */
   dayTrack?: boolean;
+  /** Form field name. The form receives the 24-hour `HH:MM`, however the time is shown. */
   name?: string | undefined;
+  /** The `id` of a form elsewhere on the page that the field belongs to. */
   form?: string | undefined;
+  /** The form cannot be submitted while the field is empty. */
   required?: boolean | undefined;
+  /** Cannot be focused, changed or submitted. */
   disabled?: boolean | undefined;
+  /** Shown and submitted but not changed: no typing, no arrows and no picker button. */
   readOnly?: boolean | undefined;
+  /** Height and text size of the field. Default "md". */
   size?: Size;
+  /** Replace the built-in English text: the two messages and the picker's names. */
   labels?: Partial<TimeFieldLabels>;
+  /** Added to the root element, for layout. */
   className?: string;
   /** Layout only. */
   style?: CSSProperties;
@@ -129,6 +150,10 @@ const formatTime12 = (t: number, seconds: boolean) => {
   return `${h % 12 || 12}:${pad(Math.floor(t / 60) % 60)}${seconds ? `:${pad(t % 60)}` : ""} ${h < 12 ? "AM" : "PM"}`;
 };
 
+/** Whether a language and region write the time of day with AM and PM. */
+const usesAmPm = (locale: string | undefined) =>
+  new Intl.DateTimeFormat(locale, { hour: "numeric" }).resolvedOptions().hour12 === true;
+
 type Unit = "h" | "m" | "s";
 interface Row {
   /** What the row shows. */
@@ -166,8 +191,9 @@ export function TimeField({
   max,
   step = 1,
   seconds = false,
-  hourCycle = 24,
-  picker = true,
+  hourCycle = "auto",
+  locale,
+  picker = false,
   dayTrack = true,
   name,
   form,
@@ -179,7 +205,12 @@ export function TimeField({
   className,
   style,
 }: TimeFieldProps) {
-  const h12 = hourCycle === 12;
+  // The person's own convention is only known in their browser: 24-hour until then, settled before the first paint.
+  const [own, setOwn] = useState<12 | 24>(24);
+  useClientLayoutEffect(() => {
+    if (hourCycle === "auto") setOwn(usesAmPm(locale) ? 12 : 24);
+  }, [hourCycle, locale]);
+  const h12 = (hourCycle === "auto" ? own : hourCycle) === 12;
   const pattern = `${h12 ? "H:MM" : "HH:MM"}${seconds ? ":SS" : ""}${h12 ? " AM" : ""}`;
   const text: TimeFieldLabels = {
     invalid: `Enter a time as ${pattern}`,
@@ -384,7 +415,7 @@ export function TimeField({
     } else if (event.key === "Enter") {
       event.preventDefault();
       close();
-    } else if (h12 && /^[ap]$/i.test(event.key) && !event.ctrlKey && !event.metaKey && !event.altKey) {
+    } else if (h12 && isTypeaheadKey(event) && /^[ap]$/i.test(event.key)) {
       setHalf(event.key.toLowerCase() === "p");
     } else if (isTypeaheadKey(event)) {
       const to = seek(
@@ -418,7 +449,7 @@ export function TimeField({
         placeholder={pattern}
         inputMode={h12 ? "text" : "numeric"}
         autoComplete="off"
-        {...(picker ? {} : { iconStart: clock })}
+        {...(hasPicker ? {} : { iconStart: clock })}
         name={ownValue ? undefined : name}
         form={form}
         required={required}

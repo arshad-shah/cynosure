@@ -57,25 +57,37 @@ export interface TableLabels {
 export interface TableProps<Row> {
   /** The table's caption: its accessible name, shown above it unless `captionHidden`. */
   caption: ReactNode;
+  /** Hides the caption visually; it still names the table. */
   captionHidden?: boolean;
+  /** The columns, in display order. */
   columns: TableColumn<Row>[];
+  /** The data, one entry per row. */
   rows: Row[];
   /** A stable id per row (for selection and React keys). */
   getRowId: (row: Row) => string;
+  /** The current sort (controlled); `null` is unsorted. */
   sort?: TableSort | null | undefined;
+  /** Starting sort when uncontrolled; unsorted when left out. */
   defaultSort?: TableSort | null;
+  /** Called when a sortable header is pressed, with the new sort, or `null` when it goes back to unsorted. */
   onSortChange?: ((sort: TableSort | null) => void) | undefined;
   /** You sort the rows (e.g. on a server); the table only shows and reports the sort. */
   manualSort?: boolean;
   /** Adds a checkbox per row and a select-all in the header. */
   selectable?: boolean;
+  /** Ids of the selected rows (controlled). */
   selected?: string[] | undefined;
+  /** Ids of the rows selected at the start when uncontrolled. */
   defaultSelected?: string[];
+  /** Called when a row's checkbox or select-all changes, with the selected ids in row order. */
   onSelectionChange?: ((ids: string[]) => void) | undefined;
   /** The header stays visible while the body scrolls inside the table. */
   stickyHeader?: boolean;
+  /** Cell padding and text size. Default "md". */
   size?: Size;
+  /** Replace the built-in English text: the checkbox names and the empty message. */
   labels?: Partial<TableLabels>;
+  /** Added to the root element, for layout. */
   className?: string;
   /** Layout only. Restyle through --cy-table-* tokens. */
   style?: CSSProperties;

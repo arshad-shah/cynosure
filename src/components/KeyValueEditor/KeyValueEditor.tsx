@@ -54,8 +54,11 @@ export interface KeyValueEditorLabels {
 export interface KeyValueEditorProps {
   /** What the pairs are ("Headers", "Query parameters"). Names the list and the text view. */
   label: string;
+  /** The pairs, when you control them. */
   pairs?: KeyValuePair[] | undefined;
+  /** Starting pairs when uncontrolled. */
   defaultPairs?: KeyValuePair[];
+  /** Called with the full list after each change: an edit, a row added, removed, moved or switched off. */
   onChange?: ((pairs: KeyValuePair[]) => void) | undefined;
   /** A checkbox per row to switch it off without deleting it. Default true. */
   toggleable?: boolean;
@@ -65,9 +68,13 @@ export interface KeyValueEditorProps {
   allowFiles?: boolean;
   /** File types for `allowFiles`, as for `<input accept>`. */
   accept?: string | undefined;
+  /** Turns off every field and button. */
   disabled?: boolean;
+  /** Size of the fields and buttons. Default "md". */
   size?: Size;
+  /** Replace the built-in English text. */
   labels?: Partial<KeyValueEditorLabels>;
+  /** Added to the root element, for layout. */
   className?: string;
   /** Layout only. Restyle through --cy-key-value-editor-* tokens. */
   style?: CSSProperties;

@@ -21,6 +21,7 @@ declare module "../../tokens/schema.js" {
 export interface SplitPaneProps {
   /** The first pane (left, or right in right-to-left text; top when vertical). Its size is what the divider sets. */
   start: ReactNode;
+  /** The second pane (right, or left in right-to-left text; bottom when vertical). */
   end: ReactNode;
   /** Accessible name of the divider, e.g. "Resize the file list". */
   label: string;
@@ -33,15 +34,19 @@ export interface SplitPaneProps {
   unit?: "percent" | "px";
   /** Size of the start pane, in `unit`. */
   size?: number | undefined;
+  /** Starting size of the start pane when uncontrolled, in `unit`. Default 50 percent, or 240 pixels. */
   defaultSize?: number | undefined;
+  /** Called with the new size as the divider moves. */
   onSizeChange?: ((size: number) => void) | undefined;
   /** Limits for the start pane, in `unit`. Defaults: 10 and 90 percent, or 120 and 600 pixels. */
   min?: number;
+  /** Largest size of the start pane, in `unit`. Default 90 percent, or 600 pixels. */
   max?: number;
   /** Arrow keys move by this much, in `unit`. Default 5 percent, or 16 pixels. */
   step?: number;
   /** Enter collapses the start pane to 0 and restores it. */
   collapsible?: boolean;
+  /** Added to the root element, for layout. */
   className?: string;
   /** Layout only. Restyle through --cy-split-pane-* tokens. */
   style?: CSSProperties;

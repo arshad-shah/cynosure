@@ -42,30 +42,43 @@ type NativeInput = Omit<
 >;
 
 export interface TextFieldProps extends NativeInput {
+  /** The field's label and accessible name. */
   label: ReactNode;
   /** Visually hide the label (it still names the control). Prefer visible labels. */
   labelHidden?: boolean | undefined;
+  /** Help text shown below the field. */
   description?: ReactNode;
+  /** Error message shown below the field; it is announced and marks the field invalid. */
   error?: ReactNode;
+  /** The text (controlled). */
   value?: string;
+  /** Starting text when uncontrolled. */
   defaultValue?: string;
+  /** Called with the new text on every edit. */
   onChange?: (value: string) => void;
+  /** The native input type. Default "text". */
   type?: "text" | "email" | "url" | "tel" | "password" | "number" | "search";
+  /** Field height and text size. Default "md". */
   size?: Size;
   /** `outline` (default) or `soft` (tinted, borderless until focus). */
   variant?: "outline" | "soft";
+  /** Icon shown before the input. */
   iconStart?: IconData | undefined;
+  /** Icon shown at the end of the field, after the input and its clear or reveal button. */
   iconEnd?: IconData | undefined;
   /** Shows a clear button while the field has a value. */
   clearable?: boolean;
   /** Controls inside the field's end, after the input (NumberField's steppers). */
   addonEnd?: ReactNode;
+  /** Replace the built-in English text: the names of the clear, show and hide buttons. */
   labels?: { clear?: string; show?: string; hide?: string };
   /** With `type="password"`: a button to show and hide the value (API keys, tokens, passwords). */
   revealable?: boolean;
+  /** Added to the root element, for layout. */
   className?: string;
   /** Layout only. */
   style?: CSSProperties;
+  /** Test id, set on the native input. */
   "data-testid"?: string;
 }
 

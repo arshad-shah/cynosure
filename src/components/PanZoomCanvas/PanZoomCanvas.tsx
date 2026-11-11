@@ -66,9 +66,11 @@ export interface PanZoomCanvasLabels {
 export interface PanZoomCanvasProps {
   /** Names the canvas ("Schema diagram"). */
   label: string;
+  /** Controlled view: the pan offset and the zoom. */
   view?: CanvasView | undefined;
   /** Where it starts. Default: `bounds` fitted in view (or the origin at 100% without bounds). */
   defaultView?: CanvasView;
+  /** Called with the new view on every pan and zoom. */
   onViewChange?: ((view: CanvasView) => void) | undefined;
   /** The content's extent in canvas units, for fitting and the minimap. */
   bounds?: CanvasRect | undefined;
@@ -84,7 +86,9 @@ export interface PanZoomCanvasProps {
   renderScreen?: (screen: CanvasScreen) => ReactNode;
   /** The content, placed in canvas units (absolutely positioned children). */
   children?: ReactNode;
+  /** Replace the built-in English text: the zoom announcement. */
   labels?: Partial<PanZoomCanvasLabels>;
+  /** Added to the root element, for layout. */
   className?: string;
   /** Layout only (give it a height). Restyle through --cy-pan-zoom-canvas-* tokens. */
   style?: CSSProperties;

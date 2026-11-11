@@ -65,11 +65,17 @@ export type MenuEntry = MenuItem | MenuSection;
 
 /** Spread onto the trigger (a Button or IconButton). */
 export interface MenuTriggerProps {
+  /** Spread onto the trigger. The menu is placed against this element and focus returns to it on close. */
   ref: Ref<HTMLButtonElement>;
+  /** Spread onto the trigger. Opens the menu, or closes it when it is open. */
   onClick: () => void;
+  /** Spread onto the trigger. Arrow Down opens the menu on its first item, Arrow Up on its last. */
   onKeyDown: (event: KeyboardEvent<HTMLButtonElement>) => void;
+  /** Spread onto the trigger. Whether the menu is open. */
   "aria-expanded": boolean;
+  /** Spread onto the trigger. The id of the menu panel. */
   "aria-controls": string;
+  /** Spread onto the trigger. Tells assistive technology that it opens a menu. */
   "aria-haspopup": "menu";
 }
 
@@ -78,9 +84,13 @@ export interface MenuProps {
   trigger: (props: MenuTriggerProps) => ReactNode;
   /** Accessible name of the menu. */
   label: string;
+  /** The commands: items, or labelled sections of items. */
   items: MenuEntry[];
+  /** Called with the chosen item's `value`. */
   onSelect: (value: string) => void;
+  /** Side of the trigger the menu opens on. Default "bottom". */
   placement?: Placement;
+  /** Added to the menu panel, for layout. */
   className?: string;
   /** Layout only, applied to the panel. */
   style?: CSSProperties;

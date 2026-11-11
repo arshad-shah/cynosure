@@ -4,23 +4,30 @@ import type { Size } from "../../tokens/schema.js";
 import { Disclosure } from "../Disclosure/Disclosure.js";
 
 interface Shared {
+  /** `plain` no chrome, `line` a divider under each section, `card` bordered surfaces. Default "line". */
   variant?: "plain" | "line" | "card";
+  /** Size of every section's header and content. Default "md". */
   size?: Size;
   /** Heading level wrapping each header (default 3). */
   headingLevel?: 2 | 3 | 4 | 5 | 6;
   /** Expose each open section as a labelled region. Turn off for long lists (more than about six sections). */
   regions?: boolean;
+  /** Added to the root element, for layout. */
   className?: string;
   /** Layout only. */
   style?: CSSProperties;
+  /** The sections: one `AccordionItem` each. */
   children?: ReactNode;
 }
 
 export interface AccordionSingleProps extends Shared {
   /** One section open at a time. */
   type?: "single";
+  /** Controlled: the `value` of the open section, or undefined for none. */
   value?: string | undefined;
+  /** The section open at first, when uncontrolled. */
   defaultValue?: string;
+  /** Called when a section opens or closes, with the open section's `value` (undefined when none is open). */
   onValueChange?: (value: string | undefined) => void;
   /** The open section can be closed, leaving none open. */
   collapsible?: boolean;
@@ -29,9 +36,13 @@ export interface AccordionSingleProps extends Shared {
 export interface AccordionMultipleProps extends Shared {
   /** Any number of sections open. */
   type: "multiple";
+  /** Controlled: the `value` of every open section. */
   value?: string[];
+  /** The sections open at first, when uncontrolled. */
   defaultValue?: string[];
+  /** Called when a section opens or closes, with the `value` of every open section. */
   onValueChange?: (value: string[]) => void;
+  /** Not used here: with `type="multiple"` every section can always be closed. */
   collapsible?: never;
 }
 
@@ -125,8 +136,11 @@ function moveFocus(event: KeyboardEvent<HTMLButtonElement>) {
 }
 
 export interface AccordionItemProps {
+  /** Identifies the section in the Accordion's `value`. Unique among its items. */
   value: string;
+  /** The header: what people press to open or close the section. */
   summary: ReactNode;
+  /** The section's content, shown while it is open. */
   children?: ReactNode;
 }
 

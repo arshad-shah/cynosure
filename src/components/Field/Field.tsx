@@ -18,21 +18,27 @@ declare module "../../tokens/schema.js" {
 }
 
 export interface FieldProps {
+  /** Visible label; it names the control. */
   label: ReactNode;
+  /** Help text shown below the control and read out with it. */
   description?: ReactNode | undefined;
   /** Shown below the control, announced, and marks the control invalid. */
   error?: ReactNode | undefined;
   /** Draws the required marker; pass `required` to the control too. */
   required?: boolean | undefined;
+  /** Size of the label text. Default "md". */
   size?: Size | undefined;
   /** Keep the label for assistive tech but take no space (toolbars, dense rows). Prefer visible labels. */
   labelHidden?: boolean | undefined;
   /** Label a group of controls (radio groups) instead of one control. */
   group?: boolean | undefined;
+  /** Id for the control; the label, description and error ids are built from it. Default: a generated id. */
   id?: string | undefined;
+  /** Added to the root element, for layout. */
   className?: string | undefined;
   /** Layout only. */
   style?: CSSProperties | undefined;
+  /** Renders the control from the ids and state in `field`. */
   children: (field: FieldRender) => ReactNode;
 }
 

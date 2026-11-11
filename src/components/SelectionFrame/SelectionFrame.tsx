@@ -46,7 +46,9 @@ export interface SelectionFrameProps {
   rotate?: number;
   /** CSS pixels per unit (the zoom). Default 1. */
   scale?: number;
+  /** Show the eight resize handles; Alt+arrows resize too. */
   resizable?: boolean;
+  /** Show the rotate handle; the [ and ] keys turn it by 15 degrees. */
   rotatable?: boolean;
   /** Keep the width-to-height ratio while resizing (Shift does it for one drag). */
   keepAspect?: boolean;
@@ -56,6 +58,7 @@ export interface SelectionFrameProps {
   bounds?: { width: number; height: number } | undefined;
   /** Arrow keys move (and Alt+arrows resize) by this many units; Shift by `largeStep`. Defaults 1 and 10. */
   step?: number;
+  /** Units the arrow keys move (and Alt+arrows resize) by with Shift held. Default 10. */
   largeStep?: number;
   /** Adjust every proposed box, e.g. snap to a grid or to other objects. */
   snap?: ((box: FrameBox) => FrameBox) | undefined;
@@ -63,8 +66,11 @@ export interface SelectionFrameProps {
   onChange?: ((box: FrameBox, rotate: number) => void) | undefined;
   /** The end of one change: pointer up, key up or Enter. One undo step. */
   onCommit: (box: FrameBox, rotate: number) => void;
+  /** Ids of text that describes the frame, such as its keys. */
   "aria-describedby"?: string | undefined;
+  /** Replace the built-in English text: how screen readers call the frame and the drawing area. */
   labels?: Partial<SelectionFrameLabels>;
+  /** Added to the frame element, for layout. */
   className?: string;
   /** Layout only. Restyle through --cy-selection-frame-* tokens. */
   style?: CSSProperties;

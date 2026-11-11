@@ -6,13 +6,17 @@ export interface CynosureThemeProps {
   theme?: Theme;
   /** Omit to inherit the surrounding mode. `system` follows the OS. */
   mode?: "light" | "dark" | "system";
+  /** `more` uses the higher-contrast palettes. `system`, or leaving it out, follows the OS setting. */
   contrast?: "normal" | "more" | "system";
   /** `self` (default) themes only this wrapper. `document` themes `<html>`; only for apps that own the page. */
   target?: "self" | "document";
+  /** The wrapper element. Default "div". */
   as?: "div" | "span";
+  /** Added to the wrapper element. Not used with `target="document"`, which renders no wrapper. */
   className?: string;
   /** Layout only (margin, placement). Restyle through tokens. */
   style?: CSSProperties;
+  /** Everything that should use the theme. */
   children?: ReactNode;
 }
 

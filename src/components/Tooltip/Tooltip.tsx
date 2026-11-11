@@ -32,6 +32,7 @@ export interface TooltipProps {
   content: ReactNode;
   /** One focusable element (Button, IconButton, Link…). */
   children: ReactElement<Record<string, unknown>>;
+  /** Preferred side; flips when it does not fit. Default "top". */
   placement?: Placement;
   /** Hover delay in ms (focus opens immediately). */
   delay?: number;

@@ -74,7 +74,9 @@ export interface ToasterProps {
   position?: ToastPosition;
   /** How many show at once; older ones collapse until newer ones close. */
   max?: number;
+  /** Replace the built-in English text: the region's name and the close button's name. */
   labels?: Partial<ToastLabels>;
+  /** Added to the notifications region, for layout. */
   className?: string;
   /** Layout only, applied to the region. Restyle through --cy-toast-* tokens. */
   style?: CSSProperties;

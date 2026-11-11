@@ -12,26 +12,34 @@ import type { Tone } from "../../tokens/schema.js";
 export interface CardProps {
   /** `surface` raised panel, `outline` border only, `soft` tone-tinted fill. */
   variant?: "surface" | "outline" | "soft";
+  /** Space between the card's edge and its content. Default "md". */
   padding?: "none" | "sm" | "md" | "lg";
+  /** Semantic colour. Default "neutral". */
   tone?: Tone;
   /** Element for a static card. Ignored when `href` or `onClick` makes the whole card interactive. */
   as?: "div" | "section" | "article" | "li" | "aside";
   /** Makes the whole card a link (rendered through LinkBase, so unsafe schemes are not linked). */
   href?: string;
+  /** With `href`: where it opens, e.g. `_blank`. */
   target?: string;
   /** Makes the whole card a button. */
   onClick?: MouseEventHandler<HTMLElement>;
+  /** With `onClick` (and no `href`): the card cannot be pressed. */
   disabled?: boolean;
   /**
    * Buttons that sit on the card but act on their own (a game card's 2-player mode, a file card's menu). They are placed
    * over the card's top end, outside its one link or button, so nothing interactive is nested.
    */
   actions?: ReactNode;
+  /** Added to the card element, for layout. */
   className?: string;
   /** Layout only. */
   style?: CSSProperties;
+  /** The card's content. Keep it non-interactive when the card is a link or a button. */
   children?: ReactNode;
+  /** Accessible name of the card, set on the card element. */
   "aria-label"?: string;
+  /** Set on the card element, to find it in tests. */
   "data-testid"?: string;
 }
 

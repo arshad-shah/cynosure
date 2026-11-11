@@ -4,14 +4,17 @@ import { useRovingFocus } from "../../foundations/roving-focus.js";
 export interface ToolbarProps {
   /** Accessible name (required: a toolbar must be named). */
   label: string;
+  /** Direction of the toolbar: Left/Right move between controls, or Up/Down when vertical. Default "horizontal". */
   orientation?: "horizontal" | "vertical";
   /** Arrow keys wrap from the last item to the first. */
   loop?: boolean;
+  /** Added to the root element, for layout. */
   className?: string;
   /** Layout only. */
   style?: CSSProperties;
   /** Buttons, IconButtons, SegmentedControls, fields. */
   children?: ReactNode;
+  /** Test id, set on the toolbar element. */
   "data-testid"?: string;
 }
 

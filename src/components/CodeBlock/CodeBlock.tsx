@@ -28,6 +28,7 @@ const defaultActive = (lines: readonly number[]) =>
   `${lines.length === 1 ? "Line" : "Lines"} ${lines.join(", ")} highlighted`;
 
 export interface CodeBlockProps {
+  /** The code to show and copy. One final new line is not shown as an empty last line. */
   code: string;
   /** Shown in the header (when there is no `title`) and passed to `highlight`. */
   language?: string | undefined;
@@ -38,6 +39,7 @@ export interface CodeBlockProps {
    * bundles none. Without it the code is plain text.
    */
   highlight?: ((code: string, language?: string) => ReactNode) | undefined;
+  /** Show line numbers beside the code. Left out when `wrap` is on. */
   lineNumbers?: boolean;
   /** Lines to mark (1-based), such as the line a debugger is on. Marked behind the text and read out. */
   activeLines?: readonly number[] | undefined;
@@ -47,8 +49,11 @@ export interface CodeBlockProps {
   copyable?: boolean;
   /** Passed to the copy button (extensions can copy through their own channel). */
   copy?: ((text: string) => Promise<void> | void) | undefined;
+  /** Text size of the code. Default "md". */
   size?: Size;
+  /** Replace the built-in English text: the copy button, the code region's name and the marked lines. */
   labels?: Partial<CodeBlockLabels>;
+  /** Added to the root element, for layout. */
   className?: string;
   /** Layout only. Restyle through --cy-code-block-* tokens. */
   style?: CSSProperties;

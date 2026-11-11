@@ -17,16 +17,23 @@ export interface NumberFieldLabels {
 }
 
 export interface NumberFieldProps {
+  /** Visible label; it names the field. */
   label: ReactNode;
+  /** Visually hide the label (it still names the field). Prefer visible labels. */
   labelHidden?: boolean | undefined;
+  /** Help text shown below the field. */
   description?: ReactNode;
+  /** Error message shown below the field; it marks the field invalid. */
   error?: ReactNode;
   /** `null` is empty. */
   value?: number | null | undefined;
+  /** Starting value when uncontrolled; `null` is empty. */
   defaultValue?: number | null;
   /** Called with the new value when it is committed: a step, Enter, or leaving the field. */
   onChange?: ((value: number | null) => void) | undefined;
+  /** Smallest value. Typed and stepped values are kept at or above it, and Home jumps to it. */
   min?: number | undefined;
+  /** Largest value. Typed and stepped values are kept at or below it, and End jumps to it. */
   max?: number | undefined;
   /** Arrow keys and steppers move by this; values they produce snap to it. Default 1. */
   step?: number;
@@ -38,20 +45,30 @@ export interface NumberFieldProps {
   formatOptions?: Intl.NumberFormatOptions | undefined;
   /** Hide the − and + buttons (the keyboard still steps). */
   hideSteppers?: boolean;
+  /** Name the plain number is submitted under in a form. */
   name?: string | undefined;
+  /** Id of the form it belongs to, when it is not inside that form. */
   form?: string | undefined;
+  /** Marks the field as required for form validation. */
   required?: boolean | undefined;
+  /** Turns off the field and its stepper buttons. */
   disabled?: boolean | undefined;
+  /** The value can be read but not changed. */
   readOnly?: boolean | undefined;
+  /** Hint shown while the field is empty. */
   placeholder?: string | undefined;
+  /** Size of the field. Default "md". */
   size?: Size;
+  /** `outline` or `soft` (tinted, borderless until focus). Default "outline". */
   variant?: "outline" | "soft";
+  /** Replace the built-in English text: the stepper button names. */
   labels?: Partial<NumberFieldLabels>;
   /**
    * Drag the label sideways to change the value, as design tools do: one `step` every few pixels, Shift for ten. Escape
    * mid-drag puts it back. The keys and the steppers still work as before.
    */
   scrub?: boolean;
+  /** Added to the root element, for layout. */
   className?: string;
   /** Layout only. */
   style?: CSSProperties;

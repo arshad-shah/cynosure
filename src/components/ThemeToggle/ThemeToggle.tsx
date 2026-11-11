@@ -10,15 +10,18 @@ import { SegmentedControl } from "../SegmentedControl/SegmentedControl.js";
 export interface ThemeToggleProps {
   /** Controlled mode; omit to manage and persist it internally. */
   value?: ColorMode;
+  /** Called with the mode the person picks. */
   onChange?: (mode: ColorMode) => void;
   /** Persistence for uncontrolled use (localStorage by default; chrome.storage works too). */
   storage?: ColorModeStorage;
+  /** Size of the control. Default "md". */
   size?: Size;
   /**
    * `segmented` (default): three choices side by side. `cycle`: one icon button that steps light → dark → system
    * (for tight headers); its name says the current mode and the next one ("Colour mode: Light. Switch to Dark").
    */
   variant?: "segmented" | "cycle";
+  /** Replace the built-in English text: the control's name and the names of the three modes. */
   labels?: {
     label?: string;
     light?: string;
@@ -27,6 +30,7 @@ export interface ThemeToggleProps {
     /** The cycle button's name. Default "Colour mode: Light. Switch to Dark". */
     cycle?: (current: string, next: string) => string;
   };
+  /** Added to the control, for layout. */
   className?: string;
   /** Layout only. */
   style?: CSSProperties;

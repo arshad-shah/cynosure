@@ -30,18 +30,27 @@ export interface SegmentOption {
 export interface SegmentedControlProps {
   /** Accessible name of the group. */
   label: string;
+  /** The segments: `{ value, label, icon?, disabled? }`. */
   options: SegmentOption[];
+  /** Submits the value with its form under this name. Two controls may share a name and stay independent. */
   name?: string;
+  /** Controlled selected value. */
   value?: string;
+  /** Selected value at first, when uncontrolled. */
   defaultValue?: string;
+  /** Called with the segment's value when it is chosen. */
   onChange?: (value: string) => void;
   /** Show icons only; labels stay as accessible names. */
   iconOnly?: boolean;
+  /** Stretch to the full width of the container. */
   fullWidth?: boolean;
+  /** Disables every segment; the value is not submitted. */
   disabled?: boolean;
+  /** Height and text size of the segments. Default "md". */
   size?: Size;
   /** Colour of the active segment's content. */
   tone?: Tone;
+  /** Added to the root element, for layout. */
   className?: string | undefined;
   /** Layout only. */
   style?: CSSProperties | undefined;

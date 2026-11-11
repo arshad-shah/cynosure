@@ -22,10 +22,15 @@ declare module "../../tokens/schema.js" {
 
 /** Spread onto the trigger (a Button or IconButton). */
 export interface PopoverTriggerProps {
+  /** Spread onto the trigger: the panel is placed against it and focus returns to it on close. */
   ref: Ref<HTMLButtonElement>;
+  /** Spread onto the trigger: opens the panel, or closes it when open. */
   onClick: () => void;
+  /** Spread onto the trigger: whether the panel is open. */
   "aria-expanded": boolean;
+  /** Spread onto the trigger: the id of the panel. */
   "aria-controls": string;
+  /** Spread onto the trigger: tells assistive technology it opens a dialog. */
   "aria-haspopup": "dialog";
 }
 
@@ -42,8 +47,11 @@ export interface PopoverProps {
   anchor?: { x: number; y: number } | VirtualAnchor | undefined;
   /** Accessible name of the panel (a non-modal dialog). */
   label: string;
+  /** Controlled open state. */
   open?: boolean;
+  /** Open at first, when uncontrolled. */
   defaultOpen?: boolean;
+  /** Called with the new state when the trigger, Escape or an outside click opens or closes it. */
   onOpenChange?: (open: boolean) => void;
   /** Preferred side; flips when it does not fit. `start`/`end` follow the reading direction. */
   placement?: Placement;
@@ -51,9 +59,11 @@ export interface PopoverProps {
   size?: Size;
   /** Keep Tab inside the panel until it closes. */
   modal?: boolean;
+  /** Added to the panel, for layout. */
   className?: string;
   /** Layout only, applied to the panel. */
   style?: CSSProperties;
+  /** The panel's content. Focus moves to its first focusable element on open. */
   children?: ReactNode;
 }
 

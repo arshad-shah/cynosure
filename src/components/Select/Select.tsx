@@ -48,22 +48,37 @@ export interface SelectOption {
 }
 
 export interface SelectProps {
+  /** Names the control, shown above it. */
   label: ReactNode;
   /** Visually hide the label (it still names the control). Prefer visible labels. */
   labelHidden?: boolean | undefined;
+  /** Help text shown below the control. */
   description?: ReactNode;
+  /** Your own error; it replaces the built-in required message. */
   error?: ReactNode;
+  /** The choices: `{ value, label, description?, icon?, disabled?, group? }`. */
   options: SelectOption[];
+  /** Controlled selected value. */
   value?: string;
+  /** Selected value at first, when uncontrolled. */
   defaultValue?: string;
+  /** Called with the chosen option's value when it changes. */
   onChange?: (value: string) => void;
+  /** Shown while nothing is chosen. Default "Select…". */
   placeholder?: string;
+  /** Submits the value with its form under this name. */
   name?: string;
+  /** The form will not submit until a value is chosen; also draws the required marker. */
   required?: boolean;
+  /** Cannot be opened or changed, and is not submitted. */
   disabled?: boolean;
+  /** Height and text size of the control. Default "md". */
   size?: Size;
+  /** `outline`, or `soft` (tinted, no border). Default "outline". */
   variant?: "outline" | "soft";
+  /** Replace the built-in English text: the placeholder, the empty list and the required message. */
   labels?: { placeholder?: string; empty?: string; required?: string };
+  /** Added to the root element, for layout. */
   className?: string;
   /** Layout only. */
   style?: CSSProperties;

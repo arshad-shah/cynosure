@@ -29,18 +29,23 @@ export interface NoticeProps {
    * whose content changes are announced politely.
    */
   tone?: Tone;
+  /** Short heading above the message. */
   title?: ReactNode;
   /** One or two Buttons; they move under the text in narrow containers. */
   action?: ReactNode;
   /** Shows a close button. The Notice hides itself unless you control it with `onDismiss` and unmount it. */
   dismissible?: boolean;
+  /** Called when the close button is pressed. With it, hiding the Notice is up to you. */
   onDismiss?: () => void;
   /** Replace the tone's icon, or `null` for none. */
   icon?: IconData | null;
+  /** Replace the built-in English text: the dismiss button's name. */
   labels?: Partial<NoticeLabels>;
+  /** Added to the root element, for layout. */
   className?: string;
   /** Layout only. Restyle through --cy-notice-* tokens. */
   style?: CSSProperties;
+  /** The message. */
   children?: ReactNode;
 }
 

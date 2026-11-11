@@ -32,9 +32,11 @@ export interface ProgressSegment {
 export interface ProgressBarProps {
   /** Accessible name, shown above the bar unless `labelHidden`. */
   label: string;
+  /** Visually hide the label (it still names the bar). */
   labelHidden?: boolean;
   /** Current value between 0 and `max`. Leave it out (or pass `indeterminate`) when progress is unknown. */
   value?: number | undefined;
+  /** The value that means complete. Default 100. */
   max?: number;
   /** Progress is happening but its amount is unknown. */
   indeterminate?: boolean;
@@ -51,10 +53,13 @@ export interface ProgressBarProps {
   marker?: number | undefined;
   /** Read with the value when there is a marker. Default "marker at 75%". */
   markerLabel?: string | undefined;
+  /** Colour of the fill. Default "accent". */
   tone?: Exclude<Tone, "neutral"> | "neutral";
   /** Bar thickness. */
   size?: Size;
+  /** Replace the built-in English text: the value text. */
   labels?: Partial<ProgressBarLabels>;
+  /** Added to the root element, for layout. */
   className?: string;
   /** Layout only. Restyle through --cy-progress-bar-* tokens. */
   style?: CSSProperties;

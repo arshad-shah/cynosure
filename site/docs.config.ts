@@ -2,6 +2,8 @@
  * This site's one settings file. To make the template another product's documentation, change what is here; the
  * pages, navigation, version, changelog and search all follow from the repository. See `site/README.md`.
  */
+
+import { storybook } from "@arshad-shah/cynosure/brands";
 import {
   code,
   history,
@@ -31,6 +33,9 @@ export default defineDocs({
     appleTouchIcon: "brand/apple-touch-icon.png",
     shareImage: "brand/og-image.png",
   },
+
+  // Storybook is built beside the site (`pnpm build:site`): every example with its controls and tests.
+  links: [{ label: "Storybook", href: "/storybook/", icon: storybook }],
 
   docs: "docs",
   // Notes for people working on Cynosure and its products, not for people using it: these stay in the repository.

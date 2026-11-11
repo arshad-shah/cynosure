@@ -44,15 +44,21 @@ export interface SortableListLabels {
 export interface SortableListProps {
   /** Accessible name of the list. */
   label: string;
+  /** Controlled items, in order: `{ id, label, content? }`. */
   items?: SortableItem[] | undefined;
+  /** Starting items when uncontrolled. */
   defaultItems?: SortableItem[];
   /** Called with the items in their new order after a move is dropped. */
   onReorder?: ((items: SortableItem[]) => void) | undefined;
+  /** Disables the handles, so nothing can be moved. */
   disabled?: boolean;
   /** `list` (rows, default) or `grid` (tiles that wrap: file grids, page thumbnails). */
   layout?: "list" | "grid";
+  /** Text size of the rows. Default "md". */
   size?: Size;
+  /** Replace the built-in English text: the handle name, the instructions and the announcements. */
   labels?: Partial<SortableListLabels>;
+  /** Added to the root element, for layout. */
   className?: string;
   /** Layout only. Restyle through --cy-sortable-list-* tokens. */
   style?: CSSProperties;

@@ -46,7 +46,9 @@ export interface AppShellProps {
    * shell's width, not the window's, so it also works in side panels.
    */
   collapseBelow?: number;
+  /** Replace the built-in English text: the menu button, the drawer title and the skip link. */
   labels?: Partial<AppShellLabels>;
+  /** Added to the root element, for layout. */
   className?: string;
   /** Layout only. Restyle through --cy-app-shell-* tokens. */
   style?: CSSProperties;

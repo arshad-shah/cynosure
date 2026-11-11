@@ -2,6 +2,7 @@ import { forwardRef, type InputHTMLAttributes, useCallback, useRef } from "react
 import { useClientLayoutEffect } from "../client-layout-effect.js";
 
 export interface ChoiceBaseProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "type"> {
+  /** Which native control to render. */
   type: "checkbox" | "radio";
   /** Checkbox only: the mixed state (aria-checked="mixed"). */
   indeterminate?: boolean;

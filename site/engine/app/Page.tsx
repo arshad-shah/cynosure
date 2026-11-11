@@ -124,6 +124,11 @@ function Foot({ page }: { page: PageData }) {
           <Link href="/changelog/" size="sm" tone="neutral">
             Changelog
           </Link>
+          {(config.links ?? []).map((item) => (
+            <Link key={item.href} href={item.href} size="sm" tone="neutral">
+              {item.label}
+            </Link>
+          ))}
           <Link href={site.repo} size="sm" tone="neutral">
             GitHub
           </Link>

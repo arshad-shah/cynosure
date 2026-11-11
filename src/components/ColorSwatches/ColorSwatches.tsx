@@ -30,12 +30,17 @@ export interface ColorSwatch {
 export interface ColorSwatchesProps {
   /** Accessible name of the group, e.g. "Recent colours". */
   label: string;
+  /** The colours to offer: a CSS colour, or `{ value, label }` to give it a spoken name. */
   swatches: (ColorSwatch | string)[];
   /** The chosen colour, matched by colour (so "#FFF" and "white" are the same swatch). */
   value?: string | undefined;
+  /** Called when a swatch is chosen (pressed, or reached with the arrow keys), with that swatch's `value`. */
   onChange: (value: string) => void;
+  /** No swatch can be chosen. */
   disabled?: boolean;
+  /** Size of each swatch. Default "md". */
   size?: Size;
+  /** Added to the root element, for layout. */
   className?: string;
   /** Layout only. Restyle through --cy-color-swatches-* tokens. */
   style?: CSSProperties;

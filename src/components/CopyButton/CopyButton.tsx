@@ -19,6 +19,7 @@ export interface CopyButtonLabels {
 export interface CopyButtonProps {
   /** The text to copy (or a function that returns it when clicked). */
   value: string | (() => string);
+  /** Replace the built-in English text: the button's name before copying, after a copy and after a failure. */
   labels?: Partial<CopyButtonLabels>;
   /** Milliseconds before the button goes back to its copy state (default 2000). */
   timeout?: number;
@@ -27,12 +28,19 @@ export interface CopyButtonProps {
    * document, `chrome.runtime` messaging) or tests. A rejection or throw shows the failed state.
    */
   copy?: (text: string) => Promise<void> | void;
+  /** Called after a successful copy, with the text that was copied. */
   onCopy?: (text: string) => void;
+  /** Called when copying fails, with the error. */
   onError?: (error: unknown) => void;
+  /** Size of the button. Default "md". */
   size?: Size;
+  /** Fill style of the button. Default "ghost". */
   variant?: ButtonVariant;
+  /** Where the label tooltip appears. Default "top". */
   tooltipPlacement?: Placement;
+  /** The button cannot be pressed. */
   disabled?: boolean;
+  /** Added to the root element, for layout. */
   className?: string;
   /** Layout only. */
   style?: CSSProperties;

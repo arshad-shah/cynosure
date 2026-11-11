@@ -55,17 +55,26 @@ export interface CommandPaletteLabels {
 }
 
 export interface CommandPaletteProps {
+  /** The commands to search and run. */
   commands: Command[];
   /** Called with the chosen command's id; the palette then closes. */
   onRun: (id: string) => void;
+  /** Controlled: whether the palette is open. */
   open?: boolean;
+  /** Open at first, when uncontrolled. */
   defaultOpen?: boolean;
+  /**
+   * Called when the palette opens or closes (shortcut, Escape, a press outside, running a command), with the new
+   * state.
+   */
   onOpenChange?: (open: boolean) => void;
   /** Global shortcut that toggles the palette (`mod` is Command on Apple platforms, else Control). `false`: none. */
   shortcut?: string | false;
   /** How many recently run commands to list before you type (default 5, 0 for none). */
   recentLimit?: number;
+  /** Replace the built-in English text: the palette's name, the placeholder, the empty note and the recent heading. */
   labels?: Partial<CommandPaletteLabels>;
+  /** Added to the panel, for layout. */
   className?: string;
   /** Layout only, applied to the panel. */
   style?: CSSProperties;

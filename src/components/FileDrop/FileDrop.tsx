@@ -44,6 +44,7 @@ export interface FileDropProps {
   onReject?: (rejections: FileRejection[]) => void;
   /** File types, as for `<input accept>`: ".pdf,image/*". */
   accept?: string | undefined;
+  /** Take more than one file at a time. */
   multiple?: boolean;
   /** Largest file in bytes. */
   maxSize?: number | undefined;
@@ -56,12 +57,19 @@ export interface FileDropProps {
   target?: "zone" | "window";
   /** Shown under the prompt, e.g. "PNG or JPG, up to 5 MB". */
   hint?: ReactNode;
+  /** Name the accepted files are submitted under in a form. */
   name?: string | undefined;
+  /** Id of the form it belongs to, when it is not inside that form. */
   form?: string | undefined;
+  /** Marks the file input as required for form validation. */
   required?: boolean | undefined;
+  /** Turns off dropping and the button. */
   disabled?: boolean | undefined;
+  /** Size of the zone and its button. Default "md". */
   size?: Size;
+  /** Replace the built-in English text. */
   labels?: Partial<FileDropLabels>;
+  /** Added to the root element, for layout. */
   className?: string;
   /** Layout only. Restyle through --cy-file-drop-* tokens. */
   style?: CSSProperties;

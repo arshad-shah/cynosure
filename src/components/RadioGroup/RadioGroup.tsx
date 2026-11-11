@@ -11,22 +11,35 @@ export interface RadioOption {
 }
 
 export interface RadioGroupProps {
+  /** Names the group, shown above the options. */
   label: ReactNode;
   /** Visually hide the label (it still names the control). Prefer visible labels. */
   labelHidden?: boolean | undefined;
+  /** Help text shown below the options. */
   description?: ReactNode;
+  /** Error message shown below the options and announced. */
   error?: ReactNode;
+  /** The choices: `{ value, label, description?, disabled? }`. */
   options: RadioOption[];
   /** Native group name (generated when omitted). */
   name?: string;
+  /** Controlled selected value. */
   value?: string;
+  /** Selected value at first, when uncontrolled. */
   defaultValue?: string | undefined;
+  /** Called with the option's value when it is chosen. */
   onChange?: (value: string) => void;
+  /** Stack the options, or lay them in a row that wraps. Default "vertical". */
   orientation?: "vertical" | "horizontal";
+  /** The form will not submit until an option is chosen; also draws the required marker. */
   required?: boolean;
+  /** Disables every option. */
   disabled?: boolean;
+  /** Size of the radios and their text. Default "md". */
   size?: Size;
+  /** Colour of the chosen radio. Default "accent". */
   tone?: Tone;
+  /** Added to the root element, for layout. */
   className?: string;
   /** Layout only. */
   style?: CSSProperties;
