@@ -34,6 +34,22 @@ export interface ColorTokens {
   successText: string;
   warningText: string;
   infoText: string;
+  /**
+   * Code: one colour per syntax role, for code blocks and editors (`docs/code-editors.md`). Each reads at least 4.5:1 on
+   * the surface, the soft fill and the background (7:1 in the contrast palettes). Keywords follow the accent.
+   */
+  syntaxComment: string;
+  syntaxKeyword: string;
+  syntaxString: string;
+  syntaxNumber: string;
+  syntaxFunction: string;
+  syntaxType: string;
+  syntaxVariable: string;
+  syntaxProperty: string;
+  syntaxOperator: string;
+  syntaxTag: string;
+  syntaxAttribute: string;
+  syntaxRegexp: string;
 }
 
 export interface MotionTokens {

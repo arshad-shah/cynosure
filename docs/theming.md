@@ -13,6 +13,6 @@ const theme = createTheme({
 });
 ```
 
-`createTheme` derives accent hover/active (OKLCH), soft and ring mixes, and on-accent text with WCAG contrast ≥ 4.5:1. Invalid colours or unsafe values throw `CynosureThemeError`.
+`createTheme` derives accent hover/active (OKLCH), soft and ring mixes, on-accent text with WCAG contrast ≥ 4.5:1, and the code colours (`--cy-color-syntax-*`, keywords from the accent; see [Code editors](code-editors.md)). Invalid colours or unsafe values throw `CynosureThemeError`.
 
 Apply it: `<CynosureTheme theme={theme} mode="system">`, at build time with `themeToCss(theme)`, or in a shadow root with `styles.inline` plus `themeToCss(theme, ":host")`. Modes: `light | dark | system`; contrast: `normal | more | system`. `useColorMode({ storage })` persists the user's choice.

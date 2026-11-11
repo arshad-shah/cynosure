@@ -38,6 +38,44 @@ export const BASE_PALETTES: Record<"light" | "dark", BasePalette & Status> = {
   },
 };
 
+/** The roles of code colours that are not taken from the palette (keywords use the accent, comments the muted ink). */
+export type SyntaxHue =
+  | "string"
+  | "number"
+  | "function"
+  | "type"
+  | "property"
+  | "tag"
+  | "attribute"
+  | "regexp";
+
+/**
+ * Starting hues for code, chosen to stay apart from each other and from the ember accent (which keywords use). They are
+ * only starting points: createTheme moves each one until it reads at least 4.5:1 on the surfaces code sits on.
+ */
+export const SYNTAX_HUES: Record<"light" | "dark", Record<SyntaxHue, string>> = {
+  light: {
+    string: "#3d7a1f",
+    number: "#7c3aed",
+    function: "#1d5fbf",
+    type: "#0f766e",
+    property: "#7a4e12",
+    tag: "#be185d",
+    attribute: "#9a5b00",
+    regexp: "#a21caf",
+  },
+  dark: {
+    string: "#a6d189",
+    number: "#c4a7ff",
+    function: "#8ab4f8",
+    type: "#5eead4",
+    property: "#e5c07b",
+    tag: "#f472b6",
+    attribute: "#fbbf24",
+    regexp: "#f0abfc",
+  },
+};
+
 /** Unscaled base values (px at comfortable scale). */
 export const BASE_GLOBAL: Omit<GlobalTokens, "scale"> = {
   control: { height: { sm: 26, md: 32, lg: 40 } },

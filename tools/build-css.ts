@@ -30,6 +30,9 @@ export function cssSources(root = "src"): string[] {
   return [...base, ...group("foundations"), ...group("components")];
 }
 
+/** Stylesheets products opt into one by one (`@arshad-shah/cynosure/styles/<name>.css`). */
+export const OPTIONAL = ["syntax/syntax.css"];
+
 export function buildCss(root = "src", out = "dist"): string {
   mkdirSync(join(out, "styles"), { recursive: true });
   const parts = cssSources(root).map((file) => {
@@ -43,6 +46,12 @@ export function buildCss(root = "src", out = "dist"): string {
   if (existsSync(fonts)) {
     mkdirSync(join(out, "fonts"), { recursive: true });
     for (const file of readdirSync(fonts)) copyFileSync(join(fonts, file), join(out, "fonts", file));
+  }
+  // Opt-in stylesheets: built and shipped beside the others, but left out of styles.css (syntax.css styles other
+  // libraries' class names, which a product should choose).
+  for (const file of OPTIONAL.map((f) => join(root, f)).filter(existsSync)) {
+    const { code } = transform({ filename: file, code: readFileSync(file), minify: true, targets: TARGETS });
+    writeFileSync(join(out, "styles", basename(file)), code.toString());
   }
   const tokens = themeToCss(createTheme());
   writeFileSync(join(out, "styles", "tokens.css"), tokens);

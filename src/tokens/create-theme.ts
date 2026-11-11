@@ -8,7 +8,7 @@ import {
   shiftLightness,
   toHex,
 } from "./color.js";
-import { BASE_GLOBAL, BASE_PALETTES, DEFAULT_ACCENT, SCALES } from "./defaults.js";
+import { BASE_GLOBAL, BASE_PALETTES, DEFAULT_ACCENT, SCALES, SYNTAX_HUES } from "./defaults.js";
 import type { ColorTokens, GlobalTokens, PaletteName, Theme, ThemeInput } from "./schema.js";
 
 const ON_CANDIDATES = ["#ffffff", "#16120f", "#000000"] as const;
@@ -89,12 +89,61 @@ function accentRoles(
   };
 }
 
-/** Raises contrast of a palette: ink to the extreme, muted until ≥ 7:1 against bg, lines from muted. */
+type SyntaxKey = Extract<keyof ColorTokens, `syntax${string}`>;
+const SYNTAX_KEYS = [
+  "syntaxComment",
+  "syntaxKeyword",
+  "syntaxString",
+  "syntaxNumber",
+  "syntaxFunction",
+  "syntaxType",
+  "syntaxVariable",
+  "syntaxProperty",
+  "syntaxOperator",
+  "syntaxTag",
+  "syntaxAttribute",
+  "syntaxRegexp",
+] as const satisfies readonly SyntaxKey[];
+
+/** Code colours, each moved until it reads at `ratio` on every surface code sits on (page, surface, soft fill). */
+function syntaxColors(p: ColorTokens, dark: boolean, ratio: number): Pick<ColorTokens, SyntaxKey> {
+  const on = [p.bg, p.surface, p.soft, p.surfaceRaised];
+  const hues = SYNTAX_HUES[dark ? "dark" : "light"];
+  const start: Record<SyntaxKey, string> = {
+    syntaxComment: p.muted,
+    syntaxKeyword: p.accentText,
+    syntaxString: hues.string,
+    syntaxNumber: hues.number,
+    syntaxFunction: hues.function,
+    syntaxType: hues.type,
+    syntaxVariable: p.ink,
+    syntaxProperty: hues.property,
+    syntaxOperator: p.ink,
+    syntaxTag: hues.tag,
+    syntaxAttribute: hues.attribute,
+    syntaxRegexp: hues.regexp,
+  };
+  return Object.fromEntries(SYNTAX_KEYS.map((k) => [k, readableOn(start[k], on, dark, ratio)])) as Pick<
+    ColorTokens,
+    SyntaxKey
+  >;
+}
+
+/** Raises contrast of a palette: ink to the extreme, muted until ≥ 7:1 against bg, lines from muted, code to 7:1. */
 function contrastPalette(p: ColorTokens, dark: boolean): ColorTokens {
   const step = dark ? 0.02 : -0.02;
   let muted = p.muted;
   for (let i = 0; i < 40 && contrastRatio(muted, p.bg) < 7; i++) muted = shiftLightness(muted, step);
-  return { ...p, ink: dark ? "#ffffff" : "#000000", muted, line: muted };
+  const raised = { ...p, ink: dark ? "#ffffff" : "#000000", muted, line: muted };
+  const code = Object.fromEntries(
+    SYNTAX_KEYS.map((k) => [
+      k,
+      k === "syntaxVariable" || k === "syntaxOperator"
+        ? raised.ink
+        : readableOn(p[k], [p.bg, p.surface, p.soft, p.surfaceRaised], dark, 7),
+    ]),
+  );
+  return { ...raised, ...code };
 }
 
 const SAFE_NAME = /^[a-z][a-z0-9-]*$/i;
@@ -128,7 +177,7 @@ export function createTheme(input: ThemeInput = {}): Theme {
     // The strongest tint components use is ~24% of the tone over the surface (soft hover).
     const text = (tone: string) =>
       readableOn(tone, [base.surface, mix(tone, base.surface, 0.24)], name === "dark");
-    return {
+    const colors = {
       ...base,
       ...roles,
       onSuccess: status("success"),
@@ -140,7 +189,8 @@ export function createTheme(input: ThemeInput = {}): Theme {
       successText: text(base.success),
       warningText: text(base.warning),
       infoText: text(base.info),
-    };
+    } as Omit<ColorTokens, SyntaxKey> as ColorTokens;
+    return { ...colors, ...syntaxColors(colors, name === "dark", 4.5) };
   };
   const light = palette("light");
   const dark = palette("dark");

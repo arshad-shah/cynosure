@@ -31,6 +31,7 @@ Still open:
 - **Merging `next` into `main`**, and setting up the trusted publisher on npmjs.com (repository `arshad-shah/cynosure`, workflow `release.yml`).
 - **The first version:** if npm only offers a trusted publisher once the package exists, `0.1.0` needs one publish another way.
 - **The documentation site:** it lives at cynosure.arshadshah.com, whose host builds `main` (today the old Astro docs, `packages/docs`). When `next` is merged into `main`, change the host's build settings to: command `pnpm install --frozen-lockfile && pnpm build:site`, output directory `site/dist`. Until the new site is built, that is Storybook at `/storybook/` behind a holding page (`site/index.html`). GitHub Pages (`pages.yml`) is removed in the same change, so Storybook is never offline.
+- **Code-editor colours:** done (2026-11-11): `--cy-color-syntax-*` palette tokens, `styles/syntax.css` (opt-in), `monacoTheme`, `textMateTheme`, `editorColors`; `docs/code-editors.md`.
 - **Order (Arshad, 2026-11-11):** the token-based code-editor theme first, then merge to `main` and publish `0.1.0` with a one-run token, then deprecate the old packages, then the docs site.
 
 ## Plans

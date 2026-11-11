@@ -40,6 +40,7 @@ export const App = () => (
 | [Theming](docs/theming.md)                                     | Accent, scale, radius, fonts, light and dark, per-component tokens |
 | [Icons](docs/icons.md)                                         | Facet icons, brand marks and how brands allow them to be used      |
 | [Without React](docs/without-react.md)                         | Tokens and icons in Astro pages, static sites and plain TypeScript |
+| [Code editors](docs/code-editors.md)                           | Code colours for CodeMirror, Monaco, Shiki, Prism and highlight.js |
 | [Build adapters](docs/adapters.md)                             | The Vite adapter and shadow roots (`styles.inline`)                |
 | [Migrating a product](docs/migration.md)                       | The order of work to move a product onto Cynosure                  |
 | [Architecture](docs/architecture.md)                           | How the package is put together                                    |
