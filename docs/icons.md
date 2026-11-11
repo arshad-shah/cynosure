@@ -1,6 +1,6 @@
 # Icons
 
-Cynosure ships two kinds of icon, both drawn by the same `Icon` component. [Search them all on the documentation site](https://cynosure.arshadshah.com/icons/), where pressing an icon copies its import.
+Cynosure ships two kinds of icon, both drawn by the same `Icon` component.
 
 - **Facet icons** (`@arshad-shah/cynosure/icons`): Cynosure's own set, 240 icons in 16 categories.
 - **Brand marks** (`@arshad-shah/cynosure/brands`): the official logos of 97 companies and projects, exactly as their owners publish them.
@@ -19,7 +19,7 @@ import { search } from "@arshad-shah/cynosure/icons";
 <Icon icon={search} color="#14b8a6" />              // a one-off colour
 ```
 
-Import icons by name so unused ones are left out of your bundle. Names are camelCase versions of the icon's kebab-case name (`arrow-up-right` → `arrowUpRight`); reserved words get an `Icon` suffix (`packageIcon`).
+`ICON_KEYWORDS` (from the same entry) maps each icon's name to other words it is found by (`trash`: delete, remove, bin), for building your own icon picker. Import icons by name so unused ones are left out of your bundle. Names are camelCase versions of the icon's kebab-case name (`arrow-up-right` → `arrowUpRight`); reserved words get an `Icon` suffix (`packageIcon`).
 
 **Adding one:** draw it on a 24 grid with strokes only, export the SVG, then run `pnpm cy new icon <name> --from icon.svg --category <category>`. In the generated file, set `motion` and mark the moving part `animate: true`. See `src/icons/AGENTS.md`.
 

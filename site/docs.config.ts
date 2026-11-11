@@ -45,6 +45,7 @@ export default defineDocs({
         label: "Icons",
         from: "@arshad-shah/cynosure/icons",
         load: () => import("@arshad-shah/cynosure/icons"),
+        keywords: () => import("@arshad-shah/cynosure/icons").then((icons) => icons.ICON_KEYWORDS),
       },
       {
         label: "Brands",

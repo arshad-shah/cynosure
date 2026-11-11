@@ -50,16 +50,22 @@ export function Gallery({ sets }: { sets: IconSet[] }) {
   useEffect(() => {
     let current = true;
     void Promise.all(
-      sets.map(async (set) => ({
-        set,
-        entries: Object.entries(await set.load())
-          .filter((pair): pair is [string, IconData] => isIcon(pair[1]))
-          .map(([id, icon]) => ({
-            id,
-            icon,
-            words: `${id} ${icon.name} ${icon.category} ${icon.brand?.title ?? ""}`.toLowerCase(),
-          })),
-      })),
+      sets.map(async (set) => {
+        const none: Readonly<Record<string, readonly string[]>> = {};
+        const [icons, keywords] = await Promise.all([set.load(), set.keywords?.() ?? none]);
+        return {
+          set,
+          entries: Object.entries(icons)
+            .filter((pair): pair is [string, IconData] => isIcon(pair[1]))
+            .map(([id, icon]) => ({
+              id,
+              icon,
+              words: [id, icon.name, icon.category, icon.brand?.title, ...(keywords[icon.name] ?? [])]
+                .join(" ")
+                .toLowerCase(),
+            })),
+        };
+      }),
     ).then((all) => {
       if (current) setLoaded(all);
     });
@@ -93,7 +99,7 @@ export function Gallery({ sets }: { sets: IconSet[] }) {
       <div className="docs-gallery-tools">
         <SearchField
           label="Search icons"
-          placeholder="Name or category, such as arrow or time"
+          placeholder="Try delete, arrow or settings"
           value={query}
           onChange={setQuery}
         />
@@ -117,47 +123,50 @@ export function Gallery({ sets }: { sets: IconSet[] }) {
               : `${loaded.map(({ set, entries }) => `${entries.length} ${set.label.toLowerCase()}`).join(", ")}. `}
             Press one to copy {form === "import" ? "its import" : "its element"}.
           </p>
-          {count === 0 && (
-            <EmptyState
-              size="sm"
-              icon={search}
-              title="No icon matches"
-              description="Try a shorter word, or a category such as arrows, files or media."
-            />
-          )}
-          {shown.map(({ set, entries }) => {
-            const groups = new Map<string, Entry[]>();
-            for (const entry of entries)
-              groups.set(entry.icon.category, [...(groups.get(entry.icon.category) ?? []), entry]);
-            return [...groups]
-              .sort(([a], [b]) => a.localeCompare(b))
-              .map(([category, items]) => (
-                <Stack key={`${set.from}-${category}`} gap="3">
-                  {/* A set of one category (brand marks) is named by the set; others by the category. */}
-                  <h3 className="docs-gallery-heading">
-                    {groups.size === 1 && category === set.label.toLowerCase()
-                      ? set.label
-                      : sentence(category)}
-                  </h3>
-                  <div className="docs-gallery-grid">
-                    {items.map((entry) => (
-                      <Card
-                        key={entry.id}
-                        variant="outline"
-                        padding="sm"
-                        aria-label={`Copy ${entry.icon.brand?.title ?? entry.id}`}
-                        onClick={() => void copy(entry, set)}
-                      >
-                        <Stack gap="2" align="center">
-                          <Icon icon={entry.icon} size={24} />
-                          <span className="docs-gallery-name">{entry.id}</span>
-                        </Stack>
-                      </Card>
-                    ))}
-                  </div>
-                </Stack>
-              ));
-          })}
+          {/* One frame of fixed height that scrolls, so the gallery never makes the page long. */}
+          <div className="docs-gallery-frame">
+            {count === 0 && (
+              <EmptyState
+                size="sm"
+                icon={search}
+                title="No icon matches"
+                description="Try another word for it, or a category such as arrows, files or media."
+              />
+            )}
+            {shown.map(({ set, entries }) => {
+              const groups = new Map<string, Entry[]>();
+              for (const entry of entries)
+                groups.set(entry.icon.category, [...(groups.get(entry.icon.category) ?? []), entry]);
+              return [...groups]
+                .sort(([a], [b]) => a.localeCompare(b))
+                .map(([category, items]) => (
+                  <Stack key={`${set.from}-${category}`} gap="2">
+                    {/* A set of one category (brand marks) is named by the set; others by the category. */}
+                    <h3 className="docs-gallery-heading">
+                      {groups.size === 1 && category === set.label.toLowerCase()
+                        ? set.label
+                        : sentence(category)}
+                    </h3>
+                    <div className="docs-gallery-grid">
+                      {items.map((entry) => (
+                        <Card
+                          key={entry.id}
+                          variant="outline"
+                          padding="sm"
+                          aria-label={`Copy ${entry.icon.brand?.title ?? entry.id}`}
+                          onClick={() => void copy(entry, set)}
+                        >
+                          <Stack gap="2" align="center">
+                            <Icon icon={entry.icon} size={24} />
+                            <span className="docs-gallery-name">{entry.id}</span>
+                          </Stack>
+                        </Card>
+                      ))}
+                    </div>
+                  </Stack>
+                ));
+            })}
+          </div>
         </>
       )}
     </section>

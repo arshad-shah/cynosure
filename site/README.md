@@ -74,7 +74,7 @@ engine/build/build.ts     writes every page as HTML into dist/, plus 404.html an
 - **The canvas** (`Canvas.tsx`) renders the component's own stories from the library's source. The code under an example is written from what the example renders (`jsx.ts`), so it reads as usage, not as test scaffolding. An example that opens over the page (a dialog) waits behind a button.
 - **Navigation** between pages swaps the content without a reload (`router.tsx`); every page is also a real HTML file, so links, search engines and a visitor without JavaScript get the content.
 - **Search** is Cynosure's CommandPalette (Ctrl or Command+K) over every page and heading.
-- **The icon gallery** (`Gallery.tsx`) is shown on the guide named by `iconGallery.page` in the config. It lists every icon exported by each set in `iconGallery.sets`, loaded when that page opens. Typing filters by name, category and brand name; pressing an icon copies its import line, or the `<Icon>` element, and a toast shows what was copied. A new icon appears by being exported: nothing is listed by hand.
+- **The icon gallery** (`Gallery.tsx`) is shown on the guide named by `iconGallery.page` in the config. It lists every icon exported by each set in `iconGallery.sets`, loaded when that page opens. Typing filters by name, category, brand name and each set's `keywords` (other words for an icon, such as delete for a trash can); pressing an icon copies its import line, or the `<Icon>` element, and a toast shows what was copied. The tiles sit in one frame of fixed height that scrolls, so the gallery never makes the page long. A new icon appears by being exported: nothing is listed by hand.
 
 ## Making it another product's site
 

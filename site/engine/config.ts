@@ -19,6 +19,8 @@ export interface IconSet {
   from: string;
   /** Loads the set: `() => import("…")`, the same address as `from`. */
   load: () => Promise<Record<string, unknown>>;
+  /** Loads other words each icon is found by (delete for a trash can), keyed by the icon's `name`. */
+  keywords?: () => Promise<Readonly<Record<string, readonly string[]>>>;
 }
 
 export interface ComponentsConfig {

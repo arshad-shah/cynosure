@@ -114,6 +114,7 @@ export { italic } from "./italic.js";
 export { justifyBetween } from "./justify-between.js";
 export { key } from "./key.js";
 export { keyboard } from "./keyboard.js";
+export { ICON_KEYWORDS } from "./keywords.js";
 export { laptop } from "./laptop.js";
 export { layers } from "./layers.js";
 export { leaf } from "./leaf.js";
