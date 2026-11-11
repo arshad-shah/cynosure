@@ -31,3 +31,16 @@ export function propsNote(site: Provenance): string {
     ? `Generated from the type definitions of unreleased changes${built(site.commit)}. ${site.package} on npm is ${site.version}.`
     : `Generated from the type definitions in ${site.package} ${site.version}.`;
 }
+
+/**
+ * The git ref a link to the repository's files should use: the branch on a release build, the built commit on a
+ * build with pending changes, because the branch may not hold those files yet (a pull request's new component).
+ * "Edit this page" always uses the branch: an edit is made there.
+ */
+export function viewRef(site: {
+  branch: string;
+  unreleased?: boolean | undefined;
+  commit?: string | undefined;
+}): string {
+  return site.unreleased && site.commit ? site.commit : site.branch;
+}

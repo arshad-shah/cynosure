@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { examplesNote, propsNote } from "../../site/engine/app/provenance";
+import { examplesNote, propsNote, viewRef } from "../../site/engine/app/provenance";
 
 /**
  * What the documentation site says about the version it shows. The site is built from one commit, so a page must
@@ -39,5 +39,11 @@ describe("the site's version notes", () => {
     expect(examplesNote({ ...base, unreleased: true })).toBe(
       "These examples run unreleased changes. The published version is 0.2.0.",
     );
+  });
+
+  it("link to files at the built commit while changes are pending, and at the branch on a release", () => {
+    expect(viewRef({ branch: "main", unreleased: true, commit: "6cc6783" })).toBe("6cc6783");
+    expect(viewRef({ branch: "main", commit: "233f3ba" })).toBe("main");
+    expect(viewRef({ branch: "main", unreleased: true })).toBe("main");
   });
 });
