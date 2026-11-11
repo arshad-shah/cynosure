@@ -9,7 +9,8 @@
       "!coverage",
       "!src/styles/generated-css.ts",
       "!**/__screenshots__",
-      "!.superpowers"
+      "!.superpowers",
+      "!.changeset"
     ]
   },
   "formatter": {
