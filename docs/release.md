@@ -23,7 +23,7 @@ Nothing publishes from `next`, and nothing publishes without a merge to `main`.
 
 ## Versions
 
-The package starts at `0.1.0` and becomes `1.0.0` when Prism ships on it.
+The first release is `0.1.0` (the package sits at `0.0.0` until the first version pull request) and becomes `1.0.0` when Prism ships on it.
 
 ## The old packages
 

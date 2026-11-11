@@ -2,7 +2,7 @@
 
 ## Status
 
-Plans 1–3 and 5–9 are complete on `next`. Plan 4 is complete except Task 10 (the final review). Storybook is live at https://arshad-shah.github.io/cynosure/ and deploys on every push to `next`. Not yet on npm: publishing is set up (`.github/workflows/release.yml`) and runs when `next` is merged to `main`, which waits for Arshad.
+Plans 1–3 and 5–9 are complete on `next`. Plan 4 is complete except Task 10 (the final review). Storybook was on GitHub Pages; it moves to https://cynosure.arshadshah.com/storybook/ (built from `main` by `pnpm build:site`), and `pages.yml` is removed. Not yet on npm: publishing is set up (`.github/workflows/release.yml`) and runs when `next` is merged to `main`, which waits for Arshad.
 
 Plan 9 (`docs/superpowers/plans/2026-11-10-cynosure-migrations.md`, tracked in issue #149) built what the product migrations asked for, as props on existing components wherever one fitted:
 
@@ -274,7 +274,7 @@ None. Publishing waits for Arshad to merge to `main` and add the npm credential;
 
 - **Latest local run (cloud container, 2026-11-10, after Plan 9):** `cy check`, lint, typecheck, unit and Preact tests, the React 18 smoke tests (6), every story on Chromium plus the touch project (1228 tests in the coverage pass), coverage (95.1% branches, floor 95%), build, publint, attw and size budgets pass. New and changed views were checked by screenshot (AppShell tab bar at 390px, closable Tabs, Calendar and its month of plans).
 - **Firefox and WebKit:** cannot be downloaded in the cloud container (`cdn.playwright.dev` is blocked); CI on `next` runs them. Runs 436 and 437 passed on all three engines; later runs were superseded by newer pushes before finishing. Check the run after the latest push (Next step 1).
-- **Published Storybook:** every story and docs page of a production build was loaded under `/cynosure/` in Chromium with no load or render errors; the stale-deploy reload was tested by swapping builds under an open tab.
+- **Published Storybook (GitHub Pages, before the move):** every story and docs page of a production build was loaded under `/cynosure/` in Chromium with no load or render errors; the stale-deploy reload was tested by swapping builds under an open tab.
 - **CI on `next`:** conventions, lint, types, unit, React 18, stories on all three engines plus touch, coverage, visual regression, build, publint, attw and size.
 - **Not verified:**
   - real extension contexts (Prism and Aperture shadow roots under MV3 CSP)

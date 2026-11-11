@@ -38,7 +38,7 @@ Node 24 (`.nvmrc`), pnpm via `packageManager` (installs refuse versions younger 
 - Work on branch `next`. Commits are conventional (`feat(button): …`) and carry **no AI attribution** (no Co-Authored-By or "Generated with" lines).
 - Push with the personal account: `gh auth switch -h github.com -u arshad-shah`, `git push`, then `gh auth switch -h github.com -u ShahA_hmh`.
 - **Never** publish to npm, deprecate the old `cynosure-*` packages or merge to `main` without Arshad's explicit go-ahead.
-- Storybook deploys to GitHub Pages on every push to `next`: https://arshad-shah.github.io/cynosure/
+- Storybook and the documentation site are published at https://cynosure.arshadshah.com (Storybook under `/storybook/`), built from `main` with `pnpm build:site`.
 
 ## End of every session
 

@@ -31,7 +31,7 @@ export const App = () => (
 );
 ```
 
-**Storybook:** https://arshad-shah.github.io/cynosure/ (every component with live examples, its props and its keyboard behaviour).
+**Storybook:** https://cynosure.arshadshah.com/storybook/ (every component with live examples, its props and its keyboard behaviour).
 
 ## Docs
 
