@@ -12,7 +12,7 @@ Publishing uses npm **trusted publishing**: npm trusts this repository's `releas
 
 Nothing publishes from `next`, and nothing publishes without a merge to `main`.
 
-`main`'s branch rules require two checks: **CI gate** (the last job of `ci.yml`, green only when every other CI job is) and **Require changeset or skip-changeset label** (`changeset-check.yml`). Keep those names; add new jobs to the gate's `needs`. Every pull request into `main` must add a changeset or carry the `skip-changeset` label: the "Changeset Check" workflow (`changeset-check.yml`) is a required check on `main`. Bot pull requests, the version pull request among them, pass without one.
+`main`'s branch rules require two checks: **CI gate** (the last job of `ci.yml`, green only when every other CI job is) and **Require changeset or skip-changeset label** (`changeset-check.yml`). Keep those names; add new jobs to the gate's `needs` (today `verify` and `site`). Every pull request into `main` must add a changeset or carry the `skip-changeset` label: the "Changeset Check" workflow (`changeset-check.yml`) is a required check on `main`. Bot pull requests, the version pull request among them, pass without one.
 
 ## One-time setup (Arshad)
 

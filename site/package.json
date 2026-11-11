@@ -1,0 +1,25 @@
+{
+  "name": "@arshad-shah/cynosure-site",
+  "private": true,
+  "type": "module",
+  "description": "The Cynosure documentation site (cynosure.arshadshah.com), built with Cynosure from npm.",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check"
+  },
+  "dependencies": {
+    "@arshad-shah/cynosure": "^0.1.0",
+    "@astrojs/react": "^7.1.1",
+    "astro": "^7.4.2",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.12",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "typescript": "~5.9.3"
+  }
+}

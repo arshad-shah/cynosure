@@ -1,0 +1,25 @@
+---
+import { Button, CodeBlock, Notice, Prose, Stack } from "@arshad-shah/cynosure";
+import Page from "../layouts/Page.astro";
+import { VERSION } from "../site";
+---
+
+<Page title="Cynosure" description="One small, themeable, accessible UI package for React, used by every Arshad Shah product." current="home">
+  <Stack gap="6">
+  <Prose>
+    <h1>Cynosure</h1>
+    <p>
+      One small, themeable, accessible UI package for React. Products import it and adjust tokens, and every component
+      looks and works the same in a page, an iframe, an extension popup or a shadow root.
+    </p>
+  </Prose>
+  <CodeBlock code="pnpm add @arshad-shah/cynosure" language="sh" title="Install" client:visible />
+  <Notice tone="info" title={`Version ${VERSION}`}>
+    The full documentation is being built here, from Cynosure itself. Until then, every component, with its examples,
+    props and keyboard behaviour, is in the workbench.
+  </Notice>
+  <div>
+    <Button href="/storybook/" variant="solid">Browse the components</Button>
+  </div>
+  </Stack>
+</Page>

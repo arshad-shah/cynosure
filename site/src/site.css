@@ -1,0 +1,33 @@
+/*
+ * The site's own layout. Colours, sizes and fonts all come from Cynosure tokens; only page layout lives here.
+ */
+html,
+body {
+  block-size: 100%;
+  margin: 0;
+  background: var(--cy-color-bg);
+  color: var(--cy-color-ink);
+  font-family: var(--cy-font-sans);
+}
+body > astro-island {
+  display: block;
+  block-size: 100dvh;
+}
+.site-bar {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--cy-space-4);
+}
+.site-brand {
+  color: var(--cy-color-ink);
+  font-size: var(--cy-font-size-lg);
+  font-weight: var(--cy-font-weight-bold);
+  text-decoration: none;
+}
+.site-page {
+  max-inline-size: 48rem;
+  margin-inline: auto;
+  padding: var(--cy-space-9) var(--cy-space-6);
+}

@@ -15,7 +15,13 @@ Plan 9 (`docs/superpowers/plans/2026-11-10-cynosure-migrations.md`, tracked in i
 
 ## Current task
 
-**0.1.0 is published** (2026-11-11, `@arshad-shah/cynosure@0.1.0`, `latest`, with provenance). Now: the documentation site, issue #152, Milestone 1.
+**0.1.0 is published** (2026-11-11, `@arshad-shah/cynosure@0.1.0`, `latest`, with provenance). Now: the documentation site, issue #152.
+
+Milestone 1 of the site is built (`site/`, rules in `site/AGENTS.md`):
+- Astro with Cynosure 0.1.0 from npm, in a pnpm workspace; `minimumReleaseAgeExclude` lets our own packages install the day they publish.
+- The shell is one React island: AppShell, SideNav (a bottom tab bar on phones), ThemeToggle (cycle) with `useColorMode` driving `CynosureTheme target="document"`, and `themeInitScript` in the head.
+- A home page; `pnpm build:site` builds the site, then Storybook into `site/dist/storybook`; a `site` CI job (types and the build) joins the CI gate.
+- Checked in Chromium on desktop (light) and a 390-point phone (dark): no console errors, no sideways scroll.
 
 The release took four rounds, each fixed at its cause:
 - #151 brought the rebuild into `main`. It was squash-merged, so `next` was joined to `main`'s history afterwards with a merge that changes no files.

@@ -1,5 +1,10 @@
-# Single-package repo; this file only carries pnpm settings.
+# The library is the root package; `site/` is the documentation site (private, never published).
+packages:
+  - site
 minimumReleaseAge: 20160 # 14 days: never install a version younger than two weeks
+# Our own packages are trusted the day they are published (the site uses each Cynosure release at once).
+minimumReleaseAgeExclude:
+  - "@arshad-shah/*"
 onlyBuiltDependencies:
   - esbuild
   - simple-git-hooks

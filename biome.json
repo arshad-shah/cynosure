@@ -6,6 +6,7 @@
       "!dist",
       "!storybook-static",
       "!site/dist",
+      "!site/.astro",
       "!coverage",
       "!src/styles/generated-css.ts",
       "!**/__screenshots__",

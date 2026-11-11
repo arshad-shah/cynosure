@@ -1,0 +1,33 @@
+---
+import "@arshad-shah/cynosure/styles.css";
+import { themeInitScript } from "@arshad-shah/cynosure/tokens";
+import Shell from "../islands/Shell";
+import "../site.css";
+
+interface Props {
+  title: string;
+  description: string;
+  /** The SideNav item this page belongs to. */
+  current: string;
+}
+const { title, description, current } = Astro.props;
+const fullTitle = title === "Cynosure" ? title : `${title} · Cynosure`;
+---
+
+<!doctype html>
+<html lang="en" data-cy-mode="system">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={new URL(Astro.url.pathname, Astro.site)} />
+    <!-- Applies the saved colour mode before the first paint, so dark-mode visitors never see a light flash. -->
+    <script is:inline set:html={themeInitScript()} />
+  </head>
+  <body>
+    <Shell client:load current={current}>
+      <slot />
+    </Shell>
+  </body>
+</html>
