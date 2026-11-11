@@ -1,14 +1,14 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { Component, type ReactNode, useState } from "react";
+import { Component, type ReactNode, useEffect, useState } from "react";
 import { expect, fn, waitFor } from "storybook/test";
 import { computeUnderHostileHost } from "../../test/hostile.js";
-import { shownFully } from "../../test/settle.js";
+import { settled, shownFully } from "../../test/settle.js";
 import { CynosureTheme } from "../../theme/CynosureTheme.js";
 import { createTheme } from "../../tokens/index.js";
 import { Button } from "../Button/Button.js";
 import { Dialog } from "../Dialog/Dialog.js";
 import { Inline } from "../Inline/Inline.js";
-import { Toaster, type ToasterProps, type ToastOptions, useToast } from "./Toast.js";
+import { Toaster, type ToasterProps, type ToastOptions, type ToastPosition, useToast } from "./Toast.js";
 
 /** Buttons that raise toasts, so the stories exercise the real `useToast()` path. */
 function Demo({ options }: { options: Record<string, ToastOptions> }) {
@@ -37,6 +37,7 @@ const meta = {
       options: ["top-start", "top-center", "top-end", "bottom-start", "bottom-center", "bottom-end"],
     },
     max: { control: { type: "number", min: 1, max: 6 } },
+    offset: { control: "text" },
   },
   render: (args) => (
     <Toaster {...args}>
@@ -236,6 +237,221 @@ export const PositionsAndRightToLeft: Story = {
       expect(box.top).toBeLessThan(window.innerHeight / 2);
       expect(box.right).toBeGreaterThan(window.innerWidth - 40);
     });
+  },
+};
+
+const POSITIONS: ToastPosition[] = [
+  "top-start",
+  "top-center",
+  "top-end",
+  "bottom-start",
+  "bottom-center",
+  "bottom-end",
+];
+
+/** Raises one lasting toast as soon as it mounts. */
+function Raise({ title }: { title: string }) {
+  const { toast } = useToast();
+  useEffect(() => {
+    const id = setTimeout(() => toast({ title, duration: Number.POSITIVE_INFINITY }), 0);
+    return () => clearTimeout(id);
+  }, [toast, title]);
+  return null;
+}
+
+/** One Toaster per position for each named set of props, each showing one toast titled "<set> <position>". */
+function EveryPosition({ sets }: { sets: Record<string, Partial<ToasterProps>> }) {
+  return (
+    <>
+      {Object.entries(sets).flatMap(([name, props]) =>
+        POSITIONS.map((position) => (
+          <Toaster
+            key={`${name} ${position}`}
+            {...props}
+            position={position}
+            labels={{ region: `Notifications, ${name} ${position}` }}
+          >
+            <Raise title={`${name} ${position}`} />
+          </Toaster>
+        )),
+      )}
+    </>
+  );
+}
+
+/** The pixel value of a CSS length where `el` is. */
+const px = (el: Element, value: string) => {
+  const probe = document.createElement("div");
+  probe.style.cssText = `position:absolute;inline-size:${value}`;
+  el.append(probe);
+  const width = probe.getBoundingClientRect().width;
+  probe.remove();
+  return width;
+};
+
+/**
+ * How far a toast is from the viewport edges its position names: `block` from the top or bottom, `inline` from the
+ * start or end side (for `center`, how far off the middle it is).
+ */
+async function distances(title: string, position: ToastPosition, rtl = false) {
+  const toast = (await waitFor(() => {
+    const found = toasts().find((t) => t.textContent?.includes(title));
+    expect(found).toBeTruthy();
+    return found;
+  })) as HTMLElement;
+  await settled(toast);
+  const box = toast.getBoundingClientRect();
+  const { clientWidth: width, clientHeight: height } = document.documentElement;
+  const [edge, side] = position.split("-") as ["top" | "bottom", "start" | "center" | "end"];
+  const fromLeft = (side === "start") !== rtl;
+  return {
+    block: edge === "top" ? box.top : height - box.bottom,
+    inline:
+      side === "center"
+        ? Math.abs((box.left + box.right) / 2 - width / 2)
+        : fromLeft
+          ? box.left
+          : width - box.right,
+    width: box.width,
+  };
+}
+
+const OFFSET_SETS: Record<string, Partial<ToasterProps>> = {
+  Plain: {},
+  Scalar: { offset: "40px" },
+  Step: { offset: "8" },
+  Both: { offset: { block: "3rem", inline: "9" } },
+  Inline: { offset: { inline: "24px" } },
+};
+
+/** Checks every position of every set in `OFFSET_SETS` against the plain margin plus what its offset asks for. */
+async function expectOffsets(root: Element, rtl: boolean) {
+  const edge = px(root, "var(--cy-space-6)");
+  const expected: Record<string, { block: number; inline: number }> = {
+    Plain: { block: 0, inline: 0 },
+    // One value is the distance from the top or bottom edge only.
+    Scalar: { block: 40, inline: 0 },
+    Step: { block: px(root, "var(--cy-space-8)"), inline: 0 },
+    Both: { block: px(root, "3rem"), inline: px(root, "var(--cy-space-9)") },
+    Inline: { block: 0, inline: 24 },
+  };
+  await expect(edge).toBeGreaterThan(0);
+  await expect(expected.Step?.block).toBeGreaterThan(0);
+  for (const [name, extra] of Object.entries(expected))
+    for (const position of POSITIONS) {
+      const at = await distances(`${name} ${position}`, position, rtl);
+      const where = `${name} ${position}`;
+      await expect(at.block, where).toBeCloseTo(edge + extra.block, 0);
+      // A centred stack stays centred; its room shrinks from both sides.
+      if (position.endsWith("center")) await expect(at.inline, where).toBeLessThan(1);
+      else await expect(at.inline, where).toBeCloseTo(edge + extra.inline, 0);
+    }
+}
+
+export const OffsetKeepsToastsClearOfFixedUi: Story = {
+  render: () => <EveryPosition sets={OFFSET_SETS} />,
+  play: async ({ canvasElement }) => {
+    await expectOffsets(canvasElement, false);
+  },
+};
+
+export const OffsetInRightToLeft: Story = {
+  render: () => (
+    <div dir="rtl">
+      <EveryPosition sets={OFFSET_SETS} />
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    // Start is the right-hand side here, and the inline offset moves with it.
+    const start = await distances("Both top-start", "top-start", true);
+    const box = (
+      toasts().find((t) => t.textContent?.includes("Both top-start")) as HTMLElement
+    ).getBoundingClientRect();
+    await expect(box.left).toBeGreaterThan(document.documentElement.clientWidth / 2);
+    await expect(start.inline).toBeGreaterThan(px(canvasElement, "var(--cy-space-6)"));
+    await expectOffsets(canvasElement, true);
+  },
+};
+
+export const OffsetFromTokens: Story = {
+  render: () => (
+    <>
+      {/* What an app's stylesheet does, for example inside a media query for phones. */}
+      <div
+        style={
+          { "--cy-toast-offset-block": "56px", "--cy-toast-offset-inline": "10px" } as React.CSSProperties
+        }
+      >
+        <EveryPosition sets={{ Token: {}, Prop: { offset: { block: "20px" } } }} />
+      </div>
+      <CynosureTheme theme={createTheme({ components: { toast: { offsetBlock: "32px" } } })}>
+        <EveryPosition sets={{ Theme: {} }} />
+      </CynosureTheme>
+    </>
+  ),
+  play: async ({ canvasElement }) => {
+    const edge = px(canvasElement, "var(--cy-space-6)");
+    for (const position of POSITIONS) {
+      const token = await distances(`Token ${position}`, position);
+      await expect(token.block, position).toBeCloseTo(edge + 56, 0);
+      // The prop wins over the token on the axis it sets; the other axis is still the token's.
+      const prop = await distances(`Prop ${position}`, position);
+      await expect(prop.block, position).toBeCloseTo(edge + 20, 0);
+      const theme = await distances(`Theme ${position}`, position);
+      await expect(theme.block, position).toBeCloseTo(edge + 32, 0);
+      if (position.endsWith("center")) continue;
+      await expect(token.inline, position).toBeCloseTo(edge + 10, 0);
+      await expect(prop.inline, position).toBeCloseTo(edge + 10, 0);
+      await expect(theme.inline, position).toBeCloseTo(edge, 0);
+    }
+  },
+};
+
+/** A phone with a bottom tab bar: the toasts sit above it, and work as they always do. */
+export const AboveABottomTabBar: Story = {
+  args: { position: "bottom-center", offset: "56px" },
+  render: (args) => (
+    <Toaster {...args} style={{ zIndex: 1 }} className="app-toasts">
+      <Demo
+        options={{
+          Save: { ...saved, duration: Number.POSITIVE_INFINITY },
+          Fail: { title: "Upload failed", tone: "danger", duration: 400 },
+        }}
+      />
+      <div
+        data-testid="tab-bar"
+        style={{
+          position: "fixed",
+          insetInline: 0,
+          insetBlockEnd: 0,
+          blockSize: 56,
+          background: "var(--cy-color-surface)",
+          borderBlockStart: "1px solid var(--cy-color-line)",
+        }}
+      />
+    </Toaster>
+  ),
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole("button", { name: "Save" }));
+    const toast = await canvas.findByRole("status");
+    // Announced as before: the text arrives in a live element that already exists.
+    await waitFor(() => expect(toast).toHaveTextContent("SavedYour changes are live."));
+    await settled(toast);
+    const bar = canvas.getByTestId("tab-bar").getBoundingClientRect();
+    await expect(toast.getBoundingClientRect().bottom).toBeLessThanOrEqual(bar.top);
+    // className and layout style still land on the region, beside the offset.
+    const region = canvas.getByRole("region", { name: "Notifications" });
+    await expect(region).toHaveClass("cy-toaster", "app-toasts");
+    await expect(region.style.zIndex).toBe("1");
+    // The strip over the tab bar lets presses through.
+    await expect(getComputedStyle(region).pointerEvents).toBe("none");
+    // A danger toast is still an alert and still times out; the close button still dismisses.
+    await userEvent.click(canvas.getByRole("button", { name: "Fail" }));
+    const alert = await canvas.findByRole("alert");
+    await waitFor(() => expect(alert).toHaveTextContent("Upload failed"));
+    await gone(alert);
+    await userEvent.click(canvas.getByRole("button", { name: "Dismiss" }));
+    await gone(toast);
   },
 };
 

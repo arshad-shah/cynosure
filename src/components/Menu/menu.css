@@ -90,10 +90,13 @@
 
 .cy-menu-icon.cy-menu-icon {
   flex: none;
-  color: var(--cy-color-muted);
   font-size: inherit;
-  [data-tone="danger"] > & {
-    color: inherit;
+  /* Muted unless the item colours it: `iconTone` is Icon's own data-tone, `iconColor` is set inline. */
+  &:not([data-tone]) {
+    color: var(--cy-color-muted);
+    [data-tone="danger"] > & {
+      color: inherit;
+    }
   }
 }
 

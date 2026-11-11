@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import type { CSSProperties } from "react";
 import { expect, fn, waitFor } from "storybook/test";
 import { computeUnderHostileHost } from "../../test/hostile.js";
+import { Badge } from "../Badge/Badge.js";
 import { Button } from "../Button/Button.js";
 import { Card } from "./Card.js";
 
@@ -23,6 +25,7 @@ const meta = {
     padding: { control: "inline-radio", options: ["none", "sm", "md", "lg"] },
     tone: { control: "select", options: TONES },
     as: { control: "select", options: ["div", "section", "article", "li"] },
+    edge: { control: "text" },
     children: { control: "text" },
   },
 } satisfies Meta<typeof Card>;
@@ -84,6 +87,7 @@ export const RendersTheRequestedElement: Story = {
 };
 
 const followed = fn();
+const clicked = fn();
 
 export const WholeCardLinkActivatesByClickAndEnter: Story = {
   args: {
@@ -208,5 +212,198 @@ export const StaticCardKeepsLayoutClassAndStyle: Story = {
     await expect(tile).toHaveClass("cy-card", "host-tile");
     await expect(getComputedStyle(tile).maxWidth).toBe("240px");
     await expect(tile.tagName).toBe("DIV");
+  },
+};
+
+/** A CSS value (`var(--cy-color-danger)`, a length token) as the browser resolves it next to `near`. */
+function resolved(near: Element, property: "color" | "width", value: string) {
+  const probe = document.createElement("i");
+  probe.style.setProperty(property, value);
+  probe.style.display = "block";
+  near.after(probe);
+  const result = getComputedStyle(probe).getPropertyValue(property);
+  probe.remove();
+  return result;
+}
+const EDGE_WIDTH = "var(--cy-card-edge-width, var(--cy-space-2))";
+const VIOLET = "rgb(124, 58, 237)";
+
+export const EdgeShowsAToneOrAnyColour: Story = {
+  tags: ["visual"],
+  render: () => (
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 200px)", gap: 12 }}>
+      {TONES.map((tone) => (
+        <Card key={tone} edge={tone} data-testid={tone}>
+          {tone} <Badge tone={tone}>Category</Badge>
+        </Card>
+      ))}
+      <Card edge={VIOLET} data-testid="custom">
+        Garden <Badge color={VIOLET}>Category</Badge>
+      </Card>
+      <Card data-testid="none">No edge</Card>
+    </div>
+  ),
+  play: async ({ canvas }) => {
+    const none = canvas.getByTestId("none");
+    const plain = style(none);
+    const width = resolved(none, "width", EDGE_WIDTH);
+    // The default thickness is a space token and is wider than the card's ordinary border.
+    await expect(width).toBe(resolved(none, "width", "var(--cy-space-2)"));
+    await expect(Number.parseFloat(width)).toBeGreaterThan(Number.parseFloat(plain.borderLeftWidth));
+    const tokenOf = (tone: string) =>
+      tone === "neutral" ? "var(--cy-color-ink)" : `var(--cy-color-${tone})`;
+    for (const tone of TONES) {
+      const card = style(canvas.getByTestId(tone));
+      await expect({ tone, colour: rgba(card.borderLeftColor), width: card.borderLeftWidth }).toEqual({
+        tone,
+        colour: rgba(resolved(none, "color", tokenOf(tone))),
+        width,
+      });
+    }
+    const custom = style(canvas.getByTestId("custom"));
+    await expect(rgba(custom.borderLeftColor)).toEqual(rgba(VIOLET));
+    await expect(custom.borderLeftWidth).toBe(width);
+    // Only the start side changes: the other three sides and every corner are those of a card without an edge.
+    for (const side of ["Top", "Right", "Bottom"] as const) {
+      await expect(custom[`border${side}Width`]).toBe(plain[`border${side}Width`]);
+      await expect(custom[`border${side}Color`]).toBe(plain[`border${side}Color`]);
+    }
+    await expect(custom.borderRadius).toBe(plain.borderRadius);
+    await expect(Number.parseFloat(custom.borderTopLeftRadius)).toBeGreaterThan(0);
+    await expect(none).not.toHaveAttribute("data-edge");
+    await expect(plain.borderLeftWidth).toBe(plain.borderTopWidth);
+  },
+};
+
+export const EdgeFollowsReadingDirectionAndItsWidthToken: Story = {
+  render: () => (
+    <div style={{ display: "grid", gap: 12, inlineSize: 240 }}>
+      <Card edge="success" data-testid="ltr">
+        Left to right
+      </Card>
+      <div dir="rtl">
+        <Card edge="success" data-testid="rtl">
+          Right to left
+        </Card>
+      </div>
+      <div style={{ "--cy-card-edge-width": "7px" } as CSSProperties}>
+        <Card edge="success" data-testid="wide">
+          Wider edge
+        </Card>
+      </div>
+    </div>
+  ),
+  play: async ({ canvas }) => {
+    const ltr = style(canvas.getByTestId("ltr"));
+    const rtl = style(canvas.getByTestId("rtl"));
+    const green = rgba(resolved(canvas.getByTestId("ltr"), "color", "var(--cy-color-success)"));
+    await expect(ltr.borderLeftWidth).not.toBe(ltr.borderRightWidth);
+    await expect(rgba(ltr.borderLeftColor)).toEqual(green);
+    // Mirrored: the edge is on the right, the left side is an ordinary border, and the corners keep their radius.
+    await expect(rtl.borderRightWidth).toBe(ltr.borderLeftWidth);
+    await expect(rgba(rtl.borderRightColor)).toEqual(green);
+    await expect(rtl.borderLeftWidth).toBe(ltr.borderRightWidth);
+    await expect(rgba(rtl.borderLeftColor)).toEqual(rgba(ltr.borderRightColor));
+    await expect(rtl.borderRadius).toBe(ltr.borderRadius);
+    await expect(style(canvas.getByTestId("wide")).borderLeftWidth).toBe("7px");
+  },
+};
+
+export const EdgeWorksWithEveryVariantAndTone: Story = {
+  render: () => (
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 160px)", gap: 12 }}>
+      {(["surface", "outline", "soft"] as const).map((variant) => (
+        <Card key={variant} variant={variant} tone="info" edge="danger" data-testid={variant}>
+          {variant}
+        </Card>
+      ))}
+    </div>
+  ),
+  play: async ({ canvas }) => {
+    const red = rgba(resolved(canvas.getByTestId("surface"), "color", "var(--cy-color-danger)"));
+    for (const variant of ["surface", "outline", "soft"]) {
+      const card = style(canvas.getByTestId(variant));
+      // The edge is its own colour, not the card's tone, which still colours the other sides.
+      await expect({ variant, edge: rgba(card.borderLeftColor) }).toEqual({ variant, edge: red });
+      await expect(rgba(card.borderTopColor)).not.toEqual(red);
+      await expect(card.borderLeftWidth).toBe(resolved(canvas.getByTestId(variant), "width", EDGE_WIDTH));
+    }
+  },
+};
+
+export const InteractiveCardKeepsItsEdgeAndStaysOneTarget: Story = {
+  render: () => (
+    <div style={{ display: "grid", gap: 12, inlineSize: 280 }}>
+      <Card href="#task" edge="warning" onClick={(event) => event.preventDefault()}>
+        Renew passport
+      </Card>
+      <Card onClick={clicked} edge={VIOLET} actions={<Button size="sm">Snooze</Button>}>
+        Water the garden
+      </Card>
+    </div>
+  ),
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    clicked.mockClear();
+    const link = canvas.getByRole("link", { name: "Renew passport" });
+    const button = canvas.getByRole("button", { name: "Water the garden" });
+    // Still exactly one link, one card button and the separate action: the edge adds no element.
+    await expect(canvas.getAllByRole("link")).toHaveLength(1);
+    await expect(canvas.getAllByRole("button")).toHaveLength(2);
+    await expect(link.querySelector("a, button")).toBeNull();
+    await expect(button.contains(canvas.getByRole("button", { name: "Snooze" }))).toBe(false);
+    await expect(canvasElement.querySelector(".cy-card-frame")?.hasAttribute("data-edge")).toBe(false);
+    const amber = rgba(resolved(link, "color", "var(--cy-color-warning)"));
+    const accent = rgba(resolved(link, "color", "var(--cy-color-accent)"));
+    await expect(rgba(style(link).borderLeftColor)).toEqual(amber);
+    await expect(rgba(style(button).borderLeftColor)).toEqual(rgba(VIOLET));
+    // Keyboard focus recolours the other three sides; the edge keeps its colour.
+    await userEvent.tab();
+    await expect(link).toHaveFocus();
+    await waitFor(() => expect(rgba(style(link).borderTopColor)).toEqual(accent), { timeout: 3000 });
+    await expect(rgba(style(link).borderLeftColor)).toEqual(amber);
+    await userEvent.tab();
+    await expect(button).toHaveFocus();
+    await waitFor(() => expect(rgba(style(button).borderTopColor)).toEqual(accent), { timeout: 3000 });
+    await expect(rgba(style(button).borderLeftColor)).toEqual(rgba(VIOLET));
+    await userEvent.keyboard("{Enter}");
+    await userEvent.click(button);
+    await expect(clicked).toHaveBeenCalledTimes(2);
+  },
+};
+
+export const EdgeIsStableUnderHostileHostAndKeptInForcedColours: Story = {
+  args: { edge: "danger", children: "Hostile edge", style: { maxWidth: 240 } },
+  play: async ({ canvasElement }) => {
+    const props = ["border-left-width", "border-left-color", "border-top-width", "border-top-left-radius"];
+    const card = computeUnderHostileHost(canvasElement, ".cy-card", props);
+    await expect(card.clean["border-left-width"]).toBe(
+      resolved(canvasElement.querySelector(".cy-card") as Element, "width", EDGE_WIDTH),
+    );
+    await expect(card.hostile).toEqual(card.clean);
+    // Forced colours: the edge is declared in the system text colour, at the same thickness.
+    const el = canvasElement.querySelector(".cy-card") as Element;
+    const forced: string[] = [];
+    const walk = (rules: CSSRuleList, inside: boolean) => {
+      for (const rule of rules) {
+        if (rule instanceof CSSMediaRule)
+          walk(rule.cssRules, inside || rule.conditionText.includes("forced-colors"));
+        else if (rule instanceof CSSStyleRule) {
+          if (inside && el.matches(rule.selectorText))
+            forced.push(rule.style.borderInlineStartColor.toLowerCase());
+          walk(rule.cssRules, inside);
+        }
+      }
+    };
+    for (const sheet of document.styleSheets) walk(sheet.cssRules, false);
+    await expect(forced.filter(Boolean)).toEqual(["canvastext"]);
+  },
+};
+
+export const CustomEdgeKeepsLayoutStyle: Story = {
+  args: { edge: "teal", style: { maxWidth: 200 }, "data-testid": "tile" },
+  play: async ({ canvas }) => {
+    const tile = canvas.getByTestId("tile");
+    await expect(style(tile).maxWidth).toBe("200px");
+    await expect(rgba(style(tile).borderLeftColor)).toEqual(rgba("teal"));
   },
 };

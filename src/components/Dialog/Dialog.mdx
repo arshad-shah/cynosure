@@ -54,6 +54,22 @@ With `dismissible={false}` there is no close button and Escape and the backdrop 
 
 <Canvas of={Stories.NotDismissible} />
 
+## Content and state
+
+The content is in the DOM only while the dialog is open. It mounts when the dialog opens and unmounts once it has faded out, so every opening starts fresh: fields are back at their defaults, and a closed dialog costs nothing to render.
+
+<Canvas of={Stories.EveryOpeningStartsFresh} />
+
+Set `keepMounted` to keep the content in the DOM while closed. Use it when what the person typed must survive closing, or when the content is expensive to rebuild. Or keep the state outside the dialog, in the component that owns `open`.
+
+```tsx
+<Dialog open={open} onOpenChange={setOpen} title="New message" keepMounted>
+  <TextArea label="Message" />
+</Dialog>
+```
+
+<Canvas of={Stories.KeepMountedKeepsContentAndState} />
+
 ## Props
 
 <ArgTypes of={Stories} />
@@ -69,6 +85,7 @@ With `dismissible={false}` there is no close button and Escape and the backdrop 
 | Android back gesture | Closes it |
 
 - **Focus:** on open, focus moves to the first control in the content, else the first action, else the dialog itself. On close it returns to where it was, usually the button that opened it.
+- **Mounting:** closed, the `<dialog>` element is empty, on the server too. The content is rendered in the same render that opens it and removed when the closing transition ends, or at once when there is none (reduced motion). Reopening before the fade has finished keeps the content. With `keepMounted` it always stays.
 - **Role:** a native modal `<dialog>`, named by `title` (an `h2`) and described by `description`.
 - **Narrow containers:** below 36rem wide, the dialog docks to the bottom edge at full width.
 - **Isolation:** it never writes to `<html>` or `<body>`. There is no scroll lock; the content uses `overscroll-behavior: contain` so scrolling it does not move the page.

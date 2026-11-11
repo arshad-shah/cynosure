@@ -15,6 +15,7 @@ import { HiddenValue } from "../../foundations/HiddenValue/HiddenValue.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
 import { isComposing } from "../../foundations/keys.js";
 import { isTypeaheadKey, seekEnabled, useTypeahead } from "../../foundations/listbox.js";
+import { OptionIcon, type OptionIconColor } from "../../foundations/option-icon.js";
 import { chevronDown } from "../../icons/chevron-down.js";
 import type { IconData } from "../../icons/types.js";
 import { useListboxLayer } from "../../overlay/listbox-layer.js";
@@ -37,10 +38,11 @@ declare module "../../tokens/schema.js" {
   }
 }
 
-export interface SelectOption {
+export interface SelectOption extends OptionIconColor {
   value: string;
   label: string;
   description?: string;
+  /** Icon before the label, in the list and in the trigger when chosen. Colour it with `iconTone` or `iconColor`. */
   icon?: IconData;
   disabled?: boolean;
   /** Options next to each other with the same `group` are listed under that heading. */
@@ -56,7 +58,7 @@ export interface SelectProps {
   description?: ReactNode;
   /** Your own error; it replaces the built-in required message. */
   error?: ReactNode;
-  /** The choices: `{ value, label, description?, icon?, disabled?, group? }`. */
+  /** The choices: `{ value, label, description?, icon?, iconTone?, iconColor?, disabled?, group? }`. */
   options: SelectOption[];
   /** Controlled selected value. */
   value?: string;
@@ -241,7 +243,7 @@ export function Select({
             onClick={() => (open ? close() : openList())}
             onKeyDown={onKeyDown}
           >
-            {selected?.icon && <Icon icon={selected.icon} />}
+            {selected && <OptionIcon option={selected} plain={disabled} className="cy-select-icon" />}
             <span className="cy-select-value" data-placeholder={selected ? undefined : ""}>
               {selected?.label ?? placeholderText}
             </span>
@@ -287,7 +289,7 @@ export function Select({
                   }}
                   onKeyDown={() => {}}
                 >
-                  {option.icon && <Icon icon={option.icon} />}
+                  <OptionIcon option={option} plain={option.disabled} className="cy-select-icon" />
                   <span className="cy-select-option-text">
                     <span className="cy-select-option-label">{option.label}</span>
                     {option.description && (

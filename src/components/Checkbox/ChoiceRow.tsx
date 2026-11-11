@@ -46,13 +46,19 @@ export function ChoiceRow({
   defaultChecked,
   onChange,
   indeterminate,
+  strike,
   size = "md",
   tone = "accent",
   id,
   className,
   style,
   ...input
-}: ChoiceRowProps & { kind: "checkbox" | "switch" | "radio"; indeterminate?: boolean | undefined }) {
+}: ChoiceRowProps & {
+  kind: "checkbox" | "switch" | "radio";
+  indeterminate?: boolean | undefined;
+  /** Checkbox only (`strikeWhenChecked`): kept out of `ChoiceRowProps`, so Switch and RadioGroup do not gain it. */
+  strike?: boolean | undefined;
+}) {
   const field = useField({ id, description });
   return (
     <label
@@ -61,6 +67,7 @@ export function ChoiceRow({
       data-size={size}
       data-tone={tone}
       data-disabled={input.disabled ? "" : undefined}
+      data-strike={strike ? "" : undefined}
       style={style}
     >
       <span className={`cy-${kind}`}>

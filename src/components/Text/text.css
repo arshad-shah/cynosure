@@ -1,0 +1,137 @@
+/*
+ * text: one piece of text in the type scale. The root keeps its element's own display (inline or block) and never
+ * adds margins. Order matters: defaults, then a nested Text, then variants, then the explicit props, which win.
+ */
+.cy-text.cy-text {
+  box-sizing: border-box !important;
+  margin: 0;
+  padding: 0;
+  color: inherit;
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-font-size-md);
+  font-weight: var(--cy-font-weight-regular);
+  line-height: var(--cy-text-line-height, var(--cy-font-line-height));
+  letter-spacing: normal;
+  text-transform: none;
+}
+/* A Text directly inside a Text (a bold word, a value) keeps the outer type and changes only what it is given. */
+:where(.cy-text) > .cy-text.cy-text:where(:not([data-variant])) {
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+}
+
+.cy-text.cy-text[data-variant="lead"] {
+  color: var(--cy-text-muted, var(--cy-color-muted));
+  font-size: var(--cy-text-lead-size, var(--cy-font-size-lg));
+}
+.cy-text.cy-text[data-variant="caption"] {
+  color: var(--cy-text-muted, var(--cy-color-muted));
+  font-size: var(--cy-text-caption-size, var(--cy-font-size-sm));
+}
+.cy-text.cy-text[data-variant="eyebrow"] {
+  color: var(--cy-text-muted, var(--cy-color-muted));
+  font-family: var(--cy-font-mono);
+  font-size: var(--cy-text-eyebrow-size, var(--cy-font-eyebrow-size));
+  font-weight: var(--cy-font-weight-bold);
+  letter-spacing: var(--cy-text-eyebrow-tracking, var(--cy-font-eyebrow-tracking));
+  text-transform: uppercase;
+}
+.cy-text.cy-text[data-variant="code"] {
+  font-family: var(--cy-font-mono);
+}
+
+.cy-text.cy-text[data-size="xs"] {
+  font-size: var(--cy-font-size-xs);
+}
+.cy-text.cy-text[data-size="sm"] {
+  font-size: var(--cy-font-size-sm);
+}
+.cy-text.cy-text[data-size="md"] {
+  font-size: var(--cy-font-size-md);
+}
+.cy-text.cy-text[data-size="lg"] {
+  font-size: var(--cy-font-size-lg);
+}
+.cy-text.cy-text[data-size="xl"] {
+  font-size: var(--cy-font-size-xl);
+}
+.cy-text.cy-text[data-size="2xl"] {
+  font-size: var(--cy-font-size-2xl);
+}
+
+.cy-text.cy-text[data-weight="regular"] {
+  font-weight: var(--cy-font-weight-regular);
+}
+.cy-text.cy-text[data-weight="medium"] {
+  font-weight: var(--cy-font-weight-medium);
+}
+.cy-text.cy-text[data-weight="bold"] {
+  font-weight: var(--cy-font-weight-bold);
+}
+
+.cy-text.cy-text[data-tone="inherit"] {
+  color: inherit;
+}
+.cy-text.cy-text[data-tone="neutral"] {
+  color: var(--cy-color-ink);
+}
+.cy-text.cy-text[data-tone="muted"] {
+  color: var(--cy-text-muted, var(--cy-color-muted));
+}
+.cy-text.cy-text[data-tone="accent"] {
+  color: var(--cy-color-accent-text);
+}
+.cy-text.cy-text[data-tone="success"] {
+  color: var(--cy-color-success-text);
+}
+.cy-text.cy-text[data-tone="warning"] {
+  color: var(--cy-color-warning-text);
+}
+.cy-text.cy-text[data-tone="danger"] {
+  color: var(--cy-color-danger-text);
+}
+.cy-text.cy-text[data-tone="info"] {
+  color: var(--cy-color-info-text);
+}
+
+.cy-text.cy-text[data-numeric] {
+  font-variant-numeric: tabular-nums;
+}
+
+/* One line: an inline element needs a box of its own before its text can be cut. */
+.cy-text.cy-text[data-truncate] {
+  max-inline-size: 100%;
+  overflow: hidden;
+}
+.cy-text.cy-text[data-truncate=""] {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  &:not(p, div, figcaption) {
+    display: inline-block;
+    vertical-align: bottom;
+  }
+}
+/* text-align only moves text inside a block. */
+.cy-text.cy-text[data-align] {
+  text-align: start;
+  &:not(p, div, figcaption) {
+    display: block;
+  }
+}
+.cy-text.cy-text[data-align="center"] {
+  text-align: center;
+}
+.cy-text.cy-text[data-align="end"] {
+  text-align: end;
+}
+/* Several lines: the line clamp needs the flex box model, on every element. */
+.cy-text.cy-text[data-truncate="lines"] {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: var(--_lines);
+  line-clamp: var(--_lines);
+  overflow-wrap: anywhere;
+}

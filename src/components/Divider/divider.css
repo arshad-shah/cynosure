@@ -1,0 +1,90 @@
+/* Divider: a line drawn by the root's pseudo-elements (borders, so it stays visible in forced-colors mode), with an
+   optional label between them. Every visual value reads a --cy-divider-* token with a global fallback. */
+.cy-divider-label {
+  flex: 0 1 auto;
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+  text-align: center;
+}
+
+.cy-divider.cy-divider {
+  --_line: var(--cy-divider-color, var(--cy-color-line));
+  --_thickness: var(--cy-divider-thickness, var(--cy-border-width));
+  --_style: solid;
+  --_space: 0;
+
+  /* Root reset (component roots never carry .cy-reset). */
+  box-sizing: border-box !important;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  letter-spacing: normal;
+  text-transform: none;
+  display: flex;
+  flex: none;
+  align-items: center;
+  align-self: stretch;
+  gap: var(--cy-divider-label-gap, var(--cy-space-4));
+  min-inline-size: 0;
+  margin-block: var(--_space);
+  color: var(--cy-divider-label-color, var(--cy-color-muted));
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-divider-label-size, var(--cy-font-size-sm));
+  font-weight: var(--cy-font-weight-regular);
+  line-height: 1.4;
+
+  &::before,
+  &::after {
+    content: "";
+    box-sizing: border-box;
+    flex: 1 1 0;
+    min-inline-size: var(--cy-space-5);
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-block-start: var(--_thickness) var(--_style) var(--_line);
+  }
+  /* Without a label one pseudo-element is the whole line; a start or end label sits flush with that edge. */
+  &:not([data-label])::after,
+  &[data-label="start"]::before,
+  &[data-label="end"]::after {
+    display: none;
+  }
+
+  &[data-orientation="vertical"] {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: stretch;
+    min-block-size: 1em;
+    margin-block: 0;
+    margin-inline: var(--_space);
+    vertical-align: middle;
+    &::before {
+      min-inline-size: 0;
+      border-block-start: 0;
+      border-inline-start: var(--_thickness) var(--_style) var(--_line);
+    }
+  }
+
+  &[data-variant="dashed"] {
+    --_style: dashed;
+  }
+  &[data-tone="strong"] {
+    --_line: var(--cy-divider-color-strong, var(--cy-color-muted));
+  }
+  &[data-spacing="sm"] {
+    --_space: var(--cy-divider-spacing-sm, var(--cy-space-2));
+  }
+  &[data-spacing="md"] {
+    --_space: var(--cy-divider-spacing-md, var(--cy-space-4));
+  }
+  &[data-spacing="lg"] {
+    --_space: var(--cy-divider-spacing-lg, var(--cy-space-6));
+  }
+}
+
+@media (forced-colors: active) {
+  .cy-divider.cy-divider {
+    --_line: CanvasText;
+  }
+}

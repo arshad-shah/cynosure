@@ -33,6 +33,18 @@ The shell fills its container's height. The content and the navigation scroll on
 
 <Canvas of={Stories.ContentScrollsOnItsOwn} />
 
+### Padding and width of the page
+
+The main region has no padding and no maximum width, so a page can run edge to edge (a map, a table, a canvas). For an ordinary page, wrap the content in [Container](?path=/docs/components-container--docs), which pads it and caps its width.
+
+```tsx
+<AppShell header={<Brand />} nav={<SideNav label="Main" items={items} />}>
+  <Container>
+    <Page />
+  </Container>
+</AppShell>
+```
+
 ## Narrow screens
 
 Below `collapseBelow` (768px of the shell's own width) the navigation leaves the layout. A menu button appears at the start of the bar and opens it in a start-side [Sheet](?path=/docs/components-sheet--docs). Choosing a link or item closes the drawer; opening a group does not.
@@ -51,6 +63,33 @@ Below `collapseBelow` (768px of the shell's own width) the navigation leaves the
 ```
 
 <Canvas of={Stories.TabBarOnPhones} />
+
+A [SideNav](?path=/docs/components-sidenav--docs) entry with `kind: "action"` puts one raised primary button, such as "Add", in the bar. In the drawer the same entry is a full-width button, and pressing it closes the drawer.
+
+<Canvas of={Stories.TabBarWithAPrimaryAction} />
+
+### Reading the narrow state
+
+Do not repeat the breakpoint in your product. Anything rendered inside the shell (header, navigation, tabs, content) reads it with `useAppShell()`. Code outside the shell uses `onNarrowChange`.
+
+```tsx
+import { AppShell, useAppShell } from "@arshad-shah/cynosure";
+
+function Toolbar() {
+  const { narrow } = useAppShell();
+  return narrow ? <CompactToolbar /> : <FullToolbar />;
+}
+
+<AppShell header={<Toolbar />} onNarrowChange={(narrow) => setCompact(narrow)}>
+```
+
+- `narrow` is `true` while the shell's own width is below `collapseBelow`.
+- It is `false` on the server and on the first client render, so server markup hydrates without a mismatch. The shell measures itself before the first paint and renders again if it is narrow.
+- Outside an AppShell the hook does not throw. It returns `{ narrow: false }`.
+- `onNarrowChange` is called once per change. A shell that mounts narrow calls it with `true` right after mounting; a shell that mounts wide does not call it until it narrows.
+- There is no hook for the drawer: the shell closes it itself when a link or button inside it is pressed.
+
+<Canvas of={Stories.ChildrenReadTheNarrowState} />
 
 ## Props
 
@@ -71,4 +110,4 @@ Tokens: `--cy-app-shell-nav-background`, `--cy-app-shell-header-background` and 
 
 ## Related
 
-[SideNav](?path=/docs/components-sidenav--docs) · [Sheet](?path=/docs/components-sheet--docs) · [Toolbar](?path=/docs/components-toolbar--docs)
+[SideNav](?path=/docs/components-sidenav--docs) · [Container](?path=/docs/components-container--docs) · [Sheet](?path=/docs/components-sheet--docs) · [Toolbar](?path=/docs/components-toolbar--docs)

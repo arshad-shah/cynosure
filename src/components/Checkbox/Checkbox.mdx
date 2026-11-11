@@ -14,6 +14,7 @@ A checkbox with a label, for choices that are independent of each other. It is a
 - Several options where any number can be on.
 - A single agreement or preference saved with a form.
 - A "select all" row with `indeterminate` when only some items are chosen.
+- A list of tasks, with `strikeWhenChecked` so a finished task reads as done.
 
 **Use something else when:**
 - the change applies immediately: [Switch](?path=/docs/components-switch--docs)
@@ -28,6 +29,7 @@ import { Checkbox } from "@arshad-shah/cynosure";
 <Checkbox label="Email me updates" name="updates" value="yes" />
 <Checkbox label="Select all" checked={all} indeterminate={some} onChange={toggleAll} />
 <Checkbox label="Remember me" description="Keeps you signed in on this device." defaultChecked />
+<Checkbox label="Buy oat milk" strikeWhenChecked checked={done} onChange={setDone} />
 ```
 
 `onChange` receives the new `checked` boolean. Use `checked` for controlled and `defaultChecked` for uncontrolled. `name`, `value`, `required` and `disabled` are passed to the native input.
@@ -44,6 +46,16 @@ import { Checkbox } from "@arshad-shah/cynosure";
 
 <Canvas of={Stories.IndeterminateIsMixed} />
 
+## Checklists
+
+`strikeWhenChecked` strikes through and mutes the label while the box is checked, and mutes the description with it. It works the same controlled or uncontrolled. A box that is `indeterminate` is not struck: a partly done task is not done.
+
+<Canvas of={Stories.StrikeWhenCheckedByPointerAndKeyboard} />
+
+The muted label keeps a contrast of at least 4.5:1 against the surface in light and dark.
+
+<Canvas of={Stories.DoneLabelIsReadableInLightAndDark} />
+
 ## Props
 
 <ArgTypes of={Stories} />
@@ -58,6 +70,7 @@ import { Checkbox } from "@arshad-shah/cynosure";
 
 - **Forms:** values reach `FormData`, form reset restores the initial state, and `required` is enforced by the browser.
 - **Whole row:** the label and description are part of the click target.
+- **Done style:** with `strikeWhenChecked` the checked state is still what is announced; the strike only shows it. In forced colours the muted colour is dropped and the strike stays, in the system text colour. The colour change is a transition and is switched off under reduced motion.
 
 ## Touch
 
@@ -66,6 +79,11 @@ The hit area is at least 24px, growing to 44px on coarse pointers without changi
 ## Theming
 
 Tokens: `--cy-checkbox-size`, `--cy-checkbox-radius` and `--cy-checkbox-border`. The `sm` and `lg` sizes use `--cy-checkbox-size-sm` and `--cy-checkbox-size-lg`.
+
+| Token | Controls |
+| --- | --- |
+| `--cy-checkbox-done-color` | Label and description colour of a checked `strikeWhenChecked` row. Default `--cy-color-muted`. Keep it at 4.5:1 or more against the surface. |
+| `--cy-checkbox-strike-width` | Thickness of the strike. Default: the border width, or 1/16 of the text size when that is larger. |
 
 ```ts
 createTheme({ components: { checkbox: { radius: "50%" } } });

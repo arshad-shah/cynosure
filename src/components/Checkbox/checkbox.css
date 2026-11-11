@@ -84,6 +84,37 @@
   }
 }
 
+/* Checklist style (Checkbox `strikeWhenChecked`): a ticked row reads as done. A mixed box is not done. */
+.cy-choice[data-strike] {
+  & .cy-choice-label,
+  & .cy-choice-description {
+    transition: color var(--cy-motion-fast) var(--cy-motion-ease);
+  }
+  &:has(.cy-checkbox > input:checked:not(:indeterminate)) {
+    & .cy-choice-label {
+      color: var(--cy-checkbox-done-color, var(--cy-color-muted));
+      text-decoration-line: line-through;
+      text-decoration-thickness: var(--cy-checkbox-strike-width, max(var(--cy-border-width), 0.0625em));
+    }
+    & .cy-choice-description {
+      color: var(--cy-checkbox-done-color, var(--cy-color-muted));
+    }
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cy-choice[data-strike] :is(.cy-choice-label, .cy-choice-description) {
+    transition: none;
+  }
+}
+/* Forced colours drop the muted colour; the strike is then the only sign of "done", so it is kept in the text colour. */
+@media (forced-colors: active) {
+  .cy-choice[data-strike]:has(.cy-checkbox > input:checked:not(:indeterminate)) .cy-choice-label {
+    color: CanvasText;
+    text-decoration-line: line-through;
+    text-decoration-color: CanvasText;
+  }
+}
+
 @media (pointer: coarse) {
   .cy-choice.cy-choice {
     --_hit: var(--cy-hit-coarse, 44px);

@@ -3,7 +3,8 @@ import { expect, fn } from "storybook/test";
 import { computeUnderHostileHost } from "../../test/hostile.js";
 import { CynosureTheme } from "../../theme/index.js";
 import { createTheme } from "../../tokens/index.js";
-import { Switch } from "./Switch.js";
+import { Checkbox } from "../Checkbox/Checkbox.js";
+import { Switch, type SwitchProps } from "./Switch.js";
 
 const meta = {
   title: "Components/Switch",
@@ -90,5 +91,30 @@ export const StableUnderHostileHost: Story = {
       "background-color",
     ]);
     await expect(hostile).toEqual(clean);
+  },
+};
+
+// The checklist strike is Checkbox's alone: this line stops compiling if Switch ever accepts the prop.
+const SWITCH_HAS_NO_STRIKE: "strikeWhenChecked" extends keyof SwitchProps ? never : true = true;
+
+export const OnLabelIsNeverStruckThrough: Story = {
+  render: () => (
+    <div style={{ display: "grid" }}>
+      <Switch label="Sync on" description="Every hour" defaultChecked />
+      <Checkbox label="Synced" description="Done" strikeWhenChecked defaultChecked />
+    </div>
+  ),
+  play: async ({ canvas }) => {
+    await expect(SWITCH_HAS_NO_STRIKE).toBe(true);
+    const text = (role: "switch" | "checkbox") =>
+      getComputedStyle(
+        (canvas.getByRole(role).closest(".cy-choice") as HTMLElement).querySelector(
+          ".cy-choice-label",
+        ) as HTMLElement,
+      );
+    // Same shared row, both on: only the checklist Checkbox is struck and muted.
+    await expect(text("checkbox").textDecorationLine).toBe("line-through");
+    await expect(text("switch").textDecorationLine).toBe("none");
+    await expect(text("switch").color).not.toBe(text("checkbox").color);
   },
 };

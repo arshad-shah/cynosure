@@ -1,0 +1,163 @@
+/*
+ * Avatar: a picture over a tinted fallback (initials or an icon), with an optional status dot at the end corner.
+ * Every visual value reads a --cy-avatar-* token with a global fallback. Inner parts first, roots last.
+ */
+.cy-avatar-initials {
+  white-space: nowrap;
+  user-select: none;
+}
+
+/* Doubled: host rules such as Tailwind's `img { max-width: 100%; height: auto }` never win. */
+.cy-avatar-image.cy-avatar-image {
+  position: absolute;
+  inset: 0;
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  max-inline-size: none;
+  padding: 0;
+  border: 0;
+  border-radius: inherit;
+  object-fit: cover;
+  /* Hidden until it has loaded: the fallback shows meanwhile. */
+  &:not([data-loaded]) {
+    visibility: hidden;
+  }
+}
+
+.cy-avatar-status.cy-avatar-status {
+  --_status: var(--cy-color-success);
+  position: absolute;
+  inset-block-end: 0;
+  inset-inline-end: 0;
+  inline-size: var(--cy-avatar-status-size, calc(var(--_size) * 0.28));
+  block-size: var(--cy-avatar-status-size, calc(var(--_size) * 0.28));
+  padding: 0;
+  border: var(--cy-border-width) solid var(--_status);
+  border-radius: var(--cy-radius-full);
+  background: var(--_status);
+  box-shadow: 0 0 0 var(--_ring-width) var(--_ring);
+  &[data-status="away"] {
+    --_status: var(--cy-color-warning);
+  }
+  &[data-status="busy"] {
+    --_status: var(--cy-color-danger);
+  }
+  /* Offline is hollow, so it differs by more than colour. */
+  &[data-status="offline"] {
+    --_status: var(--cy-color-muted);
+    background: var(--_ring);
+  }
+}
+
+.cy-avatar.cy-avatar {
+  --_tone: var(--cy-color-ink);
+  --_text: var(--cy-color-ink);
+  --_size: var(--cy-avatar-size-md, var(--cy-control-height-md));
+  --_ring: var(--cy-avatar-ring-color, var(--cy-color-surface));
+  --_ring-width: var(--cy-avatar-ring-width, calc(var(--cy-border-width) * 2));
+  /* The fallback icon is half the avatar. */
+  --cy-icon-size: calc(var(--_size) * 0.5);
+
+  /* Root reset (component roots never carry .cy-reset). */
+  box-sizing: border-box !important;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  letter-spacing: normal;
+  text-transform: none;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  inline-size: var(--_size);
+  block-size: var(--_size);
+  border-radius: var(--cy-radius-full);
+  background: color-mix(in oklab, var(--_tone) var(--cy-avatar-soft-mix, 16%), var(--cy-color-surface));
+  color: var(--_text);
+  font-family: var(--cy-font-sans);
+  font-size: calc(var(--_size) * 0.4);
+  font-weight: var(--cy-avatar-font-weight, var(--cy-font-weight-medium));
+  line-height: 1;
+  vertical-align: middle;
+
+  &[data-shape="square"] {
+    border-radius: var(--cy-avatar-radius, calc(var(--_size) * var(--cy-radius-factor)));
+  }
+
+  /* Sizes */
+  &[data-size="xs"] {
+    --_size: var(--cy-avatar-size-xs, calc(var(--cy-control-height-md) * 0.625));
+  }
+  &[data-size="sm"] {
+    --_size: var(--cy-avatar-size-sm, var(--cy-control-height-sm));
+  }
+  &[data-size="lg"] {
+    --_size: var(--cy-avatar-size-lg, var(--cy-control-height-lg));
+  }
+  &[data-size="xl"] {
+    --_size: var(--cy-avatar-size-xl, calc(var(--cy-control-height-md) * 1.75));
+  }
+
+  /* Tones */
+  &[data-tone="accent"] {
+    --_tone: var(--cy-color-accent);
+    --_text: var(--cy-color-accent-text);
+  }
+  &[data-tone="danger"] {
+    --_tone: var(--cy-color-danger);
+    --_text: var(--cy-color-danger-text);
+  }
+  &[data-tone="success"] {
+    --_tone: var(--cy-color-success);
+    --_text: var(--cy-color-success-text);
+  }
+  &[data-tone="warning"] {
+    --_tone: var(--cy-color-warning);
+    --_text: var(--cy-color-warning-text);
+  }
+  &[data-tone="info"] {
+    --_tone: var(--cy-color-info);
+    --_text: var(--cy-color-info-text);
+  }
+  /* A one-off colour: the text leans to the ink so it stays readable on the tint. */
+  &[data-color] {
+    --_text: color-mix(in oklab, var(--_tone) 45%, var(--cy-color-ink));
+  }
+}
+
+/* AvatarGroup: avatars overlap along the reading direction, each ringed in the surface colour so the edges read. */
+.cy-avatar-group.cy-avatar-group {
+  box-sizing: border-box !important;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  letter-spacing: normal;
+  text-transform: none;
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-font-size-md);
+  line-height: 1;
+  vertical-align: middle;
+
+  & > .cy-avatar {
+    box-shadow: 0 0 0 var(--_ring-width) var(--_ring);
+  }
+  & > .cy-avatar:not(:first-child) {
+    margin-inline-start: calc(var(--cy-avatar-overlap, calc(var(--_size) * 0.25)) * -1);
+  }
+}
+
+/* Forced colours drop the tint: an outline keeps the shape, and the dot draws in the text colour. */
+@media (forced-colors: active) {
+  .cy-avatar.cy-avatar {
+    outline: var(--cy-border-width) solid CanvasText;
+    outline-offset: calc(var(--cy-border-width) * -1);
+  }
+  .cy-avatar-status.cy-avatar-status {
+    --_status: CanvasText;
+    --_ring: Canvas;
+  }
+}

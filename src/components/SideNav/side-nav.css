@@ -232,6 +232,27 @@
     line-height: 1;
   }
 }
+/* The primary action (a Button or IconButton, which bring their own colours, focus ring and hit area). */
+.cy-side-nav-item.cy-side-nav-item[data-action] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  [data-layout="bar"] & {
+    /* A slot as wide as the button, so the destinations share the rest of the row. */
+    flex: 0 0 auto;
+    padding-inline: var(--cy-space-4);
+  }
+}
+/* In the bar: round, as large as the token says, lifted above the row with a shadow under it. */
+.cy-side-nav[data-layout="bar"] .cy-side-nav-action {
+  --_action: var(--cy-side-nav-action-size, calc(var(--cy-control-height-lg) + var(--cy-space-4)));
+  --cy-button-height-lg: var(--_action);
+  --cy-button-radius: var(--cy-radius-full);
+  --cy-button-solid-shadow: var(--cy-shadow-md);
+  /* Takes no height in the row, so a larger button rises out of the bar instead of making the bar taller. */
+  margin-block: calc(-0.5 * var(--_action));
+  translate: 0 calc(-1 * var(--cy-side-nav-action-lift, var(--cy-space-4)));
+}
 @media (pointer: coarse) {
   .cy-side-nav.cy-side-nav {
     --_hit: var(--cy-hit-coarse, 44px);

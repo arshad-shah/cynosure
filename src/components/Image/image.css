@@ -1,0 +1,129 @@
+/*
+ * image: a frame that clips the picture to its corners and stacks the loading placeholder over it. With a ratio the
+ * frame holds an AspectRatio, which stretches the picture, the placeholder and the fallback to its box. Without one
+ * the picture has its natural size and the placeholder covers whatever space `width` and `height` reserve.
+ */
+.cy-image.cy-image {
+  --_radius: 0;
+  box-sizing: border-box !important;
+  position: relative;
+  display: inline-block;
+  max-inline-size: 100%;
+  margin: 0;
+  overflow: hidden;
+  border-radius: var(--cy-image-radius, var(--_radius));
+  color: var(--cy-color-ink);
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-font-size-md);
+  font-weight: var(--cy-font-weight-regular);
+  line-height: var(--cy-font-line-height);
+  letter-spacing: normal;
+  text-transform: none;
+  vertical-align: middle;
+  &[data-ratio] {
+    display: block;
+    inline-size: 100%;
+  }
+  &[data-radius="sm"] {
+    --_radius: var(--cy-radius-sm);
+  }
+  &[data-radius="md"] {
+    --_radius: var(--cy-radius-md);
+  }
+  &[data-radius="lg"] {
+    --_radius: var(--cy-radius-lg);
+  }
+  &[data-radius="card"] {
+    --_radius: var(--cy-radius-card);
+  }
+  &[data-radius="full"] {
+    --_radius: var(--cy-radius-full);
+  }
+}
+
+/* Three classes: stronger than AspectRatio's rule for its children, whichever stylesheet comes first. */
+.cy-image .cy-image-img.cy-image-img {
+  display: block;
+  object-fit: cover;
+  opacity: 1;
+  transition: opacity var(--cy-motion-fast) var(--cy-motion-ease);
+}
+.cy-image[data-fit="contain"] .cy-image-img.cy-image-img {
+  object-fit: contain;
+}
+/* Hidden until it has loaded, so a half-arrived picture never shows through the placeholder. */
+.cy-image[data-state="loading"] .cy-image-img.cy-image-img {
+  opacity: 0;
+}
+/* Natural size: never wider than the container, and the height follows (`width` and `height` give the ratio). */
+.cy-image:not([data-ratio]) > .cy-image-img.cy-image-img {
+  max-inline-size: 100%;
+  block-size: auto;
+}
+
+/* The placeholder covers the frame. A Skeleton inside loses its own corners: the frame clips it. */
+.cy-image-placeholder.cy-image-placeholder {
+  --cy-skeleton-radius: 0;
+  position: absolute;
+  inset: 0;
+  display: grid;
+  pointer-events: none;
+}
+
+.cy-image-fallback.cy-image-fallback {
+  box-sizing: border-box !important;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: var(--cy-space-2);
+  max-inline-size: 100%;
+  margin: 0;
+  color: inherit;
+  font: inherit;
+  letter-spacing: normal;
+  text-transform: none;
+  &[data-default] {
+    padding: var(--cy-space-4);
+    background: var(--cy-image-fallback-background, var(--cy-color-soft));
+    color: var(--cy-image-fallback-color, var(--cy-color-muted));
+    font-size: var(--cy-font-size-sm);
+    text-align: center;
+    overflow-wrap: anywhere;
+  }
+}
+
+.cy-image-figure.cy-image-figure {
+  box-sizing: border-box !important;
+  display: grid;
+  justify-items: start;
+  gap: var(--cy-image-caption-gap, var(--cy-space-3));
+  max-inline-size: 100%;
+  margin: 0;
+  padding: 0;
+  color: var(--cy-color-ink);
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-font-size-md);
+  font-weight: var(--cy-font-weight-regular);
+  line-height: var(--cy-font-line-height);
+  letter-spacing: normal;
+  text-transform: none;
+}
+.cy-image-caption.cy-image-caption {
+  box-sizing: border-box !important;
+  margin: 0;
+  color: var(--cy-image-caption-color, var(--cy-color-muted));
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-font-size-sm);
+  font-weight: var(--cy-font-weight-regular);
+  line-height: var(--cy-font-line-height);
+  letter-spacing: normal;
+  text-transform: none;
+  overflow-wrap: anywhere;
+}
+
+@media (forced-colors: active) {
+  .cy-image-fallback.cy-image-fallback[data-default] {
+    outline: var(--cy-border-width) solid CanvasText;
+    outline-offset: calc(-1 * var(--cy-border-width));
+  }
+}

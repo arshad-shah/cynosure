@@ -1,0 +1,100 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./Breadcrumbs.stories";
+
+<Meta of={Stories} />
+
+# Breadcrumbs
+
+Shows the trail from the top of a site or app to the current page. Every item but the last is a link back up the trail; the last one is the page being shown. For moving between sections of an app, use [SideNav](?path=/docs/components-sidenav--docs) instead.
+
+<Canvas of={Stories.Default} />
+
+## When to use
+
+- **Pages nested two or more levels deep:** people can see where they are and go back up in one step.
+- **Above the page title:** one Breadcrumbs per page, before the heading.
+- **Deep trails in tight space:** set `maxItems` so the middle collapses into a menu.
+
+**Use something else when:**
+- it is the main navigation between sections: [SideNav](?path=/docs/components-sidenav--docs)
+- it switches views of the same page: [Tabs](?path=/docs/components-tabs--docs)
+- it shows progress through a sequence: [Steps](?path=/docs/components-steps--docs)
+- it moves through pages of results: [Pagination](?path=/docs/components-pagination--docs)
+- it is a single link back: [Link](?path=/docs/components-link--docs)
+
+## Usage
+
+```tsx
+import { Breadcrumbs } from "@arshad-shah/cynosure";
+import { home } from "@arshad-shah/cynosure/icons";
+
+<Breadcrumbs
+  items={[
+    { label: "Home", href: "/", icon: home },
+    { label: "Projects", href: "/projects" },
+    { label: "Cynosure" },
+  ]}
+/>
+
+<Breadcrumbs items={trail} maxItems={3} />
+<Breadcrumbs items={[{ label: "Library", href: "/library", onClick: (event) => { event.preventDefault(); router.push("/library"); } }, { label: "Report" }]} />
+```
+
+Items are data, not children. The last item is always the current page, so its `href` and `onClick` are ignored. An earlier item is a link with `href`, a button with only `onClick`, and plain text with neither.
+
+## Collapsing a long trail
+
+With more items than `maxItems`, the first item and the last `maxItems - 1` stay. The ones between go into a menu behind a "more" button, listed in trail order. Values under 2 count as 2.
+
+<Canvas of={Stories.CollapsesTheMiddle} />
+
+## Icons and separator
+
+`icon` on an item is decorative and sits before the label. `separator` replaces the chevron between crumbs.
+
+<Canvas of={Stories.IconsAndSeparator} />
+
+## Long names and narrow containers
+
+Each name is cut with an ellipsis at a maximum width, and the trail wraps onto more lines instead of overflowing.
+
+<Canvas of={Stories.LongLabelsTruncateAndWrap} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+| Input | Result |
+| --- | --- |
+| <kbd>Tab</kbd> | Moves through the links and buttons in trail order. The current page is not a tab stop |
+| Click, tap, <kbd>Enter</kbd> on a crumb | Follows the link, or calls `onClick` (which can cancel the link with `event.preventDefault()`) |
+| Click, tap, <kbd>Enter</kbd>, <kbd>Arrow Down</kbd> on the "more" button | Opens the menu of hidden items |
+| <kbd>Arrow Down</kbd> in the menu | Moves between the hidden items, skipping ones that go nowhere |
+| <kbd>Enter</kbd> or click on a menu item | The same as choosing that crumb in the trail; the menu closes and focus returns to the button |
+| <kbd>Escape</kbd> | Closes the menu and returns focus to the button |
+
+- **Landmark:** a `nav` named "Breadcrumb" (`labels.nav`) holding an ordered list, as in the WAI-ARIA APG breadcrumb pattern.
+- **Current page:** the last item is text with `aria-current="page"`.
+- **Separators:** decorative icons hidden from assistive technology, mirrored in right-to-left layouts.
+- **Hidden items:** an item with neither `href` nor `onClick` is listed as disabled in the menu.
+- **Labels:** `labels.more` (default "Show the full path") names the "more" button and its menu.
+
+## Touch
+
+The "more" button's hit area grows to 44px on coarse pointers (phones and tablets) without changing its visible size, and the menu's rows are 44px tall.
+
+## Theming
+
+Tokens: `--cy-breadcrumbs-gap`, `--cy-breadcrumbs-item-max-width` and `--cy-breadcrumbs-separator-color`.
+
+```ts
+createTheme({ components: { breadcrumbs: { itemMaxWidth: "16ch", gap: "8px" } } });
+```
+
+`className` and `style` are for layout only (margin, placement). Change the look through tokens so every product stays consistent.
+
+## Related
+
+[Link](?path=/docs/components-link--docs) · [Menu](?path=/docs/components-menu--docs) · [SideNav](?path=/docs/components-sidenav--docs) · [Tabs](?path=/docs/components-tabs--docs) · [Pagination](?path=/docs/components-pagination--docs)

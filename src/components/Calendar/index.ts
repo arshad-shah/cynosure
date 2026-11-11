@@ -1,5 +1,6 @@
 export {
   Calendar,
+  type CalendarDayMark,
   type CalendarDayState,
   type CalendarLabels,
   type CalendarProps,

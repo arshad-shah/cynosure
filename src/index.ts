@@ -18,14 +18,40 @@ export {
   AppShell,
   type AppShellLabels,
   type AppShellProps,
+  type AppShellState,
   type AppShellTokens,
+  useAppShell,
 } from "./components/AppShell/index.js";
+export {
+  AspectRatio,
+  type AspectRatioProps,
+  type AspectRatioRadius,
+  type AspectRatioTokens,
+} from "./components/AspectRatio/index.js";
+export {
+  Avatar,
+  AvatarGroup,
+  type AvatarGroupLabels,
+  type AvatarGroupProps,
+  type AvatarLabels,
+  type AvatarProps,
+  type AvatarSize,
+  type AvatarStatus,
+  type AvatarTokens,
+} from "./components/Avatar/index.js";
 export { Badge, type BadgeProps } from "./components/Badge/index.js";
+export {
+  type BreadcrumbItem,
+  Breadcrumbs,
+  type BreadcrumbsProps,
+  type BreadcrumbsTokens,
+} from "./components/Breadcrumbs/index.js";
 export { Button, type ButtonProps, type ButtonTokens } from "./components/Button/index.js";
 export {
   addDays,
   addMonths,
   Calendar,
+  type CalendarDayMark,
   type CalendarDayState,
   type CalendarLabels,
   type CalendarProps,
@@ -34,8 +60,15 @@ export {
   isISODate,
   toISODate,
 } from "./components/Calendar/index.js";
-export { Card, type CardProps } from "./components/Card/index.js";
-export { Checkbox, type CheckboxProps } from "./components/Checkbox/index.js";
+export { Card, type CardProps, type CardTokens } from "./components/Card/index.js";
+export { Checkbox, type CheckboxProps, type CheckboxTokens } from "./components/Checkbox/index.js";
+export {
+  Checklist,
+  type ChecklistItem,
+  type ChecklistLabels,
+  type ChecklistProps,
+  type ChecklistTokens,
+} from "./components/Checklist/index.js";
 export {
   CodeBlock,
   type CodeBlockLabels,
@@ -75,6 +108,7 @@ export {
   type CompareSliderProps,
   type CompareSliderTokens,
 } from "./components/CompareSlider/index.js";
+export { Container, type ContainerProps, type ContainerTokens } from "./components/Container/index.js";
 export {
   ContextMenu,
   type ContextMenuProps,
@@ -90,6 +124,7 @@ export {
 } from "./components/DescriptionList/index.js";
 export { Dialog, type DialogLabels, type DialogProps, type DialogTokens } from "./components/Dialog/index.js";
 export { Disclosure, type DisclosureProps, type DisclosureTokens } from "./components/Disclosure/index.js";
+export { Divider, type DividerProps, type DividerTokens } from "./components/Divider/index.js";
 export {
   DocumentViewport,
   type DocumentViewportLabels,
@@ -122,9 +157,25 @@ export {
   type ToolbarAnchor,
   useSelectionAnchor,
 } from "./components/FloatingToolbar/index.js";
-export { Grid, GridItem, type GridItemProps, type GridProps } from "./components/Grid/index.js";
+export {
+  GRID_BREAKPOINTS,
+  Grid,
+  type GridBreakpoint,
+  type GridColumns,
+  GridItem,
+  type GridItemProps,
+  type GridProps,
+} from "./components/Grid/index.js";
+export {
+  Heading,
+  type HeadingLevel,
+  type HeadingProps,
+  type HeadingSize,
+  type HeadingTokens,
+} from "./components/Heading/index.js";
 export { HoverCard, type HoverCardProps, type HoverCardTokens } from "./components/HoverCard/index.js";
 export { IconButton, type IconButtonProps } from "./components/IconButton/index.js";
+export { Image, type ImageProps, type ImageTokens } from "./components/Image/index.js";
 export { Inline, type InlineProps } from "./components/Inline/index.js";
 export { Kbd, type KbdProps } from "./components/Kbd/index.js";
 export {
@@ -152,6 +203,15 @@ export {
   type NumberFieldProps,
   parseNumber,
 } from "./components/NumberField/index.js";
+export { PageHeader, type PageHeaderProps, type PageHeaderTokens } from "./components/PageHeader/index.js";
+export {
+  Pagination,
+  type PaginationLabels,
+  type PaginationProps,
+  type PaginationTokens,
+  pageCount,
+  pageRange,
+} from "./components/Pagination/index.js";
 export {
   type CanvasRect,
   type CanvasScreen,
@@ -188,7 +248,13 @@ export {
   type SegmentedControlProps,
   type SegmentOption,
 } from "./components/SegmentedControl/index.js";
-export { Select, type SelectOption, type SelectProps } from "./components/Select/index.js";
+export {
+  type OptionIconColor,
+  Select,
+  type SelectOption,
+  type SelectProps,
+  type SelectTokens,
+} from "./components/Select/index.js";
 export {
   angleFrom,
   contain,
@@ -205,6 +271,7 @@ export {
 } from "./components/SelectionFrame/index.js";
 export { Sheet, type SheetProps, type SheetTokens } from "./components/Sheet/index.js";
 export {
+  type NavAction,
   type NavEntry,
   type NavItem,
   type NavLinkProps,
@@ -255,7 +322,7 @@ export {
   type StepsProps,
   type StepsTokens,
 } from "./components/Steps/index.js";
-export { Switch, type SwitchProps } from "./components/Switch/index.js";
+export { Switch, type SwitchProps, type SwitchTokens } from "./components/Switch/index.js";
 export {
   type SortDirection,
   Table,
@@ -282,6 +349,7 @@ export {
   type TagInputProps,
   type TagInputTokens,
 } from "./components/TagInput/index.js";
+export { Text, type TextProps, type TextTokens } from "./components/Text/index.js";
 export { TextArea, type TextAreaProps } from "./components/TextArea/index.js";
 export { TextField, type TextFieldProps } from "./components/TextField/index.js";
 export { ThemeToggle, type ThemeToggleProps } from "./components/ThemeToggle/index.js";
@@ -297,6 +365,8 @@ export {
   Toaster,
   type ToasterProps,
   type ToastLabels,
+  type ToastOffset,
+  type ToastOffsetLength,
   type ToastOptions,
   type ToastPosition,
   type ToastTokens,

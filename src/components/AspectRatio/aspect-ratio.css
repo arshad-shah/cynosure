@@ -1,0 +1,49 @@
+/*
+ * aspect-ratio: a box whose height follows from its width (CSS `aspect-ratio`, no measuring). It has no look of its
+ * own: it only clips its content, optionally to rounded corners. Text styles are inherited from where it sits.
+ */
+
+/* Every child is stretched to the box. `object-fit` only acts on images, videos and canvases, so other content is untouched. */
+.cy-aspect-ratio.cy-aspect-ratio > * {
+  box-sizing: border-box !important;
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  max-inline-size: none;
+  max-block-size: none;
+  margin: 0;
+  object-fit: cover;
+}
+
+.cy-aspect-ratio.cy-aspect-ratio {
+  --_radius: 0;
+  box-sizing: border-box !important;
+  position: relative;
+  display: block;
+  inline-size: 100%;
+  max-inline-size: 100%;
+  aspect-ratio: var(--_ratio);
+  margin: 0;
+  overflow: hidden;
+  border-radius: var(--cy-aspect-ratio-radius, var(--_radius));
+  color: inherit;
+  font: inherit;
+  letter-spacing: normal;
+  text-transform: none;
+  &[data-radius="sm"] {
+    --_radius: var(--cy-radius-sm);
+  }
+  &[data-radius="md"] {
+    --_radius: var(--cy-radius-md);
+  }
+  &[data-radius="lg"] {
+    --_radius: var(--cy-radius-lg);
+  }
+  &[data-radius="card"] {
+    --_radius: var(--cy-radius-card);
+  }
+  &[data-radius="full"] {
+    --_radius: var(--cy-radius-full);
+  }
+}

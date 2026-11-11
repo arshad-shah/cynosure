@@ -1,4 +1,5 @@
 export {
+  type NavAction,
   type NavEntry,
   type NavItem,
   type NavLinkProps,

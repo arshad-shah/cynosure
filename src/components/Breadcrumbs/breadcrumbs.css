@@ -1,0 +1,86 @@
+/* Breadcrumbs: a wrapping row of crumbs and separators. Every visual value reads a --cy-breadcrumbs-* token with a
+   global fallback. Inner parts first (lower specificity), root last. */
+.cy-breadcrumbs-list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--cy-breadcrumbs-gap, var(--cy-space-2));
+  min-inline-size: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cy-breadcrumbs-item {
+  display: flex;
+  align-items: center;
+  gap: var(--cy-breadcrumbs-gap, var(--cy-space-2));
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  padding: 0;
+  /* Rows keep one height whether a crumb is text, a link or a button. */
+  min-block-size: var(--cy-control-height-sm);
+  &[hidden] {
+    display: none;
+  }
+}
+
+.cy-breadcrumbs-current,
+.cy-breadcrumbs-text {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cy-space-1);
+  min-inline-size: 0;
+}
+
+.cy-breadcrumbs-text {
+  color: var(--cy-color-muted);
+}
+
+/* Long names are cut with an ellipsis, and sooner when the container is narrower than the limit. */
+.cy-breadcrumbs .cy-breadcrumbs-label {
+  display: block;
+  /* Declared here, not inherited: a Link passes on whatever line height its host page sets. */
+  line-height: var(--cy-font-line-height);
+  min-inline-size: 0;
+  max-inline-size: var(--cy-breadcrumbs-item-max-width, 24ch);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Layout of the reused Link and Button inside a crumb; their look stays theirs. */
+.cy-breadcrumbs .cy-breadcrumbs-link.cy-breadcrumbs-link {
+  flex: 0 1 auto;
+  min-inline-size: 0;
+  --cy-button-max-width: var(--cy-breadcrumbs-item-max-width, 24ch);
+  --cy-button-padding-inline: var(--cy-space-2);
+  --cy-button-gap: var(--cy-space-1);
+  --cy-button-height-md: var(--cy-control-height-sm);
+}
+
+.cy-breadcrumbs .cy-breadcrumbs-separator {
+  color: var(--cy-breadcrumbs-separator-color, var(--cy-color-muted));
+  /* The separator points the way the trail reads. */
+  &:dir(rtl) {
+    scale: -1 1;
+  }
+}
+
+.cy-breadcrumbs.cy-breadcrumbs {
+  box-sizing: border-box !important;
+  margin: 0;
+  letter-spacing: normal;
+  text-transform: none;
+  display: block;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  padding: 0;
+  color: var(--cy-color-ink);
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-font-size-md);
+  font-weight: var(--cy-font-weight-regular);
+  line-height: var(--cy-font-line-height);
+  &[data-size="sm"] {
+    font-size: var(--cy-font-size-sm);
+  }
+}

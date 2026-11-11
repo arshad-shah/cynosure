@@ -1,0 +1,102 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./PageHeader.stories";
+
+<Meta of={Stories} />
+
+# PageHeader
+
+The top of a page or a major section: where you are (breadcrumbs or an eyebrow), what this is (the title), one or two sentences about it (the lead), and the page's actions. For the heading of a smaller block inside a page, use [Heading](?path=/docs/components-heading--docs) on its own.
+
+<Canvas of={Stories.Default} />
+
+## When to use
+
+- **The top of a page:** `title` alone is enough. Add `description` when the page needs a sentence of explanation and `actions` for what the user can do with the whole page.
+- **Where the page belongs:** `breadcrumbs` when the trail can be followed, `eyebrow` when a short label is enough. With both, the breadcrumbs come first.
+- **A major section of a long page:** `headingLevel={2}` or `3` with `as="section"` or `as="div"`.
+- **A landing page:** `size="lg"` with `align="center"`.
+
+**Use something else when:**
+- it is the title of a card, a panel or a small group: [Heading](?path=/docs/components-heading--docs), or [Card](?path=/docs/components-card--docs) for a card
+- the area has no content yet: [EmptyState](?path=/docs/components-emptystate--docs), which also has a title, a description and actions
+- it is a message about something that happened: [Notice](?path=/docs/components-notice--docs)
+
+## Usage
+
+```tsx
+import { Breadcrumbs, Button, PageHeader } from "@arshad-shah/cynosure";
+
+<PageHeader title="Projects" />
+
+<PageHeader
+  breadcrumbs={<Breadcrumbs items={[{ label: "Home", href: "/" }, { label: "Projects" }]} />}
+  eyebrow="Workspace"
+  title="Projects"
+  description="Every project in this workspace, newest first."
+  actions={<Button variant="solid" tone="accent">New project</Button>}
+  divider
+/>
+```
+
+## Actions follow the header's width
+
+Beside the text, the actions sit at the inline end, level with the top of the title block, and take at most half the width. When the header itself is narrower than 36rem they move below the text and start from the start edge. This follows the header's own width, not the viewport, so it also works in a side panel or a narrow column.
+
+<Canvas of={Stories.ActionsMoveBelowWhenTheHeaderIsNarrow} />
+
+## Landing pages
+
+`size="lg"` renders the title at Heading's `display` size. `align="center"` centres every part and puts the actions below the text at any width.
+
+<Canvas of={Stories.LargeForLandingPages} />
+
+## Heading levels and divider
+
+`headingLevel` sets the element (`h1`, `h2` or `h3`). With `size="md"` the title takes Heading's usual size for that level: `2xl`, `xl` and `lg`. `divider` draws a bottom border with space above it.
+
+<Canvas of={Stories.HeadingLevels} />
+<Canvas of={Stories.Divider} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+PageHeader has no keyboard behaviour of its own. <kbd>Tab</kbd> moves through what you pass in, in reading order: breadcrumbs, actions, then `children`.
+
+- **One heading:** the title is the header's only heading, at `headingLevel`. The eyebrow and the description are paragraphs.
+- **Reading order:** breadcrumbs, eyebrow, title, description, meta, actions, children. The eyebrow is read before the title, as context for it.
+- **No landmark:** the root has no role. A `header` element inside `main` is not a banner landmark. If the header is outside `main`, `article` and `section`, use `as="div"`.
+- **Built from Heading and Text:** the title is a [Heading](?path=/docs/components-heading--docs), the eyebrow a [Text](?path=/docs/components-text--docs) with `variant="eyebrow"` and the description a Text with `variant="lead"`, so their tokens apply here too.
+- **Spacing:** no outer margin or padding, and parts that are not given render nothing. A header with only a title is exactly as tall as its heading.
+- **Width:** fills its parent. Nothing overflows at 320px: long words in the title break and the actions wrap.
+- **Line length:** the description is at most 65ch wide.
+- **Right to left:** the text starts on the right and the actions sit on the left.
+
+## Touch
+
+PageHeader has nothing pressable of its own. The buttons, breadcrumbs and fields you pass in keep their own hit areas (at least 24px, 44px on coarse pointers). On a phone the header is narrower than 36rem, so the actions are below the text.
+
+## Theming
+
+Tokens: `--cy-page-header-gap`, `--cy-page-header-text-gap`, `--cy-page-header-actions-gap`, `--cy-page-header-description-max-width`, `--cy-page-header-divider-color` and `--cy-page-header-divider-space`.
+
+| Token | What it sets | Default |
+| --- | --- | --- |
+| `--cy-page-header-gap` | Space between the breadcrumbs, the title block, the actions and the content below them | `--cy-space-6` |
+| `--cy-page-header-text-gap` | Space between the eyebrow, the title, the description and the meta row | `--cy-space-3` |
+| `--cy-page-header-actions-gap` | Space between two actions and between items of the meta row | `--cy-space-4` |
+| `--cy-page-header-description-max-width` | Longest line of the description | `65ch` |
+| `--cy-page-header-divider-color` | Colour of the bottom border drawn by `divider` | `--cy-color-line` |
+| `--cy-page-header-divider-space` | Space between the content and that border | `--cy-space-6` |
+
+```ts
+createTheme({ components: { pageHeader: { textGap: "0.5rem", descriptionMaxWidth: "50ch" } } });
+```
+
+The title, eyebrow and lead are retuned through the `--cy-heading-*` and `--cy-text-*` tokens. The 36rem switch is fixed, because a container query cannot read a token. `className` and `style` are for layout only (margin, placement, width).
+
+## Related
+
+[Heading](?path=/docs/components-heading--docs) · [Text](?path=/docs/components-text--docs) · [Breadcrumbs](?path=/docs/components-breadcrumbs--docs) · [EmptyState](?path=/docs/components-emptystate--docs) · [Button](?path=/docs/components-button--docs)

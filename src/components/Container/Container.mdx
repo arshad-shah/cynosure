@@ -1,0 +1,97 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./Container.stories";
+
+<Meta of={Stories} />
+
+# Container
+
+The page column. It centres its content, caps how wide it gets and adds side gutters, so every page of an app lines up. It is layout only: no background, border or text styles.
+
+<Canvas of={Stories.CentredColumnWithGutters} />
+
+## When to use
+
+- **The content of a page or screen:** wrap it once, usually inside [AppShell](?path=/docs/components-appshell--docs)'s main area, so headings and content share the same edges on every page.
+- **A reading column:** `size="sm"` or `size="md"` keeps lines of text short on wide screens.
+
+**Use something else when:**
+- you only need padding around a group of items: `padding` on [Stack](?path=/docs/components-stack--docs), [Inline](?path=/docs/components-inline--docs) or [Grid](?path=/docs/components-grid--docs)
+- you want a visible box with a surface and border: [Card](?path=/docs/components-card--docs)
+- you are laying out items in columns: [Grid](?path=/docs/components-grid--docs), inside the Container
+
+## Usage
+
+```tsx
+import { Container, Stack } from "@arshad-shah/cynosure";
+
+<Container as="main" paddingBlock="8">
+  <Stack gap="6">
+    <PageHeader title="Tasks" />
+    <TaskList />
+  </Stack>
+</Container>
+<Container size="sm">…</Container>
+<Container size="full" padding="8">…</Container>
+```
+
+## Sizes
+
+`size` sets the widest the column gets, gutters included: `sm` 640px, `md` 768px, `lg` 1024px (the default) and `xl` 1280px. `full` has no cap and keeps the gutters. Below its cap the column is exactly as wide as its parent, so it never overflows a narrow one.
+
+<Canvas of={Stories.EachSizeIsCappedAtItsToken} />
+
+## Gutters
+
+`padding` is the space token for the two side gutters (the default is space 6, 16px). `paddingBlock` adds padding above and below. `padding="0"` removes the gutters.
+
+<Canvas of={Stories.GuttersUseSpaceTokens} />
+
+## Not centred
+
+`center={false}` keeps the column at the inline start: the left edge, or the right edge in right-to-left text.
+
+<Canvas of={Stories.NotCentred} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+| Setting | Element and what assistive technology gets |
+| --- | --- |
+| `as="div"` (default) | A `div`: no role |
+| `as="main"` | The page's main landmark. Use it once per page |
+| `as="section"` | A `section`: a region landmark only when you give it a name (`aria-label` or `aria-labelledby`) |
+| `as="article"` | An `article` |
+
+- **Width:** fills its parent up to the cap, also inside a flex row or a Stack that centres its children.
+- **Safe area:** each gutter is at least the device's safe-area inset on that side, so content clears a phone's notch or rounded corners in landscape. Browsers only report insets when the page's viewport meta tag has `viewport-fit=cover`.
+- **Right to left:** the gutters are equal on both sides and the column stays centred.
+- **Nesting:** a nested Container has its own default gutters and inherits no padding from its parent.
+- **Text:** font, size and colour are inherited from the page.
+- **Keyboard:** none. A Container is never focusable.
+
+## Touch
+
+Nothing in a Container can be pressed, so it has no hit area. On phones the gutters keep content off the screen edges and the safe-area insets.
+
+## Theming
+
+| Token | Default | What it sets |
+| --- | --- | --- |
+| `--cy-container-size-sm` | `640px` | Widest a `size="sm"` container gets |
+| `--cy-container-size-md` | `768px` | Widest a `size="md"` container gets |
+| `--cy-container-size-lg` | `1024px` | Widest a `size="lg"` container gets |
+| `--cy-container-size-xl` | `1280px` | Widest a `size="xl"` container gets |
+| `--cy-container-padding` | `--cy-space-6` | Side gutters when `padding` is not set |
+
+```ts
+createTheme({ components: { container: { sizeLg: "1100px", padding: "24px" } } });
+```
+
+`className` and `style` are for layout only (margin, placement, a minimum height).
+
+## Related
+
+[AppShell](?path=/docs/components-appshell--docs) · [Stack](?path=/docs/components-stack--docs) · [Grid](?path=/docs/components-grid--docs) · [Card](?path=/docs/components-card--docs)

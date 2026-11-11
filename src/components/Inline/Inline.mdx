@@ -24,11 +24,22 @@ import { Inline } from "@arshad-shah/cynosure";
   <Button>Publish</Button>
 </Inline>
 <Inline as="ul" gap="2" wrap justify="between">…</Inline>
+<Inline padding="4" paddingInline="6">…</Inline>
 ```
 
 `gap` is a space token from `"0"` to `"10"` (default `"3"`). `align` is `start`, `center`, `end`, `stretch` or `baseline`. `justify` is `start`, `center`, `end` or `between`. `as` picks a neutral element (`div`, `section`, `ul`, `ol`, `nav`, `aside`, `header`, `footer`, `span`).
 
 <Canvas of={Stories.DefaultsAndLayoutProps} />
+
+## Padding
+
+`padding` pads all four sides with a space token. `paddingInline` (the sides) and `paddingBlock` (top and bottom) each win over `padding` for their axis, and `"0"` counts as a value. The padding is inside the row's width.
+
+```tsx
+<Inline padding="4" paddingInline="6">…</Inline>
+```
+
+<Canvas of={Stories.PaddingUsesSpaceTokens} />
 
 ## Props
 
@@ -38,7 +49,8 @@ import { Inline } from "@arshad-shah/cynosure";
 
 - `as` never renders an interactive element.
 - `className` and `style` are for layout only.
-- The gap is a space token (`--cy-space-*`), so it follows the theme's spacing.
+- The gap and the padding are space tokens (`--cy-space-*`), so they follow the theme's spacing.
+- A nested Inline has no padding unless it asks for it; it never inherits its parent's.
 
 ## Related
 

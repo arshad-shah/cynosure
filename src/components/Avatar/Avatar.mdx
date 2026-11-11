@@ -1,0 +1,128 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import { AvatarGroup } from "./Avatar";
+import * as Stories from "./Avatar.stories";
+
+<Meta of={Stories} />
+
+# Avatar
+
+A person, team or thing shown as a picture, falling back to initials and then to an icon. `AvatarGroup` overlaps several and sums up the rest as "+3". An avatar only shows who it is; to make one pressable, put it inside a [Button](?path=/docs/components-button--docs) or [Link](?path=/docs/components-link--docs).
+
+<Canvas of={Stories.TonesAndOneOffColour} />
+
+## When to use
+
+- **Who did or owns something:** the author of a comment, the people assigned to a task, the account in a menu.
+- **A thing with an identity:** a team, a workspace or a project, with `icon` or `shape="square"`.
+- **Several people in little space:** `AvatarGroup` with `max`.
+
+**Use something else when:**
+- the picture is content, not an identity: [Image](?path=/docs/components-image--docs)
+- it is a status or a category with no person behind it: [Badge](?path=/docs/components-badge--docs)
+- it is only an icon: [Icon](?path=/docs/foundations-icon--docs)
+- the person is still loading: [Skeleton](?path=/docs/components-skeleton--docs) with `shape="circle"`
+
+## Usage
+
+```tsx
+import { Avatar, AvatarGroup } from "@arshad-shah/cynosure";
+import { folder } from "@arshad-shah/cynosure/icons";
+
+<Avatar name="Ada Lovelace" />
+<Avatar name="Ada Lovelace" src={ada.photo} status="online" />
+<Avatar name="Design files" icon={folder} shape="square" />
+
+<AvatarGroup label="Reviewers" max={3}>
+  {reviewers.map((person) => (
+    <Avatar key={person.id} name={person.name} src={person.photo} />
+  ))}
+</AvatarGroup>
+```
+
+## Picture, initials, icon
+
+`name` is required: it is what assistive technology reads and where the initials come from. The initials are the first letters of the first and last word, upper-cased; one word gives one letter. Whole emoji and non-Latin letters are kept. `initials` replaces them.
+
+<Canvas of={Stories.InitialsComeFromTheName} />
+
+With `src`, the fallback shows while the picture loads and stays if it fails; the broken picture is removed. A new `src` is tried again.
+
+<Canvas of={Stories.PictureReplacesTheFallback} />
+
+`icon` is for things that are not people: it shows instead of initials worked out from the name. A name with no letter, number or emoji shows the `user` icon.
+
+<Canvas of={Stories.IconFallback} />
+
+## Sizes and shapes
+
+`size` is `xs`, `sm`, `md` (default), `lg` or `xl`. `sm`, `md` and `lg` are the control heights, so an avatar lines up with a Button or a field of the same size. `shape="square"` rounds the corners like a control of that size.
+
+<Canvas of={Stories.SizesFollowControlHeights} />
+<Canvas of={Stories.CircleAndSquare} />
+
+## Tone and colour
+
+`tone` colours the fallback; `color` takes any CSS colour for a one-off. `tone="auto"` picks one of accent, info, success, warning or danger from the name: the same name always gets the same tone, on every render and on the server. It is decoration that makes a list easier to scan, never the only way to tell people apart: show or speak the name too.
+
+<Canvas of={Stories.AutoToneFollowsTheName} />
+
+## Status
+
+`status` adds a dot at the bottom end corner and is spoken after the name: "Ada Lovelace, online". Translate the words with `labels`.
+
+<Canvas of={Stories.StatusIsSpokenWithTheName} />
+
+## Group
+
+`AvatarGroup` overlaps its avatars along the reading direction and gives them all its `size`. With `max`, the avatars past that number become one "+N" avatar whose accessible name counts and lists them ("3 more: Katherine Johnson, Barbara Liskov, Margaret Hamilton"); change the words with `labels.more(count, names)`. `label` names the group.
+
+<Canvas of={Stories.GroupSummarisesTheRest} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+### AvatarGroup
+
+<ArgTypes of={AvatarGroup} />
+
+## Behaviour and accessibility
+
+Avatar has no keyboard or pointer behaviour: it cannot be focused or pressed.
+
+- **Name:** the root has `role="img"` and is named by `name`. The picture inside has `alt=""` and the initials are not announced separately, so the name is read once.
+- **Status:** part of the accessible name, so it never depends on colour. Offline is also drawn hollow.
+- **Decorative:** when the name is written beside the avatar, `decorative` hides it from assistive technology (`aria-hidden`, no role). An avatar with an empty name is hidden the same way.
+- **Group:** `role="group"` named by `label`. The "+N" avatar is an image named by `labels.more`.
+- **Contrast:** fallback initials keep 4.5:1 or better in every tone (tested).
+- **Right to left:** the status dot sits at the left corner and a group overlaps towards the left.
+- **Forced colours:** an outline keeps the avatar's shape and the status dot draws in the text colour.
+
+## Touch
+
+Nothing to touch. When an avatar is wrapped in a Button or Link, that component provides the hit area.
+
+## Theming
+
+Tokens: `--cy-avatar-size-{xs,sm,md,lg,xl}`, `--cy-avatar-radius`, `--cy-avatar-font-weight`, `--cy-avatar-soft-mix`, `--cy-avatar-status-size`, `--cy-avatar-ring-color`, `--cy-avatar-ring-width` and `--cy-avatar-overlap`.
+
+| Token | What it sets |
+| --- | --- |
+| `--cy-avatar-size-{xs,sm,md,lg,xl}` | Width and height at each size |
+| `--cy-avatar-radius` | Corner radius of the square shape |
+| `--cy-avatar-font-weight` | Weight of the initials |
+| `--cy-avatar-soft-mix` | Tint strength of the fallback (percentage of the tone mixed into the surface) |
+| `--cy-avatar-status-size` | Diameter of the status dot |
+| `--cy-avatar-ring-color` | Colour of the ring around grouped avatars and the status dot; set it to the surface they sit on |
+| `--cy-avatar-ring-width` | Width of that ring |
+| `--cy-avatar-overlap` | How far each avatar in a group slides over the one before it |
+
+```ts
+createTheme({ components: { avatar: { radius: "4px", overlap: "6px" } } });
+```
+
+`className` and `style` are for layout only.
+
+## Related
+
+[Badge](?path=/docs/components-badge--docs) · [Skeleton](?path=/docs/components-skeleton--docs) · [Image](?path=/docs/components-image--docs) · [Icon](?path=/docs/foundations-icon--docs)

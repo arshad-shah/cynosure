@@ -1,0 +1,36 @@
+/*
+ * container: the page column. Layout only: a width cap per size (gutters included), side gutters that never get
+ * narrower than the device's safe area, and auto margins to centre it. Text styles are inherited.
+ */
+.cy-container.cy-container {
+  /* The padding props set these inline; declaring them here stops a nested Container inheriting its parent's. */
+  --_pad-inline: var(--cy-container-padding, var(--cy-space-6));
+  --_pad-block: 0;
+  box-sizing: border-box !important;
+  display: block;
+  inline-size: 100%;
+  max-inline-size: var(--cy-container-size-lg, 1024px);
+  min-inline-size: 0;
+  margin: 0;
+  padding-block: var(--_pad-block);
+  /* Safe-area insets are physical, and the two gutters are equal, so physical sides read the same in RTL. */
+  padding-left: max(var(--_pad-inline), env(safe-area-inset-left, 0rem));
+  padding-right: max(var(--_pad-inline), env(safe-area-inset-right, 0rem));
+  font-size: inherit;
+  line-height: inherit;
+  &[data-center] {
+    margin-inline: auto;
+  }
+  &[data-size="sm"] {
+    max-inline-size: var(--cy-container-size-sm, 640px);
+  }
+  &[data-size="md"] {
+    max-inline-size: var(--cy-container-size-md, 768px);
+  }
+  &[data-size="xl"] {
+    max-inline-size: var(--cy-container-size-xl, 1280px);
+  }
+  &[data-size="full"] {
+    max-inline-size: none;
+  }
+}

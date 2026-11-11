@@ -14,6 +14,7 @@ import { ButtonBase } from "../../foundations/ButtonBase/ButtonBase.js";
 import { ariaKeyShortcuts, shortcutKeys } from "../../foundations/hotkey.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
 import { isTypeaheadKey, useTypeahead } from "../../foundations/listbox.js";
+import { OptionIcon, type OptionIconColor } from "../../foundations/option-icon.js";
 import { useRovingFocus } from "../../foundations/roving-focus.js";
 import { check } from "../../icons/check.js";
 import type { IconData } from "../../icons/types.js";
@@ -37,9 +38,10 @@ declare module "../../tokens/schema.js" {
   }
 }
 
-export interface MenuItem {
+export interface MenuItem extends OptionIconColor {
   value: string;
   label: string;
+  /** Icon before the label, muted by default. Colour it with `iconTone` or `iconColor`. */
   icon?: IconData;
   /**
    * Keys shown at the end of the row and exposed as aria-keyshortcuts: ["Ctrl", "E"], or "mod+e" for this platform's
@@ -199,7 +201,7 @@ export function MenuPanel({
           {item.checked && <Icon icon={check} />}
         </span>
       )}
-      {item.icon && <Icon icon={item.icon} className="cy-menu-icon" />}
+      <OptionIcon option={item} plain={item.disabled} className="cy-menu-icon" />
       <span className="cy-menu-label">{item.label}</span>
       {item.shortcut && (
         <span className="cy-menu-shortcut" aria-hidden="true">

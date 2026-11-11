@@ -1,0 +1,98 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./Checklist.stories";
+
+<Meta of={Stories} />
+
+# Checklist
+
+A list of rows people add, tick, rename and remove, such as a task's subtasks. If people only choose among options you wrote, use [Checkbox](?path=/docs/components-checkbox--docs) instead.
+
+<Canvas of={Stories.Default} />
+
+## When to use
+
+- **A list people write themselves** and work through: subtasks, a packing list, the steps of a recipe.
+- **`reorderable`:** when the order matters to them.
+- **`readOnly`:** to show the same list where it cannot be changed.
+
+**Use something else when:**
+- the options are fixed and people only tick them: [Checkbox](?path=/docs/components-checkbox--docs)
+- each row has a name and a value: [KeyValueEditor](?path=/docs/components-keyvalueeditor--docs)
+- the rows are short tags: [TagInput](?path=/docs/components-taginput--docs)
+- the rows are only put in order: [SortableList](?path=/docs/components-sortablelist--docs)
+- the rows are steps of a process someone else defined: [Steps](?path=/docs/components-steps--docs)
+
+## Usage
+
+```tsx
+import { Checklist, type ChecklistItem } from "@arshad-shah/cynosure";
+
+const [subtasks, setSubtasks] = useState<ChecklistItem[]>([]);
+
+<Checklist label="Subtasks" items={subtasks} onChange={setSubtasks} />
+<Checklist label="Packing list" defaultItems={[]} onChange={save} />
+```
+
+Each row is `{ id, label, done }`. Give rows from your data a stable `id`; rows added in the list get one from `createId` (by default `crypto.randomUUID()`, or a time-based id where that is missing). `onChange` receives the full list after every change.
+
+## Renaming a row
+
+The Rename button turns the name into a field with the old name selected. Enter saves, Escape cancels, and leaving the field saves. A blank name is not saved: the row keeps the name it had, and Remove is the only way to delete a row.
+
+<Canvas of={Stories.RenameInPlace} />
+
+## Reordering
+
+`reorderable` puts the rows in a [SortableList](?path=/docs/components-sortablelist--docs): each gets a grip to drag, or to move with Space and the arrow keys.
+
+<Canvas of={Stories.Reorderable} />
+
+## Limits and states
+
+`maxItems` turns the add field and button off when the list is full. `disabled` turns everything off. `readOnly` shows only the rows.
+
+<Canvas of={Stories.MaxItems} />
+<Canvas of={Stories.ReadOnly} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+| Input | Result |
+| --- | --- |
+| <kbd>Enter</kbd> in the add field, or the Add button | Adds the trimmed name as a new row and keeps focus in the field; a blank name adds nothing |
+| Click, tap or <kbd>Space</kbd> on a row's checkbox or name | Ticks or unticks it |
+| Rename button (click, tap, <kbd>Enter</kbd>, <kbd>Space</kbd>) | Opens the name in a field, focused, with the old name selected |
+| <kbd>Enter</kbd> in the rename field | Saves and returns focus to the Rename button |
+| <kbd>Escape</kbd> in the rename field | Cancels and returns focus to the Rename button |
+| <kbd>Tab</kbd> or a press outside the rename field | Saves and leaves focus where it went |
+| Remove button | Deletes the row and focuses the checkbox of the row that took its place, or the row before it, or the add field when none is left |
+| Grip (`reorderable`): drag, or <kbd>Space</kbd>, arrows, <kbd>Space</kbd> | Moves the row; SortableList announces each step |
+
+- **Names:** the group and the list are named by `label`. Each checkbox is named by its row, and the buttons read "Rename Buy milk" and "Remove Buy milk".
+- **Done rows** are struck through and muted by Checkbox (`strikeWhenChecked`).
+- **Full list:** adding the row that reaches `maxItems` moves focus to that row's checkbox, because the add field turns off.
+- **Forms and dialogs:** Enter in either field does not submit a form around the list, and Enter and Escape in the rename field do not reach a dialog around it. Enter is left alone while an input method is composing.
+- **Read only:** the checkboxes can still be focused and read, and a press leaves them as they were.
+- **Announcements:** adding, renaming and removing are not announced; focus moves to a named control instead.
+- **Right to left:** the row mirrors.
+
+## Touch
+
+The Rename, Remove and Add buttons and the grip have 44px hit areas on coarse pointers (phones and tablets), and each checkbox row is at least 44px tall. Nothing depends on a double click or on hover.
+
+## Theming
+
+Tokens: `--cy-checklist-gap` (space between rows, and between the rows and the add field) and `--cy-checklist-row-gap` (space between a row's checkbox, name and buttons). The checkbox, the strike, the fields, the buttons and the reorderable rows follow the Checkbox, TextField, Button and SortableList tokens.
+
+```ts
+createTheme({ components: { checklist: { gap: "0.5rem" } } });
+```
+
+`className` and `style` are for layout only (margin, placement, width). Change the look through tokens so every product stays consistent.
+
+## Related
+
+[Checkbox](?path=/docs/components-checkbox--docs) · [KeyValueEditor](?path=/docs/components-keyvalueeditor--docs) · [SortableList](?path=/docs/components-sortablelist--docs) · [TagInput](?path=/docs/components-taginput--docs) · [TextField](?path=/docs/components-textfield--docs)

@@ -52,6 +52,19 @@ import { download, trash } from "@arshad-shah/cynosure/icons";
 <Canvas of={Stories.Loading} />
 <Canvas of={Stories.Pressed} />
 
+## Links and the current page
+
+With `href` the button is a real link (`target` says where it opens; only safe URLs are linked). A link takes `target`, `aria-label`, `aria-current`, `className`, `style`, `data-testid` and `onClick`; the other button attributes do not apply to it.
+
+`aria-current` marks the current item of a set and is set on the element in both forms: `aria-current="page"` on a link to the page being shown, `aria-current="step"` on the button of the current step.
+
+```tsx
+<Button href="/reports" aria-current="page" variant="soft" tone="accent">Reports</Button>
+<Button href="/billing">Billing</Button>
+```
+
+<Canvas of={Stories.CurrentPageInBothForms} />
+
 ## Props
 
 <ArgTypes of={Stories} />
@@ -66,6 +79,7 @@ import { download, trash } from "@arshad-shah/cynosure/icons";
 - **Forms:** `type` defaults to `button`, so it never submits a form by accident. Pass `type="submit"` to submit.
 - **Contrast:** every variant and tone keeps text at 4.5:1 or better in light, dark and high-contrast themes (tested).
 - **Long labels:** truncate with an ellipsis instead of wrapping.
+- **Current item:** `aria-current` is announced with the name ("Reports, current page"). It does not change the look; pick the variant and tone yourself.
 
 ## Touch
 

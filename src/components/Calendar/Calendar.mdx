@@ -12,7 +12,7 @@ A month of days to pick one from, or to lay out a month's plans on.
 ## When to use
 
 - **Choosing a day** where seeing the month helps (a booking, a due date).
-- **A month view** of plans or events: `renderDay` puts your content in each day.
+- **A month view** of plans or events: `renderDay` puts your content in each day, `markDay` tints days and adds dots.
 
 **Use something else when:**
 - the date goes into a form field: [DateField](?path=/docs/components-datefield--docs), which types or picks
@@ -40,6 +40,50 @@ Dates are `YYYY-MM-DD` strings: no time and no time zone. Month and day names co
 
 <Canvas of={Stories.AMonthOfPlans} />
 
+With `renderDay` a day is at least `--cy-calendar-content-size` tall: 2.5 times the cell size by default, and 66px on touch screens (1.5 times the 44px target), so a six-week month is under 520px tall in a 390px-wide container. Set the token for taller or shorter days; a day never drops below the touch target.
+
+## Marked days
+
+`markDay(date, state)` marks a day without drawing it. Return any of:
+
+- `tone`: tints the day softly with that tone. Days of other months are not tinted; the selected day keeps its fill and today its ring.
+- `dots`: one small dot per entry under the number, each a tone or any CSS colour. Three at most are drawn; further entries are dropped, so put the count in `label`.
+- `label`: words added to the day's name after its date, so the marks are not colour alone.
+
+`state` is `{ selected, today, outside, disabled, weekend }`. `weekend` follows the locale where the browser knows its weekend, and is Saturday and Sunday otherwise.
+
+```tsx
+<Calendar
+  markDay={(date, day) => ({
+    tone: day.weekend ? "neutral" : undefined,
+    dots: tasks[date]?.map((task) => task.colour),
+    label: tasks[date] ? `${tasks[date].length} tasks` : undefined,
+  })}
+/>
+```
+
+<Canvas of={Stories.MarkedDays} />
+
+## The month shown
+
+Left alone, the calendar starts on `defaultMonth` (or the month of the value or focused date), moves itself, and follows a new `value` to its month.
+
+Pass `month` (`YYYY-MM`, or any `YYYY-MM-DD` date of that month) to own it. Every way of leaving the month then calls `onMonthChange` with the first day of the month asked for, and the grid waits for the new `month`. If you do not move, focus stays on the day it was on. A new `value` in another month does not move a controlled month: set `month` too.
+
+```tsx
+const [month, setMonth] = useState("2026-11");
+
+<Calendar month={month} onMonthChange={setMonth} />
+```
+
+<Canvas of={Stories.ControlledMonth} />
+
+## Jumping to a month and year
+
+`monthPicker` turns the heading into a button that opens a panel: a year to step through and its twelve months. Months and years outside `min` and `max` are disabled. It is off by default.
+
+<Canvas of={Stories.JumpToAMonthAndYear} />
+
 ## Props
 
 <ArgTypes of={Stories} />
@@ -55,16 +99,28 @@ Dates are `YYYY-MM-DD` strings: no time and no time zone. Month and day names co
 | Enter, Space | Choose the focused day |
 
 - **Roles:** a `grid` named by the month title, column headers with the full day name as `abbr`, and one Tab stop on the focused day.
-- **Names:** each day reads as its full date, then any `renderDay` content; today is `aria-current="date"`; unavailable days are `aria-disabled`.
+- **Names:** each day reads as its full date, then any `markDay` label, then any `renderDay` content; today is `aria-current="date"`; unavailable days are `aria-disabled`.
 - **Announcements:** the month title is a polite live region.
+- **Focus:** the focused day is always a day of the month shown. When the month changes it is the same day number there (or the month's last day), kept within `min` and `max` where the month has such a day.
+- **Month picker:** the heading button is named by the month and "Choose month and year" and opens a dialog. Focus moves into it; <kbd>Tab</kbd> moves through the year buttons and the months, <kbd>Enter</kbd> or <kbd>Space</kbd> chooses a month, closes the panel and puts focus back on the heading. <kbd>Escape</kbd> closes it and changes nothing. The month shown is `aria-current`.
+- **Forced colours:** a tinted day has a dashed outline and dots take the text colour.
+- **Labels:** `labels` replaces `previous`, `next`, `monthPicker`, `previousYear` and `nextYear`.
 
 ## Touch
 
-Days are at least 44px on touch screens. Tap a day to choose it; the month buttons have the same hit area.
+Days are at least 44px on touch screens, also with `renderDay`: a grid in a container narrower than seven targets scrolls. Tap a day to choose it; the month buttons and the month picker's buttons have the same hit area.
 
 ## Theming
 
-Tokens: `--cy-calendar-cell-size`, `--cy-calendar-selected-background`. The selected day uses the accent and its on-accent text colour.
+| Token | Sets |
+| --- | --- |
+| `--cy-calendar-cell-size` | A day's size (never below the hit area) |
+| `--cy-calendar-selected-background` | Background of the selected day |
+| `--cy-calendar-content-size` | With `renderDay`, the least height of a day (never below the hit area) |
+| `--cy-calendar-tone-mix` | How much of a marked day's tone is mixed into its background (12%) |
+| `--cy-calendar-dot-size` | Size of a day's dots |
+
+The selected day uses the accent and its on-accent text colour.
 
 ## Related
 

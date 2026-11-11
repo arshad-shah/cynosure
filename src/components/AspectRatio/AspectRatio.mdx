@@ -1,0 +1,87 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./AspectRatio.stories";
+
+<Meta of={Stories} />
+
+# AspectRatio
+
+A box that keeps a width-to-height ratio at any width, for an image, a video, a map, a chart or an embed. For a picture that also needs a loading placeholder and an error fallback, use [Image](?path=/docs/components-image--docs) instead.
+
+<Canvas of={Stories.Default} />
+
+## When to use
+
+- **Media that arrives late:** reserve the space for a video, an iframe or a map so the page does not jump when it loads.
+- **Content with no size of its own:** a chart or a canvas that draws into whatever box it is given.
+- **Even grids:** thumbnails or tiles that must share one shape whatever is inside them.
+
+**Use something else when:**
+- it is a picture: [Image](?path=/docs/components-image--docs) with `ratio`, which uses this box and adds loading and error states
+- the content should set its own height: a plain element, or [Card](?path=/docs/components-card--docs) for a framed surface
+- you are waiting for content and want a placeholder: [Skeleton](?path=/docs/components-skeleton--docs)
+
+## Usage
+
+```tsx
+import { AspectRatio } from "@arshad-shah/cynosure";
+
+<AspectRatio>
+  <video src="/intro.mp4" controls />
+</AspectRatio>
+
+<AspectRatio ratio="4/3" radius="card">
+  <Map />
+</AspectRatio>
+
+<AspectRatio ratio={1} style={{ inlineSize: 160 }}>
+  <Chart />
+</AspectRatio>
+```
+
+`ratio` is the width divided by the height: a number (`16 / 9`, `1`) or a CSS ratio (`"4/3"`). The default is `16 / 9`.
+
+## Corners
+
+`radius` rounds the corners from the radius tokens and clips the content to them. The default is square.
+
+<Canvas of={Stories.RadiusFollowsTheTokens} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+| Situation | Result |
+| --- | --- |
+| The container gets wider or narrower | The height follows in CSS; nothing is measured and nothing re-renders |
+| `style` asks for more width than the container has | It stops at the container's width, and the height follows that |
+| It sits in a flex row | It keeps the full width instead of collapsing |
+| A child is taller than the box | The child is clipped; the box keeps its ratio |
+| `ratio` is `0`, negative, `NaN` or infinite | The default `16 / 9` is used |
+
+- **Children:** every direct child is stretched over the whole box, so give it one child. What is inside that child lays out as usual.
+- **Images and videos:** a direct child that is an image, a video or a canvas covers the box (`object-fit: cover`) instead of being squashed. `object-fit` does nothing to other elements, so a `div` or an iframe is only stretched. For `contain`, set `object-fit` on the child.
+- **No look of its own:** no fill and no border, and text styles are inherited from where it sits.
+- **Semantics:** a `div` with no role. Name the content inside it (an `alt`, an iframe's label).
+- **Right-to-left:** nothing changes.
+
+## Touch
+
+Nothing in AspectRatio can be pressed. Controls inside it bring their own hit areas.
+
+## Theming
+
+Tokens: `--cy-aspect-ratio-radius` (the corner radius of every AspectRatio, whatever its `radius` prop says).
+
+```css
+.gallery {
+  --cy-aspect-ratio-radius: 6px;
+}
+```
+
+`className` and `style` are for layout only (width, margin, placement).
+
+## Related
+
+[Image](?path=/docs/components-image--docs) · [Skeleton](?path=/docs/components-skeleton--docs) · [Card](?path=/docs/components-card--docs) · [Grid](?path=/docs/components-grid--docs)

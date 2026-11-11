@@ -1,0 +1,107 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./Divider.stories";
+
+<Meta of={Stories} />
+
+# Divider
+
+A line that separates content: between sections of a page or card, or between items in a row. It can carry a short label such as "or". If the content only needs space between it, use the `gap` of [Stack](?path=/docs/components-stack--docs) or [Inline](?path=/docs/components-inline--docs) and no line.
+
+<Canvas of={Stories.Default} />
+
+## When to use
+
+- **Horizontal (default):** between sections of a page, a card or a panel that belong together but are different subjects.
+- **Vertical:** between items in a row, such as a footer of links or groups of buttons.
+- **With a label:** between two alternatives ("or"), or to head a group in a list ("Today").
+- **`tone="strong"`:** when the quiet line is lost against a busy background.
+
+**Use something else when:**
+- space alone separates the content well enough: [Stack](?path=/docs/components-stack--docs) or [Inline](?path=/docs/components-inline--docs) `gap`
+- the line separates groups of menu items: [Menu](?path=/docs/components-menu--docs) draws its own
+- the section needs a title: [Heading](?path=/docs/components-heading--docs)
+- the content should be framed as a unit: [Card](?path=/docs/components-card--docs)
+
+## Usage
+
+```tsx
+import { Divider, Inline, Link, Stack } from "@arshad-shah/cynosure";
+
+<Stack>
+  <Profile />
+  <Divider />
+  <Billing />
+</Stack>
+
+<Divider>or</Divider>
+
+<Inline>
+  <Link href="/docs">Docs</Link>
+  <Divider orientation="vertical" />
+  <Link href="/privacy">Privacy</Link>
+</Inline>
+```
+
+A divider has no margins of its own. The `gap` of the Stack or Inline around it usually gives the space; where there is none, `spacing` (`sm`, `md`, `lg`) adds space above and below a horizontal line, or before and after a vertical one.
+
+## Vertical
+
+A vertical divider stretches to the height of its row, also when the row centres its children. It needs a flex row to take its height from: Inline, Toolbar or any `display: flex` row. It ignores `children`: a label is drawn in horizontal lines only.
+
+<Canvas of={Stories.Vertical} />
+
+## Label
+
+The label is drawn in the line. `labelAlign` places it at the `start`, `center` (default) or `end`; a start or end label sits flush with that edge, and both follow the text direction. Keep labels short.
+
+<Canvas of={Stories.WithLabel} />
+<Canvas of={Stories.LabelAlign} />
+
+## Dashed
+
+<Canvas of={Stories.Dashed} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+| Setting | What assistive technology gets |
+| --- | --- |
+| `decorative` (default) | Nothing: the line has `role="none"`. A label is read as plain text |
+| `decorative={false}` | `role="separator"`. A label is its accessible name |
+| `decorative={false}` and `orientation="vertical"` | `role="separator"` with `aria-orientation="vertical"` |
+
+- **Decorative by default:** most dividers repeat a structure that headings and landmarks already give. Set `decorative={false}` when the line itself marks a boundary the reader should know about, such as "Earlier messages" in a conversation.
+- **Element:** a `div`, not an `hr`, so that it can hold a label and stand vertically.
+- **Orientation:** horizontal is the default of the separator role, so `aria-orientation` is only set on a vertical separator.
+- **Keyboard:** none. A divider is never focusable.
+- **Forced colours:** the line is drawn with borders and stays visible in forced-colors mode.
+- **Right to left:** `labelAlign="start"` is the right edge and `end` the left edge.
+
+## Touch
+
+Nothing in a divider can be pressed, so it has no hit area.
+
+## Theming
+
+| Token | Default | What it sets |
+| --- | --- | --- |
+| `--cy-divider-thickness` | `--cy-border-width` | Thickness of the line |
+| `--cy-divider-color` | `--cy-color-line` | Line colour of the neutral tone |
+| `--cy-divider-color-strong` | `--cy-color-muted` | Line colour of the strong tone |
+| `--cy-divider-label-gap` | `--cy-space-4` | Space between the label and the line on each side |
+| `--cy-divider-label-color` | `--cy-color-muted` | Text colour of the label |
+| `--cy-divider-label-size` | `--cy-font-size-sm` | Text size of the label |
+| `--cy-divider-spacing-{sm,md,lg}` | `--cy-space-2`, `--cy-space-4`, `--cy-space-6` | Space around the line for each `spacing` value |
+
+```ts
+createTheme({ components: { divider: { thickness: "2px", labelSize: "0.75rem" } } });
+```
+
+`className` and `style` are for layout only (width, placement). Change the look through tokens so every product stays consistent.
+
+## Related
+
+[Stack](?path=/docs/components-stack--docs) · [Inline](?path=/docs/components-inline--docs) · [Toolbar](?path=/docs/components-toolbar--docs) · [Menu](?path=/docs/components-menu--docs) · [Card](?path=/docs/components-card--docs)

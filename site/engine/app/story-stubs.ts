@@ -13,4 +13,5 @@ export const expect = inert;
 export const within = inert;
 export const spyOn = inert;
 export const userEvent = inert;
+export const fireEvent = inert;
 export const waitFor = async () => undefined;

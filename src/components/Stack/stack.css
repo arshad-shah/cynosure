@@ -4,7 +4,11 @@
   display: flex;
   gap: var(--_gap);
   margin: 0;
-  padding: 0;
+  /* Padding props set these inline; resetting them here stops a nested layout inheriting its parent's padding. */
+  --_pad-block: 0;
+  --_pad-inline: 0;
+  padding-block: var(--_pad-block);
+  padding-inline: var(--_pad-inline);
   list-style: none;
   font-size: inherit;
   line-height: inherit;

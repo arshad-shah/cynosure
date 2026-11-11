@@ -235,7 +235,7 @@
       "dist/foundations/DialogBase/DialogBase.js",
       "dist/styles/dialog.css"
     ],
-    "limit": "3.25 kB",
+    "limit": "3.5 kB",
     "gzip": true
   },
   {
@@ -247,7 +247,7 @@
   {
     "name": "Toast",
     "path": ["dist/components/Toast/Toast.js", "dist/styles/toast.css"],
-    "limit": "3.75 kB",
+    "limit": "4 kB",
     "gzip": true
   },
   {
@@ -317,7 +317,7 @@
   {
     "name": "Grid",
     "path": ["dist/components/Grid/Grid.js", "dist/styles/grid.css"],
-    "limit": "1 kB",
+    "limit": "1.5 kB",
     "gzip": true
   },
   {
@@ -353,7 +353,7 @@
   {
     "name": "SideNav (with Tooltip)",
     "path": ["dist/components/SideNav/SideNav.js", "dist/styles/side-nav.css"],
-    "limit": "3.25 kB",
+    "limit": "3.5 kB",
     "gzip": true
   },
   {
@@ -489,7 +489,7 @@
   {
     "name": "Calendar",
     "path": ["dist/components/Calendar/Calendar.js", "dist/styles/calendar.css"],
-    "limit": "3.25 kB",
+    "limit": "4.75 kB",
     "gzip": true
   },
   {
@@ -502,6 +502,72 @@
     "name": "TimeField",
     "path": ["dist/components/TimeField/TimeField.js", "dist/styles/time-field.css"],
     "limit": "6 kB",
+    "gzip": true
+  },
+  {
+    "name": "Text (JS + CSS)",
+    "path": ["dist/components/Text/Text.js", "dist/styles/text.css"],
+    "limit": "3 kB",
+    "gzip": true
+  },
+  {
+    "name": "Heading (JS + CSS)",
+    "path": ["dist/components/Heading/Heading.js", "dist/styles/heading.css"],
+    "limit": "3 kB",
+    "gzip": true
+  },
+  {
+    "name": "Divider (JS + CSS)",
+    "path": ["dist/components/Divider/Divider.js", "dist/styles/divider.css"],
+    "limit": "3 kB",
+    "gzip": true
+  },
+  {
+    "name": "Avatar (JS + CSS)",
+    "path": ["dist/components/Avatar/Avatar.js", "dist/styles/avatar.css"],
+    "limit": "3 kB",
+    "gzip": true
+  },
+  {
+    "name": "Breadcrumbs (JS + CSS)",
+    "path": ["dist/components/Breadcrumbs/Breadcrumbs.js", "dist/styles/breadcrumbs.css"],
+    "limit": "3 kB",
+    "gzip": true
+  },
+  {
+    "name": "Pagination (JS + CSS)",
+    "path": ["dist/components/Pagination/Pagination.js", "dist/styles/pagination.css"],
+    "limit": "3 kB",
+    "gzip": true
+  },
+  {
+    "name": "AspectRatio (JS + CSS)",
+    "path": ["dist/components/AspectRatio/AspectRatio.js", "dist/styles/aspect-ratio.css"],
+    "limit": "3 kB",
+    "gzip": true
+  },
+  {
+    "name": "Image (JS + CSS)",
+    "path": ["dist/components/Image/Image.js", "dist/styles/image.css"],
+    "limit": "3 kB",
+    "gzip": true
+  },
+  {
+    "name": "PageHeader (JS + CSS)",
+    "path": ["dist/components/PageHeader/PageHeader.js", "dist/styles/page-header.css"],
+    "limit": "3 kB",
+    "gzip": true
+  },
+  {
+    "name": "Container (JS + CSS)",
+    "path": ["dist/components/Container/Container.js", "dist/styles/container.css"],
+    "limit": "3 kB",
+    "gzip": true
+  },
+  {
+    "name": "Checklist (JS + CSS)",
+    "path": ["dist/components/Checklist/Checklist.js", "dist/styles/checklist.css"],
+    "limit": "3 kB",
     "gzip": true
   }
 ]

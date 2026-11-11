@@ -5,7 +5,7 @@ import * as Stories from "./Grid.stories";
 
 # Grid
 
-Lays items out in rows and columns: a fixed number of equal columns, or as many as fit at a minimum width. Gaps are space tokens.
+Lays items out in rows and columns: a fixed number of equal columns, a number per width of the grid, or as many as fit at a minimum width. Gaps and padding are space tokens.
 
 <Canvas of={Stories.FixedColumns} />
 
@@ -26,7 +26,25 @@ import { Grid, GridItem } from "@arshad-shah/cynosure";
   <GridItem span={2}><Chart /></GridItem>
   <Summary />
 </Grid>
+<Grid columns={{ base: 1, sm: 2, lg: 4 }}>…</Grid>
+<Grid columns={2} padding="6">…</Grid>
 ```
+
+## Columns per breakpoint
+
+Pass `columns` an object to choose the column count at each width: `{ base: 1, sm: 2, lg: 4 }` is one column in a narrow grid, two from `sm` and four from `lg`. The widths are those of the grid's own content box, not the window's, so the same grid adapts in a page, a side panel, a popup or a shadow root. It is done in CSS alone: nothing is measured by script, server-rendered markup is right on the first paint, and nothing shifts afterwards.
+
+| Breakpoint | Applies from (grid width) | At a 16px root font size |
+| --- | --- | --- |
+| `base` | 0 | 0 |
+| `sm` | 30rem | 480px |
+| `md` | 45rem | 720px |
+| `lg` | 60rem | 960px |
+| `xl` | 75rem | 1200px |
+
+A breakpoint you leave out keeps the count of the one below it. The scale is exported as `GRID_BREAKPOINTS`. A grid that fills a [Container](?path=/docs/components-container--docs) of size `sm`, `md`, `lg` or `xl` reaches the breakpoint of the same name.
+
+<Canvas of={Stories.ColumnsPerBreakpoint} />
 
 ## Responsive without breakpoints
 
@@ -36,9 +54,21 @@ Pass `minItemWidth` and the grid fits as many columns of at least that width as 
 
 ## Spanning
 
-Wrap an item in `GridItem` to span columns (`span={2}`, or `span="full"` for the whole row) or rows (`rowSpan`). A span wider than a fixed grid is clamped to its columns.
+Wrap an item in `GridItem` to span columns (`span={2}`, or `span="full"` for the whole row) or rows (`rowSpan`). A span wider than the grid is clamped to its columns; with columns per breakpoint, to the columns in effect at the current width.
 
 <Canvas of={Stories.ItemsSpanColumnsAndRows} />
+
+<Canvas of={Stories.SpansClampToTheColumnsAtEachWidth} />
+
+## Padding
+
+`padding` pads all four sides of the grid with a space token. `paddingInline` (the sides) and `paddingBlock` (top and bottom) each win over `padding` for their axis, and `"0"` counts as a value. The padding is inside the grid's width, and breakpoints measure the room inside it.
+
+```tsx
+<Grid columns={2} padding="6" paddingBlock="8">…</Grid>
+```
+
+<Canvas of={Stories.PaddingUsesSpaceTokens} />
 
 ## Props
 
@@ -49,12 +79,13 @@ Wrap an item in `GridItem` to span columns (`span={2}`, or `span="full"` for the
 - **Semantics:** Grid is layout only; it adds no role. Render a list with `as="ul"` and `GridItem as="li"`: bullets and indentation are removed, the list semantics stay.
 - **Reading order:** visual order follows source order, so keyboard and screen reader order match what is seen.
 - **Direction:** columns run with the text direction.
-- **Nesting:** a nested Grid has its own columns and never inherits its parent's.
+- **Nesting:** a nested Grid has its own columns and padding and never inherits its parent's.
+- **Columns per breakpoint:** such a grid is a size container (`container-type: inline-size`), so its width must come from its parent. That is the case in normal block layout and in stretched flex or grid cells; in a shrink-to-fit place (an inline-flex box, a float) give it a width. Spans are clamped for `GridItem`s that are direct children. The breakpoints are in rem, so they follow the page's root font size.
 
 ## Theming
 
-Grid has no tokens of its own: gaps are the global space tokens (`--cy-space-*`).
+Grid has no tokens of its own: gaps and padding are the global space tokens (`--cy-space-*`). The breakpoint widths are fixed (CSS container queries cannot read custom properties).
 
 ## Related
 
-[Stack](?path=/docs/components-stack--docs) · [Inline](?path=/docs/components-inline--docs) · [Card](?path=/docs/components-card--docs)
+[Stack](?path=/docs/components-stack--docs) · [Inline](?path=/docs/components-inline--docs) · [Container](?path=/docs/components-container--docs) · [Card](?path=/docs/components-card--docs)

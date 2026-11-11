@@ -30,6 +30,7 @@ import { SideNav } from "@arshad-shah/cynosure";
 | ----------------- | ---------- | ----------------------------------------------------------------------------------------------------------- |
 | `label`           | –          | Name of the navigation landmark ("Main")                                                                    |
 | `items`           | –          | `NavItem` (`id`, `label`, `href?`, `icon?`, `badge?`, `items?`, `disabled?`) or `{ label, items }` sections |
+|                   |            | or one `NavAction` (`kind: "action"`, `id`, `label`, `icon`, `onClick`, `disabled?`): a primary button      |
 | `current`         | –          | `id` of the page shown: `aria-current="page"`; groups on the way to it open                                 |
 | `onNavigate`      | –          | `(id, event)` on every choice; `event.preventDefault()` to route on the client                              |
 | `renderLink`      | plain link | Render links with your router; spread the props it receives                                                 |
@@ -41,12 +42,39 @@ import { SideNav } from "@arshad-shah/cynosure";
 - Keyboard: Tab moves between items, Enter follows a link or toggles a group (Space too for buttons).
 - Rows are at least 24px tall, 44px on touch screens.
 
+## A primary action
+
+One top-level entry may be an action instead of a destination, for example the "Add" button in the middle of a phone's tab bar:
+
+```tsx
+<SideNav
+  label="Sections"
+  layout="bar"
+  current={route.id}
+  items={[
+    { id: "today", label: "Today", icon: home },
+    { kind: "action", id: "add", label: "Add", icon: plus, onClick: openNewTask },
+    { id: "inbox", label: "Inbox", icon: inbox },
+  ]}
+/>;
+```
+
+- It is a Cynosure button named by `label`: not a link, never `aria-current` (even when its `id` equals `current`), and it calls its own `onClick`, not `onNavigate`.
+- It sits where it is placed in `items`: put it in the middle of an odd number of entries to centre it.
+- `layout="bar"`: a round accent IconButton, raised above the row with a shadow. The label is its accessible name and tooltip.
+- `layout="column"`: a full-width accent Button showing the icon and the label. In the collapsed rail: an accent IconButton.
+- Keyboard: it is one Tab stop in its place among the items; Enter or Space presses it. The bar has no arrow-key movement.
+- Touch: the button is 48px across by default and its hit area is never under 44px on touch screens.
+- Give a navigation one action at most, and keep it at the top level (not inside a section or a group).
+
 ## Tokens
 
 - `--cy-side-nav-width`: expanded width (240px)
 - `--cy-side-nav-rail-width`: collapsed width
 - `--cy-side-nav-radius`: item highlight corners
+- `--cy-side-nav-action-size`: diameter of the round action button in the bar (48px)
+- `--cy-side-nav-action-lift`: how far the action button rises above the bar's row (8px)
 
 ## Used by
 
-App sidebars, docs navigation and settings sections in the web apps, extensions' options pages and sites (cross-product audit, 2026-11-10).
+App sidebars, docs navigation and settings sections in the web apps, extensions' options pages and sites (cross-product audit, 2026-11-10). Planr's phone tab bar uses the bar layout with an "Add" action in the middle.

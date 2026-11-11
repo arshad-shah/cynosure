@@ -54,6 +54,31 @@ Groups open and close with a click, Enter or Space. A group holding the current 
 
 `layout="bar"` lays the top-level items out in one row, icon over label, for a phone's tab bar ([AppShell](?path=/docs/components-appshell--docs)'s `tabs`). Section headings are left out, and a group is one item that calls `onNavigate` with its own id. Give it three to five items, each with an icon.
 
+### A primary action
+
+One top-level entry may be an action instead of a destination: `{ kind: "action", id, label, icon, onClick }`. In the bar it is a round accent button raised above the row, for a phone's "Add". It sits where it is placed in `items`, so put it in the middle of an odd number of entries to centre it.
+
+```tsx
+import { home, inbox, plus } from "@arshad-shah/cynosure/icons";
+
+<SideNav
+  label="Sections"
+  layout="bar"
+  current={route.id}
+  items={[
+    { id: "today", label: "Today", icon: home },
+    { kind: "action", id: "add", label: "Add", icon: plus, onClick: openNewTask },
+    { id: "inbox", label: "Inbox", icon: inbox },
+  ]}
+/>
+```
+
+<Canvas of={Stories.BarWithAPrimaryAction} />
+
+In the column the same entry is a full-width accent [Button](?path=/docs/components-button--docs) with the icon and the label, and in the collapsed rail an accent [IconButton](?path=/docs/components-iconbutton--docs). Give a navigation one action at most and keep it at the top level, not inside a section or a group.
+
+<Canvas of={Stories.ActionInTheColumnAndTheRail} />
+
 ## Props
 
 <ArgTypes of={Stories} />
@@ -64,13 +89,20 @@ Groups open and close with a click, Enter or Space. A group holding the current 
 - **Current page:** `aria-current="page"`, the accent's soft fill and a bar on the inline start.
 - **Keyboard:** Tab and Shift+Tab move between items; Enter follows a link; Enter or Space presses a button or toggles a group (`aria-expanded`).
 - **Disabled items** are `aria-disabled` buttons that do nothing.
-- **Touch:** rows are at least 44px tall on touch screens (24px with a mouse).
+- **Primary action:** a button named by its `label`. It is not a link, is never `aria-current` (even when its `id` equals `current`) and does not call `onNavigate`. It is one Tab stop in its place among the items; Enter or Space presses it. In the bar and the rail the label also shows as a tooltip.
+- **Touch:** rows are at least 44px tall on touch screens (24px with a mouse). The bar's action button is 48px across by default, and its hit area is never under 44px on touch screens.
 - **Contrast:** items, headings and the current item keep 4.5:1 in light and dark modes.
 - **Direction:** indents, the current bar and the rail's badge follow the text direction.
 
 ## Theming
 
-Tokens: `--cy-side-nav-width`, `--cy-side-nav-rail-width` and `--cy-side-nav-radius`.
+| Token                       | Sets                                                     |
+| --------------------------- | -------------------------------------------------------- |
+| `--cy-side-nav-width`       | Width of the expanded navigation (240px)                 |
+| `--cy-side-nav-rail-width`  | Width of the collapsed rail                              |
+| `--cy-side-nav-radius`      | Corner radius of item highlights                         |
+| `--cy-side-nav-action-size` | Diameter of the round action button in the bar (48px)    |
+| `--cy-side-nav-action-lift` | How far the action button rises above the bar's row (8px) |
 
 ```ts
 createTheme({ components: { sideNav: { width: "280px" } } });
@@ -78,4 +110,4 @@ createTheme({ components: { sideNav: { width: "280px" } } });
 
 ## Related
 
-[AppShell](?path=/docs/components-appshell--docs) · [Tabs](?path=/docs/components-tabs--docs) · [Tooltip](?path=/docs/components-tooltip--docs)
+[AppShell](?path=/docs/components-appshell--docs) · [Tabs](?path=/docs/components-tabs--docs) · [Button](?path=/docs/components-button--docs) · [IconButton](?path=/docs/components-iconbutton--docs) · [Tooltip](?path=/docs/components-tooltip--docs)

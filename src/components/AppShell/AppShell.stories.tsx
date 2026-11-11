@@ -1,15 +1,18 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
-import { expect, waitFor, within } from "storybook/test";
+import { hydrateRoot } from "react-dom/client";
+import { renderToString } from "react-dom/server";
+import { expect, fn, waitFor, within } from "storybook/test";
 import { home } from "../../icons/home.js";
 import { inbox } from "../../icons/inbox.js";
+import { plus } from "../../icons/plus.js";
 import { users } from "../../icons/users.js";
 import { computeUnderHostileHost } from "../../test/hostile.js";
 import { shownFully } from "../../test/settle.js";
 import { Button } from "../Button/Button.js";
 import { type NavEntry, SideNav } from "../SideNav/SideNav.js";
 import { Table } from "../Table/Table.js";
-import { AppShell } from "./AppShell.js";
+import { AppShell, useAppShell } from "./AppShell.js";
 
 const ITEMS: NavEntry[] = [
   { id: "home", label: "Home", icon: home },
@@ -158,6 +161,51 @@ export const TabBarOnPhones: Story = {
   },
 };
 
+const add = fn();
+
+export const TabBarWithAPrimaryAction: Story = {
+  render: (args) => {
+    const items: NavEntry[] = [
+      { id: "home", label: "Home", icon: home },
+      { kind: "action", id: "add", label: "Add", icon: plus, onClick: add },
+      { id: "inbox", label: "Inbox", icon: inbox },
+    ];
+    return (
+      <div className="frame" style={{ inlineSize: 390, blockSize: 420 }}>
+        <AppShell
+          {...args}
+          header={<strong>Acme</strong>}
+          nav={<SideNav label="Main" items={items} current="home" />}
+          tabs={<SideNav label="Sections" layout="bar" items={items} current="home" />}
+        >
+          <div style={{ blockSize: 2000, background: "var(--cy-color-surface)" }}>Long page</div>
+        </AppShell>
+      </div>
+    );
+  },
+  beforeEach: () => {
+    add.mockClear();
+  },
+  play: async ({ canvas, userEvent }) => {
+    const tabs = await canvas.findByRole("navigation", { name: "Sections" }, RESIZE);
+    const action = within(tabs).getByRole("button", { name: "Add" });
+    // The raised button reaches over the content's edge and is painted on top of it, so all of it can be pressed.
+    await expect(box(action).top).toBeLessThan(box(canvas.getByRole("main")).bottom);
+    const top = document.elementFromPoint(box(action).left + box(action).width / 2, box(action).top + 2);
+    await expect(action.contains(top)).toBe(true);
+    await userEvent.click(action);
+    await expect(add).toHaveBeenCalledTimes(1);
+    // In the drawer the same entry is a full-width button; pressing it closes the drawer, like choosing a link.
+    await userEvent.click(canvas.getByRole("button", { name: "Open navigation" }));
+    const dialog = sheet() as HTMLDialogElement;
+    await waitFor(() => expect(dialog.open).toBe(true));
+    await shownFully(dialog.querySelector(".cy-dialog-panel") as Element);
+    await userEvent.click(within(dialog).getByRole("button", { name: "Add" }));
+    await expect(add).toHaveBeenCalledTimes(2);
+    await waitFor(() => expect(dialog.open).toBe(false));
+  },
+};
+
 export const TabBarOnlyWhenNarrow: Story = {
   render: (args) => <Demo {...args} withTabs />,
   play: async ({ canvas, canvasElement }) => {
@@ -280,6 +328,173 @@ export const TouchMenuButton: Story = {
     await userEvent.pointer({ keys: "[TouchA]", target: open });
     await waitFor(() => expect(sheet()?.open).toBe(true));
     await userEvent.keyboard("{Escape}");
+  },
+};
+
+/** Shows what `useAppShell()` returns where it is rendered, and records every value it rendered with. */
+function Probe({ name, seen }: { name: string; seen?: boolean[] }) {
+  const { narrow } = useAppShell();
+  seen?.push(narrow);
+  return <span data-testid={name}>{narrow ? "narrow" : "wide"}</span>;
+}
+
+function ProbedShell({ width = 900, ...props }: { width?: number } & Parameters<typeof AppShell>[0]) {
+  return (
+    <div className="frame" style={{ inlineSize: width, blockSize: 300 }}>
+      <AppShell
+        header={<Probe name="in-header" />}
+        nav={<Probe name="in-nav" />}
+        tabs={<Probe name="in-tabs" />}
+        {...props}
+      >
+        <Probe name="in-content" />
+      </AppShell>
+    </div>
+  );
+}
+
+export const ChildrenReadTheNarrowState: Story = {
+  args: { onNarrowChange: fn() },
+  render: (args) => <ProbedShell {...args} />,
+  play: async ({ args, canvas, canvasElement, userEvent }) => {
+    // Wide: the header, the navigation and the content all read "wide", and nothing was announced.
+    for (const name of ["in-header", "in-nav", "in-content"])
+      await expect(canvas.getByTestId(name)).toHaveTextContent("wide");
+    await expect(args.onNarrowChange).not.toHaveBeenCalled();
+    // The shell's own container shrinks under 768px (the window does not change).
+    frame(canvasElement).style.inlineSize = "600px";
+    await waitFor(() => expect(canvas.getByTestId("in-content")).toHaveTextContent("narrow"), RESIZE);
+    for (const name of ["in-header", "in-tabs"])
+      await expect(canvas.getByTestId(name)).toHaveTextContent("narrow");
+    // The callback runs in an effect, just after the render that changed the text.
+    await waitFor(() => expect(args.onNarrowChange).toHaveBeenCalledTimes(1));
+    await expect(args.onNarrowChange).toHaveBeenLastCalledWith(true);
+    // The navigation in the drawer reads it too.
+    await userEvent.click(canvas.getByRole("button", { name: "Open navigation" }));
+    const dialog = sheet() as HTMLDialogElement;
+    await waitFor(() => expect(dialog.open).toBe(true));
+    await expect(within(dialog).getByTestId("in-nav")).toHaveTextContent("narrow");
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() => expect(dialog.open).toBe(false));
+    // Shrinking further is not a change.
+    frame(canvasElement).style.inlineSize = "500px";
+    await waitFor(() => expect(box(canvas.getByRole("main")).width).toBeLessThan(510), RESIZE);
+    await expect(args.onNarrowChange).toHaveBeenCalledTimes(1);
+    // Wide again: one more call.
+    frame(canvasElement).style.inlineSize = "900px";
+    await waitFor(() => expect(canvas.getByTestId("in-content")).toHaveTextContent("wide"), RESIZE);
+    await expect(canvas.getByTestId("in-nav")).toHaveTextContent("wide");
+    // The callback runs in an effect, just after the render that changed the text.
+    await waitFor(() => expect(args.onNarrowChange).toHaveBeenCalledTimes(2));
+    await expect(args.onNarrowChange).toHaveBeenLastCalledWith(false);
+  },
+};
+
+export const NarrowStateHonoursCollapseBelow: Story = {
+  args: { collapseBelow: 500, onNarrowChange: fn() },
+  render: (args) => <ProbedShell {...args} width={600} />,
+  play: async ({ args, canvas, canvasElement }) => {
+    // 600px is narrow by default, but not under a 500px breakpoint.
+    await expect(canvas.getByTestId("in-content")).toHaveTextContent("wide");
+    await expect(canvas.getByTestId("in-nav")).toBeVisible();
+    frame(canvasElement).style.inlineSize = "499px";
+    await waitFor(() => expect(canvas.getByTestId("in-content")).toHaveTextContent("narrow"), RESIZE);
+    // The callback runs in an effect, just after the render that changed the text.
+    await waitFor(() => expect(args.onNarrowChange).toHaveBeenCalledTimes(1));
+    await expect(args.onNarrowChange).toHaveBeenLastCalledWith(true);
+    frame(canvasElement).style.inlineSize = "500px";
+    await waitFor(() => expect(canvas.getByTestId("in-content")).toHaveTextContent("wide"), RESIZE);
+    // The callback runs in an effect, just after the render that changed the text.
+    await waitFor(() => expect(args.onNarrowChange).toHaveBeenCalledTimes(2));
+    await expect(args.onNarrowChange).toHaveBeenLastCalledWith(false);
+  },
+};
+
+const SEEN: boolean[] = [];
+
+export const MountingNarrowStartsWide: Story = {
+  args: { onNarrowChange: fn() },
+  render: (args) => {
+    function Outside() {
+      // A new callback on every render must not be called again.
+      const [calls, setCalls] = useState(0);
+      return (
+        <div className="frame" style={{ inlineSize: 420, blockSize: 300 }}>
+          <AppShell
+            {...args}
+            className="host-shell"
+            onNarrowChange={(narrow) => {
+              args.onNarrowChange?.(narrow);
+              setCalls((n) => n + 1);
+            }}
+          >
+            <Probe name="in-content" seen={SEEN} />
+            <span data-testid="calls">{calls}</span>
+          </AppShell>
+        </div>
+      );
+    }
+    return <Outside />;
+  },
+  beforeEach: () => {
+    SEEN.length = 0;
+  },
+  play: async ({ args, canvas, canvasElement }) => {
+    await waitFor(() => expect(canvas.getByTestId("calls")).toHaveTextContent("1"));
+    // Without a header or navigation there is no bar, and the shell still reports its width.
+    await expect(canvasElement.querySelector(".cy-app-shell.host-shell")).toHaveAttribute("data-narrow");
+    await expect(canvas.queryByRole("banner")).toBeNull();
+    await expect(canvas.getByTestId("in-content")).toHaveTextContent("narrow");
+    // The first render is always wide (as on the server); the measured value follows.
+    await expect(SEEN[0]).toBe(false);
+    await expect(SEEN[SEEN.length - 1]).toBe(true);
+    await expect(args.onNarrowChange).toHaveBeenCalledTimes(1);
+    await expect(args.onNarrowChange).toHaveBeenCalledWith(true);
+  },
+};
+
+export const OutsideAShellTheHookSaysWide: Story = {
+  render: () => (
+    <div style={{ inlineSize: 200 }}>
+      <Probe name="outside" />
+    </div>
+  ),
+  play: async ({ canvas }) => {
+    // No shell: no error, and the default is "not narrow", however small the space.
+    await expect(canvas.getByTestId("outside")).toHaveTextContent("wide");
+  },
+};
+
+export const ServerMarkupHydratesWithoutMismatch: Story = {
+  render: () => <div className="host" />,
+  play: async ({ canvasElement }) => {
+    const host = canvasElement.querySelector(".host") as HTMLElement;
+    host.style.inlineSize = "420px";
+    host.style.blockSize = "300px";
+    const app = (
+      <AppShell nav={<Probe name="in-nav" />}>
+        <Probe name="in-content" />
+      </AppShell>
+    );
+    // The server cannot measure: it renders the wide layout and the hook says wide.
+    host.innerHTML = renderToString(app);
+    await expect(within(host).getByTestId("in-content")).toHaveTextContent("wide");
+    await expect(host.querySelector(".cy-app-shell")).not.toHaveAttribute("data-narrow");
+    await expect(within(host).getByTestId("in-nav")).toHaveTextContent("wide");
+    await expect(within(host).queryByRole("banner")).toBeNull();
+    const mismatch = fn();
+    const root = hydrateRoot(host, app, { onRecoverableError: mismatch });
+    try {
+      // The client starts from the same markup, then measures its 420px and becomes narrow.
+      await waitFor(() => expect(within(host).getByTestId("in-content")).toHaveTextContent("narrow"), RESIZE);
+      // With no header content, the bar appears only to hold the menu button.
+      await expect(
+        within(within(host).getByRole("banner")).getByRole("button", { name: "Open navigation" }),
+      ).toBeVisible();
+      await expect(mismatch).not.toHaveBeenCalled();
+    } finally {
+      root.unmount();
+    }
   },
 };
 
