@@ -34,7 +34,10 @@ export interface DocsConfig {
   tagline: string;
   /** A sentence or two for the home page and the site's description. */
   description: string;
-  /** The npm package the site documents. Its installed version is the version the site shows. */
+  /**
+   * The npm package the site documents. Its installed version is the version the site shows: in the package's own
+   * repository that is the workspace's copy (`workspace:*`), so the site always matches the code beside it.
+   */
   package: string;
   /** The GitHub repository, e.g. `https://github.com/arshad-shah/cynosure`. */
   repo: string;
@@ -44,6 +47,11 @@ export interface DocsConfig {
   url: string;
   /** The product's own website, when it has one besides these docs. */
   website?: string;
+  /**
+   * The folder of pending Changesets (relative to the repository root). While it holds any, the code is ahead of the
+   * last release and the site says so beside the version. Default: `.changeset`.
+   */
+  changesets?: string;
   /** Extra links for the header and footer (GitHub and npm are added from `repo` and `package`). */
   links?: DocsLink[];
   /** The command shown on the home page. Default: `pnpm add <package>`. */

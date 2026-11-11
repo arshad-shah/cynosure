@@ -3,8 +3,3 @@
  * file (an accent colour, a different font) and nothing else to restyle the whole site.
  */
 @import "@arshad-shah/cynosure/fonts/hanken.css";
-/*
- * Until Cynosure 0.3.0 is installed: the live examples run the library's source, and TimeField's picker is newer than
- * the published stylesheet, so its popup would be unstyled. Delete this import when the dependency is raised.
- */
-@import "../src/components/TimeField/time-field.css";

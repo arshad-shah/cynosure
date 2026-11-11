@@ -118,6 +118,8 @@ export interface SiteData {
   package: string;
   /** The installed version of `package`: what the site documents. */
   version: string;
+  /** True when the repository holds changes that are not released yet: this build is a preview of the next version. */
+  unreleased?: boolean;
   repo: string;
   branch: string;
   url: string;

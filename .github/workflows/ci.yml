@@ -60,10 +60,11 @@ jobs:
           node-version-file: .nvmrc
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - name: Site types
-        run: pnpm --filter @arshad-shah/cynosure-site check
+      # The site uses the library beside it (workspace:*), so the library is built first; its types need it too.
       - name: Site and Storybook build
         run: pnpm build:site
+      - name: Site types
+        run: pnpm --filter @arshad-shah/cynosure-site check
       - name: The build holds the site and Storybook
         run: test -f site/dist/index.html && test -f site/dist/storybook/index.html
       - name: Every internal link resolves

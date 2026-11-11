@@ -114,11 +114,17 @@ function Foot({ page }: { page: PageData }) {
       <div className="docs-colophon">
         <span>
           {site.name} {site.version}
+          {site.unreleased && " with unreleased changes"}
         </span>
         <Inline gap="4" wrap>
           {page.source && (
             <Link href={`${blob}/${page.source}`} size="sm" tone="neutral">
               Edit this page
+            </Link>
+          )}
+          {site.unreleased && (
+            <Link href={site.url} size="sm" tone="neutral" external>
+              Published documentation
             </Link>
           )}
           <Link href="/changelog/" size="sm" tone="neutral">

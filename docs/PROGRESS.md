@@ -46,14 +46,18 @@ Plan 9 (`docs/superpowers/plans/2026-11-10-cynosure-migrations.md`, tracked in i
 - **Size:** TimeField's own budget in `.size-limit.json` went from 2 kB to 6 kB (it is about 5.7 kB). Confirm or ask for it to be trimmed.
 - **Changeset:** `.changeset/time-field-picker.md` (minor).
 
-**Every prop is described (2026-11-11).** 525 props on 85 exported `…Props` types had no doc comment, so their rows in the site's props tables were empty. Each now has one (comments only, written from the source and READMEs), and `tests/unit/prop-docs.test.ts` fails when an exported prop has none. The site reads the **published** package's types, so the tables fill in once this is released and `site/package.json` is raised.
+**Every prop is described (2026-11-11).** 525 props on 85 exported `…Props` types had no doc comment, so their rows in the site's props tables were empty. Each now has one (comments only, written from the source and READMEs), and `tests/unit/prop-docs.test.ts` fails when an exported prop has none. The site now reads this repository's own types (see below), so the tables show them on every build.
 
 **Storybook link on the site (2026-11-11).** `links` in `site/docs.config.ts` puts a Storybook button in the header; the engine now also lists `links` in every page's footer, because the header's link buttons are hidden on phones.
 
-**Found on the #160 preview (2026-11-11):**
-- The site's Getting started page (the root README) told readers to go to the site they were on. The engine now drops a paragraph whose link is the site's own address (`url` in the config) and treats full links to the site as links within it.
-- TimeField's picker was unstyled in the site's live examples: examples run the library's source, the stylesheet is the published one. `site/theme.css` imports `time-field.css` from source, marked "Until Cynosure 0.3.0". **Delete that import when the dependency is raised.** The same gap will hit any component whose styles change between releases.
-- Props tables on the site still show empty descriptions: they are read from the published 0.2.0 types. They fill in when 0.3.0 is installed. Whether the site should read props from the repository instead is Arshad's call (it would contradict "the site shows what users get").
+**The site and the release are now one commit (2026-11-11, Arshad's decision, in #160).** The MUI convention: the site uses the library beside it and the live site is deployed by the release.
+- `site/package.json` depends on `@arshad-shah/cynosure` as `workspace:*`; `pnpm build:site` builds the library first. Pages, examples, props tables, styles and version always come from the same commit. No dependency to raise after a release, and no stand-ins (the two that existed are gone).
+- `tools/publish.sh` ends by pushing the published commit to the `docs-live` branch. It only runs when no changeset is pending, so `docs-live` is always exactly what is on npm, or that plus documentation-only fixes.
+- Builds with a pending changeset (`main` between releases, pull requests) show an "Unreleased" badge beside the version and a link to the published documentation in the footer. The engine works this out from `.changeset/`.
+- `pnpm version-packages` is plain `changeset version` again (rehearsed: 0.3.0, `site/package.json` untouched).
+- **Waiting on Arshad, once:** after the first release that creates `docs-live` (0.3.0), set Cloudflare Pages' production branch to `docs-live` (Settings → Builds → Branch control). Until then production still builds from `main` and will show "Unreleased" between a merge and its release.
+- Also fixed from the preview: the Getting started page no longer tells readers to visit the site they are on (the engine drops a paragraph whose link is the site's own address), and the props tables now show every description, because they are read from this repository.
+- The step that pushes `docs-live` can only be proven by the next real release.
 
 **First CI run on #160 (2026-11-11):** two WebKit-only failures, both "popover is not visible". (1) Select `InsideAPopover` (untouched, green on `main`) asserted the popover visible while it was still fading in; it now waits. (2) TimeField `PickFromTheColumns` reopened the picker straight after closing it and it never became visible within a second; the story now waits for the close to finish first. **Unverified suspicion:** a Popover reopened inside its 120 ms fade-out may stay invisible in WebKit. WebKit is not installed on the machine that wrote this, so check it there if it matters.
 
@@ -63,7 +67,7 @@ Plan 9 (`docs/superpowers/plans/2026-11-10-cynosure-migrations.md`, tracked in i
 
 0. **TimeField picker, prop descriptions, Storybook link:** open a pull request from `ccr-892a2583-3xxim5`, let CI run Firefox and WebKit, run the `visual-baselines` workflow, and confirm the TimeField size budget.
 
-1. **Done (2026-11-11, in #160):** the site installs `@arshad-shah/cynosure` 0.2.0 (its header and footer showed 0.1.0 beside a 0.2.0 changelog) and the "Until Cynosure 0.1.1" stand-in is deleted. After each release, raise the dependency in `site/package.json` again: the site shows the installed version.
+1. **After 0.3.0 publishes:** check that `docs-live` exists at the release commit, then set it as Cloudflare Pages' production branch (see `docs/release.md`).
 2. **Library gaps the site works around (fix in Cynosure, release, then use):**
    - SideNav does not open the group holding `current` when `current` changes after mount (the site remounts it by key).
    - EmptyState cannot be an `h1` (the not-found page writes its own heading).

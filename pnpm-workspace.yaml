@@ -4,7 +4,7 @@ packages:
   - .
   - site
 minimumReleaseAge: 20160 # 14 days: never install a version younger than two weeks
-# Our own packages are trusted the day they are published (the site uses each Cynosure release at once).
+# Our own packages (detent) are trusted the day they are published. The site uses the library beside it, not npm's.
 minimumReleaseAgeExclude:
   - "@arshad-shah/*"
 onlyBuiltDependencies:
