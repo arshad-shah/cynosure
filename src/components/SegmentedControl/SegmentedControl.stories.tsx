@@ -1,7 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, fn, waitFor, within } from "storybook/test";
 import { code, moon, sun, tree } from "../../icons/index.js";
+import { contrast, textContrast } from "../../test/color.js";
 import { computeUnderHostileHost } from "../../test/hostile.js";
+import { CynosureTheme } from "../../theme/index.js";
 import { Button } from "../Button/Button.js";
 import { SegmentedControl } from "./SegmentedControl.js";
 
@@ -85,6 +87,30 @@ export const IndicatorFollowsSelectionAndResets: Story = {
     (canvas.getByTestId("form") as HTMLFormElement).reset();
     await waitFor(() => expect(canvas.getByRole("radio", { name: "Tree" })).toBeChecked());
     await expect(canvasElement.querySelectorAll(".cy-segment")).toHaveLength(3);
+  },
+};
+
+export const ActiveSegmentStandsOutInLightAndDark: Story = {
+  render: (args) => (
+    <div style={{ display: "grid", gap: 12, justifyItems: "start" }}>
+      {(["light", "dark"] as const).map((mode) => (
+        <CynosureTheme key={mode} mode={mode} style={{ padding: 12, background: "var(--cy-color-bg)" }}>
+          <SegmentedControl {...args} label={`View on ${mode}`} />
+        </CynosureTheme>
+      ))}
+    </div>
+  ),
+  play: async ({ canvas }) => {
+    // The active segment is a filled pill on the track. It has to be seen as one in every mode, not only read from
+    // the text colour: in dark the raised surface is as dark as the track, which made the pill vanish.
+    for (const mode of ["light", "dark"]) {
+      const group = canvas.getByRole("radiogroup", { name: `View on ${mode}` });
+      const active = within(group).getByText("Tree").closest(".cy-segment") as Element;
+      const track = getComputedStyle(group).backgroundColor;
+      await expect(contrast(getComputedStyle(active).backgroundColor, track)).toBeGreaterThanOrEqual(1.2);
+      await expect(textContrast(within(group).getByText("Tree"))).toBeGreaterThanOrEqual(4.5);
+      await expect(textContrast(within(group).getByText("Raw"))).toBeGreaterThanOrEqual(4.5);
+    }
   },
 };
 
