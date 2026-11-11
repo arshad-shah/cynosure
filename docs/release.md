@@ -14,7 +14,7 @@ Nothing publishes from `next`, and nothing publishes without a merge to `main`.
 
 ## One-time setup (Arshad)
 
-- **Trusted publisher:** on npmjs.com, in the settings of `@arshad-shah/cynosure`, add a trusted publisher: GitHub Actions, repository `arshad-shah/cynosure`, workflow `release.yml`. If npm only offers this once the package exists, the very first version (`0.1.0`) needs one publish by other means (see Arshad's decision in `docs/PROGRESS.md`); every version after it comes from the workflow.
+- **Trusted publisher:** on npmjs.com, in the settings of `@arshad-shah/cynosure`, add a trusted publisher: GitHub Actions, repository `arshad-shah/cynosure`, workflow `release.yml`. npm offers this only for a package that exists, so the very first version goes out differently (Arshad's choice, 2026-11-11): add a short-lived, granular `NPM_TOKEN` repository secret that can publish `@arshad-shah/cynosure`, merge the first version pull request, and the workflow publishes `0.1.0` with provenance using that token. Then delete the secret and the token, and add the trusted publisher. Every later version is published through OIDC alone.
 - **Actions permissions:** Settings → Actions → General → Workflow permissions: allow GitHub Actions to create pull requests.
 
 ## Before a release

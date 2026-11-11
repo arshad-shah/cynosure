@@ -5,6 +5,7 @@
       "**",
       "!dist",
       "!storybook-static",
+      "!site/dist",
       "!coverage",
       "!src/styles/generated-css.ts",
       "!**/__screenshots__",

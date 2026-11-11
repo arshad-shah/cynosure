@@ -38,3 +38,6 @@ jobs:
           commit: "chore(release): version packages"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Only for the very first version (0.1.0): a short-lived npm token, deleted once the trusted publisher is set
+          # up. When the secret is absent this is empty and npm authenticates through OIDC alone.
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

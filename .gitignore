@@ -27,3 +27,4 @@ tsup.config.bundled_*.mjs
 dist/
 src/styles/generated-css.ts
 __screenshots__/**/__diff__/
+site/dist
