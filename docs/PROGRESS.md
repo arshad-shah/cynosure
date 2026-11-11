@@ -39,7 +39,17 @@ Plan 9 (`docs/superpowers/plans/2026-11-10-cynosure-migrations.md`, tracked in i
 
 **Site:** the logo, favicon, home-screen icon and share image come from `brand/` through `brand` in `docs.config.ts`. `pnpm build:site` now generates the stylesheet module the stories need (a fresh checkout failed without it, which is what failed CI on the first push).
 
+**TimeField picker (2026-11-11, Arshad's direction; branch `ccr-892a2583-3xxim5`, not yet in a pull request).** TimeField now has a popup, chosen from three mock-ups (columns, one list, steppers): columns that roll under one lens, with a day track.
+- **What it is:** the clock is a button at the end of the field (as DateField's calendar). The Popover holds listbox columns for hours, minutes and (with `seconds`) seconds whose chosen rows sit in one lens; a Slider with `trackContent` drawn as the 24 hours, with the hours outside `min` and `max` hatched; a "Now" button when now is inside the limits.
+- **New props:** `hourCycle` (`12` shows `9:30 PM` and adds a SegmentedControl AM/PM switch; the value, limits and form value stay 24-hour, through HiddenValue), `picker` (`false` is the old typed-only field) and `dayTrack`. New labels and five `--cy-time-field-*` tokens.
+- **Decisions taken as defaults, for Arshad to confirm:** `hourCycle` defaults to 24 and never follows the locale; scrolling a column chooses the row it stops on; the picker and the day track are on by default, so every existing TimeField gains the button.
+- **Size:** TimeField's own budget in `.size-limit.json` went from 2 kB to 6 kB (it is 5.64 kB). Confirm or ask for it to be trimmed.
+- **Verification (this machine has only Chromium 1243, not the pinned build, and no Firefox or WebKit):** `check`, `lint`, `typecheck`, `test`, `build` and `size` pass; all 792 stories pass in Chromium and the touch project through an untracked local config pointing at the installed browser; coverage is above the thresholds. **Not run here:** Firefox, WebKit, `test:react18`, `publint`, `attw`. TimeField's visual baselines were regenerated with the local Chromium, so CI's visual job may ask for them again (run the `visual-baselines` workflow if it does).
+- **Changeset:** `.changeset/time-field-picker.md` (minor).
+
 ## Next step
+
+0. **TimeField picker:** Arshad reviews it in Storybook (Components/TimeField), confirms the three defaults and the size budget above, then it goes into a pull request. Let CI run Firefox and WebKit before merging.
 
 1. **After 0.2.0 publishes:** raise `@arshad-shah/cynosure` in `site/package.json`, delete the stand-in at the end of `site/engine/app/site.css` ("Until Cynosure 0.1.1"), rebuild and sweep.
 2. **Library gaps the site works around (fix in Cynosure, release, then use):**
