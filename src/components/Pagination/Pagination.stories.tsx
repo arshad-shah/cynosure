@@ -792,6 +792,15 @@ export const SizesFollowTokens: Story = {
     <div style={{ display: "grid", gap: 12 }}>
       <Pagination {...args} count={100} defaultPage={50} size="sm" labels={{ nav: "Small" }} />
       <Pagination {...args} count={100} defaultPage={50} labels={{ nav: "Medium" }} />
+      {/* Wide digits (a font with broad figures, or more padding) must not make "50" wider than "1". */}
+      <Pagination
+        {...args}
+        count={100}
+        defaultPage={50}
+        size="sm"
+        style={{ "--cy-pagination-page-padding": "9px" } as React.CSSProperties}
+        labels={{ nav: "Roomy" }}
+      />
       <Pagination {...args} variant="compact" size="sm" labels={{ nav: "Small compact" }} />
       <Pagination
         {...args}
@@ -816,6 +825,13 @@ export const SizesFollowTokens: Story = {
   ),
   play: async ({ canvas }) => {
     const nav = (name: string) => canvas.getByRole("navigation", { name });
+    // One and two digits take the same width whatever the font and padding, so the row never shifts between pages.
+    const widthOf = (root: HTMLElement, page: string) =>
+      within(root).getByRole("button", { name: page }).getBoundingClientRect().width;
+    await expect(widthOf(nav("Roomy"), "Page 1")).toBeCloseTo(widthOf(nav("Roomy"), "Page 50"), 1);
+    await expect(widthOf(nav("Roomy"), "Page 1")).toBeGreaterThan(
+      lengthOf(nav("Roomy"), "var(--cy-control-height-sm)"),
+    );
     for (const [name, size] of [
       ["Small", "sm"],
       ["Medium", "md"],

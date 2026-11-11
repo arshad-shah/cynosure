@@ -429,11 +429,16 @@ export const OptionIconsKeepTheirColourInTheListAndTheTrigger: Story = {
     await userEvent.click(option("High"));
     await expect(trigger).toHaveTextContent("High");
     await expect(colourOf(optionIcon(trigger))).toEqual(danger);
-    await expect(colourOf(optionIcon(option("High")))).toEqual(danger);
+    // (The list has closed, so the option is looked up in the DOM, not among what is on screen.)
+    await expect(colourOf(optionIcon(canvas.getByRole("option", { name: "High", hidden: true })))).toEqual(
+      danger,
+    );
     await userEvent.click(trigger);
+    await shownFully(list(canvasElement));
     await userEvent.click(option("Garden"));
     await expect(colourOf(optionIcon(trigger))).toEqual(rgb(VIOLET));
     await userEvent.click(trigger);
+    await shownFully(list(canvasElement));
     await userEvent.click(option("No priority"));
     await expect(colourOf(optionIcon(trigger))).toEqual(colourOf(trigger));
     // Opening and closing again from the trigger leaves the chosen icon as it is.

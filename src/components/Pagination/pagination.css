@@ -33,10 +33,15 @@
   white-space: nowrap;
 }
 
-/* A page number is at least square, and grows with its digits. */
+/*
+ * A page number is at least square and always has room for two digits, so "1" and "50" are the same width whatever
+ * the font and the row does not shift from page to page. Three digits and more grow it.
+ */
 .cy-pagination .cy-button.cy-pagination-page {
-  min-inline-size: var(--_h);
-  padding-inline: var(--cy-pagination-page-padding, var(--cy-space-2));
+  --_pad: var(--cy-pagination-page-padding, var(--cy-space-2));
+  /* A quarter of a digit to spare: tabular figures can be a little wider than the "0" that `ch` measures. */
+  min-inline-size: max(var(--_h), calc(2.25ch + 2 * var(--_pad) + 2 * var(--cy-border-width)));
+  padding-inline: var(--_pad);
   font-variant-numeric: tabular-nums;
 }
 

@@ -209,11 +209,7 @@ export const Pagination = forwardRef<HTMLElement, PaginationProps>(function Pagi
           pageRange(current, last, siblings, boundaries).map((item, index) =>
             item === "gap" ? (
               // Not a control and nothing to read: the page names on each side already say what is left out.
-              <li
-                key={index ? "gap-end" : "gap-start"}
-                className="cy-reset cy-pagination-gap"
-                aria-hidden="true"
-              >
+              <li key={`gap-${index}`} className="cy-reset cy-pagination-gap" aria-hidden="true">
                 <Icon icon={moreHorizontal} />
               </li>
             ) : (
