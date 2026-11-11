@@ -1,0 +1,51 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./CompareSlider.stories";
+
+<Meta of={Stories} />
+
+# CompareSlider
+
+Two versions of the same thing, one over the other, split by a divider people move to compare them.
+
+<Canvas of={Stories.BeforeAndAfterSplitByADivider} />
+
+## When to use
+
+- **Before and after** of an image edit, a redesign or a render, where the difference is in the detail.
+
+**Use something else when:**
+- people pick a number: [Slider](?path=/docs/components-slider--docs)
+- two panes are both worked in: [SplitPane](?path=/docs/components-splitpane--docs)
+
+## Usage
+
+```tsx
+import { CompareSlider } from "@arshad-shah/cynosure";
+
+<CompareSlider before={<img src={original} alt="Original" />} after={<img src={edited} alt="Edited" />} />
+```
+
+`before` and `after` should be the same size. Control the divider with `value` and `onChange` (percent of the width showing `before`).
+
+<Canvas of={Stories.Controlled} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+- **Role:** the divider is a slider named "Comparison", read as "40% before". Rename it and the tags with `labels`.
+- **Pointer:** press anywhere on the picture to jump the divider there (and focus it), then drag; Escape mid-drag puts it back.
+- **Keyboard:** arrows move 1%, Shift+arrows and Page Up/Down 10%, Home and End go to the ends.
+- **Touch:** a sideways drag moves the divider at once and a tap jumps it; an upward or downward swipe scrolls the page. The divider's hit area is 44px on touch screens.
+
+<Canvas of={Stories.KeyboardMovesTheDivider} />
+
+## Theming
+
+Tokens: `--cy-compare-slider-divider` and `--cy-compare-slider-grip-size`.
+
+## Related
+
+[Slider](?path=/docs/components-slider--docs) · [SplitPane](?path=/docs/components-splitpane--docs) · [SelectionFrame](?path=/docs/components-selectionframe--docs)

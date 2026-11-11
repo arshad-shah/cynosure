@@ -1,0 +1,62 @@
+/* empty-state: centred icon, heading, description and actions; wraps cleanly in narrow panels. */
+.cy-empty-state.cy-empty-state {
+  box-sizing: border-box !important;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--cy-empty-state-gap, var(--cy-space-4));
+  inline-size: 100%;
+  margin: 0;
+  padding: var(--cy-empty-state-padding, var(--cy-space-10)) var(--cy-space-6);
+  color: var(--cy-color-ink);
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-font-size-md);
+  font-weight: var(--cy-font-weight-regular);
+  line-height: var(--cy-font-line-height);
+  letter-spacing: normal;
+  text-align: center;
+  text-transform: none;
+  &[data-size="sm"] {
+    gap: var(--cy-space-3);
+    padding: var(--cy-space-7) var(--cy-space-4);
+  }
+}
+.cy-empty-state-icon.cy-empty-state-icon {
+  display: grid;
+  place-items: center;
+  inline-size: calc(2.5 * var(--cy-control-height-md));
+  block-size: calc(2.5 * var(--cy-control-height-md));
+  border-radius: var(--cy-radius-full);
+  background: var(--cy-color-soft);
+  color: var(--cy-color-muted);
+  font-size: var(--cy-font-size-md);
+}
+.cy-empty-state[data-size="sm"] .cy-empty-state-icon.cy-empty-state-icon {
+  inline-size: calc(1.5 * var(--cy-control-height-md));
+  block-size: calc(1.5 * var(--cy-control-height-md));
+}
+.cy-empty-state-title.cy-empty-state-title {
+  max-inline-size: var(--cy-empty-state-max-width, 40ch);
+  margin: 0;
+  color: var(--cy-color-ink);
+  font-family: var(--cy-font-display, var(--cy-font-sans));
+  font-size: var(--cy-font-size-lg);
+  font-weight: var(--cy-font-weight-bold);
+  line-height: var(--cy-font-line-height);
+  overflow-wrap: anywhere;
+}
+.cy-empty-state-description.cy-empty-state-description {
+  max-inline-size: var(--cy-empty-state-max-width, 40ch);
+  margin: 0;
+  color: var(--cy-color-muted);
+  font-size: var(--cy-font-size-md);
+  overflow-wrap: anywhere;
+}
+.cy-empty-state-actions.cy-empty-state-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--cy-space-3);
+  margin-block-start: var(--cy-space-2);
+  font-size: var(--cy-font-size-md);
+}

@@ -1,0 +1,507 @@
+[
+  {
+    "name": "all CSS",
+    "path": "dist/styles.css",
+    "limit": "30 kB",
+    "gzip": true
+  },
+  {
+    "name": "createTheme + themeToCss",
+    "path": [
+      "dist/tokens/create-theme.js",
+      "dist/tokens/color.js",
+      "dist/tokens/defaults.js",
+      "dist/tokens/to-css.js"
+    ],
+    "limit": "6.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "Icon",
+    "path": ["dist/foundations/Icon/Icon.js", "dist/styles/icon.css"],
+    "limit": "1.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "Button (JS + CSS)",
+    "path": [
+      "dist/components/Button/Button.js",
+      "dist/foundations/ButtonBase/ButtonBase.js",
+      "dist/styles/button.css"
+    ],
+    "limit": "3 kB",
+    "gzip": true
+  },
+  {
+    "name": "IconButton",
+    "path": ["dist/components/IconButton/IconButton.js", "dist/styles/iconbutton.css"],
+    "limit": "1 kB",
+    "gzip": true
+  },
+  {
+    "name": "LoadingDots",
+    "path": ["dist/components/LoadingDots/LoadingDots.js", "dist/styles/loading-dots.css"],
+    "limit": "1.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "Field",
+    "path": ["dist/components/Field/Field.js", "dist/foundations/field.js", "dist/styles/field.css"],
+    "limit": "3 kB",
+    "gzip": true
+  },
+  {
+    "name": "TextField",
+    "path": [
+      "dist/components/TextField/TextField.js",
+      "dist/foundations/InputBase/InputBase.js",
+      "dist/styles/text-field.css"
+    ],
+    "limit": "3 kB",
+    "gzip": true
+  },
+  {
+    "name": "SearchField",
+    "path": ["dist/components/SearchField/SearchField.js", "dist/styles/search-field.css"],
+    "limit": "1 kB",
+    "gzip": true
+  },
+  {
+    "name": "TextArea",
+    "path": [
+      "dist/components/TextArea/TextArea.js",
+      "dist/foundations/TextAreaBase/TextAreaBase.js",
+      "dist/styles/text-area.css"
+    ],
+    "limit": "3 kB",
+    "gzip": true
+  },
+  {
+    "name": "Link",
+    "path": ["dist/components/Link/Link.js", "dist/foundations/LinkBase/LinkBase.js", "dist/styles/link.css"],
+    "limit": "3 kB",
+    "gzip": true
+  },
+  {
+    "name": "Checkbox + Switch",
+    "path": [
+      "dist/components/Checkbox/Checkbox.js",
+      "dist/components/Checkbox/ChoiceRow.js",
+      "dist/components/Switch/Switch.js",
+      "dist/foundations/ChoiceBase/ChoiceBase.js",
+      "dist/styles/checkbox.css",
+      "dist/styles/choice.css"
+    ],
+    "limit": "3.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "RadioGroup",
+    "path": ["dist/components/RadioGroup/RadioGroup.js", "dist/styles/radio-group.css"],
+    "limit": "1.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "SegmentedControl",
+    "path": ["dist/components/SegmentedControl/SegmentedControl.js", "dist/styles/segmented-control.css"],
+    "limit": "3 kB",
+    "gzip": true
+  },
+  {
+    "name": "Tooltip",
+    "path": [
+      "dist/components/Tooltip/Tooltip.js",
+      "dist/overlay/position.js",
+      "dist/overlay/use-anchored-position.js",
+      "dist/styles/tooltip.css"
+    ],
+    "limit": "3 kB",
+    "gzip": true
+  },
+  {
+    "name": "Select",
+    "path": [
+      "dist/components/Select/Select.js",
+      "dist/foundations/HiddenValue/HiddenValue.js",
+      "dist/styles/select.css",
+      "dist/styles/hidden-value.css"
+    ],
+    "limit": "5 kB",
+    "gzip": true
+  },
+  {
+    "name": "Badge",
+    "path": ["dist/components/Badge/Badge.js", "dist/styles/badge.css"],
+    "limit": "1.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "Kbd",
+    "path": ["dist/components/Kbd/Kbd.js", "dist/styles/kbd.css"],
+    "limit": "1.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "ThemeToggle",
+    "path": ["dist/components/ThemeToggle/ThemeToggle.js"],
+    "limit": "1 kB",
+    "gzip": true
+  },
+  {
+    "name": "Stack",
+    "path": ["dist/components/Stack/Stack.js", "dist/styles/stack.css"],
+    "limit": "1 kB",
+    "gzip": true
+  },
+  {
+    "name": "Inline",
+    "path": ["dist/components/Inline/Inline.js", "dist/styles/stack.css"],
+    "limit": "1 kB",
+    "gzip": true
+  },
+  {
+    "name": "useRovingFocus",
+    "path": ["dist/foundations/roving-focus.js"],
+    "limit": "1.25 kB",
+    "gzip": true
+  },
+  {
+    "name": "Card",
+    "path": ["dist/components/Card/Card.js", "dist/styles/card.css"],
+    "limit": "2 kB",
+    "gzip": true
+  },
+  {
+    "name": "Toolbar",
+    "path": [
+      "dist/components/Toolbar/Toolbar.js",
+      "dist/foundations/roving-focus.js",
+      "dist/styles/toolbar.css"
+    ],
+    "limit": "2 kB",
+    "gzip": true
+  },
+  {
+    "name": "Tabs",
+    "path": ["dist/components/Tabs/Tabs.js", "dist/foundations/roving-focus.js", "dist/styles/tabs.css"],
+    "limit": "6 kB",
+    "gzip": true
+  },
+  {
+    "name": "Disclosure",
+    "path": ["dist/components/Disclosure/Disclosure.js", "dist/styles/disclosure.css"],
+    "limit": "2 kB",
+    "gzip": true
+  },
+  {
+    "name": "Accordion",
+    "path": [
+      "dist/components/Accordion/Accordion.js",
+      "dist/components/Disclosure/Disclosure.js",
+      "dist/styles/disclosure.css",
+      "dist/styles/accordion.css"
+    ],
+    "limit": "3.25 kB",
+    "gzip": true
+  },
+  {
+    "name": "Popover",
+    "path": ["dist/components/Popover/Popover.js", "dist/styles/popover.css"],
+    "limit": "2 kB",
+    "gzip": true
+  },
+  {
+    "name": "Overlay core",
+    "path": ["dist/overlay/dismiss.js", "dist/overlay/position.js", "dist/overlay/use-anchored-position.js"],
+    "limit": "2 kB",
+    "gzip": true
+  },
+  {
+    "name": "Menu",
+    "path": ["dist/components/Menu/Menu.js", "dist/styles/menu.css"],
+    "limit": "3.25 kB",
+    "gzip": true
+  },
+  {
+    "name": "DialogBase",
+    "path": ["dist/foundations/DialogBase/DialogBase.js"],
+    "limit": "0.75 kB",
+    "gzip": true
+  },
+  {
+    "name": "Dialog (with DialogBase)",
+    "path": [
+      "dist/components/Dialog/Dialog.js",
+      "dist/foundations/DialogBase/DialogBase.js",
+      "dist/styles/dialog.css"
+    ],
+    "limit": "3.25 kB",
+    "gzip": true
+  },
+  {
+    "name": "Sheet",
+    "path": ["dist/components/Sheet/Sheet.js", "dist/styles/sheet.css"],
+    "limit": "0.75 kB",
+    "gzip": true
+  },
+  {
+    "name": "Toast",
+    "path": ["dist/components/Toast/Toast.js", "dist/styles/toast.css"],
+    "limit": "3.75 kB",
+    "gzip": true
+  },
+  {
+    "name": "Notice",
+    "path": ["dist/components/Notice/Notice.js", "dist/styles/notice.css"],
+    "limit": "1.75 kB",
+    "gzip": true
+  },
+  {
+    "name": "EmptyState",
+    "path": ["dist/components/EmptyState/EmptyState.js", "dist/styles/empty-state.css"],
+    "limit": "1.25 kB",
+    "gzip": true
+  },
+  {
+    "name": "CopyButton",
+    "path": ["dist/components/CopyButton/CopyButton.js", "dist/styles/copy-button.css"],
+    "limit": "1.25 kB",
+    "gzip": true
+  },
+  {
+    "name": "ProgressBar",
+    "path": ["dist/components/ProgressBar/ProgressBar.js", "dist/styles/progress-bar.css"],
+    "limit": "2.25 kB",
+    "gzip": true
+  },
+  {
+    "name": "Slider",
+    "path": ["dist/components/Slider/Slider.js", "dist/styles/slider.css"],
+    "limit": "3.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "Combobox",
+    "path": ["dist/components/Combobox/Combobox.js", "dist/styles/combobox.css"],
+    "limit": "3.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "Tree",
+    "path": ["dist/components/Tree/Tree.js", "dist/styles/tree.css"],
+    "limit": "4.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "CommandPalette (with useHotkey)",
+    "path": [
+      "dist/components/CommandPalette/CommandPalette.js",
+      "dist/foundations/hotkey.js",
+      "dist/styles/command-palette.css"
+    ],
+    "limit": "4.75 kB",
+    "gzip": true
+  },
+  {
+    "name": "ColorField",
+    "path": ["dist/components/ColorField/ColorField.js", "dist/styles/color-field.css"],
+    "limit": "4 kB",
+    "gzip": true
+  },
+  {
+    "name": "Skeleton",
+    "path": ["dist/components/Skeleton/Skeleton.js", "dist/styles/skeleton.css"],
+    "limit": "1.25 kB",
+    "gzip": true
+  },
+  {
+    "name": "Grid",
+    "path": ["dist/components/Grid/Grid.js", "dist/styles/grid.css"],
+    "limit": "1 kB",
+    "gzip": true
+  },
+  {
+    "name": "Steps",
+    "path": ["dist/components/Steps/Steps.js", "dist/styles/steps.css"],
+    "limit": "2.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "DescriptionList",
+    "path": ["dist/components/DescriptionList/DescriptionList.js", "dist/styles/description-list.css"],
+    "limit": "1.25 kB",
+    "gzip": true
+  },
+  {
+    "name": "Announcer",
+    "path": ["dist/components/Announcer/Announcer.js", "dist/styles/announcer.css"],
+    "limit": "1 kB",
+    "gzip": true
+  },
+  {
+    "name": "Prose",
+    "path": ["dist/components/Prose/Prose.js", "dist/styles/prose.css"],
+    "limit": "1.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "ContextMenu (with Menu)",
+    "path": ["dist/components/ContextMenu/ContextMenu.js", "dist/styles/menu.css"],
+    "limit": "2.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "SideNav (with Tooltip)",
+    "path": ["dist/components/SideNav/SideNav.js", "dist/styles/side-nav.css"],
+    "limit": "3.25 kB",
+    "gzip": true
+  },
+  {
+    "name": "AppShell",
+    "path": ["dist/components/AppShell/AppShell.js", "dist/styles/app-shell.css"],
+    "limit": "2.25 kB",
+    "gzip": true
+  },
+  {
+    "name": "NumberField (with TextField)",
+    "path": ["dist/components/NumberField/NumberField.js", "dist/styles/number-field.css"],
+    "limit": "4 kB",
+    "gzip": true
+  },
+  {
+    "name": "FileInputBase",
+    "path": ["dist/foundations/FileInputBase/FileInputBase.js"],
+    "limit": "500 B",
+    "gzip": true
+  },
+  {
+    "name": "FileDrop (with Button)",
+    "path": ["dist/components/FileDrop/FileDrop.js", "dist/styles/file-drop.css"],
+    "limit": "3 kB",
+    "gzip": true
+  },
+  {
+    "name": "SplitPane",
+    "path": ["dist/components/SplitPane/SplitPane.js", "dist/styles/split-pane.css"],
+    "limit": "2.25 kB",
+    "gzip": true
+  },
+  {
+    "name": "TagInput (with TextField and the Combobox list styles)",
+    "path": ["dist/components/TagInput/TagInput.js", "dist/styles/tag-input.css", "dist/styles/combobox.css"],
+    "limit": "4.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "CodeBlock (with CopyButton)",
+    "path": ["dist/components/CodeBlock/CodeBlock.js", "dist/styles/code-block.css"],
+    "limit": "3 kB",
+    "gzip": true
+  },
+  {
+    "name": "SortableList (with IconButton)",
+    "path": ["dist/components/SortableList/SortableList.js", "dist/styles/sortable-list.css"],
+    "limit": "3.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "Table (with Checkbox)",
+    "path": ["dist/components/Table/Table.js", "dist/styles/table.css"],
+    "limit": "4 kB",
+    "gzip": true
+  },
+  {
+    "name": "FloatingToolbar (with Toolbar and positioning)",
+    "path": ["dist/components/FloatingToolbar/FloatingToolbar.js", "dist/styles/floating-toolbar.css"],
+    "limit": "3.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "SignaturePad (with ink)",
+    "path": [
+      "dist/components/SignaturePad/SignaturePad.js",
+      "dist/components/SignaturePad/ink.js",
+      "dist/styles/signature-pad.css"
+    ],
+    "limit": "3.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "SelectionFrame (with geometry)",
+    "path": ["dist/components/SelectionFrame/SelectionFrame.js", "dist/styles/selection-frame.css"],
+    "limit": "3.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "ColorSwatches",
+    "path": ["dist/components/ColorSwatches/ColorSwatches.js", "dist/styles/color-swatches.css"],
+    "limit": "2.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "CompareSlider",
+    "path": ["dist/components/CompareSlider/CompareSlider.js", "dist/styles/compare-slider.css"],
+    "limit": "2.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "VirtualList",
+    "path": ["dist/components/VirtualList/VirtualList.js", "dist/styles/virtual-list.css"],
+    "limit": "4.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "HoverCard",
+    "path": ["dist/components/HoverCard/HoverCard.js", "dist/styles/hover-card.css"],
+    "limit": "2 kB",
+    "gzip": true
+  },
+  {
+    "name": "ProgressOverlay",
+    "path": ["dist/components/ProgressOverlay/ProgressOverlay.js", "dist/styles/progress-overlay.css"],
+    "limit": "6 kB",
+    "gzip": true
+  },
+  {
+    "name": "KeyValueEditor",
+    "path": ["dist/components/KeyValueEditor/KeyValueEditor.js", "dist/styles/key-value-editor.css"],
+    "limit": "2.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "DocumentViewport",
+    "path": ["dist/components/DocumentViewport/DocumentViewport.js", "dist/styles/document-viewport.css"],
+    "limit": "3 kB",
+    "gzip": true
+  },
+  {
+    "name": "ZoomControls",
+    "path": ["dist/components/ZoomControls/ZoomControls.js", "dist/styles/zoom-controls.css"],
+    "limit": "1.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "PanZoomCanvas",
+    "path": ["dist/components/PanZoomCanvas/PanZoomCanvas.js", "dist/styles/pan-zoom-canvas.css"],
+    "limit": "3 kB",
+    "gzip": true
+  },
+  {
+    "name": "Calendar",
+    "path": ["dist/components/Calendar/Calendar.js", "dist/styles/calendar.css"],
+    "limit": "3.25 kB",
+    "gzip": true
+  },
+  {
+    "name": "DateField",
+    "path": ["dist/components/DateField/DateField.js", "dist/styles/date-field.css"],
+    "limit": "2 kB",
+    "gzip": true
+  },
+  {
+    "name": "TimeField",
+    "path": ["dist/components/TimeField/TimeField.js", "dist/styles/time-field.css"],
+    "limit": "2 kB",
+    "gzip": true
+  }
+]

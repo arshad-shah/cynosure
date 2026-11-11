@@ -1,0 +1,62 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./LoadingDots.stories";
+
+<Meta of={Stories} />
+
+# LoadingDots
+
+Three dots that pulse in sequence, for short waits of unknown length. For a task with known progress, show the progress itself.
+
+<Canvas of={Stories.Default} />
+
+## When to use
+
+- Inside a button while it saves ([Button](?path=/docs/components-button--docs) does this for you with `loading`).
+- Inline status text, list footers, a panel that is still loading.
+
+## Usage
+
+```tsx
+import { LoadingDots } from "@arshad-shah/cynosure";
+
+<LoadingDots label="Saving document" />        // announced
+<LoadingDots size="lg" tone="accent" />        // decorative
+<LoadingDots color="#14b8a6" speed="slow" />   // one-off colour
+```
+
+## Announcing it
+
+By default the dots are decorative. Set `label` to give them `role="status"` and an accessible name. Leave it out when the surrounding control already reports the state, as Button does with `aria-busy`.
+
+<Canvas of={Stories.Labelled} />
+
+## Size, tone and speed
+
+`size` defaults to `inherit`, which follows the surrounding font size; `sm`, `md` and `lg` are fixed. `tone` is any tone, `muted`, or `inherit` (the current text colour). `speed` is `slow`, `normal` or `fast`. `color` takes any CSS colour for one-off cases; prefer tones.
+
+<Canvas of={Stories.Sizes} />
+<Canvas of={Stories.Tones} />
+<Canvas of={Stories.InheritsColourAndSize} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+- **Reduced motion:** with the OS setting or `createTheme({ motion: "reduced" })`, the dots stay still and fully visible.
+- **Without a label** the dots are `aria-hidden`.
+
+## Theming
+
+Tokens: `--cy-loading-dots-dot-size`, `--cy-loading-dots-gap`, `--cy-loading-dots-color`, `--cy-loading-dots-duration` and `--cy-loading-dots-size-{sm,md,lg}`.
+
+```ts
+createTheme({ components: { loadingDots: { gap: "0.4em" } } });
+```
+
+<Canvas of={Stories.CustomColourAndSpeed} />
+
+## Related
+
+[Button](?path=/docs/components-button--docs)

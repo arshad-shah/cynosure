@@ -1,0 +1,65 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./IconButton.stories";
+
+<Meta of={Stories} />
+
+# IconButton
+
+A square [Button](?path=/docs/components-button--docs) with only an icon. It needs a `label`, which is both its accessible name and its tooltip.
+
+<Canvas of={Stories.Default} />
+
+## When to use
+
+- Toolbar and table-row actions where the icon is widely understood (copy, close, delete).
+- Dense chrome where a text button would not fit.
+
+**Use something else when:**
+- the action is not obvious from an icon alone: [Button](?path=/docs/components-button--docs) with visible text
+- it navigates: [Link](?path=/docs/components-link--docs)
+
+## Usage
+
+```tsx
+import { IconButton } from "@arshad-shah/cynosure";
+import { copy, trash } from "@arshad-shah/cynosure/icons";
+
+<IconButton icon={copy} label="Copy document" onClick={copyDoc} />
+<IconButton icon={trash} label="Delete" tone="danger" tooltipPlacement="bottom" />
+```
+
+## Tone and variant
+
+IconButton accepts the Button props `variant`, `tone`, `size`, `loading`, `pressed`, `disabled` and `type`, except `children`, `iconEnd` and `fullWidth`.
+
+<Canvas of={Stories.Danger} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+| Input | Result |
+| --- | --- |
+| Click, tap, <kbd>Enter</kbd>, <kbd>Space</kbd> | Activates |
+| Hover or keyboard focus | Shows the `label` tooltip |
+| <kbd>Esc</kbd>, blur, pointer leave | Closes the tooltip |
+
+- **Name:** `label` is set as `aria-label`. There is no native `title` tooltip.
+- **Tooltip placement:** `tooltipPlacement` defaults to `top`.
+- **Everything else** works as in Button: `type` defaults to `button`.
+
+## Theming
+
+IconButton uses the [Button](?path=/docs/components-button--docs) tokens, such as `--cy-button-height-{sm,md,lg}` and `--cy-button-radius`.
+
+```ts
+createTheme({ components: { button: { radius: "999px" } } });
+```
+
+`className` and `style` are for layout only.
+
+## Related
+
+[Button](?path=/docs/components-button--docs) · [Tooltip](?path=/docs/components-tooltip--docs) · [Toolbar](?path=/docs/components-toolbar--docs)

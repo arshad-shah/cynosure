@@ -1,9 +1,0 @@
-{
-  "name": "@arshad-shah/cynosure-react/theme",
-  "private": true,
-  "type": "module",
-  "main": "../dist/theme/index.js",
-  "module": "../dist/theme/index.js",
-  "types": "../dist/theme/index.d.ts",
-  "sideEffects": false
-}

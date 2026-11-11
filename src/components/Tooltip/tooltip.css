@@ -1,0 +1,50 @@
+.cy-tooltip-anchor {
+  font-size: inherit;
+  line-height: inherit;
+  display: inline-flex;
+  vertical-align: middle;
+}
+
+.cy-tooltip.cy-tooltip {
+  box-sizing: border-box !important;
+  position: fixed;
+  inset: auto;
+  margin: 0;
+  max-inline-size: var(--cy-tooltip-max-width, 32ch);
+  padding: var(--cy-space-2) var(--cy-space-4);
+  border: 0;
+  border-radius: var(--cy-tooltip-radius, calc(var(--cy-radius-sm) * 0.8));
+  background: var(--cy-tooltip-bg, var(--cy-color-ink));
+  color: var(--cy-tooltip-ink, var(--cy-color-bg));
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-font-size-sm);
+  font-weight: var(--cy-font-weight-regular);
+  line-height: 1.4;
+  letter-spacing: normal;
+  text-transform: none;
+  overflow: visible;
+  opacity: 1;
+  transition:
+    opacity var(--cy-motion-fast) var(--cy-motion-ease),
+    display var(--cy-motion-fast) allow-discrete,
+    overlay var(--cy-motion-fast) allow-discrete;
+  &:popover-open {
+    animation: cy-tooltip-in var(--cy-motion-fast) var(--cy-motion-ease);
+  }
+  &:not(:popover-open) {
+    opacity: 0;
+  }
+}
+
+/* Entrance as a keyframe animation, not @starting-style: if an engine mishandles the animation, the element still
+   ends in its normal visible style (WebKit left nested @starting-style overlays at opacity 0). */
+@keyframes cy-tooltip-in {
+  from {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cy-tooltip.cy-tooltip {
+    animation: none;
+  }
+}

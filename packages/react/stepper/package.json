@@ -1,9 +1,0 @@
-{
-  "name": "@arshad-shah/cynosure-react/stepper",
-  "private": true,
-  "type": "module",
-  "main": "../dist/stepper.js",
-  "module": "../dist/stepper.js",
-  "types": "../dist/stepper.d.ts",
-  "sideEffects": ["*.css"]
-}

@@ -1,9 +1,0 @@
-{
-  "name": "@arshad-shah/cynosure-react/checkbox",
-  "private": true,
-  "type": "module",
-  "main": "../dist/checkbox.js",
-  "module": "../dist/checkbox.js",
-  "types": "../dist/checkbox.d.ts",
-  "sideEffects": ["*.css"]
-}

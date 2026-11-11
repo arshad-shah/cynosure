@@ -1,0 +1,74 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./TagInput.stories";
+
+<Meta of={Stories} />
+
+# TagInput
+
+A field for several short values: topics, labels, keywords, recipients. People type and press Enter, pick a suggestion or paste a list, and remove tags with a click or the keyboard.
+
+<Canvas of={Stories.EnterAndCommaAddTags} />
+
+## When to use
+
+- **An open-ended list of short values**, typed or picked.
+
+**Use something else when:**
+- the choices are a fixed, short set: checkboxes ([Checkbox](?path=/docs/components-checkbox--docs))
+- there is exactly one value: [Combobox](?path=/docs/components-combobox--docs) or [TextField](?path=/docs/components-textfield--docs)
+
+## Usage
+
+```tsx
+import { TagInput } from "@arshad-shah/cynosure";
+
+<TagInput label="Topics" value={topics} onChange={setTopics} suggestions={allTopics} />
+```
+
+## Suggestions
+
+With `suggestions`, matching ones (anywhere in the word, not already added) appear in a list while typing. Arrow keys move through it, Enter or a click adds one. Free text is still accepted.
+
+<Canvas of={Stories.Suggestions} />
+
+## Checks
+
+Duplicates are refused (without regard to case) unless `allowDuplicates`; `maxTags` caps the count; `validate` returns a message to refuse a tag. The message shows as the field's error and the typed text stays so it can be fixed.
+
+<Canvas of={Stories.RefusalsAreExplained} />
+
+## Forms
+
+With `name`, each tag is submitted as its own value under that name (`formData.getAll(name)`). `required` needs at least one tag; reset restores `defaultValue`; disabled fields are not submitted and lose their remove buttons.
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+- **Roles:** the input is a text box, or an APG combobox with a listbox when `suggestions` is set. The tags are a list named "Tags"; each has a "Remove …" button.
+- **Keyboard:**
+
+| Key                          | Where           | Action                                     |
+| ---------------------------- | --------------- | ------------------------------------------ |
+| Enter / `,`                  | Field           | Add the typed text (or the active suggestion) |
+| Backspace                    | Empty field     | Remove the last tag                         |
+| Arrow Left                   | Start of field  | Move to the last tag                        |
+| Arrow Left / Right           | Tags            | Move between tags; past the last, back to the field |
+| Delete / Backspace           | Tag             | Remove it                                   |
+| Escape                       | Tags or list    | Back to the field / close the list          |
+
+- **Tab order:** the field is one tab stop; tags are reached with the arrow keys.
+- **Paste:** text with commas or new lines becomes several tags.
+- **Announcements:** "… added" and "… removed" are announced politely.
+- **Touch:** remove buttons have a 44px hit area on touch screens.
+- All built-in text is in `labels`.
+
+## Theming
+
+Tokens: `--cy-tag-input-tag-background` and `--cy-tag-input-tag-radius`. The suggestion list uses Combobox's.
+
+## Related
+
+[Combobox](?path=/docs/components-combobox--docs) · [TextField](?path=/docs/components-textfield--docs) · [Badge](?path=/docs/components-badge--docs)

@@ -1,9 +1,0 @@
-{
-  "name": "@arshad-shah/cynosure-react/back-to-top",
-  "private": true,
-  "type": "module",
-  "main": "../dist/backtotop.js",
-  "module": "../dist/backtotop.js",
-  "types": "../dist/backtotop.d.ts",
-  "sideEffects": ["*.css"]
-}

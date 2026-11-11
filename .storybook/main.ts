@@ -1,42 +1,19 @@
-import type { StorybookConfig } from '@storybook/react-vite';
+import type { StorybookConfig } from "@storybook/react-vite";
+import remarkGfm from "remark-gfm";
 
 const config: StorybookConfig = {
-  framework: { name: '@storybook/react-vite', options: {} },
-  stories: [
-    // Storybook is a pure UI playground — interactive Canvas + Controls only.
-    // There is no Docs tab and no MDX: all long-form documentation lives in
-    // the Astro site under packages/docs (see astro.config.mjs).
-    '../packages/react/**/*.stories.@(ts|tsx)',
-  ],
+  framework: { name: "@storybook/react-vite", options: {} },
+  stories: ["../src/**/*.mdx", "../src/**/*.stories.tsx"],
   addons: [
-    // No `@storybook/addon-docs`: the playground has no Docs/MDX surface.
-    '@storybook/addon-a11y',
-    '@storybook/addon-themes',
-    '@storybook/addon-vitest',
-  ],
-  // react-docgen-typescript powers the argTypes behind the Controls panel.
-  // Enabling literal-value extraction lets CVA-driven unions (`variant`,
-  // `colorScheme`, `size`, …) render as proper dropdowns. The prop filter
-  // excludes node_modules so we don't spam the panel with inherited
-  // React.HTMLAttributes noise.
-  typescript: {
-    reactDocgen: 'react-docgen-typescript',
-    reactDocgenTypescriptOptions: {
-      shouldExtractLiteralValuesFromEnum: true,
-      shouldRemoveUndefinedFromOptional: true,
-      propFilter: (prop) => !prop.parent || !/node_modules/.test(prop.parent.fileName),
+    // GFM (tables, task lists) for the hand-written docs pages; plain MDX renders tables as text.
+    {
+      name: "@storybook/addon-docs",
+      options: { mdxPluginOptions: { mdxCompileOptions: { remarkPlugins: [remarkGfm] } } },
     },
-  },
-  staticDirs: [{ from: '../brand', to: '/brand' }],
-  // When the static Storybook build is meant to be served from a subpath of
-  // the docs site (`cynosure.arshadshah.com/storybook/`), set the env var
-  // `STORYBOOK_BASE_PATH=/storybook/` before running `storybook build`. The
-  // dev server keeps the default `/` base, so local DX is unchanged.
-  async viteFinal(config) {
-    const base = process.env.STORYBOOK_BASE_PATH;
-    if (base) config.base = base;
-    return config;
-  },
+    "@storybook/addon-a11y",
+    "@storybook/addon-vitest",
+  ],
+  core: { disableTelemetry: true },
+  staticDirs: [{ from: "../brand", to: "/brand" }],
 };
-
 export default config;

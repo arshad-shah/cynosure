@@ -1,9 +1,0 @@
-{
-  "name": "@arshad-shah/cynosure-react/drawer",
-  "private": true,
-  "type": "module",
-  "main": "../dist/drawer.js",
-  "module": "../dist/drawer.js",
-  "types": "../dist/drawer.d.ts",
-  "sideEffects": ["*.css"]
-}

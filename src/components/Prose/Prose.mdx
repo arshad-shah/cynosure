@@ -1,0 +1,64 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./Prose.stories";
+
+<Meta of={Stories} />
+
+# Prose
+
+Gives long-form HTML that you do not style element by element (rendered Markdown, release notes, help pages) Cynosure's typography: headings, paragraphs, lists, links, quotes, code, tables and images.
+
+<Canvas of={Stories.HeadingsStepDownInSize} />
+
+## When to use
+
+- **Content from Markdown or a CMS**: plain elements without classes.
+
+**Use something else when:**
+- you write the markup yourself: compose components ([Stack](?path=/docs/components-stack--docs), [Card](?path=/docs/components-card--docs), [DescriptionList](?path=/docs/components-descriptionlist--docs)) instead
+- you need a single line of styled text: it does not need Prose
+
+## Usage
+
+```tsx
+import { Prose } from "@arshad-shah/cynosure";
+
+<Prose as="article">
+  <div dangerouslySetInnerHTML={{ __html: html }} />
+</Prose>
+```
+
+Only render HTML you trust or have sanitised: Prose styles content, it does not clean it.
+
+## Components inside
+
+Cynosure components inside Prose keep exactly their own styles, so MDX or a renderer can mix them in.
+
+<Canvas of={Stories.ComponentsInsideKeepTheirStyles} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+- **Scope:** the rules apply to plain elements and stop at any Cynosure component (CSS `@scope` with a lower boundary).
+- **Host CSS:** rules have the lowest specificity. They beat tag resets such as Tailwind preflight because they are scoped, and your own classes (a syntax highlighter's) still win.
+- **Reading:** lines stop at about 70 characters; headings step down in size from `h1` to `h4`; lists keep their bullets and numbers.
+- **Links:** underlined and in the accent text colour, with a focus ring for keyboard users.
+- **Code:** monospaced; code blocks wrap long lines instead of scrolling, so there is no scroll region that keyboard users cannot reach.
+- **Contrast:** text, links, quotes and code keep 4.5:1 in light and dark modes.
+- **Direction:** list indents and the quote rule follow the text direction.
+
+<Canvas of={Stories.ReadableInLightAndDark} />
+
+## Theming
+
+Tokens: `--cy-prose-measure`, `--cy-prose-flow`, `--cy-prose-link` and `--cy-prose-code-background`.
+
+```ts
+createTheme({ components: { prose: { measure: "60ch", flow: "1.25em" } } });
+```
+
+## Related
+
+[Kbd](?path=/docs/components-kbd--docs) · [CopyButton](?path=/docs/components-copybutton--docs) · [Link](?path=/docs/components-link--docs)

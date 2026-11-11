@@ -1,9 +1,0 @@
-{
-  "name": "@arshad-shah/cynosure-react/alert",
-  "private": true,
-  "type": "module",
-  "main": "../dist/alert.js",
-  "module": "../dist/alert.js",
-  "types": "../dist/alert.d.ts",
-  "sideEffects": ["*.css"]
-}

@@ -1,0 +1,204 @@
+/*
+ * steps: an ordered list. Each item holds the step (a span, or a ButtonBase when steps can be chosen) and a line to the
+ * next step, drawn absolutely from the marker: across to the next item when horizontal, down when vertical.
+ */
+.cy-steps.cy-steps {
+  --_m: var(--cy-steps-marker-size, calc(2 * var(--cy-font-size-md)));
+  --_lw: var(--cy-steps-line-width, calc(2 * var(--cy-border-width)));
+  --_gap: var(--cy-steps-gap, var(--cy-space-4));
+  --_hit: var(--cy-hit-min, 24px);
+  box-sizing: border-box !important;
+  display: flex;
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--cy-color-ink);
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-font-size-md);
+  font-weight: var(--cy-font-weight-regular);
+  line-height: var(--cy-font-line-height);
+  letter-spacing: normal;
+  text-transform: none;
+  &[data-size="sm"] {
+    --_m: var(--cy-steps-marker-size, calc(2 * var(--cy-font-size-sm)));
+    font-size: var(--cy-font-size-sm);
+  }
+  &[data-size="lg"] {
+    --_m: var(--cy-steps-marker-size, calc(2 * var(--cy-font-size-lg)));
+    font-size: var(--cy-font-size-lg);
+  }
+  &[data-orientation="vertical"] {
+    flex-direction: column;
+  }
+}
+.cy-steps-item.cy-steps-item {
+  position: relative;
+  display: block;
+  flex: 1 1 0;
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+  font-size: inherit;
+  [data-orientation="vertical"] > & {
+    flex: none;
+    padding-block-end: calc(3 * var(--_gap));
+    &:last-child {
+      padding-block-end: 0;
+    }
+  }
+}
+.cy-steps-step.cy-steps-step {
+  box-sizing: border-box !important;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--cy-space-3);
+  max-inline-size: calc(100% - var(--_gap));
+  min-block-size: var(--_hit);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--cy-radius-sm);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  letter-spacing: normal;
+  text-align: start;
+  text-transform: none;
+  [data-orientation="vertical"] > .cy-steps-item > & {
+    flex-direction: row;
+    gap: var(--cy-space-5);
+    max-inline-size: 100%;
+  }
+}
+button.cy-steps-step.cy-steps-step {
+  min-inline-size: var(--_hit);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  &:hover:not([aria-disabled="true"], [aria-current="step"]) .cy-steps-label {
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+  &:focus-visible {
+    outline: var(--cy-border-focus) solid var(--cy-color-ring);
+    outline-offset: var(--cy-space-2);
+  }
+  &[aria-disabled="true"] {
+    cursor: not-allowed;
+  }
+  &[aria-current="step"] {
+    cursor: default;
+  }
+}
+.cy-steps-marker.cy-steps-marker {
+  box-sizing: border-box !important;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  inline-size: var(--_m);
+  block-size: var(--_m);
+  border: var(--_lw) solid var(--cy-color-muted);
+  border-radius: var(--cy-radius-full);
+  background: var(--cy-color-surface);
+  color: var(--cy-color-muted);
+  font-size: 0.9em;
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--cy-font-weight-medium);
+  line-height: 1;
+  [data-status="current"] > .cy-steps-step > & {
+    border-color: var(--cy-color-accent-text);
+    color: var(--cy-color-accent-text);
+  }
+  [data-status="complete"] > .cy-steps-step > & {
+    border-color: var(--cy-color-accent);
+    background: var(--cy-color-accent);
+    color: var(--cy-color-on-accent);
+  }
+  [data-status="error"] > .cy-steps-step > & {
+    border-color: var(--cy-color-danger);
+    background: var(--cy-color-danger);
+    color: var(--cy-color-on-danger);
+  }
+}
+.cy-steps-text.cy-steps-text {
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 0;
+  font-size: inherit;
+  overflow-wrap: anywhere;
+  [data-orientation="vertical"] .cy-steps-step > & {
+    padding-block-start: calc((var(--_m) - var(--cy-font-line-height) * 1em) / 2);
+  }
+}
+.cy-steps-label.cy-steps-label {
+  color: var(--cy-color-ink);
+  font-size: inherit;
+  font-weight: var(--cy-font-weight-medium);
+  [data-status="upcoming"] > .cy-steps-step & {
+    color: var(--cy-color-muted);
+  }
+  [data-status="error"] > .cy-steps-step & {
+    color: var(--cy-color-danger-text);
+  }
+}
+.cy-steps-description.cy-steps-description {
+  color: var(--cy-color-muted);
+  font-size: var(--cy-font-size-sm);
+}
+.cy-steps-hidden.cy-steps-hidden {
+  position: absolute !important;
+  inline-size: var(--cy-border-width);
+  block-size: var(--cy-border-width);
+  margin: calc(var(--cy-border-width) * -1);
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+  font-size: inherit;
+}
+.cy-steps-line.cy-steps-line {
+  position: absolute;
+  inset-block-start: calc((var(--_m) - var(--_lw)) / 2);
+  inset-inline: calc(var(--_m) + var(--_gap)) var(--_gap);
+  block-size: var(--_lw);
+  border-radius: var(--cy-radius-full);
+  background: var(--cy-color-line);
+  font-size: inherit;
+  [data-status="complete"] > & {
+    background: var(--cy-color-accent);
+  }
+  [data-orientation="vertical"] > .cy-steps-item > & {
+    inset-block: calc(var(--_m) + var(--cy-space-2)) var(--cy-space-2);
+    inset-inline: calc((var(--_m) - var(--_lw)) / 2) auto;
+    inline-size: var(--_lw);
+    block-size: auto;
+  }
+}
+@media (pointer: coarse) {
+  .cy-steps.cy-steps {
+    --_hit: var(--cy-hit-coarse, 44px);
+  }
+}
+@media (forced-colors: active) {
+  .cy-steps-marker.cy-steps-marker,
+  .cy-steps-line.cy-steps-line {
+    forced-color-adjust: none;
+    border-color: CanvasText;
+    color: CanvasText;
+  }
+  .cy-steps-line.cy-steps-line {
+    background: CanvasText;
+  }
+  [data-status="complete"] > .cy-steps-step > .cy-steps-marker.cy-steps-marker {
+    background: Highlight;
+    color: HighlightText;
+  }
+  button.cy-steps-step.cy-steps-step:focus-visible {
+    outline-color: Highlight;
+  }
+}

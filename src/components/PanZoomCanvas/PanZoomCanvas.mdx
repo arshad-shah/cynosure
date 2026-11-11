@@ -1,0 +1,62 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./PanZoomCanvas.stories";
+
+<Meta of={Stories} />
+
+# PanZoomCanvas
+
+A surface to pan and zoom freely, for diagrams, maps and boards; your content, placed in canvas units.
+
+<Canvas of={Stories.FitsItsContent} />
+
+## When to use
+
+- **Free two-dimensional content** bigger than the screen: diagrams, schemas, mind maps, boards.
+
+**Use something else when:**
+- the content is pages one under another: [DocumentViewport](?path=/docs/components-documentviewport--docs)
+- it is a long list: [VirtualList](?path=/docs/components-virtuallist--docs)
+
+## Usage
+
+```tsx
+<PanZoomCanvas ref={canvas} label="Schema" bounds={bounds} minimap renderMinimap={() => <Dots />}>
+  {nodes.map((n) => <Node key={n.id} style={{ position: "absolute", left: n.x, top: n.y }} />)}
+</PanZoomCanvas>
+```
+
+Place children absolutely in canvas units. Give `bounds` (the content's extent) to fit it on first show, for Shift+1 and `fit()`, and for the minimap. The ref has `fit`, `zoomTo` and `centreOn` for your own buttons; pair it with [ZoomControls](?path=/docs/components-zoomcontrols--docs) for a zoom toolbar.
+
+## Painting into a canvas
+
+An engine that draws the whole scene into a `<canvas>` (a large graph, a map) uses `renderScreen`. It gets `{ view, width, height }` on every view change and draws in screen pixels; a canvas point (x, y) is at (x times scale plus view.x, y times scale plus view.y). The layer sits under any children and does not take the pointer, so pressing it pans. Render your own component from it (`renderScreen={(s) => <Scene {...s} />}`) so its hooks belong to it.
+
+<Canvas of={Stories.PaintedIntoACanvas} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+- **Role:** a named region and tab stop. Zoom changes are announced ("Zoom 125%").
+- **Pointer:** drag the empty background, or hold Space and drag anywhere, to pan; the wheel pans; Ctrl/Cmd+wheel zooms around the pointer. Presses on your content are left to it.
+- **Touch:** one finger pans; two fingers pinch-zoom around their midpoint.
+
+| Key | Does |
+| --- | --- |
+| Arrows (Shift: further) | Pan |
+| Ctrl/Cmd + = / - | Zoom in / out a step |
+| Ctrl/Cmd + 0 | 100% |
+| Shift + 1 | Fit the content |
+| Space (held) + drag | Pan |
+
+<Canvas of={Stories.TheMinimapMovesTheView} />
+
+## Theming
+
+Tokens: `--cy-pan-zoom-canvas-background` and `--cy-pan-zoom-canvas-minimap-width`.
+
+## Related
+
+[DocumentViewport](?path=/docs/components-documentviewport--docs) · [ZoomControls](?path=/docs/components-zoomcontrols--docs) · [SelectionFrame](?path=/docs/components-selectionframe--docs)

@@ -1,9 +1,0 @@
-{
-  "name": "@arshad-shah/cynosure-react/heading",
-  "private": true,
-  "type": "module",
-  "main": "../dist/heading.js",
-  "module": "../dist/heading.js",
-  "types": "../dist/heading.d.ts",
-  "sideEffects": ["*.css"]
-}

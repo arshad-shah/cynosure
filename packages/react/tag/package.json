@@ -1,9 +1,0 @@
-{
-  "name": "@arshad-shah/cynosure-react/tag",
-  "private": true,
-  "type": "module",
-  "main": "../dist/tag.js",
-  "module": "../dist/tag.js",
-  "types": "../dist/tag.d.ts",
-  "sideEffects": ["*.css"]
-}

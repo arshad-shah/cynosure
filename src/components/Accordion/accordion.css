@@ -1,0 +1,16 @@
+.cy-accordion.cy-accordion {
+  box-sizing: border-box !important;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+  font-size: var(--cy-font-size-md);
+  line-height: var(--cy-font-line-height);
+  &[data-variant="line"] {
+    border-block-start: var(--cy-border-width) solid var(--cy-color-line);
+  }
+  &[data-variant="card"] {
+    gap: var(--cy-accordion-gap, var(--cy-space-3));
+  }
+}

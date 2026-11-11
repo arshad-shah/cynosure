@@ -1,0 +1,37 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+
+<Meta title="Introduction" />
+
+# Cynosure
+
+One small, themeable, accessible UI system for every product. Same feel and layout everywhere; each product changes its accent, its scale, and any token it needs.
+
+```bash
+pnpm add @arshad-shah/cynosure
+```
+
+```tsx
+import "@arshad-shah/cynosure/styles.css";
+import { CynosureTheme, createTheme, Button } from "@arshad-shah/cynosure";
+
+const theme = createTheme({ accent: "#e8462e", scale: "compact" });
+
+<CynosureTheme theme={theme} mode="system">
+  <Button variant="solid" tone="accent">Export</Button>
+</CynosureTheme>;
+```
+
+**What is here:**
+
+- **Foundations:** the only modules with native elements (ButtonBase, LinkBase, InputBase, TextAreaBase, ChoiceBase, HiddenValue, DialogBase, Icon).
+- **Controls:** Button, IconButton, CopyButton, Link, TextField, NumberField, SearchField, TextArea, Select, Combobox, TagInput, Checkbox, Switch, RadioGroup, SegmentedControl, Slider, ColorField, ColorSwatches, FileDrop, SignaturePad, SelectionFrame, ThemeToggle. Every form control works in native forms (FormData, reset, required).
+- **Structure:** AppShell, Stack, Inline, Grid, SideNav, SplitPane, Card, Toolbar, Tabs, Disclosure, Accordion, Tree, SortableList.
+- **Overlays:** Tooltip, Popover, FloatingToolbar (`DockedToolbar`), Menu, ContextMenu, Dialog, Sheet, CommandPalette and Toast, all in the browser top layer, sharing one Escape and outside-click stack.
+- **Feedback and display:** Notice, EmptyState, ProgressBar, Steps, LoadingDots, Skeleton, DescriptionList, Table, Prose, CodeBlock, Announcer (`useAnnounce`), Badge, Kbd, Field.
+
+**Use the toolbar** to switch mode, contrast, scale and product accent on every story, and to render under a **hostile host** stylesheet (Tailwind preflight plus aggressive globals). Cynosure must look identical either way.
+
+- Works on a page, inside a shadow root (`@arshad-shah/cynosure/styles.inline`), and in extension popups.
+- No runtime dependencies, no CSS-in-JS, no writes to `<html>`, `<head>` or `<body>`.
+- Icons: 240 Facet stroke icons in 16 categories, drawn on the Cynosure grid with softened squares and built-in micro-animations; 97 official brand marks; and `iconToSvg` for pages without React.
+- One prop vocabulary everywhere: `size`, `tone`, `variant`, `color`, plus behaviour props. Every story has controls for all of them.

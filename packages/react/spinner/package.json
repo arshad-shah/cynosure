@@ -1,9 +1,0 @@
-{
-  "name": "@arshad-shah/cynosure-react/spinner",
-  "private": true,
-  "type": "module",
-  "main": "../dist/spinner.js",
-  "module": "../dist/spinner.js",
-  "types": "../dist/spinner.d.ts",
-  "sideEffects": ["*.css"]
-}

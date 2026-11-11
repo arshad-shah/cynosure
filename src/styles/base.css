@@ -1,0 +1,55 @@
+/*
+ * Cynosure base: mode switching, the theme wrapper, and the component-local reset.
+ * Everything is scoped to Cynosure classes or attributes; host elements are never touched.
+ */
+:where([data-cy-mode="light"]) {
+  color-scheme: light;
+}
+:where([data-cy-mode="dark"]) {
+  color-scheme: dark;
+}
+:where([data-cy-mode="system"]) {
+  color-scheme: light dark;
+}
+/* The outermost theme wrapper follows the OS by default. Cynosure never sets color-scheme on the host <html>. */
+:where(.cy-theme:not(.cy-theme *)):not([data-cy-mode]) {
+  color-scheme: light dark;
+}
+
+.cy-theme {
+  display: contents;
+  color: var(--cy-color-ink);
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-font-size-md);
+  line-height: var(--cy-font-line-height);
+}
+
+/*
+ * Inner-element reset for parts that set none of these properties themselves (icons, label spans). A part that sets its own font or colour declares the reset properties instead of carrying .cy-reset.
+ * Never put .cy-reset on a component root; roots declare these properties themselves, so rule order never matters.
+ */
+.cy-reset,
+.cy-reset::before,
+.cy-reset::after {
+  /* !important only here: hosts commonly force box-sizing with !important on * */
+  box-sizing: border-box !important;
+  margin: 0;
+  font: inherit;
+  color: inherit;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :where([class*="cy-"]),
+  :where([class*="cy-"])::before,
+  :where([class*="cy-"])::after,
+  .cy-reset,
+  .cy-reset *,
+  .cy-reset::before,
+  .cy-reset::after {
+    animation-duration: 0s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0s !important;
+  }
+}

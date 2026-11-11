@@ -1,0 +1,89 @@
+/*
+ * skeleton: grey "bones" in the shape of loading content. A text skeleton takes the same height as the text it stands
+ * in for: each bone is 0.8em tall and the gaps fill the rest of the line height. A highlight sweeps along the inline
+ * direction while loading; it stops under reduced motion.
+ */
+.cy-skeleton.cy-skeleton {
+  --_lh: var(--cy-font-line-height);
+  --_bone: 0.8em;
+  box-sizing: border-box !important;
+  display: grid;
+  gap: calc(var(--_lh) * 1em - var(--_bone));
+  inline-size: var(--_w, 100%);
+  max-inline-size: 100%;
+  margin: 0;
+  padding-block: calc((var(--_lh) * 1em - var(--_bone)) / 2);
+  padding-inline: 0;
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-font-size-md);
+  line-height: var(--_lh);
+  letter-spacing: normal;
+  text-transform: none;
+  vertical-align: middle;
+  pointer-events: none;
+  user-select: none;
+  &[data-size="sm"] {
+    font-size: var(--cy-font-size-sm);
+  }
+  &[data-size="lg"] {
+    font-size: var(--cy-font-size-lg);
+  }
+  &[data-shape="block"] {
+    --_bone: var(--_h, calc(var(--_lh) * 1em));
+    padding-block: 0;
+  }
+  &[data-shape="circle"] {
+    --_bone: var(--_h, calc(var(--_lh) * 2em));
+    inline-size: var(--_w, var(--_bone));
+    padding-block: 0;
+  }
+}
+.cy-skeleton-bone.cy-skeleton-bone {
+  display: block;
+  block-size: var(--_bone);
+  border-radius: var(--cy-skeleton-radius, var(--cy-radius-sm));
+  background:
+    linear-gradient(
+      90deg,
+      transparent 30%,
+      var(--cy-skeleton-highlight, color-mix(in oklab, var(--cy-color-surface-raised) 70%, transparent)) 50%,
+      transparent 70%
+    )
+    0 0 / 300% 100% no-repeat,
+    var(--cy-skeleton-color, color-mix(in oklab, var(--cy-color-ink) 12%, transparent));
+  font-size: inherit;
+  animation: cy-skeleton-sweep calc(4 * var(--cy-motion-slow)) linear infinite;
+}
+/* A paragraph's last line is shorter. */
+.cy-skeleton[data-shape="text"] .cy-skeleton-bone.cy-skeleton-bone:last-child:not(:first-child) {
+  inline-size: 60%;
+}
+.cy-skeleton[data-shape="circle"] .cy-skeleton-bone.cy-skeleton-bone {
+  border-radius: var(--cy-radius-full);
+}
+.cy-skeleton:dir(rtl) .cy-skeleton-bone.cy-skeleton-bone {
+  animation-direction: reverse;
+}
+@keyframes cy-skeleton-sweep {
+  from {
+    background-position:
+      100% 0,
+      0 0;
+  }
+  to {
+    background-position:
+      0 0,
+      0 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cy-skeleton-bone.cy-skeleton-bone {
+    animation: none;
+  }
+}
+@media (forced-colors: active) {
+  .cy-skeleton-bone.cy-skeleton-bone {
+    forced-color-adjust: none;
+    background: GrayText;
+  }
+}

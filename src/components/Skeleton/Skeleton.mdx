@@ -1,0 +1,63 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./Skeleton.stories";
+
+<Meta of={Stories} />
+
+# Skeleton
+
+A placeholder in the shape of content that is still loading: lines of text, a block or an avatar circle. It holds the space the content will take, so the layout does not jump when it arrives.
+
+<Canvas of={Stories.HiddenFromAssistiveTechnology} />
+
+## When to use
+
+- **Content with a known shape is loading**: a list, a card, a profile, a table of results.
+
+**Use something else when:**
+- the wait is inside a button: the Button's `loading` state
+- a small inline busy indicator is enough: [LoadingDots](?path=/docs/components-loadingdots--docs)
+- the task has a measurable amount: [ProgressBar](?path=/docs/components-progressbar--docs)
+
+## Usage
+
+```tsx
+import { Skeleton } from "@arshad-shah/cynosure";
+
+<section aria-label="Profile" aria-busy={loading}>
+  {loading ? <Skeleton lines={3} /> : <Profile user={user} />}
+</section>
+```
+
+<Canvas of={Stories.ReplacedWhenLoaded} />
+
+## Shapes
+
+`text` draws `lines` lines the height of text at `size`; the last of several is shorter. `block` draws a box (one line tall unless you pass `height`), and `circle` an avatar (two lines across unless you pass `height`). `width` and `height` take any CSS length.
+
+<Canvas of={Stories.ShapesAndSizes} />
+
+<Canvas of={Stories.TextTakesTheHeightOfItsText} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+- **Hidden:** the skeleton is `aria-hidden` and has no text or focus stops. Put `aria-busy="true"` on the region that owns it while it loads, and say in the page if loading fails.
+- **No layout shift:** a text skeleton is exactly as tall as the text it stands in for at the same `size`.
+- **Motion:** a highlight sweeps along the reading direction (right to left in right-to-left text). It stops under reduced motion, and in a theme made with `createTheme({ motion: "reduced" })`.
+- **Forced colours:** the bones draw in the system's grey text colour.
+- **Touch:** nothing to touch; pointer events pass through.
+
+## Theming
+
+Tokens: `--cy-skeleton-color`, `--cy-skeleton-highlight` and `--cy-skeleton-radius`.
+
+```ts
+createTheme({ components: { skeleton: { radius: "2px" } } });
+```
+
+## Related
+
+[LoadingDots](?path=/docs/components-loadingdots--docs) · [ProgressBar](?path=/docs/components-progressbar--docs) · [EmptyState](?path=/docs/components-emptystate--docs)

@@ -1,0 +1,44 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./Kbd.stories";
+
+<Meta of={Stories} />
+
+# Kbd
+
+A keyboard shortcut shown as drawn key caps. Screen readers get a spoken combination instead ("Control plus K").
+
+<Canvas of={Stories.ReadsAsAKeyCombination} />
+
+## Usage
+
+```tsx
+import { Kbd } from "@arshad-shah/cynosure";
+
+<Kbd keys={["Ctrl", "K"]} />
+<Kbd keys={["Cmd", "Shift", "P"]} size="sm" />
+<Kbd keys={["⌘", "K"]} label="Command K" />
+```
+
+`keys` lists the keys in order. Keys are joined by a drawn separator, not a "+" character. `size` is `sm`, `md` (default) or `lg`.
+
+## Spoken text
+
+Common names are spoken in full: Ctrl as Control, Cmd as Command, Esc as Escape, and so on. For symbols or unusual keys, set `label` to say what you mean.
+
+<Canvas of={Stories.SpeaksSymbolNames} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Theming
+
+Tokens: `--cy-kbd-radius`, `--cy-kbd-bg` and `--cy-kbd-border`.
+
+```ts
+createTheme({ components: { kbd: { radius: "6px" } } });
+```
+
+## Related
+
+[Button](?path=/docs/components-button--docs) · [Tooltip](?path=/docs/components-tooltip--docs)

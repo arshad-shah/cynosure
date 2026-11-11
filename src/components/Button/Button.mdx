@@ -1,0 +1,86 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./Button.stories";
+
+<Meta of={Stories} />
+
+# Button
+
+Triggers an action: save, export, delete, open. One Button is one action. If clicking it takes the user somewhere, use [Link](?path=/docs/components-link--docs) instead.
+
+<Canvas of={Stories.VariantsAndTones} />
+
+## When to use
+
+- **`solid` + `accent`:** the one main action in a view (Save, Create). Aim for at most one per screen region.
+- **`outline` + `neutral` (default):** secondary actions next to it (Cancel, Back).
+- **`soft`:** supporting actions that should still read as buttons in dense UI (toolbars, cards).
+- **`ghost`:** low-emphasis actions in already busy chrome (table rows, panel headers).
+- **`tone="danger"`:** destructive actions. Pair with a confirmation when the action cannot be undone.
+
+**Use something else when:**
+- the button has an icon and no visible text: [IconButton](?path=/docs/components-iconbutton--docs), which requires a label and shows it as a tooltip
+- it navigates: [Link](?path=/docs/components-link--docs)
+- it picks one of a few options: [SegmentedControl](?path=/docs/components-segmentedcontrol--docs)
+- it turns a setting on or off: [Switch](?path=/docs/components-switch--docs)
+
+## Usage
+
+```tsx
+import { Button } from "@arshad-shah/cynosure";
+import { download, trash } from "@arshad-shah/cynosure/icons";
+
+<Button variant="solid" tone="accent" icon={download} onClick={save}>Export</Button>
+<Button>Cancel</Button>
+<Button variant="soft" tone="danger" icon={trash}>Delete</Button>
+<Button loading={saving}>Save</Button>
+<Button type="submit">Send</Button>
+```
+
+## Sizes and icons
+
+`sm`, `md` and `lg` match TextField, Select and SearchField heights, so mixed rows line up. Icons sit at the start or end edge and flip in right-to-left layouts.
+
+<Canvas of={Stories.Sizes} />
+<Canvas of={Stories.WithIcons} />
+
+## States
+
+- **Loading:** shows [LoadingDots](?path=/docs/components-loadingdots--docs), sets `aria-busy` and ignores clicks. It keeps its width, so the layout doesn't jump.
+- **Pressed:** `pressed` makes it a toggle button (`aria-pressed`).
+- **Disabled:** dims the button and blocks activation. Prefer explaining why an action is unavailable over silently disabling it.
+
+<Canvas of={Stories.Loading} />
+<Canvas of={Stories.Pressed} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+| Input | Result |
+| --- | --- |
+| Click, tap, <kbd>Enter</kbd>, <kbd>Space</kbd> | Activates (not while `loading` or `disabled`) |
+| <kbd>Tab</kbd> | Focus with a visible ring, also in forced-colors mode |
+
+- **Forms:** `type` defaults to `button`, so it never submits a form by accident. Pass `type="submit"` to submit.
+- **Contrast:** every variant and tone keeps text at 4.5:1 or better in light, dark and high-contrast themes (tested).
+- **Long labels:** truncate with an ellipsis instead of wrapping.
+
+## Touch
+
+The hit area is at least 24px, growing to 44px on coarse pointers (phones and tablets) without changing the visible size.
+
+## Theming
+
+Tokens: `--cy-button-height-{sm,md,lg}`, `--cy-button-radius`, `--cy-button-padding-inline`, `--cy-button-gap`, `--cy-button-font-weight`, `--cy-button-max-width`, `--cy-button-solid-shadow`, `--cy-button-soft-mix`, `--cy-button-outline-mix` and `--cy-button-press-scale`.
+
+```ts
+createTheme({ accent: "#2563eb", components: { button: { radius: "999px", fontWeight: "600" } } });
+```
+
+`className` and `style` are for layout only (margin, placement). Change the look through tokens so every product stays consistent.
+
+## Related
+
+[IconButton](?path=/docs/components-iconbutton--docs) · [LoadingDots](?path=/docs/components-loadingdots--docs) · [Link](?path=/docs/components-link--docs) · [Toolbar](?path=/docs/components-toolbar--docs)

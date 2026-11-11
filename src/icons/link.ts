@@ -1,0 +1,16 @@
+import type { IconData } from "./types.js";
+
+export const link: IconData = {
+  name: "link",
+  category: "actions",
+  body: [
+    [
+      "path",
+      {
+        d: "M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1",
+        animate: true,
+      },
+    ],
+  ],
+  motion: "tilt",
+};

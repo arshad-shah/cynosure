@@ -1,0 +1,70 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./Field.stories";
+
+<Meta of={Stories} />
+
+# Field
+
+Adds a label, help text and an error message to any control and wires them together for assistive tech. Your control is rendered through a render prop that receives the ids and state. Checkbox and Switch carry their own label, so they don't need Field.
+
+<Canvas of={Stories.LabelAndDescription} />
+
+## When to use
+
+- Around a text input, select or any custom control that needs a visible label.
+- To show validation errors consistently.
+- With `group` to label a set of controls such as a radio group.
+
+**Use something else when:**
+- the control brings its own label: [Checkbox](?path=/docs/components-checkbox--docs)
+- the component already includes a Field, such as [TextField](?path=/docs/components-textfield--docs)
+
+## Usage
+
+```tsx
+import { Field, InputBase } from "@arshad-shah/cynosure";
+
+<Field label="Email" description="We never share it." error={error} required>
+  {(f) => <InputBase id={f.id} aria-describedby={f.describedBy} invalid={f.invalid} required />}
+</Field>
+```
+
+The render prop gives you `id`, `describedBy` and `invalid`. Pass them to the control.
+
+## Errors and required
+
+`error` is shown below the control, announced with `role="alert"`, linked to the control and marks it invalid. `required` draws the marker as a shape, not a typed asterisk; also pass `required` to the control itself.
+
+<Canvas of={Stories.ErrorAnnouncesAndMarksInvalid} />
+<Canvas of={Stories.RequiredMarkerIsDrawnNotTyped} />
+
+## Groups
+
+With `group`, Field renders a `fieldset` and the label names the whole group instead of one control.
+
+<Canvas of={Stories.GroupLabelsAGroup} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+- **Label:** a `label` linked to the control, or the group label when `group` is set.
+- **Hidden label:** `labelHidden` keeps the label for assistive tech but takes no space. Prefer visible labels.
+- **Description and error:** linked through `aria-describedby`. The error also announces itself.
+- **Size:** `sm`, `md` (default) or `lg`.
+
+## Theming
+
+Tokens: `--cy-field-gap`, `--cy-field-label-weight`, `--cy-field-label-color`, `--cy-field-description-color`, `--cy-field-error-color` and `--cy-field-required-color`.
+
+```ts
+createTheme({ components: { field: { gap: "8px", labelWeight: "600" } } });
+```
+
+`className` and `style` are for layout only.
+
+## Related
+
+[TextField](?path=/docs/components-textfield--docs) · [Checkbox](?path=/docs/components-checkbox--docs) · [Stack](?path=/docs/components-stack--docs)

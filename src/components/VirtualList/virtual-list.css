@@ -1,0 +1,139 @@
+/*
+ * virtual-list: the list scrolls; a spacer gives the full height and the rendered rows are placed by their offset.
+ * Rows share one height, set here (so a touch screen's taller hit area still lines up).
+ */
+.cy-virtual-list.cy-virtual-list {
+  --_row: var(--cy-virtual-list-row-height, var(--cy-control-height-md));
+  --_hit: var(--cy-hit-min, 24px);
+  position: relative;
+  display: block;
+  box-sizing: border-box !important;
+  block-size: var(--cy-virtual-list-height, calc(10 * var(--cy-control-height-md)));
+  margin: 0;
+  padding: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  border: var(--cy-border-width) solid var(--cy-color-line);
+  border-radius: var(--cy-radius-md);
+  background: var(--cy-color-surface);
+  color: var(--cy-color-ink);
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-font-size-md);
+  font-weight: var(--cy-font-weight-regular);
+  line-height: var(--cy-font-line-height);
+  letter-spacing: normal;
+  text-transform: none;
+  outline: none;
+  &[data-size="sm"] {
+    --_row: var(--cy-virtual-list-row-height, var(--cy-control-height-sm));
+    font-size: var(--cy-font-size-sm);
+  }
+}
+@media (pointer: coarse) {
+  .cy-virtual-list.cy-virtual-list {
+    --_hit: var(--cy-hit-coarse, 44px);
+  }
+}
+.cy-virtual-list-space.cy-virtual-list-space {
+  pointer-events: none;
+}
+.cy-virtual-list-row.cy-virtual-list-row {
+  position: absolute;
+  inset-inline: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--cy-space-3);
+  box-sizing: border-box;
+  block-size: max(var(--_row), var(--_hit));
+  padding-inline: var(--cy-space-4);
+  overflow: hidden;
+  color: var(--cy-color-ink);
+  white-space: nowrap;
+  cursor: pointer;
+  outline: none;
+  user-select: none;
+  &:hover {
+    background: var(--cy-color-soft);
+  }
+  &[aria-selected="true"] {
+    background: var(
+      --cy-virtual-list-selected-background,
+      color-mix(in oklab, var(--cy-color-accent) 14%, var(--cy-color-surface))
+    );
+    color: var(--cy-color-accent-text);
+  }
+  &:focus-visible {
+    box-shadow: inset 0 0 0 var(--cy-border-focus) var(--cy-color-ring);
+  }
+  &[aria-disabled="true"] {
+    color: var(--cy-color-muted);
+    cursor: not-allowed;
+    &:hover {
+      background: transparent;
+    }
+  }
+}
+/* wrap: rows take the height their text needs (each is measured). */
+.cy-virtual-list.cy-virtual-list[data-wrap] .cy-virtual-list-row {
+  align-items: flex-start;
+  block-size: auto;
+  min-block-size: max(var(--_row), var(--_hit));
+  padding-block: var(--cy-space-2);
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+/* Section headings, and the copy of the current one pinned to the top (it takes no space in the flow). */
+.cy-virtual-list-row.cy-virtual-list-row[data-header],
+.cy-virtual-list-pinned.cy-virtual-list-pinned {
+  color: var(--cy-color-muted);
+  font-size: var(--cy-font-size-sm);
+  font-weight: var(--cy-font-weight-medium);
+  cursor: default;
+  &:hover {
+    background: transparent;
+  }
+}
+.cy-virtual-list-pinned.cy-virtual-list-pinned {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: var(--cy-space-3);
+  box-sizing: border-box;
+  block-size: max(var(--_row), var(--_hit));
+  margin-block-end: calc(-1 * max(var(--_row), var(--_hit)));
+  padding-inline: var(--cy-space-4);
+  overflow: hidden;
+  border-block-end: var(--cy-border-width) solid var(--cy-color-line);
+  background: var(--cy-color-surface);
+  white-space: nowrap;
+  pointer-events: none;
+}
+.cy-virtual-list-empty.cy-virtual-list-empty {
+  display: grid;
+  place-items: center;
+  block-size: 100%;
+  padding: var(--cy-space-6);
+  color: var(--cy-color-muted);
+}
+@media (forced-colors: active) {
+  .cy-virtual-list-row.cy-virtual-list-row[aria-selected="true"] {
+    outline: var(--cy-border-width) solid Highlight;
+    outline-offset: calc(-1 * var(--cy-border-width));
+  }
+}
+/* Reordering: the rows being dragged fade; a line shows where they will land. */
+.cy-virtual-list-row.cy-virtual-list-row[data-moving] {
+  opacity: 0.5;
+}
+.cy-virtual-list-drop.cy-virtual-list-drop {
+  position: absolute;
+  inset-inline: var(--cy-space-2);
+  z-index: 1;
+  block-size: var(--cy-border-focus);
+  margin-block-start: calc(var(--cy-border-focus) / -2);
+  border-radius: var(--cy-border-focus);
+  background: var(--cy-color-accent);
+  pointer-events: none;
+}

@@ -1,0 +1,52 @@
+/*
+ * signature-pad: a bordered box with a guide line to sign on, holding a canvas that fills it. The canvas's `color` is
+ * the ink (read when painting), so the ink token follows light and dark modes.
+ */
+.cy-signature-pad.cy-signature-pad {
+  box-sizing: border-box !important;
+  position: relative;
+  display: block;
+  inline-size: 100%;
+  block-size: var(--cy-signature-pad-height, calc(10 * var(--cy-space-6)));
+  margin: 0;
+  padding: 0;
+  border: var(--cy-border-width) solid var(--cy-color-line);
+  border-radius: var(--cy-radius-card);
+  background: var(--cy-signature-pad-background, var(--cy-color-surface));
+  overflow: hidden;
+  font-size: var(--cy-font-size-md);
+  letter-spacing: normal;
+  text-transform: none;
+  &::after {
+    content: "";
+    position: absolute;
+    inset-inline: var(--cy-space-8);
+    inset-block-end: 28%;
+    border-block-end: var(--cy-border-width) dashed var(--cy-signature-pad-guide, var(--cy-color-muted));
+    pointer-events: none;
+  }
+  &[data-disabled] {
+    background: var(--cy-color-soft);
+  }
+}
+.cy-signature-pad-canvas.cy-signature-pad-canvas {
+  position: relative;
+  z-index: 1;
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  color: var(--cy-signature-pad-ink, var(--cy-color-ink));
+  font-size: inherit;
+  cursor: crosshair;
+  touch-action: none;
+  user-select: none;
+  [data-disabled] > & {
+    cursor: not-allowed;
+  }
+}
+@media (forced-colors: active) {
+  .cy-signature-pad-canvas.cy-signature-pad-canvas {
+    forced-color-adjust: none;
+    color: CanvasText;
+  }
+}

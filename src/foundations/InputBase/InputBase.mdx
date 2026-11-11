@@ -1,0 +1,44 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./InputBase.stories";
+
+<Meta of={Stories} />
+
+# InputBase
+
+The native text-like `<input>` for Cynosure, and the only module allowed to render one. It is a foundation: no visual opinions, so composites style it.
+
+## Who uses it
+
+[TextField](?path=/docs/components-textfield--docs) and [SearchField](?path=/docs/components-searchfield--docs). [Field](?path=/docs/components-field--docs) also pairs with it in its stories.
+
+## When to use it directly
+
+Only when building a new text-entry composite that needs a native input.
+
+**Use a component instead when** you want a text box: [TextField](?path=/docs/components-textfield--docs) for general text, [SearchField](?path=/docs/components-searchfield--docs) for search, [TextArea](?path=/docs/components-textarea--docs) for multi-line.
+
+<Canvas of={Stories.MapsInvalidToAria} />
+
+## Usage
+
+```tsx
+import { InputBase } from "@arshad-shah/cynosure";
+
+<InputBase className="my-input" name="email" invalid={hasError} />
+```
+
+## Props
+
+It accepts every native input attribute, plus `invalid`.
+
+<ArgTypes of={Stories} />
+
+## Guarantees
+
+- `invalid` maps to `aria-invalid`; when it is not set, the attribute is omitted.
+- The ref reaches the native `<input>`.
+- No styling: composites add their own classes.
+
+## Related
+
+[TextField](?path=/docs/components-textfield--docs) · [SearchField](?path=/docs/components-searchfield--docs) · [TextAreaBase](?path=/docs/foundations-textareabase--docs)

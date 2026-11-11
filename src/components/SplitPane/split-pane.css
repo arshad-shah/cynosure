@@ -1,0 +1,98 @@
+/*
+ * split-pane: a three-track grid (start pane, divider, end pane). The divider is a thin line with a wide invisible
+ * hit area (::before) centred on it; the accent shows while it is focused or dragged.
+ */
+.cy-split-pane.cy-split-pane {
+  --_d: var(--cy-split-pane-divider-size, var(--cy-border-width));
+  --_hit: var(--cy-hit-min, 24px);
+  box-sizing: border-box !important;
+  display: grid;
+  grid-template-columns: minmax(0, calc(var(--_size) - var(--_d) / 2)) var(--_d) minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+  inline-size: 100%;
+  block-size: 100%;
+  min-block-size: 0;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  font-size: inherit;
+  &[data-orientation="vertical"] {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, calc(var(--_size) - var(--_d) / 2)) var(--_d) minmax(0, 1fr);
+  }
+  &[data-dragging] {
+    cursor: col-resize;
+    user-select: none;
+  }
+  &[data-dragging][data-orientation="vertical"] {
+    cursor: row-resize;
+  }
+}
+.cy-split-pane-pane.cy-split-pane-pane {
+  min-inline-size: 0;
+  min-block-size: 0;
+  overflow: auto;
+  font-size: inherit;
+  &[data-collapsed] {
+    visibility: hidden;
+  }
+}
+.cy-split-pane-divider.cy-split-pane-divider {
+  position: relative;
+  z-index: 1;
+  background: var(--cy-split-pane-divider, var(--cy-color-line));
+  cursor: col-resize;
+  touch-action: none;
+  font-size: inherit;
+  transition: background-color var(--cy-motion-fast) var(--cy-motion-ease);
+  &::before {
+    content: "";
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 50%;
+    inline-size: var(--_hit);
+    translate: -50% 0;
+  }
+  [data-orientation="vertical"] > & {
+    cursor: row-resize;
+    &::before {
+      inset-block: auto;
+      inset-inline: 0;
+      inset-block-start: 50%;
+      inline-size: auto;
+      block-size: var(--_hit);
+      translate: 0 -50%;
+    }
+  }
+  &:hover,
+  [data-dragging] > & {
+    background: var(--cy-color-muted);
+  }
+  &:focus-visible {
+    outline: none;
+    background: var(--cy-color-accent);
+    box-shadow: 0 0 0 var(--cy-border-focus) var(--cy-color-ring);
+  }
+}
+.cy-split-pane-divider.cy-split-pane-divider:dir(rtl)::before {
+  translate: 50% 0;
+}
+@media (pointer: coarse) {
+  .cy-split-pane.cy-split-pane {
+    --_hit: var(--cy-hit-coarse, 44px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cy-split-pane-divider.cy-split-pane-divider {
+    transition: none;
+  }
+}
+@media (forced-colors: active) {
+  .cy-split-pane-divider.cy-split-pane-divider {
+    forced-color-adjust: none;
+    background: CanvasText;
+    &:focus-visible {
+      background: Highlight;
+    }
+  }
+}

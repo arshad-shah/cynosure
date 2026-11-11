@@ -1,0 +1,4 @@
+/* time-field: a TextField with a clock at its start; digits line up. */
+.cy-time-field .cy-text-field-input.cy-text-field-input {
+  font-variant-numeric: tabular-nums;
+}

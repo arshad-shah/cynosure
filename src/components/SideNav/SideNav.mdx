@@ -1,0 +1,81 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./SideNav.stories";
+
+<Meta of={Stories} />
+
+# SideNav
+
+Vertical navigation for an app or a docs site: links in titled sections, groups that expand, the current page marked, and a collapsed icon rail.
+
+<Canvas of={Stories.MarksTheCurrentPage} />
+
+## When to use
+
+- **The main navigation of an app or site** with more than a handful of destinations.
+
+**Use something else when:**
+- there are two to five peer views on one page: [Tabs](?path=/docs/components-tabs--docs)
+- the choices are commands, not places: [Menu](?path=/docs/components-menu--docs)
+- you need the whole layout with a top bar and a small-screen drawer: [AppShell](?path=/docs/components-appshell--docs), which holds a SideNav
+
+## Usage
+
+```tsx
+import { SideNav } from "@arshad-shah/cynosure";
+
+<SideNav label="Main" items={items} current={route.id} />
+```
+
+An item with `href` is a link; without it, a button that calls `onNavigate`. An item with `items` is a group. Entries with a `label` and `items` but no `id` are sections with a heading.
+
+## Routers
+
+`renderLink` renders each link with your router; spread the props it receives (`href`, `className`, `aria-current`, `onClick`, `children`). Or keep plain links and call `event.preventDefault()` in `onNavigate` to route on the client.
+
+```tsx
+<SideNav renderLink={({ href, ...props }) => <RouterLink to={href} {...props} />} … />
+```
+
+<Canvas of={Stories.WorksWithYourRouter} />
+
+## Groups
+
+Groups open and close with a click, Enter or Space. A group holding the current page opens by itself, also when the page changes.
+
+<Canvas of={Stories.GroupsOpenOnTheWayToTheCurrentPage} />
+
+## Collapsed rail
+
+`collapsed` shows icons only. Labels appear in tooltips on hover and keyboard focus and stay the accessible names. Give top-level items icons. Groups do not open inside the rail; choosing one calls `onCollapsedChange(false)` and opens the group, so the navigation can widen.
+
+<Canvas of={Stories.RailExpandsToTheGroup} />
+
+## Bottom bar
+
+`layout="bar"` lays the top-level items out in one row, icon over label, for a phone's tab bar ([AppShell](?path=/docs/components-appshell--docs)'s `tabs`). Section headings are left out, and a group is one item that calls `onNavigate` with its own id. Give it three to five items, each with an icon.
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+- **Landmark:** a `<nav>` named by `label`. Each section is a list named by its heading.
+- **Current page:** `aria-current="page"`, the accent's soft fill and a bar on the inline start.
+- **Keyboard:** Tab and Shift+Tab move between items; Enter follows a link; Enter or Space presses a button or toggles a group (`aria-expanded`).
+- **Disabled items** are `aria-disabled` buttons that do nothing.
+- **Touch:** rows are at least 44px tall on touch screens (24px with a mouse).
+- **Contrast:** items, headings and the current item keep 4.5:1 in light and dark modes.
+- **Direction:** indents, the current bar and the rail's badge follow the text direction.
+
+## Theming
+
+Tokens: `--cy-side-nav-width`, `--cy-side-nav-rail-width` and `--cy-side-nav-radius`.
+
+```ts
+createTheme({ components: { sideNav: { width: "280px" } } });
+```
+
+## Related
+
+[AppShell](?path=/docs/components-appshell--docs) · [Tabs](?path=/docs/components-tabs--docs) · [Tooltip](?path=/docs/components-tooltip--docs)

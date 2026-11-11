@@ -1,0 +1,60 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./Grid.stories";
+
+<Meta of={Stories} />
+
+# Grid
+
+Lays items out in rows and columns: a fixed number of equal columns, or as many as fit at a minimum width. Gaps are space tokens.
+
+<Canvas of={Stories.FixedColumns} />
+
+## When to use
+
+- **Galleries, dashboards and tiles**: items that line up in both directions.
+
+**Use something else when:**
+- items run in one direction: [Stack](?path=/docs/components-stack--docs) (vertical) or [Inline](?path=/docs/components-inline--docs) (horizontal, wrapping)
+- the content is data with headers: a table
+
+## Usage
+
+```tsx
+import { Grid, GridItem } from "@arshad-shah/cynosure";
+
+<Grid columns={3} gap="6">
+  <GridItem span={2}><Chart /></GridItem>
+  <Summary />
+</Grid>
+```
+
+## Responsive without breakpoints
+
+Pass `minItemWidth` and the grid fits as many columns of at least that width as its own width allows, wrapping the rest. Add `columns` to cap how many there can be. It responds to the grid's width, not the window's, so it works in side panels and popups too. A grid narrower than `minItemWidth` shows one column the grid's width, never overflowing.
+
+<Canvas of={Stories.FitsAsManyAsTheWidthAllows} />
+
+## Spanning
+
+Wrap an item in `GridItem` to span columns (`span={2}`, or `span="full"` for the whole row) or rows (`rowSpan`). A span wider than a fixed grid is clamped to its columns.
+
+<Canvas of={Stories.ItemsSpanColumnsAndRows} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+- **Semantics:** Grid is layout only; it adds no role. Render a list with `as="ul"` and `GridItem as="li"`: bullets and indentation are removed, the list semantics stay.
+- **Reading order:** visual order follows source order, so keyboard and screen reader order match what is seen.
+- **Direction:** columns run with the text direction.
+- **Nesting:** a nested Grid has its own columns and never inherits its parent's.
+
+## Theming
+
+Grid has no tokens of its own: gaps are the global space tokens (`--cy-space-*`).
+
+## Related
+
+[Stack](?path=/docs/components-stack--docs) · [Inline](?path=/docs/components-inline--docs) · [Card](?path=/docs/components-card--docs)

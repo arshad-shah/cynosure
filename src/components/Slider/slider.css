@@ -1,0 +1,251 @@
+/*
+ * slider: label row, then a track (the pointer target) holding the fill, marks and one or two thumbs. Positions are
+ * logical, so horizontal sliders run from the inline start (right in RTL); vertical ones run bottom to top.
+ */
+.cy-slider.cy-slider {
+  --_tone: var(--cy-color-accent);
+  --_t: var(--cy-slider-track-md, 4px);
+  --_thumb: var(--cy-slider-thumb-md, 16px);
+  --_hit: var(--cy-hit-min, 24px);
+  box-sizing: border-box !important;
+  display: grid;
+  gap: var(--cy-space-4);
+  margin: 0;
+  color: var(--cy-color-ink);
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-font-size-md);
+  font-weight: var(--cy-font-weight-regular);
+  line-height: var(--cy-font-line-height);
+  letter-spacing: normal;
+  text-transform: none;
+  &[data-size="sm"] {
+    --_t: var(--cy-slider-track-sm, 2px);
+    --_thumb: var(--cy-slider-thumb-sm, 12px);
+  }
+  &[data-size="lg"] {
+    --_t: var(--cy-slider-track-lg, 6px);
+    --_thumb: var(--cy-slider-thumb-lg, 20px);
+  }
+  &[data-orientation="vertical"] {
+    justify-items: center;
+    inline-size: max-content;
+  }
+}
+@media (pointer: coarse) {
+  .cy-slider.cy-slider {
+    --_hit: var(--cy-hit-coarse, 44px);
+  }
+}
+.cy-slider-head.cy-slider-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--cy-space-4);
+  font-size: var(--cy-font-size-md);
+}
+.cy-slider-label.cy-slider-label {
+  min-inline-size: 0;
+  color: var(--cy-color-ink);
+  font-size: var(--cy-font-size-md);
+  font-weight: var(--cy-font-weight-medium);
+}
+.cy-slider-value.cy-slider-value {
+  flex: none;
+  color: var(--cy-color-muted);
+  font-family: var(--cy-font-mono);
+  font-size: var(--cy-font-size-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+/* The track box is as tall as the thumb's hit area, so the whole band is easy to press; the bar is drawn by ::before. */
+.cy-slider-track.cy-slider-track {
+  position: relative;
+  block-size: var(--_hit);
+  margin-inline: calc(var(--_thumb) / 2);
+  font-size: var(--cy-font-size-md);
+  cursor: pointer;
+  touch-action: pan-y;
+  user-select: none;
+  &::before {
+    content: "";
+    position: absolute;
+    inset-inline: calc(var(--_thumb) / -2);
+    inset-block-start: calc(50% - var(--_t) / 2);
+    block-size: var(--_t);
+    border-radius: var(--cy-radius-full);
+    background: var(--cy-slider-track, color-mix(in oklab, var(--cy-color-ink) 14%, var(--cy-color-surface)));
+  }
+}
+/* trackContent: the product's drawing takes the bar's place, as tall as a thumb, under the thumbs. */
+.cy-slider-track.cy-slider-track[data-custom]::before {
+  content: none;
+}
+.cy-slider-drawing.cy-slider-drawing {
+  position: absolute;
+  inset-inline: calc(var(--_thumb) / -2);
+  inset-block-start: calc(50% - var(--_thumb) / 2);
+  block-size: var(--_thumb);
+  overflow: hidden;
+  border-radius: var(--cy-radius-full);
+  font-size: var(--cy-font-size-md);
+  pointer-events: none;
+  & > * {
+    display: block;
+    inline-size: 100%;
+    block-size: 100%;
+  }
+}
+.cy-slider[data-orientation="vertical"] .cy-slider-drawing.cy-slider-drawing {
+  inset-inline: auto;
+  inset-inline-start: calc(50% - var(--_thumb) / 2);
+  inset-block: calc(var(--_thumb) / -2);
+  inline-size: var(--_thumb);
+  block-size: auto;
+}
+/* Disabled: the control fades, the label stays readable. */
+.cy-slider[data-disabled] .cy-slider-track.cy-slider-track {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.cy-slider-fill.cy-slider-fill {
+  position: absolute;
+  inset-block-start: calc(50% - var(--_t) / 2);
+  inset-inline-start: var(--_from);
+  inline-size: calc(var(--_to) - var(--_from));
+  block-size: var(--_t);
+  border-radius: var(--cy-radius-full);
+  background: var(--cy-color-accent-text);
+  font-size: var(--cy-font-size-md);
+}
+.cy-slider-thumb.cy-slider-thumb {
+  position: absolute;
+  inset-block-start: calc(50% - var(--_thumb) / 2);
+  inset-inline-start: var(--_pos);
+  inline-size: var(--_thumb);
+  block-size: var(--_thumb);
+  margin-inline-start: calc(var(--_thumb) / -2);
+  border: calc(2 * var(--cy-border-width)) solid var(--cy-color-accent-text);
+  border-radius: var(--cy-radius-full);
+  background: var(--cy-color-surface);
+  box-shadow: var(--cy-shadow-sm);
+  font-size: var(--cy-font-size-md);
+  outline: none;
+  cursor: grab;
+  touch-action: none;
+  transition:
+    box-shadow var(--cy-motion-fast) var(--cy-motion-ease),
+    scale var(--cy-motion-fast) var(--cy-motion-ease);
+  /* Hit area: centred on the thumb, never moving it. */
+  &::before {
+    content: "";
+    position: absolute;
+    inset-block-start: 50%;
+    inset-inline-start: 50%;
+    inline-size: max(100%, var(--_hit));
+    block-size: max(100%, var(--_hit));
+    translate: -50% -50%;
+  }
+  &:hover {
+    scale: 1.08;
+  }
+  &:focus-visible {
+    box-shadow:
+      var(--cy-shadow-sm),
+      0 0 0 var(--cy-border-focus) var(--cy-color-ring);
+  }
+  &:active {
+    cursor: grabbing;
+  }
+}
+.cy-slider[data-disabled] .cy-slider-thumb.cy-slider-thumb {
+  cursor: not-allowed;
+  scale: 1;
+}
+.cy-slider-mark.cy-slider-mark {
+  position: absolute;
+  inset-block-start: calc(50% - var(--_t));
+  inset-inline-start: var(--_pos);
+  inline-size: var(--cy-border-width);
+  block-size: calc(2 * var(--_t));
+  margin-inline-start: calc(var(--cy-border-width) / -2);
+  background: var(--cy-color-muted);
+  font-size: var(--cy-font-size-md);
+  pointer-events: none;
+}
+.cy-slider-mark-label.cy-slider-mark-label {
+  position: absolute;
+  inset-block-start: calc(var(--_hit) / 2 + var(--cy-space-2));
+  inset-inline-start: 50%;
+  translate: -50% 0;
+  color: var(--cy-color-muted);
+  font-size: var(--cy-font-size-xs);
+  white-space: nowrap;
+}
+
+/* Vertical: the same parts turned upright; positions run from the bottom. */
+.cy-slider[data-orientation="vertical"] {
+  & .cy-slider-track.cy-slider-track {
+    inline-size: var(--_hit);
+    block-size: var(--cy-slider-length, 160px);
+    margin: calc(var(--_thumb) / 2) 0;
+    touch-action: pan-x;
+    &::before {
+      inset-inline: auto;
+      inset-inline-start: calc(50% - var(--_t) / 2);
+      inset-block: calc(var(--_thumb) / -2);
+      inline-size: var(--_t);
+      block-size: auto;
+    }
+  }
+  & .cy-slider-fill.cy-slider-fill {
+    inset-block-start: auto;
+    inset-block-end: var(--_from);
+    inset-inline-start: calc(50% - var(--_t) / 2);
+    inline-size: var(--_t);
+    block-size: calc(var(--_to) - var(--_from));
+  }
+  & .cy-slider-thumb.cy-slider-thumb {
+    inset-block-start: auto;
+    inset-block-end: var(--_pos);
+    inset-inline-start: calc(50% - var(--_thumb) / 2);
+    margin-inline-start: 0;
+    margin-block-end: calc(var(--_thumb) / -2);
+  }
+  & .cy-slider-mark.cy-slider-mark {
+    inset-block-start: auto;
+    inset-block-end: var(--_pos);
+    inset-inline-start: calc(50% - var(--_t));
+    inline-size: calc(2 * var(--_t));
+    block-size: var(--cy-border-width);
+    margin: 0;
+  }
+}
+/* A single slider fills from the very start of the bar (which reaches half a thumb past the first value). */
+.cy-slider:not([data-range])[data-orientation="horizontal"] .cy-slider-fill.cy-slider-fill {
+  inset-inline-start: calc(var(--_thumb) / -2);
+  inline-size: calc(var(--_to) + var(--_thumb) / 2);
+}
+.cy-slider:not([data-range])[data-orientation="vertical"] .cy-slider-fill.cy-slider-fill {
+  inset-block-end: calc(var(--_thumb) / -2);
+  block-size: calc(var(--_to) + var(--_thumb) / 2);
+}
+/* Room under the track for mark labels. */
+.cy-slider:has(.cy-slider-mark[data-label]) .cy-slider-track.cy-slider-track {
+  margin-block-end: calc(var(--cy-font-size-xs) * 1.6);
+}
+@media (prefers-reduced-motion: reduce) {
+  .cy-slider-thumb.cy-slider-thumb {
+    transition: none;
+  }
+}
+@media (forced-colors: active) {
+  .cy-slider-track.cy-slider-track::before {
+    background: CanvasText;
+  }
+  .cy-slider-fill.cy-slider-fill {
+    background: Highlight;
+  }
+  .cy-slider-thumb.cy-slider-thumb {
+    border-color: Highlight;
+  }
+}

@@ -1,0 +1,49 @@
+/*
+ * grid: equal columns. With data-fit, as many columns as fit at --_min (never wider than the grid), capped at --_cols
+ * when given: the max() term makes each column at least 1/cols of the width, so no more than cols fit.
+ */
+.cy-grid.cy-grid {
+  box-sizing: border-box !important;
+  display: grid;
+  grid-template-columns: repeat(var(--_cols, 1), minmax(0, 1fr));
+  gap: var(--_row-gap) var(--_gap);
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: inherit;
+  line-height: inherit;
+  &[data-fit] {
+    grid-template-columns: repeat(
+        auto-fill,
+        minmax(
+          max(min(var(--_min), 100%), (100% - (var(--_cols, 1000) - 1) * var(--_gap)) / var(--_cols, 1000)),
+          1fr
+        )
+      );
+  }
+  &[data-align="start"] {
+    align-items: start;
+  }
+  &[data-align="center"] {
+    align-items: center;
+  }
+  &[data-align="end"] {
+    align-items: end;
+  }
+  &[data-align="stretch"] {
+    align-items: stretch;
+  }
+}
+.cy-grid-item.cy-grid-item {
+  box-sizing: border-box !important;
+  grid-column: span min(var(--_span, 1), var(--_cols, 1000));
+  grid-row: span var(--_row-span, 1);
+  min-inline-size: 0;
+  margin: 0;
+  font-size: inherit;
+  line-height: inherit;
+  &[data-full] {
+    grid-column: 1 / -1;
+  }
+}

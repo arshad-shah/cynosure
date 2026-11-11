@@ -1,0 +1,186 @@
+/*
+ * command-palette: like Dialog, the native <dialog> fills the viewport and is the backdrop; the panel sits near the
+ * top (where the eye already is) and is a search field over a scrolling list of grouped commands.
+ */
+.cy-command-palette.cy-command-palette {
+  box-sizing: border-box !important;
+  position: fixed;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  max-inline-size: none;
+  max-block-size: none;
+  margin: 0;
+  padding: var(--cy-command-palette-offset, 12vh) var(--cy-space-6) var(--cy-space-6);
+  border: 0;
+  overflow: hidden;
+  display: none;
+  justify-items: center;
+  align-items: start;
+  background: var(--cy-dialog-scrim, rgb(0 0 0 / 0.45));
+  color: var(--cy-color-ink);
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-font-size-md);
+  font-weight: var(--cy-font-weight-regular);
+  line-height: var(--cy-font-line-height);
+  letter-spacing: normal;
+  text-align: start;
+  text-transform: none;
+  outline: none;
+  opacity: 1;
+  transition:
+    opacity var(--cy-motion-fast) var(--cy-motion-ease),
+    display var(--cy-motion-fast) allow-discrete,
+    overlay var(--cy-motion-fast) allow-discrete;
+  &[open] {
+    display: grid;
+    animation: cy-command-palette-in var(--cy-motion-fast) var(--cy-motion-ease);
+  }
+  &:not([open]) {
+    opacity: 0;
+  }
+  &::backdrop {
+    background: transparent;
+  }
+}
+.cy-command-palette-panel.cy-command-palette-panel {
+  display: flex;
+  flex-direction: column;
+  inline-size: min(var(--cy-command-palette-width, 560px), 100%);
+  max-block-size: 100%;
+  overflow: hidden;
+  border: var(--cy-border-width) solid var(--cy-color-line);
+  border-radius: var(--cy-radius-card);
+  background: var(--cy-color-surface);
+  box-shadow: var(--cy-shadow-lg);
+  font-size: var(--cy-font-size-md);
+}
+.cy-command-palette-search.cy-command-palette-search {
+  display: flex;
+  align-items: center;
+  gap: var(--cy-space-4);
+  padding: 0 var(--cy-space-6);
+  border-block-end: var(--cy-border-width) solid var(--cy-color-line);
+  font-size: var(--cy-font-size-md);
+}
+.cy-command-palette-search-icon.cy-command-palette-search-icon {
+  flex: none;
+  color: var(--cy-color-muted);
+}
+.cy-command-palette-input.cy-command-palette-input {
+  box-sizing: border-box !important;
+  flex: 1;
+  min-inline-size: 0;
+  block-size: calc(1.5 * var(--cy-control-height-lg));
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--cy-color-ink);
+  font: inherit;
+  font-size: var(--cy-font-size-lg);
+  letter-spacing: normal;
+  text-transform: none;
+  outline: none;
+  appearance: none;
+  &::placeholder {
+    color: var(--cy-color-muted);
+    opacity: 1;
+  }
+}
+.cy-command-palette-list.cy-command-palette-list {
+  max-block-size: var(--cy-command-palette-list-max-height, min(420px, 60vh));
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: var(--cy-space-2);
+  font-size: var(--cy-font-size-md);
+}
+.cy-command-palette-group.cy-command-palette-group {
+  font-size: var(--cy-font-size-md);
+  & + & {
+    margin-block-start: var(--cy-space-3);
+  }
+}
+.cy-command-palette-heading.cy-command-palette-heading {
+  padding: var(--cy-space-3) var(--cy-space-4) var(--cy-space-2);
+  color: var(--cy-color-muted);
+  font-size: var(--cy-font-size-xs);
+  font-weight: var(--cy-font-weight-medium);
+  letter-spacing: normal;
+  text-transform: none;
+}
+.cy-command-palette-item.cy-command-palette-item {
+  --_hit: var(--cy-hit-min, 24px);
+  display: flex;
+  align-items: center;
+  gap: var(--cy-space-4);
+  min-block-size: max(var(--cy-control-height-md), var(--_hit));
+  padding: 0 var(--cy-space-4);
+  border-radius: var(--cy-radius-sm);
+  color: var(--cy-color-ink);
+  font-size: var(--cy-font-size-md);
+  letter-spacing: normal;
+  text-transform: none;
+  cursor: pointer;
+  &[data-active] {
+    background: var(--cy-color-soft);
+  }
+  &[aria-disabled="true"] {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+}
+.cy-command-palette-icon.cy-command-palette-icon {
+  flex: none;
+  color: var(--cy-color-muted);
+}
+.cy-command-palette-label.cy-command-palette-label {
+  flex: 1;
+  min-inline-size: 0;
+  overflow: hidden;
+  color: inherit;
+  font-size: var(--cy-font-size-md);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cy-command-palette-empty.cy-command-palette-empty {
+  margin: 0;
+  letter-spacing: normal;
+  text-transform: none;
+  padding: var(--cy-space-6);
+  color: var(--cy-color-muted);
+  font-size: var(--cy-font-size-md);
+  text-align: center;
+}
+@media (pointer: coarse) {
+  .cy-command-palette-item.cy-command-palette-item {
+    --_hit: var(--cy-hit-coarse, 44px);
+  }
+}
+/* Narrow screens: the panel spans the width and starts at the top. */
+@media (width < 36rem) {
+  .cy-command-palette.cy-command-palette {
+    padding: var(--cy-space-4);
+  }
+}
+/* Entrance as a keyframe animation, not @starting-style (see Popover). */
+@keyframes cy-command-palette-in {
+  from {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cy-command-palette.cy-command-palette,
+  .cy-command-palette.cy-command-palette[open] {
+    transition: none;
+    animation: none;
+  }
+}
+@media (forced-colors: active) {
+  .cy-command-palette-panel.cy-command-palette-panel {
+    border-color: CanvasText;
+  }
+  .cy-command-palette-item[data-active] {
+    outline: var(--cy-border-width) solid Highlight;
+  }
+}

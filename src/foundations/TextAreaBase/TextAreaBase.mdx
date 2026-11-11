@@ -1,0 +1,44 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./TextAreaBase.stories";
+
+<Meta of={Stories} />
+
+# TextAreaBase
+
+The native `<textarea>` for Cynosure, and the only module allowed to render one. It is a foundation: no visual opinions, so composites style it.
+
+## Who uses it
+
+[TextArea](?path=/docs/components-textarea--docs).
+
+## When to use it directly
+
+Only when building a new multi-line text composite that needs a native textarea.
+
+**Use a component instead when** you want a multi-line text box: [TextArea](?path=/docs/components-textarea--docs). For single-line text use [TextField](?path=/docs/components-textfield--docs).
+
+<Canvas of={Stories.AcceptsTextAndInvalid} />
+
+## Usage
+
+```tsx
+import { TextAreaBase } from "@arshad-shah/cynosure";
+
+<TextAreaBase className="my-notes" name="notes" rows={4} invalid={hasError} />
+```
+
+## Props
+
+It accepts every native textarea attribute, plus `invalid`.
+
+<ArgTypes of={Stories} />
+
+## Guarantees
+
+- `invalid` maps to `aria-invalid`; when it is not set, the attribute is omitted.
+- The ref reaches the native `<textarea>`.
+- No styling: composites add their own classes.
+
+## Related
+
+[TextArea](?path=/docs/components-textarea--docs) · [InputBase](?path=/docs/foundations-inputbase--docs)

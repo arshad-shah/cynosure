@@ -1,9 +1,0 @@
-{
-  "name": "@arshad-shah/cynosure-react/chip",
-  "private": true,
-  "type": "module",
-  "main": "../dist/chip.js",
-  "module": "../dist/chip.js",
-  "types": "../dist/chip.d.ts",
-  "sideEffects": ["*.css"]
-}

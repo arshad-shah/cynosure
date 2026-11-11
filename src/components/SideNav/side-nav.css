@@ -1,0 +1,252 @@
+/*
+ * side-nav: sections of lists; each row is a link or a ButtonBase (`.cy-side-nav-link`). The current page gets the
+ * accent's soft fill and a bar at the inline start. Collapsed: an icon rail, labels visually hidden (still the names).
+ */
+.cy-side-nav.cy-side-nav {
+  --_h: var(--cy-control-height-md);
+  --_hit: var(--cy-hit-min, 24px);
+  --_pad: var(--cy-space-4);
+  --_icon: 1.25em;
+  box-sizing: border-box !important;
+  display: flex;
+  flex-direction: column;
+  gap: var(--cy-space-6);
+  inline-size: var(--cy-side-nav-width, 240px);
+  max-inline-size: 100%;
+  min-inline-size: 0;
+  margin: 0;
+  padding: var(--cy-space-4);
+  color: var(--cy-color-ink);
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-font-size-md);
+  font-weight: var(--cy-font-weight-regular);
+  line-height: var(--cy-font-line-height);
+  letter-spacing: normal;
+  text-transform: none;
+  &[data-size="sm"] {
+    --_h: var(--cy-control-height-sm);
+    font-size: var(--cy-font-size-sm);
+  }
+  &[data-size="lg"] {
+    --_h: var(--cy-control-height-lg);
+    font-size: var(--cy-font-size-lg);
+  }
+  &[data-collapsed] {
+    inline-size: var(--cy-side-nav-rail-width, calc(var(--_h) + 2 * var(--cy-space-4)));
+  }
+}
+.cy-side-nav-section.cy-side-nav-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cy-space-2);
+  min-inline-size: 0;
+  font-size: inherit;
+}
+.cy-side-nav-heading.cy-side-nav-heading {
+  padding-inline: var(--_pad);
+  color: var(--cy-color-muted);
+  font-size: var(--cy-font-size-xs);
+  font-weight: var(--cy-font-weight-medium);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  [data-collapsed] & {
+    position: absolute;
+    inline-size: var(--cy-border-width);
+    block-size: var(--cy-border-width);
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+.cy-side-nav-list.cy-side-nav-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cy-space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: inherit;
+  &[hidden] {
+    display: none;
+  }
+  &:not([data-depth="0"]) {
+    padding-block-start: var(--cy-space-1);
+    padding-inline-start: calc(var(--_icon) + var(--cy-space-4));
+  }
+  [data-collapsed] &:not([data-depth="0"]) {
+    padding-inline-start: 0;
+  }
+}
+.cy-side-nav-item.cy-side-nav-item {
+  display: block;
+  margin: 0;
+  padding: 0;
+  font-size: inherit;
+  & > .cy-tooltip-anchor {
+    display: flex;
+  }
+}
+.cy-side-nav-link.cy-side-nav-link {
+  box-sizing: border-box !important;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--cy-space-4);
+  inline-size: 100%;
+  min-block-size: max(var(--_h), var(--_hit));
+  margin: 0;
+  padding: var(--cy-space-2) var(--_pad);
+  border: 0;
+  border-radius: var(--cy-side-nav-radius, var(--cy-radius-md));
+  background: transparent;
+  color: var(--cy-color-ink);
+  font: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  letter-spacing: normal;
+  text-align: start;
+  text-decoration: none;
+  text-transform: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  &:hover:not([aria-disabled="true"]) {
+    background: var(--cy-color-soft);
+  }
+  &:focus-visible {
+    outline: var(--cy-border-focus) solid var(--cy-color-ring);
+    outline-offset: 0;
+  }
+  &[aria-current="page"] {
+    background: var(--cy-color-accent-soft);
+    color: var(--cy-color-accent-text);
+    font-weight: var(--cy-font-weight-medium);
+    &::before {
+      content: "";
+      position: absolute;
+      inset-block: var(--cy-space-3);
+      inset-inline-start: 0;
+      inline-size: calc(3 * var(--cy-border-width));
+      border-radius: var(--cy-radius-full);
+      background: currentColor;
+    }
+  }
+  &[aria-disabled="true"] {
+    color: var(--cy-color-muted);
+    cursor: not-allowed;
+  }
+  [data-collapsed] & {
+    justify-content: center;
+    padding-inline: 0;
+  }
+}
+.cy-side-nav-icon.cy-side-nav-icon {
+  flex: none;
+  inline-size: var(--_icon);
+  block-size: var(--_icon);
+}
+.cy-side-nav-label.cy-side-nav-label {
+  flex: 1;
+  min-inline-size: 0;
+  overflow: hidden;
+  font-size: inherit;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  [data-collapsed] & {
+    position: absolute;
+    inline-size: var(--cy-border-width);
+    block-size: var(--cy-border-width);
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
+}
+.cy-side-nav-badge.cy-side-nav-badge {
+  flex: none;
+  color: var(--cy-color-muted);
+  font-size: var(--cy-font-size-sm);
+  font-variant-numeric: tabular-nums;
+  /* In the rail the badge shrinks into the corner so the icon stays visible. */
+  [data-collapsed] & {
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline-end: 0;
+    scale: 0.7;
+    transform-origin: top right;
+    line-height: 1;
+  }
+  [data-collapsed] &:dir(rtl) {
+    transform-origin: top left;
+  }
+}
+.cy-side-nav-chevron.cy-side-nav-chevron {
+  flex: none;
+  color: var(--cy-color-muted);
+  transition: rotate var(--cy-motion-fast) var(--cy-motion-ease);
+  [aria-expanded="true"] > & {
+    rotate: 180deg;
+  }
+  [data-collapsed] & {
+    display: none;
+  }
+}
+/* The bar: one row of equal items, icon over a small label; the current item is drawn in the accent, without a fill. */
+.cy-side-nav.cy-side-nav[data-layout="bar"] {
+  inline-size: 100%;
+  padding: var(--cy-space-1) var(--cy-space-2);
+  & .cy-side-nav-list {
+    flex-direction: row;
+    gap: 0;
+  }
+  & .cy-side-nav-item {
+    flex: 1 1 0;
+    min-inline-size: 0;
+  }
+  & .cy-side-nav-link {
+    flex-direction: column;
+    justify-content: center;
+    gap: var(--cy-space-1);
+    min-block-size: max(calc(var(--_h) + var(--cy-space-6)), var(--_hit));
+    padding: var(--cy-space-2) var(--cy-space-1);
+    color: var(--cy-color-muted);
+    text-align: center;
+    &[aria-current="page"] {
+      background: transparent;
+      color: var(--cy-color-accent-text);
+      &::before {
+        inset-block: 0 auto;
+        inset-inline: 30%;
+        inline-size: auto;
+        block-size: calc(3 * var(--cy-border-width));
+      }
+    }
+  }
+  & .cy-side-nav-label {
+    flex: none;
+    max-inline-size: 100%;
+    font-size: var(--cy-font-size-xs);
+  }
+  & .cy-side-nav-badge {
+    position: absolute;
+    inset-block-start: var(--cy-space-1);
+    inset-inline-start: calc(50% + var(--_icon) / 4);
+    scale: 0.8;
+    line-height: 1;
+  }
+}
+@media (pointer: coarse) {
+  .cy-side-nav.cy-side-nav {
+    --_hit: var(--cy-hit-coarse, 44px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cy-side-nav-chevron.cy-side-nav-chevron {
+    transition: none;
+  }
+}
+@media (forced-colors: active) {
+  .cy-side-nav-link.cy-side-nav-link[aria-current="page"] {
+    outline: var(--cy-border-width) solid Highlight;
+  }
+  .cy-side-nav-link.cy-side-nav-link:focus-visible {
+    outline-color: Highlight;
+  }
+}

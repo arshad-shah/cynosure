@@ -1,9 +1,0 @@
-{
-  "name": "@arshad-shah/cynosure-react/rhf",
-  "private": true,
-  "type": "module",
-  "main": "../dist/rhf.js",
-  "module": "../dist/rhf.js",
-  "types": "../dist/rhf.d.ts",
-  "sideEffects": ["*.css"]
-}

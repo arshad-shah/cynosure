@@ -1,0 +1,55 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./HiddenValue.stories";
+
+<Meta of={Stories} />
+
+# HiddenValue
+
+Lets a custom widget take part in a native form. It renders a visually and semantically hidden input that carries the widget's value, so the form sees it like any other field. It is a foundation: it has no visual output.
+
+## Who uses it
+
+[Select](?path=/docs/components-select--docs).
+
+## When to use it directly
+
+When you build a custom widget (a listbox, a picker) that has no native input of its own but must submit a value, validate and reset with its form.
+
+**Use a component instead when** a ready-made control fits: [Select](?path=/docs/components-select--docs) for choosing from a list, [TextField](?path=/docs/components-textfield--docs) for text.
+
+<Canvas of={Stories.SubmitsValidatesAndResets} />
+
+## Usage
+
+```tsx
+import { HiddenValue } from "@arshad-shah/cynosure";
+
+<HiddenValue
+  name="plan"
+  value={plan}
+  required
+  requiredMessage="Choose a plan."
+  onReset={() => setPlan(defaultPlan)}
+  onInvalid={(event) => {
+    event.preventDefault();
+    triggerRef.current?.focus();
+  }}
+/>
+```
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Guarantees
+
+- **Submits:** `name` and `value` appear in FormData. Use `form` to associate it with a form elsewhere in the page.
+- **Validates:** while `required` and the value is empty, the form is invalid with `requiredMessage` (default "Please choose a value.").
+- **Resets:** `onReset` is called when the owning form is reset, so the widget can restore its default.
+- **Disabled:** a `disabled` value is neither submitted nor validated, like a native disabled control.
+- **Custom reporting:** call `event.preventDefault()` in `onInvalid` to stop the browser reporting on the hidden input, then focus and explain on the widget's visible control.
+- It is a text input rather than `type="hidden"` so constraint validation applies, and it is out of the tab order and hidden from assistive technology.
+
+## Related
+
+[Select](?path=/docs/components-select--docs)

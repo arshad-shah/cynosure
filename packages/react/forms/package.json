@@ -1,9 +1,0 @@
-{
-  "name": "@arshad-shah/cynosure-react/forms",
-  "private": true,
-  "type": "module",
-  "main": "../dist/forms/index.js",
-  "module": "../dist/forms/index.js",
-  "types": "../dist/forms/index.d.ts",
-  "sideEffects": ["*.css"]
-}

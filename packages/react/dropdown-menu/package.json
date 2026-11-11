@@ -1,9 +1,0 @@
-{
-  "name": "@arshad-shah/cynosure-react/dropdown-menu",
-  "private": true,
-  "type": "module",
-  "main": "../dist/dropdownmenu.js",
-  "module": "../dist/dropdownmenu.js",
-  "types": "../dist/dropdownmenu.d.ts",
-  "sideEffects": ["*.css"]
-}

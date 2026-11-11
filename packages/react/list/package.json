@@ -1,9 +1,0 @@
-{
-  "name": "@arshad-shah/cynosure-react/list",
-  "private": true,
-  "type": "module",
-  "main": "../dist/list.js",
-  "module": "../dist/list.js",
-  "types": "../dist/list.d.ts",
-  "sideEffects": ["*.css"]
-}

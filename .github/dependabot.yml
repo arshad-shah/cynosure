@@ -11,7 +11,7 @@ updates:
     open-pull-requests-limit: 5
     groups:
       actions:
-        patterns: ['*']
+        patterns: ["*"]
 
   # npm dependencies across the whole pnpm workspace. One weekly PR
   # grouped per risk tier cuts review fatigue without hiding majors.

@@ -1,0 +1,147 @@
+/*
+ * syntax: Cynosure's code colours for highlighters and editors that are styled with CSS. Opt in with
+ * `@arshad-shah/cynosure/styles/syntax.css` (it is not part of styles.css, because it styles other libraries' class
+ * names). Every colour is a --cy-color-syntax-* token, so light, dark, high contrast and a product's own palette all
+ * follow without rebuilding anything. Selectors are wrapped in :where() so a product's own rules always win.
+ * Editors that take a theme object instead (Monaco, Shiki with a TextMate theme) use monacoTheme() and textMateTheme().
+ */
+
+/* CodeMirror 6: the editor's surfaces. Highlighting comes from `classHighlighter` (the tok-* classes below). */
+:where(.cm-editor) {
+  background-color: var(--cy-color-surface);
+  color: var(--cy-color-ink);
+  font-family: var(--cy-font-mono);
+}
+:where(.cm-editor) :where(.cm-gutters) {
+  border-inline-end: var(--cy-border-width) solid var(--cy-color-line);
+  background-color: var(--cy-color-surface);
+  color: var(--cy-color-muted);
+}
+:where(.cm-editor) :where(.cm-activeLine, .cm-activeLineGutter) {
+  background-color: var(--cy-color-soft);
+}
+:where(.cm-editor) :where(.cm-cursor, .cm-dropCursor) {
+  border-inline-start-color: var(--cy-color-accent-text);
+}
+:where(.cm-editor) :where(.cm-selectionBackground),
+:where(.cm-editor.cm-focused) :where(.cm-selectionBackground),
+:where(.cm-editor) :where(.cm-content) ::selection {
+  background-color: color-mix(in oklab, var(--cy-color-accent) 22%, var(--cy-color-surface));
+}
+:where(.cm-editor) :where(.cm-matchingBracket) {
+  outline: var(--cy-border-width) solid var(--cy-color-accent-text);
+}
+
+/* The roles, for CodeMirror's classHighlighter (tok-*), Prism (.token.*) and highlight.js (.hljs-*). */
+:where(.tok-comment, .token.comment, .token.prolog, .token.doctype, .hljs-comment, .hljs-quote) {
+  color: var(--cy-color-syntax-comment);
+  font-style: italic;
+}
+:where(
+  .tok-keyword,
+  .tok-modifier,
+  .tok-controlKeyword,
+  .token.keyword,
+  .token.important,
+  .hljs-keyword,
+  .hljs-built_in,
+  .hljs-selector-tag
+) {
+  color: var(--cy-color-syntax-keyword);
+}
+:where(
+  .tok-string,
+  .tok-string2,
+  .token.string,
+  .token.char,
+  .token.template-string,
+  .hljs-string,
+  .hljs-addition
+) {
+  color: var(--cy-color-syntax-string);
+}
+:where(
+  .tok-number,
+  .tok-bool,
+  .tok-atom,
+  .tok-literal,
+  .token.number,
+  .token.boolean,
+  .token.constant,
+  .hljs-number,
+  .hljs-literal
+) {
+  color: var(--cy-color-syntax-number);
+}
+:where(.tok-function, .token.function, .hljs-title.function_, .hljs-function .hljs-title) {
+  color: var(--cy-color-syntax-function);
+}
+:where(
+  .tok-typeName,
+  .tok-className,
+  .tok-namespace,
+  .token.class-name,
+  .token.builtin,
+  .hljs-type,
+  .hljs-title.class_
+) {
+  color: var(--cy-color-syntax-type);
+}
+:where(.tok-variableName, .tok-labelName, .token.variable, .hljs-variable, .hljs-params) {
+  color: var(--cy-color-syntax-variable);
+}
+:where(.tok-propertyName, .token.property, .hljs-property, .hljs-attr) {
+  color: var(--cy-color-syntax-property);
+}
+:where(
+  .tok-operator,
+  .tok-punctuation,
+  .token.operator,
+  .token.punctuation,
+  .hljs-operator,
+  .hljs-punctuation
+) {
+  color: var(--cy-color-syntax-operator);
+}
+:where(.tok-tagName, .token.tag, .hljs-tag, .hljs-name) {
+  color: var(--cy-color-syntax-tag);
+}
+:where(.tok-attributeName, .token.attr-name, .hljs-attribute, .hljs-selector-attr) {
+  color: var(--cy-color-syntax-attribute);
+}
+:where(.tok-regexp, .token.regex, .hljs-regexp) {
+  color: var(--cy-color-syntax-regexp);
+}
+:where(.tok-invalid, .tok-deleted, .hljs-deletion) {
+  color: var(--cy-color-danger-text);
+}
+:where(.tok-strong, .hljs-strong) {
+  font-weight: var(--cy-font-weight-bold);
+}
+:where(.tok-emphasis, .hljs-emphasis) {
+  font-style: italic;
+}
+:where(.tok-link) {
+  text-decoration: underline;
+}
+
+/* Shiki's css-variables theme reads these names. */
+:where(:root, :host) {
+  --shiki-foreground: var(--cy-color-ink);
+  --shiki-background: transparent;
+  --shiki-token-comment: var(--cy-color-syntax-comment);
+  --shiki-token-keyword: var(--cy-color-syntax-keyword);
+  --shiki-token-string: var(--cy-color-syntax-string);
+  --shiki-token-string-expression: var(--cy-color-syntax-string);
+  --shiki-token-constant: var(--cy-color-syntax-number);
+  --shiki-token-function: var(--cy-color-syntax-function);
+  --shiki-token-parameter: var(--cy-color-syntax-variable);
+  --shiki-token-punctuation: var(--cy-color-syntax-operator);
+  --shiki-token-link: var(--cy-color-accent-text);
+}
+
+@media (forced-colors: active) {
+  :where(.cm-editor) :where(.cm-selectionBackground) {
+    background-color: Highlight;
+  }
+}

@@ -1,9 +1,0 @@
-{
-  "name": "@arshad-shah/cynosure-react/resizable",
-  "private": true,
-  "type": "module",
-  "main": "../dist/resizable.js",
-  "module": "../dist/resizable.js",
-  "types": "../dist/resizable.d.ts",
-  "sideEffects": ["*.css"]
-}

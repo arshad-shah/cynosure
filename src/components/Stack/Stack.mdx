@@ -1,0 +1,45 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./Stack.stories";
+
+<Meta of={Stories} />
+
+# Stack
+
+Lays children out in a column with a gap from the space scale. For a row, use [Inline](?path=/docs/components-inline--docs).
+
+<Canvas of={Stories.GapsUseSpaceTokens} />
+
+## When to use
+
+- Forms, settings panels, card content, any vertical rhythm.
+- Instead of margins on each child.
+
+## Usage
+
+```tsx
+import { Stack } from "@arshad-shah/cynosure";
+
+<Stack gap="4">
+  <TextField label="Name" />
+  <TextField label="Email" />
+</Stack>
+<Stack as="ul" gap="2" align="start">…</Stack>
+```
+
+`gap` is a space token from `"0"` to `"10"` (default `"4"`). `align` is `start`, `center`, `end` or `stretch`. `justify` is `start`, `center`, `end` or `between`. `as` picks a neutral element (`div`, `section`, `ul`, `ol`, `nav`, `aside`, `header`, `footer`, `span`).
+
+<Canvas of={Stories.DefaultsAndLayoutProps} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Notes
+
+- `as` never renders an interactive element.
+- `className` and `style` are for layout only.
+- The gap is a space token (`--cy-space-*`), so it follows the theme's spacing.
+
+## Related
+
+[Inline](?path=/docs/components-inline--docs) · [Card](?path=/docs/components-card--docs) · [Field](?path=/docs/components-field--docs)

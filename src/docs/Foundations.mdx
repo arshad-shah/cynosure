@@ -1,0 +1,10 @@
+import { Meta } from "@storybook/addon-docs/blocks";
+import { TokenTable } from "./TokenTable";
+
+<Meta title="Foundations/Tokens" />
+
+# Tokens
+
+Every visual property resolves to a `--cy-*` custom property generated from one TypeScript schema. Products override any of them through `createTheme({ tokens, components, palettes })`. Values below are the defaults at the comfortable scale; colours show light and dark.
+
+<TokenTable />

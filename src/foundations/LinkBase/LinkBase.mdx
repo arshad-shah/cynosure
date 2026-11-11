@@ -1,0 +1,51 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./LinkBase.stories";
+
+<Meta of={Stories} />
+
+# LinkBase
+
+The native `<a>` for Cynosure, and the only module allowed to render one. It is a foundation: it adds safe link behaviour and no styling.
+
+## Who uses it
+
+[Link](?path=/docs/components-link--docs) and [Card](?path=/docs/components-card--docs) (when it navigates), and any composite that navigates.
+
+## When to use it directly
+
+Only when building a new composite that navigates and needs a native anchor.
+
+**Use a component instead when** you want a link in content: [Link](?path=/docs/components-link--docs). For an action that does not navigate, use [Button](?path=/docs/components-button--docs).
+
+<Canvas of={Stories.OpensExternalLinksSafely} />
+
+## Usage
+
+```tsx
+import { LinkBase } from "@arshad-shah/cynosure";
+
+<LinkBase className="my-link" href="/docs">Docs</LinkBase>
+<LinkBase href="https://example.com" target="_blank">Example</LinkBase>
+
+<LinkBase href="javascript:alert(1)">Dropped</LinkBase> // renders <a> with no href
+```
+
+## Props
+
+It accepts every native anchor attribute.
+
+<ArgTypes of={Stories} />
+
+## Guarantees
+
+- **New tabs:** with `target="_blank"`, `rel` gets `noopener noreferrer` added after any `rel` you pass.
+- **Safe schemes only:** `href` is checked by `safeHref` (internal to LinkBase). Relative, hash and query URLs, and `http`, `https`, `mailto` and `tel` are linked. Anything else, including `javascript:`, is dropped and the anchor gets no `href`.
+- **Parsed like a browser:** `safeHref` strips tab and newline characters anywhere and leading control characters before checking, so obfuscated `javascript:` URLs cannot slip through. An unparseable absolute URL is dropped.
+- The ref reaches the native `<a>`.
+
+<Canvas of={Stories.DropsJavascriptHrefs} />
+<Canvas of={Stories.AllowsOnlySafeSchemes} />
+
+## Related
+
+[Link](?path=/docs/components-link--docs) · [Button](?path=/docs/components-button--docs)

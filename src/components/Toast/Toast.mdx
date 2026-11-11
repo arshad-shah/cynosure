@@ -1,0 +1,94 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./Toast.stories";
+
+<Meta of={Stories} />
+
+# Toast
+
+A short message about something that just happened, shown along one edge of the screen and gone after a few seconds: "Saved", "Copied", "Upload failed". It never takes focus and never blocks the page.
+
+<Canvas of={Stories.ShowsAndAutoDismisses} />
+
+## When to use
+
+- **Confirmation of an action** the person just took, when the result is not otherwise visible.
+- **A background event** worth knowing about now (an upload failed, sync paused).
+
+**Use something else when:**
+- the message belongs to one part of the page and should stay: a Notice
+- the person must decide something: [Dialog](?path=/docs/components-dialog--docs)
+- the message explains a form error: the field's own error text
+
+## Usage
+
+Put one `Toaster` around the part of the app that raises toasts, then call `useToast()` anywhere inside it.
+
+```tsx
+import { Button, Toaster, useToast } from "@arshad-shah/cynosure";
+
+<Toaster position="bottom-end">
+  <App />
+</Toaster>
+
+function Archive() {
+  const { toast } = useToast();
+  return (
+    <Button
+      onClick={() =>
+        toast({ title: "Archived 3 files", action: { label: "Undo", onClick: restore } })
+      }
+    >
+      Archive
+    </Button>
+  );
+}
+```
+
+`toast()` returns an id; `dismiss(id)` closes that toast and `dismiss()` closes them all. Each Toaster has its own store, so two products on one page (or two extension surfaces) never share toasts.
+
+## Stacking
+
+At most `max` toasts show at once. Older ones fold away and come back as newer ones close; they are the same elements, so a screen reader does not hear them twice.
+
+<Canvas of={Stories.MaxVisibleOlderCollapse} />
+
+## Inside a Dialog
+
+Toasts raised while a Dialog is open appear above it, and carry on after it closes.
+
+<Canvas of={Stories.ToastsInsideADialogShowAboveIt} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+| Input | Result |
+| --- | --- |
+| Pointer over the toasts | Timers pause until it leaves |
+| Focus inside a toast (<kbd>Tab</kbd> into it) | Timers pause until focus leaves |
+| Close button | Closes that toast |
+| Action button | Runs the action; the toast stays until it times out or is closed |
+
+- **Announcements:** each toast is a live element: `role="status"` (polite), or `role="alert"` (assertive) for `tone="danger"`. Its text arrives once, after the live element exists, so it is announced once.
+- **Region:** toasts sit in a region named "Notifications" in the browser top layer, so no parent can clip them. Pointer events pass through the empty parts of the region.
+- **Hidden page:** timers also pause while the tab is hidden, so a toast is not missed.
+- **Modal dialogs:** while a [Dialog](?path=/docs/components-dialog--docs) or Sheet inside the Toaster is open, the toasts show inside it, above its backdrop, so they stay visible, clickable and announced (outside, the modal would make them inert). When the dialog closes they move back to the page with the time they had left, and are not announced a second time.
+- **Motion:** toasts slide and fade in and out, and do not move under reduced motion.
+
+## Touch
+
+Swipe a toast sideways by 64px or more to dismiss it; a shorter swipe springs back. Close and action buttons keep a 44px hit area on coarse pointers.
+
+## Theming
+
+Tokens: `--cy-toast-width`, `--cy-toast-radius`, `--cy-toast-padding` and `--cy-toast-gap`.
+
+```ts
+createTheme({ components: { toast: { width: "400px", radius: "10px" } } });
+```
+
+## Related
+
+[Dialog](?path=/docs/components-dialog--docs) · [Button](?path=/docs/components-button--docs)

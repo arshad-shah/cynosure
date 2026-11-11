@@ -1,0 +1,36 @@
+# ContextMenu
+
+A menu of commands for one thing (a file row, a card, a canvas object), opened where the person points: right-click, a long press on touch screens, or Shift+F10 / the context menu key on the focused target. The menu itself is the same as `Menu`: arrow keys, type-ahead, sections, checkable items, shortcuts.
+
+```tsx
+import { ContextMenu } from "@arshad-shah/cynosure";
+
+<ContextMenu label="File actions" items={items} onSelect={run}>
+  {(props) => (
+    <div {...props} tabIndex={0} className="file-row">
+      report.pdf
+    </div>
+  )}
+</ContextMenu>;
+```
+
+| Prop                  | Default | Notes                                                                              |
+| --------------------- | ------- | ---------------------------------------------------------------------------------- |
+| `children`            | –       | `(props) => element`: spread `props` (ref and handlers) onto one focusable element |
+| `label`               | –       | Accessible name of the menu                                                        |
+| `items` / `onSelect`  | –       | Same entries as `Menu` (`MenuItem` or `MenuSection`)                               |
+| `onOpenChange`        | –       | Called with `true` / `false`, e.g. to highlight the row the menu belongs to        |
+| `disabled`            | `false` | The browser's own menu shows instead                                               |
+| `className` / `style` | –       | Layout only, applied to the panel                                                  |
+- Right-click opens the menu with its corner at the pointer; the keyboard opens it under the target. It stays on screen near edges.
+- Touch: a 500ms press opens it (iOS sends no `contextmenu` event); a tap or a scroll does not. Add `-webkit-touch-callout: none` and `user-select: none` to the target so the system's own callout does not appear.
+- Focus moves to the first item and returns to the target when the menu closes.
+- Every command must also be reachable another way (a Menu button or toolbar): a context menu is a shortcut, not the only path.
+
+## Tokens
+
+Shared with Menu: `--cy-menu-*`.
+
+## Used by
+
+File and item lists, editors and canvases in the web apps and extensions (cross-product audit, 2026-11-10).

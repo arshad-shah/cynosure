@@ -1,0 +1,76 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./FloatingToolbar.stories";
+
+<Meta of={Stories} />
+
+# FloatingToolbar
+
+A compact toolbar beside the box or text it works on, like the mini toolbars of document editors. On phones, `DockedToolbar` puts the same controls in one row above the on-screen keyboard.
+
+<Canvas of={Stories.AnchoredAboveItsBox} />
+
+## When to use
+
+- **Actions for the thing being edited**: a field on a PDF, a shape on a canvas, selected text.
+
+**Use something else when:**
+- the actions belong to the whole page: a [Toolbar](?path=/docs/components-toolbar--docs) in the layout
+- the actions are a list of commands: [Menu](?path=/docs/components-menu--docs) or [ContextMenu](?path=/docs/components-contextmenu--docs)
+
+## Usage
+
+```tsx
+import { FloatingToolbar } from "@arshad-shah/cynosure";
+
+<FloatingToolbar label="Field tools" anchor={fieldRef} onEscape={stopEditing}>
+  <IconButton icon={bold} label="Bold" variant="ghost" size="sm" />
+  …
+</FloatingToolbar>
+```
+
+`anchor` is a ref to an element, or any object with `getBoundingClientRect()`. The bar shows while there is an anchor (or while `open`), sits above it at its start edge, flips below when there is no room, and follows it as the page scrolls or the layout changes. It never covers its anchor.
+
+## Selections
+
+`useSelectionAnchor(containerRef)` returns the current text selection inside the container as an anchor, or `null` when there is none, so a formatting bubble appears over selected text and goes when the selection does.
+
+<Canvas of={Stories.FollowsATextSelection} />
+
+## On phones
+
+`DockedToolbar` docks one row to the bottom of the visible viewport, so it rides above the on-screen keyboard. The row scrolls sideways instead of wrapping; `trailing` stays in reach. `keepVisible` scrolls the page so the box being edited stays above the bar, and the bar leaves room at the end of the page for that.
+
+<Canvas of={Stories.DockedAboveTheKeyboard} />
+
+## Palettes and docks
+
+The same `DockedToolbar` makes a vertical tool palette on the `start` or `end` edge. With `onEdgeChange`, people can move it: a grip flips it (click or tap) or snaps it to the half it is dragged to (Escape mid-drag cancels), and Alt+Left/Right inside the bar does the same. `floating` makes the bottom bar a centred pill, the place for a mode switcher.
+
+```tsx
+<DockedToolbar label="Tools" edge={edge} onEdgeChange={setEdge}>…</DockedToolbar>
+<DockedToolbar label="Mode" floating>
+  <SegmentedControl label="Mode" options={modes} value={mode} onChange={setMode} />
+</DockedToolbar>
+```
+
+<Canvas of={Stories.ASidePaletteThatMoves} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+- **Toolbar:** an APG toolbar named by `label`: one tab stop, arrow keys between controls, Home and End.
+- **Focus:** the bar never takes focus by itself. Alt+F10 (`hotkey`) moves into it while it is open; Escape calls `onEscape` and returns focus where it came from, so an editor keeps its caret.
+- **Layering:** both bars are top-layer popovers rendered in place; nothing is added to `<body>`.
+- **Touch:** IconButtons inside have 44px hit areas on touch screens.
+- **Motion:** the floating bar fades in, unless motion is reduced.
+
+## Theming
+
+Tokens: `--cy-floating-toolbar-background`, `--cy-floating-toolbar-radius` and `--cy-floating-toolbar-offset`.
+
+## Related
+
+[Toolbar](?path=/docs/components-toolbar--docs) · [Popover](?path=/docs/components-popover--docs) · [ContextMenu](?path=/docs/components-contextmenu--docs)

@@ -1,0 +1,191 @@
+/*
+ * dialog: the native <dialog> fills its container (the viewport, in the top layer) and is the scrim; the panel sits
+ * inside it. A pointer down on the dialog itself is therefore a backdrop click. The dialog is also the size container,
+ * so a narrow viewport, extension popup or side panel turns the centred dialog into a bottom sheet.
+ */
+.cy-dialog.cy-dialog {
+  --_w: var(--cy-dialog-width-md, 480px);
+  --_radius: var(--cy-dialog-radius, var(--cy-radius-card));
+  --_pad: var(--cy-dialog-padding, var(--cy-space-7));
+  box-sizing: border-box !important;
+  position: fixed;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  max-inline-size: none;
+  max-block-size: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  overflow: hidden;
+  container: cy-dialog / inline-size;
+  display: none;
+  place-items: center;
+  background: var(--cy-dialog-scrim, rgb(0 0 0 / 0.45));
+  color: var(--cy-color-ink);
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-font-size-md);
+  font-weight: var(--cy-font-weight-regular);
+  line-height: var(--cy-font-line-height);
+  letter-spacing: normal;
+  text-align: start;
+  text-transform: none;
+  outline: none;
+  /* Fades as a whole (scrim and panel together); the panel only scales or slides. */
+  opacity: 1;
+  transition:
+    opacity var(--cy-motion-base) var(--cy-motion-ease),
+    display var(--cy-motion-base) allow-discrete,
+    overlay var(--cy-motion-base) allow-discrete;
+  &[open] {
+    display: grid;
+    animation: cy-dialog-in var(--cy-motion-base) var(--cy-motion-ease);
+  }
+  &:not([open]) {
+    opacity: 0;
+  }
+  &::backdrop {
+    background: transparent;
+  }
+  &[data-size="sm"] {
+    --_w: var(--cy-dialog-width-sm, 360px);
+  }
+  &[data-size="lg"] {
+    --_w: var(--cy-dialog-width-lg, 640px);
+  }
+}
+
+.cy-dialog-panel.cy-dialog-panel {
+  --_gap: var(--cy-space-6);
+  --_from-translate: 0 0;
+  --_from-scale: 0.97;
+  box-sizing: border-box !important;
+  display: flex;
+  flex-direction: column;
+  inline-size: min(var(--_w), calc(100% - 2 * var(--_gap)));
+  max-block-size: calc(100% - 2 * var(--_gap));
+  min-block-size: 0;
+  margin: var(--_gap);
+  padding: 0;
+  overflow: hidden;
+  border: var(--cy-border-width) solid var(--cy-color-line);
+  border-radius: var(--_radius);
+  background: var(--cy-color-surface);
+  color: var(--cy-color-ink);
+  box-shadow: var(--cy-shadow-lg);
+  font-size: var(--cy-font-size-md);
+  scale: 1;
+  translate: 0 0;
+  transition:
+    scale var(--cy-motion-base) var(--cy-motion-ease),
+    translate var(--cy-motion-base) var(--cy-motion-ease);
+}
+.cy-dialog.cy-dialog:not([open]) .cy-dialog-panel {
+  scale: var(--_from-scale);
+  translate: var(--_from-translate);
+}
+.cy-dialog.cy-dialog[open] .cy-dialog-panel {
+  animation: cy-dialog-panel-in var(--cy-motion-base) var(--cy-motion-ease);
+}
+
+/* Where a Toaster's region lives while this dialog is open (the region itself is a top-layer popover). */
+.cy-dialog-toasts {
+  display: contents;
+  font-size: var(--cy-font-size-md);
+}
+
+.cy-dialog-header.cy-dialog-header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--cy-space-4);
+  padding: var(--_pad) var(--_pad) 0;
+  font-size: var(--cy-font-size-md);
+}
+.cy-dialog-title.cy-dialog-title {
+  flex: 1 1 auto;
+  min-inline-size: 0;
+  margin: 0;
+  padding-block: var(--cy-space-1);
+  color: var(--cy-color-ink);
+  font-family: var(--cy-font-display, var(--cy-font-sans));
+  font-size: var(--cy-font-size-lg);
+  font-weight: var(--cy-font-weight-bold);
+  line-height: var(--cy-font-line-height);
+  overflow-wrap: anywhere;
+}
+.cy-dialog-header > .cy-tooltip-anchor {
+  flex: none;
+  margin-block-start: calc(-1 * var(--cy-space-1));
+  margin-inline-end: calc(-1 * var(--cy-space-3));
+}
+.cy-dialog-description.cy-dialog-description {
+  margin: 0;
+  padding: var(--cy-space-2) var(--_pad) 0;
+  color: var(--cy-color-muted);
+  font-size: var(--cy-font-size-md);
+}
+.cy-dialog-body.cy-dialog-body {
+  flex: 1 1 auto;
+  min-block-size: 0;
+  padding: var(--cy-space-6) var(--_pad) var(--_pad);
+  overflow: auto;
+  overscroll-behavior: contain;
+  font-size: var(--cy-font-size-md);
+  scroll-padding-block: var(--cy-space-6);
+}
+.cy-dialog-actions.cy-dialog-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--cy-space-4);
+  padding: var(--cy-space-6) var(--_pad);
+  border-block-start: var(--cy-border-width) solid var(--cy-color-line);
+  font-size: var(--cy-font-size-md);
+}
+
+/* Narrow container: a centred dialog becomes a bottom sheet. */
+@container cy-dialog (inline-size < 36rem) {
+  .cy-dialog:not([data-side]) .cy-dialog-panel.cy-dialog-panel {
+    --_from-translate: 0 100%;
+    --_from-scale: 1;
+    align-self: end;
+    inline-size: 100%;
+    max-block-size: calc(100% - var(--cy-space-8));
+    margin: 0;
+    border-block-end: 0;
+    border-end-start-radius: 0;
+    border-end-end-radius: 0;
+  }
+  .cy-dialog:not([data-side]) .cy-dialog-actions.cy-dialog-actions {
+    padding-block-end: max(var(--cy-space-6), env(safe-area-inset-bottom));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cy-dialog.cy-dialog,
+  .cy-dialog.cy-dialog[open],
+  .cy-dialog.cy-dialog[open] .cy-dialog-panel,
+  .cy-dialog-panel.cy-dialog-panel {
+    transition: none;
+    animation: none;
+  }
+}
+@media (forced-colors: active) {
+  .cy-dialog-panel.cy-dialog-panel {
+    border-color: CanvasText;
+  }
+}
+
+/* Entrance as a keyframe animation, not @starting-style: if an engine mishandles the animation, the element still
+   ends in its normal visible style (WebKit left nested @starting-style overlays at opacity 0). */
+@keyframes cy-dialog-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes cy-dialog-panel-in {
+  from {
+    scale: var(--_from-scale);
+    translate: var(--_from-translate);
+  }
+}

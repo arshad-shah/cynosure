@@ -1,9 +1,0 @@
-{
-  "name": "@arshad-shah/cynosure-react/feedback",
-  "private": true,
-  "type": "module",
-  "main": "../dist/feedback/index.js",
-  "module": "../dist/feedback/index.js",
-  "types": "../dist/feedback/index.d.ts",
-  "sideEffects": ["*.css"]
-}

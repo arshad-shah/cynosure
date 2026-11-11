@@ -1,0 +1,106 @@
+/*
+ * sortable-list: rows with a grip handle at the inline start. The row being moved is lifted (raised surface, shadow,
+ * accent outline); rows swap places live as it moves.
+ */
+.cy-sortable-list.cy-sortable-list {
+  box-sizing: border-box !important;
+  display: block;
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+  color: var(--cy-color-ink);
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-font-size-md);
+  font-weight: var(--cy-font-weight-regular);
+  line-height: var(--cy-font-line-height);
+  letter-spacing: normal;
+  text-transform: none;
+  &[data-size="sm"] {
+    font-size: var(--cy-font-size-sm);
+  }
+  &[data-size="lg"] {
+    font-size: var(--cy-font-size-lg);
+  }
+}
+.cy-sortable-list-items.cy-sortable-list-items {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cy-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: inherit;
+}
+.cy-sortable-list-item.cy-sortable-list-item {
+  display: flex;
+  align-items: center;
+  gap: var(--cy-space-3);
+  min-block-size: var(--cy-control-height-lg);
+  margin: 0;
+  padding: var(--cy-space-2) var(--cy-space-4) var(--cy-space-2) var(--cy-space-2);
+  border: var(--cy-border-width) solid var(--cy-color-line);
+  border-radius: var(--cy-sortable-list-radius, var(--cy-radius-md));
+  background: var(--cy-sortable-list-item-background, var(--cy-color-surface));
+  font-size: inherit;
+  transition:
+    box-shadow var(--cy-motion-fast) var(--cy-motion-ease),
+    border-color var(--cy-motion-fast) var(--cy-motion-ease);
+  &[data-moving] {
+    position: relative;
+    z-index: 1;
+    border-color: var(--cy-color-accent);
+    background: var(--cy-color-surface-raised);
+    box-shadow: var(--cy-shadow-md);
+  }
+}
+.cy-sortable-list .cy-sortable-list-handle.cy-sortable-list-handle {
+  flex: none;
+  cursor: grab;
+  touch-action: none;
+  [data-moving] > .cy-tooltip-anchor > & {
+    cursor: grabbing;
+  }
+}
+.cy-sortable-list-content.cy-sortable-list-content {
+  flex: 1;
+  min-inline-size: 0;
+  font-size: inherit;
+}
+.cy-sortable-list-hidden.cy-sortable-list-hidden {
+  position: absolute;
+  inline-size: var(--cy-border-width);
+  block-size: var(--cy-border-width);
+  margin: calc(var(--cy-border-width) * -1);
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  font-size: inherit;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cy-sortable-list-item.cy-sortable-list-item {
+    transition: none;
+  }
+}
+@media (forced-colors: active) {
+  .cy-sortable-list-item.cy-sortable-list-item[data-moving] {
+    outline: calc(2 * var(--cy-border-width)) solid Highlight;
+  }
+}
+/* Grid: tiles wrap into as many columns as fit; the grip sits at the tile's top start, the content fills it. */
+.cy-sortable-list.cy-sortable-list[data-layout="grid"] {
+  & > .cy-sortable-list-items.cy-sortable-list-items {
+    display: grid;
+    grid-template-columns: repeat(
+        auto-fill,
+        minmax(min(100%, var(--cy-sortable-list-tile-min, calc(8 * var(--cy-space-6)))), 1fr)
+      );
+  }
+  & .cy-sortable-list-item.cy-sortable-list-item {
+    flex-direction: column;
+    align-items: stretch;
+    padding: var(--cy-space-2);
+  }
+  & .cy-sortable-list-handle.cy-sortable-list-handle {
+    align-self: flex-start;
+  }
+}

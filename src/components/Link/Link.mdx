@@ -1,0 +1,66 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./Link.stories";
+
+<Meta of={Stories} />
+
+# Link
+
+An inline text link that takes the user somewhere. For an action that doesn't navigate, use [Button](?path=/docs/components-button--docs).
+
+<Canvas of={Stories.TonesAreReadable} />
+
+## When to use
+
+- Links inside sentences, help text and footers.
+- `external` for pages outside your product.
+
+**Use something else when:**
+- it performs an action (save, delete): [Button](?path=/docs/components-button--docs)
+- it is a whole clickable panel: [Card](?path=/docs/components-card--docs) with `href`
+
+## Usage
+
+```tsx
+import { Link } from "@arshad-shah/cynosure";
+
+<Link href="/docs">Read the docs</Link>
+<Link href="https://example.com" external>Example</Link>
+<Link href="mailto:hello@example.com" tone="neutral" size="sm">Email us</Link>
+```
+
+## External links
+
+`external` opens a new tab with a safe `rel`, adds an external icon and announces "(opens in new tab)" to screen readers. Change that text with `labels.external`.
+
+<Canvas of={Stories.ExternalAnnouncesNewTab} />
+<Canvas of={Stories.ExternalLabelOverride} />
+
+## Tone and size
+
+`tone` defaults to `accent`; text uses each tone's readable text colour. `size` defaults to `inherit`, so the link matches the surrounding text; `sm`, `md` and `lg` set a fixed size.
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+| Input | Result |
+| --- | --- |
+| Click, <kbd>Enter</kbd> | Follows the link, or calls `onClick` |
+| <kbd>Tab</kbd> | Focus with a visible ring |
+
+- **Safe schemes:** `href` may be relative, `http(s)`, `mailto` or `tel`. Other schemes are not linked.
+- **Ref:** the ref points at the anchor.
+
+## Theming
+
+Tokens: `--cy-link-underline-offset` and `--cy-link-underline-thickness`.
+
+```ts
+createTheme({ components: { link: { underlineThickness: "2px" } } });
+```
+
+## Related
+
+[Button](?path=/docs/components-button--docs) · [Card](?path=/docs/components-card--docs)

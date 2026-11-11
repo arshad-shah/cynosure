@@ -1,0 +1,192 @@
+/* Button: variant (fill style) × tone (semantic colour) × size. Every visual value reads a --cy-button-* token
+   with a global fallback. Inner parts first (lower specificity), root last. */
+.cy-button-content {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cy-button-gap, var(--cy-space-3));
+  min-inline-size: 0;
+  max-inline-size: 100%;
+}
+
+.cy-button-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-inline-size: 0;
+}
+
+/* LoadingDots overlay, centred over the (transparent) content so the button keeps its width. */
+.cy-button .cy-loading-dots.cy-button-loading {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  inline-size: fit-content;
+}
+
+/* Root selector is doubled so host type/attribute rules (e.g. Tailwind v3 [type=button]) never win. */
+.cy-button.cy-button {
+  /* Tone: the semantic colour, its text colour and its pressed shade. */
+  --_tone: var(--cy-color-ink);
+  --_tone-text: var(--cy-color-ink);
+  --_on: var(--cy-color-bg);
+  --_tone-hover: color-mix(in oklab, var(--_tone) 86%, var(--cy-color-bg));
+  --_soft: var(--cy-button-soft-mix, 14%);
+  --_outline: var(--cy-button-outline-mix, 55%);
+  --_h: var(--cy-button-height-md, var(--cy-control-height-md));
+  --_hit: var(--cy-hit-min, 24px);
+
+  /* Variant defaults (outline): computed from the tone. */
+  --_bg: var(--cy-color-surface);
+  --_fg: var(--_tone-text);
+  --_border: color-mix(in oklab, var(--_tone) var(--_outline), var(--cy-color-line));
+  --_hover: color-mix(in oklab, var(--_tone) var(--_soft), var(--cy-color-surface));
+
+  /* Root reset (component roots never carry .cy-reset, so nothing competes with these rules). */
+  box-sizing: border-box !important;
+  margin: 0;
+  letter-spacing: normal;
+  text-transform: none;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  block-size: var(--_h);
+  min-block-size: var(--_h);
+  max-inline-size: var(--cy-button-max-width, 32ch);
+  min-inline-size: 0;
+  padding: 0 var(--cy-button-padding-inline, var(--cy-space-5));
+  border: var(--cy-border-width) solid var(--_border);
+  border-radius: var(--cy-button-radius, calc(var(--_h) * var(--cy-radius-factor)));
+  background: var(--_bg);
+  background-image: none;
+  color: var(--_fg);
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-font-size-md);
+  font-weight: var(--cy-button-font-weight, var(--cy-font-weight-medium));
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  appearance: none;
+  transition:
+    background-color var(--cy-motion-fast) var(--cy-motion-ease),
+    border-color var(--cy-motion-fast) var(--cy-motion-ease),
+    box-shadow var(--cy-motion-fast) var(--cy-motion-ease),
+    transform var(--cy-motion-fast) var(--cy-motion-ease);
+
+  /* Invisible hit area: never smaller than --cy-hit-min (44px on coarse pointers). */
+  &::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    translate: -50% -50%;
+    inline-size: max(100%, var(--_hit));
+    block-size: max(100%, var(--_hit));
+  }
+
+  /* Tones */
+  &[data-tone="accent"] {
+    --_tone: var(--cy-color-accent);
+    --_tone-text: var(--cy-color-accent-text);
+    --_on: var(--cy-color-on-accent);
+    --_tone-hover: var(--cy-color-accent-hover);
+  }
+  &[data-tone="danger"] {
+    --_tone: var(--cy-color-danger);
+    --_tone-text: var(--cy-color-danger-text);
+    --_on: var(--cy-color-on-danger);
+  }
+  &[data-tone="success"] {
+    --_tone: var(--cy-color-success);
+    --_tone-text: var(--cy-color-success-text);
+    --_on: var(--cy-color-on-success);
+  }
+  &[data-tone="warning"] {
+    --_tone: var(--cy-color-warning);
+    --_tone-text: var(--cy-color-warning-text);
+    --_on: var(--cy-color-on-warning);
+  }
+  &[data-tone="info"] {
+    --_tone: var(--cy-color-info);
+    --_tone-text: var(--cy-color-info-text);
+    --_on: var(--cy-color-on-info);
+  }
+
+  /* Variants */
+  &[data-variant="solid"] {
+    --_bg: var(--_tone);
+    --_fg: var(--_on);
+    --_border: transparent;
+    --_hover: var(--_tone-hover);
+    box-shadow: var(--cy-button-solid-shadow, var(--cy-shadow-lit));
+  }
+  &[data-variant="soft"] {
+    --_bg: color-mix(in oklab, var(--_tone) var(--_soft), var(--cy-color-surface));
+    --_border: transparent;
+    --_hover: color-mix(in oklab, var(--_tone) calc(var(--_soft) * 1.7), var(--cy-color-surface));
+  }
+  &[data-variant="ghost"] {
+    --_bg: transparent;
+    --_border: transparent;
+  }
+  &[data-tone="neutral"]:is([data-variant="soft"], [data-variant="ghost"], [data-variant="outline"]) {
+    --_fg: var(--cy-color-ink);
+  }
+  &[data-tone="neutral"][data-variant="outline"] {
+    --_border: var(--cy-color-line);
+    --_hover: var(--cy-color-soft);
+  }
+
+  /* Sizes */
+  &[data-size="sm"] {
+    --_h: var(--cy-button-height-sm, var(--cy-control-height-sm));
+    font-size: var(--cy-font-size-sm);
+  }
+  &[data-size="lg"] {
+    --_h: var(--cy-button-height-lg, var(--cy-control-height-lg));
+    font-size: var(--cy-font-size-lg);
+  }
+  &[data-full] {
+    inline-size: 100%;
+    max-inline-size: none;
+  }
+
+  /* States */
+  &:hover:not(:disabled, [aria-disabled="true"]) {
+    background: var(--_hover);
+  }
+  &:active:not(:disabled, [aria-disabled="true"]) {
+    transform: scale(var(--cy-button-press-scale, 0.97));
+  }
+  &[data-pressed] {
+    --_bg: color-mix(in oklab, var(--_tone) var(--_soft), var(--cy-color-surface));
+    --_border: var(--_tone);
+  }
+  &:focus-visible {
+    outline: var(--cy-border-focus) solid transparent;
+    outline-offset: 0;
+    border-color: var(--cy-color-accent);
+    box-shadow: 0 0 0 var(--cy-border-focus) var(--cy-color-ring);
+  }
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  &[data-loading] {
+    cursor: progress;
+  }
+  &[data-loading] .cy-button-content {
+    opacity: 0;
+  }
+}
+
+@media (pointer: coarse) {
+  .cy-button.cy-button {
+    --_hit: var(--cy-hit-coarse, 44px);
+  }
+}

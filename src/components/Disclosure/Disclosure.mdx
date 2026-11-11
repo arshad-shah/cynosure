@@ -1,0 +1,70 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./Disclosure.stories";
+
+<Meta of={Stories} />
+
+# Disclosure
+
+Shows and hides one section behind a button: advanced options, extra detail, a long explanation. For several related sections that share state, use [Accordion](?path=/docs/components-accordion--docs).
+
+<Canvas of={Stories.TogglesWithClickEnterAndSpace} />
+
+## When to use
+
+- **Secondary content** most people don't need, but some do (advanced settings, technical details).
+- **Long pages** where collapsing optional parts keeps the main task visible.
+
+**Use something else when:**
+- several sections belong together: [Accordion](?path=/docs/components-accordion--docs)
+- views are alternatives to each other: [Tabs](?path=/docs/components-tabs--docs)
+- the content is required to complete the task: show it, don't hide it
+
+## Usage
+
+```tsx
+import { Disclosure } from "@arshad-shah/cynosure";
+
+<Disclosure summary="Advanced options">
+  <Stack gap="4">…</Stack>
+</Disclosure>
+
+<Disclosure summary="Details" open={open} onOpenChange={setOpen} variant="card" />
+```
+
+## Variants
+
+`plain` has no chrome, `line` adds a divider below, and `card` is a bordered surface with inner padding.
+
+<Canvas of={Stories.Variants} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+| Input | Result |
+| --- | --- |
+| Click, tap, <kbd>Enter</kbd>, <kbd>Space</kbd> | Opens or closes |
+| <kbd>Tab</kbd> | Skips content inside a closed section |
+
+- **Wiring:** the trigger is a button with `aria-expanded` and `aria-controls`. `headingLevel` wraps it in a heading, and `region` makes the content a region labelled by the trigger.
+- **Hidden means hidden:** after closing, the content is not focusable and not announced.
+- **Motion:** the height animates smoothly in every browser. Reduced motion (the OS setting, or `createTheme({ motion: "reduced" })`) makes it instant.
+- **Focus ring:** sits outside the trigger in `plain` and `line`, so it never touches the text, and inside the `card` border.
+
+## Touch
+
+The trigger is the full width and at least 44px tall on coarse pointers.
+
+## Theming
+
+Tokens: `--cy-disclosure-gap` (summary to chevron), `--cy-disclosure-radius` (card) and `--cy-disclosure-padding-inline`. The speed follows `--cy-motion-base`.
+
+```ts
+createTheme({ components: { disclosure: { radius: "8px", paddingInline: "20px" } } });
+```
+
+## Related
+
+[Accordion](?path=/docs/components-accordion--docs) · [Tabs](?path=/docs/components-tabs--docs) · [Card](?path=/docs/components-card--docs)

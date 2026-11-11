@@ -1,9 +1,0 @@
-{
-  "name": "@arshad-shah/cynosure-react/menu",
-  "private": true,
-  "type": "module",
-  "main": "../dist/menu.js",
-  "module": "../dist/menu.js",
-  "types": "../dist/menu.d.ts",
-  "sideEffects": ["*.css"]
-}

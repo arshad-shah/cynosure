@@ -1,0 +1,73 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./ThemeToggle.stories";
+
+<Meta of={Stories} />
+
+# ThemeToggle
+
+A light, dark or system switch with sun, moon and monitor icons. It is a [SegmentedControl](?path=/docs/components-segmentedcontrol--docs) wired to `useColorMode`. Pair it with `CynosureTheme` so the chosen mode is applied.
+
+<Canvas of={Stories.SelectsAndPersists} />
+
+## When to use
+
+- A colour-mode switch in an app header, settings page or extension popup.
+
+**Use something else when:**
+- you need a different set of modes or other labels and icons: [SegmentedControl](?path=/docs/components-segmentedcontrol--docs)
+
+## Usage
+
+Uncontrolled, it manages and persists the mode itself. Pass the mode to `CynosureTheme` through `useColorMode`:
+
+```tsx
+import { CynosureTheme, ThemeToggle, useColorMode } from "@arshad-shah/cynosure";
+
+function App() {
+  const { mode } = useColorMode();
+  return (
+    <CynosureTheme mode={mode}>
+      <ThemeToggle />
+      {/* app */}
+    </CynosureTheme>
+  );
+}
+```
+
+<Canvas of={Stories.UncontrolledToggleDrivesThePage} />
+
+## Controlled use
+
+Pass `value` and `onChange(mode)` to own the state. `mode` is `"light"`, `"dark"` or `"system"`.
+
+```tsx
+<ThemeToggle value={mode} onChange={setMode} size="sm" />
+```
+
+## Persistence
+
+Uncontrolled mode is stored in `localStorage` by default. Pass `storage` (any `{ get, set }` object, sync or async, such as one backed by `chrome.storage`) to persist elsewhere.
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+- **Names:** the group is named "Colour mode" and the options "Light", "Dark" and "System". Override them with `labels` (`label`, `light`, `dark`, `system`) when you localise.
+- **Keyboard:** it behaves as its SegmentedControl: arrow keys move and select, and activating the current option does nothing.
+- **Icon-only:** the icons carry no visible text, but each option keeps its accessible name.
+
+<Canvas of={Stories.KeyboardAndLabels} />
+
+## Theming
+
+ThemeToggle has no tokens of its own. It uses the SegmentedControl tokens: `--cy-segmented-control-{radius,track-bg,active-bg,padding}`.
+
+```ts
+createTheme({ components: { segmentedControl: { radius: "999px" } } });
+```
+
+## Related
+
+[SegmentedControl](?path=/docs/components-segmentedcontrol--docs) · [Toolbar](?path=/docs/components-toolbar--docs)

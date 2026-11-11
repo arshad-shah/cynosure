@@ -1,0 +1,78 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./Tooltip.stories";
+
+<Meta of={Stories} />
+
+# Tooltip
+
+Short supplementary text for a control, shown on hover or keyboard focus. It becomes the trigger's accessible description. For an icon-only button, [IconButton](?path=/docs/components-iconbutton--docs) already shows its label as a tooltip.
+
+<Canvas of={Stories.HoverShowsAfterDelay} />
+
+## When to use
+
+- A hint that explains a control, such as a shortcut or what an action exports.
+- Extra detail the user can do without.
+
+**Use something else when:**
+- the text is essential to using the control: put it in a visible label or `description`
+- the content is interactive or long: a popover or dialog
+- the control is an icon-only button: [IconButton](?path=/docs/components-iconbutton--docs), which requires a label
+
+## Usage
+
+```tsx
+import { Button, Tooltip } from "@arshad-shah/cynosure";
+import { download } from "@arshad-shah/cynosure/icons";
+
+<Tooltip content="Download as JSON">
+  <Button icon={download}>Export</Button>
+</Tooltip>
+<Tooltip content="Copy link" placement="bottom" delay={500}>
+  <Button variant="ghost">Share</Button>
+</Tooltip>
+```
+
+The child must be one focusable element (a Button, IconButton or Link). Keep `content` short and non-interactive.
+
+## Placement
+
+`placement` is `top` (default), `bottom`, `start` or `end`. The tooltip flips and shifts to stay in the viewport, and follows its trigger on scroll and resize.
+
+<Canvas of={Stories.FlipsNearTheViewportEdge} />
+
+## Timing
+
+Hover opens after `delay` milliseconds (default `300`). Keyboard focus opens it immediately.
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+| Input | Result |
+| --- | --- |
+| Hover | Opens after `delay`, closes shortly after the pointer leaves |
+| Keyboard focus | Opens immediately |
+| <kbd>Escape</kbd> | Dismisses it |
+
+- **WCAG 1.4.13:** the tooltip is hoverable, dismissible with Escape, and stays while hovered or focused.
+- **Description:** the trigger gets `aria-describedby` pointing to the tooltip, and any existing value is kept.
+- **Top layer:** it uses the Popover API, so it is never clipped and works inside shadow roots.
+
+## Touch
+
+It never opens on touch. Do not rely on a tooltip for information touch users need.
+
+## Theming
+
+Tokens: `--cy-tooltip-{bg,ink,radius,max-width}`.
+
+```ts
+createTheme({ components: { tooltip: { radius: "6px", maxWidth: "240px" } } });
+```
+
+## Related
+
+[IconButton](?path=/docs/components-iconbutton--docs) · [Button](?path=/docs/components-button--docs) · [Link](?path=/docs/components-link--docs)
