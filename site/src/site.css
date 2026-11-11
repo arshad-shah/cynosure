@@ -61,3 +61,14 @@ body > astro-island {
 .site-page pre.astro-code {
   background-color: var(--cy-prose-code-background, var(--cy-color-soft)) !important;
 }
+.site-props {
+  margin-block-start: var(--cy-space-9);
+}
+.site-required {
+  color: var(--cy-color-danger-text);
+  font-size: var(--cy-font-size-xs);
+}
+/* Types wrap between words only, so short names (ReactNode) never break in the middle. */
+.site-type {
+  overflow-wrap: break-word;
+}

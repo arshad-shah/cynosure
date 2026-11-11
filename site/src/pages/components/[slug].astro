@@ -2,7 +2,9 @@
 import { getEntry, render } from "astro:content";
 import { Button, Inline } from "@arshad-shah/cynosure";
 import { allEntries } from "../../catalogue";
+import PropsTable from "../../components/PropsTable";
 import Doc from "../../layouts/Doc.astro";
+import { propsOf } from "../../props";
 import { REPO } from "../../routes";
 
 export async function getStaticPaths() {
@@ -16,6 +18,7 @@ const { Content } = await render(readme);
 // Storybook ids: "Components/AppShell" → components-appshell.
 const stories = `/storybook/?path=/docs/${entry.kind}-${entry.name.toLowerCase()}--docs`;
 const folder = `${REPO}/tree/main/src/${entry.kind}/${entry.name}`;
+const props = propsOf(entry.name);
 ---
 
 <Doc title={entry.name} description={entry.summary.slice(0, 200)} current="components" source={entry.source}>
@@ -24,4 +27,13 @@ const folder = `${REPO}/tree/main/src/${entry.kind}/${entry.name}`;
     <Button href={folder} size="sm" variant="ghost">Source</Button>
   </Inline>
   <Content />
+  {
+    props && props.length > 0 && (
+      <section class="site-props">
+        <h2 id="all-props">All props</h2>
+        <p>Every prop {entry.name} declares, generated from the published type definitions.</p>
+        <PropsTable name={entry.name} rows={props} />
+      </section>
+    )
+  }
 </Doc>
