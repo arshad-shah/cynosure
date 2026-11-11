@@ -1,27 +1,32 @@
 /**
- * Props tables generated from the published package's own type declarations (dist/*.d.ts), at build time, so every
+ * Props tables generated from the published package's own type declarations, at build time, so every
  * table matches what users install. Only props Cynosure declares are listed: attributes inherited from React's DOM
  * types (an input's hundreds of HTML attributes) are left to the platform's documentation.
  */
+import { readFileSync } from "node:fs";
 import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
 import ts from "typescript";
-
-export interface PropRow {
-  name: string;
-  type: string;
-  required: boolean;
-  default: string;
-  description: string;
-}
+import type { PropRow } from "../types.ts";
 
 const require = createRequire(import.meta.url);
-const pkgDir = dirname(require.resolve("@arshad-shah/cynosure/package.json"));
-const entry = join(pkgDir, "dist", "index.d.ts");
 
-let cached: { checker: ts.TypeChecker; exports: Map<string, ts.Symbol> } | null = null;
-function load() {
+/** The folder an installed package lives in. */
+export const packageDir = (name: string) => dirname(require.resolve(`${name}/package.json`));
+
+interface Loaded {
+  pkgDir: string;
+  checker: ts.TypeChecker;
+  exports: Map<string, ts.Symbol>;
+}
+const cache = new Map<string, Loaded>();
+function load(pkg: string): Loaded {
+  const cached = cache.get(pkg);
   if (cached) return cached;
+  const pkgDir = packageDir(pkg);
+  const manifest = JSON.parse(readFileSync(join(pkgDir, "package.json"), "utf8"));
+  const types = manifest.exports?.["."]?.types ?? manifest.types ?? "dist/index.d.ts";
+  const entry = join(pkgDir, types);
   const program = ts.createProgram([entry], {
     strict: true,
     skipLibCheck: true,
@@ -35,12 +40,10 @@ function load() {
   const source = program.getSourceFile(entry);
   const module = source && checker.getSymbolAtLocation(source);
   const exports = new Map((module ? checker.getExportsOfModule(module) : []).map((s) => [s.getName(), s]));
-  cached = { checker, exports };
-  return cached;
+  const loaded = { pkgDir, checker, exports };
+  cache.set(pkg, loaded);
+  return loaded;
 }
-
-const ownDeclaration = (symbol: ts.Symbol) =>
-  (symbol.getDeclarations() ?? []).some((d) => d.getSourceFile().fileName.startsWith(pkgDir));
 
 /**
  * The default stated in a doc comment ("Default: 768.", "Default 1", "Defaults to `button` so …"): the value only. A
@@ -52,9 +55,11 @@ function defaultFrom(text: string): string {
   return found.split(/\s+/).length <= 4 ? found : "";
 }
 
-/** The props of `<name>Props`, or null when the package exports no such type. */
-export function propsOf(name: string): PropRow[] | null {
-  const { checker, exports } = load();
+/** The props of `<name>Props` in `pkg`, or null when the package exports no such type. */
+export function propsOf(pkg: string, name: string): PropRow[] | null {
+  const { checker, exports, pkgDir } = load(pkg);
+  const ownDeclaration = (symbol: ts.Symbol) =>
+    (symbol.getDeclarations() ?? []).some((d) => d.getSourceFile().fileName.startsWith(pkgDir));
   const symbol = exports.get(`${name}Props`);
   if (!symbol) return null;
   const target = symbol.flags & ts.SymbolFlags.Alias ? checker.getAliasedSymbol(symbol) : symbol;
@@ -87,4 +92,9 @@ export function propsOf(name: string): PropRow[] | null {
   }
   // Required props first, then in declaration order.
   return rows.sort((a, b) => Number(b.required) - Number(a.required));
+}
+
+/** The names of every component-like value `pkg` exports (capitalised), for telling its components from helpers. */
+export function exportedNames(pkg: string): string[] {
+  return [...load(pkg).exports.keys()].filter((name) => /^[A-Z][a-z]/.test(name)).sort();
 }

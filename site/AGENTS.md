@@ -1,14 +1,19 @@
 # site/
 
-The documentation site at https://cynosure.arshadshah.com: Astro (static output) with Cynosure's React components as islands. The plan and the rest of the work are in issue #152.
+The documentation site at https://cynosure.arshadshah.com, and the template every other product's documentation is made from. Read `README.md` in this folder first: it says how the site is managed and how it works. The plan and the remaining work are in issue #152.
 
-- **Cynosure from npm.** `@arshad-shah/cynosure` is a normal dependency on the published version, never a link to `../src`: the site shows what users get. To use a change, release it first. (`minimumReleaseAgeExclude` in `pnpm-workspace.yaml` lets our own packages install the day they publish.)
-- **Only Cynosure for interface.** No other UI library, no hand-made buttons, inputs or menus, no glyphs or emoji as icons (Facet icons and brand marks only). Something awkward to build here is a gap in Cynosure: fix it there, with a story and a test, then use it.
-- **Every colour and size is a token** (`--cy-*`). `src/site.css` holds page layout only.
-- **Content is not copied.** Pages come from the component READMEs, docs pages and `docs/*.md`; a correction is made in the source file.
-- **Navigation lists only pages that exist** (`src/site.ts`; the phone tab bar is `TABS`).
-- **How content arrives:** `src/content.config.ts` reads the root `README.md` (Getting started), `CHANGELOG.md`, the guides in `docs/` (the list in `src/routes.ts`) and every component and foundation README. `src/remark-repo-links.mjs` rewrites their links: a document with a page links to that page (`routeOf` in `src/routes.ts`), anything else to the file on GitHub. The component catalogue's groups come from the root README's "Components" section.
-- **Props tables** (`src/props.ts`) are generated at build time with the TypeScript compiler from the installed package's `dist/index.d.ts`: `<Name>Props`, only the props Cynosure declares (not inherited DOM attributes), required first, with each doc comment and its stated default. They render with Cynosure's Table, without sorting (no script on the page).
-- **Code colours:** Markdown code is highlighted by Shiki's CSS-variables theme and coloured by Cynosure's `styles/syntax.css`, so it follows light, dark and contrast.
-- **Build:** `pnpm build:site` at the root builds the site into `site/dist`, then Storybook into `site/dist/storybook`. Cloudflare Pages runs it for `main` and for every branch preview; CI runs it in the `site` job. Types: `pnpm --filter @arshad-shah/cynosure-site check`.
-- **Local:** `pnpm --filter @arshad-shah/cynosure-site dev`.
+- **No framework.** Vite, React and the engine in `engine/`. `engine/build` runs in Node at build time (reads the repository, writes HTML); `engine/app` is the React app. Astro is gone; do not bring a site framework back.
+- **Data-driven.** The app renders `PageData` (`engine/types.ts`) and never reads files; `engine/build/scan.ts` is the only place that knows where content lives. A new kind of page is a new `kind` with data, not a hand-written route.
+- **Nothing product-specific in `engine/`.** What differs per product lives in `docs.config.ts` (settings) and `theme.css` (fonts and tokens). If a change only makes sense for Cynosure, it belongs in one of those two files.
+- **Cynosure from npm.** `@arshad-shah/cynosure` is a normal dependency on the published version, never a link to `../src`: the site shows what users get. To use a library change, release it first. (`minimumReleaseAgeExclude` in `pnpm-workspace.yaml` lets our own packages install the day they publish.) Only the live examples load the library's source, through the stories.
+- **Only Cynosure for interface.** No other UI library, no hand-made buttons, links, inputs or menus, no glyphs or emoji as icons (Facet icons and brand marks only). Headings, paragraphs and lists inside Prose are plain elements; everything interactive is a Cynosure component. Something awkward to build here is a gap in Cynosure: fix it there, with a story and a test, release it, then use it. A stand-in while a release is pending is marked "Until Cynosure x.y.z" and deleted afterwards.
+- **Every colour and size is a token** (`--cy-*`). `engine/app/site.css` holds page layout only; column widths may be in `rem` or `ch`. Cynosure components reset their own margins, so space around one goes on a wrapper (`.docs-block`), never on the component's class.
+- **Content is not copied.** Pages come from `docs/*.md`, the root README, `CHANGELOG.md` and each component's docs page; a correction is made in the source file.
+- **The site is public.** Notes for people working on Cynosure or its products (plans, progress, migration, conventions) stay in the repository: list them in `exclude`.
+- **Navigation lists only pages that exist:** it is built from the scanned pages, never typed.
+- **Examples** are the stories a docs page shows in `<Canvas>`. Their code is written from what they render (`engine/app/jsx.ts`); never print a story's source, which is test scaffolding.
+- **Node runs the build's TypeScript directly:** files in `engine/build` import each other with the `.ts` extension and use only erasable syntax (no enums, no parameter properties).
+
+## Checks before every push
+
+`pnpm --filter @arshad-shah/cynosure-site check`, `pnpm build:site`, `... links`, `... sweep` (with `... preview` running), `pnpm lint`. Then look at it in a real browser: desktop and a 390-point phone, light and dark, console clean, no sideways scrolling.

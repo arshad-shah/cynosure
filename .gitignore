@@ -28,3 +28,4 @@ dist/
 src/styles/generated-css.ts
 __screenshots__/**/__diff__/
 site/dist
+site/.server

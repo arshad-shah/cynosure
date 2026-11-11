@@ -6,7 +6,7 @@
       "!dist",
       "!storybook-static",
       "!site/dist",
-      "!site/.astro",
+      "!site/.server",
       "!pnpm-lock.yaml",
       "!coverage",
       "!src/styles/generated-css.ts",
@@ -29,15 +29,5 @@
   },
   "assist": {
     "enabled": true
-  },
-  "overrides": [
-    {
-      "includes": ["site/**/*.astro"],
-      "linter": {
-        "rules": {
-          "correctness": { "noUnusedImports": "off", "noUnusedVariables": "off" }
-        }
-      }
-    }
-  ]
+  }
 }
