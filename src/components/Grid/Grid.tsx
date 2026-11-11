@@ -18,10 +18,13 @@ export interface GridProps {
   align?: "start" | "center" | "end" | "stretch";
   /** Neutral layout element to render (never an interactive one). Use `ul` or `ol` with `GridItem as="li"`. */
   as?: "div" | "section" | "ul" | "ol" | "nav" | "aside" | "header" | "footer";
+  /** Added to the root element, for layout. */
   className?: string;
   /** Layout only. */
   style?: CSSProperties;
+  /** The items: any elements, or `GridItem` for ones that span columns or rows. */
   children?: ReactNode;
+  /** Set on the root element, for tests. */
   "data-testid"?: string;
 }
 
@@ -30,11 +33,15 @@ export interface GridItemProps {
   span?: number | "full";
   /** Rows the item spans. */
   rowSpan?: number;
+  /** Neutral layout element to render (never an interactive one). Default "div". */
   as?: "div" | "li" | "section" | "article" | "aside";
+  /** Added to the root element, for layout. */
   className?: string;
   /** Layout only. */
   style?: CSSProperties;
+  /** The item's content. */
   children?: ReactNode;
+  /** Set on the root element, for tests. */
   "data-testid"?: string;
 }
 

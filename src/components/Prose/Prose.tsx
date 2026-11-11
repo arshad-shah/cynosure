@@ -23,6 +23,7 @@ export interface ProseProps {
   size?: Size;
   /** Neutral element to render. Use `article` for a standalone piece of writing. */
   as?: "div" | "article" | "section";
+  /** Added to the root element, for layout. */
   className?: string;
   /** Layout only. Restyle through --cy-prose-* tokens. */
   style?: CSSProperties;

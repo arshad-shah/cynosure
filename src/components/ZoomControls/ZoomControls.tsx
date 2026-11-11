@@ -24,11 +24,15 @@ export interface ZoomControlsProps {
   zoom: ZoomSetting;
   /** The percent it comes to now (DocumentViewport's `onScaleChange` times 100): shown, and stepped from. */
   percent: number;
+  /** Called with the new setting when the person zooms in or out, or picks one from the menu. */
   onZoomChange: (zoom: ZoomSetting) => void;
   /** The percents offered in the menu. Default 50, 75, 100, 125, 150, 200, 400. */
   presets?: number[];
+  /** Size of the three buttons. Default "sm". */
   size?: Size;
+  /** Replace the built-in English text: the names of the toolbar, the buttons and the fit modes. */
   labels?: Partial<ZoomControlsLabels>;
+  /** Added to the toolbar element, for layout. */
   className?: string;
   /** Layout only. */
   style?: CSSProperties;

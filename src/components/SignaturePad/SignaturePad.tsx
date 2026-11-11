@@ -36,10 +36,13 @@ export interface SignaturePadProps {
   space?: { width: number; height: number } | undefined;
   /** Fixed size in CSS pixels. Default: the full width, and the height token. */
   width?: number | undefined;
+  /** Fixed height in CSS pixels. Default: the height token. */
   height?: number | undefined;
+  /** Stops drawing; the strokes so far stay shown. */
   disabled?: boolean;
   /** Ids of text that explains the pad (e.g. "Or type your name instead"). */
   "aria-describedby"?: string | undefined;
+  /** Added to the root element, for layout. */
   className?: string;
   /** Layout only. Restyle through --cy-signature-pad-* tokens. */
   style?: CSSProperties;

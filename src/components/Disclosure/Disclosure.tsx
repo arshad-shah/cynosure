@@ -20,11 +20,15 @@ declare module "../../tokens/schema.js" {
 export interface DisclosureProps {
   /** The always-visible trigger text. */
   summary: ReactNode;
+  /** Whether the content is shown, when you control it. */
   open?: boolean;
+  /** Shown on first render when uncontrolled. */
   defaultOpen?: boolean;
+  /** Called with the new state when the trigger is pressed. */
   onOpenChange?: (open: boolean) => void;
   /** `plain` no chrome, `line` bottom divider, `card` bordered surface. */
   variant?: "plain" | "line" | "card";
+  /** Height of the trigger and size of the text. Default "md". */
   size?: Size;
   /** Wrap the trigger in a heading of this level (accordion sections in a document outline). */
   headingLevel?: 1 | 2 | 3 | 4 | 5 | 6;
@@ -34,10 +38,13 @@ export interface DisclosureProps {
   locked?: boolean;
   /** Keyboard handler on the trigger (Accordion uses it for arrow navigation). */
   onTriggerKeyDown?: (event: KeyboardEvent<HTMLButtonElement>) => void;
+  /** Added to the root element, for layout. */
   className?: string;
   /** Layout only. */
   style?: CSSProperties;
+  /** The content that is shown and hidden. */
   children?: ReactNode;
+  /** Set on the root element, for tests. */
   "data-testid"?: string;
 }
 

@@ -75,16 +75,21 @@ export interface TabsProps {
   value?: string;
   /** Initially selected tab (uncontrolled). Defaults to the first enabled tab. */
   defaultValue?: string;
+  /** Called with the tab's `value` when a different tab is selected. */
   onChange?: (value: string) => void;
   /** `auto`: arrow keys select as they move. `manual`: arrows move focus; Enter or Space selects. */
   activation?: "auto" | "manual";
+  /** Height and text size of the tabs. Default "md". */
   size?: Size;
   /** `line`: underline indicator. `soft`: tinted pill. */
   variant?: "line" | "soft";
+  /** Replace the built-in English text: the close button's name and the announcement after a move. */
   labels?: Partial<TabsLabels>;
+  /** Added to the root element, for layout. */
   className?: string;
   /** Layout only. */
   style?: CSSProperties;
+  /** A `TabList` and its `TabPanel`s. */
   children?: ReactNode;
 }
 
@@ -186,7 +191,9 @@ export interface TabListProps {
    * arrow on it. Called with every tab's value in the new order; render the tabs in that order.
    */
   onReorder?: ((values: string[]) => void) | undefined;
+  /** Added to the tab list element, for layout. */
   className?: string;
+  /** The `Tab`s, in order. */
   children?: ReactNode;
 }
 
@@ -327,14 +334,18 @@ export function TabList({ label, onReorder, className, children }: TabListProps)
 }
 
 export interface TabProps {
+  /** Identifies the tab: it is what `Tabs` selects by, and what its `TabPanel` matches. */
   value: string;
+  /** Icon shown before the label. */
   icon?: IconData;
+  /** The tab cannot be selected or closed. */
   disabled?: boolean;
   /**
    * Makes the tab closable (document tabs): a close button beside its label, and Delete on the focused tab. Remove the
    * tab in response; the one now in its place is selected and focused.
    */
   onClose?: (() => void) | undefined;
+  /** The tab's label. */
   children: ReactNode;
 }
 
@@ -391,10 +402,13 @@ export function Tab({ value, icon, disabled, onClose, children }: TabProps) {
 }
 
 export interface TabPanelProps {
+  /** The `value` of the `Tab` this panel belongs to. */
   value: string;
   /** Keep the content mounted while hidden (preserves state). By default only the selected panel renders content. */
   keepMounted?: boolean;
+  /** Added to the panel element, for layout. */
   className?: string;
+  /** The panel's content. */
   children?: ReactNode;
 }
 

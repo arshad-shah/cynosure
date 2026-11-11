@@ -3,17 +3,17 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "description": "The Cynosure documentation site (cynosure.arshadshah.com): a data-driven docs template built with Cynosure from npm.",
+  "description": "The Cynosure documentation site (cynosure.arshadshah.com): a data-driven docs template built with Cynosure from this repository.",
   "scripts": {
-    "dev": "pnpm -w css && vite",
-    "build": "pnpm -w css && node engine/build/build.ts",
+    "dev": "pnpm -w build && vite",
+    "build": "pnpm -w build && node engine/build/build.ts",
     "preview": "vite preview --port 4321 --strictPort",
     "check": "tsc --noEmit",
     "links": "node engine/build/check-links.ts",
     "sweep": "node engine/build/sweep.ts"
   },
   "dependencies": {
-    "@arshad-shah/cynosure": "^0.1.0",
+    "@arshad-shah/cynosure": "workspace:*",
     "react": "^19.3.1",
     "react-dom": "^19.3.1"
   },

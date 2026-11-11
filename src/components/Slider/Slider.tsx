@@ -45,20 +45,27 @@ export interface SliderMark {
 export interface SliderProps {
   /** Accessible name, shown above the slider unless `labelHidden`. */
   label: string;
+  /** Visually hide the label (it still names the slider). */
   labelHidden?: boolean;
   /** A number, `[from, to]` for a range, or more numbers for more thumbs (each stays between its neighbours). */
   value?: SliderValue;
+  /** Starting value when uncontrolled. Default: `min`. */
   defaultValue?: SliderValue;
   /** Every change while dragging or pressing keys. */
   onChange?: (value: SliderValue) => void;
   /** When a change is finished: pointer released, or after each key press. */
   onCommit?: (value: SliderValue) => void;
+  /** Lowest value. Default 0. */
   min?: number;
+  /** Highest value. Default 100. */
   max?: number;
+  /** Values snap to this step, and the arrow keys move by it. Default 1. */
   step?: number;
   /** Page Up and Page Down step (default a tenth of the range). */
   largeStep?: number;
+  /** `vertical` runs bottom to top. Default "horizontal". */
   orientation?: "horizontal" | "vertical";
+  /** Ticks on the track, with optional text under them. */
   marks?: SliderMark[];
   /**
    * Your own drawing of the track (a gradient, a histogram, a waveform), filling it under the thumbs. The accent fill
@@ -69,9 +76,13 @@ export interface SliderProps {
   showValue?: boolean;
   /** Form field name; a range submits two values under it. */
   name?: string;
+  /** Not focusable, cannot be changed and not submitted. */
   disabled?: boolean;
+  /** Track and thumb size. Default "md". */
   size?: Size;
+  /** Replace the built-in English text: the thumb names and the value text. */
   labels?: Partial<SliderLabels>;
+  /** Added to the root element, for layout. */
   className?: string;
   /** Layout only. Restyle through --cy-slider-* tokens. */
   style?: CSSProperties;

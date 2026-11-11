@@ -46,9 +46,11 @@ export interface KbdProps {
    * names (Cmd on Apple, Ctrl elsewhere) and hidden on touch-only screens, where a shortcut means nothing.
    */
   keys: string[] | string;
+  /** Size of the key caps. Default "md". */
   size?: Size;
   /** Override the spoken text (default "Control plus K"). */
   label?: string;
+  /** Added to the root element, for layout. */
   className?: string;
   /** Layout only. */
   style?: CSSProperties;

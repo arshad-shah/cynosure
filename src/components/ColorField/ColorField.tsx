@@ -43,13 +43,19 @@ export interface ColorFieldLabels {
 }
 
 export interface ColorFieldProps {
+  /** The field's label. */
   label: ReactNode;
+  /** Visually hide the label (it still names the control). Prefer visible labels. */
   labelHidden?: boolean;
+  /** Help text shown below the control and read with it. */
   description?: ReactNode;
+  /** Your own error; it replaces the field's own messages. */
   error?: ReactNode;
   /** Any CSS colour; reported back in `format`. */
   value?: string;
+  /** The starting colour when uncontrolled, any CSS colour. Default "black". */
   defaultValue?: string;
+  /** Called when the colour changes (typed, picked or chosen from a swatch), with the colour written in `format`. */
   onChange?: (value: string) => void;
   /** How values are written: six-digit hex, `rgb(51 102 255)` or `oklch(55% 0.21 264)`. */
   format?: "hex" | "rgb" | "oklch";
@@ -57,11 +63,17 @@ export interface ColorFieldProps {
   alpha?: boolean;
   /** Colours offered in the picker: brand colours, presets, or recent colours you keep. */
   swatches?: (ColorSwatch | string)[] | undefined;
+  /** Name the colour is submitted under in a form, written in `format`. */
   name?: string;
+  /** Marks the field as required and makes its input required in a form. */
   required?: boolean;
+  /** Turns off the input and the picker; the colour is not submitted with a form. */
   disabled?: boolean;
+  /** Size of the field. Default "md". */
   size?: Size;
+  /** Replace the built-in English text: the picker's controls and the error for text that is not a colour. */
   labels?: Partial<ColorFieldLabels>;
+  /** Added to the root element, for layout. */
   className?: string;
   /** Layout only. */
   style?: CSSProperties;

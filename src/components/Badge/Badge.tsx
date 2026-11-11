@@ -16,10 +16,15 @@ declare module "../../tokens/schema.js" {
 }
 
 export interface BadgeProps {
+  /** The badge's text. */
   children: ReactNode;
+  /** Semantic colour. Default "neutral". */
   tone?: Tone;
+  /** Fill style. Default "soft". */
   variant?: "soft" | "solid" | "outline";
+  /** Size of the badge. Default "md". */
   size?: Size;
+  /** Icon shown before the text. */
   icon?: IconData | undefined;
   /**
    * A category colour (any CSS colour), for labels a product colours itself (HTTP methods, calendar categories). The
@@ -28,6 +33,7 @@ export interface BadgeProps {
   color?: string | undefined;
   /** A dot before the text: `true` for a steady one, `"live"` for a pulsing one (recording, connected). */
   dot?: boolean | "live";
+  /** Added to the root element, for layout. */
   className?: string;
   /** Layout only. */
   style?: CSSProperties;

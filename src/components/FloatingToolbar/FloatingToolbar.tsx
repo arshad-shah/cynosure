@@ -84,6 +84,7 @@ export interface FloatingToolbarProps {
   hotkey?: string | false;
   /** Buttons, IconButtons, SegmentedControls. */
   children?: ReactNode;
+  /** Added to the root element, for layout. */
   className?: string;
   /** Layout only. Restyle through --cy-floating-toolbar-* tokens. */
   style?: CSSProperties;
@@ -154,8 +155,11 @@ export interface DockedToolbarProps {
   onEdgeChange?: ((edge: "start" | "end") => void) | undefined;
   /** At the bottom: a centred pill above the edge instead of a full-width bar (a mode switcher). */
   floating?: boolean;
+  /** Replace the built-in English text: the grip that moves a side palette. */
   labels?: Partial<DockedToolbarLabels>;
+  /** Buttons, IconButtons, SegmentedControls. */
   children?: ReactNode;
+  /** Added to the bar, for layout. */
   className?: string;
   /** Layout only. Restyle through --cy-floating-toolbar-* tokens. */
   style?: CSSProperties;

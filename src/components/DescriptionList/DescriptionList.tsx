@@ -25,6 +25,7 @@ export interface DescriptionItem {
 }
 
 export interface DescriptionListProps {
+  /** The terms and their details, in order. */
   items: DescriptionItem[];
   /**
    * `inline`: terms beside their details. `stacked`: terms above. `auto` (default): inline when the list is at least
@@ -33,7 +34,9 @@ export interface DescriptionListProps {
   layout?: "auto" | "inline" | "stacked";
   /** Lines between rows. */
   divided?: boolean;
+  /** Text size. Default "md". */
   size?: Size;
+  /** Added to the root element, for layout. */
   className?: string;
   /** Layout only. Restyle through --cy-description-list-* tokens. */
   style?: CSSProperties;

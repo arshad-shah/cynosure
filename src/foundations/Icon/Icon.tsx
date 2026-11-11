@@ -3,14 +3,17 @@ import type { IconData } from "../../icons/types.js";
 import type { Tone } from "../../tokens/schema.js";
 
 export interface IconProps {
+  /** The icon to draw: a Facet icon or a brand mark. */
   icon: IconData;
   /** Gives the icon `role="img"` and this accessible name. Omit for decorative icons. */
   label?: string;
+  /** A named size, or a number of pixels. Default "md". */
   size?: "sm" | "md" | "lg" | number;
   /** Semantic colour. `inherit` (default) uses the current text colour. */
   tone?: Tone | "inherit" | "muted";
   /** Any CSS colour; overrides `tone` for one-off cases. `brand` draws a brand mark in its owner's colour. */
   color?: string;
+  /** Added to the `<svg>` element, for layout. */
   className?: string;
   /** Layout only. */
   style?: CSSProperties;

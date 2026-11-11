@@ -53,16 +53,22 @@ export type NavEntry = NavItem | NavSection;
 
 /** What `renderLink` receives: spread it onto your router's link component. */
 export interface NavLinkProps {
+  /** The item's `href`. */
   href: string;
+  /** The item's styling; keep it on the link. */
   className: string;
+  /** Set to "page" on the current item. */
   "aria-current"?: "page";
+  /** Calls `onNavigate` with the item's id; keep it on the link. */
   onClick: (event: MouseEvent<HTMLElement>) => void;
+  /** The item's icon, label and badge. */
   children: ReactNode;
 }
 
 export interface SideNavProps {
   /** Accessible name of the navigation landmark, e.g. "Main". */
   label: string;
+  /** Items and sections (`{ label, items }`), in order. */
   items: NavEntry[];
   /** `id` of the page being shown: marked `aria-current="page"`; groups holding it start expanded. */
   current?: string | undefined;
@@ -75,6 +81,7 @@ export interface SideNavProps {
    * open inside the rail: choosing one calls `onCollapsedChange(false)` so you can widen the navigation.
    */
   collapsed?: boolean;
+  /** Called with `false` when a group is chosen in the collapsed rail. */
   onCollapsedChange?: (collapsed: boolean) => void;
   /** Group ids expanded at first (groups holding `current` always are). */
   defaultExpanded?: string[];
@@ -84,7 +91,9 @@ export interface SideNavProps {
    * with its id (a bar has no room to open it). Give a bar three to five items, each with an icon.
    */
   layout?: "column" | "bar";
+  /** Height and text size of the items. Default "md". */
   size?: Size;
+  /** Added to the root element, for layout. */
   className?: string;
   /** Layout only. Restyle through --cy-side-nav-* tokens. */
   style?: CSSProperties;

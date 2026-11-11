@@ -16,14 +16,21 @@ declare module "../../tokens/schema.js" {
 }
 
 export interface LinkProps {
+  /** Where the link goes. */
   href: string;
+  /** The link text. */
   children: ReactNode;
+  /** Colour of the text. Default "accent". */
   tone?: Tone;
+  /** Text size; `inherit` follows the surrounding text. Default "inherit". */
   size?: Size | "inherit";
   /** Opens in a new tab with a safe rel, an external icon and announced text. */
   external?: boolean;
+  /** Called when the link is activated. */
   onClick?: MouseEventHandler<HTMLAnchorElement>;
+  /** Replace the built-in English text: `external` is read out after a link that opens in a new tab. */
   labels?: { external?: string };
+  /** Added to the root element, for layout. */
   className?: string;
   /** Layout only. */
   style?: CSSProperties;

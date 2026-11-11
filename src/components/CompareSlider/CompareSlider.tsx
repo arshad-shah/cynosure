@@ -34,11 +34,15 @@ export interface CompareSliderProps {
   after: ReactNode;
   /** Divider position: percent of the width showing `before`. */
   value?: number | undefined;
+  /** The divider's starting position when uncontrolled, 0 to 100. Default 50. */
   defaultValue?: number;
+  /** Called as the divider moves (drag, click or keys), with the new position, 0 to 100. */
   onChange?: ((value: number) => void) | undefined;
   /** Show the Before and After tags. Default true. */
   showTags?: boolean;
+  /** Replace the built-in English text: the divider's name, its spoken position and the two tags. */
   labels?: Partial<CompareSliderLabels>;
+  /** Added to the root element, for layout. */
   className?: string;
   /** Layout only. Restyle through --cy-compare-slider-* tokens. */
   style?: CSSProperties;

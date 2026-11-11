@@ -44,15 +44,19 @@ export interface StepsLabels {
 }
 
 export interface StepsProps {
+  /** The steps, in order. */
   steps: StepItem[];
   /** `id` of the step the person is on. Steps before it are complete, steps after it upcoming. */
   current: string;
+  /** Lays the steps out in a row or in a column. Default "horizontal". */
   orientation?: "horizontal" | "vertical";
   /** Makes steps buttons that go to that step. Leave it out for a read-only progress display. */
   onStepSelect?: (id: string) => void;
   /** Text size of labels and markers. */
   size?: Size;
+  /** Replace the built-in English text: the list's name and the status read after each step. */
   labels?: Partial<StepsLabels>;
+  /** Added to the root element, for layout. */
   className?: string;
   /** Layout only. Restyle through --cy-steps-* tokens. */
   style?: CSSProperties;

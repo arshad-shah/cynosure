@@ -19,12 +19,15 @@ export interface ProgressOverlayProps {
   title: string;
   /** How far it has got; leave undefined while the amount is unknown. */
   value?: number | undefined;
+  /** The value that means complete. Default 100. */
   max?: number | undefined;
   /** A line under the bar ("Page 3: images"). Default: the count, or "Working…". Read out politely as it changes. */
   status?: string | undefined;
   /** Cancels the work: the Cancel button and Escape. Without it the overlay cannot be closed. */
   onCancel?: (() => void) | undefined;
+  /** Replace the built-in English text: the Cancel button and the status line. */
   labels?: Partial<ProgressOverlayLabels>;
+  /** Added to the dialog's panel, for layout. */
   className?: string;
   /** Layout only. */
   style?: CSSProperties;

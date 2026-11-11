@@ -73,6 +73,12 @@ function groupsFrom(
   return groups;
 }
 
+/** Whether changes are waiting for a release: Changesets keeps one file per change until the version is made. */
+function hasPendingChanges(folder: string): boolean {
+  if (!existsSync(folder)) return false;
+  return readdirSync(folder).some((name) => name.endsWith(".md") && name.toLowerCase() !== "readme.md");
+}
+
 function installedVersion(pkg: string, root: string): string {
   try {
     return JSON.parse(readFileSync(join(packageDir(pkg), "package.json"), "utf8")).version;
@@ -276,6 +282,7 @@ export async function scan(config: DocsConfig, siteDir: string): Promise<Scanned
     routeOf: (path) => routes.get(path) ?? null,
     blob: `${config.repo}/blob/${branch}`,
     hidden: (path) => hidden.has(path),
+    ...(config.url ? { site: config.url.replace(/\/$/, "") } : {}),
     // A docs page links to its neighbours by their Storybook address; here they are pages.
     storybook: (query) => {
       const [, id = "", rest = ""] = /^\?path=\/docs\/[a-z]+-([a-z0-9]+)--docs(.*)$/.exec(query) ?? [];
@@ -507,6 +514,7 @@ export async function scan(config: DocsConfig, siteDir: string): Promise<Scanned
     description: config.description,
     package: config.package,
     version,
+    ...(hasPendingChanges(join(root, config.changesets ?? ".changeset")) ? { unreleased: true } : {}),
     repo: config.repo,
     branch,
     url: config.url.replace(/\/$/, ""),

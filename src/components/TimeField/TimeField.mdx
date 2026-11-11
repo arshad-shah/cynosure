@@ -5,7 +5,7 @@ import * as Stories from "./TimeField.stories";
 
 # TimeField
 
-A time of day in a form: typed loosely, reported as 24-hour `HH:MM`.
+A time of day in a form: typed loosely, or with `picker` chosen from columns that roll under a lens, and reported as 24-hour `HH:MM`.
 
 <Canvas of={Stories.ArrowsStepThePartUnderTheCaret} />
 
@@ -22,12 +22,40 @@ A time of day in a form: typed loosely, reported as 24-hour `HH:MM`.
 ```tsx
 import { TimeField } from "@arshad-shah/cynosure";
 
-<TimeField label="Start time" value={start} onChange={setStart} min="09:00" max="17:30" step={15} />
+<TimeField label="Start time" value={start} onChange={setStart} min="09:00" max="17:30" step={15} picker />
 ```
 
 The value is `HH:MM` (or `HH:MM:SS` with `seconds`) or `null`. `930`, `9:30 pm` and `12am` are understood; anything that is not a time is kept for correcting and explained.
 
 <Canvas of={Stories.ExplainsWhatItCannotTake} />
+
+### The picker
+
+`picker` adds a clock button at the end of the field. It opens columns for hours and minutes; the chosen time sits in the lens and applies at once.
+
+<Canvas of={Stories.PickFromTheColumns} />
+
+### 12-hour and 24-hour
+
+By default the field follows the person's own language and region: `9:30 PM` where AM and PM are used, `21:30` elsewhere. `locale` names the region for them; `hourCycle={12}` or `hourCycle={24}` fixes the form for everyone. The value, `min`, `max` and what a form receives stay 24-hour.
+
+<Canvas of={Stories.FollowsThePersonsLocale} />
+
+With 12-hour display the picker gains an AM/PM switch.
+
+<Canvas of={Stories.TwelveHour} />
+
+### Limits and the day track
+
+The strip under the columns is the whole day: click or drag to jump to a time. The hours outside `min` and `max` are hatched, and their rows are struck through.
+
+<Canvas of={Stories.TheDayTrack} />
+
+### Without the day track, with seconds
+
+`dayTrack={false}` keeps the columns without the strip; `seconds` adds a third column.
+
+<Canvas of={Stories.WithoutTheDayTrackAndWithSeconds} />
 
 ## Props
 
@@ -35,21 +63,47 @@ The value is `HH:MM` (or `HH:MM:SS` with `seconds`) or `null`. `930`, `9:30 pm` 
 
 ## Behaviour and accessibility
 
+In the field:
+
 | Key | Does |
 | --- | --- |
 | Enter | Finish typing |
-| Up / Down | Step the part the caret is in: hours, minutes (by `step`) or seconds; Shift: ten times as far |
+| Up / Down | Step the part the caret is in: hours, minutes (by `step`), seconds, or AM/PM; Shift: ten times as far |
+
+In the picker (with `picker`):
+
+| Key | Does |
+| --- | --- |
+| Up / Down | Roll the focused column to the next allowed row; the time changes at once |
+| Home / End | First and last allowed row |
+| Left / Right | The column before or after |
+| Digits | Seek in the column: `1` then `4` is 14 |
+| A / P | Morning or afternoon, when the time is shown as 12-hour |
+| Enter | Close the picker and return to the field |
+| Escape | Close the picker |
+| Arrows, Page Up / Down on the day track | Move by `step`, or by an hour |
 
 - **Errors** are the field's description and set `aria-invalid`.
-- **Limits:** `min` and `max` stop the arrows; typed times outside them are explained.
+- **Limits:** `min` and `max` stop the arrows and the day track; typed times outside them are explained; their rows in the picker are disabled.
+- **The picker** is a dialog named by `labels.open`. Each column is a listbox named by `labels.hours`, `labels.minutes` or `labels.seconds`; the day track is a slider that reads out the time.
+- **Scrolling** a column chooses the row it stops on. With reduced motion the columns jump instead of gliding.
+- **Right to left:** hours, minutes and seconds keep their order.
 
 ## Touch
 
-The field asks for the numeric keyboard.
+The field asks for the numeric keyboard (the full one when the time is shown as 12-hour, to type AM and PM). In the picker, rows are at least 44px tall on coarse pointers and a column is rolled with a finger.
 
 ## Theming
 
-No tokens of its own; it follows TextField.
+The field follows TextField, the popup Popover, the day track Slider and the AM/PM switch SegmentedControl. The picker's own tokens:
+
+| Token | Does |
+| --- | --- |
+| `--cy-time-field-row-height` | Height of a row in the columns (never below the touch hit area) |
+| `--cy-time-field-column-width` | Width of one column |
+| `--cy-time-field-lens-background` | Background of the band the chosen time sits in |
+| `--cy-time-field-night` | Colour of the day track at midnight |
+| `--cy-time-field-day` | Colour of the day track at midday |
 
 ## Related
 

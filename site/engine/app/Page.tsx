@@ -27,6 +27,7 @@ import { type ReactNode, useEffect, useMemo, useState } from "react";
 import config from "../../docs.config";
 import type { PageData, PageLink, PropRow, TocEntry } from "../types";
 import { Canvas } from "./Canvas";
+import { Gallery } from "./Gallery";
 import { Markdown } from "./Markdown";
 
 const icons = config.icons ?? {};
@@ -114,6 +115,7 @@ function Foot({ page }: { page: PageData }) {
       <div className="docs-colophon">
         <span>
           {site.name} {site.version}
+          {site.unreleased && " with unreleased changes"}
         </span>
         <Inline gap="4" wrap>
           {page.source && (
@@ -121,9 +123,19 @@ function Foot({ page }: { page: PageData }) {
               Edit this page
             </Link>
           )}
+          {site.unreleased && (
+            <Link href={site.url} size="sm" tone="neutral" external>
+              Published documentation
+            </Link>
+          )}
           <Link href="/changelog/" size="sm" tone="neutral">
             Changelog
           </Link>
+          {(config.links ?? []).map((item) => (
+            <Link key={item.href} href={item.href} size="sm" tone="neutral">
+              {item.label}
+            </Link>
+          ))}
           <Link href={site.repo} size="sm" tone="neutral">
             GitHub
           </Link>
@@ -172,13 +184,25 @@ function PropsTable({ name, rows }: { name: string; rows: PropRow[] }) {
             </Inline>
           ),
         },
+        // Second, so that on a phone the name and what it does are read without scrolling the table sideways.
+        {
+          key: "description",
+          header: "What it does",
+          cell: (row) => (
+            <span className="docs-prop-text">
+              {/* A doc comment marks code with backticks: every second piece is code. */}
+              {row.description
+                .split(/`([^`]+)`/)
+                .map((piece, i) => (i % 2 ? <code key={`${i}-${piece}`}>{piece}</code> : piece))}
+            </span>
+          ),
+        },
         { key: "type", header: "Type", cell: (row) => <code className="docs-type">{row.type}</code> },
         {
           key: "default",
           header: "Default",
           cell: (row) => (row.default ? <code>{row.default}</code> : null),
         },
-        { key: "description", header: "What it does", cell: (row) => row.description },
       ]}
     />
   );
@@ -188,6 +212,7 @@ function Doc({ page }: { page: PageData }) {
   return (
     <Frame page={page}>
       <Head page={page} />
+      {config.iconGallery?.page === page.id && <Gallery sets={config.iconGallery.sets} />}
       <Prose as="div" size="lg" className="docs-prose">
         <Markdown nodes={page.body} />
       </Prose>

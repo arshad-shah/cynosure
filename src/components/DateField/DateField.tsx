@@ -29,30 +29,47 @@ export interface DateFieldLabels {
 }
 
 export interface DateFieldProps {
+  /** Visible label; it names the field. */
   label: ReactNode;
+  /** Visually hide the label (it still names the field). Prefer visible labels. */
   labelHidden?: boolean;
+  /** Help text shown below the field. */
   description?: ReactNode;
   /** Your own error; it replaces the field's own messages. */
   error?: ReactNode;
   /** `YYYY-MM-DD`, or null when empty. */
   value?: string | null;
+  /** Starting date when uncontrolled, as `YYYY-MM-DD`. */
   defaultValue?: string | null;
   /** A valid, available date (or null when cleared), when typing is finished or a day is picked. */
   onChange?: (date: string | null) => void;
+  /** Earliest date that can be typed or picked, as `YYYY-MM-DD`. */
   min?: string | undefined;
+  /** Latest date that can be typed or picked, as `YYYY-MM-DD`. */
   max?: string | undefined;
+  /** Return true for dates that cannot be chosen (fully booked, weekends). */
   isDateDisabled?: ((date: string) => boolean) | undefined;
   /** The calendar's locale and first day of the week. */
   locale?: string | undefined;
+  /** 0 Sunday to 6 Saturday. Default: the locale's first day, else Monday. */
   weekStartsOn?: number | undefined;
+  /** What the calendar counts as today, as `YYYY-MM-DD`. Default: the device's date. */
   today?: string | undefined;
+  /** Name the field's text is submitted under in a form. */
   name?: string | undefined;
+  /** Id of the form it belongs to, when it is not inside that form. */
   form?: string | undefined;
+  /** Marks the field as required for form validation. */
   required?: boolean | undefined;
+  /** Turns off the field and the calendar button. */
   disabled?: boolean | undefined;
+  /** The date can be read but not changed; the calendar button is hidden. */
   readOnly?: boolean | undefined;
+  /** Size of the field. Default "md". */
   size?: Size;
+  /** Replace the built-in English text: the calendar button, the two error messages and the month buttons. */
   labels?: Partial<DateFieldLabels>;
+  /** Added to the root element, for layout. */
   className?: string;
   /** Layout only. */
   style?: CSSProperties;

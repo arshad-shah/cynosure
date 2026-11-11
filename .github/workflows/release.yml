@@ -2,7 +2,8 @@ name: Release
 # Publishes @arshad-shah/cynosure to npm from `main` with Changesets. Each merge to `main` that carries changesets
 # opens (or updates) a "Version packages" pull request; merging that pull request publishes the new version. Publishing
 # is npm trusted publishing: GitHub's OIDC token (id-token: write) proves the run, so no npm token is stored, and npm
-# adds provenance itself. It only happens when Arshad merges, never from `next`.
+# adds provenance itself. It only happens when Arshad merges, never from `next`. The same step moves `docs-live`, the
+# branch the live documentation is built from, to the published commit (tools/publish.sh; docs/release.md).
 on:
   push:
     branches: [main]
@@ -32,10 +33,9 @@ jobs:
       - name: Version pull request, or publish
         uses: changesets/action@v1
         with:
-          # Also undoes the one change Changesets should not make (see the script in package.json).
           version: pnpm version-packages
           publish: tools/publish.sh
-          # tools/publish.sh tags `v<version>` and makes the GitHub release itself.
+          # tools/publish.sh tags `v<version>`, makes the GitHub release itself and moves `docs-live`.
           createGithubReleases: false
           title: "chore(release): version packages"
           commit: "chore(release): version packages"

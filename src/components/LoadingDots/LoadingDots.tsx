@@ -28,9 +28,11 @@ export interface LoadingDotsProps {
   speed?: "slow" | "normal" | "fast";
   /** Announces progress (`role="status"`) with this name. Omit when the surrounding control already reports it (e.g. Button `aria-busy`). */
   label?: string;
+  /** Added to the root element, for layout. */
   className?: string;
   /** Layout only. Restyle through --cy-loading-dots-* tokens. */
   style?: CSSProperties;
+  /** Set on the root element, for tests. */
   "data-testid"?: string;
 }
 

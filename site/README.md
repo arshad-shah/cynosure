@@ -17,7 +17,7 @@ The site at https://cynosure.arshadshah.com, and a template for the documentatio
 | Document a component      | Nothing to do here: every folder in `src/components` and `src/foundations` with a docs page (`<Name>.mdx`) or a README gets a page                                                                |
 | Show a live example       | In the component's docs page, write `<Canvas of={Stories.Name} />`. Canvases on neighbouring lines become one canvas with tabs                                                                    |
 | Record a release          | Nothing to do here: the changelog page is `CHANGELOG.md`, which Changesets writes                                                                                                                 |
-| Change the version shown  | Nothing to do here: it is the installed version of the package (see "Following a release")                                                                                                        |
+| Change the version shown  | Nothing to do here: it is the version of the package in this repository (see "What is live")                                                                                                      |
 | Correct some wording      | Edit the source file (the footer's "Edit this page" leads to it). Nothing is copied into `site/`                                                                                                  |
 
 ## Commands
@@ -36,15 +36,19 @@ Run from the repository root.
 
 Before pushing: `check`, `build:site`, `links`, `sweep`, and `pnpm lint`.
 
-## Following a release
+## What is live, and what is a preview
 
-The site installs Cynosure from npm, so it shows what users get. After a release:
+The site uses the library in this repository (`workspace:*`), so a build's pages, examples, props tables, styles and version all come from one commit. Which commit is live is decided by the release:
 
-1. Raise `@arshad-shah/cynosure` in `site/package.json` and run `pnpm install`.
-2. Build. The header badge, the home page, the props tables and the changelog now show the new version.
-3. Delete any stand-in the release made unnecessary (search `site/` for "Until Cynosure").
-
-Live examples are the exception: they run the library's source at the commit being built, so they can be ahead of the published package. Each component page says which commit and which version.
+| Build                           | From                   | Shows                                                                                                                          |
+| ------------------------------- | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| https://cynosure.arshadshah.com | the `docs-live` branch | The published version. `tools/publish.sh` moves `docs-live` to the commit it has just published, and Cloudflare Pages rebuilds |
+| `main`'s preview                | `main`                 | What the next release will hold. Marked "Unreleased" while a changeset is pending                                              |
+| A pull request's preview        | its branch             | That pull request. Marked "Unreleased" if it carries a changeset                                                               |
+- Nothing to do after a release: there is no dependency to raise.
+- A documentation fix merged to `main` while no changeset is pending goes live at once (the release workflow runs, finds nothing to publish and moves `docs-live`). While library changes are pending it goes live with their release.
+- "Unreleased" is worked out from `.changeset/`: a pending changeset means the code is ahead of the published version. The footer then links to the published documentation.
+- Cloudflare Pages: the production branch is `docs-live`; every other branch gets a preview. The build command and output directory are the same for all (`pnpm build:site`, `site/dist`).
 
 ## How it works
 
@@ -70,6 +74,7 @@ engine/build/build.ts     writes every page as HTML into dist/, plus 404.html an
 - **The canvas** (`Canvas.tsx`) renders the component's own stories from the library's source. The code under an example is written from what the example renders (`jsx.ts`), so it reads as usage, not as test scaffolding. An example that opens over the page (a dialog) waits behind a button.
 - **Navigation** between pages swaps the content without a reload (`router.tsx`); every page is also a real HTML file, so links, search engines and a visitor without JavaScript get the content.
 - **Search** is Cynosure's CommandPalette (Ctrl or Command+K) over every page and heading.
+- **The icon gallery** (`Gallery.tsx`) is shown on the guide named by `iconGallery.page` in the config. It lists every icon exported by each set in `iconGallery.sets`, loaded when that page opens. Typing filters by name, category, brand name and each set's `keywords` (other words for an icon, such as delete for a trash can); pressing an icon copies its import line, or the `<Icon>` element, and a toast shows what was copied. The tiles sit in one frame of fixed height that scrolls, so the gallery never makes the page long. A new icon appears by being exported: nothing is listed by hand.
 
 ## Making it another product's site
 

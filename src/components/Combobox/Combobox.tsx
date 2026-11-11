@@ -47,17 +47,25 @@ export interface ComboboxLabels {
 }
 
 export interface ComboboxProps {
+  /** The field's label. It also names the list when it is a string. */
   label: ReactNode;
+  /** Visually hide the label (it still names the control). Prefer visible labels. */
   labelHidden?: boolean;
+  /** Help text shown below the control and read with it. */
   description?: ReactNode;
+  /** Your own error; it replaces the field's own messages. */
   error?: ReactNode;
+  /** The options to choose from. */
   options: ComboboxOption[];
   /** The chosen option's value (or the typed text, with `allowCustom`). */
   value?: string;
+  /** The value chosen at first, when uncontrolled. */
   defaultValue?: string;
+  /** Called when the value changes, with the chosen option's value, or an empty string when it is cleared. */
   onChange?: (value: string) => void;
   /** The text in the input. Control it to load options as people type. */
   inputValue?: string;
+  /** Called when the text in the input changes (typed, or filled in by a choice), with the text. */
   onInputChange?: (text: string) => void;
   /** Which options match the text. Default: label contains the text, ignoring case. `false`: show `options` as given. */
   filter?: ((option: ComboboxOption, text: string) => boolean) | false;
@@ -65,14 +73,23 @@ export interface ComboboxProps {
   allowCustom?: boolean;
   /** Options are being fetched: the list says so and is `aria-busy`. */
   loading?: boolean;
+  /** Hint shown in the input while it is empty. */
   placeholder?: string;
+  /** Name the value is submitted under in a form. */
   name?: string;
+  /** A value must be chosen: submitting the form without one is blocked and shows an error. */
   required?: boolean;
+  /** Turns off the input; the value is not submitted with a form. */
   disabled?: boolean;
+  /** Size of the field. Default "md". */
   size?: Size;
+  /** `outline` or `soft` (tinted, borderless until focus). Default "outline". */
   variant?: "outline" | "soft";
+  /** Icon at the start of the input. */
   iconStart?: IconData;
+  /** Replace the built-in English text: the empty and loading notes and the required error. */
   labels?: Partial<ComboboxLabels>;
+  /** Added to the root element, for layout. */
   className?: string;
   /** Layout only. */
   style?: CSSProperties;

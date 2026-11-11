@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import * as icons from "../../src/icons";
+import { ICON_KEYWORDS } from "../../src/icons/keywords";
 import { ICON_CATEGORIES, type IconData } from "../../src/icons/types";
 import { validateIcon } from "../../src/icons/validate";
 
@@ -16,6 +17,19 @@ describe("Facet icon set", () => {
   });
   it.each(shipped.map((i) => [i.name, i] as const))("%s passes validateIcon", (_name, icon) => {
     expect(validateIcon(icon)).toEqual([]);
+  });
+});
+
+describe("search keywords", () => {
+  it("every icon has words to be found by, and no words are left for an icon that is gone", () => {
+    const names = shipped.map((icon) => icon.name).sort();
+    expect(Object.keys(ICON_KEYWORDS).sort()).toEqual(names);
+    for (const [name, words] of Object.entries(ICON_KEYWORDS)) {
+      expect(words.length, name).toBeGreaterThanOrEqual(2);
+      // Lower case, and never just the name again: the name is searched anyway.
+      for (const word of words) expect(word, name).toBe(word.toLowerCase());
+      expect(words, name).not.toContain(name);
+    }
   });
 });
 

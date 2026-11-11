@@ -47,6 +47,7 @@ export interface VirtualListHandle {
 export interface VirtualListProps<T> {
   /** Accessible name of the list. */
   label: string;
+  /** The data, one entry per row. */
   items: readonly T[];
   /** A stable, unique key per item. */
   getKey: (item: T, index: number) => string;
@@ -63,11 +64,15 @@ export interface VirtualListProps<T> {
   isHeader?: (item: T) => boolean;
   /** `scrollToIndex` and `scrollToEnd`, for scrolling from outside the list. */
   handle?: Ref<VirtualListHandle>;
+  /** Return true for rows that cannot be selected; the arrow keys skip them. */
   isDisabled?: (item: T) => boolean;
   /** "none" (a list to act on), "single" (default) or "multiple". */
   selectionMode?: "none" | "single" | "multiple";
+  /** Keys of the selected rows (controlled). */
   selectedKeys?: string[] | undefined;
+  /** Keys of the rows selected at the start when uncontrolled. */
   defaultSelectedKeys?: string[];
+  /** Called with the selected keys when the selection changes. */
   onSelectionChange?: ((keys: string[]) => void) | undefined;
   /** Enter on a row, a double-click, or a click when nothing is selectable. */
   onAction?: ((item: T, index: number) => void) | undefined;
@@ -78,8 +83,11 @@ export interface VirtualListProps<T> {
   onMove?: ((keys: string[], to: number) => void) | undefined;
   /** Shown when there are no items. */
   empty?: ReactNode;
+  /** Replace the built-in English text: the announcement after a move. */
   labels?: Partial<VirtualListLabels>;
+  /** Row height and text size. Default "md". */
   size?: "sm" | "md";
+  /** Added to the root element, for layout. */
   className?: string;
   /** Layout only (e.g. `blockSize`). Restyle through --cy-virtual-list-* tokens. */
   style?: CSSProperties;

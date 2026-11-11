@@ -44,29 +44,47 @@ export interface TagInputLabels {
 }
 
 export interface TagInputProps {
+  /** The field's label and accessible name. */
   label: ReactNode;
+  /** Visually hide the label (it still names the control). Prefer visible labels. */
   labelHidden?: boolean | undefined;
+  /** Help text shown below the field. */
   description?: ReactNode;
+  /** Your own error; it replaces the field's own messages. */
   error?: ReactNode;
+  /** The tags (controlled). */
   value?: string[] | undefined;
+  /** Starting tags when uncontrolled. */
   defaultValue?: string[];
+  /** Called with the full list of tags whenever one is added or removed. */
   onChange?: ((tags: string[]) => void) | undefined;
   /** Offered while typing (and with Arrow Down). Free text is still allowed. */
   suggestions?: string[] | undefined;
   /** Typing one of these adds the text as a tag (Enter always does). Pasted text is split on them. Default: [","]. */
   separators?: string[];
+  /** Allows the same tag more than once. Otherwise a tag already in the list (ignoring case) is refused. */
   allowDuplicates?: boolean;
+  /** The most tags allowed; more are refused with a message. */
   maxTags?: number | undefined;
   /** Return a message to refuse a tag (shown as the field's error), or null to accept it. */
   validate?: ((tag: string, tags: string[]) => string | null) | undefined;
+  /** Form field name; each tag is submitted as its own value under it. */
   name?: string | undefined;
+  /** `id` of the form the tags are submitted with, when the field sits outside it. */
   form?: string | undefined;
+  /** The form cannot be submitted while there are no tags. */
   required?: boolean | undefined;
+  /** Blocks typing and removing tags, and leaves the tags out of the form submission. */
   disabled?: boolean | undefined;
+  /** Hint shown in the input while nothing is typed. */
   placeholder?: string | undefined;
+  /** Field height and text size. Default "md". */
   size?: Size;
+  /** `outline` or `soft` (tinted, borderless until focus). Default "outline". */
   variant?: "outline" | "soft";
+  /** Replace the built-in English text: the tag list's name, the remove buttons, announcements and refusals. */
   labels?: Partial<TagInputLabels>;
+  /** Added to the root element, for layout. */
   className?: string;
   /** Layout only. Restyle through --cy-tag-input-* tokens. */
   style?: CSSProperties;

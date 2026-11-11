@@ -50,14 +50,19 @@ export interface TreeLabels {
 export interface TreeProps {
   /** Accessible name of the tree. */
   label: string;
+  /** The top-level items; each can hold more under `children`. */
   items: TreeItem[];
   /** Selected ids (controlled) and the default for uncontrolled use. */
   selected?: string[];
+  /** Ids selected at the start when uncontrolled. */
   defaultSelected?: string[];
+  /** Called with the selected ids when the selection changes. */
   onSelectionChange?: (ids: string[]) => void;
   /** Expanded ids (controlled) and the default for uncontrolled use. */
   expanded?: string[];
+  /** Ids expanded at the start when uncontrolled. */
   defaultExpanded?: string[];
+  /** Called with the expanded ids when an item is expanded or collapsed. */
   onExpandedChange?: (ids: string[]) => void;
   /** `single` (default): one at a time. `multiple`: Space and clicks toggle. */
   selectionMode?: "single" | "multiple";
@@ -72,8 +77,11 @@ export interface TreeProps {
    * must share one height.
    */
   virtual?: boolean;
+  /** Row height and indent. Default "md". */
   size?: Extract<Size, "sm" | "md">;
+  /** Replace the built-in English text: the loading row and the failed-to-load row. */
   labels?: Partial<TreeLabels>;
+  /** Added to the root element, for layout. */
   className?: string;
   /** Layout only. Restyle through --cy-tree-* tokens. */
   style?: CSSProperties;

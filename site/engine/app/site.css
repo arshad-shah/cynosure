@@ -172,9 +172,71 @@ body {
   font-size: var(--cy-font-size-sm);
   font-weight: var(--cy-font-weight-medium);
 }
+/*
+ * A props table keeps readable columns: a long type may break anywhere, but never down to a letter per line, and the
+ * description keeps a sentence's width. On a phone the table scrolls sideways inside its own frame instead.
+ */
 .docs-type {
+  display: inline-block;
+  min-inline-size: 14ch;
   color: var(--cy-color-muted);
   overflow-wrap: anywhere;
+}
+.docs-prop-text {
+  display: block;
+  min-inline-size: 26ch;
+}
+/* The icon gallery: search and what a press copies, then a grid of tiles per category. */
+.docs-gallery {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cy-space-4);
+  margin-block-end: var(--cy-space-8);
+}
+/* The tiles sit in one frame that scrolls; each category's name stays at the top of it while its tiles pass. */
+.docs-gallery-frame {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cy-space-5);
+  max-block-size: min(24rem, 60vh);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0 var(--cy-space-4) var(--cy-space-4);
+  border: var(--cy-border-width) solid var(--cy-color-line);
+  border-radius: var(--cy-radius-card);
+  background: var(--cy-color-surface);
+}
+.docs-gallery-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: var(--cy-space-5);
+}
+.docs-gallery-tools > :first-child {
+  flex: 1 1 16rem;
+}
+.docs-gallery-heading {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 1;
+  margin: 0;
+  padding-block: var(--cy-space-3) var(--cy-space-2);
+  background: var(--cy-color-surface);
+  color: var(--cy-color-muted);
+  font-size: var(--cy-font-size-sm);
+  font-weight: var(--cy-font-weight-medium);
+}
+.docs-gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(5.5rem, 1fr));
+  gap: var(--cy-space-3);
+}
+.docs-gallery-name {
+  max-inline-size: 100%;
+  color: var(--cy-color-muted);
+  font-size: var(--cy-font-size-xs);
+  overflow-wrap: anywhere;
+  text-align: center;
 }
 .docs-examples,
 .docs-props,
@@ -341,13 +403,4 @@ body {
   .docs-neighbours {
     grid-template-columns: minmax(0, 1fr);
   }
-}
-
-/*
- * Until Cynosure 0.1.1 is installed: AppShell's content area must be the positioning parent of text hidden for
- * screen readers, or that text stretches the page into a second scrollbar. 0.1.1 does this itself; delete this rule
- * when the dependency is raised.
- */
-.docs-shell main {
-  position: relative;
 }

@@ -37,7 +37,9 @@ export interface PageRect {
 }
 
 export interface RenderPageProps {
+  /** The page's `id` from `pages`. */
   id: string;
+  /** Position of the page in `pages`, from 0. */
   index: number;
   /** 1 = 100%. Draw at `width` by `height` times `scale`. */
   scale: number;
@@ -66,12 +68,15 @@ export interface DocumentViewportLabels {
 export interface DocumentViewportProps {
   /** Names the viewport ("Document", "Contract.pdf"). */
   label: string;
+  /** The pages, top to bottom, each with its size at 100%. */
   pages: readonly ViewportPage[];
+  /** The zoom setting, when you control it: fit width, fit page or a percent. */
   zoom?: ZoomSetting | undefined;
   /** Default fit-width. */
   defaultZoom?: ZoomSetting;
   /** Gestures and keys ask for a percent. */
   onZoomChange?: ((zoom: ZoomSetting) => void) | undefined;
+  /** Draws one page. Called for each page in or near the view. */
   renderPage: (page: RenderPageProps) => ReactNode;
   /** The pages in view, top to bottom. */
   onVisiblePagesChange?: ((ids: string[]) => void) | undefined;
@@ -79,8 +84,11 @@ export interface DocumentViewportProps {
   onCurrentPageChange?: ((id: string | null) => void) | undefined;
   /** The scale the zoom came to (fit modes depend on the viewport). */
   onScaleChange?: ((scale: number) => void) | undefined;
+  /** Scrolls to a page, or to a rect on it. A new `nonce` scrolls again. */
   scrollTo?: ScrollRequest | undefined;
+  /** Replace the built-in English text: page names and the zoom announcement. */
   labels?: Partial<DocumentViewportLabels>;
+  /** Added to the scrolling root element, for layout. */
   className?: string;
   /** Layout only (give it a height). Restyle through --cy-document-viewport-* tokens. */
   style?: CSSProperties;

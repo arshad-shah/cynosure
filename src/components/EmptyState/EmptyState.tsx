@@ -18,7 +18,9 @@ declare module "../../tokens/schema.js" {
 export interface EmptyStateProps {
   /** A Facet icon shown above the title (decorative). */
   icon?: IconData | undefined;
+  /** The heading: what is empty or missing. */
   title: ReactNode;
+  /** A sentence under the title. */
   description?: ReactNode | undefined;
   /** Buttons for the next step ("Create a project", "Clear filters"). */
   actions?: ReactNode | undefined;
@@ -26,6 +28,7 @@ export interface EmptyStateProps {
   headingLevel?: 2 | 3 | 4 | 5 | 6;
   /** `sm` for panels and popups, `md` for page areas. */
   size?: Extract<Size, "sm" | "md">;
+  /** Added to the root element, for layout. */
   className?: string;
   /** Layout only. Restyle through --cy-empty-state-* tokens. */
   style?: CSSProperties;

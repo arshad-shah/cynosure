@@ -122,6 +122,12 @@ export function Shell({ children }: { children: ReactNode }) {
                 <Badge size="sm" tone="neutral" variant="outline">
                   v{site.version}
                 </Badge>
+                {/* A preview of what is on its way: the published documentation is the one at the site's address. */}
+                {site.unreleased && (
+                  <Badge size="sm" tone="warning" variant="outline">
+                    Unreleased
+                  </Badge>
+                )}
               </div>
               <div className="docs-bar-tools">
                 <Button

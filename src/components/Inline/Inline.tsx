@@ -5,16 +5,21 @@ type Space = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" | "10";
 export interface InlineProps {
   /** Space token between children. */
   gap?: Space;
+  /** Cross-axis alignment of children. They are centred when it is not set. */
   align?: "start" | "center" | "end" | "stretch" | "baseline";
+  /** How children are spread along the row. */
   justify?: "start" | "center" | "end" | "between";
   /** Wrap onto new lines when space runs out. */
   wrap?: boolean;
   /** Neutral layout element to render (never an interactive one). */
   as?: "div" | "section" | "ul" | "ol" | "nav" | "aside" | "header" | "footer" | "span";
+  /** Added to the root element, for layout. */
   className?: string;
   /** Layout only. */
   style?: CSSProperties;
+  /** The elements to lay out in a row. */
   children?: ReactNode;
+  /** Set on the root element, for tests. */
   "data-testid"?: string;
 }
 

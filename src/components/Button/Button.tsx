@@ -45,6 +45,7 @@ export interface ButtonProps extends Omit<ButtonBaseProps, "children" | "classNa
   variant?: ButtonVariant;
   /** Semantic colour. */
   tone?: Tone;
+  /** Height and text size of the button. Default "md". */
   size?: Size;
   /** Leading icon (inline-start, RTL aware). */
   icon?: IconData | undefined;
@@ -71,10 +72,13 @@ export interface ButtonProps extends Omit<ButtonBaseProps, "children" | "classNa
    * users still reach it with Tab.
    */
   keepFocus?: boolean;
+  /** Added to the button (or link) element, for layout. */
   className?: string;
   /** Layout only. Restyle through `--cy-button-*` tokens. */
   style?: CSSProperties;
+  /** The button's label. */
   children: ReactNode;
+  /** Set on the button (or link) element, to find it in tests. */
   "data-testid"?: string;
 }
 

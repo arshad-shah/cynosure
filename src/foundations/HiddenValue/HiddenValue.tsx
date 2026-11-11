@@ -2,8 +2,11 @@ import { useRef } from "react";
 import { useClientLayoutEffect } from "../client-layout-effect.js";
 
 export interface HiddenValueProps {
+  /** Form field name the value is submitted under. */
   name?: string | undefined;
+  /** The value to submit. */
   value: string;
+  /** `id` of the form to submit with, when rendered outside it. */
   form?: string | undefined;
   /** Fails form validation while value is empty. */
   required?: boolean | undefined;

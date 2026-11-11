@@ -6,6 +6,7 @@ import { Button, type ButtonProps } from "../Button/Button.js";
 import { Tooltip } from "../Tooltip/Tooltip.js";
 
 export interface IconButtonProps extends Omit<ButtonProps, "children" | "icon" | "iconEnd" | "fullWidth"> {
+  /** The Facet icon shown in the button. */
   icon: IconData;
   /** Required accessible name, also shown as the tooltip. */
   label: string;

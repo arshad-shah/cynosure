@@ -2,6 +2,8 @@
  * This site's one settings file. To make the template another product's documentation, change what is here; the
  * pages, navigation, version, changelog and search all follow from the repository. See `site/README.md`.
  */
+
+import { storybook } from "@arshad-shah/cynosure/brands";
 import {
   code,
   history,
@@ -30,6 +32,27 @@ export default defineDocs({
     favicon: "brand/favicon.ico",
     appleTouchIcon: "brand/apple-touch-icon.png",
     shareImage: "brand/og-image.png",
+  },
+
+  // Storybook is built beside the site (`pnpm build:site`): every example with its controls and tests.
+  links: [{ label: "Storybook", href: "/storybook/", icon: storybook }],
+
+  // On the Icons guide: every Facet icon and brand mark, searched as you type; a press copies its import.
+  iconGallery: {
+    page: "icons",
+    sets: [
+      {
+        label: "Icons",
+        from: "@arshad-shah/cynosure/icons",
+        load: () => import("@arshad-shah/cynosure/icons"),
+        keywords: () => import("@arshad-shah/cynosure/icons").then((icons) => icons.ICON_KEYWORDS),
+      },
+      {
+        label: "Brands",
+        from: "@arshad-shah/cynosure/brands",
+        load: () => import("@arshad-shah/cynosure/brands"),
+      },
+    ],
   },
 
   docs: "docs",

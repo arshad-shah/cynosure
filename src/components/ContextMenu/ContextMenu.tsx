@@ -16,13 +16,21 @@ import { type MenuEntry, MenuPanel } from "../Menu/Menu.js";
 
 /** Spread onto the one element that opens the menu (a row, a card, a canvas). */
 export interface ContextMenuTargetProps {
+  /** Spread onto the target: focus returns to it when the menu closes. */
   ref: Ref<HTMLElement>;
+  /** Spread onto the target: opens the menu on right-click, in place of the browser's own menu. */
   onContextMenu: (event: MouseEvent<HTMLElement>) => void;
+  /** Spread onto the target: opens the menu on Shift+F10 or the context menu key while the target has focus. */
   onKeyDown: (event: KeyboardEvent<HTMLElement>) => void;
+  /** Spread onto the target: starts the long press that opens the menu on touch screens. */
   onPointerDown: (event: PointerEvent<HTMLElement>) => void;
+  /** Spread onto the target: cancels the long press when the finger moves (a scroll). */
   onPointerMove: (event: PointerEvent<HTMLElement>) => void;
+  /** Spread onto the target: cancels the long press when the finger lifts early. */
   onPointerUp: () => void;
+  /** Spread onto the target: cancels the long press when the browser takes over the touch. */
   onPointerCancel: () => void;
+  /** Spread onto the target: tells assistive tech that Shift+F10 opens the menu. */
   "aria-keyshortcuts": "Shift+F10";
 }
 
@@ -31,12 +39,15 @@ export interface ContextMenuProps {
   children: (props: ContextMenuTargetProps) => ReactNode;
   /** Accessible name of the menu. */
   label: string;
+  /** The commands, as in `Menu`: items, or sections of items with a group name. */
   items: MenuEntry[];
+  /** Called when an item is chosen, with its `value`. */
   onSelect: (value: string) => void;
   /** Called when the menu opens or closes, e.g. to highlight the row it belongs to. */
   onOpenChange?: ((open: boolean) => void) | undefined;
   /** The browser's own menu shows instead. */
   disabled?: boolean;
+  /** Added to the menu panel, for layout. */
   className?: string;
   /** Layout only, applied to the panel. */
   style?: CSSProperties;

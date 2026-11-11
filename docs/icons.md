@@ -1,13 +1,13 @@
 # Icons
 
-Cynosure ships two kinds of icon, drawn by the same `Icon` component:
+Cynosure ships two kinds of icon, both drawn by the same `Icon` component.
 
 - **Facet icons** (`@arshad-shah/cynosure/icons`): Cynosure's own set, 240 icons in 16 categories.
 - **Brand marks** (`@arshad-shah/cynosure/brands`): the official logos of 97 companies and projects, exactly as their owners publish them.
 
 ## Facet icons
 
-One grammar: a 24 grid, a 1.75 round stroke, softened-square geometry, strokes only. The categories (`ICON_CATEGORIES`) are arrows, navigation, actions, editing, files, data, media, communication, status, time, security, people, devices, design, layout and maths. Browse them in Storybook: **Foundations → Icon → Gallery** (hover a tile to see its motion).
+One grammar: a 24 grid, a 1.75 round stroke, softened-square geometry, strokes only. The categories (`ICON_CATEGORIES`) are arrows, navigation, actions, editing, files, data, media, communication, status, time, security, people, devices, design, layout and maths. Search them at the top of the [Icons page](https://cynosure.arshadshah.com/icons/), or browse them in Storybook: **Foundations → Icon → Gallery** (hover a tile to see its motion).
 
 ```tsx
 import { Icon } from "@arshad-shah/cynosure";
@@ -19,7 +19,7 @@ import { search } from "@arshad-shah/cynosure/icons";
 <Icon icon={search} color="#14b8a6" />              // a one-off colour
 ```
 
-Import icons by name so unused ones are left out of your bundle. Names are camelCase versions of the icon's kebab-case name (`arrow-up-right` → `arrowUpRight`); reserved words get an `Icon` suffix (`packageIcon`).
+`ICON_KEYWORDS` (from the same entry) maps each icon's name to other words it is found by (`trash`: delete, remove, bin), for building your own icon picker. Import icons by name so unused ones are left out of your bundle. Names are camelCase versions of the icon's kebab-case name (`arrow-up-right` → `arrowUpRight`); reserved words get an `Icon` suffix (`packageIcon`).
 
 **Adding one:** draw it on a 24 grid with strokes only, export the SVG, then run `pnpm cy new icon <name> --from icon.svg --category <category>`. In the generated file, set `motion` and mark the moving part `animate: true`. See `src/icons/AGENTS.md`.
 
