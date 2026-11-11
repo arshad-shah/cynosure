@@ -27,6 +27,7 @@ import { type ReactNode, useEffect, useMemo, useState } from "react";
 import config from "../../docs.config";
 import type { PageData, PageLink, PropRow, TocEntry } from "../types";
 import { Canvas } from "./Canvas";
+import { Gallery } from "./Gallery";
 import { Markdown } from "./Markdown";
 
 const icons = config.icons ?? {};
@@ -211,6 +212,7 @@ function Doc({ page }: { page: PageData }) {
   return (
     <Frame page={page}>
       <Head page={page} />
+      {config.iconGallery?.page === page.id && <Gallery sets={config.iconGallery.sets} />}
       <Prose as="div" size="lg" className="docs-prose">
         <Markdown nodes={page.body} />
       </Prose>

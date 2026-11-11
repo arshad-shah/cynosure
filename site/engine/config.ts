@@ -11,6 +11,16 @@ export interface DocsLink {
   icon?: IconData;
 }
 
+/** One set of icons in the gallery: an entry of the package whose exports are icons. */
+export interface IconSet {
+  /** What the set is called in the gallery, e.g. "Icons". */
+  label: string;
+  /** Where its icons are imported from; this is what a copied import says. */
+  from: string;
+  /** Loads the set: `() => import("…")`, the same address as `from`. */
+  load: () => Promise<Record<string, unknown>>;
+}
+
 export interface ComponentsConfig {
   /** Folders that hold one folder per component, each with a `README.md` (relative to the repository root). */
   folders: string[];
@@ -52,6 +62,11 @@ export interface DocsConfig {
    * last release and the site says so beside the version. Default: `.changeset`.
    */
   changesets?: string;
+  /**
+   * A gallery of the package's icons, shown on one of the guides: searched as you type, and a press copies the
+   * icon's import. `page` is the guide's id (its file name without `.md`).
+   */
+  iconGallery?: { page: string; sets: IconSet[] };
   /** Extra links for the header and footer (GitHub and npm are added from `repo` and `package`). */
   links?: DocsLink[];
   /** The command shown on the home page. Default: `pnpm add <package>`. */

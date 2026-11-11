@@ -1,13 +1,13 @@
 # Icons
 
-Cynosure ships two kinds of icon, drawn by the same `Icon` component:
+Cynosure ships two kinds of icon, both drawn by the same `Icon` component. [Search them all on the documentation site](https://cynosure.arshadshah.com/icons/), where pressing an icon copies its import.
 
 - **Facet icons** (`@arshad-shah/cynosure/icons`): Cynosure's own set, 240 icons in 16 categories.
 - **Brand marks** (`@arshad-shah/cynosure/brands`): the official logos of 97 companies and projects, exactly as their owners publish them.
 
 ## Facet icons
 
-One grammar: a 24 grid, a 1.75 round stroke, softened-square geometry, strokes only. The categories (`ICON_CATEGORIES`) are arrows, navigation, actions, editing, files, data, media, communication, status, time, security, people, devices, design, layout and maths. Browse them in Storybook: **Foundations → Icon → Gallery** (hover a tile to see its motion).
+One grammar: a 24 grid, a 1.75 round stroke, softened-square geometry, strokes only. The categories (`ICON_CATEGORIES`) are arrows, navigation, actions, editing, files, data, media, communication, status, time, security, people, devices, design, layout and maths. Search them at the top of the [Icons page](https://cynosure.arshadshah.com/icons/), or browse them in Storybook: **Foundations → Icon → Gallery** (hover a tile to see its motion).
 
 ```tsx
 import { Icon } from "@arshad-shah/cynosure";

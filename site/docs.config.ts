@@ -37,6 +37,23 @@ export default defineDocs({
   // Storybook is built beside the site (`pnpm build:site`): every example with its controls and tests.
   links: [{ label: "Storybook", href: "/storybook/", icon: storybook }],
 
+  // On the Icons guide: every Facet icon and brand mark, searched as you type; a press copies its import.
+  iconGallery: {
+    page: "icons",
+    sets: [
+      {
+        label: "Icons",
+        from: "@arshad-shah/cynosure/icons",
+        load: () => import("@arshad-shah/cynosure/icons"),
+      },
+      {
+        label: "Brands",
+        from: "@arshad-shah/cynosure/brands",
+        load: () => import("@arshad-shah/cynosure/brands"),
+      },
+    ],
+  },
+
   docs: "docs",
   // Notes for people working on Cynosure and its products, not for people using it: these stay in the repository.
   exclude: [
