@@ -25,7 +25,30 @@ const openPicker = async (
 ) => {
   await userEvent.click(canvas.getByRole("button", { name }));
   const dialog = await canvas.findByRole("dialog", { name });
-  await waitFor(() => expect(dialog).toBeVisible());
+  // The picker fades in. WebKit under load can take over a second to draw the first frame of that, so this waits
+  // longer than the default, and when it never shows, the failure says what state it was left in.
+  await waitFor(
+    () => {
+      const style = getComputedStyle(dialog);
+      const state = {
+        open: dialog.matches(":popover-open"),
+        display: style.display,
+        visibility: style.visibility,
+        fadedIn: Number(style.opacity) > 0,
+      };
+      const running = dialog
+        .getAnimations()
+        .map((a: Animation) => `${a.playState} at ${String(a.currentTime)}`);
+      expect(state, `opacity ${style.opacity}; animations: ${running.join(", ") || "none"}`).toEqual({
+        open: true,
+        display: "block",
+        visibility: "visible",
+        fadedIn: true,
+      });
+    },
+    { timeout: 5000 },
+  );
+  await expect(dialog).toBeVisible();
   return within(dialog);
 };
 /** How far the chosen row of a column is from the middle of the lens, in pixels. */
