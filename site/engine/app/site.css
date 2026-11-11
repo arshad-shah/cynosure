@@ -172,9 +172,19 @@ body {
   font-size: var(--cy-font-size-sm);
   font-weight: var(--cy-font-weight-medium);
 }
+/*
+ * A props table keeps readable columns: a long type may break anywhere, but never down to a letter per line, and the
+ * description keeps a sentence's width. On a phone the table scrolls sideways inside its own frame instead.
+ */
 .docs-type {
+  display: inline-block;
+  min-inline-size: 14ch;
   color: var(--cy-color-muted);
   overflow-wrap: anywhere;
+}
+.docs-prop-text {
+  display: block;
+  min-inline-size: 26ch;
 }
 .docs-examples,
 .docs-props,

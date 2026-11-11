@@ -183,13 +183,25 @@ function PropsTable({ name, rows }: { name: string; rows: PropRow[] }) {
             </Inline>
           ),
         },
+        // Second, so that on a phone the name and what it does are read without scrolling the table sideways.
+        {
+          key: "description",
+          header: "What it does",
+          cell: (row) => (
+            <span className="docs-prop-text">
+              {/* A doc comment marks code with backticks: every second piece is code. */}
+              {row.description
+                .split(/`([^`]+)`/)
+                .map((piece, i) => (i % 2 ? <code key={`${i}-${piece}`}>{piece}</code> : piece))}
+            </span>
+          ),
+        },
         { key: "type", header: "Type", cell: (row) => <code className="docs-type">{row.type}</code> },
         {
           key: "default",
           header: "Default",
           cell: (row) => (row.default ? <code>{row.default}</code> : null),
         },
-        { key: "description", header: "What it does", cell: (row) => row.description },
       ]}
     />
   );

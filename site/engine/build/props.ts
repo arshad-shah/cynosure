@@ -58,8 +58,13 @@ function defaultFrom(text: string): string {
 /** The props of `<name>Props` in `pkg`, or null when the package exports no such type. */
 export function propsOf(pkg: string, name: string): PropRow[] | null {
   const { checker, exports, pkgDir } = load(pkg);
+  // Declared by the package itself. A package used from its own repository (`workspace:*`) has its dependencies'
+  // types in a `node_modules` inside its folder, and those (React's HTML attributes) are not its own.
   const ownDeclaration = (symbol: ts.Symbol) =>
-    (symbol.getDeclarations() ?? []).some((d) => d.getSourceFile().fileName.startsWith(pkgDir));
+    (symbol.getDeclarations() ?? []).some((d) => {
+      const file = d.getSourceFile().fileName;
+      return file.startsWith(pkgDir) && !file.slice(pkgDir.length).includes("/node_modules/");
+    });
   const symbol = exports.get(`${name}Props`);
   if (!symbol) return null;
   const target = symbol.flags & ts.SymbolFlags.Alias ? checker.getAliasedSymbol(symbol) : symbol;
