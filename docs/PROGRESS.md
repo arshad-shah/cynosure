@@ -15,24 +15,23 @@ Plan 9 (`docs/superpowers/plans/2026-11-10-cynosure-migrations.md`, tracked in i
 
 ## Current task
 
-Plan 4 Task 10: the final review. Docs, an independent review of Plans 6–9, `pnpm verify`, CI green on all three engines, push.
+Releasing 0.1.0. `next` is merged into `main` through pull request #151 (a merge commit with `next`'s files and both histories as parents, because the two branches share no history; `main` only accepts pull requests). Once it is merged, the release workflow opens the version pull request; merging that publishes 0.1.0 with the one-run `NPM_TOKEN` (already added by Arshad). Then: delete the token, add the trusted publisher on npmjs.com.
 
 ## Next step
 
-1. Check CI on the latest push to `next` (all three engines, touch, coverage, visual regression). New visual stories (Calendar, DateField, TimeField) get their baselines from the `[baselines]` commit.
-2. Final review (Plan 4 Task 10), then report to Arshad.
-3. When detent releases its new options (detent issues #89 and #90), open a Cynosure issue to update the dependency and drop the workarounds: `useDrag` clearing detent's inline `touch-action`, and detent's `user-select` lock on `<body>` (see the detent ruling below).
+1. Watch #151 and the version pull request through to 0.1.0 on npm.
+2. The documentation site, issue #152 (Astro with Cynosure islands in `site/`, examples from the stories through `composeStories`, Pagefind in a CommandPalette, the same `pnpm build:site` command and `site/dist` output Cloudflare already uses).
+3. Plan 4 Task 10, the final review.
+4. When detent releases its new options (detent #89 and #90), open a Cynosure issue to update the dependency and drop the workarounds.
 
 ## Waiting on Arshad
 
-Decided 2026-11-11: publishing is npm trusted publishing with provenance (no stored token; `release.yml` and `tools/publish.sh` switched); the old `@arshad-shah/cynosure-*` packages (react, core, themes, tokens, icons, cli) are to be deprecated once the new package is on npm (commands in `docs/release.md`); a code-editor theme comes from tokens so any editor can be styled; a new documentation site, built with Cynosure itself, hosts Storybook too and replaces GitHub Pages. Order: publish first, then the site.
+Done by Arshad (2026-11-11): Cloudflare Pages builds `main` with `pnpm install --frozen-lockfile && pnpm build:site` into `site/dist` (previews per branch at `<branch>.cynosure.pages.dev`); Actions may create pull requests; the `NPM_TOKEN` secret is added for the first publish; the six old `@arshad-shah/cynosure-*` packages are deprecated (with npm's default message, which does not name the new package: once 0.1.0 is out, `npm deprecate` with "Replaced by @arshad-shah/cynosure" would point people to it).
 
 Still open:
-- **Merging `next` into `main`**, and setting up the trusted publisher on npmjs.com (repository `arshad-shah/cynosure`, workflow `release.yml`).
-- **The first version:** if npm only offers a trusted publisher once the package exists, `0.1.0` needs one publish another way.
-- **The documentation site:** it lives at cynosure.arshadshah.com, whose host builds `main` (today the old Astro docs, `packages/docs`). When `next` is merged into `main`, change the host's build settings to: command `pnpm install --frozen-lockfile && pnpm build:site`, output directory `site/dist`. Until the new site is built, that is Storybook at `/storybook/` behind a holding page (`site/index.html`). GitHub Pages (`pages.yml`) is removed in the same change, so Storybook is never offline.
-- **Code-editor colours:** done (2026-11-11): `--cy-color-syntax-*` palette tokens, `styles/syntax.css` (opt-in), `monacoTheme`, `textMateTheme`, `editorColors`; `docs/code-editors.md`.
-- **Order (Arshad, 2026-11-11):** the token-based code-editor theme first, then merge to `main` and publish `0.1.0` with a one-run token, then deprecate the old packages, then the docs site.
+- Merge #151, then the version pull request.
+- After 0.1.0: delete the npm token and add the trusted publisher (repository `arshad-shah/cynosure`, workflow `release.yml`).
+- Turn GitHub Pages off in the settings once the new site (#152) is live.
 
 ## Plans
 

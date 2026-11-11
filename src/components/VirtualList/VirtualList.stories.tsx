@@ -394,7 +394,7 @@ export const DraggingNearAnEdgeScrolls: Story = {
 };
 
 /** A request log, as the tools app shows one: wrapped lines, new entries arriving, a button to jump back. */
-function Log() {
+function Log({ follow = true }: { follow?: boolean }) {
   const [lines, setLines] = useState<Entry[]>(() =>
     Array.from({ length: 60 }, (_, i) => ({
       id: `l${i}`,
@@ -414,7 +414,7 @@ function Log() {
         renderItem={(e) => e.name}
         selectionMode="none"
         wrap
-        follow
+        follow={follow}
         handle={handle}
       />
       <div style={{ display: "flex", gap: 8 }}>
@@ -439,12 +439,11 @@ function Log() {
 const rowAt = (el: Element, i: number) => el.querySelector(`[data-index="${i}"]`) as HTMLElement | null;
 
 export const WrappedRowsTakeTheirHeight: Story = {
-  render: () => <Log />,
+  // Without following, so it starts at the top whatever the timing of the first measure.
+  render: () => <Log follow={false} />,
   play: async ({ canvasElement }) => {
     const el = list(canvasElement);
-    // It opens at the end (it follows); go back to the top.
-    await waitFor(() => expect(el.scrollTop).toBeGreaterThan(0));
-    el.scrollTop = 0;
+    await expect(el.scrollTop).toBe(0);
     await waitFor(() => expect(rowAt(canvasElement, 3)).not.toBeNull());
     // A long line wraps and is taller than a short one, and the next row starts right below it.
     // Rows are looked up each time: they are placed again as their heights settle.
