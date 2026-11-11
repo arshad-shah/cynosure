@@ -72,5 +72,5 @@ On 2026-11-11 the GitHub releases and tags of the six retired packages were remo
 
 - `tools/publish.sh` ends with `git push origin HEAD:refs/heads/docs-live`. Changesets only runs that script when no changeset is pending, so the commit it pushes is exactly what is on npm (or that plus documentation-only fixes).
 - Cloudflare Pages has `docs-live` as its production branch. `main` and pull requests are previews, marked "Unreleased" while a changeset is pending.
-- **One-time setup (Arshad, in Cloudflare Pages → Settings → Builds → Branch control):** after the first release that creates `docs-live`, set the production branch to `docs-live` and leave preview deployments on for all other branches. Until then production still builds from `main`.
+- **One-time setup (Arshad, in Cloudflare Pages → Settings → Builds → Branch control):** set the production branch to `docs-live` and leave preview deployments on for all other branches. `docs-live` was created on 2026-11-11 at the 0.2.0 release commit (`233f3ba`), so switching changes nothing that is live. Do it before merging unreleased work to `main`; until it is done, production still builds from `main`.
 - Never push to `docs-live` by hand, and never protect it against the workflow's push.

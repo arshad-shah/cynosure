@@ -55,7 +55,7 @@ Plan 9 (`docs/superpowers/plans/2026-11-10-cynosure-migrations.md`, tracked in i
 - `tools/publish.sh` ends by pushing the published commit to the `docs-live` branch. It only runs when no changeset is pending, so `docs-live` is always exactly what is on npm, or that plus documentation-only fixes.
 - Builds with a pending changeset (`main` between releases, pull requests) show an "Unreleased" badge beside the version and a link to the published documentation in the footer. The engine works this out from `.changeset/`.
 - `pnpm version-packages` is plain `changeset version` again (rehearsed: 0.3.0, `site/package.json` untouched).
-- **Waiting on Arshad, once:** after the first release that creates `docs-live` (0.3.0), set Cloudflare Pages' production branch to `docs-live` (Settings → Builds → Branch control). Until then production still builds from `main` and will show "Unreleased" between a merge and its release.
+- **Waiting on Arshad, once:** set Cloudflare Pages' production branch to `docs-live` (Settings → Builds → Branch control). The branch exists (created 2026-11-11 at the 0.2.0 release commit, `233f3ba`, the same commit as `main` then). Do it before merging #160, or production (still `main`) will show "Unreleased" between that merge and the 0.3.0 release.
 - Also fixed from the preview: the Getting started page no longer tells readers to visit the site they are on (the engine drops a paragraph whose link is the site's own address), and the props tables now show every description, because they are read from this repository.
 - Props tables: with the library used from the workspace, React's own types sit inside the package's folder (`node_modules`), so the tables briefly listed every inherited HTML attribute (4,388 rows, none described). `engine/build/props.ts` now leaves out anything declared under a `node_modules`. A browser audit of all 78 component pages finds 876 rows and no empty description. The table's columns keep a readable minimum width, the description is the second column (read on a phone without scrolling sideways), and backticks in a description are drawn as code.
 - The step that pushes `docs-live` can only be proven by the next real release.
@@ -68,7 +68,7 @@ Plan 9 (`docs/superpowers/plans/2026-11-10-cynosure-migrations.md`, tracked in i
 
 0. **TimeField picker, prop descriptions, Storybook link:** open a pull request from `ccr-892a2583-3xxim5`, let CI run Firefox and WebKit, run the `visual-baselines` workflow, and confirm the TimeField size budget.
 
-1. **After 0.3.0 publishes:** check that `docs-live` exists at the release commit, then set it as Cloudflare Pages' production branch (see `docs/release.md`).
+1. **After 0.3.0 publishes:** check that the release moved `docs-live` to the release commit and that the live site rebuilt (the first real test of that step; see `docs/release.md`).
 2. **Library gaps the site works around (fix in Cynosure, release, then use):**
    - SideNav does not open the group holding `current` when `current` changes after mount (the site remounts it by key).
    - EmptyState cannot be an `h1` (the not-found page writes its own heading).
