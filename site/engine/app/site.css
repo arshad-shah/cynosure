@@ -1,0 +1,353 @@
+/*
+ * Page layout only. Every colour, size, radius and font is a Cynosure token (`--cy-*`), so a product restyles the
+ * site by changing tokens in `theme.css`, never here.
+ */
+html,
+body,
+#root {
+  block-size: 100%;
+  margin: 0;
+}
+body {
+  background: var(--cy-color-bg);
+  color: var(--cy-color-ink);
+  font-family: var(--cy-font-sans);
+}
+
+/* The bar across the top. */
+.docs-bar {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--cy-space-3);
+  min-inline-size: 0;
+}
+.docs-bar-brand,
+.docs-bar-tools,
+.docs-bar-links {
+  display: flex;
+  align-items: center;
+  gap: var(--cy-space-2);
+}
+.docs-bar-tools,
+.docs-bar-links {
+  gap: var(--cy-space-1);
+}
+.docs-brand.docs-brand {
+  font-family: var(--cy-font-display);
+  font-size: var(--cy-font-size-lg);
+  font-weight: var(--cy-font-weight-bold);
+  text-decoration: none;
+}
+.docs-brand.docs-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cy-space-4);
+}
+.docs-logo {
+  inline-size: var(--cy-space-8);
+  block-size: var(--cy-space-8);
+}
+.docs-search-narrow.docs-search-narrow {
+  display: none;
+}
+.docs-search-wide.docs-search-wide {
+  margin-inline-end: var(--cy-space-2);
+}
+
+/* A page: the article, and "On this page" beside it when there is room. */
+.docs-page {
+  display: grid;
+  /* One reading column that text, tables, examples and the foot all share, with "On this page" beside it. */
+  grid-template-columns: minmax(0, 48rem) 14rem;
+  justify-content: center;
+  gap: var(--cy-space-9);
+  box-sizing: border-box;
+  max-inline-size: 76rem;
+  margin-inline: auto;
+  padding: var(--cy-space-9) var(--cy-space-7) var(--cy-space-7);
+}
+.docs-page[data-wide] {
+  grid-template-columns: minmax(0, 1fr);
+}
+.docs-article {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cy-space-7);
+  min-inline-size: 0;
+}
+
+/* The page heading. */
+.docs-head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cy-space-3);
+}
+.docs-eyebrow {
+  margin: 0;
+  color: var(--cy-color-muted);
+  font-size: var(--cy-font-eyebrow-size, var(--cy-font-size-xs));
+  font-weight: var(--cy-font-weight-medium);
+  letter-spacing: var(--cy-font-eyebrow-tracking, 0.08em);
+  text-transform: uppercase;
+}
+.docs-title,
+.docs-display {
+  margin: 0;
+  font-family: var(--cy-font-display);
+  font-weight: var(--cy-font-weight-bold);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+.docs-title {
+  font-size: calc(var(--cy-font-size-2xl) * 1.5);
+}
+.docs-display {
+  max-inline-size: 18ch;
+  font-size: clamp(calc(var(--cy-font-size-2xl) * 1.5), 6vw, calc(var(--cy-font-size-2xl) * 2.5));
+  line-height: 1.05;
+}
+.docs-lead {
+  max-inline-size: 65ch;
+  margin: 0;
+  color: var(--cy-color-muted);
+  font-size: var(--cy-font-size-lg);
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+.docs-small {
+  margin: 0;
+  color: var(--cy-color-muted);
+  font-size: var(--cy-font-size-sm);
+}
+.docs-clamp {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+/* Long text: Prose styles the elements; here only the measure of text lines, so tables and code can run wider. */
+.docs-prose.docs-prose {
+  max-inline-size: none;
+}
+.docs-heading {
+  display: flex;
+  align-items: center;
+  gap: var(--cy-space-1);
+  scroll-margin-block-start: var(--cy-space-6);
+}
+.docs-section-title {
+  margin: 0;
+  font-family: var(--cy-font-display);
+  font-size: var(--cy-font-size-xl);
+  font-weight: var(--cy-font-weight-bold);
+}
+/* The link beside a heading shows when the heading is pointed at or the link has focus. */
+.docs-anchor.docs-anchor {
+  opacity: 0;
+}
+.docs-heading:hover .docs-anchor,
+.docs-anchor:focus-visible {
+  opacity: 1;
+}
+@media (hover: none) {
+  .docs-anchor.docs-anchor {
+    opacity: 1;
+  }
+}
+.docs-block {
+  margin-block: var(--cy-space-5);
+}
+.docs-block {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cy-space-2);
+}
+.docs-canvas-name {
+  padding-inline: var(--cy-space-2);
+  color: var(--cy-color-muted);
+  font-size: var(--cy-font-size-sm);
+  font-weight: var(--cy-font-weight-medium);
+}
+.docs-type {
+  color: var(--cy-color-muted);
+  overflow-wrap: anywhere;
+}
+.docs-examples,
+.docs-props,
+.docs-release,
+.docs-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cy-space-4);
+}
+
+/* "On this page". */
+.docs-toc {
+  position: sticky;
+  inset-block-start: var(--cy-space-9);
+  align-self: start;
+  max-block-size: calc(100dvh - var(--cy-space-10) * 3);
+  overflow-y: auto;
+  padding-inline-start: var(--cy-space-4);
+  border-inline-start: var(--cy-border-width) solid var(--cy-color-line);
+}
+.docs-toc ul {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cy-space-2);
+  margin: var(--cy-space-3) 0 0;
+  padding: 0;
+  list-style: none;
+}
+.docs-toc li[data-depth="3"] {
+  padding-inline-start: var(--cy-space-3);
+}
+.docs-toc-link.docs-toc-link {
+  text-decoration: none;
+}
+
+/* The canvas. */
+.docs-canvas.docs-canvas {
+  overflow: hidden;
+}
+.docs-canvas-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--cy-space-2) var(--cy-space-3);
+  padding: var(--cy-space-2) var(--cy-space-3);
+  border-block-end: var(--cy-border-width) solid var(--cy-color-line);
+  background: var(--cy-color-surface);
+}
+.docs-stage {
+  box-sizing: border-box;
+  min-block-size: calc(var(--cy-space-10) * 3);
+  padding: var(--cy-space-9) var(--cy-space-8);
+  overflow-x: auto;
+  background-color: var(--cy-color-bg);
+  background-image: radial-gradient(
+    var(--cy-color-line) var(--cy-border-width),
+    transparent var(--cy-border-width)
+  );
+  background-size: var(--cy-space-4) var(--cy-space-4);
+  color: var(--cy-color-ink);
+}
+/* An example gets the stage's full width, as it has in Storybook: wide ones (a gallery, a table) need all of it. */
+.docs-stage-frame {
+  box-sizing: border-box;
+  inline-size: 100%;
+  min-inline-size: 0;
+  margin-inline: auto;
+  transition: max-inline-size var(--cy-motion-duration-normal, 0.2s);
+}
+.docs-stage-frame[data-width="tablet"] {
+  max-inline-size: 48rem;
+}
+.docs-stage-frame[data-width="phone"] {
+  max-inline-size: 24.375rem;
+}
+.docs-stage-frame:not([data-width="desktop"]) {
+  outline: var(--cy-border-width) dashed var(--cy-color-line);
+  outline-offset: var(--cy-space-3);
+}
+.docs-stage-loading.docs-stage-loading {
+  inline-size: calc(var(--cy-space-10) * 3);
+  block-size: var(--cy-control-height-md);
+}
+.docs-canvas-code.docs-canvas-code {
+  border-inline: 0;
+  border-block-end: 0;
+  border-radius: 0;
+}
+
+/* Cards: the home page and the catalogue. */
+.docs-cards.docs-cards {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.docs-card.docs-card {
+  block-size: 100%;
+}
+.docs-filter {
+  max-inline-size: calc(var(--cy-space-10) * 7);
+}
+.docs-hero {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cy-space-5);
+  padding-block: var(--cy-space-7);
+}
+.docs-install {
+  max-inline-size: calc(var(--cy-space-10) * 7);
+}
+.docs-notes {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cy-space-2);
+  margin: 0;
+  padding-inline-start: var(--cy-space-5);
+}
+
+/* The foot of a page. */
+.docs-foot {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cy-space-6);
+  margin-block-start: var(--cy-space-8);
+}
+.docs-neighbours {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--cy-space-4);
+}
+.docs-colophon {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: var(--cy-space-3);
+  padding-block-start: var(--cy-space-5);
+  border-block-start: var(--cy-border-width) solid var(--cy-color-line);
+  color: var(--cy-color-muted);
+  font-size: var(--cy-font-size-sm);
+}
+
+/* Narrower than a laptop: "On this page" goes; the content keeps the width. */
+@media (max-width: 72rem) {
+  .docs-page {
+    grid-template-columns: minmax(0, 48rem);
+  }
+  .docs-toc {
+    display: none;
+  }
+}
+/* Phones. */
+@media (max-width: 40rem) {
+  .docs-page {
+    padding: var(--cy-space-6) var(--cy-space-4) var(--cy-space-5);
+  }
+  .docs-bar-links,
+  .docs-search-wide.docs-search-wide {
+    display: none;
+  }
+  .docs-search-narrow.docs-search-narrow {
+    display: inline-flex;
+  }
+  .docs-neighbours {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/*
+ * Until Cynosure 0.1.1 is installed: AppShell's content area must be the positioning parent of text hidden for
+ * screen readers, or that text stretches the page into a second scrollbar. 0.1.1 does this itself; delete this rule
+ * when the dependency is raised.
+ */
+.docs-shell main {
+  position: relative;
+}

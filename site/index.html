@@ -1,35 +1,12 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-cy-mode="system">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Cynosure</title>
-    <meta name="description" content="Cynosure: one small, themeable, accessible React UI package used by every Arshad Shah product." />
-    <!--
-      A holding page until the documentation site (built with Cynosure itself) replaces it. `pnpm build:site` copies it
-      to site/dist/index.html beside the Storybook build in site/dist/storybook.
-    -->
-    <style>
-      :root { color-scheme: light dark; --bg: #f5f1ea; --ink: #1d1a16; --muted: #5d564d; --accent: #b23e0c; --line: #d9d1c4; }
-      @media (prefers-color-scheme: dark) { :root { --bg: #161412; --ink: #f2ede6; --muted: #b3aa9e; --accent: #ff8a57; --line: #39332c; } }
-      body { margin: 0; min-height: 100dvh; display: grid; place-items: center; background: var(--bg); color: var(--ink); font: 16px/1.55 system-ui, sans-serif; }
-      main { max-width: 36rem; padding: 2rem 1rem; }
-      h1 { margin: 0 0 0.5rem; font-size: 2.25rem; letter-spacing: -0.02em; }
-      p { color: var(--muted); }
-      ul { list-style: none; padding: 0; display: grid; gap: 0.5rem; }
-      a { display: inline-block; padding: 0.5rem 0; color: var(--accent); font-weight: 600; text-underline-offset: 3px; }
-      code { padding: 0.1rem 0.35rem; border: 1px solid var(--line); border-radius: 6px; }
-    </style>
+    <!--head-->
   </head>
   <body>
-    <main>
-      <h1>Cynosure</h1>
-      <p>One small, themeable, accessible UI package for React: <code>@arshad-shah/cynosure</code>. The full documentation site is on its way; until then, every component is in the workbench.</p>
-      <ul>
-        <li><a href="storybook/">Components in Storybook</a></li>
-        <li><a href="https://github.com/arshad-shah/cynosure#readme">README and guides on GitHub</a></li>
-        <li><a href="https://www.npmjs.com/package/@arshad-shah/cynosure">Package on npm</a></li>
-      </ul>
-    </main>
+    <div id="root"><!--app--></div>
+    <script type="module" src="/engine/app/entry-client.tsx"></script>
   </body>
 </html>

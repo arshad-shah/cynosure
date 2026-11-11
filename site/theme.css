@@ -1,0 +1,5 @@
+/*
+ * This site's own look, on top of Cynosure's defaults: fonts and token overrides only. Another product changes this
+ * file (an accent colour, a different font) and nothing else to restyle the whole site.
+ */
+@import "@arshad-shah/cynosure/fonts/hanken.css";

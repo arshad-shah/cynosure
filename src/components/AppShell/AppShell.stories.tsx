@@ -8,6 +8,7 @@ import { computeUnderHostileHost } from "../../test/hostile.js";
 import { shownFully } from "../../test/settle.js";
 import { Button } from "../Button/Button.js";
 import { type NavEntry, SideNav } from "../SideNav/SideNav.js";
+import { Table } from "../Table/Table.js";
 import { AppShell } from "./AppShell.js";
 
 const ITEMS: NavEntry[] = [
@@ -225,6 +226,45 @@ export const ContentScrollsOnItsOwn: Story = {
     main.scrollTop = 500;
     await expect(main.scrollTop).toBeGreaterThan(0);
     await expect(box(banner).top).toBeCloseTo(box(frame(canvasElement)).top, 0);
+  },
+};
+
+export const HiddenTextStaysInsideTheScrollingAreas: Story = {
+  render: () => (
+    <div className="frame" style={{ inlineSize: 900, blockSize: 300 }}>
+      <AppShell
+        header={<strong>Acme</strong>}
+        nav={
+          <div style={{ blockSize: 1200 }}>
+            <SideNav label="Main" items={ITEMS} />
+            <span className="cy-visually-hidden" style={{ insetBlockStart: 1100 }}>
+              Hidden in the navigation
+            </span>
+          </div>
+        }
+      >
+        <div style={{ blockSize: 2000 }}>
+          <Button>Top</Button>
+        </div>
+        <Table
+          caption="Far down the page"
+          captionHidden
+          columns={[{ key: "name", header: "Name", rowHeader: true }]}
+          rows={[{ name: "Ada" }]}
+          getRowId={(row) => row.name}
+        />
+      </AppShell>
+    </div>
+  ),
+  play: async ({ canvas, canvasElement }) => {
+    const outer = frame(canvasElement);
+    const main = canvas.getByRole("main");
+    // Text hidden for screen readers is absolutely positioned. It must scroll with the area it is in: when it
+    // escapes, the container (the page, for a full-height shell) grows a second scrollbar beside the content's own.
+    await expect(main.scrollHeight).toBeGreaterThan(2000);
+    await expect(outer.scrollHeight).toBe(outer.clientHeight);
+    const shell = canvasElement.querySelector(".cy-app-shell") as HTMLElement;
+    await expect(shell.scrollHeight).toBe(shell.clientHeight);
   },
 };
 

@@ -8,9 +8,11 @@ permissions:
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
+# Runners are pinned to Ubuntu 24.04, not `ubuntu-latest`: the visual baselines are rendered on it, and a new image is
+# adopted on purpose (with fresh baselines), not on the day GitHub moves the label.
 jobs:
   verify:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -19,6 +21,13 @@ jobs:
           node-version-file: .nvmrc
           cache: pnpm
       - run: pnpm install --frozen-lockfile
+      # GitHub's runners could not resolve Ubuntu's package servers on 2026-11-11 (the browsers' system packages come
+      # from them), while public resolvers could. Harmless when the runner's own resolver works.
+      - name: Resolve package servers through public DNS
+        run: |
+          sudo mkdir -p /etc/systemd/resolved.conf.d
+          printf '[Resolve]\nDNS=1.1.1.1 8.8.8.8\nDomains=~.\n' | sudo tee /etc/systemd/resolved.conf.d/public-dns.conf
+          sudo systemctl restart systemd-resolved
       - run: pnpm exec playwright install --with-deps chromium firefox webkit
       - name: Conventions, lint, types, unit
         run: pnpm check && pnpm lint && pnpm typecheck && pnpm test
@@ -40,13 +49,33 @@ jobs:
           name: visual-diffs
           path: "**/__screenshots__/**"
           if-no-files-found: ignore
+  # The documentation site (site/): types, then the same build Cloudflare Pages runs (site plus Storybook in site/dist).
+  site:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Site types
+        run: pnpm --filter @arshad-shah/cynosure-site check
+      - name: Site and Storybook build
+        run: pnpm build:site
+      - name: The build holds the site and Storybook
+        run: test -f site/dist/index.html && test -f site/dist/storybook/index.html
+      - name: Every internal link resolves
+        run: pnpm --filter @arshad-shah/cynosure-site links
+
   # The one required status check on main's branch rules. It fans in to every job, so the rules never need touching
   # when jobs are added or renamed (a renamed job would otherwise make protection pass silently, or wait forever).
   gate:
     name: CI gate
-    needs: [verify]
+    needs: [verify, site]
     if: ${{ always() }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Require every job green
         env:

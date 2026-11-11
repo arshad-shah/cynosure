@@ -286,7 +286,8 @@ export const DefaultsAndLayout: Story = {
     // A div at the medium size by default; className and style are for layout.
     await expect(plain.tagName).toBe("DIV");
     await expect(plain).toHaveAttribute("data-size", "md");
-    await expect(css(plain).marginLeft).toBe(css(plain).marginRight);
+    // Centred: the two margins match (to within a pixel; Firefox rounds each side on its own).
+    await expect(Math.abs(px(css(plain).marginLeft) - px(css(plain).marginRight))).toBeLessThan(1);
     await expect(q(canvasElement, ".large").tagName).toBe("SECTION");
     const size = (sel: string) => px(css(q(canvasElement, `${sel} p`)).fontSize);
     await expect(size(".small")).toBeLessThan(size(".host-prose"));

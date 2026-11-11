@@ -15,23 +15,59 @@ Plan 9 (`docs/superpowers/plans/2026-11-10-cynosure-migrations.md`, tracked in i
 
 ## Current task
 
-Releasing 0.1.0. `next` is merged into `main` through pull request #151 (a merge commit with `next`'s files and both histories as parents, because the two branches share no history; `main` only accepts pull requests). Once it is merged, the release workflow opens the version pull request; merging that publishes 0.1.0 with the one-run `NPM_TOKEN` (already added by Arshad). Then: delete the token, add the trusted publisher on npmjs.com.
+**0.1.0 is published** (2026-11-11). Now: the documentation site, issue #152, and the library fixes it turns up. Everything is on `next`, in pull request #158 into `main`.
+
+**The site was rebuilt as a template (2026-11-11, Arshad's direction).** Astro is gone. `site/` is now a data-driven documentation template built entirely from Cynosure components, to be reused for every product's docs. How it is managed and how it works: `site/README.md`; its rules: `site/AGENTS.md`.
+
+- **Engine:** Vite, React and `site/engine/`. `engine/build/scan.ts` reads the repository and infers pages, navigation, props, examples, changelog and search; `engine/app` renders that data with Cynosure; `engine/build/build.ts` writes every page as HTML. Per-product settings are `site/docs.config.ts` and `site/theme.css` only.
+- **Pages (88):** home, Getting started (root README), the guides in `docs/` (inferred; internal notes excluded), a catalogue, one page per component and foundation, and the changelog.
+- **Component pages** come from the hand-written docs pages (`<Name>.mdx`), not the READMEs: they carry the lead, "when to use", behaviour and theming. `<Canvas>` becomes a live canvas (the component's own stories, from source), `<ArgTypes>` the generated props table.
+- **Canvas:** width (desktop, tablet, phone), light or dark, code. The code is written from what the example renders (usage, not story source). Examples that open over the page wait behind a button.
+- **Shell:** AppShell, SideNav (drawer and tab bar on phones), CommandPalette search over pages and headings, ThemeToggle, version badge from the installed package.
+- **Checks:** `check` (types), `links`, and `sweep` (every page in Chromium at 1440 and 390 points: console errors, sideways scroll, second scrollbar, self-opening examples). All clean on 2026-11-11.
+- **Milestone 2** is complete: `docs/accessibility.md` is written and on the site.
+
+**Library fixes found by building the site (in #158, changesets included; the release will be 0.2.0):**
+- AppShell: hidden text (a Table's hidden caption) escaped the scrolling content and gave a second page scrollbar. The content and navigation areas are now positioning parents.
+- SegmentedControl: two controls with the same `name` shared one selection and had clashing ids. Segments are grouped under the control's own name; `name` submits through a hidden field. The small size is 26px tall like other small controls, with a 24px hit area.
+- SegmentedControl in dark mode: the active segment's pill was as dark as the track (contrast 1.04), so only the text colour showed the choice. The pill is now the track lifted towards the ink on dark.
+- Tests: the CommandPalette stories press the platform's shortcut and the Prose margin check allows sub-pixel rounding (both failed on macOS only).
+
+**Release tooling, fixed before it could bite (2026-11-11):** with `site/` in the workspace, Changesets could not find the library, the version step would have raised the site's dependency to an unpublished version, and the action would have pushed a tag nothing creates. Now: the root is in the workspace, `pnpm version-packages` restores `site/package.json`, and `tools/publish.sh` tags `v<version>` and makes the GitHub release (see `docs/release.md`). The version step was run in a throwaway copy: it produces 0.2.0, the changelog entry and nothing else. The publish step itself can only be proven by the real release.
+
+**GitHub releases:** `v0.1.0` is tagged on `f7b66c1` with its changelog as notes, and is the only release. The eleven releases and tags of the retired packages were removed (listed in `docs/release.md`).
+
+**Site:** the logo, favicon, home-screen icon and share image come from `brand/` through `brand` in `docs.config.ts`. `pnpm build:site` now generates the stylesheet module the stories need (a fresh checkout failed without it, which is what failed CI on the first push).
 
 ## Next step
 
-1. Watch #151 and the version pull request through to 0.1.0 on npm.
-2. The documentation site, issue #152 (Astro with Cynosure islands in `site/`, examples from the stories through `composeStories`, Pagefind in a CommandPalette, the same `pnpm build:site` command and `site/dist` output Cloudflare already uses).
-3. Plan 4 Task 10, the final review.
-4. When detent releases its new options (detent #89 and #90), open a Cynosure issue to update the dependency and drop the workarounds.
+1. **After 0.2.0 publishes:** raise `@arshad-shah/cynosure` in `site/package.json`, delete the stand-in at the end of `site/engine/app/site.css` ("Until Cynosure 0.1.1"), rebuild and sweep.
+2. **Library gaps the site works around (fix in Cynosure, release, then use):**
+   - SideNav does not open the group holding `current` when `current` changes after mount (the site remounts it by key).
+   - EmptyState cannot be an `h1` (the not-found page writes its own heading).
+   - CommandPalette cannot take results from outside (needed for full-text search with Pagefind).
+   - RadioGroup has the same shared-`name` hazard SegmentedControl had.
+   - Candidates to become components: the page header (eyebrow, title, lead), "On this page", and the example canvas.
+3. **Milestone 3, rest:** the theme playground on Home and Theming (ColorField, SegmentedControl, Slider and ThemeToggle driving `createTheme`, with "Copy theme").
+4. **Milestone 4:** the icons gallery and brand marks page, the tokens reference, full-text search.
+5. **Milestone 5, launch:** axe and contrast in light, dark and high contrast; Lighthouse; redirects from the old site's addresses; Open Graph images; CSP headers.
+6. Plan 4 Task 10, the final review. When detent releases its new options (detent #89 and #90), update the dependency.
+
+## Site decisions (2026-11-11, Arshad)
+
+- **A template, not a framework:** copy `site/`, change `docs.config.ts` and `theme.css`.
+- **Inferred, not listed:** navigation and pages come from the files.
+- **Reading layout:** one reading column with "On this page" beside it (chosen over a tabbed workbench).
+- **Public site, private notes:** the migration guide and other working notes stay in the repository (`exclude`).
+- **No Storybook links on the site:** the site has its own live examples. Storybook is still built into `site/dist/storybook` by `pnpm build:site` (Cloudflare's command and CI are unchanged).
+- **One pull request:** the library fixes and the site go to `main` together from `next`.
 
 ## Waiting on Arshad
 
-Done by Arshad (2026-11-11): Cloudflare Pages builds `main` with `pnpm install --frozen-lockfile && pnpm build:site` into `site/dist` (previews per branch at `<branch>.cynosure.pages.dev`); Actions may create pull requests; the `NPM_TOKEN` secret is added for the first publish; the six old `@arshad-shah/cynosure-*` packages are deprecated (with npm's default message, which does not name the new package: once 0.1.0 is out, `npm deprecate` with "Replaced by @arshad-shah/cynosure" would point people to it).
-
-Still open:
-- Merge #151, then the version pull request.
-- After 0.1.0: delete the npm token and add the trusted publisher (repository `arshad-shah/cynosure`, workflow `release.yml`).
-- Turn GitHub Pages off in the settings once the new site (#152) is live.
+- **After 0.1.0:** delete the `NPM_TOKEN` secret and revoke the token on npmjs.com, then add the trusted publisher for `@arshad-shah/cynosure` (GitHub Actions, repository `arshad-shah/cynosure`, workflow `release.yml`). Later versions publish through OIDC alone.
+- **Branches:** `main` deletes merged head branches, which removed `next` twice. `next` is recreated each time; turning off "Automatically delete head branches" (or protecting `next`) would stop it.
+- **Deprecation message:** the six old packages carry npm's default message; `npm deprecate "@arshad-shah/cynosure-<name>" "Replaced by @arshad-shah/cynosure"` would point people to the new one.
+- **GitHub Pages:** turn it off once the new site (#152) is live.
 
 ## Plans
 

@@ -1,5 +1,7 @@
 import { type CSSProperties, useId } from "react";
 import { ChoiceBase } from "../../foundations/ChoiceBase/ChoiceBase.js";
+import { useControllableState } from "../../foundations/controllable.js";
+import { HiddenValue } from "../../foundations/HiddenValue/HiddenValue.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
 import type { IconData } from "../../icons/types.js";
 import type { Size, Tone } from "../../tokens/schema.js";
@@ -61,8 +63,15 @@ export function SegmentedControl({
   className,
   style,
 }: SegmentedControlProps) {
-  const generated = useId();
-  const groupName = name ?? `cy-seg-${generated}`;
+  // The radios are grouped under a name of the control's own, never the caller's: two controls given the same
+  // `name` (rows of a list, two panels) would otherwise be one native radio group with clashing ids, and choosing in
+  // one would clear the other. The caller's `name` submits the value through a hidden field instead.
+  const groupName = `cy-seg-${useId()}`;
+  const [current, setCurrent, reset] = useControllableState<string, string | undefined>(
+    value,
+    defaultValue,
+    onChange,
+  );
   return (
     <div
       role="radiogroup"
@@ -74,6 +83,13 @@ export function SegmentedControl({
       data-icon-only={iconOnly ? "" : undefined}
       style={style}
     >
+      {/* Always present, so a form's reset restores the default; it submits only when there is a name and a value. */}
+      <HiddenValue
+        name={name}
+        value={current ?? ""}
+        disabled={disabled || current === undefined}
+        onReset={() => reset(defaultValue)}
+      />
       {options.map((option) => (
         <label
           key={option.value}
@@ -85,13 +101,13 @@ export function SegmentedControl({
             id={`${groupName}-${option.value}`}
             type="radio"
             name={groupName}
+            // Belongs to no form: the hidden field above submits the value under the caller's name.
+            form=""
             value={option.value}
             disabled={disabled || option.disabled}
             aria-label={option.label}
-            {...(value !== undefined
-              ? { checked: value === option.value }
-              : { defaultChecked: defaultValue === option.value })}
-            onChange={(e) => e.currentTarget.checked && onChange?.(option.value)}
+            checked={current === option.value}
+            onChange={(e) => e.currentTarget.checked && setCurrent(option.value)}
           />
           {option.icon && <Icon icon={option.icon} />}
           {!iconOnly && <span className="cy-segment-label">{option.label}</span>}

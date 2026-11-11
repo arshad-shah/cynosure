@@ -17,7 +17,7 @@
   justify-content: center;
   gap: var(--cy-space-2);
   flex: 1 0 auto;
-  min-block-size: max(calc(var(--_h) - var(--_pad) * 2), var(--_hit));
+  min-block-size: calc(var(--_h) - var(--_pad) * 2);
   margin: 0;
   padding: 0 var(--cy-space-5);
   font-size: inherit;
@@ -34,11 +34,28 @@
     background-color var(--cy-motion-fast) var(--cy-motion-ease),
     color var(--cy-motion-fast) var(--cy-motion-ease),
     box-shadow var(--cy-motion-fast) var(--cy-motion-ease);
+  /* Invisible hit area: a small segment looks smaller than --cy-hit-min, and is still that easy to press. */
+  &::before {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    top: 50%;
+    translate: 0 -50%;
+    block-size: max(100%, var(--_hit));
+  }
   &:hover:not([data-disabled]) {
     color: var(--cy-color-ink);
   }
   &:has(> input:checked) {
-    background: var(--cy-segmented-control-active-bg, var(--cy-color-surface-raised));
+    /* A pill lighter than the track in both modes. On light that is the raised surface; on dark the raised surface is
+       as dark as the track, so the pill is the track lifted towards the ink. */
+    background: var(
+      --cy-segmented-control-active-bg,
+      light-dark(
+        var(--cy-color-surface-raised),
+        color-mix(in oklab, var(--cy-color-soft), var(--cy-color-ink) 16%)
+      )
+    );
     color: var(--_active);
     box-shadow: var(--cy-shadow-sm);
   }
@@ -104,8 +121,10 @@
   }
 }
 
+/* On touch screens the segments themselves grow to the coarse hit size. */
 @media (pointer: coarse) {
   .cy-segmented .cy-segment {
     --_hit: var(--cy-hit-coarse, 44px);
+    min-block-size: max(calc(var(--_h) - var(--_pad) * 2), var(--_hit));
   }
 }

@@ -6,6 +6,8 @@
       "!dist",
       "!storybook-static",
       "!site/dist",
+      "!site/.server",
+      "!pnpm-lock.yaml",
       "!coverage",
       "!src/styles/generated-css.ts",
       "!**/__screenshots__",
@@ -27,6 +29,5 @@
   },
   "assist": {
     "enabled": true
-  },
-  "overrides": []
+  }
 }
