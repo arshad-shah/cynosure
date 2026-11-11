@@ -3,5 +3,8 @@
   "changelog": "@changesets/cli/changelog",
   "commit": false,
   "access": "public",
-  "baseBranch": "main"
+  "baseBranch": "main",
+  "ignore": [
+    "@arshad-shah/cynosure-site"
+  ]
 }

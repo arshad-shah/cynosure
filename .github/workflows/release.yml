@@ -32,12 +32,17 @@ jobs:
       - name: Version pull request, or publish
         uses: changesets/action@v1
         with:
-          version: pnpm changeset version
+          # Also undoes the one change Changesets should not make (see the script in package.json).
+          version: pnpm version-packages
           publish: tools/publish.sh
+          # tools/publish.sh tags `v<version>` and makes the GitHub release itself.
+          createGithubReleases: false
           title: "chore(release): version packages"
           commit: "chore(release): version packages"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # For `gh` in tools/publish.sh.
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           # Only for the very first version (0.1.0): a short-lived npm token, deleted once the trusted publisher is set
           # up. When the secret is absent this is empty and npm authenticates through OIDC alone.
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

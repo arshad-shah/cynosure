@@ -41,6 +41,7 @@
     "check": "node --import tsx tools/cli/index.ts check",
     "verify": "pnpm check && pnpm lint && pnpm typecheck && pnpm test && pnpm test:react18 && pnpm test:stories && pnpm coverage && pnpm build && publint && pnpm attw && pnpm size",
     "changeset": "changeset",
+    "version-packages": "changeset version && git checkout -- site/package.json",
     "prepare": "git config --worktree core.hooksPath .githooks 2>/dev/null || git config core.hooksPath .githooks",
     "css": "node --import tsx tools/build-css.ts",
     "attw": "attw --pack . --profile esm-only --exclude-entrypoints styles.css 'styles/*.css' 'fonts/*'",
