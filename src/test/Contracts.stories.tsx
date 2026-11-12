@@ -42,7 +42,7 @@ const cases: [string, string, ReactElement][] = [
   ["dots", ".cy-loading-dots", <LoadingDots key="d" {...layout} />],
   [
     "segmented",
-    ".cy-segmented",
+    ".cy-segmented-control",
     <SegmentedControl key="s" label="View" options={[{ value: "a", label: "A" }]} {...layout} />,
   ],
   [
@@ -95,10 +95,10 @@ export const DefaultsFollowTheVocabulary: Story = {
       attr(".cy-badge", "data-size"),
     ]).toEqual(["neutral", "soft", "md"]);
     await expect(attr(".cy-kbd", "data-size")).toBe("md");
-    await expect([attr(".cy-segmented", "data-size"), attr(".cy-segmented", "data-tone")]).toEqual([
-      "md",
-      "neutral",
-    ]);
+    await expect([
+      attr(".cy-segmented-control", "data-size"),
+      attr(".cy-segmented-control", "data-tone"),
+    ]).toEqual(["md", "neutral"]);
     await expect(attr(".cy-field", "data-size")).toBe("md");
     await expect([attr(".cy-link", "data-tone"), attr(".cy-link", "data-size")]).toEqual([
       "accent",
