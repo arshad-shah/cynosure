@@ -241,12 +241,14 @@ export const SpinnerSpeed: Story = {
 export const SpinnerInButton: Story = {
   render: () => (
     <Button data-testid="button">
-      <LoadingDots variant="spinner" /> Connecting
+      <LoadingDots variant="spinner" className="connect-spinner" /> Connecting
     </Button>
   ),
   play: async ({ canvas }) => {
     const button = canvas.getByTestId("button");
     const svg = spinner(button) as SVGSVGElement;
+    // className lands on the root, for layout.
+    await expect(svg.parentElement).toHaveClass("cy-loading-dots", "connect-spinner");
     // Sits on the text's line, sized like its text and coloured like it.
     const size = Number.parseFloat(getComputedStyle(button).fontSize);
     await expect(svg.getBoundingClientRect().width).toBeCloseTo(size, 0);
