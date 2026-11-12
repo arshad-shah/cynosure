@@ -32,7 +32,8 @@ export const SearchField = forwardRef<HTMLInputElement, SearchFieldProps>(functi
           e.preventDefault();
           onSubmit?.(input.value);
         }
-        if (e.key === "Escape") {
+        // Escape while an IME composes belongs to the IME (it cancels the composition), not to the field.
+        if (e.key === "Escape" && !isComposing(e)) {
           e.preventDefault();
           if (input.value) {
             Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, "value")?.set?.call(input, "");
