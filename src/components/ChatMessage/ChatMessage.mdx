@@ -1,0 +1,127 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./ChatMessage.stories";
+
+<Meta of={Stories} />
+
+# ChatMessage
+
+One message in an assistant chat: the person's at the end, filled with the accent; the assistant's at the start, after its avatar. It holds any content (render markdown into [Prose](?path=/docs/components-prose--docs) yourself), shows a caret while text streams in, and offers actions such as copy and retry.
+
+<Canvas of={Stories.Default} />
+
+## When to use
+
+- **Assistant chats:** a conversation between a person and an assistant, in a side panel or a page.
+
+**Use something else when:** the message is a system notice in the thread (rate limits, a lost connection): use a [Notice](?path=/docs/components-notice--docs); or it is a comment thread between people with names and times: build it from [Avatar](?path=/docs/components-avatar--docs) and [Text](?path=/docs/components-text--docs).
+
+## Usage
+
+```tsx
+import { Avatar, ChatMessage, CopyButton, IconButton, Prose } from "@arshad-shah/cynosure";
+
+<ChatMessage role="user">{question}</ChatMessage>
+<ChatMessage
+  role="assistant"
+  avatar={<Avatar name="Assistant" icon={sparkles} size="sm" decorative />}
+  streaming={isStreaming}
+  actions={
+    <>
+      <CopyButton value={answer} size="sm" />
+      <IconButton icon={retry} label="Retry" size="sm" variant="ghost" onClick={retryLast} />
+    </>
+  }
+>
+  <Prose size="sm">{renderMarkdown(answer)}</Prose>
+</ChatMessage>
+```
+
+The person's messages keep their line breaks. Make the avatar `decorative`: each message is already named by its author.
+
+### Errors
+
+`tone="danger"` tints the bubble for a message that reports a failure.
+
+<Canvas of={Stories.DangerTone} />
+
+### Wide content
+
+A bubble hugs its text and stops at `--cy-chat-message-max-width` (82%). With `wide`, it takes the whole row after the avatar, for tables and code.
+
+<Canvas of={Stories.WideContentTakesTheWholeRow} />
+
+### Streaming
+
+While `streaming`, a caret follows the content and the message is `aria-busy`, so screen readers wait for the whole reply. The caret is placed after the content: after the last word for plain text, under the last block for Prose.
+
+<Canvas of={Stories.StreamingShowsACaret} />
+
+## The thread
+
+A thread is a [ScrollArea](?path=/docs/components-scrollarea--docs) with `follow`: it keeps to the end while replies stream in, lets go when the person scrolls up to read, and follows again when they return to the end. `onAtBottomChange` tells you when to offer a way back (`handle.scrollToEnd()`, here in the ScrollArea's `overlay`).
+
+Do not make the thread a live region: it would read every streamed fragment. When an assistant reply finishes, announce it once through `useAnnounce` (inside an [Announcer](?path=/docs/components-announcer--docs)).
+
+```tsx
+const announce = useAnnounce();
+const scroller = useRef<ScrollAreaHandle>(null);
+const [atBottom, setAtBottom] = useState(true);
+// When a reply finishes streaming:
+announce(replyText);
+
+<ScrollArea
+  label="Conversation"
+  follow
+  onAtBottomChange={setAtBottom}
+  handle={scroller}
+  overlay={!atBottom && <Button size="sm" onClick={() => scroller.current?.scrollToEnd()}>Latest</Button>}
+>
+  {messages.map((m) => (
+    <ChatMessage key={m.id} role={m.role} avatar={m.role === "assistant" ? botAvatar : undefined}>
+      …
+    </ChatMessage>
+  ))}
+</ScrollArea>
+```
+
+<Canvas of={Stories.Thread_} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+| Input | Result |
+| --- | --- |
+| <kbd>Tab</kbd> | Moves to the message's actions (one stop per message), then on |
+| <kbd>Left</kbd> / <kbd>Right</kbd> in the actions | Moves between them (mirrored in right-to-left text) |
+| Pointer over the message | Shows the actions |
+
+- **Structure:** each message is an `article` named by its author (`labels.user`, "You"; `labels.assistant`, "Assistant"), so screen readers can move message by message.
+- **Actions:** an APG toolbar named "Message actions". With a mouse, they fade in while the message is hovered or holds focus; they keep their space, so nothing moves. Keyboard focus always reveals them.
+- **Streaming:** `aria-busy` while text arrives; the caret is hidden from assistive technology.
+- **Right to left:** the layout mirrors: the person's messages on the left, the assistant's avatar on the right.
+- **Reduced motion:** the caret stops blinking and stays lit.
+
+## Touch
+
+Screens without hover show the actions all the time, and IconButtons keep a 44px hit area on coarse pointers.
+
+## Theming
+
+| Token | Default | What it changes |
+| --- | --- | --- |
+| `--cy-chat-message-bg` | `--cy-color-surface-raised` | The assistant's bubble |
+| `--cy-chat-message-border` | `--cy-color-line` | The assistant's bubble border |
+| `--cy-chat-message-user-bg` | `--cy-color-accent` | The person's bubble |
+| `--cy-chat-message-user-color` | `--cy-color-on-accent` | The person's text |
+| `--cy-chat-message-radius` | `--cy-radius-card` | Bubble corners (the one by the avatar is a quarter of it) |
+| `--cy-chat-message-padding` | `--cy-space-3` `--cy-space-5` | Inside the bubble |
+| `--cy-chat-message-max-width` | `82%` | The widest a bubble grows (not with `wide`) |
+| `--cy-chat-message-caret` | `--cy-color-accent` | The streaming caret |
+| `--cy-chat-message-gap` | `--cy-space-3` | Between the avatar and the message |
+
+## Related
+
+[Prose](?path=/docs/components-prose--docs) · [ScrollArea](?path=/docs/components-scrollarea--docs) · [Announcer](?path=/docs/components-announcer--docs) · [Avatar](?path=/docs/components-avatar--docs) · [CopyButton](?path=/docs/components-copybutton--docs)

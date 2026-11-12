@@ -691,5 +691,11 @@
     "path": ["dist/components/HotkeyField/HotkeyField.js", "dist/styles/hotkey-field.css"],
     "limit": "3 kB",
     "gzip": true
+  },
+  {
+    "name": "ChatMessage (JS + CSS)",
+    "path": ["dist/components/ChatMessage/ChatMessage.js", "dist/styles/chat-message.css"],
+    "limit": "3 kB",
+    "gzip": true
   }
 ]

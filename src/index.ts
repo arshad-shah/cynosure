@@ -61,6 +61,12 @@ export {
   toISODate,
 } from "./components/Calendar/index.js";
 export { Card, type CardProps, type CardTokens } from "./components/Card/index.js";
+export {
+  ChatMessage,
+  type ChatMessageLabels,
+  type ChatMessageProps,
+  type ChatMessageTokens,
+} from "./components/ChatMessage/index.js";
 export { Checkbox, type CheckboxProps, type CheckboxTokens } from "./components/Checkbox/index.js";
 export {
   Checklist,
