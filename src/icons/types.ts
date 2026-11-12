@@ -18,6 +18,7 @@ export const ICON_CATEGORIES = [
   "design",
   "layout",
   "maths",
+  "faith",
 ] as const;
 export type IconCategory = (typeof ICON_CATEGORIES)[number];
 

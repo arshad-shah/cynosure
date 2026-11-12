@@ -54,6 +54,7 @@ export const ICON_KEYWORDS = {
   power: ["on", "off", "shut down", "switch", "start", "standby"],
   puzzle: ["extension", "plugin", "add-on", "component", "module", "integration"],
   redo: ["repeat", "forward", "again", "history"],
+  "refresh-cw": ["reload", "sync", "refresh", "update", "rotate", "cycle", "arrows"],
   retry: ["refresh", "reload", "again", "sync", "try again", "restart"],
   save: ["disk", "floppy", "store", "keep"],
   "scan-line": ["scanner", "barcode", "qr", "read", "capture"],
@@ -97,6 +98,7 @@ export const ICON_KEYWORDS = {
 
   // files
   archive: ["box", "store", "zip", "backup", "storage"],
+  "book-marked": ["bookmark", "reading list", "saved", "library", "notebook", "journal"],
   "book-open": ["read", "docs", "documentation", "manual", "guide", "library"],
   briefcase: ["work", "job", "business", "portfolio", "case", "career"],
   clipboard: ["paste", "copy", "board", "task", "checklist"],
@@ -129,8 +131,10 @@ export const ICON_KEYWORDS = {
   hash: ["number", "pound", "hashtag", "channel", "tag", "id"],
   layers: ["stack", "levels", "depth", "sheets", "z-index"],
   "list-checks": ["checklist", "tasks", "todo", "to-do", "done"],
+  "list-tree": ["hierarchy", "outline", "nested", "indent", "tree view", "structure"],
   network: ["nodes", "graph", "connections", "topology", "hierarchy", "organisation"],
   package: ["box", "parcel", "npm", "delivery", "module", "dependency", "shipment"],
+  "qr-code": ["qr", "barcode", "scan", "matrix code", "share", "link"],
   radar: ["scan", "detect", "sweep", "monitor", "signal"],
   server: ["host", "backend", "rack", "machine", "data centre"],
   "sort-asc": ["ascending", "a to z", "order", "lowest first"],
@@ -172,6 +176,7 @@ export const ICON_KEYWORDS = {
   ban: ["block", "forbidden", "not allowed", "prohibited", "no", "disabled"],
   check: ["tick", "done", "ok", "yes", "confirm", "success", "complete", "correct"],
   "check-circle": ["tick", "done", "success", "complete", "verified", "approved"],
+  "check-square": ["checkbox", "checked", "square check big", "tick", "done", "task", "todo"],
   "circle-dot": ["radio", "selected", "option", "target", "record", "current"],
   flag: ["report", "mark", "milestone", "country", "important"],
   help: ["question", "support", "faq", "question mark", "unknown", "assist"],
@@ -185,6 +190,7 @@ export const ICON_KEYWORDS = {
 
   // time
   calendar: ["date", "day", "month", "schedule", "event", "agenda"],
+  "calendar-days": ["date picker", "dates", "month view", "days", "schedule", "agenda"],
   "calendar-plus": ["add event", "new date", "schedule", "book", "appointment"],
   clock: ["time", "hour", "watch", "schedule", "duration", "recent"],
   history: ["recent", "past", "time", "undo", "version", "log", "rewind"],
@@ -252,7 +258,7 @@ export const ICON_KEYWORDS = {
   collapse: ["shrink", "fold", "minimise", "minimize", "close", "less"],
   columns: ["layout", "split", "side by side", "two columns", "vertical"],
   expand: ["grow", "unfold", "enlarge", "open", "more", "fullscreen"],
-  grid: ["tiles", "gallery", "layout", "squares", "apps", "cards"],
+  grid: ["tiles", "gallery", "layout", "layout grid", "squares", "apps", "cards", "dashboard"],
   "justify-between": ["space between", "distribute", "flex", "spread", "align"],
   list: ["rows", "lines", "items", "bullets", "menu", "ul"],
   maximize: ["fullscreen", "enlarge", "expand", "window", "bigger"],
@@ -277,4 +283,10 @@ export const ICON_KEYWORDS = {
   "plus-minus": ["tolerance", "approximately", "give or take", "sign"],
   sigma: ["sum", "total", "summation", "greek", "add up"],
   "square-root": ["root", "radical", "sqrt"],
+
+  // faith
+  crescent: ["hilal", "crescent moon", "star", "islam", "ramadan", "eid", "moon"],
+  kaaba: ["mecca", "makkah", "qibla", "hajj", "umrah", "islam", "pilgrimage"],
+  mosque: ["masjid", "islam", "prayer", "worship", "salah", "minaret", "dome"],
+  "prayer-beads": ["tasbih", "misbaha", "dhikr", "rosary", "beads", "islam", "prayer"],
 } as const satisfies Readonly<Record<string, readonly string[]>>;
