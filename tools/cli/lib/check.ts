@@ -297,7 +297,7 @@ export const FOUNDATION_USERS: Record<string, readonly string[]> = {
   LinkBase: ["Button", "Card", "Link", "SideNav"],
   InputBase: ["CommandPalette", "TextField"],
   TextAreaBase: ["TextArea"],
-  ChoiceBase: ["Checkbox", "SegmentedControl"],
+  ChoiceBase: ["Checkbox", "RadioGroup", "SegmentedControl", "Switch"],
   DialogBase: ["CommandPalette", "Dialog"],
   FileInputBase: ["FileDrop", "KeyValueEditor"],
 };

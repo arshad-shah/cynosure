@@ -1,12 +1,21 @@
-import type { CSSProperties, ReactNode } from "react";
-import { ChoiceBase } from "../../foundations/ChoiceBase/ChoiceBase.js";
+import type { ChangeEvent, CSSProperties, ReactNode } from "react";
 import { useField } from "../../foundations/field.js";
-import { Icon } from "../../foundations/Icon/Icon.js";
-import { check } from "../../icons/check.js";
-import { minus } from "../../icons/minus.js";
 import type { Size, Tone } from "../../tokens/schema.js";
 
-export interface ChoiceRowProps {
+export interface ChoiceTokens {
+  gap: string;
+  doneColor: string;
+  strikeWidth: string;
+}
+
+declare module "../../tokens/schema.js" {
+  interface ComponentTokens {
+    choice: ChoiceTokens;
+  }
+}
+
+/** The props of a control that sits in a Choice row (Checkbox, Switch). */
+export interface ChoiceControlProps {
   /** The control's label. Pressing it toggles the control. */
   label: ReactNode;
   /** Help text shown under the label and read with the control. */
@@ -37,60 +46,69 @@ export interface ChoiceRowProps {
   style?: CSSProperties | undefined;
 }
 
-/** Shared row for Checkbox and Switch: a native checkbox over a drawn control, with a fully clickable label. */
-export function ChoiceRow({
-  kind,
+/** What a Choice hands its control: spread it onto the native checkbox or radio (`ChoiceBase`). */
+export interface ChoiceInput {
+  id: string;
+  "aria-labelledby": string;
+  "aria-describedby": string | undefined;
+  name?: string | undefined;
+  value?: string | undefined;
+  required?: boolean | undefined;
+  disabled?: boolean | undefined;
+  checked?: boolean | undefined;
+  defaultChecked?: boolean | undefined;
+  onChange: (event: ChangeEvent<HTMLInputElement>) => void;
+}
+
+export interface ChoiceProps extends Omit<ChoiceControlProps, "tone"> {
+  /**
+   * Draws the control, given the props for its native input. The input must be a direct child of the element this
+   * returns (the label's strike follows it).
+   */
+  control: (input: ChoiceInput) => ReactNode;
+  /**
+   * While the control is checked (and not mixed), the label is struck through and muted, and the description muted,
+   * so a done task reads as done. Default false.
+   */
+  strikeWhenChecked?: boolean | undefined;
+}
+
+/**
+ * The row a choice control sits in: the control, its label and its description, the whole row clickable. Checkbox,
+ * Switch and RadioGroup's options are Choice rows; each draws its own control.
+ */
+export function Choice({
+  control,
   label,
   description,
   checked,
   defaultChecked,
   onChange,
-  indeterminate,
-  strike,
+  strikeWhenChecked = false,
   size = "md",
-  tone = "accent",
   id,
   className,
   style,
   ...input
-}: ChoiceRowProps & {
-  kind: "checkbox" | "switch" | "radio";
-  indeterminate?: boolean | undefined;
-  /** Checkbox only (`strikeWhenChecked`): kept out of `ChoiceRowProps`, so Switch and RadioGroup do not gain it. */
-  strike?: boolean | undefined;
-}) {
+}: ChoiceProps) {
   const field = useField({ id, description });
   return (
     <label
       htmlFor={field.id}
       className={`cy-choice${className ? ` ${className}` : ""}`}
       data-size={size}
-      data-tone={tone}
       data-disabled={input.disabled ? "" : undefined}
-      data-strike={strike ? "" : undefined}
+      data-strike={strikeWhenChecked ? "" : undefined}
       style={style}
     >
-      <span className={`cy-${kind}`}>
-        <ChoiceBase
-          {...input}
-          id={field.id}
-          type={kind === "radio" ? "radio" : "checkbox"}
-          role={kind === "switch" ? "switch" : undefined}
-          indeterminate={indeterminate ?? false}
-          aria-labelledby={field.labelId}
-          aria-describedby={field.describedBy}
-          {...(checked !== undefined ? { checked } : { defaultChecked })}
-          onChange={(e) => onChange?.(e.currentTarget.checked)}
-        />
-        {kind === "checkbox" ? (
-          <>
-            <Icon icon={check} className="cy-checkbox-mark" />
-            <Icon icon={minus} className="cy-checkbox-dash" />
-          </>
-        ) : kind === "switch" ? (
-          <span className="cy-reset cy-switch-thumb" />
-        ) : null}
-      </span>
+      {control({
+        ...input,
+        id: field.id,
+        "aria-labelledby": field.labelId,
+        "aria-describedby": field.describedBy,
+        ...(checked !== undefined ? { checked } : { defaultChecked }),
+        onChange: (e) => onChange?.(e.currentTarget.checked),
+      })}
       <span className="cy-choice-text">
         <span id={field.labelId} className="cy-choice-label">
           {label}

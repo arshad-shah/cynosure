@@ -39,7 +39,7 @@ It accepts every native input attribute except `type`, which is required and mus
 - It stays focusable, clickable and form-associated (FormData, reset, required) without extra code.
 - `indeterminate` sets the mixed state on the underlying input. It applies to checkboxes only.
 - The ref reaches the native `<input>`.
-- It adds the `cy-choice-input` class, which hides it visually; any `className` you pass is kept alongside.
+- It adds the `cy-choice-base` class (its stylesheet is `styles/choice-base.css`), which hides it visually; any `className` you pass is kept alongside.
 
 <Canvas of={Stories.Indeterminate} />
 

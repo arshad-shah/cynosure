@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { useState } from "react";
+import { type CSSProperties, useState } from "react";
 import { expect, fn, waitFor } from "storybook/test";
 import { rgb, textContrast } from "../../test/color.js";
 import { computeUnderHostileHost } from "../../test/hostile.js";
@@ -311,5 +311,28 @@ export const StrikeIsStableUnderHostileHost: Story = {
     await expect(label.hostile).toEqual(label.clean);
     const description = computeUnderHostileHost(canvasElement, ".cy-choice-description", ["color"]);
     await expect(description.hostile).toEqual(description.clean);
+  },
+};
+
+export const DoneTokensRestyleTheStrike: Story = {
+  args: { strikeWhenChecked: true, defaultChecked: true, label: "File taxes", description: "By the 31st" },
+  render: (args) => (
+    <div
+      style={
+        { "--cy-checkbox-done-color": "rgb(0, 110, 0)", "--cy-checkbox-strike-width": "3px" } as CSSProperties
+      }
+    >
+      <Checkbox {...args} />
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    await settled(canvasElement);
+    const label = getComputedStyle(part(canvasElement, "label"));
+    await expect([
+      label.textDecorationLine,
+      rgb(label.color),
+      Number.parseFloat(label.textDecorationThickness),
+    ]).toEqual(["line-through", [0, 110, 0], 3]);
+    await expect(rgb(getComputedStyle(part(canvasElement, "description")).color)).toEqual([0, 110, 0]);
   },
 };

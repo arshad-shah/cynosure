@@ -1,0 +1,82 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./Choice.stories";
+
+<Meta of={Stories} />
+
+# Choice
+
+The row a choice control sits in: the control, its label and an optional description, the whole row clickable. [Checkbox](?path=/docs/components-checkbox--docs), [Switch](?path=/docs/components-switch--docs) and each [RadioGroup](?path=/docs/components-radiogroup--docs) option are Choice rows that draw their own control.
+
+<Canvas of={Stories.LabelNamesAndTogglesTheControl} />
+
+## When to use
+
+- Building a new kind of choice control (a star, a coloured chip) that needs the same label, description, forms and touch behaviour as a checkbox.
+
+**Use something else when:**
+- you need a checkbox: [Checkbox](?path=/docs/components-checkbox--docs)
+- you need an on/off setting: [Switch](?path=/docs/components-switch--docs)
+- one option of several: [RadioGroup](?path=/docs/components-radiogroup--docs) or [SegmentedControl](?path=/docs/components-segmentedcontrol--docs)
+
+## Usage
+
+```tsx
+import { Choice, ChoiceBase } from "@arshad-shah/cynosure";
+
+<Choice
+  label="Show hidden files"
+  description="Dotfiles and system folders."
+  onChange={setShown}
+  control={(input) => (
+    <span className="my-star">
+      <ChoiceBase {...input} type="checkbox" />
+    </span>
+  )}
+/>
+```
+
+`control` receives the input's props: its `id`, `aria-labelledby`, `aria-describedby`, `checked` or `defaultChecked`, `onChange`, and `name`, `value`, `required` and `disabled`. Spread them onto [ChoiceBase](?path=/docs/foundations-choicebase--docs), which hides the native input over your drawing. The input must be a direct child of the element `control` returns. `onChange` on Choice receives the new `checked` boolean.
+
+<Canvas of={Stories.ControlledAndUncontrolled} />
+
+## Done style
+
+`strikeWhenChecked` strikes through and mutes the label while the input is checked (and not indeterminate), and mutes the description with it. An input placed inside the label does not count.
+
+<Canvas of={Stories.StrikeWhenCheckedAndItsTokens} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+| Input | Result |
+| --- | --- |
+| Click or tap the control, label or description | Toggles the input |
+| <kbd>Space</kbd> on the focused input | Toggles it |
+
+- **Name and description:** the label names the input and the description is linked with `aria-describedby`.
+- **Forms:** the input is native, so `FormData`, reset and `required` work as the browser does them.
+- **Disabled:** the input is disabled and the row is dimmed with a not-allowed cursor.
+- **Done style:** the checked state is what is announced; the strike only shows it. In forced colours the strike stays, in the system text colour; the colour change stops under reduced motion.
+
+## Touch
+
+The row is at least 24px tall, and 44px on coarse pointers, where the control is centred on the text.
+
+## Theming
+
+| Token | Controls |
+| --- | --- |
+| `--cy-choice-gap` | Space between the control and the text. Default `--cy-space-4`. |
+| `--cy-choice-done-color` | Label and description colour of a checked `strikeWhenChecked` row. Default `--cy-color-muted`. Checkbox sets it from `--cy-checkbox-done-color`. |
+| `--cy-choice-strike-width` | Thickness of the strike. Default: the border width, or 1/16 of the text size when that is larger. Checkbox sets it from `--cy-checkbox-strike-width`. |
+
+```ts
+createTheme({ components: { choice: { gap: "12px" } } });
+```
+
+## Related
+
+[Checkbox](?path=/docs/components-checkbox--docs) · [Switch](?path=/docs/components-switch--docs) · [RadioGroup](?path=/docs/components-radiogroup--docs) · [ChoiceBase](?path=/docs/foundations-choicebase--docs)

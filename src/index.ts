@@ -70,6 +70,13 @@ export {
   type ChecklistTokens,
 } from "./components/Checklist/index.js";
 export {
+  Choice,
+  type ChoiceControlProps,
+  type ChoiceInput,
+  type ChoiceProps,
+  type ChoiceTokens,
+} from "./components/Choice/index.js";
+export {
   CodeBlock,
   type CodeBlockLabels,
   type CodeBlockProps,
