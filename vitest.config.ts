@@ -4,11 +4,17 @@ import { defineConfig } from "vitest/config";
 import type { BrowserCommand } from "vitest/node";
 
 /**
- * Story tests emulate media features (prefers-reduced-motion, prefers-contrast) on their own page through this command;
- * stories reach it with `emulateMedia` from src/test/media.ts. `null` puts a feature back to the browser's own value.
+ * Story tests emulate media features (prefers-reduced-motion, prefers-contrast, forced-colors) on their own page through
+ * this command; stories reach it with `emulateMedia` from src/test/media.ts. `null` puts a feature back to the browser's own value.
  */
 const emulateMedia: BrowserCommand<
-  [media: { reducedMotion?: "reduce" | "no-preference" | null; contrast?: "more" | "no-preference" | null }]
+  [
+    media: {
+      reducedMotion?: "reduce" | "no-preference" | null;
+      contrast?: "more" | "no-preference" | null;
+      forcedColors?: "active" | "none" | null;
+    },
+  ]
 > = async ({ page }, media) => {
   await page.emulateMedia(media);
 };

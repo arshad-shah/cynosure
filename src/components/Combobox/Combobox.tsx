@@ -15,6 +15,7 @@ import { OptionIcon, type OptionIconColor } from "../../foundations/option-icon.
 import type { IconData } from "../../icons/types.js";
 import { useListboxLayer } from "../../overlay/listbox-layer.js";
 import type { Size } from "../../tokens/schema.js";
+import { HighlightedText } from "../HighlightedText/HighlightedText.js";
 import { OptionList, OptionListItem, OptionListNote } from "../OptionList/OptionList.js";
 import { TextField } from "../TextField/TextField.js";
 
@@ -153,6 +154,8 @@ export function Combobox({
   const visible = match && typing ? options.filter((o) => match(o, typedText)) : options;
   const enabled = visible.filter((o) => !o.disabled);
   const activeIndex = visible.findIndex((o) => o.value === activeValue);
+  // While people type, the text is marked where it appears in each label.
+  const marked = typing ? typedText.trim() : "";
 
   const setValue = (next: string) => {
     if (next === current) return;
@@ -297,7 +300,7 @@ export function Combobox({
           <OptionListItem
             key={option.value}
             id={`${listId}-${index}`}
-            label={option.label}
+            label={<HighlightedText text={option.label} query={marked} />}
             description={option.description}
             icon={<OptionIcon option={option} plain={option.disabled} className="cy-combobox-icon" />}
             selected={option.value === current}

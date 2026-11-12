@@ -194,6 +194,11 @@ export {
   type HeadingTokens,
 } from "./components/Heading/index.js";
 export {
+  HighlightedText,
+  type HighlightedTextProps,
+  type HighlightedTextTokens,
+} from "./components/HighlightedText/index.js";
+export {
   HotkeyField,
   type HotkeyFieldLabels,
   type HotkeyFieldProps,

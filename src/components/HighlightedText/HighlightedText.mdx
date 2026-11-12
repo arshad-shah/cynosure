@@ -1,0 +1,66 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./HighlightedText.stories";
+
+<Meta of={Stories} />
+
+# HighlightedText
+
+Text with the parts that matched a search marked: the characters a fuzzy matcher returned, or every occurrence of a query. Tree, Combobox and CommandPalette mark their matches with it.
+
+<Canvas of={Stories.QueryMarksEveryOccurrenceIgnoringCase} />
+
+## When to use
+
+- **Search results**: the rows of a filtered list, tree or table, so people see why each one matched.
+
+**Use something else when:**
+- you want to emphasise words in prose: `<strong>` or `<em>` inside [Prose](?path=/docs/components-prose--docs)
+- the list is a Combobox, CommandPalette or Tree: they mark matches themselves
+
+## Usage
+
+```tsx
+import { HighlightedText } from "@arshad-shah/cynosure";
+
+// Every occurrence of a query, ignoring case
+<HighlightedText text={table.name} query={search} />
+
+// The characters a fuzzy matcher picked
+const match = fuzzyMatch(search, table.name);
+<HighlightedText text={table.name} positions={match?.positions} />
+
+// Each word of a search
+<HighlightedText text={command.label} query={search.split(/\s+/)} />
+```
+
+`positions` are string indices (UTF-16 code units), as JavaScript fuzzy matchers return them; order does not matter and indices outside the text are ignored. When both are given, `positions` wins. `query` is plain text, not a pattern: `a.b` finds only `a.b`.
+
+<Canvas of={Stories.PositionsFromAFuzzyMatcher} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+- **Read once:** the text is in the page once, with matched runs in `<mark>` elements. An option or tree row named by its content is named by the whole text ("Select a table", not "Sel", "ect a ", "ta"…), and when it takes focus screen readers read that name, with no "highlighted" between the pieces. There is no hidden second copy, so find-in-page, copying and `textContent` see the text once.
+- **Reading by line:** in a screen reader's reading mode, NVDA and JAWS may say "highlighted" at a mark: that is what it means here, the part that matched.
+- **Nothing matched:** the text is one plain text node.
+- **Font:** the text inherits the font of where it sits; a matched run is bold and tinted.
+- **Forced colours:** marks use the system's `Mark` and `MarkText` colours and are underlined.
+
+<Canvas of={Stories.ScreenReadersReadTheWholeTextOnce} />
+
+## Theming
+
+Tokens: `--cy-highlighted-text-highlight` (the tint, translucent so it shows on selected rows too), `--cy-highlighted-text-ink`, `--cy-highlighted-text-weight` and `--cy-highlighted-text-radius`.
+
+```ts
+createTheme({ components: { highlightedText: { highlight: "rgb(255 220 0 / 0.5)", weight: "inherit" } } });
+```
+
+<Canvas of={Stories.ReadableInLightAndDark} />
+
+## Related
+
+[Tree](?path=/docs/components-tree--docs) · [Combobox](?path=/docs/components-combobox--docs) · [CommandPalette](?path=/docs/components-commandpalette--docs)

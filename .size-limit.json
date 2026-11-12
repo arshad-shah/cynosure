@@ -2,7 +2,7 @@
   {
     "name": "all CSS",
     "path": "dist/styles.css",
-    "limit": "34.4 kB",
+    "limit": "35.5 kB",
     "gzip": true
   },
   {
@@ -295,7 +295,7 @@
   {
     "name": "Tree",
     "path": ["dist/components/Tree/Tree.js", "dist/styles/tree.css"],
-    "limit": "4.5 kB",
+    "limit": "6.2 kB",
     "gzip": true
   },
   {
@@ -305,7 +305,7 @@
       "dist/foundations/hotkey.js",
       "dist/styles/command-palette.css"
     ],
-    "limit": "4.9 kB",
+    "limit": "5 kB",
     "gzip": true
   },
   {
@@ -702,6 +702,12 @@
     "name": "ChatMessage (JS + CSS)",
     "path": ["dist/components/ChatMessage/ChatMessage.js", "dist/styles/chat-message.css"],
     "limit": "3 kB",
+    "gzip": true
+  },
+  {
+    "name": "HighlightedText (JS + CSS)",
+    "path": ["dist/components/HighlightedText/HighlightedText.js", "dist/styles/highlighted-text.css"],
+    "limit": "1 kB",
     "gzip": true
   }
 ]
