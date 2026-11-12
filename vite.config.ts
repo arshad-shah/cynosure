@@ -28,7 +28,7 @@ export default defineConfig({
         preserveModules: true,
         preserveModulesRoot: "src",
         entryFileNames: "[name].js",
-        banner: (chunk) => clientBanner(chunk.name),
+        banner: (chunk) => clientBanner(chunk),
       },
     },
   },
