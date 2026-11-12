@@ -2,9 +2,12 @@ import { type CSSProperties, forwardRef, type ReactNode } from "react";
 import { AspectRatio } from "../AspectRatio/AspectRatio.js";
 
 export interface DeviceFrameTokens {
-  /** Colour of a phone's or tablet's bezel. Default: the light palette's ink, so the device stays dark in dark mode. */
+  /**
+   * Colour of a phone's or tablet's bezel. Default: the ink on a light page; on a dark page a dark grey lifted off the
+   * page, so the device stays dark but does not disappear.
+   */
   bezel: string;
-  /** Hairline around the frame, which keeps it apart from a background of the same colour. */
+  /** Rim around the frame: the line colour on a light page, a lighter rim (3:1 against the page) on a dark one. */
   edge: string;
   /** Shadow under the frame. */
   shadow: string;
@@ -48,6 +51,12 @@ export interface DeviceFrameProps {
    * nothing to the accessibility tree, so the content keeps its own semantics.
    */
   label?: string;
+  /**
+   * Phone only: keep the content clear of the camera island (below it upright, beside it turned), as an app keeps
+   * clear of a real phone's. By default live content is kept clear and a screenshot, video or canvas fills the whole
+   * screen (it has its own status bar); `true` or `false` decides for any content.
+   */
+  safeArea?: boolean | undefined;
   /** What the screen shows: a screenshot, a video or a live demo. Each child is stretched to the screen and clipped. */
   children?: ReactNode;
   /** Added to the root element, for layout. */
@@ -60,7 +69,7 @@ const RATIOS: Record<DeviceFrameDevice, number> = { phone: 9 / 19.5, tablet: 3 /
 
 /** A phone, tablet or browser window drawn around a screenshot or a live demo, at any width. */
 export const DeviceFrame = forwardRef<HTMLElement, DeviceFrameProps>(function DeviceFrame(
-  { device = "phone", orientation = "portrait", ratio, url, label, children, className, style },
+  { device = "phone", orientation = "portrait", ratio, url, label, safeArea, children, className, style },
   ref,
 ) {
   const upright = ratio !== undefined && ratio > 0 && Number.isFinite(ratio) ? ratio : RATIOS[device];
@@ -74,6 +83,7 @@ export const DeviceFrame = forwardRef<HTMLElement, DeviceFrameProps>(function De
       className={`cy-device-frame${className ? ` ${className}` : ""}`}
       data-device={device}
       data-orientation={device === "browser" ? undefined : orientation}
+      data-safe={safeArea === undefined ? "auto" : safeArea ? "on" : undefined}
       style={{ "--_screen-ratio": screen, ...style } as CSSProperties}
     >
       <div className="cy-device-frame-body">
@@ -92,7 +102,7 @@ export const DeviceFrame = forwardRef<HTMLElement, DeviceFrameProps>(function De
           </div>
         )}
         <AspectRatio ratio={screen} className="cy-device-frame-screen">
-          {children}
+          <div className="cy-device-frame-content cy-reset">{children}</div>
         </AspectRatio>
       </div>
     </Root>

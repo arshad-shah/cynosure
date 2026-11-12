@@ -17,18 +17,26 @@
   font: inherit;
   border-radius: var(--_corner);
   isolation: isolate;
+  /* The rim: the theme's line on a light page; on a dark page a lighter rim (3:1 against the page) draws the outline
+     of a dark device, as the metal edge of a real phone does. */
   box-shadow:
-    0 0 0 var(--cy-border-width) var(--cy-device-frame-edge, var(--cy-color-line)),
+    0 0 0 var(--cy-border-width)
+    var(
+      --cy-device-frame-edge,
+      light-dark(var(--cy-color-line), color-mix(in oklab, var(--cy-color-ink) 42%, var(--cy-color-bg)))
+    ),
     var(--cy-device-frame-shadow, var(--cy-shadow-lg));
-  /* The bezel (::before) and the camera (::after) are painted in the light palette, so a phone stays a dark device in
-     dark mode instead of turning white; the edge line sets it apart from a dark page. */
+  /* The bezel (::before) and the camera (::after): a dark device in both modes. On a light page it is the ink; on a
+     dark page it is lifted a little off the page (never white), so it does not disappear into it. */
   &::before,
   &::after {
     content: none;
     position: absolute;
     border-radius: var(--cy-radius-full);
-    background: var(--cy-device-frame-bezel, var(--cy-color-ink));
-    color-scheme: light;
+    background: var(
+      --cy-device-frame-bezel,
+      light-dark(var(--cy-color-ink), color-mix(in oklab, var(--cy-color-ink) 20%, var(--cy-color-bg)))
+    );
   }
   &::before {
     inset: 0;
@@ -45,6 +53,28 @@
   --cy-aspect-ratio-radius: calc(var(--_corner) - var(--_bezel));
   isolation: isolate;
   background: var(--cy-device-frame-screen, var(--cy-color-bg));
+}
+
+/*
+ * The content area: the screen's one child (AspectRatio stretches it), holding the content. Each child fills it, one
+ * over another. With the safe area (data-safe), it starts clear of a phone's camera island: below it when upright,
+ * beside it when turned (--_safe-top and --_safe-left, set below from --_island).
+ */
+.cy-device-frame-content.cy-device-frame-content {
+  display: grid;
+  grid-template: minmax(0, 1fr) / minmax(0, 1fr);
+  padding-block-start: var(--_safe-top, 0);
+  padding-left: var(--_safe-left, 0);
+  & > * {
+    grid-area: 1 / 1;
+    box-sizing: border-box;
+    inline-size: 100%;
+    block-size: 100%;
+    max-inline-size: none;
+    min-block-size: 0;
+    margin: 0;
+    object-fit: cover;
+  }
 }
 
 /* Browser bar: three drawn dots and the address. Decoration only. */
@@ -128,6 +158,8 @@
     & > .cy-device-frame-body {
       --_bezel: calc(var(--_u) * 3.5);
       --_corner: calc(var(--_u) * 15);
+      /* The island ends 10.5 units into the screen; content starts 3 units after it. */
+      --_island: calc(var(--_u) * 13.5);
       /* The camera island. */
       &::after {
         content: "";
@@ -137,6 +169,19 @@
         block-size: calc(var(--_u) * 8);
         translate: -50% 0;
       }
+    }
+  }
+  /* Safe area: always with safeArea, and by default for live content (a screenshot, a video or a canvas fills the
+     screen, as it has its own status bar). */
+  &[data-device="phone"]:is(
+      [data-safe="on"],
+      [data-safe="auto"]:not(:has(.cy-device-frame-content > :is(img, picture, video, canvas, svg)))
+    )
+    .cy-device-frame-content {
+    --_safe-top: var(--_island);
+    &:is([data-orientation="landscape"] *) {
+      --_safe-top: 0;
+      --_safe-left: var(--_island);
     }
   }
   &[data-device="tablet"] {

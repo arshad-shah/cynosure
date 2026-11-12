@@ -310,19 +310,79 @@ export const LightAndDark: Story = {
   play: async ({ canvasElement }) => {
     const part = (mode: string, pseudo: string) =>
       getComputedStyle(q(canvasElement, `.mode-${mode} .cy-device-frame-body`), pseudo);
-    // The device stays dark in both modes (a phone does not turn white), and its camera with it.
-    await expect(part("dark", "::before").backgroundColor).toBe(part("light", "::before").backgroundColor);
-    await expect(part("dark", "::after").backgroundColor).toBe(part("light", "::before").backgroundColor);
     const page = (mode: string) => getComputedStyle(q(canvasElement, `.mode-${mode}`)).backgroundColor;
-    await expect(contrast(part("light", "::before").backgroundColor, page("light"))).toBeGreaterThan(3);
-    // On a dark page an edge line in the theme's line colour sets it apart.
+    const bezel = (mode: string) => part(mode, "::before").backgroundColor;
+    // Light page: a dark device that stands out clearly, its camera in the bezel's colour.
+    await expect(contrast(bezel("light"), page("light"))).toBeGreaterThan(3);
+    await expect(part("light", "::after").backgroundColor).toBe(bezel("light"));
+    // Dark page: the device is still dark (never white), but lifted off the page so its outline shows,
+    // and its rim reads like any outline (3:1, WCAG non-text contrast).
+    await expect(contrast(bezel("dark"), "#000000")).toBeLessThan(2.5);
+    await expect(contrast(bezel("dark"), page("dark"))).toBeGreaterThanOrEqual(1.5);
     const edge = getComputedStyle(q(canvasElement, ".mode-dark .cy-device-frame-body")).boxShadow;
-    await expect(edge).toContain("0px 0px 0px 1px");
-    await expect(contrast(edge.slice(0, edge.indexOf(")") + 1), page("dark"))).toBeGreaterThan(1.3);
-    // The screen follows the theme.
+    await expect(contrast(edge.slice(0, edge.indexOf(")") + 1), page("dark"))).toBeGreaterThanOrEqual(3);
+    // The screen follows the theme, and is set apart from the bezel in both modes.
     const screen = (mode: string) =>
       getComputedStyle(screenOf(q(canvasElement, `.mode-${mode}`))).backgroundColor;
     await expect(screen("light")).not.toBe(screen("dark"));
+    for (const mode of ["light", "dark"])
+      await expect(contrast(screen(mode), bezel(mode))).toBeGreaterThan(1.2);
+  },
+};
+
+export const ContentClearsTheCamera: Story = {
+  render: () => (
+    <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+      <div className="upright" style={{ inlineSize: 180 }}>
+        <DeviceFrame>
+          <p className="first" style={{ margin: 0 }}>
+            Today
+          </p>
+        </DeviceFrame>
+      </div>
+      <div className="turned" style={{ inlineSize: 360 }}>
+        <DeviceFrame orientation="landscape">
+          <p className="first" style={{ margin: 0 }}>
+            Today
+          </p>
+        </DeviceFrame>
+      </div>
+      <div className="bleed" style={{ inlineSize: 180 }}>
+        <DeviceFrame>
+          <img className="first" alt="" src={shot(390, 844)} />
+        </DeviceFrame>
+      </div>
+      <div className="forced" style={{ inlineSize: 180 }}>
+        <DeviceFrame safeArea={false}>
+          <p className="first" style={{ margin: 0 }}>
+            Under the camera
+          </p>
+        </DeviceFrame>
+      </div>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const camera = (root: string) => {
+      const body = q(canvasElement, `.${root} .cy-device-frame-body`);
+      const s = getComputedStyle(body, "::after");
+      const b = box(body);
+      return { top: b.top + Number.parseFloat(s.top), left: b.left + Number.parseFloat(s.left), s, b };
+    };
+    const first = (root: string) => box(q(canvasElement, `.${root} .first`));
+    // Upright: live content starts below the camera island, not under it.
+    const up = camera("upright");
+    const islandBottom = up.top + Number.parseFloat(up.s.height);
+    await expect(first("upright").top).toBeGreaterThanOrEqual(islandBottom);
+    // Turned: the camera is at the left edge, so content starts to its right.
+    const turned = camera("turned");
+    const islandRight = turned.left + Number.parseFloat(turned.s.width);
+    await expect(first("turned").left).toBeGreaterThanOrEqual(islandRight);
+    // A screenshot (it has its own status bar) fills the whole screen by default.
+    const screen = box(screenOf(q(canvasElement, ".bleed")));
+    await expect(first("bleed").top).toBeCloseTo(screen.top, 0);
+    await expect(first("bleed").height).toBeCloseTo(screen.height, 0);
+    // safeArea={false} lets any content run under the camera.
+    await expect(first("forced").top).toBeCloseTo(box(screenOf(q(canvasElement, ".forced"))).top, 0);
   },
 };
 
