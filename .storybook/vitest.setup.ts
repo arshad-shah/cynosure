@@ -9,8 +9,12 @@ import * as project from "./preview";
 (globalThis as { cyEmulateMedia?: (media: EmulatedMedia) => Promise<void> }).cyEmulateMedia = (media) =>
   (commands as unknown as { emulateMedia: (media: EmulatedMedia) => Promise<void> }).emulateMedia(media);
 /* Stories that check CSS :hover move the real pointer through `realHover` (src/test/hover.ts). */
-(globalThis as { cyHover?: (el: Element, over: boolean) => Promise<void> }).cyHover = (el, over) =>
-  over ? userEvent.hover(page.elementLocator(el)) : userEvent.unhover(page.elementLocator(el));
+(globalThis as { cyHover?: (el: Element | null, over: boolean) => Promise<void> }).cyHover = (el, over) =>
+  el === null
+    ? page.elementLocator(document.documentElement).hover({ position: { x: 1, y: 1 } } as never)
+    : over
+      ? userEvent.hover(page.elementLocator(el))
+      : userEvent.unhover(page.elementLocator(el));
 
 /** Visual regression, Vitest-only: stories tagged "visual" are screenshotted when VITE_CY_VISUAL=1 (CI, Linux baselines). */
 const visual = import.meta.env.VITE_CY_VISUAL === "1";

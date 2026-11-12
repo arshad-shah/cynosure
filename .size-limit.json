@@ -2,7 +2,7 @@
   {
     "name": "all CSS",
     "path": "dist/styles.css",
-    "limit": "32.4 kB",
+    "limit": "32.6 kB",
     "gzip": true
   },
   {
@@ -667,6 +667,12 @@
   {
     "name": "StatusBar (JS + CSS)",
     "path": ["dist/components/StatusBar/StatusBar.js", "dist/styles/status-bar.css"],
+    "limit": "2.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "TitleBar (JS + CSS)",
+    "path": ["dist/components/TitleBar/TitleBar.js", "dist/styles/title-bar.css"],
     "limit": "2.5 kB",
     "gzip": true
   }
