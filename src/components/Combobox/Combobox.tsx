@@ -4,10 +4,10 @@ import {
   type ReactNode,
   useEffect,
   useId,
-  useLayoutEffect,
   useRef,
   useState,
 } from "react";
+import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js";
 import { useControllableState } from "../../foundations/controllable.js";
 import { HiddenValue } from "../../foundations/HiddenValue/HiddenValue.js";
 import { isComposing } from "../../foundations/keys.js";
@@ -173,14 +173,29 @@ export function Combobox({
     setActiveValue(pick?.value ?? null);
     setOpen(true);
   };
-  /** Leaving the field: keep a valid choice, or the custom text, and never leave stale text behind. */
+  /**
+   * Leaving the field: keep a valid choice, or the custom text, and never leave stale text behind. Text that still
+   * shows the chosen option's label (or none yet, while options load) changes nothing.
+   */
   const settle = () => {
     setOpen(false);
     setTyping(false);
-    if (allowCustom) setValue(typedText);
+    if (typedText === labelOf(current)) return;
+    if (allowCustom) setValue(options.find((o) => !o.disabled && o.label === typedText)?.value ?? typedText);
     else if (typedText.trim() === "") setValue("");
-    else if (typedText !== labelOf(current)) setText(labelOf(current));
+    else setText(labelOf(current));
   };
+
+  // The chosen option's label changed under the text (options arrived late, or the value was set from outside):
+  // text that showed the old label follows, unless the person is typing.
+  const shownLabel = labelOf(current);
+  const lastLabel = useRef(shownLabel);
+  useEffect(() => {
+    const was = lastLabel.current;
+    if (shownLabel === was) return;
+    lastLabel.current = shownLabel;
+    if (shownLabel && !typing && typedText === was) setText(shownLabel);
+  });
 
   // Late or changed results: keep the active option if it is still there, else the first enabled one. Focus never
   // moves (it stays in the input; the list uses aria-activedescendant), so typing is never interrupted.
@@ -190,7 +205,7 @@ export function Combobox({
   });
 
   // The list drops from the whole field (input and any end buttons), found before the layer shows.
-  useLayoutEffect(() => {
+  useClientLayoutEffect(() => {
     anchor.current = (input.current as HTMLInputElement).closest<HTMLElement>(".cy-text-field");
   });
   useListboxLayer({ anchor, list, open, onClose: () => setOpen(false) });
