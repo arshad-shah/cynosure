@@ -168,6 +168,20 @@ export const DecimalMinAndTinySteps: Story = {
   },
 };
 
+export const ControlledOutOfRangeIsClamped: Story = {
+  args: { value: 150, min: 0, max: 100 },
+  play: async ({ args, canvas, userEvent }) => {
+    const thumb = canvas.getByRole("slider", { name: "Volume" });
+    // A value beyond max shows at max, for the thumb and for screen readers.
+    await expect(thumb).toHaveAttribute("aria-valuenow", "100");
+    await expect(thumb.style.getPropertyValue("--_pos")).toBe("100%");
+    // Keys step from the shown value.
+    thumb.focus();
+    await userEvent.keyboard("{ArrowLeft}");
+    await expect(args.onChange).toHaveBeenLastCalledWith(99);
+  },
+};
+
 export const RangeThumbsNeverCross: Story = {
   args: { label: "Price", defaultValue: [20, 60], showValue: true },
   play: async ({ args, canvas, canvasElement, userEvent }) => {

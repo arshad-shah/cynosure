@@ -129,7 +129,8 @@ export function Slider({
   const initial = defaultValue ?? min;
   const [current, setCurrent, resetCurrent] = useControllableState<SliderValue>(value, initial, onChange);
   const range = Array.isArray(current);
-  const values: number[] = range ? [...current] : [current];
+  // A controlled value outside min and max shows (and is announced) at the nearest end.
+  const values: number[] = (range ? current : [current]).map((v) => clamp(v, min, max));
   const track = useRef<HTMLDivElement>(null);
   const thumbs = useRef<(HTMLDivElement | null)[]>([]);
   const drag = useRef<Drag | null>(null);
