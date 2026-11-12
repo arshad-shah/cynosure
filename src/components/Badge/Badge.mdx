@@ -38,6 +38,17 @@ import { check } from "@arshad-shah/cynosure/icons";
 
 Tone carries meaning, but keep the text meaningful too: don't rely on colour alone to say "failed".
 
+## Status dot
+
+`dot` adds a dot before the text: `true` for a steady one, `"live"` for a pulsing one (recording, connected). Leave the text out for a dot alone, in the tone's own colour with no pill around it. It is then an image named by `label`, which is required, since colour alone says nothing.
+
+```tsx
+<Badge tone="success" dot label="Connected" />
+<Badge tone="danger" dot="live" label="Recording" />
+```
+
+<Canvas of={Stories.DotWithoutText} />
+
 ## Props
 
 <ArgTypes of={Stories} />

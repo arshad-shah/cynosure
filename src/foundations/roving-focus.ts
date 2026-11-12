@@ -8,6 +8,13 @@ export interface RovingOptions {
   selector?: string;
 }
 
+/**
+ * The items of a toolbar's roving group: every focusable control inside (hidden form proxies excluded), plus anything
+ * marked `data-roving`. Toolbar and StatusBar use it.
+ */
+export const TOOLBAR_ITEMS =
+  'button, a[href], textarea, input:not([type="hidden"]):not([aria-hidden="true"]), [data-roving]';
+
 const enabled = (el: HTMLElement) =>
   el.getAttribute("aria-disabled") !== "true" && !(el as HTMLButtonElement).disabled;
 

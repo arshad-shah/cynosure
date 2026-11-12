@@ -83,6 +83,8 @@ export function Tooltip({
     if (off.current) return;
     timer.current = setTimeout(() => setOpen(true), wait);
   }, []);
+  // Disabled while open (a label stopped being cut short): close, so it does not reappear when enabled again.
+  if (disabled && open) setOpen(false);
   const hide = useCallback((wait = 0) => {
     clearTimeout(timer.current);
     timer.current = setTimeout(() => setOpen(false), wait);

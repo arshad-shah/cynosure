@@ -15,9 +15,7 @@ declare module "../../tokens/schema.js" {
   }
 }
 
-export interface BadgeProps {
-  /** The badge's text. */
-  children: ReactNode;
+interface BadgeBaseProps {
   /** Semantic colour. Default "neutral". */
   tone?: Tone;
   /** Fill style. Default "soft". */
@@ -39,7 +37,23 @@ export interface BadgeProps {
   style?: CSSProperties;
 }
 
-/** Small status or category label in the mono "eyebrow" style. */
+export type BadgeProps = BadgeBaseProps &
+  (
+    | {
+        /** The badge's text. Leave it out, with `dot`, for a status dot alone (then `label` is required). */
+        children: ReactNode;
+        /** Accessible name of a dot without text; a badge with text is named by its text. */
+        label?: undefined;
+      }
+    | {
+        /** The badge's text. Leave it out, with `dot`, for a status dot alone (then `label` is required). */
+        children?: undefined;
+        /** Accessible name of a dot without text, saying the state ("Connected"): colour alone says nothing. */
+        label: string;
+      }
+  );
+
+/** Small status or category label in the mono "eyebrow" style; without text, a status dot. */
 export function Badge({
   children,
   tone = "neutral",
@@ -48,19 +62,24 @@ export function Badge({
   icon,
   color,
   dot,
+  label,
   className,
   style,
 }: BadgeProps) {
+  // Without text it is a status dot: an image named by `label`.
+  const alone = children == null;
   return (
     <span
       className={`cy-badge${className ? ` ${className}` : ""}`}
+      {...(alone ? { role: "img", "aria-label": label } : {})}
+      data-dot-only={alone ? "" : undefined}
       data-tone={color ? undefined : tone}
       data-color={color ? "" : undefined}
       data-variant={variant}
       data-size={size}
       style={color ? ({ "--_tone": color, ...style } as CSSProperties) : style}
     >
-      {dot && (
+      {(dot || alone) && (
         <span
           className="cy-badge-dot cy-reset"
           data-live={dot === "live" ? "" : undefined}

@@ -67,6 +67,13 @@
     background: var(--cy-color-surface);
     border-color: color-mix(in oklab, var(--_tone) 55%, var(--cy-color-line));
   }
+  /* A status dot without text: only the dot shows, in the tone itself. */
+  &[data-dot-only] {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--_tone);
+  }
 }
 
 .cy-badge-dot.cy-badge-dot {
