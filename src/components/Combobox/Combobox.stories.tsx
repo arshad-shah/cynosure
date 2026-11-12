@@ -67,6 +67,31 @@ export const TypeToFilterThenChooseWithEnter: Story = {
   },
 };
 
+export const TypedTextIsMarkedInTheOptions: Story = {
+  play: async ({ canvas, userEvent }) => {
+    const input = canvas.getByRole("combobox", { name: "Fruit" });
+    const marks = () =>
+      [...listbox().querySelectorAll('[role="option"]')].map((o) =>
+        [...o.querySelectorAll("mark")].map((m) => m.textContent),
+      );
+    // Opened without typing: the whole list, nothing marked.
+    await userEvent.click(input);
+    await waitFor(() => expect(isOpen()).toBe(true));
+    await expect(marks().flat()).toEqual([]);
+    // Typing marks where the text appears in each label, ignoring case; spaces around it are not marked.
+    await userEvent.keyboard(" AP");
+    await expect(marks()).toEqual([["Ap"], ["Ap"], ["ap"]]);
+    // Options are still named by their whole label (and description).
+    await expect(canvas.getByRole("option", { name: "Apple" })).toBeInTheDocument();
+    await expect(canvas.getByRole("option", { name: /^Grape/ })).toBeInTheDocument();
+    // After a choice the list shows everything again, unmarked.
+    await userEvent.keyboard("{Enter}");
+    await userEvent.keyboard("{ArrowDown}");
+    await waitFor(() => expect(isOpen()).toBe(true));
+    await expect(marks().flat()).toEqual([]);
+  },
+};
+
 export const ArrowsOpenAndEscapeClosesThenClears: Story = {
   args: { defaultValue: "banana" },
   play: async ({ args, canvas, userEvent }) => {

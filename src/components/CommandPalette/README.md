@@ -20,7 +20,7 @@ A search-and-run list of commands in a modal dialog, opened from anywhere with C
 | `shortcut`                              | `mod+k` | Toggles the palette; `mod` is Command on Apple, Control elsewhere; `false` for none |
 | `recentLimit`                           | `5`     | Recently run commands listed first before you type; `0` for none                    |
 | `labels`                                | –       | `title`, `placeholder`, `empty`, `recent`                                           |
-- Every typed word must appear in the label or keywords; label prefix matches rank first. Results are grouped by `group`.
+- Every typed word must appear in the label or keywords; label prefix matches rank first. Results are grouped by `group`. Typed words are marked in the labels (HighlightedText).
 - Arrows wrap; Enter or a click runs; Escape, the backdrop or the shortcut close. Focus returns to where it was.
 - `shortcut` shows nothing by itself: a command's `shortcut` is display only, so bind those keys with `useHotkey`.
 - Works in shadow roots (extension content scripts): the shortcut is heard from inside them.

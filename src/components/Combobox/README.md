@@ -20,6 +20,7 @@ A text input with a list of suggestions (WAI-ARIA APG editable combobox). Type t
 | `name`, `required`, `disabled`                 | –        | Native form behaviour through a hidden value                                         |
 | `labels`                                       | –        | `empty`, `loading`, `required`                                                       |
 - Focus stays in the input; the active option is `aria-activedescendant`, so late results never interrupt typing.
+- While typing, the text is marked where it appears in each option's label (HighlightedText).
 - Leaving with text that matches nothing restores the last choice (unless `allowCustom`); leaving it empty clears the value.
 - Escape: closes the list, then clears the text, then (with nothing to undo) reaches an enclosing Dialog.
 

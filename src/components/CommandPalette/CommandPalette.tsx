@@ -19,6 +19,7 @@ import { isComposing } from "../../foundations/keys.js";
 import { search } from "../../icons/search.js";
 import type { IconData } from "../../icons/types.js";
 import { useDismiss } from "../../overlay/dismiss.js";
+import { HighlightedText } from "../HighlightedText/HighlightedText.js";
 import { Kbd } from "../Kbd/Kbd.js";
 
 export interface CommandPaletteTokens {
@@ -88,9 +89,12 @@ const DEFAULT_LABELS: CommandPaletteLabels = {
   recent: "Recent",
 };
 
+/** The words of a query. */
+const wordsOf = (query: string) => query.toLowerCase().split(/\s+/).filter(Boolean);
+
 /** Every word of the query must appear in the label or keywords; label prefix matches rank first. */
 function rank(commands: Command[], query: string): Command[] {
-  const words = query.toLowerCase().split(/\s+/).filter(Boolean);
+  const words = wordsOf(query);
   if (!words.length) return commands;
   const hay = (c: Command) => [c.label, ...(c.keywords ?? [])].join(" ").toLowerCase();
   const found = commands.filter((c) => words.every((w) => hay(c).includes(w)));
@@ -143,6 +147,8 @@ export function CommandPalette({
     for (const [name, items] of byGroup) out.push({ name, items });
     return out;
   }, [commands, query, recent, recentLimit, text.recent]);
+  // Each typed word is marked where it appears in a label.
+  const words = useMemo(() => wordsOf(query), [query]);
   const rows = sections.flatMap((s) => s.items.map((c) => ({ command: c, section: s.name })));
   const runnable = rows.map((r, i) => (r.command.disabled ? -1 : i)).filter((i) => i >= 0);
 
@@ -277,7 +283,9 @@ export function CommandPalette({
                       onKeyDown={() => {}}
                     >
                       {command.icon && <Icon icon={command.icon} className="cy-command-palette-icon" />}
-                      <span className="cy-command-palette-label cy-reset">{command.label}</span>
+                      <span className="cy-command-palette-label cy-reset">
+                        <HighlightedText text={command.label} query={words} />
+                      </span>
                       {command.shortcut && <Kbd keys={command.shortcut} size="sm" />}
                     </div>
                   </Fragment>

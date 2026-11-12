@@ -101,6 +101,28 @@ export const KeywordsGroupsAndWrappingArrows: Story = {
   },
 };
 
+export const TypedWordsAreMarkedInTheLabels: Story = {
+  args: { defaultOpen: true },
+  play: async ({ canvas, userEvent }) => {
+    const input = await canvas.findByRole("combobox", { name: "Command palette" });
+    await waitFor(() => expect(input).toHaveFocus());
+    const marks = () =>
+      canvas.getAllByRole("option").map((o) => [...o.querySelectorAll("mark")].map((m) => m.textContent));
+    // Nothing typed: nothing marked.
+    await expect(marks().flat()).toEqual([]);
+    // Each typed word is marked where it appears in a label, ignoring case; a keyword match marks nothing.
+    await userEvent.keyboard("FILE n");
+    await expect(marks()).toEqual([["N", "file"]]);
+    await userEvent.clear(input);
+    await userEvent.keyboard("disk");
+    await expect(marks()).toEqual([[]]);
+    // The option is still named by its whole label.
+    await userEvent.clear(input);
+    await userEvent.keyboard("pre");
+    await expect(canvas.getByRole("option", { name: /^Toggle preview/ })).toBeInTheDocument();
+  },
+};
+
 export const RecentCommandsComeFirst: Story = {
   play: async ({ canvas, userEvent }) => {
     await userEvent.keyboard(MOD_K);
