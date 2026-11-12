@@ -5,10 +5,10 @@ import {
   useCallback,
   useEffect,
   useId,
-  useLayoutEffect,
   useRef,
   useState,
 } from "react";
+import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js";
 import { useDismiss } from "../../overlay/dismiss.js";
 import { usePopover } from "../../overlay/floating.js";
 import type { Placement } from "../../overlay/position.js";
@@ -68,7 +68,7 @@ export function Tooltip({ content, children, placement = "top", delay = 300, cla
   }, []);
 
   useEffect(() => () => clearTimeout(timer.current), []);
-  useLayoutEffect(() => {
+  useClientLayoutEffect(() => {
     triggerRef.current = trigger();
   });
   usePopover(tip, open);

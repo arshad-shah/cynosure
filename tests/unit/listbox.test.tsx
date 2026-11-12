@@ -37,6 +37,16 @@ describe("type-ahead", () => {
     expect(type("z", labels, 0)).toBe(-1);
     vi.useRealTimers();
   });
+  it("starts at the first item when nothing is active", () => {
+    vi.useFakeTimers();
+    const { result } = renderHook(() => useTypeahead());
+    expect(result.current("a", labels, -1)).toBe(0);
+    vi.advanceTimersByTime(600);
+    expect(result.current("b", labels, -1)).toBe(1);
+    vi.advanceTimersByTime(600);
+    expect(result.current("a", ["Apple", "Avocado"], -1)).toBe(0);
+    vi.useRealTimers();
+  });
 });
 
 describe("moving items", () => {

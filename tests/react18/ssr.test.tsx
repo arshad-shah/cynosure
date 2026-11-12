@@ -2,6 +2,11 @@
 import { version } from "react";
 import { renderToString } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { Button } from "../../src/components/Button/Button";
+import { Combobox } from "../../src/components/Combobox/Combobox";
+import { Popover } from "../../src/components/Popover/Popover";
+import { TagInput } from "../../src/components/TagInput/TagInput";
+import { Tooltip } from "../../src/components/Tooltip/Tooltip";
 import { CynosureTheme } from "../../src/theme/CynosureTheme";
 
 afterEach(() => vi.restoreAllMocks());
@@ -21,5 +26,25 @@ describe("server rendering on React 18", () => {
     );
     expect(html).toContain("Themed");
     expect(error).not.toHaveBeenCalled();
+  });
+
+  it("Tooltip, Combobox, TagInput and Popover render on the server without the useLayoutEffect warning", () => {
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    renderToString(
+      <>
+        <Tooltip content="Saves the file">
+          <Button>Save</Button>
+        </Tooltip>
+        <Combobox label="Fruit" options={[{ value: "apple", label: "Apple" }]} />
+        <TagInput label="Topics" />
+        <Popover label="Filters" trigger={(p) => <Button {...p}>Filters</Button>}>
+          Body
+        </Popover>
+      </>,
+    );
+    const warnings = error.mock.calls
+      .map((args) => String(args[0]))
+      .filter((m) => m.includes("useLayoutEffect"));
+    expect(warnings).toEqual([]);
   });
 });

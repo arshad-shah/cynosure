@@ -15,6 +15,7 @@ import { HiddenValue } from "../../foundations/HiddenValue/HiddenValue.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
 import { isComposing } from "../../foundations/keys.js";
 import { isTypeaheadKey, seekEnabled, useTypeahead } from "../../foundations/listbox.js";
+import { clamp } from "../../foundations/math.js";
 import { OptionIcon, type OptionIconColor } from "../../foundations/option-icon.js";
 import { chevronDown } from "../../icons/chevron-down.js";
 import type { IconData } from "../../icons/types.js";
@@ -138,6 +139,14 @@ export function Select({
   const step = (from: number, delta: 1 | -1) => seekEnabled(options.length, from, delta, enabled);
   const first = () => step(-1, 1);
   const last = () => step(options.length, -1);
+  // A page away, or the nearest usable option short of it; with none there, the active option stays.
+  const page = (delta: 1 | -1) => {
+    const target = clamp(active + delta * PAGE, 0, options.length - 1);
+    const beyond = seekEnabled(options.length, target - delta, delta, enabled);
+    if (beyond >= 0 && beyond !== target - delta) return beyond;
+    const short = seekEnabled(options.length, target, -delta as 1 | -1, enabled);
+    return short >= 0 ? short : active;
+  };
 
   const choose = useCallback(
     (index: number) => {
@@ -192,8 +201,8 @@ export function Select({
       ArrowUp: () => step(active, -1),
       Home: first,
       End: last,
-      PageDown: () => step(Math.min(active + PAGE - 1, options.length - 1), 1),
-      PageUp: () => step(Math.max(active - PAGE + 1, 0), -1),
+      PageDown: () => page(1),
+      PageUp: () => page(-1),
     };
     if (moves[key]) {
       e.preventDefault();

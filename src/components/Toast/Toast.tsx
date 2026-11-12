@@ -1,7 +1,6 @@
 import {
   type CSSProperties,
   createContext,
-  type PointerEvent,
   type ReactNode,
   useCallback,
   useContext,
@@ -13,7 +12,10 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js";
+import { useDrag } from "../../foundations/drag.js";
+import { deepActiveElement } from "../../foundations/focus.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
+import { transitionTime } from "../../foundations/motion.js";
 import { TONE_ICONS } from "../../foundations/tone-icons.js";
 import { close as closeIcon } from "../../icons/close.js";
 import { ToastHostContext, type ToastHostRegistry } from "../../overlay/toast-host.js";
@@ -187,7 +189,7 @@ export function Toaster({
   const dismiss = useCallback((id?: string) => {
     // Closing the toast that holds focus (its close button, from the keyboard): hand focus to the next toast's close
     // button, or let the region stop pausing if there is none.
-    const active = region.current?.ownerDocument.activeElement;
+    const active = deepActiveElement(region.current?.ownerDocument);
     const holder = active?.closest<HTMLElement>(".cy-toast");
     if (holder && region.current?.contains(holder) && (id === undefined || holder.dataset.id === id)) {
       const others = [
@@ -297,7 +299,6 @@ function ToastItem({ item, collapsed, paused, dismissLabel, onDismiss, onRemoved
     return found;
   });
   const [announcedBefore] = useState(mem.announced);
-  const drag = useRef<{ x: number; pointer: number } | null>(null);
   // The live element exists (empty) first and its text arrives a moment later: screen readers announce text added to
   // a live region, and the text is added once, so the toast is announced once.
   // Already announced (re-created after a move): show the text at once, so nothing is inserted to announce again.
@@ -333,20 +334,27 @@ function ToastItem({ item, collapsed, paused, dismissLabel, onDismiss, onRemoved
   useEffect(() => {
     if (!leaving) return;
     const node = el.current;
-    const ms = node ? Number.parseFloat(getComputedStyle(node).transitionDuration) * 1000 || 0 : 0;
-    const t = setTimeout(() => onRemoved(id), ms);
+    const t = setTimeout(() => onRemoved(id), node ? transitionTime(getComputedStyle(node)) : 0);
     return () => clearTimeout(t);
   }, [leaving, id, onRemoved]);
 
-  const endSwipe = (event: PointerEvent<HTMLDivElement>) => {
-    const start = drag.current;
-    if (!start || start.pointer !== event.pointerId) return;
-    drag.current = null;
-    const node = event.currentTarget;
-    delete node.dataset.swiping;
-    if (Math.abs(event.clientX - start.x) >= SWIPE) onDismiss(id);
-    else node.style.removeProperty("--_dx");
-  };
+  // A finger swipes the toast away sideways. A press on its buttons stays a tap; a vertical swipe scrolls (the
+  // stylesheet's pan-y) and, like Escape, puts it back.
+  useDrag(el, {
+    touchAction: "css",
+    onStart: (session) =>
+      session.pointerType === "touch" &&
+      !session.path.some((n) => n instanceof Element && n.matches("button, a") && el.current?.contains(n)),
+    onMove: (session) => {
+      el.current?.setAttribute("data-swiping", "");
+      el.current?.style.setProperty("--_dx", `${session.delta.x}px`);
+    },
+    onEnd: (session, cancelled) => {
+      el.current?.removeAttribute("data-swiping");
+      if (!cancelled && Math.abs(session.delta.x) >= SWIPE) onDismiss(id);
+      else el.current?.style.removeProperty("--_dx");
+    },
+  });
 
   const icon = TONE_ICONS[tone];
   return (
@@ -360,23 +368,6 @@ function ToastItem({ item, collapsed, paused, dismissLabel, onDismiss, onRemoved
       data-tone={tone}
       data-collapsed={collapsed || undefined}
       data-leaving={leaving || undefined}
-      onPointerDown={(event) => {
-        if (event.pointerType !== "touch") return;
-        drag.current = { x: event.clientX, pointer: event.pointerId };
-      }}
-      onPointerMove={(event) => {
-        const start = drag.current;
-        if (!start || start.pointer !== event.pointerId) return;
-        event.currentTarget.dataset.swiping = "";
-        event.currentTarget.style.setProperty("--_dx", `${event.clientX - start.x}px`);
-      }}
-      onPointerUp={endSwipe}
-      onPointerCancel={(event) => {
-        // The browser took the gesture (a scroll): spring back, never dismiss.
-        drag.current = null;
-        delete event.currentTarget.dataset.swiping;
-        event.currentTarget.style.removeProperty("--_dx");
-      }}
     >
       {icon && <Icon icon={icon} className="cy-toast-icon" />}
       <div className="cy-toast-text cy-reset">

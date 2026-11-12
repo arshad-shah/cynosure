@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { Component, type ReactNode, useEffect, useState } from "react";
+import { Component, type ReactNode, useEffect, useRef, useState } from "react";
+import { createRoot } from "react-dom/client";
 import { expect, fn, waitFor } from "storybook/test";
+import { createStyleSheet } from "../../styles/inline.js";
 import { computeUnderHostileHost } from "../../test/hostile.js";
 import { settled, shownFully } from "../../test/settle.js";
 import { CynosureTheme } from "../../theme/CynosureTheme.js";
@@ -158,6 +160,47 @@ export const KeyboardDismissKeepsFocusInTheStack: Story = {
     await expect(one.querySelector('[aria-label="Dismiss"]')).toHaveFocus();
     await userEvent.keyboard("{Enter}");
     await gone(one);
+  },
+};
+
+function ShadowToaster() {
+  const host = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = host.current;
+    if (!el || el.shadowRoot) return;
+    const root = el.attachShadow({ mode: "open" });
+    root.adoptedStyleSheets = [createStyleSheet()];
+    const mount = document.createElement("div");
+    root.append(mount);
+    createRoot(mount).render(
+      withToaster({
+        One: { title: "One", duration: Number.POSITIVE_INFINITY },
+        Two: { title: "Two", duration: Number.POSITIVE_INFINITY },
+      }),
+    );
+  }, []);
+  return <div data-testid="host" ref={host} />;
+}
+
+export const KeyboardDismissInsideAShadowRoot: Story = {
+  render: () => <ShadowToaster />,
+  play: async ({ canvas }) => {
+    const host = await canvas.findByTestId("host");
+    await waitFor(() => expect(host.shadowRoot?.querySelector("button")).toBeTruthy());
+    const root = host.shadowRoot as ShadowRoot;
+    const button = (name: string) =>
+      [...root.querySelectorAll<HTMLElement>("button")].find((b) => b.textContent === name) as HTMLElement;
+    button("One").click();
+    button("Two").click();
+    const all = () => [...root.querySelectorAll<HTMLElement>(".cy-toast")];
+    await waitFor(() => expect(all()).toHaveLength(2));
+    const [one, two] = all() as [HTMLElement, HTMLElement];
+    const close = (toast: HTMLElement) => toast.querySelector('[aria-label="Dismiss"]') as HTMLElement;
+    close(two).focus();
+    close(two).click();
+    await gone(two);
+    // Focus moved to the remaining toast's close button, though the page only sees the shadow host focused.
+    await expect(root.activeElement).toBe(close(one));
   },
 };
 
@@ -523,6 +566,46 @@ export const SwipeToDismiss: Story = {
       { pointerName: "TouchA", target: toast, coords: { clientX: box.left + 140, clientY: y } },
       { keys: "[/TouchA]", target: toast, coords: { clientX: box.left + 140, clientY: y } },
     ]);
+    await gone(toast);
+  },
+};
+
+const tapUndo = fn();
+
+export const SwipeCancelsWithEscapeAndTapsStillWork: Story = {
+  tags: ["touch", "!dev"],
+  render: (args) =>
+    withToaster(
+      { Save: { ...saved, duration: Number.POSITIVE_INFINITY, action: { label: "Undo", onClick: tapUndo } } },
+      args,
+    ),
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.pointer({ keys: "[TouchA]", target: canvas.getByRole("button", { name: "Save" }) });
+    const toast = await canvas.findByRole("status");
+    const box = toast.getBoundingClientRect();
+    const y = box.top + box.height / 2;
+    // Escape during a swipe puts the toast back, even past the dismiss distance.
+    await userEvent.pointer([
+      { keys: "[TouchA>]", target: toast, coords: { clientX: box.left + 40, clientY: y } },
+      { pointerName: "TouchA", target: toast, coords: { clientX: box.left + 140, clientY: y } },
+    ]);
+    await expect(toast.style.getPropertyValue("--_dx")).toBe("100px");
+    await userEvent.keyboard("{Escape}");
+    await userEvent.pointer({
+      keys: "[/TouchA]",
+      target: toast,
+      coords: { clientX: box.left + 140, clientY: y },
+    });
+    await expect(toast.isConnected).toBe(true);
+    await expect(toast.style.getPropertyValue("--_dx")).toBe("");
+    await expect(toast).not.toHaveAttribute("data-swiping");
+    // A tap on the toast's buttons is a tap, not a swipe.
+    await userEvent.pointer({
+      keys: "[TouchA]",
+      target: await canvas.findByRole("button", { name: "Undo" }),
+    });
+    await expect(tapUndo).toHaveBeenCalledTimes(1);
+    await userEvent.pointer({ keys: "[TouchA]", target: canvas.getByRole("button", { name: "Dismiss" }) });
     await gone(toast);
   },
 };

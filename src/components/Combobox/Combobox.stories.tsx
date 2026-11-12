@@ -146,6 +146,77 @@ export const AllowCustomAcceptsNewText: Story = {
   },
 };
 
+export const AllowCustomKeepsTheChosenOptionsValue: Story = {
+  args: {
+    allowCustom: true,
+    label: "Owner",
+    name: "owner",
+    options: [
+      { value: "u-1", label: "Ada Lovelace" },
+      { value: "u-2", label: "Grace Hopper" },
+    ],
+  },
+  render: (args) => (
+    <form data-testid="form">
+      <Combobox {...args} />
+      <Button>After</Button>
+    </form>
+  ),
+  play: async ({ args, canvas, userEvent }) => {
+    const form = canvas.getByTestId("form") as HTMLFormElement;
+    const input = canvas.getByRole("combobox", { name: "Owner" });
+    await userEvent.click(input);
+    await userEvent.keyboard("gra{Enter}");
+    await expect(args.onChange).toHaveBeenLastCalledWith("u-2");
+    // Leaving the field keeps the option's value, not the label it shows.
+    await userEvent.tab();
+    await expect(canvas.getByRole("button", { name: "After" })).toHaveFocus();
+    await expect(args.onChange).toHaveBeenLastCalledWith("u-2");
+    await expect(new FormData(form).get("owner")).toBe("u-2");
+    // Typing an option's exact label also means that option; other text stays custom.
+    await userEvent.clear(input);
+    await userEvent.keyboard("Ada Lovelace");
+    await userEvent.tab();
+    await expect(new FormData(form).get("owner")).toBe("u-1");
+    await userEvent.clear(input);
+    await userEvent.keyboard("Alan Turing");
+    await userEvent.tab();
+    await expect(new FormData(form).get("owner")).toBe("Alan Turing");
+  },
+};
+
+/** Options that load after the field mounts, with a value already chosen. */
+function LateOptions({ onChange }: { onChange: (v: string) => void }) {
+  const [options, setOptions] = useState<ComboboxOption[]>([]);
+  useEffect(() => {
+    const t = setTimeout(() => setOptions(fruits), 200);
+    return () => clearTimeout(t);
+  }, []);
+  return (
+    <form data-testid="form">
+      <Combobox label="Fruit" name="fruit" options={options} defaultValue="banana" onChange={onChange} />
+      <Button>After</Button>
+    </form>
+  );
+}
+
+export const OptionsArrivingLateShowTheChosenLabel: Story = {
+  render: (args) => <LateOptions onChange={args.onChange as (v: string) => void} />,
+  play: async ({ args, canvas, userEvent }) => {
+    const form = canvas.getByTestId("form") as HTMLFormElement;
+    const input = canvas.getByRole("combobox", { name: "Fruit" });
+    // Focus and leave before the options arrive: the value is not cleared.
+    input.focus();
+    await userEvent.tab();
+    await expect(new FormData(form).get("fruit")).toBe("banana");
+    await waitFor(() => expect(input).toHaveValue("Banana"));
+    await userEvent.click(input);
+    await userEvent.tab();
+    await expect(new FormData(form).get("fruit")).toBe("banana");
+    await expect(args.onChange).not.toHaveBeenCalled();
+  },
+};
+
 /** Fetches matching fruit 300ms after each keystroke, like a server would. */
 function AsyncFruit({ onChange }: { onChange: (v: string) => void }) {
   const [text, setText] = useState("");

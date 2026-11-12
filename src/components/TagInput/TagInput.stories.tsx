@@ -94,6 +94,28 @@ export const ArrowKeysThroughTags: Story = {
   },
 };
 
+export const RightToLeftFlipsArrowKeys: Story = {
+  args: { defaultValue: ["design", "docs", "release"] },
+  render: (args) => (
+    <div dir="rtl">
+      <TagInput {...args} />
+    </div>
+  ),
+  play: async ({ canvas, userEvent }) => {
+    const input = canvas.getByRole("textbox", { name: "Topics" });
+    input.focus();
+    // In right-to-left text the tags lie to the right of the input: Arrow Right moves into them, Arrow Left back.
+    await userEvent.keyboard("{ArrowRight}");
+    await expect(canvas.getByRole("button", { name: "Remove release" })).toHaveFocus();
+    await userEvent.keyboard("{ArrowRight}");
+    await expect(canvas.getByRole("button", { name: "Remove docs" })).toHaveFocus();
+    await userEvent.keyboard("{ArrowLeft}{ArrowLeft}");
+    await expect(input).toHaveFocus();
+    await userEvent.keyboard("{ArrowLeft}");
+    await expect(input).toHaveFocus();
+  },
+};
+
 export const RefusalsAreExplained: Story = {
   args: {
     defaultValue: ["design"],

@@ -15,6 +15,7 @@ import { useHotkey } from "../../foundations/hotkey.js";
 import { grip as gripIcon } from "../../icons/grip.js";
 import {
   type FloatingAnchor,
+  floatingOffset,
   type PopoverEl,
   useFloatingAnchor,
   useFloatingOffset,
@@ -55,6 +56,9 @@ function useReturnFocus(onEscape: (() => void) | undefined) {
     },
     onKeyDown: (event: KeyboardEvent<HTMLElement>) => {
       if (event.key !== "Escape" || event.defaultPrevented) return;
+      // Escape inside a layer nested in the bar (a Menu's panel) belongs to that layer: the dismiss stack closes it.
+      const layer = (event.target as HTMLElement).closest("[popover]");
+      if (layer && layer !== event.currentTarget && event.currentTarget.contains(layer)) return;
       event.preventDefault();
       const back = from.current;
       onEscape?.();
@@ -110,7 +114,7 @@ export function FloatingToolbar({
   const target = useFloatingAnchor(anchor);
   const shown = (open ?? true) && target.present;
   usePopover(bar, shown);
-  const offset = useFloatingOffset(bar);
+  const offset = useFloatingOffset(bar, shown);
   useAnchoredPosition(target.ref, bar, shown, side, offset, "start");
   useHotkey(shown && hotkey, () => enter(bar.current));
   const focus = useReturnFocus(onEscape);
@@ -262,7 +266,7 @@ export function DockedToolbar({
     // Measured on the next frame, once the bar and the page have their final layout.
     const frame = requestAnimationFrame(() => {
       const covered = target.getBoundingClientRect().bottom - el.getBoundingClientRect().top;
-      const gap = Number.parseFloat(getComputedStyle(el).getPropertyValue("--_offset"));
+      const gap = floatingOffset(el);
       if (covered > -gap) window.scrollBy({ top: covered + gap, behavior: "instant" });
     });
     return () => cancelAnimationFrame(frame);

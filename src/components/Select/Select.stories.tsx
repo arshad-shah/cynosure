@@ -275,6 +275,29 @@ export const ArrowUpOpensAtLastAndTypingWhileClosedJumps: Story = {
   },
 };
 
+export const PageKeysStopAtTheLastUsableOption: Story = {
+  args: {
+    options: [
+      { value: "first", label: "First", disabled: true },
+      { value: "a", label: "Alpha" },
+      { value: "b", label: "Bravo" },
+      { value: "c", label: "Charlie" },
+      { value: "last", label: "Last", disabled: true },
+    ],
+  },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    canvas.getByRole("combobox").focus();
+    await userEvent.keyboard("{ArrowDown}");
+    await expect(active(canvasElement)).toBe("Alpha");
+    await userEvent.keyboard("{PageDown}");
+    await expect(active(canvasElement)).toBe("Charlie");
+    await userEvent.keyboard("{PageUp}");
+    await expect(active(canvasElement)).toBe("Alpha");
+    await userEvent.keyboard("{Enter}");
+    await expect(canvas.getByRole("combobox")).toHaveTextContent("Alpha");
+  },
+};
+
 export const AllDisabledHasNoActiveOption: Story = {
   args: { options: [{ value: "x", label: "Only", disabled: true }], labels: { empty: "Nothing" } },
   play: async ({ canvas, canvasElement, userEvent }) => {
