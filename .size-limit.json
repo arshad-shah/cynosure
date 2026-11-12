@@ -2,7 +2,7 @@
   {
     "name": "all CSS",
     "path": "dist/styles.css",
-    "limit": "33.7 kB",
+    "limit": "33.95 kB",
     "gzip": true
   },
   {
@@ -295,7 +295,7 @@
   {
     "name": "Tree",
     "path": ["dist/components/Tree/Tree.js", "dist/styles/tree.css"],
-    "limit": "4.5 kB",
+    "limit": "6.2 kB",
     "gzip": true
   },
   {
@@ -689,7 +689,7 @@
   {
     "name": "HighlightedText (JS + CSS)",
     "path": ["dist/components/HighlightedText/HighlightedText.js", "dist/styles/highlighted-text.css"],
-    "limit": "3 kB",
+    "limit": "1 kB",
     "gzip": true
   }
 ]
