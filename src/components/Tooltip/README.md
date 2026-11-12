@@ -20,7 +20,3 @@ Behaviour (WCAG 1.4.13): hoverable, dismissible with Escape, stays while hovered
 ## Tokens
 
 - `--cy-tooltip-{bg,ink,radius,max-width}`
-
-## Used by
-
-IconButton (labels), and any control needing a hint: Prism, Aperture, Stepframe, Verql toolbars.

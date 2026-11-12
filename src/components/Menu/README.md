@@ -24,7 +24,3 @@ Items: `value`, `label`, `icon`, `iconTone` and `iconColor`, `shortcut` (shown w
 - Icons are muted by default (and take a danger item's colour). `iconTone` and `iconColor` colour one item's icon, with the meaning of Icon's `tone` and `color` (`iconColor` is any CSS colour and overrides `iconTone`), the same two fields as Select and Combobox options. The highlighted item keeps the colour; a disabled item shows the icon muted. Keep the label meaningful without the colour.
 
 Tokens: `--cy-menu-min-width`, `--cy-menu-max-width`, `--cy-menu-radius`, `--cy-menu-row-height`.
-
-## Used by
-
-Prism (node actions), Aperture (panel menus), extension popups, Planr (priority and category menus with coloured icons).

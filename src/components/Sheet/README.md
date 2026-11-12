@@ -18,7 +18,3 @@ A Dialog docked to an edge: the bottom (full width), the inline end or the inlin
 - The bottom sheet keeps its actions above the home indicator (`safe-area-inset-bottom`).
 
 Tokens: `--cy-sheet-radius`, `--cy-sheet-width-{sm,md,lg}`, `--cy-sheet-max-height` (and the Dialog tokens for padding and scrim).
-
-## Used by
-
-Aperture (inspector panel), web apps (mobile navigation, filters on phones), extension side panels.

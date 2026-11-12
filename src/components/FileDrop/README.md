@@ -36,7 +36,3 @@ import { FileDrop } from "@arshad-shah/cynosure";
 - `--cy-file-drop-radius`
 - `--cy-file-drop-active-background`: while files are dragged over
 - `--cy-file-drop-overlay-background`: the whole-window overlay
-
-## Used by
-
-Imports, attachments and uploads in the web apps and extensions (cross-product audit, 2026-11-10).

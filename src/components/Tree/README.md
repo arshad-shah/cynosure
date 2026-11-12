@@ -28,7 +28,3 @@ Tokens: `--cy-tree-indent`, `--cy-tree-row-height`, `--cy-tree-selected-bg`.
 
 - `onAction(item)`: Enter or a double-click runs an item's default action (open it, copy its path); Space still selects.
 - A `selected` value changed from outside (search next/previous) moves the tab stop to that item and scrolls it into view, even in a virtual tree, without taking focus from where the person is. Its ancestors must be expanded.
-
-## Used by
-
-Prism (the JSON and XML document tree: `src/ui/VirtualTree.tsx`, virtual with custom rows), aperture-css (DOM tree panel), verql (schema browser).

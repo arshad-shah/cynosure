@@ -36,7 +36,3 @@ import { Container } from "@arshad-shah/cynosure";
 - `--cy-container-padding`: side gutters when the `padding` prop is not set (default `--cy-space-6`)
 
 Set them with `createTheme({ components: { container: { sizeLg: "1100px" } } })`.
-
-## Used by
-
-Planr (the page column of every screen inside AppShell's main area, replacing its `.planr-page` class) and the tools app (page width and gutters of each tool page).

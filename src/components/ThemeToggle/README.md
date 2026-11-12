@@ -17,7 +17,3 @@ const { mode } = useColorMode();
 | `labels`                   | English         | `label`, `light`, `dark`, `system`                                           |
 | `size`                     | `md`            | Shared vocabulary                                                            |
 - `variant="cycle"`: one icon button that steps light, dark, system, for tight headers. Its name says the current mode and the next ("Colour mode: Light. Switch to Dark"); `labels.cycle(current, next)` overrides it.
-
-## Used by
-
-Every product with a theme switch: Prism, Aperture, Planr, portfolio, nimaz-web.

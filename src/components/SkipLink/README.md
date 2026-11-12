@@ -39,7 +39,3 @@ The ref goes to the `a` element.
 - `--cy-skip-link-background`: background of the shown link (`--cy-color-surface-raised`)
 - `--cy-skip-link-color`: text colour of the shown link (`--cy-color-accent-text`)
 - `--cy-skip-link-radius`: corner radius (`--cy-radius-md`)
-
-## Used by
-
-SiteHeader (every document-scrolled site: marketing pages and docs built with Astro or React) and AppShell (every app frame), so the library has one skip link.

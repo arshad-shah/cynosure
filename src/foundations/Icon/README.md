@@ -16,7 +16,3 @@ import { search } from "@arshad-shah/cynosure/icons";
 - Tokens: `--cy-icon-size-{sm,md,lg}`, `--cy-icon-stroke` (1.75).
 - Motion: plays when an ancestor has `.cy-motion-trigger` and is hovered, keyboard-focused or `[data-active]`. Durations follow `--cy-motion-slow`; reduced motion turns it off.
 - Add icons with `pnpm cy new icon <name> --from file.svg`. See `docs/icons.md`.
-
-## Used by
-
-Every component that shows an icon; all products.

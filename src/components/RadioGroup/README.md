@@ -26,7 +26,3 @@ One choice from a short list, on native radios: arrow keys move and select (wrap
 ## Tokens
 
 - `--cy-radio-group-gap`, plus `--cy-checkbox-border` for the ring
-
-## Used by
-
-Aperture (settings), Planr (repeat options), Verql (connection type), Stepframe (mode selection).

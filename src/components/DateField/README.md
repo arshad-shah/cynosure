@@ -26,7 +26,3 @@ import { DateField } from "@arshad-shah/cynosure";
 ## Tokens
 
 None of its own: it follows TextField, Popover and Calendar.
-
-## Used by
-
-The tools app's date inputs (in seven tools), Verql's query filters and Planr's task dates.

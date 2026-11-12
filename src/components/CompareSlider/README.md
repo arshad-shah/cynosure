@@ -23,7 +23,3 @@ import { CompareSlider } from "@arshad-shah/cynosure";
 
 - `--cy-compare-slider-divider`: divider and grip colour
 - `--cy-compare-slider-grip-size`
-
-## Used by
-
-The tools app's image editors (compare an edit with the original) and before/after showcases on the sites.

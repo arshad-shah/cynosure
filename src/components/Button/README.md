@@ -34,7 +34,3 @@ Every variant × tone pair is distinct and keeps text at ≥ 4.5:1 (tested). Sof
 - `aria-current`: set on the element in both forms. A link to the page being shown takes `aria-current="page"` (as Pagination does with `getHref`), so a screen reader says "current page".
 - `confirm`: ask before acting, in place. The first press shows this text ("Press again to delete"); a second press within 4 seconds acts; Escape, leaving or the timeout disarms it.
 - `keepFocus`: a pointer press leaves focus where it was, for on-screen keypads beside a field.
-
-## Used by
-
-Every product (all action buttons).

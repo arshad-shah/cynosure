@@ -47,7 +47,3 @@ The geometry helpers are exported for your own tools: `moveBy`, `resizeBy`, `res
 ## Tokens
 
 - `--cy-selection-frame-color`, `--cy-selection-frame-handle-size`
-
-## Used by
-
-Fill-and-sign fields and the crop tool in the tools app, and canvas or page editors in other products.

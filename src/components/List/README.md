@@ -69,8 +69,3 @@ The forwarded ref is the `ul` or `ol`.
 - `--cy-list-divider-color`: colour of the line with `divided` (`--cy-color-line`)
 
 Set them with `createTheme({ components: { list: { markerGap: "12px" } } })`.
-
-## Used by
-
-- Products' getting-started and how-to pages: numbered steps with a description each (reported missing by a product team migrating to Cynosure).
-- Pricing and feature sections: ticked and icon lists.

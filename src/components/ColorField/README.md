@@ -23,7 +23,3 @@ A colour input. Type any CSS colour (a hex code, `rgb()`, `hsl()`, `oklch()` or 
 Tokens: `--cy-color-field-swatch-size`, `--cy-color-field-area-height`, `--cy-color-field-picker-width` (and TextField's for the field).
 
 Pass `swatches` (any CSS colours, or `{ value, label }`) to offer brand, preset or recent colours in the picker as a [ColorSwatches](../ColorSwatches/README.md) group; keep recent colours yourself.
-
-## Used by
-
-aperture-css (colour properties in the inspector, with the eyedropper), css-inspector and tools (colour inputs), products' theme settings (accent pickers).

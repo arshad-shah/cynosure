@@ -7,7 +7,3 @@ A `TextField` preset for search: `role="searchbox"`, the Facet `search` icon, cl
 ```
 
 All `TextField` props apply except `type` and `iconStart`.
-
-## Used by
-
-Prism (document search), Aperture (selector search), Planr, Verql (table filter), Stepframe.

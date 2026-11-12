@@ -45,7 +45,3 @@ A Section fills its parent's width; it never breaks out of it. For bands that ru
 - `--cy-section-accent`: background of `variant="accent"` (`--cy-color-accent-soft`)
 
 Set them with `createTheme({ components: { section: { paddingBlock: "6rem" } } })`.
-
-## Used by
-
-Marketing and documentation sites built with Astro or React (the hero, feature, pricing and call-to-action bands of a landing page), which asked for it in place of hand-written full-width wrappers.

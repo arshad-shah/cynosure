@@ -31,7 +31,8 @@ Node 24 (`.nvmrc`), pnpm via `packageManager` (installs refuse versions younger 
 5. **Behavioural tests only.** Every story has play tests that fail when the behaviour breaks: pointer, keyboard, touch, focus, values, disabled, a11y, hostile host. No "renders" or snapshot-only tests. Write the failing test first.
 6. **Touch and a11y.** Hit area ≥ 24px always, ≥ 44px on coarse pointers. WAI-ARIA APG patterns. Built-in strings are English and overridable through a typed `labels` prop.
 7. **One runtime dependency: `@arshad-shah/detent`** (Arshad's own zero-dependency drag, reorder and resize library) for pointer dragging; use it (through `useDrag` in `src/foundations/drag.ts`) instead of hand-written drag code. Ask before adding any other.
-8. **Docs move with code.** Every component has a README with `## Used by`; every folder rule lives in that folder's `AGENTS.md`.
+8. **Docs move with code.** Every component has a README and a docs page; every folder rule lives in that folder's `AGENTS.md`.
+9. **Own your styles, reuse components.** A component's one stylesheet (`<kebab-folder>.css`) styles only its own classes; to use another component's look, render it and set its tokens, never borrow or override its classes. Hidden text is `.cy-visually-hidden`. See "Ownership" in `docs/conventions.md` (`cy check` enforces it).
 
 ## Git, branches and publishing
 

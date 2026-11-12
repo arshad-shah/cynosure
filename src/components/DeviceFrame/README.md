@@ -45,7 +45,3 @@ import { DeviceFrame } from "@arshad-shah/cynosure";
 - `--cy-device-frame-browser-radius`: browser window corners
 - `--cy-device-frame-browser-bar`: browser bar fill
 - `--cy-device-frame-dot`: the three window dots
-
-## Used by
-
-Product sites and the documentation site (app screenshots and live demos on landing pages), and store listings drafted from the same pages.

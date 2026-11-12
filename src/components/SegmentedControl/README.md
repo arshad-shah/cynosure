@@ -19,7 +19,3 @@ A compact single choice (view switchers, modes, theme) on native radios: arrow k
 ## Tokens
 
 - `--cy-segmented-control-{radius,track-bg,active-bg,padding}`
-
-## Used by
-
-Prism (Tree / Raw), Aperture (panel modes), ThemeToggle, Stepframe (view modes), Verql (result views).

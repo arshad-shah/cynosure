@@ -33,7 +33,3 @@ import { Skeleton } from "@arshad-shah/cynosure";
 - `--cy-skeleton-color`: placeholder fill (default: a translucent ink tint, so it shows on any surface)
 - `--cy-skeleton-highlight`: the sweeping band
 - `--cy-skeleton-radius`: corners of text lines and blocks
-
-## Used by
-
-Lists, cards and panels that load data in the web apps and extensions (cross-product audit, 2026-11-10), in place of their own loading placeholders.

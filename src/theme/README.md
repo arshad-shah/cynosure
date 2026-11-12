@@ -32,7 +32,3 @@ export function App() {
 ```astro
 <script is:inline set:html={themeInitScript()} />
 ```
-
-## Used by
-
-All products (theme root).

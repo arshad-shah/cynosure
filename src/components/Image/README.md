@@ -44,7 +44,3 @@ import { Image } from "@arshad-shah/cynosure";
 - `--cy-image-fallback-color`: icon and text colour of the default fallback
 - `--cy-image-caption-gap`: space between the picture and its caption
 - `--cy-image-caption-color`: text colour of the caption
-
-## Used by
-
-Screenshots and figures in the documentation site's guides, and thumbnails and previews of people's pictures in the tools app, in place of bare `img` elements with their own loading and error handling.

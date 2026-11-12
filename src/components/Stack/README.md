@@ -24,7 +24,3 @@ Vertical layout with token gaps (`gap="1"` … `"10"` map to `--cy-space-*`), al
 - Padding is a space token (`--cy-space-*`) applied with logical properties, inside the stack's width. `"0"` is a value: `padding="4" paddingInline="0"` pads the top and bottom only.
 - A nested Stack or Inline has no padding unless it asks for it; it never inherits its parent's.
 - `space.ts` in this folder holds the `Space` type and the padding props and logic shared with Inline, Grid and Container.
-
-## Used by
-
-Every product layout (toolbars, forms, settings panels, cards).

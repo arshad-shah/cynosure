@@ -33,7 +33,3 @@ const steps = [
 - `--cy-steps-marker-size`: diameter of the numbered marker (default: twice the text size)
 - `--cy-steps-line-width`: thickness of the line between steps
 - `--cy-steps-gap`: space around the lines
-
-## Used by
-
-Onboarding and setup flows, multi-step forms and import wizards in the web apps and extensions (cross-product audit, 2026-11-10).

@@ -35,7 +35,3 @@ import { SplitPane } from "@arshad-shah/cynosure";
 
 - `--cy-split-pane-divider-size`: line thickness
 - `--cy-split-pane-divider`: line colour
-
-## Used by
-
-Editors, inspectors and list–detail views in the web apps and extensions (cross-product audit, 2026-11-10).

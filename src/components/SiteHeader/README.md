@@ -59,7 +59,3 @@ The ref goes to the `header` element.
 - `--cy-site-header-link-color`: navigation links (`--cy-color-muted`)
 - `--cy-site-header-link-current-color`: the current and hovered link (`--cy-color-ink`)
 - `--cy-site-header-link-highlight`: background of the current and hovered link (`--cy-color-soft`)
-
-## Used by
-
-Marketing and documentation sites built with Astro or React, which reported that AppShell, an app frame with its own scrolling area, does not suit a page that scrolls as a document.

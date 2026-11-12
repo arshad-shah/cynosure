@@ -24,7 +24,3 @@ A native checkbox under a drawn Facet box: forms (`FormData`, reset, `required`)
 - `--cy-checkbox-{size,radius,border}`
 - `--cy-checkbox-done-color`: label and description colour of a checked `strikeWhenChecked` row (default `--cy-color-muted`; keep it at 4.5:1 or more)
 - `--cy-checkbox-strike-width`: thickness of the strike (default: the border width, or 1/16 of the text size when that is larger)
-
-## Used by
-
-Planr (task lists), Aperture (settings), Prism (preferences), Verql (row selection), request-interceptor (rule toggles).

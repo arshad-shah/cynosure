@@ -36,7 +36,3 @@ APG tabs: `Tabs` holds the selection, `TabList` (named) holds `Tab`s, each `TabP
 Tokens: `--cy-tabs-gap`, `--cy-tabs-indicator`, `--cy-tabs-indicator-width`, `--cy-tabs-radius`.
 
 **Printing:** a printout has every panel, in order. TabPanel renders the content of unselected panels while the page is printed (`beforeprint`), and the print stylesheet shows them.
-
-## Used by
-
-Prism (tree / raw / schema views), Aperture panels, settings pages.

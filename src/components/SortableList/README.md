@@ -25,7 +25,3 @@ import { SortableList } from "@arshad-shah/cynosure";
 ## Tokens
 
 - `--cy-sortable-list-item-background`, `--cy-sortable-list-radius`, `--cy-sortable-list-tile-min` (smallest tile width in a grid)
-
-## Used by
-
-Ordering sidebar sections, favourites, steps and priorities in the web apps and extensions (cross-product audit, 2026-11-10).

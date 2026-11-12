@@ -61,7 +61,3 @@ function Toolbar() {
 
 - `--cy-app-shell-nav-background`, `--cy-app-shell-header-background`
 - `--cy-app-shell-border`: lines between the bar, navigation and content
-
-## Used by
-
-The layouts of the web apps and the extensions' full-page views (cross-product audit, 2026-11-10).

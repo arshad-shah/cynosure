@@ -71,7 +71,3 @@ import { folder } from "@arshad-shah/cynosure/icons";
 - `--cy-avatar-ring-color`: colour of the ring around grouped avatars and the status dot
 - `--cy-avatar-ring-width`: width of that ring
 - `--cy-avatar-overlap`: how far each avatar in a group slides over the one before it
-
-## Used by
-
-Planr (people assigned to a task, shared calendars), Verql (workspace members and who ran a query), the tools app (account menu), the docs site (contributors).

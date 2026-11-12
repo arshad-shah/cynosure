@@ -22,7 +22,3 @@ import { HoverCard } from "@arshad-shah/cynosure";
 ## Tokens
 
 - `--cy-hover-card-background`, `--cy-hover-card-radius`, `--cy-hover-card-padding`, `--cy-hover-card-offset`
-
-## Used by
-
-The tools app's page rails and file grids (page and image previews), and Aperture's element previews.

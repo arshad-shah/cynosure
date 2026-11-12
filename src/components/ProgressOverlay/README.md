@@ -22,7 +22,3 @@ Built from Dialog, ProgressBar and Button: focus moves in, stays in, and returns
 ## Tokens
 
 None of its own: it uses the Dialog and ProgressBar tokens.
-
-## Used by
-
-The tools app's long document jobs (PDF compress, merge and convert) and exports in the web apps.

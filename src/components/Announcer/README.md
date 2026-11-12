@@ -38,7 +38,3 @@ function SaveButton() {
 ## Tokens
 
 None: the regions are never seen.
-
-## Used by
-
-Save, copy, filter and search feedback in the web apps and extensions (cross-product audit, 2026-11-10), in place of hand-made live regions.

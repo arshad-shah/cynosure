@@ -9,7 +9,3 @@ A square `Button` with only an icon. `label` is required: it is the accessible n
 The tooltip opens on hover and keyboard focus and closes on Escape, blur or pointer leave. All `Button` props and tokens apply (except `children`, `iconEnd` and `fullWidth`).
 
 `aria-current` (for example `"page"`) is set on the element whether it is a button or, with `href`, a link.
-
-## Used by
-
-Prism, Aperture, SonicTap, Stepframe, Planr (toolbar actions).

@@ -19,7 +19,3 @@ Inline text link built on `LinkBase` (safe schemes only). Tone colours use each 
 ## Tokens
 
 - `--cy-link-underline-offset`, `--cy-link-underline-thickness`
-
-## Used by
-
-Every product (docs links, settings help, portfolio, nimaz-web, extension popups).

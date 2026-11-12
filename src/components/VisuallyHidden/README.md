@@ -38,7 +38,3 @@ The ref goes to the rendered element.
 ## Tokens
 
 None. The hidden size is `--cy-border-width`, one pixel.
-
-## Used by
-
-Marketing and documentation sites built on Cynosure, which asked for it in place of a hand-written `sr-only` class: headings for sections that are introduced visually, and the extra words after short "Read more" links. Inside the library, every component that hides text uses the same rule.

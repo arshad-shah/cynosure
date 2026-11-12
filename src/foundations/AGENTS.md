@@ -4,7 +4,8 @@ The **only** modules allowed to render native interactive elements (`button`, `a
 
 - Create with `pnpm cy new component <Name> --kind foundation`.
 - Foundations are thin: semantics, refs, form behaviour (`type="button"` default, FormData, reset), no visual opinions except Icon.
-- Each foundation still needs stories with play tests and a README with `## Used by`.
+- Each foundation still needs stories with play tests and a README.
+- **Who builds on a foundation** (`FOUNDATION_USERS` in `tools/cli/lib/check.ts`, enforced by `cy check`): only composites whose element no component covers. ButtonBase: Button, and patterns that are buttons but not Buttons (Card as a whole-card button, Disclosure's trigger, Menu items, Select's trigger and options, SideNav entries, Steps, Table's sort headers, Tabs, ColorSwatches' swatches). LinkBase: Link, Button's link form, Card as a whole-card link, SideNav entries. InputBase: TextField, and CommandPalette's combobox input. TextAreaBase: TextArea. ChoiceBase: Checkbox and SegmentedControl. DialogBase: Dialog and CommandPalette. FileInputBase: FileDrop and KeyValueEditor's file picker. Everyone else uses those components. Icon and HiddenValue are parts any component may use.
 - If a composite needs a native element that has no foundation, add the foundation here first; never inline the element in the composite (`cy check` fails with `native-elements`).
 
 Shared hooks also live here: `roving-focus.ts` (`useRovingFocus`), `field.ts` (`useField`), `client-layout-effect.ts` (`useClientLayoutEffect`), `virtual-window.ts` (`useVirtualWindow`: windowing for equal-height rows, sized by CSS and always rendering the focused row; used by Tree and VirtualList; `sizes` and `gap` for rows of different sizes, as DocumentViewport's pages) and `hotkey.ts` (`useHotkey`: global shortcuts that work in shadow roots, skip plain keys in text fields, and honour `data-cy-hotkeys="off"`; unit-tested in `tests/unit/hotkey.test.tsx`).

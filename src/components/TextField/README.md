@@ -26,7 +26,3 @@ Works in native forms: `FormData`, `form.reset()` and `required` validation.
 ## Tokens
 
 - `--cy-text-field-{height-sm,height-md,height-lg,radius,padding-inline,bg,border,soft-bg}`
-
-## Used by
-
-Every product form: Prism search, Aperture settings, Planr tasks, Verql connections, Stepframe inputs.

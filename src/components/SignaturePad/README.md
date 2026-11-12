@@ -32,7 +32,3 @@ Helpers: `inkToSvg(strokes, { width, height, ink, weight })` for saving or placi
 ## Tokens
 
 - `--cy-signature-pad-ink`, `--cy-signature-pad-background`, `--cy-signature-pad-height`, `--cy-signature-pad-guide`
-
-## Used by
-
-Signing PDFs in the tools app (fill and sign), and any product that collects a signature.

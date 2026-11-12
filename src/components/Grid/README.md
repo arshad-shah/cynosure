@@ -67,7 +67,3 @@ import { Grid, GridItem } from "@arshad-shah/cynosure";
 | `hideBelow` / `hideAbove`, `id`, `role`, `aria-*` | –       | As on Grid                                                                                                         |
 
 **Unequal columns that change with the width:** give the grid equal columns per breakpoint and the items a span per breakpoint. `columns={{ base: 1, md: 3 }}` with a main item of `span={{ md: 2 }}` is one column on phones and two to one from `md`; `order={{ base: 2, md: 1 }}` moves it after its sibling on phones only. Item spans and orders per breakpoint follow the grid's own width, like its columns.
-
-## Used by
-
-Card galleries, dashboards and settings layouts in the web apps and sites (cross-product audit, 2026-11-10), in place of hand-written CSS grids.

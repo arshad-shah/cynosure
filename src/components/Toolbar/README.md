@@ -15,7 +15,3 @@ APG toolbar: a named `role="toolbar"` group with one Tab stop. Arrow keys move b
 - Controls added later join the group automatically.
 
 Props: `label`, `orientation` (`horizontal`), `loop` (`true`), `className`/`style` (layout only). Tokens: `--cy-toolbar-gap`, `--cy-toolbar-padding`.
-
-## Used by
-
-Editor and viewer chrome (Prism tree actions, Aperture panels), table headers, extension popups.

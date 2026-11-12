@@ -49,7 +49,3 @@ qrPath(matrix, 4); // path data, one unit per module, offset by the quiet zone
 - `--cy-qr-code-size-{sm,md,lg}`: width and height per size
 - `--cy-qr-code-icon-size`: the centred icon, as a share of the width
 - `--cy-qr-code-radius`: corner radius of the square
-
-## Used by
-
-Product sites (a link to the mobile app or the extension store on a desktop page) and sharing panels (an invite or a sign-in link to open on a phone).

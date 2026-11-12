@@ -21,7 +21,3 @@ Small status or category label in Cynosure's mono "eyebrow" style. Every tone ×
 ## Tokens
 
 - `--cy-badge-{radius,tracking,soft-mix}`
-
-## Used by
-
-Prism (node kinds), Aperture (property states), Planr (categories), Verql (column types), extension popups (status).

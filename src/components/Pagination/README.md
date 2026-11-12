@@ -65,7 +65,3 @@ Helpers, exported beside the component:
 - `--cy-pagination-muted-color`: colour of the ellipsis and of the "Page 3 of 10" text
 
 Heights, radius and colours of the controls are Button's tokens (`--cy-button-*`).
-
-## Used by
-
-The companion to [Table](../Table/README.md): paged member lists, history and log views in the web apps (Verql, Planr), and paged lists on product documentation sites, where `getHref` gives every page its own address.

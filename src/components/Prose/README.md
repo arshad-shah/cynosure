@@ -25,7 +25,3 @@ import { Prose } from "@arshad-shah/cynosure";
 - `--cy-prose-flow`: space between blocks (default 1em)
 - `--cy-prose-link`: link colour (default the accent text colour)
 - `--cy-prose-code-background`: inline code and code block background
-
-## Used by
-
-Docs pages, changelogs, release notes and help content in the web apps and sites (cross-product audit, 2026-11-10).

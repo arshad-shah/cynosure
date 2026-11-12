@@ -28,7 +28,3 @@ A search-and-run list of commands in a modal dialog, opened from anywhere with C
 `useHotkey(combo, handler)` is exported too: shortcuts with Ctrl, Command or Alt work everywhere; plain keys ("/") are ignored while typing in a field; `data-cy-hotkeys="off"` opts a subtree out.
 
 Tokens: `--cy-command-palette-width`, `--cy-command-palette-offset`, `--cy-command-palette-list-max-height`.
-
-## Used by
-
-aperture-css (command palette over the inspector), verql and verql-next (query, table and settings commands).

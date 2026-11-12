@@ -43,9 +43,3 @@ The ref is the heading element (`HTMLHeadingElement`).
 - `--cy-heading-line-height`: line height as a number (1.2)
 
 Set them with `createTheme({ components: { heading: { sizeXl: "1.5rem", "size-2xl": "2rem" } } })`.
-
-## Used by
-
-- The docs site: page titles (`level={1}`, `size="display"` on the home page) and section headings.
-- The tools app: tool page titles and the headings of settings groups.
-- Verql and Planr: panel and card headings, where `size` keeps a compact look while `level` follows the page outline.

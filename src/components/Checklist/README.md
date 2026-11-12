@@ -42,7 +42,3 @@ const [subtasks, setSubtasks] = useState<ChecklistItem[]>([{ id: "1", label: "Bu
 - `--cy-checklist-row-gap`: space between a row's checkbox, name and buttons
 
 The checkbox, the strike, the fields, the buttons and the reorderable rows follow the Checkbox, TextField, Button and SortableList tokens.
-
-## Used by
-
-Planr: a task's subtasks, which are added, ticked, renamed in place and removed. This is the one essential use; any product with a list people write and work through uses it too.

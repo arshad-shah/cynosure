@@ -54,7 +54,3 @@ The ref goes to the `footer` element.
 - `--cy-site-footer-border`: the hairline above the footer and above the bottom row (`--cy-color-line`)
 - `--cy-site-footer-padding-block`: space above and below the content and between its rows (`--cy-space-10`)
 - `--cy-site-footer-column-min-width`: least width of a link column before the columns wrap (10rem)
-
-## Used by
-
-Marketing and documentation sites built with Astro or React (product, resources and company links, the copyright line and social links), which reported the gap alongside SiteHeader.

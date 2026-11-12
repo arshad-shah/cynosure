@@ -46,9 +46,3 @@ The forwarded ref is the root `span`.
 - `--cy-icon-tile-icon-scale`: icon size as a fraction of the tile (`0.5`)
 
 Set them with `createTheme({ components: { iconTile: { radius: "4px" } } })`.
-
-## Used by
-
-- Stat: the optional icon at the start of a stat tile.
-- List: `marker="tile"`, for feature lists with an icon per item.
-- Products' feature grids and settings sections, in place of an Avatar with an icon (the product team that reported it missing had used Avatar this way).

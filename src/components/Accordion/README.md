@@ -29,7 +29,3 @@ APG accordion: every header is a Tab stop; Up and Down move between headers (wra
 Tokens: `--cy-accordion-gap` (card spacing) plus the Disclosure tokens.
 
 **Printing:** a printout has every section open. Closed content is always in the page, so the print stylesheet only expands it.
-
-## Used by
-
-Settings pages, FAQs, extension option pages.

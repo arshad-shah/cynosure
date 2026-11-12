@@ -28,7 +28,3 @@ Reduced motion (OS setting or `createTheme({ motion: "reduced" })`) shows three 
 - `--cy-loading-dots-color`: dot colour (default: tone or currentColor)
 - `--cy-loading-dots-duration`: one pulse cycle (default 6 × motion base)
 - `--cy-loading-dots-size-{sm,md,lg}`: font size for each fixed size
-
-## Used by
-
-Button (`loading`), and every product's inline loading states (Prism document load, Aperture licence checks, Planr sync, SonicTap processing).

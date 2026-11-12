@@ -31,7 +31,3 @@ import { DescriptionList } from "@arshad-shah/cynosure";
 - `--cy-description-list-term-width`: widest the term column gets (default 40%)
 - `--cy-description-list-column-gap`: space between terms and details
 - `--cy-description-list-row-gap`: space between rows
-
-## Used by
-
-Settings summaries, record details and review screens in the web apps and extensions (cross-product audit, 2026-11-10).

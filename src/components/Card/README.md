@@ -22,7 +22,3 @@ Interactive cards render through `LinkBase` (`href`, unsafe schemes are not link
 - `--cy-card-edge-width`: thickness of the `edge` (default `--cy-space-2`)
 
 - `actions`: buttons on a clickable card that act on their own (a game card's 2-player mode). They sit over the card's top end, outside its one link or button, so nothing interactive is nested; `style` then goes on the shared frame.
-
-## Used by
-
-Settings panels, plan pickers, dashboard tiles, extension popups. Planr (task cards, with `edge` for the category colour).

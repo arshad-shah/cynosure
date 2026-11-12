@@ -63,7 +63,3 @@ A linked stat is a whole Card, far above the 44px coarse-pointer target. A stati
 - `--cy-stat-value-size-sm`, `--cy-stat-value-size-md`, `--cy-stat-value-size-lg`: value size (`--cy-font-size-xl`, `--cy-font-size-2xl`, `1.45 times --cy-font-size-2xl`)
 
 The frame is a Card: restyle it through the `--cy-card-*` tokens. Set Stat's with `createTheme({ components: { stat: { valueWeight: "500" } } })`.
-
-## Used by
-
-- Product dashboards and admin overviews: KPI tiles (reported missing by a product team migrating to Cynosure).

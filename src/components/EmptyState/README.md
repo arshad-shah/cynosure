@@ -25,7 +25,3 @@ What to show where content will be: no items yet, no search results, nothing sel
 | `size`         | `md`    | `sm` for panels and popups                                                      |
 
 Tokens: `--cy-empty-state-gap`, `--cy-empty-state-padding`, `--cy-empty-state-max-width`.
-
-## Used by
-
-Prism (empty folders, no search results), Aperture (no captures yet), web apps (empty lists and dashboards).

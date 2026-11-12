@@ -25,7 +25,3 @@ Tokens: `--cy-progress-bar-height-{sm,md,lg}`, `--cy-progress-bar-radius`, `--cy
 
 - `segments` (with `offset`): parts drawn end to end, such as a request's timing or a waterfall row. Each has a `label` (read out: "DNS 12, Connect 30") and a `tone` or category `color`.
 - `marker` (with `markerLabel`): a thin mark at a value, such as a budget or target.
-
-## Used by
-
-verql (query and import progress), whetstone (practice session progress), Nimaz (prayer-time countdown), Planr (task progress, per the spec).
