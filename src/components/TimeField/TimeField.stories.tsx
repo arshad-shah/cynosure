@@ -135,6 +135,28 @@ export const ArrowsStepThePartUnderTheCaret: Story = {
   },
 };
 
+export const ArrowsSnapTheMinutesToTheStep: Story = {
+  args: { defaultValue: "09:32", step: 15 },
+  play: async ({ args, canvas, userEvent }) => {
+    const field = canvas.getByRole("textbox", { name: "Start time" }) as HTMLInputElement;
+    field.focus();
+    field.setSelectionRange(4, 4);
+    // Off the step's grid, the first press lands on it (the picker's rows), in the arrow's direction.
+    await userEvent.keyboard("{ArrowDown}");
+    await expect(args.onChange).toHaveBeenLastCalledWith("09:30");
+    await userEvent.clear(field);
+    await userEvent.type(field, "9:52{Enter}{ArrowUp}");
+    await expect(args.onChange).toHaveBeenLastCalledWith("10:00");
+    // Shift: the snap counts as the first of its ten steps.
+    await userEvent.clear(field);
+    await userEvent.type(field, "9:37{Enter}{Shift>}{ArrowUp}{/Shift}");
+    await expect(args.onChange).toHaveBeenLastCalledWith("12:00");
+    // On the grid it moves by whole steps, as before.
+    await userEvent.keyboard("{ArrowUp}");
+    await expect(args.onChange).toHaveBeenLastCalledWith("12:15");
+  },
+};
+
 export const LimitsStopTheArrows: Story = {
   args: { defaultValue: "17:00", min: "09:00", max: "17:30" },
   play: async ({ args, canvas, userEvent }) => {

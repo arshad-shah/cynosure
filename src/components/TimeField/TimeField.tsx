@@ -307,8 +307,18 @@ export function TimeField({
     const colons = shown.slice(0, caret).split(":").length - 1;
     const half = shown.search(/[ap]/i);
     const inHalf = half >= 0 && caret > half;
-    const unit = inHalf ? HALF : colons === 0 ? 3600 : colons === 1 ? 60 * step : 1;
-    const by = (event.key === "ArrowUp" ? 1 : -1) * unit * (event.shiftKey && !inHalf ? 10 : 1);
+    const up = event.key === "ArrowUp";
+    const times = event.shiftKey && !inHalf ? 10 : 1;
+    let by: number;
+    if (!inHalf && colons === 1) {
+      // Minutes move along the step's grid, the picker's rows (:00, :15, :30, :45): off it, the first step lands on it.
+      const m = Math.floor(from / 60) % 60;
+      const off = m % every;
+      const snap = off === 0 ? 0 : up ? Math.min(m - off + every, 60) - m : -off;
+      by = (snap + (up ? 1 : -1) * (times - (snap === 0 ? 0 : 1)) * every) * 60;
+    } else {
+      by = (up ? 1 : -1) * (inHalf ? HALF : colons === 0 ? 3600 : 1) * times;
+    }
     let next = (((from + by) % DAY) + DAY) % DAY;
     if (lo !== null && next < lo) next = lo;
     if (hi !== null && next > hi) next = hi;
