@@ -36,6 +36,7 @@ export { google } from "./google.js";
 export { googlechrome } from "./googlechrome.js";
 export { googlecloud } from "./googlecloud.js";
 export { googledrive } from "./googledrive.js";
+export { googleplay } from "./googleplay.js";
 export { gravatar } from "./gravatar.js";
 export { html5 } from "./html5.js";
 export { instagram } from "./instagram.js";

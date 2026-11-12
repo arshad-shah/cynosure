@@ -13,7 +13,7 @@ Available now (Milestones 1 and 2, and Milestone 3 as it lands):
 - **Structure:** AppShell, Stack, Inline, Grid, SideNav, SplitPane, Card, Toolbar, Tabs, Disclosure, Accordion, Tree, SortableList, VirtualList, DocumentViewport, PanZoomCanvas, ZoomControls.
 - **Overlays:** Tooltip, HoverCard, Popover, FloatingToolbar (`DockedToolbar`), Menu, ContextMenu, Dialog, ProgressOverlay, Sheet, CommandPalette, Toast.
 - **Feedback and display:** Notice, EmptyState, ProgressBar, Steps, LoadingDots, Skeleton, DescriptionList, Table, Prose, CodeBlock, Announcer (`useAnnounce`), Badge, Kbd, Field.
-- **Icons:** 240 Facet icons, 97 brand marks (`@arshad-shah/cynosure/brands`), and `iconToSvg` for pages without React.
+- **Icons:** 250 Facet icons, 98 brand marks (`@arshad-shah/cynosure/brands`), and `iconToSvg` for pages without React.
 
 Milestone 2 is the point at which the per-product migration issues open (Plan 4). Anything a product needs that is still missing goes into Cynosure first.
 
