@@ -125,8 +125,7 @@
     "path": [
       "dist/components/Select/Select.js",
       "dist/foundations/HiddenValue/HiddenValue.js",
-      "dist/styles/select.css",
-      "dist/styles/hidden-value.css"
+      "dist/styles/select.css"
     ],
     "limit": "5 kB",
     "gzip": true
