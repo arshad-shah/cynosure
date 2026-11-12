@@ -45,6 +45,10 @@ The child must be one focusable element (a Button, IconButton or Link). Keep `co
 
 Hover opens after `delay` milliseconds (default `300`). Keyboard focus opens it immediately.
 
+## Only sometimes
+
+`disabled` keeps the tooltip shut and drops the description while the trigger stays mounted (so it keeps focus). Use it for a tooltip needed only sometimes, such as the full text of a label only while it is cut short ([StatusBar](?path=/docs/components-statusbar--docs) segments do this).
+
 ## Props
 
 <ArgTypes of={Stories} />

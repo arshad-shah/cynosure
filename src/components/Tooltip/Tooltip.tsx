@@ -41,13 +41,25 @@ export interface TooltipProps {
    * `flex`, margins.
    */
   className?: string | undefined;
+  /**
+   * Never opens and describes nothing, while the trigger stays where it is (it is not remounted, so it keeps focus):
+   * for a tooltip only needed sometimes, such as the full text of a label only when it is cut short. Default false.
+   */
+  disabled?: boolean;
 }
 
 /**
  * Tooltip in the top layer (Popover API), positioned against its trigger. Opens on hover after `delay` and on
  * keyboard focus; dismissible with Escape; hoverable; never opens on touch (WCAG 1.4.13).
  */
-export function Tooltip({ content, children, placement = "top", delay = 300, className }: TooltipProps) {
+export function Tooltip({
+  content,
+  children,
+  placement = "top",
+  delay = 300,
+  className,
+  disabled = false,
+}: TooltipProps) {
   const id = `cy-tip-${useId().replace(/:/g, "")}`;
   const anchor = useRef<HTMLSpanElement>(null);
   const tip = useRef<HTMLSpanElement>(null);
@@ -58,10 +70,15 @@ export function Tooltip({ content, children, placement = "top", delay = 300, cla
   // Focus that follows a pointer press (mouse or touch) is not keyboard focus: hover handles mouse, touch never opens.
   const pointerFocus = useRef(false);
 
-  const show = useCallback((wait: number) => {
-    clearTimeout(timer.current);
-    timer.current = setTimeout(() => setOpen(true), wait);
-  }, []);
+  const show = useCallback(
+    (wait: number) => {
+      clearTimeout(timer.current);
+      if (!disabled) timer.current = setTimeout(() => setOpen(true), wait);
+    },
+    [disabled],
+  );
+  // Disabled while open (the label stopped being cut short): close.
+  if (disabled && open) setOpen(false);
   const hide = useCallback((wait = 0) => {
     clearTimeout(timer.current);
     timer.current = setTimeout(() => setOpen(false), wait);
@@ -97,7 +114,8 @@ export function Tooltip({ content, children, placement = "top", delay = 300, cla
       }}
     >
       {cloneElement(children, {
-        "aria-describedby": [children.props["aria-describedby"], id].filter(Boolean).join(" "),
+        "aria-describedby":
+          [children.props["aria-describedby"], !disabled && id].filter(Boolean).join(" ") || undefined,
       })}
       <span
         ref={tip}

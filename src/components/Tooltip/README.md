@@ -15,6 +15,7 @@ Short supplementary text for a control, rendered in the top layer (Popover API) 
 | `placement` | `top`   | `top` · `bottom` · `start` · `end`; flips and shifts to stay visible                  |
 | `delay`     | `300`   | Hover delay in ms; keyboard focus opens immediately                                   |
 | `className` | –       | Added to the anchor around the trigger (the box its parent lays out), for layout only |
+| `disabled`  | `false` | Never opens and describes nothing; the trigger stays mounted (a label cut short only) |
 
 Behaviour (WCAG 1.4.13): hoverable, dismissible with Escape, stays while hovered or focused, never opens on touch. Follows its trigger on scroll and resize.
 

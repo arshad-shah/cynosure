@@ -26,6 +26,7 @@ const meta = {
     delay: { control: { type: "number", min: 0, max: 1500, step: 50 } },
     content: { control: "text" },
     className: { control: "text" },
+    disabled: { control: "boolean" },
   },
   parameters: { layout: "centered" },
 } satisfies Meta<typeof Tooltip>;
@@ -78,6 +79,25 @@ export const TouchDoesNotOpen: Story = {
     await userEvent.pointer({ keys: "[TouchA]", target: canvas.getByTestId("trigger") });
     await pause(250);
     await expect(isOpen(tooltip(canvasElement))).toBe(false);
+  },
+};
+
+export const DisabledNeverOpens: Story = {
+  args: { disabled: true },
+  play: async ({ args, canvas, canvasElement, userEvent, step }) => {
+    const trigger = canvas.getByTestId("trigger");
+    await step("hover and keyboard focus open nothing, and nothing describes the trigger", async () => {
+      await userEvent.hover(trigger);
+      await pause(250);
+      await expect(isOpen(tooltip(canvasElement))).toBe(false);
+      await userEvent.unhover(trigger);
+      await userEvent.tab();
+      await expect(trigger).toHaveFocus();
+      await pause(50);
+      await expect(isOpen(tooltip(canvasElement))).toBe(false);
+      await expect(trigger).not.toHaveAttribute("aria-describedby");
+    });
+    await expect(args.disabled).toBe(true);
   },
 };
 
