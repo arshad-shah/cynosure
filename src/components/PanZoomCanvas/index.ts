@@ -1,4 +1,5 @@
 export {
+  type CanvasCorner,
   type CanvasDrag,
   type CanvasPoint,
   type CanvasPress,

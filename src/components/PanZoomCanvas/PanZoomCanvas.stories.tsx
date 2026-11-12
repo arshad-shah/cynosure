@@ -1,8 +1,12 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useEffect, useRef, useState } from "react";
+import { createRoot } from "react-dom/client";
 import { expect, waitFor } from "storybook/test";
+import type { ZoomSetting } from "../../foundations/zoom.js";
+import { createStyleSheet } from "../../styles/inline.js";
 import { computeUnderHostileHost } from "../../test/hostile.js";
 import { Button } from "../Button/Button.js";
+import { ZoomControls } from "../ZoomControls/ZoomControls.js";
 import {
   type CanvasScreen,
   type CanvasView,
@@ -54,9 +58,11 @@ function Board({
         <Button size="sm" onClick={() => canvas.current?.zoomTo(100)}>
           Actual size
         </Button>
-        <Button size="sm" onClick={() => canvas.current?.zoomTo(1000)}>
-          Largest
-        </Button>
+        {rest.maxScale !== undefined && (
+          <Button size="sm" onClick={() => canvas.current?.zoomTo(1000)}>
+            Largest
+          </Button>
+        )}
         <Button
           size="sm"
           onClick={() => canvas.current?.centreOn({ x: 1080, y: 740, width: 120, height: 60 })}
@@ -484,7 +490,13 @@ const textOf = (el: HTMLElement, id: string) =>
   el.querySelector(`[data-testid="${id}"]`)?.textContent as string;
 
 /** Cards the person moves: a press on a card is claimed, so dragging it moves the card, not the view. */
-function Movable({ start = { x: 0, y: 0, scale: 1 } }: { start?: CanvasView }) {
+function Movable({
+  start = { x: 0, y: 0, scale: 1 },
+  overlays,
+}: {
+  start?: CanvasView;
+  overlays?: PanZoomCanvasProps["overlays"];
+}) {
   const [at, setAt] = useState<Record<string, Spot>>({ A: { x: 0, y: 0 }, B: { x: 540, y: 120 } });
   const [view, setView] = useState<CanvasView>(start);
   const [log, setLog] = useState("");
@@ -495,6 +507,7 @@ function Movable({ start = { x: 0, y: 0, scale: 1 } }: { start?: CanvasView }) {
           label="Schema"
           view={view}
           onViewChange={setView}
+          {...(overlays ? { overlays } : {})}
           claimPress={(press) => {
             const id = press.target.closest("[data-node]")?.getAttribute("data-node");
             if (!id) return false;
@@ -736,10 +749,314 @@ export const FingersPanAndPinch: Story = {
   },
 };
 
+/** A schema view with controls in its corners: zoom controls, a legend, a minimap toggle and a status note. */
+function Cornered({ claimed }: { claimed?: string[] }) {
+  const canvas = useRef<PanZoomCanvasHandle>(null);
+  const [view, setView] = useState<CanvasView>({ x: 0, y: 0, scale: 1 });
+  const [map, setMap] = useState(true);
+  const percent = Math.round(view.scale * 100);
+  const zoom: ZoomSetting = { kind: "percent", value: percent };
+  return (
+    <div style={{ inlineSize: 600, blockSize: 400 }}>
+      <PanZoomCanvas
+        ref={canvas}
+        label="Schema"
+        view={view}
+        onViewChange={setView}
+        bounds={BOUNDS}
+        minimap={map}
+        minScale={0.2}
+        maxScale={3}
+        claimPress={(press) => {
+          claimed?.push(press.target.getAttribute("class") ?? press.target.tagName);
+          return false;
+        }}
+        overlays={{
+          "top-start": (
+            <div data-testid="legend" style={{ background: "var(--cy-color-surface)", padding: 8 }}>
+              Legend
+            </div>
+          ),
+          "top-end": (
+            <ZoomControls
+              zoom={zoom}
+              percent={percent}
+              min={20}
+              max={300}
+              onZoomChange={(z) =>
+                z.kind === "percent" ? canvas.current?.zoomTo(z.value) : canvas.current?.fit()
+              }
+            />
+          ),
+          "bottom-start": (
+            <Button size="sm" pressed={map} onClick={() => setMap((m) => !m)}>
+              Minimap
+            </Button>
+          ),
+          "bottom-end": (
+            <div data-testid="note" style={{ background: "var(--cy-color-surface)", padding: 8 }}>
+              Saved
+            </div>
+          ),
+        }}
+      >
+        {NODES.map(card)}
+      </PanZoomCanvas>
+      <output data-testid="view">{JSON.stringify(view)}</output>
+    </div>
+  );
+}
+const near = (a: number, b: number) => Math.abs(a - b) < 1;
+
+export const ControlsInTheCorners: Story = {
+  render: () => <Cornered />,
+  play: async ({ canvas, canvasElement }) => {
+    const r = box(surface(canvasElement));
+    const legend = box(canvas.getByTestId("legend"));
+    const zoom = box(canvas.getByRole("toolbar", { name: "Zoom" }));
+    const toggle = box(canvas.getByRole("button", { name: "Minimap" }));
+    const note = box(canvas.getByTestId("note"));
+    const map = box(canvasElement.querySelector(".cy-pan-zoom-canvas-minimap") as HTMLElement);
+    const inset = legend.left - r.left;
+    await expect(inset).toBeGreaterThan(0);
+    // Each sits in its corner, the same distance in from both edges.
+    await expect(near(legend.top - r.top, inset)).toBe(true);
+    await expect(near(r.right - zoom.right, inset)).toBe(true);
+    await expect(near(zoom.top - r.top, inset)).toBe(true);
+    await expect(near(toggle.left - r.left, inset)).toBe(true);
+    await expect(near(r.bottom - toggle.bottom, inset)).toBe(true);
+    // The minimap keeps the bottom-end corner; that corner's overlay stands above it.
+    await expect(near(r.right - map.right, inset)).toBe(true);
+    await expect(near(r.bottom - map.bottom, inset)).toBe(true);
+    await expect(near(r.right - note.right, inset)).toBe(true);
+    await expect(note.bottom).toBeLessThan(map.top);
+    // They neither pan nor zoom with the content.
+    surface(canvasElement).dispatchEvent(
+      new WheelEvent("wheel", { deltaX: 30, deltaY: 60, bubbles: true, cancelable: true }),
+    );
+    await waitFor(() => expect(viewOf(canvasElement)).toEqual({ x: -30, y: -60, scale: 1 }));
+    await expect(box(canvas.getByTestId("legend"))).toEqual(legend);
+    await expect(box(canvas.getByRole("toolbar", { name: "Zoom" }))).toEqual(zoom);
+  },
+};
+
+export const ControlsKeepTheirOwnPointer: Story = {
+  render: () => {
+    const claimed: string[] = [];
+    return (
+      <>
+        <Cornered claimed={claimed} />
+        <Button
+          size="sm"
+          onClick={(e) => {
+            e.currentTarget.dataset.asked = claimed.join("|");
+          }}
+        >
+          Asked
+        </Button>
+      </>
+    );
+  },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const el = surface(canvasElement);
+    const legend = canvas.getByTestId("legend");
+    const start = { x: 0, y: 0, scale: 1 };
+    // Dragging a control does not pan, nor does the wheel over it; the canvas does not ask to claim it.
+    const l = box(legend);
+    drag(legend, { x: l.left + 5, y: l.top + 5 }, { x: 60, y: 40 });
+    const wheel = new WheelEvent("wheel", { deltaY: 80, bubbles: true, cancelable: true });
+    legend.dispatchEvent(wheel);
+    await expect(wheel.defaultPrevented).toBe(false);
+    // Not even with Space held.
+    el.focus();
+    el.dispatchEvent(new KeyboardEvent("keydown", { key: " ", bubbles: true, cancelable: true }));
+    await waitFor(() => expect(el).toHaveAttribute("data-panning"));
+    drag(legend, { x: l.left + 5, y: l.top + 5 }, { x: 60, y: 40 });
+    el.dispatchEvent(new KeyboardEvent("keyup", { key: " ", bubbles: true }));
+    await expect(viewOf(canvasElement)).toEqual(start);
+    // Ctrl+wheel over a control still zooms the canvas (never the page).
+    const zoomWheel = new WheelEvent("wheel", {
+      deltaY: -100,
+      ctrlKey: true,
+      bubbles: true,
+      cancelable: true,
+    });
+    legend.dispatchEvent(zoomWheel);
+    await expect(zoomWheel.defaultPrevented).toBe(true);
+    await waitFor(() => expect(viewOf(canvasElement).scale).toBeGreaterThan(1));
+    // Their own clicks work: zoom in, and the minimap toggle.
+    const before = viewOf(canvasElement).scale;
+    await userEvent.click(canvas.getByRole("button", { name: "Zoom in" }));
+    await waitFor(() => expect(viewOf(canvasElement).scale).toBeGreaterThan(before));
+    await userEvent.click(canvas.getByRole("button", { name: "Minimap" }));
+    await expect(canvasElement.querySelector(".cy-pan-zoom-canvas-minimap")).toBeNull();
+    await expect(canvas.getByTestId("note")).toBeVisible();
+    // The space between a corner's controls is the background: pressing there pans.
+    await userEvent.click(canvas.getByRole("button", { name: "Minimap" }));
+    const note = box(canvas.getByTestId("note"));
+    const map = box(canvasElement.querySelector(".cy-pan-zoom-canvas-minimap") as HTMLElement);
+    const gap = { x: note.right - 4, y: (note.bottom + map.top) / 2 };
+    await expect(document.elementFromPoint(gap.x, gap.y)).toBe(el);
+    const v = viewOf(canvasElement);
+    drag(el, gap, { x: -25, y: 0 });
+    await waitFor(() => expect(viewOf(canvasElement).x).toBe(v.x - 25));
+    // Only that press was offered to claimPress: the background, never a control.
+    const asked = canvas.getByRole("button", { name: "Asked" });
+    await userEvent.click(asked);
+    await expect(asked.dataset.asked).toBe("cy-pan-zoom-canvas");
+  },
+};
+
+export const ControlsByKeyboard: Story = {
+  render: () => <Cornered />,
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const start = { x: 0, y: 0, scale: 1 };
+    // The canvas, then each corner's controls in reading order: top-end's zoom toolbar, then bottom-start's toggle.
+    await userEvent.tab();
+    await expect(surface(canvasElement)).toHaveFocus();
+    await userEvent.tab();
+    await expect(canvas.getByRole("button", { name: "Zoom out" })).toHaveFocus();
+    // Arrows move within the toolbar; they do not pan the canvas.
+    await userEvent.keyboard("{ArrowRight}{ArrowRight}");
+    await expect(canvas.getByRole("button", { name: "Zoom in" })).toHaveFocus();
+    await expect(viewOf(canvasElement)).toEqual(start);
+    await userEvent.keyboard("{Enter}");
+    await waitFor(() => expect(viewOf(canvasElement).scale).toBeCloseTo(1.1, 5));
+    // Space presses the control; it does not take up the hand tool.
+    await userEvent.tab();
+    await expect(canvas.getByRole("button", { name: "Minimap" })).toHaveFocus();
+    await userEvent.keyboard(" ");
+    await expect(surface(canvasElement)).not.toHaveAttribute("data-panning");
+    await waitFor(() => expect(canvasElement.querySelector(".cy-pan-zoom-canvas-minimap")).toBeNull());
+  },
+};
+
+export const ControlsInRightToLeft: Story = {
+  render: () => (
+    <div dir="rtl">
+      <Cornered />
+    </div>
+  ),
+  play: async ({ canvas, canvasElement }) => {
+    const r = box(surface(canvasElement));
+    const legend = box(canvas.getByTestId("legend"));
+    const zoom = box(canvas.getByRole("toolbar", { name: "Zoom" }));
+    const toggle = box(canvas.getByRole("button", { name: "Minimap" }));
+    const note = box(canvas.getByTestId("note"));
+    const minimap = canvasElement.querySelector(".cy-pan-zoom-canvas-minimap") as HTMLElement;
+    const map = box(minimap);
+    const inset = r.right - legend.right;
+    await expect(inset).toBeGreaterThan(0);
+    // Start is the right in a right-to-left page: the corners mirror.
+    await expect(near(legend.top - r.top, inset)).toBe(true);
+    await expect(near(zoom.left - r.left, inset)).toBe(true);
+    await expect(near(r.right - toggle.right, inset)).toBe(true);
+    await expect(near(note.left - r.left, inset)).toBe(true);
+    await expect(near(map.left - r.left, inset)).toBe(true);
+    // The content and the minimap's maths stay left to right: the origin is at the left, the view box too.
+    const a = box(canvas.getByTestId("node-A"));
+    await expect(near(a.left, r.left)).toBe(true);
+    const seen = box(canvasElement.querySelector(".cy-pan-zoom-canvas-minimap-view") as HTMLElement);
+    await expect(seen.left).toBeCloseTo(map.left + 1, 0);
+    // Pressing the minimap's left edge still looks at the left of the content.
+    drag(minimap, { x: map.left + 2, y: map.top + 2 }, { x: 0, y: 0 });
+    await waitFor(() => expect(viewOf(canvasElement).x).toBeGreaterThan(0));
+  },
+};
+
+export const ControlsOnATouchScreen: Story = {
+  tags: ["touch", "!dev"],
+  render: () => <Cornered />,
+  play: async ({ canvas, canvasElement }) => {
+    const legend = canvas.getByTestId("legend");
+    const l = box(legend);
+    // A finger on a control does not pan, and two fingers there do not pinch.
+    drag(
+      legend,
+      { x: l.left + 5, y: l.top + 5 },
+      { x: 60, y: 40 },
+      { ...mouse, pointerType: "touch", pointerId: 51 },
+    );
+    const touch = (type: string, id: number, x: number) =>
+      (type === "pointerdown" ? legend : window).dispatchEvent(
+        new PointerEvent(type, {
+          bubbles: true,
+          pointerId: id,
+          pointerType: "touch",
+          isPrimary: id === 52,
+          clientX: l.left + x,
+          clientY: l.top + 5,
+        }),
+      );
+    touch("pointerdown", 52, 5);
+    touch("pointerdown", 53, 25);
+    touch("pointermove", 52, 0);
+    touch("pointermove", 53, 200);
+    touch("pointerup", 52, 0);
+    touch("pointerup", 53, 200);
+    await expect(viewOf(canvasElement)).toEqual({ x: 0, y: 0, scale: 1 });
+  },
+};
+
+/** The canvas with a corner control inside a shadow root, as an extension's in-page UI has it. */
+function ShadowCanvas() {
+  const host = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = host.current;
+    if (!el || el.shadowRoot) return;
+    const root = el.attachShadow({ mode: "open" });
+    root.adoptedStyleSheets = [createStyleSheet()];
+    const mount = document.createElement("div");
+    root.append(mount);
+    createRoot(mount).render(<Movable overlays={{ "top-end": <Button size="sm">Fit</Button> }} />);
+  }, []);
+  return <div data-testid="host" ref={host} />;
+}
+
+export const InsideAShadowRoot: Story = {
+  render: () => <ShadowCanvas />,
+  play: async ({ canvas }) => {
+    const host = await canvas.findByTestId("host");
+    const root = host.shadowRoot as ShadowRoot;
+    await waitFor(() => expect(root.querySelector(".cy-pan-zoom-canvas")).toBeTruthy());
+    const el = root.querySelector(".cy-pan-zoom-canvas") as HTMLElement;
+    const inside = (id: string) => root.querySelector(`[data-testid="${id}"]`) as HTMLElement;
+    const view = () => JSON.parse(inside("view").textContent as string) as CanvasView;
+    // A card claimed through the shadow boundary moves; the background pans; the corner's control does neither.
+    const a = box(inside("node-A"));
+    drag(inside("node-A"), { x: a.left + 10, y: a.top + 10 }, { x: 40, y: 0 });
+    await waitFor(() => expect(JSON.parse(inside("at").textContent as string).A).toEqual({ x: 40, y: 0 }));
+    const r = box(el);
+    drag(el, { x: r.left + 300, y: r.top + 300 }, { x: -30, y: 0 });
+    await waitFor(() => expect(view()).toEqual({ x: -30, y: 0, scale: 1 }));
+    const corner = root.querySelector(".cy-pan-zoom-canvas-corner") as HTMLElement;
+    const f = box(corner);
+    await expect(f.width).toBeGreaterThan(0);
+    await expect(near(r.right - f.right, f.top - r.top)).toBe(true);
+    const fit = root.querySelector(".cy-pan-zoom-canvas-overlay") as HTMLElement;
+    drag(fit, { x: f.left + 5, y: f.top + 5 }, { x: 60, y: 0 });
+    await expect(view()).toEqual({ x: -30, y: 0, scale: 1 });
+  },
+};
+
 export const StableUnderHostileHost: Story = {
+  render: () => <Cornered />,
   play: async ({ canvasElement }) => {
-    const props = ["display", "overflow-x", "box-sizing", "position", "font-size", "touch-action"];
-    for (const selector of [".cy-pan-zoom-canvas", ".cy-pan-zoom-canvas-minimap"]) {
+    const props = [
+      "display",
+      "overflow-x",
+      "box-sizing",
+      "position",
+      "font-size",
+      "touch-action",
+      "pointer-events",
+    ];
+    for (const selector of [
+      ".cy-pan-zoom-canvas",
+      ".cy-pan-zoom-canvas-minimap",
+      ".cy-pan-zoom-canvas-corner",
+      ".cy-pan-zoom-canvas-overlay",
+    ]) {
       const { clean, hostile } = computeUnderHostileHost(canvasElement, selector, props);
       await expect({ selector, ...hostile }).toEqual({ selector, ...clean });
     }

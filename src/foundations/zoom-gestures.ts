@@ -32,6 +32,12 @@ export interface ZoomGestureOptions {
    * `true` to leave it alone (it never pans), or nothing for the usual rules. A finger pinching does not move it.
    */
   claim?: ((session: DragSession) => ClaimedPress | boolean | null | undefined) | undefined;
+  /**
+   * Parts of the element that keep their own pointer and wheel (controls drawn over a canvas): given an event's composed
+   * path, true when it starts on one. Presses and fingers there never pan or pinch, and the wheel there is left to the
+   * page; Ctrl/Cmd+wheel still zooms, so the page itself never does.
+   */
+  ignore?: ((path: EventTarget[]) => boolean) | undefined;
 }
 
 /**
@@ -45,10 +51,10 @@ export interface ZoomGestureOptions {
  */
 export function useZoomGestures(
   scroller: RefObject<HTMLElement | null>,
-  { percent, onZoom, onPan, min = MIN_PERCENT, max = MAX_PERCENT, claim }: ZoomGestureOptions,
+  { percent, onZoom, onPan, min = MIN_PERCENT, max = MAX_PERCENT, claim, ignore }: ZoomGestureOptions,
 ) {
-  const latest = useRef({ percent, onZoom, onPan, min, max, claim });
-  latest.current = { percent, onZoom, onPan, min, max, claim };
+  const latest = useRef({ percent, onZoom, onPan, min, max, claim, ignore });
+  latest.current = { percent, onZoom, onPan, min, max, claim, ignore };
   /** True while two fingers are down: the first one's drag must not pan meanwhile. */
   const pinching = useRef(false);
   const [panning, setPanning] = useState(false);
@@ -76,7 +82,7 @@ export function useZoomGestures(
     const onWheel = (e: WheelEvent) => {
       if (!e.ctrlKey && !e.metaKey) {
         const pan = latest.current.onPan;
-        if (!pan) return;
+        if (!pan || latest.current.ignore?.(e.composedPath())) return;
         e.preventDefault();
         pan(-e.deltaX, -e.deltaY);
         return;
@@ -96,7 +102,7 @@ export function useZoomGestures(
       return { distance: Math.hypot(a.x - b.x, a.y - b.y), mid: at((a.x + b.x) / 2, (a.y + b.y) / 2) };
     };
     const onDown = (e: PointerEvent) => {
-      if (e.pointerType !== "touch") return;
+      if (e.pointerType !== "touch" || latest.current.ignore?.(e.composedPath())) return;
       touches.set(e.pointerId, { x: e.clientX, y: e.clientY });
       if (touches.size === 2) {
         pinch = { distance: spread().distance || 1, percent: latest.current.percent };
@@ -139,6 +145,7 @@ export function useZoomGestures(
     onStart: (session) => {
       const { pointerType, path } = session;
       claimed.current = null;
+      if (latest.current.ignore?.(path)) return false;
       const owner = panningRef.current ? null : latest.current.claim?.(session);
       if (owner) {
         if (owner === true) return false;

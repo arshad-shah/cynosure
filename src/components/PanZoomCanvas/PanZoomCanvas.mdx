@@ -70,6 +70,35 @@ claimPress={({ point }) => {
 
 <Canvas of={Stories.DragANodeNotTheView} />
 
+## Controls in the corners
+
+`overlays` places controls over the canvas in its corners: `"top-start"`, `"top-end"`, `"bottom-start"` and `"bottom-end"`, with start and end following the page's direction. They stay put while the content pans and zooms, and keep their own pointer, wheel and keys: pressing or dragging them never pans (not even with Space held) and never reaches `claimPress`, and the wheel over them is theirs, though Ctrl/Cmd+wheel still zooms the canvas rather than the page. The space between a corner's controls is background. The minimap keeps the bottom-end corner, under that corner's overlay.
+
+```tsx
+<PanZoomCanvas
+  ref={canvas}
+  label="Schema"
+  minScale={0.2}
+  maxScale={3}
+  minimap={showMap}
+  overlays={{
+    "top-start": <Legend />,
+    "top-end": (
+      <ZoomControls zoom={zoom} percent={percent} min={20} max={300} onZoomChange={onZoomChange} />
+    ),
+    "bottom-start": (
+      <Button size="sm" pressed={showMap} onClick={() => setShowMap((s) => !s)}>
+        Minimap
+      </Button>
+    ),
+  }}
+>
+  {cards}
+</PanZoomCanvas>
+```
+
+<Canvas of={Stories.ControlsInTheCorners} />
+
 ## Props
 
 <ArgTypes of={Stories} />
@@ -78,7 +107,8 @@ claimPress={({ point }) => {
 
 - **Role:** a named region and tab stop. Zoom changes are announced ("Zoom 125%").
 - **Pointer:** drag the empty background, or hold Space and drag anywhere, to pan; the wheel pans; Ctrl/Cmd+wheel zooms around the pointer. Presses on your content are left to it, and presses `claimPress` claims never pan.
-- **Touch:** one finger pans (or drags a claimed node); two fingers pinch-zoom around their midpoint.
+- **Touch:** one finger pans (or drags a claimed node); two fingers pinch-zoom around their midpoint. Fingers on the corner controls are theirs.
+- **Focus:** the overlays come after the canvas in tab order; the keys below act only while the canvas itself has focus (Ctrl/Cmd zoom keys anywhere inside).
 
 | Key | Does |
 | --- | --- |

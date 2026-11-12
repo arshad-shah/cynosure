@@ -98,6 +98,9 @@ export interface CanvasPressHandlers {
   onEnd?: (drag: CanvasDrag, cancelled: boolean) => void;
 }
 
+/** A corner of the canvas for `overlays`; start and end follow the page's direction. */
+export type CanvasCorner = "top-start" | "top-end" | "bottom-start" | "bottom-end";
+
 export interface PanZoomCanvasLabels {
   /** Announced when the zoom changes. Default "Zoom 125%". */
   zoom: (percent: number) => string;
@@ -135,6 +138,12 @@ export interface PanZoomCanvasProps {
    * `press.point` or look at `press.target`.
    */
   claimPress?: ((press: CanvasPress) => CanvasPressHandlers | boolean | null | undefined) | undefined;
+  /**
+   * Controls drawn over the canvas in its corners (zoom controls, a legend, a minimap toggle): they stay put while the
+   * content pans and zooms, keep their own pointer, wheel and keys, and never start a pan. The minimap keeps the
+   * bottom-end corner, under that corner's overlay.
+   */
+  overlays?: Partial<Record<CanvasCorner, ReactNode>> | undefined;
   /** The content, placed in canvas units (absolutely positioned children). */
   children?: ReactNode;
   /** Replace the built-in English text: the zoom announcement. */
@@ -162,6 +171,11 @@ function screenOf(view: CanvasView, size: { width: number; height: number; dpr: 
   };
 }
 
+const CORNERS: CanvasCorner[] = ["top-start", "top-end", "bottom-start", "bottom-end"];
+/** Whether an event's path starts on a corner's controls (or the minimap), which keep their own pointer. */
+const onCorner = (path: EventTarget[]) =>
+  path.some((t) => t instanceof Element && t.classList.contains("cy-pan-zoom-canvas-corner"));
+
 const DEFAULT_LABELS: PanZoomCanvasLabels = { zoom: (percent) => `Zoom ${percent}%` };
 /** Pixels an arrow key pans (Shift: five times as far). */
 const STEP = 40;
@@ -185,6 +199,7 @@ export const PanZoomCanvas = forwardRef<PanZoomCanvasHandle, PanZoomCanvasProps>
     renderMinimap,
     renderScreen,
     claimPress,
+    overlays,
     children,
     labels,
     className,
@@ -285,6 +300,7 @@ export const PanZoomCanvas = forwardRef<PanZoomCanvasHandle, PanZoomCanvasProps>
     max: maxScale * 100,
     onZoom: (p, at: ZoomAnchor) => zoomAround(p / 100, at ?? centre()),
     onPan: (dx, dy) => go({ ...latest.current, x: latest.current.x + dx, y: latest.current.y + dy }),
+    ignore: onCorner,
     claim: (session) => {
       if (!claimPress) return null;
       const from = toCanvas(session.origin);
@@ -364,6 +380,27 @@ export const PanZoomCanvas = forwardRef<PanZoomCanvasHandle, PanZoomCanvasProps>
       lookAt(point.x - r.left, point.y - r.top);
     },
   });
+  const minimapEl = minimap && bounds && (
+    <div
+      ref={map}
+      className="cy-pan-zoom-canvas-minimap cy-reset"
+      style={{ blockSize: bounds.height * k }}
+      aria-hidden="true"
+    >
+      {renderMinimap && (
+        <div
+          className="cy-pan-zoom-canvas-minimap-content cy-reset"
+          style={{ transform: `scale(${k}) translate(${-bounds.x}px, ${-bounds.y}px)` }}
+        >
+          {renderMinimap()}
+        </div>
+      )}
+      <div
+        className="cy-pan-zoom-canvas-minimap-view cy-reset"
+        style={{ left: seen.x, top: seen.y, width: seen.width, height: seen.height }}
+      />
+    </div>
+  );
 
   return (
     <>
@@ -388,32 +425,17 @@ export const PanZoomCanvas = forwardRef<PanZoomCanvasHandle, PanZoomCanvasProps>
         >
           {children}
         </div>
-        {minimap && bounds && (
-          <div
-            ref={map}
-            className="cy-pan-zoom-canvas-minimap cy-reset"
-            style={{ blockSize: bounds.height * k }}
-            aria-hidden="true"
-          >
-            {renderMinimap && (
-              <div
-                className="cy-pan-zoom-canvas-minimap-content cy-reset"
-                style={{ transform: `scale(${k}) translate(${-bounds.x}px, ${-bounds.y}px)` }}
-              >
-                {renderMinimap()}
-              </div>
-            )}
-            <div
-              className="cy-pan-zoom-canvas-minimap-view cy-reset"
-              style={{
-                insetInlineStart: seen.x,
-                insetBlockStart: seen.y,
-                inlineSize: seen.width,
-                blockSize: seen.height,
-              }}
-            />
-          </div>
-        )}
+        {CORNERS.map((corner) => {
+          const overlay = overlays?.[corner];
+          const withMap = corner === "bottom-end" && minimapEl;
+          if (overlay == null && !withMap) return null;
+          return (
+            <div key={corner} className="cy-pan-zoom-canvas-corner cy-reset" data-corner={corner}>
+              {overlay != null && <div className="cy-pan-zoom-canvas-overlay cy-reset">{overlay}</div>}
+              {withMap}
+            </div>
+          );
+        })}
       </section>
       <span className="cy-visually-hidden" role="status">
         {said.text}

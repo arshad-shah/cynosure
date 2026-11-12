@@ -283,6 +283,7 @@ export {
   pageRange,
 } from "./components/Pagination/index.js";
 export {
+  type CanvasCorner,
   type CanvasDrag,
   type CanvasPoint,
   type CanvasPress,
