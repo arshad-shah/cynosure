@@ -3,6 +3,7 @@ import { useState } from "react";
 import { expect, fn, waitFor } from "storybook/test";
 import { code, info, list } from "../../icons/index.js";
 import { computeUnderHostileHost } from "../../test/hostile.js";
+import { realHover } from "../../test/hover.js";
 import { asIfPrinting } from "../../test/print.js";
 import { Button } from "../Button/Button.js";
 import { Tab, TabList, TabPanel, Tabs } from "./Tabs.js";
@@ -647,5 +648,223 @@ export const PrintsEveryPanel: Story = {
     // After printing the screen is as it was.
     await waitFor(() => expect(canvas.queryByText("Second panel")).toBeNull());
     await expect(canvas.getByRole("tab", { name: "One" })).toHaveAttribute("aria-selected", "true");
+  },
+};
+
+/** An editor's tab strip: closable, reorderable, some with unsaved changes. */
+function Editor({
+  initial = ["a.ts", "b.ts", "c.ts"],
+  dirty = [],
+  width,
+  dir,
+  onClose,
+}: {
+  initial?: string[];
+  dirty?: string[];
+  width?: number;
+  dir?: "rtl";
+  onClose?: (file: string) => void;
+}) {
+  const [files, setFiles] = useState(initial);
+  const [current, setCurrent] = useState(initial[0] as string);
+  const close = (f: string) => {
+    onClose?.(f);
+    setFiles((all) => all.filter((x) => x !== f));
+  };
+  return (
+    <div dir={dir} style={width ? { width } : undefined}>
+      <Tabs value={current} onChange={setCurrent}>
+        <TabList label="Open files" onReorder={setFiles}>
+          {files.map((f) => (
+            <Tab key={f} value={f} dirty={dirty.includes(f)} onClose={() => close(f)}>
+              {f}
+            </Tab>
+          ))}
+        </TabList>
+        {files.map((f) => (
+          <TabPanel key={f} value={f}>
+            Editing {f}
+          </TabPanel>
+        ))}
+      </Tabs>
+      <span data-testid="order" hidden>
+        {files.join(",")}
+      </span>
+    </div>
+  );
+}
+const slotOf = (tab: HTMLElement) => tab.closest(".cy-tab-slot") as HTMLElement;
+const dotOf = (tab: HTMLElement) => slotOf(tab).querySelector(".cy-tab-dirty") as HTMLElement;
+const closeOf = (tab: HTMLElement) => slotOf(tab).querySelector(".cy-tab-close") as HTMLElement;
+const shows = (el: HTMLElement) => getComputedStyle(el).opacity === "1";
+const spied = () => {
+  const spy = fn();
+  (window as unknown as { tabsClosed: typeof spy }).tabsClosed = spy;
+  return spy;
+};
+const closedSpy = () => (window as unknown as { tabsClosed: ReturnType<typeof fn> }).tabsClosed;
+
+export const UnsavedTabShowsADotThatBecomesTheCloseButton: Story = {
+  tags: ["visual"],
+  render: () => <Editor dirty={["a.ts", "b.ts"]} onClose={spied()} />,
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const a = canvas.getByRole("tab", { name: "a.ts" });
+    const b = canvas.getByRole("tab", { name: "b.ts" });
+    const c = canvas.getByRole("tab", { name: "c.ts" });
+    // The name stays the file's; the unsaved state is the tab's description.
+    await expect(b).toHaveAccessibleDescription("Unsaved changes");
+    await expect(c).not.toHaveAccessibleDescription("Unsaved changes");
+    await expect(closeOf(b).querySelector("[aria-label]")).toHaveAttribute(
+      "aria-label",
+      "Close b.ts, unsaved changes",
+    );
+    await expect(closeOf(c).querySelector("[aria-label]")).toHaveAttribute("aria-label", "Close c.ts");
+    // At rest the dot sits where the close button is, selected or not; a saved tab has no dot.
+    await waitFor(() => {
+      expect(shows(dotOf(a))).toBe(true);
+      expect(shows(dotOf(b))).toBe(true);
+      expect(shows(closeOf(b))).toBe(false);
+      expect(shows(closeOf(a))).toBe(false);
+    });
+    await expect(dotOf(c)).toBeNull();
+    const dot = dotOf(b).getBoundingClientRect();
+    const button = closeOf(b).getBoundingClientRect();
+    await expect(Math.abs(dot.left + dot.width / 2 - (button.left + button.width / 2))).toBeLessThan(1.5);
+    // Keyboard focus on the tab turns its dot into the close button.
+    await userEvent.tab();
+    await expect(a).toHaveFocus();
+    await waitFor(() => {
+      expect(shows(dotOf(a))).toBe(false);
+      expect(shows(closeOf(a))).toBe(true);
+    });
+    await userEvent.click(closeOf(b).querySelector("[aria-label]") as HTMLElement);
+    await expect(closedSpy()).toHaveBeenLastCalledWith("b.ts");
+    await expect(orderOf(canvasElement)).toBe("a.ts,c.ts");
+  },
+};
+
+export const HoverTurnsTheDotIntoTheCloseButton: Story = {
+  tags: ["!dev"],
+  render: () => <Editor dirty={["a.ts", "b.ts"]} />,
+  play: async ({ canvas }) => {
+    const b = canvas.getByRole("tab", { name: "b.ts" });
+    await waitFor(() => expect(shows(dotOf(b)), "dot at rest").toBe(true));
+    if (!(await realHover(b))) return;
+    await waitFor(() => {
+      expect(shows(dotOf(b)), "dot on hover").toBe(false);
+      expect(shows(closeOf(b)), "close on hover").toBe(true);
+    });
+    // Only the hovered tab changes.
+    await expect(shows(dotOf(canvas.getByRole("tab", { name: "a.ts" })))).toBe(true);
+    await realHover(b, false);
+    await waitFor(() => {
+      expect(shows(dotOf(b)), "dot after hover").toBe(true);
+      expect(shows(closeOf(b)), "close after hover").toBe(false);
+    });
+  },
+};
+
+export const UnsavedLabelsOverride: Story = {
+  render: () => (
+    <Tabs defaultValue="x" labels={{ unsaved: "Modifié", closeUnsaved: (n) => `Fermer ${n} (modifié)` }}>
+      <TabList label="Fichiers">
+        <Tab value="x" dirty onClose={() => {}}>
+          x.ts
+        </Tab>
+        <Tab value="y" dirty>
+          y.ts
+        </Tab>
+      </TabList>
+    </Tabs>
+  ),
+  play: async ({ canvas, canvasElement }) => {
+    await expect(canvas.getByRole("tab", { name: "x.ts" })).toHaveAccessibleDescription("Modifié");
+    await expect(canvasElement.querySelector(".cy-tab-close [aria-label]")).toHaveAttribute(
+      "aria-label",
+      "Fermer x.ts (modifié)",
+    );
+    // Unsaved without a close button: the dot alone, and the same description.
+    const y = canvas.getByRole("tab", { name: "y.ts" });
+    await expect(y).toHaveAccessibleDescription("Modifié");
+    await expect(closeOf(y)).toBeNull();
+    await waitFor(() => expect(shows(dotOf(y))).toBe(true));
+  },
+};
+
+export const MiddleClickCloses: Story = {
+  render: () => <Editor onClose={spied()} />,
+  play: async ({ canvas, canvasElement }) => {
+    const b = canvas.getByRole("tab", { name: "b.ts" });
+    const at = { bubbles: true, cancelable: true, button: 1, buttons: 4 };
+    // The press does not start the browser's autoscroll.
+    const press = new MouseEvent("mousedown", at);
+    b.dispatchEvent(press);
+    await expect(press.defaultPrevented).toBe(true);
+    b.dispatchEvent(new MouseEvent("mouseup", { ...at, buttons: 0 }));
+    b.dispatchEvent(new MouseEvent("auxclick", { ...at, buttons: 0 }));
+    await expect(closedSpy()).toHaveBeenLastCalledWith("b.ts");
+    await expect(orderOf(canvasElement)).toBe("a.ts,c.ts");
+    // The selected tab stays selected; other buttons do not close.
+    await expect(selected(canvas)).toBe("a.ts");
+    const c = canvas.getByRole("tab", { name: "c.ts" });
+    c.dispatchEvent(new MouseEvent("auxclick", { ...at, button: 2, buttons: 0 }));
+    const left = new MouseEvent("mousedown", { ...at, button: 0, buttons: 1 });
+    c.dispatchEvent(left);
+    await expect(left.defaultPrevented).toBe(false);
+    await expect(orderOf(canvasElement)).toBe("a.ts,c.ts");
+  },
+};
+
+export const MiddleClickLeavesTabsThatCannotClose: Story = {
+  play: async ({ canvas }) => {
+    const raw = canvas.getByRole("tab", { name: "Raw" });
+    const press = new MouseEvent("mousedown", { bubbles: true, cancelable: true, button: 1, buttons: 4 });
+    raw.dispatchEvent(press);
+    // A tab with no onClose keeps the browser's own middle-click behaviour.
+    await expect(press.defaultPrevented).toBe(false);
+    raw.dispatchEvent(new MouseEvent("auxclick", { bubbles: true, cancelable: true, button: 1 }));
+    await expect(canvas.getAllByRole("tab")).toHaveLength(4);
+  },
+};
+
+export const TouchRevealsTheCloseButtonOfAnUnsavedTab: Story = {
+  tags: ["touch", "!dev"],
+  render: () => <Editor dirty={["b.ts"]} onClose={spied()} />,
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const b = canvas.getByRole("tab", { name: "b.ts" });
+    await waitFor(() => expect(shows(dotOf(b))).toBe(true));
+    // A tap selects the tab and shows its close button in place of the dot.
+    await userEvent.pointer({ keys: "[TouchA]", target: b });
+    await expect(selected(canvas)).toBe("b.ts");
+    await waitFor(() => expect(shows(closeOf(b))).toBe(true));
+    const button = closeOf(b).querySelector("[aria-label]") as HTMLElement;
+    const hit = getComputedStyle(button, "::before");
+    await expect(
+      Math.max(button.getBoundingClientRect().height, Number.parseFloat(hit.height) || 0),
+    ).toBeGreaterThanOrEqual(44);
+    await userEvent.pointer({ keys: "[TouchA]", target: button });
+    await expect(closedSpy()).toHaveBeenLastCalledWith("b.ts");
+    await expect(orderOf(canvasElement)).toBe("a.ts,c.ts");
+  },
+};
+
+export const UnsavedTabsInRightToLeft: Story = {
+  render: () => <Editor dir="rtl" dirty={["b.ts"]} />,
+  play: async ({ canvas }) => {
+    const b = canvas.getByRole("tab", { name: "b.ts" });
+    // The dot sits at the tab's end, which is its left edge in right-to-left text.
+    await waitFor(() => expect(shows(dotOf(b))).toBe(true));
+    const dot = dotOf(b).getBoundingClientRect();
+    const label = (b.querySelector(".cy-tab-label") as HTMLElement).getBoundingClientRect();
+    await expect(dot.right).toBeLessThanOrEqual(label.left);
+  },
+};
+
+export const UnsavedTabStableUnderHostileHost: Story = {
+  render: () => <Editor dirty={["a.ts"]} />,
+  play: async ({ canvasElement }) => {
+    const props = ["width", "height", "background-color", "border-radius", "opacity", "inset-inline-end"];
+    const dot = computeUnderHostileHost(canvasElement, ".cy-tab-dirty", props);
+    await expect(dot.hostile).toEqual(dot.clean);
   },
 };

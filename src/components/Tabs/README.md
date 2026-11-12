@@ -17,22 +17,22 @@ APG tabs: `Tabs` holds the selection, `TabList` (named) holds `Tab`s, each `TabP
 </Tabs>;
 ```
 
-| Prop (Tabs)                           | Default           | Notes                                           |
-| ------------------------------------- | ----------------- | ----------------------------------------------- |
-| `value` / `defaultValue` / `onChange` | first enabled tab | Controlled or uncontrolled                      |
-| `activation`                          | `auto`            | `manual`: arrows move focus, Enter/Space select |
-| `size`                                | `md`              | `sm` · `md` · `lg` (control heights)            |
-| `variant`                             | `line`            | `line` underline · `soft` tinted pill           |
-| `labels`                              | –                 | `close(name)`, `moved(name, position, total)`   |
+| Prop (Tabs)                           | Default           | Notes                                                                          |
+| ------------------------------------- | ----------------- | ------------------------------------------------------------------------------ |
+| `value` / `defaultValue` / `onChange` | first enabled tab | Controlled or uncontrolled                                                     |
+| `activation`                          | `auto`            | `manual`: arrows move focus, Enter/Space select                                |
+| `size`                                | `md`              | `sm` · `md` · `lg` (control heights)                                           |
+| `variant`                             | `line`            | `line` underline · `soft` tinted pill                                          |
+| `labels`                              | –                 | `close(name)`, `closeUnsaved(name)`, `unsaved`, `moved(name, position, total)` |
 
-
-`TabList`: `label`, `onReorder(values)` (reorderable tabs). `Tab`: `value`, `icon`, `disabled`, `onClose` (closable tab), `closeLabel` (the close button's name; by default `labels.close` with the tab's text, also when the label is not a plain string). `TabPanel`: `value`, `keepMounted` (keep hidden content mounted). Tabs without a `TabPanel` (e.g. routed content) are valid: they simply omit `aria-controls`.
+`TabList`: `label`, `onReorder(values)` (reorderable tabs). `Tab`: `value`, `icon`, `disabled`, `onClose` (closable tab), `dirty` (unsaved changes), `closeLabel` (the close button's name; by default `labels.close` with the tab's text, also when the label is not a plain string). `TabPanel`: `value`, `keepMounted` (keep hidden content mounted). Tabs without a `TabPanel` (e.g. routed content) are valid: they simply omit `aria-controls`.
 
 - One Tab stop; arrows (RTL aware), Home and End; disabled tabs skipped; Tab moves to the panel.
 - Removing the selected tab selects the one now in its place (or the previous one).
-- **Document tabs.** `onClose` on a Tab adds a close button beside its label, and Delete (or Backspace) on the focused tab closes it; the tab now in its place is selected and focused. The close button is for the pointer: it is out of the tab order and hidden from screen readers, which are told about Delete through `aria-keyshortcuts`. `onReorder` on the TabList lets people drag tabs along the list (through detent; on touch, hold briefly, so a swipe still scrolls) or press Ctrl+Shift (Cmd+Shift) with Left or Right; each move is announced.
+- **Document tabs.** `onClose` on a Tab adds a close button beside its label, and Delete (or Backspace) on the focused tab, or a middle-click on it, closes it (the middle press never starts the browser's autoscroll); the tab now in its place is selected and focused. The close button is for the pointer: it is out of the tab order and hidden from screen readers, which are told about Delete through `aria-keyshortcuts`. `onReorder` on the TabList lets people drag tabs along the list (through detent; on touch, hold briefly, so a swipe still scrolls) or press Ctrl+Shift (Cmd+Shift) with Left or Right; each move is announced.
+- **Unsaved changes.** `dirty` puts a dot where the close button sits; while the tab is hovered or focused (selected or not) the dot gives way to the close button, whose name says the changes are unsaved (`labels.closeUnsaved`, "Close notes.md, unsaved changes"). Screen readers hear the state as the tab's description (`labels.unsaved`, "Unsaved changes"), so its name stays the document's. On touch, a tap focuses the tab and shows the close button.
 - Overflowing lists scroll; edges with hidden tabs fade, and the selected or focused tab is scrolled clear of the fade.
 
-Tokens: `--cy-tabs-gap`, `--cy-tabs-indicator`, `--cy-tabs-indicator-width`, `--cy-tabs-radius`.
+Tokens: `--cy-tabs-dirty` (the unsaved dot, default muted ink), `--cy-tabs-gap`, `--cy-tabs-indicator`, `--cy-tabs-indicator-width`, `--cy-tabs-radius`.
 
 **Printing:** a printout has every panel, in order. TabPanel renders the content of unselected panels while the page is printed (`beforeprint`), and the print stylesheet shows them.

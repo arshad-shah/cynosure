@@ -3,6 +3,7 @@ import {
   type CSSProperties,
   createContext,
   type KeyboardEvent,
+  type MouseEvent,
   type ReactNode,
   useCallback,
   useContext,
@@ -24,6 +25,7 @@ import type { Size } from "../../tokens/schema.js";
 import { IconButton } from "../IconButton/IconButton.js";
 
 export interface TabsTokens {
+  dirty: string;
   gap: string;
   indicator: string;
   indicatorWidth: string;
@@ -39,12 +41,18 @@ declare module "../../tokens/schema.js" {
 export interface TabsLabels {
   /** A closable tab's close button. Default "Close notes.md". */
   close: (name: string) => string;
+  /** The close button of a tab with unsaved changes. Default "Close notes.md, unsaved changes". */
+  closeUnsaved: (name: string) => string;
+  /** The description of a tab with unsaved changes, read after its name. Default "Unsaved changes". */
+  unsaved: string;
   /** Announced after a tab is moved. Default "Moved notes.md to position 2 of 4". */
   moved: (name: string, position: number, total: number) => string;
 }
 
 const DEFAULT_LABELS: TabsLabels = {
   close: (name) => (name ? `Close ${name}` : "Close"),
+  closeUnsaved: (name) => (name ? `Close ${name}, unsaved changes` : "Close, unsaved changes"),
+  unsaved: "Unsaved changes",
   moved: (name, position, total) => `Moved ${name} to position ${position} of ${total}`,
 };
 
@@ -84,7 +92,10 @@ export interface TabsProps {
   size?: Size;
   /** `line`: underline indicator. `soft`: tinted pill. */
   variant?: "line" | "soft";
-  /** Replace the built-in English text: the close button's name and the announcement after a move. */
+  /**
+   * Replace the built-in English text: the close button's name (saved and unsaved), the unsaved description and the
+   * announcement after a move.
+   */
   labels?: Partial<TabsLabels>;
   /** Added to the root element, for layout. */
   className?: string;
@@ -345,10 +356,15 @@ export interface TabProps {
   /** The tab cannot be selected or closed. */
   disabled?: boolean;
   /**
-   * Makes the tab closable (document tabs): a close button beside its label, and Delete on the focused tab. Remove the
-   * tab in response; the one now in its place is selected and focused.
+   * Makes the tab closable (document tabs): a close button beside its label, Delete on the focused tab and a
+   * middle-click. Remove the tab in response; the one now in its place is selected and focused.
    */
   onClose?: (() => void) | undefined;
+  /**
+   * The document has unsaved changes: a dot where the close button sits, which turns into the close button while the
+   * tab is hovered or focused. Announced as the tab's description (`labels.unsaved`), and the close button says so.
+   */
+  dirty?: boolean | undefined;
   /**
    * The close button's name (and tooltip), such as "Close query 3". By default it is `labels.close` with the tab's
    * text: the label itself when it is a string, else the text it renders.
@@ -358,7 +374,7 @@ export interface TabProps {
   children: ReactNode;
 }
 
-export function Tab({ value, icon, disabled, onClose, closeLabel, children }: TabProps) {
+export function Tab({ value, icon, disabled, onClose, closeLabel, dirty = false, children }: TabProps) {
   const { value: current, select, activation, tabId, panelId, panels, labels, refocus } = useTabs("Tab");
   const selected = value === current;
   // A label that is not plain text (a badge, a <strong>) names the close button by the text it renders.
@@ -370,12 +386,16 @@ export function Tab({ value, icon, disabled, onClose, closeLabel, children }: Ta
     const text = labelRef.current?.textContent?.trim() ?? "";
     if (text !== rendered) setRendered(text);
   });
+  const id = tabId(value);
   const tab = (
     <ButtonBase
       role="tab"
-      id={tabId(value)}
+      id={id}
       aria-selected={selected}
       aria-controls={panels.has(value) ? panelId(value) : undefined}
+      // The unsaved state is a description, not part of the name: the name stays the document's (what voice control,
+      // the close button and the panel's label use), and screen readers read the state after it.
+      aria-describedby={dirty ? `${id}-unsaved` : undefined}
       data-value={value}
       disabled={disabled}
       className="cy-tab"
@@ -391,6 +411,15 @@ export function Tab({ value, icon, disabled, onClose, closeLabel, children }: Ta
           refocus.current = "";
           onClose();
         },
+        // A middle-click closes, as in browsers and editors; its press must not start the browser's autoscroll.
+        onMouseDown: (event: MouseEvent<HTMLElement>) => {
+          if (event.button === 1) event.preventDefault();
+        },
+        onAuxClick: (event: MouseEvent<HTMLElement>) => {
+          if (event.button !== 1 || disabled) return;
+          event.preventDefault();
+          onClose();
+        },
       })}
     >
       {icon && <Icon icon={icon} className="cy-tab-icon" />}
@@ -399,24 +428,41 @@ export function Tab({ value, icon, disabled, onClose, closeLabel, children }: Ta
       </span>
     </ButtonBase>
   );
-  if (!onClose) return tab;
+  if (!onClose && !dirty) return tab;
+  const name = plain ?? rendered;
   // The close button sits beside the tab, not in it (a tab is a button). Keyboard users press Delete instead, so it
-  // stays out of the tab order and the accessibility tree; its label is its tooltip.
+  // stays out of the tab order and the accessibility tree; its label is its tooltip. An unsaved tab's dot sits in the
+  // same place, under it, and the stylesheet shows one or the other.
   return (
-    <span className="cy-tab-slot" data-selected={selected ? "" : undefined}>
+    <span
+      className="cy-tab-slot"
+      data-selected={selected ? "" : undefined}
+      data-dirty={dirty ? "" : undefined}
+    >
       {tab}
-      <span className="cy-tab-close cy-reset" aria-hidden="true">
-        <IconButton
-          icon={close}
-          label={closeLabel ?? labels.close(plain ?? rendered)}
-          variant="ghost"
-          tone="neutral"
-          size="sm"
-          tabIndex={-1}
-          disabled={disabled}
-          onClick={() => onClose()}
-        />
-      </span>
+      {dirty && (
+        <>
+          <span className="cy-tab-dirty cy-reset" aria-hidden="true" />
+          {/* Hidden, so outside the accessibility tree (a tablist holds only tabs) but still read as the description. */}
+          <span id={`${id}-unsaved`} hidden>
+            {labels.unsaved}
+          </span>
+        </>
+      )}
+      {onClose && (
+        <span className="cy-tab-close cy-reset" aria-hidden="true">
+          <IconButton
+            icon={close}
+            label={closeLabel ?? (dirty ? labels.closeUnsaved(name) : labels.close(name))}
+            variant="ghost"
+            tone="neutral"
+            size="sm"
+            tabIndex={-1}
+            disabled={disabled}
+            onClick={() => onClose()}
+          />
+        </span>
+      )}
     </span>
   );
 }

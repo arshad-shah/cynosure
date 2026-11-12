@@ -164,12 +164,33 @@
     inset-inline-end: var(--cy-space-1);
     top: 50%;
     translate: 0 -50%;
+    transition: opacity var(--cy-motion-fast) var(--cy-motion-ease);
+  }
+  /* Unsaved changes: a dot centred where the close button is, never in the way of a press on it. */
+  & > .cy-tab-dirty {
+    --_dot: var(--cy-space-4);
+    box-sizing: border-box;
+    position: absolute;
+    inset-inline-end: calc(var(--cy-space-1) + (var(--cy-control-height-sm) - var(--_dot)) / 2);
+    top: 50%;
+    translate: 0 -50%;
+    inline-size: var(--_dot);
+    block-size: var(--_dot);
+    border-radius: 50%;
+    background: var(--cy-tabs-dirty, var(--cy-color-muted));
+    pointer-events: none;
+    transition: opacity var(--cy-motion-fast) var(--cy-motion-ease);
   }
 }
 @media (hover: hover) {
   .cy-tab-slot.cy-tab-slot:not(:hover, :focus-within, [data-selected]) > .cy-tab-close {
     opacity: 0;
   }
+}
+/* The dot turns into the close button while the tab is hovered or focused (selected or not). */
+.cy-tab-slot.cy-tab-slot[data-dirty]:not(:hover, :focus-within) > .cy-tab-close,
+.cy-tab-slot.cy-tab-slot[data-dirty]:is(:hover, :focus-within):has(> .cy-tab-close) > .cy-tab-dirty {
+  opacity: 0;
 }
 .cy-tab-list.cy-tab-list[data-reorderable] .cy-tab {
   user-select: none;
@@ -210,11 +231,15 @@
   .cy-tab-list.cy-tab-list {
     scroll-behavior: auto;
   }
-  .cy-tab.cy-tab {
+  .cy-tab.cy-tab,
+  .cy-tab-slot.cy-tab-slot > * {
     transition: none;
   }
 }
 @media (forced-colors: active) {
+  .cy-tab-slot.cy-tab-slot > .cy-tab-dirty {
+    background: CanvasText;
+  }
   .cy-tab.cy-tab[aria-selected="true"] {
     outline: var(--cy-border-width) solid Highlight;
   }

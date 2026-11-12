@@ -72,11 +72,19 @@ For open files or documents, a Tab with `onClose` gets a close button, and Delet
 
 <Canvas of={Stories.ReorderWithTheKeyboard} />
 
+A middle-click on a closable tab closes it too, as in browsers and editors.
+
+### Unsaved changes
+
+`dirty` marks a document with unsaved changes: a dot sits where the close button is, and turns into the close button while the tab is hovered or focused. The close button's name says so ("Close b.ts, unsaved changes"), and screen readers hear "Unsaved changes" as the tab's description, after its name. Ask before discarding the changes in your `onClose`.
+
+<Canvas of={Stories.UnsavedTabShowsADotThatBecomesTheCloseButton} />
+
 ## Props
 
 <ArgTypes of={Stories} />
 
-`Tab`: `value`, `icon`, `disabled`, `onClose`, `closeLabel`, `children`. The close button is named `labels.close` with the tab's text (a label with markup, such as a badge, is named by the text it shows); give `closeLabel` to name it yourself, such as "Close query 3". `TabList`: `label`, `onReorder`. `Tabs` also takes `labels`: `close(name)` and `moved(name, position, total)`. `TabPanel`: `value`, `keepMounted` (keep the content mounted while hidden, preserving its state; by default only the selected panel renders its content).
+`Tab`: `value`, `icon`, `disabled`, `onClose`, `dirty`, `closeLabel`, `children`. The close button is named `labels.close` with the tab's text (a label with markup, such as a badge, is named by the text it shows); give `closeLabel` to name it yourself, such as "Close query 3". `TabList`: `label`, `onReorder`. `Tabs` also takes `labels`: `close(name)`, `closeUnsaved(name)`, `unsaved` and `moved(name, position, total)`. `TabPanel`: `value`, `keepMounted` (keep the content mounted while hidden, preserving its state; by default only the selected panel renders its content).
 
 ## Behaviour and accessibility
 
@@ -87,11 +95,13 @@ For open files or documents, a Tab with `onClose` gets a close button, and Delet
 | <kbd>Home</kbd> <kbd>End</kbd> | First / last tab |
 | <kbd>Enter</kbd> <kbd>Space</kbd>, click, tap | Select (the only way to select with `activation="manual"`) |
 | <kbd>Delete</kbd> | Close the focused tab (with `onClose`) |
+| Middle-click | Close the tab (with `onClose`), without the browser's autoscroll |
 | <kbd>Ctrl</kbd> or <kbd>Cmd</kbd> + <kbd>Shift</kbd> + Left / Right | Move the focused tab (with `onReorder`); announced |
 
 - **Roles:** `tablist` (named by `label`), `tab` with `aria-selected` and `aria-controls`, and `tabpanel` labelled by its tab.
 - **Hidden panels** stay in the DOM with `hidden`, so `aria-controls` always resolves.
 - **Panels are focusable** (`tabIndex=0`), so keyboard users can reach panels without interactive content.
+- **Unsaved state** is the tab's description (`aria-describedby` to hidden text), not part of its name, so the name stays the document's for voice control and the panel's label.
 - **Forced colors:** the selected tab is outlined with the system highlight colour.
 
 ## Touch
@@ -100,7 +110,7 @@ Each tab has at least a 24px hit area, and 44px on coarse pointers, without chan
 
 ## Theming
 
-Tokens: `--cy-tabs-gap`, `--cy-tabs-indicator` (selected colour, default accent), `--cy-tabs-indicator-width` and `--cy-tabs-radius`.
+Tokens: `--cy-tabs-dirty` (the unsaved dot, default muted ink), `--cy-tabs-gap`, `--cy-tabs-indicator` (selected colour, default accent), `--cy-tabs-indicator-width` and `--cy-tabs-radius`.
 
 ```ts
 createTheme({ components: { tabs: { indicator: "#2563eb", indicatorWidth: "3px" } } });
