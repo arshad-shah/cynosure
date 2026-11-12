@@ -20,11 +20,14 @@ import { OptionIcon, type OptionIconColor } from "../../foundations/option-icon.
 import { chevronDown } from "../../icons/chevron-down.js";
 import type { IconData } from "../../icons/types.js";
 import { useListboxLayer } from "../../overlay/listbox-layer.js";
-import type { Size } from "../../tokens/schema.js";
+import type { DenseSize } from "../../tokens/schema.js";
 import { Field } from "../Field/Field.js";
 import { OptionList, OptionListGroup, OptionListItem, OptionListNote } from "../OptionList/OptionList.js";
 
 export interface SelectTokens {
+  fontSizeXs: string;
+  paddingInlineXs: string;
+  heightXs: string;
   radius: string;
   bg: string;
   border: string;
@@ -76,8 +79,11 @@ export interface SelectProps {
   required?: boolean;
   /** Cannot be opened or changed, and is not submitted. */
   disabled?: boolean;
-  /** Height and text size of the control. Default "md". */
-  size?: Size;
+  /**
+   * Height and text size of the control. Default "md". `xs` (about 20px) is for dense desktop chrome: the trigger is
+   * still 24px to press (44px on coarse pointers); its label is set as for `sm`.
+   */
+  size?: DenseSize;
   /** `outline`, or `soft` (tinted, no border). Default "outline". */
   variant?: "outline" | "soft";
   /** Replace the built-in English text: the placeholder, the empty list and the required message. */
@@ -125,6 +131,7 @@ export function Select({
   className,
   style,
 }: SelectProps) {
+  const iconSize = size === "xs" ? "sm" : "md";
   const listId = `cy-select-${useId().replace(/:/g, "")}`;
   const trigger = useRef<HTMLButtonElement | null>(null);
   const list = useRef<HTMLDivElement | null>(null);
@@ -230,7 +237,7 @@ export function Select({
       description={description}
       error={error ?? (missing && !current ? (labels?.required ?? "Please choose a value.") : undefined)}
       required={required}
-      size={size}
+      size={size === "xs" ? "sm" : size}
       className={className}
       style={style}
     >
@@ -253,11 +260,13 @@ export function Select({
             onClick={() => (open ? close() : openList())}
             onKeyDown={onKeyDown}
           >
-            {selected && <OptionIcon option={selected} plain={disabled} className="cy-select-icon" />}
+            {selected && (
+              <OptionIcon option={selected} plain={disabled} size={iconSize} className="cy-select-icon" />
+            )}
             <span className="cy-select-value" data-placeholder={selected ? undefined : ""}>
               {selected?.label ?? placeholderText}
             </span>
-            <Icon icon={chevronDown} className="cy-select-chevron" />
+            <Icon icon={chevronDown} size={iconSize} className="cy-select-chevron" />
           </ButtonBase>
           <OptionList ref={list} id={listId} aria-labelledby={field.labelId}>
             {options.length === 0 && <OptionListNote>{labels?.empty ?? "No options"}</OptionListNote>}

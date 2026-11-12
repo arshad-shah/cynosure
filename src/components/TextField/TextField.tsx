@@ -15,11 +15,14 @@ import { close } from "../../icons/close.js";
 import { eye } from "../../icons/eye.js";
 import { eyeOff } from "../../icons/eye-off.js";
 import type { IconData } from "../../icons/types.js";
-import type { Size } from "../../tokens/schema.js";
+import type { DenseSize } from "../../tokens/schema.js";
 import { Field } from "../Field/Field.js";
 import { IconButton } from "../IconButton/IconButton.js";
 
 export interface TextFieldTokens {
+  fontSizeXs: string;
+  paddingInlineXs: string;
+  heightXs: string;
   heightSm: string;
   heightMd: string;
   heightLg: string;
@@ -60,8 +63,12 @@ export interface TextFieldProps extends NativeInput {
   onChange?: (value: string) => void;
   /** The native input type. Default "text". */
   type?: "text" | "email" | "url" | "tel" | "password" | "number" | "search";
-  /** Field height and text size. Default "md". */
-  size?: Size;
+  /**
+   * Field height and text size. Default "md". `xs` (about 20px) is for dense desktop chrome: the input still reaches
+   * 24px to press (44px on coarse pointers), and the clear and reveal buttons shrink with it. Its label is set as for
+   * `sm`. Addons keep their own size.
+   */
+  size?: DenseSize;
   /** `outline` (default) or `soft` (tinted, borderless until focus). */
   variant?: "outline" | "soft";
   /** Icon shown before the input. */
@@ -122,6 +129,8 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(function T
   forwarded,
 ) {
   const inner = useRef<HTMLInputElement | null>(null);
+  const dense = size === "xs";
+  const iconSize = dense ? "sm" : "md";
   const [shown, setShown] = useState(false);
   const secret = type === "password" && revealable;
   const [filled, setFilled] = useState(Boolean(value ?? defaultValue));
@@ -158,7 +167,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(function T
       description={description}
       error={error}
       required={required}
-      size={size}
+      size={size === "xs" ? "sm" : size}
       id={id}
       className={className}
       style={style}
@@ -172,7 +181,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(function T
           data-disabled={disabled ? "" : undefined}
         >
           {addonStart}
-          {iconStart && <Icon icon={iconStart} className="cy-text-field-icon" />}
+          {iconStart && <Icon icon={iconStart} size={iconSize} className="cy-text-field-icon" />}
           <InputBase
             ref={ref}
             {...rest}
@@ -195,7 +204,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(function T
               icon={close}
               label={labels?.clear ?? "Clear"}
               variant="ghost"
-              size="sm"
+              size={dense ? "xs" : "sm"}
               onClick={clear}
               className="cy-text-field-clear"
             />
@@ -206,12 +215,12 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(function T
               label={shown ? (labels?.hide ?? "Hide") : (labels?.show ?? "Show")}
               aria-pressed={shown}
               variant="ghost"
-              size="sm"
+              size={dense ? "xs" : "sm"}
               onClick={() => setShown(!shown)}
               className="cy-text-field-clear"
             />
           )}
-          {iconEnd && <Icon icon={iconEnd} className="cy-text-field-icon" />}
+          {iconEnd && <Icon icon={iconEnd} size={iconSize} className="cy-text-field-icon" />}
           {addonEnd}
         </div>
       )}

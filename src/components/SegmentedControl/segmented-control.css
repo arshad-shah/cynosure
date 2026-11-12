@@ -93,6 +93,10 @@
     --_h: var(--cy-control-height-sm);
     font-size: var(--cy-font-size-sm);
   }
+  &[data-size="xs"] {
+    --_h: var(--cy-segmented-control-height-xs, var(--cy-space-7));
+    font-size: var(--cy-segmented-control-font-size-xs, var(--cy-font-size-xs));
+  }
   &[data-size="lg"] {
     --_h: var(--cy-control-height-lg);
     font-size: var(--cy-font-size-lg);
@@ -103,6 +107,12 @@
   }
   &[data-icon-only] .cy-segmented-control-segment {
     padding: 0 var(--cy-space-4);
+  }
+  &[data-size="xs"] .cy-segmented-control-segment {
+    padding: 0 var(--cy-space-4);
+  }
+  &[data-size="xs"][data-icon-only] .cy-segmented-control-segment {
+    padding: 0 var(--cy-space-3);
   }
   &[data-tone="accent"] {
     --_active: var(--cy-color-accent-text);
@@ -121,10 +131,14 @@
   }
 }
 
-/* On touch screens the segments themselves grow to the coarse hit size. */
+/* On touch screens the segments themselves grow to the coarse hit size, except a dense (xs) control's: it keeps its
+   look and only the invisible ::before grows. */
 @media (pointer: coarse) {
   .cy-segmented-control .cy-segmented-control-segment {
     --_hit: var(--cy-hit-coarse, 44px);
     min-block-size: max(calc(var(--_h) - var(--_pad) * 2), var(--_hit));
+  }
+  .cy-segmented-control[data-size="xs"] .cy-segmented-control-segment {
+    min-block-size: calc(var(--_h) - var(--_pad) * 2);
   }
 }

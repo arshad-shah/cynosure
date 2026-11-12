@@ -10,7 +10,7 @@ const meta = {
   component: TextField,
   args: { label: "Email", placeholder: "you@example.com", onChange: fn(), size: "md", variant: "outline" },
   argTypes: {
-    size: { control: "inline-radio", options: ["sm", "md", "lg"] },
+    size: { control: "inline-radio", options: ["xs", "sm", "md", "lg"] },
     variant: { control: "inline-radio", options: ["outline", "soft"] },
     type: { control: "select", options: ["text", "email", "url", "tel", "password", "number"] },
     label: { control: "text" },
@@ -140,6 +140,67 @@ export const RevealASecret: Story = {
     await userEvent.click(canvas.getByRole("button", { name: "Hide" }));
     await expect(field).toHaveAttribute("type", "password");
     await expect(field).toHaveValue("sk-123");
+  },
+};
+
+const shellOf = (input: HTMLElement) => input.closest(".cy-text-field") as HTMLElement;
+
+export const ExtraSmallForDenseChrome: Story = {
+  args: { size: "xs", label: "Filter", iconStart: search, clearable: true, defaultValue: "orders" },
+  render: (args) => (
+    <div style={{ display: "grid", gap: 16, maxWidth: 280 }}>
+      <TextField {...args} />
+      <TextField {...args} size="sm" label="Small" />
+      <TextField size="xs" label="Token" type="password" revealable defaultValue="sk-123" />
+    </div>
+  ),
+  play: async ({ canvas, args, userEvent }) => {
+    const xs = canvas.getByRole("textbox", { name: "Filter" });
+    const sm = canvas.getByRole("textbox", { name: "Small" });
+    const shell = shellOf(xs).getBoundingClientRect();
+    // A 20px field with smaller text and icon than sm's.
+    await expect(shell.height).toBe(20);
+    const size = (el: Element) => Number.parseFloat(getComputedStyle(el).fontSize);
+    await expect(size(xs)).toBeLessThan(size(sm));
+    await expect(size(xs)).toBeGreaterThanOrEqual(11);
+    const icon = (el: HTMLElement) =>
+      (shellOf(el).querySelector(".cy-icon") as Element).getBoundingClientRect();
+    await expect(icon(xs).height).toBeLessThan(icon(sm).height);
+    // The clear button is the dense size too: it fits the field instead of standing out of it.
+    const clear = canvas.getAllByRole("button", { name: "Clear" })[0] as HTMLElement;
+    await expect(clear.getBoundingClientRect().height).toBeLessThanOrEqual(shell.height);
+    // The input itself is still at least 24px tall to press, reaching invisibly past the field's edge.
+    await expect(xs.getBoundingClientRect().height).toBeGreaterThanOrEqual(24);
+    await expect(document.elementFromPoint(shell.left + shell.width / 2, shell.top - 1)).toBe(xs);
+    // Typing and clearing work as at any size.
+    xs.focus();
+    await userEvent.clear(xs);
+    await userEvent.type(xs, "users");
+    await expect(args.onChange).toHaveBeenLastCalledWith("users");
+    await userEvent.click(canvas.getAllByRole("button", { name: "Clear" })[0] as HTMLElement);
+    await expect(xs).toHaveValue("");
+    await expect(xs).toHaveFocus();
+    // The reveal button of a dense secret field fits it too, and still works.
+    const token = canvas.getByLabelText("Token");
+    const show = canvas.getByRole("button", { name: "Show" });
+    await expect(show.getBoundingClientRect().height).toBeLessThanOrEqual(
+      shellOf(token).getBoundingClientRect().height,
+    );
+    await userEvent.click(show);
+    await expect(token).toHaveAttribute("type", "text");
+  },
+};
+
+export const ExtraSmallCoarsePointer: Story = {
+  tags: ["touch", "!dev"],
+  args: { size: "xs" },
+  play: async ({ canvas, userEvent }) => {
+    const input = canvas.getByRole("textbox", { name: "Email" });
+    // The field stays dense; the input reaches 44px invisibly, so a finger finds it.
+    await expect(shellOf(input).getBoundingClientRect().height).toBe(20);
+    await expect(input.getBoundingClientRect().height).toBeGreaterThanOrEqual(44);
+    await userEvent.pointer({ keys: "[TouchA]", target: input });
+    await expect(input).toHaveFocus();
   },
 };
 

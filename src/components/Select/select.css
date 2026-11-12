@@ -82,6 +82,22 @@
     --_h: var(--cy-control-height-sm);
     font-size: var(--cy-font-size-sm);
   }
+  /* xs: dense desktop chrome. The trigger looks 20px tall; an invisible ::before keeps it --_hit to press. */
+  &[data-size="xs"] .cy-select-trigger {
+    --_h: var(--cy-select-height-xs, var(--cy-space-7));
+    min-block-size: var(--_h);
+    gap: var(--cy-space-2);
+    padding-inline: var(--cy-select-padding-inline-xs, var(--cy-space-4)) var(--cy-space-3);
+    font-size: var(--cy-select-font-size-xs, var(--cy-font-size-xs));
+    &::before {
+      content: "";
+      position: absolute;
+      inset-inline: 0;
+      top: 50%;
+      translate: 0 -50%;
+      block-size: max(100%, var(--_hit));
+    }
+  }
   &[data-size="lg"] .cy-select-trigger {
     --_h: var(--cy-control-height-lg);
     font-size: var(--cy-font-size-lg);
