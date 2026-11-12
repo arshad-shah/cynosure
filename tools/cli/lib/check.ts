@@ -288,6 +288,7 @@ export const FOUNDATION_USERS: Record<string, readonly string[]> = {
     "ColorSwatches",
     "Disclosure",
     "Menu",
+    "Menubar",
     "Select",
     "SideNav",
     "Steps",

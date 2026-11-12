@@ -1,0 +1,94 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./Menubar.stories";
+
+<Meta of={Stories} />
+
+# Menubar
+
+A desktop application's menu bar: a row of titles (File, Edit, View), each opening a [Menu](?path=/docs/components-menu--docs) of commands. Once one menu is open, the arrow keys and the pointer move straight between menus, as in a native app.
+
+<Canvas of={Stories.KeyboardMovesBetweenMenus} />
+
+## When to use
+
+- **The application menu** of an installed or desktop-style app, usually in its title bar.
+- **Many commands in a few familiar groups**, where people expect File, Edit and View.
+
+**Use something else when:**
+- there is one group of commands: a [Menu](?path=/docs/components-menu--docs) on a button
+- the commands are a few visible actions: a [Toolbar](?path=/docs/components-toolbar--docs) of [Button](?path=/docs/components-button--docs)s
+- the entries navigate between pages: [SiteHeader](?path=/docs/components-siteheader--docs) or [SideNav](?path=/docs/components-sidenav--docs)
+- people search for commands: [CommandPalette](?path=/docs/components-commandpalette--docs)
+
+## Usage
+
+```tsx
+import { Menubar } from "@arshad-shah/cynosure";
+import { copy, folder, save } from "@arshad-shah/cynosure/icons";
+
+<Menubar
+  label="Application"
+  menus={[
+    {
+      label: "File",
+      items: [
+        { value: "open", label: "Open", icon: folder, shortcut: "mod+o" },
+        { value: "save", label: "Save", icon: save, shortcut: "mod+s", disabled: !dirty },
+      ],
+    },
+    { label: "Edit", items: [{ value: "copy", label: "Copy", icon: copy, shortcut: "mod+c" }] },
+    { label: "View", items: [{ value: "wrap", label: "Word wrap", kind: "checkbox", checked: wrap }] },
+  ]}
+  onSelect={(value) => run(value)}
+/>
+```
+
+Each menu's `items` are exactly what [Menu](?path=/docs/components-menu--docs) takes: icons, `shortcut`s (shown with Kbd and exposed as `aria-keyshortcuts`; bind the keys yourself with `useHotkey`), `disabled`, `tone`, checkable `kind`s and labelled sections. `onSelect` receives the chosen item's `value` from whichever menu, so keep values unique across menus.
+
+## Moving between menus
+
+While a menu is open, hovering another title opens that menu instead, and so does tapping it. At rest, hovering opens nothing.
+
+<Canvas of={Stories.PointerHoverSwitchesWhileOpen} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+| Input | Result |
+| --- | --- |
+| <kbd>Tab</kbd> | Enters the bar on one title (the one last used); <kbd>Tab</kbd> again leaves it |
+| <kbd>Left</kbd> / <kbd>Right</kbd> arrows on a title | Move between titles, wrapping |
+| <kbd>Home</kbd> / <kbd>End</kbd> on a title | First / last title |
+| <kbd>Down</kbd>, <kbd>Enter</kbd>, <kbd>Space</kbd> or click on a title | Opens its menu on the first item |
+| <kbd>Up</kbd> arrow on a title | Opens its menu on the last item |
+| <kbd>Left</kbd> / <kbd>Right</kbd> arrows in an open menu | Close it and open the neighbouring menu, on its first item |
+| <kbd>Up</kbd>, <kbd>Down</kbd>, <kbd>Home</kbd>, <kbd>End</kbd>, a letter | Move inside the open menu, as in Menu |
+| <kbd>Enter</kbd>, <kbd>Space</kbd> or click on an item | Runs it, closes the menu and returns focus to its title (checkable items stay open) |
+| <kbd>Escape</kbd> | Closes the menu and returns focus to its title |
+| <kbd>Tab</kbd> / <kbd>Shift</kbd>+<kbd>Tab</kbd> in an open menu | Closes it and leaves the bar |
+| Click outside | Closes the menu |
+
+- **Roles:** `menubar` named by `label`, with `aria-orientation="horizontal"`; each title is a `menuitem` with `aria-haspopup="menu"`, `aria-expanded` and `aria-controls` naming its `menu`, which is named after the title.
+- **One menu at a time:** opening one closes the other.
+- **Right to left:** in an RTL page the bar reads from the right, and Left and Right swap.
+- **Shadow DOM:** works inside a shadow root (keys, focus return and outside clicks).
+- **Layers:** the menus use the shared overlay stack, so inside a dialog Escape closes only the open menu.
+
+## Touch
+
+Each title's hit area is at least 24px, and 44px on coarse pointers; menu rows are 44px tall there. A tap opens a menu, a tap on another title switches to it and a tap on an item runs it.
+
+## Theming
+
+Tokens: `--cy-menubar-height`, `--cy-menubar-padding-inline`, `--cy-menubar-radius`, `--cy-menubar-active-bg` (hovered title and the open menu's title) and `--cy-menubar-gap`. The menus are Menu's, themed with `--cy-menu-*`.
+
+```ts
+createTheme({ components: { menubar: { height: "28px", radius: "4px" } } });
+```
+
+## Related
+
+[Menu](?path=/docs/components-menu--docs) · [ContextMenu](?path=/docs/components-contextmenu--docs) · [Toolbar](?path=/docs/components-toolbar--docs) · [CommandPalette](?path=/docs/components-commandpalette--docs) · [Kbd](?path=/docs/components-kbd--docs)
