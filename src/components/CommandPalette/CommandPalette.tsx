@@ -11,6 +11,7 @@ import {
 import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js";
 import { useControllableState } from "../../foundations/controllable.js";
 import { DialogBase } from "../../foundations/DialogBase/DialogBase.js";
+import { deepActiveElement } from "../../foundations/focus.js";
 import { useHotkey } from "../../foundations/hotkey.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
 import { InputBase } from "../../foundations/InputBase/InputBase.js";
@@ -148,9 +149,7 @@ export function CommandPalette({
   // Opening: remember where focus was, start fresh, and focus the search field.
   useClientLayoutEffect(() => {
     if (!isOpen) return;
-    const active = document.activeElement as HTMLElement | null;
-    returnTo.current =
-      active?.shadowRoot?.activeElement instanceof HTMLElement ? active.shadowRoot.activeElement : active;
+    returnTo.current = deepActiveElement();
     setQuery("");
     setActive(0);
     input.current?.focus();

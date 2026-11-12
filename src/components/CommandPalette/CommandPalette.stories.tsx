@@ -176,22 +176,32 @@ export const ShortcutCanBeChangedOrOff: Story = {
   },
 };
 
-function ShadowPalette({ onRun }: { onRun: (id: string) => void }) {
+function ShadowPalette({ onRun, nested = false }: { onRun: (id: string) => void; nested?: boolean }) {
   const host = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const el = host.current;
     if (!el || el.shadowRoot) return;
-    const root = el.attachShadow({ mode: "open" });
+    let root = el.attachShadow({ mode: "open" });
+    if (nested) {
+      // An extension's widget inside another component's shadow root: two hosts deep.
+      const inner = document.createElement("div");
+      inner.dataset.testid = "inner-host";
+      root.append(inner);
+      root = inner.attachShadow({ mode: "open" });
+    }
     root.adoptedStyleSheets = [createStyleSheet()];
     const mount = document.createElement("div");
     root.append(mount);
-    createRoot(mount).render(
+    const app = createRoot(mount);
+    app.render(
       <>
         <Button>Inside the extension</Button>
         <CommandPalette commands={commands} onRun={onRun} />
       </>,
     );
-  }, [onRun]);
+    // Unmount with the story, or this palette keeps answering the shortcut from a detached host.
+    return () => queueMicrotask(() => app.unmount());
+  }, [onRun, nested]);
   return <div data-testid="host" ref={host} />;
 }
 
@@ -213,6 +223,25 @@ export const WorksInsideAShadowRoot: Story = {
     await waitFor(() => expect(root.querySelectorAll('[role="option"]')).toHaveLength(1));
     input.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
     await expect(args.onRun).toHaveBeenCalledWith("preview");
+  },
+};
+
+export const ReturnsFocusInsideNestedShadowRoots: Story = {
+  render: (args) => <ShadowPalette onRun={args.onRun} nested />,
+  play: async ({ canvas, userEvent }) => {
+    const host = await canvas.findByTestId("host");
+    const inner = () => host.shadowRoot?.querySelector<HTMLElement>('[data-testid="inner-host"]')?.shadowRoot;
+    await waitFor(() => expect(inner()?.querySelector("button")).toBeTruthy());
+    const root = inner() as ShadowRoot;
+    const button = root.querySelector("button") as HTMLElement;
+    button.focus();
+    await userEvent.keyboard(MOD_K);
+    await waitFor(() => expect(palette(root).open).toBe(true));
+    const input = root.querySelector("input") as HTMLInputElement;
+    await waitFor(() => expect(root.activeElement).toBe(input));
+    input.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true, composed: true }));
+    await waitFor(() => expect(palette(root).open).toBe(false));
+    await waitFor(() => expect(root.activeElement).toBe(button));
   },
 };
 
