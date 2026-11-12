@@ -15,7 +15,7 @@ const visual = import.meta.env.VITE_CY_VISUAL === "1";
  */
 if (visual) {
   const fonts = document.createElement("style");
-  fonts.textContent = ':root, .cy-theme { --cy-font-mono: "Liberation Mono" !important; }';
+  fonts.textContent = ':root, .cy-theme { --cy-font-mono: "Liberation Mono", monospace !important; }';
   document.head.append(fonts);
 }
 
