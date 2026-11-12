@@ -9,6 +9,12 @@ import * as project from "./preview";
 (globalThis as { cyEmulateMedia?: (media: EmulatedMedia) => Promise<void> }).cyEmulateMedia = (media) =>
   (commands as unknown as { emulateMedia: (media: EmulatedMedia) => Promise<void> }).emulateMedia(media);
 
+/* Stories move the real pointer (CSS :hover) through `realHover` (src/test/hover.ts); null leaves every element. */
+(globalThis as { cyRealHover?: (el: Element | null) => Promise<void> }).cyRealHover = (el) =>
+  el
+    ? page.elementLocator(el).hover()
+    : page.elementLocator(document.documentElement).hover({ position: { x: 1, y: 1 } } as never);
+
 /** Visual regression, Vitest-only: stories tagged "visual" are screenshotted when VITE_CY_VISUAL=1 (CI, Linux baselines). */
 const visual = import.meta.env.VITE_CY_VISUAL === "1";
 

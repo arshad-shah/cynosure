@@ -7,6 +7,7 @@ import { chevronDown, copy, download, trash } from "../../icons/index.js";
 import { createStyleSheet } from "../../styles/inline.js";
 import { backdrop, contrast, rgb, textContrast } from "../../test/color.js";
 import { computeUnderHostileHost } from "../../test/hostile.js";
+import { realHover } from "../../test/hover.js";
 import { CynosureTheme } from "../../theme/index.js";
 import { createTheme } from "../../tokens/index.js";
 import { TextField } from "../TextField/TextField.js";
@@ -651,6 +652,33 @@ export const SquareForOneIcon: Story = {
     const label = canvas.getByTestId("glyph").parentElement as HTMLElement;
     await expect(label).toHaveClass("cy-button-label");
     await expect(getComputedStyle(label).display).toBe("contents");
+  },
+};
+
+export const HoverColoursFromTokens: Story = {
+  tags: ["!dev"],
+  args: { variant: "ghost", children: "Close" },
+  render: (args) => (
+    <div
+      style={
+        { "--cy-button-hover-bg": "rgb(200, 0, 40)", "--cy-button-hover-ink": "rgb(255, 255, 255)" } as never
+      }
+    >
+      <Button {...args} />
+      <Button variant="ghost">Stays</Button>
+    </div>
+  ),
+  play: async ({ canvas }) => {
+    const button = canvas.getByRole("button", { name: "Close" });
+    const resting = getComputedStyle(button).color;
+    await expect(rgb(resting)).not.toEqual([255, 255, 255]);
+    // On hover the fill and the ink come from the tokens; off hover the button is its usual ghost self.
+    if (!(await realHover(button))) return;
+    await waitFor(() => expect(rgb(getComputedStyle(button).backgroundColor)).toEqual([200, 0, 40]));
+    await expect(rgb(getComputedStyle(button).color)).toEqual([255, 255, 255]);
+    await realHover(null);
+    await waitFor(() => expect(getComputedStyle(button).backgroundColor).toBe("rgba(0, 0, 0, 0)"));
+    await expect(getComputedStyle(button).color).toBe(resting);
   },
 };
 

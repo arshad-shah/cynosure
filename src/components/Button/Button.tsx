@@ -35,6 +35,10 @@ export interface ButtonTokens {
   /** Border strength of outline buttons (percentage of the tone mixed into the line colour). */
   outlineMix: string;
   pressScale: string;
+  /** Fill on hover. Default: the variant's own hover fill. */
+  hoverBg: string;
+  /** Text and icon colour on hover. Default: unchanged. */
+  hoverInk: string;
 }
 
 declare module "../../tokens/schema.js" {

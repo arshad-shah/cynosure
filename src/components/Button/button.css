@@ -193,7 +193,8 @@
 
   /* States */
   &:hover:not(:disabled, [aria-disabled="true"]) {
-    background: var(--_hover);
+    background: var(--cy-button-hover-bg, var(--_hover));
+    color: var(--cy-button-hover-ink, var(--_fg));
   }
   &:active:not(:disabled, [aria-disabled="true"]) {
     transform: scale(var(--cy-button-press-scale, 0.97));
