@@ -73,6 +73,9 @@ export function ColorSwatches({
 }: ColorSwatchesProps) {
   const group = useRef<HTMLDivElement>(null);
   useRovingFocus(group, { orientation: "both", selector: '[role="radio"]' });
+  // True while a key press is being handled: focus that arrives then came from the arrow keys (roving), not from Tab
+  // (which moves focus after the key press) or a pointer (whose click chooses on its own).
+  const byKey = useRef(false);
   const chosen = key(value);
   const items = swatches.map((s) => (typeof s === "string" ? { value: s } : s));
   return (
@@ -84,6 +87,15 @@ export function ColorSwatches({
       className={className ? `cy-color-swatches ${className}` : "cy-color-swatches"}
       data-size={size}
       style={style}
+      onKeyDownCapture={() => {
+        byKey.current = true;
+      }}
+      onKeyDown={() => {
+        byKey.current = false;
+      }}
+      onPointerDownCapture={() => {
+        byKey.current = false;
+      }}
     >
       {items.map((item) => {
         const on = chosen !== undefined && key(item.value) === chosen;
@@ -99,8 +111,8 @@ export function ColorSwatches({
             data-light={lightness(item.value) > 0.4 ? "" : undefined}
             style={{ "--_swatch": item.value } as CSSProperties}
             onClick={() => onChange(item.value)}
-            // Arrow keys move focus (roving); in a radio group the focused swatch is chosen too, once one is.
-            onFocus={() => chosen !== undefined && !on && onChange(item.value)}
+            // Arrow keys move focus (roving); in a radio group the swatch they reach is chosen too, once one is.
+            onFocus={() => byKey.current && chosen !== undefined && !on && onChange(item.value)}
           >
             {on && <Icon icon={check} size="sm" />}
           </ButtonBase>
