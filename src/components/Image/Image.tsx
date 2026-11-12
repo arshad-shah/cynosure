@@ -6,10 +6,9 @@ import {
   useId,
   useImperativeHandle,
   useRef,
-  useState,
 } from "react";
-import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
+import { useImageOutcome } from "../../foundations/image-outcome.js";
 import { image } from "../../icons/image.js";
 import { AspectRatio, type AspectRatioRadius } from "../AspectRatio/AspectRatio.js";
 import { Skeleton } from "../Skeleton/Skeleton.js";
@@ -75,8 +74,6 @@ export interface ImageProps {
   style?: CSSProperties;
 }
 
-type Outcome = "loaded" | "error";
-
 /** A picture that keeps its space while it loads, shows a placeholder until then and a fallback when it fails. */
 export const Image = forwardRef<HTMLImageElement, ImageProps>(function Image(
   {
@@ -106,24 +103,8 @@ export const Image = forwardRef<HTMLImageElement, ImageProps>(function Image(
   useImperativeHandle(ref, () => el.current as HTMLImageElement);
   // One outcome per picture: a new `src` starts again from "loading", whatever happened to the last one.
   const key = `${src} ${srcSet ?? ""}`;
-  const [settled, setSettled] = useState<{ key: string; outcome: Outcome }>();
-  const state = settled?.key === key ? settled.outcome : "loading";
-
-  // A picture that finished before React attached (cached, or sent in the server's HTML) fires no event here.
-  useClientLayoutEffect(() => {
-    const img = el.current as HTMLImageElement;
-    if (!img.complete) return;
-    if (img.naturalWidth > 0) return setSettled({ key, outcome: "loaded" });
-    // Finished with no size: broken, or a picture without one of its own (some SVG). Decoding tells them apart.
-    let current = true;
-    const settle = (outcome: Outcome) => () => {
-      if (current) setSettled({ key, outcome });
-    };
-    new Promise((resolve) => resolve(img.decode())).then(settle("loaded"), settle("error"));
-    return () => {
-      current = false;
-    };
-  }, [key]);
+  const picture = useImageOutcome(el, key);
+  const state = picture.outcome;
 
   const content = (
     <>
@@ -161,11 +142,11 @@ export const Image = forwardRef<HTMLImageElement, ImageProps>(function Image(
           decoding="async"
           style={position === undefined ? undefined : { objectPosition: position }}
           onLoad={(event) => {
-            setSettled({ key, outcome: "loaded" });
+            picture.loaded();
             onLoad?.(event);
           }}
           onError={(event) => {
-            setSettled({ key, outcome: "error" });
+            picture.failed();
             onError?.(event);
           }}
         />

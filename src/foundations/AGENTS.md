@@ -19,6 +19,7 @@ Shared helpers (use these instead of writing your own; a second copy is a review
 - `reorder.ts`: `moveItems(items, keys, to, getKey)`, the new order after a move (VirtualList's rows, Tabs' tabs).
 - `tone-icons.ts`: `TONE_ICONS`, the icon for a message's tone (Notice, Toast).
 - `drag.ts`: `useDrag(ref, { onStart, onMove, onEnd })`, detent's `bindPointer` bound once with fresh handlers, re-bound when the element changes; Escape and browser cancels arrive as `onEnd(session, true)`, so put the value back. `touchAction: "css"` leaves `touch-action` to the stylesheet (e.g. `pan-y`). Slider, SplitPane, CompareSlider, ColorField's area and TextArea's grip use it.
+- `image-outcome.ts`: `useImageOutcome(ref, key)`, a picture's way from loading to loaded or failed (the img's own events, plus the element's state for one that finished before React attached). Image and Avatar use it.
 - `option-icon.tsx`: `OptionIcon` and the `OptionIconColor` props (`iconTone`, `iconColor`), an option's icon in its own colour, muted when the option is disabled. Select, Combobox, Menu and ContextMenu use it.
 - `src/overlay/floating.ts`: `usePopover(el, open, onShow)` (every manual popover shows and hides through it), `useFloatingAnchor`, `useFloatingOffset`.
 - `src/overlay/listbox-layer.ts`: `useListboxLayer`, the drop-down list of Select, Combobox and TagInput (show, width, position, dismissal).

@@ -6,11 +6,10 @@ import {
   type ReactElement,
   type ReactNode,
   useContext,
-  useEffect,
   useRef,
-  useState,
 } from "react";
 import { Icon } from "../../foundations/Icon/Icon.js";
+import { useImageOutcome } from "../../foundations/image-outcome.js";
 import type { IconData } from "../../icons/types.js";
 import { user } from "../../icons/user.js";
 import type { Tone } from "../../tokens/schema.js";
@@ -144,17 +143,9 @@ export const Avatar = forwardRef<HTMLSpanElement, AvatarProps>(function Avatar(
 ) {
   const groupSize = useContext(GroupSize);
   const image = useRef<HTMLImageElement>(null);
-  // The outcome of the picture last waited for; a new `src` starts again from the fallback.
-  const [settled, setSettled] = useState<{ src: string; ok: boolean }>();
-  useEffect(() => {
-    // decode() also settles for a picture that loaded or failed before React attached (server rendering).
-    if (src)
-      image.current?.decode?.().then(
-        () => setSettled({ src, ok: true }),
-        () => setSettled({ src, ok: false }),
-      );
-  }, [src]);
-  const outcome = settled?.src === src ? settled?.ok : undefined;
+  // A new `src` starts again from the fallback; the picture shows once it has loaded and goes if it fails.
+  const picture = useImageOutcome(image, src ?? "");
+  const outcome = picture.outcome === "loading" ? undefined : picture.outcome === "loaded";
   const letters = initials ?? (icon ? "" : initialsOf(name));
   return (
     <span
@@ -180,11 +171,15 @@ export const Avatar = forwardRef<HTMLSpanElement, AvatarProps>(function Avatar(
         ))}
       {src && outcome !== false && (
         <img
+          // A new element for each picture, so `complete` never describes the one before.
+          key={src}
           ref={image}
           className="cy-reset cy-avatar-image"
           src={src}
           alt=""
           data-loaded={outcome ? "" : undefined}
+          onLoad={picture.loaded}
+          onError={picture.failed}
         />
       )}
       {status && <span className="cy-reset cy-avatar-status" data-status={status} />}

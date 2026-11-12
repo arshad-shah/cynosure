@@ -283,16 +283,22 @@ const paddingOf = (el: Element) => {
   const style = getComputedStyle(el);
   return [style.paddingBlockStart, style.paddingInlineEnd, style.paddingBlockEnd, style.paddingInlineStart];
 };
-/** No item pokes out of the grid's sides (to a tenth of a pixel, so it also holds at fractional widths). */
-const itemsInside = (grid: Element) =>
-  items(grid).every(
-    (item) => box(item).left >= box(grid).left - 0.1 && box(item).right <= box(grid).right + 0.1,
+/**
+ * How far the items poke out of the grid's sides, in px (0 when none does). Engines round fractional tracks
+ * differently (Firefox lays out in sixtieths of a pixel), so a column grid at a fractional width can be out by a
+ * fraction of a pixel; half a pixel is the line between rounding and a column too many.
+ */
+const overflowOf = (grid: Element) =>
+  Math.max(
+    0,
+    ...items(grid).flatMap((item) => [box(grid).left - box(item).left, box(item).right - box(grid).right]),
   );
+const itemsInside = (grid: Element) => overflowOf(grid) < 0.5;
 /** Sets the frame's width and waits for the grid inside it to show `columns` columns without overflowing. */
 async function expectColumnsAt(frame: HTMLElement, grid: HTMLElement, width: number, columns: number) {
   frame.style.inlineSize = `${width}px`;
   await waitFor(() => expect(`${width}px: ${columnsOf(grid)}`).toBe(`${width}px: ${columns}`));
-  await expect(`${width}px: ${itemsInside(grid)}`).toBe(`${width}px: true`);
+  await expect(overflowOf(grid), `items poke out of a ${width}px grid`).toBeLessThan(0.5);
 }
 
 export const ColumnsPerBreakpoint: Story = {

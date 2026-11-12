@@ -269,14 +269,14 @@ export const LabelAlign: Story = {
       HTMLElement,
     ];
     // start: flush with the left edge, one line after it.
-    await expect(box(canvas.getByText("Today")).left).toBe(box(start).left);
+    await expect(box(canvas.getByText("Today")).left).toBeCloseTo(box(start).left, 1);
     await expect(getComputedStyle(start, "::before").display).toBe("none");
     await expect(getComputedStyle(start, "::after").display).not.toBe("none");
     // center: away from both edges.
     await expect(box(canvas.getByText("Yesterday")).left).toBeGreaterThan(box(center).left);
     await expect(box(canvas.getByText("Yesterday")).right).toBeLessThan(box(center).right);
     // end: flush with the right edge, one line before it.
-    await expect(box(canvas.getByText("Last week")).right).toBe(box(end).right);
+    await expect(box(canvas.getByText("Last week")).right).toBeCloseTo(box(end).right, 1);
     await expect(getComputedStyle(end, "::after").display).toBe("none");
     await expect(getComputedStyle(end, "::before").display).not.toBe("none");
     // The remaining line takes the rest of the width, less the label gap.
@@ -291,9 +291,9 @@ export const RightToLeft: Story = {
     const start = divider(canvasElement, "start");
     const end = divider(canvasElement, "end");
     // start is the right edge in right-to-left text, end the left edge.
-    await expect(box(canvas.getByText("Today")).right).toBe(box(start).right);
+    await expect(box(canvas.getByText("Today")).right).toBeCloseTo(box(start).right, 1);
     await expect(box(canvas.getByText("Today")).left).toBeGreaterThan(box(start).left + 100);
-    await expect(box(canvas.getByText("Last week")).left).toBe(box(end).left);
+    await expect(box(canvas.getByText("Last week")).left).toBeCloseTo(box(end).left, 1);
     await expect(box(canvas.getByText("Last week")).right).toBeLessThan(box(end).right - 100);
   },
 };
