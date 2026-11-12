@@ -202,15 +202,27 @@ export const KeyboardScrollsTheRegion: Story = {
     await expect(canvas.getByRole("region", { name: "Short note" })).not.toHaveAttribute("tabindex");
     await userEvent.tab();
     await expect(canvas.getByRole("button", { name: "After" })).toHaveFocus();
-    // The browser's own keys scroll the focused region (real key presses: synthetic ones scroll nothing).
-    region.focus();
-    if (!(await pressKey("PageDown"))) return;
-    await waitFor(() => expect(region.scrollTop).toBeGreaterThan(50), { timeout: 3000 });
-    await pressKey("End");
-    await waitFor(() => expect(atEnd(region)).toBe(true), { timeout: 3000 });
+    // The browser's own keys scroll the focused region (real key presses: synthetic ones scroll nothing). A test file
+    // running in parallel can take focus between a press and its scroll, so each check presses again until it holds.
+    const press = async (key: string, holds: () => void) => {
+      region.focus();
+      if (!(await pressKey(key))) return false;
+      await waitFor(
+        async () => {
+          if (!document.hasFocus() || document.activeElement !== region) {
+            region.focus();
+            await pressKey(key);
+          }
+          holds();
+        },
+        { timeout: 3000 },
+      );
+      return true;
+    };
+    if (!(await press("PageDown", () => expect(region.scrollTop).toBeGreaterThan(50)))) return;
+    await press("End", () => expect(atEnd(region)).toBe(true));
     const end = region.scrollTop;
-    await pressKey("PageUp");
-    await waitFor(() => expect(region.scrollTop).toBeLessThan(end - 50), { timeout: 3000 });
+    await press("PageUp", () => expect(region.scrollTop).toBeLessThan(end - 50));
   },
 };
 
