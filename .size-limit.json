@@ -587,5 +587,28 @@
     "path": ["dist/components/List/List.js", "dist/styles/list.css"],
     "limit": "2.5 kB",
     "gzip": true
+  },
+  {
+    "name": "QRCode (JS + CSS)",
+    "path": ["dist/components/QRCode/QRCode.js", "dist/foundations/qr.js", "dist/styles/qr-code.css"],
+    "limit": "5 kB",
+    "gzip": true
+  },
+  {
+    "name": "qrToSvg (no React)",
+    "path": "dist/foundations/qr.js",
+    "limit": "3.6 kB",
+    "gzip": true
+  },
+  {
+    "name": "DeviceFrame (JS + CSS)",
+    "path": [
+      "dist/components/DeviceFrame/DeviceFrame.js",
+      "dist/components/AspectRatio/AspectRatio.js",
+      "dist/styles/device-frame.css",
+      "dist/styles/aspect-ratio.css"
+    ],
+    "limit": "2.75 kB",
+    "gzip": true
   }
 ]

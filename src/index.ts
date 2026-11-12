@@ -122,6 +122,12 @@ export {
   type DescriptionListProps,
   type DescriptionListTokens,
 } from "./components/DescriptionList/index.js";
+export {
+  DeviceFrame,
+  type DeviceFrameDevice,
+  type DeviceFrameProps,
+  type DeviceFrameTokens,
+} from "./components/DeviceFrame/index.js";
 export { Dialog, type DialogLabels, type DialogProps, type DialogTokens } from "./components/Dialog/index.js";
 export { Disclosure, type DisclosureProps, type DisclosureTokens } from "./components/Disclosure/index.js";
 export { Divider, type DividerProps, type DividerTokens } from "./components/Divider/index.js";
@@ -250,6 +256,7 @@ export {
   type ProgressOverlayProps,
 } from "./components/ProgressOverlay/index.js";
 export { Prose, type ProseProps, type ProseTokens } from "./components/Prose/index.js";
+export { QRCode, type QRCodeLabels, type QRCodeProps, type QRCodeTokens } from "./components/QRCode/index.js";
 export { RadioGroup, type RadioGroupProps, type RadioOption } from "./components/RadioGroup/index.js";
 export { SearchField, type SearchFieldProps } from "./components/SearchField/index.js";
 export {
@@ -434,6 +441,14 @@ export { ariaKeyShortcuts, isApple, matchesHotkey, shortcutKeys, useHotkey } fro
 export { Icon, type IconProps } from "./foundations/Icon/Icon.js";
 export { InputBase, type InputBaseProps } from "./foundations/InputBase/InputBase.js";
 export { LinkBase, type LinkBaseProps } from "./foundations/LinkBase/LinkBase.js";
+export {
+  type QrLevel,
+  type QrOptions,
+  type QrToSvgOptions,
+  qrMatrix,
+  qrPath,
+  qrToSvg,
+} from "./foundations/qr.js";
 export { type RovingOptions, useRovingFocus } from "./foundations/roving-focus.js";
 export { TextAreaBase, type TextAreaBaseProps } from "./foundations/TextAreaBase/TextAreaBase.js";
 export type { BrandInfo, IconCategory, IconData, IconMotion, IconNode } from "./icons/types.js";

@@ -39,4 +39,4 @@ import { AspectRatio } from "@arshad-shah/cynosure";
 
 ## Used by
 
-Image (its `ratio` prop is an AspectRatio). Video, map and embed frames on the documentation site and the product sites.
+Image (its `ratio` prop is an AspectRatio), DeviceFrame (its screen). Video, map and embed frames on the documentation site and the product sites.

@@ -1,0 +1,106 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./QRCode.stories";
+
+<Meta of={Stories} />
+
+# QRCode
+
+A QR code drawn as one crisp SVG path, so a phone can open a link shown on a bigger screen. It stays dark on light in every colour mode, because many phone cameras cannot read an inverted code.
+
+<Canvas of={Stories.Default} />
+
+## When to use
+
+- **Desktop to phone:** a link to the mobile app, the extension store or a sign-in page, on a page people read on a computer.
+- **Sharing:** an invite or a document link in a sharing panel.
+- **Print and slides:** where nobody can click a link.
+
+**Use something else when:**
+- people are already on their phone: a [Link](?path=/docs/components-link--docs) or a [Button](?path=/docs/components-button--docs) with `href`
+- the link should be copied: [CopyButton](?path=/docs/components-copybutton--docs)
+
+## Usage
+
+```tsx
+import { Icon, QRCode } from "@arshad-shah/cynosure";
+import { globe } from "@arshad-shah/cynosure/icons";
+
+<QRCode value="https://cynosure.arshadshah.com" label="Open the documentation on your phone" />
+<QRCode value={inviteUrl} size="lg" icon={<Icon icon={globe} />} />
+<QRCode value={text} size={240} level="Q" />
+```
+
+`size` is `sm`, `md` (default) or `lg`, or a number of pixels. The code is never wider than its container and is always square. A longer value needs a denser code, drawn in the same box.
+
+<Canvas of={Stories.SizesAndPixels} />
+
+## Error correction
+
+`level` says how much of the code can be lost and still scan: `L` 7%, `M` 15% (default), `Q` 25%, `H` 30%. A higher level needs a denser code. Use `Q` or `H` for print that may get scuffed.
+
+<Canvas of={Stories.ErrorCorrectionLevels} />
+
+## A logo in the middle
+
+`icon` draws a logo in the centre on the light colour. It covers modules, so the level is raised to `H` whatever `level` says. The icon box is 20% of the width (`--cy-qr-code-icon-size`); keep it at 22% or less.
+
+<Canvas of={Stories.WithACentredIcon} />
+
+## Dark mode
+
+The code keeps dark modules on a light square in dark mode. The root sets `color-scheme: light`, so the theme's colours resolve to the light palette's ink and surface inside it, and the light quiet zone sets the code apart from the dark page. To change the colours, set `--cy-qr-code-color` and `--cy-qr-code-background` together and keep the modules darker than the background (4.5:1 or more).
+
+<Canvas of={Stories.DarkOnLightInEveryMode} />
+
+## Without React
+
+The encoder is exported for Astro components, static HTML and files:
+
+```ts
+import { qrMatrix, qrPath, qrToSvg } from "@arshad-shah/cynosure";
+
+// A standalone SVG with its colours written in (black on white unless `color` and `background` say otherwise).
+qrToSvg("https://example.com", { size: 160, label: "Example", level: "Q", quietZone: 4 });
+
+// The modules as rows of booleans (true is dark), without the quiet zone.
+const matrix = qrMatrix("HELLO", { level: "Q" });
+
+// Path data, one unit per module, offset by the quiet zone: use it in your own <svg viewBox>.
+qrPath(matrix, 4);
+```
+
+`qrMatrix` picks the smallest version that holds the text, in numeric, alphanumeric or UTF-8 byte mode. It throws a `RangeError` when the text does not fit in version 40 (2,953 bytes at `L`, 1,273 at `H`).
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+| Situation | Result |
+| --- | --- |
+| Any `value` | Every module of the encoder's matrix is drawn, in one path, with `quietZone` light modules around it |
+| `icon` is set | The level is `H` and the icon sits in the middle on the light colour |
+| Dark mode | Same colours as light mode: dark modules on a light square |
+| Right-to-left | Nothing is mirrored |
+| The container is narrower than `size` | The code shrinks to fit and stays square |
+
+- **Semantics:** the root is one image (`role="img"`) named "QR code" by default. Set `label` to say where it leads, or `labels.name` to translate the default. The SVG and the icon inside are hidden.
+- **Show the link too.** A screen reader user cannot scan the code, and some people cannot hold a phone to the screen.
+- **Keyboard:** nothing to focus.
+
+## Touch
+
+Nothing in QRCode can be pressed.
+
+## Theming
+
+Tokens: `--cy-qr-code-color` (dark modules), `--cy-qr-code-background` (light modules and the quiet zone), `--cy-qr-code-size-sm`, `--cy-qr-code-size-md`, `--cy-qr-code-size-lg`, `--cy-qr-code-icon-size` and `--cy-qr-code-radius`.
+
+```ts
+createTheme({ components: { qrCode: { color: "#0b2545", radius: "0px" } } });
+```
+
+## Related
+
+[Link](?path=/docs/components-link--docs) · [CopyButton](?path=/docs/components-copybutton--docs) · [DeviceFrame](?path=/docs/components-deviceframe--docs)
