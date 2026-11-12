@@ -271,6 +271,9 @@ export const HeaderSharesItsRowWithTheActions: Story = {
           نص
         </Card>
       </div>
+      <Card actions={<Button size="sm">Pin</Button>} data-testid="untitled">
+        No header
+      </Card>
     </div>
   ),
   play: async ({ canvas, canvasElement, userEvent }) => {
@@ -294,6 +297,12 @@ export const HeaderSharesItsRowWithTheActions: Story = {
     const body = canvas.getByTestId("static").querySelector(".cy-card-body") as Element;
     await expect(box(body).top).toBeGreaterThanOrEqual(box(edit).bottom);
     await expect(box(body).right).toBeGreaterThan(box(edit).left);
+    // Without a header, a static card's actions sit over its top end as before.
+    const untitled = canvas.getByTestId("untitled");
+    const pin = canvas.getByRole("button", { name: "Pin" });
+    await expect(untitled.querySelector(".cy-card-header")).toBeNull();
+    await expect(box(pin).right).toBeLessThanOrEqual(box(untitled).right);
+    await expect(box(pin).top).toBeLessThan(box(untitled).top + box(untitled).height / 2);
     // The pressable card stays one button, and its action a separate one after it in the tab order.
     const card = canvas.getByRole("button", { name: /^A pressable card/ });
     await expect(card.contains(snooze)).toBe(false);
