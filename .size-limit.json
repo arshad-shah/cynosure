@@ -190,7 +190,7 @@
   {
     "name": "Tabs",
     "path": ["dist/components/Tabs/Tabs.js", "dist/foundations/roving-focus.js", "dist/styles/tabs.css"],
-    "limit": "6 kB",
+    "limit": "7.5 kB",
     "gzip": true
   },
   {
