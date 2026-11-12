@@ -1,5 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { useEffect, useRef } from "react";
+import { createRoot } from "react-dom/client";
 import { expect, fn, waitFor } from "storybook/test";
+import { createStyleSheet } from "../../styles/inline.js";
 import { computeUnderHostileHost } from "../../test/hostile.js";
 import { DateField } from "./DateField.js";
 
@@ -189,5 +192,33 @@ export const StableUnderHostileHost: Story = {
     await expect(hostile).toEqual(clean);
     // Digits line up as they are typed (TextField's --cy-text-field-numeric, set by this field).
     await expect(clean["font-variant-numeric"]).toBe("tabular-nums");
+  },
+};
+
+function ShadowDateField() {
+  const host = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = host.current;
+    if (!el || el.shadowRoot) return;
+    const root = el.attachShadow({ mode: "open" });
+    root.adoptedStyleSheets = [createStyleSheet()];
+    const mount = document.createElement("div");
+    root.append(mount);
+    createRoot(mount).render(
+      <DateField label="Shadow date" defaultValue="2026-11-20" today="2026-11-10" locale="en-GB" />,
+    );
+  }, []);
+  return <div data-testid="host" ref={host} style={{ paddingBlockEnd: 360 }} />;
+}
+
+export const OpensOnTheChosenDayInsideAShadowRoot: Story = {
+  render: () => <ShadowDateField />,
+  play: async ({ canvas, userEvent }) => {
+    const host = await canvas.findByTestId("host");
+    await waitFor(() => expect(host.shadowRoot?.querySelector("button")).toBeTruthy());
+    const root = host.shadowRoot as ShadowRoot;
+    await userEvent.click(root.querySelector("button") as HTMLElement);
+    // The calendar is found inside the shadow root too, so focus lands on the chosen day.
+    await waitFor(() => expect((root.activeElement as HTMLElement | null)?.dataset.date).toBe("2026-11-20"));
   },
 };

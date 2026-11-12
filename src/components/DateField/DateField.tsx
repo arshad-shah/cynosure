@@ -1,12 +1,4 @@
-import {
-  type CSSProperties,
-  type KeyboardEvent,
-  type ReactNode,
-  useEffect,
-  useId,
-  useRef,
-  useState,
-} from "react";
+import { type CSSProperties, type KeyboardEvent, type ReactNode, useEffect, useRef, useState } from "react";
 import { useControllableState } from "../../foundations/controllable.js";
 import { calendar } from "../../icons/calendar.js";
 import type { Size } from "../../tokens/schema.js";
@@ -120,12 +112,12 @@ export function DateField({
   style,
 }: DateFieldProps) {
   const text = { ...DEFAULT_LABELS, ...labels };
-  const id = useId();
   const [current, setCurrent] = useControllableState<string | null>(value, defaultValue, onChange);
   const [draft, setDraft] = useState<string | null>(null);
   const [problem, setProblem] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
   const input = useRef<HTMLInputElement>(null);
+  const calendarBox = useRef<HTMLDivElement>(null);
 
   const available = (date: string) =>
     !(min !== undefined && date < min) && !(max !== undefined && date > max) && !isDateDisabled?.(date);
@@ -164,14 +156,12 @@ export function DateField({
     choose(next);
   };
 
-  // The picker opens on the chosen day (the APG date picker), not on its first button.
+  // The picker opens on the chosen day (the APG date picker), not on its first button. A ref, not an id lookup, so it
+  // works inside a shadow root.
   useEffect(() => {
     if (!open) return;
-    document
-      .getElementById(`${id}-calendar`)
-      ?.querySelector<HTMLElement>('[data-date][tabindex="0"]')
-      ?.focus();
-  }, [open, id]);
+    calendarBox.current?.querySelector<HTMLElement>('[data-date][tabindex="0"]')?.focus();
+  }, [open]);
 
   return (
     <TextField
@@ -215,7 +205,7 @@ export function DateField({
               />
             )}
           >
-            <div id={`${id}-calendar`} className="cy-date-field-calendar">
+            <div ref={calendarBox} className="cy-date-field-calendar">
               <Calendar
                 value={draft !== null && isISODate(normalise(draft)) ? normalise(draft) : current}
                 onChange={(date) => {
