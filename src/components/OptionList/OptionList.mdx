@@ -1,0 +1,78 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./OptionList.stories";
+
+<Meta of={Stories} />
+
+# OptionList
+
+The drop-down list of options under a field: options with an optional icon and description, group headings, and a note when there is nothing to choose. [Select](?path=/docs/components-select--docs), [Combobox](?path=/docs/components-combobox--docs) and [TagInput](?path=/docs/components-taginput--docs) draw their lists with it. It is a building block: for a ready field, use one of those.
+
+<Canvas of={Stories.GroupsAreNamedByTheirHeadings} />
+
+## When to use
+
+- Building a new field whose choices drop down under it, so its list looks and behaves like Select's and Combobox's.
+
+**Use something else when:**
+- people pick one value from a list: [Select](?path=/docs/components-select--docs)
+- people type to filter suggestions: [Combobox](?path=/docs/components-combobox--docs)
+- the list is a set of actions, not values: [Menu](?path=/docs/components-menu--docs)
+
+## Usage
+
+```tsx
+import { OptionList, OptionListItem, OptionListNote } from "@arshad-shah/cynosure";
+
+useListboxLayer({ anchor: field, list, open, onClose: () => setOpen(false) });
+
+<OptionList ref={list} id={listId} label="Fruit">
+  {matches.length === 0 && <OptionListNote>No matches</OptionListNote>}
+  {matches.map((fruit, index) => (
+    <OptionListItem
+      key={fruit.value}
+      id={`${listId}-${index}`}
+      label={fruit.label}
+      description={fruit.description}
+      selected={fruit.value === value}
+      active={index === active}
+      disabled={fruit.disabled}
+      onPointerMove={() => setActive(index)}
+      onClick={() => choose(fruit)}
+    />
+  ))}
+</OptionList>
+```
+
+The list is a manual popover. `useListboxLayer` (in `src/overlay/listbox-layer.ts`) shows it in the top layer, at least as wide as the field and below it, and closes it on Escape or a press outside.
+
+## Options, descriptions and notes
+
+`OptionListItem` takes a `label`, an optional `description` (a smaller, muted second line) and an `icon` drawn before the text. `selected` marks the chosen option, `active` highlights the one the arrow keys are on, and `disabled` fades an option and marks it `aria-disabled`. `OptionListNote` stands in for options when nothing matches or results are loading.
+
+<Canvas of={Stories.DisabledOptionsDescriptionsAndNotes} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+- **Roles:** the list is a `listbox` named by `label` or `aria-labelledby`; options are `option`s with `aria-selected`; groups are `group`s named by their heading.
+- **Focus:** a press on an option never moves focus: the field keeps it and points at the active option with `aria-activedescendant`.
+- **Keys:** the list handles none; the field that owns it does (arrows, Enter, Escape, type-ahead).
+- **Loading:** `busy` sets `aria-busy`.
+- **Right to left:** the icon leads on the right.
+
+## Touch
+
+Options are at least 44px tall on coarse pointers, and a tap chooses.
+
+## Theming
+
+Tokens: `--cy-option-list-bg`, `--cy-option-list-shadow`, `--cy-option-list-max-height`, `--cy-option-list-max-width` and `--cy-option-list-active-bg`. Select and Combobox set them from their own list tokens (`--cy-select-list-bg`, `--cy-combobox-list-bg` and the rest).
+
+<Canvas of={Stories.TokensRestyleTheList} />
+
+## Related
+
+[Select](?path=/docs/components-select--docs) · [Combobox](?path=/docs/components-combobox--docs) · [TagInput](?path=/docs/components-taginput--docs) · [Menu](?path=/docs/components-menu--docs)

@@ -343,7 +343,7 @@ export const NarrowTriggerLongLabels: Story = {
     const t = trigger.getBoundingClientRect();
     await expect(Math.abs(l.left - t.left)).toBeLessThan(1);
     await expect(l.width).toBeLessThanOrEqual(Math.max(t.width, 320) + 1);
-    const label = canvasElement.querySelector(".cy-select-option-label") as HTMLElement;
+    const label = canvasElement.querySelector(".cy-option-list-label") as HTMLElement;
     await expect(label.scrollWidth).toBeGreaterThan(label.clientWidth);
   },
 };
@@ -465,9 +465,9 @@ export const OptionIconColourIsStableUnderHostileHost: Story = {
   play: async ({ canvasElement }) => {
     for (const selector of [
       ".cy-select-trigger .cy-select-icon",
-      '.cy-select-option .cy-select-icon[data-tone="info"]',
-      '.cy-select-option .cy-select-icon[style*="color"]',
-      '.cy-select-option[aria-disabled="true"] .cy-select-icon',
+      '[role="option"] .cy-select-icon[data-tone="info"]',
+      '[role="option"] .cy-select-icon[style*="color"]',
+      '[role="option"][aria-disabled="true"] .cy-select-icon',
     ]) {
       const icon = computeUnderHostileHost(canvasElement, selector, ["color", "stroke", "width"]);
       await expect({ selector, ...icon.hostile }).toEqual({ selector, ...icon.clean });

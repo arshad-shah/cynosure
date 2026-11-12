@@ -31,4 +31,4 @@ Shared helpers (use these instead of writing your own; a second copy is a review
 - `printing.ts`: `usePrinting()`, true from `beforeprint` to `afterprint` (flushed synchronously), for content that must be in the page when it is printed. TabPanel uses it to print every panel.
 - `option-icon.tsx`: `OptionIcon` and the `OptionIconColor` props (`iconTone`, `iconColor`), an option's icon in its own colour, muted when the option is disabled. Select, Combobox, Menu and ContextMenu use it.
 - `src/overlay/floating.ts`: `usePopover(el, open, onShow)` (every manual popover shows and hides through it), `useFloatingAnchor`, `useFloatingOffset`.
-- `src/overlay/listbox-layer.ts`: `useListboxLayer`, the drop-down list of Select, Combobox and TagInput (show, width, position, dismissal).
+- `src/overlay/listbox-layer.ts`: `useListboxLayer`, the drop-down list of Select, Combobox and TagInput (show, width, position, dismissal). The list itself is drawn with the `OptionList` component.

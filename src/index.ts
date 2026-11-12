@@ -225,6 +225,17 @@ export {
   type NumberFieldProps,
   parseNumber,
 } from "./components/NumberField/index.js";
+export {
+  OptionList,
+  OptionListGroup,
+  type OptionListGroupProps,
+  OptionListItem,
+  type OptionListItemProps,
+  OptionListNote,
+  type OptionListNoteProps,
+  type OptionListProps,
+  type OptionListTokens,
+} from "./components/OptionList/index.js";
 export { PageHeader, type PageHeaderProps, type PageHeaderTokens } from "./components/PageHeader/index.js";
 export {
   Pagination,

@@ -35,10 +35,9 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const listbox = () => document.querySelector(".cy-combobox-list") as HTMLElement;
+const listbox = () => document.querySelector('.cy-combobox [role="listbox"]') as HTMLElement;
 const isOpen = () => listbox().matches(":popover-open");
-const optionNames = () =>
-  [...listbox().querySelectorAll(".cy-combobox-option-label")].map((o) => o.textContent);
+const optionNames = () => [...listbox().querySelectorAll(".cy-option-list-label")].map((o) => o.textContent);
 const activeOption = (input: HTMLElement) => {
   const id = input.getAttribute("aria-activedescendant");
   return id ? document.getElementById(id) : null;
@@ -269,7 +268,7 @@ export const StableUnderHostileHost: Story = {
   play: async ({ canvas, userEvent }) => {
     await userEvent.click(canvas.getByRole("combobox", { name: "Fruit" }));
     await waitFor(() => expect(isOpen()).toBe(true));
-    for (const selector of [".cy-combobox-list", ".cy-combobox-option", ".cy-combobox-option-label"]) {
+    for (const selector of [".cy-option-list", ".cy-option-list-option", ".cy-option-list-label"]) {
       const { clean, hostile } = computeUnderHostileHost(document, selector, [
         "display",
         "padding-top",
@@ -435,7 +434,7 @@ export const OptionIconColourIsStableUnderHostileHost: Story = {
     for (const selector of [
       '.cy-combobox-icon[data-tone="danger"]',
       '.cy-combobox-icon[style*="color"]',
-      '.cy-combobox-option[aria-disabled="true"] .cy-combobox-icon',
+      '[role="option"][aria-disabled="true"] .cy-combobox-icon',
     ]) {
       const icon = computeUnderHostileHost(canvasElement, selector, ["color", "stroke", "width"]);
       await expect({ selector, ...icon.hostile }).toEqual({ selector, ...icon.clean });

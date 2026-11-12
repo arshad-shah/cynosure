@@ -62,7 +62,7 @@
   },
   {
     "name": "SearchField",
-    "path": ["dist/components/SearchField/SearchField.js", "dist/styles/search-field.css"],
+    "path": ["dist/components/SearchField/SearchField.js"],
     "limit": "1 kB",
     "gzip": true
   },
@@ -649,6 +649,12 @@
   {
     "name": "Choice",
     "path": ["dist/components/Choice/Choice.js", "dist/styles/choice.css"],
+    "limit": "3 kB",
+    "gzip": true
+  },
+  {
+    "name": "OptionList (JS + CSS)",
+    "path": ["dist/components/OptionList/OptionList.js", "dist/styles/option-list.css"],
     "limit": "3 kB",
     "gzip": true
   }

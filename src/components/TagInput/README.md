@@ -30,4 +30,4 @@ Also takes TextField's `label`, `labelHidden`, `description`, `error`, `placehol
 ## Tokens
 
 - `--cy-tag-input-tag-background`, `--cy-tag-input-tag-radius`
-- The suggestion list uses Combobox's tokens (`--cy-combobox-*`).
+- The suggestion list is an [OptionList](../OptionList/README.md): restyle it with `--cy-option-list-*`.

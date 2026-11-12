@@ -1,6 +1,6 @@
 /*
- * tag-input: a TextField, then the tags as a wrapping list of chips (text and a remove button). The suggestion list
- * reuses Combobox's listbox styles (combobox.css).
+ * tag-input: a TextField, then the tags as a wrapping list of chips (text and a remove button). Suggestions drop down
+ * in an OptionList.
  */
 .cy-tag-input.cy-tag-input {
   box-sizing: border-box !important;
@@ -55,16 +55,6 @@
   font-size: inherit;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-.cy-tag-input-status.cy-tag-input-status {
-  position: absolute;
-  inline-size: var(--cy-border-width);
-  block-size: var(--cy-border-width);
-  margin: calc(var(--cy-border-width) * -1);
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
-  font-size: inherit;
 }
 @media (forced-colors: active) {
   .cy-tag-input-tag.cy-tag-input-tag {
