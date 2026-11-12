@@ -101,6 +101,14 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* Wrapping, before truncation so a cut line still wins. `pre` keeps spaces and breaks; `break` breaks long words. */
+.cy-text.cy-text[data-wrap="pre"] {
+  white-space: pre-wrap;
+}
+.cy-text.cy-text[data-wrap="break"] {
+  overflow-wrap: anywhere;
+}
+
 /* One line: an inline element needs a box of its own before its text can be cut. */
 .cy-text.cy-text[data-truncate] {
   max-inline-size: 100%;
