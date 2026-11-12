@@ -39,6 +39,23 @@ Every typed word must appear in the label or the `keywords`, in any order, and c
 
 <Canvas of={Stories.RecentCommandsComeFirst} />
 
+Before anything is typed, commands are listed under their `group` headings. Search results are one flat list in rank order, so each row shows its group as a small [Badge](?path=/docs/components-badge--docs) between the label and the shortcut; recent commands, which mix groups, carry the tag too.
+
+<Canvas of={Stories.SearchResultsAreFlatWithCategoryTags} />
+
+## Your own search
+
+`filter(command, query)` replaces the built-in search, for an app with its own fuzzy matcher. It is called for each command while there is a query (trimmed), and answers with a match, `true`, or `null`:
+
+```tsx
+<CommandPalette commands={commands} onRun={run} filter={(command, query) => fuzzyMatch(query, command.label)} />
+```
+
+- **A match** `{ score, positions }` keeps the command. Lower scores come first, as fuzzy matchers score them; ties, and matches without a score, keep the order of `commands`. `positions` are the indices of the matched characters in the label, and exactly those are marked.
+- **`true`** keeps the command, unmarked. **`null`** or **`false`** leaves it out.
+
+<Canvas of={Stories.CustomFilterRanksAndMarksItsPositions} />
+
 ## Shortcuts with useHotkey
 
 ```tsx
@@ -59,12 +76,12 @@ Shortcuts with Ctrl, Command or Alt work everywhere, text fields included. Plain
 | Input | Result |
 | --- | --- |
 | <kbd>Ctrl</kbd> / <kbd>Command</kbd> + <kbd>K</kbd> | Opens or closes it from anywhere |
-| Typing | Filters the commands |
+| Typing | Filters the commands into one flat list, each tagged with its group |
 | <kbd>Down</kbd> / <kbd>Up</kbd> | Next / previous command, wrapping around; disabled ones are skipped |
 | <kbd>Enter</kbd> or a click | Runs the command and closes |
 | <kbd>Escape</kbd> or the backdrop | Closes; focus returns to where it was |
 
-- **Roles:** a modal `dialog` named by `labels.title`, holding a `combobox` search field and a `listbox` of `option`s in named `group`s. The active command is `aria-activedescendant`, so focus stays in the search field.
+- **Roles:** a modal `dialog` named by `labels.title`, holding a `combobox` search field and a `listbox` of `option`s in named `group`s (search results are one unnamed group). A row's group tag is part of its name. The active command is `aria-activedescendant`, so focus stays in the search field.
 - **Fresh each time:** the search field is empty whenever it opens.
 - **Shadow DOM:** works inside shadow roots (extensions), including the shortcut.
 

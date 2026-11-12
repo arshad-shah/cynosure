@@ -110,6 +110,7 @@ export {
 } from "./components/Combobox/index.js";
 export {
   type Command,
+  type CommandMatch,
   CommandPalette,
   type CommandPaletteLabels,
   type CommandPaletteProps,
@@ -274,6 +275,7 @@ export {
 } from "./components/NumberField/index.js";
 export {
   OptionList,
+  type OptionListAction,
   OptionListGroup,
   type OptionListGroupProps,
   OptionListItem,
@@ -307,6 +309,12 @@ export {
   type PanZoomCanvasProps,
   type PanZoomCanvasTokens,
 } from "./components/PanZoomCanvas/index.js";
+export {
+  PathField,
+  type PathFieldLabels,
+  type PathFieldProps,
+  type PathFieldTokens,
+} from "./components/PathField/index.js";
 export {
   Popover,
   type PopoverProps,

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 import { expect, fn, waitFor } from "storybook/test";
-import { flag, tag } from "../../icons/index.js";
+import { flag, settings, tag } from "../../icons/index.js";
 import { backdrop, contrast, rgb } from "../../test/color.js";
 import { computeUnderHostileHost } from "../../test/hostile.js";
 import { shownFully } from "../../test/settle.js";
@@ -348,6 +348,64 @@ export const PageKeysStopAtTheLastUsableOption: Story = {
     await expect(active(canvasElement)).toBe("Alpha");
     await userEvent.keyboard("{Enter}");
     await expect(canvas.getByRole("combobox")).toHaveTextContent("Alpha");
+  },
+};
+
+const manageConnections = fn();
+const connections: SelectOption[] = [
+  { value: "prod", label: "Production", trailing: "3 tabs" },
+  { value: "staging", label: "Staging", dimmed: true },
+  { value: "local", label: "Local", trailing: "Ctrl+3" },
+];
+
+export const TrailingDimmedAndAFooterAction: Story = {
+  tags: ["visual"],
+  args: {
+    label: "Connection",
+    options: connections,
+    defaultValue: "prod",
+    footer: { label: "Manage connections…", icon: settings, onSelect: manageConnections },
+  },
+  play: async ({ canvas, canvasElement, args, userEvent }) => {
+    const trigger = canvas.getByRole("combobox");
+    await userEvent.click(trigger);
+    await waitFor(() => expect(isOpen(list(canvasElement))).toBe(true));
+    // Trailing text is in the row (the trigger shows the label only); a dimmed option is still choosable.
+    await expect(canvas.getByRole("option", { name: /Production/ })).toHaveTextContent("3 tabs");
+    await expect(trigger).not.toHaveTextContent("3 tabs");
+    const staging = canvas.getByRole("option", { name: /Staging/ });
+    await expect(staging).toHaveAttribute("data-dimmed");
+    await expect(staging).not.toHaveAttribute("aria-disabled");
+    // The footer is the last option: End, ArrowDown and PageDown reach it, and it never goes past it.
+    await userEvent.keyboard("{End}");
+    await expect(active(canvasElement)).toBe("Manage connections…");
+    await userEvent.keyboard("{ArrowDown}");
+    await expect(active(canvasElement)).toBe("Manage connections…");
+    await userEvent.keyboard("{ArrowUp}");
+    await expect(active(canvasElement)).toMatch(/^Local/);
+    await userEvent.keyboard("{Home}{PageDown}");
+    await expect(active(canvasElement)).toBe("Manage connections…");
+    // Tab on the footer leaves without running it or changing the value.
+    await userEvent.keyboard("{Tab}");
+    await expect(manageConnections).not.toHaveBeenCalled();
+    await expect(isOpen(list(canvasElement))).toBe(false);
+    // Enter runs it: the list closes, the value stays and focus returns to the trigger.
+    trigger.focus();
+    await userEvent.keyboard("{ArrowUp}");
+    await expect(active(canvasElement)).toBe("Manage connections…");
+    await userEvent.keyboard("{Enter}");
+    await expect(manageConnections).toHaveBeenCalledTimes(1);
+    await expect(isOpen(list(canvasElement))).toBe(false);
+    await expect(trigger).toHaveTextContent("Production");
+    await expect(trigger).toHaveFocus();
+    // So does a press; choosing the dimmed option works.
+    await userEvent.click(trigger);
+    await userEvent.click(canvas.getByRole("option", { name: "Manage connections…" }));
+    await expect(manageConnections).toHaveBeenCalledTimes(2);
+    await expect(args.onChange).not.toHaveBeenCalled();
+    await userEvent.click(trigger);
+    await userEvent.click(canvas.getByRole("option", { name: /Staging/ }));
+    await expect(args.onChange).toHaveBeenLastCalledWith("staging");
   },
 };
 

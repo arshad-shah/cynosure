@@ -85,6 +85,51 @@
   font-size: var(--cy-font-size-sm);
   overflow-wrap: anywhere;
 }
+/* The chosen files (`value`): a column of rows across the zone, each an icon, the name and a remove button. */
+.cy-file-drop-files.cy-file-drop-files {
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+  gap: var(--cy-space-1);
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  list-style: none;
+  font-size: var(--cy-font-size-sm);
+  text-align: start;
+}
+.cy-file-drop-file.cy-file-drop-file {
+  display: flex;
+  align-items: center;
+  gap: var(--cy-space-2);
+  min-inline-size: 0;
+  min-block-size: var(--cy-control-height-sm);
+  margin: 0;
+  padding-block: 0;
+  padding-inline: var(--cy-space-3) var(--cy-space-1);
+  border: 0;
+  border-radius: var(--cy-radius-sm);
+  background: var(--cy-file-drop-file-background, var(--cy-color-soft));
+  color: var(--cy-color-ink);
+  font-size: var(--cy-font-size-sm);
+  &:has(> .cy-file-drop-file-name:last-child) {
+    padding-inline-end: var(--cy-space-3);
+  }
+}
+.cy-file-drop-file-icon.cy-file-drop-file-icon {
+  flex: none;
+  color: var(--cy-color-muted);
+}
+.cy-file-drop-file-name.cy-file-drop-file-name {
+  flex: 1;
+  min-inline-size: 0;
+  overflow: hidden;
+  border: 0;
+  font-size: inherit;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 /* The status and the native input are hidden from sight (.cy-visually-hidden); the input also takes no paint. */
 .cy-file-drop-status.cy-file-drop-status,
 .cy-file-drop-input.cy-file-drop-input {

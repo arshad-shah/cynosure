@@ -1,4 +1,5 @@
 import { type CSSProperties, forwardRef, type HTMLAttributes, type ReactNode } from "react";
+import type { IconData } from "../../icons/types.js";
 
 export interface OptionListTokens {
   bg: string;
@@ -12,6 +13,16 @@ declare module "../../tokens/schema.js" {
   interface ComponentTokens {
     optionList: OptionListTokens;
   }
+}
+
+/** An action at the foot of a field's list ("Manage connections…"): Select's and Combobox's `footer`. */
+export interface OptionListAction {
+  /** The action's text. */
+  label: string;
+  /** Icon before the text. */
+  icon?: IconData;
+  /** Runs the action, after the list has closed. The field's value does not change. */
+  onSelect: () => void;
 }
 
 export interface OptionListProps {
@@ -29,6 +40,12 @@ export interface OptionListProps {
   style?: CSSProperties;
   /** OptionListItem, OptionListNote and OptionListGroup. */
   children?: ReactNode;
+  /**
+   * Pinned under the options, set off by a line and kept in view while they scroll: an action such as "Manage
+   * connections…", drawn as an OptionListItem. It is an option of the list (a listbox holds only options), so the
+   * field's arrow keys reach it after the last option and Enter runs it, while focus stays in the field.
+   */
+  footer?: ReactNode;
 }
 
 /**
@@ -37,7 +54,7 @@ export interface OptionListProps {
  * `aria-activedescendant` from the field, which keeps focus.
  */
 export const OptionList = forwardRef<HTMLDivElement, OptionListProps>(function OptionList(
-  { id, label, "aria-labelledby": labelledBy, busy, className, style, children },
+  { id, label, "aria-labelledby": labelledBy, busy, className, style, children, footer },
   ref,
 ) {
   return (
@@ -53,6 +70,11 @@ export const OptionList = forwardRef<HTMLDivElement, OptionListProps>(function O
       {...{ popover: "manual" }}
     >
       {children}
+      {footer && (
+        <div role="none" className="cy-option-list-footer cy-reset">
+          {footer}
+        </div>
+      )}
     </div>
   );
 });
@@ -73,6 +95,10 @@ export interface OptionListItemProps
   active?: boolean;
   /** Shown but not choosable (`aria-disabled`). */
   disabled?: boolean | undefined;
+  /** Drawn at the end of the row, smaller and muted: a shortcut, a count. */
+  trailing?: ReactNode;
+  /** Drawn muted but still choosable: an option that is there but not in use (a saved, unconnected connection). */
+  dimmed?: boolean | undefined;
 }
 
 /** One option of an OptionList. A press never moves focus out of the field the list drops down from. */
@@ -84,6 +110,8 @@ export function OptionListItem({
   selected = false,
   active = false,
   disabled,
+  trailing,
+  dimmed,
   onPointerDown,
   ...rest
 }: OptionListItemProps) {
@@ -95,6 +123,7 @@ export function OptionListItem({
       aria-selected={selected}
       aria-disabled={disabled || undefined}
       data-active={active ? "" : undefined}
+      data-dimmed={dimmed ? "" : undefined}
       className="cy-option-list-option"
       tabIndex={-1}
       onPointerDown={(event) => {
@@ -109,6 +138,7 @@ export function OptionListItem({
         <span className="cy-option-list-label">{label}</span>
         {description && <span className="cy-option-list-description">{description}</span>}
       </span>
+      {trailing && <span className="cy-option-list-trailing">{trailing}</span>}
     </div>
   );
 }

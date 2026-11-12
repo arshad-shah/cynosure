@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useEffect, useState } from "react";
 import { expect, fn, waitFor } from "storybook/test";
-import { flag, heart, tag } from "../../icons/index.js";
+import { flag, heart, plus, tag } from "../../icons/index.js";
 import { backdrop, contrast, rgb } from "../../test/color.js";
 import { computeUnderHostileHost } from "../../test/hostile.js";
 import { shownFully } from "../../test/settle.js";
@@ -64,6 +64,56 @@ export const TypeToFilterThenChooseWithEnter: Story = {
     await waitFor(() => expect(isOpen()).toBe(false));
     await expect(input).not.toHaveAttribute("aria-activedescendant");
     await expect(input).toHaveFocus();
+  },
+};
+
+const newConnection = fn();
+
+export const TrailingDimmedAndAFooterAction: Story = {
+  tags: ["visual"],
+  args: {
+    label: "Connection",
+    options: [
+      { value: "prod", label: "Production", trailing: "3 tabs" },
+      { value: "staging", label: "Staging", dimmed: true },
+      { value: "local", label: "Local" },
+    ],
+    footer: { label: "New connection", icon: plus, onSelect: newConnection },
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    const input = canvas.getByRole("combobox", { name: "Connection" });
+    await userEvent.click(input);
+    await waitFor(() => expect(isOpen()).toBe(true));
+    await expect(canvas.getByRole("option", { name: /Production/ })).toHaveTextContent("3 tabs");
+    await expect(canvas.getByRole("option", { name: /Staging/ })).toHaveAttribute("data-dimmed");
+    // The footer is the arrow keys' last stop, after the last option, and they never go past it.
+    await expect(activeOption(input)).toHaveTextContent("Production");
+    await userEvent.keyboard("{ArrowDown}{ArrowDown}{ArrowDown}");
+    await expect(activeOption(input)).toHaveTextContent("New connection");
+    await userEvent.keyboard("{ArrowDown}");
+    await expect(activeOption(input)).toHaveTextContent("New connection");
+    await userEvent.keyboard("{ArrowUp}");
+    await expect(activeOption(input)).toHaveTextContent("Local");
+    // It stays when nothing matches the text, still reachable.
+    await userEvent.keyboard("zz");
+    await expect(canvas.getByRole("option", { name: "No matches" })).toBeVisible();
+    await userEvent.keyboard("{ArrowDown}");
+    await expect(activeOption(input)).toHaveTextContent("New connection");
+    // Enter runs it: the list closes, focus stays, the value does not change.
+    await userEvent.keyboard("{Enter}");
+    await expect(newConnection).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(isOpen()).toBe(false));
+    await expect(input).toHaveFocus();
+    await expect(args.onChange).not.toHaveBeenCalled();
+    // A press runs it too; a dimmed option is still chosen like any other.
+    await userEvent.clear(input);
+    await waitFor(() => expect(isOpen()).toBe(true));
+    await userEvent.click(canvas.getByRole("option", { name: "New connection" }));
+    await expect(newConnection).toHaveBeenCalledTimes(2);
+    await waitFor(() => expect(isOpen()).toBe(false));
+    await userEvent.keyboard("{ArrowDown}");
+    await userEvent.click(canvas.getByRole("option", { name: /Staging/ }));
+    await expect(args.onChange).toHaveBeenLastCalledWith("staging");
   },
 };
 

@@ -2,7 +2,7 @@
   {
     "name": "all CSS",
     "path": "dist/styles.css",
-    "limit": "36.7 kB",
+    "limit": "37 kB",
     "gzip": true
   },
   {
@@ -311,7 +311,7 @@
       "dist/foundations/hotkey.js",
       "dist/styles/command-palette.css"
     ],
-    "limit": "5 kB",
+    "limit": "5.2 kB",
     "gzip": true
   },
   {
@@ -389,7 +389,7 @@
   {
     "name": "FileDrop (with Button)",
     "path": ["dist/components/FileDrop/FileDrop.js", "dist/styles/file-drop.css"],
-    "limit": "3 kB",
+    "limit": "3.5 kB",
     "gzip": true
   },
   {
@@ -726,6 +726,24 @@
     "name": "DataGrid",
     "path": ["dist/components/DataGrid/DataGrid.js", "dist/styles/data-grid.css"],
     "limit": "5.9 kB",
+    "gzip": true
+  },
+  {
+    "name": "PathField",
+    "path": ["dist/components/PathField/PathField.js", "dist/styles/path-field.css"],
+    "limit": "1.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "icons/by-name (every Facet icon)",
+    "path": [
+      "dist/icons/*.js",
+      "!dist/icons/index.js",
+      "!dist/icons/keywords.js",
+      "!dist/icons/to-svg.js",
+      "!dist/icons/validate.js"
+    ],
+    "limit": "65.5 kB",
     "gzip": true
   }
 ]

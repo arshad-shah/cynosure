@@ -57,6 +57,12 @@ The list has a maximum height and scrolls. Long labels truncate with an ellipsis
 - **`labels`:** override `placeholder`, `empty` (no options) and `required` (validation message).
 - **`labelHidden`:** hides the label visually while it still names the trigger. Prefer a visible label.
 
+## Trailing text, dimmed options and a footer action
+
+An option's `trailing` is drawn at the end of its row in the list, smaller and muted (a shortcut, a count); the trigger shows the label only. `dimmed` draws an option muted while it stays choosable. `footer` pins an action under the options, `{ label, icon?, onSelect }`: it is the last option the arrow keys reach (End and PageDown too), and Enter, Space or a press closes the list and runs it. The value does not change, and Tab passes over it.
+
+<Canvas of={Stories.TrailingDimmedAndAFooterAction} />
+
 ## Coloured icons
 
 `iconTone` and `iconColor` colour an option's icon and mean what [Icon](?path=/docs/foundations-icon--docs)'s `tone` and `color` mean: `iconTone` is a semantic colour (`accent`, `neutral`, `danger`, `success`, `warning`, `info`, `muted`), `iconColor` is any CSS colour and overrides it (`brand` draws a brand mark in its owner's colour). The colour shows in the list, on the highlighted and the selected option, and in the trigger once the option is chosen. Without the two fields an icon takes the text colour.
@@ -75,7 +81,7 @@ A disabled option shows its icon without the colour, muted with the rest of the 
 | --- | --- |
 | Click, <kbd>Enter</kbd>, <kbd>Space</kbd>, <kbd>ArrowDown</kbd>, <kbd>ArrowUp</kbd> | Opens the list |
 | Arrow keys, <kbd>Home</kbd>, <kbd>End</kbd>, <kbd>PageUp</kbd>, <kbd>PageDown</kbd> | Move through options, skipping disabled ones |
-| <kbd>Enter</kbd>, <kbd>Space</kbd>, <kbd>Tab</kbd> | Select the active option |
+| <kbd>Enter</kbd>, <kbd>Space</kbd>, <kbd>Tab</kbd> | Select the active option (Enter and Space run the `footer` action when it is active) |
 | <kbd>Escape</kbd> | Closes without changing the value |
 | Typing | Jumps to a matching option (ignored during IME composition) |
 

@@ -17,12 +17,16 @@ A select-only combobox (WAI-ARIA APG): the trigger is a Cynosure button with `ro
 | -------------------------------------------- | ---------------- | ----------------------------------------------------------------------------------- |
 | `label` / `description` / `error`            | –                | Through `Field`                                                                     |
 | `options`                                    | –                | `{ value, label, description?, icon?, iconTone?, iconColor?, disabled?, group? }[]` |
+| `options[].trailing` / `options[].dimmed`    | –                | Row-end text in the list (a shortcut, a count); muted but still choosable           |
+| `footer`                                     | –                | `{ label, icon?, onSelect }`: an action pinned under the options (see below)        |
 | `value` / `defaultValue` / `onChange(value)` | –                | Controlled or uncontrolled                                                          |
 | `placeholder`                                | `"Select…"`      | Also `labels.placeholder`; `labels.empty` for no options                            |
 | `size` / `variant`                           | `md` / `outline` | Shared vocabulary; `size` also takes `xs` (20px, dense chrome)                      |
 | `name`, `required`, `disabled`               | –                | `required` participates in form validation                                          |
 
 **Keyboard:** ArrowDown/Up, Enter or Space open; arrows, Home, End, PageUp, PageDown move (disabled skipped); Enter, Space or Tab select; Escape closes without change; typing jumps (ignored during IME composition). Coarse pointers get 44px rows.
+
+- `footer` is the arrow keys' last option (End and PageDown reach it); Enter, Space or a press closes the list, returns focus to the trigger and calls `onSelect`. The value does not change, and Tab passes over it.
 
 - Options with the same `group`, next to each other, are listed under that heading (`role="group"`); arrow keys move straight across headings.
 

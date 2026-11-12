@@ -14,6 +14,8 @@ interface Fruit {
   label: string;
   description?: string;
   disabled?: boolean;
+  dimmed?: boolean;
+  trailing?: string;
   group?: string;
 }
 const FRUITS: Fruit[] = [
@@ -27,11 +29,13 @@ interface DemoProps {
   fruits?: Fruit[];
   grouped?: boolean;
   onChoose?: (value: string) => void;
+  /** An action pinned under the options. */
+  onManage?: () => void;
   style?: CSSProperties;
 }
 
 /** A button that drops an OptionList down (the parts Select, Combobox and TagInput put together). */
-function Demo({ fruits = FRUITS, grouped = false, onChoose, style }: DemoProps) {
+function Demo({ fruits = FRUITS, grouped = false, onChoose, onManage, style }: DemoProps) {
   const id = useId();
   const anchor = useRef<HTMLButtonElement>(null);
   const list = useRef<HTMLDivElement>(null);
@@ -49,6 +53,8 @@ function Demo({ fruits = FRUITS, grouped = false, onChoose, style }: DemoProps) 
       selected={fruit.value === chosen}
       active={index === active}
       disabled={fruit.disabled}
+      dimmed={fruit.dimmed}
+      trailing={fruit.trailing}
       onPointerMove={() => !fruit.disabled && setActive(index)}
       onClick={() => {
         if (fruit.disabled) return;
@@ -64,7 +70,25 @@ function Demo({ fruits = FRUITS, grouped = false, onChoose, style }: DemoProps) 
       <Button ref={anchor} aria-expanded={open} aria-controls={id} onClick={() => setOpen(!open)}>
         Fruit
       </Button>
-      <OptionList ref={list} id={id} label="Fruit">
+      <OptionList
+        ref={list}
+        id={id}
+        label="Fruit"
+        footer={
+          onManage && (
+            <OptionListItem
+              id={`${id}-manage`}
+              label="Manage fruit…"
+              active={active === fruits.length}
+              onPointerMove={() => setActive(fruits.length)}
+              onClick={() => {
+                setOpen(false);
+                onManage();
+              }}
+            />
+          )
+        }
+      >
         {fruits.length === 0 && <OptionListNote>No fruit</OptionListNote>}
         {grouped
           ? groups.map((group) => (
@@ -176,6 +200,75 @@ export const DisabledOptionsDescriptionsAndNotes: Story = {
   },
 };
 
+const MORE_FRUITS: Fruit[] = [
+  { value: "apple", label: "Apple", trailing: "12" },
+  { value: "pear", label: "Pear", trailing: "Ctrl+P", dimmed: true },
+  { value: "banana", label: "Banana" },
+  { value: "cherry", label: "Cherry", dimmed: true },
+  { value: "damson", label: "Damson" },
+  { value: "fig", label: "Fig" },
+  { value: "grape", label: "Grape" },
+  { value: "kiwi", label: "Kiwi" },
+];
+const manage = fn();
+const chooseDimmed = fn();
+
+export const TrailingDimmedAndFooter: Story = {
+  tags: ["visual"],
+  render: () => (
+    <Demo
+      fruits={MORE_FRUITS}
+      onChoose={chooseDimmed}
+      onManage={manage}
+      style={{ "--cy-option-list-max-height": "200px" } as CSSProperties}
+    />
+  ),
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const button = canvas.getByRole("button", { name: "Fruit" });
+    await userEvent.click(button);
+    const list = listbox(canvasElement);
+    await waitFor(() => expect(list.matches(":popover-open")).toBe(true));
+    await shownFully(list);
+    // Trailing content sits at the row's end, after the label, smaller and muted.
+    const apple = option(canvasElement, "Apple");
+    const count = canvas.getByText("12");
+    const label = canvas.getByText("Apple");
+    await expect(apple).toContainElement(count);
+    await expect(count.getBoundingClientRect().left).toBeGreaterThan(label.getBoundingClientRect().right);
+    await expect(apple.getBoundingClientRect().right - count.getBoundingClientRect().right).toBeLessThan(24);
+    await expect(getComputedStyle(count).color).not.toBe(getComputedStyle(label).color);
+    // A dimmed option reads muted but is not disabled: it can still be chosen.
+    const pear = option(canvasElement, "Pear");
+    const banana = option(canvasElement, "Banana");
+    await expect(pear).not.toHaveAttribute("aria-disabled");
+    await expect(getComputedStyle(pear).color).not.toBe(getComputedStyle(banana).color);
+    // The footer is an option of the listbox, after the last option, pinned to the bottom while the options scroll.
+    const footer = option(canvasElement, "Manage fruit");
+    const options = [...list.querySelectorAll('[role="option"]')];
+    await expect(options.at(-1)).toBe(footer);
+    await expect(footer).toHaveAttribute("aria-selected", "false");
+    await expect(list.scrollHeight).toBeGreaterThan(list.clientHeight);
+    const pinned = () =>
+      expect(
+        Math.abs(list.getBoundingClientRect().bottom - footer.getBoundingClientRect().bottom),
+      ).toBeLessThan(16);
+    await pinned();
+    list.scrollTop = 40;
+    await pinned();
+    // It is set off from the options by a line.
+    await expect(getComputedStyle(footer.parentElement as HTMLElement).borderTopStyle).toBe("solid");
+    // Choosing a dimmed option works; pressing the footer runs its action and keeps focus in the field.
+    await userEvent.click(pear);
+    await expect(chooseDimmed).toHaveBeenLastCalledWith("pear");
+    await userEvent.click(button);
+    await waitFor(() => expect(list.matches(":popover-open")).toBe(true));
+    button.focus();
+    await userEvent.click(option(canvasElement, "Manage fruit"));
+    await expect(manage).toHaveBeenCalledTimes(1);
+    await expect(button).toHaveFocus();
+  },
+};
+
 export const GroupsAreNamedByTheirHeadings: Story = {
   play: async ({ canvas, canvasElement, userEvent }) => {
     await userEvent.click(canvas.getByRole("button", { name: "Fruit" }));
@@ -222,32 +315,46 @@ export const TokensRestyleTheList: Story = {
 export const RightToLeft: Story = {
   render: () => (
     <div dir="rtl">
-      <Demo />
+      <Demo fruits={MORE_FRUITS} onManage={() => {}} />
     </div>
   ),
   play: async ({ canvas, canvasElement, userEvent }) => {
     await userEvent.click(canvas.getByRole("button", { name: "Fruit" }));
     const apple = option(canvasElement, "Apple");
     await waitFor(() => expect(apple).toBeVisible());
-    // The icon leads on the right, the text follows to its left.
+    // The icon leads on the right, the text follows to its left, and the trailing count ends the row on the left.
     const icon = apple.querySelector("svg") as SVGElement;
     const text = apple.querySelector("span") as HTMLElement;
     await expect(icon.getBoundingClientRect().left).toBeGreaterThanOrEqual(
       text.getBoundingClientRect().right - 1,
     );
+    const count = canvas.getByText("12");
+    await expect(count.getBoundingClientRect().right).toBeLessThan(
+      canvas.getByText("Apple").getBoundingClientRect().left,
+    );
   },
 };
 
 export const StableUnderHostileHost: Story = {
+  render: () => (
+    <>
+      <Demo grouped />
+      <Demo fruits={MORE_FRUITS} onManage={() => {}} />
+    </>
+  ),
   play: async ({ canvas, canvasElement, userEvent }) => {
-    await userEvent.click(canvas.getByRole("button", { name: "Fruit" }));
-    await waitFor(() => expect(listbox(canvasElement).matches(":popover-open")).toBe(true));
+    for (const button of canvas.getAllByRole("button", { name: "Fruit" })) {
+      await userEvent.click(button);
+      await waitFor(() => expect(button.nextElementSibling?.matches(":popover-open")).toBe(true));
+    }
     for (const selector of [
       ".cy-option-list",
       ".cy-option-list-option",
       ".cy-option-list-label",
       ".cy-option-list-description",
       ".cy-option-list-group-label",
+      ".cy-option-list-trailing",
+      ".cy-option-list-footer",
     ]) {
       const { clean, hostile } = computeUnderHostileHost(canvasElement, selector, [
         "font-size",

@@ -349,7 +349,8 @@ export function scaffoldIcon(root: string, name: string, svg: string, category: 
     file,
     `import type { IconData } from "./types.js";\n\nexport const ${id}: IconData = {\n  name: ${JSON.stringify(name)},\n  category: ${JSON.stringify(category)},\n  body: ${literal(icon.body)},\n};\n`,
   );
-  const index = join(root, "src/icons/index.ts");
+  // Icons are listed in facet.ts (re-exported by index.ts and read by by-name.ts), one export each.
+  const index = join(root, "src/icons/facet.ts");
   writeFileSync(index, sortExports(`${readFileSync(index, "utf8")}export { ${id} } from "./${name}.js";\n`));
   return file;
 }
