@@ -1,0 +1,117 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./StatusBar.stories";
+
+<Meta of={Stories} />
+
+# StatusBar
+
+The bar along the bottom of a desktop app or editor: short status segments (connection, branch, cursor position, problems) in a `start` and an `end` cluster. Segments that do something are buttons, and one can open a [Popover](?path=/docs/components-popover--docs) above itself.
+
+<Canvas of={Stories.StartAndEndClusters} />
+
+## When to use
+
+- **The status line of an app shell:** what is connected, where the cursor is, what needs attention.
+- **Short, glanceable state** with a few quick actions behind it (switch connection, show problems).
+
+**Use something else when:**
+- the row holds actions rather than state: a [Toolbar](?path=/docs/components-toolbar--docs)
+- the message needs reading or acting on now: a [Notice](?path=/docs/components-notice--docs) or a [Toast](?path=/docs/components-toast--docs)
+- the bar is the app's menu: a [Menubar](?path=/docs/components-menubar--docs)
+- it is a page footer with links: [SiteFooter](?path=/docs/components-sitefooter--docs)
+
+## Usage
+
+```tsx
+import { StatusBar, StatusBarSegment } from "@arshad-shah/cynosure";
+import { gitBranch, warning } from "@arshad-shah/cynosure/icons";
+
+<StatusBar
+  label="Status"
+  start={
+    <>
+      <StatusBarSegment
+        variant="solid"
+        tone="accent"
+        dot
+        dotTone="success"
+        dotLabel="Connected"
+        popover={<ConnectionList />}
+        popoverLabel="Connections"
+      >
+        main-db
+      </StatusBarSegment>
+      <StatusBarSegment icon={gitBranch} mono>
+        feature/login
+      </StatusBarSegment>
+    </>
+  }
+  end={
+    <>
+      <StatusBarSegment mono>Ln 12, Col 4</StatusBarSegment>
+      <StatusBarSegment tone="warning" icon={warning} onClick={showProblems}>
+        2 warnings
+      </StatusBarSegment>
+    </>
+  }
+/>
+```
+
+## Segments
+
+A segment is its text (`children`) with an `icon` or a status `dot` before it. `tone` colours a `plain` segment's text and icon, or fills a `soft` (tinted) or `solid` segment. `mono` sets the text in the monospace face, for positions, paths and versions.
+
+The dot is a [Badge](?path=/docs/components-badge--docs) status dot: `dot` is `true` for a steady one or `"live"` for a pulsing one, in `dotTone` (default: the segment's `tone`). When the text does not say the state (a database name beside a green dot), give `dotLabel`, and the dot becomes part of the segment's name ("Connected main-db"); without it the dot is decoration.
+
+<Canvas of={Stories.DotTones} />
+
+## Clickable segments and popovers
+
+With `onClick` a segment is a [Button](?path=/docs/components-button--docs) of size `xs`, flat and as tall as the bar. With `popover` it opens that content in a Popover above itself (`placement`, default `top`, flips when it does not fit), named by `popoverLabel`; `open`, `defaultOpen` and `onOpenChange` control it, so another control can open it too.
+
+<Canvas of={Stories.PopoverOpensUpward} />
+
+## Long text
+
+Text wider than `--cy-status-bar-segment-max-width` ends in an ellipsis, and the full text shows in a tooltip on hover (and on keyboard focus for a clickable segment). Text that fits has no tooltip.
+
+<Canvas of={Stories.LongTextShowsInFullInATooltip} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+StatusBarSegment takes `children`, `tone`, `variant`, `icon`, `dot`, `dotTone`, `dotLabel`, `mono`, `label`, `onClick`, `popover`, `popoverLabel`, `placement`, `open`, `defaultOpen`, `onOpenChange`, `disabled`, `className` and `style`.
+
+## Behaviour and accessibility
+
+| Input | Result |
+| --- | --- |
+| <kbd>Tab</kbd> | Enters the bar on one clickable segment (the one last used); <kbd>Tab</kbd> again leaves it |
+| <kbd>Left</kbd> / <kbd>Right</kbd> arrows | Move between clickable segments across both clusters, wrapping; status-only and disabled segments are skipped |
+| <kbd>Home</kbd> / <kbd>End</kbd> | First / last clickable segment |
+| <kbd>Enter</kbd>, <kbd>Space</kbd> or click | Presses the segment, or opens or closes its popover |
+| <kbd>Escape</kbd> in a popover | Closes it and returns focus to the segment |
+| Click outside a popover | Closes it |
+
+- **Role:** `toolbar` named by `label`, with `aria-orientation="horizontal"`. Not `status`: a live region would read out every change in the bar (cursor positions, counters). Announce what matters with [Announcer](?path=/docs/components-announcer--docs).
+- **Popover segments** have `aria-haspopup="dialog"`, `aria-expanded` and `aria-controls`; focus moves into the panel, and arrow keys inside it are the panel's.
+- **Long text** keeps its full text as the accessible name; the tooltip is not a `title` attribute.
+- **Right to left:** the start cluster sits on the right, and Left and Right swap.
+- **Shadow DOM:** works inside a shadow root (arrow keys, popover and focus return).
+
+## Touch
+
+Clickable segments look dense but their hit area is at least 24px, and 44px on coarse pointers; the bar keeps its height. A tap opens a popover; tooltips never open on touch.
+
+## Theming
+
+Tokens: `--cy-status-bar-height`, `--cy-status-bar-background`, `--cy-status-bar-border` (the top line's colour), `--cy-status-bar-font-size`, `--cy-status-bar-padding-inline` (inside each segment), `--cy-status-bar-segment-max-width` and `--cy-status-bar-gap`.
+
+```ts
+createTheme({ components: { statusBar: { height: "22px", segmentMaxWidth: "24ch" } } });
+```
+
+## Related
+
+[Toolbar](?path=/docs/components-toolbar--docs) · [Badge](?path=/docs/components-badge--docs) · [Popover](?path=/docs/components-popover--docs) · [Tooltip](?path=/docs/components-tooltip--docs) · [Menubar](?path=/docs/components-menubar--docs)

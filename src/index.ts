@@ -393,6 +393,14 @@ export {
   type StatTokens,
 } from "./components/Stat/index.js";
 export {
+  StatusBar,
+  type StatusBarProps,
+  StatusBarSegment,
+  type StatusBarSegmentProps,
+  type StatusBarSegmentVariant,
+  type StatusBarTokens,
+} from "./components/StatusBar/index.js";
+export {
   type StepItem,
   type StepStatus,
   Steps,
