@@ -49,6 +49,27 @@ function Scene(screen: CanvasScreen) {
 
 <Canvas of={Stories.PaintedIntoACanvas} />
 
+## Dragging nodes
+
+To drag a node (a table card) rather than pan, claim the press: `claimPress` is asked about every press except a Space+drag, with the point in canvas units, the element pressed and the pointer type. Return `{ onMove, onEnd }` to follow it, `true` to claim it without them, or nothing to leave it to the canvas (the background and painted content pan). `onMove` and `onEnd` get `{ point, delta }` in canvas units, whatever the zoom; `onEnd` also says whether Escape cancelled the drag. A press that does not travel is a tap (`delta` is zero); the click after a claimed press is not delivered, so select in `onEnd`. It serves children (look at `press.target`) and painted content (hit-test `press.point` with your own `pick`) alike; while two fingers pinch, the node stays put.
+
+```tsx
+claimPress={({ point }) => {
+  const card = pick(cards, point.x, point.y);
+  if (!card) return; // the background pans
+  const from = { x: card.x, y: card.y };
+  return {
+    onMove: ({ delta }) => moveCard(card.id, from.x + delta.x, from.y + delta.y),
+    onEnd: ({ delta }, cancelled) => {
+      if (cancelled) moveCard(card.id, from.x, from.y);
+      else if (!delta.x && !delta.y) select(card.id);
+    },
+  };
+}}
+```
+
+<Canvas of={Stories.DragANodeNotTheView} />
+
 ## Props
 
 <ArgTypes of={Stories} />
@@ -56,8 +77,8 @@ function Scene(screen: CanvasScreen) {
 ## Behaviour and accessibility
 
 - **Role:** a named region and tab stop. Zoom changes are announced ("Zoom 125%").
-- **Pointer:** drag the empty background, or hold Space and drag anywhere, to pan; the wheel pans; Ctrl/Cmd+wheel zooms around the pointer. Presses on your content are left to it.
-- **Touch:** one finger pans; two fingers pinch-zoom around their midpoint.
+- **Pointer:** drag the empty background, or hold Space and drag anywhere, to pan; the wheel pans; Ctrl/Cmd+wheel zooms around the pointer. Presses on your content are left to it, and presses `claimPress` claims never pan.
+- **Touch:** one finger pans (or drags a claimed node); two fingers pinch-zoom around their midpoint.
 
 | Key | Does |
 | --- | --- |

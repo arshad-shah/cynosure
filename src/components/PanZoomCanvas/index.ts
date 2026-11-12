@@ -1,4 +1,8 @@
 export {
+  type CanvasDrag,
+  type CanvasPoint,
+  type CanvasPress,
+  type CanvasPressHandlers,
   type CanvasRect,
   type CanvasScreen,
   type CanvasView,

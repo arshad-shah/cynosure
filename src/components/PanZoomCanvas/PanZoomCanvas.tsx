@@ -9,7 +9,7 @@ import {
 } from "react";
 import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js";
 import { useControllableState } from "../../foundations/controllable.js";
-import { useDrag } from "../../foundations/drag.js";
+import { type DragSession, useDrag } from "../../foundations/drag.js";
 import { clamp } from "../../foundations/math.js";
 import { clampPercent, MAX_PERCENT, MIN_PERCENT } from "../../foundations/zoom.js";
 import { useZoomGestures, type ZoomAnchor } from "../../foundations/zoom-gestures.js";
@@ -67,6 +67,37 @@ export interface CanvasScreen {
   transform: [number, number, number, number, number, number];
 }
 
+/** A point in canvas units. */
+export interface CanvasPoint {
+  x: number;
+  y: number;
+}
+
+/** A press on the canvas, offered to `claimPress` before it pans. */
+export interface CanvasPress {
+  /** Where, in canvas units: hit-test painted content with it. */
+  point: CanvasPoint;
+  /** The element pressed: one of your children, or the canvas itself (its background and anything painted). */
+  target: Element;
+  /** "mouse", "pen" or "touch". */
+  pointerType: string;
+}
+
+/** Where a claimed press has got to. */
+export interface CanvasDrag {
+  /** The pointer now, in canvas units. */
+  point: CanvasPoint;
+  /** How far it has come since the press, in canvas units (screen pixels divided by the scale). */
+  delta: CanvasPoint;
+}
+
+/** Follows a claimed press: move a node with `onMove`; `onEnd` with no `delta` is a tap. */
+export interface CanvasPressHandlers {
+  onMove?: (drag: CanvasDrag) => void;
+  /** `cancelled` when Escape (or the browser) cancelled the drag: put the node back. */
+  onEnd?: (drag: CanvasDrag, cancelled: boolean) => void;
+}
+
 export interface PanZoomCanvasLabels {
   /** Announced when the zoom changes. Default "Zoom 125%". */
   zoom: (percent: number) => string;
@@ -97,6 +128,13 @@ export interface PanZoomCanvasProps {
    * the pointer, so pressing it pans like the background.
    */
   renderScreen?: (screen: CanvasScreen) => ReactNode;
+  /**
+   * Asked about each press (not one with Space held, which always pans): return handlers to follow it (drag a node, and
+   * the view stays), `true` to claim it without them, or nothing to leave it to the canvas (the background and painted
+   * content pan; presses on your children are left to them). Works for children and painted content alike: hit-test
+   * `press.point` or look at `press.target`.
+   */
+  claimPress?: ((press: CanvasPress) => CanvasPressHandlers | boolean | null | undefined) | undefined;
   /** The content, placed in canvas units (absolutely positioned children). */
   children?: ReactNode;
   /** Replace the built-in English text: the zoom announcement. */
@@ -146,6 +184,7 @@ export const PanZoomCanvas = forwardRef<PanZoomCanvasHandle, PanZoomCanvasProps>
     minimap = false,
     renderMinimap,
     renderScreen,
+    claimPress,
     children,
     labels,
     className,
@@ -234,12 +273,36 @@ export const PanZoomCanvas = forwardRef<PanZoomCanvasHandle, PanZoomCanvasProps>
   });
 
   const percent = Math.round(current.scale * 100);
+  /** A screen point (viewport pixels) in canvas units, at the view now. */
+  const toCanvas = (p: { x: number; y: number }) => {
+    const r = (surface.current as HTMLElement).getBoundingClientRect();
+    const v = latest.current;
+    return { x: (p.x - r.left - v.x) / v.scale, y: (p.y - r.top - v.y) / v.scale };
+  };
   const gestures = useZoomGestures(surface, {
     percent,
     min: minScale * 100,
     max: maxScale * 100,
     onZoom: (p, at: ZoomAnchor) => zoomAround(p / 100, at ?? centre()),
     onPan: (dx, dy) => go({ ...latest.current, x: latest.current.x + dx, y: latest.current.y + dy }),
+    claim: (session) => {
+      if (!claimPress) return null;
+      const from = toCanvas(session.origin);
+      const owner = claimPress({
+        point: from,
+        target: session.path[0] as Element,
+        pointerType: session.pointerType,
+      });
+      if (!owner || owner === true) return owner;
+      const dragOf = (s: DragSession): CanvasDrag => {
+        const point = toCanvas(s.point);
+        return { point, delta: { x: point.x - from.x, y: point.y - from.y } };
+      };
+      return {
+        onMove: (s) => owner.onMove?.(dragOf(s)),
+        onEnd: (s, cancelled) => owner.onEnd?.(dragOf(s), cancelled),
+      };
+    },
   });
   const onKeyDown = (event: KeyboardEvent<HTMLElement>) => {
     gestures.onKeyDown(event);

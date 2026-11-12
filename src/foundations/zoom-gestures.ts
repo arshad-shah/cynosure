@@ -1,10 +1,17 @@
 import { type KeyboardEvent, type RefObject, useEffect, useRef, useState } from "react";
-import { useDrag } from "./drag.js";
+import { type DragSession, useDrag } from "./drag.js";
 import { clamp } from "./math.js";
 import { clampPercent, MAX_PERCENT, MIN_PERCENT, zoomStep } from "./zoom.js";
 
 /** Where a zoom is centred, in pixels from the viewport's top left; null for its centre (a key or a button). */
 export type ZoomAnchor = { x: number; y: number } | null;
+
+/** A press the caller follows itself (a node being dragged); see `claim`. */
+export interface ClaimedPress {
+  onMove?: ((session: DragSession) => void) | undefined;
+  /** `cancelled` when Escape (or the browser) cancelled it: put things back. */
+  onEnd?: ((session: DragSession, cancelled: boolean) => void) | undefined;
+}
 
 export interface ZoomGestureOptions {
   /** The percent shown now. */
@@ -20,6 +27,11 @@ export interface ZoomGestureOptions {
   min?: number | undefined;
   /** The largest percent the wheel, a pinch and the keys go to. Default 800. */
   max?: number | undefined;
+  /**
+   * Asked first about each press that is not a Space+drag: return handlers to follow its drag yourself (it never pans),
+   * `true` to leave it alone (it never pans), or nothing for the usual rules. A finger pinching does not move it.
+   */
+  claim?: ((session: DragSession) => ClaimedPress | boolean | null | undefined) | undefined;
 }
 
 /**
@@ -33,10 +45,10 @@ export interface ZoomGestureOptions {
  */
 export function useZoomGestures(
   scroller: RefObject<HTMLElement | null>,
-  { percent, onZoom, onPan, min = MIN_PERCENT, max = MAX_PERCENT }: ZoomGestureOptions,
+  { percent, onZoom, onPan, min = MIN_PERCENT, max = MAX_PERCENT, claim }: ZoomGestureOptions,
 ) {
-  const latest = useRef({ percent, onZoom, onPan, min, max });
-  latest.current = { percent, onZoom, onPan, min, max };
+  const latest = useRef({ percent, onZoom, onPan, min, max, claim });
+  latest.current = { percent, onZoom, onPan, min, max, claim };
   /** True while two fingers are down: the first one's drag must not pan meanwhile. */
   const pinching = useRef(false);
   const [panning, setPanning] = useState(false);
@@ -120,15 +132,30 @@ export function useZoomGestures(
   // Space+drag pans with a mouse or pen; a scroller's finger pans natively (it keeps touch-action pan-x pan-y). With
   // `onPan`, a press on the element's own background pans too, and so does a finger.
   const last = useRef({ x: 0, y: 0 });
+  /** The press being followed by its claimer, if any. */
+  const claimed = useRef<ClaimedPress | null>(null);
   useDrag(scroller, {
     touchAction: "css",
-    onStart: ({ pointerType, path }) => {
+    onStart: (session) => {
+      const { pointerType, path } = session;
+      claimed.current = null;
+      const owner = panningRef.current ? null : latest.current.claim?.(session);
+      if (owner) {
+        if (owner === true) return false;
+        claimed.current = owner;
+        return;
+      }
       const custom = !!latest.current.onPan;
       const background = custom && path[0] === scroller.current;
       if (pointerType === "touch" ? !background : !panningRef.current && !background) return false;
       last.current = { x: 0, y: 0 };
     },
-    onMove: ({ delta }) => {
+    onMove: (session) => {
+      if (claimed.current) {
+        if (!pinching.current) claimed.current.onMove?.(session);
+        return;
+      }
+      const { delta } = session;
       const dx = delta.x - last.current.x;
       const dy = delta.y - last.current.y;
       last.current = { x: delta.x, y: delta.y };
@@ -140,6 +167,10 @@ export function useZoomGestures(
         el.scrollLeft -= dx;
         el.scrollTop -= dy;
       }
+    },
+    onEnd: (session, cancelled) => {
+      claimed.current?.onEnd?.(session, cancelled);
+      claimed.current = null;
     },
   });
 

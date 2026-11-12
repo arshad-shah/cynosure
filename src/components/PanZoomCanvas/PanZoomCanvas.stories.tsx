@@ -479,6 +479,228 @@ export const WithoutAMinimap: Story = {
   },
 };
 
+type Spot = { x: number; y: number };
+const textOf = (el: HTMLElement, id: string) =>
+  el.querySelector(`[data-testid="${id}"]`)?.textContent as string;
+
+/** Cards the person moves: a press on a card is claimed, so dragging it moves the card, not the view. */
+function Movable({ start = { x: 0, y: 0, scale: 1 } }: { start?: CanvasView }) {
+  const [at, setAt] = useState<Record<string, Spot>>({ A: { x: 0, y: 0 }, B: { x: 540, y: 120 } });
+  const [view, setView] = useState<CanvasView>(start);
+  const [log, setLog] = useState("");
+  return (
+    <div style={{ inlineSize: 600 }}>
+      <div style={{ blockSize: 400 }}>
+        <PanZoomCanvas
+          label="Schema"
+          view={view}
+          onViewChange={setView}
+          claimPress={(press) => {
+            const id = press.target.closest("[data-node]")?.getAttribute("data-node");
+            if (!id) return false;
+            const { x, y } = press.point;
+            setLog(`pressed ${id} at ${Math.round(x)},${Math.round(y)} by ${press.pointerType}`);
+            const from = at[id] as Spot;
+            const put = (by: Spot) =>
+              setAt((all) => ({ ...all, [id]: { x: from.x + by.x, y: from.y + by.y } }));
+            return {
+              onMove: ({ delta }) => put(delta),
+              onEnd: ({ delta }, cancelled) => {
+                if (cancelled) put({ x: 0, y: 0 });
+                else if (delta.x === 0 && delta.y === 0) setLog(`selected ${id}`);
+              },
+            };
+          }}
+        >
+          {Object.entries(at).map(([id, p]) => (
+            <div
+              key={id}
+              data-node={id}
+              data-testid={`node-${id}`}
+              style={{
+                position: "absolute",
+                left: p.x,
+                top: p.y,
+                width: 120,
+                height: 60,
+                background: "var(--cy-color-surface)",
+                border: "var(--cy-border-width) solid var(--cy-color-line)",
+              }}
+            >
+              Table {id}
+            </div>
+          ))}
+        </PanZoomCanvas>
+      </div>
+      <output data-testid="view">{JSON.stringify(view)}</output>
+      <output data-testid="at">{JSON.stringify(at)}</output>
+      <output data-testid="log">{log}</output>
+    </div>
+  );
+}
+const atOf = (el: HTMLElement) => JSON.parse(textOf(el, "at")) as Record<string, Spot>;
+
+export const DragANodeNotTheView: Story = {
+  render: () => <Movable />,
+  play: async ({ canvas, canvasElement }) => {
+    const el = surface(canvasElement);
+    const node = (id: string) => canvas.getByTestId(`node-${id}`);
+    // Dragging a claimed card moves the card; the view stays where it is.
+    const a = box(node("A"));
+    drag(node("A"), { x: a.left + 10, y: a.top + 20 }, { x: 80, y: 30 });
+    await waitFor(() => expect(atOf(canvasElement).A).toEqual({ x: 80, y: 30 }));
+    await expect(viewOf(canvasElement)).toEqual({ x: 0, y: 0, scale: 1 });
+    await expect(textOf(canvasElement, "log")).toBe("pressed A at 10,20 by mouse");
+    // The background still pans.
+    const r = box(el);
+    drag(el, { x: r.left + 400, y: r.top + 350 }, { x: -50, y: -20 });
+    await waitFor(() => expect(viewOf(canvasElement)).toEqual({ x: -50, y: -20, scale: 1 }));
+    // A press that does not move is a tap: here it selects.
+    const b = box(node("B"));
+    drag(node("B"), { x: b.left + 5, y: b.top + 5 }, { x: 0, y: 0 });
+    await waitFor(() => expect(textOf(canvasElement, "log")).toBe("selected B"));
+    // Escape cancels a drag: the card goes back.
+    const a2 = box(node("A"));
+    node("A").dispatchEvent(
+      new PointerEvent("pointerdown", { ...mouse, clientX: a2.left + 5, clientY: a2.top + 5 }),
+    );
+    window.dispatchEvent(
+      new PointerEvent("pointermove", { ...mouse, clientX: a2.left + 45, clientY: a2.top + 5 }),
+    );
+    await waitFor(() => expect(atOf(canvasElement).A).toEqual({ x: 120, y: 30 }));
+    window.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true, cancelable: true }));
+    await waitFor(() => expect(atOf(canvasElement).A).toEqual({ x: 80, y: 30 }));
+    window.dispatchEvent(new PointerEvent("pointerup", { ...mouse, buttons: 0 }));
+    // With Space held, a drag anywhere pans, even on a card.
+    el.focus();
+    el.dispatchEvent(new KeyboardEvent("keydown", { key: " ", bubbles: true, cancelable: true }));
+    await waitFor(() => expect(el).toHaveAttribute("data-panning"));
+    const a3 = box(node("A"));
+    drag(node("A"), { x: a3.left + 5, y: a3.top + 5 }, { x: 30, y: 0 });
+    await waitFor(() => expect(viewOf(canvasElement)).toEqual({ x: -20, y: -20, scale: 1 }));
+    await expect(atOf(canvasElement).A).toEqual({ x: 80, y: 30 });
+    el.dispatchEvent(new KeyboardEvent("keyup", { key: " ", bubbles: true }));
+  },
+};
+
+export const DragANodeAtAnyZoom: Story = {
+  render: () => <Movable start={{ x: 20, y: 10, scale: 2 }} />,
+  play: async ({ canvas, canvasElement }) => {
+    // The press and the drag come in canvas units: 80 by 40 screen pixels at 200% is 40 by 20.
+    const a = box(canvas.getByTestId("node-A"));
+    drag(canvas.getByTestId("node-A"), { x: a.left + 30, y: a.top + 50 }, { x: 80, y: 40 });
+    await waitFor(() => expect(atOf(canvasElement).A).toEqual({ x: 40, y: 20 }));
+    await expect(textOf(canvasElement, "log")).toBe("pressed A at 15,25 by mouse");
+    await expect(viewOf(canvasElement)).toEqual({ x: 20, y: 10, scale: 2 });
+  },
+};
+
+/** Painted squares: red moves, blue is claimed but stays (locked), green is picked with a tap; the app hit-tests. */
+function Squares(screen: CanvasScreen & { red: Spot }) {
+  const el = useRef<HTMLCanvasElement>(null);
+  useEffect(() => {
+    const ctx = el.current?.getContext("2d");
+    if (!ctx) return;
+    ctx.resetTransform();
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    ctx.setTransform(...screen.transform);
+    ctx.fillStyle = "rgb(255, 0, 0)";
+    ctx.fillRect(screen.red.x, screen.red.y, 20, 20);
+    ctx.fillStyle = "rgb(0, 0, 255)";
+    ctx.fillRect(200, 100, 20, 20);
+    ctx.fillStyle = "rgb(0, 128, 0)";
+    ctx.fillRect(150, 40, 20, 20);
+  });
+  return <canvas ref={el} {...screen.canvasProps} data-testid="painted" />;
+}
+
+export const DragAPaintedNode: Story = {
+  render: () => {
+    const [view, setView] = useState<CanvasView>({ x: 10, y: 20, scale: 2 });
+    const [red, setRed] = useState<Spot>({ x: 100, y: 100 });
+    const [picked, setPicked] = useState("");
+    const inside = (p: Spot, s: Spot) => p.x >= s.x && p.x <= s.x + 20 && p.y >= s.y && p.y <= s.y + 20;
+    return (
+      <div style={{ blockSize: 300, inlineSize: 500 }}>
+        <PanZoomCanvas
+          label="Scene"
+          view={view}
+          onViewChange={setView}
+          renderScreen={(screen) => <Squares {...screen} red={red} />}
+          claimPress={({ point }) => {
+            if (inside(point, red)) {
+              const from = red;
+              return { onMove: ({ delta }) => setRed({ x: from.x + delta.x, y: from.y + delta.y }) };
+            }
+            if (inside(point, { x: 150, y: 40 }))
+              return { onEnd: ({ delta }) => setPicked(delta.x || delta.y ? "dragged green" : "green") };
+            return inside(point, { x: 200, y: 100 });
+          }}
+        />
+        <output data-testid="view">{JSON.stringify(view)}</output>
+        <output data-testid="red">{JSON.stringify(red)}</output>
+        <output data-testid="picked">{picked}</output>
+      </div>
+    );
+  },
+  play: async ({ canvas, canvasElement }) => {
+    const region = canvas.getByRole("region", { name: "Scene" });
+    await canvas.findByTestId("painted");
+    const r = box(region);
+    // The red square is at canvas (100, 100): screen (210, 220) at 200%. Dragging it moves it, in canvas units.
+    drag(region, { x: r.left + 215, y: r.top + 225 }, { x: 40, y: 20 });
+    await waitFor(() => expect(JSON.parse(textOf(canvasElement, "red"))).toEqual({ x: 120, y: 110 }));
+    await expect(viewOf(canvasElement)).toEqual({ x: 10, y: 20, scale: 2 });
+    // The blue square is claimed and left where it is: pressing it does not pan.
+    drag(region, { x: r.left + 420, y: r.top + 230 }, { x: -40, y: 0 });
+    await expect(viewOf(canvasElement)).toEqual({ x: 10, y: 20, scale: 2 });
+    // The green square only listens for the end: a drag off it does not pan, and a tap picks it.
+    drag(region, { x: r.left + 315, y: r.top + 105 }, { x: 30, y: 30 });
+    await waitFor(() => expect(textOf(canvasElement, "picked")).toBe("dragged green"));
+    drag(region, { x: r.left + 315, y: r.top + 105 }, { x: 0, y: 0 });
+    await waitFor(() => expect(textOf(canvasElement, "picked")).toBe("green"));
+    await expect(viewOf(canvasElement)).toEqual({ x: 10, y: 20, scale: 2 });
+    // Anywhere else pans.
+    drag(region, { x: r.left + 60, y: r.top + 60 }, { x: -40, y: 0 });
+    await waitFor(() => expect(viewOf(canvasElement)).toEqual({ x: -30, y: 20, scale: 2 }));
+  },
+};
+
+export const FingersDragNodes: Story = {
+  tags: ["touch", "!dev"],
+  render: () => <Movable />,
+  play: async ({ canvas, canvasElement }) => {
+    const el = surface(canvasElement);
+    const finger = { ...mouse, pointerType: "touch", pointerId: 31 };
+    const a = box(canvas.getByTestId("node-A"));
+    drag(canvas.getByTestId("node-A"), { x: a.left + 10, y: a.top + 10 }, { x: 60, y: 0 }, finger);
+    await waitFor(() => expect(atOf(canvasElement).A).toEqual({ x: 60, y: 0 }));
+    await expect(textOf(canvasElement, "log")).toBe("pressed A at 10,10 by touch");
+    await expect(viewOf(canvasElement)).toEqual({ x: 0, y: 0, scale: 1 });
+    // A pinch that starts with a finger on a card zooms; the card does not move meanwhile.
+    const r = box(el);
+    const touch = (type: string, id: number, x: number, y: number, target: EventTarget = window) =>
+      target.dispatchEvent(
+        new PointerEvent(type, {
+          bubbles: true,
+          pointerId: id,
+          pointerType: "touch",
+          isPrimary: id === 41,
+          clientX: r.left + x,
+          clientY: r.top + y,
+        }),
+      );
+    touch("pointerdown", 41, 80, 20, canvas.getByTestId("node-A"));
+    touch("pointerdown", 42, 300, 20, el);
+    touch("pointermove", 41, 20, 20);
+    touch("pointermove", 42, 400, 20);
+    await waitFor(() => expect(viewOf(canvasElement).scale).toBeGreaterThan(1.3));
+    await expect(atOf(canvasElement).A).toEqual({ x: 60, y: 0 });
+    touch("pointerup", 41, 20, 20);
+    touch("pointerup", 42, 400, 20);
+  },
+};
+
 export const FingersPanAndPinch: Story = {
   tags: ["touch", "!dev"],
   render: () => <Board start={{ x: 0, y: 0, scale: 1 }} />,
