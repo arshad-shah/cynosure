@@ -1,5 +1,7 @@
 import { type CSSProperties, type ElementType, forwardRef, type ReactNode } from "react";
 import {
+  type BoxProps,
+  boxAttrs,
   BREAKPOINTS as LAYOUT_BREAKPOINTS,
   type LayoutAttributes,
   type PaddingProps,
@@ -28,7 +30,7 @@ export type GridColumns = GridResponsive<number>;
 
 const BREAKPOINTS = Object.keys(GRID_BREAKPOINTS) as GridBreakpoint[];
 
-export interface GridProps extends PaddingProps, VisibilityProps, LayoutAttributes {
+export interface GridProps extends PaddingProps, VisibilityProps, BoxProps, LayoutAttributes {
   /**
    * Number of equal columns, or a number per width of the grid itself: `{ base: 1, sm: 2, lg: 4 }`. A breakpoint that
    * is left out keeps the count of the one below it. With `minItemWidth` it is the most columns there can be.
@@ -57,7 +59,7 @@ export interface GridProps extends PaddingProps, VisibilityProps, LayoutAttribut
   "data-testid"?: string;
 }
 
-export interface GridItemProps extends VisibilityProps, LayoutAttributes {
+export interface GridItemProps extends VisibilityProps, Pick<BoxProps, "overflow">, LayoutAttributes {
   /**
    * Columns the item spans, or `full` for the whole row. Clamped to the columns the grid has at its current width.
    * In a grid with `columns` per breakpoint it can be one per breakpoint too (`{ base: "full", md: 2 }`), measured on
@@ -108,6 +110,11 @@ export const Grid = forwardRef<HTMLElement, GridProps>(function Grid(
     align,
     hideBelow,
     hideAbove,
+    grow,
+    shrink,
+    fill,
+    minSize,
+    overflow,
     as = "div",
     className,
     style,
@@ -140,6 +147,7 @@ export const Grid = forwardRef<HTMLElement, GridProps>(function Grid(
       data-tracks={tracks ? "" : undefined}
       data-align={align}
       {...visibilityAttrs({ hideBelow, hideAbove })}
+      {...boxAttrs({ grow, shrink, fill, minSize, overflow })}
       style={
         {
           "--_gap": space(gap),
@@ -189,6 +197,7 @@ export const GridItem = forwardRef<HTMLElement, GridItemProps>(function GridItem
     stickyOffset,
     hideBelow,
     hideAbove,
+    overflow,
     as = "div",
     className,
     style,
@@ -211,6 +220,7 @@ export const GridItem = forwardRef<HTMLElement, GridItemProps>(function GridItem
       data-order-steps={orderSteps ? "" : undefined}
       data-sticky={sticky ? "" : undefined}
       {...visibilityAttrs({ hideBelow, hideAbove })}
+      {...boxAttrs({ overflow })}
       style={
         {
           "--_span": cols ?? "initial",

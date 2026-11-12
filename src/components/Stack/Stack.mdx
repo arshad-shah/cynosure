@@ -41,6 +41,26 @@ import { Stack } from "@arshad-shah/cynosure";
 
 <Canvas of={Stories.PaddingUsesSpaceTokens} />
 
+## App shells
+
+`grow`, `shrink`, `fill`, `minSize` and `overflow` size a box inside its parent, for an app whose header and status bar stay put while the middle scrolls. `grow` takes the free space along a flex parent's row or column (a status bar item that pushes the rest to the end: no spacer component needed); `shrink={false}` keeps a box at its size when room runs out; `fill` is 100% of the parent both ways; `minSize="0"` lets a flex or grid child be smaller than its content, so what is inside it can scroll instead of pushing the page longer; `overflow` is `hidden`, `auto` or `visible`. For a scrolling area people read with the keyboard, follow or jump to the end of, use [ScrollArea](?path=/docs/components-scrollarea--docs).
+
+```tsx
+<Stack fill gap="0">
+  <Toolbar label="Editor">…</Toolbar>
+  <Stack grow minSize="0">
+    <ScrollArea label="Results">…</ScrollArea>
+  </Stack>
+  <Inline gap="2">
+    <Text>main</Text>
+    <Inline grow>…</Inline>
+    <Text>Ln 1, Col 1</Text>
+  </Inline>
+</Stack>
+```
+
+<Canvas of={Stories.FillAndMinSizeLetAChildScroll} />
+
 ## Props
 
 <ArgTypes of={Stories} />

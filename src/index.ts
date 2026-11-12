@@ -369,6 +369,8 @@ export {
 } from "./components/SortableList/index.js";
 export { SplitPane, type SplitPaneProps, type SplitPaneTokens } from "./components/SplitPane/index.js";
 export {
+  type BoxOverflow,
+  type BoxProps,
   BREAKPOINTS,
   type Breakpoint,
   type LayoutAttributes,

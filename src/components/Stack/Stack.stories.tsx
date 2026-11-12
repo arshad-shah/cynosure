@@ -5,6 +5,7 @@ import { computeUnderHostileHost } from "../../test/hostile.js";
 import { BREAKPOINT_NAMES, expectVisibilityFollowsTheWindow } from "../../test/visibility.js";
 import { Badge } from "../Badge/Badge.js";
 import { Inline } from "../Inline/Inline.js";
+import { Link } from "../Link/Link.js";
 import { Stack } from "./Stack.js";
 
 const SPACES = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
@@ -23,6 +24,11 @@ const meta = {
     padding: { control: "select", options: SPACES },
     paddingInline: { control: "select", options: SPACES },
     paddingBlock: { control: "select", options: SPACES },
+    grow: { control: "boolean" },
+    shrink: { control: "boolean" },
+    fill: { control: "boolean" },
+    minSize: { control: "inline-radio", options: [undefined, "0"] },
+    overflow: { control: "inline-radio", options: [undefined, "hidden", "auto", "visible"] },
     direction: { control: "inline-radio", options: ["column", "row"] },
     align: { control: "inline-radio", options: ["start", "center", "end", "stretch", "baseline"] },
     justify: { control: "inline-radio", options: ["start", "center", "end", "between"] },
@@ -354,5 +360,150 @@ export const StickyStaysInView: Story = {
     await expect(flush.getBoundingClientRect().top - top()).toBeCloseTo(0, 0);
     // A Stack inside a sticky one does not inherit its offset.
     await expect(getComputedStyle(canvas.getByTestId("long")).position).toBe("static");
+  },
+};
+
+/** A status bar: the grown middle takes the free space, so what follows it sits at the end of the row. */
+export const GrowPushesTheRestToTheEnd: Story = {
+  render: () => (
+    <div style={{ inlineSize: 400 }}>
+      <Inline gap="2" data-testid="bar">
+        <Badge>main</Badge>
+        <Inline grow data-testid="middle">
+          <Badge>Ready</Badge>
+        </Inline>
+        <Badge>Ln 1</Badge>
+        <Stack shrink={false} data-testid="fixed">
+          <Badge>UTF-8</Badge>
+        </Stack>
+      </Inline>
+    </div>
+  ),
+  play: async ({ canvas }) => {
+    const bar = canvas.getByTestId("bar").getBoundingClientRect();
+    const middle = canvas.getByTestId("middle").getBoundingClientRect();
+    const fixed = canvas.getByTestId("fixed");
+    // The last item ends at the row's end; the grown one fills the space before the items after it.
+    await expect(fixed.getBoundingClientRect().right).toBeCloseTo(bar.right, 0);
+    await expect(canvas.getByText("Ln 1").getBoundingClientRect().left - middle.right).toBeCloseTo(4, 0);
+    await expect(middle.width).toBeGreaterThan(200);
+    await expect(getComputedStyle(fixed).flexShrink).toBe("0");
+    // Nothing grows that did not ask to.
+    await expect(getComputedStyle(fixed).flexGrow).toBe("0");
+  },
+};
+
+const longList = (n: number) =>
+  Array.from({ length: n }, (_, i) => (
+    <li key={`row-${i + 1}`}>
+      <Link href={`#row-${i + 1}`}>Row {i + 1}</Link>
+    </li>
+  ));
+
+/**
+ * An app shell column: a header, a body that takes the rest and scrolls, and a footer that stays in view. The body
+ * needs `minSize="0"`: a flex child is otherwise at least as tall as its content, and pushes the footer off.
+ */
+export const FillAndMinSizeLetAChildScroll: Story = {
+  render: () => (
+    <>
+      <div style={{ blockSize: 240 }} data-testid="frame">
+        <Stack fill gap="0" data-testid="shell">
+          <Badge>Header</Badge>
+          <Stack grow minSize="0" data-testid="body">
+            <Stack as="ul" grow overflow="auto" data-testid="scroller">
+              {longList(40)}
+            </Stack>
+          </Stack>
+          <Badge>Footer</Badge>
+        </Stack>
+      </div>
+      <div style={{ blockSize: 240 }}>
+        <Stack fill gap="0" overflow="hidden" data-testid="unshrunk">
+          <Stack grow data-testid="body-without">
+            <Stack as="ul" grow overflow="auto">
+              {longList(40)}
+            </Stack>
+          </Stack>
+        </Stack>
+      </div>
+    </>
+  ),
+  play: async ({ canvas }) => {
+    const frame = canvas.getByTestId("frame").getBoundingClientRect();
+    const shell = canvas.getByTestId("shell");
+    const scroller = canvas.getByTestId("scroller");
+    // fill: the shell is exactly as big as its parent.
+    await expect(shell.getBoundingClientRect().height).toBeCloseTo(240, 0);
+    await expect(shell.getBoundingClientRect().width).toBeCloseTo(frame.width, 0);
+    // The footer stays inside the shell, and the list scrolls inside the body instead of overflowing.
+    await expect(canvas.getByText("Footer").getBoundingClientRect().bottom).toBeLessThanOrEqual(
+      shell.getBoundingClientRect().bottom + 0.5,
+    );
+    await expect(scroller.scrollHeight).toBeGreaterThan(scroller.clientHeight);
+    await expect(shell.scrollHeight).toBeLessThanOrEqual(shell.clientHeight);
+    scroller.scrollTop = 200;
+    await expect(scroller.scrollTop).toBe(200);
+    await expect(getComputedStyle(canvas.getByTestId("body")).minHeight).toBe("0px");
+    // Without minSize the body is as tall as its list, so the shell overflows.
+    const unshrunk = canvas.getByTestId("unshrunk");
+    await expect(canvas.getByTestId("body-without").getBoundingClientRect().height).toBeGreaterThan(240);
+    await expect(unshrunk.scrollHeight).toBeGreaterThan(unshrunk.clientHeight);
+  },
+};
+
+export const OverflowClipsOrScrolls: Story = {
+  render: () => (
+    <>
+      {(["hidden", "auto", "visible"] as const).map((overflow) => (
+        <Stack key={overflow} overflow={overflow} style={{ blockSize: 40 }} data-testid={overflow}>
+          <Link href={`#${overflow}`}>{overflow}</Link>
+          <Stack shrink={false} style={{ blockSize: 100 }}>
+            Tall
+          </Stack>
+        </Stack>
+      ))}
+      <Stack data-testid="default">
+        <span>Plain</span>
+      </Stack>
+    </>
+  ),
+  play: async ({ canvas }) => {
+    for (const overflow of ["hidden", "auto", "visible"])
+      await expect(getComputedStyle(canvas.getByTestId(overflow)).overflowY).toBe(overflow);
+    const auto = canvas.getByTestId("auto");
+    auto.scrollTop = 30;
+    await expect(auto.scrollTop).toBe(30);
+    // The box props add nothing to a box that does not ask for them.
+    const plain = getComputedStyle(canvas.getByTestId("default"));
+    await expect([plain.overflowY, plain.flexGrow, plain.flexShrink]).toEqual(["visible", "0", "1"]);
+  },
+};
+
+export const BoxPropsStableUnderHostileHost: Story = {
+  render: () => (
+    <div style={{ blockSize: 120, display: "flex", flexDirection: "column" }}>
+      <Stack fill grow shrink={false} minSize="0" overflow="hidden">
+        <Badge>One</Badge>
+      </Stack>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const { clean, hostile } = computeUnderHostileHost(canvasElement, ".cy-stack", [
+      "flex-grow",
+      "flex-shrink",
+      "height",
+      "width",
+      "min-height",
+      "min-width",
+      "overflow-y",
+    ]);
+    await expect(hostile).toEqual(clean);
+    await expect([clean["flex-grow"], clean["flex-shrink"], clean["min-height"], clean.height]).toEqual([
+      "1",
+      "0",
+      "0px",
+      "120px",
+    ]);
   },
 };

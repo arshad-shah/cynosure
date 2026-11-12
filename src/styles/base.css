@@ -101,6 +101,35 @@
   }
 }
 
+/*
+ * grow, shrink, fill, minSize and overflow on the layout primitives (BoxProps in src/components/Stack/space.ts:
+ * Stack, Inline, Grid; overflow on GridItem). The attribute is doubled so a host's element rules never win; the
+ * primitives' own rules set none of these properties.
+ */
+[data-cy-grow][data-cy-grow] {
+  flex-grow: 1;
+}
+[data-cy-shrink="false"][data-cy-shrink="false"] {
+  flex-shrink: 0;
+}
+[data-cy-fill][data-cy-fill] {
+  inline-size: 100%;
+  block-size: 100%;
+}
+[data-cy-min-size="0"][data-cy-min-size="0"] {
+  min-inline-size: 0;
+  min-block-size: 0;
+}
+[data-cy-overflow="hidden"][data-cy-overflow="hidden"] {
+  overflow: hidden;
+}
+[data-cy-overflow="auto"][data-cy-overflow="auto"] {
+  overflow: auto;
+}
+[data-cy-overflow="visible"][data-cy-overflow="visible"] {
+  overflow: visible;
+}
+
 /* Visually hidden, still read by screen readers. Shared by every component that names things with hidden text
    (Link, Steps, Tabs, Calendar, Kbd, Stat…), so it lives here rather than in one of them. */
 .cy-visually-hidden {

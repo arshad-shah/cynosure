@@ -53,3 +53,40 @@ export const visibilityAttrs = ({ hideBelow, hideAbove }: VisibilityProps) => ({
   "data-cy-hide-below": hideBelow,
   "data-cy-hide-above": hideAbove,
 });
+
+/** How a layout box scrolls or clips what does not fit in it. */
+export type BoxOverflow = "hidden" | "auto" | "visible";
+
+/**
+ * How a layout box sizes itself inside its parent, for app shells (a body that takes the rest of a column and
+ * scrolls, a status bar item pushed to the end). `grow` and `shrink` act in a flex parent (Stack, Inline, a flex
+ * element); `fill` and `minSize` in any parent.
+ */
+export interface BoxProps {
+  /** Take the free space along the parent's row or column (`flex-grow: 1`), pushing the boxes after it to the end. */
+  grow?: boolean | undefined;
+  /** `false` keeps the box at its own size when the parent's row or column runs out of room. Default true. */
+  shrink?: boolean | undefined;
+  /** As wide and as tall as the parent's content box (`100%` both ways). */
+  fill?: boolean | undefined;
+  /**
+   * `"0"` lets the box be smaller than its content, so a child can scroll instead of overflowing the page. A flex or
+   * grid child is otherwise at least as tall (and wide) as what it holds. Default: the CSS automatic minimum.
+   */
+  minSize?: "0" | undefined;
+  /**
+   * What happens to content that does not fit: `hidden` clips it, `auto` scrolls it, `visible` lets it overflow (the
+   * default). A box that scrolls content with nothing focusable in it should be a ScrollArea with a `label`, so
+   * keyboard users can scroll it.
+   */
+  overflow?: BoxOverflow | undefined;
+}
+
+/** The data attributes `base.css` sizes a box by. Unset props add nothing. */
+export const boxAttrs = ({ grow, shrink, fill, minSize, overflow }: BoxProps) => ({
+  "data-cy-grow": grow ? "" : undefined,
+  "data-cy-shrink": shrink === false ? "false" : undefined,
+  "data-cy-fill": fill ? "" : undefined,
+  "data-cy-min-size": minSize === "0" ? "0" : undefined,
+  "data-cy-overflow": overflow,
+});

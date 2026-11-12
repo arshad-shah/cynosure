@@ -41,6 +41,20 @@ import { Inline } from "@arshad-shah/cynosure";
 
 <Canvas of={Stories.PaddingUsesSpaceTokens} />
 
+## Taking the free space
+
+A child Stack or Inline with `grow` takes the free space in the row, so the items after it sit at the end (a status bar). Inline also takes `shrink`, `fill`, `minSize` and `overflow`; see [Stack](?path=/docs/components-stack--docs) for app shells.
+
+```tsx
+<Inline gap="2">
+  <Text>main</Text>
+  <Inline grow>…</Inline>
+  <Text>Ln 1, Col 1</Text>
+</Inline>
+```
+
+<Canvas of={Stories.GrowPushesTheRestToTheEndInRtl} />
+
 ## Props
 
 <ArgTypes of={Stories} />
