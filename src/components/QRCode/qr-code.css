@@ -1,0 +1,79 @@
+/*
+ * qr-code: one SVG path of dark modules on a light square. `color-scheme: light` makes the theme's light-dark()
+ * colours resolve to their light values here, so the code stays dark on light in dark mode (inverted codes do not scan
+ * on many phones). Forced colours are left alone for the same reason.
+ */
+.cy-qr-code-svg.cy-qr-code-svg {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  max-inline-size: none;
+  margin: 0;
+  overflow: hidden;
+}
+.cy-qr-code-modules {
+  fill: var(--_ink);
+}
+
+/* The logo sits on the light colour in the middle; level H recovers the modules it covers. */
+.cy-qr-code-icon.cy-qr-code-icon {
+  box-sizing: border-box !important;
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  inline-size: var(--cy-qr-code-icon-size, 20%);
+  block-size: var(--cy-qr-code-icon-size, 20%);
+  margin: auto;
+  padding: 2%;
+  overflow: hidden;
+  border-radius: var(--cy-radius-sm);
+  background: var(--_paper);
+  color: var(--_ink);
+  letter-spacing: normal;
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-font-size-md);
+  text-transform: none;
+  & > * {
+    max-inline-size: 100%;
+    max-block-size: 100%;
+  }
+  & > .cy-icon {
+    --cy-icon-size: 100%;
+    inline-size: 100%;
+    block-size: 100%;
+  }
+}
+
+.cy-qr-code.cy-qr-code {
+  --_ink: var(--cy-qr-code-color, var(--cy-color-ink));
+  --_paper: var(--cy-qr-code-background, var(--cy-color-surface));
+  --_size: var(--cy-qr-code-size-md, calc(var(--cy-control-height-md) * 4.5));
+  box-sizing: border-box !important;
+  position: relative;
+  display: inline-block;
+  flex: none;
+  inline-size: var(--_size);
+  block-size: auto;
+  max-inline-size: 100%;
+  aspect-ratio: 1;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: var(--cy-qr-code-radius, var(--cy-radius-sm));
+  background: var(--_paper);
+  color-scheme: light;
+  forced-color-adjust: none;
+  vertical-align: middle;
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-font-size-md);
+  letter-spacing: normal;
+  text-transform: none;
+  &[data-size="sm"] {
+    --_size: var(--cy-qr-code-size-sm, calc(var(--cy-control-height-md) * 3));
+  }
+  &[data-size="lg"] {
+    --_size: var(--cy-qr-code-size-lg, calc(var(--cy-control-height-md) * 6.5));
+  }
+}
