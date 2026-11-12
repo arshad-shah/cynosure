@@ -14,6 +14,7 @@ import { useDrag } from "../../foundations/drag.js";
 import { seekEnabled } from "../../foundations/listbox.js";
 import { clamp } from "../../foundations/math.js";
 import { moveItems } from "../../foundations/reorder.js";
+import { useFollow } from "../../foundations/use-follow.js";
 import { useVirtualWindow } from "../../foundations/virtual-window.js";
 
 export interface VirtualListTokens {
@@ -23,6 +24,8 @@ export interface VirtualListTokens {
   rowHeight: string;
   /** Background of the chosen rows. */
   selectedBackground: string;
+  /** Space between the bottom edge and the `overlay` (a "3 new" pill). */
+  overlayOffset: string;
 }
 
 declare module "../../tokens/schema.js" {
@@ -58,6 +61,16 @@ export interface VirtualListProps<T> {
   wrap?: boolean;
   /** Keep the end in view as rows are added, while the list is scrolled to the end (a log, a live feed). */
   follow?: boolean;
+  /**
+   * Called with false when the view leaves the end of the list and true when it is back, from scrolling or from rows
+   * arriving past it. It starts true. Use it to show a "jump to latest" control in `overlay`.
+   */
+  onAtBottomChange?: ((atBottom: boolean) => void) | undefined;
+  /**
+   * Content pinned over the list at the bottom centre that does not scroll: a "3 new" pill, a "jump to latest" button.
+   * It is outside the listbox.
+   */
+  overlay?: ReactNode;
   /**
    * Rows that head a section (a date, a group). They cannot be focused or selected, and the current section's heading
    * stays pinned at the top while its rows scroll under it.
@@ -126,6 +139,8 @@ export function VirtualList<T>({
   onMove,
   wrap = false,
   follow = false,
+  onAtBottomChange,
+  overlay,
   isHeader,
   handle,
   empty,
@@ -239,16 +254,10 @@ export function VirtualList<T>({
   };
 
   // Following: while the list sits at its end, new rows keep it there.
-  const atEnd = useRef(true);
-  const scrollToEnd = () => {
-    const el = root.current;
-    if (el) el.scrollTop = el.scrollHeight;
-  };
-  useClientLayoutEffect(() => {
-    if (follow && atEnd.current) scrollToEnd();
-  }, [follow, items.length, win.total]);
+  const following = useFollow(root, { follow, onAtBottomChange });
+  useClientLayoutEffect(() => following.contentChanged(), [items.length, win.total]);
   useImperativeHandle(handle, () => ({
-    scrollToEnd,
+    scrollToEnd: following.scrollToEnd,
     scrollToIndex: (index, align = "nearest") => {
       const el = root.current;
       const i = clamp(index, 0, keys.length - 1);
@@ -430,73 +439,88 @@ export function VirtualList<T>({
   };
 
   const rootClass = className ? `cy-virtual-list ${className}` : "cy-virtual-list";
+  // The overlay shares a grid cell with the list, so it stays put while the list scrolls under it. The frame is
+  // always there: one that came and went with the overlay would remount the list and lose its scroll position.
+  const framed = (list: ReactNode) => (
+    <div className="cy-virtual-list-frame">
+      {list}
+      {overlay != null && overlay !== false && (
+        <div className="cy-virtual-list-overlay cy-reset">{overlay}</div>
+      )}
+    </div>
+  );
   // An empty listbox is invalid ARIA: with no items the list is just its message.
   if (items.length === 0)
-    return (
+    return framed(
       <div ref={root} className={rootClass} data-size={size} style={style}>
         <div className="cy-virtual-list-empty cy-reset">{empty}</div>
-      </div>
+      </div>,
     );
   return (
     <>
-      <div
-        ref={root}
-        role="listbox"
-        aria-label={label}
-        aria-multiselectable={selectionMode === "multiple" || undefined}
-        className={rootClass}
-        data-size={size}
-        data-wrap={wrap ? "" : undefined}
-        style={style}
-        onKeyDown={onKeyDown}
-        onScroll={(e) => {
-          const el = e.currentTarget;
-          atEnd.current = el.scrollTop + el.clientHeight >= el.scrollHeight - 2;
-          win.onScroll(el.scrollTop);
-        }}
-      >
-        {pinned >= 0 && win.view.top > top(pinned) && (
-          <div className="cy-virtual-list-pinned cy-reset" aria-hidden="true">
-            {renderItem(items[pinned] as T, { index: pinned, selected: false, disabled: true })}
-          </div>
-        )}
-        <div className="cy-virtual-list-space cy-reset" style={{ blockSize: win.total }} aria-hidden="true" />
-        {drag && (
+      {framed(
+        <div
+          ref={root}
+          role="listbox"
+          aria-label={label}
+          aria-multiselectable={selectionMode === "multiple" || undefined}
+          className={rootClass}
+          data-size={size}
+          data-wrap={wrap ? "" : undefined}
+          style={style}
+          onKeyDown={onKeyDown}
+          onScroll={(e) => {
+            following.onScroll();
+            win.onScroll(e.currentTarget.scrollTop);
+          }}
+        >
+          {pinned >= 0 && win.view.top > top(pinned) && (
+            <div className="cy-virtual-list-pinned cy-reset" aria-hidden="true">
+              {renderItem(items[pinned] as T, { index: pinned, selected: false, disabled: true })}
+            </div>
+          )}
           <div
-            className="cy-virtual-list-drop cy-reset"
-            style={{ insetBlockStart: drag.gap < keys.length ? top(drag.gap) : win.total }}
+            className="cy-virtual-list-space cy-reset"
+            style={{ blockSize: win.total }}
             aria-hidden="true"
           />
-        )}
-        {win.indices.map((i) => {
-          const key = keys[i] as string;
-          const disabled = off(i);
-          const selected = selectionMode !== "none" && pickedSet.has(key);
-          return (
-            // biome-ignore lint/a11y/useKeyWithClickEvents: the listbox handles keys for every row (roving focus)
+          {drag && (
             <div
-              key={key}
-              role="option"
-              data-index={i}
-              aria-selected={selectionMode === "none" ? undefined : selected}
-              aria-disabled={disabled || undefined}
-              aria-posinset={i + 1}
-              aria-setsize={items.length}
-              tabIndex={i === stop ? 0 : -1}
-              className="cy-virtual-list-row cy-reset"
-              data-moving={dragging?.has(key) ? "" : undefined}
-              data-header={header(i) ? "" : undefined}
-              style={{ insetBlockStart: top(i) }}
-              onClick={() => onRowClick(i)}
-              // Focus can arrive without our keys (a screen reader, a script): keys then act from here.
-              onFocus={() => focusKey !== key && setFocusKey(key)}
-              onDoubleClick={() => !disabled && selectionMode !== "none" && onAction?.(items[i] as T, i)}
-            >
-              {renderItem(items[i] as T, { index: i, selected, disabled })}
-            </div>
-          );
-        })}
-      </div>
+              className="cy-virtual-list-drop cy-reset"
+              style={{ insetBlockStart: drag.gap < keys.length ? top(drag.gap) : win.total }}
+              aria-hidden="true"
+            />
+          )}
+          {win.indices.map((i) => {
+            const key = keys[i] as string;
+            const disabled = off(i);
+            const selected = selectionMode !== "none" && pickedSet.has(key);
+            return (
+              // biome-ignore lint/a11y/useKeyWithClickEvents: the listbox handles keys for every row (roving focus)
+              <div
+                key={key}
+                role="option"
+                data-index={i}
+                aria-selected={selectionMode === "none" ? undefined : selected}
+                aria-disabled={disabled || undefined}
+                aria-posinset={i + 1}
+                aria-setsize={items.length}
+                tabIndex={i === stop ? 0 : -1}
+                className="cy-virtual-list-row cy-reset"
+                data-moving={dragging?.has(key) ? "" : undefined}
+                data-header={header(i) ? "" : undefined}
+                style={{ insetBlockStart: top(i) }}
+                onClick={() => onRowClick(i)}
+                // Focus can arrive without our keys (a screen reader, a script): keys then act from here.
+                onFocus={() => focusKey !== key && setFocusKey(key)}
+                onDoubleClick={() => !disabled && selectionMode !== "none" && onAction?.(items[i] as T, i)}
+              >
+                {renderItem(items[i] as T, { index: i, selected, disabled })}
+              </div>
+            );
+          })}
+        </div>,
+      )}
       {onMove && (
         <span className="cy-visually-hidden" role="status">
           {said}

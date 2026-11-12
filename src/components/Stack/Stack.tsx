@@ -1,5 +1,7 @@
 import { type CSSProperties, type ElementType, forwardRef, type ReactNode } from "react";
 import {
+  type BoxProps,
+  boxAttrs,
   type LayoutAttributes,
   type PaddingProps,
   paddingVars,
@@ -9,7 +11,7 @@ import {
   visibilityAttrs,
 } from "./space.js";
 
-export interface StackProps extends PaddingProps, VisibilityProps, LayoutAttributes {
+export interface StackProps extends PaddingProps, VisibilityProps, BoxProps, LayoutAttributes {
   /** Space token between children. */
   gap?: Space;
   /** Lay the children out in a column (the default) or in a row. For a row, Inline adds wrapping and centring. */
@@ -52,6 +54,11 @@ export const Stack = forwardRef<HTMLElement, StackProps>(function Stack(
     stickyOffset,
     hideBelow,
     hideAbove,
+    grow,
+    shrink,
+    fill,
+    minSize,
+    overflow,
     as = "div",
     className,
     style,
@@ -71,6 +78,7 @@ export const Stack = forwardRef<HTMLElement, StackProps>(function Stack(
       data-justify={justify}
       data-sticky={sticky ? "" : undefined}
       {...visibilityAttrs({ hideBelow, hideAbove })}
+      {...boxAttrs({ grow, shrink, fill, minSize, overflow })}
       style={
         {
           "--_gap": space(gap),

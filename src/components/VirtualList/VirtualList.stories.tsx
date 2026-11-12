@@ -34,7 +34,12 @@ function Files(props: Partial<VirtualListProps<Entry>>) {
 const meta = {
   title: "Components/VirtualList",
   component: VirtualList,
-  args: { ...base, onSelectionChange: fn(), onAction: fn() } as VirtualListProps<unknown>,
+  args: {
+    ...base,
+    onSelectionChange: fn(),
+    onAction: fn(),
+    onAtBottomChange: fn(),
+  } as VirtualListProps<unknown>,
   render: (args) => <Files {...(args as Partial<VirtualListProps<Entry>>)} />,
 } satisfies Meta<typeof VirtualList>;
 export default meta;
@@ -546,6 +551,86 @@ export const FollowsNewRowsAtTheEnd: Story = {
   },
 };
 
+/** An activity stream: a pill over the list counts what arrived while someone reads further up, and jumps back. */
+function Stream({ onAtBottomChange }: { onAtBottomChange?: ((atBottom: boolean) => void) | undefined }) {
+  const [lines, setLines] = useState<Entry[]>(() =>
+    Array.from({ length: 60 }, (_, i) => ({ id: `s${i}`, name: `Event ${i + 1}` })),
+  );
+  const [atBottom, setAtBottom] = useState(true);
+  const [unseen, setUnseen] = useState(0);
+  const handle = useRef<VirtualListHandle>(null);
+  return (
+    <div style={{ display: "grid", gap: 8, inlineSize: 360 }}>
+      <VirtualList
+        label="Activity"
+        items={lines}
+        getKey={(e) => e.id}
+        renderItem={(e) => e.name}
+        selectionMode="none"
+        follow
+        handle={handle}
+        onAtBottomChange={(bottom) => {
+          setAtBottom(bottom);
+          if (bottom) setUnseen(0);
+          onAtBottomChange?.(bottom);
+        }}
+        overlay={
+          !atBottom && unseen > 0 ? (
+            <Button size="sm" variant="solid" tone="accent" onClick={() => handle.current?.scrollToEnd()}>
+              {`${unseen} new`}
+            </Button>
+          ) : null
+        }
+      />
+      <Button
+        size="sm"
+        onClick={() => {
+          setLines((all) => [...all, { id: `s${all.length}`, name: `Event ${all.length + 1}` }]);
+          if (!atBottom) setUnseen((u) => u + 1);
+        }}
+      >
+        Add an event
+      </Button>
+    </div>
+  );
+}
+
+export const AtBottomChangeAndOverlay: Story = {
+  render: (args) => <Stream onAtBottomChange={args.onAtBottomChange} />,
+  play: async ({ canvas, canvasElement, args, userEvent }) => {
+    const el = list(canvasElement);
+    const spy = args.onAtBottomChange;
+    const atEnd = () => el.scrollTop + el.clientHeight >= el.scrollHeight - 2;
+    await waitFor(() => expect(atEnd()).toBe(true));
+    // Scrolling up lets go of the end and says so; new rows then leave the view where it is.
+    el.scrollTop = 100;
+    await waitFor(() => expect(spy).toHaveBeenLastCalledWith(false));
+    await userEvent.click(canvas.getByRole("button", { name: "Add an event" }));
+    const pill = await canvas.findByRole("button", { name: "1 new" });
+    await expect(el.scrollTop).toBe(100);
+    // The overlay sits over the bottom of the list, outside the listbox, and stays put while the list scrolls.
+    await expect(canvas.getByRole("listbox", { name: "Activity" })).not.toContainElement(pill);
+    const box = el.getBoundingClientRect();
+    const where = () => pill.getBoundingClientRect().bottom - box.bottom;
+    const before = where();
+    await expect(before).toBeLessThan(0);
+    await expect(before).toBeGreaterThan(-40);
+    await expect(pill.getBoundingClientRect().left + pill.getBoundingClientRect().width / 2).toBeCloseTo(
+      box.left + box.width / 2,
+      0,
+    );
+    el.scrollTop = 40;
+    await waitFor(() => expect(where()).toBe(before));
+    // It jumps back to the end, which follows again.
+    await userEvent.click(pill);
+    await waitFor(() => expect(atEnd()).toBe(true));
+    await waitFor(() => expect(spy).toHaveBeenLastCalledWith(true));
+    await userEvent.click(canvas.getByRole("button", { name: "Add an event" }));
+    await waitFor(() => expect(rowAt(canvasElement, 61)).not.toBeNull());
+    await waitFor(() => expect(atEnd()).toBe(true));
+  },
+};
+
 export const DragWrappedRows: Story = {
   render: () => {
     const [items, setItems] = useState(
@@ -628,10 +713,19 @@ export const SectionHeadingsStayPinned: Story = {
 };
 
 export const StableUnderHostileHost: Story = {
+  args: { overlay: <Button size="sm">Latest</Button> },
   play: async ({ canvasElement }) => {
     const props = ["display", "height", "overflow-y", "box-sizing", "padding-left", "font-size", "position"];
     for (const selector of [".cy-virtual-list", ".cy-virtual-list-row"]) {
       const { clean, hostile } = computeUnderHostileHost(canvasElement, selector, props);
+      await expect({ selector, ...hostile }).toEqual({ selector, ...clean });
+    }
+    const parts: [string, string[]][] = [
+      [".cy-virtual-list-frame", ["display", "height", "box-sizing", "margin-top", "padding-left"]],
+      [".cy-virtual-list-overlay", ["align-self", "justify-self", "margin-bottom", "z-index"]],
+    ];
+    for (const [selector, list] of parts) {
+      const { clean, hostile } = computeUnderHostileHost(canvasElement, selector, list);
       await expect({ selector, ...hostile }).toEqual({ selector, ...clean });
     }
   },

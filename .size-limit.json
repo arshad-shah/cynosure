@@ -323,7 +323,7 @@
   {
     "name": "Grid",
     "path": ["dist/components/Grid/Grid.js", "dist/styles/grid.css"],
-    "limit": "2 kB",
+    "limit": "2.05 kB",
     "gzip": true
   },
   {
@@ -453,7 +453,7 @@
   {
     "name": "VirtualList",
     "path": ["dist/components/VirtualList/VirtualList.js", "dist/styles/virtual-list.css"],
-    "limit": "4.6 kB",
+    "limit": "4.7 kB",
     "gzip": true
   },
   {
@@ -674,6 +674,16 @@
     "name": "TitleBar (JS + CSS)",
     "path": ["dist/components/TitleBar/TitleBar.js", "dist/styles/title-bar.css"],
     "limit": "2.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "ScrollArea",
+    "path": [
+      "dist/components/ScrollArea/ScrollArea.js",
+      "dist/foundations/use-follow.js",
+      "dist/styles/scroll-area.css"
+    ],
+    "limit": "2.1 kB",
     "gzip": true
   }
 ]

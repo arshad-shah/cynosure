@@ -16,6 +16,10 @@ import * as project from "./preview";
       ? userEvent.hover(page.elementLocator(el))
       : userEvent.unhover(page.elementLocator(el));
 
+/* Stories press real keys (the browser's own scrolling, which synthetic events never start) through `pressKey`. */
+(globalThis as { cyPressKey?: (key: string) => Promise<void> }).cyPressKey = (key) =>
+  userEvent.keyboard(`{${key}}`);
+
 /** Visual regression, Vitest-only: stories tagged "visual" are screenshotted when VITE_CY_VISUAL=1 (CI, Linux baselines). */
 const visual = import.meta.env.VITE_CY_VISUAL === "1";
 
