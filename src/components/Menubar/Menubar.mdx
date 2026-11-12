@@ -43,7 +43,7 @@ import { copy, folder, save } from "@arshad-shah/cynosure/icons";
 />
 ```
 
-Each menu's `items` are exactly what [Menu](?path=/docs/components-menu--docs) takes: icons, `shortcut`s (shown with Kbd and exposed as `aria-keyshortcuts`; bind the keys yourself with `useHotkey`), `disabled`, `tone`, checkable `kind`s and labelled sections. `onSelect` receives the chosen item's `value` from whichever menu, so keep values unique across menus.
+Each menu's `items` are exactly what [Menu](?path=/docs/components-menu--docs) takes: icons, `shortcut`s (shown with Kbd and exposed as `aria-keyshortcuts`; bind the keys yourself with `useHotkey`), `disabled`, `tone`, checkable `kind`s, sections (labelled or not) and submenus (an item with `items`). `onSelect` receives the chosen item's `value` from whichever menu, so keep values unique across menus.
 
 ## Moving between menus
 
@@ -65,6 +65,8 @@ While a menu is open, hovering another title opens that menu instead, and so doe
 | <kbd>Down</kbd>, <kbd>Enter</kbd>, <kbd>Space</kbd> or click on a title | Opens its menu on the first item |
 | <kbd>Up</kbd> arrow on a title | Opens its menu on the last item |
 | <kbd>Left</kbd> / <kbd>Right</kbd> arrows in an open menu | Close it and open the neighbouring menu, on its first item |
+| <kbd>Right</kbd> arrow on an item with a submenu (<kbd>Left</kbd> in RTL) | Opens the submenu on its first item; the bar stays on this menu |
+| <kbd>Left</kbd> arrow in a submenu (<kbd>Right</kbd> in RTL) | Closes the submenu, back to its parent item |
 | <kbd>Up</kbd>, <kbd>Down</kbd>, <kbd>Home</kbd>, <kbd>End</kbd>, a letter | Move inside the open menu, as in Menu |
 | <kbd>Enter</kbd>, <kbd>Space</kbd> or click on an item | Runs it, closes the menu and returns focus to its title (checkable items stay open) |
 | <kbd>Escape</kbd> | Closes the menu and returns focus to its title |

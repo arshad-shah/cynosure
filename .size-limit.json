@@ -2,7 +2,7 @@
   {
     "name": "all CSS",
     "path": "dist/styles.css",
-    "limit": "33.7 kB",
+    "limit": "33.75 kB",
     "gzip": true
   },
   {
@@ -225,7 +225,7 @@
   {
     "name": "Menu",
     "path": ["dist/components/Menu/Menu.js", "dist/styles/menu.css"],
-    "limit": "3.25 kB",
+    "limit": "4 kB",
     "gzip": true
   },
   {

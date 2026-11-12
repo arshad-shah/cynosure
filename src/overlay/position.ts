@@ -22,15 +22,19 @@ export function computePosition(
   placement: Placement,
   offset: number,
   dir: "ltr" | "rtl",
-  /** Cross-axis alignment for top/bottom: centred on the anchor, or flush with its start edge (lists, menus). */
-  align: "center" | "start" = "center",
+  /**
+   * Cross-axis alignment: centred on the anchor; `start`, flush with its start edge for top/bottom (lists, menus);
+   * `flush`, that and also flush with its top edge for start/end (submenus beside their item).
+   */
+  align: "center" | "start" | "flush" = "center",
 ): { x: number; y: number; placement: Placement } {
   const crossX =
-    align === "start"
+    align !== "center"
       ? dir === "rtl"
         ? anchor.right - floating.width
         : anchor.left
       : anchor.left + anchor.width / 2 - floating.width / 2;
+  const crossY = align === "flush" ? anchor.top : anchor.top + anchor.height / 2 - floating.height / 2;
   const place = (p: Placement) => {
     const physical =
       p === "start"
@@ -44,12 +48,8 @@ export function computePosition(
           : p;
     if (physical === "top") return { x: crossX, y: anchor.top - offset - floating.height };
     if (physical === "bottom") return { x: crossX, y: anchor.bottom + offset };
-    if (physical === "left")
-      return {
-        x: anchor.left - offset - floating.width,
-        y: anchor.top + anchor.height / 2 - floating.height / 2,
-      };
-    return { x: anchor.right + offset, y: anchor.top + anchor.height / 2 - floating.height / 2 };
+    if (physical === "left") return { x: anchor.left - offset - floating.width, y: crossY };
+    return { x: anchor.right + offset, y: crossY };
   };
   const fits = (p: Placement) => {
     const { x, y } = place(p);

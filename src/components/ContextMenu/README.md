@@ -1,6 +1,6 @@
 # ContextMenu
 
-A menu of commands for one thing (a file row, a card, a canvas object), opened where the person points: right-click, a long press on touch screens, or Shift+F10 / the context menu key on the focused target. The menu itself is the same as `Menu`: arrow keys, type-ahead, sections, checkable items, shortcuts.
+A menu of commands for one thing (a file row, a card, a canvas object), opened where the person points: right-click, a long press on touch screens, or Shift+F10 / the context menu key on the focused target. The menu itself is the same as `Menu`: arrow keys, type-ahead, sections (labelled, or set apart by separator lines only), submenus, checkable items, shortcuts.
 
 ```tsx
 import { ContextMenu } from "@arshad-shah/cynosure";
