@@ -4,6 +4,7 @@ import { createRoot } from "react-dom/client";
 import { expect, fn, waitFor } from "storybook/test";
 import { createStyleSheet } from "../../styles/inline.js";
 import { computeUnderHostileHost } from "../../test/hostile.js";
+import { shownFully } from "../../test/settle.js";
 import { Button } from "../Button/Button.js";
 import { DateField } from "./DateField.js";
 
@@ -265,5 +266,7 @@ export const OpensOnTheChosenDayInsideAShadowRoot: Story = {
     await userEvent.click(root.querySelector("button") as HTMLElement);
     // The calendar is found inside the shadow root too, so focus lands on the chosen day.
     await waitFor(() => expect((root.activeElement as HTMLElement | null)?.dataset.date).toBe("2026-11-20"));
+    // Let the panel finish fading in before the page is checked for contrast.
+    await shownFully(root.querySelector('[role="dialog"]') as HTMLElement);
   },
 };
