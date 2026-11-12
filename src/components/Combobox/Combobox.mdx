@@ -50,6 +50,12 @@ const { data, isLoading } = useSearch(query);
 />
 ```
 
+## Coloured icons
+
+`iconTone` and `iconColor` colour an option's icon and mean what [Icon](?path=/docs/foundations-icon--docs)'s `tone` and `color` mean: `iconTone` is a semantic colour (`accent`, `neutral`, `danger`, `success`, `warning`, `info`, `muted`), `iconColor` is any CSS colour and overrides it (`brand` draws a brand mark in its owner's colour). The active and the selected option keep the colour. A disabled option shows its icon without the colour, muted with the rest of the row. The input itself shows text only: `iconStart` is the field's own icon.
+
+<Canvas of={Stories.OptionIconsKeepTheirColour} />
+
 ## Props
 
 <ArgTypes of={Stories} />

@@ -1,0 +1,98 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./Heading.stories";
+
+<Meta of={Stories} />
+
+# Heading
+
+A section or page heading. `level` sets the element (`h1` to `h6`) and `size` sets how it looks, so the page outline stays correct whatever the design asks for. For text that is not a heading, use Text.
+
+<Canvas of={Stories.Levels} />
+
+## When to use
+
+- **A page title:** `level={1}`, once per page. Add `size="display"` for a hero title.
+- **A section or panel title:** `level` from the page structure (a section inside a level 2 section is level 3), then `size` if the default looks too large or too small there.
+- **A compact heading in dense UI:** a small `size` with `tone="muted"`, still at the right `level`.
+
+**Use something else when:**
+- the text is not a heading (body copy, captions, labels): Text
+- it is rendered Markdown or other plain HTML: [Prose](?path=/docs/components-prose--docs), which styles the headings inside it
+- it is the title of an empty view with an icon and a next step: [EmptyState](?path=/docs/components-emptystate--docs)
+- it labels a form control: [Field](?path=/docs/components-field--docs)
+
+## Usage
+
+```tsx
+import { Heading } from "@arshad-shah/cynosure";
+
+<Heading level={1}>Projects</Heading>
+<Heading>Recent exports</Heading>
+<Heading level={2} size="sm" tone="muted">Filters</Heading>
+<Heading level={1} size="display" align="center">Capture anything</Heading>
+<Heading level={3} truncate>{file.name}</Heading>
+```
+
+## Level and size
+
+Without `size`, each level takes its own step of the type scale: level 1 is `2xl`, 2 is `xl`, 3 is `lg`, 4 is `md`, 5 is `sm` and 6 is `xs`. Setting `size` changes the look only. Every heading below is an `h3`. `display` grows with the viewport and stays between 1.25 and 2 times `2xl`.
+
+<Canvas of={Stories.SizeIsSeparateFromLevel} />
+
+## Tone, weight and alignment
+
+`tone` is `neutral` (the ink colour), `muted`, `accent` or `inherit` (the colour of whatever the heading sits in). `weight` is `bold` or `medium`. `align` is `start`, `center` or `end`. Left unset, the heading follows its parent's alignment.
+
+<Canvas of={Stories.Tones} />
+<Canvas of={Stories.Weights} />
+<Canvas of={Stories.Alignment} />
+
+## Truncation
+
+`truncate` keeps the heading on one line and ends it with an ellipsis. A number cuts it after that many lines. Text that fits is left alone.
+
+<Canvas of={Stories.Truncation} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+Heading is not interactive: it has no keyboard or pointer behaviour.
+
+- **Outline:** it renders a real `h1` to `h6`, so it appears in the page outline and in screen reader heading lists at `level`. Choose the level from the page structure and the size from the design.
+- **Naming a region:** pass `id` and point `aria-labelledby` at it.
+- **Truncated text:** the full text stays the heading's accessible name.
+- **Wrapping:** lines are balanced (`text-wrap: balance`), and long words break instead of overflowing.
+- **No margins:** space headings with [Stack](?path=/docs/components-stack--docs) or the layout around them.
+- **Right to left:** `start` and `end` swap sides, and a truncated heading keeps the start of its text.
+- **Ref:** the forwarded ref is the heading element.
+
+## Touch
+
+Nothing in Heading is pressable, so it has no hit area.
+
+## Theming
+
+Tokens: `--cy-heading-size-{xs,sm,md,lg,xl,2xl,display}`, `--cy-heading-font-family`, `--cy-heading-font-weight` and `--cy-heading-line-height`.
+
+| Token | Changes | Falls back to |
+| --- | --- | --- |
+| `--cy-heading-size-xs` to `--cy-heading-size-2xl` | Font size of each `size` | `--cy-font-size-xs` to `--cy-font-size-2xl` |
+| `--cy-heading-size-display` | Font size of `size="display"` | 5% of the viewport width, between 1.25 and 2 times `--cy-font-size-2xl` |
+| `--cy-heading-font-family` | Font family | `--cy-font-display` |
+| `--cy-heading-font-weight` | Weight of bold headings | `--cy-font-weight-bold` |
+| `--cy-heading-line-height` | Line height, as a number | 1.2 |
+
+```ts
+createTheme({ components: { heading: { sizeXl: "1.5rem", "size-2xl": "2rem", lineHeight: "1.15" } } });
+```
+
+<Canvas of={Stories.TokensRetuneTheScale} />
+
+`className` and `style` are for layout only (margin, placement, width). Change the look through tokens so every product stays consistent.
+
+## Related
+
+[Prose](?path=/docs/components-prose--docs) · [Stack](?path=/docs/components-stack--docs) · [EmptyState](?path=/docs/components-emptystate--docs)

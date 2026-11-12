@@ -10,8 +10,8 @@ import {
 } from "react";
 import { useControllableState } from "../../foundations/controllable.js";
 import { HiddenValue } from "../../foundations/HiddenValue/HiddenValue.js";
-import { Icon } from "../../foundations/Icon/Icon.js";
 import { isComposing } from "../../foundations/keys.js";
+import { OptionIcon, type OptionIconColor } from "../../foundations/option-icon.js";
 import type { IconData } from "../../icons/types.js";
 import { useListboxLayer } from "../../overlay/listbox-layer.js";
 import type { Size } from "../../tokens/schema.js";
@@ -29,11 +29,12 @@ declare module "../../tokens/schema.js" {
   }
 }
 
-export interface ComboboxOption {
+export interface ComboboxOption extends OptionIconColor {
   value: string;
   label: string;
   description?: string;
   disabled?: boolean;
+  /** Icon before the label in the list. Colour it with `iconTone` or `iconColor`. */
   icon?: IconData;
 }
 
@@ -319,7 +320,7 @@ export function Combobox({
             onClick={() => choose(option)}
             onKeyDown={() => {}}
           >
-            {option.icon && <Icon icon={option.icon} />}
+            <OptionIcon option={option} plain={option.disabled} className="cy-combobox-icon" />
             <span className="cy-combobox-option-text">
               <span className="cy-combobox-option-label">{option.label}</span>
               {option.description && (

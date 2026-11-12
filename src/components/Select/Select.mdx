@@ -57,6 +57,14 @@ The list has a maximum height and scrolls. Long labels truncate with an ellipsis
 - **`labels`:** override `placeholder`, `empty` (no options) and `required` (validation message).
 - **`labelHidden`:** hides the label visually while it still names the trigger. Prefer a visible label.
 
+## Coloured icons
+
+`iconTone` and `iconColor` colour an option's icon and mean what [Icon](?path=/docs/foundations-icon--docs)'s `tone` and `color` mean: `iconTone` is a semantic colour (`accent`, `neutral`, `danger`, `success`, `warning`, `info`, `muted`), `iconColor` is any CSS colour and overrides it (`brand` draws a brand mark in its owner's colour). The colour shows in the list, on the highlighted and the selected option, and in the trigger once the option is chosen. Without the two fields an icon takes the text colour.
+
+<Canvas of={Stories.OptionIconsKeepTheirColourInTheListAndTheTrigger} />
+
+A disabled option shows its icon without the colour, muted with the rest of the row, and so does the trigger of a disabled Select. Tone colours keep a contrast of 3:1 against the highlight. With your own colour, check it in light and dark. The label must make sense without the colour.
+
 ## Props
 
 <ArgTypes of={Stories} />

@@ -39,7 +39,7 @@ export function themeProperties(theme: Theme, options: { contrast?: boolean } = 
     ...flatten(theme.global, "", []),
     ...colorPairs(a, b),
     ...Object.entries(theme.components).flatMap(([c, t]) =>
-      Object.entries(t).map(([k, v]) => [`${c}-${kebab(k)}`, v] as [string, string]),
+      Object.entries(t).map(([k, v]) => [`${kebab(c)}-${kebab(k)}`, v] as [string, string]),
     ),
   ];
   return Object.fromEntries(pairs.map(([k, v]) => [`--cy-${k}`, v]));
@@ -55,7 +55,7 @@ export function themeToCss(theme: Theme, selector: string = DEFAULT_SELECTOR): s
     ...flatten(theme.global, "", []),
     ...colorPairs(light, dark),
     ...Object.entries(theme.components).flatMap(([c, t]) =>
-      Object.entries(t).map(([k, v]) => [`${c}-${kebab(k)}`, v] as [string, string]),
+      Object.entries(t).map(([k, v]) => [`${kebab(c)}-${kebab(k)}`, v] as [string, string]),
     ),
   ];
   const contrast = decl(colorPairs(theme.palettes["light-contrast"], theme.palettes["dark-contrast"]));

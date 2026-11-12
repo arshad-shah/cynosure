@@ -3,6 +3,8 @@ export {
   Toaster,
   type ToasterProps,
   type ToastLabels,
+  type ToastOffset,
+  type ToastOffsetLength,
   type ToastOptions,
   type ToastPosition,
   type ToastTokens,

@@ -1,4 +1,4 @@
-import { type CSSProperties, type ReactNode, useContext, useId, useRef } from "react";
+import { type CSSProperties, type ReactNode, useContext, useEffect, useId, useRef, useState } from "react";
 import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js";
 import { useControllableState } from "../../foundations/controllable.js";
 import { DialogBase } from "../../foundations/DialogBase/DialogBase.js";
@@ -45,6 +45,13 @@ export interface DialogProps {
   size?: Size;
   /** Escape, the backdrop and the close button close it (default). `false` leaves only your actions. */
   dismissible?: boolean;
+  /**
+   * Keep the content in the DOM while the dialog is closed. By default a closed dialog renders nothing inside it: the
+   * content mounts when it opens and unmounts once the closing transition has ended, so every opening starts fresh.
+   * Set it for content whose state must survive closing (a half-filled form) or that is expensive to rebuild.
+   * Default false.
+   */
+  keepMounted?: boolean;
   /** Replace the built-in English text: the close button's name. */
   labels?: Partial<DialogLabels>;
   /** Added to the panel, for layout. */
@@ -95,6 +102,7 @@ export function DialogFrame({
   actions,
   size = "md",
   dismissible = true,
+  keepMounted = false,
   labels,
   side,
   className,
@@ -117,6 +125,32 @@ export function DialogFrame({
   const dismiss = () => {
     if (dismissible) setOpen(false);
   };
+
+  // The content is rendered while open, and after closing until the closing transition has ended. `present` goes true
+  // in the render that opens the dialog, so the content is there before DialogBase shows it (no empty first frame).
+  const [present, setPresent] = useState(isOpen);
+  if (isOpen && !present) setPresent(true);
+  useEffect(() => {
+    if (isOpen || !present) return;
+    const el = dialog.current as HTMLDialogElement;
+    const unmount = () => setPresent(false);
+    // Unmount when the dialog's own closing transition ends. The timer covers a transition that never reports back
+    // (interrupted, or the dialog is not rendered) and is the whole wait when there is none: reduced motion, or no
+    // stylesheet.
+    const style = getComputedStyle(el);
+    const longest = (times: string) => Math.max(...times.split(",").map((time) => Number.parseFloat(time)));
+    const wait = (longest(style.transitionDuration) + longest(style.transitionDelay)) * 1000;
+    const ended = (event: Event) => {
+      if (event.target === el) unmount();
+    };
+    el.addEventListener("transitionend", ended);
+    const timer = setTimeout(unmount, wait && wait + 100);
+    return () => {
+      el.removeEventListener("transitionend", ended);
+      clearTimeout(timer);
+    };
+  }, [isOpen, present]);
+  const mounted = isOpen || present || keepMounted;
 
   // On close, before useDismiss returns focus: make sure the remembered element can still take it.
   // Inside a Toaster, lend it a container while open: toasts raised now show above this dialog instead of under its
@@ -163,56 +197,59 @@ export function DialogFrame({
       tabIndex={-1}
       data-size={size}
       data-side={side}
-      aria-labelledby={`${id}-title`}
-      aria-describedby={description ? `${id}-description` : undefined}
+      aria-labelledby={mounted ? `${id}-title` : undefined}
+      aria-describedby={mounted && description ? `${id}-description` : undefined}
     >
-      <div
-        className={className ? `cy-dialog-panel cy-reset ${className}` : "cy-dialog-panel cy-reset"}
-        style={style}
-      >
-        <div className="cy-dialog-header cy-reset">
-          <h2 id={`${id}-title`} className="cy-dialog-title cy-reset">
-            {title}
-          </h2>
-          {dismissible && (
-            <IconButton
-              icon={closeIcon}
-              label={text.close}
-              variant="ghost"
-              size="sm"
-              tooltipPlacement="bottom"
-              onClick={() => setOpen(false)}
-            />
+      {mounted && (
+        <div
+          className={className ? `cy-dialog-panel cy-reset ${className}` : "cy-dialog-panel cy-reset"}
+          style={style}
+        >
+          <div className="cy-dialog-header cy-reset">
+            <h2 id={`${id}-title`} className="cy-dialog-title cy-reset">
+              {title}
+            </h2>
+            {dismissible && (
+              <IconButton
+                icon={closeIcon}
+                label={text.close}
+                variant="ghost"
+                size="sm"
+                tooltipPlacement="bottom"
+                onClick={() => setOpen(false)}
+              />
+            )}
+          </div>
+          {description && (
+            <p id={`${id}-description`} className="cy-dialog-description cy-reset">
+              {description}
+            </p>
+          )}
+          {/* biome-ignore lint/a11y/noStaticElementInteractions: delegated focus listener for the controls inside */}
+          <div
+            ref={body}
+            className="cy-dialog-body cy-reset"
+            // A focused field low in the content (Tab, or the on-screen keyboard opening) is brought fully into view.
+            onFocus={(event) => event.target.scrollIntoView({ block: "nearest" })}
+          >
+            {children}
+          </div>
+          {actions && (
+            <div ref={footer} className="cy-dialog-actions cy-reset">
+              {actions}
+            </div>
           )}
         </div>
-        {description && (
-          <p id={`${id}-description`} className="cy-dialog-description cy-reset">
-            {description}
-          </p>
-        )}
-        {/* biome-ignore lint/a11y/noStaticElementInteractions: delegated focus listener for the controls inside */}
-        <div
-          ref={body}
-          className="cy-dialog-body cy-reset"
-          // A focused field low in the content (Tab, or the on-screen keyboard opening) is brought fully into view.
-          onFocus={(event) => event.target.scrollIntoView({ block: "nearest" })}
-        >
-          {children}
-        </div>
-        {actions && (
-          <div ref={footer} className="cy-dialog-actions cy-reset">
-            {actions}
-          </div>
-        )}
-      </div>
-      {toastHost && <div ref={toasts} className="cy-dialog-toasts" />}
+      )}
+      {toastHost && mounted && <div ref={toasts} className="cy-dialog-toasts" />}
     </DialogBase>
   );
 }
 
 /**
  * Modal dialog in the top layer: focus moves in, stays in and comes back; Escape, the backdrop and the close button
- * dismiss it. In a container narrower than about 36rem it becomes a bottom sheet.
+ * dismiss it. In a container narrower than about 36rem it becomes a bottom sheet. Its content is mounted only while
+ * it is open (and while it closes), unless `keepMounted`.
  */
 export function Dialog(props: DialogProps) {
   return <DialogFrame {...props} />;

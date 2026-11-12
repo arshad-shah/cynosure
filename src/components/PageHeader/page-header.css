@@ -1,0 +1,139 @@
+/* page-header: the top of a page. Type comes from Heading and Text; this file only lays the parts out. Every value
+   reads a --cy-page-header-* token with a global fallback. The root is the size container, so the actions drop under
+   the text when the header itself is narrow, whatever the viewport. Root never carries .cy-reset. */
+.cy-page-header.cy-page-header {
+  box-sizing: border-box !important;
+  container: cy-page-header / inline-size;
+  display: flex;
+  flex-direction: column;
+  gap: var(--cy-page-header-gap, var(--cy-space-6));
+  /* Size containment gives the root no width of its own: fill the parent, also in a flex or grid parent. */
+  inline-size: 100%;
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  color: var(--cy-color-ink);
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-font-size-md);
+  font-style: normal;
+  font-weight: var(--cy-font-weight-regular);
+  line-height: var(--cy-font-line-height);
+  letter-spacing: normal;
+  text-align: start;
+  text-transform: none;
+  &[data-divider] {
+    padding-block-end: var(--cy-page-header-divider-space, var(--cy-space-6));
+    border-block-end: var(--cy-border-width) solid var(--cy-page-header-divider-color, var(--cy-color-line));
+  }
+  &[data-align="center"] {
+    text-align: center;
+  }
+}
+
+.cy-page-header-breadcrumbs.cy-page-header-breadcrumbs,
+.cy-page-header-body.cy-page-header-body {
+  display: block;
+  min-inline-size: 0;
+  padding: 0;
+}
+.cy-page-header[data-align="center"] > .cy-page-header-breadcrumbs.cy-page-header-breadcrumbs {
+  display: flex;
+  justify-content: center;
+}
+
+/* Wide: the text takes the room and the actions sit at the inline end, level with the top of the text. */
+.cy-page-header-main.cy-page-header-main {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--cy-page-header-gap, var(--cy-space-6));
+  min-inline-size: 0;
+  padding: 0;
+}
+.cy-page-header-text.cy-page-header-text {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  gap: var(--cy-page-header-text-gap, var(--cy-space-3));
+  min-inline-size: 0;
+  padding: 0;
+}
+.cy-page-header-description.cy-page-header-description {
+  max-inline-size: var(--cy-page-header-description-max-width, 65ch);
+  overflow-wrap: break-word;
+  text-wrap: pretty;
+}
+.cy-page-header-eyebrow.cy-page-header-eyebrow {
+  overflow-wrap: break-word;
+}
+/* Sets its own font and colour, so it declares the reset properties instead of carrying .cy-reset. */
+.cy-page-header-meta.cy-page-header-meta {
+  box-sizing: border-box !important;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--cy-space-2) var(--cy-page-header-actions-gap, var(--cy-space-4));
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+  color: var(--cy-color-muted);
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-font-size-sm);
+  font-style: normal;
+  font-weight: var(--cy-font-weight-regular);
+  line-height: var(--cy-font-line-height);
+  letter-spacing: normal;
+  text-transform: none;
+}
+.cy-page-header-actions.cy-page-header-actions {
+  display: flex;
+  flex: 0 1 auto;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--cy-page-header-actions-gap, var(--cy-space-4));
+  min-inline-size: 0;
+  max-inline-size: 50%;
+  padding: 0;
+}
+
+/* Centred: one column, everything on the centre line. */
+.cy-page-header[data-align="center"] {
+  & .cy-page-header-main.cy-page-header-main {
+    flex-direction: column;
+    align-items: center;
+  }
+  & .cy-page-header-text.cy-page-header-text {
+    flex: none;
+    align-items: center;
+    max-inline-size: 100%;
+  }
+  & .cy-page-header-meta.cy-page-header-meta,
+  & .cy-page-header-actions.cy-page-header-actions {
+    justify-content: center;
+    max-inline-size: 100%;
+  }
+}
+
+/* Narrow header: the actions go below the text, from the start edge. */
+@container cy-page-header (inline-size < 36rem) {
+  .cy-page-header-main.cy-page-header-main {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .cy-page-header-text.cy-page-header-text {
+    flex: none;
+    max-inline-size: 100%;
+  }
+  .cy-page-header-actions.cy-page-header-actions {
+    justify-content: flex-start;
+    max-inline-size: 100%;
+  }
+}
+
+@media (forced-colors: active) {
+  .cy-page-header.cy-page-header[data-divider] {
+    border-block-end-color: CanvasText;
+  }
+}

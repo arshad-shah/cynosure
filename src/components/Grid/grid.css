@@ -9,7 +9,11 @@
   gap: var(--_row-gap) var(--_gap);
   min-inline-size: 0;
   margin: 0;
-  padding: 0;
+  /* Padding props set these inline; resetting them here stops a nested Grid inheriting its parent's padding. */
+  --_pad-block: 0;
+  --_pad-inline: 0;
+  padding-block: var(--_pad-block);
+  padding-inline: var(--_pad-inline);
   list-style: none;
   font-size: inherit;
   line-height: inherit;
@@ -18,6 +22,59 @@
         auto-fill,
         minmax(
           max(min(var(--_min), 100%), (100% - (var(--_cols, 1000) - 1) * var(--_gap)) / var(--_cols, 1000)),
+          1fr
+        )
+      );
+  }
+  /*
+   * Columns per breakpoint (GRID_BREAKPOINTS in Grid.tsx: sm 30rem, md 45rem, lg 60rem, xl 75rem), following the
+   * grid's own content width with no script. A container query cannot restyle its own container, so the column
+   * template is arithmetic on 100% (the grid's content width) instead:
+   *   --_from-x  is hugely positive from breakpoint x upwards and negative below it; --_to-x is its opposite.
+   *   Each min() below is one breakpoint's column width while the grid is in that range and negative outside it,
+   *   so the max() of them is the column width of the range the grid is in, and that many columns fit.
+   * The half-thousandth of a rem makes a grid exactly at a breakpoint count as being in it and absorbs rounding.
+   * The grid is also a size container so that its items can clamp their span to the columns in effect (below).
+   */
+  &[data-responsive] {
+    container: cy-grid / inline-size;
+    --_from-sm: calc((100% - 30rem + 0.0005rem) * 10000000);
+    --_from-md: calc((100% - 45rem + 0.0005rem) * 10000000);
+    --_from-lg: calc((100% - 60rem + 0.0005rem) * 10000000);
+    --_from-xl: calc((100% - 75rem + 0.0005rem) * 10000000);
+    --_to-sm: calc((30rem - 0.0005rem - 100%) * 10000000);
+    --_to-md: calc((45rem - 0.0005rem - 100%) * 10000000);
+    --_to-lg: calc((60rem - 0.0005rem - 100%) * 10000000);
+    --_to-xl: calc((75rem - 0.0005rem - 100%) * 10000000);
+    grid-template-columns: repeat(
+        auto-fill,
+        minmax(
+          max(
+            min(var(--_min, 0rem), 100%),
+            max(
+              min((100% - (var(--_cols) - 1) * var(--_gap)) / var(--_cols), var(--_to-sm)),
+              min(
+                (100% - (var(--_cols-sm) - 1) * var(--_gap)) /
+                var(--_cols-sm),
+                var(--_from-sm),
+                var(--_to-md)
+              ),
+              min(
+                (100% - (var(--_cols-md) - 1) * var(--_gap)) /
+                var(--_cols-md),
+                var(--_from-md),
+                var(--_to-lg)
+              ),
+              min(
+                (100% - (var(--_cols-lg) - 1) * var(--_gap)) /
+                var(--_cols-lg),
+                var(--_from-lg),
+                var(--_to-xl)
+              ),
+              min((100% - (var(--_cols-xl) - 1) * var(--_gap)) / var(--_cols-xl), var(--_from-xl))
+            ) -
+            0.0005rem
+          ),
           1fr
         )
       );
@@ -45,5 +102,26 @@
   line-height: inherit;
   &[data-full] {
     grid-column: 1 / -1;
+  }
+}
+/* The same breakpoints for the items of a per-breakpoint grid: --_cols becomes the count in effect, for the clamp. */
+@container cy-grid (inline-size >= 30rem) {
+  .cy-grid[data-responsive] > .cy-grid-item {
+    --_cols: var(--_cols-sm);
+  }
+}
+@container cy-grid (inline-size >= 45rem) {
+  .cy-grid[data-responsive] > .cy-grid-item {
+    --_cols: var(--_cols-md);
+  }
+}
+@container cy-grid (inline-size >= 60rem) {
+  .cy-grid[data-responsive] > .cy-grid-item {
+    --_cols: var(--_cols-lg);
+  }
+}
+@container cy-grid (inline-size >= 75rem) {
+  .cy-grid[data-responsive] > .cy-grid-item {
+    --_cols: var(--_cols-xl);
   }
 }

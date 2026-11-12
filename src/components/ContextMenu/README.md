@@ -25,6 +25,7 @@ import { ContextMenu } from "@arshad-shah/cynosure";
 - Right-click opens the menu with its corner at the pointer; the keyboard opens it under the target. It stays on screen near edges.
 - Touch: a 500ms press opens it (iOS sends no `contextmenu` event); a tap or a scroll does not. Add `-webkit-touch-callout: none` and `user-select: none` to the target so the system's own callout does not appear.
 - Focus moves to the first item and returns to the target when the menu closes.
+- Items are Menu's `MenuItem`, so `iconTone` and `iconColor` colour an item's icon here too (see [Menu](../Menu/README.md)); a disabled item shows its icon muted.
 - Every command must also be reachable another way (a Menu button or toolbar): a context menu is a shortcut, not the only path.
 
 ## Tokens

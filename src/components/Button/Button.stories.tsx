@@ -289,6 +289,31 @@ export const ALinkThatLooksLikeAButton: Story = {
   },
 };
 
+export const CurrentPageInBothForms: Story = {
+  render: () => (
+    <div style={{ display: "flex", gap: 8 }}>
+      <Button href="/reports" aria-current="page" variant="soft" tone="accent" style={{ marginInlineEnd: 4 }}>
+        Reports
+      </Button>
+      <Button href="/billing">Billing</Button>
+      <Button aria-current="step">Shipping</Button>
+      <Button>Payment</Button>
+    </div>
+  ),
+  play: async ({ canvas }) => {
+    // A link that is the page being shown says so, and so does a button that is the current step.
+    const reports = canvas.getByRole("link", { name: "Reports" });
+    await expect(reports).toHaveAttribute("aria-current", "page");
+    await expect(reports).toHaveAttribute("href", "/reports");
+    await expect(canvas.getByRole("button", { name: "Shipping" })).toHaveAttribute("aria-current", "step");
+    // Nothing is marked unless asked.
+    await expect(canvas.getByRole("link", { name: "Billing" })).not.toHaveAttribute("aria-current");
+    await expect(canvas.getByRole("button", { name: "Payment" })).not.toHaveAttribute("aria-current");
+    // Layout style reaches a link as it does a button.
+    await expect(getComputedStyle(reports).marginInlineEnd).toBe("4px");
+  },
+};
+
 export const ConfirmInPlace: Story = {
   args: { children: "Delete", confirm: "Press again to delete", tone: "danger", onClick: fn() },
   play: async ({ args, canvas, userEvent }) => {

@@ -1,7 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useEffect, useState } from "react";
 import { expect, fn, waitFor } from "storybook/test";
-import { heart, tag } from "../../icons/index.js";
+import { flag, heart, tag } from "../../icons/index.js";
+import { backdrop, contrast, rgb } from "../../test/color.js";
 import { computeUnderHostileHost } from "../../test/hostile.js";
 import { shownFully } from "../../test/settle.js";
 import { Button } from "../Button/Button.js";
@@ -370,5 +371,78 @@ export const FullyControlled: Story = {
     // A reset leaves controlled values to their owner.
     (canvas.getByTestId("form") as HTMLFormElement).reset();
     await expect(canvas.getByTestId("out")).toHaveTextContent("grape");
+  },
+};
+
+/** A colour token as painted sRGB, resolved next to `near` (so it follows that element's theme). */
+function token(near: Element, name: string) {
+  const probe = document.createElement("i");
+  probe.style.color = `var(${name})`;
+  near.after(probe);
+  const value = rgb(getComputedStyle(probe).color);
+  probe.remove();
+  return value;
+}
+const VIOLET = "rgb(124, 58, 237)";
+
+const categories: ComboboxOption[] = [
+  { value: "work", label: "Work", icon: tag, iconTone: "info" },
+  { value: "urgent", label: "Urgent", icon: flag, iconTone: "danger" },
+  { value: "garden", label: "Garden", icon: tag, iconColor: VIOLET },
+  { value: "archived", label: "Archived", icon: tag, iconTone: "success", iconColor: VIOLET, disabled: true },
+  { value: "other", label: "Other", icon: tag },
+  { value: "text", label: "Text only" },
+];
+const iconOf = (option: HTMLElement) => option.querySelector(".cy-icon") as SVGElement;
+const colourOf = (el: Element) => rgb(getComputedStyle(el).color);
+
+export const OptionIconsKeepTheirColour: Story = {
+  args: { label: "Category", options: categories, placeholder: "Search categories" },
+  play: async ({ canvas, userEvent }) => {
+    const input = canvas.getByRole("combobox", { name: "Category" });
+    const danger = token(input, "--cy-color-danger");
+    await userEvent.click(input);
+    await waitFor(() => expect(isOpen()).toBe(true));
+    await shownFully(listbox());
+    const option = (name: string) => canvas.getByRole("option", { name });
+    await expect(colourOf(iconOf(option("Work")))).toEqual(token(input, "--cy-color-info"));
+    await expect(colourOf(iconOf(option("Urgent")))).toEqual(danger);
+    await expect(colourOf(iconOf(option("Garden")))).toEqual(rgb(VIOLET));
+    // Without the props an icon is the option's text colour, as before; a disabled option's icon is muted with its row.
+    await expect(colourOf(iconOf(option("Other")))).toEqual(colourOf(option("Other")));
+    await expect(colourOf(iconOf(option("Archived")))).toEqual(colourOf(option("Archived")));
+    await expect(getComputedStyle(option("Archived")).opacity).toBe("0.45");
+    await expect(option("Text only").querySelector(".cy-icon")).toBeNull();
+    // The active option (arrow keys) keeps the icon's colour, readable on the highlight (3:1 for graphics).
+    await userEvent.keyboard("{ArrowDown}");
+    await expect(activeOption(input)).toHaveTextContent("Urgent");
+    await expect(colourOf(iconOf(option("Urgent")))).toEqual(danger);
+    const ratio = contrast(getComputedStyle(iconOf(option("Urgent"))).color, backdrop(option("Urgent")));
+    await expect(ratio).toBeGreaterThanOrEqual(3);
+    // Chosen and reopened: the selected option's icon is still its own colour.
+    await userEvent.keyboard("{Enter}");
+    await expect(input).toHaveValue("Urgent");
+    await userEvent.click(input);
+    await waitFor(() => expect(isOpen()).toBe(true));
+    await expect(option("Urgent")).toHaveAttribute("aria-selected", "true");
+    await expect(colourOf(iconOf(option("Urgent")))).toEqual(danger);
+  },
+};
+
+export const OptionIconColourIsStableUnderHostileHost: Story = {
+  args: { label: "Category", options: categories },
+  play: async ({ canvasElement }) => {
+    for (const selector of [
+      '.cy-combobox-icon[data-tone="danger"]',
+      '.cy-combobox-icon[style*="color"]',
+      '.cy-combobox-option[aria-disabled="true"] .cy-combobox-icon',
+    ]) {
+      const icon = computeUnderHostileHost(canvasElement, selector, ["color", "stroke", "width"]);
+      await expect({ selector, ...icon.hostile }).toEqual({ selector, ...icon.clean });
+    }
+    const toned = computeUnderHostileHost(canvasElement, '.cy-combobox-icon[data-tone="danger"]', ["color"]);
+    await expect(rgb(toned.hostile.color as string)).toEqual(
+      token(canvasElement.querySelector(".cy-combobox") as Element, "--cy-color-danger"),
+    );
   },
 };

@@ -8,6 +8,7 @@ import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { extname, join, relative, resolve } from "node:path";
 import type { List, RootContent } from "mdast";
 import { toString as textOf } from "mdast-util-to-string";
+import { viewRef } from "../app/provenance.ts";
 import type { DocsConfig } from "../config.ts";
 import type {
   CatalogueGroup,
@@ -123,6 +124,10 @@ function releasesFrom(body: RootContent[]): Release[] {
 export async function scan(config: DocsConfig, siteDir: string): Promise<Scanned> {
   const root = resolve(siteDir, "..");
   const branch = config.branch ?? "main";
+  // Links that show a file use the built commit while changes are pending (see `viewRef`).
+  const unreleased = hasPendingChanges(join(root, config.changesets ?? ".changeset"));
+  const commit = commitOf(root);
+  const view = viewRef({ branch, unreleased, ...(commit ? { commit } : {}) });
   const files: string[] = [];
   const read = (file: string) => {
     files.push(file);
@@ -280,7 +285,7 @@ export async function scan(config: DocsConfig, siteDir: string): Promise<Scanned
   const context = (source: string): LinkContext => ({
     source,
     routeOf: (path) => routes.get(path) ?? null,
-    blob: `${config.repo}/blob/${branch}`,
+    blob: `${config.repo}/blob/${view}`,
     hidden: (path) => hidden.has(path),
     ...(config.url ? { site: config.url.replace(/\/$/, "") } : {}),
     // A docs page links to its neighbours by their Storybook address; here they are pages.
@@ -361,7 +366,7 @@ export async function scan(config: DocsConfig, siteDir: string): Promise<Scanned
         ...(storybookBase
           ? { storybook: `${storybookBase}?path=/docs/${kind}-${componentName.toLowerCase()}--docs` }
           : {}),
-        folder: `${config.repo}/tree/${branch}/${repoPath(componentFolder)}`,
+        folder: `${config.repo}/tree/${view}/${repoPath(componentFolder)}`,
       };
       // A page whose document does not place the props table gets it at the end.
       const placed = (parsed.body as { type: string }[]).some((node) => node.type === "props");
@@ -507,14 +512,13 @@ export async function scan(config: DocsConfig, siteDir: string): Promise<Scanned
     files.push(join(root, source));
   }
 
-  const commit = commitOf(root);
   const site: SiteData = {
     name: config.name,
     tagline: config.tagline,
     description: config.description,
     package: config.package,
     version,
-    ...(hasPendingChanges(join(root, config.changesets ?? ".changeset")) ? { unreleased: true } : {}),
+    ...(unreleased ? { unreleased: true } : {}),
     repo: config.repo,
     branch,
     url: config.url.replace(/\/$/, ""),

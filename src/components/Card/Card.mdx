@@ -29,6 +29,7 @@ import { Card } from "@arshad-shah/cynosure";
 <Card href="/settings">Whole card is one link</Card>
 <Card onClick={choose}>Whole card is one button</Card>
 <Card variant="soft" tone="info">Heads up</Card>
+<Card edge="success">Water the garden <Badge tone="success">Home</Badge></Card>
 ```
 
 ## Padding
@@ -36,6 +37,18 @@ import { Card } from "@arshad-shah/cynosure";
 `padding` is `none`, `sm`, `md` (default) or `lg`, and uses space tokens.
 
 <Canvas of={Stories.PaddingUsesSpaceTokens} />
+
+## Coloured edge
+
+`edge` draws a coloured edge on the card's inline-start side: the left in left-to-right text, the right in right-to-left. A tone name (`accent`, `neutral`, `danger`, `success`, `warning`, `info`) uses that tone's colour. Any other string is a CSS colour, for categories with their own colours.
+
+<Canvas of={Stories.EdgeShowsAToneOrAnyColour} />
+
+The edge is the card's own start border, so it follows the card's radius, and the content starts after it. It works with every `variant` and `tone`, on link and button cards and with `actions`, and it keeps its colour when the card is hovered or focused.
+
+**Colour must not be the only carrier of meaning.** Some people cannot tell the colours apart and a screen reader does not announce them. Say the same thing in the card's text or with a [Badge](?path=/docs/components-badge--docs), as the cards above do.
+
+<Canvas of={Stories.EdgeFollowsReadingDirectionAndItsWidthToken} />
 
 ## Interactive cards
 
@@ -56,17 +69,22 @@ With `href` the card renders as a link; unsafe URL schemes are not linked. With 
 - **Static cards:** choose the element with `as` (`div`, `section`, `article`, `li`, `aside`).
 - **Names:** add `aria-label` when the card's content doesn't give a clear name.
 - **Ref:** the ref points at the rendered element.
+- **Edge:** `edge` is visual only and adds no element or name. In forced colours it stays as a thicker edge in the system text colour.
 
 ## Theming
 
 Tokens: `--cy-card-bg`, `--cy-card-border`, `--cy-card-radius`, `--cy-card-shadow` and `--cy-card-soft-mix`.
 
+| Token | Controls |
+| --- | --- |
+| `--cy-card-edge-width` | Thickness of the `edge`. Default `--cy-space-2`. |
+
 ```ts
-createTheme({ components: { card: { radius: "12px", shadow: "none" } } });
+createTheme({ components: { card: { radius: "12px", shadow: "none", edgeWidth: "6px" } } });
 ```
 
 `className` and `style` are for layout only.
 
 ## Related
 
-[Stack](?path=/docs/components-stack--docs) · [Inline](?path=/docs/components-inline--docs) · [Link](?path=/docs/components-link--docs) · [Button](?path=/docs/components-button--docs)
+[Badge](?path=/docs/components-badge--docs) · [Stack](?path=/docs/components-stack--docs) · [Inline](?path=/docs/components-inline--docs) · [Link](?path=/docs/components-link--docs) · [Button](?path=/docs/components-button--docs)

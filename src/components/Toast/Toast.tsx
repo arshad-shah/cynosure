@@ -20,12 +20,17 @@ import { ToastHostContext, type ToastHostRegistry } from "../../overlay/toast-ho
 import type { Tone } from "../../tokens/schema.js";
 import { Button } from "../Button/Button.js";
 import { IconButton } from "../IconButton/IconButton.js";
+import { type Space, space } from "../Stack/space.js";
 
 export interface ToastTokens {
   width: string;
   radius: string;
   padding: string;
   gap: string;
+  /** Extra distance between the toasts and the top or bottom edge they sit on (a fixed tab bar or header). */
+  offsetBlock: string;
+  /** Extra distance between the toasts and the side they sit on (a fixed side rail). */
+  offsetInline: string;
 }
 
 declare module "../../tokens/schema.js" {
@@ -62,6 +67,17 @@ export type ToastPosition =
   | "bottom-center"
   | "bottom-end";
 
+/** A distance: a step of the space scale (`"6"` is `--cy-space-6`) or any CSS length (`"72px"`, `"calc(56px + 1rem)"`). */
+export type ToastOffsetLength = Space | (string & {});
+
+/** How far in from their edges the toasts sit, for each axis. */
+export interface ToastOffset {
+  /** From the top or bottom edge, whichever `position` names. */
+  block?: ToastOffsetLength | undefined;
+  /** From the side `position` names (both sides for `center`). Follows the reading direction. */
+  inline?: ToastOffsetLength | undefined;
+}
+
 export interface ToastLabels {
   /** Name of the notifications region. */
   region: string;
@@ -74,6 +90,14 @@ export interface ToasterProps {
   position?: ToastPosition;
   /** How many show at once; older ones collapse until newer ones close. */
   max?: number;
+  /**
+   * Keeps the toasts clear of fixed parts of the app, such as a bottom tab bar: extra distance from the edge they sit
+   * on, added to the usual margin and the device's safe area. A step of the space scale (`"8"`) or a CSS length
+   * (`"72px"`) moves them in from the top or bottom edge; `{ block, inline }` sets that and the distance from the
+   * side. To set it from CSS instead (only below a breakpoint, say) use the `--cy-toast-offset-block` and
+   * `--cy-toast-offset-inline` tokens; this prop wins over them. Default: none.
+   */
+  offset?: ToastOffsetLength | ToastOffset | undefined;
   /** Replace the built-in English text: the region's name and the close button's name. */
   labels?: Partial<ToastLabels>;
   /** Added to the notifications region, for layout. */
@@ -92,6 +116,16 @@ interface Item extends ToastOptions {
 const DEFAULT_LABELS: ToastLabels = { region: "Notifications", dismiss: "Dismiss" };
 /** Horizontal distance a touch has to travel to swipe a toast away. */
 const SWIPE = 64;
+
+const length = (value: ToastOffsetLength) => (/^(\d|10)$/.test(value) ? space(value as Space) : value);
+/** The private custom properties toast.css reads the `offset` prop from; an axis that is not set is left to the token. */
+function offsetVars(offset: ToasterProps["offset"]) {
+  const { block, inline }: ToastOffset = typeof offset === "object" ? offset : { block: offset };
+  const vars: Record<string, string> = {};
+  if (block) vars["--_offset-block"] = length(block);
+  if (inline) vars["--_offset-inline"] = length(inline);
+  return vars;
+}
 
 const ToastContext = createContext<ToastApi | null>(null);
 
@@ -118,6 +152,7 @@ type MemoryMap = Map<string, Memory>;
 export function Toaster({
   position = "bottom-end",
   max = 3,
+  offset,
   labels,
   className,
   style,
@@ -211,7 +246,7 @@ export function Toaster({
       {...{ popover: "manual" }}
       className={className ? `cy-toaster ${className}` : "cy-toaster"}
       data-position={position}
-      style={style}
+      style={{ ...offsetVars(offset), ...style }}
       onPointerEnter={() => setHovered(true)}
       onPointerLeave={() => setHovered(false)}
       onFocus={() => setFocused(true)}

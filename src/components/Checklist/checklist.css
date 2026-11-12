@@ -1,0 +1,56 @@
+/*
+ * checklist: a labelled list of rows (Checkbox, rename and remove IconButtons, or a TextField while a row is renamed)
+ * and an add row (TextField and IconButton). The checkbox, or the field that replaces its name, takes the free width.
+ * The controls bring their own hit areas, focus rings, motion and forced-colors rules.
+ */
+.cy-checklist.cy-checklist {
+  box-sizing: border-box !important;
+  display: block;
+  min-inline-size: 0;
+  margin: 0;
+  color: var(--cy-color-ink);
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-font-size-md);
+  font-weight: var(--cy-font-weight-regular);
+  line-height: var(--cy-font-line-height);
+  letter-spacing: normal;
+  text-transform: none;
+  &[data-size="sm"] {
+    font-size: var(--cy-font-size-sm);
+  }
+}
+/* The label and the body sit in a Field, which leaves line-height to its host: the body sets it again. */
+.cy-checklist-body.cy-checklist-body {
+  line-height: var(--cy-font-line-height);
+}
+.cy-checklist-body.cy-checklist-body,
+.cy-checklist-items.cy-checklist-items {
+  display: grid;
+  gap: var(--cy-checklist-gap, var(--cy-space-2));
+  min-inline-size: 0;
+  padding: 0;
+  list-style: none;
+}
+.cy-checklist-item.cy-checklist-item {
+  display: block;
+  min-inline-size: 0;
+  padding: 0;
+}
+.cy-checklist-row.cy-checklist-row,
+.cy-checklist-add.cy-checklist-add {
+  display: flex;
+  align-items: center;
+  gap: var(--cy-checklist-row-gap, var(--cy-space-2));
+  min-inline-size: 0;
+  /* A long name wraps instead of pushing the buttons out of the row. */
+  overflow-wrap: anywhere;
+  & > .cy-checklist-check,
+  & > .cy-checklist-field {
+    flex: 1 1 0;
+    min-inline-size: 0;
+  }
+  /* While a row is renamed its checkbox keeps only the box: the field holds the name. */
+  &[data-renaming] > .cy-checklist-check {
+    flex: none;
+  }
+}

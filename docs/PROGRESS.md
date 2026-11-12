@@ -66,6 +66,33 @@ Plan 9 (`docs/superpowers/plans/2026-11-10-cynosure-migrations.md`, tracked in i
 
 **Verification of the above (this machine has only Chromium 1243, not the pinned build, and no Firefox or WebKit):** `check`, `lint`, `typecheck`, `test`, `build` and `size` pass; all 793 stories pass in Chromium and the touch project through an untracked local config pointing at the installed browser; the site's `check` and `build` pass. **Not run here:** Firefox, WebKit, `test:react18`, `publint`, `attw`, the site's `links` and `sweep`. Visual tests cannot be trusted here: the untouched TimeField differs from its own committed baseline by 460 pixels in this browser. The new `the-day-track` baselines were made with it, so run the `visual-baselines` workflow before relying on CI's visual job.
 
+**Missing components and the Planr findings (2026-11-11/12, Arshad's direction; branch `ccr-892a2583-3xxim5`, restarted from `main` after #160 merged). Changesets accumulate; Arshad releases in one go. Do not merge the "version packages" pull request until he says so.**
+
+New components (each with behavioural stories, README, docs page, tokens, changeset):
+- **Text** (`as`, `variant` body/lead/caption/eyebrow/code, `size`, `weight`, `tone`, `align`, `truncate`, `numeric`) and **Heading** (`level` for the element, `size` for the look, including `display`): typography outside Prose.
+- **Divider** (horizontal or vertical, optional label, decorative by default), **AspectRatio**, **Image** (reserved space, Skeleton while loading, a fallback on error, `caption`), **Avatar** and **AvatarGroup** (picture, initials, icon; `status`; `tone="auto"`).
+- **Breadcrumbs** (items as data, `maxItems` collapses the middle into a Menu), **Pagination** (`pageCount`, `pageRange`, `getHref` for real links, `variant="compact"`), **PageHeader** (breadcrumbs, eyebrow, title, description, meta, actions; made of Text and Heading), **Container** (the page column: `size`, gutters), **Checklist** (rows you add, tick, rename and remove; `reorderable` through SortableList).
+
+From Planr's migration:
+- Stack, Inline, Grid: `padding`, `paddingInline`, `paddingBlock`. Grid `columns` per breakpoint (`{ base, sm, md, lg, xl }`, on the grid's own width, CSS only; the scale `GRID_BREAKPOINTS` lives in Grid until it is promoted to a shared token).
+- AppShell: `useAppShell()` gives `{ narrow }`, plus `onNarrowChange`. Its drawer passes `keepMounted` so the navigation keeps its state.
+- SideNav: an entry of `kind: "action"` is a button (the raised "Add" in the tab bar).
+- Calendar: controlled `month`/`defaultMonth`; `monthPicker` (off by default: Arshad to decide); `markDay` (tone, up to three dots, a spoken label) and `state.weekend`; planner cells 66px on touch instead of 110px (`--cy-calendar-content-size`).
+- Checkbox `strikeWhenChecked`; Card `edge`; `iconTone`/`iconColor` on Select, Combobox, Menu and ContextMenu options (shared helper `src/foundations/option-icon.tsx`).
+- Toaster `offset` (and tokens, and safe-area insets); Dialog and Sheet unmount their content while closed unless `keepMounted` (a behaviour change: Arshad was told, has not objected); Button and IconButton forward `aria-current` in their link form; Pagination's current page is a link with `getHref`, and `onChange(page, event)`.
+- `engines.node` is `>=22` (development still uses Node 24, `.nvmrc`).
+- **Bug fixed:** `createTheme({ components })` wrote multi-word component names in camelCase (`--cy-sideNav-…`), so those overrides did nothing. Now kebab-case; unit test added.
+
+Size budgets raised to what the build measures: Calendar 3.25 to 4.75 kB (the month picker brings Popover), Grid 1 to 1.5 kB, Toast 3.75 to 4 kB, Dialog 3.25 to 3.5 kB, SideNav 3.25 to 3.5 kB.
+
+**Verification (this machine: Chromium only, and not the pinned build):** `check`, `lint`, `typecheck`, 464 unit tests, `build`, `size`; all 1058 stories in Chromium and touch, run alone; coverage 98.8% statements, 95.76% branches, 99.66% lines; the site builds 99 pages, types and links pass, and a browser sweep of all 89 component pages at 1440 and 390 points found no console errors, no empty prop descriptions, no sideways scroll. **Not run here:** Firefox, WebKit, `test:react18`, `publint`, `attw`. **Visual baselines are missing for every new `visual` story:** run the `visual-baselines` workflow on the branch before trusting CI's visual job.
+
+**CI on #161 (2026-11-12).** Chromium, WebKit and touch pass (2064 tests). Fixed on the way: Pagination's "1" and "50" were only the same width in fonts with narrow digits (page buttons now reserve two digits) and its two ellipses shared a React key; a Select story queried the list before it opened on WebKit. First Firefox run: four failures. Divider compared sub-pixel positions with exact equality and Grid allowed a tenth of a pixel of overflow at fractional widths (tests now allow sub-pixel rounding; Grid reports the overflow it measures). Avatar waited for a picture only with `img.decode()`, which did not settle for a missing picture in Firefox: Avatar and Image now share `useImageOutcome` (`src/foundations/image-outcome.ts`), which listens to the img's own load and error events as Image already did. **None of the Firefox fixes could be run in Firefox here; CI proves them.**
+
+**The Release run after #160 failed (2026-11-11), so there is no "version packages" pull request yet.** The version step wrote a `CHANGELOG.md` that Biome rejects (a multi-paragraph changeset leaves a line of trailing spaces) and the commit hook stopped it. Fixed in #161: `pnpm version-packages` formats the changelog after `changeset version`. Nothing was published and nothing is broken on npm; the next push to `main` runs the release again.
+
+**Open, for Arshad:** `monthPicker` on by default (and in DateField)? Is unmounting closed dialogs by default right? The docs site still hand-writes its page head (`.docs-title`, `.docs-eyebrow`, `.docs-lead`); moving it to PageHeader changes its look slightly (the eyebrow becomes mono and bold), so it was left alone. Each README's "Used by" names intended uses, not verified call sites.
+
 ## Next step
 
 0. **TimeField picker, prop descriptions, Storybook link:** open a pull request from `ccr-892a2583-3xxim5`, let CI run Firefox and WebKit, run the `visual-baselines` workflow, and confirm the TimeField size budget.

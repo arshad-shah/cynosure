@@ -59,3 +59,25 @@ export function firstDayOfWeek(locale?: string): number {
   }
   return 1;
 }
+
+/** The day of `iso` in `month` (`YYYY-MM`), or that month's last day when it is shorter. */
+export function inMonth(iso: string, month: string) {
+  const first = fromISODate(`${month}-01`) as Date;
+  const last = new Date(first.getFullYear(), first.getMonth() + 1, 0).getDate();
+  return `${month}-${pad(Math.min(Number(iso.slice(8)), last))}`;
+}
+
+/** The weekend's weekdays in `locale` (0 Sunday to 6 Saturday), where the browser knows them; else Saturday and Sunday. */
+export function weekendDays(locale?: string): number[] {
+  try {
+    const loc = new Intl.Locale(locale ?? navigator.language) as Intl.Locale & {
+      getWeekInfo?: () => { weekend?: number[] };
+      weekInfo?: { weekend?: number[] };
+    };
+    const weekend = (loc.getWeekInfo?.() ?? loc.weekInfo)?.weekend;
+    if (weekend) return weekend.map((day) => day % 7);
+  } catch {
+    // An unknown locale falls through to Saturday and Sunday.
+  }
+  return [6, 0];
+}

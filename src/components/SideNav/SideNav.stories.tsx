@@ -4,6 +4,7 @@ import { expect, fn, waitFor } from "storybook/test";
 import { archive } from "../../icons/archive.js";
 import { home } from "../../icons/home.js";
 import { inbox } from "../../icons/inbox.js";
+import { plus } from "../../icons/plus.js";
 import { settings } from "../../icons/settings.js";
 import { star } from "../../icons/star.js";
 import { users } from "../../icons/users.js";
@@ -282,6 +283,301 @@ export const UnknownCurrentMarksNothing: Story = {
   play: async ({ canvasElement }) => {
     await expect(canvasElement.querySelector("[aria-current]")).toBeNull();
     await expect(canvasElement.querySelector('[aria-expanded="true"]')).toBeNull();
+  },
+};
+
+const add = fn();
+const clearAdd = () => {
+  add.mockClear();
+};
+const DESTINATIONS = ["Home", "Inbox", "Starred", "Settings"];
+/** A phone tab bar: two destinations, the primary action in the middle, two more destinations. */
+const BAR_ITEMS: NavEntry[] = [
+  { id: "home", label: "Home", icon: home },
+  { id: "inbox", label: "Inbox", icon: inbox },
+  { kind: "action", id: "add", label: "Add", icon: plus, onClick: add },
+  { id: "starred", label: "Starred", icon: star },
+  { id: "settings", label: "Settings", icon: settings },
+];
+const rect = (el: Element) => el.getBoundingClientRect();
+const centre = (el: Element) => rect(el).left + rect(el).width / 2;
+const phone = (args: Parameters<typeof SideNav>[0], dir?: "rtl") => (
+  <div
+    className="phone"
+    dir={dir}
+    style={{ inlineSize: 390, paddingBlockStart: 24, background: "var(--cy-color-surface)" }}
+  >
+    <SideNav {...args} />
+    <span className="accent" style={{ background: "var(--cy-color-accent)" }} />
+  </div>
+);
+
+export const BarWithAPrimaryAction: Story = {
+  tags: ["visual"],
+  args: { label: "Sections", layout: "bar", items: BAR_ITEMS, current: "home" },
+  render: (args) => phone(args),
+  beforeEach: clearAdd,
+  play: async ({ args, canvas, canvasElement, userEvent }) => {
+    const nav = canvas.getByRole("navigation", { name: "Sections" });
+    // A button named by its label: not a link, and never the current page.
+    const action = canvas.getByRole("button", { name: "Add" });
+    await expect(action.tagName).toBe("BUTTON");
+    await expect(action).not.toHaveAttribute("aria-current");
+    await expect(canvas.queryByRole("link", { name: "Add" })).toBeNull();
+    // Filled with the accent colour, round, in the middle of the bar, and raised above the row of destinations.
+    const accent = getComputedStyle(canvasElement.querySelector(".accent") as Element).backgroundColor;
+    await expect(getComputedStyle(action).backgroundColor).toBe(accent);
+    await expect(getComputedStyle(action).boxShadow).not.toBe("none");
+    await expect(rect(action).width).toBeCloseTo(rect(action).height, 0);
+    await expect(Number.parseFloat(getComputedStyle(action).borderTopLeftRadius)).toBeGreaterThanOrEqual(
+      rect(action).width / 2,
+    );
+    await expect(centre(action)).toBeCloseTo(centre(nav), 0);
+    const homeItem = canvas.getByRole("button", { name: "Home" });
+    await expect(rect(action).top).toBeLessThan(rect(homeItem).top);
+    await expect(rect(action).top).toBeLessThan(rect(nav).top);
+    // It sits where it was placed: after Inbox, before Starred.
+    await expect(rect(action).left).toBeGreaterThanOrEqual(
+      rect(canvas.getByRole("button", { name: "Inbox" })).right,
+    );
+    await expect(rect(action).right).toBeLessThanOrEqual(
+      rect(canvas.getByRole("button", { name: "Starred" })).left,
+    );
+    // The destinations are unchanged: one row of equal items, the current one marked.
+    const places = DESTINATIONS.map((name) => canvas.getByRole("button", { name }));
+    await expect(new Set(places.map((el) => Math.round(rect(el).top))).size).toBe(1);
+    await expect(new Set(places.map((el) => Math.round(rect(el).width))).size).toBe(1);
+    await expect(homeItem).toHaveAttribute("aria-current", "page");
+    await expect(nav.querySelectorAll("[aria-current]")).toHaveLength(1);
+    // Pressing it runs its own handler and is not a navigation.
+    await userEvent.click(action);
+    await expect(add).toHaveBeenCalledTimes(1);
+    await expect(args.onNavigate).not.toHaveBeenCalled();
+    await userEvent.click(canvas.getByRole("button", { name: "Starred" }));
+    await expect(args.onNavigate).toHaveBeenLastCalledWith("starred", expect.anything());
+    await expect(add).toHaveBeenCalledTimes(1);
+  },
+};
+
+export const BarActionWithTheKeyboard: Story = {
+  args: { label: "Sections", layout: "bar", items: BAR_ITEMS, current: "home" },
+  render: (args) => phone(args),
+  beforeEach: clearAdd,
+  play: async ({ args, canvas, userEvent }) => {
+    // Tab walks the bar in order, the action in its place between the destinations.
+    for (const name of ["Home", "Inbox", "Add", "Starred", "Settings"]) {
+      await userEvent.tab();
+      await expect(canvas.getByRole("button", { name })).toHaveFocus();
+    }
+    await userEvent.tab({ shift: true });
+    await userEvent.tab({ shift: true });
+    const action = canvas.getByRole("button", { name: "Add" });
+    await expect(action).toHaveFocus();
+    // Focus is shown with the ring.
+    await waitFor(() => expect(getComputedStyle(action).boxShadow).toContain("0px 0px 0px"));
+    await userEvent.keyboard("{Enter}");
+    await expect(add).toHaveBeenCalledTimes(1);
+    await userEvent.keyboard(" ");
+    await expect(add).toHaveBeenCalledTimes(2);
+    await expect(args.onNavigate).not.toHaveBeenCalled();
+  },
+};
+
+export const ActionIsNeverTheCurrentPage: Story = {
+  args: { label: "Sections", layout: "bar", items: BAR_ITEMS, current: "add" },
+  render: (args) => phone(args),
+  play: async ({ canvas }) => {
+    const nav = canvas.getByRole("navigation", { name: "Sections" });
+    await expect(canvas.getByRole("button", { name: "Add" })).not.toHaveAttribute("aria-current");
+    await expect(nav.querySelector("[aria-current]")).toBeNull();
+  },
+};
+
+export const BarActionFollowsItsTokens: Story = {
+  args: { label: "Sections", layout: "bar", items: BAR_ITEMS },
+  render: (args) => (
+    <Stack gap="8">
+      {phone(args)}
+      <div
+        className="themed"
+        style={
+          {
+            "--cy-side-nav-action-size": "60px",
+            "--cy-side-nav-action-lift": "20px",
+          } as React.CSSProperties
+        }
+      >
+        {phone({ ...args, label: "Themed" })}
+      </div>
+    </Stack>
+  ),
+  play: async ({ canvas }) => {
+    const [plain, themed] = canvas.getAllByRole("button", { name: "Add" }) as [HTMLElement, HTMLElement];
+    const [plainHome, themedHome] = canvas.getAllByRole("button", { name: "Home" }) as [
+      HTMLElement,
+      HTMLElement,
+    ];
+    // --cy-side-nav-action-size sets the diameter; --cy-side-nav-action-lift how far it rises.
+    await expect(rect(themed).width).toBeCloseTo(60, 0);
+    await expect(rect(themed).height).toBeCloseTo(60, 0);
+    await expect(getComputedStyle(themed).translate).toBe("0px -20px");
+    await expect(rect(plain).width).toBeLessThan(60);
+    const rise = (action: Element, row: Element) =>
+      rect(row).top + rect(row).height / 2 - (rect(action).top + rect(action).height / 2);
+    await expect(rise(themed, themedHome)).toBeCloseTo(20, 0);
+    await expect(rise(plain, plainHome)).toBeGreaterThan(0);
+    await expect(rise(plain, plainHome)).toBeLessThan(20);
+    // A larger button rises out of the bar; the bar keeps its height.
+    await expect(rect(themedHome).height).toBe(rect(plainHome).height);
+    const [plainNav, themedNav] = canvas.getAllByRole("navigation") as [HTMLElement, HTMLElement];
+    await expect(rect(themedNav).height).toBe(rect(plainNav).height);
+  },
+};
+
+export const TouchBarAction: Story = {
+  tags: ["touch", "!dev"],
+  args: { label: "Sections", layout: "bar", items: BAR_ITEMS },
+  render: (args) => phone(args),
+  beforeEach: clearAdd,
+  play: async ({ args, canvas, userEvent }) => {
+    const action = canvas.getByRole("button", { name: "Add" });
+    // The button and its hit area are at least 44px on touch screens.
+    await expect(rect(action).width).toBeGreaterThanOrEqual(44);
+    await expect(rect(action).height).toBeGreaterThanOrEqual(44);
+    const hit = getComputedStyle(action, "::before");
+    await expect(Number.parseFloat(hit.width)).toBeGreaterThanOrEqual(44);
+    await expect(Number.parseFloat(hit.height)).toBeGreaterThanOrEqual(44);
+    for (const name of DESTINATIONS)
+      await expect(rect(canvas.getByRole("button", { name })).height).toBeGreaterThanOrEqual(44);
+    await userEvent.pointer({ keys: "[TouchA]", target: action });
+    await expect(add).toHaveBeenCalledTimes(1);
+    await expect(args.onNavigate).not.toHaveBeenCalled();
+  },
+};
+
+export const BarActionFollowsTheTextDirection: Story = {
+  args: { label: "Sections", layout: "bar", items: BAR_ITEMS.slice(1) },
+  render: (args) => phone(args, "rtl"),
+  play: async ({ canvas }) => {
+    // Inbox, Add, Starred, Settings read from the right: the action is left of Inbox and right of Starred.
+    const action = canvas.getByRole("button", { name: "Add" });
+    await expect(rect(action).right).toBeLessThanOrEqual(
+      rect(canvas.getByRole("button", { name: "Inbox" })).left,
+    );
+    await expect(rect(action).left).toBeGreaterThanOrEqual(
+      rect(canvas.getByRole("button", { name: "Starred" })).right,
+    );
+    // Off-centre here, because it is the second of four entries; still raised.
+    await expect(centre(action)).toBeGreaterThan(centre(canvas.getByRole("navigation")));
+    await expect(rect(action).top).toBeLessThan(rect(canvas.getByRole("button", { name: "Inbox" })).top);
+  },
+};
+
+export const ActionInTheColumnAndTheRail: Story = {
+  args: {
+    label: "Column",
+    items: [BAR_ITEMS[0], BAR_ITEMS[2], BAR_ITEMS[1]] as NavEntry[],
+    current: "home",
+    size: "sm",
+  },
+  render: (args) => (
+    <Stack gap="6">
+      <SideNav {...args} />
+      <SideNav {...args} label="Rail" collapsed />
+      <span className="accent" style={{ background: "var(--cy-color-accent)" }} />
+    </Stack>
+  ),
+  beforeEach: clearAdd,
+  play: async ({ args, canvas, canvasElement, userEvent }) => {
+    const [column, rail] = canvas.getAllByRole("button", { name: "Add" }) as [HTMLElement, HTMLElement];
+    const accent = getComputedStyle(canvasElement.querySelector(".accent") as Element).backgroundColor;
+    // Column: a filled accent button with its label shown, as wide as the rows, between its neighbours, not lifted.
+    const [homeRow] = canvas.getAllByRole("button", { name: "Home" }) as [HTMLElement];
+    const [inboxRow] = canvas.getAllByRole("button", { name: "Inbox" }) as [HTMLElement];
+    await expect(column).toHaveTextContent("Add");
+    await expect(getComputedStyle(column).backgroundColor).toBe(accent);
+    await expect(rect(column).width).toBeCloseTo(rect(homeRow).width, 0);
+    await expect(rect(column).top).toBeGreaterThanOrEqual(rect(homeRow).bottom);
+    await expect(rect(column).bottom).toBeLessThanOrEqual(rect(inboxRow).top);
+    await expect(getComputedStyle(column).translate).toBe("none");
+    await expect(column).toHaveAttribute("data-size", "sm");
+    await expect(column).not.toHaveAttribute("aria-current");
+    await userEvent.click(column);
+    await expect(add).toHaveBeenCalledTimes(1);
+    // Rail: an icon button that keeps its name and fits the rail.
+    await expect(rail).toHaveAccessibleName("Add");
+    await expect(rect(rail).width).toBeCloseTo(rect(rail).height, 0);
+    await expect(rect(rail).width).toBeLessThanOrEqual(
+      rect(canvas.getByRole("navigation", { name: "Rail" })).width,
+    );
+    await userEvent.click(rail);
+    await expect(add).toHaveBeenCalledTimes(2);
+    await expect(args.onNavigate).not.toHaveBeenCalled();
+  },
+};
+
+export const DisabledActionDoesNothing: Story = {
+  args: {
+    label: "Sections",
+    layout: "bar",
+    items: BAR_ITEMS.map((entry) => ("kind" in entry ? { ...entry, disabled: true } : entry)),
+  },
+  render: (args) => phone(args),
+  beforeEach: clearAdd,
+  play: async ({ canvas, userEvent }) => {
+    const action = canvas.getByRole("button", { name: "Add" });
+    await expect(action).toBeDisabled();
+    await userEvent.click(action);
+    await expect(add).not.toHaveBeenCalled();
+  },
+};
+
+export const BarWithoutAnActionIsUnchanged: Story = {
+  args: { label: "Sections", layout: "bar", items: ITEMS, current: "inbox" },
+  render: (args) => phone(args),
+  play: async ({ args, canvas, canvasElement, userEvent }) => {
+    const nav = canvas.getByRole("navigation", { name: "Sections" });
+    // Sections are flattened and a group is one item: six equal items in one row filling the bar.
+    const rows = [...nav.querySelectorAll(".cy-side-nav-link")];
+    await expect(rows).toHaveLength(6);
+    await expect(canvasElement.querySelector("[data-action]")).toBeNull();
+    await expect(new Set(rows.map((el) => Math.round(rect(el).top))).size).toBe(1);
+    await expect(
+      Math.max(...rows.map((el) => rect(el).width)) - Math.min(...rows.map((el) => rect(el).width)),
+    ).toBeLessThan(1);
+    await expect(canvas.queryByText("Workspace")).toBeNull();
+    await expect(canvas.getByRole("link", { name: "Inbox 3" })).toHaveAttribute("aria-current", "page");
+    const team = canvas.getByRole("button", { name: "Team" });
+    await expect(team).not.toHaveAttribute("aria-expanded");
+    await userEvent.click(team);
+    await expect(args.onNavigate).toHaveBeenLastCalledWith("team", expect.anything());
+    // Tab moves from one item to the next (the bar has no arrow-key roving).
+    (rows[0] as HTMLElement).focus();
+    await userEvent.tab();
+    await expect(rows[1]).toHaveFocus();
+  },
+};
+
+export const BarActionStableUnderHostileHost: Story = {
+  args: { label: "Sections", layout: "bar", items: BAR_ITEMS, current: "home" },
+  render: (args) => phone(args),
+  play: async ({ canvasElement }) => {
+    const props = [
+      "display",
+      "width",
+      "height",
+      "background-color",
+      "color",
+      "border-top-width",
+      "border-top-left-radius",
+      "padding-left",
+      "translate",
+      "box-sizing",
+    ];
+    for (const selector of [".cy-side-nav-action", "[data-action]", ".cy-side-nav-action svg"]) {
+      const { clean, hostile } = computeUnderHostileHost(canvasElement, selector, props);
+      await expect({ selector, ...hostile }).toEqual({ selector, ...clean });
+    }
   },
 };
 

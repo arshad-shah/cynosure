@@ -13,6 +13,8 @@ import { LinkBase } from "../../foundations/LinkBase/LinkBase.js";
 import { chevronDown } from "../../icons/chevron-down.js";
 import type { IconData } from "../../icons/types.js";
 import type { Size } from "../../tokens/schema.js";
+import { Button } from "../Button/Button.js";
+import { IconButton } from "../IconButton/IconButton.js";
 import { Tooltip } from "../Tooltip/Tooltip.js";
 
 export interface SideNavTokens {
@@ -22,6 +24,10 @@ export interface SideNavTokens {
   railWidth: string;
   /** Corner radius of item highlights. */
   radius: string;
+  /** Diameter of the round action button in the bar. */
+  actionSize: string;
+  /** How far the action button rises above the bar's row. */
+  actionLift: string;
 }
 
 declare module "../../tokens/schema.js" {
@@ -49,7 +55,28 @@ export interface NavSection {
   items: NavItem[];
 }
 
-export type NavEntry = NavItem | NavSection;
+/**
+ * A primary action among the items, such as "Add": a button, not a place. It is never the current page (even when
+ * its `id` equals `current`), does not call `onNavigate`, and belongs at the top level, not in a section or group.
+ * In a bar it is a raised round accent button showing only the icon; in the column, a filled accent button with the
+ * icon and label; in the collapsed rail, a filled icon button. Give a navigation one at most.
+ */
+export interface NavAction {
+  /** Marks the entry as an action instead of a destination. */
+  kind: "action";
+  /** Unique among the entries. */
+  id: string;
+  /** The button's accessible name; its visible text in the column, a tooltip in the bar and the rail. */
+  label: string;
+  /** The Facet icon shown in the button. */
+  icon: IconData;
+  /** Called when the action is pressed. */
+  onClick: (event: MouseEvent<HTMLElement>) => void;
+  /** The button cannot be pressed. */
+  disabled?: boolean;
+}
+
+export type NavEntry = NavItem | NavSection | NavAction;
 
 /** What `renderLink` receives: spread it onto your router's link component. */
 export interface NavLinkProps {
@@ -68,7 +95,10 @@ export interface NavLinkProps {
 export interface SideNavProps {
   /** Accessible name of the navigation landmark, e.g. "Main". */
   label: string;
-  /** Items and sections (`{ label, items }`), in order. */
+  /**
+   * Items and sections (`{ label, items }`), in order. One entry may be a primary action
+   * (`{ kind: "action", id, label, icon, onClick }`): a button that sits where it is placed.
+   */
   items: NavEntry[];
   /** `id` of the page being shown: marked `aria-current="page"`; groups holding it start expanded. */
   current?: string | undefined;
@@ -100,6 +130,7 @@ export interface SideNavProps {
 }
 
 const isSection = (entry: NavEntry): entry is NavSection => !("id" in entry);
+const isAction = (entry: NavItem | NavAction): entry is NavAction => "kind" in entry;
 
 /** Ids of the groups that lead to `id`. */
 function ancestors(items: NavItem[], id: string | undefined, trail: string[] = []): string[] | null {
@@ -132,10 +163,11 @@ export function SideNav({
   const id = useId();
   const bar = layout === "bar";
   const all = items.flatMap((entry) => (isSection(entry) ? entry.items : [entry]));
+  const places = all.filter((entry) => !isAction(entry)) as NavItem[];
   const [expanded, setExpanded] = useState(
-    () => new Set([...defaultExpanded, ...(ancestors(all, current) ?? [])]),
+    () => new Set([...defaultExpanded, ...(ancestors(places, current) ?? [])]),
   );
-  const path = ancestors(all, current)?.join(" ");
+  const path = ancestors(places, current)?.join(" ");
   // Navigating somewhere else opens the groups on the way to it (never closes any).
   useEffect(() => {
     if (!path) return;
@@ -159,6 +191,30 @@ export function SideNav({
       {group && !bar && <Icon icon={chevronDown} className="cy-side-nav-chevron" />}
     </>
   );
+
+  // The primary action: Cynosure's own buttons, so it presses, focuses and names itself like any other button.
+  const action = (item: NavAction) => {
+    const shared = {
+      className: "cy-side-nav-action",
+      variant: "solid",
+      tone: "accent",
+      disabled: item.disabled,
+      onClick: item.onClick,
+    } as const;
+    return bar || collapsed ? (
+      <IconButton
+        {...shared}
+        icon={item.icon}
+        label={item.label}
+        size={bar ? "lg" : size}
+        tooltipPlacement={bar ? "top" : "end"}
+      />
+    ) : (
+      <Button {...shared} icon={item.icon} size={size} fullWidth>
+        {item.label}
+      </Button>
+    );
+  };
 
   const control = (item: NavItem): ReactElement<Record<string, unknown>> => {
     const isCurrent = item.id === current;
@@ -211,7 +267,7 @@ export function SideNav({
   };
 
   const list = (
-    entries: NavItem[],
+    entries: (NavItem | NavAction)[],
     depth: number,
     listId?: string,
     hidden?: boolean,
@@ -224,26 +280,32 @@ export function SideNav({
       aria-labelledby={labelledBy}
       data-depth={depth}
     >
-      {entries.map((item) => (
-        <li key={item.id} className="cy-side-nav-item cy-reset">
-          {collapsed && !bar ? (
-            <Tooltip content={item.label} placement="end">
-              {control(item)}
-            </Tooltip>
-          ) : (
-            control(item)
-          )}
-          {item.items &&
-            !collapsed &&
-            !bar &&
-            list(item.items, depth + 1, `${id}-${item.id}`, !expanded.has(item.id))}
-        </li>
-      ))}
+      {entries.map((item) =>
+        isAction(item) ? (
+          <li key={item.id} className="cy-side-nav-item cy-reset" data-action="">
+            {action(item)}
+          </li>
+        ) : (
+          <li key={item.id} className="cy-side-nav-item cy-reset">
+            {collapsed && !bar ? (
+              <Tooltip content={item.label} placement="end">
+                {control(item)}
+              </Tooltip>
+            ) : (
+              control(item)
+            )}
+            {item.items &&
+              !collapsed &&
+              !bar &&
+              list(item.items, depth + 1, `${id}-${item.id}`, !expanded.has(item.id))}
+          </li>
+        ),
+      )}
     </ul>
   );
 
   // Consecutive plain items share one list; each section gets its own heading and list.
-  const blocks: ({ section: NavSection } | { items: NavItem[] })[] = [];
+  const blocks: ({ section: NavSection } | { items: (NavItem | NavAction)[] })[] = [];
   if (bar) blocks.push({ items: all });
   else
     for (const entry of items) {

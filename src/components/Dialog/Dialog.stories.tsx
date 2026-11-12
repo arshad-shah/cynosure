@@ -1,11 +1,14 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
+import { renderToStaticMarkup } from "react-dom/server";
 import { expect, fn, waitFor } from "storybook/test";
 import { copy as copyIcon } from "../../icons/copy.js";
 import { createStyleSheet } from "../../styles/inline.js";
 import { computeUnderHostileHost } from "../../test/hostile.js";
 import { settled, shownFully } from "../../test/settle.js";
+import { CynosureTheme } from "../../theme/CynosureTheme.js";
+import { createTheme } from "../../tokens/index.js";
 import { Button } from "../Button/Button.js";
 import { IconButton } from "../IconButton/IconButton.js";
 import { Menu } from "../Menu/Menu.js";
@@ -54,6 +57,7 @@ const meta = {
   argTypes: {
     size: { control: "inline-radio", options: ["sm", "md", "lg"] },
     dismissible: { control: "boolean" },
+    keepMounted: { control: "boolean" },
     open: { control: "boolean" },
     title: { control: "text" },
     description: { control: "text" },
@@ -109,6 +113,191 @@ export const OpensModalMovesFocusInAndReturnsIt: Story = {
     await settledClosed(el);
     await expect(args.onOpenChange).toHaveBeenLastCalledWith(false);
     await expect(trigger).toHaveFocus();
+  },
+};
+
+const panelOf = (el: HTMLDialogElement) => el.querySelector<HTMLElement>(".cy-dialog-panel");
+const unmounted = (el: HTMLDialogElement) =>
+  waitFor(() => expect(el.childElementCount).toBe(0), { timeout: 3000 });
+
+/**
+ * What happens to the dialog element, in order: its content arriving and leaving, and it opening and closing. Each
+ * entry also says what the other half looked like at that moment.
+ */
+function record(el: HTMLDialogElement) {
+  const log: string[] = [];
+  const watch = new MutationObserver((records) => {
+    for (const r of records) {
+      if (r.type === "attributes")
+        log.push(el.open ? "opened" : `closed, content ${panelOf(el) ? "in" : "out"}`);
+      else if (r.addedNodes.length) log.push("content in");
+      else log.push(`content out, opacity ${getComputedStyle(el).opacity}`);
+    }
+  });
+  watch.observe(el, { attributes: true, attributeFilter: ["open"], childList: true });
+  return { log, stop: () => watch.disconnect() };
+}
+
+export const ContentIsMountedOnlyWhileOpen: Story = {
+  play: async ({ canvas, userEvent }) => {
+    const trigger = canvas.getByRole("button", { name: "Edit profile" });
+    const el = dialogEl();
+    // Closed: the dialog element is an empty shell. No heading, no fields, no actions, and no dangling references.
+    await expect(el.childElementCount).toBe(0);
+    await expect(canvas.queryByRole("textbox", { name: "Name", hidden: true })).toBeNull();
+    await expect(canvas.queryByRole("button", { name: "Save", hidden: true })).toBeNull();
+    await expect(el).not.toHaveAttribute("aria-labelledby");
+    await expect(el).not.toHaveAttribute("aria-describedby");
+
+    const { log, stop } = record(el);
+    await userEvent.click(trigger);
+    await waitFor(() => expect(el.open).toBe(true));
+    // The content is in place before the dialog shows: no empty first frame.
+    await expect(log).toEqual(["content in", "opened"]);
+    await expect(canvas.getByRole("dialog", { name: "Edit profile" })).toHaveAccessibleDescription(
+      "Changes are saved to your account.",
+    );
+    await waitFor(() => expect(canvas.getByRole("textbox", { name: "Name" })).toHaveFocus());
+    await shownFully(el);
+
+    // Escape: it closes with its content still inside, which leaves only once the dialog has faded out.
+    await userEvent.keyboard("{Escape}");
+    await unmounted(el);
+    await expect(log.slice(2)).toEqual(["closed, content in", "content out, opacity 0"]);
+    await expect(getComputedStyle(el).display).toBe("none");
+    await expect(canvas.queryByRole("textbox", { name: "Name", hidden: true })).toBeNull();
+    await expect(el).not.toHaveAttribute("aria-labelledby");
+    // Focus went back to the button that opened it, and stays there when the content goes.
+    await expect(trigger).toHaveFocus();
+
+    // The backdrop and the close button end the same way.
+    await userEvent.click(trigger);
+    await waitFor(() => expect(el.open).toBe(true));
+    await userEvent.click(el);
+    await unmounted(el);
+    await expect(trigger).toHaveFocus();
+    await userEvent.click(trigger);
+    await waitFor(() => expect(el.open).toBe(true));
+    await userEvent.click(canvas.getByRole("button", { name: "Close" }));
+    await unmounted(el);
+    await expect(trigger).toHaveFocus();
+    await expect(log.filter((entry) => entry.startsWith("content out"))).toEqual(
+      Array(3).fill("content out, opacity 0"),
+    );
+    stop();
+  },
+};
+
+export const EveryOpeningStartsFresh: Story = {
+  play: async ({ canvas, userEvent }) => {
+    const el = await openWith(canvas, (e) => userEvent.click(e));
+    const name = canvas.getByRole("textbox", { name: "Name" });
+    await userEvent.clear(name);
+    await userEvent.type(name, "Grace");
+    await expect(name).toHaveValue("Grace");
+    await userEvent.keyboard("{Escape}");
+    await unmounted(el);
+    await expect(name.isConnected).toBe(false);
+    // Opened again: new content, with the state it starts with.
+    await openWith(canvas, (e) => userEvent.click(e));
+    const again = canvas.getByRole("textbox", { name: "Name" });
+    await expect(again).not.toBe(name);
+    await expect(again).toHaveValue("Ada");
+    await waitFor(() => expect(again).toHaveFocus());
+  },
+};
+
+export const KeepMountedKeepsContentAndState: Story = {
+  args: { keepMounted: true },
+  play: async ({ canvas, userEvent }) => {
+    const el = dialogEl();
+    // Closed, and the content is already in the DOM (not shown, not reachable).
+    const name = canvas.getByRole("textbox", { name: "Name", hidden: true });
+    await expect(name).not.toBeVisible();
+    await expect(el).toHaveAttribute("aria-labelledby");
+    await openWith(canvas, (e) => userEvent.click(e));
+    await waitFor(() => expect(name).toHaveFocus());
+    await userEvent.clear(name);
+    await userEvent.type(name, "Grace");
+    await userEvent.keyboard("{Escape}");
+    await settledClosed(el);
+    await settled(el);
+    // Well after the closing transition the same field is still there, with what was typed.
+    await new Promise((r) => setTimeout(r, 400));
+    await expect(name.isConnected).toBe(true);
+    await expect(canvas.getByRole("button", { name: "Edit profile" })).toHaveFocus();
+    await openWith(canvas, (e) => userEvent.click(e));
+    await expect(canvas.getByRole("textbox", { name: "Name" })).toBe(name);
+    await expect(name).toHaveValue("Grace");
+  },
+};
+
+export const ReopenedWhileClosingKeepsItsContent: Story = {
+  play: async ({ canvas, userEvent }) => {
+    const trigger = canvas.getByRole("button", { name: "Edit profile" });
+    const el = await openWith(canvas, (e) => userEvent.click(e));
+    await shownFully(el);
+    const name = canvas.getByRole("textbox", { name: "Name" });
+    await userEvent.type(name, " L");
+    // Closed and opened again before the fade has finished: the pending unmount is called off.
+    await userEvent.keyboard("{Escape}");
+    await expect(el.open).toBe(false);
+    await userEvent.click(trigger);
+    await waitFor(() => expect(el.open).toBe(true));
+    await shownFully(el);
+    await new Promise((r) => setTimeout(r, 400));
+    await expect(name.isConnected).toBe(true);
+    await expect(name).toHaveValue("Ada L");
+    await expect(el.open).toBe(true);
+  },
+};
+
+export const UnmountsAtOnceWithoutMotion: Story = {
+  render: (args) => (
+    <CynosureTheme theme={createTheme({ motion: "reduced" })}>
+      <Page {...args} />
+    </CynosureTheme>
+  ),
+  play: async ({ canvas, userEvent }) => {
+    const el = await openWith(canvas, (e) => userEvent.click(e));
+    await expect(Number.parseFloat(getComputedStyle(el).transitionDuration)).toBe(0);
+    await expect(panelOf(el)).not.toBeNull();
+    // No transition will ever end, so nothing is waited for.
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() => expect(el.childElementCount).toBe(0), { timeout: 150 });
+    await expect(canvas.getByRole("button", { name: "Edit profile" })).toHaveFocus();
+    // And it opens again.
+    await openWith(canvas, (e) => userEvent.click(e));
+    await waitFor(() => expect(canvas.getByRole("textbox", { name: "Name" })).toHaveFocus());
+  },
+};
+
+export const ServerRendersNoContentWhileClosed: Story = {
+  render: () => <div className="frame" />,
+  play: async ({ canvasElement }) => {
+    const html = (props: Partial<DialogProps>) =>
+      renderToStaticMarkup(
+        <Dialog title="Edit profile" description="Changes are saved to your account." {...props}>
+          {form}
+        </Dialog>,
+      );
+    // Static HTML, as a server sends it. A closed dialog is an empty element.
+    const frame = canvasElement.querySelector(".frame") as HTMLElement;
+    frame.innerHTML = html({});
+    const closed = frame.querySelector("dialog") as HTMLDialogElement;
+    await expect(closed.childElementCount).toBe(0);
+    await expect(closed.textContent).toBe("");
+    await expect(closed).not.toHaveAttribute("aria-labelledby");
+    // Open on the server, or kept mounted: the content is in the HTML.
+    for (const props of [{ defaultOpen: true }, { open: true }, { keepMounted: true }]) {
+      frame.innerHTML = html(props);
+      const el = frame.querySelector("dialog") as HTMLDialogElement;
+      const title = el.querySelector("h2") as HTMLElement;
+      await expect(title).toHaveTextContent("Edit profile");
+      await expect(el.getAttribute("aria-labelledby")).toBe(title.id);
+      await expect(el.querySelectorAll("input")).toHaveLength(2);
+    }
+    frame.innerHTML = "";
   },
 };
 

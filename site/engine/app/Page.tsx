@@ -29,6 +29,7 @@ import type { PageData, PageLink, PropRow, TocEntry } from "../types";
 import { Canvas } from "./Canvas";
 import { Gallery } from "./Gallery";
 import { Markdown } from "./Markdown";
+import { examplesNote, propsNote } from "./provenance";
 
 const icons = config.icons ?? {};
 const blob = `${site.repo}/blob/${site.branch}`;
@@ -265,20 +266,13 @@ function ComponentPage({ page }: { page: PageData }) {
               component.props.length ? (
                 <div className="docs-block">
                   <PropsTable name={component.name} rows={component.props} />
-                  <p className="docs-small">
-                    Generated from the type definitions in {site.package} {site.version}.
-                  </p>
+                  <p className="docs-small">{propsNote(site)}</p>
                 </div>
               ) : null,
           }}
         />
       </Prose>
-      {component.examples.length > 0 && (
-        <p className="docs-small">
-          The examples run the library's source{site.commit ? ` at ${site.commit}` : ""}; the package on npm
-          is {site.version}.
-        </p>
-      )}
+      {component.examples.length > 0 && <p className="docs-small">{examplesNote(site)}</p>}
     </Frame>
   );
 }

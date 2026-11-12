@@ -1,8 +1,7 @@
 import { type CSSProperties, type ElementType, forwardRef, type ReactNode } from "react";
+import { type PaddingProps, paddingVars, type Space, space } from "../Stack/space.js";
 
-type Space = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" | "10";
-
-export interface InlineProps {
+export interface InlineProps extends PaddingProps {
   /** Space token between children. */
   gap?: Space;
   /** Cross-axis alignment of children. They are centred when it is not set. */
@@ -25,7 +24,20 @@ export interface InlineProps {
 
 /** Horizontal layout with token gaps. */
 export const Inline = forwardRef<HTMLElement, InlineProps>(function Inline(
-  { gap = "3", align, justify, wrap = false, as = "div", className, style, children, ...rest },
+  {
+    gap = "3",
+    padding,
+    paddingInline,
+    paddingBlock,
+    align,
+    justify,
+    wrap = false,
+    as = "div",
+    className,
+    style,
+    children,
+    ...rest
+  },
   ref,
 ) {
   const Tag = as as ElementType;
@@ -37,7 +49,13 @@ export const Inline = forwardRef<HTMLElement, InlineProps>(function Inline(
       data-align={align}
       data-justify={justify}
       data-wrap={wrap ? "" : undefined}
-      style={{ "--_gap": `var(--cy-space-${gap})`, ...style } as CSSProperties}
+      style={
+        {
+          "--_gap": space(gap),
+          ...paddingVars({ padding, paddingInline, paddingBlock }),
+          ...style,
+        } as CSSProperties
+      }
     >
       {children}
     </Tag>

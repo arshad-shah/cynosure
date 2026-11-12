@@ -1,11 +1,13 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 import { expect, fn, waitFor } from "storybook/test";
+import { flag, tag } from "../../icons/index.js";
+import { backdrop, contrast, rgb } from "../../test/color.js";
 import { computeUnderHostileHost } from "../../test/hostile.js";
 import { shownFully } from "../../test/settle.js";
 import { Button } from "../Button/Button.js";
 import { Popover } from "../Popover/Popover.js";
-import { Select } from "./Select.js";
+import { Select, type SelectOption } from "./Select.js";
 
 const fruits = [
   { value: "apple", label: "Apple" },
@@ -369,5 +371,110 @@ export const HiddenLabelStillNamesTheTrigger: Story = {
     await expect(
       Math.abs(trigger.getBoundingClientRect().top - field.getBoundingClientRect().top),
     ).toBeLessThan(1);
+  },
+};
+
+/** A colour token as painted sRGB, resolved next to `near` (so it follows that element's theme). */
+function token(near: Element, name: string) {
+  const probe = document.createElement("i");
+  probe.style.color = `var(${name})`;
+  near.after(probe);
+  const value = rgb(getComputedStyle(probe).color);
+  probe.remove();
+  return value;
+}
+const VIOLET = "rgb(124, 58, 237)";
+
+const priorities: SelectOption[] = [
+  { value: "low", label: "Low", icon: flag, iconTone: "info" },
+  { value: "high", label: "High", icon: flag, iconTone: "danger" },
+  { value: "garden", label: "Garden", icon: tag, iconColor: VIOLET },
+  { value: "blocked", label: "Blocked", icon: flag, iconTone: "danger", iconColor: VIOLET, disabled: true },
+  { value: "none", label: "No priority", icon: flag },
+  { value: "text", label: "Text only" },
+];
+const optionIcon = (option: HTMLElement) => option.querySelector(".cy-icon") as SVGElement;
+const colourOf = (el: Element) => rgb(getComputedStyle(el).color);
+
+export const OptionIconsKeepTheirColourInTheListAndTheTrigger: Story = {
+  args: { label: "Priority", options: priorities },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const trigger = canvas.getByRole("combobox", { name: "Priority" });
+    const danger = token(trigger, "--cy-color-danger");
+    await userEvent.click(trigger);
+    await shownFully(list(canvasElement));
+    const option = (name: string) => canvas.getByRole("option", { name });
+    await expect(colourOf(optionIcon(option("Low")))).toEqual(token(trigger, "--cy-color-info"));
+    await expect(colourOf(optionIcon(option("High")))).toEqual(danger);
+    await expect(colourOf(optionIcon(option("Garden")))).toEqual(rgb(VIOLET));
+    // Without the props an icon is the option's text colour, as before; a disabled option's icon is muted with its row.
+    await expect(colourOf(optionIcon(option("No priority")))).toEqual(colourOf(option("No priority")));
+    await expect(colourOf(optionIcon(option("Blocked")))).toEqual(colourOf(option("Blocked")));
+    await expect(getComputedStyle(option("Blocked")).opacity).toBe("0.45");
+    await expect(option("Text only").querySelector(".cy-icon")).toBeNull();
+    // The highlighted option keeps the icon's colour, readable on the highlight (3:1 for graphics).
+    await userEvent.hover(option("High"));
+    await expect(option("High")).toHaveAttribute("data-active");
+    await expect(colourOf(optionIcon(option("High")))).toEqual(danger);
+    for (const name of ["Low", "High"]) {
+      await userEvent.hover(option(name));
+      const ratio = contrast(getComputedStyle(optionIcon(option(name))).color, backdrop(option(name)));
+      await expect({ name, visible: ratio >= 3 }).toEqual({ name, visible: true });
+    }
+    // A disabled option cannot be chosen, so its icon never reaches the trigger.
+    await userEvent.click(option("Blocked"));
+    await expect(isOpen(list(canvasElement))).toBe(true);
+    await expect(trigger.querySelector(".cy-select-icon")).toBeNull();
+    // Chosen: the trigger shows the icon in the same colour, and so does the now selected option.
+    await userEvent.click(option("High"));
+    await expect(trigger).toHaveTextContent("High");
+    await expect(colourOf(optionIcon(trigger))).toEqual(danger);
+    // (The list has closed, so the option is looked up in the DOM, not among what is on screen.)
+    await expect(colourOf(optionIcon(canvas.getByRole("option", { name: "High", hidden: true })))).toEqual(
+      danger,
+    );
+    await userEvent.click(trigger);
+    await shownFully(list(canvasElement));
+    await userEvent.click(option("Garden"));
+    await expect(colourOf(optionIcon(trigger))).toEqual(rgb(VIOLET));
+    await userEvent.click(trigger);
+    await shownFully(list(canvasElement));
+    await userEvent.click(option("No priority"));
+    await expect(colourOf(optionIcon(trigger))).toEqual(colourOf(trigger));
+    // Opening and closing again from the trigger leaves the chosen icon as it is.
+    await userEvent.click(trigger);
+    await waitFor(() => expect(isOpen(list(canvasElement))).toBe(true));
+    await userEvent.click(trigger);
+    await waitFor(() => expect(isOpen(list(canvasElement))).toBe(false));
+    await expect(colourOf(optionIcon(trigger))).toEqual(colourOf(trigger));
+  },
+};
+
+export const DisabledSelectMutesTheChosenIcon: Story = {
+  args: { label: "Priority", options: priorities, defaultValue: "high", disabled: true },
+  play: async ({ canvas }) => {
+    const trigger = canvas.getByRole("combobox", { name: "Priority" });
+    await expect(trigger).toBeDisabled();
+    await expect(colourOf(optionIcon(trigger))).toEqual(colourOf(trigger));
+    await expect(optionIcon(trigger)).not.toHaveAttribute("data-tone");
+  },
+};
+
+export const OptionIconColourIsStableUnderHostileHost: Story = {
+  args: { label: "Priority", options: priorities, defaultValue: "high" },
+  play: async ({ canvasElement }) => {
+    for (const selector of [
+      ".cy-select-trigger .cy-select-icon",
+      '.cy-select-option .cy-select-icon[data-tone="info"]',
+      '.cy-select-option .cy-select-icon[style*="color"]',
+      '.cy-select-option[aria-disabled="true"] .cy-select-icon',
+    ]) {
+      const icon = computeUnderHostileHost(canvasElement, selector, ["color", "stroke", "width"]);
+      await expect({ selector, ...icon.hostile }).toEqual({ selector, ...icon.clean });
+    }
+    const chosen = computeUnderHostileHost(canvasElement, ".cy-select-trigger .cy-select-icon", ["color"]);
+    await expect(rgb(chosen.hostile.color as string)).toEqual(
+      token(canvasElement.querySelector(".cy-select") as Element, "--cy-color-danger"),
+    );
   },
 };

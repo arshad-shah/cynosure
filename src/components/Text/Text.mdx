@@ -1,0 +1,107 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./Text.stories";
+
+<Meta of={Stories} />
+
+# Text
+
+One piece of text in Cynosure's type scale: a label, a caption, a lead paragraph, a helper line or a value. For long-form content use [Prose](?path=/docs/components-prose--docs); for a title use [Heading](?path=/docs/components-heading--docs).
+
+<Canvas of={Stories.Variants} />
+
+## When to use
+
+- **`body` (default):** a short line of interface text. It takes the size `md` and the colour around it.
+- **`lead`:** the intro sentence under a page or section title.
+- **`caption`:** secondary detail under or beside something: a timestamp, a hint, a figure caption.
+- **`eyebrow`:** the small uppercase label above a title or a group.
+- **`code`:** a command, a file name or an identifier inside a line of text.
+- **`numeric`:** values that sit in a column or change in place, so the digits do not jump.
+
+**Use something else when:**
+- the text is rendered Markdown or several paragraphs: [Prose](?path=/docs/components-prose--docs)
+- it is a title: [Heading](?path=/docs/components-heading--docs)
+- it is a status or category label with a background: [Badge](?path=/docs/components-badge--docs)
+- it is a block of code: [CodeBlock](?path=/docs/components-codeblock--docs)
+- it is a keyboard key: [Kbd](?path=/docs/components-kbd--docs)
+- it labels a form control: the control's own `label` prop ([TextField](?path=/docs/components-textfield--docs) and the other fields)
+
+## Usage
+
+```tsx
+import { Text } from "@arshad-shah/cynosure";
+
+<Text>Last saved 2 minutes ago</Text>
+<Text as="p" variant="lead">Everything that changed this month.</Text>
+<Text variant="eyebrow">Release notes</Text>
+<Text variant="caption" tone="danger">Could not save</Text>
+<Text numeric weight="bold" size="xl">1,284.50</Text>
+<Text as="p" truncate={2}>{description}</Text>
+<Text as="time" dateTime="2026-03-12" variant="caption">12 March</Text>
+```
+
+## Sizes, weights and tones
+
+`size` maps to the six font size tokens, `weight` to the three weight tokens. A variant only sets defaults: a `size`, `weight` or `tone` you give always wins.
+
+<Canvas of={Stories.Sizes} />
+<Canvas of={Stories.Weights} />
+
+`tone="inherit"` (the default for body and code) takes the surrounding colour. `neutral` is the ink and `muted` the secondary ink. The other tones use the readable text colour of that tone.
+
+<Canvas of={Stories.Tones} />
+
+## Truncation
+
+`truncate` keeps one line and ends it with an ellipsis. A number keeps that many lines. The text is cut to the width of its container, so the container needs a width.
+
+<Canvas of={Stories.TruncateOneLine} />
+<Canvas of={Stories.TruncateToLines} />
+
+## Values and nesting
+
+`numeric` switches to tabular figures. A Text directly inside another Text keeps the outer size, weight and face, and changes only what it is given, so a value or a strong word inside a lead stays a lead.
+
+<Canvas of={Stories.NumericValuesLineUp} />
+<Canvas of={Stories.NestedTextKeepsTheOuterType} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+Text is not interactive, so it has no keyboard behaviour.
+
+| Prop | Result |
+| --- | --- |
+| `as` | Renders that element. `span`, `label`, `strong`, `em`, `small` and `time` are inline; `p`, `div` and `figcaption` are blocks. None has a margin |
+| `as="label"` with `htmlFor` | Pressing the text focuses the control with that id |
+| `as="time"` with `dateTime` | Carries the machine-readable date |
+| `as="strong"` | Bold unless `weight` is given |
+| `align` | `start` and `end` follow the reading direction. An inline element becomes a block |
+| `truncate` | An inline element becomes an inline block (one line) or a block (several lines) |
+
+- **Meaning:** Text adds no role. Pick the element for what the text is.
+- **Truncated text:** the full text stays in the DOM and is read by screen readers. Sighted users cannot reach the hidden part, so do not truncate text people must read.
+- **Eyebrow:** the uppercase is visual only. The text in the DOM keeps its case.
+- **Contrast:** every tone and the muted variants keep 4.5:1 on the page background (tested).
+- **Host CSS:** host rules for `span` and `div` (weight, case, letter spacing, colour, size, line height) do not change Text (tested).
+
+## Touch
+
+Text is not pressable, so it has no hit area. A `label` passes a tap on to its control, which has its own hit area.
+
+## Theming
+
+Tokens: `--cy-text-line-height`, `--cy-text-lead-size`, `--cy-text-caption-size`, `--cy-text-eyebrow-size`, `--cy-text-eyebrow-tracking` and `--cy-text-muted`. Sizes, weights, faces and tone colours come from the global tokens (`--cy-font-size-*`, `--cy-font-weight-*`, `--cy-font-sans`, `--cy-font-mono`, `--cy-color-*-text`).
+
+```ts
+createTheme({ components: { text: { leadSize: "18px", eyebrowTracking: ".12em" } } });
+```
+
+`className` and `style` are for layout only (margin, placement, width). Change the look through tokens so every product stays consistent.
+
+## Related
+
+[Heading](?path=/docs/components-heading--docs) · [Prose](?path=/docs/components-prose--docs) · [Badge](?path=/docs/components-badge--docs) · [Kbd](?path=/docs/components-kbd--docs) · [CodeBlock](?path=/docs/components-codeblock--docs)

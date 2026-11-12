@@ -1,7 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 import { expect, fn, waitFor } from "storybook/test";
-import { archive, copy, download, edit, trash } from "../../icons/index.js";
+import { archive, copy, download, edit, flag, tag, trash } from "../../icons/index.js";
+import { backdrop, contrast, rgb } from "../../test/color.js";
+import { computeUnderHostileHost } from "../../test/hostile.js";
 import { shownFully } from "../../test/settle.js";
 import { Button } from "../Button/Button.js";
 import { Popover } from "../Popover/Popover.js";
@@ -217,5 +219,83 @@ export const TouchRows: Story = {
     await waitFor(() => expect(row.getBoundingClientRect().height).toBeGreaterThanOrEqual(44));
     await userEvent.pointer({ keys: "[TouchA]", target: row });
     await expect(args.onSelect).toHaveBeenCalledWith("archive");
+  },
+};
+
+/** A colour token as painted sRGB, resolved next to `near` (so it follows that element's theme). */
+function token(near: Element, name: string) {
+  const probe = document.createElement("i");
+  probe.style.color = `var(${name})`;
+  near.after(probe);
+  const value = rgb(getComputedStyle(probe).color);
+  probe.remove();
+  return value;
+}
+const VIOLET = "rgb(124, 58, 237)";
+
+const coloured: MenuEntry[] = [
+  { value: "high", label: "High priority", icon: flag, iconTone: "danger" },
+  { value: "low", label: "Low priority", icon: flag, iconTone: "info" },
+  { value: "garden", label: "Garden", icon: tag, iconColor: VIOLET },
+  { value: "locked", label: "Locked", icon: flag, iconTone: "danger", iconColor: VIOLET, disabled: true },
+  { value: "plain", label: "No priority", icon: flag },
+  { label: "Danger zone", items: [{ value: "delete", label: "Delete", icon: trash, tone: "danger" }] },
+];
+const iconOf = (item: HTMLElement) => item.querySelector(".cy-menu-icon") as SVGElement;
+const colourOf = (el: Element) => rgb(getComputedStyle(el).color);
+
+export const ItemIconsKeepTheirColour: Story = {
+  args: { label: "Priority", items: coloured, className: "priority-menu" },
+  play: async ({ canvas, userEvent }) => {
+    const trigger = canvas.getByRole("button", { name: "Actions" });
+    const danger = token(trigger, "--cy-color-danger");
+    const muted = token(trigger, "--cy-color-muted");
+    await userEvent.click(trigger);
+    const menu = await canvas.findByRole("menu", { name: "Priority" });
+    await shownFully(menu);
+    const item = (name: string) => canvas.getByRole("menuitem", { name });
+    await expect(colourOf(iconOf(item("High priority")))).toEqual(danger);
+    await expect(colourOf(iconOf(item("Low priority")))).toEqual(token(trigger, "--cy-color-info"));
+    await expect(colourOf(iconOf(item("Garden")))).toEqual(rgb(VIOLET));
+    // Unchanged without the props: muted, or the item's own colour on a danger item. Disabled items are muted too.
+    await expect(colourOf(iconOf(item("No priority")))).toEqual(muted);
+    await expect(colourOf(iconOf(item("Delete")))).toEqual(colourOf(item("Delete")));
+    await expect(colourOf(iconOf(item("Locked")))).toEqual(muted);
+    await expect(getComputedStyle(item("Locked")).opacity).toBe("0.45");
+    // The focused (highlighted) item keeps the icon's colour, readable on the highlight (3:1 for graphics).
+    await waitFor(() => expect(item("High priority")).toHaveFocus());
+    await expect(colourOf(iconOf(item("High priority")))).toEqual(danger);
+    for (const name of ["High priority", "Low priority"]) {
+      item(name).focus();
+      const ratio = contrast(getComputedStyle(iconOf(item(name))).color, backdrop(item(name)));
+      await expect({ name, visible: ratio >= 3 }).toEqual({ name, visible: true });
+    }
+    await expect(getComputedStyle(item("Low priority")).backgroundColor).not.toBe("rgba(0, 0, 0, 0)");
+    // Closing from the trigger and opening again: the colours are a property of the items, not of one opening.
+    await userEvent.click(trigger);
+    await settledClosed(menu);
+    await expect(menu).toHaveClass("cy-menu", "priority-menu");
+    await userEvent.click(trigger);
+    await shownFully(menu);
+    await expect(colourOf(iconOf(item("Garden")))).toEqual(rgb(VIOLET));
+  },
+};
+
+export const ItemIconColourIsStableUnderHostileHost: Story = {
+  args: { label: "Priority", items: coloured },
+  play: async ({ canvasElement }) => {
+    for (const selector of [
+      '.cy-menu-icon[data-tone="danger"]',
+      '.cy-menu-icon[style*="color"]',
+      '[aria-disabled="true"] > .cy-menu-icon',
+      '[data-label="No priority"] > .cy-menu-icon',
+    ]) {
+      const icon = computeUnderHostileHost(canvasElement, selector, ["color", "stroke", "width"]);
+      await expect({ selector, ...icon.hostile }).toEqual({ selector, ...icon.clean });
+    }
+    const toned = computeUnderHostileHost(canvasElement, '.cy-menu-icon[data-tone="danger"]', ["color"]);
+    await expect(rgb(toned.hostile.color as string)).toEqual(
+      token(canvasElement.querySelector(".cy-menu") as Element, "--cy-color-danger"),
+    );
   },
 };

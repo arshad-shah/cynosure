@@ -1,0 +1,87 @@
+/* Heading: level (the element) and size (the look) are separate. Every visual value reads a --cy-heading-* token
+   with a global fallback. No margins: spacing belongs to the layout (Stack). */
+.cy-heading.cy-heading {
+  --_size: var(--cy-heading-size-xl, var(--cy-font-size-xl));
+
+  /* Root reset (component roots never carry .cy-reset, so nothing competes with these rules). */
+  box-sizing: border-box !important;
+  margin: 0;
+  padding: 0;
+  letter-spacing: normal;
+  text-transform: none;
+  display: block;
+  min-inline-size: 0;
+  color: var(--cy-color-ink);
+  font-family: var(--cy-heading-font-family, var(--cy-font-display, var(--cy-font-sans)));
+  font-size: var(--_size);
+  font-style: normal;
+  font-weight: var(--cy-heading-font-weight, var(--cy-font-weight-bold));
+  line-height: var(--cy-heading-line-height, 1.2);
+  text-decoration: none;
+  text-wrap: balance;
+  overflow-wrap: break-word;
+
+  /* Sizes */
+  &[data-size="xs"] {
+    --_size: var(--cy-heading-size-xs, var(--cy-font-size-xs));
+  }
+  &[data-size="sm"] {
+    --_size: var(--cy-heading-size-sm, var(--cy-font-size-sm));
+  }
+  &[data-size="md"] {
+    --_size: var(--cy-heading-size-md, var(--cy-font-size-md));
+  }
+  &[data-size="lg"] {
+    --_size: var(--cy-heading-size-lg, var(--cy-font-size-lg));
+  }
+  &[data-size="2xl"] {
+    --_size: var(--cy-heading-size-2xl, var(--cy-font-size-2xl));
+  }
+  /* Hero title: grows with the viewport, always larger than 2xl. */
+  &[data-size="display"] {
+    --_size: var(
+      --cy-heading-size-display,
+      clamp(calc(var(--cy-font-size-2xl) * 1.25), 5vw, calc(var(--cy-font-size-2xl) * 2))
+    );
+  }
+
+  /* Tones */
+  &[data-tone="inherit"] {
+    color: inherit;
+  }
+  &[data-tone="muted"] {
+    color: var(--cy-color-muted);
+  }
+  &[data-tone="accent"] {
+    color: var(--cy-color-accent-text);
+  }
+
+  &[data-weight="medium"] {
+    font-weight: var(--cy-font-weight-medium);
+  }
+
+  &[data-align="start"] {
+    text-align: start;
+  }
+  &[data-align="center"] {
+    text-align: center;
+  }
+  &[data-align="end"] {
+    text-align: end;
+  }
+
+  /* Truncation: one line with an ellipsis, or a clamp to --_lines lines. */
+  &[data-truncate] {
+    overflow: hidden;
+  }
+  &[data-truncate="line"] {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  &[data-truncate="lines"] {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: var(--_lines);
+    line-clamp: var(--_lines);
+  }
+}

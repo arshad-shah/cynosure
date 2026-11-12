@@ -1,0 +1,86 @@
+/* Pagination: a row of Buttons. Every visual value reads a --cy-pagination-* token with a global fallback.
+   Inner parts first, root last. The root never carries .cy-reset. */
+.cy-pagination-list.cy-pagination-list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--_gap);
+  padding: 0;
+  list-style: none;
+}
+
+.cy-pagination-item.cy-pagination-item {
+  display: flex;
+  align-items: center;
+  padding: 0;
+}
+
+/* The ellipsis takes the room of one page number, so the row keeps its width. */
+.cy-pagination-gap.cy-pagination-gap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: var(--_h);
+  block-size: var(--_h);
+  padding: 0;
+  color: var(--cy-pagination-muted-color, var(--cy-color-muted));
+}
+
+.cy-pagination-status.cy-pagination-status {
+  padding: 0 var(--cy-space-3);
+  color: var(--cy-pagination-muted-color, var(--cy-color-muted));
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/*
+ * A page number is at least square and always has room for two digits, so "1" and "50" are the same width whatever
+ * the font and the row does not shift from page to page. Three digits and more grow it.
+ */
+.cy-pagination .cy-button.cy-pagination-page {
+  --_pad: var(--cy-pagination-page-padding, var(--cy-space-2));
+  /* A quarter of a digit to spare: tabular figures can be a little wider than the "0" that `ch` measures. */
+  min-inline-size: max(var(--_h), calc(2.25ch + 2 * var(--_pad) + 2 * var(--cy-border-width)));
+  padding-inline: var(--_pad);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Previous and next point the way the pages run in the reading direction. */
+.cy-pagination.cy-pagination:dir(rtl) .cy-icon-button .cy-icon {
+  scale: -1 1;
+}
+
+.cy-pagination.cy-pagination {
+  --_h: var(--cy-button-height-md, var(--cy-control-height-md));
+  --_gap: var(--cy-pagination-gap, var(--cy-space-2));
+  box-sizing: border-box !important;
+  margin: 0;
+  padding: 0;
+  letter-spacing: normal;
+  text-transform: none;
+  display: block;
+  max-inline-size: 100%;
+  color: var(--cy-color-ink);
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-font-size-md);
+  font-weight: var(--cy-font-weight-regular);
+  line-height: 1.25;
+  &[data-size="sm"] {
+    --_h: var(--cy-button-height-sm, var(--cy-control-height-sm));
+    font-size: var(--cy-font-size-sm);
+  }
+}
+
+/* On touch screens the controls stand apart, so each 44px hit area is its own. */
+@media (pointer: coarse) {
+  .cy-pagination.cy-pagination {
+    --_gap: max(var(--cy-pagination-gap, var(--cy-space-2)), calc(var(--cy-hit-coarse, 44px) - var(--_h)));
+  }
+}
+
+/* Without background colours the current page keeps a mark: a border in the system's selection colour. */
+@media (forced-colors: active) {
+  .cy-pagination .cy-button[aria-current] {
+    border-color: Highlight;
+  }
+}

@@ -99,6 +99,23 @@ export const ForwardsConsumerHandlersAndClassName: Story = {
   },
 };
 
+export const CurrentPageInBothForms: Story = {
+  render: (args) => (
+    <div style={{ display: "flex", gap: 8 }}>
+      <IconButton {...args} icon={copy} label="Previous page" href="#page-1" />
+      <IconButton {...args} icon={copy} label="This page" href="#page-2" aria-current="page" />
+      <IconButton {...args} icon={trash} label="This step" aria-current="step" />
+    </div>
+  ),
+  play: async ({ canvas }) => {
+    // The mark reaches the element whether it is a link or a button, and only where it was asked for.
+    await expect(canvas.getByRole("link", { name: "This page" })).toHaveAttribute("aria-current", "page");
+    await expect(canvas.getByRole("link", { name: "This page" })).toHaveAttribute("href", "#page-2");
+    await expect(canvas.getByRole("button", { name: "This step" })).toHaveAttribute("aria-current", "step");
+    await expect(canvas.getByRole("link", { name: "Previous page" })).not.toHaveAttribute("aria-current");
+  },
+};
+
 export const MouseFocusDoesNotPinTooltip: Story = {
   play: async ({ canvas, canvasElement, userEvent }) => {
     const button = canvas.getByRole("button", { name: "Copy document" });

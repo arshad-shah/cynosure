@@ -44,6 +44,7 @@ const meta = {
     side: { control: "inline-radio", options: ["bottom", "end", "start"] },
     size: { control: "inline-radio", options: ["sm", "md", "lg"] },
     dismissible: { control: "boolean" },
+    keepMounted: { control: "boolean" },
     title: { control: "text" },
     description: { control: "text" },
   },
@@ -82,6 +83,63 @@ export const BottomSheetDocksAndCloses: Story = {
     await settledClosed(el);
     await expect(args.onOpenChange).toHaveBeenLastCalledWith(false);
     await expect(trigger).toHaveFocus();
+  },
+};
+
+export const ContentIsMountedOnlyWhileOpen: Story = {
+  args: { side: "end" },
+  play: async ({ canvas, userEvent }) => {
+    const trigger = canvas.getByRole("button", { name: "Settings" });
+    const el = dialogEl();
+    // Closed: nothing inside the sheet.
+    await expect(el.childElementCount).toBe(0);
+    await expect(canvas.queryByRole("switch", { name: "Compact rows", hidden: true })).toBeNull();
+    await userEvent.click(trigger);
+    await waitFor(() => expect(el.open).toBe(true));
+    const first = canvas.getByRole("switch", { name: "Compact rows" });
+    await userEvent.click(first);
+    await expect(first).toBeChecked();
+    // It slides out with its content, which is removed once the sheet has gone.
+    let seenClosing = false;
+    const watch = new MutationObserver(() => {
+      if (!el.open && panelEl()) seenClosing = true;
+    });
+    watch.observe(el, { attributes: true, attributeFilter: ["open"] });
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() => expect(el.childElementCount).toBe(0), { timeout: 3000 });
+    watch.disconnect();
+    await expect(seenClosing).toBe(true);
+    await expect(getComputedStyle(el).display).toBe("none");
+    await expect(trigger).toHaveFocus();
+    // Opened again it starts fresh; the backdrop closes it the same way.
+    await userEvent.click(trigger);
+    await waitFor(() => expect(el.open).toBe(true));
+    await expect(canvas.getByRole("switch", { name: "Compact rows" })).not.toBeChecked();
+    await userEvent.click(el);
+    await waitFor(() => expect(el.childElementCount).toBe(0), { timeout: 3000 });
+    await expect(trigger).toHaveFocus();
+  },
+};
+
+export const KeepMountedKeepsContentAndState: Story = {
+  args: { side: "start", keepMounted: true },
+  play: async ({ canvas, userEvent }) => {
+    const trigger = canvas.getByRole("button", { name: "Settings" });
+    const el = dialogEl();
+    // Closed, with the content already in the DOM.
+    const first = canvas.getByRole("switch", { name: "Compact rows", hidden: true });
+    await expect(first).not.toBeVisible();
+    await userEvent.click(trigger);
+    await waitFor(() => expect(el.open).toBe(true));
+    await userEvent.click(first);
+    await userEvent.keyboard("{Escape}");
+    await settledClosed(el);
+    await new Promise((r) => setTimeout(r, 400));
+    await expect(first.isConnected).toBe(true);
+    await userEvent.click(trigger);
+    await waitFor(() => expect(el.open).toBe(true));
+    await expect(canvas.getByRole("switch", { name: "Compact rows" })).toBe(first);
+    await expect(first).toBeChecked();
   },
 };
 

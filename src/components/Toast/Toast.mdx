@@ -52,6 +52,30 @@ At most `max` toasts show at once. Older ones fold away and come back as newer o
 
 <Canvas of={Stories.MaxVisibleOlderCollapse} />
 
+## Keeping clear of fixed UI
+
+Toasts sit a small margin in from the edges, plus the device's safe area. When the app has something fixed along the edge they sit on, such as a bottom tab bar on a phone, `offset` moves them further in.
+
+```tsx
+<Toaster position="bottom-center" offset="56px">
+  <App />
+</Toaster>
+```
+
+- One value is the distance from the top or bottom edge, whichever `position` names: a step of the space scale (`"8"`) or any CSS length (`"72px"`, `"calc(56px + 1rem)"`).
+- `{ block, inline }` also sets the distance from the side: `offset={{ block: "56px", inline: "4" }}`. The side follows the reading direction; a centred stack keeps its place and gives up room on both sides.
+- To set it from CSS instead, for example only below a breakpoint, use the tokens `--cy-toast-offset-block` and `--cy-toast-offset-inline` on any element around the Toaster. The prop wins over them.
+
+```css
+@media (max-width: 48rem) {
+  .app {
+    --cy-toast-offset-block: 56px;
+  }
+}
+```
+
+<Canvas of={Stories.AboveABottomTabBar} />
+
 ## Inside a Dialog
 
 Toasts raised while a Dialog is open appear above it, and carry on after it closes.
@@ -73,6 +97,7 @@ Toasts raised while a Dialog is open appear above it, and carry on after it clos
 
 - **Announcements:** each toast is a live element: `role="status"` (polite), or `role="alert"` (assertive) for `tone="danger"`. Its text arrives once, after the live element exists, so it is announced once.
 - **Region:** toasts sit in a region named "Notifications" in the browser top layer, so no parent can clip them. Pointer events pass through the empty parts of the region.
+- **Edges:** the region keeps the toasts inside the device's safe area on every side (`env(safe-area-inset-*)`), then adds `offset`. Its empty parts never take presses, so a tab bar under it still works.
 - **Hidden page:** timers also pause while the tab is hidden, so a toast is not missed.
 - **Modal dialogs:** while a [Dialog](?path=/docs/components-dialog--docs) or Sheet inside the Toaster is open, the toasts show inside it, above its backdrop, so they stay visible, clickable and announced (outside, the modal would make them inert). When the dialog closes they move back to the page with the time they had left, and are not announced a second time.
 - **Motion:** toasts slide and fade in and out, and do not move under reduced motion.
@@ -83,10 +108,17 @@ Swipe a toast sideways by 64px or more to dismiss it; a shorter swipe springs ba
 
 ## Theming
 
-Tokens: `--cy-toast-width`, `--cy-toast-radius`, `--cy-toast-padding` and `--cy-toast-gap`.
+| Token | What it sets |
+| --- | --- |
+| `--cy-toast-width` | Width of a toast (never wider than the screen) |
+| `--cy-toast-radius` | Corner radius |
+| `--cy-toast-padding` | Padding inside a toast |
+| `--cy-toast-gap` | Space between stacked toasts |
+| `--cy-toast-offset-block` | Extra distance from the top or bottom edge the toasts sit on |
+| `--cy-toast-offset-inline` | Extra distance from the side they sit on |
 
 ```ts
-createTheme({ components: { toast: { width: "400px", radius: "10px" } } });
+createTheme({ components: { toast: { width: "400px", radius: "10px", offsetBlock: "56px" } } });
 ```
 
 ## Related

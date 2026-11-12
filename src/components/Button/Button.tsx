@@ -1,4 +1,5 @@
 import {
+  type AriaAttributes,
   type CSSProperties,
   forwardRef,
   type MouseEvent,
@@ -57,7 +58,8 @@ export interface ButtonProps extends Omit<ButtonBaseProps, "children" | "classNa
   fullWidth?: boolean;
   /**
    * A link that looks like a button (it navigates: a real `<a>`, so it opens in a new tab, can be copied, and so on).
-   * Only safe URLs are linked. The forwarded ref is not attached to a link.
+   * Only safe URLs are linked. The forwarded ref is not attached to a link. A link takes `target`, `aria-label`,
+   * `aria-current`, `className`, `style`, `data-testid` and `onClick`; the other button attributes do not apply to it.
    */
   href?: string | undefined;
   /** With `href`: where it opens, e.g. `_blank`. */
@@ -72,6 +74,12 @@ export interface ButtonProps extends Omit<ButtonBaseProps, "children" | "classNa
    * users still reach it with Tab.
    */
   keepFocus?: boolean;
+  /**
+   * Marks the button or link as the current item of a set: `"page"` for the page being shown (a link to it in a
+   * navigation bar or in Pagination), or `"step"`, `"location"`, `"date"`, `"time"` or `true`. Set on the button or
+   * link element. Default: not set.
+   */
+  "aria-current"?: AriaAttributes["aria-current"];
   /** Added to the button (or link) element, for layout. */
   className?: string;
   /** Layout only. Restyle through `--cy-button-*` tokens. */
@@ -151,6 +159,8 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
         {...shared}
         data-testid={rest["data-testid"]}
         aria-label={rest["aria-label"]}
+        aria-current={rest["aria-current"]}
+        style={rest.style}
         onClick={onClick as unknown as (e: MouseEvent<HTMLAnchorElement>) => void}
       >
         {content}

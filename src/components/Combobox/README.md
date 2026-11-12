@@ -11,7 +11,7 @@ A text input with a list of suggestions (WAI-ARIA APG editable combobox). Type t
 | Prop                                           | Default  | Notes                                                                                |
 | ---------------------------------------------- | -------- | ------------------------------------------------------------------------------------ |
 | `label`, `labelHidden`, `description`, `error` | –        | As TextField                                                                         |
-| `options`                                      | –        | `{ value, label, description?, disabled?, icon? }[]`                                 |
+| `options`                                      | –        | `{ value, label, description?, disabled?, icon?, iconTone?, iconColor? }[]`          |
 | `value` / `defaultValue` / `onChange`          | `""`     | The chosen option's value (or the typed text with `allowCustom`)                     |
 | `inputValue` / `onInputChange`                 | –        | The typed text; control it to fetch options                                          |
 | `filter`                                       | contains | `(option, text) => boolean`, or `false` to show `options` as given (server-filtered) |
@@ -22,6 +22,8 @@ A text input with a list of suggestions (WAI-ARIA APG editable combobox). Type t
 - Focus stays in the input; the active option is `aria-activedescendant`, so late results never interrupt typing.
 - Leaving with text that matches nothing restores the last choice (unless `allowCustom`); leaving it empty clears the value.
 - Escape: closes the list, then clears the text, then (with nothing to undo) reaches an enclosing Dialog.
+
+- `iconTone` and `iconColor` on an option colour its `icon` in the list, with the meaning of Icon's `tone` and `color` (`iconColor` is any CSS colour and overrides `iconTone`), the same two fields as Select and Menu options. The active and the selected option keep the colour; a disabled option shows the icon without it, muted with its row. The input shows text only (`iconStart` is the field's own icon).
 
 Tokens: `--cy-combobox-list-max-height`, `--cy-combobox-list-bg`, `--cy-combobox-option-active-bg` (and TextField's for the input).
 

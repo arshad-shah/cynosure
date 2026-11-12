@@ -1,0 +1,119 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./Pagination.stories";
+
+<Meta of={Stories} />
+
+# Pagination
+
+Moves between the pages of a list or table: previous and next, numbered pages, and the current page marked. It is a navigation landmark built from [Button](?path=/docs/components-button--docs) and [IconButton](?path=/docs/components-iconbutton--docs).
+
+<Canvas of={Stories.LandmarkAndCurrentPage} />
+
+## When to use
+
+- **Below a [Table](?path=/docs/components-table--docs) or a list** whose rows are loaded a page at a time.
+- **`variant="compact"`:** on phones and in tight spaces such as a panel footer. It shows only previous and next around "Page 3 of 10".
+- **`getHref`:** when each page has its own address (search results, an archive). The controls are real links, so they work without JavaScript and can be opened in a new tab.
+- **`showEdges`:** when people often jump to the first or last page.
+
+**Use something else when:**
+- the choices are views of the same content, not pages of a list: [Tabs](?path=/docs/components-tabs--docs) or [SegmentedControl](?path=/docs/components-segmentedcontrol--docs)
+- it is progress through a task with named steps: [Steps](?path=/docs/components-steps--docs)
+- the whole list is already loaded and long: [VirtualList](?path=/docs/components-virtuallist--docs) scrolls it without pages
+
+## Usage
+
+```tsx
+import { Pagination, pageCount } from "@arshad-shah/cynosure";
+
+<Pagination count={pageCount(members.length, 25)} page={page} onChange={setPage} />
+<Pagination count={10} defaultPage={3} showEdges />
+<Pagination count={10} variant="compact" />
+<Pagination count={10} page={page} getHref={(p) => `?page=${p}`} />
+```
+
+`count` is the number of pages. `pageCount(total, pageSize)` works it out from a number of items and never returns less than 1. With one page or fewer, Pagination renders nothing.
+
+`page` is controlled and `defaultPage` is not; both count from 1 and are clamped to the pages that exist.
+
+## Which pages are shown
+
+`boundaries` pages are always shown at each end and `siblings` each side of the current one; the rest is an ellipsis. The row has the same number of items on every page, so the controls do not move under the pointer, and an ellipsis never stands for a single page.
+
+`pageRange(page, count, siblings, boundaries)` is the function that decides this, exported for your own layouts: `pageRange(5, 10)` is `[1, "gap", 4, 5, 6, "gap", 10]`.
+
+<Canvas of={Stories.SiblingsAndBoundaries} />
+
+## First and last
+
+<Canvas of={Stories.PreviousNextAndEdges} />
+
+## Compact
+
+<Canvas of={Stories.Compact} />
+
+## Links
+
+With `getHref`, every page number and every control that leads to another page is a link to it. The current page is a link to its own address, marked with `aria-current="page"`. `onChange` still fires on a plain click; a click with Ctrl, Cmd, Shift or Alt is left to the browser. Only the disabled ends stay buttons, because they lead nowhere.
+
+<Canvas of={Stories.LinksToEveryPage} />
+
+### With a client-side router
+
+`onChange` is called with the page and the click event. Call `event.preventDefault()` to stop the browser following the link, then navigate yourself. The links still work without JavaScript and open in a new tab.
+
+```tsx
+<Pagination
+  count={pages}
+  page={page}
+  getHref={(p) => `/members?page=${p}`}
+  onChange={(p, event) => {
+    event.preventDefault();
+    router.push(`/members?page=${p}`);
+  }}
+/>
+```
+
+<Canvas of={Stories.RouterPreventsTheLinkAndNavigatesItself} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+| Input | Result |
+| --- | --- |
+| Click, tap, <kbd>Enter</kbd>, <kbd>Space</kbd> | Goes to that page and calls `onChange(page, event)` |
+| <kbd>Tab</kbd> | Moves between the controls. Disabled ones and ellipses are skipped |
+
+- **Landmark:** a `nav` named "Pagination" (`labels.nav`) holding an ordered list. Give each one its own name when a page has several.
+- **Current page:** named "Page 3" and marked with `aria-current="page"` (on the button, or on the link with `getHref`), so a screen reader says "Page 3, current page" once. Do not add "current" to `labels.page`.
+- **Ends:** previous and first are disabled on page 1, next and last on the last page.
+- **Ellipses** are hidden from assistive technology and cannot be focused. The page names on each side already say what is left out.
+- **No arrow keys:** there is no ARIA pattern for pagination, so the controls are plain buttons.
+- **Focus:** the pressed control keeps focus when the numbers move along. When it can no longer hold focus (previous on reaching page 1), focus goes to the current page, or in the compact variant to the control that still works.
+- **Compact:** the "Page 3 of 10" text is a polite live region, so a change of page is announced.
+- **Narrow spaces:** the row wraps instead of overflowing.
+- **Right to left:** the order follows the reading direction and the chevrons are mirrored.
+- **Strings:** every built-in string is English and can be replaced through `labels`.
+
+<Canvas of={Stories.RightToLeft} />
+
+## Touch
+
+Each control has a hit area of at least 24px, growing to 44px on coarse pointers (phones and tablets) without changing its visible size. On coarse pointers the space between controls grows so the hit areas do not overlap; the row wraps sooner, which is what `variant="compact"` is for.
+
+## Theming
+
+Tokens: `--cy-pagination-gap` (space between the controls), `--cy-pagination-page-padding` (inline padding of a page number) and `--cy-pagination-muted-color` (the ellipsis and the "Page 3 of 10" text). The controls themselves follow Button's tokens (`--cy-button-*`).
+
+```ts
+createTheme({ components: { pagination: { gap: "2px", pagePadding: "8px" } } });
+```
+
+`className` and `style` are for layout only (margin, placement). Change the look through tokens so every product stays consistent.
+
+## Related
+
+[Table](?path=/docs/components-table--docs) · [Button](?path=/docs/components-button--docs) · [IconButton](?path=/docs/components-iconbutton--docs) · [Tabs](?path=/docs/components-tabs--docs) · [Steps](?path=/docs/components-steps--docs)

@@ -1,8 +1,7 @@
 import { type CSSProperties, type ElementType, forwardRef, type ReactNode } from "react";
+import { type PaddingProps, paddingVars, type Space, space } from "./space.js";
 
-type Space = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" | "10";
-
-export interface StackProps {
+export interface StackProps extends PaddingProps {
   /** Space token between children. */
   gap?: Space;
   /** How children line up across the stack (horizontally). */
@@ -24,7 +23,19 @@ export interface StackProps {
 
 /** Vertical layout with token gaps. */
 export const Stack = forwardRef<HTMLElement, StackProps>(function Stack(
-  { gap = "4", align, justify, as = "div", className, style, children, ...rest },
+  {
+    gap = "4",
+    padding,
+    paddingInline,
+    paddingBlock,
+    align,
+    justify,
+    as = "div",
+    className,
+    style,
+    children,
+    ...rest
+  },
   ref,
 ) {
   const Tag = as as ElementType;
@@ -35,7 +46,13 @@ export const Stack = forwardRef<HTMLElement, StackProps>(function Stack(
       className={`cy-stack${className ? ` ${className}` : ""}`}
       data-align={align}
       data-justify={justify}
-      style={{ "--_gap": `var(--cy-space-${gap})`, ...style } as CSSProperties}
+      style={
+        {
+          "--_gap": space(gap),
+          ...paddingVars({ padding, paddingInline, paddingBlock }),
+          ...style,
+        } as CSSProperties
+      }
     >
       {children}
     </Tag>

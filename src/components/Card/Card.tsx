@@ -9,6 +9,23 @@ import { ButtonBase } from "../../foundations/ButtonBase/ButtonBase.js";
 import { LinkBase } from "../../foundations/LinkBase/LinkBase.js";
 import type { Tone } from "../../tokens/schema.js";
 
+export interface CardTokens {
+  bg: string;
+  border: string;
+  radius: string;
+  shadow: string;
+  softMix: string;
+  edgeWidth: string;
+}
+
+declare module "../../tokens/schema.js" {
+  interface ComponentTokens {
+    card: CardTokens;
+  }
+}
+
+const TONES: readonly string[] = ["accent", "neutral", "danger", "success", "warning", "info"];
+
 export interface CardProps {
   /** `surface` raised panel, `outline` border only, `soft` tone-tinted fill. */
   variant?: "surface" | "outline" | "soft";
@@ -16,6 +33,12 @@ export interface CardProps {
   padding?: "none" | "sm" | "md" | "lg";
   /** Semantic colour. Default "neutral". */
   tone?: Tone;
+  /**
+   * A coloured edge on the card's inline-start side (left in left-to-right text), e.g. a task's category. A tone name
+   * uses that tone's colour; any other string is a CSS colour. Colour alone carries no meaning for many people: say
+   * the same thing in the card's text or a Badge. Default: no edge.
+   */
+  edge?: Tone | (string & {});
   /** Element for a static card. Ignored when `href` or `onClick` makes the whole card interactive. */
   as?: "div" | "section" | "article" | "li" | "aside";
   /** Makes the whole card a link (rendered through LinkBase, so unsafe schemes are not linked). */
@@ -66,13 +89,19 @@ export const Card = forwardRef<HTMLElement, CardProps>(function CardRender(props
     onClick,
     disabled,
     actions,
+    edge,
     className,
+    style,
     children,
     ...rest
   } = props;
+  // A tone name is mapped to its token in CSS; any other colour is handed over as a private custom property.
+  const custom = !!edge && !TONES.includes(edge);
   const common = {
     ...rest,
     className: className ? `cy-card ${className}` : "cy-card",
+    style: custom ? ({ "--_edge": edge, ...style } as CSSProperties) : style,
+    "data-edge": edge ? (custom ? "custom" : edge) : undefined,
     "data-variant": variant,
     "data-padding": padding,
     "data-tone": tone,

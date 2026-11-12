@@ -259,3 +259,14 @@ describe("remaining theme branches", () => {
     expect(createTheme({ accent: "#f5d90a" }).palettes.light.onAccent).not.toBe("#ffffff");
   });
 });
+
+describe("component tokens of multi-word components", () => {
+  it("are written with the component's kebab-case name, which is what its CSS reads", () => {
+    const css = themeToCss(
+      createTheme({ components: { sideNav: { width: "20rem" }, timeField: { rowHeight: "40px" } } as never }),
+    );
+    expect(css).toContain("--cy-side-nav-width:20rem");
+    expect(css).toContain("--cy-time-field-row-height:40px");
+    expect(css).not.toContain("--cy-sideNav");
+  });
+});

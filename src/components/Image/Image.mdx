@@ -1,0 +1,98 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./Image.stories";
+
+<Meta of={Stories} />
+
+# Image
+
+A picture that never shifts the layout, shows a placeholder while it loads and something sensible when it fails. For a person or an account, use [Avatar](?path=/docs/components-avatar--docs); for an interface symbol, use [Icon](?path=/docs/foundations-icon--docs).
+
+<Canvas of={Stories.Default} />
+
+## When to use
+
+- **Photos, screenshots and illustrations** anywhere in a page: give it a `ratio` and it holds its space from the first paint.
+- **Thumbnails in a grid:** one `ratio` for all, `fit="cover"` to crop them to the same shape.
+- **Pictures that may be missing:** uploads, remote addresses and anything else that can fail gets a fallback instead of a broken-image mark.
+- **Figures:** `caption` adds a caption that names the picture.
+
+**Use something else when:**
+- the box holds a video, a map or an embed: [AspectRatio](?path=/docs/components-aspectratio--docs)
+- it is a person, a team or an account: [Avatar](?path=/docs/components-avatar--docs)
+- it is a symbol in the interface: [Icon](?path=/docs/foundations-icon--docs)
+- two pictures are compared: [CompareSlider](?path=/docs/components-compareslider--docs)
+
+## Usage
+
+```tsx
+import { Image } from "@arshad-shah/cynosure";
+
+<Image src="/team.jpg" alt="The team at the 2026 offsite" ratio={16 / 9} radius="card" />
+
+<Image src="/logo.png" alt="" width={120} height={40} />
+
+<Image src={url} alt="Uploaded scan" ratio="4/3" fit="contain" caption="Page 1 of 3" />
+```
+
+`alt` is required. Describe what the picture shows, or pass `alt=""` when it is decoration: it is then hidden from assistive technology.
+
+With `ratio` the picture fills a box of that shape, as wide as its container. Without it the picture has its natural size, never wider than its container; pass `width` and `height` so its space is reserved before it loads.
+
+## Fit and position
+
+With a `ratio`, `fit="cover"` (the default) fills the box and crops what does not fit, and `fit="contain"` shows the whole picture. `position` chooses the part that stays in view, as CSS `object-position`.
+
+<Canvas of={Stories.FitAndPosition} />
+
+## When it fails
+
+The picture is replaced by a quiet box with the image icon and the `alt` text, in the same space. `fallback` replaces that box, and `onError` is still called. Changing `src` tries again.
+
+<Canvas of={Stories.FallbackOnError} />
+
+## Caption
+
+`caption` wraps the picture in a `figure` whose name is the caption.
+
+<Canvas of={Stories.CaptionMakesAFigure} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+| Situation | Result |
+| --- | --- |
+| Before the picture has loaded | A [Skeleton](?path=/docs/components-skeleton--docs) (or `placeholder`) covers the box; the box already has its final size |
+| The picture loads | The placeholder goes, the picture fades in, `onLoad` is called. Nothing moves |
+| The picture fails | The fallback takes its place in the same box, `onError` is called |
+| `src` or `srcSet` changes | Loading starts again, also after a failure |
+| The picture finished before React attached (cached, or in the server's HTML) | It is shown, or its fallback is, without waiting for an event. For a picture in the server's HTML the event has passed, so `onLoad` and `onError` are not called |
+
+- **Name:** the `img` has the `alt` text as its name. With `alt=""` nothing has the image role.
+- **Fallback:** the default fallback shows the `alt` text on screen, so it is read as text. For a decorative picture it shows only the icon and is hidden from assistive technology. A custom `fallback` is shown as it is: give it its own text.
+- **Placeholder:** the Skeleton is hidden from assistive technology and stops moving under reduced motion.
+- **Loading:** `lazy` by default, so pictures far below the screen wait. Use `loading="eager"` for a picture at the top of the page. `decoding` is `async`.
+- **Root element:** with a `ratio` or a `caption` it is a block as wide as its container (a `div` or a `figure`), so keep it out of paragraphs. Otherwise it is an inline `span` the size of the picture.
+- **Ref:** the `img` element. There is none while the fallback is shown.
+- **Native behaviour:** dragging and the context menu are the browser's own.
+- **Right-to-left:** nothing changes. Pictures are not mirrored and `position` is physical, as in CSS.
+
+## Touch
+
+Nothing in Image can be pressed. To make a picture a link or a button, put it inside [Link](?path=/docs/components-link--docs) or a control with a hit area of its own.
+
+## Theming
+
+Tokens: `--cy-image-radius` (the corners of every Image, whatever its `radius` prop says), `--cy-image-fallback-background`, `--cy-image-fallback-color`, `--cy-image-caption-gap` and `--cy-image-caption-color`. The placeholder is themed through the Skeleton tokens.
+
+```ts
+createTheme({ components: { image: { radius: "8px", captionGap: "4px" } } });
+```
+
+`className` and `style` are for layout only (width, margin, placement).
+
+## Related
+
+[AspectRatio](?path=/docs/components-aspectratio--docs) · [Skeleton](?path=/docs/components-skeleton--docs) · [Avatar](?path=/docs/components-avatar--docs) · [CompareSlider](?path=/docs/components-compareslider--docs) · [Card](?path=/docs/components-card--docs)

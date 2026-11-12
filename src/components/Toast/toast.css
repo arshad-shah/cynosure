@@ -2,8 +2,16 @@
  * toast: the Toaster region is a top-layer strip along one edge (pointer events pass through it); toasts stack in it,
  * newest nearest the edge. Collapsed (older than `max`) toasts fold to nothing but stay in the DOM, so a toast is
  * announced once even when it comes back into view.
+ *
+ * The strip's padding keeps the toasts off the edges: the usual margin, plus the device's safe area on every side,
+ * plus the offset (the `offset` prop, else the --cy-toast-offset-* tokens) on the edges `position` names.
  */
 .cy-toaster.cy-toaster {
+  --_edge: var(--cy-space-6);
+  --_block: var(--_offset-block, var(--cy-toast-offset-block, 0px));
+  --_inline: var(--_offset-inline, var(--cy-toast-offset-inline, 0px));
+  --_safe-start: env(safe-area-inset-left);
+  --_safe-end: env(safe-area-inset-right);
   box-sizing: border-box !important;
   position: fixed;
   inset: auto 0;
@@ -11,7 +19,9 @@
   block-size: auto;
   max-block-size: 100vh;
   margin: 0;
-  padding: var(--cy-space-6);
+  padding-block: calc(var(--_edge) + env(safe-area-inset-top))
+    calc(var(--_edge) + env(safe-area-inset-bottom));
+  padding-inline: calc(var(--_edge) + var(--_safe-start)) calc(var(--_edge) + var(--_safe-end));
   border: 0;
   overflow: visible;
   background: transparent;
@@ -31,20 +41,32 @@
   &:not(:popover-open) {
     display: none;
   }
+  &:dir(rtl) {
+    --_safe-start: env(safe-area-inset-right);
+    --_safe-end: env(safe-area-inset-left);
+  }
   &[data-position^="bottom"] {
     inset-block-end: 0;
     justify-content: flex-end;
+    padding-block-end: calc(var(--_edge) + env(safe-area-inset-bottom) + var(--_block));
   }
   &[data-position^="top"] {
     inset-block-start: 0;
     flex-direction: column-reverse;
     justify-content: flex-end;
+    padding-block-start: calc(var(--_edge) + env(safe-area-inset-top) + var(--_block));
   }
   &[data-position$="start"] {
     align-items: flex-start;
   }
   &[data-position$="center"] {
     align-items: center;
+  }
+  &:is([data-position$="start"], [data-position$="center"]) {
+    padding-inline-start: calc(var(--_edge) + var(--_safe-start) + var(--_inline));
+  }
+  &:is([data-position$="end"], [data-position$="center"]) {
+    padding-inline-end: calc(var(--_edge) + var(--_safe-end) + var(--_inline));
   }
 }
 
