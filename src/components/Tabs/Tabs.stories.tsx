@@ -1,11 +1,12 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 import { expect, fn, waitFor } from "storybook/test";
-import { code, info, list } from "../../icons/index.js";
+import { code, info, list, plus } from "../../icons/index.js";
 import { computeUnderHostileHost } from "../../test/hostile.js";
 import { realHover } from "../../test/hover.js";
 import { asIfPrinting } from "../../test/print.js";
 import { Button } from "../Button/Button.js";
+import { IconButton } from "../IconButton/IconButton.js";
 import { Tab, TabList, TabPanel, Tabs } from "./Tabs.js";
 
 const meta = {
@@ -866,5 +867,229 @@ export const UnsavedTabStableUnderHostileHost: Story = {
     const props = ["width", "height", "background-color", "border-radius", "opacity", "inset-inline-end"];
     const dot = computeUnderHostileHost(canvasElement, ".cy-tab-dirty", props);
     await expect(dot.hostile).toEqual(dot.clean);
+  },
+};
+
+/** Many open files in a narrow strip, with a new-file button after the last tab. */
+function ManyFiles({ count = 12, width = 320, dir }: { count?: number; width?: number; dir?: "rtl" }) {
+  const [files, setFiles] = useState(() => Array.from({ length: count }, (_, i) => `file-${i + 1}.ts`));
+  const [current, setCurrent] = useState("file-1.ts");
+  return (
+    <div dir={dir} style={{ width }}>
+      <Tabs value={current} onChange={setCurrent}>
+        <TabList
+          label="Open files"
+          scrollable
+          end={
+            <IconButton
+              icon={plus}
+              label="New file"
+              variant="ghost"
+              size="sm"
+              onClick={() => {
+                const next = `file-${files.length + 1}.ts`;
+                setFiles((all) => [...all, next]);
+                setCurrent(next);
+              }}
+            />
+          }
+        >
+          {files.map((f) => (
+            <Tab key={f} value={f} onClose={() => setFiles((all) => all.filter((x) => x !== f))}>
+              {f}
+            </Tab>
+          ))}
+        </TabList>
+      </Tabs>
+    </div>
+  );
+}
+const scroller = (root: HTMLElement, name: "back" | "forward") =>
+  root.querySelector(`[aria-label="Scroll tabs ${name}"]`) as HTMLElement;
+/** Visible and taking part in layout (a hidden chevron keeps its space but is not painted or pressable). */
+const visible = (el: HTMLElement) => el.checkVisibility({ visibilityProperty: true });
+/** How far along the strip has scrolled, from its start (RTL scrollLeft runs from 0 down to -max). */
+const along = (list: HTMLElement) => Math.abs(list.scrollLeft);
+
+export const ScrollableShowsChevronsTowardMoreTabs: Story = {
+  tags: ["visual"],
+  render: () => <ManyFiles />,
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const list = canvas.getByRole("tablist");
+    const back = scroller(canvasElement, "back");
+    const forward = scroller(canvasElement, "forward");
+    await expect(list.scrollWidth).toBeGreaterThan(list.clientWidth);
+    // At the start, only the forward chevron shows; neither is in the tab order or the accessibility tree.
+    await waitFor(() => {
+      expect(visible(forward)).toBe(true);
+      expect(visible(back)).toBe(false);
+    });
+    for (const chevron of [back, forward]) {
+      await expect(chevron).toHaveAttribute("tabindex", "-1");
+      await expect(chevron.closest('[aria-hidden="true"]')).not.toBeNull();
+      await expect(chevron.closest('[role="tablist"]')).toBeNull();
+    }
+    // Pressing it scrolls the strip forward, and then there is something back too.
+    await userEvent.click(forward);
+    await waitFor(() => expect(along(list)).toBeGreaterThan(list.clientWidth / 2));
+    await waitFor(() => expect(visible(back)).toBe(true));
+    // Back returns to the start, where the back chevron goes away again.
+    await userEvent.click(back);
+    await waitFor(() => expect(along(list)).toBe(0));
+    await waitFor(() => expect(visible(back)).toBe(false));
+    // The selection is untouched: the chevrons only scroll.
+    await expect(selected(canvas)).toBe("file-1.ts");
+    // At the far end the forward chevron goes.
+    await userEvent.tab();
+    await userEvent.keyboard("{End}");
+    await waitFor(() => expect(visible(forward)).toBe(false));
+    await expect(visible(back)).toBe(true);
+    // Arrows keep the focused tab in view.
+    const last = canvas.getByRole("tab", { name: "file-12.ts" });
+    await expect(last).toHaveFocus();
+    await waitFor(() => {
+      const l = list.getBoundingClientRect();
+      const t = last.getBoundingClientRect();
+      expect(t.right).toBeLessThanOrEqual(l.right + 1);
+      expect(t.left).toBeGreaterThanOrEqual(l.left - 1);
+    });
+  },
+};
+
+export const WheelScrollsTheStripSideways: Story = {
+  render: () => <ManyFiles />,
+  play: async ({ canvas }) => {
+    const list = canvas.getByRole("tablist");
+    const wheel = (deltaY: number, extra: WheelEventInit = {}) => {
+      const event = new WheelEvent("wheel", { deltaY, bubbles: true, cancelable: true, ...extra });
+      (canvas.getByRole("tab", { name: "file-2.ts" }) as HTMLElement).dispatchEvent(event);
+      return event;
+    };
+    // A vertical wheel turn moves the strip along, instead of scrolling the page.
+    await expect(wheel(120).defaultPrevented).toBe(true);
+    await waitFor(() => expect(along(list)).toBeGreaterThanOrEqual(100));
+    const at = along(list);
+    await expect(wheel(-60).defaultPrevented).toBe(true);
+    await waitFor(() => expect(along(list)).toBeLessThan(at));
+    // Back at the start, a turn toward the start has nowhere to go and is left to the page.
+    list.scrollLeft = 0;
+    await waitFor(() => expect(along(list)).toBe(0));
+    await expect(wheel(-60).defaultPrevented).toBe(false);
+    // Ctrl+wheel (zoom) and sideways wheels are the browser's.
+    await expect(wheel(120, { ctrlKey: true }).defaultPrevented).toBe(false);
+    await expect(wheel(0, { deltaX: 120 }).defaultPrevented).toBe(false);
+  },
+};
+
+export const ScrollableInRightToLeft: Story = {
+  render: () => <ManyFiles dir="rtl" />,
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const list = canvas.getByRole("tablist");
+    const back = scroller(canvasElement, "back");
+    const forward = scroller(canvasElement, "forward");
+    await waitFor(() => {
+      expect(visible(forward)).toBe(true);
+      expect(visible(back)).toBe(false);
+    });
+    // Forward is on the left in right-to-left text, and its chevron points left.
+    const strip = list.getBoundingClientRect();
+    await expect(forward.getBoundingClientRect().right).toBeLessThanOrEqual(strip.left + 1);
+    await userEvent.click(forward);
+    await waitFor(() => expect(list.scrollLeft).toBeLessThan(-list.clientWidth / 2));
+    await waitFor(() => expect(visible(back)).toBe(true));
+    await expect(back.getBoundingClientRect().left).toBeGreaterThanOrEqual(strip.right - 1);
+    // The wheel moves toward the end, leftwards.
+    list.scrollTo({ left: 0, behavior: "instant" });
+    await waitFor(() => expect(list.scrollLeft).toBe(0));
+    const event = new WheelEvent("wheel", { deltaY: 120, bubbles: true, cancelable: true });
+    list.dispatchEvent(event);
+    await expect(event.defaultPrevented).toBe(true);
+    await waitFor(() => expect(list.scrollLeft).toBeLessThanOrEqual(-100));
+  },
+};
+
+export const ScrollableThatFitsShowsNoChevrons: Story = {
+  render: () => <ManyFiles count={2} width={600} />,
+  play: async ({ canvas, canvasElement }) => {
+    const list = canvas.getByRole("tablist");
+    await expect(list.scrollWidth).toBeLessThanOrEqual(list.clientWidth);
+    // Nothing to scroll to: no chevrons, and they take no room.
+    await expect(visible(scroller(canvasElement, "back"))).toBe(false);
+    await expect(visible(scroller(canvasElement, "forward"))).toBe(false);
+    await expect(scroller(canvasElement, "back").getBoundingClientRect().width).toBe(0);
+    const first = canvas.getByRole("tab", { name: "file-1.ts" });
+    await expect(
+      Math.abs(first.getBoundingClientRect().left - list.getBoundingClientRect().left),
+    ).toBeLessThan(1);
+  },
+};
+
+export const EndSlotSitsAfterTheLastTab: Story = {
+  render: () => <ManyFiles count={2} width={600} />,
+  play: async ({ canvas, userEvent }) => {
+    const add = canvas.getByRole("button", { name: "New file" });
+    // Outside the tablist (which holds only tabs), right after the last tab, and in the Tab order after the tabs.
+    await expect(add.closest('[role="tablist"]')).toBeNull();
+    const last = () => slotOf(canvas.getAllByRole("tab").at(-1) as HTMLElement);
+    const gap = add.getBoundingClientRect().left - last().getBoundingClientRect().right;
+    await expect(gap).toBeGreaterThanOrEqual(0);
+    await expect(gap).toBeLessThan(16);
+    await userEvent.tab();
+    await userEvent.tab();
+    await expect(add).toHaveFocus();
+    await userEvent.keyboard("{Enter}");
+    await expect(canvas.getAllByRole("tab")).toHaveLength(3);
+    await expect(selected(canvas)).toBe("file-3.ts");
+    await expect(add.getBoundingClientRect().left).toBeGreaterThanOrEqual(
+      last().getBoundingClientRect().right,
+    );
+  },
+};
+
+export const EndSlotStaysInViewWhenTabsOverflow: Story = {
+  render: () => <ManyFiles />,
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const add = canvas.getByRole("button", { name: "New file" });
+    const box = (canvasElement.querySelector(".cy-tab-strip") as HTMLElement).getBoundingClientRect();
+    await expect(box.width).toBeLessThanOrEqual(320);
+    await expect(add.getBoundingClientRect().right).toBeLessThanOrEqual(box.right + 1);
+    await expect(add.getBoundingClientRect().left).toBeGreaterThanOrEqual(
+      scroller(canvasElement, "forward").getBoundingClientRect().right - 1,
+    );
+    // A new tab is selected and scrolled into view.
+    await userEvent.click(add);
+    const tab = canvas.getByRole("tab", { name: "file-13.ts" });
+    const list = canvas.getByRole("tablist");
+    await waitFor(() => {
+      expect(tab.getBoundingClientRect().right).toBeLessThanOrEqual(list.getBoundingClientRect().right + 1);
+    });
+  },
+};
+
+export const TouchScrollsWithChevrons: Story = {
+  tags: ["touch", "!dev"],
+  render: () => <ManyFiles />,
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const list = canvas.getByRole("tablist");
+    const forward = scroller(canvasElement, "forward");
+    await waitFor(() => expect(visible(forward)).toBe(true));
+    const hit = getComputedStyle(forward, "::before");
+    await expect(
+      Math.max(forward.getBoundingClientRect().height, Number.parseFloat(hit.height) || 0),
+    ).toBeGreaterThanOrEqual(44);
+    await userEvent.pointer({ keys: "[TouchA]", target: forward });
+    await waitFor(() => expect(along(list)).toBeGreaterThan(0));
+    await expect(selected(canvas)).toBe("file-1.ts");
+  },
+};
+
+export const ScrollableStableUnderHostileHost: Story = {
+  render: () => <ManyFiles />,
+  play: async ({ canvasElement }) => {
+    const props = ["display", "height", "width", "padding-left", "gap", "overflow-x"];
+    for (const selector of ['[role="tablist"]', ".cy-tab-strip"]) {
+      const result = computeUnderHostileHost(canvasElement, selector, props);
+      await expect(result.hostile).toEqual(result.clean);
+    }
   },
 };

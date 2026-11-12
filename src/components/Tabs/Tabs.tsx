@@ -19,6 +19,8 @@ import { Icon } from "../../foundations/Icon/Icon.js";
 import { usePrinting } from "../../foundations/printing.js";
 import { moveItems } from "../../foundations/reorder.js";
 import { useRovingFocus } from "../../foundations/roving-focus.js";
+import { chevronLeft } from "../../icons/chevron-left.js";
+import { chevronRight } from "../../icons/chevron-right.js";
 import { close } from "../../icons/close.js";
 import type { IconData } from "../../icons/types.js";
 import type { Size } from "../../tokens/schema.js";
@@ -45,6 +47,10 @@ export interface TabsLabels {
   closeUnsaved: (name: string) => string;
   /** The description of a tab with unsaved changes, read after its name. Default "Unsaved changes". */
   unsaved: string;
+  /** The chevron that scrolls a `scrollable` list back toward its first tab. Default "Scroll tabs back". */
+  scrollBack: string;
+  /** The chevron that scrolls a `scrollable` list on toward its last tab. Default "Scroll tabs forward". */
+  scrollForward: string;
   /** Announced after a tab is moved. Default "Moved notes.md to position 2 of 4". */
   moved: (name: string, position: number, total: number) => string;
 }
@@ -53,6 +59,8 @@ const DEFAULT_LABELS: TabsLabels = {
   close: (name) => (name ? `Close ${name}` : "Close"),
   closeUnsaved: (name) => (name ? `Close ${name}, unsaved changes` : "Close, unsaved changes"),
   unsaved: "Unsaved changes",
+  scrollBack: "Scroll tabs back",
+  scrollForward: "Scroll tabs forward",
   moved: (name, position, total) => `Moved ${name} to position ${position} of ${total}`,
 };
 
@@ -93,8 +101,8 @@ export interface TabsProps {
   /** `line`: underline indicator. `soft`: tinted pill. */
   variant?: "line" | "soft";
   /**
-   * Replace the built-in English text: the close button's name (saved and unsaved), the unsaved description and the
-   * announcement after a move.
+   * Replace the built-in English text: the close button's name (saved and unsaved), the unsaved description, the
+   * scroll chevrons' names and the announcement after a move.
    */
   labels?: Partial<TabsLabels>;
   /** Added to the root element, for layout. */
@@ -206,6 +214,16 @@ export interface TabListProps {
    * arrow on it. Called with every tab's value in the new order; render the tabs in that order.
    */
   onReorder?: ((values: string[]) => void) | undefined;
+  /**
+   * For many tabs (document tabs): chevrons at each end scroll the list while there is more that way, and a vertical
+   * mouse wheel scrolls it sideways. The chevrons are for the pointer; arrow keys scroll the focused tab into view.
+   */
+  scrollable?: boolean | undefined;
+  /**
+   * Content after the last tab, outside the tab list, such as a "New tab" IconButton. It follows the last tab, and
+   * stays at the end in view when the tabs overflow.
+   */
+  end?: ReactNode;
   /** Added to the tab list element, for layout. */
   className?: string;
   /** The `Tab`s, in order. */
@@ -216,9 +234,10 @@ export interface TabListProps {
 const tabIn = (el: Element) =>
   (el.matches('[role="tab"]') ? el : el.querySelector('[role="tab"]')) as HTMLElement;
 
-export function TabList({ label, onReorder, className, children }: TabListProps) {
+export function TabList({ label, onReorder, scrollable = false, end, className, children }: TabListProps) {
   const { size, variant, value, labels, refocus } = useTabs("TabList");
   const ref = useRef<HTMLDivElement>(null);
+  const strip = useRef<HTMLDivElement>(null);
   const [said, setSaid] = useState("");
   const latest = useRef({ onReorder, labels });
   latest.current = { onReorder, labels };
@@ -296,30 +315,60 @@ export function TabList({ label, onReorder, className, children }: TabListProps)
     target = Math.min(Math.max(target, 0), max);
     if (target !== current) list.scrollTo({ left: rtl ? target - max : target });
   }, []);
-  // Mark edges that hide tabs so CSS can fade them (works in RTL: scrollLeft is negative there).
+  // Mark edges that hide tabs so CSS can fade them, and show the chevrons that lead there (works in RTL: scrollLeft is
+  // negative there).
+  const edges = useCallback(() => {
+    const list = ref.current;
+    if (!list) return;
+    const max = list.scrollWidth - list.clientWidth;
+    const at = Math.abs(list.scrollLeft);
+    for (const el of [list, strip.current]) {
+      el?.toggleAttribute("data-more-start", max > 1 && at > 1);
+      el?.toggleAttribute("data-more-end", max > 1 && at < max - 1);
+    }
+    strip.current?.toggleAttribute("data-overflow", max > 1);
+  }, []);
   useClientLayoutEffect(() => {
     const list = ref.current;
     if (!list) return;
-    const update = () => {
-      const max = list.scrollWidth - list.clientWidth;
-      const at = Math.abs(list.scrollLeft);
-      list.toggleAttribute("data-more-start", max > 1 && at > 1);
-      list.toggleAttribute("data-more-end", max > 1 && at < max - 1);
-    };
-    update();
-    list.addEventListener("scroll", update, { passive: true });
-    const observer = new ResizeObserver(update);
+    list.addEventListener("scroll", edges, { passive: true });
+    const observer = new ResizeObserver(edges);
     observer.observe(list);
     return () => {
-      list.removeEventListener("scroll", update);
+      list.removeEventListener("scroll", edges);
       observer.disconnect();
     };
-  }, []);
+  }, [edges]);
+  // Tabs added or removed change what there is to scroll to without resizing a list that already overflows.
+  useClientLayoutEffect(edges);
+  // A vertical wheel scrolls a scrollable list sideways; at the end it has nowhere to go, the page scrolls instead.
+  useClientLayoutEffect(() => {
+    const list = ref.current;
+    if (!list || !scrollable) return;
+    const onWheel = (event: WheelEvent) => {
+      if (event.ctrlKey || Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
+      const max = list.scrollWidth - list.clientWidth;
+      const at = Math.abs(list.scrollLeft);
+      if (max <= 1 || (event.deltaY > 0 ? at >= max - 1 : at <= 1)) return;
+      event.preventDefault();
+      const line = Number.parseFloat(getComputedStyle(list).lineHeight) || 16;
+      const unit = event.deltaMode === 1 ? line : event.deltaMode === 2 ? list.clientWidth : 1;
+      list.scrollBy({ left: event.deltaY * unit * (isRtl(list) ? -1 : 1), behavior: "instant" });
+    };
+    list.addEventListener("wheel", onWheel, { passive: false });
+    return () => list.removeEventListener("wheel", onWheel);
+  }, [scrollable]);
+  // A chevron scrolls most of a list's width, so the tab cut at that edge is still in view afterwards.
+  const page = (direction: 1 | -1) => {
+    const list = ref.current;
+    if (!list) return;
+    list.scrollBy({ left: direction * list.clientWidth * 0.8 * (isRtl(list) ? -1 : 1) });
+  };
   // Reveal again whenever the selection changes.
   useClientLayoutEffect(() => {
     reveal(ref.current?.querySelector<HTMLElement>('[role="tab"][aria-selected="true"]') ?? null);
   }, [value, reveal]);
-  const list = (
+  const tablist = (
     <div
       ref={ref}
       role="tablist"
@@ -335,6 +384,33 @@ export function TabList({ label, onReorder, className, children }: TabListProps)
       {children}
     </div>
   );
+  const chevron = (edge: "start" | "end") => (
+    // For the pointer only, like a tab's close button: keyboard users move with the arrows, which reveal the tab.
+    <span className="cy-tab-scroll cy-reset" data-edge={edge} aria-hidden="true">
+      <IconButton
+        icon={edge === "start" ? chevronLeft : chevronRight}
+        flipRtl
+        label={edge === "start" ? labels.scrollBack : labels.scrollForward}
+        variant="ghost"
+        tone="neutral"
+        size="sm"
+        tabIndex={-1}
+        onClick={() => page(edge === "start" ? -1 : 1)}
+      />
+    </span>
+  );
+  // The chevrons and the end content sit beside the list, not in it: a tablist holds only tabs.
+  const list =
+    scrollable || end !== undefined ? (
+      <div ref={strip} className="cy-tab-strip" data-size={size} data-variant={variant}>
+        {scrollable && chevron("start")}
+        {tablist}
+        {scrollable && chevron("end")}
+        {end !== undefined && <div className="cy-tab-end">{end}</div>}
+      </div>
+    ) : (
+      tablist
+    );
   // The announcement sits beside the list, not in it: a tablist holds only tabs, and every child is sortable.
   return reorderable ? (
     <>
