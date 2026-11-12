@@ -569,5 +569,23 @@
     "path": ["dist/components/Checklist/Checklist.js", "dist/styles/checklist.css"],
     "limit": "3 kB",
     "gzip": true
+  },
+  {
+    "name": "IconTile (JS + CSS)",
+    "path": ["dist/components/IconTile/IconTile.js", "dist/styles/icon-tile.css"],
+    "limit": "1.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "Stat (JS + CSS)",
+    "path": ["dist/components/Stat/Stat.js", "dist/styles/stat.css"],
+    "limit": "2.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "List (JS + CSS)",
+    "path": ["dist/components/List/List.js", "dist/styles/list.css"],
+    "limit": "2.5 kB",
+    "gzip": true
   }
 ]

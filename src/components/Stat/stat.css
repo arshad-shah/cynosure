@@ -1,0 +1,136 @@
+/*
+ * Stat: a Card holding an optional IconTile and a description list (label, value, delta, description). The Card draws
+ * the frame and the link states; this sheet lays out the figures. Every value reads a --cy-stat-* token with a global
+ * fallback. Inner parts that set their own font declare the reset properties.
+ */
+.cy-stat.cy-stat {
+  min-inline-size: 0;
+}
+
+/* A linked stat inside a list: the list item only carries the link. */
+.cy-stat-item.cy-stat-item {
+  display: block;
+  padding: 0;
+  list-style: none;
+}
+
+.cy-stat-body.cy-stat-body {
+  --_label: var(--cy-stat-label-color, var(--cy-color-muted));
+  --_value: var(--cy-stat-value-size-md, var(--cy-font-size-2xl));
+  --_text: var(--cy-font-size-sm);
+  display: flex;
+  align-items: flex-start;
+  gap: var(--cy-stat-gap, var(--cy-space-5));
+  min-inline-size: 0;
+  padding: 0;
+  text-align: start;
+  &[data-size="sm"] {
+    --_value: var(--cy-stat-value-size-sm, var(--cy-font-size-xl));
+    --_text: var(--cy-font-size-xs);
+  }
+  &[data-size="lg"] {
+    --_value: var(--cy-stat-value-size-lg, calc(var(--cy-font-size-2xl) * 1.45));
+    --_text: var(--cy-font-size-md);
+  }
+  &[data-align="center"] {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+}
+
+.cy-stat-list.cy-stat-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cy-space-1);
+  flex: 1 1 auto;
+  min-inline-size: 0;
+  padding: 0;
+  [data-align="center"] > & {
+    align-items: center;
+  }
+}
+
+.cy-stat-label.cy-stat-label,
+.cy-stat-description.cy-stat-description {
+  box-sizing: border-box !important;
+  margin: 0;
+  padding: 0;
+  color: var(--_label);
+  font-family: var(--cy-font-sans);
+  font-size: var(--_text);
+  font-weight: var(--cy-font-weight-medium);
+  line-height: var(--cy-font-line-height);
+  letter-spacing: normal;
+  text-transform: none;
+}
+.cy-stat-description.cy-stat-description {
+  font-weight: var(--cy-font-weight-regular);
+}
+
+.cy-stat-value.cy-stat-value {
+  box-sizing: border-box !important;
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: var(--cy-space-2);
+  margin: 0;
+  padding: 0;
+  color: var(--cy-color-ink);
+  font-family: var(--cy-stat-value-font, var(--cy-font-display));
+  font-size: var(--_value);
+  font-weight: var(--cy-stat-value-weight, var(--cy-font-weight-bold));
+  font-variant-numeric: tabular-nums;
+  line-height: 1.15;
+  letter-spacing: normal;
+  text-transform: none;
+  overflow-wrap: anywhere;
+  [data-align="center"] & {
+    justify-content: center;
+  }
+}
+
+.cy-stat-unit.cy-stat-unit {
+  box-sizing: border-box !important;
+  margin: 0;
+  color: var(--_label);
+  font-family: var(--cy-font-sans);
+  font-size: var(--_text);
+  font-weight: var(--cy-font-weight-medium);
+  line-height: inherit;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+.cy-stat-delta.cy-stat-delta {
+  --_tone: var(--cy-color-ink);
+  box-sizing: border-box !important;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cy-space-1);
+  margin: 0;
+  padding: 0;
+  color: var(--_tone);
+  font-family: var(--cy-font-sans);
+  font-size: var(--_text);
+  font-weight: var(--cy-font-weight-medium);
+  font-variant-numeric: tabular-nums;
+  line-height: var(--cy-font-line-height);
+  letter-spacing: normal;
+  text-transform: none;
+  &[data-tone="accent"] {
+    --_tone: var(--cy-color-accent-text);
+  }
+  &[data-tone="danger"] {
+    --_tone: var(--cy-color-danger-text);
+  }
+  &[data-tone="success"] {
+    --_tone: var(--cy-color-success-text);
+  }
+  &[data-tone="warning"] {
+    --_tone: var(--cy-color-warning-text);
+  }
+  &[data-tone="info"] {
+    --_tone: var(--cy-color-info-text);
+  }
+}

@@ -176,6 +176,7 @@ export {
 } from "./components/Heading/index.js";
 export { HoverCard, type HoverCardProps, type HoverCardTokens } from "./components/HoverCard/index.js";
 export { IconButton, type IconButtonProps } from "./components/IconButton/index.js";
+export { IconTile, type IconTileProps, type IconTileTokens } from "./components/IconTile/index.js";
 export { Image, type ImageProps, type ImageTokens } from "./components/Image/index.js";
 export { Inline, type InlineProps } from "./components/Inline/index.js";
 export { Kbd, type KbdProps } from "./components/Kbd/index.js";
@@ -187,6 +188,13 @@ export {
   type KeyValuePair,
 } from "./components/KeyValueEditor/index.js";
 export { Link, type LinkProps } from "./components/Link/index.js";
+export {
+  List,
+  type ListItem,
+  type ListMarker,
+  type ListProps,
+  type ListTokens,
+} from "./components/List/index.js";
 export { LoadingDots, type LoadingDotsProps } from "./components/LoadingDots/index.js";
 export {
   Menu,
@@ -324,6 +332,14 @@ export {
   type StackProps,
   type VisibilityProps,
 } from "./components/Stack/index.js";
+export {
+  Stat,
+  type StatDelta,
+  type StatDirection,
+  type StatLabels,
+  type StatProps,
+  type StatTokens,
+} from "./components/Stat/index.js";
 export {
   type StepItem,
   type StepStatus,
