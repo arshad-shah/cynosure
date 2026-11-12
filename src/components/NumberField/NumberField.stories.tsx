@@ -136,6 +136,17 @@ export const DecimalStepsStayExact: Story = {
   },
 };
 
+export const ExponentSteps: Story = {
+  args: { label: "Tolerance", defaultValue: 0, min: 0, max: 1, step: 1e-7 },
+  play: async ({ canvas, userEvent }) => {
+    const input = canvas.getByRole("spinbutton", { name: "Tolerance" });
+    input.focus();
+    // A step written in exponent notation keeps its decimals instead of rounding to 0.
+    await userEvent.keyboard("{ArrowUp}{ArrowUp}");
+    await expect(input).toHaveAttribute("aria-valuenow", "0.0000002");
+  },
+};
+
 export const CurrencyAndPercent: Story = {
   render: () => (
     <Stack gap="6">

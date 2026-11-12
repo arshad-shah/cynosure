@@ -3,7 +3,7 @@ import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js
 import { useControllableState } from "../../foundations/controllable.js";
 import { useDrag } from "../../foundations/drag.js";
 import { HiddenValue } from "../../foundations/HiddenValue/HiddenValue.js";
-import { clamp } from "../../foundations/math.js";
+import { clamp, plainNumber, roundLike } from "../../foundations/math.js";
 import { minus } from "../../icons/minus.js";
 import { plus } from "../../icons/plus.js";
 import type { Size } from "../../tokens/schema.js";
@@ -75,9 +75,6 @@ export interface NumberFieldProps {
 }
 
 const DEFAULT_LABELS: NumberFieldLabels = { decrement: "Decrease", increment: "Increase" };
-
-/** Decimal places of `n`, so stepping by 0.1 gives 0.3 and not 0.30000000000000004. */
-const places = (n: number) => (String(n).split(".")[1] ?? "").length;
 
 /** Reads what a person typed in `locale`: group separators, the local decimal mark, a typographic minus, a % or a currency. */
 export function parseNumber(
@@ -158,10 +155,9 @@ export function NumberField({
     const base = min ?? 0;
     const from = draft !== null ? (parseNumber(draft, locale, formatOptions) ?? current) : current;
     const start = from ?? (delta > 0 ? (min ?? 0) : (max ?? 0));
-    // Snap onto the step grid (counted from min), then round away floating-point noise.
+    // Snap onto the step grid (counted from min), then round away floating-point noise (0.3, not 0.30000000000000004).
     const snapped = from === null ? start : Math.round((start - base + delta) / step) * step + base;
-    const digits = Math.max(places(step), places(base));
-    commit(limit(Number(snapped.toFixed(digits))));
+    commit(limit(roundLike(snapped, step, base)));
   };
   const commitDraft = () => {
     if (draft === null) return;
@@ -209,8 +205,7 @@ export function NumberField({
     onMove: ({ delta, event }) => {
       const steps = Math.round(delta.x / 4) * (event.shiftKey ? 10 : 1);
       const from = scrubFrom.current ?? min ?? 0;
-      const digits = Math.max(places(step), places(min ?? 0));
-      commit(limit(Number((from + steps * step).toFixed(digits))));
+      commit(limit(roundLike(from + steps * step, step, min ?? 0)));
     },
     onEnd: (_, cancelled) => {
       if (cancelled) commit(scrubFrom.current);
@@ -239,7 +234,7 @@ export function NumberField({
         autoComplete="off"
         autoCorrect="off"
         spellCheck={false}
-        aria-valuenow={current ?? undefined}
+        aria-valuenow={current === null ? undefined : (plainNumber(current) as unknown as number)}
         aria-valuemin={min}
         aria-valuemax={max}
         aria-valuetext={current === null ? undefined : shown(current)}
@@ -286,7 +281,7 @@ export function NumberField({
       <HiddenValue
         name={name}
         form={form}
-        value={current === null ? "" : String(current)}
+        value={current === null ? "" : plainNumber(current)}
         disabled={disabled}
         onReset={() => {
           setDraft(null);

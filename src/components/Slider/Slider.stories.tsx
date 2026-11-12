@@ -145,6 +145,29 @@ export const StepsAndDecimals: Story = {
   },
 };
 
+export const DecimalMinAndTinySteps: Story = {
+  render: (args: SliderProps) => (
+    <>
+      <Slider {...args} label="Half" min={0.5} max={10} step={1} defaultValue={3.5} />
+      <Slider {...args} label="Tiny" min={0} max={0.000001} step={1e-7} defaultValue={0} />
+    </>
+  ),
+  play: async ({ canvas, userEvent }) => {
+    // min 0.5 with step 1: the values are 0.5, 1.5, 2.5…, and Home reaches min itself.
+    const half = canvas.getByRole("slider", { name: "Half" });
+    half.focus();
+    await userEvent.keyboard("{ArrowRight}");
+    await expect(half).toHaveAttribute("aria-valuenow", "4.5");
+    await userEvent.keyboard("{Home}");
+    await expect(half).toHaveAttribute("aria-valuenow", "0.5");
+    // A step written in exponent notation keeps its decimals.
+    const tiny = canvas.getByRole("slider", { name: "Tiny" });
+    tiny.focus();
+    await userEvent.keyboard("{ArrowRight}");
+    await expect(tiny).toHaveAttribute("aria-valuenow", "0.0000001");
+  },
+};
+
 export const RangeThumbsNeverCross: Story = {
   args: { label: "Price", defaultValue: [20, 60], showValue: true },
   play: async ({ args, canvas, canvasElement, userEvent }) => {
