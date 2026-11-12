@@ -50,7 +50,8 @@
 
 /* The screen: content is stretched to it and clipped to its corners; its stacking stays inside it. */
 .cy-device-frame-screen.cy-device-frame-screen {
-  --cy-aspect-ratio-radius: calc(var(--_corner) - var(--_bezel));
+  --_screen-radius: calc(var(--_corner) - var(--_bezel));
+  --cy-aspect-ratio-radius: var(--_screen-radius);
   isolation: isolate;
   background: var(--cy-device-frame-screen, var(--cy-color-bg));
 }
@@ -62,10 +63,10 @@
  */
 .cy-device-frame-content.cy-device-frame-content {
   display: grid;
-  /* Clips the content itself, to the screen's rounded corners: WebKit hit-tests content outside the screen's own
-     clip when it overflows a grid child, so the clip is not left to the screen alone. */
+  /* Clips the content itself to the screen's rounded corners. A clip-path, not only the screen's overflow and radius:
+     WebKit ignores a border-radius clip when it hit-tests, so the content was still under the pointer at a corner. */
   overflow: hidden;
-  border-radius: inherit;
+  clip-path: inset(0 round var(--_screen-radius, 0));
   grid-template: minmax(0, 1fr) / minmax(0, 1fr);
   padding-block-start: var(--_safe-top, 0);
   padding-left: var(--_safe-left, 0);
@@ -227,7 +228,7 @@
     overflow: hidden;
     background: var(--cy-device-frame-browser-bar, var(--cy-color-soft));
     & > .cy-device-frame-screen {
-      --cy-aspect-ratio-radius: 0;
+      --_screen-radius: 0;
     }
   }
 }

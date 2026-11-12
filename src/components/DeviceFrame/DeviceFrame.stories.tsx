@@ -78,12 +78,12 @@ export const ContentIsClippedToTheScreen: Story = {
     await expect(s.height / s.width).toBeCloseTo(4 / 3, 1);
     await expect(getComputedStyle(screen).overflow).toBe("hidden");
     const outside = document.elementFromPoint(s.left + s.width / 2, s.bottom + 4);
-    await expect(outside?.closest(".tall")).toBeNull();
+    await expect(outside?.closest(".tall"), "content below the screen").toBeNull();
     const within = document.elementFromPoint(s.left + s.width / 2, s.bottom - 4);
-    await expect(within?.closest(".tall")).not.toBeNull();
+    await expect(within?.closest(".tall"), "content inside the screen").not.toBeNull();
     // Rounded corners clip too: the very corner of the screen shows the frame, not the content.
     const corner = document.elementFromPoint(s.left + 1, s.top + 1);
-    await expect(corner?.closest(".tall")).toBeNull();
+    await expect(corner?.closest(".tall"), "content at the screen's rounded corner").toBeNull();
   },
 };
 
