@@ -146,6 +146,9 @@ const DEFAULT_LABELS: CalendarLabels = {
 const TONES: readonly string[] = ["accent", "neutral", "danger", "success", "warning", "info"];
 const MAX_DOTS = 3;
 const MONTHS = Array.from({ length: 12 }, (_, i) => i);
+/** What the calendar is drawn with until the browser's own language and weekend are known. */
+const SERVER_LOCALE = "en-US";
+const SERVER_WEEKEND = [6, 0];
 
 /** The heading as a button, and its panel: a year to step through and that year's twelve months. */
 function MonthPicker({
@@ -276,7 +279,15 @@ export function Calendar({
 }: CalendarProps) {
   const text = { ...DEFAULT_LABELS, ...labels };
   const id = useId();
-  const today = todayProp ?? toISODate(new Date());
+  // The device's date, its language and the default locale are only known in the browser. Until they settle there
+  // (before the first paint), the calendar draws what a server would: no day marked as today, names in `locale` or
+  // English, weeks from Monday with a Saturday and Sunday weekend. So the server's markup and the browser's match.
+  const [settled, setSettled] = useState(false);
+  useClientLayoutEffect(() => setSettled(true), []);
+  const today = todayProp ?? (settled ? toISODate(new Date()) : null);
+  const names = settled ? locale : (locale ?? SERVER_LOCALE);
+  /** Where the calendar starts when nothing else says: today (on a server, the server's date). */
+  const start = () => todayProp ?? toISODate(new Date());
   const [selected, setSelected] = useControllableState<string | null>(
     value,
     defaultValue,
@@ -284,7 +295,7 @@ export function Calendar({
   );
   const [month, setMonth] = useControllableState<string>(
     monthProp?.slice(0, 7),
-    () => (defaultMonth ?? clampDate(selected ?? defaultFocusedDate ?? today, min, max)).slice(0, 7),
+    () => (defaultMonth ?? clampDate(selected ?? defaultFocusedDate ?? start(), min, max)).slice(0, 7),
     (next) => onMonthChange?.(`${next}-01`),
   );
   // The focused day is always a day of the month shown: the same day number, kept within the limits where it can be.
@@ -294,7 +305,7 @@ export function Calendar({
     return day.slice(0, 7) === m ? day : inMonth(date, m);
   };
   const [focused, setFocusedState] = useState(() =>
-    within(clampDate(selected ?? defaultFocusedDate ?? today, min, max), month),
+    within(clampDate(selected ?? defaultFocusedDate ?? start(), min, max), month),
   );
   const grid = useRef<HTMLTableElement>(null);
   const moveFocus = useRef(false);
@@ -358,8 +369,8 @@ export function Calendar({
   };
 
   // The weeks shown: from the week holding the 1st to the week holding the last day.
-  const weekStart = weekStartsOn ?? firstDayOfWeek(locale);
-  const weekend = weekendDays(locale);
+  const weekStart = weekStartsOn ?? (settled ? firstDayOfWeek(locale) : 1);
+  const weekend = settled ? weekendDays(locale) : SERVER_WEEKEND;
   const first = fromISODate(`${month}-01`) as Date;
   const lead = (first.getDay() - weekStart + 7) % 7;
   const gridStart = addDays(`${month}-01`, -lead);
@@ -369,9 +380,9 @@ export function Calendar({
     Array.from({ length: 7 }, (_, d) => addDays(gridStart, w * 7 + d)),
   );
 
-  const weekday = (style: "long" | "short") => new Intl.DateTimeFormat(locale, { weekday: style });
-  const fullDate = new Intl.DateTimeFormat(locale, { dateStyle: "full" });
-  const dayNumber = new Intl.DateTimeFormat(locale, { day: "numeric" });
+  const weekday = (style: "long" | "short") => new Intl.DateTimeFormat(names, { weekday: style });
+  const fullDate = new Intl.DateTimeFormat(names, { dateStyle: "full" });
+  const dayNumber = new Intl.DateTimeFormat(names, { day: "numeric" });
 
   const onKeyDown = (event: KeyboardEvent<HTMLTableElement>) => {
     const across = isRtl(event.currentTarget) ? -1 : 1;
@@ -400,7 +411,7 @@ export function Calendar({
   const nextMonth = addMonths(`${month}-01`, 1);
   const title = (
     <span className="cy-calendar-title cy-reset" id={`${id}-title`} aria-live="polite">
-      {new Intl.DateTimeFormat(locale, { month: "long", year: "numeric" }).format(first)}
+      {new Intl.DateTimeFormat(names, { month: "long", year: "numeric" }).format(first)}
     </span>
   );
   return (
@@ -422,15 +433,7 @@ export function Calendar({
           onClick={() => page(-1)}
         />
         {monthPicker ? (
-          <MonthPicker
-            month={month}
-            onPick={show}
-            min={min}
-            max={max}
-            locale={locale}
-            text={text}
-            size={size}
-          >
+          <MonthPicker month={month} onPick={show} min={min} max={max} locale={names} text={text} size={size}>
             {title}
           </MonthPicker>
         ) : (
