@@ -295,6 +295,12 @@ export {
   type PanZoomCanvasTokens,
 } from "./components/PanZoomCanvas/index.js";
 export {
+  PathField,
+  type PathFieldLabels,
+  type PathFieldProps,
+  type PathFieldTokens,
+} from "./components/PathField/index.js";
+export {
   Popover,
   type PopoverProps,
   type PopoverTokens,
