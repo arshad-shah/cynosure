@@ -79,7 +79,10 @@ export interface TableProps<Row> {
   selected?: string[] | undefined;
   /** Ids of the rows selected at the start when uncontrolled. */
   defaultSelected?: string[];
-  /** Called when a row's checkbox or select-all changes, with the selected ids in row order. */
+  /**
+   * Called when a row's checkbox or select-all changes, with the selected ids: those not in `rows` (another page,
+   * filtered out) first, then the shown ones in row order. Select-all acts on the shown rows only.
+   */
   onSelectionChange?: ((ids: string[]) => void) | undefined;
   /** The header stays visible while the body scrolls inside the table. */
   stickyHeader?: boolean;
@@ -161,12 +164,16 @@ export function Table<Row>({
     else if (currentSort.direction === "ascending") setSort({ key, direction: "descending" });
     else setSort(null);
   };
+  const allIds = rows.map(getRowId);
+  /** `next` is the choice among the rows shown; ids not among them (another page, filtered out) stay selected. */
   const setSelected = (next: Set<string>) => {
-    const ids = rows.map(getRowId).filter((rowId) => next.has(rowId));
-    setChosen(ids);
+    const here = new Set(allIds);
+    setChosen([
+      ...chosenIds.filter((rowId) => !here.has(rowId)),
+      ...allIds.filter((rowId) => next.has(rowId)),
+    ]);
   };
 
-  const allIds = rows.map(getRowId);
   const chosenCount = allIds.filter((rowId) => chosen.has(rowId)).length;
   const rowName = (row: Row) => {
     const v = headerColumn?.cell ? headerColumn.cell(row) : cellValue(row, headerColumn?.key ?? "");
