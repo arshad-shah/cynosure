@@ -45,6 +45,10 @@ The child must be one focusable element (a Button, IconButton or Link). Keep `co
 
 Hover opens after `delay` milliseconds (default `300`). Keyboard focus opens it immediately.
 
+## Sometimes, or for the eye only
+
+`disabled` turns the tooltip off without remounting its trigger, for a tooltip that only matters some of the time, such as the full text of a label while it is cut short. `describe={false}` is for a tip that repeats the trigger's own name (that same cut-short label): it still shows, but screen readers, which already hear the name, are not read it again as a description. Tabs uses both for long tab labels.
+
 ## Props
 
 <ArgTypes of={Stories} />

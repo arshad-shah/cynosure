@@ -67,6 +67,55 @@
   }
 }
 
+/* A scrollable list's chevrons and the end content sit with the list in a strip, which draws the line under them all. */
+.cy-tab-strip.cy-tab-strip {
+  box-sizing: border-box !important;
+  display: flex;
+  align-items: center;
+  gap: var(--cy-space-1);
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+  font-size: var(--cy-font-size-md);
+  line-height: var(--cy-font-line-height);
+  letter-spacing: normal;
+  text-transform: none;
+  &[data-variant="line"] {
+    box-shadow: inset 0 calc(-1 * var(--cy-border-width)) 0 var(--cy-color-line);
+  }
+  &[data-size="sm"] {
+    font-size: var(--cy-font-size-sm);
+  }
+  &[data-size="lg"] {
+    font-size: var(--cy-font-size-lg);
+  }
+  /* The list takes only the room its tabs need, so the end content follows the last tab until they overflow. */
+  & > .cy-tab-list {
+    flex: 0 1 auto;
+    box-shadow: none;
+  }
+  & > .cy-tab-scroll {
+    display: none;
+    flex: none;
+  }
+  /* While the tabs overflow both chevrons keep their place (so the list does not jump), shown only toward more tabs. */
+  &[data-overflow] > .cy-tab-scroll {
+    display: inline-flex;
+  }
+  &:not([data-more-start]) > .cy-tab-scroll[data-edge="start"],
+  &:not([data-more-end]) > .cy-tab-scroll[data-edge="end"] {
+    visibility: hidden;
+  }
+}
+
+.cy-tab-end.cy-tab-end {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: var(--cy-space-1);
+  font-size: inherit;
+}
+
 .cy-tab.cy-tab {
   box-sizing: border-box !important;
   position: relative;
@@ -155,7 +204,7 @@
   flex: none;
   align-items: center;
   font-size: inherit;
-  & > .cy-tab {
+  & > .cy-tab-tip > .cy-tab {
     padding-inline-end: calc(var(--cy-control-height-sm) + var(--cy-space-1));
   }
   & > .cy-tab-close {
@@ -164,12 +213,33 @@
     inset-inline-end: var(--cy-space-1);
     top: 50%;
     translate: 0 -50%;
+    transition: opacity var(--cy-motion-fast) var(--cy-motion-ease);
+  }
+  /* Unsaved changes: a dot centred where the close button is, never in the way of a press on it. */
+  & > .cy-tab-dirty {
+    --_dot: var(--cy-space-4);
+    box-sizing: border-box;
+    position: absolute;
+    inset-inline-end: calc(var(--cy-space-1) + (var(--cy-control-height-sm) - var(--_dot)) / 2);
+    top: 50%;
+    translate: 0 -50%;
+    inline-size: var(--_dot);
+    block-size: var(--_dot);
+    border-radius: 50%;
+    background: var(--cy-tabs-dirty, var(--cy-color-muted));
+    pointer-events: none;
+    transition: opacity var(--cy-motion-fast) var(--cy-motion-ease);
   }
 }
 @media (hover: hover) {
   .cy-tab-slot.cy-tab-slot:not(:hover, :focus-within, [data-selected]) > .cy-tab-close {
     opacity: 0;
   }
+}
+/* The dot turns into the close button while the tab is hovered or focused (selected or not). */
+.cy-tab-slot.cy-tab-slot[data-dirty]:not(:hover, :focus-within) > .cy-tab-close,
+.cy-tab-slot.cy-tab-slot[data-dirty]:is(:hover, :focus-within):has(> .cy-tab-close) > .cy-tab-dirty {
+  opacity: 0;
 }
 .cy-tab-list.cy-tab-list[data-reorderable] .cy-tab {
   user-select: none;
@@ -180,7 +250,18 @@
   font-size: inherit;
 }
 
+/* Every tab sits in the anchor of the tooltip that shows a cut-short label in full. */
+.cy-tab-tip.cy-tab-tip {
+  flex: none;
+  min-inline-size: 0;
+}
+
 .cy-tab-label {
+  min-inline-size: 0;
+  max-inline-size: var(--cy-tabs-label-max-width, 20em);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font-size: inherit;
   line-height: inherit;
 }
@@ -210,11 +291,15 @@
   .cy-tab-list.cy-tab-list {
     scroll-behavior: auto;
   }
-  .cy-tab.cy-tab {
+  .cy-tab.cy-tab,
+  .cy-tab-slot.cy-tab-slot > * {
     transition: none;
   }
 }
 @media (forced-colors: active) {
+  .cy-tab-slot.cy-tab-slot > .cy-tab-dirty {
+    background: CanvasText;
+  }
   .cy-tab.cy-tab[aria-selected="true"] {
     outline: var(--cy-border-width) solid Highlight;
   }
