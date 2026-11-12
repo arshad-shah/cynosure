@@ -89,6 +89,10 @@
       "types": "./dist/icons/index.d.ts",
       "default": "./dist/icons/index.js"
     },
+    "./icons/by-name": {
+      "types": "./dist/icons/by-name.d.ts",
+      "default": "./dist/icons/by-name.js"
+    },
     "./brands": {
       "types": "./dist/brands/index.d.ts",
       "default": "./dist/brands/index.js"

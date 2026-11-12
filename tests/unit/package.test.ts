@@ -14,6 +14,7 @@ describe("package manifest", () => {
     expect(Object.keys(pkg.exports)).toEqual([
       ".",
       "./icons",
+      "./icons/by-name",
       "./brands",
       "./tokens",
       "./styles.css",

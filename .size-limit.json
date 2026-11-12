@@ -719,7 +719,19 @@
   {
     "name": "PathField",
     "path": ["dist/components/PathField/PathField.js", "dist/styles/path-field.css"],
-    "limit": "3 kB",
+    "limit": "1.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "icons/by-name (every Facet icon)",
+    "path": [
+      "dist/icons/*.js",
+      "!dist/icons/index.js",
+      "!dist/icons/keywords.js",
+      "!dist/icons/to-svg.js",
+      "!dist/icons/validate.js"
+    ],
+    "limit": "65.5 kB",
     "gzip": true
   }
 ]

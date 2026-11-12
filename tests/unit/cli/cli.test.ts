@@ -279,7 +279,7 @@ describe("cy new icon", () => {
     expect(mod).toContain('name: "flat-line"');
     expect(mod).toContain('category: "actions"');
     expect(mod).toContain('["rect", { x: 3, y: 3, width: 6, height: 6, rx: 1.5 }]');
-    expect(readFileSync(join(root, "src/icons/index.ts"), "utf8")).toContain(
+    expect(readFileSync(join(root, "src/icons/facet.ts"), "utf8")).toContain(
       'export { flatLine } from "./flat-line.js";',
     );
   });
