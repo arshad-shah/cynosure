@@ -59,7 +59,7 @@ export interface DataGridColumn<Row> {
   /** The header's content. */
   header: ReactNode;
   /** Starting width in CSS pixels. Default 160. A new value replaces a width the user dragged. */
-  width?: number;
+  width?: number | undefined;
   /** Narrowest the column can be resized to. Default 48. */
   minWidth?: number;
   /** Widest the column can be resized to. Default: no limit. */
@@ -393,13 +393,9 @@ export function DataGrid<Row>({
     const ctrl = event.ctrlKey || event.metaKey;
     const rtl = isRtl(at.el);
     const column = columns[col] as DataGridColumn<Row>;
-    // Alt+Left/Right on a resizable header moves its edge.
-    if (
-      row < 0 &&
-      column.resizable &&
-      event.altKey &&
-      (event.key === "ArrowLeft" || event.key === "ArrowRight")
-    ) {
+    // Alt+Left/Right on a resizable header moves its edge (and on other headers, nothing).
+    if (row < 0 && event.altKey && (event.key === "ArrowLeft" || event.key === "ArrowRight")) {
+      if (!column.resizable) return;
       event.preventDefault();
       const [lo, hi] = limits(column);
       const to = stepKey(event, {

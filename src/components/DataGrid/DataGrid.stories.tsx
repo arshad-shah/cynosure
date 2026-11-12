@@ -1,6 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { useState } from "react";
 import { expect, fn, waitFor } from "storybook/test";
 import { computeUnderHostileHost } from "../../test/hostile.js";
+import { Button } from "../Button/Button.js";
+import { Stack } from "../Stack/Stack.js";
 import { DataGrid, type DataGridColumn, type DataGridProps } from "./DataGrid.js";
 
 /** A hundred thousand rows by fifty columns: rows are their own index, and each cell is worked out when shown. */
@@ -265,6 +268,115 @@ export const SortByAColumnThatIsGone: Story = {
   args: { ...people, defaultSort: { key: "missing", direction: "ascending" } },
   play: async ({ canvasElement }) => {
     await expect(names(canvasElement)).toEqual(["Grace", "ada", "Linus", "Barbara"]);
+  },
+};
+
+const width = (el: Element | null) => Math.round((el as HTMLElement).getBoundingClientRect().width);
+const header = (el: Element, name: string) =>
+  [...el.querySelectorAll<HTMLElement>('[role="columnheader"]')].find(
+    (h) => h.textContent === name,
+  ) as HTMLElement;
+/** Drags column `col`'s edge by `dx` pixels with a mouse (or `pointerType`), releasing unless told not to. */
+function dragEdge(el: Element, col: number, dx: number, { pointerType = "mouse", release = true } = {}) {
+  const edge = el.querySelector(`.cy-data-grid-resize[data-col="${col}"]`) as HTMLElement;
+  const r = edge.getBoundingClientRect();
+  const x = r.left + r.width / 2;
+  const y = r.top + r.height / 2;
+  const init = {
+    bubbles: true,
+    cancelable: true,
+    pointerId: 7,
+    pointerType,
+    isPrimary: true,
+    button: 0,
+    buttons: 1,
+  };
+  edge.dispatchEvent(new PointerEvent("pointerdown", { ...init, clientX: x, clientY: y }));
+  for (const step of [dx / 2, dx])
+    window.dispatchEvent(new PointerEvent("pointermove", { ...init, clientX: x + step, clientY: y }));
+  if (release)
+    window.dispatchEvent(new PointerEvent("pointerup", { ...init, buttons: 0, clientX: x + dx, clientY: y }));
+}
+
+/** People whose Name column's width the parent can set (as a saved layout would). */
+function Resettable(props: Partial<DataGridProps<Person>>) {
+  const [nameWidth, setNameWidth] = useState<number | undefined>(undefined);
+  const columns = PEOPLE_COLUMNS.map((c) => (c.key === "name" ? { ...c, width: nameWidth } : c));
+  return (
+    <Stack gap="3">
+      <DataGrid {...(people as DataGridProps<Person>)} {...props} columns={columns} />
+      <Button onClick={() => setNameWidth(300)}>Saved layout</Button>
+    </Stack>
+  );
+}
+
+export const DragAHeaderEdgeToResize: Story = {
+  render: (args) => <Resettable {...(args as Partial<DataGridProps<Person>>)} />,
+  args: people,
+  play: async ({ args, canvas, canvasElement, userEvent }) => {
+    const name = header(canvasElement, "Name");
+    await expect(width(name)).toBe(160);
+    const cityAt = header(canvasElement, "City").getBoundingClientRect().left;
+    dragEdge(canvasElement, 0, 40);
+    // The header, its cells and the columns after it all follow.
+    await waitFor(() => expect(width(name)).toBe(200));
+    await expect(width(cell(canvasElement, "Grace"))).toBe(200);
+    await expect(Math.round(header(canvasElement, "City").getBoundingClientRect().left - cityAt)).toBe(40);
+    await expect(args.onColumnResize).toHaveBeenLastCalledWith("name", 200);
+    // Escape during a drag puts the width back and reports nothing.
+    dragEdge(canvasElement, 0, 60, { release: false });
+    await waitFor(() => expect(width(name)).toBe(260));
+    window.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true, cancelable: true }));
+    await waitFor(() => expect(width(name)).toBe(200));
+    await expect(args.onColumnResize).toHaveBeenCalledTimes(1);
+    // minWidth and maxWidth bound it (48 when not given).
+    dragEdge(canvasElement, 0, -400);
+    await waitFor(() => expect(width(name)).toBe(48));
+    dragEdge(canvasElement, 2, 400);
+    await waitFor(() => expect(width(header(canvasElement, "City"))).toBe(240));
+    await expect(args.onColumnResize).toHaveBeenLastCalledWith("city", 240);
+    // A drag that ends where it started reports nothing; a column that does not resize has no edge.
+    dragEdge(canvasElement, 2, 0);
+    await expect(args.onColumnResize).toHaveBeenCalledTimes(3);
+    await expect(canvasElement.querySelector('.cy-data-grid-resize[data-col="1"]')).toBeNull();
+    // Pressing the header elsewhere sorts, never resizes.
+    await userEvent.click(canvas.getByRole("button", { name: "Name" }));
+    await expect(width(name)).toBe(48);
+    // A new width from the parent replaces the one dragged.
+    await userEvent.click(canvas.getByRole("button", { name: "Saved layout" }));
+    await expect(width(header(canvasElement, "Name"))).toBe(300);
+  },
+};
+
+export const ResizeFromTheKeyboard: Story = {
+  args: people,
+  play: async ({ args, canvas, canvasElement, userEvent }) => {
+    await userEvent.tab();
+    await userEvent.keyboard("{ArrowUp}");
+    await expect(document.activeElement).toBe(canvas.getByRole("button", { name: "Name" }));
+    await expect(document.activeElement).toHaveAttribute("aria-keyshortcuts", "Alt+ArrowLeft Alt+ArrowRight");
+    // Alt+Right widens by 8, Shift by 64, Alt+Left narrows; focus stays on the header.
+    await userEvent.keyboard("{Alt>}{ArrowRight}{/Alt}");
+    await expect(width(header(canvasElement, "Name"))).toBe(168);
+    await expect(args.onColumnResize).toHaveBeenLastCalledWith("name", 168);
+    await userEvent.keyboard("{Alt>}{Shift>}{ArrowRight}{/Shift}{/Alt}");
+    await expect(width(header(canvasElement, "Name"))).toBe(232);
+    await userEvent.keyboard("{Alt>}{ArrowLeft}{/Alt}");
+    await expect(width(header(canvasElement, "Name"))).toBe(224);
+    await expect(document.activeElement).toBe(canvas.getByRole("button", { name: "Name" }));
+    // A column that does not resize ignores Alt+arrows (focus stays put).
+    await userEvent.keyboard("{ArrowRight}");
+    await expect(document.activeElement).toBe(canvas.getByRole("button", { name: "Age" }));
+    await expect(document.activeElement).not.toHaveAttribute("aria-keyshortcuts");
+    await userEvent.keyboard("{Alt>}{ArrowRight}{/Alt}");
+    await expect(document.activeElement).toBe(canvas.getByRole("button", { name: "Age" }));
+    await expect(width(header(canvasElement, "Age"))).toBe(96);
+    // The max holds.
+    await userEvent.keyboard("{ArrowRight}{Alt>}{Shift>}{ArrowRight}{ArrowRight}{/Shift}{/Alt}");
+    await expect(width(header(canvasElement, "City"))).toBe(240);
+    // In a body cell, Alt+arrows move focus as plain arrows do.
+    await userEvent.keyboard("{ArrowDown}{Alt>}{ArrowLeft}{/Alt}");
+    await expect(focused()).toBe("85");
   },
 };
 
