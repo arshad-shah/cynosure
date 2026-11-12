@@ -251,12 +251,16 @@ export const PointerEdges: Story = {
 
 export const KeyEdges: Story = {
   play: async ({ args, canvas, canvasElement, userEvent }) => {
-    // While one row is moving by keyboard, Space on another handle does nothing.
+    // While one row is moving by keyboard, Space on another handle does nothing (keys sent there without moving
+    // focus, a script or an assistive tool: moving focus would cancel the move).
     canvas.getByRole("button", { name: "Move Inbox" }).focus();
     await userEvent.keyboard(" ");
-    canvas.getByRole("button", { name: "Move Drafts" }).focus();
-    await userEvent.keyboard(" {ArrowDown}");
+    const drafts = canvas.getByRole("button", { name: "Move Drafts" });
+    for (const key of [" ", "ArrowDown"])
+      drafts.dispatchEvent(new KeyboardEvent("keydown", { key, bubbles: true, cancelable: true }));
     await expect(order(canvasElement)).toEqual(["inbox", "docs", "drafts", "archive"]);
+    await expect(drafts).toHaveAttribute("aria-pressed", "false");
+    await userEvent.keyboard("{Escape}");
     // Picking up and dropping without moving changes nothing and calls nothing.
     canvas.getByRole("button", { name: "Move Inbox" }).focus();
     await userEvent.keyboard(" {ArrowUp} ");

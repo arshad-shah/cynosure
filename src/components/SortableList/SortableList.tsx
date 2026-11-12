@@ -178,11 +178,18 @@ export function SortableList({
     if (to === p.to) return;
     setTarget(to);
     setSaid(text.moved(p.item.label, to + 1, committed.length));
-    // The moved row's handle keeps focus as it changes place.
-    requestAnimationFrame(() => handleOf(p.item.id)?.focus());
+    refocus.current = p.item.id;
   };
+  // The moved row's handle keeps focus as it changes place: put back in the same commit, so nothing (a click) can come
+  // between the row moving and its handle taking focus again.
+  const refocus = useRef<string | null>(null);
+  useClientLayoutEffect(() => {
+    if (refocus.current === null) return;
+    handleOf(refocus.current)?.focus();
+    refocus.current = null;
+  });
   // Focus leaving the handle mid-move (a click elsewhere, a screen reader's own navigation) cancels the move. A row
-  // changing place can blur its handle for a moment, so check once that frame's refocus has run.
+  // changing place can blur its handle for a moment, so check again a frame later.
   const onBlur = (item: SortableItem) => () => {
     const m = movingRef.current;
     if (m?.id !== item.id || m.by !== "keyboard") return;
