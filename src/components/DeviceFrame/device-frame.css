@@ -62,6 +62,10 @@
  */
 .cy-device-frame-content.cy-device-frame-content {
   display: grid;
+  /* Clips the content itself, to the screen's rounded corners: WebKit hit-tests content outside the screen's own
+     clip when it overflows a grid child, so the clip is not left to the screen alone. */
+  overflow: hidden;
+  border-radius: inherit;
   grid-template: minmax(0, 1fr) / minmax(0, 1fr);
   padding-block-start: var(--_safe-top, 0);
   padding-left: var(--_safe-left, 0);
