@@ -4,7 +4,7 @@ Verql v1 (Electron, React) is reworked onto Cynosure alone: no primitives, Tailw
 
 The list was assessed on 2026-11-12 against `@arshad-shah/cynosure@0.4.0` and Verql `main` at `c95ca58`. Every gap below was checked against the props in the source; the bugs in Phase 0 were traced through the code (none run in a browser yet). The rule from Plans 7 and 9 holds: a prop on an existing component where one fits, a new component only when nothing covers the need.
 
-Status: **planned**. Release in one go when Arshad says so.
+Status: **Phase 0 done** (2026-11-12), except item 24 (not a bug) and item 33 (not shown here). Phases 1 to 5 next. Release in one go when Arshad says so.
 
 ## Decisions (Arshad, 2026-11-12)
 
@@ -61,7 +61,7 @@ Where Verql positions things today, and who owns each:
 21. **ColorField:** controlled, it loses saturation at black (HSV rebuilt from RGB; `ColorField.tsx:168`).
 22. **Calendar:** possible hydration mismatch: `new Date()`, the `navigator.language` fallback and the default `Intl` locale differ between server and client (`Calendar.tsx:279,361`). Settle them on the client.
 23. **ChoiceBase:** `indeterminate` is lost after a click while the parent keeps it true (`ChoiceBase.tsx:30`).
-24. **FileDrop:** the drag depth goes negative after a non-file drag, so the highlight drops out (`FileDrop.tsx:221`, `:177`).
+24. ~~**FileDrop:** the drag depth goes negative after a non-file drag.~~ **Not a bug:** `reset()` sets the depth back to 0 whenever it reaches 0 or below; a story passed on the old code.
 25. **CompareSlider:** `onChange` fires when the value did not change (`CompareSlider.tsx:80`).
 26. **SearchField:** Escape during IME composition clears the query (`SearchField.tsx:35`).
 27. **Listbox type-ahead:** with nothing active, one letter starts at item 1, skipping item 0 (`listbox.ts:39`).
@@ -70,7 +70,7 @@ Where Verql positions things today, and who owns each:
 30. **Toast:** the swipe is hand-written pointer code instead of `useDrag` (rule 7; `Toast.tsx:363`); the exit wait reads only the first duration and no delay (`Toast.tsx:336`).
 31. **AppShell:** the drawer reopens after the shell widens and narrows again (`AppShell.tsx:119`).
 32. **React 18 SSR:** raw `useLayoutEffect` in CynosureTheme, Tree, Tabs, Tooltip, Combobox, TagInput and `use-anchored-position`; use `useClientLayoutEffect`.
-33. **DocumentViewport:** fit-width may flip as the scrollbar comes and goes; add `scrollbar-gutter: stable` (plausible, `DocumentViewport.tsx:148`).
+33. **DocumentViewport:** fit-width may flip as the scrollbar comes and goes; add `scrollbar-gutter: stable` (plausible, `DocumentViewport.tsx:148`). **Open:** headless Chromium hides scrollbars, so it could not be shown here; check in a headed browser. Also `sizesAt(scale)` builds a new array every render, which busts `useVirtualWindow`'s memo.
 34. **Slider:** a controlled `value` outside `min`/`max` is not clamped, so the thumb and `aria-valuenow` go out of range.
 35. **TimeField:** arrow-key minute steps do not snap to the `step` grid.
 36. **TextArea:** auto-height is not recomputed when the width changes (no ResizeObserver).
