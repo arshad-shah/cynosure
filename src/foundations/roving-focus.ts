@@ -6,6 +6,11 @@ export interface RovingOptions {
   loop?: boolean;
   /** Items are elements inside the container matching this selector. */
   selector?: string;
+  /**
+   * Also treat an item marked `aria-current` (the open entry of a list of links or buttons) as the selection: the tab
+   * stop starts on it and follows it while focus is elsewhere. Default false.
+   */
+  current?: boolean;
 }
 
 /**
@@ -30,7 +35,7 @@ const ownsArrowKeys = (el: HTMLElement) =>
  * Home and End jump; horizontal arrows follow the reading direction (RTL aware).
  */
 export function useRovingFocus(container: RefObject<HTMLElement | null>, options: RovingOptions = {}) {
-  const { orientation = "horizontal", loop = true, selector = "[data-roving]" } = options;
+  const { orientation = "horizontal", loop = true, selector = "[data-roving]", current = false } = options;
   useEffect(() => {
     const root = container.current;
     if (!root) return;
@@ -48,7 +53,9 @@ export function useRovingFocus(container: RefObject<HTMLElement | null>, options
       items().find(
         (el) =>
           enabled(el) &&
-          (el.getAttribute("aria-selected") === "true" || el.getAttribute("aria-checked") === "true"),
+          (el.getAttribute("aria-selected") === "true" ||
+            el.getAttribute("aria-checked") === "true" ||
+            (current && !!el.getAttribute("aria-current") && el.getAttribute("aria-current") !== "false")),
       );
     let stop: HTMLElement | undefined = selected() ?? items().find(enabled);
     const sync = () => {
@@ -65,7 +72,7 @@ export function useRovingFocus(container: RefObject<HTMLElement | null>, options
       childList: true,
       subtree: true,
       attributes: true,
-      attributeFilter: ["disabled", "aria-disabled", "aria-selected", "aria-checked"],
+      attributeFilter: ["disabled", "aria-disabled", "aria-selected", "aria-checked", "aria-current"],
     });
 
     const onFocusIn = (e: FocusEvent) => {
@@ -105,5 +112,5 @@ export function useRovingFocus(container: RefObject<HTMLElement | null>, options
       root.removeEventListener("focusin", onFocusIn);
       root.removeEventListener("keydown", onKeyDown);
     };
-  }, [container, orientation, loop, selector]);
+  }, [container, orientation, loop, selector, current]);
 }
