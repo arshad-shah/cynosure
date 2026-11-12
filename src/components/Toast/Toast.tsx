@@ -22,6 +22,7 @@ import { ToastHostContext, type ToastHostRegistry } from "../../overlay/toast-ho
 import type { Tone } from "../../tokens/schema.js";
 import { Button } from "../Button/Button.js";
 import { IconButton } from "../IconButton/IconButton.js";
+import { LoadingDots } from "../LoadingDots/LoadingDots.js";
 import { type Space, space } from "../Stack/space.js";
 
 export interface ToastTokens {
@@ -43,7 +44,16 @@ declare module "../../tokens/schema.js" {
 
 export type ToastTone = Extract<Tone, "neutral" | "success" | "danger" | "warning" | "info">;
 
+/** Why a toast closed: its timer ran out, the user closed it (close button or swipe), or `dismiss()` was called. */
+export type ToastDismissReason = "timeout" | "user" | "programmatic";
+
 export interface ToastOptions {
+  /**
+   * Names the toast. Calling `toast()` again with the id of a toast that is still showing updates that toast in place
+   * (a loading toast becoming done) instead of adding another; its timer starts again with the new `duration`.
+   * Default: a new id for every call.
+   */
+  id?: string;
   title: string;
   description?: string;
   /** Colour and icon. `danger` is announced assertively (`role="alert"`); the others politely. */
@@ -52,10 +62,17 @@ export interface ToastOptions {
   action?: { label: string; onClick: () => void };
   /** Milliseconds before it closes itself (default 5000). `Infinity` keeps it until dismissed. */
   duration?: number;
+  /**
+   * Work in progress: a spinner in place of the tone's icon, and no timer until the toast is updated (`toast()` with
+   * the same `id`) or dismissed.
+   */
+  loading?: boolean;
+  /** Called once when the toast starts to close, with its id and why it closed. */
+  onDismiss?: (id: string, reason: ToastDismissReason) => void;
 }
 
 export interface ToastApi {
-  /** Shows a toast and returns its id. */
+  /** Shows a toast and returns its id; with the `id` of a toast that is showing, updates that toast instead. */
   toast: (options: ToastOptions) => string;
   /** Closes one toast, or all of them without an id. */
   dismiss: (id?: string) => void;
@@ -112,6 +129,8 @@ export interface ToasterProps {
 
 interface Item extends ToastOptions {
   id: string;
+  /** Counts updates, so an update restarts the timer even when its duration is unchanged. */
+  version: number;
   leaving?: boolean;
 }
 
@@ -143,7 +162,8 @@ type RegionEl = HTMLElement & { showPopover?: () => void; hidePopover?: () => vo
 /** What a toast keeps when its element is re-created (the region moved into or out of a Dialog). */
 interface Memory {
   announced: boolean;
-  remaining?: number;
+  /** Time left on the timer of one version of the toast; an update starts a timer of its own. */
+  remaining?: { version: number; ms: number };
 }
 type MemoryMap = Map<string, Memory>;
 
@@ -164,6 +184,13 @@ export function Toaster({
   const prefix = useId();
   const count = useRef(0);
   const [items, setItems] = useState<Item[]>([]);
+  // The store as of the last change, read synchronously by toast() and dismiss() (two calls in one handler see each
+  // other), so updates find their toast and onDismiss is called outside a state updater, exactly once.
+  const store = useRef<Item[]>([]);
+  const commit = useCallback((next: Item[]) => {
+    store.current = next;
+    setItems(next);
+  }, []);
   const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
   const [hidden, setHidden] = useState(false);
@@ -182,39 +209,56 @@ export function Toaster({
   );
   const host = hosts.at(-1) ?? null;
 
-  const remove = useCallback((id: string) => {
-    memory.current.delete(id);
-    setItems((list) => list.filter((t) => t.id !== id));
-  }, []);
-  const dismiss = useCallback((id?: string) => {
-    // Closing the toast that holds focus (its close button, from the keyboard): hand focus to the next toast's close
-    // button, or let the region stop pausing if there is none.
-    const active = deepActiveElement(region.current?.ownerDocument);
-    const holder = active?.closest<HTMLElement>(".cy-toast");
-    if (holder && region.current?.contains(holder) && (id === undefined || holder.dataset.id === id)) {
-      const others = [
-        ...region.current.querySelectorAll<HTMLElement>(
-          ".cy-toast:not([data-collapsed]):not([data-leaving])",
-        ),
-      ];
-      const next = id === undefined ? undefined : others.find((t) => t !== holder);
-      const button = next ? [...next.querySelectorAll<HTMLElement>("button")].at(-1) : undefined;
-      if (button) button.focus();
-      else {
-        (active as HTMLElement).blur();
-        setFocused(false);
+  const remove = useCallback(
+    (id: string) => {
+      memory.current.delete(id);
+      commit(store.current.filter((t) => t.id !== id));
+    },
+    [commit],
+  );
+  const close = useCallback(
+    (id: string | undefined, reason: ToastDismissReason) => {
+      const ending = store.current.filter((t) => !t.leaving && (id === undefined || t.id === id));
+      if (ending.length === 0) return;
+      // Closing the toast that holds focus (its close button, from the keyboard): hand focus to the next toast's close
+      // button, or let the region stop pausing if there is none.
+      const active = deepActiveElement(region.current?.ownerDocument);
+      const holder = active?.closest<HTMLElement>(".cy-toast");
+      if (holder && region.current?.contains(holder) && (id === undefined || holder.dataset.id === id)) {
+        const others = [
+          ...region.current.querySelectorAll<HTMLElement>(
+            ".cy-toast:not([data-collapsed]):not([data-leaving])",
+          ),
+        ];
+        const next = id === undefined ? undefined : others.find((t) => t !== holder);
+        const button = next ? [...next.querySelectorAll<HTMLElement>("button")].at(-1) : undefined;
+        if (button) button.focus();
+        else {
+          (active as HTMLElement).blur();
+          setFocused(false);
+        }
       }
-    }
-    setItems((list) => list.map((t) => (id === undefined || t.id === id ? { ...t, leaving: true } : t)));
-  }, []);
+      commit(store.current.map((t) => (ending.includes(t) ? { ...t, leaving: true } : t)));
+      for (const t of ending) t.onDismiss?.(t.id, reason);
+    },
+    [commit],
+  );
+  const dismiss = useCallback((id?: string) => close(id, "programmatic"), [close]);
   const toast = useCallback(
-    (options: ToastOptions) => {
+    ({ id: wanted, ...options }: ToastOptions) => {
+      // The id of a toast still in the store: update it in place (one that was closing comes back).
+      const current = wanted === undefined ? undefined : store.current.find((t) => t.id === wanted);
+      if (current) {
+        const next: Item = { ...options, id: current.id, version: current.version + 1 };
+        commit(store.current.map((t) => (t === current ? next : t)));
+        return current.id;
+      }
       count.current += 1;
-      const id = `${prefix}-${count.current}`;
-      setItems((list) => [...list, { ...options, id }]);
+      const id = wanted ?? `${prefix}-${count.current}`;
+      commit([...store.current, { ...options, id, version: 0 }]);
       return id;
     },
-    [prefix],
+    [prefix, commit],
   );
   const api = useMemo<ToastApi>(() => ({ toast, dismiss }), [toast, dismiss]);
 
@@ -263,7 +307,7 @@ export function Toaster({
           collapsed={!item.leaving && !shown.has(item.id)}
           paused={paused}
           dismissLabel={text.dismiss}
-          onDismiss={dismiss}
+          onDismiss={close}
           onRemoved={remove}
           memory={memory.current}
         />
@@ -284,13 +328,23 @@ interface ToastItemProps {
   collapsed: boolean;
   paused: boolean;
   dismissLabel: string;
-  onDismiss: (id: string) => void;
+  onDismiss: (id: string, reason: ToastDismissReason) => void;
   onRemoved: (id: string) => void;
   memory: MemoryMap;
 }
 
 function ToastItem({ item, collapsed, paused, dismissLabel, onDismiss, onRemoved, memory }: ToastItemProps) {
-  const { id, title, description, tone = "neutral", action, duration = 5000, leaving = false } = item;
+  const {
+    id,
+    version,
+    title,
+    description,
+    tone = "neutral",
+    action,
+    duration = 5000,
+    loading = false,
+    leaving = false,
+  } = item;
   const el = useRef<HTMLDivElement>(null);
   // Survives the element being re-created (region moved into or out of a Dialog).
   const [mem] = useState<Memory>(() => {
@@ -318,17 +372,18 @@ function ToastItem({ item, collapsed, paused, dismissLabel, onDismiss, onRemoved
   }, [collapsed, leaving]);
 
   // Auto-dismiss, keeping the time already spent across pauses and moves. The time left lives in `mem`, read when the
-  // timer starts: a re-created toast's effects run after the old one has saved it.
+  // timer starts: a re-created toast's effects run after the old one has saved it. An update (a new version) starts a
+  // fresh timer; a loading toast has none until it is updated.
   useEffect(() => {
-    if (paused || collapsed || leaving || !Number.isFinite(duration) || duration <= 0) return;
+    if (paused || collapsed || leaving || loading || !Number.isFinite(duration) || duration <= 0) return;
     const started = Date.now();
-    const left = mem.remaining ?? duration;
-    const t = setTimeout(() => onDismiss(id), Math.max(left, 0));
+    const left = mem.remaining?.version === version ? mem.remaining.ms : duration;
+    const t = setTimeout(() => onDismiss(id, "timeout"), Math.max(left, 0));
     return () => {
       clearTimeout(t);
-      mem.remaining = left - (Date.now() - started);
+      mem.remaining = { version, ms: left - (Date.now() - started) };
     };
-  }, [paused, collapsed, leaving, duration, id, onDismiss, mem]);
+  }, [paused, collapsed, leaving, loading, duration, version, id, onDismiss, mem]);
 
   // Leaving: play the exit transition (none under reduced motion), then drop it from the store.
   useEffect(() => {
@@ -351,7 +406,7 @@ function ToastItem({ item, collapsed, paused, dismissLabel, onDismiss, onRemoved
     },
     onEnd: (session, cancelled) => {
       el.current?.removeAttribute("data-swiping");
-      if (!cancelled && Math.abs(session.delta.x) >= SWIPE) onDismiss(id);
+      if (!cancelled && Math.abs(session.delta.x) >= SWIPE) onDismiss(id, "user");
       else el.current?.style.removeProperty("--_dx");
     },
   });
@@ -369,7 +424,11 @@ function ToastItem({ item, collapsed, paused, dismissLabel, onDismiss, onRemoved
       data-collapsed={collapsed || undefined}
       data-leaving={leaving || undefined}
     >
-      {icon && <Icon icon={icon} className="cy-toast-icon" />}
+      {loading ? (
+        <LoadingDots variant="spinner" size="md" className="cy-toast-icon" />
+      ) : (
+        icon && <Icon icon={icon} className="cy-toast-icon" />
+      )}
       <div className="cy-toast-text cy-reset">
         {ready && (
           <>
@@ -395,7 +454,7 @@ function ToastItem({ item, collapsed, paused, dismissLabel, onDismiss, onRemoved
         variant="ghost"
         size="sm"
         wrapperClassName="cy-toast-dismiss"
-        onClick={() => onDismiss(id)}
+        onClick={() => onDismiss(id, "user")}
       />
     </div>
   );

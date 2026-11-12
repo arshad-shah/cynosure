@@ -464,6 +464,7 @@ export {
 } from "./components/TitleBar/index.js";
 export {
   type ToastApi,
+  type ToastDismissReason,
   Toaster,
   type ToasterProps,
   type ToastLabels,
