@@ -34,6 +34,21 @@
   &[data-collapsed] {
     inline-size: var(--cy-side-nav-rail-width, calc(var(--_h) + 2 * var(--cy-space-4)));
   }
+  /* With a footer the navigation fills its container's height, so the footer can sit at the bottom. */
+  &[data-footer] {
+    min-block-size: 100%;
+  }
+}
+/* Entries pinned to the bottom (Settings, notifications): pushed down by the free space above them. */
+.cy-side-nav-footer.cy-side-nav-footer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cy-space-6);
+  min-inline-size: 0;
+  margin: 0;
+  margin-block-start: auto;
+  padding: 0;
+  font-size: inherit;
 }
 .cy-side-nav-section.cy-side-nav-section {
   display: flex;
@@ -123,6 +138,11 @@
       background: currentColor;
     }
   }
+  /* On the inline end of the content, the indicator faces the content: the row's inline end. */
+  [data-placement="end"] &[aria-current="page"]::before {
+    inset-inline-start: auto;
+    inset-inline-end: 0;
+  }
   &[aria-disabled="true"] {
     color: var(--cy-color-muted);
     cursor: not-allowed;
@@ -150,17 +170,18 @@
   color: var(--cy-color-muted);
   font-size: var(--cy-font-size-sm);
   font-variant-numeric: tabular-nums;
-  /* In the rail the badge shrinks into the corner so the icon stays visible. */
+  /* In the rail the badge shrinks onto the icon's top inline-end corner (the icon is centred in the row). */
   [data-collapsed] & {
     position: absolute;
-    inset-block-start: 0;
-    inset-inline-end: 0;
+    inset-block-start: calc(50% - var(--_icon) / 2);
+    inset-inline-start: calc(50% + var(--_icon) / 4);
+    translate: 0 -40%;
     scale: 0.7;
-    transform-origin: top right;
+    transform-origin: top left;
     line-height: 1;
   }
   [data-collapsed] &:dir(rtl) {
-    transform-origin: top left;
+    transform-origin: top right;
   }
 }
 .cy-side-nav-chevron.cy-side-nav-chevron {

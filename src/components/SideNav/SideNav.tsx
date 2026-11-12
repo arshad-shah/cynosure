@@ -123,6 +123,18 @@ export interface SideNavProps {
   layout?: "column" | "bar";
   /** Height and text size of the items. Default "md". */
   size?: Size;
+  /**
+   * Which side of the content the navigation sits on. `start` (default): the inline start, as a left sidebar or
+   * activity bar. `end`: the inline end, as a secondary activity bar on the right; the current item's indicator moves to
+   * the inline end, facing the content, and the rail's tooltips open towards the inline start.
+   */
+  placement?: "start" | "end";
+  /**
+   * Entries pinned to the bottom of the navigation, such as Settings or a notifications action: items, sections and
+   * actions, as in `items`, and in the same Tab order after them. The navigation then fills its container's height. In a
+   * bar they end the row.
+   */
+  footer?: NavEntry[] | undefined;
   /** Added to the root element, for layout. */
   className?: string;
   /** Layout only. Restyle through --cy-side-nav-* tokens. */
@@ -157,6 +169,8 @@ export function SideNav({
   defaultExpanded = [],
   layout = "column",
   size = "md",
+  placement = "start",
+  footer,
   className,
   style,
 }: SideNavProps) {
@@ -164,7 +178,11 @@ export function SideNav({
   const bar = layout === "bar";
   // The collapsed rail: icons only, the labels and headings hidden from sight (still their names).
   const rail = collapsed && !bar;
-  const all = items.flatMap((entry) => (isSection(entry) ? entry.items : [entry]));
+  // Tooltips in the rail open away from the window edge the navigation sits on.
+  const tipSide = placement === "end" ? "start" : "end";
+  const flat = (entries: NavEntry[]) =>
+    entries.flatMap((entry) => (isSection(entry) ? entry.items : [entry]));
+  const all = [...flat(items), ...flat(footer ?? [])];
   const places = all.filter((entry) => !isAction(entry)) as NavItem[];
   const [expanded, setExpanded] = useState(
     () => new Set([...defaultExpanded, ...(ancestors(places, current) ?? [])]),
@@ -210,7 +228,7 @@ export function SideNav({
         icon={item.icon}
         label={item.label}
         size={bar ? "lg" : size}
-        tooltipPlacement={bar ? "top" : "end"}
+        tooltipPlacement={bar ? "top" : tipSide}
         wrapperClassName="cy-side-nav-tip"
       />
     ) : (
@@ -292,7 +310,7 @@ export function SideNav({
         ) : (
           <li key={item.id} className="cy-side-nav-item cy-reset">
             {collapsed && !bar ? (
-              <Tooltip content={item.label} placement="end" className="cy-side-nav-tip">
+              <Tooltip content={item.label} placement={tipSide} className="cy-side-nav-tip">
                 {control(item)}
               </Tooltip>
             ) : (
@@ -309,15 +327,36 @@ export function SideNav({
   );
 
   // Consecutive plain items share one list; each section gets its own heading and list.
-  const blocks: ({ section: NavSection } | { items: (NavItem | NavAction)[] })[] = [];
-  if (bar) blocks.push({ items: all });
-  else
-    for (const entry of items) {
+  const blocksOf = (entries: NavEntry[]) => {
+    const blocks: ({ section: NavSection } | { items: (NavItem | NavAction)[] })[] = [];
+    for (const entry of entries) {
       const last = blocks[blocks.length - 1];
       if (isSection(entry)) blocks.push({ section: entry });
       else if (last && "items" in last) last.items.push(entry);
       else blocks.push({ items: [entry] });
     }
+    return blocks;
+  };
+  const render = (entries: NavEntry[], zone: string) =>
+    blocksOf(entries).map((block, i) =>
+      "section" in block ? (
+        <div key={`section-${block.section.label}`} className="cy-side-nav-section cy-reset">
+          <span
+            className={`cy-side-nav-heading cy-reset${rail ? " cy-visually-hidden" : ""}`}
+            id={`${id}-${zone}${i}`}
+          >
+            {block.section.label}
+          </span>
+          {list(block.section.items, 0, undefined, false, `${id}-${zone}${i}`)}
+        </div>
+      ) : (
+        <div key={i} className="cy-side-nav-section cy-reset">
+          {list(block.items, 0)}
+        </div>
+      ),
+    );
+  // A bar is one row: sections flattened, the footer's entries at its end.
+  const hasFooter = !bar && footer !== undefined && footer.length > 0;
 
   return (
     <nav
@@ -326,25 +365,12 @@ export function SideNav({
       data-size={size}
       data-collapsed={rail ? "" : undefined}
       data-layout={layout}
+      data-placement={placement}
+      data-footer={hasFooter ? "" : undefined}
       style={style}
     >
-      {blocks.map((block, i) =>
-        "section" in block ? (
-          <div key={`section-${block.section.label}`} className="cy-side-nav-section cy-reset">
-            <span
-              className={`cy-side-nav-heading cy-reset${rail ? " cy-visually-hidden" : ""}`}
-              id={`${id}-s${i}`}
-            >
-              {block.section.label}
-            </span>
-            {list(block.section.items, 0, undefined, false, `${id}-s${i}`)}
-          </div>
-        ) : (
-          <div key={i} className="cy-side-nav-section cy-reset">
-            {list(block.items, 0)}
-          </div>
-        ),
-      )}
+      {bar ? render(all, "s") : render(items, "s")}
+      {hasFooter && <div className="cy-side-nav-footer cy-reset">{render(footer, "f")}</div>}
     </nav>
   );
 }

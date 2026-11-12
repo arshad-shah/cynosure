@@ -38,8 +38,31 @@ import { SideNav } from "@arshad-shah/cynosure";
 | `defaultExpanded` | `[]`       | Group ids open at first                                                                                     |
 | `layout`          | `column`   | `bar`: one row of top-level items, icon over label, for AppShell's phone `tabs`                             |
 | `size`            | `md`       | `sm` · `md` · `lg`                                                                                          |
+| `footer`          | –          | Entries pinned to the bottom (Settings, notifications); the nav then fills its container's height           |
+| `placement`       | `start`    | `end` for a rail on the inline end: the current indicator faces the content, tooltips open towards it       |
 - A `<nav>` landmark; each section is a list named by its heading. Items without `href` are buttons.
-- Keyboard: Tab moves between items, Enter follows a link or toggles a group (Space too for buttons).
+- Keyboard: Tab moves between items (then the footer's), Enter follows a link or toggles a group (Space too for buttons).
+- In the collapsed rail an item's `badge` sits on its icon's top inline-end corner, still part of its name.
+
+## An activity bar
+
+A collapsed SideNav works on its own, without AppShell, as an editor's activity bar:
+
+```tsx
+<SideNav
+  label="Views"
+  collapsed
+  current={view}
+  onNavigate={setView}
+  items={[{ id: "explorer", label: "Explorer", icon: database }]}
+  footer={[
+    { kind: "action", id: "notify", label: "Notifications", icon: bell, onClick: openNotifications },
+    { id: "settings", label: "Settings", icon: settings },
+  ]}
+/>;
+```
+
+Footer entries are ordinary items, sections and actions. In `layout="bar"` they end the row.
 - Rows are at least 24px tall, 44px on touch screens.
 
 ## A primary action
