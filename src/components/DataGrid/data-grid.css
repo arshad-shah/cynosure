@@ -60,7 +60,6 @@
   block-size: max(var(--_head), var(--_hit));
   /* The last column's resize edge reaches past the columns: it never widens the scroll area. */
   overflow-x: clip;
-  border-block-end: var(--cy-border-width) solid var(--cy-color-line);
   background: var(--cy-data-grid-header-background, var(--cy-color-soft));
   font-size: inherit;
 }
@@ -90,6 +89,7 @@
   }
 }
 .cy-data-grid-header.cy-data-grid-header {
+  border-block-end: var(--cy-border-width) solid var(--cy-color-line);
   color: var(--cy-color-muted);
   font-size: var(--cy-font-size-sm);
   font-weight: var(--cy-font-weight-medium);
@@ -172,7 +172,6 @@
   position: absolute;
   inset-inline: 0;
   block-size: max(var(--_row), var(--_hit));
-  border-block-end: var(--cy-border-width) solid var(--cy-color-line);
   box-sizing: border-box;
   font-size: inherit;
   &:hover {
@@ -186,6 +185,8 @@
   }
 }
 .cy-data-grid-cell.cy-data-grid-cell {
+  /* The line under each row is the cells': the full row height stays a hit area. */
+  border-block-end: var(--cy-border-width) solid var(--cy-color-line);
   color: var(--cy-color-ink);
   cursor: default;
   &[aria-selected="true"] {
@@ -197,6 +198,11 @@
   &[data-tone="null"] {
     color: var(--cy-data-grid-null-color, var(--cy-color-muted));
     font-style: italic;
+  }
+  /* Muted text on the selection's tint: halfway to ink, so it still reads. */
+  [aria-selected="true"] > &[data-tone="null"],
+  &[aria-selected="true"][data-tone="null"] {
+    color: var(--cy-data-grid-null-color, color-mix(in oklab, var(--cy-color-muted), var(--cy-color-ink)));
   }
   &[data-tone="number"] {
     color: var(--cy-data-grid-number-color, var(--cy-color-ink));

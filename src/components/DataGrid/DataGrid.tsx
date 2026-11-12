@@ -289,7 +289,7 @@ export function DataGrid<Row>({
     axis: "x",
   });
   useClientLayoutEffect(() => {
-    const h = head.current?.offsetHeight ?? 0;
+    const h = (head.current as HTMLDivElement).offsetHeight;
     if (h !== headerSize) setHeaderSize(h);
   });
 
@@ -368,9 +368,10 @@ export function DataGrid<Row>({
   };
   const onCopy = (event: ClipboardEvent<HTMLDivElement>) => {
     // Text selected inside the cells (by dragging) copies as text, the browser's way; otherwise the selected cells.
-    const doc = (root.current?.getRootNode() ?? document) as Document | ShadowRoot;
-    const chosenText = ("getSelection" in doc ? doc.getSelection?.() : null) ?? document.getSelection();
-    if (chosenText && !chosenText.isCollapsed && chosenText.toString()) return;
+    // In a shadow root, Chromium keeps the selection on the root; elsewhere the document has it.
+    const doc = (root.current as HTMLDivElement).getRootNode() as Partial<Pick<Document, "getSelection">>;
+    const chosenText = ((doc.getSelection ? doc : document) as Document).getSelection() as Selection;
+    if (chosenText.toString()) return;
     const tsv = copyText();
     if (!tsv) return;
     event.preventDefault();
@@ -542,9 +543,9 @@ export function DataGrid<Row>({
           const at = cellOf(e.target);
           if (at && at.row >= 0) onRowActivate?.(shown[at.row] as Row, at.row);
         }}
-        // Shift+click selects cells, not text.
+        // With a selection mode, Shift+click selects cells, not text.
         onMouseDown={(e) => {
-          if (e.shiftKey && multi && cellOf(e.target)) e.preventDefault();
+          if (e.shiftKey && selectionMode !== "none" && cellOf(e.target)) e.preventDefault();
         }}
         onFocus={(e) => {
           // Focus can arrive without our keys (a click, a screen reader): keys then act from here.

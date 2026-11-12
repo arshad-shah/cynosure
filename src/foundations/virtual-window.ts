@@ -79,9 +79,10 @@ export function useVirtualWindow(
     const el = scroller.current;
     if (!enabled || !el) return;
     const x = axis === "x";
+    const along = x ? "offsetWidth" : "offsetHeight";
     const measure = () => {
       const first = rowSelector ? el.querySelector<HTMLElement>(rowSelector) : null;
-      const row = (first && (x ? first.offsetWidth : first.offsetHeight)) || estimate;
+      const row = first?.[along] || estimate;
       const { clientHeight, clientWidth } = el;
       // Along the axis: `height` is the view's length, `width` its breadth.
       const height = x ? clientWidth : clientHeight;
