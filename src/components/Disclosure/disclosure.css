@@ -31,6 +31,14 @@
     background: var(--cy-color-surface);
     overflow: clip;
   }
+  /* Accent edge on the inline-start side, as Card's: the border itself, coloured by --_edge (foundations/edge.ts).
+     Plain and line sections get the card's inner padding so the text clears it. */
+  &[data-edge][data-edge] {
+    border-inline-start: var(--cy-disclosure-edge-width, var(--cy-space-2)) solid var(--_edge);
+  }
+  &[data-edge]:not([data-variant="card"]) {
+    --_pad: var(--cy-disclosure-padding-inline, var(--cy-space-5));
+  }
 }
 
 .cy-disclosure-heading.cy-disclosure-heading {
@@ -77,7 +85,11 @@
   }
   /* No inner padding in plain and line: ring outside the trigger so it never touches the text. */
   :is([data-variant="plain"], [data-variant="line"]) > &,
-  :is([data-variant="plain"], [data-variant="line"]) > .cy-disclosure-heading > & {
+  :is([data-variant="plain"], [data-variant="line"]) > :where(.cy-disclosure-heading, .cy-disclosure-row) > &,
+  :is([data-variant="plain"], [data-variant="line"])
+    > :where(.cy-disclosure-row)
+    > :where(.cy-disclosure-heading)
+    > & {
     border-radius: var(--cy-radius-sm);
     &:focus-visible {
       box-shadow: none;
@@ -95,13 +107,14 @@
 
 .cy-disclosure-chevron.cy-disclosure-chevron {
   flex: none;
+  /* The last column when the trigger is a grid (a summary row with an end slot); ignored by the plain flex trigger. */
+  grid-column: -2 / -1;
   color: var(--cy-color-muted);
   font-size: inherit;
   transition:
     rotate var(--_d) var(--cy-motion-ease),
     color var(--cy-motion-fast) var(--cy-motion-ease);
-  [data-open] > .cy-disclosure-trigger > &,
-  [data-open] > .cy-disclosure-heading > .cy-disclosure-trigger > & {
+  [aria-expanded="true"] > & {
     rotate: 180deg;
   }
 }
@@ -164,5 +177,47 @@
   }
   .cy-disclosure-chevron.cy-disclosure-chevron {
     display: none;
+  }
+}
+
+/*
+ * Summary row with an end slot: a grid whose columns the trigger (and its heading) share through subgrid. The trigger
+ * spans the row, the summary sits in the first column, the chevron in the last; the end slot is laid over the middle
+ * column, which the trigger keeps free. Pointer presses on plain content there fall through to the trigger.
+ */
+.cy-disclosure-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  font-size: inherit;
+  line-height: inherit;
+  & > .cy-disclosure-heading,
+  & > .cy-disclosure-trigger {
+    grid-area: 1 / 1 / 2 / -1;
+  }
+  & > .cy-disclosure-heading {
+    display: grid;
+    grid-template-columns: subgrid;
+    & > .cy-disclosure-trigger {
+      grid-column: 1 / -1;
+    }
+  }
+  & .cy-disclosure-trigger.cy-disclosure-trigger {
+    display: grid;
+    grid-template-columns: subgrid;
+    column-gap: 0;
+  }
+}
+.cy-disclosure-end.cy-disclosure-end {
+  grid-area: 1 / 2;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--cy-space-2);
+  margin-inline: var(--cy-disclosure-gap, var(--cy-space-4));
+  pointer-events: none;
+  font-size: inherit;
+  & :is(a, button, input, select, textarea, [tabindex]) {
+    pointer-events: auto;
   }
 }
