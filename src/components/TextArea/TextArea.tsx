@@ -157,6 +157,20 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(function 
   });
 
   useLayoutEffect(resize, [resize, value]);
+  // A new width rewraps the text: fit the height again. Only width changes count, since fitting sets the height.
+  useEffect(() => {
+    const area = inner.current;
+    if (!area || typeof ResizeObserver === "undefined") return;
+    let width = area.getBoundingClientRect().width;
+    const observer = new ResizeObserver(() => {
+      const now = area.getBoundingClientRect().width;
+      if (now === width) return;
+      width = now;
+      resize();
+    });
+    observer.observe(area);
+    return () => observer.disconnect();
+  }, [resize]);
   useEffect(() => {
     if (value !== undefined) setCount(value.length);
   }, [value]);
