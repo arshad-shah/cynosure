@@ -139,6 +139,8 @@
   flex: none;
   margin-block-start: var(--cy-space-1);
   color: var(--_tone);
+  /* A loading toast's spinner (LoadingDots) takes the tone through its own token. */
+  --cy-loading-dots-color: var(--_tone);
 }
 .cy-toast-text.cy-toast-text {
   display: flex;

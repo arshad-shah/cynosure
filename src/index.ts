@@ -156,6 +156,12 @@ export {
   type ZoomSetting,
 } from "./components/DocumentViewport/index.js";
 export { EmptyState, type EmptyStateProps, type EmptyStateTokens } from "./components/EmptyState/index.js";
+export {
+  ErrorBoundary,
+  type ErrorBoundaryLabels,
+  type ErrorBoundaryProps,
+  type ErrorBoundaryTokens,
+} from "./components/ErrorBoundary/index.js";
 export { Field, type FieldProps } from "./components/Field/index.js";
 export {
   acceptsFile,
@@ -489,6 +495,7 @@ export {
 } from "./components/TitleBar/index.js";
 export {
   type ToastApi,
+  type ToastDismissReason,
   Toaster,
   type ToasterProps,
   type ToastLabels,

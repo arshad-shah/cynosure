@@ -2,7 +2,7 @@
   {
     "name": "all CSS",
     "path": "dist/styles.css",
-    "limit": "35.5 kB",
+    "limit": "35.6 kB",
     "gzip": true
   },
   {
@@ -253,7 +253,7 @@
   {
     "name": "Toast",
     "path": ["dist/components/Toast/Toast.js", "dist/styles/toast.css"],
-    "limit": "4 kB",
+    "limit": "4.2 kB",
     "gzip": true
   },
   {
@@ -707,6 +707,12 @@
   {
     "name": "HighlightedText (JS + CSS)",
     "path": ["dist/components/HighlightedText/HighlightedText.js", "dist/styles/highlighted-text.css"],
+    "limit": "1 kB",
+    "gzip": true
+  },
+  {
+    "name": "ErrorBoundary (JS + CSS)",
+    "path": ["dist/components/ErrorBoundary/ErrorBoundary.js", "dist/styles/error-boundary.css"],
     "limit": "1 kB",
     "gzip": true
   }

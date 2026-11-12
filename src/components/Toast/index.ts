@@ -1,5 +1,6 @@
 export {
   type ToastApi,
+  type ToastDismissReason,
   Toaster,
   type ToasterProps,
   type ToastLabels,

@@ -69,6 +69,22 @@
   }
 }
 
+/* variant="spinner": the loader icon at one em of the root's size, turning once per cycle. Reduced motion zeroes the
+   duration, which leaves it still and fully visible, as the dots are. */
+.cy-loading-dots.cy-loading-dots[data-variant="spinner"] {
+  color: var(--cy-loading-dots-color, var(--_c));
+}
+.cy-loading-dots-spinner {
+  --cy-icon-size: 1em;
+  animation: cy-loading-dots-spin var(--_d) linear infinite;
+}
+
+@keyframes cy-loading-dots-spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
 @keyframes cy-loading-dots-pulse {
   0%,
   100% {
