@@ -7,11 +7,11 @@ import {
   useCallback,
   useContext,
   useId,
-  useLayoutEffect,
   useRef,
   useState,
 } from "react";
 import { ButtonBase } from "../../foundations/ButtonBase/ButtonBase.js";
+import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js";
 import { useControllableState } from "../../foundations/controllable.js";
 import { isRtl } from "../../foundations/dir.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
@@ -44,7 +44,7 @@ export interface TabsLabels {
 }
 
 const DEFAULT_LABELS: TabsLabels = {
-  close: (name) => `Close ${name}`,
+  close: (name) => (name ? `Close ${name}` : "Close"),
   moved: (name, position, total) => `Moved ${name} to position ${position} of ${total}`,
 };
 
@@ -131,7 +131,7 @@ export function Tabs({
 
   // Keep a valid selection: default to the first enabled tab, and when the selected tab disappears pick the one now
   // at its position (or the previous one).
-  useLayoutEffect(() => {
+  useClientLayoutEffect(() => {
     const tabs = [...(root.current?.querySelectorAll<HTMLElement>('[role="tab"]') ?? [])].filter(
       (t) => t.closest(".cy-tabs") === root.current,
     );
@@ -160,7 +160,10 @@ export function Tabs({
     if (next !== undefined) setCurrent(next);
   });
 
-  const safe = (v: string) => v.replace(/[^\w-]/g, "_");
+  // An id from any value, one to one: letters, digits and "-" stay; every other character (including "_") becomes
+  // "_<code>_", so "a b" and "a_b" never share an id.
+  const safe = (v: string) =>
+    v.replace(/[^A-Za-z0-9-]/gu, (c) => `_${(c.codePointAt(0) as number).toString(36)}_`);
   return (
     <Context.Provider
       value={{
@@ -222,7 +225,7 @@ export function TabList({ label, onReorder, className, children }: TabListProps)
   // Pointer, touch and pen reordering through detent's sortable (as SortableList). A finger held briefly drags; a
   // swipe still scrolls the list. React stays the DOM's owner: the node is put back and the new order is reported.
   const reorderable = onReorder !== undefined;
-  useLayoutEffect(() => {
+  useClientLayoutEffect(() => {
     const el = ref.current;
     if (!el || !reorderable) return;
     const bound = sortable(el, {
@@ -283,7 +286,7 @@ export function TabList({ label, onReorder, className, children }: TabListProps)
     if (target !== current) list.scrollTo({ left: rtl ? target - max : target });
   }, []);
   // Mark edges that hide tabs so CSS can fade them (works in RTL: scrollLeft is negative there).
-  useLayoutEffect(() => {
+  useClientLayoutEffect(() => {
     const list = ref.current;
     if (!list) return;
     const update = () => {
@@ -302,7 +305,7 @@ export function TabList({ label, onReorder, className, children }: TabListProps)
     };
   }, []);
   // Reveal again whenever the selection changes.
-  useLayoutEffect(() => {
+  useClientLayoutEffect(() => {
     reveal(ref.current?.querySelector<HTMLElement>('[role="tab"][aria-selected="true"]') ?? null);
   }, [value, reveal]);
   const list = (
@@ -346,13 +349,27 @@ export interface TabProps {
    * tab in response; the one now in its place is selected and focused.
    */
   onClose?: (() => void) | undefined;
+  /**
+   * The close button's name (and tooltip), such as "Close query 3". By default it is `labels.close` with the tab's
+   * text: the label itself when it is a string, else the text it renders.
+   */
+  closeLabel?: string | undefined;
   /** The tab's label. */
   children: ReactNode;
 }
 
-export function Tab({ value, icon, disabled, onClose, children }: TabProps) {
+export function Tab({ value, icon, disabled, onClose, closeLabel, children }: TabProps) {
   const { value: current, select, activation, tabId, panelId, panels, labels, refocus } = useTabs("Tab");
   const selected = value === current;
+  // A label that is not plain text (a badge, a <strong>) names the close button by the text it renders.
+  const plain = typeof children === "string" || typeof children === "number" ? String(children) : null;
+  const labelRef = useRef<HTMLSpanElement>(null);
+  const [rendered, setRendered] = useState("");
+  useClientLayoutEffect(() => {
+    if (!onClose || closeLabel !== undefined || plain !== null) return;
+    const text = labelRef.current?.textContent?.trim() ?? "";
+    if (text !== rendered) setRendered(text);
+  });
   const tab = (
     <ButtonBase
       role="tab"
@@ -377,7 +394,9 @@ export function Tab({ value, icon, disabled, onClose, children }: TabProps) {
       })}
     >
       {icon && <Icon icon={icon} className="cy-tab-icon" />}
-      <span className="cy-tab-label">{children}</span>
+      <span ref={labelRef} className="cy-tab-label">
+        {children}
+      </span>
     </ButtonBase>
   );
   if (!onClose) return tab;
@@ -389,7 +408,7 @@ export function Tab({ value, icon, disabled, onClose, children }: TabProps) {
       <span className="cy-tab-close cy-reset" aria-hidden="true">
         <IconButton
           icon={close}
-          label={labels.close(typeof children === "string" ? children : value)}
+          label={closeLabel ?? labels.close(plain ?? rendered)}
           variant="ghost"
           tone="neutral"
           size="sm"
@@ -418,7 +437,7 @@ export interface TabPanelProps {
 
 export function TabPanel({ value, keepMounted = false, className, children }: TabPanelProps) {
   const { value: current, tabId, panelId, registerPanel } = useTabs("TabPanel");
-  useLayoutEffect(() => registerPanel(value), [registerPanel, value]);
+  useClientLayoutEffect(() => registerPanel(value), [registerPanel, value]);
   const selected = value === current;
   const printing = usePrinting();
   return (

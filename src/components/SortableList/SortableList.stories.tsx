@@ -111,6 +111,53 @@ export const TabDropsWhereItIs: Story = {
   },
 };
 
+export const LeavingCancelsAKeyboardMove: Story = {
+  render: (args) => (
+    <>
+      <SortableList {...args} />
+      <Button>Elsewhere</Button>
+    </>
+  ),
+  play: async ({ args, canvas, canvasElement, userEvent }) => {
+    canvas.getByRole("button", { name: "Move Inbox" }).focus();
+    await userEvent.keyboard(" {ArrowDown}");
+    await expect(order(canvasElement)).toEqual(["docs", "inbox", "drafts", "archive"]);
+    // Focus goes elsewhere (a click, a screen reader): the move is cancelled, not left half done.
+    await userEvent.click(canvas.getByRole("button", { name: "Elsewhere" }));
+    await waitFor(() => expect(order(canvasElement)).toEqual(["inbox", "docs", "drafts", "archive"]));
+    await expect(canvas.getByRole("button", { name: "Move Inbox" })).toHaveAttribute("aria-pressed", "false");
+    await expect(canvas.getByRole("status")).toHaveTextContent("Move cancelled. Inbox is back where it was.");
+    await expect(args.onReorder).not.toHaveBeenCalled();
+    // Arrows on the handle no longer move it.
+    canvas.getByRole("button", { name: "Move Inbox" }).focus();
+    await userEvent.keyboard("{ArrowDown}");
+    await expect(order(canvasElement)).toEqual(["inbox", "docs", "drafts", "archive"]);
+  },
+};
+
+/** Set by the story below: adds an item from outside, as a sync from another device would. */
+let arrive: (() => void) | null = null;
+
+export const ItemsArrivingDuringAMoveAreKept: Story = {
+  render: (args) => {
+    function Synced() {
+      const [items, setItems] = useState(ITEMS);
+      arrive = () => setItems((all) => [...all, { id: "spam", label: "Spam" }]);
+      return <SortableList {...args} items={items} onReorder={setItems} />;
+    }
+    return <Synced />;
+  },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    canvas.getByRole("button", { name: "Move Inbox" }).focus();
+    await userEvent.keyboard(" {ArrowDown}");
+    // An item arrives while Inbox is picked up; the drop moves Inbox among the items as they are now.
+    arrive?.();
+    await waitFor(() => expect(order(canvasElement)).toContain("spam"));
+    await userEvent.keyboard(" ");
+    await expect(order(canvasElement)).toEqual(["docs", "inbox", "drafts", "archive", "spam"]);
+  },
+};
+
 /** Presses a handle, moves the pointer to the vertical middle of row `to` (index), and releases. */
 function dragRow(canvasElement: HTMLElement, handleName: string, to: number, pointerType = "mouse") {
   const handle = [...canvasElement.querySelectorAll("button")].find(
@@ -204,12 +251,16 @@ export const PointerEdges: Story = {
 
 export const KeyEdges: Story = {
   play: async ({ args, canvas, canvasElement, userEvent }) => {
-    // While one row is moving by keyboard, Space on another handle does nothing.
+    // While one row is moving by keyboard, Space on another handle does nothing (keys sent there without moving
+    // focus, a script or an assistive tool: moving focus would cancel the move).
     canvas.getByRole("button", { name: "Move Inbox" }).focus();
     await userEvent.keyboard(" ");
-    canvas.getByRole("button", { name: "Move Drafts" }).focus();
-    await userEvent.keyboard(" {ArrowDown}");
+    const drafts = canvas.getByRole("button", { name: "Move Drafts" });
+    for (const key of [" ", "ArrowDown"])
+      drafts.dispatchEvent(new KeyboardEvent("keydown", { key, bubbles: true, cancelable: true }));
     await expect(order(canvasElement)).toEqual(["inbox", "docs", "drafts", "archive"]);
+    await expect(drafts).toHaveAttribute("aria-pressed", "false");
+    await userEvent.keyboard("{Escape}");
     // Picking up and dropping without moving changes nothing and calls nothing.
     canvas.getByRole("button", { name: "Move Inbox" }).focus();
     await userEvent.keyboard(" {ArrowUp} ");

@@ -223,6 +223,51 @@ export const RightToLeftSwapsLeftAndRight: Story = {
   },
 };
 
+const guarded: TreeItem[] = [
+  {
+    id: "vault",
+    label: "vault",
+    icon: folder,
+    disabled: true,
+    children: [{ id: "keys", label: "keys.txt", icon: file }],
+  },
+  {
+    id: "shared",
+    label: "shared",
+    icon: folder,
+    children: [
+      { id: "secret", label: "secret.txt", icon: file, disabled: true },
+      { id: "notes", label: "notes.txt", icon: file },
+    ],
+  },
+];
+
+export const DisabledRowsNeverTakeTheTabStop: Story = {
+  args: { items: guarded, defaultExpanded: ["vault", "shared"], defaultSelected: ["secret"] },
+  play: async ({ canvas, userEvent }) => {
+    const tree = canvas.getByRole("tree");
+    const tabStops = () => tree.querySelectorAll('[tabindex="0"]');
+    // A selected disabled row is not the tab stop; the first usable row is.
+    await expect(tabStops()).toHaveLength(1);
+    await userEvent.tab();
+    await expect(focused()).toBe("keys.txt");
+    // Left from a child of a disabled parent stays put: the parent cannot take focus.
+    await userEvent.keyboard("{ArrowLeft}");
+    await expect(focused()).toBe("keys.txt");
+    await expect(tabStops()).toHaveLength(1);
+    // Right on an open branch whose first child is disabled moves to its first usable child.
+    await userEvent.keyboard("{ArrowDown}");
+    await expect(focused()).toBe("shared");
+    await userEvent.keyboard("{ArrowRight}");
+    await expect(focused()).toBe("notes.txt");
+    await expect(tabStops()).toHaveLength(1);
+    // Focus leaves and comes back to the same row: the tree never drops out of the Tab order.
+    await userEvent.tab({ shift: true });
+    await userEvent.tab();
+    await expect(focused()).toBe("notes.txt");
+  },
+};
+
 const big: TreeItem[] = Array.from({ length: 10 }, (_, f) => ({
   id: `folder-${f}`,
   label: `Folder ${f}`,

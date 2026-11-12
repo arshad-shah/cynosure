@@ -4,11 +4,11 @@ import {
   memo,
   type ReactNode,
   useCallback,
-  useLayoutEffect,
   useMemo,
   useRef,
   useState,
 } from "react";
+import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js";
 import { useControllableState } from "../../foundations/controllable.js";
 import { isRtl } from "../../foundations/dir.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
@@ -137,10 +137,13 @@ export function Tree({
   const childrenOf = useCallback((item: TreeItem) => item.children ?? loaded[item.id], [loaded]);
   const isBranch = useCallback((item: TreeItem) => Boolean(item.children?.length || item.hasChildren), []);
 
+  // Sets once per render, so each row's lookups do not scan the lists.
+  const openSet = useMemo(() => new Set(open), [open]);
+  const pickedSet = useMemo(() => new Set(picked), [picked]);
+
   // Visible rows, depth first through expanded branches only: a collapsed subtree costs nothing.
   const rows = useMemo(() => {
     const out: Row[] = [];
-    const openSet = new Set(open);
     const walk = (list: TreeItem[], level: number, parent: string | null) => {
       list.forEach((item, i) => {
         out.push({ key: item.id, item, level, pos: i + 1, setSize: list.length, parent, kind: "item" });
@@ -161,12 +164,18 @@ export function Tree({
     };
     walk(items, 1, null);
     return out;
-  }, [items, open, status, childrenOf, isBranch]);
+  }, [items, openSet, status, childrenOf, isBranch]);
 
-  const focusable = rows.filter((r) => r.kind !== "loading" && !(r.kind === "item" && r.item.disabled));
+  // Disabled and loading rows never take focus, so they are never the tab stop either: a tab stop that cannot be
+  // focused would drop the tree out of the Tab order.
+  const focusable = useMemo(
+    () => rows.filter((r) => r.kind !== "loading" && !(r.kind === "item" && r.item.disabled)),
+    [rows],
+  );
+  const focusableKeys = useMemo(() => new Set(focusable.map((r) => r.key)), [focusable]);
   const tabStop =
-    (focusKey && rows.some((r) => r.key === focusKey) ? focusKey : null) ??
-    rows.find((r) => r.kind === "item" && picked.includes(r.item.id))?.key ??
+    (focusKey && focusableKeys.has(focusKey) ? focusKey : null) ??
+    focusable.find((r) => r.kind === "item" && pickedSet.has(r.item.id))?.key ??
     focusable[0]?.key ??
     null;
 
@@ -185,7 +194,7 @@ export function Tree({
   // taking focus from where the person is (the search field).
   const outside = selected?.[0];
   const seenOutside = useRef(outside);
-  useLayoutEffect(() => {
+  useClientLayoutEffect(() => {
     if (outside === seenOutside.current) return;
     seenOutside.current = outside;
     const index = rows.findIndex((r) => r.key === outside);
@@ -198,7 +207,7 @@ export function Tree({
         ?.scrollIntoView?.({ block: "nearest" });
   });
 
-  useLayoutEffect(() => {
+  useClientLayoutEffect(() => {
     if (!moveFocus.current || !tabStop) return;
     moveFocus.current = false;
     // Bring the row into view first; it is rendered either way.
@@ -220,23 +229,23 @@ export function Tree({
     );
   };
   const expand = (item: TreeItem) => {
-    if (!open.includes(item.id)) setOpen([...open, item.id]);
+    if (!openSet.has(item.id)) setOpen([...open, item.id]);
     if (!childrenOf(item)) load(item);
   };
   const collapse = (item: TreeItem) => setOpen(open.filter((id) => id !== item.id));
-  const toggle = (item: TreeItem) => (open.includes(item.id) ? collapse(item) : expand(item));
+  const toggle = (item: TreeItem) => (openSet.has(item.id) ? collapse(item) : expand(item));
   const select = (item: TreeItem, additive: boolean) => {
     if (item.disabled) return;
     const next =
       selectionMode === "multiple" && additive
-        ? picked.includes(item.id)
+        ? pickedSet.has(item.id)
           ? picked.filter((id) => id !== item.id)
           : [...picked, item.id]
         : [item.id];
     setPicked(next);
   };
   const focusRow = (key: string | undefined) => {
-    if (!key) return;
+    if (!key || !focusableKeys.has(key)) return;
     moveFocus.current = true;
     setFocusKey(key);
   };
@@ -255,7 +264,7 @@ export function Tree({
     const index = focusable.findIndex((r) => r.key === tabStop);
     const item = row.item;
     const branch = row.kind === "item" && isBranch(item);
-    const isOpen = open.includes(item.id);
+    const isOpen = openSet.has(item.id);
     let handled = true;
     switch (key) {
       case "ArrowDown":
@@ -272,9 +281,11 @@ export function Tree({
         break;
       case "ArrowRight":
         if (branch && !isOpen) expand(item);
-        else if (branch) focusRow(rows[at + 1]?.kind === "item" ? rows[at + 1]?.key : undefined);
+        // Into the first child that can take focus (a disabled first child is passed over).
+        else if (branch) focusRow(focusable.find((r) => r.kind === "item" && r.parent === item.id)?.key);
         break;
       case "ArrowLeft":
+        // To the parent; a disabled parent cannot take focus, so focus stays.
         if (branch && isOpen) collapse(item);
         else focusRow(row.parent ?? undefined);
         break;
@@ -338,8 +349,8 @@ export function Tree({
             offset={virtual ? i * rowH : undefined}
             renderLabel={renderLabel}
             branch={row.kind === "item" && isBranch(row.item)}
-            open={open.includes(row.item.id)}
-            selected={row.kind === "item" && picked.includes(row.item.id)}
+            open={openSet.has(row.item.id)}
+            selected={row.kind === "item" && pickedSet.has(row.item.id)}
             tabbable={row.key === tabStop}
             busy={status[row.item.id] === "loading"}
             text={text}

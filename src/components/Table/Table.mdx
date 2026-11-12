@@ -36,7 +36,7 @@ Mark columns `sortable` and their headers become buttons: ascending, then descen
 
 ## Selection
 
-`selectable` adds a checkbox to each row (named after the row header, "Select Grace") and a select-all that is mixed when some rows are selected. Selected ids are reported in the rows' own order.
+`selectable` adds a checkbox to each row (named after the row header, "Select Grace") and a select-all that is mixed when some rows are selected. Selected ids are reported in the rows' own order. Ids that are not in `rows` (another page, or filtered out) stay selected, listed first; the select-all acts on the rows shown.
 
 <Canvas of={Stories.SelectingRows} />
 

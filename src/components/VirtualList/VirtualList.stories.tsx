@@ -393,6 +393,72 @@ export const DraggingNearAnEdgeScrolls: Story = {
   },
 };
 
+const HUGE: Entry[] = Array.from({ length: 100_000 }, (_, i) => ({ id: `h${i}`, name: `Row ${i + 1}` }));
+/** A hundred thousand rows, every one chosen: moves work on the whole list at once. */
+function HugeRail() {
+  const [rows, setRows] = useState(HUGE);
+  return (
+    <>
+      <Files
+        label="Rows"
+        items={rows}
+        selectionMode="multiple"
+        defaultSelectedKeys={HUGE.map((r) => r.id)}
+        onMove={(keys, to) => setRows(moveItems(rows, keys, to, (r) => r.id))}
+      />
+      <output data-testid="order">
+        {[...rows.slice(0, 3), ...rows.slice(-2)].map((r) => r.id).join(",")}
+      </output>
+    </>
+  );
+}
+
+export const MovesStayRightInAHundredThousandRows: Story = {
+  render: () => <HugeRail />,
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    // Unchoose the first row, then move the other 99,999 up past it with Alt+Up. Each step is linear in the row
+    // count; a quadratic one (scanning the selection per row) would not finish within the test's time.
+    await userEvent.click(canvas.getByRole("option", { name: "Row 1" }));
+    await expect(canvas.getByRole("option", { name: "Row 1" })).toHaveAttribute("aria-selected", "false");
+    await userEvent.keyboard("{ArrowDown}{Alt>}{ArrowUp}{/Alt}");
+    await expect(order(canvas)).toBe("h1,h2,h3,h99999,h0");
+    await expect(said(canvasElement)).toBe("Moved 99999 rows to position 1 of 100000");
+    await expect(canvas.getByRole("option", { name: "Row 2" })).toHaveFocus();
+    // And back down again.
+    await userEvent.keyboard("{Alt>}{ArrowDown}{/Alt}");
+    await expect(order(canvas)).toBe("h0,h1,h2,h99998,h99999");
+  },
+};
+
+let keyCalls = 0;
+const countedKey = (e: Entry) => {
+  keyCalls++;
+  return e.id;
+};
+
+export const ScrollingDoesNotWalkEveryRow: Story = {
+  render: () => <Files getKey={countedKey} />,
+  play: async ({ canvas, canvasElement }) => {
+    const box = list(canvasElement);
+    await waitFor(() => expect(canvas.getByRole("option", { name: "File 1" })).toBeInTheDocument());
+    // Scrolling re-renders the rows in view; it does not key (or size) all ten thousand rows again each time.
+    // Counted, not timed: re-keying every row would be 10,000 calls per scroll.
+    keyCalls = 0;
+    for (const n of [1, 2, 3, 4, 5]) {
+      box.scrollTop = n * 2000;
+      // The rows at the new position are rendered.
+      await waitFor(() =>
+        expect(
+          [...box.querySelectorAll<HTMLElement>('[role="option"]')].some(
+            (r) => r.offsetTop <= box.scrollTop && r.offsetTop + r.offsetHeight > box.scrollTop,
+          ),
+        ).toBe(true),
+      );
+    }
+    await expect(keyCalls).toBe(0);
+  },
+};
+
 /** A request log, as the tools app shows one: wrapped lines, new entries arriving, a button to jump back. */
 function Log({ follow = true }: { follow?: boolean }) {
   const [lines, setLines] = useState<Entry[]>(() =>

@@ -230,6 +230,32 @@ export const FollowsItsOwnWidth: Story = {
   },
 };
 
+export const WideningClosesTheDrawer: Story = {
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    frame(canvasElement).style.inlineSize = "600px";
+    await waitFor(
+      () => expect(canvas.getByRole("button", { name: "Open navigation" })).toBeVisible(),
+      RESIZE,
+    );
+    await userEvent.click(canvas.getByRole("button", { name: "Open navigation" }));
+    await waitFor(() => expect(sheet()?.open).toBe(true));
+    // Widened, the navigation moves back beside the content; narrowed again, the drawer stays shut until asked.
+    frame(canvasElement).style.inlineSize = "900px";
+    await waitFor(() => expect(canvas.getByRole("navigation", { name: "Main" })).toBeVisible(), RESIZE);
+    frame(canvasElement).style.inlineSize = "600px";
+    await waitFor(
+      () => expect(canvas.getByRole("button", { name: "Open navigation" })).toBeVisible(),
+      RESIZE,
+    );
+    await new Promise((r) => setTimeout(r, 100));
+    await expect(sheet()?.open ?? false).toBe(false);
+    await expect(canvas.getByRole("button", { name: "Open navigation" })).toHaveAttribute(
+      "aria-expanded",
+      "false",
+    );
+  },
+};
+
 export const CustomBreakpointAndLabels: Story = {
   args: {
     collapseBelow: 1000,
