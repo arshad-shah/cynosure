@@ -1,9 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { useEffect, useRef, useState } from "react";
+import { type ReactElement, useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { expect, waitFor } from "storybook/test";
 import { createStyleSheet } from "../styles/inline.js";
-import { createTheme } from "../tokens/index.js";
+import { emulateMedia } from "../test/media.js";
+import { createTheme, themeProperties } from "../tokens/index.js";
 import { CynosureTheme } from "./CynosureTheme.js";
 
 const meta = { title: "Foundations/CynosureTheme", component: CynosureTheme } satisfies Meta<
@@ -115,7 +116,7 @@ export const TargetDocument: Story = {
   },
 };
 
-function ShadowHost() {
+function ShadowHost({ content = <Swatch id="shadow" /> }: { content?: ReactElement }) {
   const host = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const el = host.current;
@@ -124,8 +125,8 @@ function ShadowHost() {
     root.adoptedStyleSheets = [createStyleSheet()];
     const mount = document.createElement("div");
     root.append(mount);
-    createRoot(mount).render(<Swatch id="shadow" />);
-  }, []);
+    createRoot(mount).render(content);
+  }, [content]);
   return <div data-testid="host" ref={host} />;
 }
 
@@ -138,6 +139,41 @@ export const InsideShadowRoot: Story = {
     const swatch = host.shadowRoot?.querySelector('[data-testid="shadow"]') as Element;
     await expect(token(swatch, "--cy-color-bg")).toBe("light-dark(#f4f1ea,#14120f)");
     await expect(getComputedStyle(swatch).backgroundColor).not.toBe("rgba(0, 0, 0, 0)");
+  },
+};
+
+/*
+ * On an OS set to more contrast, the stylesheet gives the root (here a shadow host) the high-contrast palettes;
+ * contrast="normal" without a theme must put the normal ones back for its subtree. Tagged "!dev": the media feature is
+ * emulated through the Vitest run.
+ */
+const normalAndSystem = (
+  <div>
+    <Swatch id="system" />
+    <CynosureTheme contrast="normal">
+      <Swatch id="normal" />
+    </CynosureTheme>
+  </div>
+);
+export const ContrastNormalOnMoreContrastOs: Story = {
+  tags: ["!dev"],
+  args: { children: null },
+  render: () => <ShadowHost content={normalAndSystem} />,
+  play: async ({ canvas }) => {
+    const host = await canvas.findByTestId("host");
+    const swatch = (id: string) => host.shadowRoot?.querySelector(`[data-testid="${id}"]`) as Element;
+    await waitFor(() => expect(swatch("normal")).toBeTruthy());
+    const normal = themeProperties(createTheme())["--cy-color-muted"];
+    const more = themeProperties(createTheme(), { contrast: true })["--cy-color-muted"];
+    await expect(normal).not.toBe(more);
+    if (!(await emulateMedia({ contrast: "more" }))) return;
+    try {
+      await waitFor(() => expect(matchMedia("(prefers-contrast: more)").matches).toBe(true));
+      await waitFor(() => expect(token(swatch("system"), "--cy-color-muted")).toBe(more));
+      await expect(token(swatch("normal"), "--cy-color-muted")).toBe(normal);
+    } finally {
+      await emulateMedia({ contrast: null });
+    }
   },
 };
 

@@ -42,7 +42,7 @@ export function App() {
 
 - **`theme`:** the result of `createTheme()`. Omit to inherit every token from the surrounding theme (or the default stylesheet).
 - **`mode`:** `light`, `dark` or `system` (follows the OS). Omit to inherit.
-- **`contrast`:** `normal`, `more` or `system`. When omitted it follows the OS, like `system`.
+- **`contrast`:** `normal`, `more` or `system`. When omitted it follows the OS, like `system`. `normal` keeps the normal palettes even on an OS set to more contrast, with or without a `theme`.
 - **`target`:** `self` (default) themes only the wrapper; `document` themes `<html>`.
 - **`as`:** `div` (default) or `span`. The wrapper uses `display: contents`, so it does not affect layout.
 - **`style`:** layout only (margin, placement). Restyle through tokens.

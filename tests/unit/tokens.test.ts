@@ -92,6 +92,18 @@ describe("themeToCss", () => {
       /@media \(prefers-contrast:more\)\{:where\(:root:not\(\[data-cy-contrast\]\),:host,\[data-cy-contrast="system"\]\)\{/,
     );
   });
+  it('contrast="normal" puts the normal palettes back on an OS set to more contrast', () => {
+    const block = css.slice(css.indexOf("@media (prefers-contrast:more)"));
+    const normal = block.indexOf(':where([data-cy-contrast="normal"]){');
+    // After the rule that swaps the contrast palettes in, so it wins for a wrapper that inherits them from the root.
+    expect(normal).toBeGreaterThan(block.indexOf(":where(:root:not([data-cy-contrast])"));
+    const rule = block.slice(normal, block.indexOf("}", normal));
+    expect(rule).toContain("--cy-color-bg:light-dark(#f4f1ea,#14120f)");
+    expect(rule).toContain(`--cy-color-muted:${firstBlock.match(/--cy-color-muted:([^;]+)/)?.[1]}`);
+    // Colours only: global and component tokens stay inherited.
+    expect(rule).not.toContain("--cy-button-radius");
+    expect(rule).not.toContain("--cy-space");
+  });
   it("emits component token overrides", () => {
     expect(firstBlock).toContain("--cy-button-radius:2px");
   });
@@ -180,6 +192,9 @@ describe("themeToCss with a custom selector", () => {
     const css = themeToCss(createTheme(), ".app");
     expect(css).toContain('.app[data-cy-mode="dark"]{color-scheme:dark}');
     expect(css).toContain('@media (prefers-contrast:more){.app[data-cy-contrast="system"]{');
+    expect(css).toContain(
+      '.app[data-cy-contrast="system"] [data-cy-contrast="normal"]{--cy-color-bg:light-dark(#f4f1ea,#14120f)',
+    );
   });
 });
 
