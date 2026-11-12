@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
-import { expect, waitFor } from "storybook/test";
+import { expect, waitFor, within } from "storybook/test";
 import { contrast, textContrast } from "../../test/color.js";
 import { computeUnderHostileHost } from "../../test/hostile.js";
 import { CynosureTheme } from "../../theme/CynosureTheme.js";
@@ -152,6 +152,67 @@ export const VisibleInEveryToneAndMode: Story = {
       const track = getComputedStyle(root.querySelector(".cy-progress-bar-track") as Element).backgroundColor;
       await expect({ name, visible: contrast(fill, track) >= 3 }).toEqual({ name, visible: true });
     }
+  },
+};
+
+function CostRow({ dir }: { dir: "ltr" | "rtl" }) {
+  return (
+    <div
+      dir={dir}
+      data-testid={dir}
+      style={{ display: "flex", alignItems: "center", gap: 8, inlineSize: 360, fontSize: 12 }}
+    >
+      <span>Seq Scan</span>
+      <ProgressBar label="Cost 1234.5" labelHidden value={45} size="sm" tone="warning" style={{ flex: 1 }} />
+      <span>cost: 1234.5</span>
+    </div>
+  );
+}
+
+export const SlimInlineBarInARow: Story = {
+  tags: ["visual"],
+  render: () => (
+    <Stack gap="4">
+      <CostRow dir="ltr" />
+      <CostRow dir="rtl" />
+    </Stack>
+  ),
+  play: async ({ canvas }) => {
+    for (const dir of ["ltr", "rtl"] as const) {
+      const row = canvas.getByTestId(dir);
+      const [first, last] = [...row.querySelectorAll(":scope > span")].map((el) =>
+        el.getBoundingClientRect(),
+      ) as [DOMRect, DOMRect];
+      const root = row.querySelector(".cy-progress-bar") as HTMLElement;
+      const track = bar(row).getBoundingClientRect();
+      // No visible text: the label only names the bar, and the bar is as tall as its track.
+      await expect(root.textContent).toBe("");
+      await expect(Math.abs(root.getBoundingClientRect().height - track.height)).toBeLessThan(1);
+      await expect(track.height).toBeLessThan(first.height);
+      await expect(within(row).getByRole("progressbar", { name: "Cost 1234.5" })).toHaveAttribute(
+        "aria-valuenow",
+        "45",
+      );
+      // It takes the space left between the texts, on their line, and the row does not overflow.
+      const [start, end] = dir === "ltr" ? [first, last] : [last, first];
+      await expect(track.left).toBeGreaterThan(start.right);
+      await expect(track.right).toBeLessThan(end.left);
+      await expect(track.width).toBeGreaterThan(100);
+      await expect(Math.abs(track.top + track.height / 2 - (first.top + first.height / 2))).toBeLessThan(1);
+      await expect(row.scrollWidth).toBeLessThanOrEqual(row.clientWidth);
+      // The fill grows from the reading start.
+      const fill = (row.querySelector(".cy-progress-bar-fill") as HTMLElement).getBoundingClientRect();
+      await waitFor(() => expect(Math.abs(fill.width / track.width - 0.45)).toBeLessThan(0.01));
+      if (dir === "ltr") await expect(Math.round(fill.left)).toBe(Math.round(track.left));
+      else await expect(Math.round(fill.right)).toBe(Math.round(track.right));
+    }
+    // Host CSS cannot give the bar a label row or another height.
+    const { clean, hostile } = computeUnderHostileHost(canvas.getByTestId("ltr"), ".cy-progress-bar", [
+      "display",
+      "height",
+      "box-sizing",
+    ]);
+    await expect(hostile).toEqual(clean);
   },
 };
 

@@ -25,6 +25,7 @@ Tokens: `--cy-progress-bar-height-{sm,md,lg}`, `--cy-progress-bar-radius`, `--cy
 
 - `segments` (with `offset`): parts drawn end to end, such as a request's timing or a waterfall row. Each has a `label` (read out: "DNS 12, Connect 30") and a `tone` or category `color`.
 - `marker` (with `markerLabel`): a thin mark at a value, such as a budget or target.
+- A slim bar in a row of text (a query plan's cost): `labelHidden` without `showValue` leaves only the track, still named by `label`; give it `style={{ flex: 1 }}` and a `size` of `xs` or `sm`.
 
 ## Tokens
 
