@@ -2,7 +2,7 @@
   {
     "name": "all CSS",
     "path": "dist/styles.css",
-    "limit": "35.8 kB",
+    "limit": "35.85 kB",
     "gzip": true
   },
   {
@@ -13,7 +13,13 @@
       "dist/tokens/defaults.js",
       "dist/tokens/to-css.js"
     ],
-    "limit": "6.5 kB",
+    "limit": "6.86 kB",
+    "gzip": true
+  },
+  {
+    "name": "Named themes + chart themes (no React)",
+    "path": ["dist/tokens/named-themes.js", "dist/tokens/chart-themes.js"],
+    "limit": "1.93 kB",
     "gzip": true
   },
   {
@@ -259,7 +265,7 @@
   {
     "name": "Notice",
     "path": ["dist/components/Notice/Notice.js", "dist/styles/notice.css"],
-    "limit": "1.75 kB",
+    "limit": "1.93 kB",
     "gzip": true
   },
   {

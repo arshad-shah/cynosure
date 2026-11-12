@@ -1,11 +1,15 @@
-import { type CSSProperties, type ReactNode, useMemo, useSyncExternalStore } from "react";
+import { type CSSProperties, type ReactNode, useContext, useMemo } from "react";
 import { useClientLayoutEffect } from "../foundations/client-layout-effect.js";
 import { type Theme, themeProperties } from "../tokens/index.js";
+import { ThemeContext, type ThemeState, useMediaQuery } from "./theme-context.js";
 
 export interface CynosureThemeProps {
-  /** A theme from `createTheme()`. Omit to inherit every token from the surrounding theme (or the default stylesheet). */
+  /**
+   * A theme from `createTheme()`, or a named theme's `theme` (`defineTheme`, `createThemeRegistry`). Omit to inherit
+   * every token from the surrounding theme (or the default stylesheet).
+   */
   theme?: Theme;
-  /** Omit to inherit the surrounding mode. `system` follows the OS. */
+  /** Omit to inherit the surrounding mode. `system` follows the OS. A theme fixed to one mode (Midnight) ignores it. */
   mode?: "light" | "dark" | "system";
   /** `more` uses the higher-contrast palettes. `system`, or leaving it out, follows the OS setting. */
   contrast?: "normal" | "more" | "system";
@@ -21,15 +25,6 @@ export interface CynosureThemeProps {
   children?: ReactNode;
 }
 
-const CONTRAST_QUERY = "(prefers-contrast: more)";
-function subscribe(callback: () => void) {
-  // Client-only: on the server useSyncExternalStore uses the server snapshot and never subscribes.
-  const query = matchMedia(CONTRAST_QUERY);
-  query.addEventListener("change", callback);
-  return () => query.removeEventListener("change", callback);
-}
-const prefersMore = () => matchMedia(CONTRAST_QUERY).matches;
-
 /** Applies a Cynosure theme to its own wrapper (or, opt-in, to the document). Never writes to <head> or <body>. */
 export function CynosureTheme({
   theme,
@@ -41,10 +36,26 @@ export function CynosureTheme({
   style,
   children,
 }: CynosureThemeProps) {
-  const osMore = useSyncExternalStore(subscribe, prefersMore, () => false);
+  const parent = useContext(ThemeContext);
+  const osMore = useMediaQuery("(prefers-contrast: more)");
   // Undefined contrast follows the OS, like "system" (spec §6.4: system by default).
   const more = contrast === "more" || (contrast !== "normal" && osMore);
   const properties = useMemo(() => (theme ? themeProperties(theme, { contrast: more }) : {}), [theme, more]);
+  // A theme fixed to one mode (its own, or the one it inherits) wins over the mode prop.
+  const painted = theme ?? parent?.theme;
+  const fixed = painted?.mode;
+  const ownMode = theme?.mode ?? (mode && (fixed ?? mode));
+  const parentMode = parent?.mode;
+  const parentMore = parent?.more;
+  // What useCynosureTheme reads below this wrapper: the same theme, mode and contrast the wrapper paints.
+  const state = useMemo<ThemeState>(
+    () => ({
+      theme: painted,
+      mode: fixed ?? mode ?? parentMode ?? "system",
+      more: theme || contrast ? more : (parentMore ?? more),
+    }),
+    [painted, fixed, mode, parentMode, theme, contrast, more, parentMore],
+  );
 
   useClientLayoutEffect(() => {
     if (target !== "document") return;
@@ -56,7 +67,7 @@ export function CynosureTheme({
       (a) => [a, html.getAttribute(a)] as const,
     );
     for (const name of names) html.style.setProperty(name, properties[name] as string);
-    if (mode) html.setAttribute("data-cy-mode", mode);
+    if (ownMode) html.setAttribute("data-cy-mode", ownMode);
     if (contrast) html.setAttribute("data-cy-contrast", contrast);
     return () => {
       for (const [name, value] of previousProps)
@@ -66,17 +77,19 @@ export function CynosureTheme({
         if (value === null) html.removeAttribute(attr);
         else html.setAttribute(attr, value);
     };
-  }, [target, properties, mode, contrast]);
+  }, [target, properties, ownMode, contrast]);
 
-  if (target === "document") return <>{children}</>;
+  if (target === "document") return <ThemeContext.Provider value={state}>{children}</ThemeContext.Provider>;
   return (
-    <Tag
-      className={className ? `cy-theme ${className}` : "cy-theme"}
-      data-cy-mode={mode}
-      data-cy-contrast={contrast}
-      style={{ ...(properties as CSSProperties), ...style }}
-    >
-      {children}
-    </Tag>
+    <ThemeContext.Provider value={state}>
+      <Tag
+        className={className ? `cy-theme ${className}` : "cy-theme"}
+        data-cy-mode={ownMode}
+        data-cy-contrast={contrast}
+        style={{ ...(properties as CSSProperties), ...style }}
+      >
+        {children}
+      </Tag>
+    </ThemeContext.Provider>
   );
 }

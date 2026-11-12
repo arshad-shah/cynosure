@@ -55,6 +55,12 @@ export interface ColorTokens {
   syntaxTag: string;
   syntaxAttribute: string;
   syntaxRegexp: string;
+  /**
+   * Data visualisation: eight categorical colours for chart series, the first being the accent. Each reads at least 3:1
+   * on the background, surface and raised surface (graphics contrast) and they stay apart from each other. CSS:
+   * `--cy-color-series-1` to `--cy-color-series-8`. A palette patch must give all eight.
+   */
+  seriesColors: string[];
 }
 
 export interface MotionTokens {
@@ -99,6 +105,11 @@ export interface ComponentTokens {}
 export type DeepPartial<T> = { [K in keyof T]?: T[K] extends object ? DeepPartial<T[K]> : T[K] };
 
 export interface ThemeInput {
+  /**
+   * Fixes the theme to one mode: a dark-only theme (Midnight) uses its dark palettes whatever the colour mode, and
+   * `CynosureTheme` sets that mode on its wrapper. Omit to follow the colour mode.
+   */
+  mode?: "light" | "dark";
   /** Any hex, rgb(), hsl() or oklch() colour. */
   accent?: string;
   scale?: Scale;
@@ -118,4 +129,6 @@ export interface Theme {
   global: GlobalTokens;
   palettes: Record<PaletteName, ColorTokens>;
   components: Record<string, Record<string, string>>;
+  /** Set when the theme is fixed to one mode (`ThemeInput.mode`); its light and dark palettes are then the same. */
+  mode?: "light" | "dark";
 }

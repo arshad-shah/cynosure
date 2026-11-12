@@ -40,8 +40,8 @@ export function App() {
 
 <ArgTypes of={Stories} />
 
-- **`theme`:** the result of `createTheme()`. Omit to inherit every token from the surrounding theme (or the default stylesheet).
-- **`mode`:** `light`, `dark` or `system` (follows the OS). Omit to inherit.
+- **`theme`:** the result of `createTheme()`, or a named theme's `theme`. Omit to inherit every token from the surrounding theme (or the default stylesheet).
+- **`mode`:** `light`, `dark` or `system` (follows the OS). Omit to inherit. A theme fixed to one mode ignores it.
 - **`contrast`:** `normal`, `more` or `system`. When omitted it follows the OS, like `system`. `normal` keeps the normal palettes even on an OS set to more contrast, with or without a `theme`.
 - **`target`:** `self` (default) themes only the wrapper; `document` themes `<html>`.
 - **`as`:** `div` (default) or `span`. The wrapper uses `display: contents`, so it does not affect layout.
@@ -79,6 +79,27 @@ const theme = createTheme({
 It derives accent hover and active (OKLCH), soft and ring mixes, and on-accent text with WCAG contrast of at least 4.5:1. Invalid colours or unsafe values throw `CynosureThemeError`.
 
 Besides `<CynosureTheme>`, a theme can be applied at build time with `themeToCss(theme)`, or in a shadow root with `styles.inline` plus `themeToCss(theme, ":host")`.
+
+## Named themes and fixed modes
+
+`createTheme({ mode: "dark" })` fixes a theme to one mode: its light and dark palettes are both the dark ones, and `CynosureTheme` sets `data-cy-mode="dark"` on its wrapper whatever `mode` it is given, so the colour-mode switch never flips it. Named themes (an id, a name and a `ThemeInput`, as plain JSON) are checked and built by `defineTheme(json)`; `createThemeRegistry(initial)` holds the ones an app offers, takes plugin themes at runtime through `register(json)` and rejects bad input with `CynosureThemeError`, including text that would not read at 4.5:1.
+
+```tsx
+const themes = createThemeRegistry([{ id: "cynosure", name: "Cynosure" }, midnightJson]);
+const list = useSyncExternalStore(themes.subscribe, themes.list); // for the picker
+<CynosureTheme theme={themes.get(picked)?.theme} mode={mode}>…</CynosureTheme>;
+```
+
+<Canvas of={Stories.FixedModeThemeIgnoresTheColourMode} />
+<Canvas of={Stories.SwitchingNamedThemes} />
+
+## useCynosureTheme
+
+```tsx
+const { theme, palette, colors, fontSize } = useCynosureTheme();
+```
+
+For canvas engines and chart libraries, which cannot read `var(--…)`: the nearest wrapper's theme, the palette it shows (`light`, `dark`, `light-contrast` or `dark-contrast`), that palette's colours as hex (including `seriesColors`, eight chart colours that read 3:1 on the page) and the type ramp in px. It re-renders when the theme, mode or contrast changes, so a canvas redraws and a chart re-registers its theme (`swiftChartTheme(theme, palette)`). Pass `mode` to `CynosureTheme` so the hook knows a mode the page chose.
 
 ## useColorMode
 

@@ -2,6 +2,9 @@ import { renderToString } from "react-dom/server";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { Calendar } from "../../src/components/Calendar/Calendar";
 import { ThemeToggle } from "../../src/components/ThemeToggle/ThemeToggle";
+import { CynosureTheme } from "../../src/theme/CynosureTheme";
+import { useCynosureTheme } from "../../src/theme/use-cynosure-theme";
+import { createTheme } from "../../src/tokens";
 
 describe("server rendering (Important 6)", () => {
   it("renders the system mode on the server without reading storage, so hydration matches", () => {
@@ -16,6 +19,21 @@ describe("server rendering (Important 6)", () => {
     const html = renderToString(<ThemeToggle storage={storage} />);
     expect(reads).toBe(0);
     expect(html).toMatch(/value="system"[^>]*checked|checked[^>]*value="system"/);
+  });
+  it("resolves the theme on the server as light with normal contrast, the first client render's values", () => {
+    const Probe = () => {
+      const { palette, colors } = useCynosureTheme();
+      return <span data-palette={palette} data-bg={colors.bg} />;
+    };
+    expect(renderToString(<Probe />)).toContain(
+      `data-palette="light" data-bg="${createTheme().palettes.light.bg}"`,
+    );
+    const html = renderToString(
+      <CynosureTheme mode="system">
+        <Probe />
+      </CynosureTheme>,
+    );
+    expect(html).toContain('data-palette="light"');
   });
 });
 
