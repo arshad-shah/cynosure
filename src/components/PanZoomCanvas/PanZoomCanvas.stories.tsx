@@ -191,6 +191,75 @@ export const PaintedIntoACanvas: Story = {
   },
 };
 
+/** Paints through the screen's helpers: its canvas sized in device pixels, drawn in canvas units. */
+function Crisp(screen: CanvasScreen) {
+  const el = useRef<HTMLCanvasElement>(null);
+  useEffect(() => {
+    const ctx = el.current?.getContext("2d");
+    if (!ctx) return;
+    ctx.resetTransform();
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    ctx.setTransform(...screen.transform);
+    ctx.fillStyle = "rgb(255, 0, 0)";
+    ctx.fillRect(100, 100, 20, 20);
+  });
+  return <canvas ref={el} {...screen.canvasProps} data-testid="painted" data-dpr={screen.dpr} />;
+}
+/** Pretends the screen has `ratio` device pixels per CSS pixel. */
+const setRatio = (ratio: number) =>
+  Object.defineProperty(window, "devicePixelRatio", { configurable: true, value: ratio });
+
+export const CrispOnHighDensityScreens: Story = {
+  beforeEach: () => {
+    // The window's own property (or the prototype's, in some engines) is put back afterwards.
+    const own = Object.getOwnPropertyDescriptor(window, "devicePixelRatio");
+    setRatio(2);
+    return () => {
+      if (own) Object.defineProperty(window, "devicePixelRatio", own);
+      else Reflect.deleteProperty(window, "devicePixelRatio");
+    };
+  },
+  render: () => {
+    const [view, setView] = useState<CanvasView>({ x: 10, y: 20, scale: 1.5 });
+    const [tall, setTall] = useState(false);
+    return (
+      <div style={{ inlineSize: 400 }}>
+        <Button size="sm" onClick={() => setTall(true)}>
+          Taller
+        </Button>
+        <div style={{ blockSize: tall ? 320 : 300 }}>
+          <PanZoomCanvas
+            label="Scene"
+            view={view}
+            onViewChange={setView}
+            renderScreen={(screen) => <Crisp {...screen} />}
+          />
+        </div>
+      </div>
+    );
+  },
+  play: async ({ canvas, userEvent }) => {
+    const region = canvas.getByRole("region", { name: "Scene" });
+    const painted = (await canvas.findByTestId("painted")) as HTMLCanvasElement;
+    // On a screen of two device pixels per CSS pixel, the canvas holds twice the pixels and shows at the CSS size.
+    await expect(painted).toHaveAttribute("data-dpr", "2");
+    await expect(painted.width).toBe(region.clientWidth * 2);
+    await expect(painted.height).toBe(region.clientHeight * 2);
+    await expect(painted.getBoundingClientRect().width).toBe(region.clientWidth);
+    await expect(painted.getBoundingClientRect().height).toBe(region.clientHeight);
+    // `transform` draws in canvas units: the square at (100, 100) is at screen (160, 170), device (320, 340).
+    await waitFor(() => expect(red(painted, 2 * 165, 2 * 175)).toBe(true));
+    await expect(red(painted, 2 * 155, 2 * 175)).toBe(false);
+    // Moving to a denser screen (or the browser zooming) is picked up on the next measure.
+    setRatio(3);
+    await userEvent.click(canvas.getByRole("button", { name: "Taller" }));
+    await waitFor(() => expect(painted.height).toBe(320 * 3));
+    await expect(painted).toHaveAttribute("data-dpr", "3");
+    await expect(painted.width).toBe(region.clientWidth * 3);
+    await waitFor(() => expect(red(painted, 3 * 165, 3 * 175)).toBe(true));
+  },
+};
+
 export const FitsItsContent: Story = {
   tags: ["visual"],
   play: async ({ canvas, canvasElement }) => {

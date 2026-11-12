@@ -29,7 +29,23 @@ Place children absolutely in canvas units. Give `bounds` (the content's extent) 
 
 ## Painting into a canvas
 
-An engine that draws the whole scene into a `<canvas>` (a large graph, a map) uses `renderScreen`. It gets `{ view, width, height }` on every view change and draws in screen pixels; a canvas point (x, y) is at (x times scale plus view.x, y times scale plus view.y). The layer sits under any children and does not take the pointer, so pressing it pans. Render your own component from it (`renderScreen={(s) => <Scene {...s} />}`) so its hooks belong to it.
+An engine that draws the whole scene into a `<canvas>` (a large graph, a map) uses `renderScreen`. It gets `{ view, width, height, dpr, canvasProps, transform }` on every view change and draws in screen pixels; a canvas point (x, y) is at (x times scale plus view.x, y times scale plus view.y). The layer sits under any children and does not take the pointer, so pressing it pans. Render your own component from it (`renderScreen={(s) => <Scene {...s} />}`) so its hooks belong to it.
+
+The canvas element is yours; the screen helps size and draw it. Spread `canvasProps` on it for a canvas of the screen's device pixels (`dpr` of them per CSS pixel, so it stays sharp on dense screens) shown at the canvas's CSS size, and call `ctx.setTransform(...screen.transform)` to draw in canvas units. A move to another screen or a browser zoom draws again at the new `dpr`.
+
+```tsx
+function Scene(screen: CanvasScreen) {
+  const ref = useRef<HTMLCanvasElement>(null);
+  useEffect(() => {
+    const ctx = ref.current!.getContext("2d")!;
+    ctx.resetTransform();
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    ctx.setTransform(...screen.transform);
+    drawScene(ctx); // in canvas units
+  });
+  return <canvas ref={ref} {...screen.canvasProps} />;
+}
+```
 
 <Canvas of={Stories.PaintedIntoACanvas} />
 

@@ -51,11 +51,20 @@ export interface PanZoomCanvasHandle {
   centreOn: (rect: CanvasRect) => void;
 }
 
-/** What `renderScreen` draws from: the current view and the canvas's size in CSS pixels. */
+/** What `renderScreen` draws from: the current view, the canvas's size in CSS pixels and the screen's density. */
 export interface CanvasScreen {
   view: CanvasView;
   width: number;
   height: number;
+  /** Device pixels per CSS pixel (`devicePixelRatio`); it changes when the window moves to another screen or zooms. */
+  dpr: number;
+  /** Spread on your `<canvas>`: its pixels are the screen's device pixels, shown at the canvas's size in CSS pixels. */
+  canvasProps: { width: number; height: number; style: { width: number; height: number } };
+  /**
+   * `ctx.setTransform(...screen.transform)` draws in canvas units, sharp at this density: a canvas point (x, y) lands
+   * at device pixel ((x * scale + view.x) * dpr, (y * scale + view.y) * dpr).
+   */
+  transform: [number, number, number, number, number, number];
 }
 
 export interface PanZoomCanvasLabels {
@@ -98,6 +107,23 @@ export interface PanZoomCanvasProps {
   style?: CSSProperties;
 }
 
+function screenOf(view: CanvasView, size: { width: number; height: number; dpr: number }): CanvasScreen {
+  const { width, height, dpr } = size;
+  const k = view.scale * dpr;
+  return {
+    view,
+    width,
+    height,
+    dpr,
+    canvasProps: {
+      width: Math.round(width * dpr),
+      height: Math.round(height * dpr),
+      style: { width, height },
+    },
+    transform: [k, 0, 0, k, view.x * dpr, view.y * dpr],
+  };
+}
+
 const DEFAULT_LABELS: PanZoomCanvasLabels = { zoom: (percent) => `Zoom ${percent}%` };
 /** Pixels an arrow key pans (Shift: five times as far). */
 const STEP = 40;
@@ -136,19 +162,29 @@ export const PanZoomCanvas = forwardRef<PanZoomCanvasHandle, PanZoomCanvasProps>
   );
   const latest = useRef(current);
   latest.current = current;
-  const [size, setSize] = useState({ width: 0, height: 0 });
+  const [size, setSize] = useState({ width: 0, height: 0, dpr: 1 });
   useClientLayoutEffect(() => {
     const el = surface.current as HTMLElement;
-    const measure = () =>
+    // The density is read with the size, and again when it changes (a move to another screen, a browser zoom).
+    let density: MediaQueryList | undefined;
+    const measure = () => {
+      const dpr = devicePixelRatio;
+      density?.removeEventListener("change", measure);
+      density = matchMedia(`(resolution: ${dpr}dppx)`);
+      density.addEventListener("change", measure);
       setSize((s) =>
-        s.width === el.clientWidth && s.height === el.clientHeight
+        s.width === el.clientWidth && s.height === el.clientHeight && s.dpr === dpr
           ? s
-          : { width: el.clientWidth, height: el.clientHeight },
+          : { width: el.clientWidth, height: el.clientHeight, dpr },
       );
+    };
     measure();
     const observer = new ResizeObserver(measure);
     observer.observe(el);
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+      (density as MediaQueryList).removeEventListener("change", measure);
+    };
   }, []);
 
   const go = (next: CanvasView) => {
@@ -281,9 +317,7 @@ export const PanZoomCanvas = forwardRef<PanZoomCanvasHandle, PanZoomCanvasProps>
         onBlur={gestures.onBlur}
       >
         {renderScreen && size.width > 0 && (
-          <div className="cy-pan-zoom-canvas-screen cy-reset">
-            {renderScreen({ view: current, width: size.width, height: size.height })}
-          </div>
+          <div className="cy-pan-zoom-canvas-screen cy-reset">{renderScreen(screenOf(current, size))}</div>
         )}
         <div
           className="cy-pan-zoom-canvas-content cy-reset"
