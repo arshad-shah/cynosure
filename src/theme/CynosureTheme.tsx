@@ -1,4 +1,5 @@
-import { type CSSProperties, type ReactNode, useLayoutEffect, useMemo, useSyncExternalStore } from "react";
+import { type CSSProperties, type ReactNode, useMemo, useSyncExternalStore } from "react";
+import { useClientLayoutEffect } from "../foundations/client-layout-effect.js";
 import { type Theme, themeProperties } from "../tokens/index.js";
 
 export interface CynosureThemeProps {
@@ -45,7 +46,7 @@ export function CynosureTheme({
   const more = contrast === "more" || (contrast !== "normal" && osMore);
   const properties = useMemo(() => (theme ? themeProperties(theme, { contrast: more }) : {}), [theme, more]);
 
-  useLayoutEffect(() => {
+  useClientLayoutEffect(() => {
     if (target !== "document") return;
     const html = document.documentElement;
     const names = Object.keys(properties);
