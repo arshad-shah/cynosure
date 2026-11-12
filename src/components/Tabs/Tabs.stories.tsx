@@ -420,12 +420,22 @@ export const CloseLabelsOverride: Story = {
         <Tab value="x" onClose={() => {}}>
           <strong>x.ts</strong>
         </Tab>
+        <Tab value="q-7f3a" onClose={() => {}} closeLabel="Fermer la requête 3">
+          <strong>Requête 3</strong> <em>non enregistrée</em>
+        </Tab>
+        <Tab value="y" onClose={() => {}}>
+          y.ts
+        </Tab>
       </TabList>
     </Tabs>
   ),
   play: async ({ canvasElement }) => {
-    // A label that is not plain text falls back to the tab's value.
-    await expect(canvasElement.querySelector('[aria-label="Fermer x"]')).not.toBeNull();
+    const closeNames = () =>
+      [...canvasElement.querySelectorAll(".cy-tab-close [aria-label]")].map((b) =>
+        b.getAttribute("aria-label"),
+      );
+    // A label that is not plain text is named by its text, never by the tab's value; `closeLabel` names it outright.
+    await waitFor(() => expect(closeNames()).toEqual(["Fermer x.ts", "Fermer la requête 3", "Fermer y.ts"]));
   },
 };
 

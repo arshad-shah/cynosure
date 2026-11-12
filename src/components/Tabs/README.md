@@ -26,7 +26,7 @@ APG tabs: `Tabs` holds the selection, `TabList` (named) holds `Tab`s, each `TabP
 | `labels`                              | –                 | `close(name)`, `moved(name, position, total)`   |
 
 
-`TabList`: `label`, `onReorder(values)` (reorderable tabs). `Tab`: `value`, `icon`, `disabled`, `onClose` (closable tab). `TabPanel`: `value`, `keepMounted` (keep hidden content mounted). Tabs without a `TabPanel` (e.g. routed content) are valid: they simply omit `aria-controls`.
+`TabList`: `label`, `onReorder(values)` (reorderable tabs). `Tab`: `value`, `icon`, `disabled`, `onClose` (closable tab), `closeLabel` (the close button's name; by default `labels.close` with the tab's text, also when the label is not a plain string). `TabPanel`: `value`, `keepMounted` (keep hidden content mounted). Tabs without a `TabPanel` (e.g. routed content) are valid: they simply omit `aria-controls`.
 
 - One Tab stop; arrows (RTL aware), Home and End; disabled tabs skipped; Tab moves to the panel.
 - Removing the selected tab selects the one now in its place (or the previous one).
