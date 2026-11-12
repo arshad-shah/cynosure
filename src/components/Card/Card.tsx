@@ -1,4 +1,5 @@
 import {
+  type AriaAttributes,
   type CSSProperties,
   type ElementType,
   forwardRef,
@@ -10,6 +11,8 @@ import { LinkBase } from "../../foundations/LinkBase/LinkBase.js";
 import type { Tone } from "../../tokens/schema.js";
 
 export interface CardTokens {
+  /** Border colour of the current card of a set (`aria-current`). Default: the accent. */
+  currentBorder: string;
   bg: string;
   border: string;
   radius: string;
@@ -62,6 +65,11 @@ export interface CardProps {
   children?: ReactNode;
   /** Accessible name of the card, set on the card element. */
   "aria-label"?: string;
+  /**
+   * Marks a link or button card as the current one of a set: `"page"` for the page being shown (a card grid of
+   * sections), or `"step"`, `"location"`, `true`. Read by screen readers, and the card's border takes the accent.
+   */
+  "aria-current"?: AriaAttributes["aria-current"];
   /** Set on the card element, to find it in tests. */
   "data-testid"?: string;
 }

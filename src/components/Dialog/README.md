@@ -39,7 +39,3 @@ A modal dialog in the browser top layer, built on the `DialogBase` foundation (n
 - Never writes to `<html>` or `<body>` (no scroll lock; the content uses `overscroll-behavior: contain`). Works inside shadow roots.
 
 Tokens: `--cy-dialog-radius`, `--cy-dialog-padding`, `--cy-dialog-width-{sm,md,lg}`, `--cy-dialog-scrim`.
-
-## Used by
-
-Prism (confirm destructive actions, rule editor), Aperture (export settings), web apps (forms that need full attention).

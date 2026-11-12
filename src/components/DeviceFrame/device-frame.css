@@ -1,0 +1,240 @@
+/*
+ * device-frame: a phone, tablet or browser window drawn in CSS around a screen (an AspectRatio). The root is a size
+ * container, so the bezel, corners and camera of a phone or tablet scale with its width: --_u is one hundredth of the
+ * device's short side.
+ */
+.cy-device-frame-body {
+  --_u: calc(1cqi / max(1, var(--_screen-ratio)));
+  --_bezel: 0;
+  --_corner: 0;
+  box-sizing: border-box !important;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: var(--_bezel);
+  border: 0;
+  font: inherit;
+  border-radius: var(--_corner);
+  isolation: isolate;
+  /* The rim: the theme's line on a light page; on a dark page a lighter rim (3:1 against the page) draws the outline
+     of a dark device, as the metal edge of a real phone does. */
+  box-shadow:
+    0 0 0 var(--cy-border-width)
+    var(
+      --cy-device-frame-edge,
+      light-dark(var(--cy-color-line), color-mix(in oklab, var(--cy-color-ink) 42%, var(--cy-color-bg)))
+    ),
+    var(--cy-device-frame-shadow, var(--cy-shadow-lg));
+  /* The bezel (::before) and the camera (::after): a dark device in both modes. On a light page it is the ink; on a
+     dark page it is lifted a little off the page (never white), so it does not disappear into it. */
+  &::before,
+  &::after {
+    content: none;
+    position: absolute;
+    border-radius: var(--cy-radius-full);
+    background: var(
+      --cy-device-frame-bezel,
+      light-dark(var(--cy-color-ink), color-mix(in oklab, var(--cy-color-ink) 20%, var(--cy-color-bg)))
+    );
+  }
+  &::before {
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+  }
+  &::after {
+    z-index: 1;
+  }
+}
+
+/* The screen: content is stretched to it and clipped to its corners; its stacking stays inside it. */
+.cy-device-frame-screen.cy-device-frame-screen {
+  --_screen-radius: calc(var(--_corner) - var(--_bezel));
+  --cy-aspect-ratio-radius: var(--_screen-radius);
+  isolation: isolate;
+  background: var(--cy-device-frame-screen, var(--cy-color-bg));
+}
+
+/*
+ * The content area: the screen's one child (AspectRatio stretches it), holding the content. Each child fills it, one
+ * over another. With the safe area (data-safe), it starts clear of a phone's camera island: below it when upright,
+ * beside it when turned (--_safe-top and --_safe-left, set below from --_island).
+ */
+.cy-device-frame-content.cy-device-frame-content {
+  display: grid;
+  /* Clips the content itself to the screen's rounded corners. A clip-path, not only the screen's overflow and radius:
+     WebKit ignores a border-radius clip when it hit-tests, so the content was still under the pointer at a corner. */
+  overflow: hidden;
+  clip-path: inset(0 round var(--_screen-radius, 0));
+  grid-template: minmax(0, 1fr) / minmax(0, 1fr);
+  padding-block-start: var(--_safe-top, 0);
+  padding-left: var(--_safe-left, 0);
+  & > * {
+    grid-area: 1 / 1;
+    box-sizing: border-box;
+    inline-size: 100%;
+    block-size: 100%;
+    max-inline-size: none;
+    min-block-size: 0;
+    margin: 0;
+    object-fit: cover;
+  }
+}
+
+/* Browser bar: three drawn dots and the address. Decoration only. */
+.cy-device-frame-bar {
+  box-sizing: border-box !important;
+  display: flex;
+  align-items: center;
+  gap: var(--cy-space-5);
+  margin: 0;
+  padding: var(--cy-space-3) var(--cy-space-4);
+  border-block-end: var(--cy-border-width) solid var(--cy-device-frame-edge, var(--cy-color-line));
+  background: var(--cy-device-frame-browser-bar, var(--cy-color-soft));
+  color: var(--cy-color-muted);
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-font-size-xs);
+  font-weight: var(--cy-font-weight-regular);
+  line-height: 1.5;
+  letter-spacing: normal;
+  text-transform: none;
+}
+.cy-device-frame-dots {
+  box-sizing: border-box !important;
+  display: inline-flex;
+  flex: none;
+  gap: var(--cy-space-2);
+  margin: 0;
+  font: inherit;
+  & > span {
+    box-sizing: border-box !important;
+    display: block;
+    inline-size: var(--cy-space-4);
+    block-size: var(--cy-space-4);
+    margin: 0;
+    border-radius: var(--cy-radius-full);
+    background: var(--cy-device-frame-dot, color-mix(in oklab, var(--cy-color-muted) 45%, transparent));
+  }
+}
+.cy-device-frame-url {
+  box-sizing: border-box !important;
+  flex: 1 1 0;
+  min-inline-size: 0;
+  max-inline-size: 60%;
+  margin: 0 auto;
+  padding: var(--cy-space-1) var(--cy-space-5);
+  overflow: hidden;
+  border-radius: var(--cy-radius-full);
+  background: var(--cy-color-surface);
+  color: inherit;
+  font: inherit;
+  letter-spacing: normal;
+  text-align: center;
+  text-overflow: ellipsis;
+  text-transform: none;
+  white-space: nowrap;
+}
+
+.cy-device-frame.cy-device-frame {
+  --_max: 100%;
+  box-sizing: border-box !important;
+  display: block;
+  container-type: inline-size;
+  inline-size: 100%;
+  max-inline-size: min(100%, var(--_max));
+  margin: 0;
+  padding: 0;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  letter-spacing: normal;
+  text-transform: none;
+
+  /* A phone is as wide as its token when upright and as tall as it when turned. */
+  &:is([data-device="phone"], [data-device="tablet"]) > .cy-device-frame-body::before {
+    content: "";
+  }
+  &[data-device="phone"] {
+    --_max: calc(
+      var(--cy-device-frame-phone-width, calc(var(--cy-control-height-md) * 9)) *
+      max(1, var(--_screen-ratio))
+    );
+    & > .cy-device-frame-body {
+      --_bezel: calc(var(--_u) * 3.5);
+      --_corner: calc(var(--_u) * 15);
+      /* The island ends 10.5 units into the screen; content starts 3 units after it. */
+      --_island: calc(var(--_u) * 13.5);
+      /* The camera island. */
+      &::after {
+        content: "";
+        inset-block-start: calc(var(--_bezel) + var(--_u) * 2.5);
+        left: 50%;
+        inline-size: calc(var(--_u) * 28);
+        block-size: calc(var(--_u) * 8);
+        translate: -50% 0;
+      }
+    }
+  }
+  /* Safe area: always with safeArea, and by default for live content (a screenshot, a video or a canvas fills the
+     screen, as it has its own status bar). */
+  &[data-device="phone"]:is(
+      [data-safe="on"],
+      [data-safe="auto"]:not(:has(.cy-device-frame-content > :is(img, picture, video, canvas, svg)))
+    )
+    .cy-device-frame-content {
+    --_safe-top: var(--_island);
+    &:is([data-orientation="landscape"] *) {
+      --_safe-top: 0;
+      --_safe-left: var(--_island);
+    }
+  }
+  &[data-device="tablet"] {
+    --_max: calc(
+      var(--cy-device-frame-tablet-width, calc(var(--cy-control-height-md) * 18)) *
+      max(1, var(--_screen-ratio))
+    );
+    & > .cy-device-frame-body {
+      --_bezel: calc(var(--_u) * 4.5);
+      --_corner: calc(var(--_u) * 6.5);
+      /* The camera, in the middle of the top bezel. */
+      &::after {
+        content: "";
+        top: calc(var(--_bezel) / 2);
+        left: 50%;
+        inline-size: calc(var(--_u) * 1.6);
+        block-size: calc(var(--_u) * 1.6);
+        translate: -50% -50%;
+        background: var(--cy-device-frame-edge, var(--cy-color-line));
+      }
+    }
+  }
+  /* Turned a quarter: the camera moves to the left edge (the device rotates, so this is physical, not logical). */
+  &[data-orientation="landscape"] > .cy-device-frame-body::after {
+    top: 50%;
+    left: calc(var(--_bezel) + var(--_u) * 2.5);
+    inline-size: calc(var(--_u) * 8);
+    block-size: calc(var(--_u) * 28);
+    translate: 0 -50%;
+  }
+  &[data-device="tablet"][data-orientation="landscape"] > .cy-device-frame-body::after {
+    left: calc(var(--_bezel) / 2);
+    inline-size: calc(var(--_u) * 1.6);
+    block-size: calc(var(--_u) * 1.6);
+    translate: -50% -50%;
+  }
+  &[data-device="browser"] > .cy-device-frame-body {
+    --_corner: var(--cy-device-frame-browser-radius, var(--cy-radius-card));
+    overflow: hidden;
+    background: var(--cy-device-frame-browser-bar, var(--cy-color-soft));
+    & > .cy-device-frame-screen {
+      --_screen-radius: 0;
+    }
+  }
+}
+
+@media (forced-colors: active) {
+  .cy-device-frame-body {
+    outline: var(--cy-border-width) solid CanvasText;
+  }
+}

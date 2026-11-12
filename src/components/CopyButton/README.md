@@ -17,7 +17,3 @@ An IconButton that copies a value to the clipboard, shows a check (or an error) 
 | `size`, `variant`, `disabled`, `tooltipPlacement` | `md`, `ghost`                                                  | As IconButton                                                          |
 - Never throws: a missing clipboard (insecure context, some extension pages), a refused permission or a throwing writer all show the failed state.
 - The result is announced through a live `role="status"` that exists before the click; the button's name changes with it.
-
-## Used by
-
-Prism (copy paths and snippets), Aperture (copy capture links), docs sites (install commands and code blocks).

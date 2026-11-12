@@ -4,7 +4,12 @@ import { join } from "node:path";
 import type { IconCategory, IconData, IconNode } from "../../../src/icons/types";
 import { validateIcon } from "../../../src/icons/validate";
 
-const kebab = (s: string) => s.replace(/([a-z0-9])([A-Z])/g, "$1-$2").toLowerCase();
+/** `IconButton` → `icon-button`, `QRCode` → `qr-code` (the same names `cy check` expects). */
+const kebab = (s: string) =>
+  s
+    .replace(/([a-z0-9])([A-Z])/g, "$1-$2")
+    .replace(/([A-Z])([A-Z][a-z])/g, "$1-$2")
+    .toLowerCase();
 const camel = (s: string) => s.replace(/-(\w)/g, (_, c: string) => c.toUpperCase());
 const RESERVED = new Set([
   "package",
@@ -49,7 +54,8 @@ const RESERVED = new Set([
 ]);
 /** Export identifier for an icon name; reserved words get an `Icon` suffix (`package` → `packageIcon`). */
 export const iconId = (name: string) => (RESERVED.has(camel(name)) ? `${camel(name)}Icon` : camel(name));
-const lowerFirst = (s: string) => s.charAt(0).toLowerCase() + s.slice(1);
+/** The token group key: `IconButton` → `iconButton`, `QRCode` → `qrCode`. */
+const lowerFirst = (s: string) => camel(kebab(s));
 
 /** Sorts whole `export { … } from "…";` statements (they may span several lines once formatted). */
 export function sortExports(text: string): string {
@@ -189,9 +195,6 @@ import { ${Name} } from "@arshad-shah/cynosure";
 
 ## Tokens
 - \`--cy-${k}-gap\`: space between children
-
-## Used by
-TODO(cy): list the products that use ${Name} (two or more, or one essential use).
 `;
 
 const docsPage = (

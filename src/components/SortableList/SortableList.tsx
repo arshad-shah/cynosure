@@ -285,10 +285,10 @@ export function SortableList({
           </li>
         ))}
       </ul>
-      <span id={`${id}-how`} className="cy-sortable-list-hidden cy-reset">
+      <span id={`${id}-how`} className="cy-reset cy-visually-hidden">
         {text.instructions}
       </span>
-      <span className="cy-sortable-list-hidden cy-reset" role="status">
+      <span className="cy-reset cy-visually-hidden" role="status">
         {said}
       </span>
     </div>

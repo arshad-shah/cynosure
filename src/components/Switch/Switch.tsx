@@ -1,4 +1,5 @@
-import { ChoiceRow, type ChoiceRowProps } from "../Checkbox/ChoiceRow.js";
+import { ChoiceBase } from "../../foundations/ChoiceBase/ChoiceBase.js";
+import { Choice, type ChoiceControlProps } from "../Choice/Choice.js";
 
 export interface SwitchTokens {
   width: string;
@@ -13,9 +14,20 @@ declare module "../../tokens/schema.js" {
   }
 }
 
-export type SwitchProps = ChoiceRowProps;
+export type SwitchProps = ChoiceControlProps;
 
-/** On/off switch (`role="switch"`) on a native checkbox. */
-export function Switch(props: SwitchProps) {
-  return <ChoiceRow kind="switch" {...props} />;
+/** On/off switch (`role="switch"`) on a native checkbox, in a Choice row. */
+export function Switch({ size = "md", tone = "accent", ...props }: SwitchProps) {
+  return (
+    <Choice
+      {...props}
+      size={size}
+      control={(input) => (
+        <span className="cy-switch" data-size={size} data-tone={tone}>
+          <ChoiceBase {...input} type="checkbox" role="switch" />
+          <span className="cy-reset cy-switch-thumb" />
+        </span>
+      )}
+    />
+  );
 }

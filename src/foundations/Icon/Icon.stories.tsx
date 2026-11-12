@@ -26,6 +26,7 @@ const meta = {
     },
     color: { control: "color" },
     label: { control: "text" },
+    flipRtl: { control: "boolean" },
   },
 } satisfies Meta<typeof Icon>;
 export default meta;
@@ -247,5 +248,27 @@ export const BrandMarksInTextColour: Story = {
   play: async ({ canvas }) => {
     // Without `color="brand"` a mark follows the text colour (the one-colour version brands allow).
     await expect(getComputedStyle(canvas.getByRole("img", { name: "GitHub" })).color).toBe("rgb(10, 20, 30)");
+  },
+};
+
+export const FlipsInRightToLeft: Story = {
+  args: { icon: icons.chevronRight, flipRtl: true },
+  render: (args) => (
+    <div>
+      <span dir="ltr">
+        <Icon {...args} className="ltr" />
+      </span>
+      <span dir="rtl">
+        <Icon {...args} className="rtl" />
+        <Icon {...args} flipRtl={false} className="plain" />
+      </span>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const scale = (cls: string) =>
+      getComputedStyle(canvasElement.querySelector(`svg.${cls}`) as SVGElement).scale;
+    await expect(scale("ltr")).toBe("none");
+    await expect(scale("rtl")).toBe("-1 1");
+    await expect(scale("plain")).toBe("none");
   },
 };

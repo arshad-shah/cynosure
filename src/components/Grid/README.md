@@ -14,16 +14,18 @@ import { Grid, GridItem } from "@arshad-shah/cynosure";
 </Grid>;
 ```
 
-| Prop                             | Default | Notes                                                                                                                           |
-| -------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| `columns`                        | `1`     | Equal columns: a number, or one per breakpoint (`{ base, sm, md, lg, xl }`). With `minItemWidth`, the most columns there can be |
-| `minItemWidth`                   | –       | Any CSS length: columns at least this wide, as many as fit, never wider than grid                                               |
-| `gap`                            | `4`     | Space token between items                                                                                                       |
-| `rowGap`                         | `gap`   | Space token between rows                                                                                                        |
-| `padding`                        | –       | Space token of padding on all four sides                                                                                        |
-| `paddingInline` / `paddingBlock` | –       | Space token for the sides / the top and bottom; each wins over `padding`                                                        |
-| `align`                          | –       | `start` · `center` · `end` · `stretch` (block axis; items stretch by default)                                                   |
-| `as`                             | `div`   | Neutral element only; use `ul`/`ol` with `GridItem as="li"`                                                                     |
+| Prop                             | Default | Notes                                                                                                                                                                                                      |
+| -------------------------------- | ------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `columns`                        | `1`     | Equal columns: a number, or one per breakpoint (`{ base, sm, md, lg, xl }`). With `minItemWidth`, the most columns there can be. A string is a track list for unequal columns (`"2fr 1fr"`, `"16rem 1fr"`) |
+| `minItemWidth`                   | –       | Any CSS length: columns at least this wide, as many as fit, never wider than grid                                                                                                                          |
+| `gap`                            | `4`     | Space token between items                                                                                                                                                                                  |
+| `rowGap`                         | `gap`   | Space token between rows                                                                                                                                                                                   |
+| `padding`                        | –       | Space token of padding on all four sides                                                                                                                                                                   |
+| `paddingInline` / `paddingBlock` | –       | Space token for the sides / the top and bottom; each wins over `padding`                                                                                                                                   |
+| `align`                          | –       | `start` · `center` · `end` · `stretch` (block axis; items stretch by default)                                                                                                                              |
+| `as`                             | `div`   | Neutral element only; use `ul`/`ol` with `GridItem as="li"`                                                                                                                                                |
+| `hideBelow` / `hideAbove`        | –       | Hidden while the window is narrower than / at least this breakpoint (`sm` 30rem, `md` 45rem, `lg` 60rem, `xl` 75rem). No script                                                                            |
+| `id`, `role`, `aria-*`           | –       | Passed to the element: a link target, a named landmark or group                                                                                                                                            |
 
 `GridItem`: `span` (columns, or `full` for the whole row; clamped to the columns a `columns` grid has at its current width), `rowSpan`, `as` (`div`, `li`, `section`, `article`, `aside`). Plain children need no wrapper.
 
@@ -54,6 +56,14 @@ import { Grid, GridItem } from "@arshad-shah/cynosure";
 
 `padding`, `paddingInline` and `paddingBlock` pad the grid's own box with space tokens, inside its width; the specific one wins over `padding`, and `"0"` counts as a value. A nested Grid never inherits its parent's padding. The props and logic are shared with Stack and Inline (`../Stack/space.ts`).
 
-## Used by
+## GridItem
 
-Card galleries, dashboards and settings layouts in the web apps and sites (cross-product audit, 2026-11-10), in place of hand-written CSS grids.
+| Prop                                              | Default | Notes                                                                                                              |
+| ------------------------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------ |
+| `span`                                            | `1`     | Columns to span, or `full`. In a grid with `columns` per breakpoint, one per breakpoint: `{ base: "full", md: 2 }` |
+| `rowSpan`                                         | `1`     | Rows to span                                                                                                       |
+| `order`                                           | `0`     | Visual position (CSS `order`), or one per breakpoint. The reading and tab order stay the source order              |
+| `sticky` / `stickyOffset`                         | – / `0` | Stays in view while the page scrolls past its row, keeping its own height (a sidebar)                              |
+| `hideBelow` / `hideAbove`, `id`, `role`, `aria-*` | –       | As on Grid                                                                                                         |
+
+**Unequal columns that change with the width:** give the grid equal columns per breakpoint and the items a span per breakpoint. `columns={{ base: 1, md: 3 }}` with a main item of `span={{ md: 2 }}` is one column on phones and two to one from `md`; `order={{ base: 2, md: 1 }}` moves it after its sibling on phones only. Item spans and orders per breakpoint follow the grid's own width, like its columns.

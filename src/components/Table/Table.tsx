@@ -190,8 +190,7 @@ export function Table<Row>({
         <table className="cy-table-table cy-reset">
           <caption
             id={`${id}-caption`}
-            className="cy-table-caption cy-reset"
-            data-hidden={captionHidden ? "" : undefined}
+            className={`cy-table-caption cy-reset${captionHidden ? " cy-visually-hidden" : ""}`}
           >
             {caption}
           </caption>
@@ -200,7 +199,7 @@ export function Table<Row>({
               {selectable && (
                 <th scope="col" className="cy-table-th cy-table-select cy-reset">
                   <Checkbox
-                    label={<span className="cy-table-hidden">{text.selectAll}</span>}
+                    label={<span className="cy-visually-hidden">{text.selectAll}</span>}
                     checked={allIds.length > 0 && chosenCount === allIds.length}
                     indeterminate={chosenCount > 0 && chosenCount < allIds.length}
                     disabled={allIds.length === 0}
@@ -251,7 +250,7 @@ export function Table<Row>({
                     {selectable && (
                       <td className="cy-table-td cy-table-select cy-reset">
                         <Checkbox
-                          label={<span className="cy-table-hidden">{text.selectRow(rowName(row))}</span>}
+                          label={<span className="cy-visually-hidden">{text.selectRow(rowName(row))}</span>}
                           checked={isChosen}
                           onChange={(on) => {
                             const next = new Set(chosen);

@@ -1,0 +1,62 @@
+/* Switch: the track and thumb drawn in its Choice row. The native input (ChoiceBase, role="switch") sits over it. */
+.cy-switch-thumb {
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: calc(var(--cy-border-width) * 2);
+  inline-size: var(--cy-switch-thumb-size, calc(var(--_sh) - var(--cy-border-width) * 4));
+  block-size: var(--cy-switch-thumb-size, calc(var(--_sh) - var(--cy-border-width) * 4));
+  border-radius: calc(var(--_sh) * 0.32);
+  background: var(--cy-color-surface-raised);
+  box-shadow: var(--cy-shadow-sm);
+  translate: 0 -50%;
+  transition: inset-inline-start var(--cy-motion-base) var(--cy-motion-ease);
+  pointer-events: none;
+}
+
+.cy-switch.cy-switch {
+  font-size: inherit;
+  line-height: inherit;
+  --_tone: var(--cy-color-accent);
+  --_sh: var(--cy-switch-height, calc(20px * var(--cy-scale, 1)));
+  box-sizing: border-box !important;
+  position: relative;
+  flex: none;
+  inline-size: var(--cy-switch-width, calc(var(--_sh) * 1.75));
+  block-size: var(--_sh);
+  margin: 0;
+  margin-block-start: calc((1lh - var(--_sh)) / 2);
+  border-radius: calc(var(--_sh) * 0.4);
+  background: var(--cy-switch-off-bg, color-mix(in oklab, var(--cy-color-ink) 28%, var(--cy-color-line)));
+  transition: background-color var(--cy-motion-base) var(--cy-motion-ease);
+  &[data-size="sm"] {
+    --_sh: var(--cy-switch-height-sm, calc(16px * var(--cy-scale, 1)));
+  }
+  &[data-size="lg"] {
+    --_sh: var(--cy-switch-height-lg, calc(24px * var(--cy-scale, 1)));
+  }
+  &[data-tone="neutral"] {
+    --_tone: var(--cy-color-ink);
+  }
+  &[data-tone="danger"] {
+    --_tone: var(--cy-color-danger);
+  }
+  &[data-tone="success"] {
+    --_tone: var(--cy-color-success);
+  }
+  &[data-tone="warning"] {
+    --_tone: var(--cy-color-warning);
+  }
+  &[data-tone="info"] {
+    --_tone: var(--cy-color-info);
+  }
+  &:has(> input:checked) {
+    background: var(--_tone);
+  }
+  &:has(> input:checked) .cy-switch-thumb {
+    inset-inline-start: calc(100% - var(--_sh) + var(--cy-border-width) * 2);
+  }
+  &:has(> input:focus-visible) {
+    box-shadow: 0 0 0 var(--cy-border-focus) var(--cy-color-ring);
+    outline: var(--cy-border-focus) solid transparent;
+  }
+}

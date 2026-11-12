@@ -16,6 +16,7 @@ import { close } from "../../icons/close.js";
 import { useListboxLayer } from "../../overlay/listbox-layer.js";
 import type { Size } from "../../tokens/schema.js";
 import { IconButton } from "../IconButton/IconButton.js";
+import { OptionList, OptionListItem, OptionListNote } from "../OptionList/OptionList.js";
 import { TextField } from "../TextField/TextField.js";
 
 export interface TagInputTokens {
@@ -346,51 +347,28 @@ export function TagInput({
         </ul>
       )}
       {suggestions && (
-        <div
-          ref={list}
-          id={listId}
-          role="listbox"
-          aria-label={typeof label === "string" ? label : undefined}
-          className="cy-combobox-list"
-          {...{ popover: "manual" }}
-        >
+        <OptionList ref={list} id={listId} label={typeof label === "string" ? label : undefined}>
           {matches.length === 0 ? (
-            <div
-              role="option"
-              aria-disabled="true"
-              aria-selected="false"
-              tabIndex={-1}
-              className="cy-combobox-note"
-            >
-              {text.empty}
-            </div>
+            <OptionListNote>{text.empty}</OptionListNote>
           ) : (
             matches.map((s, index) => (
-              <div
+              <OptionListItem
                 key={s}
                 id={`${listId}-${index}`}
-                role="option"
-                aria-selected={index === active}
-                data-active={index === active ? "" : undefined}
-                className="cy-combobox-option"
-                tabIndex={-1}
+                label={s}
+                selected={index === active}
+                active={index === active}
                 onPointerMove={() => setActive(index)}
-                onPointerDown={(e) => e.preventDefault()}
                 onClick={() => {
                   if (add([s])) setTyped("");
                   setOpen(false);
                 }}
-                onKeyDown={() => {}}
-              >
-                <span className="cy-combobox-option-text">
-                  <span className="cy-combobox-option-label">{s}</span>
-                </span>
-              </div>
+              />
             ))
           )}
-        </div>
+        </OptionList>
       )}
-      <span className="cy-tag-input-status cy-reset" role="status">
+      <span className="cy-visually-hidden" role="status">
         {said}
       </span>
       {tags.map((tag, index) => (

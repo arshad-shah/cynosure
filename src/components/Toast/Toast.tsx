@@ -388,7 +388,13 @@ function ToastItem({ item, collapsed, paused, dismissLabel, onDismiss, onRemoved
         )}
       </div>
       {action && (
-        <Button size="sm" variant="soft" tone={tone === "neutral" ? "accent" : tone} onClick={action.onClick}>
+        <Button
+          size="sm"
+          variant="soft"
+          tone={tone === "neutral" ? "accent" : tone}
+          className="cy-toast-action"
+          onClick={action.onClick}
+        >
           {action.label}
         </Button>
       )}
@@ -397,6 +403,7 @@ function ToastItem({ item, collapsed, paused, dismissLabel, onDismiss, onRemoved
         label={dismissLabel}
         variant="ghost"
         size="sm"
+        wrapperClassName="cy-toast-dismiss"
         onClick={() => onDismiss(id)}
       />
     </div>

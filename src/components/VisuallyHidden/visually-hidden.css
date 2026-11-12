@@ -1,0 +1,13 @@
+/*
+ * visually-hidden: the hiding rule itself is `.cy-visually-hidden` in base.css, shared with every component that hides
+ * text. This file adds the focusable variant: shown, in the normal flow, while something inside it has focus.
+ */
+.cy-visually-hidden.cy-visually-hidden[data-focusable]:focus-within {
+  position: static !important;
+  inline-size: auto;
+  block-size: auto;
+  margin: 0;
+  overflow: visible;
+  clip-path: none;
+  white-space: normal;
+}

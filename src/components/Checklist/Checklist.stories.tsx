@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useRef, useState } from "react";
-import { expect, fireEvent, fn, waitFor } from "storybook/test";
+import { expect, fireEvent, fn, waitFor, within } from "storybook/test";
 import { computeUnderHostileHost } from "../../test/hostile.js";
 import { Checklist, type ChecklistItem, type ChecklistProps } from "./Checklist.js";
 
@@ -46,7 +46,7 @@ const state = (el: HTMLElement) =>
 /** The rows on screen, in order, read from the checkboxes. */
 const shown = (el: HTMLElement) =>
   [...el.querySelectorAll<HTMLInputElement>('.cy-checklist-row input[type="checkbox"]')].map((box) => {
-    const name = (box.closest(".cy-choice") as HTMLElement).textContent as string;
+    const name = (box.closest(".cy-checklist-check") as HTMLElement).textContent as string;
     return box.checked ? `+${name}` : name;
   });
 
@@ -416,13 +416,11 @@ export const SmallWithAHiddenLabel: Story = {
     await expect(small.style.maxInlineSize).toBe("320px");
     // The hidden label still names the list and takes no room.
     await expect(canvas.getByRole("list", { name: "Subtasks" })).toBeVisible();
-    const label = [...small.querySelectorAll<HTMLElement>(".cy-field-label")].find(
-      (el) => el.textContent === "Subtasks",
-    ) as HTMLElement;
+    const label = within(small).getByText("Subtasks");
     await expect(label.getBoundingClientRect().width).toBeLessThanOrEqual(2);
     // sm is smaller than md: text, and the buttons.
     const font = (root: HTMLElement) =>
-      Number.parseFloat(getComputedStyle(root.querySelector(".cy-choice-label") as HTMLElement).fontSize);
+      Number.parseFloat(getComputedStyle(within(root).getByText("Buy milk")).fontSize);
     const button = (root: HTMLElement) =>
       (root.querySelector(".cy-checklist-rename") as HTMLElement).getBoundingClientRect().height;
     await expect(font(small)).toBeLessThan(font(regular));
@@ -543,7 +541,7 @@ export const TouchRows: Story = {
       await expect(Number.parseFloat(hit(button).width)).toBeGreaterThanOrEqual(44);
       await expect(Number.parseFloat(hit(button).height)).toBeGreaterThanOrEqual(44);
     }
-    const row = canvas.getByText("Buy milk").closest(".cy-choice") as HTMLElement;
+    const row = canvas.getByText("Buy milk").closest(".cy-checklist-check") as HTMLElement;
     await expect(row.getBoundingClientRect().height).toBeGreaterThanOrEqual(44);
     // A tap ticks and unticks, taps rename and add, and a finger drags the grip.
     await userEvent.pointer({ keys: "[TouchA]", target: canvas.getByText("Buy milk") });

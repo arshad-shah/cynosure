@@ -19,8 +19,9 @@
   border: 0;
   border-radius: inherit;
   object-fit: cover;
-  /* Hidden until it has loaded: the fallback shows meanwhile. */
-  &:not([data-loaded]) {
+  /* Hidden while it loads: the fallback shows meanwhile. Before script runs (data-state="pending") it shows as the
+     browser has it, over the fallback, so a page that is never hydrated still shows the picture. */
+  &[data-state="loading"] {
     visibility: hidden;
   }
 }

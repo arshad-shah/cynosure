@@ -2,17 +2,21 @@
 
 The rules in `AGENTS.md` are enforced by `pnpm check`:
 
-| Rule              | What fails                                                                                  |
-| ----------------- | ------------------------------------------------------------------------------------------- |
-| `native-elements` | `<button a input textarea select dialog details summary option>` outside `src/foundations`  |
-| `title-attr`      | any `title=` (native tooltip)                                                               |
-| `glyphs`          | emoji or text glyphs (✓ × › → …) in JSX text                                                |
-| `literals`        | hex or px literals in component CSS/TSX outside `var()` fallbacks                           |
-| `structure`       | a component without a stories file containing `play:` or a README with `## Used by`         |
-| `docs`            | a component or foundation without a hand-written `<Name>.mdx` using `<Meta of={Stories} />` |
-| `touch-hidden`    | a story tagged `touch` without `!dev` (it would fail on the published Storybook)            |
-| `scaffold-todo`   | an unfinished `TODO(cy)` from a generator                                                   |
-| `agents`          | a documented folder without `AGENTS.md`                                                     |
+| Rule              | What fails                                                                                      |
+| ----------------- | ----------------------------------------------------------------------------------------------- |
+| `native-elements` | `<button a input textarea select dialog details summary option>` outside `src/foundations`      |
+| `title-attr`      | any `title=` (native tooltip)                                                                   |
+| `glyphs`          | emoji or text glyphs (✓ × › → …) in JSX text                                                    |
+| `literals`        | hex or px literals in component CSS/TSX outside `var()` fallbacks                               |
+| `structure`       | a component without a stories file containing `play:` or a README                               |
+| `own-styles`      | a stylesheet not named `<kebab-folder>.css`, or a selector naming another component's class     |
+| `own-classes`     | a component putting another component's class in `className` (render that component)            |
+| `hidden-text`     | a hand-written visually-hidden rule (`clip-path: inset(50%)`); use `.cy-visually-hidden`        |
+| `foundation-use`  | a composite using a foundation part not listed in `FOUNDATION_USERS` (`tools/cli/lib/check.ts`) |
+| `docs`            | a component or foundation without a hand-written `<Name>.mdx` using `<Meta of={Stories} />`     |
+| `touch-hidden`    | a story tagged `touch` without `!dev` (it would fail on the published Storybook)                |
+| `scaffold-todo`   | an unfinished `TODO(cy)` from a generator                                                       |
+| `agents`          | a documented folder without `AGENTS.md`                                                         |
 
 Naming: components PascalCase; CSS classes `cy-<kebab>`, inner parts `cy-<kebab>-<part>`; tokens `--cy-<component>-<prop>`; private custom properties `--_name`. Props: `className`/`style` are for layout only; restyle through tokens. Strings: English defaults, overridable via a typed `labels` prop.
 
@@ -31,3 +35,12 @@ Components expose the same props with the same meaning, so control is predictabl
 | `className`, `style`                | –                                                                                                                 | Layout only (margin, placement, width). Restyle through tokens. |
 
 Props become `data-size`, `data-tone` and `data-variant` attributes that the component's CSS maps to tokens. Every story declares `argTypes` with a control for each prop. `pnpm cy new component` generates this shape.
+
+## Ownership: reuse components, never their insides
+
+- **One stylesheet per component folder**, `<kebab-folder>.css`, and it styles only that folder's classes (`cy-<component>` and `cy-<component>-*` for each component the folder exports). Shared rules live in `src/styles/base.css` (`.cy-reset`, `.cy-visually-hidden`).
+- **Want another component's look? Render it.** Never put its classes on your elements or select them in your CSS. Adjust it through its `--cy-<component>-*` tokens (set on your own element; custom properties cascade) or its props. If the knob is missing, add a token or prop to that component, with a test.
+- **Layout of a child** (position, margin, size of a slot) goes on a class of your own passed through the child's `className`, e.g. `<Icon className="cy-calendar-icon" />`.
+- **A piece several components share** (an option list, a choice row) is a component of its own with its own folder, stylesheet, stories and docs.
+- **Foundations** (`ButtonBase`, `LinkBase`, `InputBase`, …) are used directly only for patterns no component covers (a tab, a menu item, a whole-card link); `FOUNDATION_USERS` in `tools/cli/lib/check.ts` lists who may, and why is in `src/foundations/AGENTS.md`. Everything else uses the component that owns the element: Button, Link, TextField, Checkbox.
+- `styles/manifest.json` then lists, for each component, exactly the stylesheets of the components it renders.

@@ -31,7 +31,3 @@ import { ContextMenu } from "@arshad-shah/cynosure";
 ## Tokens
 
 Shared with Menu: `--cy-menu-*`.
-
-## Used by
-
-File and item lists, editors and canvases in the web apps and extensions (cross-product audit, 2026-11-10).

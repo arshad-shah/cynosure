@@ -18,20 +18,20 @@ import { folder } from "@arshad-shah/cynosure/icons";
 
 ## Avatar
 
-| Prop                  | Default   | Notes                                                                                             |
-| --------------------- | --------- | ------------------------------------------------------------------------------------------------- |
-| `name`                | required  | The accessible name and the source of the initials. An empty name is not announced                |
-| `initials`            | from name | Replaces the initials worked out from `name`                                                      |
-| `src`                 | –         | The picture. The fallback shows while it loads; a picture that fails is removed                   |
-| `icon`                | –         | Shown instead of worked-out initials, for things that are not people                              |
-| `size`                | `md`      | `xs` 20, `sm` 26, `md` 32, `lg` 40, `xl` 56 px at comfortable scale. A group's `size` replaces it |
-| `shape`               | `circle`  | `circle` · `square` (rounded like a control of its size)                                          |
-| `tone`                | `neutral` | `accent` · `neutral` · `danger` · `success` · `warning` · `info` · `auto` (picked from the name)  |
-| `color`               | –         | Any CSS colour for the fallback; overrides `tone`                                                 |
-| `status`              | –         | `online` · `away` · `busy` · `offline`: a dot at the bottom end corner, spoken after the name     |
-| `labels`              | English   | `{ online, away, busy, offline }`: the spoken status names                                        |
-| `decorative`          | `false`   | Hides the avatar from assistive technology, for when the name is written beside it                |
-| `className` / `style` | –         | Layout only                                                                                       |
+| Prop                  | Default   | Notes                                                                                                                                                                    |
+| --------------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `name`                | required  | The accessible name and the source of the initials. An empty name is not announced                                                                                       |
+| `initials`            | from name | Replaces the initials worked out from `name`                                                                                                                             |
+| `src`                 | –         | The picture. The fallback shows while it loads; a picture that fails is removed. In server HTML that is never hydrated it shows as the browser has it, over the fallback |
+| `icon`                | –         | Shown instead of worked-out initials, for things that are not people                                                                                                     |
+| `size`                | `md`      | `xs` 20, `sm` 26, `md` 32, `lg` 40, `xl` 56 px at comfortable scale. A group's `size` replaces it                                                                        |
+| `shape`               | `circle`  | `circle` · `square` (rounded like a control of its size)                                                                                                                 |
+| `tone`                | `neutral` | `accent` · `neutral` · `danger` · `success` · `warning` · `info` · `auto` (picked from the name)                                                                         |
+| `color`               | –         | Any CSS colour for the fallback; overrides `tone`                                                                                                                        |
+| `status`              | –         | `online` · `away` · `busy` · `offline`: a dot at the bottom end corner, spoken after the name                                                                            |
+| `labels`              | English   | `{ online, away, busy, offline }`: the spoken status names                                                                                                               |
+| `decorative`          | `false`   | Hides the avatar from assistive technology, for when the name is written beside it                                                                                       |
+| `className` / `style` | –         | Layout only                                                                                                                                                              |
 
 ## AvatarGroup
 
@@ -71,7 +71,3 @@ import { folder } from "@arshad-shah/cynosure/icons";
 - `--cy-avatar-ring-color`: colour of the ring around grouped avatars and the status dot
 - `--cy-avatar-ring-width`: width of that ring
 - `--cy-avatar-overlap`: how far each avatar in a group slides over the one before it
-
-## Used by
-
-Planr (people assigned to a task, shared calendars), Verql (workspace members and who ran a query), the tools app (account menu), the docs site (contributors).

@@ -1,5 +1,5 @@
 import { type CSSProperties, forwardRef, type ReactNode } from "react";
-import { Heading } from "../Heading/Heading.js";
+import { Heading, type HeadingSize } from "../Heading/Heading.js";
 import { Text } from "../Text/Text.js";
 
 export interface PageHeaderTokens {
@@ -33,6 +33,11 @@ export interface PageHeaderProps {
    * Heading's sizes); "lg" is the hero "display" size for a landing page. Default "md".
    */
   size?: "md" | "lg";
+  /**
+   * Any of Heading's sizes for the title, instead of the one `size` gives: `"3xl"` sits between "md" (2xl at level 1)
+   * and "lg" (display), for a section's landing page. The level and the rest of the header are unchanged.
+   */
+  titleSize?: HeadingSize | undefined;
   /** A short label above the title that says where the page belongs. It comes before the title in reading order. */
   eyebrow?: ReactNode | undefined;
   /** One or two sentences under the title, as a lead paragraph. Pass inline content only. */
@@ -69,6 +74,7 @@ export const PageHeader = forwardRef<HTMLElement, PageHeaderProps>(function Page
     title,
     headingLevel = 1,
     size = "md",
+    titleSize,
     eyebrow,
     description,
     breadcrumbs,
@@ -103,7 +109,7 @@ export const PageHeader = forwardRef<HTMLElement, PageHeaderProps>(function Page
           )}
           <Heading
             level={headingLevel}
-            {...(size === "lg" ? { size: "display" as const } : {})}
+            {...(titleSize ? { size: titleSize } : size === "lg" ? { size: "display" as const } : {})}
             className="cy-page-header-title"
           >
             {title}

@@ -15,15 +15,15 @@ const steps = [
 <Steps steps={steps} current={step} onStepSelect={setStep} orientation="vertical" />;
 ```
 
-| Prop                  | Default      | Notes                                                                                   |
-| --------------------- | ------------ | --------------------------------------------------------------------------------------- |
-| `steps`               | –            | `{ id, label, description?, status?, disabled? }`; `status` is `complete` or `error`    |
-| `current`             | –            | `id` of the current step: earlier steps are complete, later ones upcoming               |
-| `orientation`         | `horizontal` | `horizontal` · `vertical`                                                               |
-| `onStepSelect`        | –            | Makes steps buttons; called with the step `id` (not for the current or a disabled step) |
-| `size`                | `md`         | `sm` · `md` · `lg`                                                                      |
-| `labels`              | –            | `list` ("Progress"), `complete`, `current`, `upcoming`, `error`: read after each label  |
-| `className` / `style` | –            | Layout only                                                                             |
+| Prop                  | Default      | Notes                                                                                                                                                          |
+| --------------------- | ------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `steps`               | –            | `{ id, label, description?, status?, disabled? }`; `status` is `complete` or `error`                                                                           |
+| `current`             | –            | `id` of the current step: earlier steps are complete, later ones upcoming. Leave it out for a numbered how-to: no status is read and the list is named "Steps" |
+| `orientation`         | `horizontal` | `horizontal` · `vertical`                                                                                                                                      |
+| `onStepSelect`        | –            | Makes steps buttons; called with the step `id` (not for the current or a disabled step)                                                                        |
+| `size`                | `md`         | `sm` · `md` · `lg`                                                                                                                                             |
+| `labels`              | –            | `list` ("Progress"), `complete`, `current`, `upcoming`, `error`: read after each label                                                                         |
+| `className` / `style` | –            | Layout only                                                                                                                                                    |
 - An ordered list named "Progress"; the current step carries `aria-current="step"` and every step says its state ("Account, completed").
 - Steps that can be chosen are buttons in tab order; hit area ≥ 24px, ≥ 44px on touch screens.
 - Finished steps show a tick on the accent colour; a step marked `error` shows an alert on the danger colour.
@@ -33,7 +33,3 @@ const steps = [
 - `--cy-steps-marker-size`: diameter of the numbered marker (default: twice the text size)
 - `--cy-steps-line-width`: thickness of the line between steps
 - `--cy-steps-gap`: space around the lines
-
-## Used by
-
-Onboarding and setup flows, multi-step forms and import wizards in the web apps and extensions (cross-product audit, 2026-11-10).

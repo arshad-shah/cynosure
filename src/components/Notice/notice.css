@@ -88,7 +88,7 @@
   align-self: center;
   font-size: var(--cy-font-size-md);
 }
-.cy-notice-main > .cy-tooltip-anchor {
+.cy-notice-dismiss.cy-notice-dismiss {
   grid-area: close;
   /* The close button's box is taller than a line of text; keep its icon on the title line. */
   margin-block: calc((1lh - var(--cy-control-height-sm)) / 2) 0;

@@ -99,6 +99,7 @@
     },
     "./styles.css": "./dist/styles.css",
     "./styles/*.css": "./dist/styles/*.css",
+    "./styles/manifest.json": "./dist/styles/manifest.json",
     "./styles.inline": {
       "types": "./dist/styles/inline.d.ts",
       "default": "./dist/styles/inline.js"
@@ -106,6 +107,10 @@
     "./vite": {
       "types": "./dist/adapters/vite/index.d.ts",
       "default": "./dist/adapters/vite/index.js"
+    },
+    "./astro": {
+      "types": "./dist/adapters/astro/index.d.ts",
+      "default": "./dist/adapters/astro/index.js"
     },
     "./fonts/*": "./dist/fonts/*",
     "./package.json": "./package.json"

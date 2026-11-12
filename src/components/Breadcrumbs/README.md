@@ -49,7 +49,3 @@ The ref goes to the `nav` element.
 - `--cy-breadcrumbs-gap`: space between crumbs and separators
 - `--cy-breadcrumbs-item-max-width`: widest a crumb's label gets before the ellipsis (24ch)
 - `--cy-breadcrumbs-separator-color`: colour of the separators (muted)
-
-## Used by
-
-The docs site (the path above every page), the tools app (category and tool pages), Verql (workspace, connection, table) and Planr (project and board paths).

@@ -1,0 +1,38 @@
+/*
+ * skip-link: a Button link, hidden from sight by the shared .cy-visually-hidden (still focusable and in the
+ * accessibility tree) until it has focus, then shown fixed at the top-start corner of the window above everything else
+ * on the page. CSS only, so it works before any script runs. The look is the Button's, set through its tokens.
+ */
+.cy-skip-link.cy-skip-link {
+  --_min: var(--cy-hit-min, 24px);
+  --cy-button-height-md: max(var(--cy-control-height-lg), var(--_min));
+  --cy-button-padding-inline: var(--cy-space-6);
+  --cy-button-radius: var(--cy-skip-link-radius, var(--cy-radius-md));
+  --cy-button-max-width: none;
+  z-index: calc(var(--cy-z-tooltip) + 1);
+  inset-block-start: var(--cy-skip-link-offset, var(--cy-space-4));
+  inset-inline-start: var(--cy-skip-link-offset, var(--cy-space-4));
+  /* While hidden, the Button folds to its border so its box is no larger than the clipped pixel. */
+  &:not(:focus) {
+    --cy-button-height-md: var(--cy-space-0);
+    --cy-button-padding-inline: var(--cy-space-0);
+  }
+  /* Shown: undo the hiding (its position is !important, so this one is too). */
+  &:focus {
+    position: fixed !important;
+    inline-size: auto;
+    margin: 0;
+    overflow: visible;
+    clip-path: none;
+  }
+}
+/* contained: at the corner of the nearest positioned ancestor (AppShell's frame), not the window's. */
+.cy-skip-link-contained.cy-skip-link-contained:focus {
+  position: absolute !important;
+}
+
+@media (pointer: coarse) {
+  .cy-skip-link.cy-skip-link {
+    --_min: var(--cy-hit-coarse, 44px);
+  }
+}

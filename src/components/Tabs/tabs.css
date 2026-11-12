@@ -219,3 +219,13 @@
     outline: var(--cy-border-width) solid Highlight;
   }
 }
+
+/* A printout has every panel, one after another (TabPanel renders their content while printing). */
+@media print {
+  .cy-tab-panel.cy-tab-panel[hidden] {
+    display: block;
+  }
+  .cy-tab-panel.cy-tab-panel + .cy-tab-panel {
+    margin-block-start: var(--cy-space-6);
+  }
+}

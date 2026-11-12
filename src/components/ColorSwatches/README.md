@@ -26,7 +26,3 @@ import { ColorSwatches } from "@arshad-shah/cynosure";
 ## Tokens
 
 - `--cy-color-swatches-size`, `--cy-color-swatches-radius`
-
-## Used by
-
-Colour pickers in the tools app (presets and recent colours), and theme or brand colour settings in the products.

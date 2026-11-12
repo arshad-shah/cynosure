@@ -1,0 +1,88 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./DeviceFrame.stories";
+
+<Meta of={Stories} />
+
+# DeviceFrame
+
+A phone, tablet or browser window drawn in CSS around a screenshot, a video or a live demo. The screen keeps its ratio at any width and clips its content to its rounded corners.
+
+<Canvas of={Stories.Phone} />
+
+## When to use
+
+- **Landing pages:** an app screenshot or a live demo shown on the device it runs on.
+- **Docs and store listings:** a screenshot that needs context (a phone layout, a browser page).
+
+**Use something else when:**
+- the picture needs no device around it: [Image](?path=/docs/components-image--docs), or [AspectRatio](?path=/docs/components-aspectratio--docs) for a video or an embed
+- the content is a framed surface of the page itself: [Card](?path=/docs/components-card--docs)
+
+## Usage
+
+```tsx
+import { DeviceFrame } from "@arshad-shah/cynosure";
+
+<DeviceFrame>
+  <img src="/home.png" alt="The app's home screen" />
+</DeviceFrame>
+
+<DeviceFrame device="tablet" orientation="landscape" label="The editor on a tablet">
+  <img src="/editor.png" alt="" />
+</DeviceFrame>
+
+<DeviceFrame device="browser" url="example.com/pricing">
+  <PricingDemo />
+</DeviceFrame>
+```
+
+`device` is `phone` (default), `tablet` or `browser`. The frame is as wide as its container, up to a token width for a phone (288px) or a tablet (576px); set `style={{ inlineSize: … }}` for another width. Everything inside scales with it.
+
+## Browser window
+
+The browser bar has three drawn dots and an optional `url`. The address is decoration: it is not a link and is not announced. Long addresses are cut with an ellipsis.
+
+<Canvas of={Stories.BrowserWindow} />
+
+## Orientation and ratio
+
+`orientation="landscape"` turns a phone or tablet: the screen's ratio is swapped and the camera moves to the left edge. A landscape device is as tall as its upright one is wide. `ratio` sets the screen's width ÷ height upright (phone 9 / 19.5, tablet 3 / 4, browser 16 / 10 by default); landscape uses its inverse.
+
+<Canvas of={Stories.LandscapeTurnsTheScreen} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+| Situation | Result |
+| --- | --- |
+| The container gets wider or narrower | The screen keeps its ratio; a phone's or tablet's bezel and corners scale with it |
+| Content is bigger than the screen | It is clipped to the screen and its rounded corners |
+| A child is an image or a video | It covers the screen (`object-fit: cover`) |
+| Dark mode | A phone or tablet stays dark, with an edge line; the screen and the browser window follow the theme |
+| `ratio` is `0`, negative or not finite | The device's own ratio is used |
+
+- **Decorative by default:** without `label` the frame is a plain `div` and adds nothing to the accessibility tree. The content keeps its own semantics: give a screenshot its `alt`; controls in a live demo stay focusable and usable.
+- **Labelled:** with `label` the frame is a `figure` with that accessible name.
+- **Browser bar:** hidden from screen readers. Put the address in `label` if it matters.
+- **Right-to-left:** the browser dots start the bar, on the right; the address still reads left to right. A phone's camera stays in the middle.
+
+## Touch
+
+Nothing in DeviceFrame can be pressed. Controls in a live demo bring their own hit areas.
+
+## Theming
+
+Tokens: `--cy-device-frame-bezel`, `--cy-device-frame-edge`, `--cy-device-frame-shadow`, `--cy-device-frame-screen`, `--cy-device-frame-phone-width`, `--cy-device-frame-tablet-width`, `--cy-device-frame-browser-radius`, `--cy-device-frame-browser-bar` and `--cy-device-frame-dot`.
+
+```ts
+createTheme({ components: { deviceFrame: { bezel: "#3a3a3c", phoneWidth: "320px" } } });
+```
+
+`className` and `style` are for layout only (width, margin, placement).
+
+## Related
+
+[AspectRatio](?path=/docs/components-aspectratio--docs) · [Image](?path=/docs/components-image--docs) · [QRCode](?path=/docs/components-qrcode--docs)

@@ -88,9 +88,10 @@ const newId = () =>
     ? crypto.randomUUID()
     : `item-${Date.now().toString(36)}-${(++made).toString(36)}`;
 
-const CHECK = ".cy-choice input";
+// Focus targets, found through this component's own classes on the Checkbox, TextField and IconButton it renders.
+const CHECK = ".cy-checklist-check input";
 const RENAME = ".cy-checklist-rename";
-const FIELD = ".cy-text-field-input";
+const FIELD = ".cy-checklist-field input";
 const ADD = `.cy-checklist-add ${FIELD}`;
 
 /**

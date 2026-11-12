@@ -85,10 +85,12 @@ Tokens: `--cy-checkbox-size`, `--cy-checkbox-radius` and `--cy-checkbox-border`.
 | `--cy-checkbox-done-color` | Label and description colour of a checked `strikeWhenChecked` row. Default `--cy-color-muted`. Keep it at 4.5:1 or more against the surface. |
 | `--cy-checkbox-strike-width` | Thickness of the strike. Default: the border width, or 1/16 of the text size when that is larger. |
 
+The row around the box is a [Choice](?path=/docs/components-choice--docs): the space between box and label is `--cy-choice-gap`, and the two done tokens above become the row's `--cy-choice-done-color` and `--cy-choice-strike-width`.
+
 ```ts
 createTheme({ components: { checkbox: { radius: "50%" } } });
 ```
 
 ## Related
 
-[Switch](?path=/docs/components-switch--docs) · [RadioGroup](?path=/docs/components-radiogroup--docs) · [Field](?path=/docs/components-field--docs)
+[Switch](?path=/docs/components-switch--docs) · [RadioGroup](?path=/docs/components-radiogroup--docs) · [Choice](?path=/docs/components-choice--docs) · [Field](?path=/docs/components-field--docs)

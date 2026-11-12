@@ -179,6 +179,8 @@ export const Pagination = forwardRef<HTMLElement, PaginationProps>(function Pagi
           label={label}
           size={size}
           variant="ghost"
+          // Previous and next point the way the pages run in the reading direction.
+          flipRtl
           disabled={off}
           href={hrefTo(to, off)}
           onClick={go(to)}

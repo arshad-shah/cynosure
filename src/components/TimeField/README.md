@@ -64,7 +64,3 @@ Off unless you pass `picker`.
 - `--cy-time-field-day`: Colour of the day track at midday.
 
 The field itself follows TextField; the popup follows Popover, the day track Slider and the AM/PM switch SegmentedControl.
-
-## Used by
-
-The tools app's time inputs (cron and time-zone tools), Verql's query filters and Planr's task times.

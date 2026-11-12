@@ -10,14 +10,16 @@ import { Container } from "@arshad-shah/cynosure";
 <Container size="full" padding="8">…</Container>      // no cap, wider gutters
 ```
 
-| Prop                  | Default                        | Notes                                                                                   |
-| --------------------- | ------------------------------ | --------------------------------------------------------------------------------------- |
-| `size`                | `lg`                           | `sm` 640 · `md` 768 · `lg` 1024 · `xl` 1280 px at most, gutters included; `full` no cap |
-| `padding`             | `--cy-container-padding` (`6`) | Space token for the side gutters; `"0"` removes them                                    |
-| `paddingBlock`        | –                              | Space token for the top and bottom padding                                              |
-| `center`              | `true`                         | `false` keeps the column at the inline start                                            |
-| `as`                  | `div`                          | `div` · `main` · `section` · `article`                                                  |
-| `className` / `style` | –                              | Layout only                                                                             |
+| Prop                      | Default                        | Notes                                                                                                                           |
+| ------------------------- | ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------- |
+| `size`                    | `lg`                           | `sm` 640 · `md` 768 · `lg` 1024 · `xl` 1280 px at most, gutters included; `full` no cap                                         |
+| `padding`                 | `--cy-container-padding` (`6`) | Space token for the side gutters; `"0"` removes them                                                                            |
+| `paddingBlock`            | –                              | Space token for the top and bottom padding                                                                                      |
+| `center`                  | `true`                         | `false` keeps the column at the inline start                                                                                    |
+| `hideBelow` / `hideAbove` | –                              | Hidden while the window is narrower than / at least this breakpoint (`sm` 30rem, `md` 45rem, `lg` 60rem, `xl` 75rem). No script |
+| `id`, `role`, `aria-*`    | –                              | Passed to the element: a link target, a named landmark or group                                                                 |
+| `as`                      | `div`                          | `div` · `main` · `section` · `article`                                                                                          |
+| `className` / `style`     | –                              | Layout only                                                                                                                     |
 - **Width:** the column fills its parent up to the cap of its `size`, and is never wider than the parent. The cap includes the gutters, so the content is at most the cap less two gutters wide.
 - **Gutters:** `padding` is a space token, so it follows the theme. Each gutter is at least the device's safe-area inset on that side (`env(safe-area-inset-left)` and `-right`), so content clears a phone's notch in landscape. The page needs `viewport-fit=cover` in its viewport meta tag for the browser to report insets.
 - **Right to left:** the gutters are equal, so nothing changes; `center={false}` puts the column at the right edge.
@@ -34,7 +36,3 @@ import { Container } from "@arshad-shah/cynosure";
 - `--cy-container-padding`: side gutters when the `padding` prop is not set (default `--cy-space-6`)
 
 Set them with `createTheme({ components: { container: { sizeLg: "1100px" } } })`.
-
-## Used by
-
-Planr (the page column of every screen inside AppShell's main area, replacing its `.planr-page` class) and the tools app (page width and gutters of each tool page).

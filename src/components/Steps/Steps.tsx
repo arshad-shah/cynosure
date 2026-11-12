@@ -34,7 +34,7 @@ export interface StepItem {
 }
 
 export interface StepsLabels {
-  /** Accessible name of the list. Default: "Progress". */
+  /** Accessible name of the list. Default: "Progress", or "Steps" for a how-to (no `current`). */
   list: string;
   /** Read after each step's label. Defaults: "completed", "current step", "not started", "has a problem". */
   complete: string;
@@ -46,8 +46,11 @@ export interface StepsLabels {
 export interface StepsProps {
   /** The steps, in order. */
   steps: StepItem[];
-  /** `id` of the step the person is on. Steps before it are complete, steps after it upcoming. */
-  current: string;
+  /**
+   * `id` of the step the person is on. Steps before it are complete, steps after it upcoming. Leave it out for a
+   * numbered how-to (steps to follow, not progress): every step is numbered alike and no status is read.
+   */
+  current?: string | undefined;
   /** Lays the steps out in a row or in a column. Default "horizontal". */
   orientation?: "horizontal" | "vertical";
   /** Makes steps buttons that go to that step. Leave it out for a read-only progress display. */
@@ -70,7 +73,10 @@ const DEFAULT_LABELS: StepsLabels = {
   error: "has a problem",
 };
 
-/** Progress through an ordered flow (a setup wizard, a checkout): numbered steps with the current one marked. */
+/**
+ * Progress through an ordered flow (a setup wizard, a checkout): numbered steps with the current one marked. Without
+ * `current`, a numbered how-to.
+ */
 export function Steps({
   steps,
   current,
@@ -81,8 +87,9 @@ export function Steps({
   className,
   style,
 }: StepsProps) {
-  const text = { ...DEFAULT_LABELS, ...labels };
-  const at = steps.findIndex((s) => s.id === current);
+  const howTo = current === undefined;
+  const text = { ...DEFAULT_LABELS, ...(howTo ? { list: "Steps" } : {}), ...labels };
+  const at = howTo ? -1 : steps.findIndex((s) => s.id === current);
   return (
     <ol
       className={className ? `cy-steps ${className}` : "cy-steps"}
@@ -92,8 +99,10 @@ export function Steps({
       style={style}
     >
       {steps.map((step, i) => {
-        const status: StepStatus =
-          step.status ?? (i === at ? "current" : at >= 0 && i < at ? "complete" : "upcoming");
+        // A how-to has no progress: steps are plain unless one is marked (`status`), and nothing is read for them.
+        const status: StepStatus | undefined =
+          step.status ??
+          (howTo ? undefined : i === at ? "current" : at >= 0 && i < at ? "complete" : "upcoming");
         const isCurrent = i === at;
         const content = (
           <>
@@ -111,12 +120,12 @@ export function Steps({
               {step.description != null && (
                 <span className="cy-steps-description cy-reset">{step.description}</span>
               )}
-              <span className="cy-steps-hidden">{`, ${text[status]}`}</span>
+              {status && <span className="cy-visually-hidden">{`, ${text[status]}`}</span>}
             </span>
           </>
         );
         return (
-          <li key={step.id} className="cy-steps-item cy-reset" data-status={status}>
+          <li key={step.id} className="cy-steps-item cy-reset" data-status={status ?? "step"}>
             {onStepSelect ? (
               <ButtonBase
                 className="cy-steps-step cy-reset"

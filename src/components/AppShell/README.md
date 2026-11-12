@@ -24,7 +24,7 @@ import { AppShell, SideNav } from "@arshad-shah/cynosure";
 - Responds to its own width, not the window's, so it works in side panels and embedded views.
 - In the drawer, choosing a link or item closes it (group toggles do not) and focus returns to the menu button.
 - With `tabs`, a narrow shell also gets a tab bar along the bottom (clear of the home indicator); the drawer still holds the full navigation.
-- The skip link appears on the first Tab and moves focus to `<main>` without changing the URL.
+- The skip link is a [SkipLink](../SkipLink/README.md), placed at the shell's own top-start corner: it appears on the first Tab and moves focus to `<main>` without changing the URL.
 
 ## Reading the narrow state
 
@@ -61,7 +61,3 @@ function Toolbar() {
 
 - `--cy-app-shell-nav-background`, `--cy-app-shell-header-background`
 - `--cy-app-shell-border`: lines between the bar, navigation and content
-
-## Used by
-
-The layouts of the web apps and the extensions' full-page views (cross-product audit, 2026-11-10).

@@ -25,7 +25,7 @@ const meta = {
   },
   argTypes: {
     size: { control: "inline-radio", options: ["sm", "md"] },
-    headingLevel: { control: "inline-radio", options: [2, 3, 4, 5, 6] },
+    headingLevel: { control: "inline-radio", options: [1, 2, 3, 4, 5, 6] },
     title: { control: "text" },
     description: { control: "text" },
   },
@@ -146,5 +146,23 @@ export const Defaults: Story = {
     await expect(canvas.getByRole("heading", { level: 3, name: "Nothing here" })).toBeVisible();
     await expect(canvasElement.querySelector(".cy-empty-state")).toHaveAttribute("data-size", "md");
     await expect(canvasElement.querySelector(".cy-empty-state")).toHaveClass("host-empty");
+  },
+};
+
+export const AsThePageItself: Story = {
+  args: { headingLevel: 1, title: "Page not found", description: "The address may be mistyped." },
+  render: (args) => (
+    <>
+      <EmptyState {...args} />
+      <EmptyState {...args} headingLevel={2} title="Nothing here" />
+    </>
+  ),
+  play: async ({ canvas }) => {
+    // A not-found page: the empty state is the page's one h1, and looks the same as at any other level.
+    const h1 = canvas.getByRole("heading", { level: 1, name: "Page not found" });
+    const h3 = canvas.getByRole("heading", { level: 2, name: "Nothing here" });
+    await expect(h1.tagName).toBe("H1");
+    await expect(getComputedStyle(h1).fontSize).toBe(getComputedStyle(h3).fontSize);
+    await expect(getComputedStyle(h1).fontWeight).toBe(getComputedStyle(h3).fontWeight);
   },
 };

@@ -5,7 +5,7 @@ import { expect, fn, waitFor } from "storybook/test";
 import * as icons from "../../icons/index.js";
 import { chevronDown, copy, download, trash } from "../../icons/index.js";
 import { createStyleSheet } from "../../styles/inline.js";
-import { backdrop, contrast } from "../../test/color.js";
+import { backdrop, contrast, rgb, textContrast } from "../../test/color.js";
 import { computeUnderHostileHost } from "../../test/hostile.js";
 import { CynosureTheme } from "../../theme/index.js";
 import { createTheme } from "../../tokens/index.js";
@@ -31,6 +31,7 @@ const meta = {
     pressed: { control: "boolean" },
     disabled: { control: "boolean" },
     fullWidth: { control: "boolean" },
+    square: { control: "boolean" },
     children: { control: "text" },
     type: { control: "inline-radio", options: ["button", "submit", "reset"] },
   },
@@ -509,5 +510,116 @@ export const VariantsAndTones: Story = {
       }
       await expect(looks.size).toBe(VARIANTS.length);
     }
+  },
+};
+
+/** The font's own ascent and descent at the element's computed font, in px (what a glyph like g or y can reach). */
+const fontExtent = (el: Element) => {
+  const ctx = document.createElement("canvas").getContext("2d") as CanvasRenderingContext2D;
+  ctx.font = getComputedStyle(el).font;
+  const m = ctx.measureText("Égypj");
+  return m.fontBoundingBoxAscent + m.fontBoundingBoxDescent;
+};
+
+export const DescendersAreNeverClipped: Story = {
+  render: () => (
+    <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+      {(["sm", "md", "lg"] as const).map((size) => (
+        <Button key={size} size={size} variant="solid" tone="accent">
+          Typography
+        </Button>
+      ))}
+      {/* A font with deep descenders and tall accents, like Plus Jakarta Sans, at a tight line height. */}
+      <span style={{ fontFamily: "serif" }}>
+        <Button style={{ fontFamily: "inherit" }}>Gypsy jig</Button>
+      </span>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    for (const label of canvasElement.querySelectorAll<HTMLElement>(".cy-button-label")) {
+      // The label clips its overflow (long labels end in an ellipsis), so its box must hold the font's whole
+      // ascent and descent, or the tails of g, y and p are cut off.
+      await expect(label.clientHeight).toBeGreaterThanOrEqual(Math.floor(fontExtent(label)));
+      // The button keeps its height token.
+      const button = label.closest(".cy-button") as HTMLElement;
+      await expect(button.getBoundingClientRect().height).toBeCloseTo(
+        Number.parseFloat(getComputedStyle(button).blockSize),
+        0,
+      );
+    }
+  },
+};
+
+export const OneOffColour: Story = {
+  render: () => (
+    <div style={{ display: "flex", gap: 8 }}>
+      <Button color="#0b7a75" variant="solid" data-testid="teal-solid">
+        Teal
+      </Button>
+      <Button color="#f5d90a" variant="solid" data-testid="yellow-solid">
+        Yellow
+      </Button>
+      <Button color="#f5d90a" variant="outline" data-testid="yellow-outline">
+        Yellow
+      </Button>
+      <Button color="#0b7a75" variant="soft" data-testid="teal-soft">
+        Teal
+      </Button>
+      <Button color="#0b7a75" variant="ghost" tone="danger" data-testid="teal-ghost">
+        Teal
+      </Button>
+    </div>
+  ),
+  play: async ({ canvas, userEvent }) => {
+    const solid = canvas.getByTestId("teal-solid");
+    await expect(rgb(getComputedStyle(solid).backgroundColor)).toEqual(rgb("#0b7a75"));
+    // The text on a solid fill is chosen for the colour: light on dark, dark on light, readable either way.
+    await expect(contrast(getComputedStyle(solid).color, "#0b7a75")).toBeGreaterThanOrEqual(4.5);
+    const yellow = canvas.getByTestId("yellow-solid");
+    await expect(contrast(getComputedStyle(yellow).color, "#f5d90a")).toBeGreaterThanOrEqual(4.5);
+    // On the surface (outline, soft, ghost) the colour is darkened or lightened until it reads.
+    for (const id of ["yellow-outline", "teal-soft", "teal-ghost"])
+      await expect(textContrast(canvas.getByTestId(id)), id).toBeGreaterThanOrEqual(4.5);
+    // `color` wins over `tone`.
+    await expect(canvas.getByTestId("teal-ghost")).not.toHaveAttribute("data-tone");
+    // Focus still uses the theme's ring, and the button still works.
+    await userEvent.tab();
+    await expect(solid).toHaveFocus();
+  },
+};
+
+export const SquareForOneIcon: Story = {
+  args: { square: true, "aria-label": "Delete", children: <span data-testid="glyph">D</span> },
+  play: async ({ canvas }) => {
+    const button = canvas.getByRole("button", { name: "Delete" });
+    // As wide as it is tall, with no padding; the label box steps aside so its content is not clipped.
+    const { width, height } = button.getBoundingClientRect();
+    await expect(width).toBe(height);
+    await expect(getComputedStyle(button).paddingInlineStart).toBe("0px");
+    const label = canvas.getByTestId("glyph").parentElement as HTMLElement;
+    await expect(label).toHaveClass("cy-button-label");
+    await expect(getComputedStyle(label).display).toBe("contents");
+  },
+};
+
+export const LinkTakesIdAndRef: Story = {
+  render: function Render() {
+    const ref = useRef<HTMLAnchorElement>(null);
+    const [tag, setTag] = useState("");
+    useEffect(() => setTag(ref.current?.tagName ?? "none"), []);
+    return (
+      <div>
+        <Button href="/docs" id="docs-link" linkRef={ref}>
+          Read the docs
+        </Button>
+        <output data-testid="tag">{tag}</output>
+      </div>
+    );
+  },
+  play: async ({ canvas }) => {
+    const link = canvas.getByRole("link", { name: "Read the docs" });
+    await expect(link).toHaveAttribute("id", "docs-link");
+    // linkRef receives the link element.
+    await waitFor(() => expect(canvas.getByTestId("tag")).toHaveTextContent("A"));
   },
 };

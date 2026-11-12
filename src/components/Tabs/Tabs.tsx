@@ -15,6 +15,7 @@ import { ButtonBase } from "../../foundations/ButtonBase/ButtonBase.js";
 import { useControllableState } from "../../foundations/controllable.js";
 import { isRtl } from "../../foundations/dir.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
+import { usePrinting } from "../../foundations/printing.js";
 import { moveItems } from "../../foundations/reorder.js";
 import { useRovingFocus } from "../../foundations/roving-focus.js";
 import { close } from "../../icons/close.js";
@@ -404,7 +405,10 @@ export function Tab({ value, icon, disabled, onClose, children }: TabProps) {
 export interface TabPanelProps {
   /** The `value` of the `Tab` this panel belongs to. */
   value: string;
-  /** Keep the content mounted while hidden (preserves state). By default only the selected panel renders content. */
+  /**
+   * Keep the content mounted while hidden (preserves state). By default only the selected panel renders content.
+   * Every panel is rendered and shown while the page is printed, so a printout has all of them.
+   */
   keepMounted?: boolean;
   /** Added to the panel element, for layout. */
   className?: string;
@@ -416,6 +420,7 @@ export function TabPanel({ value, keepMounted = false, className, children }: Ta
   const { value: current, tabId, panelId, registerPanel } = useTabs("TabPanel");
   useLayoutEffect(() => registerPanel(value), [registerPanel, value]);
   const selected = value === current;
+  const printing = usePrinting();
   return (
     <div
       role="tabpanel"
@@ -426,7 +431,7 @@ export function TabPanel({ value, keepMounted = false, className, children }: Ta
       tabIndex={0}
       className={className ? `cy-tab-panel ${className}` : "cy-tab-panel"}
     >
-      {selected || keepMounted ? children : null}
+      {selected || keepMounted || printing ? children : null}
     </div>
   );
 }

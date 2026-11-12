@@ -57,24 +57,20 @@ export function Field({
   children,
 }: FieldProps) {
   const field = useField({ id, description, error });
+  // A hidden label stays in the accessibility tree; out of the flow, the grid gap collapses with it.
+  const labelClass = labelHidden ? "cy-field-label cy-visually-hidden" : "cy-field-label";
   const body = (
     <>
       {group ? (
-        <span
-          id={field.labelId}
-          className="cy-field-label"
-          data-required={required ? "" : undefined}
-          data-hidden={labelHidden ? "" : undefined}
-        >
+        <span id={field.labelId} className={labelClass} data-required={required ? "" : undefined}>
           {label}
         </span>
       ) : (
         <label
           id={field.labelId}
           htmlFor={field.id}
-          className="cy-field-label"
+          className={labelClass}
           data-required={required ? "" : undefined}
-          data-hidden={labelHidden ? "" : undefined}
         >
           {label}
         </label>

@@ -187,5 +187,7 @@ export const StableUnderHostileHost: Story = {
       "font-variant-numeric",
     ]);
     await expect(hostile).toEqual(clean);
+    // Digits line up as they are typed (TextField's --cy-text-field-numeric, set by this field).
+    await expect(clean["font-variant-numeric"]).toBe("tabular-nums");
   },
 };

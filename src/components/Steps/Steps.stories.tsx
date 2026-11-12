@@ -291,3 +291,42 @@ export const StableUnderHostileHost: Story = {
     }
   },
 };
+
+export const NumberedHowTo: Story = {
+  args: {
+    current: undefined,
+    orientation: "vertical",
+    steps: [
+      { id: "install", label: "Install the app", description: "From Google Play or the App Store" },
+      { id: "open", label: "Open it", description: "Allow location for prayer times" },
+      { id: "pick", label: "Pick your city" },
+    ],
+  },
+  play: async ({ canvas, canvasElement }) => {
+    // Steps to follow, not progress: the list is named "Steps", nothing is current and no status is read.
+    const list = canvas.getByRole("list", { name: "Steps" });
+    const items = canvas.getAllByRole("listitem");
+    await expect(items).toHaveLength(3);
+    await expect(list.querySelectorAll("[aria-current]")).toHaveLength(0);
+    for (const item of items) {
+      await expect(item).not.toHaveTextContent("not started");
+      await expect(item).not.toHaveTextContent("completed");
+    }
+    // Every marker is a number, styled alike and readable (not the muted "upcoming" look).
+    const all = markers(canvasElement);
+    await expect(all.map((m) => m.textContent)).toEqual(["1", "2", "3"]);
+    const colours = new Set(all.map((m) => getComputedStyle(m).color));
+    await expect(colours.size).toBe(1);
+    const label = canvasElement.querySelector(".cy-steps-label") as HTMLElement;
+    await expect(contrast(getComputedStyle(label).color, "rgb(251, 249, 245)")).toBeGreaterThanOrEqual(7);
+    // Still read-only, and the list's name can be replaced.
+    await expect(canvas.queryAllByRole("button")).toHaveLength(0);
+  },
+};
+
+export const HowToWithAnOwnName: Story = {
+  args: { current: undefined, labels: { list: "How to install" } },
+  play: async ({ canvas }) => {
+    await expect(canvas.getByRole("list", { name: "How to install" })).toBeInTheDocument();
+  },
+};

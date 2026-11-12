@@ -1,0 +1,82 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./Section.stories";
+
+<Meta of={Stories} />
+
+# Section
+
+A full-width band of a page: a background, space above and below, and the content in the page column. Stack Sections to build a landing or documentation page that scrolls as a document.
+
+<Canvas of={Stories.LandingPageBands} />
+
+## When to use
+
+- **The parts of a landing page:** hero, features, pricing, a call to action, each its own band.
+- **Alternating backgrounds** on a long documentation page, to group related content.
+
+**Use something else when:**
+- you only need the page column, with no background or vertical rhythm: [Container](?path=/docs/components-container--docs)
+- you want a bordered box inside the column: [Card](?path=/docs/components-card--docs)
+- you are building an app frame with a side navigation: [AppShell](?path=/docs/components-appshell--docs)
+
+## Usage
+
+```tsx
+import { Heading, Section, SiteFooter, SiteHeader } from "@arshad-shah/cynosure";
+
+<SiteHeader brand="Acme" nav={nav} />
+<main id="main">
+  <Section as="header">…hero…</Section>
+  <Section variant="soft" id="features" aria-labelledby="features-heading">
+    <Heading id="features-heading">Features</Heading>
+  </Section>
+  <Section variant="accent" size="md">…</Section>
+</main>
+<SiteFooter columns={columns} />
+```
+
+## Width and full bleed
+
+A Section fills its parent's width. For bands from edge to edge of the window, place Sections at the top level of the page (or directly in `main`), not inside a Container: each brings its own Container for the content. `size` sets that column's width; `contained={false}` drops it.
+
+<Canvas of={Stories.ContentInThePageColumn} />
+
+## Padding
+
+`paddingBlock` takes a space token. The default is the `--cy-section-padding-block` token, twice space 10.
+
+<Canvas of={Stories.PaddingUsesSpaceTokens} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+Section has no keyboard behaviour of its own.
+
+- **Landmarks:** a `section` is a region landmark only when it has a name: pass `aria-labelledby` with the id of its heading. `as="aside"` is a complementary landmark. `role`, `aria-label` and `id` are set on the root.
+- **In-page links:** `id` makes the Section the target of a link such as `#pricing`.
+- **Colours:** text keeps the ink colour on every variant. In forced-colours mode, bands with a background get a line above and below instead.
+- **Nesting:** a nested Section gets its own default padding.
+
+## Touch
+
+Nothing pressable of its own; what you put in keeps its own hit areas.
+
+## Theming
+
+| Token | What it sets | Default |
+| --- | --- | --- |
+| `--cy-section-padding-block` | Padding above and below when `paddingBlock` is not set | `calc(var(--cy-space-10) * 2)` |
+| `--cy-section-surface` | Background of `variant="surface"` | `--cy-color-surface` |
+| `--cy-section-soft` | Background of `variant="soft"` | `--cy-color-soft` |
+| `--cy-section-accent` | Background of `variant="accent"` | `--cy-color-accent-soft` |
+
+```ts
+createTheme({ components: { section: { paddingBlock: "6rem" } } });
+```
+
+## Related
+
+[Container](?path=/docs/components-container--docs) · [SiteHeader](?path=/docs/components-siteheader--docs) · [SiteFooter](?path=/docs/components-sitefooter--docs) · [PageHeader](?path=/docs/components-pageheader--docs) · [Card](?path=/docs/components-card--docs)

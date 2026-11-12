@@ -24,6 +24,7 @@ import { Breadcrumbs, Button, PageHeader } from "@arshad-shah/cynosure";
 | `title`               | required | The header's one heading, rendered with `Heading`                                                             |
 | `headingLevel`        | `1`      | `1`, `2` or `3`, to fit the page outline                                                                      |
 | `size`                | `md`     | `md`: Heading's usual size for the level (level 1 `2xl`, 2 `xl`, 3 `lg`). `lg`: Heading's `display` hero size |
+| `titleSize`           | –        | Any Heading size for the title instead of `size`'s: `3xl` sits between `md` and `lg`                          |
 | `eyebrow`             | –        | Small label above the title (`Text variant="eyebrow"`, a paragraph)                                           |
 | `description`         | –        | Lead paragraph under the title (`Text variant="lead"`), at most 65ch wide. Inline content only                |
 | `breadcrumbs`         | –        | Shown above the eyebrow and title. Pass a `Breadcrumbs`                                                       |
@@ -51,9 +52,3 @@ The ref is the root element (`HTMLElement`).
 - `--cy-page-header-divider-space`: space between the content and that border (`--cy-space-6`)
 
 Set them with `createTheme({ components: { pageHeader: { textGap: "0.5rem", descriptionMaxWidth: "50ch" } } })`. The title, eyebrow and lead are retuned through the `--cy-heading-*` and `--cy-text-*` tokens.
-
-## Used by
-
-- The docs site: the head of every documentation page (section and group as the eyebrow, the page title, the lead), replacing its hand-written `.docs-head` block, and the centred `size="lg"` head of the home page.
-- The tools app: each tool's page (breadcrumbs, title, description, the tool's main actions).
-- Verql and Planr: the top of list and settings pages, with the page's primary action at the inline end.

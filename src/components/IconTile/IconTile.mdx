@@ -1,0 +1,86 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./IconTile.stories";
+
+<Meta of={Stories} />
+
+# IconTile
+
+A Facet icon on a tinted square or circle: the mark of a feature, a settings section, a stat or a list item. It is decorative unless you give it a `label`. For a person or a team use [Avatar](?path=/docs/components-avatar--docs); for an icon inside a line of text use [Icon](?path=/docs/foundations-icon--docs).
+
+<Canvas of={Stories.Default} />
+
+## When to use
+
+- **Feature grids and cards:** a tile beside or above each feature's title.
+- **Settings sections and empty states:** a mark that sets the subject at a glance.
+- **Inside other components:** [Stat](?path=/docs/components-stat--docs) takes an `icon`, and [List](?path=/docs/components-list--docs) draws one per item with `marker="tile"`.
+
+**Use something else when:**
+- it stands for a person, a team or an account: [Avatar](?path=/docs/components-avatar--docs)
+- it should do something when pressed: [IconButton](?path=/docs/components-iconbutton--docs)
+- the icon sits inside a line of text or a button: [Icon](?path=/docs/foundations-icon--docs)
+- it shows a status word: [Badge](?path=/docs/components-badge--docs)
+
+## Usage
+
+```tsx
+import { IconTile } from "@arshad-shah/cynosure";
+import { zap } from "@arshad-shah/cynosure/icons";
+
+<IconTile icon={zap} />
+<IconTile icon={zap} label="Fast builds" />
+<IconTile icon={zap} tone="success" variant="solid" size="lg" shape="circle" />
+```
+
+## Sizes
+
+`sm`, `md` and `lg` are the control heights, so a tile lines up with a Button of the same size and grows with the theme's `scale`. The icon is half the tile.
+
+<Canvas of={Stories.SizesFollowControlHeights} />
+
+## Tones and variants
+
+`soft` (default) is a tint of the tone, `solid` fills with it and `outline` draws a tinted border on the surface. The icon uses the tone's readable text colour, or the on-tone colour on `solid`.
+
+<Canvas of={Stories.TonesAndVariants} />
+
+## Square and circle
+
+<Canvas of={Stories.SquareAndCircle} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+| Setting | What assistive technology gets |
+| --- | --- |
+| no `label` (default) | Nothing: the tile is `aria-hidden`. Text beside it names the thing |
+| `label="Analytics"` | One image (`role="img"`) named "Analytics"; the SVG inside stays hidden |
+
+- **Keyboard:** none. A tile is never focusable.
+- **Forced colours:** the fill is dropped; a `CanvasText` border keeps the shape and the icon draws in `CanvasText`.
+
+## Touch
+
+Nothing in a tile can be pressed, so it has no hit area. Put it in a [Card](?path=/docs/components-card--docs) with `href` or `onClick` to make the whole card the target.
+
+## Theming
+
+| Token | Default | What it sets |
+| --- | --- | --- |
+| `--cy-icon-tile-size-{sm,md,lg}` | `--cy-control-height-{sm,md,lg}` | Width and height |
+| `--cy-icon-tile-radius` | size times `--cy-radius-factor` | Corner radius of the square |
+| `--cy-icon-tile-soft-mix` | `16%` | Tint strength of `soft` |
+| `--cy-icon-tile-icon-scale` | `0.5` | Icon size as a fraction of the tile |
+
+```ts
+createTheme({ components: { iconTile: { radius: "4px", iconScale: "0.6" } } });
+```
+
+`className` and `style` are for layout only. Change the look through tokens so every product stays consistent.
+
+## Related
+
+[Avatar](?path=/docs/components-avatar--docs) · [Stat](?path=/docs/components-stat--docs) · [List](?path=/docs/components-list--docs) · [Badge](?path=/docs/components-badge--docs) · [Icon](?path=/docs/foundations-icon--docs)

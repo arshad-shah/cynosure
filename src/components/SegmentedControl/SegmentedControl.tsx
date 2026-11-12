@@ -85,7 +85,7 @@ export function SegmentedControl({
     <div
       role="radiogroup"
       aria-label={label}
-      className={`cy-segmented${className ? ` ${className}` : ""}`}
+      className={`cy-segmented-control${className ? ` ${className}` : ""}`}
       data-size={size}
       data-tone={tone}
       data-full={fullWidth ? "" : undefined}
@@ -103,7 +103,7 @@ export function SegmentedControl({
         <label
           key={option.value}
           htmlFor={`${groupName}-${option.value}`}
-          className="cy-segment"
+          className="cy-segmented-control-segment"
           data-disabled={disabled || option.disabled ? "" : undefined}
         >
           <ChoiceBase
@@ -119,7 +119,7 @@ export function SegmentedControl({
             onChange={(e) => e.currentTarget.checked && setCurrent(option.value)}
           />
           {option.icon && <Icon icon={option.icon} />}
-          {!iconOnly && <span className="cy-segment-label">{option.label}</span>}
+          {!iconOnly && <span className="cy-segmented-control-label">{option.label}</span>}
         </label>
       ))}
     </div>

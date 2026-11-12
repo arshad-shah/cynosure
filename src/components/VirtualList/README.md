@@ -42,7 +42,3 @@ import { VirtualList } from "@arshad-shah/cynosure";
 ## Tokens
 
 - `--cy-virtual-list-height`, `--cy-virtual-list-row-height`, `--cy-virtual-list-selected-background`
-
-## Used by
-
-The tools app's file lists, page lists and history panels, and log and result lists in the web apps.

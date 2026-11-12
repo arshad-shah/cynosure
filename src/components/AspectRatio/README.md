@@ -36,7 +36,3 @@ import { AspectRatio } from "@arshad-shah/cynosure";
 ## Tokens
 
 - `--cy-aspect-ratio-radius`: corner radius of every AspectRatio, whatever its `radius` prop says
-
-## Used by
-
-Image (its `ratio` prop is an AspectRatio). Video, map and embed frames on the documentation site and the product sites.

@@ -1,0 +1,8 @@
+/* Inline is a Stack in a row (Stack's direction="row"); it adds centring by default and wrapping. Stack's [data-align]
+   rules are more specific, so `align` still wins over the centring. */
+.cy-inline.cy-inline {
+  align-items: center;
+  &[data-wrap] {
+    flex-wrap: wrap;
+  }
+}

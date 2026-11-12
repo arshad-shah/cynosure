@@ -30,8 +30,4 @@ Also takes TextField's `label`, `labelHidden`, `description`, `error`, `placehol
 ## Tokens
 
 - `--cy-tag-input-tag-background`, `--cy-tag-input-tag-radius`
-- The suggestion list uses Combobox's tokens (`--cy-combobox-*`).
-
-## Used by
-
-Topics, labels, filters and recipient lists in the web apps and extensions (cross-product audit, 2026-11-10).
+- The suggestion list is an [OptionList](../OptionList/README.md): restyle it with `--cy-option-list-*`.

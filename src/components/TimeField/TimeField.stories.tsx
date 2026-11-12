@@ -370,6 +370,24 @@ export const AHalfOutsideTheLimits: Story = {
 export const TheDayTrack: Story = {
   tags: ["visual"],
   args: { picker: true, defaultValue: "09:30", step: 15, min: "09:00", max: "17:30" },
+  // The picker shows "Now" only while the time of day is inside the limits, so the screenshot would depend on when
+  // the test runs. The clock is held at 20:00 (outside them) for this story.
+  beforeEach: () => {
+    const RealDate = Date;
+    class FixedDate extends RealDate {
+      constructor(...args: ConstructorParameters<DateConstructor> | []) {
+        if (args.length === 0) super(2026, 0, 15, 20, 0, 0);
+        else super(...(args as ConstructorParameters<DateConstructor>));
+      }
+      static override now() {
+        return new RealDate(2026, 0, 15, 20, 0, 0).getTime();
+      }
+    }
+    globalThis.Date = FixedDate as DateConstructor;
+    return () => {
+      globalThis.Date = RealDate;
+    };
+  },
   play: async ({ args, canvas, userEvent }) => {
     const picker = await openPicker(canvas, userEvent);
     const track = picker.getByRole("slider", { name: "Time of day" });
@@ -393,6 +411,8 @@ export const TheDayTrack: Story = {
     });
     await expect(args.onChange).toHaveBeenLastCalledWith("12:00");
     await expect(chosen(picker.getByRole("listbox", { name: "Hours" }))).toBe("12");
+    // With the clock outside the limits there is no "Now" button, whenever the test runs.
+    await expect(picker.queryByRole("button", { name: "Now" })).toBeNull();
   },
 };
 
@@ -538,6 +558,8 @@ export const StableUnderHostileHost: Story = {
       "font-variant-numeric",
     ]);
     await expect(hostile).toEqual(clean);
+    // Digits line up as they are typed (TextField's --cy-text-field-numeric, set by this field).
+    await expect(clean["font-variant-numeric"]).toBe("tabular-nums");
     const picker = computeUnderHostileHost(canvasElement, ".cy-time-field-option", [
       "height",
       "font-size",

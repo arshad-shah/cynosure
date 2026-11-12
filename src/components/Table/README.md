@@ -39,7 +39,3 @@ import { Table } from "@arshad-shah/cynosure";
 ## Tokens
 
 - `--cy-table-header-background`, `--cy-table-selected-background`, `--cy-table-max-height`
-
-## Used by
-
-Member lists, history and log views, and settings tables in the web apps and extensions (cross-product audit, 2026-11-10).

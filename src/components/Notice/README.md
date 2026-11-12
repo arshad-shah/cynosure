@@ -21,7 +21,3 @@ An inline message about part of the page that stays until it is resolved or dism
 - Title and body are at least 4.5:1 in every tone, in light and dark modes.
 
 Tokens: `--cy-notice-radius`, `--cy-notice-padding`, `--cy-notice-soft-mix`.
-
-## Used by
-
-Prism (sync and permission warnings), Aperture (capture errors), web apps (account and billing banners).

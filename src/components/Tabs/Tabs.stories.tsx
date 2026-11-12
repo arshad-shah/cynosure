@@ -3,6 +3,7 @@ import { useState } from "react";
 import { expect, fn, waitFor } from "storybook/test";
 import { code, info, list } from "../../icons/index.js";
 import { computeUnderHostileHost } from "../../test/hostile.js";
+import { asIfPrinting } from "../../test/print.js";
 import { Button } from "../Button/Button.js";
 import { Tab, TabList, TabPanel, Tabs } from "./Tabs.js";
 
@@ -569,5 +570,40 @@ export const ManualActivationDoesNotSelectOnFocus: Story = {
     // Re-selecting the current tab does not report a change.
     await userEvent.keyboard("{Home}{Enter}");
     await expect(args.onChange).not.toHaveBeenCalled();
+  },
+};
+
+export const PrintsEveryPanel: Story = {
+  render: () => (
+    <Tabs defaultValue="one">
+      <TabList label="Sections">
+        <Tab value="one">One</Tab>
+        <Tab value="two">Two</Tab>
+        <Tab value="three">Three</Tab>
+      </TabList>
+      <TabPanel value="one">First panel</TabPanel>
+      <TabPanel value="two">Second panel</TabPanel>
+      <TabPanel value="three" keepMounted>
+        Third panel
+      </TabPanel>
+    </Tabs>
+  ),
+  play: async ({ canvas }) => {
+    // On screen only the selected panel shows, and unselected ones have no content unless kept mounted.
+    await expect(canvas.queryByText("Second panel")).toBeNull();
+    await expect(canvas.getByText("Third panel").checkVisibility()).toBe(false);
+    const stop = asIfPrinting();
+    try {
+      // On paper every panel is there, in order.
+      const texts = ["First panel", "Second panel", "Third panel"];
+      for (const text of texts) await expect(canvas.getByText(text).checkVisibility()).toBe(true);
+      const tops = texts.map((t) => canvas.getByText(t).getBoundingClientRect().top);
+      await expect([...tops].sort((a, b) => a - b)).toEqual(tops);
+    } finally {
+      stop();
+    }
+    // After printing the screen is as it was.
+    await waitFor(() => expect(canvas.queryByText("Second panel")).toBeNull());
+    await expect(canvas.getByRole("tab", { name: "One" })).toHaveAttribute("aria-selected", "true");
   },
 };

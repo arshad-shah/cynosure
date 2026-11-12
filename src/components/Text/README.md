@@ -53,9 +53,3 @@ Text adds no role. Choose the element for meaning: `label` with `htmlFor` for a 
 - `--cy-text-eyebrow-size`: font size of the eyebrow variant (default `--cy-font-eyebrow-size`)
 - `--cy-text-eyebrow-tracking`: letter spacing of the eyebrow variant (default `--cy-font-eyebrow-tracking`)
 - `--cy-text-muted`: colour of the muted tone and the muted variants (default `--cy-color-muted`)
-
-## Used by
-
-- The docs site: page leads, section eyebrows and captions under examples.
-- The tools app: helper lines, result values (`numeric`) and truncated file names.
-- Verql and Planr: metadata lines, timestamps (`as="time"`) and status text in tones.

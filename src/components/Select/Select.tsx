@@ -21,6 +21,7 @@ import type { IconData } from "../../icons/types.js";
 import { useListboxLayer } from "../../overlay/listbox-layer.js";
 import type { Size } from "../../tokens/schema.js";
 import { Field } from "../Field/Field.js";
+import { OptionList, OptionListGroup, OptionListItem, OptionListNote } from "../OptionList/OptionList.js";
 
 export interface SelectTokens {
   radius: string;
@@ -249,68 +250,37 @@ export function Select({
             </span>
             <Icon icon={chevronDown} className="cy-select-chevron" />
           </ButtonBase>
-          <div
-            ref={list}
-            id={listId}
-            role="listbox"
-            aria-labelledby={field.labelId}
-            className="cy-select-list"
-            {...{ popover: "manual" }}
-          >
-            {options.length === 0 && (
-              <div
-                role="option"
-                aria-disabled="true"
-                aria-selected="false"
-                tabIndex={-1}
-                className="cy-select-empty"
-              >
-                {labels?.empty ?? "No options"}
-              </div>
-            )}
+          <OptionList ref={list} id={listId} aria-labelledby={field.labelId}>
+            {options.length === 0 && <OptionListNote>{labels?.empty ?? "No options"}</OptionListNote>}
             {groupsOf(options).map((run) => {
               const rows = run.items.map(({ option, index }) => (
-                <div
+                <OptionListItem
                   key={option.value}
                   id={`${listId}-${index}`}
-                  role="option"
                   data-index={index}
-                  aria-selected={option.value === current}
-                  aria-disabled={option.disabled || undefined}
-                  data-active={index === active ? "" : undefined}
-                  className="cy-select-option"
-                  tabIndex={-1}
+                  label={option.label}
+                  description={option.description}
+                  icon={<OptionIcon option={option} plain={option.disabled} className="cy-select-icon" />}
+                  selected={option.value === current}
+                  disabled={option.disabled}
+                  active={index === active}
                   onPointerMove={() => enabled(index) && setActive(index)}
-                  onPointerDown={(e) => e.preventDefault()}
                   onClick={() => {
                     if (!enabled(index)) return;
                     choose(index);
                     close();
                   }}
-                  onKeyDown={() => {}}
-                >
-                  <OptionIcon option={option} plain={option.disabled} className="cy-select-icon" />
-                  <span className="cy-select-option-text">
-                    <span className="cy-select-option-label">{option.label}</span>
-                    {option.description && (
-                      <span className="cy-select-option-description">{option.description}</span>
-                    )}
-                  </span>
-                </div>
+                />
               ));
               return run.group === undefined ? (
                 <Fragment key={`run-${run.start}`}>{rows}</Fragment>
               ) : (
-                // biome-ignore lint/a11y/useSemanticElements: a group of options inside a listbox; a fieldset is a form control
-                <div key={`group-${run.start}`} role="group" aria-labelledby={`${listId}-g${run.start}`}>
-                  <div id={`${listId}-g${run.start}`} className="cy-select-group" role="presentation">
-                    {run.group}
-                  </div>
+                <OptionListGroup key={`group-${run.start}`} id={`${listId}-g${run.start}`} label={run.group}>
                   {rows}
-                </div>
+                </OptionListGroup>
               );
             })}
-          </div>
+          </OptionList>
           <HiddenValue
             name={name}
             value={current}

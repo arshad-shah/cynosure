@@ -28,7 +28,3 @@ import { CodeBlock } from "@arshad-shah/cynosure";
 ## Tokens
 
 - `--cy-code-block-background`, `--cy-code-block-radius`, `--cy-code-block-max-height`
-
-## Used by
-
-Docs sites, snippets in settings and developer tools, and copyable commands in the web apps and extensions (cross-product audit, 2026-11-10).

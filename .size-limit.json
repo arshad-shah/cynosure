@@ -2,7 +2,7 @@
   {
     "name": "all CSS",
     "path": "dist/styles.css",
-    "limit": "30 kB",
+    "limit": "32 kB",
     "gzip": true
   },
   {
@@ -34,7 +34,7 @@
   },
   {
     "name": "IconButton",
-    "path": ["dist/components/IconButton/IconButton.js", "dist/styles/iconbutton.css"],
+    "path": ["dist/components/IconButton/IconButton.js", "dist/styles/tooltip.css"],
     "limit": "1 kB",
     "gzip": true
   },
@@ -62,7 +62,7 @@
   },
   {
     "name": "SearchField",
-    "path": ["dist/components/SearchField/SearchField.js", "dist/styles/search-field.css"],
+    "path": ["dist/components/SearchField/SearchField.js"],
     "limit": "1 kB",
     "gzip": true
   },
@@ -86,13 +86,15 @@
     "name": "Checkbox + Switch",
     "path": [
       "dist/components/Checkbox/Checkbox.js",
-      "dist/components/Checkbox/ChoiceRow.js",
+      "dist/components/Choice/Choice.js",
       "dist/components/Switch/Switch.js",
       "dist/foundations/ChoiceBase/ChoiceBase.js",
       "dist/styles/checkbox.css",
-      "dist/styles/choice.css"
+      "dist/styles/switch.css",
+      "dist/styles/choice.css",
+      "dist/styles/choice-base.css"
     ],
-    "limit": "3.5 kB",
+    "limit": "4.25 kB",
     "gzip": true
   },
   {
@@ -123,8 +125,7 @@
     "path": [
       "dist/components/Select/Select.js",
       "dist/foundations/HiddenValue/HiddenValue.js",
-      "dist/styles/select.css",
-      "dist/styles/hidden-value.css"
+      "dist/styles/select.css"
     ],
     "limit": "5 kB",
     "gzip": true
@@ -155,8 +156,13 @@
   },
   {
     "name": "Inline",
-    "path": ["dist/components/Inline/Inline.js", "dist/styles/stack.css"],
-    "limit": "1 kB",
+    "path": [
+      "dist/components/Inline/Inline.js",
+      "dist/components/Stack/Stack.js",
+      "dist/styles/stack.css",
+      "dist/styles/inline.css"
+    ],
+    "limit": "1.5 kB",
     "gzip": true
   },
   {
@@ -235,7 +241,7 @@
       "dist/foundations/DialogBase/DialogBase.js",
       "dist/styles/dialog.css"
     ],
-    "limit": "3.5 kB",
+    "limit": "3.6 kB",
     "gzip": true
   },
   {
@@ -317,7 +323,7 @@
   {
     "name": "Grid",
     "path": ["dist/components/Grid/Grid.js", "dist/styles/grid.css"],
-    "limit": "1.5 kB",
+    "limit": "2 kB",
     "gzip": true
   },
   {
@@ -567,6 +573,88 @@
   {
     "name": "Checklist (JS + CSS)",
     "path": ["dist/components/Checklist/Checklist.js", "dist/styles/checklist.css"],
+    "limit": "3 kB",
+    "gzip": true
+  },
+  {
+    "name": "IconTile (JS + CSS)",
+    "path": ["dist/components/IconTile/IconTile.js", "dist/styles/icon-tile.css"],
+    "gzip": true
+  },
+  {
+    "name": "VisuallyHidden (JS + CSS)",
+    "path": ["dist/components/VisuallyHidden/VisuallyHidden.js", "dist/styles/visually-hidden.css"],
+    "limit": "0.75 kB",
+    "gzip": true
+  },
+  {
+    "name": "SkipLink (JS + CSS)",
+    "path": ["dist/components/SkipLink/SkipLink.js", "dist/styles/skip-link.css"],
+    "limit": "1.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "Stat (JS + CSS)",
+    "path": ["dist/components/Stat/Stat.js", "dist/styles/stat.css"],
+    "limit": "2.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "List (JS + CSS)",
+    "path": ["dist/components/List/List.js", "dist/styles/list.css"],
+    "limit": "2.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "QRCode (JS + CSS)",
+    "path": ["dist/components/QRCode/QRCode.js", "dist/foundations/qr.js", "dist/styles/qr-code.css"],
+    "limit": "5 kB",
+    "gzip": true
+  },
+  {
+    "name": "qrToSvg (no React)",
+    "path": "dist/foundations/qr.js",
+    "limit": "3.6 kB",
+    "gzip": true
+  },
+  {
+    "name": "DeviceFrame (JS + CSS)",
+    "path": [
+      "dist/components/DeviceFrame/DeviceFrame.js",
+      "dist/components/AspectRatio/AspectRatio.js",
+      "dist/styles/device-frame.css",
+      "dist/styles/aspect-ratio.css"
+    ],
+    "limit": "2.75 kB",
+    "gzip": true
+  },
+  {
+    "name": "SiteHeader (JS + CSS)",
+    "path": ["dist/components/SiteHeader/SiteHeader.js", "dist/styles/site-header.css"],
+    "limit": "2.75 kB",
+    "gzip": true
+  },
+  {
+    "name": "SiteFooter (JS + CSS)",
+    "path": ["dist/components/SiteFooter/SiteFooter.js", "dist/styles/site-footer.css"],
+    "limit": "2 kB",
+    "gzip": true
+  },
+  {
+    "name": "Section (JS + CSS)",
+    "path": ["dist/components/Section/Section.js", "dist/styles/section.css"],
+    "limit": "1.25 kB",
+    "gzip": true
+  },
+  {
+    "name": "Choice",
+    "path": ["dist/components/Choice/Choice.js", "dist/styles/choice.css"],
+    "limit": "3 kB",
+    "gzip": true
+  },
+  {
+    "name": "OptionList (JS + CSS)",
+    "path": ["dist/components/OptionList/OptionList.js", "dist/styles/option-list.css"],
     "limit": "3 kB",
     "gzip": true
   }

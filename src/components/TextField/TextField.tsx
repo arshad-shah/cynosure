@@ -28,6 +28,8 @@ export interface TextFieldTokens {
   bg: string;
   border: string;
   softBg: string;
+  /** `font-variant-numeric` of the typed text: `tabular-nums` lines digits up (DateField, NumberField, TimeField). */
+  numeric: string;
 }
 
 declare module "../../tokens/schema.js" {
@@ -68,6 +70,8 @@ export interface TextFieldProps extends NativeInput {
   iconEnd?: IconData | undefined;
   /** Shows a clear button while the field has a value. */
   clearable?: boolean;
+  /** Controls inside the field's start, before the input (ColorField's swatch button). */
+  addonStart?: ReactNode;
   /** Controls inside the field's end, after the input (NumberField's steppers). */
   addonEnd?: ReactNode;
   /** Replace the built-in English text: the names of the clear, show and hide buttons. */
@@ -104,6 +108,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(function T
     iconEnd,
     clearable = false,
     revealable = false,
+    addonStart,
     addonEnd,
     labels,
     required,
@@ -166,6 +171,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(function T
           data-invalid={field.invalid ? "" : undefined}
           data-disabled={disabled ? "" : undefined}
         >
+          {addonStart}
           {iconStart && <Icon icon={iconStart} className="cy-text-field-icon" />}
           <InputBase
             ref={ref}

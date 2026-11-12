@@ -19,7 +19,3 @@ Zoom out, the current percent (a menu of fit width, fit page and preset percents
 ## Tokens
 
 None of its own: Toolbar, Button and Menu tokens.
-
-## Used by
-
-The tools app's document and image editors, with DocumentViewport.

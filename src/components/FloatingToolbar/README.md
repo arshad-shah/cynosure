@@ -39,7 +39,3 @@ const anchor = useSelectionAnchor(editorRef);
 ## Tokens
 
 - `--cy-floating-toolbar-background`, `--cy-floating-toolbar-radius`, `--cy-floating-toolbar-offset`
-
-## Used by
-
-The PDF fill-and-sign editor's field and text-style bars in the tools app, and selection formatting in editors.

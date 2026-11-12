@@ -49,14 +49,6 @@
   font-weight: var(--cy-font-weight-medium);
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  [data-collapsed] & {
-    position: absolute;
-    inline-size: var(--cy-border-width);
-    block-size: var(--cy-border-width);
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
-  }
 }
 .cy-side-nav-list.cy-side-nav-list {
   display: flex;
@@ -82,9 +74,10 @@
   margin: 0;
   padding: 0;
   font-size: inherit;
-  & > .cy-tooltip-anchor {
-    display: flex;
-  }
+}
+/* The Tooltip (or IconButton) around a row's control in the rail. */
+.cy-side-nav-tip.cy-side-nav-tip {
+  display: flex;
 }
 .cy-side-nav-link.cy-side-nav-link {
   box-sizing: border-box !important;
@@ -151,13 +144,6 @@
   font-size: inherit;
   text-overflow: ellipsis;
   white-space: nowrap;
-  [data-collapsed] & {
-    position: absolute;
-    inline-size: var(--cy-border-width);
-    block-size: var(--cy-border-width);
-    overflow: hidden;
-    clip-path: inset(50%);
-  }
 }
 .cy-side-nav-badge.cy-side-nav-badge {
   flex: none;

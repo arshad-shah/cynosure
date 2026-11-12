@@ -50,7 +50,3 @@ function SaveButton() {
 - Inside an open Dialog or Sheet (within the Toaster), toasts show in the dialog, above its backdrop, instead of under it where the modal would make them inert. When it closes they move back to the page with their remaining time, and are not announced again.
 
 Tokens: `--cy-toast-width`, `--cy-toast-radius`, `--cy-toast-padding`, `--cy-toast-gap`, `--cy-toast-offset-block` (extra distance from the top or bottom edge the toasts sit on), `--cy-toast-offset-inline` (extra distance from the side they sit on).
-
-## Used by
-
-Prism (copy and export confirmations), Aperture (capture saved, upload errors), web apps (form submissions).

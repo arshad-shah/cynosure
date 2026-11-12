@@ -1,5 +1,14 @@
 import { execFileSync } from "node:child_process";
-import { cpSync, existsSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
+import {
+  cpSync,
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  rmSync,
+  symlinkSync,
+  writeFileSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
@@ -146,10 +155,43 @@ describe("cy check", () => {
         .map((v) => v.file),
     ).toEqual(["src/components"]);
   });
-  it("requires a play test and a Used by section for every component", () => {
+  it("requires a play test and a README for every component", () => {
     const root = sandbox();
     rmSync(join(root, "src/components/IconButton/README.md"));
     expect(rules(root)).toContain("structure");
+  });
+  it("lets a component style and render only its own classes", () => {
+    const root = sandbox();
+    mkdirSync(join(root, "src/components/Probe"));
+    write(
+      root,
+      "src/components/Probe/probe.css",
+      ".cy-probe.cy-probe .cy-button-label { color: red; }\n.cy-probe-part {}\n",
+    );
+    write(root, "src/components/Probe/other.css", ".cy-probe {}\n");
+    write(
+      root,
+      "src/components/Probe/Probe.tsx",
+      'export const Probe = () => <span className="cy-probe-part cy-reset cy-combobox-option" />;\n',
+    );
+    const found = check(root).filter((v) => v.file.startsWith("src/components/Probe/"));
+    expect(found.map((v) => `${v.rule} ${v.message.split(" ")[0]}`).sort()).toEqual([
+      "own-classes cy-combobox-option",
+      "own-styles .cy-button-label",
+      "own-styles Probe's",
+    ]);
+  });
+  it("flags hand-written hidden text and composites that skip the component owning an element", () => {
+    const root = sandbox();
+    mkdirSync(join(root, "src/components/Probe"));
+    write(root, "src/components/Probe/probe.css", ".cy-probe-hidden { clip-path: inset(50%); }\n");
+    write(
+      root,
+      "src/components/Probe/Probe.tsx",
+      'import { LinkBase } from "../../foundations/LinkBase/LinkBase.js";\nimport { Icon } from "../../foundations/Icon/Icon.js";\nexport const Probe = () => <LinkBase href="#"><Icon /></LinkBase>;\n',
+    );
+    const found = check(root).filter((v) => v.file.startsWith("src/components/Probe/"));
+    expect(found.map((v) => v.rule).sort()).toEqual(["foundation-use", "hidden-text"]);
   });
   it("flags glyphs used as icons or arrows in docs pages", () => {
     const root = sandbox();

@@ -29,7 +29,3 @@ const [headers, setHeaders] = useState<KeyValuePair[]>([
 ## Tokens
 
 - `--cy-key-value-editor-gap`
-
-## Used by
-
-The tools app's request builders (headers, query parameters, form fields) and settings screens with environment variables or metadata.

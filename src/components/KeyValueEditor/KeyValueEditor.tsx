@@ -164,6 +164,7 @@ export function KeyValueEditor({
           {toggleable && (
             <Checkbox
               label={<span className="cy-visually-hidden">{text.enable(name)}</span>}
+              className="cy-key-value-editor-check"
               checked={pair.enabled !== false}
               disabled={disabled}
               size={size}
@@ -272,7 +273,7 @@ export function KeyValueEditor({
       {allowFiles && (
         <FileInputBase
           ref={picker}
-          className="cy-key-value-editor-picker"
+          className="cy-visually-hidden"
           tabIndex={-1}
           aria-hidden="true"
           accept={accept}

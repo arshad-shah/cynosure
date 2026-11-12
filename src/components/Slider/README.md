@@ -28,7 +28,3 @@ Picks a number, a range with two thumbs, or several values (gradient stops), by 
 - Touch: the thumb's hit area is 44px (invisibly); horizontal drags belong to the slider while vertical swipes still scroll the page.
 
 Tokens: `--cy-slider-track-{sm,md,lg}`, `--cy-slider-thumb-{sm,md,lg}`, `--cy-slider-track`, `--cy-slider-length`.
-
-## Used by
-
-aperture-css (spacing, size and opacity controls), algo-visual and algosnap (playback speed and step scrubbing), verql (limits and ranges), whetstone (session settings).

@@ -1,0 +1,112 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./Stat.stories";
+
+<Meta of={Stories} />
+
+# Stat
+
+A figure with its label, a KPI tile: the value with an optional unit, the change since last time and a line of context, on a [Card](?path=/docs/components-card--docs). With `href` the whole tile is one link to the figure's detail. For several facts about one record, use [DescriptionList](?path=/docs/components-descriptionlist--docs) instead.
+
+<Canvas of={Stories.Default} />
+
+## When to use
+
+- **Dashboards and overviews:** the few numbers someone opens the page to see.
+- **A figure that leads somewhere:** `href` makes the tile a link to the report behind it.
+
+**Use something else when:**
+- there are many facts about one thing (a record's details, a settings summary): [DescriptionList](?path=/docs/components-descriptionlist--docs)
+- the numbers are rows to compare: [Table](?path=/docs/components-table--docs)
+- the figure is progress towards a goal: [ProgressBar](?path=/docs/components-progressbar--docs)
+
+## Usage
+
+```tsx
+import { Grid, Stat } from "@arshad-shah/cynosure";
+import { users } from "@arshad-shah/cynosure/icons";
+
+<Stat label="Revenue" value="£12,400" delta={{ value: "+12%" }} description="vs last month" />
+<Stat label="p95 latency" value="184" unit="ms" delta={{ value: "-8%", tone: "success" }} />
+<Stat label="Members" value="312" icon={users} href="/members" />
+```
+
+## Change since last time
+
+`delta` draws an arrow and the change in a tone, and gives screen readers a sentence such as "up 12%". The direction comes from the value's sign (`+` is up, `-` or `−` is down, anything else is flat) unless `direction` says otherwise. Up is `success` and down is `danger`; set `tone` when down is good news, as for costs or errors.
+
+<Canvas of={Stories.DeltaDirectionToneAndArrow} />
+
+The spoken words are English by default. `labels` takes a function per direction, given the value without its sign:
+
+```tsx
+<Stat
+  label="Chiffre d'affaires"
+  value="12 400 €"
+  delta={{ value: "+12 %" }}
+  labels={{ up: (v) => `en hausse de ${v}`, down: (v) => `en baisse de ${v}`, flat: (v) => `stable à ${v}` }}
+/>
+```
+
+## Units, icons and alignment
+
+`unit` is written after the value, smaller. `icon` adds a decorative [IconTile](?path=/docs/components-icontile--docs) at the start; `align="center"` puts it above and centres everything.
+
+<Canvas of={Stories.UnitAfterTheValue} />
+<Canvas of={Stories.IconAndAlignment} />
+
+## Sizes
+
+`size` sets the value, the label, the icon tile and the card's padding together.
+
+<Canvas of={Stories.Sizes} />
+
+## Several stats
+
+There is no StatGroup: put the stats in a [Grid](?path=/docs/components-grid--docs). When they form a set, make it a list with `as="ul"` on the Grid and `as="li"` on each Stat; a linked stat keeps its list item and puts the link inside it.
+
+<Canvas of={Stories.ListOfStats} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+| Input | Result |
+| --- | --- |
+| Click, tap, <kbd>Enter</kbd> on a stat with `href` | Follows the link (`onClick` runs first) |
+| <kbd>Tab</kbd> | Focuses a linked stat, with Card's focus ring. A static stat is not focusable |
+
+- **Reading order:** the label and the figures are a description list. The label is the term and the value, delta and description are its definitions, so a screen reader reads "Revenue, £12,400, up 12%, vs last month".
+- **Delta:** the visible figure is hidden from assistive technology and a visually hidden sentence is read instead, so the direction never depends on colour or the arrow.
+- **Icon:** decorative; the label names the stat.
+- **Link:** one link named by the stat's text, with nothing interactive inside. Unsafe schemes such as `javascript:` are not linked.
+- **Digits** are tabular, so figures in a row of stats line up.
+
+## Touch
+
+A linked stat is a whole Card, well above the 44px target for coarse pointers, and a tap follows it. A static stat has nothing to press.
+
+## Theming
+
+| Token | Default | What it sets |
+| --- | --- | --- |
+| `--cy-stat-gap` | `--cy-space-5` | Space between the icon tile and the text |
+| `--cy-stat-label-color` | `--cy-color-muted` | Colour of the label, unit and description |
+| `--cy-stat-value-font` | `--cy-font-display` | Font family of the value |
+| `--cy-stat-value-weight` | `--cy-font-weight-bold` | Font weight of the value |
+| `--cy-stat-value-size-sm` | `--cy-font-size-xl` | Value size at `size="sm"` |
+| `--cy-stat-value-size-md` | `--cy-font-size-2xl` | Value size at `size="md"` |
+| `--cy-stat-value-size-lg` | 1.45 times `--cy-font-size-2xl` | Value size at `size="lg"` |
+
+The frame is a Card, restyled through the `--cy-card-*` tokens; the icon is an IconTile (`--cy-icon-tile-*`).
+
+```ts
+createTheme({ components: { stat: { valueWeight: "500" }, card: { radius: "8px" } } });
+```
+
+`className` and `style` are for layout only. Change the look through tokens so every product stays consistent.
+
+## Related
+
+[Card](?path=/docs/components-card--docs) · [IconTile](?path=/docs/components-icontile--docs) · [Grid](?path=/docs/components-grid--docs) · [DescriptionList](?path=/docs/components-descriptionlist--docs) · [Table](?path=/docs/components-table--docs)

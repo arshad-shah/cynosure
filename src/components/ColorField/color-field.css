@@ -1,6 +1,6 @@
 /*
- * color-field: a TextField-styled control (reuses .cy-text-field) with a swatch button opening a picker: a
- * saturation-brightness area, then hue and opacity Sliders whose tracks are painted with the colour.
+ * color-field: a TextField whose start holds a swatch button opening a picker: a saturation-brightness area, then hue
+ * and opacity Sliders whose tracks are drawn with the colours they choose.
  */
 .cy-color-field.cy-color-field {
   box-sizing: border-box !important;
@@ -8,9 +8,6 @@
   font-size: var(--cy-font-size-md);
   letter-spacing: normal;
   text-transform: none;
-}
-.cy-color-field-control.cy-color-field-control {
-  padding-inline-start: var(--cy-space-1);
 }
 .cy-color-field-trigger.cy-color-field-trigger {
   flex: none;
@@ -67,24 +64,27 @@
   font-size: var(--cy-font-size-md);
   pointer-events: none;
 }
-/* Hue and opacity tracks show the colours; the generic fill is hidden. */
-.cy-color-field-hue {
-  --cy-slider-track: linear-gradient(to right, red, yellow, lime, cyan, blue, magenta, red);
-}
-.cy-color-field-alpha {
-  --cy-slider-track:
-    linear-gradient(to right, transparent, var(--_c)),
-    repeating-conic-gradient(var(--cy-color-soft) 0 25%, var(--cy-color-surface) 0 50%) 50% /
-    var(--cy-space-3) var(--cy-space-3);
-}
-.cy-color-field-hue .cy-slider-fill,
-.cy-color-field-alpha .cy-slider-fill {
-  display: none;
-}
-.cy-color-field-hue .cy-slider-track.cy-slider-track::before,
-.cy-color-field-alpha .cy-slider-track.cy-slider-track::before {
-  block-size: var(--cy-space-5);
+/*
+ * The hue and opacity strips, drawn in the Sliders' tracks (trackContent): a band as thick as --cy-space-5, centred,
+ * running under the thumbs. Repeated to win over the Slider's sizing of its drawing.
+ */
+.cy-color-field-strip.cy-color-field-strip.cy-color-field-strip {
+  position: absolute;
+  inset-inline-start: 0;
   inset-block-start: calc(50% - var(--cy-space-5) / 2);
+  block-size: var(--cy-space-5);
+  border-radius: var(--cy-radius-full);
+  font-size: var(--cy-font-size-md);
+  /* Physical on purpose: hue and opacity run left to right in every writing direction. */
+  &[data-strip="hue"] {
+    background: linear-gradient(to right, red, yellow, lime, cyan, blue, magenta, red);
+  }
+  &[data-strip="alpha"] {
+    background:
+      linear-gradient(to right, transparent, var(--_c)),
+      repeating-conic-gradient(var(--cy-color-soft) 0 25%, var(--cy-color-surface) 0 50%) 50% /
+      var(--cy-space-3) var(--cy-space-3);
+  }
 }
 @media (forced-colors: active) {
   .cy-color-field-swatch.cy-color-field-swatch {

@@ -55,7 +55,3 @@ import { Calendar } from "@arshad-shah/cynosure";
 - `--cy-calendar-content-size`: with `renderDay`, the least height of a day (never below the hit area)
 - `--cy-calendar-tone-mix`: how much of a marked day's tone is mixed into its background (12%)
 - `--cy-calendar-dot-size`: the size of a day's dots
-
-## Used by
-
-Planr (the month view) and, through DateField, the tools app's date inputs and Verql's query filters.

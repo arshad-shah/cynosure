@@ -1,4 +1,10 @@
-import { type CSSProperties, forwardRef, type MouseEventHandler, type ReactNode } from "react";
+import {
+  type AriaAttributes,
+  type CSSProperties,
+  forwardRef,
+  type MouseEventHandler,
+  type ReactNode,
+} from "react";
 import { Icon } from "../../foundations/Icon/Icon.js";
 import { LinkBase } from "../../foundations/LinkBase/LinkBase.js";
 import { external as externalIcon } from "../../icons/external.js";
@@ -26,6 +32,14 @@ export interface LinkProps {
   size?: Size | "inherit";
   /** Opens in a new tab with a safe rel, an external icon and announced text. */
   external?: boolean;
+  /**
+   * When the underline shows: `always` (default), `hover` (on hover and focus) or `none`. Leave it on in running
+   * text, where the underline is what tells a link from the words around it; take it off only where the place says
+   * it is a link (a navigation bar, a footer's columns, a card title).
+   */
+  underline?: "always" | "hover" | "none";
+  /** Marks the link as the current item of a set, e.g. `"page"` for the page being shown in a navigation bar. */
+  "aria-current"?: AriaAttributes["aria-current"];
   /** Called when the link is activated. */
   onClick?: MouseEventHandler<HTMLAnchorElement>;
   /** Replace the built-in English text: `external` is read out after a link that opens in a new tab. */
@@ -38,7 +52,19 @@ export interface LinkProps {
 
 /** Inline text link. Text colours use each tone's readable text role. */
 export const Link = forwardRef<HTMLAnchorElement, LinkProps>(function Link(
-  { href, children, tone = "accent", size = "inherit", external = false, onClick, labels, className, style },
+  {
+    href,
+    children,
+    tone = "accent",
+    size = "inherit",
+    external = false,
+    underline = "always",
+    onClick,
+    labels,
+    className,
+    style,
+    "aria-current": current,
+  },
   ref,
 ) {
   return (
@@ -49,6 +75,8 @@ export const Link = forwardRef<HTMLAnchorElement, LinkProps>(function Link(
       className={`cy-link${className ? ` ${className}` : ""}`}
       data-tone={tone}
       data-size={size}
+      data-underline={underline === "always" ? undefined : underline}
+      aria-current={current}
       style={style}
       {...(external ? { target: "_blank" } : {})}
     >

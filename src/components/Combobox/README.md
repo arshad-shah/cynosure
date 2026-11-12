@@ -25,8 +25,4 @@ A text input with a list of suggestions (WAI-ARIA APG editable combobox). Type t
 
 - `iconTone` and `iconColor` on an option colour its `icon` in the list, with the meaning of Icon's `tone` and `color` (`iconColor` is any CSS colour and overrides `iconTone`), the same two fields as Select and Menu options. The active and the selected option keep the colour; a disabled option shows the icon without it, muted with its row. The input shows text only (`iconStart` is the field's own icon).
 
-Tokens: `--cy-combobox-list-max-height`, `--cy-combobox-list-bg`, `--cy-combobox-option-active-bg` (and TextField's for the input).
-
-## Used by
-
-aperture-css (property and font pickers), algo-visual (algorithm picker), verql (table and column pickers with server results).
+Tokens: `--cy-combobox-list-max-height`, `--cy-combobox-list-max-width`, `--cy-combobox-list-bg`, `--cy-combobox-option-active-bg` (and TextField's for the input). The list is an [OptionList](../OptionList/README.md); these tokens set its `--cy-option-list-*` tokens.

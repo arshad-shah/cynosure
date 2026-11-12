@@ -25,8 +25,5 @@ One choice from a short list, on native radios: arrow keys move and select (wrap
 
 ## Tokens
 
-- `--cy-radio-group-gap`, plus `--cy-checkbox-border` for the ring
-
-## Used by
-
-Aperture (settings), Planr (repeat options), Verql (connection type), Stepframe (mode selection).
+- `--cy-radio-group-gap`, plus `--cy-checkbox-border` for the ring and `--cy-checkbox-size{,-sm,-lg}` for its size, so radios line up with checkboxes
+- Each option is a [Choice](../Choice/README.md) row: `--cy-choice-gap` is the space before its label

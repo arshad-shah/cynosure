@@ -118,8 +118,11 @@ export const PickerAreaAndHue: Story = {
     area.dispatchEvent(new PointerEvent("pointerup", { bubbles: true, pointerId: 3, isPrimary: true }));
     const hue = canvas.getByRole("slider", { name: "Hue" });
     // The hue track is thick enough to read as a colour strip.
-    const strip = getComputedStyle(hue.closest(".cy-slider-track") as Element, "::before");
-    await expect(Number.parseFloat(strip.height)).toBeGreaterThanOrEqual(10);
+    const strip = (hue.closest(".cy-color-field-hue") as Element).querySelector(
+      ".cy-color-field-strip",
+    ) as Element;
+    await expect(strip.getBoundingClientRect().height).toBeGreaterThanOrEqual(10);
+    await expect(getComputedStyle(strip).backgroundImage).toMatch(/^linear-gradient/);
     hue.focus();
     // Page Up moves a tenth of the circle (36°): three of them and twelve arrows reach 120°, green.
     await userEvent.keyboard("{Home}{PageUp}{PageUp}{PageUp}");

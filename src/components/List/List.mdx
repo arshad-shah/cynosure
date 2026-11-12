@@ -1,0 +1,97 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./List.stories";
+
+<Meta of={Stories} />
+
+# List
+
+A real list (`ul` or `ol`) with drawn markers: bullets, numbered how-to steps, a ticked feature list, or an icon per item. Each item has a label and an optional description under it. For long-form text with lists inside, use [Prose](?path=/docs/components-prose--docs); for progress through a flow, use [Steps](?path=/docs/components-steps--docs).
+
+<Canvas of={Stories.Default} />
+
+## When to use
+
+- **`marker="number"`:** instructions to follow in order, such as installing or setting something up.
+- **`marker="check"`:** what a plan or feature includes.
+- **`marker="icon"` or `"tile"`:** features or benefits, each with its own icon.
+- **`marker="disc"` (default) or `"none"`:** any short list of items.
+
+**Use something else when:**
+- the person is moving through the steps and needs to see where they are: [Steps](?path=/docs/components-steps--docs)
+- the items are terms with values: [DescriptionList](?path=/docs/components-descriptionlist--docs)
+- people tick, add or reorder the items: [Checklist](?path=/docs/components-checklist--docs) or [SortableList](?path=/docs/components-sortablelist--docs)
+- the list is part of written content from Markdown or a CMS: [Prose](?path=/docs/components-prose--docs)
+
+## Usage
+
+```tsx
+import { List } from "@arshad-shah/cynosure";
+
+<List
+  marker="number"
+  label="Install"
+  items={[
+    { label: "Add the package", description: "pnpm add @arshad-shah/cynosure" },
+    { label: "Import the styles", description: "Once, at the root of the app." },
+    { label: "Wrap the app in CynosureTheme" },
+  ]}
+/>
+```
+
+Items are data, as in Steps and DescriptionList: `{ id?, label, description?, icon?, tone? }`. Give `id` when items are added, removed or reordered.
+
+## Numbered how-to
+
+`marker="number"` renders an `ol`. The numbers start at `start` (default 1) and follow the items. Each number sits on its item's first line, also when a description follows.
+
+<Canvas of={Stories.NumberedHowTo} />
+<Canvas of={Stories.NumbersRightToLeft} />
+
+## Ticks, icons and tiles
+
+`check` draws a tick in the success colour. `icon` draws each item's `icon` (or the list's), and `tile` puts it on an [IconTile](?path=/docs/components-icontile--docs). `tone` on the list or on an item sets the marker's colour.
+
+<Canvas of={Stories.ChecksForAFeatureList} />
+<Canvas of={Stories.IconsAndTiles} />
+
+## Gap and dividers
+
+<Canvas of={Stories.GapAndDividers} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+- **Semantics:** always a real `ul` or `ol` with `li` items. `role="list"` is set explicitly because Safari drops the list role from a list without bullets. Screen readers announce the list, how many items it has, and each item's position.
+- **Markers** are `aria-hidden`. The list gives each item's position, so numbers are not read twice; ticks, icons and tiles are decoration.
+- **`label`** names the list ("Install") when no heading above it does.
+- **Keyboard:** none of its own. Nothing in a List is focusable unless you put a Link or a Button in an item.
+- **Right to left:** markers move to the right and numbers still count down the page.
+- **Forced colours:** discs draw in `CanvasText` and number circles get a `CanvasText` outline.
+
+## Touch
+
+A List has nothing to press. Links or buttons you put in items keep their own hit areas.
+
+## Theming
+
+| Token | Default | What it sets |
+| --- | --- | --- |
+| `--cy-list-gap-{sm,md,lg}` | `--cy-space-3`, `--cy-space-5`, `--cy-space-7` | Space between items |
+| `--cy-list-marker-gap` | `--cy-space-5` | Space between the marker and the text |
+| `--cy-list-marker-color` | `--cy-color-muted` | Colour of a disc with no tone |
+| `--cy-list-number-size` | one line of the label | Diameter of the circle behind a number |
+| `--cy-list-description-color` | `--cy-color-muted` | Colour of the description |
+| `--cy-list-divider-color` | `--cy-color-line` | Colour of the line with `divided` |
+
+```ts
+createTheme({ components: { list: { markerGap: "12px", gapMd: "16px" } } });
+```
+
+`className` and `style` are for layout only. Change the look through tokens so every product stays consistent.
+
+## Related
+
+[Steps](?path=/docs/components-steps--docs) · [IconTile](?path=/docs/components-icontile--docs) · [DescriptionList](?path=/docs/components-descriptionlist--docs) · [Checklist](?path=/docs/components-checklist--docs) · [Prose](?path=/docs/components-prose--docs)

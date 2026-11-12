@@ -70,6 +70,13 @@ export {
   type ChecklistTokens,
 } from "./components/Checklist/index.js";
 export {
+  Choice,
+  type ChoiceControlProps,
+  type ChoiceInput,
+  type ChoiceProps,
+  type ChoiceTokens,
+} from "./components/Choice/index.js";
+export {
   CodeBlock,
   type CodeBlockLabels,
   type CodeBlockProps,
@@ -122,6 +129,12 @@ export {
   type DescriptionListProps,
   type DescriptionListTokens,
 } from "./components/DescriptionList/index.js";
+export {
+  DeviceFrame,
+  type DeviceFrameDevice,
+  type DeviceFrameProps,
+  type DeviceFrameTokens,
+} from "./components/DeviceFrame/index.js";
 export { Dialog, type DialogLabels, type DialogProps, type DialogTokens } from "./components/Dialog/index.js";
 export { Disclosure, type DisclosureProps, type DisclosureTokens } from "./components/Disclosure/index.js";
 export { Divider, type DividerProps, type DividerTokens } from "./components/Divider/index.js";
@@ -165,6 +178,7 @@ export {
   GridItem,
   type GridItemProps,
   type GridProps,
+  type GridResponsive,
 } from "./components/Grid/index.js";
 export {
   Heading,
@@ -175,6 +189,7 @@ export {
 } from "./components/Heading/index.js";
 export { HoverCard, type HoverCardProps, type HoverCardTokens } from "./components/HoverCard/index.js";
 export { IconButton, type IconButtonProps } from "./components/IconButton/index.js";
+export { IconTile, type IconTileProps, type IconTileTokens } from "./components/IconTile/index.js";
 export { Image, type ImageProps, type ImageTokens } from "./components/Image/index.js";
 export { Inline, type InlineProps } from "./components/Inline/index.js";
 export { Kbd, type KbdProps } from "./components/Kbd/index.js";
@@ -186,6 +201,13 @@ export {
   type KeyValuePair,
 } from "./components/KeyValueEditor/index.js";
 export { Link, type LinkProps } from "./components/Link/index.js";
+export {
+  List,
+  type ListItem,
+  type ListMarker,
+  type ListProps,
+  type ListTokens,
+} from "./components/List/index.js";
 export { LoadingDots, type LoadingDotsProps } from "./components/LoadingDots/index.js";
 export {
   Menu,
@@ -203,6 +225,17 @@ export {
   type NumberFieldProps,
   parseNumber,
 } from "./components/NumberField/index.js";
+export {
+  OptionList,
+  OptionListGroup,
+  type OptionListGroupProps,
+  OptionListItem,
+  type OptionListItemProps,
+  OptionListNote,
+  type OptionListNoteProps,
+  type OptionListProps,
+  type OptionListTokens,
+} from "./components/OptionList/index.js";
 export { PageHeader, type PageHeaderProps, type PageHeaderTokens } from "./components/PageHeader/index.js";
 export {
   Pagination,
@@ -241,8 +274,10 @@ export {
   type ProgressOverlayProps,
 } from "./components/ProgressOverlay/index.js";
 export { Prose, type ProseProps, type ProseTokens } from "./components/Prose/index.js";
+export { QRCode, type QRCodeLabels, type QRCodeProps, type QRCodeTokens } from "./components/QRCode/index.js";
 export { RadioGroup, type RadioGroupProps, type RadioOption } from "./components/RadioGroup/index.js";
 export { SearchField, type SearchFieldProps } from "./components/SearchField/index.js";
+export { Section, type SectionProps, type SectionTokens } from "./components/Section/index.js";
 export {
   SegmentedControl,
   type SegmentedControlProps,
@@ -296,7 +331,27 @@ export {
   type SignaturePadTokens,
   STEADY_PRESSURE,
 } from "./components/SignaturePad/index.js";
+export {
+  SiteFooter,
+  type SiteFooterColumn,
+  type SiteFooterLabels,
+  type SiteFooterProps,
+  type SiteFooterTokens,
+} from "./components/SiteFooter/index.js";
+export {
+  SiteHeader,
+  type SiteHeaderLabels,
+  type SiteHeaderLink,
+  type SiteHeaderProps,
+  type SiteHeaderTokens,
+} from "./components/SiteHeader/index.js";
 export { Skeleton, type SkeletonProps, type SkeletonTokens } from "./components/Skeleton/index.js";
+export {
+  SkipLink,
+  type SkipLinkLabels,
+  type SkipLinkProps,
+  type SkipLinkTokens,
+} from "./components/SkipLink/index.js";
 export {
   Slider,
   type SliderLabels,
@@ -313,7 +368,24 @@ export {
   type SortableListTokens,
 } from "./components/SortableList/index.js";
 export { SplitPane, type SplitPaneProps, type SplitPaneTokens } from "./components/SplitPane/index.js";
-export { Stack, type StackProps } from "./components/Stack/index.js";
+export {
+  BREAKPOINTS,
+  type Breakpoint,
+  type LayoutAttributes,
+  type PaddingProps,
+  type Space,
+  Stack,
+  type StackProps,
+  type VisibilityProps,
+} from "./components/Stack/index.js";
+export {
+  Stat,
+  type StatDelta,
+  type StatDirection,
+  type StatLabels,
+  type StatProps,
+  type StatTokens,
+} from "./components/Stat/index.js";
 export {
   type StepItem,
   type StepStatus,
@@ -391,6 +463,7 @@ export {
   type VirtualListProps,
   type VirtualListTokens,
 } from "./components/VirtualList/index.js";
+export { VisuallyHidden, type VisuallyHiddenProps } from "./components/VisuallyHidden/index.js";
 export {
   ZoomControls,
   type ZoomControlsLabels,
@@ -408,8 +481,17 @@ export { ariaKeyShortcuts, isApple, matchesHotkey, shortcutKeys, useHotkey } fro
 export { Icon, type IconProps } from "./foundations/Icon/Icon.js";
 export { InputBase, type InputBaseProps } from "./foundations/InputBase/InputBase.js";
 export { LinkBase, type LinkBaseProps } from "./foundations/LinkBase/LinkBase.js";
+export {
+  type QrLevel,
+  type QrOptions,
+  type QrToSvgOptions,
+  qrMatrix,
+  qrPath,
+  qrToSvg,
+} from "./foundations/qr.js";
 export { type RovingOptions, useRovingFocus } from "./foundations/roving-focus.js";
 export { TextAreaBase, type TextAreaBaseProps } from "./foundations/TextAreaBase/TextAreaBase.js";
+export type { BrandInfo, IconCategory, IconData, IconMotion, IconNode } from "./icons/types.js";
 export { type DismissOptions, type DismissReason, useDismiss } from "./overlay/dismiss.js";
 export * from "./theme/index.js";
 export * from "./tokens/index.js";

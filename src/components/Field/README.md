@@ -20,7 +20,3 @@ Label, description and error wiring for any control. Controls render through a r
 ## Tokens
 
 - `--cy-field-gap`, `--cy-field-label-weight`, `--cy-field-label-color`, `--cy-field-description-color`, `--cy-field-error-color`, `--cy-field-required-color`
-
-## Used by
-
-TextField, SearchField, TextArea, Select, RadioGroup; every product form (Planr, Aperture settings, Verql connections).

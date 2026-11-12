@@ -30,8 +30,4 @@ A select-only combobox (WAI-ARIA APG): the trigger is a Cynosure button with `ro
 
 ## Tokens
 
-- `--cy-select-{radius,bg,border,list-bg,list-shadow,list-max-height,option-active-bg}`
-
-## Used by
-
-Prism (search field scope), Aperture (property pickers), Verql (database picker), Planr, Stepframe (language).
+- `--cy-select-{radius,bg,border,list-bg,list-shadow,list-max-height,option-active-bg}`; the list is an [OptionList](../OptionList/README.md), and the `list-*` and `option-*` tokens set its `--cy-option-list-*` tokens.

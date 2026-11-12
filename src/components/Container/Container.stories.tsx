@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { CSSProperties } from "react";
 import { expect } from "storybook/test";
 import { computeUnderHostileHost } from "../../test/hostile.js";
+import { BREAKPOINT_NAMES, expectVisibilityFollowsTheWindow } from "../../test/visibility.js";
 import { Card } from "../Card/Card.js";
 import { Stack } from "../Stack/Stack.js";
 import { Container } from "./Container.js";
@@ -335,5 +336,35 @@ export const StableUnderHostileHost: Story = {
       "padding-left": "16px",
       "padding-top": "8px",
     });
+  },
+};
+
+export const LinkableAndNamed: Story = {
+  render: () => (
+    <>
+      <Container as="section" id="pricing" aria-label="Pricing">
+        Plans
+      </Container>
+      <div data-testid="root">
+        {BREAKPOINT_NAMES.map((bp) => (
+          <div key={bp}>
+            <Container hideBelow={bp}>{`below ${bp}`}</Container>
+            <Container hideAbove={bp}>{`above ${bp}`}</Container>
+          </div>
+        ))}
+      </div>
+    </>
+  ),
+  play: async ({ canvas, canvasElement }) => {
+    // The id makes the column the target of an in-page link (#pricing); the label names its region.
+    await expect(canvas.getByRole("region", { name: "Pricing" })).toBe(
+      canvasElement.querySelector("#pricing"),
+    );
+    await expectVisibilityFollowsTheWindow(canvas.getByTestId("root"));
+    const shown = [...canvas.getByTestId("root").querySelectorAll<HTMLElement>(".cy-container")].filter((c) =>
+      c.checkVisibility(),
+    );
+    for (const c of shown) await expect(getComputedStyle(c).display).toBe("block");
+    await expect(shown).toHaveLength(BREAKPOINT_NAMES.length);
   },
 };

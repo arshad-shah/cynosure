@@ -8,6 +8,7 @@ import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, writeFi
 import { basename, join } from "node:path";
 import { transform } from "lightningcss";
 import { createTheme, themeToCss } from "../src/tokens";
+import { styleManifest } from "./style-manifest";
 
 /** Latest evergreen engines (spec: no down-levelling for old browsers). Lightning CSS encodes major << 16. */
 const TARGETS = { chrome: 130 << 16, edge: 130 << 16, firefox: 133 << 16, safari: 18 << 16 };
@@ -53,6 +54,9 @@ export function buildCss(root = "src", out = "dist"): string {
     const { code } = transform({ filename: file, code: readFileSync(file), minify: true, targets: TARGETS });
     writeFileSync(join(out, "styles", basename(file)), code.toString());
   }
+  // Which of these files each component needs (its own, its dependencies', base.css), from the source imports.
+  const manifest = styleManifest(root, cssSources(root));
+  writeFileSync(join(out, "styles", "manifest.json"), `${JSON.stringify(manifest, null, 2)}\n`);
   const tokens = themeToCss(createTheme());
   writeFileSync(join(out, "styles", "tokens.css"), tokens);
   const all = tokens + parts.join("");

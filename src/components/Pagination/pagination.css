@@ -37,17 +37,12 @@
  * A page number is at least square and always has room for two digits, so "1" and "50" are the same width whatever
  * the font and the row does not shift from page to page. Three digits and more grow it.
  */
-.cy-pagination .cy-button.cy-pagination-page {
+.cy-pagination-page.cy-pagination-page.cy-pagination-page {
   --_pad: var(--cy-pagination-page-padding, var(--cy-space-2));
   /* A quarter of a digit to spare: tabular figures can be a little wider than the "0" that `ch` measures. */
   min-inline-size: max(var(--_h), calc(2.25ch + 2 * var(--_pad) + 2 * var(--cy-border-width)));
   padding-inline: var(--_pad);
   font-variant-numeric: tabular-nums;
-}
-
-/* Previous and next point the way the pages run in the reading direction. */
-.cy-pagination.cy-pagination:dir(rtl) .cy-icon-button .cy-icon {
-  scale: -1 1;
 }
 
 .cy-pagination.cy-pagination {
@@ -80,7 +75,7 @@
 
 /* Without background colours the current page keeps a mark: a border in the system's selection colour. */
 @media (forced-colors: active) {
-  .cy-pagination .cy-button[aria-current] {
+  .cy-pagination-page.cy-pagination-page[aria-current] {
     border-color: Highlight;
   }
 }

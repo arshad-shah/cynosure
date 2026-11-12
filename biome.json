@@ -12,7 +12,8 @@
       "!src/styles/generated-css.ts",
       "!**/__screenshots__",
       "!.superpowers",
-      "!.changeset"
+      "!.changeset",
+      "!.claude"
     ]
   },
   "formatter": {

@@ -1,0 +1,14 @@
+/* The native input covers its skin exactly (so taps and clicks land on it) but is invisible. */
+.cy-choice-base.cy-choice-base {
+  font-size: inherit;
+  line-height: inherit;
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: inherit;
+  appearance: none;
+  z-index: 1;
+}

@@ -65,7 +65,3 @@ Render your own component from `renderScreen` (as above) rather than passing it 
 ## Tokens
 
 - `--cy-pan-zoom-canvas-background`, `--cy-pan-zoom-canvas-minimap-width`
-
-## Used by
-
-The tools app's diagram views (JSON and XML maps, schema diagrams) and Verql's ER diagrams, each keeping its own layout and cards.

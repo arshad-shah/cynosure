@@ -9,7 +9,3 @@ Keyboard shortcut: drawn key caps joined by a drawn separator (no "+" glyph), wi
 ## Tokens
 
 - `--cy-kbd-{radius,bg,border}`
-
-## Used by
-
-Aperture (command palette hints), Prism (shortcuts help), Verql, Stepframe.

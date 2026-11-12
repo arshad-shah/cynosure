@@ -15,6 +15,7 @@ import { OptionIcon, type OptionIconColor } from "../../foundations/option-icon.
 import type { IconData } from "../../icons/types.js";
 import { useListboxLayer } from "../../overlay/listbox-layer.js";
 import type { Size } from "../../tokens/schema.js";
+import { OptionList, OptionListItem, OptionListNote } from "../OptionList/OptionList.js";
 import { TextField } from "../TextField/TextField.js";
 
 export interface ComboboxTokens {
@@ -274,62 +275,24 @@ export function Combobox({
         // Options never take focus (they are aria-activedescendant targets), so any blur leaves the field.
         onBlur={settle}
       />
-      <div
-        ref={list}
-        id={listId}
-        role="listbox"
-        aria-label={typeof label === "string" ? label : undefined}
-        aria-busy={loading || undefined}
-        className="cy-combobox-list"
-        {...{ popover: "manual" }}
-      >
-        {loading && (
-          <div
-            role="option"
-            aria-disabled="true"
-            aria-selected="false"
-            tabIndex={-1}
-            className="cy-combobox-note"
-          >
-            {text.loading}
-          </div>
-        )}
-        {!loading && visible.length === 0 && (
-          <div
-            role="option"
-            aria-disabled="true"
-            aria-selected="false"
-            tabIndex={-1}
-            className="cy-combobox-note"
-          >
-            {text.empty}
-          </div>
-        )}
+      <OptionList ref={list} id={listId} label={typeof label === "string" ? label : undefined} busy={loading}>
+        {loading && <OptionListNote>{text.loading}</OptionListNote>}
+        {!loading && visible.length === 0 && <OptionListNote>{text.empty}</OptionListNote>}
         {visible.map((option, index) => (
-          <div
+          <OptionListItem
             key={option.value}
             id={`${listId}-${index}`}
-            role="option"
-            aria-selected={option.value === current}
-            aria-disabled={option.disabled || undefined}
-            data-active={index === activeIndex ? "" : undefined}
-            className="cy-combobox-option"
-            tabIndex={-1}
+            label={option.label}
+            description={option.description}
+            icon={<OptionIcon option={option} plain={option.disabled} className="cy-combobox-icon" />}
+            selected={option.value === current}
+            disabled={option.disabled}
+            active={index === activeIndex}
             onPointerMove={() => !option.disabled && setActiveValue(option.value)}
-            onPointerDown={(e) => e.preventDefault()}
             onClick={() => choose(option)}
-            onKeyDown={() => {}}
-          >
-            <OptionIcon option={option} plain={option.disabled} className="cy-combobox-icon" />
-            <span className="cy-combobox-option-text">
-              <span className="cy-combobox-option-label">{option.label}</span>
-              {option.description && (
-                <span className="cy-combobox-option-description">{option.description}</span>
-              )}
-            </span>
-          </div>
+          />
         ))}
-      </div>
+      </OptionList>
       <HiddenValue
         name={name}
         value={current}

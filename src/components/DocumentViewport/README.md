@@ -36,7 +36,3 @@ const [scale, setScale] = useState(1);
 ## Tokens
 
 - `--cy-document-viewport-background`, `--cy-document-viewport-gap`, `--cy-document-viewport-page-shadow`
-
-## Used by
-
-The tools app's PDF and image editors (sign, fill, compress, merge, annotate), and document previews in the web apps.

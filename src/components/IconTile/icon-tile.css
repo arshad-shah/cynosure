@@ -1,0 +1,91 @@
+/*
+ * IconTile: a Facet icon centred on a tinted square or circle. Every visual value reads a --cy-icon-tile-* token with a
+ * global fallback. The icon is a fraction of the tile, so it scales with it.
+ */
+.cy-icon-tile.cy-icon-tile {
+  --_tone: var(--cy-color-ink);
+  --_text: var(--cy-color-ink);
+  --_on: var(--cy-color-bg);
+  --_size: var(--cy-icon-tile-size-md, var(--cy-control-height-md));
+  --cy-icon-size: calc(var(--_size) * var(--cy-icon-tile-icon-scale, 0.5));
+
+  /* Root reset (component roots never carry .cy-reset). */
+  box-sizing: border-box !important;
+  margin: 0;
+  padding: 0;
+  letter-spacing: normal;
+  text-transform: none;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  inline-size: var(--_size);
+  block-size: var(--_size);
+  border: var(--cy-border-width) solid transparent;
+  border-radius: var(--cy-icon-tile-radius, calc(var(--_size) * var(--cy-radius-factor)));
+  background: color-mix(in oklab, var(--_tone) var(--cy-icon-tile-soft-mix, 16%), var(--cy-color-surface));
+  color: var(--_text);
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-font-size-md);
+  font-weight: var(--cy-font-weight-regular);
+  line-height: 1;
+  vertical-align: middle;
+
+  &[data-shape="circle"] {
+    border-radius: var(--cy-radius-full);
+  }
+
+  /* Sizes: the control heights, so a tile lines up with a button or field of the same size. */
+  &[data-size="sm"] {
+    --_size: var(--cy-icon-tile-size-sm, var(--cy-control-height-sm));
+  }
+  &[data-size="lg"] {
+    --_size: var(--cy-icon-tile-size-lg, var(--cy-control-height-lg));
+  }
+
+  /* Tones */
+  &[data-tone="accent"] {
+    --_tone: var(--cy-color-accent);
+    --_text: var(--cy-color-accent-text);
+    --_on: var(--cy-color-on-accent);
+  }
+  &[data-tone="danger"] {
+    --_tone: var(--cy-color-danger);
+    --_text: var(--cy-color-danger-text);
+    --_on: var(--cy-color-on-danger);
+  }
+  &[data-tone="success"] {
+    --_tone: var(--cy-color-success);
+    --_text: var(--cy-color-success-text);
+    --_on: var(--cy-color-on-success);
+  }
+  &[data-tone="warning"] {
+    --_tone: var(--cy-color-warning);
+    --_text: var(--cy-color-warning-text);
+    --_on: var(--cy-color-on-warning);
+  }
+  &[data-tone="info"] {
+    --_tone: var(--cy-color-info);
+    --_text: var(--cy-color-info-text);
+    --_on: var(--cy-color-on-info);
+  }
+
+  /* Variants */
+  &[data-variant="solid"] {
+    background: var(--_tone);
+    color: var(--_on);
+  }
+  &[data-variant="outline"] {
+    background: var(--cy-color-surface);
+    border-color: color-mix(in oklab, var(--_tone) 55%, var(--cy-color-line));
+  }
+}
+
+/* Forced colours drop the fill: a border keeps the shape and the icon draws in the text colour. */
+@media (forced-colors: active) {
+  .cy-icon-tile.cy-icon-tile {
+    border-color: CanvasText;
+    color: CanvasText;
+  }
+}

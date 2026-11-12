@@ -14,6 +14,7 @@
   font-family: var(--cy-font-sans);
   font-size: inherit;
   font-weight: var(--cy-font-weight-regular);
+  font-variant-numeric: var(--cy-text-field-numeric, normal);
   line-height: normal;
   letter-spacing: normal;
   text-transform: none;
@@ -25,12 +26,19 @@
   &:disabled {
     cursor: not-allowed;
   }
+  /* The field draws its own clear button (clearable); the browser's search decorations never show. */
+  &[type="search"]::-webkit-search-cancel-button,
+  &[type="search"]::-webkit-search-decoration {
+    appearance: none;
+    display: none;
+  }
 }
 
 .cy-text-field-icon {
   color: var(--cy-color-muted);
 }
-.cy-text-field .cy-button.cy-text-field-clear {
+/* The clear and reveal buttons sit nearer the edge; repeated to win over IconButton's own margin. */
+.cy-text-field-clear.cy-text-field-clear.cy-text-field-clear {
   margin-inline-end: calc(var(--cy-space-2) * -1);
 }
 

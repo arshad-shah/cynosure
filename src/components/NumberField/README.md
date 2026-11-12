@@ -33,7 +33,3 @@ Also takes TextField's `label`, `labelHidden`, `description`, `error`, `placehol
 ## Tokens
 
 Uses TextField's tokens (`--cy-text-field-*`).
-
-## Used by
-
-Quantities, prices, limits and settings in the web apps and extensions (cross-product audit, 2026-11-10), in place of `type="number"` inputs.

@@ -74,7 +74,3 @@ One top-level entry may be an action instead of a destination, for example the "
 - `--cy-side-nav-radius`: item highlight corners
 - `--cy-side-nav-action-size`: diameter of the round action button in the bar (48px)
 - `--cy-side-nav-action-lift`: how far the action button rises above the bar's row (8px)
-
-## Used by
-
-App sidebars, docs navigation and settings sections in the web apps, extensions' options pages and sites (cross-product audit, 2026-11-10). Planr's phone tab bar uses the bar layout with an "Add" action in the middle.

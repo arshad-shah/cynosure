@@ -57,14 +57,9 @@
   font-weight: var(--cy-font-weight-bold);
   text-align: start;
   caption-side: top;
-  &[data-hidden] {
-    position: absolute;
+  /* Hidden (captionHidden): its padding goes too, so the box is the one clipped pixel. */
+  &.cy-visually-hidden {
     padding: 0;
-    inline-size: var(--cy-border-width);
-    block-size: var(--cy-border-width);
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
   }
 }
 .cy-table-th.cy-table-th,
@@ -142,15 +137,6 @@
   padding-block: var(--cy-space-8);
   color: var(--cy-color-muted);
   text-align: center;
-}
-.cy-table-hidden.cy-table-hidden {
-  position: absolute;
-  inline-size: var(--cy-border-width);
-  block-size: var(--cy-border-width);
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
-  font-size: inherit;
 }
 @media (pointer: coarse) {
   .cy-table-sort.cy-table-sort {

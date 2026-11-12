@@ -1,0 +1,184 @@
+/*
+ * List: a ul or ol whose markers are drawn as elements (a dot, a number in a tinted circle, an icon or an IconTile), so
+ * they take tokens, sit on the first line of a two-line item and follow the reading direction. Each item is a grid of
+ * marker and text. Every value reads a --cy-list-* token with a global fallback.
+ */
+.cy-list.cy-list {
+  --_gap: var(--cy-list-gap-md, var(--cy-space-5));
+  --_line: calc(1em * var(--cy-font-line-height));
+  box-sizing: border-box !important;
+  display: flex;
+  flex-direction: column;
+  gap: var(--_gap);
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--cy-color-ink);
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-font-size-md);
+  font-weight: var(--cy-font-weight-regular);
+  line-height: var(--cy-font-line-height);
+  letter-spacing: normal;
+  text-transform: none;
+  &[data-size="sm"] {
+    font-size: var(--cy-font-size-sm);
+  }
+  &[data-size="lg"] {
+    font-size: var(--cy-font-size-lg);
+  }
+  &[data-gap="none"] {
+    --_gap: var(--cy-space-0);
+  }
+  &[data-gap="sm"] {
+    --_gap: var(--cy-list-gap-sm, var(--cy-space-3));
+  }
+  &[data-gap="lg"] {
+    --_gap: var(--cy-list-gap-lg, var(--cy-space-7));
+  }
+  /* Divided: the gap is split around a line. */
+  &[data-divided] {
+    gap: 0;
+  }
+}
+
+.cy-list-item.cy-list-item {
+  /* The marker's colour comes from the item's tone (worked out in the component); a disc without one is muted. */
+  --_tone: var(--cy-list-marker-color, var(--cy-color-muted));
+  --_text: var(--cy-list-marker-color, var(--cy-color-muted));
+  box-sizing: border-box !important;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: var(--cy-list-marker-gap, var(--cy-space-5));
+  align-items: start;
+  margin: 0;
+  padding: 0;
+  color: inherit;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+  letter-spacing: normal;
+  text-transform: none;
+  list-style: none;
+  [data-marker="none"] > & {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  /* A one-line item centres on its tile; a two-line item hangs from it. */
+  [data-marker="tile"] > &:not([data-description]) {
+    align-items: center;
+  }
+  [data-divided] > & {
+    padding-block: calc(var(--_gap) / 2);
+    border-block-end: var(--cy-border-width) solid var(--cy-list-divider-color, var(--cy-color-line));
+    &:first-child {
+      padding-block-start: 0;
+    }
+    &:last-child {
+      padding-block-end: 0;
+      border-block-end: 0;
+    }
+  }
+  &[data-tone="neutral"] {
+    --_tone: var(--cy-color-ink);
+    --_text: var(--cy-color-ink);
+  }
+  &[data-tone="accent"] {
+    --_tone: var(--cy-color-accent);
+    --_text: var(--cy-color-accent-text);
+  }
+  &[data-tone="danger"] {
+    --_tone: var(--cy-color-danger);
+    --_text: var(--cy-color-danger-text);
+  }
+  &[data-tone="success"] {
+    --_tone: var(--cy-color-success);
+    --_text: var(--cy-color-success-text);
+  }
+  &[data-tone="warning"] {
+    --_tone: var(--cy-color-warning);
+    --_text: var(--cy-color-warning-text);
+  }
+  &[data-tone="info"] {
+    --_tone: var(--cy-color-info);
+    --_text: var(--cy-color-info-text);
+  }
+}
+
+/* The marker is one line tall, so it sits on the label's first line whatever follows. */
+.cy-list-marker.cy-list-marker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-inline-size: var(--_line);
+  min-block-size: var(--_line);
+  padding: 0;
+  color: var(--_text);
+  line-height: 1;
+  --cy-icon-size: 1.15em;
+  [data-marker="tile"] > .cy-list-item > & {
+    min-inline-size: 0;
+  }
+}
+
+.cy-list-dot.cy-list-dot {
+  display: block;
+  inline-size: 0.4em;
+  block-size: 0.4em;
+  border-radius: var(--cy-radius-full);
+  background: var(--_tone);
+}
+
+.cy-list-number.cy-list-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* As tall as a line of the label: the number's own font is 0.8 of it. */
+  inline-size: var(--cy-list-number-size, calc(var(--_line) / 0.8));
+  block-size: var(--cy-list-number-size, calc(var(--_line) / 0.8));
+  border-radius: var(--cy-radius-full);
+  background: color-mix(in oklab, var(--_tone) 16%, var(--cy-color-surface));
+  color: var(--_text);
+  font-size: 0.8em;
+  font-weight: var(--cy-font-weight-bold);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+/* The label and description stack; a label with a description is the item's title. */
+.cy-list-text.cy-list-text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--cy-space-1);
+  min-inline-size: 0;
+  padding: 0;
+}
+.cy-list-label.cy-list-label {
+  padding: 0;
+  overflow-wrap: anywhere;
+  [data-description] > .cy-list-text > & {
+    font-weight: var(--cy-font-weight-medium);
+  }
+}
+.cy-list-description.cy-list-description {
+  box-sizing: border-box !important;
+  margin: 0;
+  padding: 0;
+  color: var(--cy-list-description-color, var(--cy-color-muted));
+  font-family: inherit;
+  font-size: 0.92em;
+  font-weight: var(--cy-font-weight-regular);
+  line-height: var(--cy-font-line-height);
+  letter-spacing: normal;
+  text-transform: none;
+  overflow-wrap: anywhere;
+}
+
+@media (forced-colors: active) {
+  .cy-list-dot.cy-list-dot {
+    background: CanvasText;
+  }
+  .cy-list-number.cy-list-number {
+    outline: var(--cy-border-width) solid CanvasText;
+  }
+}

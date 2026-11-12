@@ -79,6 +79,10 @@
         )
       );
   }
+  /* columns as a track list ("2fr 1fr"): the tracks as given, at every width. */
+  &[data-tracks] {
+    grid-template-columns: var(--_tracks);
+  }
   &[data-align="start"] {
     align-items: start;
   }
@@ -103,25 +107,63 @@
   &[data-full] {
     grid-column: 1 / -1;
   }
+  /* span and order per breakpoint: --_span-<bp> and --_order-<bp> are set inline; the queries below pick one. */
+  &[data-span-steps] {
+    grid-column: span min(var(--_span-base), var(--_cols, 1000));
+  }
+  &[data-order-steps] {
+    order: var(--_order-base);
+  }
+  /* sticky: the item keeps its own height (a stretched item has nowhere to move). stickyOffset sets --_sticky-top. */
+  &[data-sticky] {
+    --_sticky-top: 0;
+    position: sticky;
+    inset-block-start: var(--_sticky-top);
+    align-self: start;
+  }
 }
 /* The same breakpoints for the items of a per-breakpoint grid: --_cols becomes the count in effect, for the clamp. */
 @container cy-grid (inline-size >= 30rem) {
   .cy-grid[data-responsive] > .cy-grid-item {
     --_cols: var(--_cols-sm);
   }
+  .cy-grid[data-responsive] > .cy-grid-item[data-span-steps] {
+    grid-column: span min(var(--_span-sm), var(--_cols-sm));
+  }
+  .cy-grid[data-responsive] > .cy-grid-item[data-order-steps] {
+    order: var(--_order-sm);
+  }
 }
 @container cy-grid (inline-size >= 45rem) {
   .cy-grid[data-responsive] > .cy-grid-item {
     --_cols: var(--_cols-md);
+  }
+  .cy-grid[data-responsive] > .cy-grid-item[data-span-steps] {
+    grid-column: span min(var(--_span-md), var(--_cols-md));
+  }
+  .cy-grid[data-responsive] > .cy-grid-item[data-order-steps] {
+    order: var(--_order-md);
   }
 }
 @container cy-grid (inline-size >= 60rem) {
   .cy-grid[data-responsive] > .cy-grid-item {
     --_cols: var(--_cols-lg);
   }
+  .cy-grid[data-responsive] > .cy-grid-item[data-span-steps] {
+    grid-column: span min(var(--_span-lg), var(--_cols-lg));
+  }
+  .cy-grid[data-responsive] > .cy-grid-item[data-order-steps] {
+    order: var(--_order-lg);
+  }
 }
 @container cy-grid (inline-size >= 75rem) {
   .cy-grid[data-responsive] > .cy-grid-item {
     --_cols: var(--_cols-xl);
+  }
+  .cy-grid[data-responsive] > .cy-grid-item[data-span-steps] {
+    grid-column: span min(var(--_span-xl), var(--_cols-xl));
+  }
+  .cy-grid[data-responsive] > .cy-grid-item[data-order-steps] {
+    order: var(--_order-xl);
   }
 }

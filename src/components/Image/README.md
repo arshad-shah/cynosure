@@ -33,6 +33,7 @@ import { Image } from "@arshad-shah/cynosure";
 - **Loading:** a Skeleton covers the box (it stops moving under reduced motion and is hidden from assistive technology). The picture stays invisible until it has loaded, then fades in.
 - **Error:** the `img` is replaced by the fallback, in the same box (the ratio, or `width` by `height`). The default fallback shows the `alt` text; for a decorative picture it shows only the icon and is hidden from assistive technology.
 - **Already loaded:** a picture that finished before React attached (cached, or in the server's HTML) is shown at once. When it came in the server's HTML, `onLoad` and `onError` are not called: the event has passed.
+- **Never hydrated:** before any script runs the state is `pending` and the picture shows as the browser has it, with no placeholder over it, so an Astro page that renders Image without a client directive still shows its pictures.
 - **With a ratio or a caption** the root is a block (`div` or `figure`) as wide as its container. Otherwise it is an inline `span` the size of the picture, never wider than its container.
 - Dragging, the context menu and other native behaviour are left alone. Nothing changes in right-to-left layouts: pictures are not mirrored and `position` is physical, as in CSS.
 
@@ -43,7 +44,3 @@ import { Image } from "@arshad-shah/cynosure";
 - `--cy-image-fallback-color`: icon and text colour of the default fallback
 - `--cy-image-caption-gap`: space between the picture and its caption
 - `--cy-image-caption-color`: text colour of the caption
-
-## Used by
-
-Screenshots and figures in the documentation site's guides, and thumbnails and previews of people's pictures in the tools app, in place of bare `img` elements with their own loading and error handling.

@@ -1,0 +1,182 @@
+/*
+ * site-header: the top bar of a document-scrolled site. A Container row of brand, navigation, actions and (narrow)
+ * a menu button. The header is a size container, so the navigation collapses on the header's own width, CSS only.
+ * The brand and the navigation links are Links (underline none: their focus ring, colour and link behaviour); the
+ * brand and the pill are drawn by the span inside each. Inner parts first (lower specificity), root last.
+ */
+.cy-site-header-bar.cy-site-header-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--cy-space-6);
+  min-block-size: var(--cy-site-header-height, calc(var(--cy-control-height-lg) + 2 * var(--cy-space-5)));
+  padding-block: var(--cy-space-3);
+}
+
+/* The Links around the brand and the pills: the hit area, never smaller than --_hit. */
+.cy-site-header-brand-link.cy-site-header-brand-link,
+.cy-site-header-link-anchor.cy-site-header-link-anchor {
+  position: relative;
+  &::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    translate: -50% -50%;
+    inline-size: max(100%, var(--_hit));
+    block-size: max(100%, var(--_hit));
+  }
+}
+.cy-site-header-brand-link.cy-site-header-brand-link {
+  flex: none;
+}
+.cy-site-header-brand.cy-site-header-brand {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: var(--cy-space-3);
+  min-block-size: var(--cy-control-height-md);
+  margin: 0;
+  color: var(--cy-color-ink);
+  font-family: var(--cy-font-display, var(--cy-font-sans));
+  font-size: var(--cy-font-size-lg);
+  font-weight: var(--cy-font-weight-bold);
+  line-height: var(--cy-font-line-height);
+  letter-spacing: normal;
+  text-transform: none;
+  text-decoration: none;
+  border-radius: var(--cy-radius-sm);
+}
+.cy-site-header-nav {
+  flex: 1 1 auto;
+  min-inline-size: 0;
+}
+
+.cy-site-header-list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--cy-space-2);
+  padding: 0;
+  list-style: none;
+}
+
+.cy-site-header-item {
+  display: flex;
+  padding: 0;
+}
+
+.cy-site-header-link.cy-site-header-link {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: var(--cy-control-height-md);
+  margin: 0;
+  padding: 0 var(--cy-space-4);
+  border-radius: var(--cy-radius-md);
+  color: var(--cy-site-header-link-color, var(--cy-color-muted));
+  font-family: inherit;
+  font-size: var(--cy-font-size-md);
+  font-weight: var(--cy-font-weight-medium);
+  line-height: var(--cy-font-line-height);
+  letter-spacing: normal;
+  text-transform: none;
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    background-color var(--cy-motion-fast) var(--cy-motion-ease),
+    color var(--cy-motion-fast) var(--cy-motion-ease);
+  &:hover,
+  [aria-current="page"] > & {
+    background: var(--cy-site-header-link-highlight, var(--cy-color-soft));
+    color: var(--cy-site-header-link-current-color, var(--cy-color-ink));
+  }
+}
+
+.cy-site-header-actions {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--cy-space-3);
+  margin-inline-start: auto;
+}
+
+.cy-site-header-menu {
+  display: none;
+  flex: none;
+  margin-inline-start: auto;
+}
+
+/* The navigation moves into the menu below the chosen width of the header. */
+@container cy-site-header (inline-size < 40rem) {
+  .cy-site-header[data-collapse] .cy-site-header-nav {
+    display: none;
+  }
+  .cy-site-header[data-collapse] .cy-site-header-menu {
+    display: flex;
+  }
+}
+@container cy-site-header (inline-size < 48rem) {
+  .cy-site-header:is([data-collapse="md"], [data-collapse="lg"]) .cy-site-header-nav {
+    display: none;
+  }
+  .cy-site-header:is([data-collapse="md"], [data-collapse="lg"]) .cy-site-header-menu {
+    display: flex;
+  }
+}
+@container cy-site-header (inline-size < 64rem) {
+  .cy-site-header[data-collapse="lg"] .cy-site-header-nav {
+    display: none;
+  }
+  .cy-site-header[data-collapse="lg"] .cy-site-header-menu {
+    display: flex;
+  }
+}
+/* With the navigation gone, the actions and the menu button keep to the inline end. */
+.cy-site-header-actions + .cy-site-header-menu {
+  margin-inline-start: 0;
+}
+
+.cy-site-header.cy-site-header {
+  --_hit: var(--cy-hit-min, 24px);
+  --_bg: var(--cy-site-header-background, var(--cy-color-bg));
+  container: cy-site-header / inline-size;
+  box-sizing: border-box !important;
+  display: block;
+  inline-size: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-block-end: var(--cy-border-width) solid var(--cy-site-header-border, var(--cy-color-line));
+  background: var(--_bg);
+  color: var(--cy-color-ink);
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-font-size-md);
+  font-weight: var(--cy-font-weight-regular);
+  line-height: var(--cy-font-line-height);
+  letter-spacing: normal;
+  text-transform: none;
+  &[data-sticky] {
+    position: sticky;
+    inset-block-start: 0;
+    /* Over the page's own positioned content, under menus, dialogs and tooltips. */
+    z-index: calc(var(--cy-z-dropdown) - 1);
+    background: color-mix(in oklab, var(--_bg) 85%, transparent);
+    backdrop-filter: blur(var(--cy-site-header-blur, 12px));
+  }
+}
+
+/* In the menu sheet the navigation takes the full width of the sheet. */
+.cy-site-header-sheet-nav.cy-site-header-sheet-nav {
+  inline-size: auto;
+}
+
+@media (pointer: coarse) {
+  .cy-site-header.cy-site-header {
+    --_hit: var(--cy-hit-coarse, 44px);
+  }
+}
+
+@media (forced-colors: active) {
+  [aria-current="page"] > .cy-site-header-link.cy-site-header-link {
+    text-decoration: underline;
+  }
+}

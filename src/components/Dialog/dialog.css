@@ -113,7 +113,7 @@
   line-height: var(--cy-font-line-height);
   overflow-wrap: anywhere;
 }
-.cy-dialog-header > .cy-tooltip-anchor {
+.cy-dialog-close.cy-dialog-close {
   flex: none;
   margin-block-start: calc(-1 * var(--cy-space-1));
   margin-inline-end: calc(-1 * var(--cy-space-3));

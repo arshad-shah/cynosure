@@ -37,6 +37,9 @@
   &[data-size="2xl"] {
     --_size: var(--cy-heading-size-2xl, var(--cy-font-size-2xl));
   }
+  &[data-size="3xl"] {
+    --_size: var(--cy-heading-size-3xl, calc(var(--cy-font-size-2xl) * 1.4));
+  }
   /* Hero title: grows with the viewport, always larger than 2xl. */
   &[data-size="display"] {
     --_size: var(

@@ -179,7 +179,7 @@ function MonthPicker({
       variant="ghost"
       tone="neutral"
       size="sm"
-      className="cy-calendar-flip"
+      flipRtl
       disabled={off}
       onClick={() => setYear(shown + by)}
     />
@@ -417,7 +417,7 @@ export function Calendar({
           variant="ghost"
           tone="neutral"
           size="sm"
-          className="cy-calendar-flip"
+          flipRtl
           disabled={min !== undefined && addDays(`${month}-01`, -1) < min}
           onClick={() => page(-1)}
         />
@@ -442,7 +442,7 @@ export function Calendar({
           variant="ghost"
           tone="neutral"
           size="sm"
-          className="cy-calendar-flip"
+          flipRtl
           disabled={max !== undefined && nextMonth > max}
           onClick={() => page(1)}
         />

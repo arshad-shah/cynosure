@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { useState } from "react";
+import { type CSSProperties, useState } from "react";
 import { expect, fn } from "storybook/test";
 import { mail, search } from "../../icons/index.js";
 import { computeUnderHostileHost } from "../../test/hostile.js";
@@ -174,5 +174,34 @@ export const HiddenLabelStillNamesTheControl: Story = {
     await expect(
       Math.abs(control.getBoundingClientRect().top - field.getBoundingClientRect().top),
     ).toBeLessThan(1);
+  },
+};
+
+export const AddonsAndNumericDigits: Story = {
+  render: () => (
+    <div style={{ display: "grid", gap: 16, maxWidth: 320 }}>
+      <TextField label="Plain" defaultValue="1111" clearable />
+      <TextField
+        label="With a start addon"
+        defaultValue="1111"
+        addonStart={<span data-testid="addon">#</span>}
+        style={{ "--cy-text-field-numeric": "tabular-nums" } as CSSProperties}
+      />
+    </div>
+  ),
+  play: async ({ canvas }) => {
+    const plain = canvas.getByRole("textbox", { name: "Plain" });
+    const tuned = canvas.getByRole("textbox", { name: "With a start addon" });
+    const shell = (input: HTMLElement) => input.closest(".cy-text-field") as HTMLElement;
+    // The addon sits inside the field, before the input.
+    const addon = canvas.getByTestId("addon");
+    await expect(shell(tuned)).toContainElement(addon);
+    await expect(addon.compareDocumentPosition(tuned) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    // --cy-text-field-numeric sets the digits' style; the default leaves them proportional.
+    await expect(getComputedStyle(tuned).fontVariantNumeric).toBe("tabular-nums");
+    await expect(getComputedStyle(plain).fontVariantNumeric).toBe("normal");
+    // The clear button sits nearer the edge than the field's padding.
+    const clear = canvas.getByRole("button", { name: "Clear" });
+    await expect(Number.parseFloat(getComputedStyle(clear).marginInlineEnd)).toBeLessThan(0);
   },
 };

@@ -211,14 +211,8 @@ function structureRules(root: string, out: Violation[]) {
           line: 1,
           message: "needs a *.stories.tsx with at least one play test",
         });
-      const readme = join(folder, "README.md");
-      if (!existsSync(readme) || !readFileSync(readme, "utf8").includes("## Used by"))
-        out.push({
-          rule: "structure",
-          file: rel,
-          line: 1,
-          message: "needs a README.md with a '## Used by' section",
-        });
+      if (!existsSync(join(folder, "README.md")))
+        out.push({ rule: "structure", file: rel, line: 1, message: "needs a README.md" });
       const page = join(folder, `${name}.mdx`);
       // Docs pages follow the same rule as code: no text glyphs standing in for icons or arrows.
       if (existsSync(page))
@@ -271,6 +265,156 @@ function agentRules(root: string, out: Violation[]) {
       });
 }
 
+/** `IconButton` → `icon-button`, `QRCode` → `qr-code`: the kebab-case name a component's classes and stylesheet use. */
+export const kebabName = (name: string) =>
+  name
+    .replace(/([a-z0-9])([A-Z])/g, "$1-$2")
+    .replace(/([A-Z])([A-Z][a-z])/g, "$1-$2")
+    .toLowerCase();
+
+/** Classes any component may use: the inner reset, hidden text (base.css) and the motion hook. */
+const SHARED_CLASSES = new Set(["cy-reset", "cy-visually-hidden", "cy-motion-trigger"]);
+
+/**
+ * Foundations a composite may build on, and which composites do. A foundation is the native element under a
+ * component; a composite that needs that element uses the component (Button, Link, TextField…) unless it is a pattern
+ * no component covers (a tab, a menu item, a whole-card link). Adding a user here is a review decision: say why in
+ * src/foundations/AGENTS.md. Icon and HiddenValue are parts every component may use.
+ */
+export const FOUNDATION_USERS: Record<string, readonly string[]> = {
+  ButtonBase: [
+    "Button",
+    "Card",
+    "ColorSwatches",
+    "Disclosure",
+    "Menu",
+    "Select",
+    "SideNav",
+    "Steps",
+    "Table",
+    "Tabs",
+  ],
+  LinkBase: ["Button", "Card", "Link", "SideNav"],
+  InputBase: ["CommandPalette", "TextField"],
+  TextAreaBase: ["TextArea"],
+  ChoiceBase: ["Checkbox", "RadioGroup", "SegmentedControl", "Switch"],
+  DialogBase: ["CommandPalette", "Dialog"],
+  FileInputBase: ["FileDrop", "KeyValueEditor"],
+};
+const FREE_FOUNDATIONS = new Set(["Icon", "HiddenValue"]);
+
+/** The class prefixes a component folder owns: its own name and every component it exports. */
+function ownPrefixes(folder: string): string[] {
+  const names = new Set([folder.split(/[\\/]/).pop() as string]);
+  for (const f of readdirSync(folder).filter((n) => /\.tsx?$/.test(n) && !n.includes(".stories.")))
+    for (const m of readFileSync(join(folder, f), "utf8").matchAll(/export (?:const|function) ([A-Z]\w*)/g))
+      names.add(m[1] as string);
+  return [...names].map((n) => `cy-${kebabName(n)}`);
+}
+const owned = (cls: string, prefixes: string[]) =>
+  SHARED_CLASSES.has(cls) || prefixes.some((p) => cls === p || cls.startsWith(`${p}-`));
+
+/**
+ * Each component styles and renders only its own classes. Using another component's look means rendering that
+ * component (and restyling it through its --cy-* tokens), not borrowing or overriding its classes; hidden text uses
+ * the shared .cy-visually-hidden; composites reach native elements through the components that own them.
+ */
+function ownershipRules(root: string, out: Violation[]) {
+  for (const group of ["src/components", "src/foundations"]) {
+    const dir = join(root, group);
+    if (!existsSync(dir)) continue;
+    for (const name of readdirSync(dir).filter((n) => statSync(join(dir, n)).isDirectory())) {
+      const folder = join(dir, name);
+      const prefixes = ownPrefixes(folder);
+      const files = readdirSync(folder);
+      for (const css of files.filter((f) => f.endsWith(".css"))) {
+        const rel = relative(root, join(folder, css));
+        if (css !== `${kebabName(name)}.css`)
+          out.push({
+            rule: "own-styles",
+            file: rel,
+            line: 1,
+            message: `${name}'s stylesheet is ${kebabName(name)}.css, one per component folder`,
+          });
+        const text = readFileSync(join(folder, css), "utf8").replace(/\/\*[\s\S]*?\*\//g, (m) =>
+          m.replace(/[^\n]/g, " "),
+        );
+        for (const m of text.matchAll(/\.(cy-[a-z0-9-]+)/g))
+          if (!owned(m[1] as string, prefixes))
+            out.push({
+              rule: "own-styles",
+              file: rel,
+              line: lineOf(text, m.index ?? 0),
+              message: `.${m[1]} belongs to another component: render that component and set its --cy-* tokens, or style a class of your own`,
+            });
+        for (const m of text.matchAll(/clip-path:\s*inset\(50%\)/g))
+          out.push({
+            rule: "hidden-text",
+            file: rel,
+            line: lineOf(text, m.index ?? 0),
+            message:
+              "hand-written visually-hidden rule: use the shared .cy-visually-hidden class (base.css) or VisuallyHidden",
+          });
+      }
+      for (const file of files.filter((f) => f.endsWith(".tsx") && !isStory(f))) {
+        const path = join(folder, file);
+        const rel = relative(root, path);
+        const text = readFileSync(path, "utf8");
+        const source = ts.createSourceFile(path, text, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
+        const at = (node: ts.Node) => source.getLineAndCharacterOfPosition(node.getStart()).line + 1;
+        const strings = (node: ts.Node, found: ts.Node[] = []) => {
+          if (
+            ts.isStringLiteral(node) ||
+            ts.isNoSubstitutionTemplateLiteral(node) ||
+            ts.isTemplateHead(node) ||
+            ts.isTemplateMiddle(node) ||
+            ts.isTemplateTail(node)
+          )
+            found.push(node);
+          ts.forEachChild(node, (c) => {
+            strings(c, found);
+          });
+          return found;
+        };
+        const visit = (node: ts.Node) => {
+          if (ts.isJsxAttribute(node) && node.name.getText(source) === "className" && node.initializer)
+            for (const lit of strings(node.initializer))
+              for (const m of lit
+                .getText(source)
+                .matchAll(/(?<![\w$-])cy-[a-z0-9]+(?:-[a-z0-9]+)*(?![\w$-])/g))
+                if (!owned(m[0], prefixes))
+                  out.push({
+                    rule: "own-classes",
+                    file: rel,
+                    line: at(lit),
+                    message: `${m[0]} belongs to another component: render that component instead of borrowing its class`,
+                  });
+          if (
+            group === "src/components" &&
+            ts.isImportDeclaration(node) &&
+            ts.isStringLiteral(node.moduleSpecifier) &&
+            /\/foundations\/[A-Z]\w*\//.test(node.moduleSpecifier.text) &&
+            !node.importClause?.isTypeOnly
+          ) {
+            const base = (
+              node.moduleSpecifier.text.match(/\/foundations\/([A-Z]\w*)\//) as RegExpMatchArray
+            )[1] as string;
+            if (!FREE_FOUNDATIONS.has(base) && !(FOUNDATION_USERS[base] ?? []).includes(name))
+              out.push({
+                rule: "foundation-use",
+                file: rel,
+                line: at(node),
+                message: `${name} builds on ${base} directly: use the component that owns that element, or add ${name} to FOUNDATION_USERS with the reason in src/foundations/AGENTS.md`,
+              });
+          }
+          ts.forEachChild(node, visit);
+        };
+        visit(source);
+      }
+    }
+  }
+}
+
 export function check(root: string): Violation[] {
   const out: Violation[] = [];
   const fonts = fontClasses(root);
@@ -320,6 +464,7 @@ export function check(root: string): Violation[] {
     }
   }
   structureRules(root, out);
+  ownershipRules(root, out);
   agentRules(root, out);
   return out;
 }

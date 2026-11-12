@@ -260,7 +260,7 @@ export function FileDrop({
           </ul>
         )}
       </div>
-      <span className="cy-file-drop-status cy-reset" role="status">
+      <span className="cy-file-drop-status cy-reset cy-visually-hidden" role="status">
         {status}
       </span>
       {whole && (
@@ -277,7 +277,7 @@ export function FileDrop({
       )}
       <FileInputBase
         ref={input}
-        className="cy-file-drop-input"
+        className="cy-file-drop-input cy-visually-hidden"
         tabIndex={-1}
         aria-hidden="true"
         accept={accept}

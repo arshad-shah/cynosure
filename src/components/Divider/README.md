@@ -66,9 +66,3 @@ The forwarded ref is the root `div`.
 - `--cy-divider-spacing-lg`: space around the line with `spacing="lg"` (`--cy-space-6`)
 
 Set them with `createTheme({ components: { divider: { thickness: "2px" } } })`.
-
-## Used by
-
-- The docs site: between sections of a page and between the links of the footer (vertical).
-- The tools app: between groups of settings in a card, and "or" between two ways to add a file.
-- Planr and Verql: between sections of side panels and sign-in choices.

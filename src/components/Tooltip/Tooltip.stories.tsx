@@ -25,6 +25,7 @@ const meta = {
     placement: { control: "inline-radio", options: ["top", "bottom", "start", "end"] },
     delay: { control: { type: "number", min: 0, max: 1500, step: 50 } },
     content: { control: "text" },
+    className: { control: "text" },
   },
   parameters: { layout: "centered" },
 } satisfies Meta<typeof Tooltip>;
@@ -149,5 +150,20 @@ export const WorksInsideAShadowRoot: Story = {
     await expect(tip.getBoundingClientRect().bottom).toBeLessThanOrEqual(button.getBoundingClientRect().top);
     // Let the fade-in finish so the accessibility scan measures the final colours.
     await waitFor(() => expect(getComputedStyle(tip).opacity).toBe("1"));
+  },
+};
+
+export const AnchorTakesALayoutClass: Story = {
+  args: { className: "pushed" },
+  render: (args) => (
+    <div style={{ display: "flex" }}>
+      <style>{".pushed { margin-inline-start: 24px; }"}</style>
+      <Tooltip {...args} />
+    </div>
+  ),
+  play: async ({ canvas }) => {
+    const anchor = canvas.getByTestId("trigger").parentElement as HTMLElement;
+    await expect(anchor).toHaveClass("cy-tooltip-anchor", "pushed");
+    await expect(getComputedStyle(anchor).marginInlineStart).toBe("24px");
   },
 };
