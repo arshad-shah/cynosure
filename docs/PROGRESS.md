@@ -93,11 +93,13 @@ Size budgets raised to what the build measures: Calendar 3.25 to 4.75 kB (the mo
 
 **Open, for Arshad:** `monthPicker` on by default (and in DateField)? Is unmounting closed dialogs by default right? The docs site still hand-writes its page head (`.docs-title`, `.docs-eyebrow`, `.docs-lead`); moving it to PageHeader changes its look slightly (the eyebrow becomes mono and bold), so it was left alone. Each README's "Used by" names intended uses, not verified call sites.
 
+**0.3.0 is published (2026-11-12, 01:23 UTC).** #161 was merged, then the "version packages" pull request (#162). npm has `@arshad-shah/cynosure@0.3.0`, tag `v0.3.0` is on `69daea1`, and the GitHub release exists. **The last step failed: `docs-live` was not moved** (git refused the push from the workflow's shallow checkout), so the Release run is red and the live documentation is still the 0.2.0 commit. The script is fixed (see `docs/release.md`); merging that fix to `main` runs the release again, which finds 0.3.0 already published and only moves `docs-live`. Nobody should push `docs-live` by hand.
+
 ## Next step
 
 0. **TimeField picker, prop descriptions, Storybook link:** open a pull request from `ccr-892a2583-3xxim5`, let CI run Firefox and WebKit, run the `visual-baselines` workflow, and confirm the TimeField size budget.
 
-1. **After 0.3.0 publishes:** check that the release moved `docs-live` to the release commit and that the live site rebuilt (the first real test of that step; see `docs/release.md`).
+1. **After the release fix merges:** check that the Release run is green, that `docs-live` is at `main`'s head, and that Cloudflare rebuilt the live site showing 0.3.0 (Arshad sets Cloudflare's production branch to `docs-live` if he has not yet).
 2. **Library gaps the site works around (fix in Cynosure, release, then use):**
    - SideNav does not open the group holding `current` when `current` changes after mount (the site remounts it by key).
    - EmptyState cannot be an `h1` (the not-found page writes its own heading).

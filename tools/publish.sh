@@ -43,6 +43,16 @@ fi
 # Pages rebuilds it on this push. This script only runs when no change is waiting for a release, so this commit is
 # exactly the published version (or that version with documentation fixes on top). `main` only ever moves forward,
 # so this is a plain fast-forward; if it is ever refused, the release is already out and the next run tries again.
+# The workflow's checkout is shallow, and git refuses a push it cannot see is a fast-forward ("rejected, fetch
+# first": the 0.3.0 release published and then failed here). So: fetch the whole history and the branch, check this
+# commit really is ahead of it, then push. A missing branch (the very first release) is simply created.
+if [ "$(git rev-parse --is-shallow-repository)" = "true" ]; then git fetch --quiet --unshallow origin; fi
+if git fetch --quiet origin docs-live 2>/dev/null; then
+  if ! git merge-base --is-ancestor FETCH_HEAD HEAD; then
+    echo "docs-live is not an ancestor of this commit; it was not moved. Look at the branch before releasing again." >&2
+    exit 1
+  fi
+fi
 git push origin "HEAD:refs/heads/docs-live"
 
 # Changesets reads this line to know a version went out.
