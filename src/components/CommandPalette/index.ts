@@ -1,5 +1,6 @@
 export {
   type Command,
+  type CommandMatch,
   CommandPalette,
   type CommandPaletteLabels,
   type CommandPaletteProps,

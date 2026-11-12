@@ -143,6 +143,10 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+/* The command's group, as a tag between the label and the shortcut (in search results and recent commands). */
+.cy-command-palette-tag.cy-command-palette-tag {
+  flex: none;
+}
 .cy-command-palette-empty.cy-command-palette-empty {
   margin: 0;
   letter-spacing: normal;

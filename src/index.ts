@@ -110,6 +110,7 @@ export {
 } from "./components/Combobox/index.js";
 export {
   type Command,
+  type CommandMatch,
   CommandPalette,
   type CommandPaletteLabels,
   type CommandPaletteProps,
