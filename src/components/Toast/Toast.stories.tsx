@@ -570,6 +570,46 @@ export const SwipeToDismiss: Story = {
   },
 };
 
+const tapUndo = fn();
+
+export const SwipeCancelsWithEscapeAndTapsStillWork: Story = {
+  tags: ["touch", "!dev"],
+  render: (args) =>
+    withToaster(
+      { Save: { ...saved, duration: Number.POSITIVE_INFINITY, action: { label: "Undo", onClick: tapUndo } } },
+      args,
+    ),
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.pointer({ keys: "[TouchA]", target: canvas.getByRole("button", { name: "Save" }) });
+    const toast = await canvas.findByRole("status");
+    const box = toast.getBoundingClientRect();
+    const y = box.top + box.height / 2;
+    // Escape during a swipe puts the toast back, even past the dismiss distance.
+    await userEvent.pointer([
+      { keys: "[TouchA>]", target: toast, coords: { clientX: box.left + 40, clientY: y } },
+      { pointerName: "TouchA", target: toast, coords: { clientX: box.left + 140, clientY: y } },
+    ]);
+    await expect(toast.style.getPropertyValue("--_dx")).toBe("100px");
+    await userEvent.keyboard("{Escape}");
+    await userEvent.pointer({
+      keys: "[/TouchA]",
+      target: toast,
+      coords: { clientX: box.left + 140, clientY: y },
+    });
+    await expect(toast.isConnected).toBe(true);
+    await expect(toast.style.getPropertyValue("--_dx")).toBe("");
+    await expect(toast).not.toHaveAttribute("data-swiping");
+    // A tap on the toast's buttons is a tap, not a swipe.
+    await userEvent.pointer({
+      keys: "[TouchA]",
+      target: await canvas.findByRole("button", { name: "Undo" }),
+    });
+    await expect(tapUndo).toHaveBeenCalledTimes(1);
+    await userEvent.pointer({ keys: "[TouchA]", target: canvas.getByRole("button", { name: "Dismiss" }) });
+    await gone(toast);
+  },
+};
+
 export const TouchTargets: Story = {
   tags: ["touch", "!dev"],
   render: (args) => withToaster({ Save: { ...saved, duration: Number.POSITIVE_INFINITY } }, args),

@@ -3,6 +3,7 @@ import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js
 import { useControllableState } from "../../foundations/controllable.js";
 import { DialogBase } from "../../foundations/DialogBase/DialogBase.js";
 import { deepActiveElement } from "../../foundations/focus.js";
+import { transitionTime } from "../../foundations/motion.js";
 import { close as closeIcon } from "../../icons/close.js";
 import { useDismiss } from "../../overlay/dismiss.js";
 import { ToastHostContext } from "../../overlay/toast-host.js";
@@ -136,9 +137,7 @@ export function DialogFrame({
     // Unmount when the dialog's own closing transition ends. The timer covers a transition that never reports back
     // (interrupted, or the dialog is not rendered) and is the whole wait when there is none: reduced motion, or no
     // stylesheet.
-    const style = getComputedStyle(el);
-    const longest = (times: string) => Math.max(...times.split(",").map((time) => Number.parseFloat(time)));
-    const wait = (longest(style.transitionDuration) + longest(style.transitionDelay)) * 1000;
+    const wait = transitionTime(getComputedStyle(el));
     const ended = (event: Event) => {
       if (event.target === el) unmount();
     };
