@@ -159,7 +159,8 @@ export const StrikeWhenCheckedByPointerAndKeyboard: Story = {
     // Pointer: ticking strikes and mutes the label; the description stays muted with it.
     await userEvent.click(box);
     await waitFor(
-      async () => expect(await look(canvasElement)).toEqual({ line: "line-through", label: muted, description: muted }),
+      async () =>
+        expect(await look(canvasElement)).toEqual({ line: "line-through", label: muted, description: muted }),
       { timeout: 5000 },
     );
     // The strike is a hairline in the label's own colour, never thinner than the border width.
@@ -169,10 +170,9 @@ export const StrikeWhenCheckedByPointerAndKeyboard: Story = {
     // Keyboard: Space unticks and the label is plain again, then ticks and strikes again.
     await userEvent.keyboard(" ");
     await expect(box).not.toBeChecked();
-    await waitFor(
-      async () => expect(await look(canvasElement)).toMatchObject({ line: "none", label: ink }),
-      { timeout: 5000 },
-    );
+    await waitFor(async () => expect(await look(canvasElement)).toMatchObject({ line: "none", label: ink }), {
+      timeout: 5000,
+    });
     await userEvent.keyboard(" ");
     await waitFor(
       async () => expect(await look(canvasElement)).toMatchObject({ line: "line-through", label: muted }),
