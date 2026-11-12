@@ -9,12 +9,22 @@ import * as project from "./preview";
 (globalThis as { cyEmulateMedia?: (media: EmulatedMedia) => Promise<void> }).cyEmulateMedia = (media) =>
   (commands as unknown as { emulateMedia: (media: EmulatedMedia) => Promise<void> }).emulateMedia(media);
 /* Stories that check CSS :hover move the real pointer through `realHover` (src/test/hover.ts). */
-(globalThis as { cyHover?: (el: Element | null, over: boolean) => Promise<void> }).cyHover = (el, over) =>
-  el === null
-    ? page.elementLocator(document.documentElement).hover({ position: { x: 1, y: 1 } } as never)
+const parkPointer = () =>
+  page.elementLocator(document.documentElement).hover({ position: { x: 1, y: 1 } } as never);
+/*
+ * The real pointer stays where a story left it, across stories and test files. Left over a later story's content, it
+ * hovers it mid-test (a Calendar day caught mid-transition failed the contrast check), so it is parked after each
+ * story that moved it.
+ */
+let pointerMoved = false;
+(globalThis as { cyHover?: (el: Element | null, over: boolean) => Promise<void> }).cyHover = (el, over) => {
+  pointerMoved = el !== null;
+  return el === null
+    ? parkPointer()
     : over
       ? userEvent.hover(page.elementLocator(el))
       : userEvent.unhover(page.elementLocator(el));
+};
 
 /* Stories press real keys (the browser's own scrolling, which synthetic events never start) through `pressKey`. */
 (globalThis as { cyPressKey?: (key: string) => Promise<void> }).cyPressKey = (key) =>
@@ -45,6 +55,10 @@ setProjectAnnotations([
       window.focus();
     },
     afterEach: async ({ tags, canvasElement, id }) => {
+      if (pointerMoved) {
+        pointerMoved = false;
+        await parkPointer();
+      }
       if (!visual || !tags.includes("visual")) return;
       await expect.element(page.elementLocator(canvasElement)).toMatchScreenshot(id);
       // Dark mode: flip the decorator's theme wrapper (light-dark() tokens follow color-scheme), then restore.
