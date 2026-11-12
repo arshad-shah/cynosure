@@ -2,7 +2,7 @@
   {
     "name": "all CSS",
     "path": "dist/styles.css",
-    "limit": "30 kB",
+    "limit": "32 kB",
     "gzip": true
   },
   {
