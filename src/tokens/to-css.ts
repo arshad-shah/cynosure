@@ -20,11 +20,20 @@ function flatten(obj: object, prefix: string, out: [string, string][]): [string,
 
 const decl = (pairs: [string, string][]) => pairs.map(([k, v]) => `--cy-${k}:${v}`).join(";");
 
+const pair = (name: string, x: string, y: string): [string, string] => [
+  `color-${name}`,
+  x === y ? x : `light-dark(${x},${y})`,
+];
+
+/** One property per colour; the series list becomes `--cy-color-series-1` to `-8`. */
 function colorPairs(a: ColorTokens, b: ColorTokens): [string, string][] {
-  return (Object.keys(a) as (keyof ColorTokens)[]).map((k) => [
-    `color-${kebab(k)}`,
-    a[k] === b[k] ? a[k] : `light-dark(${a[k]},${b[k]})`,
-  ]);
+  return (Object.keys(a) as (keyof ColorTokens)[]).flatMap((k) => {
+    const x = a[k];
+    const y = b[k];
+    return Array.isArray(x)
+      ? x.map((c, i) => pair(`series-${i + 1}`, c, (y as string[])[i] as string))
+      : [pair(kebab(k), x, y as string)];
+  });
 }
 
 /**
