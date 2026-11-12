@@ -55,6 +55,9 @@ function useReturnFocus(onEscape: (() => void) | undefined) {
     },
     onKeyDown: (event: KeyboardEvent<HTMLElement>) => {
       if (event.key !== "Escape" || event.defaultPrevented) return;
+      // Escape inside a layer nested in the bar (a Menu's panel) belongs to that layer: the dismiss stack closes it.
+      const layer = (event.target as HTMLElement).closest("[popover]");
+      if (layer && layer !== event.currentTarget && event.currentTarget.contains(layer)) return;
       event.preventDefault();
       const back = from.current;
       onEscape?.();

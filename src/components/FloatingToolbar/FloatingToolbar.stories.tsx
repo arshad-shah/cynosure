@@ -9,6 +9,7 @@ import { computeUnderHostileHost } from "../../test/hostile.js";
 import { shownFully } from "../../test/settle.js";
 import { Button } from "../Button/Button.js";
 import { IconButton } from "../IconButton/IconButton.js";
+import { Menu } from "../Menu/Menu.js";
 import { SegmentedControl } from "../SegmentedControl/SegmentedControl.js";
 import { type DockEdge, DockedToolbar, FloatingToolbar, useSelectionAnchor } from "./FloatingToolbar.js";
 
@@ -113,6 +114,55 @@ export const KeyboardInAndOut: Story = {
     await userEvent.keyboard("{Escape}");
     await expect(editor).toHaveFocus();
     await expect((window as unknown as { escaped: ReturnType<typeof fn> }).escaped).toHaveBeenCalledTimes(1);
+  },
+};
+
+export const EscapeClosesANestedMenuFirst: Story = {
+  render: () => {
+    function WithMenu() {
+      const box = useRef<HTMLDivElement>(null);
+      const [escaped, setEscaped] = useState(0);
+      return (
+        <div style={{ paddingBlockStart: 160 }}>
+          <div ref={box} data-testid="escaped" style={{ inlineSize: 240, blockSize: 40 }}>
+            {escaped}
+          </div>
+          <FloatingToolbar label="Field tools" anchor={box} onEscape={() => setEscaped((n) => n + 1)}>
+            <IconButton icon={bold} label="Bold" variant="ghost" size="sm" />
+            <Menu
+              label="More"
+              trigger={(props) => (
+                <Button size="sm" variant="ghost" {...props}>
+                  More
+                </Button>
+              )}
+              items={[
+                { value: "copy", label: "Copy" },
+                { value: "paste", label: "Paste" },
+              ]}
+              onSelect={() => {}}
+            />
+          </FloatingToolbar>
+        </div>
+      );
+    }
+    return <WithMenu />;
+  },
+  play: async ({ canvas, userEvent }) => {
+    await waitFor(() => expect(shown()).toBe(true));
+    const more = canvas.getByRole("button", { name: "More" });
+    await userEvent.click(more);
+    const menu = await canvas.findByRole("menu", { name: "More" });
+    await shownFully(menu);
+    await waitFor(() => expect(canvas.getByRole("menuitem", { name: "Copy" })).toHaveFocus());
+    // The first Escape belongs to the menu: it closes and focus goes back to its trigger, in the bar.
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() => expect(menu.matches(":popover-open")).toBe(false));
+    await expect(more).toHaveFocus();
+    await expect(canvas.getByTestId("escaped")).toHaveTextContent("0");
+    // The next one leaves the bar.
+    await userEvent.keyboard("{Escape}");
+    await expect(canvas.getByTestId("escaped")).toHaveTextContent("1");
   },
 };
 
