@@ -10,6 +10,7 @@ import {
   useState,
 } from "react";
 import { useControllableState } from "../../foundations/controllable.js";
+import { isRtl } from "../../foundations/dir.js";
 import { HiddenValue } from "../../foundations/HiddenValue/HiddenValue.js";
 import { isComposing } from "../../foundations/keys.js";
 import { close } from "../../icons/close.js";
@@ -100,6 +101,14 @@ const DEFAULT_LABELS: TagInputLabels = {
   tooMany: (max) => `Up to ${max} tags`,
   empty: "No suggestions",
 };
+
+/** Left and Right as they would be in left-to-right text: in right-to-left text the tags lie to the right. */
+const inlineKey = (key: string, el: Element) =>
+  (key === "ArrowLeft" || key === "ArrowRight") && isRtl(el)
+    ? key === "ArrowLeft"
+      ? "ArrowRight"
+      : "ArrowLeft"
+    : key;
 
 /**
  * Several short values in one field: type and press Enter (or a comma), pick a suggestion, or paste a list. Tags can
@@ -208,7 +217,7 @@ export function TagInput({
       commitTyped();
       return;
     }
-    switch (event.key) {
+    switch (inlineKey(event.key, el)) {
       case "Enter": {
         const pick = listOpen ? matches[active] : undefined;
         if (pick) {
@@ -253,7 +262,7 @@ export function TagInput({
   const onTagKeyDown = (index: number) => (event: KeyboardEvent<HTMLButtonElement>) => {
     const buttons = removeButtons();
     const toInput = () => input.current?.focus();
-    switch (event.key) {
+    switch (inlineKey(event.key, event.currentTarget)) {
       case "ArrowLeft":
         event.preventDefault();
         buttons[Math.max(0, index - 1)]?.focus();
