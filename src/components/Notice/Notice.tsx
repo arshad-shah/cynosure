@@ -7,6 +7,8 @@ import type { Tone } from "../../tokens/schema.js";
 import { IconButton } from "../IconButton/IconButton.js";
 
 export interface NoticeTokens {
+  /** Padding of a compact Notice. */
+  compactPadding: string;
   radius: string;
   padding: string;
   softMix: string;
@@ -29,6 +31,13 @@ export interface NoticeProps {
    * whose content changes are announced politely.
    */
   tone?: Tone;
+  /**
+   * `soft` is a tinted panel with a tone edge; `filled` is the tone's solid colour with the readable text that goes on
+   * it, for a message that must stand out (an editor's error banner). Default "soft".
+   */
+  variant?: "soft" | "filled";
+  /** Less padding, and the title and message share one line when they fit (a status strip). Default false. */
+  compact?: boolean;
   /** Short heading above the message. */
   title?: ReactNode;
   /** One or two Buttons; they move under the text in narrow containers. */
@@ -52,6 +61,8 @@ export interface NoticeProps {
 /** An inline message about part of the page: a status, a warning or an error that stays until it is resolved. */
 export function Notice({
   tone = "info",
+  variant = "soft",
+  compact = false,
   title,
   action,
   dismissible = false,
@@ -70,6 +81,8 @@ export function Notice({
       role={tone === "danger" ? "alert" : "status"}
       className={className ? `cy-notice ${className}` : "cy-notice"}
       data-tone={tone}
+      data-variant={variant}
+      data-compact={compact ? "" : undefined}
       style={style}
     >
       <div className="cy-notice-main cy-reset">
@@ -85,6 +98,8 @@ export function Notice({
             label={labels?.dismiss ?? "Dismiss"}
             variant="ghost"
             size="sm"
+            // On a fill the close icon takes the fill's text colour; on the soft panel, the button's own.
+            {...(variant === "filled" && { iconColor: "var(--_notice-on)" })}
             wrapperClassName="cy-notice-dismiss"
             onClick={() => {
               onDismiss?.();
