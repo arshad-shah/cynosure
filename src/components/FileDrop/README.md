@@ -15,18 +15,22 @@ import { FileDrop } from "@arshad-shah/cynosure";
 />;
 ```
 
-| Prop                                   | Default | Notes                                                                              |
-| -------------------------------------- | ------- | ---------------------------------------------------------------------------------- |
-| `onFiles`                              | –       | The files that passed the checks                                                   |
-| `onReject`                             | –       | `{ file, reason }[]`; reasons `type`, `size`, `count`. Also listed in the zone     |
-| `accept`                               | –       | As `<input accept>`: extensions, MIME types, `type/*`                              |
-| `multiple`                             | `false` | More than one file; `maxFiles` caps how many                                       |
-| `maxSize`                              | –       | Largest file, in bytes                                                             |
-| `hint`                                 | –       | Shown under the button and read as its description                                 |
-| `target`                               | `zone`  | `window`: files dropped anywhere in the window are taken (see below)               |
-| `name`, `form`, `required`, `disabled` | –       | Forms submit the accepted files, dropped or picked                                 |
-| `labels`                               | –       | `prompt`, `choose`, `chooseOne`, `dragging`, `added(count)`, `rejected(rejection)` |
+| Prop                                   | Default | Notes                                                                                                                        |
+| -------------------------------------- | ------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `onFiles`                              | –       | The files that passed the checks                                                                                             |
+| `onReject`                             | –       | `{ file, reason }[]`; reasons `type`, `size`, `count`. Also listed in the zone                                               |
+| `accept`                               | –       | As `<input accept>`: extensions, MIME types, `type/*`                                                                        |
+| `multiple`                             | `false` | More than one file; `maxFiles` caps how many                                                                                 |
+| `maxSize`                              | –       | Largest file, in bytes                                                                                                       |
+| `hint`                                 | –       | Shown under the button and read as its description                                                                           |
+| `target`                               | `zone`  | `window`: files dropped anywhere in the window are taken (see below)                                                         |
+| `name`, `form`, `required`, `disabled` | –       | Forms submit the accepted files, dropped or picked                                                                           |
+| `onBrowse`                             | –       | The button calls it instead of opening the browser's file dialog (an app's picker)                                           |
+| `value` / `onRemove(item, index)`      | –       | Chosen files or paths listed in the zone, each with a remove button                                                          |
+| `labels`                               | –       | `prompt`, `choose`, `chooseOne`, `dragging`, `added(count)`, `rejected(rejection)`, `files`, `remove(name)`, `removed(name)` |
 - The button is the accessible way in (keyboard, touch, screen readers); dropping is a shortcut.
+- `onBrowse` replaces the browser's file dialog with your own (Electron's `dialog.showOpenDialog` over IPC): the button calls it, and dropped files still arrive in `onFiles`. Show the result with `value`.
+- `value` lists chosen files (by `name`) or paths (as given) in the zone, a list named "Chosen files". With `onRemove`, each has a remove button: a press calls `onRemove(item, index)`, announces "report.pdf removed", and once `value` changes, focus moves to the next remove button (or the previous one, or the main button). `value` is display only: the native input holds only files picked or dropped here.
 - After files are added, a status message is announced ("2 files added"); refusals are announced as an alert.
 - `target="window"` makes the whole page the drop target, for an app that opens whatever is dropped on it. While files are dragged in, an overlay (in the top layer, so nothing is added to `<body>`) covers the page with the `dragging` label. Text and links dragged over the page are left alone. The zone and its button stay where you put them.
 - `acceptsFile(file, accept)` is exported: the same check browsers apply to `accept`.
@@ -36,3 +40,4 @@ import { FileDrop } from "@arshad-shah/cynosure";
 - `--cy-file-drop-radius`
 - `--cy-file-drop-active-background`: while files are dragged over
 - `--cy-file-drop-overlay-background`: the whole-window overlay
+- `--cy-file-drop-file-background`: a chosen file's row (`value`)

@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { useState } from "react";
 import { expect, fn, spyOn, waitFor } from "storybook/test";
 import { contrast } from "../../test/color.js";
 import { computeUnderHostileHost } from "../../test/hostile.js";
@@ -52,6 +53,126 @@ export const ButtonOpensThePicker: Story = {
     await userEvent.upload(input, picked);
     await expect(args.onFiles).toHaveBeenLastCalledWith(picked);
     await expect(canvas.getByRole("status")).toHaveTextContent("1 file added");
+  },
+};
+
+const browse = fn();
+
+export const BrowseReplacesTheFileDialog: Story = {
+  args: { onBrowse: browse },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const open = spyOn(nativeInput(canvasElement), "click").mockImplementation(() => {});
+    // The button asks the app (an Electron dialog over IPC, say) instead of opening the browser's file dialog.
+    await userEvent.click(canvas.getByRole("button", { name: "Choose files" }));
+    await expect(browse).toHaveBeenCalledTimes(1);
+    await expect(open).not.toHaveBeenCalled();
+    canvas.getByRole("button", { name: "Choose files" }).focus();
+    await userEvent.keyboard("{Enter}");
+    await expect(browse).toHaveBeenCalledTimes(2);
+    open.mockRestore();
+  },
+};
+
+/** A FileDrop whose chosen files and paths live in the app: browse adds a path, the remove buttons take items out. */
+function Chosen({ dir, ...args }: Parameters<typeof FileDrop>[0] & { dir?: "rtl" }) {
+  const [items, setItems] = useState<(File | string)[]>([
+    "/home/me/report.pdf",
+    file("photo.png", "image/png"),
+    "/home/me/notes.txt",
+  ]);
+  return (
+    <div dir={dir} style={{ maxWidth: 420 }}>
+      <FileDrop
+        {...args}
+        value={items}
+        onBrowse={() => setItems((all) => [...all, "/home/me/new.csv"])}
+        onFiles={(files) => setItems((all) => [...all, ...files])}
+        onRemove={(item, index) => {
+          removed(item, index);
+          setItems((all) => all.filter((_, i) => i !== index));
+        }}
+      />
+    </div>
+  );
+}
+const removed = fn();
+const shown = (el: Element) => [...el.querySelectorAll(".cy-file-drop-file-name")].map((n) => n.textContent);
+
+export const ControlledListOfChosenFiles: Story = {
+  tags: ["visual"],
+  render: (args) => <Chosen {...args} />,
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    // The chosen files and paths are listed by name, each with a remove button.
+    const list = canvas.getByRole("list", { name: "Chosen files" });
+    await expect(list).toBeVisible();
+    await expect(shown(canvasElement)).toEqual(["/home/me/report.pdf", "photo.png", "/home/me/notes.txt"]);
+    // Browsing and dropping both add to the list through the app.
+    await userEvent.click(canvas.getByRole("button", { name: "Choose files" }));
+    await expect(shown(canvasElement)).toHaveLength(4);
+    const dropped = file("drop.png", "image/png");
+    drag(zone(canvasElement), [dropped])();
+    await waitFor(() => expect(shown(canvasElement)).toHaveLength(5));
+    // A press on a remove button reports the item and its index; the app takes it out, and it is announced.
+    await userEvent.click(canvas.getByRole("button", { name: "Remove photo.png" }));
+    await expect(removed).toHaveBeenLastCalledWith(expect.objectContaining({ name: "photo.png" }), 1);
+    await expect(shown(canvasElement)).not.toContain("photo.png");
+    await expect(canvas.getByRole("status")).toHaveTextContent("photo.png removed");
+    // Focus moves to the next remove button, so several can be removed in a row from the keyboard.
+    await waitFor(() =>
+      expect(canvas.getByRole("button", { name: "Remove /home/me/notes.txt" })).toHaveFocus(),
+    );
+    await userEvent.keyboard("{Enter}");
+    await waitFor(() =>
+      expect(canvas.getByRole("button", { name: "Remove /home/me/new.csv" })).toHaveFocus(),
+    );
+    // Removing the last item moves focus to the one before it, and removing the only one to the button.
+    await userEvent.click(canvas.getByRole("button", { name: "Remove drop.png" }));
+    await waitFor(() =>
+      expect(canvas.getByRole("button", { name: "Remove /home/me/new.csv" })).toHaveFocus(),
+    );
+    await userEvent.keyboard("{Enter}");
+    await userEvent.keyboard("{Enter}");
+    await expect(shown(canvasElement)).toEqual([]);
+    await expect(canvas.queryByRole("list", { name: "Chosen files" })).toBeNull();
+    await waitFor(() => expect(canvas.getByRole("button", { name: "Choose files" })).toHaveFocus());
+  },
+};
+
+export const ChosenFilesWithoutRemoveOrDisabled: Story = {
+  render: (args) => (
+    <Stack gap="4">
+      <FileDrop {...args} value={["/a/one.txt"]} />
+      <FileDrop {...args} value={["/a/two.txt"]} onRemove={fn()} disabled />
+    </Stack>
+  ),
+  play: async ({ canvas }) => {
+    // Without onRemove, or disabled, the list shows the items and offers no remove buttons.
+    await expect(canvas.getByText("/a/one.txt")).toBeVisible();
+    await expect(canvas.getByText("/a/two.txt")).toBeVisible();
+    await expect(canvas.queryAllByRole("button", { name: /^Remove/ })).toEqual([]);
+  },
+};
+
+export const ChosenFilesRightToLeftAndLabels: Story = {
+  render: (args) => (
+    <Chosen
+      {...args}
+      dir="rtl"
+      labels={{
+        files: "Gewählt",
+        remove: (name) => `${name} entfernen`,
+        removed: (name) => `${name} entfernt`,
+      }}
+    />
+  ),
+  play: async ({ canvas, userEvent }) => {
+    // The remove button ends the row: on the left in right-to-left text.
+    const remove = canvas.getByRole("button", { name: "photo.png entfernen" });
+    const name = canvas.getByText("photo.png");
+    await expect(remove.getBoundingClientRect().right).toBeLessThanOrEqual(name.getBoundingClientRect().left);
+    await expect(canvas.getByRole("list", { name: "Gewählt" })).toBeVisible();
+    await userEvent.click(remove);
+    await expect(canvas.getByRole("status")).toHaveTextContent("photo.png entfernt");
   },
 };
 
@@ -305,6 +426,7 @@ export const ReadableInLightAndDark: Story = {
 };
 
 export const StableUnderHostileHost: Story = {
+  args: { value: ["/home/me/report.pdf"], onRemove: fn() },
   play: async ({ canvasElement }) => {
     const props = [
       "display",
@@ -315,7 +437,14 @@ export const StableUnderHostileHost: Story = {
       "box-sizing",
       "text-align",
     ];
-    for (const selector of [".cy-file-drop", ".cy-file-drop-prompt", ".cy-file-drop-hint"]) {
+    for (const selector of [
+      ".cy-file-drop",
+      ".cy-file-drop-prompt",
+      ".cy-file-drop-hint",
+      ".cy-file-drop-files",
+      ".cy-file-drop-file",
+      ".cy-file-drop-file-name",
+    ]) {
       const { clean, hostile } = computeUnderHostileHost(canvasElement, selector, props);
       await expect({ selector, ...hostile }).toEqual({ selector, ...clean });
     }

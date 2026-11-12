@@ -40,6 +40,28 @@ With `target="window"`, files dropped anywhere in the window are taken, for an a
 <FileDrop target="window" accept=".har,.json" onFiles={open} />
 ```
 
+## Your own picker and a list of chosen files
+
+`onBrowse` replaces the browser's file dialog: the button calls it instead, for an app with its own picker (Electron's dialog over IPC). Dropped files still arrive in `onFiles`.
+
+`value` lists what has been chosen, files by name and paths as given, each with a remove button when `onRemove` is set. The list is yours: add to it from `onBrowse` and `onFiles`, take out what `onRemove(item, index)` reports. A removal is announced, and focus moves to the next remove button, so several can be removed in a row.
+
+```tsx
+const [chosen, setChosen] = useState<string[]>([]);
+
+<FileDrop
+  multiple
+  value={chosen}
+  onBrowse={async () => setChosen([...chosen, ...(await window.api.pickFiles())])}
+  onFiles={(files) => setChosen([...chosen, ...files.map((f) => f.name)])}
+  onRemove={(_, index) => setChosen(chosen.filter((_, i) => i !== index))}
+/>
+```
+
+<Canvas of={Stories.ControlledListOfChosenFiles} />
+
+`value` is display only: a form submits the files in the native input, those picked or dropped here.
+
 ## Forms
 
 With `name`, the form submits the accepted files, whether they were dropped or picked: FileDrop keeps its native file input in step.
@@ -52,6 +74,7 @@ With `name`, the form submits the accepted files, whether they were dropped or p
 
 - **The button is the way in.** Keyboard, touch and screen reader users pick files with it; dropping is a shortcut for pointer users. The native input is hidden and out of the tab order.
 - **Hint:** read as the button's description.
+- **Chosen files:** a list named by `labels.files`; each remove button is named "Remove " and the item's name, and the list's rows reverse in right-to-left text.
 - **Announcements:** "2 files added" is announced politely; refusals are announced as an alert.
 - **Dragging:** the zone lights up only for files (not dragged text or links) and says "Drop to add".
 - **Touch:** the button's hit area is at least 44px on touch screens.
@@ -60,7 +83,7 @@ With `name`, the form submits the accepted files, whether they were dropped or p
 
 ## Theming
 
-Tokens: `--cy-file-drop-radius` and `--cy-file-drop-active-background`.
+Tokens: `--cy-file-drop-radius`, `--cy-file-drop-active-background`, `--cy-file-drop-overlay-background` and `--cy-file-drop-file-background` (a chosen file's row).
 
 ## Related
 
