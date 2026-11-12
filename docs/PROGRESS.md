@@ -117,6 +117,8 @@ Size budgets raised to what the build measures: Calendar 3.25 to 4.75 kB (the mo
 
 ## Next step
 
+**Plan 10 (Verql rework), agreed with Arshad 2026-11-12:** start with Phase 0, the 14 bugs Verql will hit, each with a failing story first; then Phases 1 to 5 in order. Decisions are at the top of the plan.
+
 0. **TimeField picker, prop descriptions, Storybook link:** open a pull request from `ccr-892a2583-3xxim5`, let CI run Firefox and WebKit, run the `visual-baselines` workflow, and confirm the TimeField size budget.
 
 1. **After the release fix merges:** check that the Release run is green, that `docs-live` is at `main`'s head, and that Cloudflare rebuilt the live site showing 0.3.0 (Arshad sets Cloudflare's production branch to `docs-live` if he has not yet).
@@ -158,7 +160,8 @@ Size budgets raised to what the build measures: Calendar 3.25 to 4.75 kB (the mo
 - [x] Plan 7: the duplication clean-up (`docs/superpowers/plans/2026-11-10-cynosure-dedup.md`). Sheet kept.
 - [x] Plan 8: the pan/zoom document viewport (`docs/superpowers/plans/2026-11-10-cynosure-viewport.md`).
 - [x] Plan 9: what the product migrations need (`docs/superpowers/plans/2026-11-10-cynosure-migrations.md`, issue #149).
-- Later: a data grid, a code editor surface and charts.
+- [ ] Plan 10: what Verql's clean-break rework needs (`docs/superpowers/plans/2026-11-12-cynosure-verql-rework.md`). Planned 2026-11-12; Phase 0 (bug fixes) first.
+- Later: charts. The data grid is now Plan 10 Phase 4; a code editor surface is out (Cynosure stays a UI library).
 
 ## Plan 9 rulings
 
@@ -382,6 +385,13 @@ None. Publishing waits for Arshad to merge to `main` and add the npm credential;
   - Storybook reloads once on `vite:preloadError` (`.storybook/stale-deploy.ts`), at most every 30 seconds.
   - transition-dependent story assertions wait up to 3 seconds and compare colours as painted RGBA including alpha (WebKit on busy CI runners).
   - no `@starting-style` for entrances: overlays use `@keyframes` (an engine that mishandles the animation still ends visible). Every overlay story checks `shownFully()` after opening.
+
+- **2026-11-12 (Plan 10, Verql rework):**
+  - no code editor in Cynosure, not even CodeMirror as optional peers: Cynosure stays a UI library; Verql themes CodeMirror from `editorColors()`.
+  - Cynosure builds a DataGrid; AG Grid leaves Verql.
+  - TitleBar (with WindowControls as its part) and ChatMessage are admitted as essential to one product, written generically (installed-app title bar; no markdown parser).
+  - no `position`/`inset` on layout components: overlays belong to the component that owns them (PanZoomCanvas `overlays`, ScrollArea/VirtualList `overlay`, SearchField `trailing`).
+  - no Spacer, StatusDot or Spinner components: Stack `grow`, Badge `dot` without children, LoadingDots spinning variant and a `loader` icon.
 
 ## Verification
 
