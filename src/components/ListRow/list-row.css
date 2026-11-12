@@ -1,0 +1,247 @@
+/*
+ * list-row: a list of rows. A row lays out its leading slot, text, trailing slot and actions in a line. Its button or
+ * link (`.cy-list-row-main`) holds only the title, and its ::before covers the whole row, so a press anywhere lands
+ * on it; the actions sit above that. Where there is hover, the actions are drawn over the end of the row (over the
+ * trailing slot) while the row is hovered or has focus; where there is none (touch) they take their own place and are
+ * always shown. The rail is the row's inline-start border; the wash and hover are mixed into an opaque `--_bg` that the
+ * actions share, so they cover the trailing slot cleanly.
+ */
+.cy-list-rows.cy-list-rows {
+  --_hit: var(--cy-hit-min, 24px);
+  --_title: var(--cy-font-size-md);
+  --_meta: var(--cy-font-size-sm);
+  --_pad-block: var(--cy-space-3);
+  box-sizing: border-box !important;
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--cy-color-ink);
+  font-family: var(--cy-font-sans);
+  font-size: var(--_title);
+  font-weight: var(--cy-font-weight-regular);
+  line-height: var(--cy-font-line-height);
+  letter-spacing: normal;
+  text-transform: none;
+  &[data-size="sm"] {
+    --_title: var(--cy-font-size-sm);
+    --_meta: var(--cy-font-size-xs);
+    --_pad-block: var(--cy-space-2);
+  }
+  &[data-size="lg"] {
+    --_title: var(--cy-font-size-lg);
+    --_meta: var(--cy-font-size-md);
+    --_pad-block: var(--cy-space-4);
+  }
+  &[data-divided] > .cy-list-row + .cy-list-row {
+    border-block-start: var(--cy-border-width) solid var(--cy-list-row-divider-color, var(--cy-color-line));
+  }
+}
+@media (pointer: coarse) {
+  .cy-list-rows.cy-list-rows {
+    --_hit: var(--cy-hit-coarse, 44px);
+  }
+}
+
+.cy-list-row.cy-list-row {
+  --_base: var(--cy-list-row-background, var(--cy-color-surface));
+  --_wash: var(--_base);
+  --_bg: var(--_wash);
+  --_rail: transparent;
+  box-sizing: border-box !important;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--cy-list-row-gap, var(--cy-space-4));
+  min-inline-size: 0;
+  min-block-size: var(--_hit);
+  margin: 0;
+  padding: var(--_pad-block) var(--cy-list-row-padding-inline, var(--cy-space-5));
+  border-inline-start: var(--cy-list-row-rail-width, calc(2 * var(--cy-border-width))) solid var(--_rail);
+  background: var(--_bg);
+  color: var(--cy-color-ink);
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+  letter-spacing: normal;
+  text-transform: none;
+  &[data-tone] {
+    --_rail: var(--_tone);
+    --_wash: color-mix(in oklab, var(--_tone) var(--cy-list-row-wash-mix, 7%), var(--_base));
+  }
+  &[data-tone="accent"] {
+    --_tone: var(--cy-color-accent);
+  }
+  &[data-tone="neutral"] {
+    --_tone: var(--cy-color-muted);
+  }
+  &[data-tone="danger"] {
+    --_tone: var(--cy-color-danger);
+  }
+  &[data-tone="success"] {
+    --_tone: var(--cy-color-success);
+  }
+  &[data-tone="warning"] {
+    --_tone: var(--cy-color-warning);
+  }
+  &[data-tone="info"] {
+    --_tone: var(--cy-color-info);
+  }
+  &[data-active] {
+    --_rail: var(--cy-color-accent);
+    --_wash: color-mix(in oklab, var(--cy-color-accent) var(--cy-list-row-active-mix, 12%), var(--_base));
+  }
+  &[data-interactive] {
+    cursor: pointer;
+  }
+  &[data-interactive]:hover {
+    --_bg: color-mix(in oklab, var(--cy-color-ink) var(--cy-list-row-hover-mix, 6%), var(--_wash));
+  }
+  /* Presses on the rest of a clickable row fall through to the control's ::before. */
+  &[data-interactive] > :is(.cy-list-row-leading, .cy-list-row-trailing),
+  &[data-interactive] > .cy-list-row-text > :not(.cy-list-row-main) {
+    pointer-events: none;
+  }
+}
+
+/* Parts that set their own font or colour declare the reset properties (the others carry .cy-reset). */
+.cy-list-row-main.cy-list-row-main,
+.cy-list-row-label.cy-list-row-label,
+.cy-list-row-description.cy-list-row-description,
+.cy-list-row-detail.cy-list-row-detail,
+.cy-list-row-trailing.cy-list-row-trailing,
+.cy-list-row-actions.cy-list-row-actions {
+  box-sizing: border-box !important;
+  margin: 0;
+  font-weight: inherit;
+  line-height: inherit;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+/* The row's control: just the title, with its ::before stretched over the row as the hit area and focus ring. */
+.cy-list-row-main.cy-list-row-main {
+  display: block;
+  min-inline-size: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: inherit;
+  text-align: start;
+  text-decoration: none;
+  cursor: inherit;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+  &[data-list-row-main]::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+  }
+  &:focus-visible::before {
+    outline: var(--cy-border-focus) solid var(--cy-color-ring);
+    outline-offset: calc(-1 * var(--cy-border-focus));
+  }
+}
+
+.cy-list-row-leading.cy-list-row-leading {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  [data-dimmed] > & {
+    filter: var(--cy-list-row-dimmed-filter, grayscale(1));
+  }
+}
+.cy-list-row-text.cy-list-row-text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-inline-size: 0;
+}
+.cy-list-row-label.cy-list-row-label,
+.cy-list-row-description.cy-list-row-description,
+.cy-list-row-detail.cy-list-row-detail {
+  display: block;
+  min-inline-size: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cy-list-row-label.cy-list-row-label {
+  color: var(--cy-color-ink);
+  font-size: var(--_title);
+  [data-unread] & {
+    font-weight: var(--cy-font-weight-bold);
+  }
+  [data-dimmed] & {
+    color: var(--cy-color-muted);
+  }
+  [data-wrap] & {
+    overflow-wrap: anywhere;
+    white-space: normal;
+  }
+}
+.cy-list-row-description.cy-list-row-description,
+.cy-list-row-detail.cy-list-row-detail {
+  color: var(--cy-list-row-meta-color, var(--cy-color-muted));
+  font-size: var(--_meta);
+  &[data-mono] {
+    font-family: var(--cy-font-mono);
+  }
+}
+.cy-list-row-trailing.cy-list-row-trailing {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: var(--cy-space-3);
+  color: var(--cy-list-row-meta-color, var(--cy-color-muted));
+  font-size: var(--_meta);
+  font-variant-numeric: tabular-nums;
+}
+.cy-list-row-dot.cy-list-row-dot {
+  display: inline-flex;
+}
+
+/* Where there is no hover (touch), the actions take their own place at the end and are always shown. */
+.cy-list-row-actions.cy-list-row-actions {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--cy-space-1);
+  background: var(--_bg);
+  color: var(--cy-color-ink);
+  font-size: inherit;
+}
+/* With hover, they sit over the end of the row and show while it is hovered, focused, or a menu of theirs is open. */
+@media (hover: hover) {
+  .cy-list-row-actions.cy-list-row-actions {
+    position: absolute;
+    /* Clear of the focus ring, which is drawn inside the row's edge. */
+    inset-block: var(--cy-border-focus);
+    inset-inline-end: var(--cy-list-row-padding-inline, var(--cy-space-5));
+    padding-inline-start: var(--cy-space-3);
+    opacity: 0;
+    transition: opacity var(--cy-motion-fast) var(--cy-motion-ease);
+  }
+  .cy-list-row.cy-list-row:is(:hover, :focus-within, :has(> .cy-list-row-actions [aria-expanded="true"]))
+    > .cy-list-row-actions {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cy-list-row-actions.cy-list-row-actions {
+    transition: none;
+  }
+}
+@media (forced-colors: active) {
+  .cy-list-row.cy-list-row[data-active] {
+    border-inline-start-color: Highlight;
+  }
+}

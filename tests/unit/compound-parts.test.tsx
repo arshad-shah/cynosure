@@ -25,3 +25,12 @@ describe("AccordionItem", () => {
     quiet.mockRestore();
   });
 });
+
+describe("ListRow", () => {
+  it("explains when used outside <ListRows>", async () => {
+    const { ListRow } = await import("../../src/components/ListRow/ListRow");
+    const quiet = vi.spyOn(console, "error").mockImplementation(() => {});
+    expect(() => render(<ListRow label="A" />)).toThrow("<ListRow> must be inside <ListRows>");
+    quiet.mockRestore();
+  });
+});

@@ -1,0 +1,106 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./ListRow.stories";
+
+<Meta of={Stories} />
+
+# ListRow
+
+Interactive rows for an app's lists (notifications, an activity feed, saved queries, query history, connections): a leading slot, a title with up to two quieter lines, a trailing slot, and actions shown on hover or focus. `ListRows` is the list that holds them and gives it one Tab stop and arrow keys.
+
+<Canvas of={Stories.Default} />
+
+## When to use
+
+- **A list of things to open:** each row is a button (`onClick`) or a link (`href`), with the open one marked `active`.
+- **Rows with their own commands:** run, delete, a [Menu](?path=/docs/components-menu--docs) of more, beside the row rather than inside it.
+- **Feeds that carry state:** `unread`, `dimmed` (seen), and a `tone` rail for an error or a warning.
+
+**Use something else when:**
+- the list is static text with bullets, numbers or ticks: [List](?path=/docs/components-list--docs)
+- the point is choosing a value: [Select](?path=/docs/components-select--docs), [RadioGroup](?path=/docs/components-radiogroup--docs) or [Combobox](?path=/docs/components-combobox--docs)
+- the entries nest: [Tree](?path=/docs/components-tree--docs)
+- there are thousands of rows: [VirtualList](?path=/docs/components-virtuallist--docs)
+- it is the app's navigation: [SideNav](?path=/docs/components-sidenav--docs)
+
+## Usage
+
+```tsx
+import { IconButton, IconTile, ListRow, ListRows } from "@arshad-shah/cynosure";
+import { alert, play, trash } from "@arshad-shah/cynosure/icons";
+
+<ListRows label="Notifications" divided>
+  {notifications.map((n) => (
+    <ListRow
+      key={n.id}
+      label={n.message}
+      description={n.source}
+      trailing={n.time}
+      leading={<IconTile icon={alert} size="sm" tone="danger" />}
+      tone={n.level === "error" ? "danger" : undefined}
+      unread={!n.read}
+      dimmed={n.read}
+      active={n.id === openId}
+      onClick={() => open(n.id)}
+      actions={
+        <>
+          <IconButton icon={play} label="Open" size="sm" variant="ghost" onClick={() => open(n.id)} />
+          <IconButton icon={trash} label="Dismiss" size="sm" variant="ghost" onClick={() => dismiss(n.id)} />
+        </>
+      }
+    />
+  ))}
+</ListRows>;
+```
+
+## States
+
+`active` draws an accent rail on the inline start and tints the row, and sets `aria-current` (`page` on a link row). `unread` makes the title bold and adds an accent dot. `dimmed` mutes the title and turns the leading slot grey; nothing is faded, so text in it (an avatar's initials) stays readable. `tone` draws a rail and a faint wash in that colour. The words "Unread" and the tone's name ("Error", "Warning", "Success", "Info") are read with the title; replace them through `labels` on `ListRows`, or set one to `""` to read nothing.
+
+<Canvas of={Stories.ActiveUnreadDimmedAndTones} />
+
+## Meta lines
+
+`description` and `detail` sit under the title, smaller and muted; `mono` sets one of them in the monospace font (a connection string, a query). Every line is cut with an ellipsis; `wrap` lets the title wrap instead.
+
+<Canvas of={Stories.MetaLinesAndWrapping} />
+
+## Links
+
+With `href` the row is a link (through LinkBase: unsafe schemes such as `javascript:` are not linked).
+
+<Canvas of={Stories.RowsAsLinks} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+The pattern is a list of buttons or links with a roving Tab stop, not a listbox: a listbox's options cannot hold the row's actions (ARIA allows no controls inside an option), and these rows open things rather than choose a value. The selected entry is marked with `aria-current`.
+
+| Key                         | Does                                                                         |
+| --------------------------- | ---------------------------------------------------------------------------- |
+| Tab                         | Into the list on the `active` row (else the first, or the one used last); from a row, to its actions; then out |
+| Down / Up                   | The next or previous clickable row (no wrap); rows that cannot be pressed are skipped |
+| Home / End                  | The first or last clickable row                                              |
+| Right / Left (mirrored RTL) | From the row into its actions and along them, and back                       |
+| Enter, Space                | Presses a button row (Enter follows a link row)                              |
+
+- Only the title is inside the row's button or link; its hit area covers the whole row, so a press on the leading slot, the text or the trailing slot lands on it. The button is named by the title (with the tone's word and "Unread") and described by the leading slot, the meta lines and the trailing slot.
+- Actions are siblings of that button. The actions of the row holding the Tab stop are in the Tab order; other rows' actions are reached with Right. A row without `onClick` or `href` keeps its actions in the Tab order.
+- Arrow keys inside a menu opened from the actions belong to the menu, and the actions stay shown while it is open.
+
+## Touch
+
+Where the device has no hover, the actions are always shown, in their own place at the end of the row instead of over the trailing slot. Rows are at least 44px tall on a coarse pointer (24px otherwise), and IconButtons keep their own 44px hit areas.
+
+## Theming
+
+Tokens: `--cy-list-row-background` (set it to the colour of the surface the list sits on, so the actions cover the trailing slot cleanly), `--cy-list-row-gap`, `--cy-list-row-padding-inline`, `--cy-list-row-rail-width`, `--cy-list-row-hover-mix`, `--cy-list-row-active-mix`, `--cy-list-row-wash-mix`, `--cy-list-row-meta-color`, `--cy-list-row-dimmed-filter`, `--cy-list-row-divider-color`.
+
+## Related
+
+- [List](?path=/docs/components-list--docs): static lists with markers.
+- [IconButton](?path=/docs/components-iconbutton--docs) and [Menu](?path=/docs/components-menu--docs): row actions.
+- [IconTile](?path=/docs/components-icontile--docs), [Avatar](?path=/docs/components-avatar--docs), [Badge](?path=/docs/components-badge--docs): leading and trailing content.
+- [VirtualList](?path=/docs/components-virtuallist--docs): very long lists.
