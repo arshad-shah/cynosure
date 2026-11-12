@@ -7,6 +7,7 @@ import {
   type ReactNode,
 } from "react";
 import { ButtonBase } from "../../foundations/ButtonBase/ButtonBase.js";
+import { type Edge, edgeProps } from "../../foundations/edge.js";
 import { LinkBase } from "../../foundations/LinkBase/LinkBase.js";
 import type { Tone } from "../../tokens/schema.js";
 
@@ -27,8 +28,6 @@ declare module "../../tokens/schema.js" {
   }
 }
 
-const TONES: readonly string[] = ["accent", "neutral", "danger", "success", "warning", "info"];
-
 export interface CardProps {
   /** `surface` raised panel, `outline` border only, `soft` tone-tinted fill. */
   variant?: "surface" | "outline" | "soft";
@@ -41,7 +40,7 @@ export interface CardProps {
    * uses that tone's colour; any other string is a CSS colour. Colour alone carries no meaning for many people: say
    * the same thing in the card's text or a Badge. Default: no edge.
    */
-  edge?: Tone | (string & {});
+  edge?: Edge;
   /** Element for a static card. Ignored when `href` or `onClick` makes the whole card interactive. */
   as?: "div" | "section" | "article" | "li" | "aside";
   /** Makes the whole card a link (rendered through LinkBase, so unsafe schemes are not linked). */
@@ -103,13 +102,10 @@ export const Card = forwardRef<HTMLElement, CardProps>(function CardRender(props
     children,
     ...rest
   } = props;
-  // A tone name is mapped to its token in CSS; any other colour is handed over as a private custom property.
-  const custom = !!edge && !TONES.includes(edge);
   const common = {
     ...rest,
     className: className ? `cy-card ${className}` : "cy-card",
-    style: custom ? ({ "--_edge": edge, ...style } as CSSProperties) : style,
-    "data-edge": edge ? (custom ? "custom" : edge) : undefined,
+    ...edgeProps(edge, style),
     "data-variant": variant,
     "data-padding": padding,
     "data-tone": tone,
