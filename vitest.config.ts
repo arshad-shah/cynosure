@@ -1,6 +1,17 @@
 import { storybookTest } from "@storybook/addon-vitest/vitest-plugin";
 import { playwright } from "@vitest/browser-playwright";
 import { defineConfig } from "vitest/config";
+import type { BrowserCommand } from "vitest/node";
+
+/**
+ * Story tests emulate media features (prefers-reduced-motion, prefers-contrast) on their own page through this command;
+ * stories reach it with `emulateMedia` from src/test/media.ts. `null` puts a feature back to the browser's own value.
+ */
+const emulateMedia: BrowserCommand<
+  [media: { reducedMotion?: "reduce" | "no-preference" | null; contrast?: "more" | "no-preference" | null }]
+> = async ({ page }, media) => {
+  await page.emulateMedia(media);
+};
 
 const engines = (process.env.CY_BROWSERS ?? "chromium,firefox,webkit").split(",") as (
   | "chromium"
@@ -55,6 +66,7 @@ export default defineConfig({
             headless: true,
             provider: playwright(),
             instances: engines.map((browser) => ({ browser })),
+            commands: { emulateMedia },
           },
         },
       },
@@ -68,6 +80,7 @@ export default defineConfig({
             headless: true,
             provider: playwright({ contextOptions: { hasTouch: true, isMobile: true } }),
             instances: [{ browser: "chromium" }],
+            commands: { emulateMedia },
           },
         },
       },

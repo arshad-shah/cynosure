@@ -1,8 +1,13 @@
 import * as a11y from "@storybook/addon-a11y/preview";
 import { setProjectAnnotations } from "@storybook/react-vite";
 import { expect } from "vitest";
-import { page } from "vitest/browser";
+import { commands, page } from "vitest/browser";
+import type { EmulatedMedia } from "../src/test/media";
 import * as project from "./preview";
+
+/* Stories emulate media features through `emulateMedia` (src/test/media.ts), which finds the Playwright command here. */
+(globalThis as { cyEmulateMedia?: (media: EmulatedMedia) => Promise<void> }).cyEmulateMedia = (media) =>
+  (commands as unknown as { emulateMedia: (media: EmulatedMedia) => Promise<void> }).emulateMedia(media);
 
 /** Visual regression, Vitest-only: stories tagged "visual" are screenshotted when VITE_CY_VISUAL=1 (CI, Linux baselines). */
 const visual = import.meta.env.VITE_CY_VISUAL === "1";
