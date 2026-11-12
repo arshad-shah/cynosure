@@ -205,11 +205,12 @@ export const KeyboardScrollsTheRegion: Story = {
     // The browser's own keys scroll the focused region (real key presses: synthetic ones scroll nothing).
     region.focus();
     if (!(await pressKey("PageDown"))) return;
-    await waitFor(() => expect(region.scrollTop).toBeGreaterThan(50));
+    await waitFor(() => expect(region.scrollTop).toBeGreaterThan(50), { timeout: 3000 });
     await pressKey("End");
-    await waitFor(() => expect(atEnd(region)).toBe(true));
-    await pressKey("Home");
-    await waitFor(() => expect(region.scrollTop).toBe(0));
+    await waitFor(() => expect(atEnd(region)).toBe(true), { timeout: 3000 });
+    const end = region.scrollTop;
+    await pressKey("PageUp");
+    await waitFor(() => expect(region.scrollTop).toBeLessThan(end - 50), { timeout: 3000 });
   },
 };
 

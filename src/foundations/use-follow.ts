@@ -79,6 +79,10 @@ export function useFollow(scroller: RefObject<HTMLElement | null>, options: Foll
     });
     for (const el of els) if (el) observer.observe(el);
     watched.current = { observer, els };
+    // The observer's first report comes a frame later: measure now too, so the first paint is already right (at the
+    // end when following, a tab stop when there is something to scroll).
+    contentChanged();
+    latest.current.onResize?.();
   });
   useClientLayoutEffect(
     () => () => {
