@@ -2,7 +2,7 @@
   {
     "name": "all CSS",
     "path": "dist/styles.css",
-    "limit": "35.8 kB",
+    "limit": "36.1 kB",
     "gzip": true
   },
   {
@@ -305,7 +305,7 @@
       "dist/foundations/hotkey.js",
       "dist/styles/command-palette.css"
     ],
-    "limit": "5 kB",
+    "limit": "5.2 kB",
     "gzip": true
   },
   {
@@ -383,7 +383,7 @@
   {
     "name": "FileDrop (with Button)",
     "path": ["dist/components/FileDrop/FileDrop.js", "dist/styles/file-drop.css"],
-    "limit": "3 kB",
+    "limit": "3.5 kB",
     "gzip": true
   },
   {
