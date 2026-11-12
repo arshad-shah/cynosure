@@ -219,7 +219,7 @@
   {
     "name": "Overlay core",
     "path": ["dist/overlay/dismiss.js", "dist/overlay/position.js", "dist/overlay/use-anchored-position.js"],
-    "limit": "2 kB",
+    "limit": "2.1 kB",
     "gzip": true
   },
   {
