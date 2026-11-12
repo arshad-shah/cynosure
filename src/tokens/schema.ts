@@ -1,6 +1,11 @@
 /** The complete Cynosure token schema. Every visual property of every component resolves to one of these. */
 
 export type Size = "sm" | "md" | "lg";
+/**
+ * `Size` plus `xs`: about 20px tall, for dense desktop chrome (toolbars, inspectors). Only Button, IconButton, Select,
+ * TextField, ProgressBar and SegmentedControl take it; their hit area still reaches 24px (44px on coarse pointers).
+ */
+export type DenseSize = "xs" | Size;
 /** Semantic colour shared by every component prop named `tone`. */
 export type Tone = "accent" | "neutral" | "danger" | "success" | "warning" | "info";
 export type Scale = "compact" | "comfortable" | "spacious" | number;

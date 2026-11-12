@@ -54,7 +54,9 @@ By default the value reads as a percentage. Pass `labels.value` to describe it i
 
 ## Theming
 
-Tokens: `--cy-progress-bar-height-{sm,md,lg}`, `--cy-progress-bar-radius` and `--cy-progress-bar-track`.
+`size` sets the thickness: `xs` 2, `sm` 4, `md` 8 and `lg` 12 px. `xs` also sets smaller label and value text and a tighter gap, for dense desktop chrome.
+
+Tokens: `--cy-progress-bar-height-{xs,sm,md,lg}`, `--cy-progress-bar-radius` and `--cy-progress-bar-track`.
 
 ```ts
 createTheme({ components: { progressBar: { heightMd: "6px", radius: "2px" } } });

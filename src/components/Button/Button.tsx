@@ -13,10 +13,13 @@ import { ButtonBase, type ButtonBaseProps } from "../../foundations/ButtonBase/B
 import { Icon } from "../../foundations/Icon/Icon.js";
 import { LinkBase } from "../../foundations/LinkBase/LinkBase.js";
 import type { IconData } from "../../icons/types.js";
-import type { Size, Tone } from "../../tokens/schema.js";
+import type { DenseSize, Tone } from "../../tokens/schema.js";
 import { LoadingDots } from "../LoadingDots/LoadingDots.js";
 
 export interface ButtonTokens {
+  fontSizeXs: string;
+  paddingInlineXs: string;
+  heightXs: string;
   heightSm: string;
   heightMd: string;
   heightLg: string;
@@ -53,8 +56,11 @@ export interface ButtonProps extends Omit<ButtonBaseProps, "children" | "classNa
    * until it reads on the surface. Prefer a tone or the theme's accent.
    */
   color?: string | undefined;
-  /** Height and text size of the button. Default "md". */
-  size?: Size;
+  /**
+   * Height and text size of the button. Default "md". `xs` (about 20px) is for dense desktop chrome: it looks small and
+   * is still 24px to press (44px on coarse pointers).
+   */
+  size?: DenseSize;
   /** Leading icon (inline-start, RTL aware). */
   icon?: IconData | undefined;
   /** Trailing icon (inline-end). */
@@ -131,7 +137,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
   },
   ref,
 ) {
-  const iconSize = size === "lg" ? "lg" : "md";
+  const iconSize = size === "lg" ? "lg" : size === "xs" ? "sm" : "md";
   const [armed, setArmed] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const disarm = () => {

@@ -23,13 +23,17 @@ export function OptionIcon({
   option,
   plain,
   className,
+  size,
 }: {
   option: OptionIconColor & { icon?: IconData | undefined };
   plain?: boolean | undefined;
   className: string;
+  /** Icon's size; default Icon's own ("md"). A dense (`xs`) Select trigger passes "sm". */
+  size?: IconProps["size"] | undefined;
 }) {
   if (!option.icon) return null;
   const props: IconProps = { icon: option.icon, className };
+  if (size) props.size = size;
   if (!plain && option.iconTone) props.tone = option.iconTone;
   if (!plain && option.iconColor) props.color = option.iconColor;
   return <Icon {...props} />;

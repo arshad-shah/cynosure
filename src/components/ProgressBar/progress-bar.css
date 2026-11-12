@@ -17,6 +17,17 @@
   line-height: var(--cy-font-line-height);
   letter-spacing: normal;
   text-transform: none;
+  &[data-size="xs"] {
+    --_h: var(--cy-progress-bar-height-xs, 2px);
+    gap: var(--cy-space-2);
+    & .cy-progress-bar-head,
+    & .cy-progress-bar-label {
+      font-size: var(--cy-font-size-sm);
+    }
+    & .cy-progress-bar-value {
+      font-size: var(--cy-font-size-xs);
+    }
+  }
   &[data-size="sm"] {
     --_h: var(--cy-progress-bar-height-sm, 4px);
   }

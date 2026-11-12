@@ -24,7 +24,7 @@ const meta = {
   argTypes: {
     variant: { control: "inline-radio", options: ["solid", "soft", "outline", "ghost"] },
     tone: { control: "select", options: ["accent", "neutral", "danger", "success", "warning", "info"] },
-    size: { control: "inline-radio", options: ["sm", "md", "lg"] },
+    size: { control: "inline-radio", options: ["xs", "sm", "md", "lg"] },
     icon: { control: "select", options: ["none", ...iconNames], mapping: iconMapping },
     iconEnd: { control: "select", options: ["none", ...iconNames], mapping: iconMapping },
     loading: { control: "boolean" },
@@ -146,6 +146,58 @@ export const HitTargetCoarsePointer: Story = {
     const button = canvas.getByRole("button");
     const hit = pseudo(button);
     await expect(Math.min(hit.w, hit.h)).toBeGreaterThanOrEqual(44);
+    await userEvent.pointer({ keys: "[TouchA]", target: button });
+    await expect(args.onClick).toHaveBeenCalledTimes(1);
+  },
+};
+
+export const ExtraSmallForDenseChrome: Story = {
+  args: { size: "xs", icon: download, children: "Export" },
+  render: (args) => (
+    <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+      <Button {...args} />
+      <Button {...args} size="sm">
+        Small
+      </Button>
+    </div>
+  ),
+  play: async ({ canvas, args, userEvent }) => {
+    const xs = canvas.getByRole("button", { name: "Export" });
+    const sm = canvas.getByRole("button", { name: "Small" });
+    // The visible control is about 20px: smaller than sm, with smaller text and icon.
+    const box = xs.getBoundingClientRect();
+    await expect(box.height).toBe(20);
+    await expect(box.height).toBeLessThan(sm.getBoundingClientRect().height);
+    const size = (el: Element) => Number.parseFloat(getComputedStyle(el).fontSize);
+    await expect(size(xs)).toBeLessThan(size(sm));
+    await expect(size(xs)).toBeGreaterThanOrEqual(11);
+    const icon = (el: Element) => (el.querySelector(".cy-icon") as Element).getBoundingClientRect().height;
+    await expect(icon(xs)).toBeLessThan(icon(sm));
+    await expect(icon(xs)).toBeLessThan(box.height);
+    // The label is whole, not clipped, and reads on its surface.
+    const label = xs.querySelector(".cy-button-label") as HTMLElement;
+    await expect(label.scrollWidth).toBeLessThanOrEqual(label.clientWidth);
+    await expect(textContrast(label)).toBeGreaterThanOrEqual(4.5);
+    // Still at least 24px to press: a click just above the visible edge lands on the button.
+    await expect(Math.min(pseudo(xs).w, pseudo(xs).h)).toBeGreaterThanOrEqual(24);
+    await expect(document.elementFromPoint(box.left + box.width / 2, box.top - 1)).toBe(xs);
+    await userEvent.click(xs);
+    xs.focus();
+    await userEvent.keyboard("{Enter}");
+    await userEvent.keyboard(" ");
+    await expect(args.onClick).toHaveBeenCalledTimes(3);
+  },
+};
+
+export const ExtraSmallCoarsePointer: Story = {
+  tags: ["touch", "!dev"],
+  args: { size: "xs" },
+  play: async ({ canvas, args, userEvent }) => {
+    await expect(matchMedia("(pointer: coarse)").matches).toBe(true);
+    const button = canvas.getByRole("button");
+    // The look stays dense; only the invisible hit area grows to 44px.
+    await expect(button.getBoundingClientRect().height).toBe(20);
+    await expect(Math.min(pseudo(button).w, pseudo(button).h)).toBeGreaterThanOrEqual(44);
     await userEvent.pointer({ keys: "[TouchA]", target: button });
     await expect(args.onClick).toHaveBeenCalledTimes(1);
   },

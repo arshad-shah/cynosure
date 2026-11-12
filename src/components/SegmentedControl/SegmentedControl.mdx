@@ -48,7 +48,7 @@ With `iconOnly`, only the icons show. Each option's `label` stays as its accessi
 ## Options
 
 - **`fullWidth`:** stretches the control to fill its container.
-- **`size`:** `sm`, `md` or `lg`.
+- **`size`:** `xs`, `sm`, `md` or `lg`. `xs` is 20px with smaller text and icons, matching the `xs` Button, for dense desktop chrome. Each segment is still 24px to press, and 44px on coarse pointers through an invisible hit area, so an `xs` control keeps its look on touch screens.
 - **`tone`:** colours the active segment's content (default `neutral`).
 - **`disabled`:** on the control or on a single option.
 
@@ -74,7 +74,7 @@ On coarse pointers (phones and tablets) segments grow to a larger hit area witho
 
 ## Theming
 
-Tokens: `--cy-segmented-control-{radius,track-bg,active-bg,padding}`.
+Tokens: `--cy-segmented-control-{radius,track-bg,active-bg,padding}`, and for `xs` `--cy-segmented-control-{height-xs,font-size-xs}`.
 
 ```ts
 createTheme({ components: { segmentedControl: { radius: "999px", padding: "3px" } } });

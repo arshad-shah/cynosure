@@ -46,7 +46,7 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(functio
       >
         <Icon
           icon={icon}
-          size={rest.size === "lg" ? "lg" : "md"}
+          size={rest.size === "lg" ? "lg" : rest.size === "xs" ? "sm" : "md"}
           flipRtl={flipRtl}
           {...(iconColor ? { color: iconColor } : {})}
         />

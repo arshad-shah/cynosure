@@ -29,7 +29,7 @@ const meta = {
     variant: "outline",
   },
   argTypes: {
-    size: { control: "inline-radio", options: ["sm", "md", "lg"] },
+    size: { control: "inline-radio", options: ["xs", "sm", "md", "lg"] },
     variant: { control: "inline-radio", options: ["outline", "soft"] },
     label: { control: "text" },
     placeholder: { control: "text" },
@@ -244,6 +244,59 @@ export const CoarsePointerRows: Story = {
     await userEvent.click(canvas.getByRole("combobox"));
     for (const option of canvas.getAllByRole("option"))
       await expect(option.getBoundingClientRect().height).toBeGreaterThanOrEqual(44);
+  },
+};
+
+const hitArea = (el: Element) => Number.parseFloat(getComputedStyle(el, "::before").height);
+
+export const ExtraSmallForDenseChrome: Story = {
+  args: { size: "xs", defaultValue: "apple", label: "Dense" },
+  render: (args) => (
+    <div style={{ display: "flex", gap: 12, alignItems: "end", inlineSize: 360 }}>
+      <Select {...args} />
+      <Select {...args} size="sm" label="Small" />
+    </div>
+  ),
+  play: async ({ canvas, canvasElement, args, userEvent }) => {
+    const xs = canvas.getByRole("combobox", { name: "Dense" });
+    const sm = canvas.getByRole("combobox", { name: "Small" });
+    // A 20px trigger with smaller text and chevron than sm's.
+    const box = xs.getBoundingClientRect();
+    await expect(box.height).toBe(20);
+    const size = (el: Element) => Number.parseFloat(getComputedStyle(el).fontSize);
+    await expect(size(xs)).toBeLessThan(size(sm));
+    await expect(size(xs)).toBeGreaterThanOrEqual(11);
+    const chevron = (el: Element) =>
+      (el.querySelector(".cy-select-chevron") as Element).getBoundingClientRect();
+    await expect(chevron(xs).height).toBeLessThan(chevron(sm).height);
+    await expect(chevron(xs).bottom).toBeLessThanOrEqual(box.bottom);
+    // The chosen value is whole inside the trigger.
+    const value = xs.querySelector(".cy-select-value") as HTMLElement;
+    await expect(value.scrollHeight).toBeLessThanOrEqual(value.clientHeight + 1);
+    // Still 24px to press: a click just below the visible edge opens it.
+    await expect(hitArea(xs)).toBeGreaterThanOrEqual(24);
+    await expect(document.elementFromPoint(box.left + 8, box.bottom + 1)).toBe(xs);
+    // The keyboard works as at any size.
+    xs.focus();
+    await userEvent.keyboard("{ArrowDown}");
+    const lists = canvasElement.querySelectorAll('[role="listbox"]');
+    await waitFor(() => expect(isOpen(lists[0] as HTMLElement)).toBe(true));
+    await userEvent.keyboard("{ArrowDown}{Enter}");
+    await expect(xs).toHaveTextContent("Banana");
+    await expect(args.onChange).toHaveBeenCalledWith("banana");
+  },
+};
+
+export const ExtraSmallCoarsePointer: Story = {
+  tags: ["touch", "!dev"],
+  args: { size: "xs" },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const trigger = canvas.getByRole("combobox");
+    // The trigger stays dense; its invisible hit area grows to 44px.
+    await expect(trigger.getBoundingClientRect().height).toBe(20);
+    await expect(hitArea(trigger)).toBeGreaterThanOrEqual(44);
+    await userEvent.pointer({ keys: "[TouchA]", target: trigger });
+    await waitFor(() => expect(isOpen(list(canvasElement))).toBe(true));
   },
 };
 

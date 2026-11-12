@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 import { expect, waitFor } from "storybook/test";
-import { contrast } from "../../test/color.js";
+import { contrast, textContrast } from "../../test/color.js";
 import { computeUnderHostileHost } from "../../test/hostile.js";
 import { CynosureTheme } from "../../theme/CynosureTheme.js";
 import { createTheme } from "../../tokens/index.js";
@@ -17,7 +17,7 @@ const meta = {
   args: { label: "Uploading 3 files", value: 40, max: 100, size: "md", tone: "accent", showValue: true },
   argTypes: {
     value: { control: { type: "range", min: 0, max: 100 } },
-    size: { control: "inline-radio", options: ["sm", "md", "lg"] },
+    size: { control: "inline-radio", options: ["xs", "sm", "md", "lg"] },
     tone: { control: "select", options: TONES },
     indeterminate: { control: "boolean" },
     showValue: { control: "boolean" },
@@ -184,6 +184,37 @@ export const SizesChangeThickness: Story = {
     );
     await expect(heights[0]).toBeLessThan(heights[1] as number);
     await expect(heights[1]).toBeLessThan(heights[2] as number);
+  },
+};
+
+export const ExtraSmallForDenseChrome: Story = {
+  args: { label: "Indexing", value: 60 },
+  render: (args) => (
+    <Stack gap="4">
+      <ProgressBar {...args} size="xs" />
+      <ProgressBar {...args} size="sm" label="Small" />
+    </Stack>
+  ),
+  play: async ({ canvas, canvasElement }) => {
+    const [xs, sm] = [...canvasElement.querySelectorAll(".cy-progress-bar")] as HTMLElement[];
+    const track = (el: HTMLElement) =>
+      (el.querySelector(".cy-progress-bar-track") as Element).getBoundingClientRect();
+    // A thinner track than sm's, still visible.
+    await expect(track(xs as HTMLElement).height).toBeLessThan(track(sm as HTMLElement).height);
+    await expect(track(xs as HTMLElement).height).toBeGreaterThanOrEqual(2);
+    // Smaller, still readable label and value, closer to the track.
+    const size = (el: Element) => Number.parseFloat(getComputedStyle(el).fontSize);
+    const label = canvas.getByText("Indexing");
+    await expect(size(label)).toBeLessThan(size(canvas.getByText("Small")));
+    await expect(size(label)).toBeGreaterThanOrEqual(11);
+    await expect(textContrast(label)).toBeGreaterThanOrEqual(4.5);
+    const gap = (el: HTMLElement) => Number.parseFloat(getComputedStyle(el).rowGap);
+    await expect(gap(xs as HTMLElement)).toBeLessThan(gap(sm as HTMLElement));
+    // It reports its value as at any size.
+    await expect(canvas.getByRole("progressbar", { name: "Indexing" })).toHaveAttribute(
+      "aria-valuenow",
+      "60",
+    );
   },
 };
 

@@ -1,7 +1,8 @@
 import { type CSSProperties, useId } from "react";
-import type { Size, Tone } from "../../tokens/schema.js";
+import type { DenseSize, Tone } from "../../tokens/schema.js";
 
 export interface ProgressBarTokens {
+  heightXs: string;
   heightSm: string;
   heightMd: string;
   heightLg: string;
@@ -55,8 +56,8 @@ export interface ProgressBarProps {
   markerLabel?: string | undefined;
   /** Colour of the fill. Default "accent". */
   tone?: Exclude<Tone, "neutral"> | "neutral";
-  /** Bar thickness. */
-  size?: Size;
+  /** Bar thickness. `xs` is a hairline track with smaller label text, for dense desktop chrome. Default "md". */
+  size?: DenseSize;
   /** Replace the built-in English text: the value text. */
   labels?: Partial<ProgressBarLabels>;
   /** Added to the root element, for layout. */

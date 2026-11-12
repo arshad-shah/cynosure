@@ -4,9 +4,11 @@ import { useControllableState } from "../../foundations/controllable.js";
 import { HiddenValue } from "../../foundations/HiddenValue/HiddenValue.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
 import type { IconData } from "../../icons/types.js";
-import type { Size, Tone } from "../../tokens/schema.js";
+import type { DenseSize, Tone } from "../../tokens/schema.js";
 
 export interface SegmentedControlTokens {
+  fontSizeXs: string;
+  heightXs: string;
   radius: string;
   trackBg: string;
   activeBg: string;
@@ -46,8 +48,11 @@ export interface SegmentedControlProps {
   fullWidth?: boolean;
   /** Disables every segment; the value is not submitted. */
   disabled?: boolean;
-  /** Height and text size of the segments. Default "md". */
-  size?: Size;
+  /**
+   * Height and text size of the segments. Default "md". `xs` (about 20px) is for dense desktop chrome: each segment is
+   * still 24px to press (44px on coarse pointers).
+   */
+  size?: DenseSize;
   /** Colour of the active segment's content. */
   tone?: Tone;
   /** Added to the root element, for layout. */
@@ -118,7 +123,7 @@ export function SegmentedControl({
             checked={current === option.value}
             onChange={(e) => e.currentTarget.checked && setCurrent(option.value)}
           />
-          {option.icon && <Icon icon={option.icon} />}
+          {option.icon && <Icon icon={option.icon} size={size === "xs" ? "sm" : "md"} />}
           {!iconOnly && <span className="cy-segmented-control-label">{option.label}</span>}
         </label>
       ))}

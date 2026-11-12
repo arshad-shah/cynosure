@@ -24,7 +24,7 @@ const meta = {
     tone: "neutral",
   },
   argTypes: {
-    size: { control: "inline-radio", options: ["sm", "md", "lg"] },
+    size: { control: "inline-radio", options: ["xs", "sm", "md", "lg"] },
     tone: { control: "select", options: ["accent", "neutral", "danger", "success", "warning", "info"] },
     iconOnly: { control: "boolean" },
     fullWidth: { control: "boolean" },
@@ -183,6 +183,54 @@ export const CoarsePointerSegments: Story = {
   play: async ({ canvasElement }) => {
     for (const s of canvasElement.querySelectorAll(".cy-segmented-control-segment"))
       await expect(s.getBoundingClientRect().height).toBeGreaterThanOrEqual(44);
+  },
+};
+
+export const ExtraSmallLinesUpWithOtherDenseControls: Story = {
+  args: { size: "xs" },
+  render: (args) => (
+    <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+      <SegmentedControl {...args} />
+      <Button size="xs">Beside it</Button>
+      <SegmentedControl {...args} label="Small" size="sm" />
+    </div>
+  ),
+  play: async ({ canvas, args, userEvent }) => {
+    const group = canvas.getByRole("radiogroup", { name: "View" });
+    const small = canvas.getByRole("radiogroup", { name: "Small" });
+    // As tall as an xs button (20px), with smaller text and icons than sm's.
+    await expect(group.getBoundingClientRect().height).toBe(20);
+    await expect(group.getBoundingClientRect().height).toBe(
+      canvas.getByRole("button", { name: "Beside it" }).getBoundingClientRect().height,
+    );
+    const size = (el: Element) => Number.parseFloat(getComputedStyle(el).fontSize);
+    await expect(size(group)).toBeLessThan(size(small));
+    await expect(size(group)).toBeGreaterThanOrEqual(11);
+    const icon = (el: Element) => (el.querySelector(".cy-icon") as Element).getBoundingClientRect().height;
+    await expect(icon(group)).toBeLessThan(icon(small));
+    // Each segment is still 24px to press.
+    const segment = group.querySelector(".cy-segmented-control-segment") as Element;
+    await expect(Number.parseFloat(getComputedStyle(segment, "::before").height)).toBeGreaterThanOrEqual(24);
+    // Arrow keys still choose.
+    const tree = within(group).getByRole("radio", { name: "Tree" });
+    tree.focus();
+    await userEvent.keyboard("{ArrowRight}");
+    await expect(within(group).getByRole("radio", { name: "Raw" })).toBeChecked();
+    await expect(args.onChange).toHaveBeenLastCalledWith("raw");
+  },
+};
+
+export const ExtraSmallCoarsePointer: Story = {
+  tags: ["touch", "!dev"],
+  args: { size: "xs" },
+  play: async ({ canvas, args, userEvent }) => {
+    const group = canvas.getByRole("radiogroup", { name: "View" });
+    // A dense control stays dense on touch; each segment's invisible hit area reaches 44px.
+    await expect(group.getBoundingClientRect().height).toBe(20);
+    for (const s of group.querySelectorAll(".cy-segmented-control-segment"))
+      await expect(Number.parseFloat(getComputedStyle(s, "::before").height)).toBeGreaterThanOrEqual(44);
+    await userEvent.pointer({ keys: "[TouchA]", target: canvas.getByText("Raw") });
+    await expect(args.onChange).toHaveBeenLastCalledWith("raw");
   },
 };
 
