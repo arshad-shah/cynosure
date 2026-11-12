@@ -173,6 +173,36 @@ export const FlipsAtTheViewportEdge: Story = {
   },
 };
 
+function Growing(args: Parameters<typeof Popover>[0]) {
+  const [more, setMore] = useState(false);
+  return (
+    <div style={{ position: "fixed", insetBlockStart: window.innerHeight - 140, insetInlineStart: 24 }}>
+      <Popover {...args} placement="bottom">
+        <Button onClick={() => setMore(true)}>Show more</Button>
+        {more && <div data-testid="more" style={{ blockSize: 300 }} />}
+      </Popover>
+    </div>
+  );
+}
+
+export const FlipsWhenItsContentGrows: Story = {
+  render: (args) => <Growing {...args} />,
+  play: async ({ canvas, userEvent }) => {
+    const trigger = canvas.getByRole("button", { name: "Filters" });
+    await userEvent.click(trigger);
+    const dialog = await canvas.findByRole("dialog");
+    await shownFully(dialog);
+    await expect(dialog).toHaveAttribute("data-placement", "bottom");
+    // The content grows while open, with no scroll or resize: no room below any more, so it moves above.
+    await userEvent.click(canvas.getByRole("button", { name: "Show more" }));
+    await canvas.findByTestId("more");
+    await waitFor(() => expect(dialog).toHaveAttribute("data-placement", "top"));
+    await expect(dialog.getBoundingClientRect().bottom).toBeLessThanOrEqual(
+      trigger.getBoundingClientRect().top,
+    );
+  },
+};
+
 export const ControlledAndContentWithoutControls: Story = {
   args: { open: true, children: "Saved 2 minutes ago." },
   play: async ({ canvas }) => {
