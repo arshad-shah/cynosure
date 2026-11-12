@@ -554,3 +554,31 @@ export const OptionIconColourIsStableUnderHostileHost: Story = {
     );
   },
 };
+
+export const SplitSettingsRow: Story = {
+  render: (args) => (
+    <div style={{ display: "grid", gap: 12, inlineSize: 560 }}>
+      <Select {...args} label="Theme" description="Light, dark or the system's." layout="split" width="md" />
+      <Select {...args} label="Language" layout="split" width="md" />
+    </div>
+  ),
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const theme = canvas.getByRole("combobox", { name: "Theme" });
+    const language = canvas.getByRole("combobox", { name: "Language" });
+    await expect(theme).toHaveAccessibleDescription("Light, dark or the system's.");
+    // At the end of the row, after the text, and lined up with the next row's control.
+    const label = canvas.getByText("Theme").getBoundingClientRect();
+    const box = theme.getBoundingClientRect();
+    const field = (canvasElement.querySelector(".cy-field") as Element).getBoundingClientRect();
+    await expect(box.left).toBeGreaterThan(label.right);
+    await expect(box.left).toBe(language.getBoundingClientRect().left);
+    await expect(box.width).toBe(language.getBoundingClientRect().width);
+    await expect(Math.round(box.right)).toBe(Math.round(field.right));
+    // It still opens from the keyboard.
+    theme.focus();
+    await userEvent.keyboard("{ArrowDown}");
+    await waitFor(() => expect(theme).toHaveAttribute("aria-expanded", "true"));
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() => expect(theme).toHaveAttribute("aria-expanded", "false"));
+  },
+};

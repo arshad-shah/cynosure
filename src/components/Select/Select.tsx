@@ -21,7 +21,7 @@ import { chevronDown } from "../../icons/chevron-down.js";
 import type { IconData } from "../../icons/types.js";
 import { useListboxLayer } from "../../overlay/listbox-layer.js";
 import type { DenseSize } from "../../tokens/schema.js";
-import { Field } from "../Field/Field.js";
+import { Field, type FieldProps } from "../Field/Field.js";
 import { OptionList, OptionListGroup, OptionListItem, OptionListNote } from "../OptionList/OptionList.js";
 
 export interface SelectTokens {
@@ -59,6 +59,13 @@ export interface SelectProps {
   label: ReactNode;
   /** Visually hide the label (it still names the control). Prefer visible labels. */
   labelHidden?: boolean | undefined;
+  /**
+   * `split` puts the label and description at the start and the control at the end of one row (a settings row); the
+   * control moves under the text when there is no room. Default "stack". See Field.
+   */
+  layout?: FieldProps["layout"];
+  /** Width of the control, so the controls of a column of settings line up: "sm", "md", "lg" or "full". See Field. */
+  width?: FieldProps["width"];
   /** Help text shown below the control. */
   description?: ReactNode;
   /** Your own error; it replaces the built-in required message. */
@@ -116,6 +123,8 @@ export function Select({
   label,
   labelHidden,
   description,
+  layout,
+  width,
   error,
   options,
   value,
@@ -234,6 +243,8 @@ export function Select({
     <Field
       label={label}
       labelHidden={labelHidden}
+      layout={layout}
+      width={width}
       description={description}
       error={error ?? (missing && !current ? (labels?.required ?? "Please choose a value.") : undefined)}
       required={required}

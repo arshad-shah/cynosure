@@ -3,6 +3,14 @@ import { type FieldRender, useField } from "../../foundations/field.js";
 import type { Size } from "../../tokens/schema.js";
 
 export interface FieldTokens {
+  /** Narrowest the label and description get in the split layout before the control moves under them. Default 192px. */
+  splitTextMin: string;
+  /** Width of the control at `width="lg"`. Default 384px. */
+  controlWidthLg: string;
+  /** Width of the control at `width="md"`. Default 256px. */
+  controlWidthMd: string;
+  /** Width of the control at `width="sm"`. Default 160px. */
+  controlWidthSm: string;
   gap: string;
   labelWeight: string;
   labelColor: string;
@@ -17,6 +25,9 @@ declare module "../../tokens/schema.js" {
   }
 }
 
+/** Width of a Field's control: three steps from the `--cy-field-control-width-*` tokens, or the whole field. */
+export type FieldWidth = "sm" | "md" | "lg" | "full";
+
 export interface FieldProps {
   /** Visible label; it names the control. */
   label: ReactNode;
@@ -26,6 +37,18 @@ export interface FieldProps {
   error?: ReactNode | undefined;
   /** Draws the required marker; pass `required` to the control too. */
   required?: boolean | undefined;
+  /**
+   * `stack` puts the label above the control and the description and error below it. `split` puts the label and
+   * description at the start and the control at the end of one row (a settings row); when the field is too narrow for
+   * both, the control moves under the text. Default "stack".
+   */
+  layout?: "stack" | "split" | undefined;
+  /**
+   * Width of the control, so the controls of a column of fields line up: "sm", "md" and "lg" are the
+   * `--cy-field-control-width-*` tokens (never wider than the field), "full" is the whole field. Default: the control's
+   * own width (the whole field in the stacked layout for TextField and the other fields).
+   */
+  width?: FieldWidth | undefined;
   /** Size of the label text. Default "md". */
   size?: Size | undefined;
   /** Keep the label for assistive tech but take no space (toolbars, dense rows). Prefer visible labels. */
@@ -49,6 +72,8 @@ export function Field({
   error,
   required,
   size = "md",
+  layout = "stack",
+  width,
   group,
   labelHidden,
   id,
@@ -59,28 +84,47 @@ export function Field({
   const field = useField({ id, description, error });
   // A hidden label stays in the accessibility tree; out of the flow, the grid gap collapses with it.
   const labelClass = labelHidden ? "cy-field-label cy-visually-hidden" : "cy-field-label";
+  const split = layout === "split";
+  const labelEl = group ? (
+    <span id={field.labelId} className={labelClass} data-required={required ? "" : undefined}>
+      {label}
+    </span>
+  ) : (
+    <label
+      id={field.labelId}
+      htmlFor={field.id}
+      className={labelClass}
+      data-required={required ? "" : undefined}
+    >
+      {label}
+    </label>
+  );
+  const descriptionEl = description && (
+    <span id={field.descriptionId} className="cy-field-description">
+      {description}
+    </span>
+  );
+  // The control is wrapped only when the layout or a width needs a box of its own; otherwise it stays a direct child.
+  const control =
+    split || width ? (
+      <div className="cy-field-control cy-reset" data-width={width}>
+        {children(field)}
+      </div>
+    ) : (
+      children(field)
+    );
   const body = (
     <>
-      {group ? (
-        <span id={field.labelId} className={labelClass} data-required={required ? "" : undefined}>
-          {label}
-        </span>
+      {split ? (
+        <div className="cy-field-text cy-reset">
+          {labelEl}
+          {descriptionEl}
+        </div>
       ) : (
-        <label
-          id={field.labelId}
-          htmlFor={field.id}
-          className={labelClass}
-          data-required={required ? "" : undefined}
-        >
-          {label}
-        </label>
+        labelEl
       )}
-      {children(field)}
-      {description && (
-        <span id={field.descriptionId} className="cy-field-description">
-          {description}
-        </span>
-      )}
+      {control}
+      {!split && descriptionEl}
       {field.invalid && (
         <span id={field.errorId} className="cy-field-error" role="alert">
           {error}
@@ -88,7 +132,12 @@ export function Field({
       )}
     </>
   );
-  const props = { className: `cy-field${className ? ` ${className}` : ""}`, "data-size": size, style };
+  const props = {
+    className: `cy-field${className ? ` ${className}` : ""}`,
+    "data-size": size,
+    "data-layout": split ? "split" : undefined,
+    style,
+  };
   return group ? (
     <fieldset {...props} aria-labelledby={field.labelId} aria-describedby={field.describedBy}>
       {body}

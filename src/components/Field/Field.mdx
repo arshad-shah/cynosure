@@ -38,6 +38,20 @@ The render prop gives you `id`, `describedBy` and `invalid`. Pass them to the co
 <Canvas of={Stories.ErrorAnnouncesAndMarksInvalid} />
 <Canvas of={Stories.RequiredMarkerIsDrawnNotTyped} />
 
+## Settings rows
+
+`layout="split"` puts the label and description at the start and the control at the end of one row, centred on the text, as in a settings page. When the field is too narrow for both, the control moves under the text. `width` gives the control one of three widths (or the whole field), so a column of settings lines up whatever the labels. Labels, descriptions and errors stay linked to the control. TextField and Select take both props too.
+
+```tsx
+<Field layout="split" width="md" label="Font" description="Used in the query editor.">
+  {(f) => <InputBase id={f.id} aria-describedby={f.describedBy} />}
+</Field>
+<Select layout="split" width="md" label="Theme" description="Light, dark or the system's." options={themes} />
+```
+
+<Canvas of={Stories.SplitPutsTheControlAtTheEnd} />
+<Canvas of={Stories.ControlWidthsLineUp} />
+
 ## Groups
 
 With `group`, Field renders a `fieldset` and the label names the whole group instead of one control.
@@ -54,10 +68,11 @@ With `group`, Field renders a `fieldset` and the label names the whole group ins
 - **Hidden label:** `labelHidden` keeps the label for assistive tech but takes no space. Prefer visible labels.
 - **Description and error:** linked through `aria-describedby`. The error also announces itself.
 - **Size:** `sm`, `md` (default) or `lg`.
+- **Split layout:** the order in the page stays label, description, control, then error, so screen readers and the Tab key meet them as in the stacked layout. Right-to-left text mirrors the row.
 
 ## Theming
 
-Tokens: `--cy-field-gap`, `--cy-field-label-weight`, `--cy-field-label-color`, `--cy-field-description-color`, `--cy-field-error-color` and `--cy-field-required-color`.
+Tokens: `--cy-field-gap`, `--cy-field-label-weight`, `--cy-field-label-color`, `--cy-field-description-color`, `--cy-field-error-color` and `--cy-field-required-color`. Control widths: `--cy-field-control-width-sm`, `-md` and `-lg` (160, 256 and 384px). The split layout keeps the text at least `--cy-field-split-text-min` (192px) wide before the control moves under it.
 
 ```ts
 createTheme({ components: { field: { gap: "8px", labelWeight: "600" } } });

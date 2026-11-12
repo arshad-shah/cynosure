@@ -16,6 +16,7 @@ A select-only combobox (WAI-ARIA APG): the trigger is a Cynosure button with `ro
 | Prop                                         | Default          | Notes                                                                               |
 | -------------------------------------------- | ---------------- | ----------------------------------------------------------------------------------- |
 | `label` / `description` / `error`            | –                | Through `Field`                                                                     |
+| `layout` / `width`                           | `stack` / –      | `split` settings row and the control width, as on `Field`                           |
 | `options`                                    | –                | `{ value, label, description?, icon?, iconTone?, iconColor?, disabled?, group? }[]` |
 | `value` / `defaultValue` / `onChange(value)` | –                | Controlled or uncontrolled                                                          |
 | `placeholder`                                | `"Select…"`      | Also `labels.placeholder`; `labels.empty` for no options                            |
