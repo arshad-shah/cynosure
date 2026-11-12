@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { CSSProperties } from "react";
-import { expect, fn, waitFor } from "storybook/test";
+import { expect, fn, waitFor, within } from "storybook/test";
 import { computeUnderHostileHost } from "../../test/hostile.js";
 import { Badge } from "../Badge/Badge.js";
 import { Button } from "../Button/Button.js";
@@ -26,6 +26,9 @@ const meta = {
     tone: { control: "select", options: TONES },
     as: { control: "select", options: ["div", "section", "article", "li"] },
     edge: { control: "text" },
+    title: { control: "text" },
+    description: { control: "text" },
+    headingLevel: { control: "inline-radio", options: [1, 2, 3, 4, 5, 6] },
     children: { control: "text" },
   },
 } satisfies Meta<typeof Card>;
@@ -166,6 +169,137 @@ export const ActionsBesideTheTarget: Story = {
     await expect(t.top).toBeGreaterThanOrEqual(c.top);
     await expect(t.right).toBeLessThanOrEqual(c.right);
     await expect(t.right).toBeGreaterThan(c.right - 80);
+  },
+};
+
+export const TitleAndDescriptionHeadTheCard: Story = {
+  tags: ["visual"],
+  render: () => (
+    <div style={{ display: "grid", gap: 12, inlineSize: 320 }}>
+      <Card as="section" title="Connection" description="Where the client connects." data-testid="static">
+        Host, port and database.
+      </Card>
+      <Card title="Editor" headingLevel={2} data-testid="level">
+        Font and tab size.
+      </Card>
+      <Card href="#saved" title="Saved queries" description="12 queries" data-testid="link">
+        Opened yesterday.
+      </Card>
+      <Card onClick={fn()} title="Import" description="From CSV or JSON" data-testid="button">
+        Up to 50 MB.
+      </Card>
+      <Card description="A description alone" data-testid="description">
+        Body
+      </Card>
+    </div>
+  ),
+  play: async ({ canvas }) => {
+    const part = (id: string, selector: string) =>
+      canvas.getByTestId(id).querySelector(selector) as HTMLElement;
+    // A heading, level 3 by default or as asked, with the description under it and the body under both.
+    await expect(canvas.getByRole("heading", { level: 3, name: "Connection" })).toBe(
+      part("static", ".cy-card-title"),
+    );
+    await expect(canvas.getByRole("heading", { level: 2, name: "Editor" })).toBeVisible();
+    const title = part("static", ".cy-card-title").getBoundingClientRect();
+    const description = part("static", ".cy-card-description").getBoundingClientRect();
+    const body = part("static", ".cy-card-body").getBoundingClientRect();
+    await expect(description.top).toBeGreaterThanOrEqual(title.bottom);
+    await expect(body.top).toBeGreaterThan(description.bottom);
+    await expect(part("static", ".cy-card-body")).toHaveTextContent("Host, port and database.");
+    // A section card is a region named by its title.
+    await expect(canvas.getByRole("region", { name: "Connection" })).toBe(canvas.getByTestId("static"));
+    // The description reads quieter than the title.
+    const size = (el: Element) => Number.parseFloat(getComputedStyle(el).fontSize);
+    await expect(size(part("static", ".cy-card-description"))).toBeLessThan(
+      size(part("static", ".cy-card-title")),
+    );
+    await expect(style(part("static", ".cy-card-description")).color).not.toBe(
+      style(part("static", ".cy-card-title")).color,
+    );
+    // A link card keeps its heading inside the one link, which the title names.
+    const link = canvas.getByRole("link", { name: /^Saved queries/ });
+    await expect(within(link).getByRole("heading", { level: 3, name: "Saved queries" })).toBeVisible();
+    // A button may only hold phrasing content: the title is text, not a heading, and still names the button.
+    const button = canvas.getByRole("button", { name: /^Import/ });
+    await expect(within(button).queryByRole("heading")).toBeNull();
+    await expect(button).toHaveTextContent("ImportFrom CSV or JSONUp to 50 MB.");
+    await expect(button.querySelector("div, p, h1, h2, h3, h4, h5, h6")).toBeNull();
+    // Without a title there is no heading, but the description still heads the body.
+    await expect(within(canvas.getByTestId("description")).queryByRole("heading")).toBeNull();
+    await expect(part("description", ".cy-card-description")).toHaveTextContent("A description alone");
+    // Host CSS cannot restyle the header.
+    for (const selector of [".cy-card-title", ".cy-card-description", ".cy-card-header"]) {
+      const { clean, hostile } = computeUnderHostileHost(canvas.getByTestId("static"), selector, [
+        "font-size",
+        "font-weight",
+        "line-height",
+        "color",
+        "margin-top",
+        "margin-bottom",
+        "text-transform",
+      ]);
+      await expect({ selector, ...hostile }).toEqual({ selector, ...clean });
+    }
+  },
+};
+
+export const HeaderSharesItsRowWithTheActions: Story = {
+  render: () => (
+    <div style={{ display: "grid", gap: 12, inlineSize: 300 }}>
+      <Card
+        title="A static card with a title long enough to wrap"
+        actions={<Button size="sm">Edit</Button>}
+        data-testid="static"
+      >
+        Body
+      </Card>
+      <Card
+        onClick={fn()}
+        title="A pressable card with a title long enough to wrap"
+        description="And a description"
+        actions={<Button size="sm">Snooze</Button>}
+        style={{ inlineSize: 300 }}
+      >
+        Body
+      </Card>
+      <div dir="rtl" data-testid="rtl">
+        <Card
+          title="عنوان البطاقة الطويل بما يكفي ليلتف على سطرين"
+          actions={<Button size="sm">تعديل</Button>}
+        >
+          نص
+        </Card>
+      </div>
+    </div>
+  ),
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const box = (el: Element) => el.getBoundingClientRect();
+    const titles = [...canvasElement.querySelectorAll(".cy-card-title")];
+    const [staticTitle, pressTitle, rtlTitle] = titles as [Element, Element, Element];
+    const edit = canvas.getByRole("button", { name: "Edit" });
+    const snooze = canvas.getByRole("button", { name: "Snooze" });
+    const rtlEdit = canvas.getByRole("button", { name: "تعديل" });
+    // The title wraps before the actions instead of running under them, and they share its first line.
+    for (const [title, action] of [
+      [staticTitle, edit],
+      [pressTitle, snooze],
+    ] as const) {
+      await expect(box(title).right).toBeLessThanOrEqual(box(action).left);
+      await expect(box(title).height).toBeGreaterThan(box(action).height / 2 + 10);
+      await expect(box(action).top).toBeLessThan(box(title).top + box(title).height / 2);
+    }
+    await expect(box(rtlTitle).left).toBeGreaterThanOrEqual(box(rtlEdit).right);
+    // The body still spans the whole card, under the header.
+    const body = canvas.getByTestId("static").querySelector(".cy-card-body") as Element;
+    await expect(box(body).top).toBeGreaterThanOrEqual(box(edit).bottom);
+    await expect(box(body).right).toBeGreaterThan(box(edit).left);
+    // The pressable card stays one button, and its action a separate one after it in the tab order.
+    const card = canvas.getByRole("button", { name: /^A pressable card/ });
+    await expect(card.contains(snooze)).toBe(false);
+    card.focus();
+    await userEvent.tab();
+    await expect(snooze).toHaveFocus();
   },
 };
 

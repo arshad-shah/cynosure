@@ -1,10 +1,12 @@
 import {
   type AriaAttributes,
   type CSSProperties,
+  createElement,
   type ElementType,
   forwardRef,
   type MouseEventHandler,
   type ReactNode,
+  useId,
 } from "react";
 import { ButtonBase } from "../../foundations/ButtonBase/ButtonBase.js";
 import { type Edge, edgeProps } from "../../foundations/edge.js";
@@ -12,6 +14,8 @@ import { LinkBase } from "../../foundations/LinkBase/LinkBase.js";
 import type { Tone } from "../../tokens/schema.js";
 
 export interface CardTokens {
+  /** Font size of the `title`. Default: the large font size. */
+  titleSize: string;
   /** Border colour of the current card of a set (`aria-current`). Default: the accent. */
   currentBorder: string;
   bg: string;
@@ -41,6 +45,16 @@ export interface CardProps {
    * the same thing in the card's text or a Badge. Default: no edge.
    */
   edge?: Edge;
+  /**
+   * A heading at the top of the card, above the content, beside the `actions`. In a static or link card it is a
+   * heading (`headingLevel`); in a button card it is plain text, as a button may not hold a heading. A `section`,
+   * `article` or `aside` card is named by it.
+   */
+  title?: ReactNode;
+  /** A quieter line under the title. */
+  description?: ReactNode;
+  /** Heading level of the title, to fit the page outline. Default 3. */
+  headingLevel?: 1 | 2 | 3 | 4 | 5 | 6;
   /** Element for a static card. Ignored when `href` or `onClick` makes the whole card interactive. */
   as?: "div" | "section" | "article" | "li" | "aside";
   /** Makes the whole card a link (rendered through LinkBase, so unsafe schemes are not linked). */
@@ -75,12 +89,15 @@ export interface CardProps {
 
 /** Content container. With `href` or `onClick` the whole card is one link or button (no nested controls). */
 export const Card = forwardRef<HTMLElement, CardProps>(function CardRender(props, ref) {
+  const titleId = `${useId()}-title`;
+  const headed = props.title != null || props.description != null;
   // With actions, the card itself stays one target and the actions are its siblings in a shared frame. Layout
-  // (`style`) goes on the frame; the card fills it.
+  // (`style`) goes on the frame; the card fills it. With a header, the frame keeps a column for the actions that the
+  // header stops before.
   if (props.actions !== undefined && (props.href !== undefined || props.onClick)) {
     const { actions, style, ...card } = props;
     return (
-      <div className="cy-card-frame cy-reset" style={style}>
+      <div className="cy-card-frame cy-reset" data-header={headed ? "" : undefined} style={style}>
         <Card ref={ref} {...card} />
         <div className="cy-card-actions cy-reset">{actions}</div>
       </div>
@@ -97,13 +114,48 @@ export const Card = forwardRef<HTMLElement, CardProps>(function CardRender(props
     disabled,
     actions,
     edge,
+    title,
+    description,
+    headingLevel = 3,
     className,
     style,
     children,
     ...rest
   } = props;
+  // A button holds phrasing content only: its header and body are spans, and the title is not a heading.
+  const phrasing = href === undefined && !!onClick;
+  const Box = phrasing ? "span" : "div";
+  const own = href === undefined && !onClick;
+  const content = headed ? (
+    <>
+      <Box className="cy-card-header cy-reset">
+        <Box className="cy-card-heading cy-reset">
+          {title != null &&
+            createElement(
+              phrasing ? "span" : `h${headingLevel}`,
+              { id: titleId, className: "cy-card-title cy-reset" },
+              title,
+            )}
+          {description != null &&
+            createElement(
+              phrasing ? "span" : "p",
+              { className: "cy-card-description cy-reset" },
+              description,
+            )}
+        </Box>
+        {own && actions !== undefined && <div className="cy-card-actions cy-reset">{actions}</div>}
+      </Box>
+      {children != null && <Box className="cy-card-body cy-reset">{children}</Box>}
+    </>
+  ) : (
+    children
+  );
+  // A sectioning card is a landmark or an article: its title names it.
+  const named =
+    own && title != null && !rest["aria-label"] && (as === "section" || as === "article" || as === "aside");
   const common = {
     ...rest,
+    "aria-labelledby": named ? titleId : undefined,
     className: className ? `cy-card ${className}` : "cy-card",
     ...edgeProps(edge, style),
     "data-variant": variant,
@@ -120,20 +172,20 @@ export const Card = forwardRef<HTMLElement, CardProps>(function CardRender(props
         data-interactive=""
         onClick={onClick}
       >
-        {children}
+        {content}
       </LinkBase>
     );
   if (onClick)
     return (
       <ButtonBase ref={ref as never} {...common} onClick={onClick} disabled={disabled} data-interactive="">
-        {children}
+        {content}
       </ButtonBase>
     );
   const Tag = as as ElementType;
   return (
     <Tag ref={ref} {...common}>
-      {children}
-      {actions !== undefined && <div className="cy-card-actions cy-reset">{actions}</div>}
+      {content}
+      {!headed && actions !== undefined && <div className="cy-card-actions cy-reset">{actions}</div>}
     </Tag>
   );
 });

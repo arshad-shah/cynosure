@@ -30,7 +30,18 @@ import { Card } from "@arshad-shah/cynosure";
 <Card onClick={choose}>Whole card is one button</Card>
 <Card variant="soft" tone="info">Heads up</Card>
 <Card edge="success">Water the garden <Badge tone="success">Home</Badge></Card>
+<Card as="section" title="Connection" description="Where the client connects.">…</Card>
 ```
+
+## Title and description
+
+`title` and `description` put a header above the content; `headingLevel` (default 3) fits the title into the page outline. In a static or link card the title is a heading, and a `section`, `article` or `aside` card is named by it. A button may not hold a heading, so in a button card the title is plain text that still names the button.
+
+<Canvas of={Stories.TitleAndDescriptionHeadTheCard} />
+
+With `actions` the header shares its row with them: the title wraps before the actions instead of running under them, on static cards and on link and button cards, where the actions stay outside the card's one target.
+
+<Canvas of={Stories.HeaderSharesItsRowWithTheActions} />
 
 ## Padding
 
@@ -67,7 +78,7 @@ With `href` the card renders as a link; unsafe URL schemes are not linked. With 
 | <kbd>Tab</kbd> | Moves focus to an interactive card |
 
 - **Static cards:** choose the element with `as` (`div`, `section`, `article`, `li`, `aside`).
-- **Names:** add `aria-label` when the card's content doesn't give a clear name.
+- **Names:** a `section`, `article` or `aside` card with a `title` is named by it. Otherwise add `aria-label` when the card's content doesn't give a clear name.
 - **Ref:** the ref points at the rendered element.
 - **Edge:** `edge` is visual only and adds no element or name. In forced colours it stays as a thicker edge in the system text colour.
 
@@ -78,6 +89,7 @@ Tokens: `--cy-card-bg`, `--cy-card-border`, `--cy-card-radius`, `--cy-card-shado
 | Token | Controls |
 | --- | --- |
 | `--cy-card-edge-width` | Thickness of the `edge`. Default `--cy-space-2`. |
+| `--cy-card-title-size` | Font size of the `title`. Default `--cy-font-size-lg`. |
 
 ```ts
 createTheme({ components: { card: { radius: "12px", shadow: "none", edgeWidth: "6px" } } });

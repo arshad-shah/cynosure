@@ -130,3 +130,75 @@
 .cy-card.cy-card:has(> .cy-card-actions) {
   position: relative;
 }
+
+/* Header: the title and description, then the body. In a static card the actions share the header's row; in a framed
+   (link or button) card the frame keeps a column for them that the header stops before (subgrid). */
+.cy-card-header.cy-card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--cy-space-4);
+  font-size: inherit;
+  &:not(:last-child) {
+    margin-block-end: var(--cy-space-5);
+  }
+}
+.cy-card-heading.cy-card-heading {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--cy-space-2);
+  min-inline-size: 0;
+  font-size: inherit;
+}
+.cy-card-title.cy-card-title {
+  margin: 0;
+  color: var(--cy-color-ink);
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-card-title-size, var(--cy-font-size-lg));
+  font-weight: var(--cy-font-weight-bold);
+  line-height: var(--cy-font-line-height);
+  letter-spacing: normal;
+  text-transform: none;
+  overflow-wrap: anywhere;
+}
+.cy-card-description.cy-card-description {
+  margin: 0;
+  color: var(--cy-color-muted);
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-font-size-sm);
+  font-weight: var(--cy-font-weight-regular);
+  line-height: var(--cy-font-line-height);
+  letter-spacing: normal;
+  text-transform: none;
+}
+.cy-card-body.cy-card-body {
+  display: block;
+  font-size: inherit;
+}
+.cy-card-header > .cy-card-actions.cy-card-actions {
+  position: static;
+  flex: none;
+}
+.cy-card-frame[data-header] {
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: var(--cy-space-3);
+  & > .cy-card.cy-card {
+    grid-area: 1 / 1 / 2 / -1;
+    display: grid;
+    grid-template-columns: subgrid;
+    align-content: start;
+  }
+  & > .cy-card > .cy-card-header {
+    grid-column: 1;
+  }
+  & > .cy-card > .cy-card-body {
+    grid-column: 1 / -1;
+  }
+  & > .cy-card-actions.cy-card-actions {
+    position: static;
+    grid-area: 1 / 2;
+    align-self: start;
+    margin-block-start: var(--cy-space-3);
+    margin-inline-end: var(--cy-space-3);
+  }
+}
