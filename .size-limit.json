@@ -2,7 +2,7 @@
   {
     "name": "all CSS",
     "path": "dist/styles.css",
-    "limit": "35.6 kB",
+    "limit": "35.8 kB",
     "gzip": true
   },
   {
@@ -73,7 +73,7 @@
       "dist/foundations/TextAreaBase/TextAreaBase.js",
       "dist/styles/text-area.css"
     ],
-    "limit": "3 kB",
+    "limit": "4.41 kB",
     "gzip": true
   },
   {

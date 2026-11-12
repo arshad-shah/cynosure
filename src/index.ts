@@ -476,7 +476,13 @@ export {
   type TagInputTokens,
 } from "./components/TagInput/index.js";
 export { Text, type TextProps, type TextTokens } from "./components/Text/index.js";
-export { TextArea, type TextAreaProps } from "./components/TextArea/index.js";
+export {
+  TextArea,
+  type TextAreaLabels,
+  type TextAreaMention,
+  type TextAreaProps,
+  type TextAreaSuggestions,
+} from "./components/TextArea/index.js";
 export { TextField, type TextFieldProps } from "./components/TextField/index.js";
 export { ThemeToggle, type ThemeToggleProps } from "./components/ThemeToggle/index.js";
 export {

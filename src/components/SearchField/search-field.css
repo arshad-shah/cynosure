@@ -1,0 +1,28 @@
+/* SearchField: the trailing status text (a match count) inside the field's end. The field itself is TextField's. */
+.cy-search-field-trailing.cy-search-field-trailing {
+  box-sizing: border-box !important;
+  flex: none;
+  margin: 0;
+  padding: 0;
+  color: var(--cy-search-field-trailing-color, var(--cy-color-muted));
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-search-field-trailing-font-size, var(--cy-font-size-sm));
+  font-weight: var(--cy-font-weight-regular);
+  font-variant-numeric: tabular-nums;
+  line-height: normal;
+  letter-spacing: normal;
+  text-transform: none;
+  white-space: nowrap;
+  & * {
+    font: inherit;
+    color: inherit;
+    letter-spacing: inherit;
+    text-transform: inherit;
+  }
+}
+
+@media (forced-colors: active) {
+  .cy-search-field-trailing.cy-search-field-trailing {
+    color: GrayText;
+  }
+}
