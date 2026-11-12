@@ -657,5 +657,11 @@
     "path": ["dist/components/OptionList/OptionList.js", "dist/styles/option-list.css"],
     "limit": "3 kB",
     "gzip": true
+  },
+  {
+    "name": "Menubar (JS + CSS)",
+    "path": ["dist/components/Menubar/Menubar.js", "dist/styles/menubar.css"],
+    "limit": "3 kB",
+    "gzip": true
   }
 ]

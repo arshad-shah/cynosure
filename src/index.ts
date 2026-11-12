@@ -218,6 +218,12 @@ export {
   type MenuTokens,
   type MenuTriggerProps,
 } from "./components/Menu/index.js";
+export {
+  Menubar,
+  type MenubarMenu,
+  type MenubarProps,
+  type MenubarTokens,
+} from "./components/Menubar/index.js";
 export { Notice, type NoticeLabels, type NoticeProps, type NoticeTokens } from "./components/Notice/index.js";
 export {
   NumberField,
