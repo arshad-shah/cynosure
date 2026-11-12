@@ -17,7 +17,7 @@ The **only** modules allowed to render native interactive elements (`button`, `a
 Shared hooks also live here: `roving-focus.ts` (`useRovingFocus`), `field.ts` (`useField`), `client-layout-effect.ts` (`useClientLayoutEffect`), `virtual-window.ts` (`useVirtualWindow`: windowing for equal-height rows, sized by CSS and always rendering the focused row; used by Tree and VirtualList; `sizes` and `gap` for rows of different sizes, as DocumentViewport's pages) and `hotkey.ts` (`useHotkey`: global shortcuts that work in shadow roots, skip plain keys in text fields, and honour `data-cy-hotkeys="off"`; unit-tested in `tests/unit/hotkey.test.tsx`).
 
 Shared helpers (use these instead of writing your own; a second copy is a review failure):
-- `math.ts`: `clamp(v, lo = 0, hi = 1)`, safe when `hi < lo`.
+- `math.ts`: `clamp(v, lo = 0, hi = 1)`, safe when `hi < lo`; `decimals(n)` (exponent notation included: 1e-7 has 7), `roundLike(v, step, min)` (rounds away floating-point noise to the most decimals of its sources) and `plainNumber(n)` (no exponent notation, for ARIA values and forms). Slider and NumberField step with them (`tests/unit/math.test.ts`).
 - `dir.ts`: `isRtl(el)`.
 - `focus.ts`: `deepActiveElement(doc?)`, the focused element looking inside shadow roots (`document.activeElement` stops at the host). Use it wherever focus is read: dismissal's focus return, Popover's Tab trap, Dialog's return target, Toast.
 - `motion.ts`: `transitionTime(style)`, how long a computed style's transitions take to finish (longest duration plus its delay, in ms): the wait before an overlay unmounts after its exit (Dialog, Toast).

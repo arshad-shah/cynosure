@@ -108,6 +108,41 @@ export const TypingInYourOwnFormat: Story = {
   },
 };
 
+export const ReadsItsOwnOutputInEveryLocale: Story = {
+  render: (args) => (
+    <Stack gap="4">
+      <NumberField {...args} label="Arabic" locale="ar-EG" defaultValue={1234.5} />
+      <NumberField
+        {...args}
+        label="Kroner"
+        locale="da-DK"
+        defaultValue={1234.5}
+        formatOptions={{ style: "currency", currency: "DKK" }}
+      />
+    </Stack>
+  ),
+  args: { min: undefined, max: undefined, step: 1 },
+  play: async ({ args, canvas, userEvent }) => {
+    // Arabic-Indic digits: an edit that leaves the written number as it was is read back, not undone.
+    const arabic = canvas.getByRole("spinbutton", { name: "Arabic" });
+    await expect(arabic).toHaveValue("١٬٢٣٤٫٥");
+    await userEvent.click(arabic);
+    await userEvent.keyboard("{End}٥{Enter}");
+    await expect(args.onChange).toHaveBeenLastCalledWith(1234.55);
+    await expect(arabic).toHaveAttribute("aria-valuenow", "1234.55");
+    // Danish kroner: the dot in "kr." is not a group separator.
+    const kroner = canvas.getByRole("spinbutton", { name: "Kroner" });
+    // "1.234,50 kr." with a no-break space.
+    const written = new Intl.NumberFormat("da-DK", { style: "currency", currency: "DKK" }).format(1234.5);
+    await expect(kroner).toHaveValue(written);
+    await userEvent.click(kroner);
+    await userEvent.keyboard("{End}{Backspace}.");
+    await userEvent.tab();
+    await expect(kroner).toHaveAttribute("aria-valuenow", "1234.5");
+    await expect(kroner).toHaveValue(written);
+  },
+};
+
 export const TypedValuesAreClamped: Story = {
   play: async ({ args, canvas, userEvent }) => {
     const input = canvas.getByRole("spinbutton", { name: "Seats" });
@@ -133,6 +168,17 @@ export const DecimalStepsStayExact: Story = {
     // 0.1 + 0.1 + 0.1 is 0.3 here, not 0.30000000000000004.
     await expect(input).toHaveValue("0.3");
     await expect(input).toHaveAttribute("aria-valuenow", "0.3");
+  },
+};
+
+export const ExponentSteps: Story = {
+  args: { label: "Tolerance", defaultValue: 0, min: 0, max: 1, step: 1e-7 },
+  play: async ({ canvas, userEvent }) => {
+    const input = canvas.getByRole("spinbutton", { name: "Tolerance" });
+    input.focus();
+    // A step written in exponent notation keeps its decimals instead of rounding to 0.
+    await userEvent.keyboard("{ArrowUp}{ArrowUp}");
+    await expect(input).toHaveAttribute("aria-valuenow", "0.0000002");
   },
 };
 

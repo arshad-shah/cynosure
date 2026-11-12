@@ -38,6 +38,32 @@ export const IgnoresEnterDuringComposition: Story = {
   },
 };
 
+export const EscapeDuringCompositionKeepsTheQuery: Story = {
+  args: { defaultValue: "draft" },
+  play: async ({ canvas, args }) => {
+    const box = canvas.getByRole("searchbox");
+    box.focus();
+    // Escape while composing cancels the composition: the query stays and focus stays.
+    box.dispatchEvent(new CompositionEvent("compositionstart", { bubbles: true }));
+    const composing = new KeyboardEvent("keydown", {
+      key: "Escape",
+      bubbles: true,
+      cancelable: true,
+      isComposing: true,
+    });
+    box.dispatchEvent(composing);
+    await expect(box).toHaveValue("draft");
+    await expect(box).toHaveFocus();
+    await expect(args.onChange).not.toHaveBeenCalled();
+    // Safari reports it only as keyCode 229.
+    box.dispatchEvent(
+      new KeyboardEvent("keydown", { key: "Escape", keyCode: 229, bubbles: true, cancelable: true }),
+    );
+    await expect(box).toHaveValue("draft");
+    await expect(composing.defaultPrevented).toBe(false);
+  },
+};
+
 export const EscapeClearsThenBlurs: Story = {
   args: { defaultValue: "draft" },
   play: async ({ canvas, args, userEvent }) => {

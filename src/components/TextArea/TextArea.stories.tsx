@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
-import { expect, fn } from "storybook/test";
+import { expect, fn, waitFor } from "storybook/test";
 import { computeUnderHostileHost } from "../../test/hostile.js";
 import { TextArea } from "./TextArea.js";
 
@@ -39,6 +39,33 @@ export const GrowsThenScrolls: Story = {
     await userEvent.type(area, "{enter}9{enter}10");
     await expect(area.getBoundingClientRect().height).toBe(capped);
     await expect(area.scrollHeight).toBeGreaterThan(area.clientHeight);
+  },
+};
+
+export const RefitsWhenTheWidthChanges: Story = {
+  args: {
+    rows: 1,
+    maxRows: 10,
+    defaultValue: "a few words that wrap onto more lines when the box gets narrow",
+  },
+  decorators: [
+    (Story) => (
+      <div data-testid="frame" style={{ inlineSize: 600 }}>
+        {Story()}
+      </div>
+    ),
+  ],
+  play: async ({ canvas }) => {
+    const area = canvas.getByRole("textbox", { name: "Notes" });
+    const frame = canvas.getByTestId("frame");
+    const wide = area.getBoundingClientRect().height;
+    // Narrower: the text wraps onto more lines, and the box grows to show them without a scrollbar.
+    frame.style.inlineSize = "160px";
+    await waitFor(() => expect(area.getBoundingClientRect().height).toBeGreaterThan(wide));
+    await waitFor(() => expect(area.scrollHeight).toBeLessThanOrEqual(area.clientHeight));
+    // Wider again: back to the one line.
+    frame.style.inlineSize = "600px";
+    await waitFor(() => expect(area.getBoundingClientRect().height).toBe(wide));
   },
 };
 

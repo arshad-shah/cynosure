@@ -71,6 +71,37 @@ export const ArrowKeysMoveAndChoose: Story = {
   },
 };
 
+export const TabFocusDoesNotChoose: Story = {
+  render: (args) => <Picker start="rgb(1 2 3)" onChange={args.onChange} />,
+  play: async ({ args, canvas, userEvent }) => {
+    // A custom colour that matches no swatch: Tab reaches the first swatch without replacing the colour.
+    await userEvent.tab();
+    await expect(canvas.getByRole("radio", { name: "Ember" })).toHaveFocus();
+    await expect(canvas.getByRole("radio", { name: "Ember" })).not.toBeChecked();
+    await expect(canvas.getByTestId("value")).toHaveTextContent("rgb(1 2 3)");
+    await expect(args.onChange).not.toHaveBeenCalled();
+    // Shift+Tab out and back in: still nothing chosen.
+    await userEvent.tab({ shift: true });
+    await userEvent.tab();
+    await expect(args.onChange).not.toHaveBeenCalled();
+    // Arrow keys still choose.
+    await userEvent.keyboard("{ArrowRight}");
+    await expect(canvas.getByRole("radio", { name: "Ink" })).toBeChecked();
+    await expect(args.onChange).toHaveBeenCalledTimes(1);
+    await expect(args.onChange).toHaveBeenLastCalledWith("rgb(29 27 24)");
+  },
+};
+
+export const AClickChoosesOnce: Story = {
+  render: (args) => <Picker start="rgb(1 2 3)" onChange={args.onChange} />,
+  play: async ({ args, canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole("radio", { name: "Paper" }));
+    await expect(canvas.getByRole("radio", { name: "Paper" })).toBeChecked();
+    await expect(args.onChange).toHaveBeenCalledTimes(1);
+    await expect(args.onChange).toHaveBeenLastCalledWith("rgb(251 249 245)");
+  },
+};
+
 export const MatchesByColourNotSpelling: Story = {
   render: () => <Picker start="#1D1B18" />,
   play: async ({ canvas }) => {

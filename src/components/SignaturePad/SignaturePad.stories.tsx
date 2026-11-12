@@ -186,6 +186,30 @@ export const PalmRejection: Story = {
   },
 };
 
+export const InkShowsWhileDrawingAndAfterAResize: Story = {
+  render: () => (
+    <div data-testid="frame" style={{ inlineSize: 400 }}>
+      <Signing />
+    </div>
+  ),
+  play: async ({ canvas, canvasElement }) => {
+    const c = pad(canvasElement);
+    // The stroke in progress is drawn before it is finished.
+    const release = draw(c, ZIGZAG);
+    await waitFor(() => expect(inked(c)).toBeGreaterThan(200));
+    await expect(canvas.getByTestId("count")).toHaveTextContent("0");
+    release();
+    await waitFor(() => expect(canvas.getByTestId("count")).toHaveTextContent("1"));
+    // A narrower pad gets a canvas of its new size, with the ink drawn again on it.
+    const before = inked(c);
+    canvas.getByTestId("frame").style.inlineSize = "200px";
+    await waitFor(() => expect(c.width).toBe(Math.round(c.clientWidth * window.devicePixelRatio)));
+    await waitFor(() => expect(inked(c)).toBeGreaterThan(100));
+    await expect(c.clientWidth).toBeLessThan(250);
+    await expect(before).toBeGreaterThan(200);
+  },
+};
+
 export const KeepsItsShapeAtAnySize: Story = {
   render: () => <Signing space={{ width: 600, height: 200 }} width={300} height={100} />,
   play: async ({ canvas, canvasElement }) => {

@@ -74,6 +74,39 @@ export const KeyboardMovesTheDivider: Story = {
   },
 };
 
+export const NoChangeNoCallback: Story = {
+  play: async ({ args, canvas, canvasElement, userEvent }) => {
+    const divider = canvas.getByRole("slider");
+    divider.focus();
+    // At an end already, Home, End and the arrows past it tell nobody anything.
+    await userEvent.keyboard("{Home}");
+    await expect(args.onChange).toHaveBeenCalledTimes(1);
+    await userEvent.keyboard("{Home}{ArrowLeft}{PageDown}");
+    await expect(args.onChange).toHaveBeenCalledTimes(1);
+    await userEvent.keyboard("{End}{End}{ArrowRight}");
+    await expect(args.onChange).toHaveBeenCalledTimes(2);
+    await expect(args.onChange).toHaveBeenLastCalledWith(100);
+    // A press moves the divider to the middle; a pointer move that stays on that spot is not a change.
+    const box = root(canvasElement).getBoundingClientRect();
+    const at = (type: string) =>
+      root(canvasElement).dispatchEvent(
+        new PointerEvent(type, {
+          bubbles: true,
+          button: 0,
+          pointerId: 9,
+          isPrimary: true,
+          clientX: box.left + box.width / 2,
+          clientY: box.top + box.height / 2,
+        }),
+      );
+    at("pointerdown");
+    await waitFor(() => expect(args.onChange).toHaveBeenCalledTimes(3));
+    at("pointermove");
+    at("pointerup");
+    await expect(args.onChange).toHaveBeenCalledTimes(3);
+  },
+};
+
 export const ClickOrDragWithThePointer: Story = {
   play: async ({ canvas, canvasElement, userEvent }) => {
     const divider = canvas.getByRole("slider");

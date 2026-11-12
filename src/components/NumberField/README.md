@@ -21,7 +21,7 @@ import { NumberField } from "@arshad-shah/cynosure";
 | `name`, `form`, `required`, `disabled`, `readOnly` | –           | Forms receive the plain number ("1234.5"), not the formatted text                        |
 | `labels`                                           | –           | `decrement` ("Decrease"), `increment` ("Increase")                                       |
 
-Also takes TextField's `label`, `labelHidden`, `description`, `error`, `placeholder`, `size` and `variant`. `parseNumber(text, locale, options)` is exported for reading numbers elsewhere.
+Also takes TextField's `label`, `labelHidden`, `description`, `error`, `placeholder`, `size` and `variant`. `parseNumber(text, locale, options)` is exported for reading numbers elsewhere; it reads whatever `Intl.NumberFormat` writes for that locale and options (other digits such as Arabic-Indic, currency, percent and unit text, accounting brackets).
 
 - `role="spinbutton"` with `aria-valuenow`, `aria-valuemin`, `aria-valuemax` and the formatted value as `aria-valuetext`.
 - Typing commits on Enter or leaving the field; unreadable text goes back to the last value; an empty field is `null`.

@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect } from "storybook/test";
+import { expect, fn } from "storybook/test";
 import { ChoiceBase } from "./ChoiceBase.js";
 
 const meta = {
@@ -31,6 +31,19 @@ export const Indeterminate: Story = {
   args: { indeterminate: true, "aria-label": "Select all" },
   play: async ({ canvas }) => {
     const box = canvas.getByRole("checkbox", { name: "Select all" }) as HTMLInputElement;
+    await expect(box.indeterminate).toBe(true);
+  },
+};
+
+export const IndeterminateSurvivesAClick: Story = {
+  args: { indeterminate: true, "aria-label": "Select all", onChange: fn() },
+  play: async ({ args, canvas, userEvent }) => {
+    const box = canvas.getByRole("checkbox", { name: "Select all" }) as HTMLInputElement;
+    // The browser clears the mixed state on a click; while the prop stays true it is put back.
+    await userEvent.click(box);
+    await expect(args.onChange).toHaveBeenCalledTimes(1);
+    await expect(box.indeterminate).toBe(true);
+    await userEvent.keyboard(" ");
     await expect(box.indeterminate).toBe(true);
   },
 };
