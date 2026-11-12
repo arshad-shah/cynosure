@@ -160,7 +160,10 @@ export function Tabs({
     if (next !== undefined) setCurrent(next);
   });
 
-  const safe = (v: string) => v.replace(/[^\w-]/g, "_");
+  // An id from any value, one to one: letters, digits and "-" stay; every other character (including "_") becomes
+  // "_<code>_", so "a b" and "a_b" never share an id.
+  const safe = (v: string) =>
+    v.replace(/[^A-Za-z0-9-]/gu, (c) => `_${(c.codePointAt(0) as number).toString(36)}_`);
   return (
     <Context.Provider
       value={{

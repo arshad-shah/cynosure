@@ -439,6 +439,38 @@ export const CloseLabelsOverride: Story = {
   },
 };
 
+export const ValuesThatDifferOnlyInPunctuationGetTheirOwnIds: Story = {
+  render: () => (
+    <Tabs defaultValue="a b">
+      <TabList label="Queries">
+        <Tab value="a b">Space</Tab>
+        <Tab value="a_b">Underscore</Tab>
+        <Tab value="a.b">Dot</Tab>
+      </TabList>
+      <TabPanel value="a b" keepMounted>
+        Space panel
+      </TabPanel>
+      <TabPanel value="a_b" keepMounted>
+        Underscore panel
+      </TabPanel>
+      <TabPanel value="a.b" keepMounted>
+        Dot panel
+      </TabPanel>
+    </Tabs>
+  ),
+  play: async ({ canvas, canvasElement }) => {
+    const tabs = canvas.getAllByRole("tab");
+    // Every tab and panel has its own id, so each tab controls its own panel and each panel is named by its own tab.
+    const ids = [...canvasElement.querySelectorAll("[id]")].map((el) => el.id);
+    await expect(new Set(ids).size).toBe(ids.length);
+    for (const tab of tabs) {
+      const panel = document.getElementById(tab.getAttribute("aria-controls") as string) as HTMLElement;
+      await expect(panel).toHaveTextContent(`${tab.textContent} panel`);
+      await expect(document.getElementById(panel.getAttribute("aria-labelledby") as string)).toBe(tab);
+    }
+  },
+};
+
 export const StableUnderHostileHost: Story = {
   play: async ({ canvasElement }) => {
     const props = ["height", "font-size", "padding-left", "border-top-width", "background-color", "color"];
