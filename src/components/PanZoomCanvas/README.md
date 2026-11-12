@@ -18,6 +18,7 @@ canvas.current?.centreOn(tableRect);
 | --------------------------------------- | ------------ | ------------------------------------------------------------------------------------------------------ |
 | `label`                                 | –            | Names the canvas region                                                                                |
 | `view` / `defaultView` / `onViewChange` | fit `bounds` | `{ x, y, scale }`: canvas point (x, y) shows at screen (x times scale plus view.x, and the same for y) |
+| `minScale` / `maxScale`                 | 0.25 / 8     | The zoom's limits as scales (0.2 is 20%): wheel, pinch, keys, `zoomTo` and fitting keep to them        |
 | `bounds`                                | –            | The content's extent in canvas units: for fitting and the minimap                                      |
 | `minimap`, `renderMinimap`              | `false`, –   | A minimap of `bounds` with the view on it; draw a small version of the content                         |
 | `renderScreen`                          | –            | A layer in screen pixels under the content, given `{ view, width, height }` on every view change       |

@@ -31,7 +31,7 @@ declare module "../../tokens/schema.js" {
 export interface CanvasView {
   x: number;
   y: number;
-  /** 1 = 100%; kept between 25% and 800%. */
+  /** 1 = 100%; kept between `minScale` and `maxScale`. */
   scale: number;
 }
 
@@ -72,6 +72,10 @@ export interface PanZoomCanvasProps {
   defaultView?: CanvasView;
   /** Called with the new view on every pan and zoom. */
   onViewChange?: ((view: CanvasView) => void) | undefined;
+  /** The smallest zoom, as a scale (0.2 = 20%). Default 0.25. */
+  minScale?: number;
+  /** The largest zoom, as a scale (3 = 300%). Default 8. */
+  maxScale?: number;
   /** The content's extent in canvas units, for fitting and the minimap. */
   bounds?: CanvasRect | undefined;
   /** Show a minimap of `bounds` with the view on it (drag it, or press where to look). */
@@ -95,8 +99,6 @@ export interface PanZoomCanvasProps {
 }
 
 const DEFAULT_LABELS: PanZoomCanvasLabels = { zoom: (percent) => `Zoom ${percent}%` };
-const MIN = MIN_PERCENT / 100;
-const MAX = MAX_PERCENT / 100;
 /** Pixels an arrow key pans (Shift: five times as far). */
 const STEP = 40;
 
@@ -112,6 +114,8 @@ export const PanZoomCanvas = forwardRef<PanZoomCanvasHandle, PanZoomCanvasProps>
     view,
     defaultView,
     onViewChange,
+    minScale = MIN_PERCENT / 100,
+    maxScale = MAX_PERCENT / 100,
     bounds,
     minimap = false,
     renderMinimap,
@@ -153,7 +157,7 @@ export const PanZoomCanvas = forwardRef<PanZoomCanvasHandle, PanZoomCanvasProps>
   };
   const zoomAround = (scale: number, at: { x: number; y: number }) => {
     const v = latest.current;
-    const s = clamp(scale, MIN, MAX);
+    const s = clamp(scale, minScale, maxScale);
     go({ x: at.x - ((at.x - v.x) * s) / v.scale, y: at.y - ((at.y - v.y) * s) / v.scale, scale: s });
   };
   const centre = () => ({ x: size.width / 2, y: size.height / 2 });
@@ -162,8 +166,8 @@ export const PanZoomCanvas = forwardRef<PanZoomCanvasHandle, PanZoomCanvasProps>
     const pad = Math.min(size.width, size.height) * 0.05;
     const s = clamp(
       Math.min((size.width - 2 * pad) / rect.width, (size.height - 2 * pad) / rect.height),
-      MIN,
-      MAX,
+      minScale,
+      maxScale,
     );
     go({
       x: (size.width - rect.width * s) / 2 - rect.x * s,
@@ -181,7 +185,7 @@ export const PanZoomCanvas = forwardRef<PanZoomCanvasHandle, PanZoomCanvasProps>
   };
   useImperativeHandle(ref, () => ({
     fit,
-    zoomTo: (p) => zoomAround(clampPercent(p) / 100, centre()),
+    zoomTo: (p) => zoomAround(clampPercent(p, minScale * 100, maxScale * 100) / 100, centre()),
     centreOn,
   }));
 
@@ -196,6 +200,8 @@ export const PanZoomCanvas = forwardRef<PanZoomCanvasHandle, PanZoomCanvasProps>
   const percent = Math.round(current.scale * 100);
   const gestures = useZoomGestures(surface, {
     percent,
+    min: minScale * 100,
+    max: maxScale * 100,
     onZoom: (p, at: ZoomAnchor) => zoomAround(p / 100, at ?? centre()),
     onPan: (dx, dy) => go({ ...latest.current, x: latest.current.x + dx, y: latest.current.y + dy }),
   });

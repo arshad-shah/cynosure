@@ -8,6 +8,7 @@ import {
   type CanvasView,
   PanZoomCanvas,
   type PanZoomCanvasHandle,
+  type PanZoomCanvasProps,
 } from "./PanZoomCanvas.js";
 
 const NODES = [
@@ -37,7 +38,11 @@ const card = (n: (typeof NODES)[number]) => (
 );
 
 /** A diagram as a product places it: cards in canvas units, a minimap, and buttons using the handle. */
-function Board({ start, minimap = true }: { start?: CanvasView; minimap?: boolean }) {
+function Board({
+  start,
+  minimap = true,
+  ...rest
+}: { start?: CanvasView; minimap?: boolean } & Partial<PanZoomCanvasProps>) {
   const canvas = useRef<PanZoomCanvasHandle>(null);
   const [view, setView] = useState<CanvasView | null>(null);
   return (
@@ -48,6 +53,9 @@ function Board({ start, minimap = true }: { start?: CanvasView; minimap?: boolea
         </Button>
         <Button size="sm" onClick={() => canvas.current?.zoomTo(100)}>
           Actual size
+        </Button>
+        <Button size="sm" onClick={() => canvas.current?.zoomTo(1000)}>
+          Largest
         </Button>
         <Button
           size="sm"
@@ -64,6 +72,7 @@ function Board({ start, minimap = true }: { start?: CanvasView; minimap?: boolea
           minimap={minimap}
           onViewChange={setView}
           {...(start ? { defaultView: start } : {})}
+          {...rest}
           renderMinimap={() =>
             NODES.map((n) => (
               <div
@@ -280,6 +289,89 @@ export const KeysPanZoomAndFit: Story = {
     await expect(canvasElement.querySelector('[role="status"]')).toHaveTextContent("Zoom 110%");
     await userEvent.keyboard("{Shift>}!{/Shift}");
     await waitFor(() => expect(viewOf(canvasElement).scale).toBeLessThan(1));
+  },
+};
+
+/** Two fingers, each pressed at (x, 200) and moved to its own place, then lifted. */
+function pinch(el: HTMLElement, [a, b]: [number, number], [toA, toB]: [number, number]) {
+  const r = box(el);
+  const touch = (type: string, id: number, x: number, target: EventTarget = window) =>
+    target.dispatchEvent(
+      new PointerEvent(type, {
+        bubbles: true,
+        pointerId: 20 + id,
+        pointerType: "touch",
+        isPrimary: id === 1,
+        clientX: r.left + x,
+        clientY: r.top + 200,
+      }),
+    );
+  return {
+    down: () => {
+      touch("pointerdown", 1, a, el);
+      touch("pointerdown", 2, b, el);
+    },
+    move: () => {
+      touch("pointermove", 1, toA);
+      touch("pointermove", 2, toB);
+    },
+    up: () => {
+      touch("pointerup", 1, toA);
+      touch("pointerup", 2, toB);
+    },
+  };
+}
+
+export const ZoomLimits: Story = {
+  render: () => <Board start={{ x: 0, y: 0, scale: 1 }} minScale={0.2} maxScale={3} />,
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const el = surface(canvasElement);
+    const r = box(el);
+    const wheel = (deltaY: number) =>
+      el.dispatchEvent(
+        new WheelEvent("wheel", {
+          clientX: r.left + 200,
+          clientY: r.top + 150,
+          deltaY,
+          ctrlKey: true,
+          bubbles: true,
+          cancelable: true,
+        }),
+      );
+    // The wheel stops at the largest and smallest scale the product allows (300% and 20% here).
+    wheel(-2000);
+    await waitFor(() => expect(viewOf(canvasElement).scale).toBe(3));
+    el.focus();
+    await userEvent.keyboard("{Control>}={/Control}");
+    await expect(viewOf(canvasElement).scale).toBe(3);
+    wheel(4000);
+    await waitFor(() => expect(viewOf(canvasElement).scale).toBe(0.2));
+    await userEvent.keyboard("{Control>}-{/Control}");
+    await expect(viewOf(canvasElement).scale).toBe(0.2);
+    // The keys step from the limit through the usual steps.
+    await userEvent.keyboard("{Control>}={/Control}");
+    await waitFor(() => expect(viewOf(canvasElement).scale).toBe(0.25));
+    await expect(canvasElement.querySelector('[role="status"]')).toHaveTextContent("Zoom 25%");
+    await userEvent.keyboard("{Control>}0{/Control}");
+    await waitFor(() => expect(viewOf(canvasElement).scale).toBe(1));
+    // The app's zoomTo and a pinch keep to them too.
+    await userEvent.click(canvas.getByRole("button", { name: "Largest" }));
+    await expect(viewOf(canvasElement).scale).toBe(3);
+    await userEvent.click(canvas.getByRole("button", { name: "Actual size" }));
+    await expect(viewOf(canvasElement).scale).toBe(1);
+    const fingers = pinch(el, [290, 310], [100, 500]);
+    fingers.down();
+    fingers.move();
+    await waitFor(() => expect(viewOf(canvasElement).scale).toBe(3));
+    fingers.up();
+  },
+};
+
+export const FitKeepsToTheLimits: Story = {
+  render: () => <Board minScale={0.6} maxScale={3} />,
+  play: async ({ canvasElement }) => {
+    // Fitting 1200 by 800 into this canvas needs under 50%; this canvas stops at 60%.
+    await waitFor(() => expect(viewOf(canvasElement)?.scale).toBe(0.6));
   },
 };
 

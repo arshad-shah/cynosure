@@ -25,7 +25,7 @@ A surface to pan and zoom freely, for diagrams, maps and boards; your content, p
 </PanZoomCanvas>
 ```
 
-Place children absolutely in canvas units. Give `bounds` (the content's extent) to fit it on first show, for Shift+1 and `fit()`, and for the minimap. The ref has `fit`, `zoomTo` and `centreOn` for your own buttons; pair it with [ZoomControls](?path=/docs/components-zoomcontrols--docs) for a zoom toolbar.
+Place children absolutely in canvas units. Give `bounds` (the content's extent) to fit it on first show, for Shift+1 and `fit()`, and for the minimap. `minScale` and `maxScale` set the zoom's limits (25% to 800% unless given; a schema diagram might keep to 20% to 300%): the wheel, a pinch, the keys, `zoomTo` and fitting all stop there. The ref has `fit`, `zoomTo` and `centreOn` for your own buttons; pair it with [ZoomControls](?path=/docs/components-zoomcontrols--docs) for a zoom toolbar.
 
 ## Painting into a canvas
 

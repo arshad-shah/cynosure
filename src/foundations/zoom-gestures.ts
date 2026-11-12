@@ -16,6 +16,10 @@ export interface ZoomGestureOptions {
    * it) pans without Space.
    */
   onPan?: ((dx: number, dy: number) => void) | undefined;
+  /** The smallest percent the wheel, a pinch and the keys go to. Default 25. */
+  min?: number | undefined;
+  /** The largest percent the wheel, a pinch and the keys go to. Default 800. */
+  max?: number | undefined;
 }
 
 /**
@@ -29,10 +33,10 @@ export interface ZoomGestureOptions {
  */
 export function useZoomGestures(
   scroller: RefObject<HTMLElement | null>,
-  { percent, onZoom, onPan }: ZoomGestureOptions,
+  { percent, onZoom, onPan, min = MIN_PERCENT, max = MAX_PERCENT }: ZoomGestureOptions,
 ) {
-  const latest = useRef({ percent, onZoom, onPan });
-  latest.current = { percent, onZoom, onPan };
+  const latest = useRef({ percent, onZoom, onPan, min, max });
+  latest.current = { percent, onZoom, onPan, min, max };
   /** True while two fingers are down: the first one's drag must not pan meanwhile. */
   const pinching = useRef(false);
   const [panning, setPanning] = useState(false);
@@ -50,7 +54,7 @@ export function useZoomGestures(
       return { x: x - r.left, y: y - r.top };
     };
     const zoomTo = (next: number, anchor: ZoomAnchor) => {
-      const p = clampPercent(next);
+      const p = clampPercent(next, latest.current.min, latest.current.max);
       if (p !== latest.current.percent) latest.current.onZoom(p, anchor);
       return p;
     };
@@ -67,9 +71,9 @@ export function useZoomGestures(
       }
       // The browser's own page zoom must not happen on top of ours.
       e.preventDefault();
-      const { percent: shown } = latest.current;
+      const { percent: shown, min: lo, max: hi } = latest.current;
       if (shown !== wheel.reported) wheel = { exact: shown, reported: shown };
-      const exact = clamp(wheel.exact * Math.exp(-e.deltaY * 0.0015), MIN_PERCENT, MAX_PERCENT);
+      const exact = clamp(wheel.exact * Math.exp(-e.deltaY * 0.0015), lo, hi);
       wheel = { exact, reported: zoomTo(exact, at(e.clientX, e.clientY)) };
     };
     // Pinch: two touches. detent follows one pointer at a time, so the pair is tracked here.
@@ -142,15 +146,15 @@ export function useZoomGestures(
   return {
     panning,
     onKeyDown: (event: KeyboardEvent<HTMLElement>) => {
-      const { percent: p, onZoom: zoom } = latest.current;
+      const { percent: p, onZoom: zoom, min: lo, max: hi } = latest.current;
       if (event.ctrlKey || event.metaKey) {
         const next =
           event.key === "=" || event.key === "+"
-            ? zoomStep(p, 1)
+            ? zoomStep(p, 1, lo, hi)
             : event.key === "-"
-              ? zoomStep(p, -1)
+              ? zoomStep(p, -1, lo, hi)
               : event.key === "0"
-                ? 100
+                ? clampPercent(100, lo, hi)
                 : null;
         if (next === null) return;
         event.preventDefault();
