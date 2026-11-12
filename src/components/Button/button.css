@@ -14,6 +14,12 @@
   white-space: nowrap;
   min-inline-size: 0;
 }
+/* The label clips (long labels end in an ellipsis), so its box must hold the font's whole ascent and descent: at the
+   button's line-height of 1, fonts with deep descenders (Plus Jakarta Sans) lost the tails of g, y and p. Doubled to
+   win over .cy-reset's `font: inherit` whatever the rule order. */
+.cy-button-label.cy-button-label {
+  line-height: normal;
+}
 
 /* LoadingDots overlay, centred over the (transparent) content so the button keeps its width. */
 .cy-button .cy-loading-dots.cy-button-loading {
@@ -133,6 +139,19 @@
   &[data-variant="ghost"] {
     --_bg: transparent;
     --_border: transparent;
+  }
+  /* color: a one-off colour (inline --_tone). Text on a solid fill is white or black by the colour's lightness;
+     text on the surface is the colour darkened (light mode) or lightened (dark mode) until it reads. */
+  &[data-color] {
+    --_on: oklch(from var(--_tone) clamp(0, (0.68 - l) * 1000, 1) 0 0);
+    --_tone-text: light-dark(
+      oklch(from var(--_tone) min(l, 0.48) c h),
+      oklch(from var(--_tone) max(l, 0.8) c h)
+    );
+    --_fg: var(--_tone-text);
+  }
+  &[data-color][data-variant="solid"] {
+    --_fg: var(--_on);
   }
   &[data-tone="neutral"]:is([data-variant="soft"], [data-variant="ghost"], [data-variant="outline"]) {
     --_fg: var(--cy-color-ink);

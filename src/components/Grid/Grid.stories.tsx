@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { expect, waitFor } from "storybook/test";
 import { computeUnderHostileHost } from "../../test/hostile.js";
+import { BREAKPOINT_NAMES, expectVisibilityFollowsTheWindow } from "../../test/visibility.js";
 import { Card } from "../Card/Card.js";
 import { GRID_BREAKPOINTS, Grid, type GridBreakpoint, GridItem } from "./Grid.js";
 
@@ -631,5 +632,117 @@ export const BreakpointGridStableUnderHostileHost: Story = {
     await expect(
       getComputedStyle(canvasElement.querySelector(".cy-grid") as Element).gridTemplateColumns.split(" "),
     ).toHaveLength(3);
+  },
+};
+
+export const UnequalColumns: Story = {
+  args: { columns: "2fr 1fr", gap: "4" },
+  render: (args) => (
+    <div className="frame" style={{ inlineSize: 608 }}>
+      <Grid {...args} data-testid="grid">
+        {cells(4)}
+      </Grid>
+    </div>
+  ),
+  play: async ({ canvas }) => {
+    const grid = canvas.getByTestId("grid");
+    await expect(columnsOf(grid)).toBe(2);
+    // 608px less one 8px gap: 400 and 200, two to one.
+    const [a, b] = items(grid).map(box);
+    await expect(a?.width).toBeCloseTo(400, 0);
+    await expect(b?.width).toBeCloseTo(200, 0);
+    await expect(itemsInside(grid)).toBe(true);
+  },
+};
+
+export const SpanAndOrderPerBreakpoint: Story = {
+  args: { columns: { base: 1, md: 3 } },
+  render: (args) => (
+    <div className="frame" style={{ inlineSize: 320 }}>
+      <Grid {...args} data-testid="grid">
+        <GridItem span={{ md: 2 }} order={{ base: 2, md: 1 }} data-testid="main">
+          <Card>Main</Card>
+        </GridItem>
+        <GridItem order={{ base: 1, md: 2 }} data-testid="aside">
+          <Card>Aside</Card>
+        </GridItem>
+        <GridItem span={{ base: "full", lg: 1 }} data-testid="foot">
+          <Card>Foot</Card>
+        </GridItem>
+      </Grid>
+    </div>
+  ),
+  play: async ({ canvas, canvasElement }) => {
+    const frame = canvasElement.querySelector(".frame") as HTMLElement;
+    const main = canvas.getByTestId("main");
+    const aside = canvas.getByTestId("aside");
+    const foot = canvas.getByTestId("foot");
+    const grid = canvas.getByTestId("grid");
+    // Narrow: one column, the aside comes first.
+    await waitFor(() => expect(box(aside).top).toBeLessThan(box(main).top));
+    await expect(box(main).width).toBeCloseTo(box(grid).width, 0);
+    // From md (720px of the grid's own width): two columns of three for main, one for the aside, side by side,
+    // main first.
+    frame.style.inlineSize = `${px("md")}px`;
+    await waitFor(() => expect(Math.abs(box(aside).top - box(main).top)).toBeLessThan(1));
+    await expect(box(main).left).toBeLessThan(box(aside).left);
+    await expect(box(main).width / box(aside).width).toBeGreaterThan(1.9);
+    await expect(box(foot).width).toBeCloseTo(box(grid).width, 0);
+    // From lg the foot takes one column, as given; below that it keeps `full`.
+    frame.style.inlineSize = `${px("lg")}px`;
+    await waitFor(() => expect(box(foot).width).toBeCloseTo(box(aside).width, 0));
+    await expect(itemsInside(grid)).toBe(true);
+    // The reading order is still the source order: only the picture moved.
+    await expect(items(grid)[0]).toBe(main);
+  },
+};
+
+export const StickyItem: Story = {
+  args: { columns: "1fr 2fr" },
+  render: (args) => (
+    <section
+      data-testid="scroller"
+      // biome-ignore lint/a11y/noNoninteractiveTabindex: a scrolling area must be reachable by keyboard (axe)
+      tabIndex={0}
+      aria-label="Page"
+      style={{ blockSize: 200, overflow: "auto" }}
+    >
+      <Grid {...args}>
+        <GridItem sticky stickyOffset="16px" data-testid="side">
+          <Card>On this page</Card>
+        </GridItem>
+        <div style={{ blockSize: 1000 }}>Long column</div>
+      </Grid>
+    </section>
+  ),
+  play: async ({ canvas }) => {
+    const scroller = canvas.getByTestId("scroller");
+    const side = canvas.getByTestId("side");
+    // A sticky item keeps its own height instead of stretching to the row's, so it has room to move.
+    await expect(box(side).height).toBeLessThan(200);
+    scroller.scrollTop = 500;
+    await expect(box(side).top - scroller.getBoundingClientRect().top).toBeCloseTo(16, 0);
+  },
+};
+
+export const HidesByTheWindowWidth: Story = {
+  render: () => (
+    <div data-testid="root">
+      {BREAKPOINT_NAMES.map((bp) => (
+        <Grid key={bp} columns={2}>
+          <GridItem hideBelow={bp}>{`item below ${bp}`}</GridItem>
+          <GridItem hideAbove={bp}>{`item above ${bp}`}</GridItem>
+        </Grid>
+      ))}
+      <Grid hideBelow="sm" id="cards" role="list" aria-label="Cards" columns={1}>
+        <GridItem role="listitem">grid below sm</GridItem>
+      </Grid>
+    </div>
+  ),
+  play: async ({ canvas, canvasElement }) => {
+    await expectVisibilityFollowsTheWindow(canvas.getByTestId("root"));
+    // id, role and ARIA reach the elements.
+    const list = canvasElement.querySelector("#cards") as HTMLElement;
+    if (list.checkVisibility()) await expect(canvas.getByRole("list", { name: "Cards" })).toBe(list);
   },
 };

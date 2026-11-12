@@ -165,6 +165,7 @@ export {
   GridItem,
   type GridItemProps,
   type GridProps,
+  type GridResponsive,
 } from "./components/Grid/index.js";
 export {
   Heading,
@@ -313,7 +314,16 @@ export {
   type SortableListTokens,
 } from "./components/SortableList/index.js";
 export { SplitPane, type SplitPaneProps, type SplitPaneTokens } from "./components/SplitPane/index.js";
-export { Stack, type StackProps } from "./components/Stack/index.js";
+export {
+  BREAKPOINTS,
+  type Breakpoint,
+  type LayoutAttributes,
+  type PaddingProps,
+  type Space,
+  Stack,
+  type StackProps,
+  type VisibilityProps,
+} from "./components/Stack/index.js";
 export {
   type StepItem,
   type StepStatus,
@@ -410,6 +420,7 @@ export { InputBase, type InputBaseProps } from "./foundations/InputBase/InputBas
 export { LinkBase, type LinkBaseProps } from "./foundations/LinkBase/LinkBase.js";
 export { type RovingOptions, useRovingFocus } from "./foundations/roving-focus.js";
 export { TextAreaBase, type TextAreaBaseProps } from "./foundations/TextAreaBase/TextAreaBase.js";
+export type { BrandInfo, IconCategory, IconData, IconMotion, IconNode } from "./icons/types.js";
 export { type DismissOptions, type DismissReason, useDismiss } from "./overlay/dismiss.js";
 export * from "./theme/index.js";
 export * from "./tokens/index.js";

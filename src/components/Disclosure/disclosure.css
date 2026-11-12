@@ -154,3 +154,15 @@
     outline-color: Highlight;
   }
 }
+
+/* A printout has every section open (the content is always in the page; closed is only collapsed). */
+@media print {
+  .cy-disclosure-content.cy-disclosure-content {
+    grid-template-rows: 1fr;
+    visibility: visible;
+    transition: none;
+  }
+  .cy-disclosure-chevron.cy-disclosure-chevron {
+    display: none;
+  }
+}

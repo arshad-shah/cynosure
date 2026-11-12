@@ -51,3 +51,9 @@
     flex-wrap: wrap;
   }
 }
+/* sticky: stickyOffset sets --_sticky-top inline; declaring it here stops a nested Stack inheriting its parent's. */
+.cy-stack.cy-stack[data-sticky] {
+  --_sticky-top: 0;
+  position: sticky;
+  inset-block-start: var(--_sticky-top);
+}

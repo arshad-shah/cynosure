@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 import { expect, fn, waitFor } from "storybook/test";
+import { asIfPrinting } from "../../test/print.js";
 import { Button } from "../Button/Button.js";
 import { Accordion, AccordionItem } from "./Accordion.js";
 
@@ -166,5 +167,31 @@ export const RegionsOffForLongListsAndOtherKeysIgnored: Story = {
     await expect(canvasElement.querySelector(".cy-accordion.host-accordion")).toBeTruthy();
     await userEvent.keyboard("a{ArrowRight}");
     await expect(trigger(canvas, "Formatting")).toHaveFocus();
+  },
+};
+
+export const PrintsEverySection: Story = {
+  play: async ({ canvas }) => {
+    const closed = canvas.getByText("Download as JSON, XML or YAML.");
+    // On screen a closed section's content is collapsed and out of the accessibility tree.
+    await waitFor(() => expect(closed.checkVisibility({ visibilityProperty: true })).toBe(false));
+    const stop = asIfPrinting();
+    try {
+      // On paper every section is open, at its full height.
+      for (const text of [
+        "Indentation and key order.",
+        "Schema checks on load.",
+        "Download as JSON, XML or YAML.",
+      ]) {
+        const body = canvas.getByText(text);
+        await expect(body.checkVisibility({ visibilityProperty: true })).toBe(true);
+        await expect(body.getBoundingClientRect().height).toBeGreaterThan(0);
+      }
+    } finally {
+      stop();
+    }
+    // Back on screen nothing changed: the closed section is still closed.
+    await expect(trigger(canvas, "Export")).toHaveAttribute("aria-expanded", "false");
+    await waitFor(() => expect(closed.checkVisibility({ visibilityProperty: true })).toBe(false));
   },
 };

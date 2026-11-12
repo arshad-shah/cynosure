@@ -33,6 +33,10 @@
   &:hover {
     text-decoration-color: var(--_c);
   }
+  &[data-underline="none"],
+  &[data-underline="hover"]:not(:hover, :focus-visible) {
+    text-decoration-line: none;
+  }
   &:focus-visible {
     outline: var(--cy-border-focus) solid var(--cy-color-ring);
     outline-offset: calc(var(--cy-border-width) * 2);

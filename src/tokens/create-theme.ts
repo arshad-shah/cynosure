@@ -12,6 +12,7 @@ import { BASE_GLOBAL, BASE_PALETTES, DEFAULT_ACCENT, SCALES, SYNTAX_HUES } from 
 import type { ColorTokens, GlobalTokens, PaletteName, Theme, ThemeInput } from "./schema.js";
 
 const ON_CANDIDATES = ["#ffffff", "#16120f", "#000000"] as const;
+const PALETTE_NAMES: readonly PaletteName[] = ["light", "dark", "light-contrast", "dark-contrast"];
 
 function merge<T>(base: T, patch: unknown): T {
   if (!patch || typeof patch !== "object") return base;
@@ -167,48 +168,94 @@ function assertSafe(node: unknown, path: string): void {
     }
 }
 
+/** Checks a palette patch's names and parses its colours. */
+function cleanPatch(patch: Partial<ColorTokens> | undefined): Partial<ColorTokens> {
+  const clean: Partial<ColorTokens> = {};
+  for (const [k, v] of Object.entries(patch ?? {}) as [keyof ColorTokens, string][]) {
+    if (!(k in BASE_PALETTES.light) && !DERIVED.has(k))
+      throw new CynosureThemeError(`Cynosure palettes have no colour named "${k}".`);
+    clean[k] = toHex(parseColor(v));
+  }
+  return clean;
+}
+
+/** Every colour a palette works out from its base colours and accent (a patch can still set any of them). */
+const DERIVED = new Set<string>([
+  "accent",
+  "accentHover",
+  "accentActive",
+  "accentSoft",
+  "onAccent",
+  "ring",
+  "onSuccess",
+  "onWarning",
+  "onDanger",
+  "onInfo",
+  "accentText",
+  "dangerText",
+  "successText",
+  "warningText",
+  "infoText",
+  ...SYNTAX_KEYS,
+]);
+
+/**
+ * A complete palette from its base colours and accent. Everything derived (accent roles, on-colours, text colours,
+ * code) is worked out from the colours actually used, so a product's surface or accent reaches its hover, soft tint
+ * and text colours; colours the patch sets explicitly win over the derived ones.
+ */
+function derivePalette(
+  base: ColorTokens | (typeof BASE_PALETTES)["light"],
+  accent: string,
+  dark: boolean,
+  explicit: Partial<ColorTokens>,
+  code: boolean,
+): ColorTokens {
+  const b = { ...base, ...explicit };
+  const status = (k: "success" | "warning" | "danger" | "info") => bestContrast(b[k], ON_CANDIDATES);
+  const roles = accentRoles(explicit.accent ?? accent, b.surface);
+  // The strongest tint components use is ~24% of the tone over the surface (soft hover).
+  const text = (tone: string) => readableOn(tone, [b.surface, mix(tone, b.surface, 0.24)], dark);
+  const colors = {
+    ...b,
+    ...roles,
+    onSuccess: status("success"),
+    onWarning: status("warning"),
+    onDanger: status("danger"),
+    onInfo: status("info"),
+    accentText: text(roles.accent),
+    dangerText: text(b.danger),
+    successText: text(b.success),
+    warningText: text(b.warning),
+    infoText: text(b.info),
+    ...explicit,
+  } as Omit<ColorTokens, SyntaxKey> as ColorTokens;
+  return code ? { ...colors, ...syntaxColors(colors, dark, 4.5), ...explicit } : colors;
+}
+
 /** Builds a complete theme from a product's partial input. Throws CynosureThemeError for invalid colours. */
 export function createTheme(input: ThemeInput = {}): Theme {
   const accent = input.accent ?? DEFAULT_ACCENT;
-  const palette = (name: "light" | "dark"): ColorTokens => {
-    const base = BASE_PALETTES[name];
-    const status = (k: "success" | "warning" | "danger" | "info") => bestContrast(base[k], ON_CANDIDATES);
-    const roles = accentRoles(accent, base.surface);
-    // The strongest tint components use is ~24% of the tone over the surface (soft hover).
-    const text = (tone: string) =>
-      readableOn(tone, [base.surface, mix(tone, base.surface, 0.24)], name === "dark");
-    const colors = {
-      ...base,
-      ...roles,
-      onSuccess: status("success"),
-      onWarning: status("warning"),
-      onDanger: status("danger"),
-      onInfo: status("info"),
-      accentText: text(roles.accent),
-      dangerText: text(base.danger),
-      successText: text(base.success),
-      warningText: text(base.warning),
-      infoText: text(base.info),
-    } as Omit<ColorTokens, SyntaxKey> as ColorTokens;
-    return { ...colors, ...syntaxColors(colors, name === "dark", 4.5) };
+  for (const name of Object.keys(input.palettes ?? {}))
+    if (!PALETTE_NAMES.includes(name as PaletteName))
+      throw new CynosureThemeError(`Cynosure has no palette named "${name}".`);
+  const patch = (name: PaletteName) => cleanPatch(input.palettes?.[name]);
+  const light = derivePalette(BASE_PALETTES.light, accent, false, patch("light"), true);
+  const dark = derivePalette(BASE_PALETTES.dark, accent, true, patch("dark"), true);
+  // High contrast starts from the product's own palettes (not Cynosure's) and only raises their contrast.
+  const contrast = (from: ColorTokens, isDark: boolean, name: PaletteName) => {
+    const raised = contrastPalette(from, isDark);
+    const own = patch(name);
+    if (Object.keys(own).length === 0) return raised;
+    // A contrast patch re-derives the accent roles and text colours from what it changes; code keeps its 7:1 colours.
+    return derivePalette(raised, raised.accent, isDark, own, false);
   };
-  const light = palette("light");
-  const dark = palette("dark");
   const palettes: Record<PaletteName, ColorTokens> = {
     light,
     dark,
-    "light-contrast": contrastPalette(light, false),
-    "dark-contrast": contrastPalette(dark, true),
+    "light-contrast": contrast(light, false, "light-contrast"),
+    "dark-contrast": contrast(dark, true, "dark-contrast"),
   };
-  for (const [name, patch] of Object.entries(input.palettes ?? {}) as [PaletteName, Partial<ColorTokens>][]) {
-    if (!(name in palettes)) throw new CynosureThemeError(`Cynosure has no palette named "${name}".`);
-    const clean: Partial<ColorTokens> = {};
-    for (const [k, v] of Object.entries(patch) as [keyof ColorTokens, string][]) {
-      if (!(k in light)) throw new CynosureThemeError(`Cynosure palettes have no colour named "${k}".`);
-      clean[k] = toHex(parseColor(v));
-    }
-    palettes[name] = { ...palettes[name], ...clean };
-  }
   const components: Record<string, Record<string, string>> = {};
   for (const [name, tokens] of Object.entries(input.components ?? {})) {
     if (!tokens) continue;

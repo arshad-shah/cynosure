@@ -10,18 +10,19 @@ import { download, trash } from "@arshad-shah/cynosure/icons";
 <Button loading>Saving</Button>                               // LoadingDots, aria-busy, keeps width
 ```
 
-| Prop                  | Default   | Notes                                                                 |
-| --------------------- | --------- | --------------------------------------------------------------------- |
-| `variant`             | `outline` | `solid` (filled, lit), `soft` (tinted), `outline`, `ghost`            |
-| `tone`                | `neutral` | `accent`, `neutral`, `danger`, `success`, `warning`, `info`           |
-| `size`                | `md`      | `sm` 26, `md` 32, `lg` 40 px at comfortable scale                     |
-| `icon` / `iconEnd`    | –         | Facet icons; inline-start / inline-end (RTL aware)                    |
-| `loading`             | `false`   | Centred `LoadingDots`, `aria-busy`, ignores activation, keeps width   |
-| `pressed`             | –         | Toggle button (`aria-pressed`)                                        |
-| `type`                | `button`  | Never submits unless `type="submit"`                                  |
-| `fullWidth`           | `false`   | Fills its container                                                   |
-| `aria-current`        | –         | Marks the current item of a set (`"page"`, `"step"`…), button or link |
-| `className` / `style` | –         | Layout only                                                           |
+| Prop                  | Default   | Notes                                                                                                                                                                   |
+| --------------------- | --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `variant`             | `outline` | `solid` (filled, lit), `soft` (tinted), `outline`, `ghost`                                                                                                              |
+| `tone`                | `neutral` | `accent`, `neutral`, `danger`, `success`, `warning`, `info`                                                                                                             |
+| `color`               | –         | Any CSS colour, overriding `tone` (a brand button). Text on a solid fill is white or black, whichever reads; other variants darken or lighten it to read on the surface |
+| `size`                | `md`      | `sm` 26, `md` 32, `lg` 40 px at comfortable scale                                                                                                                       |
+| `icon` / `iconEnd`    | –         | Facet icons; inline-start / inline-end (RTL aware)                                                                                                                      |
+| `loading`             | `false`   | Centred `LoadingDots`, `aria-busy`, ignores activation, keeps width                                                                                                     |
+| `pressed`             | –         | Toggle button (`aria-pressed`)                                                                                                                                          |
+| `type`                | `button`  | Never submits unless `type="submit"`                                                                                                                                    |
+| `fullWidth`           | `false`   | Fills its container                                                                                                                                                     |
+| `aria-current`        | –         | Marks the current item of a set (`"page"`, `"step"`…), button or link                                                                                                   |
+| `className` / `style` | –         | Layout only                                                                                                                                                             |
 
 Every variant × tone pair is distinct and keeps text at ≥ 4.5:1 (tested). Soft, outline and ghost text uses the tone's text role (`--cy-color-<tone>-text`).
 

@@ -112,3 +112,26 @@ export const UncontrolledToggleDrivesThePage: Story = {
     await waitFor(() => expect(canvas.getByTestId("page")).toHaveAttribute("data-mode", "light"));
   },
 };
+
+const keyed = memory();
+
+export const OwnStorageKey: Story = {
+  args: { storage: keyed.storage, storageKey: "nimaz-mode" },
+  play: async ({ canvas, userEvent }) => {
+    // Two products on one origin keep their own choice: the mode is saved under the key given.
+    keyed.data.set("cy-color-mode", "light");
+    await userEvent.click(canvas.getByRole("radio", { name: "Dark" }));
+    await expect(keyed.data.get("nimaz-mode")).toBe("dark");
+    await expect(keyed.data.get("cy-color-mode")).toBe("light");
+  },
+};
+
+const saved = memory();
+saved.data.set("site-mode", "dark");
+
+export const ReadsItsOwnKey: Story = {
+  args: { storage: saved.storage, storageKey: "site-mode" },
+  play: async ({ canvas }) => {
+    await waitFor(() => expect(canvas.getByRole("radio", { name: "Dark" })).toBeChecked());
+  },
+};

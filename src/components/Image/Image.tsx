@@ -101,7 +101,8 @@ export const Image = forwardRef<HTMLImageElement, ImageProps>(function Image(
   const captionId = useId();
   const el = useRef<HTMLImageElement>(null);
   useImperativeHandle(ref, () => el.current as HTMLImageElement);
-  // One outcome per picture: a new `src` starts again from "loading", whatever happened to the last one.
+  // One outcome per picture: a new `src` starts again from "loading", whatever happened to the last one. Before
+  // script runs the state is "pending" and the picture shows as the browser has it (pages never hydrated).
   const key = `${src} ${srcSet ?? ""}`;
   const picture = useImageOutcome(el, key);
   const state = picture.outcome;

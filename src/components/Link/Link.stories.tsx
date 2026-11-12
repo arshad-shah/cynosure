@@ -88,3 +88,32 @@ export const StableUnderHostileHost: Story = {
     await expect(hostile).toEqual(clean);
   },
 };
+
+export const UnderlineChoices: Story = {
+  render: () => (
+    <p>
+      <Link href="#a">Always</Link>{" "}
+      <Link href="#h" underline="hover">
+        On hover
+      </Link>{" "}
+      <Link href="#n" underline="none" aria-current="page">
+        Never
+      </Link>
+    </p>
+  ),
+  play: async ({ canvas, userEvent }) => {
+    const line = (name: string) => getComputedStyle(canvas.getByRole("link", { name })).textDecorationLine;
+    await expect(line("Always")).toBe("underline");
+    await expect(line("On hover")).toBe("none");
+    await expect(line("Never")).toBe("none");
+    // Keyboard focus brings the underline back on a `hover` link (as hovering does).
+    canvas.getByRole("link", { name: "Always" }).focus();
+    await userEvent.tab();
+    await expect(canvas.getByRole("link", { name: "On hover" })).toHaveFocus();
+    await expect(line("On hover")).toBe("underline");
+    // A `none` link still says where it is, and keeps its focus ring.
+    await expect(canvas.getByRole("link", { name: "Never" })).toHaveAttribute("aria-current", "page");
+    await userEvent.tab();
+    await expect(getComputedStyle(canvas.getByRole("link", { name: "Never" })).outlineStyle).toBe("solid");
+  },
+};

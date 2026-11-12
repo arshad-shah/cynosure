@@ -21,6 +21,8 @@ Shows and hides a section behind a button. Replaces native `<details>`/`<summary
 
 Tokens: `--cy-disclosure-gap`, `--cy-disclosure-radius`, `--cy-disclosure-padding-inline`.
 
+**Printing:** printed open, whatever its state on screen; the chevron is left out.
+
 ## Used by
 
 Prism (advanced options), settings panels, Accordion.

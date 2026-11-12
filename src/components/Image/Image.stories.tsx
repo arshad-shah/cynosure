@@ -340,7 +340,8 @@ export const AlreadyLoadedBeforeReactAttaches: Story = {
     const img = host.querySelector("img") as HTMLImageElement;
     await waitFor(() => expect(img.complete && img.naturalWidth > 0).toBe(true));
     await pause(50);
-    await expect(host.querySelector(".cy-image-placeholder")).not.toBeNull();
+    // Before any script runs, the server's picture shows (no placeholder over it).
+    await expect(host.querySelector(".cy-image-placeholder")).toBeNull();
     const app = hydrateRoot(host, ui);
     try {
       // No load event will come any more: the finished picture is noticed on mount.
@@ -350,6 +351,29 @@ export const AlreadyLoadedBeforeReactAttaches: Story = {
     } finally {
       app.unmount();
     }
+  },
+};
+
+export const ShowsWithoutScript: Story = {
+  render: () => <div className="server" />,
+  play: async ({ canvasElement }) => {
+    const host = canvasElement.querySelector(".server") as HTMLElement;
+    // A static page (an Astro site with no client script for this part): the server's HTML is all there is.
+    host.innerHTML = renderToString(
+      <>
+        <Image src={picture(320, 180)} alt="Static picture" ratio={16 / 9} loading="eager" />
+        <Image src={picture(120, 80)} alt="Natural size" width={120} height={80} loading="eager" />
+      </>,
+    );
+    const imgs = [...host.querySelectorAll("img")];
+    await waitFor(() => expect(imgs.every((img) => img.complete && img.naturalWidth > 0)).toBe(true));
+    for (const img of imgs) {
+      await expect(getComputedStyle(img).opacity).toBe("1");
+      await expect(img.checkVisibility({ visibilityProperty: true, opacityProperty: true })).toBe(true);
+    }
+    // Nothing is laid over the pictures.
+    await expect(host.querySelector(".cy-image-placeholder")).toBeNull();
+    await expect(box(imgs[0] as HTMLElement).width).toBeGreaterThan(0);
   },
 };
 

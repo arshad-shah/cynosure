@@ -12,16 +12,16 @@ import { Heading } from "@arshad-shah/cynosure";
 <Heading level={3} truncate>{file.name}</Heading>
 ```
 
-| Prop                  | Default            | Notes                                                                                                    |
-| --------------------- | ------------------ | -------------------------------------------------------------------------------------------------------- |
-| `level`               | `2`                | `1` to `6`: the element and the level assistive technology reports                                       |
-| `size`                | follows `level`    | `xs`, `sm`, `md`, `lg`, `xl`, `2xl`, `display`. Level 1 is `2xl`, 2 `xl`, 3 `lg`, 4 `md`, 5 `sm`, 6 `xs` |
-| `tone`                | `neutral`          | `neutral` (ink), `muted`, `accent`, `inherit` (the parent's colour)                                      |
-| `weight`              | `bold`             | `medium`, `bold`                                                                                         |
-| `align`               | – (follows parent) | `start`, `center`, `end`; start and end swap in right-to-left layouts                                    |
-| `truncate`            | `false`            | `true`: one line with an ellipsis. A number: cut after that many lines                                   |
-| `id`                  | –                  | For `aria-labelledby` and links to the section                                                           |
-| `className` / `style` | –                  | Layout only                                                                                              |
+| Prop                  | Default            | Notes                                                                                                                       |
+| --------------------- | ------------------ | --------------------------------------------------------------------------------------------------------------------------- |
+| `level`               | `2`                | `1` to `6`: the element and the level assistive technology reports                                                          |
+| `size`                | follows `level`    | `xs`, `sm`, `md`, `lg`, `xl`, `2xl`, `3xl` (1.4 × 2xl), `display`. Level 1 is `2xl`, 2 `xl`, 3 `lg`, 4 `md`, 5 `sm`, 6 `xs` |
+| `tone`                | `neutral`          | `neutral` (ink), `muted`, `accent`, `inherit` (the parent's colour)                                                         |
+| `weight`              | `bold`             | `medium`, `bold`                                                                                                            |
+| `align`               | – (follows parent) | `start`, `center`, `end`; start and end swap in right-to-left layouts                                                       |
+| `truncate`            | `false`            | `true`: one line with an ellipsis. A number: cut after that many lines                                                      |
+| `id`                  | –                  | For `aria-labelledby` and links to the section                                                                              |
+| `className` / `style` | –                  | Layout only                                                                                                                 |
 
 The ref is the heading element (`HTMLHeadingElement`).
 

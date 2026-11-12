@@ -25,6 +25,7 @@ APG tabs: `Tabs` holds the selection, `TabList` (named) holds `Tab`s, each `TabP
 | `variant`                             | `line`            | `line` underline · `soft` tinted pill           |
 | `labels`                              | –                 | `close(name)`, `moved(name, position, total)`   |
 
+
 `TabList`: `label`, `onReorder(values)` (reorderable tabs). `Tab`: `value`, `icon`, `disabled`, `onClose` (closable tab). `TabPanel`: `value`, `keepMounted` (keep hidden content mounted). Tabs without a `TabPanel` (e.g. routed content) are valid: they simply omit `aria-controls`.
 
 - One Tab stop; arrows (RTL aware), Home and End; disabled tabs skipped; Tab moves to the panel.
@@ -33,6 +34,8 @@ APG tabs: `Tabs` holds the selection, `TabList` (named) holds `Tab`s, each `TabP
 - Overflowing lists scroll; edges with hidden tabs fade, and the selected or focused tab is scrolled clear of the fade.
 
 Tokens: `--cy-tabs-gap`, `--cy-tabs-indicator`, `--cy-tabs-indicator-width`, `--cy-tabs-radius`.
+
+**Printing:** a printout has every panel, in order. TabPanel renders the content of unselected panels while the page is printed (`beforeprint`), and the print stylesheet shows them.
 
 ## Used by
 

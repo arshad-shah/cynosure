@@ -79,6 +79,10 @@
   &[data-edge="info"] {
     --_edge: var(--cy-color-info);
   }
+  /* The current card of a set (aria-current): the accent border, as other current items. */
+  &[data-interactive]:is([aria-current]:not([aria-current="false"])) {
+    border-color: var(--cy-card-current-border, var(--cy-color-accent));
+  }
   &[data-interactive] {
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;

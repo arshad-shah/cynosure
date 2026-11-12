@@ -24,8 +24,11 @@ export interface EmptyStateProps {
   description?: ReactNode | undefined;
   /** Buttons for the next step ("Create a project", "Clear filters"). */
   actions?: ReactNode | undefined;
-  /** Heading level of the title, to fit the page outline (default 3). */
-  headingLevel?: 2 | 3 | 4 | 5 | 6;
+  /**
+   * Heading level of the title, to fit the page outline (default 3). 1 when the empty state is the page itself (a
+   * not-found page): the look stays the same.
+   */
+  headingLevel?: 1 | 2 | 3 | 4 | 5 | 6;
   /** `sm` for panels and popups, `md` for page areas. */
   size?: Extract<Size, "sm" | "md">;
   /** Added to the root element, for layout. */

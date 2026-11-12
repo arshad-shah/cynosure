@@ -20,6 +20,7 @@ describe("package manifest", () => {
       "./styles/*.css",
       "./styles.inline",
       "./vite",
+      "./astro",
       "./fonts/*",
       "./package.json",
     ]);

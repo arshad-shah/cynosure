@@ -270,3 +270,52 @@ describe("component tokens of multi-word components", () => {
     expect(css).not.toContain("--cy-sideNav");
   });
 });
+
+describe("palette overrides feed what is derived from them", () => {
+  const surface = "#102030";
+  const accent = "#2563eb";
+
+  it("accentSoft is mixed with the palette's own surface", () => {
+    const { light, dark } = createTheme({
+      palettes: { light: { surface }, dark: { surface: "#0a0a0a" } },
+    }).palettes;
+    expect(light.accentSoft).toContain(surface);
+    expect(dark.accentSoft).toContain("#0a0a0a");
+  });
+
+  it("an accent given for one palette re-derives that palette's hover, active, soft, text and on-accent", () => {
+    const theme = createTheme({ palettes: { dark: { accent } } });
+    const plain = createTheme({ accent }).palettes.dark;
+    const { dark, light } = theme.palettes;
+    for (const k of ["accentHover", "accentActive", "accentSoft", "onAccent", "accentText", "ring"] as const)
+      expect(dark[k]).toBe(plain[k]);
+    expect(light.accent).toBe(createTheme().palettes.light.accent);
+  });
+
+  it("a role given explicitly wins over the derived one", () => {
+    const { light } = createTheme({ palettes: { light: { accent, accentHover: "#000000" } } }).palettes;
+    expect(light.accentHover).toBe("#000000");
+    expect(light.accentActive).toBe(createTheme({ accent }).palettes.light.accentActive);
+  });
+
+  it("the high-contrast palettes keep the product's palette", () => {
+    const bg = "#e8f0ff";
+    const theme = createTheme({ accent, palettes: { light: { bg, surface, ink: "#001133" } } });
+    const hc = theme.palettes["light-contrast"];
+    expect(hc.bg).toBe(bg);
+    expect(hc.surface).toBe(surface);
+    expect(hc.accent).toBe(accent);
+    expect(hc.accentSoft).toContain(surface);
+    expect(contrastRatio(hc.muted, bg)).toBeGreaterThanOrEqual(7);
+    // The product's (contrast) palette reaches the stylesheet's prefers-contrast block.
+    const css = themeToCss(theme);
+    const block = css.slice(css.indexOf("@media (prefers-contrast:more)"));
+    expect(block).toContain(bg);
+  });
+
+  it("a contrast palette patch re-derives its accent roles too", () => {
+    const hc = createTheme({ palettes: { "dark-contrast": { accent } } }).palettes["dark-contrast"];
+    expect(hc.accent).toBe(accent);
+    expect(hc.accentHover).toBe(createTheme({ accent }).palettes.dark.accentHover);
+  });
+});

@@ -574,3 +574,22 @@ export const StableUnderHostileHost: Story = {
     }
   },
 };
+
+export const BetweenMediumAndLarge: Story = {
+  args: { title: "Prayer times", titleSize: "3xl", actions: undefined },
+  render: (args) => (
+    <div style={{ display: "grid", gap: 32 }}>
+      <PageHeader {...args} />
+      <PageHeader {...args} titleSize={undefined} title="Medium title" />
+      <PageHeader {...args} titleSize={undefined} size="lg" title="Large title" />
+    </div>
+  ),
+  play: async ({ canvas }) => {
+    const px = (name: string) =>
+      Number.parseFloat(getComputedStyle(canvas.getByRole("heading", { name })).fontSize);
+    // Larger than "md" (2xl), smaller than the hero size, and still the page's h1.
+    await expect(px("Prayer times")).toBeGreaterThan(px("Medium title"));
+    await expect(px("Prayer times")).toBeLessThan(px("Large title"));
+    await expect(canvas.getByRole("heading", { name: "Prayer times", level: 1 })).toBeInTheDocument();
+  },
+};

@@ -1,5 +1,11 @@
 import { type CSSProperties, type ElementType, forwardRef, type ReactNode } from "react";
-import { type Space, space } from "../Stack/space.js";
+import {
+  type LayoutAttributes,
+  type Space,
+  space,
+  type VisibilityProps,
+  visibilityAttrs,
+} from "../Stack/space.js";
 
 export interface ContainerTokens {
   /** Widest a `size="sm"` container gets, gutters included. */
@@ -20,7 +26,7 @@ declare module "../../tokens/schema.js" {
   }
 }
 
-export interface ContainerProps {
+export interface ContainerProps extends VisibilityProps, LayoutAttributes {
   /** Widest the column gets, gutters included; `full` has no limit. Default "lg". */
   size?: "sm" | "md" | "lg" | "xl" | "full";
   /**
@@ -46,7 +52,19 @@ export interface ContainerProps {
 
 /** The page column: centres its content, caps its width and adds side gutters, so every page lines up. */
 export const Container = forwardRef<HTMLElement, ContainerProps>(function Container(
-  { size = "lg", padding, paddingBlock, center = true, as = "div", className, style, children, ...rest },
+  {
+    size = "lg",
+    padding,
+    paddingBlock,
+    center = true,
+    hideBelow,
+    hideAbove,
+    as = "div",
+    className,
+    style,
+    children,
+    ...rest
+  },
   ref,
 ) {
   const Tag = as as ElementType;
@@ -60,6 +78,7 @@ export const Container = forwardRef<HTMLElement, ContainerProps>(function Contai
       className={`cy-container${className ? ` ${className}` : ""}`}
       data-size={size}
       data-center={center ? "" : undefined}
+      {...visibilityAttrs({ hideBelow, hideAbove })}
       style={{ ...vars, ...style } as CSSProperties}
     >
       {children}

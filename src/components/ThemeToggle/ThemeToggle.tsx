@@ -14,6 +14,12 @@ export interface ThemeToggleProps {
   onChange?: (mode: ColorMode) => void;
   /** Persistence for uncontrolled use (localStorage by default; chrome.storage works too). */
   storage?: ColorModeStorage;
+  /**
+   * The key the mode is saved under, for uncontrolled use. Give each product on a shared origin its own, and pass the
+   * same one to `themeInitScript({ key })` so the saved mode is applied before the first paint. Default
+   * "cy-color-mode".
+   */
+  storageKey?: string | undefined;
   /** Size of the control. Default "md". */
   size?: Size;
   /**
@@ -41,13 +47,14 @@ export function ThemeToggle({
   value,
   onChange,
   storage,
+  storageKey,
   size = "md",
   variant = "segmented",
   labels,
   className,
   style,
 }: ThemeToggleProps) {
-  const color = useColorMode(storage ? { storage } : {});
+  const color = useColorMode({ ...(storage ? { storage } : {}), ...(storageKey ? { key: storageKey } : {}) });
   const mode = value ?? color.mode;
   const set = (next: ColorMode) => {
     if (value === undefined) color.setMode(next);

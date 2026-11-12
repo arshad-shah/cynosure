@@ -1,2 +1,9 @@
 export { Stack, type StackProps } from "./Stack.js";
-export type { PaddingProps, Space } from "./space.js";
+export {
+  BREAKPOINTS,
+  type Breakpoint,
+  type LayoutAttributes,
+  type PaddingProps,
+  type Space,
+  type VisibilityProps,
+} from "./space.js";

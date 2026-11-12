@@ -1,3 +1,5 @@
+import type { AriaAttributes, HTMLAttributes } from "react";
+
 /** A step of the theme's space scale (`--cy-space-0` … `--cy-space-10`). */
 export type Space = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" | "10";
 
@@ -24,3 +26,30 @@ export function paddingVars({ padding, paddingInline = padding, paddingBlock = p
   if (paddingBlock) vars["--_pad-block"] = space(paddingBlock);
   return vars;
 }
+
+/**
+ * The named widths of the layout scale. Grid's per-breakpoint `columns` measure the grid's own width; `hideBelow` and
+ * `hideAbove` measure the window. A breakpoint applies from its width upwards. `base.css` and `grid.css` repeat these
+ * values (a media or container query cannot read a custom property): change them together.
+ */
+export const BREAKPOINTS = { sm: "30rem", md: "45rem", lg: "60rem", xl: "75rem" } as const;
+
+/** A named width of the layout scale (`BREAKPOINTS`). */
+export type Breakpoint = keyof typeof BREAKPOINTS;
+
+/** Attributes every layout primitive passes to its element: an id to link to, a role and ARIA attributes. */
+export interface LayoutAttributes extends Pick<HTMLAttributes<HTMLElement>, "id" | "role">, AriaAttributes {}
+
+/** Showing or hiding a layout box by the width of the window, with no script. */
+export interface VisibilityProps {
+  /** Hidden while the window is narrower than this breakpoint (`md`: below 45rem). */
+  hideBelow?: Breakpoint | undefined;
+  /** Hidden from this breakpoint upwards (`md`: 45rem and wider). */
+  hideAbove?: Breakpoint | undefined;
+}
+
+/** The data attributes `base.css` hides a box by. */
+export const visibilityAttrs = ({ hideBelow, hideAbove }: VisibilityProps) => ({
+  "data-cy-hide-below": hideBelow,
+  "data-cy-hide-above": hideAbove,
+});

@@ -1,7 +1,15 @@
 import { type CSSProperties, type ElementType, forwardRef, type ReactNode } from "react";
-import { type PaddingProps, paddingVars, type Space, space } from "../Stack/space.js";
+import {
+  type LayoutAttributes,
+  type PaddingProps,
+  paddingVars,
+  type Space,
+  space,
+  type VisibilityProps,
+  visibilityAttrs,
+} from "../Stack/space.js";
 
-export interface InlineProps extends PaddingProps {
+export interface InlineProps extends PaddingProps, VisibilityProps, LayoutAttributes {
   /** Space token between children. */
   gap?: Space;
   /** Cross-axis alignment of children. They are centred when it is not set. */
@@ -32,6 +40,8 @@ export const Inline = forwardRef<HTMLElement, InlineProps>(function Inline(
     align,
     justify,
     wrap = false,
+    hideBelow,
+    hideAbove,
     as = "div",
     className,
     style,
@@ -49,6 +59,7 @@ export const Inline = forwardRef<HTMLElement, InlineProps>(function Inline(
       data-align={align}
       data-justify={justify}
       data-wrap={wrap ? "" : undefined}
+      {...visibilityAttrs({ hideBelow, hideAbove })}
       style={
         {
           "--_gap": space(gap),

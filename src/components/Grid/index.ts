@@ -6,4 +6,5 @@ export {
   GridItem,
   type GridItemProps,
   type GridProps,
+  type GridResponsive,
 } from "./Grid.js";

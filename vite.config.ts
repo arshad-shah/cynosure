@@ -19,6 +19,7 @@ export default defineConfig({
         "entries/tokens": "src/entries/tokens.ts",
         "styles/inline": "src/styles/inline.ts",
         "adapters/vite/index": "src/adapters/vite/index.ts",
+        "adapters/astro/index": "src/adapters/astro/index.ts",
       },
     },
     rollupOptions: {

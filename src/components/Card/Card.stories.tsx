@@ -407,3 +407,31 @@ export const CustomEdgeKeepsLayoutStyle: Story = {
     await expect(rgba(style(tile).borderLeftColor)).toEqual(rgba("teal"));
   },
 };
+
+export const CurrentCardOfASet: Story = {
+  render: () => (
+    <nav aria-label="Sections" style={{ display: "flex", gap: 8 }}>
+      <Card href="#prayer" aria-current="page">
+        Prayer times
+      </Card>
+      <Card href="#qibla">Qibla</Card>
+      <Card onClick={fn()} aria-current="step">
+        Step card
+      </Card>
+    </nav>
+  ),
+  play: async ({ canvas }) => {
+    const current = canvas.getByRole("link", { name: "Prayer times" });
+    const other = canvas.getByRole("link", { name: "Qibla" });
+    // Screen readers hear which card is the page being shown; the eye sees the accent border.
+    await expect(current).toHaveAttribute("aria-current", "page");
+    await expect(other).not.toHaveAttribute("aria-current");
+    await expect(canvas.getByRole("button", { name: "Step card" })).toHaveAttribute("aria-current", "step");
+    await expect(getComputedStyle(current).borderTopColor).not.toBe(getComputedStyle(other).borderTopColor);
+    const probe = document.createElement("span");
+    probe.style.color = "var(--cy-color-accent)";
+    current.append(probe);
+    await expect(getComputedStyle(current).borderTopColor).toBe(getComputedStyle(probe).color);
+    probe.remove();
+  },
+};

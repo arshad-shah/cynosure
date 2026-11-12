@@ -109,7 +109,7 @@ button.cy-steps-step.cy-steps-step {
   font-variant-numeric: tabular-nums;
   font-weight: var(--cy-font-weight-medium);
   line-height: 1;
-  [data-status="current"] > .cy-steps-step > & {
+  :is([data-status="current"], [data-status="step"]) > .cy-steps-step > & {
     border-color: var(--cy-color-accent-text);
     color: var(--cy-color-accent-text);
   }

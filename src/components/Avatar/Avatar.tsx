@@ -143,9 +143,10 @@ export const Avatar = forwardRef<HTMLSpanElement, AvatarProps>(function Avatar(
 ) {
   const groupSize = useContext(GroupSize);
   const image = useRef<HTMLImageElement>(null);
-  // A new `src` starts again from the fallback; the picture shows once it has loaded and goes if it fails.
+  // A new `src` starts again from the fallback; the picture shows once it has loaded and goes if it fails. Before
+  // script runs (server HTML, a page never hydrated) the picture is shown over the fallback as the browser has it.
   const picture = useImageOutcome(image, src ?? "");
-  const outcome = picture.outcome === "loading" ? undefined : picture.outcome === "loaded";
+  const outcome = picture.outcome === "loaded" ? true : picture.outcome === "error" ? false : undefined;
   const letters = initials ?? (icon ? "" : initialsOf(name));
   return (
     <span
@@ -177,7 +178,7 @@ export const Avatar = forwardRef<HTMLSpanElement, AvatarProps>(function Avatar(
           className="cy-reset cy-avatar-image"
           src={src}
           alt=""
-          data-loaded={outcome ? "" : undefined}
+          data-state={picture.outcome}
           onLoad={picture.loaded}
           onError={picture.failed}
         />

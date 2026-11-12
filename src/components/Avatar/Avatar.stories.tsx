@@ -1,5 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { type CSSProperties, useRef, useState } from "react";
+import { hydrateRoot } from "react-dom/client";
+import { renderToString } from "react-dom/server";
 import { expect, userEvent, waitFor } from "storybook/test";
 import { folder, user } from "../../icons/index.js";
 import { textContrast } from "../../test/color.js";
@@ -43,7 +45,7 @@ const box = (el: Element) => el.getBoundingClientRect();
 const css = (el: Element) => getComputedStyle(el);
 const avatars = (root: Element) => [...root.querySelectorAll(".cy-avatar")] as HTMLElement[];
 const loaded = (root: Element) =>
-  waitFor(() => expect(root.querySelector("img[data-loaded]")).not.toBeNull());
+  waitFor(() => expect(root.querySelector('img[data-state="loaded"]')).not.toBeNull());
 
 export const NamedPictureOfAPerson: Story = {
   args: { className: "mine", style: { marginInlineStart: 8 } },
@@ -658,5 +660,43 @@ export const StableUnderHostileHost: Story = {
       const { clean, hostile } = computeUnderHostileHost(canvasElement, selector, props);
       await expect({ selector, ...hostile }).toEqual({ selector, ...clean });
     }
+  },
+};
+
+export const ShowsWithoutScript: Story = {
+  render: () => <div className="server" />,
+  play: async ({ canvasElement }) => {
+    const host = canvasElement.querySelector(".server") as HTMLElement;
+    const ui = <Avatar name="Ada Lovelace" src={PICTURE} size="lg" />;
+    // A static page (an Astro footer with no client script): the server's HTML is all there is.
+    host.innerHTML = renderToString(ui);
+    const img = host.querySelector("img") as HTMLImageElement;
+    await waitFor(() => expect(img.complete && img.naturalWidth > 0).toBe(true));
+    await expect(img.checkVisibility({ visibilityProperty: true, opacityProperty: true })).toBe(true);
+    // The picture covers the initials beneath it, and the avatar is still named.
+    await expect(box(img).width).toBeCloseTo(box(host.querySelector(".cy-avatar") as Element).width, 0);
+    await expect(host.querySelector('[role="img"]')).toHaveAccessibleName("Ada Lovelace");
+    // Hydrating later changes nothing that is seen: the finished picture is noticed and the initials go.
+    const app = hydrateRoot(host, ui);
+    try {
+      await loaded(host);
+      await expect(host.querySelector(".cy-avatar-initials")).toBeNull();
+      await expect(host.querySelector("img")).toBe(img);
+    } finally {
+      app.unmount();
+    }
+  },
+};
+
+export const MissingPictureWithoutScript: Story = {
+  render: () => <div className="server" />,
+  play: async ({ canvasElement }) => {
+    const host = canvasElement.querySelector(".server") as HTMLElement;
+    host.innerHTML = renderToString(<Avatar name="Grace Hopper" src={MISSING} />);
+    const img = host.querySelector("img") as HTMLImageElement;
+    await waitFor(() => expect(img.complete).toBe(true));
+    // A broken picture with empty alt draws nothing, so the initials beneath it still read.
+    await expect(host.querySelector(".cy-avatar-initials")).toHaveTextContent("GH");
+    await expect(img.naturalWidth).toBe(0);
   },
 };

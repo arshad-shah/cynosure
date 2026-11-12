@@ -107,6 +107,10 @@
       "types": "./dist/adapters/vite/index.d.ts",
       "default": "./dist/adapters/vite/index.js"
     },
+    "./astro": {
+      "types": "./dist/adapters/astro/index.d.ts",
+      "default": "./dist/adapters/astro/index.js"
+    },
     "./fonts/*": "./dist/fonts/*",
     "./package.json": "./package.json"
   },

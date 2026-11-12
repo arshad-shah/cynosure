@@ -46,6 +46,12 @@ export interface ButtonProps extends Omit<ButtonBaseProps, "children" | "classNa
   variant?: ButtonVariant;
   /** Semantic colour. */
   tone?: Tone;
+  /**
+   * A one-off colour (any CSS colour), for a brand button such as "Get it on Google Play". Overrides `tone`. The text
+   * on a solid fill is white or black, whichever reads; on the other variants the colour is darkened or lightened
+   * until it reads on the surface. Prefer a tone or the theme's accent.
+   */
+  color?: string | undefined;
   /** Height and text size of the button. Default "md". */
   size?: Size;
   /** Leading icon (inline-start, RTL aware). */
@@ -94,6 +100,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
   {
     variant = "outline",
     tone = "neutral",
+    color,
     size = "md",
     icon,
     iconEnd,
@@ -135,11 +142,13 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
   const shared = {
     className: `cy-button cy-motion-trigger${className ? ` ${className}` : ""}`,
     "data-variant": variant,
-    "data-tone": tone,
+    "data-tone": color ? undefined : tone,
+    "data-color": color ? "" : undefined,
     "data-size": size,
     "data-full": fullWidth ? "" : undefined,
     "data-loading": loading ? "" : undefined,
     "data-armed": armed ? "" : undefined,
+    style: color ? ({ "--_tone": color, ...rest.style } as CSSProperties) : rest.style,
   };
   const content = (
     <>
@@ -160,7 +169,6 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
         data-testid={rest["data-testid"]}
         aria-label={rest["aria-label"]}
         aria-current={rest["aria-current"]}
-        style={rest.style}
         onClick={onClick as unknown as (e: MouseEvent<HTMLAnchorElement>) => void}
       >
         {content}

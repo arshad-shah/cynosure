@@ -24,6 +24,7 @@ import { Breadcrumbs, Button, PageHeader } from "@arshad-shah/cynosure";
 | `title`               | required | The header's one heading, rendered with `Heading`                                                             |
 | `headingLevel`        | `1`      | `1`, `2` or `3`, to fit the page outline                                                                      |
 | `size`                | `md`     | `md`: Heading's usual size for the level (level 1 `2xl`, 2 `xl`, 3 `lg`). `lg`: Heading's `display` hero size |
+| `titleSize`           | –        | Any Heading size for the title instead of `size`'s: `3xl` sits between `md` and `lg`                          |
 | `eyebrow`             | –        | Small label above the title (`Text variant="eyebrow"`, a paragraph)                                           |
 | `description`         | –        | Lead paragraph under the title (`Text variant="lead"`), at most 65ch wide. Inline content only                |
 | `breadcrumbs`         | –        | Shown above the eyebrow and title. Pass a `Breadcrumbs`                                                       |

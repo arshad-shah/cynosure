@@ -44,7 +44,7 @@ const meta = {
   args: { children: "Export settings", level: 2, tone: "neutral", weight: "bold", truncate: false },
   argTypes: {
     level: { control: "inline-radio", options: LEVELS },
-    size: { control: "select", options: [undefined, ...SCALE, "display"] },
+    size: { control: "select", options: [undefined, ...SCALE, "3xl", "display"] },
     tone: { control: "inline-radio", options: ["inherit", "neutral", "muted", "accent"] },
     weight: { control: "inline-radio", options: ["medium", "bold"] },
     align: { control: "inline-radio", options: [undefined, "start", "center", "end"] },
@@ -127,7 +127,7 @@ export const SizeIsSeparateFromLevel: Story = {
   tags: ["visual"],
   render: (args) => (
     <div style={{ display: "grid", gap: "var(--cy-space-4)", padding: "var(--cy-space-6)" }}>
-      {[...SCALE, "display" as const].map((size) => (
+      {[...SCALE, "3xl" as const, "display" as const].map((size) => (
         <Heading key={size} {...args} level={3} size={size}>
           Size {size}
         </Heading>
@@ -135,9 +135,9 @@ export const SizeIsSeparateFromLevel: Story = {
     </div>
   ),
   play: async ({ canvas }) => {
-    // Seven looks, one level: the outline does not change.
+    // Eight looks, one level: the outline does not change.
     const headings = canvas.getAllByRole("heading", { level: 3 });
-    await expect(headings).toHaveLength(7);
+    await expect(headings).toHaveLength(8);
     for (const heading of headings) await expect(heading.tagName).toBe("H3");
     for (const size of SCALE) {
       const heading = canvas.getByRole("heading", { name: `Size ${size}` });
@@ -150,6 +150,9 @@ export const SizeIsSeparateFromLevel: Story = {
     const largest = px(canvas.getByRole("heading", { name: "Size 2xl" }), "font-size");
     await expect(display).toBeGreaterThanOrEqual(largest * 1.25);
     await expect(display).toBeLessThanOrEqual(largest * 2);
+    // "3xl" sits between them: 1.4 times "2xl" at every width.
+    const between = px(canvas.getByRole("heading", { name: "Size 3xl" }), "font-size");
+    await expect(between).toBeCloseTo(largest * 1.4, 0);
   },
 };
 
