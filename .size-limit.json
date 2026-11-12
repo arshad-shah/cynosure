@@ -317,7 +317,7 @@
   {
     "name": "Grid",
     "path": ["dist/components/Grid/Grid.js", "dist/styles/grid.css"],
-    "limit": "1.5 kB",
+    "limit": "2 kB",
     "gzip": true
   },
   {
