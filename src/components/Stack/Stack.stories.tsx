@@ -23,13 +23,53 @@ const meta = {
     padding: { control: "select", options: SPACES },
     paddingInline: { control: "select", options: SPACES },
     paddingBlock: { control: "select", options: SPACES },
-    align: { control: "inline-radio", options: ["start", "center", "end", "stretch"] },
+    direction: { control: "inline-radio", options: ["column", "row"] },
+    align: { control: "inline-radio", options: ["start", "center", "end", "stretch", "baseline"] },
     justify: { control: "inline-radio", options: ["start", "center", "end", "between"] },
     as: { control: "select", options: ["div", "section", "ul", "ol", "nav", "aside", "header", "footer"] },
   },
 } satisfies Meta<typeof Stack>;
 export default meta;
 type Story = StoryObj<typeof meta>;
+
+export const DirectionRowLaysOutARow: Story = {
+  render: () => (
+    <>
+      <Stack direction="row" gap="4" data-testid="row">
+        <Badge>One</Badge>
+        <Badge>Two</Badge>
+      </Stack>
+      <Stack data-testid="column">
+        <Badge>Three</Badge>
+        <Badge>Four</Badge>
+      </Stack>
+      <Stack direction="row" align="baseline" data-testid="baseline">
+        <span style={{ fontSize: 12 }}>small</span>
+        <span style={{ fontSize: 32 }}>Large</span>
+      </Stack>
+    </>
+  ),
+  play: async ({ canvas }) => {
+    const row = canvas.getByTestId("row");
+    await expect([getComputedStyle(row).flexDirection, getComputedStyle(row).columnGap]).toEqual([
+      "row",
+      "8px",
+    ]);
+    const [one, two] = [canvas.getByText("One"), canvas.getByText("Two")].map((b) =>
+      b.getBoundingClientRect(),
+    );
+    await expect((two as DOMRect).left).toBeGreaterThan((one as DOMRect).right);
+    await expect((two as DOMRect).top).toBeCloseTo((one as DOMRect).top, 0);
+    // The default stays a column, and a row Stack neither centres nor wraps: that is Inline's.
+    await expect(getComputedStyle(canvas.getByTestId("column")).flexDirection).toBe("column");
+    await expect([getComputedStyle(row).alignItems, getComputedStyle(row).flexWrap]).toEqual([
+      "normal",
+      "nowrap",
+    ]);
+    await expect(row).not.toHaveClass("cy-inline");
+    await expect(getComputedStyle(canvas.getByTestId("baseline")).alignItems).toBe("baseline");
+  },
+};
 
 export const GapsUseSpaceTokens: Story = {
   tags: ["visual"],

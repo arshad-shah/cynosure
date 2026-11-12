@@ -12,10 +12,12 @@ import {
 export interface StackProps extends PaddingProps, VisibilityProps, LayoutAttributes {
   /** Space token between children. */
   gap?: Space;
-  /** How children line up across the stack (horizontally). */
-  align?: "start" | "center" | "end" | "stretch";
-  /** How children are spread along the stack (vertically); `between` pushes them apart. */
-  justify?: "start" | "center" | "end" | "between";
+  /** Lay the children out in a column (the default) or in a row. For a row, Inline adds wrapping and centring. */
+  direction?: "column" | "row" | undefined;
+  /** How children line up across the stack (horizontally in a column); `baseline` lines up text in a row. */
+  align?: "start" | "center" | "end" | "stretch" | "baseline" | undefined;
+  /** How children are spread along the stack (vertically in a column); `between` pushes them apart. */
+  justify?: "start" | "center" | "end" | "between" | undefined;
 
   /**
    * Stay in view while the page scrolls past (`position: sticky`), inside its parent. In a Grid, make the GridItem
@@ -36,10 +38,11 @@ export interface StackProps extends PaddingProps, VisibilityProps, LayoutAttribu
   "data-testid"?: string;
 }
 
-/** Vertical layout with token gaps. */
+/** Vertical layout with token gaps (or a row, with `direction="row"`). */
 export const Stack = forwardRef<HTMLElement, StackProps>(function Stack(
   {
     gap = "4",
+    direction = "column",
     padding,
     paddingInline,
     paddingBlock,
@@ -63,6 +66,7 @@ export const Stack = forwardRef<HTMLElement, StackProps>(function Stack(
       ref={ref}
       {...rest}
       className={`cy-stack${className ? ` ${className}` : ""}`}
+      data-direction={direction === "row" ? "row" : undefined}
       data-align={align}
       data-justify={justify}
       data-sticky={sticky ? "" : undefined}
