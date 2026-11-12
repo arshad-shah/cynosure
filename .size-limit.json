@@ -359,7 +359,7 @@
   {
     "name": "SideNav (with Tooltip)",
     "path": ["dist/components/SideNav/SideNav.js", "dist/styles/side-nav.css"],
-    "limit": "3.5 kB",
+    "limit": "3.51 kB",
     "gzip": true
   },
   {
@@ -389,7 +389,7 @@
   {
     "name": "SplitPane",
     "path": ["dist/components/SplitPane/SplitPane.js", "dist/styles/split-pane.css"],
-    "limit": "2.25 kB",
+    "limit": "2.42 kB",
     "gzip": true
   },
   {

@@ -50,6 +50,33 @@ Groups open and close with a click, Enter or Space. A group holding the current 
 
 <Canvas of={Stories.RailExpandsToTheGroup} />
 
+In the rail an item's `badge` shrinks onto the top inline-end corner of its icon, and stays part of the item's name ("Search 12").
+
+## Activity bar
+
+A collapsed SideNav on its own, without AppShell, is an editor's activity bar. `footer` takes entries pinned to the bottom (Settings, a notifications action): the same items, sections and actions as `items`, after them in the Tab order. With a footer the navigation fills its container's height. `placement="end"` is for a rail on the inline end of the window, such as a secondary activity bar: the current item's indicator moves to the side facing the content and the tooltips open towards it.
+
+```tsx
+<SideNav
+  label="Views"
+  collapsed
+  current={view}
+  onNavigate={setView}
+  items={[
+    { id: "explorer", label: "Explorer", icon: database },
+    { id: "search", label: "Search", icon: search, badge: <Badge tone="accent">12</Badge> },
+  ]}
+  footer={[
+    { kind: "action", id: "notify", label: "Notifications", icon: bell, onClick: openNotifications },
+    { id: "settings", label: "Settings", icon: settings },
+  ]}
+/>
+```
+
+<Canvas of={Stories.AnActivityBar} />
+
+<Canvas of={Stories.ARailOnTheEnd} />
+
 ## Bottom bar
 
 `layout="bar"` lays the top-level items out in one row, icon over label, for a phone's tab bar ([AppShell](?path=/docs/components-appshell--docs)'s `tabs`). Section headings are left out, and a group is one item that calls `onNavigate` with its own id. Give it three to five items, each with an icon.
@@ -86,13 +113,13 @@ In the column the same entry is a full-width accent [Button](?path=/docs/compone
 ## Behaviour and accessibility
 
 - **Landmark:** a `<nav>` named by `label`. Each section is a list named by its heading.
-- **Current page:** `aria-current="page"`, the accent's soft fill and a bar on the inline start.
-- **Keyboard:** Tab and Shift+Tab move between items; Enter follows a link; Enter or Space presses a button or toggles a group (`aria-expanded`).
+- **Current page:** `aria-current="page"`, the accent's soft fill and a bar on the inline start (the inline end with `placement="end"`).
+- **Keyboard:** Tab and Shift+Tab move between items, then the footer's; Enter follows a link; Enter or Space presses a button or toggles a group (`aria-expanded`). There is no arrow-key roving: every item is a Tab stop, as in any list of links.
 - **Disabled items** are `aria-disabled` buttons that do nothing.
 - **Primary action:** a button named by its `label`. It is not a link, is never `aria-current` (even when its `id` equals `current`) and does not call `onNavigate`. It is one Tab stop in its place among the items; Enter or Space presses it. In the bar and the rail the label also shows as a tooltip.
 - **Touch:** rows are at least 44px tall on touch screens (24px with a mouse). The bar's action button is 48px across by default, and its hit area is never under 44px on touch screens.
 - **Contrast:** items, headings and the current item keep 4.5:1 in light and dark modes.
-- **Direction:** indents, the current bar and the rail's badge follow the text direction.
+- **Direction:** indents, the current bar, `placement` and the rail's badge follow the text direction.
 
 ## Theming
 

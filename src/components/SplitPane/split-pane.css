@@ -20,6 +20,14 @@
     grid-template-columns: minmax(0, 1fr);
     grid-template-rows: minmax(0, calc(var(--_size) - var(--_d) / 2)) var(--_d) minmax(0, 1fr);
   }
+  /* The size belongs to the end pane (a right sidebar, a bottom dock): the start pane takes what is left. */
+  &[data-anchor="end"] {
+    grid-template-columns: minmax(0, 1fr) var(--_d) minmax(0, calc(var(--_size) - var(--_d) / 2));
+  }
+  &[data-anchor="end"][data-orientation="vertical"] {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr) var(--_d) minmax(0, calc(var(--_size) - var(--_d) / 2));
+  }
   &[data-dragging] {
     cursor: col-resize;
     user-select: none;
