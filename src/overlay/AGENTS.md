@@ -2,7 +2,7 @@
 
 Shared machinery for everything that floats: Tooltip, Select, Popover, Menu, Dialog and Sheet, Toast.
 
-- `position.ts`: pure `computePosition` (preferred side, flip, shift, `align` start or centre, RTL). Unit-tested; keep it pure.
+- `position.ts`: pure `computePosition` (preferred side, flip, shift, `align` centre, start, or flush (also level with the top for side placements: submenus), RTL). Unit-tested; keep it pure.
 - `use-anchored-position.ts`: keeps a fixed, top-layer element next to its anchor on scroll and resize, and sets `data-placement`. Show the element (`showPopover`) **before** this runs, since it must be laid out to be measured.
 - `dismiss.ts`: `useDismiss({ open, onClose, inside, returnFocus, outside })`. One layer stack for the whole page:
   - Escape closes only the topmost layer: the most recently opened one with no other open layer nested in it.

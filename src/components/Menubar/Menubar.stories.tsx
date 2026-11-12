@@ -283,6 +283,110 @@ export const RightToLeft: Story = {
   },
 };
 
+const withSubmenus: MenubarMenu[] = [
+  {
+    label: "File",
+    items: [
+      { value: "new", label: "New query" },
+      {
+        value: "recent",
+        label: "Open recent",
+        items: [
+          { value: "orders", label: "orders.sql" },
+          { value: "users", label: "users.sql" },
+        ],
+      },
+      { items: [{ value: "close", label: "Close all" }] },
+    ],
+  },
+  ...menus.slice(1),
+];
+
+export const SubmenusFollowTheMenubarRules: Story = {
+  args: { menus: withSubmenus },
+  play: async ({ args, canvas, canvasElement, userEvent }) => {
+    const file = canvas.getByRole("menuitem", { name: "File" });
+    file.focus();
+    await userEvent.keyboard("{ArrowDown}");
+    const fileMenu = await canvas.findByRole("menu", { name: "File" });
+    await waitFor(() => expect(canvas.getByRole("menuitem", { name: "New query" })).toHaveFocus());
+    const recent = canvas.getByRole("menuitem", { name: "Open recent" });
+    await expect(recent).toHaveAttribute("aria-haspopup", "menu");
+    // Right on an item with a submenu opens the submenu; the bar stays on File.
+    await userEvent.keyboard("{ArrowDown}{ArrowRight}");
+    const sub = canvas.getByRole("menu", { name: "Open recent" });
+    await shownFully(sub);
+    await waitFor(() => expect(canvas.getByRole("menuitem", { name: "orders.sql" })).toHaveFocus());
+    await expect(isOpen(fileMenu)).toBe(true);
+    await expect(openMenus(canvasElement)).toEqual([fileMenu, sub]);
+    // Left in a submenu closes just the submenu.
+    await userEvent.keyboard("{ArrowLeft}");
+    await settledClosed(sub);
+    await expect(recent).toHaveFocus();
+    await expect(isOpen(fileMenu)).toBe(true);
+    // Right on an item without a submenu, even inside a submenu, moves to the next menu and closes the whole tree.
+    await userEvent.keyboard("{ArrowRight}");
+    await waitFor(() => expect(canvas.getByRole("menuitem", { name: "orders.sql" })).toHaveFocus());
+    await userEvent.keyboard("{ArrowRight}");
+    await waitFor(() => expect(canvas.getByRole("menuitem", { name: /Copy/ })).toHaveFocus());
+    await settledClosed(fileMenu);
+    await expect(isOpen(sub)).toBe(false);
+    await expect(openMenus(canvasElement)).toHaveLength(1);
+    // Left in a top-level menu still moves to the previous menu.
+    await userEvent.keyboard("{ArrowLeft}");
+    await waitFor(() => expect(canvas.getByRole("menuitem", { name: "New query" })).toHaveFocus());
+    // Escape from a submenu closes one level, then the menu.
+    await userEvent.keyboard("{ArrowDown}{Enter}");
+    await waitFor(() => expect(canvas.getByRole("menuitem", { name: "orders.sql" })).toHaveFocus());
+    await userEvent.keyboard("{Escape}");
+    await settledClosed(sub);
+    await expect(recent).toHaveFocus();
+    await userEvent.keyboard("{Escape}");
+    await settledClosed(fileMenu);
+    await expect(file).toHaveFocus();
+    // With the pointer: resting on the parent opens its submenu, a click in it chooses and closes everything.
+    await userEvent.click(file);
+    await shownFully(fileMenu);
+    await userEvent.hover(recent);
+    await waitFor(() => expect(isOpen(sub)).toBe(true));
+    await userEvent.click(canvas.getByRole("menuitem", { name: "users.sql" }));
+    await expect(args.onSelect).toHaveBeenCalledWith("users");
+    await settledClosed(fileMenu);
+    await expect(isOpen(sub)).toBe(false);
+    await expect(file).toHaveFocus();
+  },
+};
+
+export const SubmenusInRightToLeft: Story = {
+  args: { menus: withSubmenus },
+  render: (args) => (
+    <div dir="rtl">
+      <Menubar {...args} />
+    </div>
+  ),
+  play: async ({ canvas, userEvent }) => {
+    canvas.getByRole("menuitem", { name: "File" }).focus();
+    await userEvent.keyboard("{ArrowDown}");
+    const fileMenu = await canvas.findByRole("menu", { name: "File" });
+    await waitFor(() => expect(canvas.getByRole("menuitem", { name: "New query" })).toHaveFocus());
+    // Left opens the submenu, to the left of its menu.
+    await userEvent.keyboard("{ArrowDown}{ArrowLeft}");
+    const sub = canvas.getByRole("menu", { name: "Open recent" });
+    await shownFully(sub);
+    await waitFor(() => expect(canvas.getByRole("menuitem", { name: "orders.sql" })).toHaveFocus());
+    await expect(sub.getBoundingClientRect().right).toBeLessThanOrEqual(
+      fileMenu.getBoundingClientRect().left + 2,
+    );
+    // Right closes it; Right again (top-level menu) moves to the previous menu.
+    await userEvent.keyboard("{ArrowRight}");
+    await settledClosed(sub);
+    await expect(canvas.getByRole("menuitem", { name: "Open recent" })).toHaveFocus();
+    await userEvent.keyboard("{ArrowRight}");
+    await waitFor(() => expect(canvas.getByRole("menuitemcheckbox", { name: "Word wrap" })).toHaveFocus());
+    await settledClosed(fileMenu);
+  },
+};
+
 export const Sizes: Story = {
   render: (args) => (
     <>

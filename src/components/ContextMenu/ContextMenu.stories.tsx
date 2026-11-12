@@ -7,7 +7,7 @@ import { tag } from "../../icons/tag.js";
 import { trash } from "../../icons/trash.js";
 import { backdrop, contrast, rgb } from "../../test/color.js";
 import { computeUnderHostileHost } from "../../test/hostile.js";
-import { shownFully } from "../../test/settle.js";
+import { settled, shownFully } from "../../test/settle.js";
 import type { MenuEntry } from "../Menu/Menu.js";
 import { ContextMenu } from "./ContextMenu.js";
 
@@ -115,6 +115,54 @@ export const KeyboardOpensAtTheTarget: Story = {
     await userEvent.keyboard("{ContextMenu}");
     await waitFor(() => expect(isOpen()).toBe(true));
     await userEvent.keyboard("{Escape}");
+  },
+};
+
+const WITH_SUBMENU: MenuEntry[] = [
+  { value: "open", label: "Open" },
+  {
+    value: "open-with",
+    label: "Open with",
+    items: [
+      { value: "viewer", label: "Viewer" },
+      { value: "editor", label: "Editor" },
+    ],
+  },
+  { items: [{ value: "delete", label: "Delete", icon: trash, tone: "danger" }] },
+];
+
+export const SubmenusOpenBesideTheirItem: Story = {
+  args: { items: WITH_SUBMENU },
+  play: async ({ args, canvas, userEvent }) => {
+    const target = canvas.getByTestId("target");
+    target.focus();
+    await userEvent.keyboard("{Shift>}{F10}{/Shift}");
+    await shownFully(menu());
+    // An unlabelled section is set apart by a line.
+    await expect(canvas.getAllByRole("separator")).toHaveLength(1);
+    const parent = canvas.getByRole("menuitem", { name: "Open with" });
+    await expect(parent).toHaveAttribute("aria-haspopup", "menu");
+    await userEvent.keyboard("{ArrowDown}{ArrowRight}");
+    const sub = canvas.getByRole("menu", { name: "Open with" });
+    await shownFully(sub);
+    await waitFor(() => expect(canvas.getByRole("menuitem", { name: "Viewer" })).toHaveFocus());
+    await expect(sub.getBoundingClientRect().left).toBeGreaterThanOrEqual(
+      menu().getBoundingClientRect().right - 2,
+    );
+    // Escape closes the submenu only.
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() => expect(sub.matches(":popover-open")).toBe(false));
+    await expect(parent).toHaveFocus();
+    await expect(isOpen()).toBe(true);
+    // A click on the parent opens it; choosing in it closes everything and focus goes back to the target.
+    await userEvent.click(parent);
+    await userEvent.click(await canvas.findByRole("menuitem", { name: "Editor" }));
+    await expect(args.onSelect).toHaveBeenCalledWith("editor");
+    await waitFor(() => expect(isOpen()).toBe(false));
+    await expect(sub.matches(":popover-open")).toBe(false);
+    await expect(target).toHaveFocus();
+    await expect(args.onOpenChange).toHaveBeenLastCalledWith(false);
+    await settled(menu());
   },
 };
 

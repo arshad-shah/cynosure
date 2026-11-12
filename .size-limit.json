@@ -225,7 +225,7 @@
   {
     "name": "Menu",
     "path": ["dist/components/Menu/Menu.js", "dist/styles/menu.css"],
-    "limit": "3.25 kB",
+    "limit": "4 kB",
     "gzip": true
   },
   {
