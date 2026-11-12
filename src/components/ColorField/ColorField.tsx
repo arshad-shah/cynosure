@@ -164,9 +164,11 @@ export function ColorField({
   style,
 }: ColorFieldProps) {
   const text = { ...DEFAULT_LABELS, ...labels };
-  const [inner, setInner] = useState(() => fromText(defaultValue) ?? { h: 0, s: 0, v: 0, a: 1 });
+  // The full HSV colour is kept even when controlled: black or grey written as text has no saturation or hue, so the
+  // picker would lose them. `value` is read afresh only when it is a different colour from the one kept here.
+  const [inner, setInner] = useState(() => fromText(value ?? defaultValue) ?? { h: 0, s: 0, v: 0, a: 1 });
   const external = value === undefined ? null : fromText(value, inner.h);
-  const color = external ?? inner;
+  const color = external && write(external, "rgb", true) !== write(inner, "rgb", true) ? external : inner;
   const current = write(color, format, alpha);
   const [draft, setDraft] = useState<string | null>(null);
   const [invalid, setInvalid] = useState(false);
@@ -177,8 +179,7 @@ export function ColorField({
 
   const set = (next: Hsva) => {
     const out = write(next, format, alpha);
-    if (value === undefined) setInner(next);
-    else setInner((c) => ({ ...c, h: next.h }));
+    setInner(next);
     setDraft(null);
     setInvalid(false);
     if (out !== current) onChange?.(out);
