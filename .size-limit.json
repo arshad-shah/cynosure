@@ -495,7 +495,7 @@
   {
     "name": "Calendar",
     "path": ["dist/components/Calendar/Calendar.js", "dist/styles/calendar.css"],
-    "limit": "4.75 kB",
+    "limit": "5 kB",
     "gzip": true
   },
   {

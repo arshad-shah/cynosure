@@ -94,7 +94,7 @@ export interface TimeFieldProps {
   picker?: boolean;
   /** With `picker`: the strip of the whole day under the columns, to click or drag to a time. Default `true`. */
   dayTrack?: boolean;
-  /** Form field name. The form receives the 24-hour `HH:MM`, however the time is shown. */
+  /** Form field name. The form receives the 24-hour `HH:MM` value (never the text being typed), however it is shown. */
   name?: string | undefined;
   /** The `id` of a form elsewhere on the page that the field belongs to. */
   form?: string | undefined;
@@ -227,7 +227,11 @@ export function TimeField({
     ...labels,
   };
   const id = useId();
-  const [current, setCurrent] = useControllableState<string | null>(value, defaultValue, onChange);
+  const [current, setCurrent, resetCurrent] = useControllableState<string | null>(
+    value,
+    defaultValue,
+    onChange,
+  );
   const [draft, setDraft] = useState<string | null>(null);
   const [problem, setProblem] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
@@ -267,6 +271,12 @@ export function TimeField({
     setProblem(null);
     if (next !== current) setCurrent(next);
   };
+  /** What is wrong with typed text, or null when it is empty or an allowed time. */
+  const check = (typed: string) => {
+    if (typed.trim() === "") return null;
+    const t = parseTime(typed);
+    return t === null ? text.invalid : inRange(t) ? null : text.unavailable;
+  };
   const commit = () => {
     if (draft === null) return;
     if (draft.trim() === "") {
@@ -275,11 +285,15 @@ export function TimeField({
       if (current !== null) setCurrent(null);
       return;
     }
-    const t = parseTime(draft);
-    if (t === null) return setProblem(text.invalid);
-    if (!inRange(t)) return setProblem(text.unavailable);
-    take(t);
+    const wrong = check(draft);
+    if (wrong) return setProblem(wrong);
+    take(parseTime(draft) as number);
   };
+  // A form will not submit while the text is not a time it can take (the value it would submit is the last good one).
+  const invalid = draft === null ? null : check(draft);
+  useClientLayoutEffect(() => {
+    input.current?.setCustomValidity(invalid ?? "");
+  }, [invalid]);
 
   const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") commit();
@@ -293,8 +307,18 @@ export function TimeField({
     const colons = shown.slice(0, caret).split(":").length - 1;
     const half = shown.search(/[ap]/i);
     const inHalf = half >= 0 && caret > half;
-    const unit = inHalf ? HALF : colons === 0 ? 3600 : colons === 1 ? 60 * step : 1;
-    const by = (event.key === "ArrowUp" ? 1 : -1) * unit * (event.shiftKey && !inHalf ? 10 : 1);
+    const up = event.key === "ArrowUp";
+    const times = event.shiftKey && !inHalf ? 10 : 1;
+    let by: number;
+    if (!inHalf && colons === 1) {
+      // Minutes move along the step's grid, the picker's rows (:00, :15, :30, :45): off it, the first step lands on it.
+      const m = Math.floor(from / 60) % 60;
+      const off = m % every;
+      const snap = off === 0 ? 0 : up ? Math.min(m - off + every, 60) - m : -off;
+      by = (snap + (up ? 1 : -1) * (times - (snap === 0 ? 0 : 1)) * every) * 60;
+    } else {
+      by = (up ? 1 : -1) * (inHalf ? HALF : colons === 0 ? 3600 : 1) * times;
+    }
     let next = (((from + by) % DAY) + DAY) % DAY;
     if (lo !== null && next < lo) next = lo;
     if (hi !== null && next > hi) next = hi;
@@ -432,8 +456,6 @@ export function TimeField({
   const percent = (t: number) => `${(t / DAY) * 100}%`;
 
   const hasPicker = picker && !readOnly;
-  // Shown as 9:30 PM, a form still receives 21:30.
-  const ownValue = h12 && name !== undefined;
   return (
     <>
       <TextField
@@ -450,7 +472,6 @@ export function TimeField({
         inputMode={h12 ? "text" : "numeric"}
         autoComplete="off"
         {...(hasPicker ? {} : { iconStart: clock })}
-        name={ownValue ? undefined : name}
         form={form}
         required={required}
         disabled={disabled}
@@ -587,7 +608,18 @@ export function TimeField({
           )
         }
       />
-      {ownValue && <HiddenValue name={name} form={form} value={current ?? ""} disabled={disabled} />}
+      {/* The form receives the value, never the text being typed: 21:30 even when it is shown as 9:30 PM. */}
+      <HiddenValue
+        name={name}
+        form={form}
+        value={current ?? ""}
+        disabled={disabled}
+        onReset={() => {
+          setDraft(null);
+          setProblem(null);
+          resetCurrent(defaultValue);
+        }}
+      />
     </>
   );
 }

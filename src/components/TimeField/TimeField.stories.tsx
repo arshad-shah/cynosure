@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, fn, waitFor, within } from "storybook/test";
 import { computeUnderHostileHost } from "../../test/hostile.js";
+import { Button } from "../Button/Button.js";
 import { TimeField } from "./TimeField.js";
 
 const meta = {
@@ -134,6 +135,28 @@ export const ArrowsStepThePartUnderTheCaret: Story = {
   },
 };
 
+export const ArrowsSnapTheMinutesToTheStep: Story = {
+  args: { defaultValue: "09:32", step: 15 },
+  play: async ({ args, canvas, userEvent }) => {
+    const field = canvas.getByRole("textbox", { name: "Start time" }) as HTMLInputElement;
+    field.focus();
+    field.setSelectionRange(4, 4);
+    // Off the step's grid, the first press lands on it (the picker's rows), in the arrow's direction.
+    await userEvent.keyboard("{ArrowDown}");
+    await expect(args.onChange).toHaveBeenLastCalledWith("09:30");
+    await userEvent.clear(field);
+    await userEvent.type(field, "9:52{Enter}{ArrowUp}");
+    await expect(args.onChange).toHaveBeenLastCalledWith("10:00");
+    // Shift: the snap counts as the first of its ten steps.
+    await userEvent.clear(field);
+    await userEvent.type(field, "9:37{Enter}{Shift>}{ArrowUp}{/Shift}");
+    await expect(args.onChange).toHaveBeenLastCalledWith("12:00");
+    // On the grid it moves by whole steps, as before.
+    await userEvent.keyboard("{ArrowUp}");
+    await expect(args.onChange).toHaveBeenLastCalledWith("12:15");
+  },
+};
+
 export const LimitsStopTheArrows: Story = {
   args: { defaultValue: "17:00", min: "09:00", max: "17:30" },
   play: async ({ args, canvas, userEvent }) => {
@@ -192,6 +215,50 @@ export const FormsReadOnlyAndLabels: Story = {
     const heure = canvas.getByRole("textbox", { name: "Heure" });
     await userEvent.type(heure, "midi{Enter}");
     await expect(heure).toHaveAccessibleDescription("Heure au format HH:MM");
+  },
+};
+
+export const FormsSubmitTheTimeNotTheDraft: Story = {
+  args: { min: "08:00" },
+  render: (args) => (
+    <form data-testid="form" onSubmit={(event) => event.preventDefault()}>
+      <TimeField {...args} name="start" defaultValue="09:15" />
+      <Button type="reset">Reset</Button>
+    </form>
+  ),
+  play: async ({ args, canvas, userEvent }) => {
+    const form = canvas.getByTestId("form") as HTMLFormElement;
+    const field = canvas.getByRole("textbox", { name: "Start time" }) as HTMLInputElement;
+    // What is being typed is not the value: the form keeps the last real time, and will not submit a wrong one.
+    await userEvent.clear(field);
+    await userEvent.type(field, "25:99");
+    await expect(new FormData(form).getAll("start")).toEqual(["09:15"]);
+    await expect(form.checkValidity()).toBe(false);
+    await expect(field.validationMessage).toBe("Enter a time as HH:MM");
+    await userEvent.tab();
+    await expect(new FormData(form).getAll("start")).toEqual(["09:15"]);
+    await expect(form.checkValidity()).toBe(false);
+    // A time before `min` is not available either.
+    await userEvent.clear(field);
+    await userEvent.type(field, "7:30");
+    await expect(field.validationMessage).toBe("This time is not available");
+    // Corrected, it is submitted.
+    await userEvent.clear(field);
+    await userEvent.type(field, "10:45");
+    await userEvent.tab();
+    await expect(form.checkValidity()).toBe(true);
+    await expect(new FormData(form).getAll("start")).toEqual(["10:45"]);
+    // Resetting the form brings back the default, with no message, and reports nothing.
+    await userEvent.clear(field);
+    await userEvent.type(field, "soon");
+    await userEvent.tab();
+    await expect(args.onChange).toHaveBeenCalledTimes(1);
+    await userEvent.click(canvas.getByRole("button", { name: "Reset" }));
+    await waitFor(() => expect(field).toHaveValue("09:15"));
+    await expect(field).not.toHaveAttribute("aria-invalid", "true");
+    await expect(form.checkValidity()).toBe(true);
+    await expect(new FormData(form).getAll("start")).toEqual(["09:15"]);
+    await expect(args.onChange).toHaveBeenCalledTimes(1);
   },
 };
 

@@ -44,20 +44,36 @@ export function addMonths(iso: string, months: number) {
 export const clampDate = (iso: string, min?: string, max?: string) =>
   min && iso < min ? min : max && iso > max ? max : iso;
 
+interface WeekInfo {
+  firstDay: number;
+  weekend?: number[];
+}
+const weeks = new Map<string, WeekInfo | null>();
+/** A locale's week (`Intl.Locale` week info), read once per locale; null where the browser does not know it. */
+function weekInfo(locale?: string): WeekInfo | null {
+  try {
+    const name = locale ?? navigator.language;
+    let info = weeks.get(name);
+    if (info === undefined) {
+      // `getWeekInfo()` is the standard; `weekInfo` is the older accessor some engines still have.
+      const loc = new Intl.Locale(name) as Intl.Locale & {
+        getWeekInfo?: () => WeekInfo;
+        weekInfo?: WeekInfo;
+      };
+      info = loc.getWeekInfo?.() ?? loc.weekInfo ?? null;
+      weeks.set(name, info);
+    }
+    return info;
+  } catch {
+    // An unknown locale (or no navigator) is read as unknown.
+    return null;
+  }
+}
+
 /** The weekday a week starts on in `locale` (0 Sunday to 6 Saturday), where the browser knows it; else Monday. */
 export function firstDayOfWeek(locale?: string): number {
-  try {
-    // `getWeekInfo()` is the standard; `weekInfo` is the older accessor some engines still have.
-    const loc = new Intl.Locale(locale ?? navigator.language) as Intl.Locale & {
-      getWeekInfo?: () => { firstDay: number };
-      weekInfo?: { firstDay: number };
-    };
-    const info = loc.getWeekInfo?.() ?? loc.weekInfo;
-    if (info) return info.firstDay % 7;
-  } catch {
-    // An unknown locale falls through to Monday.
-  }
-  return 1;
+  const info = weekInfo(locale);
+  return info ? info.firstDay % 7 : 1;
 }
 
 /** The day of `iso` in `month` (`YYYY-MM`), or that month's last day when it is shorter. */
@@ -69,15 +85,6 @@ export function inMonth(iso: string, month: string) {
 
 /** The weekend's weekdays in `locale` (0 Sunday to 6 Saturday), where the browser knows them; else Saturday and Sunday. */
 export function weekendDays(locale?: string): number[] {
-  try {
-    const loc = new Intl.Locale(locale ?? navigator.language) as Intl.Locale & {
-      getWeekInfo?: () => { weekend?: number[] };
-      weekInfo?: { weekend?: number[] };
-    };
-    const weekend = (loc.getWeekInfo?.() ?? loc.weekInfo)?.weekend;
-    if (weekend) return weekend.map((day) => day % 7);
-  } catch {
-    // An unknown locale falls through to Saturday and Sunday.
-  }
-  return [6, 0];
+  const weekend = weekInfo(locale)?.weekend;
+  return weekend ? weekend.map((day) => day % 7) : [6, 0];
 }
