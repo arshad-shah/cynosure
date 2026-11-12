@@ -296,6 +296,10 @@ export const ScrollingAColumnChooses: Story = {
     hours.scrollTo({ top: hours.scrollTop + row * 3, behavior: "instant" });
     await waitFor(() => expect(args.onChange).toHaveBeenLastCalledWith("12:30"));
     await waitFor(() => expect(chosen(hours)).toBe("12"));
+    // Wait for the picker to finish centering the newly chosen hour before starting another gesture.
+    // WebKit can still be animating this scroll after onChange fires, otherwise the next scroll
+    // races the component's programmatic alignment and the second gesture may be lost.
+    await waitFor(() => expect(offLens(hours)).toBeLessThan(2));
     // Stopped on an hour the limits rule out, it goes to the nearest time that is allowed and rolls back to it.
     hours.dispatchEvent(new WheelEvent("wheel", { bubbles: true, deltaY: -row * 12 }));
     hours.scrollTo({ top: 0, behavior: "instant" });
