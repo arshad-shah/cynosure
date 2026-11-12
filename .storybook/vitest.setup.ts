@@ -7,6 +7,18 @@ import * as project from "./preview";
 /** Visual regression, Vitest-only: stories tagged "visual" are screenshotted when VITE_CY_VISUAL=1 (CI, Linux baselines). */
 const visual = import.meta.env.VITE_CY_VISUAL === "1";
 
+/*
+ * The theme's monospace stack (ui-monospace, SF Mono, Menlo, Consolas, monospace) names no font a Linux runner has, so
+ * each run's fontconfig picked among the installed monospace faces, and medium and bold mono text (Kbd, Badge) drew
+ * differently from run to run. Screenshot runs name one font that Chromium's own system packages always install, in CI
+ * and in the baselines workflow alike. Visual runs only: other tests and the published Storybook keep the theme's stack.
+ */
+if (visual) {
+  const fonts = document.createElement("style");
+  fonts.textContent = ':root, .cy-theme { --cy-font-mono: "Liberation Mono" !important; }';
+  document.head.append(fonts);
+}
+
 setProjectAnnotations([
   a11y,
   project,
