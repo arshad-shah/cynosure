@@ -4,6 +4,7 @@ import { createRoot } from "react-dom/client";
 import { expect, fn, waitFor } from "storybook/test";
 import { filter } from "../../icons/index.js";
 import { createStyleSheet } from "../../styles/inline.js";
+import { computeUnderHostileHost } from "../../test/hostile.js";
 import { shownFully } from "../../test/settle.js";
 import { Button } from "../Button/Button.js";
 import { Checkbox } from "../Checkbox/Checkbox.js";
@@ -35,6 +36,8 @@ const meta = {
     placement: { control: "inline-radio", options: ["top", "bottom", "start", "end"] },
     size: { control: "inline-radio", options: ["sm", "md", "lg"] },
     modal: { control: "boolean" },
+    initialFocus: { control: "inline-radio", options: ["first", "panel", "none"] },
+    width: { control: "inline-radio", options: ["content", "trigger", "fixed"] },
   },
 } satisfies Meta<typeof Popover>;
 export default meta;
@@ -358,5 +361,255 @@ export const OpenAtAPoint: Story = {
     await userEvent.keyboard("{Escape}");
     await waitFor(() => expect(canvas.queryByRole("dialog")).toBeNull());
     await expect(area).toHaveFocus();
+  },
+};
+
+export const InitialFocusOnThePanel: Story = {
+  args: { initialFocus: "panel" },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole("button", { name: "Filters" }));
+    const dialog = await canvas.findByRole("dialog", { name: "Filters" });
+    await shownFully(dialog);
+    // The panel itself takes focus (screen readers read it from the top); Tab then reaches the first control.
+    await waitFor(() => expect(dialog).toHaveFocus());
+    await userEvent.tab();
+    await expect(canvas.getByRole("checkbox", { name: "Only errors" })).toHaveFocus();
+    await userEvent.keyboard("{Escape}");
+    await settledClosed(dialog);
+    await expect(canvas.getByRole("button", { name: "Filters" })).toHaveFocus();
+  },
+};
+
+export const InitialFocusNoneLeavesFocusOnTheTrigger: Story = {
+  args: { initialFocus: "none" },
+  render: (args) => (
+    <>
+      <Popover {...args} />
+      <p data-testid="outside">Somewhere else on the page</p>
+    </>
+  ),
+  play: async ({ canvas, userEvent }) => {
+    const trigger = canvas.getByRole("button", { name: "Filters" });
+    await userEvent.click(trigger);
+    const dialog = await canvas.findByRole("dialog", { name: "Filters" });
+    await shownFully(dialog);
+    await expect(trigger).toHaveFocus();
+    // The panel follows its trigger in the document, so Tab goes straight into it.
+    await userEvent.tab();
+    await expect(canvas.getByRole("checkbox", { name: "Only errors" })).toHaveFocus();
+    await userEvent.keyboard("{Escape}");
+    await settledClosed(dialog);
+    await expect(trigger).toHaveFocus();
+    // Opened by keyboard, focus still stays on the trigger; an outside press closes it.
+    await userEvent.keyboard("{Enter}");
+    await waitFor(() => expect(isOpen(dialog)).toBe(true));
+    await expect(trigger).toHaveFocus();
+    await userEvent.click(canvas.getByTestId("outside"));
+    await settledClosed(dialog);
+  },
+};
+
+function TypingHint(args: Parameters<typeof Popover>[0]) {
+  const [text, setText] = useState("");
+  const [area, setArea] = useState<HTMLElement | null>(null);
+  const [dismissed, setDismissed] = useState(false);
+  return (
+    <>
+      <TextField
+        label="Query"
+        ref={setArea}
+        value={text}
+        onChange={(v) => {
+          setText(v);
+          setDismissed(false);
+        }}
+      />
+      <Popover
+        {...args}
+        trigger={undefined}
+        label="Hint"
+        anchor={area ?? undefined}
+        open={text.includes("join") && !dismissed}
+        onOpenChange={(o) => !o && setDismissed(true)}
+        initialFocus="none"
+      >
+        <p>Joins need an ON clause.</p>
+        <Button>Insert ON</Button>
+      </Popover>
+      <p data-testid="outside">Somewhere else on the page</p>
+    </>
+  );
+}
+
+export const InitialFocusNoneKeepsTheCaretWhileTyping: Story = {
+  render: (args) => <TypingHint {...args} />,
+  play: async ({ canvas, userEvent }) => {
+    const field = canvas.getByRole("textbox", { name: "Query" });
+    await userEvent.type(field, "a join");
+    const dialog = await canvas.findByRole("dialog", { name: "Hint" });
+    await shownFully(dialog);
+    // Focus never left the field: typing carries on.
+    await expect(field).toHaveFocus();
+    await userEvent.type(field, " b");
+    await expect(field).toHaveValue("a join b");
+    // Pressing in the anchor is not an outside press.
+    await userEvent.click(field);
+    await expect(isOpen(dialog)).toBe(true);
+    // Tab reaches the panel, which follows the field in the document.
+    await userEvent.tab();
+    await expect(canvas.getByRole("button", { name: "Insert ON" })).toHaveFocus();
+    await userEvent.tab({ shift: true });
+    await expect(field).toHaveFocus();
+    // Escape from the field closes it and leaves focus where it is.
+    await userEvent.keyboard("{Escape}");
+    await settledClosed(dialog);
+    await expect(field).toHaveFocus();
+    // An outside press closes it too.
+    await userEvent.type(field, "!");
+    await waitFor(() => expect(isOpen(dialog)).toBe(true));
+    await userEvent.click(canvas.getByTestId("outside"));
+    await settledClosed(dialog);
+  },
+};
+
+export const WidthMatchesTheTrigger: Story = {
+  args: {
+    width: "trigger",
+    children: "Short.",
+    trigger: (props) => (
+      <Button {...props} style={{ inlineSize: 380 }}>
+        Filters
+      </Button>
+    ),
+  },
+  play: async ({ canvas, userEvent }) => {
+    const trigger = canvas.getByRole("button", { name: "Filters" });
+    await userEvent.click(trigger);
+    const dialog = await canvas.findByRole("dialog");
+    await shownFully(dialog);
+    await expect(dialog).toHaveAttribute("data-width", "trigger");
+    // As wide as the trigger (wider than its short content and its size preset), and lined up with it.
+    const t = trigger.getBoundingClientRect();
+    await waitFor(() => expect(Math.abs(dialog.getBoundingClientRect().width - t.width)).toBeLessThan(1));
+    await expect(Math.abs(dialog.getBoundingClientRect().left - t.left)).toBeLessThan(1);
+  },
+};
+
+export const WidthMatchesTheTriggerInRtl: Story = {
+  args: {
+    width: "trigger",
+    children: "Short.",
+    trigger: (props) => (
+      <Button {...props} style={{ inlineSize: 300 }}>
+        Filters
+      </Button>
+    ),
+  },
+  decorators: [(Story) => <div dir="rtl">{Story()}</div>],
+  play: async ({ canvas, userEvent }) => {
+    const trigger = canvas.getByRole("button", { name: "Filters" });
+    await userEvent.click(trigger);
+    const dialog = await canvas.findByRole("dialog");
+    await shownFully(dialog);
+    const t = trigger.getBoundingClientRect();
+    await waitFor(() => expect(Math.abs(dialog.getBoundingClientRect().width - t.width)).toBeLessThan(1));
+    // Starts at the trigger's start edge, which is its right edge in right-to-left text.
+    await expect(Math.abs(dialog.getBoundingClientRect().right - t.right)).toBeLessThan(1);
+  },
+};
+
+export const WidthGrowsPastANarrowTrigger: Story = {
+  args: {
+    width: "trigger",
+    size: "sm",
+    trigger: (props) => <IconButton {...props} icon={filter} label="Filters" />,
+  },
+  play: async ({ canvas, userEvent }) => {
+    const trigger = canvas.getByRole("button", { name: "Filters" });
+    await userEvent.click(trigger);
+    const dialog = await canvas.findByRole("dialog");
+    await shownFully(dialog);
+    // At least the trigger's width: wider content still gets its room, up to the size preset.
+    const w = dialog.getBoundingClientRect().width;
+    await expect(w).toBeGreaterThan(trigger.getBoundingClientRect().width);
+    await expect(w).toBeLessThanOrEqual(241);
+  },
+};
+
+export const WidthFixedUsesTheSizeToken: Story = {
+  args: { width: "fixed", size: "sm", children: "Short." },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    await userEvent.click(canvas.getByRole("button", { name: "Filters" }));
+    const dialog = await canvas.findByRole("dialog");
+    await shownFully(dialog);
+    // The sm preset (240px) however short the content is, and the same under a hostile host.
+    await expect(Math.round(dialog.getBoundingClientRect().width)).toBe(240);
+    const { clean, hostile } = computeUnderHostileHost(canvasElement, ".cy-popover", [
+      "width",
+      "padding-top",
+    ]);
+    await expect(hostile).toEqual(clean);
+  },
+};
+
+function ShadowNone() {
+  const host = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = host.current;
+    if (!el || el.shadowRoot) return;
+    const root = el.attachShadow({ mode: "open" });
+    root.adoptedStyleSheets = [createStyleSheet()];
+    const mount = document.createElement("div");
+    root.append(mount);
+    createRoot(mount).render(
+      <Popover
+        label="Shadow"
+        initialFocus="none"
+        width="trigger"
+        trigger={(p) => (
+          <Button {...p} style={{ inlineSize: 300 }}>
+            Shadow
+          </Button>
+        )}
+      >
+        <Button>Inside shadow</Button>
+      </Popover>,
+    );
+  }, []);
+  return <div data-testid="host" ref={host} style={{ paddingBlockEnd: 160 }} />;
+}
+
+export const InitialFocusNoneInsideAShadowRoot: Story = {
+  render: () => <ShadowNone />,
+  play: async ({ canvas, userEvent }) => {
+    const host = await canvas.findByTestId("host");
+    await waitFor(() => expect(host.shadowRoot?.querySelector("button")).toBeTruthy());
+    const root = host.shadowRoot as ShadowRoot;
+    const trigger = root.querySelector("button") as HTMLElement;
+    await userEvent.click(trigger);
+    const dialog = root.querySelector('[role="dialog"]') as HTMLElement;
+    await shownFully(dialog);
+    await expect(root.activeElement).toBe(trigger);
+    const t = trigger.getBoundingClientRect();
+    await waitFor(() => expect(Math.abs(dialog.getBoundingClientRect().width - t.width)).toBeLessThan(1));
+    await userEvent.keyboard("{Escape}");
+    await settledClosed(dialog);
+    await expect(root.activeElement).toBe(trigger);
+  },
+};
+
+export const TouchOpensWithoutTakingFocus: Story = {
+  tags: ["touch", "!dev"],
+  args: { initialFocus: "none" },
+  play: async ({ canvas, userEvent }) => {
+    const trigger = canvas.getByRole("button", { name: "Filters" });
+    await userEvent.pointer({ keys: "[TouchA]", target: trigger });
+    const dialog = await canvas.findByRole("dialog");
+    await shownFully(dialog);
+    // A tap opens it without moving focus into the panel.
+    const box = canvas.getByRole("checkbox", { name: "Only errors" });
+    await expect(box).not.toHaveFocus();
+    await userEvent.pointer({ keys: "[TouchA]", target: box });
+    await expect(box).toBeChecked();
   },
 };

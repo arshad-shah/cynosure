@@ -41,6 +41,16 @@ Popovers nest, and Escape closes one layer at a time: an inner popover first, th
 
 <Canvas of={Stories.NestedCloseOneAtATime} />
 
+## Focus and width
+
+`initialFocus` says where focus goes on open: the `first` control (default), the `panel` itself, or `none`. With `none`, focus stays where it was, so a hint can open beside a field while the person keeps typing; Escape and an outside press still close it, and Tab moves into it when the panel follows the field in the document (render the Popover right after its anchor; with a trigger this is automatic).
+
+<Canvas of={Stories.InitialFocusNoneKeepsTheCaretWhileTyping} />
+
+`width="trigger"` makes the panel at least as wide as its trigger or anchor element, lined up with it; `width="fixed"` gives it exactly the `size` preset however short its content is. The default, `content`, sizes it to its content up to the preset.
+
+<Canvas of={Stories.WidthMatchesTheTrigger} />
+
 ## Props
 
 <ArgTypes of={Stories} />
@@ -54,7 +64,8 @@ Popovers nest, and Escape closes one layer at a time: an inner popover first, th
 | Pointer down outside | Closes it |
 | <kbd>Tab</kbd> with `modal` | Cycles inside the panel |
 
-- **Focus:** on open, focus moves to the first control inside, or to the panel itself when it has none, so screen readers land in it. On close, focus returns to the trigger unless you already moved it somewhere else.
+- **Focus:** on open, focus moves to the first control inside, or to the panel itself when it has none, so screen readers land in it (`initialFocus` changes this). On close, focus returns to the trigger unless you already moved it somewhere else.
+- **Anchor:** an anchor element counts as part of the popover, like the trigger: pressing it is not an outside press.
 - **Role:** the panel is a dialog named by `label`. With `modal` it is `aria-modal` and keeps Tab inside.
 - **Position:** the panel prefers `placement`, flips to the other side when there is no room, and stays inside the viewport. `start` and `end` follow the reading direction.
 - **Shadow DOM:** works inside shadow roots (extension content scripts).
