@@ -1,3 +1,4 @@
+// cy-styles: text-field.css (the field is drawn as a TextField, from InputBase)
 import { type CSSProperties, type KeyboardEvent, type ReactNode, useEffect, useRef, useState } from "react";
 import { useDrag } from "../../foundations/drag.js";
 import { HiddenValue } from "../../foundations/HiddenValue/HiddenValue.js";

@@ -40,6 +40,20 @@ describe("cynosure() Astro integration", () => {
     expect(ssr?.[1]).toBe('import "virtual:cynosure/theme.css";');
   });
 
+  it("can add only the stylesheets each page's components need", () => {
+    // The built manifest (pnpm css writes it; the package reads its own copy next to the adapter).
+    const { scripts, plugins } = setup({
+      styles: "imports",
+      manifest: "dist/styles/manifest.json",
+      theme: { accent: "#0f766e" },
+    });
+    expect(scripts.find(([stage]) => stage === "page-ssr")?.[1]).toBe('import "virtual:cynosure/theme.css";');
+    const plugin = plugins[0] as { transform(code: string, id: string): string | undefined };
+    expect(
+      plugin.transform('import { Inline } from "@arshad-shah/cynosure";', "/src/pages/index.astro"),
+    ).toContain("@arshad-shah/cynosure/styles/stack.css");
+  });
+
   it("fails the build for an invalid theme", () => {
     expect(() => cynosure({ theme: { accent: "not a colour" } })).toThrow(CynosureThemeError);
   });

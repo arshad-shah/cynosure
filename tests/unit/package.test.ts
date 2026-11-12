@@ -18,6 +18,7 @@ describe("package manifest", () => {
       "./tokens",
       "./styles.css",
       "./styles/*.css",
+      "./styles/manifest.json",
       "./styles.inline",
       "./vite",
       "./astro",

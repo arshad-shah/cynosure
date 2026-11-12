@@ -99,6 +99,7 @@
     },
     "./styles.css": "./dist/styles.css",
     "./styles/*.css": "./dist/styles/*.css",
+    "./styles/manifest.json": "./dist/styles/manifest.json",
     "./styles.inline": {
       "types": "./dist/styles/inline.d.ts",
       "default": "./dist/styles/inline.js"

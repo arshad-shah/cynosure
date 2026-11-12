@@ -9,9 +9,12 @@
 import { type ThemeInitScriptOptions, themeInitScript } from "../../theme/theme-init-script.js";
 import { type CynosureViteOptions, type CynosureVitePlugin, cynosure as vitePlugin } from "../vite/index.js";
 
-export interface CynosureAstroOptions extends CynosureViteOptions {
-  /** Add `@arshad-shah/cynosure/styles.css` to every page. `false` when you import styles yourself. Default true. */
-  styles?: boolean;
+export interface CynosureAstroOptions extends Omit<CynosureViteOptions, "styles"> {
+  /**
+   * `true` (default): add all of `styles.css` to every page. `"imports"`: only the stylesheets the components each
+   * page and island imports need (the Vite adapter's `styles: "imports"`). `false`: you import styles yourself.
+   */
+  styles?: boolean | "imports";
   /**
    * Apply the visitor's saved colour mode before the first paint (`themeInitScript`, inline in `<head>`): `false` to
    * leave it out (pages with a content security policy that forbids inline scripts), or its options (`key` must match
@@ -36,14 +39,14 @@ export interface CynosureAstroIntegration {
 export function cynosure(options: CynosureAstroOptions = {}): CynosureAstroIntegration {
   const { styles = true, initScript = true, ...vite } = options;
   // Built eagerly (by the Vite adapter), so an invalid theme fails the build at once.
-  const plugin = vitePlugin(vite);
+  const plugin = vitePlugin(styles === "imports" ? { ...vite, styles: "imports" } : vite);
   return {
     name: "@arshad-shah/cynosure",
     hooks: {
       "astro:config:setup": ({ updateConfig, injectScript }) => {
         updateConfig({ vite: { plugins: [plugin] } });
         const imports = [
-          ...(styles ? ['import "@arshad-shah/cynosure/styles.css";'] : []),
+          ...(styles === true ? ['import "@arshad-shah/cynosure/styles.css";'] : []),
           'import "virtual:cynosure/theme.css";',
         ];
         injectScript("page-ssr", imports.join("\n"));

@@ -1,3 +1,4 @@
+// cy-styles: combobox.css (the suggestion list is drawn as a Combobox list)
 import {
   type ClipboardEvent,
   type CSSProperties,
