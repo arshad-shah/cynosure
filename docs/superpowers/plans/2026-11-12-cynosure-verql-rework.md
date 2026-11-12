@@ -50,7 +50,39 @@ Where Verql positions things today, and who owns each:
 13. **Contrast:** `contrast="normal"` without a `theme` does not undo the high-contrast tokens on an OS set to more contrast (`tokens/to-css.ts:71`).
 14. **Pinch zoom:** each wheel step rounds to a whole percent, so slow trackpad pinches never zoom (`zoom-gestures.ts:65`). Keep the unrounded scale.
 
-Also found, outside Verql's path but worth the same pass: Accordion controlled single collapsible cannot close (`Accordion.tsx:78`); SortableList keyboard move sticks on blur and commits a stale copy (`SortableList.tsx:129`); ColorSwatches chooses on Tab focus and fires twice on click (`ColorSwatches.tsx:103`); DateField and TimeField submit invalid drafts and ignore form reset (`DateField.tsx:190`, `TimeField.tsx:453`); Slider rounds with `step`'s decimals only (`Slider.tsx:143`); NumberField cannot parse its own locale output (`NumberField.tsx:98`); ColorField loses saturation at black when controlled; Calendar builds about 40 `Intl` objects per render; SignaturePad redraws everything per pointermove; FileDrop's drag depth goes negative; CompareSlider fires `onChange` with no change; SearchField's Escape ignores IME composition; ChoiceBase loses `indeterminate` after a click; listbox type-ahead skips item 0 when nothing is active; Select PageUp/PageDown lose the active option at a disabled end; TagInput arrows ignore RTL; Toast's swipe is hand-written (rule 7) and its exit wait reads one duration; AppShell's drawer reopens after widening; raw `useLayoutEffect` in CynosureTheme, Tree, Tabs, Tooltip, Combobox, TagInput and `use-anchored-position`; DocumentViewport fit-width may oscillate without `scrollbar-gutter: stable`; `package.json` `homepage` still names github.io.
+### Other bugs (outside Verql's path, same pass)
+
+15. **Accordion:** a controlled single collapsible Accordion cannot close; `undefined` means both "none open" and "uncontrolled" (`Accordion.tsx:78`).
+16. **SortableList:** a keyboard move sticks when focus leaves, and dropping commits a stale copy, deleting items the parent added meanwhile (`SortableList.tsx:129`).
+17. **ColorSwatches:** Tab onto a swatch chooses it (replacing a custom colour in ColorField), and a click fires `onChange` twice (`ColorSwatches.tsx:103`).
+18. **DateField, TimeField:** an invalid draft is submitted (no `setCustomValidity`, `name` on the visible input), and form reset restores nothing (`DateField.tsx:190`, `TimeField.tsx:453`).
+19. **Slider, NumberField rounding:** Slider rounds with `step`'s decimals only, so `min=0.5, step=1` never reaches `min` (`Slider.tsx:143`); exponent steps (`1e-7`) count as 0 decimals in both.
+20. **NumberField:** cannot parse its own output in other numbering systems (`ar-EG`) or with currency text (`1.234,50 kr.`), so edits are undone (`NumberField.tsx:98`).
+21. **ColorField:** controlled, it loses saturation at black (HSV rebuilt from RGB; `ColorField.tsx:168`).
+22. **Calendar:** possible hydration mismatch: `new Date()`, the `navigator.language` fallback and the default `Intl` locale differ between server and client (`Calendar.tsx:279,361`). Settle them on the client.
+23. **ChoiceBase:** `indeterminate` is lost after a click while the parent keeps it true (`ChoiceBase.tsx:30`).
+24. **FileDrop:** the drag depth goes negative after a non-file drag, so the highlight drops out (`FileDrop.tsx:221`, `:177`).
+25. **CompareSlider:** `onChange` fires when the value did not change (`CompareSlider.tsx:80`).
+26. **SearchField:** Escape during IME composition clears the query (`SearchField.tsx:35`).
+27. **Listbox type-ahead:** with nothing active, one letter starts at item 1, skipping item 0 (`listbox.ts:39`).
+28. **Select:** PageDown/PageUp lose the active option when the last/first option is disabled (`Select.tsx:195`).
+29. **TagInput:** arrows between the input and tags ignore RTL (`TagInput.tsx:226,257`).
+30. **Toast:** the swipe is hand-written pointer code instead of `useDrag` (rule 7; `Toast.tsx:363`); the exit wait reads only the first duration and no delay (`Toast.tsx:336`).
+31. **AppShell:** the drawer reopens after the shell widens and narrows again (`AppShell.tsx:119`).
+32. **React 18 SSR:** raw `useLayoutEffect` in CynosureTheme, Tree, Tabs, Tooltip, Combobox, TagInput and `use-anchored-position`; use `useClientLayoutEffect`.
+33. **DocumentViewport:** fit-width may flip as the scrollbar comes and goes; add `scrollbar-gutter: stable` (plausible, `DocumentViewport.tsx:148`).
+34. **Slider:** a controlled `value` outside `min`/`max` is not clamped, so the thumb and `aria-valuenow` go out of range.
+35. **TimeField:** arrow-key minute steps do not snap to the `step` grid.
+36. **TextArea:** auto-height is not recomputed when the width changes (no ResizeObserver).
+37. **`package.json`:** `homepage` still names github.io; the site is cynosure.arshadshah.com.
+
+### Performance
+
+- **VirtualList:** O(n²) moves and per-scroll work over the whole list (item 3 above).
+- **Tree:** `includes` per row; Sets once per render (item 2 above).
+- **Calendar:** about 40 `Intl` objects built per render (`weekday()` twice per header cell, `fullDate`, `dayNumber`, title, MonthPicker's names, two `Intl.Locale`), and DateField re-renders it on every keystroke (`Calendar.tsx:173,361,372`). Cache per locale.
+- **SignaturePad:** each pointermove sets state, reallocates the canvas and rebuilds every stroke's path, and copies the live stroke (`SignaturePad.tsx:103,114,127`). Cache a `Path2D` per stroke, resize only on size or DPR change, draw the live stroke in `requestAnimationFrame`.
+- **`useFloatingOffset`:** `getComputedStyle` on every render; FloatingToolbar re-renders on every `selectionchange` (`floating.ts:51`). Read on open only (item 10 above).
 
 ## Phase 1: layout and shell
 
