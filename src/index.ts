@@ -128,6 +128,16 @@ export {
   type ContextMenuTargetProps,
 } from "./components/ContextMenu/index.js";
 export { CopyButton, type CopyButtonLabels, type CopyButtonProps } from "./components/CopyButton/index.js";
+export {
+  DataGrid,
+  type DataGridCell,
+  type DataGridCellTone,
+  type DataGridColumn,
+  type DataGridLabels,
+  type DataGridProps,
+  type DataGridRange,
+  type DataGridTokens,
+} from "./components/DataGrid/index.js";
 export { DateField, type DateFieldLabels, type DateFieldProps } from "./components/DateField/index.js";
 export {
   type DescriptionItem,

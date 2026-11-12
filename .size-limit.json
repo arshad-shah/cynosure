@@ -2,7 +2,7 @@
   {
     "name": "all CSS",
     "path": "dist/styles.css",
-    "limit": "35.85 kB",
+    "limit": "36.6 kB",
     "gzip": true
   },
   {
@@ -720,6 +720,12 @@
     "name": "ErrorBoundary (JS + CSS)",
     "path": ["dist/components/ErrorBoundary/ErrorBoundary.js", "dist/styles/error-boundary.css"],
     "limit": "1 kB",
+    "gzip": true
+  },
+  {
+    "name": "DataGrid",
+    "path": ["dist/components/DataGrid/DataGrid.js", "dist/styles/data-grid.css"],
+    "limit": "5.9 kB",
     "gzip": true
   }
 ]

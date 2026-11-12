@@ -286,6 +286,7 @@ export const FOUNDATION_USERS: Record<string, readonly string[]> = {
     "Button",
     "Card",
     "ColorSwatches",
+    "DataGrid",
     "Disclosure",
     "ListRow",
     "Menu",

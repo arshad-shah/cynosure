@@ -1,5 +1,6 @@
 import { type RefObject, useMemo, useState } from "react";
 import { useClientLayoutEffect } from "./client-layout-effect.js";
+import { isRtl } from "./dir.js";
 
 export interface VirtualWindowOptions {
   /** How many rows there are in all. */
@@ -21,6 +22,17 @@ export interface VirtualWindowOptions {
   overscan?: number;
   /** An index that is always rendered (the focused row), so focus survives scrolling it out of view. */
   keep?: number;
+  /**
+   * The axis the rows run along: "y" (default, rows down the page) or "x" (columns across it, read in the reading
+   * direction, so a right-to-left scroller counts from its right edge). With "x", `rowSelector` measures widths and
+   * `view.top` and `view.height` are the scroll position and size along x.
+   */
+  axis?: "x" | "y";
+  /**
+   * Pixels at the start of the view covered by sticky content (a grid's header): the view is that much shorter, so
+   * `reveal` never leaves a row under it. Offsets stay counted from the first row. Default 0.
+   */
+  inset?: number;
 }
 
 export interface VirtualWindow {
@@ -30,7 +42,7 @@ export interface VirtualWindow {
   rowSize: number;
   /** Total height of all rows: give it to a spacer so the scrollbar is right. */
   total: number;
-  /** Pass the scroller's scrollTop on scroll. */
+  /** Pass the scroller's scrollTop on scroll (with `axis: "x"`, `Math.abs(scrollLeft)`). */
   onScroll: (top: number) => void;
   /** Scrolls the least distance that brings row `index` fully into view. */
   reveal: (index: number) => void;
@@ -38,7 +50,7 @@ export interface VirtualWindow {
   offsetOf: (index: number) => number;
   /** Row `index`'s size. */
   sizeOf: (index: number) => number;
-  /** The viewport's scroll position and size, as last measured. */
+  /** The viewport's scroll position and size, as last measured (along the axis: see `axis`). */
   view: { top: number; height: number; width: number };
 }
 
@@ -58,15 +70,23 @@ export function useVirtualWindow(
     estimate = 32,
     overscan = 6,
     keep = -1,
+    axis = "y",
+    inset = 0,
   }: VirtualWindowOptions,
 ): VirtualWindow {
   const [view, setView] = useState({ top: 0, height: 0, width: 0, row: 0 });
   useClientLayoutEffect(() => {
     const el = scroller.current;
     if (!enabled || !el) return;
+    const x = axis === "x";
+    const along = x ? "offsetWidth" : "offsetHeight";
     const measure = () => {
-      const row = (rowSelector && el.querySelector<HTMLElement>(rowSelector)?.offsetHeight) || estimate;
-      const { clientHeight: height, clientWidth: width } = el;
+      const first = rowSelector ? el.querySelector<HTMLElement>(rowSelector) : null;
+      const row = first?.[along] || estimate;
+      const { clientHeight, clientWidth } = el;
+      // Along the axis: `height` is the view's length, `width` its breadth.
+      const height = x ? clientWidth : clientHeight;
+      const width = x ? clientHeight : clientWidth;
       setView((v) =>
         v.height === height && v.width === width && v.row === row ? v : { ...v, height, width, row },
       );
@@ -75,7 +95,7 @@ export function useVirtualWindow(
     const observer = new ResizeObserver(measure);
     observer.observe(el);
     return () => observer.disconnect();
-  }, [enabled, rowSelector, estimate, count > 0]);
+  }, [enabled, rowSelector, estimate, count > 0, axis]);
 
   const rowSize = view.row || estimate;
   // With sizes: each row's start, `gap` apart.
@@ -106,7 +126,7 @@ export function useVirtualWindow(
   };
   let indices: number[];
   if (enabled) {
-    const height = view.height || rowSize * 20;
+    const height = Math.max(1, (view.height || rowSize * 20) - inset);
     const first = Math.max(0, rowAt(view.top) - overscan);
     const last = Math.min(count, rowAt(view.top + height - 1) + 1 + overscan);
     indices = Array.from({ length: Math.max(0, last - first) }, (_, i) => first + i);
@@ -124,10 +144,17 @@ export function useVirtualWindow(
     reveal: (index) => {
       const el = scroller.current;
       if (!enabled || !el) return;
+      const x = axis === "x";
+      // Right to left, scrollLeft runs from 0 at the start to negative values.
+      const sign = x && isRtl(el) ? -1 : 1;
+      const at = x ? Math.abs(el.scrollLeft) : el.scrollTop;
+      const length = (x ? el.clientWidth : el.clientHeight) - inset;
       const top = offsetOf(index);
       const size = sizeOf(index);
-      if (top < el.scrollTop) el.scrollTop = top;
-      else if (top + size > el.scrollTop + el.clientHeight) el.scrollTop = top + size - el.clientHeight;
+      const to = top < at ? top : top + size > at + length ? top + size - length : at;
+      if (to === at) return;
+      if (x) el.scrollLeft = to * sign;
+      else el.scrollTop = to;
     },
   };
 }

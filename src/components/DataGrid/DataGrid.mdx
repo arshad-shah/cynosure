@@ -1,0 +1,122 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./DataGrid.stories";
+
+<Meta of={Stories} />
+
+# DataGrid
+
+A read-only grid for large results: only the rows and columns in view are rendered, so a hundred thousand rows by fifty columns scroll and move focus as quickly as twenty.
+
+<Canvas of={Stories.AHundredThousandRowsByFiftyColumns} />
+
+## When to use
+
+- **Query results and table data**: many rows, many columns, which people scan, sort, resize, select and copy.
+
+**Use something else when:**
+- the data is a few dozen rows people read rather than work through: [Table](?path=/docs/components-table--docs), a semantic table with row checkboxes
+- rows have no columns: [VirtualList](?path=/docs/components-virtuallist--docs)
+- cells are edited: not yet (inline editing, column reorder and a filter row come later)
+
+## Usage
+
+```tsx
+import { DataGrid, type DataGridColumn } from "@arshad-shah/cynosure";
+
+const columns: DataGridColumn<Row>[] = fields.map((field) => ({
+  key: field.name,
+  header: field.name,
+  sortable: true,
+  resizable: true,
+  minWidth: 80,
+  align: field.numeric ? "end" : "start",
+  cell: (row) => format(row[field.name]),
+  cellTone: (row) => (row[field.name] === null ? "null" : field.numeric ? "number" : undefined),
+}));
+
+<DataGrid label="Results" columns={columns} rows={rows} getRowId={(row) => row.id} size="sm" />
+```
+
+Columns are `width` CSS pixels wide (default 160). `cell` formats a value for display (default: the value as text, objects as JSON); `value` is the raw value that sorting compares and copying writes (default `row[key]`). Set the grid's height with `style={{ blockSize: … }}` or the `height` token.
+
+### Sorting
+
+A `sortable` column's header is a button: ascending, descending, then unsorted. The sort is a `TableSort` (`{ key, direction }`), the same as [Table](?path=/docs/components-table--docs)'s. Numbers compare as numbers, text in the locale's order, and empty values go last either way. Control it with `sort` and `onSortChange`; with `manualSort` you sort the rows (on a server) and the grid only shows and reports the sort.
+
+<Canvas of={Stories.SortingCyclesAndCompares} />
+
+### Selection and copying
+
+`selectionMode` is `"none"` (default), `"row"`, `"cell"` or `"range"`. Rows are `selectedRows` (ids); cells are `selectedRange`, two corners (`{ anchor, focus }`, each `{ rowId, key }`), so a selection survives sorting and loading more rows. Ctrl/Cmd+C copies the selection as tab-separated text: rows on lines, raw values, and a value holding a tab, a line break or a quote is quoted.
+
+Text inside cells stays selectable: dragging selects text, and a copy with text selected copies that text, the browser's way. Cells are selected by clicking, Shift+click and the keyboard instead, so both work without a mode switch.
+
+<Canvas of={Stories.SelectARangeAndCopy} />
+
+### Full values, nulls and numbers
+
+`tooltip` returns the full value of a cell cut short (shown in a [Tooltip](?path=/docs/components-tooltip--docs) on hover and keyboard focus, and describing the cell), or nothing. `cellTone` colours a cell: `"null"` is muted and italic, `"number"` takes the number colour token, or a tone. `size="sm"` is dense: 28px rows under a 32px header.
+
+<Canvas of={Stories.TooltipShowsTheFullValue} />
+
+<Canvas of={Stories.DenseRowsAndCellTones} />
+
+### Load more, or pages
+
+`onEndReached` is called once the last rows come into view, once per row count: append the next rows. For pages, put a [Pagination](?path=/docs/components-pagination--docs) under the grid and give the grid one page of rows; paging is not built in.
+
+```tsx
+const [page, setPage] = useState(1);
+<DataGrid label="Results" columns={columns} rows={rows.slice((page - 1) * 50, page * 50)} getRowId={(r) => r.id} />
+<Pagination count={pageCount(rows.length, 50)} page={page} onChange={setPage} />
+```
+
+<Canvas of={Stories.PagedWithPagination} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+An APG grid (`role="grid"` with rows, column headers and cells) with one tab stop. `aria-rowcount`, `aria-colcount` and each row's and cell's index count every row and column, rendered or not. The focused cell is scrolled into view below the sticky header, and stays rendered while it is scrolled away.
+
+| Key | Does |
+| --- | --- |
+| Arrows | Move between cells; Left and Right follow the reading direction; Up from the first row reaches the header |
+| Home / End | First or last cell of the row |
+| Ctrl+Home / Ctrl+End | First or last cell of the grid |
+| Page Up / Page Down | A view of rows up or down (Page Up from the first row reaches the header) |
+| Enter | On a cell: `onRowActivate` (so does a double-click). On a sortable header: sorts |
+| Alt+Left / Alt+Right | On a resizable header: narrow or widen the column (Shift for a bigger step); announced through `aria-keyshortcuts` |
+| Space | Selects the focused row or cell; Ctrl/Cmd+Space toggles a row; Shift+Space extends |
+| Shift+arrows | Extend the selection (rows, or a range of cells) |
+| Ctrl/Cmd+A | Select every row, or every cell with `range` |
+| Ctrl/Cmd+C | Copy the selection as tab-separated text |
+| Tab | Leaves the grid |
+
+Clicking a cell selects it (or its row); Ctrl/Cmd+click toggles a row; Shift+click extends. `onRowClick` reports every click or tap on a row. A resizable column's edge is dragged with a mouse, pen or finger; Escape cancels the drag. In right-to-left text the first column is on the right and the edge on a column's left.
+
+## Touch
+
+A finger scrolls the grid in both directions and a tap acts as a click. Rows and the header are at least 44px tall on a coarse pointer, and a column's edge has a 44px hit area.
+
+## Theming
+
+| Token | Default |
+| --- | --- |
+| `--cy-data-grid-height` | 12 control heights |
+| `--cy-data-grid-row-height` | `--cy-control-height-md`; with `sm`, `--cy-control-height-sm` plus `--cy-space-1` |
+| `--cy-data-grid-header-height` | `--cy-control-height-lg`; with `sm`, `--cy-control-height-md` |
+| `--cy-data-grid-header-background` | `--cy-color-soft` |
+| `--cy-data-grid-selected-background` | the accent mixed into the surface |
+| `--cy-data-grid-cell-padding` | `--cy-space-5`; with `sm`, `--cy-space-4` |
+| `--cy-data-grid-null-color` | `--cy-color-muted` |
+| `--cy-data-grid-number-color` | `--cy-color-ink` |
+
+## Related
+
+- [Table](?path=/docs/components-table--docs): a short, semantic table
+- [VirtualList](?path=/docs/components-virtuallist--docs): a long list without columns
+- [Pagination](?path=/docs/components-pagination--docs): pages under the grid
+- [Tooltip](?path=/docs/components-tooltip--docs): the full value of a cut-short cell
