@@ -27,7 +27,7 @@ import { SplitPane } from "@arshad-shah/cynosure";
 </div>
 ```
 
-The SplitPane fills its container, so give the container a size. Each pane scrolls on its own. Remember the size by passing `size` and `onSizeChange`.
+The SplitPane fills its container, so give the container a size. Each pane scrolls on its own. Remember the size by passing `size` and `onSizeChange`, and save it in `onResizeEnd`.
 
 ## Stacked and collapsible
 
@@ -37,23 +37,47 @@ The SplitPane fills its container, so give the container a size. Each pane scrol
 
 <Canvas of={Stories.CollapseAndRestore} />
 
+## Sidebars and docks
+
+`anchor="end"` gives the size to the end pane, so with `unit="px"` a right sidebar or a bottom dock keeps its pixels as the window grows and the start pane takes the rest. `collapsed`, `defaultCollapsed` and `onCollapsedChange` collapse the anchored pane from a menu or a button; its size is kept and comes back when it expands. `onResizeEnd` is called once, with the final size, when a drag is released or a resize key is let go: the moment to save the size.
+
+```tsx
+<SplitPane
+  label="Resize the results"
+  orientation="vertical"
+  unit="px"
+  anchor="end"
+  start={<Editor />}
+  end={<Results />}
+  defaultSize={240}
+  onResizeEnd={saveHeight}
+  collapsed={!resultsOpen}
+  onCollapsedChange={(collapsed) => setResultsOpen(!collapsed)}
+/>
+```
+
+<Canvas of={Stories.ABottomDock} />
+
+<Canvas of={Stories.ToggledFromAButton} />
+
 ## Props
 
 <ArgTypes of={Stories} />
 
 ## Behaviour and accessibility
 
-- **Role:** the divider is a focusable `separator` named by `label`, with the start pane's size as `aria-valuenow` (percent) and `aria-controls` pointing at it.
-- **Keyboard:**
+- **Role:** the divider is a focusable `separator` named by `label`, with the anchored pane's size (the start pane unless `anchor="end"`; 0 when collapsed) as `aria-valuenow` and `aria-controls` pointing at that pane.
+- **Keyboard:** the keys move the divider, so the anchored pane grows or shrinks with it.
 
-| Key                         | Action                                         |
-| --------------------------- | ---------------------------------------------- |
-| Arrow Left / Right          | Shrink / grow the start pane (side by side; flipped in right-to-left text) |
-| Arrow Up / Down             | Shrink / grow the start pane (stacked)         |
-| Home / End                  | To `min` / `max`                               |
-| Enter                       | Collapse or restore (with `collapsible`)       |
+| Key                | Action                                                                                    |
+| ------------------ | ----------------------------------------------------------------------------------------- |
+| Arrow Left / Right | Move the divider (side by side; flipped in right-to-left text)                            |
+| Arrow Up / Down    | Move the divider (stacked)                                                                |
+| Home / End         | The anchored pane to `min` / `max`                                                        |
+| Enter              | Collapse or restore the anchored pane (with `collapsible`, `collapsed` or `defaultCollapsed`) |
 
-- **Pointer and touch:** drag the divider; it keeps focus afterwards so the keys can fine-tune. Its hit area is at least 24px wide, 44px on touch screens, and touch dragging does not scroll the page.
+  Collapsed, a key that grows the pane opens it at `min`; the others leave it closed. `onResizeEnd` fires when the key is let go.
+- **Pointer and touch:** drag the divider; it keeps focus afterwards so the keys can fine-tune. Dragging a collapsed divider opens the pane, and Escape puts back the size and collapse the drag began with. Its hit area is at least 24px wide, 44px on touch screens, and touch dragging does not scroll the page.
 - **Direction:** the start pane is on the right in right-to-left text.
 
 ## Theming
