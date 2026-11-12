@@ -186,19 +186,19 @@ export function VirtualList<T>({
   useClientLayoutEffect(() => {
     if (!wrap) return;
     const observer = new ResizeObserver((entries) => {
-      const seen: [string, number][] = [];
+      const sized: [string, number][] = [];
       for (const { target } of entries) {
         const key = keysRef.current[Number((target as HTMLElement).dataset.index)];
         const h = (target as HTMLElement).offsetHeight;
-        if (h && key !== undefined) seen.push([key, h]);
+        if (h && key !== undefined) sized.push([key, h]);
       }
-      if (!seen.length) return;
+      if (!sized.length) return;
       setMeasured((measured) => {
-        const changed = seen.filter(([key, h]) => measured.get(key) !== h);
+        const changed = sized.filter(([key, h]) => measured.get(key) !== h);
         return changed.length ? new Map([...measured, ...changed]) : measured;
       });
       // One line: the smallest row first seen, so unseen rows are never guessed taller than they can be.
-      const least = Math.min(...seen.map(([, h]) => h));
+      const least = Math.min(...sized.map(([, h]) => h));
       setLine((l) => l || least);
     });
     sizer.current = { observer, seen: new Set() };
@@ -207,7 +207,8 @@ export function VirtualList<T>({
       sizer.current = null;
     };
   }, [wrap]);
-  // Observe the rows that are new to the DOM and let go of the ones that left; observing reads nothing.
+  // Observe the rows new to the DOM and let go of the ones that left; observing reads nothing (the observer measures
+  // after layout).
   useClientLayoutEffect(() => {
     const s = sizer.current;
     if (!s) return;
@@ -314,13 +315,10 @@ export function VirtualList<T>({
     setSaid(text.moved(block.length, at + 1, keys.length));
     moveFocus.current = true;
   };
-  /** Where `block`'s first row is now, counted among the rows that stay. */
-  const placeOf = (block: string[]) => {
+  /** How many rows before row `end` stay put when `block` moves. */
+  const staying = (end: number, block: string[]) => {
     const moving = new Set(block);
-    const first = indexOf.get(block[0] as string) ?? 0;
-    let place = 0;
-    for (let n = 0; n < first; n++) if (!moving.has(keys[n] as string)) place++;
-    return place;
+    return keys.slice(0, end).filter((k) => !moving.has(k)).length;
   };
   /** The rows being dragged, for a quick look-up per rendered row. */
   const dragging = useMemo(() => (drag ? new Set(drag.block) : null), [drag?.block]);
@@ -352,8 +350,7 @@ export function VirtualList<T>({
       const d = dragRef.current as { block: string[]; gap: number };
       setDrag(null);
       if (cancelled) return;
-      const moving = new Set(d.block);
-      move(d.block, keys.slice(0, d.gap).filter((k) => !moving.has(k)).length);
+      move(d.block, staying(d.gap, d.block));
     },
   });
 
@@ -362,7 +359,10 @@ export function VirtualList<T>({
       event.preventDefault();
       if (off(stop)) return;
       const block = blockFrom(stop);
-      move(block, placeOf(block) + (event.key === "ArrowUp" ? -1 : 1));
+      move(
+        block,
+        staying(indexOf.get(block[0] as string) as number, block) + (event.key === "ArrowUp" ? -1 : 1),
+      );
       return;
     }
     const page = Math.max(1, Math.floor((root.current as HTMLDivElement).clientHeight / win.rowSize) - 1);
