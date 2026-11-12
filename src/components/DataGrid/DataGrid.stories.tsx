@@ -150,6 +150,124 @@ export const FocusSurvivesScrollingAway: Story = {
   },
 };
 
+interface Person {
+  id: string;
+  name: string;
+  age: number | null;
+  city: string;
+}
+const PEOPLE: Person[] = [
+  { id: "p1", name: "Grace", age: 85, city: "Arlington" },
+  { id: "p2", name: "ada", age: 36, city: "London" },
+  { id: "p3", name: "Linus", age: null, city: "Helsinki" },
+  { id: "p4", name: "Barbara", age: 9, city: "Boston" },
+];
+const PEOPLE_COLUMNS: DataGridColumn<Person>[] = [
+  { key: "name", header: "Name", sortable: true, resizable: true },
+  {
+    key: "age",
+    header: "Age",
+    sortable: true,
+    align: "end",
+    width: 96,
+    cell: (p) => p.age ?? "NULL",
+    cellTone: (p) => (p.age === null ? "null" : "number"),
+  },
+  { key: "city", header: "City", resizable: true, minWidth: 80, maxWidth: 240 },
+];
+const people = {
+  label: "People",
+  columns: PEOPLE_COLUMNS,
+  rows: PEOPLE,
+  getRowId: (p: Person) => p.id,
+} as Partial<DataGridProps<unknown>>;
+/** The first column's text, top to bottom. */
+const names = (el: Element) =>
+  [...el.querySelectorAll('[role="row"]')]
+    .slice(1)
+    .sort((a, b) => Number(a.getAttribute("aria-rowindex")) - Number(b.getAttribute("aria-rowindex")))
+    .map((r) => r.querySelector('[aria-colindex="1"]')?.textContent);
+
+export const SortingCyclesAndCompares: Story = {
+  args: people,
+  play: async ({ args, canvas, canvasElement, userEvent }) => {
+    const name = canvas.getByRole("columnheader", { name: "Name" });
+    await expect(name).toHaveAttribute("aria-sort", "none");
+    // City is not sortable: no button, no aria-sort.
+    await expect(canvas.getByRole("columnheader", { name: "City" })).not.toHaveAttribute("aria-sort");
+    await expect(canvas.getAllByRole("button").map((b) => b.textContent)).toEqual(["Name", "Age"]);
+    await userEvent.click(canvas.getByRole("button", { name: "Name" }));
+    await expect(names(canvasElement)).toEqual(["ada", "Barbara", "Grace", "Linus"]);
+    await expect(name).toHaveAttribute("aria-sort", "ascending");
+    await expect(args.onSortChange).toHaveBeenLastCalledWith({ key: "name", direction: "ascending" });
+    await userEvent.click(canvas.getByRole("button", { name: "Name" }));
+    await expect(names(canvasElement)).toEqual(["Linus", "Grace", "Barbara", "ada"]);
+    await expect(name).toHaveAttribute("aria-sort", "descending");
+    await userEvent.click(canvas.getByRole("button", { name: "Name" }));
+    await expect(names(canvasElement)).toEqual(["Grace", "ada", "Linus", "Barbara"]);
+    await expect(args.onSortChange).toHaveBeenLastCalledWith(null);
+    // Numbers compare as numbers; an empty value is last either way.
+    await userEvent.click(canvas.getByRole("button", { name: "Age" }));
+    await expect(names(canvasElement)).toEqual(["Barbara", "ada", "Grace", "Linus"]);
+    await userEvent.click(canvas.getByRole("button", { name: "Age" }));
+    await expect(names(canvasElement)).toEqual(["Grace", "ada", "Barbara", "Linus"]);
+    await expect(name).toHaveAttribute("aria-sort", "none");
+  },
+};
+
+export const SortFromTheKeyboard: Story = {
+  args: people,
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    await userEvent.tab();
+    await expect(focused()).toBe("Grace");
+    // Up reaches the header's sort button; Enter sorts and focus stays on it.
+    await userEvent.keyboard("{ArrowUp}");
+    await expect(document.activeElement).toBe(canvas.getByRole("button", { name: "Name" }));
+    await userEvent.keyboard("{Enter}");
+    await expect(names(canvasElement)).toEqual(["ada", "Barbara", "Grace", "Linus"]);
+    await expect(document.activeElement).toBe(canvas.getByRole("button", { name: "Name" }));
+    // A header that does not sort is focused itself.
+    await userEvent.keyboard("{End}");
+    await expect(document.activeElement).toBe(canvas.getByRole("columnheader", { name: "City" }));
+    await userEvent.keyboard("{Enter}{ArrowDown}");
+    await expect(focused()).toBe("London");
+  },
+};
+
+export const ControlledAndManualSort: Story = {
+  args: { ...people, sort: { key: "age", direction: "descending" }, manualSort: true },
+  play: async ({ args, canvas, canvasElement, userEvent }) => {
+    // The server sorts: the rows stay as given, the header shows the sort.
+    await expect(names(canvasElement)).toEqual(["Grace", "ada", "Linus", "Barbara"]);
+    await expect(canvas.getByRole("columnheader", { name: "Age" })).toHaveAttribute(
+      "aria-sort",
+      "descending",
+    );
+    // Pressing reports the next sort; controlled, nothing changes until the parent passes it.
+    await userEvent.click(canvas.getByRole("button", { name: "Age" }));
+    await expect(args.onSortChange).toHaveBeenLastCalledWith(null);
+    await expect(canvas.getByRole("columnheader", { name: "Age" })).toHaveAttribute(
+      "aria-sort",
+      "descending",
+    );
+  },
+};
+
+export const ControlledSortSortsTheRows: Story = {
+  args: { ...people, sort: { key: "city", direction: "ascending" } },
+  play: async ({ canvasElement }) => {
+    // A sort on a column that is not sortable by the header still sorts, by the column's value.
+    await expect(names(canvasElement)).toEqual(["Grace", "Barbara", "Linus", "ada"]);
+  },
+};
+
+export const SortByAColumnThatIsGone: Story = {
+  args: { ...people, defaultSort: { key: "missing", direction: "ascending" } },
+  play: async ({ canvasElement }) => {
+    await expect(names(canvasElement)).toEqual(["Grace", "ada", "Linus", "Barbara"]);
+  },
+};
+
 export const StableUnderHostileHost: Story = {
   args: { rows: HUGE_ROWS.slice(0, 20), columns: HUGE_COLUMNS.slice(0, 4) } as Partial<
     DataGridProps<unknown>
