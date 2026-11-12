@@ -1,0 +1,96 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./TitleBar.stories";
+
+<Meta of={Stories} />
+
+# TitleBar
+
+The title bar of an installed app that draws its own: a frameless Electron window, or an installed web app using Window Controls Overlay. The whole bar drags the window, every control inside stays clickable, and the app's window controls sit at its end.
+
+<Canvas of={Stories.Default} />
+
+## When to use
+
+- **A desktop app without the system's title bar**: Electron with `frame: false` or `titleBarStyle: "hidden"`, or a web app whose manifest asks for `window-controls-overlay`.
+- **The app's menus and title in the window's top edge**, where people expect to drag the window.
+
+**Use something else when:**
+- the page runs in a browser tab: the site's header is a [SiteHeader](?path=/docs/components-siteheader--docs) and an app's header is [AppShell](?path=/docs/components-appshell--docs)'s
+- the row holds a page's own actions: a [Toolbar](?path=/docs/components-toolbar--docs) or a [PageHeader](?path=/docs/components-pageheader--docs)
+
+## Usage
+
+```tsx
+import { IconButton, Menubar, TitleBar } from "@arshad-shah/cynosure";
+import { settings } from "@arshad-shah/cynosure/icons";
+
+<TitleBar
+  label="Verql"
+  leading={<Menubar label="Application" menus={menus} size="sm" onSelect={run} />}
+  trailing={<IconButton icon={settings} label="Settings" variant="ghost" size="sm" />}
+  controls={{
+    minimize: () => ipc.minimize(),
+    toggleMaximize: () => ipc.toggleMaximize(),
+    close: () => ipc.close(),
+    maximized,
+  }}
+>
+  orders.sql — Verql
+</TitleBar>
+```
+
+The title is centred on the whole bar while the leading and trailing content leave room, and ends in an ellipsis when they do not.
+
+### Each platform
+
+| Where | What to pass |
+| --- | --- |
+| Windows and Linux, frameless | `controls`: the bar draws minimize, maximize or restore, and close |
+| macOS, `titleBarStyle: "hidden"` | `leadingInset={80}` to clear the traffic lights, and `onHeightChange` to place them (Electron's `setWindowButtonPosition`) |
+| Window Controls Overlay (installed web apps, Electron's `titleBarOverlay`) | `overlay`: the system draws the controls, the bar takes the area it leaves |
+
+## Window controls
+
+`controls` takes `{ minimize, toggleMaximize, close, maximized }`, and each button shows only when its callback is given (a settings window may have only close). When `maximized` is true the middle button shows the restore icon and is named Restore. Keep `maximized` in step with the window, including changes the system makes (snapping, double-clicking the bar).
+
+<Canvas of={Stories.MaximizedShowsRestore} />
+
+The controls are a part of TitleBar rather than a component of their own: they have one right place, at the window's edge after the trailing content, and are exactly as tall as the bar.
+
+## Overlay mode
+
+With `overlay`, the bar is fixed to the window's title bar area, read from `env(titlebar-area-x)`, `env(titlebar-area-y)`, `env(titlebar-area-width)` and `env(titlebar-area-height)`, so it never runs under the controls the system draws, on whichever side it draws them. Where those values are missing (a browser tab, an engine without the overlay) it falls back to the top of the window, the full width and the `--cy-title-bar-height` token. Offset the page's content by the height `onHeightChange` reports.
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+| Input | Result |
+| --- | --- |
+| Drag on the bar, the title or empty space | Moves the window (`app-region: drag`, Chromium-based hosts only) |
+| Click, <kbd>Enter</kbd> or <kbd>Space</kbd> on a control | Calls `minimize`, `toggleMaximize` or `close` |
+| <kbd>Tab</kbd> | Moves through the bar's controls in reading order, the window controls last (minimize, maximize, close) |
+
+- **Dragging:** the bar has `app-region: drag` (and `-webkit-app-region`). Interactive elements inside it, whoever rendered them (links, buttons, fields, labels, anything with a `tabindex` or a widget role such as a menubar's titles), get `no-drag`, so they stay clickable.
+- **Roles:** the bar is a `group` named by `label` (default "Title bar"). The controls are buttons named Minimize, Maximize or Restore, and Close, each with a tooltip; rename them through `labels`.
+- **Height:** `onHeightChange` reports the border-box height on mount and whenever it changes (ResizeObserver), not again for the same height.
+- **Right to left:** the bar mirrors. `leadingInset` is at the inline start (the right) and the controls at the inline end (the left), close outermost, as Windows draws its caption buttons in right-to-left languages.
+- **Isolation:** it never writes to `<html>` or `<body>`; overlay mode positions the bar itself. Works inside a shadow root.
+
+## Touch
+
+Each control is at least 24px to press, and 44px on coarse pointers; a tap acts.
+
+## Theming
+
+Tokens: `--cy-title-bar-height`, `--cy-title-bar-bg`, `--cy-title-bar-ink`, `--cy-title-bar-border`, `--cy-title-bar-padding-inline`, `--cy-title-bar-gap`, `--cy-title-bar-title-font-size`, `--cy-title-bar-control-width` (46px by default, as tall as the bar), `--cy-title-bar-close-hover-bg` and `--cy-title-bar-close-hover-ink` (close's danger fill on hover) and `--cy-title-bar-z` (overlay mode).
+
+```ts
+createTheme({ components: { titleBar: { height: "32px", controlWidth: "46px" } } });
+```
+
+## Related
+
+[Menubar](?path=/docs/components-menubar--docs) · [AppShell](?path=/docs/components-appshell--docs) · [IconButton](?path=/docs/components-iconbutton--docs) · [Toolbar](?path=/docs/components-toolbar--docs)

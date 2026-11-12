@@ -439,6 +439,13 @@ export {
   type TimeFieldProps,
 } from "./components/TimeField/index.js";
 export {
+  TitleBar,
+  type TitleBarControls,
+  type TitleBarLabels,
+  type TitleBarProps,
+  type TitleBarTokens,
+} from "./components/TitleBar/index.js";
+export {
   type ToastApi,
   Toaster,
   type ToasterProps,
