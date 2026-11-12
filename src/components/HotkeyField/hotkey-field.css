@@ -1,0 +1,99 @@
+/* hotkey-field: a Field group holding the shortcut's box (Kbd, "Not set" or the recording prompt), the record toggle
+   and the clear button (IconButtons). The box is drawn like a field and turns to the accent while recording. Parts
+   that set their own font size or colour double their selector, to win over .cy-reset whatever the rule order. */
+.cy-hotkey-field.cy-hotkey-field {
+  --_h: var(--cy-control-height-md);
+  --_hit: var(--cy-hit-min, 24px);
+  /* The text in the box, a step below the field's size like Kbd's caps. */
+  --_fs: var(--cy-font-size-sm);
+  box-sizing: border-box !important;
+  display: block;
+  margin: 0;
+  color: var(--cy-color-ink);
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-font-size-md);
+  letter-spacing: normal;
+  text-transform: none;
+  &[data-size="sm"] {
+    --_h: var(--cy-control-height-sm);
+    --_fs: var(--cy-font-size-xs);
+    font-size: var(--cy-font-size-sm);
+  }
+  &[data-size="lg"] {
+    --_h: var(--cy-control-height-lg);
+    --_fs: var(--cy-font-size-md);
+    font-size: var(--cy-font-size-lg);
+  }
+}
+
+.cy-hotkey-field-row {
+  display: flex;
+  align-items: center;
+  gap: var(--cy-hotkey-field-gap, var(--cy-space-2));
+  min-inline-size: 0;
+}
+
+.cy-hotkey-field-box.cy-hotkey-field-box {
+  box-sizing: border-box !important;
+  display: flex;
+  flex: 0 1 auto;
+  align-items: center;
+  /* Hugs the shortcut, with room for the prompt so the buttons do not jump when recording starts. */
+  min-inline-size: min(100%, 11em);
+  min-block-size: max(var(--_h), var(--_hit));
+  padding: 0 var(--cy-space-4);
+  border: var(--cy-border-width) solid var(--cy-hotkey-field-border, var(--cy-color-line));
+  border-radius: var(--cy-hotkey-field-radius, calc(var(--_h) * var(--cy-radius-factor)));
+  background: var(--cy-hotkey-field-bg, var(--cy-color-surface));
+  font-size: var(--_fs);
+  line-height: var(--cy-font-line-height);
+  cursor: pointer;
+  transition: border-color var(--cy-motion-fast) var(--cy-motion-ease);
+  &[data-recording] {
+    border-color: var(--cy-hotkey-field-recording-border, var(--cy-color-accent));
+    cursor: default;
+  }
+  /* Disabled: a sunken fill, with the keys still readable (the buttons beside it show they cannot be pressed). */
+  &[data-disabled] {
+    border-color: transparent;
+    background: var(--cy-color-soft);
+    cursor: not-allowed;
+  }
+}
+
+.cy-hotkey-field-none.cy-hotkey-field-none {
+  color: var(--cy-color-muted);
+}
+
+.cy-hotkey-field-prompt.cy-hotkey-field-prompt {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cy-space-3);
+  color: var(--cy-hotkey-field-recording-color, var(--cy-color-accent-text));
+}
+
+/* A recording light that pulses; reduced motion keeps it lit and still. */
+.cy-hotkey-field-dot {
+  flex: none;
+  inline-size: var(--cy-space-3);
+  block-size: var(--cy-space-3);
+  border-radius: 50%;
+  background: currentColor;
+  animation: cy-hotkey-field-pulse calc(3 * var(--cy-motion-slow)) var(--cy-motion-ease) infinite alternate;
+}
+@keyframes cy-hotkey-field-pulse {
+  to {
+    opacity: 0.3;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cy-hotkey-field-dot {
+    animation: none;
+  }
+}
+
+@media (pointer: coarse) {
+  .cy-hotkey-field.cy-hotkey-field {
+    --_hit: var(--cy-hit-coarse, 44px);
+  }
+}

@@ -187,6 +187,12 @@ export {
   type HeadingSize,
   type HeadingTokens,
 } from "./components/Heading/index.js";
+export {
+  HotkeyField,
+  type HotkeyFieldLabels,
+  type HotkeyFieldProps,
+  type HotkeyFieldTokens,
+} from "./components/HotkeyField/index.js";
 export { HoverCard, type HoverCardProps, type HoverCardTokens } from "./components/HoverCard/index.js";
 export { IconButton, type IconButtonProps } from "./components/IconButton/index.js";
 export { IconTile, type IconTileProps, type IconTileTokens } from "./components/IconTile/index.js";
@@ -507,7 +513,15 @@ export { type DragOptions, type DragSession, useDrag } from "./foundations/drag.
 export { FileInputBase, type FileInputBaseProps, setInputFiles } from "./foundations/FileInputBase/index.js";
 export { type FieldRender, useField } from "./foundations/field.js";
 export { HiddenValue, type HiddenValueProps } from "./foundations/HiddenValue/HiddenValue.js";
-export { ariaKeyShortcuts, isApple, matchesHotkey, shortcutKeys, useHotkey } from "./foundations/hotkey.js";
+export {
+  ariaKeyShortcuts,
+  type HotkeyFromEventOptions,
+  hotkeyFromEvent,
+  isApple,
+  matchesHotkey,
+  shortcutKeys,
+  useHotkey,
+} from "./foundations/hotkey.js";
 export { Icon, type IconProps } from "./foundations/Icon/Icon.js";
 export { InputBase, type InputBaseProps } from "./foundations/InputBase/InputBase.js";
 export { LinkBase, type LinkBaseProps } from "./foundations/LinkBase/LinkBase.js";

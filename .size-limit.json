@@ -2,7 +2,7 @@
   {
     "name": "all CSS",
     "path": "dist/styles.css",
-    "limit": "33.7 kB",
+    "limit": "34.4 kB",
     "gzip": true
   },
   {
@@ -305,7 +305,7 @@
       "dist/foundations/hotkey.js",
       "dist/styles/command-palette.css"
     ],
-    "limit": "4.75 kB",
+    "limit": "4.9 kB",
     "gzip": true
   },
   {
@@ -684,6 +684,12 @@
       "dist/styles/scroll-area.css"
     ],
     "limit": "2.1 kB",
+    "gzip": true
+  },
+  {
+    "name": "HotkeyField (JS + CSS)",
+    "path": ["dist/components/HotkeyField/HotkeyField.js", "dist/styles/hotkey-field.css"],
+    "limit": "3 kB",
     "gzip": true
   }
 ]
