@@ -12,6 +12,7 @@ export default defineConfig({
       { find: /^react\/jsx-dev-runtime$/, replacement: react18("react/jsx-dev-runtime.js") },
       { find: /^react-dom$/, replacement: react18("react-dom/index.js") },
       { find: /^react-dom\/client$/, replacement: react18("react-dom/client.js") },
+      { find: /^react-dom\/server$/, replacement: react18("react-dom/server.node.js") },
       { find: /^react-dom\/test-utils$/, replacement: react18("react-dom/test-utils.js") },
     ],
   },

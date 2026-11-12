@@ -233,6 +233,38 @@ export const WheelPansAndCtrlWheelZooms: Story = {
   },
 };
 
+export const SlowTrackpadPinchZooms: Story = {
+  render: () => <Board start={{ x: 0, y: 0, scale: 1 }} />,
+  play: async ({ canvasElement }) => {
+    const el = surface(canvasElement);
+    const r = box(el);
+    // A slow trackpad pinch: many Ctrl+wheel events of a tiny delta, each well under a whole percent.
+    const pinch = (deltaY: number) =>
+      el.dispatchEvent(
+        new WheelEvent("wheel", {
+          clientX: r.left + 200,
+          clientY: r.top + 150,
+          deltaY,
+          ctrlKey: true,
+          bubbles: true,
+          cancelable: true,
+        }),
+      );
+    for (let i = 0; i < 40; i++) {
+      pinch(-2);
+      await new Promise((done) => requestAnimationFrame(done));
+    }
+    // 40 steps of 0.3% add up to about 13%.
+    await waitFor(() => expect(viewOf(canvasElement).scale).toBeGreaterThanOrEqual(1.1));
+    await expect(viewOf(canvasElement).scale).toBeLessThanOrEqual(1.15);
+    for (let i = 0; i < 40; i++) {
+      pinch(2);
+      await new Promise((done) => requestAnimationFrame(done));
+    }
+    await waitFor(() => expect(viewOf(canvasElement).scale).toBeCloseTo(1, 1));
+  },
+};
+
 export const KeysPanZoomAndFit: Story = {
   render: () => <Board start={{ x: 0, y: 0, scale: 1 }} />,
   play: async ({ canvasElement, userEvent }) => {

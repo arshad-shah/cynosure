@@ -4,13 +4,22 @@ import { useEffect, useRef } from "react";
 export const isApple = () =>
   typeof navigator !== "undefined" && /Mac|iPhone|iPad|iPod/.test(navigator.platform || navigator.userAgent);
 
-/** Parses "mod+shift+k" into a matcher for keyboard events. */
+/** The letter or digit printed on the physical key ("KeyK" is "k", "Digit1" is "1"), or "". */
+const codeKey = (code: string) => (/^(?:Key[A-Z]|Digit\d)$/.test(code) ? code.slice(-1).toLowerCase() : "");
+
+/**
+ * Parses "mod+shift+k" into a matcher for keyboard events. The key is compared with the character typed and, when
+ * that is not a letter or digit (Option+K types "˚" on macOS, Shift+1 types "!"), with the physical key. A "+" can be
+ * the key itself ("mod++").
+ */
 export function matchesHotkey(combo: string, event: KeyboardEvent): boolean {
-  const parts = combo.toLowerCase().split("+");
+  const parts = combo.toLowerCase().split(/\+(?=.)/);
   const key = parts.pop() ?? "";
   const want = new Set(parts.map((p) => (p === "mod" ? (isApple() ? "meta" : "ctrl") : p)));
+  const typed = event.key.toLowerCase();
+  const hit = typed === key || (!/^[a-z0-9]$/.test(typed) && codeKey(event.code ?? "") === key);
   return (
-    event.key.toLowerCase() === key &&
+    hit &&
     event.ctrlKey === want.has("ctrl") &&
     event.metaKey === want.has("meta") &&
     event.altKey === want.has("alt") &&

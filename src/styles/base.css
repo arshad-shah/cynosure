@@ -40,10 +40,11 @@
   text-transform: none;
 }
 
+/* Cynosure's own elements only: a class that starts with "cy-", not a host class that contains it (.privacy-banner). */
 @media (prefers-reduced-motion: reduce) {
-  :where([class*="cy-"]),
-  :where([class*="cy-"])::before,
-  :where([class*="cy-"])::after,
+  :where([class^="cy-"], [class*=" cy-"]),
+  :where([class^="cy-"], [class*=" cy-"])::before,
+  :where([class^="cy-"], [class*=" cy-"])::after,
   .cy-reset,
   .cy-reset *,
   .cy-reset::before,

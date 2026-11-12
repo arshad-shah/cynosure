@@ -59,16 +59,22 @@ export function themeToCss(theme: Theme, selector: string = DEFAULT_SELECTOR): s
     ),
   ];
   const contrast = decl(colorPairs(theme.palettes["light-contrast"], theme.palettes["dark-contrast"]));
+  const normal = decl(colorPairs(light, dark));
   // Selector lists are wrapped in :is() so attribute qualifiers apply to every selector in the list.
   const host = selector.includes(",") ? `:is(${selector})` : selector;
   const scoped = (attr: string) => (selector === DEFAULT_SELECTOR ? `:where(${attr})` : `${host}${attr}`);
   const isDefault = selector === DEFAULT_SELECTOR;
+  // On an OS set to more contrast, a wrapper with contrast="normal" (and no theme of its own) puts the normal colours
+  // back over the contrast ones it inherits. It comes after the contrast rule, so it wins at equal specificity.
+  const undo = isDefault
+    ? `:where([data-cy-contrast="normal"]){${normal}}`
+    : `${scoped('[data-cy-contrast="system"]')} [data-cy-contrast="normal"]{${normal}}`;
   return [
     `${selector}{${decl(base)}}`,
     `${scoped('[data-cy-mode="light"]')}{color-scheme:light}`,
     `${scoped('[data-cy-mode="dark"]')}{color-scheme:dark}`,
     `${scoped('[data-cy-mode="system"]')}{color-scheme:light dark}`,
-    `@media (prefers-contrast:more){${isDefault ? ':where(:root:not([data-cy-contrast]),:host,[data-cy-contrast="system"])' : scoped('[data-cy-contrast="system"]')}{${contrast}}}`,
+    `@media (prefers-contrast:more){${isDefault ? ':where(:root:not([data-cy-contrast]),:host,[data-cy-contrast="system"])' : scoped('[data-cy-contrast="system"]')}{${contrast}}${undo}}`,
     `${scoped('[data-cy-contrast="more"]')}{${contrast}}`,
   ].join("\n");
 }

@@ -1,6 +1,7 @@
 import { type KeyboardEvent, type RefObject, useEffect, useRef, useState } from "react";
 import { useDrag } from "./drag.js";
-import { clampPercent, zoomStep } from "./zoom.js";
+import { clamp } from "./math.js";
+import { clampPercent, MAX_PERCENT, MIN_PERCENT, zoomStep } from "./zoom.js";
 
 /** Where a zoom is centred, in pixels from the viewport's top left; null for its centre (a key or a button). */
 export type ZoomAnchor = { x: number; y: number } | null;
@@ -51,7 +52,11 @@ export function useZoomGestures(
     const zoomTo = (next: number, anchor: ZoomAnchor) => {
       const p = clampPercent(next);
       if (p !== latest.current.percent) latest.current.onZoom(p, anchor);
+      return p;
     };
+    // The wheel's zoom, unrounded: a slow trackpad pinch sends steps far under 1%, which rounding each one would lose.
+    // It starts again from `percent` when something else (a key, a button, a pinch) changed the zoom.
+    let wheel = { exact: latest.current.percent, reported: latest.current.percent };
     const onWheel = (e: WheelEvent) => {
       if (!e.ctrlKey && !e.metaKey) {
         const pan = latest.current.onPan;
@@ -62,7 +67,10 @@ export function useZoomGestures(
       }
       // The browser's own page zoom must not happen on top of ours.
       e.preventDefault();
-      zoomTo(latest.current.percent * Math.exp(-e.deltaY * 0.0015), at(e.clientX, e.clientY));
+      const { percent: shown } = latest.current;
+      if (shown !== wheel.reported) wheel = { exact: shown, reported: shown };
+      const exact = clamp(wheel.exact * Math.exp(-e.deltaY * 0.0015), MIN_PERCENT, MAX_PERCENT);
+      wheel = { exact, reported: zoomTo(exact, at(e.clientX, e.clientY)) };
     };
     // Pinch: two touches. detent follows one pointer at a time, so the pair is tracked here.
     const touches = new Map<number, { x: number; y: number }>();

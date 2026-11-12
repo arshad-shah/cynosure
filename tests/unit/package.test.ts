@@ -45,6 +45,10 @@ describe("CSS build", () => {
   it("M13: OS reduced motion reaches every Cynosure element, including component roots", () => {
     const out = mkdtempSync(join(tmpdir(), "cy-build-"));
     const css = buildCss("src", out);
-    expect(css).toMatch(/@media \(prefers-reduced-motion:reduce\)\{:where\(\[class\*=cy-\]\)/);
+    // Cynosure's classes only (starting the attribute or after a space), never a host class containing "cy-".
+    expect(css).toMatch(
+      /@media \(prefers-reduced-motion:reduce\)\{:where\(\[class\^=cy-\],\[class\*=\\ cy-\]\)/,
+    );
+    expect(css).not.toContain(":where([class*=cy-])");
   });
 });
