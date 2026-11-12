@@ -33,9 +33,19 @@ import { SearchField } from "@arshad-shah/cynosure";
 
 <Canvas of={Stories.EscapeClearsThenBlurs} />
 
+## Match count
+
+`trailing` shows status text inside the field, at its end: a match count such as "1 of 3". Each new text is announced politely, once, through a live region that is always in the page; the visible copy is hidden from screen readers so it is not read twice. It is for text only; buttons such as "next match" go in `addonEnd`, after it.
+
+```tsx
+<SearchField label="Find" value={query} onChange={setQuery} trailing={query ? `${at} of ${total}` : undefined} />
+```
+
+<Canvas of={Stories.TrailingMatchCount} />
+
 ## Props
 
-SearchField takes every [TextField](?path=/docs/components-textfield--docs) prop except `type` and `iconStart`, plus `onSubmit`.
+SearchField takes every [TextField](?path=/docs/components-textfield--docs) prop except `type` and `iconStart`, plus `onSubmit` and `trailing`.
 
 <ArgTypes of={Stories} />
 
@@ -49,13 +59,14 @@ SearchField takes every [TextField](?path=/docs/components-textfield--docs) prop
 - **Role:** it is a native `type="search"` input, exposed as a search box.
 - **Label:** a visible label is preferred. `labelHidden` hides it visually but it still names the field.
 - **Refs:** the ref points at the input element.
+- **Trailing text:** announced politely when it changes (a `role="status"` region); the visible copy is `aria-hidden`.
 
 ## Theming
 
-SearchField has no tokens of its own. It uses the TextField tokens: `--cy-text-field-{height-sm,height-md,height-lg,radius,padding-inline,bg,border,soft-bg}`.
+The trailing text has `--cy-search-field-trailing-color` and `--cy-search-field-trailing-font-size`. The field itself uses the TextField tokens: `--cy-text-field-{height-sm,height-md,height-lg,radius,padding-inline,bg,border,soft-bg}`.
 
 ```ts
-createTheme({ components: { textField: { radius: "999px" } } });
+createTheme({ components: { textField: { radius: "999px" }, searchField: { trailingFontSize: "12px" } } });
 ```
 
 ## Related
