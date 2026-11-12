@@ -1,4 +1,4 @@
-import { forwardRef, type InputHTMLAttributes, useCallback, useRef } from "react";
+import { type ChangeEvent, forwardRef, type InputHTMLAttributes, useCallback, useRef } from "react";
 import { useClientLayoutEffect } from "../client-layout-effect.js";
 
 export interface ChoiceBaseProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "type"> {
@@ -13,7 +13,7 @@ export interface ChoiceBaseProps extends Omit<InputHTMLAttributes<HTMLInputEleme
  * form-associated (FormData, reset, required) for free.
  */
 export const ChoiceBase = forwardRef<HTMLInputElement, ChoiceBaseProps>(function ChoiceBase(
-  { indeterminate = false, className, ...rest },
+  { indeterminate = false, className, onChange, ...rest },
   forwarded,
 ) {
   const inner = useRef<HTMLInputElement | null>(null);
@@ -28,5 +28,16 @@ export const ChoiceBase = forwardRef<HTMLInputElement, ChoiceBaseProps>(function
   useClientLayoutEffect(() => {
     if (inner.current) inner.current.indeterminate = indeterminate;
   }, [indeterminate]);
-  return <input ref={ref} className={`cy-choice-base${className ? ` ${className}` : ""}`} {...rest} />;
+  return (
+    <input
+      ref={ref}
+      className={`cy-choice-base${className ? ` ${className}` : ""}`}
+      {...rest}
+      onChange={(event: ChangeEvent<HTMLInputElement>) => {
+        onChange?.(event);
+        // A click clears the browser's mixed state; while the prop still says mixed, put it back.
+        event.currentTarget.indeterminate = indeterminate;
+      }}
+    />
+  );
 });
