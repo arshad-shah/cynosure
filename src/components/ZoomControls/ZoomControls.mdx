@@ -31,7 +31,7 @@ Pass the percent the view came to (DocumentViewport's `onScaleChange` times 100)
 
 - **Role:** a toolbar named "Zoom": one tab stop; Left and Right move between zoom out, the menu and zoom in.
 - **Menu:** fit width, fit page and preset percents as a radio set; the current one is checked, and choosing closes the menu.
-- **Limits:** zoom in stops at 800% and zoom out at 25% (the buttons disable).
+- **Limits:** zoom in stops at 800% and zoom out at 25% (the buttons disable); give `min` and `max` for a view with other limits (a PanZoomCanvas at 20 to 300%). The menu offers only presets between them.
 - **Touch:** 44px hit areas on touch screens.
 
 ## Related

@@ -94,6 +94,33 @@ export const StopsAtTheLimits: Story = {
   },
 };
 
+export const LimitsOfItsOwn: Story = {
+  render: () => (
+    <>
+      <Alone start={{ kind: "percent", value: 300 }} min={20} max={300} labels={{ group: "Largest" }} />
+      <Alone start={{ kind: "percent", value: 25 }} min={20} max={300} labels={{ group: "Smaller" }} />
+    </>
+  ),
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const largest = canvas.getByRole("toolbar", { name: "Largest" });
+    const smaller = canvas.getByRole("toolbar", { name: "Smaller" });
+    // A canvas that stops at 300% and 20%: zoom in stops at 300, and zoom out goes below 25 to 20 and stops.
+    await expect(largest.querySelector('[aria-label="Zoom in"]')).toBeDisabled();
+    const out = smaller.querySelector('[aria-label="Zoom out"]') as HTMLElement;
+    await expect(out).toBeEnabled();
+    await userEvent.click(out);
+    const zoom = canvasElement.querySelectorAll('[data-testid="zoom"]')[1] as HTMLElement;
+    await expect(JSON.parse(zoom.textContent as string)).toEqual({ kind: "percent", value: 20 });
+    await expect(out).toBeDisabled();
+    // The menu offers only the presets inside the limits.
+    await userEvent.click(canvas.getByRole("button", { name: "Zoom 300%" }));
+    await shownFully(await canvas.findByRole("menu"));
+    await expect(canvas.getByRole("menuitemradio", { name: "200%" })).toBeVisible();
+    await expect(canvas.queryByRole("menuitemradio", { name: "400%" })).toBeNull();
+    await userEvent.keyboard("{Escape}");
+  },
+};
+
 export const DrivesADocumentViewport: Story = {
   render: () => {
     function Reader() {

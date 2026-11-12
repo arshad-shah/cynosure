@@ -25,13 +25,79 @@ A surface to pan and zoom freely, for diagrams, maps and boards; your content, p
 </PanZoomCanvas>
 ```
 
-Place children absolutely in canvas units. Give `bounds` (the content's extent) to fit it on first show, for Shift+1 and `fit()`, and for the minimap. The ref has `fit`, `zoomTo` and `centreOn` for your own buttons; pair it with [ZoomControls](?path=/docs/components-zoomcontrols--docs) for a zoom toolbar.
+Place children absolutely in canvas units. Give `bounds` (the content's extent) to fit it on first show, for Shift+1 and `fit()`, and for the minimap. `minScale` and `maxScale` set the zoom's limits (25% to 800% unless given; a schema diagram might keep to 20% to 300%): the wheel, a pinch, the keys, `zoomTo` and fitting all stop there. The ref has `fit`, `zoomTo` and `centreOn` for your own buttons; pair it with [ZoomControls](?path=/docs/components-zoomcontrols--docs) for a zoom toolbar.
 
 ## Painting into a canvas
 
-An engine that draws the whole scene into a `<canvas>` (a large graph, a map) uses `renderScreen`. It gets `{ view, width, height }` on every view change and draws in screen pixels; a canvas point (x, y) is at (x times scale plus view.x, y times scale plus view.y). The layer sits under any children and does not take the pointer, so pressing it pans. Render your own component from it (`renderScreen={(s) => <Scene {...s} />}`) so its hooks belong to it.
+An engine that draws the whole scene into a `<canvas>` (a large graph, a map) uses `renderScreen`. It gets `{ view, width, height, dpr, canvasProps, transform }` on every view change and draws in screen pixels; a canvas point (x, y) is at (x times scale plus view.x, y times scale plus view.y). The layer sits under any children and does not take the pointer, so pressing it pans. Render your own component from it (`renderScreen={(s) => <Scene {...s} />}`) so its hooks belong to it.
+
+The canvas element is yours; the screen helps size and draw it. Spread `canvasProps` on it for a canvas of the screen's device pixels (`dpr` of them per CSS pixel, so it stays sharp on dense screens) shown at the canvas's CSS size, and call `ctx.setTransform(...screen.transform)` to draw in canvas units. A move to another screen or a browser zoom draws again at the new `dpr`.
+
+```tsx
+function Scene(screen: CanvasScreen) {
+  const ref = useRef<HTMLCanvasElement>(null);
+  useEffect(() => {
+    const ctx = ref.current!.getContext("2d")!;
+    ctx.resetTransform();
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    ctx.setTransform(...screen.transform);
+    drawScene(ctx); // in canvas units
+  });
+  return <canvas ref={ref} {...screen.canvasProps} />;
+}
+```
 
 <Canvas of={Stories.PaintedIntoACanvas} />
+
+## Dragging nodes
+
+To drag a node (a table card) rather than pan, claim the press: `claimPress` is asked about every press except a Space+drag, with the point in canvas units, the element pressed and the pointer type. Return `{ onMove, onEnd }` to follow it, `true` to claim it without them, or nothing to leave it to the canvas (the background and painted content pan). `onMove` and `onEnd` get `{ point, delta }` in canvas units, whatever the zoom; `onEnd` also says whether Escape cancelled the drag. A press that does not travel is a tap (`delta` is zero); the click after a claimed press is not delivered, so select in `onEnd`. It serves children (look at `press.target`) and painted content (hit-test `press.point` with your own `pick`) alike; while two fingers pinch, the node stays put.
+
+```tsx
+claimPress={({ point }) => {
+  const card = pick(cards, point.x, point.y);
+  if (!card) return; // the background pans
+  const from = { x: card.x, y: card.y };
+  return {
+    onMove: ({ delta }) => moveCard(card.id, from.x + delta.x, from.y + delta.y),
+    onEnd: ({ delta }, cancelled) => {
+      if (cancelled) moveCard(card.id, from.x, from.y);
+      else if (!delta.x && !delta.y) select(card.id);
+    },
+  };
+}}
+```
+
+<Canvas of={Stories.DragANodeNotTheView} />
+
+## Controls in the corners
+
+`overlays` places controls over the canvas in its corners: `"top-start"`, `"top-end"`, `"bottom-start"` and `"bottom-end"`, with start and end following the page's direction. They stay put while the content pans and zooms, and keep their own pointer, wheel and keys: pressing or dragging them never pans (not even with Space held) and never reaches `claimPress`, and the wheel over them is theirs, though Ctrl/Cmd+wheel still zooms the canvas rather than the page. The space between a corner's controls is background. The minimap keeps the bottom-end corner, under that corner's overlay.
+
+```tsx
+<PanZoomCanvas
+  ref={canvas}
+  label="Schema"
+  minScale={0.2}
+  maxScale={3}
+  minimap={showMap}
+  overlays={{
+    "top-start": <Legend />,
+    "top-end": (
+      <ZoomControls zoom={zoom} percent={percent} min={20} max={300} onZoomChange={onZoomChange} />
+    ),
+    "bottom-start": (
+      <Button size="sm" pressed={showMap} onClick={() => setShowMap((s) => !s)}>
+        Minimap
+      </Button>
+    ),
+  }}
+>
+  {cards}
+</PanZoomCanvas>
+```
+
+<Canvas of={Stories.ControlsInTheCorners} />
 
 ## Props
 
@@ -40,8 +106,9 @@ An engine that draws the whole scene into a `<canvas>` (a large graph, a map) us
 ## Behaviour and accessibility
 
 - **Role:** a named region and tab stop. Zoom changes are announced ("Zoom 125%").
-- **Pointer:** drag the empty background, or hold Space and drag anywhere, to pan; the wheel pans; Ctrl/Cmd+wheel zooms around the pointer. Presses on your content are left to it.
-- **Touch:** one finger pans; two fingers pinch-zoom around their midpoint.
+- **Pointer:** drag the empty background, or hold Space and drag anywhere, to pan; the wheel pans; Ctrl/Cmd+wheel zooms around the pointer. Presses on your content are left to it, and presses `claimPress` claims never pan.
+- **Touch:** one finger pans (or drags a claimed node); two fingers pinch-zoom around their midpoint. Fingers on the corner controls are theirs.
+- **Focus:** the overlays come after the canvas in tab order; the keys below act only while the canvas itself has focus (Ctrl/Cmd zoom keys anywhere inside).
 
 | Key | Does |
 | --- | --- |

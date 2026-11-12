@@ -1,10 +1,17 @@
 import { type KeyboardEvent, type RefObject, useEffect, useRef, useState } from "react";
-import { useDrag } from "./drag.js";
+import { type DragSession, useDrag } from "./drag.js";
 import { clamp } from "./math.js";
 import { clampPercent, MAX_PERCENT, MIN_PERCENT, zoomStep } from "./zoom.js";
 
 /** Where a zoom is centred, in pixels from the viewport's top left; null for its centre (a key or a button). */
 export type ZoomAnchor = { x: number; y: number } | null;
+
+/** A press the caller follows itself (a node being dragged); see `claim`. */
+export interface ClaimedPress {
+  onMove?: ((session: DragSession) => void) | undefined;
+  /** `cancelled` when Escape (or the browser) cancelled it: put things back. */
+  onEnd?: ((session: DragSession, cancelled: boolean) => void) | undefined;
+}
 
 export interface ZoomGestureOptions {
   /** The percent shown now. */
@@ -16,6 +23,21 @@ export interface ZoomGestureOptions {
    * it) pans without Space.
    */
   onPan?: ((dx: number, dy: number) => void) | undefined;
+  /** The smallest percent the wheel, a pinch and the keys go to. Default 25. */
+  min?: number | undefined;
+  /** The largest percent the wheel, a pinch and the keys go to. Default 800. */
+  max?: number | undefined;
+  /**
+   * Asked first about each press that is not a Space+drag: return handlers to follow its drag yourself (it never pans),
+   * `true` to leave it alone (it never pans), or nothing for the usual rules. A finger pinching does not move it.
+   */
+  claim?: ((session: DragSession) => ClaimedPress | boolean | null | undefined) | undefined;
+  /**
+   * Parts of the element that keep their own pointer and wheel (controls drawn over a canvas): given an event's composed
+   * path, true when it starts on one. Presses and fingers there never pan or pinch, and the wheel there is left to the
+   * page; Ctrl/Cmd+wheel still zooms, so the page itself never does.
+   */
+  ignore?: ((path: EventTarget[]) => boolean) | undefined;
 }
 
 /**
@@ -29,10 +51,10 @@ export interface ZoomGestureOptions {
  */
 export function useZoomGestures(
   scroller: RefObject<HTMLElement | null>,
-  { percent, onZoom, onPan }: ZoomGestureOptions,
+  { percent, onZoom, onPan, min = MIN_PERCENT, max = MAX_PERCENT, claim, ignore }: ZoomGestureOptions,
 ) {
-  const latest = useRef({ percent, onZoom, onPan });
-  latest.current = { percent, onZoom, onPan };
+  const latest = useRef({ percent, onZoom, onPan, min, max, claim, ignore });
+  latest.current = { percent, onZoom, onPan, min, max, claim, ignore };
   /** True while two fingers are down: the first one's drag must not pan meanwhile. */
   const pinching = useRef(false);
   const [panning, setPanning] = useState(false);
@@ -50,7 +72,7 @@ export function useZoomGestures(
       return { x: x - r.left, y: y - r.top };
     };
     const zoomTo = (next: number, anchor: ZoomAnchor) => {
-      const p = clampPercent(next);
+      const p = clampPercent(next, latest.current.min, latest.current.max);
       if (p !== latest.current.percent) latest.current.onZoom(p, anchor);
       return p;
     };
@@ -60,16 +82,16 @@ export function useZoomGestures(
     const onWheel = (e: WheelEvent) => {
       if (!e.ctrlKey && !e.metaKey) {
         const pan = latest.current.onPan;
-        if (!pan) return;
+        if (!pan || latest.current.ignore?.(e.composedPath())) return;
         e.preventDefault();
         pan(-e.deltaX, -e.deltaY);
         return;
       }
       // The browser's own page zoom must not happen on top of ours.
       e.preventDefault();
-      const { percent: shown } = latest.current;
+      const { percent: shown, min: lo, max: hi } = latest.current;
       if (shown !== wheel.reported) wheel = { exact: shown, reported: shown };
-      const exact = clamp(wheel.exact * Math.exp(-e.deltaY * 0.0015), MIN_PERCENT, MAX_PERCENT);
+      const exact = clamp(wheel.exact * Math.exp(-e.deltaY * 0.0015), lo, hi);
       wheel = { exact, reported: zoomTo(exact, at(e.clientX, e.clientY)) };
     };
     // Pinch: two touches. detent follows one pointer at a time, so the pair is tracked here.
@@ -80,7 +102,7 @@ export function useZoomGestures(
       return { distance: Math.hypot(a.x - b.x, a.y - b.y), mid: at((a.x + b.x) / 2, (a.y + b.y) / 2) };
     };
     const onDown = (e: PointerEvent) => {
-      if (e.pointerType !== "touch") return;
+      if (e.pointerType !== "touch" || latest.current.ignore?.(e.composedPath())) return;
       touches.set(e.pointerId, { x: e.clientX, y: e.clientY });
       if (touches.size === 2) {
         pinch = { distance: spread().distance || 1, percent: latest.current.percent };
@@ -116,15 +138,31 @@ export function useZoomGestures(
   // Space+drag pans with a mouse or pen; a scroller's finger pans natively (it keeps touch-action pan-x pan-y). With
   // `onPan`, a press on the element's own background pans too, and so does a finger.
   const last = useRef({ x: 0, y: 0 });
+  /** The press being followed by its claimer, if any. */
+  const claimed = useRef<ClaimedPress | null>(null);
   useDrag(scroller, {
     touchAction: "css",
-    onStart: ({ pointerType, path }) => {
+    onStart: (session) => {
+      const { pointerType, path } = session;
+      claimed.current = null;
+      if (latest.current.ignore?.(path)) return false;
+      const owner = panningRef.current ? null : latest.current.claim?.(session);
+      if (owner) {
+        if (owner === true) return false;
+        claimed.current = owner;
+        return;
+      }
       const custom = !!latest.current.onPan;
       const background = custom && path[0] === scroller.current;
       if (pointerType === "touch" ? !background : !panningRef.current && !background) return false;
       last.current = { x: 0, y: 0 };
     },
-    onMove: ({ delta }) => {
+    onMove: (session) => {
+      if (claimed.current) {
+        if (!pinching.current) claimed.current.onMove?.(session);
+        return;
+      }
+      const { delta } = session;
       const dx = delta.x - last.current.x;
       const dy = delta.y - last.current.y;
       last.current = { x: delta.x, y: delta.y };
@@ -137,20 +175,24 @@ export function useZoomGestures(
         el.scrollTop -= dy;
       }
     },
+    onEnd: (session, cancelled) => {
+      claimed.current?.onEnd?.(session, cancelled);
+      claimed.current = null;
+    },
   });
 
   return {
     panning,
     onKeyDown: (event: KeyboardEvent<HTMLElement>) => {
-      const { percent: p, onZoom: zoom } = latest.current;
+      const { percent: p, onZoom: zoom, min: lo, max: hi } = latest.current;
       if (event.ctrlKey || event.metaKey) {
         const next =
           event.key === "=" || event.key === "+"
-            ? zoomStep(p, 1)
+            ? zoomStep(p, 1, lo, hi)
             : event.key === "-"
-              ? zoomStep(p, -1)
+              ? zoomStep(p, -1, lo, hi)
               : event.key === "0"
-                ? 100
+                ? clampPercent(100, lo, hi)
                 : null;
         if (next === null) return;
         event.preventDefault();

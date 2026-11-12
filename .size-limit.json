@@ -2,7 +2,7 @@
   {
     "name": "all CSS",
     "path": "dist/styles.css",
-    "limit": "36.6 kB",
+    "limit": "36.7 kB",
     "gzip": true
   },
   {
@@ -495,7 +495,7 @@
   {
     "name": "PanZoomCanvas",
     "path": ["dist/components/PanZoomCanvas/PanZoomCanvas.js", "dist/styles/pan-zoom-canvas.css"],
-    "limit": "3 kB",
+    "limit": "3.45 kB",
     "gzip": true
   },
   {

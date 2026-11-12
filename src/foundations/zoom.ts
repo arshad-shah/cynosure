@@ -11,19 +11,26 @@ export type ZoomSetting =
 export const MIN_PERCENT = 25;
 export const MAX_PERCENT = 800;
 
-/** A percent kept between 25 and 800, rounded. */
-export const clampPercent = (percent: number) => Math.round(clamp(percent, MIN_PERCENT, MAX_PERCENT));
+/**
+ * A percent kept between `min` and `max` (default 25 and 800), rounded. A canvas with its own limits (20 to 300%)
+ * passes them.
+ */
+export const clampPercent = (percent: number, min = MIN_PERCENT, max = MAX_PERCENT) =>
+  Math.round(clamp(percent, min, max));
 
 /** The steps the zoom buttons and keys go through (as document viewers do). */
 export const ZOOM_STEPS = [
   25, 33, 50, 67, 75, 90, 100, 110, 125, 150, 175, 200, 250, 300, 400, 500, 600, 800,
 ];
 
-/** The next step above (1) or below (-1) `percent`; from between two steps it goes to the nearer one that way. */
-export function zoomStep(percent: number, direction: 1 | -1): number {
-  const p = clampPercent(percent);
-  if (direction === 1) return ZOOM_STEPS.find((s) => s > p) ?? MAX_PERCENT;
-  return [...ZOOM_STEPS].reverse().find((s) => s < p) ?? MIN_PERCENT;
+/**
+ * The next step above (1) or below (-1) `percent`; from between two steps it goes to the nearer one that way. Steps
+ * outside `min` and `max` (default 25 and 800) are skipped; past the last one it stops at the limit.
+ */
+export function zoomStep(percent: number, direction: 1 | -1, min = MIN_PERCENT, max = MAX_PERCENT): number {
+  const p = clampPercent(percent, min, max);
+  if (direction === 1) return Math.min(ZOOM_STEPS.find((s) => s > p) ?? max, max);
+  return Math.max([...ZOOM_STEPS].reverse().find((s) => s < p) ?? min, min);
 }
 
 /**

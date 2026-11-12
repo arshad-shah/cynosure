@@ -9,7 +9,7 @@ import {
 } from "react";
 import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js";
 import { useControllableState } from "../../foundations/controllable.js";
-import { useDrag } from "../../foundations/drag.js";
+import { type DragSession, useDrag } from "../../foundations/drag.js";
 import { clamp } from "../../foundations/math.js";
 import { clampPercent, MAX_PERCENT, MIN_PERCENT } from "../../foundations/zoom.js";
 import { useZoomGestures, type ZoomAnchor } from "../../foundations/zoom-gestures.js";
@@ -31,7 +31,7 @@ declare module "../../tokens/schema.js" {
 export interface CanvasView {
   x: number;
   y: number;
-  /** 1 = 100%; kept between 25% and 800%. */
+  /** 1 = 100%; kept between `minScale` and `maxScale`. */
   scale: number;
 }
 
@@ -51,12 +51,55 @@ export interface PanZoomCanvasHandle {
   centreOn: (rect: CanvasRect) => void;
 }
 
-/** What `renderScreen` draws from: the current view and the canvas's size in CSS pixels. */
+/** What `renderScreen` draws from: the current view, the canvas's size in CSS pixels and the screen's density. */
 export interface CanvasScreen {
   view: CanvasView;
   width: number;
   height: number;
+  /** Device pixels per CSS pixel (`devicePixelRatio`); it changes when the window moves to another screen or zooms. */
+  dpr: number;
+  /** Spread on your `<canvas>`: its pixels are the screen's device pixels, shown at the canvas's size in CSS pixels. */
+  canvasProps: { width: number; height: number; style: { width: number; height: number } };
+  /**
+   * `ctx.setTransform(...screen.transform)` draws in canvas units, sharp at this density: a canvas point (x, y) lands
+   * at device pixel ((x * scale + view.x) * dpr, (y * scale + view.y) * dpr).
+   */
+  transform: [number, number, number, number, number, number];
 }
+
+/** A point in canvas units. */
+export interface CanvasPoint {
+  x: number;
+  y: number;
+}
+
+/** A press on the canvas, offered to `claimPress` before it pans. */
+export interface CanvasPress {
+  /** Where, in canvas units: hit-test painted content with it. */
+  point: CanvasPoint;
+  /** The element pressed: one of your children, or the canvas itself (its background and anything painted). */
+  target: Element;
+  /** "mouse", "pen" or "touch". */
+  pointerType: string;
+}
+
+/** Where a claimed press has got to. */
+export interface CanvasDrag {
+  /** The pointer now, in canvas units. */
+  point: CanvasPoint;
+  /** How far it has come since the press, in canvas units (screen pixels divided by the scale). */
+  delta: CanvasPoint;
+}
+
+/** Follows a claimed press: move a node with `onMove`; `onEnd` with no `delta` is a tap. */
+export interface CanvasPressHandlers {
+  onMove?: (drag: CanvasDrag) => void;
+  /** `cancelled` when Escape (or the browser) cancelled the drag: put the node back. */
+  onEnd?: (drag: CanvasDrag, cancelled: boolean) => void;
+}
+
+/** A corner of the canvas for `overlays`; start and end follow the page's direction. */
+export type CanvasCorner = "top-start" | "top-end" | "bottom-start" | "bottom-end";
 
 export interface PanZoomCanvasLabels {
   /** Announced when the zoom changes. Default "Zoom 125%". */
@@ -72,6 +115,10 @@ export interface PanZoomCanvasProps {
   defaultView?: CanvasView;
   /** Called with the new view on every pan and zoom. */
   onViewChange?: ((view: CanvasView) => void) | undefined;
+  /** The smallest zoom, as a scale (0.2 = 20%). Default 0.25. */
+  minScale?: number;
+  /** The largest zoom, as a scale (3 = 300%). Default 8. */
+  maxScale?: number;
   /** The content's extent in canvas units, for fitting and the minimap. */
   bounds?: CanvasRect | undefined;
   /** Show a minimap of `bounds` with the view on it (drag it, or press where to look). */
@@ -84,6 +131,19 @@ export interface PanZoomCanvasProps {
    * the pointer, so pressing it pans like the background.
    */
   renderScreen?: (screen: CanvasScreen) => ReactNode;
+  /**
+   * Asked about each press (not one with Space held, which always pans): return handlers to follow it (drag a node, and
+   * the view stays), `true` to claim it without them, or nothing to leave it to the canvas (the background and painted
+   * content pan; presses on your children are left to them). Works for children and painted content alike: hit-test
+   * `press.point` or look at `press.target`.
+   */
+  claimPress?: ((press: CanvasPress) => CanvasPressHandlers | boolean | null | undefined) | undefined;
+  /**
+   * Controls drawn over the canvas in its corners (zoom controls, a legend, a minimap toggle): they stay put while the
+   * content pans and zooms, keep their own pointer, wheel and keys, and never start a pan. The minimap keeps the
+   * bottom-end corner, under that corner's overlay.
+   */
+  overlays?: Partial<Record<CanvasCorner, ReactNode>> | undefined;
   /** The content, placed in canvas units (absolutely positioned children). */
   children?: ReactNode;
   /** Replace the built-in English text: the zoom announcement. */
@@ -94,9 +154,29 @@ export interface PanZoomCanvasProps {
   style?: CSSProperties;
 }
 
+function screenOf(view: CanvasView, size: { width: number; height: number; dpr: number }): CanvasScreen {
+  const { width, height, dpr } = size;
+  const k = view.scale * dpr;
+  return {
+    view,
+    width,
+    height,
+    dpr,
+    canvasProps: {
+      width: Math.round(width * dpr),
+      height: Math.round(height * dpr),
+      style: { width, height },
+    },
+    transform: [k, 0, 0, k, view.x * dpr, view.y * dpr],
+  };
+}
+
+const CORNERS: CanvasCorner[] = ["top-start", "top-end", "bottom-start", "bottom-end"];
+/** Whether an event's path starts on a corner's controls (or the minimap), which keep their own pointer. */
+const onCorner = (path: EventTarget[]) =>
+  path.some((t) => t instanceof Element && t.classList.contains("cy-pan-zoom-canvas-corner"));
+
 const DEFAULT_LABELS: PanZoomCanvasLabels = { zoom: (percent) => `Zoom ${percent}%` };
-const MIN = MIN_PERCENT / 100;
-const MAX = MAX_PERCENT / 100;
 /** Pixels an arrow key pans (Shift: five times as far). */
 const STEP = 40;
 
@@ -112,10 +192,14 @@ export const PanZoomCanvas = forwardRef<PanZoomCanvasHandle, PanZoomCanvasProps>
     view,
     defaultView,
     onViewChange,
+    minScale = MIN_PERCENT / 100,
+    maxScale = MAX_PERCENT / 100,
     bounds,
     minimap = false,
     renderMinimap,
     renderScreen,
+    claimPress,
+    overlays,
     children,
     labels,
     className,
@@ -132,19 +216,29 @@ export const PanZoomCanvas = forwardRef<PanZoomCanvasHandle, PanZoomCanvasProps>
   );
   const latest = useRef(current);
   latest.current = current;
-  const [size, setSize] = useState({ width: 0, height: 0 });
+  const [size, setSize] = useState({ width: 0, height: 0, dpr: 1 });
   useClientLayoutEffect(() => {
     const el = surface.current as HTMLElement;
-    const measure = () =>
+    // The density is read with the size, and again when it changes (a move to another screen, a browser zoom).
+    let density: MediaQueryList | undefined;
+    const measure = () => {
+      const dpr = devicePixelRatio;
+      density?.removeEventListener("change", measure);
+      density = matchMedia(`(resolution: ${dpr}dppx)`);
+      density.addEventListener("change", measure);
       setSize((s) =>
-        s.width === el.clientWidth && s.height === el.clientHeight
+        s.width === el.clientWidth && s.height === el.clientHeight && s.dpr === dpr
           ? s
-          : { width: el.clientWidth, height: el.clientHeight },
+          : { width: el.clientWidth, height: el.clientHeight, dpr },
       );
+    };
     measure();
     const observer = new ResizeObserver(measure);
     observer.observe(el);
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+      (density as MediaQueryList).removeEventListener("change", measure);
+    };
   }, []);
 
   const go = (next: CanvasView) => {
@@ -153,7 +247,7 @@ export const PanZoomCanvas = forwardRef<PanZoomCanvasHandle, PanZoomCanvasProps>
   };
   const zoomAround = (scale: number, at: { x: number; y: number }) => {
     const v = latest.current;
-    const s = clamp(scale, MIN, MAX);
+    const s = clamp(scale, minScale, maxScale);
     go({ x: at.x - ((at.x - v.x) * s) / v.scale, y: at.y - ((at.y - v.y) * s) / v.scale, scale: s });
   };
   const centre = () => ({ x: size.width / 2, y: size.height / 2 });
@@ -162,8 +256,8 @@ export const PanZoomCanvas = forwardRef<PanZoomCanvasHandle, PanZoomCanvasProps>
     const pad = Math.min(size.width, size.height) * 0.05;
     const s = clamp(
       Math.min((size.width - 2 * pad) / rect.width, (size.height - 2 * pad) / rect.height),
-      MIN,
-      MAX,
+      minScale,
+      maxScale,
     );
     go({
       x: (size.width - rect.width * s) / 2 - rect.x * s,
@@ -181,7 +275,7 @@ export const PanZoomCanvas = forwardRef<PanZoomCanvasHandle, PanZoomCanvasProps>
   };
   useImperativeHandle(ref, () => ({
     fit,
-    zoomTo: (p) => zoomAround(clampPercent(p) / 100, centre()),
+    zoomTo: (p) => zoomAround(clampPercent(p, minScale * 100, maxScale * 100) / 100, centre()),
     centreOn,
   }));
 
@@ -194,10 +288,37 @@ export const PanZoomCanvas = forwardRef<PanZoomCanvasHandle, PanZoomCanvasProps>
   });
 
   const percent = Math.round(current.scale * 100);
+  /** A screen point (viewport pixels) in canvas units, at the view now. */
+  const toCanvas = (p: { x: number; y: number }) => {
+    const r = (surface.current as HTMLElement).getBoundingClientRect();
+    const v = latest.current;
+    return { x: (p.x - r.left - v.x) / v.scale, y: (p.y - r.top - v.y) / v.scale };
+  };
   const gestures = useZoomGestures(surface, {
     percent,
+    min: minScale * 100,
+    max: maxScale * 100,
     onZoom: (p, at: ZoomAnchor) => zoomAround(p / 100, at ?? centre()),
     onPan: (dx, dy) => go({ ...latest.current, x: latest.current.x + dx, y: latest.current.y + dy }),
+    ignore: onCorner,
+    claim: (session) => {
+      if (!claimPress) return null;
+      const from = toCanvas(session.origin);
+      const owner = claimPress({
+        point: from,
+        target: session.path[0] as Element,
+        pointerType: session.pointerType,
+      });
+      if (!owner || owner === true) return owner;
+      const dragOf = (s: DragSession): CanvasDrag => {
+        const point = toCanvas(s.point);
+        return { point, delta: { x: point.x - from.x, y: point.y - from.y } };
+      };
+      return {
+        onMove: (s) => owner.onMove?.(dragOf(s)),
+        onEnd: (s, cancelled) => owner.onEnd?.(dragOf(s), cancelled),
+      };
+    },
   });
   const onKeyDown = (event: KeyboardEvent<HTMLElement>) => {
     gestures.onKeyDown(event);
@@ -259,6 +380,27 @@ export const PanZoomCanvas = forwardRef<PanZoomCanvasHandle, PanZoomCanvasProps>
       lookAt(point.x - r.left, point.y - r.top);
     },
   });
+  const minimapEl = minimap && bounds && (
+    <div
+      ref={map}
+      className="cy-pan-zoom-canvas-minimap cy-reset"
+      style={{ blockSize: bounds.height * k }}
+      aria-hidden="true"
+    >
+      {renderMinimap && (
+        <div
+          className="cy-pan-zoom-canvas-minimap-content cy-reset"
+          style={{ transform: `scale(${k}) translate(${-bounds.x}px, ${-bounds.y}px)` }}
+        >
+          {renderMinimap()}
+        </div>
+      )}
+      <div
+        className="cy-pan-zoom-canvas-minimap-view cy-reset"
+        style={{ left: seen.x, top: seen.y, width: seen.width, height: seen.height }}
+      />
+    </div>
+  );
 
   return (
     <>
@@ -275,9 +417,7 @@ export const PanZoomCanvas = forwardRef<PanZoomCanvasHandle, PanZoomCanvasProps>
         onBlur={gestures.onBlur}
       >
         {renderScreen && size.width > 0 && (
-          <div className="cy-pan-zoom-canvas-screen cy-reset">
-            {renderScreen({ view: current, width: size.width, height: size.height })}
-          </div>
+          <div className="cy-pan-zoom-canvas-screen cy-reset">{renderScreen(screenOf(current, size))}</div>
         )}
         <div
           className="cy-pan-zoom-canvas-content cy-reset"
@@ -285,32 +425,17 @@ export const PanZoomCanvas = forwardRef<PanZoomCanvasHandle, PanZoomCanvasProps>
         >
           {children}
         </div>
-        {minimap && bounds && (
-          <div
-            ref={map}
-            className="cy-pan-zoom-canvas-minimap cy-reset"
-            style={{ blockSize: bounds.height * k }}
-            aria-hidden="true"
-          >
-            {renderMinimap && (
-              <div
-                className="cy-pan-zoom-canvas-minimap-content cy-reset"
-                style={{ transform: `scale(${k}) translate(${-bounds.x}px, ${-bounds.y}px)` }}
-              >
-                {renderMinimap()}
-              </div>
-            )}
-            <div
-              className="cy-pan-zoom-canvas-minimap-view cy-reset"
-              style={{
-                insetInlineStart: seen.x,
-                insetBlockStart: seen.y,
-                inlineSize: seen.width,
-                blockSize: seen.height,
-              }}
-            />
-          </div>
-        )}
+        {CORNERS.map((corner) => {
+          const overlay = overlays?.[corner];
+          const withMap = corner === "bottom-end" && minimapEl;
+          if (overlay == null && !withMap) return null;
+          return (
+            <div key={corner} className="cy-pan-zoom-canvas-corner cy-reset" data-corner={corner}>
+              {overlay != null && <div className="cy-pan-zoom-canvas-overlay cy-reset">{overlay}</div>}
+              {withMap}
+            </div>
+          );
+        })}
       </section>
       <span className="cy-visually-hidden" role="status">
         {said.text}
