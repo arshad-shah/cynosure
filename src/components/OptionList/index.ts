@@ -1,5 +1,6 @@
 export {
   OptionList,
+  type OptionListAction,
   OptionListGroup,
   type OptionListGroupProps,
   OptionListItem,

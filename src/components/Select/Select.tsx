@@ -22,7 +22,13 @@ import type { IconData } from "../../icons/types.js";
 import { useListboxLayer } from "../../overlay/listbox-layer.js";
 import type { DenseSize } from "../../tokens/schema.js";
 import { Field } from "../Field/Field.js";
-import { OptionList, OptionListGroup, OptionListItem, OptionListNote } from "../OptionList/OptionList.js";
+import {
+  OptionList,
+  type OptionListAction,
+  OptionListGroup,
+  OptionListItem,
+  OptionListNote,
+} from "../OptionList/OptionList.js";
 
 export interface SelectTokens {
   fontSizeXs: string;
@@ -50,6 +56,10 @@ export interface SelectOption extends OptionIconColor {
   /** Icon before the label, in the list and in the trigger when chosen. Colour it with `iconTone` or `iconColor`. */
   icon?: IconData;
   disabled?: boolean;
+  /** Drawn muted in the list but still choosable: an option that is there but not in use. */
+  dimmed?: boolean;
+  /** At the end of the option's row in the list, smaller and muted: a shortcut, a count. */
+  trailing?: ReactNode;
   /** Options next to each other with the same `group` are listed under that heading. */
   group?: string;
 }
@@ -63,8 +73,15 @@ export interface SelectProps {
   description?: ReactNode;
   /** Your own error; it replaces the built-in required message. */
   error?: ReactNode;
-  /** The choices: `{ value, label, description?, icon?, iconTone?, iconColor?, disabled?, group? }`. */
+  /**
+   * The choices: `{ value, label, description?, icon?, iconTone?, iconColor?, disabled?, dimmed?, trailing?, group? }`.
+   */
   options: SelectOption[];
+  /**
+   * An action pinned under the options ("Manage connections…"): the arrow keys' last stop, run with Enter, Space or a
+   * press. The list closes, focus returns to the trigger, and the value does not change.
+   */
+  footer?: OptionListAction | undefined;
   /** Controlled selected value. */
   value?: string;
   /** Selected value at first, when uncontrolled. */
@@ -118,6 +135,7 @@ export function Select({
   description,
   error,
   options,
+  footer,
   value,
   defaultValue = "",
   onChange,
@@ -142,16 +160,19 @@ export function Select({
   // Shown after a blocked submit: the hidden input cannot be focused or explained, so the trigger is.
   const [missing, setMissing] = useState(false);
 
-  const enabled = (i: number) => i >= 0 && i < options.length && !options[i]?.disabled;
-  const step = (from: number, delta: 1 | -1) => seekEnabled(options.length, from, delta, enabled);
+  // The footer action is one more option after the last, at index `options.length` (NaN, equal to no index, without).
+  const atFooter = footer ? options.length : Number.NaN;
+  const count = options.length + (footer ? 1 : 0);
+  const enabled = (i: number) => i === atFooter || (i >= 0 && i < options.length && !options[i]?.disabled);
+  const step = (from: number, delta: 1 | -1) => seekEnabled(count, from, delta, enabled);
   const first = () => step(-1, 1);
-  const last = () => step(options.length, -1);
+  const last = () => step(count, -1);
   // A page away, or the nearest usable option short of it; with none there, the active option stays.
   const page = (delta: 1 | -1) => {
-    const target = clamp(active + delta * PAGE, 0, options.length - 1);
-    const beyond = seekEnabled(options.length, target - delta, delta, enabled);
+    const target = clamp(active + delta * PAGE, 0, count - 1);
+    const beyond = seekEnabled(count, target - delta, delta, enabled);
     if (beyond >= 0 && beyond !== target - delta) return beyond;
-    const short = seekEnabled(options.length, target, -delta as 1 | -1, enabled);
+    const short = seekEnabled(count, target, -delta as 1 | -1, enabled);
     return short >= 0 ? short : active;
   };
 
@@ -167,6 +188,11 @@ export function Select({
   const close = (focus = true) => {
     setOpen(false);
     if (focus) trigger.current?.focus();
+  };
+  // The list closes (focus back on the trigger) before the action runs, so a dialog it opens can take focus.
+  const runFooter = () => {
+    close();
+    (footer as OptionListAction).onSelect();
   };
   const openList = (at?: number) => {
     const selected = options.findIndex((o) => o.value === current);
@@ -216,8 +242,11 @@ export function Select({
       setActive(moves[key]());
     } else if (key === "Enter" || key === " ") {
       e.preventDefault();
-      choose(active);
-      close();
+      if (active === atFooter) runFooter();
+      else {
+        choose(active);
+        close();
+      }
     } else if (key === "Escape") {
       e.preventDefault();
       close();
@@ -268,7 +297,24 @@ export function Select({
             </span>
             <Icon icon={chevronDown} size={iconSize} className="cy-select-chevron" />
           </ButtonBase>
-          <OptionList ref={list} id={listId} aria-labelledby={field.labelId}>
+          <OptionList
+            ref={list}
+            id={listId}
+            aria-labelledby={field.labelId}
+            footer={
+              footer && (
+                <OptionListItem
+                  id={`${listId}-${atFooter}`}
+                  data-index={atFooter}
+                  label={footer.label}
+                  icon={footer.icon && <Icon icon={footer.icon} className="cy-select-icon" />}
+                  active={active === atFooter}
+                  onPointerMove={() => setActive(atFooter)}
+                  onClick={runFooter}
+                />
+              )
+            }
+          >
             {options.length === 0 && <OptionListNote>{labels?.empty ?? "No options"}</OptionListNote>}
             {groupsOf(options).map((run) => {
               const rows = run.items.map(({ option, index }) => (
@@ -281,6 +327,8 @@ export function Select({
                   icon={<OptionIcon option={option} plain={option.disabled} className="cy-select-icon" />}
                   selected={option.value === current}
                   disabled={option.disabled}
+                  dimmed={option.dimmed}
+                  trailing={option.trailing}
                   active={index === active}
                   onPointerMove={() => enabled(index) && setActive(index)}
                   onClick={() => {

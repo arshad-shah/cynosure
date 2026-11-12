@@ -264,6 +264,7 @@ export {
 } from "./components/NumberField/index.js";
 export {
   OptionList,
+  type OptionListAction,
   OptionListGroup,
   type OptionListGroupProps,
   OptionListItem,

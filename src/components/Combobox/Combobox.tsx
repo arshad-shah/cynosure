@@ -10,13 +10,19 @@ import {
 import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js";
 import { useControllableState } from "../../foundations/controllable.js";
 import { HiddenValue } from "../../foundations/HiddenValue/HiddenValue.js";
+import { Icon } from "../../foundations/Icon/Icon.js";
 import { isComposing } from "../../foundations/keys.js";
 import { OptionIcon, type OptionIconColor } from "../../foundations/option-icon.js";
 import type { IconData } from "../../icons/types.js";
 import { useListboxLayer } from "../../overlay/listbox-layer.js";
 import type { Size } from "../../tokens/schema.js";
 import { HighlightedText } from "../HighlightedText/HighlightedText.js";
-import { OptionList, OptionListItem, OptionListNote } from "../OptionList/OptionList.js";
+import {
+  OptionList,
+  type OptionListAction,
+  OptionListItem,
+  OptionListNote,
+} from "../OptionList/OptionList.js";
 import { TextField } from "../TextField/TextField.js";
 
 export interface ComboboxTokens {
@@ -38,6 +44,10 @@ export interface ComboboxOption extends OptionIconColor {
   disabled?: boolean;
   /** Icon before the label in the list. Colour it with `iconTone` or `iconColor`. */
   icon?: IconData;
+  /** Drawn muted in the list but still choosable: an option that is there but not in use. */
+  dimmed?: boolean;
+  /** At the end of the option's row in the list, smaller and muted: a shortcut, a count. */
+  trailing?: ReactNode;
 }
 
 export interface ComboboxLabels {
@@ -60,6 +70,11 @@ export interface ComboboxProps {
   error?: ReactNode;
   /** The options to choose from. */
   options: ComboboxOption[];
+  /**
+   * An action pinned under the options ("New connection"), shown whatever the text matches: the arrow keys' last
+   * stop, run with Enter or a press. The list closes, focus stays in the input, and the value does not change.
+   */
+  footer?: OptionListAction | undefined;
   /** The chosen option's value (or the typed text, with `allowCustom`). */
   value?: string;
   /** The value chosen at first, when uncontrolled. */
@@ -103,6 +118,8 @@ const DEFAULT_LABELS: ComboboxLabels = {
   loading: "Loading…",
   required: "Please choose a value.",
 };
+/** The active row is the footer action, not an option. */
+const FOOTER = Symbol("footer");
 const contains = (option: ComboboxOption, text: string) =>
   option.label.toLowerCase().includes(text.trim().toLowerCase());
 
@@ -113,6 +130,7 @@ export function Combobox({
   description,
   error,
   options,
+  footer,
   value,
   defaultValue = "",
   onChange,
@@ -144,7 +162,8 @@ export function Combobox({
   const [open, setOpen] = useState(false);
   // True once the person has typed since the last choice: only then does the text filter the list.
   const [typing, setTyping] = useState(false);
-  const [activeValue, setActiveValue] = useState<string | null>(null);
+  // The active option's value, or FOOTER while the footer action is active.
+  const [activeValue, setActiveValue] = useState<string | typeof FOOTER | null>(null);
   const [missing, setMissing] = useState(false);
   const input = useRef<HTMLInputElement>(null);
   const anchor = useRef<HTMLElement | null>(null);
@@ -203,7 +222,7 @@ export function Combobox({
   // Late or changed results: keep the active option if it is still there, else the first enabled one. Focus never
   // moves (it stays in the input; the list uses aria-activedescendant), so typing is never interrupted.
   useEffect(() => {
-    if (!open) return;
+    if (!open || activeValue === FOOTER) return;
     if (!enabled.some((o) => o.value === activeValue)) setActiveValue(enabled[0]?.value ?? null);
   });
 
@@ -217,10 +236,17 @@ export function Combobox({
       list.current?.querySelector(`#${listId}-${activeIndex}`)?.scrollIntoView?.({ block: "nearest" });
   }, [open, activeIndex, listId]);
 
+  // The arrow keys' stops: the enabled options, then the footer action.
+  const stops: (string | typeof FOOTER)[] = enabled.map((o) => o.value);
+  if (footer) stops.push(FOOTER);
   const move = (delta: 1 | -1) => {
-    const at = enabled.findIndex((o) => o.value === activeValue);
-    const next = enabled[Math.min(Math.max(at + delta, 0), enabled.length - 1)];
-    if (next) setActiveValue(next.value);
+    const at = stops.indexOf(activeValue as string);
+    const next = stops[Math.min(Math.max(at + delta, 0), stops.length - 1)];
+    if (next !== undefined) setActiveValue(next);
+  };
+  const runFooter = () => {
+    setOpen(false);
+    (footer as OptionListAction).onSelect();
   };
 
   const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
@@ -238,7 +264,10 @@ export function Combobox({
         return;
       case "Enter": {
         const option = visible[activeIndex];
-        if (open && option) {
+        if (open && activeValue === FOOTER) {
+          event.preventDefault();
+          runFooter();
+        } else if (open && option) {
           event.preventDefault();
           choose(option);
         } else if (allowCustom) settle();
@@ -281,7 +310,15 @@ export function Combobox({
         aria-autocomplete={match ? "list" : "none"}
         aria-expanded={open}
         aria-controls={listId}
-        aria-activedescendant={open && activeIndex >= 0 ? `${listId}-${activeIndex}` : undefined}
+        aria-activedescendant={
+          !open
+            ? undefined
+            : activeValue === FOOTER
+              ? `${listId}-footer`
+              : activeIndex >= 0
+                ? `${listId}-${activeIndex}`
+                : undefined
+        }
         value={typedText}
         onChange={(next) => {
           setText(next);
@@ -293,7 +330,24 @@ export function Combobox({
         // Options never take focus (they are aria-activedescendant targets), so any blur leaves the field.
         onBlur={settle}
       />
-      <OptionList ref={list} id={listId} label={typeof label === "string" ? label : undefined} busy={loading}>
+      <OptionList
+        ref={list}
+        id={listId}
+        label={typeof label === "string" ? label : undefined}
+        busy={loading}
+        footer={
+          footer && (
+            <OptionListItem
+              id={`${listId}-footer`}
+              label={footer.label}
+              icon={footer.icon && <Icon icon={footer.icon} className="cy-combobox-icon" />}
+              active={activeValue === FOOTER}
+              onPointerMove={() => setActiveValue(FOOTER)}
+              onClick={runFooter}
+            />
+          )
+        }
+      >
         {loading && <OptionListNote>{text.loading}</OptionListNote>}
         {!loading && visible.length === 0 && <OptionListNote>{text.empty}</OptionListNote>}
         {visible.map((option, index) => (
@@ -305,6 +359,8 @@ export function Combobox({
             icon={<OptionIcon option={option} plain={option.disabled} className="cy-combobox-icon" />}
             selected={option.value === current}
             disabled={option.disabled}
+            dimmed={option.dimmed}
+            trailing={option.trailing}
             active={index === activeIndex}
             onPointerMove={() => !option.disabled && setActiveValue(option.value)}
             onClick={() => choose(option)}
