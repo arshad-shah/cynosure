@@ -1,8 +1,10 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { expect, fn, waitFor } from "storybook/test";
+import { expect, fn, waitFor, within } from "storybook/test";
+import { plus } from "../../icons/plus.js";
 import { contrast } from "../../test/color.js";
 import { computeUnderHostileHost } from "../../test/hostile.js";
 import { CynosureTheme } from "../../theme/CynosureTheme.js";
+import { Button } from "../Button/Button.js";
 import { Stack } from "../Stack/Stack.js";
 import { CodeBlock } from "./CodeBlock.js";
 
@@ -226,6 +228,84 @@ export const SeveralMarkedLines: Story = {
     await expect(canvasElement.querySelector("figure > .cy-visually-hidden")).toHaveTextContent(
       "Lines 1, 2 highlighted",
     );
+  },
+};
+
+const onInsert = fn();
+
+export const ActionsBesideTheCopyButton: Story = {
+  tags: ["visual"],
+  render: (args) => {
+    const actions = (
+      <Button size="sm" variant="ghost" icon={plus} onClick={onInsert}>
+        Insert into editor
+      </Button>
+    );
+    return (
+      <Stack gap="4">
+        <div data-testid="ltr">
+          <CodeBlock {...args} actions={actions} />
+        </div>
+        <div data-testid="rtl" dir="rtl">
+          <CodeBlock {...args} title="rtl.config.ts" actions={actions} />
+        </div>
+        <div data-testid="narrow" style={{ inlineSize: 260 }}>
+          <CodeBlock {...args} title="a-very-long-file-name.config.ts" actions={actions} />
+        </div>
+        <div data-testid="only">
+          <CodeBlock code="select 1" copyable={false} actions={actions} />
+        </div>
+      </Stack>
+    );
+  },
+  play: async ({ canvas, userEvent }) => {
+    onInsert.mockClear();
+    const ltr = within(canvas.getByTestId("ltr"));
+    const insert = ltr.getByRole("button", { name: "Insert into editor" });
+    const copy = ltr.getByRole("button", { name: "Copy" });
+    // In the header, on the copy button's line, before it in the reading direction.
+    const title = (
+      canvas.getByTestId("ltr").querySelector(".cy-code-block-title") as Element
+    ).getBoundingClientRect();
+    const box = (el: Element) => el.getBoundingClientRect();
+    await expect(box(insert).right).toBeLessThanOrEqual(box(copy).left);
+    await expect(box(insert).left).toBeGreaterThanOrEqual(title.right);
+    await expect(
+      Math.abs(box(insert).top + box(insert).height / 2 - (box(copy).top + box(copy).height / 2)),
+    ).toBeLessThan(1);
+    const rtl = within(canvas.getByTestId("rtl"));
+    await expect(box(rtl.getByRole("button", { name: "Insert into editor" })).left).toBeGreaterThanOrEqual(
+      box(rtl.getByRole("button", { name: "Copy" })).right,
+    );
+    // Keyboard: the action, then copy, then the code region.
+    insert.focus();
+    await userEvent.keyboard("{Enter}");
+    await expect(onInsert).toHaveBeenCalledTimes(1);
+    await userEvent.tab();
+    await expect(copy).toHaveFocus();
+    await userEvent.tab();
+    await expect(ltr.getByRole("region", { name: "vite.config.ts" })).toHaveFocus();
+    await userEvent.click(insert);
+    await expect(onInsert).toHaveBeenCalledTimes(2);
+    // Narrow: the title gives way, the action and copy button keep their size and stay inside.
+    const narrow = canvas.getByTestId("narrow");
+    const header = narrow.querySelector(".cy-code-block-header") as HTMLElement;
+    await expect(header.scrollWidth).toBeLessThanOrEqual(header.clientWidth);
+    const narrowInsert = within(narrow).getByRole("button", { name: "Insert into editor" });
+    await expect(box(narrowInsert).width).toBeCloseTo(box(insert).width, 0);
+    await expect(box(narrowInsert).right).toBeLessThanOrEqual(box(header).right);
+    // Without copy or a title the header still shows, holding the action.
+    await expect(
+      within(canvas.getByTestId("only")).getByRole("button", { name: "Insert into editor" }),
+    ).toBeVisible();
+    // Host CSS cannot move the actions out of their row.
+    const { clean, hostile } = computeUnderHostileHost(canvas.getByTestId("ltr"), ".cy-code-block-actions", [
+      "display",
+      "align-items",
+      "column-gap",
+      "flex-shrink",
+    ]);
+    await expect(hostile).toEqual(clean);
   },
 };
 

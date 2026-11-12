@@ -45,6 +45,11 @@ export interface CodeBlockProps {
   activeLines?: readonly number[] | undefined;
   /** Wrap long lines instead of scrolling sideways (line numbers are then left out, as they would not line up). */
   wrap?: boolean;
+  /**
+   * Buttons in the header beside the copy button, such as "Insert into editor" or "Run". Use `Button` or
+   * `IconButton` at `size="sm"`; they come before the copy button in the reading and tab order.
+   */
+  actions?: ReactNode;
   /** Show the copy button. Default true. */
   copyable?: boolean;
   /** Passed to the copy button (extensions can copy through their own channel). */
@@ -71,6 +76,7 @@ export function CodeBlock({
   lineNumbers = false,
   activeLines,
   wrap = false,
+  actions,
   copyable = true,
   copy,
   size = "md",
@@ -100,20 +106,25 @@ export function CodeBlock({
       aria-label={heading ? undefined : name}
       style={style}
     >
-      {(heading || copyable) && (
+      {(heading || copyable || actions) && (
         <div className="cy-code-block-header cy-reset">
           <span className="cy-code-block-title cy-reset" id={`${id}-title`}>
             {heading}
           </span>
-          {copyable && (
-            <CopyButton
-              value={code}
-              size="sm"
-              variant="ghost"
-              tooltipPlacement="start"
-              {...(copy ? { copy } : {})}
-              {...(labels ? { labels } : {})}
-            />
+          {(actions || copyable) && (
+            <div className="cy-code-block-actions cy-reset">
+              {actions}
+              {copyable && (
+                <CopyButton
+                  value={code}
+                  size="sm"
+                  variant="ghost"
+                  tooltipPlacement="start"
+                  {...(copy ? { copy } : {})}
+                  {...(labels ? { labels } : {})}
+                />
+              )}
+            </div>
           )}
         </div>
       )}
