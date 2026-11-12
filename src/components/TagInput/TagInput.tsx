@@ -14,6 +14,7 @@ import { isRtl } from "../../foundations/dir.js";
 import { HiddenValue } from "../../foundations/HiddenValue/HiddenValue.js";
 import { isComposing } from "../../foundations/keys.js";
 import { close } from "../../icons/close.js";
+import type { IconData } from "../../icons/types.js";
 import { useListboxLayer } from "../../overlay/listbox-layer.js";
 import type { Size } from "../../tokens/schema.js";
 import { IconButton } from "../IconButton/IconButton.js";
@@ -39,6 +40,8 @@ export interface TagInputLabels {
   remove: (tag: string) => string;
   added: (tag: string) => string;
   removed: (tag: string) => string;
+  /** Announced when Backspace takes the last tag back into the field to edit. Default: "Editing design". */
+  editing: (tag: string) => string;
   duplicate: (tag: string) => string;
   tooMany: (max: number) => string;
   /** Shown in the suggestion list when nothing matches. Default: "No suggestions". */
@@ -80,6 +83,10 @@ export interface TagInputProps {
   disabled?: boolean | undefined;
   /** Hint shown in the input while nothing is typed. */
   placeholder?: string | undefined;
+  /** Draws a tag's content in place of its text (the remove button is still named by the text). */
+  renderTag?: ((tag: string) => ReactNode) | undefined;
+  /** Icon at the start of the field, before the input. */
+  iconStart?: IconData | undefined;
   /** Field height and text size. Default "md". */
   size?: Size;
   /** `outline` or `soft` (tinted, borderless until focus). Default "outline". */
@@ -97,6 +104,7 @@ const DEFAULT_LABELS: TagInputLabels = {
   remove: (tag) => `Remove ${tag}`,
   added: (tag) => `${tag} added`,
   removed: (tag) => `${tag} removed`,
+  editing: (tag) => `Editing ${tag}`,
   duplicate: (tag) => `${tag} is already added`,
   tooMany: (max) => `Up to ${max} tags`,
   empty: "No suggestions",
@@ -132,6 +140,8 @@ export function TagInput({
   required,
   disabled,
   placeholder,
+  renderTag,
+  iconStart,
   size = "md",
   variant = "outline",
   labels,
@@ -227,9 +237,14 @@ export function TagInput({
         return;
       }
       case "Backspace":
+        // In an empty field, the last tag comes back into it to be edited (Enter or leaving puts it back).
         if (el.value === "" && tags.length) {
           event.preventDefault();
-          remove(tags.length - 1);
+          const tag = tags[tags.length - 1] as string;
+          setProblem(null);
+          setSaid(text.editing(tag));
+          update(tags.slice(0, -1));
+          setTyped(tag);
         }
         return;
       case "ArrowLeft":
@@ -299,6 +314,7 @@ export function TagInput({
         error={error ?? problem ?? undefined}
         size={size}
         variant={variant}
+        iconStart={iconStart}
         placeholder={placeholder}
         disabled={disabled}
         required={required && tags.length === 0}
@@ -336,7 +352,7 @@ export function TagInput({
         <ul ref={chips} className="cy-tag-input-tags cy-reset" aria-label={text.tags}>
           {tags.map((tag, index) => (
             <li key={`${tag}-${index}`} className="cy-tag-input-tag cy-reset">
-              <span className="cy-tag-input-text cy-reset">{tag}</span>
+              <span className="cy-tag-input-text cy-reset">{renderTag ? renderTag(tag) : tag}</span>
               {!disabled && (
                 <IconButton
                   icon={close}
