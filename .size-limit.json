@@ -2,7 +2,7 @@
   {
     "name": "all CSS",
     "path": "dist/styles.css",
-    "limit": "33.7 kB",
+    "limit": "34.4 kB",
     "gzip": true
   },
   {
@@ -684,6 +684,12 @@
       "dist/styles/scroll-area.css"
     ],
     "limit": "2.1 kB",
+    "gzip": true
+  },
+  {
+    "name": "ListRow (JS + CSS)",
+    "path": ["dist/components/ListRow/ListRow.js", "dist/styles/list-row.css"],
+    "limit": "3.5 kB",
     "gzip": true
   }
 ]
