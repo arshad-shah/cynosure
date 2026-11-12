@@ -2,8 +2,10 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 import { expect, fn, waitFor } from "storybook/test";
 import { copy, download, edit, filter, link } from "../../icons/index.js";
+import { shownFully } from "../../test/settle.js";
 import { Button } from "../Button/Button.js";
 import { IconButton } from "../IconButton/IconButton.js";
+import { Menu } from "../Menu/Menu.js";
 import { SearchField } from "../SearchField/SearchField.js";
 import { SegmentedControl } from "../SegmentedControl/SegmentedControl.js";
 import { Toolbar } from "./Toolbar.js";
@@ -212,6 +214,42 @@ export const RightToLeftFlipsArrows: Story = {
     await userEvent.keyboard("{ArrowLeft}");
     await expect(name()).toBe("Italic");
     await expect(document.querySelector(".cy-toolbar.host-toolbar")).toBeTruthy();
+  },
+};
+
+export const NestedMenuKeepsItsKeysAndTheTabStop: Story = {
+  render: (args) => (
+    <Toolbar {...args}>
+      <Button size="sm">Bold</Button>
+      <Menu
+        label="More"
+        trigger={(props) => (
+          <Button size="sm" {...props}>
+            More
+          </Button>
+        )}
+        items={[
+          { value: "copy", label: "Copy" },
+          { value: "paste", label: "Paste" },
+        ]}
+        onSelect={() => {}}
+      />
+      <Button size="sm">Link</Button>
+    </Toolbar>
+  ),
+  play: async ({ canvas, userEvent }) => {
+    const more = canvas.getByRole("button", { name: "More" });
+    await userEvent.tab();
+    await userEvent.keyboard("{ArrowRight}{Enter}");
+    const menu = await canvas.findByRole("menu", { name: "More" });
+    await shownFully(menu);
+    await waitFor(() => expect(name()).toBe("Copy"));
+    // The menu's items are not the toolbar's: horizontal arrows stay in the menu, and the toolbar keeps its stop.
+    await userEvent.keyboard("{ArrowRight}");
+    await expect(name()).toBe("Copy");
+    await userEvent.keyboard("{ArrowDown}");
+    await expect(name()).toBe("Paste");
+    await expect(more.tabIndex).toBe(0);
   },
 };
 

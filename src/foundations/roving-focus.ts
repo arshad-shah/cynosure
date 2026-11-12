@@ -63,7 +63,7 @@ export function useRovingFocus(container: RefObject<HTMLElement | null>, options
 
     const onFocusIn = (e: FocusEvent) => {
       const item = (e.target as HTMLElement).closest<HTMLElement>(selector);
-      if (item && root.contains(item)) {
+      if (item && root.contains(item) && own(item)) {
         stop = item;
         setStop(item);
       }
@@ -71,7 +71,7 @@ export function useRovingFocus(container: RefObject<HTMLElement | null>, options
     const onKeyDown = (e: KeyboardEvent) => {
       const list = items().filter(enabled);
       const current = (e.target as HTMLElement).closest<HTMLElement>(selector);
-      if (!current || !list.length || e.defaultPrevented || ownsArrowKeys(current)) return;
+      if (!current || !own(current) || !list.length || e.defaultPrevented || ownsArrowKeys(current)) return;
       const rtl = isRtl(root);
       const horizontal = orientation !== "vertical";
       const vertical = orientation !== "horizontal";
