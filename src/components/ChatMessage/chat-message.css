@@ -1,0 +1,118 @@
+/* chat-message: a row of avatar and body; the body holds the bubble and, under it, the actions (a Toolbar in a
+   wrapper of our own that fades it in). The person's messages run the other way, so they sit at the end. Parts that
+   set their own colour or font double their selector, to win over .cy-reset whatever the rule order. */
+.cy-chat-message.cy-chat-message {
+  --_r: var(--cy-chat-message-radius, var(--cy-radius-card));
+  box-sizing: border-box !important;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--cy-chat-message-gap, var(--cy-space-3));
+  margin: 0;
+  min-inline-size: 0;
+  color: var(--cy-color-ink);
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-font-size-md);
+  font-weight: var(--cy-font-weight-regular);
+  line-height: var(--cy-font-line-height);
+  letter-spacing: normal;
+  text-align: start;
+  text-transform: none;
+  &[data-role="user"] {
+    flex-direction: row-reverse;
+  }
+}
+
+.cy-chat-message-avatar {
+  display: flex;
+  flex: none;
+}
+
+.cy-chat-message-body.cy-chat-message-body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--cy-space-1);
+  min-inline-size: 0;
+  max-inline-size: var(--cy-chat-message-max-width, 82%);
+  [data-role="user"] > & {
+    align-items: flex-end;
+  }
+  [data-wide] > & {
+    flex: 1;
+    align-items: stretch;
+    max-inline-size: none;
+  }
+}
+
+.cy-chat-message-bubble.cy-chat-message-bubble {
+  box-sizing: border-box !important;
+  max-inline-size: 100%;
+  min-inline-size: 0;
+  margin: 0;
+  padding: var(--cy-chat-message-padding, var(--cy-space-3) var(--cy-space-5));
+  border: var(--cy-border-width) solid var(--cy-chat-message-border, var(--cy-color-line));
+  border-radius: var(--_r);
+  /* The corner nearest the avatar is tighter: the bubble comes from it. */
+  border-start-start-radius: calc(var(--_r) / 4);
+  background: var(--cy-chat-message-bg, var(--cy-color-surface-raised));
+  color: var(--cy-color-ink);
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-font-size-md);
+  font-weight: var(--cy-font-weight-regular);
+  line-height: var(--cy-font-line-height);
+  letter-spacing: normal;
+  text-transform: none;
+  overflow-wrap: anywhere;
+  [data-role="user"] > * > & {
+    border-color: transparent;
+    border-start-start-radius: var(--_r);
+    border-start-end-radius: calc(var(--_r) / 4);
+    background: var(--cy-chat-message-user-bg, var(--cy-color-accent));
+    color: var(--cy-chat-message-user-color, var(--cy-color-on-accent));
+    /* What the person typed keeps its line breaks. */
+    white-space: pre-wrap;
+  }
+  [data-tone="danger"] > * > & {
+    border-color: color-mix(in oklab, var(--cy-color-danger) 45%, var(--cy-color-line));
+    background: color-mix(in oklab, var(--cy-color-danger) 12%, var(--cy-color-surface));
+    color: var(--cy-color-danger-text);
+  }
+}
+
+/* The caret after the text while it streams in; it blinks, and rests lit under reduced motion. */
+.cy-chat-message-caret.cy-chat-message-caret {
+  display: inline-block;
+  inline-size: calc(var(--cy-border-width) * 2);
+  block-size: 1em;
+  margin-inline-start: var(--cy-space-1);
+  border-radius: var(--cy-border-width);
+  background: var(--cy-chat-message-caret, var(--cy-color-accent));
+  vertical-align: text-bottom;
+  animation: cy-chat-message-blink calc(2 * var(--cy-motion-slow)) steps(2, jump-none) infinite;
+  [data-role="user"] > * > * > & {
+    background: currentColor;
+  }
+}
+@keyframes cy-chat-message-blink {
+  50% {
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cy-chat-message-caret.cy-chat-message-caret {
+    animation: none;
+  }
+}
+
+.cy-chat-message-actions.cy-chat-message-actions {
+  --cy-toolbar-padding: 0;
+  display: flex;
+  transition: opacity var(--cy-motion-fast) var(--cy-motion-ease);
+}
+/* With a mouse, the actions wait (in place, so nothing moves) until the message is pointed at or holds focus. On a
+   touch screen there is no hover: they are always shown. */
+@media (hover: hover) {
+  .cy-chat-message.cy-chat-message:not(:hover, :focus-within) .cy-chat-message-actions {
+    opacity: 0;
+  }
+}

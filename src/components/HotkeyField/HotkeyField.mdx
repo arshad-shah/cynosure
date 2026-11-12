@@ -1,0 +1,97 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./HotkeyField.stories";
+
+<Meta of={Stories} />
+
+# HotkeyField
+
+Records a keyboard shortcut for a keybindings page. It shows the shortcut as key caps beside a record toggle and a clear button; while recording, it takes the next chord itself, so the app's own shortcuts do not fire, and writes it the way `useHotkey` reads it (`"mod+shift+p"`; see [CommandPalette](?path=/docs/components-commandpalette--docs) for `useHotkey`).
+
+<Canvas of={Stories.Default} />
+
+## When to use
+
+- **Shortcut settings:** each action on a keybindings page gets a HotkeyField, with `recording` controlled so one row records at a time.
+
+**Use something else when:** you only show a shortcut ([Kbd](?path=/docs/components-kbd--docs)), or people type a key name as text ([TextField](?path=/docs/components-textfield--docs)).
+
+## Usage
+
+```tsx
+import { HotkeyField, useHotkey } from "@arshad-shah/cynosure";
+
+const [keys, setKeys] = useState("mod+shift+p");
+useHotkey(keys, openPalette);
+
+<HotkeyField label="Command palette" value={keys} onChange={setKeys} name="palette" />
+```
+
+### One row at a time
+
+Control `recording` from the page, so starting one row ends the other. Starting it from outside (an Edit button) moves focus into the field so the keys reach it.
+
+```tsx
+<HotkeyField
+  label={binding.label}
+  labelHidden
+  value={binding.keys}
+  onChange={(keys) => save(binding.id, keys)}
+  recording={editing === binding.id}
+  onRecordingChange={(on) => setEditing(on ? binding.id : null)}
+/>
+```
+
+<Canvas of={Stories.ControlledRecording} />
+
+### Plain keys
+
+By default a shortcut needs Control, Command or Alt, since a plain letter types in text fields (`useHotkey` ignores plain keys there). Function keys always count. `allowBare` accepts plain keys (`"k"`, `"shift+/"`) for shortcuts that only work outside text fields.
+
+<Canvas of={Stories.AllowBareRecordsPlainKeys} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+| Input | Idle | Recording |
+| --- | --- | --- |
+| <kbd>Enter</kbd>, <kbd>Space</kbd>, click or tap on the record toggle | Starts recording | Stops, keeping the shortcut |
+| Click or tap on the shortcut's box | Starts recording | – |
+| A chord (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>) | The app's own shortcuts | Recorded, recording ends |
+| <kbd>Control</kbd>, <kbd>Shift</kbd>, <kbd>Alt</kbd>, <kbd>Meta</kbd> alone | – | Waits for the key |
+| A plain letter, <kbd>Enter</kbd>, <kbd>Space</kbd> | – | Ignored (recorded with `allowBare`) |
+| <kbd>Escape</kbd> | – | Cancels; with a modifier it is recorded (`mod+escape`) |
+| <kbd>Tab</kbd> | Moves focus | Moves focus, which cancels |
+
+- **Capture:** keys are taken in the capture phase on the field's own element, with propagation stopped and the default prevented, so neither `useHotkey` nor any document listener sees them. It works inside shadow roots.
+- **Key names:** the key is the character typed or, when that is not a letter or digit (Option+K types "˚" on macOS, Shift+1 types "!", a dead key, another alphabet), the letter or digit on the physical key, as `matchesHotkey` reads it. `mod` is Command on Apple platforms and Control elsewhere, so a recorded shortcut works on both. The mapping is exported as `hotkeyFromEvent`.
+- **Names:** the label names the group (a fieldset); the record toggle is a pressed/not-pressed button described by the shortcut, so it is read as "Record shortcut, Control plus Shift plus P".
+- **Announcements:** the field's own `role="status"` says "Recording, press a shortcut", then "Shortcut set to …", "Recording cancelled" or "Shortcut cleared" (`labels`).
+- **Focus:** clearing moves focus to the record toggle, since the clear button goes with the shortcut. Focus leaving the field while recording cancels it.
+- **Forms:** with `name`, the form receives the shortcut string; a reset restores `defaultValue`; a disabled field is not submitted.
+- **Reduced motion:** the recording light stops pulsing and stays lit.
+
+<Canvas of={Stories.RecordsAChordFromTheKeyboard} />
+
+## Touch
+
+The buttons keep a 44px hit area on coarse pointers. On a touch-only device there is usually no keyboard to record with; the field still shows and clears shortcuts.
+
+## Theming
+
+| Token | Default | What it changes |
+| --- | --- | --- |
+| `--cy-hotkey-field-bg` | `--cy-color-surface` | The shortcut's box |
+| `--cy-hotkey-field-border` | `--cy-color-line` | The box's border |
+| `--cy-hotkey-field-radius` | from the control height | The box's corners |
+| `--cy-hotkey-field-recording-border` | `--cy-color-accent` | The box's border while recording |
+| `--cy-hotkey-field-recording-color` | `--cy-color-accent-text` | The prompt and its light |
+| `--cy-hotkey-field-gap` | `--cy-space-2` | Between the box and the buttons |
+
+The key caps are [Kbd](?path=/docs/components-kbd--docs) and the buttons [IconButton](?path=/docs/components-iconbutton--docs): restyle them through their tokens.
+
+## Related
+
+[Kbd](?path=/docs/components-kbd--docs) · [CommandPalette](?path=/docs/components-commandpalette--docs) · [Field](?path=/docs/components-field--docs)
