@@ -94,11 +94,32 @@ A middle-click on a closable tab closes it too, as in browsers and editors.
 
 <Canvas of={Stories.UnsavedTabShowsADotThatBecomesTheCloseButton} />
 
+### Commands on a tab
+
+`contextMenu` gives a tab its own commands, such as Close others or Close to the right, with the items `Menu` takes; `onContextMenuSelect` gets the chosen item's `value`. Right-click, a long press, Shift+F10 or the context menu key opens it. A command that closes the tab moves focus to the tab then selected, as Delete does.
+
+```tsx
+<Tab
+  value={f}
+  onClose={() => closeFile(f)}
+  contextMenu={[
+    { value: "close", label: "Close", shortcut: ["Delete"] },
+    { value: "others", label: "Close others" },
+    { value: "right", label: "Close to the right", disabled: isLast },
+  ]}
+  onContextMenuSelect={(command) => run(command, f)}
+>
+  {f}
+</Tab>
+```
+
+<Canvas of={Stories.RightClickOpensTheTabsMenu} />
+
 ## Props
 
 <ArgTypes of={Stories} />
 
-`Tab`: `value`, `icon`, `disabled`, `onClose`, `dirty`, `closeLabel`, `children`. The close button is named `labels.close` with the tab's text (a label with markup, such as a badge, is named by the text it shows); give `closeLabel` to name it yourself, such as "Close query 3". `TabList`: `label`, `onReorder`, `scrollable`, `end`. `Tabs` also takes `labels`: `close(name)`, `closeUnsaved(name)`, `unsaved`, `scrollBack`, `scrollForward` and `moved(name, position, total)`. `TabPanel`: `value`, `keepMounted` (keep the content mounted while hidden, preserving its state; by default only the selected panel renders its content).
+`Tab`: `value`, `icon`, `disabled`, `onClose`, `dirty`, `contextMenu`, `onContextMenuSelect`, `closeLabel`, `children`. The close button is named `labels.close` with the tab's text (a label with markup, such as a badge, is named by the text it shows); give `closeLabel` to name it yourself, such as "Close query 3". `TabList`: `label`, `onReorder`, `scrollable`, `end`. `Tabs` also takes `labels`: `close(name)`, `closeUnsaved(name)`, `unsaved`, `scrollBack`, `scrollForward`, `menu(name)` and `moved(name, position, total)`. `TabPanel`: `value`, `keepMounted` (keep the content mounted while hidden, preserving its state; by default only the selected panel renders its content).
 
 ## Behaviour and accessibility
 
@@ -111,6 +132,7 @@ A middle-click on a closable tab closes it too, as in browsers and editors.
 | <kbd>Delete</kbd> | Close the focused tab (with `onClose`) |
 | Middle-click | Close the tab (with `onClose`), without the browser's autoscroll |
 | Mouse wheel | Scroll a `scrollable` list sideways |
+| <kbd>Shift</kbd> + <kbd>F10</kbd>, context menu key, right-click | Open the tab's `contextMenu` |
 | <kbd>Ctrl</kbd> or <kbd>Cmd</kbd> + <kbd>Shift</kbd> + Left / Right | Move the focused tab (with `onReorder`); announced |
 
 - **Roles:** `tablist` (named by `label`), `tab` with `aria-selected` and `aria-controls`, and `tabpanel` labelled by its tab.
@@ -121,7 +143,7 @@ A middle-click on a closable tab closes it too, as in browsers and editors.
 
 ## Touch
 
-Each tab has at least a 24px hit area, and 44px on coarse pointers, without changing its visible size, as do the chevrons of a `scrollable` list. The list scrolls with a swipe; to drag a reorderable tab, hold it briefly first.
+Each tab has at least a 24px hit area, and 44px on coarse pointers, without changing its visible size, as do the chevrons of a `scrollable` list. A long press opens a tab's `contextMenu`. The list scrolls with a swipe; to drag a reorderable tab, hold it briefly first.
 
 ## Theming
 

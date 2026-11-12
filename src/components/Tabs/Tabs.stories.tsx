@@ -1,10 +1,11 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
-import { expect, fn, waitFor } from "storybook/test";
+import { expect, fn, waitFor, within } from "storybook/test";
 import { code, info, list, plus } from "../../icons/index.js";
 import { computeUnderHostileHost } from "../../test/hostile.js";
 import { realHover } from "../../test/hover.js";
 import { asIfPrinting } from "../../test/print.js";
+import { shownFully } from "../../test/settle.js";
 import { Button } from "../Button/Button.js";
 import { IconButton } from "../IconButton/IconButton.js";
 import { Tab, TabList, TabPanel, Tabs } from "./Tabs.js";
@@ -1091,5 +1092,170 @@ export const ScrollableStableUnderHostileHost: Story = {
       const result = computeUnderHostileHost(canvasElement, selector, props);
       await expect(result.hostile).toEqual(result.clean);
     }
+  },
+};
+
+/** Document tabs with the usual commands on each tab's context menu. */
+function FilesWithMenus({ onCommand }: { onCommand?: (command: string, file: string) => void }) {
+  const [files, setFiles] = useState(["a.ts", "b.ts", "c.ts", "d.ts"]);
+  const [current, setCurrent] = useState("a.ts");
+  const run = (command: string, f: string) => {
+    onCommand?.(command, f);
+    if (command === "close") setFiles((all) => all.filter((x) => x !== f));
+    if (command === "others") setFiles([f]);
+    if (command === "right") setFiles((all) => all.slice(0, all.indexOf(f) + 1));
+  };
+  return (
+    <Tabs value={current} onChange={setCurrent}>
+      <TabList label="Open files" onReorder={setFiles}>
+        {files.map((f, i) => (
+          <Tab
+            key={f}
+            value={f}
+            onClose={() => run("close", f)}
+            contextMenu={[
+              { value: "close", label: "Close", shortcut: ["Delete"] },
+              { value: "others", label: "Close others", disabled: files.length < 2 },
+              { value: "right", label: "Close to the right", disabled: i === files.length - 1 },
+              { value: "copy", label: "Copy path" },
+            ]}
+            onContextMenuSelect={(command) => run(command, f)}
+          >
+            {f}
+          </Tab>
+        ))}
+      </TabList>
+      {files.map((f) => (
+        <TabPanel key={f} value={f}>
+          Editing {f}
+        </TabPanel>
+      ))}
+      <span data-testid="order" hidden>
+        {files.join(",")}
+      </span>
+    </Tabs>
+  );
+}
+const menuPanel = () => document.querySelector('[role="menu"]:popover-open') as HTMLElement | null;
+const commands = () => (window as unknown as { tabCommands: ReturnType<typeof fn> }).tabCommands;
+const withCommands = () => {
+  const spy = fn();
+  (window as unknown as { tabCommands: typeof spy }).tabCommands = spy;
+  return <FilesWithMenus onCommand={spy} />;
+};
+
+export const RightClickOpensTheTabsMenu: Story = {
+  render: withCommands,
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const c = canvas.getByRole("tab", { name: "c.ts" });
+    await userEvent.pointer({ keys: "[MouseRight]", target: c });
+    await waitFor(() => expect(menuPanel()).not.toBeNull());
+    await shownFully(menuPanel() as HTMLElement);
+    await expect(menuPanel()).toHaveAccessibleName("c.ts actions");
+    await userEvent.click(within(menuPanel() as HTMLElement).getByRole("menuitem", { name: "Close others" }));
+    await expect(commands()).toHaveBeenLastCalledWith("others", "c.ts");
+    await expect(orderOf(canvasElement)).toBe("c.ts");
+    await waitFor(() => expect(selected(canvas)).toBe("c.ts"));
+    await waitFor(() => expect(menuPanel()).toBeNull());
+  },
+};
+
+export const AnOpenMenuStaysOutsideTheTabList: Story = {
+  render: withCommands,
+  play: async ({ canvas, userEvent }) => {
+    const b = canvas.getByRole("tab", { name: "b.ts" });
+    await userEvent.pointer({ keys: "[MouseRight]", target: b });
+    await waitFor(() => expect(menuPanel()).not.toBeNull());
+    await shownFully(menuPanel() as HTMLElement);
+    // A tablist may hold only tabs, so the menu is beside it (the accessibility check runs with the menu open).
+    await expect((menuPanel() as HTMLElement).closest('[role="tablist"]')).toBeNull();
+    await expect(menuPanel()).toHaveAccessibleName("b.ts actions");
+  },
+};
+
+export const ShiftF10OpensTheMenuFromTheKeyboard: Story = {
+  render: withCommands,
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    await userEvent.tab();
+    await userEvent.keyboard("{ArrowRight}");
+    const b = canvas.getByRole("tab", { name: "b.ts" });
+    await expect(b).toHaveFocus();
+    // Both keyboard ways in are announced.
+    await expect(b.getAttribute("aria-keyshortcuts")?.split(" ")).toEqual(["Delete", "Shift+F10"]);
+    await userEvent.keyboard("{Shift>}{F10}{/Shift}");
+    await waitFor(() => expect(menuPanel()).not.toBeNull());
+    await waitFor(() => expect(document.activeElement).toHaveTextContent("Close"));
+    // Escape closes it and puts focus back on the tab.
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() => expect(menuPanel()).toBeNull());
+    await expect(b).toHaveFocus();
+    // The context menu key opens it too; a command that keeps the tab returns focus to it.
+    await userEvent.keyboard("{ContextMenu}");
+    await waitFor(() => expect(menuPanel()).not.toBeNull());
+    await userEvent.keyboard("{ArrowDown}{ArrowDown}{Enter}");
+    await expect(commands()).toHaveBeenLastCalledWith("right", "b.ts");
+    await expect(orderOf(canvasElement)).toBe("a.ts,b.ts");
+    await waitFor(() => expect(b).toHaveFocus());
+    // Closing the tab itself from its menu moves focus to the tab now selected, as Delete does.
+    await userEvent.keyboard("{Shift>}{F10}{/Shift}");
+    await waitFor(() => expect(menuPanel()).not.toBeNull());
+    await userEvent.keyboard("{Enter}");
+    await expect(orderOf(canvasElement)).toBe("a.ts");
+    await waitFor(() => expect(canvas.getByRole("tab", { name: "a.ts" })).toHaveFocus());
+    // Arrows still move between tabs while no menu is open (they are not swallowed by the menu's target).
+    await expect(selected(canvas)).toBe("a.ts");
+  },
+};
+
+export const ACommandThatKeepsTheTabLeavesFocusAlone: Story = {
+  render: withCommands,
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.tab();
+    const a = canvas.getByRole("tab", { name: "a.ts" });
+    await userEvent.keyboard("{Shift>}{F10}{/Shift}");
+    await waitFor(() => expect(menuPanel()).not.toBeNull());
+    await userEvent.keyboard("{End}{Enter}");
+    await expect(commands()).toHaveBeenLastCalledWith("copy", "a.ts");
+    await waitFor(() => expect(a).toHaveFocus());
+    // A later click elsewhere is not pulled back to the tab the menu belonged to.
+    const c = canvas.getByRole("tab", { name: "c.ts" });
+    await userEvent.click(c);
+    await expect(c).toHaveFocus();
+    await userEvent.keyboard("{ArrowLeft}");
+    await expect(canvas.getByRole("tab", { name: "b.ts" })).toHaveFocus();
+  },
+};
+
+export const LongPressOpensTheMenuOnTouch: Story = {
+  tags: ["touch", "!dev"],
+  render: withCommands,
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const b = canvas.getByRole("tab", { name: "b.ts" });
+    await userEvent.pointer([{ keys: "[TouchA>]", target: b }]);
+    await waitFor(() => expect(menuPanel()).not.toBeNull(), { timeout: 2000 });
+    await userEvent.pointer([{ keys: "[/TouchA]", target: b }]);
+    await expect(menuPanel()).toHaveAccessibleName("b.ts actions");
+    // The tabs are reorderable too: a press held still opens the menu and moves nothing.
+    await expect(orderOf(canvasElement)).toBe("a.ts,b.ts,c.ts,d.ts");
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() => expect(menuPanel()).toBeNull());
+  },
+};
+
+export const ContextMenuLabelsOverride: Story = {
+  render: () => (
+    <Tabs defaultValue="x" labels={{ menu: (n) => `Actions de ${n}` }}>
+      <TabList label="Fichiers">
+        <Tab value="x" contextMenu={[{ value: "close", label: "Fermer" }]} onContextMenuSelect={() => {}}>
+          x.ts
+        </Tab>
+      </TabList>
+    </Tabs>
+  ),
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.pointer({ keys: "[MouseRight]", target: canvas.getByRole("tab", { name: "x.ts" }) });
+    await waitFor(() => expect(menuPanel()).toHaveAccessibleName("Actions de x.ts"));
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() => expect(menuPanel()).toBeNull());
   },
 };

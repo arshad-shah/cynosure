@@ -4,7 +4,9 @@ import {
   createContext,
   type KeyboardEvent,
   type MouseEvent,
+  type PointerEvent,
   type ReactNode,
+  type Ref,
   useCallback,
   useContext,
   useId,
@@ -24,7 +26,9 @@ import { chevronRight } from "../../icons/chevron-right.js";
 import { close } from "../../icons/close.js";
 import type { IconData } from "../../icons/types.js";
 import type { Size } from "../../tokens/schema.js";
+import { ContextMenu, type ContextMenuTargetProps } from "../ContextMenu/ContextMenu.js";
 import { IconButton } from "../IconButton/IconButton.js";
+import type { MenuEntry } from "../Menu/Menu.js";
 
 export interface TabsTokens {
   dirty: string;
@@ -51,6 +55,8 @@ export interface TabsLabels {
   scrollBack: string;
   /** The chevron that scrolls a `scrollable` list on toward its last tab. Default "Scroll tabs forward". */
   scrollForward: string;
+  /** The name of a tab's context menu. Default "notes.md actions". */
+  menu: (name: string) => string;
   /** Announced after a tab is moved. Default "Moved notes.md to position 2 of 4". */
   moved: (name: string, position: number, total: number) => string;
 }
@@ -61,6 +67,7 @@ const DEFAULT_LABELS: TabsLabels = {
   unsaved: "Unsaved changes",
   scrollBack: "Scroll tabs back",
   scrollForward: "Scroll tabs forward",
+  menu: (name) => (name ? `${name} actions` : "Tab actions"),
   moved: (name, position, total) => `Moved ${name} to position ${position} of ${total}`,
 };
 
@@ -102,7 +109,7 @@ export interface TabsProps {
   variant?: "line" | "soft";
   /**
    * Replace the built-in English text: the close button's name (saved and unsaved), the unsaved description, the
-   * scroll chevrons' names and the announcement after a move.
+   * scroll chevrons' names, the context menu's name and the announcement after a move.
    */
   labels?: Partial<TabsLabels>;
   /** Added to the root element, for layout. */
@@ -230,6 +237,25 @@ export interface TabListProps {
   children?: ReactNode;
 }
 
+/** The context menu a tab asks its list to open: its commands and where they go. */
+interface TabMenu {
+  value: string;
+  name: string;
+  items: MenuEntry[];
+  onSelect: ((command: string) => void) | undefined;
+}
+
+/** The list's one ContextMenu, shared with its tabs: its target handlers, and how a tab makes itself the target. */
+const MenuContext = createContext<{ target: ContextMenuTargetProps; open: (menu: TabMenu) => void } | null>(
+  null,
+);
+
+/** Points a ref at an element (the menu returns focus to its target, so the target is the tab that opened it). */
+const aim = (ref: Ref<HTMLElement>, el: HTMLElement) => {
+  if (typeof ref === "function") ref(el);
+  else if (ref) (ref as { current: HTMLElement | null }).current = el;
+};
+
 /** The tab inside a list child (a tab, or a closable tab's slot). */
 const tabIn = (el: Element) =>
   (el.matches('[role="tab"]') ? el : el.querySelector('[role="tab"]')) as HTMLElement;
@@ -239,6 +265,7 @@ export function TabList({ label, onReorder, scrollable = false, end, className, 
   const ref = useRef<HTMLDivElement>(null);
   const strip = useRef<HTMLDivElement>(null);
   const [said, setSaid] = useState("");
+  const [menu, setMenu] = useState<TabMenu | null>(null);
   const latest = useRef({ onReorder, labels });
   latest.current = { onReorder, labels };
   const order = () => [...(ref.current?.children ?? [])].map((c) => tabIn(c)?.dataset.value as string);
@@ -411,16 +438,39 @@ export function TabList({ label, onReorder, scrollable = false, end, className, 
     ) : (
       tablist
     );
+  // One context menu for the list, opened for whichever tab asked. Its panel lands beside the list, not in it: a
+  // tablist holds only tabs, even while a menu is open.
+  const hosted = (
+    <ContextMenu
+      label={labels.menu(menu?.name ?? "")}
+      items={menu?.items ?? []}
+      onSelect={(command) => {
+        if (!menu) return;
+        // A command that removes the tab (Close, Close others…) moves focus to the tab then selected, as Delete does;
+        // one that keeps it leaves focus on it.
+        refocus.current = menu.value;
+        menu.onSelect?.(command);
+      }}
+      onOpenChange={(open) => {
+        // The tab is still there (a command such as "Copy path"): the menu returns focus to it, so drop the request,
+        // which would otherwise pull focus back to it on some later render. A removed tab leaves it for Tabs.
+        if (!open && menu && refocus.current === menu.value && order().includes(menu.value))
+          refocus.current = null;
+      }}
+    >
+      {(target) => <MenuContext.Provider value={{ target, open: setMenu }}>{list}</MenuContext.Provider>}
+    </ContextMenu>
+  );
   // The announcement sits beside the list, not in it: a tablist holds only tabs, and every child is sortable.
   return reorderable ? (
     <>
-      {list}
+      {hosted}
       <span className="cy-visually-hidden" role="status">
         {said}
       </span>
     </>
   ) : (
-    list
+    hosted
   );
 }
 
@@ -446,23 +496,58 @@ export interface TabProps {
    * text: the label itself when it is a string, else the text it renders.
    */
   closeLabel?: string | undefined;
+  /**
+   * Commands for this tab, in a ContextMenu opened by right-click, a long press, Shift+F10 or the context menu key:
+   * items, or sections of items, as in `Menu` (Close others, Close to the right…). Named `labels.menu` with its text.
+   */
+  contextMenu?: MenuEntry[] | undefined;
+  /**
+   * Called with the chosen `contextMenu` item's `value`. If the command removes this tab, focus moves to the tab then
+   * selected, as after Delete.
+   */
+  onContextMenuSelect?: ((value: string) => void) | undefined;
   /** The tab's label. */
   children: ReactNode;
 }
 
-export function Tab({ value, icon, disabled, onClose, closeLabel, dirty = false, children }: TabProps) {
+export function Tab({
+  value,
+  icon,
+  disabled,
+  onClose,
+  closeLabel,
+  dirty = false,
+  contextMenu,
+  onContextMenuSelect,
+  children,
+}: TabProps) {
   const { value: current, select, activation, tabId, panelId, panels, labels, refocus } = useTabs("Tab");
   const selected = value === current;
-  // A label that is not plain text (a badge, a <strong>) names the close button by the text it renders.
+  // A label that is not plain text (a badge, a <strong>) names the close button and the menu by the text it renders.
   const plain = typeof children === "string" || typeof children === "number" ? String(children) : null;
   const labelRef = useRef<HTMLSpanElement>(null);
   const [rendered, setRendered] = useState("");
   useClientLayoutEffect(() => {
-    if (!onClose || closeLabel !== undefined || plain !== null) return;
+    if ((!onClose && !contextMenu) || plain !== null) return;
     const text = labelRef.current?.textContent?.trim() ?? "";
     if (text !== rendered) setRendered(text);
   });
   const id = tabId(value);
+  const name = plain ?? rendered;
+  const closeKey = (event: KeyboardEvent<HTMLElement>) => {
+    if (!onClose || (event.key !== "Delete" && event.key !== "Backspace") || disabled) return;
+    event.preventDefault();
+    refocus.current = "";
+    onClose();
+  };
+  const host = useContext(MenuContext);
+  // With commands, the tab becomes the list's menu target before handing the event on.
+  const menu = contextMenu && host?.target;
+  const arm = (el: HTMLElement) => {
+    if (!host || !contextMenu) return;
+    aim(host.target.ref, el);
+    host.open({ value, name, items: contextMenu, onSelect: onContextMenuSelect });
+  };
   const tab = (
     <ButtonBase
       role="tab"
@@ -472,6 +557,9 @@ export function Tab({ value, icon, disabled, onClose, closeLabel, dirty = false,
       // The unsaved state is a description, not part of the name: the name stays the document's (what voice control,
       // the close button and the panel's label use), and screen readers read the state after it.
       aria-describedby={dirty ? `${id}-unsaved` : undefined}
+      aria-keyshortcuts={
+        [onClose && "Delete", menu?.["aria-keyshortcuts"]].filter(Boolean).join(" ") || undefined
+      }
       data-value={value}
       disabled={disabled}
       className="cy-tab"
@@ -479,14 +567,13 @@ export function Tab({ value, icon, disabled, onClose, closeLabel, dirty = false,
       onFocus={() => {
         if (activation === "auto" && !disabled) select(value);
       }}
+      onKeyDown={(event) => {
+        closeKey(event);
+        if (!menu) return;
+        if (event.key === "ContextMenu" || (event.key === "F10" && event.shiftKey)) arm(event.currentTarget);
+        menu.onKeyDown(event);
+      }}
       {...(onClose && {
-        "aria-keyshortcuts": "Delete",
-        onKeyDown: (event: KeyboardEvent<HTMLElement>) => {
-          if ((event.key !== "Delete" && event.key !== "Backspace") || disabled) return;
-          event.preventDefault();
-          refocus.current = "";
-          onClose();
-        },
         // A middle-click closes, as in browsers and editors; its press must not start the browser's autoscroll.
         onMouseDown: (event: MouseEvent<HTMLElement>) => {
           if (event.button === 1) event.preventDefault();
@@ -497,6 +584,19 @@ export function Tab({ value, icon, disabled, onClose, closeLabel, dirty = false,
           onClose();
         },
       })}
+      {...(menu && {
+        onContextMenu: (event: MouseEvent<HTMLElement>) => {
+          arm(event.currentTarget);
+          menu.onContextMenu(event);
+        },
+        onPointerDown: (event: PointerEvent<HTMLElement>) => {
+          if (event.pointerType === "touch") arm(event.currentTarget);
+          menu.onPointerDown(event);
+        },
+        onPointerMove: menu.onPointerMove,
+        onPointerUp: menu.onPointerUp,
+        onPointerCancel: menu.onPointerCancel,
+      })}
     >
       {icon && <Icon icon={icon} className="cy-tab-icon" />}
       <span ref={labelRef} className="cy-tab-label">
@@ -504,11 +604,10 @@ export function Tab({ value, icon, disabled, onClose, closeLabel, dirty = false,
       </span>
     </ButtonBase>
   );
-  if (!onClose && !dirty) return tab;
-  const name = plain ?? rendered;
   // The close button sits beside the tab, not in it (a tab is a button). Keyboard users press Delete instead, so it
   // stays out of the tab order and the accessibility tree; its label is its tooltip. An unsaved tab's dot sits in the
   // same place, under it, and the stylesheet shows one or the other.
+  if (!onClose && !dirty) return tab;
   return (
     <span
       className="cy-tab-slot"
