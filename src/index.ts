@@ -187,6 +187,11 @@ export {
   type HeadingSize,
   type HeadingTokens,
 } from "./components/Heading/index.js";
+export {
+  HighlightedText,
+  type HighlightedTextProps,
+  type HighlightedTextTokens,
+} from "./components/HighlightedText/index.js";
 export { HoverCard, type HoverCardProps, type HoverCardTokens } from "./components/HoverCard/index.js";
 export { IconButton, type IconButtonProps } from "./components/IconButton/index.js";
 export { IconTile, type IconTileProps, type IconTileTokens } from "./components/IconTile/index.js";

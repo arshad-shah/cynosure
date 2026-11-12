@@ -1,0 +1,33 @@
+/* highlighted-text: inline text whose matched runs are marked with a translucent accent tint, readable on any row. */
+.cy-highlighted-text.cy-highlighted-text {
+  box-sizing: border-box !important;
+  margin: 0;
+  padding: 0;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: none;
+  white-space: inherit;
+}
+.cy-highlighted-text-mark.cy-highlighted-text-mark {
+  display: inline;
+  /* Translucent, so a match stays visible on a selected or hovered row as well as on the surface. */
+  background: var(
+    --cy-highlighted-text-highlight,
+    color-mix(in oklab, var(--cy-color-accent) 28%, transparent)
+  );
+  border-radius: var(--cy-highlighted-text-radius, var(--cy-radius-xs));
+  color: var(--cy-highlighted-text-ink, var(--cy-color-ink));
+  font: inherit;
+  font-weight: var(--cy-highlighted-text-weight, var(--cy-font-weight-bold));
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+@media (forced-colors: active) {
+  .cy-highlighted-text-mark.cy-highlighted-text-mark {
+    forced-color-adjust: none;
+    background: Mark;
+    color: MarkText;
+    text-decoration: underline;
+  }
+}

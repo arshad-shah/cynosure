@@ -685,5 +685,11 @@
     ],
     "limit": "2.1 kB",
     "gzip": true
+  },
+  {
+    "name": "HighlightedText (JS + CSS)",
+    "path": ["dist/components/HighlightedText/HighlightedText.js", "dist/styles/highlighted-text.css"],
+    "limit": "3 kB",
+    "gzip": true
   }
 ]
