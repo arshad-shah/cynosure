@@ -1,0 +1,77 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./SkipLink.stories";
+
+<Meta of={Stories} />
+
+# SkipLink
+
+"Skip to content": the first stop of a page's Tab order. It is hidden until it has focus, then shown at the top-start corner of the window. It is a real link, so it works without JavaScript; with it, focus also moves to the target.
+
+<Canvas of={Stories.RevealsOnTabAndMovesFocus} />
+
+Click into the example and press <kbd>Tab</kbd>: the link appears at the top-start corner of the window. <kbd>Enter</kbd> moves focus to `main`.
+
+## When to use
+
+- **Every page with a header or navigation before its main content.** Put it first in the page, before the header.
+
+**Use something else when:**
+- you use [SiteHeader](?path=/docs/components-siteheader--docs) or [AppShell](?path=/docs/components-appshell--docs): both render a SkipLink already
+- the link should stay visible: [Link](?path=/docs/components-link--docs)
+- any other content should appear only on focus: [VisuallyHidden](?path=/docs/components-visuallyhidden--docs) with `focusable`
+
+## Usage
+
+```tsx
+import { SkipLink } from "@arshad-shah/cynosure";
+
+<SkipLink />
+<header>…</header>
+<main id="main">…</main>
+
+<SkipLink href="#article" labels={{ skip: "Skip to the article" }} />
+```
+
+## Custom target and text
+
+<Canvas of={Stories.CustomTargetAndLabels} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+| Input | Result |
+| --- | --- |
+| <kbd>Tab</kbd> (first) | Focuses the link and shows it |
+| <kbd>Enter</kbd>, click | Moves focus to the target; the next <kbd>Tab</kbd> continues from there |
+| <kbd>Tab</kbd> away | Hidden again |
+
+- **Without JavaScript:** the markup is a plain `<a href="#main">`, which the browser follows.
+- **Focusable target:** a target that cannot take focus (`main`, `div`) gets `tabindex="-1"`, so it can be focused from script without joining the Tab order. A link, a button or an element with a `tabindex` is left as it is.
+- **The URL:** focus moves without changing the URL, so a client-side router is not disturbed. With no element of that id, the browser follows the link as usual.
+- **Shadow roots:** the target is found inside the link's own shadow root too, where a hash link cannot reach.
+- **Right to left:** shown at the top-right corner.
+- **Sticky headers:** give the target a `scroll-margin-top` the height of the header, so it is not scrolled under it.
+
+## Touch
+
+The shown link is at least 24px tall, and 44px on coarse pointers.
+
+## Theming
+
+| Token | What it sets | Default |
+| --- | --- | --- |
+| `--cy-skip-link-offset` | Distance from the top and inline-start edges of the window | `--cy-space-4` |
+| `--cy-skip-link-background` | Background of the shown link | `--cy-color-surface-raised` |
+| `--cy-skip-link-color` | Text colour | `--cy-color-accent-text` |
+| `--cy-skip-link-radius` | Corner radius | `--cy-radius-md` |
+
+```ts
+createTheme({ components: { skipLink: { background: "#111", color: "#fff" } } });
+```
+
+## Related
+
+[SiteHeader](?path=/docs/components-siteheader--docs) · [AppShell](?path=/docs/components-appshell--docs) · [VisuallyHidden](?path=/docs/components-visuallyhidden--docs) · [Link](?path=/docs/components-link--docs)

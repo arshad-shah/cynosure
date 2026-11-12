@@ -11,10 +11,10 @@ import {
   useState,
 } from "react";
 import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js";
-import { LinkBase } from "../../foundations/LinkBase/LinkBase.js";
 import { menu } from "../../icons/menu.js";
 import { IconButton } from "../IconButton/IconButton.js";
 import { Sheet } from "../Sheet/Sheet.js";
+import { SkipLink } from "../SkipLink/SkipLink.js";
 
 export interface AppShellTokens {
   /** Background of the navigation column. */
@@ -115,7 +115,6 @@ export function AppShell({
   const text = { ...DEFAULT_LABELS, ...labels };
   const id = useId();
   const root = useRef<HTMLDivElement>(null);
-  const main = useRef<HTMLElement>(null);
   const [narrow, setNarrow] = useState(false);
   const [drawer, setDrawer] = useState(false);
 
@@ -157,17 +156,8 @@ export function AppShell({
         data-tabs={tabs && narrow ? "" : undefined}
         style={style}
       >
-        <LinkBase
-          className="cy-app-shell-skip cy-reset"
-          href={`#${id}-main`}
-          onClick={(event) => {
-            // Move focus without touching the URL (the app's router owns it).
-            event.preventDefault();
-            main.current?.focus();
-          }}
-        >
-          {text.skip}
-        </LinkBase>
+        {/* Moves focus to main without touching the URL (the app's router owns it). */}
+        <SkipLink href={`#${id}-main`} labels={{ skip: text.skip }} className="cy-app-shell-skip" />
         {(header || (nav && narrow)) && (
           <header className="cy-app-shell-header cy-reset">
             {nav && narrow && (
@@ -185,7 +175,7 @@ export function AppShell({
           </header>
         )}
         {nav && !narrow && <div className="cy-app-shell-nav cy-reset">{nav}</div>}
-        <main ref={main} id={`${id}-main`} tabIndex={-1} className="cy-app-shell-main cy-reset">
+        <main id={`${id}-main`} tabIndex={-1} className="cy-app-shell-main cy-reset">
           {children}
         </main>
         {tabs && narrow && <div className="cy-app-shell-tabs cy-reset">{tabs}</div>}

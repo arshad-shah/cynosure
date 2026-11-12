@@ -1,0 +1,49 @@
+/*
+ * skip-link: hidden (one clipped pixel, still focusable and in the accessibility tree) until it has focus, then shown
+ * fixed at the top-start corner of the window above everything else on the page.
+ */
+.cy-skip-link.cy-skip-link {
+  --_hit: var(--cy-hit-min, 24px);
+  box-sizing: border-box !important;
+  position: fixed;
+  z-index: calc(var(--cy-z-tooltip) + 1);
+  inset-block-start: var(--cy-skip-link-offset, var(--cy-space-4));
+  inset-inline-start: var(--cy-skip-link-offset, var(--cy-space-4));
+  display: inline-flex;
+  align-items: center;
+  min-block-size: max(var(--cy-control-height-lg), var(--_hit));
+  margin: 0;
+  padding: var(--cy-space-3) var(--cy-space-6);
+  border: 0;
+  border-radius: var(--cy-skip-link-radius, var(--cy-radius-md));
+  background: var(--cy-skip-link-background, var(--cy-color-surface-raised));
+  box-shadow: var(--cy-shadow-md);
+  color: var(--cy-skip-link-color, var(--cy-color-accent-text));
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-font-size-md);
+  font-weight: var(--cy-font-weight-medium);
+  line-height: var(--cy-font-line-height);
+  letter-spacing: normal;
+  text-transform: none;
+  text-decoration: underline;
+  white-space: nowrap;
+  &:focus-visible {
+    outline: var(--cy-border-focus) solid var(--cy-color-ring);
+    outline-offset: calc(var(--cy-border-width) * 2);
+  }
+  &:not(:focus) {
+    inline-size: var(--cy-border-width);
+    block-size: var(--cy-border-width);
+    min-block-size: 0;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    box-shadow: none;
+  }
+}
+
+@media (pointer: coarse) {
+  .cy-skip-link.cy-skip-link {
+    --_hit: var(--cy-hit-coarse, 44px);
+  }
+}

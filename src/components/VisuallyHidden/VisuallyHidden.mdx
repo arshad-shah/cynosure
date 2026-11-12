@@ -1,0 +1,80 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./VisuallyHidden.stories";
+
+<Meta of={Stories} />
+
+# VisuallyHidden
+
+Content for screen readers only: out of sight, still in the accessibility tree and read in place. With `focusable`, it is shown while something inside it has keyboard focus.
+
+<Canvas of={Stories.HiddenButStillRead} />
+
+## When to use
+
+- **Extra words for screen readers:** "items in the basket" after a bare number, or the rest of a short "Read more" link.
+- **A heading only screen readers need:** a section whose purpose is clear from its layout still gets a heading in the page outline.
+- **Keyboard-only links:** with `focusable`, a link that appears when it is tabbed to.
+
+**Use something else when:**
+- the control has only an icon: [IconButton](?path=/docs/components-iconbutton--docs) takes a `label` and shows it as a tooltip
+- it is the page's "Skip to content" link: [SkipLink](?path=/docs/components-skiplink--docs)
+- it announces a change: [Announcer](?path=/docs/components-announcer--docs)'s live region
+
+## Usage
+
+```tsx
+import { VisuallyHidden } from "@arshad-shah/cynosure";
+
+<p>Total: 42 <VisuallyHidden>items in the basket</VisuallyHidden></p>
+
+<VisuallyHidden as="h2" id="plans">Plans and pricing</VisuallyHidden>
+
+<VisuallyHidden focusable as="div">
+  <Link href="#comments">Jump to the comments</Link>
+</VisuallyHidden>
+```
+
+## A name for a control
+
+The hidden text becomes the accessible name of the button around it.
+
+<Canvas of={Stories.NamesAnIconOnlyControl} />
+
+## A heading for screen readers
+
+`as` sets the element, so a hidden heading takes its place in the outline and can name a section through its `id`.
+
+<Canvas of={Stories.HeadingForScreenReaders} />
+
+## Shown on focus
+
+With `focusable`, the content joins the normal flow while something inside it has focus and hides again when focus leaves. Press <kbd>Tab</kbd> in the example.
+
+<Canvas of={Stories.FocusableShowsOnFocus} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+| Input | Result |
+| --- | --- |
+| <kbd>Tab</kbd> to a link inside a `focusable` one | The content is shown in place |
+| <kbd>Tab</kbd> away | Hidden again |
+
+- **Hidden, not removed:** one clipped pixel, out of the flow. Never `display: none`, `visibility: hidden` or `aria-hidden`, so it is read and can name a control.
+- **One rule:** it uses the shared `.cy-visually-hidden` rule in `base.css`, which every Cynosure component that hides text also uses.
+- **Focusable content:** without `focusable`, a link inside stays invisible when focused. Always set `focusable` for content a keyboard can reach.
+
+## Touch
+
+Nothing to press of its own. A focusable one keeps the hit areas of the links and buttons it holds.
+
+## Theming
+
+No tokens: hiding has no look. While shown, a focusable one has no styles of its own; use `className` for its layout.
+
+## Related
+
+[SkipLink](?path=/docs/components-skiplink--docs) · [IconButton](?path=/docs/components-iconbutton--docs) · [Announcer](?path=/docs/components-announcer--docs) · [Link](?path=/docs/components-link--docs)

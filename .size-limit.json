@@ -573,6 +573,17 @@
   {
     "name": "IconTile (JS + CSS)",
     "path": ["dist/components/IconTile/IconTile.js", "dist/styles/icon-tile.css"],
+    "gzip": true
+  },
+  {
+    "name": "VisuallyHidden (JS + CSS)",
+    "path": ["dist/components/VisuallyHidden/VisuallyHidden.js", "dist/styles/visually-hidden.css"],
+    "limit": "0.75 kB",
+    "gzip": true
+  },
+  {
+    "name": "SkipLink (JS + CSS)",
+    "path": ["dist/components/SkipLink/SkipLink.js", "dist/styles/skip-link.css"],
     "limit": "1.5 kB",
     "gzip": true
   },
@@ -609,6 +620,24 @@
       "dist/styles/aspect-ratio.css"
     ],
     "limit": "2.75 kB",
+    "gzip": true
+  },
+  {
+    "name": "SiteHeader (JS + CSS)",
+    "path": ["dist/components/SiteHeader/SiteHeader.js", "dist/styles/site-header.css"],
+    "limit": "2.75 kB",
+    "gzip": true
+  },
+  {
+    "name": "SiteFooter (JS + CSS)",
+    "path": ["dist/components/SiteFooter/SiteFooter.js", "dist/styles/site-footer.css"],
+    "limit": "2 kB",
+    "gzip": true
+  },
+  {
+    "name": "Section (JS + CSS)",
+    "path": ["dist/components/Section/Section.js", "dist/styles/section.css"],
+    "limit": "1.25 kB",
     "gzip": true
   }
 ]

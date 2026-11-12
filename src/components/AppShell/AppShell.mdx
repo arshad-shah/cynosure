@@ -98,7 +98,7 @@ function Toolbar() {
 ## Behaviour and accessibility
 
 - **Landmarks:** the bar is a `<header>` (banner), the navigation keeps its own `<nav>`, and the content is `<main>`.
-- **Skip link:** the first Tab shows "Skip to content"; Enter moves focus to `<main>` without changing the URL, so your router stays in charge.
+- **Skip link:** a [SkipLink](?path=/docs/components-skiplink--docs) at the shell's own top-start corner. The first Tab shows "Skip to content"; Enter moves focus to `<main>` without changing the URL, so your router stays in charge.
 - **Drawer:** a modal Sheet named "Navigation" with focus trapping and Escape; focus returns to the menu button when it closes. The button reports `aria-expanded`.
 - **Touch:** the menu button's hit area is at least 44px on touch screens.
 - **Direction:** the navigation is on the right in right-to-left text, and the drawer slides from that side.

@@ -1,0 +1,75 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./SiteFooter.stories";
+
+<Meta of={Stories} />
+
+# SiteFooter
+
+The bottom of a website: the brand and a tagline, columns of links under headings, and a bottom row for the copyright, legal links and social links. It stacks on narrow screens.
+
+<Canvas of={Stories.LandmarksHeadingsAndLinks} />
+
+## When to use
+
+- **The end of every page of a marketing or documentation site**, after `main`.
+
+**Use something else when:**
+- you need the bottom of a dialog or a card: their own `actions`
+- the page is an app inside [AppShell](?path=/docs/components-appshell--docs), which usually has no footer
+
+## Usage
+
+```tsx
+import { IconButton, Link, SiteFooter } from "@arshad-shah/cynosure";
+import { mail } from "@arshad-shah/cynosure/icons";
+
+<SiteFooter
+  brand="Acme"
+  tagline="Tools for small teams."
+  columns={[{ title: "Product", links: [{ label: "Pricing", href: "/pricing" }] }]}
+  legal={<>Copyright 2026 Acme. <Link href="/privacy">Privacy</Link></>}
+  social={<IconButton icon={mail} label="Email" href="mailto:hello@acme.dev" variant="ghost" tone="neutral" />}
+/>
+```
+
+## Narrow screens
+
+Columns wrap onto more rows, and the legal text and social links stack.
+
+<Canvas of={Stories.NarrowStacks} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+| Input | Result |
+| --- | --- |
+| <kbd>Tab</kbd> | Every column link in order, then the legal links and the social links |
+
+- **Landmarks:** the `footer` is the contentinfo landmark at the top level of the page. All columns sit in one `nav` named "Footer" (`labels.nav`).
+- **Headings:** each column title is a [Heading](?path=/docs/components-heading--docs) at `headingLevel` (default 2) and names the column's list.
+- **Links:** neutral [Link](?path=/docs/components-link--docs)s; `external` adds a new-tab icon and "(opens in new tab)" for screen readers.
+- **Naming:** `aria-label` and `id` are set on the `footer`, for a page with more than one.
+
+## Touch
+
+Each link row is at least 24px tall, and 44px on coarse pointers, with a hit area of the same size, so neighbouring links never share a finger's target. Social IconButtons keep their own 44px hit areas.
+
+## Theming
+
+| Token | What it sets | Default |
+| --- | --- | --- |
+| `--cy-site-footer-background` | Background | `--cy-color-surface` |
+| `--cy-site-footer-border` | Hairline above the footer and above its bottom row | `--cy-color-line` |
+| `--cy-site-footer-padding-block` | Space above and below the content and between its rows | `--cy-space-10` |
+| `--cy-site-footer-column-min-width` | Least width of a column before the columns wrap | `10rem` |
+
+```ts
+createTheme({ components: { siteFooter: { background: "transparent", columnMinWidth: "12rem" } } });
+```
+
+## Related
+
+[SiteHeader](?path=/docs/components-siteheader--docs) · [Section](?path=/docs/components-section--docs) · [Container](?path=/docs/components-container--docs) · [Link](?path=/docs/components-link--docs) · [IconButton](?path=/docs/components-iconbutton--docs)
