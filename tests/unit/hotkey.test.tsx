@@ -28,6 +28,24 @@ describe("useHotkey", () => {
     expect(matchesHotkey("shift+?", at({ key: "?", shiftKey: true }))).toBe(true);
   });
 
+  it("matches by physical key when the layout or a modifier changes the character", () => {
+    const at = (init: KeyboardEventInit) => new KeyboardEvent("keydown", init);
+    // Option+K on macOS types "˚"; Shift+1 types "!".
+    expect(matchesHotkey("alt+k", at({ key: "˚", code: "KeyK", altKey: true }))).toBe(true);
+    expect(matchesHotkey("shift+1", at({ key: "!", code: "Digit1", shiftKey: true }))).toBe(true);
+    expect(matchesHotkey("alt+k", at({ key: "˚", code: "KeyJ", altKey: true }))).toBe(false);
+    // A letter the layout really types wins over its position: Ctrl+A on AZERTY (code KeyQ) is not mod+q.
+    expect(matchesHotkey("mod+q", at({ key: "a", code: "KeyQ", ctrlKey: true }))).toBe(false);
+    expect(matchesHotkey("mod+a", at({ key: "a", code: "KeyQ", ctrlKey: true }))).toBe(true);
+  });
+
+  it("accepts + as the key", () => {
+    const at = (init: KeyboardEventInit) => new KeyboardEvent("keydown", init);
+    expect(matchesHotkey("mod++", at({ key: "+", code: "Equal", ctrlKey: true }))).toBe(true);
+    expect(matchesHotkey("+", at({ key: "+" }))).toBe(true);
+    expect(matchesHotkey("mod++", at({ key: "-", ctrlKey: true }))).toBe(false);
+  });
+
   it("fires from anywhere, including text fields when the combo has a modifier", () => {
     const hit = vi.fn();
     const { getByLabelText, getByText } = render(<Listen combo="mod+k" onHit={hit} />);
@@ -52,7 +70,9 @@ describe("useHotkey", () => {
     const hit = vi.fn();
     const { getByText, rerender } = render(<Listen combo="mod+k" onHit={hit} />);
     const target = getByText("elsewhere");
-    target.addEventListener("keydown", (e) => e.preventDefault(), { once: true });
+    target.addEventListener("keydown", (e) => e.preventDefault(), {
+      once: true,
+    });
     fireEvent.keyDown(target, { key: "k", ctrlKey: true });
     expect(hit).not.toHaveBeenCalled();
     rerender(<Listen combo={false} onHit={hit} />);
