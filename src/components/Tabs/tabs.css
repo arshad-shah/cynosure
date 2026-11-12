@@ -204,7 +204,7 @@
   flex: none;
   align-items: center;
   font-size: inherit;
-  & > .cy-tab {
+  & > .cy-tab-tip > .cy-tab {
     padding-inline-end: calc(var(--cy-control-height-sm) + var(--cy-space-1));
   }
   & > .cy-tab-close {
@@ -250,7 +250,18 @@
   font-size: inherit;
 }
 
+/* Every tab sits in the anchor of the tooltip that shows a cut-short label in full. */
+.cy-tab-tip.cy-tab-tip {
+  flex: none;
+  min-inline-size: 0;
+}
+
 .cy-tab-label {
+  min-inline-size: 0;
+  max-inline-size: var(--cy-tabs-label-max-width, 20em);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font-size: inherit;
   line-height: inherit;
 }

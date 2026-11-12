@@ -29,8 +29,10 @@ import type { Size } from "../../tokens/schema.js";
 import { ContextMenu, type ContextMenuTargetProps } from "../ContextMenu/ContextMenu.js";
 import { IconButton } from "../IconButton/IconButton.js";
 import type { MenuEntry } from "../Menu/Menu.js";
+import { Tooltip } from "../Tooltip/Tooltip.js";
 
 export interface TabsTokens {
+  labelMaxWidth: string;
   dirty: string;
   gap: string;
   indicator: string;
@@ -548,7 +550,22 @@ export function Tab({
     aim(host.target.ref, el);
     host.open({ value, name, items: contextMenu, onSelect: onContextMenuSelect });
   };
-  const tab = (
+  // A label cut short by `--cy-tabs-label-max-width` shows its full text in a tooltip. The tooltip is always there (off
+  // while the label fits), so the tab is never remounted when its text grows or shrinks.
+  const [cut, setCut] = useState(false);
+  const measure = useCallback(() => {
+    const label = labelRef.current;
+    if (label) setCut(label.scrollWidth > label.clientWidth);
+  }, []);
+  useClientLayoutEffect(measure);
+  useClientLayoutEffect(() => {
+    const label = labelRef.current;
+    if (!label) return;
+    const observer = new ResizeObserver(measure);
+    observer.observe(label);
+    return () => observer.disconnect();
+  }, [measure]);
+  const button = (
     <ButtonBase
       role="tab"
       id={id}
@@ -603,6 +620,12 @@ export function Tab({
         {children}
       </span>
     </ButtonBase>
+  );
+  // The tip repeats the tab's name for the eye (the name already holds the whole text), so it describes nothing.
+  const tab = (
+    <Tooltip content={children} disabled={!cut} describe={false} placement="bottom" className="cy-tab-tip">
+      {button}
+    </Tooltip>
   );
   // The close button sits beside the tab, not in it (a tab is a button). Keyboard users press Delete instead, so it
   // stays out of the tab order and the accessibility tree; its label is its tooltip. An unsaved tab's dot sits in the

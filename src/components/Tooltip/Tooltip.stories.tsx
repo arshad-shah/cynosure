@@ -167,3 +167,36 @@ export const AnchorTakesALayoutClass: Story = {
     await expect(getComputedStyle(anchor).marginInlineStart).toBe("24px");
   },
 };
+
+export const RepeatedTextShowsWithoutDescribing: Story = {
+  args: { describe: false, content: "Export" },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const trigger = canvas.getByTestId("trigger");
+    // Text the name already holds (a label cut short) is for the eye: shown, but not read twice.
+    await expect(trigger).not.toHaveAttribute("aria-describedby");
+    await expect(tooltip(canvasElement)).toHaveAttribute("aria-hidden", "true");
+    await userEvent.tab();
+    await waitFor(() => expect(isOpen(tooltip(canvasElement))).toBe(true));
+    await shownFully(tooltip(canvasElement));
+    await expect(trigger).not.toHaveAccessibleDescription();
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() => expect(isOpen(tooltip(canvasElement))).toBe(false));
+  },
+};
+
+export const DisabledNeverShowsOrDescribes: Story = {
+  args: { disabled: true, delay: 0 },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const trigger = canvas.getByTestId("trigger");
+    // Off (e.g. while the text it repeats is fully visible): no tip, no description; hover and focus do nothing.
+    await expect(tooltip(canvasElement)).toBeNull();
+    await expect(trigger).not.toHaveAttribute("aria-describedby");
+    await userEvent.hover(trigger);
+    await pause(150);
+    await userEvent.tab();
+    await pause(50);
+    await expect(canvasElement.ownerDocument.querySelector(".cy-tooltip")).toBeNull();
+    // The anchor is still there, so turning the tooltip on or off never remounts the trigger.
+    await expect(trigger.parentElement).toHaveClass("cy-tooltip-anchor");
+  },
+};

@@ -41,13 +41,31 @@ export interface TooltipProps {
    * `flex`, margins.
    */
   className?: string | undefined;
+  /**
+   * Turn the tooltip off without remounting the trigger: no tip, no description, hover and focus do nothing. For a
+   * tooltip that only matters sometimes, such as the full text of a label while it is cut short.
+   */
+  disabled?: boolean | undefined;
+  /**
+   * `false` when the tip only repeats text the trigger's name already holds, such as a label cut short with an
+   * ellipsis: it is shown but hidden from assistive technology, and does not describe the trigger. Default true.
+   */
+  describe?: boolean | undefined;
 }
 
 /**
  * Tooltip in the top layer (Popover API), positioned against its trigger. Opens on hover after `delay` and on
  * keyboard focus; dismissible with Escape; hoverable; never opens on touch (WCAG 1.4.13).
  */
-export function Tooltip({ content, children, placement = "top", delay = 300, className }: TooltipProps) {
+export function Tooltip({
+  content,
+  children,
+  placement = "top",
+  delay = 300,
+  className,
+  disabled = false,
+  describe = true,
+}: TooltipProps) {
   const id = `cy-tip-${useId().replace(/:/g, "")}`;
   const anchor = useRef<HTMLSpanElement>(null);
   const tip = useRef<HTMLSpanElement>(null);
@@ -58,8 +76,11 @@ export function Tooltip({ content, children, placement = "top", delay = 300, cla
   // Focus that follows a pointer press (mouse or touch) is not keyboard focus: hover handles mouse, touch never opens.
   const pointerFocus = useRef(false);
 
+  const off = useRef(disabled);
+  off.current = disabled;
   const show = useCallback((wait: number) => {
     clearTimeout(timer.current);
+    if (off.current) return;
     timer.current = setTimeout(() => setOpen(true), wait);
   }, []);
   const hide = useCallback((wait = 0) => {
@@ -68,6 +89,12 @@ export function Tooltip({ content, children, placement = "top", delay = 300, cla
   }, []);
 
   useEffect(() => () => clearTimeout(timer.current), []);
+  useEffect(() => {
+    if (disabled) {
+      clearTimeout(timer.current);
+      setOpen(false);
+    }
+  }, [disabled]);
   useClientLayoutEffect(() => {
     triggerRef.current = trigger();
   });
@@ -96,20 +123,25 @@ export function Tooltip({ content, children, placement = "top", delay = 300, cla
         hide();
       }}
     >
-      {cloneElement(children, {
-        "aria-describedby": [children.props["aria-describedby"], id].filter(Boolean).join(" "),
-      })}
-      <span
-        ref={tip}
-        id={id}
-        role="tooltip"
-        className="cy-tooltip"
-        {...{ popover: "manual" }}
-        onPointerEnter={() => clearTimeout(timer.current)}
-        onPointerLeave={() => hide(120)}
-      >
-        {content}
-      </span>
+      {disabled || !describe
+        ? children
+        : cloneElement(children, {
+            "aria-describedby": [children.props["aria-describedby"], id].filter(Boolean).join(" "),
+          })}
+      {!disabled && (
+        <span
+          ref={tip}
+          id={id}
+          role="tooltip"
+          aria-hidden={describe ? undefined : true}
+          className="cy-tooltip"
+          {...{ popover: "manual" }}
+          onPointerEnter={() => clearTimeout(timer.current)}
+          onPointerLeave={() => hide(120)}
+        >
+          {content}
+        </span>
+      )}
     </span>
   );
 }

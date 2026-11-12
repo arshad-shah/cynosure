@@ -61,6 +61,12 @@ For document tabs, `scrollable` adds chevrons at each end, shown only while ther
 
 <Canvas of={Stories.ScrollableShowsChevronsTowardMoreTabs} />
 
+## Long labels
+
+A label longer than `--cy-tabs-label-max-width` (default 20em) is cut short with an ellipsis, and hovering or focusing the tab shows the whole text in a tooltip. Screen readers already hear the whole text as the tab's name, so the tooltip is hidden from them.
+
+<Canvas of={Stories.LongLabelsTruncateWithTheFullTextInATooltip} />
+
 ## Changing tabs
 
 - **Controlled:** pass `value` and `onChange`. The Tab stop follows selections made from outside.
@@ -147,7 +153,7 @@ Each tab has at least a 24px hit area, and 44px on coarse pointers, without chan
 
 ## Theming
 
-Tokens: `--cy-tabs-dirty` (the unsaved dot, default muted ink), `--cy-tabs-gap`, `--cy-tabs-indicator` (selected colour, default accent), `--cy-tabs-indicator-width` and `--cy-tabs-radius`.
+Tokens: `--cy-tabs-dirty` (the unsaved dot, default muted ink), `--cy-tabs-gap`, `--cy-tabs-indicator` (selected colour, default accent), `--cy-tabs-indicator-width`, `--cy-tabs-label-max-width` (where a long label is cut short, default 20em) and `--cy-tabs-radius`.
 
 ```ts
 createTheme({ components: { tabs: { indicator: "#2563eb", indicatorWidth: "3px" } } });

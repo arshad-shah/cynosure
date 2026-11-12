@@ -1259,3 +1259,111 @@ export const ContextMenuLabelsOverride: Story = {
     await waitFor(() => expect(menuPanel()).toBeNull());
   },
 };
+
+const LONG = "monthly-revenue-by-region-and-product-line-2026.sql";
+
+function LongNames() {
+  return (
+    <Tabs defaultValue="long">
+      <TabList label="Queries">
+        <Tab value="long" onClose={() => {}}>
+          {LONG}
+        </Tab>
+        <Tab value="short">users.sql</Tab>
+      </TabList>
+    </Tabs>
+  );
+}
+const tipOf = (tab: HTMLElement) => tab.parentElement?.querySelector<HTMLElement>(".cy-tooltip") ?? null;
+
+export const LongLabelsTruncateWithTheFullTextInATooltip: Story = {
+  tags: ["visual"],
+  render: () => <LongNames />,
+  play: async ({ canvas, userEvent }) => {
+    const long = canvas.getByRole("tab", { name: LONG });
+    const label = long.querySelector(".cy-tab-label") as HTMLElement;
+    // Cut short with an ellipsis; the name is still the whole text.
+    await expect(label.scrollWidth).toBeGreaterThan(label.clientWidth);
+    await expect(getComputedStyle(label).textOverflow).toBe("ellipsis");
+    await expect(long.getBoundingClientRect().width).toBeLessThan(400);
+    // The full text is a tooltip (never a native title), for the eye only: the name already holds it.
+    await expect(long).not.toHaveAttribute("title");
+    await waitFor(() => expect(tipOf(long)).toHaveTextContent(LONG));
+    await expect(long).not.toHaveAccessibleDescription();
+    // Keyboard focus shows it.
+    await userEvent.tab();
+    await expect(long).toHaveFocus();
+    await waitFor(() => expect((tipOf(long) as HTMLElement).matches(":popover-open")).toBe(true));
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() => expect((tipOf(long) as HTMLElement).matches(":popover-open")).toBe(false));
+    // A label shown in full has no tooltip.
+    const short = canvas.getByRole("tab", { name: "users.sql" });
+    await expect(tipOf(short)).toBeNull();
+    await userEvent.keyboard("{ArrowRight}");
+    await expect(short).toHaveFocus();
+    await expect(document.querySelector(".cy-tooltip:popover-open")).toBeNull();
+  },
+};
+
+export const HoverShowsTheFullTextOfALongLabel: Story = {
+  render: () => <LongNames />,
+  play: async ({ canvas, userEvent }) => {
+    const long = canvas.getByRole("tab", { name: LONG });
+    await waitFor(() => expect(tipOf(long)).not.toBeNull());
+    await userEvent.hover(long);
+    await waitFor(() => expect((tipOf(long) as HTMLElement).matches(":popover-open")).toBe(true));
+    await shownFully(tipOf(long) as HTMLElement);
+    await userEvent.unhover(long);
+    await waitFor(() => expect((tipOf(long) as HTMLElement).matches(":popover-open")).toBe(false));
+  },
+};
+
+export const ALabelThatGrowsTooLongGetsItsTooltip: Story = {
+  render: () => {
+    function Renaming() {
+      const [name, setName] = useState("q.sql");
+      return (
+        <Tabs defaultValue="q">
+          <TabList label="Queries">
+            <Tab value="q">{name}</Tab>
+          </TabList>
+          <Button onClick={() => setName(LONG)}>Rename</Button>
+        </Tabs>
+      );
+    }
+    return <Renaming />;
+  },
+  play: async ({ canvas, userEvent }) => {
+    const tab = canvas.getByRole("tab", { name: "q.sql" });
+    await expect(tipOf(tab)).toBeNull();
+    await userEvent.click(canvas.getByRole("button", { name: "Rename" }));
+    // Same element (focus and state survive), now with the tooltip.
+    await waitFor(() => expect(tipOf(canvas.getByRole("tab", { name: LONG }))).toHaveTextContent(LONG));
+    await expect(canvas.getByRole("tab", { name: LONG })).toBe(tab);
+  },
+};
+
+export const LongLabelsInRightToLeft: Story = {
+  render: () => (
+    <div dir="rtl">
+      <LongNames />
+    </div>
+  ),
+  play: async ({ canvas }) => {
+    const long = canvas.getByRole("tab", { name: LONG });
+    const label = long.querySelector(".cy-tab-label") as HTMLElement;
+    await expect(label.scrollWidth).toBeGreaterThan(label.clientWidth);
+    // The ellipsis is at the end of the text, on the left; the close button stays clear of the label.
+    const close = (slotOf(long).querySelector(".cy-tab-close") as HTMLElement).getBoundingClientRect();
+    await expect(close.right).toBeLessThanOrEqual(label.getBoundingClientRect().left + 1);
+  },
+};
+
+export const LongLabelsStableUnderHostileHost: Story = {
+  render: () => <LongNames />,
+  play: async ({ canvasElement }) => {
+    const props = ["max-width", "overflow-x", "text-overflow", "white-space", "font-size"];
+    const label = computeUnderHostileHost(canvasElement, ".cy-tab-label", props);
+    await expect(label.hostile).toEqual(label.clean);
+  },
+};
