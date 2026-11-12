@@ -4,6 +4,7 @@ import { createRoot } from "react-dom/client";
 import { expect, fn, waitFor } from "storybook/test";
 import { createStyleSheet } from "../../styles/inline.js";
 import { computeUnderHostileHost } from "../../test/hostile.js";
+import { Button } from "../Button/Button.js";
 import { DateField } from "./DateField.js";
 
 const meta = {
@@ -139,6 +140,50 @@ export const FormsAndReadOnly: Story = {
     // A read-only date has no picker; a disabled one has a disabled picker.
     await expect(canvas.getAllByRole("button", { name: "Choose a date" })).toHaveLength(2);
     await expect(canvas.getAllByRole("button", { name: "Choose a date" })[1]).toBeDisabled();
+  },
+};
+
+export const FormsSubmitTheDateNotTheDraft: Story = {
+  args: { min: "2026-11-01" },
+  render: (args) => (
+    <form data-testid="form" onSubmit={(event) => event.preventDefault()}>
+      <DateField {...args} name="due" defaultValue="2026-11-10" />
+      <Button type="reset">Reset</Button>
+    </form>
+  ),
+  play: async ({ args, canvas, userEvent }) => {
+    const form = canvas.getByTestId("form") as HTMLFormElement;
+    const field = canvas.getByRole("textbox", { name: "Due date" });
+    // What is being typed is not the value: the form keeps the last real date, and will not submit a wrong one.
+    await userEvent.clear(field);
+    await userEvent.type(field, "2026-02-30");
+    await expect(new FormData(form).getAll("due")).toEqual(["2026-11-10"]);
+    await expect(form.checkValidity()).toBe(false);
+    await expect((field as HTMLInputElement).validationMessage).toBe("Enter a date as YYYY-MM-DD");
+    await userEvent.tab();
+    await expect(new FormData(form).getAll("due")).toEqual(["2026-11-10"]);
+    await expect(form.checkValidity()).toBe(false);
+    // A real date before `min` is not available either.
+    await userEvent.clear(field);
+    await userEvent.type(field, "2026-10-31");
+    await expect((field as HTMLInputElement).validationMessage).toBe("This date is not available");
+    // Corrected, it is submitted.
+    await userEvent.clear(field);
+    await userEvent.type(field, "2026-11-12");
+    await userEvent.tab();
+    await expect(form.checkValidity()).toBe(true);
+    await expect(new FormData(form).getAll("due")).toEqual(["2026-11-12"]);
+    // Resetting the form brings back the default, with no message, and reports nothing.
+    await userEvent.clear(field);
+    await userEvent.type(field, "nonsense");
+    await userEvent.tab();
+    await expect(args.onChange).toHaveBeenCalledTimes(1);
+    await userEvent.click(canvas.getByRole("button", { name: "Reset" }));
+    await waitFor(() => expect(field).toHaveValue("2026-11-10"));
+    await expect(field).not.toHaveAttribute("aria-invalid", "true");
+    await expect(form.checkValidity()).toBe(true);
+    await expect(new FormData(form).getAll("due")).toEqual(["2026-11-10"]);
+    await expect(args.onChange).toHaveBeenCalledTimes(1);
   },
 };
 
