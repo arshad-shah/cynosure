@@ -97,6 +97,40 @@ export const LiveAndSteadyDots: Story = {
   },
 };
 
+export const DotWithoutText: Story = {
+  render: () => (
+    <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+      <Badge tone="success" dot label="Connected" />
+      <Badge tone="danger" dot="live" label="Recording" />
+      <Badge tone="success" dot>
+        Steady
+      </Badge>
+    </div>
+  ),
+  play: async ({ canvas }) => {
+    // A dot alone is a status dot: an image named by `label`, since there is no text to say the state.
+    const connected = canvas.getByRole("img", { name: "Connected" });
+    const recording = canvas.getByRole("img", { name: "Recording" });
+    await expect(connected).toHaveTextContent("");
+    await expect(connected).toHaveAttribute("data-tone", "success");
+    // Only the dot shows: no pill around it.
+    const box = getComputedStyle(connected);
+    await expect(box.backgroundColor).toBe("rgba(0, 0, 0, 0)");
+    await expect(box.paddingTop).toBe("0px");
+    await expect(box.paddingLeft).toBe("0px");
+    await expect(box.borderTopWidth).toBe("0px");
+    const dot = connected.querySelector(".cy-badge-dot") as HTMLElement;
+    const rect = connected.getBoundingClientRect();
+    await expect(rect.width).toBeCloseTo(dot.getBoundingClientRect().width, 0);
+    await expect(rect.height).toBeLessThanOrEqual(12);
+    // The dot is the tone itself (not the darker text shade a badge with text uses), and the live one pulses.
+    const pill = getComputedStyle(canvas.getByText("Steady"));
+    await expect(getComputedStyle(dot).backgroundColor).not.toBe(pill.color);
+    const live = recording.querySelector(".cy-badge-dot") as HTMLElement;
+    await expect(getComputedStyle(live).animationName).toBe("cy-badge-live");
+  },
+};
+
 export const StableUnderHostileHost: Story = {
   play: async ({ canvasElement }) => {
     const { clean, hostile } = computeUnderHostileHost(canvasElement, ".cy-badge", [
