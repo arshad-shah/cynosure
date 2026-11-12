@@ -1,5 +1,6 @@
 import { type CSSProperties, type KeyboardEvent, type ReactNode, type Ref, useId, useRef } from "react";
 import { useControllableState } from "../../foundations/controllable.js";
+import { deepActiveElement } from "../../foundations/focus.js";
 import { useDismiss } from "../../overlay/dismiss.js";
 import { usePopover } from "../../overlay/floating.js";
 import type { Placement } from "../../overlay/position.js";
@@ -99,8 +100,7 @@ export function Popover({
   // Without a trigger, focus returns to whatever had it when the panel opened.
   const before = useRef<HTMLElement | null>(null);
   const wasOpen = useRef(false);
-  if (isOpen && !wasOpen.current && typeof document !== "undefined")
-    before.current = document.activeElement as HTMLElement | null;
+  if (isOpen && !wasOpen.current) before.current = deepActiveElement();
   wasOpen.current = isOpen;
   const returnTo = useRef<HTMLElement | null>(null);
   returnTo.current = trigger ? triggerRef.current : before.current;
@@ -124,7 +124,7 @@ export function Popover({
     if (!items.length) return;
     const first = items[0] as HTMLElement;
     const last = items[items.length - 1] as HTMLElement;
-    const active = event.currentTarget.ownerDocument.activeElement;
+    const active = deepActiveElement(event.currentTarget.ownerDocument);
     if (event.shiftKey && (active === first || active === event.currentTarget)) {
       event.preventDefault();
       last.focus();

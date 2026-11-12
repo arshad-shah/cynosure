@@ -183,7 +183,7 @@ export const ControlledAndContentWithoutControls: Story = {
   },
 };
 
-function ShadowPopover() {
+function ShadowPopover({ modal = false }: { modal?: boolean }) {
   const host = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const el = host.current;
@@ -193,11 +193,12 @@ function ShadowPopover() {
     const mount = document.createElement("div");
     root.append(mount);
     createRoot(mount).render(
-      <Popover label="Shadow" trigger={(p) => <Button {...p}>Shadow</Button>}>
+      <Popover label="Shadow" modal={modal} trigger={(p) => <Button {...p}>Shadow</Button>}>
         <Button>Inside shadow</Button>
+        <Button>Second</Button>
       </Popover>,
     );
-  }, []);
+  }, [modal]);
   return <div data-testid="host" ref={host} style={{ paddingBlockEnd: 160 }} />;
 }
 
@@ -216,6 +217,41 @@ export const WorksInsideAShadowRoot: Story = {
     await expect(isOpen(dialog)).toBe(true);
     await userEvent.keyboard("{Escape}");
     await settledClosed(dialog);
+  },
+};
+
+export const ShadowRootKeepsTheTabTrapAndReturnsFocus: Story = {
+  render: () => <ShadowPopover modal />,
+  play: async ({ canvas, userEvent }) => {
+    const host = await canvas.findByTestId("host");
+    await waitFor(() => expect(host.shadowRoot?.querySelector("button")).toBeTruthy());
+    const root = host.shadowRoot as ShadowRoot;
+    const trigger = root.querySelector("button") as HTMLElement;
+    await userEvent.click(trigger);
+    const dialog = root.querySelector('[role="dialog"]') as HTMLElement;
+    await shownFully(dialog);
+    const [first, second] = [...dialog.querySelectorAll("button")] as HTMLElement[];
+    await waitFor(() => expect(root.activeElement).toBe(first));
+    // user-event cannot Tab inside a shadow root, so press Tab on the focused control itself.
+    const tab = (shiftKey = false) => {
+      const event = new KeyboardEvent("keydown", {
+        key: "Tab",
+        shiftKey,
+        bubbles: true,
+        composed: true,
+        cancelable: true,
+      });
+      root.activeElement?.dispatchEvent(event);
+      return event.defaultPrevented;
+    };
+    // Shift+Tab from the first control wraps to the last, and Tab from the last back to the first.
+    await expect(tab(true)).toBe(true);
+    await expect(root.activeElement).toBe(second);
+    await expect(tab()).toBe(true);
+    await expect(root.activeElement).toBe(first);
+    await userEvent.keyboard("{Escape}");
+    await settledClosed(dialog);
+    await expect(root.activeElement).toBe(trigger);
   },
 };
 

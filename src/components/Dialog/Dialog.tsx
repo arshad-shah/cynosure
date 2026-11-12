@@ -2,6 +2,7 @@ import { type CSSProperties, type ReactNode, useContext, useEffect, useId, useRe
 import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js";
 import { useControllableState } from "../../foundations/controllable.js";
 import { DialogBase } from "../../foundations/DialogBase/DialogBase.js";
+import { deepActiveElement } from "../../foundations/focus.js";
 import { close as closeIcon } from "../../icons/close.js";
 import { useDismiss } from "../../overlay/dismiss.js";
 import { ToastHostContext } from "../../overlay/toast-host.js";
@@ -76,14 +77,6 @@ const DEFAULT_LABELS: DialogLabels = { close: "Close" };
 const FOCUSABLE =
   'button:not([disabled]), [href], input:not([disabled]):not([type="hidden"]):not([aria-hidden="true"]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
-/** The focused element, looking inside shadow roots (document.activeElement stops at the host). */
-function deepActive(): HTMLElement | null {
-  if (typeof document === "undefined") return null; // server render
-  let active = document.activeElement;
-  while (active?.shadowRoot?.activeElement) active = active.shadowRoot.activeElement;
-  return active as HTMLElement | null;
-}
-
 /**
  * Where focus can actually go back to. A Dialog opened from a Menu item remembers that item, but the menu has closed
  * (hidden, still in the DOM): fall back to the button that controls the hidden popover.
@@ -126,7 +119,7 @@ export function DialogFrame({
   const returnTo = useRef<HTMLElement | null>(null);
   const wasOpen = useRef(false);
   // Where focus was before opening: read while rendering, because DialogBase's showModal moves it first.
-  if (isOpen && !wasOpen.current) returnTo.current = deepActive();
+  if (isOpen && !wasOpen.current) returnTo.current = deepActiveElement();
   wasOpen.current = isOpen;
   const dismiss = () => {
     if (dismissible) setOpen(false);

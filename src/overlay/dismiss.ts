@@ -1,4 +1,5 @@
 import { type RefObject, useEffect, useRef } from "react";
+import { deepActiveElement } from "../foundations/focus.js";
 
 export type DismissReason = "escape" | "outside";
 
@@ -94,7 +95,7 @@ export function useDismiss({ open, onClose, inside, returnFocus, outside = true 
       if (at >= 0) layers.splice(at, 1);
       if (layers.length === 0) document.removeEventListener("keydown", onKeyDown);
       // Return focus only if it was inside the layer or got lost; never pull it from somewhere the user chose.
-      const active = document.activeElement;
+      const active = deepActiveElement();
       const lost = !active || active === document.body;
       const within = !!active && els(layer).some((el) => el !== target?.current && el.contains(active));
       const back = target?.current;

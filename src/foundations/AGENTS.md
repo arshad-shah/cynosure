@@ -19,6 +19,7 @@ Shared hooks also live here: `roving-focus.ts` (`useRovingFocus`), `field.ts` (`
 Shared helpers (use these instead of writing your own; a second copy is a review failure):
 - `math.ts`: `clamp(v, lo = 0, hi = 1)`, safe when `hi < lo`.
 - `dir.ts`: `isRtl(el)`.
+- `focus.ts`: `deepActiveElement(doc?)`, the focused element looking inside shadow roots (`document.activeElement` stops at the host). Use it wherever focus is read: dismissal's focus return, Popover's Tab trap, Dialog's return target, Toast.
 - `keys.ts`: `isComposing(event)` (IME, including Safari's keyCode 229) and `stepKey(event, options)`, the slider keys (arrows, Shift and Page ±big, Home/End, RTL, one axis or both). Slider, SplitPane, CompareSlider and ColorField's area use it.
 - `listbox.ts`: `seekEnabled` (next usable index), `isTypeaheadKey` and `useTypeahead` (the 500 ms word buffer, cycling on one letter). Select, Menu, Tree and VirtualList use them.
 - `controllable.ts`: `useControllableState(value, defaultValue, onChange)` returns `[current, set, reset]`; `set` is stable; `reset` (form reset) never calls `onChange`. Every component with a controlled/uncontrolled value uses it (ColorField excepted: its prop is a string and its state a parsed colour).

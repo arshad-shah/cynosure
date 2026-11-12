@@ -13,6 +13,7 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js";
+import { deepActiveElement } from "../../foundations/focus.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
 import { TONE_ICONS } from "../../foundations/tone-icons.js";
 import { close as closeIcon } from "../../icons/close.js";
@@ -187,7 +188,7 @@ export function Toaster({
   const dismiss = useCallback((id?: string) => {
     // Closing the toast that holds focus (its close button, from the keyboard): hand focus to the next toast's close
     // button, or let the region stop pausing if there is none.
-    const active = region.current?.ownerDocument.activeElement;
+    const active = deepActiveElement(region.current?.ownerDocument);
     const holder = active?.closest<HTMLElement>(".cy-toast");
     if (holder && region.current?.contains(holder) && (id === undefined || holder.dataset.id === id)) {
       const others = [
