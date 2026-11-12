@@ -4,7 +4,7 @@ Verql v1 (Electron, React) is reworked onto Cynosure alone: no primitives, Tailw
 
 The list was assessed on 2026-11-12 against `@arshad-shah/cynosure@0.4.0` and Verql `main` at `c95ca58`. Every gap below was checked against the props in the source; the bugs in Phase 0 were traced through the code (none run in a browser yet). The rule from Plans 7 and 9 holds: a prop on an existing component where one fits, a new component only when nothing covers the need.
 
-Status: **Phase 0 done** (2026-11-12), except item 24 (not a bug) and item 33 (not shown here). Phases 1 to 5 next. Release in one go when Arshad says so.
+Status: **Phases 0, 1 and 2 done** (2026-11-12); Phase 0 item 24 was not a bug and item 33 is still open. Phases 3 to 5 next. Release in one go when Arshad says so.
 
 ## Decisions (Arshad, 2026-11-12)
 
