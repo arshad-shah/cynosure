@@ -32,6 +32,12 @@ describe("plainNumber", () => {
     expect(plainNumber(42)).toBe("42");
     expect(plainNumber(0.65)).toBe("0.65");
   });
+
+  it("keeps String(n) for numbers it cannot write out", () => {
+    expect(plainNumber(1e21)).toBe("1e+21");
+    expect(plainNumber(Number.POSITIVE_INFINITY)).toBe("Infinity");
+    expect(plainNumber(Number.NaN)).toBe("NaN");
+  });
 });
 
 describe("roundLike", () => {

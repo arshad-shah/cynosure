@@ -357,6 +357,28 @@ export const ScrollIntoViewMovesOnlyTheArea: Story = {
   },
 };
 
+export const ScrollIntoViewNearestFromPastAndInView: Story = {
+  render: () => <Jump />,
+  play: async ({ canvas, userEvent }) => {
+    const region = canvas.getByRole("region", { name: "Results" });
+    const match = canvas.getByText("Match");
+    // Scrolled past the match (it is above and before the view): nearest brings it to the top and start edges.
+    region.scrollTop = region.scrollHeight;
+    region.scrollLeft = region.scrollWidth;
+    await expect(inView(match, region)).toBe(false);
+    await userEvent.click(canvas.getByRole("button", { name: "Nearest" }));
+    await expect(inView(match, region)).toBe(true);
+    await expect(match.getBoundingClientRect().top - region.getBoundingClientRect().top).toBeCloseTo(0, 0);
+    // Already in view: nearest does not scroll at all.
+    region.scrollTop -= 20;
+    region.scrollLeft -= 20;
+    await expect(inView(match, region)).toBe(true);
+    const [top, left] = [region.scrollTop, region.scrollLeft];
+    await userEvent.click(canvas.getByRole("button", { name: "Nearest" }));
+    await expect([region.scrollTop, region.scrollLeft]).toEqual([top, left]);
+  },
+};
+
 export const ScrollIntoViewInRtl: Story = {
   render: () => <Jump dir="rtl" />,
   play: async ({ canvas, userEvent }) => {
