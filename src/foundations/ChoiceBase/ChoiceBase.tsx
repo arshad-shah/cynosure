@@ -28,5 +28,5 @@ export const ChoiceBase = forwardRef<HTMLInputElement, ChoiceBaseProps>(function
   useClientLayoutEffect(() => {
     if (inner.current) inner.current.indeterminate = indeterminate;
   }, [indeterminate]);
-  return <input ref={ref} className={`cy-choice-input${className ? ` ${className}` : ""}`} {...rest} />;
+  return <input ref={ref} className={`cy-choice-base${className ? ` ${className}` : ""}`} {...rest} />;
 });

@@ -8,4 +8,5 @@ An on/off switch (`role="switch"`) on a native checkbox. Same props, forms and k
 
 ## Tokens
 
-- `--cy-switch-{width,height,thumb-size,off-bg}`
+- `--cy-switch-{width,height,thumb-size,off-bg}`; `--cy-switch-height-{sm,lg}` for the other sizes
+- The row around the switch is a [Choice](../Choice/README.md): `--cy-choice-gap` is the space before the label

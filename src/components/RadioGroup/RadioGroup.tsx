@@ -1,6 +1,7 @@
 import { type CSSProperties, type ReactNode, useId } from "react";
+import { ChoiceBase } from "../../foundations/ChoiceBase/ChoiceBase.js";
 import type { Size, Tone } from "../../tokens/schema.js";
-import { ChoiceRow } from "../Checkbox/ChoiceRow.js";
+import { Choice } from "../Choice/Choice.js";
 import { Field } from "../Field/Field.js";
 
 export interface RadioOption {
@@ -81,9 +82,8 @@ export function RadioGroup({
       {() => (
         <div className="cy-radio-group" data-orientation={orientation}>
           {options.map((option) => (
-            <ChoiceRow
+            <Choice
               key={option.value}
-              kind="radio"
               label={option.label}
               description={option.description}
               name={groupName}
@@ -91,11 +91,15 @@ export function RadioGroup({
               required={required}
               disabled={disabled || option.disabled}
               size={size}
-              tone={tone}
               {...(value !== undefined
                 ? { checked: value === option.value }
                 : { defaultChecked: defaultValue === option.value })}
               onChange={(checked) => checked && onChange?.(option.value)}
+              control={(input) => (
+                <span className="cy-radio-group-radio" data-size={size} data-tone={tone}>
+                  <ChoiceBase {...input} type="radio" />
+                </span>
+              )}
             />
           ))}
         </div>

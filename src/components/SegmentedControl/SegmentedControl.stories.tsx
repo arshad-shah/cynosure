@@ -78,7 +78,8 @@ export const IndicatorFollowsSelectionAndResets: Story = {
     </form>
   ),
   play: async ({ canvas, canvasElement, userEvent }) => {
-    const segment = (text: string) => canvas.getByText(text).closest(".cy-segment") as Element;
+    const segment = (text: string) =>
+      canvas.getByText(text).closest(".cy-segmented-control-segment") as Element;
     const bg = (text: string) => getComputedStyle(segment(text)).backgroundColor;
     const inactive = bg("Raw");
     await expect(bg("Tree")).not.toBe(inactive);
@@ -86,7 +87,7 @@ export const IndicatorFollowsSelectionAndResets: Story = {
     await expect(bg("Raw")).not.toBe(bg("Tree"));
     (canvas.getByTestId("form") as HTMLFormElement).reset();
     await waitFor(() => expect(canvas.getByRole("radio", { name: "Tree" })).toBeChecked());
-    await expect(canvasElement.querySelectorAll(".cy-segment")).toHaveLength(3);
+    await expect(canvasElement.querySelectorAll(".cy-segmented-control-segment")).toHaveLength(3);
   },
 };
 
@@ -105,7 +106,7 @@ export const ActiveSegmentStandsOutInLightAndDark: Story = {
     // the text colour: in dark the raised surface is as dark as the track, which made the pill vanish.
     for (const mode of ["light", "dark"]) {
       const group = canvas.getByRole("radiogroup", { name: `View on ${mode}` });
-      const active = within(group).getByText("Tree").closest(".cy-segment") as Element;
+      const active = within(group).getByText("Tree").closest(".cy-segmented-control-segment") as Element;
       const track = getComputedStyle(group).backgroundColor;
       await expect(contrast(getComputedStyle(active).backgroundColor, track)).toBeGreaterThanOrEqual(1.2);
       await expect(textContrast(within(group).getByText("Tree"))).toBeGreaterThanOrEqual(4.5);
@@ -172,7 +173,7 @@ export const SmallLinesUpWithOtherSmallControls: Story = {
     const button = canvas.getByRole("button", { name: "Beside it" });
     await expect(group.getBoundingClientRect().height).toBe(button.getBoundingClientRect().height);
     // The segment looks smaller than 24px there, so its hit area reaches past it.
-    const segment = canvasElement.querySelector(".cy-segment") as Element;
+    const segment = canvasElement.querySelector(".cy-segmented-control-segment") as Element;
     await expect(Number.parseFloat(getComputedStyle(segment, "::before").height)).toBeGreaterThanOrEqual(24);
   },
 };
@@ -180,14 +181,14 @@ export const SmallLinesUpWithOtherSmallControls: Story = {
 export const CoarsePointerSegments: Story = {
   tags: ["touch", "!dev"],
   play: async ({ canvasElement }) => {
-    for (const s of canvasElement.querySelectorAll(".cy-segment"))
+    for (const s of canvasElement.querySelectorAll(".cy-segmented-control-segment"))
       await expect(s.getBoundingClientRect().height).toBeGreaterThanOrEqual(44);
   },
 };
 
 export const StableUnderHostileHost: Story = {
   play: async ({ canvasElement }) => {
-    const { clean, hostile } = computeUnderHostileHost(canvasElement, ".cy-segmented", [
+    const { clean, hostile } = computeUnderHostileHost(canvasElement, ".cy-segmented-control", [
       "height",
       "border-radius",
       "background-color",

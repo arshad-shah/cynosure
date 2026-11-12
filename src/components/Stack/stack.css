@@ -1,7 +1,7 @@
-.cy-stack.cy-stack,
-.cy-inline.cy-inline {
+.cy-stack.cy-stack {
   box-sizing: border-box !important;
   display: flex;
+  flex-direction: column;
   gap: var(--_gap);
   margin: 0;
   /* Padding props set these inline; resetting them here stops a nested layout inheriting its parent's padding. */
@@ -13,6 +13,9 @@
   font-size: inherit;
   line-height: inherit;
   min-inline-size: 0;
+  &[data-direction="row"] {
+    flex-direction: row;
+  }
   &[data-align="start"] {
     align-items: flex-start;
   }
@@ -39,16 +42,6 @@
   }
   &[data-justify="between"] {
     justify-content: space-between;
-  }
-}
-.cy-stack.cy-stack {
-  flex-direction: column;
-}
-.cy-inline.cy-inline {
-  flex-direction: row;
-  align-items: center;
-  &[data-wrap] {
-    flex-wrap: wrap;
   }
 }
 /* sticky: stickyOffset sets --_sticky-top inline; declaring it here stops a nested Stack inheriting its parent's. */

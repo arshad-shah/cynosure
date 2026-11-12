@@ -86,13 +86,15 @@
     "name": "Checkbox + Switch",
     "path": [
       "dist/components/Checkbox/Checkbox.js",
-      "dist/components/Checkbox/ChoiceRow.js",
+      "dist/components/Choice/Choice.js",
       "dist/components/Switch/Switch.js",
       "dist/foundations/ChoiceBase/ChoiceBase.js",
       "dist/styles/checkbox.css",
-      "dist/styles/choice.css"
+      "dist/styles/switch.css",
+      "dist/styles/choice.css",
+      "dist/styles/choice-base.css"
     ],
-    "limit": "3.5 kB",
+    "limit": "4.25 kB",
     "gzip": true
   },
   {
@@ -123,8 +125,7 @@
     "path": [
       "dist/components/Select/Select.js",
       "dist/foundations/HiddenValue/HiddenValue.js",
-      "dist/styles/select.css",
-      "dist/styles/hidden-value.css"
+      "dist/styles/select.css"
     ],
     "limit": "5 kB",
     "gzip": true
@@ -155,8 +156,13 @@
   },
   {
     "name": "Inline",
-    "path": ["dist/components/Inline/Inline.js", "dist/styles/stack.css"],
-    "limit": "1 kB",
+    "path": [
+      "dist/components/Inline/Inline.js",
+      "dist/components/Stack/Stack.js",
+      "dist/styles/stack.css",
+      "dist/styles/inline.css"
+    ],
+    "limit": "1.5 kB",
     "gzip": true
   },
   {
@@ -638,6 +644,12 @@
     "name": "Section (JS + CSS)",
     "path": ["dist/components/Section/Section.js", "dist/styles/section.css"],
     "limit": "1.25 kB",
+    "gzip": true
+  },
+  {
+    "name": "Choice",
+    "path": ["dist/components/Choice/Choice.js", "dist/styles/choice.css"],
+    "limit": "3 kB",
     "gzip": true
   }
 ]

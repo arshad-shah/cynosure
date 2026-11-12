@@ -1,4 +1,4 @@
-.cy-segment-label {
+.cy-segmented-control-label {
   margin: 0;
   font-size: inherit;
   line-height: inherit;
@@ -8,7 +8,7 @@
   white-space: nowrap;
 }
 
-.cy-segmented .cy-segment {
+.cy-segmented-control .cy-segmented-control-segment {
   --_hit: var(--cy-hit-min, 24px);
   box-sizing: border-box !important;
   position: relative;
@@ -69,7 +69,7 @@
   }
 }
 
-.cy-segmented.cy-segmented {
+.cy-segmented-control.cy-segmented-control {
   --_h: var(--cy-control-height-md);
   --_pad: var(--cy-segmented-control-padding, var(--cy-space-1));
   --_active: var(--cy-color-ink);
@@ -101,7 +101,7 @@
     display: flex;
     inline-size: 100%;
   }
-  &[data-icon-only] .cy-segment {
+  &[data-icon-only] .cy-segmented-control-segment {
     padding: 0 var(--cy-space-4);
   }
   &[data-tone="accent"] {
@@ -123,7 +123,7 @@
 
 /* On touch screens the segments themselves grow to the coarse hit size. */
 @media (pointer: coarse) {
-  .cy-segmented .cy-segment {
+  .cy-segmented-control .cy-segmented-control-segment {
     --_hit: var(--cy-hit-coarse, 44px);
     min-block-size: max(calc(var(--_h) - var(--_pad) * 2), var(--_hit));
   }

@@ -8,6 +8,12 @@ The **only** modules allowed to render native interactive elements (`button`, `a
 - **Who builds on a foundation** (`FOUNDATION_USERS` in `tools/cli/lib/check.ts`, enforced by `cy check`): only composites whose element no component covers. ButtonBase: Button, and patterns that are buttons but not Buttons (Card as a whole-card button, Disclosure's trigger, Menu items, Select's trigger and options, SideNav entries, Steps, Table's sort headers, Tabs, ColorSwatches' swatches). LinkBase: Link, Button's link form, Card as a whole-card link, SideNav entries. InputBase: TextField, and CommandPalette's combobox input. TextAreaBase: TextArea. ChoiceBase: Checkbox and SegmentedControl. DialogBase: Dialog and CommandPalette. FileInputBase: FileDrop and KeyValueEditor's file picker. Everyone else uses those components. Icon and HiddenValue are parts any component may use.
 - If a composite needs a native element that has no foundation, add the foundation here first; never inline the element in the composite (`cy check` fails with `native-elements`).
 
+## Who builds on a foundation
+
+`FOUNDATION_USERS` in `tools/cli/lib/check.ts` lists the composites that may import a foundation directly (`foundation-use`); every other composite renders the component that owns the element. The reasons:
+
+- **ChoiceBase**: Checkbox, Switch and RadioGroup each own one native choice control (checkbox, `role="switch"` checkbox, radio) and draw its skin in a Choice row; SegmentedControl's segments are radios no other component draws. Choice itself renders no input: it hands its control the input's ids and handlers.
+
 Shared hooks also live here: `roving-focus.ts` (`useRovingFocus`), `field.ts` (`useField`), `client-layout-effect.ts` (`useClientLayoutEffect`), `virtual-window.ts` (`useVirtualWindow`: windowing for equal-height rows, sized by CSS and always rendering the focused row; used by Tree and VirtualList; `sizes` and `gap` for rows of different sizes, as DocumentViewport's pages) and `hotkey.ts` (`useHotkey`: global shortcuts that work in shadow roots, skip plain keys in text fields, and honour `data-cy-hotkeys="off"`; unit-tested in `tests/unit/hotkey.test.tsx`).
 
 Shared helpers (use these instead of writing your own; a second copy is a review failure):

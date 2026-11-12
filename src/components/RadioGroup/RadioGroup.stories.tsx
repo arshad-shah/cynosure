@@ -98,7 +98,7 @@ export const CoarsePointerRows: Story = {
 
 export const StableUnderHostileHost: Story = {
   play: async ({ canvasElement }) => {
-    const { clean, hostile } = computeUnderHostileHost(canvasElement, ".cy-radio", [
+    const { clean, hostile } = computeUnderHostileHost(canvasElement, ".cy-radio-group-radio", [
       "width",
       "height",
       "border-radius",

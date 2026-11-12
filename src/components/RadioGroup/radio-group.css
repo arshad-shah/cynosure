@@ -12,3 +12,64 @@
     column-gap: var(--cy-space-7);
   }
 }
+
+/* One option's radio, drawn in its Choice row. The native radio (ChoiceBase) sits over it. Same size and border as a
+   Checkbox, so the two line up in a form. */
+.cy-radio-group-radio.cy-radio-group-radio {
+  font-size: inherit;
+  line-height: inherit;
+  --_tone: var(--cy-color-accent);
+  --_box: var(--cy-checkbox-size, calc(16px * var(--cy-scale, 1)));
+  box-sizing: border-box !important;
+  position: relative;
+  flex: none;
+  inline-size: var(--_box);
+  block-size: var(--_box);
+  margin: 0;
+  margin-block-start: calc((1lh - var(--_box)) / 2);
+  border: calc(var(--cy-border-width) * 1.5) solid
+    var(--cy-checkbox-border, color-mix(in oklab, var(--cy-color-ink) 45%, var(--cy-color-line)));
+  border-radius: 50%;
+  background: var(--cy-color-surface);
+  transition: border-color var(--cy-motion-fast) var(--cy-motion-ease);
+  &[data-size="sm"] {
+    --_box: var(--cy-checkbox-size-sm, calc(14px * var(--cy-scale, 1)));
+  }
+  &[data-size="lg"] {
+    --_box: var(--cy-checkbox-size-lg, calc(20px * var(--cy-scale, 1)));
+  }
+  &[data-tone="neutral"] {
+    --_tone: var(--cy-color-ink);
+  }
+  &[data-tone="danger"] {
+    --_tone: var(--cy-color-danger);
+  }
+  &[data-tone="success"] {
+    --_tone: var(--cy-color-success);
+  }
+  &[data-tone="warning"] {
+    --_tone: var(--cy-color-warning);
+  }
+  &[data-tone="info"] {
+    --_tone: var(--cy-color-info);
+  }
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 22%;
+    border-radius: 50%;
+    background: var(--_tone);
+    transform: scale(0);
+    transition: transform var(--cy-motion-fast) var(--cy-motion-ease);
+  }
+  &:has(> input:checked) {
+    border-color: var(--_tone);
+  }
+  &:has(> input:checked)::after {
+    transform: scale(1);
+  }
+  &:has(> input:focus-visible) {
+    box-shadow: 0 0 0 var(--cy-border-focus) var(--cy-color-ring);
+    outline: var(--cy-border-focus) solid transparent;
+  }
+}

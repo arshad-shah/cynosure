@@ -54,7 +54,7 @@ export function HiddenValue({
   return (
     <input
       ref={ref}
-      className="cy-hidden-value"
+      className="cy-visually-hidden"
       name={name}
       form={form}
       value={value}

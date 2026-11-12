@@ -1,13 +1,6 @@
-import { type CSSProperties, type ElementType, forwardRef, type ReactNode } from "react";
-import {
-  type LayoutAttributes,
-  type PaddingProps,
-  paddingVars,
-  type Space,
-  space,
-  type VisibilityProps,
-  visibilityAttrs,
-} from "../Stack/space.js";
+import { type CSSProperties, forwardRef, type ReactNode } from "react";
+import { Stack } from "../Stack/Stack.js";
+import type { LayoutAttributes, PaddingProps, Space, VisibilityProps } from "../Stack/space.js";
 
 export interface InlineProps extends PaddingProps, VisibilityProps, LayoutAttributes {
   /** Space token between children. */
@@ -30,45 +23,19 @@ export interface InlineProps extends PaddingProps, VisibilityProps, LayoutAttrib
   "data-testid"?: string;
 }
 
-/** Horizontal layout with token gaps. */
+/** Horizontal layout with token gaps: a Stack in a row, its children centred unless `align` says otherwise. */
 export const Inline = forwardRef<HTMLElement, InlineProps>(function Inline(
-  {
-    gap = "3",
-    padding,
-    paddingInline,
-    paddingBlock,
-    align,
-    justify,
-    wrap = false,
-    hideBelow,
-    hideAbove,
-    as = "div",
-    className,
-    style,
-    children,
-    ...rest
-  },
+  { gap = "3", wrap = false, className, ...rest },
   ref,
 ) {
-  const Tag = as as ElementType;
   return (
-    <Tag
+    <Stack
       ref={ref}
       {...rest}
+      gap={gap}
+      direction="row"
       className={`cy-inline${className ? ` ${className}` : ""}`}
-      data-align={align}
-      data-justify={justify}
       data-wrap={wrap ? "" : undefined}
-      {...visibilityAttrs({ hideBelow, hideAbove })}
-      style={
-        {
-          "--_gap": space(gap),
-          ...paddingVars({ padding, paddingInline, paddingBlock }),
-          ...style,
-        } as CSSProperties
-      }
-    >
-      {children}
-    </Tag>
+    />
   );
 });

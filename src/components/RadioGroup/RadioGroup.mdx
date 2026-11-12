@@ -70,7 +70,7 @@ Pass `value` and `onChange(value)` to own the state. Without `value`, the group 
 
 ## Theming
 
-Tokens: `--cy-radio-group-gap`. The ring uses `--cy-checkbox-border`.
+Tokens: `--cy-radio-group-gap`. The ring uses `--cy-checkbox-border` and its size `--cy-checkbox-size` (`-sm`, `-lg`), so radios line up with checkboxes. Each option is a [Choice](?path=/docs/components-choice--docs) row: `--cy-choice-gap` is the space before its label.
 
 ```ts
 createTheme({ components: { radioGroup: { gap: "12px" } } });
@@ -80,4 +80,4 @@ createTheme({ components: { radioGroup: { gap: "12px" } } });
 
 ## Related
 
-[Checkbox](?path=/docs/components-checkbox--docs) · [Switch](?path=/docs/components-switch--docs) · [SegmentedControl](?path=/docs/components-segmentedcontrol--docs) · [Select](?path=/docs/components-select--docs)
+[Checkbox](?path=/docs/components-checkbox--docs) · [Choice](?path=/docs/components-choice--docs) · [Switch](?path=/docs/components-switch--docs) · [SegmentedControl](?path=/docs/components-segmentedcontrol--docs) · [Select](?path=/docs/components-select--docs)

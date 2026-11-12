@@ -1,0 +1,99 @@
+/* Choice: the row a choice control sits in (Checkbox, Switch, RadioGroup's options). The control draws itself. */
+.cy-choice-text {
+  font-size: inherit;
+  line-height: inherit;
+  display: grid;
+  gap: var(--cy-space-1);
+  padding-block: var(--cy-space-1);
+}
+.cy-choice-label {
+  font-size: inherit;
+  line-height: inherit;
+  margin: 0;
+  font-family: var(--cy-font-sans);
+  font-weight: var(--cy-font-weight-medium);
+  letter-spacing: normal;
+  text-transform: none;
+  color: var(--cy-color-ink);
+}
+.cy-choice-description {
+  line-height: var(--cy-font-line-height);
+  margin: 0;
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-font-size-sm);
+  font-weight: var(--cy-font-weight-regular);
+  letter-spacing: normal;
+  text-transform: none;
+  color: var(--cy-color-muted);
+}
+
+.cy-choice.cy-choice {
+  --_hit: var(--cy-hit-min, 24px);
+  box-sizing: border-box !important;
+  margin: 0;
+  display: inline-flex;
+  align-items: flex-start;
+  gap: var(--cy-choice-gap, var(--cy-space-4));
+  min-block-size: var(--_hit);
+  color: var(--cy-color-ink);
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-font-size-md);
+  font-weight: var(--cy-font-weight-regular);
+  line-height: var(--cy-font-line-height);
+  letter-spacing: normal;
+  text-transform: none;
+  cursor: pointer;
+  user-select: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+
+  &[data-size="sm"] {
+    font-size: var(--cy-font-size-sm);
+  }
+  &[data-size="lg"] {
+    font-size: var(--cy-font-size-lg);
+  }
+  &[data-disabled] {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+}
+
+/* strikeWhenChecked: a ticked row reads as done. A mixed control is not done. The control's input is a direct child of
+   the control's element, so an input inside the label or description never counts. */
+.cy-choice[data-strike] {
+  & .cy-choice-label,
+  & .cy-choice-description {
+    transition: color var(--cy-motion-fast) var(--cy-motion-ease);
+  }
+  &:has(> * > input:checked:not(:indeterminate)) {
+    & .cy-choice-label {
+      color: var(--cy-choice-done-color, var(--cy-color-muted));
+      text-decoration-line: line-through;
+      text-decoration-thickness: var(--cy-choice-strike-width, max(var(--cy-border-width), 0.0625em));
+    }
+    & .cy-choice-description {
+      color: var(--cy-choice-done-color, var(--cy-color-muted));
+    }
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cy-choice[data-strike] :is(.cy-choice-label, .cy-choice-description) {
+    transition: none;
+  }
+}
+/* Forced colours drop the muted colour; the strike is then the only sign of "done", so it is kept in the text colour. */
+@media (forced-colors: active) {
+  .cy-choice[data-strike]:has(> * > input:checked:not(:indeterminate)) .cy-choice-label {
+    color: CanvasText;
+    text-decoration-line: line-through;
+    text-decoration-color: CanvasText;
+  }
+}
+
+@media (pointer: coarse) {
+  .cy-choice.cy-choice {
+    --_hit: var(--cy-hit-coarse, 44px);
+    align-items: center;
+  }
+}
