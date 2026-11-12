@@ -13,6 +13,11 @@ export interface IconProps {
   tone?: Tone | "inherit" | "muted";
   /** Any CSS colour; overrides `tone` for one-off cases. `brand` draws a brand mark in its owner's colour. */
   color?: string;
+  /**
+   * The icon points along the reading direction (a chevron for previous or next, an arrow for back): it is mirrored
+   * in right-to-left text. Default false.
+   */
+  flipRtl?: boolean;
   /** Added to the `<svg>` element, for layout. */
   className?: string;
   /** Layout only. */
@@ -23,7 +28,16 @@ export interface IconProps {
  * Foundation: renders a Facet icon (stroke, currentColor) or a brand mark (filled, exactly as its owner publishes it)
  * as inline SVG.
  */
-export function Icon({ icon, label, size = "md", tone = "inherit", color, className, style }: IconProps) {
+export function Icon({
+  icon,
+  label,
+  size = "md",
+  tone = "inherit",
+  color,
+  flipRtl = false,
+  className,
+  style,
+}: IconProps) {
   const sizing = typeof size === "number" ? ({ "--cy-icon-size": `${size}px` } as CSSProperties) : undefined;
   const paint = color === "brand" ? (icon.brand ? `#${icon.brand.hex}` : undefined) : color;
   return (
@@ -35,6 +49,7 @@ export function Icon({ icon, label, size = "md", tone = "inherit", color, classN
       data-motion={icon.motion}
       data-fill={icon.fill ? "" : undefined}
       data-tone={tone === "inherit" ? undefined : tone}
+      data-flip-rtl={flipRtl ? "" : undefined}
       style={{ ...sizing, ...(paint ? { color: paint } : {}), ...style }}
       focusable="false"
       {...(label ? { role: "img", "aria-label": label } : { "aria-hidden": true })}

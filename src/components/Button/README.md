@@ -21,6 +21,7 @@ import { download, trash } from "@arshad-shah/cynosure/icons";
 | `pressed`             | –         | Toggle button (`aria-pressed`)                                                                                                                                          |
 | `type`                | `button`  | Never submits unless `type="submit"`                                                                                                                                    |
 | `fullWidth`           | `false`   | Fills its container                                                                                                                                                     |
+| `square`              | `false`   | As wide as it is tall, no padding, for one icon as the content. Prefer `IconButton`, which sets it and adds the label and tooltip                                       |
 | `aria-current`        | –         | Marks the current item of a set (`"page"`, `"step"`…), button or link                                                                                                   |
 | `className` / `style` | –         | Layout only                                                                                                                                                             |
 
@@ -30,7 +31,7 @@ Every variant × tone pair is distinct and keeps text at ≥ 4.5:1 (tested). Sof
 
 **Accessibility and touch:** hit area ≥ 24px always and ≥ 44px on coarse pointers; Enter and Space activate; visible focus ring (also in forced-colors mode); long labels truncate with an ellipsis.
 
-- `href` (with `target`): a real link styled as a button; only safe URLs are linked. A link takes `target`, `aria-label`, `aria-current`, `className`, `style`, `data-testid` and `onClick`; the other button attributes (`disabled`, `loading`, `pressed`, `type`, `confirm`, `keepFocus`) do not apply to it.
+- `href` (with `target`): a real link styled as a button; only safe URLs are linked. A link takes `target`, `id`, `aria-label`, `aria-current`, `className`, `style`, `data-testid` and `onClick`; the other button attributes (`disabled`, `loading`, `pressed`, `type`, `confirm`, `keepFocus`) do not apply to it. The forwarded ref is the button's; `linkRef` receives the link element.
 - `aria-current`: set on the element in both forms. A link to the page being shown takes `aria-current="page"` (as Pagination does with `getHref`), so a screen reader says "current page".
 - `confirm`: ask before acting, in place. The first press shows this text ("Press again to delete"); a second press within 4 seconds acts; Escape, leaving or the timeout disarms it.
 - `keepFocus`: a pointer press leaves focus where it was, for on-screen keypads beside a field.

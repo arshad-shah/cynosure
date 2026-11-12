@@ -4,6 +4,7 @@ import {
   forwardRef,
   type MouseEvent,
   type ReactNode,
+  type Ref,
   useEffect,
   useRef,
   useState,
@@ -64,12 +65,20 @@ export interface ButtonProps extends Omit<ButtonBaseProps, "children" | "classNa
   fullWidth?: boolean;
   /**
    * A link that looks like a button (it navigates: a real `<a>`, so it opens in a new tab, can be copied, and so on).
-   * Only safe URLs are linked. The forwarded ref is not attached to a link. A link takes `target`, `aria-label`,
-   * `aria-current`, `className`, `style`, `data-testid` and `onClick`; the other button attributes do not apply to it.
+   * Only safe URLs are linked. The forwarded ref is not attached to a link (use `linkRef`). A link takes `target`,
+   * `id`, `aria-label`, `aria-current`, `className`, `style`, `data-testid` and `onClick`; the other button
+   * attributes do not apply to it.
    */
   href?: string | undefined;
   /** With `href`: where it opens, e.g. `_blank`. */
   target?: string | undefined;
+  /** With `href`: receives the link element (the forwarded ref is for the button element). */
+  linkRef?: Ref<HTMLAnchorElement> | undefined;
+  /**
+   * Square: as wide as it is tall, with no padding, for one icon as the content. Prefer IconButton, which sets it and
+   * adds the required label and its tooltip. Default false.
+   */
+  square?: boolean;
   /**
    * Ask before acting, in place: the first press arms the button and shows this text ("Press again to delete"), a
    * second press within 4 seconds acts. Escape, leaving the button or the time running out disarms it.
@@ -108,6 +117,8 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
     fullWidth,
     href,
     target,
+    linkRef,
+    square = false,
     confirm,
     keepFocus = false,
     className,
@@ -146,6 +157,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
     "data-color": color ? "" : undefined,
     "data-size": size,
     "data-full": fullWidth ? "" : undefined,
+    "data-square": square ? "" : undefined,
     "data-loading": loading ? "" : undefined,
     "data-armed": armed ? "" : undefined,
     style: color ? ({ "--_tone": color, ...rest.style } as CSSProperties) : rest.style,
@@ -163,9 +175,11 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
   if (href !== undefined)
     return (
       <LinkBase
+        ref={linkRef}
         href={href}
         target={target}
         {...shared}
+        id={rest.id}
         data-testid={rest["data-testid"]}
         aria-label={rest["aria-label"]}
         aria-current={rest["aria-current"]}

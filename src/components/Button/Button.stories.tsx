@@ -31,6 +31,7 @@ const meta = {
     pressed: { control: "boolean" },
     disabled: { control: "boolean" },
     fullWidth: { control: "boolean" },
+    square: { control: "boolean" },
     children: { control: "text" },
     type: { control: "inline-radio", options: ["button", "submit", "reset"] },
   },
@@ -584,5 +585,41 @@ export const OneOffColour: Story = {
     // Focus still uses the theme's ring, and the button still works.
     await userEvent.tab();
     await expect(solid).toHaveFocus();
+  },
+};
+
+export const SquareForOneIcon: Story = {
+  args: { square: true, "aria-label": "Delete", children: <span data-testid="glyph">D</span> },
+  play: async ({ canvas }) => {
+    const button = canvas.getByRole("button", { name: "Delete" });
+    // As wide as it is tall, with no padding; the label box steps aside so its content is not clipped.
+    const { width, height } = button.getBoundingClientRect();
+    await expect(width).toBe(height);
+    await expect(getComputedStyle(button).paddingInlineStart).toBe("0px");
+    const label = canvas.getByTestId("glyph").parentElement as HTMLElement;
+    await expect(label).toHaveClass("cy-button-label");
+    await expect(getComputedStyle(label).display).toBe("contents");
+  },
+};
+
+export const LinkTakesIdAndRef: Story = {
+  render: function Render() {
+    const ref = useRef<HTMLAnchorElement>(null);
+    const [tag, setTag] = useState("");
+    useEffect(() => setTag(ref.current?.tagName ?? "none"), []);
+    return (
+      <div>
+        <Button href="/docs" id="docs-link" linkRef={ref}>
+          Read the docs
+        </Button>
+        <output data-testid="tag">{tag}</output>
+      </div>
+    );
+  },
+  play: async ({ canvas }) => {
+    const link = canvas.getByRole("link", { name: "Read the docs" });
+    await expect(link).toHaveAttribute("id", "docs-link");
+    // linkRef receives the link element.
+    await waitFor(() => expect(canvas.getByTestId("tag")).toHaveTextContent("A"));
   },
 };

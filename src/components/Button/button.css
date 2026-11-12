@@ -21,8 +21,9 @@
   line-height: normal;
 }
 
-/* LoadingDots overlay, centred over the (transparent) content so the button keeps its width. */
-.cy-button .cy-loading-dots.cy-button-loading {
+/* LoadingDots overlay, centred over the (transparent) content so the button keeps its width. Tripled to win over
+   LoadingDots' doubled root selector. */
+.cy-button-loading.cy-button-loading.cy-button-loading {
   position: absolute;
   inset: 0;
   margin: auto;
@@ -173,6 +174,15 @@
   &[data-full] {
     inline-size: 100%;
     max-inline-size: none;
+  }
+  /* Square: one icon as the content (IconButton). As wide as it is tall; the label box steps aside so the icon is not
+     clipped by it. */
+  &[data-square] {
+    inline-size: var(--_h);
+    padding: 0;
+    & .cy-button-label {
+      display: contents;
+    }
   }
 
   /* States */

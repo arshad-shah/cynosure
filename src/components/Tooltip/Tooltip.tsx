@@ -36,13 +36,18 @@ export interface TooltipProps {
   placement?: Placement;
   /** Hover delay in ms (focus opens immediately). */
   delay?: number;
+  /**
+   * Added to the element around the trigger (the anchor, the box the parent lays out), for layout: a grid area,
+   * `flex`, margins.
+   */
+  className?: string | undefined;
 }
 
 /**
  * Tooltip in the top layer (Popover API), positioned against its trigger. Opens on hover after `delay` and on
  * keyboard focus; dismissible with Escape; hoverable; never opens on touch (WCAG 1.4.13).
  */
-export function Tooltip({ content, children, placement = "top", delay = 300 }: TooltipProps) {
+export function Tooltip({ content, children, placement = "top", delay = 300, className }: TooltipProps) {
   const id = `cy-tip-${useId().replace(/:/g, "")}`;
   const anchor = useRef<HTMLSpanElement>(null);
   const tip = useRef<HTMLSpanElement>(null);
@@ -75,7 +80,7 @@ export function Tooltip({ content, children, placement = "top", delay = 300 }: T
     // biome-ignore lint/a11y/noStaticElementInteractions: delegated hover/focus listeners for the interactive child
     <span
       ref={anchor}
-      className="cy-tooltip-anchor"
+      className={className ? `cy-tooltip-anchor ${className}` : "cy-tooltip-anchor"}
       onPointerEnter={(e) => e.pointerType !== "touch" && show(delay)}
       onPointerLeave={() => hide(120)}
       onPointerDown={() => {

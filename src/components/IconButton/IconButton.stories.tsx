@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, fn, waitFor } from "storybook/test";
 import * as icons from "../../icons/index.js";
-import { copy, trash } from "../../icons/index.js";
+import { chevronRight, copy, trash } from "../../icons/index.js";
 import { IconButton } from "./IconButton.js";
 
 const iconMapping: Record<string, unknown> = {};
@@ -28,6 +28,9 @@ const meta = {
     loading: { control: "boolean" },
     pressed: { control: "boolean" },
     disabled: { control: "boolean" },
+    flipRtl: { control: "boolean" },
+    iconColor: { control: "color" },
+    wrapperClassName: { control: "text" },
   },
 } satisfies Meta<typeof IconButton>;
 export default meta;
@@ -124,5 +127,45 @@ export const MouseFocusDoesNotPinTooltip: Story = {
     await expect(button).toHaveFocus();
     await userEvent.unhover(button);
     await waitFor(() => expect(tip.matches(":popover-open")).toBe(false));
+  },
+};
+
+export const NextPointsAlongTheReadingDirection: Story = {
+  args: { icon: chevronRight, label: "Next page", flipRtl: true },
+  render: (args) => (
+    <div style={{ display: "flex", gap: 8 }}>
+      <div dir="ltr">
+        <IconButton {...args} data-testid="ltr" />
+      </div>
+      <div dir="rtl">
+        <IconButton {...args} data-testid="rtl" />
+      </div>
+    </div>
+  ),
+  play: async ({ canvas }) => {
+    const icon = (id: string) => canvas.getByTestId(id).querySelector("svg") as SVGElement;
+    await expect(getComputedStyle(icon("ltr")).scale).toBe("none");
+    // Mirrored in right-to-left text.
+    await expect(getComputedStyle(icon("rtl")).scale).toBe("-1 1");
+  },
+};
+
+export const IconColourAndWrapperLayout: Story = {
+  args: { iconColor: "rgb(0, 128, 0)", wrapperClassName: "row-end" },
+  render: (args) => (
+    <div style={{ display: "grid", gridTemplateColumns: "1fr auto" }}>
+      <span>Row</span>
+      <IconButton {...args} />
+      <style>{".row-end { grid-column: 1; }"}</style>
+    </div>
+  ),
+  play: async ({ canvas }) => {
+    const button = canvas.getByRole("button", { name: "Copy document" });
+    await expect(getComputedStyle(button.querySelector("svg") as SVGElement).color).toBe("rgb(0, 128, 0)");
+    // The wrapper (the tooltip's anchor) is the box the parent lays out, and it takes the class.
+    const wrapper = button.parentElement as HTMLElement;
+    await expect(wrapper).toHaveClass("cy-tooltip-anchor", "row-end");
+    await expect(getComputedStyle(wrapper).gridColumnStart).toBe("1");
+    await expect(button).not.toHaveClass("row-end");
   },
 };
