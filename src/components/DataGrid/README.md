@@ -62,16 +62,17 @@ rows in `onEndReached`.
 
 - **Keyboard** (APG grid): one tab stop. Arrows move between cells (Left and Right follow the reading direction), Up
   from the first row reaches the header; Home and End go to the row's ends, Ctrl+Home and Ctrl+End to the first and
-  last cells; Page Up and Page Down move a view of rows. The focused cell is scrolled into view, and stays rendered
+  last cells; Page Up and Page Down move a view of rows (Page Up from the first row reaches the header). The focused cell is scrolled into view, and stays rendered
   when scrolled away. Enter on a cell calls `onRowActivate`; on a sortable header it sorts.
-- **Selection**: `row`: click selects a row, Ctrl/Cmd+click toggles, Shift+click and Shift+Up/Down extend, Space
-  selects the focused row, Ctrl/Cmd+A selects all. `cell`: the focused cell is selected. `range`: arrows select the
-  focused cell, Shift+click and Shift+arrows extend the rectangle, Ctrl/Cmd+A selects every cell.
+- **Selection**: `row`: click selects a row, Ctrl/Cmd+click toggles, Shift+click, Shift+Up/Down and Shift+Space extend,
+  Space selects the focused row, Ctrl/Cmd+Space toggles it, Ctrl/Cmd+A selects all. `cell`: the focused cell is selected. `range`: arrows select the
+  focused cell, Shift+click and Shift+arrows extend the rectangle, Ctrl/Cmd+A selects every cell. With any selection mode,
+  Shift+click selects cells, never text.
 - **Copy**: Ctrl/Cmd+C writes the selection as tab-separated text (rows on lines; a value holding a tab, a line break
   or a quote is quoted). Text selected by dragging inside cells copies as text instead: dragging selects text, while
   Shift+click and Shift+arrows select cells, so both work.
 - **Resize**: drag a header's edge (mouse, pen or finger; Escape cancels), or press Alt+Left/Right on the header
-  (Shift for a bigger step). `minWidth` and `maxWidth` bound it.
+  (Shift for a bigger step; `aria-keyshortcuts` announces it). `minWidth` and `maxWidth` bound it.
 - **Touch**: a finger scrolls the grid and a tap acts like a click. Rows and the header are at least 44px tall on a
   coarse pointer, and a header's edge has a 44px hit area.
 

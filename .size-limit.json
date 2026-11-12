@@ -2,7 +2,7 @@
   {
     "name": "all CSS",
     "path": "dist/styles.css",
-    "limit": "35.8 kB",
+    "limit": "36.5 kB",
     "gzip": true
   },
   {
@@ -717,9 +717,9 @@
     "gzip": true
   },
   {
-    "name": "DataGrid (JS + CSS)",
+    "name": "DataGrid",
     "path": ["dist/components/DataGrid/DataGrid.js", "dist/styles/data-grid.css"],
-    "limit": "3 kB",
+    "limit": "5.9 kB",
     "gzip": true
   }
 ]
