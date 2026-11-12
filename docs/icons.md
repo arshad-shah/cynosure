@@ -2,7 +2,7 @@
 
 Cynosure ships two kinds of icon, both drawn by the same `Icon` component.
 
-- **Facet icons** (`@arshad-shah/cynosure/icons`): Cynosure's own set, 250 icons in 17 categories.
+- **Facet icons** (`@arshad-shah/cynosure/icons`): Cynosure's own set, 274 icons in 17 categories.
 - **Brand marks** (`@arshad-shah/cynosure/brands`): the official logos of 98 companies and projects, exactly as their owners publish them.
 
 ## Facet icons
