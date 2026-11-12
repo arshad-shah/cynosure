@@ -56,6 +56,12 @@ export interface TextProps {
    * An inline element becomes an inline block (one line) or a block (several lines). Default false.
    */
   truncate?: boolean | number;
+  /**
+   * How lines wrap. `pre` keeps spaces and line breaks as written (a query, a log line) and still wraps at the edge;
+   * `break` breaks long unbroken strings such as ids, hashes and URLs anywhere rather than letting them overflow.
+   * `truncate` wins over it. Default: normal wrapping.
+   */
+  wrap?: "pre" | "break" | undefined;
   /** Tabular figures, so digits in a column line up. Default false. */
   numeric?: boolean;
   /** Id of the control this text labels. Used with `as="label"`. */
@@ -82,6 +88,7 @@ export const Text = forwardRef<HTMLElement, TextProps>(function Text(
     tone,
     align,
     truncate = false,
+    wrap,
     numeric = false,
     htmlFor,
     dateTime,
@@ -105,6 +112,7 @@ export const Text = forwardRef<HTMLElement, TextProps>(function Text(
       data-tone={tone}
       data-align={align}
       data-truncate={lines ? "lines" : truncate === true ? "" : undefined}
+      data-wrap={wrap}
       data-numeric={numeric ? "" : undefined}
       {...(Tag === "label" && { htmlFor })}
       {...(Tag === "time" && { dateTime })}

@@ -266,3 +266,36 @@ export const AddonsAndNumericDigits: Story = {
     await expect(Number.parseFloat(getComputedStyle(clear).marginInlineEnd)).toBeLessThan(0);
   },
 };
+
+export const SplitSettingsRow: Story = {
+  render: (args) => (
+    <div style={{ display: "grid", gap: 12, inlineSize: 560 }}>
+      <TextField {...args} label="Font" description="Used in the editor." layout="split" width="md" />
+      <TextField {...args} label="A longer label for the size" layout="split" width="md" />
+      <div style={{ inlineSize: 240 }}>
+        <TextField {...args} label="Narrow" description="Moves under." layout="split" width="md" />
+      </div>
+    </div>
+  ),
+  play: async ({ canvas, userEvent }) => {
+    const font = canvas.getByRole("textbox", { name: "Font" });
+    const size = canvas.getByRole("textbox", { name: "A longer label for the size" });
+    await expect(font).toHaveAccessibleDescription("Used in the editor.");
+    // The fields' boxes line up at the row's end, whatever the label.
+    const box = (el: Element) => (el.closest(".cy-text-field") as Element).getBoundingClientRect();
+    await expect(box(font).left).toBe(box(size).left);
+    await expect(box(font).width).toBe(box(size).width);
+    await expect(box(font).left).toBeGreaterThan(canvas.getByText("Font").getBoundingClientRect().right);
+    // Narrow: under its text, inside the field.
+    const narrow = canvas.getByRole("textbox", { name: "Narrow" });
+    await expect(box(narrow).top).toBeGreaterThanOrEqual(
+      canvas.getByText("Moves under.").getBoundingClientRect().bottom,
+    );
+    await expect(box(narrow).width).toBeLessThanOrEqual(240);
+    // Pressing the label focuses the input, and typing works as ever.
+    await userEvent.click(canvas.getByText("Font"));
+    await expect(font).toHaveFocus();
+    await userEvent.keyboard("Inter");
+    await expect(font).toHaveValue("Inter");
+  },
+};

@@ -16,7 +16,13 @@ Label, description and error wiring for any control. Controls render through a r
 | `required`    | `false` | Draws the required marker (a shape, not a glyph)                  |
 | `size`        | `md`    | `sm` · `md` · `lg`                                                |
 | `group`       | `false` | Labels a `role="group"` (radio groups, segmented controls)        |
+| `layout`      | `stack` | `split`: label and description at the start, control at the end   |
+| `width`       | –       | Control width: `sm` · `md` · `lg` (tokens) · `full`               |
+- `layout="split"` is a settings row: the label and description at the start, the control at the end of the same row, centred on the text; when the field is too narrow for both (the text column below `--cy-field-split-text-min`), the control moves under the text. The error takes its own line below. The label still labels the control and the description and error still describe it. Also on TextField and Select.
+- `width` sets the control's width, so a column of settings lines up whatever the labels: `sm`, `md` and `lg` are the `--cy-field-control-width-*` tokens (160, 256 and 384px by default, never wider than the field), `full` the whole field. The control fills that width. Also on TextField and Select.
 
 ## Tokens
 
 - `--cy-field-gap`, `--cy-field-label-weight`, `--cy-field-label-color`, `--cy-field-description-color`, `--cy-field-error-color`, `--cy-field-required-color`
+- `--cy-field-control-width-sm`, `--cy-field-control-width-md`, `--cy-field-control-width-lg`: the control widths (160, 256, 384px)
+- `--cy-field-split-text-min`: narrowest the label and description get in the split layout before the control moves under them (192px)

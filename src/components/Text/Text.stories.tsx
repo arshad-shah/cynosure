@@ -26,6 +26,7 @@ const meta = {
     tone: { control: "select", options: TONES },
     align: { control: "inline-radio", options: ["start", "center", "end"] },
     truncate: { control: "number" },
+    wrap: { control: "inline-radio", options: ["pre", "break"] },
     numeric: { control: "boolean" },
     children: { control: "text" },
   },
@@ -390,6 +391,63 @@ export const TruncateToLines: Story = {
     await expect(full.getBoundingClientRect().height).toBeGreaterThan(3 * lineHeight);
     // The caller's layout style is kept beside the line count.
     await expect(get("l-three").getBoundingClientRect().width).toBe(200);
+  },
+};
+
+const ID = "c0a8f3e241d74b8e9f2a7d3c5b1e6a900f4c2d8b9e1a7c3f5d6b";
+const SQL = "select id,\n       name\n  from users";
+
+export const WrapKeepsLinesOrBreaksLongStrings: Story = {
+  render: () => (
+    <div style={{ inlineSize: 160 }}>
+      <Text as="div" wrap="pre" id="w-pre">
+        {SQL}
+      </Text>
+      <Text as="div" id="w-normal">
+        {SQL}
+      </Text>
+      <Text as="div" wrap="break" id="w-break">
+        {ID}
+      </Text>
+      <Text as="div" id="w-overflow">
+        {ID}
+      </Text>
+      <div>
+        <Text wrap="break" id="w-inline">
+          {ID}
+        </Text>
+      </div>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const get = (id: string) => canvasElement.querySelector(`#${id}`) as HTMLElement;
+    const lineHeight = Number.parseFloat(css(get("w-pre"), "line-height"));
+    const lines = (el: HTMLElement) => Math.round(el.getBoundingClientRect().height / lineHeight);
+    // "pre": the line breaks and the leading spaces are kept; without it the text runs together.
+    await expect(lines(get("w-pre"))).toBe(3);
+    await expect(lines(get("w-normal"))).toBeLessThan(3);
+    await expect(inkRect(get("w-pre")).width).toBeLessThan(160);
+    // "break": a long unbroken string breaks inside its box instead of overflowing it.
+    const box = get("w-break");
+    await expect(box.scrollWidth).toBeLessThanOrEqual(box.clientWidth);
+    await expect(lines(box)).toBeGreaterThan(1);
+    await expect(get("w-overflow").scrollWidth).toBeGreaterThan(get("w-overflow").clientWidth);
+    // An inline Text breaks as well: its painted lines stay inside the column.
+    await expect(inkRect(get("w-inline")).width).toBeLessThanOrEqual(160);
+    await expect(get("w-inline").getClientRects().length).toBeGreaterThan(1);
+    // The text itself is unchanged.
+    await expect(get("w-pre").textContent).toBe(SQL);
+    await expect(box).toHaveTextContent(ID);
+    // Host CSS cannot undo either.
+    for (const id of ["w-pre", "w-break"]) {
+      const { clean, hostile } = computeUnderHostileHost(canvasElement, `#${id}`, [
+        "white-space-collapse",
+        "text-wrap-mode",
+        "overflow-wrap",
+        "word-break",
+      ]);
+      await expect(hostile).toEqual(clean);
+    }
   },
 };
 

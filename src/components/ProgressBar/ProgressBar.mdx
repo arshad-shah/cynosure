@@ -38,6 +38,20 @@ By default the value reads as a percentage. Pass `labels.value` to describe it i
 
 <Canvas of={Stories.LabelsAndHiddenLabel} />
 
+## A slim bar in a row
+
+With `labelHidden` and no `showValue`, the bar is only its track: no label row, as tall as `size` makes it, and still named by `label`. Put it in a row of text (a query plan's cost, a quota beside its number) and give it the space with `style={{ flex: 1 }}`; it fills from the reading start in right-to-left text too.
+
+```tsx
+<Inline gap="2" align="center">
+  <Text size="sm">Seq Scan</Text>
+  <ProgressBar label="Cost 1234.5" labelHidden value={45} size="sm" tone="warning" style={{ flex: 1 }} />
+  <Text size="sm" tone="muted">cost: 1234.5</Text>
+</Inline>
+```
+
+<Canvas of={Stories.SlimInlineBarInARow} />
+
 ## Props
 
 <ArgTypes of={Stories} />

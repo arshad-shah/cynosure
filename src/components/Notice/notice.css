@@ -2,6 +2,7 @@
 .cy-notice.cy-notice {
   --_tone: var(--cy-color-info);
   --_text: var(--cy-color-info-text);
+  --_notice-on: var(--cy-color-on-info);
   box-sizing: border-box !important;
   container: cy-notice / inline-size;
   margin: 0;
@@ -21,22 +22,47 @@
   &[data-tone="accent"] {
     --_tone: var(--cy-color-accent);
     --_text: var(--cy-color-accent-text);
+    --_notice-on: var(--cy-color-on-accent);
   }
   &[data-tone="neutral"] {
     --_tone: var(--cy-color-muted);
     --_text: var(--cy-color-ink);
+    --_notice-on: var(--cy-color-bg);
   }
   &[data-tone="success"] {
     --_tone: var(--cy-color-success);
     --_text: var(--cy-color-success-text);
+    --_notice-on: var(--cy-color-on-success);
   }
   &[data-tone="warning"] {
     --_tone: var(--cy-color-warning);
     --_text: var(--cy-color-warning-text);
+    --_notice-on: var(--cy-color-on-warning);
   }
   &[data-tone="danger"] {
     --_tone: var(--cy-color-danger);
     --_text: var(--cy-color-danger-text);
+    --_notice-on: var(--cy-color-on-danger);
+  }
+  /* Neutral fills with the ink: a dark panel in light mode, a light one in dark mode. */
+  &[data-tone="neutral"][data-variant="filled"] {
+    --_tone: var(--cy-color-ink);
+  }
+  /* Filled: the tone's solid colour, everything on it in the text colour made for that fill. The close button is a
+     ghost IconButton; its hover fill is set through its own token. */
+  &[data-variant="filled"] {
+    --_text: var(--_notice-on);
+    --cy-button-hover-bg: color-mix(in oklab, var(--_notice-on) 16%, transparent);
+    --cy-button-hover-ink: var(--_notice-on);
+    border-color: var(--_tone);
+    background: var(--_tone);
+    color: var(--_notice-on);
+    & .cy-notice-body {
+      color: var(--_notice-on);
+    }
+  }
+  &[data-compact] {
+    padding: var(--cy-notice-compact-padding, var(--cy-space-4) var(--cy-space-5));
   }
 }
 /*
@@ -93,6 +119,20 @@
   /* The close button's box is taller than a line of text; keep its icon on the title line. */
   margin-block: calc((1lh - var(--cy-control-height-sm)) / 2) 0;
   margin-inline-end: calc(-1 * var(--cy-space-3));
+}
+/* Compact: tighter gaps, and the title and message run on as one line, wrapping only when they do not fit. */
+.cy-notice[data-compact] {
+  & .cy-notice-main.cy-notice-main {
+    column-gap: var(--cy-space-4);
+    row-gap: var(--cy-space-3);
+  }
+  & .cy-notice-text.cy-notice-text {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: baseline;
+    column-gap: var(--cy-space-3);
+    row-gap: 0;
+  }
 }
 @container cy-notice (inline-size < 26rem) {
   .cy-notice-main.cy-notice-main {

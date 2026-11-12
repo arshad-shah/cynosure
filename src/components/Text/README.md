@@ -23,6 +23,7 @@ import { Text } from "@arshad-shah/cynosure";
 | `tone`                | `inherit` | `inherit`, `neutral`, `muted`, `accent`, `success`, `warning`, `danger`, `info`. Lead, caption and eyebrow are muted |
 | `align`               | –         | `start`, `center`, `end`; follows the reading direction. Makes an inline element a block                             |
 | `truncate`            | `false`   | `true`: one line with an ellipsis. A number: that many lines                                                         |
+| `wrap`                | –         | `pre`: keep spaces and line breaks (still wraps at the edge). `break`: break long ids and URLs anywhere              |
 | `numeric`             | `false`   | Tabular figures, so digits line up                                                                                   |
 | `htmlFor`             | –         | With `as="label"`: id of the control                                                                                 |
 | `dateTime`            | –         | With `as="time"`: machine-readable date                                                                              |
@@ -37,6 +38,7 @@ The ref is forwarded to the element.
 - **No margins, element's own display.** `span`, `label`, `strong`, `em`, `small` and `time` are inline; `p`, `div` and `figcaption` are blocks. A `<p>` has no margin: space text with `Stack` or `Inline`.
 - **Nested Text keeps the outer type.** A Text directly inside another Text (a value, a bold word) takes the outer size, weight, face, tracking and case, and changes only what it is given. An inner Text with a `variant` is that preset again.
 - **Truncation.** One line: an inline element becomes an inline block no wider than its container. Several lines: the element becomes a block clamped to that many lines. The full text stays in the DOM.
+- **Wrapping.** `wrap="pre"` keeps the text's spaces and line breaks (`white-space: pre-wrap`), for a query or a log line. `wrap="break"` lets a long unbroken string (an id, a hash, a URL) break anywhere instead of overflowing its container (`overflow-wrap: anywhere`). `truncate` wins over both.
 - **Colour.** Tones use the readable text colours (`--cy-color-<tone>-text`), which keep 4.5:1 on the page background (tested, as are the muted presets).
 - **Uppercase is visual only.** The eyebrow is the only variant that applies `text-transform`; the text in the DOM keeps its case.
 - **Host CSS.** Host rules for `span` and `div` (weight, case, tracking, colour, size, line height) do not change it (tested).

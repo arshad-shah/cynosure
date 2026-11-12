@@ -2,7 +2,7 @@
   {
     "name": "all CSS",
     "path": "dist/styles.css",
-    "limit": "37 kB",
+    "limit": "37.8 kB",
     "gzip": true
   },
   {
@@ -180,7 +180,7 @@
   {
     "name": "Card",
     "path": ["dist/components/Card/Card.js", "dist/styles/card.css"],
-    "limit": "2 kB",
+    "limit": "2.25 kB",
     "gzip": true
   },
   {
@@ -202,7 +202,7 @@
   {
     "name": "Disclosure",
     "path": ["dist/components/Disclosure/Disclosure.js", "dist/styles/disclosure.css"],
-    "limit": "2 kB",
+    "limit": "2.1 kB",
     "gzip": true
   },
   {
@@ -213,7 +213,7 @@
       "dist/styles/disclosure.css",
       "dist/styles/accordion.css"
     ],
-    "limit": "3.25 kB",
+    "limit": "3.4 kB",
     "gzip": true
   },
   {

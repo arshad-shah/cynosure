@@ -37,6 +37,22 @@ import { Disclosure } from "@arshad-shah/cynosure";
 
 <Canvas of={Stories.Variants} />
 
+## Edge and summary end
+
+`edge` draws a coloured edge on the inline-start side, as Card's `edge`: a tone name uses that tone's colour and any other string is a CSS colour (a log entry's level, a tool call's status). Say the same thing in words too.
+
+<Canvas of={Stories.EdgeShowsAToneOrAnyColour} />
+
+`summaryEnd` puts content at the end of the summary row, before the chevron: a Badge with a count or a status, or a Button of its own. It is outside the trigger button, so its text is not part of the trigger's name and a Button there is a separate tab stop that does not toggle the section. Pressing plain content there, such as a Badge, toggles it. A long summary wraps before it.
+
+```tsx
+<Disclosure summary="Tool call: run_query" edge="success" summaryEnd={<Badge tone="success">Done</Badge>}>
+  …
+</Disclosure>
+```
+
+<Canvas of={Stories.SummaryEndSitsOutsideTheTrigger} />
+
 ## Props
 
 <ArgTypes of={Stories} />
@@ -46,7 +62,7 @@ import { Disclosure } from "@arshad-shah/cynosure";
 | Input | Result |
 | --- | --- |
 | Click, tap, <kbd>Enter</kbd>, <kbd>Space</kbd> | Opens or closes |
-| <kbd>Tab</kbd> | Skips content inside a closed section |
+| <kbd>Tab</kbd> | Skips content inside a closed section; reaches a control in `summaryEnd` after the trigger |
 
 - **Wiring:** the trigger is a button with `aria-expanded` and `aria-controls`. `headingLevel` wraps it in a heading, and `region` makes the content a region labelled by the trigger.
 - **Hidden means hidden:** after closing, the content is not focusable and not announced.
@@ -59,7 +75,7 @@ The trigger is the full width and at least 44px tall on coarse pointers.
 
 ## Theming
 
-Tokens: `--cy-disclosure-gap` (summary to chevron), `--cy-disclosure-radius` (card) and `--cy-disclosure-padding-inline`. The speed follows `--cy-motion-base`.
+Tokens: `--cy-disclosure-gap` (summary to chevron, and around `summaryEnd`), `--cy-disclosure-radius` (card), `--cy-disclosure-padding-inline` and `--cy-disclosure-edge-width` (the `edge`, 4px by default). The speed follows `--cy-motion-base`.
 
 ```ts
 createTheme({ components: { disclosure: { radius: "8px", paddingInline: "20px" } } });

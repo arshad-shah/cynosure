@@ -58,6 +58,12 @@ import { Text } from "@arshad-shah/cynosure";
 <Canvas of={Stories.TruncateOneLine} />
 <Canvas of={Stories.TruncateToLines} />
 
+## Wrapping
+
+`wrap="pre"` keeps spaces and line breaks as written (a query, a log line) and still wraps at the container's edge. `wrap="break"` breaks a long unbroken string, such as an id, a hash or a URL, anywhere rather than letting it overflow. `truncate` wins over both.
+
+<Canvas of={Stories.WrapKeepsLinesOrBreaksLongStrings} />
+
 ## Values and nesting
 
 `numeric` switches to tabular figures. A Text directly inside another Text keeps the outer size, weight and face, and changes only what it is given, so a value or a strong word inside a lead stays a lead.
@@ -80,6 +86,7 @@ Text is not interactive, so it has no keyboard behaviour.
 | `as="time"` with `dateTime` | Carries the machine-readable date |
 | `as="strong"` | Bold unless `weight` is given |
 | `align` | `start` and `end` follow the reading direction. An inline element becomes a block |
+| `wrap` | `pre` keeps spaces and line breaks; `break` breaks long strings anywhere |
 | `truncate` | An inline element becomes an inline block (one line) or a block (several lines) |
 
 - **Meaning:** Text adds no role. Pick the element for what the text is.
