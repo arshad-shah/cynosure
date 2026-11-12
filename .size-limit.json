@@ -453,7 +453,7 @@
   {
     "name": "VirtualList",
     "path": ["dist/components/VirtualList/VirtualList.js", "dist/styles/virtual-list.css"],
-    "limit": "4.6 kB",
+    "limit": "4.7 kB",
     "gzip": true
   },
   {

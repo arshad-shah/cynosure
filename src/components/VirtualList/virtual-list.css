@@ -137,3 +137,27 @@
   background: var(--cy-color-accent);
   pointer-events: none;
 }
+/* overlay: the list and the overlay share one grid cell; the overlay sits at the bottom centre and does not scroll. */
+.cy-virtual-list-frame.cy-virtual-list-frame {
+  box-sizing: border-box !important;
+  display: grid;
+  grid-template: minmax(0, 1fr) / minmax(0, 1fr);
+  margin: 0;
+  padding: 0;
+  font-size: inherit;
+  line-height: inherit;
+  letter-spacing: normal;
+  text-transform: none;
+  & > .cy-virtual-list {
+    grid-area: 1 / 1;
+  }
+}
+.cy-virtual-list-overlay.cy-virtual-list-overlay {
+  grid-area: 1 / 1;
+  z-index: 3;
+  align-self: end;
+  justify-self: center;
+  max-inline-size: 100%;
+  margin-block-end: var(--cy-virtual-list-overlay-offset, var(--cy-space-4));
+  padding: 0;
+}
