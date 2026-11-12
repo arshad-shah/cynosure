@@ -4,16 +4,6 @@ import { Button } from "../Button/Button.js";
 export interface SkipLinkTokens {
   /** Distance of the shown link from the top and inline-start edges of the window. */
   offset: string;
-  /**
-   * @deprecated No effect: the shown link is a Button (outline, accent). Restyle it through the `--cy-button-*`
-   * tokens.
-   */
-  background: string;
-  /**
-   * @deprecated No effect: the shown link is a Button (outline, accent). Restyle it through the `--cy-button-*`
-   * tokens.
-   */
-  color: string;
   /** Corner radius of the shown link. */
   radius: string;
 }

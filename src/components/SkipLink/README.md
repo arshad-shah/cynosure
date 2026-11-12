@@ -38,4 +38,3 @@ The ref goes to the `a` element.
 
 - `--cy-skip-link-offset`: distance from the top and inline-start edges of the window (`--cy-space-4`)
 - `--cy-skip-link-radius`: corner radius (`--cy-radius-md`)
-- `--cy-skip-link-background`, `--cy-skip-link-color`: deprecated, no effect. The shown link is a Button (outline, accent); restyle it through the `--cy-button-*` tokens.
