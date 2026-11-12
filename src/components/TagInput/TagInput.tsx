@@ -5,10 +5,10 @@ import {
   type ReactNode,
   useEffect,
   useId,
-  useLayoutEffect,
   useRef,
   useState,
 } from "react";
+import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js";
 import { useControllableState } from "../../foundations/controllable.js";
 import { isRtl } from "../../foundations/dir.js";
 import { HiddenValue } from "../../foundations/HiddenValue/HiddenValue.js";
@@ -199,7 +199,7 @@ export function TagInput({
     [...separators, "\n"].reduce<string[]>((parts, sep) => parts.flatMap((p) => p.split(sep)), [s]);
 
   // The list drops from the whole field (chips and input), found before the layer shows.
-  useLayoutEffect(() => {
+  useClientLayoutEffect(() => {
     anchor.current = input.current?.closest<HTMLElement>(".cy-text-field") ?? null;
   });
   useListboxLayer({ anchor, list, open: listOpen, onClose: () => setOpen(false) });
