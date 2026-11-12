@@ -34,7 +34,7 @@
   },
   {
     "name": "IconButton",
-    "path": ["dist/components/IconButton/IconButton.js", "dist/styles/iconbutton.css"],
+    "path": ["dist/components/IconButton/IconButton.js", "dist/styles/tooltip.css"],
     "limit": "1 kB",
     "gzip": true
   },
@@ -241,7 +241,7 @@
       "dist/foundations/DialogBase/DialogBase.js",
       "dist/styles/dialog.css"
     ],
-    "limit": "3.5 kB",
+    "limit": "3.6 kB",
     "gzip": true
   },
   {

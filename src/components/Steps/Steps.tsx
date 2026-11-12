@@ -120,7 +120,7 @@ export function Steps({
               {step.description != null && (
                 <span className="cy-steps-description cy-reset">{step.description}</span>
               )}
-              {status && <span className="cy-steps-hidden">{`, ${text[status]}`}</span>}
+              {status && <span className="cy-visually-hidden">{`, ${text[status]}`}</span>}
             </span>
           </>
         );

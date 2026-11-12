@@ -24,5 +24,11 @@ export interface SheetProps extends DialogProps {
 
 /** A Dialog docked to an edge: same focus, Escape, backdrop and labels behaviour, sliding in from its side. */
 export function Sheet({ side = "bottom", ...props }: SheetProps) {
-  return <DialogFrame {...props} side={side} />;
+  return (
+    <DialogFrame
+      {...props}
+      side={side}
+      parts={{ root: "cy-sheet", panel: "cy-sheet-panel", actions: "cy-sheet-actions" }}
+    />
+  );
 }

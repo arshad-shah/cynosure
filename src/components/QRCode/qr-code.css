@@ -17,6 +17,10 @@
 
 /* The logo sits on the light colour in the middle; level H recovers the modules it covers. */
 .cy-qr-code-icon.cy-qr-code-icon {
+  /* An Icon logo fills the box, whatever its named size (Icon's size tokens, inherited). */
+  --cy-icon-size: 100%;
+  --cy-icon-size-sm: 100%;
+  --cy-icon-size-lg: 100%;
   box-sizing: border-box !important;
   position: absolute;
   inset: 0;
@@ -37,11 +41,6 @@
   & > * {
     max-inline-size: 100%;
     max-block-size: 100%;
-  }
-  & > .cy-icon {
-    --cy-icon-size: 100%;
-    inline-size: 100%;
-    block-size: 100%;
   }
 }
 

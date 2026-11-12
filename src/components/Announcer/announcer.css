@@ -1,16 +1,8 @@
-/* announcer: two live regions, hidden from sight but not from assistive technology. */
+/* announcer: two live regions, hidden from sight but not from assistive technology (.cy-visually-hidden). Never
+   display: none, which would take them out of the accessibility tree. */
 .cy-announcer.cy-announcer {
   box-sizing: border-box !important;
-  position: absolute !important;
   display: block !important;
-  inline-size: var(--cy-border-width) !important;
-  block-size: var(--cy-border-width) !important;
-  margin: calc(var(--cy-border-width) * -1) !important;
-  padding: 0 !important;
-  overflow: hidden !important;
-  clip-path: inset(50%) !important;
-  white-space: nowrap !important;
-  border: 0 !important;
   font-size: var(--cy-font-size-md);
   letter-spacing: normal;
   text-transform: none;

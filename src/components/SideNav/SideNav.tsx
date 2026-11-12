@@ -162,6 +162,8 @@ export function SideNav({
 }: SideNavProps) {
   const id = useId();
   const bar = layout === "bar";
+  // The collapsed rail: icons only, the labels and headings hidden from sight (still their names).
+  const rail = collapsed && !bar;
   const all = items.flatMap((entry) => (isSection(entry) ? entry.items : [entry]));
   const places = all.filter((entry) => !isAction(entry)) as NavItem[];
   const [expanded, setExpanded] = useState(
@@ -186,7 +188,8 @@ export function SideNav({
   const content = (item: NavItem, group?: boolean) => (
     <>
       {item.icon && <Icon icon={item.icon} className="cy-side-nav-icon" />}
-      <span className="cy-side-nav-label cy-reset">{item.label}</span>
+      {/* In the rail the label is hidden from sight, still the row's name. */}
+      <span className={`cy-side-nav-label cy-reset${rail ? " cy-visually-hidden" : ""}`}>{item.label}</span>
       {item.badge != null && <span className="cy-side-nav-badge cy-reset">{item.badge}</span>}
       {group && !bar && <Icon icon={chevronDown} className="cy-side-nav-chevron" />}
     </>
@@ -208,6 +211,7 @@ export function SideNav({
         label={item.label}
         size={bar ? "lg" : size}
         tooltipPlacement={bar ? "top" : "end"}
+        wrapperClassName="cy-side-nav-tip"
       />
     ) : (
       <Button {...shared} icon={item.icon} size={size} fullWidth>
@@ -288,7 +292,7 @@ export function SideNav({
         ) : (
           <li key={item.id} className="cy-side-nav-item cy-reset">
             {collapsed && !bar ? (
-              <Tooltip content={item.label} placement="end">
+              <Tooltip content={item.label} placement="end" className="cy-side-nav-tip">
                 {control(item)}
               </Tooltip>
             ) : (
@@ -320,14 +324,17 @@ export function SideNav({
       className={className ? `cy-side-nav ${className}` : "cy-side-nav"}
       aria-label={label}
       data-size={size}
-      data-collapsed={collapsed && !bar ? "" : undefined}
+      data-collapsed={rail ? "" : undefined}
       data-layout={layout}
       style={style}
     >
       {blocks.map((block, i) =>
         "section" in block ? (
           <div key={`section-${block.section.label}`} className="cy-side-nav-section cy-reset">
-            <span className="cy-side-nav-heading cy-reset" id={`${id}-s${i}`}>
+            <span
+              className={`cy-side-nav-heading cy-reset${rail ? " cy-visually-hidden" : ""}`}
+              id={`${id}-s${i}`}
+            >
               {block.section.label}
             </span>
             {list(block.section.items, 0, undefined, false, `${id}-s${i}`)}

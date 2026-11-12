@@ -57,23 +57,13 @@
   flex: none;
   cursor: grab;
   touch-action: none;
-  [data-moving] > .cy-tooltip-anchor > & {
+  .cy-sortable-list-item[data-moving] & {
     cursor: grabbing;
   }
 }
 .cy-sortable-list-content.cy-sortable-list-content {
   flex: 1;
   min-inline-size: 0;
-  font-size: inherit;
-}
-.cy-sortable-list-hidden.cy-sortable-list-hidden {
-  position: absolute;
-  inline-size: var(--cy-border-width);
-  block-size: var(--cy-border-width);
-  margin: calc(var(--cy-border-width) * -1);
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
   font-size: inherit;
 }
 @media (prefers-reduced-motion: reduce) {

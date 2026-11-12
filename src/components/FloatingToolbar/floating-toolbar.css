@@ -29,10 +29,11 @@
   inline-size: max-content;
   max-inline-size: calc(100vw - 2 * var(--cy-space-4));
   border-radius: var(--cy-floating-toolbar-radius, var(--cy-radius-lg));
-  & > .cy-toolbar.cy-toolbar {
-    flex-wrap: nowrap;
-    overflow-x: auto;
-  }
+}
+/* The floating row keeps to one line and scrolls sideways (tripled to win over Toolbar's own root rules). */
+.cy-floating-toolbar-row.cy-floating-toolbar-row.cy-floating-toolbar-row {
+  flex-wrap: nowrap;
+  overflow-x: auto;
 }
 .cy-docked-toolbar.cy-docked-toolbar {
   inset: auto 0 var(--_inset, 0) 0;

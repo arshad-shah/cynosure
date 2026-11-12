@@ -1,4 +1,5 @@
-/* copy-button: an IconButton plus a visually hidden live status; the icon takes the result's tone for a moment. */
+/* copy-button: an IconButton plus a visually hidden live status (.cy-visually-hidden); the icon takes the result's
+   colour for a moment (IconButton's iconColor). */
 .cy-copy-button.cy-copy-button {
   box-sizing: border-box !important;
   position: relative;
@@ -8,22 +9,4 @@
   letter-spacing: normal;
   text-transform: none;
   vertical-align: middle;
-  &[data-state="copied"] .cy-icon {
-    color: var(--cy-color-success-text);
-  }
-  &[data-state="failed"] .cy-icon {
-    color: var(--cy-color-danger-text);
-  }
-}
-.cy-copy-button-status.cy-copy-button-status {
-  position: absolute !important;
-  inline-size: var(--cy-border-width);
-  block-size: var(--cy-border-width);
-  margin: calc(var(--cy-border-width) * -1);
-  padding: 0;
-  overflow: hidden;
-  clip-path: inset(50%);
-  white-space: nowrap;
-  border: 0;
-  font-size: var(--cy-font-size-md);
 }

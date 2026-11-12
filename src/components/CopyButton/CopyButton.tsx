@@ -113,11 +113,18 @@ export function CopyButton({
         label={label}
         size={size}
         variant={variant}
+        iconColor={
+          state === "copied"
+            ? "var(--cy-color-success-text)"
+            : state === "failed"
+              ? "var(--cy-color-danger-text)"
+              : undefined
+        }
         disabled={disabled}
         onClick={() => void run()}
         {...(tooltipPlacement ? { tooltipPlacement } : {})}
       />
-      <span className="cy-copy-button-status cy-reset" role="status">
+      <span className="cy-copy-button-status cy-reset cy-visually-hidden" role="status">
         {message}
       </span>
     </span>

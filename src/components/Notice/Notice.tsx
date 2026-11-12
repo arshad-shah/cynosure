@@ -85,6 +85,7 @@ export function Notice({
             label={labels?.dismiss ?? "Dismiss"}
             variant="ghost"
             size="sm"
+            wrapperClassName="cy-notice-dismiss"
             onClick={() => {
               onDismiss?.();
               if (!onDismiss) setHidden(true);

@@ -1,8 +1,8 @@
 import { type CSSProperties, forwardRef, type ReactNode, useState } from "react";
-import { LinkBase } from "../../foundations/LinkBase/LinkBase.js";
 import { menu } from "../../icons/menu.js";
 import { Container, type ContainerProps } from "../Container/Container.js";
 import { IconButton } from "../IconButton/IconButton.js";
+import { Link } from "../Link/Link.js";
 import { Sheet } from "../Sheet/Sheet.js";
 import { SideNav } from "../SideNav/SideNav.js";
 import { SkipLink } from "../SkipLink/SkipLink.js";
@@ -133,22 +133,26 @@ export const SiteHeader = forwardRef<HTMLElement, SiteHeaderProps>(function Site
             (brandHref === false ? (
               <div className="cy-site-header-brand">{brand}</div>
             ) : (
-              <LinkBase href={brandHref} className="cy-site-header-brand">
-                {brand}
-              </LinkBase>
+              // A Link (its focus ring and colour), drawn as the brand by the span inside it.
+              <Link href={brandHref} tone="neutral" underline="none" className="cy-site-header-brand-link">
+                <span className="cy-site-header-brand">{brand}</span>
+              </Link>
             ))}
           {nav.length > 0 && (
             <nav aria-label={text.nav} className="cy-site-header-nav cy-reset">
               <ul className="cy-site-header-list cy-reset">
                 {nav.map((item) => (
                   <li key={item.href} className="cy-site-header-item cy-reset">
-                    <LinkBase
+                    {/* A Link, drawn as a pill by the span inside it. */}
+                    <Link
                       href={item.href}
+                      tone="neutral"
+                      underline="none"
                       aria-current={item.current ? "page" : undefined}
-                      className="cy-site-header-link"
+                      className="cy-site-header-link-anchor"
                     >
-                      {item.label}
-                    </LinkBase>
+                      <span className="cy-site-header-link">{item.label}</span>
+                    </Link>
                   </li>
                 ))}
               </ul>

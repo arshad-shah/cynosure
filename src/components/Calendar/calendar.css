@@ -68,10 +68,6 @@
   gap: var(--cy-space-2);
   font-size: inherit;
 }
-/* The month arrows point the way time runs in the reading direction. */
-.cy-calendar-flip.cy-calendar-flip:dir(rtl) .cy-icon {
-  scale: -1 1;
-}
 .cy-calendar-grid.cy-calendar-grid {
   inline-size: auto;
   margin: 0;

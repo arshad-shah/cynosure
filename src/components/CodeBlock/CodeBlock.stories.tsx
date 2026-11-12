@@ -212,7 +212,9 @@ export const MarkedLines: Story = {
     );
     await expect(mark.getBoundingClientRect().height).toBeCloseTo(line, 0);
     await expect(canvasElement.querySelector("[data-active]")).toHaveTextContent("3");
-    await expect(canvasElement.querySelector(".cy-visually-hidden")).toHaveTextContent("Line 3 highlighted");
+    await expect(canvasElement.querySelector("figure > .cy-visually-hidden")).toHaveTextContent(
+      "Line 3 highlighted",
+    );
   },
 };
 
@@ -221,7 +223,7 @@ export const SeveralMarkedLines: Story = {
   play: async ({ canvasElement }) => {
     // Lines that do not exist are ignored; the rest are read out together.
     await expect(canvasElement.querySelectorAll(".cy-code-block-mark")).toHaveLength(2);
-    await expect(canvasElement.querySelector(".cy-visually-hidden")).toHaveTextContent(
+    await expect(canvasElement.querySelector("figure > .cy-visually-hidden")).toHaveTextContent(
       "Lines 1, 2 highlighted",
     );
   },

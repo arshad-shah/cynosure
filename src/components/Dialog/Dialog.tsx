@@ -65,6 +65,11 @@ export interface DialogProps {
 /** Internal: a Sheet is the same dialog docked to an edge. */
 export interface DialogFrameProps extends DialogProps {
   side?: "bottom" | "end" | "start";
+  /**
+   * Classes of the component built on the frame (Sheet), added to the dialog, the panel and the actions, so that
+   * component draws its own look in its own stylesheet.
+   */
+  parts?: { root: string; panel: string; actions: string };
 }
 
 const DEFAULT_LABELS: DialogLabels = { close: "Close" };
@@ -105,6 +110,7 @@ export function DialogFrame({
   keepMounted = false,
   labels,
   side,
+  parts,
   className,
   style,
   children,
@@ -193,7 +199,7 @@ export function DialogFrame({
       open={isOpen}
       onCancel={dismiss}
       onClose={() => setOpen(false)}
-      className="cy-dialog"
+      className={parts ? `cy-dialog ${parts.root}` : "cy-dialog"}
       tabIndex={-1}
       data-size={size}
       data-side={side}
@@ -202,7 +208,7 @@ export function DialogFrame({
     >
       {mounted && (
         <div
-          className={className ? `cy-dialog-panel cy-reset ${className}` : "cy-dialog-panel cy-reset"}
+          className={["cy-dialog-panel cy-reset", parts?.panel, className].filter(Boolean).join(" ")}
           style={style}
         >
           <div className="cy-dialog-header cy-reset">
@@ -216,6 +222,7 @@ export function DialogFrame({
                 variant="ghost"
                 size="sm"
                 tooltipPlacement="bottom"
+                wrapperClassName="cy-dialog-close"
                 onClick={() => setOpen(false)}
               />
             )}
@@ -235,7 +242,10 @@ export function DialogFrame({
             {children}
           </div>
           {actions && (
-            <div ref={footer} className="cy-dialog-actions cy-reset">
+            <div
+              ref={footer}
+              className={parts ? `cy-dialog-actions cy-reset ${parts.actions}` : "cy-dialog-actions cy-reset"}
+            >
               {actions}
             </div>
           )}

@@ -125,7 +125,9 @@ export function FloatingToolbar({
       onFocus={focus.onFocus}
       onKeyDown={focus.onKeyDown}
     >
-      <Toolbar label={label}>{children}</Toolbar>
+      <Toolbar label={label} className="cy-floating-toolbar-row">
+        {children}
+      </Toolbar>
     </div>
   );
 }

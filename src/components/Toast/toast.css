@@ -159,8 +159,8 @@
   color: var(--cy-color-muted);
   font-size: var(--cy-font-size-sm);
 }
-.cy-toast > .cy-button,
-.cy-toast > .cy-tooltip-anchor {
+.cy-toast-action.cy-toast-action,
+.cy-toast-dismiss.cy-toast-dismiss {
   flex: none;
 }
 

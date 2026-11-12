@@ -65,7 +65,7 @@ export function Announcer({ clearAfter = 5000, children }: AnnouncerProps) {
   return (
     <AnnounceContext.Provider value={announce}>
       {children}
-      <div className="cy-announcer">
+      <div className="cy-announcer cy-visually-hidden">
         <div className="cy-announcer-region cy-reset" role="status" aria-live="polite" aria-atomic="true">
           {polite.text && <span key={polite.n}>{polite.text}</span>}
         </div>

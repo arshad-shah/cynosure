@@ -1,7 +1,8 @@
 /*
  * site-header: the top bar of a document-scrolled site. A Container row of brand, navigation, actions and (narrow)
  * a menu button. The header is a size container, so the navigation collapses on the header's own width, CSS only.
- * Inner parts first (lower specificity), root last.
+ * The brand and the navigation links are Links (underline none: their focus ring, colour and link behaviour); the
+ * brand and the pill are drawn by the span inside each. Inner parts first (lower specificity), root last.
  */
 .cy-site-header-bar.cy-site-header-bar {
   display: flex;
@@ -11,8 +12,24 @@
   padding-block: var(--cy-space-3);
 }
 
-.cy-site-header-brand.cy-site-header-brand {
+/* The Links around the brand and the pills: the hit area, never smaller than --_hit. */
+.cy-site-header-brand-link.cy-site-header-brand-link,
+.cy-site-header-link-anchor.cy-site-header-link-anchor {
   position: relative;
+  &::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    translate: -50% -50%;
+    inline-size: max(100%, var(--_hit));
+    block-size: max(100%, var(--_hit));
+  }
+}
+.cy-site-header-brand-link.cy-site-header-brand-link {
+  flex: none;
+}
+.cy-site-header-brand.cy-site-header-brand {
   display: inline-flex;
   flex: none;
   align-items: center;
@@ -28,19 +45,6 @@
   text-transform: none;
   text-decoration: none;
   border-radius: var(--cy-radius-sm);
-  &::before {
-    content: "";
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    translate: -50% -50%;
-    inline-size: max(100%, var(--_hit));
-    block-size: max(100%, var(--_hit));
-  }
-  &:focus-visible {
-    outline: var(--cy-border-focus) solid var(--cy-color-ring);
-    outline-offset: calc(var(--cy-border-width) * 2);
-  }
 }
 .cy-site-header-nav {
   flex: 1 1 auto;
@@ -62,7 +66,6 @@
 }
 
 .cy-site-header-link.cy-site-header-link {
-  position: relative;
   display: inline-flex;
   align-items: center;
   min-block-size: var(--cy-control-height-md);
@@ -81,26 +84,10 @@
   transition:
     background-color var(--cy-motion-fast) var(--cy-motion-ease),
     color var(--cy-motion-fast) var(--cy-motion-ease);
-  &::before {
-    content: "";
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    translate: -50% -50%;
-    inline-size: max(100%, var(--_hit));
-    block-size: max(100%, var(--_hit));
-  }
-  &:hover {
+  &:hover,
+  [aria-current="page"] > & {
     background: var(--cy-site-header-link-highlight, var(--cy-color-soft));
     color: var(--cy-site-header-link-current-color, var(--cy-color-ink));
-  }
-  &[aria-current="page"] {
-    background: var(--cy-site-header-link-highlight, var(--cy-color-soft));
-    color: var(--cy-site-header-link-current-color, var(--cy-color-ink));
-  }
-  &:focus-visible {
-    outline: var(--cy-border-focus) solid var(--cy-color-ring);
-    outline-offset: calc(var(--cy-border-width) * 2);
   }
 }
 
@@ -189,7 +176,7 @@
 }
 
 @media (forced-colors: active) {
-  .cy-site-header-link.cy-site-header-link[aria-current="page"] {
+  [aria-current="page"] > .cy-site-header-link.cy-site-header-link {
     text-decoration: underline;
   }
 }
