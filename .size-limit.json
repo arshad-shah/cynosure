@@ -715,5 +715,11 @@
     "path": ["dist/components/ErrorBoundary/ErrorBoundary.js", "dist/styles/error-boundary.css"],
     "limit": "1 kB",
     "gzip": true
+  },
+  {
+    "name": "DataGrid (JS + CSS)",
+    "path": ["dist/components/DataGrid/DataGrid.js", "dist/styles/data-grid.css"],
+    "limit": "3 kB",
+    "gzip": true
   }
 ]

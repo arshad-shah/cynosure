@@ -1,0 +1,62 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./DataGrid.stories";
+
+<Meta of={Stories} />
+
+# DataGrid
+
+A read-only grid for large results: only the rows and columns in view are rendered, so a hundred thousand rows by fifty columns stay quick.
+
+<Canvas of={Stories.AHundredThousandRowsByFiftyColumns} />
+
+## When to use
+
+- **Query results and table data**: many rows, many columns, people scan, sort, resize, select and copy.
+
+**Use something else when:**
+- the data is a few dozen rows people read rather than work through: [Table](?path=/docs/components-table--docs), a semantic table
+- rows have no columns: [VirtualList](?path=/docs/components-virtuallist--docs)
+
+## Usage
+
+```tsx
+import { DataGrid } from "@arshad-shah/cynosure";
+
+<DataGrid
+  label="Results"
+  columns={[
+    { key: "id", header: "id", width: 80, align: "end", sortable: true },
+    { key: "name", header: "name", sortable: true, resizable: true },
+  ]}
+  rows={rows}
+  getRowId={(row) => String(row.id)}
+/>
+```
+
+Columns are `width` CSS pixels wide (default 160). `cell` formats a value for display; `value` is the raw value that sorting compares and copying writes (default `row[key]`). Set the grid's height with `style={{ blockSize: … }}` or the `height` token.
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+An APG grid with one tab stop. The focused cell is scrolled into view, below the sticky header, and stays rendered while it is scrolled away.
+
+| Key | Does |
+| --- | --- |
+| Arrows | Move between cells; Left and Right follow the reading direction; Up from the first row reaches the header |
+| Home / End | First or last cell of the row |
+| Ctrl+Home / Ctrl+End | First or last cell of the grid |
+| Page Up / Page Down | A view of rows up or down |
+| Tab | Leaves the grid |
+
+## Theming
+
+Tokens: `--cy-data-grid-height`, `--cy-data-grid-row-height`, `--cy-data-grid-header-height`, `--cy-data-grid-header-background`, `--cy-data-grid-selected-background`, `--cy-data-grid-cell-padding`, `--cy-data-grid-null-color`, `--cy-data-grid-number-color`.
+
+## Related
+
+- [Table](?path=/docs/components-table--docs): a short, semantic table
+- [VirtualList](?path=/docs/components-virtuallist--docs): a long list without columns
+- [Pagination](?path=/docs/components-pagination--docs): paging under the grid

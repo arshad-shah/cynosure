@@ -2,6 +2,7 @@ import { type CSSProperties, type ReactNode, useId, useMemo } from "react";
 import { ButtonBase } from "../../foundations/ButtonBase/ButtonBase.js";
 import { useControllableState } from "../../foundations/controllable.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
+import { nextSort, sortRows, type TableSort } from "../../foundations/sort.js";
 import { arrowDown } from "../../icons/arrow-down.js";
 import { arrowUp } from "../../icons/arrow-up.js";
 import { chevronsUpDown } from "../../icons/chevrons-up-down.js";
@@ -23,11 +24,7 @@ declare module "../../tokens/schema.js" {
   }
 }
 
-export type SortDirection = "ascending" | "descending";
-export interface TableSort {
-  key: string;
-  direction: SortDirection;
-}
+export type { SortDirection, TableSort } from "../../foundations/sort.js";
 
 export interface TableColumn<Row> {
   key: string;
@@ -102,14 +99,7 @@ const DEFAULT_LABELS: TableLabels = {
   empty: "Nothing to show",
 };
 
-const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: "base" });
 const cellValue = <Row,>(row: Row, key: string) => (row as Record<string, unknown>)[key];
-
-function compare(a: unknown, b: unknown) {
-  // Empty values sort last in either direction (handled by the caller).
-  if (typeof a === "number" && typeof b === "number") return a - b;
-  return collator.compare(String(a), String(b));
-}
 
 /**
  * Rows of data with headers: sortable columns, optional row selection, and a sticky header. A semantic `<table>`, so
@@ -147,23 +137,10 @@ export function Table<Row>({
     const column = columns.find((c) => c.key === currentSort.key);
     if (!column) return rows;
     const get = (row: Row) => (column.sortValue ? column.sortValue(row) : cellValue(row, column.key));
-    const sign = currentSort.direction === "ascending" ? 1 : -1;
-    return [...rows].sort((a, b) => {
-      const x = get(a);
-      const y = get(b);
-      const xEmpty = x === null || x === undefined || x === "";
-      const yEmpty = y === null || y === undefined || y === "";
-      if (xEmpty || yEmpty) return xEmpty === yEmpty ? 0 : xEmpty ? 1 : -1;
-      return compare(x, y) * sign;
-    });
+    return sortRows(rows, get, currentSort.direction);
   }, [rows, columns, currentSort, manualSort]);
 
-  // Ascending, then descending, then unsorted.
-  const cycle = (key: string) => {
-    if (currentSort?.key !== key) setSort({ key, direction: "ascending" });
-    else if (currentSort.direction === "ascending") setSort({ key, direction: "descending" });
-    else setSort(null);
-  };
+  const cycle = (key: string) => setSort(nextSort(currentSort, key));
   const allIds = rows.map(getRowId);
   /** `next` is the choice among the rows shown; ids not among them (another page, filtered out) stay selected. */
   const setSelected = (next: Set<string>) => {
