@@ -1,0 +1,40 @@
+/*
+ * section: a full-width band. A background per variant, padding above and below, and nothing at the sides (the inner
+ * Container adds the gutters). It fills its parent's width; for a band from edge to edge of the window, place it
+ * outside any Container.
+ */
+.cy-section.cy-section {
+  /* The paddingBlock prop sets this inline; declaring it here stops a nested Section inheriting its parent's. */
+  --_pad-block: var(--cy-section-padding-block, calc(var(--cy-space-10) * 2));
+  box-sizing: border-box !important;
+  display: block;
+  inline-size: 100%;
+  min-inline-size: 0;
+  margin: 0;
+  padding: var(--_pad-block) 0;
+  border: 0;
+  background: transparent;
+  color: var(--cy-color-ink);
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-font-size-md);
+  font-weight: var(--cy-font-weight-regular);
+  line-height: var(--cy-font-line-height);
+  letter-spacing: normal;
+  text-transform: none;
+  &[data-variant="surface"] {
+    background: var(--cy-section-surface, var(--cy-color-surface));
+  }
+  &[data-variant="soft"] {
+    background: var(--cy-section-soft, var(--cy-color-soft));
+  }
+  &[data-variant="accent"] {
+    background: var(--cy-section-accent, var(--cy-color-accent-soft));
+  }
+}
+
+@media (forced-colors: active) {
+  /* Backgrounds are dropped in forced colours: a line keeps neighbouring bands apart. */
+  .cy-section.cy-section:not([data-variant="plain"]) {
+    border-block: var(--cy-border-width) solid CanvasText;
+  }
+}

@@ -1,0 +1,141 @@
+/*
+ * site-footer: a Container with two rows. The top row holds the brand and the link columns, which wrap onto more rows
+ * as the footer narrows; the bottom row holds the legal text and the social links, and stacks when narrow.
+ * Inner parts first (lower specificity), root last.
+ */
+.cy-site-footer-inner.cy-site-footer-inner {
+  display: grid;
+  gap: var(--cy-site-footer-padding-block, var(--cy-space-10));
+}
+
+.cy-site-footer-top {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--cy-space-10);
+}
+
+.cy-site-footer-brand {
+  display: grid;
+  flex: 1 1 16rem;
+  align-content: start;
+  gap: var(--cy-space-4);
+  max-inline-size: 24rem;
+}
+
+.cy-site-footer-logo.cy-site-footer-logo {
+  margin: 0;
+  color: var(--cy-color-ink);
+  font-family: var(--cy-font-display, var(--cy-font-sans));
+  font-size: var(--cy-font-size-lg);
+  font-weight: var(--cy-font-weight-bold);
+  line-height: var(--cy-font-line-height);
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+.cy-site-footer-nav {
+  display: grid;
+  flex: 3 1 24rem;
+  grid-template-columns: repeat(
+      auto-fill,
+      minmax(min(100%, var(--cy-site-footer-column-min-width, 10rem)), 1fr)
+    );
+  gap: var(--cy-space-8);
+}
+
+.cy-site-footer-column {
+  display: grid;
+  align-content: start;
+  gap: var(--cy-space-5);
+  min-inline-size: 0;
+}
+
+.cy-site-footer-links {
+  display: grid;
+  gap: var(--cy-space-2);
+  padding: 0;
+  list-style: none;
+}
+
+/* Each row is at least one hit area tall, so neighbouring links never share a finger's target. */
+.cy-site-footer-item {
+  display: flex;
+  align-items: center;
+  min-block-size: var(--_hit);
+  padding: 0;
+}
+
+/* Layout of the reused Link: a hit area at least as large as the row; its look stays its own. */
+.cy-site-footer .cy-site-footer-link.cy-site-footer-link {
+  position: relative;
+  /* Declared here: a Link passes on whatever line height its host page sets. */
+  line-height: var(--cy-font-line-height);
+  &::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    translate: -50% -50%;
+    inline-size: max(100%, var(--_hit));
+    block-size: max(100%, var(--_hit));
+  }
+}
+
+.cy-site-footer-bottom {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--cy-space-6);
+  &[data-divided] {
+    padding-block-start: var(--cy-space-8);
+    border-block-start: var(--cy-border-width) solid var(--cy-site-footer-border, var(--cy-color-line));
+  }
+}
+
+.cy-site-footer-legal.cy-site-footer-legal {
+  margin: 0;
+  color: var(--cy-color-muted);
+  font-family: inherit;
+  font-size: var(--cy-font-size-sm);
+  font-weight: var(--cy-font-weight-regular);
+  line-height: var(--cy-font-line-height);
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+.cy-site-footer-social {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--cy-space-2);
+  margin-inline-start: auto;
+}
+
+.cy-site-footer.cy-site-footer {
+  --_hit: var(--cy-hit-min, 24px);
+  box-sizing: border-box !important;
+  display: block;
+  inline-size: 100%;
+  margin: 0;
+  padding: var(--cy-site-footer-padding-block, var(--cy-space-10)) 0;
+  border: 0;
+  border-block-start: var(--cy-border-width) solid var(--cy-site-footer-border, var(--cy-color-line));
+  background: var(--cy-site-footer-background, var(--cy-color-surface));
+  color: var(--cy-color-ink);
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-font-size-md);
+  font-weight: var(--cy-font-weight-regular);
+  line-height: var(--cy-font-line-height);
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+@media (pointer: coarse) {
+  .cy-site-footer.cy-site-footer {
+    --_hit: var(--cy-hit-coarse, 44px);
+  }
+  .cy-site-footer-links {
+    gap: 0;
+  }
+}

@@ -47,29 +47,10 @@
   background: var(--cy-app-shell-header-background, var(--cy-color-surface));
   font-size: inherit;
 }
-.cy-app-shell-skip.cy-app-shell-skip {
+/* The skip link (a SkipLink) shows at the shell's own corner, not the window's, so it stays inside a side panel. */
+.cy-app-shell > .cy-app-shell-skip.cy-skip-link.cy-skip-link {
   position: absolute;
   z-index: 1;
-  inset-block-start: var(--cy-space-2);
-  inset-inline-start: var(--cy-space-2);
-  padding: var(--cy-space-3) var(--cy-space-5);
-  border-radius: var(--cy-radius-md);
-  background: var(--cy-color-surface-raised);
-  color: var(--cy-color-accent-text);
-  font-size: inherit;
-  font-weight: var(--cy-font-weight-medium);
-  text-decoration: underline;
-  &:not(:focus) {
-    inline-size: var(--cy-border-width);
-    block-size: var(--cy-border-width);
-    padding: 0;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
-  }
-  &:focus-visible {
-    outline: var(--cy-border-focus) solid var(--cy-color-ring);
-  }
 }
 .cy-app-shell-header.cy-app-shell-header {
   grid-area: header;

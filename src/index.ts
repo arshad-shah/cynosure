@@ -243,6 +243,7 @@ export {
 export { Prose, type ProseProps, type ProseTokens } from "./components/Prose/index.js";
 export { RadioGroup, type RadioGroupProps, type RadioOption } from "./components/RadioGroup/index.js";
 export { SearchField, type SearchFieldProps } from "./components/SearchField/index.js";
+export { Section, type SectionProps, type SectionTokens } from "./components/Section/index.js";
 export {
   SegmentedControl,
   type SegmentedControlProps,
@@ -296,7 +297,27 @@ export {
   type SignaturePadTokens,
   STEADY_PRESSURE,
 } from "./components/SignaturePad/index.js";
+export {
+  SiteFooter,
+  type SiteFooterColumn,
+  type SiteFooterLabels,
+  type SiteFooterProps,
+  type SiteFooterTokens,
+} from "./components/SiteFooter/index.js";
+export {
+  SiteHeader,
+  type SiteHeaderLabels,
+  type SiteHeaderLink,
+  type SiteHeaderProps,
+  type SiteHeaderTokens,
+} from "./components/SiteHeader/index.js";
 export { Skeleton, type SkeletonProps, type SkeletonTokens } from "./components/Skeleton/index.js";
+export {
+  SkipLink,
+  type SkipLinkLabels,
+  type SkipLinkProps,
+  type SkipLinkTokens,
+} from "./components/SkipLink/index.js";
 export {
   Slider,
   type SliderLabels,
@@ -391,6 +412,7 @@ export {
   type VirtualListProps,
   type VirtualListTokens,
 } from "./components/VirtualList/index.js";
+export { VisuallyHidden, type VisuallyHiddenProps } from "./components/VisuallyHidden/index.js";
 export {
   ZoomControls,
   type ZoomControlsLabels,

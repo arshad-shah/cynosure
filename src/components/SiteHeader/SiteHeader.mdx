@@ -1,0 +1,95 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./SiteHeader.stories";
+
+<Meta of={Stories} />
+
+# SiteHeader
+
+The top bar of a website that scrolls as a document: a skip link, the brand, the site navigation and actions. It sticks to the top of the window, and on narrow screens the navigation moves into a menu sheet.
+
+<Canvas of={Stories.BrandNavigationAndActions} />
+
+## When to use
+
+- **Marketing and documentation sites** built with Astro or React, where the window scrolls the whole page.
+
+**Use something else when:**
+- you are building an app with a side navigation and its own scrolling content area: [AppShell](?path=/docs/components-appshell--docs)
+- you need the top of a page's content (title, description, actions): [PageHeader](?path=/docs/components-pageheader--docs)
+
+## Usage
+
+```tsx
+import { Button, SiteHeader, ThemeToggle } from "@arshad-shah/cynosure";
+
+<SiteHeader
+  brand="Acme"
+  nav={[
+    { label: "Docs", href: "/docs", current: true },
+    { label: "Blog", href: "/blog" },
+  ]}
+  actions={<><ThemeToggle /><Button href="/sign-in">Sign in</Button></>}
+/>
+<main id="main">…</main>
+```
+
+In Astro, render it as a React island with `client:load` (or `client:visible`) so the menu button can open the sheet. Without hydration the bar, the links and the skip link still work; only the menu does not open.
+
+## Narrow screens
+
+Below `collapseBelow` (the header's own width: `sm` 40rem, `md` 48rem, `lg` 64rem) the links move into a sheet opened from a menu button. The actions stay in the bar.
+
+<Canvas of={Stories.NarrowMenuWithTheKeyboard} />
+
+## Sticky
+
+By default the header stays at the top while the page scrolls, over a blurred view of the page. `sticky={false}` lets it scroll away.
+
+<Canvas of={Stories.StickyWhileThePageScrolls} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+| Input | Result |
+| --- | --- |
+| <kbd>Tab</kbd> | Skip link, brand, navigation links, actions, then the page |
+| <kbd>Enter</kbd> on the skip link | Focus moves to the main content |
+| <kbd>Enter</kbd>, <kbd>Space</kbd>, click on the menu button | Opens the menu sheet; focus moves into it |
+| <kbd>Escape</kbd> | Closes the sheet; focus returns to the menu button |
+| Choosing a link in the sheet | Closes the sheet; the browser follows the link |
+
+- **Landmarks:** the `header` is the banner landmark at the top level of the page. The links are a list in a `nav` named "Main" (`labels.nav`), in the bar and in the sheet.
+- **Current page:** the item with `current` gets `aria-current="page"` and a highlight.
+- **Skip link:** a [SkipLink](?path=/docs/components-skiplink--docs) to `skipTo` (`#main`) is rendered before the header. `skipLink={false}` leaves it out, for a page that has its own.
+- **Menu button:** an [IconButton](?path=/docs/components-iconbutton--docs) with `aria-expanded`. The sheet is a [Sheet](?path=/docs/components-sheet--docs) titled "Menu" (`labels.menu`), and its links are a [SideNav](?path=/docs/components-sidenav--docs).
+- **No script needed for the layout:** the switch to the menu is a container query, so a server-rendered page shows the right layout at once.
+- **Right to left:** the brand starts at the right.
+
+## Touch
+
+The brand, the links and the menu button have hit areas of at least 24px, and 44px on coarse pointers. The links in the menu sheet are 44px tall.
+
+## Theming
+
+| Token | What it sets | Default |
+| --- | --- | --- |
+| `--cy-site-header-height` | Least height of the bar | `--cy-control-height-lg` plus twice `--cy-space-5` |
+| `--cy-site-header-background` | Background of the bar | `--cy-color-bg` |
+| `--cy-site-header-border` | Hairline under the bar | `--cy-color-line` |
+| `--cy-site-header-blur` | Blur of the page behind a sticky bar | `12px` |
+| `--cy-site-header-link-color` | Navigation links | `--cy-color-muted` |
+| `--cy-site-header-link-current-color` | Current and hovered link | `--cy-color-ink` |
+| `--cy-site-header-link-highlight` | Background of the current and hovered link | `--cy-color-soft` |
+
+```ts
+createTheme({ components: { siteHeader: { blur: "0px", linkCurrentColor: "#c2410c" } } });
+```
+
+The breakpoints of `collapseBelow` are fixed, because a container query cannot read a token. `className` and `style` are for layout only.
+
+## Related
+
+[SkipLink](?path=/docs/components-skiplink--docs) · [SiteFooter](?path=/docs/components-sitefooter--docs) · [Section](?path=/docs/components-section--docs) · [Container](?path=/docs/components-container--docs) · [AppShell](?path=/docs/components-appshell--docs) · [ThemeToggle](?path=/docs/components-themetoggle--docs)
