@@ -336,5 +336,8 @@ export const StableUnderHostileHost: Story = {
       const { clean, hostile } = computeUnderHostileHost(canvasElement, selector, props);
       await expect({ selector, ...hostile }).toEqual({ selector, ...clean });
     }
+    // Digits line up as they are typed (TextField's --cy-text-field-numeric, set by this field).
+    const input = canvasElement.querySelector(".cy-text-field-input") as HTMLElement;
+    await expect(getComputedStyle(input).fontVariantNumeric).toBe("tabular-nums");
   },
 };

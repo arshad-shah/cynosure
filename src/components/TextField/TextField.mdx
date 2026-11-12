@@ -30,7 +30,7 @@ import { mail } from "@arshad-shah/cynosure/icons";
 <TextField label="Token" type="password" description="Stored locally" />
 ```
 
-`onChange` receives the string value. Use `value` for controlled state or `defaultValue` for uncontrolled. `type` is one of `text` (default), `email`, `url`, `tel`, `password`, `number` or `search`.
+`onChange` receives the string value. Use `value` for controlled state or `defaultValue` for uncontrolled. `type` is one of `text` (default), `email`, `url`, `tel`, `password`, `number` or `search`. With `search`, the browser's own search decorations are hidden: use `clearable` for a clear button.
 
 ## Clear button
 
@@ -49,6 +49,7 @@ import { mail } from "@arshad-shah/cynosure/icons";
 - **`variant`:** `outline` (default) or `soft` (tinted, borderless until focus).
 - **`size`:** `sm`, `md` or `lg`. Heights match Button and Select.
 - **`iconStart` and `iconEnd`:** icons at either edge, flipped in right-to-left layouts.
+- **`addonStart` and `addonEnd`:** controls inside the field before or after the input (ColorField's swatch button, NumberField's steppers).
 - **`labelHidden`:** hides the label visually while it still names the field. Prefer a visible label.
 - Native input attributes such as `name`, `required`, `readOnly`, `maxLength`, `autoComplete` and `inputMode` pass through.
 
@@ -65,7 +66,7 @@ import { mail } from "@arshad-shah/cynosure/icons";
 
 ## Theming
 
-Tokens: `--cy-text-field-{height-sm,height-md,height-lg,radius,padding-inline,bg,border,soft-bg}`.
+Tokens: `--cy-text-field-{height-sm,height-md,height-lg,radius,padding-inline,bg,border,soft-bg}`, and `--cy-text-field-numeric`, the typed text's `font-variant-numeric` (`tabular-nums` in DateField, NumberField and TimeField).
 
 ```ts
 createTheme({ components: { textField: { radius: "10px", paddingInline: "14px" } } });

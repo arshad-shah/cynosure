@@ -1,8 +1,6 @@
-// cy-styles: text-field.css (the field is drawn as a TextField, from InputBase)
 import { type CSSProperties, type KeyboardEvent, type ReactNode, useEffect, useRef, useState } from "react";
 import { useDrag } from "../../foundations/drag.js";
 import { HiddenValue } from "../../foundations/HiddenValue/HiddenValue.js";
-import { InputBase } from "../../foundations/InputBase/InputBase.js";
 import { stepKey } from "../../foundations/keys.js";
 import { clamp } from "../../foundations/math.js";
 import { droplet } from "../../icons/droplet.js";
@@ -14,10 +12,10 @@ export { readColor };
 
 import type { Size } from "../../tokens/schema.js";
 import { Button } from "../Button/Button.js";
-import { Field } from "../Field/Field.js";
 import { IconButton } from "../IconButton/IconButton.js";
 import { Popover } from "../Popover/Popover.js";
 import { Slider } from "../Slider/Slider.js";
+import { TextField } from "../TextField/TextField.js";
 
 export interface ColorFieldTokens {
   swatchSize: string;
@@ -236,127 +234,123 @@ export function ColorField({
     .join(" ")} / ${alpha ? color.a : 1})`;
   const pct = (n: number) => Math.round(n * 100);
 
+  const trigger = (
+    <Popover
+      label={text.pick}
+      size="sm"
+      placement="bottom"
+      trigger={(props) => (
+        <Button
+          {...props}
+          variant="ghost"
+          size="sm"
+          disabled={disabled}
+          aria-label={text.pick}
+          className="cy-color-field-trigger"
+        >
+          <span className="cy-color-field-swatch cy-reset" style={{ "--_c": swatch } as CSSProperties} />
+        </Button>
+      )}
+    >
+      <div className="cy-color-field-picker cy-reset">
+        <div
+          ref={area}
+          role="slider"
+          tabIndex={0}
+          aria-label={text.area}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={pct(color.s)}
+          aria-valuetext={`${text.area}: ${pct(color.s)}%, ${pct(color.v)}%`}
+          className="cy-color-field-area cy-reset"
+          style={
+            {
+              "--_hue": `hsl(${round(color.h)} 100% 50%)`,
+              "--_x": `${color.s * 100}%`,
+              "--_y": `${(1 - color.v) * 100}%`,
+            } as CSSProperties
+          }
+          onKeyDown={onAreaKey}
+        >
+          <span className="cy-color-field-area-thumb cy-reset" />
+        </div>
+        {/* Hue and opacity tracks are drawn with the colours they choose (Slider's trackContent: no fill). */}
+        <Slider
+          label={text.hue}
+          labelHidden
+          min={0}
+          max={360}
+          value={round(color.h)}
+          onChange={(h) => set({ ...color, h: h as number })}
+          className="cy-color-field-hue"
+          trackContent={<span className="cy-color-field-strip cy-reset" data-strip="hue" />}
+        />
+        {alpha && (
+          <Slider
+            label={text.alpha}
+            labelHidden
+            min={0}
+            max={100}
+            value={pct(color.a)}
+            labels={{ value: (v) => `${v}%` }}
+            onChange={(a) => set({ ...color, a: (a as number) / 100 })}
+            className="cy-color-field-alpha"
+            trackContent={
+              <span
+                className="cy-color-field-strip cy-reset"
+                data-strip="alpha"
+                style={
+                  {
+                    "--_c": `rgb(${hsvToRgb(color)
+                      .map((n) => Math.round(n * 255))
+                      .join(" ")})`,
+                  } as CSSProperties
+                }
+              />
+            }
+          />
+        )}
+        {swatches && swatches.length > 0 && (
+          <ColorSwatches
+            label={text.swatches}
+            swatches={swatches}
+            size="sm"
+            value={current}
+            onChange={(v) => {
+              const next = fromText(v);
+              if (next) set(next);
+            }}
+          />
+        )}
+      </div>
+    </Popover>
+  );
+
   return (
-    <Field
+    <TextField
       label={label}
       labelHidden={labelHidden}
       description={description}
       error={error ?? (invalid ? text.invalid : undefined)}
       required={required}
+      disabled={disabled}
       size={size}
       className={className ? `cy-color-field ${className}` : "cy-color-field"}
-      style={style}
-    >
-      {(field) => (
-        <div
-          className="cy-text-field cy-color-field-control"
-          data-size={size}
-          data-invalid={field.invalid || undefined}
-          data-disabled={disabled || undefined}
-        >
-          <Popover
-            label={text.pick}
-            size="sm"
-            placement="bottom"
-            trigger={(props) => (
-              <Button
-                {...props}
-                variant="ghost"
-                size="sm"
-                disabled={disabled}
-                aria-label={text.pick}
-                className="cy-color-field-trigger"
-              >
-                <span
-                  className="cy-color-field-swatch cy-reset"
-                  style={{ "--_c": swatch } as CSSProperties}
-                />
-              </Button>
-            )}
-          >
-            <div className="cy-color-field-picker cy-reset">
-              <div
-                ref={area}
-                role="slider"
-                tabIndex={0}
-                aria-label={text.area}
-                aria-valuemin={0}
-                aria-valuemax={100}
-                aria-valuenow={pct(color.s)}
-                aria-valuetext={`${text.area}: ${pct(color.s)}%, ${pct(color.v)}%`}
-                className="cy-color-field-area cy-reset"
-                style={
-                  {
-                    "--_hue": `hsl(${round(color.h)} 100% 50%)`,
-                    "--_x": `${color.s * 100}%`,
-                    "--_y": `${(1 - color.v) * 100}%`,
-                  } as CSSProperties
-                }
-                onKeyDown={onAreaKey}
-              >
-                <span className="cy-color-field-area-thumb cy-reset" />
-              </div>
-              <Slider
-                label={text.hue}
-                labelHidden
-                min={0}
-                max={360}
-                value={round(color.h)}
-                onChange={(h) => set({ ...color, h: h as number })}
-                className="cy-color-field-hue"
-              />
-              {alpha && (
-                <Slider
-                  label={text.alpha}
-                  labelHidden
-                  min={0}
-                  max={100}
-                  value={pct(color.a)}
-                  labels={{ value: (v) => `${v}%` }}
-                  onChange={(a) => set({ ...color, a: (a as number) / 100 })}
-                  className="cy-color-field-alpha"
-                  style={
-                    {
-                      "--_c": `rgb(${hsvToRgb(color)
-                        .map((n) => Math.round(n * 255))
-                        .join(" ")})`,
-                    } as CSSProperties
-                  }
-                />
-              )}
-              {swatches && swatches.length > 0 && (
-                <ColorSwatches
-                  label={text.swatches}
-                  swatches={swatches}
-                  size="sm"
-                  value={current}
-                  onChange={(v) => {
-                    const next = fromText(v);
-                    if (next) set(next);
-                  }}
-                />
-              )}
-            </div>
-          </Popover>
-          <InputBase
-            id={field.id}
-            className="cy-text-field-input"
-            aria-describedby={field.describedBy}
-            invalid={field.invalid}
-            required={required}
-            disabled={disabled}
-            autoComplete="off"
-            spellCheck={false}
-            value={draft ?? current}
-            onChange={(e) => {
-              setDraft(e.currentTarget.value);
-              setInvalid(false);
-            }}
-            onBlur={commit}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") commit();
-            }}
-          />
+      {...(style ? { style } : {})}
+      autoComplete="off"
+      spellCheck={false}
+      value={draft ?? current}
+      onChange={(next) => {
+        setDraft(next);
+        setInvalid(false);
+      }}
+      onBlur={commit}
+      onKeyDown={(e) => {
+        if (e.key === "Enter") commit();
+      }}
+      addonStart={trigger}
+      addonEnd={
+        <>
           {dropper && !disabled && (
             <IconButton
               icon={droplet}
@@ -376,8 +370,8 @@ export function ColorField({
               setInvalid(false);
             }}
           />
-        </div>
-      )}
-    </Field>
+        </>
+      }
+    />
   );
 }

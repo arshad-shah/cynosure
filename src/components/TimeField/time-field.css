@@ -2,8 +2,9 @@
  * time-field: a TextField whose end holds the clock button. The picker sits in a Popover: columns that roll under one
  * lens (the chosen time, written as the field writes it), an AM/PM switch, and a Slider drawn as the whole day.
  */
-.cy-time-field .cy-text-field-input.cy-text-field-input {
-  font-variant-numeric: tabular-nums;
+.cy-time-field.cy-time-field {
+  /* Digits line up as they are typed: TextField's token, set on this field. */
+  --cy-text-field-numeric: tabular-nums;
 }
 .cy-time-field-picker.cy-time-field-picker {
   --_hit: var(--cy-hit-min, 24px);

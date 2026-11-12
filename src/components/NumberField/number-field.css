@@ -1,6 +1,7 @@
 /* number-field: a TextField whose end holds the − and + steppers; digits line up in tables of numbers. */
-.cy-number-field .cy-text-field-input.cy-text-field-input {
-  font-variant-numeric: tabular-nums;
+.cy-number-field.cy-number-field {
+  /* Digits line up as they are typed: TextField's token, set on this field. */
+  --cy-text-field-numeric: tabular-nums;
 }
 .cy-number-field-steppers.cy-number-field-steppers {
   display: inline-flex;
