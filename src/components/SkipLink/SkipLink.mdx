@@ -5,7 +5,7 @@ import * as Stories from "./SkipLink.stories";
 
 # SkipLink
 
-"Skip to content": the first stop of a page's Tab order. It is hidden until it has focus, then shown at the top-start corner of the window. It is a real link, so it works without JavaScript; with it, focus also moves to the target.
+"Skip to content": the first stop of a page's Tab order. It is hidden until it has focus, then shown at the top-start corner of the window as an accent outline [Button](?path=/docs/components-button--docs). It is a real link, so it works without JavaScript; with it, focus also moves to the target.
 
 <Canvas of={Stories.RevealsOnTabAndMovesFocus} />
 
@@ -48,7 +48,8 @@ import { SkipLink } from "@arshad-shah/cynosure";
 | <kbd>Enter</kbd>, click | Moves focus to the target; the next <kbd>Tab</kbd> continues from there |
 | <kbd>Tab</kbd> away | Hidden again |
 
-- **Without JavaScript:** the markup is a plain `<a href="#main">`, which the browser follows.
+- **Without JavaScript:** the markup is a plain `<a href="#main">` (a Button link), which the browser follows, and it is shown on focus by CSS alone.
+- **Inside a frame:** `contained` shows it at the corner of the nearest positioned ancestor instead of the window's, so it stays inside a side panel. AppShell sets it.
 - **Focusable target:** a target that cannot take focus (`main`, `div`) gets `tabindex="-1"`, so it can be focused from script without joining the Tab order. A link, a button or an element with a `tabindex` is left as it is.
 - **The URL:** focus moves without changing the URL, so a client-side router is not disturbed. With no element of that id, the browser follows the link as usual.
 - **Shadow roots:** the target is found inside the link's own shadow root too, where a hash link cannot reach.
@@ -61,17 +62,18 @@ The shown link is at least 24px tall, and 44px on coarse pointers.
 
 ## Theming
 
+The shown link is a [Button](?path=/docs/components-button--docs) (outline, accent), so the Button tokens style it too.
+
 | Token | What it sets | Default |
 | --- | --- | --- |
 | `--cy-skip-link-offset` | Distance from the top and inline-start edges of the window | `--cy-space-4` |
-| `--cy-skip-link-background` | Background of the shown link | `--cy-color-surface-raised` |
-| `--cy-skip-link-color` | Text colour | `--cy-color-accent-text` |
 | `--cy-skip-link-radius` | Corner radius | `--cy-radius-md` |
+| `--cy-skip-link-background`, `--cy-skip-link-color` | Deprecated, no effect: restyle through the `--cy-button-*` tokens | – |
 
 ```ts
-createTheme({ components: { skipLink: { background: "#111", color: "#fff" } } });
+createTheme({ components: { skipLink: { offset: "12px", radius: "4px" } } });
 ```
 
 ## Related
 
-[SiteHeader](?path=/docs/components-siteheader--docs) · [AppShell](?path=/docs/components-appshell--docs) · [VisuallyHidden](?path=/docs/components-visuallyhidden--docs) · [Link](?path=/docs/components-link--docs)
+[SiteHeader](?path=/docs/components-siteheader--docs) · [AppShell](?path=/docs/components-appshell--docs) · [Button](?path=/docs/components-button--docs) · [VisuallyHidden](?path=/docs/components-visuallyhidden--docs) · [Link](?path=/docs/components-link--docs)

@@ -47,9 +47,9 @@
   background: var(--cy-app-shell-header-background, var(--cy-color-surface));
   font-size: inherit;
 }
-/* The skip link (a SkipLink) shows at the shell's own corner, not the window's, so it stays inside a side panel. */
-.cy-app-shell > .cy-app-shell-skip.cy-skip-link.cy-skip-link {
-  position: absolute;
+/* The skip link (a SkipLink, `contained`) shows at the shell's own corner, not the window's, so it stays inside a side
+   panel; above the shell's parts, not above the page's. */
+.cy-app-shell-skip.cy-app-shell-skip.cy-app-shell-skip {
   z-index: 1;
 }
 .cy-app-shell-header.cy-app-shell-header {
@@ -96,11 +96,9 @@
     outline: none;
   }
 }
-/* In the drawer the navigation takes the full width of the sheet. */
+/* In the drawer the navigation takes the full width of the sheet (SideNav's width token, inherited). */
 .cy-app-shell-drawer.cy-app-shell-drawer {
+  --cy-side-nav-width: auto;
   margin-inline: calc(-1 * var(--cy-space-4));
   font-size: inherit;
-  & > .cy-side-nav {
-    inline-size: auto;
-  }
 }

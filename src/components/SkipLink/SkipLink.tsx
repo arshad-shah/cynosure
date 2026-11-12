@@ -1,12 +1,18 @@
 import { type CSSProperties, forwardRef, type MouseEvent } from "react";
-import { LinkBase } from "../../foundations/LinkBase/LinkBase.js";
+import { Button } from "../Button/Button.js";
 
 export interface SkipLinkTokens {
   /** Distance of the shown link from the top and inline-start edges of the window. */
   offset: string;
-  /** Background of the shown link. */
+  /**
+   * @deprecated No effect: the shown link is a Button (outline, accent). Restyle it through the `--cy-button-*`
+   * tokens.
+   */
   background: string;
-  /** Text colour of the shown link. */
+  /**
+   * @deprecated No effect: the shown link is a Button (outline, accent). Restyle it through the `--cy-button-*`
+   * tokens.
+   */
   color: string;
   /** Corner radius of the shown link. */
   radius: string;
@@ -33,6 +39,11 @@ export interface SkipLinkProps {
   labels?: Partial<SkipLinkLabels>;
   /** Set on the link element. */
   id?: string | undefined;
+  /**
+   * Show at the top-start corner of the nearest positioned ancestor instead of the window's, so the link stays inside
+   * a frame such as a side panel (AppShell sets it). Default false.
+   */
+  contained?: boolean;
   /** Added to the link, for layout (e.g. to place it inside a positioned frame). */
   className?: string | undefined;
   /** Layout only. Restyle through --cy-skip-link-* tokens. */
@@ -62,27 +73,37 @@ function focusTarget(link: HTMLAnchorElement, href: string): boolean {
 
 /**
  * "Skip to content": the first stop of the Tab order, hidden until it has focus and then shown at the top-start corner
- * of the window. It is a real link, so it works before or without JavaScript; with it, focus also moves to the target.
+ * of the window as a Button. It is a real link, so it works before or without JavaScript; with it, focus also moves to
+ * the target.
  */
 export const SkipLink = forwardRef<HTMLAnchorElement, SkipLinkProps>(function SkipLink(
-  { href = "#main", labels, id, className, style },
+  { href = "#main", labels, id, contained = false, className, style },
   ref,
 ) {
   const text = { ...DEFAULT_LABELS, ...labels };
-  const onClick = (event: MouseEvent<HTMLAnchorElement>) => {
+  const onClick = (event: MouseEvent<HTMLElement>) => {
     // Focus moves without touching the URL (a client-side router may own it).
-    if (focusTarget(event.currentTarget, href)) event.preventDefault();
+    if (focusTarget(event.currentTarget as HTMLAnchorElement, href)) event.preventDefault();
   };
   return (
-    <LinkBase
-      ref={ref}
-      id={id}
+    <Button
       href={href}
+      linkRef={ref}
+      id={id}
+      variant="outline"
+      tone="accent"
       onClick={onClick}
-      className={`cy-skip-link${className ? ` ${className}` : ""}`}
-      style={style}
+      // Hidden from sight (.cy-visually-hidden) until it has focus; skip-link.css shows it then, without script.
+      className={[
+        "cy-skip-link cy-visually-hidden",
+        contained ? "cy-skip-link-contained" : undefined,
+        className,
+      ]
+        .filter(Boolean)
+        .join(" ")}
+      {...(style ? { style } : {})}
     >
       {text.skip}
-    </LinkBase>
+    </Button>
   );
 });

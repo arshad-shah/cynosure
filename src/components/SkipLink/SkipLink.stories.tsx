@@ -16,6 +16,7 @@ const meta = {
     href: { control: "text" },
     labels: { control: "object" },
     id: { control: "text" },
+    contained: { control: "boolean" },
   },
   render: (args) => (
     <div>
@@ -107,7 +108,10 @@ export const WorksWithoutJavaScript: Story = {
   play: async ({ canvas, canvasElement, userEvent }) => {
     // The server markup is a plain in-page link, which the browser follows before any script runs.
     const html = renderToString(<SkipLink href="#content" />);
-    await expect(html).toMatch(/^<a [^>]*href="#content"[^>]*>Skip to content<\/a>$/);
+    // (The text sits in the Button's content spans; no script is needed to show or follow it.)
+    await expect(html).toMatch(
+      /^<a [^>]*href="#content"[^>]*>(<span [^>]*>)*Skip to content(<\/span>)*<\/a>$/,
+    );
     // With no target to focus, the click is left to the browser (here stopped so the story's page stays put).
     let followed = false;
     const listen = (event: Event) => {
@@ -219,5 +223,27 @@ export const TouchHitArea: Story = {
     const skip = canvas.getByRole("link", { name: "Skip to content" });
     skip.focus();
     await expect(box(skip).height).toBeGreaterThanOrEqual(44);
+  },
+};
+
+export const ContainedInAFrame: Story = {
+  args: { contained: true },
+  render: (args) => (
+    <div data-testid="frame" style={{ position: "relative", marginBlockStart: 120, marginInlineStart: 160 }}>
+      <SkipLink {...args} />
+      <main id="main">Text</main>
+    </div>
+  ),
+  play: async ({ canvas }) => {
+    const skip = canvas.getByRole("link", { name: "Skip to content" });
+    skip.focus();
+    await expect(shown(skip)).toBe(true);
+    // At the frame's top-start corner, not the window's.
+    await expect(getComputedStyle(skip).position).toBe("absolute");
+    const frame = box(canvas.getByTestId("frame"));
+    await expect(box(skip).top - frame.top).toBeLessThan(40);
+    await expect(box(skip).top).toBeGreaterThan(100);
+    await expect(box(skip).left - frame.left).toBeLessThan(40);
+    await expect(box(skip).left).toBeGreaterThan(140);
   },
 };

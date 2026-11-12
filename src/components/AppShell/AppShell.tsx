@@ -157,7 +157,7 @@ export function AppShell({
         style={style}
       >
         {/* Moves focus to main without touching the URL (the app's router owns it). */}
-        <SkipLink href={`#${id}-main`} labels={{ skip: text.skip }} className="cy-app-shell-skip" />
+        <SkipLink href={`#${id}-main`} labels={{ skip: text.skip }} contained className="cy-app-shell-skip" />
         {(header || (nav && narrow)) && (
           <header className="cy-app-shell-header cy-reset">
             {nav && narrow && (
