@@ -657,5 +657,15 @@
     "path": ["dist/components/OptionList/OptionList.js", "dist/styles/option-list.css"],
     "limit": "3 kB",
     "gzip": true
+  },
+  {
+    "name": "ScrollArea",
+    "path": [
+      "dist/components/ScrollArea/ScrollArea.js",
+      "dist/foundations/use-follow.js",
+      "dist/styles/scroll-area.css"
+    ],
+    "limit": "2.1 kB",
+    "gzip": true
   }
 ]

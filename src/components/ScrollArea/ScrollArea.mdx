@@ -1,0 +1,100 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./ScrollArea.stories";
+
+<Meta of={Stories} />
+
+# ScrollArea
+
+A box that fills its parent and scrolls what does not fit. It can follow the end while content arrives and hold an overlay, such as a "3 new" pill, that stays put while the content scrolls.
+
+<Canvas of={Stories.FollowKeepsTheEndInView} />
+
+## When to use
+
+- **The scrolling middle of an app shell**: a panel between a header and a status bar that scrolls instead of making the page longer.
+- **Logs, chats and activity streams**: `follow` keeps the latest in view, `onAtBottomChange` tells you when someone scrolled up to read, and `overlay` holds the way back.
+
+**Use something else when:**
+
+- the content is a long list of rows people pick from: [VirtualList](?path=/docs/components-virtuallist--docs) (it renders only the rows in view, and has `follow` and `overlay` too)
+- a box only needs to clip or scroll and has nothing else to do: `overflow` on [Stack](?path=/docs/components-stack--docs), [Inline](?path=/docs/components-inline--docs) or [Grid](?path=/docs/components-grid--docs)
+- the content is code: [CodeBlock](?path=/docs/components-codeblock--docs) scrolls its own
+
+## Usage
+
+```tsx
+import { ScrollArea, type ScrollAreaHandle } from "@arshad-shah/cynosure";
+
+const area = useRef<ScrollAreaHandle>(null);
+const [atBottom, setAtBottom] = useState(true);
+
+<Stack fill gap="0">
+  <Toolbar label="Activity">…</Toolbar>
+  <ScrollArea
+    label="Activity"
+    follow
+    handle={area}
+    onAtBottomChange={setAtBottom}
+    overlay={!atBottom && <Button onClick={() => area.current?.scrollToEnd()}>Latest</Button>}
+  >
+    {events}
+  </ScrollArea>
+</Stack>
+```
+
+The area is a flex share and 100% of its parent both ways, with a minimum size of 0: in a flex column it takes what the header and footer leave. In a parent with no height of its own it is as tall as its content.
+
+<Canvas of={Stories.FillsItsParent} />
+
+## Following the end
+
+With `follow`, the end stays in view while content is added. Scrolling up lets go (and `onAtBottomChange(false)` is called); scrolling back to the end, or `handle.scrollToEnd()`, follows again (`onAtBottomChange(true)`). Without `follow`, new content arrives below and `onAtBottomChange` still reports where the view is.
+
+<Canvas of={Stories.ScrollingBackToTheEndResumes} />
+
+## Overlay
+
+`overlay` sits over the area at the bottom centre and does not scroll. It is outside the named region. Its distance from the bottom edge is the `overlayOffset` token.
+
+<Canvas of={Stories.OverlayStaysPut} />
+
+## Scrolling from outside
+
+`handle.scrollToEnd()` goes to the end. `handle.scrollIntoView(element, { align })` scrolls only the area, never the page around it, so `element` is in view: `nearest` (the least scrolling, the default), `start` or `center`. It works in right-to-left text.
+
+<Canvas of={Stories.ScrollIntoViewMovesOnlyTheArea} />
+
+## Direction
+
+`direction` is `vertical` (default), `horizontal` or `both`; the other axis is clipped.
+
+<Canvas of={Stories.DirectionPicksTheAxes} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+- **Name and focus:** with `label`, the scrolling element is a region of that name, and a tab stop while there is something to scroll. With nothing to scroll it is not a tab stop. Without `label` it is neither, so leave `label` out only when the content has its own focusable elements: focusing them scrolls the area.
+
+| Key (region focused) | Does |
+| --- | --- |
+| Page Up / Down | Scroll a screenful |
+| Home / End | Top / end |
+
+<Canvas of={Stories.KeyboardScrollsTheRegion} />
+
+- **Shadow roots:** following and the overlay work inside a shadow root.
+
+## Touch
+
+A finger pans the area with the browser's own scrolling; nothing intercepts it. Controls in the overlay keep their own hit areas.
+
+## Theming
+
+Tokens: `--cy-scroll-area-overlay-offset` (space between the bottom edge and the overlay, default `--cy-space-4`). The area itself draws nothing: give the parent its background and border.
+
+## Related
+
+[VirtualList](?path=/docs/components-virtuallist--docs) · [Stack](?path=/docs/components-stack--docs) · [SplitPane](?path=/docs/components-splitpane--docs) · [CodeBlock](?path=/docs/components-codeblock--docs)
