@@ -51,7 +51,7 @@ export function HoverCard({ open, anchor, placement = "end", children, className
   const target = useFloatingAnchor(anchor);
   const shown = open && target.present;
   usePopover(card, shown);
-  const offset = useFloatingOffset(card);
+  const offset = useFloatingOffset(card, shown);
   useAnchoredPosition(target.ref, card, shown, placement, offset);
   return (
     <div

@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { useRef, useState } from "react";
+import { type CSSProperties, useRef, useState } from "react";
 import { expect, fn, waitFor } from "storybook/test";
 import { bold } from "../../icons/bold.js";
 import { italic } from "../../icons/italic.js";
@@ -82,6 +82,22 @@ export const FlipsBelowWhenNoRoomAbove: Story = {
     await waitFor(() => expect(shown()).toBe(true));
     const field = box(canvasElement.querySelector(".box") as Element);
     await waitFor(() => expect(box(bar()).top).toBeGreaterThanOrEqual(field.bottom));
+  },
+};
+
+export const OffsetTokenInAnyLengthUnit: Story = {
+  render: () => (
+    <div style={{ "--cy-floating-toolbar-offset": "calc(1rem + 8px)" } as CSSProperties}>
+      <Field />
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    await waitFor(() => expect(shown()).toBe(true));
+    await shownFully(bar());
+    const field = box(canvasElement.querySelector(".box") as Element);
+    const rem = Number.parseFloat(getComputedStyle(document.documentElement).fontSize);
+    // The gap is the token resolved to pixels: rem and calc() included.
+    await waitFor(() => expect(Math.abs(field.top - box(bar()).bottom - (rem + 8))).toBeLessThan(1));
   },
 };
 
