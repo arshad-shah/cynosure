@@ -150,6 +150,18 @@ const MONTHS = Array.from({ length: 12 }, (_, i) => i);
 const SERVER_LOCALE = "en-US";
 const SERVER_WEEKEND = [6, 0];
 
+const formats = new Map<string, Intl.DateTimeFormat>();
+/** A date formatter, built once per locale and options: a month draws about forty names, on every render. */
+function dateFormat(locale: string | undefined, options: Intl.DateTimeFormatOptions) {
+  const key = `${locale ?? ""} ${JSON.stringify(options)}`;
+  let format = formats.get(key);
+  if (!format) {
+    format = new Intl.DateTimeFormat(locale, options);
+    formats.set(key, format);
+  }
+  return format;
+}
+
 /** The heading as a button, and its panel: a year to step through and that year's twelve months. */
 function MonthPicker({
   month,
@@ -174,7 +186,7 @@ function MonthPicker({
   const [year, setYear] = useState<number | null>(null);
   const shown = year ?? Number(month.slice(0, 4));
   const name = (style: "long" | "short", i: number) =>
-    new Intl.DateTimeFormat(locale, { month: style }).format(new Date(2001, i, 1));
+    dateFormat(locale, { month: style }).format(new Date(2001, i, 1));
   const yearStep = (by: number, label: string, icon: typeof chevronLeft, off: boolean) => (
     <IconButton
       icon={icon}
@@ -216,7 +228,7 @@ function MonthPicker({
             min !== undefined && shown <= Number(min.slice(0, 4)),
           )}
           <span className="cy-calendar-title cy-reset" aria-live="polite">
-            {new Intl.DateTimeFormat(locale, { year: "numeric" }).format(new Date(shown, 0, 1))}
+            {dateFormat(locale, { year: "numeric" }).format(new Date(shown, 0, 1))}
           </span>
           {yearStep(1, text.nextYear, chevronRight, max !== undefined && shown >= Number(max.slice(0, 4)))}
         </div>
@@ -380,9 +392,9 @@ export function Calendar({
     Array.from({ length: 7 }, (_, d) => addDays(gridStart, w * 7 + d)),
   );
 
-  const weekday = (style: "long" | "short") => new Intl.DateTimeFormat(names, { weekday: style });
-  const fullDate = new Intl.DateTimeFormat(names, { dateStyle: "full" });
-  const dayNumber = new Intl.DateTimeFormat(names, { day: "numeric" });
+  const weekday = (style: "long" | "short") => dateFormat(names, { weekday: style });
+  const fullDate = dateFormat(names, { dateStyle: "full" });
+  const dayNumber = dateFormat(names, { day: "numeric" });
 
   const onKeyDown = (event: KeyboardEvent<HTMLTableElement>) => {
     const across = isRtl(event.currentTarget) ? -1 : 1;
@@ -411,7 +423,7 @@ export function Calendar({
   const nextMonth = addMonths(`${month}-01`, 1);
   const title = (
     <span className="cy-calendar-title cy-reset" id={`${id}-title`} aria-live="polite">
-      {new Intl.DateTimeFormat(names, { month: "long", year: "numeric" }).format(first)}
+      {dateFormat(names, { month: "long", year: "numeric" }).format(first)}
     </span>
   );
   return (
