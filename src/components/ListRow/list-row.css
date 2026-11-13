@@ -91,6 +91,8 @@
   }
   &[data-active] {
     --_rail: var(--cy-color-accent);
+    /* Lighter than the selected tint (--cy-color-accent-soft): the row's muted description and trailing text must keep
+     * 4.5:1 on it, and they fall to 4.25:1 on the 18% tint. */
     --_wash: color-mix(in oklab, var(--cy-color-accent) var(--cy-list-row-active-mix, 12%), var(--_base));
   }
   &[data-interactive] {

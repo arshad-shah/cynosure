@@ -14,6 +14,7 @@ import { useDraft } from "../../foundations/draft.js";
 import { HiddenValue } from "../../foundations/HiddenValue/HiddenValue.js";
 import { isTypeaheadKey, seekEnabled, useTypeahead } from "../../foundations/listbox.js";
 import { clamp } from "../../foundations/math.js";
+import { alignedScroll } from "../../foundations/scroll-align.js";
 import { clock } from "../../icons/clock.js";
 import type { Size } from "../../tokens/schema.js";
 import { Button } from "../Button/Button.js";
@@ -393,7 +394,7 @@ export function TimeField({
       const row = list?.children[Number(rest)] as HTMLElement | undefined;
       if (!list || !row) return;
       list.scrollTo({
-        top: row.offsetTop - (list.clientHeight - row.offsetHeight) / 2,
+        top: alignedScroll(0, list.clientHeight, row.offsetTop, row.offsetHeight, "center"),
         behavior: instant ? "instant" : "auto",
       });
     });

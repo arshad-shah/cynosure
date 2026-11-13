@@ -11,29 +11,30 @@ import { VirtualList } from "@arshad-shah/cynosure";
   getKey={(file) => file.id}
   renderItem={(file) => file.name}
   selectionMode="multiple"
-  selectedKeys={chosen}
+  selected={chosen}
   onSelectionChange={setChosen}
   onAction={(file) => open(file)}
 />;
 ```
 
-| Prop                                 | Default  | Notes                                                                           |
-| ------------------------------------ | -------- | ------------------------------------------------------------------------------- |
-| `label`                              | –        | Accessible name                                                                 |
-| `items`, `getKey`, `renderItem`      | –        | `renderItem(item, { index, selected, disabled })`                               |
-| `wrap`                               | `false`  | Rows wrap and take the height they need; each is measured as it renders         |
-| `follow`                             | `false`  | Stays at the end as rows arrive, while scrolled there (logs, feeds)             |
-| `onAtBottomChange`                   | –        | `false` when the view leaves the end, `true` when it is back. Starts `true`     |
-| `overlay`                            | –        | Pinned at the bottom centre over the list, outside the listbox; does not scroll |
-| `isHeader`                           | –        | Section headings: not focusable or selectable; the current one is pinned        |
-| `handle`                             | –        | A ref to `{ scrollToIndex(index, { align }?), scrollToEnd() }`                  |
-| `selectionMode`                      | `single` | `none` (a list to act on) · `single` · `multiple`                               |
-| `selectedKeys` / `onSelectionChange` | –        | Controlled; `defaultSelectedKeys` when uncontrolled                             |
-| `onAction`                           | –        | Enter, a double-click, or a click when `selectionMode` is `none`                |
-| `isDisabled`                         | –        | Disabled rows are skipped by the keys and cannot be chosen                      |
-| `empty`                              | –        | Shown when there are no items                                                   |
-| `size`                               | `md`     | `sm` · `md`                                                                     |
-| `className` / `style`                | –        | Layout only (`style={{ blockSize: … }}` sets the height)                        |
+| Prop                                  | Default  | Notes                                                                           |
+| ------------------------------------- | -------- | ------------------------------------------------------------------------------- |
+| `label`                               | –        | Accessible name                                                                 |
+| `items`, `getKey`, `renderItem`       | –        | `renderItem(item, { index, selected, disabled })`                               |
+| `wrap`                                | `false`  | Rows wrap and take the height they need; each is measured as it renders         |
+| `follow`                              | `false`  | Stays at the end as rows arrive, while scrolled there (logs, feeds)             |
+| `onAtBottomChange`                    | –        | `false` when the view leaves the end, `true` when it is back. Starts `true`     |
+| `overlay`                             | –        | Pinned at the bottom centre over the list, outside the listbox; does not scroll |
+| `isHeader`                            | –        | Section headings: not focusable or selectable; the current one is pinned        |
+| `handle`                              | –        | A ref to `{ scrollToIndex(index, { align }?), scrollToEnd() }`                  |
+| `selectionMode`                       | `single` | `none` (a list to act on) · `single` · `multiple`                               |
+| `selected` / `onSelectionChange`      | –        | Controlled; `defaultSelected` when uncontrolled                                 |
+| `selectedKeys`, `defaultSelectedKeys` | –        | Deprecated aliases of `selected` and `defaultSelected`                          |
+| `onAction`                            | –        | Enter, a double-click, or a click when `selectionMode` is `none`                |
+| `isDisabled`                          | –        | Disabled rows are skipped by the keys and cannot be chosen                      |
+| `empty`                               | –        | Shown when there are no items                                                   |
+| `size`                                | `md`     | `sm` · `md`                                                                     |
+| `className` / `style`                 | –        | Layout only (`style={{ blockSize: … }}` sets the height)                        |
 - Keys: arrows move, Page Up/Down move a screenful, Home and End jump, Space chooses, Enter acts (or chooses). With `multiple`, Shift+arrows extend and Ctrl/Cmd+A chooses all.
 - With `onMove`, Alt+Up/Down moves the selection (or the focused row) one place, and a mouse or pen drags it; a line shows where it will land, the list scrolls near its edges, and Escape cancels. Chosen rows move together and close up. A finger scrolls the list as usual. Moves are announced.
 - The focused row is always rendered, so focus survives scrolling it far out of view; each row carries `aria-posinset` and `aria-setsize`.

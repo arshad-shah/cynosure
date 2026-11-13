@@ -56,7 +56,7 @@
   block-size: var(--_h);
   min-block-size: max(var(--_h), var(--_hit));
   padding: 0 var(--cy-text-field-padding-inline, var(--cy-space-5));
-  /* The field skin: the --cy-field-control-* tokens restyle every field's box (TextField, HotkeyField) at once. */
+  /* The field skin: the --cy-field-control-* tokens restyle every field's box (TextField, Select, TextArea, HotkeyField) at once. */
   border: var(--cy-border-width) solid
     var(--cy-text-field-border, var(--cy-field-control-border, var(--cy-color-line)));
   border-radius: var(

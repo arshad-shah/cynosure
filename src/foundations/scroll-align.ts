@@ -6,8 +6,8 @@ export type ScrollAlign = "nearest" | "start" | "center";
  * long now scrolled to `at`. `nearest` scrolls the least that shows it whole and, when it is longer than the view,
  * shows its start (as `Element.scrollIntoView` does); `start` puts it at the start of the view; `center` in the middle.
  * The result may fall outside the scroll range: the browser clamps it. Translation-invariant, so with `at = 0` and a
- * `start` measured from the view it is the distance to scroll (ScrollArea). ScrollArea, VirtualList and
- * `useVirtualWindow`'s `reveal` (Tree, DataGrid) use it.
+ * `start` measured from the view it is the distance to scroll (ScrollArea). ScrollArea, VirtualList,
+ * `useVirtualWindow`'s `reveal` (Tree, DataGrid), Tabs (revealing a tab) and TimeField (centring a time) use it.
  */
 export function alignedScroll(
   at: number,

@@ -17,10 +17,12 @@ import { useControllableState } from "../../foundations/controllable.js";
 import { isRtl } from "../../foundations/dir.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
 import { LiveRegion, useLiveMessage } from "../../foundations/LiveRegion/LiveRegion.js";
+import { clamp } from "../../foundations/math.js";
 import { motionMs } from "../../foundations/motion.js";
 import { usePrinting } from "../../foundations/printing.js";
 import { moveItems } from "../../foundations/reorder.js";
 import { useRovingFocus } from "../../foundations/roving-focus.js";
+import { alignedScroll } from "../../foundations/scroll-align.js";
 import { chevronLeft } from "../../icons/chevron-left.js";
 import { chevronRight } from "../../icons/chevron-right.js";
 import { close } from "../../icons/close.js";
@@ -336,11 +338,7 @@ export function TabList({
     // parent and on how the engine handles right-to-left scrolling; rects read in the same frame do not).
     const box = tab.getBoundingClientRect();
     const left = box.left - list.getBoundingClientRect().left - list.clientLeft + current;
-    const right = left + box.width;
-    let target = current;
-    if (left - pad < current) target = left - pad;
-    else if (right + pad > current + list.clientWidth) target = right + pad - list.clientWidth;
-    target = Math.min(Math.max(target, 0), max);
+    const target = clamp(alignedScroll(current, list.clientWidth, left - pad, box.width + 2 * pad), 0, max);
     if (target !== current) list.scrollTo({ left: rtl ? target - max : target });
   }, []);
   // Mark edges that hide tabs so CSS can fade them, and show the chevrons that lead there (works in RTL: scrollLeft is

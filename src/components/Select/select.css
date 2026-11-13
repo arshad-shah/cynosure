@@ -29,9 +29,13 @@
   min-block-size: max(var(--_h), var(--_hit));
   margin: 0;
   padding: 0 var(--cy-space-4) 0 var(--cy-space-5);
-  border: var(--cy-border-width) solid var(--cy-select-border, var(--cy-color-line));
-  border-radius: var(--cy-select-radius, calc(var(--_h) * var(--cy-radius-factor)));
-  background: var(--cy-select-bg, var(--cy-color-surface));
+  border: var(--cy-border-width) solid
+    var(--cy-select-border, var(--cy-field-control-border, var(--cy-color-line)));
+  border-radius: var(
+    --cy-select-radius,
+    var(--cy-field-control-radius, calc(var(--_h) * var(--cy-radius-factor)))
+  );
+  background: var(--cy-select-bg, var(--cy-field-control-bg, var(--cy-color-surface)));
   background-image: none;
   color: var(--cy-color-ink);
   font-family: var(--cy-font-sans);

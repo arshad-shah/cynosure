@@ -23,8 +23,8 @@ Label, description and error wiring for any control. Controls render through a r
 
 ## Tokens
 
-- `--cy-field-control-border`, `--cy-field-control-bg`, `--cy-field-control-radius`: the field skin, the box of every field (TextField and the fields built on it, HotkeyField), under each control's own tokens (`--cy-text-field-border`…). Restyle fields once here. Defaults `--cy-color-line`, `--cy-color-surface` and the control height times `--cy-radius-factor`.
-- `--cy-field-control-sunken-bg`: the sunken fill of a box that cannot be edited (a read-only TextField, a disabled HotkeyField). Default `--cy-color-soft`.
+- `--cy-field-control-border`, `--cy-field-control-bg`, `--cy-field-control-radius`: the field skin, the box of every field (TextField and the fields built on it, Select, TextArea, HotkeyField), under each control's own tokens (`--cy-text-field-border`…). Restyle fields once here. Defaults `--cy-color-line`, `--cy-color-surface` and the control height times `--cy-radius-factor`.
+- `--cy-field-control-sunken-bg`: the sunken fill of a box that cannot be edited (a read-only TextField or TextArea, a disabled HotkeyField). Default `--cy-color-soft`.
 - `--cy-field-gap`, `--cy-field-label-weight`, `--cy-field-label-color`, `--cy-field-description-color`, `--cy-field-error-color`, `--cy-field-required-color`
 - `--cy-field-control-width-sm`, `--cy-field-control-width-md`, `--cy-field-control-width-lg`: the control widths (160, 256, 384px)
 - `--cy-field-split-text-min`: narrowest the label and description get in the split layout before the control moves under them (192px)

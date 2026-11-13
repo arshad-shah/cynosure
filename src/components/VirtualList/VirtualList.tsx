@@ -93,8 +93,12 @@ export interface VirtualListProps<T> {
   /** "none" (a list to act on), "single" (default) or "multiple". */
   selectionMode?: "none" | "single" | "multiple";
   /** Keys of the selected rows (controlled). */
-  selectedKeys?: string[] | undefined;
+  selected?: string[] | undefined;
   /** Keys of the rows selected at the start when uncontrolled. */
+  defaultSelected?: string[];
+  /** Old name of `selected`. @deprecated Use `selected`, the name Tree, Table and DataGrid use. */
+  selectedKeys?: string[] | undefined;
+  /** Old name of `defaultSelected`. @deprecated Use `defaultSelected`. */
   defaultSelectedKeys?: string[];
   /** Called with the selected keys when the selection changes. */
   onSelectionChange?: ((keys: string[]) => void) | undefined;
@@ -142,8 +146,10 @@ export function VirtualList<T>({
   renderItem,
   isDisabled,
   selectionMode = "single",
+  selected,
+  defaultSelected,
   selectedKeys,
-  defaultSelectedKeys = [],
+  defaultSelectedKeys,
   onSelectionChange,
   onAction,
   onMove,
@@ -160,7 +166,11 @@ export function VirtualList<T>({
   style,
 }: VirtualListProps<T>) {
   const root = useRef<HTMLDivElement>(null);
-  const [picked, choose] = useControllableState(selectedKeys, defaultSelectedKeys, onSelectionChange);
+  const [picked, choose] = useControllableState(
+    selected ?? selectedKeys,
+    defaultSelected ?? defaultSelectedKeys ?? [],
+    onSelectionChange,
+  );
   const [focusKey, setFocusKey] = useState<string | null>(null);
   const moveFocus = useRef(false);
   const anchor = useRef<number | null>(null);

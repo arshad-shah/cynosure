@@ -32,6 +32,7 @@ Components expose the same props with the same meaning, so control is predictabl
 | `variant`                           | component-specific, e.g. Button `solid` · `soft` · `outline` · `ghost`                                                                                               | Fill or visual style                                            |
 | `color`                             | any CSS colour                                                                                                                                                       | One-off override of `tone`; prefer tones or tokens              |
 | `disabled`, `loading`, `pressed`, … | boolean                                                                                                                                                              | Behaviour and state                                             |
+| `selected` / `defaultSelected`      | the selected keys of a list (Tree, VirtualList, Table, DataGrid), with `onSelectionChange(keys)`; never `selectedKeys`                                               | Controlled / uncontrolled selection                             |
 | `label` / `labels`                  | string / typed object                                                                                                                                                | Accessible name / overridable built-in strings                  |
 | `className`, `style`                | –                                                                                                                                                                    | Layout only (margin, placement, width). Restyle through tokens. |
 
@@ -42,8 +43,9 @@ Props become `data-size`, `data-tone` and `data-variant` attributes that the com
 Content props that place things in a component's own layout use the same names:
 
 - **`leading` / `trailing`**: content at the start or end of the component's own row, inside it (an icon, a count, a Badge, a "New tab" button): TitleBar, ListRow, Tree items, TabList, Disclosure's summary row, Select, SearchField, FloatingToolbar. Never `start`, `end` or `summaryEnd` for this.
+- **`iconStart` / `iconEnd`**: an icon (Facet `IconData`, not a node) at the start or end of a text box, where the slot takes only an icon: TextField, Combobox, TagInput, PathField. A slot that takes any node is `leading` / `trailing`.
 - **`actions`**: buttons for the thing the component shows (IconButtons, a Menu), usually revealed on hover or focus: ListRow, Tree items, ChatMessage, CodeBlock.
-- **Commands**: a chosen context-menu item or a pressed row action is reported through `onCommand(value, …)` (Tree's with the item, a Tab's for itself), not `onSelect`, which is for choosing a value.
+- **Commands**: a component that hosts a ContextMenu or row actions reports the chosen item through `onCommand(value, …)` (Tree's with the item, a Tab's for itself), not `onSelect`, which is for choosing a value. The menus themselves (ContextMenu, Menu, Menubar) keep `onSelect(value, key)`: choosing an item is their value.
 - **`start` / `end`**: whole clusters of separate parts at the two ends of a bar (StatusBar's segments). Use them only where the component lays out two such groups.
 
 ## Ownership: reuse components, never their insides

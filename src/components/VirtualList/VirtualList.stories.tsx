@@ -204,7 +204,7 @@ export const Controlled: Story = {
       const [keys, setKeys] = useState(["d"]);
       return (
         <>
-          <Files items={FEW} selectedKeys={keys} onSelectionChange={setKeys} className="product-list" />
+          <Files items={FEW} selected={keys} onSelectionChange={setKeys} className="product-list" />
           <output data-testid="keys">{keys.join(",")}</output>
         </>
       );
@@ -408,7 +408,7 @@ function HugeRail() {
         label="Rows"
         items={rows}
         selectionMode="multiple"
-        defaultSelectedKeys={HUGE.map((r) => r.id)}
+        defaultSelected={HUGE.map((r) => r.id)}
         onMove={(keys, to) => setRows(moveItems(rows, keys, to, (r) => r.id))}
       />
       <output data-testid="order">

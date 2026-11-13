@@ -16,9 +16,10 @@
   margin: 0;
   padding: var(--cy-text-area-padding-block, var(--cy-space-4))
     var(--cy-text-area-padding-inline, var(--cy-space-5));
-  border: var(--cy-border-width) solid var(--cy-text-area-border, var(--cy-color-line));
-  border-radius: var(--cy-text-area-radius, var(--cy-radius-md));
-  background: var(--cy-text-area-bg, var(--cy-color-surface));
+  border: var(--cy-border-width) solid
+    var(--cy-text-area-border, var(--cy-field-control-border, var(--cy-color-line)));
+  border-radius: var(--cy-text-area-radius, var(--cy-field-control-radius, var(--cy-radius-md)));
+  background: var(--cy-text-area-bg, var(--cy-field-control-bg, var(--cy-color-surface)));
   color: var(--cy-color-ink);
   font-family: var(--cy-font-sans);
   font-size: var(--cy-font-size-md);
@@ -51,7 +52,7 @@
   }
   /* Read only: a sunken fill says "you can select and copy, not edit". */
   &[readonly] {
-    background: var(--cy-text-area-readonly-bg, var(--cy-color-soft));
+    background: var(--cy-text-area-readonly-bg, var(--cy-field-control-sunken-bg, var(--cy-color-soft)));
     border-color: transparent;
   }
   &:disabled {
