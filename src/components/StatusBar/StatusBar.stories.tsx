@@ -174,6 +174,43 @@ export const DotTones: Story = {
   },
 };
 
+export const SoftTintToken: Story = {
+  args: {
+    start: (
+      <>
+        <StatusBarSegment variant="soft" tone="accent">
+          static
+        </StatusBarSegment>
+        <StatusBarSegment variant="soft" tone="accent" onClick={() => {}}>
+          clickable
+        </StatusBarSegment>
+      </>
+    ),
+    end: null,
+  },
+  play: async ({ canvas, canvasElement }) => {
+    const fill = (text: string) =>
+      getComputedStyle(canvas.getByText(text).closest(".cy-status-bar-segment, button") as Element)
+        .backgroundColor;
+    // A static and a clickable soft segment share one tint, read from the bar's own token.
+    await expect(fill("static")).toBe(fill("clickable"));
+    const before = fill("static");
+    const bar = canvasElement.querySelector(".cy-status-bar") as HTMLElement;
+    bar.style.setProperty("--cy-status-bar-soft-mix", "60%");
+    await expect(fill("static")).not.toBe(before);
+    // The button's fill eases to its new colour.
+    await waitFor(() => expect(fill("clickable")).toBe(fill("static")));
+    // Button's own token does not reach either: the bar's look is set through its own tokens.
+    bar.style.setProperty("--cy-button-soft-mix", "5%");
+    await pause(300);
+    await expect(fill("static")).toBe(fill("clickable"));
+    // Back to the theme's tint, which keeps the text readable.
+    bar.style.removeProperty("--cy-status-bar-soft-mix");
+    bar.style.removeProperty("--cy-button-soft-mix");
+    await waitFor(() => expect(fill("clickable")).toBe(before));
+  },
+};
+
 export const MonospaceText: Story = {
   args: {
     start: (

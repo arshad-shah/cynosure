@@ -23,6 +23,7 @@ import { Popover, type PopoverTriggerProps } from "../Popover/Popover.js";
 import { Tooltip } from "../Tooltip/Tooltip.js";
 
 export interface StatusBarTokens {
+  softMix: string;
   height: string;
   background: string;
   border: string;
