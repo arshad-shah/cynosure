@@ -7,5 +7,6 @@ describe("iconSizeFor", () => {
     expect(iconSizeFor("sm")).toBe("md");
     expect(iconSizeFor("md")).toBe("md");
     expect(iconSizeFor("lg")).toBe("lg");
+    expect(iconSizeFor(undefined)).toBe("md");
   });
 });
