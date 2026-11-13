@@ -2,7 +2,7 @@
   {
     "name": "all CSS",
     "path": "dist/styles.css",
-    "limit": "37.8 kB",
+    "limit": "37.81 kB",
     "gzip": true
   },
   {
@@ -13,7 +13,7 @@
       "dist/tokens/defaults.js",
       "dist/tokens/to-css.js"
     ],
-    "limit": "6.86 kB",
+    "limit": "6.87 kB",
     "gzip": true
   },
   {
@@ -79,7 +79,7 @@
       "dist/foundations/TextAreaBase/TextAreaBase.js",
       "dist/styles/text-area.css"
     ],
-    "limit": "4.41 kB",
+    "limit": "4.44 kB",
     "gzip": true
   },
   {
@@ -311,7 +311,7 @@
       "dist/foundations/hotkey.js",
       "dist/styles/command-palette.css"
     ],
-    "limit": "5.2 kB",
+    "limit": "5.26 kB",
     "gzip": true
   },
   {
