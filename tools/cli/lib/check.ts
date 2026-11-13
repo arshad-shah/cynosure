@@ -279,7 +279,7 @@ const SHARED_CLASSES = new Set(["cy-reset", "cy-visually-hidden", "cy-motion-tri
  * Foundations a composite may build on, and which composites do. A foundation is the native element under a
  * component; a composite that needs that element uses the component (Button, Link, TextField…) unless it is a pattern
  * no component covers (a tab, a menu item, a whole-card link). Adding a user here is a review decision: say why in
- * src/foundations/AGENTS.md. Icon and HiddenValue are parts every component may use.
+ * src/foundations/AGENTS.md. Icon, HiddenValue and LiveRegion are parts every component may use.
  */
 export const FOUNDATION_USERS: Record<string, readonly string[]> = {
   ButtonBase: [
@@ -303,7 +303,7 @@ export const FOUNDATION_USERS: Record<string, readonly string[]> = {
   DialogBase: ["CommandPalette", "Dialog"],
   FileInputBase: ["FileDrop", "KeyValueEditor"],
 };
-const FREE_FOUNDATIONS = new Set(["Icon", "HiddenValue"]);
+const FREE_FOUNDATIONS = new Set(["Icon", "HiddenValue", "LiveRegion"]);
 
 /** The class prefixes a component folder owns: its own name and every component it exports. */
 function ownPrefixes(folder: string): string[] {

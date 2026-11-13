@@ -51,7 +51,7 @@ export const App = () => (
 
 ## Components
 
-- **Foundations:** ButtonBase, LinkBase, InputBase, FileInputBase, TextAreaBase, ChoiceBase, HiddenValue, DialogBase, Icon (274 Facet icons and 98 brand marks); hooks `useRovingFocus`, `useDismiss`, `useDrag` (pointer dragging through Detent), `useControllableState`.
+- **Foundations:** ButtonBase, LinkBase, InputBase, FileInputBase, TextAreaBase, ChoiceBase, HiddenValue, LiveRegion (hidden announcements), DialogBase, Icon (274 Facet icons and 98 brand marks); hooks `useRovingFocus`, `useDismiss`, `useDrag` (pointer dragging through Detent), `useControllableState`.
 - **Controls:** Button, IconButton, CopyButton, Link, TextField, NumberField, SearchField, TextArea, Select, Combobox, TagInput, Checkbox, Switch, RadioGroup, SegmentedControl, Slider, DateField, TimeField, Checklist, Pagination, ColorField, ColorSwatches, KeyValueEditor, FileDrop, PathField, SignaturePad, SelectionFrame, CompareSlider, ThemeToggle.
 - **Structure:** AppShell (`useAppShell`), TitleBar, StatusBar, Container, PageHeader, Stack, Inline, Grid, ScrollArea, Divider, AspectRatio, Breadcrumbs, SideNav, SplitPane, Card, Toolbar, Tabs, Disclosure, Accordion, Tree, SortableList, VirtualList, Calendar, DocumentViewport, PanZoomCanvas, ZoomControls.
 - **Overlays:** Tooltip, HoverCard, Popover, FloatingToolbar (`DockedToolbar`), Menu, Menubar, ContextMenu, Dialog, ProgressOverlay, Sheet, CommandPalette (`useHotkey`), Toast (`Toaster`, `useToast`).

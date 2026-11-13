@@ -1,0 +1,57 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./LiveRegion.stories";
+
+<Meta of={Stories} />
+
+# LiveRegion
+
+A hidden live region for screen reader announcements that belong to one component: "Copied", "Moved to position 3 of 8", "Zoom 150%", "3 of 12". It is a foundation: it has no visual output. For announcements from anywhere in an app, use [Announcer](?path=/docs/components-announcer--docs) and `useAnnounce()`, which speak through LiveRegions near the root.
+
+<Canvas of={Stories.AnnouncesPolitely} />
+
+## Who uses it
+
+Announcer, CopyButton, DocumentViewport, FileDrop, HotkeyField, PanZoomCanvas, SearchField, SortableList, Tabs, TagInput and VirtualList.
+
+## When to use it directly
+
+When a component you build announces the outcome of its own actions, or a value it shows (a match count, a zoom level), and must work without an `Announcer` above it, or speaks elements (a [Kbd](?path=/docs/components-kbd--docs)) rather than strings.
+
+**Use something else when** the message comes from app code rather than a component: [Announcer](?path=/docs/components-announcer--docs). When the message is visible text: [Notice](?path=/docs/components-notice--docs) or [Toast](?path=/docs/components-toast--docs), which are live regions themselves.
+
+## Usage
+
+```tsx
+import { LiveRegion, useLiveMessage } from "@arshad-shah/cynosure";
+
+function Saver() {
+  const [message, say] = useLiveMessage();
+  return (
+    <>
+      <Button onClick={() => save().then(() => say("Draft saved"))}>Save</Button>
+      <LiveRegion {...message} />
+    </>
+  );
+}
+
+// Following a value: announced when the words change, not on every render.
+<LiveRegion>{`${count} results`}</LiveRegion>
+```
+
+## Props
+
+<ArgTypes of={Stories} />
+
+`useLiveMessage()` returns `[message, say]`. `say(words)` announces the words, again when they are the same as last time; `say("")` clears the region without a sound. Spread `message` on the region.
+
+## Behaviour and accessibility
+
+- **Polite by default:** `role="status"`, `aria-live="polite"`, `aria-atomic="true"`. `politeness="assertive"` makes it `role="alert"`, for errors.
+- **Always in the page:** the region is rendered empty from the start, so screen readers have registered it before the first message.
+- **Repeats are read:** each `say` puts the words in a new node (a new `sequence`), and screen readers read added content, so pressing Copy twice is announced twice. There is no clear-then-set step and no timer.
+- **Elements:** the message may hold elements; a `Kbd` is read by its spoken name ("Control plus K").
+- **Hidden:** out of sight with `.cy-visually-hidden` (one pixel, clipped), never `display: none` or `aria-hidden`, so it stays in the accessibility tree, and steady under hostile host CSS.
+
+## Related
+
+[Announcer](?path=/docs/components-announcer--docs), [VisuallyHidden](?path=/docs/components-visuallyhidden--docs).
