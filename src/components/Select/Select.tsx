@@ -13,6 +13,7 @@ import { ButtonBase } from "../../foundations/ButtonBase/ButtonBase.js";
 import { useControllableState } from "../../foundations/controllable.js";
 import { HiddenValue } from "../../foundations/HiddenValue/HiddenValue.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
+import { iconSizeFor } from "../../foundations/icon-size.js";
 import { isComposing } from "../../foundations/keys.js";
 import { isTypeaheadKey, seekEnabled, useTypeahead } from "../../foundations/listbox.js";
 import { clamp } from "../../foundations/math.js";
@@ -155,7 +156,7 @@ export function Select({
   className,
   style,
 }: SelectProps) {
-  const iconSize = size === "xs" ? "sm" : "md";
+  const iconSize = iconSizeFor(size);
   const listId = `cy-select-${useId().replace(/:/g, "")}`;
   const trigger = useRef<HTMLButtonElement | null>(null);
   const list = useRef<HTMLDivElement | null>(null);
@@ -274,7 +275,7 @@ export function Select({
       description={description}
       error={error ?? (missing && !current ? (labels?.required ?? "Please choose a value.") : undefined)}
       required={required}
-      size={size === "xs" ? "sm" : size}
+      size={size}
       className={className}
       style={style}
     >

@@ -11,6 +11,7 @@ import {
 } from "react";
 import { ButtonBase, type ButtonBaseProps } from "../../foundations/ButtonBase/ButtonBase.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
+import { iconSizeFor } from "../../foundations/icon-size.js";
 import { LinkBase } from "../../foundations/LinkBase/LinkBase.js";
 import type { IconData } from "../../icons/types.js";
 import type { DenseSize, Tone } from "../../tokens/schema.js";
@@ -140,7 +141,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
   },
   ref,
 ) {
-  const iconSize = size === "lg" ? "lg" : size === "xs" ? "sm" : "md";
+  const iconSize = iconSizeFor(size);
   const [armed, setArmed] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const disarm = () => {

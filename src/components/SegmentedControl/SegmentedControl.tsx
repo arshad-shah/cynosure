@@ -3,6 +3,7 @@ import { ChoiceBase } from "../../foundations/ChoiceBase/ChoiceBase.js";
 import { useControllableState } from "../../foundations/controllable.js";
 import { HiddenValue } from "../../foundations/HiddenValue/HiddenValue.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
+import { iconSizeFor } from "../../foundations/icon-size.js";
 import type { IconData } from "../../icons/types.js";
 import type { DenseSize, Tone } from "../../tokens/schema.js";
 
@@ -121,7 +122,7 @@ export function SegmentedControl({
             checked={current === option.value}
             onChange={(e) => e.currentTarget.checked && setCurrent(option.value)}
           />
-          {option.icon && <Icon icon={option.icon} size={size === "xs" ? "sm" : "md"} />}
+          {option.icon && <Icon icon={option.icon} size={iconSizeFor(size)} />}
           {!iconOnly && <span className="cy-segmented-control-label">{option.label}</span>}
         </label>
       ))}

@@ -14,7 +14,7 @@ Label, description and error wiring for any control. Controls render through a r
 | `description` | –       | Help text, linked via `aria-describedby`                          |
 | `error`       | –       | Announced (`role="alert"`), linked, marks the control invalid     |
 | `required`    | `false` | Draws the required marker (a shape, not a glyph)                  |
-| `size`        | `md`    | `sm` · `md` · `lg`                                                |
+| `size`        | `md`    | `xs` · `sm` · `md` · `lg` (an `xs` control has the `sm` label)    |
 | `group`       | `false` | Labels a `role="group"` (radio groups, segmented controls)        |
 | `layout`      | `stack` | `split`: label and description at the start, control at the end   |
 | `width`       | –       | Control width: `sm` · `md` · `lg` (tokens) · `full`               |

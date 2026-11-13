@@ -11,6 +11,7 @@ import {
 } from "react";
 import { Icon } from "../../foundations/Icon/Icon.js";
 import { InputBase } from "../../foundations/InputBase/InputBase.js";
+import { iconSizeFor } from "../../foundations/icon-size.js";
 import { close } from "../../icons/close.js";
 import { eye } from "../../icons/eye.js";
 import { eyeOff } from "../../icons/eye-off.js";
@@ -138,7 +139,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(function T
 ) {
   const inner = useRef<HTMLInputElement | null>(null);
   const dense = size === "xs";
-  const iconSize = dense ? "sm" : "md";
+  const iconSize = iconSizeFor(size);
   const [shown, setShown] = useState(false);
   const secret = type === "password" && revealable;
   const [filled, setFilled] = useState(Boolean(value ?? defaultValue));
@@ -177,7 +178,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(function T
       description={description}
       error={error}
       required={required}
-      size={size === "xs" ? "sm" : size}
+      size={size}
       id={id}
       className={className}
       style={style}

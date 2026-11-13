@@ -1,6 +1,6 @@
 import type { CSSProperties, ReactNode } from "react";
 import { type FieldRender, useField } from "../../foundations/field.js";
-import type { Size } from "../../tokens/schema.js";
+import type { DenseSize } from "../../tokens/schema.js";
 
 export interface FieldTokens {
   /** Narrowest the label and description get in the split layout before the control moves under them. Default 192px. */
@@ -49,8 +49,8 @@ export interface FieldProps {
    * own width (the whole field in the stacked layout for TextField and the other fields).
    */
   width?: FieldWidth | undefined;
-  /** Size of the label text. Default "md". */
-  size?: Size | undefined;
+  /** Size of the label text, matching the control's size (an `xs` control has the `sm` label). Default "md". */
+  size?: DenseSize | undefined;
   /** Keep the label for assistive tech but take no space (toolbars, dense rows). Prefer visible labels. */
   labelHidden?: boolean | undefined;
   /** Label a group of controls (radio groups) instead of one control. */

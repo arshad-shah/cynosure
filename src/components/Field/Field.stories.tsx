@@ -20,7 +20,7 @@ const meta = {
     description: { control: "text" },
     error: { control: "text" },
     required: { control: "boolean" },
-    size: { control: "inline-radio", options: ["sm", "md", "lg"] },
+    size: { control: "inline-radio", options: ["xs", "sm", "md", "lg"] },
     layout: { control: "inline-radio", options: ["stack", "split"] },
     width: { control: "inline-radio", options: ["sm", "md", "lg", "full"] },
   },
@@ -64,6 +64,23 @@ export const GroupLabelsAGroup: Story = {
   args: { group: true, children: (f) => <div aria-describedby={f.describedBy}>options</div> },
   play: async ({ canvas }) => {
     await expect(canvas.getByRole("group", { name: "Email" })).toBeInTheDocument();
+  },
+};
+
+export const LabelFollowsTheControlSize: Story = {
+  render: (args) => (
+    <div>
+      {(["xs", "sm", "md", "lg"] as const).map((size) => (
+        <Field key={size} {...args} size={size} label={`Label ${size}`} />
+      ))}
+    </div>
+  ),
+  play: async ({ canvas }) => {
+    const size = (name: string) => Number.parseFloat(getComputedStyle(canvas.getByText(name)).fontSize);
+    // A dense (xs) control takes the small label; the label grows with the control from there.
+    await expect(size("Label xs")).toBe(size("Label sm"));
+    await expect(size("Label sm")).toBeLessThan(size("Label md"));
+    await expect(size("Label md")).toBeLessThanOrEqual(size("Label lg"));
   },
 };
 
