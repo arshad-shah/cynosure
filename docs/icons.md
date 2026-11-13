@@ -35,9 +35,9 @@ import { puzzle } from "@arshad-shah/cynosure/icons";
 
 - `iconByName(name)` takes the icon's kebab-case `name` (`"arrow-up-right"`, as in the gallery), and answers `undefined` for anything else (a camelCase export name, another set's name, `"toString"`), so keep a fallback.
 - `icons` is the frozen record behind it, keyed by name (`IconName` is the union of the names), for listing or validating names up front.
-- This entry brings **every** icon with it (about 65 kB gzipped as separate modules, far less once bundled), which is why it is separate: the main entry and `@arshad-shah/cynosure/icons` never import it, so importing icons one by one stays tree-shaken. Use it only where names arrive at run time.
+- This entry brings **every** icon with it (about 13.5 kB gzipped once bundled), which is why it is separate: the main entry and `@arshad-shah/cynosure/icons` never import it, so importing icons one by one stays tree-shaken. Use it only where names arrive at run time.
 
-**Adding one:** draw it on a 24 grid with strokes only, export the SVG, then run `pnpm cy new icon <name> --from icon.svg --category <category>`. In the generated file, set `motion` and mark the moving part `animate: true`. See `src/icons/AGENTS.md`.
+**Adding one:** draw it on a 24 grid with strokes only, export the SVG, then run `pnpm cy new icon <name> --from icon.svg --category <category>`. In the generated file, set `motion` and mark the moving part `animate: true`. See `src/icons/AGENTS.md`. The by-name entry's budget is measured as one bundle by `tools/icons-size.ts`, which `pnpm size` runs after size-limit (size-limit's file plugin gzips each module on its own and overstated it about five times): when new icons push it over, raise `ICONS_BY_NAME_BUDGET` there to what it prints.
 
 ## Brand marks
 
