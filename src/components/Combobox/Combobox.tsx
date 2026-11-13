@@ -14,6 +14,7 @@ import { Icon } from "../../foundations/Icon/Icon.js";
 import { isComposing } from "../../foundations/keys.js";
 import { seekEnabled, useActiveOption } from "../../foundations/listbox.js";
 import { OptionIcon, type OptionIconColor } from "../../foundations/option-icon.js";
+import { textMatches } from "../../foundations/text-match.js";
 import type { IconData } from "../../icons/types.js";
 import { useListboxLayer } from "../../overlay/listbox-layer.js";
 import type { Size } from "../../tokens/schema.js";
@@ -119,8 +120,7 @@ const DEFAULT_LABELS: ComboboxLabels = {
   loading: "Loading…",
   required: "Please choose a value.",
 };
-const contains = (option: ComboboxOption, text: string) =>
-  option.label.toLowerCase().includes(text.trim().toLowerCase());
+const contains = (option: ComboboxOption, text: string) => textMatches(option.label, text);
 
 /** Editable combobox with a list popup (WAI-ARIA APG): type to filter, arrows to choose, async options, forms. */
 export function Combobox({

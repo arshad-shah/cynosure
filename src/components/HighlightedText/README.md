@@ -16,6 +16,8 @@ import { HighlightedText } from "@arshad-shah/cynosure";
 | `query`               | –       | A term or several terms; every occurrence of each is marked, ignoring case |
 | `className` / `style` | –       | Layout only                                                                |
 
+To filter by the same rule that marks, use `textMatches(text, query)` (contains, ignoring case and the query's surrounding spaces): a row it keeps always shows a mark. Combobox, TagInput, TextArea's mentions, Tree and CommandPalette filter with it.
+
 ## Accessibility
 
 The text is in the page once, with matched runs in `<mark>`. An option or tree row named by its content is named by the whole text, and screen readers read that name when it takes focus, with no "highlighted" between the pieces. In a reading mode NVDA and JAWS may say "highlighted" at a mark, which is what it means here. No hidden second copy: find-in-page, copying and `textContent` see the text once. With nothing matched, the text is one plain text node.

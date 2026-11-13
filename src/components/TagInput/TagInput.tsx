@@ -13,6 +13,7 @@ import { isRtl } from "../../foundations/dir.js";
 import { HiddenValue } from "../../foundations/HiddenValue/HiddenValue.js";
 import { isComposing } from "../../foundations/keys.js";
 import { useActiveOption } from "../../foundations/listbox.js";
+import { textMatches } from "../../foundations/text-match.js";
 import { close } from "../../icons/close.js";
 import type { IconData } from "../../icons/types.js";
 import { useListboxLayer } from "../../overlay/listbox-layer.js";
@@ -163,9 +164,7 @@ export function TagInput({
 
   const same = (a: string, b: string) => a.toLocaleLowerCase() === b.toLocaleLowerCase();
   const query = typed.trim();
-  const matches = (suggestions ?? []).filter(
-    (s) => !tags.some((t) => same(t, s)) && s.toLocaleLowerCase().includes(query.toLocaleLowerCase()),
-  );
+  const matches = (suggestions ?? []).filter((s) => !tags.some((t) => same(t, s)) && textMatches(s, query));
   const listOpen = open && suggestions !== undefined && !disabled;
   const { active, activeId, optionId, setActive, first, last, move } = useActiveOption({
     id: listId,

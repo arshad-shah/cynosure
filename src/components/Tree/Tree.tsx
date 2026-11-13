@@ -20,6 +20,7 @@ import { isRtl } from "../../foundations/dir.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
 import { isTypeaheadKey, useTypeahead } from "../../foundations/listbox.js";
 import { OptionIcon, type OptionIconColor } from "../../foundations/option-icon.js";
+import { textMatches } from "../../foundations/text-match.js";
 import { useVirtualWindow } from "../../foundations/virtual-window.js";
 import { chevronRight } from "../../icons/chevron-right.js";
 import type { IconData } from "../../icons/types.js";
@@ -286,9 +287,8 @@ export function Tree<T = unknown>(props: TreeProps<T>) {
   const query = typeof filter === "string" ? filter.trim() : "";
   const search = useMemo(() => {
     if (filter === undefined || (typeof filter === "string" && !query)) return null;
-    const needle = query.toLowerCase();
     const matchOf = (item: TreeItem<never>): Match | null => {
-      if (typeof filter === "string") return item.label.toLowerCase().includes(needle) ? true : null;
+      if (typeof filter === "string") return textMatches(item.label, query) ? true : null;
       const found = filter(item);
       return found === true ? true : Array.isArray(found) ? (found as readonly number[]) : null;
     };

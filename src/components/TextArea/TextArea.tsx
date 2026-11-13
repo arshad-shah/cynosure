@@ -16,6 +16,7 @@ import { Icon } from "../../foundations/Icon/Icon.js";
 import { isComposing } from "../../foundations/keys.js";
 import { useActiveOption } from "../../foundations/listbox.js";
 import { TextAreaBase } from "../../foundations/TextAreaBase/TextAreaBase.js";
+import { textMatches } from "../../foundations/text-match.js";
 import { resizeCorner } from "../../icons/resize-corner.js";
 import { useListboxLayer } from "../../overlay/listbox-layer.js";
 import type { Size } from "../../tokens/schema.js";
@@ -293,13 +294,10 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(function 
     };
   }, [query]);
 
-  const lower = (query ?? "").toLocaleLowerCase();
   const items = fromList
     ? (suggestions as readonly (string | TextAreaMention)[])
         .map(asMention)
-        .filter((m) =>
-          `${m.value} ${typeof m.label === "string" ? m.label : ""}`.toLocaleLowerCase().includes(lower),
-        )
+        .filter((m) => textMatches(`${m.value} ${typeof m.label === "string" ? m.label : ""}`, query ?? ""))
     : found.items;
   const loading = !fromList && found.loading;
   const listOpen = query !== null && (items.length > 0 || loading);

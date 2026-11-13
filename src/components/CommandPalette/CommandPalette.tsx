@@ -8,6 +8,7 @@ import { Icon } from "../../foundations/Icon/Icon.js";
 import { InputBase } from "../../foundations/InputBase/InputBase.js";
 import { isComposing } from "../../foundations/keys.js";
 import { useActiveOption } from "../../foundations/listbox.js";
+import { textMatchAt, textMatches } from "../../foundations/text-match.js";
 import { search } from "../../icons/search.js";
 import type { IconData } from "../../icons/types.js";
 import { useDismiss } from "../../overlay/dismiss.js";
@@ -116,17 +117,14 @@ const DEFAULT_LABELS: CommandPaletteLabels = {
 };
 
 /** The words of a query. */
-const wordsOf = (query: string) => query.toLowerCase().split(/\s+/).filter(Boolean);
+const wordsOf = (query: string) => query.split(/\s+/).filter(Boolean);
 
 /** Every word of the query must appear in the label or keywords; label prefix matches rank first. */
 function rank(commands: Command[], words: string[]): Command[] {
-  const hay = (c: Command) => [c.label, ...(c.keywords ?? [])].join(" ").toLowerCase();
-  const found = commands.filter((c) => words.every((w) => hay(c).includes(w)));
-  const first = words[0] as string;
-  return [
-    ...found.filter((c) => c.label.toLowerCase().startsWith(first)),
-    ...found.filter((c) => !c.label.toLowerCase().startsWith(first)),
-  ];
+  const hay = (c: Command) => [c.label, ...(c.keywords ?? [])].join(" ");
+  const found = commands.filter((c) => words.every((w) => textMatches(hay(c), w)));
+  const prefixed = (c: Command) => textMatchAt(c.label, words[0] as string) === 0;
+  return [...found.filter(prefixed), ...found.filter((c) => !prefixed(c))];
 }
 
 /** Search-and-run list of commands in a modal dialog, opened by a global shortcut (Ctrl or Command + K). */
