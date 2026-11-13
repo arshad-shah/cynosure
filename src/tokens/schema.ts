@@ -8,6 +8,15 @@ export type Size = "sm" | "md" | "lg";
 export type DenseSize = "xs" | Size;
 /** Semantic colour shared by every component prop named `tone`. */
 export type Tone = "accent" | "neutral" | "danger" | "success" | "warning" | "info";
+/** Every `Tone`, in order: for checking a value and for listing the choices (stories, the scaffold). */
+export const TONES = [
+  "accent",
+  "neutral",
+  "danger",
+  "success",
+  "warning",
+  "info",
+] as const satisfies readonly Tone[];
 export type Scale = "compact" | "comfortable" | "spacious" | number;
 export type PaletteName = "light" | "dark" | "light-contrast" | "dark-contrast";
 

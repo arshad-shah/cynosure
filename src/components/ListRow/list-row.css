@@ -75,7 +75,7 @@
     --_tone: var(--cy-color-accent);
   }
   &[data-tone="neutral"] {
-    --_tone: var(--cy-color-muted);
+    --_tone: var(--cy-color-ink);
   }
   &[data-tone="danger"] {
     --_tone: var(--cy-color-danger);

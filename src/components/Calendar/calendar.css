@@ -152,7 +152,7 @@
 .cy-calendar-number.cy-calendar-number {
   font-size: inherit;
 }
-.cy-calendar :is(.cy-calendar-day, .cy-calendar-dot) {
+.cy-calendar .cy-calendar-day {
   &[data-tone="accent"] {
     --_tone: var(--cy-color-accent);
   }
@@ -180,7 +180,6 @@
   pointer-events: none;
 }
 .cy-calendar-dot.cy-calendar-dot {
-  --_tone: var(--cy-color-ink);
   inline-size: var(--cy-calendar-dot-size, var(--cy-space-2));
   block-size: var(--cy-calendar-dot-size, var(--cy-space-2));
   border-radius: var(--cy-radius-full, 50%);
