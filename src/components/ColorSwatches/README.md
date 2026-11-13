@@ -19,7 +19,7 @@ import { ColorSwatches } from "@arshad-shah/cynosure";
 | `swatches`           | –       | Any CSS colours, as strings or `{ value, label }` (the label is spoken; default the value) |
 | `value` / `onChange` | –       | Matched by colour, so "#FFF" and "white" are the same swatch                               |
 | `disabled`, `size`   | –, `md` |                                                                                            |
-- One tab stop; arrow keys move and choose (once a colour is chosen); Home and End jump.
+- One tab stop; arrow keys move and choose (once a colour is chosen); Home and End jump. Tab only focuses: it never replaces a colour that matches no swatch.
 - The chosen swatch has a ring and a tick that is dark on light colours and light on dark ones. Transparent colours show over a checkerboard.
 - Hit areas are at least 24px, 44px on touch screens.
 

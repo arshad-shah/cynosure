@@ -8,7 +8,7 @@
     "type": "git",
     "url": "git+https://github.com/arshad-shah/cynosure.git"
   },
-  "homepage": "https://arshad-shah.github.io/cynosure/",
+  "homepage": "https://cynosure.arshadshah.com",
   "type": "module",
   "packageManager": "pnpm@10.33.0",
   "engines": {
@@ -30,13 +30,13 @@
     "lint": "biome check .",
     "format": "biome check --write .",
     "test": "pnpm css && vitest run --project unit --project preact",
-    "test:stories": "pnpm css && CY_BROWSERS=chromium,webkit vitest run --project stories --project touch && CY_BROWSERS=firefox vitest run --project stories",
+    "test:stories": "pnpm css && CY_BROWSERS=chromium,webkit vitest run --project stories --project touch && CY_BROWSERS=chromium,webkit vitest run --project serial && CY_BROWSERS=firefox vitest run --project stories && CY_BROWSERS=firefox vitest run --project serial",
     "test:react18": "pnpm css && pnpm --dir tests/react18 install --frozen-lockfile && vitest run --root tests/react18",
-    "test:visual": "pnpm css && VITE_CY_VISUAL=1 CY_BROWSERS=chromium vitest run --project stories",
+    "test:visual": "pnpm css && VITE_CY_VISUAL=1 CY_BROWSERS=chromium vitest run --project stories --project serial",
     "storybook": "pnpm css && storybook dev -p 6006 --no-open",
     "build-storybook": "pnpm css && storybook build",
     "build:site": "pnpm --filter @arshad-shah/cynosure-site build && pnpm build-storybook --output-dir site/dist/storybook",
-    "size": "size-limit",
+    "size": "size-limit && node --import tsx tools/icons-size.ts",
     "cy": "node --import tsx tools/cli/index.ts",
     "check": "node --import tsx tools/cli/index.ts check",
     "verify": "pnpm check && pnpm lint && pnpm typecheck && pnpm test && pnpm test:react18 && pnpm test:stories && pnpm coverage && pnpm build && publint && pnpm attw && pnpm size",
@@ -45,7 +45,7 @@
     "prepare": "git config --worktree core.hooksPath .githooks 2>/dev/null || git config core.hooksPath .githooks",
     "css": "node --import tsx tools/build-css.ts",
     "attw": "attw --pack . --profile esm-only --exclude-entrypoints styles.css 'styles/*.css' 'fonts/*'",
-    "coverage": "pnpm css && CY_BROWSERS=chromium vitest run --coverage --project unit --project preact --project stories --project touch"
+    "coverage": "pnpm css && CY_BROWSERS=chromium vitest run --coverage --project unit --project preact --project stories --project touch --project serial"
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.0",
@@ -88,6 +88,10 @@
     "./icons": {
       "types": "./dist/icons/index.d.ts",
       "default": "./dist/icons/index.js"
+    },
+    "./icons/by-name": {
+      "types": "./dist/icons/by-name.d.ts",
+      "default": "./dist/icons/by-name.js"
     },
     "./brands": {
       "types": "./dist/brands/index.d.ts",

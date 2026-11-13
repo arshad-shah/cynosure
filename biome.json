@@ -25,6 +25,9 @@
     "rules": {
       "complexity": {
         "noImportantStyles": "off"
+      },
+      "a11y": {
+        "useValidAriaRole": { "level": "error", "options": { "ignoreNonDom": true } }
       }
     }
   },

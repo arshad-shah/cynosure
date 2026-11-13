@@ -26,7 +26,11 @@ export interface ZoomControlsProps {
   percent: number;
   /** Called with the new setting when the person zooms in or out, or picks one from the menu. */
   onZoomChange: (zoom: ZoomSetting) => void;
-  /** The percents offered in the menu. Default 50, 75, 100, 125, 150, 200, 400. */
+  /** The smallest percent zoom out goes to (a PanZoomCanvas's `min`). Default 25. */
+  min?: number;
+  /** The largest percent zoom in goes to (a PanZoomCanvas's `max`). Default 800. */
+  max?: number;
+  /** The percents offered in the menu (those between `min` and `max`). Default 50, 75, 100, 125, 150, 200, 400. */
   presets?: number[];
   /** Size of the three buttons. Default "sm". */
   size?: Size;
@@ -55,6 +59,8 @@ export function ZoomControls({
   zoom,
   percent,
   onZoomChange,
+  min = MIN_PERCENT,
+  max = MAX_PERCENT,
   presets = [50, 75, 100, 125, 150, 200, 400],
   size = "sm",
   labels,
@@ -67,9 +73,10 @@ export function ZoomControls({
   const items: MenuItem[] = [
     { value: "fit-width", label: text.fitWidth },
     { value: "fit-page", label: text.fitPage },
-    ...presets.map((p) => ({ value: `${p}`, label: `${p}%` })),
+    ...presets.filter((p) => p >= min && p <= max).map((p) => ({ value: `${p}`, label: `${p}%` })),
   ].map((item) => ({ ...item, kind: "radio" as const, checked: item.value === choice, keepOpen: false }));
-  const step = (direction: 1 | -1) => onZoomChange({ kind: "percent", value: zoomStep(shown, direction) });
+  const step = (direction: 1 | -1) =>
+    onZoomChange({ kind: "percent", value: zoomStep(shown, direction, min, max) });
   return (
     <Toolbar
       label={text.group}
@@ -81,7 +88,7 @@ export function ZoomControls({
         label={text.zoomOut}
         variant="ghost"
         size={size}
-        disabled={shown <= MIN_PERCENT}
+        disabled={shown <= min}
         onClick={() => step(-1)}
       />
       <Menu
@@ -111,7 +118,7 @@ export function ZoomControls({
         label={text.zoomIn}
         variant="ghost"
         size={size}
-        disabled={shown >= MAX_PERCENT}
+        disabled={shown >= max}
         onClick={() => step(1)}
       />
     </Toolbar>

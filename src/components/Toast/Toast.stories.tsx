@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { Component, type ReactNode, useEffect, useState } from "react";
-import { expect, fn, waitFor } from "storybook/test";
+import { Component, type ReactNode, useEffect, useRef, useState } from "react";
+import { createRoot } from "react-dom/client";
+import { expect, fn, waitFor, within } from "storybook/test";
+import { createStyleSheet } from "../../styles/inline.js";
 import { computeUnderHostileHost } from "../../test/hostile.js";
 import { settled, shownFully } from "../../test/settle.js";
 import { CynosureTheme } from "../../theme/CynosureTheme.js";
@@ -8,7 +10,14 @@ import { createTheme } from "../../tokens/index.js";
 import { Button } from "../Button/Button.js";
 import { Dialog } from "../Dialog/Dialog.js";
 import { Inline } from "../Inline/Inline.js";
-import { Toaster, type ToasterProps, type ToastOptions, type ToastPosition, useToast } from "./Toast.js";
+import {
+  type ToastApi,
+  Toaster,
+  type ToasterProps,
+  type ToastOptions,
+  type ToastPosition,
+  useToast,
+} from "./Toast.js";
 
 /** Buttons that raise toasts, so the stories exercise the real `useToast()` path. */
 function Demo({ options }: { options: Record<string, ToastOptions> }) {
@@ -158,6 +167,47 @@ export const KeyboardDismissKeepsFocusInTheStack: Story = {
     await expect(one.querySelector('[aria-label="Dismiss"]')).toHaveFocus();
     await userEvent.keyboard("{Enter}");
     await gone(one);
+  },
+};
+
+function ShadowToaster() {
+  const host = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = host.current;
+    if (!el || el.shadowRoot) return;
+    const root = el.attachShadow({ mode: "open" });
+    root.adoptedStyleSheets = [createStyleSheet()];
+    const mount = document.createElement("div");
+    root.append(mount);
+    createRoot(mount).render(
+      withToaster({
+        One: { title: "One", duration: Number.POSITIVE_INFINITY },
+        Two: { title: "Two", duration: Number.POSITIVE_INFINITY },
+      }),
+    );
+  }, []);
+  return <div data-testid="host" ref={host} />;
+}
+
+export const KeyboardDismissInsideAShadowRoot: Story = {
+  render: () => <ShadowToaster />,
+  play: async ({ canvas }) => {
+    const host = await canvas.findByTestId("host");
+    await waitFor(() => expect(host.shadowRoot?.querySelector("button")).toBeTruthy());
+    const root = host.shadowRoot as ShadowRoot;
+    const button = (name: string) =>
+      [...root.querySelectorAll<HTMLElement>("button")].find((b) => b.textContent === name) as HTMLElement;
+    button("One").click();
+    button("Two").click();
+    const all = () => [...root.querySelectorAll<HTMLElement>(".cy-toast")];
+    await waitFor(() => expect(all()).toHaveLength(2));
+    const [one, two] = all() as [HTMLElement, HTMLElement];
+    const close = (toast: HTMLElement) => toast.querySelector('[aria-label="Dismiss"]') as HTMLElement;
+    close(two).focus();
+    close(two).click();
+    await gone(two);
+    // Focus moved to the remaining toast's close button, though the page only sees the shadow host focused.
+    await expect(root.activeElement).toBe(close(one));
   },
 };
 
@@ -501,10 +551,14 @@ export const NeedsAToaster: Story = {
   },
 };
 
+const swiped = fn();
+
 export const SwipeToDismiss: Story = {
   tags: ["touch", "!dev"],
-  render: (args) => withToaster({ Save: { ...saved, duration: Number.POSITIVE_INFINITY } }, args),
+  render: (args) =>
+    withToaster({ Save: { ...saved, duration: Number.POSITIVE_INFINITY, onDismiss: swiped } }, args),
   play: async ({ canvas, userEvent }) => {
+    swiped.mockClear();
     await userEvent.pointer({ keys: "[TouchA]", target: canvas.getByRole("button", { name: "Save" }) });
     const toast = await canvas.findByRole("status");
     const box = toast.getBoundingClientRect();
@@ -517,12 +571,55 @@ export const SwipeToDismiss: Story = {
     ]);
     await expect(toast.isConnected).toBe(true);
     await expect(toast.style.getPropertyValue("--_dx")).toBe("");
-    // A long one dismisses.
+    await expect(swiped).not.toHaveBeenCalled();
+    // A long one dismisses, as the user's doing.
     await userEvent.pointer([
       { keys: "[TouchA>]", target: toast, coords: { clientX: box.left + 40, clientY: y } },
       { pointerName: "TouchA", target: toast, coords: { clientX: box.left + 140, clientY: y } },
       { keys: "[/TouchA]", target: toast, coords: { clientX: box.left + 140, clientY: y } },
     ]);
+    await gone(toast);
+    await expect(swiped).toHaveBeenCalledTimes(1);
+    await expect(swiped).toHaveBeenCalledWith(toast.dataset.id, "user");
+  },
+};
+
+const tapUndo = fn();
+
+export const SwipeCancelsWithEscapeAndTapsStillWork: Story = {
+  tags: ["touch", "!dev"],
+  render: (args) =>
+    withToaster(
+      { Save: { ...saved, duration: Number.POSITIVE_INFINITY, action: { label: "Undo", onClick: tapUndo } } },
+      args,
+    ),
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.pointer({ keys: "[TouchA]", target: canvas.getByRole("button", { name: "Save" }) });
+    const toast = await canvas.findByRole("status");
+    const box = toast.getBoundingClientRect();
+    const y = box.top + box.height / 2;
+    // Escape during a swipe puts the toast back, even past the dismiss distance.
+    await userEvent.pointer([
+      { keys: "[TouchA>]", target: toast, coords: { clientX: box.left + 40, clientY: y } },
+      { pointerName: "TouchA", target: toast, coords: { clientX: box.left + 140, clientY: y } },
+    ]);
+    await expect(toast.style.getPropertyValue("--_dx")).toBe("100px");
+    await userEvent.keyboard("{Escape}");
+    await userEvent.pointer({
+      keys: "[/TouchA]",
+      target: toast,
+      coords: { clientX: box.left + 140, clientY: y },
+    });
+    await expect(toast.isConnected).toBe(true);
+    await expect(toast.style.getPropertyValue("--_dx")).toBe("");
+    await expect(toast).not.toHaveAttribute("data-swiping");
+    // A tap on the toast's buttons is a tap, not a swipe.
+    await userEvent.pointer({
+      keys: "[TouchA]",
+      target: await canvas.findByRole("button", { name: "Undo" }),
+    });
+    await expect(tapUndo).toHaveBeenCalledTimes(1);
+    await userEvent.pointer({ keys: "[TouchA]", target: canvas.getByRole("button", { name: "Dismiss" }) });
     await gone(toast);
   },
 };
@@ -641,5 +738,248 @@ export const ToastsKeepTheirTimeWhenTheDialogCloses: Story = {
     await waitFor(() => expect(toast.isConnected).toBe(false), { timeout: 4000 });
     // It finished its remaining second or so, rather than starting a fresh 3s.
     await expect(Date.now() - closedAt).toBeLessThan(2500);
+  },
+};
+
+/** Buttons that each run a step against the real `useToast()` API. */
+function Steps({ steps }: { steps: Record<string, (api: ToastApi) => unknown> }) {
+  const api = useToast();
+  return (
+    <Inline gap="3" wrap>
+      {Object.entries(steps).map(([name, run]) => (
+        <Button key={name} onClick={() => run(api)}>
+          {name}
+        </Button>
+      ))}
+    </Inline>
+  );
+}
+
+const returned: string[] = [];
+const QUERY_STEPS: Record<string, (api: ToastApi) => unknown> = {
+  Run: ({ toast }) =>
+    returned.push(toast({ id: "query", title: "Running query", loading: true, duration: 200 })),
+  Finish: ({ toast }) =>
+    returned.push(
+      toast({
+        id: "query",
+        title: "Query finished",
+        description: "120 rows",
+        tone: "success",
+        duration: 600,
+      }),
+    ),
+};
+
+export const UpdatesInPlaceFromLoadingToDone: Story = {
+  render: (args) => (
+    <Toaster {...args}>
+      <Steps steps={QUERY_STEPS} />
+    </Toaster>
+  ),
+  play: async ({ canvas, userEvent }) => {
+    returned.length = 0;
+    await userEvent.click(canvas.getByRole("button", { name: "Run" }));
+    const toast = await canvas.findByRole("status");
+    await waitFor(() => expect(toast).toHaveTextContent("Running query"));
+    // Loading: the spinner in place of the tone icon, and no timer however short `duration` is.
+    await expect(toast.querySelector(".cy-loading-dots-spinner")).not.toBeNull();
+    await expect(toast.querySelectorAll(".cy-toast-icon")).toHaveLength(1);
+    await sleep(500);
+    await expect(toast.isConnected).toBe(true);
+    // The same id updates that toast: the same element, now done, with its tone and icon.
+    await userEvent.click(canvas.getByRole("button", { name: "Finish" }));
+    await waitFor(() => expect(toast).toHaveTextContent("Query finished120 rows"));
+    await expect(toasts()).toEqual([toast]);
+    await expect(toast).toHaveAttribute("data-tone", "success");
+    await expect(toast.querySelector(".cy-loading-dots-spinner")).toBeNull();
+    await expect(toast.querySelector("svg.cy-toast-icon")).not.toBeNull();
+    await expect(returned).toEqual(["query", "query"]);
+    // Updated, it times out with its new duration.
+    await gone(toast);
+  },
+};
+
+const UPDATE_STEPS: Record<string, (api: ToastApi) => unknown> = {
+  Start: ({ toast }) => toast({ id: "sync", title: "Syncing", loading: true }),
+  Same: ({ toast }) => toast({ id: "sync", title: "Syncing", loading: true, duration: 9000 }),
+  Change: ({ toast }) => toast({ id: "sync", title: "Synced", duration: Number.POSITIVE_INFINITY }),
+};
+
+export const UpdatesAreAnnouncedOnce: Story = {
+  render: (args) => (
+    <Toaster {...args}>
+      <Steps steps={UPDATE_STEPS} />
+    </Toaster>
+  ),
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole("button", { name: "Start" }));
+    const toast = await canvas.findByRole("status");
+    await waitFor(() => expect(toast).toHaveTextContent("Syncing"));
+    const text = toast.querySelector(".cy-toast-text") as HTMLElement;
+    const changes: MutationRecord[] = [];
+    const observer = new MutationObserver((records) => changes.push(...records));
+    observer.observe(text, { subtree: true, childList: true, characterData: true });
+    try {
+      // The same text again changes nothing in the live region, so there is nothing to announce again.
+      await userEvent.click(canvas.getByRole("button", { name: "Same" }));
+      await sleep(100);
+      await expect(changes).toHaveLength(0);
+      // New text replaces the old in the one live region, at once (no second toast, no delayed re-insert).
+      await userEvent.click(canvas.getByRole("button", { name: "Change" }));
+      await waitFor(() => expect(toast).toHaveTextContent("Synced"));
+      await expect(document.querySelectorAll('[role="status"], [role="alert"]')).toHaveLength(1);
+      await expect(toast.querySelector(".cy-toast-text")).toBe(text);
+      const count = changes.length;
+      await sleep(100);
+      await expect(changes).toHaveLength(count);
+    } finally {
+      observer.disconnect();
+    }
+  },
+};
+
+const ended = fn();
+const DISMISS_STEPS: Record<string, (api: ToastApi) => unknown> = {
+  Quick: ({ toast }) => toast({ id: "quick", title: "Quick", duration: 200, onDismiss: ended }),
+  Stays: ({ toast }) =>
+    toast({ id: "stays", title: "Stays", duration: Number.POSITIVE_INFINITY, onDismiss: ended }),
+  Many: ({ toast, dismiss }) => {
+    toast({ id: "a", title: "A", duration: Number.POSITIVE_INFINITY, onDismiss: ended });
+    toast({
+      id: "b",
+      title: "B",
+      duration: Number.POSITIVE_INFINITY,
+      onDismiss: ended,
+      action: { label: "Clear all", onClick: () => dismiss() },
+    });
+  },
+  "Close stays": ({ dismiss }) => dismiss("stays"),
+  "Close again": ({ dismiss }) => {
+    dismiss("a");
+    dismiss("nothing");
+  },
+};
+
+export const OnDismissSaysWhy: Story = {
+  render: (args) => (
+    <Toaster {...args}>
+      <Steps steps={DISMISS_STEPS} />
+    </Toaster>
+  ),
+  play: async ({ canvas, userEvent }) => {
+    ended.mockClear();
+    const click = (name: string) => userEvent.click(canvas.getByRole("button", { name }));
+    // Its timer ran out.
+    await click("Quick");
+    await gone(await canvas.findByRole("status"));
+    await expect(ended).toHaveBeenLastCalledWith("quick", "timeout");
+    // The close button.
+    await click("Stays");
+    const stays = await canvas.findByRole("status");
+    await userEvent.click(within(stays).getByRole("button", { name: "Dismiss" }));
+    await gone(stays);
+    await expect(ended).toHaveBeenLastCalledWith("stays", "user");
+    // dismiss(id), and dismiss() for every toast; once each.
+    await click("Stays");
+    await waitFor(() => expect(toasts()).toHaveLength(1));
+    await click("Close stays");
+    await expect(ended).toHaveBeenLastCalledWith("stays", "programmatic");
+    await click("Many");
+    await waitFor(() => expect(toasts().filter((t) => !t.hasAttribute("data-leaving"))).toHaveLength(2));
+    // dismiss() from a toast's own action: focus leaves the closing toasts rather than staying in an inert one.
+    await click("Clear all");
+    await expect(ended).toHaveBeenCalledWith("a", "programmatic");
+    await expect(canvas.getByRole("region", { name: "Notifications" }).contains(document.activeElement)).toBe(
+      false,
+    );
+    await expect(ended).toHaveBeenLastCalledWith("b", "programmatic");
+    const calls = ended.mock.calls.length;
+    // Closing one that is already closing, or one that does not exist, reports nothing.
+    await click("Close again");
+    await waitFor(() => expect(toasts()).toHaveLength(0), { timeout: 3000 });
+    await expect(ended).toHaveBeenCalledTimes(calls);
+    await expect(calls).toBe(5);
+  },
+};
+
+const REVIVE_STEPS: Record<string, (api: ToastApi) => unknown> = {
+  Show: ({ toast }) => {
+    toast({ id: "job", title: "Job queued", duration: Number.POSITIVE_INFINITY });
+    toast({ title: "Other", duration: Number.POSITIVE_INFINITY });
+  },
+  "Close and reopen": ({ toast, dismiss }) => {
+    dismiss("job");
+    toast({ id: "job", title: "Job running", loading: true });
+  },
+};
+
+export const UpdatingAClosingToastBringsItBack: Story = {
+  render: (args) => (
+    <Toaster {...args}>
+      <Steps steps={REVIVE_STEPS} />
+    </Toaster>
+  ),
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole("button", { name: "Show" }));
+    await waitFor(() => expect(toasts()).toHaveLength(2));
+    const [toast, other] = toasts() as [HTMLElement, HTMLElement];
+    await waitFor(() => expect(toast).toHaveTextContent("Job queued"));
+    await userEvent.click(canvas.getByRole("button", { name: "Close and reopen" }));
+    // It stays: the update came while it was closing, so it is the live toast again rather than a second one.
+    await waitFor(() => expect(toast).toHaveTextContent("Job running"));
+    await sleep(800);
+    await expect(toast.isConnected).toBe(true);
+    await expect(toast).not.toHaveAttribute("data-leaving");
+    // The other toast is untouched.
+    await expect(toasts()).toEqual([toast, other]);
+    await expect(other).toHaveTextContent("Other");
+  },
+};
+
+/** A Dialog whose buttons run a loading toast through to done. */
+function DialogWithProgress() {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      <Button onClick={() => setOpen(true)}>Edit</Button>
+      <Dialog title="Edit" open={open} onOpenChange={setOpen}>
+        <Steps
+          steps={{
+            Upload: ({ toast }) => toast({ id: "upload", title: "Uploading", loading: true }),
+            Done: ({ toast }) =>
+              toast({ id: "upload", title: "Uploaded", tone: "success", duration: Number.POSITIVE_INFINITY }),
+          }}
+        />
+      </Dialog>
+    </>
+  );
+}
+
+export const UpdatesInsideADialog: Story = {
+  render: (args) => (
+    <Toaster {...args}>
+      <DialogWithProgress />
+    </Toaster>
+  ),
+  play: async ({ canvas, userEvent }) => {
+    await openDialog(canvas, (e) => userEvent.click(e));
+    await userEvent.click(canvas.getByRole("button", { name: "Upload" }));
+    const toast = await canvas.findByRole("status");
+    await waitFor(() => expect(toast).toHaveTextContent("Uploading"));
+    await expect(dialogEl().contains(toast)).toBe(true);
+    // Updated while hosted in the dialog: still one toast, above the dialog.
+    await userEvent.click(canvas.getByRole("button", { name: "Done" }));
+    await waitFor(() => expect(toast).toHaveTextContent("Uploaded"));
+    await expect(toasts()).toEqual([toast]);
+    await expect(toast.querySelector(".cy-loading-dots-spinner")).toBeNull();
+    // The dialog closes: the updated toast moves back to the page as it is, without announcing again.
+    await closeDialog((k) => userEvent.keyboard(k));
+    const moved = (await canvas.findByText("Uploaded", { selector: ".cy-toast-title" })).closest(
+      ".cy-toast",
+    ) as HTMLElement;
+    await expect(dialogEl().contains(moved)).toBe(false);
+    await expect(moved).toHaveAttribute("data-tone", "success");
+    await expect(toasts()).toEqual([moved]);
   },
 };

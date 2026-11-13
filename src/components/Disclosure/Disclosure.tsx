@@ -1,11 +1,14 @@
 import { type CSSProperties, type KeyboardEvent, type ReactNode, useId } from "react";
 import { ButtonBase } from "../../foundations/ButtonBase/ButtonBase.js";
 import { useControllableState } from "../../foundations/controllable.js";
+import { type Edge, edgeProps } from "../../foundations/edge.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
 import { chevronDown } from "../../icons/chevron-down.js";
 import type { Size } from "../../tokens/schema.js";
 
 export interface DisclosureTokens {
+  /** Thickness of the `edge`. Default 4px, as Card's. */
+  edgeWidth: string;
   gap: string;
   radius: string;
   paddingInline: string;
@@ -28,6 +31,17 @@ export interface DisclosureProps {
   onOpenChange?: (open: boolean) => void;
   /** `plain` no chrome, `line` bottom divider, `card` bordered surface. */
   variant?: "plain" | "line" | "card";
+  /**
+   * A coloured edge on the inline-start side, as Card's `edge`: a tone name uses that tone's colour, any other string
+   * is a CSS colour (a log entry's level, a tool call's status). Say the same thing in words too. Default: no edge.
+   */
+  edge?: Edge;
+  /**
+   * Content at the end of the summary row, before the chevron and outside the trigger button: a Badge with a count or
+   * a status, or a Button of its own. Its text is not part of the trigger's name. Pressing a Badge or text there
+   * toggles the section; a control there is its own target.
+   */
+  trailing?: ReactNode;
   /** Height of the trigger and size of the text. Default "md". */
   size?: Size;
   /** Wrap the trigger in a heading of this level (accordion sections in a document outline). */
@@ -55,6 +69,8 @@ export function Disclosure({
   defaultOpen = false,
   onOpenChange,
   variant = "plain",
+  edge,
+  trailing,
   size = "md",
   headingLevel,
   region = false,
@@ -86,6 +102,7 @@ export function Disclosure({
     </ButtonBase>
   );
   const Heading = headingLevel ? (`h${headingLevel}` as const) : null;
+  const head = Heading ? <Heading className="cy-disclosure-heading">{trigger}</Heading> : trigger;
   return (
     <div
       {...rest}
@@ -93,9 +110,17 @@ export function Disclosure({
       data-variant={variant}
       data-size={size}
       data-open={isOpen ? "" : undefined}
-      style={style}
+      {...edgeProps(edge, style)}
     >
-      {Heading ? <Heading className="cy-disclosure-heading">{trigger}</Heading> : trigger}
+      {trailing == null ? (
+        head
+      ) : (
+        // The trigger spans the whole row; the end slot is its sibling, laid over the space the trigger keeps free.
+        <div className="cy-disclosure-row">
+          {head}
+          <div className="cy-disclosure-trailing cy-reset">{trailing}</div>
+        </div>
+      )}
       <div
         id={`${id}-content`}
         className="cy-disclosure-content"

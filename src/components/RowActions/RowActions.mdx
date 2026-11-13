@@ -1,0 +1,67 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./RowActions.stories";
+
+<Meta of={Stories} />
+
+# RowActions
+
+The buttons at the end of a row: out of the way until the row is pointed at or holds focus, always shown on touch screens, and in the Tab order only on the row that holds the Tab stop. ListRow, Tree and ChatMessage draw their `actions` with it; use it for a row of your own.
+
+<Canvas of={Stories.ShownWhileTheRowHoldsFocus} />
+
+## When to use
+
+- A row (a list entry, a tree item, a message) with a few commands of its own that would clutter every row if always shown.
+
+Use something else when:
+
+- the commands are the main thing the row does: make the row a button or a link ([ListRow](?path=/docs/components-listrow--docs) with `onClick` or `href`).
+- the controls always show: a [Toolbar](?path=/docs/components-toolbar--docs) or an [Inline](?path=/docs/components-inline--docs) of buttons.
+- the row is a whole list of rows: [ListRow](?path=/docs/components-listrow--docs) and [Tree](?path=/docs/components-tree--docs) already render it.
+
+## Usage
+
+```tsx
+import { IconButton, RowActions } from "@arshad-shah/cynosure";
+
+<li className="file-row">
+  <Button ref={main}>report.pdf</Button>
+  <RowActions tabbable={main}>
+    <IconButton icon={edit} label="Rename" variant="ghost" size="sm" />
+    <IconButton icon={trash} label="Delete" variant="ghost" size="sm" />
+  </RowActions>
+</li>
+```
+
+The row is the element that holds RowActions: hovering it, or focus anywhere in it, shows the actions. When the row is a larger element around it, mark that element with `data-row-actions-host` (ChatMessage marks the whole message).
+
+<Canvas of={Stories.InTheTabOrderOnlyOnTheTabStopRow} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+- With a mouse (`hover: hover`) the actions are hidden by opacity only: they keep their place, so nothing moves when they show, and they stay focusable, so focus reveals them. They show while the row is hovered or holds focus, while a menu of theirs is open, and with `shown` (a selected row).
+- On touch screens (no hover) they are always shown; each button keeps a 44px hit area.
+- `tabbable` with a ref to the row's own control: the actions are in the Tab order only while that control is the list's Tab stop (roving focus moves it), and always for a row with no control. `true` or `false`: always or never. Left out, their own tabindex is kept, as for a Toolbar inside, whose arrows move between them.
+
+| Key | Action |
+| --- | --- |
+| <kbd>Tab</kbd> | From the row's control (the Tab stop) to its actions, then on |
+| <kbd>Shift</kbd>+<kbd>Tab</kbd> | Back to the row's control |
+
+## Touch
+
+Always shown: there is no hover to wait for.
+
+<Canvas of={Stories.TouchShowsThemAlways} />
+
+## Theming
+
+Tokens: `--cy-row-actions-gap` (between the controls) and `--cy-row-actions-background` (behind them, for actions drawn over a row, as ListRow does with the row's own colour).
+
+## Related
+
+[ListRow](?path=/docs/components-listrow--docs) · [Tree](?path=/docs/components-tree--docs) · [ChatMessage](?path=/docs/components-chatmessage--docs) · [IconButton](?path=/docs/components-iconbutton--docs) · [Menu](?path=/docs/components-menu--docs)

@@ -230,6 +230,47 @@ export const FollowsItsOwnWidth: Story = {
   },
 };
 
+export const WideningClosesTheDrawer: Story = {
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    frame(canvasElement).style.inlineSize = "600px";
+    await waitFor(
+      () => expect(canvas.getByRole("button", { name: "Open navigation" })).toBeVisible(),
+      RESIZE,
+    );
+    await userEvent.click(canvas.getByRole("button", { name: "Open navigation" }));
+    await waitFor(() => expect(sheet()?.open).toBe(true));
+    // Widened, the navigation moves back beside the content; narrowed again, the drawer stays shut until asked.
+    frame(canvasElement).style.inlineSize = "900px";
+    // Wait for the shell itself to be wide: the open drawer holds the same "Main" navigation, so seeing it proves
+    // nothing, and narrowing again before the shell measured the wide width left the drawer rightly open (Firefox
+    // and WebKit report sizes later; CI on #167).
+    const shell = canvasElement.querySelector(".cy-app-shell") as HTMLElement;
+    await waitFor(() => expect(shell).not.toHaveAttribute("data-narrow"), RESIZE);
+    await waitFor(() => expect(canvas.getByRole("navigation", { name: "Main" })).toBeVisible(), RESIZE);
+    frame(canvasElement).style.inlineSize = "600px";
+    await waitFor(
+      () => expect(canvas.getByRole("button", { name: "Open navigation" })).toBeVisible(),
+      RESIZE,
+    );
+    await new Promise((r) => setTimeout(r, 100));
+    // This story's own drawer stays shut. If WebKit ever shows one open again (it did once on CI, intermittently, on
+    // #167), say which dialog it is and where, so the cause can be read from the failure.
+    const open = [...document.querySelectorAll("dialog")].filter((d) => d.open);
+    const where = open.map((d) =>
+      [
+        d.className,
+        canvasElement.contains(d) ? "inside this story" : "outside this story",
+        `narrow=${frame(canvasElement).querySelector("[data-narrow]") ? "yes" : "no"}`,
+      ].join(", "),
+    );
+    await expect(where, "open dialogs").toEqual([]);
+    await expect(canvas.getByRole("button", { name: "Open navigation" })).toHaveAttribute(
+      "aria-expanded",
+      "false",
+    );
+  },
+};
+
 export const CustomBreakpointAndLabels: Story = {
   args: {
     collapseBelow: 1000,

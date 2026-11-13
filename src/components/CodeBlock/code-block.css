@@ -50,6 +50,14 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+/* Your actions, then the copy button, at the header's end; they keep their size while the title gives way. */
+.cy-code-block-actions.cy-code-block-actions {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--cy-space-2);
+  font-size: inherit;
+}
 .cy-code-block-body.cy-code-block-body {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);

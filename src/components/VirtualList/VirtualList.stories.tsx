@@ -34,7 +34,12 @@ function Files(props: Partial<VirtualListProps<Entry>>) {
 const meta = {
   title: "Components/VirtualList",
   component: VirtualList,
-  args: { ...base, onSelectionChange: fn(), onAction: fn() } as VirtualListProps<unknown>,
+  args: {
+    ...base,
+    onSelectionChange: fn(),
+    onAction: fn(),
+    onAtBottomChange: fn(),
+  } as VirtualListProps<unknown>,
   render: (args) => <Files {...(args as Partial<VirtualListProps<Entry>>)} />,
 } satisfies Meta<typeof VirtualList>;
 export default meta;
@@ -199,7 +204,7 @@ export const Controlled: Story = {
       const [keys, setKeys] = useState(["d"]);
       return (
         <>
-          <Files items={FEW} selectedKeys={keys} onSelectionChange={setKeys} className="product-list" />
+          <Files items={FEW} selected={keys} onSelectionChange={setKeys} className="product-list" />
           <output data-testid="keys">{keys.join(",")}</output>
         </>
       );
@@ -393,6 +398,72 @@ export const DraggingNearAnEdgeScrolls: Story = {
   },
 };
 
+const HUGE: Entry[] = Array.from({ length: 100_000 }, (_, i) => ({ id: `h${i}`, name: `Row ${i + 1}` }));
+/** A hundred thousand rows, every one chosen: moves work on the whole list at once. */
+function HugeRail() {
+  const [rows, setRows] = useState(HUGE);
+  return (
+    <>
+      <Files
+        label="Rows"
+        items={rows}
+        selectionMode="multiple"
+        defaultSelected={HUGE.map((r) => r.id)}
+        onMove={(keys, to) => setRows(moveItems(rows, keys, to, (r) => r.id))}
+      />
+      <output data-testid="order">
+        {[...rows.slice(0, 3), ...rows.slice(-2)].map((r) => r.id).join(",")}
+      </output>
+    </>
+  );
+}
+
+export const MovesStayRightInAHundredThousandRows: Story = {
+  render: () => <HugeRail />,
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    // Unchoose the first row, then move the other 99,999 up past it with Alt+Up. Each step is linear in the row
+    // count; a quadratic one (scanning the selection per row) would not finish within the test's time.
+    await userEvent.click(canvas.getByRole("option", { name: "Row 1" }));
+    await expect(canvas.getByRole("option", { name: "Row 1" })).toHaveAttribute("aria-selected", "false");
+    await userEvent.keyboard("{ArrowDown}{Alt>}{ArrowUp}{/Alt}");
+    await expect(order(canvas)).toBe("h1,h2,h3,h99999,h0");
+    await expect(said(canvasElement)).toBe("Moved 99999 rows to position 1 of 100000");
+    await expect(canvas.getByRole("option", { name: "Row 2" })).toHaveFocus();
+    // And back down again.
+    await userEvent.keyboard("{Alt>}{ArrowDown}{/Alt}");
+    await expect(order(canvas)).toBe("h0,h1,h2,h99998,h99999");
+  },
+};
+
+let keyCalls = 0;
+const countedKey = (e: Entry) => {
+  keyCalls++;
+  return e.id;
+};
+
+export const ScrollingDoesNotWalkEveryRow: Story = {
+  render: () => <Files getKey={countedKey} />,
+  play: async ({ canvas, canvasElement }) => {
+    const box = list(canvasElement);
+    await waitFor(() => expect(canvas.getByRole("option", { name: "File 1" })).toBeInTheDocument());
+    // Scrolling re-renders the rows in view; it does not key (or size) all ten thousand rows again each time.
+    // Counted, not timed: re-keying every row would be 10,000 calls per scroll.
+    keyCalls = 0;
+    for (const n of [1, 2, 3, 4, 5]) {
+      box.scrollTop = n * 2000;
+      // The rows at the new position are rendered.
+      await waitFor(() =>
+        expect(
+          [...box.querySelectorAll<HTMLElement>('[role="option"]')].some(
+            (r) => r.offsetTop <= box.scrollTop && r.offsetTop + r.offsetHeight > box.scrollTop,
+          ),
+        ).toBe(true),
+      );
+    }
+    await expect(keyCalls).toBe(0);
+  },
+};
+
 /** A request log, as the tools app shows one: wrapped lines, new entries arriving, a button to jump back. */
 function Log({ follow = true }: { follow?: boolean }) {
   const [lines, setLines] = useState<Entry[]>(() =>
@@ -426,7 +497,7 @@ function Log({ follow = true }: { follow?: boolean }) {
         >
           Add a line
         </Button>
-        <Button size="sm" onClick={() => handle.current?.scrollToIndex(3, "start")}>
+        <Button size="sm" onClick={() => handle.current?.scrollToIndex(3, { align: "start" })}>
           Show line 4
         </Button>
         <Button size="sm" onClick={() => handle.current?.scrollToEnd()}>
@@ -437,6 +508,54 @@ function Log({ follow = true }: { follow?: boolean }) {
   );
 }
 const rowAt = (el: Element, i: number) => el.querySelector(`[data-index="${i}"]`) as HTMLElement | null;
+
+function Jumps() {
+  const handle = useRef<VirtualListHandle>(null);
+  return (
+    <div style={{ display: "grid", gap: 8, inlineSize: 360 }}>
+      <VirtualList
+        label="Pages"
+        items={PAGES}
+        getKey={(e) => e.id}
+        renderItem={(e) => e.name}
+        handle={handle}
+      />
+      <div style={{ display: "flex", gap: 8 }}>
+        <Button size="sm" onClick={() => handle.current?.scrollToIndex(100, { align: "center" })}>
+          Centre 101
+        </Button>
+        <Button size="sm" onClick={() => handle.current?.scrollToIndex(50, "start")}>
+          Top 51
+        </Button>
+        <Button size="sm" onClick={() => handle.current?.scrollToIndex(199)}>
+          Show 200
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+export const ScrollToIndexPlacesTheRow: Story = {
+  render: () => <Jumps />,
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const el = list(canvasElement);
+    const row = (i: number) => rowAt(canvasElement, i) as HTMLElement;
+    const view = () => el.getBoundingClientRect();
+    // `{ align: "center" }` puts the row in the middle of the list.
+    await userEvent.click(canvas.getByRole("button", { name: "Centre 101" }));
+    await waitFor(() => expect(row(100)).not.toBeNull());
+    const mid = row(100).getBoundingClientRect();
+    await expect(
+      Math.abs(mid.top + mid.height / 2 - (view().top + el.clientTop + el.clientHeight / 2)),
+    ).toBeLessThan(2);
+    // The alignment alone, the earlier form, still works: row 51 at the top.
+    await userEvent.click(canvas.getByRole("button", { name: "Top 51" }));
+    await waitFor(() => expect(el.scrollTop).toBe(row(50).offsetTop));
+    // No options: the least scrolling, so the last row ends at the bottom.
+    await userEvent.click(canvas.getByRole("button", { name: "Show 200" }));
+    await waitFor(() => expect(el.scrollTop + el.clientHeight).toBe(el.scrollHeight));
+  },
+};
 
 export const WrappedRowsTakeTheirHeight: Story = {
   // Without following, so it starts at the top whatever the timing of the first measure.
@@ -476,6 +595,86 @@ export const FollowsNewRowsAtTheEnd: Story = {
     await expect(el.scrollTop).toBe(where);
     // The handle jumps to the latest.
     await userEvent.click(canvas.getByRole("button", { name: "Latest" }));
+    await waitFor(() => expect(atEnd()).toBe(true));
+  },
+};
+
+/** An activity stream: a pill over the list counts what arrived while someone reads further up, and jumps back. */
+function Stream({ onAtBottomChange }: { onAtBottomChange?: ((atBottom: boolean) => void) | undefined }) {
+  const [lines, setLines] = useState<Entry[]>(() =>
+    Array.from({ length: 60 }, (_, i) => ({ id: `s${i}`, name: `Event ${i + 1}` })),
+  );
+  const [atBottom, setAtBottom] = useState(true);
+  const [unseen, setUnseen] = useState(0);
+  const handle = useRef<VirtualListHandle>(null);
+  return (
+    <div style={{ display: "grid", gap: 8, inlineSize: 360 }}>
+      <VirtualList
+        label="Activity"
+        items={lines}
+        getKey={(e) => e.id}
+        renderItem={(e) => e.name}
+        selectionMode="none"
+        follow
+        handle={handle}
+        onAtBottomChange={(bottom) => {
+          setAtBottom(bottom);
+          if (bottom) setUnseen(0);
+          onAtBottomChange?.(bottom);
+        }}
+        overlay={
+          !atBottom && unseen > 0 ? (
+            <Button size="sm" variant="solid" tone="accent" onClick={() => handle.current?.scrollToEnd()}>
+              {`${unseen} new`}
+            </Button>
+          ) : null
+        }
+      />
+      <Button
+        size="sm"
+        onClick={() => {
+          setLines((all) => [...all, { id: `s${all.length}`, name: `Event ${all.length + 1}` }]);
+          if (!atBottom) setUnseen((u) => u + 1);
+        }}
+      >
+        Add an event
+      </Button>
+    </div>
+  );
+}
+
+export const AtBottomChangeAndOverlay: Story = {
+  render: (args) => <Stream onAtBottomChange={args.onAtBottomChange} />,
+  play: async ({ canvas, canvasElement, args, userEvent }) => {
+    const el = list(canvasElement);
+    const spy = args.onAtBottomChange;
+    const atEnd = () => el.scrollTop + el.clientHeight >= el.scrollHeight - 2;
+    await waitFor(() => expect(atEnd()).toBe(true));
+    // Scrolling up lets go of the end and says so; new rows then leave the view where it is.
+    el.scrollTop = 100;
+    await waitFor(() => expect(spy).toHaveBeenLastCalledWith(false));
+    await userEvent.click(canvas.getByRole("button", { name: "Add an event" }));
+    const pill = await canvas.findByRole("button", { name: "1 new" });
+    await expect(el.scrollTop).toBe(100);
+    // The overlay sits over the bottom of the list, outside the listbox, and stays put while the list scrolls.
+    await expect(canvas.getByRole("listbox", { name: "Activity" })).not.toContainElement(pill);
+    const box = el.getBoundingClientRect();
+    const where = () => pill.getBoundingClientRect().bottom - box.bottom;
+    const before = where();
+    await expect(before).toBeLessThan(0);
+    await expect(before).toBeGreaterThan(-40);
+    await expect(pill.getBoundingClientRect().left + pill.getBoundingClientRect().width / 2).toBeCloseTo(
+      box.left + box.width / 2,
+      0,
+    );
+    el.scrollTop = 40;
+    await waitFor(() => expect(where()).toBe(before));
+    // It jumps back to the end, which follows again.
+    await userEvent.click(pill);
+    await waitFor(() => expect(atEnd()).toBe(true));
+    await waitFor(() => expect(spy).toHaveBeenLastCalledWith(true));
+    await userEvent.click(canvas.getByRole("button", { name: "Add an event" }));
+    await waitFor(() => expect(rowAt(canvasElement, 61)).not.toBeNull());
     await waitFor(() => expect(atEnd()).toBe(true));
   },
 };
@@ -562,11 +761,13 @@ export const SectionHeadingsStayPinned: Story = {
 };
 
 export const StableUnderHostileHost: Story = {
+  args: { overlay: <Button size="sm">Latest</Button> },
   play: async ({ canvasElement }) => {
     const props = ["display", "height", "overflow-y", "box-sizing", "padding-left", "font-size", "position"];
     for (const selector of [".cy-virtual-list", ".cy-virtual-list-row"]) {
       const { clean, hostile } = computeUnderHostileHost(canvasElement, selector, props);
       await expect({ selector, ...hostile }).toEqual({ selector, ...clean });
     }
+    // The frame and its overlay are OverlayFrame's (its own hostile-host story).
   },
 };

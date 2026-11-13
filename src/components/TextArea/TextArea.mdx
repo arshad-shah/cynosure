@@ -12,6 +12,7 @@ Multi-line text input. It starts at `rows`, grows with its content up to `maxRow
 ## When to use
 
 - Notes, comments, descriptions and other free text longer than a line.
+- A message or prompt with mentions (`@name`, `#channel`, a table name).
 - Input where a live character count helps (limits, annotations).
 
 **Use something else when:**
@@ -43,6 +44,26 @@ A grip in the bottom corner lets pointer and touch users drag the height. The bo
 <Canvas of={Stories.ResizesByDraggingTheGrip} />
 <Canvas of={Stories.NotResizableWhenAskedOrDisabled} />
 
+## Mentions
+
+Give a `trigger` character and `suggestions`, and typing the trigger at the start of a word opens a list of suggestions for the text that follows it, up to the caret (no spaces). The arrow keys move through it, <kbd>Enter</kbd> or <kbd>Tab</kbd> (or a click or tap) puts the chosen `value` and a space in place of the trigger and the query, and <kbd>Escape</kbd> closes it for that mention. `onMention(item)` is called after the insertion, which is an ordinary edit: `onChange` hears it and Undo takes it back.
+
+```tsx
+<TextArea
+  label="Message"
+  trigger="@"
+  suggestions={[{ value: "@ada", label: "Ada Lovelace", description: "Engineering" }, "@alan"]}
+  onMention={(item) => track(item.value)}
+/>
+<TextArea label="Ask" trigger="@" suggestions={(query) => searchTables(query)} />
+```
+
+`suggestions` is a list (strings, or items with a `value`, a `label` and a `description`), filtered by whether the value or a string label contains the query; or a function of the query that returns items or a promise of them. While a promise is pending the list says so (`labels.loading`) and is `aria-busy`; an answer for an older query is ignored, and a failed one closes the list. Nothing matching closes it too.
+
+<Canvas of={Stories.MentionsInsertOnEnter} />
+
+The list drops below the whole box, at least as wide as it, and moves above it when there is no room below (a chat input at the bottom of a window). It is the same list as [Select](?path=/docs/components-select--docs), [Combobox](?path=/docs/components-combobox--docs) and [TagInput](?path=/docs/components-taginput--docs) use ([OptionList](?path=/docs/components-optionlist--docs)).
+
 ## Options
 
 - **`variant`:** `outline` (default) or `soft`.
@@ -60,6 +81,13 @@ A grip in the bottom corner lets pointer and touch users drag the height. The bo
 - **Counter:** announced politely (`aria-live="polite"`) and linked with `aria-describedby`.
 - **Grip:** a pointer and touch affordance only. It is `aria-hidden`, so keyboard users get content growth instead. It stays tucked in the corner on every device, and the text keeps a bottom margin so the last line never runs under it.
 - **Forms:** works with `FormData`, `required`, and reset restores the value, the count and the height.
+- **Mentions:** with `trigger` and `suggestions` the textarea has `aria-autocomplete="list"` and `aria-haspopup="listbox"`; while the list is open, `aria-controls` names it and `aria-activedescendant` the active option, so focus stays in the text. The list is named by the field's label, as Combobox's and TagInput's are. A textarea cannot take the combobox role or `aria-expanded` (ARIA in HTML), so the list being open is told by `aria-controls` and the active option. The keys the list uses while open (arrows, <kbd>Enter</kbd>, <kbd>Tab</kbd>, <kbd>Escape</kbd>) are not passed to your `onKeyDown`, so an "Enter sends" handler does not fire when Enter picks a suggestion; <kbd>Shift</kbd>+<kbd>Enter</kbd> still makes a new line. Nothing happens while an IME composes: the query is read when the composition ends, and its <kbd>Enter</kbd> belongs to the IME. <kbd>Escape</kbd> closes only the list, not a dialog or popover around the field.
+
+| Key (list open) | Result |
+| --- | --- |
+| <kbd>Arrow Down</kbd> / <kbd>Arrow Up</kbd> | Next or previous suggestion (stops at the ends) |
+| <kbd>Enter</kbd> / <kbd>Tab</kbd> | Inserts the active suggestion and a space |
+| <kbd>Escape</kbd> | Closes the list for this mention |
 
 ## Theming
 

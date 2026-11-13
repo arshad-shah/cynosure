@@ -5,6 +5,7 @@ import { contrast } from "../../test/color.js";
 import { computeUnderHostileHost } from "../../test/hostile.js";
 import { CynosureTheme } from "../../theme/CynosureTheme.js";
 import { Badge } from "../Badge/Badge.js";
+import { Button } from "../Button/Button.js";
 import { Stack } from "../Stack/Stack.js";
 import { Table, type TableColumn } from "./Table.js";
 
@@ -162,6 +163,38 @@ export const ControlledSelectionSurvivesSorting: Story = {
     await userEvent.click(canvas.getByRole("checkbox", { name: "Select Grace" }));
     // Selection is reported in the rows' own order, whatever the sort.
     await expect(canvas.getByTestId("out")).toHaveTextContent("1,4");
+  },
+};
+
+export const SelectionSurvivesPaging: Story = {
+  args: { selectable: true },
+  render: (args) => {
+    function Paged() {
+      const [page, setPage] = useState(0);
+      return (
+        <Stack gap="4">
+          <Table {...args} rows={ROWS.slice(page * 2, page * 2 + 2)} />
+          <Button onClick={() => setPage(1 - page)}>{page ? "Previous page" : "Next page"}</Button>
+        </Stack>
+      );
+    }
+    return <Paged />;
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole("checkbox", { name: "Select Grace" }));
+    await userEvent.click(canvas.getByRole("button", { name: "Next page" }));
+    // Rows on another page (or filtered out) stay selected while you choose more here.
+    await userEvent.click(canvas.getByRole("checkbox", { name: "Select Linus" }));
+    await expect(args.onSelectionChange).toHaveBeenLastCalledWith(["1", "3"]);
+    // Select-all and its undo act on the rows shown.
+    const all = canvas.getByRole("checkbox", { name: "Select all rows" });
+    await userEvent.click(all);
+    await expect(args.onSelectionChange).toHaveBeenLastCalledWith(["1", "3", "4"]);
+    await userEvent.click(all);
+    await expect(args.onSelectionChange).toHaveBeenLastCalledWith(["1"]);
+    await userEvent.click(canvas.getByRole("button", { name: "Previous page" }));
+    await expect(canvas.getByRole("checkbox", { name: "Select Grace" })).toBeChecked();
+    await expect(canvas.getByRole("checkbox", { name: "Select all rows" })).toBePartiallyChecked();
   },
 };
 
@@ -336,7 +369,7 @@ export const StableUnderHostileHost: Story = {
       "border-bottom-width",
       "box-sizing",
     ];
-    for (const selector of [".cy-table", "thead th", "tbody th", "tbody td", ".cy-table-sort"]) {
+    for (const selector of [".cy-table", "thead th", "tbody th", "tbody td", ".cy-sort-button"]) {
       const { clean, hostile } = computeUnderHostileHost(canvasElement, selector, props);
       await expect({ selector, ...hostile }).toEqual({ selector, ...clean });
     }

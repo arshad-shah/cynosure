@@ -3,6 +3,10 @@ import { type CSSProperties, type KeyboardEvent, type ReactNode, useId, useRef, 
 import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js";
 import { useControllableState } from "../../foundations/controllable.js";
 import { isRtl } from "../../foundations/dir.js";
+import { LiveRegion, useLiveMessage } from "../../foundations/LiveRegion/LiveRegion.js";
+import { clamp } from "../../foundations/math.js";
+import { motionMs } from "../../foundations/motion.js";
+import { moveItems } from "../../foundations/reorder.js";
 import { grip } from "../../icons/grip.js";
 import type { Size } from "../../tokens/schema.js";
 import { IconButton } from "../IconButton/IconButton.js";
@@ -73,12 +77,7 @@ const DEFAULT_LABELS: SortableListLabels = {
   cancelled: (label) => `Move cancelled. ${label} is back where it was.`,
 };
 
-const moveItem = <T,>(list: T[], from: number, to: number) => {
-  const next = [...list];
-  const [item] = next.splice(from, 1);
-  next.splice(to, 0, item as T);
-  return next;
-};
+const byId = (item: SortableItem) => item.id;
 
 /**
  * A list people put in order: drag a row by its handle (mouse, pen or touch), or focus the handle, press Space and
@@ -100,25 +99,38 @@ export function SortableList({
   const id = useId();
   const [committed, setCommitted] = useControllableState(items, defaultItems, onReorder);
   /**
-   * While moving: the order being previewed, and the row being moved. Kept in refs too, so events that arrive before
-   * React re-renders (a fast drag's move and release) always see the latest values.
+   * While moving: the row being moved and, from the keyboard, the place it is headed for. The preview is that move
+   * applied to the items as they are now, so items the parent adds or removes meanwhile are shown and kept. Kept in
+   * refs too, so events that arrive before React re-renders (a fast drag's move and release) see the latest values.
    */
   type Moving = { id: string; by: "keyboard" | "pointer" };
-  const [preview, setPreviewState] = useState<SortableItem[] | null>(null);
+  const [target, setTargetState] = useState<number | null>(null);
   const [moving, setMovingState] = useState<Moving | null>(null);
-  const previewRef = useRef<SortableItem[] | null>(null);
+  const targetRef = useRef<number | null>(null);
   const movingRef = useRef<Moving | null>(null);
-  const setPreview = (next: SortableItem[] | null) => {
-    previewRef.current = next;
-    setPreviewState(next);
+  const setTarget = (next: number | null) => {
+    targetRef.current = next;
+    setTargetState(next);
   };
   const setMoving = (next: Moving | null) => {
     movingRef.current = next;
     setMovingState(next);
   };
-  const [said, setSaid] = useState("");
+  const [said, setSaid] = useLiveMessage();
   const list = useRef<HTMLUListElement>(null);
-  const shown = preview ?? committed;
+  /** The keyboard move applied to `items`: where the moving row is, and where it goes. */
+  const planOf = (items: SortableItem[]) => {
+    const m = movingRef.current;
+    const from = m && targetRef.current !== null ? items.findIndex((i) => i.id === m.id) : -1;
+    if (from < 0) return null;
+    return {
+      item: items[from] as SortableItem,
+      from,
+      to: clamp(targetRef.current as number, 0, items.length - 1),
+    };
+  };
+  const plan = moving?.by === "keyboard" && target !== null ? planOf(committed) : null;
+  const shown = plan ? moveItems(committed, [plan.item.id], plan.to, byId) : committed;
   const total = shown.length;
 
   const handleOf = (itemId: string) =>
@@ -126,31 +138,29 @@ export function SortableList({
       `[data-id="${CSS.escape(itemId)}"] .cy-sortable-list-handle`,
     );
 
+  const end = () => {
+    setTarget(null);
+    setMoving(null);
+  };
   const start = (item: SortableItem) => {
-    setPreview(committed);
+    const at = committed.findIndex((i) => i.id === item.id);
     setMoving({ id: item.id, by: "keyboard" });
-    setSaid(text.pickedUp(item.label, committed.indexOf(item) + 1, committed.length));
+    setTarget(at);
+    setSaid(text.pickedUp(item.label, at + 1, committed.length));
   };
   // drop, cancel and shift run only while a row is moving (their callers check), so the refs are set.
   const drop = () => {
-    const moving = movingRef.current as Moving;
-    const preview = previewRef.current as SortableItem[];
-    const item = preview.find((i) => i.id === moving.id) as SortableItem;
-    const at = preview.indexOf(item);
-    const changed = preview.some((i, n) => i.id !== committed[n]?.id);
-    setSaid(text.dropped(item.label, at + 1, preview.length));
-    if (changed) {
-      setCommitted(preview);
-    }
-    setPreview(null);
-    setMoving(null);
+    const p = planOf(committed);
+    end();
+    // The row was removed meanwhile: nothing to drop.
+    if (!p) return;
+    setSaid(text.dropped(p.item.label, p.to + 1, committed.length));
+    if (p.to !== p.from) setCommitted(moveItems(committed, [p.item.id], p.to, byId));
   };
   const cancel = () => {
-    const moving = movingRef.current as Moving;
-    const item = committed.find((i) => i.id === moving.id) as SortableItem;
-    setSaid(text.cancelled(item.label));
-    setPreview(null);
-    setMoving(null);
+    const p = planOf(committed);
+    end();
+    if (p) setSaid(text.cancelled(p.item.label));
   };
   /** Tiles in one row of the grid, measured from the layout (1 for a list). */
   const columns = () => {
@@ -160,16 +170,37 @@ export function SortableList({
     return n < 0 ? tiles.length : n;
   };
   const shift = (delta: number) => {
-    const moving = movingRef.current as Moving;
-    const preview = previewRef.current as SortableItem[];
-    const from = preview.findIndex((i) => i.id === moving.id);
-    const to = Math.min(Math.max(from + delta, 0), preview.length - 1);
-    if (to === from) return;
-    setPreview(moveItem(preview, from, to));
-    setSaid(text.moved((preview[from] as SortableItem).label, to + 1, preview.length));
-    // The moved row's handle keeps focus as it changes place.
-    requestAnimationFrame(() => handleOf(moving.id)?.focus());
+    const p = planOf(committed);
+    if (!p) return;
+    const to = clamp(p.to + delta, 0, committed.length - 1);
+    if (to === p.to) return;
+    setTarget(to);
+    setSaid(text.moved(p.item.label, to + 1, committed.length));
+    refocus.current = p.item.id;
   };
+  // The moved row's handle keeps focus as it changes place: put back in the same commit, so nothing (a click) can come
+  // between the row moving and its handle taking focus again.
+  const refocus = useRef<string | null>(null);
+  useClientLayoutEffect(() => {
+    if (refocus.current === null) return;
+    handleOf(refocus.current)?.focus();
+    refocus.current = null;
+  });
+  // Focus leaving the handle mid-move (a click elsewhere, a screen reader's own navigation) cancels the move. A row
+  // changing place can blur its handle for a moment, so check again a frame later.
+  const onBlur = (item: SortableItem) => () => {
+    const m = movingRef.current;
+    if (m?.id !== item.id || m.by !== "keyboard") return;
+    requestAnimationFrame(() => {
+      const now = movingRef.current;
+      if (now?.id !== item.id || now.by !== "keyboard") return;
+      const handle = handleOf(item.id);
+      if (handle && (handle.getRootNode() as Document | ShadowRoot).activeElement === handle) return;
+      cancelRef.current();
+    });
+  };
+  const cancelRef = useRef(cancel);
+  cancelRef.current = cancel;
 
   // A disabled handle cannot be focused, so it never gets key presses.
   const onKeyDown = (item: SortableItem) => (event: KeyboardEvent<HTMLButtonElement>) => {
@@ -216,9 +247,7 @@ export function SortableList({
       // The grip is a dedicated handle that never scrolls the page, so touch needs no press-and-hold.
       delay: 0,
       get animation() {
-        const reduced = globalThis.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-        const base = Number.parseFloat(getComputedStyle(el).getPropertyValue("--cy-motion-slow"));
-        return reduced ? 0 : Number.isFinite(base) ? base : 180;
+        return motionMs(el);
       },
       get disabled() {
         return latest.current.disabled;
@@ -236,8 +265,9 @@ export function SortableList({
         node.remove();
         el.insertBefore(node, el.children[from.index] ?? null);
         const { committed: now, text: words } = latest.current;
-        const next = moveItem(now, from.index, to.index);
-        setSaid(words.dropped((now[from.index] as SortableItem).label, to.index + 1, next.length));
+        const moved = now[from.index] as SortableItem;
+        const next = moveItems(now, [moved.id], to.index, byId);
+        setSaid(words.dropped(moved.label, to.index + 1, next.length));
         setCommitted(next);
       },
       onEnd: (node, cancelled) => {
@@ -280,6 +310,7 @@ export function SortableList({
               aria-pressed={moving?.id === item.id}
               tooltipPlacement="start"
               onKeyDown={onKeyDown(item)}
+              onBlur={onBlur(item)}
             />
             <div className="cy-sortable-list-content cy-reset">{item.content ?? item.label}</div>
           </li>
@@ -288,9 +319,7 @@ export function SortableList({
       <span id={`${id}-how`} className="cy-reset cy-visually-hidden">
         {text.instructions}
       </span>
-      <span className="cy-reset cy-visually-hidden" role="status">
-        {said}
-      </span>
+      <LiveRegion {...said} className="cy-reset" />
     </div>
   );
 }

@@ -1,1 +1,1 @@
-export { SearchField, type SearchFieldProps } from "./SearchField.js";
+export { SearchField, type SearchFieldProps, type SearchFieldTokens } from "./SearchField.js";

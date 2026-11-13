@@ -1,0 +1,80 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./PathField.stories";
+
+<Meta of={Stories} />
+
+# PathField
+
+A file or folder path: a text field with a Browse button inside its end that asks your app's picker for a path, and a clear button. The path can also be typed. It is for apps with their own file dialog (Electron), where a browser file input gives no path.
+
+<Canvas of={Stories.BrowseFillsThePath} />
+
+## When to use
+
+- A setting or form value that is a path on disk: a database file, an export folder, a binary.
+- Your app has a native dialog that returns a path (Electron's `dialog.showOpenDialog` over IPC).
+
+**Use something else when:**
+- people upload files from a web page: [FileDrop](?path=/docs/components-filedrop--docs)
+- the value is ordinary text: [TextField](?path=/docs/components-textfield--docs)
+
+## Usage
+
+```tsx
+import { PathField } from "@arshad-shah/cynosure";
+
+<PathField
+  label="Database file"
+  name="db"
+  value={path}
+  onChange={setPath}
+  onPick={() => window.api.pickFile({ filters: [{ name: "SQLite", extensions: ["db"] }] })}
+/>
+```
+
+`onPick` returns a promise of the chosen path, or `null` when the dialog was cancelled. While it is open the Browse button is busy and cannot be pressed again; a cancel, or a picker that fails (the promise rejects), leaves the path as it was. FileDrop's `onPick` works the same way.
+
+<Canvas of={Stories.CancellingChangesNothing} />
+
+## Controlled use and forms
+
+`value` and `onChange` control the path; `onChange` is called when it is typed, picked or cleared. With `name`, the path is submitted with its form, and `required` blocks the form while it is empty. The Browse button never submits.
+
+<Canvas of={Stories.ControlledValue} />
+
+## Sizes, icon and labels
+
+`size` (`xs`, `sm`, `md`, `lg`) sets the field, and the Browse button is one step smaller so it fits inside. `iconStart` leads the field with an icon (a folder). `labels` replaces the button text ("Browse…", "Clear").
+
+<Canvas of={Stories.SizesFitTheButton} />
+
+<Canvas of={Stories.DisabledAndLabels} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+| Input | Result |
+| --- | --- |
+| Typing | Edits the path |
+| <kbd>Tab</kbd> | The input, then the clear button (while there is a path), then Browse |
+| <kbd>Enter</kbd> or a press on Browse | Calls `onPick`; the chosen path fills the field |
+| A press on the clear button | Empties the field and focuses it |
+
+- **Roles:** a labelled text box, a "Clear" button and a "Browse…" button, `aria-busy` while the picker is open.
+- **Disabled:** the field and Browse are disabled and the clear button is gone; the path is not submitted.
+- **Right to left:** the buttons end the field, on the left.
+
+## Touch
+
+The Browse button has a 44px hit area on touch screens (the clear button is TextField's, sized the same way).
+
+## Theming
+
+Tokens: `--cy-path-field-browse-inset` (space between the Browse button and the field's end), and TextField's and Button's for the field and the button.
+
+## Related
+
+[TextField](?path=/docs/components-textfield--docs) · [FileDrop](?path=/docs/components-filedrop--docs) · [Button](?path=/docs/components-button--docs)

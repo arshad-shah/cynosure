@@ -1,8 +1,39 @@
 import * as a11y from "@storybook/addon-a11y/preview";
 import { setProjectAnnotations } from "@storybook/react-vite";
 import { expect } from "vitest";
-import { page } from "vitest/browser";
+import { commands, page, userEvent } from "vitest/browser";
+import type { EmulatedMedia } from "../src/test/media";
 import * as project from "./preview";
+
+/* The Playwright command vitest.config.ts registers. */
+declare module "vitest/browser" {
+  interface BrowserCommands {
+    emulateMedia: (media: EmulatedMedia) => Promise<void>;
+  }
+}
+
+/* Stories emulate media features through `emulateMedia` (src/test/media.ts), which finds the Playwright command here. */
+globalThis.cyEmulateMedia = (media) => commands.emulateMedia(media);
+/* Stories that check CSS :hover move the real pointer through `realHover` (src/test/hover.ts). */
+const parkPointer = () =>
+  page.elementLocator(document.documentElement).hover({ position: { x: 1, y: 1 } } as never);
+/*
+ * The real pointer stays where a story left it, across stories and test files. Left over a later story's content, it
+ * hovers it mid-test (a Calendar day caught mid-transition failed the contrast check), so it is parked after each
+ * story that moved it.
+ */
+let pointerMoved = false;
+globalThis.cyHover = (el, over) => {
+  pointerMoved = el !== null;
+  return el === null
+    ? parkPointer()
+    : over
+      ? userEvent.hover(page.elementLocator(el))
+      : userEvent.unhover(page.elementLocator(el));
+};
+
+/* Stories press real keys (the browser's own scrolling, which synthetic events never start) through `pressKey`. */
+globalThis.cyPressKey = (key) => userEvent.keyboard(`{${key}}`);
 
 /** Visual regression, Vitest-only: stories tagged "visual" are screenshotted when VITE_CY_VISUAL=1 (CI, Linux baselines). */
 const visual = import.meta.env.VITE_CY_VISUAL === "1";
@@ -29,6 +60,10 @@ setProjectAnnotations([
       window.focus();
     },
     afterEach: async ({ tags, canvasElement, id }) => {
+      if (pointerMoved) {
+        pointerMoved = false;
+        await parkPointer();
+      }
       if (!visual || !tags.includes("visual")) return;
       await expect.element(page.elementLocator(canvasElement)).toMatchScreenshot(id);
       // Dark mode: flip the decorator's theme wrapper (light-dark() tokens follow color-scheme), then restore.

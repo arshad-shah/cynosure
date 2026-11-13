@@ -3,27 +3,39 @@ import {
   type CSSProperties,
   createContext,
   type KeyboardEvent,
+  type MouseEvent,
   type ReactNode,
   useCallback,
   useContext,
   useId,
-  useLayoutEffect,
   useRef,
   useState,
 } from "react";
 import { ButtonBase } from "../../foundations/ButtonBase/ButtonBase.js";
+import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js";
 import { useControllableState } from "../../foundations/controllable.js";
 import { isRtl } from "../../foundations/dir.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
+import { LiveRegion, useLiveMessage } from "../../foundations/LiveRegion/LiveRegion.js";
+import { clamp } from "../../foundations/math.js";
+import { motionMs } from "../../foundations/motion.js";
 import { usePrinting } from "../../foundations/printing.js";
 import { moveItems } from "../../foundations/reorder.js";
 import { useRovingFocus } from "../../foundations/roving-focus.js";
+import { alignedScroll } from "../../foundations/scroll-align.js";
+import { chevronLeft } from "../../icons/chevron-left.js";
+import { chevronRight } from "../../icons/chevron-right.js";
 import { close } from "../../icons/close.js";
 import type { IconData } from "../../icons/types.js";
 import type { Size } from "../../tokens/schema.js";
+import { ContextMenu, type ContextMenuKeyTargetProps } from "../ContextMenu/ContextMenu.js";
 import { IconButton } from "../IconButton/IconButton.js";
+import type { MenuEntry } from "../Menu/Menu.js";
+import { Tooltip } from "../Tooltip/Tooltip.js";
 
 export interface TabsTokens {
+  labelMaxWidth: string;
+  dirty: string;
   gap: string;
   indicator: string;
   indicatorWidth: string;
@@ -39,12 +51,27 @@ declare module "../../tokens/schema.js" {
 export interface TabsLabels {
   /** A closable tab's close button. Default "Close notes.md". */
   close: (name: string) => string;
+  /** The close button of a tab with unsaved changes. Default "Close notes.md, unsaved changes". */
+  closeUnsaved: (name: string) => string;
+  /** The description of a tab with unsaved changes, read after its name. Default "Unsaved changes". */
+  unsaved: string;
+  /** The chevron that scrolls a `scrollable` list back toward its first tab. Default "Scroll tabs back". */
+  scrollBack: string;
+  /** The chevron that scrolls a `scrollable` list on toward its last tab. Default "Scroll tabs forward". */
+  scrollForward: string;
+  /** The name of a tab's context menu. Default "notes.md actions". */
+  menu: (name: string) => string;
   /** Announced after a tab is moved. Default "Moved notes.md to position 2 of 4". */
   moved: (name: string, position: number, total: number) => string;
 }
 
 const DEFAULT_LABELS: TabsLabels = {
-  close: (name) => `Close ${name}`,
+  close: (name) => (name ? `Close ${name}` : "Close"),
+  closeUnsaved: (name) => (name ? `Close ${name}, unsaved changes` : "Close, unsaved changes"),
+  unsaved: "Unsaved changes",
+  scrollBack: "Scroll tabs back",
+  scrollForward: "Scroll tabs forward",
+  menu: (name) => (name ? `${name} actions` : "Tab actions"),
   moved: (name, position, total) => `Moved ${name} to position ${position} of ${total}`,
 };
 
@@ -84,7 +111,10 @@ export interface TabsProps {
   size?: Size;
   /** `line`: underline indicator. `soft`: tinted pill. */
   variant?: "line" | "soft";
-  /** Replace the built-in English text: the close button's name and the announcement after a move. */
+  /**
+   * Replace the built-in English text: the close button's name (saved and unsaved), the unsaved description, the
+   * scroll chevrons' names, the context menu's name and the announcement after a move.
+   */
   labels?: Partial<TabsLabels>;
   /** Added to the root element, for layout. */
   className?: string;
@@ -131,7 +161,7 @@ export function Tabs({
 
   // Keep a valid selection: default to the first enabled tab, and when the selected tab disappears pick the one now
   // at its position (or the previous one).
-  useLayoutEffect(() => {
+  useClientLayoutEffect(() => {
     const tabs = [...(root.current?.querySelectorAll<HTMLElement>('[role="tab"]') ?? [])].filter(
       (t) => t.closest(".cy-tabs") === root.current,
     );
@@ -160,7 +190,10 @@ export function Tabs({
     if (next !== undefined) setCurrent(next);
   });
 
-  const safe = (v: string) => v.replace(/[^\w-]/g, "_");
+  // An id from any value, one to one: letters, digits and "-" stay; every other character (including "_") becomes
+  // "_<code>_", so "a b" and "a_b" never share an id.
+  const safe = (v: string) =>
+    v.replace(/[^A-Za-z0-9-]/gu, (c) => `_${(c.codePointAt(0) as number).toString(36)}_`);
   return (
     <Context.Provider
       value={{
@@ -192,20 +225,52 @@ export interface TabListProps {
    * arrow on it. Called with every tab's value in the new order; render the tabs in that order.
    */
   onReorder?: ((values: string[]) => void) | undefined;
+  /**
+   * For many tabs (document tabs): chevrons at each end scroll the list while there is more that way, and a vertical
+   * mouse wheel scrolls it sideways. The chevrons are for the pointer; arrow keys scroll the focused tab into view.
+   */
+  scrollable?: boolean | undefined;
+  /**
+   * Content after the last tab, outside the tab list, such as a "New tab" IconButton. It follows the last tab, and
+   * stays at the end in view when the tabs overflow.
+   */
+  trailing?: ReactNode;
   /** Added to the tab list element, for layout. */
   className?: string;
   /** The `Tab`s, in order. */
   children?: ReactNode;
 }
 
+/** The context menu a tab asks its list to open: its commands and where they go. */
+interface TabMenu {
+  value: string;
+  name: string;
+  items: MenuEntry[];
+  onSelect: ((command: string) => void) | undefined;
+}
+
+/** The list's one ContextMenu, shared with its tabs: the props that make a tab one of its targets. */
+const MenuContext = createContext<((menu: TabMenu) => ContextMenuKeyTargetProps) | null>(null);
+
+/** The label inside a tab: the text a tooltip shows in full while it is cut short. */
+const labelOf = (tab: HTMLElement) => tab.querySelector<HTMLElement>(".cy-tab-label");
+
 /** The tab inside a list child (a tab, or a closable tab's slot). */
 const tabIn = (el: Element) =>
   (el.matches('[role="tab"]') ? el : el.querySelector('[role="tab"]')) as HTMLElement;
 
-export function TabList({ label, onReorder, className, children }: TabListProps) {
+export function TabList({
+  label,
+  onReorder,
+  scrollable = false,
+  trailing,
+  className,
+  children,
+}: TabListProps) {
   const { size, variant, value, labels, refocus } = useTabs("TabList");
   const ref = useRef<HTMLDivElement>(null);
-  const [said, setSaid] = useState("");
+  const strip = useRef<HTMLDivElement>(null);
+  const [said, setSaid] = useLiveMessage();
   const latest = useRef({ onReorder, labels });
   latest.current = { onReorder, labels };
   const order = () => [...(ref.current?.children ?? [])].map((c) => tabIn(c)?.dataset.value as string);
@@ -222,7 +287,7 @@ export function TabList({ label, onReorder, className, children }: TabListProps)
   // Pointer, touch and pen reordering through detent's sortable (as SortableList). A finger held briefly drags; a
   // swipe still scrolls the list. React stays the DOM's owner: the node is put back and the new order is reported.
   const reorderable = onReorder !== undefined;
-  useLayoutEffect(() => {
+  useClientLayoutEffect(() => {
     const el = ref.current;
     if (!el || !reorderable) return;
     const bound = sortable(el, {
@@ -231,9 +296,7 @@ export function TabList({ label, onReorder, className, children }: TabListProps)
       cancel: ".cy-tab-close",
       touchAction: "auto",
       get animation() {
-        const reduced = globalThis.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-        const base = Number.parseFloat(getComputedStyle(el).getPropertyValue("--cy-motion-slow"));
-        return reduced ? 0 : Number.isFinite(base) ? base : 180;
+        return motionMs(el);
       },
       onSort: ({ item, from, to }) => {
         const v = tabIn(item).dataset.value as string;
@@ -275,37 +338,63 @@ export function TabList({ label, onReorder, className, children }: TabListProps)
     // parent and on how the engine handles right-to-left scrolling; rects read in the same frame do not).
     const box = tab.getBoundingClientRect();
     const left = box.left - list.getBoundingClientRect().left - list.clientLeft + current;
-    const right = left + box.width;
-    let target = current;
-    if (left - pad < current) target = left - pad;
-    else if (right + pad > current + list.clientWidth) target = right + pad - list.clientWidth;
-    target = Math.min(Math.max(target, 0), max);
+    const target = clamp(alignedScroll(current, list.clientWidth, left - pad, box.width + 2 * pad), 0, max);
     if (target !== current) list.scrollTo({ left: rtl ? target - max : target });
   }, []);
-  // Mark edges that hide tabs so CSS can fade them (works in RTL: scrollLeft is negative there).
-  useLayoutEffect(() => {
+  // Mark edges that hide tabs so CSS can fade them, and show the chevrons that lead there (works in RTL: scrollLeft is
+  // negative there).
+  const edges = useCallback(() => {
     const list = ref.current;
     if (!list) return;
-    const update = () => {
-      const max = list.scrollWidth - list.clientWidth;
-      const at = Math.abs(list.scrollLeft);
-      list.toggleAttribute("data-more-start", max > 1 && at > 1);
-      list.toggleAttribute("data-more-end", max > 1 && at < max - 1);
-    };
-    update();
-    list.addEventListener("scroll", update, { passive: true });
-    const observer = new ResizeObserver(update);
+    const max = list.scrollWidth - list.clientWidth;
+    const at = Math.abs(list.scrollLeft);
+    for (const el of [list, strip.current]) {
+      el?.toggleAttribute("data-more-start", max > 1 && at > 1);
+      el?.toggleAttribute("data-more-end", max > 1 && at < max - 1);
+    }
+    strip.current?.toggleAttribute("data-overflow", max > 1);
+  }, []);
+  useClientLayoutEffect(() => {
+    const list = ref.current;
+    if (!list) return;
+    list.addEventListener("scroll", edges, { passive: true });
+    const observer = new ResizeObserver(edges);
     observer.observe(list);
     return () => {
-      list.removeEventListener("scroll", update);
+      list.removeEventListener("scroll", edges);
       observer.disconnect();
     };
-  }, []);
+  }, [edges]);
+  // Tabs added or removed change what there is to scroll to without resizing a list that already overflows.
+  useClientLayoutEffect(edges);
+  // A vertical wheel scrolls a scrollable list sideways; at the end it has nowhere to go, the page scrolls instead.
+  useClientLayoutEffect(() => {
+    const list = ref.current;
+    if (!list || !scrollable) return;
+    const onWheel = (event: WheelEvent) => {
+      if (event.ctrlKey || Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
+      const max = list.scrollWidth - list.clientWidth;
+      const at = Math.abs(list.scrollLeft);
+      if (max <= 1 || (event.deltaY > 0 ? at >= max - 1 : at <= 1)) return;
+      event.preventDefault();
+      const line = Number.parseFloat(getComputedStyle(list).lineHeight) || 16;
+      const unit = event.deltaMode === 1 ? line : event.deltaMode === 2 ? list.clientWidth : 1;
+      list.scrollBy({ left: event.deltaY * unit * (isRtl(list) ? -1 : 1), behavior: "instant" });
+    };
+    list.addEventListener("wheel", onWheel, { passive: false });
+    return () => list.removeEventListener("wheel", onWheel);
+  }, [scrollable]);
+  // A chevron scrolls most of a list's width, so the tab cut at that edge is still in view afterwards.
+  const page = (direction: 1 | -1) => {
+    const list = ref.current;
+    if (!list) return;
+    list.scrollBy({ left: direction * list.clientWidth * 0.8 * (isRtl(list) ? -1 : 1) });
+  };
   // Reveal again whenever the selection changes.
-  useLayoutEffect(() => {
+  useClientLayoutEffect(() => {
     reveal(ref.current?.querySelector<HTMLElement>('[role="tab"][aria-selected="true"]') ?? null);
   }, [value, reveal]);
-  const list = (
+  const tablist = (
     <div
       ref={ref}
       role="tablist"
@@ -321,16 +410,62 @@ export function TabList({ label, onReorder, className, children }: TabListProps)
       {children}
     </div>
   );
+  const chevron = (edge: "start" | "end") => (
+    // For the pointer only, like a tab's close button: keyboard users move with the arrows, which reveal the tab.
+    <span className="cy-tab-scroll cy-reset" data-edge={edge} aria-hidden="true">
+      <IconButton
+        icon={edge === "start" ? chevronLeft : chevronRight}
+        flipRtl
+        label={edge === "start" ? labels.scrollBack : labels.scrollForward}
+        variant="ghost"
+        tone="neutral"
+        size="sm"
+        tabIndex={-1}
+        onClick={() => page(edge === "start" ? -1 : 1)}
+      />
+    </span>
+  );
+  // The chevrons and the trailing content sit beside the list, not in it: a tablist holds only tabs.
+  const list =
+    scrollable || trailing !== undefined ? (
+      <div ref={strip} className="cy-tab-strip" data-size={size} data-variant={variant}>
+        {scrollable && chevron("start")}
+        {tablist}
+        {scrollable && chevron("end")}
+        {trailing !== undefined && <div className="cy-tab-trailing">{trailing}</div>}
+      </div>
+    ) : (
+      tablist
+    );
+  // One context menu for the list, opened for whichever tab asked. Its panel lands beside the list, not in it: a
+  // tablist holds only tabs, even while a menu is open.
+  const hosted = (
+    <ContextMenu<TabMenu>
+      label={(menu) => labels.menu(menu.name)}
+      items={(menu) => menu.items}
+      onSelect={(command, menu) => {
+        // A command that removes the tab (Close, Close others…) moves focus to the tab then selected, as Delete does;
+        // one that keeps it leaves focus on it.
+        refocus.current = menu.value;
+        menu.onSelect?.(command);
+      }}
+      onOpenChange={(open, menu) => {
+        // The tab is still there (a command such as "Copy path"): the menu returns focus to it, so drop the request,
+        // which would otherwise pull focus back to it on some later render. A removed tab leaves it for Tabs.
+        if (!open && refocus.current === menu.value && order().includes(menu.value)) refocus.current = null;
+      }}
+    >
+      {(_, targetFor) => <MenuContext.Provider value={targetFor}>{list}</MenuContext.Provider>}
+    </ContextMenu>
+  );
   // The announcement sits beside the list, not in it: a tablist holds only tabs, and every child is sortable.
   return reorderable ? (
     <>
-      {list}
-      <span className="cy-visually-hidden" role="status">
-        {said}
-      </span>
+      {hosted}
+      <LiveRegion {...said} />
     </>
   ) : (
-    list
+    hosted
   );
 }
 
@@ -342,23 +477,82 @@ export interface TabProps {
   /** The tab cannot be selected or closed. */
   disabled?: boolean;
   /**
-   * Makes the tab closable (document tabs): a close button beside its label, and Delete on the focused tab. Remove the
-   * tab in response; the one now in its place is selected and focused.
+   * Makes the tab closable (document tabs): a close button beside its label, Delete on the focused tab and a
+   * middle-click. Remove the tab in response; the one now in its place is selected and focused.
    */
   onClose?: (() => void) | undefined;
+  /**
+   * The document has unsaved changes: a dot where the close button sits, which turns into the close button while the
+   * tab is hovered or focused. Announced as the tab's description (`labels.unsaved`), and the close button says so.
+   */
+  dirty?: boolean | undefined;
+  /**
+   * The close button's name (and tooltip), such as "Close query 3". By default it is `labels.close` with the tab's
+   * text: the label itself when it is a string, else the text it renders.
+   */
+  closeLabel?: string | undefined;
+  /**
+   * Commands for this tab, in a ContextMenu opened by right-click, a long press, Shift+F10 or the context menu key:
+   * items, or sections of items, as in `Menu` (Close others, Close to the right…). Named `labels.menu` with its text.
+   */
+  contextMenu?: MenuEntry[] | undefined;
+  /**
+   * Called with the chosen `contextMenu` item's `value` (named as Tree's `onCommand`). If the command removes this tab,
+   * focus moves to the tab then selected, as after Delete.
+   */
+  onCommand?: ((value: string) => void) | undefined;
   /** The tab's label. */
   children: ReactNode;
 }
 
-export function Tab({ value, icon, disabled, onClose, children }: TabProps) {
+export function Tab({
+  value,
+  icon,
+  disabled,
+  onClose,
+  closeLabel,
+  dirty = false,
+  contextMenu,
+  onCommand,
+  children,
+}: TabProps) {
   const { value: current, select, activation, tabId, panelId, panels, labels, refocus } = useTabs("Tab");
   const selected = value === current;
-  const tab = (
+  // A label that is not plain text (a badge, a <strong>) names the close button and the menu by the text it renders.
+  const plain = typeof children === "string" || typeof children === "number" ? String(children) : null;
+  const labelRef = useRef<HTMLSpanElement>(null);
+  const [rendered, setRendered] = useState("");
+  useClientLayoutEffect(() => {
+    if ((!onClose && !contextMenu) || plain !== null) return;
+    const text = labelRef.current?.textContent?.trim() ?? "";
+    if (text !== rendered) setRendered(text);
+  });
+  const id = tabId(value);
+  const name = plain ?? rendered;
+  const closeKey = (event: KeyboardEvent<HTMLElement>) => {
+    if (!onClose || (event.key !== "Delete" && event.key !== "Backspace") || disabled) return;
+    event.preventDefault();
+    refocus.current = "";
+    onClose();
+  };
+  // With commands, the tab is one of its list's context menu targets.
+  const targetFor = useContext(MenuContext);
+  const menu =
+    contextMenu && targetFor
+      ? targetFor({ value, name, items: contextMenu, onSelect: onCommand })
+      : undefined;
+  const button = (
     <ButtonBase
       role="tab"
-      id={tabId(value)}
+      id={id}
       aria-selected={selected}
       aria-controls={panels.has(value) ? panelId(value) : undefined}
+      // The unsaved state is a description, not part of the name: the name stays the document's (what voice control,
+      // the close button and the panel's label use), and screen readers read the state after it.
+      aria-describedby={dirty ? `${id}-unsaved` : undefined}
+      aria-keyshortcuts={
+        [onClose && "Delete", menu?.["aria-keyshortcuts"]].filter(Boolean).join(" ") || undefined
+      }
       data-value={value}
       disabled={disabled}
       className="cy-tab"
@@ -366,38 +560,76 @@ export function Tab({ value, icon, disabled, onClose, children }: TabProps) {
       onFocus={() => {
         if (activation === "auto" && !disabled) select(value);
       }}
+      onKeyDown={(event) => {
+        closeKey(event);
+        menu?.onKeyDown(event);
+      }}
       {...(onClose && {
-        "aria-keyshortcuts": "Delete",
-        onKeyDown: (event: KeyboardEvent<HTMLElement>) => {
-          if ((event.key !== "Delete" && event.key !== "Backspace") || disabled) return;
+        // A middle-click closes, as in browsers and editors; its press must not start the browser's autoscroll.
+        onMouseDown: (event: MouseEvent<HTMLElement>) => {
+          if (event.button === 1) event.preventDefault();
+        },
+        onAuxClick: (event: MouseEvent<HTMLElement>) => {
+          if (event.button !== 1 || disabled) return;
           event.preventDefault();
-          refocus.current = "";
           onClose();
         },
       })}
+      {...(menu && {
+        onContextMenu: menu.onContextMenu,
+        onPointerDown: menu.onPointerDown,
+        onPointerMove: menu.onPointerMove,
+        onPointerUp: menu.onPointerUp,
+        onPointerCancel: menu.onPointerCancel,
+      })}
     >
       {icon && <Icon icon={icon} className="cy-tab-icon" />}
-      <span className="cy-tab-label">{children}</span>
+      <span ref={labelRef} className="cy-tab-label">
+        {children}
+      </span>
     </ButtonBase>
   );
-  if (!onClose) return tab;
+  // A label cut short by `--cy-tabs-label-max-width` shows its full text in a tooltip, for the eye only (the name
+  // already holds it). The tooltip is always there (off while the label fits), so the tab is never remounted.
+  const tab = (
+    <Tooltip content={children} whenTruncated={labelOf} placement="bottom" className="cy-tab-tip">
+      {button}
+    </Tooltip>
+  );
   // The close button sits beside the tab, not in it (a tab is a button). Keyboard users press Delete instead, so it
-  // stays out of the tab order and the accessibility tree; its label is its tooltip.
+  // stays out of the tab order and the accessibility tree; its label is its tooltip. An unsaved tab's dot sits in the
+  // same place, under it, and the stylesheet shows one or the other.
+  if (!onClose && !dirty) return tab;
   return (
-    <span className="cy-tab-slot" data-selected={selected ? "" : undefined}>
+    <span
+      className="cy-tab-slot"
+      data-selected={selected ? "" : undefined}
+      data-dirty={dirty ? "" : undefined}
+    >
       {tab}
-      <span className="cy-tab-close cy-reset" aria-hidden="true">
-        <IconButton
-          icon={close}
-          label={labels.close(typeof children === "string" ? children : value)}
-          variant="ghost"
-          tone="neutral"
-          size="sm"
-          tabIndex={-1}
-          disabled={disabled}
-          onClick={() => onClose()}
-        />
-      </span>
+      {dirty && (
+        <>
+          <span className="cy-tab-dirty cy-reset" aria-hidden="true" />
+          {/* Hidden, so outside the accessibility tree (a tablist holds only tabs) but still read as the description. */}
+          <span id={`${id}-unsaved`} hidden>
+            {labels.unsaved}
+          </span>
+        </>
+      )}
+      {onClose && (
+        <span className="cy-tab-close cy-reset" aria-hidden="true">
+          <IconButton
+            icon={close}
+            label={closeLabel ?? (dirty ? labels.closeUnsaved(name) : labels.close(name))}
+            variant="ghost"
+            tone="neutral"
+            size="sm"
+            tabIndex={-1}
+            disabled={disabled}
+            onClick={() => onClose()}
+          />
+        </span>
+      )}
     </span>
   );
 }
@@ -418,7 +650,7 @@ export interface TabPanelProps {
 
 export function TabPanel({ value, keepMounted = false, className, children }: TabPanelProps) {
   const { value: current, tabId, panelId, registerPanel } = useTabs("TabPanel");
-  useLayoutEffect(() => registerPanel(value), [registerPanel, value]);
+  useClientLayoutEffect(() => registerPanel(value), [registerPanel, value]);
   const selected = value === current;
   const printing = usePrinting();
   return (

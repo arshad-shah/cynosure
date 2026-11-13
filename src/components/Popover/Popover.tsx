@@ -1,5 +1,6 @@
 import { type CSSProperties, type KeyboardEvent, type ReactNode, type Ref, useId, useRef } from "react";
 import { useControllableState } from "../../foundations/controllable.js";
+import { deepActiveElement } from "../../foundations/focus.js";
 import { useDismiss } from "../../overlay/dismiss.js";
 import { usePopover } from "../../overlay/floating.js";
 import type { Placement } from "../../overlay/position.js";
@@ -55,15 +56,28 @@ export interface PopoverProps {
   onOpenChange?: (open: boolean) => void;
   /** Preferred side; flips when it does not fit. `start`/`end` follow the reading direction. */
   placement?: Placement;
-  /** Panel width preset. */
+  /** Panel width preset: the most it grows to (or, with `width="fixed"`, its width). */
   size?: Size;
+  /**
+   * How wide the panel is. `content` (default): as wide as its content, up to the `size` preset. `trigger`: at least
+   * as wide as the trigger or anchor element, lined up with it (a list under a wide button). `fixed`: exactly the
+   * `size` preset (`--cy-popover-width-{sm,md,lg}`), however short the content.
+   */
+  width?: "content" | "trigger" | "fixed";
+  /**
+   * Where focus goes on open. `first` (default): the first control inside, or the panel when it has none. `panel`:
+   * the panel itself, so a screen reader starts at its top. `none`: focus stays where it is (a field the person is
+   * typing in); Escape and outside presses still close it, and Tab from the trigger, or from an anchor the panel
+   * follows in the document, moves into it.
+   */
+  initialFocus?: "first" | "panel" | "none";
   /** Keep Tab inside the panel until it closes. */
   modal?: boolean;
   /** Added to the panel, for layout. */
   className?: string;
   /** Layout only, applied to the panel. */
   style?: CSSProperties;
-  /** The panel's content. Focus moves to its first focusable element on open. */
+  /** The panel's content. Focus moves to its first focusable element on open (see `initialFocus`). */
   children?: ReactNode;
 }
 
@@ -80,6 +94,8 @@ export function Popover({
   onOpenChange,
   placement = "bottom",
   size = "md",
+  width = "content",
+  initialFocus = "first",
   modal = false,
   className,
   style,
@@ -99,22 +115,29 @@ export function Popover({
   // Without a trigger, focus returns to whatever had it when the panel opened.
   const before = useRef<HTMLElement | null>(null);
   const wasOpen = useRef(false);
-  if (isOpen && !wasOpen.current && typeof document !== "undefined")
-    before.current = document.activeElement as HTMLElement | null;
+  if (isOpen && !wasOpen.current) before.current = deepActiveElement();
   wasOpen.current = isOpen;
   const returnTo = useRef<HTMLElement | null>(null);
   returnTo.current = trigger ? triggerRef.current : before.current;
 
-  // Show before positioning (the panel must be laid out to be measured), then move focus inside.
+  // An anchor element counts as inside, as the trigger does: pressing it (back into a field) is not an outside press.
+  const anchorEl = useRef<HTMLElement | null>(null);
+  anchorEl.current = anchor && "nodeType" in anchor ? (anchor as HTMLElement) : null;
+
+  // Show before positioning (the panel must be laid out to be measured), size it, then move focus inside.
   usePopover(panel, isOpen, (el) => {
-    const first = el.querySelector<HTMLElement>(FOCUSABLE);
+    const against = anchor ? placed.current : triggerRef.current;
+    if (width === "trigger" && against)
+      el.style.setProperty("--_anchor-w", `${against.getBoundingClientRect().width}px`);
+    if (initialFocus === "none") return;
+    const first = initialFocus === "first" ? el.querySelector<HTMLElement>(FOCUSABLE) : null;
     (first ?? el).focus({ preventScroll: true });
   });
   useAnchoredPosition(anchor ? placed : triggerRef, panel, isOpen, placement, 6, "start");
   useDismiss({
     open: isOpen,
     onClose: () => setOpen(false),
-    inside: [triggerRef, panel],
+    inside: [triggerRef, panel, anchorEl],
     returnFocus: returnTo,
   });
 
@@ -124,7 +147,7 @@ export function Popover({
     if (!items.length) return;
     const first = items[0] as HTMLElement;
     const last = items[items.length - 1] as HTMLElement;
-    const active = event.currentTarget.ownerDocument.activeElement;
+    const active = deepActiveElement(event.currentTarget.ownerDocument);
     if (event.shiftKey && (active === first || active === event.currentTarget)) {
       event.preventDefault();
       last.focus();
@@ -153,6 +176,7 @@ export function Popover({
         {...{ popover: "manual" }}
         className={className ? `cy-popover ${className}` : "cy-popover"}
         data-size={size}
+        data-width={width === "content" ? undefined : width}
         style={style}
         onKeyDown={trap}
       >

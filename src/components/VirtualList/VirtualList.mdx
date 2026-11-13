@@ -56,7 +56,7 @@ Give `onMove` to let people reorder, such as the pages of a document. Alt+Up/Dow
 
 ## Logs and sections
 
-`wrap` lets rows wrap and grow (each row is measured), and `follow` keeps the end in view as rows arrive while people are reading the latest. `handle` scrolls from outside: `scrollToIndex(index, "start" | "center" | "nearest")` and `scrollToEnd()`.
+`wrap` lets rows wrap and grow (each row is measured), and `follow` keeps the end in view as rows arrive while people are reading the latest. `handle` scrolls from outside: `scrollToIndex(index, { align })` (`"nearest"`, the default, `"start"` or `"center"`, as ScrollArea's `scrollIntoView`) and `scrollToEnd()`.
 
 ```tsx
 const log = useRef<VirtualListHandle>(null);
@@ -65,6 +65,24 @@ const log = useRef<VirtualListHandle>(null);
 ```
 
 <Canvas of={Stories.FollowsNewRowsAtTheEnd} />
+
+`onAtBottomChange` reports when the view leaves the end (someone scrolled up to read) and comes back. `overlay` sits over the bottom centre of the list, outside the listbox, and does not scroll: put a "3 new" pill or a "Latest" button there that calls `handle.scrollToEnd()`.
+
+```tsx
+<VirtualList
+  label="Activity"
+  items={events}
+  getKey={(e) => e.id}
+  renderItem={(e) => e.text}
+  selectionMode="none"
+  follow
+  handle={log}
+  onAtBottomChange={setAtBottom}
+  overlay={!atBottom && unseen > 0 && <Button onClick={() => log.current?.scrollToEnd()}>{`${unseen} new`}</Button>}
+/>
+```
+
+<Canvas of={Stories.AtBottomChangeAndOverlay} />
 
 `isHeader` marks rows that head a section (a date, a folder). They cannot be focused or chosen, and the current section's heading stays pinned at the top while its rows scroll under it.
 
@@ -98,8 +116,8 @@ const log = useRef<VirtualListHandle>(null);
 
 ## Theming
 
-Tokens: `--cy-virtual-list-height`, `--cy-virtual-list-row-height` and `--cy-virtual-list-selected-background`.
+Tokens: `--cy-virtual-list-height`, `--cy-virtual-list-row-height`, `--cy-virtual-list-selected-background`. The overlay is placed by [OverlayFrame](?path=/docs/components-overlayframe--docs) (`--cy-overlay-frame-offset`, `--cy-overlay-frame-layer`).
 
 ## Related
 
-[Tree](?path=/docs/components-tree--docs) · [Table](?path=/docs/components-table--docs) · [SortableList](?path=/docs/components-sortablelist--docs)
+[ScrollArea](?path=/docs/components-scrollarea--docs) · [Tree](?path=/docs/components-tree--docs) · [Table](?path=/docs/components-table--docs) · [SortableList](?path=/docs/components-sortablelist--docs)

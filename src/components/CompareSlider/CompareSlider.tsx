@@ -77,7 +77,8 @@ export function CompareSlider({
   const position = clamp(own, 0, 100);
   const set = (next: number) => {
     const v = Math.round(clamp(next, 0, 100) * 10) / 10;
-    setOwn(v);
+    // Only a real move is a change: a key at an end, or a pointer resting on one spot, tells nobody.
+    if (v !== position) setOwn(v);
   };
   const fromX = (x: number) => {
     const box = (area.current as HTMLDivElement).getBoundingClientRect();

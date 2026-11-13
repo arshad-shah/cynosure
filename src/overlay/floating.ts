@@ -47,13 +47,24 @@ export function useFloatingAnchor(anchor: FloatingAnchor) {
   return { ref, present };
 }
 
-/** The gap to keep from the anchor, read from the surface's `--_offset` (a token that always resolves). */
-export function useFloatingOffset(el: RefObject<HTMLElement | null>) {
-  const offset = useRef(8);
+/**
+ * The surface's `--_offset` in pixels. A custom property's computed value is its text (`0.5rem`, `calc(…)`), not a
+ * length, so it is resolved through a real length property set for the moment of reading.
+ */
+export function floatingOffset(el: HTMLElement, fallback = 8) {
+  const prop = "scroll-margin-top";
+  const before = [el.style.getPropertyValue(prop), el.style.getPropertyPriority(prop)] as const;
+  el.style.setProperty(prop, "var(--_offset)");
+  const px = Number.parseFloat(getComputedStyle(el).scrollMarginTop);
+  el.style.setProperty(prop, ...before);
+  return Number.isFinite(px) ? px : fallback;
+}
+
+/** The gap to keep from the anchor, read from the surface's `--_offset` (a token that always resolves) when it opens. */
+export function useFloatingOffset(el: RefObject<HTMLElement | null>, open: boolean) {
+  const [offset, setOffset] = useState(8);
   useClientLayoutEffect(() => {
-    offset.current = Number.parseFloat(
-      getComputedStyle(el.current as HTMLElement).getPropertyValue("--_offset"),
-    );
-  });
-  return offset.current;
+    if (open && el.current) setOffset(floatingOffset(el.current));
+  }, [el, open]);
+  return offset;
 }

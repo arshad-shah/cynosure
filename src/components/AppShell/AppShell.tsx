@@ -121,7 +121,12 @@ export function AppShell({
   useClientLayoutEffect(() => {
     const el = root.current;
     if (!el) return;
-    const measure = () => setNarrow(el.getBoundingClientRect().width < collapseBelow);
+    const measure = () => {
+      const now = el.getBoundingClientRect().width < collapseBelow;
+      setNarrow(now);
+      // Wide, the drawer is gone; it must not reopen by itself when the shell narrows again.
+      if (!now) setDrawer(false);
+    };
     measure();
     const observer = new ResizeObserver(measure);
     observer.observe(el);

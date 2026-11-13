@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 import { expect, fn, waitFor, within } from "storybook/test";
+import { Icon } from "../../foundations/Icon/Icon.js";
+import { hash } from "../../icons/index.js";
 import { computeUnderHostileHost } from "../../test/hostile.js";
 import { Button } from "../Button/Button.js";
 import { Stack } from "../Stack/Stack.js";
@@ -62,13 +64,54 @@ export const RemovingTags: Story = {
     await expect(tagsOf(canvasElement)).toEqual(["design", "release"]);
     await expect(input).toHaveFocus();
     await expect(canvas.getByRole("status")).toHaveTextContent("docs removed");
-    // Backspace in an empty field removes the last tag.
+    // Backspace in an empty field takes the last tag back into the field to edit, and says so.
     await userEvent.keyboard("{Backspace}");
     await expect(tagsOf(canvasElement)).toEqual(["design"]);
-    // But not while there is text to delete.
-    await userEvent.type(input, "ab{Backspace}");
+    await expect(input).toHaveValue("release");
+    await expect(canvas.getByRole("status")).toHaveTextContent("Editing release");
+    // With text in the field, Backspace deletes text as usual; Enter puts the edited tag back.
+    await userEvent.keyboard("{Backspace}{Backspace}{Backspace}ase notes{Enter}");
+    await expect(tagsOf(canvasElement)).toEqual(["design", "release notes"]);
+    await expect(input).toHaveValue("");
+    // Taken back and left untouched, leaving the field keeps it as a tag.
+    await userEvent.keyboard("{Backspace}");
     await expect(tagsOf(canvasElement)).toEqual(["design"]);
-    await expect(input).toHaveValue("a");
+    await userEvent.tab();
+    await expect(tagsOf(canvasElement)).toEqual(["design", "release notes"]);
+  },
+};
+
+export const CustomTagContentAndAnIcon: Story = {
+  args: {
+    defaultValue: ["design", "docs"],
+    iconStart: hash,
+    renderTag: (tag: string) => (
+      <>
+        <Icon icon={hash} size="sm" /> {tag.toUpperCase()}
+      </>
+    ),
+    labels: { editing: (tag: string) => `${tag} is back in the field` },
+  },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const input = canvas.getByRole("textbox", { name: "Topics" });
+    // Each tag shows what renderTag draws; its remove button is still named by the tag itself.
+    await expect(tagsOf(canvasElement)).toEqual([" DESIGN", " DOCS"]);
+    await expect(canvasElement.querySelectorAll(".cy-tag-input-text svg")).toHaveLength(2);
+    await expect(canvas.getByRole("button", { name: "Remove docs" })).toBeInTheDocument();
+    // The icon sits in the field, before the input.
+    const field = input.closest(".cy-text-field") as HTMLElement;
+    const icon = [...field.querySelectorAll("svg")].find(
+      (svg) => !svg.closest(".cy-tag-input-tags"),
+    ) as SVGElement;
+    await expect(icon).toBeDefined();
+    await expect(icon.getBoundingClientRect().right).toBeLessThanOrEqual(
+      input.getBoundingClientRect().left + 1,
+    );
+    // Backspace edits the tag's own text, not what renderTag drew, and the announcement can be reworded.
+    input.focus();
+    await userEvent.keyboard("{Backspace}");
+    await expect(input).toHaveValue("docs");
+    await expect(canvas.getByRole("status")).toHaveTextContent("docs is back in the field");
   },
 };
 
@@ -90,6 +133,28 @@ export const ArrowKeysThroughTags: Story = {
     // Tags are not tab stops: one Tab leaves the whole field.
     await expect(canvas.getByRole("button", { name: "Remove design" })).toHaveAttribute("tabindex", "-1");
     await userEvent.keyboard("{ArrowLeft}{Escape}");
+    await expect(input).toHaveFocus();
+  },
+};
+
+export const RightToLeftFlipsArrowKeys: Story = {
+  args: { defaultValue: ["design", "docs", "release"] },
+  render: (args) => (
+    <div dir="rtl">
+      <TagInput {...args} />
+    </div>
+  ),
+  play: async ({ canvas, userEvent }) => {
+    const input = canvas.getByRole("textbox", { name: "Topics" });
+    input.focus();
+    // In right-to-left text the tags lie to the right of the input: Arrow Right moves into them, Arrow Left back.
+    await userEvent.keyboard("{ArrowRight}");
+    await expect(canvas.getByRole("button", { name: "Remove release" })).toHaveFocus();
+    await userEvent.keyboard("{ArrowRight}");
+    await expect(canvas.getByRole("button", { name: "Remove docs" })).toHaveFocus();
+    await userEvent.keyboard("{ArrowLeft}{ArrowLeft}");
+    await expect(input).toHaveFocus();
+    await userEvent.keyboard("{ArrowLeft}");
     await expect(input).toHaveFocus();
   },
 };

@@ -19,6 +19,11 @@ const meta = {
     padding: { control: "select", options: SPACES },
     paddingInline: { control: "select", options: SPACES },
     paddingBlock: { control: "select", options: SPACES },
+    grow: { control: "boolean" },
+    shrink: { control: "boolean" },
+    fill: { control: "boolean" },
+    minSize: { control: "inline-radio", options: [undefined, "0"] },
+    overflow: { control: "inline-radio", options: [undefined, "hidden", "auto", "visible"] },
     align: { control: "inline-radio", options: ["start", "center", "end", "baseline", "stretch"] },
     justify: { control: "inline-radio", options: ["start", "center", "end", "between"] },
     wrap: { control: "boolean" },
@@ -119,5 +124,26 @@ export const PaddedRowStaysInsideItsParentInRtl: Story = {
     // A nested row has no padding of its own and does not inherit the parent's.
     await expect(paddingOf(canvas.getByTestId("inner"))).toEqual(["0px", "0px", "0px", "0px"]);
     await expect(canvas.getByTestId("inner").getAttribute("style")).not.toContain("pad");
+  },
+};
+
+/** A status bar in right-to-left text: the grown item takes the free space and the one after it sits at the end. */
+export const GrowPushesTheRestToTheEndInRtl: Story = {
+  render: () => (
+    <div dir="rtl" style={{ inlineSize: 300 }}>
+      <Inline data-testid="bar" overflow="hidden">
+        <Badge>main</Badge>
+        <Inline grow minSize="0" data-testid="grown">
+          <Badge>Ready</Badge>
+        </Inline>
+        <Badge>Ln 1</Badge>
+      </Inline>
+    </div>
+  ),
+  play: async ({ canvas }) => {
+    const bar = canvas.getByTestId("bar").getBoundingClientRect();
+    await expect(canvas.getByText("Ln 1").getBoundingClientRect().left).toBeCloseTo(bar.left, 0);
+    await expect(getComputedStyle(canvas.getByTestId("grown")).flexGrow).toBe("1");
+    await expect(getComputedStyle(canvas.getByTestId("bar")).overflowX).toBe("hidden");
   },
 };

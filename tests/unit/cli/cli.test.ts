@@ -130,6 +130,17 @@ describe("cy check", () => {
     );
     expect(rules(root)).not.toContain("touch-hidden");
   });
+  it("serial-stories: a story file acting on the whole page is tagged serial in its meta", () => {
+    const root = sandbox();
+    const story = (tags: string) =>
+      `const meta = { title: "T"${tags} } satisfies Meta;\nexport default meta;\nexport const T = { play: async () => { await emulateMedia({ reducedMotion: "reduce" }); } };\n`;
+    write(root, "src/components/Button/T.stories.tsx", story(""));
+    expect(rules(root)).toContain("serial-stories");
+    write(root, "src/components/Button/T.stories.tsx", story(', tags: ["!dev"]'));
+    expect(rules(root)).toContain("serial-stories");
+    write(root, "src/components/Button/T.stories.tsx", story(', tags: ["!dev", "serial"]'));
+    expect(rules(root)).not.toContain("serial-stories");
+  });
   it("flags title= attributes", () => {
     const root = sandbox();
     write(root, "src/components/Button/T.tsx", 'export const T = () => <span title="Saved">x</span>;\n');
@@ -193,6 +204,30 @@ describe("cy check", () => {
     const found = check(root).filter((v) => v.file.startsWith("src/components/Probe/"));
     expect(found.map((v) => v.rule).sort()).toEqual(["foundation-use", "hidden-text"]);
   });
+  it("live-region: flags a hidden live region written by hand outside the foundation", () => {
+    const root = sandbox();
+    mkdirSync(join(root, "src/components/Probe"));
+    write(
+      root,
+      "src/components/Probe/Probe.tsx",
+      [
+        "export const Probe = () => (",
+        "  <>",
+        '    <span className="cy-visually-hidden" role="status">a</span>',
+        '    <span className="cy-reset cy-visually-hidden" aria-live="polite">b</span>',
+        '    <p className="cy-probe cy-reset" role="status">visible status</p>',
+        '    <span className="cy-visually-hidden">hidden text</span>',
+        "  </>",
+        ");",
+        "",
+      ].join("\n"),
+    );
+    const found = check(root).filter((v) => v.rule === "live-region");
+    expect(found.map((v) => `${v.file}:${v.line}`)).toEqual([
+      "src/components/Probe/Probe.tsx:3",
+      "src/components/Probe/Probe.tsx:4",
+    ]);
+  });
   it("flags glyphs used as icons or arrows in docs pages", () => {
     const root = sandbox();
     const page = "src/components/Badge/Badge.mdx";
@@ -233,7 +268,7 @@ describe("cy new component", () => {
     ).toContain("ScaffoldProbe (JS + CSS)");
     expect(new Set(rules(root))).toEqual(new Set(["scaffold-todo"]));
     execFileSync(join(repo, "node_modules/.bin/tsc"), ["-p", root], { stdio: "pipe" });
-  }, 30_000); // runs a full typecheck of a sandbox copy of the repo
+  }, 120_000); // runs a full typecheck of a sandbox copy of the repo
   it("scaffolds a foundation under src/foundations", () => {
     const root = sandbox();
     scaffoldComponent(root, "SliderBase", "foundation");
@@ -279,7 +314,7 @@ describe("cy new icon", () => {
     expect(mod).toContain('name: "flat-line"');
     expect(mod).toContain('category: "actions"');
     expect(mod).toContain('["rect", { x: 3, y: 3, width: 6, height: 6, rx: 1.5 }]');
-    expect(readFileSync(join(root, "src/icons/index.ts"), "utf8")).toContain(
+    expect(readFileSync(join(root, "src/icons/facet.ts"), "utf8")).toContain(
       'export { flatLine } from "./flat-line.js";',
     );
   });

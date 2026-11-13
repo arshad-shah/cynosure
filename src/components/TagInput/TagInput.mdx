@@ -37,6 +37,12 @@ Duplicates are refused (without regard to case) unless `allowDuplicates`; `maxTa
 
 <Canvas of={Stories.RefusalsAreExplained} />
 
+## Editing, custom tags and an icon
+
+Backspace in an empty field takes the last tag back into the field as text, to fix a typo: Enter (or leaving the field) adds it again, and "Editing …" is announced (`labels.editing`). `renderTag(tag)` draws a tag's content (an icon, a coloured dot, a formatted value) in place of its text; Backspace still edits the text, and the remove button is still named by it. `iconStart` puts an icon in the field, before the input.
+
+<Canvas of={Stories.CustomTagContentAndAnIcon} />
+
 ## Forms
 
 With `name`, each tag is submitted as its own value under that name (`formData.getAll(name)`). `required` needs at least one tag; reset restores `defaultValue`; disabled fields are not submitted and lose their remove buttons.
@@ -53,7 +59,7 @@ With `name`, each tag is submitted as its own value under that name (`formData.g
 | Key                          | Where           | Action                                     |
 | ---------------------------- | --------------- | ------------------------------------------ |
 | Enter / `,`                  | Field           | Add the typed text (or the active suggestion) |
-| Backspace                    | Empty field     | Remove the last tag                         |
+| Backspace                    | Empty field     | Take the last tag back into the field to edit |
 | Arrow Left                   | Start of field  | Move to the last tag                        |
 | Arrow Left / Right           | Tags            | Move between tags; past the last, back to the field |
 | Delete / Backspace           | Tag             | Remove it                                   |
@@ -61,7 +67,7 @@ With `name`, each tag is submitted as its own value under that name (`formData.g
 
 - **Tab order:** the field is one tab stop; tags are reached with the arrow keys.
 - **Paste:** text with commas or new lines becomes several tags.
-- **Announcements:** "… added" and "… removed" are announced politely.
+- **Announcements:** "… added", "… removed" and "Editing …" are announced politely.
 - **Touch:** remove buttons have a 44px hit area on touch screens.
 - All built-in text is in `labels`.
 

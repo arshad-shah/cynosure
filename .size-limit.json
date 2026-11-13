@@ -2,7 +2,7 @@
   {
     "name": "all CSS",
     "path": "dist/styles.css",
-    "limit": "32 kB",
+    "limit": "37.81 kB",
     "gzip": true
   },
   {
@@ -13,7 +13,13 @@
       "dist/tokens/defaults.js",
       "dist/tokens/to-css.js"
     ],
-    "limit": "6.5 kB",
+    "limit": "6.93 kB",
+    "gzip": true
+  },
+  {
+    "name": "Named themes + chart themes (no React)",
+    "path": ["dist/tokens/named-themes.js", "dist/tokens/chart-themes.js"],
+    "limit": "1.93 kB",
     "gzip": true
   },
   {
@@ -73,7 +79,7 @@
       "dist/foundations/TextAreaBase/TextAreaBase.js",
       "dist/styles/text-area.css"
     ],
-    "limit": "3 kB",
+    "limit": "4.44 kB",
     "gzip": true
   },
   {
@@ -174,7 +180,7 @@
   {
     "name": "Card",
     "path": ["dist/components/Card/Card.js", "dist/styles/card.css"],
-    "limit": "2 kB",
+    "limit": "2.25 kB",
     "gzip": true
   },
   {
@@ -190,13 +196,13 @@
   {
     "name": "Tabs",
     "path": ["dist/components/Tabs/Tabs.js", "dist/foundations/roving-focus.js", "dist/styles/tabs.css"],
-    "limit": "6 kB",
+    "limit": "7.5 kB",
     "gzip": true
   },
   {
     "name": "Disclosure",
     "path": ["dist/components/Disclosure/Disclosure.js", "dist/styles/disclosure.css"],
-    "limit": "2 kB",
+    "limit": "2.1 kB",
     "gzip": true
   },
   {
@@ -207,7 +213,7 @@
       "dist/styles/disclosure.css",
       "dist/styles/accordion.css"
     ],
-    "limit": "3.25 kB",
+    "limit": "3.4 kB",
     "gzip": true
   },
   {
@@ -219,13 +225,13 @@
   {
     "name": "Overlay core",
     "path": ["dist/overlay/dismiss.js", "dist/overlay/position.js", "dist/overlay/use-anchored-position.js"],
-    "limit": "2 kB",
+    "limit": "2.1 kB",
     "gzip": true
   },
   {
     "name": "Menu",
     "path": ["dist/components/Menu/Menu.js", "dist/styles/menu.css"],
-    "limit": "3.25 kB",
+    "limit": "4 kB",
     "gzip": true
   },
   {
@@ -253,13 +259,13 @@
   {
     "name": "Toast",
     "path": ["dist/components/Toast/Toast.js", "dist/styles/toast.css"],
-    "limit": "4 kB",
+    "limit": "4.2 kB",
     "gzip": true
   },
   {
     "name": "Notice",
     "path": ["dist/components/Notice/Notice.js", "dist/styles/notice.css"],
-    "limit": "1.75 kB",
+    "limit": "1.93 kB",
     "gzip": true
   },
   {
@@ -295,7 +301,7 @@
   {
     "name": "Tree",
     "path": ["dist/components/Tree/Tree.js", "dist/styles/tree.css"],
-    "limit": "4.5 kB",
+    "limit": "6.2 kB",
     "gzip": true
   },
   {
@@ -305,7 +311,7 @@
       "dist/foundations/hotkey.js",
       "dist/styles/command-palette.css"
     ],
-    "limit": "4.75 kB",
+    "limit": "5.26 kB",
     "gzip": true
   },
   {
@@ -323,7 +329,7 @@
   {
     "name": "Grid",
     "path": ["dist/components/Grid/Grid.js", "dist/styles/grid.css"],
-    "limit": "2 kB",
+    "limit": "2.05 kB",
     "gzip": true
   },
   {
@@ -340,8 +346,18 @@
   },
   {
     "name": "Announcer",
-    "path": ["dist/components/Announcer/Announcer.js", "dist/styles/announcer.css"],
-    "limit": "1 kB",
+    "path": [
+      "dist/components/Announcer/Announcer.js",
+      "dist/foundations/LiveRegion/LiveRegion.js",
+      "dist/styles/announcer.css"
+    ],
+    "limit": "1.4 kB",
+    "gzip": true
+  },
+  {
+    "name": "LiveRegion",
+    "path": ["dist/foundations/LiveRegion/LiveRegion.js"],
+    "limit": "0.5 kB",
     "gzip": true
   },
   {
@@ -359,7 +375,7 @@
   {
     "name": "SideNav (with Tooltip)",
     "path": ["dist/components/SideNav/SideNav.js", "dist/styles/side-nav.css"],
-    "limit": "3.5 kB",
+    "limit": "3.51 kB",
     "gzip": true
   },
   {
@@ -383,13 +399,13 @@
   {
     "name": "FileDrop (with Button)",
     "path": ["dist/components/FileDrop/FileDrop.js", "dist/styles/file-drop.css"],
-    "limit": "3 kB",
+    "limit": "3.65 kB",
     "gzip": true
   },
   {
     "name": "SplitPane",
     "path": ["dist/components/SplitPane/SplitPane.js", "dist/styles/split-pane.css"],
-    "limit": "2.25 kB",
+    "limit": "2.42 kB",
     "gzip": true
   },
   {
@@ -453,7 +469,7 @@
   {
     "name": "VirtualList",
     "path": ["dist/components/VirtualList/VirtualList.js", "dist/styles/virtual-list.css"],
-    "limit": "4.5 kB",
+    "limit": "4.7 kB",
     "gzip": true
   },
   {
@@ -489,13 +505,13 @@
   {
     "name": "PanZoomCanvas",
     "path": ["dist/components/PanZoomCanvas/PanZoomCanvas.js", "dist/styles/pan-zoom-canvas.css"],
-    "limit": "3 kB",
+    "limit": "3.45 kB",
     "gzip": true
   },
   {
     "name": "Calendar",
     "path": ["dist/components/Calendar/Calendar.js", "dist/styles/calendar.css"],
-    "limit": "4.75 kB",
+    "limit": "5 kB",
     "gzip": true
   },
   {
@@ -656,6 +672,94 @@
     "name": "OptionList (JS + CSS)",
     "path": ["dist/components/OptionList/OptionList.js", "dist/styles/option-list.css"],
     "limit": "3 kB",
+    "gzip": true
+  },
+  {
+    "name": "Menubar (JS + CSS)",
+    "path": ["dist/components/Menubar/Menubar.js", "dist/styles/menubar.css"],
+    "limit": "3 kB",
+    "gzip": true
+  },
+  {
+    "name": "StatusBar (JS + CSS)",
+    "path": ["dist/components/StatusBar/StatusBar.js", "dist/styles/status-bar.css"],
+    "limit": "2.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "TitleBar (JS + CSS)",
+    "path": ["dist/components/TitleBar/TitleBar.js", "dist/styles/title-bar.css"],
+    "limit": "2.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "ScrollArea",
+    "path": [
+      "dist/components/ScrollArea/ScrollArea.js",
+      "dist/foundations/use-follow.js",
+      "dist/styles/scroll-area.css"
+    ],
+    "limit": "2.1 kB",
+    "gzip": true
+  },
+  {
+    "name": "ListRow (JS + CSS)",
+    "path": ["dist/components/ListRow/ListRow.js", "dist/styles/list-row.css"],
+    "limit": "3.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "HotkeyField (JS + CSS)",
+    "path": ["dist/components/HotkeyField/HotkeyField.js", "dist/styles/hotkey-field.css"],
+    "limit": "3 kB",
+    "gzip": true
+  },
+  {
+    "name": "ChatMessage (JS + CSS)",
+    "path": ["dist/components/ChatMessage/ChatMessage.js", "dist/styles/chat-message.css"],
+    "limit": "3 kB",
+    "gzip": true
+  },
+  {
+    "name": "HighlightedText (JS + CSS)",
+    "path": ["dist/components/HighlightedText/HighlightedText.js", "dist/styles/highlighted-text.css"],
+    "limit": "1 kB",
+    "gzip": true
+  },
+  {
+    "name": "ErrorBoundary (JS + CSS)",
+    "path": ["dist/components/ErrorBoundary/ErrorBoundary.js", "dist/styles/error-boundary.css"],
+    "limit": "1 kB",
+    "gzip": true
+  },
+  {
+    "name": "DataGrid",
+    "path": ["dist/components/DataGrid/DataGrid.js", "dist/styles/data-grid.css"],
+    "limit": "5.95 kB",
+    "gzip": true
+  },
+  {
+    "name": "PathField",
+    "path": ["dist/components/PathField/PathField.js", "dist/styles/path-field.css"],
+    "limit": "1.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "RowActions (JS + CSS)",
+    "path": ["dist/components/RowActions/RowActions.js", "dist/styles/row-actions.css"],
+    "limit": "1.1 kB",
+    "gzip": true
+  },
+  {
+    "name": "OverlayFrame",
+    "path": ["dist/components/OverlayFrame/OverlayFrame.js", "dist/styles/overlay-frame.css"],
+    "limit": "650 B",
+    "gzip": true
+  },
+  {
+    "name": "SortButton",
+    "path": ["dist/components/SortButton/SortButton.js", "dist/styles/sort-button.css"],
+    "limit": "1.1 kB",
     "gzip": true
   }
 ]

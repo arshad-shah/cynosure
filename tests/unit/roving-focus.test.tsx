@@ -146,3 +146,37 @@ describe("useRovingFocus follows the selection", () => {
     expect(getByText("A").tabIndex).toBe(-1);
   });
 });
+
+function Current({ current, follow }: { current: number; follow: boolean }) {
+  const ref = useRef<HTMLDivElement>(null);
+  useRovingFocus(ref, { selector: "button", orientation: "vertical", current: follow });
+  return (
+    <div ref={ref}>
+      {["A", "B", "C"].map((label, i) => (
+        // The first has no aria-current at all; the others say "false" when they are not the current one.
+        <button
+          key={label}
+          type="button"
+          aria-current={i === current ? "true" : i === 0 ? undefined : "false"}
+        >
+          {label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+describe("useRovingFocus with current", () => {
+  it("starts on, and follows, the item marked aria-current when asked to", async () => {
+    const { getByText, rerender } = render(<Current current={1} follow />);
+    expect(getByText("B").tabIndex).toBe(0);
+    rerender(<Current current={2} follow />);
+    await act(async () => {});
+    expect(getByText("C").tabIndex).toBe(0);
+    expect(getByText("B").tabIndex).toBe(-1);
+  });
+  it("ignores aria-current otherwise", () => {
+    const { getByText } = render(<Current current={1} follow={false} />);
+    expect(getByText("A").tabIndex).toBe(0);
+  });
+});

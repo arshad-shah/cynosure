@@ -23,7 +23,7 @@ const meta = {
     icon: { control: "select", options: Object.keys(iconMapping), mapping: iconMapping },
     variant: { control: "inline-radio", options: ["solid", "soft", "outline", "ghost"] },
     tone: { control: "select", options: ["accent", "neutral", "danger", "success", "warning", "info"] },
-    size: { control: "inline-radio", options: ["sm", "md", "lg"] },
+    size: { control: "inline-radio", options: ["xs", "sm", "md", "lg"] },
     label: { control: "text" },
     loading: { control: "boolean" },
     pressed: { control: "boolean" },
@@ -44,6 +44,50 @@ export const Default: Story = {
     const { width, height } = button.getBoundingClientRect();
     await expect(width).toBe(height);
     await userEvent.click(button);
+    await expect(args.onClick).toHaveBeenCalledTimes(1);
+  },
+};
+
+const before = (el: Element) => {
+  const s = getComputedStyle(el, "::before");
+  return Math.min(Number.parseFloat(s.width), Number.parseFloat(s.height));
+};
+
+export const ExtraSmallForDenseToolbars: Story = {
+  args: { size: "xs", variant: "ghost" },
+  render: (args) => (
+    <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+      <IconButton {...args} />
+      <IconButton {...args} size="sm" label="Delete" icon={trash} />
+    </div>
+  ),
+  play: async ({ canvas, args, userEvent }) => {
+    const xs = canvas.getByRole("button", { name: "Copy document" });
+    const sm = canvas.getByRole("button", { name: "Delete" });
+    // A 20px square with a smaller icon than sm's, centred in it.
+    const box = xs.getBoundingClientRect();
+    await expect([box.width, box.height]).toEqual([20, 20]);
+    const icon = (el: Element) => (el.querySelector(".cy-icon") as Element).getBoundingClientRect();
+    await expect(icon(xs).height).toBeLessThan(icon(sm).height);
+    await expect(Math.abs(icon(xs).top + icon(xs).height / 2 - (box.top + box.height / 2))).toBeLessThan(1);
+    // Still 24px to press.
+    await expect(before(xs)).toBeGreaterThanOrEqual(24);
+    await expect(document.elementFromPoint(box.left - 1, box.top + box.height / 2)).toBe(xs);
+    await userEvent.tab();
+    await expect(xs).toHaveFocus();
+    await userEvent.keyboard("{Enter}");
+    await expect(args.onClick).toHaveBeenCalledTimes(1);
+  },
+};
+
+export const ExtraSmallCoarsePointer: Story = {
+  tags: ["touch", "!dev"],
+  args: { size: "xs" },
+  play: async ({ canvas, args, userEvent }) => {
+    const button = canvas.getByRole("button", { name: "Copy document" });
+    await expect(button.getBoundingClientRect().height).toBe(20);
+    await expect(before(button)).toBeGreaterThanOrEqual(44);
+    await userEvent.pointer({ keys: "[TouchA]", target: button });
     await expect(args.onClick).toHaveBeenCalledTimes(1);
   },
 };

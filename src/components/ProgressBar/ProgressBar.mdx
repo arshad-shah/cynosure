@@ -38,6 +38,20 @@ By default the value reads as a percentage. Pass `labels.value` to describe it i
 
 <Canvas of={Stories.LabelsAndHiddenLabel} />
 
+## A slim bar in a row
+
+With `labelHidden` and no `showValue`, the bar is only its track: no label row, as tall as `size` makes it, and still named by `label`. Put it in a row of text (a query plan's cost, a quota beside its number) and give it the space with `style={{ flex: 1 }}`; it fills from the reading start in right-to-left text too.
+
+```tsx
+<Inline gap="2" align="center">
+  <Text size="sm">Seq Scan</Text>
+  <ProgressBar label="Cost 1234.5" labelHidden value={45} size="sm" tone="warning" style={{ flex: 1 }} />
+  <Text size="sm" tone="muted">cost: 1234.5</Text>
+</Inline>
+```
+
+<Canvas of={Stories.SlimInlineBarInARow} />
+
 ## Props
 
 <ArgTypes of={Stories} />
@@ -54,7 +68,9 @@ By default the value reads as a percentage. Pass `labels.value` to describe it i
 
 ## Theming
 
-Tokens: `--cy-progress-bar-height-{sm,md,lg}`, `--cy-progress-bar-radius` and `--cy-progress-bar-track`.
+`size` sets the thickness: `xs` 2, `sm` 4, `md` 8 and `lg` 12 px. `xs` also sets smaller label and value text and a tighter gap, for dense desktop chrome.
+
+Tokens: `--cy-progress-bar-height-{xs,sm,md,lg}`, `--cy-progress-bar-radius` and `--cy-progress-bar-track`.
 
 ```ts
 createTheme({ components: { progressBar: { heightMd: "6px", radius: "2px" } } });

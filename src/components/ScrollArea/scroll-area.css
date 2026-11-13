@@ -1,0 +1,40 @@
+/*
+ * scroll-area: the root (an OverlayFrame) fills its parent (a flex share, or 100% both ways) and may be smaller than
+ * its content; the viewport scrolls inside it, and the frame's overlay stays put while the content scrolls.
+ */
+.cy-scroll-area.cy-scroll-area {
+  flex: 1 1 0%;
+  inline-size: 100%;
+  block-size: 100%;
+  min-inline-size: 0;
+  min-block-size: 0;
+}
+.cy-scroll-area-viewport.cy-scroll-area-viewport {
+  min-inline-size: 0;
+  min-block-size: 0;
+  padding: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  border-radius: inherit;
+  outline: none;
+  &:focus-visible {
+    outline: var(--cy-border-focus) solid var(--cy-color-ring);
+    outline-offset: calc(-1 * var(--cy-border-focus));
+  }
+  &[data-direction="horizontal"] {
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+  &[data-direction="both"] {
+    overflow: auto;
+  }
+}
+/* The content is as wide as what it holds when the area scrolls sideways, so growing wider is noticed. */
+.cy-scroll-area-content.cy-scroll-area-content {
+  display: flow-root;
+  padding: 0;
+}
+.cy-scroll-area-viewport:not([data-direction="vertical"]) > .cy-scroll-area-content {
+  inline-size: max-content;
+  min-inline-size: 100%;
+}

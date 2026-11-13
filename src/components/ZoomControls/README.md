@@ -10,10 +10,11 @@ Zoom out, the current percent (a menu of fit width, fit page and preset percents
 | ----------------------- | ------------------------------- | --------------------------------------------------------------------------------- |
 | `zoom` / `onZoomChange` | –                               | The `ZoomSetting` DocumentViewport takes                                          |
 | `percent`               | –                               | What the setting comes to now (fit modes depend on the view): shown, stepped from |
-| `presets`               | 50, 75, 100, 125, 150, 200, 400 | Percents in the menu                                                              |
+| `min` / `max`           | 25 / 800                        | Where zoom out and zoom in stop (a PanZoomCanvas's `min` and `max` × 100)         |
+| `presets`               | 50, 75, 100, 125, 150, 200, 400 | Percents in the menu (those between `min` and `max`)                              |
 | `size`                  | `sm`                            |                                                                                   |
 | `labels`                | –                               | `group`, `zoomIn`, `zoomOut`, `menu(percent)`, `fitWidth`, `fitPage`              |
-- Zoom in and out go through the usual steps (… 90, 100, 110, 125 …) and stop at 25% and 800%.
+- Zoom in and out go through the usual steps (… 90, 100, 110, 125 …) and stop at `min` and `max` (25% and 800% unless given).
 - The menu button reads "Zoom 125%"; the current choice is checked.
 
 ## Tokens

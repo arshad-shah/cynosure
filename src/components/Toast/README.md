@@ -31,6 +31,20 @@ function SaveButton() {
 | `tone`        | `neutral` | `neutral` · `success` · `danger` · `warning` · `info` (colour and icon) |
 | `action`      | –         | `{ label, onClick }`: one button; it does not close the toast           |
 | `duration`    | `5000`    | Milliseconds; `Infinity` keeps it until dismissed                       |
+| `id`          | generated | Same id as a showing toast: updates that toast instead of adding one    |
+| `loading`     | `false`   | A spinner in place of the tone's icon, and no timer until updated       |
+| `onDismiss`   | –         | `(id, reason)` once, as it closes: `timeout`, `user` or `programmatic`  |
+
+Updating in place, for work that finishes later:
+
+```tsx
+const { toast } = useToast();
+toast({ id: "export", title: "Exporting", loading: true });
+// later
+toast({ id: "export", title: "Exported", tone: "success" });
+```
+
+The update replaces the toast's options (its timer starts again with the new `duration`) in the same element, so only text that changed is announced. A toast that was closing comes back. `onDismiss` reports `user` for the close button and a swipe, `timeout` for the timer and `programmatic` for `dismiss()`.
 - **Keeping clear of fixed UI.** The toasts sit one `--cy-space-6` in from the edges, plus the device's safe area (`env(safe-area-inset-*)`). `offset` adds to that on the edge they sit on, so they stay above a bottom tab bar: `<Toaster offset="56px">`. One value is the distance from the top or bottom edge (whichever `position` names); `{ block, inline }` also sets the distance from the side (`start` or `end`, following the reading direction; both sides for `center`). The same two distances are tokens, for setting them from CSS, for example only on phones. The prop wins over the tokens.
 
   ```css

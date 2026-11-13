@@ -1,23 +1,19 @@
-import {
-  type CSSProperties,
-  Fragment,
-  type KeyboardEvent,
-  useEffect,
-  useId,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { type CSSProperties, Fragment, type KeyboardEvent, useId, useMemo, useRef, useState } from "react";
 import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js";
 import { useControllableState } from "../../foundations/controllable.js";
 import { DialogBase } from "../../foundations/DialogBase/DialogBase.js";
+import { deepActiveElement } from "../../foundations/focus.js";
 import { useHotkey } from "../../foundations/hotkey.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
 import { InputBase } from "../../foundations/InputBase/InputBase.js";
 import { isComposing } from "../../foundations/keys.js";
+import { useActiveOption } from "../../foundations/listbox.js";
+import { textMatchAt, textMatches } from "../../foundations/text-match.js";
 import { search } from "../../icons/search.js";
 import type { IconData } from "../../icons/types.js";
 import { useDismiss } from "../../overlay/dismiss.js";
+import { Badge } from "../Badge/Badge.js";
+import { HighlightedText } from "../HighlightedText/HighlightedText.js";
 import { Kbd } from "../Kbd/Kbd.js";
 
 export interface CommandPaletteTokens {
@@ -45,6 +41,14 @@ export interface Command {
   disabled?: boolean;
 }
 
+/** What a `filter` says about a command that matches: how well, and which letters of its label. */
+export interface CommandMatch {
+  /** Lower ranks first, as fuzzy matchers score. Matches without a score count as 0; ties keep `commands`' order. */
+  score?: number | undefined;
+  /** Indices of the matched characters in the label: they are marked (HighlightedText `positions`). */
+  positions?: readonly number[] | undefined;
+}
+
 export interface CommandPaletteLabels {
   /** Accessible name of the palette. */
   title: string;
@@ -52,6 +56,25 @@ export interface CommandPaletteLabels {
   empty: string;
   /** Heading of the recently run commands, shown before you type. */
   recent: string;
+}
+
+/** The commands a custom filter keeps, lowest score first (a stable sort), with the positions it marked. */
+function filtered(
+  commands: Command[],
+  query: string,
+  filter: (command: Command, query: string) => CommandMatch | boolean | null | undefined,
+): { found: Command[]; positions: Map<string, readonly number[]> } {
+  const kept: { command: Command; score: number }[] = [];
+  const positions = new Map<string, readonly number[]>();
+  for (const command of commands) {
+    const match = filter(command, query);
+    if (!match) continue;
+    const found: CommandMatch = match === true ? {} : match;
+    kept.push({ command, score: found.score ?? 0 });
+    positions.set(command.id, found.positions ?? []);
+  }
+  kept.sort((a, b) => a.score - b.score);
+  return { found: kept.map((k) => k.command), positions };
 }
 
 export interface CommandPaletteProps {
@@ -70,6 +93,12 @@ export interface CommandPaletteProps {
   onOpenChange?: (open: boolean) => void;
   /** Global shortcut that toggles the palette (`mod` is Command on Apple platforms, else Control). `false`: none. */
   shortcut?: string | false;
+  /**
+   * Your own search, called for each command while there is a query: return a `CommandMatch` (`{ score, positions }`,
+   * as fuzzy matchers return it), `true` to keep the command unmarked, or `null`/`false` to leave it out. Default:
+   * every word of the query in the label or keywords, label prefixes first, the words marked.
+   */
+  filter?: ((command: Command, query: string) => CommandMatch | boolean | null | undefined) | undefined;
   /** How many recently run commands to list before you type (default 5, 0 for none). */
   recentLimit?: number;
   /** Replace the built-in English text: the palette's name, the placeholder, the empty note and the recent heading. */
@@ -87,17 +116,15 @@ const DEFAULT_LABELS: CommandPaletteLabels = {
   recent: "Recent",
 };
 
+/** The words of a query. */
+const wordsOf = (query: string) => query.split(/\s+/).filter(Boolean);
+
 /** Every word of the query must appear in the label or keywords; label prefix matches rank first. */
-function rank(commands: Command[], query: string): Command[] {
-  const words = query.toLowerCase().split(/\s+/).filter(Boolean);
-  if (!words.length) return commands;
-  const hay = (c: Command) => [c.label, ...(c.keywords ?? [])].join(" ").toLowerCase();
-  const found = commands.filter((c) => words.every((w) => hay(c).includes(w)));
-  const first = words[0] as string;
-  return [
-    ...found.filter((c) => c.label.toLowerCase().startsWith(first)),
-    ...found.filter((c) => !c.label.toLowerCase().startsWith(first)),
-  ];
+function rank(commands: Command[], words: string[]): Command[] {
+  const hay = (c: Command) => [c.label, ...(c.keywords ?? [])].join(" ");
+  const found = commands.filter((c) => words.every((w) => textMatches(hay(c), w)));
+  const prefixed = (c: Command) => textMatchAt(c.label, words[0] as string) === 0;
+  return [...found.filter(prefixed), ...found.filter((c) => !prefixed(c))];
 }
 
 /** Search-and-run list of commands in a modal dialog, opened by a global shortcut (Ctrl or Command + K). */
@@ -108,6 +135,7 @@ export function CommandPalette({
   defaultOpen = false,
   onOpenChange,
   shortcut = "mod+k",
+  filter,
   recentLimit = 5,
   labels,
   className,
@@ -118,7 +146,6 @@ export function CommandPalette({
   const [isOpen, setOpen] = useControllableState(open, defaultOpen, onOpenChange);
   const [query, setQuery] = useState("");
   const [recent, setRecent] = useState<string[]>([]);
-  const [active, setActive] = useState(0);
   const dialog = useRef<HTMLDialogElement>(null);
   const input = useRef<HTMLInputElement>(null);
   const list = useRef<HTMLDivElement>(null);
@@ -126,41 +153,50 @@ export function CommandPalette({
 
   useHotkey(shortcut, () => setOpen(!isOpen));
 
-  // Rows: recent commands first while the query is empty, then the matches grouped by `group` in first-seen order.
-  const sections = useMemo(() => {
-    const matches = rank(commands, query);
-    const out: { name: string | undefined; items: Command[] }[] = [];
-    if (!query && recentLimit > 0) {
+  // Each typed word is marked where it appears in a label (unless a custom filter gives the positions).
+  const words = useMemo(() => wordsOf(query), [query]);
+  // Rows. Browsing (no query): recent commands first, then every command under its group's heading, in first-seen
+  // order. Searching: one flat list in rank order. `tagged` sections show each command's group as a tag.
+  const { sections, positions } = useMemo(() => {
+    const out: { name: string | undefined; items: Command[]; tagged: boolean }[] = [];
+    if (words.length) {
+      const { found, positions } = filter
+        ? filtered(commands, query.trim(), filter)
+        : { found: rank(commands, words), positions: undefined };
+      out.push({ name: undefined, items: found, tagged: true });
+      return { sections: out, positions };
+    }
+    if (recentLimit > 0) {
       const recents = recent
         .map((r) => commands.find((c) => c.id === r))
         .filter((c): c is Command => !!c)
         .slice(0, recentLimit);
-      if (recents.length) out.push({ name: text.recent, items: recents });
+      if (recents.length) out.push({ name: text.recent, items: recents, tagged: true });
     }
     const byGroup = new Map<string | undefined, Command[]>();
-    for (const c of matches) byGroup.set(c.group, [...(byGroup.get(c.group) ?? []), c]);
-    for (const [name, items] of byGroup) out.push({ name, items });
-    return out;
-  }, [commands, query, recent, recentLimit, text.recent]);
+    for (const c of commands) byGroup.set(c.group, [...(byGroup.get(c.group) ?? []), c]);
+    for (const [name, items] of byGroup) out.push({ name, items, tagged: false });
+    return { sections: out, positions: undefined };
+  }, [commands, query, words, filter, recent, recentLimit, text.recent]);
   const rows = sections.flatMap((s) => s.items.map((c) => ({ command: c, section: s.name })));
-  const runnable = rows.map((r, i) => (r.command.disabled ? -1 : i)).filter((i) => i >= 0);
+  // Arrows wrap around, so the last command is one key away.
+  const { active, activeId, optionId, setActive, move } = useActiveOption({
+    id,
+    list,
+    open: isOpen,
+    count: rows.length,
+    usable: (i) => !rows[i]?.command.disabled,
+    wrap: true,
+  });
 
   // Opening: remember where focus was, start fresh, and focus the search field.
   useClientLayoutEffect(() => {
     if (!isOpen) return;
-    const active = document.activeElement as HTMLElement | null;
-    returnTo.current =
-      active?.shadowRoot?.activeElement instanceof HTMLElement ? active.shadowRoot.activeElement : active;
+    returnTo.current = deepActiveElement();
     setQuery("");
     setActive(0);
     input.current?.focus();
   }, [isOpen]);
-  useEffect(() => {
-    if (!runnable.includes(active)) setActive(runnable[0] ?? -1);
-  });
-  useEffect(() => {
-    list.current?.querySelector(`#${id}-${active}`)?.scrollIntoView?.({ block: "nearest" });
-  }, [active, id]);
   useDismiss({
     open: isOpen,
     onClose: () => setOpen(false),
@@ -177,12 +213,9 @@ export function CommandPalette({
   };
   const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
     if (isComposing(event)) return;
-    const at = runnable.indexOf(active);
     if (event.key === "ArrowDown" || event.key === "ArrowUp") {
       event.preventDefault();
-      // Arrows wrap around, so the last command is one key away.
-      const step = event.key === "ArrowDown" ? 1 : -1;
-      setActive(runnable[(at + step + runnable.length) % runnable.length] ?? -1);
+      move(event.key === "ArrowDown" ? 1 : -1);
     } else if (event.key === "Enter") {
       event.preventDefault();
       run(rows[active]?.command);
@@ -215,7 +248,7 @@ export function CommandPalette({
             aria-expanded="true"
             aria-controls={`${id}-list`}
             aria-autocomplete="list"
-            aria-activedescendant={active >= 0 ? `${id}-${active}` : undefined}
+            aria-activedescendant={activeId}
             autoComplete="off"
             spellCheck={false}
             placeholder={text.placeholder}
@@ -265,7 +298,7 @@ export function CommandPalette({
                 return (
                   <Fragment key={`${section.name}-${command.id}`}>
                     <div
-                      id={`${id}-${i}`}
+                      id={optionId(i)}
                       role="option"
                       tabIndex={-1}
                       aria-selected={i === active}
@@ -278,7 +311,18 @@ export function CommandPalette({
                       onKeyDown={() => {}}
                     >
                       {command.icon && <Icon icon={command.icon} className="cy-command-palette-icon" />}
-                      <span className="cy-command-palette-label cy-reset">{command.label}</span>
+                      <span className="cy-command-palette-label cy-reset">
+                        <HighlightedText
+                          text={command.label}
+                          query={words}
+                          positions={positions?.get(command.id)}
+                        />
+                      </span>
+                      {section.tagged && command.group && (
+                        <Badge size="sm" className="cy-command-palette-tag">
+                          {command.group}
+                        </Badge>
+                      )}
                       {command.shortcut && <Kbd keys={command.shortcut} size="sm" />}
                     </div>
                   </Fragment>

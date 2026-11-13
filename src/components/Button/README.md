@@ -15,7 +15,7 @@ import { download, trash } from "@arshad-shah/cynosure/icons";
 | `variant`             | `outline` | `solid` (filled, lit), `soft` (tinted), `outline`, `ghost`                                                                                                              |
 | `tone`                | `neutral` | `accent`, `neutral`, `danger`, `success`, `warning`, `info`                                                                                                             |
 | `color`               | –         | Any CSS colour, overriding `tone` (a brand button). Text on a solid fill is white or black, whichever reads; other variants darken or lighten it to read on the surface |
-| `size`                | `md`      | `sm` 26, `md` 32, `lg` 40 px at comfortable scale                                                                                                                       |
+| `size`                | `md`      | `xs` 20, `sm` 26, `md` 32, `lg` 40 px at comfortable scale; `xs` is for dense desktop chrome and still 24px (44px coarse) to press                                      |
 | `icon` / `iconEnd`    | –         | Facet icons; inline-start / inline-end (RTL aware)                                                                                                                      |
 | `loading`             | `false`   | Centred `LoadingDots`, `aria-busy`, ignores activation, keeps width                                                                                                     |
 | `pressed`             | –         | Toggle button (`aria-pressed`)                                                                                                                                          |
@@ -35,3 +35,11 @@ Every variant × tone pair is distinct and keeps text at ≥ 4.5:1 (tested). Sof
 - `aria-current`: set on the element in both forms. A link to the page being shown takes `aria-current="page"` (as Pagination does with `getHref`), so a screen reader says "current page".
 - `confirm`: ask before acting, in place. The first press shows this text ("Press again to delete"); a second press within 4 seconds acts; Escape, leaving or the timeout disarms it.
 - `keepFocus`: a pointer press leaves focus where it was, for on-screen keypads beside a field.
+
+## Tokens
+
+- `--cy-button-hover-bg`: Fill on hover. Default: the variant's own hover fill. Set it on one button for a hover that differs from its variant (TitleBar's close control goes danger-filled).
+- `--cy-button-hover-ink`: Text and icon colour on hover. Default: unchanged.
+- `--cy-button-padding-inline-xs`: Inline padding of an `xs` button. Default `--cy-space-4`.
+- `--cy-button-height-xs`: Height of an `xs` button. Default `--cy-control-height-xs` (20px at comfortable scale).
+- `--cy-button-square-width`: Width of a square (icon-only) button, such as an IconButton. Default its height, so it is square; TitleBar widens its window controls with it.

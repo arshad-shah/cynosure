@@ -1,0 +1,93 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./ErrorBoundary.stories";
+
+<Meta of={Stories} />
+
+# ErrorBoundary
+
+Catches errors thrown while its children render and shows a fallback in their place, so one crashing part of the app leaves the rest working. The user can try again, and moving on (a new `resetKey`) recovers by itself.
+
+<Canvas of={Stories.Default} />
+
+## When to use
+
+- Around each part that can fail on its own: a tab's body, a side panel, a chart, a plugin's view.
+- Once around the whole app, as the last line, with a fallback that offers a reload.
+
+Use something else when:
+
+- an operation failed (a request, a save): show it where it happened with a [Notice](?path=/docs/components-notice--docs) or a [Toast](?path=/docs/components-toast--docs). Boundaries only catch errors thrown while rendering, not in event handlers or asynchronous code.
+- there is nothing to show yet: [EmptyState](?path=/docs/components-emptystate--docs).
+
+## Usage
+
+```tsx
+import { ErrorBoundary } from "@arshad-shah/cynosure";
+
+<ErrorBoundary label="Query results" resetKey={tabId} onError={(error, info) => report(error, info.componentStack)}>
+  <ResultsPanel />
+</ErrorBoundary>
+```
+
+Healthy children render as they are, with no wrapper element, so a boundary never changes the layout of a flex or grid parent.
+
+## Retry and reset
+
+The default fallback's "Try again" button renders the children again; if they still throw, the fallback comes back. A change of `resetKey` (compared with `Object.is`) does the same without the button: pass what the content depends on, such as the active tab or route.
+
+<Canvas of={Stories.RetryRecovers} />
+<Canvas of={Stories.ResetKeyResets} />
+
+## Your own fallback
+
+`fallback` gets the error and `retry`. Anything thrown that is not an Error (a string, say) arrives wrapped in one.
+
+```tsx
+<ErrorBoundary
+  fallback={(error, retry) => (
+    <EmptyState title="The chart could not be drawn" description={error.message} actions={<Button onClick={retry}>Reload</Button>} />
+  )}
+>
+  <Chart />
+</ErrorBoundary>
+```
+
+<Canvas of={Stories.CustomFallback} />
+
+## Nesting
+
+The nearest boundary catches the error: an inner one around the editor keeps the window's sidebar and status bar on screen, and the outer one's `onError` is not called.
+
+<Canvas of={Stories.NestedBoundariesCatchLocally} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+| Input | Result |
+| --- | --- |
+| <kbd>Tab</kbd> | Reaches "Try again" in the normal order; focus is not moved when the fallback appears |
+| <kbd>Enter</kbd> / <kbd>Space</kbd> on "Try again" | Renders the children again |
+
+- **Announcement:** the default fallback is a danger Notice (`role="alert"`), so the failure is announced when it appears. Its heading names the part with `label` ("Query results could not be shown"; "Something went wrong" without one), and the error's message follows.
+- **Reporting:** `onError(error, info)` is called once per caught error, with React's component stack in `info.componentStack`.
+- **Labels:** `labels` replaces the English text: a `title(label)` function and the `retry` button's text.
+
+## Touch
+
+The retry button is a small Button, with a 44px hit area on coarse pointers.
+
+## Theming
+
+| Token | What it sets |
+| --- | --- |
+| `--cy-error-boundary-padding` | Space around the default fallback, inside the area it replaces |
+| `--cy-error-boundary-max-width` | Widest the default fallback's message grows |
+
+The message itself is a Notice: restyle it with `--cy-notice-*` tokens.
+
+## Related
+
+[Notice](?path=/docs/components-notice--docs), [EmptyState](?path=/docs/components-emptystate--docs), [Toast](?path=/docs/components-toast--docs)

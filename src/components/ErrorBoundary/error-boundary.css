@@ -1,0 +1,21 @@
+/* error-boundary: the default fallback fills the area of the part that failed and centres its Notice there. Healthy
+   children render with no wrapper, so this only styles the fallback. */
+.cy-error-boundary.cy-error-boundary {
+  box-sizing: border-box !important;
+  display: grid;
+  place-items: center;
+  inline-size: 100%;
+  block-size: 100%;
+  margin: 0;
+  padding: var(--cy-error-boundary-padding, var(--cy-space-6));
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-font-size-md);
+  line-height: var(--cy-font-line-height);
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+.cy-error-boundary-notice.cy-error-boundary-notice {
+  inline-size: min(100%, var(--cy-error-boundary-max-width, 36rem));
+  overflow-wrap: anywhere;
+}

@@ -1,5 +1,6 @@
 import { forwardRef } from "react";
 import { Icon } from "../../foundations/Icon/Icon.js";
+import { iconSizeFor } from "../../foundations/icon-size.js";
 import type { IconData } from "../../icons/types.js";
 import type { Placement } from "../../overlay/position.js";
 import { Button, type ButtonProps } from "../Button/Button.js";
@@ -46,7 +47,7 @@ export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(functio
       >
         <Icon
           icon={icon}
-          size={rest.size === "lg" ? "lg" : "md"}
+          size={iconSizeFor(rest.size)}
           flipRtl={flipRtl}
           {...(iconColor ? { color: iconColor } : {})}
         />

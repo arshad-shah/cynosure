@@ -1,12 +1,9 @@
 import { type CSSProperties, type ReactNode, useId, useMemo } from "react";
-import { ButtonBase } from "../../foundations/ButtonBase/ButtonBase.js";
 import { useControllableState } from "../../foundations/controllable.js";
-import { Icon } from "../../foundations/Icon/Icon.js";
-import { arrowDown } from "../../icons/arrow-down.js";
-import { arrowUp } from "../../icons/arrow-up.js";
-import { chevronsUpDown } from "../../icons/chevrons-up-down.js";
+import { nextSort, sortRows, type TableSort } from "../../foundations/sort.js";
 import type { Size } from "../../tokens/schema.js";
 import { Checkbox } from "../Checkbox/Checkbox.js";
+import { SortButton } from "../SortButton/SortButton.js";
 
 export interface TableTokens {
   /** Background of the header row. */
@@ -23,11 +20,7 @@ declare module "../../tokens/schema.js" {
   }
 }
 
-export type SortDirection = "ascending" | "descending";
-export interface TableSort {
-  key: string;
-  direction: SortDirection;
-}
+export type { SortDirection, TableSort } from "../../foundations/sort.js";
 
 export interface TableColumn<Row> {
   key: string;
@@ -79,7 +72,10 @@ export interface TableProps<Row> {
   selected?: string[] | undefined;
   /** Ids of the rows selected at the start when uncontrolled. */
   defaultSelected?: string[];
-  /** Called when a row's checkbox or select-all changes, with the selected ids in row order. */
+  /**
+   * Called when a row's checkbox or select-all changes, with the selected ids: those not in `rows` (another page,
+   * filtered out) first, then the shown ones in row order. Select-all acts on the shown rows only.
+   */
   onSelectionChange?: ((ids: string[]) => void) | undefined;
   /** The header stays visible while the body scrolls inside the table. */
   stickyHeader?: boolean;
@@ -99,14 +95,7 @@ const DEFAULT_LABELS: TableLabels = {
   empty: "Nothing to show",
 };
 
-const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: "base" });
 const cellValue = <Row,>(row: Row, key: string) => (row as Record<string, unknown>)[key];
-
-function compare(a: unknown, b: unknown) {
-  // Empty values sort last in either direction (handled by the caller).
-  if (typeof a === "number" && typeof b === "number") return a - b;
-  return collator.compare(String(a), String(b));
-}
 
 /**
  * Rows of data with headers: sortable columns, optional row selection, and a sticky header. A semantic `<table>`, so
@@ -144,36 +133,25 @@ export function Table<Row>({
     const column = columns.find((c) => c.key === currentSort.key);
     if (!column) return rows;
     const get = (row: Row) => (column.sortValue ? column.sortValue(row) : cellValue(row, column.key));
-    const sign = currentSort.direction === "ascending" ? 1 : -1;
-    return [...rows].sort((a, b) => {
-      const x = get(a);
-      const y = get(b);
-      const xEmpty = x === null || x === undefined || x === "";
-      const yEmpty = y === null || y === undefined || y === "";
-      if (xEmpty || yEmpty) return xEmpty === yEmpty ? 0 : xEmpty ? 1 : -1;
-      return compare(x, y) * sign;
-    });
+    return sortRows(rows, get, currentSort.direction);
   }, [rows, columns, currentSort, manualSort]);
 
-  // Ascending, then descending, then unsorted.
-  const cycle = (key: string) => {
-    if (currentSort?.key !== key) setSort({ key, direction: "ascending" });
-    else if (currentSort.direction === "ascending") setSort({ key, direction: "descending" });
-    else setSort(null);
-  };
+  const cycle = (key: string) => setSort(nextSort(currentSort, key));
+  const allIds = rows.map(getRowId);
+  /** `next` is the choice among the rows shown; ids not among them (another page, filtered out) stay selected. */
   const setSelected = (next: Set<string>) => {
-    const ids = rows.map(getRowId).filter((rowId) => next.has(rowId));
-    setChosen(ids);
+    const here = new Set(allIds);
+    setChosen([
+      ...chosenIds.filter((rowId) => !here.has(rowId)),
+      ...allIds.filter((rowId) => next.has(rowId)),
+    ]);
   };
 
-  const allIds = rows.map(getRowId);
   const chosenCount = allIds.filter((rowId) => chosen.has(rowId)).length;
   const rowName = (row: Row) => {
     const v = headerColumn?.cell ? headerColumn.cell(row) : cellValue(row, headerColumn?.key ?? "");
     return typeof v === "string" || typeof v === "number" ? String(v) : "";
   };
-  const sortIcon = (key: string) =>
-    currentSort?.key !== key ? chevronsUpDown : currentSort.direction === "ascending" ? arrowUp : arrowDown;
 
   return (
     <div
@@ -219,10 +197,9 @@ export function Table<Row>({
                     style={column.width ? { inlineSize: column.width } : undefined}
                   >
                     {column.sortable ? (
-                      <ButtonBase className="cy-table-sort cy-reset" onClick={() => cycle(column.key)}>
-                        <span className="cy-reset">{column.header}</span>
-                        <Icon icon={sortIcon(column.key)} size="sm" className="cy-table-sort-icon" />
-                      </ButtonBase>
+                      <SortButton direction={sorted} align={column.align} onClick={() => cycle(column.key)}>
+                        {column.header}
+                      </SortButton>
                     ) : (
                       column.header
                     )}

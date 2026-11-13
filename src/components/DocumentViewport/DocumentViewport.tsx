@@ -1,6 +1,7 @@
 import { type CSSProperties, type ReactNode, useEffect, useRef, useState } from "react";
 import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js";
 import { useControllableState } from "../../foundations/controllable.js";
+import { LiveRegion } from "../../foundations/LiveRegion/LiveRegion.js";
 import { useVirtualWindow } from "../../foundations/virtual-window.js";
 import { anchoredScroll, type ZoomSetting, zoomScale } from "../../foundations/zoom.js";
 import { useZoomGestures, type ZoomAnchor } from "../../foundations/zoom-gestures.js";
@@ -281,9 +282,7 @@ export function DocumentViewport({
           ))}
         </div>
       </section>
-      <span className="cy-visually-hidden" role="status">
-        {said.text}
-      </span>
+      <LiveRegion>{said.text}</LiveRegion>
     </>
   );
 }

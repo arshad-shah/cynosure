@@ -5,6 +5,7 @@ import { expect, waitFor } from "storybook/test";
 import { computeUnderHostileHost } from "../../test/hostile.js";
 import { BREAKPOINT_NAMES, expectVisibilityFollowsTheWindow } from "../../test/visibility.js";
 import { Card } from "../Card/Card.js";
+import { Link } from "../Link/Link.js";
 import { GRID_BREAKPOINTS, Grid, type GridBreakpoint, GridItem } from "./Grid.js";
 
 const SPACES = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
@@ -21,6 +22,11 @@ const meta = {
     padding: { control: "select", options: SPACES },
     paddingInline: { control: "select", options: SPACES },
     paddingBlock: { control: "select", options: SPACES },
+    grow: { control: "boolean" },
+    shrink: { control: "boolean" },
+    fill: { control: "boolean" },
+    minSize: { control: "inline-radio", options: [undefined, "0"] },
+    overflow: { control: "inline-radio", options: [undefined, "hidden", "auto", "visible"] },
     align: { control: "inline-radio", options: ["start", "center", "end", "stretch"] },
     as: { control: "select", options: ["div", "section", "ul", "ol", "nav", "aside", "header", "footer"] },
   },
@@ -744,5 +750,53 @@ export const HidesByTheWindowWidth: Story = {
     // id, role and ARIA reach the elements.
     const list = canvasElement.querySelector("#cards") as HTMLElement;
     if (list.checkVisibility()) await expect(canvas.getByRole("list", { name: "Cards" })).toBe(list);
+  },
+};
+
+/**
+ * A grid as the body of an app shell column: it takes the space the header leaves (`grow`), may be shorter than its
+ * cards (`minSize="0"`) and scrolls them (`overflow="auto"`). A wide item scrolls sideways inside its own column.
+ */
+export const GrowsAndScrollsInAShell: Story = {
+  render: () => (
+    <div style={{ blockSize: 240, inlineSize: 480, display: "flex", flexDirection: "column" }}>
+      <Card>Header</Card>
+      <Grid columns={2} grow minSize="0" overflow="auto" data-testid="body">
+        {cells(12)}
+        <GridItem overflow="auto" data-testid="wide">
+          <Link href="#wide">
+            <span style={{ display: "inline-block", inlineSize: 600 }}>A wide table</span>
+          </Link>
+        </GridItem>
+      </Grid>
+    </div>
+  ),
+  play: async ({ canvas }) => {
+    const body = canvas.getByTestId("body");
+    const header = canvas.getByText("Header").getBoundingClientRect();
+    // The grid fills what the header leaves and scrolls its rows.
+    await expect(box(body).height + header.height).toBeCloseTo(240, 0);
+    await expect(body.scrollHeight).toBeGreaterThan(body.clientHeight);
+    body.scrollTop = 100;
+    await expect(body.scrollTop).toBe(100);
+    // The wide item keeps to its column and scrolls sideways.
+    const wide = canvas.getByTestId("wide");
+    await expect(box(wide).width).toBeLessThan(240);
+    await expect(wide.scrollWidth).toBeGreaterThan(wide.clientWidth);
+    await expect(getComputedStyle(wide).overflowX).toBe("auto");
+  },
+};
+
+export const FillTakesItsParentsSize: Story = {
+  render: () => (
+    <div style={{ blockSize: 200, inlineSize: 300 }}>
+      <Grid columns={2} fill data-testid="grid">
+        {cells(2)}
+      </Grid>
+    </div>
+  ),
+  play: async ({ canvas }) => {
+    const grid = box(canvas.getByTestId("grid"));
+    await expect([grid.width, grid.height]).toEqual([300, 200]);
   },
 };

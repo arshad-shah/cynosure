@@ -1,0 +1,63 @@
+/*
+ * sort-button: a sortable column header's button, as wide as its label (Table) or filling its cell (`fill`, DataGrid).
+ * The text colour comes from the header; hover and a sorted column use the ink colour. Root never carries .cy-reset.
+ */
+.cy-sort-button.cy-sort-button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cy-space-2);
+  box-sizing: border-box !important;
+  max-inline-size: 100%;
+  min-block-size: var(--cy-hit-min, 24px);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: var(--cy-radius-sm);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: inherit;
+  letter-spacing: normal;
+  text-align: inherit;
+  text-transform: none;
+  cursor: pointer;
+  &[data-align="end"] {
+    flex-direction: row-reverse;
+  }
+  &:hover,
+  &[data-sorted] {
+    color: var(--cy-color-ink);
+  }
+  &:focus-visible {
+    outline: var(--cy-border-focus) solid var(--cy-color-ring);
+    outline-offset: var(--cy-space-1);
+  }
+  /* Filling a fixed-height header cell: the focus ring is drawn inside, where the cell does not clip it. */
+  &[data-fill] {
+    display: flex;
+    inline-size: 100%;
+    block-size: 100%;
+    min-block-size: 0;
+    padding: 0 var(--cy-sort-button-padding, var(--cy-space-4));
+    border-radius: 0;
+    outline: none;
+    &:focus-visible {
+      box-shadow: inset 0 0 0 var(--cy-border-focus) var(--cy-color-ring);
+    }
+  }
+}
+@media (pointer: coarse) {
+  .cy-sort-button.cy-sort-button:not([data-fill]) {
+    min-block-size: var(--cy-hit-coarse, 44px);
+  }
+}
+.cy-sort-button-label.cy-sort-button-label {
+  min-inline-size: 0;
+  overflow: hidden;
+  font-size: inherit;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cy-sort-button-icon.cy-sort-button-icon {
+  flex: none;
+}

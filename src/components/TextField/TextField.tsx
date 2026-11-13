@@ -4,22 +4,27 @@ import {
   type InputHTMLAttributes,
   type KeyboardEvent,
   type ReactNode,
-  useCallback,
+  type Ref,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from "react";
 import { Icon } from "../../foundations/Icon/Icon.js";
 import { InputBase } from "../../foundations/InputBase/InputBase.js";
+import { iconSizeFor } from "../../foundations/icon-size.js";
+import { mergeRefs } from "../../foundations/refs.js";
 import { close } from "../../icons/close.js";
 import { eye } from "../../icons/eye.js";
 import { eyeOff } from "../../icons/eye-off.js";
 import type { IconData } from "../../icons/types.js";
-import type { Size } from "../../tokens/schema.js";
-import { Field } from "../Field/Field.js";
+import type { DenseSize } from "../../tokens/schema.js";
+import { Field, type FieldLayoutProps } from "../Field/Field.js";
 import { IconButton } from "../IconButton/IconButton.js";
 
 export interface TextFieldTokens {
+  paddingInlineXs: string;
+  heightXs: string;
   heightSm: string;
   heightMd: string;
   heightLg: string;
@@ -40,10 +45,19 @@ declare module "../../tokens/schema.js" {
 
 type NativeInput = Omit<
   InputHTMLAttributes<HTMLInputElement>,
-  "size" | "value" | "defaultValue" | "onChange" | "onSubmit" | "type" | "className" | "style" | "children"
+  | "size"
+  | "value"
+  | "defaultValue"
+  | "onChange"
+  | "onSubmit"
+  | "type"
+  | "className"
+  | "style"
+  | "children"
+  | "width"
 >;
 
-export interface TextFieldProps extends NativeInput {
+export interface TextFieldProps extends NativeInput, FieldLayoutProps {
   /** The field's label and accessible name. */
   label: ReactNode;
   /** Visually hide the label (it still names the control). Prefer visible labels. */
@@ -60,8 +74,12 @@ export interface TextFieldProps extends NativeInput {
   onChange?: (value: string) => void;
   /** The native input type. Default "text". */
   type?: "text" | "email" | "url" | "tel" | "password" | "number" | "search";
-  /** Field height and text size. Default "md". */
-  size?: Size;
+  /**
+   * Field height and text size. Default "md". `xs` (about 20px) is for dense desktop chrome: the input still reaches
+   * 24px to press (44px on coarse pointers), and the clear and reveal buttons shrink with it. Its label is set as for
+   * `sm`. Addons keep their own size.
+   */
+  size?: DenseSize;
   /** `outline` (default) or `soft` (tinted, borderless until focus). */
   variant?: "outline" | "soft";
   /** Icon shown before the input. */
@@ -82,6 +100,11 @@ export interface TextFieldProps extends NativeInput {
   className?: string;
   /** Layout only. */
   style?: CSSProperties;
+  /**
+   * The field's box (the input with its icons, addons and buttons), for a list or popover that drops from the whole
+   * field (Combobox, TagInput). Use it to measure or anchor; restyle through tokens, not its class.
+   */
+  boxRef?: Ref<HTMLDivElement> | undefined;
   /** Test id, set on the native input. */
   "data-testid"?: string;
 }
@@ -97,6 +120,8 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(function T
     label,
     labelHidden,
     description,
+    layout,
+    width,
     error,
     value,
     defaultValue,
@@ -110,6 +135,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(function T
     revealable = false,
     addonStart,
     addonEnd,
+    boxRef,
     labels,
     required,
     disabled,
@@ -122,6 +148,8 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(function T
   forwarded,
 ) {
   const inner = useRef<HTMLInputElement | null>(null);
+  const dense = size === "xs";
+  const iconSize = iconSizeFor(size);
   const [shown, setShown] = useState(false);
   const secret = type === "password" && revealable;
   const [filled, setFilled] = useState(Boolean(value ?? defaultValue));
@@ -137,14 +165,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(function T
     form.addEventListener("reset", onReset);
     return () => form.removeEventListener("reset", onReset);
   }, []);
-  const ref = useCallback(
-    (node: HTMLInputElement | null) => {
-      inner.current = node;
-      if (typeof forwarded === "function") forwarded(node);
-      else if (forwarded) forwarded.current = node;
-    },
-    [forwarded],
-  );
+  const ref = useMemo(() => mergeRefs(inner, forwarded), [forwarded]);
   const clear = () => {
     if (!inner.current) return;
     setNativeValue(inner.current, "");
@@ -155,6 +176,8 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(function T
     <Field
       label={label}
       labelHidden={labelHidden}
+      layout={layout}
+      width={width}
       description={description}
       error={error}
       required={required}
@@ -165,6 +188,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(function T
     >
       {(field) => (
         <div
+          ref={boxRef}
           className="cy-text-field"
           data-size={size}
           data-variant={variant}
@@ -172,7 +196,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(function T
           data-disabled={disabled ? "" : undefined}
         >
           {addonStart}
-          {iconStart && <Icon icon={iconStart} className="cy-text-field-icon" />}
+          {iconStart && <Icon icon={iconStart} size={iconSize} className="cy-text-field-icon" />}
           <InputBase
             ref={ref}
             {...rest}
@@ -195,7 +219,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(function T
               icon={close}
               label={labels?.clear ?? "Clear"}
               variant="ghost"
-              size="sm"
+              size={dense ? "xs" : "sm"}
               onClick={clear}
               className="cy-text-field-clear"
             />
@@ -206,12 +230,12 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(function T
               label={shown ? (labels?.hide ?? "Hide") : (labels?.show ?? "Show")}
               aria-pressed={shown}
               variant="ghost"
-              size="sm"
+              size={dense ? "xs" : "sm"}
               onClick={() => setShown(!shown)}
               className="cy-text-field-clear"
             />
           )}
-          {iconEnd && <Icon icon={iconEnd} className="cy-text-field-icon" />}
+          {iconEnd && <Icon icon={iconEnd} size={iconSize} className="cy-text-field-icon" />}
           {addonEnd}
         </div>
       )}

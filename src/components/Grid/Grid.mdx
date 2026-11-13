@@ -70,6 +70,16 @@ Wrap an item in `GridItem` to span columns (`span={2}`, or `span="full"` for the
 
 <Canvas of={Stories.PaddingUsesSpaceTokens} />
 
+## In an app shell
+
+Grid takes `grow`, `shrink`, `fill`, `minSize` and `overflow` as [Stack](?path=/docs/components-stack--docs) does: a grid that takes what a header leaves, may be shorter than its items and scrolls them. GridItem takes `overflow`, for a wide item that scrolls sideways inside its column.
+
+```tsx
+<Grid columns={2} grow minSize="0" overflow="auto">…</Grid>
+```
+
+<Canvas of={Stories.GrowsAndScrollsInAShell} />
+
 ## Props
 
 <ArgTypes of={Stories} />

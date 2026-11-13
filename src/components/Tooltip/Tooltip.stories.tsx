@@ -26,6 +26,7 @@ const meta = {
     delay: { control: { type: "number", min: 0, max: 1500, step: 50 } },
     content: { control: "text" },
     className: { control: "text" },
+    disabled: { control: "boolean" },
   },
   parameters: { layout: "centered" },
 } satisfies Meta<typeof Tooltip>;
@@ -78,6 +79,25 @@ export const TouchDoesNotOpen: Story = {
     await userEvent.pointer({ keys: "[TouchA]", target: canvas.getByTestId("trigger") });
     await pause(250);
     await expect(isOpen(tooltip(canvasElement))).toBe(false);
+  },
+};
+
+export const DisabledNeverOpens: Story = {
+  args: { disabled: true },
+  play: async ({ args, canvas, canvasElement, userEvent, step }) => {
+    const trigger = canvas.getByTestId("trigger");
+    await step("hover and keyboard focus open nothing, and nothing describes the trigger", async () => {
+      await userEvent.hover(trigger);
+      await pause(250);
+      await expect(canvasElement.querySelector('[role="tooltip"]')).toBeNull();
+      await userEvent.unhover(trigger);
+      await userEvent.tab();
+      await expect(trigger).toHaveFocus();
+      await pause(50);
+      await expect(canvasElement.querySelector('[role="tooltip"]')).toBeNull();
+      await expect(trigger).not.toHaveAttribute("aria-describedby");
+    });
+    await expect(args.disabled).toBe(true);
   },
 };
 
@@ -165,5 +185,102 @@ export const AnchorTakesALayoutClass: Story = {
     const anchor = canvas.getByTestId("trigger").parentElement as HTMLElement;
     await expect(anchor).toHaveClass("cy-tooltip-anchor", "pushed");
     await expect(getComputedStyle(anchor).marginInlineStart).toBe("24px");
+  },
+};
+
+export const RepeatedTextShowsWithoutDescribing: Story = {
+  args: { describe: false, content: "Export" },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const trigger = canvas.getByTestId("trigger");
+    // Text the name already holds (a label cut short) is for the eye: shown, but not read twice.
+    await expect(trigger).not.toHaveAttribute("aria-describedby");
+    await expect(tooltip(canvasElement)).toHaveAttribute("aria-hidden", "true");
+    await userEvent.tab();
+    await waitFor(() => expect(isOpen(tooltip(canvasElement))).toBe(true));
+    await shownFully(tooltip(canvasElement));
+    await expect(trigger).not.toHaveAccessibleDescription();
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() => expect(isOpen(tooltip(canvasElement))).toBe(false));
+  },
+};
+
+export const DisabledNeverShowsOrDescribes: Story = {
+  args: { disabled: true, delay: 0 },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const trigger = canvas.getByTestId("trigger");
+    // Off (e.g. while the text it repeats is fully visible): no tip, no description; hover and focus do nothing.
+    await expect(tooltip(canvasElement)).toBeNull();
+    await expect(trigger).not.toHaveAttribute("aria-describedby");
+    await userEvent.hover(trigger);
+    await pause(150);
+    await userEvent.tab();
+    await pause(50);
+    await expect(canvasElement.ownerDocument.querySelector(".cy-tooltip")).toBeNull();
+    // The anchor is still there, so turning the tooltip on or off never remounts the trigger.
+    await expect(trigger.parentElement).toHaveClass("cy-tooltip-anchor");
+  },
+};
+
+const LONG_LABEL = "quarterly-revenue-by-region-and-channel.csv";
+
+export const OnlyWhileTheTextIsCutShort: Story = {
+  args: {
+    content: LONG_LABEL,
+    delay: 0,
+    whenTruncated: (trigger) => trigger.querySelector<HTMLElement>("[data-testid='text']"),
+  },
+  render: (args) => (
+    <div>
+      <Tooltip {...args}>
+        <Button data-testid="trigger">
+          <span
+            data-testid="text"
+            style={{
+              display: "block",
+              inlineSize: 120,
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {LONG_LABEL}
+          </span>
+        </Button>
+      </Tooltip>
+    </div>
+  ),
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const trigger = canvas.getByTestId("trigger");
+    const text = canvas.getByTestId("text");
+    await expect(text.scrollWidth).toBeGreaterThan(text.clientWidth);
+    // Cut short: focus shows the full text, for the eye only (the trigger's name already holds it).
+    await userEvent.tab();
+    await waitFor(() => expect(isOpen(tooltip(canvasElement))).toBe(true));
+    await expect(tooltip(canvasElement)).toHaveAttribute("aria-hidden", "true");
+    await expect(trigger).not.toHaveAttribute("aria-describedby");
+    // Room for the whole text (a resize, no new render): the tip closes and stays off; the trigger is the same element.
+    text.style.inlineSize = "600px";
+    await waitFor(() => expect(canvasElement.ownerDocument.querySelector(".cy-tooltip")).toBeNull());
+    await expect(canvas.getByTestId("trigger")).toBe(trigger);
+    await userEvent.tab({ shift: true });
+    await userEvent.tab();
+    await pause(50);
+    await expect(canvasElement.ownerDocument.querySelector(".cy-tooltip")).toBeNull();
+    // Cut short again: it works again.
+    text.style.inlineSize = "120px";
+    await waitFor(() => expect(tooltip(canvasElement)).not.toBeNull());
+    await userEvent.tab({ shift: true });
+    await userEvent.tab();
+    await waitFor(() => expect(isOpen(tooltip(canvasElement))).toBe(true));
+  },
+};
+
+export const WhenTruncatedMeasuresTheTrigger: Story = {
+  args: { content: "Export everything", delay: 0, whenTruncated: true },
+  play: async ({ canvasElement, userEvent }) => {
+    // `true` measures the trigger itself, which fits: no tip at all.
+    await userEvent.tab();
+    await pause(50);
+    await expect(canvasElement.ownerDocument.querySelector(".cy-tooltip")).toBeNull();
   },
 };

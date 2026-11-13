@@ -41,6 +41,41 @@ import { copy, edit, moreHorizontal, trash } from "@arshad-shah/cynosure/icons";
 
 `trigger` is a render prop: spread its props onto a [Button](?path=/docs/components-button--docs) or [IconButton](?path=/docs/components-iconbutton--docs). Sections (`{ label, items }`) render as a named group after a separator.
 
+## Sections without a label
+
+A section with no `label` (`{ items: [...] }`) is set apart by separator lines before and after it, without a group name: undo/redo, then cut/copy/paste.
+
+<Canvas of={Stories.SectionsWithoutALabelAreSeparated} />
+
+## Submenus
+
+An item with `items` opens a submenu beside it instead of being chosen, nested to any depth. The entries are plain data, so a plugin can contribute them. `onSelect` receives the value chosen at any level, and choosing closes the whole menu.
+
+```tsx
+items={[
+  { value: "open", label: "Open" },
+  {
+    value: "move",
+    label: "Move to",
+    icon: folder,
+    items: [
+      { value: "inbox", label: "Inbox" },
+      { value: "projects", label: "Projects", items: [{ value: "alpha", label: "Alpha" }] },
+    ],
+  },
+]}
+```
+
+The submenu opens on the end side of its parent item, its first item level with the parent, and flips to the other side at the edge of the viewport.
+
+<Canvas of={Stories.SubmenusOpenAndCloseFromTheKeyboard} />
+
+## Opening from elsewhere
+
+`open` with `onOpenChange` controls the menu, so an app can open it from a keyboard shortcut; it opens on its first item. `defaultOpen` opens it on first render without controlling it.
+
+<Canvas of={Stories.ControlledOpen} />
+
 ## Checkable items
 
 Checkable items keep the menu open, so several options can be changed in one go. Keep `checked` in your state and update it in `onSelect`.
@@ -57,7 +92,7 @@ Item icons are muted by default. `iconTone` and `iconColor` colour one item's ic
 
 <ArgTypes of={Stories} />
 
-Item fields: `value`, `label`, `icon`, `iconTone`, `iconColor`, `shortcut` (keys such as `["Ctrl", "E"]`), `disabled`, `tone` (`neutral` or `danger`), `kind` (`checkbox` or `radio`) and `checked`.
+Item fields: `value`, `label`, `icon`, `iconTone`, `iconColor`, `shortcut` (keys such as `["Ctrl", "E"]`), `disabled`, `tone` (`neutral` or `danger`), `kind` (`checkbox` or `radio`), `checked`, `keepOpen` and `items` (a submenu). Section fields: `items` and an optional `label`.
 
 ## Behaviour and accessibility
 
@@ -67,22 +102,26 @@ Item fields: `value`, `label`, `icon`, `iconTone`, `iconColor`, `shortcut` (keys
 | <kbd>Up</kbd> arrow on the trigger | Opens on the last item |
 | <kbd>Down</kbd> / <kbd>Up</kbd> arrows, <kbd>Home</kbd>, <kbd>End</kbd> | Move between items, wrapping and skipping disabled ones |
 | A letter | Jumps to the next item starting with it |
-| <kbd>Enter</kbd>, <kbd>Space</kbd>, click | Runs the item and closes (checkable items stay open) |
-| <kbd>Escape</kbd> | Closes and returns focus to the trigger |
-| <kbd>Tab</kbd> | Closes and moves on to the next control |
+| <kbd>Enter</kbd>, <kbd>Space</kbd>, click | Runs the item and closes the whole menu (checkable items stay open) |
+| <kbd>Right</kbd> arrow (<kbd>Left</kbd> in right-to-left text), <kbd>Enter</kbd>, <kbd>Space</kbd> or click on a parent item | Opens its submenu on the first item |
+| <kbd>Left</kbd> arrow (<kbd>Right</kbd> in right-to-left text) in a submenu | Closes it, back to its parent item |
+| Resting the pointer on a parent item | Opens its submenu after 150 ms, without moving focus |
+| <kbd>Escape</kbd> | Closes one level: a submenu back to its parent item, the menu back to the trigger |
+| <kbd>Tab</kbd> | Closes the whole menu and moves on to the next control |
 
-- **Roles:** `menu` named by `label`, items as `menuitem`, `menuitemcheckbox` or `menuitemradio` with `aria-checked`, sections as named `group`s.
+- **Roles:** `menu` named by `label`, items as `menuitem`, `menuitemcheckbox` or `menuitemradio` with `aria-checked`, sections as named `group`s, unlabelled sections set apart by `separator`s. A parent item has `aria-haspopup="menu"`, `aria-expanded` and `aria-controls` naming its submenu, a `menu` named by the item's label.
+- **Diagonal travel:** while a submenu is open, another item must hold the pointer for 300 ms before the submenu closes or switches, so moving towards the submenu across other items keeps it open. Leaving the menu cancels a pending switch.
 - **Shortcuts** are shown with [Kbd](?path=/docs/components-kbd--docs) and announced through `aria-keyshortcuts`. The menu shows them; your app still has to handle the keys.
 - **Disabled items** stay visible (so people learn the command exists) but can't be focused or run.
 - **Layers:** inside a [Popover](?path=/docs/components-popover--docs) or dialog, Escape closes only the menu.
 
 ## Touch
 
-Rows are at least 44px tall on coarse pointers, and a tap runs the item.
+Rows are at least 44px tall on coarse pointers, and a tap runs the item. Touch has no hover: a tap on a parent item opens its submenu.
 
 ## Theming
 
-Tokens: `--cy-menu-min-width`, `--cy-menu-max-width`, `--cy-menu-radius` and `--cy-menu-row-height`.
+Tokens: `--cy-menu-min-width`, `--cy-menu-max-width`, `--cy-menu-radius`, `--cy-menu-row-height` and `--cy-menu-offset` (the gap from the trigger, also under a Menubar title).
 
 ```ts
 createTheme({ components: { menu: { minWidth: "240px", radius: "10px" } } });

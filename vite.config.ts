@@ -15,6 +15,7 @@ export default defineConfig({
       entry: {
         index: "src/index.ts",
         "icons/index": "src/icons/index.ts",
+        "icons/by-name": "src/icons/by-name.ts",
         "brands/index": "src/brands/index.ts",
         "entries/tokens": "src/entries/tokens.ts",
         "styles/inline": "src/styles/inline.ts",
@@ -28,7 +29,7 @@ export default defineConfig({
         preserveModules: true,
         preserveModulesRoot: "src",
         entryFileNames: "[name].js",
-        banner: (chunk) => clientBanner(chunk.name),
+        banner: (chunk) => clientBanner(chunk),
       },
     },
   },

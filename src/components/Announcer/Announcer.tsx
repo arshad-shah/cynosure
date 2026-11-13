@@ -8,8 +8,9 @@ import {
   useRef,
   useState,
 } from "react";
+import { LiveRegion, type Politeness } from "../../foundations/LiveRegion/LiveRegion.js";
 
-export type Politeness = "polite" | "assertive";
+export type { Politeness };
 
 export interface AnnounceOptions {
   /** `polite` (default) waits for the screen reader to finish; `assertive` interrupts. Keep assertive for errors. */
@@ -27,7 +28,7 @@ export interface AnnouncerProps {
 
 interface Said {
   text: string;
-  /** Changes on every announcement, so the same text twice is a new node and is read again. */
+  /** Changes on every announcement, so the same text twice is a new node and is read again (LiveRegion's `sequence`). */
   n: number;
 }
 
@@ -66,12 +67,12 @@ export function Announcer({ clearAfter = 5000, children }: AnnouncerProps) {
     <AnnounceContext.Provider value={announce}>
       {children}
       <div className="cy-announcer cy-visually-hidden">
-        <div className="cy-announcer-region cy-reset" role="status" aria-live="polite" aria-atomic="true">
-          {polite.text && <span key={polite.n}>{polite.text}</span>}
-        </div>
-        <div className="cy-announcer-region cy-reset" role="alert" aria-live="assertive" aria-atomic="true">
-          {assertive.text && <span key={assertive.n}>{assertive.text}</span>}
-        </div>
+        <LiveRegion className="cy-announcer-region cy-reset" sequence={polite.n}>
+          {polite.text}
+        </LiveRegion>
+        <LiveRegion className="cy-announcer-region cy-reset" politeness="assertive" sequence={assertive.n}>
+          {assertive.text}
+        </LiveRegion>
       </div>
     </AnnounceContext.Provider>
   );

@@ -7,6 +7,7 @@ import { chevronDown, copy, download, trash } from "../../icons/index.js";
 import { createStyleSheet } from "../../styles/inline.js";
 import { backdrop, contrast, rgb, textContrast } from "../../test/color.js";
 import { computeUnderHostileHost } from "../../test/hostile.js";
+import { realHover } from "../../test/hover.js";
 import { CynosureTheme } from "../../theme/index.js";
 import { createTheme } from "../../tokens/index.js";
 import { TextField } from "../TextField/TextField.js";
@@ -18,13 +19,14 @@ for (const value of Object.values(icons))
 const iconNames = Object.keys(iconMapping).filter((n) => n !== "none");
 
 const meta = {
+  tags: ["serial"],
   title: "Components/Button",
   component: Button,
   args: { children: "Export", onClick: fn(), variant: "outline", tone: "neutral", size: "md" },
   argTypes: {
     variant: { control: "inline-radio", options: ["solid", "soft", "outline", "ghost"] },
     tone: { control: "select", options: ["accent", "neutral", "danger", "success", "warning", "info"] },
-    size: { control: "inline-radio", options: ["sm", "md", "lg"] },
+    size: { control: "inline-radio", options: ["xs", "sm", "md", "lg"] },
     icon: { control: "select", options: ["none", ...iconNames], mapping: iconMapping },
     iconEnd: { control: "select", options: ["none", ...iconNames], mapping: iconMapping },
     loading: { control: "boolean" },
@@ -146,6 +148,58 @@ export const HitTargetCoarsePointer: Story = {
     const button = canvas.getByRole("button");
     const hit = pseudo(button);
     await expect(Math.min(hit.w, hit.h)).toBeGreaterThanOrEqual(44);
+    await userEvent.pointer({ keys: "[TouchA]", target: button });
+    await expect(args.onClick).toHaveBeenCalledTimes(1);
+  },
+};
+
+export const ExtraSmallForDenseChrome: Story = {
+  args: { size: "xs", icon: download, children: "Export" },
+  render: (args) => (
+    <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+      <Button {...args} />
+      <Button {...args} size="sm">
+        Small
+      </Button>
+    </div>
+  ),
+  play: async ({ canvas, args, userEvent }) => {
+    const xs = canvas.getByRole("button", { name: "Export" });
+    const sm = canvas.getByRole("button", { name: "Small" });
+    // The visible control is about 20px: smaller than sm, with smaller text and icon.
+    const box = xs.getBoundingClientRect();
+    await expect(box.height).toBe(20);
+    await expect(box.height).toBeLessThan(sm.getBoundingClientRect().height);
+    const size = (el: Element) => Number.parseFloat(getComputedStyle(el).fontSize);
+    await expect(size(xs)).toBeLessThan(size(sm));
+    await expect(size(xs)).toBeGreaterThanOrEqual(11);
+    const icon = (el: Element) => (el.querySelector(".cy-icon") as Element).getBoundingClientRect().height;
+    await expect(icon(xs)).toBeLessThan(icon(sm));
+    await expect(icon(xs)).toBeLessThan(box.height);
+    // The label is whole, not clipped, and reads on its surface.
+    const label = xs.querySelector(".cy-button-label") as HTMLElement;
+    await expect(label.scrollWidth).toBeLessThanOrEqual(label.clientWidth);
+    await expect(textContrast(label)).toBeGreaterThanOrEqual(4.5);
+    // Still at least 24px to press: a click just above the visible edge lands on the button.
+    await expect(Math.min(pseudo(xs).w, pseudo(xs).h)).toBeGreaterThanOrEqual(24);
+    await expect(document.elementFromPoint(box.left + box.width / 2, box.top - 1)).toBe(xs);
+    await userEvent.click(xs);
+    xs.focus();
+    await userEvent.keyboard("{Enter}");
+    await userEvent.keyboard(" ");
+    await expect(args.onClick).toHaveBeenCalledTimes(3);
+  },
+};
+
+export const ExtraSmallCoarsePointer: Story = {
+  tags: ["touch", "!dev"],
+  args: { size: "xs" },
+  play: async ({ canvas, args, userEvent }) => {
+    await expect(matchMedia("(pointer: coarse)").matches).toBe(true);
+    const button = canvas.getByRole("button");
+    // The look stays dense; only the invisible hit area grows to 44px.
+    await expect(button.getBoundingClientRect().height).toBe(20);
+    await expect(Math.min(pseudo(button).w, pseudo(button).h)).toBeGreaterThanOrEqual(44);
     await userEvent.pointer({ keys: "[TouchA]", target: button });
     await expect(args.onClick).toHaveBeenCalledTimes(1);
   },
@@ -599,6 +653,33 @@ export const SquareForOneIcon: Story = {
     const label = canvas.getByTestId("glyph").parentElement as HTMLElement;
     await expect(label).toHaveClass("cy-button-label");
     await expect(getComputedStyle(label).display).toBe("contents");
+  },
+};
+
+export const HoverColoursFromTokens: Story = {
+  tags: ["!dev"],
+  args: { variant: "ghost", children: "Close" },
+  render: (args) => (
+    <div
+      style={
+        { "--cy-button-hover-bg": "rgb(200, 0, 40)", "--cy-button-hover-ink": "rgb(255, 255, 255)" } as never
+      }
+    >
+      <Button {...args} />
+      <Button variant="ghost">Stays</Button>
+    </div>
+  ),
+  play: async ({ canvas }) => {
+    const button = canvas.getByRole("button", { name: "Close" });
+    const resting = getComputedStyle(button).color;
+    await expect(rgb(resting)).not.toEqual([255, 255, 255]);
+    // On hover the fill and the ink come from the tokens; off hover the button is its usual ghost self.
+    if (!(await realHover(button))) return;
+    await waitFor(() => expect(rgb(getComputedStyle(button).backgroundColor)).toEqual([200, 0, 40]));
+    await expect(rgb(getComputedStyle(button).color)).toEqual([255, 255, 255]);
+    await realHover(null);
+    await waitFor(() => expect(getComputedStyle(button).backgroundColor).toBe("rgba(0, 0, 0, 0)"));
+    await expect(getComputedStyle(button).color).toBe(resting);
   },
 };
 

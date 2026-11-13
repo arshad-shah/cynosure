@@ -6,7 +6,19 @@ export interface RovingOptions {
   loop?: boolean;
   /** Items are elements inside the container matching this selector. */
   selector?: string;
+  /**
+   * Also treat an item marked `aria-current` (the open entry of a list of links or buttons) as the selection: the tab
+   * stop starts on it and follows it while focus is elsewhere. Default false.
+   */
+  current?: boolean;
 }
+
+/**
+ * The items of a toolbar's roving group: every focusable control inside (hidden form proxies excluded), plus anything
+ * marked `data-roving`. Toolbar and StatusBar use it.
+ */
+export const TOOLBAR_ITEMS =
+  'button, a[href], textarea, input:not([type="hidden"]):not([aria-hidden="true"]), [data-roving]';
 
 const enabled = (el: HTMLElement) =>
   el.getAttribute("aria-disabled") !== "true" && !(el as HTMLButtonElement).disabled;
@@ -23,7 +35,7 @@ const ownsArrowKeys = (el: HTMLElement) =>
  * Home and End jump; horizontal arrows follow the reading direction (RTL aware).
  */
 export function useRovingFocus(container: RefObject<HTMLElement | null>, options: RovingOptions = {}) {
-  const { orientation = "horizontal", loop = true, selector = "[data-roving]" } = options;
+  const { orientation = "horizontal", loop = true, selector = "[data-roving]", current = false } = options;
   useEffect(() => {
     const root = container.current;
     if (!root) return;
@@ -41,7 +53,9 @@ export function useRovingFocus(container: RefObject<HTMLElement | null>, options
       items().find(
         (el) =>
           enabled(el) &&
-          (el.getAttribute("aria-selected") === "true" || el.getAttribute("aria-checked") === "true"),
+          (el.getAttribute("aria-selected") === "true" ||
+            el.getAttribute("aria-checked") === "true" ||
+            (current && !!el.getAttribute("aria-current") && el.getAttribute("aria-current") !== "false")),
       );
     let stop: HTMLElement | undefined = selected() ?? items().find(enabled);
     const sync = () => {
@@ -58,12 +72,12 @@ export function useRovingFocus(container: RefObject<HTMLElement | null>, options
       childList: true,
       subtree: true,
       attributes: true,
-      attributeFilter: ["disabled", "aria-disabled", "aria-selected", "aria-checked"],
+      attributeFilter: ["disabled", "aria-disabled", "aria-selected", "aria-checked", "aria-current"],
     });
 
     const onFocusIn = (e: FocusEvent) => {
       const item = (e.target as HTMLElement).closest<HTMLElement>(selector);
-      if (item && root.contains(item)) {
+      if (item && root.contains(item) && own(item)) {
         stop = item;
         setStop(item);
       }
@@ -71,7 +85,7 @@ export function useRovingFocus(container: RefObject<HTMLElement | null>, options
     const onKeyDown = (e: KeyboardEvent) => {
       const list = items().filter(enabled);
       const current = (e.target as HTMLElement).closest<HTMLElement>(selector);
-      if (!current || !list.length || e.defaultPrevented || ownsArrowKeys(current)) return;
+      if (!current || !own(current) || !list.length || e.defaultPrevented || ownsArrowKeys(current)) return;
       const rtl = isRtl(root);
       const horizontal = orientation !== "vertical";
       const vertical = orientation !== "horizontal";
@@ -98,5 +112,5 @@ export function useRovingFocus(container: RefObject<HTMLElement | null>, options
       root.removeEventListener("focusin", onFocusIn);
       root.removeEventListener("keydown", onKeyDown);
     };
-  }, [container, orientation, loop, selector]);
+  }, [container, orientation, loop, selector, current]);
 }

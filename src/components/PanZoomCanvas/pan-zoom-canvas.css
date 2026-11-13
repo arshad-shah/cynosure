@@ -1,6 +1,7 @@
 /*
- * pan-zoom-canvas: a clipped surface with one transformed content layer (canvas units, origin at the top left) and an
- * optional minimap in the bottom corner. The maths is left to right, so the surface keeps direction ltr.
+ * pan-zoom-canvas: a clipped surface with one transformed content layer (canvas units, origin at the top left), and
+ * controls in its corners (the overlays and the minimap). The maths is left to right, so the content, the screen layer
+ * and the minimap keep direction ltr; the corners follow the page's direction.
  */
 .cy-pan-zoom-canvas.cy-pan-zoom-canvas {
   position: relative;
@@ -11,8 +12,9 @@
   margin: 0;
   padding: 0;
   overflow: hidden;
-  direction: ltr;
   contain: strict;
+  /* The minimap's height is capped against the canvas's. */
+  container-type: size;
   /* Every finger gesture is ours: one pans, two pinch. */
   touch-action: none;
   background: var(--cy-pan-zoom-canvas-background, var(--cy-color-soft));
@@ -36,23 +38,54 @@
 .cy-pan-zoom-canvas-screen.cy-pan-zoom-canvas-screen {
   position: absolute;
   inset: 0;
+  direction: ltr;
   overflow: hidden;
   pointer-events: none;
   font-size: inherit;
 }
 .cy-pan-zoom-canvas-content.cy-pan-zoom-canvas-content {
   position: absolute;
-  inset-block-start: 0;
-  inset-inline-start: 0;
+  top: 0;
+  left: 0;
+  direction: ltr;
   transform-origin: 0 0;
   font-size: inherit;
 }
-.cy-pan-zoom-canvas-minimap.cy-pan-zoom-canvas-minimap {
+/* A corner: its controls in a column, the gaps between them left to the background (they pan). */
+.cy-pan-zoom-canvas-corner.cy-pan-zoom-canvas-corner {
   position: absolute;
-  inset-block-end: var(--cy-space-4);
-  inset-inline-end: var(--cy-space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--cy-space-2);
+  max-inline-size: calc(100% - 2 * var(--cy-space-4));
+  max-block-size: calc(100% - 2 * var(--cy-space-4));
+  pointer-events: none;
+  &[data-corner^="top"] {
+    inset-block-start: var(--cy-space-4);
+  }
+  &[data-corner^="bottom"] {
+    inset-block-end: var(--cy-space-4);
+  }
+  &[data-corner$="start"] {
+    inset-inline-start: var(--cy-space-4);
+    align-items: flex-start;
+  }
+  &[data-corner$="end"] {
+    inset-inline-end: var(--cy-space-4);
+    align-items: flex-end;
+  }
+}
+.cy-pan-zoom-canvas-overlay.cy-pan-zoom-canvas-overlay {
+  max-inline-size: 100%;
+  pointer-events: auto;
+}
+.cy-pan-zoom-canvas-minimap.cy-pan-zoom-canvas-minimap {
+  position: relative;
+  flex: none;
+  direction: ltr;
   inline-size: var(--cy-pan-zoom-canvas-minimap-width, calc(10 * var(--cy-space-6)));
-  max-block-size: 40%;
+  max-block-size: 40cqb;
+  pointer-events: auto;
   overflow: hidden;
   border: var(--cy-border-width) solid var(--cy-color-line);
   border-radius: var(--cy-radius-sm);
@@ -63,8 +96,8 @@
 }
 .cy-pan-zoom-canvas-minimap-content.cy-pan-zoom-canvas-minimap-content {
   position: absolute;
-  inset-block-start: 0;
-  inset-inline-start: 0;
+  top: 0;
+  left: 0;
   transform-origin: 0 0;
   pointer-events: none;
 }

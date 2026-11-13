@@ -1,4 +1,4 @@
-import type { ColorTokens, GlobalTokens } from "./schema.js";
+import type { ColorTokens, GlobalTokens, ThemeMode } from "./schema.js";
 
 /** Placeholder brand accent; final value is signed off in Storybook (spec §15). */
 /** Cynosure ember: the brand accent (white text passes AA on rest, hover and active). */
@@ -9,7 +9,7 @@ export const SCALES = { compact: 0.875, comfortable: 1, spacious: 1.2 } as const
 type BasePalette = Pick<ColorTokens, "bg" | "surface" | "surfaceRaised" | "soft" | "ink" | "muted" | "line">;
 type Status = Pick<ColorTokens, "success" | "warning" | "danger" | "info">;
 
-export const BASE_PALETTES: Record<"light" | "dark", BasePalette & Status> = {
+export const BASE_PALETTES: Record<ThemeMode, BasePalette & Status> = {
   light: {
     bg: "#f4f1ea",
     surface: "#fbf9f5",
@@ -53,7 +53,7 @@ export type SyntaxHue =
  * Starting hues for code, chosen to stay apart from each other and from the ember accent (which keywords use). They are
  * only starting points: createTheme moves each one until it reads at least 4.5:1 on the surfaces code sits on.
  */
-export const SYNTAX_HUES: Record<"light" | "dark", Record<SyntaxHue, string>> = {
+export const SYNTAX_HUES: Record<ThemeMode, Record<SyntaxHue, string>> = {
   light: {
     string: "#3d7a1f",
     number: "#7c3aed",
@@ -78,7 +78,7 @@ export const SYNTAX_HUES: Record<"light" | "dark", Record<SyntaxHue, string>> = 
 
 /** Unscaled base values (px at comfortable scale). */
 export const BASE_GLOBAL: Omit<GlobalTokens, "scale"> = {
-  control: { height: { sm: 26, md: 32, lg: 40 } },
+  control: { height: { xs: 20, sm: 26, md: 32, lg: 40 } },
   radius: { factor: 0.3, segment: 0.22, sm: 0, md: 0, lg: 0, card: 14, full: 999 },
   space: { "0": 0, "1": 2, "2": 4, "3": 6, "4": 8, "5": 12, "6": 16, "7": 20, "8": 24, "9": 32, "10": 40 },
   font: {

@@ -101,6 +101,127 @@ export const KeywordsGroupsAndWrappingArrows: Story = {
   },
 };
 
+export const TypedWordsAreMarkedInTheLabels: Story = {
+  args: { defaultOpen: true },
+  play: async ({ canvas, userEvent }) => {
+    const input = await canvas.findByRole("combobox", { name: "Command palette" });
+    await waitFor(() => expect(input).toHaveFocus());
+    const marks = () =>
+      canvas.getAllByRole("option").map((o) => [...o.querySelectorAll("mark")].map((m) => m.textContent));
+    // Nothing typed: nothing marked.
+    await expect(marks().flat()).toEqual([]);
+    // Each typed word is marked where it appears in a label, ignoring case; a keyword match marks nothing.
+    await userEvent.keyboard("FILE n");
+    await expect(marks()).toEqual([["N", "file"]]);
+    await userEvent.clear(input);
+    await userEvent.keyboard("disk");
+    await expect(marks()).toEqual([[]]);
+    // The option is still named by its whole label.
+    await userEvent.clear(input);
+    await userEvent.keyboard("pre");
+    await expect(canvas.getByRole("option", { name: /^Toggle preview/ })).toBeInTheDocument();
+  },
+};
+
+/** A small subsequence matcher like an app's own: letters in order, consecutive and early ones score lower. */
+function fuzzy(command: Command, query: string) {
+  const label = command.label.toLowerCase();
+  const positions: number[] = [];
+  let from = 0;
+  for (const ch of query.toLowerCase().replace(/\s/g, "")) {
+    const at = label.indexOf(ch, from);
+    if (at < 0) return null;
+    positions.push(at);
+    from = at + 1;
+  }
+  const gaps = positions.reduce((sum, p, i) => sum + (i ? p - (positions[i - 1] as number) - 1 : p), 0);
+  return { score: gaps, positions };
+}
+const fuzzySpy = fn(fuzzy);
+
+export const CustomFilterRanksAndMarksItsPositions: Story = {
+  args: { defaultOpen: true, filter: fuzzySpy },
+  play: async ({ canvas, userEvent }) => {
+    const input = await canvas.findByRole("combobox", { name: "Command palette" });
+    await waitFor(() => expect(input).toHaveFocus());
+    // Nothing typed: the filter is not asked, and every command is listed under its group.
+    await expect(fuzzySpy).not.toHaveBeenCalled();
+    await expect(canvas.getByRole("group", { name: "Edit" })).toBeInTheDocument();
+    const labels = () =>
+      canvas.getAllByRole("option").map((o) => o.querySelector(".cy-command-palette-label")?.textContent);
+    const marks = () =>
+      canvas.getAllByRole("option").map((o) => [...o.querySelectorAll("mark")].map((m) => m.textContent));
+    // Only the filter decides what matches: "pv" is a subsequence of "Toggle preview" alone, which the built-in
+    // search (whole words) would not find.
+    await userEvent.keyboard("pv");
+    await expect(fuzzySpy).toHaveBeenCalledWith(expect.objectContaining({ id: "preview" }), "pv");
+    await expect(labels()).toEqual(["Toggle preview"]);
+    // Its positions feed the marks: exactly those letters.
+    await expect(marks()).toEqual([["p", "v"]]);
+    // Results come in score order, lowest first: "ee" scores Rename 4, New file 6, Save file 7, Toggle preview 8.
+    await userEvent.clear(input);
+    await userEvent.keyboard("ee");
+    await expect(labels()).toEqual(["Rename", "New file", "Save file", "Toggle preview"]);
+    await expect(activeLabel(input)).toMatch(/^Rename/);
+  },
+};
+
+const acceptAll = fn(() => true);
+
+export const SearchResultsAreFlatWithCategoryTags: Story = {
+  args: { defaultOpen: true },
+  play: async ({ args, canvas, userEvent }) => {
+    const input = await canvas.findByRole("combobox", { name: "Command palette" });
+    await waitFor(() => expect(input).toHaveFocus());
+    const tags = () =>
+      canvas.getAllByRole("option").map((o) => o.querySelector(".cy-badge")?.textContent ?? null);
+    // Browsing: commands sit under their group's heading, so no row repeats its group.
+    await expect(tags().every((t) => t === null)).toBe(true);
+    // Searching: one flat list in rank order, no headings, and each row carries its group as a small tag.
+    await userEvent.keyboard("e");
+    await expect(canvas.queryAllByRole("group", { name: /File|Edit|View/ })).toEqual([]);
+    const rows = canvas.getAllByRole("option");
+    await expect(rows.length).toBeGreaterThan(3);
+    await expect(rows.map((r) => r.querySelector(".cy-badge")?.textContent)).toEqual(
+      rows.map((r) => commands.find((c) => r.textContent?.startsWith(c.label))?.group),
+    );
+    // The tag is smaller than the label and sits between it and the shortcut.
+    const save = canvas.getByRole("option", { name: /^Save file/ });
+    const badge = save.querySelector(".cy-badge") as HTMLElement;
+    await expect(badge.getBoundingClientRect().height).toBeLessThan(save.getBoundingClientRect().height);
+    await expect(badge.getBoundingClientRect().left).toBeGreaterThan(
+      (save.querySelector(".cy-command-palette-label") as HTMLElement).getBoundingClientRect().left,
+    );
+    // Run one: it then shows under "Recent", a flat list of mixed groups, tagged too.
+    await userEvent.keyboard("{Enter}");
+    await expect(args.onRun).toHaveBeenCalled();
+    await userEvent.keyboard(MOD_K);
+    await waitFor(() => expect(canvas.getByRole("group", { name: "Recent" })).toBeInTheDocument());
+    const recent = canvas.getByRole("group", { name: "Recent" });
+    await expect(recent.querySelector(".cy-badge")).not.toBeNull();
+  },
+};
+
+export const FilterMayAnswerTrueOrNothing: Story = {
+  args: {
+    defaultOpen: true,
+    commands: [...commands, { id: "about", label: "About" }],
+    filter: (command, query) =>
+      command.id === "about" ? acceptAll() : command.label.includes(query) ? {} : null,
+  },
+  play: async ({ canvas, userEvent }) => {
+    const input = await canvas.findByRole("combobox", { name: "Command palette" });
+    await waitFor(() => expect(input).toHaveFocus());
+    // `true` and a match without positions keep the command and mark nothing; null drops it. A command without a
+    // group carries no tag.
+    await userEvent.keyboard("Re");
+    const rows = canvas.getAllByRole("option");
+    await expect(rows.map((r) => r.textContent)).toEqual([expect.stringMatching(/^Rename/), "About"]);
+    await expect(rows[1]?.querySelector(".cy-badge")).toBeNull();
+    await expect(rows.map((r) => r.querySelector("mark"))).toEqual([null, null]);
+  },
+};
+
 export const RecentCommandsComeFirst: Story = {
   play: async ({ canvas, userEvent }) => {
     await userEvent.keyboard(MOD_K);
@@ -176,22 +297,32 @@ export const ShortcutCanBeChangedOrOff: Story = {
   },
 };
 
-function ShadowPalette({ onRun }: { onRun: (id: string) => void }) {
+function ShadowPalette({ onRun, nested = false }: { onRun: (id: string) => void; nested?: boolean }) {
   const host = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const el = host.current;
     if (!el || el.shadowRoot) return;
-    const root = el.attachShadow({ mode: "open" });
+    let root = el.attachShadow({ mode: "open" });
+    if (nested) {
+      // An extension's widget inside another component's shadow root: two hosts deep.
+      const inner = document.createElement("div");
+      inner.dataset.testid = "inner-host";
+      root.append(inner);
+      root = inner.attachShadow({ mode: "open" });
+    }
     root.adoptedStyleSheets = [createStyleSheet()];
     const mount = document.createElement("div");
     root.append(mount);
-    createRoot(mount).render(
+    const app = createRoot(mount);
+    app.render(
       <>
         <Button>Inside the extension</Button>
         <CommandPalette commands={commands} onRun={onRun} />
       </>,
     );
-  }, [onRun]);
+    // Unmount with the story, or this palette keeps answering the shortcut from a detached host.
+    return () => queueMicrotask(() => app.unmount());
+  }, [onRun, nested]);
   return <div data-testid="host" ref={host} />;
 }
 
@@ -213,6 +344,25 @@ export const WorksInsideAShadowRoot: Story = {
     await waitFor(() => expect(root.querySelectorAll('[role="option"]')).toHaveLength(1));
     input.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
     await expect(args.onRun).toHaveBeenCalledWith("preview");
+  },
+};
+
+export const ReturnsFocusInsideNestedShadowRoots: Story = {
+  render: (args) => <ShadowPalette onRun={args.onRun} nested />,
+  play: async ({ canvas, userEvent }) => {
+    const host = await canvas.findByTestId("host");
+    const inner = () => host.shadowRoot?.querySelector<HTMLElement>('[data-testid="inner-host"]')?.shadowRoot;
+    await waitFor(() => expect(inner()?.querySelector("button")).toBeTruthy());
+    const root = inner() as ShadowRoot;
+    const button = root.querySelector("button") as HTMLElement;
+    button.focus();
+    await userEvent.keyboard(MOD_K);
+    await waitFor(() => expect(palette(root).open).toBe(true));
+    const input = root.querySelector("input") as HTMLInputElement;
+    await waitFor(() => expect(root.activeElement).toBe(input));
+    input.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true, composed: true }));
+    await waitFor(() => expect(palette(root).open).toBe(false));
+    await waitFor(() => expect(root.activeElement).toBe(button));
   },
 };
 

@@ -1,0 +1,135 @@
+/* TitleBar: the title bar of an installed app that draws its own. Every visual value reads a --cy-title-bar-* token
+   with a global fallback. Inner parts first, root last; the root never carries .cy-reset. */
+
+/* Leading and trailing content: as wide as it needs (the title gives way first), centred on the bar's height. */
+.cy-title-bar-leading,
+.cy-title-bar-trailing {
+  display: flex;
+  align-items: center;
+  align-self: stretch;
+  gap: var(--cy-title-bar-gap, var(--cy-space-4));
+  min-inline-size: 0;
+}
+.cy-title-bar-leading {
+  justify-content: flex-start;
+}
+.cy-title-bar-trailing {
+  justify-content: flex-end;
+}
+
+/* The title sets its own font, so it declares the reset properties instead of carrying .cy-reset. Doubled to win over
+   host element rules. */
+.cy-title-bar-title.cy-title-bar-title {
+  box-sizing: border-box !important;
+  margin: 0;
+  padding: 0;
+  min-inline-size: 0;
+  overflow: hidden;
+  color: inherit;
+  font-family: inherit;
+  font-size: var(--cy-title-bar-title-font-size, var(--cy-font-size-sm));
+  font-weight: inherit;
+  line-height: inherit;
+  letter-spacing: normal;
+  text-transform: none;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Window controls: full-height, fixed-width, square-cornered IconButtons flush with the bar's inline end. */
+.cy-title-bar-controls.cy-title-bar-controls {
+  display: flex;
+  align-self: stretch;
+  /* Into the bar's end padding, which stays so the title is centred on the whole bar. */
+  margin-inline-end: calc(-1 * var(--_pad));
+}
+.cy-title-bar-control-anchor.cy-title-bar-control-anchor {
+  align-self: stretch;
+}
+/* The child IconButton's size and look, through its own tokens: as tall as the bar, wider than tall. */
+.cy-title-bar-control.cy-title-bar-control {
+  --cy-button-height-md: 100%;
+  --cy-button-square-width: var(--cy-title-bar-control-width, calc(var(--cy-space-10) + var(--cy-space-3)));
+  --cy-button-radius: 0;
+  --cy-button-press-scale: 1;
+}
+.cy-title-bar-close.cy-title-bar-close {
+  --cy-button-hover-bg: var(--cy-title-bar-close-hover-bg, var(--cy-color-danger));
+  --cy-button-hover-ink: var(--cy-title-bar-close-hover-ink, var(--cy-color-on-danger));
+}
+
+/* Root selector is doubled so host type/attribute rules never win. */
+.cy-title-bar.cy-title-bar {
+  --_h: var(--cy-title-bar-height, var(--cy-control-height-lg));
+  --_pad: var(--cy-title-bar-padding-inline, var(--cy-space-4));
+
+  box-sizing: border-box !important;
+  margin: 0;
+  letter-spacing: normal;
+  text-transform: none;
+  display: grid;
+  /* The title is centred on the whole bar while both sides fit; the sides never shrink below their content. */
+  grid-template-columns: minmax(max-content, 1fr) minmax(0, auto) minmax(max-content, 1fr);
+  align-items: center;
+  column-gap: var(--cy-title-bar-gap, var(--cy-space-4));
+  block-size: var(--_h);
+  min-inline-size: 0;
+  padding-block: 0;
+  padding-inline: calc(var(--_inset, 0px) + var(--_pad)) var(--_pad);
+  border: 0 solid transparent;
+  border-block-end: var(--cy-border-width) solid var(--cy-title-bar-border, var(--cy-color-line));
+  background: var(--cy-title-bar-bg, var(--cy-color-surface));
+  color: var(--cy-title-bar-ink, var(--cy-color-ink));
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-font-size-md);
+  font-weight: var(--cy-font-weight-regular);
+  line-height: var(--cy-font-line-height);
+  user-select: none;
+  /* The whole bar moves the window (Electron frameless windows, Window Controls Overlay). */
+  -webkit-app-region: drag;
+  app-region: drag;
+
+  /* Window Controls Overlay: fixed to the area the system leaves for the page's title bar (physical: the system puts
+     its controls on whichever side it uses, and these values already leave it out). */
+  &[data-overlay] {
+    --_h: env(titlebar-area-height, var(--cy-title-bar-height, var(--cy-control-height-lg)));
+    position: fixed;
+    z-index: var(--cy-title-bar-z, calc(var(--cy-z-dropdown) - 1));
+    top: env(titlebar-area-y, 0);
+    left: env(titlebar-area-x, 0);
+    width: env(titlebar-area-width, 100%);
+  }
+
+  /* Every control inside stays clickable: interactive elements, whoever rendered them, opt out of dragging. */
+  &
+    :is(
+      a,
+      button,
+      input,
+      select,
+      textarea,
+      summary,
+      label,
+      iframe,
+      video,
+      audio,
+      [tabindex],
+      [contenteditable]:not([contenteditable="false"]),
+      [role="button"],
+      [role="link"],
+      [role="menubar"] [role^="menuitem"],
+      [role="tab"],
+      [role="switch"],
+      [role="checkbox"],
+      [role="radio"],
+      [role="slider"],
+      [role="combobox"],
+      [role="textbox"],
+      [role="searchbox"],
+      [role="spinbutton"]
+    ) {
+    -webkit-app-region: no-drag;
+    app-region: no-drag;
+  }
+}

@@ -312,6 +312,35 @@ export const FormatsWithAlphaControlledAndDrag: Story = {
   },
 };
 
+export const ControlledKeepsSaturationAtBlack: Story = {
+  render: (args) => {
+    function Controlled() {
+      const [value, setValue] = useState("#ff0000");
+      return (
+        <>
+          <ColorField {...args} label="Controlled" value={value} onChange={setValue} />
+          <output data-testid="parent">{value}</output>
+        </>
+      );
+    }
+    return <Controlled />;
+  },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole("button", { name: "Choose colour" }));
+    await shownFully(await canvas.findByRole("dialog", { name: "Choose colour" }));
+    const area = canvas.getByRole("slider", { name: "Saturation and brightness" });
+    area.focus();
+    // All the way down to black, and one step back up: the colour is still red, not grey.
+    await userEvent.keyboard("{Shift>}{ArrowDown}{ArrowDown}{ArrowDown}{ArrowDown}{ArrowDown}");
+    await userEvent.keyboard("{ArrowDown}{ArrowDown}{ArrowDown}{ArrowDown}{ArrowDown}{ArrowDown}{/Shift}");
+    await expect(canvas.getByTestId("parent")).toHaveTextContent("#000000");
+    await expect(area).toHaveAttribute("aria-valuetext", "Saturation and brightness: 100%, 0%");
+    await userEvent.keyboard("{Shift>}{ArrowUp}{ArrowUp}{ArrowUp}{ArrowUp}{ArrowUp}{/Shift}");
+    await expect(area).toHaveAttribute("aria-valuetext", "Saturation and brightness: 100%, 50%");
+    await expect(canvas.getByTestId("parent")).toHaveTextContent("#800000");
+  },
+};
+
 export const SwatchesInThePicker: Story = {
   args: {
     swatches: [

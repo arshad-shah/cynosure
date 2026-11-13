@@ -52,10 +52,16 @@ The list has a maximum height and scrolls. Long labels truncate with an ellipsis
 ## Options and states
 
 - **`variant`:** `outline` (default) or `soft`.
-- **`size`:** `sm`, `md` or `lg`.
+- **`size`:** `xs`, `sm`, `md` or `lg`. `xs` is a 20px trigger with smaller text and chevron for dense desktop chrome; it is still 24px to press (44px on coarse pointers) and its label is set as for `sm`.
 - **`error` and `description`:** shown under the field and linked to the trigger.
 - **`labels`:** override `placeholder`, `empty` (no options) and `required` (validation message).
 - **`labelHidden`:** hides the label visually while it still names the trigger. Prefer a visible label.
+
+## Trailing text, dimmed options and a footer action
+
+An option's `trailing` is drawn at the end of its row in the list, smaller and muted (a shortcut, a count); the trigger shows the label only. `dimmed` draws an option muted while it stays choosable. `footer` pins an action under the options, `{ label, icon?, onSelect }`: it is the last option the arrow keys reach (End and PageDown too), and Enter, Space or a press closes the list and runs it. The value does not change, and Tab passes over it.
+
+<Canvas of={Stories.TrailingDimmedAndAFooterAction} />
 
 ## Coloured icons
 
@@ -75,7 +81,7 @@ A disabled option shows its icon without the colour, muted with the rest of the 
 | --- | --- |
 | Click, <kbd>Enter</kbd>, <kbd>Space</kbd>, <kbd>ArrowDown</kbd>, <kbd>ArrowUp</kbd> | Opens the list |
 | Arrow keys, <kbd>Home</kbd>, <kbd>End</kbd>, <kbd>PageUp</kbd>, <kbd>PageDown</kbd> | Move through options, skipping disabled ones |
-| <kbd>Enter</kbd>, <kbd>Space</kbd>, <kbd>Tab</kbd> | Select the active option |
+| <kbd>Enter</kbd>, <kbd>Space</kbd>, <kbd>Tab</kbd> | Select the active option (Enter and Space run the `footer` action when it is active) |
 | <kbd>Escape</kbd> | Closes without changing the value |
 | Typing | Jumps to a matching option (ignored during IME composition) |
 
@@ -89,7 +95,7 @@ On coarse pointers (phones and tablets) option rows grow to 44px.
 
 ## Theming
 
-Tokens: `--cy-select-{radius,bg,border,list-bg,list-shadow,list-max-height,option-active-bg}`. The list is an [OptionList](?path=/docs/components-optionlist--docs): the `list-*` and `option-*` tokens set its `--cy-option-list-*` tokens.
+Tokens: `--cy-select-{radius,bg,border,list-bg,list-shadow,list-max-height,option-active-bg}`; an `xs` trigger is `--cy-control-height-xs` tall. The list is an [OptionList](?path=/docs/components-optionlist--docs): the `list-*` and `option-*` tokens set its `--cy-option-list-*` tokens.
 
 ```ts
 createTheme({ components: { select: { radius: "10px", listMaxHeight: "240px" } } });

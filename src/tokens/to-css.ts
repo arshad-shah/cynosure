@@ -20,11 +20,20 @@ function flatten(obj: object, prefix: string, out: [string, string][]): [string,
 
 const decl = (pairs: [string, string][]) => pairs.map(([k, v]) => `--cy-${k}:${v}`).join(";");
 
+const pair = (name: string, x: string, y: string): [string, string] => [
+  `color-${name}`,
+  x === y ? x : `light-dark(${x},${y})`,
+];
+
+/** One property per colour; the series list becomes `--cy-color-series-1` to `-8`. */
 function colorPairs(a: ColorTokens, b: ColorTokens): [string, string][] {
-  return (Object.keys(a) as (keyof ColorTokens)[]).map((k) => [
-    `color-${kebab(k)}`,
-    a[k] === b[k] ? a[k] : `light-dark(${a[k]},${b[k]})`,
-  ]);
+  return (Object.keys(a) as (keyof ColorTokens)[]).flatMap((k) => {
+    const x = a[k];
+    const y = b[k];
+    return Array.isArray(x)
+      ? x.map((c, i) => pair(`series-${i + 1}`, c, (y as string[])[i] as string))
+      : [pair(kebab(k), x, y as string)];
+  });
 }
 
 /**
@@ -59,16 +68,22 @@ export function themeToCss(theme: Theme, selector: string = DEFAULT_SELECTOR): s
     ),
   ];
   const contrast = decl(colorPairs(theme.palettes["light-contrast"], theme.palettes["dark-contrast"]));
+  const normal = decl(colorPairs(light, dark));
   // Selector lists are wrapped in :is() so attribute qualifiers apply to every selector in the list.
   const host = selector.includes(",") ? `:is(${selector})` : selector;
   const scoped = (attr: string) => (selector === DEFAULT_SELECTOR ? `:where(${attr})` : `${host}${attr}`);
   const isDefault = selector === DEFAULT_SELECTOR;
+  // On an OS set to more contrast, a wrapper with contrast="normal" (and no theme of its own) puts the normal colours
+  // back over the contrast ones it inherits. It comes after the contrast rule, so it wins at equal specificity.
+  const undo = isDefault
+    ? `:where([data-cy-contrast="normal"]){${normal}}`
+    : `${scoped('[data-cy-contrast="system"]')} [data-cy-contrast="normal"]{${normal}}`;
   return [
     `${selector}{${decl(base)}}`,
     `${scoped('[data-cy-mode="light"]')}{color-scheme:light}`,
     `${scoped('[data-cy-mode="dark"]')}{color-scheme:dark}`,
     `${scoped('[data-cy-mode="system"]')}{color-scheme:light dark}`,
-    `@media (prefers-contrast:more){${isDefault ? ':where(:root:not([data-cy-contrast]),:host,[data-cy-contrast="system"])' : scoped('[data-cy-contrast="system"]')}{${contrast}}}`,
+    `@media (prefers-contrast:more){${isDefault ? ':where(:root:not([data-cy-contrast]),:host,[data-cy-contrast="system"])' : scoped('[data-cy-contrast="system"]')}{${contrast}}${undo}}`,
     `${scoped('[data-cy-contrast="more"]')}{${contrast}}`,
   ].join("\n");
 }

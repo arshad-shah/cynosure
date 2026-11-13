@@ -7,6 +7,7 @@
  *  - the saved-mode script inline in `<head>`, so a visitor's own choice applies before the first paint.
  */
 import { type ThemeInitScriptOptions, themeInitScript } from "../../theme/theme-init-script.js";
+import type { ThemeMode } from "../../tokens/schema.js";
 import { type CynosureViteOptions, type CynosureVitePlugin, cynosure as vitePlugin } from "../vite/index.js";
 
 export interface CynosureAstroOptions extends Omit<CynosureViteOptions, "styles"> {
@@ -58,7 +59,7 @@ export function cynosure(options: CynosureAstroOptions = {}): CynosureAstroInteg
 
 export interface HtmlAttributesOptions {
   /** The colour mode the page starts in, before any saved choice is read. Default "system" (follows the device). */
-  mode?: "light" | "dark" | "system";
+  mode?: ThemeMode | "system";
   /** `more` uses the higher-contrast palettes; `system` (the default) follows the device setting. */
   contrast?: "normal" | "more" | "system";
 }

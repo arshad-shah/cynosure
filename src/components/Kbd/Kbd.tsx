@@ -1,6 +1,5 @@
-import { type CSSProperties, Fragment, useState } from "react";
-import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js";
-import { isApple, shortcutKeys } from "../../foundations/hotkey.js";
+import { type CSSProperties, Fragment } from "react";
+import { shortcutKeys, useApple } from "../../foundations/hotkey.js";
 import type { Size } from "../../tokens/schema.js";
 
 export interface KbdTokens {
@@ -79,11 +78,4 @@ export function Kbd({ keys, size = "md", label, className, style }: KbdProps) {
       <span className="cy-visually-hidden">{spoken}</span>
     </kbd>
   );
-}
-
-/** Apple or not, decided after hydration so the server and the first client render agree. */
-export function useApple() {
-  const [apple, setApple] = useState(false);
-  useClientLayoutEffect(() => setApple(isApple()), []);
-  return apple;
 }

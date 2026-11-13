@@ -1,5 +1,7 @@
 .cy-menu.cy-menu {
   --_row: var(--cy-menu-row-height, var(--cy-control-height-md));
+  /* Gap from the trigger, read by the component when the menu opens. */
+  --_offset: var(--cy-menu-offset, var(--cy-space-2));
   box-sizing: border-box !important;
   position: fixed;
   inset: auto;
@@ -32,6 +34,12 @@
   &:popover-open {
     animation: cy-menu-in var(--cy-motion-fast) var(--cy-motion-ease);
   }
+  /* A submenu sits against its parent menu's edge, its first item level with the parent item: the gap from the item
+     (read as --_offset) and the shift up are the parent's padding and border. */
+  &[data-nested] {
+    --_offset: calc(var(--cy-space-2) + var(--cy-border-width));
+    margin-block-start: calc(-1 * var(--_offset));
+  }
 }
 
 .cy-menu-item.cy-menu-item {
@@ -58,6 +66,7 @@
   outline: none;
   -webkit-tap-highlight-color: transparent;
   &:hover:not([aria-disabled="true"]),
+  &[aria-expanded="true"],
   &:focus-visible,
   &:focus {
     background: var(--cy-color-soft);
@@ -115,6 +124,13 @@
   color: var(--cy-color-muted);
   font-size: inherit;
   line-height: inherit;
+}
+
+.cy-menu-chevron.cy-menu-chevron {
+  flex: none;
+  margin: 0;
+  color: var(--cy-color-muted);
+  font-size: inherit;
 }
 
 .cy-menu-group {

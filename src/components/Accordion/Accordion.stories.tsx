@@ -156,6 +156,16 @@ export const Controlled: Story = {
     await expect(trigger(canvas, "Many Y")).toHaveAttribute("aria-expanded", "true");
     await userEvent.click(trigger(canvas, "Many Y"));
     await expect(trigger(canvas, "Many Y")).toHaveAttribute("aria-expanded", "false");
+    // Collapsible and controlled: undefined is "none open", so the open section closes, every time.
+    await userEvent.click(trigger(canvas, "Single B"));
+    await expect(trigger(canvas, "Single B")).toHaveAttribute("aria-expanded", "false");
+    await userEvent.click(trigger(canvas, "Single A"));
+    await expect(trigger(canvas, "Single A")).toHaveAttribute("aria-expanded", "true");
+    await userEvent.click(trigger(canvas, "Single A"));
+    await expect(trigger(canvas, "Single A")).toHaveAttribute("aria-expanded", "false");
+    // The parent holds the value: opening B from outside still works after closing.
+    await userEvent.click(canvas.getByRole("button", { name: "Open B" }));
+    await expect(trigger(canvas, "Single B")).toHaveAttribute("aria-expanded", "true");
   },
 };
 

@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { useRef, useState } from "react";
+import { type CSSProperties, useRef, useState } from "react";
 import { expect, fn, waitFor } from "storybook/test";
 import { bold } from "../../icons/bold.js";
 import { italic } from "../../icons/italic.js";
@@ -9,6 +9,7 @@ import { computeUnderHostileHost } from "../../test/hostile.js";
 import { shownFully } from "../../test/settle.js";
 import { Button } from "../Button/Button.js";
 import { IconButton } from "../IconButton/IconButton.js";
+import { Menu } from "../Menu/Menu.js";
 import { SegmentedControl } from "../SegmentedControl/SegmentedControl.js";
 import { type DockEdge, DockedToolbar, FloatingToolbar, useSelectionAnchor } from "./FloatingToolbar.js";
 
@@ -84,6 +85,22 @@ export const FlipsBelowWhenNoRoomAbove: Story = {
   },
 };
 
+export const OffsetTokenInAnyLengthUnit: Story = {
+  render: () => (
+    <div style={{ "--cy-floating-toolbar-offset": "calc(1rem + 8px)" } as CSSProperties}>
+      <Field />
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    await waitFor(() => expect(shown()).toBe(true));
+    await shownFully(bar());
+    const field = box(canvasElement.querySelector(".box") as Element);
+    const rem = Number.parseFloat(getComputedStyle(document.documentElement).fontSize);
+    // The gap is the token resolved to pixels: rem and calc() included.
+    await waitFor(() => expect(Math.abs(field.top - box(bar()).bottom - (rem + 8))).toBeLessThan(1));
+  },
+};
+
 export const FollowsItsBox: Story = {
   play: async ({ canvasElement }) => {
     await waitFor(() => expect(shown()).toBe(true));
@@ -113,6 +130,55 @@ export const KeyboardInAndOut: Story = {
     await userEvent.keyboard("{Escape}");
     await expect(editor).toHaveFocus();
     await expect((window as unknown as { escaped: ReturnType<typeof fn> }).escaped).toHaveBeenCalledTimes(1);
+  },
+};
+
+export const EscapeClosesANestedMenuFirst: Story = {
+  render: () => {
+    function WithMenu() {
+      const box = useRef<HTMLDivElement>(null);
+      const [escaped, setEscaped] = useState(0);
+      return (
+        <div style={{ paddingBlockStart: 160 }}>
+          <div ref={box} data-testid="escaped" style={{ inlineSize: 240, blockSize: 40 }}>
+            {escaped}
+          </div>
+          <FloatingToolbar label="Field tools" anchor={box} onEscape={() => setEscaped((n) => n + 1)}>
+            <IconButton icon={bold} label="Bold" variant="ghost" size="sm" />
+            <Menu
+              label="More"
+              trigger={(props) => (
+                <Button size="sm" variant="ghost" {...props}>
+                  More
+                </Button>
+              )}
+              items={[
+                { value: "copy", label: "Copy" },
+                { value: "paste", label: "Paste" },
+              ]}
+              onSelect={() => {}}
+            />
+          </FloatingToolbar>
+        </div>
+      );
+    }
+    return <WithMenu />;
+  },
+  play: async ({ canvas, userEvent }) => {
+    await waitFor(() => expect(shown()).toBe(true));
+    const more = canvas.getByRole("button", { name: "More" });
+    await userEvent.click(more);
+    const menu = await canvas.findByRole("menu", { name: "More" });
+    await shownFully(menu);
+    await waitFor(() => expect(canvas.getByRole("menuitem", { name: "Copy" })).toHaveFocus());
+    // The first Escape belongs to the menu: it closes and focus goes back to its trigger, in the bar.
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() => expect(menu.matches(":popover-open")).toBe(false));
+    await expect(more).toHaveFocus();
+    await expect(canvas.getByTestId("escaped")).toHaveTextContent("0");
+    // The next one leaves the bar.
+    await userEvent.keyboard("{Escape}");
+    await expect(canvas.getByTestId("escaped")).toHaveTextContent("1");
   },
 };
 

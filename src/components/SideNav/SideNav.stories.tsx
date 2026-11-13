@@ -1,10 +1,14 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { useState } from "react";
+import { type CSSProperties, useState } from "react";
 import { expect, fn, waitFor } from "storybook/test";
 import { archive } from "../../icons/archive.js";
+import { bell } from "../../icons/bell.js";
+import { database } from "../../icons/database.js";
 import { home } from "../../icons/home.js";
 import { inbox } from "../../icons/inbox.js";
 import { plus } from "../../icons/plus.js";
+import { puzzle } from "../../icons/puzzle.js";
+import { search } from "../../icons/search.js";
 import { settings } from "../../icons/settings.js";
 import { star } from "../../icons/star.js";
 import { users } from "../../icons/users.js";
@@ -46,6 +50,8 @@ const meta = {
   argTypes: {
     current: { control: "select", options: ["home", "inbox", "starred", "members", "billing", "settings"] },
     collapsed: { control: "boolean" },
+    placement: { control: "inline-radio", options: ["start", "end"] },
+    footer: { control: false },
     size: { control: "inline-radio", options: ["sm", "md", "lg"] },
   },
 } satisfies Meta<typeof SideNav>;
@@ -603,6 +609,217 @@ export const StableUnderHostileHost: Story = {
       ".cy-side-nav-heading",
     ]) {
       const { clean, hostile } = computeUnderHostileHost(canvasElement, selector.trim(), props);
+      await expect({ selector, ...hostile }).toEqual({ selector, ...clean });
+    }
+  },
+};
+
+/** An editor's activity bar: views at the top; settings, notifications and an action pinned to the bottom. */
+const ACTIVITY: NavEntry[] = [
+  { id: "explorer", label: "Explorer", icon: database },
+  { id: "search", label: "Search", icon: search, badge: <Badge tone="accent">12</Badge> },
+  { id: "plugins", label: "Plugins", icon: puzzle },
+];
+const notify = fn();
+const ACTIVITY_FOOTER: NavEntry[] = [
+  { kind: "action", id: "notify", label: "Notifications", icon: bell, onClick: notify },
+  { id: "settings", label: "Settings", icon: settings },
+];
+const tall = (args: Parameters<typeof SideNav>[0], dir?: "rtl") => (
+  <div
+    dir={dir}
+    style={{
+      display: "flex",
+      justifyContent: args.placement === "end" ? "flex-end" : "flex-start",
+      blockSize: 420,
+      border: "var(--cy-border-width) solid var(--cy-color-line)",
+    }}
+  >
+    <SideNav {...args} />
+  </div>
+);
+const tipOf = (el: Element) =>
+  el.ownerDocument.getElementById(el.getAttribute("aria-describedby") as string) as HTMLElement;
+
+export const AnActivityBar: Story = {
+  tags: ["visual"],
+  args: {
+    label: "Views",
+    items: ACTIVITY,
+    footer: ACTIVITY_FOOTER,
+    current: "explorer",
+    collapsed: true,
+  },
+  render: (args) => tall(args),
+  beforeEach: () => {
+    notify.mockClear();
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    // A navigation landmark on its own, without AppShell.
+    const nav = canvas.getByRole("navigation", { name: "Views" });
+    const explorer = canvas.getByRole("button", { name: "Explorer" });
+    const settingsRow = canvas.getByRole("button", { name: "Settings" });
+    const bellButton = canvas.getByRole("button", { name: "Notifications" });
+    // The footer is pinned to the bottom of the rail, apart from the views.
+    await expect(rect(nav).height).toBeCloseTo((nav.parentElement as HTMLElement).clientHeight, 0);
+    await expect(rect(nav).bottom - rect(settingsRow).bottom).toBeLessThan(24);
+    await expect(
+      rect(bellButton).top - rect(canvas.getByRole("button", { name: "Plugins" })).bottom,
+    ).toBeGreaterThan(150);
+    // The current view gets the indicator on the inline start.
+    await expect(explorer).toHaveAttribute("aria-current", "page");
+    await expect(getComputedStyle(explorer, "::before").left).toBe("0px");
+    // Tab runs through the views and then the footer, in order.
+    explorer.focus();
+    await userEvent.tab();
+    await expect(canvas.getByRole("button", { name: "Search 12" })).toHaveFocus();
+    await userEvent.tab();
+    await userEvent.tab();
+    await expect(bellButton).toHaveFocus();
+    await userEvent.tab();
+    await expect(settingsRow).toHaveFocus();
+    // Footer entries are ordinary entries: an item navigates and can be current, an action only acts.
+    await userEvent.keyboard("{Enter}");
+    await expect(args.onNavigate).toHaveBeenLastCalledWith("settings", expect.anything());
+    await userEvent.click(bellButton);
+    await expect(notify).toHaveBeenCalledTimes(1);
+    await expect(args.onNavigate).toHaveBeenCalledTimes(1);
+    // Tooltips sit on the inline end, away from the window edge.
+    settingsRow.focus();
+    await waitFor(() => expect(tipOf(settingsRow).matches(":popover-open")).toBe(true));
+    await shownFully(tipOf(settingsRow));
+    await expect(rect(tipOf(settingsRow)).left).toBeGreaterThanOrEqual(rect(settingsRow).right);
+  },
+};
+
+export const FooterItemIsCurrent: Story = {
+  args: { label: "Views", items: ACTIVITY, footer: ACTIVITY_FOOTER, current: "settings" },
+  // In a plain block of fixed height (not a flex row), the navigation still fills it.
+  render: (args) => (
+    <div style={{ blockSize: 420 }}>
+      <SideNav {...args} />
+    </div>
+  ),
+  play: async ({ canvas }) => {
+    // Expanded too, the footer sits at the bottom and its items show labels.
+    const settingsRow = canvas.getByRole("button", { name: "Settings" });
+    await expect(settingsRow).toHaveAttribute("aria-current", "page");
+    await expect(settingsRow).toHaveTextContent("Settings");
+    await expect(canvas.getByRole("button", { name: "Notifications" })).toHaveTextContent("Notifications");
+    const nav = canvas.getByRole("navigation", { name: "Views" });
+    await expect(rect(nav).bottom - rect(settingsRow).bottom).toBeLessThan(24);
+    await expect(canvas.getByRole("button", { name: "Explorer" })).not.toHaveAttribute("aria-current");
+  },
+};
+
+export const ARailOnTheEnd: Story = {
+  args: {
+    label: "Panels",
+    items: ACTIVITY,
+    footer: ACTIVITY_FOOTER,
+    current: "search",
+    collapsed: true,
+    placement: "end",
+  },
+  render: (args) => tall(args),
+  play: async ({ canvas }) => {
+    const searchRow = canvas.getByRole("button", { name: "Search 12" });
+    // The indicator is on the inline end, the side facing the content.
+    const bar = getComputedStyle(searchRow, "::before");
+    await expect(bar.right).toBe("0px");
+    await expect(bar.left).not.toBe("0px");
+    // Tooltips open towards the inline start.
+    searchRow.focus();
+    await waitFor(() => expect(tipOf(searchRow).matches(":popover-open")).toBe(true));
+    await shownFully(tipOf(searchRow));
+    await expect(rect(tipOf(searchRow)).right).toBeLessThanOrEqual(rect(searchRow).left);
+    const bellButton = canvas.getByRole("button", { name: "Notifications" });
+    bellButton.focus();
+    await waitFor(() => expect(tipOf(bellButton).matches(":popover-open")).toBe(true));
+    await shownFully(tipOf(bellButton));
+    await expect(rect(tipOf(bellButton)).right).toBeLessThanOrEqual(rect(bellButton).left);
+  },
+};
+
+export const ARailOnTheEndRightToLeft: Story = {
+  args: { label: "Panels", items: ACTIVITY, current: "search", placement: "end" },
+  render: (args) => tall(args, "rtl"),
+  play: async ({ canvas }) => {
+    // The inline end is the left in right-to-left text, expanded or not.
+    const searchRow = canvas.getByRole("button", { name: "Search 12" });
+    await expect(getComputedStyle(searchRow, "::before").left).toBe("0px");
+  },
+};
+
+export const BadgeOverTheIconInTheRail: Story = {
+  args: { label: "Views", items: ACTIVITY, current: "explorer", collapsed: true },
+  // A wide rail (as a theme may set), so the row's corner is far from the icon.
+  render: (args) => (
+    <div style={{ "--cy-side-nav-rail-width": "96px" } as CSSProperties}>
+      <Stack direction="row" gap="6">
+        {tall(args)}
+        {tall({ ...args, label: "RTL" }, "rtl")}
+      </Stack>
+    </div>
+  ),
+  play: async ({ canvas }) => {
+    const [ltr, rtl] = canvas.getAllByRole("button", { name: "Search 12" }) as [HTMLElement, HTMLElement];
+    await expect(rect(canvas.getAllByRole("navigation")[0] as HTMLElement).width).toBeCloseTo(96, 0);
+    // The badge sits on the icon's top inline-end corner, not at the far edge of the row.
+    for (const [row, dir] of [
+      [ltr, "ltr"],
+      [rtl, "rtl"],
+    ] as const) {
+      const icon = rect(row.querySelector(".cy-side-nav-icon") as Element);
+      const badge = rect(row.querySelector(".cy-side-nav-badge") as Element);
+      await expect({ dir, above: badge.top < icon.top + icon.height / 2 }).toEqual({ dir, above: true });
+      await expect({ dir, overlaps: badge.bottom > icon.top }).toEqual({ dir, overlaps: true });
+      if (dir === "ltr") {
+        await expect(badge.left).toBeLessThan(icon.right);
+        await expect(badge.right).toBeGreaterThan(icon.right);
+      } else {
+        await expect(badge.right).toBeGreaterThan(icon.left);
+        await expect(badge.left).toBeLessThan(icon.left);
+      }
+      await expect(badge.right).toBeLessThanOrEqual(rect(row).right);
+      await expect(badge.left).toBeGreaterThanOrEqual(rect(row).left);
+    }
+  },
+};
+
+export const FooterInTheBar: Story = {
+  args: { label: "Sections", layout: "bar", items: ACTIVITY, footer: ACTIVITY_FOOTER, current: "settings" },
+  render: (args) => phone(args),
+  play: async ({ canvas, canvasElement }) => {
+    // A bar has no bottom: the footer's entries end the row.
+    const rows = [...canvasElement.querySelectorAll(".cy-side-nav-link, .cy-side-nav-action")];
+    await expect(rows).toHaveLength(5);
+    await expect(new Set(rows.map((el) => Math.round(rect(el).top + rect(el).height / 2))).size).toBe(2);
+    await expect(rows.at(-1)).toBe(canvas.getByRole("button", { name: "Settings" }));
+    await expect(rows.at(-1)).toHaveAttribute("aria-current", "page");
+  },
+};
+
+export const TouchFooter: Story = {
+  tags: ["touch", "!dev"],
+  args: { label: "Views", items: ACTIVITY, footer: ACTIVITY_FOOTER, collapsed: true },
+  render: (args) => tall(args),
+  play: async ({ args, canvas, canvasElement, userEvent }) => {
+    for (const row of canvasElement.querySelectorAll(".cy-side-nav-footer .cy-side-nav-link")) {
+      await expect(rect(row).height).toBeGreaterThanOrEqual(44);
+    }
+    await userEvent.pointer({ keys: "[TouchA]", target: canvas.getByRole("button", { name: "Settings" }) });
+    await expect(args.onNavigate).toHaveBeenLastCalledWith("settings", expect.anything());
+  },
+};
+
+export const FooterStableUnderHostileHost: Story = {
+  args: { label: "Views", items: ACTIVITY, footer: ACTIVITY_FOOTER, collapsed: true, placement: "end" },
+  render: (args) => tall(args),
+  play: async ({ canvasElement }) => {
+    const props = ["display", "height", "margin-top", "padding-left", "box-sizing", "right", "position"];
+    for (const selector of [".cy-side-nav", ".cy-side-nav-footer", ".cy-side-nav-badge"]) {
+      const { clean, hostile } = computeUnderHostileHost(canvasElement, selector, props);
       await expect({ selector, ...hostile }).toEqual({ selector, ...clean });
     }
   },

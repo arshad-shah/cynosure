@@ -1,0 +1,18 @@
+/* path-field: a TextField with a Browse button inside its end. The root only holds the field; the button's place is
+   set here, its look by Button. Root never carries .cy-reset. */
+.cy-path-field.cy-path-field {
+  box-sizing: border-box !important;
+  display: block;
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-font-size-md);
+  letter-spacing: normal;
+  text-transform: none;
+}
+.cy-path-field-browse.cy-path-field-browse {
+  flex: none;
+  margin-block: 0;
+  margin-inline: 0 var(--cy-path-field-browse-inset, var(--cy-space-1));
+}

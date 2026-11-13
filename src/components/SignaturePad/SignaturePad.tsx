@@ -1,4 +1,5 @@
-import { type CSSProperties, type PointerEvent, useCallback, useEffect, useRef, useState } from "react";
+import { type CSSProperties, type PointerEvent, useCallback, useEffect, useRef } from "react";
+import { useCanvasSize } from "../../foundations/canvas-size.js";
 import { type InkPoint, type InkStroke, type InkWeight, inkPath, inkPoint } from "./ink.js";
 
 export interface SignaturePadTokens {
@@ -73,45 +74,56 @@ export function SignaturePad({
   style,
 }: SignaturePadProps) {
   const canvas = useRef<HTMLCanvasElement>(null);
-  // Several pointer events can arrive between renders: the stroke in progress lives in a ref; state mirrors it.
+  // The stroke in progress lives in a ref, grown in place and drawn once per frame: pointer moves never re-render.
   const liveRef = useRef<InkStroke | null>(null);
   const pointer = useRef<number | null>(null);
   const penSeen = useRef(Number.NEGATIVE_INFINITY);
-  const [live, setLive] = useState<InkStroke | null>(null);
   // The latest list, updated the moment a stroke ends: a second stroke can finish before React re-renders.
   const committed = useRef(value);
   committed.current = value;
-  const [size, setSize] = useState({ width: 0, height: 0 });
+  // Measured with the screen's density, and again when it changes (a move to another screen, a browser zoom).
+  const size = useCanvasSize(canvas);
 
-  useEffect(() => {
-    const el = canvas.current as HTMLCanvasElement;
-    const measure = () =>
-      setSize((s) =>
-        s.width === el.clientWidth && s.height === el.clientHeight
-          ? s
-          : { width: el.clientWidth, height: el.clientHeight },
-      );
-    measure();
-    const observer = new ResizeObserver(measure);
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
-
+  // One outline per finished stroke, kept while the stroke and the nib are the same.
+  const outlines = useRef(new WeakMap<InkStroke, [InkWeight, Path2D]>());
   const paint = useCallback(() => {
-    const el = canvas.current as HTMLCanvasElement;
-    const dpr = window.devicePixelRatio;
-    el.width = Math.round(size.width * dpr);
-    el.height = Math.round(size.height * dpr);
+    const el = canvas.current;
+    if (!el) return;
+    const { dpr } = size;
+    // The canvas is reallocated only when its size or pixel ratio changes.
+    for (const side of ["width", "height"] as const) {
+      const pixels = Math.round(size[side] * dpr);
+      if (el[side] !== pixels) el[side] = pixels;
+    }
     const ctx = el.getContext("2d") as CanvasRenderingContext2D;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, size.width, size.height);
     if (space && size.width > 0) ctx.scale(size.width / space.width, size.height / space.height);
     ctx.fillStyle = ink ?? getComputedStyle(el).color;
-    for (const stroke of live ? [...value, live] : value) {
-      // Every stroke has at least its first sample, so it always has an outline.
-      ctx.fill(new Path2D(inkPath(stroke, weight)));
+    // Every stroke has at least its first sample, so it always has an outline.
+    for (const stroke of value) {
+      let known = outlines.current.get(stroke);
+      if (known?.[0] !== weight) {
+        known = [weight, new Path2D(inkPath(stroke, weight))];
+        outlines.current.set(stroke, known);
+      }
+      ctx.fill(known[1]);
     }
-  }, [value, live, ink, weight, space, size]);
+    // The live stroke changes on every move: its outline is built afresh each frame.
+    if (liveRef.current) ctx.fill(new Path2D(inkPath(liveRef.current, weight)));
+  }, [value, ink, weight, space, size]);
   useEffect(paint, [paint]);
+
+  // Pointer moves ask for a frame; the latest paint draws it (nothing, once the pad is gone).
+  const latestPaint = useRef(paint);
+  latestPaint.current = paint;
+  const frame = useRef(0);
+  const requestPaint = () => {
+    frame.current ||= requestAnimationFrame(() => {
+      frame.current = 0;
+      latestPaint.current();
+    });
+  };
 
   const sample = (event: PointerEvent<HTMLCanvasElement>, stroke: InkStroke): InkStroke => {
     const rect = event.currentTarget.getBoundingClientRect();
@@ -119,14 +131,14 @@ export function SignaturePad({
     const native = event.nativeEvent;
     // Coalesced events keep a fast stroke smooth: the browser batches several samples into one event.
     const samples = native.getCoalescedEvents?.() ?? [];
-    let out = stroke;
+    // The live stroke is ours alone until it is finished, so samples are pushed onto it rather than copied.
     for (const e of samples.length ? samples : [native]) {
-      const prev: InkPoint | null = out[out.length - 1] ?? null;
+      const prev: InkPoint | null = stroke[stroke.length - 1] ?? null;
       const p = inkPoint(e, rect, prev, scale);
       if (prev && Math.hypot(p.x - prev.x, p.y - prev.y) < MIN_STEP) continue;
-      out = [...out, p];
+      stroke.push(p);
     }
-    return out;
+    return stroke;
   };
 
   const ours = (event: PointerEvent) => liveRef.current !== null && event.pointerId === pointer.current;
@@ -139,9 +151,10 @@ export function SignaturePad({
     const stroke = liveRef.current as InkStroke;
     liveRef.current = null;
     pointer.current = null;
-    setLive(null);
     committed.current = [...committed.current, stroke];
     onChange(committed.current);
+    // Drawn from `value` from now on: if the owner keeps the stroke, the next render paints it.
+    requestPaint();
   };
 
   return (
@@ -171,13 +184,13 @@ export function SignaturePad({
           }
           pointer.current = event.pointerId;
           liveRef.current = sample(event, []);
-          setLive(liveRef.current);
+          requestPaint();
         }}
         onPointerMove={(event) => {
           notePen(event);
           if (!ours(event)) return;
-          liveRef.current = sample(event, liveRef.current as InkStroke);
-          setLive(liveRef.current);
+          sample(event, liveRef.current as InkStroke);
+          requestPaint();
         }}
         onPointerUp={finish}
         onPointerCancel={finish}

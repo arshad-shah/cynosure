@@ -4,7 +4,7 @@ import { isRtl } from "../../foundations/dir.js";
 import { useDrag } from "../../foundations/drag.js";
 import { HiddenValue } from "../../foundations/HiddenValue/HiddenValue.js";
 import { stepKey } from "../../foundations/keys.js";
-import { clamp } from "../../foundations/math.js";
+import { ariaNumber, clamp, plainNumber, snapToStep } from "../../foundations/math.js";
 import type { Size } from "../../tokens/schema.js";
 
 export interface SliderTokens {
@@ -92,9 +92,8 @@ const DEFAULT_LABELS: SliderLabels = {
   minimum: "minimum",
   maximum: "maximum",
   thumb: (index) => `stop ${index + 1}`,
-  value: (v) => String(v),
+  value: plainNumber,
 };
-const decimals = (n: number) => (String(n).split(".")[1] ?? "").length;
 
 /** Picks a number (or a range) by dragging or with the keyboard: APG slider, with pointer, touch and forms. */
 /** The thumb being dragged, and the value to go back to if the drag is cancelled. */
@@ -130,20 +129,15 @@ export function Slider({
   const initial = defaultValue ?? min;
   const [current, setCurrent, resetCurrent] = useControllableState<SliderValue>(value, initial, onChange);
   const range = Array.isArray(current);
-  const values: number[] = range ? [...current] : [current];
+  // A controlled value outside min and max shows (and is announced) at the nearest end.
+  const values: number[] = (range ? current : [current]).map((v) => clamp(v, min, max));
   const track = useRef<HTMLDivElement>(null);
   const thumbs = useRef<(HTMLDivElement | null)[]>([]);
   const drag = useRef<Drag | null>(null);
   const big = largeStep ?? Math.max(step, (max - min) / 10);
   const vertical = orientation === "vertical";
 
-  const snap = useCallback(
-    (v: number) => {
-      const stepped = min + Math.round((v - min) / step) * step;
-      return Number(Math.min(Math.max(stepped, min), max).toFixed(decimals(step)));
-    },
-    [min, max, step],
-  );
+  const snap = useCallback((v: number) => clamp(snapToStep(v, step, min), min, max), [min, max, step]);
   /** New value with thumb `index` moved to `v`; thumbs stop at their neighbours instead of crossing. */
   const withThumb = (index: number, v: number): SliderValue => {
     if (!range) return snap(v);
@@ -270,9 +264,9 @@ export function Slider({
             tabIndex={disabled ? undefined : 0}
             className="cy-slider-thumb cy-reset"
             aria-orientation={orientation}
-            aria-valuemin={values[index - 1] ?? min}
-            aria-valuemax={values[index + 1] ?? max}
-            aria-valuenow={v}
+            aria-valuemin={ariaNumber(values[index - 1] ?? min)}
+            aria-valuemax={ariaNumber(values[index + 1] ?? max)}
+            aria-valuenow={ariaNumber(v)}
             aria-valuetext={text.value(v)}
             aria-disabled={disabled || undefined}
             {...(range
@@ -289,7 +283,7 @@ export function Slider({
         <HiddenValue
           key={index}
           name={name}
-          value={String(v)}
+          value={plainNumber(v)}
           disabled={disabled}
           onReset={() => {
             resetCurrent(initial);

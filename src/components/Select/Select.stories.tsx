@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 import { expect, fn, waitFor } from "storybook/test";
-import { flag, tag } from "../../icons/index.js";
+import { flag, settings, tag } from "../../icons/index.js";
 import { backdrop, contrast, rgb } from "../../test/color.js";
 import { computeUnderHostileHost } from "../../test/hostile.js";
 import { shownFully } from "../../test/settle.js";
@@ -29,7 +29,7 @@ const meta = {
     variant: "outline",
   },
   argTypes: {
-    size: { control: "inline-radio", options: ["sm", "md", "lg"] },
+    size: { control: "inline-radio", options: ["xs", "sm", "md", "lg"] },
     variant: { control: "inline-radio", options: ["outline", "soft"] },
     label: { control: "text" },
     placeholder: { control: "text" },
@@ -247,6 +247,59 @@ export const CoarsePointerRows: Story = {
   },
 };
 
+const hitArea = (el: Element) => Number.parseFloat(getComputedStyle(el, "::before").height);
+
+export const ExtraSmallForDenseChrome: Story = {
+  args: { size: "xs", defaultValue: "apple", label: "Dense" },
+  render: (args) => (
+    <div style={{ display: "flex", gap: 12, alignItems: "end", inlineSize: 360 }}>
+      <Select {...args} />
+      <Select {...args} size="sm" label="Small" />
+    </div>
+  ),
+  play: async ({ canvas, canvasElement, args, userEvent }) => {
+    const xs = canvas.getByRole("combobox", { name: "Dense" });
+    const sm = canvas.getByRole("combobox", { name: "Small" });
+    // A 20px trigger with smaller text and chevron than sm's.
+    const box = xs.getBoundingClientRect();
+    await expect(box.height).toBe(20);
+    const size = (el: Element) => Number.parseFloat(getComputedStyle(el).fontSize);
+    await expect(size(xs)).toBeLessThan(size(sm));
+    await expect(size(xs)).toBeGreaterThanOrEqual(11);
+    const chevron = (el: Element) =>
+      (el.querySelector(".cy-select-chevron") as Element).getBoundingClientRect();
+    await expect(chevron(xs).height).toBeLessThan(chevron(sm).height);
+    await expect(chevron(xs).bottom).toBeLessThanOrEqual(box.bottom);
+    // The chosen value is whole inside the trigger.
+    const value = xs.querySelector(".cy-select-value") as HTMLElement;
+    await expect(value.scrollHeight).toBeLessThanOrEqual(value.clientHeight + 1);
+    // Still 24px to press: a click just below the visible edge opens it.
+    await expect(hitArea(xs)).toBeGreaterThanOrEqual(24);
+    await expect(document.elementFromPoint(box.left + 8, box.bottom + 1)).toBe(xs);
+    // The keyboard works as at any size.
+    xs.focus();
+    await userEvent.keyboard("{ArrowDown}");
+    const lists = canvasElement.querySelectorAll('[role="listbox"]');
+    await waitFor(() => expect(isOpen(lists[0] as HTMLElement)).toBe(true));
+    await userEvent.keyboard("{ArrowDown}{Enter}");
+    await expect(xs).toHaveTextContent("Banana");
+    await expect(args.onChange).toHaveBeenCalledWith("banana");
+  },
+};
+
+export const ExtraSmallCoarsePointer: Story = {
+  tags: ["touch", "!dev"],
+  args: { size: "xs" },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const trigger = canvas.getByRole("combobox");
+    // The trigger stays dense; its invisible hit area grows to 44px.
+    await expect(trigger.getBoundingClientRect().height).toBe(20);
+    await expect(hitArea(trigger)).toBeGreaterThanOrEqual(44);
+    await userEvent.pointer({ keys: "[TouchA]", target: trigger });
+    await waitFor(() => expect(isOpen(list(canvasElement))).toBe(true));
+  },
+};
+
 export const StableUnderHostileHost: Story = {
   play: async ({ canvasElement }) => {
     const { clean, hostile } = computeUnderHostileHost(canvasElement, '[role="combobox"]', [
@@ -272,6 +325,91 @@ export const ArrowUpOpensAtLastAndTypingWhileClosedJumps: Story = {
     await userEvent.keyboard("c");
     await waitFor(() => expect(isOpen(list(canvasElement))).toBe(true));
     await expect(active(canvasElement)).toBe("Cherry");
+  },
+};
+
+export const PageKeysStopAtTheLastUsableOption: Story = {
+  args: {
+    options: [
+      { value: "first", label: "First", disabled: true },
+      { value: "a", label: "Alpha" },
+      { value: "b", label: "Bravo" },
+      { value: "c", label: "Charlie" },
+      { value: "last", label: "Last", disabled: true },
+    ],
+  },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    canvas.getByRole("combobox").focus();
+    await userEvent.keyboard("{ArrowDown}");
+    await expect(active(canvasElement)).toBe("Alpha");
+    await userEvent.keyboard("{PageDown}");
+    await expect(active(canvasElement)).toBe("Charlie");
+    await userEvent.keyboard("{PageUp}");
+    await expect(active(canvasElement)).toBe("Alpha");
+    await userEvent.keyboard("{Enter}");
+    await expect(canvas.getByRole("combobox")).toHaveTextContent("Alpha");
+  },
+};
+
+const manageConnections = fn();
+const connections: SelectOption[] = [
+  { value: "prod", label: "Production", trailing: "3 tabs" },
+  { value: "staging", label: "Staging", dimmed: true },
+  { value: "local", label: "Local", trailing: "Ctrl+3" },
+];
+
+export const TrailingDimmedAndAFooterAction: Story = {
+  tags: ["visual"],
+  args: {
+    label: "Connection",
+    options: connections,
+    defaultValue: "prod",
+    footer: { label: "Manage connections…", icon: settings, onSelect: manageConnections },
+  },
+  play: async ({ canvas, canvasElement, args, userEvent }) => {
+    const trigger = canvas.getByRole("combobox");
+    await userEvent.click(trigger);
+    await waitFor(() => expect(isOpen(list(canvasElement))).toBe(true));
+    // Trailing text is in the row (the trigger shows the label only); a dimmed option is still choosable.
+    await expect(canvas.getByRole("option", { name: /Production/ })).toHaveTextContent("3 tabs");
+    await expect(trigger).not.toHaveTextContent("3 tabs");
+    const staging = canvas.getByRole("option", { name: /Staging/ });
+    await expect(staging).toHaveAttribute("data-dimmed");
+    await expect(staging).not.toHaveAttribute("aria-disabled");
+    // The footer is the last option: End, ArrowDown and PageDown reach it, and it never goes past it.
+    await userEvent.keyboard("{End}");
+    await expect(active(canvasElement)).toBe("Manage connections…");
+    // The list draws the action with its icon.
+    await expect(
+      canvas.getByRole("option", { name: "Manage connections…" }).querySelector("svg"),
+    ).not.toBeNull();
+    await userEvent.keyboard("{ArrowDown}");
+    await expect(active(canvasElement)).toBe("Manage connections…");
+    await userEvent.keyboard("{ArrowUp}");
+    await expect(active(canvasElement)).toMatch(/^Local/);
+    await userEvent.keyboard("{Home}{PageDown}");
+    await expect(active(canvasElement)).toBe("Manage connections…");
+    // Tab on the footer leaves without running it or changing the value.
+    await userEvent.keyboard("{Tab}");
+    await expect(manageConnections).not.toHaveBeenCalled();
+    await expect(isOpen(list(canvasElement))).toBe(false);
+    // Enter runs it: the list closes, the value stays and focus returns to the trigger.
+    trigger.focus();
+    await userEvent.keyboard("{ArrowUp}");
+    await expect(active(canvasElement)).toBe("Manage connections…");
+    await userEvent.keyboard("{Enter}");
+    await expect(manageConnections).toHaveBeenCalledTimes(1);
+    await expect(isOpen(list(canvasElement))).toBe(false);
+    await expect(trigger).toHaveTextContent("Production");
+    await expect(trigger).toHaveFocus();
+    // So does a press; choosing the dimmed option works.
+    await userEvent.click(trigger);
+    await userEvent.click(canvas.getByRole("option", { name: "Manage connections…" }));
+    await expect(manageConnections).toHaveBeenCalledTimes(2);
+    await expect(args.onChange).not.toHaveBeenCalled();
+    await userEvent.click(trigger);
+    await userEvent.click(canvas.getByRole("option", { name: /Staging/ }));
+    await expect(args.onChange).toHaveBeenLastCalledWith("staging");
   },
 };
 
@@ -476,5 +614,33 @@ export const OptionIconColourIsStableUnderHostileHost: Story = {
     await expect(rgb(chosen.hostile.color as string)).toEqual(
       token(canvasElement.querySelector(".cy-select") as Element, "--cy-color-danger"),
     );
+  },
+};
+
+export const SplitSettingsRow: Story = {
+  render: (args) => (
+    <div style={{ display: "grid", gap: 12, inlineSize: 560 }}>
+      <Select {...args} label="Theme" description="Light, dark or the system's." layout="split" width="md" />
+      <Select {...args} label="Language" layout="split" width="md" />
+    </div>
+  ),
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const theme = canvas.getByRole("combobox", { name: "Theme" });
+    const language = canvas.getByRole("combobox", { name: "Language" });
+    await expect(theme).toHaveAccessibleDescription("Light, dark or the system's.");
+    // At the end of the row, after the text, and lined up with the next row's control.
+    const label = canvas.getByText("Theme").getBoundingClientRect();
+    const box = theme.getBoundingClientRect();
+    const field = (canvasElement.querySelector(".cy-field") as Element).getBoundingClientRect();
+    await expect(box.left).toBeGreaterThan(label.right);
+    await expect(box.left).toBe(language.getBoundingClientRect().left);
+    await expect(box.width).toBe(language.getBoundingClientRect().width);
+    await expect(Math.round(box.right)).toBe(Math.round(field.right));
+    // It still opens from the keyboard.
+    theme.focus();
+    await userEvent.keyboard("{ArrowDown}");
+    await waitFor(() => expect(theme).toHaveAttribute("aria-expanded", "true"));
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() => expect(theme).toHaveAttribute("aria-expanded", "false"));
   },
 };

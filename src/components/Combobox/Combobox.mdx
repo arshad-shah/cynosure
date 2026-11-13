@@ -28,7 +28,7 @@ import { Combobox } from "@arshad-shah/cynosure";
 <Combobox label="Fruit" options={fruits} name="fruit" required />
 ```
 
-By default an option matches when its label contains the typed text, ignoring case. Pass `filter` to match your way.
+By default an option matches when its label contains the typed text, ignoring case. Pass `filter` to match your way. While people type, the text is marked where it appears in each label ([HighlightedText](?path=/docs/components-highlightedtext--docs)); options are still named by their whole label.
 
 ## Options from a server
 
@@ -50,6 +50,12 @@ const { data, isLoading } = useSearch(query);
 />
 ```
 
+## Trailing text, dimmed options and a footer action
+
+An option's `trailing` is drawn at the end of its row, smaller and muted (a shortcut, a count). `dimmed` draws an option muted while it stays choosable. `footer` pins an action under the options, `{ label, icon?, onSelect }`, whatever the text matches: it is the last stop of the arrow keys, and Enter or a press closes the list and runs it. Focus stays in the input and the value does not change.
+
+<Canvas of={Stories.TrailingDimmedAndAFooterAction} />
+
 ## Coloured icons
 
 `iconTone` and `iconColor` colour an option's icon and mean what [Icon](?path=/docs/foundations-icon--docs)'s `tone` and `color` mean: `iconTone` is a semantic colour (`accent`, `neutral`, `danger`, `success`, `warning`, `info`, `muted`), `iconColor` is any CSS colour and overrides it (`brand` draws a brand mark in its owner's colour). The active and the selected option keep the colour. A disabled option shows its icon without the colour, muted with the rest of the row. The input itself shows text only: `iconStart` is the field's own icon.
@@ -66,7 +72,7 @@ const { data, isLoading } = useSearch(query);
 | --- | --- |
 | Typing | Filters and opens the list; the first match is active |
 | <kbd>Down</kbd> / <kbd>Up</kbd> | Opens on the first / last option, then moves (disabled options are skipped) |
-| <kbd>Enter</kbd> | Chooses the active option (with `allowCustom` and no active option, keeps the text) |
+| <kbd>Enter</kbd> | Chooses the active option, or runs the active `footer` action (with `allowCustom` and no active option, keeps the text) |
 | <kbd>Escape</kbd> | Closes the list; pressed again, clears the text and the value |
 | <kbd>Tab</kbd> or a click elsewhere | Closes the list and settles the value |
 

@@ -1,21 +1,78 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useClientLayoutEffect } from "./client-layout-effect.js";
 
 /** True on Apple platforms, where `mod` means Command; elsewhere it means Control. */
 export const isApple = () =>
   typeof navigator !== "undefined" && /Mac|iPhone|iPad|iPod/.test(navigator.platform || navigator.userAgent);
 
-/** Parses "mod+shift+k" into a matcher for keyboard events. */
+/**
+ * `isApple()` as a hook, decided after hydration so the server and the first client render agree (false until then).
+ * Kbd, HotkeyField and Menu write shortcuts with it.
+ */
+export function useApple() {
+  const [apple, setApple] = useState(false);
+  useClientLayoutEffect(() => setApple(isApple()), []);
+  return apple;
+}
+
+/** The letter or digit printed on the physical key ("KeyK" is "k", "Digit1" is "1"), or "". */
+const codeKey = (code: string) => (/^(?:Key[A-Z]|Digit\d)$/.test(code) ? code.slice(-1).toLowerCase() : "");
+
+/**
+ * Parses "mod+shift+k" into a matcher for keyboard events. The key is compared with the character typed and, when
+ * that is not a letter or digit (Option+K types "˚" on macOS, Shift+1 types "!"), with the physical key. A "+" can be
+ * the key itself ("mod++").
+ */
 export function matchesHotkey(combo: string, event: KeyboardEvent): boolean {
-  const parts = combo.toLowerCase().split("+");
-  const key = parts.pop() ?? "";
+  const parts = combo.toLowerCase().split(/\+(?=.)/);
+  const last = parts.pop() ?? "";
+  const key = last === "space" ? " " : last;
   const want = new Set(parts.map((p) => (p === "mod" ? (isApple() ? "meta" : "ctrl") : p)));
+  const typed = event.key.toLowerCase();
+  const hit = typed === key || (!/^[a-z0-9]$/.test(typed) && codeKey(event.code ?? "") === key);
   return (
-    event.key.toLowerCase() === key &&
+    hit &&
     event.ctrlKey === want.has("ctrl") &&
     event.metaKey === want.has("meta") &&
     event.altKey === want.has("alt") &&
     event.shiftKey === want.has("shift")
   );
+}
+
+/** Keys that only modify another key, or lock a mode: a shortcut waits for the key that follows them. */
+const MODIFIER_KEYS =
+  /^(?:Control|Shift|Alt|AltGraph|Meta|OS|Hyper|Super|Fn|FnLock|CapsLock|NumLock|ScrollLock|Symbol|SymbolLock)$/;
+
+export interface HotkeyFromEventOptions {
+  /** Write for Apple platforms, where Command is `mod` and Control is `ctrl`. Default: this platform. */
+  apple?: boolean;
+  /** Accept keys without Control, Command or Alt ("k", "shift+/"). Function keys are always accepted. */
+  allowBare?: boolean;
+}
+
+/**
+ * The shortcut a key press makes, written as `useHotkey` reads it ("mod+shift+p"), or null when the press is not one
+ * yet: only modifiers held, a key with no name, or (without `allowBare`) a key that types rather than commands. The
+ * key is the character typed and, when that is not a letter or digit (Option+K types "˚", Shift+1 types "!", a dead
+ * key or another alphabet), the letter or digit printed on the physical key, so `matchesHotkey` matches it again.
+ */
+export function hotkeyFromEvent(event: KeyboardEvent, options: HotkeyFromEventOptions = {}): string | null {
+  const { apple = isApple(), allowBare = false } = options;
+  if (MODIFIER_KEYS.test(event.key)) return null;
+  const typed = event.key.toLowerCase();
+  let key = /^[a-z0-9]$/.test(typed) ? typed : codeKey(event.code) || typed;
+  if (key === " ") key = "space";
+  if (!key || key === "dead" || key === "unidentified") return null;
+  const command = event.ctrlKey || event.metaKey || event.altKey;
+  if (!command && !allowBare && !/^f\d{1,2}$/.test(key)) return null;
+  const mods = [
+    (apple ? event.metaKey : event.ctrlKey) && "mod",
+    apple && event.ctrlKey && "ctrl",
+    !apple && event.metaKey && "meta",
+    event.altKey && "alt",
+    event.shiftKey && "shift",
+  ].filter(Boolean);
+  return [...mods, key].join("+");
 }
 
 const editable = (el: Element) =>

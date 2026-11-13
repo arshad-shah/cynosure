@@ -5,7 +5,7 @@ import * as Stories from "./LoadingDots.stories";
 
 # LoadingDots
 
-Three dots that pulse in sequence, for short waits of unknown length. For a task with known progress, show the progress itself.
+Three dots that pulse in sequence, or a turning spinner, for short waits of unknown length. For a task with known progress, show the progress itself.
 
 <Canvas of={Stories.Default} />
 
@@ -38,14 +38,28 @@ By default the dots are decorative. Set `label` to give them `role="status"` and
 <Canvas of={Stories.Tones} />
 <Canvas of={Stories.InheritsColourAndSize} />
 
+## Spinner
+
+`variant="spinner"` draws the `loader` icon turning instead of the dots. It is one em square, so it sits where an icon would: a statement gutter, a tree row, a tool call's header, beside a button's text. It takes the same `size`, `tone`, `color`, `speed` and `label`.
+
+```tsx
+<Button>
+  <LoadingDots variant="spinner" /> Connecting
+</Button>
+```
+
+<Canvas of={Stories.Spinner} />
+<Canvas of={Stories.SpinnerSizesAndColour} />
+<Canvas of={Stories.SpinnerInButton} />
+
 ## Props
 
 <ArgTypes of={Stories} />
 
 ## Behaviour and accessibility
 
-- **Reduced motion:** with the OS setting or `createTheme({ motion: "reduced" })`, the dots stay still and fully visible.
-- **Without a label** the dots are `aria-hidden`.
+- **Reduced motion:** with the OS setting or `createTheme({ motion: "reduced" })`, the dots stay still and fully visible, and the spinner stops turning.
+- **Without a label** the dots or spinner are `aria-hidden`. The spinner's icon is always decorative; with a label the root is the status.
 
 ## Theming
 

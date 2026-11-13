@@ -107,6 +107,24 @@ function tsxRules(root: string, file: string, out: Violation[], fonts: Set<strin
       const intrinsic = /^[a-z]/.test(tag);
       if (!inFoundations && NATIVE.has(tag))
         push("native-elements", node, `<${tag}> outside src/foundations; use the Cynosure component`);
+      if (!inFoundations && intrinsic) {
+        const attrs = new Map(
+          node.attributes.properties
+            .filter(ts.isJsxAttribute)
+            .map((a) => [a.name.getText(source), a] as const),
+        );
+        const role = attrs.get("role")?.initializer;
+        const live =
+          attrs.has("aria-live") ||
+          (role !== undefined && ts.isStringLiteral(role) && /^(status|alert|log)$/.test(role.text));
+        const hidden = attrs.get("className");
+        if (live && hidden && staticClassText(hidden, source).split(/\s+/).includes("cy-visually-hidden"))
+          push(
+            "live-region",
+            node,
+            "hand-written hidden live region: render LiveRegion (src/foundations/LiveRegion) with useLiveMessage",
+          );
+      }
       for (const attr of node.attributes.properties) {
         if (!ts.isJsxAttribute(attr)) continue;
         const name = attr.name.getText(source);
@@ -279,7 +297,7 @@ const SHARED_CLASSES = new Set(["cy-reset", "cy-visually-hidden", "cy-motion-tri
  * Foundations a composite may build on, and which composites do. A foundation is the native element under a
  * component; a composite that needs that element uses the component (Button, Link, TextField…) unless it is a pattern
  * no component covers (a tab, a menu item, a whole-card link). Adding a user here is a review decision: say why in
- * src/foundations/AGENTS.md. Icon and HiddenValue are parts every component may use.
+ * src/foundations/AGENTS.md. Icon, HiddenValue and LiveRegion are parts every component may use.
  */
 export const FOUNDATION_USERS: Record<string, readonly string[]> = {
   ButtonBase: [
@@ -287,21 +305,23 @@ export const FOUNDATION_USERS: Record<string, readonly string[]> = {
     "Card",
     "ColorSwatches",
     "Disclosure",
+    "ListRow",
     "Menu",
+    "Menubar",
     "Select",
     "SideNav",
+    "SortButton",
     "Steps",
-    "Table",
     "Tabs",
   ],
-  LinkBase: ["Button", "Card", "Link", "SideNav"],
+  LinkBase: ["Button", "Card", "Link", "ListRow", "SideNav"],
   InputBase: ["CommandPalette", "TextField"],
   TextAreaBase: ["TextArea"],
   ChoiceBase: ["Checkbox", "RadioGroup", "SegmentedControl", "Switch"],
   DialogBase: ["CommandPalette", "Dialog"],
   FileInputBase: ["FileDrop", "KeyValueEditor"],
 };
-const FREE_FOUNDATIONS = new Set(["Icon", "HiddenValue"]);
+const FREE_FOUNDATIONS = new Set(["Icon", "HiddenValue", "LiveRegion"]);
 
 /** The class prefixes a component folder owns: its own name and every component it exports. */
 function ownPrefixes(folder: string): string[] {
@@ -443,6 +463,18 @@ export function check(root: string): Violation[] {
     if (isStory(file)) {
       // Touch stories only pass under the touch project's emulation; on the published Storybook they would fail.
       const text = readFileSync(file, "utf8");
+      // Emulated media features, the real pointer and real keys act on the whole page, which test files share in
+      // parallel frames: such a story file runs in the "serial" project (vitest.config.ts), one file at a time.
+      const pageWide = /\b(emulateMedia|realHover|pressKey)\(/.exec(text);
+      const metaStart = text.indexOf("const meta");
+      const meta = metaStart < 0 ? "" : text.slice(metaStart, text.indexOf("export default meta", metaStart));
+      if (pageWide && !/tags:\s*\[[^\]]*["']serial["']/.test(meta))
+        out.push({
+          rule: "serial-stories",
+          file: rel,
+          line: lineOf(text, pageWide.index),
+          message: `${pageWide[1]} acts on the whole page: tag the file's meta "serial" so it runs one file at a time`,
+        });
       for (const m of text.matchAll(/tags:\s*\[([^\]]*)\]/g))
         if (/["']touch["']/.test(m[1] ?? "") && !/["']!dev["']/.test(m[1] ?? ""))
           out.push({

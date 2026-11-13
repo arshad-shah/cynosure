@@ -1,0 +1,149 @@
+/* status-bar: the bar, its two clusters and its segments. Every visual value reads a --cy-status-bar-* token with a
+   global fallback. Clickable segments are Buttons: their look is set through --cy-button-* tokens on our own class. */
+.cy-status-bar-start,
+.cy-status-bar-end {
+  display: flex;
+  align-items: stretch;
+  gap: var(--cy-status-bar-gap, var(--cy-space-1));
+  min-inline-size: 0;
+}
+
+/* Tooltip's anchor around each segment: it fills the bar's height and may shrink. */
+.cy-status-bar-item {
+  align-self: stretch;
+  min-inline-size: 0;
+}
+
+.cy-status-bar-segment-content {
+  display: flex;
+  align-items: center;
+  gap: var(--cy-space-3);
+  min-inline-size: 0;
+  max-inline-size: 100%;
+}
+.cy-status-bar-segment-dot {
+  display: inline-flex;
+  flex: none;
+}
+/* Sets its own font (mono, line height), so it declares the reset properties instead of carrying .cy-reset. */
+.cy-status-bar-segment-text.cy-status-bar-segment-text {
+  box-sizing: border-box !important;
+  display: block;
+  margin: 0;
+  min-inline-size: 0;
+  overflow: hidden;
+  color: inherit;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  letter-spacing: normal;
+  text-transform: none;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  /* The text clips, so its box must hold the font's whole ascent and descent. */
+  line-height: normal;
+  &[data-mono] {
+    font-family: var(--cy-font-mono);
+  }
+}
+
+/* A clickable segment: a Button of size xs, flat and as tall as the bar. */
+.cy-status-bar-button {
+  --cy-button-height-xs: 100%;
+  --cy-button-radius: 0;
+  --cy-button-padding-inline-xs: var(--cy-status-bar-padding-inline, var(--cy-space-4));
+  --cy-button-font-size-xs: var(--cy-status-bar-font-size, var(--cy-font-size-xs));
+  --cy-button-font-weight: var(--cy-font-weight-regular);
+  --cy-button-max-width: var(--cy-status-bar-segment-max-width, 32ch);
+  --cy-button-soft-mix: var(--cy-status-bar-soft-mix, 14%);
+  --cy-button-solid-shadow: none;
+  --cy-button-press-scale: 1;
+}
+
+/* Root selector doubled so host type/attribute rules never win. */
+.cy-status-bar.cy-status-bar {
+  box-sizing: border-box !important;
+  margin: 0;
+  letter-spacing: normal;
+  text-transform: none;
+  display: flex;
+  align-items: stretch;
+  /* Start cluster at the start edge, end cluster at the end edge. */
+  justify-content: space-between;
+  gap: var(--cy-status-bar-gap, var(--cy-space-1));
+  block-size: var(--cy-status-bar-height, calc(var(--cy-space-8) + var(--cy-space-2)));
+  min-inline-size: 0;
+  padding: 0;
+  border: 0;
+  border-block-start: var(--cy-border-width) solid var(--cy-status-bar-border, var(--cy-color-line));
+  background: var(--cy-status-bar-background, var(--cy-color-surface));
+  color: var(--cy-color-ink);
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-status-bar-font-size, var(--cy-font-size-xs));
+  font-weight: var(--cy-font-weight-regular);
+  line-height: 1;
+  white-space: nowrap;
+  user-select: none;
+}
+
+/* A segment that only shows status. */
+.cy-status-bar-segment.cy-status-bar-segment {
+  --_tone: var(--cy-color-ink);
+  --_tone-text: var(--cy-color-ink);
+  --_on: var(--cy-color-bg);
+  box-sizing: border-box !important;
+  margin: 0;
+  letter-spacing: normal;
+  text-transform: none;
+  display: flex;
+  align-items: center;
+  block-size: 100%;
+  min-inline-size: 0;
+  max-inline-size: var(--cy-status-bar-segment-max-width, 32ch);
+  padding: 0 var(--cy-status-bar-padding-inline, var(--cy-space-4));
+  background: transparent;
+  color: var(--_tone-text);
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-status-bar-font-size, var(--cy-font-size-xs));
+  font-weight: var(--cy-font-weight-regular);
+  line-height: 1;
+  &[data-tone="accent"] {
+    --_tone: var(--cy-color-accent);
+    --_tone-text: var(--cy-color-accent-text);
+    --_on: var(--cy-color-on-accent);
+  }
+  &[data-tone="danger"] {
+    --_tone: var(--cy-color-danger);
+    --_tone-text: var(--cy-color-danger-text);
+    --_on: var(--cy-color-on-danger);
+  }
+  &[data-tone="success"] {
+    --_tone: var(--cy-color-success);
+    --_tone-text: var(--cy-color-success-text);
+    --_on: var(--cy-color-on-success);
+  }
+  &[data-tone="warning"] {
+    --_tone: var(--cy-color-warning);
+    --_tone-text: var(--cy-color-warning-text);
+    --_on: var(--cy-color-on-warning);
+  }
+  &[data-tone="info"] {
+    --_tone: var(--cy-color-info);
+    --_tone-text: var(--cy-color-info-text);
+    --_on: var(--cy-color-on-info);
+  }
+  /* The same tint and fill as a clickable segment (a Button, given the same mix above), so the two sit side by side. */
+  &[data-variant="soft"] {
+    background: color-mix(in oklab, var(--_tone) var(--cy-status-bar-soft-mix, 14%), var(--cy-color-surface));
+  }
+  &[data-variant="solid"] {
+    background: var(--_tone);
+    color: var(--_on);
+  }
+}
+
+@media (forced-colors: active) {
+  .cy-status-bar.cy-status-bar {
+    border-block-start-color: CanvasText;
+  }
+}

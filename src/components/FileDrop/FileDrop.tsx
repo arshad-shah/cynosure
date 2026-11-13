@@ -1,10 +1,14 @@
 import { type CSSProperties, type ReactNode, useEffect, useId, useRef, useState } from "react";
 import { FileInputBase, setInputFiles } from "../../foundations/FileInputBase/FileInputBase.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
+import { LiveRegion, useLiveMessage } from "../../foundations/LiveRegion/LiveRegion.js";
+import { close } from "../../icons/close.js";
+import { file as fileIcon } from "../../icons/file.js";
 import { upload } from "../../icons/upload.js";
 import { usePopover } from "../../overlay/floating.js";
 import type { Size } from "../../tokens/schema.js";
 import { Button } from "../Button/Button.js";
+import { IconButton } from "../IconButton/IconButton.js";
 
 export interface FileDropTokens {
   /** Corner radius of the drop zone. */
@@ -13,6 +17,8 @@ export interface FileDropTokens {
   activeBackground: string;
   /** Behind the whole-window overlay (`target="window"`). */
   overlayBackground: string;
+  /** Background of a chosen file's row (`value`). */
+  fileBackground: string;
 }
 
 declare module "../../tokens/schema.js" {
@@ -35,11 +41,34 @@ export interface FileDropLabels {
   added: (count: number) => string;
   /** Why a file was turned away. */
   rejected: (rejection: FileRejection) => string;
+  /** Name of the list of chosen files (`value`). Default: "Chosen files". */
+  files: string;
+  /** A chosen file's remove button. Default: "Remove report.pdf". */
+  remove: (name: string) => string;
+  /** Announced after a chosen file is removed. Default: "report.pdf removed". */
+  removed: (name: string) => string;
 }
 
 export interface FileDropProps {
   /** Called with the files that passed the checks. */
   onFiles?: (files: File[]) => void;
+  /**
+   * Replaces the browser's file dialog with your picker (Electron's `dialog.showOpenDialog` over IPC), as PathField's
+   * `onPick`: the button calls it and is busy until it settles. It resolves with what was chosen, or null when it was
+   * cancelled; a cancel or a failure (the promise rejects) changes nothing. Chosen files are checked as dropped ones
+   * are and arrive in `onFiles`, chosen paths in `onPaths`. Dropped files still arrive in `onFiles`.
+   */
+  onPick?: (() => Promise<readonly (File | string)[] | null>) | undefined;
+  /** Called with the paths `onPick` chose (strings, as your picker gave them); put them in `value` to list them. */
+  onPaths?: ((paths: string[]) => void) | undefined;
+  /**
+   * The chosen files or paths, listed in the zone by name (a File's `name`, a path as given), each with a remove
+   * button when `onRemove` is set. Controlled: add to it from `onFiles` or your own picker. Display only: the native
+   * input (and so a form) holds only files picked or dropped here.
+   */
+  value?: readonly (File | string)[] | undefined;
+  /** Called with a chosen item and its index when its remove button is pressed; take it out of `value`. */
+  onRemove?: ((item: File | string, index: number) => void) | undefined;
   /** Called with the files that did not, and why (they are also listed in the zone). */
   onReject?: (rejections: FileRejection[]) => void;
   /** File types, as for `<input accept>`: ".pdf,image/*". */
@@ -84,7 +113,13 @@ const DEFAULT_LABELS: FileDropLabels = {
   added: (n) => `${plural(n, "file", "files")} added`,
   rejected: ({ file, reason }) =>
     `${file.name}: ${reason === "type" ? "this type of file is not accepted" : reason === "size" ? "too large" : "too many files"}`,
+  files: "Chosen files",
+  remove: (name) => `Remove ${name}`,
+  removed: (name) => `${name} removed`,
 };
+
+/** What a chosen item is called: a File's name, or a path as given. */
+const nameOf = (item: File | string) => (typeof item === "string" ? item : item.name);
 
 /** Whether `file` matches an `accept` list (extensions, exact MIME types and `type/*` wildcards), as browsers do. */
 export function acceptsFile(file: File, accept: string | undefined): boolean {
@@ -106,6 +141,10 @@ export function acceptsFile(file: File, accept: string | undefined): boolean {
  */
 export function FileDrop({
   onFiles,
+  onPick,
+  onPaths,
+  value,
+  onRemove,
   onReject,
   accept,
   multiple = false,
@@ -127,8 +166,21 @@ export function FileDrop({
   const input = useRef<HTMLInputElement>(null);
   const depth = useRef(0);
   const [over, setOver] = useState(false);
-  const [status, setStatus] = useState("");
+  const [status, setStatus] = useLiveMessage();
   const [problems, setProblems] = useState<string[]>([]);
+  const chooser = useRef<HTMLButtonElement>(null);
+  const chosen = useRef<HTMLUListElement>(null);
+  // After a remove, the index whose button takes focus once `value` has changed.
+  const refocus = useRef<number | null>(null);
+  const items = value ?? [];
+  const count = items.length;
+  useEffect(() => {
+    const at = refocus.current;
+    if (at === null) return;
+    refocus.current = null;
+    const buttons = chosen.current?.querySelectorAll<HTMLButtonElement>("button") ?? [];
+    (buttons[Math.min(at, buttons.length - 1)] ?? (chooser.current as HTMLButtonElement)).focus();
+  }, [count]);
 
   const take = (files: File[], fromDrop: boolean) => {
     const accepted: File[] = [];
@@ -146,6 +198,27 @@ export function FileDrop({
     setStatus(accepted.length ? text.added(accepted.length) : "");
     if (accepted.length) onFiles?.(accepted);
     if (rejected.length) onReject?.(rejected);
+    return accepted.length;
+  };
+
+  const [picking, setPicking] = useState(false);
+  const pick = (picker: NonNullable<FileDropProps["onPick"]>) => {
+    setPicking(true);
+    // A picker that fails changes nothing: the button stops being busy.
+    picker()
+      .then(
+        (items) => {
+          if (!items) return;
+          const files = items.filter((item): item is File => typeof item !== "string");
+          const paths = items.filter((item): item is string => typeof item === "string");
+          const added = files.length ? take(files, true) : 0;
+          if (!paths.length) return;
+          onPaths?.(paths);
+          setStatus(text.added(added + paths.length));
+        },
+        () => {},
+      )
+      .finally(() => setPicking(false));
   };
 
   const dragging = (event: { dataTransfer: DataTransfer | null }) =>
@@ -235,12 +308,14 @@ export function FileDrop({
         {over ? text.dragging : text.prompt}
       </span>
       <Button
+        ref={chooser}
         variant="outline"
         tone="neutral"
         size={size}
         disabled={disabled}
+        loading={picking}
         aria-describedby={hint ? `${id}-hint` : undefined}
-        onClick={() => input.current?.click()}
+        onClick={() => (onPick ? pick(onPick) : input.current?.click())}
       >
         {multiple ? text.choose : text.chooseOne}
       </Button>
@@ -248,6 +323,32 @@ export function FileDrop({
         <span className="cy-file-drop-hint cy-reset" id={`${id}-hint`}>
           {hint}
         </span>
+      )}
+      {count > 0 && (
+        <ul ref={chosen} className="cy-file-drop-files cy-reset" aria-label={text.files}>
+          {items.map((item, index) => (
+            <li key={`${nameOf(item)}-${index}`} className="cy-file-drop-file cy-reset">
+              <Icon icon={fileIcon} size="sm" className="cy-file-drop-file-icon" />
+              <span className="cy-file-drop-file-name cy-reset">
+                {/* Isolated, so a path reads left to right in right-to-left text, still at the row's start. */}
+                <bdi>{nameOf(item)}</bdi>
+              </span>
+              {onRemove && !disabled && (
+                <IconButton
+                  icon={close}
+                  label={text.remove(nameOf(item))}
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    refocus.current = index;
+                    setStatus(text.removed(nameOf(item)));
+                    onRemove(item, index);
+                  }}
+                />
+              )}
+            </li>
+          ))}
+        </ul>
       )}
       <div className="cy-file-drop-alert cy-reset" role="alert">
         {problems.length > 0 && (
@@ -260,9 +361,7 @@ export function FileDrop({
           </ul>
         )}
       </div>
-      <span className="cy-file-drop-status cy-reset cy-visually-hidden" role="status">
-        {status}
-      </span>
+      <LiveRegion {...status} className="cy-file-drop-status cy-reset" />
       {whole && (
         <div
           ref={overlay}

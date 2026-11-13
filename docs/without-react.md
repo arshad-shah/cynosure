@@ -30,6 +30,8 @@ const css = themeToCss(createTheme({ accent: "#2f66b0", scale: "compact" }));
 // write `css` to a file, or inline it in a <style> in the page head
 ```
 
+The same entry has the named-theme helpers (`defineTheme`, `createThemeRegistry`), `resolveColors(theme, palette)` for a canvas or chart that needs concrete colours, and the editor and chart theme builders (`monacoTheme`, `textMateTheme`, `swiftChartTheme`); see [Theming](theming.md).
+
 With Vite (Astro uses Vite too), the adapter does this for you: see `docs/adapters.md`.
 
 ## Light and dark without a flash

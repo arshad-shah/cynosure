@@ -47,13 +47,27 @@ Cynosure bundles no highlighter. Pass `highlight`, a function from the code and 
 
 <Canvas of={Stories.Wrapped} />
 
+## Actions
+
+`actions` puts your own buttons in the header, before the copy button: "Insert into editor", "Run". Use `Button` or `IconButton` at `size="sm"`. They keep their size when the block is narrow (the title gives way) and come before the copy button in the tab order. With `copyable={false}` and no title the header still shows, holding the actions.
+
+```tsx
+<CodeBlock
+  code={sql}
+  language="sql"
+  actions={<Button size="sm" variant="ghost" icon={plus} onClick={insert}>Insert into editor</Button>}
+/>
+```
+
+<Canvas of={Stories.ActionsBesideTheCopyButton} />
+
 ## Props
 
 <ArgTypes of={Stories} />
 
 ## Behaviour and accessibility
 
-- **Structure:** a figure named by its `title` (or `language`). The copy button follows the title in the header.
+- **Structure:** a figure named by its `title` (or `language`). Your `actions`, then the copy button, follow the title in the header; Tab reaches them in that order, then the code region.
 - **Scrolling:** code that scrolls sideways is a focusable region named like the block, so keyboard users can Tab to it and scroll with the arrow keys. Tall code scrolls inside the block, line numbers with it.
 - **Copy:** the button copies `code` and announces "Copied"; pass `copy` to copy through an extension's own channel.
 - **Contrast:** code, line numbers and the title keep 4.5:1 in light and dark modes (your highlighter's colours are yours to check).

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useEffect, useState } from "react";
 import { expect, fn, waitFor } from "storybook/test";
-import { flag, heart, tag } from "../../icons/index.js";
+import { flag, heart, plus, tag } from "../../icons/index.js";
 import { backdrop, contrast, rgb } from "../../test/color.js";
 import { computeUnderHostileHost } from "../../test/hostile.js";
 import { shownFully } from "../../test/settle.js";
@@ -43,6 +43,22 @@ const activeOption = (input: HTMLElement) => {
   return id ? document.getElementById(id) : null;
 };
 
+export const TheListDropsFromTheWholeField: Story = {
+  args: { iconStart: tag },
+  play: async ({ canvas, userEvent }) => {
+    const input = canvas.getByRole("combobox", { name: "Fruit" });
+    await userEvent.click(input);
+    await waitFor(() => expect(isOpen()).toBe(true));
+    await shownFully(listbox());
+    // Anchored to TextField's box (icon included), not the bare input: as wide, and starting at its edge.
+    const box = (input.parentElement as HTMLElement).getBoundingClientRect();
+    const list = listbox().getBoundingClientRect();
+    await expect(box.width).toBeGreaterThan(input.getBoundingClientRect().width);
+    await expect(list.width).toBeGreaterThanOrEqual(box.width - 1);
+    await expect(Math.abs(list.left - box.left)).toBeLessThan(2);
+  },
+};
+
 export const TypeToFilterThenChooseWithEnter: Story = {
   play: async ({ args, canvas, userEvent }) => {
     const input = canvas.getByRole("combobox", { name: "Fruit" });
@@ -64,6 +80,81 @@ export const TypeToFilterThenChooseWithEnter: Story = {
     await waitFor(() => expect(isOpen()).toBe(false));
     await expect(input).not.toHaveAttribute("aria-activedescendant");
     await expect(input).toHaveFocus();
+  },
+};
+
+const newConnection = fn();
+
+export const TrailingDimmedAndAFooterAction: Story = {
+  tags: ["visual"],
+  args: {
+    label: "Connection",
+    options: [
+      { value: "prod", label: "Production", trailing: "3 tabs" },
+      { value: "staging", label: "Staging", dimmed: true },
+      { value: "local", label: "Local" },
+    ],
+    footer: { label: "New connection", icon: plus, onSelect: newConnection },
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    const input = canvas.getByRole("combobox", { name: "Connection" });
+    await userEvent.click(input);
+    await waitFor(() => expect(isOpen()).toBe(true));
+    await expect(canvas.getByRole("option", { name: /Production/ })).toHaveTextContent("3 tabs");
+    await expect(canvas.getByRole("option", { name: /Staging/ })).toHaveAttribute("data-dimmed");
+    // The footer is the arrow keys' last stop, after the last option, and they never go past it.
+    await expect(activeOption(input)).toHaveTextContent("Production");
+    await userEvent.keyboard("{ArrowDown}{ArrowDown}{ArrowDown}");
+    await expect(activeOption(input)).toHaveTextContent("New connection");
+    await userEvent.keyboard("{ArrowDown}");
+    await expect(activeOption(input)).toHaveTextContent("New connection");
+    await userEvent.keyboard("{ArrowUp}");
+    await expect(activeOption(input)).toHaveTextContent("Local");
+    // It stays when nothing matches the text, still reachable.
+    await userEvent.keyboard("zz");
+    await expect(canvas.getByRole("option", { name: "No matches" })).toBeVisible();
+    await userEvent.keyboard("{ArrowDown}");
+    await expect(activeOption(input)).toHaveTextContent("New connection");
+    // Enter runs it: the list closes, focus stays, the value does not change.
+    await userEvent.keyboard("{Enter}");
+    await expect(newConnection).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(isOpen()).toBe(false));
+    await expect(input).toHaveFocus();
+    await expect(args.onChange).not.toHaveBeenCalled();
+    // A press runs it too; a dimmed option is still chosen like any other.
+    await userEvent.clear(input);
+    await waitFor(() => expect(isOpen()).toBe(true));
+    await userEvent.click(canvas.getByRole("option", { name: "New connection" }));
+    await expect(newConnection).toHaveBeenCalledTimes(2);
+    await waitFor(() => expect(isOpen()).toBe(false));
+    await userEvent.keyboard("{ArrowDown}");
+    await userEvent.click(canvas.getByRole("option", { name: /Staging/ }));
+    await expect(args.onChange).toHaveBeenLastCalledWith("staging");
+  },
+};
+
+export const TypedTextIsMarkedInTheOptions: Story = {
+  play: async ({ canvas, userEvent }) => {
+    const input = canvas.getByRole("combobox", { name: "Fruit" });
+    const marks = () =>
+      [...listbox().querySelectorAll('[role="option"]')].map((o) =>
+        [...o.querySelectorAll("mark")].map((m) => m.textContent),
+      );
+    // Opened without typing: the whole list, nothing marked.
+    await userEvent.click(input);
+    await waitFor(() => expect(isOpen()).toBe(true));
+    await expect(marks().flat()).toEqual([]);
+    // Typing marks where the text appears in each label, ignoring case; spaces around it are not marked.
+    await userEvent.keyboard(" AP");
+    await expect(marks()).toEqual([["Ap"], ["Ap"], ["ap"]]);
+    // Options are still named by their whole label (and description).
+    await expect(canvas.getByRole("option", { name: "Apple" })).toBeInTheDocument();
+    await expect(canvas.getByRole("option", { name: /^Grape/ })).toBeInTheDocument();
+    // After a choice the list shows everything again, unmarked.
+    await userEvent.keyboard("{Enter}");
+    await userEvent.keyboard("{ArrowDown}");
+    await waitFor(() => expect(isOpen()).toBe(true));
+    await expect(marks().flat()).toEqual([]);
   },
 };
 
@@ -143,6 +234,77 @@ export const AllowCustomAcceptsNewText: Story = {
     await userEvent.keyboard("research{Enter}");
     await expect(args.onChange).toHaveBeenLastCalledWith("research");
     await expect(input).toHaveValue("research");
+  },
+};
+
+export const AllowCustomKeepsTheChosenOptionsValue: Story = {
+  args: {
+    allowCustom: true,
+    label: "Owner",
+    name: "owner",
+    options: [
+      { value: "u-1", label: "Ada Lovelace" },
+      { value: "u-2", label: "Grace Hopper" },
+    ],
+  },
+  render: (args) => (
+    <form data-testid="form">
+      <Combobox {...args} />
+      <Button>After</Button>
+    </form>
+  ),
+  play: async ({ args, canvas, userEvent }) => {
+    const form = canvas.getByTestId("form") as HTMLFormElement;
+    const input = canvas.getByRole("combobox", { name: "Owner" });
+    await userEvent.click(input);
+    await userEvent.keyboard("gra{Enter}");
+    await expect(args.onChange).toHaveBeenLastCalledWith("u-2");
+    // Leaving the field keeps the option's value, not the label it shows.
+    await userEvent.tab();
+    await expect(canvas.getByRole("button", { name: "After" })).toHaveFocus();
+    await expect(args.onChange).toHaveBeenLastCalledWith("u-2");
+    await expect(new FormData(form).get("owner")).toBe("u-2");
+    // Typing an option's exact label also means that option; other text stays custom.
+    await userEvent.clear(input);
+    await userEvent.keyboard("Ada Lovelace");
+    await userEvent.tab();
+    await expect(new FormData(form).get("owner")).toBe("u-1");
+    await userEvent.clear(input);
+    await userEvent.keyboard("Alan Turing");
+    await userEvent.tab();
+    await expect(new FormData(form).get("owner")).toBe("Alan Turing");
+  },
+};
+
+/** Options that load after the field mounts, with a value already chosen. */
+function LateOptions({ onChange }: { onChange: (v: string) => void }) {
+  const [options, setOptions] = useState<ComboboxOption[]>([]);
+  useEffect(() => {
+    const t = setTimeout(() => setOptions(fruits), 200);
+    return () => clearTimeout(t);
+  }, []);
+  return (
+    <form data-testid="form">
+      <Combobox label="Fruit" name="fruit" options={options} defaultValue="banana" onChange={onChange} />
+      <Button>After</Button>
+    </form>
+  );
+}
+
+export const OptionsArrivingLateShowTheChosenLabel: Story = {
+  render: (args) => <LateOptions onChange={args.onChange as (v: string) => void} />,
+  play: async ({ args, canvas, userEvent }) => {
+    const form = canvas.getByTestId("form") as HTMLFormElement;
+    const input = canvas.getByRole("combobox", { name: "Fruit" });
+    // Focus and leave before the options arrive: the value is not cleared.
+    input.focus();
+    await userEvent.tab();
+    await expect(new FormData(form).get("fruit")).toBe("banana");
+    await waitFor(() => expect(input).toHaveValue("Banana"));
+    await userEvent.click(input);
+    await userEvent.tab();
+    await expect(new FormData(form).get("fruit")).toBe("banana");
+    await expect(args.onChange).not.toHaveBeenCalled();
   },
 };
 

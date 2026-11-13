@@ -31,6 +31,19 @@ import { Button, Notice } from "@arshad-shah/cynosure";
 
 Without `onDismiss`, the close button hides the Notice by itself. With `onDismiss`, you decide: remove it from your state to hide it.
 
+## Solid and small
+
+`variant="solid"` paints the tone's solid colour with the text colour made for it, for a message that must stand out, such as an error banner over an editor. `size="sm"` tightens the padding and runs the title and message on as one line when they fit, for a status strip.
+
+<Canvas of={Stories.SolidReadableInEveryToneAndMode} />
+<Canvas of={Stories.SmallSitsOnOneLineWhenItFits} />
+
+```tsx
+<Notice tone="danger" variant="solid" size="sm" title="Query failed">
+  relation "users" does not exist
+</Notice>
+```
+
 ## Narrow containers
 
 The Notice measures its own width. Below 26rem the actions move under the text, so it fits side panels and extension popups.
@@ -50,7 +63,7 @@ The Notice measures its own width. Below 26rem the actions move under the text, 
 - **Role:** `role="alert"` for `tone="danger"`, which screen readers announce even when it appears already filled. Every other tone is `role="status"`: changes to its content are announced politely, but a status Notice that mounts with its text already in it is usually only read in place.
 - **To announce a non-danger message** that appears later, keep the Notice mounted and change its content, or use a [Toast](?path=/docs/components-toast--docs), which is built to be announced once.
 - **Icon:** decorative; the tone is also carried by the words.
-- **Contrast:** title and body are at least 4.5:1 in every tone, in light and dark modes.
+- **Contrast:** title and body are at least 4.5:1 in every tone and both variants, in light and dark modes. On a fill the tone icon and the close icon are at least 3:1.
 
 ## Touch
 
@@ -58,7 +71,7 @@ The close button keeps a 44px hit area on coarse pointers.
 
 ## Theming
 
-Tokens: `--cy-notice-radius`, `--cy-notice-padding` and `--cy-notice-soft-mix` (how strongly the tone tints the background).
+Tokens: `--cy-notice-radius`, `--cy-notice-padding`, `--cy-notice-padding-sm` (the padding of `size="sm"`) and `--cy-notice-soft-mix` (how strongly the tone tints the background).
 
 ```ts
 createTheme({ components: { notice: { radius: "8px", softMix: "14%" } } });

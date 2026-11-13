@@ -3,8 +3,10 @@ import {
   CynosureThemeError,
   contrastRatio,
   mix,
+  oklchToRgb,
   parseColor,
   readableOn,
+  rgbToOklch,
   shiftLightness,
   toHex,
 } from "./color.js";
@@ -40,7 +42,7 @@ function buildGlobal(input: ThemeInput): GlobalTokens {
   const scale = scaleOf(input.scale);
   const g = structuredClone(BASE_GLOBAL);
   const px = (n: number) => Math.round(n * scale * 100) / 100;
-  for (const k of ["sm", "md", "lg"] as const) g.control.height[k] = px(g.control.height[k]);
+  for (const k of ["xs", "sm", "md", "lg"] as const) g.control.height[k] = px(g.control.height[k]);
   for (const k of Object.keys(g.space) as (keyof typeof g.space)[]) g.space[k] = px(g.space[k]);
   for (const k of Object.keys(g.font.size) as (keyof typeof g.font.size)[])
     g.font.size[k] = px(g.font.size[k]);
@@ -84,11 +86,22 @@ function accentRoles(
     accent: hex,
     accentHover: best.hover,
     accentActive: best.active,
-    accentSoft: `color-mix(in oklab, ${hex} 18%, ${surface})`,
+    ...accentMixCss(hex, surface),
     onAccent: best.on,
-    ring: `color-mix(in oklab, ${hex} 28%, transparent)`,
   };
 }
+
+/** How much accent (in percent) the soft tint takes over the surface and the focus ring over transparency. */
+export const ACCENT_MIX = { accentSoft: 18, ring: 28 } as const;
+
+/**
+ * The accent's two mixed colours as CSS (`color-mix()`, which the stylesheet resolves). `resolveColors` works out the
+ * same colours as hex from `ACCENT_MIX`, and recognises these values by building them again, never by parsing them.
+ */
+export const accentMixCss = (accent: string, surface: string): Pick<ColorTokens, "accentSoft" | "ring"> => ({
+  accentSoft: `color-mix(in oklab, ${accent} ${ACCENT_MIX.accentSoft}%, ${surface})`,
+  ring: `color-mix(in oklab, ${accent} ${ACCENT_MIX.ring}%, transparent)`,
+});
 
 type SyntaxKey = Extract<keyof ColorTokens, `syntax${string}`>;
 const SYNTAX_KEYS = [
@@ -130,6 +143,25 @@ function syntaxColors(p: ColorTokens, dark: boolean, ratio: number): Pick<ColorT
   >;
 }
 
+/** Hue turns from the accent: neighbouring series sit far apart on the wheel. */
+const SERIES_TURNS = [0, 180, 90, 270, 45, 225, 135, 315];
+
+/** Eight series colours: the accent, then hues turned from it, each moved until it reads 3:1 on the page's fills. */
+function seriesColors(
+  p: Pick<ColorTokens, "accent" | "bg" | "surface" | "surfaceRaised">,
+  dark: boolean,
+): string[] {
+  const hue = rgbToOklch(parseColor(p.accent))[2];
+  return SERIES_TURNS.map((turn, i) =>
+    readableOn(
+      i ? toHex(oklchToRgb((dark ? 0.7 : 0.5) + (i % 2) * (dark ? 0.1 : 0.12), 0.15, hue + turn)) : p.accent,
+      [p.bg, p.surface, p.surfaceRaised],
+      dark,
+      3,
+    ),
+  );
+}
+
 /** Raises contrast of a palette: ink to the extreme, muted until ≥ 7:1 against bg, lines from muted, code to 7:1. */
 function contrastPalette(p: ColorTokens, dark: boolean): ColorTokens {
   const step = dark ? 0.02 : -0.02;
@@ -168,13 +200,17 @@ function assertSafe(node: unknown, path: string): void {
     }
 }
 
+const hex = (c: unknown) => toHex(parseColor(String(c)));
+
 /** Checks a palette patch's names and parses its colours. */
 function cleanPatch(patch: Partial<ColorTokens> | undefined): Partial<ColorTokens> {
   const clean: Partial<ColorTokens> = {};
-  for (const [k, v] of Object.entries(patch ?? {}) as [keyof ColorTokens, string][]) {
+  for (const [k, v] of Object.entries(patch ?? {})) {
     if (!(k in BASE_PALETTES.light) && !DERIVED.has(k))
       throw new CynosureThemeError(`Cynosure palettes have no colour named "${k}".`);
-    clean[k] = toHex(parseColor(v));
+    if (k !== "seriesColors") clean[k as "bg"] = hex(v);
+    else if (Array.isArray(v) && v.length === 8) clean.seriesColors = v.map(hex);
+    else throw new CynosureThemeError("Cynosure seriesColors must be eight colours.");
   }
   return clean;
 }
@@ -196,6 +232,7 @@ const DERIVED = new Set<string>([
   "successText",
   "warningText",
   "infoText",
+  "seriesColors",
   ...SYNTAX_KEYS,
 ]);
 
@@ -228,6 +265,7 @@ function derivePalette(
     successText: text(b.success),
     warningText: text(b.warning),
     infoText: text(b.info),
+    seriesColors: seriesColors({ ...b, accent: roles.accent }, dark),
     ...explicit,
   } as Omit<ColorTokens, SyntaxKey> as ColorTokens;
   return code ? { ...colors, ...syntaxColors(colors, dark, 4.5), ...explicit } : colors;
@@ -256,6 +294,14 @@ export function createTheme(input: ThemeInput = {}): Theme {
     "light-contrast": contrast(light, false, "light-contrast"),
     "dark-contrast": contrast(dark, true, "dark-contrast"),
   };
+  const { mode } = input;
+  if (mode) {
+    if (mode !== "light" && mode !== "dark")
+      throw new CynosureThemeError(`Cynosure has no mode named "${mode}".`);
+    // A fixed-mode theme shows its own mode's palettes in both modes, so the colour-mode switch has nothing to flip.
+    palettes.light = palettes.dark = palettes[mode];
+    palettes["light-contrast"] = palettes["dark-contrast"] = palettes[`${mode}-contrast`];
+  }
   const components: Record<string, Record<string, string>> = {};
   for (const [name, tokens] of Object.entries(input.components ?? {})) {
     if (!tokens) continue;
@@ -269,7 +315,7 @@ export function createTheme(input: ThemeInput = {}): Theme {
     }
     components[name] = clean;
   }
-  const theme: Theme = { global: buildGlobal(input), palettes, components };
+  const theme: Theme = { global: buildGlobal(input), palettes, components, ...(mode && { mode }) };
   assertSafe(theme, "theme");
   return theme;
 }

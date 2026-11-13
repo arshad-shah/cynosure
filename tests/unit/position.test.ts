@@ -70,4 +70,20 @@ describe("computePosition alignment", () => {
         .x,
     ).toBe(420 - 320);
   });
+  it("lines side placements up with the anchor's top edge when flush (submenus)", () => {
+    const sub = { width: 200, height: 120 };
+    expect(computePosition(rect(200, 100, 180, 32), sub, viewport, "end", 4, "ltr", "flush")).toEqual({
+      x: 384,
+      y: 100,
+      placement: "end",
+    });
+    // Flush top/bottom placements align like "start".
+    expect(computePosition(rect(200, 100, 220), sub, viewport, "bottom", 4, "rtl", "flush").x).toBe(
+      420 - 200,
+    );
+    // Still kept inside the viewport.
+    expect(computePosition(rect(200, 560, 180, 32), sub, viewport, "end", 4, "ltr", "flush").y).toBe(
+      600 - 120 - 8,
+    );
+  });
 });

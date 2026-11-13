@@ -20,7 +20,11 @@ const meta = {
   },
   argTypes: {
     orientation: { control: "inline-radio", options: ["horizontal", "vertical"] },
+    unit: { control: "inline-radio", options: ["percent", "px"] },
+    anchor: { control: "inline-radio", options: ["start", "end"] },
     collapsible: { control: "boolean" },
+    collapsed: { control: "boolean" },
+    defaultCollapsed: { control: "boolean" },
     start: { control: false },
     end: { control: false },
   },
@@ -350,6 +354,319 @@ export const StableUnderHostileHost: Story = {
       "cursor",
     ];
     for (const selector of [".cy-split-pane", ".cy-split-pane-divider"]) {
+      const { clean, hostile } = computeUnderHostileHost(canvasElement, selector, props);
+      await expect({ selector, ...hostile }).toEqual({ selector, ...clean });
+    }
+  },
+};
+
+const endPane = (el: Element) => el.querySelector('[data-pane="end"]') as HTMLElement;
+
+export const ToggledFromAButton: Story = {
+  args: { unit: "px", defaultSize: 200, onCollapsedChange: fn() },
+  render: (args) => {
+    function Shell() {
+      const [collapsed, setCollapsed] = useState(false);
+      return (
+        <>
+          <Button onClick={() => setCollapsed((c) => !c)}>Toggle sidebar</Button>
+          <SplitPane
+            {...args}
+            collapsed={collapsed}
+            onCollapsedChange={(next) => {
+              args.onCollapsedChange?.(next);
+              setCollapsed(next);
+            }}
+          />
+        </>
+      );
+    }
+    return <Shell />;
+  },
+  play: async ({ args, canvas, canvasElement, userEvent }) => {
+    const divider = canvas.getByRole("separator");
+    // Collapsible because the collapse is controlled: the divider's range starts at 0.
+    await expect(divider).toHaveAttribute("aria-valuemin", "0");
+    await userEvent.click(canvas.getByRole("button", { name: "Toggle sidebar" }));
+    await expect(divider).toHaveAttribute("aria-valuenow", "0");
+    await expect(divider).toHaveAttribute("aria-valuetext", "0 pixels");
+    await expect(startPane(canvasElement)).toHaveAttribute("data-collapsed");
+    await expect(canvas.queryByText("Files")).not.toBeVisible();
+    await expect(box(startPane(canvasElement)).width).toBe(0);
+    // The size is remembered, not reported as 0.
+    await expect(args.onSizeChange).not.toHaveBeenCalled();
+    await userEvent.click(canvas.getByRole("button", { name: "Toggle sidebar" }));
+    await expect(divider).toHaveAttribute("aria-valuenow", "200");
+    await expect(canvas.getByText("Files")).toBeVisible();
+    // Enter on the divider (APG window splitter) asks the parent too.
+    divider.focus();
+    await userEvent.keyboard("{Enter}");
+    await expect(args.onCollapsedChange).toHaveBeenLastCalledWith(true);
+    await expect(divider).toHaveAttribute("aria-valuenow", "0");
+    await userEvent.keyboard("{Enter}");
+    await expect(args.onCollapsedChange).toHaveBeenLastCalledWith(false);
+    await expect(divider).toHaveAttribute("aria-valuenow", "200");
+    // The button's own toggles do not call onCollapsedChange: the parent made them.
+    await expect(args.onCollapsedChange).toHaveBeenCalledTimes(2);
+  },
+};
+
+export const StartsCollapsed: Story = {
+  args: { defaultCollapsed: true, defaultSize: 30, onCollapsedChange: fn() },
+  play: async ({ args, canvas, canvasElement, userEvent }) => {
+    const divider = canvas.getByRole("separator");
+    await expect(divider).toHaveAttribute("aria-valuenow", "0");
+    await expect(startPane(canvasElement)).toHaveAttribute("data-collapsed");
+    divider.focus();
+    await userEvent.keyboard("{Enter}");
+    await expect(args.onCollapsedChange).toHaveBeenLastCalledWith(false);
+    await expect(divider).toHaveAttribute("aria-valuenow", "30");
+    await expect(share(canvasElement)).toBeCloseTo(0.3, 1);
+  },
+};
+
+export const ExpandFromCollapsed: Story = {
+  args: { collapsible: true, defaultCollapsed: true, defaultSize: 40, min: 20, onCollapsedChange: fn() },
+  play: async ({ args, canvas, canvasElement, userEvent }) => {
+    const divider = canvas.getByRole("separator");
+    divider.focus();
+    // A key that would shrink it, or Home, leaves it collapsed.
+    await userEvent.keyboard("{ArrowLeft}{Home}");
+    await expect(divider).toHaveAttribute("aria-valuenow", "0");
+    await expect(args.onCollapsedChange).not.toHaveBeenCalled();
+    // A key that grows it opens it from 0: at min.
+    await userEvent.keyboard("{ArrowRight}");
+    await expect(args.onCollapsedChange).toHaveBeenLastCalledWith(false);
+    await expect(divider).toHaveAttribute("aria-valuenow", "20");
+    // Dragging a collapsed divider opens the pane where the pointer is; Escape puts it back collapsed.
+    await userEvent.keyboard("{Enter}");
+    await expect(divider).toHaveAttribute("aria-valuenow", "0");
+    const area = box(root(canvasElement));
+    const y = area.top + 20;
+    await userEvent.pointer([
+      { keys: "[MouseLeft>]", target: divider, coords: { clientX: area.left + 1, clientY: y } },
+      {
+        pointerName: "mouse",
+        target: divider,
+        coords: { clientX: area.left + area.width * 0.6, clientY: y },
+      },
+    ]);
+    await waitFor(() => expect(divider).toHaveAttribute("aria-valuenow", "60"));
+    await expect(startPane(canvasElement)).not.toHaveAttribute("data-collapsed");
+    window.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true, cancelable: true }));
+    await waitFor(() => expect(divider).toHaveAttribute("aria-valuenow", "0"));
+    await expect(startPane(canvasElement)).toHaveAttribute("data-collapsed");
+    await userEvent.pointer({ keys: "[/MouseLeft]", target: divider });
+    // Restoring brings back the size from before the collapse, not the cancelled drag's.
+    await userEvent.keyboard("{Enter}");
+    await expect(divider).toHaveAttribute("aria-valuenow", "20");
+  },
+};
+
+export const ResizeEndsOnce: Story = {
+  args: { onResizeEnd: fn() },
+  play: async ({ args, canvas, canvasElement, userEvent }) => {
+    const divider = canvas.getByRole("separator");
+    const area = box(root(canvasElement));
+    const y = area.top + 20;
+    const at = (f: number) => ({ clientX: area.left + area.width * f, clientY: y });
+    // A drag through several points reports every size, but ends once, with the last.
+    await userEvent.pointer([
+      { keys: "[MouseLeft>]", target: divider, coords: at(0.5) },
+      { pointerName: "mouse", target: divider, coords: at(0.4) },
+      { pointerName: "mouse", target: divider, coords: at(0.3) },
+      { pointerName: "mouse", target: divider, coords: at(0.35) },
+    ]);
+    await waitFor(() => expect(divider).toHaveAttribute("aria-valuenow", "35"));
+    await expect(args.onSizeChange).toHaveBeenCalledTimes(3);
+    await expect(args.onResizeEnd).not.toHaveBeenCalled();
+    await userEvent.pointer({ keys: "[/MouseLeft]", target: divider });
+    await expect(args.onResizeEnd).toHaveBeenCalledTimes(1);
+    await expect(args.onResizeEnd).toHaveBeenLastCalledWith(35);
+    // A press that does not move, and a cancelled drag, change nothing to save.
+    await userEvent.pointer([
+      { keys: "[MouseLeft>]", target: divider, coords: at(0.35) },
+      { keys: "[/MouseLeft]", target: divider },
+    ]);
+    await userEvent.pointer([
+      { keys: "[MouseLeft>]", target: divider, coords: at(0.35) },
+      { pointerName: "mouse", target: divider, coords: at(0.6) },
+    ]);
+    await waitFor(() => expect(divider).toHaveAttribute("aria-valuenow", "60"));
+    window.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true, cancelable: true }));
+    await waitFor(() => expect(divider).toHaveAttribute("aria-valuenow", "35"));
+    await userEvent.pointer({ keys: "[/MouseLeft]", target: divider });
+    await expect(args.onResizeEnd).toHaveBeenCalledTimes(1);
+    // Holding an arrow key repeats the move; letting go ends it once.
+    divider.focus();
+    await userEvent.keyboard("{ArrowRight>4/}");
+    await expect(divider).toHaveAttribute("aria-valuenow", "55");
+    await expect(args.onResizeEnd).toHaveBeenCalledTimes(2);
+    await expect(args.onResizeEnd).toHaveBeenLastCalledWith(55);
+    await userEvent.keyboard("{End}");
+    await expect(args.onResizeEnd).toHaveBeenLastCalledWith(90);
+    // A key at the limit, and a key that is not a move, end nothing.
+    await userEvent.keyboard("{ArrowRight}{a}");
+    await expect(args.onResizeEnd).toHaveBeenCalledTimes(3);
+  },
+};
+
+export const TouchResizeEndsOnce: Story = {
+  tags: ["touch", "!dev"],
+  args: { onResizeEnd: fn(), unit: "px", anchor: "end", defaultSize: 200, min: 100, max: 400 },
+  play: async ({ args, canvas, canvasElement, userEvent }) => {
+    const divider = canvas.getByRole("separator");
+    const area = box(root(canvasElement));
+    const y = area.top + 40;
+    await userEvent.pointer([
+      { keys: "[TouchA>]", target: divider, coords: { clientX: area.right - 200, clientY: y } },
+      { pointerName: "TouchA", target: divider, coords: { clientX: area.right - 260, clientY: y } },
+      { pointerName: "TouchA", target: divider, coords: { clientX: area.right - 300, clientY: y } },
+      { keys: "[/TouchA]", target: divider },
+    ]);
+    await waitFor(() => expect(divider).toHaveAttribute("aria-valuenow", "300"));
+    await expect(args.onResizeEnd).toHaveBeenCalledTimes(1);
+    await expect(args.onResizeEnd).toHaveBeenLastCalledWith(300);
+  },
+};
+
+export const AnchoredToTheEnd: Story = {
+  args: {
+    unit: "px",
+    anchor: "end",
+    defaultSize: 200,
+    min: 120,
+    max: 400,
+    step: 20,
+    label: "Resize the inspector",
+  },
+  decorators: [
+    (Story) => (
+      <div data-testid="frame" style={{ inlineSize: 400, blockSize: 200 }}>
+        {Story()}
+      </div>
+    ),
+  ],
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const divider = canvas.getByRole("separator", { name: "Resize the inspector" });
+    const end = endPane(canvasElement);
+    const half = box(divider).width / 2;
+    // The pixel size belongs to the end pane, and the divider controls it.
+    await expect(document.getElementById(divider.getAttribute("aria-controls") as string)).toBe(end);
+    await expect(box(end).width).toBeCloseTo(200 - half, 0);
+    // A wider window grows the start pane; the end pane keeps its pixels.
+    canvas.getByTestId("frame").style.inlineSize = "560px";
+    await waitFor(() => expect(box(startPane(canvasElement)).width).toBeCloseTo(360 - half, 0));
+    await expect(box(end).width).toBeCloseTo(200 - half, 0);
+    // The arrows move the divider: Left moves it towards the start, growing the end pane.
+    divider.focus();
+    await userEvent.keyboard("{ArrowLeft}");
+    await expect(divider).toHaveAttribute("aria-valuenow", "220");
+    await userEvent.keyboard("{ArrowRight}{ArrowRight}");
+    await expect(divider).toHaveAttribute("aria-valuenow", "180");
+    await userEvent.keyboard("{End}");
+    await expect(divider).toHaveAttribute("aria-valuenow", "400");
+    // Dragging measures from the end edge.
+    const area = box(root(canvasElement));
+    await userEvent.pointer([
+      {
+        keys: "[MouseLeft>]",
+        target: divider,
+        coords: { clientX: area.right - 400, clientY: area.top + 20 },
+      },
+      {
+        pointerName: "mouse",
+        target: divider,
+        coords: { clientX: area.right - 250, clientY: area.top + 20 },
+      },
+      { keys: "[/MouseLeft]", target: divider },
+    ]);
+    await waitFor(() => expect(divider).toHaveAttribute("aria-valuenow", "250"));
+    await expect(box(end).width).toBeCloseTo(250 - half, 0);
+  },
+};
+
+export const ABottomDock: Story = {
+  args: {
+    orientation: "vertical",
+    unit: "px",
+    anchor: "end",
+    defaultSize: 100,
+    min: 60,
+    max: 240,
+    step: 20,
+    collapsible: true,
+    start: pane("Editor"),
+    end: pane("Results"),
+    label: "Resize the results",
+  },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const divider = canvas.getByRole("separator");
+    const end = endPane(canvasElement);
+    await expect(box(end).height).toBeCloseTo(100 - box(divider).height / 2, 0);
+    await expect(box(end).top).toBeGreaterThan(box(startPane(canvasElement)).top);
+    divider.focus();
+    // Up moves the divider up, so the dock grows.
+    await userEvent.keyboard("{ArrowUp}");
+    await expect(divider).toHaveAttribute("aria-valuenow", "120");
+    await userEvent.keyboard("{ArrowDown}{ArrowDown}");
+    await expect(divider).toHaveAttribute("aria-valuenow", "80");
+    // Enter collapses the dock, not the editor.
+    await userEvent.keyboard("{Enter}");
+    await expect(end).toHaveAttribute("data-collapsed");
+    await expect(startPane(canvasElement)).not.toHaveAttribute("data-collapsed");
+    await expect(box(end).height).toBe(0);
+    await expect(canvas.getByText("Editor")).toBeVisible();
+    await userEvent.keyboard("{Enter}");
+    await expect(divider).toHaveAttribute("aria-valuenow", "80");
+    const area = box(root(canvasElement));
+    await userEvent.pointer([
+      {
+        keys: "[MouseLeft>]",
+        target: divider,
+        coords: { clientX: area.left + 20, clientY: area.bottom - 80 },
+      },
+      {
+        pointerName: "mouse",
+        target: divider,
+        coords: { clientX: area.left + 20, clientY: area.bottom - 150 },
+      },
+      { keys: "[/MouseLeft]", target: divider },
+    ]);
+    await waitFor(() => expect(divider).toHaveAttribute("aria-valuenow", "150"));
+  },
+};
+
+export const AnchoredToTheEndRightToLeft: Story = {
+  args: { unit: "px", anchor: "end", defaultSize: 200, min: 120, max: 400, step: 20 },
+  decorators: [(Story) => <div dir="rtl">{Story()}</div>],
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const divider = canvas.getByRole("separator");
+    const end = endPane(canvasElement);
+    // The end pane is on the left, and keeps the pixels.
+    await expect(box(end).right).toBeLessThan(box(divider).right);
+    await expect(box(end).width).toBeCloseTo(200 - box(divider).width / 2, 0);
+    divider.focus();
+    // Right moves the divider away from the end pane, so it grows.
+    await userEvent.keyboard("{ArrowRight}");
+    await expect(divider).toHaveAttribute("aria-valuenow", "220");
+    await userEvent.keyboard("{ArrowLeft}{ArrowLeft}");
+    await expect(divider).toHaveAttribute("aria-valuenow", "180");
+    const area = box(root(canvasElement));
+    await userEvent.pointer([
+      { keys: "[MouseLeft>]", target: divider, coords: { clientX: area.left + 180, clientY: area.top + 20 } },
+      { pointerName: "mouse", target: divider, coords: { clientX: area.left + 300, clientY: area.top + 20 } },
+      { keys: "[/MouseLeft]", target: divider },
+    ]);
+    await waitFor(() => expect(divider).toHaveAttribute("aria-valuenow", "300"));
+  },
+};
+
+export const AnchoredStableUnderHostileHost: Story = {
+  args: { unit: "px", anchor: "end", defaultSize: 200, defaultCollapsed: true },
+  play: async ({ canvasElement }) => {
+    const props = ["display", "grid-template-columns", "width", "visibility"];
+    for (const selector of [".cy-split-pane", '[data-pane="end"]']) {
       const { clean, hostile } = computeUnderHostileHost(canvasElement, selector, props);
       await expect({ selector, ...hostile }).toEqual({ selector, ...clean });
     }

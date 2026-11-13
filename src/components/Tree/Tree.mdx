@@ -45,6 +45,40 @@ With `virtual`, only the rows in view are in the page, so a document with 100,00
 
 <Canvas of={Stories.CustomRowContent} />
 
+## A schema explorer
+
+Groups (`kind: "group"`) head the rows under them: Enter, Space and a click open and close them, they are never selected, and they end with their child count. Items take an icon colour (`iconTone`, `iconColor`), a `trailing` count or badge, your own `data` (handed back in every callback), `actions` (buttons at the row's end) and a `contextMenu`. A pressed action or a chosen command calls `onCommand(value, item)`.
+
+```tsx
+<Tree<Table>
+  label="Schema"
+  items={[{ id: "tables", label: "Tables", kind: "group", children: tables.map((t) => ({
+    id: t.name, label: t.name, icon: table, iconTone: "accent", trailing: format(t.rows), data: t,
+    actions: [{ value: "view", label: "View data", icon: rows }],
+    contextMenu: [{ value: "view", label: "View data" }, { value: "copy", label: "Copy name" }],
+  })) }]}
+  onCommand={(command, item) => run(command, item.data)}
+/>
+```
+
+<Canvas of={Stories.RowActionsFromTheKeyboard} />
+
+Actions show while their row is hovered, focused or selected, and always on screens without hover. On the focused row they come right after it in the Tab order: Tab reaches them, Shift+Tab or Escape goes back to the row, and the arrows still move between rows. The tree keys stay those of the APG pattern and the tree keeps a single way in; every action can also be in the context menu, which Shift+F10 opens.
+
+<Canvas of={Stories.ContextMenuOnRows} />
+
+## Filtering
+
+`filter` shows only matching items, with their ancestors opened and their own children, and marks the matched text with [HighlightedText](?path=/docs/components-highlightedtext--docs). A string matches anywhere in the label, ignoring case. A function returns true, false, or the positions a fuzzy matcher found, which are marked exactly. The `expanded` ids are not changed, and an opened ancestor can still be closed. Only known children are searched.
+
+<Canvas of={Stories.FilterShowsMatchesWithTheirAncestors} />
+
+## Loading from a store
+
+When children are fetched somewhere else (a store), put them in `children` when they arrive and say what is happening with `loadingIds` and `errorIds`. `onRetry` is called when a failed item is retried; `renderError(item, retry)` and `renderEmpty(item)` draw the error row and the row under an open item with no children. With `loadChildren`, the `handle`'s `reload(id)` loads an item's children again.
+
+<Canvas of={Stories.LoadingAndErrorsFromAStore} />
+
 ## Props
 
 <ArgTypes of={Stories} />
@@ -57,14 +91,18 @@ With `virtual`, only the rows in view are in the page, so a document with 100,00
 | <kbd>Right</kbd> | Opens a closed branch; on an open one, moves to its first child |
 | <kbd>Left</kbd> | Closes an open branch; otherwise moves to the parent |
 | <kbd>Home</kbd> / <kbd>End</kbd> | First / last visible row |
-| <kbd>Enter</kbd> | Selects the row (only that row); on a failure row, retries |
-| <kbd>Space</kbd> | Selects; with `selectionMode="multiple"`, toggles |
+| <kbd>Enter</kbd> | Selects the row (only that row), or runs `onAction`; on a group, opens or closes; on a failure row, retries |
+| <kbd>Space</kbd> | Selects; with `selectionMode="multiple"`, toggles; on a group, opens or closes |
+| <kbd>Tab</kbd> | From the focused row, to its action buttons; then out of the tree |
+| <kbd>Escape</kbd> | From an action button, back to its row |
+| <kbd>Shift</kbd>+<kbd>F10</kbd>, context menu key | Opens the row's context menu |
 | <kbd>*</kbd> | Opens every branch at the same level |
 | Letters | Jump to the next row whose label starts with them |
 | Click / chevron | Selects / opens or closes without selecting |
 
-- **Roles:** `role="tree"` (with `aria-multiselectable` in multiple mode) and `treeitem` rows with `aria-level`, `aria-posinset`, `aria-setsize`, `aria-expanded`, `aria-selected`, and `aria-busy` while children load.
-- **Focus:** one Tab stop; the focused row is the only one in the Tab order.
+- **Roles:** `role="tree"` (with `aria-multiselectable` in multiple mode) and `treeitem` rows with `aria-level`, `aria-posinset`, `aria-setsize`, `aria-expanded`, `aria-selected` (not on groups), `aria-busy` while children load and `aria-keyshortcuts="Shift+F10"` with a context menu. A row with actions is named by its label and trailing text.
+- **Context menu:** one ContextMenu beside the tree, not inside it (a tree holds only tree items); focus returns to the row.
+- **Focus:** one Tab stop; the focused row is the only row in the Tab order, followed by its action buttons.
 - **Direction:** in right-to-left text, Left and Right swap, and closed chevrons point left.
 - **Performance:** only expanded branches are rendered, and rows are memoised, so moving focus re-renders two rows even in a tree of thousands.
 
@@ -72,11 +110,11 @@ With `virtual`, only the rows in view are in the page, so a document with 100,00
 
 ## Touch
 
-Rows are at least 44px tall on coarse pointers.
+Rows are at least 44px tall on coarse pointers. Row actions always show on screens without hover, with 44px hit areas, and a long press opens a row's context menu.
 
 ## Theming
 
-Tokens: `--cy-tree-indent`, `--cy-tree-row-height` and `--cy-tree-selected-bg`.
+Tokens: `--cy-tree-indent`, `--cy-tree-row-height`, `--cy-tree-selected-bg`, `--cy-tree-group-ink` (group rows) and `--cy-tree-trailing-ink` (trailing text; on a selected row it takes the row's colour).
 
 ```ts
 createTheme({ components: { tree: { indent: "20px", rowHeight: "28px" } } });
@@ -84,4 +122,4 @@ createTheme({ components: { tree: { indent: "20px", rowHeight: "28px" } } });
 
 ## Related
 
-[Accordion](?path=/docs/components-accordion--docs) · [Menu](?path=/docs/components-menu--docs) · [Combobox](?path=/docs/components-combobox--docs)
+[HighlightedText](?path=/docs/components-highlightedtext--docs) · [ContextMenu](?path=/docs/components-contextmenu--docs) · [Accordion](?path=/docs/components-accordion--docs) · [Menu](?path=/docs/components-menu--docs) · [Combobox](?path=/docs/components-combobox--docs)

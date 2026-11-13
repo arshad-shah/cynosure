@@ -167,6 +167,12 @@
     --_h: var(--cy-button-height-sm, var(--cy-control-height-sm));
     font-size: var(--cy-font-size-sm);
   }
+  /* xs: dense desktop chrome. Only the look shrinks; ::before keeps the hit area at --_hit. */
+  &[data-size="xs"] {
+    --_h: var(--cy-button-height-xs, var(--cy-control-height-xs));
+    padding-inline: var(--cy-button-padding-inline-xs, var(--cy-space-4));
+    font-size: var(--cy-font-size-xs);
+  }
   &[data-size="lg"] {
     --_h: var(--cy-button-height-lg, var(--cy-control-height-lg));
     font-size: var(--cy-font-size-lg);
@@ -178,7 +184,7 @@
   /* Square: one icon as the content (IconButton). As wide as it is tall; the label box steps aside so the icon is not
      clipped by it. */
   &[data-square] {
-    inline-size: var(--_h);
+    inline-size: var(--cy-button-square-width, var(--_h));
     padding: 0;
     & .cy-button-label {
       display: contents;
@@ -187,7 +193,8 @@
 
   /* States */
   &:hover:not(:disabled, [aria-disabled="true"]) {
-    background: var(--_hover);
+    background: var(--cy-button-hover-bg, var(--_hover));
+    color: var(--cy-button-hover-ink, var(--_fg));
   }
   &:active:not(:disabled, [aria-disabled="true"]) {
     transform: scale(var(--cy-button-press-scale, 0.97));

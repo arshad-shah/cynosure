@@ -145,6 +145,47 @@ export const StepsAndDecimals: Story = {
   },
 };
 
+export const DecimalMinAndTinySteps: Story = {
+  render: (args: SliderProps) => (
+    <>
+      <Slider {...args} label="Half" min={0.5} max={10} step={1} defaultValue={3.5} />
+      <Slider {...args} label="Tiny" min={0} max={5e-7} step={1e-7} defaultValue={0} />
+    </>
+  ),
+  play: async ({ canvas, userEvent }) => {
+    // min 0.5 with step 1: the values are 0.5, 1.5, 2.5…, and Home reaches min itself.
+    const half = canvas.getByRole("slider", { name: "Half" });
+    half.focus();
+    await userEvent.keyboard("{ArrowRight}");
+    await expect(half).toHaveAttribute("aria-valuenow", "4.5");
+    await userEvent.keyboard("{Home}");
+    await expect(half).toHaveAttribute("aria-valuenow", "0.5");
+    // A step written in exponent notation keeps its decimals.
+    const tiny = canvas.getByRole("slider", { name: "Tiny" });
+    tiny.focus();
+    await userEvent.keyboard("{ArrowRight}");
+    await expect(tiny).toHaveAttribute("aria-valuenow", "0.0000001");
+    // The limits are written out too, as ARIA expects.
+    await expect(tiny).toHaveAttribute("aria-valuemax", "0.0000005");
+    await userEvent.keyboard("{End}");
+    await expect(tiny).toHaveAttribute("aria-valuenow", "0.0000005");
+  },
+};
+
+export const ControlledOutOfRangeIsClamped: Story = {
+  args: { value: 150, min: 0, max: 100 },
+  play: async ({ args, canvas, userEvent }) => {
+    const thumb = canvas.getByRole("slider", { name: "Volume" });
+    // A value beyond max shows at max, for the thumb and for screen readers.
+    await expect(thumb).toHaveAttribute("aria-valuenow", "100");
+    await expect(thumb.style.getPropertyValue("--_pos")).toBe("100%");
+    // Keys step from the shown value.
+    thumb.focus();
+    await userEvent.keyboard("{ArrowLeft}");
+    await expect(args.onChange).toHaveBeenLastCalledWith(99);
+  },
+};
+
 export const RangeThumbsNeverCross: Story = {
   args: { label: "Price", defaultValue: [20, 60], showValue: true },
   play: async ({ args, canvas, canvasElement, userEvent }) => {

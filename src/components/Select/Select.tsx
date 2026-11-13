@@ -4,7 +4,6 @@ import {
   type KeyboardEvent,
   type ReactNode,
   useCallback,
-  useEffect,
   useId,
   useRef,
   useState,
@@ -13,15 +12,23 @@ import { ButtonBase } from "../../foundations/ButtonBase/ButtonBase.js";
 import { useControllableState } from "../../foundations/controllable.js";
 import { HiddenValue } from "../../foundations/HiddenValue/HiddenValue.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
+import { iconSizeFor } from "../../foundations/icon-size.js";
 import { isComposing } from "../../foundations/keys.js";
-import { isTypeaheadKey, seekEnabled, useTypeahead } from "../../foundations/listbox.js";
+import { isTypeaheadKey, seekEnabled, useActiveOption, useTypeahead } from "../../foundations/listbox.js";
+import { clamp } from "../../foundations/math.js";
 import { OptionIcon, type OptionIconColor } from "../../foundations/option-icon.js";
 import { chevronDown } from "../../icons/chevron-down.js";
 import type { IconData } from "../../icons/types.js";
 import { useListboxLayer } from "../../overlay/listbox-layer.js";
-import type { Size } from "../../tokens/schema.js";
-import { Field } from "../Field/Field.js";
-import { OptionList, OptionListGroup, OptionListItem, OptionListNote } from "../OptionList/OptionList.js";
+import type { DenseSize } from "../../tokens/schema.js";
+import { Field, type FieldLayoutProps } from "../Field/Field.js";
+import {
+  OptionList,
+  type OptionListAction,
+  OptionListGroup,
+  OptionListItem,
+  OptionListNote,
+} from "../OptionList/OptionList.js";
 
 export interface SelectTokens {
   radius: string;
@@ -46,11 +53,15 @@ export interface SelectOption extends OptionIconColor {
   /** Icon before the label, in the list and in the trigger when chosen. Colour it with `iconTone` or `iconColor`. */
   icon?: IconData;
   disabled?: boolean;
+  /** Drawn muted in the list but still choosable: an option that is there but not in use. */
+  dimmed?: boolean;
+  /** At the end of the option's row in the list, smaller and muted: a shortcut, a count. */
+  trailing?: ReactNode;
   /** Options next to each other with the same `group` are listed under that heading. */
   group?: string;
 }
 
-export interface SelectProps {
+export interface SelectProps extends FieldLayoutProps {
   /** Names the control, shown above it. */
   label: ReactNode;
   /** Visually hide the label (it still names the control). Prefer visible labels. */
@@ -59,8 +70,15 @@ export interface SelectProps {
   description?: ReactNode;
   /** Your own error; it replaces the built-in required message. */
   error?: ReactNode;
-  /** The choices: `{ value, label, description?, icon?, iconTone?, iconColor?, disabled?, group? }`. */
+  /**
+   * The choices: `{ value, label, description?, icon?, iconTone?, iconColor?, disabled?, dimmed?, trailing?, group? }`.
+   */
   options: SelectOption[];
+  /**
+   * An action pinned under the options ("Manage connections…"): the arrow keys' last stop, run with Enter, Space or a
+   * press. The list closes, focus returns to the trigger, and the value does not change.
+   */
+  footer?: OptionListAction | undefined;
   /** Controlled selected value. */
   value?: string;
   /** Selected value at first, when uncontrolled. */
@@ -75,8 +93,11 @@ export interface SelectProps {
   required?: boolean;
   /** Cannot be opened or changed, and is not submitted. */
   disabled?: boolean;
-  /** Height and text size of the control. Default "md". */
-  size?: Size;
+  /**
+   * Height and text size of the control. Default "md". `xs` (about 20px) is for dense desktop chrome: the trigger is
+   * still 24px to press (44px on coarse pointers); its label is set as for `sm`.
+   */
+  size?: DenseSize;
   /** `outline`, or `soft` (tinted, no border). Default "outline". */
   variant?: "outline" | "soft";
   /** Replace the built-in English text: the placeholder, the empty list and the required message. */
@@ -109,8 +130,11 @@ export function Select({
   label,
   labelHidden,
   description,
+  layout,
+  width,
   error,
   options,
+  footer,
   value,
   defaultValue = "",
   onChange,
@@ -124,20 +148,36 @@ export function Select({
   className,
   style,
 }: SelectProps) {
+  const iconSize = iconSizeFor(size);
   const listId = `cy-select-${useId().replace(/:/g, "")}`;
   const trigger = useRef<HTMLButtonElement | null>(null);
   const list = useRef<HTMLDivElement | null>(null);
   const [current, setCurrent, resetCurrent] = useControllableState(value, defaultValue, onChange);
   const [open, setOpen] = useState(false);
-  const [active, setActive] = useState(-1);
   const typeTo = useTypeahead();
   // Shown after a blocked submit: the hidden input cannot be focused or explained, so the trigger is.
   const [missing, setMissing] = useState(false);
 
-  const enabled = (i: number) => i >= 0 && i < options.length && !options[i]?.disabled;
-  const step = (from: number, delta: 1 | -1) => seekEnabled(options.length, from, delta, enabled);
-  const first = () => step(-1, 1);
-  const last = () => step(options.length, -1);
+  // The footer action is one more option after the last, at index `options.length` (NaN, equal to no index, without).
+  const atFooter = footer ? options.length : Number.NaN;
+  const count = options.length + (footer ? 1 : 0);
+  const enabled = (i: number) => i === atFooter || (i >= 0 && i < options.length && !options[i]?.disabled);
+  const { active, activeId, optionId, setActive, first, last, move } = useActiveOption({
+    id: listId,
+    list,
+    open,
+    count: options.length,
+    footer: !!footer,
+    usable: (i) => !options[i]?.disabled,
+  });
+  // A page away, or the nearest usable option short of it; with none there, the active option stays.
+  const page = (delta: 1 | -1) => {
+    const target = clamp(active + delta * PAGE, 0, count - 1);
+    const beyond = seekEnabled(count, target - delta, delta, enabled);
+    if (beyond >= 0 && beyond !== target - delta) return beyond;
+    const short = seekEnabled(count, target, -delta as 1 | -1, enabled);
+    return short >= 0 ? short : active;
+  };
 
   const choose = useCallback(
     (index: number) => {
@@ -152,6 +192,11 @@ export function Select({
     setOpen(false);
     if (focus) trigger.current?.focus();
   };
+  // The list closes (focus back on the trigger) before the action runs, so a dialog it opens can take focus.
+  const runFooter = () => {
+    close();
+    (footer as OptionListAction).onSelect();
+  };
   const openList = (at?: number) => {
     const selected = options.findIndex((o) => o.value === current);
     setActive(at ?? (enabled(selected) ? selected : first()));
@@ -160,10 +205,6 @@ export function Select({
 
   // As wide as the trigger, never wider than max(trigger, 20rem): long labels truncate instead of overflowing.
   useListboxLayer({ anchor: trigger, list, open, onClose: () => close(false), capWidth: true });
-  useEffect(() => {
-    if (!open || active < 0) return;
-    list.current?.querySelector(`[data-index="${active}"]`)?.scrollIntoView({ block: "nearest" });
-  }, [open, active]);
 
   const typeahead = (key: string) => {
     const hit = typeTo(
@@ -187,21 +228,24 @@ export function Select({
       } else if (isTypeaheadKey(e)) typeahead(key);
       return;
     }
-    const moves: Record<string, () => number> = {
-      ArrowDown: () => step(active, 1),
-      ArrowUp: () => step(active, -1),
-      Home: first,
-      End: last,
-      PageDown: () => step(Math.min(active + PAGE - 1, options.length - 1), 1),
-      PageUp: () => step(Math.max(active - PAGE + 1, 0), -1),
+    const moves: Record<string, () => void> = {
+      ArrowDown: () => move(1),
+      ArrowUp: () => move(-1),
+      Home: () => setActive(first()),
+      End: () => setActive(last()),
+      PageDown: () => setActive(page(1)),
+      PageUp: () => setActive(page(-1)),
     };
     if (moves[key]) {
       e.preventDefault();
-      setActive(moves[key]());
+      moves[key]();
     } else if (key === "Enter" || key === " ") {
       e.preventDefault();
-      choose(active);
-      close();
+      if (active === atFooter) runFooter();
+      else {
+        choose(active);
+        close();
+      }
     } else if (key === "Escape") {
       e.preventDefault();
       close();
@@ -218,6 +262,8 @@ export function Select({
     <Field
       label={label}
       labelHidden={labelHidden}
+      layout={layout}
+      width={width}
       description={description}
       error={error ?? (missing && !current ? (labels?.required ?? "Please choose a value.") : undefined)}
       required={required}
@@ -239,30 +285,46 @@ export function Select({
             aria-haspopup="listbox"
             aria-expanded={open}
             aria-controls={listId}
-            aria-activedescendant={open && active >= 0 ? `${listId}-${active}` : undefined}
+            aria-activedescendant={activeId}
             disabled={disabled}
             onClick={() => (open ? close() : openList())}
             onKeyDown={onKeyDown}
           >
-            {selected && <OptionIcon option={selected} plain={disabled} className="cy-select-icon" />}
+            {selected && (
+              <OptionIcon option={selected} plain={disabled} size={iconSize} className="cy-select-icon" />
+            )}
             <span className="cy-select-value" data-placeholder={selected ? undefined : ""}>
               {selected?.label ?? placeholderText}
             </span>
-            <Icon icon={chevronDown} className="cy-select-chevron" />
+            <Icon icon={chevronDown} size={iconSize} className="cy-select-chevron" />
           </ButtonBase>
-          <OptionList ref={list} id={listId} aria-labelledby={field.labelId}>
+          <OptionList
+            ref={list}
+            id={listId}
+            aria-labelledby={field.labelId}
+            footer={
+              footer && {
+                action: footer,
+                id: optionId(atFooter),
+                active: active === atFooter,
+                onActive: () => setActive(atFooter),
+                onRun: runFooter,
+              }
+            }
+          >
             {options.length === 0 && <OptionListNote>{labels?.empty ?? "No options"}</OptionListNote>}
             {groupsOf(options).map((run) => {
               const rows = run.items.map(({ option, index }) => (
                 <OptionListItem
                   key={option.value}
-                  id={`${listId}-${index}`}
-                  data-index={index}
+                  id={optionId(index)}
                   label={option.label}
                   description={option.description}
                   icon={<OptionIcon option={option} plain={option.disabled} className="cy-select-icon" />}
                   selected={option.value === current}
                   disabled={option.disabled}
+                  dimmed={option.dimmed}
+                  trailing={option.trailing}
                   active={index === active}
                   onPointerMove={() => enabled(index) && setActive(index)}
                   onClick={() => {

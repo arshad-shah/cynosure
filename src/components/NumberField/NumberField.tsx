@@ -3,10 +3,11 @@ import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js
 import { useControllableState } from "../../foundations/controllable.js";
 import { useDrag } from "../../foundations/drag.js";
 import { HiddenValue } from "../../foundations/HiddenValue/HiddenValue.js";
-import { clamp } from "../../foundations/math.js";
+import { ariaNumber, clamp, plainNumber, roundLike, snapToStep } from "../../foundations/math.js";
 import { minus } from "../../icons/minus.js";
 import { plus } from "../../icons/plus.js";
 import type { Size } from "../../tokens/schema.js";
+import type { FieldLayoutProps } from "../Field/Field.js";
 import { IconButton } from "../IconButton/IconButton.js";
 import { TextField } from "../TextField/TextField.js";
 
@@ -16,7 +17,7 @@ export interface NumberFieldLabels {
   increment: string;
 }
 
-export interface NumberFieldProps {
+export interface NumberFieldProps extends FieldLayoutProps {
   /** Visible label; it names the field. */
   label: ReactNode;
   /** Visually hide the label (it still names the field). Prefer visible labels. */
@@ -76,30 +77,110 @@ export interface NumberFieldProps {
 
 const DEFAULT_LABELS: NumberFieldLabels = { decrement: "Decrease", increment: "Increase" };
 
-/** Decimal places of `n`, so stepping by 0.1 gives 0.3 and not 0.30000000000000004. */
-const places = (n: number) => (String(n).split(".")[1] ?? "").length;
+/** The marks a format writes, learnt from `Intl.NumberFormat` itself so every locale reads its own output. */
+interface NumberMarks {
+  group: string;
+  decimal: string;
+  minus: string;
+  /** The ten digits of its numbering system, 0 to 9 (Arabic-Indic, Devanagari…). */
+  digits: string[];
+  /** Currency, percent and unit text and literals ("kr.", "%", "km/h"), longest first. */
+  affixes: string[];
+}
 
-/** Reads what a person typed in `locale`: group separators, the local decimal mark, a typographic minus, a % or a currency. */
+const marksCache = new Map<string, NumberMarks>();
+const SAMPLES = [-1234567.5, 1234567.5, 1, 2];
+
+function marksOf(locale: string | undefined, options: Intl.NumberFormatOptions | undefined): NumberMarks {
+  const id = JSON.stringify([locale ?? "", options ?? {}]);
+  const known = marksCache.get(id);
+  if (known) return known;
+  const plain = new Intl.NumberFormat(locale);
+  const numberingSystem = (
+    options?.numberingSystem ? new Intl.NumberFormat(locale, options) : plain
+  ).resolvedOptions().numberingSystem;
+  // The separators and signs of the field's own style (a currency may group differently), else of plain numbers.
+  let styled: Intl.NumberFormatPart[] = [];
+  try {
+    styled = SAMPLES.flatMap((n) =>
+      new Intl.NumberFormat(locale, {
+        ...options,
+        minimumFractionDigits: 1,
+        maximumFractionDigits: 1,
+        minimumSignificantDigits: undefined,
+        maximumSignificantDigits: undefined,
+      }).formatToParts(n),
+    );
+  } catch {
+    // Options that refuse one fraction digit: plain numbers' marks are enough.
+  }
+  const parts = [...styled, ...plain.formatToParts(-12345.6)];
+  const of = (type: string, fallback: string) => parts.find((p) => p.type === type)?.value ?? fallback;
+  const digitFormat = new Intl.NumberFormat(locale, { numberingSystem, useGrouping: false });
+  const marks: NumberMarks = {
+    group: of("group", ","),
+    decimal: of("decimal", "."),
+    minus: of("minusSign", "-"),
+    digits: Array.from({ length: 10 }, (_, d) => digitFormat.format(d)),
+    affixes: [
+      ...new Set(
+        styled
+          .filter((p) => ["currency", "percentSign", "unit", "literal", "compact"].includes(p.type))
+          .map((p) => p.value.trim())
+          .filter(Boolean),
+      ),
+    ].sort((x, y) => y.length - x.length),
+  };
+  marksCache.set(id, marks);
+  return marks;
+}
+
+/** Bidirectional marks some locales put around signs (Arabic's U+061C before the minus). */
+const BIDI = /[\u061c\u200e\u200f\u202a-\u202e\u2066-\u2069]/g;
+
+/**
+ * Reads what a person typed, or what the field wrote, in `locale` and `options`: the locale's digits (Arabic-Indic,
+ * Devanagari…), group separators, decimal mark and minus, a typographic minus, currency, percent and unit text, and
+ * accounting brackets.
+ */
 export function parseNumber(
   text: string,
   locale?: string,
   options?: Intl.NumberFormatOptions,
 ): number | null {
-  const parts = new Intl.NumberFormat(locale).formatToParts(-12345.6);
-  const group = parts.find((p) => p.type === "group")?.value ?? ",";
-  const decimal = parts.find((p) => p.type === "decimal")?.value ?? ".";
-  const cleaned = text
-    .replace(/[−‒–]/g, "-")
-    .split(group)
-    .join(group.trim() ? "" : group)
+  const { group, decimal, minus, digits, affixes } = marksOf(locale, options);
+  let t = text.replace(BIDI, "");
+  // Accounting style writes a negative amount in brackets.
+  const bracketed = /\(.*\)/.test(t);
+  // Currency, percent and unit text first, so a dot in "kr." is not read as a separator.
+  for (const affix of affixes)
+    if (affix !== group.trim() && affix !== decimal && affix !== minus.replace(BIDI, ""))
+      t = t.split(affix).join(" ");
+  t = t.replace(/\p{Nd}/gu, (c) => {
+    const local = digits.indexOf(c);
+    return local >= 0 ? String(local) : c;
+  });
+  t = t.replace(/[()]/g, "");
+  const minusMark = minus.replace(BIDI, "");
+  if (minusMark && minusMark !== "-") t = t.split(minusMark).join("-");
+  t = t.replace(/[−‒–]/g, "-");
+  // A group mark that is a space (French, Swedish) matches any space; a typographic apostrophe matches a plain one.
+  if (!group.trim()) t = t.replace(/\s/g, "");
+  else {
+    t = t.split(group).join("");
+    if (group === "’") t = t.split("'").join("");
+  }
+  const cleaned = t
     .replace(/\s/g, "")
     .split(decimal)
     .join(".")
     .replace(/[^\d.-]/g, "");
   if (!/^-?\d*\.?\d+$|^-?\d+\.?$/.test(cleaned)) return null;
-  const n = Number(cleaned);
+  let n = Number(cleaned);
   if (!Number.isFinite(n)) return null;
-  return options?.style === "percent" ? n / 100 : n;
+  if (bracketed && n > 0) n = -n;
+  // Percent text is a hundred times the value; round away the noise of dividing (12.5% is 0.125).
+  return options?.style === "percent" ? Number((n / 100).toPrecision(15)) : n;
 }
 
 /**
@@ -109,6 +190,8 @@ export function parseNumber(
 export function NumberField({
   label,
   labelHidden,
+  layout,
+  width,
   description,
   error,
   value,
@@ -158,10 +241,8 @@ export function NumberField({
     const base = min ?? 0;
     const from = draft !== null ? (parseNumber(draft, locale, formatOptions) ?? current) : current;
     const start = from ?? (delta > 0 ? (min ?? 0) : (max ?? 0));
-    // Snap onto the step grid (counted from min), then round away floating-point noise.
-    const snapped = from === null ? start : Math.round((start - base + delta) / step) * step + base;
-    const digits = Math.max(places(step), places(base));
-    commit(limit(Number(snapped.toFixed(digits))));
+    // Snap onto the step grid (counted from min), without floating-point noise (0.3, not 0.30000000000000004).
+    commit(limit(from === null ? roundLike(start, step, base) : snapToStep(start + delta, step, base)));
   };
   const commitDraft = () => {
     if (draft === null) return;
@@ -209,8 +290,7 @@ export function NumberField({
     onMove: ({ delta, event }) => {
       const steps = Math.round(delta.x / 4) * (event.shiftKey ? 10 : 1);
       const from = scrubFrom.current ?? min ?? 0;
-      const digits = Math.max(places(step), places(min ?? 0));
-      commit(limit(Number((from + steps * step).toFixed(digits))));
+      commit(limit(roundLike(from + steps * step, step, min ?? 0)));
     },
     onEnd: (_, cancelled) => {
       if (cancelled) commit(scrubFrom.current);
@@ -228,6 +308,8 @@ export function NumberField({
         ref={input}
         label={label}
         labelHidden={labelHidden}
+        layout={layout}
+        width={width}
         description={description}
         error={error}
         size={size}
@@ -239,9 +321,9 @@ export function NumberField({
         autoComplete="off"
         autoCorrect="off"
         spellCheck={false}
-        aria-valuenow={current ?? undefined}
-        aria-valuemin={min}
-        aria-valuemax={max}
+        aria-valuenow={ariaNumber(current)}
+        aria-valuemin={ariaNumber(min)}
+        aria-valuemax={ariaNumber(max)}
         aria-valuetext={current === null ? undefined : shown(current)}
         required={required}
         disabled={disabled}
@@ -286,7 +368,7 @@ export function NumberField({
       <HiddenValue
         name={name}
         form={form}
-        value={current === null ? "" : String(current)}
+        value={current === null ? "" : plainNumber(current)}
         disabled={disabled}
         onReset={() => {
           setDraft(null);

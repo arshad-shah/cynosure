@@ -56,10 +56,7 @@
     background: var(--cy-color-soft);
   }
   &[aria-selected="true"] {
-    background: var(
-      --cy-virtual-list-selected-background,
-      color-mix(in oklab, var(--cy-color-accent) 14%, var(--cy-color-surface))
-    );
+    background: var(--cy-virtual-list-selected-background, var(--cy-color-accent-soft));
     color: var(--cy-color-accent-text);
   }
   &:focus-visible {

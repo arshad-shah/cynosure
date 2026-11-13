@@ -61,6 +61,12 @@ export {
   toISODate,
 } from "./components/Calendar/index.js";
 export { Card, type CardProps, type CardTokens } from "./components/Card/index.js";
+export {
+  ChatMessage,
+  type ChatMessageLabels,
+  type ChatMessageProps,
+  type ChatMessageTokens,
+} from "./components/ChatMessage/index.js";
 export { Checkbox, type CheckboxProps, type CheckboxTokens } from "./components/Checkbox/index.js";
 export {
   Checklist,
@@ -104,6 +110,7 @@ export {
 } from "./components/Combobox/index.js";
 export {
   type Command,
+  type CommandMatch,
   CommandPalette,
   type CommandPaletteLabels,
   type CommandPaletteProps,
@@ -122,6 +129,16 @@ export {
   type ContextMenuTargetProps,
 } from "./components/ContextMenu/index.js";
 export { CopyButton, type CopyButtonLabels, type CopyButtonProps } from "./components/CopyButton/index.js";
+export {
+  DataGrid,
+  type DataGridCell,
+  type DataGridCellKind,
+  type DataGridColumn,
+  type DataGridLabels,
+  type DataGridProps,
+  type DataGridRange,
+  type DataGridTokens,
+} from "./components/DataGrid/index.js";
 export { DateField, type DateFieldLabels, type DateFieldProps } from "./components/DateField/index.js";
 export {
   type DescriptionItem,
@@ -150,7 +167,13 @@ export {
   type ZoomSetting,
 } from "./components/DocumentViewport/index.js";
 export { EmptyState, type EmptyStateProps, type EmptyStateTokens } from "./components/EmptyState/index.js";
-export { Field, type FieldProps } from "./components/Field/index.js";
+export {
+  ErrorBoundary,
+  type ErrorBoundaryLabels,
+  type ErrorBoundaryProps,
+  type ErrorBoundaryTokens,
+} from "./components/ErrorBoundary/index.js";
+export { Field, type FieldLayoutProps, type FieldProps, type FieldWidth } from "./components/Field/index.js";
 export {
   acceptsFile,
   FileDrop,
@@ -187,6 +210,18 @@ export {
   type HeadingSize,
   type HeadingTokens,
 } from "./components/Heading/index.js";
+export {
+  HighlightedText,
+  type HighlightedTextProps,
+  type HighlightedTextTokens,
+  textMatches,
+} from "./components/HighlightedText/index.js";
+export {
+  HotkeyField,
+  type HotkeyFieldLabels,
+  type HotkeyFieldProps,
+  type HotkeyFieldTokens,
+} from "./components/HotkeyField/index.js";
 export { HoverCard, type HoverCardProps, type HoverCardTokens } from "./components/HoverCard/index.js";
 export { IconButton, type IconButtonProps } from "./components/IconButton/index.js";
 export { IconTile, type IconTileProps, type IconTileTokens } from "./components/IconTile/index.js";
@@ -208,6 +243,14 @@ export {
   type ListProps,
   type ListTokens,
 } from "./components/List/index.js";
+export {
+  ListRow,
+  type ListRowLabels,
+  type ListRowProps,
+  ListRows,
+  type ListRowsProps,
+  type ListRowTokens,
+} from "./components/ListRow/index.js";
 export { LoadingDots, type LoadingDotsProps } from "./components/LoadingDots/index.js";
 export {
   Menu,
@@ -218,6 +261,12 @@ export {
   type MenuTokens,
   type MenuTriggerProps,
 } from "./components/Menu/index.js";
+export {
+  Menubar,
+  type MenubarMenu,
+  type MenubarProps,
+  type MenubarTokens,
+} from "./components/Menubar/index.js";
 export { Notice, type NoticeLabels, type NoticeProps, type NoticeTokens } from "./components/Notice/index.js";
 export {
   NumberField,
@@ -227,6 +276,7 @@ export {
 } from "./components/NumberField/index.js";
 export {
   OptionList,
+  type OptionListAction,
   OptionListGroup,
   type OptionListGroupProps,
   OptionListItem,
@@ -236,6 +286,11 @@ export {
   type OptionListProps,
   type OptionListTokens,
 } from "./components/OptionList/index.js";
+export {
+  OverlayFrame,
+  type OverlayFrameProps,
+  type OverlayFrameTokens,
+} from "./components/OverlayFrame/index.js";
 export { PageHeader, type PageHeaderProps, type PageHeaderTokens } from "./components/PageHeader/index.js";
 export {
   Pagination,
@@ -246,6 +301,11 @@ export {
   pageRange,
 } from "./components/Pagination/index.js";
 export {
+  type CanvasCorner,
+  type CanvasDrag,
+  type CanvasPoint,
+  type CanvasPress,
+  type CanvasPressHandlers,
   type CanvasRect,
   type CanvasScreen,
   type CanvasView,
@@ -255,6 +315,12 @@ export {
   type PanZoomCanvasProps,
   type PanZoomCanvasTokens,
 } from "./components/PanZoomCanvas/index.js";
+export {
+  PathField,
+  type PathFieldLabels,
+  type PathFieldProps,
+  type PathFieldTokens,
+} from "./components/PathField/index.js";
 export {
   Popover,
   type PopoverProps,
@@ -276,6 +342,13 @@ export {
 export { Prose, type ProseProps, type ProseTokens } from "./components/Prose/index.js";
 export { QRCode, type QRCodeLabels, type QRCodeProps, type QRCodeTokens } from "./components/QRCode/index.js";
 export { RadioGroup, type RadioGroupProps, type RadioOption } from "./components/RadioGroup/index.js";
+export { RowActions, type RowActionsProps } from "./components/RowActions/index.js";
+export {
+  ScrollArea,
+  type ScrollAreaHandle,
+  type ScrollAreaIntoViewOptions,
+  type ScrollAreaProps,
+} from "./components/ScrollArea/index.js";
 export { SearchField, type SearchFieldProps } from "./components/SearchField/index.js";
 export { Section, type SectionProps, type SectionTokens } from "./components/Section/index.js";
 export {
@@ -367,8 +440,11 @@ export {
   type SortableListProps,
   type SortableListTokens,
 } from "./components/SortableList/index.js";
+export { SortButton, type SortButtonProps, type SortButtonTokens } from "./components/SortButton/index.js";
 export { SplitPane, type SplitPaneProps, type SplitPaneTokens } from "./components/SplitPane/index.js";
 export {
+  type BoxOverflow,
+  type BoxProps,
   BREAKPOINTS,
   type Breakpoint,
   type LayoutAttributes,
@@ -386,6 +462,14 @@ export {
   type StatProps,
   type StatTokens,
 } from "./components/Stat/index.js";
+export {
+  StatusBar,
+  type StatusBarProps,
+  StatusBarSegment,
+  type StatusBarSegmentProps,
+  type StatusBarSegmentVariant,
+  type StatusBarTokens,
+} from "./components/StatusBar/index.js";
 export {
   type StepItem,
   type StepStatus,
@@ -422,7 +506,13 @@ export {
   type TagInputTokens,
 } from "./components/TagInput/index.js";
 export { Text, type TextProps, type TextTokens } from "./components/Text/index.js";
-export { TextArea, type TextAreaProps } from "./components/TextArea/index.js";
+export {
+  TextArea,
+  type TextAreaLabels,
+  type TextAreaMention,
+  type TextAreaProps,
+  type TextAreaSuggestions,
+} from "./components/TextArea/index.js";
 export { TextField, type TextFieldProps } from "./components/TextField/index.js";
 export { ThemeToggle, type ThemeToggleProps } from "./components/ThemeToggle/index.js";
 export {
@@ -433,7 +523,15 @@ export {
   type TimeFieldProps,
 } from "./components/TimeField/index.js";
 export {
+  TitleBar,
+  type TitleBarControls,
+  type TitleBarLabels,
+  type TitleBarProps,
+  type TitleBarTokens,
+} from "./components/TitleBar/index.js";
+export {
   type ToastApi,
+  type ToastDismissReason,
   Toaster,
   type ToasterProps,
   type ToastLabels,
@@ -461,6 +559,7 @@ export {
   type VirtualListHandle,
   type VirtualListLabels,
   type VirtualListProps,
+  type VirtualListScrollOptions,
   type VirtualListTokens,
 } from "./components/VirtualList/index.js";
 export { VisuallyHidden, type VisuallyHiddenProps } from "./components/VisuallyHidden/index.js";
@@ -477,10 +576,24 @@ export { type DragOptions, type DragSession, useDrag } from "./foundations/drag.
 export { FileInputBase, type FileInputBaseProps, setInputFiles } from "./foundations/FileInputBase/index.js";
 export { type FieldRender, useField } from "./foundations/field.js";
 export { HiddenValue, type HiddenValueProps } from "./foundations/HiddenValue/HiddenValue.js";
-export { ariaKeyShortcuts, isApple, matchesHotkey, shortcutKeys, useHotkey } from "./foundations/hotkey.js";
+export {
+  ariaKeyShortcuts,
+  type HotkeyFromEventOptions,
+  hotkeyFromEvent,
+  isApple,
+  matchesHotkey,
+  shortcutKeys,
+  useHotkey,
+} from "./foundations/hotkey.js";
 export { Icon, type IconProps } from "./foundations/Icon/Icon.js";
 export { InputBase, type InputBaseProps } from "./foundations/InputBase/InputBase.js";
 export { LinkBase, type LinkBaseProps } from "./foundations/LinkBase/LinkBase.js";
+export {
+  type LiveMessage,
+  LiveRegion,
+  type LiveRegionProps,
+  useLiveMessage,
+} from "./foundations/LiveRegion/index.js";
 export {
   type QrLevel,
   type QrOptions,

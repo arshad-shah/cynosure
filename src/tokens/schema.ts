@@ -1,8 +1,24 @@
 /** The complete Cynosure token schema. Every visual property of every component resolves to one of these. */
 
 export type Size = "sm" | "md" | "lg";
+/**
+ * `Size` plus `xs`: about 20px tall, for dense desktop chrome (toolbars, inspectors). Only Button, IconButton, Select,
+ * TextField, ProgressBar and SegmentedControl take it; their hit area still reaches 24px (44px on coarse pointers).
+ */
+export type DenseSize = "xs" | Size;
 /** Semantic colour shared by every component prop named `tone`. */
 export type Tone = "accent" | "neutral" | "danger" | "success" | "warning" | "info";
+/** Every `Tone`, in order: for checking a value and for listing the choices (stories, the scaffold). */
+export const TONES = [
+  "accent",
+  "neutral",
+  "danger",
+  "success",
+  "warning",
+  "info",
+] as const satisfies readonly Tone[];
+/** A palette's mode: the one a fixed-mode theme keeps, and what a colour mode resolves to. */
+export type ThemeMode = "light" | "dark";
 export type Scale = "compact" | "comfortable" | "spacious" | number;
 export type PaletteName = "light" | "dark" | "light-contrast" | "dark-contrast";
 
@@ -50,6 +66,12 @@ export interface ColorTokens {
   syntaxTag: string;
   syntaxAttribute: string;
   syntaxRegexp: string;
+  /**
+   * Data visualisation: eight categorical colours for chart series, the first being the accent. Each reads at least 3:1
+   * on the background, surface and raised surface (graphics contrast) and they stay apart from each other. CSS:
+   * `--cy-color-series-1` to `--cy-color-series-8`. A palette patch must give all eight.
+   */
+  seriesColors: string[];
 }
 
 export interface MotionTokens {
@@ -64,7 +86,8 @@ export interface MotionTokens {
 /** Lengths are CSS px numbers, already multiplied by `scale`. */
 export interface GlobalTokens {
   scale: number;
-  control: { height: Record<Size, number> };
+  /** Control heights: `xs` (dense desktop chrome), `sm`, `md`, `lg`. CSS: `--cy-control-height-<size>`. */
+  control: { height: Record<DenseSize, number> };
   radius: { factor: number; segment: number; sm: number; md: number; lg: number; card: number; full: number };
   space: Record<"0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" | "10", number>;
   font: {
@@ -94,6 +117,11 @@ export interface ComponentTokens {}
 export type DeepPartial<T> = { [K in keyof T]?: T[K] extends object ? DeepPartial<T[K]> : T[K] };
 
 export interface ThemeInput {
+  /**
+   * Fixes the theme to one mode: a dark-only theme (Midnight) uses its dark palettes whatever the colour mode, and
+   * `CynosureTheme` sets that mode on its wrapper. Omit to follow the colour mode.
+   */
+  mode?: ThemeMode;
   /** Any hex, rgb(), hsl() or oklch() colour. */
   accent?: string;
   scale?: Scale;
@@ -113,4 +141,6 @@ export interface Theme {
   global: GlobalTokens;
   palettes: Record<PaletteName, ColorTokens>;
   components: Record<string, Record<string, string>>;
+  /** Set when the theme is fixed to one mode (`ThemeInput.mode`); its light and dark palettes are then the same. */
+  mode?: ThemeMode;
 }

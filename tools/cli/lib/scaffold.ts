@@ -143,6 +143,7 @@ const stories = (
 ) => `import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect } from "storybook/test";
 import { computeUnderHostileHost } from "../../test/hostile.js";
+import { TONES } from "../../tokens/schema.js";
 import { ${Name} } from "./${Name}.js";
 
 const meta = {
@@ -151,7 +152,7 @@ const meta = {
   args: { children: "${Name}", size: "md", tone: "neutral" },
   argTypes: {
     size: { control: "inline-radio", options: ["sm", "md", "lg"] },
-    tone: { control: "select", options: ["accent", "neutral", "danger", "success", "warning", "info"] },
+    tone: { control: "select", options: TONES },
   },
 } satisfies Meta<typeof ${Name}>;
 export default meta;
@@ -349,7 +350,8 @@ export function scaffoldIcon(root: string, name: string, svg: string, category: 
     file,
     `import type { IconData } from "./types.js";\n\nexport const ${id}: IconData = {\n  name: ${JSON.stringify(name)},\n  category: ${JSON.stringify(category)},\n  body: ${literal(icon.body)},\n};\n`,
   );
-  const index = join(root, "src/icons/index.ts");
+  // Icons are listed in facet.ts (re-exported by index.ts and read by by-name.ts), one export each.
+  const index = join(root, "src/icons/facet.ts");
   writeFileSync(index, sortExports(`${readFileSync(index, "utf8")}export { ${id} } from "./${name}.js";\n`));
   return file;
 }

@@ -186,6 +186,81 @@ export const PalmRejection: Story = {
   },
 };
 
+export const InkShowsWhileDrawingAndAfterAResize: Story = {
+  render: () => (
+    <div data-testid="frame" style={{ inlineSize: 400 }}>
+      <Signing />
+    </div>
+  ),
+  play: async ({ canvas, canvasElement }) => {
+    const c = pad(canvasElement);
+    // The stroke in progress is drawn before it is finished.
+    const release = draw(c, ZIGZAG);
+    await waitFor(() => expect(inked(c)).toBeGreaterThan(200));
+    await expect(canvas.getByTestId("count")).toHaveTextContent("0");
+    release();
+    await waitFor(() => expect(canvas.getByTestId("count")).toHaveTextContent("1"));
+    // A narrower pad gets a canvas of its new size, with the ink drawn again on it.
+    const before = inked(c);
+    canvas.getByTestId("frame").style.inlineSize = "200px";
+    await waitFor(() => expect(c.width).toBe(Math.round(c.clientWidth * window.devicePixelRatio)));
+    await waitFor(() => expect(inked(c)).toBeGreaterThan(100));
+    await expect(c.clientWidth).toBeLessThan(250);
+    await expect(before).toBeGreaterThan(200);
+  },
+};
+
+/** Pretends the screen has `ratio` device pixels per CSS pixel. */
+const setRatio = (ratio: number) =>
+  Object.defineProperty(window, "devicePixelRatio", { configurable: true, value: ratio });
+/** The density queries the pad watches, as fakes a test can fire (a real one fires only on a real screen change). */
+const densityWatches: EventTarget[] = [];
+
+export const SharpAfterMovingToADenserScreen: Story = {
+  beforeEach: () => {
+    const ratio = Object.getOwnPropertyDescriptor(window, "devicePixelRatio");
+    const match = Object.getOwnPropertyDescriptor(window, "matchMedia");
+    const real = window.matchMedia.bind(window);
+    setRatio(1);
+    densityWatches.length = 0;
+    Object.defineProperty(window, "matchMedia", {
+      configurable: true,
+      value: (query: string) => {
+        if (!query.startsWith("(resolution:")) return real(query);
+        const watch = Object.assign(new EventTarget(), { media: query, matches: true });
+        densityWatches.push(watch);
+        return watch;
+      },
+    });
+    // The window's own properties (or the prototype's, in some engines) are put back afterwards.
+    return () => {
+      for (const [name, own] of [
+        ["devicePixelRatio", ratio],
+        ["matchMedia", match],
+      ] as const)
+        if (own) Object.defineProperty(window, name, own);
+        else Reflect.deleteProperty(window, name);
+    };
+  },
+  render: () => <Signing />,
+  play: async ({ canvas, canvasElement }) => {
+    const c = pad(canvasElement);
+    draw(c, ZIGZAG)();
+    await waitFor(() => expect(canvas.getByTestId("count")).toHaveTextContent("1"));
+    await waitFor(() => expect(c.width).toBe(c.clientWidth));
+    const before = inked(c);
+    // The window moves to a screen of twice the density: nothing resizes, but the density query changes.
+    setRatio(2);
+    (densityWatches.at(-1) as EventTarget).dispatchEvent(new Event("change"));
+    // The canvas gets twice the pixels at the same CSS size, with the signature drawn again on them.
+    await waitFor(() => expect(c.width).toBe(c.clientWidth * 2));
+    await expect(c.height).toBe(c.clientHeight * 2);
+    await waitFor(() => expect(inked(c)).toBeGreaterThan(before * 3));
+    // It now watches for a change from the new density.
+    await expect((densityWatches.at(-1) as unknown as MediaQueryList).media).toBe("(resolution: 2dppx)");
+  },
+};
+
 export const KeepsItsShapeAtAnySize: Story = {
   render: () => <Signing space={{ width: 600, height: 200 }} width={300} height={100} />,
   play: async ({ canvas, canvasElement }) => {
@@ -236,6 +311,32 @@ export const Disabled: Story = {
     await expect(c).toHaveAttribute("aria-disabled", "true");
     draw(c, ZIGZAG)();
     await expect(canvas.getByTestId("count")).toHaveTextContent("0");
+  },
+};
+
+function Removable() {
+  const [shown, setShown] = useState(true);
+  return (
+    <Stack gap="2">
+      {shown && <Signing />}
+      <Button onClick={() => setShown(false)}>Remove</Button>
+    </Stack>
+  );
+}
+
+export const RemovedMidStroke: Story = {
+  render: () => <Removable />,
+  play: async ({ canvas, canvasElement }) => {
+    const errors: unknown[] = [];
+    const onError = (e: ErrorEvent) => errors.push(e.error);
+    window.addEventListener("error", onError);
+    // A move asks for a frame; the pad is gone before the frame comes, and the frame then draws nothing.
+    draw(pad(canvasElement), ZIGZAG);
+    canvas.getByRole("button", { name: "Remove" }).click();
+    await waitFor(() => expect(canvasElement.querySelector("canvas")).toBeNull());
+    await new Promise((res) => requestAnimationFrame(() => requestAnimationFrame(res)));
+    window.removeEventListener("error", onError);
+    await expect(errors).toEqual([]);
   },
 };
 

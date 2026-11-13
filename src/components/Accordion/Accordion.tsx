@@ -23,7 +23,7 @@ interface Shared {
 export interface AccordionSingleProps extends Shared {
   /** One section open at a time. */
   type?: "single";
-  /** Controlled: the `value` of the open section, or undefined for none. */
+  /** Controlled: the `value` of the open section, or undefined for none (passing the prop at all makes it controlled). */
   value?: string | undefined;
   /** The section open at first, when uncontrolled. */
   defaultValue?: string;
@@ -75,8 +75,10 @@ export function Accordion(props: AccordionProps) {
   // Single mode holds one value (or none); both modes are kept as a list here.
   const asList = (v: string | string[] | undefined) =>
     v === undefined ? undefined : Array.isArray(v) ? v : [v];
+  // In single mode a `value` prop that is present makes it controlled, even when undefined: that means none open.
+  const controlledNone = !multiple && "value" in props && props.value === undefined;
   const [open, commit] = useControllableState<string[]>(
-    asList(props.value),
+    controlledNone ? [] : asList(props.value),
     () => asList(props.defaultValue) ?? [],
     (next) =>
       multiple

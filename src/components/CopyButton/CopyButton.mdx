@@ -47,7 +47,7 @@ Whatever `copy` does, a throw or a rejected promise shows the failed state.
 | Click, tap, <kbd>Enter</kbd>, <kbd>Space</kbd> | Copies |
 
 - **Name:** the button is named by `labels.copy`; after a copy its name and tooltip become `labels.copied` (or `labels.failed`) until `timeout` passes.
-- **Announcement:** a visually hidden `role="status"` exists from the start, and the result is written into it, so screen readers hear it once.
+- **Announcement:** a visually hidden `role="status"` exists from the start, and the result is written into it, so screen readers hear it once; copying again is announced again (a [LiveRegion](?path=/docs/foundations-liveregion--docs)).
 - **Colour:** the icon takes the success or danger text colour while the result shows; the change is also in the icon shape and the words.
 - **Never throws:** a missing clipboard, a refused permission and a throwing writer all end in the failed state, and `onError` receives the error.
 

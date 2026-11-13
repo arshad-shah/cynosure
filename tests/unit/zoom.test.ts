@@ -20,6 +20,17 @@ describe("zoom", () => {
     expect(zoomStep(800, 1)).toBe(800);
     expect(zoomStep(25, -1)).toBe(25);
   });
+  it("keeps to other limits when given them (a canvas at 20 to 300%)", () => {
+    expect(clampPercent(10, 20, 300)).toBe(20);
+    expect(clampPercent(500, 20, 300)).toBe(300);
+    expect(zoomStep(25, -1, 20, 300)).toBe(20);
+    expect(zoomStep(20, -1, 20, 300)).toBe(20);
+    expect(zoomStep(20, 1, 20, 300)).toBe(25);
+    expect(zoomStep(250, 1, 20, 300)).toBe(300);
+    expect(zoomStep(300, 1, 20, 300)).toBe(300);
+    expect(zoomStep(280, 1, 20, 280)).toBe(280);
+    expect(zoomStep(40, -1, 40, 300)).toBe(40);
+  });
   it("fits the widest page, or the whole page, inside the viewport", () => {
     const view = { width: 632, height: 532 };
     expect(zoomScale({ kind: "fit-width" }, pages, view, 16)).toBeCloseTo(1, 6);

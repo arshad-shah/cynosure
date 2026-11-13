@@ -46,6 +46,21 @@ function Archive() {
 
 `toast()` returns an id; `dismiss(id)` closes that toast and `dismiss()` closes them all. Each Toaster has its own store, so two products on one page (or two extension surfaces) never share toasts.
 
+## Loading, then done
+
+Give a toast an `id` and call `toast()` again with the same id to update it in place: the same toast, not a second one. `loading: true` shows a spinner instead of the tone's icon and keeps the toast until it is updated or dismissed; the update's `duration` starts afresh.
+
+```tsx
+const { toast } = useToast();
+toast({ id: "export", title: "Exporting", loading: true });
+await exportRows();
+toast({ id: "export", title: "Exported 120 rows", tone: "success" });
+```
+
+`onDismiss(id, reason)` is called once when a toast starts to close: `"timeout"` when its timer ran out, `"user"` for the close button or a swipe, `"programmatic"` for `dismiss()`.
+
+<Canvas of={Stories.UpdatesInPlaceFromLoadingToDone} />
+
 ## Stacking
 
 At most `max` toasts show at once. Older ones fold away and come back as newer ones close; they are the same elements, so a screen reader does not hear them twice.
@@ -95,7 +110,7 @@ Toasts raised while a Dialog is open appear above it, and carry on after it clos
 | Close button | Closes that toast |
 | Action button | Runs the action; the toast stays until it times out or is closed |
 
-- **Announcements:** each toast is a live element: `role="status"` (polite), or `role="alert"` (assertive) for `tone="danger"`. Its text arrives once, after the live element exists, so it is announced once.
+- **Announcements:** each toast is a live element: `role="status"` (polite), or `role="alert"` (assertive) for `tone="danger"`. Its text arrives once, after the live element exists, so it is announced once. An update changes the text in the same live element: only a change is announced, and an update with the same text announces nothing. The loading spinner is decorative.
 - **Region:** toasts sit in a region named "Notifications" in the browser top layer, so no parent can clip them. Pointer events pass through the empty parts of the region.
 - **Edges:** the region keeps the toasts inside the device's safe area on every side (`env(safe-area-inset-*)`), then adds `offset`. Its empty parts never take presses, so a tab bar under it still works.
 - **Hidden page:** timers also pause while the tab is hidden, so a toast is not missed.

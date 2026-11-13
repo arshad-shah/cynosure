@@ -58,10 +58,66 @@
   color: var(--cy-color-ink);
   font-family: var(--cy-font-sans);
   font-size: var(--cy-font-size-md);
-  &[data-size="sm"] .cy-field-label {
+  &[data-size="sm"] .cy-field-label,
+  &[data-size="xs"] .cy-field-label {
     font-size: var(--cy-font-size-xs);
   }
   &[data-size="lg"] .cy-field-label {
     font-size: var(--cy-font-size-md);
+  }
+}
+
+/*
+ * Control width: a box of the token's width (never wider than the field) that the control fills. Without a width the
+ * box takes the control's own size.
+ */
+.cy-field-control.cy-field-control {
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  font-size: inherit;
+  &[data-width] > * {
+    inline-size: 100%;
+    max-inline-size: 100%;
+  }
+  &[data-width="sm"] {
+    inline-size: var(--cy-field-control-width-sm, 160px);
+  }
+  &[data-width="md"] {
+    inline-size: var(--cy-field-control-width-md, 256px);
+  }
+  &[data-width="lg"] {
+    inline-size: var(--cy-field-control-width-lg, 384px);
+  }
+  &[data-width="full"] {
+    inline-size: 100%;
+  }
+}
+
+/*
+ * Split: the label and description at the start, the control at the end of the same row, centred on the text. A
+ * wrapping row, so when the text column would drop below its minimum the control moves under it; the error takes a
+ * line of its own under both.
+ */
+.cy-field.cy-field[data-layout="split"] {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: var(--cy-space-7);
+  row-gap: var(--cy-field-gap, var(--cy-space-3));
+  & > .cy-field-text {
+    display: grid;
+    flex: 1 1 var(--cy-field-split-text-min, 192px);
+    align-content: start;
+    gap: var(--cy-space-2);
+    min-inline-size: 0;
+    font-size: inherit;
+  }
+  & > .cy-field-control {
+    flex: none;
+  }
+  & > .cy-field-error {
+    flex-basis: 100%;
   }
 }

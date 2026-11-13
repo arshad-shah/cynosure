@@ -43,6 +43,10 @@ import { download, trash } from "@arshad-shah/cynosure/icons";
 <Canvas of={Stories.Sizes} />
 <Canvas of={Stories.WithIcons} />
 
+`xs` (20px, smaller text and icon) is for dense desktop chrome such as toolbars and inspectors. It matches the `xs` of TextField, Select, IconButton and SegmentedControl. Only the look is small: the button is still 24px to press, and 44px on coarse pointers.
+
+<Canvas of={Stories.ExtraSmallForDenseChrome} />
+
 ## States
 
 - **Loading:** shows [LoadingDots](?path=/docs/components-loadingdots--docs), sets `aria-busy` and ignores clicks. It keeps its width, so the layout doesn't jump.
@@ -87,7 +91,7 @@ The hit area is at least 24px, growing to 44px on coarse pointers (phones and ta
 
 ## Theming
 
-Tokens: `--cy-button-height-{sm,md,lg}`, `--cy-button-radius`, `--cy-button-padding-inline`, `--cy-button-gap`, `--cy-button-font-weight`, `--cy-button-max-width`, `--cy-button-solid-shadow`, `--cy-button-soft-mix`, `--cy-button-outline-mix` and `--cy-button-press-scale`.
+Tokens: `--cy-button-height-{xs,sm,md,lg}`, `--cy-button-radius`, `--cy-button-padding-inline`, `--cy-button-padding-inline-xs`, `--cy-button-gap`, `--cy-button-font-weight`, `--cy-button-max-width`, `--cy-button-solid-shadow`, `--cy-button-soft-mix`, `--cy-button-outline-mix`, `--cy-button-press-scale`, and `--cy-button-hover-bg` and `--cy-button-hover-ink` (the hover fill and text colour, for one button whose hover differs from its variant, such as TitleBar's close control).
 
 ```ts
 createTheme({ accent: "#2563eb", components: { button: { radius: "999px", fontWeight: "600" } } });

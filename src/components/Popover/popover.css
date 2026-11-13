@@ -41,6 +41,15 @@
   &[data-size="lg"] {
     --_w: var(--cy-popover-width-lg, 420px);
   }
+  /* Exactly the size preset, however short the content. */
+  &[data-width="fixed"] {
+    inline-size: min(var(--_w), calc(100vw - var(--cy-space-6)));
+  }
+  /* At least the trigger's width (measured on open into --_anchor-w); content may widen it up to the preset. */
+  &[data-width="trigger"] {
+    min-inline-size: min(var(--_anchor-w, 0px), calc(100vw - var(--cy-space-6)));
+    max-inline-size: min(max(var(--_w), var(--_anchor-w, 0px)), calc(100vw - var(--cy-space-6)));
+  }
   &:focus-visible {
     box-shadow:
       var(--cy-shadow-lg),

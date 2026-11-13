@@ -3,18 +3,22 @@ import {
   type CSSProperties,
   type KeyboardEvent,
   type ReactNode,
-  useEffect,
   useId,
-  useLayoutEffect,
   useRef,
   useState,
 } from "react";
 import { useControllableState } from "../../foundations/controllable.js";
+import { isRtl } from "../../foundations/dir.js";
 import { HiddenValue } from "../../foundations/HiddenValue/HiddenValue.js";
 import { isComposing } from "../../foundations/keys.js";
+import { LiveRegion, useLiveMessage } from "../../foundations/LiveRegion/LiveRegion.js";
+import { useActiveOption } from "../../foundations/listbox.js";
+import { textMatches } from "../../foundations/text-match.js";
 import { close } from "../../icons/close.js";
+import type { IconData } from "../../icons/types.js";
 import { useListboxLayer } from "../../overlay/listbox-layer.js";
 import type { Size } from "../../tokens/schema.js";
+import type { FieldLayoutProps } from "../Field/Field.js";
 import { IconButton } from "../IconButton/IconButton.js";
 import { OptionList, OptionListItem, OptionListNote } from "../OptionList/OptionList.js";
 import { TextField } from "../TextField/TextField.js";
@@ -38,13 +42,15 @@ export interface TagInputLabels {
   remove: (tag: string) => string;
   added: (tag: string) => string;
   removed: (tag: string) => string;
+  /** Announced when Backspace takes the last tag back into the field to edit. Default: "Editing design". */
+  editing: (tag: string) => string;
   duplicate: (tag: string) => string;
   tooMany: (max: number) => string;
   /** Shown in the suggestion list when nothing matches. Default: "No suggestions". */
   empty: string;
 }
 
-export interface TagInputProps {
+export interface TagInputProps extends FieldLayoutProps {
   /** The field's label and accessible name. */
   label: ReactNode;
   /** Visually hide the label (it still names the control). Prefer visible labels. */
@@ -79,6 +85,10 @@ export interface TagInputProps {
   disabled?: boolean | undefined;
   /** Hint shown in the input while nothing is typed. */
   placeholder?: string | undefined;
+  /** Draws a tag's content in place of its text (the remove button is still named by the text). */
+  renderTag?: ((tag: string) => ReactNode) | undefined;
+  /** Icon at the start of the field, before the input. */
+  iconStart?: IconData | undefined;
   /** Field height and text size. Default "md". */
   size?: Size;
   /** `outline` or `soft` (tinted, borderless until focus). Default "outline". */
@@ -96,10 +106,19 @@ const DEFAULT_LABELS: TagInputLabels = {
   remove: (tag) => `Remove ${tag}`,
   added: (tag) => `${tag} added`,
   removed: (tag) => `${tag} removed`,
+  editing: (tag) => `Editing ${tag}`,
   duplicate: (tag) => `${tag} is already added`,
   tooMany: (max) => `Up to ${max} tags`,
   empty: "No suggestions",
 };
+
+/** Left and Right as they would be in left-to-right text: in right-to-left text the tags lie to the right. */
+const inlineKey = (key: string, el: Element) =>
+  (key === "ArrowLeft" || key === "ArrowRight") && isRtl(el)
+    ? key === "ArrowLeft"
+      ? "ArrowRight"
+      : "ArrowLeft"
+    : key;
 
 /**
  * Several short values in one field: type and press Enter (or a comma), pick a suggestion, or paste a list. Tags can
@@ -108,6 +127,8 @@ const DEFAULT_LABELS: TagInputLabels = {
 export function TagInput({
   label,
   labelHidden,
+  layout,
+  width,
   description,
   error,
   value,
@@ -123,6 +144,8 @@ export function TagInput({
   required,
   disabled,
   placeholder,
+  renderTag,
+  iconStart,
   size = "md",
   variant = "outline",
   labels,
@@ -135,20 +158,24 @@ export function TagInput({
   const [tags, update, resetTags] = useControllableState(value, defaultValue, onChange);
   const [typed, setTyped] = useState("");
   const [problem, setProblem] = useState<string | null>(null);
-  const [said, setSaid] = useState("");
+  const [said, setSaid] = useLiveMessage();
   const [open, setOpen] = useState(false);
-  const [active, setActive] = useState(0);
   const input = useRef<HTMLInputElement>(null);
-  const anchor = useRef<HTMLElement | null>(null);
+  // The list drops from the whole field (TextField's box), not just the input.
+  const anchor = useRef<HTMLDivElement>(null);
   const list = useRef<HTMLDivElement>(null);
   const chips = useRef<HTMLUListElement>(null);
 
   const same = (a: string, b: string) => a.toLocaleLowerCase() === b.toLocaleLowerCase();
   const query = typed.trim();
-  const matches = (suggestions ?? []).filter(
-    (s) => !tags.some((t) => same(t, s)) && s.toLocaleLowerCase().includes(query.toLocaleLowerCase()),
-  );
+  const matches = (suggestions ?? []).filter((s) => !tags.some((t) => same(t, s)) && textMatches(s, query));
   const listOpen = open && suggestions !== undefined && !disabled;
+  const { active, activeId, optionId, setActive, first, last, move } = useActiveOption({
+    id: listId,
+    list,
+    open: listOpen,
+    count: matches.length,
+  });
 
   /** Adds each candidate that passes the checks; reports the first problem. Returns whether all were added. */
   const add = (candidates: string[]) => {
@@ -189,14 +216,7 @@ export function TagInput({
   const split = (s: string) =>
     [...separators, "\n"].reduce<string[]>((parts, sep) => parts.flatMap((p) => p.split(sep)), [s]);
 
-  // The list drops from the whole field (chips and input), found before the layer shows.
-  useLayoutEffect(() => {
-    anchor.current = input.current?.closest<HTMLElement>(".cy-text-field") ?? null;
-  });
   useListboxLayer({ anchor, list, open: listOpen, onClose: () => setOpen(false) });
-  useEffect(() => {
-    if (active >= matches.length) setActive(Math.max(0, matches.length - 1));
-  }, [active, matches.length]);
 
   const removeButtons = () => [...(chips.current?.querySelectorAll<HTMLButtonElement>("button") ?? [])];
 
@@ -208,7 +228,7 @@ export function TagInput({
       commitTyped();
       return;
     }
-    switch (event.key) {
+    switch (inlineKey(event.key, el)) {
       case "Enter": {
         const pick = listOpen ? matches[active] : undefined;
         if (pick) {
@@ -218,9 +238,14 @@ export function TagInput({
         return;
       }
       case "Backspace":
+        // In an empty field, the last tag comes back into it to be edited (Enter or leaving puts it back).
         if (el.value === "" && tags.length) {
           event.preventDefault();
-          remove(tags.length - 1);
+          const tag = tags[tags.length - 1] as string;
+          setProblem(null);
+          setSaid(text.editing(tag));
+          update(tags.slice(0, -1));
+          setTyped(tag);
         }
         return;
       case "ArrowLeft":
@@ -235,11 +260,8 @@ export function TagInput({
         event.preventDefault();
         if (!listOpen) {
           setOpen(true);
-          setActive(event.key === "ArrowUp" ? Math.max(0, matches.length - 1) : 0);
-        } else
-          setActive((a) =>
-            Math.min(Math.max(a + (event.key === "ArrowDown" ? 1 : -1), 0), Math.max(0, matches.length - 1)),
-          );
+          setActive(event.key === "ArrowUp" ? last() : first());
+        } else move(event.key === "ArrowDown" ? 1 : -1);
         return;
       case "Escape":
         if (listOpen) {
@@ -253,7 +275,7 @@ export function TagInput({
   const onTagKeyDown = (index: number) => (event: KeyboardEvent<HTMLButtonElement>) => {
     const buttons = removeButtons();
     const toInput = () => input.current?.focus();
-    switch (event.key) {
+    switch (inlineKey(event.key, event.currentTarget)) {
       case "ArrowLeft":
         event.preventDefault();
         buttons[Math.max(0, index - 1)]?.focus();
@@ -284,12 +306,16 @@ export function TagInput({
     <div className={className ? `cy-tag-input ${className}` : "cy-tag-input"} data-size={size} style={style}>
       <TextField
         ref={input}
+        boxRef={anchor}
         label={label}
         labelHidden={labelHidden}
+        layout={layout}
+        width={width}
         description={description}
         error={error ?? problem ?? undefined}
         size={size}
         variant={variant}
+        iconStart={iconStart}
         placeholder={placeholder}
         disabled={disabled}
         required={required && tags.length === 0}
@@ -302,7 +328,7 @@ export function TagInput({
               "aria-autocomplete": "list" as const,
               "aria-expanded": listOpen,
               "aria-controls": listId,
-              "aria-activedescendant": listOpen && matches.length ? `${listId}-${active}` : undefined,
+              "aria-activedescendant": activeId,
             }
           : {})}
         onChange={(next) => {
@@ -327,7 +353,7 @@ export function TagInput({
         <ul ref={chips} className="cy-tag-input-tags cy-reset" aria-label={text.tags}>
           {tags.map((tag, index) => (
             <li key={`${tag}-${index}`} className="cy-tag-input-tag cy-reset">
-              <span className="cy-tag-input-text cy-reset">{tag}</span>
+              <span className="cy-tag-input-text cy-reset">{renderTag ? renderTag(tag) : tag}</span>
               {!disabled && (
                 <IconButton
                   icon={close}
@@ -354,7 +380,7 @@ export function TagInput({
             matches.map((s, index) => (
               <OptionListItem
                 key={s}
-                id={`${listId}-${index}`}
+                id={optionId(index)}
                 label={s}
                 selected={index === active}
                 active={index === active}
@@ -368,9 +394,7 @@ export function TagInput({
           )}
         </OptionList>
       )}
-      <span className="cy-visually-hidden" role="status">
-        {said}
-      </span>
+      <LiveRegion {...said} />
       {tags.map((tag, index) => (
         <HiddenValue key={`${tag}-${index}`} name={name} form={form} value={tag} disabled={disabled} />
       ))}

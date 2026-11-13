@@ -29,9 +29,13 @@
   min-block-size: max(var(--_h), var(--_hit));
   margin: 0;
   padding: 0 var(--cy-space-4) 0 var(--cy-space-5);
-  border: var(--cy-border-width) solid var(--cy-select-border, var(--cy-color-line));
-  border-radius: var(--cy-select-radius, calc(var(--_h) * var(--cy-radius-factor)));
-  background: var(--cy-select-bg, var(--cy-color-surface));
+  border: var(--cy-border-width) solid
+    var(--cy-select-border, var(--cy-field-control-border, var(--cy-color-line)));
+  border-radius: var(
+    --cy-select-radius,
+    var(--cy-field-control-radius, calc(var(--_h) * var(--cy-radius-factor)))
+  );
+  background: var(--cy-select-bg, var(--cy-field-control-bg, var(--cy-color-surface)));
   background-image: none;
   color: var(--cy-color-ink);
   font-family: var(--cy-font-sans);
@@ -81,6 +85,22 @@
   &[data-size="sm"] .cy-select-trigger {
     --_h: var(--cy-control-height-sm);
     font-size: var(--cy-font-size-sm);
+  }
+  /* xs: dense desktop chrome. The trigger looks 20px tall; an invisible ::before keeps it --_hit to press. */
+  &[data-size="xs"] .cy-select-trigger {
+    --_h: var(--cy-control-height-xs);
+    min-block-size: var(--_h);
+    gap: var(--cy-space-2);
+    padding-inline: var(--cy-space-4) var(--cy-space-3);
+    font-size: var(--cy-font-size-xs);
+    &::before {
+      content: "";
+      position: absolute;
+      inset-inline: 0;
+      top: 50%;
+      translate: 0 -50%;
+      block-size: max(100%, var(--_hit));
+    }
   }
   &[data-size="lg"] .cy-select-trigger {
     --_h: var(--cy-control-height-lg);

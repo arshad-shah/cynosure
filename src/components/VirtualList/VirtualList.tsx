@@ -4,16 +4,21 @@ import {
   type ReactNode,
   type Ref,
   useImperativeHandle,
+  useMemo,
   useRef,
   useState,
 } from "react";
 import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js";
 import { useControllableState } from "../../foundations/controllable.js";
 import { useDrag } from "../../foundations/drag.js";
+import { LiveRegion, useLiveMessage } from "../../foundations/LiveRegion/LiveRegion.js";
 import { seekEnabled } from "../../foundations/listbox.js";
 import { clamp } from "../../foundations/math.js";
 import { moveItems } from "../../foundations/reorder.js";
+import type { ScrollAlign } from "../../foundations/scroll-align.js";
+import { useFollow } from "../../foundations/use-follow.js";
 import { useVirtualWindow } from "../../foundations/virtual-window.js";
+import { OverlayFrame } from "../OverlayFrame/OverlayFrame.js";
 
 export interface VirtualListTokens {
   /** Height of the list (it scrolls inside). */
@@ -36,10 +41,19 @@ export interface VirtualItemState {
   disabled: boolean;
 }
 
+/** Where `scrollToIndex` puts the row. */
+export interface VirtualListScrollOptions {
+  /** `nearest` (default) scrolls the least that shows it whole; `start` puts it at the top; `center` in the middle. */
+  align?: ScrollAlign;
+}
+
 /** What `handle` gives you: scroll a row into view from outside (a search hit, a "jump to latest" button). */
 export interface VirtualListHandle {
-  /** Scrolls row `index` into view: `nearest` (default, the least scrolling), `start` or `center`. */
-  scrollToIndex: (index: number, align?: "nearest" | "start" | "center") => void;
+  /**
+   * Scrolls row `index` into view, placed by `options.align` (as ScrollArea's `scrollIntoView`). The alignment alone
+   * (`scrollToIndex(i, "center")`, the earlier form) still works.
+   */
+  scrollToIndex: (index: number, options?: VirtualListScrollOptions | ScrollAlign) => void;
   /** Scrolls to the last row. */
   scrollToEnd: () => void;
 }
@@ -58,6 +72,16 @@ export interface VirtualListProps<T> {
   /** Keep the end in view as rows are added, while the list is scrolled to the end (a log, a live feed). */
   follow?: boolean;
   /**
+   * Called with false when the view leaves the end of the list and true when it is back, from scrolling or from rows
+   * arriving past it. It starts true. Use it to show a "jump to latest" control in `overlay`.
+   */
+  onAtBottomChange?: ((atBottom: boolean) => void) | undefined;
+  /**
+   * Content pinned over the list at the bottom centre that does not scroll: a "3 new" pill, a "jump to latest" button.
+   * It is outside the listbox.
+   */
+  overlay?: ReactNode;
+  /**
    * Rows that head a section (a date, a group). They cannot be focused or selected, and the current section's heading
    * stays pinned at the top while its rows scroll under it.
    */
@@ -69,8 +93,12 @@ export interface VirtualListProps<T> {
   /** "none" (a list to act on), "single" (default) or "multiple". */
   selectionMode?: "none" | "single" | "multiple";
   /** Keys of the selected rows (controlled). */
-  selectedKeys?: string[] | undefined;
+  selected?: string[] | undefined;
   /** Keys of the rows selected at the start when uncontrolled. */
+  defaultSelected?: string[];
+  /** Old name of `selected`. @deprecated Use `selected`, the name Tree, Table and DataGrid use. */
+  selectedKeys?: string[] | undefined;
+  /** Old name of `defaultSelected`. @deprecated Use `defaultSelected`. */
   defaultSelectedKeys?: string[];
   /** Called with the selected keys when the selection changes. */
   onSelectionChange?: ((keys: string[]) => void) | undefined;
@@ -118,13 +146,17 @@ export function VirtualList<T>({
   renderItem,
   isDisabled,
   selectionMode = "single",
+  selected,
+  defaultSelected,
   selectedKeys,
-  defaultSelectedKeys = [],
+  defaultSelectedKeys,
   onSelectionChange,
   onAction,
   onMove,
   wrap = false,
   follow = false,
+  onAtBottomChange,
+  overlay,
   isHeader,
   handle,
   empty,
@@ -134,12 +166,16 @@ export function VirtualList<T>({
   style,
 }: VirtualListProps<T>) {
   const root = useRef<HTMLDivElement>(null);
-  const [picked, choose] = useControllableState(selectedKeys, defaultSelectedKeys, onSelectionChange);
+  const [picked, choose] = useControllableState(
+    selected ?? selectedKeys,
+    defaultSelected ?? defaultSelectedKeys ?? [],
+    onSelectionChange,
+  );
   const [focusKey, setFocusKey] = useState<string | null>(null);
   const moveFocus = useRef(false);
   const anchor = useRef<number | null>(null);
   const text = { ...DEFAULT_LABELS, ...labels };
-  const [said, setSaid] = useState("");
+  const [said, setSaid] = useLiveMessage();
   /** While dragging: the rows moved and the gap they would drop into (0 to the row count). */
   const [drag, setDragState] = useState<{ block: string[]; gap: number } | null>(null);
   const dragRef = useRef(drag);
@@ -148,66 +184,96 @@ export function VirtualList<T>({
     setDragState(next);
   };
 
-  const keys = items.map((item, i) => getKey(item, i));
+  // Work over the whole list happens once per change of the items or the selection, never per scroll: keys, where
+  // each key is, and the chosen keys as a Set (so nothing below scans a list per row).
+  const keys = useMemo(() => items.map((item, i) => getKey(item, i)), [items, getKey]);
+  const indexOf = useMemo(() => new Map(keys.map((k, i) => [k, i])), [keys]);
+  const pickedSet = useMemo(() => new Set(picked), [picked]);
   const header = (i: number) => !!isHeader?.(items[i] as T);
   const off = (i: number) => !!isDisabled?.(items[i] as T) || header(i);
-  const firstEnabled = keys.findIndex((_, i) => !off(i));
-  const focusIndex = focusKey === null ? -1 : keys.indexOf(focusKey);
-  const pickedIndex = keys.findIndex((k, i) => picked.includes(k) && !off(i));
+  const { firstEnabled, pickedIndex } = useMemo(() => {
+    const usable = (i: number) => !isDisabled?.(items[i] as T) && !isHeader?.(items[i] as T);
+    return {
+      firstEnabled: keys.findIndex((_, i) => usable(i)),
+      pickedIndex: keys.findIndex((k, i) => pickedSet.has(k) && usable(i)),
+    };
+  }, [keys, items, isDisabled, isHeader, pickedSet]);
+  const focusIndex = focusKey === null ? -1 : (indexOf.get(focusKey) ?? -1);
   const stop = focusIndex >= 0 ? focusIndex : pickedIndex >= 0 ? pickedIndex : firstEnabled;
 
-  // Wrapped rows are measured as they render; rows not yet seen are guessed at the height of one line.
+  // Wrapped rows are measured by a ResizeObserver as they render (and again when they change size, say when the list
+  // narrows); rows not yet seen are guessed at the height of one line. Scrolling reads no heights.
   const [measured, setMeasured] = useState<ReadonlyMap<string, number>>(() => new Map());
   const [line, setLine] = useState(0);
-  const sizes = wrap ? keys.map((k) => measured.get(k) ?? line) : undefined;
+  const sizes = useMemo(
+    () => (wrap && line ? keys.map((k) => measured.get(k) ?? line) : undefined),
+    [wrap, line, keys, measured],
+  );
   const win = useVirtualWindow(root, {
     count: items.length,
     rowSelector: ".cy-virtual-list-row",
     keep: stop,
-    ...(sizes && line ? { sizes } : {}),
+    ...(sizes ? { sizes } : {}),
   });
+  const keysRef = useRef(keys);
+  keysRef.current = keys;
+  const sizer = useRef<{ observer: ResizeObserver; seen: Set<Element> } | null>(null);
   useClientLayoutEffect(() => {
     if (!wrap) return;
-    const rows = root.current?.querySelectorAll<HTMLElement>(".cy-virtual-list-row") ?? [];
-    let next: Map<string, number> | null = null;
-    for (const row of rows) {
-      const key = keys[Number(row.dataset.index)] as string;
-      const h = row.offsetHeight;
-      if (h && measured.get(key) !== h) {
-        next ??= new Map(measured);
-        next.set(key, h);
+    const observer = new ResizeObserver((entries) => {
+      const sized: [string, number][] = [];
+      for (const { target } of entries) {
+        const key = keysRef.current[Number((target as HTMLElement).dataset.index)];
+        const h = (target as HTMLElement).offsetHeight;
+        if (h && key !== undefined) sized.push([key, h]);
       }
-    }
-    if (next) setMeasured(next);
-    // One line: the smallest row, so unseen rows are never guessed taller than they can be.
-    if (!line && rows.length) setLine(Math.min(...[...rows].map((row) => row.offsetHeight || win.rowSize)));
+      if (!sized.length) return;
+      setMeasured((measured) => {
+        const changed = sized.filter(([key, h]) => measured.get(key) !== h);
+        return changed.length ? new Map([...measured, ...changed]) : measured;
+      });
+      // One line: the smallest row first seen, so unseen rows are never guessed taller than they can be.
+      const least = Math.min(...sized.map(([, h]) => h));
+      setLine((l) => l || least);
+    });
+    sizer.current = { observer, seen: new Set() };
+    return () => {
+      observer.disconnect();
+      sizer.current = null;
+    };
+  }, [wrap]);
+  // Observe the rows new to the DOM and let go of the ones that left; observing reads nothing (the observer measures
+  // after layout).
+  useClientLayoutEffect(() => {
+    const s = sizer.current;
+    if (!s) return;
+    const rows = new Set<Element>(root.current?.querySelectorAll(".cy-virtual-list-row") ?? []);
+    for (const row of s.seen)
+      if (!rows.has(row)) {
+        s.observer.unobserve(row);
+        s.seen.delete(row);
+      }
+    for (const row of rows)
+      if (!s.seen.has(row)) {
+        s.observer.observe(row);
+        s.seen.add(row);
+      }
   });
-  const top = (i: number) => (wrap && line ? win.offsetOf(i) : i * win.rowSize);
-  /** The gap (0 to the row count) nearest to `y`, in content pixels. */
+  /** The gap (0 to the row count) nearest to `y`, in content pixels: before the row at `y`, or after it past its middle. */
   const gapAt = (y: number) => {
-    if (!(wrap && line)) return clamp(Math.round(y / win.rowSize), 0, keys.length);
-    let i = 0;
-    while (i < keys.length && top(i) + win.sizeOf(i) / 2 < y) i++;
-    return i;
+    const at = win.rowAt(Math.max(0, y));
+    if (at >= keys.length) return keys.length;
+    return y < win.offsetOf(at) + win.sizeOf(at) / 2 ? at : at + 1;
   };
 
   // Following: while the list sits at its end, new rows keep it there.
-  const atEnd = useRef(true);
-  const scrollToEnd = () => {
-    const el = root.current;
-    if (el) el.scrollTop = el.scrollHeight;
-  };
-  useClientLayoutEffect(() => {
-    if (follow && atEnd.current) scrollToEnd();
-  }, [follow, items.length, win.total]);
+  const following = useFollow(root, { follow, onAtBottomChange });
+  useClientLayoutEffect(() => following.contentChanged(), [items.length, win.total]);
   useImperativeHandle(handle, () => ({
-    scrollToEnd,
-    scrollToIndex: (index, align = "nearest") => {
-      const el = root.current;
-      const i = clamp(index, 0, keys.length - 1);
-      if (!el) return;
-      if (align === "nearest") win.reveal(i);
-      else el.scrollTop = align === "start" ? top(i) : top(i) + win.sizeOf(i) / 2 - el.clientHeight / 2;
+    scrollToEnd: following.scrollToEnd,
+    scrollToIndex: (index, options = {}) => {
+      const { align } = typeof options === "string" ? { align: options } : options;
+      win.reveal(clamp(index, 0, keys.length - 1), align);
     },
   }));
 
@@ -215,7 +281,7 @@ export function VirtualList<T>({
   let pinned = -1;
   if (isHeader) {
     const first = win.indices.length
-      ? Math.min(...win.indices.filter((i) => top(i) + win.sizeOf(i) > win.view.top))
+      ? Math.min(...win.indices.filter((i) => win.offsetOf(i) + win.sizeOf(i) > win.view.top))
       : -1;
     for (let i = Math.min(first, keys.length - 1); i >= 0; i--)
       if (header(i)) {
@@ -235,7 +301,7 @@ export function VirtualList<T>({
     const key = keys[i] as string;
     if (selectionMode === "single") choose([key]);
     else if (selectionMode === "multiple")
-      choose(picked.includes(key) ? picked.filter((k) => k !== key) : [...picked, key]);
+      choose(pickedSet.has(key) ? picked.filter((k) => k !== key) : [...picked, key]);
   };
   const go = (i: number) => {
     setFocusKey(keys[i] as string);
@@ -256,8 +322,8 @@ export function VirtualList<T>({
 
   /** What moves from row `i`: the selection if `i` is in it, else row `i` alone. Disabled rows stay. */
   const blockFrom = (i: number) =>
-    picked.includes(keys[i] as string)
-      ? keys.filter((k, n) => picked.includes(k) && !off(n))
+    pickedSet.has(keys[i] as string)
+      ? keys.filter((k, n) => pickedSet.has(k) && !off(n))
       : [keys[i] as string];
   /** Moves `block` so its first row lands at `to` among the rows that stay, and announces it. */
   const move = (block: string[], to: number) => {
@@ -268,9 +334,13 @@ export function VirtualList<T>({
     setSaid(text.moved(block.length, at + 1, keys.length));
     moveFocus.current = true;
   };
-  /** Where `block`'s first row is now, counted among the rows that stay. */
-  const placeOf = (block: string[]) =>
-    keys.filter((k) => !block.includes(k) && keys.indexOf(k) < keys.indexOf(block[0] as string)).length;
+  /** How many rows before row `end` stay put when `block` moves. */
+  const staying = (end: number, block: string[]) => {
+    const moving = new Set(block);
+    return keys.slice(0, end).filter((k) => !moving.has(k)).length;
+  };
+  /** The rows being dragged, for a quick look-up per rendered row. */
+  const dragging = useMemo(() => (drag ? new Set(drag.block) : null), [drag?.block]);
 
   // Dragging the selection with a mouse or pen. A finger scrolls the list instead.
   useDrag(root, {
@@ -299,7 +369,7 @@ export function VirtualList<T>({
       const d = dragRef.current as { block: string[]; gap: number };
       setDrag(null);
       if (cancelled) return;
-      move(d.block, keys.slice(0, d.gap).filter((k) => !d.block.includes(k)).length);
+      move(d.block, staying(d.gap, d.block));
     },
   });
 
@@ -308,7 +378,10 @@ export function VirtualList<T>({
       event.preventDefault();
       if (off(stop)) return;
       const block = blockFrom(stop);
-      move(block, placeOf(block) + (event.key === "ArrowUp" ? -1 : 1));
+      move(
+        block,
+        staying(indexOf.get(block[0] as string) as number, block) + (event.key === "ArrowUp" ? -1 : 1),
+      );
       return;
     }
     const page = Math.max(1, Math.floor((root.current as HTMLDivElement).clientHeight / win.rowSize) - 1);
@@ -360,7 +433,8 @@ export function VirtualList<T>({
       const lo = Math.min(from, target);
       const hi = Math.max(from, target);
       const range = keys.filter((_, i) => i >= lo && i <= hi && !off(i));
-      choose([...picked.filter((k) => !range.includes(k)), ...range]);
+      const inRange = new Set(range);
+      choose([...picked.filter((k) => !inRange.has(k)), ...range]);
       anchor.current = from;
     } else anchor.current = target;
     go(target);
@@ -375,78 +449,82 @@ export function VirtualList<T>({
   };
 
   const rootClass = className ? `cy-virtual-list ${className}` : "cy-virtual-list";
+  // The overlay stays put while the list scrolls under it. The frame is always there: one that came and went with the
+  // overlay would remount the list and lose its scroll position.
+  const framed = (list: ReactNode) => <OverlayFrame overlay={overlay}>{list}</OverlayFrame>;
   // An empty listbox is invalid ARIA: with no items the list is just its message.
   if (items.length === 0)
-    return (
+    return framed(
       <div ref={root} className={rootClass} data-size={size} style={style}>
         <div className="cy-virtual-list-empty cy-reset">{empty}</div>
-      </div>
+      </div>,
     );
   return (
     <>
-      <div
-        ref={root}
-        role="listbox"
-        aria-label={label}
-        aria-multiselectable={selectionMode === "multiple" || undefined}
-        className={rootClass}
-        data-size={size}
-        data-wrap={wrap ? "" : undefined}
-        style={style}
-        onKeyDown={onKeyDown}
-        onScroll={(e) => {
-          const el = e.currentTarget;
-          atEnd.current = el.scrollTop + el.clientHeight >= el.scrollHeight - 2;
-          win.onScroll(el.scrollTop);
-        }}
-      >
-        {pinned >= 0 && win.view.top > top(pinned) && (
-          <div className="cy-virtual-list-pinned cy-reset" aria-hidden="true">
-            {renderItem(items[pinned] as T, { index: pinned, selected: false, disabled: true })}
-          </div>
-        )}
-        <div className="cy-virtual-list-space cy-reset" style={{ blockSize: win.total }} aria-hidden="true" />
-        {drag && (
+      {framed(
+        <div
+          ref={root}
+          role="listbox"
+          aria-label={label}
+          aria-multiselectable={selectionMode === "multiple" || undefined}
+          className={rootClass}
+          data-size={size}
+          data-wrap={wrap ? "" : undefined}
+          style={style}
+          onKeyDown={onKeyDown}
+          onScroll={(e) => {
+            following.onScroll();
+            win.onScroll(e.currentTarget.scrollTop);
+          }}
+        >
+          {pinned >= 0 && win.view.top > win.offsetOf(pinned) && (
+            <div className="cy-virtual-list-pinned cy-reset" aria-hidden="true">
+              {renderItem(items[pinned] as T, { index: pinned, selected: false, disabled: true })}
+            </div>
+          )}
           <div
-            className="cy-virtual-list-drop cy-reset"
-            style={{ insetBlockStart: drag.gap < keys.length ? top(drag.gap) : win.total }}
+            className="cy-virtual-list-space cy-reset"
+            style={{ blockSize: win.total }}
             aria-hidden="true"
           />
-        )}
-        {win.indices.map((i) => {
-          const key = keys[i] as string;
-          const disabled = off(i);
-          const selected = selectionMode !== "none" && picked.includes(key);
-          return (
-            // biome-ignore lint/a11y/useKeyWithClickEvents: the listbox handles keys for every row (roving focus)
+          {drag && (
             <div
-              key={key}
-              role="option"
-              data-index={i}
-              aria-selected={selectionMode === "none" ? undefined : selected}
-              aria-disabled={disabled || undefined}
-              aria-posinset={i + 1}
-              aria-setsize={items.length}
-              tabIndex={i === stop ? 0 : -1}
-              className="cy-virtual-list-row cy-reset"
-              data-moving={drag?.block.includes(key) ? "" : undefined}
-              data-header={header(i) ? "" : undefined}
-              style={{ insetBlockStart: top(i) }}
-              onClick={() => onRowClick(i)}
-              // Focus can arrive without our keys (a screen reader, a script): keys then act from here.
-              onFocus={() => focusKey !== key && setFocusKey(key)}
-              onDoubleClick={() => !disabled && selectionMode !== "none" && onAction?.(items[i] as T, i)}
-            >
-              {renderItem(items[i] as T, { index: i, selected, disabled })}
-            </div>
-          );
-        })}
-      </div>
-      {onMove && (
-        <span className="cy-visually-hidden" role="status">
-          {said}
-        </span>
+              className="cy-virtual-list-drop cy-reset"
+              style={{ insetBlockStart: drag.gap < keys.length ? win.offsetOf(drag.gap) : win.total }}
+              aria-hidden="true"
+            />
+          )}
+          {win.indices.map((i) => {
+            const key = keys[i] as string;
+            const disabled = off(i);
+            const selected = selectionMode !== "none" && pickedSet.has(key);
+            return (
+              // biome-ignore lint/a11y/useKeyWithClickEvents: the listbox handles keys for every row (roving focus)
+              <div
+                key={key}
+                role="option"
+                data-index={i}
+                aria-selected={selectionMode === "none" ? undefined : selected}
+                aria-disabled={disabled || undefined}
+                aria-posinset={i + 1}
+                aria-setsize={items.length}
+                tabIndex={i === stop ? 0 : -1}
+                className="cy-virtual-list-row cy-reset"
+                data-moving={dragging?.has(key) ? "" : undefined}
+                data-header={header(i) ? "" : undefined}
+                style={{ insetBlockStart: win.offsetOf(i) }}
+                onClick={() => onRowClick(i)}
+                // Focus can arrive without our keys (a screen reader, a script): keys then act from here.
+                onFocus={() => focusKey !== key && setFocusKey(key)}
+                onDoubleClick={() => !disabled && selectionMode !== "none" && onAction?.(items[i] as T, i)}
+              >
+                {renderItem(items[i] as T, { index: i, selected, disabled })}
+              </div>
+            );
+          })}
+        </div>,
       )}
+      {onMove && <LiveRegion {...said} />}
     </>
   );
 }

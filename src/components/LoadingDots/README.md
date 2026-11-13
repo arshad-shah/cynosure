@@ -8,10 +8,12 @@ import { LoadingDots } from "@arshad-shah/cynosure";
 <LoadingDots label="Saving document" />          // announced: role="status"
 <LoadingDots size="lg" tone="accent" />           // decorative
 <LoadingDots color="#14b8a6" speed="slow" />      // one-off colour
+<LoadingDots variant="spinner" />                 // a turning loader icon, icon-sized
 ```
 
 | Prop                  | Default   | Notes                                                                                            |
 | --------------------- | --------- | ------------------------------------------------------------------------------------------------ |
+| `variant`             | `dots`    | `spinner`: the `loader` icon turning, one em square, for gutters, tree rows and beside text      |
 | `size`                | `inherit` | `inherit` follows the font size; `sm` 12, `md` 16, `lg` 24 px (× scale)                          |
 | `tone`                | `inherit` | `accent`, `neutral`, `muted`, `danger`, `success`, `warning`, `info`, or the current text colour |
 | `color`               | –         | Any CSS colour for one-off cases; prefer tones or tokens                                         |
@@ -19,12 +21,14 @@ import { LoadingDots } from "@arshad-shah/cynosure";
 | `label`               | –         | Gives `role="status"` and an accessible name. Omit when the parent already reports busy state.   |
 | `className` / `style` | –         | Layout only                                                                                      |
 
-Reduced motion (OS setting or `createTheme({ motion: "reduced" })`) shows three static, fully visible dots.
+Reduced motion (OS setting or `createTheme({ motion: "reduced" })`) shows three static, fully visible dots, or a still spinner.
+
+The spinner is the same component, so it takes the same props: it follows the font size and text colour by default, `speed` sets how fast it turns, and `label` announces it. Its icon is always decorative; the root carries the status.
 
 ## Tokens
 
 - `--cy-loading-dots-dot-size`: dot diameter (default 0.5em)
 - `--cy-loading-dots-gap`: space between dots (default 0.3em)
-- `--cy-loading-dots-color`: dot colour (default: tone or currentColor)
-- `--cy-loading-dots-duration`: one pulse cycle (default 6 × motion base)
+- `--cy-loading-dots-color`: dot or spinner colour (default: tone or currentColor)
+- `--cy-loading-dots-duration`: one pulse cycle, or one turn of the spinner (default 6 × motion base)
 - `--cy-loading-dots-size-{sm,md,lg}`: font size for each fixed size

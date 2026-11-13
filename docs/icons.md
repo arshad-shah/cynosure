@@ -2,7 +2,7 @@
 
 Cynosure ships two kinds of icon, both drawn by the same `Icon` component.
 
-- **Facet icons** (`@arshad-shah/cynosure/icons`): Cynosure's own set, 250 icons in 17 categories.
+- **Facet icons** (`@arshad-shah/cynosure/icons`): Cynosure's own set, 274 icons in 17 categories.
 - **Brand marks** (`@arshad-shah/cynosure/brands`): the official logos of 98 companies and projects, exactly as their owners publish them.
 
 ## Facet icons
@@ -21,7 +21,23 @@ import { search } from "@arshad-shah/cynosure/icons";
 
 `ICON_KEYWORDS` (from the same entry) maps each icon's name to other words it is found by (`trash`: delete, remove, bin), for building your own icon picker. Import icons by name so unused ones are left out of your bundle. Names are camelCase versions of the icon's kebab-case name (`arrow-up-right` → `arrowUpRight`); reserved words get an `Icon` suffix (`packageIcon`).
 
-**Adding one:** draw it on a 24 grid with strokes only, export the SVG, then run `pnpm cy new icon <name> --from icon.svg --category <category>`. In the generated file, set `motion` and mark the moving part `animate: true`. See `src/icons/AGENTS.md`.
+### By name
+
+When all you have is a name as a string (a plugin manifest that says `icon: "database"`, a setting saved as text), look the icon up on its own entry:
+
+```tsx
+import { Icon } from "@arshad-shah/cynosure";
+import { iconByName, type IconName, icons } from "@arshad-shah/cynosure/icons/by-name";
+import { puzzle } from "@arshad-shah/cynosure/icons";
+
+<Icon icon={iconByName(plugin.icon) ?? puzzle} />;
+```
+
+- `iconByName(name)` takes the icon's kebab-case `name` (`"arrow-up-right"`, as in the gallery), and answers `undefined` for anything else (a camelCase export name, another set's name, `"toString"`), so keep a fallback.
+- `icons` is the frozen record behind it, keyed by name (`IconName` is the union of the names), for listing or validating names up front.
+- This entry brings **every** icon with it (about 13.5 kB gzipped once bundled), which is why it is separate: the main entry and `@arshad-shah/cynosure/icons` never import it, so importing icons one by one stays tree-shaken. Use it only where names arrive at run time.
+
+**Adding one:** draw it on a 24 grid with strokes only, export the SVG, then run `pnpm cy new icon <name> --from icon.svg --category <category>`. In the generated file, set `motion` and mark the moving part `animate: true`. See `src/icons/AGENTS.md`. The by-name entry's budget is measured as one bundle by `tools/icons-size.ts`, which `pnpm size` runs after size-limit (size-limit's file plugin gzips each module on its own and overstated it about five times): when new icons push it over, raise `ICONS_BY_NAME_BUDGET` there to what it prints.
 
 ## Brand marks
 

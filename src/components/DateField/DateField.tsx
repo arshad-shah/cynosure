@@ -1,17 +1,12 @@
-import {
-  type CSSProperties,
-  type KeyboardEvent,
-  type ReactNode,
-  useEffect,
-  useId,
-  useRef,
-  useState,
-} from "react";
+import { type CSSProperties, type KeyboardEvent, type ReactNode, useEffect, useRef, useState } from "react";
 import { useControllableState } from "../../foundations/controllable.js";
+import { useDraft } from "../../foundations/draft.js";
+import { HiddenValue } from "../../foundations/HiddenValue/HiddenValue.js";
 import { calendar } from "../../icons/calendar.js";
 import type { Size } from "../../tokens/schema.js";
 import { Calendar } from "../Calendar/Calendar.js";
 import { addDays, addMonths, isISODate } from "../Calendar/dates.js";
+import type { FieldLayoutProps } from "../Field/Field.js";
 import { IconButton } from "../IconButton/IconButton.js";
 import { Popover } from "../Popover/Popover.js";
 import { TextField } from "../TextField/TextField.js";
@@ -28,7 +23,7 @@ export interface DateFieldLabels {
   next: string;
 }
 
-export interface DateFieldProps {
+export interface DateFieldProps extends FieldLayoutProps {
   /** Visible label; it names the field. */
   label: ReactNode;
   /** Visually hide the label (it still names the field). Prefer visible labels. */
@@ -55,7 +50,7 @@ export interface DateFieldProps {
   weekStartsOn?: number | undefined;
   /** What the calendar counts as today, as `YYYY-MM-DD`. Default: the device's date. */
   today?: string | undefined;
-  /** Name the field's text is submitted under in a form. */
+  /** Name the date (`YYYY-MM-DD`, or empty) is submitted under in a form; text being typed is never submitted. */
   name?: string | undefined;
   /** Id of the form it belongs to, when it is not inside that form. */
   form?: string | undefined;
@@ -98,6 +93,8 @@ const normalise = (text: string) => {
 export function DateField({
   label,
   labelHidden,
+  layout,
+  width,
   description,
   error,
   value,
@@ -120,34 +117,40 @@ export function DateField({
   style,
 }: DateFieldProps) {
   const text = { ...DEFAULT_LABELS, ...labels };
-  const id = useId();
-  const [current, setCurrent] = useControllableState<string | null>(value, defaultValue, onChange);
-  const [draft, setDraft] = useState<string | null>(null);
-  const [problem, setProblem] = useState<string | null>(null);
+  const [current, setCurrent, resetCurrent] = useControllableState<string | null>(
+    value,
+    defaultValue,
+    onChange,
+  );
   const [open, setOpen] = useState(false);
   const input = useRef<HTMLInputElement>(null);
+  const calendarBox = useRef<HTMLDivElement>(null);
 
   const available = (date: string) =>
     !(min !== undefined && date < min) && !(max !== undefined && date > max) && !isDateDisabled?.(date);
+  /** What is wrong with typed text (already normalised), or null when it is empty or a real, available date. */
+  const check = (typed: string) =>
+    typed === "" ? null : !isISODate(typed) ? text.invalid : !available(typed) ? text.unavailable : null;
+  // A form will not submit while the text is not a date it can take (the value it would submit is the last good one).
+  const { draft, setDraft, problem, setProblem, settle } = useDraft(input, (typed) =>
+    check(normalise(typed)),
+  );
   /** Takes what was typed: a real, available date is kept; anything else is explained and left for correcting. */
   const commit = () => {
     if (draft === null) return;
     const typed = normalise(draft);
     if (typed === "") {
-      setDraft(null);
-      setProblem(null);
+      settle();
       if (current !== null) setCurrent(null);
       return;
     }
-    if (!isISODate(typed)) return setProblem(text.invalid);
-    if (!available(typed)) return setProblem(text.unavailable);
-    setDraft(null);
-    setProblem(null);
+    const wrong = check(typed);
+    if (wrong) return setProblem(wrong);
+    settle();
     if (typed !== current) setCurrent(typed);
   };
   const choose = (date: string) => {
-    setDraft(null);
-    setProblem(null);
+    settle();
     if (date !== current) setCurrent(date);
   };
 
@@ -164,78 +167,89 @@ export function DateField({
     choose(next);
   };
 
-  // The picker opens on the chosen day (the APG date picker), not on its first button.
+  // The picker opens on the chosen day (the APG date picker), not on its first button. A ref, not an id lookup, so it
+  // works inside a shadow root.
   useEffect(() => {
     if (!open) return;
-    document
-      .getElementById(`${id}-calendar`)
-      ?.querySelector<HTMLElement>('[data-date][tabindex="0"]')
-      ?.focus();
-  }, [open, id]);
+    calendarBox.current?.querySelector<HTMLElement>('[data-date][tabindex="0"]')?.focus();
+  }, [open]);
 
   return (
-    <TextField
-      ref={input}
-      label={label}
-      {...(labelHidden ? { labelHidden } : {})}
-      {...(description !== undefined ? { description } : {})}
-      {...((error ?? problem) != null ? { error: error ?? problem } : {})}
-      value={draft ?? current ?? ""}
-      onChange={setDraft}
-      onBlur={commit}
-      onKeyDown={onKeyDown}
-      placeholder="YYYY-MM-DD"
-      inputMode="numeric"
-      autoComplete="off"
-      name={name}
-      form={form}
-      required={required}
-      disabled={disabled}
-      readOnly={readOnly}
-      size={size}
-      className={className ? `cy-date-field ${className}` : "cy-date-field"}
-      {...(style ? { style } : {})}
-      addonEnd={
-        !readOnly && (
-          <Popover
-            label={text.open}
-            open={open}
-            onOpenChange={setOpen}
-            placement="bottom"
-            size="sm"
-            trigger={(props) => (
-              <IconButton
-                {...props}
-                icon={calendar}
-                label={text.open}
-                variant="ghost"
-                size="sm"
-                disabled={disabled}
-                className="cy-date-field-open"
-              />
-            )}
-          >
-            <div id={`${id}-calendar`} className="cy-date-field-calendar">
-              <Calendar
-                value={draft !== null && isISODate(normalise(draft)) ? normalise(draft) : current}
-                onChange={(date) => {
-                  choose(date);
-                  setOpen(false);
-                  input.current?.focus();
-                }}
-                min={min}
-                max={max}
-                isDateDisabled={isDateDisabled}
-                locale={locale}
-                weekStartsOn={weekStartsOn}
-                today={today}
-                size="sm"
-                labels={{ previous: text.previous, next: text.next }}
-              />
-            </div>
-          </Popover>
-        )
-      }
-    />
+    <>
+      <TextField
+        ref={input}
+        label={label}
+        {...(labelHidden ? { labelHidden } : {})}
+        layout={layout}
+        width={width}
+        {...(description !== undefined ? { description } : {})}
+        {...((error ?? problem) != null ? { error: error ?? problem } : {})}
+        value={draft ?? current ?? ""}
+        onChange={setDraft}
+        onBlur={commit}
+        onKeyDown={onKeyDown}
+        placeholder="YYYY-MM-DD"
+        inputMode="numeric"
+        autoComplete="off"
+        form={form}
+        required={required}
+        disabled={disabled}
+        readOnly={readOnly}
+        size={size}
+        className={className ? `cy-date-field ${className}` : "cy-date-field"}
+        {...(style ? { style } : {})}
+        addonEnd={
+          !readOnly && (
+            <Popover
+              label={text.open}
+              open={open}
+              onOpenChange={setOpen}
+              placement="bottom"
+              size="sm"
+              trigger={(props) => (
+                <IconButton
+                  {...props}
+                  icon={calendar}
+                  label={text.open}
+                  variant="ghost"
+                  size="sm"
+                  disabled={disabled}
+                  className="cy-date-field-open"
+                />
+              )}
+            >
+              <div ref={calendarBox} className="cy-date-field-calendar">
+                <Calendar
+                  value={draft !== null && isISODate(normalise(draft)) ? normalise(draft) : current}
+                  onChange={(date) => {
+                    choose(date);
+                    setOpen(false);
+                    input.current?.focus();
+                  }}
+                  min={min}
+                  max={max}
+                  isDateDisabled={isDateDisabled}
+                  locale={locale}
+                  weekStartsOn={weekStartsOn}
+                  today={today}
+                  size="sm"
+                  labels={{ previous: text.previous, next: text.next }}
+                />
+              </div>
+            </Popover>
+          )
+        }
+      />
+      <HiddenValue
+        name={name}
+        form={form}
+        value={current ?? ""}
+        disabled={disabled}
+        onReset={() => {
+          settle();
+          resetCurrent(defaultValue);
+        }}
+      />
+    </>
   );
 }
