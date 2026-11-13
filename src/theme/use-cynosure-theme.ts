@@ -1,4 +1,5 @@
 import { useContext, useMemo } from "react";
+import { useMediaQuery } from "../foundations/media-query.js";
 import {
   type ColorTokens,
   createTheme,
@@ -7,7 +8,7 @@ import {
   resolveColors,
   type Theme,
 } from "../tokens/index.js";
-import { ThemeContext, useMediaQuery } from "./theme-context.js";
+import { ThemeContext } from "./theme-context.js";
 
 /** The theme in force where `useCynosureTheme` is called, resolved for code that cannot read CSS variables. */
 export interface CynosureThemeValue {

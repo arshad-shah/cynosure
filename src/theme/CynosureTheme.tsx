@@ -1,7 +1,8 @@
 import { type CSSProperties, type ReactNode, useContext, useMemo } from "react";
 import { useClientLayoutEffect } from "../foundations/client-layout-effect.js";
+import { useMediaQuery } from "../foundations/media-query.js";
 import { type Theme, themeProperties } from "../tokens/index.js";
-import { ThemeContext, type ThemeState, useMediaQuery } from "./theme-context.js";
+import { ThemeContext, type ThemeState } from "./theme-context.js";
 
 export interface CynosureThemeProps {
   /**
