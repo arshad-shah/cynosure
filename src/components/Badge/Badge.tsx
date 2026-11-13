@@ -40,16 +40,20 @@ interface BadgeBaseProps {
 export type BadgeProps = BadgeBaseProps &
   (
     | {
-        /** The badge's text. Leave it out, with `dot`, for a status dot alone (then `label` is required). */
+        /** The badge's text. Leave it out, with `dot`, for a status dot alone. */
         children: ReactNode;
         /** Accessible name of a dot without text; a badge with text is named by its text. */
         label?: undefined;
       }
     | {
-        /** The badge's text. Leave it out, with `dot`, for a status dot alone (then `label` is required). */
+        /** The badge's text. Leave it out, with `dot`, for a status dot alone. */
         children?: undefined;
-        /** Accessible name of a dot without text, saying the state ("Connected"): colour alone says nothing. */
-        label: string;
+        /**
+         * Accessible name of a dot without text, saying the state ("Connected"): colour alone says nothing. Leave it
+         * out only where text beside the dot already says the state: the dot is then decoration, hidden from assistive
+         * technology.
+         */
+        label?: string | undefined;
       }
   );
 
@@ -66,12 +70,12 @@ export function Badge({
   className,
   style,
 }: BadgeProps) {
-  // Without text it is a status dot: an image named by `label`.
+  // Without text it is a status dot: an image named by `label`, or decoration without one.
   const alone = children == null;
   return (
     <span
       className={`cy-badge${className ? ` ${className}` : ""}`}
-      {...(alone ? { role: "img", "aria-label": label } : {})}
+      {...(alone ? (label ? { role: "img", "aria-label": label } : { "aria-hidden": true }) : {})}
       data-dot-only={alone ? "" : undefined}
       data-tone={color ? undefined : tone}
       data-color={color ? "" : undefined}

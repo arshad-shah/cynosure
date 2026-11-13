@@ -195,8 +195,8 @@ export const StatusBarSegment = forwardRef<HTMLElement, StatusBarSegmentProps>(f
   const content = (
     <span className="cy-reset cy-status-bar-segment-content">
       {dot && (
-        <span className="cy-reset cy-status-bar-segment-dot" aria-hidden={dotLabel ? undefined : "true"}>
-          <Badge dot={dot} tone={dotTone ?? tone} label={dotLabel ?? ""} />
+        <span className="cy-reset cy-status-bar-segment-dot">
+          <Badge dot={dot} tone={dotTone ?? tone} label={dotLabel} />
         </span>
       )}
       {icon && <Icon icon={icon} size="sm" />}

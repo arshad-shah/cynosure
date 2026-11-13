@@ -165,7 +165,8 @@ export const DotTones: Story = {
       getComputedStyle(canvas.getByText("danger")).color,
     );
     // Without dotLabel the dot is decoration (the text says the state); with it, the dot is a named image.
-    await expect(dotOf("success").closest("[aria-hidden]")).toHaveAttribute("aria-hidden", "true");
+    await expect(dotOf("success").closest(".cy-badge")).toHaveAttribute("aria-hidden", "true");
+    await expect(dotOf("success").closest(".cy-badge")).not.toHaveAttribute("role");
     await expect(canvas.queryAllByRole("img")).toHaveLength(1);
     const recording = canvas.getByRole("img", { name: "Recording" });
     await expect(getComputedStyle(recording.querySelector(".cy-badge-dot") as Element).animationName).toBe(
