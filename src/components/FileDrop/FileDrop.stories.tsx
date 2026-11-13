@@ -103,6 +103,10 @@ export const PickReplacesTheFileDialog: Story = {
     button.focus();
     await userEvent.keyboard("{Enter}");
     await expect(pick).toHaveBeenCalledTimes(2);
+    // Only files: they arrive in onFiles, and onPaths is not called.
+    held.answer([pickedPng]);
+    await waitFor(() => expect(args.onFiles).toHaveBeenCalledTimes(2));
+    await expect(paths).toHaveBeenCalledTimes(1);
     open.mockRestore();
   },
 };
