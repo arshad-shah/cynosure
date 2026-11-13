@@ -1,6 +1,6 @@
 import { type CSSProperties, type KeyboardEvent, type ReactNode, useEffect, useRef, useState } from "react";
-import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js";
 import { useControllableState } from "../../foundations/controllable.js";
+import { useDraft } from "../../foundations/draft.js";
 import { HiddenValue } from "../../foundations/HiddenValue/HiddenValue.js";
 import { calendar } from "../../icons/calendar.js";
 import type { Size } from "../../tokens/schema.js";
@@ -122,8 +122,6 @@ export function DateField({
     defaultValue,
     onChange,
   );
-  const [draft, setDraft] = useState<string | null>(null);
-  const [problem, setProblem] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
   const input = useRef<HTMLInputElement>(null);
   const calendarBox = useRef<HTMLDivElement>(null);
@@ -133,25 +131,26 @@ export function DateField({
   /** What is wrong with typed text (already normalised), or null when it is empty or a real, available date. */
   const check = (typed: string) =>
     typed === "" ? null : !isISODate(typed) ? text.invalid : !available(typed) ? text.unavailable : null;
+  // A form will not submit while the text is not a date it can take (the value it would submit is the last good one).
+  const { draft, setDraft, problem, setProblem, settle } = useDraft(input, (typed) =>
+    check(normalise(typed)),
+  );
   /** Takes what was typed: a real, available date is kept; anything else is explained and left for correcting. */
   const commit = () => {
     if (draft === null) return;
     const typed = normalise(draft);
     if (typed === "") {
-      setDraft(null);
-      setProblem(null);
+      settle();
       if (current !== null) setCurrent(null);
       return;
     }
     const wrong = check(typed);
     if (wrong) return setProblem(wrong);
-    setDraft(null);
-    setProblem(null);
+    settle();
     if (typed !== current) setCurrent(typed);
   };
   const choose = (date: string) => {
-    setDraft(null);
-    setProblem(null);
+    settle();
     if (date !== current) setCurrent(date);
   };
 
@@ -167,12 +166,6 @@ export function DateField({
     if ((min !== undefined && next < min) || (max !== undefined && next > max)) return;
     choose(next);
   };
-
-  // A form will not submit while the text is not a date it can take (the value it would submit is the last good one).
-  const invalid = draft === null ? null : check(normalise(draft));
-  useClientLayoutEffect(() => {
-    input.current?.setCustomValidity(invalid ?? "");
-  }, [invalid]);
 
   // The picker opens on the chosen day (the APG date picker), not on its first button. A ref, not an id lookup, so it
   // works inside a shadow root.
@@ -253,8 +246,7 @@ export function DateField({
         value={current ?? ""}
         disabled={disabled}
         onReset={() => {
-          setDraft(null);
-          setProblem(null);
+          settle();
           resetCurrent(defaultValue);
         }}
       />
