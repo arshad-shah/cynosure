@@ -56,16 +56,28 @@ export const ButtonOpensThePicker: Story = {
   },
 };
 
-/** A picker that answers like a native dialog would, after a moment: what was chosen, or null when cancelled. */
-const pickerOf = (answer: readonly (File | string)[] | null | Error, ms = 30) =>
-  fn(
+type Picked = readonly (File | string)[] | null;
+/**
+ * A picker the story answers itself (what was chosen, null for a cancel, or a failure), so the busy state is checked
+ * while it is surely still open.
+ */
+function heldPicker() {
+  let settle = { resolve: (_: Picked) => {}, reject: (_: unknown) => {} };
+  const picker = fn(
     () =>
-      new Promise<readonly (File | string)[] | null>((resolve, reject) =>
-        setTimeout(() => (answer instanceof Error ? reject(answer) : resolve(answer)), ms),
-      ),
+      new Promise<Picked>((resolve, reject) => {
+        settle = { resolve, reject };
+      }),
   );
+  return {
+    picker,
+    answer: (chosen: Picked) => settle.resolve(chosen),
+    fail: () => settle.reject(new Error("IPC")),
+  };
+}
 const pickedPng = file("picked.png", "image/png");
-const pick = pickerOf([pickedPng, "/home/me/data.csv"]);
+const held = heldPicker();
+const pick = held.picker;
 const paths = fn();
 
 export const PickReplacesTheFileDialog: Story = {
@@ -81,6 +93,7 @@ export const PickReplacesTheFileDialog: Story = {
     await expect(button).toHaveAttribute("aria-busy", "true");
     await userEvent.click(button);
     await expect(pick).toHaveBeenCalledTimes(1);
+    held.answer([pickedPng, "/home/me/data.csv"]);
     // Chosen files are checked and arrive in onFiles (and the form); chosen paths arrive in onPaths.
     await waitFor(() => expect(button).not.toHaveAttribute("aria-busy"));
     await expect(args.onFiles).toHaveBeenLastCalledWith([pickedPng]);
@@ -95,14 +108,18 @@ export const PickReplacesTheFileDialog: Story = {
 };
 
 const onlyPaths = fn();
+const cancelled = heldPicker();
+const failing = heldPicker();
+const pathsOnly = heldPicker();
+const unheard = heldPicker();
 export const PickCancelledFailedOrPathsOnly: Story = {
   render: (args) => (
     <Stack gap="4" style={{ maxWidth: 420 }}>
-      <FileDrop {...args} onPick={pickerOf(null)} labels={{ choose: "Cancelled" }} />
-      <FileDrop {...args} onPick={pickerOf(new Error("IPC"))} labels={{ choose: "Failing" }} />
-      <FileDrop {...args} onPick={pickerOf(["/a.csv"])} onPaths={onlyPaths} labels={{ choose: "Paths" }} />
+      <FileDrop {...args} onPick={cancelled.picker} labels={{ choose: "Cancelled" }} />
+      <FileDrop {...args} onPick={failing.picker} labels={{ choose: "Failing" }} />
+      <FileDrop {...args} onPick={pathsOnly.picker} onPaths={onlyPaths} labels={{ choose: "Paths" }} />
       {/* Without onPaths, chosen paths are dropped quietly. */}
-      <FileDrop {...args} onPick={pickerOf(["/b.csv"])} labels={{ choose: "Unheard" }} />
+      <FileDrop {...args} onPick={unheard.picker} labels={{ choose: "Unheard" }} />
     </Stack>
   ),
   play: async ({ args, canvas, userEvent }) => {
@@ -111,10 +128,16 @@ export const PickCancelledFailedOrPathsOnly: Story = {
     window.addEventListener("unhandledrejection", listen);
     try {
       // A cancel and a failure both leave the button free again and change nothing, and the failure is handled.
-      for (const name of ["Cancelled", "Failing", "Unheard"]) {
+      const ends = [
+        ["Cancelled", () => cancelled.answer(null)],
+        ["Failing", failing.fail],
+        ["Unheard", () => unheard.answer(["/b.csv"])],
+      ] as const;
+      for (const [name, end] of ends) {
         const button = canvas.getByRole("button", { name });
         await userEvent.click(button);
         await expect(button).toHaveAttribute("aria-busy", "true");
+        end();
         await waitFor(() => expect(button).not.toHaveAttribute("aria-busy"));
       }
       await new Promise((resolve) => setTimeout(resolve, 50));
@@ -122,6 +145,7 @@ export const PickCancelledFailedOrPathsOnly: Story = {
       await expect(unhandled).toEqual([]);
       // Only paths: they arrive in onPaths and are announced as added.
       await userEvent.click(canvas.getByRole("button", { name: "Paths" }));
+      pathsOnly.answer(["/a.csv"]);
       await waitFor(() => expect(onlyPaths).toHaveBeenLastCalledWith(["/a.csv"]));
       await expect(canvas.getAllByRole("status")[2]).toHaveTextContent("1 file added");
     } finally {

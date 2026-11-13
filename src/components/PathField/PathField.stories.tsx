@@ -86,11 +86,16 @@ export const CancellingChangesNothing: Story = {
   },
 };
 
+/** A picker the story makes fail itself, once the busy state has been checked. */
+let fail: (reason: Error) => void = () => {};
 export const AFailingPickerChangesNothing: Story = {
   args: {
     defaultValue: "/srv/old.db",
     onPick: fn(
-      () => new Promise<string | null>((_, reject) => setTimeout(() => reject(new Error("IPC")), 30)),
+      () =>
+        new Promise<string | null>((_, reject) => {
+          fail = reject;
+        }),
     ),
   },
   play: async ({ args, canvas, userEvent }) => {
@@ -101,6 +106,7 @@ export const AFailingPickerChangesNothing: Story = {
       const browse = canvas.getByRole("button", { name: "Browse…" });
       await userEvent.click(browse);
       await expect(browse).toHaveAttribute("aria-busy", "true");
+      fail(new Error("IPC"));
       // The picker failed: the button is free again, the path stays, and the failure is not left unhandled.
       await waitFor(() => expect(browse).not.toHaveAttribute("aria-busy"));
       await new Promise((resolve) => setTimeout(resolve, 50));
