@@ -5,7 +5,7 @@ import {
   space,
   type VisibilityProps,
   visibilityAttrs,
-} from "../Stack/space.js";
+} from "../../foundations/layout.js";
 
 export interface ContainerTokens {
   /** Widest a `size="sm"` container gets, gutters included. */

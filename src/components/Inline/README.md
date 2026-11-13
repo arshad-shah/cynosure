@@ -28,4 +28,4 @@ Horizontal layout with token gaps (`gap="1"` … `"10"` map to `--cy-space-*`), 
 - Padding is a space token (`--cy-space-*`) applied with logical properties, inside the row's width. `"0"` is a value: `padding="4" paddingBlock="0"` pads the sides only.
 - A nested Inline or Stack has no padding unless it asks for it; it never inherits its parent's.
 - Inline is a Stack with `direction="row"`: Stack's stylesheet lays it out, and `inline.css` adds the centring (when `align` is not set) and `wrap`.
-- The padding props and logic are shared with Stack and Grid (`../Stack/space.ts`).
+- The padding props and logic are shared with Stack and Grid (`src/foundations/layout.ts`).
