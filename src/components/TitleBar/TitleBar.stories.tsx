@@ -27,6 +27,7 @@ const controls = (): TitleBarControls => ({
 });
 
 const meta = {
+  tags: ["serial"],
   title: "Components/TitleBar",
   component: TitleBar,
   args: {

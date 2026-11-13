@@ -29,6 +29,7 @@ const actions = (
 );
 
 const meta = {
+  tags: ["serial"],
   title: "Components/ChatMessage",
   component: ChatMessage,
   args: {

@@ -446,6 +446,18 @@ export function check(root: string): Violation[] {
     if (isStory(file)) {
       // Touch stories only pass under the touch project's emulation; on the published Storybook they would fail.
       const text = readFileSync(file, "utf8");
+      // Emulated media features, the real pointer and real keys act on the whole page, which test files share in
+      // parallel frames: such a story file runs in the "serial" project (vitest.config.ts), one file at a time.
+      const pageWide = /\b(emulateMedia|realHover|pressKey)\(/.exec(text);
+      const metaStart = text.indexOf("const meta");
+      const meta = metaStart < 0 ? "" : text.slice(metaStart, text.indexOf("export default meta", metaStart));
+      if (pageWide && !/tags:\s*\[[^\]]*["']serial["']/.test(meta))
+        out.push({
+          rule: "serial-stories",
+          file: rel,
+          line: lineOf(text, pageWide.index),
+          message: `${pageWide[1]} acts on the whole page: tag the file's meta "serial" so it runs one file at a time`,
+        });
       for (const m of text.matchAll(/tags:\s*\[([^\]]*)\]/g))
         if (/["']touch["']/.test(m[1] ?? "") && !/["']!dev["']/.test(m[1] ?? ""))
           out.push({

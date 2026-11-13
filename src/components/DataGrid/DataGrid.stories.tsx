@@ -29,6 +29,7 @@ const huge: DataGridProps<number> = {
 };
 
 const meta = {
+  tags: ["serial"],
   title: "Components/DataGrid",
   component: DataGrid,
   args: {

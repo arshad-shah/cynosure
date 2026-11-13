@@ -27,6 +27,7 @@ const actions = (name: string) => (
 );
 
 const meta = {
+  tags: ["serial"],
   title: "Components/ListRow",
   component: ListRow,
   args: {

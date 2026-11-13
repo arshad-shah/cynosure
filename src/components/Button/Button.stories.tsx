@@ -19,6 +19,7 @@ for (const value of Object.values(icons))
 const iconNames = Object.keys(iconMapping).filter((n) => n !== "none");
 
 const meta = {
+  tags: ["serial"],
   title: "Components/Button",
   component: Button,
   args: { children: "Export", onClick: fn(), variant: "outline", tone: "neutral", size: "md" },

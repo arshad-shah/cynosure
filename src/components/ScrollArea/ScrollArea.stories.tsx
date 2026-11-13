@@ -14,6 +14,7 @@ const lines = (n: number, from = 0) =>
   Array.from({ length: n }, (_, i) => <p key={`line-${from + i}`}>{`Line ${from + i + 1}`}</p>);
 
 const meta = {
+  tags: ["serial"],
   title: "Components/ScrollArea",
   component: ScrollArea,
   args: { label: "Log", direction: "vertical", follow: false, onScroll: fn(), onAtBottomChange: fn() },

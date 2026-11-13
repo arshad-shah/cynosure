@@ -8,7 +8,7 @@ import { emulateMedia } from "./media.js";
  * and only its own. A host element whose class merely contains "cy-" (privacy-banner, legacy-box) keeps moving.
  * Tagged "!dev": the media feature is emulated through the Vitest run's Playwright command.
  */
-const meta = { title: "Contracts/Reduced motion", tags: ["!dev"] } satisfies Meta;
+const meta = { title: "Contracts/Reduced motion", tags: ["!dev", "serial"] } satisfies Meta;
 export default meta;
 type Story = StoryObj<typeof meta>;
 

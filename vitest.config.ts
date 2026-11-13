@@ -65,10 +65,33 @@ export default defineConfig({
         },
       },
       {
-        plugins: [storybookTest({ configDir: ".storybook", tags: { exclude: ["touch"] } })],
+        plugins: [storybookTest({ configDir: ".storybook", tags: { exclude: ["touch", "serial"] } })],
         test: {
           name: "stories",
           setupFiles: [".storybook/vitest.setup.ts"],
+          browser: {
+            enabled: true,
+            headless: true,
+            provider: playwright(),
+            instances: engines.map((browser) => ({ browser })),
+            commands: { emulateMedia },
+          },
+        },
+      },
+      /*
+       * Story files that change the whole page (emulated media features, the real pointer, real keys) run here, one
+       * file at a time. Test files share one page per browser, in parallel frames: an emulated "reduce motion" or a
+       * real pointer move in one file reached every file running beside it (WebKit, 2026-11-13). `cy check` requires
+       * the "serial" tag on any story file that calls emulateMedia, realHover or pressKey.
+       */
+      {
+        plugins: [
+          storybookTest({ configDir: ".storybook", tags: { include: ["serial"], exclude: ["touch"] } }),
+        ],
+        test: {
+          name: "serial",
+          setupFiles: [".storybook/vitest.setup.ts"],
+          fileParallelism: false,
           browser: {
             enabled: true,
             headless: true,

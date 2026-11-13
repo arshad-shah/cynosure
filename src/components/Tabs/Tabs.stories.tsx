@@ -11,6 +11,7 @@ import { IconButton } from "../IconButton/IconButton.js";
 import { Tab, TabList, TabPanel, Tabs } from "./Tabs.js";
 
 const meta = {
+  tags: ["serial"],
   title: "Components/Tabs",
   component: Tabs,
   args: { defaultValue: "tree", activation: "auto", size: "md", variant: "line", onChange: fn() },

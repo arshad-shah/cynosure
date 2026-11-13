@@ -7,6 +7,7 @@ import { CynosureTheme } from "../../theme/CynosureTheme.js";
 import { HighlightedText } from "./HighlightedText.js";
 
 const meta = {
+  tags: ["serial"],
   title: "Components/HighlightedText",
   component: HighlightedText,
   args: { text: "customer_orders", query: "order" },
@@ -163,8 +164,10 @@ export const ForcedColoursUseTheSystemMark: Story = {
   play: async ({ canvasElement }) => {
     if (!(await emulateMedia({ forcedColors: "active" }))) return;
     try {
-      // Only Chromium emulates forced colours.
-      if (!matchMedia("(forced-colors: active)").matches) return;
+      // Engines that cannot emulate forced colours, or lack `forced-color-adjust` (WebKit emulates the mode but has no
+      // such property), have nothing to check here.
+      if (!matchMedia("(forced-colors: active)").matches || !CSS.supports("forced-color-adjust", "none"))
+        return;
       const mark = canvasElement.querySelector("mark") as HTMLElement;
       const style = getComputedStyle(mark);
       // The system's own mark colours, kept (not overridden), and an underline that survives any palette.

@@ -130,6 +130,17 @@ describe("cy check", () => {
     );
     expect(rules(root)).not.toContain("touch-hidden");
   });
+  it("serial-stories: a story file acting on the whole page is tagged serial in its meta", () => {
+    const root = sandbox();
+    const story = (tags: string) =>
+      `const meta = { title: "T"${tags} } satisfies Meta;\nexport default meta;\nexport const T = { play: async () => { await emulateMedia({ reducedMotion: "reduce" }); } };\n`;
+    write(root, "src/components/Button/T.stories.tsx", story(""));
+    expect(rules(root)).toContain("serial-stories");
+    write(root, "src/components/Button/T.stories.tsx", story(', tags: ["!dev"]'));
+    expect(rules(root)).toContain("serial-stories");
+    write(root, "src/components/Button/T.stories.tsx", story(', tags: ["!dev", "serial"]'));
+    expect(rules(root)).not.toContain("serial-stories");
+  });
   it("flags title= attributes", () => {
     const root = sandbox();
     write(root, "src/components/Button/T.tsx", 'export const T = () => <span title="Saved">x</span>;\n');

@@ -8,6 +8,7 @@ import { Button } from "../Button/Button.js";
 import { LoadingDots } from "./LoadingDots.js";
 
 const meta = {
+  tags: ["serial"],
   title: "Components/LoadingDots",
   component: LoadingDots,
   args: { size: "md", tone: "inherit", speed: "normal", variant: "dots" },

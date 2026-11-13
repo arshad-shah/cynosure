@@ -17,9 +17,11 @@ import {
 import { CynosureTheme } from "./CynosureTheme.js";
 import { useCynosureTheme } from "./use-cynosure-theme.js";
 
-const meta = { title: "Foundations/CynosureTheme", component: CynosureTheme } satisfies Meta<
-  typeof CynosureTheme
->;
+const meta = {
+  tags: ["serial"],
+  title: "Foundations/CynosureTheme",
+  component: CynosureTheme,
+} satisfies Meta<typeof CynosureTheme>;
 export default meta;
 type Story = StoryObj<typeof meta>;
 

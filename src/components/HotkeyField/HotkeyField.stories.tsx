@@ -10,6 +10,7 @@ import { Button } from "../Button/Button.js";
 import { HotkeyField } from "./HotkeyField.js";
 
 const meta = {
+  tags: ["serial"],
   title: "Components/HotkeyField",
   component: HotkeyField,
   args: {
