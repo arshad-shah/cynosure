@@ -285,6 +285,11 @@ export {
   type OptionListProps,
   type OptionListTokens,
 } from "./components/OptionList/index.js";
+export {
+  OverlayFrame,
+  type OverlayFrameProps,
+  type OverlayFrameTokens,
+} from "./components/OverlayFrame/index.js";
 export { PageHeader, type PageHeaderProps, type PageHeaderTokens } from "./components/PageHeader/index.js";
 export {
   Pagination,
@@ -341,7 +346,6 @@ export {
   type ScrollAreaHandle,
   type ScrollAreaIntoViewOptions,
   type ScrollAreaProps,
-  type ScrollAreaTokens,
 } from "./components/ScrollArea/index.js";
 export { SearchField, type SearchFieldProps } from "./components/SearchField/index.js";
 export { Section, type SectionProps, type SectionTokens } from "./components/Section/index.js";

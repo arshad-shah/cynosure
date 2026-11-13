@@ -720,13 +720,6 @@ export const StableUnderHostileHost: Story = {
       const { clean, hostile } = computeUnderHostileHost(canvasElement, selector, props);
       await expect({ selector, ...hostile }).toEqual({ selector, ...clean });
     }
-    const parts: [string, string[]][] = [
-      [".cy-virtual-list-frame", ["display", "height", "box-sizing", "margin-top", "padding-left"]],
-      [".cy-virtual-list-overlay", ["align-self", "justify-self", "margin-bottom", "z-index"]],
-    ];
-    for (const [selector, list] of parts) {
-      const { clean, hostile } = computeUnderHostileHost(canvasElement, selector, list);
-      await expect({ selector, ...hostile }).toEqual({ selector, ...clean });
-    }
+    // The frame and its overlay are OverlayFrame's (its own hostile-host story).
   },
 };

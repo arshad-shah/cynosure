@@ -9,17 +9,7 @@ import {
   useState,
 } from "react";
 import { useFollow } from "../../foundations/use-follow.js";
-
-export interface ScrollAreaTokens {
-  /** Space between the bottom edge and the `overlay` (a "3 new" pill). */
-  overlayOffset: string;
-}
-
-declare module "../../tokens/schema.js" {
-  interface ComponentTokens {
-    scrollArea: ScrollAreaTokens;
-  }
-}
+import { OverlayFrame } from "../OverlayFrame/OverlayFrame.js";
 
 /** Where `scrollIntoView` puts the element. */
 export interface ScrollAreaIntoViewOptions {
@@ -134,16 +124,17 @@ export const ScrollArea = forwardRef<HTMLDivElement, ScrollAreaProps>(function S
   }));
 
   return (
-    <div
+    <OverlayFrame
       ref={ref}
       {...rest}
       className={className ? `cy-scroll-area ${className}` : "cy-scroll-area"}
-      data-direction={direction}
       style={style}
+      overlay={overlay}
     >
       <div
         ref={viewport}
         className="cy-scroll-area-viewport cy-reset"
+        data-direction={direction}
         // A named region, and a tab stop while there is something to scroll, so a keyboard can scroll it.
         {...(label ? { role: "region", "aria-label": label, tabIndex: scrolls ? 0 : undefined } : {})}
         onScroll={(event) => {
@@ -155,9 +146,6 @@ export const ScrollArea = forwardRef<HTMLDivElement, ScrollAreaProps>(function S
           {children}
         </div>
       </div>
-      {overlay != null && overlay !== false && (
-        <div className="cy-scroll-area-overlay cy-reset">{overlay}</div>
-      )}
-    </div>
+    </OverlayFrame>
   );
 });

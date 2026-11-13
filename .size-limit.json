@@ -745,5 +745,11 @@
     ],
     "limit": "65.5 kB",
     "gzip": true
+  },
+  {
+    "name": "OverlayFrame",
+    "path": ["dist/components/OverlayFrame/OverlayFrame.js", "dist/styles/overlay-frame.css"],
+    "limit": "650 B",
+    "gzip": true
   }
 ]

@@ -419,7 +419,6 @@ export const StableUnderHostileHost: Story = {
     const parts: [string, string[]][] = [
       [".cy-scroll-area", ["display", "width", "height", "min-height", "box-sizing", "margin-top"]],
       [".cy-scroll-area-viewport", ["overflow-x", "overflow-y", "height", "padding-top", "box-sizing"]],
-      [".cy-scroll-area-overlay", ["align-self", "justify-self", "margin-bottom", "z-index"]],
     ];
     for (const [selector, props] of parts) {
       const { clean, hostile } = computeUnderHostileHost(canvasElement, selector, props);

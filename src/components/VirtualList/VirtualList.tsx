@@ -16,6 +16,7 @@ import { clamp } from "../../foundations/math.js";
 import { moveItems } from "../../foundations/reorder.js";
 import { useFollow } from "../../foundations/use-follow.js";
 import { useVirtualWindow } from "../../foundations/virtual-window.js";
+import { OverlayFrame } from "../OverlayFrame/OverlayFrame.js";
 
 export interface VirtualListTokens {
   /** Height of the list (it scrolls inside). */
@@ -24,8 +25,6 @@ export interface VirtualListTokens {
   rowHeight: string;
   /** Background of the chosen rows. */
   selectedBackground: string;
-  /** Space between the bottom edge and the `overlay` (a "3 new" pill). */
-  overlayOffset: string;
 }
 
 declare module "../../tokens/schema.js" {
@@ -439,16 +438,9 @@ export function VirtualList<T>({
   };
 
   const rootClass = className ? `cy-virtual-list ${className}` : "cy-virtual-list";
-  // The overlay shares a grid cell with the list, so it stays put while the list scrolls under it. The frame is
-  // always there: one that came and went with the overlay would remount the list and lose its scroll position.
-  const framed = (list: ReactNode) => (
-    <div className="cy-virtual-list-frame">
-      {list}
-      {overlay != null && overlay !== false && (
-        <div className="cy-virtual-list-overlay cy-reset">{overlay}</div>
-      )}
-    </div>
-  );
+  // The overlay stays put while the list scrolls under it. The frame is always there: one that came and went with the
+  // overlay would remount the list and lose its scroll position.
+  const framed = (list: ReactNode) => <OverlayFrame overlay={overlay}>{list}</OverlayFrame>;
   // An empty listbox is invalid ARIA: with no items the list is just its message.
   if (items.length === 0)
     return framed(

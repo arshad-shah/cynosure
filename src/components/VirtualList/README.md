@@ -39,10 +39,10 @@ import { VirtualList } from "@arshad-shah/cynosure";
 - The focused row is always rendered, so focus survives scrolling it far out of view; each row carries `aria-posinset` and `aria-setsize`.
 - Row height comes from CSS (the `rowHeight` token, and 44px on touch screens) and is measured, never passed in. With `wrap`, every row is measured, and rows not yet seen are guessed at one line, so the scrollbar settles as you scroll.
 - `follow` is for logs: while the list is scrolled to its end, new rows keep it there; scroll up to read and it stays put until you return (or call `scrollToEnd`). The list stays a listbox rather than `role="log"`, which would read every new line aloud; announce what matters with your own status message.
-- `onAtBottomChange` and `overlay` make a "3 new" pill: count what arrives while `atBottom` is false, show it in `overlay`, and call `handle.scrollToEnd()` from it. Following is shared with ScrollArea (`useFollow` in `src/foundations/use-follow.ts`). The list always sits in a frame (`cy-virtual-list-frame`) as wide as its parent, so the overlay can come and go without remounting the list.
+- `onAtBottomChange` and `overlay` make a "3 new" pill: count what arrives while `atBottom` is false, show it in `overlay`, and call `handle.scrollToEnd()` from it. Following is shared with ScrollArea (`useFollow` in `src/foundations/use-follow.ts`). The list always sits in an [OverlayFrame](../OverlayFrame/README.md) as wide as its parent, so the overlay can come and go without remounting the list.
 - `isHeader` rows are announced as dimmed options, in reading order, and the keys step over them. A copy of the current heading is pinned at the top (hidden from screen readers, which already have the real one).
 
 ## Tokens
 
 - `--cy-virtual-list-height`, `--cy-virtual-list-row-height`, `--cy-virtual-list-selected-background`
-- `--cy-virtual-list-overlay-offset`: space between the bottom edge and the overlay (default `--cy-space-4`)
+- The overlay is placed by OverlayFrame: `--cy-overlay-frame-offset` (space between the bottom edge and the overlay, default `--cy-space-4`) and `--cy-overlay-frame-layer`, set on an element around the list
