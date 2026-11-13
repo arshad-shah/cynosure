@@ -3,7 +3,7 @@
  * plain hex, and a theme object for swift-chart. Nothing here imports a chart library, so Cynosure gains no dependency.
  */
 import { mix } from "./color.js";
-import { accentMixes, createTheme } from "./create-theme.js";
+import { ACCENT_MIX, accentMixCss, createTheme } from "./create-theme.js";
 import type { ColorTokens, PaletteName, Theme } from "./schema.js";
 
 /**
@@ -12,12 +12,16 @@ import type { ColorTokens, PaletteName, Theme } from "./schema.js";
  */
 export function resolveColors(theme: Theme = createTheme(), palette: PaletteName = "light"): ColorTokens {
   const p = theme.palettes[palette];
-  const { css, concrete } = accentMixes(p.accent, p.surface);
+  const css = accentMixCss(p.accent, p.surface);
+  const alpha = Math.round((ACCENT_MIX.ring / 100) * 255)
+    .toString(16)
+    .padStart(2, "0");
   // Only the mixes createTheme wrote are swapped: a palette that sets its own accentSoft or ring already has hex.
   return {
     ...p,
-    accentSoft: p.accentSoft === css.accentSoft ? concrete.accentSoft : p.accentSoft,
-    ring: p.ring === css.ring ? concrete.ring : p.ring,
+    accentSoft:
+      p.accentSoft === css.accentSoft ? mix(p.accent, p.surface, ACCENT_MIX.accentSoft / 100) : p.accentSoft,
+    ring: p.ring === css.ring ? `${p.accent}${alpha}` : p.ring,
     seriesColors: [...p.seriesColors],
   };
 }

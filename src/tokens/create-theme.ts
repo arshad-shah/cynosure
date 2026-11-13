@@ -86,35 +86,22 @@ function accentRoles(
     accent: hex,
     accentHover: best.hover,
     accentActive: best.active,
-    ...accentMixes(hex, surface).css,
+    ...accentMixCss(hex, surface),
     onAccent: best.on,
   };
 }
 
-/** How much accent the soft tint (over the surface) and the focus ring (over transparency) take, in percent. */
-const SOFT_MIX = 18;
-const RING_MIX = 28;
+/** How much accent (in percent) the soft tint takes over the surface and the focus ring over transparency. */
+export const ACCENT_MIX = { accentSoft: 18, ring: 28 } as const;
 
 /**
- * The accent's two mixed colours, `accentSoft` and `ring`: as CSS (`color-mix()`, which the stylesheet resolves) and
- * as concrete hex (8-digit where translucent) for canvases and chart libraries, which cannot read `color-mix()`. Both
- * come from the same inputs, so `resolveColors` never parses CSS text.
+ * The accent's two mixed colours as CSS (`color-mix()`, which the stylesheet resolves). `resolveColors` works out the
+ * same colours as hex from `ACCENT_MIX`, and recognises these values by building them again, never by parsing them.
  */
-export function accentMixes(
-  accent: string,
-  surface: string,
-): Record<"css" | "concrete", Pick<ColorTokens, "accentSoft" | "ring">> {
-  const alpha = Math.round((RING_MIX / 100) * 255)
-    .toString(16)
-    .padStart(2, "0");
-  return {
-    css: {
-      accentSoft: `color-mix(in oklab, ${accent} ${SOFT_MIX}%, ${surface})`,
-      ring: `color-mix(in oklab, ${accent} ${RING_MIX}%, transparent)`,
-    },
-    concrete: { accentSoft: mix(accent, surface, SOFT_MIX / 100), ring: `${accent}${alpha}` },
-  };
-}
+export const accentMixCss = (accent: string, surface: string): Pick<ColorTokens, "accentSoft" | "ring"> => ({
+  accentSoft: `color-mix(in oklab, ${accent} ${ACCENT_MIX.accentSoft}%, ${surface})`,
+  ring: `color-mix(in oklab, ${accent} ${ACCENT_MIX.ring}%, transparent)`,
+});
 
 type SyntaxKey = Extract<keyof ColorTokens, `syntax${string}`>;
 const SYNTAX_KEYS = [
