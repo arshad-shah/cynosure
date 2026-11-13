@@ -268,8 +268,11 @@ export const CrispOnHighDensityScreens: Story = {
 
 export const FitsItsContent: Story = {
   tags: ["visual"],
+  render: () => <Board className="layout-probe" />,
   play: async ({ canvas, canvasElement }) => {
     const region = canvas.getByRole("region", { name: "Schema" });
+    // A layout class goes beside the canvas's own.
+    await expect(surface(canvasElement)).toHaveClass("cy-pan-zoom-canvas", "layout-probe");
     await expect(region).toHaveAttribute("tabindex", "0");
     // Without a starting view, the content is fitted: every card is inside.
     await waitFor(() => expect(viewOf(canvasElement)?.scale).toBeLessThan(1));

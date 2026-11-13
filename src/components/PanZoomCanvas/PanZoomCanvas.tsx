@@ -7,6 +7,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { useCanvasSize } from "../../foundations/canvas-size.js";
 import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js";
 import { useControllableState } from "../../foundations/controllable.js";
 import { type DragSession, useDrag } from "../../foundations/drag.js";
@@ -216,30 +217,8 @@ export const PanZoomCanvas = forwardRef<PanZoomCanvasHandle, PanZoomCanvasProps>
   );
   const latest = useRef(current);
   latest.current = current;
-  const [size, setSize] = useState({ width: 0, height: 0, dpr: 1 });
-  useClientLayoutEffect(() => {
-    const el = surface.current as HTMLElement;
-    // The density is read with the size, and again when it changes (a move to another screen, a browser zoom).
-    let density: MediaQueryList | undefined;
-    const measure = () => {
-      const dpr = devicePixelRatio;
-      density?.removeEventListener("change", measure);
-      density = matchMedia(`(resolution: ${dpr}dppx)`);
-      density.addEventListener("change", measure);
-      setSize((s) =>
-        s.width === el.clientWidth && s.height === el.clientHeight && s.dpr === dpr
-          ? s
-          : { width: el.clientWidth, height: el.clientHeight, dpr },
-      );
-    };
-    measure();
-    const observer = new ResizeObserver(measure);
-    observer.observe(el);
-    return () => {
-      observer.disconnect();
-      (density as MediaQueryList).removeEventListener("change", measure);
-    };
-  }, []);
+  // The density is read with the size, and again when it changes (a move to another screen, a browser zoom).
+  const size = useCanvasSize(surface);
 
   const go = (next: CanvasView) => {
     latest.current = next;
