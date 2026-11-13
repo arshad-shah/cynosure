@@ -149,7 +149,7 @@ export const DecimalMinAndTinySteps: Story = {
   render: (args: SliderProps) => (
     <>
       <Slider {...args} label="Half" min={0.5} max={10} step={1} defaultValue={3.5} />
-      <Slider {...args} label="Tiny" min={0} max={0.000001} step={1e-7} defaultValue={0} />
+      <Slider {...args} label="Tiny" min={0} max={5e-7} step={1e-7} defaultValue={0} />
     </>
   ),
   play: async ({ canvas, userEvent }) => {
@@ -165,6 +165,10 @@ export const DecimalMinAndTinySteps: Story = {
     tiny.focus();
     await userEvent.keyboard("{ArrowRight}");
     await expect(tiny).toHaveAttribute("aria-valuenow", "0.0000001");
+    // The limits are written out too, as ARIA expects.
+    await expect(tiny).toHaveAttribute("aria-valuemax", "0.0000005");
+    await userEvent.keyboard("{End}");
+    await expect(tiny).toHaveAttribute("aria-valuenow", "0.0000005");
   },
 };
 

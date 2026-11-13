@@ -3,7 +3,7 @@ import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js
 import { useControllableState } from "../../foundations/controllable.js";
 import { useDrag } from "../../foundations/drag.js";
 import { HiddenValue } from "../../foundations/HiddenValue/HiddenValue.js";
-import { clamp, plainNumber, roundLike } from "../../foundations/math.js";
+import { ariaNumber, clamp, plainNumber, roundLike, snapToStep } from "../../foundations/math.js";
 import { minus } from "../../icons/minus.js";
 import { plus } from "../../icons/plus.js";
 import type { Size } from "../../tokens/schema.js";
@@ -241,9 +241,8 @@ export function NumberField({
     const base = min ?? 0;
     const from = draft !== null ? (parseNumber(draft, locale, formatOptions) ?? current) : current;
     const start = from ?? (delta > 0 ? (min ?? 0) : (max ?? 0));
-    // Snap onto the step grid (counted from min), then round away floating-point noise (0.3, not 0.30000000000000004).
-    const snapped = from === null ? start : Math.round((start - base + delta) / step) * step + base;
-    commit(limit(roundLike(snapped, step, base)));
+    // Snap onto the step grid (counted from min), without floating-point noise (0.3, not 0.30000000000000004).
+    commit(limit(from === null ? roundLike(start, step, base) : snapToStep(start + delta, step, base)));
   };
   const commitDraft = () => {
     if (draft === null) return;
@@ -322,9 +321,9 @@ export function NumberField({
         autoComplete="off"
         autoCorrect="off"
         spellCheck={false}
-        aria-valuenow={current === null ? undefined : (plainNumber(current) as unknown as number)}
-        aria-valuemin={min}
-        aria-valuemax={max}
+        aria-valuenow={ariaNumber(current)}
+        aria-valuemin={ariaNumber(min)}
+        aria-valuemax={ariaNumber(max)}
         aria-valuetext={current === null ? undefined : shown(current)}
         required={required}
         disabled={disabled}

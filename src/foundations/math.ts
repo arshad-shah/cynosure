@@ -26,3 +26,20 @@ export const roundLike = (v: number, ...sources: number[]) =>
  */
 export const plainNumber = (n: number) =>
   Number.isFinite(n) && Math.abs(n) < 1e21 ? n.toFixed(Math.min(100, decimals(n))) : String(n);
+
+/**
+ * `v` moved to the nearest point of the step grid that starts at `origin` (`origin + k * step`), without
+ * floating-point noise: `snapToStep(0.34, 0.1, 0)` is 0.3, `snapToStep(4.2, 1, 0.5)` is 4.5.
+ */
+export const snapToStep = (v: number, step: number, origin: number) =>
+  roundLike(origin + Math.round((v - origin) / step) * step, step, origin);
+
+/**
+ * A number for `aria-valuenow`, `aria-valuemin` and `aria-valuemax`, written out without exponent notation
+ * (`plainNumber`) so screen readers read it; React types these attributes as numbers. Absent stays absent.
+ */
+export function ariaNumber(n: number): number;
+export function ariaNumber(n: number | null | undefined): number | undefined;
+export function ariaNumber(n: number | null | undefined) {
+  return n == null ? undefined : (plainNumber(n) as unknown as number);
+}
