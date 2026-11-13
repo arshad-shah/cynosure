@@ -42,9 +42,9 @@ With `target="window"`, files dropped anywhere in the window are taken, for an a
 
 ## Your own picker and a list of chosen files
 
-`onBrowse` replaces the browser's file dialog: the button calls it instead, for an app with its own picker (Electron's dialog over IPC). Dropped files still arrive in `onFiles`.
+`onPick` replaces the browser's file dialog with your own picker (Electron's dialog over IPC), as PathField's `onPick` does: the button calls it and is busy until it settles. It resolves with what was chosen, files or paths, or `null` when cancelled; a cancel or a failure changes nothing. Chosen files are checked like dropped ones and arrive in `onFiles`; chosen paths arrive in `onPaths`. Dropped files still arrive in `onFiles`.
 
-`value` lists what has been chosen, files by name and paths as given, each with a remove button when `onRemove` is set. The list is yours: add to it from `onBrowse` and `onFiles`, take out what `onRemove(item, index)` reports. A removal is announced, and focus moves to the next remove button, so several can be removed in a row.
+`value` lists what has been chosen, files by name and paths as given, each with a remove button when `onRemove` is set. The list is yours: add to it from `onPaths` and `onFiles`, take out what `onRemove(item, index)` reports. A removal is announced, and focus moves to the next remove button, so several can be removed in a row.
 
 ```tsx
 const [chosen, setChosen] = useState<string[]>([]);
@@ -52,7 +52,8 @@ const [chosen, setChosen] = useState<string[]>([]);
 <FileDrop
   multiple
   value={chosen}
-  onBrowse={async () => setChosen([...chosen, ...(await window.api.pickFiles())])}
+  onPick={() => window.api.pickFiles()} // Promise<string[] | null>
+  onPaths={(paths) => setChosen([...chosen, ...paths])}
   onFiles={(files) => setChosen([...chosen, ...files.map((f) => f.name)])}
   onRemove={(_, index) => setChosen(chosen.filter((_, i) => i !== index))}
 />
