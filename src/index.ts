@@ -132,7 +132,7 @@ export { CopyButton, type CopyButtonLabels, type CopyButtonProps } from "./compo
 export {
   DataGrid,
   type DataGridCell,
-  type DataGridCellTone,
+  type DataGridCellKind,
   type DataGridColumn,
   type DataGridLabels,
   type DataGridProps,

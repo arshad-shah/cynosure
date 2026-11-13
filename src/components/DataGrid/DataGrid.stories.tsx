@@ -37,8 +37,8 @@ const meta = {
     onSortChange: fn(),
     onColumnResize: fn(),
     onRowClick: fn(),
-    onRowActivate: fn(),
-    onSelectedRowsChange: fn(),
+    onAction: fn(),
+    onSelectionChange: fn(),
     onSelectedRangeChange: fn(),
     onEndReached: fn(),
   } as DataGridProps<unknown>,
@@ -185,7 +185,7 @@ const PEOPLE_COLUMNS: DataGridColumn<Person>[] = [
     align: "end",
     width: 96,
     cell: (p) => p.age ?? "NULL",
-    cellTone: (p) => (p.age === null ? "null" : "number"),
+    cellKind: (p) => (p.age === null ? "null" : "number"),
   },
   { key: "city", header: "City", resizable: true, minWidth: 80, maxWidth: 240 },
 ];
@@ -425,7 +425,7 @@ export const SelectRows: Story = {
     await expect(canvasElement.querySelectorAll('[role="row"][aria-selected="false"]')).toHaveLength(4);
     await userEvent.click(cell(canvasElement, "Grace"));
     await expect(selectedRowNames(canvasElement)).toEqual(["Grace"]);
-    await expect(args.onSelectedRowsChange).toHaveBeenLastCalledWith(["p1"]);
+    await expect(args.onSelectionChange).toHaveBeenLastCalledWith(["p1"]);
     await expect(args.onRowClick).toHaveBeenLastCalledWith(PEOPLE[0], 0);
     // Ctrl (or Cmd) toggles one more; Shift extends from the last row chosen, and selects no text.
     await userEvent.keyboard("{Control>}");
@@ -435,7 +435,7 @@ export const SelectRows: Story = {
     await userEvent.keyboard("{Shift>}");
     await userEvent.click(cell(canvasElement, "Boston"));
     await userEvent.keyboard("{/Shift}");
-    await expect(args.onSelectedRowsChange).toHaveBeenLastCalledWith(["p3", "p4"]);
+    await expect(args.onSelectionChange).toHaveBeenLastCalledWith(["p3", "p4"]);
     await expect(document.getSelection()?.toString()).toBe("");
     await expect(focused()).toBe("Boston");
     // Space selects the focused row; Shift+Up extends; plain arrows only move focus; Ctrl+Space toggles.
@@ -465,11 +465,11 @@ export const SelectRows: Story = {
 };
 
 export const ControlledRows: Story = {
-  args: { ...people, selectionMode: "row", selectedRows: ["p2"] },
+  args: { ...people, selectionMode: "row", selected: ["p2"] },
   play: async ({ args, canvasElement, userEvent }) => {
     await expect(selectedRowNames(canvasElement)).toEqual(["ada"]);
     await userEvent.click(cell(canvasElement, "Grace"));
-    await expect(args.onSelectedRowsChange).toHaveBeenLastCalledWith(["p1"]);
+    await expect(args.onSelectionChange).toHaveBeenLastCalledWith(["p1"]);
     await expect(selectedRowNames(canvasElement)).toEqual(["ada"]);
   },
 };
@@ -615,19 +615,19 @@ export const ClickAndActivateRows: Story = {
     await expect(args.onRowClick).toHaveBeenLastCalledWith(PEOPLE[1], 1);
     // Enter or a double-click opens the row.
     await userEvent.keyboard("{Enter}");
-    await expect(args.onRowActivate).toHaveBeenLastCalledWith(PEOPLE[1], 1);
+    await expect(args.onAction).toHaveBeenLastCalledWith(PEOPLE[1], 1);
     await userEvent.dblClick(cell(canvasElement, "Boston"));
-    await expect(args.onRowActivate).toHaveBeenLastCalledWith(PEOPLE[3], 3);
+    await expect(args.onAction).toHaveBeenLastCalledWith(PEOPLE[3], 3);
     // Enter on the header does not.
     await userEvent.keyboard("{ArrowUp}{ArrowUp}{ArrowUp}{ArrowUp}{End}{Enter}");
-    await expect(args.onRowActivate).toHaveBeenCalledTimes(2);
+    await expect(args.onAction).toHaveBeenCalledTimes(2);
     // Nor does a double-click on the header, or an Enter that ends an input method's composition.
     await userEvent.dblClick(header(canvasElement, "City"));
     await userEvent.keyboard("{ArrowDown}");
     document.activeElement?.dispatchEvent(
       new KeyboardEvent("keydown", { key: "Enter", bubbles: true, cancelable: true, isComposing: true }),
     );
-    await expect(args.onRowActivate).toHaveBeenCalledTimes(2);
+    await expect(args.onAction).toHaveBeenCalledTimes(2);
   },
 };
 
@@ -744,7 +744,12 @@ export const DenseRowsAndCellTones: Story = {
     ...people,
     size: "sm",
     columns: [
-      ...PEOPLE_COLUMNS.slice(0, 2),
+      PEOPLE_COLUMNS[0] as DataGridColumn<Person>,
+      // A tone wins over the kind's colour: Barbara's age is a number drawn in the neutral ink.
+      {
+        ...(PEOPLE_COLUMNS[1] as DataGridColumn<Person>),
+        cellTone: (p: Person) => (p.age === 9 ? "neutral" : undefined),
+      },
       { key: "city", header: "City", cellTone: (p: Person) => (p.city === "London" ? "success" : undefined) },
     ],
   } as Partial<DataGridProps<unknown>>,
@@ -753,6 +758,7 @@ export const DenseRowsAndCellTones: Story = {
       <DataGrid {...(args as DataGridProps<unknown>)} />
       <span data-testid="muted" style={{ color: "var(--cy-color-muted)" }} />
       <span data-testid="success" style={{ color: "var(--cy-color-success-text)" }} />
+      <span data-testid="ink" style={{ color: "var(--cy-color-ink)" }} />
     </div>
   ),
   play: async ({ canvas, canvasElement }) => {
@@ -769,6 +775,9 @@ export const DenseRowsAndCellTones: Story = {
       getComputedStyle(canvas.getByTestId("success")).color,
     );
     await expect(getComputedStyle(cell(canvasElement, "Boston")).fontStyle).toBe("normal");
+    await expect(getComputedStyle(cell(canvasElement, "9")).color).toBe(
+      getComputedStyle(canvas.getByTestId("ink")).color,
+    );
   },
 };
 
@@ -902,7 +911,7 @@ export const InsideShadowRoot: Story = {
 
 export const ReadableInLightAndDark: Story = {
   tags: ["visual"],
-  args: { ...people, selectionMode: "row", defaultSelectedRows: ["p2"], style: { blockSize: 220 } },
+  args: { ...people, selectionMode: "row", defaultSelected: ["p2"], style: { blockSize: 220 } },
   render: (args) => (
     <Stack gap="4">
       {(["light", "dark"] as const).map((mode) => (

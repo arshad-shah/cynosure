@@ -16,6 +16,7 @@ import { isComposing, stepKey } from "../../foundations/keys.js";
 import { clamp } from "../../foundations/math.js";
 import { nextSort, sortRows, type TableSort } from "../../foundations/sort.js";
 import { useVirtualWindow } from "../../foundations/virtual-window.js";
+import type { Tone } from "../../tokens/schema.js";
 import { SortButton } from "../SortButton/SortButton.js";
 import { Tooltip } from "../Tooltip/Tooltip.js";
 
@@ -32,9 +33,9 @@ export interface DataGridTokens {
   selectedBackground: string;
   /** Inline padding of a cell. */
   cellPadding: string;
-  /** Text colour of cells whose `cellTone` is "null" (an empty value). */
+  /** Text colour of cells whose `cellKind` is "null" (an empty value). */
   nullColor: string;
-  /** Text colour of cells whose `cellTone` is "number". */
+  /** Text colour of cells whose `cellKind` is "number". */
   numberColor: string;
 }
 
@@ -46,8 +47,8 @@ declare module "../../tokens/schema.js" {
 
 export type { SortDirection, TableSort } from "../../foundations/sort.js";
 
-/** How a cell's text is coloured: an empty value, a number, or a tone. */
-export type DataGridCellTone = "null" | "number" | "accent" | "danger" | "success" | "warning" | "info";
+/** What kind of value a cell holds, for its styling: an empty value (muted, italic) or a number. */
+export type DataGridCellKind = "null" | "number";
 
 export interface DataGridColumn<Row> {
   /** Unique key of the column; also the default field read from each row. */
@@ -72,8 +73,10 @@ export interface DataGridColumn<Row> {
   value?: (row: Row) => unknown;
   /** The full value of a cell cut short, shown in a Tooltip on hover and keyboard focus. Nothing: no tooltip. */
   tooltip?: (row: Row) => ReactNode;
-  /** Colours the cell's text: "null" for an empty value, "number" for numbers, or a tone. */
-  cellTone?: (row: Row) => DataGridCellTone | undefined;
+  /** The kind of value the cell holds: "null" (an empty value, muted and italic) or "number". Nothing: plain text. */
+  cellKind?: (row: Row) => DataGridCellKind | undefined;
+  /** Colours the cell's text with a tone (a status, a match); it wins over the kind's colour. Nothing: no tone. */
+  cellTone?: (row: Row) => Tone | undefined;
 }
 
 /** One cell, by its row's id and its column's key (so it survives sorting and loading more rows). */
@@ -118,12 +121,12 @@ export interface DataGridProps<Row> {
    * Shift+click and Shift+arrows extend it). Ctrl/Cmd+C copies the selection as tab-separated text.
    */
   selectionMode?: "none" | "row" | "cell" | "range";
-  /** Ids of the selected rows, with `selectionMode="row"` (controlled). */
-  selectedRows?: string[] | undefined;
+  /** Ids of the selected rows, with `selectionMode="row"` (controlled), as Table's `selected`. */
+  selected?: string[] | undefined;
   /** Ids of the rows selected at the start when uncontrolled. */
-  defaultSelectedRows?: string[];
+  defaultSelected?: string[];
   /** Called with the selected row ids when they change. */
-  onSelectedRowsChange?: ((ids: string[]) => void) | undefined;
+  onSelectionChange?: ((ids: string[]) => void) | undefined;
   /** The selected cells, with `selectionMode` "cell" or "range" (controlled); `null` is none. */
   selectedRange?: DataGridRange | null | undefined;
   /** The cells selected at the start when uncontrolled. */
@@ -132,8 +135,8 @@ export interface DataGridProps<Row> {
   onSelectedRangeChange?: ((range: DataGridRange | null) => void) | undefined;
   /** A row's cell was clicked or tapped. */
   onRowClick?: ((row: Row, index: number) => void) | undefined;
-  /** Enter on a row's cell, or a double-click on it (open the row). */
-  onRowActivate?: ((row: Row, index: number) => void) | undefined;
+  /** Enter on a row's cell, or a double-click on it (open the row), as VirtualList's and Tree's `onAction`. */
+  onAction?: ((row: Row, index: number) => void) | undefined;
   /**
    * Called once the last rows come into view, once per row count: load the next rows and append them ("load more").
    * For pages, put a `Pagination` under the grid and pass it one page of rows.
@@ -184,14 +187,14 @@ export function DataGrid<Row>({
   manualSort = false,
   onColumnResize,
   selectionMode = "none",
-  selectedRows,
-  defaultSelectedRows = [],
-  onSelectedRowsChange,
+  selected,
+  defaultSelected = [],
+  onSelectionChange,
   selectedRange,
   defaultSelectedRange = null,
   onSelectedRangeChange,
   onRowClick,
-  onRowActivate,
+  onAction,
   onEndReached,
   size = "md",
   labels,
@@ -202,11 +205,7 @@ export function DataGrid<Row>({
   const root = useRef<HTMLDivElement>(null);
   const head = useRef<HTMLDivElement>(null);
   const [currentSort, setSort] = useControllableState<TableSort | null>(sort, defaultSort, onSortChange);
-  const [chosenRows, setChosenRows] = useControllableState(
-    selectedRows,
-    defaultSelectedRows,
-    onSelectedRowsChange,
-  );
+  const [chosenRows, setChosenRows] = useControllableState(selected, defaultSelected, onSelectionChange);
   const [range, setRange] = useControllableState<DataGridRange | null>(
     selectedRange,
     defaultSelectedRange,
@@ -441,7 +440,7 @@ export function DataGrid<Row>({
       case "Enter":
         if (row >= 0) {
           event.preventDefault();
-          onRowActivate?.(shown[row] as Row, row);
+          onAction?.(shown[row] as Row, row);
         }
         return;
       case " ":
@@ -535,7 +534,7 @@ export function DataGrid<Row>({
         onClick={onClick}
         onDoubleClick={(e) => {
           const at = cellOf(e.target);
-          if (at && at.row >= 0) onRowActivate?.(shown[at.row] as Row, at.row);
+          if (at && at.row >= 0) onAction?.(shown[at.row] as Row, at.row);
         }}
         // With a selection mode, Shift+click selects cells, not text.
         onMouseDown={(e) => {
@@ -634,6 +633,7 @@ export function DataGrid<Row>({
                           }
                           data-cell={cellAttr(r, c)}
                           data-align={column.align}
+                          data-kind={column.cellKind?.(row)}
                           data-tone={column.cellTone?.(row)}
                           tabIndex={tabStop(r, c)}
                           className="cy-data-grid-cell cy-reset"

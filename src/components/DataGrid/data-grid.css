@@ -157,17 +157,20 @@
   &[aria-selected="true"] {
     background: var(--cy-data-grid-selected-background, var(--cy-color-accent-soft));
   }
-  &[data-tone="null"] {
+  &[data-kind="null"] {
     color: var(--cy-data-grid-null-color, var(--cy-color-muted));
     font-style: italic;
   }
   /* Muted text on the selection's tint: halfway to ink, so it still reads. */
-  [aria-selected="true"] > &[data-tone="null"],
-  &[aria-selected="true"][data-tone="null"] {
+  [aria-selected="true"] > &[data-kind="null"],
+  &[aria-selected="true"][data-kind="null"] {
     color: var(--cy-data-grid-null-color, color-mix(in oklab, var(--cy-color-muted), var(--cy-color-ink)));
   }
-  &[data-tone="number"] {
+  &[data-kind="number"] {
     color: var(--cy-data-grid-number-color, var(--cy-color-ink));
+  }
+  &[data-tone="neutral"] {
+    color: var(--cy-color-ink);
   }
   &[data-tone="accent"] {
     color: var(--cy-color-accent-text);

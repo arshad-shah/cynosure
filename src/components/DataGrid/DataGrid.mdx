@@ -31,7 +31,7 @@ const columns: DataGridColumn<Row>[] = fields.map((field) => ({
   minWidth: 80,
   align: field.numeric ? "end" : "start",
   cell: (row) => format(row[field.name]),
-  cellTone: (row) => (row[field.name] === null ? "null" : field.numeric ? "number" : undefined),
+  cellKind: (row) => (row[field.name] === null ? "null" : field.numeric ? "number" : undefined),
 }));
 
 <DataGrid label="Results" columns={columns} rows={rows} getRowId={(row) => row.id} size="sm" />
@@ -47,7 +47,7 @@ A `sortable` column's header is a button (a [SortButton](?path=/docs/components-
 
 ### Selection and copying
 
-`selectionMode` is `"none"` (default), `"row"`, `"cell"` or `"range"`. Rows are `selectedRows` (ids); cells are `selectedRange`, two corners (`{ anchor, focus }`, each `{ rowId, key }`), so a selection survives sorting and loading more rows. Ctrl/Cmd+C copies the selection as tab-separated text: rows on lines, raw values, and a value holding a tab, a line break or a quote is quoted.
+`selectionMode` is `"none"` (default), `"row"`, `"cell"` or `"range"`. Rows are `selected` (ids, as Table's); cells are `selectedRange`, two corners (`{ anchor, focus }`, each `{ rowId, key }`), so a selection survives sorting and loading more rows. Ctrl/Cmd+C copies the selection as tab-separated text: rows on lines, raw values, and a value holding a tab, a line break or a quote is quoted.
 
 Text inside cells stays selectable: dragging selects text, and a copy with text selected copies that text, the browser's way. Cells are selected by clicking, Shift+click and the keyboard instead, so both work without a mode switch.
 
@@ -55,7 +55,7 @@ Text inside cells stays selectable: dragging selects text, and a copy with text 
 
 ### Full values, nulls and numbers
 
-`tooltip` returns the full value of a cell cut short (shown in a [Tooltip](?path=/docs/components-tooltip--docs) on hover and keyboard focus, and describing the cell), or nothing. `cellTone` colours a cell: `"null"` is muted and italic, `"number"` takes the number colour token, or a tone. `size="sm"` is dense: 28px rows under a 32px header.
+`tooltip` returns the full value of a cell cut short (shown in a [Tooltip](?path=/docs/components-tooltip--docs) on hover and keyboard focus, and describing the cell), or nothing. `cellKind` says what a cell holds: `"null"` is muted and italic, `"number"` takes the number colour token. `cellTone` colours a cell with a tone (`accent`, `neutral`, `danger`, `success`, `warning`, `info`), over the kind's colour. `size="sm"` is dense: 28px rows under a 32px header.
 
 <Canvas of={Stories.TooltipShowsTheFullValue} />
 
@@ -87,7 +87,7 @@ An APG grid (`role="grid"` with rows, column headers and cells) with one tab sto
 | Home / End | First or last cell of the row |
 | Ctrl+Home / Ctrl+End | First or last cell of the grid |
 | Page Up / Page Down | A view of rows up or down (Page Up from the first row reaches the header) |
-| Enter | On a cell: `onRowActivate` (so does a double-click). On a sortable header: sorts |
+| Enter | On a cell: `onAction` (so does a double-click). On a sortable header: sorts |
 | Alt+Left / Alt+Right | On a resizable header: narrow or widen the column (Shift for a bigger step); announced through `aria-keyshortcuts` |
 | Space | Selects the focused row or cell; Ctrl/Cmd+Space toggles a row; Shift+Space extends |
 | Shift+arrows | Extend the selection (rows, or a range of cells) |
