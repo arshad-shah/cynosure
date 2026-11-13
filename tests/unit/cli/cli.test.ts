@@ -204,6 +204,30 @@ describe("cy check", () => {
     const found = check(root).filter((v) => v.file.startsWith("src/components/Probe/"));
     expect(found.map((v) => v.rule).sort()).toEqual(["foundation-use", "hidden-text"]);
   });
+  it("live-region: flags a hidden live region written by hand outside the foundation", () => {
+    const root = sandbox();
+    mkdirSync(join(root, "src/components/Probe"));
+    write(
+      root,
+      "src/components/Probe/Probe.tsx",
+      [
+        "export const Probe = () => (",
+        "  <>",
+        '    <span className="cy-visually-hidden" role="status">a</span>',
+        '    <span className="cy-reset cy-visually-hidden" aria-live="polite">b</span>',
+        '    <p className="cy-probe cy-reset" role="status">visible status</p>',
+        '    <span className="cy-visually-hidden">hidden text</span>',
+        "  </>",
+        ");",
+        "",
+      ].join("\n"),
+    );
+    const found = check(root).filter((v) => v.rule === "live-region");
+    expect(found.map((v) => `${v.file}:${v.line}`)).toEqual([
+      "src/components/Probe/Probe.tsx:3",
+      "src/components/Probe/Probe.tsx:4",
+    ]);
+  });
   it("flags glyphs used as icons or arrows in docs pages", () => {
     const root = sandbox();
     const page = "src/components/Badge/Badge.mdx";

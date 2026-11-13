@@ -107,6 +107,24 @@ function tsxRules(root: string, file: string, out: Violation[], fonts: Set<strin
       const intrinsic = /^[a-z]/.test(tag);
       if (!inFoundations && NATIVE.has(tag))
         push("native-elements", node, `<${tag}> outside src/foundations; use the Cynosure component`);
+      if (!inFoundations && intrinsic) {
+        const attrs = new Map(
+          node.attributes.properties
+            .filter(ts.isJsxAttribute)
+            .map((a) => [a.name.getText(source), a] as const),
+        );
+        const role = attrs.get("role")?.initializer;
+        const live =
+          attrs.has("aria-live") ||
+          (role !== undefined && ts.isStringLiteral(role) && /^(status|alert|log)$/.test(role.text));
+        const hidden = attrs.get("className");
+        if (live && hidden && staticClassText(hidden, source).split(/\s+/).includes("cy-visually-hidden"))
+          push(
+            "live-region",
+            node,
+            "hand-written hidden live region: render LiveRegion (src/foundations/LiveRegion) with useLiveMessage",
+          );
+      }
       for (const attr of node.attributes.properties) {
         if (!ts.isJsxAttribute(attr)) continue;
         const name = attr.name.getText(source);
