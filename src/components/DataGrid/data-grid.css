@@ -146,10 +146,7 @@
     background: var(--cy-color-soft);
   }
   &[aria-selected="true"] {
-    background: var(
-      --cy-data-grid-selected-background,
-      color-mix(in oklab, var(--cy-color-accent) 14%, var(--cy-color-surface))
-    );
+    background: var(--cy-data-grid-selected-background, var(--cy-color-accent-soft));
   }
 }
 .cy-data-grid-cell.cy-data-grid-cell {
@@ -158,10 +155,7 @@
   color: var(--cy-color-ink);
   cursor: default;
   &[aria-selected="true"] {
-    background: var(
-      --cy-data-grid-selected-background,
-      color-mix(in oklab, var(--cy-color-accent) 14%, var(--cy-color-surface))
-    );
+    background: var(--cy-data-grid-selected-background, var(--cy-color-accent-soft));
   }
   &[data-tone="null"] {
     color: var(--cy-data-grid-null-color, var(--cy-color-muted));
