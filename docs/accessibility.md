@@ -34,7 +34,7 @@ Interactive components follow the WAI-ARIA Authoring Practices Guide (APG) patte
 
 **Focus rings.** Focus is shown on `:focus-visible` with an outline whose width is the `--cy-border-focus` token (3px by default). Two forms are used: an outline in `--cy-color-ring`, or, as on Button, a ring drawn with `box-shadow` over a transparent solid outline, which is the part forced-colours mode paints.
 
-**Overlays, Escape and focus return.** Everything that floats registers with one layer stack for the whole page (`useDismiss` in `src/overlay/dismiss.ts`): Tooltip, Popover, Menu, Dialog (and Sheet, which is a Dialog), CommandPalette, and the drop-down lists of Select, Combobox and TagInput.
+**Overlays, Escape and focus return.** Everything that floats registers with one layer stack for the whole page (`useDismiss` in `src/overlay/dismiss.ts`): Tooltip, Popover, Menu, Dialog (and Sheet, which is a Dialog), CommandPalette, and the drop-down lists of Select, Combobox, TagInput and TextArea's mentions.
 
 - Escape closes only the topmost layer: the most recently opened one with no other open layer nested in it. A Menu, Select or Tooltip inside a Dialog closes first.
 - When a layer closes, focus returns to its trigger, but only if focus was inside the layer or had been lost to the body. Focus the user moved elsewhere is left alone.

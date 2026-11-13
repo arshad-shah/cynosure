@@ -1,6 +1,6 @@
 # OptionList
 
-The drop-down list of options under a field: a top-layer `listbox` of options, with an optional icon and description line per option, group headings, and a note in place of options ("No matches", "Loading…"). Select, Combobox and TagInput draw their lists with it; it holds no state and handles no keys. The field that owns the list keeps focus, moves the active option with `aria-activedescendant`, and shows, places and dismisses the list with `useListboxLayer` (`src/overlay/listbox-layer.ts`).
+The drop-down list of options under a field: a top-layer `listbox` of options, with an optional icon and description line per option, group headings, and a note in place of options ("No matches", "Loading…"). Select, Combobox, TagInput and TextArea's mentions draw their lists with it; it holds no state and handles no keys. The field that owns the list keeps focus, moves the active option with `aria-activedescendant`, and shows, places and dismisses the list with `useListboxLayer` (`src/overlay/listbox-layer.ts`).
 
 ```tsx
 import { OptionList, OptionListItem, OptionListNote } from "@arshad-shah/cynosure";
