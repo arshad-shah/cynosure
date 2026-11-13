@@ -1,0 +1,59 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./SortButton.stories";
+
+<Meta of={Stories} />
+
+# SortButton
+
+The button in a sortable column's header: the header text and an icon that shows the sort. [Table](?path=/docs/components-table--docs) and [DataGrid](?path=/docs/components-datagrid--docs) render it for their `sortable` columns.
+
+<Canvas of={Stories.Default} />
+
+## When to use
+
+Use Table or DataGrid and mark columns `sortable`: they render SortButton for you. Reach for it directly only in a table of your own, inside a header cell that carries `aria-sort`.
+
+Use something else when the control sorts a whole list from outside it (a [Select](?path=/docs/components-select--docs) of sort orders) or toggles an option ([Button](?path=/docs/components-button--docs) with `pressed`).
+
+## Usage
+
+```tsx
+import { SortButton } from "@arshad-shah/cynosure";
+
+<th aria-sort={sort?.key === "name" ? sort.direction : "none"}>
+  <SortButton direction={sort?.key === "name" ? sort.direction : undefined} onClick={() => cycleSort("name")}>
+    Name
+  </SortButton>
+</th>
+```
+
+`fill` makes it fill a fixed-height header cell, as in DataGrid; `align="end"` puts the icon before the label for numeric columns.
+
+<Canvas of={Stories.FillsItsCell} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+| Key | Does |
+|---|---|
+| Enter, Space | Press: change the sort |
+
+- The icon follows `direction`: both ways when unsorted, an arrow up for ascending, down for descending. It is decorative: the header cell's `aria-sort` says how the column is sorted.
+- A sorted column's button is drawn in the ink colour; an unsorted one takes the header's colour.
+- A long header is cut short with an ellipsis rather than overflowing its column.
+- `tabIndex`, `aria-keyshortcuts` and `data-cell` reach the button, for a grid with one tab stop.
+
+## Touch
+
+The hit area is at least 24px tall, and 44px on touch screens; a filling button takes its cell's height.
+
+## Theming
+
+Tokens: `--cy-sort-button-padding` (inline padding when it fills its cell, default `--cy-space-4`). Colours come from the header around it.
+
+## Related
+
+[Table](?path=/docs/components-table--docs), [DataGrid](?path=/docs/components-datagrid--docs).

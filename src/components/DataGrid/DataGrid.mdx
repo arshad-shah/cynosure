@@ -41,7 +41,7 @@ Columns are `width` CSS pixels wide (default 160). `cell` formats a value for di
 
 ### Sorting
 
-A `sortable` column's header is a button: ascending, descending, then unsorted. The sort is a `TableSort` (`{ key, direction }`), the same as [Table](?path=/docs/components-table--docs)'s. Numbers compare as numbers, text in the locale's order, and empty values go last either way. Control it with `sort` and `onSortChange`; with `manualSort` you sort the rows (on a server) and the grid only shows and reports the sort.
+A `sortable` column's header is a button (a [SortButton](?path=/docs/components-sortbutton--docs) filling the header cell): ascending, descending, then unsorted. The sort is a `TableSort` (`{ key, direction }`), the same as [Table](?path=/docs/components-table--docs)'s. Numbers compare as numbers, text in the locale's order, and empty values go last either way. Control it with `sort` and `onSortChange`; with `manualSort` you sort the rows (on a server) and the grid only shows and reports the sort.
 
 <Canvas of={Stories.SortingCyclesAndCompares} />
 

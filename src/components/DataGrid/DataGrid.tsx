@@ -8,19 +8,15 @@ import {
   useRef,
   useState,
 } from "react";
-import { ButtonBase } from "../../foundations/ButtonBase/ButtonBase.js";
 import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js";
 import { useControllableState } from "../../foundations/controllable.js";
 import { isRtl } from "../../foundations/dir.js";
 import { useDrag } from "../../foundations/drag.js";
-import { Icon } from "../../foundations/Icon/Icon.js";
 import { isComposing, stepKey } from "../../foundations/keys.js";
 import { clamp } from "../../foundations/math.js";
 import { nextSort, sortRows, type TableSort } from "../../foundations/sort.js";
 import { useVirtualWindow } from "../../foundations/virtual-window.js";
-import { arrowDown } from "../../icons/arrow-down.js";
-import { arrowUp } from "../../icons/arrow-up.js";
-import { chevronsUpDown } from "../../icons/chevrons-up-down.js";
+import { SortButton } from "../SortButton/SortButton.js";
 import { Tooltip } from "../Tooltip/Tooltip.js";
 
 export interface DataGridTokens {
@@ -510,8 +506,6 @@ export function DataGrid<Row>({
     },
   });
 
-  const sortIcon = (key: string) =>
-    currentSort?.key !== key ? chevronsUpDown : currentSort.direction === "ascending" ? arrowUp : arrowDown;
   const tabStop = (row: number, col: number) => (row === activeRow && col === activeCol ? 0 : -1);
   const place = (col: number): CSSProperties => ({
     insetInlineStart: colsWin.offsetOf(col),
@@ -580,16 +574,17 @@ export function DataGrid<Row>({
                         })}
                   >
                     {column.sortable ? (
-                      <ButtonBase
-                        className="cy-data-grid-sort cy-reset"
+                      <SortButton
+                        fill
+                        direction={sorted}
+                        align={column.align}
                         data-cell={cellAttr(-1, c)}
                         tabIndex={tabStop(-1, c)}
                         aria-keyshortcuts={keys}
                         onClick={() => setSort(nextSort(currentSort, column.key))}
                       >
-                        <span className="cy-data-grid-label cy-reset">{column.header}</span>
-                        <Icon icon={sortIcon(column.key)} size="sm" className="cy-data-grid-sort-icon" />
-                      </ButtonBase>
+                        {column.header}
+                      </SortButton>
                     ) : (
                       <span className="cy-data-grid-label cy-reset">{column.header}</span>
                     )}

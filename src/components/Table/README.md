@@ -34,7 +34,7 @@ import { Table } from "@arshad-shah/cynosure";
 | `labels`                       | –          | `selectRow(rowName)`, `selectAll`, `empty`                                                  |
 - Text sorts in the locale's order ignoring case and with numbers in order; numbers sort as numbers; empty values go last.
 - The first column (or the one marked `rowHeader`) is a row header.
-- Sort buttons have `aria-sort` on their header and a 44px hit area on touch screens.
+- Sort buttons are SortButtons: `aria-sort` on their header and a 44px hit area on touch screens.
 
 ## Tokens
 
