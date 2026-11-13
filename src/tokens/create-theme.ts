@@ -86,9 +86,33 @@ function accentRoles(
     accent: hex,
     accentHover: best.hover,
     accentActive: best.active,
-    accentSoft: `color-mix(in oklab, ${hex} 18%, ${surface})`,
+    ...accentMixes(hex, surface).css,
     onAccent: best.on,
-    ring: `color-mix(in oklab, ${hex} 28%, transparent)`,
+  };
+}
+
+/** How much accent the soft tint (over the surface) and the focus ring (over transparency) take, in percent. */
+const SOFT_MIX = 18;
+const RING_MIX = 28;
+
+/**
+ * The accent's two mixed colours, `accentSoft` and `ring`: as CSS (`color-mix()`, which the stylesheet resolves) and
+ * as concrete hex (8-digit where translucent) for canvases and chart libraries, which cannot read `color-mix()`. Both
+ * come from the same inputs, so `resolveColors` never parses CSS text.
+ */
+export function accentMixes(
+  accent: string,
+  surface: string,
+): Record<"css" | "concrete", Pick<ColorTokens, "accentSoft" | "ring">> {
+  const alpha = Math.round((RING_MIX / 100) * 255)
+    .toString(16)
+    .padStart(2, "0");
+  return {
+    css: {
+      accentSoft: `color-mix(in oklab, ${accent} ${SOFT_MIX}%, ${surface})`,
+      ring: `color-mix(in oklab, ${accent} ${RING_MIX}%, transparent)`,
+    },
+    concrete: { accentSoft: mix(accent, surface, SOFT_MIX / 100), ring: `${accent}${alpha}` },
   };
 }
 
