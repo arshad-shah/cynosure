@@ -497,7 +497,7 @@ function Log({ follow = true }: { follow?: boolean }) {
         >
           Add a line
         </Button>
-        <Button size="sm" onClick={() => handle.current?.scrollToIndex(3, "start")}>
+        <Button size="sm" onClick={() => handle.current?.scrollToIndex(3, { align: "start" })}>
           Show line 4
         </Button>
         <Button size="sm" onClick={() => handle.current?.scrollToEnd()}>
@@ -508,6 +508,54 @@ function Log({ follow = true }: { follow?: boolean }) {
   );
 }
 const rowAt = (el: Element, i: number) => el.querySelector(`[data-index="${i}"]`) as HTMLElement | null;
+
+function Jumps() {
+  const handle = useRef<VirtualListHandle>(null);
+  return (
+    <div style={{ display: "grid", gap: 8, inlineSize: 360 }}>
+      <VirtualList
+        label="Pages"
+        items={PAGES}
+        getKey={(e) => e.id}
+        renderItem={(e) => e.name}
+        handle={handle}
+      />
+      <div style={{ display: "flex", gap: 8 }}>
+        <Button size="sm" onClick={() => handle.current?.scrollToIndex(100, { align: "center" })}>
+          Centre 101
+        </Button>
+        <Button size="sm" onClick={() => handle.current?.scrollToIndex(50, "start")}>
+          Top 51
+        </Button>
+        <Button size="sm" onClick={() => handle.current?.scrollToIndex(199)}>
+          Show 200
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+export const ScrollToIndexPlacesTheRow: Story = {
+  render: () => <Jumps />,
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const el = list(canvasElement);
+    const row = (i: number) => rowAt(canvasElement, i) as HTMLElement;
+    const view = () => el.getBoundingClientRect();
+    // `{ align: "center" }` puts the row in the middle of the list.
+    await userEvent.click(canvas.getByRole("button", { name: "Centre 101" }));
+    await waitFor(() => expect(row(100)).not.toBeNull());
+    const mid = row(100).getBoundingClientRect();
+    await expect(
+      Math.abs(mid.top + mid.height / 2 - (view().top + el.clientTop + el.clientHeight / 2)),
+    ).toBeLessThan(2);
+    // The alignment alone, the earlier form, still works: row 51 at the top.
+    await userEvent.click(canvas.getByRole("button", { name: "Top 51" }));
+    await waitFor(() => expect(el.scrollTop).toBe(row(50).offsetTop));
+    // No options: the least scrolling, so the last row ends at the bottom.
+    await userEvent.click(canvas.getByRole("button", { name: "Show 200" }));
+    await waitFor(() => expect(el.scrollTop + el.clientHeight).toBe(el.scrollHeight));
+  },
+};
 
 export const WrappedRowsTakeTheirHeight: Story = {
   // Without following, so it starts at the top whatever the timing of the first measure.

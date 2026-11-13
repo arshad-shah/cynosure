@@ -58,21 +58,21 @@ function Board({
         <Button size="sm" onClick={() => canvas.current?.zoomTo(100)}>
           Actual size
         </Button>
-        {rest.maxScale !== undefined && (
+        {rest.max !== undefined && (
           <Button size="sm" onClick={() => canvas.current?.zoomTo(1000)}>
             Largest
           </Button>
         )}
         <Button
           size="sm"
-          onClick={() => canvas.current?.centreOn({ x: 1080, y: 740, width: 120, height: 60 })}
+          onClick={() => canvas.current?.centerOn({ x: 1080, y: 740, width: 120, height: 60 })}
         >
           Show table C
         </Button>
       </div>
       <div style={{ blockSize: 400 }}>
         <PanZoomCanvas
-          ref={canvas}
+          handle={canvas}
           label="Schema"
           bounds={BOUNDS}
           minimap={minimap}
@@ -401,7 +401,7 @@ function pinch(el: HTMLElement, [a, b]: [number, number], [toA, toB]: [number, n
 }
 
 export const ZoomLimits: Story = {
-  render: () => <Board start={{ x: 0, y: 0, scale: 1 }} minScale={0.2} maxScale={3} />,
+  render: () => <Board start={{ x: 0, y: 0, scale: 1 }} min={20} max={300} />,
   play: async ({ canvas, canvasElement, userEvent }) => {
     const el = surface(canvasElement);
     const r = box(el);
@@ -446,7 +446,7 @@ export const ZoomLimits: Story = {
 };
 
 export const FitKeepsToTheLimits: Story = {
-  render: () => <Board minScale={0.6} maxScale={3} />,
+  render: () => <Board min={60} max={300} />,
   play: async ({ canvasElement }) => {
     // Fitting 1200 by 800 into this canvas needs under 50%; this canvas stops at 60%.
     await waitFor(() => expect(viewOf(canvasElement)?.scale).toBe(0.6));
@@ -464,6 +464,40 @@ export const FitZoomAndCentreFromTheApp: Story = {
     await expect(Math.abs(c.left + c.width / 2 - (r.left + r.width / 2))).toBeLessThan(2);
     await userEvent.click(canvas.getByRole("button", { name: "Fit" }));
     await waitFor(() => expect(viewOf(canvasElement).scale).toBeLessThan(0.5));
+  },
+};
+
+/** The handle as it was first released: on `ref`, with `centreOn`. */
+function OnRef() {
+  const canvas = useRef<PanZoomCanvasHandle>(null);
+  const [view, setView] = useState<CanvasView>({ x: 0, y: 0, scale: 1 });
+  return (
+    <div style={{ display: "grid", gap: 8, inlineSize: 600 }}>
+      <Button size="sm" onClick={() => canvas.current?.centreOn({ x: 1080, y: 740, width: 120, height: 60 })}>
+        Show table C
+      </Button>
+      <Button size="sm" onClick={() => canvas.current?.zoomTo(50)}>
+        Half size
+      </Button>
+      <div style={{ blockSize: 400 }}>
+        <PanZoomCanvas ref={canvas} label="Schema" view={view} onViewChange={setView}>
+          {NODES.map(card)}
+        </PanZoomCanvas>
+      </div>
+    </div>
+  );
+}
+
+export const TheRefAndCentreOnStillWork: Story = {
+  render: () => <OnRef />,
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    await userEvent.click(canvas.getByRole("button", { name: "Show table C" }));
+    const r = box(surface(canvasElement));
+    const c = box(canvas.getByTestId("node-C"));
+    await expect(Math.abs(c.left + c.width / 2 - (r.left + r.width / 2))).toBeLessThan(2);
+    await expect(Math.abs(c.top + c.height / 2 - (r.top + r.height / 2))).toBeLessThan(2);
+    await userEvent.click(canvas.getByRole("button", { name: "Half size" }));
+    await waitFor(() => expect(canvas.getByRole("status")).toHaveTextContent("Zoom 50%"));
   },
 };
 
@@ -768,8 +802,8 @@ function Cornered({ claimed }: { claimed?: string[] }) {
         onViewChange={setView}
         bounds={BOUNDS}
         minimap={map}
-        minScale={0.2}
-        maxScale={3}
+        min={20}
+        max={300}
         claimPress={(press) => {
           claimed?.push(press.target.getAttribute("class") ?? press.target.tagName);
           return false;

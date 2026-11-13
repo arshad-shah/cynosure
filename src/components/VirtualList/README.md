@@ -26,7 +26,7 @@ import { VirtualList } from "@arshad-shah/cynosure";
 | `onAtBottomChange`                   | –        | `false` when the view leaves the end, `true` when it is back. Starts `true`     |
 | `overlay`                            | –        | Pinned at the bottom centre over the list, outside the listbox; does not scroll |
 | `isHeader`                           | –        | Section headings: not focusable or selectable; the current one is pinned        |
-| `handle`                             | –        | A ref to `{ scrollToIndex(index, align?), scrollToEnd() }`                      |
+| `handle`                             | –        | A ref to `{ scrollToIndex(index, { align }?), scrollToEnd() }`                  |
 | `selectionMode`                      | `single` | `none` (a list to act on) · `single` · `multiple`                               |
 | `selectedKeys` / `onSelectionChange` | –        | Controlled; `defaultSelectedKeys` when uncontrolled                             |
 | `onAction`                           | –        | Enter, a double-click, or a click when `selectionMode` is `none`                |

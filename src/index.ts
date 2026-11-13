@@ -557,6 +557,7 @@ export {
   type VirtualListHandle,
   type VirtualListLabels,
   type VirtualListProps,
+  type VirtualListScrollOptions,
   type VirtualListTokens,
 } from "./components/VirtualList/index.js";
 export { VisuallyHidden, type VisuallyHiddenProps } from "./components/VisuallyHidden/index.js";

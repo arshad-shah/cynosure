@@ -3,6 +3,7 @@ import {
   forwardRef,
   type KeyboardEvent,
   type ReactNode,
+  type Ref,
   useImperativeHandle,
   useRef,
   useState,
@@ -32,7 +33,7 @@ declare module "../../tokens/schema.js" {
 export interface CanvasView {
   x: number;
   y: number;
-  /** 1 = 100%; kept between `minScale` and `maxScale`. */
+  /** 1 = 100%; kept between `min` and `max` percent. */
   scale: number;
 }
 
@@ -43,12 +44,15 @@ export interface CanvasRect {
   height: number;
 }
 
+/** What `handle` gives you: moving the view from outside the canvas (a "Fit" button, a search hit). */
 export interface PanZoomCanvasHandle {
   /** Fits `bounds` (or a given rect) in view. */
   fit: (rect?: CanvasRect) => void;
   /** Zooms to a percent around the viewport's centre. */
   zoomTo: (percent: number) => void;
-  /** Centres a rect (a node) without changing the zoom. */
+  /** Centers a rect (a node) without changing the zoom. */
+  centerOn: (rect: CanvasRect) => void;
+  /** @deprecated The earlier spelling of `centerOn`; it does the same. */
   centreOn: (rect: CanvasRect) => void;
 }
 
@@ -116,10 +120,12 @@ export interface PanZoomCanvasProps {
   defaultView?: CanvasView;
   /** Called with the new view on every pan and zoom. */
   onViewChange?: ((view: CanvasView) => void) | undefined;
-  /** The smallest zoom, as a scale (0.2 = 20%). Default 0.25. */
-  minScale?: number;
-  /** The largest zoom, as a scale (3 = 300%). Default 8. */
-  maxScale?: number;
+  /** The smallest zoom, in percent (as ZoomControls' `min`). Default 25. */
+  min?: number;
+  /** The largest zoom, in percent (as ZoomControls' `max`). Default 800. */
+  max?: number;
+  /** `fit`, `zoomTo` and `centerOn`, for moving the view from outside (as ScrollArea's and VirtualList's `handle`). */
+  handle?: Ref<PanZoomCanvasHandle>;
   /** The content's extent in canvas units, for fitting and the minimap. */
   bounds?: CanvasRect | undefined;
   /** Show a minimap of `bounds` with the view on it (drag it, or press where to look). */
@@ -193,8 +199,9 @@ export const PanZoomCanvas = forwardRef<PanZoomCanvasHandle, PanZoomCanvasProps>
     view,
     defaultView,
     onViewChange,
-    minScale = MIN_PERCENT / 100,
-    maxScale = MAX_PERCENT / 100,
+    min = MIN_PERCENT,
+    max = MAX_PERCENT,
+    handle,
     bounds,
     minimap = false,
     renderMinimap,
@@ -215,6 +222,8 @@ export const PanZoomCanvas = forwardRef<PanZoomCanvasHandle, PanZoomCanvasProps>
     defaultView ?? { x: 0, y: 0, scale: 1 },
     onViewChange,
   );
+  const minScale = min / 100;
+  const maxScale = max / 100;
   const latest = useRef(current);
   latest.current = current;
   // The density is read with the size, and again when it changes (a move to another screen, a browser zoom).
@@ -244,7 +253,7 @@ export const PanZoomCanvas = forwardRef<PanZoomCanvasHandle, PanZoomCanvasProps>
       scale: s,
     });
   };
-  const centreOn = (rect: CanvasRect) => {
+  const centerOn = (rect: CanvasRect) => {
     const { scale } = latest.current;
     go({
       x: size.width / 2 - (rect.x + rect.width / 2) * scale,
@@ -252,11 +261,15 @@ export const PanZoomCanvas = forwardRef<PanZoomCanvasHandle, PanZoomCanvasProps>
       scale,
     });
   };
-  useImperativeHandle(ref, () => ({
+  const api = (): PanZoomCanvasHandle => ({
     fit,
-    zoomTo: (p) => zoomAround(clampPercent(p, minScale * 100, maxScale * 100) / 100, centre()),
-    centreOn,
-  }));
+    zoomTo: (p) => zoomAround(clampPercent(p, min, max) / 100, centre()),
+    centerOn,
+    centreOn: centerOn,
+  });
+  useImperativeHandle(handle, api);
+  // The ref gives the same handle, as it did before `handle` (kept so existing code works).
+  useImperativeHandle(ref, api);
 
   // Without a starting view, fit the content once the canvas has a size.
   const fitted = useRef(view !== undefined || defaultView !== undefined);
@@ -275,8 +288,8 @@ export const PanZoomCanvas = forwardRef<PanZoomCanvasHandle, PanZoomCanvasProps>
   };
   const gestures = useZoomGestures(surface, {
     percent,
-    min: minScale * 100,
-    max: maxScale * 100,
+    min,
+    max,
     onZoom: (p, at: ZoomAnchor) => zoomAround(p / 100, at ?? centre()),
     onPan: (dx, dy) => go({ ...latest.current, x: latest.current.x + dx, y: latest.current.y + dy }),
     ignore: onCorner,

@@ -2,4 +2,4 @@
 "@arshad-shah/cynosure": minor
 ---
 
-PanZoomCanvas takes `minScale` and `maxScale` for its zoom limits (25% to 800% unless given), and ZoomControls takes `min` and `max` to match, offering only the presets between them.
+PanZoomCanvas takes `min` and `max` for its zoom limits in percent (25 to 800 unless given), and ZoomControls takes the same `min` and `max`, offering only the presets between them.

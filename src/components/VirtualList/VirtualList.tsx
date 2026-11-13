@@ -14,6 +14,7 @@ import { useDrag } from "../../foundations/drag.js";
 import { seekEnabled } from "../../foundations/listbox.js";
 import { clamp } from "../../foundations/math.js";
 import { moveItems } from "../../foundations/reorder.js";
+import type { ScrollAlign } from "../../foundations/scroll-align.js";
 import { useFollow } from "../../foundations/use-follow.js";
 import { useVirtualWindow } from "../../foundations/virtual-window.js";
 import { OverlayFrame } from "../OverlayFrame/OverlayFrame.js";
@@ -39,10 +40,19 @@ export interface VirtualItemState {
   disabled: boolean;
 }
 
+/** Where `scrollToIndex` puts the row. */
+export interface VirtualListScrollOptions {
+  /** `nearest` (default) scrolls the least that shows it whole; `start` puts it at the top; `center` in the middle. */
+  align?: ScrollAlign;
+}
+
 /** What `handle` gives you: scroll a row into view from outside (a search hit, a "jump to latest" button). */
 export interface VirtualListHandle {
-  /** Scrolls row `index` into view: `nearest` (default, the least scrolling), `start` or `center`. */
-  scrollToIndex: (index: number, align?: "nearest" | "start" | "center") => void;
+  /**
+   * Scrolls row `index` into view, placed by `options.align` (as ScrollArea's `scrollIntoView`). The alignment alone
+   * (`scrollToIndex(i, "center")`, the earlier form) still works.
+   */
+  scrollToIndex: (index: number, options?: VirtualListScrollOptions | ScrollAlign) => void;
   /** Scrolls to the last row. */
   scrollToEnd: () => void;
 }
@@ -250,7 +260,8 @@ export function VirtualList<T>({
   useClientLayoutEffect(() => following.contentChanged(), [items.length, win.total]);
   useImperativeHandle(handle, () => ({
     scrollToEnd: following.scrollToEnd,
-    scrollToIndex: (index, align = "nearest") => {
+    scrollToIndex: (index, options = {}) => {
+      const { align } = typeof options === "string" ? { align: options } : options;
       win.reveal(clamp(index, 0, keys.length - 1), align);
     },
   }));
