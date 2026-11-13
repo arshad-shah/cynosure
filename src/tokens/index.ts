@@ -28,6 +28,7 @@ export type {
   Size,
   Theme,
   ThemeInput,
+  ThemeMode,
   Tone,
 } from "./schema.js";
 export { DEFAULT_SELECTOR, themeProperties, themeToCss } from "./to-css.js";

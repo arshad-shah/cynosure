@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useClientLayoutEffect } from "../foundations/client-layout-effect.js";
 import { useMediaQuery } from "../foundations/media-query.js";
+import type { ThemeMode } from "../tokens/schema.js";
 
 const CHANGE = "cy-color-mode-change";
 
-export type ColorMode = "light" | "dark" | "system";
+export type ColorMode = ThemeMode | "system";
 
 export interface ColorModeStorage {
   get(key: string): string | null | Promise<string | null>;
@@ -80,6 +81,6 @@ export function useColorMode(options: { storage?: ColorModeStorage; key?: string
     [key],
   );
 
-  const resolved: "light" | "dark" = mode === "system" ? (systemDark ? "dark" : "light") : mode;
+  const resolved: ThemeMode = mode === "system" ? (systemDark ? "dark" : "light") : mode;
   return { mode, setMode, resolved };
 }

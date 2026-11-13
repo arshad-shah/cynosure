@@ -17,6 +17,8 @@ export const TONES = [
   "warning",
   "info",
 ] as const satisfies readonly Tone[];
+/** A palette's mode: the one a fixed-mode theme keeps, and what a colour mode resolves to. */
+export type ThemeMode = "light" | "dark";
 export type Scale = "compact" | "comfortable" | "spacious" | number;
 export type PaletteName = "light" | "dark" | "light-contrast" | "dark-contrast";
 
@@ -118,7 +120,7 @@ export interface ThemeInput {
    * Fixes the theme to one mode: a dark-only theme (Midnight) uses its dark palettes whatever the colour mode, and
    * `CynosureTheme` sets that mode on its wrapper. Omit to follow the colour mode.
    */
-  mode?: "light" | "dark";
+  mode?: ThemeMode;
   /** Any hex, rgb(), hsl() or oklch() colour. */
   accent?: string;
   scale?: Scale;
@@ -139,5 +141,5 @@ export interface Theme {
   palettes: Record<PaletteName, ColorTokens>;
   components: Record<string, Record<string, string>>;
   /** Set when the theme is fixed to one mode (`ThemeInput.mode`); its light and dark palettes are then the same. */
-  mode?: "light" | "dark";
+  mode?: ThemeMode;
 }

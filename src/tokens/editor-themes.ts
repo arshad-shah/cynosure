@@ -9,7 +9,7 @@
 import { resolveColors } from "./chart-themes.js";
 import { mix } from "./color.js";
 import { createTheme } from "./create-theme.js";
-import type { PaletteName, Theme } from "./schema.js";
+import type { PaletteName, Theme, ThemeMode } from "./schema.js";
 
 /** Every colour an editor needs, as hex: the syntax roles plus the editor's own surfaces. */
 export interface EditorColors {
@@ -123,7 +123,7 @@ export function monacoTheme(theme: Theme = createTheme(), palette: PaletteName =
 /** A TextMate theme (the format Shiki and VS Code read) from a Cynosure palette. */
 export interface TextMateTheme {
   name: string;
-  type: "light" | "dark";
+  type: ThemeMode;
   colors: Record<string, string>;
   tokenColors: { scope: string[]; settings: { foreground?: string; fontStyle?: string } }[];
 }
