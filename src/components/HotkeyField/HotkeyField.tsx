@@ -11,7 +11,7 @@ import {
 import { useControllableState } from "../../foundations/controllable.js";
 import { deepActiveElement } from "../../foundations/focus.js";
 import { HiddenValue } from "../../foundations/HiddenValue/HiddenValue.js";
-import { hotkeyFromEvent, shortcutKeys } from "../../foundations/hotkey.js";
+import { hotkeyFromEvent, shortcutKeys, useApple } from "../../foundations/hotkey.js";
 import { isComposing } from "../../foundations/keys.js";
 import { close } from "../../icons/close.js";
 import { record } from "../../icons/record.js";
@@ -19,7 +19,7 @@ import { stop } from "../../icons/stop.js";
 import type { Size } from "../../tokens/schema.js";
 import { Field, type FieldLayoutProps } from "../Field/Field.js";
 import { IconButton } from "../IconButton/IconButton.js";
-import { Kbd, useApple } from "../Kbd/Kbd.js";
+import { Kbd } from "../Kbd/Kbd.js";
 
 export interface HotkeyFieldTokens {
   recordingColor: string;

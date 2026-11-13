@@ -16,7 +16,7 @@ import { ButtonBase } from "../../foundations/ButtonBase/ButtonBase.js";
 import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js";
 import { useControllableState } from "../../foundations/controllable.js";
 import { isRtl } from "../../foundations/dir.js";
-import { ariaKeyShortcuts, shortcutKeys } from "../../foundations/hotkey.js";
+import { ariaKeyShortcuts, shortcutKeys, useApple } from "../../foundations/hotkey.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
 import { isTypeaheadKey, useTypeahead } from "../../foundations/listbox.js";
 import { OptionIcon, type OptionIconColor } from "../../foundations/option-icon.js";
@@ -29,7 +29,7 @@ import { useFloatingOffset, usePopover } from "../../overlay/floating.js";
 import type { Placement } from "../../overlay/position.js";
 import { useAnchoredPosition, type VirtualAnchor } from "../../overlay/use-anchored-position.js";
 import type { Tone } from "../../tokens/schema.js";
-import { Kbd, useApple } from "../Kbd/Kbd.js";
+import { Kbd } from "../Kbd/Kbd.js";
 
 export interface MenuTokens {
   minWidth: string;
