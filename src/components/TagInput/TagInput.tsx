@@ -7,7 +7,6 @@ import {
   useRef,
   useState,
 } from "react";
-import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js";
 import { useControllableState } from "../../foundations/controllable.js";
 import { isRtl } from "../../foundations/dir.js";
 import { HiddenValue } from "../../foundations/HiddenValue/HiddenValue.js";
@@ -158,7 +157,8 @@ export function TagInput({
   const [said, setSaid] = useState("");
   const [open, setOpen] = useState(false);
   const input = useRef<HTMLInputElement>(null);
-  const anchor = useRef<HTMLElement | null>(null);
+  // The list drops from the whole field (TextField's box), not just the input.
+  const anchor = useRef<HTMLDivElement>(null);
   const list = useRef<HTMLDivElement>(null);
   const chips = useRef<HTMLUListElement>(null);
 
@@ -212,10 +212,6 @@ export function TagInput({
   const split = (s: string) =>
     [...separators, "\n"].reduce<string[]>((parts, sep) => parts.flatMap((p) => p.split(sep)), [s]);
 
-  // The list drops from the whole field (chips and input), found before the layer shows.
-  useClientLayoutEffect(() => {
-    anchor.current = input.current?.closest<HTMLElement>(".cy-text-field") ?? null;
-  });
   useListboxLayer({ anchor, list, open: listOpen, onClose: () => setOpen(false) });
 
   const removeButtons = () => [...(chips.current?.querySelectorAll<HTMLButtonElement>("button") ?? [])];
@@ -306,6 +302,7 @@ export function TagInput({
     <div className={className ? `cy-tag-input ${className}` : "cy-tag-input"} data-size={size} style={style}>
       <TextField
         ref={input}
+        boxRef={anchor}
         label={label}
         labelHidden={labelHidden}
         description={description}

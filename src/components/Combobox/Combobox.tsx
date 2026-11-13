@@ -7,7 +7,6 @@ import {
   useRef,
   useState,
 } from "react";
-import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js";
 import { useControllableState } from "../../foundations/controllable.js";
 import { HiddenValue } from "../../foundations/HiddenValue/HiddenValue.js";
 import { isComposing } from "../../foundations/keys.js";
@@ -162,7 +161,8 @@ export function Combobox({
   const [typing, setTyping] = useState(false);
   const [missing, setMissing] = useState(false);
   const input = useRef<HTMLInputElement>(null);
-  const anchor = useRef<HTMLElement | null>(null);
+  // The list drops from the whole field (TextField's box), not just the input.
+  const anchor = useRef<HTMLDivElement>(null);
   const list = useRef<HTMLDivElement>(null);
 
   const match = filter === false ? null : (filter ?? contains);
@@ -227,10 +227,6 @@ export function Combobox({
     if (shownLabel && !typing && typedText === was) setText(shownLabel);
   });
 
-  // The list drops from the whole field (input and any end buttons), found before the layer shows.
-  useClientLayoutEffect(() => {
-    anchor.current = (input.current as HTMLInputElement).closest<HTMLElement>(".cy-text-field");
-  });
   useListboxLayer({ anchor, list, open, onClose: () => setOpen(false) });
   const runFooter = () => {
     setOpen(false);
@@ -283,6 +279,7 @@ export function Combobox({
     <div className={className ? `cy-combobox ${className}` : "cy-combobox"} style={style}>
       <TextField
         ref={input}
+        boxRef={anchor}
         label={label}
         labelHidden={labelHidden}
         description={description}
