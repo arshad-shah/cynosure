@@ -18,3 +18,14 @@ export function transitionTime(style: Pick<CSSStyleDeclaration, "transitionDurat
     longest = Math.max(longest, (durations[i % durations.length] ?? 0) + (delays[i % delays.length] ?? 0));
   return longest;
 }
+
+/**
+ * A theme duration, `--cy-motion-<speed>` as `el` sees it, in milliseconds, for animations run from script (detent's
+ * reorder animation in SortableList and Tabs): 0 when the person asks for reduced motion, `fallback` when the element
+ * has no such token.
+ */
+export function motionMs(el: Element, speed: "fast" | "base" | "slow" = "slow", fallback = 180) {
+  if (globalThis.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return 0;
+  const ms = Number.parseFloat(getComputedStyle(el).getPropertyValue(`--cy-motion-${speed}`));
+  return Number.isFinite(ms) ? ms : fallback;
+}

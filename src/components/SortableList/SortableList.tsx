@@ -4,6 +4,7 @@ import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js
 import { useControllableState } from "../../foundations/controllable.js";
 import { isRtl } from "../../foundations/dir.js";
 import { clamp } from "../../foundations/math.js";
+import { motionMs } from "../../foundations/motion.js";
 import { grip } from "../../icons/grip.js";
 import type { Size } from "../../tokens/schema.js";
 import { IconButton } from "../IconButton/IconButton.js";
@@ -249,9 +250,7 @@ export function SortableList({
       // The grip is a dedicated handle that never scrolls the page, so touch needs no press-and-hold.
       delay: 0,
       get animation() {
-        const reduced = globalThis.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-        const base = Number.parseFloat(getComputedStyle(el).getPropertyValue("--cy-motion-slow"));
-        return reduced ? 0 : Number.isFinite(base) ? base : 180;
+        return motionMs(el);
       },
       get disabled() {
         return latest.current.disabled;

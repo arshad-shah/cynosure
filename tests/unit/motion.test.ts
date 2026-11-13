@@ -1,5 +1,28 @@
-import { describe, expect, it } from "vitest";
-import { transitionTime } from "../../src/foundations/motion";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { motionMs, transitionTime } from "../../src/foundations/motion";
+
+describe("motionMs", () => {
+  const el = {} as Element;
+  const stub = (reduced: boolean, slow: string) => {
+    vi.stubGlobal("matchMedia", () => ({ matches: reduced }));
+    vi.stubGlobal("getComputedStyle", () => ({
+      getPropertyValue: (name: string) => (name === "--cy-motion-slow" ? slow : "120ms"),
+    }));
+  };
+  afterEach(() => vi.unstubAllGlobals());
+  it("reads the theme's duration token in milliseconds", () => {
+    stub(false, "350ms");
+    expect(motionMs(el)).toBe(350);
+    expect(motionMs(el, "fast")).toBe(120);
+  });
+  it("is the fallback when the element has no token, and 0 under reduced motion", () => {
+    stub(false, "");
+    expect(motionMs(el)).toBe(180);
+    expect(motionMs(el, "slow", 90)).toBe(90);
+    stub(true, "350ms");
+    expect(motionMs(el)).toBe(0);
+  });
+});
 
 const style = (transitionDuration: string, transitionDelay: string) => ({
   transitionDuration,
