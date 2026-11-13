@@ -91,10 +91,14 @@ export const EscapeCancels: Story = {
     await expect(order(canvasElement)).toEqual(["drafts", "inbox", "docs", "archive"]);
     await userEvent.keyboard("{Escape}");
     await expect(order(canvasElement)).toEqual(["inbox", "docs", "drafts", "archive"]);
-    await expect(canvas.getByRole("status")).toHaveTextContent(
-      "Move cancelled. Drafts is back where it was.",
-    );
+    const status = canvas.getByRole("status");
+    await expect(status).toHaveTextContent("Move cancelled. Drafts is back where it was.");
     await expect(args.onReorder).not.toHaveBeenCalled();
+    // A second cancel says the same words in a new node, so it is spoken again.
+    const first = status.firstElementChild;
+    await userEvent.keyboard(" {Escape}");
+    await expect(status).toHaveTextContent("Move cancelled. Drafts is back where it was.");
+    await expect(status.firstElementChild).not.toBe(first);
     // Arrow keys do nothing when nothing is picked up, and the ends stop a move.
     await userEvent.keyboard("{ArrowDown}");
     await expect(order(canvasElement)).toEqual(["inbox", "docs", "drafts", "archive"]);

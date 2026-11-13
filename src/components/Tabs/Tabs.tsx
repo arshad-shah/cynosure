@@ -16,6 +16,7 @@ import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js
 import { useControllableState } from "../../foundations/controllable.js";
 import { isRtl } from "../../foundations/dir.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
+import { LiveRegion, useLiveMessage } from "../../foundations/LiveRegion/LiveRegion.js";
 import { motionMs } from "../../foundations/motion.js";
 import { usePrinting } from "../../foundations/printing.js";
 import { moveItems } from "../../foundations/reorder.js";
@@ -267,7 +268,7 @@ export function TabList({
   const { size, variant, value, labels, refocus } = useTabs("TabList");
   const ref = useRef<HTMLDivElement>(null);
   const strip = useRef<HTMLDivElement>(null);
-  const [said, setSaid] = useState("");
+  const [said, setSaid] = useLiveMessage();
   const latest = useRef({ onReorder, labels });
   latest.current = { onReorder, labels };
   const order = () => [...(ref.current?.children ?? [])].map((c) => tabIn(c)?.dataset.value as string);
@@ -463,9 +464,7 @@ export function TabList({
   return reorderable ? (
     <>
       {hosted}
-      <span className="cy-visually-hidden" role="status">
-        {said}
-      </span>
+      <LiveRegion {...said} />
     </>
   ) : (
     hosted

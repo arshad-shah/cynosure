@@ -11,6 +11,7 @@ import {
 import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js";
 import { useControllableState } from "../../foundations/controllable.js";
 import { useDrag } from "../../foundations/drag.js";
+import { LiveRegion, useLiveMessage } from "../../foundations/LiveRegion/LiveRegion.js";
 import { seekEnabled } from "../../foundations/listbox.js";
 import { clamp } from "../../foundations/math.js";
 import { moveItems } from "../../foundations/reorder.js";
@@ -164,7 +165,7 @@ export function VirtualList<T>({
   const moveFocus = useRef(false);
   const anchor = useRef<number | null>(null);
   const text = { ...DEFAULT_LABELS, ...labels };
-  const [said, setSaid] = useState("");
+  const [said, setSaid] = useLiveMessage();
   /** While dragging: the rows moved and the gap they would drop into (0 to the row count). */
   const [drag, setDragState] = useState<{ block: string[]; gap: number } | null>(null);
   const dragRef = useRef(drag);
@@ -513,11 +514,7 @@ export function VirtualList<T>({
           })}
         </div>,
       )}
-      {onMove && (
-        <span className="cy-visually-hidden" role="status">
-          {said}
-        </span>
-      )}
+      {onMove && <LiveRegion {...said} />}
     </>
   );
 }

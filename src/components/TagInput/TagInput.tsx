@@ -11,6 +11,7 @@ import { useControllableState } from "../../foundations/controllable.js";
 import { isRtl } from "../../foundations/dir.js";
 import { HiddenValue } from "../../foundations/HiddenValue/HiddenValue.js";
 import { isComposing } from "../../foundations/keys.js";
+import { LiveRegion, useLiveMessage } from "../../foundations/LiveRegion/LiveRegion.js";
 import { useActiveOption } from "../../foundations/listbox.js";
 import { textMatches } from "../../foundations/text-match.js";
 import { close } from "../../icons/close.js";
@@ -157,7 +158,7 @@ export function TagInput({
   const [tags, update, resetTags] = useControllableState(value, defaultValue, onChange);
   const [typed, setTyped] = useState("");
   const [problem, setProblem] = useState<string | null>(null);
-  const [said, setSaid] = useState("");
+  const [said, setSaid] = useLiveMessage();
   const [open, setOpen] = useState(false);
   const input = useRef<HTMLInputElement>(null);
   // The list drops from the whole field (TextField's box), not just the input.
@@ -393,9 +394,7 @@ export function TagInput({
           )}
         </OptionList>
       )}
-      <span className="cy-visually-hidden" role="status">
-        {said}
-      </span>
+      <LiveRegion {...said} />
       {tags.map((tag, index) => (
         <HiddenValue key={`${tag}-${index}`} name={name} form={form} value={tag} disabled={disabled} />
       ))}

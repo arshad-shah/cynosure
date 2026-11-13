@@ -178,7 +178,14 @@ export const EscapeCancelsUnlessModified: Story = {
     await expect(args.onRecordingChange).toHaveBeenLastCalledWith(false);
     await expect(args.onChange).not.toHaveBeenCalled();
     await expect(box(canvasElement)).toHaveTextContent(/ShiftP/);
-    await waitFor(() => expect(canvas.getByRole("status")).toHaveTextContent("Recording cancelled"));
+    const status = canvas.getByRole("status");
+    await waitFor(() => expect(status).toHaveTextContent("Recording cancelled"));
+    // Cancelling again says the same words in a new node, so it is spoken again.
+    const first = status.firstElementChild;
+    await userEvent.keyboard("{Enter}");
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() => expect(status).toHaveTextContent("Recording cancelled"));
+    await expect(status.firstElementChild).not.toBe(first);
     // With a modifier, Escape is a shortcut like any other.
     await userEvent.keyboard("{Enter}");
     await userEvent.keyboard("{Control>}{Escape}{/Control}");

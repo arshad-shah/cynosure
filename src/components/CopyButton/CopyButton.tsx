@@ -1,4 +1,5 @@
 import { type CSSProperties, useEffect, useRef, useState } from "react";
+import { LiveRegion, useLiveMessage } from "../../foundations/LiveRegion/LiveRegion.js";
 import { check } from "../../icons/check.js";
 import { copy as copyIcon } from "../../icons/copy.js";
 import { xCircle } from "../../icons/x-circle.js";
@@ -71,7 +72,7 @@ export function CopyButton({
 }: CopyButtonProps) {
   const text = { ...DEFAULT_LABELS, ...labels };
   const [state, setState] = useState<State>("idle");
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useLiveMessage();
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
   useEffect(() => () => clearTimeout(timer.current), []);
 
@@ -86,16 +87,12 @@ export function CopyButton({
   };
 
   const run = async () => {
-    // Clear the live region first, so copying again while it still says "Copied" is announced again.
-    setMessage("");
     try {
       const content = typeof value === "function" ? value() : value;
       await copy(content);
-      await new Promise((resolve) => setTimeout(resolve));
       settle("copied");
       onCopy?.(content);
     } catch (error) {
-      await new Promise((resolve) => setTimeout(resolve));
       settle("failed");
       onError?.(error);
     }
@@ -124,9 +121,7 @@ export function CopyButton({
         onClick={() => void run()}
         {...(tooltipPlacement ? { tooltipPlacement } : {})}
       />
-      <span className="cy-copy-button-status cy-reset cy-visually-hidden" role="status">
-        {message}
-      </span>
+      <LiveRegion {...message} className="cy-copy-button-status cy-reset" />
     </span>
   );
 }

@@ -68,7 +68,7 @@ By default a shortcut needs Control, Command or Alt, since a plain letter types 
 - **Capture:** keys are taken in the capture phase on the field's own element, with propagation stopped and the default prevented, so neither `useHotkey` nor any document listener sees them. It works inside shadow roots.
 - **Key names:** the key is the character typed or, when that is not a letter or digit (Option+K types "˚" on macOS, Shift+1 types "!", a dead key, another alphabet), the letter or digit on the physical key, as `matchesHotkey` reads it. `mod` is Command on Apple platforms and Control elsewhere, so a recorded shortcut works on both. The mapping is exported as `hotkeyFromEvent`.
 - **Names:** the label names the group (a fieldset); the record toggle is a pressed/not-pressed button described by the shortcut, so it is read as "Record shortcut, Control plus Shift plus P".
-- **Announcements:** the field's own `role="status"` says "Recording, press a shortcut", then "Shortcut set to …", "Recording cancelled" or "Shortcut cleared" (`labels`).
+- **Announcements:** the field's own `role="status"` says "Recording, press a shortcut", then "Shortcut set to …", "Recording cancelled" or "Shortcut cleared" (`labels`), through a [LiveRegion](?path=/docs/foundations-liveregion--docs), so the same message twice (cancelling twice) is spoken twice.
 - **Focus:** clearing moves focus to the record toggle, since the clear button goes with the shortcut. Focus leaving the field while recording cancels it.
 - **Forms:** with `name`, the form receives the shortcut string; a reset restores `defaultValue`; a disabled field is not submitted.
 - **Reduced motion:** the recording light stops pulsing and stays lit.

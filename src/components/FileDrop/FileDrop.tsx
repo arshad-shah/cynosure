@@ -1,6 +1,7 @@
 import { type CSSProperties, type ReactNode, useEffect, useId, useRef, useState } from "react";
 import { FileInputBase, setInputFiles } from "../../foundations/FileInputBase/FileInputBase.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
+import { LiveRegion, useLiveMessage } from "../../foundations/LiveRegion/LiveRegion.js";
 import { close } from "../../icons/close.js";
 import { file as fileIcon } from "../../icons/file.js";
 import { upload } from "../../icons/upload.js";
@@ -165,7 +166,7 @@ export function FileDrop({
   const input = useRef<HTMLInputElement>(null);
   const depth = useRef(0);
   const [over, setOver] = useState(false);
-  const [status, setStatus] = useState("");
+  const [status, setStatus] = useLiveMessage();
   const [problems, setProblems] = useState<string[]>([]);
   const chooser = useRef<HTMLButtonElement>(null);
   const chosen = useRef<HTMLUListElement>(null);
@@ -360,9 +361,7 @@ export function FileDrop({
           </ul>
         )}
       </div>
-      <span className="cy-file-drop-status cy-reset cy-visually-hidden" role="status">
-        {status}
-      </span>
+      <LiveRegion {...status} className="cy-file-drop-status cy-reset" />
       {whole && (
         <div
           ref={overlay}

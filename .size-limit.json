@@ -346,8 +346,18 @@
   },
   {
     "name": "Announcer",
-    "path": ["dist/components/Announcer/Announcer.js", "dist/styles/announcer.css"],
-    "limit": "1 kB",
+    "path": [
+      "dist/components/Announcer/Announcer.js",
+      "dist/foundations/LiveRegion/LiveRegion.js",
+      "dist/styles/announcer.css"
+    ],
+    "limit": "1.4 kB",
+    "gzip": true
+  },
+  {
+    "name": "LiveRegion",
+    "path": ["dist/foundations/LiveRegion/LiveRegion.js"],
+    "limit": "0.5 kB",
     "gzip": true
   },
   {

@@ -3,6 +3,7 @@ import { type CSSProperties, type KeyboardEvent, type ReactNode, useId, useRef, 
 import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js";
 import { useControllableState } from "../../foundations/controllable.js";
 import { isRtl } from "../../foundations/dir.js";
+import { LiveRegion, useLiveMessage } from "../../foundations/LiveRegion/LiveRegion.js";
 import { clamp } from "../../foundations/math.js";
 import { motionMs } from "../../foundations/motion.js";
 import { moveItems } from "../../foundations/reorder.js";
@@ -115,7 +116,7 @@ export function SortableList({
     movingRef.current = next;
     setMovingState(next);
   };
-  const [said, setSaid] = useState("");
+  const [said, setSaid] = useLiveMessage();
   const list = useRef<HTMLUListElement>(null);
   /** The keyboard move applied to `items`: where the moving row is, and where it goes. */
   const planOf = (items: SortableItem[]) => {
@@ -318,9 +319,7 @@ export function SortableList({
       <span id={`${id}-how`} className="cy-reset cy-visually-hidden">
         {text.instructions}
       </span>
-      <span className="cy-reset cy-visually-hidden" role="status">
-        {said}
-      </span>
+      <LiveRegion {...said} className="cy-reset" />
     </div>
   );
 }

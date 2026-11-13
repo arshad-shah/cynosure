@@ -6,13 +6,13 @@ import {
   useId,
   useImperativeHandle,
   useRef,
-  useState,
 } from "react";
 import { useControllableState } from "../../foundations/controllable.js";
 import { deepActiveElement } from "../../foundations/focus.js";
 import { HiddenValue } from "../../foundations/HiddenValue/HiddenValue.js";
 import { hotkeyFromEvent, shortcutKeys, useApple } from "../../foundations/hotkey.js";
 import { isComposing } from "../../foundations/keys.js";
+import { LiveRegion, useLiveMessage } from "../../foundations/LiveRegion/LiveRegion.js";
 import { close } from "../../icons/close.js";
 import { record } from "../../icons/record.js";
 import { stop } from "../../icons/stop.js";
@@ -145,17 +145,13 @@ export const HotkeyField = forwardRef<HTMLDivElement, HotkeyFieldProps>(function
   const apple = useApple();
   const [current, setCurrent, resetCurrent] = useControllableState(value, defaultValue, onChange);
   const [recording, setRecording] = useControllableState(recordingProp, defaultRecording, onRecordingChange);
-  const [message, setMessage] = useState<ReactNode>("");
+  // A repeat (cancelling twice) is spoken again: LiveRegion puts each message in a new node.
+  const [message, announce] = useLiveMessage();
   const root = useRef<HTMLDivElement>(null);
   const button = useRef<HTMLButtonElement>(null);
   const boxId = useId();
   const active = recording && !disabled;
 
-  const announce = (next: ReactNode) => {
-    // Cleared first, so the same words twice in a row are spoken twice.
-    setMessage("");
-    queueMicrotask(() => setMessage(next));
-  };
   const start = () => {
     setRecording(true);
     announce(text.recording);
@@ -282,9 +278,7 @@ export const HotkeyField = forwardRef<HTMLDivElement, HotkeyFieldProps>(function
           </div>
         )}
       </Field>
-      <span className="cy-visually-hidden" role="status">
-        {message}
-      </span>
+      <LiveRegion {...message} />
       <HiddenValue
         name={name}
         form={form}

@@ -1,6 +1,7 @@
 import { forwardRef, type ReactNode, useRef, useState } from "react";
 import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js";
 import { isComposing } from "../../foundations/keys.js";
+import { LiveRegion } from "../../foundations/LiveRegion/LiveRegion.js";
 import { mergeRefs } from "../../foundations/refs.js";
 import { search } from "../../icons/search.js";
 import { TextField, type TextFieldProps } from "../TextField/TextField.js";
@@ -55,9 +56,7 @@ export const SearchField = forwardRef<HTMLInputElement, SearchFieldProps>(functi
               {trailing}
             </span>
           )}
-          <span className="cy-visually-hidden" role="status" aria-live="polite" aria-atomic="true">
-            {said}
-          </span>
+          <LiveRegion>{said}</LiveRegion>
           {addonEnd}
         </>
       }

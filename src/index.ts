@@ -589,6 +589,12 @@ export { Icon, type IconProps } from "./foundations/Icon/Icon.js";
 export { InputBase, type InputBaseProps } from "./foundations/InputBase/InputBase.js";
 export { LinkBase, type LinkBaseProps } from "./foundations/LinkBase/LinkBase.js";
 export {
+  type LiveMessage,
+  LiveRegion,
+  type LiveRegionProps,
+  useLiveMessage,
+} from "./foundations/LiveRegion/index.js";
+export {
   type QrLevel,
   type QrOptions,
   type QrToSvgOptions,
