@@ -19,7 +19,7 @@ import { TextAreaBase } from "../../foundations/TextAreaBase/TextAreaBase.js";
 import { resizeCorner } from "../../icons/resize-corner.js";
 import { useListboxLayer } from "../../overlay/listbox-layer.js";
 import type { Size } from "../../tokens/schema.js";
-import { Field } from "../Field/Field.js";
+import { Field, type FieldLayoutProps } from "../Field/Field.js";
 import { OptionList, OptionListItem, OptionListNote } from "../OptionList/OptionList.js";
 
 export interface TextAreaTokens {
@@ -68,7 +68,7 @@ export interface TextAreaLabels {
   loading: string;
 }
 
-export interface TextAreaProps extends NativeArea {
+export interface TextAreaProps extends NativeArea, FieldLayoutProps {
   /** The field's label and accessible name. */
   label: ReactNode;
   /** Visually hide the label (it still names the control). Prefer visible labels. */
@@ -144,6 +144,8 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(function 
   {
     label,
     labelHidden,
+    layout,
+    width,
     description,
     error,
     value,
@@ -363,6 +365,8 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(function 
     <Field
       label={label}
       labelHidden={labelHidden}
+      layout={layout}
+      width={width}
       description={description}
       error={error}
       required={required}

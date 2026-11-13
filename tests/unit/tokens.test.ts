@@ -40,6 +40,11 @@ describe("scale and radius", () => {
     expect(md({ scale: "spacious" })).toBeCloseTo(38.4);
     expect(md({ scale: 1.5 })).toBe(48);
   });
+  it("the dense xs control height is 20px and scales like the others", () => {
+    expect(createTheme().global.control.height.xs).toBe(20);
+    expect(createTheme({ scale: "compact" }).global.control.height.xs).toBe(17.5);
+    expect(themeToCss(createTheme())).toContain("--cy-control-height-xs:20px");
+  });
   it("control radius is 0.3 x control height", () => {
     expect(createTheme().global.radius.md).toBeCloseTo(9.6);
     expect(createTheme({ radius: 0 }).global.radius.md).toBe(0);

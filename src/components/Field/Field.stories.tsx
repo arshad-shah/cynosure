@@ -3,6 +3,17 @@ import { expect } from "storybook/test";
 import type { FieldRender } from "../../foundations/field.js";
 import { InputBase } from "../../foundations/InputBase/InputBase.js";
 import { computeUnderHostileHost } from "../../test/hostile.js";
+import { ColorField } from "../ColorField/ColorField.js";
+import { Combobox } from "../Combobox/Combobox.js";
+import { DateField } from "../DateField/DateField.js";
+import { HotkeyField } from "../HotkeyField/HotkeyField.js";
+import { NumberField } from "../NumberField/NumberField.js";
+import { PathField } from "../PathField/PathField.js";
+import { Select } from "../Select/Select.js";
+import { TagInput } from "../TagInput/TagInput.js";
+import { TextArea } from "../TextArea/TextArea.js";
+import { TextField } from "../TextField/TextField.js";
+import { TimeField } from "../TimeField/TimeField.js";
 import { Field } from "./Field.js";
 
 const meta = {
@@ -20,7 +31,7 @@ const meta = {
     description: { control: "text" },
     error: { control: "text" },
     required: { control: "boolean" },
-    size: { control: "inline-radio", options: ["sm", "md", "lg"] },
+    size: { control: "inline-radio", options: ["xs", "sm", "md", "lg"] },
     layout: { control: "inline-radio", options: ["stack", "split"] },
     width: { control: "inline-radio", options: ["sm", "md", "lg", "full"] },
   },
@@ -64,6 +75,23 @@ export const GroupLabelsAGroup: Story = {
   args: { group: true, children: (f) => <div aria-describedby={f.describedBy}>options</div> },
   play: async ({ canvas }) => {
     await expect(canvas.getByRole("group", { name: "Email" })).toBeInTheDocument();
+  },
+};
+
+export const LabelFollowsTheControlSize: Story = {
+  render: (args) => (
+    <div>
+      {(["xs", "sm", "md", "lg"] as const).map((size) => (
+        <Field key={size} {...args} size={size} label={`Label ${size}`} />
+      ))}
+    </div>
+  ),
+  play: async ({ canvas }) => {
+    const size = (name: string) => Number.parseFloat(getComputedStyle(canvas.getByText(name)).fontSize);
+    // A dense (xs) control takes the small label; the label grows with the control from there.
+    await expect(size("Label xs")).toBe(size("Label sm"));
+    await expect(size("Label sm")).toBeLessThan(size("Label md"));
+    await expect(size("Label md")).toBeLessThanOrEqual(size("Label lg"));
   },
 };
 
@@ -212,6 +240,48 @@ export const ControlWidthsLineUp: Story = {
     await expect(Math.round(control("Natural").right)).toBe(Math.round(control("Theme").right));
     // A width never pushes the control out of a narrower field.
     await expect(control("Squeezed").width).toBeLessThanOrEqual(120);
+  },
+};
+
+export const SplitColumnLinesUpMixedControls: Story = {
+  render: () => (
+    <div style={{ display: "grid", gap: 12, inlineSize: 640 }}>
+      <TextField layout="split" width="md" label="Name" description="Shown in the title bar." />
+      <Select
+        layout="split"
+        width="md"
+        label="Theme"
+        options={[{ value: "system", label: "System" }]}
+        defaultValue="system"
+      />
+      <Combobox layout="split" width="md" label="Font" options={[{ value: "mono", label: "Mono" }]} />
+      <TagInput layout="split" width="md" label="Tags" />
+      <PathField layout="split" width="md" label="Folder" onPick={async () => null} />
+      <NumberField layout="split" width="md" label="Port" />
+      <DateField layout="split" width="md" label="Since" />
+      <TimeField layout="split" width="md" label="At" />
+      <ColorField layout="split" width="md" label="Accent" defaultValue="#4f7bd9" />
+      <TextArea layout="split" width="md" label="Notes" />
+      <HotkeyField layout="split" width="md" label="Run query" />
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const fields = [...canvasElement.querySelectorAll(".cy-field")];
+    await expect(fields).toHaveLength(11);
+    const md = rect(fields[0]?.querySelector(":scope > .cy-field-control") ?? null);
+    for (const field of fields) {
+      // Every control of the column sits in the same box at the end of its row, whatever the control...
+      const control = field.querySelector(":scope > .cy-field-control");
+      await expect(field).toHaveAttribute("data-layout", "split");
+      await expect({ left: rect(control).left, width: rect(control).width }).toEqual({
+        left: md.left,
+        width: md.width,
+      });
+      // ...and the visible control fills that box, so their edges line up.
+      const shown = rect(control?.firstElementChild ?? null);
+      await expect(Math.round(shown.left)).toBe(Math.round(md.left));
+      await expect(Math.round(shown.right)).toBe(Math.round(md.right));
+    }
   },
 };
 

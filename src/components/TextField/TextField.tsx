@@ -11,16 +11,16 @@ import {
 } from "react";
 import { Icon } from "../../foundations/Icon/Icon.js";
 import { InputBase } from "../../foundations/InputBase/InputBase.js";
+import { iconSizeFor } from "../../foundations/icon-size.js";
 import { close } from "../../icons/close.js";
 import { eye } from "../../icons/eye.js";
 import { eyeOff } from "../../icons/eye-off.js";
 import type { IconData } from "../../icons/types.js";
 import type { DenseSize } from "../../tokens/schema.js";
-import { Field, type FieldProps } from "../Field/Field.js";
+import { Field, type FieldLayoutProps } from "../Field/Field.js";
 import { IconButton } from "../IconButton/IconButton.js";
 
 export interface TextFieldTokens {
-  fontSizeXs: string;
   paddingInlineXs: string;
   heightXs: string;
   heightSm: string;
@@ -43,21 +43,23 @@ declare module "../../tokens/schema.js" {
 
 type NativeInput = Omit<
   InputHTMLAttributes<HTMLInputElement>,
-  "size" | "value" | "defaultValue" | "onChange" | "onSubmit" | "type" | "className" | "style" | "children"
+  | "size"
+  | "value"
+  | "defaultValue"
+  | "onChange"
+  | "onSubmit"
+  | "type"
+  | "className"
+  | "style"
+  | "children"
+  | "width"
 >;
 
-export interface TextFieldProps extends NativeInput {
+export interface TextFieldProps extends NativeInput, FieldLayoutProps {
   /** The field's label and accessible name. */
   label: ReactNode;
   /** Visually hide the label (it still names the control). Prefer visible labels. */
   labelHidden?: boolean | undefined;
-  /**
-   * `split` puts the label and description at the start and the control at the end of one row (a settings row); the
-   * control moves under the text when there is no room. Default "stack". See Field.
-   */
-  layout?: FieldProps["layout"];
-  /** Width of the control, so the controls of a column of settings line up: "sm", "md", "lg" or "full". See Field. */
-  width?: FieldProps["width"];
   /** Help text shown below the field. */
   description?: ReactNode;
   /** Error message shown below the field; it is announced and marks the field invalid. */
@@ -139,7 +141,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(function T
 ) {
   const inner = useRef<HTMLInputElement | null>(null);
   const dense = size === "xs";
-  const iconSize = dense ? "sm" : "md";
+  const iconSize = iconSizeFor(size);
   const [shown, setShown] = useState(false);
   const secret = type === "password" && revealable;
   const [filled, setFilled] = useState(Boolean(value ?? defaultValue));
@@ -178,7 +180,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(function T
       description={description}
       error={error}
       required={required}
-      size={size === "xs" ? "sm" : size}
+      size={size}
       id={id}
       className={className}
       style={style}

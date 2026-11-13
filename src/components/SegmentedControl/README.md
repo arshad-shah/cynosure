@@ -18,7 +18,5 @@ A compact single choice (view switchers, modes, theme) on native radios: arrow k
 
 ## Tokens
 
-- `--cy-segmented-control-font-size-xs`: Text size of an `xs` control. Default `--cy-font-size-xs`.
-- `--cy-segmented-control-height-xs`: Height of an `xs` control. Default the `--cy-space-7` step (20px at comfortable scale).
-
 - `--cy-segmented-control-{radius,track-bg,active-bg,padding}`
+- An `xs` control is `--cy-control-height-xs` tall (20px at comfortable scale).

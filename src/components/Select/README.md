@@ -35,8 +35,5 @@ A select-only combobox (WAI-ARIA APG): the trigger is a Cynosure button with `ro
 
 ## Tokens
 
-- `--cy-select-font-size-xs`: Text size of an `xs` trigger. Default `--cy-font-size-xs`.
-- `--cy-select-padding-inline-xs`: Inline padding of an `xs` trigger. Default `--cy-space-4`.
-- `--cy-select-height-xs`: Height of an `xs` trigger. Default the `--cy-space-7` step (20px at comfortable scale).
-
 - `--cy-select-{radius,bg,border,list-bg,list-shadow,list-max-height,option-active-bg}`; the list is an [OptionList](../OptionList/README.md), and the `list-*` and `option-*` tokens set its `--cy-option-list-*` tokens.
+- An `xs` trigger is `--cy-control-height-xs` tall (20px at comfortable scale).

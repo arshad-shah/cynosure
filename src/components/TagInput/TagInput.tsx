@@ -17,6 +17,7 @@ import { close } from "../../icons/close.js";
 import type { IconData } from "../../icons/types.js";
 import { useListboxLayer } from "../../overlay/listbox-layer.js";
 import type { Size } from "../../tokens/schema.js";
+import type { FieldLayoutProps } from "../Field/Field.js";
 import { IconButton } from "../IconButton/IconButton.js";
 import { OptionList, OptionListItem, OptionListNote } from "../OptionList/OptionList.js";
 import { TextField } from "../TextField/TextField.js";
@@ -48,7 +49,7 @@ export interface TagInputLabels {
   empty: string;
 }
 
-export interface TagInputProps {
+export interface TagInputProps extends FieldLayoutProps {
   /** The field's label and accessible name. */
   label: ReactNode;
   /** Visually hide the label (it still names the control). Prefer visible labels. */
@@ -125,6 +126,8 @@ const inlineKey = (key: string, el: Element) =>
 export function TagInput({
   label,
   labelHidden,
+  layout,
+  width,
   description,
   error,
   value,
@@ -310,6 +313,8 @@ export function TagInput({
         ref={input}
         label={label}
         labelHidden={labelHidden}
+        layout={layout}
+        width={width}
         description={description}
         error={error ?? problem ?? undefined}
         size={size}

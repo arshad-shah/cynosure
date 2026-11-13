@@ -4,6 +4,9 @@ import { createRoot } from "react-dom/client";
 import { expect, waitFor } from "storybook/test";
 import { Button } from "../components/Button/Button.js";
 import { Inline } from "../components/Inline/Inline.js";
+import { SegmentedControl } from "../components/SegmentedControl/SegmentedControl.js";
+import { Select } from "../components/Select/Select.js";
+import { TextField } from "../components/TextField/TextField.js";
 import { createStyleSheet } from "../styles/inline.js";
 import { computeUnderHostileHost } from "../test/hostile.js";
 import { emulateMedia } from "../test/media.js";
@@ -67,6 +70,39 @@ export const Nested: Story = {
     await expect(token(inner, "--cy-control-height-md")).toBe("28px");
     await expect(getComputedStyle(outer).colorScheme).toBe("light");
     await expect(getComputedStyle(inner).colorScheme).toBe("dark");
+  },
+};
+
+export const DenseControlHeightIsOneToken: Story = {
+  args: {
+    theme: createTheme({ tokens: { control: { height: { xs: 24 } } } }),
+    children: (
+      <Inline gap="3">
+        <Button size="xs">Run</Button>
+        <TextField size="xs" label="Filter" />
+        <Select size="xs" label="Mode" options={[{ value: "a", label: "All" }]} defaultValue="a" />
+        <SegmentedControl
+          size="xs"
+          label="View"
+          options={[
+            { value: "tree", label: "Tree" },
+            { value: "raw", label: "Raw" },
+          ]}
+          defaultValue="tree"
+        />
+      </Inline>
+    ),
+  },
+  play: async ({ canvas }) => {
+    // The theme's one xs control height sizes every dense control alike.
+    await expect(token(canvas.getByRole("button", { name: "Run" }), "--cy-control-height-xs")).toBe("24px");
+    const boxes = [
+      canvas.getByRole("button", { name: "Run" }),
+      canvas.getByRole("textbox", { name: "Filter" }).closest(".cy-text-field"),
+      canvas.getByRole("combobox", { name: "Mode" }),
+      canvas.getByRole("radiogroup", { name: "View" }),
+    ];
+    for (const box of boxes) await expect((box as Element).getBoundingClientRect().height).toBe(24);
   },
 };
 

@@ -56,9 +56,14 @@
   block-size: var(--_h);
   min-block-size: max(var(--_h), var(--_hit));
   padding: 0 var(--cy-text-field-padding-inline, var(--cy-space-5));
-  border: var(--cy-border-width) solid var(--cy-text-field-border, var(--cy-color-line));
-  border-radius: var(--cy-text-field-radius, calc(var(--_h) * var(--cy-radius-factor)));
-  background: var(--cy-text-field-bg, var(--cy-color-surface));
+  /* The field skin: the --cy-field-control-* tokens restyle every field's box (TextField, HotkeyField) at once. */
+  border: var(--cy-border-width) solid
+    var(--cy-text-field-border, var(--cy-field-control-border, var(--cy-color-line)));
+  border-radius: var(
+    --cy-text-field-radius,
+    var(--cy-field-control-radius, calc(var(--_h) * var(--cy-radius-factor)))
+  );
+  background: var(--cy-text-field-bg, var(--cy-field-control-bg, var(--cy-color-surface)));
   color: var(--cy-color-ink);
   font-family: var(--cy-font-sans);
   font-size: var(--cy-font-size-md);
@@ -74,11 +79,11 @@
   /* xs: dense desktop chrome. The field looks 20px tall and does not grow to the hit size; the transparent input
      reaches past the field's edges instead, so a press just outside it still lands in the input. */
   &[data-size="xs"] {
-    --_h: var(--cy-text-field-height-xs, var(--cy-space-7));
+    --_h: var(--cy-text-field-height-xs, var(--cy-control-height-xs));
     min-block-size: var(--_h);
     gap: var(--cy-space-2);
     padding-inline: var(--cy-text-field-padding-inline-xs, var(--cy-space-4));
-    font-size: var(--cy-text-field-font-size-xs, var(--cy-font-size-xs));
+    font-size: var(--cy-font-size-xs);
     & .cy-text-field-input {
       block-size: max(100%, var(--_hit));
     }
@@ -107,7 +112,7 @@
   }
   /* Read only: a sunken fill says "you can select and copy, not edit". */
   &:has(input[readonly]) {
-    background: var(--cy-text-field-readonly-bg, var(--cy-color-soft));
+    background: var(--cy-text-field-readonly-bg, var(--cy-field-control-sunken-bg, var(--cy-color-soft)));
     border-color: transparent;
   }
   &[data-disabled] {

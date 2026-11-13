@@ -8,6 +8,7 @@ Multi-line input that grows with its content from `rows` up to `maxRows`, then s
 
 | Prop                                         | Default          | Notes                                                             |
 | -------------------------------------------- | ---------------- | ----------------------------------------------------------------- |
+| `layout` / `width`                           | `stack` / –      | `split` settings row and the control width, as on `Field`         |
 | `label` / `description` / `error`            | –                | Through `Field`                                                   |
 | `value` / `defaultValue` / `onChange(value)` | –                | Controlled or uncontrolled                                        |
 | `rows` / `maxRows`                           | `3` / `12`       | Minimum rows and auto-grow cap                                    |

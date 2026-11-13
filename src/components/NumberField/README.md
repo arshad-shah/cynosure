@@ -12,6 +12,7 @@ import { NumberField } from "@arshad-shah/cynosure";
 
 | Prop                                               | Default     | Notes                                                                                    |
 | -------------------------------------------------- | ----------- | ---------------------------------------------------------------------------------------- |
+| `layout` / `width`                                 | `stack` / – | `split` settings row and the control width, as on `Field`                                |
 | `value` / `defaultValue`                           | – / `null`  | A number, or `null` for empty                                                            |
 | `onChange`                                         | –           | Called when a value is committed: a step, Enter, or leaving the field                    |
 | `min` / `max`                                      | –           | Typed and stepped values are clamped; Home/End jump to them                              |

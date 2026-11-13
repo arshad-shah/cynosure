@@ -86,7 +86,8 @@ export interface MotionTokens {
 /** Lengths are CSS px numbers, already multiplied by `scale`. */
 export interface GlobalTokens {
   scale: number;
-  control: { height: Record<Size, number> };
+  /** Control heights: `xs` (dense desktop chrome), `sm`, `md`, `lg`. CSS: `--cy-control-height-<size>`. */
+  control: { height: Record<DenseSize, number> };
   radius: { factor: number; segment: number; sm: number; md: number; lg: number; card: number; full: number };
   space: Record<"0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" | "10", number>;
   font: {

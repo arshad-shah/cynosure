@@ -3,6 +3,7 @@ import { useControllableState } from "../../foundations/controllable.js";
 import type { IconData } from "../../icons/types.js";
 import type { DenseSize } from "../../tokens/schema.js";
 import { Button } from "../Button/Button.js";
+import type { FieldLayoutProps } from "../Field/Field.js";
 import { TextField } from "../TextField/TextField.js";
 
 export interface PathFieldTokens {
@@ -23,7 +24,7 @@ export interface PathFieldLabels {
   clear: string;
 }
 
-export interface PathFieldProps {
+export interface PathFieldProps extends FieldLayoutProps {
   /** The field's label and accessible name. */
   label: ReactNode;
   /** Visually hide the label (it still names the field). Prefer visible labels. */
@@ -78,6 +79,8 @@ export const PathField = forwardRef<HTMLInputElement, PathFieldProps>(function P
   {
     label,
     labelHidden,
+    layout,
+    width,
     description,
     error,
     value,
@@ -116,6 +119,8 @@ export const PathField = forwardRef<HTMLInputElement, PathFieldProps>(function P
         ref={ref}
         label={label}
         labelHidden={labelHidden}
+        layout={layout}
+        width={width}
         description={description}
         error={error}
         name={name}

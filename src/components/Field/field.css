@@ -58,7 +58,8 @@
   color: var(--cy-color-ink);
   font-family: var(--cy-font-sans);
   font-size: var(--cy-font-size-md);
-  &[data-size="sm"] .cy-field-label {
+  &[data-size="sm"] .cy-field-label,
+  &[data-size="xs"] .cy-field-label {
     font-size: var(--cy-font-size-xs);
   }
   &[data-size="lg"] .cy-field-label {

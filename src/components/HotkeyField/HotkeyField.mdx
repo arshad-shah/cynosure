@@ -83,12 +83,14 @@ The buttons keep a 44px hit area on coarse pointers. On a touch-only device ther
 
 | Token | Default | What it changes |
 | --- | --- | --- |
-| `--cy-hotkey-field-bg` | `--cy-color-surface` | The shortcut's box |
-| `--cy-hotkey-field-border` | `--cy-color-line` | The box's border |
-| `--cy-hotkey-field-radius` | from the control height | The box's corners |
+| `--cy-hotkey-field-bg` | `--cy-field-control-bg`, then `--cy-color-surface` | The shortcut's box |
+| `--cy-hotkey-field-border` | `--cy-field-control-border`, then `--cy-color-line` | The box's border |
+| `--cy-hotkey-field-radius` | `--cy-field-control-radius`, then from the control height | The box's corners |
 | `--cy-hotkey-field-recording-border` | `--cy-color-accent` | The box's border while recording |
 | `--cy-hotkey-field-recording-color` | `--cy-color-accent-text` | The prompt and its light |
 | `--cy-hotkey-field-gap` | `--cy-space-2` | Between the box and the buttons |
+
+The box shares TextField's skin through Field's `--cy-field-control-*` tokens, so restyling those restyles both; a disabled box takes `--cy-field-control-sunken-bg`.
 
 The key caps are [Kbd](?path=/docs/components-kbd--docs) and the buttons [IconButton](?path=/docs/components-iconbutton--docs): restyle them through their tokens.
 

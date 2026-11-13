@@ -94,8 +94,8 @@
     font-size: var(--cy-font-size-sm);
   }
   &[data-size="xs"] {
-    --_h: var(--cy-segmented-control-height-xs, var(--cy-space-7));
-    font-size: var(--cy-segmented-control-font-size-xs, var(--cy-font-size-xs));
+    --_h: var(--cy-control-height-xs);
+    font-size: var(--cy-font-size-xs);
   }
   &[data-size="lg"] {
     --_h: var(--cy-control-height-lg);

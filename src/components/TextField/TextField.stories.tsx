@@ -3,6 +3,8 @@ import { type CSSProperties, useState } from "react";
 import { expect, fn } from "storybook/test";
 import { mail, search } from "../../icons/index.js";
 import { computeUnderHostileHost } from "../../test/hostile.js";
+import { Button } from "../Button/Button.js";
+import { SegmentedControl } from "../SegmentedControl/SegmentedControl.js";
 import { TextField } from "./TextField.js";
 
 const meta = {
@@ -188,6 +190,37 @@ export const ExtraSmallForDenseChrome: Story = {
     );
     await userEvent.click(show);
     await expect(token).toHaveAttribute("type", "text");
+  },
+};
+
+export const IconsMatchAButtonOfTheSameSize: Story = {
+  render: () => (
+    <div style={{ display: "grid", gap: 8, maxWidth: 360 }}>
+      {(["xs", "sm", "md", "lg"] as const).map((size) => (
+        <div key={size} style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          <TextField size={size} label={`Find ${size}`} iconStart={search} />
+          <Button size={size} icon={search}>{`Go ${size}`}</Button>
+          <SegmentedControl
+            size={size}
+            label={`View ${size}`}
+            options={[{ value: "a", label: "All", icon: search }]}
+            defaultValue="a"
+          />
+        </div>
+      ))}
+    </div>
+  ),
+  play: async ({ canvas }) => {
+    const icon = (el: HTMLElement) =>
+      (el.querySelector(".cy-icon") as Element).getBoundingClientRect().height;
+    // At every size a field's icon, a button's and a segment's are the same size, so a row of mixed controls agrees.
+    for (const size of ["xs", "sm", "md", "lg"]) {
+      const field = shellOf(canvas.getByRole("textbox", { name: `Find ${size}` }));
+      const button = canvas.getByRole("button", { name: `Go ${size}` });
+      const segmented = canvas.getByRole("radiogroup", { name: `View ${size}` });
+      await expect(icon(field)).toBe(icon(button));
+      await expect(icon(segmented)).toBe(icon(button));
+    }
   },
 };
 
