@@ -20,6 +20,7 @@ import { isRtl } from "../../foundations/dir.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
 import { isTypeaheadKey, useTypeahead } from "../../foundations/listbox.js";
 import { OptionIcon, type OptionIconColor } from "../../foundations/option-icon.js";
+import { setRef } from "../../foundations/refs.js";
 import { useVirtualWindow } from "../../foundations/virtual-window.js";
 import { chevronRight } from "../../icons/chevron-right.js";
 import type { IconData } from "../../icons/types.js";
@@ -206,12 +207,6 @@ interface RowMenu {
   item: TreeItem<never>;
   items: MenuEntry[];
 }
-
-/** Points a ref at an element (the menu returns focus to its target, so the target is the row that opened it). */
-const aim = (ref: Ref<HTMLElement>, el: HTMLElement) => {
-  if (typeof ref === "function") ref(el);
-  else if (ref) (ref as { current: HTMLElement | null }).current = el;
-};
 
 /** A press on a control inside a row (an action, a retry button) is that control's, not the row's. */
 const onControl = (event: { target: EventTarget; currentTarget: Element }) => {
@@ -562,7 +557,7 @@ export function Tree<T = unknown>(props: TreeProps<T>) {
     command: (value, item) => onCommand?.(value, item),
     menu: (item, el) => {
       if (!item.contextMenu || !target.current) return;
-      aim(target.current.ref, el);
+      setRef(target.current.ref, el);
       setMenu({ item, items: item.contextMenu });
     },
   };

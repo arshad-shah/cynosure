@@ -12,6 +12,7 @@ import {
 } from "react";
 import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
+import { mergeRefs } from "../../foundations/refs.js";
 import { TOOLBAR_ITEMS, useRovingFocus } from "../../foundations/roving-focus.js";
 import type { IconData } from "../../icons/types.js";
 import type { Placement } from "../../overlay/position.js";
@@ -225,11 +226,7 @@ export const StatusBarSegment = forwardRef<HTMLElement, StatusBarSegmentProps>(f
       <Button
         {...rest}
         {...trigger}
-        ref={(node: HTMLButtonElement | null) => {
-          for (const r of [ref, trigger?.ref])
-            if (typeof r === "function") r(node);
-            else if (r) (r as { current: HTMLElement | null }).current = node;
-        }}
+        ref={mergeRefs<HTMLElement>(ref, trigger?.ref)}
         size="xs"
         variant={BUTTON_VARIANT[variant]}
         tone={tone}

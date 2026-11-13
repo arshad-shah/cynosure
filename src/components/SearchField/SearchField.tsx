@@ -1,6 +1,7 @@
 import { forwardRef, type ReactNode, useRef, useState } from "react";
 import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js";
 import { isComposing } from "../../foundations/keys.js";
+import { mergeRefs } from "../../foundations/refs.js";
 import { search } from "../../icons/search.js";
 import { TextField, type TextFieldProps } from "../TextField/TextField.js";
 
@@ -43,11 +44,7 @@ export const SearchField = forwardRef<HTMLInputElement, SearchFieldProps>(functi
   return (
     <TextField
       {...rest}
-      ref={(node) => {
-        local.current = node;
-        if (typeof forwarded === "function") forwarded(node);
-        else if (forwarded) forwarded.current = node;
-      }}
+      ref={mergeRefs(local, forwarded)}
       type="search"
       iconStart={search}
       clearable={clearable}

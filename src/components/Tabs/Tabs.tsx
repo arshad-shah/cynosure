@@ -6,7 +6,6 @@ import {
   type MouseEvent,
   type PointerEvent,
   type ReactNode,
-  type Ref,
   useCallback,
   useContext,
   useId,
@@ -19,6 +18,7 @@ import { useControllableState } from "../../foundations/controllable.js";
 import { isRtl } from "../../foundations/dir.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
 import { usePrinting } from "../../foundations/printing.js";
+import { setRef } from "../../foundations/refs.js";
 import { moveItems } from "../../foundations/reorder.js";
 import { useRovingFocus } from "../../foundations/roving-focus.js";
 import { chevronLeft } from "../../icons/chevron-left.js";
@@ -251,12 +251,6 @@ interface TabMenu {
 const MenuContext = createContext<{ target: ContextMenuTargetProps; open: (menu: TabMenu) => void } | null>(
   null,
 );
-
-/** Points a ref at an element (the menu returns focus to its target, so the target is the tab that opened it). */
-const aim = (ref: Ref<HTMLElement>, el: HTMLElement) => {
-  if (typeof ref === "function") ref(el);
-  else if (ref) (ref as { current: HTMLElement | null }).current = el;
-};
 
 /** The tab inside a list child (a tab, or a closable tab's slot). */
 const tabIn = (el: Element) =>
@@ -547,7 +541,7 @@ export function Tab({
   const menu = contextMenu && host?.target;
   const arm = (el: HTMLElement) => {
     if (!host || !contextMenu) return;
-    aim(host.target.ref, el);
+    setRef(host.target.ref, el);
     host.open({ value, name, items: contextMenu, onSelect: onContextMenuSelect });
   };
   // A label cut short by `--cy-tabs-label-max-width` shows its full text in a tooltip. The tooltip is always there (off

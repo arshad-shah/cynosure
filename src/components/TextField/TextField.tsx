@@ -4,13 +4,14 @@ import {
   type InputHTMLAttributes,
   type KeyboardEvent,
   type ReactNode,
-  useCallback,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from "react";
 import { Icon } from "../../foundations/Icon/Icon.js";
 import { InputBase } from "../../foundations/InputBase/InputBase.js";
+import { mergeRefs } from "../../foundations/refs.js";
 import { close } from "../../icons/close.js";
 import { eye } from "../../icons/eye.js";
 import { eyeOff } from "../../icons/eye-off.js";
@@ -155,14 +156,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(function T
     form.addEventListener("reset", onReset);
     return () => form.removeEventListener("reset", onReset);
   }, []);
-  const ref = useCallback(
-    (node: HTMLInputElement | null) => {
-      inner.current = node;
-      if (typeof forwarded === "function") forwarded(node);
-      else if (forwarded) forwarded.current = node;
-    },
-    [forwarded],
-  );
+  const ref = useMemo(() => mergeRefs(inner, forwarded), [forwarded]);
   const clear = () => {
     if (!inner.current) return;
     setNativeValue(inner.current, "");
