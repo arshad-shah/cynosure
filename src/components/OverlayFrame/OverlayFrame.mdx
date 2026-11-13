@@ -1,0 +1,45 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./OverlayFrame.stories";
+
+<Meta of={Stories} />
+
+# OverlayFrame
+
+A frame whose content fills it, with an overlay pinned at the bottom centre that stays put while the content scrolls under it: a "3 new" pill, a "jump to latest" button.
+
+<Canvas of={Stories.Default} />
+
+## When to use
+
+ScrollArea and VirtualList already hold their scroller in an OverlayFrame and take an `overlay` prop: use those. Reach for OverlayFrame directly only to put the same overlay over a scroller of your own (a canvas, a code view).
+
+Use something else when the content should move aside for the control (put it below the content in a [Stack](?path=/docs/components-stack--docs)), or when it floats next to a selection ([FloatingToolbar](?path=/docs/components-floatingtoolbar--docs)).
+
+## Usage
+
+```tsx
+import { OverlayFrame } from "@arshad-shah/cynosure";
+
+<OverlayFrame overlay={unseen > 0 && <Button onClick={jump}>{`${unseen} new`}</Button>}>
+  <div style={{ overflow: "auto" }}>…</div>
+</OverlayFrame>
+```
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+- The content and the overlay share one grid cell: the content fills the frame and the overlay sits over its bottom centre, a little above the edge. Scrolling the content leaves it where it is.
+- The overlay is outside the content, so it is not part of a listbox or a named region it covers; give it a control with its own name.
+- It stacks above content raised with a z-index up to 2 (a sticky heading), so presses reach it.
+- `null`, `undefined` and `false` render no overlay. The frame itself stays, so the content is never remounted and keeps its scroll position.
+
+## Theming
+
+Tokens: `--cy-overlay-frame-offset` (space between the bottom edge and the overlay, default `--cy-space-4`) and `--cy-overlay-frame-layer` (the overlay's stacking order, default 3). Set them on the frame (a ScrollArea's root is one) or on any element around it.
+
+## Related
+
+[ScrollArea](?path=/docs/components-scrollarea--docs) and [VirtualList](?path=/docs/components-virtuallist--docs) render it for their `overlay`.

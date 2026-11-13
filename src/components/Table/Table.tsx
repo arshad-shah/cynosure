@@ -1,13 +1,9 @@
 import { type CSSProperties, type ReactNode, useId, useMemo } from "react";
-import { ButtonBase } from "../../foundations/ButtonBase/ButtonBase.js";
 import { useControllableState } from "../../foundations/controllable.js";
-import { Icon } from "../../foundations/Icon/Icon.js";
 import { nextSort, sortRows, type TableSort } from "../../foundations/sort.js";
-import { arrowDown } from "../../icons/arrow-down.js";
-import { arrowUp } from "../../icons/arrow-up.js";
-import { chevronsUpDown } from "../../icons/chevrons-up-down.js";
 import type { Size } from "../../tokens/schema.js";
 import { Checkbox } from "../Checkbox/Checkbox.js";
+import { SortButton } from "../SortButton/SortButton.js";
 
 export interface TableTokens {
   /** Background of the header row. */
@@ -156,8 +152,6 @@ export function Table<Row>({
     const v = headerColumn?.cell ? headerColumn.cell(row) : cellValue(row, headerColumn?.key ?? "");
     return typeof v === "string" || typeof v === "number" ? String(v) : "";
   };
-  const sortIcon = (key: string) =>
-    currentSort?.key !== key ? chevronsUpDown : currentSort.direction === "ascending" ? arrowUp : arrowDown;
 
   return (
     <div
@@ -203,10 +197,9 @@ export function Table<Row>({
                     style={column.width ? { inlineSize: column.width } : undefined}
                   >
                     {column.sortable ? (
-                      <ButtonBase className="cy-table-sort cy-reset" onClick={() => cycle(column.key)}>
-                        <span className="cy-reset">{column.header}</span>
-                        <Icon icon={sortIcon(column.key)} size="sm" className="cy-table-sort-icon" />
-                      </ButtonBase>
+                      <SortButton direction={sorted} align={column.align} onClick={() => cycle(column.key)}>
+                        {column.header}
+                      </SortButton>
                     ) : (
                       column.header
                     )}

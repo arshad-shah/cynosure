@@ -739,5 +739,17 @@
     "path": ["dist/components/RowActions/RowActions.js", "dist/styles/row-actions.css"],
     "limit": "1.1 kB",
     "gzip": true
+  },
+  {
+    "name": "OverlayFrame",
+    "path": ["dist/components/OverlayFrame/OverlayFrame.js", "dist/styles/overlay-frame.css"],
+    "limit": "650 B",
+    "gzip": true
+  },
+  {
+    "name": "SortButton",
+    "path": ["dist/components/SortButton/SortButton.js", "dist/styles/sort-button.css"],
+    "limit": "1.1 kB",
+    "gzip": true
   }
 ]

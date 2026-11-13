@@ -369,7 +369,7 @@ export const StableUnderHostileHost: Story = {
       "border-bottom-width",
       "box-sizing",
     ];
-    for (const selector of [".cy-table", "thead th", "tbody th", "tbody td", ".cy-table-sort"]) {
+    for (const selector of [".cy-table", "thead th", "tbody th", "tbody td", ".cy-sort-button"]) {
       const { clean, hostile } = computeUnderHostileHost(canvasElement, selector, props);
       await expect({ selector, ...hostile }).toEqual({ selector, ...clean });
     }

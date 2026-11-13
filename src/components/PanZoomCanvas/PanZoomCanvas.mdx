@@ -20,12 +20,12 @@ A surface to pan and zoom freely, for diagrams, maps and boards; your content, p
 ## Usage
 
 ```tsx
-<PanZoomCanvas ref={canvas} label="Schema" bounds={bounds} minimap renderMinimap={() => <Dots />}>
+<PanZoomCanvas handle={canvas} label="Schema" bounds={bounds} minimap renderMinimap={() => <Dots />}>
   {nodes.map((n) => <Node key={n.id} style={{ position: "absolute", left: n.x, top: n.y }} />)}
 </PanZoomCanvas>
 ```
 
-Place children absolutely in canvas units. Give `bounds` (the content's extent) to fit it on first show, for Shift+1 and `fit()`, and for the minimap. `minScale` and `maxScale` set the zoom's limits (25% to 800% unless given; a schema diagram might keep to 20% to 300%): the wheel, a pinch, the keys, `zoomTo` and fitting all stop there. The ref has `fit`, `zoomTo` and `centreOn` for your own buttons; pair it with [ZoomControls](?path=/docs/components-zoomcontrols--docs) for a zoom toolbar.
+Place children absolutely in canvas units. Give `bounds` (the content's extent) to fit it on first show, for Shift+1 and `fit()`, and for the minimap. `min` and `max` set the zoom's limits in percent, as ZoomControls' do (25 to 800 unless given; a schema diagram might keep to 20 to 300): the wheel, a pinch, the keys, `zoomTo` and fitting all stop there. The `handle` has `fit`, `zoomTo` and `centerOn` for your own buttons (`ref` gives the same handle, and the earlier spelling `centreOn` still works); pair it with [ZoomControls](?path=/docs/components-zoomcontrols--docs) for a zoom toolbar.
 
 ## Painting into a canvas
 
@@ -76,10 +76,10 @@ claimPress={({ point }) => {
 
 ```tsx
 <PanZoomCanvas
-  ref={canvas}
+  handle={canvas}
   label="Schema"
-  minScale={0.2}
-  maxScale={3}
+  min={20}
+  max={300}
   minimap={showMap}
   overlays={{
     "top-start": <Legend />,

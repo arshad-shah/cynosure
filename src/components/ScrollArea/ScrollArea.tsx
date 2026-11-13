@@ -8,23 +8,14 @@ import {
   useRef,
   useState,
 } from "react";
+import { alignedScroll, type ScrollAlign } from "../../foundations/scroll-align.js";
 import { useFollow } from "../../foundations/use-follow.js";
-
-export interface ScrollAreaTokens {
-  /** Space between the bottom edge and the `overlay` (a "3 new" pill). */
-  overlayOffset: string;
-}
-
-declare module "../../tokens/schema.js" {
-  interface ComponentTokens {
-    scrollArea: ScrollAreaTokens;
-  }
-}
+import { OverlayFrame } from "../OverlayFrame/OverlayFrame.js";
 
 /** Where `scrollIntoView` puts the element. */
 export interface ScrollAreaIntoViewOptions {
   /** `nearest` (default) scrolls the least that shows it whole; `start` puts it at the top; `center` in the middle. */
-  align?: "nearest" | "start" | "center";
+  align?: ScrollAlign;
 }
 
 /** What `handle` gives you: scrolling from outside the area (a "jump to latest" button, a search hit). */
@@ -110,22 +101,14 @@ export const ScrollArea = forwardRef<HTMLDivElement, ScrollAreaProps>(function S
 
   useImperativeHandle(handle, () => ({
     scrollToEnd: following.scrollToEnd,
+    // The handle is set while the area is mounted, so its viewport is there.
     scrollIntoView: (element, { align = "nearest" } = {}) => {
-      const el = viewport.current;
-      if (!el) return;
+      const el = viewport.current as HTMLDivElement;
       const view = el.getBoundingClientRect();
       const box = element.getBoundingClientRect();
-      // Where the element is in the visible area, so the same change works in either text direction.
+      // Where the element is in the visible area (the view at 0), so the distance works in either text direction.
       const along = (offset: number, size: number, room: number) =>
-        align === "start"
-          ? offset
-          : align === "center"
-            ? offset + size / 2 - room / 2
-            : offset < 0
-              ? offset
-              : offset + size > room
-                ? Math.min(offset, offset + size - room)
-                : 0;
+        alignedScroll(0, room, offset, size, align);
       if (direction !== "horizontal")
         el.scrollTop += along(box.top - view.top - el.clientTop, box.height, el.clientHeight);
       if (direction !== "vertical")
@@ -134,16 +117,17 @@ export const ScrollArea = forwardRef<HTMLDivElement, ScrollAreaProps>(function S
   }));
 
   return (
-    <div
+    <OverlayFrame
       ref={ref}
       {...rest}
       className={className ? `cy-scroll-area ${className}` : "cy-scroll-area"}
-      data-direction={direction}
       style={style}
+      overlay={overlay}
     >
       <div
         ref={viewport}
         className="cy-scroll-area-viewport cy-reset"
+        data-direction={direction}
         // A named region, and a tab stop while there is something to scroll, so a keyboard can scroll it.
         {...(label ? { role: "region", "aria-label": label, tabIndex: scrolls ? 0 : undefined } : {})}
         onScroll={(event) => {
@@ -155,9 +139,6 @@ export const ScrollArea = forwardRef<HTMLDivElement, ScrollAreaProps>(function S
           {children}
         </div>
       </div>
-      {overlay != null && overlay !== false && (
-        <div className="cy-scroll-area-overlay cy-reset">{overlay}</div>
-      )}
-    </div>
+    </OverlayFrame>
   );
 });

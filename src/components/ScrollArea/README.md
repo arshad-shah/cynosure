@@ -45,4 +45,4 @@ A finger pans the area with the browser's own scrolling; nothing intercepts it. 
 
 ## Tokens
 
-- `--cy-scroll-area-overlay-offset`: space between the bottom edge and the overlay (default `--cy-space-4`)
+None of its own: the root is an [OverlayFrame](../OverlayFrame/README.md), so `--cy-overlay-frame-offset` (space between the bottom edge and the overlay) and `--cy-overlay-frame-layer` set on it move the overlay.

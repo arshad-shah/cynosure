@@ -14,8 +14,10 @@ import { useDrag } from "../../foundations/drag.js";
 import { seekEnabled } from "../../foundations/listbox.js";
 import { clamp } from "../../foundations/math.js";
 import { moveItems } from "../../foundations/reorder.js";
+import type { ScrollAlign } from "../../foundations/scroll-align.js";
 import { useFollow } from "../../foundations/use-follow.js";
 import { useVirtualWindow } from "../../foundations/virtual-window.js";
+import { OverlayFrame } from "../OverlayFrame/OverlayFrame.js";
 
 export interface VirtualListTokens {
   /** Height of the list (it scrolls inside). */
@@ -24,8 +26,6 @@ export interface VirtualListTokens {
   rowHeight: string;
   /** Background of the chosen rows. */
   selectedBackground: string;
-  /** Space between the bottom edge and the `overlay` (a "3 new" pill). */
-  overlayOffset: string;
 }
 
 declare module "../../tokens/schema.js" {
@@ -40,10 +40,19 @@ export interface VirtualItemState {
   disabled: boolean;
 }
 
+/** Where `scrollToIndex` puts the row. */
+export interface VirtualListScrollOptions {
+  /** `nearest` (default) scrolls the least that shows it whole; `start` puts it at the top; `center` in the middle. */
+  align?: ScrollAlign;
+}
+
 /** What `handle` gives you: scroll a row into view from outside (a search hit, a "jump to latest" button). */
 export interface VirtualListHandle {
-  /** Scrolls row `index` into view: `nearest` (default, the least scrolling), `start` or `center`. */
-  scrollToIndex: (index: number, align?: "nearest" | "start" | "center") => void;
+  /**
+   * Scrolls row `index` into view, placed by `options.align` (as ScrollArea's `scrollIntoView`). The alignment alone
+   * (`scrollToIndex(i, "center")`, the earlier form) still works.
+   */
+  scrollToIndex: (index: number, options?: VirtualListScrollOptions | ScrollAlign) => void;
   /** Scrolls to the last row. */
   scrollToEnd: () => void;
 }
@@ -239,18 +248,11 @@ export function VirtualList<T>({
         s.seen.add(row);
       }
   });
-  const top = (i: number) => (sizes ? win.offsetOf(i) : i * win.rowSize);
-  /** The gap (0 to the row count) nearest to `y`, in content pixels: the first row whose middle is below it. */
+  /** The gap (0 to the row count) nearest to `y`, in content pixels: before the row at `y`, or after it past its middle. */
   const gapAt = (y: number) => {
-    if (!sizes) return clamp(Math.round(y / win.rowSize), 0, keys.length);
-    let lo = 0;
-    let hi = keys.length;
-    while (lo < hi) {
-      const mid = (lo + hi) >> 1;
-      if (top(mid) + win.sizeOf(mid) / 2 < y) lo = mid + 1;
-      else hi = mid;
-    }
-    return lo;
+    const at = win.rowAt(Math.max(0, y));
+    if (at >= keys.length) return keys.length;
+    return y < win.offsetOf(at) + win.sizeOf(at) / 2 ? at : at + 1;
   };
 
   // Following: while the list sits at its end, new rows keep it there.
@@ -258,12 +260,9 @@ export function VirtualList<T>({
   useClientLayoutEffect(() => following.contentChanged(), [items.length, win.total]);
   useImperativeHandle(handle, () => ({
     scrollToEnd: following.scrollToEnd,
-    scrollToIndex: (index, align = "nearest") => {
-      const el = root.current;
-      const i = clamp(index, 0, keys.length - 1);
-      if (!el) return;
-      if (align === "nearest") win.reveal(i);
-      else el.scrollTop = align === "start" ? top(i) : top(i) + win.sizeOf(i) / 2 - el.clientHeight / 2;
+    scrollToIndex: (index, options = {}) => {
+      const { align } = typeof options === "string" ? { align: options } : options;
+      win.reveal(clamp(index, 0, keys.length - 1), align);
     },
   }));
 
@@ -271,7 +270,7 @@ export function VirtualList<T>({
   let pinned = -1;
   if (isHeader) {
     const first = win.indices.length
-      ? Math.min(...win.indices.filter((i) => top(i) + win.sizeOf(i) > win.view.top))
+      ? Math.min(...win.indices.filter((i) => win.offsetOf(i) + win.sizeOf(i) > win.view.top))
       : -1;
     for (let i = Math.min(first, keys.length - 1); i >= 0; i--)
       if (header(i)) {
@@ -439,16 +438,9 @@ export function VirtualList<T>({
   };
 
   const rootClass = className ? `cy-virtual-list ${className}` : "cy-virtual-list";
-  // The overlay shares a grid cell with the list, so it stays put while the list scrolls under it. The frame is
-  // always there: one that came and went with the overlay would remount the list and lose its scroll position.
-  const framed = (list: ReactNode) => (
-    <div className="cy-virtual-list-frame">
-      {list}
-      {overlay != null && overlay !== false && (
-        <div className="cy-virtual-list-overlay cy-reset">{overlay}</div>
-      )}
-    </div>
-  );
+  // The overlay stays put while the list scrolls under it. The frame is always there: one that came and went with the
+  // overlay would remount the list and lose its scroll position.
+  const framed = (list: ReactNode) => <OverlayFrame overlay={overlay}>{list}</OverlayFrame>;
   // An empty listbox is invalid ARIA: with no items the list is just its message.
   if (items.length === 0)
     return framed(
@@ -474,7 +466,7 @@ export function VirtualList<T>({
             win.onScroll(e.currentTarget.scrollTop);
           }}
         >
-          {pinned >= 0 && win.view.top > top(pinned) && (
+          {pinned >= 0 && win.view.top > win.offsetOf(pinned) && (
             <div className="cy-virtual-list-pinned cy-reset" aria-hidden="true">
               {renderItem(items[pinned] as T, { index: pinned, selected: false, disabled: true })}
             </div>
@@ -487,7 +479,7 @@ export function VirtualList<T>({
           {drag && (
             <div
               className="cy-virtual-list-drop cy-reset"
-              style={{ insetBlockStart: drag.gap < keys.length ? top(drag.gap) : win.total }}
+              style={{ insetBlockStart: drag.gap < keys.length ? win.offsetOf(drag.gap) : win.total }}
               aria-hidden="true"
             />
           )}
@@ -509,7 +501,7 @@ export function VirtualList<T>({
                 className="cy-virtual-list-row cy-reset"
                 data-moving={dragging?.has(key) ? "" : undefined}
                 data-header={header(i) ? "" : undefined}
-                style={{ insetBlockStart: top(i) }}
+                style={{ insetBlockStart: win.offsetOf(i) }}
                 onClick={() => onRowClick(i)}
                 // Focus can arrive without our keys (a screen reader, a script): keys then act from here.
                 onFocus={() => focusKey !== key && setFocusKey(key)}

@@ -132,7 +132,7 @@ export { CopyButton, type CopyButtonLabels, type CopyButtonProps } from "./compo
 export {
   DataGrid,
   type DataGridCell,
-  type DataGridCellTone,
+  type DataGridCellKind,
   type DataGridColumn,
   type DataGridLabels,
   type DataGridProps,
@@ -286,6 +286,11 @@ export {
   type OptionListProps,
   type OptionListTokens,
 } from "./components/OptionList/index.js";
+export {
+  OverlayFrame,
+  type OverlayFrameProps,
+  type OverlayFrameTokens,
+} from "./components/OverlayFrame/index.js";
 export { PageHeader, type PageHeaderProps, type PageHeaderTokens } from "./components/PageHeader/index.js";
 export {
   Pagination,
@@ -343,7 +348,6 @@ export {
   type ScrollAreaHandle,
   type ScrollAreaIntoViewOptions,
   type ScrollAreaProps,
-  type ScrollAreaTokens,
 } from "./components/ScrollArea/index.js";
 export { SearchField, type SearchFieldProps } from "./components/SearchField/index.js";
 export { Section, type SectionProps, type SectionTokens } from "./components/Section/index.js";
@@ -436,6 +440,7 @@ export {
   type SortableListProps,
   type SortableListTokens,
 } from "./components/SortableList/index.js";
+export { SortButton, type SortButtonProps, type SortButtonTokens } from "./components/SortButton/index.js";
 export { SplitPane, type SplitPaneProps, type SplitPaneTokens } from "./components/SplitPane/index.js";
 export {
   type BoxOverflow,
@@ -554,6 +559,7 @@ export {
   type VirtualListHandle,
   type VirtualListLabels,
   type VirtualListProps,
+  type VirtualListScrollOptions,
   type VirtualListTokens,
 } from "./components/VirtualList/index.js";
 export { VisuallyHidden, type VisuallyHiddenProps } from "./components/VisuallyHidden/index.js";

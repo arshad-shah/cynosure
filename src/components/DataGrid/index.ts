@@ -1,7 +1,7 @@
 export {
   DataGrid,
   type DataGridCell,
-  type DataGridCellTone,
+  type DataGridCellKind,
   type DataGridColumn,
   type DataGridLabels,
   type DataGridProps,

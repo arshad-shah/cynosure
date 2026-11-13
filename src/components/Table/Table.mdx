@@ -30,7 +30,7 @@ A column shows `row[key]` unless it has a `cell` function. `align: "end"` lines 
 
 ## Sorting
 
-Mark columns `sortable` and their headers become buttons: ascending, then descending, then the original order. Sorting compares `row[key]` (or `sortValue(row)`): text in the locale's order, numbers as numbers, empty values last. Sort on a server with `manualSort`: the table then shows and reports the sort through `onSortChange` without reordering.
+Mark columns `sortable` and their headers become buttons (a [SortButton](?path=/docs/components-sortbutton--docs)): ascending, then descending, then the original order. Sorting compares `row[key]` (or `sortValue(row)`): text in the locale's order, numbers as numbers, empty values last. Sort on a server with `manualSort`: the table then shows and reports the sort through `onSortChange` without reordering.
 
 <Canvas of={Stories.SortingCyclesAndCompares} />
 

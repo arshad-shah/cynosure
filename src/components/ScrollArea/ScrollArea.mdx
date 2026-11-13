@@ -54,7 +54,7 @@ With `follow`, the end stays in view while content is added. Scrolling up lets g
 
 ## Overlay
 
-`overlay` sits over the area at the bottom centre and does not scroll. It is outside the named region. Its distance from the bottom edge is the `overlayOffset` token.
+`overlay` sits over the area at the bottom centre and does not scroll. It is outside the named region. The area is an [OverlayFrame](?path=/docs/components-overlayframe--docs), which places it.
 
 <Canvas of={Stories.OverlayStaysPut} />
 
@@ -93,7 +93,7 @@ A finger pans the area with the browser's own scrolling; nothing intercepts it. 
 
 ## Theming
 
-Tokens: `--cy-scroll-area-overlay-offset` (space between the bottom edge and the overlay, default `--cy-space-4`). The area itself draws nothing: give the parent its background and border.
+No tokens of its own: the overlay's place comes from OverlayFrame's `--cy-overlay-frame-offset` (space between the bottom edge and the overlay, default `--cy-space-4`) and `--cy-overlay-frame-layer`. The area itself draws nothing: give the parent its background and border.
 
 ## Related
 

@@ -26,9 +26,9 @@ export interface ZoomControlsProps {
   percent: number;
   /** Called with the new setting when the person zooms in or out, or picks one from the menu. */
   onZoomChange: (zoom: ZoomSetting) => void;
-  /** The smallest percent zoom out goes to (a PanZoomCanvas's `minScale` times 100). Default 25. */
+  /** The smallest percent zoom out goes to (a PanZoomCanvas's `min`). Default 25. */
   min?: number;
-  /** The largest percent zoom in goes to (a PanZoomCanvas's `maxScale` times 100). Default 800. */
+  /** The largest percent zoom in goes to (a PanZoomCanvas's `max`). Default 800. */
   max?: number;
   /** The percents offered in the menu (those between `min` and `max`). Default 50, 75, 100, 125, 150, 200, 400. */
   presets?: number[];

@@ -16,6 +16,7 @@ import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js
 import { useControllableState } from "../../foundations/controllable.js";
 import { isRtl } from "../../foundations/dir.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
+import { motionMs } from "../../foundations/motion.js";
 import { usePrinting } from "../../foundations/printing.js";
 import { moveItems } from "../../foundations/reorder.js";
 import { useRovingFocus } from "../../foundations/roving-focus.js";
@@ -292,9 +293,7 @@ export function TabList({
       cancel: ".cy-tab-close",
       touchAction: "auto",
       get animation() {
-        const reduced = globalThis.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-        const base = Number.parseFloat(getComputedStyle(el).getPropertyValue("--cy-motion-slow"));
-        return reduced ? 0 : Number.isFinite(base) ? base : 180;
+        return motionMs(el);
       },
       onSort: ({ item, from, to }) => {
         const v = tabIn(item).dataset.value as string;

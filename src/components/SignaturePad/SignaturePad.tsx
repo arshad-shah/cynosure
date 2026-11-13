@@ -1,4 +1,5 @@
-import { type CSSProperties, type PointerEvent, useCallback, useEffect, useRef, useState } from "react";
+import { type CSSProperties, type PointerEvent, useCallback, useEffect, useRef } from "react";
+import { useCanvasSize } from "../../foundations/canvas-size.js";
 import { type InkPoint, type InkStroke, type InkWeight, inkPath, inkPoint } from "./ink.js";
 
 export interface SignaturePadTokens {
@@ -80,28 +81,15 @@ export function SignaturePad({
   // The latest list, updated the moment a stroke ends: a second stroke can finish before React re-renders.
   const committed = useRef(value);
   committed.current = value;
-  const [size, setSize] = useState({ width: 0, height: 0 });
-
-  useEffect(() => {
-    const el = canvas.current as HTMLCanvasElement;
-    const measure = () =>
-      setSize((s) =>
-        s.width === el.clientWidth && s.height === el.clientHeight
-          ? s
-          : { width: el.clientWidth, height: el.clientHeight },
-      );
-    measure();
-    const observer = new ResizeObserver(measure);
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
+  // Measured with the screen's density, and again when it changes (a move to another screen, a browser zoom).
+  const size = useCanvasSize(canvas);
 
   // One outline per finished stroke, kept while the stroke and the nib are the same.
   const outlines = useRef(new WeakMap<InkStroke, [InkWeight, Path2D]>());
   const paint = useCallback(() => {
     const el = canvas.current;
     if (!el) return;
-    const dpr = window.devicePixelRatio;
+    const { dpr } = size;
     // The canvas is reallocated only when its size or pixel ratio changes.
     for (const side of ["width", "height"] as const) {
       const pixels = Math.round(size[side] * dpr);
