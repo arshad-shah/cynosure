@@ -1,4 +1,4 @@
-import { type KeyboardEvent as ReactKeyboardEvent, useRef } from "react";
+import { type KeyboardEvent as ReactKeyboardEvent, type RefObject, useEffect, useRef, useState } from "react";
 
 /**
  * The next usable index from `from` in direction `step` (±1), skipping unusable ones; `wrap` goes round the ends. When
@@ -47,5 +47,90 @@ export function useTypeahead() {
     const word = find(typed.current.text);
     // A word that matches nothing ("aa" where only one item starts with "a") falls back to cycling on the key.
     return word >= 0 ? word : find(key);
+  };
+}
+
+const everyOption = () => true;
+const NONE = Symbol("none");
+const FOOTER = Symbol("footer");
+
+export interface ActiveOptionOptions {
+  /** The list's id. Option `i` has the id `${id}-${i}`, the target of the field's `aria-activedescendant`. */
+  id: string;
+  /** The list element: the active option is scrolled into view in it. */
+  list: RefObject<HTMLElement | null>;
+  /** The list is shown: only then is there an active option to name and to scroll to. */
+  open: boolean;
+  /** How many options. */
+  count: number;
+  /**
+   * A footer action after the options, at index `count`: the arrow keys' and `last()`'s final stop, but never made
+   * active on its own (when the list changes, or by `first()`).
+   */
+  footer?: boolean | undefined;
+  /** Whether option `i` can be active (it is not disabled). Default: every option. */
+  usable?: ((index: number) => boolean) | undefined;
+  /** The arrow keys go round the ends. Default: they stop at the first and the last option. */
+  wrap?: boolean | undefined;
+  /** An option's identity, so the active option is followed when the list changes. Default: its position. */
+  keyOf?: ((index: number) => unknown) | undefined;
+}
+
+/**
+ * The active option of a list that a field points into with `aria-activedescendant` (focus stays in the field):
+ * Select, Combobox, TagInput, TextArea's mentions and CommandPalette. It holds the active index, moves it with the
+ * arrow keys (stopping at the ends unless `wrap`), scrolls it into view, and names it `${id}-${index}`. When the list
+ * changes, the active option stays if it is still there (by `keyOf`), else the first usable one becomes active; with
+ * no usable option, `active` is -1.
+ */
+export function useActiveOption({
+  id,
+  list,
+  open,
+  count,
+  footer = false,
+  usable = everyOption,
+  wrap = false,
+  keyOf,
+}: ActiveOptionOptions) {
+  const total = footer ? count + 1 : count;
+  const stop = (index: number) => (index === count ? footer : usable(index));
+  const keyAt = (index: number) => (index === count ? FOOTER : keyOf ? keyOf(index) : index);
+  const [chosen, setChosen] = useState<unknown>(NONE);
+  const first = () => seekEnabled(count, -1, 1, usable);
+  const last = () => seekEnabled(total, total, -1, stop);
+  let active = -1;
+  if (chosen !== NONE)
+    for (let i = 0; i < total && active < 0; i++) if (keyAt(i) === chosen && stop(i)) active = i;
+  if (active < 0) active = first();
+  const optionId = (index: number) => `${id}-${index}`;
+  const setActive = (index: number) => setChosen(index < 0 ? NONE : keyAt(index));
+  // An option given way to (gone, or now disabled) is forgotten: it does not take over again if it comes back.
+  const shown = active < 0 ? NONE : keyAt(active);
+  useEffect(() => {
+    if (chosen !== NONE && shown !== chosen) setChosen(shown);
+  });
+  useEffect(() => {
+    if (open && active >= 0)
+      list.current?.querySelector(`[id="${id}-${active}"]`)?.scrollIntoView?.({ block: "nearest" });
+  }, [open, active, list, id]);
+  return {
+    /** The active option's index, or -1. */
+    active,
+    /** The active option's id while the list is open: the field's `aria-activedescendant`. */
+    activeId: open && active >= 0 ? optionId(active) : undefined,
+    /** Option `index`'s id. */
+    optionId,
+    /** Makes option `index` active (-1: none, so the first usable one is). */
+    setActive,
+    /** The first usable option's index, or -1. */
+    first,
+    /** The last usable option's index, or -1. */
+    last,
+    /** Makes the next usable option active (1) or the one before (-1). */
+    move: (step: 1 | -1) => {
+      const next = seekEnabled(total, active >= 0 ? active : step > 0 ? -1 : total, step, stop, wrap);
+      if (next >= 0) setActive(next);
+    },
   };
 }

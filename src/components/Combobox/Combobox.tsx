@@ -12,6 +12,7 @@ import { useControllableState } from "../../foundations/controllable.js";
 import { HiddenValue } from "../../foundations/HiddenValue/HiddenValue.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
 import { isComposing } from "../../foundations/keys.js";
+import { seekEnabled, useActiveOption } from "../../foundations/listbox.js";
 import { OptionIcon, type OptionIconColor } from "../../foundations/option-icon.js";
 import type { IconData } from "../../icons/types.js";
 import { useListboxLayer } from "../../overlay/listbox-layer.js";
@@ -118,8 +119,6 @@ const DEFAULT_LABELS: ComboboxLabels = {
   loading: "Loading…",
   required: "Please choose a value.",
 };
-/** The active row is the footer action, not an option. */
-const FOOTER = Symbol("footer");
 const contains = (option: ComboboxOption, text: string) =>
   option.label.toLowerCase().includes(text.trim().toLowerCase());
 
@@ -162,8 +161,6 @@ export function Combobox({
   const [open, setOpen] = useState(false);
   // True once the person has typed since the last choice: only then does the text filter the list.
   const [typing, setTyping] = useState(false);
-  // The active option's value, or FOOTER while the footer action is active.
-  const [activeValue, setActiveValue] = useState<string | typeof FOOTER | null>(null);
   const [missing, setMissing] = useState(false);
   const input = useRef<HTMLInputElement>(null);
   const anchor = useRef<HTMLElement | null>(null);
@@ -171,8 +168,20 @@ export function Combobox({
 
   const match = filter === false ? null : (filter ?? contains);
   const visible = match && typing ? options.filter((o) => match(o, typedText)) : options;
-  const enabled = visible.filter((o) => !o.disabled);
-  const activeIndex = visible.findIndex((o) => o.value === activeValue);
+  // The arrow keys' stops: the enabled options, then the footer action (one more option, after the last). The active
+  // option is followed by its value, so late or changed results keep it, else the first enabled one is active. Focus
+  // never moves (it stays in the input; the list uses aria-activedescendant), so typing is never interrupted.
+  const atFooter = footer ? visible.length : Number.NaN;
+  const usable = (i: number) => !visible[i]?.disabled;
+  const { active, activeId, optionId, setActive, first, move } = useActiveOption({
+    id: listId,
+    list,
+    open,
+    count: visible.length,
+    footer: !!footer,
+    usable,
+    keyOf: (i) => visible[i]?.value,
+  });
   // While people type, the text is marked where it appears in each label.
   const marked = typing ? typedText.trim() : "";
 
@@ -189,10 +198,10 @@ export function Combobox({
     setOpen(false);
   };
   const show = (at: "first" | "last" | "selected") => {
-    const pool = enabled;
-    const selected = pool.find((o) => o.value === current);
-    const pick = at === "selected" ? (selected ?? pool[0]) : at === "first" ? pool[0] : pool[pool.length - 1];
-    setActiveValue(pick?.value ?? null);
+    const selected = visible.findIndex((o) => o.value === current && !o.disabled);
+    // Opening upwards starts at the last option (the footer action is a key further).
+    const last = seekEnabled(visible.length, visible.length, -1, usable);
+    setActive(at === "selected" && selected >= 0 ? selected : at === "last" ? last : first());
     setOpen(true);
   };
   /**
@@ -219,31 +228,11 @@ export function Combobox({
     if (shownLabel && !typing && typedText === was) setText(shownLabel);
   });
 
-  // Late or changed results: keep the active option if it is still there, else the first enabled one. Focus never
-  // moves (it stays in the input; the list uses aria-activedescendant), so typing is never interrupted.
-  useEffect(() => {
-    if (!open || activeValue === FOOTER) return;
-    if (!enabled.some((o) => o.value === activeValue)) setActiveValue(enabled[0]?.value ?? null);
-  });
-
   // The list drops from the whole field (input and any end buttons), found before the layer shows.
   useClientLayoutEffect(() => {
     anchor.current = (input.current as HTMLInputElement).closest<HTMLElement>(".cy-text-field");
   });
   useListboxLayer({ anchor, list, open, onClose: () => setOpen(false) });
-  useEffect(() => {
-    if (open && activeIndex >= 0)
-      list.current?.querySelector(`#${listId}-${activeIndex}`)?.scrollIntoView?.({ block: "nearest" });
-  }, [open, activeIndex, listId]);
-
-  // The arrow keys' stops: the enabled options, then the footer action.
-  const stops: (string | typeof FOOTER)[] = enabled.map((o) => o.value);
-  if (footer) stops.push(FOOTER);
-  const move = (delta: 1 | -1) => {
-    const at = stops.indexOf(activeValue as string);
-    const next = stops[Math.min(Math.max(at + delta, 0), stops.length - 1)];
-    if (next !== undefined) setActiveValue(next);
-  };
   const runFooter = () => {
     setOpen(false);
     (footer as OptionListAction).onSelect();
@@ -263,8 +252,8 @@ export function Combobox({
         else move(-1);
         return;
       case "Enter": {
-        const option = visible[activeIndex];
-        if (open && activeValue === FOOTER) {
+        const option = visible[active];
+        if (open && active === atFooter) {
           event.preventDefault();
           runFooter();
         } else if (open && option) {
@@ -310,15 +299,7 @@ export function Combobox({
         aria-autocomplete={match ? "list" : "none"}
         aria-expanded={open}
         aria-controls={listId}
-        aria-activedescendant={
-          !open
-            ? undefined
-            : activeValue === FOOTER
-              ? `${listId}-footer`
-              : activeIndex >= 0
-                ? `${listId}-${activeIndex}`
-                : undefined
-        }
+        aria-activedescendant={activeId}
         value={typedText}
         onChange={(next) => {
           setText(next);
@@ -338,11 +319,11 @@ export function Combobox({
         footer={
           footer && (
             <OptionListItem
-              id={`${listId}-footer`}
+              id={optionId(atFooter)}
               label={footer.label}
               icon={footer.icon && <Icon icon={footer.icon} className="cy-combobox-icon" />}
-              active={activeValue === FOOTER}
-              onPointerMove={() => setActiveValue(FOOTER)}
+              active={active === atFooter}
+              onPointerMove={() => setActive(atFooter)}
               onClick={runFooter}
             />
           )
@@ -353,7 +334,7 @@ export function Combobox({
         {visible.map((option, index) => (
           <OptionListItem
             key={option.value}
-            id={`${listId}-${index}`}
+            id={optionId(index)}
             label={<HighlightedText text={option.label} query={marked} />}
             description={option.description}
             icon={<OptionIcon option={option} plain={option.disabled} className="cy-combobox-icon" />}
@@ -361,8 +342,8 @@ export function Combobox({
             disabled={option.disabled}
             dimmed={option.dimmed}
             trailing={option.trailing}
-            active={index === activeIndex}
-            onPointerMove={() => !option.disabled && setActiveValue(option.value)}
+            active={index === active}
+            onPointerMove={() => !option.disabled && setActive(index)}
             onClick={() => choose(option)}
           />
         ))}

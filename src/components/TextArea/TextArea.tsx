@@ -14,7 +14,7 @@ import {
 import { useDrag } from "../../foundations/drag.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
 import { isComposing } from "../../foundations/keys.js";
-import { clamp } from "../../foundations/math.js";
+import { useActiveOption } from "../../foundations/listbox.js";
 import { TextAreaBase } from "../../foundations/TextAreaBase/TextAreaBase.js";
 import { resizeCorner } from "../../icons/resize-corner.js";
 import { useListboxLayer } from "../../overlay/listbox-layer.js";
@@ -256,7 +256,6 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(function 
   const composing = useRef(false);
   const [mention, setMention] = useState<{ start: number; query: string } | null>(null);
   const [dismissed, setDismissed] = useState(-1);
-  const [active, setActive] = useState(0);
   const [found, setFound] = useState<{ items: TextAreaMention[]; loading: boolean }>({
     items: [],
     loading: false,
@@ -304,17 +303,16 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(function 
     : found.items;
   const loading = !fromList && found.loading;
   const listOpen = query !== null && (items.length > 0 || loading);
-  const at = clamp(active, 0, items.length - 1);
+  const { active, activeId, optionId, setActive, move } = useActiveOption({
+    id: listId,
+    list,
+    open: listOpen,
+    count: items.length,
+  });
   const close = () => {
     if (mention) setDismissed(mention.start);
   };
   useListboxLayer({ anchor: box, list, open: listOpen, onClose: close });
-  useEffect(() => {
-    if (listOpen)
-      list.current
-        ?.querySelector(`#${CSS.escape(`${listId}-${at}`)}`)
-        ?.scrollIntoView?.({ block: "nearest" });
-  }, [listOpen, listId, at]);
 
   const insert = (item: TextAreaMention) => {
     const area = inner.current as HTMLTextAreaElement;
@@ -335,12 +333,11 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(function 
   /** The list's keys while it is open; returns whether the key was used (then it is not passed on). */
   const mentionKey = (event: KeyboardEvent<HTMLTextAreaElement>) => {
     if (!listOpen || isComposing(event)) return false;
-    const pick = items[at];
+    const pick = items[active];
     const plain = !event.shiftKey && !event.ctrlKey && !event.metaKey && !event.altKey;
     if (event.key === "Escape") close();
     else if (!pick) return false;
-    else if (event.key === "ArrowDown" || event.key === "ArrowUp")
-      setActive(clamp(at + (event.key === "ArrowDown" ? 1 : -1), 0, items.length - 1));
+    else if (event.key === "ArrowDown" || event.key === "ArrowUp") move(event.key === "ArrowDown" ? 1 : -1);
     else if ((event.key === "Enter" || event.key === "Tab") && plain) insert(pick);
     else return false;
     event.preventDefault();
@@ -391,7 +388,7 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(function 
                       "aria-autocomplete": "list" as const,
                       "aria-haspopup": "listbox" as const,
                       "aria-controls": listOpen ? listId : undefined,
-                      "aria-activedescendant": listOpen && items.length ? `${listId}-${at}` : undefined,
+                      "aria-activedescendant": activeId,
                     }
                   : {})}
                 id={field.id}
@@ -449,11 +446,11 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(function 
                   items.map((item, index) => (
                     <OptionListItem
                       key={item.value}
-                      id={`${listId}-${index}`}
+                      id={optionId(index)}
                       label={item.label ?? item.value}
                       description={item.description}
-                      selected={index === at}
-                      active={index === at}
+                      selected={index === active}
+                      active={index === active}
                       onPointerMove={() => setActive(index)}
                       onClick={() => insert(item)}
                     />
