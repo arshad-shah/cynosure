@@ -27,6 +27,7 @@ import { HighlightedText } from "../HighlightedText/HighlightedText.js";
 import { IconButton } from "../IconButton/IconButton.js";
 import { LoadingDots } from "../LoadingDots/LoadingDots.js";
 import type { MenuEntry } from "../Menu/Menu.js";
+import { RowActions } from "../RowActions/RowActions.js";
 
 export interface TreeTokens {
   trailingInk: string;
@@ -751,7 +752,9 @@ const TreeRow = memo(function TreeRow({
         </>
       )}
       {actions?.length ? (
-        <span className="cy-tree-actions cy-reset">
+        // Shown while the row is hovered, holds focus or is selected; only the focused row's buttons are in the Tab
+        // order, right after it.
+        <RowActions className="cy-tree-actions" tabbable={tabbable} shown={selected}>
           {actions.map((action) => (
             <IconButton
               key={action.value}
@@ -761,12 +764,10 @@ const TreeRow = memo(function TreeRow({
               size="xs"
               variant="ghost"
               tone="neutral"
-              // Only the focused row's buttons are in the Tab order, right after it.
-              tabIndex={tabbable ? 0 : -1}
               onClick={() => calls.command(action.value, item)}
             />
           ))}
-        </span>
+        </RowActions>
       ) : null}
     </div>
   );

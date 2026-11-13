@@ -1,0 +1,37 @@
+/* row-actions: every visual property reads a --cy-row-actions-* token with a global fallback. Root never carries
+   .cy-reset. The one reveal rule for row actions: hidden by opacity (so they stay focusable and keep their place)
+   where there is hover, shown while their row (the parent, or an ancestor marked data-row-actions-host) is hovered
+   or holds focus, while a menu of theirs is open, or with
+   data-shown; always shown where there is no hover (touch). */
+.cy-row-actions.cy-row-actions {
+  box-sizing: border-box !important;
+  margin: 0;
+  letter-spacing: normal;
+  text-transform: none;
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--cy-row-actions-gap, var(--cy-space-1));
+  background: var(--cy-row-actions-background, transparent);
+  color: inherit;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: inherit;
+  transition: opacity var(--cy-motion-fast) var(--cy-motion-ease);
+}
+@media (hover: hover) {
+  .cy-row-actions.cy-row-actions {
+    opacity: 0;
+  }
+  :is(:hover, :focus-within) > .cy-row-actions.cy-row-actions,
+  [data-row-actions-host]:is(:hover, :focus-within) .cy-row-actions.cy-row-actions,
+  .cy-row-actions.cy-row-actions:is([data-shown], :focus-within, :has([aria-expanded="true"])) {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cy-row-actions.cy-row-actions {
+    transition: none;
+  }
+}

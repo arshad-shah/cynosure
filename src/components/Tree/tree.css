@@ -149,23 +149,10 @@
 .cy-tree-row[aria-selected="true"] > .cy-tree-trailing {
   color: inherit;
 }
-/* Row actions: shown while the row is hovered, holds focus or is selected; always on screens without hover. */
+/* Row actions (a RowActions, which shows and hides them): at the row's end. */
 .cy-tree-actions.cy-tree-actions {
-  display: inline-flex;
-  flex: none;
-  align-items: center;
-  gap: var(--cy-space-1);
   margin-inline-start: auto;
-  visibility: hidden;
 }
-.cy-tree-trailing + .cy-tree-actions {
+.cy-tree-trailing + .cy-tree-actions.cy-tree-actions {
   margin-inline-start: 0;
-}
-.cy-tree-row:is(:hover, :focus-within, [aria-selected="true"]) > .cy-tree-actions {
-  visibility: visible;
-}
-@media (hover: none) {
-  .cy-tree-actions.cy-tree-actions {
-    visibility: visible;
-  }
 }
