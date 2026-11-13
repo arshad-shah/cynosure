@@ -4,13 +4,9 @@ import {
   type MouseEvent,
   type ReactNode,
   type Ref,
-  type RefObject,
-  useEffect,
   useImperativeHandle,
   useRef,
-  useState,
 } from "react";
-import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
 import { mergeRefs } from "../../foundations/refs.js";
 import { TOOLBAR_ITEMS, useRovingFocus } from "../../foundations/roving-focus.js";
@@ -141,24 +137,8 @@ const BUTTON_VARIANT: Record<StatusBarSegmentVariant, ButtonVariant> = {
   solid: "solid",
 };
 
-/** True while the element's text is cut short (it overflows its box). `kind` changes when the element is replaced. */
-function useTruncated(el: RefObject<HTMLElement | null>, kind: string) {
-  const [truncated, setTruncated] = useState(false);
-  // After every render (the text may have changed while the box kept its width)…
-  useClientLayoutEffect(() => {
-    const node = el.current;
-    if (node) setTruncated(node.scrollWidth > node.clientWidth);
-  });
-  // …and whenever the box is resized (the window, the bar, a neighbouring segment).
-  useEffect(() => {
-    const node = el.current;
-    if (!node || typeof ResizeObserver === "undefined") return;
-    const observer = new ResizeObserver(() => setTruncated(node.scrollWidth > node.clientWidth));
-    observer.observe(node);
-    return () => observer.disconnect();
-  }, [el, kind]);
-  return truncated;
-}
+/** The text inside a segment: what its tooltip shows in full while it is cut short. */
+const textOf = (segment: HTMLElement) => segment.querySelector<HTMLElement>(".cy-status-bar-segment-text");
 
 /**
  * One segment of a StatusBar: short text with an icon or a status dot. With `onClick` or `popover` it is a button;
@@ -189,9 +169,7 @@ export const StatusBarSegment = forwardRef<HTMLElement, StatusBarSegmentProps>(f
   },
   ref,
 ) {
-  const text = useRef<HTMLSpanElement>(null);
   const kind = popover !== undefined ? "popover" : onClick !== undefined ? "button" : "static";
-  const truncated = useTruncated(text, kind);
   const content = (
     <span className="cy-reset cy-status-bar-segment-content">
       {dot && (
@@ -200,7 +178,7 @@ export const StatusBarSegment = forwardRef<HTMLElement, StatusBarSegmentProps>(f
         </span>
       )}
       {icon && <Icon icon={icon} size="sm" />}
-      <span ref={text} className="cy-status-bar-segment-text" data-mono={mono ? "" : undefined}>
+      <span className="cy-status-bar-segment-text" data-mono={mono ? "" : undefined}>
         {children}
       </span>
     </span>
@@ -208,7 +186,7 @@ export const StatusBarSegment = forwardRef<HTMLElement, StatusBarSegmentProps>(f
 
   if (kind === "static")
     return (
-      <Tooltip content={truncated ? children : null} disabled={!truncated} className="cy-status-bar-item">
+      <Tooltip content={children} whenTruncated={textOf} className="cy-status-bar-item">
         <span
           ref={ref as Ref<HTMLSpanElement>}
           {...rest}
@@ -223,7 +201,7 @@ export const StatusBarSegment = forwardRef<HTMLElement, StatusBarSegmentProps>(f
     );
 
   const button = (trigger?: PopoverTriggerProps) => (
-    <Tooltip content={truncated ? children : null} disabled={!truncated} className="cy-status-bar-item">
+    <Tooltip content={children} whenTruncated={textOf} className="cy-status-bar-item">
       <Button
         {...rest}
         {...trigger}

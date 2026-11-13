@@ -248,6 +248,9 @@ interface TabMenu {
 /** The list's one ContextMenu, shared with its tabs: the props that make a tab one of its targets. */
 const MenuContext = createContext<((menu: TabMenu) => ContextMenuKeyTargetProps) | null>(null);
 
+/** The label inside a tab: the text a tooltip shows in full while it is cut short. */
+const labelOf = (tab: HTMLElement) => tab.querySelector<HTMLElement>(".cy-tab-label");
+
 /** The tab inside a list child (a tab, or a closable tab's slot). */
 const tabIn = (el: Element) =>
   (el.matches('[role="tab"]') ? el : el.querySelector('[role="tab"]')) as HTMLElement;
@@ -542,21 +545,6 @@ export function Tab({
     contextMenu && targetFor
       ? targetFor({ value, name, items: contextMenu, onSelect: onCommand })
       : undefined;
-  // A label cut short by `--cy-tabs-label-max-width` shows its full text in a tooltip. The tooltip is always there (off
-  // while the label fits), so the tab is never remounted when its text grows or shrinks.
-  const [cut, setCut] = useState(false);
-  const measure = useCallback(() => {
-    const label = labelRef.current;
-    if (label) setCut(label.scrollWidth > label.clientWidth);
-  }, []);
-  useClientLayoutEffect(measure);
-  useClientLayoutEffect(() => {
-    const label = labelRef.current;
-    if (!label) return;
-    const observer = new ResizeObserver(measure);
-    observer.observe(label);
-    return () => observer.disconnect();
-  }, [measure]);
   const button = (
     <ButtonBase
       role="tab"
@@ -605,9 +593,10 @@ export function Tab({
       </span>
     </ButtonBase>
   );
-  // The tip repeats the tab's name for the eye (the name already holds the whole text), so it describes nothing.
+  // A label cut short by `--cy-tabs-label-max-width` shows its full text in a tooltip, for the eye only (the name
+  // already holds it). The tooltip is always there (off while the label fits), so the tab is never remounted.
   const tab = (
-    <Tooltip content={children} disabled={!cut} describe={false} placement="bottom" className="cy-tab-tip">
+    <Tooltip content={children} whenTruncated={labelOf} placement="bottom" className="cy-tab-tip">
       {button}
     </Tooltip>
   );

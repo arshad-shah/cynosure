@@ -51,6 +51,40 @@ export interface TooltipProps {
    * ellipsis: it is shown but hidden from assistive technology, and does not describe the trigger. Default true.
    */
   describe?: boolean | undefined;
+  /**
+   * Show the tip only while text is cut short (it overflows its box, as with an ellipsis), for the full text of a
+   * label: `true` measures the trigger, a function picks the element inside it that holds the text. It is measured
+   * after every render and whenever the element is resized, and the tip repeats the trigger's name, so it implies
+   * `describe={false}`.
+   */
+  whenTruncated?: boolean | ((trigger: HTMLElement) => HTMLElement | null) | undefined;
+}
+
+/**
+ * Whether the text `whenTruncated` names is cut short: measured after every render (the text may change while the box
+ * keeps its width) and, through one ResizeObserver, whenever its box is resized (the window, a neighbour). Off: false.
+ */
+function useTruncated(whenTruncated: TooltipProps["whenTruncated"], trigger: () => HTMLElement | null) {
+  const [cut, setCut] = useState(false);
+  const watched = useRef<{ el: HTMLElement; observer: ResizeObserver | undefined } | null>(null);
+  useClientLayoutEffect(() => {
+    const host = whenTruncated ? trigger() : null;
+    const el = host && typeof whenTruncated === "function" ? whenTruncated(host) : host;
+    const measure = () => {
+      const node = watched.current?.el;
+      setCut(!!node && node.scrollWidth > node.clientWidth);
+    };
+    if (el !== (watched.current?.el ?? null)) {
+      watched.current?.observer?.disconnect();
+      watched.current = el
+        ? { el, observer: typeof ResizeObserver === "undefined" ? undefined : new ResizeObserver(measure) }
+        : null;
+      watched.current?.observer?.observe(el as HTMLElement);
+    }
+    measure();
+  });
+  useEffect(() => () => watched.current?.observer?.disconnect(), []);
+  return cut;
 }
 
 /**
@@ -63,8 +97,9 @@ export function Tooltip({
   placement = "top",
   delay = 300,
   className,
-  disabled = false,
-  describe = true,
+  disabled: off = false,
+  describe: describes = true,
+  whenTruncated,
 }: TooltipProps) {
   const id = `cy-tip-${useId().replace(/:/g, "")}`;
   const anchor = useRef<HTMLSpanElement>(null);
@@ -76,21 +111,23 @@ export function Tooltip({
   // Focus that follows a pointer press (mouse or touch) is not keyboard focus: hover handles mouse, touch never opens.
   const pointerFocus = useRef(false);
 
-  const off = useRef(disabled);
-  off.current = disabled;
+  const cut = useTruncated(whenTruncated, trigger);
+  const disabled = off || (whenTruncated ? !cut : false);
+  const describe = describes && !whenTruncated;
+  const disabledNow = useRef(disabled);
+  disabledNow.current = disabled;
   const show = useCallback((wait: number) => {
     clearTimeout(timer.current);
-    if (off.current) return;
+    if (disabledNow.current) return;
     timer.current = setTimeout(() => setOpen(true), wait);
   }, []);
-  // Disabled while open (a label stopped being cut short): close, so it does not reappear when enabled again.
-  if (disabled && open) setOpen(false);
   const hide = useCallback((wait = 0) => {
     clearTimeout(timer.current);
     timer.current = setTimeout(() => setOpen(false), wait);
   }, []);
 
   useEffect(() => () => clearTimeout(timer.current), []);
+  // Disabled while open (a label stopped being cut short): close, so it does not reappear when enabled again.
   useEffect(() => {
     if (disabled) {
       clearTimeout(timer.current);
