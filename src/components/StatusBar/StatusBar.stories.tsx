@@ -175,6 +175,34 @@ export const DotTones: Story = {
   },
 };
 
+export const LayoutPropsAndAnOpenPopover: Story = {
+  args: {
+    start: (
+      <>
+        <StatusBarSegment onClick={() => {}} className="pushed" style={{ marginInlineStart: 12 }}>
+          spaced
+        </StatusBarSegment>
+        <StatusBarSegment popover={<p>Branch details</p>} defaultOpen>
+          main
+        </StatusBarSegment>
+      </>
+    ),
+    end: null,
+  },
+  play: async ({ canvas, canvasElement }) => {
+    // className and style reach a clickable segment's button, beside its own class.
+    const spaced = canvas.getByRole("button", { name: "spaced" });
+    await expect(spaced).toHaveClass("cy-status-bar-button", "pushed");
+    await expect(getComputedStyle(spaced).marginInlineStart).toBe("12px");
+    // A popover open from the start, named by nothing given (its text is not a string): open, with an empty name.
+    const branch = canvas.getByRole("button", { name: "main" });
+    await expect(branch).toHaveAttribute("aria-expanded", "true");
+    await waitFor(() =>
+      expect(canvasElement.ownerDocument.querySelector("[popover]:popover-open")).not.toBeNull(),
+    );
+  },
+};
+
 export const SoftTintToken: Story = {
   args: {
     start: (

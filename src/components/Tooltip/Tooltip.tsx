@@ -66,7 +66,7 @@ export interface TooltipProps {
  */
 function useTruncated(whenTruncated: TooltipProps["whenTruncated"], trigger: () => HTMLElement | null) {
   const [cut, setCut] = useState(false);
-  const watched = useRef<{ el: HTMLElement; observer: ResizeObserver | undefined } | null>(null);
+  const watched = useRef<{ el: HTMLElement; observer: ResizeObserver } | null>(null);
   useClientLayoutEffect(() => {
     const host = whenTruncated ? trigger() : null;
     const el = host && typeof whenTruncated === "function" ? whenTruncated(host) : host;
@@ -75,15 +75,13 @@ function useTruncated(whenTruncated: TooltipProps["whenTruncated"], trigger: () 
       setCut(!!node && node.scrollWidth > node.clientWidth);
     };
     if (el !== (watched.current?.el ?? null)) {
-      watched.current?.observer?.disconnect();
-      watched.current = el
-        ? { el, observer: typeof ResizeObserver === "undefined" ? undefined : new ResizeObserver(measure) }
-        : null;
-      watched.current?.observer?.observe(el as HTMLElement);
+      watched.current?.observer.disconnect();
+      watched.current = el ? { el, observer: new ResizeObserver(measure) } : null;
+      watched.current?.observer.observe(el as HTMLElement);
     }
     measure();
   });
-  useEffect(() => () => watched.current?.observer?.disconnect(), []);
+  useEffect(() => () => watched.current?.observer.disconnect(), []);
   return cut;
 }
 
