@@ -206,7 +206,8 @@ export const SpinnerSizesAndColour: Story = {
   ),
   play: async ({ canvas }) => {
     const svg = (id: string) => spinner(canvas.getByTestId(id)) as SVGSVGElement;
-    const width = (id: string) => svg(id).getBoundingClientRect().width;
+    // Laid-out width, not the on-screen box, which widens as the square turns.
+    const width = (id: string) => Number.parseFloat(getComputedStyle(svg(id)).width);
     // Icon-sized: one em of its size.
     await expect(width("sm")).toBeCloseTo(12, 0);
     await expect(width("md")).toBeCloseTo(16, 0);
@@ -252,7 +253,8 @@ export const SpinnerInButton: Story = {
     await expect(svg.parentElement).toHaveClass("cy-loading-dots", "connect-spinner");
     // Sits on the text's line, sized like its text and coloured like it.
     const size = Number.parseFloat(getComputedStyle(button).fontSize);
-    await expect(svg.getBoundingClientRect().width).toBeCloseTo(size, 0);
+    // Its laid-out width: the on-screen box of a square mid-turn is wider than the square.
+    await expect(Number.parseFloat(getComputedStyle(svg).width)).toBeCloseTo(size, 0);
     await expect(getComputedStyle(svg).stroke).toBe(getComputedStyle(button).color);
     // A Button plays its icons' hover motion; the spinner has none to add to its turning.
     await expect(svg).not.toHaveAttribute("data-motion");
