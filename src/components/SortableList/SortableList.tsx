@@ -5,6 +5,7 @@ import { useControllableState } from "../../foundations/controllable.js";
 import { isRtl } from "../../foundations/dir.js";
 import { clamp } from "../../foundations/math.js";
 import { motionMs } from "../../foundations/motion.js";
+import { moveItems } from "../../foundations/reorder.js";
 import { grip } from "../../icons/grip.js";
 import type { Size } from "../../tokens/schema.js";
 import { IconButton } from "../IconButton/IconButton.js";
@@ -75,12 +76,7 @@ const DEFAULT_LABELS: SortableListLabels = {
   cancelled: (label) => `Move cancelled. ${label} is back where it was.`,
 };
 
-const moveItem = <T,>(list: T[], from: number, to: number) => {
-  const next = [...list];
-  const [item] = next.splice(from, 1);
-  next.splice(to, 0, item as T);
-  return next;
-};
+const byId = (item: SortableItem) => item.id;
 
 /**
  * A list people put in order: drag a row by its handle (mouse, pen or touch), or focus the handle, press Space and
@@ -133,7 +129,7 @@ export function SortableList({
     };
   };
   const plan = moving?.by === "keyboard" && target !== null ? planOf(committed) : null;
-  const shown = plan ? moveItem(committed, plan.from, plan.to) : committed;
+  const shown = plan ? moveItems(committed, [plan.item.id], plan.to, byId) : committed;
   const total = shown.length;
 
   const handleOf = (itemId: string) =>
@@ -158,7 +154,7 @@ export function SortableList({
     // The row was removed meanwhile: nothing to drop.
     if (!p) return;
     setSaid(text.dropped(p.item.label, p.to + 1, committed.length));
-    if (p.to !== p.from) setCommitted(moveItem(committed, p.from, p.to));
+    if (p.to !== p.from) setCommitted(moveItems(committed, [p.item.id], p.to, byId));
   };
   const cancel = () => {
     const p = planOf(committed);
@@ -268,8 +264,9 @@ export function SortableList({
         node.remove();
         el.insertBefore(node, el.children[from.index] ?? null);
         const { committed: now, text: words } = latest.current;
-        const next = moveItem(now, from.index, to.index);
-        setSaid(words.dropped((now[from.index] as SortableItem).label, to.index + 1, next.length));
+        const moved = now[from.index] as SortableItem;
+        const next = moveItems(now, [moved.id], to.index, byId);
+        setSaid(words.dropped(moved.label, to.index + 1, next.length));
         setCommitted(next);
       },
       onEnd: (node, cancelled) => {
