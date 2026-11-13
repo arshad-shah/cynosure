@@ -241,6 +241,11 @@ export const WideningClosesTheDrawer: Story = {
     await waitFor(() => expect(sheet()?.open).toBe(true));
     // Widened, the navigation moves back beside the content; narrowed again, the drawer stays shut until asked.
     frame(canvasElement).style.inlineSize = "900px";
+    // Wait for the shell itself to be wide: the open drawer holds the same "Main" navigation, so seeing it proves
+    // nothing, and narrowing again before the shell measured the wide width left the drawer rightly open (Firefox
+    // and WebKit report sizes later; CI on #167).
+    const shell = canvasElement.querySelector(".cy-app-shell") as HTMLElement;
+    await waitFor(() => expect(shell).not.toHaveAttribute("data-narrow"), RESIZE);
     await waitFor(() => expect(canvas.getByRole("navigation", { name: "Main" })).toBeVisible(), RESIZE);
     frame(canvasElement).style.inlineSize = "600px";
     await waitFor(
