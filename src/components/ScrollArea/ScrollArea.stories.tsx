@@ -153,13 +153,20 @@ export const WithoutFollowNewContentStaysBelow: Story = {
 export const OverlayStaysPut: Story = {
   render: () => (
     <div style={{ blockSize: 200, inlineSize: 320 }}>
-      <ScrollArea label="Log" overlay={<Badge tone="accent">3 new</Badge>} data-testid="area">
+      <ScrollArea
+        label="Log"
+        overlay={<Badge tone="accent">3 new</Badge>}
+        data-testid="area"
+        className="layout-probe"
+      >
         {lines(40)}
       </ScrollArea>
     </div>
   ),
   play: async ({ canvas, canvasElement }) => {
     const area = canvas.getByTestId("area");
+    // A layout class goes beside the area's own.
+    await expect(area).toHaveClass("cy-scroll-area", "layout-probe");
     const pill = canvas.getByText("3 new");
     const where = () => {
       const [a, p] = [area.getBoundingClientRect(), pill.getBoundingClientRect()];

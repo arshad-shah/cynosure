@@ -1,6 +1,7 @@
 import { type RefObject, useMemo, useState } from "react";
 import { useClientLayoutEffect } from "./client-layout-effect.js";
 import { isRtl } from "./dir.js";
+import { alignedScroll, type ScrollAlign } from "./scroll-align.js";
 
 export interface VirtualWindowOptions {
   /** How many rows there are in all. */
@@ -44,8 +45,13 @@ export interface VirtualWindow {
   total: number;
   /** Pass the scroller's scrollTop on scroll (with `axis: "x"`, `Math.abs(scrollLeft)`). */
   onScroll: (top: number) => void;
-  /** Scrolls the least distance that brings row `index` fully into view. */
-  reveal: (index: number) => void;
+  /**
+   * Scrolls row `index` into view: `nearest` (default) the least distance that shows it whole (its start when it is
+   * longer than the view), `start` to the start of the view, `center` to the middle.
+   */
+  reveal: (index: number, align?: ScrollAlign) => void;
+  /** The row at content offset `y`: the first row that ends below it (`count` past the last row). */
+  rowAt: (y: number) => number;
   /** Where row `index` starts, from the top of the content. */
   offsetOf: (index: number) => number;
   /** Row `index`'s size. */
@@ -141,7 +147,8 @@ export function useVirtualWindow(
     sizeOf,
     view: { top: view.top, height: view.height, width: view.width },
     onScroll: (top) => setView((v) => (v.top === top ? v : { ...v, top })),
-    reveal: (index) => {
+    rowAt,
+    reveal: (index, align = "nearest") => {
       const el = scroller.current;
       if (!enabled || !el) return;
       const x = axis === "x";
@@ -149,9 +156,7 @@ export function useVirtualWindow(
       const sign = x && isRtl(el) ? -1 : 1;
       const at = x ? Math.abs(el.scrollLeft) : el.scrollTop;
       const length = (x ? el.clientWidth : el.clientHeight) - inset;
-      const top = offsetOf(index);
-      const size = sizeOf(index);
-      const to = top < at ? top : top + size > at + length ? top + size - length : at;
+      const to = alignedScroll(at, length, offsetOf(index), sizeOf(index), align);
       if (to === at) return;
       if (x) el.scrollLeft = to * sign;
       else el.scrollTop = to;
