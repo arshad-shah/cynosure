@@ -41,6 +41,7 @@ describe("editor themes", () => {
     for (const name of PALETTES)
       for (const [key, value] of Object.entries(editorColors(createTheme(), name)))
         expect(value, `${name} ${key}`).toMatch(HEX);
+    expect(editorColors()).toEqual(editorColors(createTheme(), "light"));
   });
   it("build a Monaco theme without importing Monaco", () => {
     const light = monacoTheme();
