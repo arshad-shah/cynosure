@@ -52,7 +52,13 @@ export const ButtonOpensThePicker: Story = {
     const picked = [file("a.png", "image/png")];
     await userEvent.upload(input, picked);
     await expect(args.onFiles).toHaveBeenLastCalledWith(picked);
-    await expect(canvas.getByRole("status")).toHaveTextContent("1 file added");
+    const status = canvas.getByRole("status");
+    await expect(status).toHaveTextContent("1 file added");
+    // The same words again are a new node, so a second pick is announced too.
+    const first = status.firstElementChild;
+    await userEvent.upload(input, [file("b.png", "image/png")]);
+    await expect(status).toHaveTextContent("1 file added");
+    await expect(status.firstElementChild).not.toBe(first);
   },
 };
 
