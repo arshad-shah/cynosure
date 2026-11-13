@@ -63,8 +63,6 @@ export type TextAreaSuggestions =
 export interface TextAreaLabels {
   /** The character counter. */
   count: (count: number, max?: number) => string;
-  /** Name of the suggestion list. Default: "Suggestions". */
-  suggestions: string;
   /** Shown in the suggestion list while a promise is pending. Default: "Loading…". */
   loading: string;
 }
@@ -108,7 +106,7 @@ export interface TextAreaProps extends NativeArea {
   suggestions?: TextAreaSuggestions | undefined;
   /** Called with the suggestion chosen, after it is inserted. */
   onMention?: ((item: TextAreaMention) => void) | undefined;
-  /** Replace the built-in English text: the character counter, the suggestion list's name and its loading note. */
+  /** Replace the built-in English text: the character counter and the suggestion list's loading note. */
   labels?: Partial<TextAreaLabels>;
   /** Added to the root element, for layout. */
   className?: string;
@@ -118,7 +116,6 @@ export interface TextAreaProps extends NativeArea {
 
 const DEFAULT_LABELS: TextAreaLabels = {
   count: (n, max) => (max ? `${n} / ${max}` : `${n} characters`),
-  suggestions: "Suggestions",
   loading: "Loading…",
 };
 
@@ -436,8 +433,9 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(function 
                 {text.count(count, maxLength)}
               </span>
             )}
+            {/* Named by the field's label, as Combobox's and TagInput's lists are. */}
             {mentions && (
-              <OptionList ref={list} id={listId} label={text.suggestions} busy={loading}>
+              <OptionList ref={list} id={listId} aria-labelledby={field.labelId} busy={loading}>
                 {items.length === 0 ? (
                   <OptionListNote>{text.loading}</OptionListNote>
                 ) : (
