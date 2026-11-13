@@ -23,8 +23,8 @@ const meta = {
     tone: { control: "select", options: TONES },
     title: { control: "text" },
     dismissible: { control: "boolean" },
-    variant: { control: "inline-radio", options: ["soft", "filled"] },
-    compact: { control: "boolean" },
+    variant: { control: "inline-radio", options: ["soft", "solid"] },
+    size: { control: "inline-radio", options: ["sm", "md"] },
   },
 } satisfies Meta<typeof Notice>;
 export default meta;
@@ -83,9 +83,9 @@ function resolvedBg(el: Element, value: string): string {
   return out;
 }
 
-export const FilledReadableInEveryToneAndMode: Story = {
+export const SolidReadableInEveryToneAndMode: Story = {
   tags: ["visual"],
-  args: { variant: "filled", dismissible: true },
+  args: { variant: "solid", dismissible: true },
   render: (args) => (
     <Stack gap="4">
       {(["light", "dark"] as const).map((mode) => (
@@ -128,21 +128,21 @@ export const FilledReadableInEveryToneAndMode: Story = {
   },
 };
 
-export const CompactSitsOnOneLineWhenItFits: Story = {
+export const SmallSitsOnOneLineWhenItFits: Story = {
   args: { title: "Offline", children: "Changes will upload later." },
   render: (args) => (
     <Stack gap="4">
       <div data-testid="regular" style={{ width: 640 }}>
         <Notice {...args} dismissible />
       </div>
-      <div data-testid="compact" style={{ width: 640 }}>
-        <Notice {...args} compact dismissible />
+      <div data-testid="small" style={{ width: 640 }}>
+        <Notice {...args} size="sm" dismissible />
       </div>
       <div data-testid="narrow" style={{ width: 220 }}>
-        <Notice {...args} compact dismissible />
+        <Notice {...args} size="sm" dismissible />
       </div>
-      <div data-testid="filled" style={{ width: 640 }}>
-        <Notice {...args} compact variant="filled" tone="danger" />
+      <div data-testid="solid" style={{ width: 640 }}>
+        <Notice {...args} size="sm" variant="solid" tone="danger" />
       </div>
     </Stack>
   ),
@@ -150,12 +150,12 @@ export const CompactSitsOnOneLineWhenItFits: Story = {
     const part = (id: string, selector: string) =>
       (canvas.getByTestId(id).querySelector(selector) as HTMLElement).getBoundingClientRect();
     const root = (id: string) => canvas.getByTestId(id).querySelector(".cy-notice") as HTMLElement;
-    // Compact: less padding, so a shorter box than the regular Notice.
+    // Small: less padding, so a shorter box than the regular Notice.
     const pad = (id: string) => Number.parseFloat(getComputedStyle(root(id)).paddingTop);
-    await expect(pad("compact")).toBeLessThan(pad("regular"));
-    await expect(part("compact", ".cy-notice").height).toBeLessThan(part("regular", ".cy-notice").height);
+    await expect(pad("small")).toBeLessThan(pad("regular"));
+    await expect(part("small", ".cy-notice").height).toBeLessThan(part("regular", ".cy-notice").height);
     // When it fits, the title and the message share one line, the message after the title.
-    for (const id of ["compact", "filled"]) {
+    for (const id of ["small", "solid"]) {
       const title = part(id, ".cy-notice-title");
       const body = part(id, ".cy-notice-body");
       await expect({ id, sameLine: Math.abs(body.top - title.top) <= 1 }).toEqual({ id, sameLine: true });
@@ -171,23 +171,21 @@ export const CompactSitsOnOneLineWhenItFits: Story = {
     );
     await expect(root("narrow").scrollWidth).toBeLessThanOrEqual(root("narrow").clientWidth);
     // The icon and the close button stay centred on the line.
-    const title = part("compact", ".cy-notice-title");
+    const title = part("small", ".cy-notice-title");
     const mid = title.top + title.height / 2;
     for (const selector of [".cy-notice-icon", '[aria-label="Dismiss"] svg']) {
-      const box = part("compact", selector);
+      const box = part("small", selector);
       await expect({ selector, centred: Math.abs(box.top + box.height / 2 - mid) <= 2 }).toEqual({
         selector,
         centred: true,
       });
     }
     // In right-to-left text the message follows the title leftwards.
-    root("compact").setAttribute("dir", "rtl");
-    await expect(part("compact", ".cy-notice-body").right).toBeLessThan(
-      part("compact", ".cy-notice-title").left,
-    );
-    root("compact").removeAttribute("dir");
-    // Host CSS cannot undo the compact or the filled look.
-    for (const id of ["compact", "filled"]) {
+    root("small").setAttribute("dir", "rtl");
+    await expect(part("small", ".cy-notice-body").right).toBeLessThan(part("small", ".cy-notice-title").left);
+    root("small").removeAttribute("dir");
+    // Host CSS cannot undo the small or the solid look.
+    for (const id of ["small", "solid"]) {
       for (const selector of [".cy-notice", ".cy-notice-text", ".cy-notice-title"]) {
         const { clean, hostile } = computeUnderHostileHost(canvas.getByTestId(id), selector, [
           "padding-top",
