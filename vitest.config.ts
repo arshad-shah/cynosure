@@ -18,7 +18,22 @@ const emulateMedia: BrowserCommand<
     },
   ]
 > = async ({ page }, media) => {
-  await page.emulateMedia(media);
+  // `null` should put a feature back, but on WebKit an emulated "reduce" outlived it and reached the next file (CI on
+  // #167, 2026-11-13). Put back Playwright's own starting values instead.
+  const initial = {
+    reducedMotion: "no-preference",
+    contrast: "no-preference",
+    forcedColors: "none",
+    colorScheme: "light",
+  };
+  await page.emulateMedia(
+    Object.fromEntries(
+      Object.entries(media).map(([feature, value]) => [
+        feature,
+        value ?? initial[feature as keyof typeof initial],
+      ]),
+    ),
+  );
 };
 
 const engines = (process.env.CY_BROWSERS ?? "chromium,firefox,webkit").split(",") as (
