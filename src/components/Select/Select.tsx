@@ -31,9 +31,6 @@ import {
 } from "../OptionList/OptionList.js";
 
 export interface SelectTokens {
-  fontSizeXs: string;
-  paddingInlineXs: string;
-  heightXs: string;
   radius: string;
   bg: string;
   border: string;

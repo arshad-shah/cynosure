@@ -7,8 +7,6 @@ import type { IconData } from "../../icons/types.js";
 import type { DenseSize, Tone } from "../../tokens/schema.js";
 
 export interface SegmentedControlTokens {
-  fontSizeXs: string;
-  heightXs: string;
   radius: string;
   trackBg: string;
   activeBg: string;

@@ -27,9 +27,8 @@ Works in native forms: `FormData`, `form.reset()` and `required` validation. Wit
 
 ## Tokens
 
-- `--cy-text-field-font-size-xs`: Text size of an `xs` field. Default `--cy-font-size-xs`.
 - `--cy-text-field-padding-inline-xs`: Inline padding of an `xs` field. Default `--cy-space-4`.
-- `--cy-text-field-height-xs`: Height of an `xs` field. Default the `--cy-space-7` step (20px at comfortable scale).
+- `--cy-text-field-height-xs`: Height of an `xs` field. Default `--cy-control-height-xs` (20px at comfortable scale).
 
 - `--cy-text-field-{height-sm,height-md,height-lg,radius,padding-inline,bg,border,soft-bg}`
 - `--cy-text-field-numeric`: `font-variant-numeric` of the typed text (default `normal`); DateField, NumberField and TimeField set `tabular-nums` so digits line up.

@@ -42,7 +42,7 @@ function buildGlobal(input: ThemeInput): GlobalTokens {
   const scale = scaleOf(input.scale);
   const g = structuredClone(BASE_GLOBAL);
   const px = (n: number) => Math.round(n * scale * 100) / 100;
-  for (const k of ["sm", "md", "lg"] as const) g.control.height[k] = px(g.control.height[k]);
+  for (const k of ["xs", "sm", "md", "lg"] as const) g.control.height[k] = px(g.control.height[k]);
   for (const k of Object.keys(g.space) as (keyof typeof g.space)[]) g.space[k] = px(g.space[k]);
   for (const k of Object.keys(g.font.size) as (keyof typeof g.font.size)[])
     g.font.size[k] = px(g.font.size[k]);

@@ -20,7 +20,6 @@ import { Field, type FieldProps } from "../Field/Field.js";
 import { IconButton } from "../IconButton/IconButton.js";
 
 export interface TextFieldTokens {
-  fontSizeXs: string;
   paddingInlineXs: string;
   heightXs: string;
   heightSm: string;

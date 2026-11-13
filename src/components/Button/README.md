@@ -40,6 +40,5 @@ Every variant × tone pair is distinct and keeps text at ≥ 4.5:1 (tested). Sof
 
 - `--cy-button-hover-bg`: Fill on hover. Default: the variant's own hover fill. Set it on one button for a hover that differs from its variant (TitleBar's close control goes danger-filled).
 - `--cy-button-hover-ink`: Text and icon colour on hover. Default: unchanged.
-- `--cy-button-font-size-xs`: Text size of an `xs` button. Default `--cy-font-size-xs`.
 - `--cy-button-padding-inline-xs`: Inline padding of an `xs` button. Default `--cy-space-4`.
-- `--cy-button-height-xs`: Height of an `xs` button. Default the `--cy-space-7` step (20px at comfortable scale).
+- `--cy-button-height-xs`: Height of an `xs` button. Default `--cy-control-height-xs` (20px at comfortable scale).

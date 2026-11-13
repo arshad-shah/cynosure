@@ -169,9 +169,9 @@
   }
   /* xs: dense desktop chrome. Only the look shrinks; ::before keeps the hit area at --_hit. */
   &[data-size="xs"] {
-    --_h: var(--cy-button-height-xs, var(--cy-space-7));
+    --_h: var(--cy-button-height-xs, var(--cy-control-height-xs));
     padding-inline: var(--cy-button-padding-inline-xs, var(--cy-space-4));
-    font-size: var(--cy-button-font-size-xs, var(--cy-font-size-xs));
+    font-size: var(--cy-font-size-xs);
   }
   &[data-size="lg"] {
     --_h: var(--cy-button-height-lg, var(--cy-control-height-lg));

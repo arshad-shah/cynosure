@@ -74,11 +74,11 @@
   /* xs: dense desktop chrome. The field looks 20px tall and does not grow to the hit size; the transparent input
      reaches past the field's edges instead, so a press just outside it still lands in the input. */
   &[data-size="xs"] {
-    --_h: var(--cy-text-field-height-xs, var(--cy-space-7));
+    --_h: var(--cy-text-field-height-xs, var(--cy-control-height-xs));
     min-block-size: var(--_h);
     gap: var(--cy-space-2);
     padding-inline: var(--cy-text-field-padding-inline-xs, var(--cy-space-4));
-    font-size: var(--cy-text-field-font-size-xs, var(--cy-font-size-xs));
+    font-size: var(--cy-font-size-xs);
     & .cy-text-field-input {
       block-size: max(100%, var(--_hit));
     }
