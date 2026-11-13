@@ -146,7 +146,6 @@ export function Menubar({ label, menus, onSelect, size = "md", className, style 
               focusOn={focusOn}
               anchor={title}
               placement="bottom"
-              offset={4}
               inside={[title]}
               returnFocus={title}
             />

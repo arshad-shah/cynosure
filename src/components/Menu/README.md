@@ -29,3 +29,7 @@ An item with `items` opens a **submenu** beside it (end side, flipping at the vi
 - Icons are muted by default (and take a danger item's colour). `iconTone` and `iconColor` colour one item's icon, with the meaning of Icon's `tone` and `color` (`iconColor` is any CSS colour and overrides `iconTone`), the same two fields as Select and Combobox options. The highlighted item keeps the colour; a disabled item shows the icon muted. Keep the label meaningful without the colour.
 
 Tokens: `--cy-menu-min-width`, `--cy-menu-max-width`, `--cy-menu-radius`, `--cy-menu-row-height`.
+
+## Tokens
+
+- `--cy-menu-offset`: Gap between a menu and its trigger (Menu's button, a Menubar title). Default `--cy-space-2`.
