@@ -2,9 +2,7 @@ import {
   type CSSProperties,
   type FocusEvent,
   type KeyboardEvent,
-  type MouseEvent,
   memo,
-  type PointerEvent,
   type ReactNode,
   type Ref,
   useCallback,
@@ -20,12 +18,11 @@ import { isRtl } from "../../foundations/dir.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
 import { isTypeaheadKey, useTypeahead } from "../../foundations/listbox.js";
 import { OptionIcon, type OptionIconColor } from "../../foundations/option-icon.js";
-import { setRef } from "../../foundations/refs.js";
 import { useVirtualWindow } from "../../foundations/virtual-window.js";
 import { chevronRight } from "../../icons/chevron-right.js";
 import type { IconData } from "../../icons/types.js";
 import type { Size } from "../../tokens/schema.js";
-import { ContextMenu, type ContextMenuTargetProps } from "../ContextMenu/ContextMenu.js";
+import { ContextMenu, type ContextMenuKeyTargetProps } from "../ContextMenu/ContextMenu.js";
 import { HighlightedText } from "../HighlightedText/HighlightedText.js";
 import { IconButton } from "../IconButton/IconButton.js";
 import { LoadingDots } from "../LoadingDots/LoadingDots.js";
@@ -202,12 +199,6 @@ type Status = "loading" | "failed";
 /** How an item matched the filter: by the query string, or at these character positions. */
 type Match = true | readonly number[];
 
-/** The context menu a row asks the tree to open. */
-interface RowMenu {
-  item: TreeItem<never>;
-  items: MenuEntry[];
-}
-
 /** A press on a control inside a row (an action, a retry button) is that control's, not the row's. */
 const onControl = (event: { target: EventTarget; currentTarget: Element }) => {
   const control = (event.target as Element).closest("button, a, input, [role='button']");
@@ -254,7 +245,6 @@ export function Tree<T = unknown>(props: TreeProps<T>) {
   const [loaded, setLoaded] = useState<Record<string, TreeItem<never>[]>>({});
   const [status, setStatus] = useState<Record<string, Status>>({});
   const [focusKey, setFocusKey] = useState<string | null>(null);
-  const [menu, setMenu] = useState<RowMenu | null>(null);
   const moveFocus = useRef(false);
   const root = useRef<HTMLDivElement>(null);
   const typeTo = useTypeahead();
@@ -543,7 +533,6 @@ export function Tree<T = unknown>(props: TreeProps<T>) {
     click: (_row: Row, _onChevron: boolean, _additive: boolean) => {},
     retry: (_item: TreeItem<never>) => {},
     command: (_value: string, _item: TreeItem<never>) => {},
-    menu: (_item: TreeItem<never>, _el: HTMLElement) => {},
   });
   handlers.current = {
     click: (row, onChevron, additive) => {
@@ -555,26 +544,18 @@ export function Tree<T = unknown>(props: TreeProps<T>) {
     },
     retry,
     command: (value, item) => onCommand?.(value, item),
-    menu: (item, el) => {
-      if (!item.contextMenu || !target.current) return;
-      setRef(target.current.ref, el);
-      setMenu({ item, items: item.contextMenu });
-    },
   };
-  const target = useRef<ContextMenuTargetProps | null>(null);
   const calls = useMemo(
     () => ({
       click: (row: Row, onChevron: boolean, additive: boolean) =>
         handlers.current.click(row, onChevron, additive),
       retry: (item: TreeItem<never>) => handlers.current.retry(item),
       command: (value: string, item: TreeItem<never>) => handlers.current.command(value, item),
-      menu: (item: TreeItem<never>, el: HTMLElement) => handlers.current.menu(item, el),
-      target: () => target.current,
     }),
     [],
   );
 
-  const tree = (
+  const tree = (menuFor: (item: TreeItem<never>) => ContextMenuKeyTargetProps) => (
     <div
       ref={root}
       role="tree"
@@ -610,6 +591,7 @@ export function Tree<T = unknown>(props: TreeProps<T>) {
             count={kids && (search ? kids.filter((k) => search.shown.has(k.id)).length : kids.length)}
             text={text}
             calls={calls}
+            menuFor={menuFor}
             onAction={onAction}
           />
         );
@@ -620,15 +602,12 @@ export function Tree<T = unknown>(props: TreeProps<T>) {
   // One context menu for the tree, opened for whichever row asked. Its panel lands beside the tree, not in it: a tree
   // holds only tree items, even while a menu is open.
   return (
-    <ContextMenu
-      label={menuName(menu?.item.label ?? "")}
-      items={menu?.items ?? []}
-      onSelect={(value) => menu && onCommand?.(value, menu.item)}
+    <ContextMenu<TreeItem<never>>
+      label={(item) => menuName(item.label)}
+      items={(item) => item.contextMenu ?? []}
+      onSelect={(value, item) => onCommand?.(value, item)}
     >
-      {(props) => {
-        target.current = props;
-        return tree;
-      }}
+      {(_, targetFor) => tree(targetFor)}
     </ContextMenu>
   );
 }
@@ -656,9 +635,9 @@ interface TreeRowProps {
     click: (row: Row, onChevron: boolean, additive: boolean) => void;
     retry: (item: TreeItem<never>) => void;
     command: (value: string, item: TreeItem<never>) => void;
-    menu: (item: TreeItem<never>, el: HTMLElement) => void;
-    target: () => ContextMenuTargetProps | null;
   };
+  /** The props that make a row a target of the tree's one context menu (stable). */
+  menuFor: (item: TreeItem<never>) => ContextMenuKeyTargetProps;
   onAction: ((item: TreeItem<never>) => void) | undefined;
 }
 
@@ -679,6 +658,7 @@ const TreeRow = memo(function TreeRow({
   count,
   text,
   calls,
+  menuFor,
   onAction,
 }: TreeRowProps) {
   const id = useId();
@@ -721,10 +701,6 @@ const TreeRow = memo(function TreeRow({
     );
   }
 
-  // The context menu opens for this row: it makes itself the tree's menu target first.
-  const target = menu ? calls.target() : null;
-  const arm = (el: HTMLElement) => calls.menu(item, el);
-
   return (
     // biome-ignore lint/a11y/useKeyWithClickEvents: the tree handles keys for every row (roving focus)
     <div
@@ -746,7 +722,6 @@ const TreeRow = memo(function TreeRow({
           ? `${id}-label${trailing !== undefined ? ` ${id}-trailing` : ""}`
           : undefined
       }
-      aria-keyshortcuts={menu ? "Shift+F10" : undefined}
       // Disabled and loading rows never take focus, not even from a click.
       tabIndex={usable ? (tabbable ? 0 : -1) : undefined}
       style={{ "--_level": level - 1, insetBlockStart: offset } as CSSProperties}
@@ -759,24 +734,8 @@ const TreeRow = memo(function TreeRow({
         if (onControl(e) || kind !== "item" || group || item.disabled) return;
         if (!(e.target as Element).closest(".cy-tree-chevron")) onAction?.(item);
       }}
-      {...(target && {
-        onKeyDown: (event: KeyboardEvent<HTMLElement>) => {
-          if (event.key === "ContextMenu" || (event.key === "F10" && event.shiftKey))
-            arm(event.currentTarget);
-          target.onKeyDown(event);
-        },
-        onContextMenu: (event: MouseEvent<HTMLElement>) => {
-          arm(event.currentTarget);
-          target.onContextMenu(event);
-        },
-        onPointerDown: (event: PointerEvent<HTMLElement>) => {
-          if (event.pointerType === "touch") arm(event.currentTarget);
-          target.onPointerDown(event);
-        },
-        onPointerMove: target.onPointerMove,
-        onPointerUp: target.onPointerUp,
-        onPointerCancel: target.onPointerCancel,
-      })}
+      // A row with commands is one of the targets of the tree's context menu (and says Shift+F10 opens it).
+      {...(menu && menuFor(item))}
     >
       <span className="cy-tree-chevron cy-reset" data-open={open || undefined} aria-hidden="true">
         {branch && <Icon icon={chevronRight} size="sm" />}

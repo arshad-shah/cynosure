@@ -4,7 +4,6 @@ import {
   createContext,
   type KeyboardEvent,
   type MouseEvent,
-  type PointerEvent,
   type ReactNode,
   useCallback,
   useContext,
@@ -18,7 +17,6 @@ import { useControllableState } from "../../foundations/controllable.js";
 import { isRtl } from "../../foundations/dir.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
 import { usePrinting } from "../../foundations/printing.js";
-import { setRef } from "../../foundations/refs.js";
 import { moveItems } from "../../foundations/reorder.js";
 import { useRovingFocus } from "../../foundations/roving-focus.js";
 import { chevronLeft } from "../../icons/chevron-left.js";
@@ -26,7 +24,7 @@ import { chevronRight } from "../../icons/chevron-right.js";
 import { close } from "../../icons/close.js";
 import type { IconData } from "../../icons/types.js";
 import type { Size } from "../../tokens/schema.js";
-import { ContextMenu, type ContextMenuTargetProps } from "../ContextMenu/ContextMenu.js";
+import { ContextMenu, type ContextMenuKeyTargetProps } from "../ContextMenu/ContextMenu.js";
 import { IconButton } from "../IconButton/IconButton.js";
 import type { MenuEntry } from "../Menu/Menu.js";
 import { Tooltip } from "../Tooltip/Tooltip.js";
@@ -247,10 +245,8 @@ interface TabMenu {
   onSelect: ((command: string) => void) | undefined;
 }
 
-/** The list's one ContextMenu, shared with its tabs: its target handlers, and how a tab makes itself the target. */
-const MenuContext = createContext<{ target: ContextMenuTargetProps; open: (menu: TabMenu) => void } | null>(
-  null,
-);
+/** The list's one ContextMenu, shared with its tabs: the props that make a tab one of its targets. */
+const MenuContext = createContext<((menu: TabMenu) => ContextMenuKeyTargetProps) | null>(null);
 
 /** The tab inside a list child (a tab, or a closable tab's slot). */
 const tabIn = (el: Element) =>
@@ -268,7 +264,6 @@ export function TabList({
   const ref = useRef<HTMLDivElement>(null);
   const strip = useRef<HTMLDivElement>(null);
   const [said, setSaid] = useState("");
-  const [menu, setMenu] = useState<TabMenu | null>(null);
   const latest = useRef({ onReorder, labels });
   latest.current = { onReorder, labels };
   const order = () => [...(ref.current?.children ?? [])].map((c) => tabIn(c)?.dataset.value as string);
@@ -444,24 +439,22 @@ export function TabList({
   // One context menu for the list, opened for whichever tab asked. Its panel lands beside the list, not in it: a
   // tablist holds only tabs, even while a menu is open.
   const hosted = (
-    <ContextMenu
-      label={labels.menu(menu?.name ?? "")}
-      items={menu?.items ?? []}
-      onSelect={(command) => {
-        if (!menu) return;
+    <ContextMenu<TabMenu>
+      label={(menu) => labels.menu(menu.name)}
+      items={(menu) => menu.items}
+      onSelect={(command, menu) => {
         // A command that removes the tab (Close, Close others…) moves focus to the tab then selected, as Delete does;
         // one that keeps it leaves focus on it.
         refocus.current = menu.value;
         menu.onSelect?.(command);
       }}
-      onOpenChange={(open) => {
+      onOpenChange={(open, menu) => {
         // The tab is still there (a command such as "Copy path"): the menu returns focus to it, so drop the request,
         // which would otherwise pull focus back to it on some later render. A removed tab leaves it for Tabs.
-        if (!open && menu && refocus.current === menu.value && order().includes(menu.value))
-          refocus.current = null;
+        if (!open && refocus.current === menu.value && order().includes(menu.value)) refocus.current = null;
       }}
     >
-      {(target) => <MenuContext.Provider value={{ target, open: setMenu }}>{list}</MenuContext.Provider>}
+      {(_, targetFor) => <MenuContext.Provider value={targetFor}>{list}</MenuContext.Provider>}
     </ContextMenu>
   );
   // The announcement sits beside the list, not in it: a tablist holds only tabs, and every child is sortable.
@@ -543,14 +536,12 @@ export function Tab({
     refocus.current = "";
     onClose();
   };
-  const host = useContext(MenuContext);
-  // With commands, the tab becomes the list's menu target before handing the event on.
-  const menu = contextMenu && host?.target;
-  const arm = (el: HTMLElement) => {
-    if (!host || !contextMenu) return;
-    setRef(host.target.ref, el);
-    host.open({ value, name, items: contextMenu, onSelect: onContextMenuSelect });
-  };
+  // With commands, the tab is one of its list's context menu targets.
+  const targetFor = useContext(MenuContext);
+  const menu =
+    contextMenu && targetFor
+      ? targetFor({ value, name, items: contextMenu, onSelect: onContextMenuSelect })
+      : undefined;
   // A label cut short by `--cy-tabs-label-max-width` shows its full text in a tooltip. The tooltip is always there (off
   // while the label fits), so the tab is never remounted when its text grows or shrinks.
   const [cut, setCut] = useState(false);
@@ -587,9 +578,7 @@ export function Tab({
       }}
       onKeyDown={(event) => {
         closeKey(event);
-        if (!menu) return;
-        if (event.key === "ContextMenu" || (event.key === "F10" && event.shiftKey)) arm(event.currentTarget);
-        menu.onKeyDown(event);
+        menu?.onKeyDown(event);
       }}
       {...(onClose && {
         // A middle-click closes, as in browsers and editors; its press must not start the browser's autoscroll.
@@ -603,14 +592,8 @@ export function Tab({
         },
       })}
       {...(menu && {
-        onContextMenu: (event: MouseEvent<HTMLElement>) => {
-          arm(event.currentTarget);
-          menu.onContextMenu(event);
-        },
-        onPointerDown: (event: PointerEvent<HTMLElement>) => {
-          if (event.pointerType === "touch") arm(event.currentTarget);
-          menu.onPointerDown(event);
-        },
+        onContextMenu: menu.onContextMenu,
+        onPointerDown: menu.onPointerDown,
         onPointerMove: menu.onPointerMove,
         onPointerUp: menu.onPointerUp,
         onPointerCancel: menu.onPointerCancel,
