@@ -31,4 +31,5 @@ Works in native forms: `FormData`, `form.reset()` and `required` validation. Wit
 - `--cy-text-field-height-xs`: Height of an `xs` field. Default `--cy-control-height-xs` (20px at comfortable scale).
 
 - `--cy-text-field-{height-sm,height-md,height-lg,radius,padding-inline,bg,border,soft-bg}`
+- Border, background, radius and the read-only fill fall back to the shared field skin, `--cy-field-control-{border,bg,radius,sunken-bg}` (Field), which HotkeyField reads too.
 - `--cy-text-field-numeric`: `font-variant-numeric` of the typed text (default `normal`); DateField, NumberField and TimeField set `tabular-nums` so digits line up.

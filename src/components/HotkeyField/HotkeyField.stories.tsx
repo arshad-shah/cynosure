@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { useEffect, useRef, useState } from "react";
+import { type CSSProperties, useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { expect, fn, waitFor } from "storybook/test";
 import { useHotkey } from "../../foundations/hotkey.js";
@@ -7,6 +7,7 @@ import { createStyleSheet } from "../../styles/inline.js";
 import { computeUnderHostileHost } from "../../test/hostile.js";
 import { emulateMedia } from "../../test/media.js";
 import { Button } from "../Button/Button.js";
+import { TextField } from "../TextField/TextField.js";
 import { HotkeyField } from "./HotkeyField.js";
 
 const meta = {
@@ -397,6 +398,48 @@ export const Sizes: Story = {
     await expect(Number.parseFloat(getComputedStyle(sm).fontSize)).toBeLessThan(
       Number.parseFloat(getComputedStyle(lg).fontSize),
     );
+  },
+};
+
+export const SharesTheFieldSkinWithTextField: Story = {
+  render: (args) => (
+    <div
+      style={
+        {
+          display: "grid",
+          gap: 12,
+          maxWidth: 320,
+          "--cy-field-control-border": "rgb(200, 30, 30)",
+          "--cy-field-control-bg": "rgb(250, 240, 200)",
+          "--cy-field-control-radius": "3px",
+          "--cy-field-control-sunken-bg": "rgb(210, 230, 250)",
+        } as CSSProperties
+      }
+    >
+      <HotkeyField {...args} />
+      <TextField label="Name" defaultValue="Query" />
+      <HotkeyField {...args} label="Disabled" disabled />
+      <TextField label="Read only" defaultValue="Query" readOnly />
+    </div>
+  ),
+  play: async ({ canvas, canvasElement }) => {
+    const [box, disabledBox] = [...canvasElement.querySelectorAll(".cy-hotkey-field-box")] as HTMLElement[];
+    const shell = (name: string) =>
+      canvas.getByRole("textbox", { name }).closest(".cy-text-field") as HTMLElement;
+    const skin = (el: Element) => {
+      const s = getComputedStyle(el);
+      return { border: s.borderTopColor, background: s.backgroundColor, radius: s.borderTopLeftRadius };
+    };
+    // A product restyling fields once gets the same box for a shortcut as for text.
+    await expect(skin(box as HTMLElement)).toEqual({
+      border: "rgb(200, 30, 30)",
+      background: "rgb(250, 240, 200)",
+      radius: "3px",
+    });
+    await expect(skin(box as HTMLElement)).toEqual(skin(shell("Name")));
+    // A box that cannot be edited takes the same sunken fill in both.
+    await expect(getComputedStyle(disabledBox as HTMLElement).backgroundColor).toBe("rgb(210, 230, 250)");
+    await expect(getComputedStyle(shell("Read only")).backgroundColor).toBe("rgb(210, 230, 250)");
   },
 };
 

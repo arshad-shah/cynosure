@@ -3,6 +3,14 @@ import { type FieldRender, useField } from "../../foundations/field.js";
 import type { DenseSize } from "../../tokens/schema.js";
 
 export interface FieldTokens {
+  /** Border colour of every field's box (TextField, HotkeyField), under each control's own token. Default --cy-color-line. */
+  controlBorder: string;
+  /** Background of every field's box (TextField, HotkeyField), under each control's own token. Default --cy-color-surface. */
+  controlBg: string;
+  /** Corner radius of every field's box (TextField, HotkeyField). Default the control height times the radius factor. */
+  controlRadius: string;
+  /** Sunken fill of a box that cannot be edited: a read-only TextField, a disabled HotkeyField. Default --cy-color-soft. */
+  controlSunkenBg: string;
   /** Narrowest the label and description get in the split layout before the control moves under them. Default 192px. */
   splitTextMin: string;
   /** Width of the control at `width="lg"`. Default 384px. */

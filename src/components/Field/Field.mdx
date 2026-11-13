@@ -74,6 +74,8 @@ With `group`, Field renders a `fieldset` and the label names the whole group ins
 
 Tokens: `--cy-field-gap`, `--cy-field-label-weight`, `--cy-field-label-color`, `--cy-field-description-color`, `--cy-field-error-color` and `--cy-field-required-color`. Control widths: `--cy-field-control-width-sm`, `-md` and `-lg` (160, 256 and 384px). The split layout keeps the text at least `--cy-field-split-text-min` (192px) wide before the control moves under it.
 
+The field skin: `--cy-field-control-border`, `--cy-field-control-bg` and `--cy-field-control-radius` style the box of every field at once (TextField and the fields built on it, and HotkeyField), and `--cy-field-control-sunken-bg` the fill of a box that cannot be edited (a read-only TextField, a disabled HotkeyField). Each control's own tokens (`--cy-text-field-bg`…) still win over them.
+
 ```ts
 createTheme({ components: { field: { gap: "8px", labelWeight: "600" } } });
 ```

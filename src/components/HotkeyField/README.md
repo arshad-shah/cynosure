@@ -53,4 +53,5 @@ One row recording at a time on a settings page: control `recording`.
 - `--cy-hotkey-field-radius`: corner radius of the shortcut's box
 - `--cy-hotkey-field-border`: border colour of the shortcut's box
 - `--cy-hotkey-field-bg`: background of the shortcut's box
+- The box falls back to the shared field skin, `--cy-field-control-{border,bg,radius}` (Field), as TextField does; a disabled box takes `--cy-field-control-sunken-bg`.
 - `--cy-hotkey-field-gap`: space between the box and the buttons
