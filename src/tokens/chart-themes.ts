@@ -3,23 +3,8 @@
  * plain hex, and a theme object for swift-chart. Nothing here imports a chart library, so Cynosure gains no dependency.
  */
 import { mix } from "./color.js";
-import { createTheme } from "./create-theme.js";
+import { ACCENT_MIX, accentMixCss, createTheme } from "./create-theme.js";
 import type { ColorTokens, PaletteName, Theme } from "./schema.js";
-
-const MIXED = /^color-mix\(in oklab, (#[0-9a-f]{6}) (\d+)%, (#[0-9a-f]{6}|transparent)\)$/;
-
-/** One colour as hex: `color-mix()` values (the soft accent and the focus ring) are worked out here. */
-function concrete(value: string): string {
-  const m = MIXED.exec(value);
-  if (!m) return value;
-  const [, a, pct, b] = m as unknown as [string, string, string, string];
-  const amount = Number(pct) / 100;
-  return b === "transparent"
-    ? `${a}${Math.round(amount * 255)
-        .toString(16)
-        .padStart(2, "0")}`
-    : mix(a, b, amount);
-}
 
 /**
  * Every colour of one palette as a concrete value (hex, or 8-digit hex where the colour is translucent), for a canvas
@@ -27,9 +12,18 @@ function concrete(value: string): string {
  */
 export function resolveColors(theme: Theme = createTheme(), palette: PaletteName = "light"): ColorTokens {
   const p = theme.palettes[palette];
-  return Object.fromEntries(
-    Object.entries(p).map(([k, v]) => [k, Array.isArray(v) ? v.map(concrete) : concrete(v)]),
-  ) as unknown as ColorTokens;
+  const css = accentMixCss(p.accent, p.surface);
+  const alpha = Math.round((ACCENT_MIX.ring / 100) * 255)
+    .toString(16)
+    .padStart(2, "0");
+  // Only the mixes createTheme wrote are swapped: a palette that sets its own accentSoft or ring already has hex.
+  return {
+    ...p,
+    accentSoft:
+      p.accentSoft === css.accentSoft ? mix(p.accent, p.surface, ACCENT_MIX.accentSoft / 100) : p.accentSoft,
+    ring: p.ring === css.ring ? `${p.accent}${alpha}` : p.ring,
+    seriesColors: [...p.seriesColors],
+  };
 }
 
 /**

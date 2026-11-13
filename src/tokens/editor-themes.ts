@@ -5,9 +5,11 @@
  * TextMate theme, VS Code-style themes) get one built here from resolved colours: build one per palette and switch
  * with the page's mode. Nothing here imports an editor, so Cynosure gains no dependency.
  */
+
+import { resolveColors } from "./chart-themes.js";
 import { mix } from "./color.js";
 import { createTheme } from "./create-theme.js";
-import type { ColorTokens, PaletteName, Theme } from "./schema.js";
+import type { PaletteName, Theme, ThemeMode } from "./schema.js";
 
 /** Every colour an editor needs, as hex: the syntax roles plus the editor's own surfaces. */
 export interface EditorColors {
@@ -37,7 +39,7 @@ export interface EditorColors {
 
 /** The editor colours of one palette of a theme (by default Cynosure's own theme, light). */
 export function editorColors(theme: Theme = createTheme(), palette: PaletteName = "light"): EditorColors {
-  const p: ColorTokens = theme.palettes[palette];
+  const p = resolveColors(theme, palette);
   return {
     background: p.surface,
     foreground: p.ink,
@@ -121,7 +123,7 @@ export function monacoTheme(theme: Theme = createTheme(), palette: PaletteName =
 /** A TextMate theme (the format Shiki and VS Code read) from a Cynosure palette. */
 export interface TextMateTheme {
   name: string;
-  type: "light" | "dark";
+  type: ThemeMode;
   colors: Record<string, string>;
   tokenColors: { scope: string[]; settings: { foreground?: string; fontStyle?: string } }[];
 }

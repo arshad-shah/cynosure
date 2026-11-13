@@ -86,11 +86,22 @@ function accentRoles(
     accent: hex,
     accentHover: best.hover,
     accentActive: best.active,
-    accentSoft: `color-mix(in oklab, ${hex} 18%, ${surface})`,
+    ...accentMixCss(hex, surface),
     onAccent: best.on,
-    ring: `color-mix(in oklab, ${hex} 28%, transparent)`,
   };
 }
+
+/** How much accent (in percent) the soft tint takes over the surface and the focus ring over transparency. */
+export const ACCENT_MIX = { accentSoft: 18, ring: 28 } as const;
+
+/**
+ * The accent's two mixed colours as CSS (`color-mix()`, which the stylesheet resolves). `resolveColors` works out the
+ * same colours as hex from `ACCENT_MIX`, and recognises these values by building them again, never by parsing them.
+ */
+export const accentMixCss = (accent: string, surface: string): Pick<ColorTokens, "accentSoft" | "ring"> => ({
+  accentSoft: `color-mix(in oklab, ${accent} ${ACCENT_MIX.accentSoft}%, ${surface})`,
+  ring: `color-mix(in oklab, ${accent} ${ACCENT_MIX.ring}%, transparent)`,
+});
 
 type SyntaxKey = Extract<keyof ColorTokens, `syntax${string}`>;
 const SYNTAX_KEYS = [

@@ -2,25 +2,17 @@ import { storybookTest } from "@storybook/addon-vitest/vitest-plugin";
 import { playwright } from "@vitest/browser-playwright";
 import { defineConfig } from "vitest/config";
 import type { BrowserCommand } from "vitest/node";
+import type { EmulatedMedia } from "./src/test/media";
 
 /**
  * Story tests emulate media features (prefers-reduced-motion, prefers-contrast, forced-colors, prefers-color-scheme) on
  * their own page through this command; stories reach it with `emulateMedia` from src/test/media.ts. `null` puts a
  * feature back to the browser's own value.
  */
-const emulateMedia: BrowserCommand<
-  [
-    media: {
-      reducedMotion?: "reduce" | "no-preference" | null;
-      contrast?: "more" | "no-preference" | null;
-      forcedColors?: "active" | "none" | null;
-      colorScheme?: "light" | "dark" | null;
-    },
-  ]
-> = async ({ page }, media) => {
+const emulateMedia: BrowserCommand<[media: EmulatedMedia]> = async ({ page }, media) => {
   // `null` should put a feature back, but on WebKit an emulated "reduce" outlived it and reached the next file (CI on
   // #167, 2026-11-13). Put back Playwright's own starting values instead.
-  const initial = {
+  const initial: { [K in keyof EmulatedMedia]-?: NonNullable<EmulatedMedia[K]> } = {
     reducedMotion: "no-preference",
     contrast: "no-preference",
     forcedColors: "none",

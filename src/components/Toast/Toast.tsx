@@ -15,6 +15,7 @@ import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js
 import { useDrag } from "../../foundations/drag.js";
 import { deepActiveElement } from "../../foundations/focus.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
+import { type Space, space } from "../../foundations/layout.js";
 import { transitionTime } from "../../foundations/motion.js";
 import { TONE_ICONS } from "../../foundations/tone-icons.js";
 import { close as closeIcon } from "../../icons/close.js";
@@ -23,7 +24,6 @@ import type { Tone } from "../../tokens/schema.js";
 import { Button } from "../Button/Button.js";
 import { IconButton } from "../IconButton/IconButton.js";
 import { LoadingDots } from "../LoadingDots/LoadingDots.js";
-import { type Space, space } from "../Stack/space.js";
 
 export interface ToastTokens {
   width: string;

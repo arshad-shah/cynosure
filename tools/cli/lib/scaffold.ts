@@ -143,6 +143,7 @@ const stories = (
 ) => `import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect } from "storybook/test";
 import { computeUnderHostileHost } from "../../test/hostile.js";
+import { TONES } from "../../tokens/schema.js";
 import { ${Name} } from "./${Name}.js";
 
 const meta = {
@@ -151,7 +152,7 @@ const meta = {
   args: { children: "${Name}", size: "md", tone: "neutral" },
   argTypes: {
     size: { control: "inline-radio", options: ["sm", "md", "lg"] },
-    tone: { control: "select", options: ["accent", "neutral", "danger", "success", "warning", "info"] },
+    tone: { control: "select", options: TONES },
   },
 } satisfies Meta<typeof ${Name}>;
 export default meta;

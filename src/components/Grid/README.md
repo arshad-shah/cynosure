@@ -58,7 +58,7 @@ import { Grid, GridItem } from "@arshad-shah/cynosure";
 
 ## Padding
 
-`padding`, `paddingInline` and `paddingBlock` pad the grid's own box with space tokens, inside its width; the specific one wins over `padding`, and `"0"` counts as a value. A nested Grid never inherits its parent's padding. The props and logic are shared with Stack and Inline (`../Stack/space.ts`).
+`padding`, `paddingInline` and `paddingBlock` pad the grid's own box with space tokens, inside its width; the specific one wins over `padding`, and `"0"` counts as a value. A nested Grid never inherits its parent's padding. The props and logic are shared with Stack and Inline (`src/foundations/layout.ts`).
 
 ## GridItem
 

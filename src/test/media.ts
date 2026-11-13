@@ -1,3 +1,5 @@
+import { bridge } from "./bridge.js";
+
 /** Media features a story can emulate; `null` puts one back to the browser's own value. */
 export type EmulatedMedia = {
   reducedMotion?: "reduce" | "no-preference" | null;
@@ -16,7 +18,7 @@ export type EmulatedMedia = {
  * Always put the features back (`null`, which the command turns into Playwright's starting values) in a `finally`, since the page is shared with the next story file.
  */
 export async function emulateMedia(media: EmulatedMedia): Promise<boolean> {
-  const command = (globalThis as { cyEmulateMedia?: (media: EmulatedMedia) => Promise<void> }).cyEmulateMedia;
+  const command = bridge("cyEmulateMedia");
   if (!command) return false;
   await command(media);
   return true;

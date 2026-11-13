@@ -2,6 +2,7 @@ import { type CSSProperties, type KeyboardEvent, type ReactNode, useId, useRef, 
 import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js";
 import { useControllableState } from "../../foundations/controllable.js";
 import { isRtl } from "../../foundations/dir.js";
+import { toneColour } from "../../foundations/edge.js";
 import { chevronDown } from "../../icons/chevron-down.js";
 import { chevronLeft } from "../../icons/chevron-left.js";
 import { chevronRight } from "../../icons/chevron-right.js";
@@ -143,7 +144,6 @@ const DEFAULT_LABELS: CalendarLabels = {
   nextYear: "Next year",
 };
 
-const TONES: readonly string[] = ["accent", "neutral", "danger", "success", "warning", "info"];
 const MAX_DOTS = 3;
 const MONTHS = Array.from({ length: 12 }, (_, i) => i);
 /** What the calendar is drawn with until the browser's own language and weekend are known. */
@@ -530,17 +530,13 @@ export function Calendar({
                     </span>
                     {dots && dots.length > 0 && (
                       <span className="cy-calendar-dots cy-reset" aria-hidden="true">
-                        {dots.map((dot, i) => {
-                          const tone = TONES.includes(dot);
-                          return (
-                            <span
-                              key={`${i}${dot}`}
-                              className="cy-calendar-dot cy-reset"
-                              data-tone={tone ? dot : undefined}
-                              style={tone ? undefined : ({ "--_tone": dot } as CSSProperties)}
-                            />
-                          );
-                        })}
+                        {dots.map((dot, i) => (
+                          <span
+                            key={`${i}${dot}`}
+                            className="cy-calendar-dot cy-reset"
+                            style={{ "--_tone": toneColour(dot) } as CSSProperties}
+                          />
+                        ))}
                       </span>
                     )}
                     {renderDay && (

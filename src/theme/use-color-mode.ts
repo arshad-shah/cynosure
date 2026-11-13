@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useClientLayoutEffect } from "../foundations/client-layout-effect.js";
+import { useMediaQuery } from "../foundations/media-query.js";
+import type { ThemeMode } from "../tokens/schema.js";
 
 const CHANGE = "cy-color-mode-change";
 
-export type ColorMode = "light" | "dark" | "system";
+export type ColorMode = ThemeMode | "system";
 
 export interface ColorModeStorage {
   get(key: string): string | null | Promise<string | null>;
@@ -28,8 +30,6 @@ function read(storage: ColorModeStorage, key: string): ColorMode | Promise<Color
   }
 }
 
-const prefersDark = () => globalThis.matchMedia?.("(prefers-color-scheme: dark)").matches ?? false;
-
 /** The user's colour mode, persisted through `storage` (localStorage by default). Never throws. */
 export function useColorMode(options: { storage?: ColorModeStorage; key?: string } = {}) {
   const { key = "cy-color-mode" } = options;
@@ -39,11 +39,10 @@ export function useColorMode(options: { storage?: ColorModeStorage; key?: string
   const touched = useRef(false);
   // Server and first client render agree on "system"; storage is read after mount (hydration-safe).
   const [mode, setState] = useState<ColorMode>("system");
-  const [systemDark, setSystemDark] = useState(false);
+  const systemDark = useMediaQuery("(prefers-color-scheme: dark)");
 
   useClientLayoutEffect(() => {
     touched.current = false;
-    setSystemDark(prefersDark());
     const initial = read(storageRef.current, key);
     if (!(initial instanceof Promise)) setState(initial);
     else {
@@ -55,13 +54,6 @@ export function useColorMode(options: { storage?: ColorModeStorage; key?: string
       };
     }
   }, [key]);
-
-  useEffect(() => {
-    const query = globalThis.matchMedia?.("(prefers-color-scheme: dark)");
-    const update = () => setSystemDark(query?.matches ?? false);
-    query?.addEventListener("change", update);
-    return () => query?.removeEventListener("change", update);
-  }, []);
 
   // Other hooks on the page (e.g. an uncontrolled ThemeToggle) announce changes; follow them.
   useEffect(() => {
@@ -89,6 +81,6 @@ export function useColorMode(options: { storage?: ColorModeStorage; key?: string
     [key],
   );
 
-  const resolved: "light" | "dark" = mode === "system" ? (systemDark ? "dark" : "light") : mode;
+  const resolved: ThemeMode = mode === "system" ? (systemDark ? "dark" : "light") : mode;
   return { mode, setMode, resolved };
 }

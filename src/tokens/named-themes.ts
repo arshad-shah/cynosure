@@ -7,7 +7,7 @@
 import { CynosureThemeError, contrastRatio } from "./color.js";
 import { createTheme } from "./create-theme.js";
 import { BASE_GLOBAL } from "./defaults.js";
-import type { PaletteName, Theme, ThemeInput } from "./schema.js";
+import type { PaletteName, Theme, ThemeInput, ThemeMode } from "./schema.js";
 
 /** A theme as plain, serialisable data: what a plugin ships and what an app saves. */
 export interface ThemeDefinition extends ThemeInput {
@@ -24,7 +24,7 @@ export interface NamedTheme {
   /** The definition's name. */
   name: string;
   /** `light` or `dark` for a theme fixed to one mode; undefined when it follows the colour mode. */
-  mode?: "light" | "dark";
+  mode?: ThemeMode;
   /** The definition as given (serialise it with `JSON.stringify`). */
   definition: ThemeDefinition;
   /** The built theme, for `<CynosureTheme theme>`, `themeToCss` and the editor and chart themes. */

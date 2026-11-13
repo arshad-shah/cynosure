@@ -36,7 +36,7 @@
     "storybook": "pnpm css && storybook dev -p 6006 --no-open",
     "build-storybook": "pnpm css && storybook build",
     "build:site": "pnpm --filter @arshad-shah/cynosure-site build && pnpm build-storybook --output-dir site/dist/storybook",
-    "size": "size-limit",
+    "size": "size-limit && node --import tsx tools/icons-size.ts",
     "cy": "node --import tsx tools/cli/index.ts",
     "check": "node --import tsx tools/cli/index.ts check",
     "verify": "pnpm check && pnpm lint && pnpm typecheck && pnpm test && pnpm test:react18 && pnpm test:stories && pnpm coverage && pnpm build && publint && pnpm attw && pnpm size",

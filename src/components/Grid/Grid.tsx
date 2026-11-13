@@ -10,7 +10,7 @@ import {
   space,
   type VisibilityProps,
   visibilityAttrs,
-} from "../Stack/space.js";
+} from "../../foundations/layout.js";
 
 /**
  * The widths at which a Grid with `columns` per breakpoint changes its column count. They are widths of the Grid's

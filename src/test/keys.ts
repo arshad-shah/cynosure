@@ -1,3 +1,5 @@
+import { bridge } from "./bridge.js";
+
 /**
  * Presses a real key (a Playwright key press, by its `KeyboardEvent.key` name such as "PageDown") through the command
  * the Vitest run registers (.storybook/vitest.setup.ts). Synthetic key events, as `userEvent.keyboard` sends, never
@@ -7,7 +9,7 @@
  * is harmless.
  */
 export async function pressKey(key: string): Promise<boolean> {
-  const command = (globalThis as { cyPressKey?: (key: string) => Promise<void> }).cyPressKey;
+  const command = bridge("cyPressKey");
   if (!command) return false;
   // Test files run in iframes of one page, and a file starting in parallel focuses its own frame: a real key goes to
   // whichever frame has focus, so take it back first. Stories should still retry a press until its effect shows.

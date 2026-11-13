@@ -1,6 +1,6 @@
 import { type AriaRole, type CSSProperties, forwardRef, type ReactNode } from "react";
+import { type Space, space } from "../../foundations/layout.js";
 import { Container, type ContainerProps } from "../Container/Container.js";
-import { type Space, space } from "../Stack/space.js";
 
 export interface SectionTokens {
   /** Space above and below the content when the `paddingBlock` prop is not set. */

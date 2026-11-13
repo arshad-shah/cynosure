@@ -9,7 +9,7 @@ import {
   themeProperties,
   themeToCss,
 } from "../../src/tokens";
-import { parseColor, rgbToOklch } from "../../src/tokens/color";
+import { mix, parseColor, rgbToOklch } from "../../src/tokens/color";
 
 const PALETTES: PaletteName[] = ["light", "dark", "light-contrast", "dark-contrast"];
 const HEX = /^#[0-9a-f]{6}([0-9a-f]{2})?$/;
@@ -98,6 +98,22 @@ describe("resolveColors", () => {
     expect(resolved.ring).toBe(`${light.accent}47`);
     expect(resolved.bg).toBe(light.bg);
     expect(resolveColors()).toEqual(resolved);
+  });
+  it("resolves the mixes of any theme createTheme builds, and keeps a palette's own accentSoft and ring", () => {
+    const themes = [
+      ...ACCENTS.map((accent) => createTheme(accent ? { accent } : {})),
+      createTheme({ mode: "dark", accent: "#2563eb" }),
+      createTheme({ palettes: { light: { surface: "#fdf6e3" }, "dark-contrast": { accent: "#00d4ff" } } }),
+    ];
+    for (const theme of themes)
+      for (const name of PALETTES) {
+        const p = theme.palettes[name];
+        const resolved = resolveColors(theme, name);
+        expect(resolved.accentSoft, name).toBe(mix(p.accent, p.surface, 0.18));
+        expect(resolved.ring, name).toBe(`${p.accent}47`);
+      }
+    const own = createTheme({ palettes: { light: { accentSoft: "#eeeeff", ring: "#123456" } } });
+    expect(resolveColors(own, "light")).toMatchObject({ accentSoft: "#eeeeff", ring: "#123456" });
   });
 });
 

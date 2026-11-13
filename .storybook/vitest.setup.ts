@@ -5,9 +5,15 @@ import { commands, page, userEvent } from "vitest/browser";
 import type { EmulatedMedia } from "../src/test/media";
 import * as project from "./preview";
 
+/* The Playwright command vitest.config.ts registers. */
+declare module "vitest/browser" {
+  interface BrowserCommands {
+    emulateMedia: (media: EmulatedMedia) => Promise<void>;
+  }
+}
+
 /* Stories emulate media features through `emulateMedia` (src/test/media.ts), which finds the Playwright command here. */
-(globalThis as { cyEmulateMedia?: (media: EmulatedMedia) => Promise<void> }).cyEmulateMedia = (media) =>
-  (commands as unknown as { emulateMedia: (media: EmulatedMedia) => Promise<void> }).emulateMedia(media);
+globalThis.cyEmulateMedia = (media) => commands.emulateMedia(media);
 /* Stories that check CSS :hover move the real pointer through `realHover` (src/test/hover.ts). */
 const parkPointer = () =>
   page.elementLocator(document.documentElement).hover({ position: { x: 1, y: 1 } } as never);
@@ -17,7 +23,7 @@ const parkPointer = () =>
  * story that moved it.
  */
 let pointerMoved = false;
-(globalThis as { cyHover?: (el: Element | null, over: boolean) => Promise<void> }).cyHover = (el, over) => {
+globalThis.cyHover = (el, over) => {
   pointerMoved = el !== null;
   return el === null
     ? parkPointer()
@@ -27,8 +33,7 @@ let pointerMoved = false;
 };
 
 /* Stories press real keys (the browser's own scrolling, which synthetic events never start) through `pressKey`. */
-(globalThis as { cyPressKey?: (key: string) => Promise<void> }).cyPressKey = (key) =>
-  userEvent.keyboard(`{${key}}`);
+globalThis.cyPressKey = (key) => userEvent.keyboard(`{${key}}`);
 
 /** Visual regression, Vitest-only: stories tagged "visual" are screenshotted when VITE_CY_VISUAL=1 (CI, Linux baselines). */
 const visual = import.meta.env.VITE_CY_VISUAL === "1";
