@@ -47,13 +47,13 @@ When tabs don't fit, the list scrolls sideways (with no visible scrollbar). Edge
 
 <Canvas of={Stories.OverflowScrollsTheActiveTabIntoView} />
 
-For document tabs, `scrollable` adds chevrons at each end, shown only while there are more tabs that way, and lets a vertical mouse wheel scroll the list sideways. The chevrons are for the pointer: keyboard users move with the arrows, which bring the focused tab into view. `end` puts content after the last tab, outside the tab list, such as a button that opens a new tab; it stays in view when the tabs overflow.
+For document tabs, `scrollable` adds chevrons at each end, shown only while there are more tabs that way, and lets a vertical mouse wheel scroll the list sideways. The chevrons are for the pointer: keyboard users move with the arrows, which bring the focused tab into view. `trailing` puts content after the last tab, outside the tab list, such as a button that opens a new tab; it stays in view when the tabs overflow.
 
 ```tsx
 <TabList
   label="Open files"
   scrollable
-  end={<IconButton icon={plus} label="New query" variant="ghost" size="sm" onClick={newQuery} />}
+  trailing={<IconButton icon={plus} label="New query" variant="ghost" size="sm" onClick={newQuery} />}
 >
   {files.map((f) => <Tab key={f.id} value={f.id} onClose={() => closeFile(f.id)}>{f.name}</Tab>)}
 </TabList>
@@ -125,7 +125,7 @@ A middle-click on a closable tab closes it too, as in browsers and editors.
 
 <ArgTypes of={Stories} />
 
-`Tab`: `value`, `icon`, `disabled`, `onClose`, `dirty`, `contextMenu`, `onContextMenuSelect`, `closeLabel`, `children`. The close button is named `labels.close` with the tab's text (a label with markup, such as a badge, is named by the text it shows); give `closeLabel` to name it yourself, such as "Close query 3". `TabList`: `label`, `onReorder`, `scrollable`, `end`. `Tabs` also takes `labels`: `close(name)`, `closeUnsaved(name)`, `unsaved`, `scrollBack`, `scrollForward`, `menu(name)` and `moved(name, position, total)`. `TabPanel`: `value`, `keepMounted` (keep the content mounted while hidden, preserving its state; by default only the selected panel renders its content).
+`Tab`: `value`, `icon`, `disabled`, `onClose`, `dirty`, `contextMenu`, `onContextMenuSelect`, `closeLabel`, `children`. The close button is named `labels.close` with the tab's text (a label with markup, such as a badge, is named by the text it shows); give `closeLabel` to name it yourself, such as "Close query 3". `TabList`: `label`, `onReorder`, `scrollable`, `trailing`. `Tabs` also takes `labels`: `close(name)`, `closeUnsaved(name)`, `unsaved`, `scrollBack`, `scrollForward`, `menu(name)` and `moved(name, position, total)`. `TabPanel`: `value`, `keepMounted` (keep the content mounted while hidden, preserving its state; by default only the selected panel renders its content).
 
 ## Behaviour and accessibility
 

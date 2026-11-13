@@ -232,7 +232,7 @@ export interface TabListProps {
    * Content after the last tab, outside the tab list, such as a "New tab" IconButton. It follows the last tab, and
    * stays at the end in view when the tabs overflow.
    */
-  end?: ReactNode;
+  trailing?: ReactNode;
   /** Added to the tab list element, for layout. */
   className?: string;
   /** The `Tab`s, in order. */
@@ -256,7 +256,14 @@ const MenuContext = createContext<{ target: ContextMenuTargetProps; open: (menu:
 const tabIn = (el: Element) =>
   (el.matches('[role="tab"]') ? el : el.querySelector('[role="tab"]')) as HTMLElement;
 
-export function TabList({ label, onReorder, scrollable = false, end, className, children }: TabListProps) {
+export function TabList({
+  label,
+  onReorder,
+  scrollable = false,
+  trailing,
+  className,
+  children,
+}: TabListProps) {
   const { size, variant, value, labels, refocus } = useTabs("TabList");
   const ref = useRef<HTMLDivElement>(null);
   const strip = useRef<HTMLDivElement>(null);
@@ -422,14 +429,14 @@ export function TabList({ label, onReorder, scrollable = false, end, className, 
       />
     </span>
   );
-  // The chevrons and the end content sit beside the list, not in it: a tablist holds only tabs.
+  // The chevrons and the trailing content sit beside the list, not in it: a tablist holds only tabs.
   const list =
-    scrollable || end !== undefined ? (
+    scrollable || trailing !== undefined ? (
       <div ref={strip} className="cy-tab-strip" data-size={size} data-variant={variant}>
         {scrollable && chevron("start")}
         {tablist}
         {scrollable && chevron("end")}
-        {end !== undefined && <div className="cy-tab-end">{end}</div>}
+        {trailing !== undefined && <div className="cy-tab-trailing">{trailing}</div>}
       </div>
     ) : (
       tablist

@@ -882,7 +882,7 @@ function ManyFiles({ count = 12, width = 320, dir }: { count?: number; width?: n
         <TabList
           label="Open files"
           scrollable
-          end={
+          trailing={
             <IconButton
               icon={plus}
               label="New file"

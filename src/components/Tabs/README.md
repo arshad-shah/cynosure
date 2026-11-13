@@ -25,7 +25,7 @@ APG tabs: `Tabs` holds the selection, `TabList` (named) holds `Tab`s, each `TabP
 | `variant`                             | `line`            | `line` underline · `soft` tinted pill                                                                                       |
 | `labels`                              | –                 | `close(name)`, `closeUnsaved(name)`, `unsaved`, `scrollBack`, `scrollForward`, `menu(name)`, `moved(name, position, total)` |
 
-`TabList`: `label`, `onReorder(values)` (reorderable tabs), `scrollable` (chevrons and wheel scrolling for many tabs), `end` (content after the last tab, such as a "New tab" IconButton). `Tab`: `value`, `icon`, `disabled`, `onClose` (closable tab), `dirty` (unsaved changes), `contextMenu` and `onContextMenuSelect` (the tab's commands), `closeLabel` (the close button's name; by default `labels.close` with the tab's text, also when the label is not a plain string). `TabPanel`: `value`, `keepMounted` (keep hidden content mounted). Tabs without a `TabPanel` (e.g. routed content) are valid: they simply omit `aria-controls`.
+`TabList`: `label`, `onReorder(values)` (reorderable tabs), `scrollable` (chevrons and wheel scrolling for many tabs), `trailing` (content after the last tab, such as a "New tab" IconButton). `Tab`: `value`, `icon`, `disabled`, `onClose` (closable tab), `dirty` (unsaved changes), `contextMenu` and `onContextMenuSelect` (the tab's commands), `closeLabel` (the close button's name; by default `labels.close` with the tab's text, also when the label is not a plain string). `TabPanel`: `value`, `keepMounted` (keep hidden content mounted). Tabs without a `TabPanel` (e.g. routed content) are valid: they simply omit `aria-controls`.
 
 - One Tab stop; arrows (RTL aware), Home and End; disabled tabs skipped; Tab moves to the panel.
 - Removing the selected tab selects the one now in its place (or the previous one).
@@ -35,7 +35,7 @@ APG tabs: `Tabs` holds the selection, `TabList` (named) holds `Tab`s, each `TabP
 - **Long labels** stop at `--cy-tabs-label-max-width` (default 20em) and end in an ellipsis; while a label is cut short, hovering or focusing the tab shows the whole text in a Tooltip. The tab's name always holds the whole text, so the tooltip is for the eye only (hidden from screen readers, no description).
 - Overflowing lists scroll; edges with hidden tabs fade, and the selected or focused tab is scrolled clear of the fade.
 - **`scrollable`** adds chevron IconButtons at each end while the tabs overflow, each shown only while there is more that way (RTL aware); a press scrolls most of the list's width. Like the close buttons they are for the pointer, out of the tab order and the accessibility tree: keyboard users move with the arrows, which scroll the focused tab into view. A vertical mouse wheel over the list scrolls it sideways (Ctrl+wheel stays the browser's zoom, and at either end the wheel scrolls the page).
-- **`end`** content sits right after the last tab, outside the tablist (which may hold only tabs), and stays in view at the end when the tabs overflow. It comes after the tabs in the Tab order.
+- **`trailing`** content sits right after the last tab, outside the tablist (which may hold only tabs), and stays in view at the end when the tabs overflow. It comes after the tabs in the Tab order.
 
 Tokens: `--cy-tabs-dirty` (the unsaved dot, default muted ink), `--cy-tabs-gap`, `--cy-tabs-indicator`, `--cy-tabs-indicator-width`, `--cy-tabs-label-max-width` (where a label is cut short, default 20em), `--cy-tabs-radius`.
 

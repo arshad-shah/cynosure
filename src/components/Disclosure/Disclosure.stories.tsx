@@ -243,7 +243,7 @@ export const SummaryEndSitsOutsideTheTrigger: Story = {
       <Disclosure
         {...args}
         summary="Tool call: run_query"
-        summaryEnd={<Badge tone="success">Done</Badge>}
+        trailing={<Badge tone="success">Done</Badge>}
         data-testid="badge"
       />
       <Disclosure
@@ -251,7 +251,7 @@ export const SummaryEndSitsOutsideTheTrigger: Story = {
         variant="card"
         headingLevel={3}
         summary="A long summary that has to give way to what sits at the end of its row"
-        summaryEnd={
+        trailing={
           <Button size="sm" onClick={retry}>
             Retry
           </Button>
@@ -259,7 +259,7 @@ export const SummaryEndSitsOutsideTheTrigger: Story = {
         data-testid="button"
       />
       <div dir="rtl">
-        <Disclosure {...args} summary="RTL" summaryEnd={<Badge>3</Badge>} data-testid="rtl" />
+        <Disclosure {...args} summary="RTL" trailing={<Badge>3</Badge>} data-testid="rtl" />
       </div>
     </div>
   ),
@@ -308,11 +308,11 @@ export const SummaryEndSitsOutsideTheTrigger: Story = {
       retryButton.getBoundingClientRect().left,
     );
     // Right-to-left: the slot sits left of the summary, the chevron left of the slot.
-    const r = box("rtl", ".cy-disclosure-end");
+    const r = box("rtl", ".cy-disclosure-trailing");
     await expect(r.right).toBeLessThan(box("rtl", ".cy-disclosure-summary").left);
     await expect(r.left).toBeGreaterThanOrEqual(box("rtl", ".cy-disclosure-chevron").right);
     // Host CSS cannot move it.
-    const { clean, hostile } = computeUnderHostileHost(root("badge"), ".cy-disclosure-end", [
+    const { clean, hostile } = computeUnderHostileHost(root("badge"), ".cy-disclosure-trailing", [
       "display",
       "align-items",
       "pointer-events",
@@ -334,7 +334,7 @@ export const TouchTarget: Story = {
 
 export const TouchTargetWithASummaryEnd: Story = {
   tags: ["touch", "!dev"],
-  args: { summaryEnd: <Badge>3</Badge> },
+  args: { trailing: <Badge>3</Badge> },
   play: async ({ canvas, userEvent }) => {
     const trigger = canvas.getByRole("button", { name: "Advanced options" });
     await expect(trigger.getBoundingClientRect().height).toBeGreaterThanOrEqual(44);
