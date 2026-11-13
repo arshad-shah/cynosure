@@ -72,6 +72,32 @@ export const KeyboardOpensNavigatesAndSelects: Story = {
   },
 };
 
+export const GapFromTheTriggerIsAToken: Story = {
+  render: (args) => (
+    <div style={{ display: "flex", gap: 16 }}>
+      <Menu {...args} />
+      <div style={{ "--cy-menu-offset": "20px" } as React.CSSProperties}>
+        <Menu {...args} label="Wide gap" trigger={(props) => <Button {...props}>Spaced</Button>} />
+      </div>
+    </div>
+  ),
+  play: async ({ canvas, userEvent }) => {
+    const gapOf = async (name: string, menuName: string) => {
+      const trigger = canvas.getByRole("button", { name });
+      await userEvent.click(trigger);
+      const menu = await canvas.findByRole("menu", { name: menuName });
+      await shownFully(menu);
+      const gap = menu.getBoundingClientRect().top - trigger.getBoundingClientRect().bottom;
+      await userEvent.keyboard("{Escape}");
+      await settledClosed(menu);
+      return gap;
+    };
+    // The default gap is --cy-space-2 (4px); --cy-menu-offset changes it.
+    await expect(await gapOf("Actions", "File actions")).toBeCloseTo(4, 0);
+    await expect(await gapOf("Spaced", "Wide gap")).toBeCloseTo(20, 0);
+  },
+};
+
 export const ArrowUpOpensAtTheLastItem: Story = {
   play: async ({ canvas, userEvent }) => {
     canvas.getByRole("button", { name: "Actions" }).focus();

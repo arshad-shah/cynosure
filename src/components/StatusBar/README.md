@@ -73,3 +73,4 @@ import { StatusBar, StatusBarSegment } from "@arshad-shah/cynosure";
 - `--cy-status-bar-padding-inline`: space inside each segment, on both sides of its content
 - `--cy-status-bar-segment-max-width`: widest a segment grows before its text ends in an ellipsis
 - `--cy-status-bar-gap`: space between segments, and between the two clusters
+- `--cy-status-bar-soft-mix`: how much of the tone is mixed into a `soft` segment's fill, static or clickable (a percentage, default 14%)

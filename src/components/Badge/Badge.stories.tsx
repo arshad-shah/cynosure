@@ -105,9 +105,19 @@ export const DotWithoutText: Story = {
       <Badge tone="success" dot>
         Steady
       </Badge>
+      <span data-testid="decorative">
+        <Badge tone="info" dot /> Synced
+      </span>
     </div>
   ),
   play: async ({ canvas }) => {
+    // Without a label, a dot alone is decoration (the text beside it says the state): no image, hidden from assistive
+    // technology, still drawn.
+    await expect(canvas.getAllByRole("img")).toHaveLength(2);
+    const decorative = canvas.getByTestId("decorative").querySelector(".cy-badge") as HTMLElement;
+    await expect(decorative).toHaveAttribute("aria-hidden", "true");
+    await expect(decorative).not.toHaveAttribute("role");
+    await expect(decorative.querySelector(".cy-badge-dot")?.getBoundingClientRect().width).toBeGreaterThan(0);
     // A dot alone is a status dot: an image named by `label`, since there is no text to say the state.
     const connected = canvas.getByRole("img", { name: "Connected" });
     const recording = canvas.getByRole("img", { name: "Recording" });

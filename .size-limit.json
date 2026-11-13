@@ -725,13 +725,19 @@
   {
     "name": "DataGrid",
     "path": ["dist/components/DataGrid/DataGrid.js", "dist/styles/data-grid.css"],
-    "limit": "5.9 kB",
+    "limit": "5.95 kB",
     "gzip": true
   },
   {
     "name": "PathField",
     "path": ["dist/components/PathField/PathField.js", "dist/styles/path-field.css"],
     "limit": "1.5 kB",
+    "gzip": true
+  },
+  {
+    "name": "RowActions (JS + CSS)",
+    "path": ["dist/components/RowActions/RowActions.js", "dist/styles/row-actions.css"],
+    "limit": "1.1 kB",
     "gzip": true
   }
 ]

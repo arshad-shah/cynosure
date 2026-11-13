@@ -17,11 +17,11 @@ Small status or category label in Cynosure's mono "eyebrow" style. Every tone ×
 | `icon`    | –         | Facet icon                                                                                             |
 | `color`   | –         | A category colour (any CSS colour), e.g. HTTP methods or calendar categories; overrides `tone`         |
 | `dot`     | –         | `true` for a steady dot, `"live"` for a pulsing one (recording, connected); still under reduced motion |
-| `label`   | –         | Required without `children`: the name of a status dot alone                                            |
+| `label`   | –         | The name of a status dot alone; without it the dot is decoration, hidden from assistive technology     |
 
 ## Status dot
 
-Leave out the text for a dot alone, in the tone's own colour: `<Badge tone="success" dot label="Connected" />`. It is an image named by `label` (required then), since colour alone says nothing. Inside a component that already says the state in text, hide it with an `aria-hidden` wrapper.
+Leave out the text for a dot alone, in the tone's own colour: `<Badge tone="success" dot label="Connected" />`. It is an image named by `label`, since colour alone says nothing. Where text beside it already says the state, leave `label` out: the dot is then decoration, hidden from assistive technology (`<Badge tone="success" dot />`).
 
 ## Tokens
 

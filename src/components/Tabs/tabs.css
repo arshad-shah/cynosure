@@ -108,7 +108,7 @@
   }
 }
 
-.cy-tab-end.cy-tab-end {
+.cy-tab-trailing.cy-tab-trailing {
   display: inline-flex;
   flex: none;
   align-items: center;

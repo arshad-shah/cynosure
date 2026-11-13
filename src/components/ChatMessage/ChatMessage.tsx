@@ -1,4 +1,5 @@
 import { type CSSProperties, forwardRef, type ReactNode } from "react";
+import { RowActions } from "../RowActions/RowActions.js";
 import { Toolbar } from "../Toolbar/Toolbar.js";
 
 export interface ChatMessageTokens {
@@ -81,6 +82,8 @@ export const ChatMessage = forwardRef<HTMLElement, ChatMessageProps>(function Ch
       ref={ref}
       className={`cy-chat-message${className ? ` ${className}` : ""}`}
       data-role={role}
+      // The whole message is the row its actions show for, not only the bubble beside them.
+      data-row-actions-host=""
       data-tone={tone}
       data-wide={wide ? "" : undefined}
       aria-label={role === "user" ? text.user : text.assistant}
@@ -94,9 +97,10 @@ export const ChatMessage = forwardRef<HTMLElement, ChatMessageProps>(function Ch
           {streaming && <span className="cy-chat-message-caret cy-reset" aria-hidden="true" />}
         </div>
         {actions && (
-          <div className="cy-chat-message-actions cy-reset">
+          // Messages are not a roving list, so the actions are always in the Tab order: one stop, arrows between them.
+          <RowActions className="cy-chat-message-actions">
             <Toolbar label={text.actions}>{actions}</Toolbar>
-          </div>
+          </RowActions>
         )}
       </div>
     </article>

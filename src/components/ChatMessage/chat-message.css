@@ -106,13 +106,4 @@
 
 .cy-chat-message-actions.cy-chat-message-actions {
   --cy-toolbar-padding: 0;
-  display: flex;
-  transition: opacity var(--cy-motion-fast) var(--cy-motion-ease);
-}
-/* With a mouse, the actions wait (in place, so nothing moves) until the message is pointed at or holds focus. On a
-   touch screen there is no hover: they are always shown. */
-@media (hover: hover) {
-  .cy-chat-message.cy-chat-message:not(:hover, :focus-within) .cy-chat-message-actions {
-    opacity: 0;
-  }
 }

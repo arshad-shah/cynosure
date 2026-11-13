@@ -42,3 +42,4 @@ Every variant × tone pair is distinct and keeps text at ≥ 4.5:1 (tested). Sof
 - `--cy-button-hover-ink`: Text and icon colour on hover. Default: unchanged.
 - `--cy-button-padding-inline-xs`: Inline padding of an `xs` button. Default `--cy-space-4`.
 - `--cy-button-height-xs`: Height of an `xs` button. Default `--cy-control-height-xs` (20px at comfortable scale).
+- `--cy-button-square-width`: Width of a square (icon-only) button, such as an IconButton. Default its height, so it is square; TitleBar widens its window controls with it.

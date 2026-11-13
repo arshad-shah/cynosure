@@ -1,4 +1,5 @@
 import { type CSSProperties, forwardRef, type ReactNode, useEffect, useRef } from "react";
+import { mergeRefs } from "../../foundations/refs.js";
 import { close as closeIcon, minus, windowMaximize, windowRestore } from "../../icons/index.js";
 import { IconButton } from "../IconButton/IconButton.js";
 
@@ -120,11 +121,6 @@ export const TitleBar = forwardRef<HTMLDivElement, TitleBarProps>(function Title
   forwarded,
 ) {
   const own = useRef<HTMLDivElement | null>(null);
-  const setRef = (el: HTMLDivElement | null) => {
-    own.current = el;
-    if (typeof forwarded === "function") forwarded(el);
-    else if (forwarded) forwarded.current = el;
-  };
 
   // Report the border-box height (a ResizeObserver entry's content box would leave out the bottom border), once per
   // change, with the latest callback.
@@ -173,7 +169,7 @@ export const TitleBar = forwardRef<HTMLDivElement, TitleBarProps>(function Title
   return (
     // biome-ignore lint/a11y/useSemanticElements: a fieldset is a form part; the bar is a named group of chrome.
     <div
-      ref={setRef}
+      ref={mergeRefs(own, forwarded)}
       role="group"
       aria-label={label}
       className={`cy-title-bar${className ? ` ${className}` : ""}`}

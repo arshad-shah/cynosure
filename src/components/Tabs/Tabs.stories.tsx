@@ -882,7 +882,7 @@ function ManyFiles({ count = 12, width = 320, dir }: { count?: number; width?: n
         <TabList
           label="Open files"
           scrollable
-          end={
+          trailing={
             <IconButton
               icon={plus}
               label="New file"
@@ -1120,7 +1120,7 @@ function FilesWithMenus({ onCommand }: { onCommand?: (command: string, file: str
               { value: "right", label: "Close to the right", disabled: i === files.length - 1 },
               { value: "copy", label: "Copy path" },
             ]}
-            onContextMenuSelect={(command) => run(command, f)}
+            onCommand={(command) => run(command, f)}
           >
             {f}
           </Tab>
@@ -1247,7 +1247,7 @@ export const ContextMenuLabelsOverride: Story = {
   render: () => (
     <Tabs defaultValue="x" labels={{ menu: (n) => `Actions de ${n}` }}>
       <TabList label="Fichiers">
-        <Tab value="x" contextMenu={[{ value: "close", label: "Fermer" }]} onContextMenuSelect={() => {}}>
+        <Tab value="x" contextMenu={[{ value: "close", label: "Fermer" }]} onCommand={() => {}}>
           x.ts
         </Tab>
       </TabList>

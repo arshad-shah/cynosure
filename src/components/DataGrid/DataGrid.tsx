@@ -23,6 +23,9 @@ import { arrowUp } from "../../icons/arrow-up.js";
 import { chevronsUpDown } from "../../icons/chevrons-up-down.js";
 import { Tooltip } from "../Tooltip/Tooltip.js";
 
+/** The value inside a cell: its tooltip shows only while this is cut short. */
+const cellValue = (cell: HTMLElement) => cell.querySelector<HTMLElement>(".cy-data-grid-value");
+
 export interface DataGridTokens {
   /** Height of the grid (it scrolls inside, in both directions). */
   height: string;
@@ -74,7 +77,10 @@ export interface DataGridColumn<Row> {
   cell?: (row: Row) => ReactNode;
   /** The cell's raw value: what sorting compares and copying writes. Default: `row[key]`. */
   value?: (row: Row) => unknown;
-  /** The full value of a cell cut short, shown in a Tooltip on hover and keyboard focus. Nothing: no tooltip. */
+  /**
+   * The full value of a cell, shown in a Tooltip on hover and keyboard focus only while the cell's text is cut short
+   * with an ellipsis. It repeats what the cell holds, so it is not read again. Nothing: no tooltip.
+   */
   tooltip?: (row: Row) => ReactNode;
   /** Colours the cell's text: "null" for an empty value, "number" for numbers, or a tone. */
   cellTone?: (row: Row) => DataGridCellTone | undefined;
@@ -650,7 +656,12 @@ export function DataGrid<Row>({
                       return tip === null || tip === undefined || tip === "" ? (
                         cell
                       ) : (
-                        <Tooltip key={column.key} content={tip} className="cy-data-grid-tip">
+                        <Tooltip
+                          key={column.key}
+                          content={tip}
+                          whenTruncated={cellValue}
+                          className="cy-data-grid-tip"
+                        >
                           {cell}
                         </Tooltip>
                       );

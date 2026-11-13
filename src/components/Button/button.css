@@ -184,7 +184,7 @@
   /* Square: one icon as the content (IconButton). As wide as it is tall; the label box steps aside so the icon is not
      clipped by it. */
   &[data-square] {
-    inline-size: var(--_h);
+    inline-size: var(--cy-button-square-width, var(--_h));
     padding: 0;
     & .cy-button-label {
       display: contents;

@@ -575,7 +575,8 @@ const explorer: TreeItem<SchemaObject>[] = [
 const row = (root: HTMLElement, name: string | RegExp) =>
   within(root).getByRole("treeitem", { name }) as HTMLElement;
 const actionsOf = (el: HTMLElement) => el.querySelector(".cy-tree-actions") as HTMLElement;
-const shows = (el: HTMLElement) => getComputedStyle(el).visibility === "visible";
+// Shown: not hidden by opacity (a reveal may still be easing in).
+const shows = (el: HTMLElement) => getComputedStyle(el).opacity !== "0";
 
 export const GroupRowsOpenAndCountButNeverSelect: Story = {
   args: { label: "Schema", items: explorer, defaultExpanded: ["tables", "views"] },
@@ -630,7 +631,7 @@ export const RowActionsFromTheKeyboard: Story = {
     await userEvent.tab();
     await userEvent.keyboard("{ArrowDown}");
     await expect(users).toHaveFocus();
-    await expect(shows(actionsOf(users))).toBe(true);
+    await waitFor(() => expect(shows(actionsOf(users))).toBe(true));
     // The row's name is its label and trailing text, not its buttons'.
     await expect(users).toHaveAccessibleName("users 1.2k");
     // Tab reaches the focused row's buttons; Enter presses one, with the item and its payload, and selects nothing.
@@ -671,7 +672,7 @@ export const RowActionsByPointer: Story = {
     const orders = row(canvasElement, "orders 880");
     // A selected row shows its buttons; a press runs the command and leaves the selection alone.
     await userEvent.click(within(orders).getByText("orders"));
-    await expect(shows(actionsOf(orders))).toBe(true);
+    await waitFor(() => expect(shows(actionsOf(orders))).toBe(true));
     await expect(shows(actionsOf(users))).toBe(false);
     await userEvent.click(within(orders).getByRole("button", { name: "Open in query tab" }));
     await expect(args.onCommand).toHaveBeenLastCalledWith("open", expect.objectContaining({ id: "orders" }));
@@ -1099,7 +1100,7 @@ export const TouchShowsActionsAndLongPressOpensTheMenu: Story = {
   play: async ({ args, canvasElement, userEvent }) => {
     const orders = row(canvasElement, "orders 880");
     // No hover on a touch screen: the buttons always show, and are big enough for a finger.
-    await expect(shows(actionsOf(orders))).toBe(true);
+    await waitFor(() => expect(shows(actionsOf(orders))).toBe(true));
     const button = within(orders).getByRole("button", { name: "View data" });
     const hit = getComputedStyle(button, "::before");
     await expect(Number.parseFloat(hit.height)).toBeGreaterThanOrEqual(44);

@@ -43,10 +43,10 @@ import { Disclosure } from "@arshad-shah/cynosure";
 
 <Canvas of={Stories.EdgeShowsAToneOrAnyColour} />
 
-`summaryEnd` puts content at the end of the summary row, before the chevron: a Badge with a count or a status, or a Button of its own. It is outside the trigger button, so its text is not part of the trigger's name and a Button there is a separate tab stop that does not toggle the section. Pressing plain content there, such as a Badge, toggles it. A long summary wraps before it.
+`trailing` puts content at the end of the summary row, before the chevron: a Badge with a count or a status, or a Button of its own. It is outside the trigger button, so its text is not part of the trigger's name and a Button there is a separate tab stop that does not toggle the section. Pressing plain content there, such as a Badge, toggles it. A long summary wraps before it.
 
 ```tsx
-<Disclosure summary="Tool call: run_query" edge="success" summaryEnd={<Badge tone="success">Done</Badge>}>
+<Disclosure summary="Tool call: run_query" edge="success" trailing={<Badge tone="success">Done</Badge>}>
   …
 </Disclosure>
 ```
@@ -62,7 +62,7 @@ import { Disclosure } from "@arshad-shah/cynosure";
 | Input | Result |
 | --- | --- |
 | Click, tap, <kbd>Enter</kbd>, <kbd>Space</kbd> | Opens or closes |
-| <kbd>Tab</kbd> | Skips content inside a closed section; reaches a control in `summaryEnd` after the trigger |
+| <kbd>Tab</kbd> | Skips content inside a closed section; reaches a control in `trailing` after the trigger |
 
 - **Wiring:** the trigger is a button with `aria-expanded` and `aria-controls`. `headingLevel` wraps it in a heading, and `region` makes the content a region labelled by the trigger.
 - **Hidden means hidden:** after closing, the content is not focusable and not announced.
@@ -75,7 +75,7 @@ The trigger is the full width and at least 44px tall on coarse pointers.
 
 ## Theming
 
-Tokens: `--cy-disclosure-gap` (summary to chevron, and around `summaryEnd`), `--cy-disclosure-radius` (card), `--cy-disclosure-padding-inline` and `--cy-disclosure-edge-width` (the `edge`, 4px by default). The speed follows `--cy-motion-base`.
+Tokens: `--cy-disclosure-gap` (summary to chevron, and around `trailing`), `--cy-disclosure-radius` (card), `--cy-disclosure-padding-inline` and `--cy-disclosure-edge-width` (the `edge`, 4px by default). The speed follows `--cy-motion-base`.
 
 ```ts
 createTheme({ components: { disclosure: { radius: "8px", paddingInline: "20px" } } });

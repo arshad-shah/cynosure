@@ -5,8 +5,8 @@ import {
   type KeyboardEvent,
   type MouseEventHandler,
   type ReactNode,
+  type RefObject,
   useContext,
-  useEffect,
   useId,
   useImperativeHandle,
   useRef,
@@ -17,6 +17,7 @@ import { LinkBase } from "../../foundations/LinkBase/LinkBase.js";
 import { useRovingFocus } from "../../foundations/roving-focus.js";
 import type { Size, Tone } from "../../tokens/schema.js";
 import { Badge } from "../Badge/Badge.js";
+import { RowActions } from "../RowActions/RowActions.js";
 
 export interface ListRowTokens {
   /** The row's background at rest: the colour of the surface the list sits on (actions are drawn over it). */
@@ -113,28 +114,6 @@ export const ListRows = forwardRef<HTMLUListElement, ListRowsProps>(function Lis
   const root = useRef<HTMLUListElement>(null);
   useImperativeHandle(ref, () => root.current as HTMLUListElement);
   useRovingFocus(root, { orientation: "vertical", loop: false, selector: MAIN, current: true });
-
-  // The actions of the row holding the Tab stop (and of rows that cannot be pressed) are in the Tab order: Tab from
-  // a row reaches its actions, then leaves the list. Everyone else's are reached with the arrows.
-  useEffect(() => {
-    const list = root.current as HTMLUListElement;
-    const sync = () => {
-      for (const row of list.querySelectorAll<HTMLElement>(":scope > .cy-list-row")) {
-        const main = row.querySelector<HTMLElement>(`:scope > .cy-list-row-text > ${MAIN}`);
-        const want = !main || main.tabIndex === 0 ? 0 : -1;
-        for (const action of actionsOf(row)) if (action.tabIndex !== want) action.tabIndex = want;
-      }
-    };
-    sync();
-    const observer = new MutationObserver(sync);
-    observer.observe(list, {
-      childList: true,
-      subtree: true,
-      attributes: true,
-      attributeFilter: ["tabindex"],
-    });
-    return () => observer.disconnect();
-  }, []);
 
   // Left and Right (mirrored in RTL) move between a row's own control and its actions.
   const onKeyDown = (event: KeyboardEvent<HTMLUListElement>) => {
@@ -236,6 +215,7 @@ export const ListRow = forwardRef<HTMLLIElement, ListRowProps>(function ListRow(
   ref,
 ) {
   const labels = useContext(RowsContext);
+  const main = useRef<HTMLElement>(null);
   if (!labels) throw new Error("<ListRow> must be inside <ListRows>");
   const id = useId();
   const toneWord = tone && tone !== "accent" && tone !== "neutral" ? labels[tone] : "";
@@ -297,11 +277,22 @@ export const ListRow = forwardRef<HTMLLIElement, ListRowProps>(function ListRow(
       )}
       <span className="cy-list-row-text cy-reset">
         {href != null ? (
-          <LinkBase {...control} href={href} onClick={onClick} aria-current={active ? "page" : undefined}>
+          <LinkBase
+            {...control}
+            ref={main as RefObject<HTMLAnchorElement>}
+            href={href}
+            onClick={onClick}
+            aria-current={active ? "page" : undefined}
+          >
             {title}
           </LinkBase>
         ) : onClick ? (
-          <ButtonBase {...control} onClick={onClick} aria-current={active ? "true" : undefined}>
+          <ButtonBase
+            {...control}
+            ref={main as RefObject<HTMLButtonElement>}
+            onClick={onClick}
+            aria-current={active ? "true" : undefined}
+          >
             {title}
           </ButtonBase>
         ) : (
@@ -341,7 +332,13 @@ export const ListRow = forwardRef<HTMLLIElement, ListRowProps>(function ListRow(
           )}
         </span>
       )}
-      {actions != null && <span className="cy-list-row-actions">{actions}</span>}
+      {/* The actions of the row holding the Tab stop (and of a row that cannot be pressed) are in the Tab order: Tab
+          from a row reaches its actions, then leaves the list. Everyone else's are reached with the arrows. */}
+      {actions != null && (
+        <RowActions className="cy-list-row-actions" tabbable={main}>
+          {actions}
+        </RowActions>
+      )}
     </li>
   );
 });

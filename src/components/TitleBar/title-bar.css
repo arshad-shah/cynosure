@@ -47,13 +47,12 @@
 .cy-title-bar-control-anchor.cy-title-bar-control-anchor {
   align-self: stretch;
 }
-/* Layout of the child IconButton (its size), and its look through its own tokens. Quadrupled to win over the button's
-   square sizing, which is as wide as it is tall. */
-.cy-title-bar-control.cy-title-bar-control.cy-title-bar-control.cy-title-bar-control {
+/* The child IconButton's size and look, through its own tokens: as tall as the bar, wider than tall. */
+.cy-title-bar-control.cy-title-bar-control {
   --cy-button-height-md: 100%;
+  --cy-button-square-width: var(--cy-title-bar-control-width, calc(var(--cy-space-10) + var(--cy-space-3)));
   --cy-button-radius: 0;
   --cy-button-press-scale: 1;
-  inline-size: var(--cy-title-bar-control-width, calc(var(--cy-space-10) + var(--cy-space-3)));
 }
 .cy-title-bar-close.cy-title-bar-close {
   --cy-button-hover-bg: var(--cy-title-bar-close-hover-bg, var(--cy-color-danger));

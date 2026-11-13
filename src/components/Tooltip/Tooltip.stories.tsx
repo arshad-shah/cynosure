@@ -220,3 +220,67 @@ export const DisabledNeverShowsOrDescribes: Story = {
     await expect(trigger.parentElement).toHaveClass("cy-tooltip-anchor");
   },
 };
+
+const LONG_LABEL = "quarterly-revenue-by-region-and-channel.csv";
+
+export const OnlyWhileTheTextIsCutShort: Story = {
+  args: {
+    content: LONG_LABEL,
+    delay: 0,
+    whenTruncated: (trigger) => trigger.querySelector<HTMLElement>("[data-testid='text']"),
+  },
+  render: (args) => (
+    <div>
+      <Tooltip {...args}>
+        <Button data-testid="trigger">
+          <span
+            data-testid="text"
+            style={{
+              display: "block",
+              inlineSize: 120,
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {LONG_LABEL}
+          </span>
+        </Button>
+      </Tooltip>
+    </div>
+  ),
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const trigger = canvas.getByTestId("trigger");
+    const text = canvas.getByTestId("text");
+    await expect(text.scrollWidth).toBeGreaterThan(text.clientWidth);
+    // Cut short: focus shows the full text, for the eye only (the trigger's name already holds it).
+    await userEvent.tab();
+    await waitFor(() => expect(isOpen(tooltip(canvasElement))).toBe(true));
+    await expect(tooltip(canvasElement)).toHaveAttribute("aria-hidden", "true");
+    await expect(trigger).not.toHaveAttribute("aria-describedby");
+    // Room for the whole text (a resize, no new render): the tip closes and stays off; the trigger is the same element.
+    text.style.inlineSize = "600px";
+    await waitFor(() => expect(canvasElement.ownerDocument.querySelector(".cy-tooltip")).toBeNull());
+    await expect(canvas.getByTestId("trigger")).toBe(trigger);
+    await userEvent.tab({ shift: true });
+    await userEvent.tab();
+    await pause(50);
+    await expect(canvasElement.ownerDocument.querySelector(".cy-tooltip")).toBeNull();
+    // Cut short again: it works again.
+    text.style.inlineSize = "120px";
+    await waitFor(() => expect(tooltip(canvasElement)).not.toBeNull());
+    await userEvent.tab({ shift: true });
+    await userEvent.tab();
+    await waitFor(() => expect(isOpen(tooltip(canvasElement))).toBe(true));
+  },
+};
+
+export const WhenTruncatedMeasuresTheTrigger: Story = {
+  args: { content: "Export everything", delay: 0, whenTruncated: true },
+  play: async ({ canvasElement, userEvent }) => {
+    // `true` measures the trigger itself, which fits: no tip at all.
+    await userEvent.tab();
+    await pause(50);
+    await expect(canvasElement.ownerDocument.querySelector(".cy-tooltip")).toBeNull();
+  },
+};

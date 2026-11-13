@@ -8,6 +8,7 @@ import {
   useEffect,
   useId,
   useLayoutEffect,
+  useMemo,
   useRef,
   useState,
 } from "react";
@@ -15,6 +16,7 @@ import { useDrag } from "../../foundations/drag.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
 import { isComposing } from "../../foundations/keys.js";
 import { useActiveOption } from "../../foundations/listbox.js";
+import { mergeRefs } from "../../foundations/refs.js";
 import { TextAreaBase } from "../../foundations/TextAreaBase/TextAreaBase.js";
 import { textMatches } from "../../foundations/text-match.js";
 import { resizeCorner } from "../../icons/resize-corner.js";
@@ -181,14 +183,7 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(function 
   const manual = useRef(0);
   const grip = useRef<HTMLSpanElement>(null);
   const dragFrom = useRef({ height: 0, manual: 0 });
-  const ref = useCallback(
-    (node: HTMLTextAreaElement | null) => {
-      inner.current = node;
-      if (typeof forwarded === "function") forwarded(node);
-      else if (forwarded) forwarded.current = node;
-    },
-    [forwarded],
-  );
+  const ref = useMemo(() => mergeRefs(inner, forwarded), [forwarded]);
 
   const resize = useCallback(() => {
     const area = inner.current;

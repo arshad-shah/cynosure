@@ -36,6 +36,15 @@ Components expose the same props with the same meaning, so control is predictabl
 
 Props become `data-size`, `data-tone` and `data-variant` attributes that the component's CSS maps to tokens. Every story declares `argTypes` with a control for each prop. `pnpm cy new component` generates this shape.
 
+### Slots
+
+Content props that place things in a component's own layout use the same names:
+
+- **`leading` / `trailing`**: content at the start or end of the component's own row, inside it (an icon, a count, a Badge, a "New tab" button): TitleBar, ListRow, Tree items, TabList, Disclosure's summary row, Select, SearchField, FloatingToolbar. Never `start`, `end` or `summaryEnd` for this.
+- **`actions`**: buttons for the thing the component shows (IconButtons, a Menu), usually revealed on hover or focus: ListRow, Tree items, ChatMessage, CodeBlock.
+- **Commands**: a chosen context-menu item or a pressed row action is reported through `onCommand(value, …)` (Tree's with the item, a Tab's for itself), not `onSelect`, which is for choosing a value.
+- **`start` / `end`**: whole clusters of separate parts at the two ends of a bar (StatusBar's segments). Use them only where the component lays out two such groups.
+
 ## Ownership: reuse components, never their insides
 
 - **One stylesheet per component folder**, `<kebab-folder>.css`, and it styles only that folder's classes (`cy-<component>` and `cy-<component>-*` for each component the folder exports). Shared rules live in `src/styles/base.css` (`.cy-reset`, `.cy-visually-hidden`).

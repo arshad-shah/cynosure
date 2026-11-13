@@ -165,12 +165,78 @@ export const DotTones: Story = {
       getComputedStyle(canvas.getByText("danger")).color,
     );
     // Without dotLabel the dot is decoration (the text says the state); with it, the dot is a named image.
-    await expect(dotOf("success").closest("[aria-hidden]")).toHaveAttribute("aria-hidden", "true");
+    await expect(dotOf("success").closest(".cy-badge")).toHaveAttribute("aria-hidden", "true");
+    await expect(dotOf("success").closest(".cy-badge")).not.toHaveAttribute("role");
     await expect(canvas.queryAllByRole("img")).toHaveLength(1);
     const recording = canvas.getByRole("img", { name: "Recording" });
     await expect(getComputedStyle(recording.querySelector(".cy-badge-dot") as Element).animationName).toBe(
       "cy-badge-live",
     );
+  },
+};
+
+export const LayoutPropsAndAnOpenPopover: Story = {
+  args: {
+    start: (
+      <>
+        <StatusBarSegment onClick={() => {}} className="pushed" style={{ marginInlineStart: 12 }}>
+          spaced
+        </StatusBarSegment>
+        <StatusBarSegment popover={<p>Branch details</p>} defaultOpen>
+          main
+        </StatusBarSegment>
+      </>
+    ),
+    end: null,
+  },
+  play: async ({ canvas, canvasElement }) => {
+    // className and style reach a clickable segment's button, beside its own class.
+    const spaced = canvas.getByRole("button", { name: "spaced" });
+    await expect(spaced).toHaveClass("cy-status-bar-button", "pushed");
+    await expect(getComputedStyle(spaced).marginInlineStart).toBe("12px");
+    // A popover open from the start, named by nothing given (its text is not a string): open, with an empty name.
+    const branch = canvas.getByRole("button", { name: "main" });
+    await expect(branch).toHaveAttribute("aria-expanded", "true");
+    await waitFor(() =>
+      expect(canvasElement.ownerDocument.querySelector("[popover]:popover-open")).not.toBeNull(),
+    );
+  },
+};
+
+export const SoftTintToken: Story = {
+  args: {
+    start: (
+      <>
+        <StatusBarSegment variant="soft" tone="accent">
+          static
+        </StatusBarSegment>
+        <StatusBarSegment variant="soft" tone="accent" onClick={() => {}}>
+          clickable
+        </StatusBarSegment>
+      </>
+    ),
+    end: null,
+  },
+  play: async ({ canvas, canvasElement }) => {
+    const fill = (text: string) =>
+      getComputedStyle(canvas.getByText(text).closest(".cy-status-bar-segment, button") as Element)
+        .backgroundColor;
+    // A static and a clickable soft segment share one tint, read from the bar's own token.
+    await expect(fill("static")).toBe(fill("clickable"));
+    const before = fill("static");
+    const bar = canvasElement.querySelector(".cy-status-bar") as HTMLElement;
+    bar.style.setProperty("--cy-status-bar-soft-mix", "60%");
+    await expect(fill("static")).not.toBe(before);
+    // The button's fill eases to its new colour.
+    await waitFor(() => expect(fill("clickable")).toBe(fill("static")));
+    // Button's own token does not reach either: the bar's look is set through its own tokens.
+    bar.style.setProperty("--cy-button-soft-mix", "5%");
+    await pause(300);
+    await expect(fill("static")).toBe(fill("clickable"));
+    // Back to the theme's tint, which keeps the text readable.
+    bar.style.removeProperty("--cy-status-bar-soft-mix");
+    bar.style.removeProperty("--cy-button-soft-mix");
+    await waitFor(() => expect(fill("clickable")).toBe(before));
   },
 };
 
