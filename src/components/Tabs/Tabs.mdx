@@ -102,7 +102,7 @@ A middle-click on a closable tab closes it too, as in browsers and editors.
 
 ### Commands on a tab
 
-`contextMenu` gives a tab its own commands, such as Close others or Close to the right, with the items `Menu` takes; `onContextMenuSelect` gets the chosen item's `value`. Right-click, a long press, Shift+F10 or the context menu key opens it. A command that closes the tab moves focus to the tab then selected, as Delete does.
+`contextMenu` gives a tab its own commands, such as Close others or Close to the right, with the items `Menu` takes; `onCommand` gets the chosen item's `value`. Right-click, a long press, Shift+F10 or the context menu key opens it. A command that closes the tab moves focus to the tab then selected, as Delete does.
 
 ```tsx
 <Tab
@@ -113,7 +113,7 @@ A middle-click on a closable tab closes it too, as in browsers and editors.
     { value: "others", label: "Close others" },
     { value: "right", label: "Close to the right", disabled: isLast },
   ]}
-  onContextMenuSelect={(command) => run(command, f)}
+  onCommand={(command) => run(command, f)}
 >
   {f}
 </Tab>
@@ -125,7 +125,7 @@ A middle-click on a closable tab closes it too, as in browsers and editors.
 
 <ArgTypes of={Stories} />
 
-`Tab`: `value`, `icon`, `disabled`, `onClose`, `dirty`, `contextMenu`, `onContextMenuSelect`, `closeLabel`, `children`. The close button is named `labels.close` with the tab's text (a label with markup, such as a badge, is named by the text it shows); give `closeLabel` to name it yourself, such as "Close query 3". `TabList`: `label`, `onReorder`, `scrollable`, `trailing`. `Tabs` also takes `labels`: `close(name)`, `closeUnsaved(name)`, `unsaved`, `scrollBack`, `scrollForward`, `menu(name)` and `moved(name, position, total)`. `TabPanel`: `value`, `keepMounted` (keep the content mounted while hidden, preserving its state; by default only the selected panel renders its content).
+`Tab`: `value`, `icon`, `disabled`, `onClose`, `dirty`, `contextMenu`, `onCommand`, `closeLabel`, `children`. The close button is named `labels.close` with the tab's text (a label with markup, such as a badge, is named by the text it shows); give `closeLabel` to name it yourself, such as "Close query 3". `TabList`: `label`, `onReorder`, `scrollable`, `trailing`. `Tabs` also takes `labels`: `close(name)`, `closeUnsaved(name)`, `unsaved`, `scrollBack`, `scrollForward`, `menu(name)` and `moved(name, position, total)`. `TabPanel`: `value`, `keepMounted` (keep the content mounted while hidden, preserving its state; by default only the selected panel renders its content).
 
 ## Behaviour and accessibility
 

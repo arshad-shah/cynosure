@@ -42,6 +42,7 @@ Content props that place things in a component's own layout use the same names:
 
 - **`leading` / `trailing`**: content at the start or end of the component's own row, inside it (an icon, a count, a Badge, a "New tab" button): TitleBar, ListRow, Tree items, TabList, Disclosure's summary row, Select, SearchField, FloatingToolbar. Never `start`, `end` or `summaryEnd` for this.
 - **`actions`**: buttons for the thing the component shows (IconButtons, a Menu), usually revealed on hover or focus: ListRow, Tree items, ChatMessage, CodeBlock.
+- **Commands**: a chosen context-menu item or a pressed row action is reported through `onCommand(value, …)` (Tree's with the item, a Tab's for itself), not `onSelect`, which is for choosing a value.
 - **`start` / `end`**: whole clusters of separate parts at the two ends of a bar (StatusBar's segments). Use them only where the component lays out two such groups.
 
 ## Ownership: reuse components, never their insides

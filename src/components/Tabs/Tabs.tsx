@@ -498,10 +498,10 @@ export interface TabProps {
    */
   contextMenu?: MenuEntry[] | undefined;
   /**
-   * Called with the chosen `contextMenu` item's `value`. If the command removes this tab, focus moves to the tab then
-   * selected, as after Delete.
+   * Called with the chosen `contextMenu` item's `value` (named as Tree's `onCommand`). If the command removes this tab,
+   * focus moves to the tab then selected, as after Delete.
    */
-  onContextMenuSelect?: ((value: string) => void) | undefined;
+  onCommand?: ((value: string) => void) | undefined;
   /** The tab's label. */
   children: ReactNode;
 }
@@ -514,7 +514,7 @@ export function Tab({
   closeLabel,
   dirty = false,
   contextMenu,
-  onContextMenuSelect,
+  onCommand,
   children,
 }: TabProps) {
   const { value: current, select, activation, tabId, panelId, panels, labels, refocus } = useTabs("Tab");
@@ -540,7 +540,7 @@ export function Tab({
   const targetFor = useContext(MenuContext);
   const menu =
     contextMenu && targetFor
-      ? targetFor({ value, name, items: contextMenu, onSelect: onContextMenuSelect })
+      ? targetFor({ value, name, items: contextMenu, onSelect: onCommand })
       : undefined;
   // A label cut short by `--cy-tabs-label-max-width` shows its full text in a tooltip. The tooltip is always there (off
   // while the label fits), so the tab is never remounted when its text grows or shrinks.
