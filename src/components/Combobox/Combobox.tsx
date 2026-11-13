@@ -10,7 +10,6 @@ import {
 import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js";
 import { useControllableState } from "../../foundations/controllable.js";
 import { HiddenValue } from "../../foundations/HiddenValue/HiddenValue.js";
-import { Icon } from "../../foundations/Icon/Icon.js";
 import { isComposing } from "../../foundations/keys.js";
 import { seekEnabled, useActiveOption } from "../../foundations/listbox.js";
 import { OptionIcon, type OptionIconColor } from "../../foundations/option-icon.js";
@@ -317,16 +316,13 @@ export function Combobox({
         label={typeof label === "string" ? label : undefined}
         busy={loading}
         footer={
-          footer && (
-            <OptionListItem
-              id={optionId(atFooter)}
-              label={footer.label}
-              icon={footer.icon && <Icon icon={footer.icon} className="cy-combobox-icon" />}
-              active={active === atFooter}
-              onPointerMove={() => setActive(atFooter)}
-              onClick={runFooter}
-            />
-          )
+          footer && {
+            action: footer,
+            id: optionId(atFooter),
+            active: active === atFooter,
+            onActive: () => setActive(atFooter),
+            onRun: runFooter,
+          }
         }
       >
         {loading && <OptionListNote>{text.loading}</OptionListNote>}

@@ -312,16 +312,13 @@ export function Select({
             id={listId}
             aria-labelledby={field.labelId}
             footer={
-              footer && (
-                <OptionListItem
-                  id={optionId(atFooter)}
-                  label={footer.label}
-                  icon={footer.icon && <Icon icon={footer.icon} className="cy-select-icon" />}
-                  active={active === atFooter}
-                  onPointerMove={() => setActive(atFooter)}
-                  onClick={runFooter}
-                />
-              )
+              footer && {
+                action: footer,
+                id: optionId(atFooter),
+                active: active === atFooter,
+                onActive: () => setActive(atFooter),
+                onRun: runFooter,
+              }
             }
           >
             {options.length === 0 && <OptionListNote>{labels?.empty ?? "No options"}</OptionListNote>}
