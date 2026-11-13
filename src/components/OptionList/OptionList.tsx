@@ -1,4 +1,5 @@
 import { type CSSProperties, forwardRef, type HTMLAttributes, type ReactNode } from "react";
+import { Icon } from "../../foundations/Icon/Icon.js";
 import type { IconData } from "../../icons/types.js";
 
 export interface OptionListTokens {
@@ -41,16 +42,30 @@ export interface OptionListProps {
   /** OptionListItem, OptionListNote and OptionListGroup. */
   children?: ReactNode;
   /**
-   * Pinned under the options, set off by a line and kept in view while they scroll: an action such as "Manage
-   * connections…", drawn as an OptionListItem. It is an option of the list (a listbox holds only options), so the
-   * field's arrow keys reach it after the last option and Enter runs it, while focus stays in the field.
+   * An action pinned under the options, set off by a line and kept in view while they scroll ("Manage
+   * connections…"). The list draws it as an option (a listbox holds only options), so the field's arrow keys reach it
+   * after the last option and Enter runs it, while focus stays in the field. Select's and Combobox's `footer`.
    */
-  footer?: ReactNode;
+  footer?: OptionListFooter | undefined;
+}
+
+/** The footer row: an action the list draws and the field that owns the list runs. */
+export interface OptionListFooter {
+  /** The action: its label, icon and what it does. */
+  action: OptionListAction;
+  /** The row's id, the target of the field's `aria-activedescendant` (with `useActiveOption`, `optionId(count)`). */
+  id: string;
+  /** The arrow keys are on it (highlighted). */
+  active: boolean;
+  /** The pointer moved over it: make it the active option. */
+  onActive: () => void;
+  /** A press on it: close the list, then run the action. */
+  onRun: () => void;
 }
 
 /**
- * The drop-down list of options under a field: Select, Combobox and TagInput draw their lists with it. It is a manual
- * popover; show, place and dismiss it with `useListboxLayer`, and move the active option with
+ * The drop-down list of options under a field: Select, Combobox, TagInput and TextArea's mentions draw their lists
+ * with it. It is a manual popover; show, place and dismiss it with `useListboxLayer`, and move the active option with
  * `aria-activedescendant` from the field, which keeps focus.
  */
 export const OptionList = forwardRef<HTMLDivElement, OptionListProps>(function OptionList(
@@ -72,7 +87,14 @@ export const OptionList = forwardRef<HTMLDivElement, OptionListProps>(function O
       {children}
       {footer && (
         <div role="none" className="cy-option-list-footer cy-reset">
-          {footer}
+          <OptionListItem
+            id={footer.id}
+            label={footer.action.label}
+            icon={footer.action.icon && <Icon icon={footer.action.icon} className="cy-option-list-icon" />}
+            active={footer.active}
+            onPointerMove={footer.onActive}
+            onClick={footer.onRun}
+          />
         </div>
       )}
     </div>

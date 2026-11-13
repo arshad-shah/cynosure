@@ -379,6 +379,10 @@ export const TrailingDimmedAndAFooterAction: Story = {
     // The footer is the last option: End, ArrowDown and PageDown reach it, and it never goes past it.
     await userEvent.keyboard("{End}");
     await expect(active(canvasElement)).toBe("Manage connections…");
+    // The list draws the action with its icon.
+    await expect(
+      canvas.getByRole("option", { name: "Manage connections…" }).querySelector("svg"),
+    ).not.toBeNull();
     await userEvent.keyboard("{ArrowDown}");
     await expect(active(canvasElement)).toBe("Manage connections…");
     await userEvent.keyboard("{ArrowUp}");

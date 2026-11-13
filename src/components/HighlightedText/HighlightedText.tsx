@@ -1,4 +1,5 @@
 import { type CSSProperties, memo, type ReactNode } from "react";
+import { textMatchRanges } from "../../foundations/text-match.js";
 
 export interface HighlightedTextTokens {
   radius: string;
@@ -32,9 +33,10 @@ export interface HighlightedTextProps {
   style?: CSSProperties;
 }
 
-const literal = (term: string) => term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-
-/** Which characters of `text` are matched: from `positions`, else from every occurrence of each `query` term. */
+/**
+ * Which characters of `text` are matched: from `positions`, else from every occurrence of each `query` term, found as
+ * `textMatches` finds them (so a filter built on it keeps exactly the rows that show a mark).
+ */
 export function matchedCharacters(
   text: string,
   positions: readonly number[] | undefined,
@@ -45,12 +47,8 @@ export function matchedCharacters(
     for (const p of positions) if (p >= 0 && p < text.length) hit[p] = true;
     return hit;
   }
-  const terms = (typeof query === "string" ? [query] : (query ?? [])).filter(Boolean);
-  for (const term of terms) {
-    // A regular expression ignoring case keeps indices in `text` itself (lower-casing can change a string's length).
-    for (const m of text.matchAll(new RegExp(literal(term), "giu")))
-      hit.fill(true, m.index, m.index + m[0].length);
-  }
+  for (const term of typeof query === "string" ? [query] : (query ?? []))
+    for (const [start, end] of textMatchRanges(text, term)) hit.fill(true, start, end);
   return hit;
 }
 

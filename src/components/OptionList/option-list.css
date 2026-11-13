@@ -1,6 +1,7 @@
 /*
- * option-list: the drop-down list of options under a field (Select, Combobox, TagInput), in the top layer. Options,
- * notes and group headings; every visual property reads a --cy-option-list-* token with a global fallback.
+ * option-list: the drop-down list of options under a field (Select, Combobox, TagInput, TextArea's mentions), in
+ * the top layer. Options, notes and group headings; every visual property reads a --cy-option-list-* token with a
+ * global fallback.
  */
 .cy-option-list.cy-option-list {
   box-sizing: border-box !important;

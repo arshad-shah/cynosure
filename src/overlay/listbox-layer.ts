@@ -15,8 +15,9 @@ export interface ListboxLayerOptions {
 }
 
 /**
- * The drop-down list layer of Select, Combobox and TagInput: shown in the top layer, at least as wide as its anchor,
- * placed below it (flipping when there is no room), and closed by Escape or a press outside in layer order.
+ * The drop-down list layer of Select, Combobox, TagInput and TextArea's mentions: shown in the top layer, at least as
+ * wide as its anchor, placed below it (flipping when there is no room), and closed by Escape or a press outside in
+ * layer order.
  */
 export function useListboxLayer({ anchor, list, open, onClose, capWidth = false }: ListboxLayerOptions) {
   usePopover(list, open, (el) => {

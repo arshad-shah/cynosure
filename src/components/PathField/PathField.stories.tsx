@@ -86,6 +86,41 @@ export const CancellingChangesNothing: Story = {
   },
 };
 
+/** A picker the story makes fail itself, once the busy state has been checked. */
+let fail: (reason: Error) => void = () => {};
+export const AFailingPickerChangesNothing: Story = {
+  args: {
+    defaultValue: "/srv/old.db",
+    onPick: fn(
+      () =>
+        new Promise<string | null>((_, reject) => {
+          fail = reject;
+        }),
+    ),
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    const unhandled: unknown[] = [];
+    const listen = (event: PromiseRejectionEvent) => unhandled.push(event.reason);
+    window.addEventListener("unhandledrejection", listen);
+    try {
+      const browse = canvas.getByRole("button", { name: "Browse…" });
+      await userEvent.click(browse);
+      await expect(browse).toHaveAttribute("aria-busy", "true");
+      fail(new Error("IPC"));
+      // The picker failed: the button is free again, the path stays, and the failure is not left unhandled.
+      await waitFor(() => expect(browse).not.toHaveAttribute("aria-busy"));
+      await new Promise((resolve) => setTimeout(resolve, 50));
+      await expect(canvas.getByRole("textbox", { name: "Database file" })).toHaveValue("/srv/old.db");
+      await expect(args.onChange).not.toHaveBeenCalled();
+      await expect(unhandled).toEqual([]);
+      await userEvent.click(browse);
+      await expect(args.onPick).toHaveBeenCalledTimes(2);
+    } finally {
+      window.removeEventListener("unhandledrejection", listen);
+    }
+  },
+};
+
 export const TypeClearAndKeyboard: Story = {
   play: async ({ args, canvas, userEvent }) => {
     const input = canvas.getByRole("textbox", { name: "Database file" });
@@ -152,6 +187,23 @@ export const InAForm: Story = {
     await expect(form.checkValidity()).toBe(false);
     // Browse never submits the form.
     await expect(canvas.getByRole("button", { name: "Browse…" })).toHaveAttribute("type", "button");
+  },
+};
+
+export const InAFormByItsId: Story = {
+  args: { name: "db", defaultValue: "/srv/a.db", form: "path-form" },
+  render: (args) => (
+    <>
+      <form id="path-form" />
+      <PathField {...args} />
+    </>
+  ),
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    // Outside the form, `form` still ties the path to it.
+    const form = canvasElement.querySelector("form") as HTMLFormElement;
+    await expect(new FormData(form).get("db")).toBe("/srv/a.db");
+    await userEvent.click(canvas.getByRole("button", { name: "Browse…" }));
+    await waitFor(() => expect(new FormData(form).get("db")).toBe("/home/me/data/app.db"));
   },
 };
 

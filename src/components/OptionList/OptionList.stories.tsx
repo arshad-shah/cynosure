@@ -75,18 +75,16 @@ function Demo({ fruits = FRUITS, grouped = false, onChoose, onManage, style }: D
         id={id}
         label="Fruit"
         footer={
-          onManage && (
-            <OptionListItem
-              id={`${id}-manage`}
-              label="Manage fruit…"
-              active={active === fruits.length}
-              onPointerMove={() => setActive(fruits.length)}
-              onClick={() => {
-                setOpen(false);
-                onManage();
-              }}
-            />
-          )
+          onManage && {
+            action: { label: "Manage fruit…", onSelect: onManage },
+            id: `${id}-${fruits.length}`,
+            active: active === fruits.length,
+            onActive: () => setActive(fruits.length),
+            onRun: () => {
+              setOpen(false);
+              onManage();
+            },
+          }
         }
       >
         {fruits.length === 0 && <OptionListNote>No fruit</OptionListNote>}
@@ -247,6 +245,11 @@ export const TrailingDimmedAndFooter: Story = {
     const options = [...list.querySelectorAll('[role="option"]')];
     await expect(options.at(-1)).toBe(footer);
     await expect(footer).toHaveAttribute("aria-selected", "false");
+    // The list draws the action itself: its id, no icon when the action has none, the pointer making it active.
+    await expect(footer.id.endsWith(`-${MORE_FRUITS.length}`)).toBe(true);
+    await expect(footer.querySelector("svg")).toBeNull();
+    await userEvent.hover(footer);
+    await waitFor(() => expect(footer).toHaveAttribute("data-active"));
     await expect(list.scrollHeight).toBeGreaterThan(list.clientHeight);
     const pinned = () =>
       expect(

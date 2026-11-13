@@ -52,10 +52,14 @@ export interface FileDropProps {
   /** Called with the files that passed the checks. */
   onFiles?: (files: File[]) => void;
   /**
-   * Replaces the browser's file dialog: the button calls it instead of opening the file input, for an app with its
-   * own picker (Electron's dialog over IPC). Put what was chosen in `value`. Dropped files still arrive in `onFiles`.
+   * Replaces the browser's file dialog with your picker (Electron's `dialog.showOpenDialog` over IPC), as PathField's
+   * `onPick`: the button calls it and is busy until it settles. It resolves with what was chosen, or null when it was
+   * cancelled; a cancel or a failure (the promise rejects) changes nothing. Chosen files are checked as dropped ones
+   * are and arrive in `onFiles`, chosen paths in `onPaths`. Dropped files still arrive in `onFiles`.
    */
-  onBrowse?: (() => void) | undefined;
+  onPick?: (() => Promise<readonly (File | string)[] | null>) | undefined;
+  /** Called with the paths `onPick` chose (strings, as your picker gave them); put them in `value` to list them. */
+  onPaths?: ((paths: string[]) => void) | undefined;
   /**
    * The chosen files or paths, listed in the zone by name (a File's `name`, a path as given), each with a remove
    * button when `onRemove` is set. Controlled: add to it from `onFiles` or your own picker. Display only: the native
@@ -136,7 +140,8 @@ export function acceptsFile(file: File, accept: string | undefined): boolean {
  */
 export function FileDrop({
   onFiles,
-  onBrowse,
+  onPick,
+  onPaths,
   value,
   onRemove,
   onReject,
@@ -192,6 +197,27 @@ export function FileDrop({
     setStatus(accepted.length ? text.added(accepted.length) : "");
     if (accepted.length) onFiles?.(accepted);
     if (rejected.length) onReject?.(rejected);
+    return accepted.length;
+  };
+
+  const [picking, setPicking] = useState(false);
+  const pick = (picker: NonNullable<FileDropProps["onPick"]>) => {
+    setPicking(true);
+    // A picker that fails changes nothing: the button stops being busy.
+    picker()
+      .then(
+        (items) => {
+          if (!items) return;
+          const files = items.filter((item): item is File => typeof item !== "string");
+          const paths = items.filter((item): item is string => typeof item === "string");
+          const added = files.length ? take(files, true) : 0;
+          if (!paths.length) return;
+          onPaths?.(paths);
+          setStatus(text.added(added + paths.length));
+        },
+        () => {},
+      )
+      .finally(() => setPicking(false));
   };
 
   const dragging = (event: { dataTransfer: DataTransfer | null }) =>
@@ -286,8 +312,9 @@ export function FileDrop({
         tone="neutral"
         size={size}
         disabled={disabled}
+        loading={picking}
         aria-describedby={hint ? `${id}-hint` : undefined}
-        onClick={() => (onBrowse ? onBrowse() : input.current?.click())}
+        onClick={() => (onPick ? pick(onPick) : input.current?.click())}
       >
         {multiple ? text.choose : text.chooseOne}
       </Button>

@@ -3,16 +3,16 @@ import {
   type CSSProperties,
   type KeyboardEvent,
   type ReactNode,
-  useEffect,
   useId,
   useRef,
   useState,
 } from "react";
-import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js";
 import { useControllableState } from "../../foundations/controllable.js";
 import { isRtl } from "../../foundations/dir.js";
 import { HiddenValue } from "../../foundations/HiddenValue/HiddenValue.js";
 import { isComposing } from "../../foundations/keys.js";
+import { useActiveOption } from "../../foundations/listbox.js";
+import { textMatches } from "../../foundations/text-match.js";
 import { close } from "../../icons/close.js";
 import type { IconData } from "../../icons/types.js";
 import { useListboxLayer } from "../../overlay/listbox-layer.js";
@@ -159,18 +159,22 @@ export function TagInput({
   const [problem, setProblem] = useState<string | null>(null);
   const [said, setSaid] = useState("");
   const [open, setOpen] = useState(false);
-  const [active, setActive] = useState(0);
   const input = useRef<HTMLInputElement>(null);
-  const anchor = useRef<HTMLElement | null>(null);
+  // The list drops from the whole field (TextField's box), not just the input.
+  const anchor = useRef<HTMLDivElement>(null);
   const list = useRef<HTMLDivElement>(null);
   const chips = useRef<HTMLUListElement>(null);
 
   const same = (a: string, b: string) => a.toLocaleLowerCase() === b.toLocaleLowerCase();
   const query = typed.trim();
-  const matches = (suggestions ?? []).filter(
-    (s) => !tags.some((t) => same(t, s)) && s.toLocaleLowerCase().includes(query.toLocaleLowerCase()),
-  );
+  const matches = (suggestions ?? []).filter((s) => !tags.some((t) => same(t, s)) && textMatches(s, query));
   const listOpen = open && suggestions !== undefined && !disabled;
+  const { active, activeId, optionId, setActive, first, last, move } = useActiveOption({
+    id: listId,
+    list,
+    open: listOpen,
+    count: matches.length,
+  });
 
   /** Adds each candidate that passes the checks; reports the first problem. Returns whether all were added. */
   const add = (candidates: string[]) => {
@@ -211,14 +215,7 @@ export function TagInput({
   const split = (s: string) =>
     [...separators, "\n"].reduce<string[]>((parts, sep) => parts.flatMap((p) => p.split(sep)), [s]);
 
-  // The list drops from the whole field (chips and input), found before the layer shows.
-  useClientLayoutEffect(() => {
-    anchor.current = input.current?.closest<HTMLElement>(".cy-text-field") ?? null;
-  });
   useListboxLayer({ anchor, list, open: listOpen, onClose: () => setOpen(false) });
-  useEffect(() => {
-    if (active >= matches.length) setActive(Math.max(0, matches.length - 1));
-  }, [active, matches.length]);
 
   const removeButtons = () => [...(chips.current?.querySelectorAll<HTMLButtonElement>("button") ?? [])];
 
@@ -262,11 +259,8 @@ export function TagInput({
         event.preventDefault();
         if (!listOpen) {
           setOpen(true);
-          setActive(event.key === "ArrowUp" ? Math.max(0, matches.length - 1) : 0);
-        } else
-          setActive((a) =>
-            Math.min(Math.max(a + (event.key === "ArrowDown" ? 1 : -1), 0), Math.max(0, matches.length - 1)),
-          );
+          setActive(event.key === "ArrowUp" ? last() : first());
+        } else move(event.key === "ArrowDown" ? 1 : -1);
         return;
       case "Escape":
         if (listOpen) {
@@ -311,6 +305,7 @@ export function TagInput({
     <div className={className ? `cy-tag-input ${className}` : "cy-tag-input"} data-size={size} style={style}>
       <TextField
         ref={input}
+        boxRef={anchor}
         label={label}
         labelHidden={labelHidden}
         layout={layout}
@@ -332,7 +327,7 @@ export function TagInput({
               "aria-autocomplete": "list" as const,
               "aria-expanded": listOpen,
               "aria-controls": listId,
-              "aria-activedescendant": listOpen && matches.length ? `${listId}-${active}` : undefined,
+              "aria-activedescendant": activeId,
             }
           : {})}
         onChange={(next) => {
@@ -384,7 +379,7 @@ export function TagInput({
             matches.map((s, index) => (
               <OptionListItem
                 key={s}
-                id={`${listId}-${index}`}
+                id={optionId(index)}
                 label={s}
                 selected={index === active}
                 active={index === active}

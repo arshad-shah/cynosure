@@ -18,6 +18,7 @@ Single-line input with label, description, error, icons and an optional clear bu
 | `iconStart` / `iconEnd`                                                                 | –           | Facet icons (RTL aware)                                                   |
 | `addonStart`                                                                            | –           | Controls inside the field's start, before the input (ColorField's swatch) |
 | `addonEnd`                                                                              | –           | Controls inside the field's end, after the input (NumberField's steppers) |
+| `boxRef`                                                                                | –           | The field's box, to anchor a list to the whole field (Combobox, TagInput) |
 | `clearable`                                                                             | `false`     | Clear button while filled; `labels.clear` overrides "Clear"               |
 | `required`, `disabled`, `readOnly`, `name`, `maxLength`, `autoComplete`, `inputMode`, … | –           | Native input attributes                                                   |
 

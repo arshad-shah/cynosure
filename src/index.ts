@@ -214,6 +214,7 @@ export {
   HighlightedText,
   type HighlightedTextProps,
   type HighlightedTextTokens,
+  textMatches,
 } from "./components/HighlightedText/index.js";
 export {
   HotkeyField,

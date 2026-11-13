@@ -389,7 +389,7 @@
   {
     "name": "FileDrop (with Button)",
     "path": ["dist/components/FileDrop/FileDrop.js", "dist/styles/file-drop.css"],
-    "limit": "3.5 kB",
+    "limit": "3.65 kB",
     "gzip": true
   },
   {

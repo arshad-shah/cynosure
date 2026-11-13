@@ -4,7 +4,6 @@ import {
   type KeyboardEvent,
   type ReactNode,
   useCallback,
-  useEffect,
   useId,
   useRef,
   useState,
@@ -15,7 +14,7 @@ import { HiddenValue } from "../../foundations/HiddenValue/HiddenValue.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
 import { iconSizeFor } from "../../foundations/icon-size.js";
 import { isComposing } from "../../foundations/keys.js";
-import { isTypeaheadKey, seekEnabled, useTypeahead } from "../../foundations/listbox.js";
+import { isTypeaheadKey, seekEnabled, useActiveOption, useTypeahead } from "../../foundations/listbox.js";
 import { clamp } from "../../foundations/math.js";
 import { OptionIcon, type OptionIconColor } from "../../foundations/option-icon.js";
 import { chevronDown } from "../../icons/chevron-down.js";
@@ -155,7 +154,6 @@ export function Select({
   const list = useRef<HTMLDivElement | null>(null);
   const [current, setCurrent, resetCurrent] = useControllableState(value, defaultValue, onChange);
   const [open, setOpen] = useState(false);
-  const [active, setActive] = useState(-1);
   const typeTo = useTypeahead();
   // Shown after a blocked submit: the hidden input cannot be focused or explained, so the trigger is.
   const [missing, setMissing] = useState(false);
@@ -164,9 +162,14 @@ export function Select({
   const atFooter = footer ? options.length : Number.NaN;
   const count = options.length + (footer ? 1 : 0);
   const enabled = (i: number) => i === atFooter || (i >= 0 && i < options.length && !options[i]?.disabled);
-  const step = (from: number, delta: 1 | -1) => seekEnabled(count, from, delta, enabled);
-  const first = () => step(-1, 1);
-  const last = () => step(count, -1);
+  const { active, activeId, optionId, setActive, first, last, move } = useActiveOption({
+    id: listId,
+    list,
+    open,
+    count: options.length,
+    footer: !!footer,
+    usable: (i) => !options[i]?.disabled,
+  });
   // A page away, or the nearest usable option short of it; with none there, the active option stays.
   const page = (delta: 1 | -1) => {
     const target = clamp(active + delta * PAGE, 0, count - 1);
@@ -202,10 +205,6 @@ export function Select({
 
   // As wide as the trigger, never wider than max(trigger, 20rem): long labels truncate instead of overflowing.
   useListboxLayer({ anchor: trigger, list, open, onClose: () => close(false), capWidth: true });
-  useEffect(() => {
-    if (!open || active < 0) return;
-    list.current?.querySelector(`[data-index="${active}"]`)?.scrollIntoView({ block: "nearest" });
-  }, [open, active]);
 
   const typeahead = (key: string) => {
     const hit = typeTo(
@@ -229,17 +228,17 @@ export function Select({
       } else if (isTypeaheadKey(e)) typeahead(key);
       return;
     }
-    const moves: Record<string, () => number> = {
-      ArrowDown: () => step(active, 1),
-      ArrowUp: () => step(active, -1),
-      Home: first,
-      End: last,
-      PageDown: () => page(1),
-      PageUp: () => page(-1),
+    const moves: Record<string, () => void> = {
+      ArrowDown: () => move(1),
+      ArrowUp: () => move(-1),
+      Home: () => setActive(first()),
+      End: () => setActive(last()),
+      PageDown: () => setActive(page(1)),
+      PageUp: () => setActive(page(-1)),
     };
     if (moves[key]) {
       e.preventDefault();
-      setActive(moves[key]());
+      moves[key]();
     } else if (key === "Enter" || key === " ") {
       e.preventDefault();
       if (active === atFooter) runFooter();
@@ -286,7 +285,7 @@ export function Select({
             aria-haspopup="listbox"
             aria-expanded={open}
             aria-controls={listId}
-            aria-activedescendant={open && active >= 0 ? `${listId}-${active}` : undefined}
+            aria-activedescendant={activeId}
             disabled={disabled}
             onClick={() => (open ? close() : openList())}
             onKeyDown={onKeyDown}
@@ -304,17 +303,13 @@ export function Select({
             id={listId}
             aria-labelledby={field.labelId}
             footer={
-              footer && (
-                <OptionListItem
-                  id={`${listId}-${atFooter}`}
-                  data-index={atFooter}
-                  label={footer.label}
-                  icon={footer.icon && <Icon icon={footer.icon} className="cy-select-icon" />}
-                  active={active === atFooter}
-                  onPointerMove={() => setActive(atFooter)}
-                  onClick={runFooter}
-                />
-              )
+              footer && {
+                action: footer,
+                id: optionId(atFooter),
+                active: active === atFooter,
+                onActive: () => setActive(atFooter),
+                onRun: runFooter,
+              }
             }
           >
             {options.length === 0 && <OptionListNote>{labels?.empty ?? "No options"}</OptionListNote>}
@@ -322,8 +317,7 @@ export function Select({
               const rows = run.items.map(({ option, index }) => (
                 <OptionListItem
                   key={option.value}
-                  id={`${listId}-${index}`}
-                  data-index={index}
+                  id={optionId(index)}
                   label={option.label}
                   description={option.description}
                   icon={<OptionIcon option={option} plain={option.disabled} className="cy-select-icon" />}

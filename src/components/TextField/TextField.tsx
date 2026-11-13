@@ -4,6 +4,7 @@ import {
   type InputHTMLAttributes,
   type KeyboardEvent,
   type ReactNode,
+  type Ref,
   useCallback,
   useEffect,
   useRef,
@@ -98,6 +99,11 @@ export interface TextFieldProps extends NativeInput, FieldLayoutProps {
   className?: string;
   /** Layout only. */
   style?: CSSProperties;
+  /**
+   * The field's box (the input with its icons, addons and buttons), for a list or popover that drops from the whole
+   * field (Combobox, TagInput). Use it to measure or anchor; restyle through tokens, not its class.
+   */
+  boxRef?: Ref<HTMLDivElement> | undefined;
   /** Test id, set on the native input. */
   "data-testid"?: string;
 }
@@ -128,6 +134,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(function T
     revealable = false,
     addonStart,
     addonEnd,
+    boxRef,
     labels,
     required,
     disabled,
@@ -187,6 +194,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(function T
     >
       {(field) => (
         <div
+          ref={boxRef}
           className="cy-text-field"
           data-size={size}
           data-variant={variant}
