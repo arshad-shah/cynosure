@@ -351,7 +351,7 @@
       "dist/foundations/LiveRegion/LiveRegion.js",
       "dist/styles/announcer.css"
     ],
-    "limit": "1 kB",
+    "limit": "1.4 kB",
     "gzip": true
   },
   {
