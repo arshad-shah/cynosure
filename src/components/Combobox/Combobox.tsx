@@ -16,6 +16,7 @@ import { OptionIcon, type OptionIconColor } from "../../foundations/option-icon.
 import type { IconData } from "../../icons/types.js";
 import { useListboxLayer } from "../../overlay/listbox-layer.js";
 import type { Size } from "../../tokens/schema.js";
+import type { FieldLayoutProps } from "../Field/Field.js";
 import { HighlightedText } from "../HighlightedText/HighlightedText.js";
 import {
   OptionList,
@@ -59,7 +60,7 @@ export interface ComboboxLabels {
   required: string;
 }
 
-export interface ComboboxProps {
+export interface ComboboxProps extends FieldLayoutProps {
   /** The field's label. It also names the list when it is a string. */
   label: ReactNode;
   /** Visually hide the label (it still names the control). Prefer visible labels. */
@@ -127,6 +128,8 @@ const contains = (option: ComboboxOption, text: string) =>
 export function Combobox({
   label,
   labelHidden,
+  layout,
+  width,
   description,
   error,
   options,
@@ -297,6 +300,8 @@ export function Combobox({
         ref={input}
         label={label}
         labelHidden={labelHidden}
+        layout={layout}
+        width={width}
         description={description}
         error={error ?? (missing && !current ? text.required : undefined)}
         size={size}

@@ -28,15 +28,8 @@ declare module "../../tokens/schema.js" {
 /** Width of a Field's control: three steps from the `--cy-field-control-width-*` tokens, or the whole field. */
 export type FieldWidth = "sm" | "md" | "lg" | "full";
 
-export interface FieldProps {
-  /** Visible label; it names the control. */
-  label: ReactNode;
-  /** Help text shown below the control and read out with it. */
-  description?: ReactNode | undefined;
-  /** Shown below the control, announced, and marks the control invalid. */
-  error?: ReactNode | undefined;
-  /** Draws the required marker; pass `required` to the control too. */
-  required?: boolean | undefined;
+/** How a Field lays out its label and control. Every control built on Field takes these and passes them on. */
+export interface FieldLayoutProps {
   /**
    * `stack` puts the label above the control and the description and error below it. `split` puts the label and
    * description at the start and the control at the end of one row (a settings row); when the field is too narrow for
@@ -49,6 +42,17 @@ export interface FieldProps {
    * own width (the whole field in the stacked layout for TextField and the other fields).
    */
   width?: FieldWidth | undefined;
+}
+
+export interface FieldProps extends FieldLayoutProps {
+  /** Visible label; it names the control. */
+  label: ReactNode;
+  /** Help text shown below the control and read out with it. */
+  description?: ReactNode | undefined;
+  /** Shown below the control, announced, and marks the control invalid. */
+  error?: ReactNode | undefined;
+  /** Draws the required marker; pass `required` to the control too. */
+  required?: boolean | undefined;
   /** Size of the label text, matching the control's size (an `xs` control has the `sm` label). Default "md". */
   size?: DenseSize | undefined;
   /** Keep the label for assistive tech but take no space (toolbars, dense rows). Prefer visible labels. */

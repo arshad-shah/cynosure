@@ -16,6 +16,7 @@ import { PathField } from "@arshad-shah/cynosure";
 
 | Prop                                           | Default          | Notes                                                                            |
 | ---------------------------------------------- | ---------------- | -------------------------------------------------------------------------------- |
+| `layout` / `width`                             | `stack` / –      | `split` settings row and the control width, as on `Field`                        |
 | `onPick`                                       | –                | `() => Promise<string \| null>`: the chosen path, or `null` when cancelled       |
 | `value` / `defaultValue` / `onChange`          | – / `""`         | The path; `onChange` is called when it is typed, picked or cleared               |
 | `label`, `labelHidden`, `description`, `error` | –                | As TextField                                                                     |

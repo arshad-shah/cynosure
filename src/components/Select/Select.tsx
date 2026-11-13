@@ -22,7 +22,7 @@ import { chevronDown } from "../../icons/chevron-down.js";
 import type { IconData } from "../../icons/types.js";
 import { useListboxLayer } from "../../overlay/listbox-layer.js";
 import type { DenseSize } from "../../tokens/schema.js";
-import { Field, type FieldProps } from "../Field/Field.js";
+import { Field, type FieldLayoutProps } from "../Field/Field.js";
 import {
   OptionList,
   type OptionListAction,
@@ -62,18 +62,11 @@ export interface SelectOption extends OptionIconColor {
   group?: string;
 }
 
-export interface SelectProps {
+export interface SelectProps extends FieldLayoutProps {
   /** Names the control, shown above it. */
   label: ReactNode;
   /** Visually hide the label (it still names the control). Prefer visible labels. */
   labelHidden?: boolean | undefined;
-  /**
-   * `split` puts the label and description at the start and the control at the end of one row (a settings row); the
-   * control moves under the text when there is no room. Default "stack". See Field.
-   */
-  layout?: FieldProps["layout"];
-  /** Width of the control, so the controls of a column of settings line up: "sm", "md", "lg" or "full". See Field. */
-  width?: FieldProps["width"];
   /** Help text shown below the control. */
   description?: ReactNode;
   /** Your own error; it replaces the built-in required message. */

@@ -7,6 +7,7 @@ import { clamp, plainNumber, roundLike } from "../../foundations/math.js";
 import { minus } from "../../icons/minus.js";
 import { plus } from "../../icons/plus.js";
 import type { Size } from "../../tokens/schema.js";
+import type { FieldLayoutProps } from "../Field/Field.js";
 import { IconButton } from "../IconButton/IconButton.js";
 import { TextField } from "../TextField/TextField.js";
 
@@ -16,7 +17,7 @@ export interface NumberFieldLabels {
   increment: string;
 }
 
-export interface NumberFieldProps {
+export interface NumberFieldProps extends FieldLayoutProps {
   /** Visible label; it names the field. */
   label: ReactNode;
   /** Visually hide the label (it still names the field). Prefer visible labels. */
@@ -189,6 +190,8 @@ export function parseNumber(
 export function NumberField({
   label,
   labelHidden,
+  layout,
+  width,
   description,
   error,
   value,
@@ -306,6 +309,8 @@ export function NumberField({
         ref={input}
         label={label}
         labelHidden={labelHidden}
+        layout={layout}
+        width={width}
         description={description}
         error={error}
         size={size}

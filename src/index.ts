@@ -173,7 +173,7 @@ export {
   type ErrorBoundaryProps,
   type ErrorBoundaryTokens,
 } from "./components/ErrorBoundary/index.js";
-export { Field, type FieldProps } from "./components/Field/index.js";
+export { Field, type FieldLayoutProps, type FieldProps, type FieldWidth } from "./components/Field/index.js";
 export {
   acceptsFile,
   FileDrop,

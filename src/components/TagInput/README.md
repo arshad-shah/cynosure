@@ -8,19 +8,20 @@ import { TagInput } from "@arshad-shah/cynosure";
 <TagInput label="Topics" name="topic" defaultValue={["design"]} suggestions={allTopics} maxTags={5} />;
 ```
 
-| Prop                                   | Default  | Notes                                                                                                          |
-| -------------------------------------- | -------- | -------------------------------------------------------------------------------------------------------------- |
-| `value` / `defaultValue`               | – / `[]` | The tags                                                                                                       |
-| `onChange`                             | –        | Called with the new list after each add or remove                                                              |
-| `suggestions`                          | –        | Offered while typing (matches anywhere); free text is still allowed                                            |
-| `separators`                           | `[","]`  | Keys that add the typed text; pasted text is split on them and on new lines                                    |
-| `allowDuplicates`                      | `false`  | Duplicates are compared without case                                                                           |
-| `maxTags`                              | –        | Most tags                                                                                                      |
-| `validate`                             | –        | `(tag, tags) => message or null`; a message refuses the tag and shows as the error                             |
-| `name`, `form`, `required`, `disabled` | –        | Each tag is submitted under `name`; `required` needs at least one tag                                          |
-| `renderTag`                            | –        | `(tag) => ReactNode`: a tag's content in place of its text; the remove button keeps the text                   |
-| `iconStart`                            | –        | Icon at the start of the field, before the input                                                               |
-| `labels`                               | –        | `tags`, `remove(tag)`, `added(tag)`, `removed(tag)`, `editing(tag)`, `duplicate(tag)`, `tooMany(max)`, `empty` |
+| Prop                                   | Default     | Notes                                                                                                          |
+| -------------------------------------- | ----------- | -------------------------------------------------------------------------------------------------------------- |
+| `layout` / `width`                     | `stack` / – | `split` settings row and the control width, as on `Field`                                                      |
+| `value` / `defaultValue`               | – / `[]`    | The tags                                                                                                       |
+| `onChange`                             | –           | Called with the new list after each add or remove                                                              |
+| `suggestions`                          | –           | Offered while typing (matches anywhere); free text is still allowed                                            |
+| `separators`                           | `[","]`     | Keys that add the typed text; pasted text is split on them and on new lines                                    |
+| `allowDuplicates`                      | `false`     | Duplicates are compared without case                                                                           |
+| `maxTags`                              | –           | Most tags                                                                                                      |
+| `validate`                             | –           | `(tag, tags) => message or null`; a message refuses the tag and shows as the error                             |
+| `name`, `form`, `required`, `disabled` | –           | Each tag is submitted under `name`; `required` needs at least one tag                                          |
+| `renderTag`                            | –           | `(tag) => ReactNode`: a tag's content in place of its text; the remove button keeps the text                   |
+| `iconStart`                            | –           | Icon at the start of the field, before the input                                                               |
+| `labels`                               | –           | `tags`, `remove(tag)`, `added(tag)`, `removed(tag)`, `editing(tag)`, `duplicate(tag)`, `tooMany(max)`, `empty` |
 
 Also takes TextField's `label`, `labelHidden`, `description`, `error`, `placeholder`, `size` and `variant`.
 

@@ -40,7 +40,7 @@ The render prop gives you `id`, `describedBy` and `invalid`. Pass them to the co
 
 ## Settings rows
 
-`layout="split"` puts the label and description at the start and the control at the end of one row, centred on the text, as in a settings page. When the field is too narrow for both, the control moves under the text. `width` gives the control one of three widths (or the whole field), so a column of settings lines up whatever the labels. Labels, descriptions and errors stay linked to the control. TextField and Select take both props too.
+`layout="split"` puts the label and description at the start and the control at the end of one row, centred on the text, as in a settings page. When the field is too narrow for both, the control moves under the text. `width` gives the control one of three widths (or the whole field), so a column of settings lines up whatever the labels. Labels, descriptions and errors stay linked to the control. Every control built on Field takes both props too (`FieldLayoutProps`): TextField, Select, Combobox, TagInput, PathField, NumberField, DateField, TimeField, ColorField, TextArea and HotkeyField.
 
 ```tsx
 <Field layout="split" width="md" label="Font" description="Used in the query editor.">

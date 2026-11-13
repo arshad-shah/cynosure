@@ -16,6 +16,7 @@ import { clamp } from "../../foundations/math.js";
 import { clock } from "../../icons/clock.js";
 import type { Size } from "../../tokens/schema.js";
 import { Button } from "../Button/Button.js";
+import type { FieldLayoutProps } from "../Field/Field.js";
 import { IconButton } from "../IconButton/IconButton.js";
 import { Popover } from "../Popover/Popover.js";
 import { SegmentedControl } from "../SegmentedControl/SegmentedControl.js";
@@ -57,7 +58,7 @@ export interface TimeFieldLabels {
   now: string;
 }
 
-export interface TimeFieldProps {
+export interface TimeFieldProps extends FieldLayoutProps {
   /** The field's visible label, and its accessible name. */
   label: ReactNode;
   /** Hide the label visually; it still names the field. */
@@ -182,6 +183,8 @@ const SPAN: Record<Unit, number> = { h: 3600, m: 60, s: 1 };
 export function TimeField({
   label,
   labelHidden,
+  layout,
+  width,
   description,
   error,
   value,
@@ -462,6 +465,8 @@ export function TimeField({
         ref={input}
         label={label}
         {...(labelHidden ? { labelHidden } : {})}
+        layout={layout}
+        width={width}
         {...(description !== undefined ? { description } : {})}
         {...((error ?? problem) != null ? { error: error ?? problem } : {})}
         value={shown}

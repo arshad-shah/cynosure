@@ -17,7 +17,7 @@ import { close } from "../../icons/close.js";
 import { record } from "../../icons/record.js";
 import { stop } from "../../icons/stop.js";
 import type { Size } from "../../tokens/schema.js";
-import { Field } from "../Field/Field.js";
+import { Field, type FieldLayoutProps } from "../Field/Field.js";
 import { IconButton } from "../IconButton/IconButton.js";
 import { Kbd, useApple } from "../Kbd/Kbd.js";
 
@@ -55,7 +55,7 @@ export interface HotkeyFieldLabels {
   cleared: string;
 }
 
-export interface HotkeyFieldProps {
+export interface HotkeyFieldProps extends FieldLayoutProps {
   /** The field's visible label (what the shortcut does); it names the group of controls. */
   label: ReactNode;
   /** Hide the label visually (a table row that already says what the shortcut does); it still names the field. */
@@ -120,6 +120,8 @@ export const HotkeyField = forwardRef<HTMLDivElement, HotkeyFieldProps>(function
   {
     label,
     labelHidden,
+    layout,
+    width,
     description,
     error,
     value,
@@ -222,6 +224,8 @@ export const HotkeyField = forwardRef<HTMLDivElement, HotkeyFieldProps>(function
         group
         label={label}
         labelHidden={labelHidden}
+        layout={layout}
+        width={width}
         description={description}
         error={error}
         size={size}

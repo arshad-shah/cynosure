@@ -12,6 +12,7 @@ export { readColor };
 
 import type { Size } from "../../tokens/schema.js";
 import { Button } from "../Button/Button.js";
+import type { FieldLayoutProps } from "../Field/Field.js";
 import { IconButton } from "../IconButton/IconButton.js";
 import { Popover } from "../Popover/Popover.js";
 import { Slider } from "../Slider/Slider.js";
@@ -41,7 +42,7 @@ export interface ColorFieldLabels {
   invalid: string;
 }
 
-export interface ColorFieldProps {
+export interface ColorFieldProps extends FieldLayoutProps {
   /** The field's label. */
   label: ReactNode;
   /** Visually hide the label (it still names the control). Prefer visible labels. */
@@ -147,6 +148,8 @@ type EyeDropperCtor = new () => { open: () => Promise<{ sRGBHex: string }> };
 export function ColorField({
   label,
   labelHidden,
+  layout,
+  width,
   description,
   error,
   value,
@@ -331,6 +334,8 @@ export function ColorField({
     <TextField
       label={label}
       labelHidden={labelHidden}
+      layout={layout}
+      width={width}
       description={description}
       error={error ?? (invalid ? text.invalid : undefined)}
       required={required}
