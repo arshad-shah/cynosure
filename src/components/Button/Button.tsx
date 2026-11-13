@@ -17,6 +17,7 @@ import type { DenseSize, Tone } from "../../tokens/schema.js";
 import { LoadingDots } from "../LoadingDots/LoadingDots.js";
 
 export interface ButtonTokens {
+  squareWidth: string;
   fontSizeXs: string;
   paddingInlineXs: string;
   heightXs: string;
