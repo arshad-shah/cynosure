@@ -60,7 +60,16 @@ export default defineConfig({
       reporter: ["text-summary", "text"],
     },
     projects: [
-      { test: { name: "unit", include: ["tests/unit/**/*.test.{ts,tsx}"], environment: "node" } },
+      {
+        test: {
+          name: "unit",
+          include: ["tests/unit/**/*.test.{ts,tsx}"],
+          environment: "node",
+          // Several unit tests read or typecheck the whole repository (prop docs, root types, cy check on a sandbox
+          // copy): seconds alone, far more on a loaded machine, where the 5 s default failed the pre-commit hook.
+          testTimeout: 60_000,
+        },
+      },
       {
         resolve: {
           alias: [
