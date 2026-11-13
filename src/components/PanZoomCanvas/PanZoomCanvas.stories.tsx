@@ -840,22 +840,13 @@ export const ControlsInTheCorners: Story = {
   },
 };
 
+/** What claimPress was offered in ControlsKeepTheirOwnPointer, read by its play function directly. */
+const offered: string[] = [];
+
 export const ControlsKeepTheirOwnPointer: Story = {
   render: () => {
-    const claimed: string[] = [];
-    return (
-      <>
-        <Cornered claimed={claimed} />
-        <Button
-          size="sm"
-          onClick={(e) => {
-            e.currentTarget.dataset.asked = claimed.join("|");
-          }}
-        >
-          Asked
-        </Button>
-      </>
-    );
+    offered.length = 0;
+    return <Cornered claimed={offered} />;
   },
   play: async ({ canvas, canvasElement, userEvent }) => {
     const el = surface(canvasElement);
@@ -900,10 +891,9 @@ export const ControlsKeepTheirOwnPointer: Story = {
     const v = viewOf(canvasElement);
     drag(el, gap, { x: -25, y: 0 });
     await waitFor(() => expect(viewOf(canvasElement).x).toBe(v.x - 25));
-    // Only that press was offered to claimPress: the background, never a control.
-    const asked = canvas.getByRole("button", { name: "Asked" });
-    await userEvent.click(asked);
-    await expect(asked.dataset.asked).toBe("cy-pan-zoom-canvas");
+    // Only that press was offered to claimPress: the background, never a control. (Read directly: a click on a helper
+    // button right after a synthetic drag can be swallowed as the drag's own click, as WebKit did on CI.)
+    await expect(offered).toEqual(["cy-pan-zoom-canvas"]);
   },
 };
 
