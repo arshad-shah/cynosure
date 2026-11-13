@@ -37,8 +37,19 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+/** A picker the story answers itself, so a second press is sure to land while it is still open. */
+let answer: (path: string | null) => void = () => {};
+const heldPicker = () =>
+  fn(
+    () =>
+      new Promise<string | null>((resolve) => {
+        answer = resolve;
+      }),
+  );
+
 export const BrowseFillsThePath: Story = {
   tags: ["visual"],
+  args: { onPick: heldPicker() },
   play: async ({ args, canvas, userEvent }) => {
     const input = canvas.getByRole("textbox", { name: "Database file" });
     const browse = canvas.getByRole("button", { name: "Browse…" });
@@ -54,6 +65,7 @@ export const BrowseFillsThePath: Story = {
     await expect(browse).toHaveAttribute("aria-busy", "true");
     await userEvent.click(browse);
     await expect(args.onPick).toHaveBeenCalledTimes(1);
+    answer("/home/me/data/app.db");
     // The chosen path fills the field and is reported.
     await waitFor(() => expect(input).toHaveValue("/home/me/data/app.db"));
     await expect(args.onChange).toHaveBeenLastCalledWith("/home/me/data/app.db");

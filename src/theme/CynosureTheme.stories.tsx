@@ -181,6 +181,17 @@ export const ContrastNormalOnMoreContrastOs: Story = {
     if (!(await emulateMedia({ contrast: "more" }))) return;
     try {
       await waitFor(() => expect(matchMedia("(prefers-contrast: more)").matches).toBe(true));
+      // Firefox reports the emulated preference to matchMedia but does not re-apply it to a shadow root's adopted
+      // style sheets (CI on #167): a probe rule under the same media query shows whether this engine can, here.
+      const shadow = host.shadowRoot as ShadowRoot;
+      const probeSheet = new CSSStyleSheet();
+      probeSheet.replaceSync("@media (prefers-contrast: more) { .contrast-probe { --probe: on; } }");
+      shadow.adoptedStyleSheets = [...shadow.adoptedStyleSheets, probeSheet];
+      const probe = document.createElement("span");
+      probe.className = "contrast-probe";
+      shadow.append(probe);
+      const applies = getComputedStyle(probe).getPropertyValue("--probe").trim() === "on";
+      if (!applies) return;
       await waitFor(() => expect(token(swatch("system"), "--cy-color-muted")).toBe(more));
       await expect(token(swatch("normal"), "--cy-color-muted")).toBe(normal);
     } finally {

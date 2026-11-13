@@ -406,8 +406,16 @@ function copy(target: Element) {
     cancelable: true,
     composed: true,
   });
+  // Read what the grid wrote to the event's own clipboard data while the event is still being dispatched: Firefox gives
+  // a synthetic copy event its own DataTransfer rather than the one passed in (CI on #167).
+  let text = "";
+  const read = (e: Event) => {
+    text = (e as ClipboardEvent).clipboardData?.getData("text/plain") ?? "";
+  };
+  window.addEventListener("copy", read);
   target.dispatchEvent(event);
-  return { text: clipboardData.getData("text/plain"), taken: event.defaultPrevented };
+  window.removeEventListener("copy", read);
+  return { text, taken: event.defaultPrevented };
 }
 
 export const SelectRows: Story = {
