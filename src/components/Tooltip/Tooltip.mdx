@@ -47,7 +47,9 @@ Hover opens after `delay` milliseconds (default `300`). Keyboard focus opens it 
 
 ## Sometimes, or for the eye only
 
-`disabled` turns the tooltip off without remounting its trigger, for a tooltip that only matters some of the time, such as the full text of a label while it is cut short. `describe={false}` is for a tip that repeats the trigger's own name (that same cut-short label): it still shows, but screen readers, which already hear the name, are not read it again as a description. Tabs uses both for long tab labels.
+`disabled` turns the tooltip off without remounting its trigger, for a tooltip that only matters some of the time, such as the full text of a label while it is cut short. `describe={false}` is for a tip that repeats the trigger's own name (that same cut-short label): it still shows, but screen readers, which already hear the name, are not read it again as a description. `whenTruncated` does both for the full text of a label: the tip is on only while the text is cut short (measured after every render and, with one ResizeObserver, whenever its box is resized), and it never describes the trigger. Pass `true` to measure the trigger, or a function that picks the element inside it holding the text. Tabs, StatusBar and DataGrid use it.
+
+<Canvas of={Stories.OnlyWhileTheTextIsCutShort} />
 
 ## Props
 

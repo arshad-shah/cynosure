@@ -4,6 +4,7 @@ import { contrast, rgb } from "../../test/color.js";
 import { computeUnderHostileHost } from "../../test/hostile.js";
 import { emulateMedia } from "../../test/media.js";
 import { CynosureTheme } from "../../theme/CynosureTheme.js";
+import { createTheme } from "../../tokens/index.js";
 import { HighlightedText } from "./HighlightedText.js";
 
 const meta = {
@@ -134,6 +135,30 @@ export const ReadableInLightAndDark: Story = {
       await expect(contrast(style.color, behind)).toBeGreaterThanOrEqual(4.5);
       await expect(Number(style.fontWeight)).toBeGreaterThan(Number(getComputedStyle(surface).fontWeight));
     }
+  },
+};
+
+export const MarkCornersFollowTheTheme: Story = {
+  render: (args) => (
+    <>
+      <HighlightedText {...args} className="default" />
+      <CynosureTheme theme={createTheme({ radius: 0 })}>
+        <HighlightedText {...args} className="square" />
+      </CynosureTheme>
+      <span style={{ "--cy-highlighted-text-radius": "2px" } as React.CSSProperties}>
+        <HighlightedText {...args} className="token" />
+      </span>
+    </>
+  ),
+  play: async ({ canvasElement }) => {
+    const radius = (cls: string) =>
+      Number.parseFloat(
+        getComputedStyle(canvasElement.querySelector(`.${cls} mark`) as HTMLElement).borderTopLeftRadius,
+      );
+    // A soft corner by default (from the theme's radius), square in a theme with no radius, and the token wins.
+    await expect(radius("default")).toBeGreaterThan(0);
+    await expect(radius("square")).toBe(0);
+    await expect(radius("token")).toBe(2);
   },
 };
 

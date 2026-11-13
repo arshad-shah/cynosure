@@ -1,6 +1,6 @@
 # OptionList
 
-The drop-down list of options under a field: a top-layer `listbox` of options, with an optional icon and description line per option, group headings, and a note in place of options ("No matches", "Loading…"). Select, Combobox and TagInput draw their lists with it; it holds no state and handles no keys. The field that owns the list keeps focus, moves the active option with `aria-activedescendant`, and shows, places and dismisses the list with `useListboxLayer` (`src/overlay/listbox-layer.ts`).
+The drop-down list of options under a field: a top-layer `listbox` of options, with an optional icon and description line per option, group headings, and a note in place of options ("No matches", "Loading…"). Select, Combobox, TagInput and TextArea's mentions draw their lists with it; it holds no state and handles no keys. The field that owns the list keeps focus, moves the active option with `aria-activedescendant`, and shows, places and dismisses the list with `useListboxLayer` (`src/overlay/listbox-layer.ts`).
 
 ```tsx
 import { OptionList, OptionListItem, OptionListNote } from "@arshad-shah/cynosure";
@@ -43,7 +43,7 @@ useListboxLayer({ anchor: field, list, open, onClose: () => setOpen(false) });
 
 Options are at least 24px tall, and 44px on coarse pointers. In forced-colors mode the active option is outlined.
 
-**Footer.** `footer` takes an `OptionListItem` that runs an action ("Manage connections…"). It stays in view under the options while they scroll, set off by a line. It is an option rather than a button: the field keeps focus and moves through options with `aria-activedescendant`, and a listbox may only hold options, so a button would be out of the arrow keys' reach and a Tab to it would close the list. The owning field makes it the arrow keys' last stop and runs it on Enter (Select and Combobox take a `footer` action).
+**Footer.** `footer` takes `{ action, id, active, onActive, onRun }`: the list draws the action (`{ label, icon?, onSelect }`, "Manage connections…") as its last option, with the id the field points at, highlighted while `active`; the pointer moving over it calls `onActive` and a press `onRun`. It stays in view under the options while they scroll, set off by a line. It is an option rather than a button: the field keeps focus and moves through options with `aria-activedescendant`, and a listbox may only hold options, so a button would be out of the arrow keys' reach and a Tab to it would close the list. The owning field makes it the arrow keys' last stop and runs it on Enter (Select and Combobox take a `footer` action).
 
 ## Tokens
 

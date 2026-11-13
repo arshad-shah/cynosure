@@ -43,6 +43,22 @@ const activeOption = (input: HTMLElement) => {
   return id ? document.getElementById(id) : null;
 };
 
+export const TheListDropsFromTheWholeField: Story = {
+  args: { iconStart: tag },
+  play: async ({ canvas, userEvent }) => {
+    const input = canvas.getByRole("combobox", { name: "Fruit" });
+    await userEvent.click(input);
+    await waitFor(() => expect(isOpen()).toBe(true));
+    await shownFully(listbox());
+    // Anchored to TextField's box (icon included), not the bare input: as wide, and starting at its edge.
+    const box = (input.parentElement as HTMLElement).getBoundingClientRect();
+    const list = listbox().getBoundingClientRect();
+    await expect(box.width).toBeGreaterThan(input.getBoundingClientRect().width);
+    await expect(list.width).toBeGreaterThanOrEqual(box.width - 1);
+    await expect(Math.abs(list.left - box.left)).toBeLessThan(2);
+  },
+};
+
 export const TypeToFilterThenChooseWithEnter: Story = {
   play: async ({ args, canvas, userEvent }) => {
     const input = canvas.getByRole("combobox", { name: "Fruit" });

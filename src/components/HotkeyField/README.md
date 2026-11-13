@@ -24,18 +24,19 @@ One row recording at a time on a settings page: control `recording`.
 />;
 ```
 
-| Prop                                                   | Default | Notes                                                                                     |
-| ------------------------------------------------------ | ------- | ----------------------------------------------------------------------------------------- |
-| `label`                                                | –       | Names the group (fieldset); `labelHidden` keeps it for screen readers only                |
-| `description`, `error`                                 | –       | As Field                                                                                  |
-| `value` / `defaultValue` / `onChange`                  | `""`    | The shortcut string (`mod` is Command on Apple platforms, Control elsewhere); `""` = none |
-| `recording` / `defaultRecording` / `onRecordingChange` | `false` | Controlled or not; reports every start and stop                                           |
-| `allowBare`                                            | `false` | Accept keys without Control, Command or Alt (`"k"`, `"shift+/"`); F1–F24 always count     |
-| `name`, `form`                                         | –       | The form receives the shortcut string; a form reset restores `defaultValue`               |
-| `disabled`                                             | `false` | Nothing records or clears; not submitted                                                  |
-| `size`                                                 | `md`    | `sm` · `md` · `lg`                                                                        |
-| `labels`                                               | English | `record`, `clear`, `none`, `prompt`, `recording`, `recorded`, `cancelled`, `cleared`      |
-| `className` / `style`                                  | –       | Layout only                                                                               |
+| Prop                                                   | Default     | Notes                                                                                     |
+| ------------------------------------------------------ | ----------- | ----------------------------------------------------------------------------------------- |
+| `layout` / `width`                                     | `stack` / – | `split` settings row and the control width, as on `Field`                                 |
+| `label`                                                | –           | Names the group (fieldset); `labelHidden` keeps it for screen readers only                |
+| `description`, `error`                                 | –           | As Field                                                                                  |
+| `value` / `defaultValue` / `onChange`                  | `""`        | The shortcut string (`mod` is Command on Apple platforms, Control elsewhere); `""` = none |
+| `recording` / `defaultRecording` / `onRecordingChange` | `false`     | Controlled or not; reports every start and stop                                           |
+| `allowBare`                                            | `false`     | Accept keys without Control, Command or Alt (`"k"`, `"shift+/"`); F1–F24 always count     |
+| `name`, `form`                                         | –           | The form receives the shortcut string; a form reset restores `defaultValue`               |
+| `disabled`                                             | `false`     | Nothing records or clears; not submitted                                                  |
+| `size`                                                 | `md`        | `sm` · `md` · `lg`                                                                        |
+| `labels`                                               | English     | `record`, `clear`, `none`, `prompt`, `recording`, `recorded`, `cancelled`, `cleared`      |
+| `className` / `style`                                  | –           | Layout only                                                                               |
 
 ## Recording
 
@@ -52,4 +53,5 @@ One row recording at a time on a settings page: control `recording`.
 - `--cy-hotkey-field-radius`: corner radius of the shortcut's box
 - `--cy-hotkey-field-border`: border colour of the shortcut's box
 - `--cy-hotkey-field-bg`: background of the shortcut's box
+- The box falls back to the shared field skin, `--cy-field-control-{border,bg,radius}` (Field), as TextField does; a disabled box takes `--cy-field-control-sunken-bg`.
 - `--cy-hotkey-field-gap`: space between the box and the buttons

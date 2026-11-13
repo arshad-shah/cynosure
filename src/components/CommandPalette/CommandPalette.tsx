@@ -1,13 +1,4 @@
-import {
-  type CSSProperties,
-  Fragment,
-  type KeyboardEvent,
-  useEffect,
-  useId,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { type CSSProperties, Fragment, type KeyboardEvent, useId, useMemo, useRef, useState } from "react";
 import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js";
 import { useControllableState } from "../../foundations/controllable.js";
 import { DialogBase } from "../../foundations/DialogBase/DialogBase.js";
@@ -16,6 +7,8 @@ import { useHotkey } from "../../foundations/hotkey.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
 import { InputBase } from "../../foundations/InputBase/InputBase.js";
 import { isComposing } from "../../foundations/keys.js";
+import { useActiveOption } from "../../foundations/listbox.js";
+import { textMatchAt, textMatches } from "../../foundations/text-match.js";
 import { search } from "../../icons/search.js";
 import type { IconData } from "../../icons/types.js";
 import { useDismiss } from "../../overlay/dismiss.js";
@@ -124,17 +117,14 @@ const DEFAULT_LABELS: CommandPaletteLabels = {
 };
 
 /** The words of a query. */
-const wordsOf = (query: string) => query.toLowerCase().split(/\s+/).filter(Boolean);
+const wordsOf = (query: string) => query.split(/\s+/).filter(Boolean);
 
 /** Every word of the query must appear in the label or keywords; label prefix matches rank first. */
 function rank(commands: Command[], words: string[]): Command[] {
-  const hay = (c: Command) => [c.label, ...(c.keywords ?? [])].join(" ").toLowerCase();
-  const found = commands.filter((c) => words.every((w) => hay(c).includes(w)));
-  const first = words[0] as string;
-  return [
-    ...found.filter((c) => c.label.toLowerCase().startsWith(first)),
-    ...found.filter((c) => !c.label.toLowerCase().startsWith(first)),
-  ];
+  const hay = (c: Command) => [c.label, ...(c.keywords ?? [])].join(" ");
+  const found = commands.filter((c) => words.every((w) => textMatches(hay(c), w)));
+  const prefixed = (c: Command) => textMatchAt(c.label, words[0] as string) === 0;
+  return [...found.filter(prefixed), ...found.filter((c) => !prefixed(c))];
 }
 
 /** Search-and-run list of commands in a modal dialog, opened by a global shortcut (Ctrl or Command + K). */
@@ -156,7 +146,6 @@ export function CommandPalette({
   const [isOpen, setOpen] = useControllableState(open, defaultOpen, onOpenChange);
   const [query, setQuery] = useState("");
   const [recent, setRecent] = useState<string[]>([]);
-  const [active, setActive] = useState(0);
   const dialog = useRef<HTMLDialogElement>(null);
   const input = useRef<HTMLInputElement>(null);
   const list = useRef<HTMLDivElement>(null);
@@ -190,7 +179,15 @@ export function CommandPalette({
     return { sections: out, positions: undefined };
   }, [commands, query, words, filter, recent, recentLimit, text.recent]);
   const rows = sections.flatMap((s) => s.items.map((c) => ({ command: c, section: s.name })));
-  const runnable = rows.map((r, i) => (r.command.disabled ? -1 : i)).filter((i) => i >= 0);
+  // Arrows wrap around, so the last command is one key away.
+  const { active, activeId, optionId, setActive, move } = useActiveOption({
+    id,
+    list,
+    open: isOpen,
+    count: rows.length,
+    usable: (i) => !rows[i]?.command.disabled,
+    wrap: true,
+  });
 
   // Opening: remember where focus was, start fresh, and focus the search field.
   useClientLayoutEffect(() => {
@@ -200,12 +197,6 @@ export function CommandPalette({
     setActive(0);
     input.current?.focus();
   }, [isOpen]);
-  useEffect(() => {
-    if (!runnable.includes(active)) setActive(runnable[0] ?? -1);
-  });
-  useEffect(() => {
-    list.current?.querySelector(`#${id}-${active}`)?.scrollIntoView?.({ block: "nearest" });
-  }, [active, id]);
   useDismiss({
     open: isOpen,
     onClose: () => setOpen(false),
@@ -222,12 +213,9 @@ export function CommandPalette({
   };
   const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
     if (isComposing(event)) return;
-    const at = runnable.indexOf(active);
     if (event.key === "ArrowDown" || event.key === "ArrowUp") {
       event.preventDefault();
-      // Arrows wrap around, so the last command is one key away.
-      const step = event.key === "ArrowDown" ? 1 : -1;
-      setActive(runnable[(at + step + runnable.length) % runnable.length] ?? -1);
+      move(event.key === "ArrowDown" ? 1 : -1);
     } else if (event.key === "Enter") {
       event.preventDefault();
       run(rows[active]?.command);
@@ -260,7 +248,7 @@ export function CommandPalette({
             aria-expanded="true"
             aria-controls={`${id}-list`}
             aria-autocomplete="list"
-            aria-activedescendant={active >= 0 ? `${id}-${active}` : undefined}
+            aria-activedescendant={activeId}
             autoComplete="off"
             spellCheck={false}
             placeholder={text.placeholder}
@@ -310,7 +298,7 @@ export function CommandPalette({
                 return (
                   <Fragment key={`${section.name}-${command.id}`}>
                     <div
-                      id={`${id}-${i}`}
+                      id={optionId(i)}
                       role="option"
                       tabIndex={-1}
                       aria-selected={i === active}

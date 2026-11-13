@@ -75,7 +75,7 @@
     --_tone: var(--cy-color-accent);
   }
   &[data-tone="neutral"] {
-    --_tone: var(--cy-color-muted);
+    --_tone: var(--cy-color-ink);
   }
   &[data-tone="danger"] {
     --_tone: var(--cy-color-danger);
@@ -206,19 +206,15 @@
   display: inline-flex;
 }
 
-/* Where there is no hover (touch), the actions take their own place at the end and are always shown. */
+/* The row's RowActions (which shows and hides them). Where there is no hover (touch), they take their own place at
+   the end; drawn over the row's colour, above the row's own button. */
 .cy-list-row-actions.cy-list-row-actions {
+  --cy-row-actions-background: var(--_bg);
   position: relative;
   z-index: 1;
-  display: flex;
-  flex: none;
-  align-items: center;
-  gap: var(--cy-space-1);
-  background: var(--_bg);
   color: var(--cy-color-ink);
-  font-size: inherit;
 }
-/* With hover, they sit over the end of the row and show while it is hovered, focused, or a menu of theirs is open. */
+/* With hover, they sit over the end of the row (over the trailing slot) while they show. */
 @media (hover: hover) {
   .cy-list-row-actions.cy-list-row-actions {
     position: absolute;
@@ -226,18 +222,6 @@
     inset-block: var(--cy-border-focus);
     inset-inline-end: var(--cy-list-row-padding-inline, var(--cy-space-5));
     padding-inline-start: var(--cy-space-3);
-    opacity: 0;
-    transition: opacity var(--cy-motion-fast) var(--cy-motion-ease);
-  }
-  .cy-list-row.cy-list-row:is(:hover, :focus-within, :has(> .cy-list-row-actions [aria-expanded="true"]))
-    > .cy-list-row-actions {
-    opacity: 1;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .cy-list-row-actions.cy-list-row-actions {
-    transition: none;
   }
 }
 @media (forced-colors: active) {

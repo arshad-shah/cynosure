@@ -8,6 +8,17 @@ export type Size = "sm" | "md" | "lg";
 export type DenseSize = "xs" | Size;
 /** Semantic colour shared by every component prop named `tone`. */
 export type Tone = "accent" | "neutral" | "danger" | "success" | "warning" | "info";
+/** Every `Tone`, in order: for checking a value and for listing the choices (stories, the scaffold). */
+export const TONES = [
+  "accent",
+  "neutral",
+  "danger",
+  "success",
+  "warning",
+  "info",
+] as const satisfies readonly Tone[];
+/** A palette's mode: the one a fixed-mode theme keeps, and what a colour mode resolves to. */
+export type ThemeMode = "light" | "dark";
 export type Scale = "compact" | "comfortable" | "spacious" | number;
 export type PaletteName = "light" | "dark" | "light-contrast" | "dark-contrast";
 
@@ -75,7 +86,8 @@ export interface MotionTokens {
 /** Lengths are CSS px numbers, already multiplied by `scale`. */
 export interface GlobalTokens {
   scale: number;
-  control: { height: Record<Size, number> };
+  /** Control heights: `xs` (dense desktop chrome), `sm`, `md`, `lg`. CSS: `--cy-control-height-<size>`. */
+  control: { height: Record<DenseSize, number> };
   radius: { factor: number; segment: number; sm: number; md: number; lg: number; card: number; full: number };
   space: Record<"0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" | "10", number>;
   font: {
@@ -109,7 +121,7 @@ export interface ThemeInput {
    * Fixes the theme to one mode: a dark-only theme (Midnight) uses its dark palettes whatever the colour mode, and
    * `CynosureTheme` sets that mode on its wrapper. Omit to follow the colour mode.
    */
-  mode?: "light" | "dark";
+  mode?: ThemeMode;
   /** Any hex, rgb(), hsl() or oklch() colour. */
   accent?: string;
   scale?: Scale;
@@ -130,5 +142,5 @@ export interface Theme {
   palettes: Record<PaletteName, ColorTokens>;
   components: Record<string, Record<string, string>>;
   /** Set when the theme is fixed to one mode (`ThemeInput.mode`); its light and dark palettes are then the same. */
-  mode?: "light" | "dark";
+  mode?: ThemeMode;
 }

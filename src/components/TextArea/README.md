@@ -8,6 +8,7 @@ Multi-line input that grows with its content from `rows` up to `maxRows`, then s
 
 | Prop                                         | Default          | Notes                                                             |
 | -------------------------------------------- | ---------------- | ----------------------------------------------------------------- |
+| `layout` / `width`                           | `stack` / –      | `split` settings row and the control width, as on `Field`         |
 | `label` / `description` / `error`            | –                | Through `Field`                                                   |
 | `value` / `defaultValue` / `onChange(value)` | –                | Controlled or uncontrolled                                        |
 | `rows` / `maxRows`                           | `3` / `12`       | Minimum rows and auto-grow cap                                    |
@@ -15,7 +16,7 @@ Multi-line input that grows with its content from `rows` up to `maxRows`, then s
 | `labels.count(n, max)`                       | `"n / max"`      | Override the counter text                                         |
 | `size` / `variant`                           | `md` / `outline` | `sm` · `md` · `lg`; `outline` · `soft`                            |
 | `trigger` / `suggestions` / `onMention`      | –                | Mentions: see below                                               |
-| `labels.suggestions` / `labels.loading`      | English          | The suggestion list's name and its loading note                   |
+| `labels.loading`                             | `"Loading…"`     | The suggestion list's loading note (the field's label names it)   |
 
 Mentions: with `trigger` (such as `"@"`) and `suggestions` (a list filtered by the query, or a function of the query returning items or a promise), typing the trigger at the start of a word opens the shared drop-down list (`OptionList` on `useListboxLayer`) below the box. Arrows move, Enter or Tab inserts the item's `value` and a space in place of the trigger and query (a native edit: `onChange` hears it and Undo reverts it), Escape closes it for that mention, and `onMention(item)` is called. While open, the textarea carries `aria-controls` and `aria-activedescendant` (it keeps `aria-autocomplete="list"` and `aria-haspopup="listbox"`; a textarea may not take `aria-expanded`). Keys the list uses are not passed to `onKeyDown`. IME-safe: the query is read when a composition ends.
 

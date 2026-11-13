@@ -55,7 +55,7 @@ Text inside cells stays selectable: dragging selects text, and a copy with text 
 
 ### Full values, nulls and numbers
 
-`tooltip` returns the full value of a cell cut short (shown in a [Tooltip](?path=/docs/components-tooltip--docs) on hover and keyboard focus, and describing the cell), or nothing. `cellKind` says what a cell holds: `"null"` is muted and italic, `"number"` takes the number colour token. `cellTone` colours a cell with a tone (`accent`, `neutral`, `danger`, `success`, `warning`, `info`), over the kind's colour. `size="sm"` is dense: 28px rows under a 32px header.
+`tooltip` returns the full value of a cell (shown in a [Tooltip](?path=/docs/components-tooltip--docs) on hover and keyboard focus only while the cell's text is cut short with an ellipsis, and not read to screen readers, since the cell's text already holds it), or nothing. `cellKind` says what a cell holds: `"null"` is muted and italic, `"number"` takes the number colour token. `cellTone` colours a cell with a tone (`accent`, `neutral`, `danger`, `success`, `warning`, `info`), over the kind's colour. `size="sm"` is dense: 28px rows under a 32px header.
 
 <Canvas of={Stories.TooltipShowsTheFullValue} />
 

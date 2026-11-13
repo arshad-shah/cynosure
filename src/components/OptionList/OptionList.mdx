@@ -55,7 +55,7 @@ The list is a manual popover. `useListboxLayer` (in `src/overlay/listbox-layer.t
 
 `trailing` puts a shortcut or a count at the end of an option's row, smaller and muted. `dimmed` draws an option muted while it stays choosable: a saved connection that is not connected, say. `footer` pins an action under the options, set off by a line and kept in view while the options scroll: "Manage connections…".
 
-The footer is an option, not a separate button. The field keeps focus and points at options with `aria-activedescendant`, and a listbox may only hold options, so a button would be out of reach of the arrow keys and a Tab to it would close the list. As an option it is the last stop of the arrow keys, Enter runs it and a press runs it without moving focus. The field that owns the list decides what choosing it does: Select and Combobox take a `footer` action and close the list before running it.
+The footer is an option, not a separate button. The field keeps focus and points at options with `aria-activedescendant`, and a listbox may only hold options, so a button would be out of reach of the arrow keys and a Tab to it would close the list. As an option it is the last stop of the arrow keys, Enter runs it and a press runs it without moving focus. The list draws it from `footer={{ action, id, active, onActive, onRun }}`; the field that owns the list decides what choosing it does: Select and Combobox take a `footer` action (`{ label, icon?, onSelect }`), make it the last stop of `useActiveOption`, and close the list before running it.
 
 <Canvas of={Stories.TrailingDimmedAndFooter} />
 

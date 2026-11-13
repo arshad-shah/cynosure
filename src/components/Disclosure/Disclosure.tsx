@@ -41,7 +41,7 @@ export interface DisclosureProps {
    * a status, or a Button of its own. Its text is not part of the trigger's name. Pressing a Badge or text there
    * toggles the section; a control there is its own target.
    */
-  summaryEnd?: ReactNode;
+  trailing?: ReactNode;
   /** Height of the trigger and size of the text. Default "md". */
   size?: Size;
   /** Wrap the trigger in a heading of this level (accordion sections in a document outline). */
@@ -70,7 +70,7 @@ export function Disclosure({
   onOpenChange,
   variant = "plain",
   edge,
-  summaryEnd,
+  trailing,
   size = "md",
   headingLevel,
   region = false,
@@ -112,13 +112,13 @@ export function Disclosure({
       data-open={isOpen ? "" : undefined}
       {...edgeProps(edge, style)}
     >
-      {summaryEnd == null ? (
+      {trailing == null ? (
         head
       ) : (
         // The trigger spans the whole row; the end slot is its sibling, laid over the space the trigger keeps free.
         <div className="cy-disclosure-row">
           {head}
-          <div className="cy-disclosure-end cy-reset">{summaryEnd}</div>
+          <div className="cy-disclosure-trailing cy-reset">{trailing}</div>
         </div>
       )}
       <div

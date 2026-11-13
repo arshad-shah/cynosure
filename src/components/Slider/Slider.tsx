@@ -4,7 +4,7 @@ import { isRtl } from "../../foundations/dir.js";
 import { useDrag } from "../../foundations/drag.js";
 import { HiddenValue } from "../../foundations/HiddenValue/HiddenValue.js";
 import { stepKey } from "../../foundations/keys.js";
-import { clamp, plainNumber, roundLike } from "../../foundations/math.js";
+import { ariaNumber, clamp, plainNumber, snapToStep } from "../../foundations/math.js";
 import type { Size } from "../../tokens/schema.js";
 
 export interface SliderTokens {
@@ -137,13 +137,7 @@ export function Slider({
   const big = largeStep ?? Math.max(step, (max - min) / 10);
   const vertical = orientation === "vertical";
 
-  const snap = useCallback(
-    (v: number) => {
-      const stepped = min + Math.round((v - min) / step) * step;
-      return roundLike(clamp(stepped, min, max), step, min);
-    },
-    [min, max, step],
-  );
+  const snap = useCallback((v: number) => clamp(snapToStep(v, step, min), min, max), [min, max, step]);
   /** New value with thumb `index` moved to `v`; thumbs stop at their neighbours instead of crossing. */
   const withThumb = (index: number, v: number): SliderValue => {
     if (!range) return snap(v);
@@ -270,9 +264,9 @@ export function Slider({
             tabIndex={disabled ? undefined : 0}
             className="cy-slider-thumb cy-reset"
             aria-orientation={orientation}
-            aria-valuemin={values[index - 1] ?? min}
-            aria-valuemax={values[index + 1] ?? max}
-            aria-valuenow={plainNumber(v) as unknown as number}
+            aria-valuemin={ariaNumber(values[index - 1] ?? min)}
+            aria-valuemax={ariaNumber(values[index + 1] ?? max)}
+            aria-valuenow={ariaNumber(v)}
             aria-valuetext={text.value(v)}
             aria-disabled={disabled || undefined}
             {...(range

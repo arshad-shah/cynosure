@@ -16,7 +16,7 @@ const columns: DataGridColumn<Row>[] = fields.map((f) => ({
   minWidth: 80,
   align: f.numeric ? "end" : "start",
   cell: (row) => format(row[f.name]),
-  tooltip: (row) => (isCut(row[f.name]) ? fullText(row[f.name]) : null),
+  tooltip: (row) => fullText(row[f.name]),
   cellKind: (row) => (row[f.name] === null ? "null" : typeof row[f.name] === "number" ? "number" : undefined),
 }));
 
@@ -52,7 +52,7 @@ const columns: DataGridColumn<Row>[] = fields.map((f) => ({
 
 Columns: `width` is in CSS pixels (default 160; a new value replaces a width the user dragged). `cell` formats the
 value (default: the value as text); `value` is the raw value sorting compares and copying writes (default `row[key]`).
-`tooltip` returns the full value of a cell cut short (shown in a `Tooltip`, never `title`), or nothing. `cellKind`
+`tooltip` returns the full value of a cell (shown in a `Tooltip`, never `title`), or nothing; it shows only while the cell's text is cut short with an ellipsis, and is not read to screen readers (the cell's text already holds it). `cellKind`
 marks what a cell holds: `"null"` (muted, italic) or `"number"` (the number colour). `cellTone` colours a cell with a
 tone (`accent`, `neutral`, `danger`, `success`, `warning`, `info`), over the kind's colour.
 

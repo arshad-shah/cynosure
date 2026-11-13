@@ -10,12 +10,14 @@ import {
 } from "react";
 import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js";
 import { useControllableState } from "../../foundations/controllable.js";
+import { useDraft } from "../../foundations/draft.js";
 import { HiddenValue } from "../../foundations/HiddenValue/HiddenValue.js";
 import { isTypeaheadKey, seekEnabled, useTypeahead } from "../../foundations/listbox.js";
 import { clamp } from "../../foundations/math.js";
 import { clock } from "../../icons/clock.js";
 import type { Size } from "../../tokens/schema.js";
 import { Button } from "../Button/Button.js";
+import type { FieldLayoutProps } from "../Field/Field.js";
 import { IconButton } from "../IconButton/IconButton.js";
 import { Popover } from "../Popover/Popover.js";
 import { SegmentedControl } from "../SegmentedControl/SegmentedControl.js";
@@ -57,7 +59,7 @@ export interface TimeFieldLabels {
   now: string;
 }
 
-export interface TimeFieldProps {
+export interface TimeFieldProps extends FieldLayoutProps {
   /** The field's visible label, and its accessible name. */
   label: ReactNode;
   /** Hide the label visually; it still names the field. */
@@ -182,6 +184,8 @@ const SPAN: Record<Unit, number> = { h: 3600, m: 60, s: 1 };
 export function TimeField({
   label,
   labelHidden,
+  layout,
+  width,
   description,
   error,
   value,
@@ -232,8 +236,6 @@ export function TimeField({
     defaultValue,
     onChange,
   );
-  const [draft, setDraft] = useState<string | null>(null);
-  const [problem, setProblem] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
   /** Whether the current time of day is inside the limits, read when the picker opens. */
   const [nowAllowed, setNowAllowed] = useState(false);
@@ -261,27 +263,27 @@ export function TimeField({
   const inRange = (t: number) => t >= first && t <= last;
   const fit = (t: number) => clamp(t, first, last);
   const every = Math.max(1, Math.round(step));
-
-  const currentTime = current === null ? null : parseTime(current);
-  const shown = draft ?? (h12 && currentTime !== null ? formatTime12(currentTime, seconds) : (current ?? ""));
-
-  const take = (t: number) => {
-    const next = formatTime(t, seconds);
-    setDraft(null);
-    setProblem(null);
-    if (next !== current) setCurrent(next);
-  };
   /** What is wrong with typed text, or null when it is empty or an allowed time. */
   const check = (typed: string) => {
     if (typed.trim() === "") return null;
     const t = parseTime(typed);
     return t === null ? text.invalid : inRange(t) ? null : text.unavailable;
   };
+  // A form will not submit while the text is not a time it can take (the value it would submit is the last good one).
+  const { draft, setDraft, problem, setProblem, settle } = useDraft(input, check);
+
+  const currentTime = current === null ? null : parseTime(current);
+  const shown = draft ?? (h12 && currentTime !== null ? formatTime12(currentTime, seconds) : (current ?? ""));
+
+  const take = (t: number) => {
+    const next = formatTime(t, seconds);
+    settle();
+    if (next !== current) setCurrent(next);
+  };
   const commit = () => {
     if (draft === null) return;
     if (draft.trim() === "") {
-      setDraft(null);
-      setProblem(null);
+      settle();
       if (current !== null) setCurrent(null);
       return;
     }
@@ -289,11 +291,6 @@ export function TimeField({
     if (wrong) return setProblem(wrong);
     take(parseTime(draft) as number);
   };
-  // A form will not submit while the text is not a time it can take (the value it would submit is the last good one).
-  const invalid = draft === null ? null : check(draft);
-  useClientLayoutEffect(() => {
-    input.current?.setCustomValidity(invalid ?? "");
-  }, [invalid]);
 
   const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") commit();
@@ -462,6 +459,8 @@ export function TimeField({
         ref={input}
         label={label}
         {...(labelHidden ? { labelHidden } : {})}
+        layout={layout}
+        width={width}
         {...(description !== undefined ? { description } : {})}
         {...((error ?? problem) != null ? { error: error ?? problem } : {})}
         value={shown}
@@ -615,8 +614,7 @@ export function TimeField({
         value={current ?? ""}
         disabled={disabled}
         onReset={() => {
-          setDraft(null);
-          setProblem(null);
+          settle();
           resetCurrent(defaultValue);
         }}
       />

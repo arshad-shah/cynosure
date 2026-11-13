@@ -18,6 +18,7 @@ Single-line input with label, description, error, icons and an optional clear bu
 | `iconStart` / `iconEnd`                                                                 | –           | Facet icons (RTL aware)                                                   |
 | `addonStart`                                                                            | –           | Controls inside the field's start, before the input (ColorField's swatch) |
 | `addonEnd`                                                                              | –           | Controls inside the field's end, after the input (NumberField's steppers) |
+| `boxRef`                                                                                | –           | The field's box, to anchor a list to the whole field (Combobox, TagInput) |
 | `clearable`                                                                             | `false`     | Clear button while filled; `labels.clear` overrides "Clear"               |
 | `required`, `disabled`, `readOnly`, `name`, `maxLength`, `autoComplete`, `inputMode`, … | –           | Native input attributes                                                   |
 
@@ -27,9 +28,9 @@ Works in native forms: `FormData`, `form.reset()` and `required` validation. Wit
 
 ## Tokens
 
-- `--cy-text-field-font-size-xs`: Text size of an `xs` field. Default `--cy-font-size-xs`.
 - `--cy-text-field-padding-inline-xs`: Inline padding of an `xs` field. Default `--cy-space-4`.
-- `--cy-text-field-height-xs`: Height of an `xs` field. Default the `--cy-space-7` step (20px at comfortable scale).
+- `--cy-text-field-height-xs`: Height of an `xs` field. Default `--cy-control-height-xs` (20px at comfortable scale).
 
 - `--cy-text-field-{height-sm,height-md,height-lg,radius,padding-inline,bg,border,soft-bg}`
+- Border, background, radius and the read-only fill fall back to the shared field skin, `--cy-field-control-{border,bg,radius,sunken-bg}` (Field), which HotkeyField reads too.
 - `--cy-text-field-numeric`: `font-variant-numeric` of the typed text (default `normal`); DateField, NumberField and TimeField set `tabular-nums` so digits line up.

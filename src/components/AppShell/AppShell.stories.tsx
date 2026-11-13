@@ -248,7 +248,17 @@ export const WideningClosesTheDrawer: Story = {
       RESIZE,
     );
     await new Promise((r) => setTimeout(r, 100));
-    await expect(sheet()?.open ?? false).toBe(false);
+    // This story's own drawer stays shut. If WebKit ever shows one open again (it did once on CI, intermittently, on
+    // #167), say which dialog it is and where, so the cause can be read from the failure.
+    const open = [...document.querySelectorAll("dialog")].filter((d) => d.open);
+    const where = open.map((d) =>
+      [
+        d.className,
+        canvasElement.contains(d) ? "inside this story" : "outside this story",
+        `narrow=${frame(canvasElement).querySelector("[data-narrow]") ? "yes" : "no"}`,
+      ].join(", "),
+    );
+    await expect(where, "open dialogs").toEqual([]);
     await expect(canvas.getByRole("button", { name: "Open navigation" })).toHaveAttribute(
       "aria-expanded",
       "false",

@@ -45,12 +45,12 @@
     --_notice-on: var(--cy-color-on-danger);
   }
   /* Neutral fills with the ink: a dark panel in light mode, a light one in dark mode. */
-  &[data-tone="neutral"][data-variant="filled"] {
+  &[data-tone="neutral"][data-variant="solid"] {
     --_tone: var(--cy-color-ink);
   }
-  /* Filled: the tone's solid colour, everything on it in the text colour made for that fill. The close button is a
+  /* Solid: the tone's solid colour, everything on it in the text colour made for that fill. The close button is a
      ghost IconButton; its hover fill is set through its own token. */
-  &[data-variant="filled"] {
+  &[data-variant="solid"] {
     --_text: var(--_notice-on);
     --cy-button-hover-bg: color-mix(in oklab, var(--_notice-on) 16%, transparent);
     --cy-button-hover-ink: var(--_notice-on);
@@ -61,8 +61,8 @@
       color: var(--_notice-on);
     }
   }
-  &[data-compact] {
-    padding: var(--cy-notice-compact-padding, var(--cy-space-4) var(--cy-space-5));
+  &[data-size="sm"] {
+    padding: var(--cy-notice-padding-sm, var(--cy-space-4) var(--cy-space-5));
   }
 }
 /*
@@ -120,8 +120,8 @@
   margin-block: calc((1lh - var(--cy-control-height-sm)) / 2) 0;
   margin-inline-end: calc(-1 * var(--cy-space-3));
 }
-/* Compact: tighter gaps, and the title and message run on as one line, wrapping only when they do not fit. */
-.cy-notice[data-compact] {
+/* Small: tighter gaps, and the title and message run on as one line, wrapping only when they do not fit. */
+.cy-notice[data-size="sm"] {
   & .cy-notice-main.cy-notice-main {
     column-gap: var(--cy-space-4);
     row-gap: var(--cy-space-3);

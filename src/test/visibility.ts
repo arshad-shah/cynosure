@@ -1,5 +1,5 @@
 import { expect } from "storybook/test";
-import { BREAKPOINTS, type Breakpoint } from "../components/Stack/space.js";
+import { BREAKPOINTS, type Breakpoint } from "../foundations/layout.js";
 
 export const BREAKPOINT_NAMES = Object.keys(BREAKPOINTS) as Breakpoint[];
 

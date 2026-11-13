@@ -31,15 +31,15 @@ import { Button, Notice } from "@arshad-shah/cynosure";
 
 Without `onDismiss`, the close button hides the Notice by itself. With `onDismiss`, you decide: remove it from your state to hide it.
 
-## Filled and compact
+## Solid and small
 
-`variant="filled"` paints the tone's solid colour with the text colour made for it, for a message that must stand out, such as an error banner over an editor. `compact` tightens the padding and runs the title and message on as one line when they fit, for a status strip.
+`variant="solid"` paints the tone's solid colour with the text colour made for it, for a message that must stand out, such as an error banner over an editor. `size="sm"` tightens the padding and runs the title and message on as one line when they fit, for a status strip.
 
-<Canvas of={Stories.FilledReadableInEveryToneAndMode} />
-<Canvas of={Stories.CompactSitsOnOneLineWhenItFits} />
+<Canvas of={Stories.SolidReadableInEveryToneAndMode} />
+<Canvas of={Stories.SmallSitsOnOneLineWhenItFits} />
 
 ```tsx
-<Notice tone="danger" variant="filled" compact title="Query failed">
+<Notice tone="danger" variant="solid" size="sm" title="Query failed">
   relation "users" does not exist
 </Notice>
 ```
@@ -71,7 +71,7 @@ The close button keeps a 44px hit area on coarse pointers.
 
 ## Theming
 
-Tokens: `--cy-notice-radius`, `--cy-notice-padding`, `--cy-notice-compact-padding` (the padding of `compact`) and `--cy-notice-soft-mix` (how strongly the tone tints the background).
+Tokens: `--cy-notice-radius`, `--cy-notice-padding`, `--cy-notice-padding-sm` (the padding of `size="sm"`) and `--cy-notice-soft-mix` (how strongly the tone tints the background).
 
 ```ts
 createTheme({ components: { notice: { radius: "8px", softMix: "14%" } } });

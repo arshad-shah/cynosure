@@ -1,5 +1,7 @@
 .cy-menu.cy-menu {
   --_row: var(--cy-menu-row-height, var(--cy-control-height-md));
+  /* Gap from the trigger, read by the component when the menu opens. */
+  --_offset: var(--cy-menu-offset, var(--cy-space-2));
   box-sizing: border-box !important;
   position: fixed;
   inset: auto;

@@ -1,6 +1,12 @@
 import { type CSSProperties, forwardRef, type ReactNode } from "react";
+import type {
+  BoxProps,
+  LayoutAttributes,
+  PaddingProps,
+  Space,
+  VisibilityProps,
+} from "../../foundations/layout.js";
 import { Stack } from "../Stack/Stack.js";
-import type { BoxProps, LayoutAttributes, PaddingProps, Space, VisibilityProps } from "../Stack/space.js";
 
 export interface InlineProps extends PaddingProps, VisibilityProps, BoxProps, LayoutAttributes {
   /** Space token between children. */

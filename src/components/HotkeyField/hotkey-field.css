@@ -42,9 +42,14 @@
   min-inline-size: min(100%, 11em);
   min-block-size: max(var(--_h), var(--_hit));
   padding: 0 var(--cy-space-4);
-  border: var(--cy-border-width) solid var(--cy-hotkey-field-border, var(--cy-color-line));
-  border-radius: var(--cy-hotkey-field-radius, calc(var(--_h) * var(--cy-radius-factor)));
-  background: var(--cy-hotkey-field-bg, var(--cy-color-surface));
+  /* TextField's skin, through the shared --cy-field-control-* tokens. */
+  border: var(--cy-border-width) solid
+    var(--cy-hotkey-field-border, var(--cy-field-control-border, var(--cy-color-line)));
+  border-radius: var(
+    --cy-hotkey-field-radius,
+    var(--cy-field-control-radius, calc(var(--_h) * var(--cy-radius-factor)))
+  );
+  background: var(--cy-hotkey-field-bg, var(--cy-field-control-bg, var(--cy-color-surface)));
   font-size: var(--_fs);
   line-height: var(--cy-font-line-height);
   cursor: pointer;
@@ -56,7 +61,7 @@
   /* Disabled: a sunken fill, with the keys still readable (the buttons beside it show they cannot be pressed). */
   &[data-disabled] {
     border-color: transparent;
-    background: var(--cy-color-soft);
+    background: var(--cy-field-control-sunken-bg, var(--cy-color-soft));
     cursor: not-allowed;
   }
 }

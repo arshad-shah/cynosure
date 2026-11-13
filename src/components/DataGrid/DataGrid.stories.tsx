@@ -58,6 +58,7 @@ const cell = (el: Element, text: string) =>
     (c) => c.textContent === text,
   ) as HTMLElement;
 const focused = () => (document.activeElement as HTMLElement | null)?.textContent;
+const pause = (ms: number) => new Promise((r) => setTimeout(r, ms));
 /** Whether `el` is fully inside the grid's view, below its sticky header. */
 function inView(root: Element, el: HTMLElement) {
   const view = grid(root).getBoundingClientRect();
@@ -711,31 +712,38 @@ export const TooltipShowsTheFullValue: Story = {
         key: "title",
         header: "Title",
         width: 160,
-        cell: (r: Item) => (r.title.length > 20 ? `${r.title.slice(0, 20)}…` : r.title),
-        tooltip: (r: Item) => (r.title.length > 20 ? r.title : null),
+        tooltip: (r: Item) => r.title,
       },
     ],
     getRowId: (r: Item) => r.id,
   } as Partial<DataGridProps<unknown>>,
-  play: async ({ canvas, canvasElement, userEvent }) => {
-    // Keyboard focus on a cut-short cell shows the full value, which also describes the cell.
+  play: async ({ canvasElement, userEvent }) => {
+    // Keyboard focus on a cell cut short with an ellipsis shows the full value. The cell's text already holds it, so
+    // the tip is for the eye only: it does not describe the cell.
     await userEvent.tab();
     await userEvent.keyboard("{ArrowRight}");
     const cut = document.activeElement as HTMLElement;
     await expect(cut).toHaveAttribute("role", "gridcell");
-    const tip = await canvas.findByRole("tooltip");
-    await waitFor(() => expect(tip).toBeVisible());
+    const value = cut.querySelector(".cy-data-grid-value") as HTMLElement;
+    await expect(value.scrollWidth).toBeGreaterThan(value.clientWidth);
+    const tip = await waitFor(() => {
+      const open = canvasElement.ownerDocument.querySelector<HTMLElement>(".cy-tooltip:popover-open");
+      expect(open).not.toBeNull();
+      return open as HTMLElement;
+    });
     await expect(tip).toHaveTextContent(LONG);
-    await expect(cut).toHaveAttribute("aria-describedby", tip.id);
+    await expect(tip).toHaveAttribute("aria-hidden", "true");
+    await expect(cut).not.toHaveAttribute("aria-describedby");
     // The anchor takes no box: the cell is still placed in its row.
     await expect(
       cut.getBoundingClientRect().left - grid(canvasElement).getBoundingClientRect().left,
     ).toBeGreaterThan(60);
-    // A short value has no tooltip.
+    // A value that fits has no tooltip, though the column gives one.
     await userEvent.keyboard("{ArrowDown}");
     await expect(focused()).toBe("Short");
-    await expect(document.activeElement).not.toHaveAttribute("aria-describedby");
-    await waitFor(() => expect(canvas.queryByRole("tooltip")).toBeNull());
+    await pause(150);
+    await expect(canvasElement.ownerDocument.querySelector(".cy-tooltip:popover-open")).toBeNull();
+    await expect(document.activeElement?.parentElement?.querySelector(".cy-tooltip")).toBeNull();
   },
 };
 

@@ -1,8 +1,19 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useClientLayoutEffect } from "./client-layout-effect.js";
 
 /** True on Apple platforms, where `mod` means Command; elsewhere it means Control. */
 export const isApple = () =>
   typeof navigator !== "undefined" && /Mac|iPhone|iPad|iPod/.test(navigator.platform || navigator.userAgent);
+
+/**
+ * `isApple()` as a hook, decided after hydration so the server and the first client render agree (false until then).
+ * Kbd, HotkeyField and Menu write shortcuts with it.
+ */
+export function useApple() {
+  const [apple, setApple] = useState(false);
+  useClientLayoutEffect(() => setApple(isApple()), []);
+  return apple;
+}
 
 /** The letter or digit printed on the physical key ("KeyK" is "k", "Digit1" is "1"), or "". */
 const codeKey = (code: string) => (/^(?:Key[A-Z]|Digit\d)$/.test(code) ? code.slice(-1).toLowerCase() : "");

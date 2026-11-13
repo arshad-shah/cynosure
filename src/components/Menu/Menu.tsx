@@ -16,7 +16,7 @@ import { ButtonBase } from "../../foundations/ButtonBase/ButtonBase.js";
 import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js";
 import { useControllableState } from "../../foundations/controllable.js";
 import { isRtl } from "../../foundations/dir.js";
-import { ariaKeyShortcuts, shortcutKeys } from "../../foundations/hotkey.js";
+import { ariaKeyShortcuts, shortcutKeys, useApple } from "../../foundations/hotkey.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
 import { isTypeaheadKey, useTypeahead } from "../../foundations/listbox.js";
 import { OptionIcon, type OptionIconColor } from "../../foundations/option-icon.js";
@@ -29,9 +29,10 @@ import { useFloatingOffset, usePopover } from "../../overlay/floating.js";
 import type { Placement } from "../../overlay/position.js";
 import { useAnchoredPosition, type VirtualAnchor } from "../../overlay/use-anchored-position.js";
 import type { Tone } from "../../tokens/schema.js";
-import { Kbd, useApple } from "../Kbd/Kbd.js";
+import { Kbd } from "../Kbd/Kbd.js";
 
 export interface MenuTokens {
+  offset: string;
   minWidth: string;
   maxWidth: string;
   radius: string;
@@ -146,7 +147,8 @@ export interface MenuPanelProps {
   /** What the panel is placed against: the trigger, or a point (context menus). */
   anchor: RefObject<HTMLElement | VirtualAnchor | null>;
   placement: Placement;
-  offset: number;
+  /** Gap from the anchor in pixels. Default: the panel's `--_offset` (`--cy-menu-offset`), read when it opens. */
+  offset?: number | undefined;
   /** Elements that count as inside (clicking them does not dismiss). */
   inside: RefObject<HTMLElement | null>[];
   returnFocus: RefObject<HTMLElement | null>;
@@ -186,7 +188,8 @@ export function MenuPanel({
   const pending = useRef<{ to: string | null; timer: ReturnType<typeof setTimeout> } | null>(null);
   const rows = useRef(new Map<string, RefObject<HTMLButtonElement | null>>());
   const nested = depth > 0;
-  const subOffset = useFloatingOffset(panel, open && nested);
+  // The gap is a token: a submenu's sits against its parent; a menu's is --cy-menu-offset. Read when it opens.
+  const tokenOffset = useFloatingOffset(panel, open && (nested || offset === undefined));
 
   usePopover(panel, open, (el) => {
     if (focusOn === "none") return;
@@ -198,7 +201,7 @@ export function MenuPanel({
     panel,
     open,
     nested ? "end" : placement,
-    nested ? subOffset : offset,
+    nested || offset === undefined ? tokenOffset : offset,
     nested ? "flush" : "start",
   );
   useRovingFocus(panel, { orientation: "vertical", selector: ITEM });
@@ -477,7 +480,6 @@ export function Menu({
         focusOn={focusOn}
         anchor={triggerRef}
         placement={placement}
-        offset={4}
         inside={[triggerRef]}
         returnFocus={triggerRef}
         className={className}

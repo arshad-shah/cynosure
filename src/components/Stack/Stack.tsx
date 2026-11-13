@@ -9,7 +9,7 @@ import {
   space,
   type VisibilityProps,
   visibilityAttrs,
-} from "./space.js";
+} from "../../foundations/layout.js";
 
 export interface StackProps extends PaddingProps, VisibilityProps, BoxProps, LayoutAttributes {
   /** Space token between children. */

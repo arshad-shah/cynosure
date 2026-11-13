@@ -3,6 +3,7 @@ import { useControllableState } from "../../foundations/controllable.js";
 import type { IconData } from "../../icons/types.js";
 import type { DenseSize } from "../../tokens/schema.js";
 import { Button } from "../Button/Button.js";
+import type { FieldLayoutProps } from "../Field/Field.js";
 import { TextField } from "../TextField/TextField.js";
 
 export interface PathFieldTokens {
@@ -23,7 +24,7 @@ export interface PathFieldLabels {
   clear: string;
 }
 
-export interface PathFieldProps {
+export interface PathFieldProps extends FieldLayoutProps {
   /** The field's label and accessible name. */
   label: ReactNode;
   /** Visually hide the label (it still names the field). Prefer visible labels. */
@@ -40,11 +41,14 @@ export interface PathFieldProps {
   onChange?: ((value: string) => void) | undefined;
   /**
    * Opens your picker (Electron's `dialog.showOpenDialog` over IPC, a file system access handle) and resolves with the
-   * chosen path, or null when it was cancelled (the path stays as it was). The button is busy until it settles.
+   * chosen path, or null when it was cancelled. The button is busy until it settles; a cancel or a failure (the
+   * promise rejects) leaves the path as it was.
    */
   onPick: () => Promise<string | null>;
   /** Name the path is submitted under in a form. */
   name?: string | undefined;
+  /** Id of the form it belongs to, when it is not inside that form. */
+  form?: string | undefined;
   /** The form cannot be submitted while the path is empty. */
   required?: boolean | undefined;
   /** Turns off the field and its buttons; the path is not submitted. */
@@ -78,6 +82,8 @@ export const PathField = forwardRef<HTMLInputElement, PathFieldProps>(function P
   {
     label,
     labelHidden,
+    layout,
+    width,
     description,
     error,
     value,
@@ -85,6 +91,7 @@ export const PathField = forwardRef<HTMLInputElement, PathFieldProps>(function P
     onChange,
     onPick,
     name,
+    form,
     required,
     disabled,
     placeholder,
@@ -103,10 +110,14 @@ export const PathField = forwardRef<HTMLInputElement, PathFieldProps>(function P
 
   const pick = () => {
     setPicking(true);
+    // A picker that fails changes nothing: the button stops being busy and the path stays.
     onPick()
-      .then((chosen) => {
-        if (chosen !== null) setPath(chosen);
-      })
+      .then(
+        (chosen) => {
+          if (chosen !== null) setPath(chosen);
+        },
+        () => {},
+      )
       .finally(() => setPicking(false));
   };
 
@@ -116,9 +127,12 @@ export const PathField = forwardRef<HTMLInputElement, PathFieldProps>(function P
         ref={ref}
         label={label}
         labelHidden={labelHidden}
+        layout={layout}
+        width={width}
         description={description}
         error={error}
         name={name}
+        form={form}
         required={required}
         disabled={disabled}
         placeholder={placeholder}

@@ -35,6 +35,8 @@ const match = fuzzyMatch(search, table.name);
 
 `positions` are string indices (UTF-16 code units), as JavaScript fuzzy matchers return them; order does not matter and indices outside the text are ignored. When both are given, `positions` wins. `query` is plain text, not a pattern: `a.b` finds only `a.b`.
 
+To filter a list by the same rule that marks it, use `textMatches(text, query)`: it is true when `text` contains `query` (its surrounding spaces trimmed) ignoring case, exactly when `query` would mark something. Combobox, TagInput, TextArea's mentions, Tree and CommandPalette filter with it.
+
 <Canvas of={Stories.PositionsFromAFuzzyMatcher} />
 
 ## Props

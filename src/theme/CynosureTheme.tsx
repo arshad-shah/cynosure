@@ -1,7 +1,9 @@
 import { type CSSProperties, type ReactNode, useContext, useMemo } from "react";
 import { useClientLayoutEffect } from "../foundations/client-layout-effect.js";
+import { useMediaQuery } from "../foundations/media-query.js";
 import { type Theme, themeProperties } from "../tokens/index.js";
-import { ThemeContext, type ThemeState, useMediaQuery } from "./theme-context.js";
+import { ThemeContext, type ThemeState } from "./theme-context.js";
+import type { ColorMode } from "./use-color-mode.js";
 
 export interface CynosureThemeProps {
   /**
@@ -10,7 +12,7 @@ export interface CynosureThemeProps {
    */
   theme?: Theme;
   /** Omit to inherit the surrounding mode. `system` follows the OS. A theme fixed to one mode (Midnight) ignores it. */
-  mode?: "light" | "dark" | "system";
+  mode?: ColorMode;
   /** `more` uses the higher-contrast palettes. `system`, or leaving it out, follows the OS setting. */
   contrast?: "normal" | "more" | "system";
   /** `self` (default) themes only this wrapper. `document` themes `<html>`; only for apps that own the page. */

@@ -32,7 +32,7 @@ import { PathField } from "@arshad-shah/cynosure";
 />
 ```
 
-`onPick` returns a promise of the chosen path, or `null` when the dialog was cancelled. While it is open the Browse button is busy and cannot be pressed again; a cancel leaves the path as it was.
+`onPick` returns a promise of the chosen path, or `null` when the dialog was cancelled. While it is open the Browse button is busy and cannot be pressed again; a cancel, or a picker that fails (the promise rejects), leaves the path as it was. FileDrop's `onPick` works the same way.
 
 <Canvas of={Stories.CancellingChangesNothing} />
 

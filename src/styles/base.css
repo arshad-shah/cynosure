@@ -57,7 +57,7 @@
 
 /*
  * hideBelow / hideAbove on the layout primitives (Stack, Inline, Grid, GridItem, Container), by the window's width.
- * The widths are BREAKPOINTS in src/components/Stack/space.ts: sm 30rem, md 45rem, lg 60rem, xl 75rem.
+ * The widths are BREAKPOINTS in src/foundations/layout.ts: sm 30rem, md 45rem, lg 60rem, xl 75rem.
  * !important: the attribute must win over the component's own display, whatever the rule order.
  */
 @media (width < 30rem) {
@@ -102,7 +102,7 @@
 }
 
 /*
- * grow, shrink, fill, minSize and overflow on the layout primitives (BoxProps in src/components/Stack/space.ts:
+ * grow, shrink, fill, minSize and overflow on the layout primitives (BoxProps in src/foundations/layout.ts:
  * Stack, Inline, Grid; overflow on GridItem). The attribute is doubled so a host's element rules never win; the
  * primitives' own rules set none of these properties.
  */

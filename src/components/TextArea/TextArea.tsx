@@ -8,18 +8,21 @@ import {
   useEffect,
   useId,
   useLayoutEffect,
+  useMemo,
   useRef,
   useState,
 } from "react";
 import { useDrag } from "../../foundations/drag.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
 import { isComposing } from "../../foundations/keys.js";
-import { clamp } from "../../foundations/math.js";
+import { useActiveOption } from "../../foundations/listbox.js";
+import { mergeRefs } from "../../foundations/refs.js";
 import { TextAreaBase } from "../../foundations/TextAreaBase/TextAreaBase.js";
+import { textMatches } from "../../foundations/text-match.js";
 import { resizeCorner } from "../../icons/resize-corner.js";
 import { useListboxLayer } from "../../overlay/listbox-layer.js";
 import type { Size } from "../../tokens/schema.js";
-import { Field } from "../Field/Field.js";
+import { Field, type FieldLayoutProps } from "../Field/Field.js";
 import { OptionList, OptionListItem, OptionListNote } from "../OptionList/OptionList.js";
 
 export interface TextAreaTokens {
@@ -62,13 +65,11 @@ export type TextAreaSuggestions =
 export interface TextAreaLabels {
   /** The character counter. */
   count: (count: number, max?: number) => string;
-  /** Name of the suggestion list. Default: "Suggestions". */
-  suggestions: string;
   /** Shown in the suggestion list while a promise is pending. Default: "Loading…". */
   loading: string;
 }
 
-export interface TextAreaProps extends NativeArea {
+export interface TextAreaProps extends NativeArea, FieldLayoutProps {
   /** The field's label and accessible name. */
   label: ReactNode;
   /** Visually hide the label (it still names the control). Prefer visible labels. */
@@ -107,7 +108,7 @@ export interface TextAreaProps extends NativeArea {
   suggestions?: TextAreaSuggestions | undefined;
   /** Called with the suggestion chosen, after it is inserted. */
   onMention?: ((item: TextAreaMention) => void) | undefined;
-  /** Replace the built-in English text: the character counter, the suggestion list's name and its loading note. */
+  /** Replace the built-in English text: the character counter and the suggestion list's loading note. */
   labels?: Partial<TextAreaLabels>;
   /** Added to the root element, for layout. */
   className?: string;
@@ -117,7 +118,6 @@ export interface TextAreaProps extends NativeArea {
 
 const DEFAULT_LABELS: TextAreaLabels = {
   count: (n, max) => (max ? `${n} / ${max}` : `${n} characters`),
-  suggestions: "Suggestions",
   loading: "Loading…",
 };
 
@@ -144,6 +144,8 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(function 
   {
     label,
     labelHidden,
+    layout,
+    width,
     description,
     error,
     value,
@@ -181,14 +183,7 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(function 
   const manual = useRef(0);
   const grip = useRef<HTMLSpanElement>(null);
   const dragFrom = useRef({ height: 0, manual: 0 });
-  const ref = useCallback(
-    (node: HTMLTextAreaElement | null) => {
-      inner.current = node;
-      if (typeof forwarded === "function") forwarded(node);
-      else if (forwarded) forwarded.current = node;
-    },
-    [forwarded],
-  );
+  const ref = useMemo(() => mergeRefs(inner, forwarded), [forwarded]);
 
   const resize = useCallback(() => {
     const area = inner.current;
@@ -256,7 +251,6 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(function 
   const composing = useRef(false);
   const [mention, setMention] = useState<{ start: number; query: string } | null>(null);
   const [dismissed, setDismissed] = useState(-1);
-  const [active, setActive] = useState(0);
   const [found, setFound] = useState<{ items: TextAreaMention[]; loading: boolean }>({
     items: [],
     loading: false,
@@ -294,27 +288,23 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(function 
     };
   }, [query]);
 
-  const lower = (query ?? "").toLocaleLowerCase();
   const items = fromList
     ? (suggestions as readonly (string | TextAreaMention)[])
         .map(asMention)
-        .filter((m) =>
-          `${m.value} ${typeof m.label === "string" ? m.label : ""}`.toLocaleLowerCase().includes(lower),
-        )
+        .filter((m) => textMatches(`${m.value} ${typeof m.label === "string" ? m.label : ""}`, query ?? ""))
     : found.items;
   const loading = !fromList && found.loading;
   const listOpen = query !== null && (items.length > 0 || loading);
-  const at = clamp(active, 0, items.length - 1);
+  const { active, activeId, optionId, setActive, move } = useActiveOption({
+    id: listId,
+    list,
+    open: listOpen,
+    count: items.length,
+  });
   const close = () => {
     if (mention) setDismissed(mention.start);
   };
   useListboxLayer({ anchor: box, list, open: listOpen, onClose: close });
-  useEffect(() => {
-    if (listOpen)
-      list.current
-        ?.querySelector(`#${CSS.escape(`${listId}-${at}`)}`)
-        ?.scrollIntoView?.({ block: "nearest" });
-  }, [listOpen, listId, at]);
 
   const insert = (item: TextAreaMention) => {
     const area = inner.current as HTMLTextAreaElement;
@@ -335,12 +325,11 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(function 
   /** The list's keys while it is open; returns whether the key was used (then it is not passed on). */
   const mentionKey = (event: KeyboardEvent<HTMLTextAreaElement>) => {
     if (!listOpen || isComposing(event)) return false;
-    const pick = items[at];
+    const pick = items[active];
     const plain = !event.shiftKey && !event.ctrlKey && !event.metaKey && !event.altKey;
     if (event.key === "Escape") close();
     else if (!pick) return false;
-    else if (event.key === "ArrowDown" || event.key === "ArrowUp")
-      setActive(clamp(at + (event.key === "ArrowDown" ? 1 : -1), 0, items.length - 1));
+    else if (event.key === "ArrowDown" || event.key === "ArrowUp") move(event.key === "ArrowDown" ? 1 : -1);
     else if ((event.key === "Enter" || event.key === "Tab") && plain) insert(pick);
     else return false;
     event.preventDefault();
@@ -363,6 +352,8 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(function 
     <Field
       label={label}
       labelHidden={labelHidden}
+      layout={layout}
+      width={width}
       description={description}
       error={error}
       required={required}
@@ -391,7 +382,7 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(function 
                       "aria-autocomplete": "list" as const,
                       "aria-haspopup": "listbox" as const,
                       "aria-controls": listOpen ? listId : undefined,
-                      "aria-activedescendant": listOpen && items.length ? `${listId}-${at}` : undefined,
+                      "aria-activedescendant": activeId,
                     }
                   : {})}
                 id={field.id}
@@ -441,19 +432,20 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(function 
                 {text.count(count, maxLength)}
               </span>
             )}
+            {/* Named by the field's label, as Combobox's and TagInput's lists are. */}
             {mentions && (
-              <OptionList ref={list} id={listId} label={text.suggestions} busy={loading}>
+              <OptionList ref={list} id={listId} aria-labelledby={field.labelId} busy={loading}>
                 {items.length === 0 ? (
                   <OptionListNote>{text.loading}</OptionListNote>
                 ) : (
                   items.map((item, index) => (
                     <OptionListItem
                       key={item.value}
-                      id={`${listId}-${index}`}
+                      id={optionId(index)}
                       label={item.label ?? item.value}
                       description={item.description}
-                      selected={index === at}
-                      active={index === at}
+                      selected={index === active}
+                      active={index === active}
                       onPointerMove={() => setActive(index)}
                       onClick={() => insert(item)}
                     />

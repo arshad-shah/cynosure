@@ -173,7 +173,7 @@ export {
   type ErrorBoundaryProps,
   type ErrorBoundaryTokens,
 } from "./components/ErrorBoundary/index.js";
-export { Field, type FieldProps } from "./components/Field/index.js";
+export { Field, type FieldLayoutProps, type FieldProps, type FieldWidth } from "./components/Field/index.js";
 export {
   acceptsFile,
   FileDrop,
@@ -214,6 +214,7 @@ export {
   HighlightedText,
   type HighlightedTextProps,
   type HighlightedTextTokens,
+  textMatches,
 } from "./components/HighlightedText/index.js";
 export {
   HotkeyField,
@@ -341,6 +342,7 @@ export {
 export { Prose, type ProseProps, type ProseTokens } from "./components/Prose/index.js";
 export { QRCode, type QRCodeLabels, type QRCodeProps, type QRCodeTokens } from "./components/QRCode/index.js";
 export { RadioGroup, type RadioGroupProps, type RadioOption } from "./components/RadioGroup/index.js";
+export { RowActions, type RowActionsProps } from "./components/RowActions/index.js";
 export {
   ScrollArea,
   type ScrollAreaHandle,

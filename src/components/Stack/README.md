@@ -28,6 +28,6 @@ Vertical layout with token gaps (`gap="1"` … `"10"` map to `--cy-space-*`), al
 | `as`                             | `div`      | Neutral element only                                                                                                            |
 - Padding is a space token (`--cy-space-*`) applied with logical properties, inside the stack's width. `"0"` is a value: `padding="4" paddingInline="0"` pads the top and bottom only.
 - A nested Stack or Inline has no padding unless it asks for it; it never inherits its parent's.
-- `grow`, `shrink`, `fill`, `minSize` and `overflow` (`BoxProps` in `space.ts`, shared with Inline and Grid) become `data-cy-*` attributes styled in `src/styles/base.css`. For a keyboard-scrollable area use ScrollArea.
+- `grow`, `shrink`, `fill`, `minSize` and `overflow` (`BoxProps` in `src/foundations/layout.ts`, shared with Inline and Grid) become `data-cy-*` attributes styled in `src/styles/base.css`. For a keyboard-scrollable area use ScrollArea.
 - Inline renders a Stack with `direction="row"` and adds its own rules (centring, `wrap`) in `inline.css`.
-- `space.ts` in this folder holds the `Space` type and the padding props and logic shared with Inline, Grid and Container.
+- `src/foundations/layout.ts` holds the `Space` type and the padding, box and visibility props and logic shared with Inline, Grid and Container.

@@ -55,6 +55,7 @@
   --cy-button-font-size-xs: var(--cy-status-bar-font-size, var(--cy-font-size-xs));
   --cy-button-font-weight: var(--cy-font-weight-regular);
   --cy-button-max-width: var(--cy-status-bar-segment-max-width, 32ch);
+  --cy-button-soft-mix: var(--cy-status-bar-soft-mix, 14%);
   --cy-button-solid-shadow: none;
   --cy-button-press-scale: 1;
 }
@@ -131,9 +132,9 @@
     --_tone-text: var(--cy-color-info-text);
     --_on: var(--cy-color-on-info);
   }
-  /* The same tint and fill as a clickable segment (a Button), so the two sit side by side. */
+  /* The same tint and fill as a clickable segment (a Button, given the same mix above), so the two sit side by side. */
   &[data-variant="soft"] {
-    background: color-mix(in oklab, var(--_tone) var(--cy-button-soft-mix, 14%), var(--cy-color-surface));
+    background: color-mix(in oklab, var(--_tone) var(--cy-status-bar-soft-mix, 14%), var(--cy-color-surface));
   }
   &[data-variant="solid"] {
     background: var(--_tone);

@@ -8,19 +8,20 @@ A text input with a list of suggestions (WAI-ARIA APG editable combobox). Type t
 <Combobox label="User" options={results} inputValue={query} onInputChange={setQuery} filter={false} loading={fetching} />
 ```
 
-| Prop                                           | Default  | Notes                                                                                   |
-| ---------------------------------------------- | -------- | --------------------------------------------------------------------------------------- |
-| `label`, `labelHidden`, `description`, `error` | –        | As TextField                                                                            |
-| `options`                                      | –        | `{ value, label, description?, disabled?, icon?, iconTone?, iconColor? }[]`             |
-| `value` / `defaultValue` / `onChange`          | `""`     | The chosen option's value (or the typed text with `allowCustom`)                        |
-| `inputValue` / `onInputChange`                 | –        | The typed text; control it to fetch options                                             |
-| `filter`                                       | contains | `(option, text) => boolean`, or `false` to show `options` as given (server-filtered)    |
-| `options[].trailing` / `options[].dimmed`      | –        | Row-end text (a shortcut, a count); muted but still choosable                           |
-| `footer`                                       | –        | `{ label, icon?, onSelect }`: an action pinned under the options, the arrows' last stop |
-| `allowCustom`                                  | `false`  | Text that matches no option becomes the value                                           |
-| `loading`                                      | `false`  | The list shows `labels.loading` and is `aria-busy`                                      |
-| `name`, `required`, `disabled`                 | –        | Native form behaviour through a hidden value                                            |
-| `labels`                                       | –        | `empty`, `loading`, `required`                                                          |
+| Prop                                           | Default     | Notes                                                                                   |
+| ---------------------------------------------- | ----------- | --------------------------------------------------------------------------------------- |
+| `layout` / `width`                             | `stack` / – | `split` settings row and the control width, as on `Field`                               |
+| `label`, `labelHidden`, `description`, `error` | –           | As TextField                                                                            |
+| `options`                                      | –           | `{ value, label, description?, disabled?, icon?, iconTone?, iconColor? }[]`             |
+| `value` / `defaultValue` / `onChange`          | `""`        | The chosen option's value (or the typed text with `allowCustom`)                        |
+| `inputValue` / `onInputChange`                 | –           | The typed text; control it to fetch options                                             |
+| `filter`                                       | contains    | `(option, text) => boolean`, or `false` to show `options` as given (server-filtered)    |
+| `options[].trailing` / `options[].dimmed`      | –           | Row-end text (a shortcut, a count); muted but still choosable                           |
+| `footer`                                       | –           | `{ label, icon?, onSelect }`: an action pinned under the options, the arrows' last stop |
+| `allowCustom`                                  | `false`     | Text that matches no option becomes the value                                           |
+| `loading`                                      | `false`     | The list shows `labels.loading` and is `aria-busy`                                      |
+| `name`, `required`, `disabled`                 | –           | Native form behaviour through a hidden value                                            |
+| `labels`                                       | –           | `empty`, `loading`, `required`                                                          |
 - Focus stays in the input; the active option is `aria-activedescendant`, so late results never interrupt typing.
 - While typing, the text is marked where it appears in each option's label (HighlightedText).
 - Leaving with text that matches nothing restores the last choice (unless `allowCustom`); leaving it empty clears the value.

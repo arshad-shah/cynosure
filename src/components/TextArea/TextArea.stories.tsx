@@ -346,7 +346,8 @@ export const MentionsInsertOnEnter: Story = {
     await waitFor(() => expect(shownList(list)).toBe(true));
     await shownFully(list);
     await expect(list).toHaveAttribute("role", "listbox");
-    await expect(list).toHaveAccessibleName("Suggestions");
+    // The list is named by the field's label, as Combobox's and TagInput's are.
+    await expect(list).toHaveAccessibleName("Notes");
     await expect(optionNames(list)).toEqual(["Ada Lovelace", "Alan Turing"]);
     // The first option is active; the arrows move, stopping at the ends; focus stays in the text.
     await expect(activeOption(area)).toHaveTextContent("Ada Lovelace");

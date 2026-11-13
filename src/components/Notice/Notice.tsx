@@ -3,14 +3,14 @@ import { Icon } from "../../foundations/Icon/Icon.js";
 import { TONE_ICONS } from "../../foundations/tone-icons.js";
 import { close as closeIcon } from "../../icons/close.js";
 import type { IconData } from "../../icons/types.js";
-import type { Tone } from "../../tokens/schema.js";
+import type { Size, Tone } from "../../tokens/schema.js";
 import { IconButton } from "../IconButton/IconButton.js";
 
 export interface NoticeTokens {
-  /** Padding of a compact Notice. */
-  compactPadding: string;
   radius: string;
   padding: string;
+  /** Padding of a small Notice (`size="sm"`). */
+  paddingSm: string;
   softMix: string;
 }
 
@@ -32,12 +32,12 @@ export interface NoticeProps {
    */
   tone?: Tone;
   /**
-   * `soft` is a tinted panel with a tone edge; `filled` is the tone's solid colour with the readable text that goes on
+   * `soft` is a tinted panel with a tone edge; `solid` is the tone's solid colour with the readable text that goes on
    * it, for a message that must stand out (an editor's error banner). Default "soft".
    */
-  variant?: "soft" | "filled";
-  /** Less padding, and the title and message share one line when they fit (a status strip). Default false. */
-  compact?: boolean;
+  variant?: "soft" | "solid";
+  /** `sm`: less padding, and the title and message share one line when they fit (a status strip). Default "md". */
+  size?: Extract<Size, "sm" | "md">;
   /** Short heading above the message. */
   title?: ReactNode;
   /** One or two Buttons; they move under the text in narrow containers. */
@@ -62,7 +62,7 @@ export interface NoticeProps {
 export function Notice({
   tone = "info",
   variant = "soft",
-  compact = false,
+  size = "md",
   title,
   action,
   dismissible = false,
@@ -82,7 +82,7 @@ export function Notice({
       className={className ? `cy-notice ${className}` : "cy-notice"}
       data-tone={tone}
       data-variant={variant}
-      data-compact={compact ? "" : undefined}
+      data-size={size}
       style={style}
     >
       <div className="cy-notice-main cy-reset">
@@ -99,7 +99,7 @@ export function Notice({
             variant="ghost"
             size="sm"
             // On a fill the close icon takes the fill's text colour; on the soft panel, the button's own.
-            {...(variant === "filled" && { iconColor: "var(--_notice-on)" })}
+            {...(variant === "solid" && { iconColor: "var(--_notice-on)" })}
             wrapperClassName="cy-notice-dismiss"
             onClick={() => {
               onDismiss?.();

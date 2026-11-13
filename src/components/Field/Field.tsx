@@ -1,8 +1,16 @@
 import type { CSSProperties, ReactNode } from "react";
 import { type FieldRender, useField } from "../../foundations/field.js";
-import type { Size } from "../../tokens/schema.js";
+import type { DenseSize } from "../../tokens/schema.js";
 
 export interface FieldTokens {
+  /** Border colour of every field's box (TextField, HotkeyField), under each control's own token. Default --cy-color-line. */
+  controlBorder: string;
+  /** Background of every field's box (TextField, HotkeyField), under each control's own token. Default --cy-color-surface. */
+  controlBg: string;
+  /** Corner radius of every field's box (TextField, HotkeyField). Default the control height times the radius factor. */
+  controlRadius: string;
+  /** Sunken fill of a box that cannot be edited: a read-only TextField, a disabled HotkeyField. Default --cy-color-soft. */
+  controlSunkenBg: string;
   /** Narrowest the label and description get in the split layout before the control moves under them. Default 192px. */
   splitTextMin: string;
   /** Width of the control at `width="lg"`. Default 384px. */
@@ -28,15 +36,8 @@ declare module "../../tokens/schema.js" {
 /** Width of a Field's control: three steps from the `--cy-field-control-width-*` tokens, or the whole field. */
 export type FieldWidth = "sm" | "md" | "lg" | "full";
 
-export interface FieldProps {
-  /** Visible label; it names the control. */
-  label: ReactNode;
-  /** Help text shown below the control and read out with it. */
-  description?: ReactNode | undefined;
-  /** Shown below the control, announced, and marks the control invalid. */
-  error?: ReactNode | undefined;
-  /** Draws the required marker; pass `required` to the control too. */
-  required?: boolean | undefined;
+/** How a Field lays out its label and control. Every control built on Field takes these and passes them on. */
+export interface FieldLayoutProps {
   /**
    * `stack` puts the label above the control and the description and error below it. `split` puts the label and
    * description at the start and the control at the end of one row (a settings row); when the field is too narrow for
@@ -49,8 +50,19 @@ export interface FieldProps {
    * own width (the whole field in the stacked layout for TextField and the other fields).
    */
   width?: FieldWidth | undefined;
-  /** Size of the label text. Default "md". */
-  size?: Size | undefined;
+}
+
+export interface FieldProps extends FieldLayoutProps {
+  /** Visible label; it names the control. */
+  label: ReactNode;
+  /** Help text shown below the control and read out with it. */
+  description?: ReactNode | undefined;
+  /** Shown below the control, announced, and marks the control invalid. */
+  error?: ReactNode | undefined;
+  /** Draws the required marker; pass `required` to the control too. */
+  required?: boolean | undefined;
+  /** Size of the label text, matching the control's size (an `xs` control has the `sm` label). Default "md". */
+  size?: DenseSize | undefined;
   /** Keep the label for assistive tech but take no space (toolbars, dense rows). Prefer visible labels. */
   labelHidden?: boolean | undefined;
   /** Label a group of controls (radio groups) instead of one control. */

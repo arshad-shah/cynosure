@@ -357,3 +357,103 @@ export const ItemIconColourIsStableUnderHostileHost: Story = {
     }
   },
 };
+
+const FILES = ["report.pdf", "notes.md", "photo.png"];
+const many = { select: fn(), change: fn() };
+
+function ManyTargets({ disabled = false }: { disabled?: boolean }) {
+  return (
+    <ContextMenu<string>
+      label={(file) => `${file} actions`}
+      items={(file) => [
+        { value: "open", label: `Open ${file}` },
+        { value: "delete", label: "Delete", icon: trash, tone: "danger" },
+      ]}
+      onSelect={many.select}
+      onOpenChange={many.change}
+      disabled={disabled}
+    >
+      {(_, targetFor) => (
+        <ul aria-label="Files" style={{ display: "grid", gap: 4, margin: 0, padding: 0, listStyle: "none" }}>
+          {FILES.map((file) => (
+            <li
+              key={file}
+              {...targetFor(file)}
+              // biome-ignore lint/a11y/noNoninteractiveTabindex: a focusable row, so keyboard users can open its menu
+              tabIndex={0}
+              data-testid={file}
+              style={{ padding: 8, WebkitTouchCallout: "none", userSelect: "none" }}
+            >
+              {file}
+            </li>
+          ))}
+        </ul>
+      )}
+    </ContextMenu>
+  );
+}
+
+export const OneMenuForManyTargets: Story = {
+  render: () => <ManyTargets />,
+  play: async ({ canvas, userEvent }) => {
+    many.select.mockClear();
+    many.change.mockClear();
+    // One menu, beside the list, for every row: right-click names it and fills it for the row pressed.
+    await expect(document.querySelectorAll('[role="menu"]')).toHaveLength(1);
+    const notes = canvas.getByTestId("notes.md");
+    await expect(notes).toHaveAttribute("aria-keyshortcuts", "Shift+F10");
+    await userEvent.pointer({ keys: "[MouseRight]", target: notes });
+    await shownFully(menu());
+    await expect(menu()).toHaveAccessibleName("notes.md actions");
+    await expect(document.activeElement).toHaveTextContent("Open notes.md");
+    await expect(many.change).toHaveBeenLastCalledWith(true, "notes.md");
+    await userEvent.keyboard("{Enter}");
+    await expect(many.select).toHaveBeenLastCalledWith("open", "notes.md");
+    await waitFor(() => expect(isOpen()).toBe(false));
+    await expect(many.change).toHaveBeenLastCalledWith(false, "notes.md");
+    // Focus goes back to the row that opened it.
+    await expect(notes).toHaveFocus();
+    // Shift+F10 on another row opens the menu for that row; Escape returns focus to it.
+    const photo = canvas.getByTestId("photo.png");
+    photo.focus();
+    await userEvent.keyboard("{Shift>}{F10}{/Shift}");
+    await shownFully(menu());
+    await expect(menu()).toHaveAccessibleName("photo.png actions");
+    await expect(document.activeElement).toHaveTextContent("Open photo.png");
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() => expect(isOpen()).toBe(false));
+    await expect(photo).toHaveFocus();
+    // The context menu key too, and the chosen command goes with that row's key.
+    await userEvent.keyboard("{ContextMenu}{ArrowDown}{Enter}");
+    await expect(many.select).toHaveBeenLastCalledWith("delete", "photo.png");
+  },
+};
+
+export const ManyTargetsLongPressOnTouch: Story = {
+  tags: ["touch", "!dev"],
+  render: () => <ManyTargets />,
+  play: async ({ canvas, userEvent }) => {
+    const report = canvas.getByTestId("report.pdf");
+    // A tap does nothing; holding still opens the menu for the row held.
+    await userEvent.pointer({ keys: "[TouchA]", target: report });
+    await new Promise((r) => setTimeout(r, 650));
+    await expect(isOpen()).toBe(false);
+    await userEvent.pointer({ keys: "[TouchA>]", target: report });
+    await waitFor(() => expect(isOpen()).toBe(true), { timeout: 2000 });
+    await userEvent.pointer({ keys: "[/TouchA]", target: report });
+    await expect(menu()).toHaveAccessibleName("report.pdf actions");
+  },
+};
+
+export const ManyTargetsDisabled: Story = {
+  render: () => <ManyTargets disabled />,
+  play: async ({ canvas, userEvent }) => {
+    const notes = canvas.getByTestId("notes.md");
+    notes.focus();
+    await userEvent.keyboard("{Shift>}{F10}{/Shift}");
+    await userEvent.pointer({ keys: "[MouseRight]", target: notes });
+    await new Promise((r) => setTimeout(r, 100));
+    await expect(isOpen()).toBe(false);
+    await expect(notes).toHaveFocus();
+  },
+};

@@ -56,6 +56,25 @@ const settledClosed = (el: Element) =>
 /** The open menus (only one may be open at a time). */
 const openMenus = (root: ParentNode) => [...root.querySelectorAll('[role="menu"]')].filter(isOpen);
 
+export const GapFromTheTitleIsMenusToken: Story = {
+  render: (args) => (
+    <div style={{ "--cy-menu-offset": "12px" } as React.CSSProperties}>
+      <Menubar {...args} />
+    </div>
+  ),
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const file = canvas.getByRole("menuitem", { name: "File" });
+    await userEvent.click(file);
+    await waitFor(() => expect(openMenus(canvasElement)).toHaveLength(1));
+    const menu = openMenus(canvasElement)[0] as HTMLElement;
+    await shownFully(menu);
+    // The same gap as a Menu's, from Menu's own token.
+    await expect(menu.getBoundingClientRect().top - file.getBoundingClientRect().bottom).toBeCloseTo(12, 0);
+    await userEvent.keyboard("{Escape}");
+    await settledClosed(menu);
+  },
+};
+
 export const KeyboardMovesBetweenMenus: Story = {
   tags: ["visual"],
   play: async ({ args, canvas, canvasElement, userEvent }) => {

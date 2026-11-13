@@ -16,7 +16,8 @@
     --cy-highlighted-text-highlight,
     color-mix(in oklab, var(--cy-color-accent) 28%, transparent)
   );
-  border-radius: var(--cy-highlighted-text-radius, var(--cy-radius-xs));
+  /* Half the small control radius: a soft corner on a run of text, square when the theme's radius is 0. */
+  border-radius: var(--cy-highlighted-text-radius, calc(var(--cy-radius-sm) * 0.5));
   color: var(--cy-highlighted-text-ink, var(--cy-color-ink));
   font: inherit;
   font-weight: var(--cy-highlighted-text-weight, var(--cy-font-weight-bold));

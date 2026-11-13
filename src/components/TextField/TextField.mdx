@@ -66,7 +66,7 @@ import { mail } from "@arshad-shah/cynosure/icons";
 
 ## Theming
 
-Tokens: `--cy-text-field-{height-xs,height-sm,height-md,height-lg,radius,padding-inline,padding-inline-xs,font-size-xs,bg,border,soft-bg}`, and `--cy-text-field-numeric`, the typed text's `font-variant-numeric` (`tabular-nums` in DateField, NumberField and TimeField).
+Tokens: `--cy-text-field-{height-xs,height-sm,height-md,height-lg,radius,padding-inline,padding-inline-xs,bg,border,soft-bg}`, and `--cy-text-field-numeric`, the typed text's `font-variant-numeric` (`tabular-nums` in DateField, NumberField and TimeField). The border, background, radius and read-only fill fall back to Field's shared skin, `--cy-field-control-{border,bg,radius,sunken-bg}`, which HotkeyField's box reads too.
 
 ```ts
 createTheme({ components: { textField: { radius: "10px", paddingInline: "14px" } } });

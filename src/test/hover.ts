@@ -1,4 +1,4 @@
-type Mover = (el: Element | null, over: boolean) => Promise<void>;
+import { bridge } from "./bridge.js";
 
 /**
  * Moves the real pointer over `el` (or, with `over` false, off it) through the provider the Vitest run registers
@@ -7,7 +7,7 @@ type Mover = (el: Element | null, over: boolean) => Promise<void>;
  * can move the pointer, as in the published Storybook: stories that need it are tagged "!dev".
  */
 export async function realHover(el: Element | null, over = true): Promise<boolean> {
-  const move = (globalThis as { cyHover?: Mover }).cyHover;
+  const move = bridge("cyHover");
   if (!move) return false;
   await move(el, over);
   return true;

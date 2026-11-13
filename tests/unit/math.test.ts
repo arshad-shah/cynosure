@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { clamp, decimals, plainNumber, roundLike } from "../../src/foundations/math";
+import { ariaNumber, clamp, decimals, plainNumber, roundLike, snapToStep } from "../../src/foundations/math";
 
 describe("clamp", () => {
   it("keeps a value inside its bounds and settles on lo when hi is below it", () => {
@@ -51,5 +51,24 @@ describe("roundLike", () => {
   it("keeps exponent steps", () => {
     expect(roundLike(1e-7, 1e-7, 0)).toBe(1e-7);
     expect(roundLike(3 * 1e-7, 1e-7)).toBe(3e-7);
+  });
+});
+
+describe("snapToStep", () => {
+  it("moves a value to the nearest point of the grid from its origin, without noise", () => {
+    expect(snapToStep(0.34, 0.1, 0)).toBe(0.3);
+    expect(snapToStep(0.1 + 0.2, 0.1, 0)).toBe(0.3);
+    expect(snapToStep(4.2, 1, 0.5)).toBe(4.5);
+    expect(snapToStep(-3.4, 2, 1)).toBe(-3);
+    expect(snapToStep(3e-7, 1e-7, 0)).toBe(3e-7);
+  });
+});
+
+describe("ariaNumber", () => {
+  it("writes ARIA values without exponent notation and keeps absent values absent", () => {
+    expect(ariaNumber(5e-7)).toBe("0.0000005");
+    expect(ariaNumber(42)).toBe("42");
+    expect(ariaNumber(null)).toBeUndefined();
+    expect(ariaNumber(undefined)).toBeUndefined();
   });
 });
