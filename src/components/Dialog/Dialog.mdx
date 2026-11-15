@@ -54,6 +54,20 @@ With `dismissible={false}` there is no close button and Escape and the backdrop 
 
 <Canvas of={Stories.NotDismissible} />
 
+## Full size
+
+`size="full"` fills the viewport edge to edge, at every width, keeping its content inside the safe areas (notches, the home indicator). Use it for a focus view: one pane or a page preview, shown as large as the screen allows. It has no radius, border or shadow, and fades in without scaling.
+
+When the content names itself (a page preview), set `titleHidden`: the title stays the dialog's accessible name and its `h2` for screen readers, and only the close button shows.
+
+```tsx
+<Dialog open={open} onOpenChange={setOpen} size="full" title="Page 3 preview" titleHidden>
+  <PagePreview page={3} />
+</Dialog>
+```
+
+<Canvas of={Stories.FullSizeFillsTheViewport} />
+
 ## Content and state
 
 The content is in the DOM only while the dialog is open. It mounts when the dialog opens and unmounts once it has faded out, so every opening starts fresh: fields are back at their defaults, and a closed dialog costs nothing to render.
@@ -87,7 +101,8 @@ Set `keepMounted` to keep the content in the DOM while closed. Use it when what 
 - **Focus:** on open, focus moves to the first control in the content, else the first action, else the dialog itself. On close it returns to where it was, usually the button that opened it.
 - **Mounting:** closed, the `<dialog>` element is empty, on the server too. The content is rendered in the same render that opens it and removed when the closing transition ends, or at once when there is none (reduced motion). Reopening before the fade has finished keeps the content. With `keepMounted` it always stays.
 - **Role:** a native modal `<dialog>`, named by `title` (an `h2`) and described by `description`.
-- **Narrow containers:** below 36rem wide, the dialog docks to the bottom edge at full width.
+- **Narrow containers:** below 36rem wide, the dialog docks to the bottom edge at full width. `size="full"` fills the container at every width instead.
+- **Hidden title:** with `titleHidden` the title is visually hidden (the shared `.cy-visually-hidden`), not removed: it still names the dialog.
 - **Isolation:** it never writes to `<html>` or `<body>`. There is no scroll lock; the content uses `overscroll-behavior: contain` so scrolling it does not move the page.
 - **Toasts:** inside a [Toaster](?path=/docs/components-toast--docs), toasts raised while the dialog is open show above it (not under its backdrop), and move back to the page when it closes.
 - **Shadow DOM:** works inside shadow roots (extension content scripts).

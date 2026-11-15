@@ -43,8 +43,16 @@ export interface DialogProps {
   description?: ReactNode;
   /** Buttons along the bottom, outside the scrolling content (Cancel first, then the main action). */
   actions?: ReactNode;
-  /** Width preset (the panel never grows wider than its container). */
-  size?: Size;
+  /**
+   * Width preset (the panel never grows wider than its container). `full` fills the viewport edge to edge, inside the
+   * safe areas, at every width: for a focus view of one pane or a page preview. Default `md`.
+   */
+  size?: Size | "full";
+  /**
+   * Hide the title visually. It stays the dialog's accessible name and its `h2` for screen readers; only the close
+   * button shows in the header. For content that names itself, such as a full-size page preview. Default false.
+   */
+  titleHidden?: boolean;
   /** Escape, the backdrop and the close button close it (default). `false` leaves only your actions. */
   dismissible?: boolean;
   /**
@@ -102,6 +110,7 @@ export function DialogFrame({
   size = "md",
   dismissible = true,
   keepMounted = false,
+  titleHidden = false,
   labels,
   side,
   parts,
@@ -204,7 +213,12 @@ export function DialogFrame({
           style={style}
         >
           <div className="cy-dialog-header cy-reset">
-            <h2 id={`${id}-title`} className="cy-dialog-title cy-reset">
+            <h2
+              id={`${id}-title`}
+              className={
+                titleHidden ? "cy-dialog-title cy-reset cy-visually-hidden" : "cy-dialog-title cy-reset"
+              }
+            >
               {title}
             </h2>
             {dismissible && (
