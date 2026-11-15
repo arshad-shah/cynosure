@@ -18,7 +18,8 @@ Plan 9 (`docs/superpowers/plans/2026-11-10-cynosure-migrations.md`, tracked in i
 **Tools migration gaps (2026-11-15, Arshad's direction; branch `feat/tools-migration-gaps`, PR #169 into `main`).** What `arshad-shah/tools` still needs from Cynosure before it migrates (tools#104), released together. Charts (swiftchart) and code editing are out of scope. Each change is shown to Arshad as a throwaway proposal story first, then built with stories, docs and a changeset on this branch.
 - **Done:** Dialog `size="full"` and `titleHidden`. Storybook is grouped like the README (`Components/<group>/<Name>`; `cy check` rule `story-group`, `cy new component --group`, groups read by `tools/component-groups.ts`; ids changed, so links and the 502 visual baselines were renamed). Windows development fixes (`pnpm css`, `cy check`, unit tests). Storybook's onboarding is off.
 - **Done:** ProgressBar `meter`, `valueText` and `steps` (Arshad approved the proposal; `steps` also works without `meter`); "all CSS" budget 37.81 to 38 kB for it. Docs read against the source everywhere (about 75 corrections) and six documented CSS variables made real tokens.
-- **Next:** RadioGroup picture cards, TabList overflow into a More menu, then the icons (about 97 PDF glyphs from tools and the missing Lucide names, drawn as Facet icons).
+- **Done:** RadioGroup `variant="card"` with option `media` and `columns` (Choice gained `variant="card"` and `media`); budgets all CSS 38 to 38.25 kB and Checkbox + Switch 4.25 to 4.5 kB (Choice's stylesheet holds the card).
+- **Next:** TabList overflow into a More menu, then the icons (about 97 PDF glyphs from tools and the missing Lucide names, drawn as Facet icons).
 - **Not run on Windows:** Firefox, WebKit, touch, `test:react18`, `publint`, `attw`; CI covers them.
 
 

@@ -3,6 +3,11 @@ import { useField } from "../../foundations/field.js";
 import type { Size, Tone } from "../../tokens/schema.js";
 
 export interface ChoiceTokens {
+  mediaBackground: string;
+  mediaMinHeight: string;
+  cardCheckedBackground: string;
+  cardRadius: string;
+  cardPadding: string;
   gap: string;
   doneColor: string;
   strikeWidth: string;
@@ -71,6 +76,14 @@ export interface ChoiceProps extends Omit<ChoiceControlProps, "tone"> {
    * so a done task reads as done. Default false.
    */
   strikeWhenChecked?: boolean | undefined;
+  /**
+   * `"card"`: a bordered card with `media` above the label, chosen-looking (accent border and soft background) while
+   * its control is checked. The control should hide its look (RadioGroup's cards keep the native radio, visually
+   * hidden). Default `"row"`.
+   */
+  variant?: "row" | "card" | undefined;
+  /** The card's picture (a font sample, a thumbnail, a swatch), above the label. Only with `variant="card"`. */
+  media?: ReactNode;
 }
 
 /**
@@ -85,6 +98,8 @@ export function Choice({
   defaultChecked,
   onChange,
   strikeWhenChecked = false,
+  variant = "row",
+  media,
   size = "md",
   id,
   className,
@@ -99,6 +114,7 @@ export function Choice({
       data-size={size}
       data-disabled={input.disabled ? "" : undefined}
       data-strike={strikeWhenChecked ? "" : undefined}
+      data-variant={variant === "card" ? "card" : undefined}
       style={style}
     >
       {control({
@@ -109,6 +125,7 @@ export function Choice({
         ...(checked !== undefined ? { checked } : { defaultChecked }),
         onChange: (e) => onChange?.(e.currentTarget.checked),
       })}
+      {variant === "card" && media !== undefined && <span className="cy-choice-media">{media}</span>}
       <span className="cy-choice-text">
         <span id={field.labelId} className="cy-choice-label">
           {label}

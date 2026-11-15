@@ -23,6 +23,8 @@ import { Choice, ChoiceBase } from "@arshad-shah/cynosure";
 | `label` / `description`                            | –       | The label names the input; the description is linked with `aria-describedby`           |
 | `checked` / `defaultChecked` / `onChange(checked)` | –       | Controlled or uncontrolled; passed to the input through `input`                        |
 | `strikeWhenChecked`                                | `false` | While the input is checked (not mixed), the label is struck through and muted          |
+| `variant`                                          | `row`   | `row` · `card`: a bordered card with `media` above the label (RadioGroup's cards)      |
+| `media`                                            | –       | A card's picture, above the label                                                      |
 | `size`                                             | `md`    | Text size: `sm` · `md` · `lg`                                                          |
 | `name`, `value`, `required`, `disabled`, `id`      | –       | Passed to the input; `disabled` also dims the row                                      |
 | `className` / `style`                              | –       | Layout only, on the root `<label>`                                                     |
@@ -34,6 +36,12 @@ import { Choice, ChoiceBase } from "@arshad-shah/cynosure";
 The root is a `<label>` for the input, so pressing the label or description toggles it; the label element names the input (`aria-labelledby`). The row is at least `--cy-hit-min` (24px) tall, and `--cy-hit-coarse` (44px) on coarse pointers, where the control is centred on the text.
 
 ## Tokens
+
+- `--cy-choice-media-background`: background behind a card's picture
+- `--cy-choice-media-min-height`: least height of a card's picture
+- `--cy-choice-card-checked-background`: background of a checked card
+- `--cy-choice-card-radius`: corner radius of a card
+- `--cy-choice-card-padding`: padding inside a card
 
 - `--cy-choice-gap`: space between the control and the text (default `--cy-space-4`)
 - `--cy-choice-done-color`: label and description colour of a checked `strikeWhenChecked` row (default `--cy-color-muted`; keep it at 4.5:1 or more). Checkbox sets it from `--cy-checkbox-done-color`.

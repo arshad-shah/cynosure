@@ -2,7 +2,7 @@
   {
     "name": "all CSS",
     "path": "dist/styles.css",
-    "limit": "38 kB",
+    "limit": "38.25 kB",
     "gzip": true
   },
   {
@@ -100,7 +100,7 @@
       "dist/styles/choice.css",
       "dist/styles/choice-base.css"
     ],
-    "limit": "4.25 kB",
+    "limit": "4.5 kB",
     "gzip": true
   },
   {
