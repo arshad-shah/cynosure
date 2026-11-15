@@ -20,7 +20,8 @@ Plan 9 (`docs/superpowers/plans/2026-11-10-cynosure-migrations.md`, tracked in i
 - **Done:** ProgressBar `meter`, `valueText` and `steps` (Arshad approved the proposal; `steps` also works without `meter`); "all CSS" budget 37.81 to 38 kB for it. Docs read against the source everywhere (about 75 corrections) and six documented CSS variables made real tokens.
 - **Done:** RadioGroup `variant="card"` with option `media` and `columns` (Choice gained `variant="card"` and `media`); budgets all CSS 38 to 38.25 kB and Checkbox + Switch 4.25 to 4.5 kB (Choice's stylesheet holds the card).
 - **Done:** `TabList overflow="menu"` (More menu of the tabs that do not fit, selected tab kept in the row, measured widths), `Tab shortcut`, `labels.more`.
-- **Next:** the icons (about 97 PDF glyphs from tools and the missing Lucide names, drawn as Facet icons).
+- **Done:** SVG optimization (svgo path pass, pixel-identical check in Chromium, `pnpm icons:optimize`, in `verify`); 97 new Facet icons (371) for tools, drawn from tools' glyphs and the Lucide names Facet lacked, each checked at 16px in light and dark (fewer, larger marks where tools' originals were too fine), motion on the moving part (all but `battery` and `shield-x`, which match static families). Tools icons mapped to existing Facet icons instead: SelectTool `cursor`, ShareLink `share`, RedactVerified `shield-check`, CropPage `crop`, InsertBlankPage `file-plus`, OcrLanguage `languages`, Timestamp `timer`, StarFilled `star`, Github the brand mark, plus the Lucide renames (Trash2 `trash`, AlertTriangle `warning`…). 27 icons tools defines but never uses were not drawn.
+- **Next:** release (Arshad's go-ahead), then the tools migration (tools#104) (about 97 PDF glyphs from tools and the missing Lucide names, drawn as Facet icons).
 - **Not run on Windows:** Firefox, WebKit, touch, `test:react18`, `publint`, `attw`; CI covers them.
 
 

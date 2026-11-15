@@ -13,7 +13,7 @@ Available now (the README "## Components" groups):
 - **Structure:** AppShell (`useAppShell`), TitleBar, StatusBar, Container, PageHeader, Stack, Inline, Grid, ScrollArea, Divider, AspectRatio, Breadcrumbs, SideNav, SplitPane, Card, Toolbar, Tabs, Disclosure, Accordion, Tree, SortableList, VirtualList, Calendar, DocumentViewport, PanZoomCanvas, ZoomControls, Section, SiteHeader, SiteFooter, SkipLink, ListRow (`ListRows`), OverlayFrame, VisuallyHidden.
 - **Overlays:** Tooltip, HoverCard, Popover, FloatingToolbar (`DockedToolbar`), Menu, Menubar, ContextMenu, Dialog, ProgressOverlay, Sheet, CommandPalette (`useHotkey`), Toast (`Toaster`, `useToast`).
 - **Feedback and display:** Notice, EmptyState, ErrorBoundary, ProgressBar, Steps, LoadingDots, Skeleton, DescriptionList, Stat, List, Table, Text, Heading, Prose, Avatar (`AvatarGroup`), IconTile, Image, CodeBlock, Announcer (`useAnnounce`), Badge, Kbd, Field, DataGrid, HighlightedText, ChatMessage, QRCode, DeviceFrame.
-- **Icons:** 274 Facet icons, 98 brand marks (`@arshad-shah/cynosure/brands`), and `iconToSvg` for pages without React.
+- **Icons:** 371 Facet icons, 98 brand marks (`@arshad-shah/cynosure/brands`), and `iconToSvg` for pages without React.
 
 Anything a product needs that is still missing goes into Cynosure first.
 

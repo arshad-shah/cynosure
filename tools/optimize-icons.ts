@@ -38,7 +38,7 @@ const RENDER_COMPARE = `async ({ pairs, sizes }) => {
 }`;
 
 /** Renders pairs of SVGs and says, for each pair, whether every pixel is the same at every size. */
-async function sameRendering(pairs: [string, string][]): Promise<boolean[]> {
+export async function sameRendering(pairs: [string, string][]): Promise<boolean[]> {
   const browser = await chromium.launch();
   try {
     const page = await browser.newPage();

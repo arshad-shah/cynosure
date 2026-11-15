@@ -22,6 +22,10 @@ export const ICON_KEYWORDS = {
   move: ["drag", "pan", "reposition", "four arrows", "directions"],
   sort: ["order", "arrange", "ascending", "descending", "up down"],
   swap: ["exchange", "switch", "replace", "transfer", "reverse", "trade"],
+  "arrow-down-right": ["arrow", "down right", "diagonal", "south east", "expand"],
+  "arrow-up-left": ["arrow", "up left", "diagonal", "north west", "back"],
+  merge: ["combine", "join", "unite", "two into one", "git merge"],
+  split: ["divide", "separate", "fork", "one into two", "branch"],
 
   // navigation
   "chevron-first": ["start", "beginning", "first page", "rewind", "pagination"],
@@ -71,6 +75,7 @@ export const ICON_KEYWORDS = {
   wrench: ["tool", "spanner", "fix", "repair", "maintenance", "settings"],
   "zoom-in": ["magnify", "enlarge", "bigger", "plus", "closer"],
   "zoom-out": ["shrink", "smaller", "minus", "further", "reduce"],
+  "ocr-scan": ["ocr", "recognise text", "scan text", "text recognition", "extract text", "read"],
 
   // editing
   "align-center": ["text", "centre", "middle", "paragraph"],
@@ -100,6 +105,49 @@ export const ICON_KEYWORDS = {
   "text-select": ["select all", "selection", "highlight text", "marquee", "text cursor"],
   type: ["text", "font", "typography", "letter", "t"],
   underline: ["text", "format", "underscore", "u"],
+  "annotate-text": ["free text", "text box", "comment", "annotation", "typewriter", "callout"],
+  "underline-wavy": ["squiggly", "wavy underline", "spelling", "annotation", "mark text"],
+  stamp: ["rubber stamp", "approved", "seal", "mark", "annotation", "stamp tool"],
+  whiteout: ["cover and replace", "correction", "white out", "replace text", "cover", "page"],
+  "page-header-footer": ["header", "footer", "running head", "page margin", "document", "page"],
+  "page-number": ["page numbers", "pagination", "numbering", "folio", "document", "page"],
+  "page-watermark": ["watermark", "background mark", "brand", "draft", "document", "page"],
+  "field-text": ["text field", "input", "text box", "form", "fill in", "type"],
+  "field-signature": ["signature field", "sign here", "sign", "form", "autograph"],
+  "field-tick": ["tick", "check mark", "checkbox", "form", "yes", "mark"],
+  "field-cross": ["cross", "x mark", "checkbox", "form", "no", "mark"],
+  "field-date": ["date field", "date", "calendar", "form", "today", "day"],
+  "field-suggest": ["add field", "suggested field", "smart field", "form", "auto", "magic"],
+  "field-next": ["next field", "go to field", "tab", "form", "skip", "forward"],
+  "field-search": ["detect fields", "find fields", "form recognition", "scan form", "search", "auto detect"],
+  "field-fillable": [
+    "make fillable",
+    "create form",
+    "add form fields",
+    "interactive form",
+    "convert",
+    "fillable",
+  ],
+  flatten: ["merge layers", "bake", "lock form", "collapse", "layers"],
+  "signature-draw": ["draw signature", "handwritten", "sign", "pen", "ink", "autograph"],
+  "signature-type": ["type signature", "typed", "script", "font", "sign", "text"],
+  "signature-upload": ["upload signature", "signature image", "scan signature", "import", "sign", "picture"],
+  "signature-initials": ["initials", "initial here", "sign", "monogram", "paraph", "letters"],
+  "signature-next": ["next signature", "sign next", "next place to sign", "go to", "forward", "jump"],
+  "page-rotate": ["rotate clockwise", "turn page", "orientation", "rotate right"],
+  "page-rotate-ccw": [
+    "rotate counterclockwise",
+    "rotate anticlockwise",
+    "turn page",
+    "orientation",
+    "rotate left",
+  ],
+  "page-duplicate": ["duplicate page", "copy page", "clone", "repeat", "add copy"],
+  "page-extract": ["extract pages", "export pages", "take out", "save pages as", "pull out"],
+  "page-merge": ["merge in", "insert file", "combine", "import pages", "append document"],
+  "page-split": ["split", "divide", "cut here", "separate", "break document"],
+  "page-label": ["page number", "numbering", "name pages", "tag page"],
+  "rotate-ccw": ["rotate left", "counter-clockwise", "anticlockwise", "turn", "reset"],
 
   // files
   archive: ["box", "store", "zip", "backup", "storage"],
@@ -120,6 +168,22 @@ export const ICON_KEYWORDS = {
   image: ["picture", "photo", "photograph", "gallery", "img", "media"],
   paperclip: ["attach", "attachment", "clip", "file"],
   "scroll-text": ["document", "log", "script", "terms", "changelog", "paper"],
+  "text-layer": ["searchable", "selectable text", "hidden text", "ocr", "scanned page"],
+  "file-grid": ["organize", "arrange pages", "thumbnails", "page grid", "document", "reorder"],
+  "file-pen": ["edit document", "write", "pen", "modify", "file edit"],
+  "file-signature": ["fill and sign", "sign document", "signature", "form", "contract", "e-sign"],
+  "file-scan": ["ocr", "scan document", "recognise text", "text recognition", "digitise"],
+  "file-comment": ["annotate", "comment", "note", "markup", "review", "speech bubble"],
+  "file-convert": ["convert", "export", "transform", "change format", "file type", "swap"],
+  "file-compress": ["optimize", "compress", "reduce size", "shrink", "smaller file", "squeeze"],
+  "file-pixels": ["rasterised", "raster", "pixels", "flattened", "image page", "bitmap"],
+  images: ["photos", "gallery", "pictures", "album", "several images"],
+  "file-down": ["download file", "save file", "export", "get file"],
+  "file-up": ["upload file", "import", "open file", "send file"],
+  "file-stack": ["files", "documents", "stack", "batch", "multiple files", "pages"],
+  "file-image": ["image file", "photo file", "picture", "jpg", "png"],
+  "folder-plus": ["new folder", "add folder", "create folder", "directory"],
+  "image-off": ["no image", "image missing", "broken image", "no preview", "hidden"],
 
   // data
   activity: ["pulse", "heartbeat", "monitor", "health", "graph", "vitals"],
@@ -156,6 +220,8 @@ export const ICON_KEYWORDS = {
   terminal: ["console", "command line", "shell", "prompt", "cli", "bash"],
   tree: ["hierarchy", "structure", "outline", "nested", "folders"],
   workflow: ["flow", "process", "automation", "pipeline", "steps", "diagram"],
+  "file-chart": ["size breakdown", "report", "statistics", "bar chart", "usage", "analysis"],
+  binary: ["bits", "zeros and ones", "base 2", "bytes", "code"],
 
   // media
   camera: ["photo", "picture", "capture", "snapshot", "photograph"],
@@ -172,6 +238,7 @@ export const ICON_KEYWORDS = {
   video: ["film", "movie", "camera", "clip", "record", "call"],
   volume: ["sound", "audio", "speaker", "loud", "unmute"],
   "volume-off": ["mute", "silent", "quiet", "no sound", "speaker"],
+  "play-circle": ["play", "start", "video", "run", "resume", "circle play"],
 
   // communication
   "at-sign": ["email", "mention", "address", "username", "handle"],
@@ -183,6 +250,7 @@ export const ICON_KEYWORDS = {
   "message-plus": ["new chat", "new comment", "add message", "start conversation"],
   radio: ["broadcast", "signal", "live", "wireless", "antenna", "podcast"],
   send: ["submit", "paper plane", "message", "deliver", "post"],
+  forward: ["send to", "pass on", "hand off", "route", "export"],
 
   // status
   alert: ["warning", "caution", "attention", "exclamation", "triangle"],
@@ -205,6 +273,9 @@ export const ICON_KEYWORDS = {
   warning: ["caution", "alert", "attention", "exclamation", "danger", "triangle"],
   "x-circle": ["error", "failed", "cancel", "close", "wrong", "remove", "invalid"],
   zap: ["lightning", "bolt", "flash", "fast", "quick", "energy", "electric", "power"],
+  flame: ["fire", "streak", "hot", "burn", "trending"],
+  award: ["badge", "medal", "achievement", "prize", "rosette"],
+  "plus-circle": ["add", "new", "create", "plus", "insert", "circle plus"],
 
   // time
   calendar: ["date", "day", "month", "schedule", "event", "agenda"],
@@ -224,6 +295,33 @@ export const ICON_KEYWORDS = {
   "shield-check": ["secure", "verified", "protected", "safe", "trusted"],
   "shield-question": ["unverified", "unknown security", "untrusted", "security help", "privacy question"],
   unlock: ["open", "access", "public", "unsecured", "padlock"],
+  certificate: ["digital id", "credential", "award", "diploma", "seal"],
+  "certificate-new": [
+    "new certificate",
+    "create certificate",
+    "add digital id",
+    "generate",
+    "credential",
+    "add",
+  ],
+  "signature-verified": ["valid signature", "verified", "signed", "trusted", "approved", "check"],
+  "signature-broken": ["invalid signature", "broken", "tampered", "failed", "untrusted", "error"],
+  "signature-unknown": [
+    "unknown signature",
+    "unverified",
+    "cannot verify",
+    "untrusted signer",
+    "question",
+    "unchecked",
+  ],
+  "file-redact": ["redact", "black out", "censor", "hide text", "privacy", "document"],
+  "file-lock": ["protect", "password", "encrypt", "secure document", "locked file", "private"],
+  "file-clean": ["sanitize", "clean", "remove metadata", "scrub", "strip hidden data", "brush"],
+  "file-key": ["permissions", "access", "restrictions", "owner password", "rights", "document key"],
+  "redact-area": ["mark region", "select area", "black out", "box"],
+  "redact-search": ["find and redact", "search redact", "redact text", "find matches", "censor search"],
+  "redact-apply": ["apply redactions", "confirm", "burn in", "finalise", "commit redaction"],
+  "shield-x": ["blocked", "insecure", "not protected", "denied", "threat", "invalid signature", "shield"],
 
   // people
   bot: ["robot", "ai", "assistant", "automation", "machine", "agent"],
@@ -233,6 +331,8 @@ export const ICON_KEYWORDS = {
   user: ["person", "account", "profile", "avatar", "member", "me"],
   "user-plus": ["add person", "invite", "new member", "sign up", "add friend"],
   users: ["people", "team", "group", "members", "community", "audience"],
+  "id-card": ["my details", "profile", "contact card", "identity", "badge", "autofill", "vcard"],
+  brain: ["mind", "think", "intelligence", "memory", "ai", "smart"],
 
   // devices
   calculator: ["maths", "math", "numbers", "sum", "compute", "arithmetic"],
@@ -250,6 +350,7 @@ export const ICON_KEYWORDS = {
   webcam: ["camera", "video call", "stream", "meeting"],
   wifi: ["wireless", "internet", "network", "connection", "signal", "online"],
   "wifi-off": ["offline", "no internet", "disconnected", "no signal"],
+  battery: ["power", "charge", "energy", "rest", "break"],
 
   // design
   anchor: ["link", "fix", "ship", "attach point", "bookmark"],
@@ -274,6 +375,19 @@ export const ICON_KEYWORDS = {
   sun: ["light mode", "light theme", "day", "brightness", "weather"],
   tag: ["label", "price", "category", "badge", "keyword"],
   target: ["goal", "aim", "focus", "bullseye", "objective", "crosshair"],
+  "shape-arrow": ["arrow tool", "draw arrow", "annotation", "pointer", "callout"],
+  "shape-line": ["line tool", "draw line", "segment", "annotation", "connector"],
+  "shape-ellipse": ["ellipse tool", "oval", "circle", "draw shape", "annotation"],
+  pipette: ["eyedropper", "colour picker", "color picker", "sample colour", "pick"],
+  shapes: ["geometry", "triangle", "square", "circle", "graphics"],
+  "bring-to-front": ["arrange", "z order", "layer up", "stack", "move forward"],
+  "send-to-back": ["arrange", "z order", "layer down", "stack", "move backward"],
+  scale: ["resize", "enlarge", "fit", "transform", "size"],
+  eraser: ["erase", "rubber", "remove ink", "clear", "annotate"],
+  highlighter: ["highlight", "marker", "annotate", "mark text", "pen"],
+  circle: ["shape", "ellipse", "round", "unchecked", "dot"],
+  square: ["shape", "box", "rectangle", "unchecked"],
+  wand: ["magic", "auto", "enhance", "auto format", "magic wand"],
 
   // layout
   collapse: ["shrink", "fold", "minimise", "minimize", "close", "less"],
@@ -289,6 +403,15 @@ export const ICON_KEYWORDS = {
   sidebar: ["panel", "navigation", "drawer", "side panel", "layout"],
   "window-maximize": ["maximise", "app window", "fullscreen", "title bar", "zoom window"],
   "window-restore": ["restore down", "unmaximise", "unmaximize", "app window", "title bar", "overlap"],
+  "layout-workspace": ["standard layout", "dashboard", "panels", "toolbar", "sidebars", "workspace"],
+  "layout-focus": ["focus mode", "zen", "distraction free", "full screen", "dock", "minimal"],
+  "layout-left-right": ["horizontal layout", "tree", "flow right", "diagram", "graph direction", "hierarchy"],
+  "layout-top-bottom": ["vertical layout", "tree", "flow down", "diagram", "graph direction", "hierarchy"],
+  "zoom-actual-size": ["actual size", "100%", "one to one", "1:1", "reset zoom", "zoom"],
+  "zoom-fit-width": ["fit width", "page width", "stretch", "zoom", "expand horizontally"],
+  "zoom-fit-page": ["fit page", "whole page", "fit to screen", "zoom", "fit"],
+  minimap: ["overview", "navigator", "map", "canvas", "bird's eye"],
+  "panel-top": ["top panel", "header", "split pane", "drawer", "toolbar", "layout"],
 
   // maths
   divide: ["division", "obelus", "over", "split"],
@@ -307,6 +430,7 @@ export const ICON_KEYWORDS = {
   "plus-minus": ["tolerance", "approximately", "give or take", "sign"],
   sigma: ["sum", "total", "summation", "greek", "add up"],
   "square-root": ["root", "radical", "sqrt"],
+  dice: ["die", "random", "roll", "chance", "game", "shuffle"],
 
   // faith
   crescent: ["hilal", "crescent moon", "star", "islam", "ramadan", "eid", "moon"],
