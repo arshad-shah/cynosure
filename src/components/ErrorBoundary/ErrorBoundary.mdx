@@ -16,8 +16,8 @@ Catches errors thrown while its children render and shows a fallback in their pl
 
 Use something else when:
 
-- an operation failed (a request, a save): show it where it happened with a [Notice](?path=/docs/components-notice--docs) or a [Toast](?path=/docs/components-toast--docs). Boundaries only catch errors thrown while rendering, not in event handlers or asynchronous code.
-- there is nothing to show yet: [EmptyState](?path=/docs/components-emptystate--docs).
+- an operation failed (a request, a save): show it where it happened with a [Notice](?path=/docs/components-feedback-and-display-notice--docs) or a [Toast](?path=/docs/components-overlays-toast--docs). Boundaries only catch errors thrown while rendering, not in event handlers or asynchronous code.
+- there is nothing to show yet: [EmptyState](?path=/docs/components-feedback-and-display-emptystate--docs).
 
 ## Usage
 
@@ -90,4 +90,4 @@ The message itself is a Notice: restyle it with `--cy-notice-*` tokens.
 
 ## Related
 
-[Notice](?path=/docs/components-notice--docs), [EmptyState](?path=/docs/components-emptystate--docs), [Toast](?path=/docs/components-toast--docs)
+[Notice](?path=/docs/components-feedback-and-display-notice--docs), [EmptyState](?path=/docs/components-feedback-and-display-emptystate--docs), [Toast](?path=/docs/components-overlays-toast--docs)

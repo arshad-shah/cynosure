@@ -9,13 +9,13 @@ Renders a Facet icon as inline SVG. It is a foundation, and the one that has vis
 
 ## Who uses it
 
-[Button](?path=/docs/components-button--docs), [IconButton](?path=/docs/components-iconbutton--docs), [Link](?path=/docs/components-link--docs), [Badge](?path=/docs/components-badge--docs), [TextField](?path=/docs/components-textfield--docs), [TextArea](?path=/docs/components-textarea--docs), [Select](?path=/docs/components-select--docs), [SegmentedControl](?path=/docs/components-segmentedcontrol--docs), [Checkbox](?path=/docs/components-checkbox--docs) rows and [Toolbar](?path=/docs/components-toolbar--docs) content, among others.
+[Button](?path=/docs/components-controls-button--docs), [IconButton](?path=/docs/components-controls-iconbutton--docs), [Link](?path=/docs/components-controls-link--docs), [Badge](?path=/docs/components-feedback-and-display-badge--docs), [TextField](?path=/docs/components-controls-textfield--docs), [TextArea](?path=/docs/components-controls-textarea--docs), [Select](?path=/docs/components-controls-select--docs), [SegmentedControl](?path=/docs/components-controls-segmentedcontrol--docs), [Checkbox](?path=/docs/components-controls-checkbox--docs) rows and [Toolbar](?path=/docs/components-structure-toolbar--docs) content, among others.
 
 ## When to use it directly
 
 Product code can use Icon directly for a standalone glyph next to text or in your own layout. Most of the time you pass an icon to a component's `icon` prop instead.
 
-**Use a component instead when** the icon is the control: [IconButton](?path=/docs/components-iconbutton--docs) requires a label and shows it as a tooltip.
+**Use a component instead when** the icon is the control: [IconButton](?path=/docs/components-controls-iconbutton--docs) requires a label and shows it as a tooltip.
 
 <Canvas of={Stories.Sizes} />
 
@@ -53,7 +53,7 @@ Icons are decorative by default (`aria-hidden`). Pass `label` to give one `role=
 
 ## The icon registry
 
-Facet icons share one grammar: a 24 grid, a 1.75 round stroke, softened-square geometry and stroke only (no fills). Each icon is one file in `src/icons` and has a `category` from `ICON_CATEGORIES`: arrows, navigation, actions, editing, files, data, media, communication, status, time, security, people, devices, design, layout, maths and faith.
+Facet icons share one grammar: a 24 grid, a 1.75 round stroke, softened-square geometry and stroke only (no fills). Each icon is one file in `src/icons` and has a `category` from `ICON_CATEGORIES`: arrows, navigation, actions, editing, files, data, media, communication, status, time, security, people, devices, design, layout, maths, faith, commerce, nature, travel, health, development, charts, home and social.
 
 The Gallery below shows every icon by category. Hover a tile to see its motion.
 
@@ -79,4 +79,4 @@ Tokens: `--cy-icon-size-{sm,md,lg}` and `--cy-icon-stroke` (default 1.75).
 
 ## Related
 
-[IconButton](?path=/docs/components-iconbutton--docs) · [Button](?path=/docs/components-button--docs)
+[IconButton](?path=/docs/components-controls-iconbutton--docs) · [Button](?path=/docs/components-controls-button--docs)

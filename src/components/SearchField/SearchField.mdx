@@ -5,18 +5,18 @@ import * as Stories from "./SearchField.stories";
 
 # SearchField
 
-A [TextField](?path=/docs/components-textfield--docs) preset for search: it has a search icon, is clearable, and submits on Enter. For a plain text input, use TextField.
+A [TextField](?path=/docs/components-controls-textfield--docs) preset for search: it has a search icon, is clearable, and submits on Enter. For a plain text input, use TextField.
 
 <Canvas of={Stories.SubmitsOnEnter} />
 
 ## When to use
 
 - A search or filter box above a list, table or document.
-- Search inside a [Toolbar](?path=/docs/components-toolbar--docs).
+- Search inside a [Toolbar](?path=/docs/components-structure-toolbar--docs).
 
 **Use something else when:**
-- the input is not a search: [TextField](?path=/docs/components-textfield--docs)
-- the user picks from a fixed list: [Select](?path=/docs/components-select--docs)
+- the input is not a search: [TextField](?path=/docs/components-controls-textfield--docs)
+- the user picks from a fixed list: [Select](?path=/docs/components-controls-select--docs)
 
 ## Usage
 
@@ -45,7 +45,7 @@ import { SearchField } from "@arshad-shah/cynosure";
 
 ## Props
 
-SearchField takes every [TextField](?path=/docs/components-textfield--docs) prop except `type` and `iconStart`, plus `onSubmit` and `trailing`.
+SearchField takes every [TextField](?path=/docs/components-controls-textfield--docs) prop except `type` and `iconStart`, plus `onSubmit` and `trailing`.
 
 <ArgTypes of={Stories} />
 
@@ -71,4 +71,4 @@ createTheme({ components: { textField: { radius: "999px" }, searchField: { trail
 
 ## Related
 
-[TextField](?path=/docs/components-textfield--docs) · [IconButton](?path=/docs/components-iconbutton--docs) · [Toolbar](?path=/docs/components-toolbar--docs)
+[TextField](?path=/docs/components-controls-textfield--docs) · [IconButton](?path=/docs/components-controls-iconbutton--docs) · [Toolbar](?path=/docs/components-structure-toolbar--docs)

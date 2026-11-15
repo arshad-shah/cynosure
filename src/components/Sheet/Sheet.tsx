@@ -1,3 +1,4 @@
+import type { Size } from "../../tokens/schema.js";
 import { DialogFrame, type DialogProps } from "../Dialog/Dialog.js";
 
 export interface SheetTokens {
@@ -14,7 +15,9 @@ declare module "../../tokens/schema.js" {
   }
 }
 
-export interface SheetProps extends DialogProps {
+export interface SheetProps extends Omit<DialogProps, "size"> {
+  /** Width of an `end` or `start` sheet: `sm`, `md` or `lg`. Default `md`. */
+  size?: Size;
   /**
    * Edge it docks to: the bottom (full width), the inline end (full height; left in right-to-left text) or the inline
    * start (full height; a navigation drawer; right in right-to-left text).

@@ -5,7 +5,7 @@ import * as Stories from "./RadioGroup.stories";
 
 # RadioGroup
 
-Picks one option from a short list, with every option visible. It is built on native radios, so forms, reset and `required` work without extra code. For a compact switcher use [SegmentedControl](?path=/docs/components-segmentedcontrol--docs) instead.
+Picks one option from a short list, with every option visible. It is built on native radios, so forms, reset and `required` work without extra code. For a compact switcher use [SegmentedControl](?path=/docs/components-controls-segmentedcontrol--docs) instead.
 
 <Canvas of={Stories.ArrowKeysSelectAndWrapSkippingDisabled} />
 
@@ -16,9 +16,9 @@ Picks one option from a short list, with every option visible. It is built on na
 - A choice that is submitted with a form.
 
 **Use something else when:**
-- there are many options: [Select](?path=/docs/components-select--docs)
-- the choice is a compact view or mode switcher: [SegmentedControl](?path=/docs/components-segmentedcontrol--docs)
-- it is a single on/off setting: [Switch](?path=/docs/components-switch--docs)
+- there are many options: [Select](?path=/docs/components-controls-select--docs)
+- the choice is a compact view or mode switcher: [SegmentedControl](?path=/docs/components-controls-segmentedcontrol--docs)
+- it is a single on/off setting: [Switch](?path=/docs/components-controls-switch--docs)
 
 ## Usage
 
@@ -45,9 +45,24 @@ Pass `value` and `onChange(value)` to own the state. Without `value`, the group 
 
 <Canvas of={Stories.ControlledValue} />
 
+## Picture cards
+
+`variant="card"` shows each option as a card with a picture (`media`) above its label, for choices made by looking: a signature style, a theme, a layout. `columns` sets the cards per row (default 2); a narrow container wraps to fewer so no card is narrower than 8rem.
+
+```tsx
+<RadioGroup
+  label="Signature style"
+  variant="card"
+  columns={3}
+  options={fonts.map((f) => ({ value: f.id, label: f.name, media: <FontSample font={f} text={name} /> }))}
+/>
+```
+
+<Canvas of={Stories.CardsChooseByPicture} />
+
 ## Layout and states
 
-- **`orientation`:** `vertical` (default) or `horizontal`.
+- **`orientation`:** `vertical` (default) or `horizontal`, for lists.
 - **`error`:** shows a message under the group. `description` adds help text.
 - **`required` and `disabled`:** apply to the whole group. Set `disabled` on one option to disable just that choice.
 - **`labelHidden`:** hides the group label visually while it still names the group. Prefer a visible label.
@@ -62,15 +77,17 @@ Pass `value` and `onChange(value)` to own the state. Without `value`, the group 
 | --- | --- |
 | <kbd>Tab</kbd> | Moves to the checked option (or the first one if none is checked) |
 | Arrow keys | Move and select, wrapping at the ends and skipping disabled options |
+| <kbd>Up</kbd>, <kbd>Down</kbd> in cards | Move a row (by the columns shown) and select; stay put at the first or last row or on a disabled card |
 | Click, tap | Selects the option |
 
 - **Native radios:** the group shares one `name` (generated when omitted), so forms, `form.reset()` and `required` validation are native.
 - **Group label:** the label, description and error are linked to the group through `Field`.
 - **Right-to-left:** arrow keys follow the reading direction.
+- **Cards:** the native radio stays in each card, visually hidden; the label names it and the picture is not read. The chosen card has an accent border and soft background (`Highlight` in forced colours), the focused one the focus ring.
 
 ## Theming
 
-Tokens: `--cy-radio-group-gap`. The ring uses `--cy-checkbox-border` and its size `--cy-checkbox-size` (`-sm`, `-lg`), so radios line up with checkboxes. Each option is a [Choice](?path=/docs/components-choice--docs) row: `--cy-choice-gap` is the space before its label.
+Tokens: `--cy-radio-group-gap` and `--cy-radio-group-card-min-width` (narrowest card before the grid wraps). Cards are drawn by Choice: `--cy-choice-card-padding`, `--cy-choice-card-radius`, `--cy-choice-card-checked-background`, `--cy-choice-media-min-height` and `--cy-choice-media-background`. The ring uses `--cy-checkbox-border` and its size `--cy-checkbox-size` (`-sm`, `-lg`), so radios line up with checkboxes. Each option is a [Choice](?path=/docs/components-controls-choice--docs) row: `--cy-choice-gap` is the space before its label.
 
 ```ts
 createTheme({ components: { radioGroup: { gap: "12px" } } });
@@ -80,4 +97,4 @@ createTheme({ components: { radioGroup: { gap: "12px" } } });
 
 ## Related
 
-[Checkbox](?path=/docs/components-checkbox--docs) · [Choice](?path=/docs/components-choice--docs) · [Switch](?path=/docs/components-switch--docs) · [SegmentedControl](?path=/docs/components-segmentedcontrol--docs) · [Select](?path=/docs/components-select--docs)
+[Checkbox](?path=/docs/components-controls-checkbox--docs) · [Choice](?path=/docs/components-controls-choice--docs) · [Switch](?path=/docs/components-controls-switch--docs) · [SegmentedControl](?path=/docs/components-controls-segmentedcontrol--docs) · [Select](?path=/docs/components-controls-select--docs)

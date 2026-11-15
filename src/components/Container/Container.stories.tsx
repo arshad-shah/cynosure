@@ -11,7 +11,7 @@ const SPACES = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
 const SIZES = ["sm", "md", "lg", "xl"] as const;
 
 const meta = {
-  title: "Components/Container",
+  title: "Components/Structure/Container",
   component: Container,
   args: { size: "sm", center: true, as: "div" },
   argTypes: {

@@ -5,7 +5,7 @@ import * as Stories from "./Switch.stories";
 
 # Switch
 
-An on/off setting that takes effect straight away, such as "Auto-expand". It is built on a native checkbox with `role="switch"`. If the choice is confirmed later with a submit button, use [Checkbox](?path=/docs/components-checkbox--docs).
+An on/off setting that takes effect straight away, such as "Auto-expand". It is built on a native checkbox with `role="switch"`. If the choice is confirmed later with a submit button, use [Checkbox](?path=/docs/components-controls-checkbox--docs).
 
 <Canvas of={Stories.TogglesAsASwitch} />
 
@@ -15,9 +15,9 @@ An on/off setting that takes effect straight away, such as "Auto-expand". It is 
 - Settings lists with a short description under each label.
 
 **Use something else when:**
-- the value is part of a form that is submitted or confirmed: [Checkbox](?path=/docs/components-checkbox--docs)
-- the user picks one of several options: [RadioGroup](?path=/docs/components-radiogroup--docs) or [SegmentedControl](?path=/docs/components-segmentedcontrol--docs)
-- it is an action, not a setting: [Button](?path=/docs/components-button--docs)
+- the value is part of a form that is submitted or confirmed: [Checkbox](?path=/docs/components-controls-checkbox--docs)
+- the user picks one of several options: [RadioGroup](?path=/docs/components-controls-radiogroup--docs) or [SegmentedControl](?path=/docs/components-controls-segmentedcontrol--docs)
+- it is an action, not a setting: [Button](?path=/docs/components-controls-button--docs)
 
 ## Usage
 
@@ -38,7 +38,7 @@ import { Switch } from "@arshad-shah/cynosure";
 - **`tone`:** colours the track when on: `accent` (default), `neutral`, `danger`, `success`, `warning` or `info`.
 - **`name` and `value`:** native, so the switch submits with a form.
 
-A Switch has no `strikeWhenChecked`: that checklist style belongs to [Checkbox](?path=/docs/components-checkbox--docs). A switch that is on keeps a plain label.
+A Switch has no `strikeWhenChecked`: that checklist style belongs to [Checkbox](?path=/docs/components-controls-checkbox--docs). A switch that is on keeps a plain label.
 
 ## Props
 
@@ -51,13 +51,13 @@ A Switch has no `strikeWhenChecked`: that checklist style belongs to [Checkbox](
 | Click, tap, <kbd>Space</kbd> | Toggles |
 | <kbd>Tab</kbd> | Focus with a visible ring |
 
-- **Native checkbox:** forms, reset, `required` and keyboard behaviour match [Checkbox](?path=/docs/components-checkbox--docs), without the mixed state.
+- **Native checkbox:** forms, reset, `required` and keyboard behaviour match [Checkbox](?path=/docs/components-controls-checkbox--docs), without the mixed state.
 - **Role:** it is announced as a switch with its checked state.
 - **Motion:** the thumb slides, and stops animating under reduced motion.
 
 ## Theming
 
-Tokens: `--cy-switch-{width,height,thumb-size,off-bg}`, and `--cy-switch-height-sm` and `--cy-switch-height-lg` for the other sizes. The row around the switch is a [Choice](?path=/docs/components-choice--docs): `--cy-choice-gap` is the space before the label.
+Tokens: `--cy-switch-{width,height,thumb-size,off-bg}`, and `--cy-switch-height-sm` and `--cy-switch-height-lg` for the other sizes. The row around the switch is a [Choice](?path=/docs/components-controls-choice--docs): `--cy-choice-gap` is the space before the label.
 
 ```ts
 createTheme({ components: { switch: { width: "44px", offBg: "#cbd5e1" } } });
@@ -65,4 +65,4 @@ createTheme({ components: { switch: { width: "44px", offBg: "#cbd5e1" } } });
 
 ## Related
 
-[Checkbox](?path=/docs/components-checkbox--docs) · [Choice](?path=/docs/components-choice--docs) · [RadioGroup](?path=/docs/components-radiogroup--docs) · [SegmentedControl](?path=/docs/components-segmentedcontrol--docs)
+[Checkbox](?path=/docs/components-controls-checkbox--docs) · [Choice](?path=/docs/components-controls-choice--docs) · [RadioGroup](?path=/docs/components-controls-radiogroup--docs) · [SegmentedControl](?path=/docs/components-controls-segmentedcontrol--docs)

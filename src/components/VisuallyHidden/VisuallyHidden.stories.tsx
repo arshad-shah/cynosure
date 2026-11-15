@@ -7,7 +7,7 @@ import { Link } from "../Link/Link.js";
 import { VisuallyHidden } from "./VisuallyHidden.js";
 
 const meta = {
-  title: "Components/VisuallyHidden",
+  title: "Components/Structure/VisuallyHidden",
   component: VisuallyHidden,
   args: { children: "Read by screen readers only", as: "span", focusable: false },
   argTypes: {

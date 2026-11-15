@@ -16,9 +16,9 @@ A text input with a list of suggestions. People type to narrow the list, then pi
 - **Free text with suggestions** (`allowCustom`): tags, labels.
 
 **Use something else when:**
-- there are only a handful of options and no need to type: [Select](?path=/docs/components-select--docs)
+- there are only a handful of options and no need to type: [Select](?path=/docs/components-controls-select--docs)
 - people search for commands or places to go: the CommandPalette
-- the text is free and needs no suggestions: [TextField](?path=/docs/components-textfield--docs)
+- the text is free and needs no suggestions: [TextField](?path=/docs/components-controls-textfield--docs)
 
 ## Usage
 
@@ -28,7 +28,7 @@ import { Combobox } from "@arshad-shah/cynosure";
 <Combobox label="Fruit" options={fruits} name="fruit" required />
 ```
 
-By default an option matches when its label contains the typed text, ignoring case. Pass `filter` to match your way. While people type, the text is marked where it appears in each label ([HighlightedText](?path=/docs/components-highlightedtext--docs)); options are still named by their whole label.
+By default an option matches when its label contains the typed text, ignoring case. Pass `filter` to match your way. While people type, the text is marked where it appears in each label ([HighlightedText](?path=/docs/components-feedback-and-display-highlightedtext--docs)); options are still named by their whole label.
 
 ## Options from a server
 
@@ -79,7 +79,7 @@ An option's `trailing` is drawn at the end of its row, smaller and muted (a shor
 - **Roles:** the input is `role="combobox"` with `aria-expanded`, `aria-controls`, `aria-autocomplete` and `aria-activedescendant`; the popup is a `listbox` of `option`s.
 - **Leaving the field:** text that matches no option goes back to the last choice (unless `allowCustom`); an empty field clears the value.
 - **Forms:** with `name`, the chosen value is submitted. With `required`, a blocked submit focuses the input and shows `labels.required`. Reset restores the default.
-- **Layers:** the list is in the top layer, so it works inside a [Dialog](?path=/docs/components-dialog--docs). Escape closes one thing at a time: the list, then the text, then the dialog.
+- **Layers:** the list is in the top layer, so it works inside a [Dialog](?path=/docs/components-overlays-dialog--docs). Escape closes one thing at a time: the list, then the text, then the dialog.
 
 <Canvas of={Stories.InsideADialogEscapeClosesOneThingAtATime} />
 
@@ -89,8 +89,8 @@ Option rows are at least 44px tall on coarse pointers.
 
 ## Theming
 
-Tokens: `--cy-combobox-list-max-height`, `--cy-combobox-list-max-width`, `--cy-combobox-list-bg` and `--cy-combobox-option-active-bg`. The input uses the TextField tokens. The list is an [OptionList](?path=/docs/components-optionlist--docs): these tokens set its `--cy-option-list-*` tokens.
+Tokens: `--cy-combobox-list-max-height`, `--cy-combobox-list-max-width`, `--cy-combobox-list-bg` and `--cy-combobox-option-active-bg`. The input uses the TextField tokens. The list is an [OptionList](?path=/docs/components-controls-optionlist--docs): these tokens set its `--cy-option-list-*` tokens.
 
 ## Related
 
-[Select](?path=/docs/components-select--docs) · [TextField](?path=/docs/components-textfield--docs) · [OptionList](?path=/docs/components-optionlist--docs) · [SearchField](?path=/docs/components-searchfield--docs)
+[Select](?path=/docs/components-controls-select--docs) · [TextField](?path=/docs/components-controls-textfield--docs) · [OptionList](?path=/docs/components-controls-optionlist--docs) · [SearchField](?path=/docs/components-controls-searchfield--docs)

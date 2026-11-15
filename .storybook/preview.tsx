@@ -65,7 +65,23 @@ const choice = (title: string, items: string[], icon?: string) => ({
 
 const preview: Preview = {
   decorators: [withCynosure],
-  parameters: { a11y: { test: "error" }, layout: "fullscreen" },
+  parameters: {
+    a11y: { test: "error" },
+    layout: "fullscreen",
+    // Sidebar order: the component groups in the README's order (tools/component-groups.ts). Components inside a group
+    // and stories inside a component keep their file order.
+    options: {
+      storySort: {
+        order: [
+          "Introduction",
+          "Components",
+          ["Controls", "Structure", "Overlays", "Feedback and display"],
+          "Foundations",
+          "Contracts",
+        ],
+      },
+    },
+  },
   globalTypes: {
     mode: choice("Mode", ["light", "dark", "system"], "mirror"),
     contrast: choice("Contrast", ["normal", "more"], "contrast"),

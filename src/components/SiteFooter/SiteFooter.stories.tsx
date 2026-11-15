@@ -46,7 +46,7 @@ const social = (
 );
 
 const meta = {
-  title: "Components/SiteFooter",
+  title: "Components/Structure/SiteFooter",
   component: SiteFooter,
   args: {
     brand: "Acme",

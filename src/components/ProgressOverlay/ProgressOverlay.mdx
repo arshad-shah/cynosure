@@ -14,8 +14,8 @@ A modal progress dialog for long work the page has to wait for.
 - **Blocking work** that takes seconds or more: exporting, compressing, converting a document.
 
 **Use something else when:**
-- people can keep working meanwhile: a [ProgressBar](?path=/docs/components-progressbar--docs) in the page, or a [Toast](?path=/docs/components-toast--docs) when it is done
-- it takes under a second: [LoadingDots](?path=/docs/components-loadingdots--docs) or nothing
+- people can keep working meanwhile: a [ProgressBar](?path=/docs/components-feedback-and-display-progressbar--docs) in the page, or a [Toast](?path=/docs/components-overlays-toast--docs) when it is done
+- it takes under a second: [LoadingDots](?path=/docs/components-feedback-and-display-loadingdots--docs) or nothing
 
 ## Usage
 
@@ -35,7 +35,7 @@ Leave `value` undefined while the amount is unknown. Give `onCancel` whenever th
 
 - **Role:** a modal dialog named by `title`, holding a progress bar with the same name.
 - **Announcements:** the status line ("3 of 12", or your `status`) is a polite live region.
-- **Keyboard:** focus moves into the dialog and stays there; Escape cancels (only with `onCancel`); focus returns where it was when it closes.
+- **Keyboard:** focus moves into the dialog and stays there; Escape cancels, as do the close button and a press on the backdrop (only with `onCancel`); focus returns where it was when it closes.
 
 <Canvas of={Stories.UnknownAmount} />
 
@@ -45,4 +45,4 @@ No tokens of its own: style it through the Dialog and ProgressBar tokens.
 
 ## Related
 
-[Dialog](?path=/docs/components-dialog--docs) · [ProgressBar](?path=/docs/components-progressbar--docs)
+[Dialog](?path=/docs/components-overlays-dialog--docs) · [ProgressBar](?path=/docs/components-feedback-and-display-progressbar--docs)

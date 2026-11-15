@@ -143,9 +143,31 @@
   font-size: var(--cy-font-size-md);
 }
 
-/* Narrow container: a centred dialog becomes a bottom sheet. */
+/* Full: the panel is the whole dialog, edge to edge at every width, its content kept inside the safe areas. It fades
+   without scaling (a full-viewport scale reads as a jump). */
+.cy-dialog.cy-dialog[data-size="full"] .cy-dialog-panel.cy-dialog-panel {
+  --_from-scale: 1;
+  inline-size: 100%;
+  block-size: 100%;
+  max-block-size: 100%;
+  margin: 0;
+  padding-top: env(safe-area-inset-top);
+  padding-right: env(safe-area-inset-right);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+/* A hidden title leaves the close button alone at the end of the header. */
+.cy-dialog-header.cy-dialog-header:has(> .cy-visually-hidden) {
+  justify-content: flex-end;
+}
+
+/* Narrow container: a centred dialog becomes a bottom sheet (a full one already fills the container). */
 @container cy-dialog (inline-size < 36rem) {
-  .cy-dialog:not([data-side]) .cy-dialog-panel.cy-dialog-panel {
+  .cy-dialog:not([data-side], [data-size="full"]) .cy-dialog-panel.cy-dialog-panel {
     --_from-translate: 0 100%;
     --_from-scale: 1;
     align-self: end;
@@ -156,7 +178,7 @@
     border-end-start-radius: 0;
     border-end-end-radius: 0;
   }
-  .cy-dialog:not([data-side]) .cy-dialog-actions.cy-dialog-actions {
+  .cy-dialog:not([data-side], [data-size="full"]) .cy-dialog-actions.cy-dialog-actions {
     padding-block-end: max(var(--cy-space-6), env(safe-area-inset-bottom));
   }
 }

@@ -44,7 +44,7 @@ const ITEMS: NavEntry[] = [
 ];
 
 const meta = {
-  title: "Components/SideNav",
+  title: "Components/Structure/SideNav",
   component: SideNav,
   args: { label: "Main", items: ITEMS, current: "inbox", collapsed: false, size: "md", onNavigate: fn() },
   argTypes: {

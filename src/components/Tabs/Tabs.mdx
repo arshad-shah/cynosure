@@ -5,7 +5,7 @@ import * as Stories from "./Tabs.stories";
 
 # Tabs
 
-Switches between views of the same thing, such as a document's tree, raw and schema views, while staying on one page. If the options filter or change a value rather than swapping whole panels, use [SegmentedControl](?path=/docs/components-segmentedcontrol--docs).
+Switches between views of the same thing, such as a document's tree, raw and schema views, while staying on one page. If the options filter or change a value rather than swapping whole panels, use [SegmentedControl](?path=/docs/components-controls-segmentedcontrol--docs).
 
 <Canvas of={Stories.ArrowsSelectSkippingDisabled} />
 
@@ -17,9 +17,9 @@ Switches between views of the same thing, such as a document's tree, raw and sch
 - **`activation="manual"`:** when showing a panel is expensive (network, large renders), so arrowing past a tab doesn't load it.
 
 **Use something else when:**
-- the choice is a setting or filter: [SegmentedControl](?path=/docs/components-segmentedcontrol--docs) or [RadioGroup](?path=/docs/components-radiogroup--docs)
-- each option goes to a different page: [Link](?path=/docs/components-link--docs)s in your navigation
-- the sections should be readable together: [Stack](?path=/docs/components-stack--docs) with headings
+- the choice is a setting or filter: [SegmentedControl](?path=/docs/components-controls-segmentedcontrol--docs) or [RadioGroup](?path=/docs/components-controls-radiogroup--docs)
+- each option goes to a different page: [Link](?path=/docs/components-controls-link--docs)s in your navigation
+- the sections should be readable together: [Stack](?path=/docs/components-structure-stack--docs) with headings
 
 ## Usage
 
@@ -60,6 +60,22 @@ For document tabs, `scrollable` adds chevrons at each end, shown only while ther
 ```
 
 <Canvas of={Stories.ScrollableShowsChevronsTowardMoreTabs} />
+
+### Into a More menu
+
+For a fixed set of modes in a window that can be narrow, `overflow="menu"` keeps the tabs that fit in the row and puts the rest in a **More** menu after it, in order, with their icons and shortcuts. The selected tab always keeps its place in the row; choosing a tab from the menu selects it and brings it into the row. Nothing scrolls. Give each tab its `shortcut` ("alt+3") to show it in the menu and announce it as `aria-keyshortcuts`; handle the keys with `useHotkey`.
+
+```tsx
+<TabList label="Mode" overflow="menu">
+  {modes.map((m) => (
+    <Tab key={m.id} value={m.id} icon={m.icon} shortcut={m.shortcut}>
+      {m.label}
+    </Tab>
+  ))}
+</TabList>
+```
+
+<Canvas of={Stories.OverflowMenuHoldsTheTabsThatDoNotFit} />
 
 ## Long labels
 
@@ -125,7 +141,7 @@ A middle-click on a closable tab closes it too, as in browsers and editors.
 
 <ArgTypes of={Stories} />
 
-`Tab`: `value`, `icon`, `disabled`, `onClose`, `dirty`, `contextMenu`, `onCommand`, `closeLabel`, `children`. The close button is named `labels.close` with the tab's text (a label with markup, such as a badge, is named by the text it shows); give `closeLabel` to name it yourself, such as "Close query 3". `TabList`: `label`, `onReorder`, `scrollable`, `trailing`. `Tabs` also takes `labels`: `close(name)`, `closeUnsaved(name)`, `unsaved`, `scrollBack`, `scrollForward`, `menu(name)` and `moved(name, position, total)`. `TabPanel`: `value`, `keepMounted` (keep the content mounted while hidden, preserving its state; by default only the selected panel renders its content).
+`Tab`: `value`, `icon`, `disabled`, `shortcut`, `onClose`, `dirty`, `contextMenu`, `onCommand`, `closeLabel`, `children`. The close button is named `labels.close` with the tab's text (a label with markup, such as a badge, is named by the text it shows); give `closeLabel` to name it yourself, such as "Close query 3". `TabList`: `label`, `onReorder`, `scrollable`, `overflow`, `trailing`. `Tabs` also takes `labels`: `close(name)`, `closeUnsaved(name)`, `unsaved`, `scrollBack`, `scrollForward`, `menu(name)`, `moved(name, position, total)` and `more` (the More button and menu, default "More"). `TabPanel`: `value`, `keepMounted` (keep the content mounted while hidden, preserving its state; by default only the selected panel renders its content).
 
 ## Behaviour and accessibility
 
@@ -135,9 +151,10 @@ A middle-click on a closable tab closes it too, as in browsers and editors.
 | <kbd>Left</kbd> <kbd>Right</kbd> arrows | Previous / next tab, wrapping, skipping disabled ones (flipped in RTL) |
 | <kbd>Home</kbd> <kbd>End</kbd> | First / last tab |
 | <kbd>Enter</kbd> <kbd>Space</kbd>, click, tap | Select (the only way to select with `activation="manual"`) |
-| <kbd>Delete</kbd> | Close the focused tab (with `onClose`) |
+| <kbd>Delete</kbd> <kbd>Backspace</kbd> | Close the focused tab (with `onClose`) |
 | Middle-click | Close the tab (with `onClose`), without the browser's autoscroll |
 | Mouse wheel | Scroll a `scrollable` list sideways |
+| Arrows with `overflow="menu"` | Move through the tabs in the row only; the More button is the next Tab stop, and its menu selects a tab |
 | <kbd>Shift</kbd> + <kbd>F10</kbd>, context menu key, right-click | Open the tab's `contextMenu` |
 | <kbd>Ctrl</kbd> or <kbd>Cmd</kbd> + <kbd>Shift</kbd> + Left / Right | Move the focused tab (with `onReorder`); announced |
 
@@ -161,4 +178,4 @@ createTheme({ components: { tabs: { indicator: "#2563eb", indicatorWidth: "3px" 
 
 ## Related
 
-[SegmentedControl](?path=/docs/components-segmentedcontrol--docs) · [Toolbar](?path=/docs/components-toolbar--docs) · [Card](?path=/docs/components-card--docs)
+[SegmentedControl](?path=/docs/components-controls-segmentedcontrol--docs) · [Toolbar](?path=/docs/components-structure-toolbar--docs) · [Card](?path=/docs/components-structure-card--docs)

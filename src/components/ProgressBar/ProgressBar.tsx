@@ -2,6 +2,7 @@ import { type CSSProperties, useId } from "react";
 import type { DenseSize, Tone } from "../../tokens/schema.js";
 
 export interface ProgressBarTokens {
+  stepGap: string;
   heightXs: string;
   heightSm: string;
   heightMd: string;
@@ -54,6 +55,21 @@ export interface ProgressBarProps {
   marker?: number | undefined;
   /** Read with the value when there is a marker. Default "marker at 75%". */
   markerLabel?: string | undefined;
+  /**
+   * A measurement, not a task's progress (password strength, entropy, a quota): `role="meter"` instead of
+   * `"progressbar"`. A meter always has a value: it is never indeterminate, and a missing value reads 0. Default false.
+   */
+  meter?: boolean;
+  /**
+   * What the value means, in words ("Strong", "62 bits", "Step 2 of 5"): shown with `showValue` and read out instead
+   * of the percentage. Ignored with `segments`, which read out their own labels.
+   */
+  valueText?: string | undefined;
+  /**
+   * Draw the track as this many separate pills, lit up to round(value / max × steps) in the tone: a stepped gauge
+   * (four steps of password strength) or "step 2 of 5". Ignored with `segments` and while indeterminate.
+   */
+  steps?: number | undefined;
   /** Colour of the fill. Default "accent". */
   tone?: Exclude<Tone, "neutral"> | "neutral";
   /** Bar thickness. `xs` is a hairline track with smaller label text, for dense desktop chrome. Default "md". */
@@ -68,7 +84,10 @@ export interface ProgressBarProps {
 
 const percent = (value: number, max: number) => `${Math.round((value / max) * 100)}%`;
 
-/** How far a task has got: a labelled `role="progressbar"`, determinate or indeterminate. */
+/**
+ * How far a task has got: a labelled `role="progressbar"`, determinate or indeterminate. With `meter`, a measurement
+ * (`role="meter"`); with `steps`, a row of pills.
+ */
 export function ProgressBar({
   label,
   labelHidden = false,
@@ -80,6 +99,9 @@ export function ProgressBar({
   offset = 0,
   marker,
   markerLabel,
+  meter = false,
+  valueText,
+  steps,
   tone = "accent",
   size = "md",
   labels,
@@ -88,18 +110,21 @@ export function ProgressBar({
 }: ProgressBarProps) {
   const id = useId();
   const top = max > 0 ? max : 100;
-  const unknown = indeterminate || value === undefined || Number.isNaN(value);
-  const now = unknown ? 0 : Math.min(Math.max(value, 0), top);
+  // A meter always has a value; a missing one reads 0.
+  const unknown = !meter && (indeterminate || value === undefined || Number.isNaN(value));
+  const now = unknown || value === undefined || Number.isNaN(value) ? 0 : Math.min(Math.max(value, 0), top);
   const parts = segments?.length ? segments : null;
   const total = parts ? offset + parts.reduce((sum, p) => sum + Math.max(0, p.value), 0) : 0;
   const unknownBar = parts ? false : unknown;
   const shownNow = parts ? Math.min(total, top) : now;
   const at = (v: number) => `${(Math.min(Math.max(v, 0), top) / top) * 100}%`;
+  const pills = !parts && !unknownBar && steps && steps > 0 ? Math.floor(steps) : 0;
+  const litPills = Math.round((now / top) * pills);
   const text = parts
     ? parts.map((p) => `${p.label} ${p.value}`).join(", ")
     : unknown
       ? ""
-      : (labels?.value ?? percent)(now, top);
+      : (valueText ?? (labels?.value ?? percent)(now, top));
   const spoken =
     marker === undefined
       ? text
@@ -126,16 +151,20 @@ export function ProgressBar({
           )}
         </div>
       )}
+      {/* biome-ignore lint/a11y/useAriaPropsSupportedByRole: both roles, progressbar and meter, take the value attributes */}
       <div
-        role="progressbar"
+        role={meter ? "meter" : "progressbar"}
         className="cy-progress-bar-track cy-reset"
+        data-steps={pills || undefined}
         {...(labelHidden ? { "aria-label": label } : { "aria-labelledby": `${id}-label` })}
         aria-valuemin={0}
         aria-valuemax={top}
         aria-valuenow={unknownBar ? undefined : shownNow}
         aria-valuetext={unknownBar ? undefined : spoken}
         aria-busy={unknownBar || undefined}
-        style={{ "--_fill": unknownBar || parts ? undefined : `${(now / top) * 100}%` } as CSSProperties}
+        style={
+          { "--_fill": unknownBar || parts || pills ? undefined : `${(now / top) * 100}%` } as CSSProperties
+        }
       >
         {parts ? (
           parts.map((p, i) => {
@@ -155,6 +184,10 @@ export function ProgressBar({
               />
             );
           })
+        ) : pills ? (
+          Array.from({ length: pills }, (_, i) => (
+            <div key={i} className="cy-progress-bar-step cy-reset" data-on={i < litPills || undefined} />
+          ))
         ) : (
           <div className="cy-progress-bar-fill cy-reset" />
         )}

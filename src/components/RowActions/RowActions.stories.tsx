@@ -26,7 +26,7 @@ const buttons = (
 );
 
 const meta = {
-  title: "Components/RowActions",
+  title: "Components/Controls/RowActions",
   component: RowActions,
   // Moves the real pointer (the reveal on hover).
   tags: ["serial"],

@@ -50,7 +50,7 @@ function Field({ top = 160, onEscape }: { top?: number; onEscape?: () => void })
 }
 
 const meta = {
-  title: "Components/FloatingToolbar",
+  title: "Components/Overlays/FloatingToolbar",
   component: FloatingToolbar,
   args: { label: "Field tools", anchor: null },
   render: () => <Field />,

@@ -58,7 +58,7 @@ function Rail({
 }
 
 const meta = {
-  title: "Components/HoverCard",
+  title: "Components/Overlays/HoverCard",
   component: HoverCard,
   args: { open: false, anchor: null },
   render: () => <Rail />,

@@ -37,6 +37,7 @@ The ref is the heading element (`HTMLHeadingElement`).
 - `--cy-heading-size-lg`: font size of `size="lg"` (`--cy-font-size-lg`)
 - `--cy-heading-size-xl`: font size of `size="xl"` (`--cy-font-size-xl`)
 - `--cy-heading-size-2xl`: font size of `size="2xl"` (`--cy-font-size-2xl`)
+- `--cy-heading-size-3xl`: font size of `size="3xl"` (1.4 times `--cy-font-size-2xl`)
 - `--cy-heading-size-display`: font size of `size="display"` (between 1.25 and 2 times `--cy-font-size-2xl`, following the viewport width)
 - `--cy-heading-font-family`: font family (`--cy-font-display`)
 - `--cy-heading-font-weight`: weight of bold headings (`--cy-font-weight-bold`)

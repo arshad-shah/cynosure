@@ -5,7 +5,7 @@ import * as Stories from "./Select.stories";
 
 # Select
 
-Picks one option from a list that opens on demand. The trigger is a Cynosure button and the list opens in the top layer, so it is never clipped. For a short list that should stay visible, use [RadioGroup](?path=/docs/components-radiogroup--docs).
+Picks one option from a list that opens on demand. The trigger is a Cynosure button and the list opens in the top layer, so it is never clipped. For a short list that should stay visible, use [RadioGroup](?path=/docs/components-controls-radiogroup--docs).
 
 <Canvas of={Stories.ClickToOpenAndSelect} />
 
@@ -16,8 +16,8 @@ Picks one option from a list that opens on demand. The trigger is a Cynosure but
 - Options that benefit from a description or an icon.
 
 **Use something else when:**
-- there are only a few options: [RadioGroup](?path=/docs/components-radiogroup--docs) or [SegmentedControl](?path=/docs/components-segmentedcontrol--docs)
-- the user types free text: [TextField](?path=/docs/components-textfield--docs)
+- there are only a few options: [RadioGroup](?path=/docs/components-controls-radiogroup--docs) or [SegmentedControl](?path=/docs/components-controls-segmentedcontrol--docs)
+- the user types free text: [TextField](?path=/docs/components-controls-textfield--docs)
 
 ## Usage
 
@@ -95,7 +95,7 @@ On coarse pointers (phones and tablets) option rows grow to 44px.
 
 ## Theming
 
-Tokens: `--cy-select-{radius,bg,border,list-bg,list-shadow,list-max-height,option-active-bg}`; an `xs` trigger is `--cy-control-height-xs` tall. The list is an [OptionList](?path=/docs/components-optionlist--docs): the `list-*` and `option-*` tokens set its `--cy-option-list-*` tokens.
+Tokens: `--cy-select-{radius,bg,border,list-bg,list-shadow,list-max-height,option-active-bg}`; an `xs` trigger is `--cy-control-height-xs` tall. The list is an [OptionList](?path=/docs/components-controls-optionlist--docs): the `list-*` and `option-*` tokens set its `--cy-option-list-*` tokens.
 
 ```ts
 createTheme({ components: { select: { radius: "10px", listMaxHeight: "240px" } } });
@@ -103,4 +103,4 @@ createTheme({ components: { select: { radius: "10px", listMaxHeight: "240px" } }
 
 ## Related
 
-[RadioGroup](?path=/docs/components-radiogroup--docs) · [SegmentedControl](?path=/docs/components-segmentedcontrol--docs) · [TextField](?path=/docs/components-textfield--docs)
+[RadioGroup](?path=/docs/components-controls-radiogroup--docs) · [SegmentedControl](?path=/docs/components-controls-segmentedcontrol--docs) · [TextField](?path=/docs/components-controls-textfield--docs)

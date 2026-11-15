@@ -5,17 +5,17 @@ import * as Stories from "./Toolbar.stories";
 
 # Toolbar
 
-Groups related controls into one named bar with a single Tab stop, following the WAI-ARIA toolbar pattern. Arrow keys move between the controls. For one standalone action, use [Button](?path=/docs/components-button--docs).
+Groups related controls into one named bar with a single Tab stop, following the WAI-ARIA toolbar pattern. Arrow keys move between the controls. For one standalone action, use [Button](?path=/docs/components-controls-button--docs).
 
 <Canvas of={Stories.OneTabStopArrowsHomeEnd} />
 
 ## When to use
 
 - Three or more related controls in a row: editor actions, tree actions, table headers, popup chrome.
-- Mixed controls that should share one Tab stop (buttons, a [SegmentedControl](?path=/docs/components-segmentedcontrol--docs), a search field).
+- Mixed controls that should share one Tab stop (buttons, a [SegmentedControl](?path=/docs/components-controls-segmentedcontrol--docs), a search field).
 
 **Use something else when:**
-- you have one or two actions: place [Button](?path=/docs/components-button--docs)s directly
+- you have one or two actions: place [Button](?path=/docs/components-controls-button--docs)s directly
 - the controls are page navigation: links in a navigation landmark
 
 ## Usage
@@ -84,4 +84,4 @@ createTheme({ components: { toolbar: { gap: "4px", padding: "6px" } } });
 
 ## Related
 
-[Button](?path=/docs/components-button--docs) · [IconButton](?path=/docs/components-iconbutton--docs) · [SegmentedControl](?path=/docs/components-segmentedcontrol--docs) · [SearchField](?path=/docs/components-searchfield--docs)
+[Button](?path=/docs/components-controls-button--docs) · [IconButton](?path=/docs/components-controls-iconbutton--docs) · [SegmentedControl](?path=/docs/components-controls-segmentedcontrol--docs) · [SearchField](?path=/docs/components-controls-searchfield--docs)

@@ -4,7 +4,7 @@ import { computeUnderHostileHost } from "../../test/hostile.js";
 import { Slider, type SliderProps } from "./Slider.js";
 
 const meta = {
-  title: "Components/Slider",
+  title: "Components/Controls/Slider",
   component: Slider,
   args: {
     label: "Volume",

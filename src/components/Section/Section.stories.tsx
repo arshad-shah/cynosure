@@ -13,7 +13,7 @@ const SPACES = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
 const VARIANTS = ["plain", "surface", "soft", "accent"] as const;
 
 const meta = {
-  title: "Components/Section",
+  title: "Components/Structure/Section",
   component: Section,
   args: { variant: "soft", contained: true, size: "lg", as: "section" },
   argTypes: {

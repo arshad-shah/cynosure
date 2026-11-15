@@ -25,7 +25,7 @@ function Subtasks(props: Partial<ChecklistProps> & { start?: ChecklistItem[] }) 
 }
 
 const meta = {
-  title: "Components/Checklist",
+  title: "Components/Controls/Checklist",
   component: Checklist,
   args: { label: "Subtasks", defaultItems: ITEMS, onChange: fn(), size: "md" },
   argTypes: {

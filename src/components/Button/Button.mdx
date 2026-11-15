@@ -5,7 +5,7 @@ import * as Stories from "./Button.stories";
 
 # Button
 
-Triggers an action: save, export, delete, open. One Button is one action. If clicking it takes the user somewhere, use [Link](?path=/docs/components-link--docs) instead.
+Triggers an action: save, export, delete, open. One Button is one action. If clicking it takes the user somewhere, use [Link](?path=/docs/components-controls-link--docs) instead.
 
 <Canvas of={Stories.VariantsAndTones} />
 
@@ -18,10 +18,10 @@ Triggers an action: save, export, delete, open. One Button is one action. If cli
 - **`tone="danger"`:** destructive actions. Pair with a confirmation when the action cannot be undone.
 
 **Use something else when:**
-- the button has an icon and no visible text: [IconButton](?path=/docs/components-iconbutton--docs), which requires a label and shows it as a tooltip
-- it navigates: [Link](?path=/docs/components-link--docs)
-- it picks one of a few options: [SegmentedControl](?path=/docs/components-segmentedcontrol--docs)
-- it turns a setting on or off: [Switch](?path=/docs/components-switch--docs)
+- the button has an icon and no visible text: [IconButton](?path=/docs/components-controls-iconbutton--docs), which requires a label and shows it as a tooltip
+- it navigates: [Link](?path=/docs/components-controls-link--docs)
+- it picks one of a few options: [SegmentedControl](?path=/docs/components-controls-segmentedcontrol--docs)
+- it turns a setting on or off: [Switch](?path=/docs/components-controls-switch--docs)
 
 ## Usage
 
@@ -49,7 +49,7 @@ import { download, trash } from "@arshad-shah/cynosure/icons";
 
 ## States
 
-- **Loading:** shows [LoadingDots](?path=/docs/components-loadingdots--docs), sets `aria-busy` and ignores clicks. It keeps its width, so the layout doesn't jump.
+- **Loading:** shows [LoadingDots](?path=/docs/components-feedback-and-display-loadingdots--docs), sets `aria-busy` and ignores clicks. It keeps its width, so the layout doesn't jump.
 - **Pressed:** `pressed` makes it a toggle button (`aria-pressed`).
 - **Disabled:** dims the button and blocks activation. Prefer explaining why an action is unavailable over silently disabling it.
 
@@ -91,7 +91,7 @@ The hit area is at least 24px, growing to 44px on coarse pointers (phones and ta
 
 ## Theming
 
-Tokens: `--cy-button-height-{xs,sm,md,lg}`, `--cy-button-radius`, `--cy-button-padding-inline`, `--cy-button-padding-inline-xs`, `--cy-button-gap`, `--cy-button-font-weight`, `--cy-button-max-width`, `--cy-button-solid-shadow`, `--cy-button-soft-mix`, `--cy-button-outline-mix`, `--cy-button-press-scale`, and `--cy-button-hover-bg` and `--cy-button-hover-ink` (the hover fill and text colour, for one button whose hover differs from its variant, such as TitleBar's close control).
+Tokens: `--cy-button-height-{xs,sm,md,lg}`, `--cy-button-radius`, `--cy-button-padding-inline`, `--cy-button-padding-inline-xs`, `--cy-button-gap`, `--cy-button-font-weight`, `--cy-button-max-width`, `--cy-button-solid-shadow`, `--cy-button-soft-mix`, `--cy-button-outline-mix`, `--cy-button-press-scale`, `--cy-button-square-width` (the width of a square, icon-only button; default its height), and `--cy-button-hover-bg` and `--cy-button-hover-ink` (the hover fill and text colour, for one button whose hover differs from its variant, such as TitleBar's close control).
 
 ```ts
 createTheme({ accent: "#2563eb", components: { button: { radius: "999px", fontWeight: "600" } } });
@@ -101,4 +101,4 @@ createTheme({ accent: "#2563eb", components: { button: { radius: "999px", fontWe
 
 ## Related
 
-[IconButton](?path=/docs/components-iconbutton--docs) · [LoadingDots](?path=/docs/components-loadingdots--docs) · [Link](?path=/docs/components-link--docs) · [Toolbar](?path=/docs/components-toolbar--docs)
+[IconButton](?path=/docs/components-controls-iconbutton--docs) · [LoadingDots](?path=/docs/components-feedback-and-display-loadingdots--docs) · [Link](?path=/docs/components-controls-link--docs) · [Toolbar](?path=/docs/components-structure-toolbar--docs)

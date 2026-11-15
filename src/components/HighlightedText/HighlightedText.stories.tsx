@@ -9,7 +9,7 @@ import { HighlightedText } from "./HighlightedText.js";
 
 const meta = {
   tags: ["serial"],
-  title: "Components/HighlightedText",
+  title: "Components/Feedback and display/HighlightedText",
   component: HighlightedText,
   args: { text: "customer_orders", query: "order" },
   argTypes: {

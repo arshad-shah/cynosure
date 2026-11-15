@@ -9,7 +9,7 @@ export const calculator: IconData = {
     [
       "path",
       {
-        d: "M9 13h.01M12 13h.01M15 13h.01M9 16.5h.01M12 16.5h.01M15 16.5h.01",
+        d: "M9 13h.01M12 13h.01M15 13h.01M9 16.5h.01m2.99 0h.01m2.99 0h.01",
         animate: true,
       },
     ],

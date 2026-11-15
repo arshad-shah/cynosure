@@ -15,7 +15,7 @@ const STEPS: StepItem[] = [
 ];
 
 const meta = {
-  title: "Components/Steps",
+  title: "Components/Feedback and display/Steps",
   component: Steps,
   args: { steps: STEPS, current: "invite", orientation: "horizontal", size: "md" },
   argTypes: {

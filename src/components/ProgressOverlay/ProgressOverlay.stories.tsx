@@ -37,7 +37,7 @@ function Job({ cancellable = true, onCancel }: { cancellable?: boolean; onCancel
 }
 
 const meta = {
-  title: "Components/ProgressOverlay",
+  title: "Components/Overlays/ProgressOverlay",
   component: ProgressOverlay,
   args: { open: true, title: "Compressing the PDF", value: 3, max: 12 },
 } satisfies Meta<typeof ProgressOverlay>;

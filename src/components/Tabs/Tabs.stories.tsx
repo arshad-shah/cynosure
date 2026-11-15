@@ -12,7 +12,7 @@ import { Tab, TabList, TabPanel, Tabs } from "./Tabs.js";
 
 const meta = {
   tags: ["serial"],
-  title: "Components/Tabs",
+  title: "Components/Structure/Tabs",
   component: Tabs,
   args: { defaultValue: "tree", activation: "auto", size: "md", variant: "line", onChange: fn() },
   argTypes: {
@@ -1366,5 +1366,115 @@ export const LongLabelsStableUnderHostileHost: Story = {
     const props = ["max-width", "overflow-x", "text-overflow", "white-space", "font-size"];
     const label = computeUnderHostileHost(canvasElement, ".cy-tab-label", props);
     await expect(label.hostile).toEqual(label.clean);
+  },
+};
+
+const MODES = [
+  "Organise",
+  "Edit",
+  "Annotate",
+  "Fill and sign",
+  "Redact",
+  "Convert",
+  "Protect",
+  "Optimise",
+  "OCR",
+];
+const modeValue = (m: string) => m.toLowerCase().replace(/\s+/g, "-");
+
+/** Nine mode tabs with `overflow="menu"` in a box `width` wide (resizable by the play test). */
+function OverflowModes({ width, initial = "organise" }: { width: number; initial?: string }) {
+  return (
+    <div data-testid="box" style={{ inlineSize: width }}>
+      <Tabs defaultValue={initial}>
+        <TabList label="Mode" overflow="menu">
+          {MODES.map((m, i) => (
+            <Tab key={m} value={modeValue(m)} icon={list} shortcut={`alt+${i + 1}`}>
+              {m}
+            </Tab>
+          ))}
+        </TabList>
+        {MODES.map((m) => (
+          <TabPanel key={m} value={modeValue(m)}>
+            {m} panel
+          </TabPanel>
+        ))}
+      </Tabs>
+    </div>
+  );
+}
+const shownTabs = (root: HTMLElement) =>
+  [...root.querySelectorAll<HTMLElement>('[role="tab"]')].filter((t) => t.checkVisibility());
+
+/** `overflow="menu"`: the tabs that do not fit go into a More menu, in order, with their shortcuts; none scroll. */
+export const OverflowMenuHoldsTheTabsThatDoNotFit: Story = {
+  render: () => <OverflowModes width={520} />,
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const list = canvas.getByRole("tablist", { name: "Mode" });
+    await waitFor(() => expect(shownTabs(canvasElement).length).toBeLessThan(MODES.length));
+    const shown = shownTabs(canvasElement).map((t) => t.textContent);
+    await expect(shown[0]).toBe("Organise");
+    // Nothing scrolls or spills: the row fits its box.
+    await expect(list.scrollWidth).toBeLessThanOrEqual(list.clientWidth + 1);
+    const box = canvas.getByTestId("box").getBoundingClientRect();
+    const more = canvas.getByRole("button", { name: "More" });
+    await expect(more.getBoundingClientRect().right).toBeLessThanOrEqual(box.right + 1);
+    await userEvent.click(more);
+    const menu = await waitFor(() => canvas.getByRole("menu", { name: "More" }));
+    const items = within(menu).getAllByRole("menuitem");
+    await expect(items.map((i) => i.textContent?.replace(/Alt.*$/, "").trim())).toEqual(
+      MODES.filter((m) => !shown.includes(m)),
+    );
+    await userEvent.click(within(menu).getByRole("menuitem", { name: /Protect/ }));
+    // Chosen from the menu: selected, and now in the row.
+    const protect = canvas.getByRole("tab", { name: "Protect" });
+    await waitFor(() => expect(protect).toHaveAttribute("aria-selected", "true"));
+    await waitFor(() => expect(protect.checkVisibility()).toBe(true));
+    await expect(canvas.getByText("Protect panel")).toBeVisible();
+  },
+};
+
+/** The selected tab always keeps a place in the row, even when it comes last. */
+export const OverflowMenuKeepsTheSelectedTabInTheRow: Story = {
+  render: () => <OverflowModes width={420} initial="ocr" />,
+  play: async ({ canvas, canvasElement }) => {
+    await waitFor(() => expect(shownTabs(canvasElement).length).toBeLessThan(MODES.length));
+    await expect(canvas.getByRole("tab", { name: "OCR" }).checkVisibility()).toBe(true);
+    await expect(shownTabs(canvasElement)[0]?.textContent).toBe("Organise");
+  },
+};
+
+/** When every tab fits there is no More button; widening the box brings tabs back from the menu. */
+export const OverflowMenuFollowsTheWidth: Story = {
+  render: () => <OverflowModes width={420} />,
+  play: async ({ canvas, canvasElement }) => {
+    await waitFor(() => expect(canvas.getByRole("button", { name: "More" })).toBeVisible());
+    const before = shownTabs(canvasElement).length;
+    canvas.getByTestId("box").style.inlineSize = "1400px";
+    await waitFor(() => expect(shownTabs(canvasElement)).toHaveLength(MODES.length));
+    await expect(canvas.queryByRole("button", { name: "More" })).toBeNull();
+    await expect(before).toBeLessThan(MODES.length);
+  },
+};
+
+/** Arrow keys move only through the tabs in the row (wrapping), never to one in the menu. */
+export const OverflowMenuArrowsStayInTheRow: Story = {
+  render: () => <OverflowModes width={520} />,
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    await waitFor(() => expect(shownTabs(canvasElement).length).toBeLessThan(MODES.length));
+    const last = shownTabs(canvasElement).at(-1) as HTMLElement;
+    await userEvent.click(canvas.getByRole("tab", { name: "Organise" }));
+    await userEvent.keyboard("{ArrowLeft}");
+    await expect(last).toHaveFocus();
+    await userEvent.keyboard("{ArrowRight}");
+    await expect(canvas.getByRole("tab", { name: "Organise" })).toHaveFocus();
+  },
+};
+
+/** `shortcut` is the tab's key combination for assistive tech (`aria-keyshortcuts`), and its hint in the menu. */
+export const TabShortcut: Story = {
+  render: () => <OverflowModes width={1400} />,
+  play: async ({ canvas }) => {
+    await expect(canvas.getByRole("tab", { name: "Annotate" })).toHaveAttribute("aria-keyshortcuts", "Alt+3");
   },
 };

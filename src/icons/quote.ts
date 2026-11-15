@@ -7,7 +7,7 @@ export const quote: IconData = {
     [
       "path",
       {
-        d: "M5 17.5c2.5-1 4-3 4-6V7H5v4.5h4M15 17.5c2.5-1 4-3 4-6V7h-4v4.5h4",
+        d: "M5 17.5c2.5-1 4-3 4-6V7H5v4.5h4m6 6c2.5-1 4-3 4-6V7h-4v4.5h4",
         animate: true,
       },
     ],

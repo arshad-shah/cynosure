@@ -14,6 +14,8 @@ const config: StorybookConfig = {
     "@storybook/addon-vitest",
   ],
   core: { disableTelemetry: true },
+  // Storybook 10's built-in onboarding: the sidebar checklist and the guide page in the menu.
+  features: { sidebarOnboardingChecklist: false, menuOnboardingChecklist: false },
   staticDirs: [{ from: "../brand", to: "/brand" }],
 };
 export default config;

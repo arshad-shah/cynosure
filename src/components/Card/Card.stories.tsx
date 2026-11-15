@@ -17,7 +17,7 @@ function rgba(value: string): number[] {
 const TONES = ["neutral", "accent", "danger", "success", "warning", "info"] as const;
 
 const meta = {
-  title: "Components/Card",
+  title: "Components/Structure/Card",
   component: Card,
   args: { variant: "surface", padding: "md", tone: "neutral", children: "Workspace settings" },
   argTypes: {

@@ -32,7 +32,7 @@ const deep: BreadcrumbItem[] = [
 ];
 
 const meta = {
-  title: "Components/Breadcrumbs",
+  title: "Components/Structure/Breadcrumbs",
   component: Breadcrumbs,
   args: { items: trail, size: "md" },
   argTypes: {

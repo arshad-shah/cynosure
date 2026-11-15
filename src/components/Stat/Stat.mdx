@@ -5,7 +5,7 @@ import * as Stories from "./Stat.stories";
 
 # Stat
 
-A figure with its label, a KPI tile: the value with an optional unit, the change since last time and a line of context, on a [Card](?path=/docs/components-card--docs). With `href` the whole tile is one link to the figure's detail. For several facts about one record, use [DescriptionList](?path=/docs/components-descriptionlist--docs) instead.
+A figure with its label, a KPI tile: the value with an optional unit, the change since last time and a line of context, on a [Card](?path=/docs/components-structure-card--docs). With `href` the whole tile is one link to the figure's detail. For several facts about one record, use [DescriptionList](?path=/docs/components-feedback-and-display-descriptionlist--docs) instead.
 
 <Canvas of={Stories.Default} />
 
@@ -15,9 +15,9 @@ A figure with its label, a KPI tile: the value with an optional unit, the change
 - **A figure that leads somewhere:** `href` makes the tile a link to the report behind it.
 
 **Use something else when:**
-- there are many facts about one thing (a record's details, a settings summary): [DescriptionList](?path=/docs/components-descriptionlist--docs)
-- the numbers are rows to compare: [Table](?path=/docs/components-table--docs)
-- the figure is progress towards a goal: [ProgressBar](?path=/docs/components-progressbar--docs)
+- there are many facts about one thing (a record's details, a settings summary): [DescriptionList](?path=/docs/components-feedback-and-display-descriptionlist--docs)
+- the numbers are rows to compare: [Table](?path=/docs/components-feedback-and-display-table--docs)
+- the figure is progress towards a goal: [ProgressBar](?path=/docs/components-feedback-and-display-progressbar--docs)
 
 ## Usage
 
@@ -49,7 +49,7 @@ The spoken words are English by default. `labels` takes a function per direction
 
 ## Units, icons and alignment
 
-`unit` is written after the value, smaller. `icon` adds a decorative [IconTile](?path=/docs/components-icontile--docs) at the start; `align="center"` puts it above and centres everything.
+`unit` is written after the value, smaller. `icon` adds a decorative [IconTile](?path=/docs/components-feedback-and-display-icontile--docs) at the start; `align="center"` puts it above and centres everything.
 
 <Canvas of={Stories.UnitAfterTheValue} />
 <Canvas of={Stories.IconAndAlignment} />
@@ -62,7 +62,7 @@ The spoken words are English by default. `labels` takes a function per direction
 
 ## Several stats
 
-There is no StatGroup: put the stats in a [Grid](?path=/docs/components-grid--docs). When they form a set, make it a list with `as="ul"` on the Grid and `as="li"` on each Stat; a linked stat keeps its list item and puts the link inside it.
+There is no StatGroup: put the stats in a [Grid](?path=/docs/components-structure-grid--docs). When they form a set, make it a list with `as="ul"` on the Grid and `as="li"` on each Stat; a linked stat keeps its list item and puts the link inside it.
 
 <Canvas of={Stories.ListOfStats} />
 
@@ -109,4 +109,4 @@ createTheme({ components: { stat: { valueWeight: "500" }, card: { radius: "8px" 
 
 ## Related
 
-[Card](?path=/docs/components-card--docs) · [IconTile](?path=/docs/components-icontile--docs) · [Grid](?path=/docs/components-grid--docs) · [DescriptionList](?path=/docs/components-descriptionlist--docs) · [Table](?path=/docs/components-table--docs)
+[Card](?path=/docs/components-structure-card--docs) · [IconTile](?path=/docs/components-feedback-and-display-icontile--docs) · [Grid](?path=/docs/components-structure-grid--docs) · [DescriptionList](?path=/docs/components-feedback-and-display-descriptionlist--docs) · [Table](?path=/docs/components-feedback-and-display-table--docs)

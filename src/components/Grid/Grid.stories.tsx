@@ -11,7 +11,7 @@ import { GRID_BREAKPOINTS, Grid, type GridBreakpoint, GridItem } from "./Grid.js
 const SPACES = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
 
 const meta = {
-  title: "Components/Grid",
+  title: "Components/Structure/Grid",
   component: Grid,
   args: { columns: 3, gap: "4", as: "div" },
   argTypes: {

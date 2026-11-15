@@ -3,6 +3,8 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import type { IconCategory, IconData, IconNode } from "../../../src/icons/types";
 import { validateIcon } from "../../../src/icons/validate";
+import { COMPONENT_GROUPS, type ComponentGroup } from "../../component-groups";
+import { optimizeIcon } from "../../icon-optimize";
 
 /** `IconButton` → `icon-button`, `QRCode` → `qr-code` (the same names `cy check` expects). */
 const kebab = (s: string) =>
@@ -241,9 +243,28 @@ Tokens: \`--cy-${k}-gap\`.
 TODO(cy): links to related components.
 `;
 
-/** `cy new component <Name> --kind foundation|composite` */
-export function scaffoldComponent(root: string, Name: string, kind: "foundation" | "composite"): string[] {
+/**
+ * Adds a component to its group's list in the README ("- **Controls:** Button, …, Name."), which places it in that
+ * group in Storybook's sidebar and on the documentation site.
+ */
+function listInReadme(root: string, Name: string, group: ComponentGroup) {
+  const file = join(root, "README.md");
+  const text = readFileSync(file, "utf8");
+  const line = new RegExp(String.raw`^(- \*\*${group}:\*\* [^\n]*?)\.( \*\*|$)`, "m");
+  if (!line.test(text)) throw new Error(`README.md has no "- **${group}:**" list under "## Components"`);
+  writeFileSync(file, text.replace(line, `$1, ${Name}.$2`));
+}
+
+/** `cy new component <Name> --kind foundation|composite [--group <README group>]` */
+export function scaffoldComponent(
+  root: string,
+  Name: string,
+  kind: "foundation" | "composite",
+  sidebarGroup?: ComponentGroup,
+): string[] {
   if (!/^[A-Z][A-Za-z0-9]+$/.test(Name)) throw new Error(`Component names are PascalCase: got "${Name}"`);
+  if (kind === "composite" && !sidebarGroup)
+    throw new Error(`A composite needs --group: one of ${COMPONENT_GROUPS.join(", ")}`);
   const group = kind === "foundation" ? "foundations" : "components";
   const dir = join(root, "src", group, Name);
   const taken = ["foundations", "components"].some((g) => existsSync(join(root, "src", g, Name)));
@@ -253,12 +274,17 @@ export function scaffoldComponent(root: string, Name: string, kind: "foundation"
   const files: Record<string, string> = {
     [`${Name}.tsx`]: tsx(Name, k),
     [`${k}.css`]: css(k),
-    [`${Name}.stories.tsx`]: stories(Name, k, kind === "foundation" ? "Foundations" : "Components"),
+    [`${Name}.stories.tsx`]: stories(
+      Name,
+      k,
+      kind === "foundation" ? "Foundations" : `Components/${sidebarGroup}`,
+    ),
     "README.md": readme(Name, k, kind),
     [`${Name}.mdx`]: docsPage(Name, k),
     "index.ts": `export { ${Name}, type ${Name}Props, type ${Name}Tokens } from "./${Name}.js";\n`,
   };
   for (const [file, text] of Object.entries(files)) writeFileSync(join(dir, file), text);
+  if (kind === "composite" && sidebarGroup) listInReadme(root, Name, sidebarGroup);
   const index = join(root, "src/index.ts");
   writeFileSync(
     index,
@@ -340,7 +366,8 @@ const literal = (v: unknown): string =>
 
 /** `cy new icon <name> --from file.svg` */
 export function scaffoldIcon(root: string, name: string, svg: string, category: IconCategory): string {
-  const icon = svgToIcon(name, svg, category);
+  // Stored as small as it draws identically (svgo's path pass; tools/icon-optimize.ts).
+  const icon = optimizeIcon(svgToIcon(name, svg, category));
   const errors = validateIcon(icon);
   if (errors.length) throw new Error(`Icon "${name}" is not a valid Facet icon:\n- ${errors.join("\n- ")}`);
   const file = join(root, "src/icons", `${name}.ts`);

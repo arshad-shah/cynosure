@@ -16,7 +16,7 @@ const paddingOf = (el: Element) => {
 };
 
 const meta = {
-  title: "Components/Stack",
+  title: "Components/Structure/Stack",
   component: Stack,
   args: { gap: "4", align: "stretch", as: "div" },
   argTypes: {

@@ -11,7 +11,7 @@ const paddingOf = (el: Element) => {
 };
 
 const meta = {
-  title: "Components/Inline",
+  title: "Components/Structure/Inline",
   component: Inline,
   args: { gap: "3", wrap: true },
   argTypes: {

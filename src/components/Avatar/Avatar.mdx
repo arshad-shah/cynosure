@@ -6,7 +6,7 @@ import * as Stories from "./Avatar.stories";
 
 # Avatar
 
-A person, team or thing shown as a picture, falling back to initials and then to an icon. `AvatarGroup` overlaps several and sums up the rest as "+3". An avatar only shows who it is; to make one pressable, put it inside a [Button](?path=/docs/components-button--docs) or [Link](?path=/docs/components-link--docs).
+A person, team or thing shown as a picture, falling back to initials and then to an icon. `AvatarGroup` overlaps several and sums up the rest as "+3". An avatar only shows who it is; to make one pressable, put it inside a [Button](?path=/docs/components-controls-button--docs) or [Link](?path=/docs/components-controls-link--docs).
 
 <Canvas of={Stories.TonesAndOneOffColour} />
 
@@ -17,10 +17,10 @@ A person, team or thing shown as a picture, falling back to initials and then to
 - **Several people in little space:** `AvatarGroup` with `max`.
 
 **Use something else when:**
-- the picture is content, not an identity: [Image](?path=/docs/components-image--docs)
-- it is a status or a category with no person behind it: [Badge](?path=/docs/components-badge--docs)
+- the picture is content, not an identity: [Image](?path=/docs/components-feedback-and-display-image--docs)
+- it is a status or a category with no person behind it: [Badge](?path=/docs/components-feedback-and-display-badge--docs)
 - it is only an icon: [Icon](?path=/docs/foundations-icon--docs)
-- the person is still loading: [Skeleton](?path=/docs/components-skeleton--docs) with `shape="circle"`
+- the person is still loading: [Skeleton](?path=/docs/components-feedback-and-display-skeleton--docs) with `shape="circle"`
 
 ## Usage
 
@@ -125,4 +125,4 @@ createTheme({ components: { avatar: { radius: "4px", overlap: "6px" } } });
 
 ## Related
 
-[Badge](?path=/docs/components-badge--docs) · [Skeleton](?path=/docs/components-skeleton--docs) · [Image](?path=/docs/components-image--docs) · [Icon](?path=/docs/foundations-icon--docs)
+[Badge](?path=/docs/components-feedback-and-display-badge--docs) · [Skeleton](?path=/docs/components-feedback-and-display-skeleton--docs) · [Image](?path=/docs/components-feedback-and-display-image--docs) · [Icon](?path=/docs/foundations-icon--docs)

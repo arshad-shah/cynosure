@@ -5,7 +5,7 @@ import * as Stories from "./Menu.stories";
 
 # Menu
 
-A button that opens a list of commands: edit, copy, export, delete. Choosing one runs it and closes the menu. For picking a value that stays shown on the control, use [Select](?path=/docs/components-select--docs).
+A button that opens a list of commands: edit, copy, export, delete. Choosing one runs it and closes the menu. For picking a value that stays shown on the control, use [Select](?path=/docs/components-controls-select--docs).
 
 <Canvas of={Stories.KeyboardOpensNavigatesAndSelects} />
 
@@ -16,9 +16,9 @@ A button that opens a list of commands: edit, copy, export, delete. Choosing one
 - **View options** with checkable items (`kind: "checkbox"` toggles, `kind: "radio"` picks one of a set).
 
 **Use something else when:**
-- the user picks a value for a form: [Select](?path=/docs/components-select--docs)
-- there are only one or two actions: show [Button](?path=/docs/components-button--docs)s
-- the panel holds controls or a form: [Popover](?path=/docs/components-popover--docs)
+- the user picks a value for a form: [Select](?path=/docs/components-controls-select--docs)
+- there are only one or two actions: show [Button](?path=/docs/components-controls-button--docs)s
+- the panel holds controls or a form: [Popover](?path=/docs/components-overlays-popover--docs)
 - the items navigate to pages: links in your navigation
 
 ## Usage
@@ -39,7 +39,7 @@ import { copy, edit, moreHorizontal, trash } from "@arshad-shah/cynosure/icons";
 />
 ```
 
-`trigger` is a render prop: spread its props onto a [Button](?path=/docs/components-button--docs) or [IconButton](?path=/docs/components-iconbutton--docs). Sections (`{ label, items }`) render as a named group after a separator.
+`trigger` is a render prop: spread its props onto a [Button](?path=/docs/components-controls-button--docs) or [IconButton](?path=/docs/components-controls-iconbutton--docs). Sections (`{ label, items }`) render as a named group after a separator.
 
 ## Sections without a label
 
@@ -111,9 +111,9 @@ Item fields: `value`, `label`, `icon`, `iconTone`, `iconColor`, `shortcut` (keys
 
 - **Roles:** `menu` named by `label`, items as `menuitem`, `menuitemcheckbox` or `menuitemradio` with `aria-checked`, sections as named `group`s, unlabelled sections set apart by `separator`s. A parent item has `aria-haspopup="menu"`, `aria-expanded` and `aria-controls` naming its submenu, a `menu` named by the item's label.
 - **Diagonal travel:** while a submenu is open, another item must hold the pointer for 300 ms before the submenu closes or switches, so moving towards the submenu across other items keeps it open. Leaving the menu cancels a pending switch.
-- **Shortcuts** are shown with [Kbd](?path=/docs/components-kbd--docs) and announced through `aria-keyshortcuts`. The menu shows them; your app still has to handle the keys.
+- **Shortcuts** are shown with [Kbd](?path=/docs/components-feedback-and-display-kbd--docs) and announced through `aria-keyshortcuts`. The menu shows them; your app still has to handle the keys.
 - **Disabled items** stay visible (so people learn the command exists) but can't be focused or run.
-- **Layers:** inside a [Popover](?path=/docs/components-popover--docs) or dialog, Escape closes only the menu.
+- **Layers:** inside a [Popover](?path=/docs/components-overlays-popover--docs) or dialog, Escape closes only the menu.
 
 ## Touch
 
@@ -129,4 +129,4 @@ createTheme({ components: { menu: { minWidth: "240px", radius: "10px" } } });
 
 ## Related
 
-[Popover](?path=/docs/components-popover--docs) · [Select](?path=/docs/components-select--docs) · [Toolbar](?path=/docs/components-toolbar--docs) · [Kbd](?path=/docs/components-kbd--docs)
+[Popover](?path=/docs/components-overlays-popover--docs) · [Select](?path=/docs/components-controls-select--docs) · [Toolbar](?path=/docs/components-structure-toolbar--docs) · [Kbd](?path=/docs/components-feedback-and-display-kbd--docs)

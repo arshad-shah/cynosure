@@ -5,7 +5,7 @@ export const rows: IconData = {
   category: "data",
   body: [
     ["rect", { x: 3.5, y: 4.5, width: 17, height: 15, rx: 3 }],
-    ["path", { d: "M3.5 9.5h17M3.5 14.5h17", animate: true }],
+    ["path", { d: "M3.5 9.5h17m-17 5h17", animate: true }],
   ],
   motion: "drop",
 };

@@ -14,8 +14,8 @@ Two panes with a divider people can move, by dragging it or with the keyboard.
 - **List and detail, editor and preview, code and output**: two regions whose balance depends on the task.
 
 **Use something else when:**
-- the side region is navigation: [AppShell](?path=/docs/components-appshell--docs)
-- the second region is temporary: a [Sheet](?path=/docs/components-sheet--docs)
+- the side region is navigation: [AppShell](?path=/docs/components-structure-appshell--docs)
+- the second region is temporary: a [Sheet](?path=/docs/components-overlays-sheet--docs)
 
 ## Usage
 
@@ -69,14 +69,16 @@ The SplitPane fills its container, so give the container a size. Each pane scrol
 - **Role:** the divider is a focusable `separator` named by `label`, with the anchored pane's size (the start pane unless `anchor="end"`; 0 when collapsed) as `aria-valuenow` and `aria-controls` pointing at that pane.
 - **Keyboard:** the keys move the divider, so the anchored pane grows or shrinks with it.
 
-| Key                | Action                                                                                    |
-| ------------------ | ----------------------------------------------------------------------------------------- |
-| Arrow Left / Right | Move the divider (side by side; flipped in right-to-left text)                            |
-| Arrow Up / Down    | Move the divider (stacked)                                                                |
-| Home / End         | The anchored pane to `min` / `max`                                                        |
+| Key                | Action                                                                                        |
+| ------------------ | --------------------------------------------------------------------------------------------- |
+| Arrow Left / Right | Move the divider (side by side; flipped in right-to-left text)                                |
+| Arrow Up / Down    | Move the divider (stacked)                                                                    |
+| Shift + Arrow      | Move the divider 10 times `step`                                                              |
+| Page Up / Down     | Grow / shrink the anchored pane by 10 times `step`                                            |
+| Home / End         | The anchored pane to `min` / `max`                                                            |
 | Enter              | Collapse or restore the anchored pane (with `collapsible`, `collapsed` or `defaultCollapsed`) |
 
-  Collapsed, a key that grows the pane opens it at `min`; the others leave it closed. `onResizeEnd` fires when the key is let go.
+  Collapsed, a key that grows the pane opens it as if from 0: an arrow at `min`, Shift+Arrow and Page Up at 10 times `step` (at least `min`), End at `max`; the others leave it closed. `onResizeEnd` fires when the key is let go.
 - **Pointer and touch:** drag the divider; it keeps focus afterwards so the keys can fine-tune. Dragging a collapsed divider opens the pane, and Escape puts back the size and collapse the drag began with. Its hit area is at least 24px wide, 44px on touch screens, and touch dragging does not scroll the page.
 - **Direction:** the start pane is on the right in right-to-left text.
 
@@ -86,4 +88,4 @@ Tokens: `--cy-split-pane-divider-size` and `--cy-split-pane-divider`.
 
 ## Related
 
-[AppShell](?path=/docs/components-appshell--docs) · [Slider](?path=/docs/components-slider--docs)
+[AppShell](?path=/docs/components-structure-appshell--docs) · [Slider](?path=/docs/components-controls-slider--docs)

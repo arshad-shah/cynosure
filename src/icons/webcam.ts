@@ -6,6 +6,6 @@ export const webcam: IconData = {
   body: [
     ["circle", { cx: 12, cy: 10, r: 6.5 }],
     ["circle", { cx: 12, cy: 10, r: 2.5 }],
-    ["path", { d: "M8 20.5h8M12 16.5v4" }],
+    ["path", { d: "M8 20.5h8m-4-4v4" }],
   ],
 };

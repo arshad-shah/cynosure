@@ -15,7 +15,7 @@ const lines = (n: number, from = 0) =>
 
 const meta = {
   tags: ["serial"],
-  title: "Components/ScrollArea",
+  title: "Components/Structure/ScrollArea",
   component: ScrollArea,
   args: { label: "Log", direction: "vertical", follow: false, onScroll: fn(), onAtBottomChange: fn() },
   argTypes: {

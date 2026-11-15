@@ -14,7 +14,7 @@ const memory = () => {
 };
 
 const meta = {
-  title: "Components/ThemeToggle",
+  title: "Components/Controls/ThemeToggle",
   component: ThemeToggle,
   args: { onChange: fn(), size: "md" },
   argTypes: { size: { control: "inline-radio", options: ["sm", "md", "lg"] } },

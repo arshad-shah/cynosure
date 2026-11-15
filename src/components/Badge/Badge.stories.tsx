@@ -9,7 +9,7 @@ const TONES = ["accent", "neutral", "danger", "success", "warning", "info"] as c
 const VARIANTS = ["soft", "solid", "outline"] as const;
 
 const meta = {
-  title: "Components/Badge",
+  title: "Components/Feedback and display/Badge",
   component: Badge,
   args: { children: "Object", tone: "accent", variant: "soft", size: "md" },
   argTypes: {

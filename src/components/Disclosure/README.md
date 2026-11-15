@@ -16,6 +16,8 @@ Shows and hides a section behind a button. Replaces native `<details>`/`<summary
 | `trailing`                              | –       | Content at the end of the summary row (a Badge)        |
 | `size`                                  | `md`    | `sm` · `md` · `lg`                                     |
 | `headingLevel`                          | –       | Wrap the trigger in `h1`–`h6`                          |
+| `locked`                                | `false` | The trigger cannot close the content (`aria-disabled`) |
+| `onTriggerKeyDown`                      | –       | Key handler on the trigger (Accordion's arrow keys)    |
 | `region`                                | `false` | Content as a region labelled by the trigger            |
 - Height animates by interpolating a grid row (0fr to 1fr) in every engine, no script; `--cy-motion-base` sets the speed and reduced motion (OS or `createTheme({ motion: "reduced" })`) makes it instant.
 - Closed content is `visibility: hidden` after the collapse: not focusable, not announced.

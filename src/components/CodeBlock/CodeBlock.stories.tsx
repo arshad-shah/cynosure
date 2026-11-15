@@ -29,7 +29,7 @@ const highlight = (code: string) =>
   );
 
 const meta = {
-  title: "Components/CodeBlock",
+  title: "Components/Feedback and display/CodeBlock",
   component: CodeBlock,
   args: { code: CODE, title: "vite.config.ts", language: "ts", copy: fn() },
   argTypes: {

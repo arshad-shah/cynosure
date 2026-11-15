@@ -5,7 +5,7 @@ import * as Stories from "./Card.stories";
 
 # Card
 
-A content container. Give it `href` or `onClick` and the whole card becomes one link or one button. For a plain grouping with no surface, use [Stack](?path=/docs/components-stack--docs).
+A content container. Give it `href` or `onClick` and the whole card becomes one link or one button. For a plain grouping with no surface, use [Stack](?path=/docs/components-structure-stack--docs).
 
 <Canvas of={Stories.VariantsAndTones} />
 
@@ -18,7 +18,7 @@ A content container. Give it `href` or `onClick` and the whole card becomes one 
 
 **Use something else when:**
 - the card holds its own buttons, links or inputs: use a static Card (no `href`/`onClick`) and put those controls inside
-- you only need spacing between items: [Stack](?path=/docs/components-stack--docs) or [Inline](?path=/docs/components-inline--docs)
+- you only need spacing between items: [Stack](?path=/docs/components-structure-stack--docs) or [Inline](?path=/docs/components-structure-inline--docs)
 
 ## Usage
 
@@ -57,7 +57,7 @@ With `actions` the header shares its row with them: the title wraps before the a
 
 The edge is the card's own start border, so it follows the card's radius, and the content starts after it. It works with every `variant` and `tone`, on link and button cards and with `actions`, and it keeps its colour when the card is hovered or focused.
 
-**Colour must not be the only carrier of meaning.** Some people cannot tell the colours apart and a screen reader does not announce them. Say the same thing in the card's text or with a [Badge](?path=/docs/components-badge--docs), as the cards above do.
+**Colour must not be the only carrier of meaning.** Some people cannot tell the colours apart and a screen reader does not announce them. Say the same thing in the card's text or with a [Badge](?path=/docs/components-feedback-and-display-badge--docs), as the cards above do.
 
 <Canvas of={Stories.EdgeFollowsReadingDirectionAndItsWidthToken} />
 
@@ -84,7 +84,7 @@ With `href` the card renders as a link; unsafe URL schemes are not linked. With 
 
 ## Theming
 
-Tokens: `--cy-card-bg`, `--cy-card-border`, `--cy-card-radius`, `--cy-card-shadow` and `--cy-card-soft-mix`.
+Tokens: `--cy-card-bg`, `--cy-card-border`, `--cy-card-radius`, `--cy-card-shadow`, `--cy-card-soft-mix` and `--cy-card-current-border` (the border of the current card, `aria-current`; default the accent).
 
 | Token | Controls |
 | --- | --- |
@@ -99,4 +99,4 @@ createTheme({ components: { card: { radius: "12px", shadow: "none", edgeWidth: "
 
 ## Related
 
-[Badge](?path=/docs/components-badge--docs) · [Stack](?path=/docs/components-stack--docs) · [Inline](?path=/docs/components-inline--docs) · [Link](?path=/docs/components-link--docs) · [Button](?path=/docs/components-button--docs)
+[Badge](?path=/docs/components-feedback-and-display-badge--docs) · [Stack](?path=/docs/components-structure-stack--docs) · [Inline](?path=/docs/components-structure-inline--docs) · [Link](?path=/docs/components-controls-link--docs) · [Button](?path=/docs/components-controls-button--docs)

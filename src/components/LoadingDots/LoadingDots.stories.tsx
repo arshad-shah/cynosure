@@ -9,7 +9,7 @@ import { LoadingDots } from "./LoadingDots.js";
 
 const meta = {
   tags: ["serial"],
-  title: "Components/LoadingDots",
+  title: "Components/Feedback and display/LoadingDots",
   component: LoadingDots,
   args: { size: "md", tone: "inherit", speed: "normal", variant: "dots" },
   argTypes: {

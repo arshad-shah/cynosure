@@ -101,7 +101,7 @@ function Demo({ fruits = FRUITS, grouped = false, onChoose, onManage, style }: D
 }
 
 const meta = {
-  title: "Components/OptionList",
+  title: "Components/Controls/OptionList",
   component: OptionList,
   args: { id: "fruit", label: "Fruit" },
   argTypes: {

@@ -9,7 +9,7 @@ import { Button } from "../Button/Button.js";
 import { DateField } from "./DateField.js";
 
 const meta = {
-  title: "Components/DateField",
+  title: "Components/Controls/DateField",
   component: DateField,
   args: { label: "Due date", today: "2026-11-10", weekStartsOn: 1, locale: "en-GB", onChange: fn() },
   argTypes: { size: { control: "inline-radio", options: ["sm", "md", "lg"] } },

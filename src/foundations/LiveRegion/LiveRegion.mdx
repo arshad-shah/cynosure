@@ -5,7 +5,7 @@ import * as Stories from "./LiveRegion.stories";
 
 # LiveRegion
 
-A hidden live region for screen reader announcements that belong to one component: "Copied", "Moved to position 3 of 8", "Zoom 150%", "3 of 12". It is a foundation: it has no visual output. For announcements from anywhere in an app, use [Announcer](?path=/docs/components-announcer--docs) and `useAnnounce()`, which speak through LiveRegions near the root.
+A hidden live region for screen reader announcements that belong to one component: "Copied", "Moved to position 3 of 8", "Zoom 150%", "3 of 12". It is a foundation: it has no visual output. For announcements from anywhere in an app, use [Announcer](?path=/docs/components-feedback-and-display-announcer--docs) and `useAnnounce()`, which speak through LiveRegions near the root.
 
 <Canvas of={Stories.AnnouncesPolitely} />
 
@@ -15,9 +15,9 @@ Announcer, CopyButton, DocumentViewport, FileDrop, HotkeyField, PanZoomCanvas, S
 
 ## When to use it directly
 
-When a component you build announces the outcome of its own actions, or a value it shows (a match count, a zoom level), and must work without an `Announcer` above it, or speaks elements (a [Kbd](?path=/docs/components-kbd--docs)) rather than strings.
+When a component you build announces the outcome of its own actions, or a value it shows (a match count, a zoom level), and must work without an `Announcer` above it, or speaks elements (a [Kbd](?path=/docs/components-feedback-and-display-kbd--docs)) rather than strings.
 
-**Use something else when** the message comes from app code rather than a component: [Announcer](?path=/docs/components-announcer--docs). When the message is visible text: [Notice](?path=/docs/components-notice--docs) or [Toast](?path=/docs/components-toast--docs), which are live regions themselves.
+**Use something else when** the message comes from app code rather than a component: [Announcer](?path=/docs/components-feedback-and-display-announcer--docs). When the message is visible text: [Notice](?path=/docs/components-feedback-and-display-notice--docs) or [Toast](?path=/docs/components-overlays-toast--docs), which are live regions themselves.
 
 ## Usage
 
@@ -54,4 +54,4 @@ function Saver() {
 
 ## Related
 
-[Announcer](?path=/docs/components-announcer--docs), [VisuallyHidden](?path=/docs/components-visuallyhidden--docs).
+[Announcer](?path=/docs/components-feedback-and-display-announcer--docs), [VisuallyHidden](?path=/docs/components-structure-visuallyhidden--docs).

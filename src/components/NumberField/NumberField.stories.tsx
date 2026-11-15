@@ -7,7 +7,7 @@ import { Stack } from "../Stack/Stack.js";
 import { NumberField } from "./NumberField.js";
 
 const meta = {
-  title: "Components/NumberField",
+  title: "Components/Controls/NumberField",
   component: NumberField,
   args: { label: "Seats", defaultValue: 5, min: 1, max: 20, step: 1, onChange: fn(), locale: "en-US" },
   argTypes: {

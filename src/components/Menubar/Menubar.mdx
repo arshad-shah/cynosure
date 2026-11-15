@@ -5,7 +5,7 @@ import * as Stories from "./Menubar.stories";
 
 # Menubar
 
-A desktop application's menu bar: a row of titles (File, Edit, View), each opening a [Menu](?path=/docs/components-menu--docs) of commands. Once one menu is open, the arrow keys and the pointer move straight between menus, as in a native app.
+A desktop application's menu bar: a row of titles (File, Edit, View), each opening a [Menu](?path=/docs/components-overlays-menu--docs) of commands. Once one menu is open, the arrow keys and the pointer move straight between menus, as in a native app.
 
 <Canvas of={Stories.KeyboardMovesBetweenMenus} />
 
@@ -15,10 +15,10 @@ A desktop application's menu bar: a row of titles (File, Edit, View), each openi
 - **Many commands in a few familiar groups**, where people expect File, Edit and View.
 
 **Use something else when:**
-- there is one group of commands: a [Menu](?path=/docs/components-menu--docs) on a button
-- the commands are a few visible actions: a [Toolbar](?path=/docs/components-toolbar--docs) of [Button](?path=/docs/components-button--docs)s
-- the entries navigate between pages: [SiteHeader](?path=/docs/components-siteheader--docs) or [SideNav](?path=/docs/components-sidenav--docs)
-- people search for commands: [CommandPalette](?path=/docs/components-commandpalette--docs)
+- there is one group of commands: a [Menu](?path=/docs/components-overlays-menu--docs) on a button
+- the commands are a few visible actions: a [Toolbar](?path=/docs/components-structure-toolbar--docs) of [Button](?path=/docs/components-controls-button--docs)s
+- the entries navigate between pages: [SiteHeader](?path=/docs/components-structure-siteheader--docs) or [SideNav](?path=/docs/components-structure-sidenav--docs)
+- people search for commands: [CommandPalette](?path=/docs/components-overlays-commandpalette--docs)
 
 ## Usage
 
@@ -43,7 +43,7 @@ import { copy, folder, save } from "@arshad-shah/cynosure/icons";
 />
 ```
 
-Each menu's `items` are exactly what [Menu](?path=/docs/components-menu--docs) takes: icons, `shortcut`s (shown with Kbd and exposed as `aria-keyshortcuts`; bind the keys yourself with `useHotkey`), `disabled`, `tone`, checkable `kind`s, sections (labelled or not) and submenus (an item with `items`). `onSelect` receives the chosen item's `value` from whichever menu, so keep values unique across menus.
+Each menu's `items` are exactly what [Menu](?path=/docs/components-overlays-menu--docs) takes: icons, `shortcut`s (shown with Kbd and exposed as `aria-keyshortcuts`; bind the keys yourself with `useHotkey`), `disabled`, `tone`, checkable `kind`s, sections (labelled or not) and submenus (an item with `items`). `onSelect` receives the chosen item's `value` from whichever menu, so keep values unique across menus.
 
 ## Moving between menus
 
@@ -93,4 +93,4 @@ createTheme({ components: { menubar: { height: "28px", radius: "4px" } } });
 
 ## Related
 
-[Menu](?path=/docs/components-menu--docs) · [ContextMenu](?path=/docs/components-contextmenu--docs) · [Toolbar](?path=/docs/components-toolbar--docs) · [CommandPalette](?path=/docs/components-commandpalette--docs) · [Kbd](?path=/docs/components-kbd--docs)
+[Menu](?path=/docs/components-overlays-menu--docs) · [ContextMenu](?path=/docs/components-overlays-contextmenu--docs) · [Toolbar](?path=/docs/components-structure-toolbar--docs) · [CommandPalette](?path=/docs/components-overlays-commandpalette--docs) · [Kbd](?path=/docs/components-feedback-and-display-kbd--docs)

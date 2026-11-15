@@ -5,7 +5,7 @@ import * as Stories from "./Stack.stories";
 
 # Stack
 
-Lays children out in a column with a gap from the space scale. For a row, use [Inline](?path=/docs/components-inline--docs).
+Lays children out in a column with a gap from the space scale. For a row, use [Inline](?path=/docs/components-structure-inline--docs).
 
 <Canvas of={Stories.GapsUseSpaceTokens} />
 
@@ -27,13 +27,13 @@ import { Stack } from "@arshad-shah/cynosure";
 <Stack padding="6">…</Stack>
 ```
 
-`gap` is a space token from `"0"` to `"10"` (default `"4"`). `direction` is `column` (default) or `row`; a row that centres its items and can wrap is [Inline](?path=/docs/components-inline--docs), which is a Stack in a row. `align` is `start`, `center`, `end`, `stretch` or `baseline`. `justify` is `start`, `center`, `end` or `between`. `as` picks a neutral element (`div`, `section`, `ul`, `ol`, `nav`, `aside`, `header`, `footer`, `span`).
+`gap` is a space token from `"0"` to `"10"` (default `"4"`). `direction` is `column` (default) or `row`; a row that centres its items and can wrap is [Inline](?path=/docs/components-structure-inline--docs), which is a Stack in a row. `align` is `start`, `center`, `end`, `stretch` or `baseline`. `justify` is `start`, `center`, `end` or `between`. `as` picks a neutral element (`div`, `section`, `ul`, `ol`, `nav`, `aside`, `header`, `footer`, `span`).
 
 <Canvas of={Stories.DefaultsAndLayoutProps} />
 
 ## Padding
 
-`padding` pads all four sides with a space token. `paddingInline` (the sides) and `paddingBlock` (top and bottom) each win over `padding` for their axis, and `"0"` counts as a value. The padding is inside the stack's width. For the page's own column and gutters, use [Container](?path=/docs/components-container--docs).
+`padding` pads all four sides with a space token. `paddingInline` (the sides) and `paddingBlock` (top and bottom) each win over `padding` for their axis, and `"0"` counts as a value. The padding is inside the stack's width. For the page's own column and gutters, use [Container](?path=/docs/components-structure-container--docs).
 
 ```tsx
 <Stack padding="6" paddingBlock="8">…</Stack>
@@ -43,7 +43,7 @@ import { Stack } from "@arshad-shah/cynosure";
 
 ## App shells
 
-`grow`, `shrink`, `fill`, `minSize` and `overflow` size a box inside its parent, for an app whose header and status bar stay put while the middle scrolls. `grow` takes the free space along a flex parent's row or column (a status bar item that pushes the rest to the end: no spacer component needed); `shrink={false}` keeps a box at its size when room runs out; `fill` is 100% of the parent both ways; `minSize="0"` lets a flex or grid child be smaller than its content, so what is inside it can scroll instead of pushing the page longer; `overflow` is `hidden`, `auto` or `visible`. For a scrolling area people read with the keyboard, follow or jump to the end of, use [ScrollArea](?path=/docs/components-scrollarea--docs).
+`grow`, `shrink`, `fill`, `minSize` and `overflow` size a box inside its parent, for an app whose header and status bar stay put while the middle scrolls. `grow` takes the free space along a flex parent's row or column (a status bar item that pushes the rest to the end: no spacer component needed); `shrink={false}` keeps a box at its size when room runs out; `fill` is 100% of the parent both ways; `minSize="0"` lets a flex or grid child be smaller than its content, so what is inside it can scroll instead of pushing the page longer; `overflow` is `hidden`, `auto` or `visible`. For a scrolling area people read with the keyboard, follow or jump to the end of, use [ScrollArea](?path=/docs/components-structure-scrollarea--docs).
 
 ```tsx
 <Stack fill gap="0">
@@ -74,4 +74,4 @@ import { Stack } from "@arshad-shah/cynosure";
 
 ## Related
 
-[Inline](?path=/docs/components-inline--docs) · [Container](?path=/docs/components-container--docs) · [Card](?path=/docs/components-card--docs) · [Field](?path=/docs/components-field--docs)
+[Inline](?path=/docs/components-structure-inline--docs) · [Container](?path=/docs/components-structure-container--docs) · [Card](?path=/docs/components-structure-card--docs) · [Field](?path=/docs/components-feedback-and-display-field--docs)

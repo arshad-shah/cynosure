@@ -73,3 +73,19 @@
     outline: var(--cy-border-focus) solid transparent;
   }
 }
+
+/* Cards: a grid of `--_cols` columns that wraps to fewer before a card goes below its minimum width. */
+.cy-radio-group.cy-radio-group[data-variant="card"] {
+  display: grid;
+  gap: var(--cy-radio-group-gap, var(--cy-space-4));
+  grid-template-columns: repeat(
+      auto-fill,
+      minmax(
+        max(
+          var(--cy-radio-group-card-min-width, 8rem),
+          calc((100% - (var(--_cols) - 1) * var(--cy-radio-group-gap, var(--cy-space-4))) / var(--_cols))
+        ),
+        1fr
+      )
+    );
+}

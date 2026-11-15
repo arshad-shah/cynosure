@@ -15,9 +15,9 @@ An inline message about part of the page: a status, a warning or an error that s
 - **An error that is not about one field**, such as a failed import.
 
 **Use something else when:**
-- the message is a passing confirmation: a [Toast](?path=/docs/components-toast--docs)
+- the message is a passing confirmation: a [Toast](?path=/docs/components-overlays-toast--docs)
 - the error belongs to one field: that field's error text
-- the person must answer before going on: [Dialog](?path=/docs/components-dialog--docs)
+- the person must answer before going on: [Dialog](?path=/docs/components-overlays-dialog--docs)
 
 ## Usage
 
@@ -61,7 +61,7 @@ The Notice measures its own width. Below 26rem the actions move under the text, 
 | Close button | Hides it (or calls `onDismiss`) |
 
 - **Role:** `role="alert"` for `tone="danger"`, which screen readers announce even when it appears already filled. Every other tone is `role="status"`: changes to its content are announced politely, but a status Notice that mounts with its text already in it is usually only read in place.
-- **To announce a non-danger message** that appears later, keep the Notice mounted and change its content, or use a [Toast](?path=/docs/components-toast--docs), which is built to be announced once.
+- **To announce a non-danger message** that appears later, keep the Notice mounted and change its content, or use a [Toast](?path=/docs/components-overlays-toast--docs), which is built to be announced once.
 - **Icon:** decorative; the tone is also carried by the words.
 - **Contrast:** title and body are at least 4.5:1 in every tone and both variants, in light and dark modes. On a fill the tone icon and the close icon are at least 3:1.
 
@@ -79,4 +79,4 @@ createTheme({ components: { notice: { radius: "8px", softMix: "14%" } } });
 
 ## Related
 
-[Toast](?path=/docs/components-toast--docs) · [Badge](?path=/docs/components-badge--docs) · [EmptyState](?path=/docs/components-emptystate--docs)
+[Toast](?path=/docs/components-overlays-toast--docs) · [Badge](?path=/docs/components-feedback-and-display-badge--docs) · [EmptyState](?path=/docs/components-feedback-and-display-emptystate--docs)

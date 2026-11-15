@@ -49,7 +49,7 @@ function Editor(props: Partial<SelectionFrameProps> & { onCommitSpy?: (b: FrameB
 }
 
 const meta = {
-  title: "Components/SelectionFrame",
+  title: "Components/Controls/SelectionFrame",
   component: SelectionFrame,
   args: { label: "Text box: Hello", box: { x: 0, y: 0, width: 1, height: 1 }, onCommit: fn() },
   render: () => <Editor resizable rotatable />,

@@ -12,7 +12,7 @@ import { ProgressBar } from "./ProgressBar.js";
 const TONES = ["accent", "success", "warning", "danger", "info", "neutral"] as const;
 
 const meta = {
-  title: "Components/ProgressBar",
+  title: "Components/Feedback and display/ProgressBar",
   component: ProgressBar,
   args: { label: "Uploading 3 files", value: 40, max: 100, size: "md", tone: "accent", showValue: true },
   argTypes: {
@@ -20,6 +20,9 @@ const meta = {
     size: { control: "inline-radio", options: ["xs", "sm", "md", "lg"] },
     tone: { control: "select", options: TONES },
     indeterminate: { control: "boolean" },
+    meter: { control: "boolean" },
+    steps: { control: { type: "number", min: 0, max: 10 } },
+    valueText: { control: "text" },
     showValue: { control: "boolean" },
     labelHidden: { control: "boolean" },
   },
@@ -335,6 +338,117 @@ export const SegmentsTakeTheBarsTone: Story = {
     const part = canvasElement.querySelector(".cy-progress-bar-segment") as HTMLElement;
     await expect(part).toHaveAttribute("data-tone", "success");
     await expect(canvas.getByRole("progressbar")).toHaveAttribute("aria-valuetext", "Done 4");
+  },
+};
+
+const pills = (canvasElement: HTMLElement) => [
+  ...canvasElement.querySelectorAll<HTMLElement>(".cy-progress-bar-step"),
+];
+const lit = (canvasElement: HTMLElement) => pills(canvasElement).filter((p) => p.hasAttribute("data-on"));
+
+/** `meter`: a measurement (password strength, entropy), read as what it means, not a task's progress. */
+export const MeterIsAMeasurement: Story = {
+  args: { label: "Password strength", meter: true, value: 3, max: 4, valueText: "Good", tone: "success" },
+  play: async ({ canvas }) => {
+    const meter = canvas.getByRole("meter", { name: "Password strength" });
+    await expect(canvas.queryByRole("progressbar")).toBeNull();
+    await expect(meter).toHaveAttribute("aria-valuenow", "3");
+    await expect(meter).toHaveAttribute("aria-valuemin", "0");
+    await expect(meter).toHaveAttribute("aria-valuemax", "4");
+    await expect(meter).toHaveAttribute("aria-valuetext", "Good");
+    // The words, not a percentage, are what shows.
+    await expect(canvas.getByText("Good")).toBeVisible();
+    await expect(canvas.queryByText("75%")).toBeNull();
+  },
+};
+
+/** A meter always has a value: without one it reads 0 and never sweeps. */
+export const MeterIsNeverIndeterminate: Story = {
+  args: { label: "Strength", meter: true, value: undefined, indeterminate: true, showValue: false },
+  play: async ({ canvas, canvasElement }) => {
+    const meter = canvas.getByRole("meter", { name: "Strength" });
+    await expect(meter).toHaveAttribute("aria-valuenow", "0");
+    await expect(meter).not.toHaveAttribute("aria-busy");
+    await expect(canvasElement.querySelector("[data-indeterminate]")).toBeNull();
+  },
+};
+
+/** `steps`: separate pills, lit up to round(value / max × steps), in the tone; the rest in the track colour. */
+export const StepsLightUpToTheValue: Story = {
+  args: {
+    label: "Password strength",
+    meter: true,
+    value: 2,
+    max: 4,
+    steps: 4,
+    valueText: "Fair",
+    tone: "warning",
+  },
+  render: function Render(args) {
+    const [value, setValue] = useState(args.value ?? 0);
+    // As a product would: the words and the tone follow the score.
+    const strong = value >= 3.5;
+    return (
+      <Stack gap="4">
+        <ProgressBar
+          {...args}
+          value={value}
+          valueText={strong ? "Strong" : "Fair"}
+          tone={strong ? "success" : "warning"}
+        />
+        <Button onClick={() => setValue(2.4)}>2.4 of 4</Button>
+        <Button onClick={() => setValue(4)}>Full</Button>
+      </Stack>
+    );
+  },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    await expect(pills(canvasElement)).toHaveLength(4);
+    await expect(lit(canvasElement)).toHaveLength(2);
+    const on = lit(canvasElement)[0] as HTMLElement;
+    const off = pills(canvasElement)[3] as HTMLElement;
+    // Lit and unlit differ visibly (3:1, as a fill against its track).
+    await expect(
+      contrast(getComputedStyle(on).backgroundColor, getComputedStyle(off).backgroundColor),
+    ).toBeGreaterThanOrEqual(3);
+    // The pills sit apart, in a row across the track.
+    const a = (pills(canvasElement)[0] as HTMLElement).getBoundingClientRect();
+    const b = (pills(canvasElement)[1] as HTMLElement).getBoundingClientRect();
+    await expect(b.left - a.right).toBeGreaterThan(0);
+    await expect(Math.round(a.top)).toBe(Math.round(b.top));
+    await userEvent.click(canvas.getByRole("button", { name: "2.4 of 4" }));
+    await waitFor(() => expect(lit(canvasElement)).toHaveLength(2));
+    await userEvent.click(canvas.getByRole("button", { name: "Full" }));
+    await waitFor(() => expect(lit(canvasElement)).toHaveLength(4));
+    await expect(canvas.getByRole("meter")).toHaveAttribute("aria-valuenow", "4");
+    await expect(canvas.getByRole("meter")).toHaveAttribute("aria-valuetext", "Strong");
+  },
+};
+
+/** Steps also work on a progress bar (step 2 of 5), which keeps role="progressbar" and its own value text. */
+export const StepsOnAProgressBar: Story = {
+  args: { label: "Setting up", value: 2, max: 5, steps: 5, valueText: "Step 2 of 5" },
+  play: async ({ canvas, canvasElement }) => {
+    const bar = canvas.getByRole("progressbar", { name: "Setting up" });
+    await expect(bar).toHaveAttribute("aria-valuetext", "Step 2 of 5");
+    await expect(canvas.getByText("Step 2 of 5")).toBeVisible();
+    await expect(pills(canvasElement)).toHaveLength(5);
+    await expect(lit(canvasElement)).toHaveLength(2);
+    await expect(canvasElement.querySelector(".cy-progress-bar-fill")).toBeNull();
+  },
+};
+
+/** Lit steps start at the inline start: the right-hand end in right-to-left text. */
+export const StepsFillFromTheStartInRightToLeft: Story = {
+  args: { label: "Strength", meter: true, value: 1, max: 4, steps: 4, valueText: "Weak", tone: "danger" },
+  render: (args) => (
+    <div dir="rtl">
+      <ProgressBar {...args} />
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const first = lit(canvasElement)[0] as HTMLElement;
+    const right = Math.max(...pills(canvasElement).map((p) => p.getBoundingClientRect().right));
+    await expect(Math.round(first.getBoundingClientRect().right)).toBe(Math.round(right));
   },
 };
 

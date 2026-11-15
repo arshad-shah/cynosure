@@ -39,7 +39,7 @@ function Signing(props: Partial<SignaturePadProps> & { onChangeSpy?: (s: InkStro
 }
 
 const meta = {
-  title: "Components/SignaturePad",
+  title: "Components/Controls/SignaturePad",
   component: SignaturePad,
   args: { label: "Draw your signature", value: [], onChange: fn() },
   render: () => <Signing />,

@@ -7,7 +7,7 @@ One small, themeable, accessible UI system, used by all my projects: browser ext
 - **Tiny and tree-shaken**: one module per component and icon, and one small runtime dependency ([Detent](https://github.com/arshad-shah/detent), for dragging).
 - **Looks identical anywhere**: pages, iframes, extension popups and shadow roots; host CSS can't break it.
 - **Every property is a token**: `createTheme({ accent, scale, radius, font, tokens, components })`.
-- **Icons**: 274 Facet stroke icons in 17 categories (softened-square geometry, built-in micro-animations), 98 official brand marks, and `iconToSvg` for pages without React.
+- **Icons**: 463 Facet stroke icons in 25 categories (softened-square geometry, built-in micro-animations), 98 official brand marks, and `iconToSvg` for pages without React.
 - **One prop vocabulary**: `size`, `tone`, `variant`, `color` on every component, so control is consistent.
 - **Tested in real browsers**: every story is a behavioural, accessibility and touch test on Chromium, Firefox and WebKit.
 
@@ -42,7 +42,7 @@ export const App = () => (
 | [Accessibility](docs/accessibility.md)                         | What every component guarantees, and how it is tested              |
 | [Without React](docs/without-react.md)                         | Tokens and icons in Astro pages, static sites and plain TypeScript |
 | [Code editors](docs/code-editors.md)                           | Code colours for CodeMirror, Monaco, Shiki, Prism and highlight.js |
-| [Build adapters](docs/adapters.md)                             | The Vite adapter and shadow roots (`styles.inline`)                |
+| [Build adapters](docs/adapters.md)                             | The Vite and Astro adapters and shadow roots (`styles.inline`)     |
 | [Migrating a product](docs/migration.md)                       | The order of work to move a product onto Cynosure                  |
 | [Architecture](docs/architecture.md)                           | How the package is put together                                    |
 | [Conventions](docs/conventions.md), [Testing](docs/testing.md) | The rules `pnpm check` enforces, and how components are tested     |
@@ -51,11 +51,11 @@ export const App = () => (
 
 ## Components
 
-- **Foundations:** ButtonBase, LinkBase, InputBase, FileInputBase, TextAreaBase, ChoiceBase, HiddenValue, LiveRegion (hidden announcements), DialogBase, Icon (274 Facet icons and 98 brand marks); hooks `useRovingFocus`, `useDismiss`, `useDrag` (pointer dragging through Detent), `useControllableState`.
-- **Controls:** Button, IconButton, CopyButton, Link, TextField, NumberField, SearchField, TextArea, Select, Combobox, TagInput, Checkbox, Switch, RadioGroup, SegmentedControl, Slider, DateField, TimeField, Checklist, Pagination, ColorField, ColorSwatches, KeyValueEditor, FileDrop, PathField, SignaturePad, SelectionFrame, CompareSlider, ThemeToggle.
-- **Structure:** AppShell (`useAppShell`), TitleBar, StatusBar, Container, PageHeader, Stack, Inline, Grid, ScrollArea, Divider, AspectRatio, Breadcrumbs, SideNav, SplitPane, Card, Toolbar, Tabs, Disclosure, Accordion, Tree, SortableList, VirtualList, Calendar, DocumentViewport, PanZoomCanvas, ZoomControls.
+- **Foundations:** ButtonBase, LinkBase, InputBase, FileInputBase, TextAreaBase, ChoiceBase, HiddenValue, LiveRegion (hidden announcements), DialogBase, Icon (463 Facet icons and 98 brand marks); hooks `useRovingFocus`, `useDismiss`, `useDrag` (pointer dragging through Detent), `useControllableState`.
+- **Controls:** Button, IconButton, CopyButton, Link, TextField, NumberField, SearchField, TextArea, Select, Combobox, TagInput, Checkbox, Switch, RadioGroup, SegmentedControl, Slider, DateField, TimeField, Checklist, Pagination, ColorField, ColorSwatches, KeyValueEditor, FileDrop, PathField, SignaturePad, SelectionFrame, CompareSlider, ThemeToggle, Choice, OptionList, HotkeyField, SortButton, RowActions, Rating.
+- **Structure:** AppShell (`useAppShell`), TitleBar, StatusBar, Container, PageHeader, Stack, Inline, Grid, ScrollArea, Divider, AspectRatio, Breadcrumbs, SideNav, SplitPane, Card, Toolbar, Tabs, Disclosure, Accordion, Tree, SortableList, VirtualList, Calendar, DocumentViewport, PanZoomCanvas, ZoomControls, Section, SiteHeader, SiteFooter, SkipLink, ListRow (`ListRows`), OverlayFrame, VisuallyHidden.
 - **Overlays:** Tooltip, HoverCard, Popover, FloatingToolbar (`DockedToolbar`), Menu, Menubar, ContextMenu, Dialog, ProgressOverlay, Sheet, CommandPalette (`useHotkey`), Toast (`Toaster`, `useToast`).
-- **Feedback and display:** Notice, EmptyState, ErrorBoundary, ProgressBar, Steps, LoadingDots, Skeleton, DescriptionList, Stat, List, Table, Text, Heading, Prose, Avatar (`AvatarGroup`), IconTile, Image, CodeBlock, Announcer (`useAnnounce`), Badge, Kbd, Field. **Theme:** CynosureTheme, useColorMode, themeInitScript, createTheme.
-- **Build:** optional Vite adapter (`@arshad-shah/cynosure/vite`), React-free tokens (`@arshad-shah/cynosure/tokens`) and self-hosted Hanken Grotesk (`fonts/hanken.css`).
+- **Feedback and display:** Notice, EmptyState, ErrorBoundary, ProgressBar, Steps, LoadingDots, Skeleton, DescriptionList, Stat, List, Table, Text, Heading, Prose, Avatar (`AvatarGroup`), IconTile, Image, CodeBlock, Announcer (`useAnnounce`), Badge, Kbd, Field, DataGrid, HighlightedText, ChatMessage, QRCode, DeviceFrame. **Theme:** CynosureTheme, useColorMode, themeInitScript, createTheme.
+- **Build:** optional Vite and Astro adapters (`@arshad-shah/cynosure/vite`, `@arshad-shah/cynosure/astro`), React-free tokens (`@arshad-shah/cynosure/tokens`) and self-hosted Hanken Grotesk (`fonts/hanken.css`).
 
 > Status: pre-release (`0.x`), developed on `next`. Releases publish to npm from `main` through GitHub Actions (see [Release](docs/release.md)).

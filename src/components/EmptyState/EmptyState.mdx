@@ -15,8 +15,8 @@ What to show where content will be: no items yet, no search results, nothing sel
 - **No results** for a search or filter, with a way to widen it.
 
 **Use something else when:**
-- something went wrong: a [Notice](?path=/docs/components-notice--docs)
-- content is still loading: a loading indicator such as [LoadingDots](?path=/docs/components-loadingdots--docs)
+- something went wrong: a [Notice](?path=/docs/components-feedback-and-display-notice--docs)
+- content is still loading: a loading indicator such as [LoadingDots](?path=/docs/components-feedback-and-display-loadingdots--docs)
 
 ## Usage
 
@@ -49,7 +49,7 @@ With `size="sm"` it uses less space. Long titles wrap and the actions stack, so 
 
 ## Behaviour and accessibility
 
-- **Heading:** the title is a real `h2` to `h6`, so it shows up in the page outline and heading navigation.
+- **Heading:** the title is a real `h1` to `h6` (`headingLevel`, default 3), so it shows up in the page outline and heading navigation.
 - **Icon:** decorative (`aria-hidden`).
 - **Contrast:** title and description are at least 4.5:1 on the page background in light and dark modes.
 - It has no interaction of its own; the actions are ordinary Buttons.
@@ -64,4 +64,4 @@ createTheme({ components: { emptyState: { maxWidth: "48ch" } } });
 
 ## Related
 
-[Notice](?path=/docs/components-notice--docs) · [Button](?path=/docs/components-button--docs)
+[Notice](?path=/docs/components-feedback-and-display-notice--docs) · [Button](?path=/docs/components-controls-button--docs)

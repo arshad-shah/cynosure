@@ -4,7 +4,7 @@ export const regex: IconData = {
   name: "regex",
   category: "editing",
   body: [
-    ["path", { d: "M17 4v8M13.5 6l7 4M20.5 6l-7 4" }],
+    ["path", { d: "M17 4v8m-3.5-6 7 4m0-4-7 4" }],
     ["rect", { x: 4, y: 14.5, width: 5.5, height: 5.5, rx: 1.5 }],
   ],
 };

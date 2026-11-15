@@ -21,7 +21,7 @@ const side = (name: string, background: string) => (
 );
 
 const meta = {
-  title: "Components/CompareSlider",
+  title: "Components/Controls/CompareSlider",
   component: CompareSlider,
   args: {
     before: side("original", "var(--cy-color-soft)"),

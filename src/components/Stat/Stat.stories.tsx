@@ -7,7 +7,7 @@ import { Grid } from "../Grid/Grid.js";
 import { Stat } from "./Stat.js";
 
 const meta = {
-  title: "Components/Stat",
+  title: "Components/Feedback and display/Stat",
   component: Stat,
   args: {
     label: "Revenue",

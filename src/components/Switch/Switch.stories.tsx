@@ -7,7 +7,7 @@ import { Checkbox } from "../Checkbox/Checkbox.js";
 import { Switch, type SwitchProps } from "./Switch.js";
 
 const meta = {
-  title: "Components/Switch",
+  title: "Components/Controls/Switch",
   component: Switch,
   args: { label: "Auto-expand", onChange: fn(), size: "md", tone: "accent" },
   argTypes: {

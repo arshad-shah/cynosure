@@ -16,7 +16,7 @@ import { HighlightedText } from "@arshad-shah/cynosure";
 | `query`               | –       | A term or several terms; every occurrence of each is marked, ignoring case |
 | `className` / `style` | –       | Layout only                                                                |
 
-To filter by the same rule that marks, use `textMatches(text, query)` (contains, ignoring case and the query's surrounding spaces): a row it keeps always shows a mark. Combobox, TagInput, TextArea's mentions, Tree and CommandPalette filter with it.
+To filter by the same rule that marks, use `textMatches(text, query)` (contains, ignoring case and the query's surrounding spaces): a row it keeps always shows a mark, except with an empty or blank query, which keeps every row and marks nothing. Combobox, TagInput, TextArea's mentions, Tree and CommandPalette filter with it.
 
 ## Accessibility
 

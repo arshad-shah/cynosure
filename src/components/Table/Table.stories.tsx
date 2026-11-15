@@ -34,7 +34,7 @@ const COLUMNS: TableColumn<Member>[] = [
 ];
 
 const meta = {
-  title: "Components/Table",
+  title: "Components/Feedback and display/Table",
   component: Table<Member>,
   args: {
     caption: "Team members",

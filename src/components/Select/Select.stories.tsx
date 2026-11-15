@@ -18,7 +18,7 @@ const fruits = [
 ];
 
 const meta = {
-  title: "Components/Select",
+  title: "Components/Controls/Select",
   component: Select,
   args: {
     label: "Fruit",

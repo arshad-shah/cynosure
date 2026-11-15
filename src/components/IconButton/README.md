@@ -10,6 +10,7 @@ The tooltip opens on hover and keyboard focus and closes on Escape, blur or poin
 
 | Prop               | Default | Notes                                                                                                       |
 | ------------------ | ------- | ----------------------------------------------------------------------------------------------------------- |
+| `tooltipPlacement` | `top`   | Where the label tooltip appears                                                                             |
 | `flipRtl`          | `false` | The icon points along the reading direction (previous, next): mirrored in right-to-left text                |
 | `iconColor`        | –       | Any CSS colour for the icon (a status shown for a moment, as CopyButton does)                               |
 | `wrapperClassName` | –       | Added to the element around the button (the tooltip's anchor, the box the parent lays out), for layout only |

@@ -13,7 +13,7 @@ const picture = (width: number, height: number) =>
 const fill = { background: "var(--cy-color-soft)" };
 
 const meta = {
-  title: "Components/AspectRatio",
+  title: "Components/Structure/AspectRatio",
   component: AspectRatio,
   args: { ratio: 16 / 9, radius: "none" },
   argTypes: {

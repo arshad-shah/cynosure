@@ -13,6 +13,7 @@ A compact single choice (view switchers, modes, theme) on native radios: arrow k
 | `options`                                    | –                | `{ value, label, icon?, disabled? }[]`; `label` names icon-only segments                  |
 | `value` / `defaultValue` / `onChange(value)` | –                | Controlled or uncontrolled                                                                |
 | `name`                                       | –                | Submits the value with its form; two controls may share a name and stay independent       |
+| `disabled`                                   | `false`          | Disables every segment; the value is not submitted                                        |
 | `iconOnly` / `fullWidth`                     | `false`          | Visual options                                                                            |
 | `size` / `tone`                              | `md` / `neutral` | `xs` (20px, dense chrome) · `sm` · `md` · `lg`; tone colours the active segment's content |
 

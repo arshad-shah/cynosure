@@ -10,7 +10,7 @@ import { computeUnderHostileHost } from "../../test/hostile.js";
 import { SortButton } from "./SortButton.js";
 
 const meta = {
-  title: "Components/SortButton",
+  title: "Components/Controls/SortButton",
   component: SortButton,
   args: { children: "Name", onClick: fn(), fill: false, align: "start" },
   argTypes: {

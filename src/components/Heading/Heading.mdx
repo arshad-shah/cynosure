@@ -17,9 +17,9 @@ A section or page heading. `level` sets the element (`h1` to `h6`) and `size` se
 
 **Use something else when:**
 - the text is not a heading (body copy, captions, labels): Text
-- it is rendered Markdown or other plain HTML: [Prose](?path=/docs/components-prose--docs), which styles the headings inside it
-- it is the title of an empty view with an icon and a next step: [EmptyState](?path=/docs/components-emptystate--docs)
-- it labels a form control: [Field](?path=/docs/components-field--docs)
+- it is rendered Markdown or other plain HTML: [Prose](?path=/docs/components-feedback-and-display-prose--docs), which styles the headings inside it
+- it is the title of an empty view with an icon and a next step: [EmptyState](?path=/docs/components-feedback-and-display-emptystate--docs)
+- it labels a form control: [Field](?path=/docs/components-feedback-and-display-field--docs)
 
 ## Usage
 
@@ -65,7 +65,7 @@ Heading is not interactive: it has no keyboard or pointer behaviour.
 - **Naming a region:** pass `id` and point `aria-labelledby` at it.
 - **Truncated text:** the full text stays the heading's accessible name.
 - **Wrapping:** lines are balanced (`text-wrap: balance`), and long words break instead of overflowing.
-- **No margins:** space headings with [Stack](?path=/docs/components-stack--docs) or the layout around them.
+- **No margins:** space headings with [Stack](?path=/docs/components-structure-stack--docs) or the layout around them.
 - **Right to left:** `start` and `end` swap sides, and a truncated heading keeps the start of its text.
 - **Ref:** the forwarded ref is the heading element.
 
@@ -75,11 +75,12 @@ Nothing in Heading is pressable, so it has no hit area.
 
 ## Theming
 
-Tokens: `--cy-heading-size-{xs,sm,md,lg,xl,2xl,display}`, `--cy-heading-font-family`, `--cy-heading-font-weight` and `--cy-heading-line-height`.
+Tokens: `--cy-heading-size-{xs,sm,md,lg,xl,2xl,3xl,display}`, `--cy-heading-font-family`, `--cy-heading-font-weight` and `--cy-heading-line-height`.
 
 | Token | Changes | Falls back to |
 | --- | --- | --- |
 | `--cy-heading-size-xs` to `--cy-heading-size-2xl` | Font size of each `size` | `--cy-font-size-xs` to `--cy-font-size-2xl` |
+| `--cy-heading-size-3xl` | Font size of `size="3xl"` | 1.4 times `--cy-font-size-2xl` |
 | `--cy-heading-size-display` | Font size of `size="display"` | 5% of the viewport width, between 1.25 and 2 times `--cy-font-size-2xl` |
 | `--cy-heading-font-family` | Font family | `--cy-font-display` |
 | `--cy-heading-font-weight` | Weight of bold headings | `--cy-font-weight-bold` |
@@ -95,4 +96,4 @@ createTheme({ components: { heading: { sizeXl: "1.5rem", "size-2xl": "2rem", lin
 
 ## Related
 
-[Prose](?path=/docs/components-prose--docs) · [Stack](?path=/docs/components-stack--docs) · [EmptyState](?path=/docs/components-emptystate--docs)
+[Prose](?path=/docs/components-feedback-and-display-prose--docs) · [Stack](?path=/docs/components-structure-stack--docs) · [EmptyState](?path=/docs/components-feedback-and-display-emptystate--docs)

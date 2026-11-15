@@ -5,7 +5,7 @@ import * as Stories from "./HotkeyField.stories";
 
 # HotkeyField
 
-Records a keyboard shortcut for a keybindings page. It shows the shortcut as key caps beside a record toggle and a clear button; while recording, it takes the next chord itself, so the app's own shortcuts do not fire, and writes it the way `useHotkey` reads it (`"mod+shift+p"`; see [CommandPalette](?path=/docs/components-commandpalette--docs) for `useHotkey`).
+Records a keyboard shortcut for a keybindings page. It shows the shortcut as key caps beside a record toggle and a clear button; while recording, it takes the next chord itself, so the app's own shortcuts do not fire, and writes it the way `useHotkey` reads it (`"mod+shift+p"`; see [CommandPalette](?path=/docs/components-overlays-commandpalette--docs) for `useHotkey`).
 
 <Canvas of={Stories.Default} />
 
@@ -13,7 +13,7 @@ Records a keyboard shortcut for a keybindings page. It shows the shortcut as key
 
 - **Shortcut settings:** each action on a keybindings page gets a HotkeyField, with `recording` controlled so one row records at a time.
 
-**Use something else when:** you only show a shortcut ([Kbd](?path=/docs/components-kbd--docs)), or people type a key name as text ([TextField](?path=/docs/components-textfield--docs)).
+**Use something else when:** you only show a shortcut ([Kbd](?path=/docs/components-feedback-and-display-kbd--docs)), or people type a key name as text ([TextField](?path=/docs/components-controls-textfield--docs)).
 
 ## Usage
 
@@ -57,7 +57,8 @@ By default a shortcut needs Control, Command or Alt, since a plain letter types 
 
 | Input | Idle | Recording |
 | --- | --- | --- |
-| <kbd>Enter</kbd>, <kbd>Space</kbd>, click or tap on the record toggle | Starts recording | Stops, keeping the shortcut |
+| <kbd>Enter</kbd> or <kbd>Space</kbd> on the record toggle | Starts recording | Ignored (recorded with `allowBare`) |
+| Click or tap on the record toggle | Starts recording | Stops, keeping the shortcut |
 | Click or tap on the shortcut's box | Starts recording | – |
 | A chord (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>) | The app's own shortcuts | Recorded, recording ends |
 | <kbd>Control</kbd>, <kbd>Shift</kbd>, <kbd>Alt</kbd>, <kbd>Meta</kbd> alone | – | Waits for the key |
@@ -92,8 +93,8 @@ The buttons keep a 44px hit area on coarse pointers. On a touch-only device ther
 
 The box shares TextField's skin through Field's `--cy-field-control-*` tokens, so restyling those restyles both; a disabled box takes `--cy-field-control-sunken-bg`.
 
-The key caps are [Kbd](?path=/docs/components-kbd--docs) and the buttons [IconButton](?path=/docs/components-iconbutton--docs): restyle them through their tokens.
+The key caps are [Kbd](?path=/docs/components-feedback-and-display-kbd--docs) and the buttons [IconButton](?path=/docs/components-controls-iconbutton--docs): restyle them through their tokens.
 
 ## Related
 
-[Kbd](?path=/docs/components-kbd--docs) · [CommandPalette](?path=/docs/components-commandpalette--docs) · [Field](?path=/docs/components-field--docs)
+[Kbd](?path=/docs/components-feedback-and-display-kbd--docs) · [CommandPalette](?path=/docs/components-overlays-commandpalette--docs) · [Field](?path=/docs/components-feedback-and-display-field--docs)

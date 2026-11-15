@@ -5,7 +5,7 @@ import * as Stories from "./IconTile.stories";
 
 # IconTile
 
-A Facet icon on a tinted square or circle: the mark of a feature, a settings section, a stat or a list item. It is decorative unless you give it a `label`. For a person or a team use [Avatar](?path=/docs/components-avatar--docs); for an icon inside a line of text use [Icon](?path=/docs/foundations-icon--docs).
+A Facet icon on a tinted square or circle: the mark of a feature, a settings section, a stat or a list item. It is decorative unless you give it a `label`. For a person or a team use [Avatar](?path=/docs/components-feedback-and-display-avatar--docs); for an icon inside a line of text use [Icon](?path=/docs/foundations-icon--docs).
 
 <Canvas of={Stories.Default} />
 
@@ -13,13 +13,13 @@ A Facet icon on a tinted square or circle: the mark of a feature, a settings sec
 
 - **Feature grids and cards:** a tile beside or above each feature's title.
 - **Settings sections and empty states:** a mark that sets the subject at a glance.
-- **Inside other components:** [Stat](?path=/docs/components-stat--docs) takes an `icon`, and [List](?path=/docs/components-list--docs) draws one per item with `marker="tile"`.
+- **Inside other components:** [Stat](?path=/docs/components-feedback-and-display-stat--docs) takes an `icon`, and [List](?path=/docs/components-feedback-and-display-list--docs) draws one per item with `marker="tile"`.
 
 **Use something else when:**
-- it stands for a person, a team or an account: [Avatar](?path=/docs/components-avatar--docs)
-- it should do something when pressed: [IconButton](?path=/docs/components-iconbutton--docs)
+- it stands for a person, a team or an account: [Avatar](?path=/docs/components-feedback-and-display-avatar--docs)
+- it should do something when pressed: [IconButton](?path=/docs/components-controls-iconbutton--docs)
 - the icon sits inside a line of text or a button: [Icon](?path=/docs/foundations-icon--docs)
-- it shows a status word: [Badge](?path=/docs/components-badge--docs)
+- it shows a status word: [Badge](?path=/docs/components-feedback-and-display-badge--docs)
 
 ## Usage
 
@@ -64,7 +64,7 @@ import { zap } from "@arshad-shah/cynosure/icons";
 
 ## Touch
 
-Nothing in a tile can be pressed, so it has no hit area. Put it in a [Card](?path=/docs/components-card--docs) with `href` or `onClick` to make the whole card the target.
+Nothing in a tile can be pressed, so it has no hit area. Put it in a [Card](?path=/docs/components-structure-card--docs) with `href` or `onClick` to make the whole card the target.
 
 ## Theming
 
@@ -83,4 +83,4 @@ createTheme({ components: { iconTile: { radius: "4px", iconScale: "0.6" } } });
 
 ## Related
 
-[Avatar](?path=/docs/components-avatar--docs) · [Stat](?path=/docs/components-stat--docs) · [List](?path=/docs/components-list--docs) · [Badge](?path=/docs/components-badge--docs) · [Icon](?path=/docs/foundations-icon--docs)
+[Avatar](?path=/docs/components-feedback-and-display-avatar--docs) · [Stat](?path=/docs/components-feedback-and-display-stat--docs) · [List](?path=/docs/components-feedback-and-display-list--docs) · [Badge](?path=/docs/components-feedback-and-display-badge--docs) · [Icon](?path=/docs/foundations-icon--docs)

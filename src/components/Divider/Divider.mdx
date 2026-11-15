@@ -5,7 +5,7 @@ import * as Stories from "./Divider.stories";
 
 # Divider
 
-A line that separates content: between sections of a page or card, or between items in a row. It can carry a short label such as "or". If the content only needs space between it, use the `gap` of [Stack](?path=/docs/components-stack--docs) or [Inline](?path=/docs/components-inline--docs) and no line.
+A line that separates content: between sections of a page or card, or between items in a row. It can carry a short label such as "or". If the content only needs space between it, use the `gap` of [Stack](?path=/docs/components-structure-stack--docs) or [Inline](?path=/docs/components-structure-inline--docs) and no line.
 
 <Canvas of={Stories.Default} />
 
@@ -17,10 +17,10 @@ A line that separates content: between sections of a page or card, or between it
 - **`tone="strong"`:** when the quiet line is lost against a busy background.
 
 **Use something else when:**
-- space alone separates the content well enough: [Stack](?path=/docs/components-stack--docs) or [Inline](?path=/docs/components-inline--docs) `gap`
-- the line separates groups of menu items: [Menu](?path=/docs/components-menu--docs) draws its own
-- the section needs a title: [Heading](?path=/docs/components-heading--docs)
-- the content should be framed as a unit: [Card](?path=/docs/components-card--docs)
+- space alone separates the content well enough: [Stack](?path=/docs/components-structure-stack--docs) or [Inline](?path=/docs/components-structure-inline--docs) `gap`
+- the line separates groups of menu items: [Menu](?path=/docs/components-overlays-menu--docs) draws its own
+- the section needs a title: [Heading](?path=/docs/components-feedback-and-display-heading--docs)
+- the content should be framed as a unit: [Card](?path=/docs/components-structure-card--docs)
 
 ## Usage
 
@@ -104,4 +104,4 @@ createTheme({ components: { divider: { thickness: "2px", labelSize: "0.75rem" } 
 
 ## Related
 
-[Stack](?path=/docs/components-stack--docs) · [Inline](?path=/docs/components-inline--docs) · [Toolbar](?path=/docs/components-toolbar--docs) · [Menu](?path=/docs/components-menu--docs) · [Card](?path=/docs/components-card--docs)
+[Stack](?path=/docs/components-structure-stack--docs) · [Inline](?path=/docs/components-structure-inline--docs) · [Toolbar](?path=/docs/components-structure-toolbar--docs) · [Menu](?path=/docs/components-overlays-menu--docs) · [Card](?path=/docs/components-structure-card--docs)

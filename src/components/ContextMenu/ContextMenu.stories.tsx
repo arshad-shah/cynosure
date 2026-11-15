@@ -19,7 +19,7 @@ const ITEMS: MenuEntry[] = [
 ];
 
 const meta = {
-  title: "Components/ContextMenu",
+  title: "Components/Overlays/ContextMenu",
   component: ContextMenu,
   args: {
     label: "File actions",

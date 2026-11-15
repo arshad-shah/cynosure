@@ -8,7 +8,7 @@ import { CynosureTheme } from "../../theme/CynosureTheme.js";
 import { Checkbox } from "./Checkbox.js";
 
 const meta = {
-  title: "Components/Checkbox",
+  title: "Components/Controls/Checkbox",
   component: Checkbox,
   args: { label: "Email me updates", onChange: fn(), size: "md", tone: "accent" },
   argTypes: {

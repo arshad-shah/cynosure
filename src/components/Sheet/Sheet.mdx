@@ -5,7 +5,7 @@ import * as Stories from "./Sheet.stories";
 
 # Sheet
 
-A [Dialog](?path=/docs/components-dialog--docs) docked to an edge of the screen: a drawer from the bottom, or a full-height panel at the inline end. It behaves exactly like a Dialog (focus, Escape, backdrop, labels) and slides in from its side.
+A [Dialog](?path=/docs/components-overlays-dialog--docs) docked to an edge of the screen: a drawer from the bottom, or a full-height panel at the inline end. It behaves exactly like a Dialog (focus, Escape, backdrop, labels) and slides in from its side.
 
 <Canvas of={Stories.BottomSheetDocksAndCloses} />
 
@@ -13,10 +13,10 @@ A [Dialog](?path=/docs/components-dialog--docs) docked to an edge of the screen:
 
 - **Settings or filters on a phone:** a bottom sheet keeps them within thumb reach.
 - **An inspector or detail panel** beside the content: `side="end"`.
-- **A navigation drawer** on small screens: `side="start"` ([AppShell](?path=/docs/components-appshell--docs) uses one).
+- **A navigation drawer** on small screens: `side="start"` ([AppShell](?path=/docs/components-structure-appshell--docs) uses one).
 
 **Use something else when:**
-- it is a short decision or form in the middle of the page: [Dialog](?path=/docs/components-dialog--docs) (which turns into a bottom sheet on its own in narrow containers)
+- it is a short decision or form in the middle of the page: [Dialog](?path=/docs/components-overlays-dialog--docs) (which turns into a bottom sheet on its own in narrow containers)
 - it should stay open while the person works on the page: a layout panel, not an overlay
 
 ## Usage
@@ -48,7 +48,7 @@ import { Sheet, Switch } from "@arshad-shah/cynosure";
 - **Sides:** `bottom` is full width and up to 85% of the height; `end` is full height and docks to the right (left in right-to-left text); `start` is full height and docks to the left (right in right-to-left text).
 - **Size:** `size` sets the width of an `end` or `start` sheet.
 - **Mounting:** the content is in the DOM only while the sheet is open, and is removed once it has slid out, so every opening starts fresh. `keepMounted` keeps it while closed, for a drawer whose scroll position or expanded sections should survive.
-- Everything else (focus, roles, shadow DOM, no writes to `<body>`) is the same as [Dialog](?path=/docs/components-dialog--docs).
+- Everything else (focus, roles, shadow DOM, no writes to `<body>`) is the same as [Dialog](?path=/docs/components-overlays-dialog--docs).
 
 ## Touch
 
@@ -64,4 +64,4 @@ createTheme({ components: { sheet: { widthMd: "440px", maxHeight: "90%" } } });
 
 ## Related
 
-[Dialog](?path=/docs/components-dialog--docs) · [Popover](?path=/docs/components-popover--docs)
+[Dialog](?path=/docs/components-overlays-dialog--docs) · [Popover](?path=/docs/components-overlays-popover--docs)

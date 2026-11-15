@@ -39,7 +39,7 @@ function textBox(el: Element) {
 }
 
 const meta = {
-  title: "Components/Heading",
+  title: "Components/Feedback and display/Heading",
   component: Heading,
   args: { children: "Export settings", level: 2, tone: "neutral", weight: "bold", truncate: false },
   argTypes: {

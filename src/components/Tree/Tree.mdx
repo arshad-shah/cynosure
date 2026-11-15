@@ -14,8 +14,8 @@ A hierarchical list people can open, close and select from: folders and files, a
 - **Nested data** where the hierarchy matters: a file system, a document outline, an inspector.
 
 **Use something else when:**
-- there is only one level: a list or a [Menu](?path=/docs/components-menu--docs)
-- sections of content open and close: [Accordion](?path=/docs/components-accordion--docs)
+- there is only one level: a list or a [Menu](?path=/docs/components-overlays-menu--docs)
+- sections of content open and close: [Accordion](?path=/docs/components-structure-accordion--docs)
 
 ## Usage
 
@@ -69,7 +69,7 @@ Actions show while their row is hovered, focused or selected, and always on scre
 
 ## Filtering
 
-`filter` shows only matching items, with their ancestors opened and their own children, and marks the matched text with [HighlightedText](?path=/docs/components-highlightedtext--docs). A string matches anywhere in the label, ignoring case. A function returns true, false, or the positions a fuzzy matcher found, which are marked exactly. The `expanded` ids are not changed, and an opened ancestor can still be closed. Only known children are searched.
+`filter` shows only matching items, with their ancestors opened and their own children, and marks the matched text with [HighlightedText](?path=/docs/components-feedback-and-display-highlightedtext--docs). A string matches anywhere in the label, ignoring case. A function returns true, false, or the positions a fuzzy matcher found, which are marked exactly. The `expanded` ids are not changed, and an opened ancestor can still be closed. Only known children are searched.
 
 <Canvas of={Stories.FilterShowsMatchesWithTheirAncestors} />
 
@@ -122,4 +122,4 @@ createTheme({ components: { tree: { indent: "20px", rowHeight: "28px" } } });
 
 ## Related
 
-[HighlightedText](?path=/docs/components-highlightedtext--docs) · [ContextMenu](?path=/docs/components-contextmenu--docs) · [Accordion](?path=/docs/components-accordion--docs) · [Menu](?path=/docs/components-menu--docs) · [Combobox](?path=/docs/components-combobox--docs)
+[HighlightedText](?path=/docs/components-feedback-and-display-highlightedtext--docs) · [ContextMenu](?path=/docs/components-overlays-contextmenu--docs) · [Accordion](?path=/docs/components-structure-accordion--docs) · [Menu](?path=/docs/components-overlays-menu--docs) · [Combobox](?path=/docs/components-controls-combobox--docs)

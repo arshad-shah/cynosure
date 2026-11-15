@@ -8,7 +8,7 @@ export const sun: IconData = {
     [
       "path",
       {
-        d: "M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6L7 7M17 17l1.4 1.4M5.6 18.4L7 17M17 7l1.4-1.4",
+        d: "M12 3v2m0 14v2m-9-9h2m14 0h2M5.6 5.6 7 7m10 10 1.4 1.4m-12.8 0L7 17M17 7l1.4-1.4",
         animate: true,
       },
     ],

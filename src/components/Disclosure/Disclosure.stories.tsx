@@ -12,7 +12,7 @@ import { Disclosure } from "./Disclosure.js";
 const retry = fn();
 
 const meta = {
-  title: "Components/Disclosure",
+  title: "Components/Structure/Disclosure",
   component: Disclosure,
   args: {
     summary: "Advanced options",

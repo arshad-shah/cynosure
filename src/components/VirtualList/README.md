@@ -31,6 +31,8 @@ import { VirtualList } from "@arshad-shah/cynosure";
 | `selected` / `onSelectionChange`      | –        | Controlled; `defaultSelected` when uncontrolled                                 |
 | `selectedKeys`, `defaultSelectedKeys` | –        | Deprecated aliases of `selected` and `defaultSelected`                          |
 | `onAction`                            | –        | Enter, a double-click, or a click when `selectionMode` is `none`                |
+| `onMove`                              | –        | `(keys, to)`: rows moved and where the first lands; `moveItems` applies it      |
+| `labels`                              | –        | `{ moved(count, position, total) }`: "Moved 3 rows to position 5 of 120"        |
 | `isDisabled`                          | –        | Disabled rows are skipped by the keys and cannot be chosen                      |
 | `empty`                               | –        | Shown when there are no items                                                   |
 | `size`                                | `md`     | `sm` · `md`                                                                     |

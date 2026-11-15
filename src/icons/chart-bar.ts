@@ -2,7 +2,7 @@ import type { IconData } from "./types.js";
 
 export const chartBar: IconData = {
   name: "chart-bar",
-  category: "data",
+  category: "charts",
   body: [
     ["path", { d: "M4 20h16" }],
     ["rect", { x: 6, y: 12, width: 3, height: 6, rx: 1 }],

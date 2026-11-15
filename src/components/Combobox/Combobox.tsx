@@ -27,6 +27,7 @@ import {
 import { TextField } from "../TextField/TextField.js";
 
 export interface ComboboxTokens {
+  listMaxWidth: string;
   listMaxHeight: string;
   listBg: string;
   optionActiveBg: string;

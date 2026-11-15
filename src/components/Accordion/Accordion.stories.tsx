@@ -6,7 +6,7 @@ import { Button } from "../Button/Button.js";
 import { Accordion, AccordionItem } from "./Accordion.js";
 
 const meta = {
-  title: "Components/Accordion",
+  title: "Components/Structure/Accordion",
   component: Accordion,
   args: { type: "single", defaultValue: "format", collapsible: true, variant: "line", onValueChange: fn() },
   argTypes: {

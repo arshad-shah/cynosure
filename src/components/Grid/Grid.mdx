@@ -14,7 +14,7 @@ Lays items out in rows and columns: a fixed number of equal columns, a number pe
 - **Galleries, dashboards and tiles**: items that line up in both directions.
 
 **Use something else when:**
-- items run in one direction: [Stack](?path=/docs/components-stack--docs) (vertical) or [Inline](?path=/docs/components-inline--docs) (horizontal, wrapping)
+- items run in one direction: [Stack](?path=/docs/components-structure-stack--docs) (vertical) or [Inline](?path=/docs/components-structure-inline--docs) (horizontal, wrapping)
 - the content is data with headers: a table
 
 ## Usage
@@ -42,7 +42,7 @@ Pass `columns` an object to choose the column count at each width: `{ base: 1, s
 | `lg` | 60rem | 960px |
 | `xl` | 75rem | 1200px |
 
-A breakpoint you leave out keeps the count of the one below it. The scale is exported as `GRID_BREAKPOINTS`. A grid that fills a [Container](?path=/docs/components-container--docs) of size `sm`, `md`, `lg` or `xl` reaches the breakpoint of the same name.
+A breakpoint you leave out keeps the count of the one below it. The scale is exported as `GRID_BREAKPOINTS`. A grid that fills a [Container](?path=/docs/components-structure-container--docs) of size `sm`, `md`, `lg` or `xl` reaches the breakpoint of the same name.
 
 <Canvas of={Stories.ColumnsPerBreakpoint} />
 
@@ -72,7 +72,7 @@ Wrap an item in `GridItem` to span columns (`span={2}`, or `span="full"` for the
 
 ## In an app shell
 
-Grid takes `grow`, `shrink`, `fill`, `minSize` and `overflow` as [Stack](?path=/docs/components-stack--docs) does: a grid that takes what a header leaves, may be shorter than its items and scrolls them. GridItem takes `overflow`, for a wide item that scrolls sideways inside its column.
+Grid takes `grow`, `shrink`, `fill`, `minSize` and `overflow` as [Stack](?path=/docs/components-structure-stack--docs) does: a grid that takes what a header leaves, may be shorter than its items and scrolls them. GridItem takes `overflow`, for a wide item that scrolls sideways inside its column.
 
 ```tsx
 <Grid columns={2} grow minSize="0" overflow="auto">…</Grid>
@@ -87,7 +87,7 @@ Grid takes `grow`, `shrink`, `fill`, `minSize` and `overflow` as [Stack](?path=/
 ## Behaviour and accessibility
 
 - **Semantics:** Grid is layout only; it adds no role. Render a list with `as="ul"` and `GridItem as="li"`: bullets and indentation are removed, the list semantics stay.
-- **Reading order:** visual order follows source order, so keyboard and screen reader order match what is seen.
+- **Reading order:** visual order follows source order unless a `GridItem` is given `order`. `order` moves an item visually only: keyboard and screen reader order stay the source order, so use it only where the order does not matter to understanding.
 - **Direction:** columns run with the text direction.
 - **Nesting:** a nested Grid has its own columns and padding and never inherits its parent's.
 - **Columns per breakpoint:** such a grid is a size container (`container-type: inline-size`), so its width must come from its parent. That is the case in normal block layout and in stretched flex or grid cells; in a shrink-to-fit place (an inline-flex box, a float) give it a width. Spans are clamped for `GridItem`s that are direct children. The breakpoints are in rem, so they follow the page's root font size.
@@ -98,4 +98,4 @@ Grid has no tokens of its own: gaps and padding are the global space tokens (`--
 
 ## Related
 
-[Stack](?path=/docs/components-stack--docs) · [Inline](?path=/docs/components-inline--docs) · [Container](?path=/docs/components-container--docs) · [Card](?path=/docs/components-card--docs)
+[Stack](?path=/docs/components-structure-stack--docs) · [Inline](?path=/docs/components-structure-inline--docs) · [Container](?path=/docs/components-structure-container--docs) · [Card](?path=/docs/components-structure-card--docs)

@@ -8,7 +8,7 @@ import { Stack } from "../Stack/Stack.js";
 import { FileDrop } from "./FileDrop.js";
 
 const meta = {
-  title: "Components/FileDrop",
+  title: "Components/Controls/FileDrop",
   component: FileDrop,
   args: { multiple: true, name: "files", hint: "PNG or PDF, up to 5 MB", onFiles: fn(), onReject: fn() },
   argTypes: { size: { control: "inline-radio", options: ["sm", "md", "lg"] } },

@@ -6,7 +6,7 @@ import { styleManifest } from "../../tools/style-manifest";
 
 const manifest = styleManifest("src", cssSources("src"));
 const cssText = new Map(
-  cssSources("src").map((f) => [f.split("/").pop() as string, readFileSync(f, "utf8")]),
+  cssSources("src").map((f) => [f.split(/[\\/]/).pop() as string, readFileSync(f, "utf8")]),
 );
 const all = [...cssText.keys()];
 const defines = (files: string[], cls: string) =>

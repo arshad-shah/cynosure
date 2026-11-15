@@ -2,7 +2,7 @@ import type { IconData } from "./types.js";
 
 export const heart: IconData = {
   name: "heart",
-  category: "actions",
+  category: "social",
   body: [
     [
       "path",

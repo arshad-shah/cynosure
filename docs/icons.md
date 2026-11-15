@@ -2,12 +2,12 @@
 
 Cynosure ships two kinds of icon, both drawn by the same `Icon` component.
 
-- **Facet icons** (`@arshad-shah/cynosure/icons`): Cynosure's own set, 274 icons in 17 categories.
+- **Facet icons** (`@arshad-shah/cynosure/icons`): Cynosure's own set, 463 icons in 25 categories.
 - **Brand marks** (`@arshad-shah/cynosure/brands`): the official logos of 98 companies and projects, exactly as their owners publish them.
 
 ## Facet icons
 
-One grammar: a 24 grid, a 1.75 round stroke, softened-square geometry, strokes only. The categories (`ICON_CATEGORIES`) are arrows, navigation, actions, editing, files, data, media, communication, status, time, security, people, devices, design, layout, maths and faith. Search them at the top of the [Icons page](https://cynosure.arshadshah.com/icons/), or browse them in Storybook: **Foundations → Icon → Gallery** (hover a tile to see its motion).
+One grammar: a 24 grid, a 1.75 round stroke, softened-square geometry, strokes only. The categories (`ICON_CATEGORIES`) are arrows, navigation, actions, editing, files, data, media, communication, status, time, security, people, devices, design, layout, maths, faith, commerce, nature, travel, health, development, charts, home and social. Search them at the top of the [Icons page](https://cynosure.arshadshah.com/icons/), or browse them in Storybook: **Foundations → Icon → Gallery** (hover a tile to see its motion).
 
 ```tsx
 import { Icon } from "@arshad-shah/cynosure";
@@ -37,7 +37,7 @@ import { puzzle } from "@arshad-shah/cynosure/icons";
 - `icons` is the frozen record behind it, keyed by name (`IconName` is the union of the names), for listing or validating names up front.
 - This entry brings **every** icon with it (about 13.5 kB gzipped once bundled), which is why it is separate: the main entry and `@arshad-shah/cynosure/icons` never import it, so importing icons one by one stays tree-shaken. Use it only where names arrive at run time.
 
-**Adding one:** draw it on a 24 grid with strokes only, export the SVG, then run `pnpm cy new icon <name> --from icon.svg --category <category>`. In the generated file, set `motion` and mark the moving part `animate: true`. See `src/icons/AGENTS.md`. The by-name entry's budget is measured as one bundle by `tools/icons-size.ts`, which `pnpm size` runs after size-limit (size-limit's file plugin gzips each module on its own and overstated it about five times): when new icons push it over, raise `ICONS_BY_NAME_BUDGET` there to what it prints.
+**Adding one:** draw it on a 24 grid with strokes only, export the SVG, then run `pnpm cy new icon <name> --from icon.svg --category <category>`. In the generated file, set `motion` and mark the moving part `animate: true`. The generator stores the path data as small as it draws identically (svgo's path pass); after editing an icon by hand, run `pnpm icons:optimize`, which keeps a shorter form only when it renders to the same pixels, and `pnpm verify` checks that nothing is left to shorten. See `src/icons/AGENTS.md`. The by-name entry's budget is measured as one bundle by `tools/icons-size.ts`, which `pnpm size` runs after size-limit (size-limit's file plugin gzips each module on its own and overstated it about five times): when new icons push it over, raise `ICONS_BY_NAME_BUDGET` there to what it prints.
 
 ## Brand marks
 

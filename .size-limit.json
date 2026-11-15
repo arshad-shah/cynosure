@@ -2,7 +2,7 @@
   {
     "name": "all CSS",
     "path": "dist/styles.css",
-    "limit": "37.81 kB",
+    "limit": "38.5 kB",
     "gzip": true
   },
   {
@@ -100,13 +100,13 @@
       "dist/styles/choice.css",
       "dist/styles/choice-base.css"
     ],
-    "limit": "4.25 kB",
+    "limit": "4.5 kB",
     "gzip": true
   },
   {
     "name": "RadioGroup",
     "path": ["dist/components/RadioGroup/RadioGroup.js", "dist/styles/radio-group.css"],
-    "limit": "1.5 kB",
+    "limit": "1.85 kB",
     "gzip": true
   },
   {
@@ -196,7 +196,7 @@
   {
     "name": "Tabs",
     "path": ["dist/components/Tabs/Tabs.js", "dist/foundations/roving-focus.js", "dist/styles/tabs.css"],
-    "limit": "7.5 kB",
+    "limit": "8.25 kB",
     "gzip": true
   },
   {
@@ -283,7 +283,7 @@
   {
     "name": "ProgressBar",
     "path": ["dist/components/ProgressBar/ProgressBar.js", "dist/styles/progress-bar.css"],
-    "limit": "2.25 kB",
+    "limit": "2.4 kB",
     "gzip": true
   },
   {
@@ -760,6 +760,12 @@
     "name": "SortButton",
     "path": ["dist/components/SortButton/SortButton.js", "dist/styles/sort-button.css"],
     "limit": "1.1 kB",
+    "gzip": true
+  },
+  {
+    "name": "Rating (JS + CSS)",
+    "path": ["dist/components/Rating/Rating.js", "dist/styles/rating.css"],
+    "limit": "3 kB",
     "gzip": true
   }
 ]

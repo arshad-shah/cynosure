@@ -27,7 +27,16 @@ const temps: string[] = [];
 function sandbox(): string {
   const dir = mkdtempSync(join(tmpdir(), "cy-cli-"));
   temps.push(dir);
-  for (const p of ["src", "tsconfig.json", ".size-limit.json", "AGENTS.md", "tools", ".storybook", "docs"])
+  for (const p of [
+    "src",
+    "tsconfig.json",
+    ".size-limit.json",
+    "AGENTS.md",
+    "README.md",
+    "tools",
+    ".storybook",
+    "docs",
+  ])
     cpSync(join(repo, p), join(dir, p), { recursive: true });
   symlinkSync(join(repo, "node_modules"), join(dir, "node_modules"));
   return dir;
@@ -41,6 +50,29 @@ const rules = (root: string) => check(root).map((v) => v.rule);
 describe("cy check", () => {
   it("passes on the real repo", () => {
     expect(check(repo)).toEqual([]);
+  });
+  it("story-group: a component's story title must be Components/<its README group>/<Name>", () => {
+    const root = sandbox();
+    const story = "src/components/Badge/Badge.stories.tsx";
+    const text = readFileSync(join(root, story), "utf8");
+    write(
+      root,
+      story,
+      text.replace('title: "Components/Feedback and display/Badge"', 'title: "Components/Badge"'),
+    );
+    expect(check(root).find((v) => v.rule === "story-group")).toMatchObject({
+      file: story,
+      message: expect.stringContaining('"Components/Feedback and display/Badge"'),
+    });
+  });
+  it("story-group: every component is listed in a README group", () => {
+    const root = sandbox();
+    const readme = readFileSync(join(root, "README.md"), "utf8");
+    write(root, "README.md", readme.replace(", Badge, Kbd,", ", Kbd,"));
+    expect(check(root).find((v) => v.rule === "story-group")).toMatchObject({
+      file: "src/components/Badge/Badge.stories.tsx",
+      message: expect.stringContaining("in no component group"),
+    });
   });
   it("flags a native button in a composite with file and line", () => {
     const root = sandbox();
@@ -247,7 +279,7 @@ describe("cy check", () => {
 describe("cy new component", () => {
   it("scaffolds a composite that typechecks and only reports its TODO(cy) markers", () => {
     const root = sandbox();
-    scaffoldComponent(root, "ScaffoldProbe", "composite");
+    scaffoldComponent(root, "ScaffoldProbe", "composite", "Controls");
     for (const f of [
       "ScaffoldProbe.tsx",
       "scaffold-probe.css",
@@ -260,6 +292,13 @@ describe("cy new component", () => {
     expect(readFileSync(join(root, "src/components/ScaffoldProbe/ScaffoldProbe.mdx"), "utf8")).toContain(
       "<Meta of={Stories} />",
     );
+    // Placed in its group: the story title and the README list agree.
+    expect(
+      readFileSync(join(root, "src/components/ScaffoldProbe/ScaffoldProbe.stories.tsx"), "utf8"),
+    ).toContain('title: "Components/Controls/ScaffoldProbe"');
+    expect(readFileSync(join(root, "README.md"), "utf8")).toMatch(
+      /\*\*Controls:\*\* [^\n]*, ScaffoldProbe\.\n/,
+    );
     expect(readFileSync(join(root, "src/index.ts"), "utf8")).toContain(
       'export { ScaffoldProbe, type ScaffoldProbeProps } from "./components/ScaffoldProbe/index.js";',
     );
@@ -267,7 +306,10 @@ describe("cy new component", () => {
       JSON.parse(readFileSync(join(root, ".size-limit.json"), "utf8")).map((e: { name: string }) => e.name),
     ).toContain("ScaffoldProbe (JS + CSS)");
     expect(new Set(rules(root))).toEqual(new Set(["scaffold-todo"]));
-    execFileSync(join(repo, "node_modules/.bin/tsc"), ["-p", root], { stdio: "pipe" });
+    // TypeScript's own entry through Node: the .bin shim is a .cmd file on Windows, which execFileSync cannot run.
+    execFileSync(process.execPath, [join(repo, "node_modules/typescript/bin/tsc"), "-p", root], {
+      stdio: "pipe",
+    });
   }, 120_000); // runs a full typecheck of a sandbox copy of the repo
   it("scaffolds a foundation under src/foundations", () => {
     const root = sandbox();
@@ -276,8 +318,9 @@ describe("cy new component", () => {
   });
   it("refuses an existing name and non-PascalCase names", () => {
     const root = sandbox();
-    expect(() => scaffoldComponent(root, "Button", "composite")).toThrow(/exists/);
-    expect(() => scaffoldComponent(root, "badge", "composite")).toThrow(/PascalCase/);
+    expect(() => scaffoldComponent(root, "Button", "composite", "Controls")).toThrow(/exists/);
+    expect(() => scaffoldComponent(root, "badge", "composite", "Controls")).toThrow(/PascalCase/);
+    expect(() => scaffoldComponent(root, "Probe", "composite")).toThrow(/--group/);
   });
 });
 

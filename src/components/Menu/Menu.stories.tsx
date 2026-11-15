@@ -23,7 +23,7 @@ const items: MenuEntry[] = [
 ];
 
 const meta = {
-  title: "Components/Menu",
+  title: "Components/Overlays/Menu",
   component: Menu,
   args: {
     label: "File actions",

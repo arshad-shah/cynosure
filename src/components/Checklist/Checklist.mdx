@@ -5,7 +5,7 @@ import * as Stories from "./Checklist.stories";
 
 # Checklist
 
-A list of rows people add, tick, rename and remove, such as a task's subtasks. If people only choose among options you wrote, use [Checkbox](?path=/docs/components-checkbox--docs) instead.
+A list of rows people add, tick, rename and remove, such as a task's subtasks. If people only choose among options you wrote, use [Checkbox](?path=/docs/components-controls-checkbox--docs) instead.
 
 <Canvas of={Stories.Default} />
 
@@ -16,11 +16,11 @@ A list of rows people add, tick, rename and remove, such as a task's subtasks. I
 - **`readOnly`:** to show the same list where it cannot be changed.
 
 **Use something else when:**
-- the options are fixed and people only tick them: [Checkbox](?path=/docs/components-checkbox--docs)
-- each row has a name and a value: [KeyValueEditor](?path=/docs/components-keyvalueeditor--docs)
-- the rows are short tags: [TagInput](?path=/docs/components-taginput--docs)
-- the rows are only put in order: [SortableList](?path=/docs/components-sortablelist--docs)
-- the rows are steps of a process someone else defined: [Steps](?path=/docs/components-steps--docs)
+- the options are fixed and people only tick them: [Checkbox](?path=/docs/components-controls-checkbox--docs)
+- each row has a name and a value: [KeyValueEditor](?path=/docs/components-controls-keyvalueeditor--docs)
+- the rows are short tags: [TagInput](?path=/docs/components-controls-taginput--docs)
+- the rows are only put in order: [SortableList](?path=/docs/components-structure-sortablelist--docs)
+- the rows are steps of a process someone else defined: [Steps](?path=/docs/components-feedback-and-display-steps--docs)
 
 ## Usage
 
@@ -43,7 +43,7 @@ The Rename button turns the name into a field with the old name selected. Enter 
 
 ## Reordering
 
-`reorderable` puts the rows in a [SortableList](?path=/docs/components-sortablelist--docs): each gets a grip to drag, or to move with Space and the arrow keys.
+`reorderable` puts the rows in a [SortableList](?path=/docs/components-structure-sortablelist--docs): each gets a grip to drag, or to move with Space and the arrow keys.
 
 <Canvas of={Stories.Reorderable} />
 
@@ -95,4 +95,4 @@ createTheme({ components: { checklist: { gap: "0.5rem" } } });
 
 ## Related
 
-[Checkbox](?path=/docs/components-checkbox--docs) · [KeyValueEditor](?path=/docs/components-keyvalueeditor--docs) · [SortableList](?path=/docs/components-sortablelist--docs) · [TagInput](?path=/docs/components-taginput--docs) · [TextField](?path=/docs/components-textfield--docs)
+[Checkbox](?path=/docs/components-controls-checkbox--docs) · [KeyValueEditor](?path=/docs/components-controls-keyvalueeditor--docs) · [SortableList](?path=/docs/components-structure-sortablelist--docs) · [TagInput](?path=/docs/components-controls-taginput--docs) · [TextField](?path=/docs/components-controls-textfield--docs)

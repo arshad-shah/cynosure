@@ -16,8 +16,8 @@ Adds a label, help text and an error message to any control and wires them toget
 - With `group` to label a set of controls such as a radio group.
 
 **Use something else when:**
-- the control brings its own label: [Checkbox](?path=/docs/components-checkbox--docs)
-- the component already includes a Field, such as [TextField](?path=/docs/components-textfield--docs)
+- the control brings its own label: [Checkbox](?path=/docs/components-controls-checkbox--docs)
+- the component already includes a Field, such as [TextField](?path=/docs/components-controls-textfield--docs)
 
 ## Usage
 
@@ -67,7 +67,7 @@ With `group`, Field renders a `fieldset` and the label names the whole group ins
 - **Label:** a `label` linked to the control, or the group label when `group` is set.
 - **Hidden label:** `labelHidden` keeps the label for assistive tech but takes no space. Prefer visible labels.
 - **Description and error:** linked through `aria-describedby`. The error also announces itself.
-- **Size:** `sm`, `md` (default) or `lg`.
+- **Size:** `xs`, `sm`, `md` (default) or `lg`; an `xs` control has the `sm` label.
 - **Split layout:** the order in the page stays label, description, control, then error, so screen readers and the Tab key meet them as in the stacked layout. Right-to-left text mirrors the row.
 
 ## Theming
@@ -84,4 +84,4 @@ createTheme({ components: { field: { gap: "8px", labelWeight: "600" } } });
 
 ## Related
 
-[TextField](?path=/docs/components-textfield--docs) · [Checkbox](?path=/docs/components-checkbox--docs) · [Stack](?path=/docs/components-stack--docs)
+[TextField](?path=/docs/components-controls-textfield--docs) · [Checkbox](?path=/docs/components-controls-checkbox--docs) · [Stack](?path=/docs/components-structure-stack--docs)

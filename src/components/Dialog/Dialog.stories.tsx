@@ -44,7 +44,7 @@ const form = (
 );
 
 const meta = {
-  title: "Components/Dialog",
+  title: "Components/Overlays/Dialog",
   component: Dialog,
   args: {
     title: "Edit profile",
@@ -55,7 +55,8 @@ const meta = {
     children: form,
   },
   argTypes: {
-    size: { control: "inline-radio", options: ["sm", "md", "lg"] },
+    size: { control: "inline-radio", options: ["sm", "md", "lg", "full"] },
+    titleHidden: { control: "boolean" },
     dismissible: { control: "boolean" },
     keepMounted: { control: "boolean" },
     open: { control: "boolean" },
@@ -469,6 +470,57 @@ export const NarrowContainerBecomesBottomSheet: Story = {
       expect(Math.round(box.bottom)).toBe(Math.round(el.getBoundingClientRect().bottom));
       expect(Math.round(box.width)).toBe(360);
     });
+  },
+};
+
+/** `size="full"` fills its container edge to edge, and stays that way in a narrow one instead of becoming a sheet. */
+export const FullSizeFillsTheViewport: Story = {
+  args: { defaultOpen: true, size: "full" },
+  render: (args) => <Page {...args} />,
+  play: async () => {
+    const el = dialogEl();
+    await waitFor(() => expect(el.open).toBe(true));
+    const panel = panelOf(el) as HTMLElement;
+    await shownFully(el);
+    const fills = () =>
+      waitFor(() => {
+        const box = panel.getBoundingClientRect();
+        const frame = el.getBoundingClientRect();
+        expect(Math.round(box.left)).toBe(Math.round(frame.left));
+        expect(Math.round(box.top)).toBe(Math.round(frame.top));
+        expect(Math.round(box.width)).toBe(Math.round(frame.width));
+        expect(Math.round(box.height)).toBe(Math.round(frame.height));
+      });
+    await fills();
+    await expect(getComputedStyle(panel).borderTopLeftRadius).toBe("0px");
+    // A narrow container (phone, extension popup) docks other sizes to the bottom; full still fills it.
+    el.style.inlineSize = "360px";
+    await settled(el);
+    await fills();
+    // Back to the viewport: the story ends showing the real full-size dialog, not the narrowed test state.
+    el.style.inlineSize = "";
+    await settled(el);
+    await fills();
+    await expect(Math.round(el.getBoundingClientRect().width)).toBe(document.documentElement.clientWidth);
+  },
+};
+
+/** `titleHidden`: the title is still the dialog's name and heading for screen readers, but only the close button shows. */
+export const TitleHiddenStaysTheName: Story = {
+  args: { defaultOpen: true, size: "full", titleHidden: true, description: undefined },
+  render: (args) => <Page {...args} />,
+  play: async ({ args, canvas, userEvent }) => {
+    const el = dialogEl();
+    await waitFor(() => expect(el.open).toBe(true));
+    await shownFully(el);
+    await expect(canvas.getByRole("dialog", { name: "Edit profile" })).toBeInTheDocument();
+    const heading = canvas.getByRole("heading", { level: 2, name: "Edit profile" });
+    // Hidden the shared way (clipped to 1px), not removed: no visible box.
+    await expect(heading.closest(".cy-visually-hidden") ?? heading).toHaveClass("cy-visually-hidden");
+    await expect(heading.getBoundingClientRect().width).toBeLessThanOrEqual(1);
+    await userEvent.click(canvas.getByRole("button", { name: "Close" }));
+    await settledClosed(el);
+    await expect(args.onOpenChange).toHaveBeenLastCalledWith(false);
   },
 };
 

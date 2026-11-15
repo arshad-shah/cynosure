@@ -314,3 +314,27 @@
     margin-block-start: var(--cy-space-6);
   }
 }
+
+/* overflow="menu": a tab moved into the More menu is not drawn in the row (its slot or tooltip wrapper goes with it).
+   The list does not scroll; the More button sits after it. Idle (nothing in the menu), the button stays rendered but
+   out of sight and out of the way, so its width is known before it is needed. */
+.cy-tab-list.cy-tab-list[data-overflow-menu] {
+  overflow-x: hidden;
+  & > :is([data-overflowed], :has([data-overflowed])) {
+    display: none;
+  }
+}
+.cy-tab-strip.cy-tab-strip[data-overflow-menu] {
+  position: relative;
+}
+.cy-tab-more.cy-tab-more {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  font-size: var(--cy-font-size-md);
+  &[data-idle] {
+    position: absolute;
+    visibility: hidden;
+    pointer-events: none;
+  }
+}

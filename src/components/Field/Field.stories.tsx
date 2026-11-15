@@ -17,7 +17,7 @@ import { TimeField } from "../TimeField/TimeField.js";
 import { Field } from "./Field.js";
 
 const meta = {
-  title: "Components/Field",
+  title: "Components/Feedback and display/Field",
   component: Field,
   args: {
     label: "Email",

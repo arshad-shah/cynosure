@@ -8,6 +8,7 @@ import { ariaNumber, clamp, plainNumber, snapToStep } from "../../foundations/ma
 import type { Size } from "../../tokens/schema.js";
 
 export interface SliderTokens {
+  length: string;
   trackSm: string;
   trackMd: string;
   trackLg: string;

@@ -4,7 +4,7 @@ export const listChecks: IconData = {
   name: "list-checks",
   category: "data",
   body: [
-    ["path", { d: "M11 6h9M11 12h9M11 18h9" }],
+    ["path", { d: "M11 6h9m-9 6h9m-9 6h9" }],
     [
       "path",
       {

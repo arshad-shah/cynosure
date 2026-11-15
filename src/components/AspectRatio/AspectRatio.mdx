@@ -5,7 +5,7 @@ import * as Stories from "./AspectRatio.stories";
 
 # AspectRatio
 
-A box that keeps a width-to-height ratio at any width, for an image, a video, a map, a chart or an embed. For a picture that also needs a loading placeholder and an error fallback, use [Image](?path=/docs/components-image--docs) instead.
+A box that keeps a width-to-height ratio at any width, for an image, a video, a map, a chart or an embed. For a picture that also needs a loading placeholder and an error fallback, use [Image](?path=/docs/components-feedback-and-display-image--docs) instead.
 
 <Canvas of={Stories.Default} />
 
@@ -16,9 +16,9 @@ A box that keeps a width-to-height ratio at any width, for an image, a video, a 
 - **Even grids:** thumbnails or tiles that must share one shape whatever is inside them.
 
 **Use something else when:**
-- it is a picture: [Image](?path=/docs/components-image--docs) with `ratio`, which uses this box and adds loading and error states
-- the content should set its own height: a plain element, or [Card](?path=/docs/components-card--docs) for a framed surface
-- you are waiting for content and want a placeholder: [Skeleton](?path=/docs/components-skeleton--docs)
+- it is a picture: [Image](?path=/docs/components-feedback-and-display-image--docs) with `ratio`, which uses this box and adds loading and error states
+- the content should set its own height: a plain element, or [Card](?path=/docs/components-structure-card--docs) for a framed surface
+- you are waiting for content and want a placeholder: [Skeleton](?path=/docs/components-feedback-and-display-skeleton--docs)
 
 ## Usage
 
@@ -84,4 +84,4 @@ Tokens: `--cy-aspect-ratio-radius` (the corner radius of every AspectRatio, what
 
 ## Related
 
-[Image](?path=/docs/components-image--docs) · [Skeleton](?path=/docs/components-skeleton--docs) · [Card](?path=/docs/components-card--docs) · [Grid](?path=/docs/components-grid--docs)
+[Image](?path=/docs/components-feedback-and-display-image--docs) · [Skeleton](?path=/docs/components-feedback-and-display-skeleton--docs) · [Card](?path=/docs/components-structure-card--docs) · [Grid](?path=/docs/components-structure-grid--docs)

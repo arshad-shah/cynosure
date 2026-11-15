@@ -1,6 +1,8 @@
 # src/components
 
-Composite components. Create with `pnpm cy new component <Name>` (never by hand), then replace every `TODO(cy)`.
+Composite components. Create with `pnpm cy new component <Name> --group <group>` (never by hand), then replace every `TODO(cy)`.
+
+**Groups.** Every component sits in one of the README's component groups (`Controls`, `Structure`, `Overlays`, `Feedback and display`, under "## Components"), and its story title is `Components/<group>/<Name>`, so Storybook's sidebar and the documentation site are grouped the same way. `--group` writes both; `cy check` (rule `story-group`) fails when they disagree or a component is in no group. The groups are read by `tools/component-groups.ts`.
 
 ## Recipe
 

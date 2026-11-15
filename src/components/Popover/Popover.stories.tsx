@@ -14,7 +14,7 @@ import { TextField } from "../TextField/TextField.js";
 import { Popover } from "./Popover.js";
 
 const meta = {
-  title: "Components/Popover",
+  title: "Components/Overlays/Popover",
   component: Popover,
   args: {
     label: "Filters",

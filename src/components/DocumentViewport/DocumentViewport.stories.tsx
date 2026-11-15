@@ -51,7 +51,7 @@ function Reader({ start = { kind: "fit-width" } as ZoomSetting }) {
 }
 
 const meta = {
-  title: "Components/DocumentViewport",
+  title: "Components/Structure/DocumentViewport",
   component: DocumentViewport,
   args: { label: "Contract", pages: PAGES, renderPage: () => null, onZoomChange: fn() },
   render: () => <Reader />,

@@ -14,8 +14,8 @@ The top bar of a website that scrolls as a document: a skip link, the brand, the
 - **Marketing and documentation sites** built with Astro or React, where the window scrolls the whole page.
 
 **Use something else when:**
-- you are building an app with a side navigation and its own scrolling content area: [AppShell](?path=/docs/components-appshell--docs)
-- you need the top of a page's content (title, description, actions): [PageHeader](?path=/docs/components-pageheader--docs)
+- you are building an app with a side navigation and its own scrolling content area: [AppShell](?path=/docs/components-structure-appshell--docs)
+- you need the top of a page's content (title, description, actions): [PageHeader](?path=/docs/components-structure-pageheader--docs)
 
 ## Usage
 
@@ -63,8 +63,8 @@ By default the header stays at the top while the page scrolls, over a blurred vi
 
 - **Landmarks:** the `header` is the banner landmark at the top level of the page. The links are a list in a `nav` named "Main" (`labels.nav`), in the bar and in the sheet.
 - **Current page:** the item with `current` gets `aria-current="page"` and a highlight.
-- **Skip link:** a [SkipLink](?path=/docs/components-skiplink--docs) to `skipTo` (`#main`) is rendered before the header. `skipLink={false}` leaves it out, for a page that has its own.
-- **Menu button:** an [IconButton](?path=/docs/components-iconbutton--docs) with `aria-expanded`. The sheet is a [Sheet](?path=/docs/components-sheet--docs) titled "Menu" (`labels.menu`), and its links are a [SideNav](?path=/docs/components-sidenav--docs).
+- **Skip link:** a [SkipLink](?path=/docs/components-structure-skiplink--docs) to `skipTo` (`#main`) is rendered before the header. `skipLink={false}` leaves it out, for a page that has its own.
+- **Menu button:** an [IconButton](?path=/docs/components-controls-iconbutton--docs) with `aria-expanded`. The sheet is a [Sheet](?path=/docs/components-overlays-sheet--docs) titled "Menu" (`labels.menu`), and its links are a [SideNav](?path=/docs/components-structure-sidenav--docs).
 - **No script needed for the layout:** the switch to the menu is a container query, so a server-rendered page shows the right layout at once.
 - **Right to left:** the brand starts at the right.
 
@@ -92,4 +92,4 @@ The breakpoints of `collapseBelow` are fixed, because a container query cannot r
 
 ## Related
 
-[SkipLink](?path=/docs/components-skiplink--docs) · [SiteFooter](?path=/docs/components-sitefooter--docs) · [Section](?path=/docs/components-section--docs) · [Container](?path=/docs/components-container--docs) · [AppShell](?path=/docs/components-appshell--docs) · [ThemeToggle](?path=/docs/components-themetoggle--docs)
+[SkipLink](?path=/docs/components-structure-skiplink--docs) · [SiteFooter](?path=/docs/components-structure-sitefooter--docs) · [Section](?path=/docs/components-structure-section--docs) · [Container](?path=/docs/components-structure-container--docs) · [AppShell](?path=/docs/components-structure-appshell--docs) · [ThemeToggle](?path=/docs/components-controls-themetoggle--docs)

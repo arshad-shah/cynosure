@@ -12,7 +12,7 @@ import { HotkeyField } from "./HotkeyField.js";
 
 const meta = {
   tags: ["serial"],
-  title: "Components/HotkeyField",
+  title: "Components/Controls/HotkeyField",
   component: HotkeyField,
   args: {
     label: "Command palette",

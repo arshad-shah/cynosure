@@ -5,7 +5,7 @@ import { computeUnderHostileHost } from "../../test/hostile.js";
 import { Link } from "./Link.js";
 
 const meta = {
-  title: "Components/Link",
+  title: "Components/Controls/Link",
   component: Link,
   args: { href: "#docs", children: "Read the docs", tone: "accent", size: "md" },
   argTypes: {

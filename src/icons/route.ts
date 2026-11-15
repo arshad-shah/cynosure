@@ -2,7 +2,7 @@ import type { IconData } from "./types.js";
 
 export const route: IconData = {
   name: "route",
-  category: "navigation",
+  category: "travel",
   body: [
     ["circle", { cx: 6, cy: 18, r: 2 }],
     ["circle", { cx: 18, cy: 6, r: 2 }],

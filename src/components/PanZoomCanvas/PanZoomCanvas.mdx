@@ -14,8 +14,8 @@ A surface to pan and zoom freely, for diagrams, maps and boards; your content, p
 - **Free two-dimensional content** bigger than the screen: diagrams, schemas, mind maps, boards.
 
 **Use something else when:**
-- the content is pages one under another: [DocumentViewport](?path=/docs/components-documentviewport--docs)
-- it is a long list: [VirtualList](?path=/docs/components-virtuallist--docs)
+- the content is pages one under another: [DocumentViewport](?path=/docs/components-structure-documentviewport--docs)
+- it is a long list: [VirtualList](?path=/docs/components-structure-virtuallist--docs)
 
 ## Usage
 
@@ -25,7 +25,7 @@ A surface to pan and zoom freely, for diagrams, maps and boards; your content, p
 </PanZoomCanvas>
 ```
 
-Place children absolutely in canvas units. Give `bounds` (the content's extent) to fit it on first show, for Shift+1 and `fit()`, and for the minimap. `min` and `max` set the zoom's limits in percent, as ZoomControls' do (25 to 800 unless given; a schema diagram might keep to 20 to 300): the wheel, a pinch, the keys, `zoomTo` and fitting all stop there. The `handle` has `fit`, `zoomTo` and `centerOn` for your own buttons (`ref` gives the same handle, and the earlier spelling `centreOn` still works); pair it with [ZoomControls](?path=/docs/components-zoomcontrols--docs) for a zoom toolbar.
+Place children absolutely in canvas units. Give `bounds` (the content's extent) to fit it on first show, for Shift+1 and `fit()`, and for the minimap. `min` and `max` set the zoom's limits in percent, as ZoomControls' do (25 to 800 unless given; a schema diagram might keep to 20 to 300): the wheel, a pinch, the keys, `zoomTo` and fitting all stop there. The `handle` has `fit`, `zoomTo` and `centerOn` for your own buttons (`ref` gives the same handle, and the earlier spelling `centreOn` still works); pair it with [ZoomControls](?path=/docs/components-structure-zoomcontrols--docs) for a zoom toolbar.
 
 ## Painting into a canvas
 
@@ -126,4 +126,4 @@ Tokens: `--cy-pan-zoom-canvas-background` and `--cy-pan-zoom-canvas-minimap-widt
 
 ## Related
 
-[DocumentViewport](?path=/docs/components-documentviewport--docs) · [ZoomControls](?path=/docs/components-zoomcontrols--docs) · [SelectionFrame](?path=/docs/components-selectionframe--docs)
+[DocumentViewport](?path=/docs/components-structure-documentviewport--docs) · [ZoomControls](?path=/docs/components-structure-zoomcontrols--docs) · [SelectionFrame](?path=/docs/components-controls-selectionframe--docs)

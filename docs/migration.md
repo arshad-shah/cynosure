@@ -1,21 +1,21 @@
 # Migrating a product to Cynosure
 
-Tracked as one issue per product repo (opened after Milestone 2). Order of work in a product:
+Tracked as one issue per product repo. Order of work in a product:
 
 1. `pnpm add @arshad-shah/cynosure`; import `styles.css` (or `styles.inline` in shadow roots).
 2. Wrap the root in `<CynosureTheme theme={createTheme({ accent, scale })}>`; delete the product's own token system.
 3. Replace product components with Cynosure ones; replace icons with Facet icons; delete native controls.
 4. Anything missing goes into Cynosure (with tests), never back into the product.
 
-Available now (Milestones 1 and 2, and Milestone 3 as it lands):
+Available now (the README "## Components" groups):
 
-- **Controls:** Button, IconButton, CopyButton, Link, TextField, NumberField, SearchField, TextArea, Select, Combobox, TagInput, Checkbox, Switch, RadioGroup, SegmentedControl, Slider, ColorField, ColorSwatches, KeyValueEditor, FileDrop, SignaturePad, SelectionFrame, CompareSlider, ThemeToggle.
-- **Structure:** AppShell, Stack, Inline, Grid, SideNav, SplitPane, Card, Toolbar, Tabs, Disclosure, Accordion, Tree, SortableList, VirtualList, DocumentViewport, PanZoomCanvas, ZoomControls.
-- **Overlays:** Tooltip, HoverCard, Popover, FloatingToolbar (`DockedToolbar`), Menu, ContextMenu, Dialog, ProgressOverlay, Sheet, CommandPalette, Toast.
-- **Feedback and display:** Notice, EmptyState, ProgressBar, Steps, LoadingDots, Skeleton, DescriptionList, Table, Prose, CodeBlock, Announcer (`useAnnounce`), Badge, Kbd, Field.
-- **Icons:** 274 Facet icons, 98 brand marks (`@arshad-shah/cynosure/brands`), and `iconToSvg` for pages without React.
+- **Controls:** Button, IconButton, CopyButton, Link, TextField, NumberField, SearchField, TextArea, Select, Combobox, TagInput, Checkbox, Switch, RadioGroup, SegmentedControl, Slider, DateField, TimeField, Checklist, Pagination, ColorField, ColorSwatches, KeyValueEditor, FileDrop, PathField, SignaturePad, SelectionFrame, CompareSlider, ThemeToggle, Choice, OptionList, HotkeyField, SortButton, RowActions, Rating.
+- **Structure:** AppShell (`useAppShell`), TitleBar, StatusBar, Container, PageHeader, Stack, Inline, Grid, ScrollArea, Divider, AspectRatio, Breadcrumbs, SideNav, SplitPane, Card, Toolbar, Tabs, Disclosure, Accordion, Tree, SortableList, VirtualList, Calendar, DocumentViewport, PanZoomCanvas, ZoomControls, Section, SiteHeader, SiteFooter, SkipLink, ListRow (`ListRows`), OverlayFrame, VisuallyHidden.
+- **Overlays:** Tooltip, HoverCard, Popover, FloatingToolbar (`DockedToolbar`), Menu, Menubar, ContextMenu, Dialog, ProgressOverlay, Sheet, CommandPalette (`useHotkey`), Toast (`Toaster`, `useToast`).
+- **Feedback and display:** Notice, EmptyState, ErrorBoundary, ProgressBar, Steps, LoadingDots, Skeleton, DescriptionList, Stat, List, Table, Text, Heading, Prose, Avatar (`AvatarGroup`), IconTile, Image, CodeBlock, Announcer (`useAnnounce`), Badge, Kbd, Field, DataGrid, HighlightedText, ChatMessage, QRCode, DeviceFrame.
+- **Icons:** 463 Facet icons, 98 brand marks (`@arshad-shah/cynosure/brands`), and `iconToSvg` for pages without React.
 
-Milestone 2 is the point at which the per-product migration issues open (Plan 4). Anything a product needs that is still missing goes into Cynosure first.
+Anything a product needs that is still missing goes into Cynosure first.
 
 | Scope          | Products                                                                                                                                                             |
 | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

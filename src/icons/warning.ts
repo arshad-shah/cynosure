@@ -5,7 +5,7 @@ export const warning: IconData = {
   category: "status",
   body: [
     ["path", { d: "M12 4.5l8.5 15h-17z" }],
-    ["path", { d: "M12 10.5v3.5M12 17h.01" }],
+    ["path", { d: "M12 10.5V14m0 3h.01" }],
   ],
   motion: "pop",
 };

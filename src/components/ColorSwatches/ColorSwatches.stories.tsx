@@ -32,7 +32,7 @@ function Picker(props: Partial<ColorSwatchesProps> & { start?: string }) {
 }
 
 const meta = {
-  title: "Components/ColorSwatches",
+  title: "Components/Controls/ColorSwatches",
   component: ColorSwatches,
   args: { label: "Brand colours", swatches: BRAND, onChange: fn() },
   render: (args) => <Picker onChange={args.onChange} />,

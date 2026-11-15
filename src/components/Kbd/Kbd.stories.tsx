@@ -4,7 +4,7 @@ import { computeUnderHostileHost } from "../../test/hostile.js";
 import { Kbd } from "./Kbd.js";
 
 const meta = {
-  title: "Components/Kbd",
+  title: "Components/Feedback and display/Kbd",
   component: Kbd,
   args: { keys: ["Ctrl", "K"], size: "md" },
   argTypes: { size: { control: "inline-radio", options: ["sm", "md", "lg"] }, keys: { control: "object" } },

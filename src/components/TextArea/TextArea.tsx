@@ -26,6 +26,7 @@ import { Field, type FieldLayoutProps } from "../Field/Field.js";
 import { OptionList, OptionListItem, OptionListNote } from "../OptionList/OptionList.js";
 
 export interface TextAreaTokens {
+  readonlyBg: string;
   radius: string;
   paddingInline: string;
   paddingBlock: string;

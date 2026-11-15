@@ -5,7 +5,7 @@ import { computeUnderHostileHost } from "../../test/hostile.js";
 import { SearchField, type SearchFieldProps } from "./SearchField.js";
 
 const meta = {
-  title: "Components/SearchField",
+  title: "Components/Controls/SearchField",
   component: SearchField,
   args: { label: "Search documents", onSubmit: fn(), onChange: fn(), size: "md" },
   argTypes: {

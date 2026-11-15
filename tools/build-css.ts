@@ -6,6 +6,7 @@
  */
 import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { basename, join } from "node:path";
+import { pathToFileURL } from "node:url";
 import { transform } from "lightningcss";
 import { createTheme, themeToCss } from "../src/tokens";
 import { styleManifest } from "./style-manifest";
@@ -65,4 +66,4 @@ export function buildCss(root = "src", out = "dist"): string {
   return all;
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) buildCss();
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) buildCss();

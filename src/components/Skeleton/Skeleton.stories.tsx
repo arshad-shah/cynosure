@@ -10,7 +10,7 @@ import { Stack } from "../Stack/Stack.js";
 import { Skeleton } from "./Skeleton.js";
 
 const meta = {
-  title: "Components/Skeleton",
+  title: "Components/Feedback and display/Skeleton",
   component: Skeleton,
   args: { shape: "text", lines: 3, size: "md" },
   argTypes: {

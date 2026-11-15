@@ -14,7 +14,7 @@ const shot = (width: number, height: number) =>
   )}`;
 
 const meta = {
-  title: "Components/DeviceFrame",
+  title: "Components/Feedback and display/DeviceFrame",
   component: DeviceFrame,
   args: { device: "phone", orientation: "portrait" },
   argTypes: {

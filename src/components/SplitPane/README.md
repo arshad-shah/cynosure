@@ -43,8 +43,8 @@ import { SplitPane } from "@arshad-shah/cynosure";
 | `collapsible`                                          | see notes          | Enter collapses the anchored pane and restores it; on when `collapsed` or `defaultCollapsed` is given |
 | `collapsed` / `defaultCollapsed` / `onCollapsedChange` | – / `false` / –    | Collapse the anchored pane from a menu or button; the size is remembered                              |
 - The divider is a focusable `role="separator"` with `aria-valuenow` (the anchored pane's size, 0 when collapsed), `aria-valuemin`, `aria-valuemax` and `aria-controls` (the anchored pane).
-- Arrow keys move the divider (Left and Right side by side, flipped in right-to-left text; Up and Down stacked), so with `anchor="end"` Left grows a right sidebar and Up grows a bottom dock. Home and End go to the limits. Enter collapses and restores.
-- Collapsed, a key that grows the pane opens it at `min`; dragging the divider opens it where the pointer is. Escape during a drag puts back the size, and the collapse, it started from.
+- Arrow keys move the divider (Left and Right side by side, flipped in right-to-left text; Up and Down stacked), so with `anchor="end"` Left grows a right sidebar and Up grows a bottom dock. Shift+Arrow moves it 10 times `step`, and Page Up and Page Down grow and shrink the anchored pane by 10 times `step`. Home and End go to the limits. Enter collapses and restores.
+- Collapsed, a key that grows the pane opens it as if from 0: an arrow at `min`, Shift+Arrow and Page Up at 10 times `step` (at least `min`), End at `max`; dragging the divider opens it where the pointer is. Escape during a drag puts back the size, and the collapse, it started from.
 - Its hit area is at least 24px wide, 44px on touch screens, while the line stays thin.
 - The SplitPane fills its container; give the container a height.
 

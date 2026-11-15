@@ -32,7 +32,7 @@ function Files(props: Partial<VirtualListProps<Entry>>) {
 }
 
 const meta = {
-  title: "Components/VirtualList",
+  title: "Components/Structure/VirtualList",
   component: VirtualList,
   args: {
     ...base,

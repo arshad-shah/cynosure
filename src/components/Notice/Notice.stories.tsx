@@ -11,7 +11,7 @@ import { Notice } from "./Notice.js";
 const TONES: Tone[] = ["info", "success", "warning", "danger", "neutral", "accent"];
 
 const meta = {
-  title: "Components/Notice",
+  title: "Components/Feedback and display/Notice",
   component: Notice,
   args: {
     tone: "info",
