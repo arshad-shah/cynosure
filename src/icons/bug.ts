@@ -8,7 +8,7 @@ export const bug: IconData = {
     [
       "path",
       {
-        d: "M12 11v9.5M7.5 12H4M20 12h-3.5M7.5 16.5h-3M19.5 16.5h-3M9 7.5L7.5 4.5M15 7.5l1.5-3",
+        d: "M12 11v9.5M7.5 12H4m16 0h-3.5m-9 4.5h-3m15 0h-3M9 7.5l-1.5-3m7.5 3 1.5-3",
         animate: true,
       },
     ],

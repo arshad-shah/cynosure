@@ -74,13 +74,6 @@
   transition:
     border-color var(--cy-motion-fast) var(--cy-motion-ease),
     background-color var(--cy-motion-fast) var(--cy-motion-ease);
-  & .cy-choice-text {
-    padding-block: 0;
-  }
-  & .cy-choice-label {
-    font-size: var(--cy-font-size-sm);
-    overflow-wrap: anywhere;
-  }
   &:hover:not([data-disabled]) {
     border-color: color-mix(in oklab, var(--cy-color-ink) 35%, var(--cy-color-line));
   }
@@ -93,6 +86,15 @@
     outline: var(--cy-border-focus) solid var(--cy-color-ring);
     outline-offset: var(--cy-border-focus);
   }
+}
+/* A card's text: no row padding, a smaller label that wraps (one class less than the card itself, so the strike rules
+   below stay in ascending order). */
+.cy-choice[data-variant="card"] .cy-choice-text {
+  padding-block: 0;
+}
+.cy-choice[data-variant="card"] .cy-choice-label {
+  font-size: var(--cy-font-size-sm);
+  overflow-wrap: anywhere;
 }
 /* strikeWhenChecked: a ticked row reads as done. A mixed control is not done. The control's input is a direct child of
    the control's element, so an input inside the label or description never counts. */

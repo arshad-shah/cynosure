@@ -5,7 +5,7 @@ export const swap: IconData = {
   category: "arrows",
   body: [
     ["path", { d: "M4 8h15M15.5 4.5L19 8l-3.5 3.5", animate: true }],
-    ["path", { d: "M20 16H5M8.5 12.5L5 16l3.5 3.5" }],
+    ["path", { d: "M20 16H5m3.5-3.5L5 16l3.5 3.5" }],
   ],
   motion: "slide",
 };

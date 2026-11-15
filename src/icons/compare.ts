@@ -5,7 +5,7 @@ export const compare: IconData = {
   category: "data",
   body: [
     ["path", { d: "M8 4v12M5 13l3 3 3-3", animate: true }],
-    ["path", { d: "M16 20V8M13 11l3-3 3 3" }],
+    ["path", { d: "M16 20V8m-3 3 3-3 3 3" }],
   ],
   motion: "slide",
 };

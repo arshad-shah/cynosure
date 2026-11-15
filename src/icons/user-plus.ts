@@ -6,7 +6,7 @@ export const userPlus: IconData = {
   body: [
     ["circle", { cx: 10, cy: 8, r: 4 }],
     ["path", { d: "M3 20.5a7 7 0 0 1 14 0" }],
-    ["path", { d: "M19 8v6M16 11h6", animate: true }],
+    ["path", { d: "M19 8v6m-3-3h6", animate: true }],
   ],
   motion: "pop",
 };

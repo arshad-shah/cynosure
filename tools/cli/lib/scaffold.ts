@@ -4,6 +4,7 @@ import { join } from "node:path";
 import type { IconCategory, IconData, IconNode } from "../../../src/icons/types";
 import { validateIcon } from "../../../src/icons/validate";
 import { COMPONENT_GROUPS, type ComponentGroup } from "../../component-groups";
+import { optimizeIcon } from "../../icon-optimize";
 
 /** `IconButton` → `icon-button`, `QRCode` → `qr-code` (the same names `cy check` expects). */
 const kebab = (s: string) =>
@@ -365,7 +366,8 @@ const literal = (v: unknown): string =>
 
 /** `cy new icon <name> --from file.svg` */
 export function scaffoldIcon(root: string, name: string, svg: string, category: IconCategory): string {
-  const icon = svgToIcon(name, svg, category);
+  // Stored as small as it draws identically (svgo's path pass; tools/icon-optimize.ts).
+  const icon = optimizeIcon(svgToIcon(name, svg, category));
   const errors = validateIcon(icon);
   if (errors.length) throw new Error(`Icon "${name}" is not a valid Facet icon:\n- ${errors.join("\n- ")}`);
   const file = join(root, "src/icons", `${name}.ts`);

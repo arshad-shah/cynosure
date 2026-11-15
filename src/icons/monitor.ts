@@ -5,7 +5,7 @@ export const monitor: IconData = {
   category: "devices",
   body: [
     ["rect", { x: 3, y: 4, width: 18, height: 12.5, rx: 2.5, animate: true }],
-    ["path", { d: "M8.5 20.5h7M12 16.5v4" }],
+    ["path", { d: "M8.5 20.5h7m-3.5-4v4" }],
   ],
   motion: "lift",
 };

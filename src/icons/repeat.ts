@@ -7,7 +7,7 @@ export const repeat: IconData = {
     [
       "path",
       {
-        d: "M17 3.5l3 3-3 3M4 11.5v-1a4 4 0 0 1 4-4h12M7 20.5l-3-3 3-3M20 12.5v1a4 4 0 0 1-4 4H4",
+        d: "m17 3.5 3 3-3 3m-13 2v-1a4 4 0 0 1 4-4h12m-13 14-3-3 3-3m13-2v1a4 4 0 0 1-4 4H4",
         animate: true,
       },
     ],

@@ -5,6 +5,6 @@ export const radar: IconData = {
   category: "data",
   body: [
     ["circle", { cx: 12, cy: 12, r: 8.5 }],
-    ["path", { d: "M12 12l5.5-5.5M12 7.5a4.5 4.5 0 1 0 4.5 4.5M15.5 15h.01" }],
+    ["path", { d: "m12 12 5.5-5.5m-5.5 1a4.5 4.5 0 1 0 4.5 4.5m-1 3h.01" }],
   ],
 };
