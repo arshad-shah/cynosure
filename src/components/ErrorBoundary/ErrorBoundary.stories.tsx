@@ -34,7 +34,7 @@ function Breakable(props: {
 }
 
 const meta = {
-  title: "Components/ErrorBoundary",
+  title: "Components/Feedback and display/ErrorBoundary",
   component: ErrorBoundary,
   args: { label: "Query results" },
   argTypes: {

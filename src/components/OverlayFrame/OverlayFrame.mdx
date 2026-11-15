@@ -13,7 +13,7 @@ A frame whose content fills it, with an overlay pinned at the bottom centre that
 
 ScrollArea and VirtualList already hold their scroller in an OverlayFrame and take an `overlay` prop: use those. Reach for OverlayFrame directly only to put the same overlay over a scroller of your own (a canvas, a code view).
 
-Use something else when the content should move aside for the control (put it below the content in a [Stack](?path=/docs/components-stack--docs)), or when it floats next to a selection ([FloatingToolbar](?path=/docs/components-floatingtoolbar--docs)).
+Use something else when the content should move aside for the control (put it below the content in a [Stack](?path=/docs/components-structure-stack--docs)), or when it floats next to a selection ([FloatingToolbar](?path=/docs/components-overlays-floatingtoolbar--docs)).
 
 ## Usage
 
@@ -42,4 +42,4 @@ Tokens: `--cy-overlay-frame-offset` (space between the bottom edge and the overl
 
 ## Related
 
-[ScrollArea](?path=/docs/components-scrollarea--docs) and [VirtualList](?path=/docs/components-virtuallist--docs) render it for their `overlay`.
+[ScrollArea](?path=/docs/components-structure-scrollarea--docs) and [VirtualList](?path=/docs/components-structure-virtuallist--docs) render it for their `overlay`.

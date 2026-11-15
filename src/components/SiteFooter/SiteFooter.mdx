@@ -15,7 +15,7 @@ The bottom of a website: the brand and a tagline, columns of links under heading
 
 **Use something else when:**
 - you need the bottom of a dialog or a card: their own `actions`
-- the page is an app inside [AppShell](?path=/docs/components-appshell--docs), which usually has no footer
+- the page is an app inside [AppShell](?path=/docs/components-structure-appshell--docs), which usually has no footer
 
 ## Usage
 
@@ -49,8 +49,8 @@ Columns wrap onto more rows, and the legal text and social links stack.
 | <kbd>Tab</kbd> | Every column link in order, then the legal links and the social links |
 
 - **Landmarks:** the `footer` is the contentinfo landmark at the top level of the page. All columns sit in one `nav` named "Footer" (`labels.nav`).
-- **Headings:** each column title is a [Heading](?path=/docs/components-heading--docs) at `headingLevel` (default 2) and names the column's list.
-- **Links:** neutral [Link](?path=/docs/components-link--docs)s; `external` adds a new-tab icon and "(opens in new tab)" for screen readers.
+- **Headings:** each column title is a [Heading](?path=/docs/components-feedback-and-display-heading--docs) at `headingLevel` (default 2) and names the column's list.
+- **Links:** neutral [Link](?path=/docs/components-controls-link--docs)s; `external` adds a new-tab icon and "(opens in new tab)" for screen readers.
 - **Naming:** `aria-label` and `id` are set on the `footer`, for a page with more than one.
 
 ## Touch
@@ -72,4 +72,4 @@ createTheme({ components: { siteFooter: { background: "transparent", columnMinWi
 
 ## Related
 
-[SiteHeader](?path=/docs/components-siteheader--docs) · [Section](?path=/docs/components-section--docs) · [Container](?path=/docs/components-container--docs) · [Link](?path=/docs/components-link--docs) · [IconButton](?path=/docs/components-iconbutton--docs)
+[SiteHeader](?path=/docs/components-structure-siteheader--docs) · [Section](?path=/docs/components-structure-section--docs) · [Container](?path=/docs/components-structure-container--docs) · [Link](?path=/docs/components-controls-link--docs) · [IconButton](?path=/docs/components-controls-iconbutton--docs)

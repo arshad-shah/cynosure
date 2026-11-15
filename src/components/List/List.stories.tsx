@@ -25,7 +25,7 @@ const FEATURES: ListItem[] = [
 ];
 
 const meta = {
-  title: "Components/List",
+  title: "Components/Feedback and display/List",
   component: List,
   args: { items: FRUIT, marker: "disc", gap: "md", size: "md", divided: false },
   argTypes: {

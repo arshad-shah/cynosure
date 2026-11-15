@@ -15,10 +15,10 @@ A small floating panel attached to a button, for options and details that belong
 - **Extra detail** about one item, with links or buttons in it.
 
 **Use something else when:**
-- it is a short text hint with no controls: [Tooltip](?path=/docs/components-tooltip--docs)
-- it is a list of commands: [Menu](?path=/docs/components-menu--docs)
-- the person must finish or cancel before continuing: [Dialog](?path=/docs/components-dialog--docs)
-- the content is long or is a whole task: a page or a [Sheet](?path=/docs/components-sheet--docs)
+- it is a short text hint with no controls: [Tooltip](?path=/docs/components-overlays-tooltip--docs)
+- it is a list of commands: [Menu](?path=/docs/components-overlays-menu--docs)
+- the person must finish or cancel before continuing: [Dialog](?path=/docs/components-overlays-dialog--docs)
+- the content is long or is a whole task: a page or a [Sheet](?path=/docs/components-overlays-sheet--docs)
 
 ## Usage
 
@@ -33,11 +33,11 @@ import { Button, Checkbox, Popover, Stack } from "@arshad-shah/cynosure";
 </Popover>
 ```
 
-`trigger` is a render prop: spread the props it receives onto your [Button](?path=/docs/components-button--docs) or [IconButton](?path=/docs/components-iconbutton--docs). They carry the ref, the click handler and the ARIA wiring (`aria-expanded`, `aria-controls`, `aria-haspopup`).
+`trigger` is a render prop: spread the props it receives onto your [Button](?path=/docs/components-controls-button--docs) or [IconButton](?path=/docs/components-controls-iconbutton--docs). They carry the ref, the click handler and the ARIA wiring (`aria-expanded`, `aria-controls`, `aria-haspopup`).
 
 ## Layers
 
-Popovers nest, and Escape closes one layer at a time: an inner popover first, then the outer one. A [Tooltip](?path=/docs/components-tooltip--docs) shown inside a popover also closes before the popover does.
+Popovers nest, and Escape closes one layer at a time: an inner popover first, then the outer one. A [Tooltip](?path=/docs/components-overlays-tooltip--docs) shown inside a popover also closes before the popover does.
 
 <Canvas of={Stories.NestedCloseOneAtATime} />
 
@@ -81,4 +81,4 @@ createTheme({ components: { popover: { radius: "10px", widthMd: "360px" } } });
 
 ## Related
 
-[Tooltip](?path=/docs/components-tooltip--docs) · [Button](?path=/docs/components-button--docs) · [Toolbar](?path=/docs/components-toolbar--docs)
+[Tooltip](?path=/docs/components-overlays-tooltip--docs) · [Button](?path=/docs/components-controls-button--docs) · [Toolbar](?path=/docs/components-structure-toolbar--docs)

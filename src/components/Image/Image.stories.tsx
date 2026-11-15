@@ -36,7 +36,7 @@ const failed = (el: ParentNode, selector?: string) =>
 const HILL = picture(640, 360);
 
 const meta = {
-  title: "Components/Image",
+  title: "Components/Feedback and display/Image",
   component: Image,
   args: {
     src: HILL,

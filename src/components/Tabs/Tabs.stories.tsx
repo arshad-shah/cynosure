@@ -12,7 +12,7 @@ import { Tab, TabList, TabPanel, Tabs } from "./Tabs.js";
 
 const meta = {
   tags: ["serial"],
-  title: "Components/Tabs",
+  title: "Components/Structure/Tabs",
   component: Tabs,
   args: { defaultValue: "tree", activation: "auto", size: "md", variant: "line", onChange: fn() },
   argTypes: {

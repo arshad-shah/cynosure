@@ -62,7 +62,7 @@ function Article() {
 }
 
 const meta = {
-  title: "Components/Prose",
+  title: "Components/Feedback and display/Prose",
   component: Prose,
   args: { size: "md", as: "article" },
   argTypes: {

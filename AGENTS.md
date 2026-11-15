@@ -8,19 +8,19 @@ Read before working: `docs/PROGRESS.md` (where we are), `docs/architecture.md`, 
 
 Node 24 (`.nvmrc`), pnpm via `packageManager` (installs refuse versions younger than 14 days).
 
-| Command                                                     | What it does                                                                       |
-| ----------------------------------------------------------- | ---------------------------------------------------------------------------------- |
-| `pnpm install`                                              | Install; also sets the worktree's git hooks (`.githooks`)                          |
-| `pnpm storybook`                                            | Workbench at http://localhost:6006 (theme, scale, accent and hostile-host toolbar) |
-| `pnpm test`                                                 | Unit tests (tokens, CLI, Preact compat)                                            |
-| `pnpm test:stories`                                         | Every story as a browser test on Chromium, Firefox, WebKit, plus the touch project |
-| `pnpm check`                                                | `cy check`: every convention rule (must be clean)                                  |
-| `pnpm lint` / `pnpm typecheck` / `pnpm build` / `pnpm size` | Gates                                                                              |
-| `pnpm verify`                                               | All gates in order. Run before pushing.                                            |
-| `pnpm cy new component <Name> --kind composite\|foundation` | Scaffold a component (never hand-create one)                                       |
-| `pnpm cy new icon <name> --from file.svg`                   | Add a Facet icon                                                                   |
-| `pnpm cy new token <component.token> --doc "…"`             | Add a component token                                                              |
-| `pnpm cy progress`                                          | Print the current task and next step                                               |
+| Command                                                                            | What it does                                                                       |
+| ---------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| `pnpm install`                                                                     | Install; also sets the worktree's git hooks (`.githooks`)                          |
+| `pnpm storybook`                                                                   | Workbench at http://localhost:6006 (theme, scale, accent and hostile-host toolbar) |
+| `pnpm test`                                                                        | Unit tests (tokens, CLI, Preact compat)                                            |
+| `pnpm test:stories`                                                                | Every story as a browser test on Chromium, Firefox, WebKit, plus the touch project |
+| `pnpm check`                                                                       | `cy check`: every convention rule (must be clean)                                  |
+| `pnpm lint` / `pnpm typecheck` / `pnpm build` / `pnpm size`                        | Gates                                                                              |
+| `pnpm verify`                                                                      | All gates in order. Run before pushing.                                            |
+| `pnpm cy new component <Name> --kind composite\|foundation --group <README group>` | Scaffold a component (never hand-create one); a composite needs `--group`          |
+| `pnpm cy new icon <name> --from file.svg`                                          | Add a Facet icon                                                                   |
+| `pnpm cy new token <component.token> --doc "…"`                                    | Add a component token                                                              |
+| `pnpm cy progress`                                                                 | Print the current task and next step                                               |
 
 ## Non-negotiable rules
 

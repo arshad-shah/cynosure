@@ -12,7 +12,7 @@ import { ProgressBar } from "./ProgressBar.js";
 const TONES = ["accent", "success", "warning", "danger", "info", "neutral"] as const;
 
 const meta = {
-  title: "Components/ProgressBar",
+  title: "Components/Feedback and display/ProgressBar",
   component: ProgressBar,
   args: { label: "Uploading 3 files", value: 40, max: 100, size: "md", tone: "accent", showValue: true },
   argTypes: {

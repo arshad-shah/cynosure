@@ -8,7 +8,7 @@ import { Button } from "../Button/Button.js";
 import { SegmentedControl } from "./SegmentedControl.js";
 
 const meta = {
-  title: "Components/SegmentedControl",
+  title: "Components/Controls/SegmentedControl",
   component: SegmentedControl,
   args: {
     label: "View",

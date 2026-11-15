@@ -8,7 +8,7 @@ import { Popover } from "../Popover/Popover.js";
 import { Calendar, type CalendarDayMark, type CalendarDayState } from "./Calendar.js";
 
 const meta = {
-  title: "Components/Calendar",
+  title: "Components/Structure/Calendar",
   component: Calendar,
   args: { today: "2026-11-10", weekStartsOn: 1, locale: "en-GB", onChange: fn(), onMonthChange: fn() },
   argTypes: { size: { control: "inline-radio", options: ["sm", "md", "lg"] } },

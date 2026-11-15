@@ -4,7 +4,7 @@ import { computeUnderHostileHost } from "../../test/hostile.js";
 import { CopyButton } from "./CopyButton.js";
 
 const meta = {
-  title: "Components/CopyButton",
+  title: "Components/Controls/CopyButton",
   component: CopyButton,
   args: {
     value: "npm i @arshad-shah/cynosure",

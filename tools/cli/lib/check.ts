@@ -2,6 +2,7 @@
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { join, relative, sep } from "node:path";
 import ts from "typescript";
+import { COMPONENT_GROUPS, componentGroups } from "../../component-groups";
 
 export interface Violation {
   rule: string;
@@ -255,8 +256,38 @@ function structureRules(root: string, out: Violation[]) {
           line: 1,
           message: `needs a hand-written ${name}.mdx docs page with <Meta of={Stories} /> (what it is, when to use it, examples, props, accessibility, tokens)`,
         });
+      if (group === "src/components" && story) storyGroupRule(root, name, join(folder, story), out);
     }
   }
+}
+
+/**
+ * A component sits in one README group (`- **Controls:** …`), and its stories sit in the same group in Storybook's
+ * sidebar: `title: "Components/<group>/<Name>"`. One list keeps the sidebar and the documentation site in step.
+ */
+function storyGroupRule(root: string, name: string, story: string, out: Violation[]) {
+  const readme = join(root, "README.md");
+  const group = existsSync(readme) ? componentGroups(readFileSync(readme, "utf8")).get(name) : undefined;
+  const file = posixRelative(root, story);
+  if (!group) {
+    out.push({
+      rule: "story-group",
+      file,
+      line: 1,
+      message: `${name} is in no component group: list it under one of ${COMPONENT_GROUPS.join(", ")} in the README's "## Components"`,
+    });
+    return;
+  }
+  const text = readFileSync(story, "utf8");
+  const match = /title:\s*"(Components\/[^"]*)"/.exec(text);
+  const want = `Components/${group}/${name}`;
+  if (match?.[1] !== want)
+    out.push({
+      rule: "story-group",
+      file,
+      line: match ? lineOf(text, match.index) : 1,
+      message: `story title must be "${want}" (the README lists ${name} under ${group})`,
+    });
 }
 
 /** Folders that must carry an AGENTS.md with their local rules and recipes. */

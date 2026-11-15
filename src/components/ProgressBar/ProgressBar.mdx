@@ -16,7 +16,7 @@ Shows how far a task has got: an upload, an export, the steps of a setup. When t
 
 **Use something else when:**
 - the wait is short and inside a button: the Button's `loading` state
-- a small inline busy indicator is enough: [LoadingDots](?path=/docs/components-loadingdots--docs)
+- a small inline busy indicator is enough: [LoadingDots](?path=/docs/components-feedback-and-display-loadingdots--docs)
 - the person sets the value: a Slider
 
 ## Usage
@@ -59,7 +59,7 @@ With `labelHidden` and no `showValue`, the bar is only its track: no label row, 
 ## Behaviour and accessibility
 
 - **Role:** `role="progressbar"`, named by `label`, with `aria-valuemin`, `aria-valuemax`, `aria-valuenow` and `aria-valuetext`. Indeterminate bars have no current value and are `aria-busy`.
-- **Announcements:** a progress bar is not a live region. To announce completion, say so in the page (a [Notice](?path=/docs/components-notice--docs) or a [Toast](?path=/docs/components-toast--docs)).
+- **Announcements:** a progress bar is not a live region. To announce completion, say so in the page (a [Notice](?path=/docs/components-feedback-and-display-notice--docs) or a [Toast](?path=/docs/components-overlays-toast--docs)).
 - **Contrast:** the fill keeps at least 3:1 against its track in every tone, in light and dark modes.
 - **Direction:** fills from the inline start, so from the right in right-to-left text.
 - **Motion:** the fill eases between values; the indeterminate segment sweeps, and stands still in the middle under reduced motion.
@@ -78,4 +78,4 @@ createTheme({ components: { progressBar: { heightMd: "6px", radius: "2px" } } })
 
 ## Related
 
-[LoadingDots](?path=/docs/components-loadingdots--docs) · [Toast](?path=/docs/components-toast--docs) · [Notice](?path=/docs/components-notice--docs)
+[LoadingDots](?path=/docs/components-feedback-and-display-loadingdots--docs) · [Toast](?path=/docs/components-overlays-toast--docs) · [Notice](?path=/docs/components-feedback-and-display-notice--docs)

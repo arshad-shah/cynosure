@@ -45,7 +45,7 @@ const end = (
 );
 
 const meta = {
-  title: "Components/StatusBar",
+  title: "Components/Structure/StatusBar",
   component: StatusBar,
   args: { label: "Status", start, end },
   argTypes: {

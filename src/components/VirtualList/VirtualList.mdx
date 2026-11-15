@@ -14,10 +14,10 @@ A list of thousands of rows that stays fast: only the rows in view are rendered.
 - **Long lists** of files, log lines, search results or history, where people pick one or several rows or open one.
 
 **Use something else when:**
-- the list is short (under a few hundred rows): [Select](?path=/docs/components-select--docs), [RadioGroup](?path=/docs/components-radiogroup--docs) or a plain list
-- rows nest: [Tree](?path=/docs/components-tree--docs) (which windows the same way with `virtual`)
-- rows have columns: [Table](?path=/docs/components-table--docs)
-- people reorder rows: [SortableList](?path=/docs/components-sortablelist--docs)
+- the list is short (under a few hundred rows): [Select](?path=/docs/components-controls-select--docs), [RadioGroup](?path=/docs/components-controls-radiogroup--docs) or a plain list
+- rows nest: [Tree](?path=/docs/components-structure-tree--docs) (which windows the same way with `virtual`)
+- rows have columns: [Table](?path=/docs/components-feedback-and-display-table--docs)
+- people reorder rows: [SortableList](?path=/docs/components-structure-sortablelist--docs)
 
 ## Usage
 
@@ -116,8 +116,8 @@ const log = useRef<VirtualListHandle>(null);
 
 ## Theming
 
-Tokens: `--cy-virtual-list-height`, `--cy-virtual-list-row-height`, `--cy-virtual-list-selected-background`. The overlay is placed by [OverlayFrame](?path=/docs/components-overlayframe--docs) (`--cy-overlay-frame-offset`, `--cy-overlay-frame-layer`).
+Tokens: `--cy-virtual-list-height`, `--cy-virtual-list-row-height`, `--cy-virtual-list-selected-background`. The overlay is placed by [OverlayFrame](?path=/docs/components-structure-overlayframe--docs) (`--cy-overlay-frame-offset`, `--cy-overlay-frame-layer`).
 
 ## Related
 
-[ScrollArea](?path=/docs/components-scrollarea--docs) · [Tree](?path=/docs/components-tree--docs) · [Table](?path=/docs/components-table--docs) · [SortableList](?path=/docs/components-sortablelist--docs)
+[ScrollArea](?path=/docs/components-structure-scrollarea--docs) · [Tree](?path=/docs/components-structure-tree--docs) · [Table](?path=/docs/components-feedback-and-display-table--docs) · [SortableList](?path=/docs/components-structure-sortablelist--docs)

@@ -2,6 +2,7 @@
 import { readFileSync } from "node:fs";
 import { createCLI, defineCommand, dim, log, red } from "@arshad-shah/clif";
 import { ICON_CATEGORIES, type IconCategory } from "../../src/icons/types";
+import { COMPONENT_GROUPS, type ComponentGroup } from "../component-groups";
 import { check } from "./lib/check";
 import { readProgress } from "./lib/progress";
 import { addComponentToken, scaffoldComponent, scaffoldIcon } from "./lib/scaffold";
@@ -19,12 +20,18 @@ const component = defineCommand({
       default: "composite",
       description: "foundation may render native elements",
     },
+    group: {
+      type: "string",
+      choices: [...COMPONENT_GROUPS],
+      description: "README group of a composite; its Storybook folder (Components/<group>/<Name>)",
+    },
   },
   handler: ({ args }) => {
     for (const file of scaffoldComponent(
       root,
       String(args.values.name),
       args.flags.kind as "foundation" | "composite",
+      args.flags.group as ComponentGroup | undefined,
     ))
       log.success(file.replace(`${root}/`, ""));
     log.info("Replace every TODO(cy), then run pnpm check && pnpm test:stories.");

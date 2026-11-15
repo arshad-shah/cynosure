@@ -21,7 +21,7 @@ function SaveButtons() {
 }
 
 const meta = {
-  title: "Components/Announcer",
+  title: "Components/Feedback and display/Announcer",
   component: Announcer,
   args: { clearAfter: 5000 },
   render: (args) => (

@@ -28,7 +28,7 @@ const actions = (name: string) => (
 
 const meta = {
   tags: ["serial"],
-  title: "Components/ListRow",
+  title: "Components/Structure/ListRow",
   component: ListRow,
   args: {
     label: "Query failed on orders",

@@ -5,7 +5,7 @@ import * as Stories from "./ChatMessage.stories";
 
 # ChatMessage
 
-One message in an assistant chat: the person's at the end, filled with the accent; the assistant's at the start, after its avatar. It holds any content (render markdown into [Prose](?path=/docs/components-prose--docs) yourself), shows a caret while text streams in, and offers actions such as copy and retry.
+One message in an assistant chat: the person's at the end, filled with the accent; the assistant's at the start, after its avatar. It holds any content (render markdown into [Prose](?path=/docs/components-feedback-and-display-prose--docs) yourself), shows a caret while text streams in, and offers actions such as copy and retry.
 
 <Canvas of={Stories.Default} />
 
@@ -13,7 +13,7 @@ One message in an assistant chat: the person's at the end, filled with the accen
 
 - **Assistant chats:** a conversation between a person and an assistant, in a side panel or a page.
 
-**Use something else when:** the message is a system notice in the thread (rate limits, a lost connection): use a [Notice](?path=/docs/components-notice--docs); or it is a comment thread between people with names and times: build it from [Avatar](?path=/docs/components-avatar--docs) and [Text](?path=/docs/components-text--docs).
+**Use something else when:** the message is a system notice in the thread (rate limits, a lost connection): use a [Notice](?path=/docs/components-feedback-and-display-notice--docs); or it is a comment thread between people with names and times: build it from [Avatar](?path=/docs/components-feedback-and-display-avatar--docs) and [Text](?path=/docs/components-feedback-and-display-text--docs).
 
 ## Usage
 
@@ -58,9 +58,9 @@ While `streaming`, a caret follows the content and the message is `aria-busy`, s
 
 ## The thread
 
-A thread is a [ScrollArea](?path=/docs/components-scrollarea--docs) with `follow`: it keeps to the end while replies stream in, lets go when the person scrolls up to read, and follows again when they return to the end. `onAtBottomChange` tells you when to offer a way back (`handle.scrollToEnd()`, here in the ScrollArea's `overlay`).
+A thread is a [ScrollArea](?path=/docs/components-structure-scrollarea--docs) with `follow`: it keeps to the end while replies stream in, lets go when the person scrolls up to read, and follows again when they return to the end. `onAtBottomChange` tells you when to offer a way back (`handle.scrollToEnd()`, here in the ScrollArea's `overlay`).
 
-Do not make the thread a live region: it would read every streamed fragment. When an assistant reply finishes, announce it once through `useAnnounce` (inside an [Announcer](?path=/docs/components-announcer--docs)).
+Do not make the thread a live region: it would read every streamed fragment. When an assistant reply finishes, announce it once through `useAnnounce` (inside an [Announcer](?path=/docs/components-feedback-and-display-announcer--docs)).
 
 ```tsx
 const announce = useAnnounce();
@@ -124,4 +124,4 @@ Screens without hover show the actions all the time, and IconButtons keep a 44px
 
 ## Related
 
-[Prose](?path=/docs/components-prose--docs) · [ScrollArea](?path=/docs/components-scrollarea--docs) · [Announcer](?path=/docs/components-announcer--docs) · [Avatar](?path=/docs/components-avatar--docs) · [CopyButton](?path=/docs/components-copybutton--docs)
+[Prose](?path=/docs/components-feedback-and-display-prose--docs) · [ScrollArea](?path=/docs/components-structure-scrollarea--docs) · [Announcer](?path=/docs/components-feedback-and-display-announcer--docs) · [Avatar](?path=/docs/components-feedback-and-display-avatar--docs) · [CopyButton](?path=/docs/components-controls-copybutton--docs)

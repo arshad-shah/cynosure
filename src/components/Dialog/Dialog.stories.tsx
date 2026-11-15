@@ -44,7 +44,7 @@ const form = (
 );
 
 const meta = {
-  title: "Components/Dialog",
+  title: "Components/Overlays/Dialog",
   component: Dialog,
   args: {
     title: "Edit profile",

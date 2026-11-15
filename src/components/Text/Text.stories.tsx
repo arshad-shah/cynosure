@@ -15,7 +15,7 @@ const LONG =
   "The export keeps every layer, guide and comment, and writes one file per page into the folder you pick, so nothing is lost on the way.";
 
 const meta = {
-  title: "Components/Text",
+  title: "Components/Feedback and display/Text",
   component: Text,
   args: { children: "Last saved 2 minutes ago" },
   argTypes: {

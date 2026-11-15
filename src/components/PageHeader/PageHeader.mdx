@@ -5,7 +5,7 @@ import * as Stories from "./PageHeader.stories";
 
 # PageHeader
 
-The top of a page or a major section: where you are (breadcrumbs or an eyebrow), what this is (the title), one or two sentences about it (the lead), and the page's actions. For the heading of a smaller block inside a page, use [Heading](?path=/docs/components-heading--docs) on its own.
+The top of a page or a major section: where you are (breadcrumbs or an eyebrow), what this is (the title), one or two sentences about it (the lead), and the page's actions. For the heading of a smaller block inside a page, use [Heading](?path=/docs/components-feedback-and-display-heading--docs) on its own.
 
 <Canvas of={Stories.Default} />
 
@@ -17,9 +17,9 @@ The top of a page or a major section: where you are (breadcrumbs or an eyebrow),
 - **A landing page:** `size="lg"` with `align="center"`.
 
 **Use something else when:**
-- it is the title of a card, a panel or a small group: [Heading](?path=/docs/components-heading--docs), or [Card](?path=/docs/components-card--docs) for a card
-- the area has no content yet: [EmptyState](?path=/docs/components-emptystate--docs), which also has a title, a description and actions
-- it is a message about something that happened: [Notice](?path=/docs/components-notice--docs)
+- it is the title of a card, a panel or a small group: [Heading](?path=/docs/components-feedback-and-display-heading--docs), or [Card](?path=/docs/components-structure-card--docs) for a card
+- the area has no content yet: [EmptyState](?path=/docs/components-feedback-and-display-emptystate--docs), which also has a title, a description and actions
+- it is a message about something that happened: [Notice](?path=/docs/components-feedback-and-display-notice--docs)
 
 ## Usage
 
@@ -68,7 +68,7 @@ PageHeader has no keyboard behaviour of its own. <kbd>Tab</kbd> moves through wh
 - **One heading:** the title is the header's only heading, at `headingLevel`. The eyebrow and the description are paragraphs.
 - **Reading order:** breadcrumbs, eyebrow, title, description, meta, actions, children. The eyebrow is read before the title, as context for it.
 - **No landmark:** the root has no role. A `header` element inside `main` is not a banner landmark. If the header is outside `main`, `article` and `section`, use `as="div"`.
-- **Built from Heading and Text:** the title is a [Heading](?path=/docs/components-heading--docs), the eyebrow a [Text](?path=/docs/components-text--docs) with `variant="eyebrow"` and the description a Text with `variant="lead"`, so their tokens apply here too.
+- **Built from Heading and Text:** the title is a [Heading](?path=/docs/components-feedback-and-display-heading--docs), the eyebrow a [Text](?path=/docs/components-feedback-and-display-text--docs) with `variant="eyebrow"` and the description a Text with `variant="lead"`, so their tokens apply here too.
 - **Spacing:** no outer margin or padding, and parts that are not given render nothing. A header with only a title is exactly as tall as its heading.
 - **Width:** fills its parent. Nothing overflows at 320px: long words in the title break and the actions wrap.
 - **Line length:** the description is at most 65ch wide.
@@ -99,4 +99,4 @@ The title, eyebrow and lead are retuned through the `--cy-heading-*` and `--cy-t
 
 ## Related
 
-[Heading](?path=/docs/components-heading--docs) · [Text](?path=/docs/components-text--docs) · [Breadcrumbs](?path=/docs/components-breadcrumbs--docs) · [EmptyState](?path=/docs/components-emptystate--docs) · [Button](?path=/docs/components-button--docs)
+[Heading](?path=/docs/components-feedback-and-display-heading--docs) · [Text](?path=/docs/components-feedback-and-display-text--docs) · [Breadcrumbs](?path=/docs/components-structure-breadcrumbs--docs) · [EmptyState](?path=/docs/components-feedback-and-display-emptystate--docs) · [Button](?path=/docs/components-controls-button--docs)

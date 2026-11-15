@@ -30,7 +30,7 @@ const actions = (
 
 const meta = {
   tags: ["serial"],
-  title: "Components/ChatMessage",
+  title: "Components/Feedback and display/ChatMessage",
   component: ChatMessage,
   args: {
     role: "assistant",

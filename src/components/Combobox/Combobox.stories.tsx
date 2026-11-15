@@ -19,7 +19,7 @@ const fruits: ComboboxOption[] = [
 ];
 
 const meta = {
-  title: "Components/Combobox",
+  title: "Components/Controls/Combobox",
   component: Combobox,
   args: { label: "Fruit", options: fruits, placeholder: "Search fruit", onChange: fn(), onInputChange: fn() },
   argTypes: {

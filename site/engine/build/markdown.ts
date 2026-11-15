@@ -36,7 +36,7 @@ export interface LinkContext {
   hidden?: (repoPath: string) => boolean;
   /** This site's own address, e.g. `https://docs.example.com`: a link to it is a link within the site. */
   site?: string;
-  /** Where a Storybook address (`?path=/docs/components-button--docs`) leads on the site, when it has a page. */
+  /** Where a Storybook address (`?path=/docs/components-controls-button--docs`) leads on the site, when it has a page. */
   storybook?: (query: string) => string | null;
 }
 

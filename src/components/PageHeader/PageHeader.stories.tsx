@@ -25,7 +25,7 @@ const threeActions = (
   </>
 );
 const meta = {
-  title: "Components/PageHeader",
+  title: "Components/Structure/PageHeader",
   component: PageHeader,
   args: {
     title: "Atlas",

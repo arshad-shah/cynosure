@@ -25,7 +25,7 @@ const square = (input: ChoiceInput) => (
 );
 
 const meta = {
-  title: "Components/Choice",
+  title: "Components/Controls/Choice",
   component: Choice,
   args: { label: "Show hidden files", control: square, onChange: fn(), size: "md" },
   argTypes: {

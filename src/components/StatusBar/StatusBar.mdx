@@ -5,7 +5,7 @@ import * as Stories from "./StatusBar.stories";
 
 # StatusBar
 
-The bar along the bottom of a desktop app or editor: short status segments (connection, branch, cursor position, problems) in a `start` and an `end` cluster. Segments that do something are buttons, and one can open a [Popover](?path=/docs/components-popover--docs) above itself.
+The bar along the bottom of a desktop app or editor: short status segments (connection, branch, cursor position, problems) in a `start` and an `end` cluster. Segments that do something are buttons, and one can open a [Popover](?path=/docs/components-overlays-popover--docs) above itself.
 
 <Canvas of={Stories.StartAndEndClusters} />
 
@@ -15,10 +15,10 @@ The bar along the bottom of a desktop app or editor: short status segments (conn
 - **Short, glanceable state** with a few quick actions behind it (switch connection, show problems).
 
 **Use something else when:**
-- the row holds actions rather than state: a [Toolbar](?path=/docs/components-toolbar--docs)
-- the message needs reading or acting on now: a [Notice](?path=/docs/components-notice--docs) or a [Toast](?path=/docs/components-toast--docs)
-- the bar is the app's menu: a [Menubar](?path=/docs/components-menubar--docs)
-- it is a page footer with links: [SiteFooter](?path=/docs/components-sitefooter--docs)
+- the row holds actions rather than state: a [Toolbar](?path=/docs/components-structure-toolbar--docs)
+- the message needs reading or acting on now: a [Notice](?path=/docs/components-feedback-and-display-notice--docs) or a [Toast](?path=/docs/components-overlays-toast--docs)
+- the bar is the app's menu: a [Menubar](?path=/docs/components-overlays-menubar--docs)
+- it is a page footer with links: [SiteFooter](?path=/docs/components-structure-sitefooter--docs)
 
 ## Usage
 
@@ -61,13 +61,13 @@ import { gitBranch, warning } from "@arshad-shah/cynosure/icons";
 
 A segment is its text (`children`) with an `icon` or a status `dot` before it. `tone` colours a `plain` segment's text and icon, or fills a `soft` (tinted) or `solid` segment. `mono` sets the text in the monospace face, for positions, paths and versions.
 
-The dot is a [Badge](?path=/docs/components-badge--docs) status dot: `dot` is `true` for a steady one or `"live"` for a pulsing one, in `dotTone` (default: the segment's `tone`). When the text does not say the state (a database name beside a green dot), give `dotLabel`, and the dot becomes part of the segment's name ("Connected main-db"); without it the dot is decoration.
+The dot is a [Badge](?path=/docs/components-feedback-and-display-badge--docs) status dot: `dot` is `true` for a steady one or `"live"` for a pulsing one, in `dotTone` (default: the segment's `tone`). When the text does not say the state (a database name beside a green dot), give `dotLabel`, and the dot becomes part of the segment's name ("Connected main-db"); without it the dot is decoration.
 
 <Canvas of={Stories.DotTones} />
 
 ## Clickable segments and popovers
 
-With `onClick` a segment is a [Button](?path=/docs/components-button--docs) of size `xs`, flat and as tall as the bar. With `popover` it opens that content in a Popover above itself (`placement`, default `top`, flips when it does not fit), named by `popoverLabel`; `open`, `defaultOpen` and `onOpenChange` control it, so another control can open it too.
+With `onClick` a segment is a [Button](?path=/docs/components-controls-button--docs) of size `xs`, flat and as tall as the bar. With `popover` it opens that content in a Popover above itself (`placement`, default `top`, flips when it does not fit), named by `popoverLabel`; `open`, `defaultOpen` and `onOpenChange` control it, so another control can open it too.
 
 <Canvas of={Stories.PopoverOpensUpward} />
 
@@ -94,7 +94,7 @@ StatusBarSegment takes `children`, `tone`, `variant`, `icon`, `dot`, `dotTone`, 
 | <kbd>Escape</kbd> in a popover | Closes it and returns focus to the segment |
 | Click outside a popover | Closes it |
 
-- **Role:** `toolbar` named by `label`, with `aria-orientation="horizontal"`. Not `status`: a live region would read out every change in the bar (cursor positions, counters). Announce what matters with [Announcer](?path=/docs/components-announcer--docs).
+- **Role:** `toolbar` named by `label`, with `aria-orientation="horizontal"`. Not `status`: a live region would read out every change in the bar (cursor positions, counters). Announce what matters with [Announcer](?path=/docs/components-feedback-and-display-announcer--docs).
 - **Popover segments** have `aria-haspopup="dialog"`, `aria-expanded` and `aria-controls`; focus moves into the panel, and arrow keys inside it are the panel's.
 - **Long text** keeps its full text as the accessible name; the tooltip is not a `title` attribute.
 - **Right to left:** the start cluster sits on the right, and Left and Right swap.
@@ -114,4 +114,4 @@ createTheme({ components: { statusBar: { height: "22px", segmentMaxWidth: "24ch"
 
 ## Related
 
-[Toolbar](?path=/docs/components-toolbar--docs) · [Badge](?path=/docs/components-badge--docs) · [Popover](?path=/docs/components-popover--docs) · [Tooltip](?path=/docs/components-tooltip--docs) · [Menubar](?path=/docs/components-menubar--docs)
+[Toolbar](?path=/docs/components-structure-toolbar--docs) · [Badge](?path=/docs/components-feedback-and-display-badge--docs) · [Popover](?path=/docs/components-overlays-popover--docs) · [Tooltip](?path=/docs/components-overlays-tooltip--docs) · [Menubar](?path=/docs/components-overlays-menubar--docs)

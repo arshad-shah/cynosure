@@ -5,7 +5,7 @@ import * as Stories from "./SkipLink.stories";
 
 # SkipLink
 
-"Skip to content": the first stop of a page's Tab order. It is hidden until it has focus, then shown at the top-start corner of the window as an accent outline [Button](?path=/docs/components-button--docs). It is a real link, so it works without JavaScript; with it, focus also moves to the target.
+"Skip to content": the first stop of a page's Tab order. It is hidden until it has focus, then shown at the top-start corner of the window as an accent outline [Button](?path=/docs/components-controls-button--docs). It is a real link, so it works without JavaScript; with it, focus also moves to the target.
 
 <Canvas of={Stories.RevealsOnTabAndMovesFocus} />
 
@@ -16,9 +16,9 @@ Click into the example and press <kbd>Tab</kbd>: the link appears at the top-sta
 - **Every page with a header or navigation before its main content.** Put it first in the page, before the header.
 
 **Use something else when:**
-- you use [SiteHeader](?path=/docs/components-siteheader--docs) or [AppShell](?path=/docs/components-appshell--docs): both render a SkipLink already
-- the link should stay visible: [Link](?path=/docs/components-link--docs)
-- any other content should appear only on focus: [VisuallyHidden](?path=/docs/components-visuallyhidden--docs) with `focusable`
+- you use [SiteHeader](?path=/docs/components-structure-siteheader--docs) or [AppShell](?path=/docs/components-structure-appshell--docs): both render a SkipLink already
+- the link should stay visible: [Link](?path=/docs/components-controls-link--docs)
+- any other content should appear only on focus: [VisuallyHidden](?path=/docs/components-structure-visuallyhidden--docs) with `focusable`
 
 ## Usage
 
@@ -62,7 +62,7 @@ The shown link is at least 24px tall, and 44px on coarse pointers.
 
 ## Theming
 
-The shown link is a [Button](?path=/docs/components-button--docs) (outline, accent), so the Button tokens style it too.
+The shown link is a [Button](?path=/docs/components-controls-button--docs) (outline, accent), so the Button tokens style it too.
 
 | Token | What it sets | Default |
 | --- | --- | --- |
@@ -75,4 +75,4 @@ createTheme({ components: { skipLink: { offset: "12px", radius: "4px" } } });
 
 ## Related
 
-[SiteHeader](?path=/docs/components-siteheader--docs) · [AppShell](?path=/docs/components-appshell--docs) · [Button](?path=/docs/components-button--docs) · [VisuallyHidden](?path=/docs/components-visuallyhidden--docs) · [Link](?path=/docs/components-link--docs)
+[SiteHeader](?path=/docs/components-structure-siteheader--docs) · [AppShell](?path=/docs/components-structure-appshell--docs) · [Button](?path=/docs/components-controls-button--docs) · [VisuallyHidden](?path=/docs/components-structure-visuallyhidden--docs) · [Link](?path=/docs/components-controls-link--docs)

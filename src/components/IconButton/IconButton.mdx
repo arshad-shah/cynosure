@@ -5,7 +5,7 @@ import * as Stories from "./IconButton.stories";
 
 # IconButton
 
-A square [Button](?path=/docs/components-button--docs) with only an icon. It needs a `label`, which is both its accessible name and its tooltip.
+A square [Button](?path=/docs/components-controls-button--docs) with only an icon. It needs a `label`, which is both its accessible name and its tooltip.
 
 <Canvas of={Stories.Default} />
 
@@ -15,8 +15,8 @@ A square [Button](?path=/docs/components-button--docs) with only an icon. It nee
 - Dense chrome where a text button would not fit.
 
 **Use something else when:**
-- the action is not obvious from an icon alone: [Button](?path=/docs/components-button--docs) with visible text
-- it navigates: [Link](?path=/docs/components-link--docs)
+- the action is not obvious from an icon alone: [Button](?path=/docs/components-controls-button--docs) with visible text
+- it navigates: [Link](?path=/docs/components-controls-link--docs)
 
 ## Usage
 
@@ -57,7 +57,7 @@ IconButton accepts the Button props `variant`, `tone`, `size`, `loading`, `press
 
 ## Theming
 
-IconButton uses the [Button](?path=/docs/components-button--docs) tokens, such as `--cy-button-height-{sm,md,lg}` and `--cy-button-radius`.
+IconButton uses the [Button](?path=/docs/components-controls-button--docs) tokens, such as `--cy-button-height-{sm,md,lg}` and `--cy-button-radius`.
 
 ```ts
 createTheme({ components: { button: { radius: "999px" } } });
@@ -67,4 +67,4 @@ createTheme({ components: { button: { radius: "999px" } } });
 
 ## Related
 
-[Button](?path=/docs/components-button--docs) · [Tooltip](?path=/docs/components-tooltip--docs) · [Toolbar](?path=/docs/components-toolbar--docs)
+[Button](?path=/docs/components-controls-button--docs) · [Tooltip](?path=/docs/components-overlays-tooltip--docs) · [Toolbar](?path=/docs/components-structure-toolbar--docs)

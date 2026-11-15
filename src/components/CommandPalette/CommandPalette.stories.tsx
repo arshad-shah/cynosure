@@ -30,7 +30,7 @@ const commands: Command[] = [
 ];
 
 const meta = {
-  title: "Components/CommandPalette",
+  title: "Components/Overlays/CommandPalette",
   component: CommandPalette,
   args: { commands, onRun: fn(), onOpenChange: fn() },
   argTypes: { shortcut: { control: "text" }, recentLimit: { control: "number" } },

@@ -5,7 +5,7 @@ import * as Stories from "./Image.stories";
 
 # Image
 
-A picture that never shifts the layout, shows a placeholder while it loads and something sensible when it fails. For a person or an account, use [Avatar](?path=/docs/components-avatar--docs); for an interface symbol, use [Icon](?path=/docs/foundations-icon--docs).
+A picture that never shifts the layout, shows a placeholder while it loads and something sensible when it fails. For a person or an account, use [Avatar](?path=/docs/components-feedback-and-display-avatar--docs); for an interface symbol, use [Icon](?path=/docs/foundations-icon--docs).
 
 <Canvas of={Stories.Default} />
 
@@ -17,10 +17,10 @@ A picture that never shifts the layout, shows a placeholder while it loads and s
 - **Figures:** `caption` adds a caption that names the picture.
 
 **Use something else when:**
-- the box holds a video, a map or an embed: [AspectRatio](?path=/docs/components-aspectratio--docs)
-- it is a person, a team or an account: [Avatar](?path=/docs/components-avatar--docs)
+- the box holds a video, a map or an embed: [AspectRatio](?path=/docs/components-structure-aspectratio--docs)
+- it is a person, a team or an account: [Avatar](?path=/docs/components-feedback-and-display-avatar--docs)
 - it is a symbol in the interface: [Icon](?path=/docs/foundations-icon--docs)
-- two pictures are compared: [CompareSlider](?path=/docs/components-compareslider--docs)
+- two pictures are compared: [CompareSlider](?path=/docs/components-controls-compareslider--docs)
 
 ## Usage
 
@@ -64,7 +64,7 @@ The picture is replaced by a quiet box with the image icon and the `alt` text, i
 
 | Situation | Result |
 | --- | --- |
-| Before the picture has loaded | A [Skeleton](?path=/docs/components-skeleton--docs) (or `placeholder`) covers the box; the box already has its final size |
+| Before the picture has loaded | A [Skeleton](?path=/docs/components-feedback-and-display-skeleton--docs) (or `placeholder`) covers the box; the box already has its final size |
 | The picture loads | The placeholder goes, the picture fades in, `onLoad` is called. Nothing moves |
 | The picture fails | The fallback takes its place in the same box, `onError` is called |
 | `src` or `srcSet` changes | Loading starts again, also after a failure |
@@ -81,7 +81,7 @@ The picture is replaced by a quiet box with the image icon and the `alt` text, i
 
 ## Touch
 
-Nothing in Image can be pressed. To make a picture a link or a button, put it inside [Link](?path=/docs/components-link--docs) or a control with a hit area of its own.
+Nothing in Image can be pressed. To make a picture a link or a button, put it inside [Link](?path=/docs/components-controls-link--docs) or a control with a hit area of its own.
 
 ## Theming
 
@@ -95,4 +95,4 @@ createTheme({ components: { image: { radius: "8px", captionGap: "4px" } } });
 
 ## Related
 
-[AspectRatio](?path=/docs/components-aspectratio--docs) · [Skeleton](?path=/docs/components-skeleton--docs) · [Avatar](?path=/docs/components-avatar--docs) · [CompareSlider](?path=/docs/components-compareslider--docs) · [Card](?path=/docs/components-card--docs)
+[AspectRatio](?path=/docs/components-structure-aspectratio--docs) · [Skeleton](?path=/docs/components-feedback-and-display-skeleton--docs) · [Avatar](?path=/docs/components-feedback-and-display-avatar--docs) · [CompareSlider](?path=/docs/components-controls-compareslider--docs) · [Card](?path=/docs/components-structure-card--docs)

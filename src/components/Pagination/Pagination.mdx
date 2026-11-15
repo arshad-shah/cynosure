@@ -5,21 +5,21 @@ import * as Stories from "./Pagination.stories";
 
 # Pagination
 
-Moves between the pages of a list or table: previous and next, numbered pages, and the current page marked. It is a navigation landmark built from [Button](?path=/docs/components-button--docs) and [IconButton](?path=/docs/components-iconbutton--docs).
+Moves between the pages of a list or table: previous and next, numbered pages, and the current page marked. It is a navigation landmark built from [Button](?path=/docs/components-controls-button--docs) and [IconButton](?path=/docs/components-controls-iconbutton--docs).
 
 <Canvas of={Stories.LandmarkAndCurrentPage} />
 
 ## When to use
 
-- **Below a [Table](?path=/docs/components-table--docs) or a list** whose rows are loaded a page at a time.
+- **Below a [Table](?path=/docs/components-feedback-and-display-table--docs) or a list** whose rows are loaded a page at a time.
 - **`variant="compact"`:** on phones and in tight spaces such as a panel footer. It shows only previous and next around "Page 3 of 10".
 - **`getHref`:** when each page has its own address (search results, an archive). The controls are real links, so they work without JavaScript and can be opened in a new tab.
 - **`showEdges`:** when people often jump to the first or last page.
 
 **Use something else when:**
-- the choices are views of the same content, not pages of a list: [Tabs](?path=/docs/components-tabs--docs) or [SegmentedControl](?path=/docs/components-segmentedcontrol--docs)
-- it is progress through a task with named steps: [Steps](?path=/docs/components-steps--docs)
-- the whole list is already loaded and long: [VirtualList](?path=/docs/components-virtuallist--docs) scrolls it without pages
+- the choices are views of the same content, not pages of a list: [Tabs](?path=/docs/components-structure-tabs--docs) or [SegmentedControl](?path=/docs/components-controls-segmentedcontrol--docs)
+- it is progress through a task with named steps: [Steps](?path=/docs/components-feedback-and-display-steps--docs)
+- the whole list is already loaded and long: [VirtualList](?path=/docs/components-structure-virtuallist--docs) scrolls it without pages
 
 ## Usage
 
@@ -116,4 +116,4 @@ createTheme({ components: { pagination: { gap: "2px", pagePadding: "8px" } } });
 
 ## Related
 
-[Table](?path=/docs/components-table--docs) · [Button](?path=/docs/components-button--docs) · [IconButton](?path=/docs/components-iconbutton--docs) · [Tabs](?path=/docs/components-tabs--docs) · [Steps](?path=/docs/components-steps--docs)
+[Table](?path=/docs/components-feedback-and-display-table--docs) · [Button](?path=/docs/components-controls-button--docs) · [IconButton](?path=/docs/components-controls-iconbutton--docs) · [Tabs](?path=/docs/components-structure-tabs--docs) · [Steps](?path=/docs/components-feedback-and-display-steps--docs)

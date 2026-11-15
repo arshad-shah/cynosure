@@ -11,7 +11,7 @@ import { TagInput } from "./TagInput.js";
 const SUGGESTIONS = ["react", "preact", "astro", "design", "docs", "release"];
 
 const meta = {
-  title: "Components/TagInput",
+  title: "Components/Controls/TagInput",
   component: TagInput,
   args: { label: "Topics", defaultValue: ["design"], onChange: fn() },
   argTypes: {

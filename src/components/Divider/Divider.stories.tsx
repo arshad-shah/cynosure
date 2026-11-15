@@ -11,7 +11,7 @@ import { Text } from "../Text/Text.js";
 import { Divider } from "./Divider.js";
 
 const meta = {
-  title: "Components/Divider",
+  title: "Components/Structure/Divider",
   component: Divider,
   args: {
     orientation: "horizontal",

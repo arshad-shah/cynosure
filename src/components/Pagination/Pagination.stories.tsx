@@ -6,7 +6,7 @@ import { Button } from "../Button/Button.js";
 import { Pagination, pageCount, pageRange } from "./Pagination.js";
 
 const meta = {
-  title: "Components/Pagination",
+  title: "Components/Controls/Pagination",
   component: Pagination,
   args: {
     count: 10,

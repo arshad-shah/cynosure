@@ -5,7 +5,7 @@ import * as Stories from "./List.stories";
 
 # List
 
-A real list (`ul` or `ol`) with drawn markers: bullets, numbered how-to steps, a ticked feature list, or an icon per item. Each item has a label and an optional description under it. For long-form text with lists inside, use [Prose](?path=/docs/components-prose--docs); for progress through a flow, use [Steps](?path=/docs/components-steps--docs).
+A real list (`ul` or `ol`) with drawn markers: bullets, numbered how-to steps, a ticked feature list, or an icon per item. Each item has a label and an optional description under it. For long-form text with lists inside, use [Prose](?path=/docs/components-feedback-and-display-prose--docs); for progress through a flow, use [Steps](?path=/docs/components-feedback-and-display-steps--docs).
 
 <Canvas of={Stories.Default} />
 
@@ -17,10 +17,10 @@ A real list (`ul` or `ol`) with drawn markers: bullets, numbered how-to steps, a
 - **`marker="disc"` (default) or `"none"`:** any short list of items.
 
 **Use something else when:**
-- the person is moving through the steps and needs to see where they are: [Steps](?path=/docs/components-steps--docs)
-- the items are terms with values: [DescriptionList](?path=/docs/components-descriptionlist--docs)
-- people tick, add or reorder the items: [Checklist](?path=/docs/components-checklist--docs) or [SortableList](?path=/docs/components-sortablelist--docs)
-- the list is part of written content from Markdown or a CMS: [Prose](?path=/docs/components-prose--docs)
+- the person is moving through the steps and needs to see where they are: [Steps](?path=/docs/components-feedback-and-display-steps--docs)
+- the items are terms with values: [DescriptionList](?path=/docs/components-feedback-and-display-descriptionlist--docs)
+- people tick, add or reorder the items: [Checklist](?path=/docs/components-controls-checklist--docs) or [SortableList](?path=/docs/components-structure-sortablelist--docs)
+- the list is part of written content from Markdown or a CMS: [Prose](?path=/docs/components-feedback-and-display-prose--docs)
 
 ## Usage
 
@@ -49,7 +49,7 @@ Items are data, as in Steps and DescriptionList: `{ id?, label, description?, ic
 
 ## Ticks, icons and tiles
 
-`check` draws a tick in the success colour. `icon` draws each item's `icon` (or the list's), and `tile` puts it on an [IconTile](?path=/docs/components-icontile--docs). `tone` on the list or on an item sets the marker's colour.
+`check` draws a tick in the success colour. `icon` draws each item's `icon` (or the list's), and `tile` puts it on an [IconTile](?path=/docs/components-feedback-and-display-icontile--docs). `tone` on the list or on an item sets the marker's colour.
 
 <Canvas of={Stories.ChecksForAFeatureList} />
 <Canvas of={Stories.IconsAndTiles} />
@@ -94,4 +94,4 @@ createTheme({ components: { list: { markerGap: "12px", gapMd: "16px" } } });
 
 ## Related
 
-[Steps](?path=/docs/components-steps--docs) · [IconTile](?path=/docs/components-icontile--docs) · [DescriptionList](?path=/docs/components-descriptionlist--docs) · [Checklist](?path=/docs/components-checklist--docs) · [Prose](?path=/docs/components-prose--docs)
+[Steps](?path=/docs/components-feedback-and-display-steps--docs) · [IconTile](?path=/docs/components-feedback-and-display-icontile--docs) · [DescriptionList](?path=/docs/components-feedback-and-display-descriptionlist--docs) · [Checklist](?path=/docs/components-controls-checklist--docs) · [Prose](?path=/docs/components-feedback-and-display-prose--docs)

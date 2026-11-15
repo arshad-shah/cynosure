@@ -36,7 +36,7 @@ function Headers(props: {
 }
 
 const meta = {
-  title: "Components/KeyValueEditor",
+  title: "Components/Controls/KeyValueEditor",
   component: KeyValueEditor,
   args: { label: "Headers", defaultPairs: HEADERS, onChange: fn() },
   render: () => <Headers />,

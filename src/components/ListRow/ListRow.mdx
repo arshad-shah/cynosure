@@ -12,15 +12,15 @@ Interactive rows for an app's lists (notifications, an activity feed, saved quer
 ## When to use
 
 - **A list of things to open:** each row is a button (`onClick`) or a link (`href`), with the open one marked `active`.
-- **Rows with their own commands:** run, delete, a [Menu](?path=/docs/components-menu--docs) of more, beside the row rather than inside it.
+- **Rows with their own commands:** run, delete, a [Menu](?path=/docs/components-overlays-menu--docs) of more, beside the row rather than inside it.
 - **Feeds that carry state:** `unread`, `dimmed` (seen), and a `tone` rail for an error or a warning.
 
 **Use something else when:**
-- the list is static text with bullets, numbers or ticks: [List](?path=/docs/components-list--docs)
-- the point is choosing a value: [Select](?path=/docs/components-select--docs), [RadioGroup](?path=/docs/components-radiogroup--docs) or [Combobox](?path=/docs/components-combobox--docs)
-- the entries nest: [Tree](?path=/docs/components-tree--docs)
-- there are thousands of rows: [VirtualList](?path=/docs/components-virtuallist--docs)
-- it is the app's navigation: [SideNav](?path=/docs/components-sidenav--docs)
+- the list is static text with bullets, numbers or ticks: [List](?path=/docs/components-feedback-and-display-list--docs)
+- the point is choosing a value: [Select](?path=/docs/components-controls-select--docs), [RadioGroup](?path=/docs/components-controls-radiogroup--docs) or [Combobox](?path=/docs/components-controls-combobox--docs)
+- the entries nest: [Tree](?path=/docs/components-structure-tree--docs)
+- there are thousands of rows: [VirtualList](?path=/docs/components-structure-virtuallist--docs)
+- it is the app's navigation: [SideNav](?path=/docs/components-structure-sidenav--docs)
 
 ## Usage
 
@@ -100,7 +100,7 @@ Tokens: `--cy-list-row-background` (set it to the colour of the surface the list
 
 ## Related
 
-- [List](?path=/docs/components-list--docs): static lists with markers.
-- [IconButton](?path=/docs/components-iconbutton--docs) and [Menu](?path=/docs/components-menu--docs): row actions.
-- [IconTile](?path=/docs/components-icontile--docs), [Avatar](?path=/docs/components-avatar--docs), [Badge](?path=/docs/components-badge--docs): leading and trailing content.
-- [VirtualList](?path=/docs/components-virtuallist--docs): very long lists.
+- [List](?path=/docs/components-feedback-and-display-list--docs): static lists with markers.
+- [IconButton](?path=/docs/components-controls-iconbutton--docs) and [Menu](?path=/docs/components-overlays-menu--docs): row actions.
+- [IconTile](?path=/docs/components-feedback-and-display-icontile--docs), [Avatar](?path=/docs/components-feedback-and-display-avatar--docs), [Badge](?path=/docs/components-feedback-and-display-badge--docs): leading and trailing content.
+- [VirtualList](?path=/docs/components-structure-virtuallist--docs): very long lists.

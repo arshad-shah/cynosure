@@ -9,7 +9,7 @@ for (const value of Object.values(icons))
   if (typeof value === "object" && value && "body" in value) iconMapping[value.name] = value;
 
 const meta = {
-  title: "Components/IconButton",
+  title: "Components/Controls/IconButton",
   component: IconButton,
   args: {
     icon: copy,

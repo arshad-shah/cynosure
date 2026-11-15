@@ -16,7 +16,7 @@ A short message about something that just happened, shown along one edge of the 
 
 **Use something else when:**
 - the message belongs to one part of the page and should stay: a Notice
-- the person must decide something: [Dialog](?path=/docs/components-dialog--docs)
+- the person must decide something: [Dialog](?path=/docs/components-overlays-dialog--docs)
 - the message explains a form error: the field's own error text
 
 ## Usage
@@ -114,7 +114,7 @@ Toasts raised while a Dialog is open appear above it, and carry on after it clos
 - **Region:** toasts sit in a region named "Notifications" in the browser top layer, so no parent can clip them. Pointer events pass through the empty parts of the region.
 - **Edges:** the region keeps the toasts inside the device's safe area on every side (`env(safe-area-inset-*)`), then adds `offset`. Its empty parts never take presses, so a tab bar under it still works.
 - **Hidden page:** timers also pause while the tab is hidden, so a toast is not missed.
-- **Modal dialogs:** while a [Dialog](?path=/docs/components-dialog--docs) or Sheet inside the Toaster is open, the toasts show inside it, above its backdrop, so they stay visible, clickable and announced (outside, the modal would make them inert). When the dialog closes they move back to the page with the time they had left, and are not announced a second time.
+- **Modal dialogs:** while a [Dialog](?path=/docs/components-overlays-dialog--docs) or Sheet inside the Toaster is open, the toasts show inside it, above its backdrop, so they stay visible, clickable and announced (outside, the modal would make them inert). When the dialog closes they move back to the page with the time they had left, and are not announced a second time.
 - **Motion:** toasts slide and fade in and out, and do not move under reduced motion.
 
 ## Touch
@@ -138,4 +138,4 @@ createTheme({ components: { toast: { width: "400px", radius: "10px", offsetBlock
 
 ## Related
 
-[Dialog](?path=/docs/components-dialog--docs) · [Button](?path=/docs/components-button--docs)
+[Dialog](?path=/docs/components-overlays-dialog--docs) · [Button](?path=/docs/components-controls-button--docs)

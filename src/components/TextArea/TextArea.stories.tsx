@@ -9,7 +9,7 @@ import { Popover } from "../Popover/Popover.js";
 import { TextArea, type TextAreaMention } from "./TextArea.js";
 
 const meta = {
-  title: "Components/TextArea",
+  title: "Components/Controls/TextArea",
   component: TextArea,
   args: { label: "Notes", onChange: fn(), rows: 2, maxRows: 4, size: "md" },
   argTypes: {

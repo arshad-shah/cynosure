@@ -14,7 +14,7 @@ const NAV: SiteHeaderLink[] = [
 ];
 
 const meta = {
-  title: "Components/SiteHeader",
+  title: "Components/Structure/SiteHeader",
   component: SiteHeader,
   args: {
     brand: "Acme",

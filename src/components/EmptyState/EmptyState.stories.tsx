@@ -9,7 +9,7 @@ import { EmptyState } from "./EmptyState.js";
 
 const create = fn();
 const meta = {
-  title: "Components/EmptyState",
+  title: "Components/Feedback and display/EmptyState",
   component: EmptyState,
   args: {
     icon: folderOpen,

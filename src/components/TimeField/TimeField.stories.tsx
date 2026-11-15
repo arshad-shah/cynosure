@@ -5,7 +5,7 @@ import { Button } from "../Button/Button.js";
 import { TimeField } from "./TimeField.js";
 
 const meta = {
-  title: "Components/TimeField",
+  title: "Components/Controls/TimeField",
   component: TimeField,
   // Stories pin the 24-hour form; `FollowsThePersonsLocale` covers the default.
   args: { label: "Start time", hourCycle: 24, onChange: fn() },

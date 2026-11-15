@@ -11,7 +11,7 @@ import { SegmentedControl } from "../SegmentedControl/SegmentedControl.js";
 import { Toolbar } from "./Toolbar.js";
 
 const meta = {
-  title: "Components/Toolbar",
+  title: "Components/Structure/Toolbar",
   component: Toolbar,
   args: { label: "Document actions", orientation: "horizontal", loop: true },
   argTypes: {

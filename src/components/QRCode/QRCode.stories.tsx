@@ -12,7 +12,7 @@ import { QRCode } from "./QRCode.js";
 const URL = "https://cynosure.arshadshah.com";
 
 const meta = {
-  title: "Components/QRCode",
+  title: "Components/Feedback and display/QRCode",
   component: QRCode,
   args: { value: URL, size: "md", level: "M", quietZone: 4 },
   argTypes: {

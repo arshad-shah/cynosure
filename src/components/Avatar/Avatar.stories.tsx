@@ -20,7 +20,7 @@ const PICTURE =
 const MISSING = "/no-such-avatar-picture.png";
 
 const meta = {
-  title: "Components/Avatar",
+  title: "Components/Feedback and display/Avatar",
   component: Avatar,
   args: { name: "Ada Lovelace", size: "md", shape: "circle", tone: "neutral" },
   argTypes: {

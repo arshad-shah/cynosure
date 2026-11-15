@@ -25,7 +25,7 @@ function Page(props: SheetProps) {
 }
 
 const meta = {
-  title: "Components/Sheet",
+  title: "Components/Overlays/Sheet",
   component: Sheet,
   args: {
     title: "Settings",

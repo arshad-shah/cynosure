@@ -46,7 +46,7 @@ const project: TreeItem[] = [
 
 const meta = {
   tags: ["serial"],
-  title: "Components/Tree",
+  title: "Components/Structure/Tree",
   component: Tree,
   args: {
     label: "Files",

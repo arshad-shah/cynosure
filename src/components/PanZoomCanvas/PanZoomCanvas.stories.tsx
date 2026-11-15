@@ -104,7 +104,7 @@ function Board({
 }
 
 const meta = {
-  title: "Components/PanZoomCanvas",
+  title: "Components/Structure/PanZoomCanvas",
   component: PanZoomCanvas,
   args: { label: "Schema" },
   render: () => <Board />,

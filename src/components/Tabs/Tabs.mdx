@@ -5,7 +5,7 @@ import * as Stories from "./Tabs.stories";
 
 # Tabs
 
-Switches between views of the same thing, such as a document's tree, raw and schema views, while staying on one page. If the options filter or change a value rather than swapping whole panels, use [SegmentedControl](?path=/docs/components-segmentedcontrol--docs).
+Switches between views of the same thing, such as a document's tree, raw and schema views, while staying on one page. If the options filter or change a value rather than swapping whole panels, use [SegmentedControl](?path=/docs/components-controls-segmentedcontrol--docs).
 
 <Canvas of={Stories.ArrowsSelectSkippingDisabled} />
 
@@ -17,9 +17,9 @@ Switches between views of the same thing, such as a document's tree, raw and sch
 - **`activation="manual"`:** when showing a panel is expensive (network, large renders), so arrowing past a tab doesn't load it.
 
 **Use something else when:**
-- the choice is a setting or filter: [SegmentedControl](?path=/docs/components-segmentedcontrol--docs) or [RadioGroup](?path=/docs/components-radiogroup--docs)
-- each option goes to a different page: [Link](?path=/docs/components-link--docs)s in your navigation
-- the sections should be readable together: [Stack](?path=/docs/components-stack--docs) with headings
+- the choice is a setting or filter: [SegmentedControl](?path=/docs/components-controls-segmentedcontrol--docs) or [RadioGroup](?path=/docs/components-controls-radiogroup--docs)
+- each option goes to a different page: [Link](?path=/docs/components-controls-link--docs)s in your navigation
+- the sections should be readable together: [Stack](?path=/docs/components-structure-stack--docs) with headings
 
 ## Usage
 
@@ -161,4 +161,4 @@ createTheme({ components: { tabs: { indicator: "#2563eb", indicatorWidth: "3px" 
 
 ## Related
 
-[SegmentedControl](?path=/docs/components-segmentedcontrol--docs) · [Toolbar](?path=/docs/components-toolbar--docs) · [Card](?path=/docs/components-card--docs)
+[SegmentedControl](?path=/docs/components-controls-segmentedcontrol--docs) · [Toolbar](?path=/docs/components-structure-toolbar--docs) · [Card](?path=/docs/components-structure-card--docs)

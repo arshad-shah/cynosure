@@ -5,7 +5,7 @@ import * as Stories from "./Breadcrumbs.stories";
 
 # Breadcrumbs
 
-Shows the trail from the top of a site or app to the current page. Every item but the last is a link back up the trail; the last one is the page being shown. For moving between sections of an app, use [SideNav](?path=/docs/components-sidenav--docs) instead.
+Shows the trail from the top of a site or app to the current page. Every item but the last is a link back up the trail; the last one is the page being shown. For moving between sections of an app, use [SideNav](?path=/docs/components-structure-sidenav--docs) instead.
 
 <Canvas of={Stories.Default} />
 
@@ -16,11 +16,11 @@ Shows the trail from the top of a site or app to the current page. Every item bu
 - **Deep trails in tight space:** set `maxItems` so the middle collapses into a menu.
 
 **Use something else when:**
-- it is the main navigation between sections: [SideNav](?path=/docs/components-sidenav--docs)
-- it switches views of the same page: [Tabs](?path=/docs/components-tabs--docs)
-- it shows progress through a sequence: [Steps](?path=/docs/components-steps--docs)
-- it moves through pages of results: [Pagination](?path=/docs/components-pagination--docs)
-- it is a single link back: [Link](?path=/docs/components-link--docs)
+- it is the main navigation between sections: [SideNav](?path=/docs/components-structure-sidenav--docs)
+- it switches views of the same page: [Tabs](?path=/docs/components-structure-tabs--docs)
+- it shows progress through a sequence: [Steps](?path=/docs/components-feedback-and-display-steps--docs)
+- it moves through pages of results: [Pagination](?path=/docs/components-controls-pagination--docs)
+- it is a single link back: [Link](?path=/docs/components-controls-link--docs)
 
 ## Usage
 
@@ -97,4 +97,4 @@ createTheme({ components: { breadcrumbs: { itemMaxWidth: "16ch", gap: "8px" } } 
 
 ## Related
 
-[Link](?path=/docs/components-link--docs) · [Menu](?path=/docs/components-menu--docs) · [SideNav](?path=/docs/components-sidenav--docs) · [Tabs](?path=/docs/components-tabs--docs) · [Pagination](?path=/docs/components-pagination--docs)
+[Link](?path=/docs/components-controls-link--docs) · [Menu](?path=/docs/components-overlays-menu--docs) · [SideNav](?path=/docs/components-structure-sidenav--docs) · [Tabs](?path=/docs/components-structure-tabs--docs) · [Pagination](?path=/docs/components-controls-pagination--docs)

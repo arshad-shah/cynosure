@@ -28,7 +28,7 @@ const controls = (): TitleBarControls => ({
 
 const meta = {
   tags: ["serial"],
-  title: "Components/TitleBar",
+  title: "Components/Structure/TitleBar",
   component: TitleBar,
   args: {
     label: "Verql",

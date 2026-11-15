@@ -28,7 +28,7 @@ function Alone(props: Partial<ZoomControlsProps> & { start?: ZoomSetting }) {
 }
 
 const meta = {
-  title: "Components/ZoomControls",
+  title: "Components/Structure/ZoomControls",
   component: ZoomControls,
   args: { zoom: { kind: "percent", value: 100 }, percent: 100, onZoomChange: fn() },
   render: (args) => <Alone onZoomChange={args.onZoomChange} />,

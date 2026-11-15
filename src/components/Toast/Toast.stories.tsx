@@ -37,7 +37,7 @@ function Demo({ options }: { options: Record<string, ToastOptions> }) {
 const saved: ToastOptions = { title: "Saved", description: "Your changes are live.", tone: "success" };
 
 const meta = {
-  title: "Components/Toast",
+  title: "Components/Overlays/Toast",
   component: Toaster,
   args: { position: "bottom-end", max: 3 },
   argTypes: {

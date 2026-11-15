@@ -12,7 +12,7 @@ const options = [
 ];
 
 const meta = {
-  title: "Components/RadioGroup",
+  title: "Components/Controls/RadioGroup",
   component: RadioGroup,
   args: {
     label: "Digest",

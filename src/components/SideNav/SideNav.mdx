@@ -14,9 +14,9 @@ Vertical navigation for an app or a docs site: links in titled sections, groups 
 - **The main navigation of an app or site** with more than a handful of destinations.
 
 **Use something else when:**
-- there are two to five peer views on one page: [Tabs](?path=/docs/components-tabs--docs)
-- the choices are commands, not places: [Menu](?path=/docs/components-menu--docs)
-- you need the whole layout with a top bar and a small-screen drawer: [AppShell](?path=/docs/components-appshell--docs), which holds a SideNav
+- there are two to five peer views on one page: [Tabs](?path=/docs/components-structure-tabs--docs)
+- the choices are commands, not places: [Menu](?path=/docs/components-overlays-menu--docs)
+- you need the whole layout with a top bar and a small-screen drawer: [AppShell](?path=/docs/components-structure-appshell--docs), which holds a SideNav
 
 ## Usage
 
@@ -79,7 +79,7 @@ A collapsed SideNav on its own, without AppShell, is an editor's activity bar. `
 
 ## Bottom bar
 
-`layout="bar"` lays the top-level items out in one row, icon over label, for a phone's tab bar ([AppShell](?path=/docs/components-appshell--docs)'s `tabs`). Section headings are left out, and a group is one item that calls `onNavigate` with its own id. Give it three to five items, each with an icon.
+`layout="bar"` lays the top-level items out in one row, icon over label, for a phone's tab bar ([AppShell](?path=/docs/components-structure-appshell--docs)'s `tabs`). Section headings are left out, and a group is one item that calls `onNavigate` with its own id. Give it three to five items, each with an icon.
 
 ### A primary action
 
@@ -102,7 +102,7 @@ import { home, inbox, plus } from "@arshad-shah/cynosure/icons";
 
 <Canvas of={Stories.BarWithAPrimaryAction} />
 
-In the column the same entry is a full-width accent [Button](?path=/docs/components-button--docs) with the icon and the label, and in the collapsed rail an accent [IconButton](?path=/docs/components-iconbutton--docs). Give a navigation one action at most and keep it at the top level, not inside a section or a group.
+In the column the same entry is a full-width accent [Button](?path=/docs/components-controls-button--docs) with the icon and the label, and in the collapsed rail an accent [IconButton](?path=/docs/components-controls-iconbutton--docs). Give a navigation one action at most and keep it at the top level, not inside a section or a group.
 
 <Canvas of={Stories.ActionInTheColumnAndTheRail} />
 
@@ -137,4 +137,4 @@ createTheme({ components: { sideNav: { width: "280px" } } });
 
 ## Related
 
-[AppShell](?path=/docs/components-appshell--docs) · [Tabs](?path=/docs/components-tabs--docs) · [Button](?path=/docs/components-button--docs) · [IconButton](?path=/docs/components-iconbutton--docs) · [Tooltip](?path=/docs/components-tooltip--docs)
+[AppShell](?path=/docs/components-structure-appshell--docs) · [Tabs](?path=/docs/components-structure-tabs--docs) · [Button](?path=/docs/components-controls-button--docs) · [IconButton](?path=/docs/components-controls-iconbutton--docs) · [Tooltip](?path=/docs/components-overlays-tooltip--docs)

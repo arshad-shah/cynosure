@@ -23,7 +23,7 @@ const ITEMS: SortableItem[] = [
 ];
 
 const meta = {
-  title: "Components/SortableList",
+  title: "Components/Structure/SortableList",
   component: SortableList,
   args: { label: "Sidebar order", defaultItems: ITEMS, onReorder: fn() },
   argTypes: { size: { control: "inline-radio", options: ["sm", "md", "lg"] } },

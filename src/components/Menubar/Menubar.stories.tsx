@@ -36,7 +36,7 @@ const menus: MenubarMenu[] = [
 ];
 
 const meta = {
-  title: "Components/Menubar",
+  title: "Components/Overlays/Menubar",
   component: Menubar,
   args: { label: "Application", menus, onSelect: fn(), size: "md" },
   argTypes: {

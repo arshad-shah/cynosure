@@ -60,7 +60,7 @@ function Demo({
 }
 
 const meta = {
-  title: "Components/AppShell",
+  title: "Components/Structure/AppShell",
   component: AppShell,
   args: { collapseBelow: 768 },
   render: (args) => <Demo {...args} />,

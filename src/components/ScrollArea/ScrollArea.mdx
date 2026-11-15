@@ -16,9 +16,9 @@ A box that fills its parent and scrolls what does not fit. It can follow the end
 
 **Use something else when:**
 
-- the content is a long list of rows people pick from: [VirtualList](?path=/docs/components-virtuallist--docs) (it renders only the rows in view, and has `follow` and `overlay` too)
-- a box only needs to clip or scroll and has nothing else to do: `overflow` on [Stack](?path=/docs/components-stack--docs), [Inline](?path=/docs/components-inline--docs) or [Grid](?path=/docs/components-grid--docs)
-- the content is code: [CodeBlock](?path=/docs/components-codeblock--docs) scrolls its own
+- the content is a long list of rows people pick from: [VirtualList](?path=/docs/components-structure-virtuallist--docs) (it renders only the rows in view, and has `follow` and `overlay` too)
+- a box only needs to clip or scroll and has nothing else to do: `overflow` on [Stack](?path=/docs/components-structure-stack--docs), [Inline](?path=/docs/components-structure-inline--docs) or [Grid](?path=/docs/components-structure-grid--docs)
+- the content is code: [CodeBlock](?path=/docs/components-feedback-and-display-codeblock--docs) scrolls its own
 
 ## Usage
 
@@ -54,7 +54,7 @@ With `follow`, the end stays in view while content is added. Scrolling up lets g
 
 ## Overlay
 
-`overlay` sits over the area at the bottom centre and does not scroll. It is outside the named region. The area is an [OverlayFrame](?path=/docs/components-overlayframe--docs), which places it.
+`overlay` sits over the area at the bottom centre and does not scroll. It is outside the named region. The area is an [OverlayFrame](?path=/docs/components-structure-overlayframe--docs), which places it.
 
 <Canvas of={Stories.OverlayStaysPut} />
 
@@ -97,4 +97,4 @@ No tokens of its own: the overlay's place comes from OverlayFrame's `--cy-overla
 
 ## Related
 
-[VirtualList](?path=/docs/components-virtuallist--docs) · [Stack](?path=/docs/components-stack--docs) · [SplitPane](?path=/docs/components-splitpane--docs) · [CodeBlock](?path=/docs/components-codeblock--docs)
+[VirtualList](?path=/docs/components-structure-virtuallist--docs) · [Stack](?path=/docs/components-structure-stack--docs) · [SplitPane](?path=/docs/components-structure-splitpane--docs) · [CodeBlock](?path=/docs/components-feedback-and-display-codeblock--docs)

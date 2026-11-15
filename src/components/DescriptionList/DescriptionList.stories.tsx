@@ -15,7 +15,7 @@ const ITEMS: DescriptionItem[] = [
 ];
 
 const meta = {
-  title: "Components/DescriptionList",
+  title: "Components/Feedback and display/DescriptionList",
   component: DescriptionList,
   args: { items: ITEMS, layout: "auto", divided: false, size: "md" },
   argTypes: {

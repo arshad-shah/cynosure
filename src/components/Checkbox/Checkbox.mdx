@@ -5,7 +5,7 @@ import * as Stories from "./Checkbox.stories";
 
 # Checkbox
 
-A checkbox with a label, for choices that are independent of each other. It is a native input under a drawn box, so forms, reset and keyboard work as the browser does them. For a setting that takes effect immediately, use [Switch](?path=/docs/components-switch--docs).
+A checkbox with a label, for choices that are independent of each other. It is a native input under a drawn box, so forms, reset and keyboard work as the browser does them. For a setting that takes effect immediately, use [Switch](?path=/docs/components-controls-switch--docs).
 
 <Canvas of={Stories.CheckedShowsMark} />
 
@@ -17,9 +17,9 @@ A checkbox with a label, for choices that are independent of each other. It is a
 - A list of tasks, with `strikeWhenChecked` so a finished task reads as done.
 
 **Use something else when:**
-- the change applies immediately: [Switch](?path=/docs/components-switch--docs)
-- exactly one option may be chosen: [RadioGroup](?path=/docs/components-radiogroup--docs)
-- it triggers an action: [Button](?path=/docs/components-button--docs)
+- the change applies immediately: [Switch](?path=/docs/components-controls-switch--docs)
+- exactly one option may be chosen: [RadioGroup](?path=/docs/components-controls-radiogroup--docs)
+- it triggers an action: [Button](?path=/docs/components-controls-button--docs)
 
 ## Usage
 
@@ -85,7 +85,7 @@ Tokens: `--cy-checkbox-size`, `--cy-checkbox-radius` and `--cy-checkbox-border`.
 | `--cy-checkbox-done-color` | Label and description colour of a checked `strikeWhenChecked` row. Default `--cy-color-muted`. Keep it at 4.5:1 or more against the surface. |
 | `--cy-checkbox-strike-width` | Thickness of the strike. Default: the border width, or 1/16 of the text size when that is larger. |
 
-The row around the box is a [Choice](?path=/docs/components-choice--docs): the space between box and label is `--cy-choice-gap`, and the two done tokens above become the row's `--cy-choice-done-color` and `--cy-choice-strike-width`.
+The row around the box is a [Choice](?path=/docs/components-controls-choice--docs): the space between box and label is `--cy-choice-gap`, and the two done tokens above become the row's `--cy-choice-done-color` and `--cy-choice-strike-width`.
 
 ```ts
 createTheme({ components: { checkbox: { radius: "50%" } } });
@@ -93,4 +93,4 @@ createTheme({ components: { checkbox: { radius: "50%" } } });
 
 ## Related
 
-[Switch](?path=/docs/components-switch--docs) · [RadioGroup](?path=/docs/components-radiogroup--docs) · [Choice](?path=/docs/components-choice--docs) · [Field](?path=/docs/components-field--docs)
+[Switch](?path=/docs/components-controls-switch--docs) · [RadioGroup](?path=/docs/components-controls-radiogroup--docs) · [Choice](?path=/docs/components-controls-choice--docs) · [Field](?path=/docs/components-feedback-and-display-field--docs)

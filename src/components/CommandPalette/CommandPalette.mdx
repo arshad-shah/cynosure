@@ -14,8 +14,8 @@ A search box over every command in the product. Press Ctrl+K (Command+K on a Mac
 - **Products with many actions** spread across menus and panels: inspectors, editors, database tools.
 
 **Use something else when:**
-- the actions belong to one button: a [Menu](?path=/docs/components-menu--docs)
-- people pick a value for a field: a [Combobox](?path=/docs/components-combobox--docs)
+- the actions belong to one button: a [Menu](?path=/docs/components-overlays-menu--docs)
+- people pick a value for a field: a [Combobox](?path=/docs/components-controls-combobox--docs)
 
 ## Usage
 
@@ -35,11 +35,11 @@ Mount it once near the root. It listens for its shortcut (`mod+k` by default) an
 
 ## Finding commands
 
-Every typed word must appear in the label or the `keywords`, in any order, and commands whose label starts with the first word come first. Each typed word is marked where it appears in a label ([HighlightedText](?path=/docs/components-highlightedtext--docs)); the option is still named by its whole label. Before anything is typed, the commands run most recently come first under "Recent".
+Every typed word must appear in the label or the `keywords`, in any order, and commands whose label starts with the first word come first. Each typed word is marked where it appears in a label ([HighlightedText](?path=/docs/components-feedback-and-display-highlightedtext--docs)); the option is still named by its whole label. Before anything is typed, the commands run most recently come first under "Recent".
 
 <Canvas of={Stories.RecentCommandsComeFirst} />
 
-Before anything is typed, commands are listed under their `group` headings. Search results are one flat list in rank order, so each row shows its group as a small [Badge](?path=/docs/components-badge--docs) between the label and the shortcut; recent commands, which mix groups, carry the tag too.
+Before anything is typed, commands are listed under their `group` headings. Search results are one flat list in rank order, so each row shows its group as a small [Badge](?path=/docs/components-feedback-and-display-badge--docs) between the label and the shortcut; recent commands, which mix groups, carry the tag too.
 
 <Canvas of={Stories.SearchResultsAreFlatWithCategoryTags} />
 
@@ -97,4 +97,4 @@ Tokens: `--cy-command-palette-width`, `--cy-command-palette-offset` (distance fr
 
 ## Related
 
-[Menu](?path=/docs/components-menu--docs) · [Combobox](?path=/docs/components-combobox--docs) · [Kbd](?path=/docs/components-kbd--docs) · [Dialog](?path=/docs/components-dialog--docs)
+[Menu](?path=/docs/components-overlays-menu--docs) · [Combobox](?path=/docs/components-controls-combobox--docs) · [Kbd](?path=/docs/components-feedback-and-display-kbd--docs) · [Dialog](?path=/docs/components-overlays-dialog--docs)

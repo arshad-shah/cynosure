@@ -11,7 +11,7 @@ const TONES = ["accent", "neutral", "danger", "success", "warning", "info"] as c
 const VARIANTS = ["soft", "solid", "outline"] as const;
 
 const meta = {
-  title: "Components/IconTile",
+  title: "Components/Feedback and display/IconTile",
   component: IconTile,
   args: { icon: zap, size: "md", tone: "accent", variant: "soft", shape: "square" },
   argTypes: {

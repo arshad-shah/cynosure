@@ -9,7 +9,7 @@ import { Button } from "../Button/Button.js";
 import { Tooltip } from "./Tooltip.js";
 
 const meta = {
-  title: "Components/Tooltip",
+  title: "Components/Overlays/Tooltip",
   component: Tooltip,
   args: {
     content: "Download as JSON",

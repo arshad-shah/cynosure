@@ -5,7 +5,7 @@ import * as Stories from "./RadioGroup.stories";
 
 # RadioGroup
 
-Picks one option from a short list, with every option visible. It is built on native radios, so forms, reset and `required` work without extra code. For a compact switcher use [SegmentedControl](?path=/docs/components-segmentedcontrol--docs) instead.
+Picks one option from a short list, with every option visible. It is built on native radios, so forms, reset and `required` work without extra code. For a compact switcher use [SegmentedControl](?path=/docs/components-controls-segmentedcontrol--docs) instead.
 
 <Canvas of={Stories.ArrowKeysSelectAndWrapSkippingDisabled} />
 
@@ -16,9 +16,9 @@ Picks one option from a short list, with every option visible. It is built on na
 - A choice that is submitted with a form.
 
 **Use something else when:**
-- there are many options: [Select](?path=/docs/components-select--docs)
-- the choice is a compact view or mode switcher: [SegmentedControl](?path=/docs/components-segmentedcontrol--docs)
-- it is a single on/off setting: [Switch](?path=/docs/components-switch--docs)
+- there are many options: [Select](?path=/docs/components-controls-select--docs)
+- the choice is a compact view or mode switcher: [SegmentedControl](?path=/docs/components-controls-segmentedcontrol--docs)
+- it is a single on/off setting: [Switch](?path=/docs/components-controls-switch--docs)
 
 ## Usage
 
@@ -70,7 +70,7 @@ Pass `value` and `onChange(value)` to own the state. Without `value`, the group 
 
 ## Theming
 
-Tokens: `--cy-radio-group-gap`. The ring uses `--cy-checkbox-border` and its size `--cy-checkbox-size` (`-sm`, `-lg`), so radios line up with checkboxes. Each option is a [Choice](?path=/docs/components-choice--docs) row: `--cy-choice-gap` is the space before its label.
+Tokens: `--cy-radio-group-gap`. The ring uses `--cy-checkbox-border` and its size `--cy-checkbox-size` (`-sm`, `-lg`), so radios line up with checkboxes. Each option is a [Choice](?path=/docs/components-controls-choice--docs) row: `--cy-choice-gap` is the space before its label.
 
 ```ts
 createTheme({ components: { radioGroup: { gap: "12px" } } });
@@ -80,4 +80,4 @@ createTheme({ components: { radioGroup: { gap: "12px" } } });
 
 ## Related
 
-[Checkbox](?path=/docs/components-checkbox--docs) · [Choice](?path=/docs/components-choice--docs) · [Switch](?path=/docs/components-switch--docs) · [SegmentedControl](?path=/docs/components-segmentedcontrol--docs) · [Select](?path=/docs/components-select--docs)
+[Checkbox](?path=/docs/components-controls-checkbox--docs) · [Choice](?path=/docs/components-controls-choice--docs) · [Switch](?path=/docs/components-controls-switch--docs) · [SegmentedControl](?path=/docs/components-controls-segmentedcontrol--docs) · [Select](?path=/docs/components-controls-select--docs)

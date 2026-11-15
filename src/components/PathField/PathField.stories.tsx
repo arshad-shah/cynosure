@@ -12,7 +12,7 @@ const pickerOf = (answer: string | null, ms = 30) =>
   fn(() => new Promise<string | null>((resolve) => setTimeout(() => resolve(answer), ms)));
 
 const meta = {
-  title: "Components/PathField",
+  title: "Components/Controls/PathField",
   component: PathField,
   args: {
     label: "Database file",

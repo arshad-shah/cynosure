@@ -7,7 +7,7 @@ import { shownFully } from "../../test/settle.js";
 import { ColorField, readColor } from "./ColorField.js";
 
 const meta = {
-  title: "Components/ColorField",
+  title: "Components/Controls/ColorField",
   component: ColorField,
   args: { label: "Accent", defaultValue: "rgb(51 102 255)", format: "hex", onChange: fn() },
   argTypes: {

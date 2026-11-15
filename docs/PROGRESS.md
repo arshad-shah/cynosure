@@ -15,6 +15,12 @@ Plan 9 (`docs/superpowers/plans/2026-11-10-cynosure-migrations.md`, tracked in i
 
 ## Current task
 
+**Tools migration gaps (2026-11-15, Arshad's direction; branch `feat/tools-migration-gaps`, PR #169 into `main`).** What `arshad-shah/tools` still needs from Cynosure before it migrates (tools#104), released together. Charts (swiftchart) and code editing are out of scope. Each change is shown to Arshad as a throwaway proposal story first, then built with stories, docs and a changeset on this branch.
+- **Done:** Dialog `size="full"` and `titleHidden`. Storybook is grouped like the README (`Components/<group>/<Name>`; `cy check` rule `story-group`, `cy new component --group`, groups read by `tools/component-groups.ts`; ids changed, so links and the 502 visual baselines were renamed). Windows development fixes (`pnpm css`, `cy check`, unit tests). Storybook's onboarding is off.
+- **Next:** ProgressBar `meter`, RadioGroup picture cards, TabList overflow into a More menu, then the icons (about 97 PDF glyphs from tools and the missing Lucide names, drawn as Facet icons).
+- **Not run on Windows:** Firefox, WebKit, touch, `test:react18`, `publint`, `attw`; CI covers them.
+
+
 **0.1.0 is published** (2026-11-11). Now: the documentation site, issue #152, and the library fixes it turns up. Everything is on `next`, in pull request #158 into `main`.
 
 **The site was rebuilt as a template (2026-11-11, Arshad's direction).** Astro is gone. `site/` is now a data-driven documentation template built entirely from Cynosure components, to be reused for every product's docs. How it is managed and how it works: `site/README.md`; its rules: `site/AGENTS.md`.

@@ -74,6 +74,19 @@ function groupsFrom(
   return groups;
 }
 
+/**
+ * The Storybook id of a component's title folder: `foundations`, or `components-<group>` for a component in a README
+ * group (its story title is `Components/<group>/<Name>`; "Feedback and display" → `feedback-and-display`).
+ */
+function storybookTitleId(kind: string, group: string | undefined): string {
+  const parts =
+    kind === "components" && group && group !== "More" && group !== "All" ? [kind, group] : [kind];
+  return parts
+    .join("-")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-");
+}
+
 /** Whether changes are waiting for a release: Changesets keeps one file per change until the version is made. */
 function hasPendingChanges(folder: string): boolean {
   if (!existsSync(folder)) return false;
@@ -290,7 +303,9 @@ export async function scan(config: DocsConfig, siteDir: string): Promise<Scanned
     ...(config.url ? { site: config.url.replace(/\/$/, "") } : {}),
     // A docs page links to its neighbours by their Storybook address; here they are pages.
     storybook: (query) => {
-      const [, id = "", rest = ""] = /^\?path=\/docs\/[a-z]+-([a-z0-9]+)--docs(.*)$/.exec(query) ?? [];
+      // The id's last part is the component ("components-controls-button--docs", "foundations-icon--docs").
+      const [, id = "", rest = ""] =
+        /^\?path=\/docs\/(?:[a-z0-9]+-)+([a-z0-9]+)--docs(.*)$/.exec(query) ?? [];
       const route = byStorybookId.get(id);
       if (route) return route + rest;
       return storybookBase ? storybookBase + query : null;
@@ -364,7 +379,9 @@ export async function scan(config: DocsConfig, siteDir: string): Promise<Scanned
         exports,
         ...(examples.length ? { stories: plan.id } : {}),
         ...(storybookBase
-          ? { storybook: `${storybookBase}?path=/docs/${kind}-${componentName.toLowerCase()}--docs` }
+          ? {
+              storybook: `${storybookBase}?path=/docs/${storybookTitleId(kind, groupOf.get(componentName))}-${componentName.toLowerCase()}--docs`,
+            }
           : {}),
         folder: `${config.repo}/tree/${view}/${repoPath(componentFolder)}`,
       };

@@ -8,7 +8,7 @@ import { SegmentedControl } from "../SegmentedControl/SegmentedControl.js";
 import { TextField } from "./TextField.js";
 
 const meta = {
-  title: "Components/TextField",
+  title: "Components/Controls/TextField",
   component: TextField,
   args: { label: "Email", placeholder: "you@example.com", onChange: fn(), size: "md", variant: "outline" },
   argTypes: {

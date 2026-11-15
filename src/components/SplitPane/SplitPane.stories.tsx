@@ -8,7 +8,7 @@ import { SplitPane } from "./SplitPane.js";
 const pane = (text: string) => <div style={{ padding: 12 }}>{text}</div>;
 
 const meta = {
-  title: "Components/SplitPane",
+  title: "Components/Structure/SplitPane",
   component: SplitPane,
   args: {
     label: "Resize the file list",

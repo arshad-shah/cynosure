@@ -21,7 +21,7 @@ const Scroller = () => (
 );
 
 const meta = {
-  title: "Components/OverlayFrame",
+  title: "Components/Structure/OverlayFrame",
   component: OverlayFrame,
   args: { overlay: <Badge tone="accent">3 new</Badge> },
   argTypes: {

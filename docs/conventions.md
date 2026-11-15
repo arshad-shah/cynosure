@@ -48,6 +48,10 @@ Content props that place things in a component's own layout use the same names:
 - **Commands**: a component that hosts a ContextMenu or row actions reports the chosen item through `onCommand(value, …)` (Tree's with the item, a Tab's for itself), not `onSelect`, which is for choosing a value. The menus themselves (ContextMenu, Menu, Menubar) keep `onSelect(value, key)`: choosing an item is their value.
 - **`start` / `end`**: whole clusters of separate parts at the two ends of a bar (StatusBar's segments). Use them only where the component lays out two such groups.
 
+## Where a component sits
+
+The README's "## Components" lists every component in one group: Controls, Structure, Overlays, or Feedback and display. That list is the one source: a component's Storybook title is `Components/<group>/<Name>` and the documentation site groups its navigation from the same list. `pnpm cy new component <Name> --group <group>` writes both, and `cy check` (`story-group`) fails when the title and the list disagree.
+
 ## Ownership: reuse components, never their insides
 
 - **One stylesheet per component folder**, `<kebab-folder>.css`, and it styles only that folder's classes (`cy-<component>` and `cy-<component>-*` for each component the folder exports). Shared rules live in `src/styles/base.css` (`.cy-reset`, `.cy-visually-hidden`).

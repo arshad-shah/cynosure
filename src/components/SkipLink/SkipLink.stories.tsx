@@ -9,7 +9,7 @@ import { Button } from "../Button/Button.js";
 import { SkipLink } from "./SkipLink.js";
 
 const meta = {
-  title: "Components/SkipLink",
+  title: "Components/Structure/SkipLink",
   component: SkipLink,
   args: { href: "#main" },
   argTypes: {

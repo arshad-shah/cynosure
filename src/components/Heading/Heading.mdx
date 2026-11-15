@@ -17,9 +17,9 @@ A section or page heading. `level` sets the element (`h1` to `h6`) and `size` se
 
 **Use something else when:**
 - the text is not a heading (body copy, captions, labels): Text
-- it is rendered Markdown or other plain HTML: [Prose](?path=/docs/components-prose--docs), which styles the headings inside it
-- it is the title of an empty view with an icon and a next step: [EmptyState](?path=/docs/components-emptystate--docs)
-- it labels a form control: [Field](?path=/docs/components-field--docs)
+- it is rendered Markdown or other plain HTML: [Prose](?path=/docs/components-feedback-and-display-prose--docs), which styles the headings inside it
+- it is the title of an empty view with an icon and a next step: [EmptyState](?path=/docs/components-feedback-and-display-emptystate--docs)
+- it labels a form control: [Field](?path=/docs/components-feedback-and-display-field--docs)
 
 ## Usage
 
@@ -65,7 +65,7 @@ Heading is not interactive: it has no keyboard or pointer behaviour.
 - **Naming a region:** pass `id` and point `aria-labelledby` at it.
 - **Truncated text:** the full text stays the heading's accessible name.
 - **Wrapping:** lines are balanced (`text-wrap: balance`), and long words break instead of overflowing.
-- **No margins:** space headings with [Stack](?path=/docs/components-stack--docs) or the layout around them.
+- **No margins:** space headings with [Stack](?path=/docs/components-structure-stack--docs) or the layout around them.
 - **Right to left:** `start` and `end` swap sides, and a truncated heading keeps the start of its text.
 - **Ref:** the forwarded ref is the heading element.
 
@@ -95,4 +95,4 @@ createTheme({ components: { heading: { sizeXl: "1.5rem", "size-2xl": "2rem", lin
 
 ## Related
 
-[Prose](?path=/docs/components-prose--docs) · [Stack](?path=/docs/components-stack--docs) · [EmptyState](?path=/docs/components-emptystate--docs)
+[Prose](?path=/docs/components-feedback-and-display-prose--docs) · [Stack](?path=/docs/components-structure-stack--docs) · [EmptyState](?path=/docs/components-feedback-and-display-emptystate--docs)
