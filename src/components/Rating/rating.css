@@ -1,0 +1,83 @@
+/* rating: a row of stars. Each star is Facet's `star` outline, with a filled copy above it clipped to the filled part
+   (`--_fill`, 0 to 1, measured across the star's drawn shape: x 3.5 to 20.5 of its 24 grid). In RTL it fills from the
+   right. */
+.cy-rating.cy-rating {
+  box-sizing: border-box !important;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cy-space-3);
+  margin: 0;
+  color: var(--cy-color-ink);
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-font-size-md);
+  font-weight: var(--cy-font-weight-regular);
+  line-height: var(--cy-font-line-height);
+  letter-spacing: normal;
+  text-transform: none;
+  vertical-align: middle;
+  &[data-disabled] {
+    opacity: 0.55;
+  }
+}
+.cy-rating-stars.cy-rating-stars,
+.cy-rating.cy-rating[role="img"] {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cy-rating-gap, var(--cy-space-1));
+  border-radius: var(--cy-radius-sm);
+  font-size: var(--cy-font-size-md);
+}
+.cy-rating-stars.cy-rating-stars {
+  /* The row is the hit target: at least --cy-hit-min tall, --cy-hit-coarse on touch screens. */
+  min-block-size: var(--cy-hit-min, 24px);
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  outline: none;
+  &:focus-visible {
+    box-shadow: 0 0 0 var(--cy-border-focus) var(--cy-color-ring);
+  }
+  &[aria-disabled="true"] {
+    cursor: not-allowed;
+  }
+}
+@media (pointer: coarse) {
+  .cy-rating-stars.cy-rating-stars {
+    min-block-size: var(--cy-hit-coarse, 44px);
+  }
+}
+.cy-rating-star.cy-rating-star {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  color: var(--cy-rating-empty, var(--cy-color-muted));
+  font-size: var(--cy-font-size-md);
+}
+.cy-rating-filled.cy-rating-filled {
+  position: absolute;
+  inset: 0;
+  display: inline-flex;
+  color: var(--cy-rating-filled, var(--cy-color-warning));
+  font-size: var(--cy-font-size-md);
+  clip-path: inset(0 calc(100% - (3.5 / 24 * 100%) - var(--_fill, 0) * (17 / 24 * 100%)) 0 0);
+  & > * {
+    position: absolute;
+    inset: 0;
+  }
+}
+.cy-rating-star:dir(rtl) > .cy-rating-filled {
+  clip-path: inset(0 0 0 calc(100% - (3.5 / 24 * 100%) - var(--_fill, 0) * (17 / 24 * 100%)));
+}
+.cy-rating-value.cy-rating-value {
+  color: var(--cy-color-muted);
+  font-size: var(--cy-font-size-sm);
+  font-variant-numeric: tabular-nums;
+}
+@media (forced-colors: active) {
+  .cy-rating-filled.cy-rating-filled {
+    color: Highlight;
+  }
+  .cy-rating-star.cy-rating-star {
+    color: CanvasText;
+  }
+}

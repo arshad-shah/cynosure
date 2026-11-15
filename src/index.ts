@@ -347,6 +347,7 @@ export {
   type RadioGroupTokens,
   type RadioOption,
 } from "./components/RadioGroup/index.js";
+export { Rating, type RatingLabels, type RatingProps, type RatingTokens } from "./components/Rating/index.js";
 export { RowActions, type RowActionsProps } from "./components/RowActions/index.js";
 export {
   ScrollArea,

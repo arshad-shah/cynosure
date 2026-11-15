@@ -1,0 +1,70 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./Rating.stories";
+
+<Meta of={Stories} />
+
+# Rating
+
+Stars for a score: a product's average, a review, how much someone liked something. Read-only, it draws any value exactly; interactive, it lets a person give a score with a pointer, a finger or the keyboard.
+
+<Canvas of={Stories.ReadOnlyDrawsTheExactValue} />
+
+## When to use
+
+- **Show a score** out of a few stars: an average of 4.3, a 3.5-star review.
+- **Ask for a score** where stars are the expected form: reviews, feedback, favourites ranked by liking.
+
+**Use something else when:**
+- the value is a measurement, not a judgement (strength, a quota): [ProgressBar](?path=/docs/components-feedback-and-display-progressbar--docs) with `meter`
+- the choice has named options (Poor, Fair, Good): [RadioGroup](?path=/docs/components-controls-radiogroup--docs) or [SegmentedControl](?path=/docs/components-controls-segmentedcontrol--docs)
+- it is any number on a range: [Slider](?path=/docs/components-controls-slider--docs)
+
+## Usage
+
+```tsx
+import { Rating } from "@arshad-shah/cynosure";
+
+<Rating value={4.3} showValue />                                        // read-only
+<Rating label="Your rating" value={stars} onChange={setStars} step={0.5} />  // interactive
+```
+
+A rating with `value` and no `onChange` is read-only: one image, named "Rated 4.3 out of 5", with no focus stop. Give it `onChange` (or `defaultValue`) to make it interactive. `step` sets what keys, hover and taps move by: `1` for whole stars, `0.5` for halves. With `name` the value submits with a form.
+
+<Canvas of={Stories.HoverPreviewsPreciselyAndClickSets} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+| Input | Result |
+| --- | --- |
+| <kbd>Right</kbd>, <kbd>Up</kbd> | One `step` more (in right-to-left text, <kbd>Left</kbd> is more) |
+| <kbd>Left</kbd>, <kbd>Down</kbd> | One `step` less, never below one step |
+| <kbd>Page Up</kbd>, <kbd>Page Down</kbd> | A whole star more or less |
+| <kbd>Home</kbd>, <kbd>End</kbd> | The least (one step) and the most |
+| Pointer over the stars | Previews the value under the pointer: the star it is over (the nearest one in a gap), stepped across that star's shape; past the last star it stays at the most |
+| Press, tap | Sets the value where it lands |
+
+- **Role:** interactive, a `slider` named by `label`, with `aria-valuenow` and `aria-valuetext` ("3.5 out of 5"). Read-only, a single `img` named "Rated 4.3 out of 5" (`labels.rated`).
+- **Exact drawing:** each star is Facet's `star` outline with a filled copy clipped to the filled part, measured across the star's drawn shape, so 0.3 of a star looks like 30%.
+- **Right-to-left:** the stars run and fill from the right.
+- **Disabled:** dimmed, no focus stop, and keys, hover and taps change nothing.
+- **Forced colours:** the filled part is `Highlight`, the outline `CanvasText`.
+
+## Touch
+
+The row of stars is the hit target: at least 24px tall, and 44px on touch screens. A tap sets the value where the finger lands.
+
+## Theming
+
+Tokens: `--cy-rating-gap` (space between stars), `--cy-rating-filled` (the filled colour, default the warning colour; `color` sets it for one rating) and `--cy-rating-empty` (an empty star's outline).
+
+```ts
+createTheme({ components: { rating: { filled: "#f5b301", gap: "2px" } } });
+```
+
+## Related
+
+[ProgressBar](?path=/docs/components-feedback-and-display-progressbar--docs) · [Slider](?path=/docs/components-controls-slider--docs) · [RadioGroup](?path=/docs/components-controls-radiogroup--docs) · [Icon](?path=/docs/foundations-icon--docs)

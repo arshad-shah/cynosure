@@ -2,7 +2,7 @@
   {
     "name": "all CSS",
     "path": "dist/styles.css",
-    "limit": "38.25 kB",
+    "limit": "38.5 kB",
     "gzip": true
   },
   {
@@ -760,6 +760,12 @@
     "name": "SortButton",
     "path": ["dist/components/SortButton/SortButton.js", "dist/styles/sort-button.css"],
     "limit": "1.1 kB",
+    "gzip": true
+  },
+  {
+    "name": "Rating (JS + CSS)",
+    "path": ["dist/components/Rating/Rating.js", "dist/styles/rating.css"],
+    "limit": "3 kB",
     "gzip": true
   }
 ]
