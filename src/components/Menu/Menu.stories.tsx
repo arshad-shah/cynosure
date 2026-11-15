@@ -32,7 +32,11 @@ const meta = {
     placement: "bottom",
     trigger: (props) => <Button {...props}>Actions</Button>,
   },
-  argTypes: { placement: { control: "inline-radio", options: ["top", "bottom", "start", "end"] } },
+  argTypes: {
+    placement: { control: "inline-radio", options: ["top", "bottom", "start", "end"] },
+    align: { control: "inline-radio", options: ["start", "center", "end"] },
+    offset: { control: "number" },
+  },
 } satisfies Meta<typeof Menu>;
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -95,6 +99,50 @@ export const GapFromTheTriggerIsAToken: Story = {
     // The default gap is --cy-space-2 (4px); --cy-menu-offset changes it.
     await expect(await gapOf("Actions", "File actions")).toBeCloseTo(4, 0);
     await expect(await gapOf("Spaced", "Wide gap")).toBeCloseTo(20, 0);
+  },
+};
+
+export const AlignAndOffsetPlaceTheMenu: Story = {
+  args: { align: "end", offset: 12 },
+  argTypes: { align: { control: "inline-radio", options: ["start", "center", "end"] } },
+  render: (args) => (
+    <div style={{ paddingInlineStart: 240 }}>
+      <Menu {...args} />
+    </div>
+  ),
+  play: async ({ canvas, userEvent }) => {
+    const trigger = canvas.getByRole("button", { name: "Actions" });
+    await userEvent.click(trigger);
+    const menu = await canvas.findByRole("menu", { name: "File actions" });
+    await shownFully(menu);
+    const t = trigger.getBoundingClientRect();
+    const m = menu.getBoundingClientRect();
+    // The menu is wider than its button: `end` lines up the end edges, `offset` sets the gap (over the token).
+    await expect(m.width).toBeGreaterThan(t.width);
+    await expect(Math.abs(m.right - t.right)).toBeLessThan(1);
+    await expect(m.top - t.bottom).toBeCloseTo(12, 0);
+    await userEvent.keyboard("{Escape}");
+    await settledClosed(menu);
+  },
+};
+
+export const AlignCenterInRtl: Story = {
+  args: { align: "center" },
+  render: (args) => (
+    <div dir="rtl" style={{ paddingInlineStart: 240 }}>
+      <Menu {...args} />
+    </div>
+  ),
+  play: async ({ canvas, userEvent }) => {
+    const trigger = canvas.getByRole("button", { name: "Actions" });
+    await userEvent.click(trigger);
+    const menu = await canvas.findByRole("menu", { name: "File actions" });
+    await shownFully(menu);
+    const t = trigger.getBoundingClientRect();
+    const m = menu.getBoundingClientRect();
+    await expect(Math.abs(m.left + m.width / 2 - (t.left + t.width / 2))).toBeLessThan(1);
+    // Without `offset`, the gap is still the token.
+    await expect(m.top - t.bottom).toBeCloseTo(4, 0);
   },
 };
 

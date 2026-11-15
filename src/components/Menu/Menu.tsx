@@ -26,7 +26,7 @@ import { chevronRight } from "../../icons/chevron-right.js";
 import type { IconData } from "../../icons/types.js";
 import { useDismiss } from "../../overlay/dismiss.js";
 import { useFloatingOffset, usePopover } from "../../overlay/floating.js";
-import type { Placement } from "../../overlay/position.js";
+import { type Align, crossAlign, type Placement } from "../../overlay/position.js";
 import { useAnchoredPosition, type VirtualAnchor } from "../../overlay/use-anchored-position.js";
 import type { Tone } from "../../tokens/schema.js";
 import { Kbd } from "../Kbd/Kbd.js";
@@ -111,6 +111,14 @@ export interface MenuProps {
   onOpenChange?: ((open: boolean) => void) | undefined;
   /** Side of the trigger the menu opens on. Default "bottom". */
   placement?: Placement;
+  /**
+   * Which edges line up with the trigger's across that side: `start`, `center` or `end` (following the reading
+   * direction; beside the trigger, `start` is the top edge and `end` the bottom). Default: the start edge above or
+   * below, centred beside.
+   */
+  align?: Align | undefined;
+  /** Gap from the trigger in pixels. Default: the `--cy-menu-offset` token. */
+  offset?: number | undefined;
   /** Added to the menu panel, for layout. */
   className?: string;
   /** Layout only, applied to the panel. */
@@ -147,6 +155,8 @@ export interface MenuPanelProps {
   /** What the panel is placed against: the trigger, or a point (context menus). */
   anchor: RefObject<HTMLElement | VirtualAnchor | null>;
   placement: Placement;
+  /** Cross-axis alignment against the anchor (ignored by submenus, which sit flush beside their item). */
+  align?: Align | undefined;
   /** Gap from the anchor in pixels. Default: the panel's `--_offset` (`--cy-menu-offset`), read when it opens. */
   offset?: number | undefined;
   /** Elements that count as inside (clicking them does not dismiss). */
@@ -170,6 +180,7 @@ export function MenuPanel({
   focusOn,
   anchor,
   placement,
+  align,
   offset,
   inside,
   returnFocus,
@@ -202,7 +213,7 @@ export function MenuPanel({
     open,
     nested ? "end" : placement,
     nested || offset === undefined ? tokenOffset : offset,
-    nested ? "flush" : "start",
+    nested ? "flush" : crossAlign(align),
   );
   useRovingFocus(panel, { orientation: "vertical", selector: ITEM });
   useDismiss({ open, onClose, inside: [...inside, panel], returnFocus });
@@ -439,6 +450,8 @@ export function Menu({
   defaultOpen = false,
   onOpenChange,
   placement = "bottom",
+  align,
+  offset,
   className,
   style,
 }: MenuProps) {
@@ -480,6 +493,8 @@ export function Menu({
         focusOn={focusOn}
         anchor={triggerRef}
         placement={placement}
+        align={align}
+        offset={offset}
         inside={[triggerRef]}
         returnFocus={triggerRef}
         className={className}
