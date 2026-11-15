@@ -18,6 +18,7 @@ import { CodeBlock } from "@arshad-shah/cynosure";
 | `lineNumbers` | `false` | A gutter of numbers, hidden from screen readers and never copied                     |
 | `wrap`        | `false` | Wrap long lines instead of scrolling sideways (line numbers are then left out)       |
 | `actions`     | –       | Buttons in the header before the copy button, e.g. "Insert into editor"              |
+| `size`        | `md`    | Font size of the code: `sm` · `md` · `lg`                                            |
 | `copyable`    | `true`  | The copy button (it copies `code`, not the highlighted markup)                       |
 | `copy`        | –       | Passed to CopyButton, for extensions that copy through their own channel             |
 | `labels`      | –       | CopyButton's `copy`, `copied`, `failed`, plus `region` (name when there is no title) |

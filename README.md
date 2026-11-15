@@ -42,7 +42,7 @@ export const App = () => (
 | [Accessibility](docs/accessibility.md)                         | What every component guarantees, and how it is tested              |
 | [Without React](docs/without-react.md)                         | Tokens and icons in Astro pages, static sites and plain TypeScript |
 | [Code editors](docs/code-editors.md)                           | Code colours for CodeMirror, Monaco, Shiki, Prism and highlight.js |
-| [Build adapters](docs/adapters.md)                             | The Vite adapter and shadow roots (`styles.inline`)                |
+| [Build adapters](docs/adapters.md)                             | The Vite and Astro adapters and shadow roots (`styles.inline`)     |
 | [Migrating a product](docs/migration.md)                       | The order of work to move a product onto Cynosure                  |
 | [Architecture](docs/architecture.md)                           | How the package is put together                                    |
 | [Conventions](docs/conventions.md), [Testing](docs/testing.md) | The rules `pnpm check` enforces, and how components are tested     |
@@ -56,6 +56,6 @@ export const App = () => (
 - **Structure:** AppShell (`useAppShell`), TitleBar, StatusBar, Container, PageHeader, Stack, Inline, Grid, ScrollArea, Divider, AspectRatio, Breadcrumbs, SideNav, SplitPane, Card, Toolbar, Tabs, Disclosure, Accordion, Tree, SortableList, VirtualList, Calendar, DocumentViewport, PanZoomCanvas, ZoomControls, Section, SiteHeader, SiteFooter, SkipLink, ListRow (`ListRows`), OverlayFrame, VisuallyHidden.
 - **Overlays:** Tooltip, HoverCard, Popover, FloatingToolbar (`DockedToolbar`), Menu, Menubar, ContextMenu, Dialog, ProgressOverlay, Sheet, CommandPalette (`useHotkey`), Toast (`Toaster`, `useToast`).
 - **Feedback and display:** Notice, EmptyState, ErrorBoundary, ProgressBar, Steps, LoadingDots, Skeleton, DescriptionList, Stat, List, Table, Text, Heading, Prose, Avatar (`AvatarGroup`), IconTile, Image, CodeBlock, Announcer (`useAnnounce`), Badge, Kbd, Field, DataGrid, HighlightedText, ChatMessage, QRCode, DeviceFrame. **Theme:** CynosureTheme, useColorMode, themeInitScript, createTheme.
-- **Build:** optional Vite adapter (`@arshad-shah/cynosure/vite`), React-free tokens (`@arshad-shah/cynosure/tokens`) and self-hosted Hanken Grotesk (`fonts/hanken.css`).
+- **Build:** optional Vite and Astro adapters (`@arshad-shah/cynosure/vite`, `@arshad-shah/cynosure/astro`), React-free tokens (`@arshad-shah/cynosure/tokens`) and self-hosted Hanken Grotesk (`fonts/hanken.css`).
 
 > Status: pre-release (`0.x`), developed on `next`. Releases publish to npm from `main` through GitHub Actions (see [Release](docs/release.md)).

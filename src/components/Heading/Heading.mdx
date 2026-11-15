@@ -75,11 +75,12 @@ Nothing in Heading is pressable, so it has no hit area.
 
 ## Theming
 
-Tokens: `--cy-heading-size-{xs,sm,md,lg,xl,2xl,display}`, `--cy-heading-font-family`, `--cy-heading-font-weight` and `--cy-heading-line-height`.
+Tokens: `--cy-heading-size-{xs,sm,md,lg,xl,2xl,3xl,display}`, `--cy-heading-font-family`, `--cy-heading-font-weight` and `--cy-heading-line-height`.
 
 | Token | Changes | Falls back to |
 | --- | --- | --- |
 | `--cy-heading-size-xs` to `--cy-heading-size-2xl` | Font size of each `size` | `--cy-font-size-xs` to `--cy-font-size-2xl` |
+| `--cy-heading-size-3xl` | Font size of `size="3xl"` | 1.4 times `--cy-font-size-2xl` |
 | `--cy-heading-size-display` | Font size of `size="display"` | 5% of the viewport width, between 1.25 and 2 times `--cy-font-size-2xl` |
 | `--cy-heading-font-family` | Font family | `--cy-font-display` |
 | `--cy-heading-font-weight` | Weight of bold headings | `--cy-font-weight-bold` |

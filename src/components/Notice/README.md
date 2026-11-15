@@ -17,6 +17,7 @@ An inline message about part of the page that stays until it is resolved or dism
 | `children`    | –                        | Body text                                                                 |
 | `action`      | –                        | One or two Buttons; they drop under the text below a width of 26rem       |
 | `dismissible` | `false`                  | Close button; hides the Notice unless you pass `onDismiss` and unmount it |
+| `onDismiss`   | –                        | Called when the close button is pressed; with it, hiding is up to you     |
 | `icon`        | the tone's icon          | Another Facet icon, or `null` for none                                    |
 | `labels`      | `{ dismiss: "Dismiss" }` | Built-in strings                                                          |
 - `role="alert"` for `danger` (announced even when it appears filled), `role="status"` otherwise: content changes are announced, but a status Notice that mounts already filled is usually only read in place. For a passing message that must be announced, use Toast. The icon is decorative.

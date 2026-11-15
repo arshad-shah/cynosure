@@ -14,14 +14,15 @@ One choice from a short list, on native radios: arrow keys move and select (wrap
 />;
 ```
 
-| Prop                                         | Default         | Notes                                         |
-| -------------------------------------------- | --------------- | --------------------------------------------- |
-| `label` / `description` / `error`            | –               | Group label through `Field`                   |
-| `options`                                    | –               | `{ value, label, description?, disabled? }[]` |
-| `value` / `defaultValue` / `onChange(value)` | –               | Controlled or uncontrolled                    |
-| `orientation`                                | `vertical`      | `vertical` · `horizontal`                     |
-| `size` / `tone`                              | `md` / `accent` | Shared vocabulary                             |
-| `name`, `required`, `disabled`               | –               | Native                                        |
+| Prop                                         | Default         | Notes                                                                           |
+| -------------------------------------------- | --------------- | ------------------------------------------------------------------------------- |
+| `label` / `description` / `error`            | –               | Group label through `Field`                                                     |
+| `labelHidden`                                | `false`         | Visually hides the group label; it still names the group. Prefer visible labels |
+| `options`                                    | –               | `{ value, label, description?, disabled? }[]`                                   |
+| `value` / `defaultValue` / `onChange(value)` | –               | Controlled or uncontrolled                                                      |
+| `orientation`                                | `vertical`      | `vertical` · `horizontal`                                                       |
+| `size` / `tone`                              | `md` / `accent` | Shared vocabulary                                                               |
+| `name`, `required`, `disabled`               | –               | Native                                                                          |
 
 ## Tokens
 

@@ -19,6 +19,7 @@ import { Slider } from "../Slider/Slider.js";
 import { TextField } from "../TextField/TextField.js";
 
 export interface ColorFieldTokens {
+  pickerWidth: string;
   swatchSize: string;
   areaHeight: string;
 }

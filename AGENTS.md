@@ -18,7 +18,7 @@ Node 24 (`.nvmrc`), pnpm via `packageManager` (installs refuse versions younger 
 | `pnpm lint` / `pnpm typecheck` / `pnpm build` / `pnpm size`                        | Gates                                                                              |
 | `pnpm verify`                                                                      | All gates in order. Run before pushing.                                            |
 | `pnpm cy new component <Name> --kind composite\|foundation --group <README group>` | Scaffold a component (never hand-create one); a composite needs `--group`          |
-| `pnpm cy new icon <name> --from file.svg`                                          | Add a Facet icon                                                                   |
+| `pnpm cy new icon <name> --from file.svg --category <category>`                    | Add a Facet icon                                                                   |
 | `pnpm cy new token <component.token> --doc "…"`                                    | Add a component token                                                              |
 | `pnpm cy progress`                                                                 | Print the current task and next step                                               |
 

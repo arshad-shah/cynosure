@@ -27,7 +27,7 @@ import { Choice, ChoiceBase } from "@arshad-shah/cynosure";
 | `name`, `value`, `required`, `disabled`, `id`      | –       | Passed to the input; `disabled` also dims the row                                      |
 | `className` / `style`                              | –       | Layout only, on the root `<label>`                                                     |
 
-`ChoiceControlProps` is the prop set Checkbox and Switch share (Choice's props plus `tone`, without `control`).
+`ChoiceControlProps` is the prop set Checkbox and Switch share (Choice's props plus `tone`, without `control` and `strikeWhenChecked`).
 
 ## Accessibility and touch
 

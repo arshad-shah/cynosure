@@ -14,5 +14,5 @@
 - **Transitions:** never read a colour, opacity or position mid-transition. Wait for it to settle (`waitFor`, up to 3 seconds on CI), and compare colours as painted RGBA with alpha, since engines serialise colours differently.
 - **Unit:** `pnpm test` for pure logic (tokens, CLI, Preact compat).
 - **React 18:** `pnpm test:react18` runs a few core components on React 18 (`tests/react18`, its own install), the oldest supported peer.
-- **Published Storybook:** before telling Arshad the site is fine, build it (`pnpm build-storybook`) and load every story under `/cynosure/`; play functions run there too and show as errors when they fail.
+- **Published Storybook:** before telling Arshad the site is fine, build it (`pnpm build-storybook`) and load every story under `/storybook/`; play functions run there too and show as errors when they fail.
 - Never weaken a test to pass. Write the failing test first.

@@ -35,7 +35,7 @@ Leave `value` undefined while the amount is unknown. Give `onCancel` whenever th
 
 - **Role:** a modal dialog named by `title`, holding a progress bar with the same name.
 - **Announcements:** the status line ("3 of 12", or your `status`) is a polite live region.
-- **Keyboard:** focus moves into the dialog and stays there; Escape cancels (only with `onCancel`); focus returns where it was when it closes.
+- **Keyboard:** focus moves into the dialog and stays there; Escape cancels, as do the close button and a press on the backdrop (only with `onCancel`); focus returns where it was when it closes.
 
 <Canvas of={Stories.UnknownAmount} />
 

@@ -26,20 +26,21 @@ import { SideNav } from "@arshad-shah/cynosure";
 />;
 ```
 
-| Prop              | Default    | Notes                                                                                                       |
-| ----------------- | ---------- | ----------------------------------------------------------------------------------------------------------- |
-| `label`           | –          | Name of the navigation landmark ("Main")                                                                    |
-| `items`           | –          | `NavItem` (`id`, `label`, `href?`, `icon?`, `badge?`, `items?`, `disabled?`) or `{ label, items }` sections |
-|                   |            | or one `NavAction` (`kind: "action"`, `id`, `label`, `icon`, `onClick`, `disabled?`): a primary button      |
-| `current`         | –          | `id` of the page shown: `aria-current="page"`; groups on the way to it open                                 |
-| `onNavigate`      | –          | `(id, event)` on every choice; `event.preventDefault()` to route on the client                              |
-| `renderLink`      | plain link | Render links with your router; spread the props it receives                                                 |
-| `collapsed`       | `false`    | Icon rail: labels in tooltips (still the accessible names); groups call `onCollapsedChange(false)`          |
-| `defaultExpanded` | `[]`       | Group ids open at first                                                                                     |
-| `layout`          | `column`   | `bar`: one row of top-level items, icon over label, for AppShell's phone `tabs`                             |
-| `size`            | `md`       | `sm` · `md` · `lg`                                                                                          |
-| `footer`          | –          | Entries pinned to the bottom (Settings, notifications); the nav then fills its container's height           |
-| `placement`       | `start`    | `end` for a rail on the inline end: the current indicator faces the content, tooltips open towards it       |
+| Prop                | Default    | Notes                                                                                                       |
+| ------------------- | ---------- | ----------------------------------------------------------------------------------------------------------- |
+| `label`             | –          | Name of the navigation landmark ("Main")                                                                    |
+| `items`             | –          | `NavItem` (`id`, `label`, `href?`, `icon?`, `badge?`, `items?`, `disabled?`) or `{ label, items }` sections |
+|                     |            | or one `NavAction` (`kind: "action"`, `id`, `label`, `icon`, `onClick`, `disabled?`): a primary button      |
+| `current`           | –          | `id` of the page shown: `aria-current="page"`; groups on the way to it open                                 |
+| `onNavigate`        | –          | `(id, event)` on every choice; `event.preventDefault()` to route on the client                              |
+| `renderLink`        | plain link | Render links with your router; spread the props it receives                                                 |
+| `collapsed`         | `false`    | Icon rail: labels in tooltips (still the accessible names); groups call `onCollapsedChange(false)`          |
+| `onCollapsedChange` | –          | Called with `false` when a group is chosen in the collapsed rail                                            |
+| `defaultExpanded`   | `[]`       | Group ids open at first                                                                                     |
+| `layout`            | `column`   | `bar`: one row of top-level items, icon over label, for AppShell's phone `tabs`                             |
+| `size`              | `md`       | `sm` · `md` · `lg`                                                                                          |
+| `footer`            | –          | Entries pinned to the bottom (Settings, notifications); the nav then fills its container's height           |
+| `placement`         | `start`    | `end` for a rail on the inline end: the current indicator faces the content, tooltips open towards it       |
 - A `<nav>` landmark; each section is a list named by its heading. Items without `href` are buttons.
 - Keyboard: Tab moves between items (then the footer's), Enter follows a link or toggles a group (Space too for buttons).
 - In the collapsed rail an item's `badge` sits on its icon's top inline-end corner, still part of its name.

@@ -50,4 +50,4 @@ For the rows of a list or the tabs of a tab list, use one ContextMenu for all of
 
 ## Tokens
 
-Shared with Menu: `--cy-menu-*`.
+Shared with Menu: `--cy-menu-min-width`, `--cy-menu-max-width`, `--cy-menu-radius` and `--cy-menu-row-height`. `--cy-menu-offset` does not apply: a context menu opens 2px from the pointer.

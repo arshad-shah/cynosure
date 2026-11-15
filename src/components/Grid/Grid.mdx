@@ -87,7 +87,7 @@ Grid takes `grow`, `shrink`, `fill`, `minSize` and `overflow` as [Stack](?path=/
 ## Behaviour and accessibility
 
 - **Semantics:** Grid is layout only; it adds no role. Render a list with `as="ul"` and `GridItem as="li"`: bullets and indentation are removed, the list semantics stay.
-- **Reading order:** visual order follows source order, so keyboard and screen reader order match what is seen.
+- **Reading order:** visual order follows source order unless a `GridItem` is given `order`. `order` moves an item visually only: keyboard and screen reader order stay the source order, so use it only where the order does not matter to understanding.
 - **Direction:** columns run with the text direction.
 - **Nesting:** a nested Grid has its own columns and padding and never inherits its parent's.
 - **Columns per breakpoint:** such a grid is a size container (`container-type: inline-size`), so its width must come from its parent. That is the case in normal block layout and in stretched flex or grid cells; in a shrink-to-fit place (an inline-flex box, a float) give it a width. Spans are clamped for `GridItem`s that are direct children. The breakpoints are in rem, so they follow the page's root font size.

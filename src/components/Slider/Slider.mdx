@@ -68,8 +68,10 @@ Give three or more numbers for as many thumbs, each held between its neighbours:
 | <kbd>Right</kbd> / <kbd>Up</kbd> | Up by `step` (in right-to-left text, <kbd>Right</kbd> lowers it) |
 | <kbd>Left</kbd> / <kbd>Down</kbd> | Down by `step` |
 | <kbd>Page Up</kbd> / <kbd>Page Down</kbd> | By `largeStep` (a tenth of the range by default) |
+| <kbd>Shift</kbd> + arrow keys | By `largeStep`, in the arrow's direction |
 | <kbd>Home</kbd> / <kbd>End</kbd> | To `min` / `max` |
 | Press or drag on the track | Moves the nearest thumb and keeps dragging |
+| <kbd>Escape</kbd> during a drag | Cancels the drag and restores the value from before the press |
 
 - **Roles:** each thumb is `role="slider"` with `aria-valuemin`, `aria-valuemax`, `aria-valuenow`, `aria-valuetext` and `aria-orientation`. A range is a `group`.
 - **Forms:** with `name`, the value is submitted (two values for a range) and a form reset restores the default. Disabled sliders are not submitted.

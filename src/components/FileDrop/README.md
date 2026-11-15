@@ -15,19 +15,22 @@ import { FileDrop } from "@arshad-shah/cynosure";
 />;
 ```
 
-| Prop                                   | Default | Notes                                                                                                                        |
-| -------------------------------------- | ------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| `onFiles`                              | –       | The files that passed the checks                                                                                             |
-| `onReject`                             | –       | `{ file, reason }[]`; reasons `type`, `size`, `count`. Also listed in the zone                                               |
-| `accept`                               | –       | As `<input accept>`: extensions, MIME types, `type/*`                                                                        |
-| `multiple`                             | `false` | More than one file; `maxFiles` caps how many                                                                                 |
-| `maxSize`                              | –       | Largest file, in bytes                                                                                                       |
-| `hint`                                 | –       | Shown under the button and read as its description                                                                           |
-| `target`                               | `zone`  | `window`: files dropped anywhere in the window are taken (see below)                                                         |
-| `name`, `form`, `required`, `disabled` | –       | Forms submit the accepted files, dropped or picked                                                                           |
-| `onPick` / `onPaths`                   | –       | `() => Promise<(File \| string)[] \| null>`, your picker in place of the browser's; chosen paths arrive in `onPaths`         |
-| `value` / `onRemove(item, index)`      | –       | Chosen files or paths listed in the zone, each with a remove button                                                          |
-| `labels`                               | –       | `prompt`, `choose`, `chooseOne`, `dragging`, `added(count)`, `rejected(rejection)`, `files`, `remove(name)`, `removed(name)` |
+| Prop                              | Default | Notes                                                                                                                        |
+| --------------------------------- | ------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `onFiles`                         | –       | The files that passed the checks                                                                                             |
+| `onReject`                        | –       | `{ file, reason }[]`; reasons `type`, `size`, `count`. Also listed in the zone                                               |
+| `accept`                          | –       | As `<input accept>`: extensions, MIME types, `type/*`                                                                        |
+| `multiple`                        | `false` | More than one file; `maxFiles` caps how many                                                                                 |
+| `maxFiles`                        | –       | Most files in one go, with `multiple`; more are refused as `count`                                                           |
+| `maxSize`                         | –       | Largest file, in bytes                                                                                                       |
+| `hint`                            | –       | Shown under the button and read as its description                                                                           |
+| `target`                          | `zone`  | `window`: files dropped anywhere in the window are taken (see below)                                                         |
+| `name`, `form`, `required`        | –       | Forms submit the accepted files, dropped or picked                                                                           |
+| `disabled`                        | `false` | Turns off dropping and the button                                                                                            |
+| `size`                            | `md`    | Size of the zone and its button                                                                                              |
+| `onPick` / `onPaths`              | –       | `() => Promise<(File \| string)[] \| null>`, your picker in place of the browser's; chosen paths arrive in `onPaths`         |
+| `value` / `onRemove(item, index)` | –       | Chosen files or paths listed in the zone, each with a remove button                                                          |
+| `labels`                          | –       | `prompt`, `choose`, `chooseOne`, `dragging`, `added(count)`, `rejected(rejection)`, `files`, `remove(name)`, `removed(name)` |
 - The button is the accessible way in (keyboard, touch, screen readers); dropping is a shortcut.
 - `onPick` replaces the browser's file dialog with your own (Electron's `dialog.showOpenDialog` over IPC), as PathField's `onPick`: the button calls it and is busy (`aria-busy`) until it settles. It resolves with the chosen files or paths, or `null` when cancelled; a cancel or a rejected promise changes nothing. Chosen files are checked like dropped ones and arrive in `onFiles` (and the form); chosen paths arrive in `onPaths`. Show them with `value`.
 - `value` lists chosen files (by `name`) or paths (as given) in the zone, a list named "Chosen files". With `onRemove`, each has a remove button: a press calls `onRemove(item, index)`, announces "report.pdf removed", and once `value` changes, focus moves to the next remove button (or the previous one, or the main button). `value` is display only: the native input holds only files picked or dropped here.

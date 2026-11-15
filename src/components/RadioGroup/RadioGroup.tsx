@@ -4,6 +4,17 @@ import type { Size, Tone } from "../../tokens/schema.js";
 import { Choice } from "../Choice/Choice.js";
 import { Field } from "../Field/Field.js";
 
+export interface RadioGroupTokens {
+  /** Space between the options. */
+  gap: string;
+}
+
+declare module "../../tokens/schema.js" {
+  interface ComponentTokens {
+    radioGroup: RadioGroupTokens;
+  }
+}
+
 export interface RadioOption {
   value: string;
   label: ReactNode;

@@ -14,6 +14,7 @@ Inline text link built on `LinkBase` (safe schemes only). Tone colours use each 
 | `size`         | `inherit` | `inherit` · `sm` · `md` · `lg`                                                                                                  |
 | `external`     | `false`   | `target="_blank"`, safe `rel`, external icon, announced text (`labels.external`)                                                |
 | `underline`    | `always`  | `hover` (on hover and focus) or `none`; keep it in running text, drop it only where the place says "link" (navigation, footers) |
+| `onClick`      | –         | Called when the link is activated                                                                                               |
 | `aria-current` | –         | `"page"` for the page being shown, in a navigation bar                                                                          |
 
 ## Tokens

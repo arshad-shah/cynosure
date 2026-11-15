@@ -13,6 +13,7 @@ Label, description and error wiring for any control. Controls render through a r
 | `label`       | –       | Visible label (associated with the control, or labelling a group) |
 | `description` | –       | Help text, linked via `aria-describedby`                          |
 | `error`       | –       | Announced (`role="alert"`), linked, marks the control invalid     |
+| `labelHidden` | `false` | Label kept for assistive tech but takes no space; prefer visible  |
 | `required`    | `false` | Draws the required marker (a shape, not a glyph)                  |
 | `size`        | `md`    | `xs` · `sm` · `md` · `lg` (an `xs` control has the `sm` label)    |
 | `group`       | `false` | Labels a `role="group"` (radio groups, segmented controls)        |

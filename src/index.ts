@@ -341,7 +341,12 @@ export {
 } from "./components/ProgressOverlay/index.js";
 export { Prose, type ProseProps, type ProseTokens } from "./components/Prose/index.js";
 export { QRCode, type QRCodeLabels, type QRCodeProps, type QRCodeTokens } from "./components/QRCode/index.js";
-export { RadioGroup, type RadioGroupProps, type RadioOption } from "./components/RadioGroup/index.js";
+export {
+  RadioGroup,
+  type RadioGroupProps,
+  type RadioGroupTokens,
+  type RadioOption,
+} from "./components/RadioGroup/index.js";
 export { RowActions, type RowActionsProps } from "./components/RowActions/index.js";
 export {
   ScrollArea,

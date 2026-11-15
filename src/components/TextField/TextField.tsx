@@ -23,6 +23,7 @@ import { Field, type FieldLayoutProps } from "../Field/Field.js";
 import { IconButton } from "../IconButton/IconButton.js";
 
 export interface TextFieldTokens {
+  readonlyBg: string;
   paddingInlineXs: string;
   heightXs: string;
   heightSm: string;

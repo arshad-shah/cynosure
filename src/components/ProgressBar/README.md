@@ -21,7 +21,7 @@ How far a task has got: uploads, exports, multi-step setups. A labelled `role="p
 - The fill uses the tone's text colour, which stays at 3:1 or more against the track in light and dark modes.
 - Fills from the inline start (right in right-to-left text). The indeterminate segment stands still in the middle under reduced motion.
 
-Tokens: `--cy-progress-bar-height-{sm,md,lg}`, `--cy-progress-bar-radius`, `--cy-progress-bar-track`.
+Tokens: `--cy-progress-bar-height-{xs,sm,md,lg}`, `--cy-progress-bar-radius`, `--cy-progress-bar-track`.
 
 - `segments` (with `offset`): parts drawn end to end, such as a request's timing or a waterfall row. Each has a `label` (read out: "DNS 12, Connect 30") and a `tone` or category `color`.
 - `marker` (with `markerLabel`): a thin mark at a value, such as a budget or target.
