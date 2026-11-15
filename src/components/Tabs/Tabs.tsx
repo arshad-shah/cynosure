@@ -1,7 +1,9 @@
 import { sortable } from "@arshad-shah/detent";
 import {
+  Children,
   type CSSProperties,
   createContext,
+  isValidElement,
   type KeyboardEvent,
   type MouseEvent,
   type ReactNode,
@@ -15,6 +17,7 @@ import { ButtonBase } from "../../foundations/ButtonBase/ButtonBase.js";
 import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js";
 import { useControllableState } from "../../foundations/controllable.js";
 import { isRtl } from "../../foundations/dir.js";
+import { ariaKeyShortcuts, shortcutKeys } from "../../foundations/hotkey.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
 import { LiveRegion, useLiveMessage } from "../../foundations/LiveRegion/LiveRegion.js";
 import { clamp } from "../../foundations/math.js";
@@ -23,14 +26,16 @@ import { usePrinting } from "../../foundations/printing.js";
 import { moveItems } from "../../foundations/reorder.js";
 import { useRovingFocus } from "../../foundations/roving-focus.js";
 import { alignedScroll } from "../../foundations/scroll-align.js";
+import { chevronDown } from "../../icons/chevron-down.js";
 import { chevronLeft } from "../../icons/chevron-left.js";
 import { chevronRight } from "../../icons/chevron-right.js";
 import { close } from "../../icons/close.js";
 import type { IconData } from "../../icons/types.js";
 import type { Size } from "../../tokens/schema.js";
+import { Button } from "../Button/Button.js";
 import { ContextMenu, type ContextMenuKeyTargetProps } from "../ContextMenu/ContextMenu.js";
 import { IconButton } from "../IconButton/IconButton.js";
-import type { MenuEntry } from "../Menu/Menu.js";
+import { Menu, type MenuEntry } from "../Menu/Menu.js";
 import { Tooltip } from "../Tooltip/Tooltip.js";
 
 export interface TabsTokens {
@@ -63,6 +68,8 @@ export interface TabsLabels {
   menu: (name: string) => string;
   /** Announced after a tab is moved. Default "Moved notes.md to position 2 of 4". */
   moved: (name: string, position: number, total: number) => string;
+  /** The button (and its menu) holding the tabs that do not fit, with `overflow="menu"`. Default "More". */
+  more: string;
 }
 
 const DEFAULT_LABELS: TabsLabels = {
@@ -73,6 +80,7 @@ const DEFAULT_LABELS: TabsLabels = {
   scrollForward: "Scroll tabs forward",
   menu: (name) => (name ? `${name} actions` : "Tab actions"),
   moved: (name, position, total) => `Moved ${name} to position ${position} of ${total}`,
+  more: "More",
 };
 
 interface TabsContext {
@@ -231,6 +239,12 @@ export interface TabListProps {
    */
   scrollable?: boolean | undefined;
   /**
+   * `"menu"`: the tabs that do not fit the list's width go into a More menu at its end, in order, with their icons
+   * and shortcuts (mode tabs in a narrow window). The selected tab always keeps its place in the row; choosing one
+   * from the menu selects it. Arrow keys move through the tabs in the row. Not with `scrollable`.
+   */
+  overflow?: "menu" | undefined;
+  /**
    * Content after the last tab, outside the tab list, such as a "New tab" IconButton. It follows the last tab, and
    * stays at the end in view when the tabs overflow.
    */
@@ -249,6 +263,9 @@ interface TabMenu {
   onSelect: ((command: string) => void) | undefined;
 }
 
+/** The values of the tabs a `overflow="menu"` list has moved into its More menu; such a tab is not drawn in the row. */
+const OverflowContext = createContext<ReadonlySet<string>>(new Set());
+
 /** The list's one ContextMenu, shared with its tabs: the props that make a tab one of its targets. */
 const MenuContext = createContext<((menu: TabMenu) => ContextMenuKeyTargetProps) | null>(null);
 
@@ -263,11 +280,12 @@ export function TabList({
   label,
   onReorder,
   scrollable = false,
+  overflow,
   trailing,
   className,
   children,
 }: TabListProps) {
-  const { size, variant, value, labels, refocus } = useTabs("TabList");
+  const { size, variant, value, labels, refocus, select } = useTabs("TabList");
   const ref = useRef<HTMLDivElement>(null);
   const strip = useRef<HTMLDivElement>(null);
   const [said, setSaid] = useLiveMessage();
@@ -322,7 +340,7 @@ export function TabList({
     refocus.current = v;
     move(v, to);
   };
-  useRovingFocus(ref, { selector: '[role="tab"]' });
+  useRovingFocus(ref, { selector: '[role="tab"]:not([data-overflowed])' });
   // Keep the selected (or focused) tab fully visible and clear of the faded edges. The target is a position in the
   // content (not relative to the current scroll), so repeated key presses during a smooth scroll still land right.
   const reveal = useCallback((tab: HTMLElement | null) => {
@@ -394,6 +412,93 @@ export function TabList({
   useClientLayoutEffect(() => {
     reveal(ref.current?.querySelector<HTMLElement>('[role="tab"][aria-selected="true"]') ?? null);
   }, [value, reveal]);
+  // overflow="menu": which tabs fit the row. Widths are measured while a tab is drawn and remembered while it is in the
+  // menu; the More button is always rendered (out of sight while idle) so its width is known before it is needed.
+  const fitting = overflow === "menu";
+  const more = useRef<HTMLDivElement>(null);
+  const widths = useRef(new Map<string, number>());
+  const [overflowed, setOverflowed] = useState<ReadonlySet<string>>(() => new Set());
+  const fit = useCallback(() => {
+    const list = ref.current;
+    const row = strip.current;
+    if (!fitting || !list || !row) return;
+    const kids = [...list.children] as HTMLElement[];
+    const values = kids.map((k) => tabIn(k)?.dataset.value ?? "");
+    kids.forEach((k, i) => {
+      const w = k.getBoundingClientRect().width;
+      if (w > 0) widths.current.set(values[i] as string, w);
+    });
+    const width = (v: string) => widths.current.get(v) ?? 0;
+    const gap = Number.parseFloat(getComputedStyle(list).columnGap) || 0;
+    const rowGap = Number.parseFloat(getComputedStyle(row).columnGap) || 0;
+    const besides = [...row.children]
+      .filter((c) => c !== list && c !== more.current)
+      .reduce((sum, c) => sum + c.getBoundingClientRect().width + rowGap, 0);
+    const room = row.clientWidth - besides;
+    const all = values.reduce((sum, v, i) => sum + width(v) + (i ? gap : 0), 0);
+    let next: string[] = [];
+    if (all > room + 0.5) {
+      const space = room - (more.current?.getBoundingClientRect().width ?? 0) - rowGap;
+      const shown: string[] = [];
+      let used = 0;
+      for (const v of values) {
+        const add = width(v) + (shown.length ? gap : 0);
+        if (used + add > space) break;
+        shown.push(v);
+        used += add;
+      }
+      // The selected tab keeps a place: it takes the last one(s) that fit.
+      if (value !== undefined && values.includes(value) && !shown.includes(value)) {
+        while (shown.length && used + gap + width(value) > space) {
+          const v = shown.pop() as string;
+          used -= width(v) + (shown.length ? gap : 0);
+        }
+        shown.push(value);
+      }
+      if (!shown.length && values[0] !== undefined) shown.push(values[0]);
+      next = values.filter((v) => !shown.includes(v));
+    }
+    setOverflowed((prev) =>
+      prev.size === next.length && next.every((v) => prev.has(v)) ? prev : new Set(next),
+    );
+  }, [fitting, value]);
+  useClientLayoutEffect(() => {
+    const row = strip.current;
+    if (!fitting || !row) return;
+    const observer = new ResizeObserver(() => fit());
+    observer.observe(row);
+    return () => observer.disconnect();
+  }, [fitting, fit]);
+  // Tabs added, removed or relabelled, and a new selection, can change what fits.
+  useClientLayoutEffect(() => fit());
+  const moreItems: MenuEntry[] = fitting
+    ? Children.toArray(children)
+        .filter((c) => isValidElement<TabProps>(c) && overflowed.has(c.props.value))
+        .map((c) => {
+          const tab = (c as { props: TabProps }).props;
+          return {
+            value: tab.value,
+            label: name(tab.value),
+            ...(tab.icon ? { icon: tab.icon } : {}),
+            ...(tab.shortcut ? { shortcut: tab.shortcut } : {}),
+            ...(tab.disabled ? { disabled: true } : {}),
+          };
+        })
+    : [];
+  const moreMenu = fitting && (
+    <div ref={more} className="cy-tab-more" data-idle={moreItems.length ? undefined : ""}>
+      <Menu
+        label={labels.more}
+        items={moreItems}
+        onSelect={(v) => select(v)}
+        trigger={(props) => (
+          <Button {...props} variant="ghost" tone="neutral" size="sm" iconEnd={chevronDown}>
+            {labels.more}
+          </Button>
+        )}
+      />
+    </div>
+  );
   const tablist = (
     <div
       ref={ref}
@@ -404,6 +509,7 @@ export function TabList({
       data-size={size}
       data-variant={variant}
       data-reorderable={reorderable ? "" : undefined}
+      data-overflow-menu={fitting ? "" : undefined}
       onFocus={(e) => reveal(e.target as HTMLElement)}
       onKeyDownCapture={onKeyDown}
     >
@@ -426,12 +532,20 @@ export function TabList({
     </span>
   );
   // The chevrons and the trailing content sit beside the list, not in it: a tablist holds only tabs.
+  const scrolls = scrollable && !fitting;
   const list =
-    scrollable || trailing !== undefined ? (
-      <div ref={strip} className="cy-tab-strip" data-size={size} data-variant={variant}>
-        {scrollable && chevron("start")}
-        {tablist}
-        {scrollable && chevron("end")}
+    scrolls || fitting || trailing !== undefined ? (
+      <div
+        ref={strip}
+        className="cy-tab-strip"
+        data-size={size}
+        data-variant={variant}
+        data-overflow-menu={fitting ? "" : undefined}
+      >
+        {scrolls && chevron("start")}
+        <OverflowContext.Provider value={overflowed}>{tablist}</OverflowContext.Provider>
+        {scrolls && chevron("end")}
+        {moreMenu}
         {trailing !== undefined && <div className="cy-tab-trailing">{trailing}</div>}
       </div>
     ) : (
@@ -477,6 +591,11 @@ export interface TabProps {
   /** The tab cannot be selected or closed. */
   disabled?: boolean;
   /**
+   * The tab's key combination, written as `useHotkey` writes it ("alt+3", "mod+shift+e"): `aria-keyshortcuts` on the
+   * tab, and the hint beside it in an `overflow="menu"` list's More menu. Handle the keys yourself (`useHotkey`).
+   */
+  shortcut?: string | undefined;
+  /**
    * Makes the tab closable (document tabs): a close button beside its label, Delete on the focused tab and a
    * middle-click. Remove the tab in response; the one now in its place is selected and focused.
    */
@@ -509,6 +628,7 @@ export function Tab({
   value,
   icon,
   disabled,
+  shortcut,
   onClose,
   closeLabel,
   dirty = false,
@@ -518,6 +638,7 @@ export function Tab({
 }: TabProps) {
   const { value: current, select, activation, tabId, panelId, panels, labels, refocus } = useTabs("Tab");
   const selected = value === current;
+  const overflowed = useContext(OverflowContext).has(value);
   // A label that is not plain text (a badge, a <strong>) names the close button and the menu by the text it renders.
   const plain = typeof children === "string" || typeof children === "number" ? String(children) : null;
   const labelRef = useRef<HTMLSpanElement>(null);
@@ -551,9 +672,16 @@ export function Tab({
       // the close button and the panel's label use), and screen readers read the state after it.
       aria-describedby={dirty ? `${id}-unsaved` : undefined}
       aria-keyshortcuts={
-        [onClose && "Delete", menu?.["aria-keyshortcuts"]].filter(Boolean).join(" ") || undefined
+        [
+          shortcut && ariaKeyShortcuts(shortcutKeys(shortcut)),
+          onClose && "Delete",
+          menu?.["aria-keyshortcuts"],
+        ]
+          .filter(Boolean)
+          .join(" ") || undefined
       }
       data-value={value}
+      data-overflowed={overflowed ? "" : undefined}
       disabled={disabled}
       className="cy-tab"
       onClick={() => select(value)}

@@ -19,7 +19,8 @@ Plan 9 (`docs/superpowers/plans/2026-11-10-cynosure-migrations.md`, tracked in i
 - **Done:** Dialog `size="full"` and `titleHidden`. Storybook is grouped like the README (`Components/<group>/<Name>`; `cy check` rule `story-group`, `cy new component --group`, groups read by `tools/component-groups.ts`; ids changed, so links and the 502 visual baselines were renamed). Windows development fixes (`pnpm css`, `cy check`, unit tests). Storybook's onboarding is off.
 - **Done:** ProgressBar `meter`, `valueText` and `steps` (Arshad approved the proposal; `steps` also works without `meter`); "all CSS" budget 37.81 to 38 kB for it. Docs read against the source everywhere (about 75 corrections) and six documented CSS variables made real tokens.
 - **Done:** RadioGroup `variant="card"` with option `media` and `columns` (Choice gained `variant="card"` and `media`); budgets all CSS 38 to 38.25 kB and Checkbox + Switch 4.25 to 4.5 kB (Choice's stylesheet holds the card).
-- **Next:** TabList overflow into a More menu, then the icons (about 97 PDF glyphs from tools and the missing Lucide names, drawn as Facet icons).
+- **Done:** `TabList overflow="menu"` (More menu of the tabs that do not fit, selected tab kept in the row, measured widths), `Tab shortcut`, `labels.more`.
+- **Next:** the icons (about 97 PDF glyphs from tools and the missing Lucide names, drawn as Facet icons).
 - **Not run on Windows:** Firefox, WebKit, touch, `test:react18`, `publint`, `attw`; CI covers them.
 
 
