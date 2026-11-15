@@ -37,8 +37,9 @@ function reachable(entry: string): string[] {
     if (seen.has(id)) return;
     seen.add(id);
     const dir = dirname(sourceOf(id));
+    // Module ids use forward slashes on every platform ("theme/theme-init-script", also on Windows).
     for (const spec of runtimeImports(id).filter((s) => s.startsWith(".")))
-      visit(relative(SRC, join(dir, spec)).replace(/\.js$/, ""));
+      visit(relative(SRC, join(dir, spec)).replaceAll("\\", "/").replace(/\.js$/, ""));
   };
   visit(entry);
   return [...seen];

@@ -4,6 +4,7 @@
  * gzip overhead and the re-export modules too (about five times the real cost). An app that imports the entry gets
  * one bundle, so this bundles the entry with the build's own bundler (Vite) and gzips that.
  */
+import { pathToFileURL } from "node:url";
 import { gzipSync } from "node:zlib";
 import { build, type Rolldown } from "vite";
 
@@ -30,7 +31,7 @@ export async function iconsByNameSize(): Promise<number> {
   return gzipSync(code, { level: 9 }).length;
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const size = await iconsByNameSize();
   const kb = (n: number) => `${(n / 1000).toFixed(2)} kB`;
   const line = `icons/by-name (every Facet icon, one bundle): ${kb(size)} gzipped, budget ${kb(ICONS_BY_NAME_BUDGET)}`;

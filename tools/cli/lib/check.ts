@@ -1,6 +1,6 @@
 /** `cy check`: every Cynosure convention as a rule. Pure: returns violations, never exits. */
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
-import { join, relative } from "node:path";
+import { join, relative, sep } from "node:path";
 import ts from "typescript";
 
 export interface Violation {
@@ -33,6 +33,9 @@ function walk(dir: string, out: string[] = []): string[] {
   }
   return out;
 }
+
+/** A path relative to the repository with forward slashes on every platform (the rules and reports use "src/…"). */
+const posixRelative = (root: string, path: string) => relative(root, path).split(sep).join("/");
 
 const isStory = (f: string) => f.endsWith(".stories.tsx");
 const lineOf = (text: string, index: number) => text.slice(0, index).split("\n").length;
@@ -94,7 +97,7 @@ function staticClassText(node: ts.JsxAttribute, source: ts.SourceFile): string {
 }
 
 function tsxRules(root: string, file: string, out: Violation[], fonts: Set<string>) {
-  const rel = relative(root, file);
+  const rel = posixRelative(root, file);
   const text = readFileSync(file, "utf8");
   const source = ts.createSourceFile(file, text, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
   const inFoundations = rel.startsWith("src/foundations/");
@@ -191,7 +194,7 @@ function literalRules(root: string, file: string, out: Violation[]) {
     for (const m of stripped.matchAll(/#[0-9a-f]{3,8}\b|\b\d+(?:\.\d+)?px\b/gi))
       out.push({
         rule: "literals",
-        file: relative(root, file),
+        file: posixRelative(root, file),
         line: i + 1,
         message: `literal ${m[0]}: use a --cy-* token`,
       });
@@ -207,7 +210,7 @@ function importRules(root: string, file: string, out: Violation[]) {
     if (!/\.(js|css|json|mdx|svg)$/.test(m[1] ?? ""))
       out.push({
         rule: "import-extensions",
-        file: relative(root, file),
+        file: posixRelative(root, file),
         line: lineOf(text, m.index ?? 0),
         message: `import "${m[1]}" needs a .js extension (or /index.js)`,
       });
@@ -221,7 +224,7 @@ function structureRules(root: string, out: Violation[]) {
       const folder = join(dir, name);
       const files = readdirSync(folder);
       const story = files.find(isStory);
-      const rel = relative(root, folder);
+      const rel = posixRelative(root, folder);
       if (!story || !readFileSync(join(folder, story), "utf8").includes("play:"))
         out.push({
           rule: "structure",
@@ -240,7 +243,7 @@ function structureRules(root: string, out: Violation[]) {
             if (GLYPHS.test(text))
               out.push({
                 rule: "glyphs",
-                file: relative(root, page),
+                file: posixRelative(root, page),
                 line: i + 1,
                 message: "text glyph in a docs page: write the word (Left arrow, use X) or show an Icon",
               });
@@ -348,7 +351,7 @@ function ownershipRules(root: string, out: Violation[]) {
       const prefixes = ownPrefixes(folder);
       const files = readdirSync(folder);
       for (const css of files.filter((f) => f.endsWith(".css"))) {
-        const rel = relative(root, join(folder, css));
+        const rel = posixRelative(root, join(folder, css));
         if (css !== `${kebabName(name)}.css`)
           out.push({
             rule: "own-styles",
@@ -378,7 +381,7 @@ function ownershipRules(root: string, out: Violation[]) {
       }
       for (const file of files.filter((f) => f.endsWith(".tsx") && !isStory(f))) {
         const path = join(folder, file);
-        const rel = relative(root, path);
+        const rel = posixRelative(root, path);
         const text = readFileSync(path, "utf8");
         const source = ts.createSourceFile(path, text, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
         const at = (node: ts.Node) => source.getLineAndCharacterOfPosition(node.getStart()).line + 1;
@@ -440,7 +443,7 @@ export function check(root: string): Violation[] {
   const fonts = fontClasses(root);
   const files = walk(join(root, "src"));
   for (const file of files) {
-    const rel = relative(root, file);
+    const rel = posixRelative(root, file);
     if (
       file.endsWith(".tsx") &&
       !isStory(file) &&

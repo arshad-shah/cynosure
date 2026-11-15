@@ -267,7 +267,10 @@ describe("cy new component", () => {
       JSON.parse(readFileSync(join(root, ".size-limit.json"), "utf8")).map((e: { name: string }) => e.name),
     ).toContain("ScaffoldProbe (JS + CSS)");
     expect(new Set(rules(root))).toEqual(new Set(["scaffold-todo"]));
-    execFileSync(join(repo, "node_modules/.bin/tsc"), ["-p", root], { stdio: "pipe" });
+    // TypeScript's own entry through Node: the .bin shim is a .cmd file on Windows, which execFileSync cannot run.
+    execFileSync(process.execPath, [join(repo, "node_modules/typescript/bin/tsc"), "-p", root], {
+      stdio: "pipe",
+    });
   }, 120_000); // runs a full typecheck of a sandbox copy of the repo
   it("scaffolds a foundation under src/foundations", () => {
     const root = sandbox();
