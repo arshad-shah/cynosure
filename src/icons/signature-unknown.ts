@@ -4,10 +4,9 @@ export const signatureUnknown: IconData = {
   name: "signature-unknown",
   category: "security",
   body: [
-    ["path", { d: "M3 10c1.6-3.2 2.8-3.2 3.4-1.4S7.6 11 9 9" }],
-    ["path", { d: "M3 13.5h5" }],
-    ["circle", { cx: 15.5, cy: 14.5, r: 5.5 }],
-    ["path", { d: "M13.75 12.9a1.75 1.75 0 1 1 2.5 1.6c-.5.25-.75.6-.75 1.15m0 1.75h.01", animate: true }],
+    ["circle", { cx: 12, cy: 10, r: 6.5 }],
+    ["path", { d: "M9.9 8.4a2.2 2.2 0 1 1 3.2 1.95c-.65.35-1.1.8-1.1 1.45M12 14h.01", animate: true }],
+    ["path", { d: "M4.5 20.5c1.3-1.8 2.3-1.8 2.8-.5s1.2 1.5 2.5-.2 2.1-1.5 2.9 0 1.5 1 3.3.2" }],
   ],
   motion: "pop",
 };

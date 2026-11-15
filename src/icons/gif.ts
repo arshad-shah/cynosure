@@ -4,12 +4,8 @@ export const gif: IconData = {
   name: "gif",
   category: "media",
   body: [
-    ["rect", { x: 3, y: 5, width: 18, height: 14, rx: 3 }],
-    [
-      "path",
-      {
-        d: "M10 10H8.2a1.5 1.5 0 0 0-1.5 1.5v1A1.5 1.5 0 0 0 8.2 14H10v-2H8.8m3.7-2v4m3 0v-4H18m-2.5 2h2",
-      },
-    ],
+    ["path", { d: "M8.56 9.43A4 4 0 1 0 9.5 12h-3" }],
+    ["path", { d: "M12.5 8v8" }],
+    ["path", { d: "M16 16V8h5m-5 4h4" }],
   ],
 };

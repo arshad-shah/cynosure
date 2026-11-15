@@ -351,6 +351,11 @@ export const ICON_KEYWORDS = {
   wifi: ["wireless", "internet", "network", "connection", "signal", "online"],
   "wifi-off": ["offline", "no internet", "disconnected", "no signal"],
   battery: ["power", "charge", "energy", "rest", "break"],
+  "battery-low": ["low battery", "charge", "power level", "one bar", "running out"],
+  "battery-medium": ["half battery", "charge", "power level", "two bars"],
+  "battery-full": ["full battery", "charged", "power level", "three bars"],
+  "battery-charging": ["charging", "plugged in", "power", "bolt", "recharge"],
+  "battery-warning": ["battery alert", "critical", "low power", "empty", "warning"],
 
   // design
   anchor: ["link", "fix", "ship", "attach point", "bookmark"],

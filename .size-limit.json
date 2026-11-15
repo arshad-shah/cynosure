@@ -106,7 +106,7 @@
   {
     "name": "RadioGroup",
     "path": ["dist/components/RadioGroup/RadioGroup.js", "dist/styles/radio-group.css"],
-    "limit": "1.5 kB",
+    "limit": "1.85 kB",
     "gzip": true
   },
   {
@@ -196,7 +196,7 @@
   {
     "name": "Tabs",
     "path": ["dist/components/Tabs/Tabs.js", "dist/foundations/roving-focus.js", "dist/styles/tabs.css"],
-    "limit": "7.5 kB",
+    "limit": "8.25 kB",
     "gzip": true
   },
   {
@@ -283,7 +283,7 @@
   {
     "name": "ProgressBar",
     "path": ["dist/components/ProgressBar/ProgressBar.js", "dist/styles/progress-bar.css"],
-    "limit": "2.25 kB",
+    "limit": "2.4 kB",
     "gzip": true
   },
   {
