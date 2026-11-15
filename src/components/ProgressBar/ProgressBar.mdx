@@ -38,6 +38,19 @@ By default the value reads as a percentage. Pass `labels.value` to describe it i
 
 <Canvas of={Stories.LabelsAndHiddenLabel} />
 
+## Meters and steps
+
+A progress bar says how far a task has got. A **meter** measures something that is not a task: password strength, entropy, a quota. Set `meter` and the bar becomes `role="meter"`; it always has a value (a missing one reads 0) and never sweeps. Give the value in words with `valueText` ("Strong", "62 bits"): it is shown with `showValue` and read out instead of the percentage.
+
+`steps` draws the track as separate pills, lit up to round(value / max times steps), for a stepped gauge. Pick the `tone` from the value: the lit pills take it, the rest stay the track colour. Steps work on a progress bar too ("Step 2 of 5").
+
+```tsx
+<ProgressBar label="Password strength" meter steps={4} max={4} value={score} valueText="Good" tone="success" showValue />
+<ProgressBar label="Entropy" meter max={128} value={62} valueText="62 bits" tone="warning" showValue />
+```
+
+<Canvas of={Stories.StepsLightUpToTheValue} />
+
 ## A slim bar in a row
 
 With `labelHidden` and no `showValue`, the bar is only its track: no label row, as tall as `size` makes it, and still named by `label`. Put it in a row of text (a query plan's cost, a quota beside its number) and give it the space with `style={{ flex: 1 }}`; it fills from the reading start in right-to-left text too.
@@ -58,10 +71,11 @@ With `labelHidden` and no `showValue`, the bar is only its track: no label row, 
 
 ## Behaviour and accessibility
 
-- **Role:** `role="progressbar"`, named by `label`, with `aria-valuemin`, `aria-valuemax`, `aria-valuenow` and `aria-valuetext`. Indeterminate bars have no current value and are `aria-busy`.
+- **Role:** `role="progressbar"`, or `role="meter"` with `meter`, named by `label`, with `aria-valuemin`, `aria-valuemax`, `aria-valuenow` and `aria-valuetext` (`valueText` when given). Indeterminate bars have no current value and are `aria-busy`; a meter is never indeterminate.
 - **Announcements:** a progress bar is not a live region. To announce completion, say so in the page (a [Notice](?path=/docs/components-feedback-and-display-notice--docs) or a [Toast](?path=/docs/components-overlays-toast--docs)).
 - **Contrast:** the fill keeps at least 3:1 against its track in every tone, in light and dark modes.
-- **Direction:** fills from the inline start, so from the right in right-to-left text.
+- **Direction:** fills from the inline start, so from the right in right-to-left text; lit steps do the same.
+- **Forced colours:** the fill and lit steps are `Highlight`; each step is outlined.
 - **Motion:** the fill eases between values; the indeterminate segment sweeps, and stands still in the middle under reduced motion.
 
 <Canvas of={Stories.VisibleInEveryToneAndMode} />
@@ -70,7 +84,7 @@ With `labelHidden` and no `showValue`, the bar is only its track: no label row, 
 
 `size` sets the thickness: `xs` 2, `sm` 4, `md` 8 and `lg` 12 px. `xs` also sets smaller label and value text and a tighter gap, for dense desktop chrome.
 
-Tokens: `--cy-progress-bar-height-{xs,sm,md,lg}`, `--cy-progress-bar-radius` and `--cy-progress-bar-track`.
+Tokens: `--cy-progress-bar-height-{xs,sm,md,lg}`, `--cy-progress-bar-radius`, `--cy-progress-bar-track` and `--cy-progress-bar-step-gap` (space between steps).
 
 ```ts
 createTheme({ components: { progressBar: { heightMd: "6px", radius: "2px" } } });

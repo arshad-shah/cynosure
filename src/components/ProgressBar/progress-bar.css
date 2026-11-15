@@ -170,3 +170,43 @@
     background: CanvasText;
   }
 }
+
+/* Steps: the track becomes a row of separate pills (a stepped gauge); the lit ones take the tone. The row starts at the
+   inline start, so lit pills fill from the right in right-to-left text. */
+.cy-progress-bar-track.cy-progress-bar-track[data-steps] {
+  display: flex;
+  gap: var(--cy-progress-bar-step-gap, var(--cy-space-2));
+  overflow: visible;
+  border-radius: 0;
+  background: none;
+}
+.cy-progress-bar-step.cy-progress-bar-step {
+  flex: 1 1 0;
+  min-inline-size: 0;
+  border-radius: var(--cy-progress-bar-radius, var(--cy-radius-full));
+  background: var(
+    --cy-progress-bar-track,
+    color-mix(in oklab, var(--cy-color-ink) 12%, var(--cy-color-surface))
+  );
+  font-size: var(--cy-font-size-md);
+  transition: background-color var(--cy-motion-base) var(--cy-motion-ease);
+  &[data-on] {
+    background: var(--_tone);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cy-progress-bar-step.cy-progress-bar-step {
+    transition: none;
+  }
+}
+@media (forced-colors: active) {
+  .cy-progress-bar-track.cy-progress-bar-track[data-steps] {
+    outline: none;
+  }
+  .cy-progress-bar-step.cy-progress-bar-step {
+    outline: var(--cy-border-width) solid CanvasText;
+    &[data-on] {
+      background: Highlight;
+    }
+  }
+}
