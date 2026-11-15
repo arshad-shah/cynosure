@@ -2,7 +2,7 @@ import type { IconData } from "./types.js";
 
 export const bug: IconData = {
   name: "bug",
-  category: "data",
+  category: "development",
   body: [
     ["rect", { x: 7.5, y: 7.5, width: 9, height: 13, rx: 4.5 }],
     [

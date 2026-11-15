@@ -2,7 +2,7 @@ import type { IconData } from "./types.js";
 
 export const gitBranch: IconData = {
   name: "git-branch",
-  category: "data",
+  category: "development",
   body: [
     ["circle", { cx: 6.5, cy: 5.5, r: 2 }],
     ["circle", { cx: 6.5, cy: 18.5, r: 2 }],

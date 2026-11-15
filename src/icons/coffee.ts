@@ -2,7 +2,7 @@ import type { IconData } from "./types.js";
 
 export const coffee: IconData = {
   name: "coffee",
-  category: "people",
+  category: "home",
   body: [
     [
       "path",

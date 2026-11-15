@@ -2,7 +2,7 @@ import type { IconData } from "./types.js";
 
 export const partyPopper: IconData = {
   name: "party-popper",
-  category: "status",
+  category: "social",
   body: [
     ["path", { d: "M4.5 19.5L8 9l7 7z" }],
     [

@@ -15,6 +15,23 @@ describe("Facet icon set", () => {
     expect(new Set(shipped.map((i) => i.name)).size).toBe(shipped.length);
     expect(new Set(shipped.map((i) => i.category))).toEqual(new Set(ICON_CATEGORIES));
   });
+  it("covers commerce, nature, travel, health, development, charts, home and social", () => {
+    const byName = Object.fromEntries(shipped.map((i) => [i.name, i.category]));
+    const members: Record<string, string[]> = {
+      commerce: ["shopping-cart", "credit-card", "wallet", "receipt", "shopping-bag"],
+      nature: ["cloud-rain", "snowflake", "thermometer", "sprout", "leaf"],
+      travel: ["plane", "car", "train", "luggage", "map-pin", "route", "compass", "anchor"],
+      health: ["heart-pulse", "pill", "stethoscope", "accessibility", "brain", "dumbbell"],
+      development: ["git-commit", "git-merge", "git-pull-request", "git-branch", "code", "terminal", "bug"],
+      charts: ["chart-pie", "chart-area", "trending-up", "chart-bar", "chart-line"],
+      home: ["utensils", "chef-hat", "sofa", "washing-machine", "coffee"],
+      social: ["thumbs-up", "smile", "trophy", "medal", "hand", "heart", "award", "party-popper"],
+    };
+    for (const [category, names] of Object.entries(members)) {
+      expect(ICON_CATEGORIES, category).toContain(category);
+      for (const name of names) expect(byName[name], name).toBe(category);
+    }
+  });
   it.each(shipped.map((i) => [i.name, i] as const))("%s passes validateIcon", (_name, icon) => {
     expect(validateIcon(icon)).toEqual([]);
   });

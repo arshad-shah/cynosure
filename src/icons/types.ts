@@ -19,6 +19,14 @@ export const ICON_CATEGORIES = [
   "layout",
   "maths",
   "faith",
+  "commerce",
+  "nature",
+  "travel",
+  "health",
+  "development",
+  "charts",
+  "home",
+  "social",
 ] as const;
 export type IconCategory = (typeof ICON_CATEGORIES)[number];
 

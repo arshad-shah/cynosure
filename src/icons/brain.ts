@@ -2,7 +2,7 @@ import type { IconData } from "./types.js";
 
 export const brain: IconData = {
   name: "brain",
-  category: "people",
+  category: "health",
   body: [
     [
       "path",
