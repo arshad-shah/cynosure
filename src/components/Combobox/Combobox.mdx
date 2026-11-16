@@ -32,6 +32,10 @@ By default an option matches when its label contains the typed text, ignoring ca
 
 ## Options from a server
 
+A controlled `value` shows its option's label in the input from the start, and a value set from outside (a reset, another control) replaces the text unless the person is typing; you only need `inputValue` to fetch options.
+
+<Canvas of={Stories.ControlledValueShowsItsLabel} />
+
 Control the text with `inputValue` and `onInputChange`, fetch, and pass the results as `options` with `filter={false}`. While `loading`, the list says so. Focus never leaves the input, so results arriving late never swallow keystrokes; the first enabled result becomes active.
 
 <Canvas of={Stories.AsyncResultsArriveLateWithoutLosingKeys} />
