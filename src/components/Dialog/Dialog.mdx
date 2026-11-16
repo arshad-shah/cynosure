@@ -54,6 +54,12 @@ With `dismissible={false}` there is no close button and Escape and the backdrop 
 
 <Canvas of={Stories.NotDismissible} />
 
+## Without a close button
+
+`closeButton={false}` hides the close button in the header while Escape and the backdrop still close the dialog: for a dialog whose own actions close it (a label picker) or a progress overlay. With `titleHidden` as well, the header takes no room and the title still names the dialog. On a touch screen with no keyboard, the backdrop or an action is the only way out, so keep one.
+
+<Canvas of={Stories.WithoutACloseButtonStillDismisses} />
+
 ## Full size
 
 `size="full"` fills the viewport edge to edge, at every width, keeping its content inside the safe areas (notches, the home indicator). Use it for a focus view: one pane or a page preview, shown as large as the screen allows. It has no radius, border or shadow, and fades in without scaling.

@@ -58,6 +58,7 @@ const meta = {
     size: { control: "inline-radio", options: ["sm", "md", "lg", "full"] },
     titleHidden: { control: "boolean" },
     dismissible: { control: "boolean" },
+    closeButton: { control: "boolean" },
     keepMounted: { control: "boolean" },
     open: { control: "boolean" },
     title: { control: "text" },
@@ -388,6 +389,44 @@ export const NotDismissible: Story = {
     await expect(el.open).toBe(true);
     await expect(args.onOpenChange).not.toHaveBeenCalled();
     await userEvent.click(canvas.getByRole("button", { name: "Discard" }));
+    await settledClosed(el);
+  },
+};
+
+export const WithoutACloseButtonStillDismisses: Story = {
+  args: { closeButton: false, description: "Pick a label for the page." },
+  play: async ({ args, canvas, userEvent }) => {
+    const el = await openWith(canvas, (e) => userEvent.click(e));
+    // No close button, but the dialog is still dismissible: focus lands on the first field.
+    await expect(canvas.queryByRole("button", { name: "Close" })).toBeNull();
+    await waitFor(() => expect(canvas.getByRole("textbox", { name: "Name" })).toHaveFocus());
+    await userEvent.keyboard("{Escape}");
+    await settledClosed(el);
+    await expect(args.onOpenChange).toHaveBeenLastCalledWith(false);
+    await expect(canvas.getByRole("button", { name: "Edit profile" })).toHaveFocus();
+    // The backdrop closes it too.
+    await openWith(canvas, (e) => userEvent.click(e));
+    await userEvent.click(el);
+    await settledClosed(el);
+  },
+};
+
+export const ProgressOverlayWithAHiddenTitle: Story = {
+  args: { closeButton: false, titleHidden: true, title: "Exporting", description: undefined, size: "sm" },
+  render: (args) => (
+    <Page {...args}>
+      <p>Exporting 3 pages…</p>
+    </Page>
+  ),
+  play: async ({ canvas, userEvent }) => {
+    const el = await openWith(canvas, (e) => userEvent.click(e));
+    await shownFully(el);
+    await expect(canvas.getByRole("dialog", { name: "Exporting" })).toBeInTheDocument();
+    // With nothing to show, the header takes no room.
+    await expect(
+      (el.querySelector(".cy-dialog-header") as HTMLElement).getBoundingClientRect().height,
+    ).toBeLessThanOrEqual(1);
+    await userEvent.keyboard("{Escape}");
     await settledClosed(el);
   },
 };
