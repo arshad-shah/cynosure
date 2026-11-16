@@ -13,6 +13,17 @@
   font-size: inherit;
 }
 
+/* The unit after the number ("px"): muted text, not part of the typed value. */
+.cy-number-field-unit.cy-number-field-unit {
+  flex: none;
+  margin: 0;
+  color: var(--cy-number-field-unit-color, var(--cy-color-muted));
+  font-size: inherit;
+  line-height: inherit;
+  white-space: nowrap;
+  user-select: none;
+}
+
 /* Scrubbing: the label is a horizontal drag handle. Vertical swipes still scroll the page. */
 .cy-number-field label[data-scrub] {
   cursor: ew-resize;

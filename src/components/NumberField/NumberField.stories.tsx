@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 import { expect, fn, waitFor } from "storybook/test";
+import { chevronDown, chevronUp } from "../../icons/index.js";
 import { computeUnderHostileHost } from "../../test/hostile.js";
 import { Button } from "../Button/Button.js";
 import { Stack } from "../Stack/Stack.js";
@@ -409,5 +410,79 @@ export const IdAndNamedAndDescribedFromOutside: Story = {
     const input = canvas.getByRole("spinbutton", { name: "Guests" });
     await expect(input).toHaveAttribute("id", "nf-guests");
     await expect(input).toHaveAccessibleDescription("Adults only Up to 20");
+  },
+};
+
+export const CommitWhileTyping: Story = {
+  args: { label: "Opacity", min: 0, max: 100, defaultValue: 50, commit: "input" },
+  play: async ({ args, canvas, userEvent }) => {
+    const input = canvas.getByRole("spinbutton", { name: "Opacity" });
+    await userEvent.clear(input);
+    // Empty is not applied while typing (the person is about to type a number).
+    await expect(args.onChange).not.toHaveBeenCalled();
+    await userEvent.type(input, "7");
+    await expect(args.onChange).toHaveBeenLastCalledWith(7);
+    await userEvent.type(input, "5");
+    await expect(args.onChange).toHaveBeenLastCalledWith(75);
+    await expect(input).toHaveAttribute("aria-valuenow", "75");
+    // Out of range or unreadable: not applied until it is again; the text is left as typed.
+    await userEvent.type(input, "0");
+    await expect(args.onChange).toHaveBeenCalledTimes(2);
+    await expect(input).toHaveValue("750");
+    // Leaving the field settles it as before: clamped and written back.
+    await userEvent.tab();
+    await expect(args.onChange).toHaveBeenLastCalledWith(100);
+    await expect(input).toHaveValue("100");
+  },
+};
+
+export const UnitStepperIconsAndFocusableSteppers: Story = {
+  args: {
+    label: "Width",
+    defaultValue: 12,
+    unit: "px",
+    incrementIcon: chevronUp,
+    decrementIcon: chevronDown,
+    steppersFocusable: true,
+  },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const input = canvas.getByRole("spinbutton", { name: "Width" });
+    // The unit is shown after the number and read with the value; it is not part of the typed text.
+    await expect(input).toHaveValue("12");
+    await expect(input).toHaveAttribute("aria-valuetext", "12 px");
+    await expect(canvasElement.querySelector(".cy-number-field-unit")).toHaveTextContent("px");
+    // Your own stepper icons.
+    const plusButton = canvas.getByRole("button", { name: "Increase" });
+    const path = (icon: typeof chevronUp) => (icon.body[0] as [string, { d: string }])[1].d;
+    await expect(plusButton.querySelector("path")).toHaveAttribute("d", path(chevronUp));
+    await expect(canvas.getByRole("button", { name: "Decrease" }).querySelector("path")).toHaveAttribute(
+      "d",
+      path(chevronDown),
+    );
+    // Steppers are Tab stops: Tab from the input reaches −, then +; pressing keeps focus on the stepper.
+    input.focus();
+    await userEvent.tab();
+    await expect(canvas.getByRole("button", { name: "Decrease" })).toHaveFocus();
+    await userEvent.tab();
+    await expect(plusButton).toHaveFocus();
+    await userEvent.keyboard("{Enter}");
+    await expect(input).toHaveValue("13");
+    await expect(plusButton).toHaveFocus();
+    // Its name shows as a tooltip (no native title) while it has keyboard focus.
+    const tip = plusButton.closest(".cy-tooltip-anchor")?.querySelector(".cy-tooltip") as HTMLElement;
+    await waitFor(() => expect(tip.matches(":popover-open")).toBe(true));
+    await expect(tip).toHaveTextContent("Increase");
+  },
+};
+
+export const FocusableStepperAtItsLimitHandsFocusBack: Story = {
+  args: { defaultValue: 19, steppersFocusable: true },
+  play: async ({ canvas, userEvent }) => {
+    const plusButton = canvas.getByRole("button", { name: "Increase" });
+    plusButton.focus();
+    await userEvent.keyboard("{Enter}");
+    // At max the button is disabled, so focus goes to the input instead of being lost.
+    await expect(plusButton).toBeDisabled();
+    await expect(canvas.getByRole("spinbutton", { name: "Seats" })).toHaveFocus();
   },
 };
