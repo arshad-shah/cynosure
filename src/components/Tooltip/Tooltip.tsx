@@ -34,7 +34,7 @@ export interface TooltipProps {
   children: ReactElement<Record<string, unknown>>;
   /** Preferred side; flips when it does not fit. Default "top". */
   placement?: Placement;
-  /** Hover delay in ms (focus opens immediately). */
+  /** Hover delay in ms (focus opens immediately). `0` opens it at once, for toolbars. Default 300. */
   delay?: number;
   /**
    * Added to the element around the trigger (the anchor, the box the parent lays out), for layout: a grid area,
@@ -117,7 +117,8 @@ export function Tooltip({
   const show = useCallback((wait: number) => {
     clearTimeout(timer.current);
     if (disabledNow.current) return;
-    timer.current = setTimeout(() => setOpen(true), wait);
+    if (wait <= 0) setOpen(true);
+    else timer.current = setTimeout(() => setOpen(true), wait);
   }, []);
   const hide = useCallback((wait = 0) => {
     clearTimeout(timer.current);
