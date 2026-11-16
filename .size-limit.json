@@ -2,7 +2,7 @@
   {
     "name": "all CSS",
     "path": "dist/styles.css",
-    "limit": "39.4 kB",
+    "limit": "40.39 kB",
     "gzip": true
   },
   {
@@ -317,7 +317,7 @@
   {
     "name": "ColorField",
     "path": ["dist/components/ColorField/ColorField.js", "dist/styles/color-field.css"],
-    "limit": "3.51 kB",
+    "limit": "3.72 kB",
     "gzip": true
   },
   {
@@ -451,13 +451,13 @@
   {
     "name": "SelectionFrame (with geometry)",
     "path": ["dist/components/SelectionFrame/SelectionFrame.js", "dist/styles/selection-frame.css"],
-    "limit": "3.14 kB",
+    "limit": "3.38 kB",
     "gzip": true
   },
   {
     "name": "ColorSwatches",
     "path": ["dist/components/ColorSwatches/ColorSwatches.js", "dist/styles/color-swatches.css"],
-    "limit": "1.6 kB",
+    "limit": "1.69 kB",
     "gzip": true
   },
   {
@@ -499,13 +499,13 @@
   {
     "name": "ZoomControls",
     "path": ["dist/components/ZoomControls/ZoomControls.js", "dist/styles/zoom-controls.css"],
-    "limit": "1.14 kB",
+    "limit": "1.32 kB",
     "gzip": true
   },
   {
     "name": "PanZoomCanvas",
     "path": ["dist/components/PanZoomCanvas/PanZoomCanvas.js", "dist/styles/pan-zoom-canvas.css"],
-    "limit": "3.28 kB",
+    "limit": "3.36 kB",
     "gzip": true
   },
   {
@@ -529,7 +529,7 @@
   {
     "name": "Text (JS + CSS)",
     "path": ["dist/components/Text/Text.js", "dist/styles/text.css"],
-    "limit": "1.3 kB",
+    "limit": "1.38 kB",
     "gzip": true
   },
   {
@@ -571,7 +571,7 @@
   {
     "name": "Image (JS + CSS)",
     "path": ["dist/components/Image/Image.js", "dist/styles/image.css"],
-    "limit": "2.48 kB",
+    "limit": "2.96 kB",
     "gzip": true
   },
   {
@@ -784,37 +784,37 @@
   {
     "name": "ColorSample (JS + CSS)",
     "path": ["dist/components/ColorSample/ColorSample.js", "dist/styles/color-sample.css"],
-    "limit": "3 kB",
+    "limit": "1.77 kB",
     "gzip": true
   },
   {
     "name": "CanvasStage (JS + CSS)",
     "path": ["dist/components/CanvasStage/CanvasStage.js", "dist/styles/canvas-stage.css"],
-    "limit": "3 kB",
+    "limit": "1.52 kB",
     "gzip": true
   },
   {
     "name": "FrameBase",
     "path": ["dist/foundations/FrameBase/FrameBase.js"],
-    "limit": "3 kB",
+    "limit": "304 B",
     "gzip": true
   },
   {
     "name": "HtmlPreview (JS + CSS)",
     "path": ["dist/components/HtmlPreview/HtmlPreview.js", "dist/styles/html-preview.css"],
-    "limit": "3 kB",
+    "limit": "1.39 kB",
     "gzip": true
   },
   {
     "name": "VideoBase",
     "path": ["dist/foundations/VideoBase/VideoBase.js"],
-    "limit": "3 kB",
+    "limit": "430 B",
     "gzip": true
   },
   {
     "name": "CameraView (JS + CSS)",
     "path": ["dist/components/CameraView/CameraView.js", "dist/styles/camera-view.css"],
-    "limit": "3 kB",
+    "limit": "2.87 kB",
     "gzip": true
   }
 ]
