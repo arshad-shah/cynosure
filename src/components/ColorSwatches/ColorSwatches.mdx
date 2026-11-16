@@ -30,6 +30,16 @@ The chosen colour is matched by colour, not spelling, so `#1D1B18` selects an `r
 
 <Canvas of={Stories.MatchesByColourNotSpelling} />
 
+## Read-only
+
+`readOnly` shows the colours without offering a choice: a palette, a scheme's colours. It is a group of named colour images with no tab stop and no tick. For one colour as a surface, or text on a colour with its contrast, use [ColorSample](?path=/docs/components-feedback-and-display-colorsample--docs).
+
+```tsx
+<ColorSwatches label="Palette" swatches={palette} readOnly />
+```
+
+<Canvas of={Stories.ReadOnlyShowsColoursWithoutAChoice} />
+
 ## Props
 
 <ArgTypes of={Stories} />

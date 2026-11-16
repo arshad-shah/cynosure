@@ -461,7 +461,9 @@ export const LongTextShowsInFullInATooltip: Story = {
     const button = canvas.getByTestId("long-button");
     await expect(button).toHaveAccessibleName(`${LONG} (button)`);
     button.focus();
-    await userEvent.keyboard("{Home}");
+    await userEvent.tab({ shift: true });
+    await userEvent.tab();
+    await expect(button).toHaveFocus();
     await waitFor(() => expect(openTip()).toHaveTextContent(`${LONG} (button)`));
     await shownFully(openTip() as HTMLElement);
   },

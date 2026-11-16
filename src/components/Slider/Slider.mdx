@@ -28,7 +28,13 @@ import { Slider } from "@arshad-shah/cynosure";
 <Slider label="Price" defaultValue={[20, 60]} name="price" onCommit={search} />
 ```
 
-`onChange` follows every movement while dragging; `onCommit` fires once the change is finished, so expensive work (a search, a save) can wait for it.
+`onChange` follows every movement while dragging; `onCommit` fires once the change is finished, so expensive work (a search, a save) can wait for it: when the pointer is released, or when the key is let go (a held arrow key repeats `onChange` and commits once). `commitDelay` waits that many milliseconds after the last key, so several presses commit once; leaving the slider commits a pending change at once.
+
+```tsx
+<Slider label="Contrast" onCommit={cleanUp} commitDelay={300} />
+```
+
+<Canvas of={Stories.KeysCommitOnReleaseOrAfterAPause} />
 
 ## Range
 

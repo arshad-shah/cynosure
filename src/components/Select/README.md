@@ -23,6 +23,7 @@ A select-only combobox (WAI-ARIA APG): the trigger is a Cynosure button with `ro
 | `options[].trailing` / `options[].dimmed`     | –                | Row-end text in the list (a shortcut, a count); muted but still choosable                                                          |
 | `footer`                                      | –                | `{ label, icon?, onSelect }`: an action pinned under the options (see below)                                                       |
 | `value` / `defaultValue` / `onChange(value)`  | –                | Controlled or uncontrolled                                                                                                         |
+| `emptyOption`                                 | –                | Label of a first option for no value ("Any", "None"): chosen, the value is `""` and the trigger shows this label                   |
 | `placeholder`                                 | `"Select…"`      | Also `labels.placeholder`; `labels.empty` for no options                                                                           |
 | `size` / `variant`                            | `md` / `outline` | Shared vocabulary; `size` also takes `xs` (20px, dense chrome)                                                                     |
 | `name`, `required`, `disabled`                | –                | `required` participates in form validation                                                                                         |
@@ -30,6 +31,8 @@ A select-only combobox (WAI-ARIA APG): the trigger is a Cynosure button with `ro
 **Keyboard:** ArrowDown/Up, Enter or Space open; arrows, Home, End, PageUp, PageDown move (disabled skipped); Enter, Space or Tab select; Escape closes without change; typing jumps (ignored during IME composition). Coarse pointers get 44px rows.
 
 - `footer` is the arrow keys' last option (End and PageDown reach it); Enter, Space or a press closes the list, returns focus to the trigger and calls `onSelect`. The value does not change, and Tab passes over it.
+
+- `emptyOption="Any"` adds a first option, before the groups, whose value is `""`: no sentinel value to filter out. The trigger shows its label while the value is `""`, a form submits `""`, and `required` still counts it as no choice.
 
 - Options with the same `group`, next to each other, are listed under that heading (`role="group"`); arrow keys move straight across headings.
 

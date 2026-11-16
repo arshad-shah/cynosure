@@ -47,6 +47,16 @@ With `alpha`, an opacity slider joins the picker and the value keeps opacity (`#
 
 <Canvas of={Stories.SwatchesInThePicker} />
 
+## Inline picker
+
+`inline` puts the picker on the page above the text, as wide as the field: for a page whose job is picking a colour. The area, hue, opacity (with `alpha`) and swatches are always shown, as is the eyedropper where the browser has one; the swatch stays beside the text as a sample.
+
+```tsx
+<ColorField label="Base colour" inline alpha value={base} onChange={setBase} />
+```
+
+<Canvas of={Stories.InlinePicker} />
+
 ## Props
 
 <ArgTypes of={Stories} />
@@ -56,7 +66,7 @@ With `alpha`, an opacity slider joins the picker and the value keeps opacity (`#
 | Input | Result |
 | --- | --- |
 | Typing, then <kbd>Enter</kbd> or leaving | Reads the colour |
-| Swatch button | Opens the picker (a dialog popover) |
+| Swatch button | Opens the picker (a dialog popover); with `inline` the picker is always shown |
 | Area: <kbd>Left</kbd> / <kbd>Right</kbd> | Saturation down / up (<kbd>Shift</kbd>: by ten) |
 | Area: <kbd>Up</kbd> / <kbd>Down</kbd> | Brightness up / down |
 | Hue and opacity sliders | Standard [Slider](?path=/docs/components-controls-slider--docs) keys |

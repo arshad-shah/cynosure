@@ -54,6 +54,14 @@ Set `orientation="vertical"` to use Up and Down instead of Left and Right.
 
 `loop` (default `true`) wraps from the last control to the first. Set `loop={false}` to stop at the ends.
 
+## Blocking a region
+
+`inert` blocks the toolbar while a job holds the page: nothing inside can be focused, clicked or typed into, and assistive technology skips it (the HTML `inert` attribute, set as a property so React 18, React 19 and Preact all honour it). `disabled` does the same and dims the toolbar as a disabled Button is. Clear it to give the toolbar back. Tell people why it is blocked outside it, with a ProgressBar or a status Text.
+
+```tsx
+<Toolbar label="Pages" disabled={job.running}>…</Toolbar>
+```
+
 ## Props
 
 <ArgTypes of={Stories} />

@@ -18,6 +18,7 @@ import { isRtl } from "../../foundations/dir.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
 import { isTypeaheadKey, useTypeahead } from "../../foundations/listbox.js";
 import { OptionIcon, type OptionIconColor } from "../../foundations/option-icon.js";
+import type { ScrollAlign } from "../../foundations/scroll-align.js";
 import { textMatches } from "../../foundations/text-match.js";
 import { useVirtualWindow } from "../../foundations/virtual-window.js";
 import { chevronRight } from "../../icons/chevron-right.js";
@@ -98,6 +99,12 @@ export interface TreeHandle {
    * else the next time it opens.
    */
   reload: (id: string) => void;
+  /**
+   * Shows an item chosen elsewhere (a map, a search, a link): opens its closed ancestors (through `onExpandedChange`),
+   * scrolls it into view (`align`: `nearest`, the default, `start` or `center`) and makes it the tree's tab stop,
+   * leaving focus where it is. Only known items are found (loaded children included). Returns whether it was found.
+   */
+  reveal: (id: string, options?: { align?: ScrollAlign }) => boolean;
 }
 
 export interface TreeLabels {
@@ -154,6 +161,12 @@ export interface TreeProps<T = unknown> {
    * branches closed while filtering open again when it changes.
    */
   filter?: TreeFilter<T> | undefined;
+  /**
+   * Mark this text in every shown label (ignoring case and surrounding spaces) without hiding or opening anything: a
+   * search that keeps the tree whole and moves between matches with `selected` or `handle.reveal`. A `filter` wins
+   * where it marks a row.
+   */
+  highlight?: string | undefined;
   /**
    * Custom row content after the chevron and icon (a value, a badge, a line number). `label` is the label as the tree
    * would draw it (with matches marked while filtering). The item's `label` still drives type-ahead.
@@ -227,6 +240,7 @@ export function Tree<T = unknown>(props: TreeProps<T>) {
     renderError,
     renderEmpty,
     filter,
+    highlight,
     renderLabel,
     onAction,
     onCommand,
@@ -247,6 +261,8 @@ export function Tree<T = unknown>(props: TreeProps<T>) {
   const [loaded, setLoaded] = useState<Record<string, TreeItem<never>[]>>({});
   const [status, setStatus] = useState<Record<string, Status>>({});
   const [focusKey, setFocusKey] = useState<string | null>(null);
+  // Bumped by `reveal`, so a render runs the reveal even when nothing had to open.
+  const [, setRevealTick] = useState(0);
   const moveFocus = useRef(false);
   const root = useRef<HTMLDivElement>(null);
   const typeTo = useTypeahead();
@@ -297,6 +313,10 @@ export function Tree<T = unknown>(props: TreeProps<T>) {
     visit(items, false);
     return { matches, shown, opened };
   }, [filter, query, items, childrenOf]);
+  // Marks without filtering: a row whose label holds `highlight` is marked, if the filter has not marked it.
+  const marked = typeof highlight === "string" ? highlight.trim() : "";
+  const highlighted = (item: TreeItem<never>): Match | undefined =>
+    marked && textMatches(item.label, marked) ? true : undefined;
   // Branches closed by hand while filtering, so a matched ancestor can still be closed. Forgotten when the filter changes.
   const [shut, setShut] = useState<{ filter: unknown; ids: Set<string> }>({ filter, ids: new Set() });
   const shutIds = shut.filter === filter ? shut.ids : null;
@@ -397,9 +417,34 @@ export function Tree<T = unknown>(props: TreeProps<T>) {
     onRetry?.(item);
     load(item);
   };
-  // `reload` reads the latest state through a ref, so the handle never changes.
-  const latest = useRef({ items, loaded, isOpen, loadChildren, fetchChildren });
-  latest.current = { items, loaded, isOpen, loadChildren, fetchChildren };
+  // `reload` and `reveal` read the latest state through a ref, so the handle never changes.
+  const latest = useRef({
+    items,
+    loaded,
+    isOpen,
+    loadChildren,
+    fetchChildren,
+    open,
+    setOpen,
+    shutIds,
+    filter,
+  });
+  latest.current = { items, loaded, isOpen, loadChildren, fetchChildren, open, setOpen, shutIds, filter };
+  /** The item `reveal` asked for, shown once its row is there. */
+  const revealing = useRef<{ id: string; align: ScrollAlign } | null>(null);
+  useClientLayoutEffect(() => {
+    const want = revealing.current;
+    if (!want) return;
+    const index = rows.findIndex((r) => r.key === want.id);
+    if (index < 0) return;
+    revealing.current = null;
+    setFocusKey(want.id);
+    if (virtual) win.reveal(index, want.align);
+    else
+      root.current
+        ?.querySelector(`[data-key="${CSS.escape(want.id)}"]`)
+        ?.scrollIntoView?.({ block: want.align === "center" ? "center" : want.align, inline: "nearest" });
+  });
   useImperativeHandle(
     handle,
     () => ({
@@ -418,6 +463,30 @@ export function Tree<T = unknown>(props: TreeProps<T>) {
         // Open: load now. Closed: the children load the next time it opens.
         if (isOpen(id)) fetchChildren(item, loadChildren);
         else setStatus(({ [id]: _, ...rest }) => rest);
+      },
+      reveal: (id, { align = "nearest" } = {}) => {
+        const { items, loaded, isOpen, open, setOpen, shutIds, filter } = latest.current;
+        // The ancestors of the item, outermost first.
+        const pathTo = (list: TreeItem<never>[] | undefined, trail: string[]): string[] | null => {
+          for (const item of list ?? []) {
+            if (item.id === id) return trail;
+            const found = pathTo(item.children ?? loaded[item.id], [...trail, item.id]);
+            if (found) return found;
+          }
+          return null;
+        };
+        const path = pathTo(items, []);
+        if (!path) return false;
+        const closed = path.filter((a) => !isOpen(a));
+        const notListed = closed.filter((a) => !open.includes(a));
+        if (notListed.length) setOpen([...open, ...notListed]);
+        if (shutIds && closed.some((a) => shutIds.has(a)))
+          setShut({ filter, ids: new Set([...shutIds].filter((a) => !closed.includes(a))) });
+        revealing.current = { id, align };
+        // Already shown: no render is coming from the opening, so ask for one.
+        setFocusKey((k) => k);
+        setRevealTick((n) => n + 1);
+        return true;
       },
     }),
     [],
@@ -587,8 +656,10 @@ export function Tree<T = unknown>(props: TreeProps<T>) {
             selected={row.kind === "item" && pickedSet.has(row.item.id)}
             tabbable={row.key === tabStop}
             busy={statusOf(row.item.id) === "loading"}
-            match={row.kind === "item" ? search?.matches.get(row.item.id) : undefined}
-            query={query}
+            match={
+              row.kind === "item" ? (search?.matches.get(row.item.id) ?? highlighted(row.item)) : undefined
+            }
+            query={row.kind === "item" && search?.matches.has(row.item.id) ? query : marked}
             count={kids && (search ? kids.filter((k) => search.shown.has(k.id)).length : kids.length)}
             text={text}
             calls={calls}

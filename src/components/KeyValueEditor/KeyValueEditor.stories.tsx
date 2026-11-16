@@ -236,6 +236,69 @@ export const FileValuedRows: Story = {
   },
 };
 
+function Variables({ files = false }: { files?: boolean }) {
+  const [pairs, setPairs] = useState<KeyValuePair[]>([
+    { id: "h", key: "host", value: "api.example.com" },
+    { id: "t", key: "token", value: "abc123" },
+  ]);
+  return (
+    <>
+      <KeyValueEditor label="Variables" pairs={pairs} onChange={setPairs} rowTypes allowFiles={files} />
+      <output data-testid="pairs">
+        {JSON.stringify(pairs.map((p) => [p.key, p.secret ? "secret" : p.file ? "file" : "text"]))}
+      </output>
+    </>
+  );
+}
+
+/** `rowTypes`: a Type select per row, so the user marks a pair Secret (masked) or Text, and File with `allowFiles`. */
+export const UserMarksAPairSecret: Story = {
+  render: () => <Variables />,
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const out = () => JSON.parse(canvas.getByTestId("pairs").textContent as string);
+    const type = canvas.getByRole("combobox", { name: "Type (token)" });
+    await expect(type).toHaveTextContent("Text");
+    await expect(canvas.getByRole("textbox", { name: "Value (token)" })).toHaveAttribute("type", "text");
+    await userEvent.click(type);
+    // Without allowFiles there is no File type.
+    await expect(canvas.queryByRole("option", { name: "File" })).toBeNull();
+    await userEvent.click(canvas.getByRole("option", { name: "Secret" }));
+    await expect(out()).toEqual([
+      ["host", "text"],
+      ["token", "secret"],
+    ]);
+    const masked = canvasElement.querySelector('[data-pair="t"] input[type="password"]') as HTMLInputElement;
+    await expect(masked).toHaveValue("abc123");
+    await expect(type).toHaveTextContent("Secret");
+    // Back to Text with the keyboard.
+    type.focus();
+    await userEvent.keyboard("{ArrowDown}{Home}{Enter}");
+    await expect(out()[1]).toEqual(["token", "text"]);
+    await expect(canvas.getByRole("textbox", { name: "Value (token)" })).toHaveValue("abc123");
+  },
+};
+
+/** With `allowFiles`, File is a type too: choosing it opens the file picker, and Text takes the file away. */
+export const RowTypesWithFiles: Story = {
+  render: () => <Variables files />,
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const out = () => JSON.parse(canvas.getByTestId("pairs").textContent as string);
+    const picker = canvasElement.querySelector('input[type="file"]') as HTMLInputElement;
+    const open = spyOn(picker, "click").mockImplementation(() => {});
+    await userEvent.click(canvas.getByRole("combobox", { name: "Type (host)" }));
+    await userEvent.click(canvas.getByRole("option", { name: "File" }));
+    await expect(open).toHaveBeenCalledTimes(1);
+    open.mockRestore();
+    await userEvent.upload(picker, new File(["x"], "cert.pem", { type: "text/plain" }));
+    await waitFor(() => expect(out()[0]).toEqual(["host", "file"]));
+    await expect(canvas.getByRole("combobox", { name: "Type (host)" })).toHaveTextContent("File");
+    await userEvent.click(canvas.getByRole("combobox", { name: "Type (host)" }));
+    await userEvent.click(canvas.getByRole("option", { name: "Text" }));
+    await expect(out()[0]).toEqual(["host", "text"]);
+    await expect(canvas.getByRole("textbox", { name: "Value (host)" })).not.toHaveAttribute("readonly");
+  },
+};
+
 export const TouchRows: Story = {
   tags: ["touch", "!dev"],
   play: async ({ canvas }) => {

@@ -1,5 +1,6 @@
-import type { AriaAttributes, DOMAttributes, HTMLAttributes } from "react";
+import { type AriaAttributes, type DOMAttributes, type HTMLAttributes, type Ref, useMemo } from "react";
 import type { DataAttributes } from "./attributes.js";
+import { setRef } from "./refs.js";
 
 /** A step of the theme's space scale (`--cy-space-0` … `--cy-space-10`). */
 export type Space = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" | "10";
@@ -99,3 +100,31 @@ export const boxAttrs = ({ grow, shrink, fill, minSize, overflow }: BoxProps) =>
   "data-cy-min-size": minSize === "0" ? "0" : undefined,
   "data-cy-overflow": overflow,
 });
+
+/** Blocking a whole region (a panel while a job holds the document), on the layout primitives and Toolbar. */
+export interface BlockProps {
+  /**
+   * The HTML `inert` attribute: nothing inside can be focused, clicked or typed into, and assistive technology skips
+   * the region. It looks unchanged; `disabled` adds the dimmed look. Default false.
+   */
+  inert?: boolean | undefined;
+  /** `inert` with the disabled look (dimmed, as a disabled Button): a region blocked while a job runs. Default false. */
+  disabled?: boolean | undefined;
+}
+
+/**
+ * The ref and attributes that block a region (`BlockProps`). `inert` is set as the element's property, which React
+ * 18, React 19 and Preact all honour (React 18 drops `inert={true}`); `data-cy-disabled` is the dimmed look in
+ * `base.css`. `ref` is the component's forwarded ref, pointed at the same element.
+ */
+export function useBlock<E extends HTMLElement>(ref: Ref<E> | undefined, { inert, disabled }: BlockProps) {
+  const blocked = !!(inert || disabled);
+  const callback = useMemo(
+    () => (el: E | null) => {
+      setRef(ref, el);
+      if (el) el.inert = blocked;
+    },
+    [ref, blocked],
+  );
+  return { ref: callback, "data-cy-disabled": disabled ? "" : undefined };
+}

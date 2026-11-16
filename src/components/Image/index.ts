@@ -1,1 +1,1 @@
-export { Image, type ImageProps, type ImageTokens } from "./Image.js";
+export { Image, type ImageProps, type ImageRegion, type ImageTokens } from "./Image.js";

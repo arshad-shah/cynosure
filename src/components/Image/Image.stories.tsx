@@ -700,3 +700,95 @@ export const OverlayWaitsForThePicture: Story = {
     await expect(frameOf(canvasElement, ".waiting").querySelector(".cy-image-overlay")).toBeNull();
   },
 };
+
+/** Two codes found on a 400 by 200 scan, in the scan's own pixels. */
+const CODES = [
+  { x: 20, y: 40, width: 100, height: 100, label: "Code 1" },
+  { x: 260, y: 20, width: 120, height: 60, label: "Code 2", tone: "success" as const },
+];
+
+/** `regions` outline areas of the picture, given in its own pixels: they land on the picture at any size and fit. */
+export const RegionsOutlineThePicture: Story = {
+  args: { src: picture(400, 200), alt: "Scanned label", ratio: 1, fit: "contain", regions: CODES },
+  play: async ({ canvas, canvasElement }) => {
+    await loaded(canvasElement);
+    const frame = box(frameOf(canvasElement));
+    // A 2:1 picture shown whole in a square: half as tall as the frame, in its middle; 1 picture pixel = k CSS px.
+    const k = frame.width / 400;
+    const top = frame.top + (frame.height - 200 * k) / 2;
+    const regions = canvasElement.querySelectorAll<HTMLElement>(".cy-image-region");
+    await expect(regions).toHaveLength(2);
+    await waitFor(() =>
+      near(box(regions[0] as HTMLElement), {
+        left: frame.left + 20 * k,
+        top: top + 40 * k,
+        width: 100 * k,
+        height: 100 * k,
+      }),
+    );
+    await near(box(regions[1] as HTMLElement), {
+      left: frame.left + 260 * k,
+      top: top + 20 * k,
+      width: 120 * k,
+      height: 60 * k,
+    });
+    // Each region shows its label, and its tone colours the outline.
+    await expect(canvas.getByText("Code 1")).toBeVisible();
+    const outline = (el: HTMLElement) => getComputedStyle(el).outlineColor;
+    await expect(outline(regions[0] as HTMLElement)).not.toBe(outline(regions[1] as HTMLElement));
+    // The outlines never take a press.
+    await expect(getComputedStyle(overlayOf(canvasElement)).pointerEvents).toBe("none");
+    // They follow the picture when it is shown smaller.
+    (frameOf(canvasElement).parentElement as HTMLElement).style.maxWidth = "160px";
+    await waitFor(async () => {
+      const small = box(frameOf(canvasElement));
+      await expect(small.width).toBeLessThanOrEqual(160.5);
+      const s = small.width / 400;
+      await near(box(regions[0] as HTMLElement), {
+        left: small.left + 20 * s,
+        top: small.top + (small.height - 200 * s) / 2 + 40 * s,
+        width: 100 * s,
+        height: 100 * s,
+      });
+    });
+  },
+};
+
+/** The regions are part of the picture's meaning: with `overlayLabel` they are named, and each label is read. */
+export const RegionsWithALabel: Story = {
+  args: {
+    src: picture(400, 200),
+    alt: "Scanned label",
+    regions: CODES,
+    overlayLabel: "2 codes found",
+    width: 400,
+    height: 200,
+  },
+  play: async ({ canvas, canvasElement }) => {
+    await loaded(canvasElement);
+    await expect(canvas.getByRole("img", { name: "2 codes found" })).toBe(overlayOf(canvasElement));
+    // Without a label of its own, a region is still drawn, unlabelled.
+    await expect(canvasElement.querySelectorAll(".cy-image-region-label")).toHaveLength(2);
+  },
+};
+
+export const RegionsThemedThroughTokens: Story = {
+  args: {
+    src: picture(100, 100),
+    alt: "",
+    width: 100,
+    height: 100,
+    regions: [{ x: 10, y: 10, width: 50, height: 50 }],
+  },
+  render: (args) => (
+    <div style={{ ["--cy-image-region-color" as string]: "rgb(255, 0, 0)" }}>
+      <Image {...args} />
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    await loaded(canvasElement);
+    const region = await waitFor(() => canvasElement.querySelector(".cy-image-region") as HTMLElement);
+    await expect(getComputedStyle(region).outlineColor).toBe("rgb(255, 0, 0)");
+    await expect(region.querySelector(".cy-image-region-label")).toBeNull();
+  },
+};

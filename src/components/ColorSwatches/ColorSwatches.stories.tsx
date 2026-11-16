@@ -133,6 +133,57 @@ export const PlainStringsAndDisabled: Story = {
   },
 };
 
+export const ReadOnlyShowsColoursWithoutAChoice: Story = {
+  render: () => <ColorSwatches label="Palette" swatches={BRAND} readOnly value="rgb(29 27 24)" />,
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    // A labelled group of named colour images: nothing to choose, no tab stop.
+    const group = canvas.getByRole("group", { name: "Palette" });
+    await expect(canvas.queryByRole("radiogroup")).toBeNull();
+    await expect(canvas.queryAllByRole("radio")).toHaveLength(0);
+    const images = canvas.getAllByRole("img");
+    await expect(images.map((i) => i.getAttribute("aria-label"))).toEqual(BRAND.map((b) => b.label));
+    await expect(group.querySelectorAll("button")).toHaveLength(0);
+    await userEvent.tab();
+    await expect(canvasElement.contains(document.activeElement)).toBe(false);
+    // Each swatch still shows its colour, with no tick or ring for `value`.
+    const ink = images[1] as HTMLElement;
+    await expect(getComputedStyle(ink).getPropertyValue("--_swatch").trim()).toBe("rgb(29 27 24)");
+    await expect(ink.querySelector("svg")).toBeNull();
+    await expect(getComputedStyle(ink).cursor).not.toBe("pointer");
+  },
+};
+
+export const PlainStringsAndProductClasses: Story = {
+  render: () => (
+    <>
+      <ColorSwatches label="Read only" swatches={["rgb(1 2 3)"]} readOnly className="product-palette" />
+      <ColorSwatches
+        label="Pick"
+        swatches={["var(--brand-unknown)"]}
+        value="var(--brand-unknown)"
+        onChange={() => {}}
+        className="product-picker"
+      />
+    </>
+  ),
+  play: async ({ canvas }) => {
+    // A plain string is named by its value, read only or not; the product's class sits beside Cynosure's.
+    await expect(canvas.getByRole("group", { name: "Read only" })).toHaveClass(
+      "cy-color-swatches",
+      "product-palette",
+    );
+    await expect(canvas.getByRole("img", { name: "rgb(1 2 3)" })).toBeVisible();
+    await expect(canvas.getByRole("radiogroup", { name: "Pick" })).toHaveClass(
+      "cy-color-swatches",
+      "product-picker",
+    );
+    // A colour Cynosure cannot read is still chosen by its spelling, with a tick.
+    const swatch = canvas.getByRole("radio", { name: "var(--brand-unknown)" });
+    await expect(swatch).toHaveAttribute("aria-checked", "true");
+    await expect(swatch.querySelector("svg")).not.toBeNull();
+  },
+};
+
 export const TouchSwatches: Story = {
   tags: ["touch", "!dev"],
   play: async ({ canvas, userEvent }) => {

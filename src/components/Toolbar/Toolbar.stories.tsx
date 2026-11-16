@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 import { expect, fn, waitFor } from "storybook/test";
 import { copy, download, edit, filter, link } from "../../icons/index.js";
+import { blockingStory } from "../../test/blocking.js";
 import { shownFully } from "../../test/settle.js";
 import { Button } from "../Button/Button.js";
 import { IconButton } from "../IconButton/IconButton.js";
@@ -284,3 +285,10 @@ export const FieldsSitLevelWithButtons: Story = {
     ).toBe(canvas.getByRole("button", { name: "Filter" }).getBoundingClientRect().height);
   },
 };
+
+/** `inert` blocks the region (no focus, no clicks); `disabled` also dims it; clearing them gives it back. */
+export const InertOrDisabledBlocksTheRegion: Story = blockingStory((p, inside) => (
+  <Toolbar data-testid="region" label="Tools" {...p}>
+    {inside}
+  </Toolbar>
+));

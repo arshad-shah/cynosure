@@ -198,8 +198,7 @@ const people = {
 } as Partial<DataGridProps<unknown>>;
 /** The first column's text, top to bottom. */
 const names = (el: Element) =>
-  [...el.querySelectorAll('[role="row"]')]
-    .slice(1)
+  [...el.querySelectorAll(".cy-data-grid-row")]
     .sort((a, b) => Number(a.getAttribute("aria-rowindex")) - Number(b.getAttribute("aria-rowindex")))
     .map((r) => r.querySelector('[aria-colindex="1"]')?.textContent);
 
@@ -1029,5 +1028,427 @@ export const StableUnderHostileHost: Story = {
       const { clean, hostile } = computeUnderHostileHost(canvasElement, selector, props);
       await expect({ selector, ...hostile }).toEqual({ selector, ...clean });
     }
+  },
+};
+
+// ── Editing, multi-sort, filters, the column menu and row details ──
+
+const CITIES = ["Arlington", "Boston", "Helsinki", "London"];
+const EDIT_COLUMNS: DataGridColumn<Person>[] = [
+  { key: "name", header: "Name", editable: true },
+  {
+    key: "age",
+    header: "Age",
+    align: "end",
+    width: 96,
+    editable: true,
+    editor: "number",
+    cell: (p) => p.age ?? "NULL",
+  },
+  {
+    key: "city",
+    header: "City",
+    editable: (p) => p.id !== "p3",
+    editor: "select",
+    options: CITIES.map((c) => ({ value: c, label: c })),
+  },
+];
+
+/** People whose cells can be edited: each edit is written back to the rows. */
+function Editable(props: Partial<DataGridProps<Person>>) {
+  const [rows, setRows] = useState(PEOPLE);
+  return (
+    <DataGrid
+      label="People"
+      columns={EDIT_COLUMNS}
+      rows={rows}
+      getRowId={(p) => p.id}
+      {...props}
+      onCellEdit={(row, key, value) => {
+        props.onCellEdit?.(row, key, value);
+        setRows((all) => all.map((p) => (p.id === row.id ? { ...p, [key]: value } : p)));
+      }}
+    />
+  );
+}
+const edits = fn();
+
+/**
+ * Cell editing: Enter or F2 edits the focused cell, typing a character replaces its value; Enter commits and stays,
+ * Tab commits and moves on, Escape cancels, leaving the cell commits. `onCellEdit(row, key, value)` gets the value.
+ */
+export const EditCellsWithTheKeyboard: Story = {
+  render: () => <Editable onCellEdit={edits} onAction={editAction} />,
+  play: async ({ canvas, userEvent }) => {
+    edits.mockClear();
+    await userEvent.tab();
+    await expect(focused()).toBe("Grace");
+    // Enter opens a text field holding the value, named for the column.
+    await userEvent.keyboard("{Enter}");
+    const field = canvas.getByRole("textbox", { name: "Edit Name" });
+    await expect(field).toHaveFocus();
+    await expect(field).toHaveValue("Grace");
+    await userEvent.clear(field);
+    await userEvent.type(field, "Grace Hopper{Enter}");
+    await expect(edits).toHaveBeenLastCalledWith(PEOPLE[0], "name", "Grace Hopper");
+    await expect(focused()).toBe("Grace Hopper");
+    await expect(canvas.queryByRole("textbox")).toBeNull();
+    // Enter on an editable cell edits, it does not run onAction.
+    await expect(editAction).not.toHaveBeenCalled();
+    // F2 edits too; Escape cancels and puts focus back on the cell.
+    await userEvent.keyboard("{F2}");
+    await userEvent.type(canvas.getByRole("textbox", { name: "Edit Name" }), "!!");
+    await userEvent.keyboard("{Escape}");
+    await expect(edits).toHaveBeenCalledTimes(1);
+    await expect(focused()).toBe("Grace Hopper");
+    // Typing a character starts editing with it; Tab commits and moves to the next cell.
+    await userEvent.keyboard("{ArrowDown}Z");
+    await expect(canvas.getByRole("textbox", { name: "Edit Name" })).toHaveValue("Z");
+    await userEvent.keyboard("ed{Tab}");
+    await expect(edits).toHaveBeenLastCalledWith(PEOPLE[1], "name", "Zed");
+    await expect(focused()).toBe("36");
+    // A number column parses its value; text that is not a number keeps the field open with an error.
+    await userEvent.keyboard("{Enter}");
+    const age = canvas.getByRole("textbox", { name: "Edit Age" });
+    await userEvent.clear(age);
+    await userEvent.type(age, "abc{Enter}");
+    await expect(age).toHaveFocus();
+    await expect(age).toHaveAttribute("aria-invalid", "true");
+    await userEvent.clear(age);
+    await userEvent.type(age, "37{Enter}");
+    await expect(edits).toHaveBeenLastCalledWith(expect.objectContaining({ id: "p2" }), "age", 37);
+    await expect(focused()).toBe("37");
+    // Emptied, a number is null.
+    await userEvent.keyboard("{Enter}");
+    await userEvent.clear(canvas.getByRole("textbox", { name: "Edit Age" }));
+    await userEvent.keyboard("{Enter}");
+    await expect(edits).toHaveBeenLastCalledWith(expect.objectContaining({ id: "p2" }), "age", null);
+    // A select column edits with a Select: its value is committed as it is chosen.
+    await userEvent.keyboard("{ArrowRight}{Enter}");
+    const city = canvas.getByRole("combobox", { name: "Edit City" });
+    await expect(city).toHaveFocus();
+    await userEvent.keyboard("{ArrowDown}");
+    await userEvent.click(await canvas.findByRole("option", { name: "Boston" }));
+    await expect(edits).toHaveBeenLastCalledWith(expect.objectContaining({ id: "p2" }), "city", "Boston");
+    await waitFor(() => expect(focused()).toBe("Boston"));
+    // A cell whose column says no (Linus' city) runs onAction on Enter as before.
+    await userEvent.keyboard("{ArrowDown}{Enter}");
+    await expect(canvas.queryByRole("combobox")).toBeNull();
+    await expect(editAction).toHaveBeenCalledTimes(1);
+  },
+};
+const editAction = fn();
+
+/** A double-click edits an editable cell; leaving the field (a click elsewhere) commits it. */
+export const DoubleClickEditsAndLeavingCommits: Story = {
+  render: () => (
+    <Stack gap="2">
+      <Editable onCellEdit={edits} />
+      <Button>Elsewhere</Button>
+    </Stack>
+  ),
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    edits.mockClear();
+    await userEvent.dblClick(cell(canvasElement, "Barbara"));
+    const field = canvas.getByRole("textbox", { name: "Edit Name" });
+    await expect(field).toHaveFocus();
+    // Clicking inside the field keeps it open.
+    await userEvent.click(field);
+    await expect(field).toHaveFocus();
+    await userEvent.type(field, " Liskov");
+    await userEvent.click(canvas.getByRole("button", { name: "Elsewhere" }));
+    await expect(edits).toHaveBeenLastCalledWith(PEOPLE[3], "name", "Barbara Liskov");
+    await expect(canvas.queryByRole("textbox")).toBeNull();
+    await expect(cell(canvasElement, "Barbara Liskov")).toBeVisible();
+  },
+};
+
+const TEAM: Person[] = [
+  { id: "t1", name: "Cy", age: 40, city: "London" },
+  { id: "t2", name: "Ann", age: 31, city: "Boston" },
+  { id: "t3", name: "Bo", age: 31, city: "London" },
+  { id: "t4", name: "Al", age: 40, city: "Boston" },
+];
+const sortsChanged = fn();
+
+/**
+ * Multi-column sort: Shift+click (or Shift+Enter) on another header adds it as the next key; each sorted header shows
+ * its priority. A plain click sorts by that column alone again.
+ */
+export const ShiftClickSortsByMoreColumns: Story = {
+  args: {
+    ...people,
+    rows: TEAM,
+    columns: PEOPLE_COLUMNS.map((c) => ({ ...c, sortable: true })),
+    multiSort: true,
+    onSortsChange: sortsChanged,
+  } as Partial<DataGridProps<unknown>>,
+  play: async ({ args, canvas, canvasElement, userEvent }) => {
+    const button = (name: RegExp) => canvas.getByRole("button", { name });
+    await userEvent.click(button(/^City/));
+    await expect(names(canvasElement)).toEqual(["Ann", "Al", "Cy", "Bo"]);
+    await userEvent.keyboard("{Shift>}");
+    await userEvent.click(button(/^Name/));
+    await userEvent.keyboard("{/Shift}");
+    await expect(names(canvasElement)).toEqual(["Al", "Ann", "Bo", "Cy"]);
+    await expect(sortsChanged).toHaveBeenLastCalledWith([
+      { key: "city", direction: "ascending" },
+      { key: "name", direction: "ascending" },
+    ]);
+    // The first key is aria-sort; each sorted header shows its priority, also in its name.
+    await expect(canvas.getByRole("columnheader", { name: /City/ })).toHaveAttribute(
+      "aria-sort",
+      "ascending",
+    );
+    await expect(canvas.getByRole("columnheader", { name: /Name/ })).not.toHaveAttribute(
+      "aria-sort",
+      "ascending",
+    );
+    await expect(button(/^City/)).toHaveAccessibleName("City sort 1");
+    await expect(button(/^Name/)).toHaveAccessibleName("Name sort 2");
+    // Shift on a sorted key turns it around, then off.
+    await userEvent.keyboard("{Shift>}");
+    await userEvent.click(button(/^Name/));
+    await userEvent.keyboard("{/Shift}");
+    await expect(names(canvasElement)).toEqual(["Ann", "Al", "Cy", "Bo"]);
+    // From the keyboard: Shift+Enter on a header adds it.
+    button(/^Age/).focus();
+    await userEvent.keyboard("{Shift>}{Enter}{/Shift}");
+    await expect(sortsChanged).toHaveBeenLastCalledWith([
+      { key: "city", direction: "ascending" },
+      { key: "name", direction: "descending" },
+      { key: "age", direction: "ascending" },
+    ]);
+    // A plain click sorts by that column alone; onSortChange reports the first key throughout.
+    await userEvent.click(button(/^Age/));
+    await expect(sortsChanged).toHaveBeenLastCalledWith([{ key: "age", direction: "ascending" }]);
+    await expect(args.onSortChange).toHaveBeenLastCalledWith({ key: "age", direction: "ascending" });
+    await expect(button(/^Age/)).toHaveAccessibleName("Age");
+  },
+};
+
+const filtersChanged = fn();
+/**
+ * Column filters: a column with `filter` gets a field in a row under the header. `text` keeps rows whose value holds
+ * the text; `number` takes a number or a comparison (`>30`, `<=40`, `30..40`); a function filters as it likes.
+ */
+export const FilterRowFiltersByColumn: Story = {
+  args: {
+    ...people,
+    rows: TEAM,
+    columns: [
+      { key: "name", header: "Name", filter: "text" },
+      { key: "age", header: "Age", align: "end", filter: "number" },
+      { key: "city", header: "City", filter: (p: Person, q: string) => p.city.startsWith(q) },
+    ],
+    onFiltersChange: filtersChanged,
+  } as Partial<DataGridProps<unknown>>,
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const g = canvas.getByRole("grid", { name: "People" });
+    const name = canvas.getByRole("textbox", { name: "Filter Name" });
+    await userEvent.type(name, "  a ");
+    await expect(names(canvasElement)).toEqual(["Ann", "Al"]);
+    await expect(filtersChanged).toHaveBeenLastCalledWith({ name: "  a " });
+    await expect(g).toHaveAttribute("aria-rowcount", "4");
+    await userEvent.clear(name);
+    const age = canvas.getByRole("textbox", { name: "Filter Age" });
+    await userEvent.type(age, ">35");
+    await expect(names(canvasElement)).toEqual(["Cy", "Al"]);
+    await userEvent.clear(age);
+    await userEvent.type(age, "30..35");
+    await expect(names(canvasElement)).toEqual(["Ann", "Bo"]);
+    await userEvent.clear(age);
+    await userEvent.type(age, "40");
+    await expect(names(canvasElement)).toEqual(["Cy", "Al"]);
+    // Not a number or a comparison: it filters nothing out.
+    await userEvent.clear(age);
+    await userEvent.type(age, "forty");
+    await expect(names(canvasElement)).toEqual(["Cy", "Ann", "Bo", "Al"]);
+    await userEvent.clear(age);
+    await userEvent.type(canvas.getByRole("textbox", { name: "Filter City" }), "Lon");
+    await expect(names(canvasElement)).toEqual(["Cy", "Bo"]);
+    // Nothing matches: the empty message.
+    await userEvent.type(name, "zz");
+    await expect(canvas.getByText("Nothing to show")).toBeVisible();
+    // Shift+Tab from the grid's cells reaches the filters; the arrows in a filter move its caret, not the grid.
+    await userEvent.clear(name);
+    await expect(names(canvasElement)).toEqual(["Cy", "Bo"]);
+  },
+};
+
+const orderChanged = fn();
+const hiddenChanged = fn();
+const headerNames = (el: Element) =>
+  [...el.querySelectorAll<HTMLElement>('[role="columnheader"]')]
+    .sort((a, b) => Number(a.getAttribute("aria-colindex")) - Number(b.getAttribute("aria-colindex")))
+    .map((h) => h.querySelector(".cy-data-grid-label, .cy-sort-button-label")?.textContent);
+
+/**
+ * `columnMenu`: each header has a menu (its button, or Alt+Down, Shift+F10 or the context menu key on the header) to
+ * sort, move the column left or right, hide it, and show hidden columns again.
+ */
+export const ColumnMenuHidesAndReorders: Story = {
+  args: {
+    ...people,
+    columns: PEOPLE_COLUMNS,
+    columnMenu: true,
+    onColumnOrderChange: orderChanged,
+    onHiddenColumnsChange: hiddenChanged,
+  } as Partial<DataGridProps<unknown>>,
+  play: async ({ args, canvas, canvasElement, userEvent }) => {
+    await expect(headerNames(canvasElement)).toEqual(["Name", "Age", "City"]);
+    // Pointer: the header's menu button.
+    await userEvent.click(canvas.getByRole("button", { name: "Name column options" }));
+    await userEvent.click(await canvas.findByRole("menuitem", { name: "Move right" }));
+    await expect(headerNames(canvasElement)).toEqual(["Age", "Name", "City"]);
+    await expect(orderChanged).toHaveBeenLastCalledWith(["age", "name", "city"]);
+    await expect(names(canvasElement)).toEqual(["85", "36", "NULL", "9"]);
+    // Keyboard: Alt+Down on a header opens its menu; focus comes back to the header after.
+    await waitFor(() => expect(document.activeElement?.closest('[role="columnheader"]')).not.toBeNull());
+    await userEvent.keyboard("{End}");
+    await expect(document.activeElement).toBe(canvas.getByRole("columnheader", { name: /City/ }));
+    await userEvent.keyboard("{Alt>}{ArrowDown}{/Alt}");
+    const menu = await canvas.findByRole("menu", { name: "City column options" });
+    await waitFor(() => expect(menu).toBeVisible());
+    await userEvent.keyboard("{ArrowDown}");
+    await waitFor(() => expect(document.activeElement).toHaveTextContent("Hide column"));
+    await userEvent.keyboard("{Enter}");
+    await expect(headerNames(canvasElement)).toEqual(["Age", "Name"]);
+    await expect(hiddenChanged).toHaveBeenLastCalledWith(["city"]);
+    await waitFor(() => expect(document.activeElement?.closest('[role="columnheader"]')).not.toBeNull());
+    // The Columns submenu shows a hidden column again.
+    await userEvent.click(canvas.getByRole("button", { name: "Age column options" }));
+    await userEvent.click(await canvas.findByRole("menuitem", { name: "Columns" }));
+    await userEvent.click(await canvas.findByRole("menuitemcheckbox", { name: "City" }));
+    await expect(headerNames(canvasElement)).toEqual(["Age", "Name", "City"]);
+    await expect(hiddenChanged).toHaveBeenLastCalledWith([]);
+    // Sorting from the menu.
+    await userEvent.click(canvas.getByRole("button", { name: "Name column options" }));
+    await userEvent.click(await canvas.findByRole("menuitem", { name: "Sort descending" }));
+    await expect(args.onSortChange).toHaveBeenLastCalledWith({ key: "name", direction: "descending" });
+    // The first column cannot move left; the last visible column cannot be hidden.
+    await userEvent.click(canvas.getByRole("button", { name: "Age column options" }));
+    await expect(await canvas.findByRole("menuitem", { name: "Move left" })).toHaveAttribute(
+      "aria-disabled",
+      "true",
+    );
+    await userEvent.keyboard("{Escape}");
+  },
+};
+
+/** The column menu's names, and the filter fields', take `labels`. */
+export const ColumnMenuAndFilterLabels: Story = {
+  args: {
+    ...people,
+    columns: PEOPLE_COLUMNS.map((c) => ({ ...c, filter: "text" as const })),
+    columnMenu: true,
+    labels: {
+      columnMenu: (name: string) => `Options de ${name}`,
+      filter: (name: string) => `Filtrer ${name}`,
+      hide: "Masquer",
+    },
+  } as Partial<DataGridProps<unknown>>,
+  play: async ({ canvas, userEvent }) => {
+    await expect(canvas.getByRole("textbox", { name: "Filtrer Name" })).toBeVisible();
+    await userEvent.click(canvas.getByRole("button", { name: "Options de City" }));
+    const hide = await canvas.findByRole("menuitem", { name: "Masquer" });
+    await waitFor(() => expect(hide).toBeVisible());
+    await userEvent.keyboard("{Escape}");
+  },
+};
+
+/** Controlled order and hidden columns: the grid shows what it is given. */
+export const ControlledColumns: Story = {
+  args: { ...people, columnOrder: ["city", "name"], hiddenColumns: ["age"] } as Partial<
+    DataGridProps<unknown>
+  >,
+  play: async ({ canvas, canvasElement }) => {
+    // Columns left out of the order follow it, in their own order; hidden ones are not drawn.
+    await expect(headerNames(canvasElement)).toEqual(["City", "Name"]);
+    await expect(canvas.getByRole("grid")).toHaveAttribute("aria-colcount", "2");
+  },
+};
+
+function Details(props: Partial<DataGridProps<number>>) {
+  return (
+    <DataGrid
+      {...huge}
+      columns={HUGE_COLUMNS.slice(0, 6)}
+      renderRowDetails={(r) => (
+        <Stack gap="1">
+          <span>{`Details of row ${r + 1}`}</span>
+          <span>Second line</span>
+          <Button size="sm">{`Open row ${r + 1}`}</Button>
+        </Stack>
+      )}
+      {...props}
+    />
+  );
+}
+const expandedChanged = fn();
+
+/**
+ * Row details: `renderRowDetails` adds a first column whose cell shows or hides a panel under the row (a click,
+ * Enter or Space on it). The rows below move down, and the grid stays virtual.
+ */
+export const RowDetailsOpenUnderTheRow: Story = {
+  render: () => <Details onExpandedRowsChange={expandedChanged} />,
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const g = canvas.getByRole("grid", { name: "Results" });
+    await expect(g).toHaveAttribute("aria-colcount", "7");
+    const toggle = (r: number) => canvasElement.querySelector(`[data-cell="${r}:0"]`) as HTMLElement;
+    const rowEl = (r: number) => toggle(r).closest('[role="row"]') as HTMLElement;
+    await expect(toggle(1)).toHaveAccessibleName("Show details");
+    await expect(toggle(1)).toHaveAttribute("aria-expanded", "false");
+    const before = rowEl(2).getBoundingClientRect().top;
+    await userEvent.click(toggle(1));
+    await expect(expandedChanged).toHaveBeenLastCalledWith(["1"]);
+    await expect(toggle(1)).toHaveAttribute("aria-expanded", "true");
+    await expect(toggle(1)).toHaveAccessibleName("Hide details");
+    const panel = canvas.getByText("Details of row 2");
+    await expect(panel).toBeVisible();
+    // The panel sits under its row, and the next row below the panel.
+    await waitFor(() =>
+      expect(rowEl(2).getBoundingClientRect().top).toBeGreaterThanOrEqual(
+        panel.closest('[role="row"]')?.getBoundingClientRect().bottom ?? Number.POSITIVE_INFINITY,
+      ),
+    );
+    await expect(rowEl(2).getBoundingClientRect().top).toBeGreaterThan(before + 40);
+    // Row numbers count the panel's row, so assistive technology reads a consistent grid.
+    await expect(rowEl(1)).toHaveAttribute("aria-rowindex", "3");
+    await expect(panel.closest('[role="row"]')).toHaveAttribute("aria-rowindex", "4");
+    await expect(rowEl(2)).toHaveAttribute("aria-rowindex", "5");
+    await expect(g).toHaveAttribute("aria-rowcount", "100002");
+    // Keyboard: Enter or Space on the toggle cell; the arrows pass over the panel.
+    toggle(1).focus();
+    await userEvent.keyboard("{ArrowDown}");
+    await expect(document.activeElement).toBe(toggle(2));
+    await userEvent.keyboard(" ");
+    await expect(canvas.getByText("Details of row 3")).toBeVisible();
+    await userEvent.keyboard("{ArrowUp}{Enter}");
+    await expect(canvas.queryByText("Details of row 2")).toBeNull();
+    await expect(expandedChanged).toHaveBeenLastCalledWith(["2"]);
+    // Tab from the row reaches the panel's controls.
+    toggle(2).focus();
+    await userEvent.tab();
+    await expect(canvas.getByRole("button", { name: "Open row 3" })).toHaveFocus();
+    // Far down the grid, details still open in place.
+    g.scrollTop = g.scrollHeight;
+    await waitFor(() => expect(toggle(99_999)).not.toBeNull());
+    await userEvent.click(toggle(99_999));
+    await waitFor(() => expect(canvas.getByText("Details of row 100000")).toBeVisible());
+  },
+};
+
+/** With a touch screen, the details toggle keeps a 44px hit area. */
+export const TouchOpensRowDetails: Story = {
+  tags: ["touch", "!dev"],
+  render: () => <Details />,
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const toggle = canvasElement.querySelector('[data-cell="0:0"]') as HTMLElement;
+    await expect(toggle.getBoundingClientRect().height).toBeGreaterThanOrEqual(44);
+    await expect(toggle.getBoundingClientRect().width).toBeGreaterThanOrEqual(44);
+    await userEvent.pointer({ keys: "[TouchA]", target: toggle });
+    await expect(canvas.getByText("Details of row 1")).toBeVisible();
   },
 };

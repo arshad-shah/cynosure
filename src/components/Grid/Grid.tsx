@@ -1,5 +1,6 @@
 import { type CSSProperties, type ElementType, forwardRef, type ReactNode } from "react";
 import {
+  type BlockProps,
   type BoxProps,
   boxAttrs,
   BREAKPOINTS as LAYOUT_BREAKPOINTS,
@@ -8,6 +9,7 @@ import {
   paddingVars,
   type Space,
   space,
+  useBlock,
   type VisibilityProps,
   visibilityAttrs,
 } from "../../foundations/layout.js";
@@ -30,7 +32,7 @@ export type GridColumns = GridResponsive<number>;
 
 const BREAKPOINTS = Object.keys(GRID_BREAKPOINTS) as GridBreakpoint[];
 
-export interface GridProps extends PaddingProps, VisibilityProps, BoxProps, LayoutAttributes {
+export interface GridProps extends PaddingProps, VisibilityProps, BoxProps, BlockProps, LayoutAttributes {
   /**
    * Number of equal columns, or a number per width of the grid itself: `{ base: 1, sm: 2, lg: 4 }`. A breakpoint that
    * is left out keeps the count of the one below it. With `minItemWidth` it is the most columns there can be.
@@ -115,6 +117,8 @@ export const Grid = forwardRef<HTMLElement, GridProps>(function Grid(
     fill,
     minSize,
     overflow,
+    inert,
+    disabled,
     as = "div",
     className,
     style,
@@ -124,6 +128,7 @@ export const Grid = forwardRef<HTMLElement, GridProps>(function Grid(
   ref,
 ) {
   const Tag = as as ElementType;
+  const block = useBlock(ref, { inert, disabled });
   const responsive = typeof columns === "object" && columns !== null;
   const tracks = typeof columns === "string" && columns.trim() ? columns : undefined;
   const perWidth: Record<string, number> = {};
@@ -139,8 +144,8 @@ export const Grid = forwardRef<HTMLElement, GridProps>(function Grid(
   }
   return (
     <Tag
-      ref={ref}
       {...rest}
+      {...block}
       className={className ? `cy-grid ${className}` : "cy-grid"}
       data-fit={minItemWidth ? "" : undefined}
       data-responsive={responsive ? "" : undefined}

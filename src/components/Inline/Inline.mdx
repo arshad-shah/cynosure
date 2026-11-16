@@ -75,6 +75,14 @@ A child Stack or Inline with `grow` takes the free space in the row, so the item
 
 <Canvas of={Stories.SeparatorMakesAMetaLine} />
 
+## Blocking a region
+
+`inert` blocks the row while a job holds the page: nothing inside can be focused, clicked or typed into, and assistive technology skips it (the HTML `inert` attribute, set as a property so React 18, React 19 and Preact all honour it). `disabled` does the same and dims the row as a disabled Button is. Clear it to give the row back. Tell people why it is blocked outside it, with a ProgressBar or a status Text.
+
+```tsx
+<Inline disabled={job.running}>…</Inline>
+```
+
 ## Props
 
 <ArgTypes of={Stories} />

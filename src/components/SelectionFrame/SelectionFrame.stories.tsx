@@ -6,8 +6,11 @@ import type { FrameBox } from "./frame-math.js";
 import { SelectionFrame, type SelectionFrameProps } from "./SelectionFrame.js";
 
 /** A page with one object on it and the frame around it, as an editor wires it. */
-function Editor(props: Partial<SelectionFrameProps> & { onCommitSpy?: (b: FrameBox, r: number) => void }) {
-  const [box, setBox] = useState<FrameBox>({ x: 40, y: 60, width: 120, height: 60 });
+function Editor({
+  start,
+  ...props
+}: Partial<SelectionFrameProps> & { onCommitSpy?: (b: FrameBox, r: number) => void; start?: FrameBox }) {
+  const [box, setBox] = useState<FrameBox>(start ?? { x: 40, y: 60, width: 120, height: 60 });
   const [rotate, setRotate] = useState(0);
   const scale = props.scale ?? 1;
   return (
@@ -63,11 +66,22 @@ const state = (el: Element) =>
     rotate: number;
   };
 
-/** Drags `target` by (dx, dy) CSS pixels with detent's pointer path. */
-async function drag(target: Element, dx: number, dy: number, pointerType = "mouse", hold = 0, end = true) {
+/**
+ * Drags `target` by (dx, dy) CSS pixels with detent's pointer path, from its centre or from `at` (viewport pixels).
+ * Moves carry `button: -1`, as browsers send them (no button changed).
+ */
+async function drag(
+  target: Element,
+  dx: number,
+  dy: number,
+  pointerType = "mouse",
+  hold = 0,
+  end = true,
+  at?: { x: number; y: number },
+) {
   const r = target.getBoundingClientRect();
-  const x = r.left + r.width / 2;
-  const y = r.top + r.height / 2;
+  const x = at?.x ?? r.left + r.width / 2;
+  const y = at?.y ?? r.top + r.height / 2;
   const init = {
     bubbles: true,
     cancelable: true,
@@ -81,7 +95,12 @@ async function drag(target: Element, dx: number, dy: number, pointerType = "mous
   if (hold) await new Promise((res) => setTimeout(res, hold));
   for (let i = 1; i <= 4; i++)
     target.dispatchEvent(
-      new PointerEvent("pointermove", { ...init, clientX: x + (dx * i) / 4, clientY: y + (dy * i) / 4 }),
+      new PointerEvent("pointermove", {
+        ...init,
+        button: -1,
+        clientX: x + (dx * i) / 4,
+        clientY: y + (dy * i) / 4,
+      }),
     );
   await new Promise((res) => requestAnimationFrame(() => res(null)));
   if (end)
@@ -158,6 +177,71 @@ export const DragToMove: Story = {
     // At 2× zoom, 40 by 20 screen pixels is 20 by 10 units.
     await waitFor(() => expect(state(canvasElement)).toMatchObject({ x: 60, y: 70 }));
     await expect(frame(canvasElement)).toHaveFocus();
+  },
+};
+
+/** The frame's own element at a viewport point, or the handle there. */
+const hitAt = (x: number, y: number) => {
+  const el = document.elementFromPoint(x, y);
+  return el?.closest("[data-handle]") ?? el?.closest(".cy-selection-frame");
+};
+/** Points across a box's body, inset by one pixel. */
+function bodyPoints(el: Element) {
+  const r = el.getBoundingClientRect();
+  const xs = [r.left + 1, r.left + r.width / 2, r.right - 1];
+  const ys = [r.top + 1, r.top + r.height / 2, r.bottom - 1];
+  return xs.flatMap((x) => ys.map((y) => ({ x, y })));
+}
+
+export const SmallObjectsKeepTheirBodyFree: Story = {
+  render: () => (
+    <>
+      <Editor resizable rotatable start={{ x: 60, y: 60, width: 20, height: 16 }} label="Tick" />
+      <Editor resizable start={{ x: 40, y: 100, width: 300, height: 8 }} label="Highlight" />
+      <Editor resizable start={{ x: 40, y: 60, width: 120, height: 60 }} label="Text box" />
+    </>
+  ),
+  play: async ({ canvas }) => {
+    const tick = canvas.getByRole("group", { name: "Tick" });
+    const line = canvas.getByRole("group", { name: "Highlight" });
+    const large = canvas.getByRole("group", { name: "Text box" });
+    // A tick smaller than its handles: no handle lies over any part of its body, so the body can be dragged.
+    for (const p of bodyPoints(tick)) await expect(hitAt(p.x, p.y)).toBe(tick);
+    // The corner handles move outside it and still resize it; the edge handles, which would cover it, are hidden.
+    const visible = (el: Element) =>
+      [...el.querySelectorAll<HTMLElement>("[data-handle]")].filter((h) => h.checkVisibility());
+    await expect(visible(tick).map((h) => h.dataset.handle)).toEqual(["nw", "ne", "se", "sw", "rotate"]);
+    const t = tick.getBoundingClientRect();
+    for (const h of visible(tick)) {
+      const r = h.getBoundingClientRect();
+      const inside = r.right > t.left && r.left < t.right && r.bottom > t.top && r.top < t.bottom;
+      await expect({ handle: h.dataset.handle, inside }).toEqual({ handle: h.dataset.handle, inside: false });
+    }
+    const se = tick.querySelector('[data-handle="se"]') as HTMLElement;
+    await drag(se, 10, 6);
+    await waitFor(() => expect(tick.getBoundingClientRect().width).toBeCloseTo(30, 0));
+    // A thin highlight keeps its whole length free: the handles across its short side (e, w) are hidden and the
+    // rest sit just above and below it.
+    for (const p of bodyPoints(line)) await expect(hitAt(p.x, p.y)).toBe(line);
+    await expect(visible(line).map((h) => h.dataset.handle)).toEqual(["nw", "n", "ne", "se", "s", "sw"]);
+    // Dragging the body moves it.
+    const before = line.getBoundingClientRect();
+    await drag(line, 30, 0, "mouse", 0, true, { x: before.left + 4, y: before.top + 4 });
+    await waitFor(() => expect(line.getBoundingClientRect().left).toBeCloseTo(before.left + 30, 0));
+    // A large object keeps all eight handles on its edges.
+    await expect(visible(large)).toHaveLength(8);
+    const l = large.getBoundingClientRect();
+    const nw = (large.querySelector('[data-handle="nw"]') as HTMLElement).getBoundingClientRect();
+    await expect(nw.left + nw.width / 2).toBeCloseTo(l.left, 0);
+  },
+};
+
+export const CompactBelowASizeOfYourOwn: Story = {
+  render: () => <Editor resizable compactBelow={200} />,
+  play: async ({ canvasElement }) => {
+    // 120 by 60 is under 200 on both sides: the edge handles hide.
+    const n = canvasElement.querySelector('[data-handle="n"]') as HTMLElement;
+    await expect(n.checkVisibility()).toBe(false);
   },
 };
 
@@ -315,6 +399,18 @@ export const TouchHandlesAndDrag: Story = {
     // A finger held briefly, then dragged, moves the object (a quick swipe would scroll the page instead).
     await drag(frame(canvasElement), 30, 0, "touch", 260);
     await waitFor(() => expect(state(canvasElement).x).toBe(70));
+  },
+};
+
+export const TouchSmallObjectsKeepTheirBodyFree: Story = {
+  tags: ["touch", "!dev"],
+  render: () => <Editor resizable start={{ x: 100, y: 100, width: 60, height: 60 }} />,
+  play: async ({ canvasElement }) => {
+    // 60px is small for a finger: the 44px hit areas would cover it, so the handles move outside.
+    const el = frame(canvasElement);
+    for (const p of bodyPoints(el)) await expect(hitAt(p.x, p.y)).toBe(el);
+    await drag(el, 30, 0, "touch", 260);
+    await waitFor(() => expect(state(canvasElement).x).toBe(130));
   },
 };
 

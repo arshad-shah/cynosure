@@ -1,7 +1,8 @@
 import { type CSSProperties, type ReactNode, useRef } from "react";
+import { type BlockProps, useBlock } from "../../foundations/layout.js";
 import { TOOLBAR_ITEMS, useRovingFocus } from "../../foundations/roving-focus.js";
 
-export interface ToolbarProps {
+export interface ToolbarProps extends BlockProps {
   /** Accessible name (required: a toolbar must be named). */
   label: string;
   /** Direction of the toolbar: Left/Right move between controls, or Up/Down when vertical. Default "horizontal". */
@@ -23,6 +24,8 @@ export function Toolbar({
   label,
   orientation = "horizontal",
   loop = true,
+  inert,
+  disabled,
   className,
   style,
   children,
@@ -30,10 +33,11 @@ export function Toolbar({
 }: ToolbarProps) {
   const ref = useRef<HTMLDivElement>(null);
   useRovingFocus(ref, { orientation, loop, selector: TOOLBAR_ITEMS });
+  const block = useBlock(ref, { inert, disabled });
   return (
     <div
-      ref={ref}
       {...rest}
+      {...block}
       role="toolbar"
       aria-label={label}
       aria-orientation={orientation}

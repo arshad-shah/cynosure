@@ -15,6 +15,7 @@ const meta = {
     alpha: { control: "boolean" },
     disabled: { control: "boolean" },
     size: { control: "inline-radio", options: ["sm", "md", "lg"] },
+    inline: { control: "boolean" },
   },
   decorators: [(Story) => <div style={{ maxWidth: 300 }}>{Story()}</div>],
 } satisfies Meta<typeof ColorField>;
@@ -362,6 +363,74 @@ export const SwatchesInThePicker: Story = {
     // Arrow keys move along the swatches and choose.
     await userEvent.keyboard("{ArrowRight}");
     await expect(args.onChange).toHaveBeenLastCalledWith("#2f66b0");
+  },
+};
+
+export const InlinePicker: Story = {
+  args: { inline: true, alpha: true, defaultValue: "red", label: "Base colour" },
+  decorators: [(Story) => <div style={{ inlineSize: 320 }}>{Story()}</div>],
+  beforeEach: () => {
+    const w = window as EyeDropperWindow;
+    const original = w.EyeDropper;
+    w.EyeDropper = class {
+      open() {
+        return Promise.resolve({ sRGBHex: "#123456" });
+      }
+    };
+    return () => {
+      w.EyeDropper = original;
+    };
+  },
+  play: async ({ args, canvas, canvasElement, userEvent }) => {
+    const input = canvas.getByRole("textbox", { name: "Base colour" });
+    // Area, hue and opacity are on the page: no button to open them, no popover.
+    const area = canvas.getByRole("slider", { name: "Saturation and brightness" });
+    await expect(area).toBeVisible();
+    await expect(canvas.getByRole("slider", { name: "Hue" })).toBeVisible();
+    await expect(canvas.getByRole("slider", { name: "Opacity" })).toBeVisible();
+    await expect(canvas.queryByRole("button", { name: "Choose colour" })).toBeNull();
+    await expect(canvas.queryByRole("dialog")).toBeNull();
+    // The picker is a group named like the popover was, and fills the field's width.
+    const group = canvas.getByRole("group", { name: "Choose colour" });
+    await expect(group).toContainElement(area);
+    const root = canvasElement.querySelector(".cy-color-field") as HTMLElement;
+    await expect(
+      Math.abs(area.getBoundingClientRect().width - root.getBoundingClientRect().width),
+    ).toBeLessThan(1);
+    // The swatch still shows the colour, as a sample beside the text.
+    await expect(painted(swatch(canvasElement))).toBe("rgb(255 0 0 / 1)");
+    // Keys on the area change the value and the text.
+    area.focus();
+    await userEvent.keyboard("{Shift>}{ArrowLeft}{/Shift}");
+    await waitFor(() => expect(input).toHaveValue("#ff1919"));
+    await expect(args.onChange).toHaveBeenLastCalledWith("#ff1919");
+    // Typing moves the picker.
+    await userEvent.clear(input);
+    await userEvent.type(input, "black{Enter}");
+    await expect(area).toHaveAttribute("aria-valuetext", "Saturation and brightness: 0%, 0%");
+    // The eyedropper is always there where the browser has one.
+    await userEvent.click(canvas.getByRole("button", { name: "Pick a colour from the screen" }));
+    await waitFor(() => expect(input).toHaveValue("#123456"));
+  },
+};
+
+export const InlinePickerDisabled: Story = {
+  args: { inline: true, disabled: true },
+  play: async ({ canvas }) => {
+    await expect(canvas.getByRole("slider", { name: "Hue" })).toHaveAttribute("aria-disabled", "true");
+    const area = canvas.getByRole("slider", { name: "Saturation and brightness" });
+    await expect(area).toHaveAttribute("aria-disabled", "true");
+    await expect(area).not.toHaveAttribute("tabindex", "0");
+  },
+};
+
+export const InlinePickerOnTouch: Story = {
+  tags: ["touch", "!dev"],
+  args: { inline: true },
+  play: async ({ canvas }) => {
+    const area = canvas.getByRole("slider", { name: "Saturation and brightness" });
+    await expect(getComputedStyle(area).touchAction).toBe("none");
+    await expect(area.getBoundingClientRect().height).toBeGreaterThanOrEqual(44);
   },
 };
 

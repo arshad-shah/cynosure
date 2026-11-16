@@ -26,6 +26,7 @@ import { Image } from "@arshad-shah/cynosure";
 | `placeholder`         | –       | Shown while loading, in place of the [Skeleton](../Skeleton/README.md)                                        |
 | `fallback`            | –       | Shown on error, in place of the box with the `image` icon and the `alt` text                                  |
 | `overlay`             | –       | Drawn over the picture's own box (letterbox left out), scaling with it; shown once loaded                     |
+| `regions`             | –       | `{ x, y, width, height, label?, tone?, id? }[]` in the picture's own pixels: outlined on the picture          |
 | `overlayLabel`        | –       | Names the overlay as an image of its own; without it the overlay is decorative                                |
 | `caption`             | –       | Wraps the picture in a `figure` with a `figcaption` that names it                                             |
 | `onLoad` / `onError`  | –       | The `img` events. The fallback shows as well as `onError` being called                                        |
@@ -36,6 +37,7 @@ import { Image } from "@arshad-shah/cynosure";
 - **Error:** the `img` is replaced by the fallback, in the same box (the ratio, or `width` by `height`). The default fallback shows the `alt` text; for a decorative picture it shows only the icon and is hidden from assistive technology.
 - **Already loaded:** a picture that finished before React attached (cached, or in the server's HTML) is shown at once. When it came in the server's HTML, `onLoad` and `onError` are not called: the event has passed.
 - **Never hydrated:** before any script runs the state is `pending` and the picture shows as the browser has it, with no placeholder over it, so an Astro page that renders Image without a client directive still shows its pictures.
+- **Regions:** each region is outlined on the overlay's box, placed in percents of the picture's natural size, so it follows the picture at any size, `fit` and `position` (tested). `label` is a tag inside its top-start corner; `tone` colours the outline and tag (default `--cy-image-region-color`, the accent). Regions are drawn under `overlay`'s content and follow its accessibility: decorative unless `overlayLabel` is set.
 - **Overlay:** `overlay` sits on the picture's own box as `fit` and `position` draw it: inside the letterbox of a `contain` picture, the whole (cropped) picture with `cover`, the picture itself without a ratio. It is measured again when the frame resizes, so it scales with the picture, and its content is stretched to that box (an SVG with a `viewBox` keeps the picture's proportions). It is shown only once the picture has loaded, takes no presses and is `aria-hidden` unless `overlayLabel` names it (then `role="img"`).
 - **With a ratio or a caption** the root is a block (`div` or `figure`) as wide as its container. Otherwise it is an inline `span` the size of the picture, never wider than its container.
 - Dragging, the context menu and other native behaviour are left alone. Nothing changes in right-to-left layouts: pictures are not mirrored and `position` is physical, as in CSS.
@@ -47,3 +49,5 @@ import { Image } from "@arshad-shah/cynosure";
 - `--cy-image-fallback-color`: icon and text colour of the default fallback
 - `--cy-image-caption-gap`: space between the picture and its caption
 - `--cy-image-caption-color`: text colour of the caption
+- `--cy-image-region-color`: outline colour of a region with no `tone` (default `--cy-color-accent`)
+- `--cy-image-region-width`: outline width of a region (default twice `--cy-border-width`)

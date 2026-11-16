@@ -13,6 +13,14 @@ export interface TextTokens {
   eyebrowSize: string;
   /** Letter spacing of the `eyebrow` variant. */
   eyebrowTracking: string;
+  /** Font size of `size="3xl"`, the smallest display size. */
+  size3xl: string;
+  /** Font size of `size="4xl"`. */
+  size4xl: string;
+  /** Font size of `size="5xl"`, the largest display size (a countdown or a clock). */
+  size5xl: string;
+  /** Line height of the display sizes (`3xl`, `4xl`, `5xl`), tighter than body text. */
+  displayLineHeight: string;
   /** Colour of `tone="muted"` and of the muted variants (lead, caption, eyebrow). */
   muted: string;
 }
@@ -36,10 +44,11 @@ export interface TextProps extends RootAttributes {
    */
   variant?: "body" | "lead" | "caption" | "eyebrow" | "code";
   /**
-   * Font size, from the `--cy-font-size-*` tokens. Default: from the variant ("md" for body). A Text placed directly
-   * inside another Text takes the outer size.
+   * Font size, from the `--cy-font-size-*` tokens. `3xl`, `4xl` and `5xl` are display sizes for a large figure (a
+   * countdown, a clock), set by the `--cy-text-size-*` tokens with a tighter line height. Default: from the variant
+   * ("md" for body). A Text placed directly inside another Text takes the outer size.
    */
-  size?: "xs" | "sm" | "md" | "lg" | "xl" | "2xl";
+  size?: "xs" | "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "4xl" | "5xl";
   /**
    * Font weight. Default "regular" ("bold" for the eyebrow variant and for `as="strong"`). A Text placed directly
    * inside another Text takes the outer weight.

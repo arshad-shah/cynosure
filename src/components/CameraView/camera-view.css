@@ -1,0 +1,41 @@
+/*
+ * camera-view: the picture (a VideoBase on a CanvasStage, with a message while the camera is off), a message when it
+ * fails, then a row of controls: Start or Stop, the camera choice and the torch switch.
+ */
+.cy-camera-view.cy-camera-view {
+  box-sizing: border-box !important;
+  display: grid;
+  gap: var(--cy-camera-view-gap, var(--cy-space-4));
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+  color: var(--cy-color-ink);
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-font-size-md);
+  font-weight: var(--cy-font-weight-regular);
+  line-height: var(--cy-font-line-height);
+  letter-spacing: normal;
+  text-transform: none;
+}
+.cy-camera-view-video.cy-camera-view-video {
+  box-sizing: border-box !important;
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  margin: 0;
+  object-fit: cover;
+  font-size: var(--cy-font-size-md);
+  [data-mirror] & {
+    scale: -1 1;
+  }
+}
+.cy-camera-view-controls.cy-camera-view-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--cy-space-4);
+}
+.cy-camera-view-choice.cy-camera-view-choice {
+  flex: 1 1 calc(var(--cy-space-10) * 4);
+  min-inline-size: 0;
+}

@@ -313,6 +313,45 @@ export const HeaderSharesItsRowWithTheActions: Story = {
   },
 };
 
+/**
+ * On a narrow card the header's actions move under the title instead of squeezing it: the title keeps at least
+ * `--cy-card-title-min` (12rem) and nothing spills out of the card.
+ */
+export const HeaderActionsWrapWhenNarrow: Story = {
+  render: () => (
+    <Card
+      data-testid="narrow"
+      title="quarterly-sales-report-final.csv"
+      description="3,412 rows · 18 columns"
+      actions={
+        <>
+          <Button size="sm">Parse options</Button>
+          <Button size="sm">Export</Button>
+          <Button size="sm">Send to</Button>
+          <Button size="sm">Clear</Button>
+        </>
+      }
+      style={{ inlineSize: 320 }}
+    >
+      Body
+    </Card>
+  ),
+  play: async ({ canvas }) => {
+    const card = canvas.getByTestId("narrow");
+    const title = canvas.getByRole("heading", { name: "quarterly-sales-report-final.csv" });
+    const cardBox = card.getBoundingClientRect();
+    // The title is not squeezed to a sliver: it keeps a readable width.
+    await expect(title.getBoundingClientRect().width).toBeGreaterThanOrEqual(150);
+    // Every action stays inside the card, below the title.
+    for (const button of canvas.getAllByRole("button")) {
+      const box = button.getBoundingClientRect();
+      await expect(box.right).toBeLessThanOrEqual(cardBox.right + 0.5);
+      await expect(box.left).toBeGreaterThanOrEqual(cardBox.left - 0.5);
+      await expect(box.top).toBeGreaterThanOrEqual(title.getBoundingClientRect().bottom - 0.5);
+    }
+  },
+};
+
 export const StableUnderHostileHost: Story = {
   args: { href: "#x", children: "Hostile" },
   play: async ({ canvasElement }) => {

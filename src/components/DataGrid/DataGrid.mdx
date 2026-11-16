@@ -5,18 +5,18 @@ import * as Stories from "./DataGrid.stories";
 
 # DataGrid
 
-A read-only grid for large results: only the rows and columns in view are rendered, so a hundred thousand rows by fifty columns scroll and move focus as quickly as twenty.
+A grid for large results: only the rows and columns in view are rendered, so a hundred thousand rows by fifty columns scroll and move focus as quickly as twenty. Cells can be edited, sorted by several columns, filtered, and opened into row details; columns can be resized, moved and hidden.
 
 <Canvas of={Stories.AHundredThousandRowsByFiftyColumns} />
 
 ## When to use
 
-- **Query results and table data**: many rows, many columns, which people scan, sort, resize, select and copy.
+- **Query results and table data**: many rows, many columns, which people scan, sort, filter, resize, select, copy and edit.
 
 **Use something else when:**
 - the data is a few dozen rows people read rather than work through: [Table](?path=/docs/components-feedback-and-display-table--docs), a semantic table with row checkboxes
 - rows have no columns: [VirtualList](?path=/docs/components-structure-virtuallist--docs)
-- cells are edited: not yet (inline editing, column reorder and a filter row come later)
+- one record is edited at a time with many fields: a form in a [Dialog](?path=/docs/components-overlays-dialog--docs)
 
 ## Usage
 
@@ -61,6 +61,48 @@ Text inside cells stays selectable: dragging selects text, and a copy with text 
 
 <Canvas of={Stories.DenseRowsAndCellTones} />
 
+### Editing cells
+
+A column with `editable` (`true`, or `(row) => boolean` for some rows) can be edited. Enter or F2 opens the editor on the focused cell, typing a character starts it with that character, and a double-click opens it (Enter on an editable cell edits rather than calling `onAction`). Enter commits and keeps the cell, Tab commits and moves to the next cell (Shift+Tab the previous), Escape cancels, and leaving the field commits it. `onCellEdit(row, key, value)` receives the value: put it in your rows.
+
+`editor` picks the field: `text` (default) gives a string; `number` gives a number, or `null` when emptied, and refuses text that is no number (the field stays open, marked invalid, with `labels.invalidNumber`); `select` edits with a [Select](?path=/docs/components-controls-select--docs) of `options` and commits as soon as one is chosen. The field is named from the column ("Edit Name": `labels.edit`, and the column's `label` when its header is not text).
+
+```tsx
+const columns = [
+  { key: "name", header: "Name", editable: true },
+  { key: "age", header: "Age", editable: true, editor: "number" },
+  { key: "city", header: "City", editable: true, editor: "select", options: cities },
+];
+<DataGrid label="People" columns={columns} rows={rows} getRowId={(p) => p.id}
+  onCellEdit={(row, key, value) => update(row.id, { [key]: value })} />
+```
+
+<Canvas of={Stories.EditCellsWithTheKeyboard} />
+
+### Sorting by several columns
+
+With `multiSort`, Shift+click (or Shift+Enter) on another sortable header adds it as the next key, and again turns it around, then removes it; a plain press sorts by that column alone. Sorted headers show their priority, and say it ("sort 2", `labels.sortRank`); the first key is the header's `aria-sort`. Every key is `sorts` / `defaultSorts` / `onSortsChange` (`TableSort[]`); `onSortChange` still reports the first.
+
+<Canvas of={Stories.ShiftClickSortsByMoreColumns} />
+
+### Filters
+
+A column with `filter` gets a field in a filter row under the header (named "Filter Name", `labels.filter`). `text` keeps rows whose value holds the text, ignoring case; `number` takes a number (`40`) or a comparison (`>30`, `<=40`, `30..40`), and text that is neither filters nothing; a function `(row, query)` keeps the rows it returns true for. The fields' text is `filters` / `defaultFilters` / `onFiltersChange` (by column key); with `manualFilter` you filter the rows (on a server). The fields are reached with Tab and Shift+Tab, outside the grid's arrow keys.
+
+<Canvas of={Stories.FilterRowFiltersByColumn} />
+
+### Column menu: moving and hiding columns
+
+`columnMenu` puts a menu on every header: its button, or Alt+Down, Shift+F10 or the context menu key on the focused header. It sorts the column (when `sortable`), moves it left or right, hides it, and its Columns submenu shows or hides any column; the last shown column cannot be hidden. Focus comes back to the header. The order and the hidden columns are `columnOrder` / `onColumnOrderChange` and `hiddenColumns` / `onHiddenColumnsChange`, controlled or not; columns left out of `columnOrder` follow in their own order.
+
+<Canvas of={Stories.ColumnMenuHidesAndReorders} />
+
+### Row details
+
+`renderRowDetails(row)` adds a first column of toggles ("Show details", with `aria-expanded`): a click, Enter or Space opens a panel under the row with that content, and the rows below move down. Each panel is measured, so it can hold anything, and the grid stays virtual. Its controls are reached with Tab from the row; the arrow keys pass over it. The open rows are `expandedRows` / `defaultExpandedRows` / `onExpandedRowsChange`.
+
+<Canvas of={Stories.RowDetailsOpenUnderTheRow} />
+
 ### Load more, or pages
 
 `onEndReached` is called once the last rows come into view, once per row count: append the next rows. For pages, put a [Pagination](?path=/docs/components-controls-pagination--docs) under the grid and give the grid one page of rows; paging is not built in.
@@ -87,7 +129,10 @@ An APG grid (`role="grid"` with rows, column headers and cells) with one tab sto
 | Home / End | First or last cell of the row |
 | Ctrl+Home / Ctrl+End | First or last cell of the grid |
 | Page Up / Page Down | A view of rows up or down (Page Up from the first row reaches the header) |
-| Enter | On a cell: `onAction` (so does a double-click). On a sortable header: sorts |
+| Enter | On a cell: `onAction` (so does a double-click), or edits an editable cell. On a sortable header: sorts; Shift+Enter adds it with `multiSort`. On a details toggle: opens or closes the details |
+| F2, or a character | Edits an editable cell (a character starts the field with it) |
+| Enter / Tab / Escape (editing) | Commit and stay / commit and move to the next cell / cancel |
+| Alt+Down, Shift+F10 | On a header, with `columnMenu`: opens its menu |
 | Alt+Left / Alt+Right | On a resizable header: narrow or widen the column (Shift for a bigger step); announced through `aria-keyshortcuts` |
 | Space | Selects the focused row or cell; Ctrl/Cmd+Space toggles a row; Shift+Space extends |
 | Shift+arrows | Extend the selection (rows, or a range of cells) |
@@ -113,6 +158,7 @@ A finger scrolls the grid in both directions and a tap acts as a click. Rows and
 | `--cy-data-grid-cell-padding` | `--cy-space-5`; with `sm`, `--cy-space-4` |
 | `--cy-data-grid-null-color` | `--cy-color-muted` |
 | `--cy-data-grid-number-color` | `--cy-color-ink` |
+| `--cy-data-grid-details-background` | `--cy-color-soft`: an open row's details panel |
 
 ## Related
 

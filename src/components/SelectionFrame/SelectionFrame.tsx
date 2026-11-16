@@ -1,6 +1,7 @@
 import { bindPointer } from "@arshad-shah/detent";
 import { type CSSProperties, type KeyboardEvent, useEffect, useRef, useState } from "react";
 import { useDrag } from "../../foundations/drag.js";
+import { useMediaQuery } from "../../foundations/media-query.js";
 import {
   angleFrom,
   contain,
@@ -48,6 +49,13 @@ export interface SelectionFrameProps {
   scale?: number;
   /** Show the eight resize handles; Alt+arrows resize too. */
   resizable?: boolean;
+  /**
+   * On screen, in CSS pixels: an object narrower or shorter than this keeps its body free of handles. The handles
+   * across that side are hidden and the others move just outside it, so a small object (a tick, a line of
+   * highlight) can still be dragged by its body and resized by the handles left. Default: twice the hit area (48px,
+   * 88px on touch screens).
+   */
+  compactBelow?: number | undefined;
   /** Show the rotate handle; the [ and ] keys turn it by 15 degrees. */
   rotatable?: boolean;
   /** Keep the width-to-height ratio while resizing (Shift does it for one drag). */
@@ -103,6 +111,7 @@ export function SelectionFrame({
   scale = 1,
   draw = false,
   resizable = false,
+  compactBelow,
   rotatable = false,
   keepAspect = false,
   minSize = 1,
@@ -217,59 +226,57 @@ export function SelectionFrame({
     frame.current.focus({ preventScroll: true });
   });
 
-  // Pointer gestures through detent: the frame moves, each handle resizes or rotates. Escape cancels a drag.
+  // Pointer gestures through detent: the frame's body moves it, each handle resizes or rotates. Escape cancels a drag.
+  const begin = () => {
+    const from = latest.current as { box: FrameBox; rotate: number };
+    set({ ...from, start: from });
+    frame.current?.focus({ preventScroll: true });
+  };
+  const end = (_: unknown, cancelled: boolean) => (cancelled ? cancel() : commit());
+  // The body: detent's distance and touch delay, so a tap focuses and a quick swipe still scrolls. A press on a handle
+  // is the handle's.
+  useDrag(frame, {
+    distance: 4,
+    delay: 200,
+    onStart: ({ path }) => {
+      if (path.some((t) => t instanceof Element && t.hasAttribute("data-handle"))) return false;
+      begin();
+    },
+    onMove: ({ delta }) => {
+      const { box: b0, rotate: r0 } = (liveRef.current as Live).start as { box: FrameBox; rotate: number };
+      const k = props.current.scale;
+      change(moveBy(b0, delta.x / k, delta.y / k, limitsRef.current), r0);
+    },
+    onEnd: end,
+  });
   const hasFrame = (live ?? box) !== null;
   useEffect(() => {
     const el = frame.current;
     if (!el) return;
-    const begin = () => {
-      const from = latest.current as { box: FrameBox; rotate: number };
-      set({ ...from, start: from });
-      el.focus({ preventScroll: true });
-    };
-    const end = (_: unknown, cancelled: boolean) => (cancelled ? cancel() : commit());
-    const bound = [
-      bindPointer(el, {
-        cancel: "[data-handle]",
-        onStart: (session) => {
-          if (session.event.button !== 0) return false;
-          begin();
-        },
-        onMove: ({ delta }) => {
+    const bound = [...el.querySelectorAll<HTMLElement>("[data-handle]")].map((handle) =>
+      bindPointer(handle, {
+        distance: 0,
+        delay: 0,
+        onStart: () => begin(),
+        onMove: ({ delta, point, event }) => {
           const { box: b0, rotate: r0 } = (liveRef.current as Live).start as {
             box: FrameBox;
             rotate: number;
           };
+          const name = handle.dataset.handle as FrameHandle | "rotate";
+          if (name === "rotate") {
+            const r = el.getBoundingClientRect();
+            const deg = angleFrom(r.left + r.width / 2, r.top + r.height / 2, point.x, point.y);
+            change(b0, event.shiftKey ? Math.round(deg / 15) * 15 : deg);
+            return;
+          }
           const k = props.current.scale;
-          change(moveBy(b0, delta.x / k, delta.y / k, limitsRef.current), r0);
+          const aspect = props.current.keepAspect || event.shiftKey;
+          change(resizeBy(b0, name, delta.x / k, delta.y / k, r0, aspect, limitsRef.current), r0);
         },
         onEnd: end,
       }),
-      ...[...el.querySelectorAll<HTMLElement>("[data-handle]")].map((handle) =>
-        bindPointer(handle, {
-          distance: 0,
-          delay: 0,
-          onStart: () => begin(),
-          onMove: ({ delta, point, event }) => {
-            const { box: b0, rotate: r0 } = (liveRef.current as Live).start as {
-              box: FrameBox;
-              rotate: number;
-            };
-            const name = handle.dataset.handle as FrameHandle | "rotate";
-            if (name === "rotate") {
-              const r = el.getBoundingClientRect();
-              const deg = angleFrom(r.left + r.width / 2, r.top + r.height / 2, point.x, point.y);
-              change(b0, event.shiftKey ? Math.round(deg / 15) * 15 : deg);
-              return;
-            }
-            const k = props.current.scale;
-            const aspect = props.current.keepAspect || event.shiftKey;
-            change(resizeBy(b0, name, delta.x / k, delta.y / k, r0, aspect, limitsRef.current), r0);
-          },
-          onEnd: end,
-        }),
-      ),
-    ];
+    );
     return () => {
       for (const b of bound) b.destroy();
     };
@@ -308,7 +315,12 @@ export function SelectionFrame({
     if (ARROWS[event.key] || event.key === "[" || event.key === "]") commit();
   };
 
+  const coarse = useMediaQuery("(pointer: coarse)");
   const shown = live ?? (box ? { box, rotate } : null);
+  const below = compactBelow ?? (coarse ? 88 : 48);
+  const compact = shown
+    ? `${shown.box.width * scale < below ? "x" : ""}${shown.box.height * scale < below ? "y" : ""}`
+    : "";
   const area = draw && (
     <div
       ref={surface}
@@ -344,6 +356,7 @@ export function SelectionFrame({
         tabIndex={0}
         className={className ? `cy-selection-frame ${className}` : "cy-selection-frame"}
         data-moving={live ? "" : undefined}
+        data-compact={compact || undefined}
         style={
           {
             "--_x": `${shown.box.x * scale}px`,

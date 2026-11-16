@@ -1,0 +1,74 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./CameraView.stories";
+
+<Meta of={Stories} />
+
+# CameraView
+
+A live camera with Start and Stop, a choice of camera, a torch switch, frames for a scanner and stills for a photo.
+
+<Canvas of={Stories.StartAndStop} />
+
+## When to use
+
+- **Scanning** (a QR code, a document) from a live picture: read each frame in `onFrame`.
+- **Taking a photo** (a signature, a receipt): `handle.capture()`.
+
+**Use something else when:** people pick a picture they already have: [FileDrop](?path=/docs/components-controls-filedrop--docs) with `accept="image/*"` (on phones it offers the camera too).
+
+## Usage
+
+```tsx
+const camera = useRef<CameraViewHandle>(null);
+
+<CameraView label="Scanner" onFrame={(video) => scan(video)} />
+<CameraView label="Signature photo" handle={camera} />
+
+const photo = await camera.current?.capture("image/jpeg", 0.9);
+const pixels = camera.current?.frame(); // ImageData, for a decoder
+```
+
+Nothing is asked of the browser until Start is pressed. Stop ends the stream, so the camera light goes out.
+
+## Cameras and the torch
+
+With two or more cameras, a Select lists them by name once access is allowed; choosing one stops the first stream before asking for the new one. A torch switch appears when the camera has a torch.
+
+<Canvas of={Stories.TorchWhereTheCameraHasOne} />
+
+## Frames and stills
+
+`onFrame(video)` runs for each new frame while the camera runs. `handle.capture(type?, quality?)` gives the picture as a file and `handle.frame()` as pixels, at the camera's own size and never mirrored.
+
+<Canvas of={Stories.FramesAndCapture} />
+
+## When it fails
+
+A refusal, no camera, or a camera held by another app is explained in a danger Notice (announced), reported to `onError` with its `kind`, and the camera is off again with Start ready to retry. Without camera support (an old browser, a page not on HTTPS) Start is disabled. Every message is in `labels`.
+
+<Canvas of={Stories.PermissionRefused} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+| Control | Keys |
+| --- | --- |
+| Start / Stop | <kbd>Enter</kbd> or <kbd>Space</kbd>; it is one button that keeps focus as it changes |
+| Camera | [Select](?path=/docs/components-controls-select--docs) keys |
+| Torch | <kbd>Space</kbd> ([Switch](?path=/docs/components-controls-switch--docs)) |
+
+- **Picture:** a video named by `label`, inside a group of the same name, with "The camera is off." while it is off.
+- **Messages:** failures are `role="alert"`; the unsupported warning is a status.
+- **Touch:** the buttons and the switch keep 44px hit areas on coarse pointers.
+- **Mirror:** a selfie camera is shown as a mirror, as people expect.
+
+## Theming
+
+Tokens: `--cy-camera-view-gap`. The stage uses the CanvasStage tokens, the controls their own.
+
+## Related
+
+[CanvasStage](?path=/docs/components-structure-canvasstage--docs) · [FileDrop](?path=/docs/components-controls-filedrop--docs) · [Select](?path=/docs/components-controls-select--docs) · [Switch](?path=/docs/components-controls-switch--docs)

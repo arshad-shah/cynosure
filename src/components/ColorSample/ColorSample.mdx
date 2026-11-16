@@ -1,0 +1,62 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./ColorSample.stories";
+
+<Meta of={Stories} />
+
+# ColorSample
+
+A colour shown as a surface, or text in one colour on another with its contrast ratio and the WCAG levels it meets.
+
+<Canvas of={Stories.TextOnAColourWithItsContrast} />
+
+## When to use
+
+- **Showing a colour** that is not a choice: the base colour of a palette tool, a picked colour, a theme's surface.
+- **Previewing text on a colour** with its contrast: a contrast checker, a theme editor.
+
+**Use something else when:**
+- people choose a colour: [ColorSwatches](?path=/docs/components-controls-colorswatches--docs) or [ColorField](?path=/docs/components-controls-colorfield--docs)
+- several colours are shown in a row without a choice: `ColorSwatches readOnly`
+
+## Usage
+
+```tsx
+import { ColorSample } from "@arshad-shah/cynosure";
+
+<ColorSample color={base} label="Base colour" />
+<ColorSample color={background} ink={text}>The quick brown fox</ColorSample>
+```
+
+<Canvas of={Stories.AColourAsASurface} />
+
+## Contrast
+
+With `ink`, the sample text is drawn in it and the contrast line shows the WCAG 2 ratio of the pair as seen (a translucent ink is blended onto the colour first). The ratio is cut, never rounded up, to two decimals, so a pair just under a level fails it. `largeText` judges the pair as large text: AA at 3:1 and AAA at 4.5:1.
+
+<Canvas of={Stories.JustBelowAAFails} />
+<Canvas of={Stories.LargeTextThresholds} />
+
+`sampleContrast(ink, color)` gives the same ratio for your own checks.
+
+## Sizes
+
+<Canvas of={Stories.Sizes} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+- **Roles:** without an ink, an image named by `label` (default the colour). With an ink, a group named by `label` (default "#767676 on #ffffff"), holding the sample text and the contrast line.
+- **Levels:** each is a Badge with a tick or a cross; its spoken text says "AA pass" or "AA fail" (`labels.pass`, `labels.fail`), so the verdict never rests on colour alone.
+- **Not interactive:** it takes no focus and no presses.
+- **Host CSS:** host rules for `div` and `span` do not change it (tested).
+
+## Theming
+
+Tokens: `--cy-color-sample-height`, `--cy-color-sample-radius` and `--cy-color-sample-gap`. The verdicts use the Badge tokens.
+
+## Related
+
+[ColorSwatches](?path=/docs/components-controls-colorswatches--docs) · [ColorField](?path=/docs/components-controls-colorfield--docs) · [Badge](?path=/docs/components-feedback-and-display-badge--docs)

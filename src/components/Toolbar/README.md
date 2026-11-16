@@ -14,4 +14,4 @@ APG toolbar: a named `role="toolbar"` group with one Tab stop. Arrow keys move b
 - Text fields keep their own arrow, Home and End keys.
 - Controls added later join the group automatically.
 
-Props: `label`, `orientation` (`horizontal`), `loop` (`true`), `className`/`style` (layout only). Tokens: `--cy-toolbar-gap`, `--cy-toolbar-padding`.
+Props: `label`, `orientation` (`horizontal`), `loop` (`true`), `inert` / `disabled` (block every control while a job runs; `disabled` also dims the bar), `className`/`style` (layout only). Tokens: `--cy-toolbar-gap`, `--cy-toolbar-padding`.

@@ -57,16 +57,36 @@
   position: sticky;
   inset-block-start: 0;
   z-index: 2;
-  block-size: max(var(--_head), var(--_hit));
   /* The last column's resize edge reaches past the columns: it never widens the scroll area. */
   overflow-x: clip;
   background: var(--cy-data-grid-header-background, var(--cy-color-soft));
   font-size: inherit;
 }
-.cy-data-grid-header-row.cy-data-grid-header-row {
+.cy-data-grid-header-row.cy-data-grid-header-row,
+.cy-data-grid-filter-row.cy-data-grid-filter-row {
   position: relative;
-  block-size: 100%;
+  block-size: max(var(--_head), var(--_hit));
   font-size: inherit;
+}
+/* Filters: a row of fields under the header, one per filtered column. */
+.cy-data-grid-filter.cy-data-grid-filter {
+  position: absolute;
+  inset-block: 0;
+  display: flex;
+  align-items: center;
+  box-sizing: border-box;
+  padding-inline: var(--cy-space-2);
+  border-block-end: var(--cy-border-width) solid var(--cy-color-line);
+  font-size: inherit;
+}
+.cy-data-grid-filter-field.cy-data-grid-filter-field {
+  flex: 1;
+  min-inline-size: 0;
+}
+/* The column menu's button, at the end of the header. */
+.cy-data-grid-menu.cy-data-grid-menu {
+  flex: none;
+  margin-inline: auto var(--cy-space-1);
 }
 .cy-data-grid-header.cy-data-grid-header,
 .cy-data-grid-cell.cy-data-grid-cell {
@@ -187,6 +207,46 @@
   &[data-tone="info"] {
     color: var(--cy-color-info-text);
   }
+}
+/* The cell being edited: its field fills it, and a refusal shows over the row below. */
+.cy-data-grid-cell.cy-data-grid-cell[data-editing] {
+  z-index: 1;
+  padding-inline: var(--cy-space-1);
+  overflow: visible;
+}
+.cy-data-grid-editor.cy-data-grid-editor {
+  flex: 1;
+  min-inline-size: 0;
+  font-size: inherit;
+}
+/* Row details: the toggle's chevron turns when open; the panel spans the view under its row. */
+.cy-data-grid-toggle.cy-data-grid-toggle {
+  justify-content: center;
+  padding-inline: 0;
+  color: var(--cy-color-muted);
+  cursor: pointer;
+}
+.cy-data-grid-chevron.cy-data-grid-chevron {
+  transition: rotate var(--cy-motion-fast) var(--cy-motion-ease);
+}
+[data-open] > .cy-data-grid-chevron.cy-data-grid-chevron {
+  rotate: 90deg;
+}
+:dir(rtl) [data-open] > .cy-data-grid-chevron.cy-data-grid-chevron {
+  rotate: -90deg;
+}
+.cy-data-grid-details-row.cy-data-grid-details-row {
+  position: absolute;
+  inset-inline-start: 0;
+  box-sizing: border-box;
+  border-block-end: var(--cy-border-width) solid var(--cy-color-line);
+  background: var(--cy-data-grid-details-background, var(--cy-color-soft));
+  font-size: inherit;
+}
+.cy-data-grid-details.cy-data-grid-details {
+  padding: var(--cy-space-4) var(--_pad);
+  font-size: inherit;
+  white-space: normal;
 }
 /* A tooltip's anchor around a cell takes no box: the cell stays placed in its row. */
 .cy-data-grid-tip.cy-data-grid-tip {

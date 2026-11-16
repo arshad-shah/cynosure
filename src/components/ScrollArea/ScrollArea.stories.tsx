@@ -316,7 +316,48 @@ export const FillsItsParent: Story = {
   },
 };
 
-function Jump({ dir }: { dir?: "rtl" }) {
+/** In a parent with no height of its own, `maxHeight` (or the token) stops the area growing and it scrolls. */
+export const MaxHeightCapsTheArea: Story = {
+  render: () => (
+    <>
+      <ScrollArea label="Capped" maxHeight="10rem" data-testid="capped">
+        {lines(30)}
+      </ScrollArea>
+      <ScrollArea label="Short" maxHeight="10rem" data-testid="short">
+        {lines(2)}
+      </ScrollArea>
+      <div style={{ ["--cy-scroll-area-max-height" as string]: "6rem" }}>
+        <ScrollArea label="Token" data-testid="token">
+          {lines(30)}
+        </ScrollArea>
+      </div>
+    </>
+  ),
+  play: async ({ canvas }) => {
+    const rem = Number.parseFloat(getComputedStyle(document.documentElement).fontSize);
+    const height = (id: string) => canvas.getByTestId(id).getBoundingClientRect().height;
+    await expect(Math.abs(height("capped") - 10 * rem)).toBeLessThan(1);
+    const capped = canvas.getByRole("region", { name: "Capped" });
+    await expect(capped.scrollHeight).toBeGreaterThan(capped.clientHeight);
+    // A tab stop, since there is something to scroll.
+    await waitFor(() => expect(capped).toHaveAttribute("tabindex", "0"));
+    // Short content keeps its own height under the cap.
+    await expect(height("short")).toBeLessThan(10 * rem - 1);
+    await expect(canvas.getByRole("region", { name: "Short" })).not.toHaveAttribute("tabindex");
+    // The token caps every area under it.
+    await expect(Math.abs(height("token") - 6 * rem)).toBeLessThan(1);
+  },
+};
+
+function Jump({
+  dir,
+  direction = "both",
+  label = "Results",
+}: {
+  dir?: "rtl";
+  direction?: ScrollAreaProps["direction"];
+  label?: string;
+}) {
   const handle = useRef<ScrollAreaHandle>(null);
   const target = useRef<HTMLSpanElement>(null);
   const go = (align?: "start" | "center") =>
@@ -335,7 +376,7 @@ function Jump({ dir }: { dir?: "rtl" }) {
         </Button>
       </Stack>
       <div style={{ blockSize: 160, inlineSize: 300 }}>
-        <ScrollArea label="Results" direction="both" handle={handle}>
+        <ScrollArea label={label} direction={direction} handle={handle}>
           <div style={{ inlineSize: 1200, blockSize: 1200, paddingBlockStart: 700, paddingInlineStart: 800 }}>
             <span ref={target} style={{ display: "inline-block", inlineSize: 60, blockSize: 20 }}>
               Match
@@ -396,6 +437,27 @@ export const ScrollIntoViewNearestFromPastAndInView: Story = {
     const [top, left] = [region.scrollTop, region.scrollLeft];
     await userEvent.click(canvas.getByRole("button", { name: "Nearest" }));
     await expect([region.scrollTop, region.scrollLeft]).toEqual([top, left]);
+  },
+};
+
+export const ScrollIntoViewKeepsToTheAreaAxis: Story = {
+  render: () => (
+    <>
+      <Jump direction="vertical" label="Down" />
+      <Jump direction="horizontal" label="Across" />
+    </>
+  ),
+  play: async ({ canvas, userEvent }) => {
+    const vertical = canvas.getByRole("region", { name: "Down" });
+    const horizontal = canvas.getByRole("region", { name: "Across" });
+    const [nearV, nearH] = canvas.getAllByRole("button", { name: "Nearest" });
+    // A vertical area only scrolls up and down to the element, a horizontal one only sideways.
+    await userEvent.click(nearV as HTMLElement);
+    await expect(vertical.scrollTop).toBeGreaterThan(0);
+    await expect(vertical.scrollLeft).toBe(0);
+    await userEvent.click(nearH as HTMLElement);
+    await expect(horizontal.scrollLeft).toBeGreaterThan(0);
+    await expect(horizontal.scrollTop).toBe(0);
   },
 };
 

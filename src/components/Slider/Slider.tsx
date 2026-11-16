@@ -1,4 +1,12 @@
-import { type CSSProperties, type KeyboardEvent, type ReactNode, useCallback, useId, useRef } from "react";
+import {
+  type CSSProperties,
+  type KeyboardEvent,
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useId,
+  useRef,
+} from "react";
 import { useControllableState } from "../../foundations/controllable.js";
 import { isRtl } from "../../foundations/dir.js";
 import { useDrag } from "../../foundations/drag.js";
@@ -54,8 +62,17 @@ export interface SliderProps {
   defaultValue?: SliderValue;
   /** Every change while dragging or pressing keys. */
   onChange?: (value: SliderValue) => void;
-  /** When a change is finished: pointer released, or after each key press. */
+  /**
+   * When a change is finished: the pointer released, or the keys let go (a held arrow key repeats `onChange` and
+   * commits once, on release). With `commitDelay`, after that long without a key. Leaving the slider commits a pending
+   * key change at once. A key that changes nothing commits nothing.
+   */
   onCommit?: (value: SliderValue) => void;
+  /**
+   * Milliseconds without a key press before a keyboard change commits, so several presses (arrow, arrow, arrow) run a
+   * costly `onCommit` once. Default 0: each key commits when it is released.
+   */
+  commitDelay?: number | undefined;
   /** Lowest value. Default 0. */
   min?: number;
   /** Highest value. Default 100. */
@@ -119,6 +136,7 @@ export function Slider({
   defaultValue,
   onChange,
   onCommit,
+  commitDelay = 0,
   min = 0,
   max = 100,
   step = 1,
@@ -185,6 +203,7 @@ export function Slider({
     touchAction: "css",
     onStart: ({ point }) => {
       if (disabled) return false;
+      commitPending();
       const v = fromPoint(point);
       // The nearest thumb takes the press; among thumbs on one spot, the one that can still move that way.
       const distances = values.map((n) => Math.abs(n - v));
@@ -203,13 +222,36 @@ export function Slider({
     },
   });
 
+  // A keyboard change waits to commit: until the key is released, or `commitDelay` after it, or the slider is left.
+  const pending = useRef<{ value: SliderValue } | null>(null);
+  const commitTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const commitNow = useRef(onCommit);
+  commitNow.current = onCommit;
+  const commitPending = useCallback(() => {
+    clearTimeout(commitTimer.current);
+    const p = pending.current;
+    pending.current = null;
+    if (p) commitNow.current?.(p.value);
+  }, []);
+  useEffect(() => () => clearTimeout(commitTimer.current), []);
+
   const onKeyDown = (index: number) => (event: KeyboardEvent<HTMLDivElement>) => {
     const now = values[index] as number;
     const rtl = !vertical && isRtl(event.currentTarget);
     const target = stepKey(event, { value: now, min, max, step, big, rtl });
     if (target === undefined) return;
     event.preventDefault();
-    set(withThumb(index, target), true);
+    clearTimeout(commitTimer.current);
+    const next = withThumb(index, target);
+    const same = Array.isArray(next) ? next.every((n, i) => n === values[i]) : next === values[0];
+    set(next, false);
+    if (!same) pending.current = { value: next };
+  };
+  const onKeyUp = () => {
+    if (!pending.current) return;
+    clearTimeout(commitTimer.current);
+    if (commitDelay > 0) commitTimer.current = setTimeout(commitPending, commitDelay);
+    else commitPending();
   };
 
   const position = (v: number) => `${((v - min) / (max - min || 1)) * 100}%`;
@@ -291,6 +333,8 @@ export function Slider({
             {...(range ? { "aria-label": `${label}, ${thumbName(index)}` } : naming)}
             style={{ "--_pos": position(v) } as CSSProperties}
             onKeyDown={disabled ? undefined : onKeyDown(index)}
+            onKeyUp={disabled ? undefined : onKeyUp}
+            onBlur={commitPending}
           />
         ))}
       </div>

@@ -10,6 +10,12 @@ import { Text } from "./Text.js";
 const ELEMENTS = ["span", "p", "div", "label", "strong", "em", "small", "time", "figcaption"] as const;
 const VARIANTS = ["body", "lead", "caption", "eyebrow", "code"] as const;
 const SIZES = ["xs", "sm", "md", "lg", "xl", "2xl"] as const;
+const DISPLAY_SIZES = ["3xl", "4xl", "5xl"] as const;
+const DISPLAY_TOKENS = {
+  "3xl": "var(--cy-text-size-3xl, calc(var(--cy-font-size-2xl) * 1.4))",
+  "4xl": "var(--cy-text-size-4xl, calc(var(--cy-font-size-2xl) * 2))",
+  "5xl": "var(--cy-text-size-5xl, calc(var(--cy-font-size-2xl) * 3))",
+} as const;
 const WEIGHTS = ["regular", "medium", "bold"] as const;
 const TONES = ["inherit", "neutral", "muted", "accent", "success", "warning", "danger", "info"] as const;
 const LONG =
@@ -22,7 +28,7 @@ const meta = {
   argTypes: {
     as: { control: "select", options: ELEMENTS },
     variant: { control: "inline-radio", options: VARIANTS },
-    size: { control: "inline-radio", options: SIZES },
+    size: { control: "inline-radio", options: [...SIZES, ...DISPLAY_SIZES] },
     weight: { control: "inline-radio", options: WEIGHTS },
     tone: { control: "select", options: TONES },
     align: { control: "inline-radio", options: ["start", "center", "end"] },
@@ -147,6 +153,69 @@ export const Sizes: Story = {
     // Six distinct steps, smallest to largest.
     await expect(seen).toEqual([...new Set(seen)].sort((a, b) => a - b));
     await expect(new Set(seen).size).toBe(SIZES.length);
+  },
+};
+
+export const DisplaySizesForACountdown: Story = {
+  render: () => (
+    <div style={column}>
+      {DISPLAY_SIZES.map((size) => (
+        <Text key={size} size={size} numeric weight="bold">
+          Size {size}
+        </Text>
+      ))}
+      <div role="timer" aria-label="Focus time left">
+        <Text as="div" size="5xl" numeric weight="bold" data-testid="clock">
+          24:59
+        </Text>
+      </div>
+      <Text as="div" size="5xl" numeric weight="bold" data-testid="ones">
+        11:11
+      </Text>
+    </div>
+  ),
+  play: async ({ canvas }) => {
+    const seen: number[] = [];
+    for (const size of DISPLAY_SIZES) {
+      const el = canvas.getByText(`Size ${size}`);
+      await expectTokens(el, {
+        "font-size": DISPLAY_TOKENS[size],
+        "line-height": "var(--cy-text-display-line-height, 1.1)",
+      });
+      seen.push(Number.parseFloat(css(el, "font-size")));
+    }
+    // Each display size is larger than the last, and all are larger than 2xl.
+    const largest = Number.parseFloat(
+      resolved(canvas.getByText("Size 3xl"), "font-size", "var(--cy-font-size-2xl)"),
+    );
+    await expect(seen[0]).toBeGreaterThan(largest);
+    await expect(seen).toEqual([...seen].sort((a, b) => a - b));
+    await expect(new Set(seen).size).toBe(DISPLAY_SIZES.length);
+    // A countdown's digits are tabular: "24:59" and "11:11" are the same width, so the clock does not jitter.
+    const clock = canvas.getByTestId("clock");
+    await expect(canvas.getByRole("timer", { name: "Focus time left" })).toContainElement(clock);
+    await expect(Math.abs(inkRect(clock).width - inkRect(canvas.getByTestId("ones")).width)).toBeLessThan(1);
+    // The tight line height keeps the box close to the digits.
+    await expect(clock.getBoundingClientRect().height).toBeLessThan((seen[2] ?? 0) * 1.2);
+  },
+};
+
+export const DisplaySizesThemedThroughTokens: Story = {
+  render: () => (
+    <div
+      style={{
+        ...column,
+        ["--cy-text-size-4xl" as string]: "50px",
+        ["--cy-text-display-line-height" as string]: "1",
+      }}
+    >
+      <Text size="4xl">Themed</Text>
+    </div>
+  ),
+  play: async ({ canvas }) => {
+    const el = canvas.getByText("Themed");
+    await expect(css(el, "font-size")).toBe("50px");
+    await expect(css(el, "line-height")).toBe("50px");
   },
 };
 
@@ -696,3 +765,27 @@ export const PassesIdDataAndRef: Story = rootAttributesStory<HTMLElement>(
   ),
   "cy-text",
 );
+
+/** `role` and every `aria-*` attribute reach the element, so status text can be a live region. */
+export const PassesRoleAndAria: Story = {
+  render: () => (
+    <>
+      <Text role="status" aria-live="polite" aria-atomic aria-label="Upload" id="live">
+        3 of 5 files uploaded
+      </Text>
+      <Text as="p" aria-hidden aria-describedby="live" data-testid="hidden">
+        Decoration
+      </Text>
+    </>
+  ),
+  play: async ({ canvasElement }) => {
+    const live = canvasElement.querySelector("#live") as HTMLElement;
+    await expect(live).toHaveAttribute("role", "status");
+    await expect(live).toHaveAttribute("aria-live", "polite");
+    await expect(live).toHaveAttribute("aria-atomic", "true");
+    await expect(live).toHaveAccessibleName("Upload");
+    const hidden = canvasElement.querySelector('[data-testid="hidden"]') as HTMLElement;
+    await expect(hidden).toHaveAttribute("aria-hidden", "true");
+    await expect(hidden).toHaveAttribute("aria-describedby", "live");
+  },
+};

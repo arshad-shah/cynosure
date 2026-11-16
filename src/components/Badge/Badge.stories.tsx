@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useEffect, useRef, useState } from "react";
-import { expect } from "storybook/test";
+import { expect, userEvent } from "storybook/test";
 import { check } from "../../icons/index.js";
 import { textContrast } from "../../test/color.js";
 import { computeUnderHostileHost } from "../../test/hostile.js";
@@ -180,5 +180,87 @@ export const PassesIdDataAndRef: Story = {
     await expect(root).toHaveAttribute("data-state", "ready");
     await expect(root).toHaveAttribute("data-row", "3");
     await expect(canvas.getByTestId("ref")).toHaveTextContent("ready");
+  },
+};
+
+function Filters({ initial = ["GET", "Errors", "Last hour"] }: { initial?: string[] }) {
+  const [filters, setFilters] = useState(initial);
+  return (
+    <div style={{ display: "flex", gap: 8 }}>
+      {filters.map((f) => (
+        <Badge key={f} onRemove={() => setFilters((all) => all.filter((x) => x !== f))}>
+          {f}
+        </Badge>
+      ))}
+      <output data-testid="left">{filters.join(",")}</output>
+    </div>
+  );
+}
+
+/** `onRemove` adds a remove IconButton named "Remove <text>": a removable chip (an active filter). */
+export const RemovableChip: Story = {
+  render: () => <Filters />,
+  play: async ({ canvas }) => {
+    const left = canvas.getByTestId("left");
+    await userEvent.click(canvas.getByRole("button", { name: "Remove GET" }));
+    await expect(left).toHaveTextContent(/^Errors,Last hour$/);
+    // Keyboard: Tab reaches each remove button; Enter and Space remove.
+    await userEvent.tab();
+    await expect(canvas.getByRole("button", { name: "Remove Errors" })).toHaveFocus();
+    await userEvent.keyboard("{Enter}");
+    await expect(left).toHaveTextContent(/^Last hour$/);
+    canvas.getByRole("button", { name: "Remove Last hour" }).focus();
+    await userEvent.keyboard(" ");
+    await expect(left).toBeEmptyDOMElement();
+  },
+};
+
+/** The remove button reads on every tone and variant, and its name can be replaced through `labels`. */
+export const RemovableLabelsAndTones: Story = {
+  render: () => (
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(3, max-content)", gap: 10 }}>
+      {TONES.flatMap((tone) =>
+        VARIANTS.map((variant) => (
+          <Badge key={`${tone}-${variant}`} tone={tone} variant={variant} onRemove={() => {}}>
+            {tone}
+          </Badge>
+        )),
+      )}
+      <Badge color="#2f7d4a" onRemove={() => {}}>
+        Custom
+      </Badge>
+      <Badge onRemove={() => {}} labels={{ remove: "Filter entfernen" }}>
+        <strong>Status</strong>: 500
+      </Badge>
+      <Badge onRemove={() => {}}>
+        <strong>Rich</strong>
+      </Badge>
+    </div>
+  ),
+  play: async ({ canvas, canvasElement }) => {
+    await expect(canvas.getByRole("button", { name: "Filter entfernen" })).toBeVisible();
+    // Content that is not plain text gets the plain default.
+    await expect(canvas.getByRole("button", { name: "Remove" })).toBeVisible();
+    for (const button of canvasElement.querySelectorAll<HTMLElement>(".cy-badge button"))
+      await expect({ name: button.getAttribute("aria-label"), readable: textContrast(button) >= 3 }).toEqual({
+        name: button.getAttribute("aria-label"),
+        readable: true,
+      });
+    // The chip stays one line tall: the button does not stretch the badge past a small control.
+    const badge = canvas.getAllByText("accent", { selector: ".cy-badge" })[0] as HTMLElement;
+    const control = Number.parseFloat(getComputedStyle(canvas.getAllByRole("button")[0] as Element).height);
+    await expect(badge.getBoundingClientRect().height).toBeLessThanOrEqual(control + 2);
+  },
+};
+
+/** A finger presses the remove button through a 44px hit area. */
+export const TouchRemovesAChip: Story = {
+  tags: ["touch", "!dev"],
+  render: () => <Filters initial={["GET"]} />,
+  play: async ({ canvas }) => {
+    const remove = canvas.getByRole("button", { name: "Remove GET" });
+    await expect(Number.parseFloat(getComputedStyle(remove, "::before").height)).toBeGreaterThanOrEqual(44);
+    await userEvent.pointer({ keys: "[TouchA]", target: remove });
+    await expect(canvas.getByTestId("left")).toBeEmptyDOMElement();
   },
 };

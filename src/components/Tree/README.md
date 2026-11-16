@@ -18,25 +18,26 @@ A hierarchical list (WAI-ARIA APG tree view): folders and files, a database sche
 />
 ```
 
-| Prop                                                 | Default  | Notes                                                                                          |
-| ---------------------------------------------------- | -------- | ---------------------------------------------------------------------------------------------- |
-| `label`                                              | –        | Accessible name of the tree                                                                    |
-| `items`                                              | –        | `TreeItem<T>[]` (below)                                                                        |
-| `selected` / `defaultSelected` / `onSelectionChange` | `[]`     | Selected ids                                                                                   |
-| `expanded` / `defaultExpanded` / `onExpandedChange`  | `[]`     | Expanded ids                                                                                   |
-| `selectionMode`                                      | `single` | `multiple`: Space and Ctrl/Cmd-click toggle; Enter and a plain click select one                |
-| `loadChildren`                                       | –        | `(item) => Promise<TreeItem[]>` for items with `hasChildren` and no `children`                 |
-| `loadingIds` / `errorIds`                            | –        | Loading and failure driven by your store: a loading row, or an error row in place of children  |
-| `onRetry`                                            | –        | `(item)`: a failed item is retried (Enter or a click on its error row)                         |
-| `renderError` / `renderEmpty`                        | –        | `(item, retry)` / `(item)`: content of the error row, and of a row under an empty open item    |
-| `filter`                                             | –        | A string, or `(item) => boolean \| positions`: matches, their ancestors (opened), marked text  |
-| `renderLabel`                                        | –        | `(item, label)`: custom row content; `label` has the matches marked; `label` drives type-ahead |
-| `onAction`                                           | –        | `(item)`: Enter or a double-click                                                              |
-| `onCommand`                                          | –        | `(value, item)`: a row action pressed or a context menu command chosen                         |
-| `handle`                                             | –        | `Ref<TreeHandle>`: `reload(id)` runs `loadChildren` again                                      |
-| `virtual`                                            | `false`  | Render only rows in view; give the tree a height; rows share one height                        |
-| `size`                                               | `md`     | Row height and indent                                                                          |
-| `labels`                                             | –        | `loading`, `failed` (the retry row), `menu(label)` (a row's context menu name)                 |
+| Prop                                                 | Default  | Notes                                                                                                                                                 |
+| ---------------------------------------------------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `label`                                              | –        | Accessible name of the tree                                                                                                                           |
+| `items`                                              | –        | `TreeItem<T>[]` (below)                                                                                                                               |
+| `selected` / `defaultSelected` / `onSelectionChange` | `[]`     | Selected ids                                                                                                                                          |
+| `expanded` / `defaultExpanded` / `onExpandedChange`  | `[]`     | Expanded ids                                                                                                                                          |
+| `selectionMode`                                      | `single` | `multiple`: Space and Ctrl/Cmd-click toggle; Enter and a plain click select one                                                                       |
+| `loadChildren`                                       | –        | `(item) => Promise<TreeItem[]>` for items with `hasChildren` and no `children`                                                                        |
+| `loadingIds` / `errorIds`                            | –        | Loading and failure driven by your store: a loading row, or an error row in place of children                                                         |
+| `onRetry`                                            | –        | `(item)`: a failed item is retried (Enter or a click on its error row)                                                                                |
+| `renderError` / `renderEmpty`                        | –        | `(item, retry)` / `(item)`: content of the error row, and of a row under an empty open item                                                           |
+| `filter`                                             | –        | A string, or `(item) => boolean \| positions`: matches, their ancestors (opened), marked text                                                         |
+| `highlight`                                          | –        | Text marked in every shown label, without hiding or opening anything (search with next/previous)                                                      |
+| `renderLabel`                                        | –        | `(item, label)`: custom row content; `label` has the matches marked; `label` drives type-ahead                                                        |
+| `onAction`                                           | –        | `(item)`: Enter or a double-click                                                                                                                     |
+| `onCommand`                                          | –        | `(value, item)`: a row action pressed or a context menu command chosen                                                                                |
+| `handle`                                             | –        | `Ref<TreeHandle>`: `reload(id)` runs `loadChildren` again; `reveal(id, { align })` opens the ancestors, scrolls to the item and makes it the tab stop |
+| `virtual`                                            | `false`  | Render only rows in view; give the tree a height; rows share one height                                                                               |
+| `size`                                               | `md`     | Row height and indent                                                                                                                                 |
+| `labels`                                             | –        | `loading`, `failed` (the retry row), `menu(label)` (a row's context menu name)                                                                        |
 
 `TreeItem<T>`: `id`, `label`, `icon`, `iconTone`/`iconColor`, `disabled`, `children`, `hasChildren`, `kind` (`"group"`: a heading row that opens and closes, never selected, ending with its child count), `trailing` (a count or badge at the row's end, part of its name), `data` (your payload, handed back in every callback), `actions` (`{ value, label, icon }[]`, IconButtons at the row's end) and `contextMenu` (`MenuEntry[]`).
 
@@ -49,7 +50,8 @@ A hierarchical list (WAI-ARIA APG tree view): folders and files, a database sche
 - **Context menu:** right-click, a long press, Shift+F10 or the context menu key on a row opens one ContextMenu hosted beside the tree (a tree holds only tree items); focus returns to the row.
 - **Filter:** matches show with their ancestors opened (the `expanded` ids are not changed) and everything under them; other rows are hidden; matched text is marked with HighlightedText. An opened ancestor can still be closed. Only known children are searched.
 - `onAction(item)`: Enter or a double-click runs an item's default action (open it, copy its path); Space still selects.
-- A `selected` value changed from outside (search next/previous) moves the tab stop to that item and scrolls it into view, even in a virtual tree, without taking focus from where the person is. Its ancestors must be expanded.
+- A `selected` value changed from outside (search next/previous) moves the tab stop to that item and scrolls it into view, even in a virtual tree, without taking focus from where the person is. Its ancestors must be expanded: `handle.reveal(id, { align })` opens them (through `onExpandedChange`) and scrolls to the item, in a virtual tree too, and returns false for an id the tree does not hold.
+- **Highlight:** `highlight` marks a query in every shown label (ignoring case) and hides nothing, for a search that keeps the tree whole and moves between matches with `selected` and `reveal`.
 
 ## Tokens
 

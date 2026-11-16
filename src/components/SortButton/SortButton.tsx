@@ -1,4 +1,4 @@
-import { forwardRef, type ReactNode } from "react";
+import { forwardRef, type MouseEvent, type ReactNode } from "react";
 import { ButtonBase } from "../../foundations/ButtonBase/ButtonBase.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
 import type { SortDirection } from "../../foundations/sort.js";
@@ -22,8 +22,16 @@ export interface SortButtonProps {
   children?: ReactNode;
   /** How the column is sorted now; nothing when it is not. The icon follows it. */
   direction?: SortDirection | undefined;
-  /** Pressed: change the sort (Table and DataGrid cycle ascending, descending, unsorted with `nextSort`). */
-  onClick?: (() => void) | undefined;
+  /**
+   * Pressed: change the sort (Table and DataGrid cycle ascending, descending, unsorted with `nextSort`). The event says
+   * whether Shift was held (DataGrid's multi-column sort adds the column then).
+   */
+  onClick?: ((event: MouseEvent<HTMLButtonElement>) => void) | undefined;
+  /**
+   * The column's place among several sort keys (1 is the first), shown small after the icon when a table sorts by more
+   * than one column. Decorative: say it in the label too (DataGrid adds ", sort 2"). Nothing: not shown.
+   */
+  rank?: number | undefined;
   /** Fill the header cell (a data grid's fixed-height header); otherwise the button is as wide as its label. */
   fill?: boolean;
   /** `end` (a numeric column) puts the icon before the label, so the label lines up with the values. */
@@ -45,7 +53,7 @@ const ICONS = { ascending: arrowUp, descending: arrowDown } as const;
  * and DataGrid render it; the header cell carries `aria-sort`.
  */
 export const SortButton = forwardRef<HTMLButtonElement, SortButtonProps>(function SortButton(
-  { children, direction, onClick, fill = false, align, className, ...rest },
+  { children, direction, onClick, rank, fill = false, align, className, ...rest },
   ref,
 ) {
   return (
@@ -60,6 +68,11 @@ export const SortButton = forwardRef<HTMLButtonElement, SortButtonProps>(functio
     >
       <span className="cy-sort-button-label cy-reset">{children}</span>
       <Icon icon={direction ? ICONS[direction] : chevronsUpDown} size="sm" className="cy-sort-button-icon" />
+      {rank !== undefined && (
+        <span className="cy-sort-button-rank cy-reset" aria-hidden="true">
+          {rank}
+        </span>
+      )}
     </ButtonBase>
   );
 });

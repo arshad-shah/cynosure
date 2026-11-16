@@ -130,6 +130,12 @@
   overflow: visible;
 }
 
+/* disabled on the layout primitives and Toolbar (BlockProps in src/foundations/layout.ts): the region is inert and
+   dimmed as a disabled Button is. */
+[data-cy-disabled][data-cy-disabled] {
+  opacity: 0.5;
+}
+
 /* Visually hidden, still read by screen readers. Shared by every component that names things with hidden text
    (Link, Steps, Tabs, Calendar, Kbd, Stat…), so it lives here rather than in one of them. */
 .cy-visually-hidden {

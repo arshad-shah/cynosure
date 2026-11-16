@@ -25,7 +25,7 @@ A surface to pan and zoom freely, for diagrams, maps and boards; your content, p
 </PanZoomCanvas>
 ```
 
-Place children absolutely in canvas units. Give `bounds` (the content's extent) to fit it on first show, for Shift+1 and `fit()`, and for the minimap. `min` and `max` set the zoom's limits in percent, as ZoomControls' do (25 to 800 unless given; a schema diagram might keep to 20 to 300): the wheel, a pinch, the keys, `zoomTo` and fitting all stop there. The `handle` has `fit`, `zoomTo` and `centerOn` for your own buttons (`ref` gives the same handle, and the earlier spelling `centreOn` still works); pair it with [ZoomControls](?path=/docs/components-structure-zoomcontrols--docs) for a zoom toolbar.
+Place children absolutely in canvas units. Give `bounds` (the content's extent) to fit it on first show, for Shift+1 and `fit()`, and for the minimap. `min` and `max` set the zoom's limits in percent, as ZoomControls' do (25 to 800 unless given; a schema diagram might keep to 20 to 300): the wheel, a pinch, the keys, `zoomTo` and fitting all stop there. The `handle` has `fit`, `zoomTo`, `zoom` and `centerOn` for your own buttons (`ref` gives the same handle, and the earlier spelling `centreOn` still works); pair it with [ZoomControls](?path=/docs/components-structure-zoomcontrols--docs) for a zoom toolbar: `zoom(setting)` applies what ZoomControls reports (a percent, `fit-page` to fit `bounds`, `fit-width` to fit their width).
 
 ## Painting into a canvas
 
@@ -84,7 +84,14 @@ claimPress={({ point }) => {
   overlays={{
     "top-start": <Legend />,
     "top-end": (
-      <ZoomControls zoom={zoom} percent={percent} min={20} max={300} onZoomChange={onZoomChange} />
+      <ZoomControls
+        percent={view.scale * 100}
+        min={20}
+        max={300}
+        fits={[]}
+        buttons={["fit", "actual-size"]}
+        onZoomChange={(z) => canvas.current?.zoom(z)}
+      />
     ),
     "bottom-start": (
       <Button size="sm" pressed={showMap} onClick={() => setShowMap((s) => !s)}>

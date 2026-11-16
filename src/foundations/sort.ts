@@ -35,3 +35,38 @@ export function nextSort(current: TableSort | null, key: string): TableSort | nu
   if (current?.key !== key) return { key, direction: "ascending" };
   return current.direction === "ascending" ? { key, direction: "descending" } : null;
 }
+
+/**
+ * `rows` sorted by several keys in priority order (a new array): the first key decides, the next breaks its ties,
+ * and so on. Each key compares as `sortRows` does; `get(row, key)` reads a key's value. Keys `get` cannot read (a
+ * column that is gone) are skipped by the caller.
+ */
+export function sortRowsBy<Row>(
+  rows: readonly Row[],
+  sorts: readonly TableSort[],
+  get: (row: Row, key: string) => unknown,
+): Row[] {
+  // Array sort is stable: sorting by the last key first leaves each earlier key to break the later ones' ties.
+  let out = [...rows];
+  for (let i = sorts.length - 1; i >= 0; i--) {
+    const { key, direction } = sorts[i] as TableSort;
+    out = sortRows(out, (row) => get(row, key), direction);
+  }
+  return out;
+}
+
+/**
+ * What pressing column `key`'s header does to a list of sorts. Alone (`add` false): that column only, cycling as
+ * `nextSort` from its place as the first key. Added (Shift): appended ascending, or turned descending, or removed.
+ */
+export function nextSorts(current: readonly TableSort[], key: string, add: boolean): TableSort[] {
+  if (!add) {
+    const next = nextSort(current[0]?.key === key ? (current[0] as TableSort) : null, key);
+    return next ? [next] : [];
+  }
+  const at = current.findIndex((s) => s.key === key);
+  if (at < 0) return [...current, { key, direction: "ascending" }];
+  if (current[at]?.direction === "ascending")
+    return current.map((s, i) => (i === at ? { key, direction: "descending" } : s));
+  return current.filter((_, i) => i !== at);
+}

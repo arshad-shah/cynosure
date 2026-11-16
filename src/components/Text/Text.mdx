@@ -47,6 +47,16 @@ import { Text } from "@arshad-shah/cynosure";
 <Canvas of={Stories.Sizes} />
 <Canvas of={Stories.Weights} />
 
+`3xl`, `4xl` and `5xl` are display sizes for one large figure: a countdown, a clock, a hero number. They are larger than `2xl`, come from the `--cy-text-size-3xl`, `-4xl` and `-5xl` tokens, and use a tighter line height (`--cy-text-display-line-height`, 1.1). Add `numeric` so the digits keep their width as they change, and put a ticking value inside an element with `role="timer"`.
+
+<Canvas of={Stories.DisplaySizesForACountdown} />
+
+```tsx
+<Stack role="timer" aria-label="Focus time left">
+  <Text as="div" size="5xl" weight="bold" numeric>24:59</Text>
+</Stack>
+```
+
 `tone="inherit"` (the default for body and code) takes the surrounding colour. `neutral` is the ink and `muted` the secondary ink. The other tones use the readable text colour of that tone.
 
 <Canvas of={Stories.Tones} />
@@ -94,7 +104,7 @@ Text is not interactive, so it has no keyboard behaviour.
 - **Eyebrow:** the uppercase is visual only. The text in the DOM keeps its case.
 - **Contrast:** every tone and the muted variants keep 4.5:1 on the page background (tested).
 - **Host CSS:** host rules for `span` and `div` (weight, case, letter spacing, colour, size, line height) do not change Text (tested).
-- **Attributes:** `id`, any `data-*` attribute and the `ref` go to the root element.
+- **Attributes:** `id`, any `data-*` attribute, `role`, any `aria-*` attribute and the `ref` go to the root element, so status text can be a live region (`role="status"` with `aria-live`).
 
 ## Touch
 
@@ -102,7 +112,7 @@ Text is not pressable, so it has no hit area. A `label` passes a tap on to its c
 
 ## Theming
 
-Tokens: `--cy-text-line-height`, `--cy-text-lead-size`, `--cy-text-caption-size`, `--cy-text-eyebrow-size`, `--cy-text-eyebrow-tracking` and `--cy-text-muted`. Sizes, weights, faces and tone colours come from the global tokens (`--cy-font-size-*`, `--cy-font-weight-*`, `--cy-font-sans`, `--cy-font-mono`, `--cy-color-*-text`).
+Tokens: `--cy-text-line-height`, `--cy-text-size-3xl`, `--cy-text-size-4xl`, `--cy-text-size-5xl`, `--cy-text-display-line-height`, `--cy-text-lead-size`, `--cy-text-caption-size`, `--cy-text-eyebrow-size`, `--cy-text-eyebrow-tracking` and `--cy-text-muted`. Sizes, weights, faces and tone colours come from the global tokens (`--cy-font-size-*`, `--cy-font-weight-*`, `--cy-font-sans`, `--cy-font-mono`, `--cy-color-*-text`).
 
 ```ts
 createTheme({ components: { text: { leadSize: "18px", eyebrowTracking: ".12em" } } });

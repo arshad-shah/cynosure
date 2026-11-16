@@ -12,6 +12,17 @@ import { alignedScroll, type ScrollAlign } from "../../foundations/scroll-align.
 import { useFollow } from "../../foundations/use-follow.js";
 import { OverlayFrame } from "../OverlayFrame/OverlayFrame.js";
 
+export interface ScrollAreaTokens {
+  /** The tallest an area gets when its `maxHeight` prop is not set (any CSS length). Default `none`. */
+  maxHeight: string;
+}
+
+declare module "../../tokens/schema.js" {
+  interface ComponentTokens {
+    scrollArea: ScrollAreaTokens;
+  }
+}
+
 /** Where `scrollIntoView` puts the element. */
 export interface ScrollAreaIntoViewOptions {
   /** `nearest` (default) scrolls the least that shows it whole; `start` puts it at the top; `center` in the middle. */
@@ -39,6 +50,11 @@ export interface ScrollAreaProps {
    * back to the end, or `handle.scrollToEnd()`, follows again.
    */
   follow?: boolean;
+  /**
+   * The tallest the area gets, as any CSS length ("20rem", "50vh"): in a parent with no height of its own it grows
+   * with its content up to this, then scrolls. Default: the `--cy-scroll-area-max-height` token (none).
+   */
+  maxHeight?: string | undefined;
   /** Called on every scroll of the area, with the scroll event of its scrolling element. */
   onScroll?: ((event: UIEvent<HTMLDivElement>) => void) | undefined;
   /**
@@ -72,6 +88,7 @@ export const ScrollArea = forwardRef<HTMLDivElement, ScrollAreaProps>(function S
     label,
     direction = "vertical",
     follow = false,
+    maxHeight,
     onScroll,
     onAtBottomChange,
     overlay,
@@ -121,7 +138,7 @@ export const ScrollArea = forwardRef<HTMLDivElement, ScrollAreaProps>(function S
       ref={ref}
       {...rest}
       className={className ? `cy-scroll-area ${className}` : "cy-scroll-area"}
-      style={style}
+      style={maxHeight ? ({ "--_max-block": maxHeight, ...style } as CSSProperties) : style}
       overlay={overlay}
     >
       <div

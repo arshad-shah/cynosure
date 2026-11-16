@@ -1,0 +1,38 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./VideoBase.stories";
+
+<Meta of={Stories} />
+
+# VideoBase
+
+The native `<video>` for Cynosure, and the only module allowed to render one. It plays a live `MediaStream`, muted and inline. It is a foundation: no visual opinions, so composites style it.
+
+## Who uses it
+
+[CameraView](?path=/docs/components-controls-cameraview--docs).
+
+## When to use it directly
+
+Only when building a new composite that shows a live stream.
+
+**Use a component instead when** you want a camera: CameraView adds Start and Stop, a camera choice, a torch switch, frames and error messages.
+
+<Canvas of={Stories.PlaysAStreamMutedAndInline} />
+
+## Usage
+
+```tsx
+import { VideoBase } from "@arshad-shah/cynosure";
+
+<VideoBase label="Camera" stream={stream} />
+```
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour
+
+- **Stream:** set as `srcObject` and played as soon as it changes; null empties the element.
+- **Muted and inline:** phones neither ask for sound nor go full screen; no controls, no picture-in-picture.
+- **Name:** `aria-label`.

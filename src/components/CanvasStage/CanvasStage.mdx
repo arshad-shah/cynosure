@@ -1,0 +1,62 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./CanvasStage.stories";
+
+<Meta of={Stories} />
+
+# CanvasStage
+
+A sized stage for a product's own drawing surface, with a file drop target over it and a centred overlay slot.
+
+<Canvas of={Stories.OverlayIsCentred} />
+
+## When to use
+
+- **A canvas a product paints itself** (an animation player, a renderer, a game) that needs a size, somewhere to drop a file, and a picker or progress over it.
+
+**Use something else when:**
+- the content pans and zooms: [PanZoomCanvas](?path=/docs/components-structure-panzoomcanvas--docs)
+- the page's job is to take files: [FileDrop](?path=/docs/components-controls-filedrop--docs)
+- a picture or video keeps a ratio: [AspectRatio](?path=/docs/components-structure-aspectratio--docs)
+
+## Usage
+
+```tsx
+<CanvasStage
+  label="Animation"
+  ratio={16 / 9}
+  accept=".riv"
+  onFiles={([file]) => open(file)}
+  overlay={file ? undefined : <FileDrop variant="button" accept=".riv" onFiles={([f]) => open(f)} />}
+>
+  <canvas ref={canvasRef} aria-label="Hero animation" />
+</CanvasStage>
+```
+
+The surface is stretched to the stage. With `ratio` the stage keeps it at any width; without one it fills its parent's height.
+
+<Canvas of={Stories.ASizedStageForACanvas} />
+
+## Dropping files
+
+With `onFiles`, the whole stage takes files: while they are dragged over it, `labels.drop` ("Drop to open") covers it. A drop passes the files that match `accept` (the first one only, unless `multiple`) to `onFiles` and the rest to `onReject`. Dragged text is left alone.
+
+<Canvas of={Stories.DropAFileOnTheStage} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+- **Role:** a group named by `label`. Name the surface inside it for what it shows.
+- **Overlay:** centred; only its content takes presses, so around it the surface still gets them. It hides while files are dragged over.
+- **Keyboard:** the stage adds no keys and no tab stop. Dropping is pointer-only, so give keyboard users a picker too (a FileDrop button in the overlay or a toolbar).
+- **Host CSS:** host rules for `div` and `span` do not change it (tested).
+
+## Theming
+
+Tokens: `--cy-canvas-stage-background`, `--cy-canvas-stage-radius`, `--cy-canvas-stage-min-height` and `--cy-canvas-stage-drop-background`.
+
+## Related
+
+[FileDrop](?path=/docs/components-controls-filedrop--docs) · [PanZoomCanvas](?path=/docs/components-structure-panzoomcanvas--docs) · [DeviceFrame](?path=/docs/components-feedback-and-display-deviceframe--docs) · [ProgressBar](?path=/docs/components-feedback-and-display-progressbar--docs)
