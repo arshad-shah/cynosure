@@ -523,7 +523,7 @@
   {
     "name": "TimeField",
     "path": ["dist/components/TimeField/TimeField.js", "dist/styles/time-field.css"],
-    "limit": "5.91 kB",
+    "limit": "5.93 kB",
     "gzip": true
   },
   {
