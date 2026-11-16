@@ -69,6 +69,7 @@ The list drops below the whole box, at least as wide as it, and moves above it w
 - **`variant`:** `outline` (default) or `soft`.
 - **`size`:** `sm`, `md` or `lg`.
 - **`labelHidden`:** hides the label visually while it still names the field. Prefer a visible label.
+- **Named and described from outside:** `aria-labelledby` names the field by other elements (a column heading) instead of its label; pair it with `labelHidden`. Your `aria-describedby` ids are read first, then the field's own description and error: they are merged, never replaced. The counter's id comes last.
 - Native textarea attributes such as `name`, `required`, `disabled`, `readOnly` and `maxLength` pass through.
 
 ## Props

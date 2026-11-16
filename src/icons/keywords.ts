@@ -74,6 +74,7 @@ export const ICON_KEYWORDS = {
   "ocr-scan": ["ocr", "recognise text", "scan text", "text recognition", "extract text", "read"],
 
   // editing
+  "delete-left": ["backspace", "erase", "delete", "remove character", "keyboard key", "clear"],
   "align-center": ["text", "centre", "middle", "paragraph"],
   "align-justify": ["text", "full width", "paragraph", "block"],
   "align-left": ["text", "start", "paragraph", "flush left"],
@@ -306,6 +307,7 @@ export const ICON_KEYWORDS = {
   "file-lock": ["protect", "password", "encrypt", "secure document", "locked file", "private"],
   "file-clean": ["sanitize", "clean", "remove metadata", "scrub", "strip hidden data", "brush"],
   "file-key": ["permissions", "access", "restrictions", "owner password", "rights", "document key"],
+  "file-repair": ["repair", "fix document", "recover", "broken file", "wrench", "spanner", "maintenance"],
   "redact-area": ["mark region", "select area", "black out", "box"],
   "redact-search": ["find and redact", "search redact", "redact text", "find matches", "censor search"],
   "redact-apply": ["apply redactions", "confirm", "burn in", "finalise", "commit redaction"],
@@ -399,6 +401,28 @@ export const ICON_KEYWORDS = {
   "zoom-fit-page": ["fit page", "whole page", "fit to screen", "zoom", "fit"],
   minimap: ["overview", "navigator", "map", "canvas", "bird's eye"],
   "panel-top": ["top panel", "header", "split pane", "drawer", "toolbar", "layout"],
+  "panel-left-close": ["collapse sidebar", "hide sidebar", "close panel", "split pane", "chevron", "layout"],
+  "panel-left-open": ["expand sidebar", "show sidebar", "open panel", "split pane", "chevron", "layout"],
+  "panel-right-close": [
+    "collapse inspector",
+    "hide side panel",
+    "close panel",
+    "split pane",
+    "chevron",
+    "layout",
+  ],
+  "panel-right-open": [
+    "expand inspector",
+    "show side panel",
+    "open panel",
+    "split pane",
+    "chevron",
+    "layout",
+  ],
+  "panel-top-close": ["collapse header", "hide top panel", "close panel", "split pane", "chevron", "layout"],
+  "panel-top-open": ["expand header", "show top panel", "open panel", "split pane", "chevron", "layout"],
+  "panel-bottom-close": ["collapse console", "hide drawer", "close panel", "split pane", "chevron", "layout"],
+  "panel-bottom-open": ["expand console", "show drawer", "open panel", "split pane", "chevron", "layout"],
 
   // maths
   divide: ["division", "obelus", "over", "split"],

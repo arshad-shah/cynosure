@@ -1,6 +1,6 @@
 # SegmentedControl
 
-A compact single choice (view switchers, modes, theme) on native radios: arrow keys, forms and reset are native; re-activating the current segment never fires `onChange`.
+A compact single choice (view switchers, modes, theme) on native radios: arrow keys, forms and reset are native, and Home and End select the first and last segment that can be chosen; re-activating the current segment never fires `onChange`.
 
 ```tsx
 <SegmentedControl label="View" options={[{ value: "tree", label: "Tree", icon: tree }, { value: "raw", label: "Raw", icon: code }]} defaultValue="tree" onChange={setView} />

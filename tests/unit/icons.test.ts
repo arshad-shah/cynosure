@@ -3,6 +3,7 @@ import * as icons from "../../src/icons";
 import { ICON_KEYWORDS } from "../../src/icons/keywords";
 import { ICON_CATEGORIES, type IconData } from "../../src/icons/types";
 import { validateIcon } from "../../src/icons/validate";
+import { drawingKey, duplicateDrawings } from "../../tools/icon-drawing";
 
 const shipped = Object.values(icons).filter(
   (v): v is IconData => typeof v === "object" && v !== null && "body" in v,
@@ -82,5 +83,27 @@ describe("validateIcon", () => {
   it("rejects coordinates outside the 24 grid and bad names", () => {
     expect(validateIcon({ ...ok, body: [["circle", { cx: 30, cy: 12, r: 2 }]] }).join()).toMatch(/grid/);
     expect(validateIcon({ ...ok, name: "Bad Name" }).join()).toMatch(/name/);
+  });
+});
+
+describe("Facet drawings", () => {
+  it("has no two icons with the same drawing", () => {
+    expect(duplicateDrawings(shipped)).toEqual([]);
+  });
+  it("compares drawings, not how they are written", () => {
+    const close = shipped.find((i) => i.name === "close") as IconData;
+    // The same drawing with animate dropped, elements reordered and a number off by float noise.
+    const rect: IconData["body"][number] = ["rect", { x: 3.5, y: 4.5, width: 17, height: 15, rx: 3 }];
+    const a = { body: [rect, ["path", { d: "M9.5 4.5v15", animate: true }]] } as Pick<IconData, "body">;
+    const b = {
+      body: [
+        ["path", { d: "M9.5 4.5v15" }],
+        ["rect", { x: 3.5000001, y: 4.5, width: 17, height: 15, rx: 3 }],
+      ],
+    } as Pick<IconData, "body">;
+    expect(drawingKey(a)).toBe(drawingKey(b));
+    expect(duplicateDrawings([{ ...close, name: "x" }, close])).toEqual([["x", "close"]]);
+    // A filled shape is a different drawing from its outline.
+    expect(drawingKey(close)).not.toBe(drawingKey({ ...close, fill: true }));
   });
 });

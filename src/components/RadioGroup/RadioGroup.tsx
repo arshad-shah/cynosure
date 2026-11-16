@@ -62,6 +62,8 @@ export interface RadioGroupProps {
   size?: Size;
   /** Colour of the chosen radio. Default "accent". */
   tone?: Tone;
+  /** Ids of more elements that describe the group, read before its own description and error. */
+  "aria-describedby"?: string | undefined;
   /** Added to the root element, for layout. */
   className?: string;
   /** Layout only. */
@@ -108,6 +110,7 @@ export function RadioGroup({
   disabled,
   size = "md",
   tone = "accent",
+  "aria-describedby": describedBy,
   className,
   style,
 }: RadioGroupProps) {
@@ -115,6 +118,7 @@ export function RadioGroup({
   const groupName = name ?? `cy-radio-${generated}`;
   return (
     <Field
+      describedBy={describedBy}
       group
       label={label}
       labelHidden={labelHidden}

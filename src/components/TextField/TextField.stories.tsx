@@ -332,3 +332,29 @@ export const SplitSettingsRow: Story = {
     await expect(font).toHaveValue("Inter");
   },
 };
+
+export const NamedAndDescribedFromOutside: Story = {
+  render: (args) => (
+    <div>
+      <span id="tf-heading">Work email</span>
+      <span id="tf-hint">Used for invoices</span>
+      <TextField
+        {...args}
+        id="tf-email"
+        labelHidden
+        description="We never share it."
+        error="Not an email address"
+        aria-labelledby="tf-heading"
+        aria-describedby="tf-hint"
+      />
+    </div>
+  ),
+  play: async ({ canvas }) => {
+    const input = canvas.getByRole("textbox", { name: "Work email" });
+    await expect(input).toHaveAttribute("id", "tf-email");
+    // The caller's description comes first, then the field's own help and error: none is lost.
+    await expect(input).toHaveAccessibleDescription(
+      "Used for invoices We never share it. Not an email address",
+    );
+  },
+};

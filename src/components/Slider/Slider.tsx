@@ -83,6 +83,15 @@ export interface SliderProps {
   size?: Size;
   /** Replace the built-in English text: the thumb names and the value text. */
   labels?: Partial<SliderLabels>;
+  /** Id of the slider (the thumb), or of the group around the two or more thumbs of a range. */
+  id?: string | undefined;
+  /**
+   * Ids of the element(s) that name the slider instead of `label` (a heading elsewhere in the layout): the thumb, or
+   * a range's group. A range's thumbs keep "label, minimum" and so on. Pair with `labelHidden`.
+   */
+  "aria-labelledby"?: string | undefined;
+  /** Ids of elements that describe the slider; set on every thumb. */
+  "aria-describedby"?: string | undefined;
   /** Added to the root element, for layout. */
   className?: string;
   /** Layout only. Restyle through --cy-slider-* tokens. */
@@ -122,10 +131,19 @@ export function Slider({
   disabled = false,
   size = "md",
   labels,
+  id: idProp,
+  "aria-labelledby": labelledBy,
+  "aria-describedby": describedBy,
   className,
   style,
 }: SliderProps) {
   const id = useId();
+  // The name the slider (or a range's group) gets: the caller's elements, else the label (hidden: as text).
+  const naming = labelledBy
+    ? { "aria-labelledby": labelledBy }
+    : labelHidden
+      ? { "aria-label": label }
+      : { "aria-labelledby": `${id}-label` };
   const text = { ...DEFAULT_LABELS, ...labels };
   const initial = defaultValue ?? min;
   const [current, setCurrent, resetCurrent] = useControllableState<SliderValue>(value, initial, onChange);
@@ -208,9 +226,7 @@ export function Slider({
     <div
       className={className ? `cy-slider ${className}` : "cy-slider"}
       // A range is a group of two sliders named by the label; a single slider is named directly.
-      {...(range
-        ? { role: "group", ...(labelHidden ? { "aria-label": label } : { "aria-labelledby": `${id}-label` }) }
-        : {})}
+      {...(range ? { role: "group", id: idProp, ...naming } : {})}
       data-orientation={orientation}
       data-range={range || undefined}
       data-size={size}
@@ -262,6 +278,8 @@ export function Slider({
               thumbs.current[index] = el;
             }}
             role="slider"
+            id={range ? undefined : idProp}
+            aria-describedby={describedBy}
             tabIndex={disabled ? undefined : 0}
             className="cy-slider-thumb cy-reset"
             aria-orientation={orientation}
@@ -270,11 +288,7 @@ export function Slider({
             aria-valuenow={ariaNumber(v)}
             aria-valuetext={text.value(v)}
             aria-disabled={disabled || undefined}
-            {...(range
-              ? { "aria-label": `${label}, ${thumbName(index)}` }
-              : labelHidden
-                ? { "aria-label": label }
-                : { "aria-labelledby": `${id}-label` })}
+            {...(range ? { "aria-label": `${label}, ${thumbName(index)}` } : naming)}
             style={{ "--_pos": position(v) } as CSSProperties}
             onKeyDown={disabled ? undefined : onKeyDown(index)}
           />

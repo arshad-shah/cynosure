@@ -10,6 +10,13 @@ export type ColorMode = ThemeMode | "system";
 export interface ColorModeStorage {
   get(key: string): string | null | Promise<string | null>;
   set(key: string, value: string): void | Promise<void>;
+  /**
+   * Optional: call `onChange` with the new stored value whenever `key` changes elsewhere (another tab, window or
+   * extension page: `chrome.storage.onChanged`, a `BroadcastChannel`), and return a function that stops. Every
+   * `useColorMode` and ThemeToggle on that key then follows. The default localStorage storage follows other tabs
+   * through the `storage` event.
+   */
+  subscribe?(key: string, onChange: (value: string | null) => void): () => void;
 }
 
 const MODES: readonly ColorMode[] = ["light", "dark", "system"];
@@ -18,6 +25,20 @@ const isMode = (v: unknown): v is ColorMode => MODES.includes(v as ColorMode);
 const localStorageAdapter: ColorModeStorage = {
   get: (k) => globalThis.localStorage?.getItem(k) ?? null,
   set: (k, v) => globalThis.localStorage?.setItem(k, v),
+  // Another tab of the same origin wrote the key (or cleared all keys: `key` is null).
+  subscribe: (k, onChange) => {
+    const follow = (e: StorageEvent) => {
+      if (e.key !== k && e.key !== null) return;
+      try {
+        if (e.storageArea && e.storageArea !== globalThis.localStorage) return;
+      } catch {
+        return;
+      }
+      onChange(e.key === null ? null : e.newValue);
+    };
+    window.addEventListener("storage", follow);
+    return () => window.removeEventListener("storage", follow);
+  },
 };
 
 function read(storage: ColorModeStorage, key: string): ColorMode | Promise<ColorMode> {
@@ -66,6 +87,22 @@ export function useColorMode(options: { storage?: ColorModeStorage; key?: string
     window.addEventListener(CHANGE, follow);
     return () => window.removeEventListener(CHANGE, follow);
   }, [key]);
+
+  // Another tab or window (through the storage's `subscribe`): follow it, as a choice made here would be.
+  const custom = options.storage !== undefined;
+  useEffect(() => {
+    const storage = storageRef.current;
+    if (!storage.subscribe) return;
+    try {
+      return storage.subscribe(key, (value) => {
+        touched.current = true;
+        setState(isMode(value) ? value : "system");
+      });
+    } catch {
+      return;
+    }
+    // A new storage object each render must not resubscribe; a switch between custom and default storage does.
+  }, [key, custom]);
 
   const setMode = useCallback(
     (next: ColorMode) => {

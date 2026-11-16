@@ -595,3 +595,16 @@ export const CompoundFormHeadersAndCorners: Story = {
     await expect(getComputedStyle(corner).backgroundColor).toBe(getComputedStyle(q1).backgroundColor);
   },
 };
+
+export const SelectionCheckboxesTakeOnlyTheirBox: Story = {
+  args: { selectable: true },
+  play: async ({ canvas }) => {
+    for (const name of ["Select all rows", "Select ada"]) {
+      const input = canvas.getByRole("checkbox", { name });
+      const row = input.closest(".cy-choice") as HTMLElement;
+      const box = input.closest(".cy-checkbox") as HTMLElement;
+      // The name is a hidden label: no gap or text space beside the box, so the column stays narrow.
+      await expect(row.getBoundingClientRect().width - box.getBoundingClientRect().width).toBeLessThan(1);
+    }
+  },
+};

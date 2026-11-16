@@ -756,3 +756,18 @@ export const MentionsInsideAShadowRoot: Story = {
     await waitFor(() => expect(shownList(list)).toBe(false));
   },
 };
+
+export const DescribedFromOutside: Story = {
+  args: { description: "Markdown works.", showCount: true, maxLength: 20 },
+  render: (args) => (
+    <div>
+      <span id="ta-hint">Shown on your profile</span>
+      <TextArea {...args} aria-describedby="ta-hint" />
+    </div>
+  ),
+  play: async ({ canvas }) => {
+    const area = canvas.getByRole("textbox", { name: "Notes" });
+    await expect(area.getAttribute("aria-describedby")?.split(" ")[0]).toBe("ta-hint");
+    await expect(area).toHaveAccessibleDescription(/^Shown on your profile Markdown works\./);
+  },
+};

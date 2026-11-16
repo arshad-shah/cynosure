@@ -52,6 +52,9 @@ import { download, trash } from "@arshad-shah/cynosure/icons";
 - **Loading:** shows [LoadingDots](?path=/docs/components-feedback-and-display-loadingdots--docs), sets `aria-busy` and ignores clicks. It keeps its width, so the layout doesn't jump.
 - **Pressed:** `pressed` makes it a toggle button (`aria-pressed`).
 - **Disabled:** dims the button and blocks activation. Prefer explaining why an action is unavailable over silently disabling it.
+- **Disabled with a reason:** `aria-disabled="true"` looks the same and blocks activation (no `onClick`, no form submit), but the button stays focusable, so a description (`aria-describedby`, a Tooltip) can say why. Your `aria-disabled` and `aria-busy` are kept alongside `loading`'s.
+
+<Canvas of={Stories.DisabledWithAReason} />
 
 <Canvas of={Stories.Loading} />
 <Canvas of={Stories.Pressed} />

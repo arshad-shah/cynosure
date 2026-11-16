@@ -252,7 +252,8 @@ function DataTable<Row>({
           {selectable && (
             <th scope="col" className="cy-table-th cy-table-select cy-reset">
               <Checkbox
-                label={<span className="cy-visually-hidden">{text.selectAll}</span>}
+                label={text.selectAll}
+                labelHidden
                 checked={allIds.length > 0 && chosenCount === allIds.length}
                 indeterminate={chosenCount > 0 && chosenCount < allIds.length}
                 disabled={allIds.length === 0}
@@ -302,7 +303,8 @@ function DataTable<Row>({
                 {selectable && (
                   <td className="cy-table-td cy-table-select cy-reset">
                     <Checkbox
-                      label={<span className="cy-visually-hidden">{text.selectRow(rowName(row))}</span>}
+                      label={text.selectRow(rowName(row))}
+                      labelHidden
                       checked={isChosen}
                       onChange={(on) => {
                         const next = new Set(chosen);

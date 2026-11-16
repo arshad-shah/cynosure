@@ -14,6 +14,8 @@ export interface IconButtonProps
   label: string;
   /** Where the label tooltip appears. */
   tooltipPlacement?: Placement;
+  /** Hover delay of the label tooltip in ms, as Tooltip's `delay`: `0` opens it at once (toolbars). Default 300. */
+  tooltipDelay?: number | undefined;
   /**
    * The icon points along the reading direction (previous, next, back): it is mirrored in right-to-left text, as
    * Icon's `flipRtl`. Default false.
@@ -33,11 +35,26 @@ export interface IconButtonProps
 
 /** A square Button with only an icon. Its label is the accessible name and a Tooltip (no native title). */
 export const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(function IconButton(
-  { icon, label, className, tooltipPlacement = "top", flipRtl = false, iconColor, wrapperClassName, ...rest },
+  {
+    icon,
+    label,
+    className,
+    tooltipPlacement = "top",
+    tooltipDelay,
+    flipRtl = false,
+    iconColor,
+    wrapperClassName,
+    ...rest
+  },
   ref,
 ) {
   return (
-    <Tooltip content={label} placement={tooltipPlacement} className={wrapperClassName}>
+    <Tooltip
+      content={label}
+      placement={tooltipPlacement}
+      {...(tooltipDelay !== undefined ? { delay: tooltipDelay } : {})}
+      className={wrapperClassName}
+    >
       <Button
         ref={ref}
         {...rest}
