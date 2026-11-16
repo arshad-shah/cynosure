@@ -2,7 +2,39 @@
 
 ## Status
 
-**Now (2026-11-16):** the tools migration gaps of issue #171 are built on branch `gaps/b` (with gaps/a merged in) and verified; see "Current task". Next step: push and open a pull request into `main` when Arshad says so.
+**Now (2026-11-16, later):** 0.7.0 is being assembled from three merged or open pull requests, all approved by Arshad, who also approved the release itself.
+- **#172** (merged): the tools migration gaps of issue #171, from branches `gaps/a` and `gaps/b`.
+- **#174** (merged): what the tools redesign needs.
+  - themeInitScript follows the OS when nothing is saved;
+  - tone text keeps 4.5:1 on every surface;
+  - `useCynosureTheme().resolveColor`;
+  - CommandPalette `onQueryChange`, saved recents and `disabledReason`;
+  - the new `Form`;
+  - AppShell `brand` and rail collapse;
+  - SideNav footer content;
+  - Tabs and ContextMenu under StrictMode;
+  - `monospace` on TextArea and TextField;
+  - SplitPane `stackBelow`.
+- **#175** (open): media, files and code.
+  - Checkbox `variant="card"`;
+  - CompareSlider `beforeSrc`/`afterSrc`, zoom and pan;
+  - Image `overlay`;
+  - FileDrop `variant="button"`;
+  - TextArea `onFiles`;
+  - CodeBlock `maxLines`, a tokenizer and the palette's syntax tokens;
+  - the new BitField;
+  - Table `tone`;
+  - the Combobox controlled-label fix;
+  - QRCode colours, logo and PNG export;
+  - **a Button fix:** a pressed solid button keeps its fill. It used to take the tone's pale tint under on-tone text, at 1.3:1, so BitField's set bits could not be read. Stories now check every pressed variant and tone, light and dark, at 4.5:1.
+
+  Its seven new visual stories got baselines from the `visual-baselines` workflow (CI's pinned image); no existing baseline changed.
+
+**Release:** the version pull request #173 merges into `main` and publishes. Its branch rules need Arshad's own approval and checks, so he merges it.
+
+**Decided by Arshad:**
+- SwiftChart is not wrapped: #123 is closed, and products use `@arshad-shah/swift-chart` directly with `swiftChartTheme`.
+- Code editing is not in Cynosure: tools uses CodeMirror 6 directly, themed with Cynosure's CSS variables.
 
 Plans 1–3 and 5–9 are complete on `next`. Plan 4 is complete except Task 10 (the final review). Storybook was on GitHub Pages; it moves to https://cynosure.arshadshah.com/storybook/ (built from `main` by `pnpm build:site`), and `pages.yml` is removed. Not yet on npm: publishing is set up (`.github/workflows/release.yml`) and runs when `next` is merged to `main`, which waits for Arshad.
 
