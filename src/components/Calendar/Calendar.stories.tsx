@@ -435,15 +435,14 @@ export const JumpWithTheKeyboard: Story = {
     await userEvent.tab();
     await userEvent.tab();
     await expect(focusedDate()).toBe("2024-02-10");
-    // Escape closes the panel and changes nothing (the focused year button's tooltip goes first, as everywhere).
+    // Escape closes the panel and changes nothing. The year button the panel focuses as it opens shows no tooltip
+    // (focus a script moved), so one Escape is enough.
     await userEvent.tab({ shift: true });
     await userEvent.tab({ shift: true });
     await userEvent.keyboard("{Enter}");
     await shownFully(canvas.getByRole("dialog"));
-    await shownFully(await canvas.findByRole("tooltip"));
-    await userEvent.keyboard("{Escape}");
-    await waitFor(() => expect(canvas.queryByRole("tooltip")).toBeNull());
-    await expect(canvas.getByRole("dialog")).toBeVisible();
+    await new Promise((r) => setTimeout(r, 400));
+    await expect(canvas.queryByRole("tooltip")).toBeNull();
     await userEvent.keyboard("{Escape}");
     await waitFor(() => expect(canvas.queryByRole("dialog")).toBeNull());
     await waitFor(() => expect(jump(canvas)).toHaveFocus());
