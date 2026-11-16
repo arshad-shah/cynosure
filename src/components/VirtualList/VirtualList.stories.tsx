@@ -575,6 +575,86 @@ export const WrappedRowsTakeTheirHeight: Story = {
   },
 };
 
+function Expanding() {
+  const [open, setOpen] = useState<Set<string>>(new Set());
+  return (
+    <VirtualList
+      {...base}
+      label="Entries"
+      items={MANY.slice(0, 500)}
+      wrap
+      selectionMode="none"
+      onAction={(e) => setOpen((s) => new Set(s.has(e.id) ? [...s].filter((k) => k !== e.id) : [...s, e.id]))}
+      renderItem={(e) => (
+        <div>
+          <div>{e.name}</div>
+          {open.has(e.id) && (
+            <>
+              <div>Details line one</div>
+              <div>Details line two</div>
+              <div>Details line three</div>
+            </>
+          )}
+        </div>
+      )}
+    />
+  );
+}
+
+/** With `wrap`, a row that grows (details shown in it) is measured again and the rows after it move down. */
+export const ExpandingRowsAreMeasuredAgain: Story = {
+  render: () => <Expanding />,
+  play: async ({ canvasElement, userEvent }) => {
+    await waitFor(() => expect(rowAt(canvasElement, 3)).not.toBeNull());
+    const h = (i: number) => rowAt(canvasElement, i)?.offsetHeight ?? 0;
+    const top = (i: number) => rowAt(canvasElement, i)?.offsetTop ?? 0;
+    const one = h(2);
+    await userEvent.click(rowAt(canvasElement, 2) as HTMLElement);
+    await waitFor(() => expect(h(2)).toBeGreaterThan(one * 2));
+    await waitFor(() => expect(top(3)).toBe(top(2) + h(2)));
+    // And back.
+    await userEvent.click(rowAt(canvasElement, 2) as HTMLElement);
+    await waitFor(() => expect(h(2)).toBe(one));
+    await waitFor(() => expect(top(3)).toBe(top(2) + one));
+  },
+};
+
+function Ranges({ onRangeChange }: { onRangeChange: (start: number, end: number) => void }) {
+  return <VirtualList {...base} onRangeChange={onRangeChange} />;
+}
+
+/**
+ * `onRangeChange(start, end)` reports the rows in view (end exclusive) as they change, for rows fetched by position:
+ * once at first, again on scrolling, never when the range stays the same.
+ */
+export const RangeChangeReportsTheRowsInView: Story = {
+  render: () => <Ranges onRangeChange={ranges} />,
+  play: async ({ canvas }) => {
+    const box = canvas.getByRole("listbox", { name: "Files" });
+    const row = (canvas.getByRole("option", { name: "File 1" }) as HTMLElement).offsetHeight;
+    // The rows any part of which is in view.
+    const inView = () => [
+      Math.floor(box.scrollTop / row),
+      Math.min(10_000, Math.ceil((box.scrollTop + box.clientHeight) / row)),
+    ];
+    await waitFor(() => expect(ranges).toHaveBeenCalled());
+    await expect(ranges.mock.lastCall).toEqual(inView());
+    await expect(inView()[0]).toBe(0);
+    const calls = ranges.mock.calls.length;
+    // A scroll that shows the same rows reports nothing new.
+    box.scrollTop = 0.5;
+    await new Promise((r) => setTimeout(r, 100));
+    await expect(ranges.mock.calls.length).toBe(calls);
+    box.scrollTop = row * 5000;
+    await waitFor(() => expect(ranges.mock.lastCall?.[0]).toBe(5000));
+    await expect(ranges.mock.lastCall).toEqual(inView());
+    box.scrollTop = box.scrollHeight;
+    await waitFor(() => expect(ranges.mock.lastCall?.[1]).toBe(10_000));
+    await expect(ranges.mock.lastCall).toEqual(inView());
+  },
+};
+const ranges = fn();
+
 export const FollowsNewRowsAtTheEnd: Story = {
   render: () => <Log />,
   play: async ({ canvas, canvasElement, userEvent }) => {

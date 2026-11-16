@@ -88,6 +88,12 @@ export interface VirtualListProps<T> {
   isHeader?: (item: T) => boolean;
   /** `scrollToIndex` and `scrollToEnd`, for scrolling from outside the list. */
   handle?: Ref<VirtualListHandle>;
+  /**
+   * Called with the rows in view, `start` the first and `end` one past the last, whenever they change (on mount, on
+   * scrolling, on resizing): fetch rows held elsewhere (a worker, a server) by position, and render placeholders
+   * until they arrive. Not called again while the same rows stay in view.
+   */
+  onRangeChange?: ((start: number, end: number) => void) | undefined;
   /** Return true for rows that cannot be selected; the arrow keys skip them. */
   isDisabled?: (item: T) => boolean;
   /** "none" (a list to act on), "single" (default) or "multiple". */
@@ -159,6 +165,7 @@ export function VirtualList<T>({
   overlay,
   isHeader,
   handle,
+  onRangeChange,
   empty,
   labels,
   size = "md",
@@ -265,6 +272,19 @@ export function VirtualList<T>({
     if (at >= keys.length) return keys.length;
     return y < win.offsetOf(at) + win.sizeOf(at) / 2 ? at : at + 1;
   };
+
+  // The rows in view, reported when they change. Nothing is reported before the view has been measured.
+  const reported = useRef("");
+  useClientLayoutEffect(() => {
+    if (!onRangeChange || win.view.height <= 0) return;
+    const n = keys.length;
+    const start = n ? Math.min(win.rowAt(win.view.top), n) : 0;
+    const end = n ? Math.min(win.rowAt(win.view.top + win.view.height - 0.5) + 1, n) : 0;
+    const key = `${start}:${end}`;
+    if (key === reported.current) return;
+    reported.current = key;
+    onRangeChange(start, end);
+  });
 
   // Following: while the list sits at its end, new rows keep it there.
   const following = useFollow(root, { follow, onAtBottomChange });
