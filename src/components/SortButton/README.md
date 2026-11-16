@@ -16,7 +16,8 @@ import { SortButton } from "@arshad-shah/cynosure";
 | -------------------------------------------- | ------- | ----------------------------------------------------------------------------------- |
 | `children`                                   | –       | The header text; cut short with an ellipsis in a narrow column                      |
 | `direction`                                  | –       | `ascending` · `descending`; nothing when unsorted                                   |
-| `onClick`                                    | –       | Change the sort                                                                     |
+| `onClick`                                    | –       | Change the sort; gets the click, so Shift+click can add a sort key                  |
+| `rank`                                       | –       | Place among several sort keys, shown small after the icon (decorative)              |
 | `fill`                                       | `false` | Fill the header cell (a grid's fixed-height header); otherwise as wide as the label |
 | `align`                                      | `start` | `end` (numeric columns) puts the icon before the label                              |
 | `tabIndex`, `aria-keyshortcuts`, `data-cell` | –       | For a grid's one-tab-stop keyboard navigation                                       |

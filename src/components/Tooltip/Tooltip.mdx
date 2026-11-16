@@ -43,7 +43,7 @@ The child must be one focusable element (a Button, IconButton or Link). Keep `co
 
 ## Timing
 
-Hover opens after `delay` milliseconds (default `300`); `delay={0}` opens it at once, for toolbars (IconButton passes `tooltipDelay`). Keyboard focus opens it immediately. Once one tooltip is shown, a neighbour hovered while it is open, or within 300 ms of it closing, opens without its delay, so moving along a toolbar shows each tip at once.
+Hover opens after `delay` milliseconds (default `300`); `delay={0}` opens it at once, for toolbars (IconButton passes `tooltipDelay`). Keyboard focus opens it at once: focus that Tab, the arrows, Home, End or Page Up/Down moved to the trigger, still there a frame later. Focus a script moves (a Dialog's close button while the dialog opens, a Popover's first control, focus returned after Escape) opens nothing, so a tip never appears on its own and takes the first Escape. It closes as soon as focus leaves the trigger by any route, unless the pointer rests on it. Once one tooltip is shown, a neighbour hovered while it is open, or within 300 ms of it closing, opens without its delay, so moving along a toolbar shows each tip at once.
 
 <Canvas of={Stories.NeighboursOpenAtOnceOnceOneIsShown} />
 
@@ -62,7 +62,9 @@ Hover opens after `delay` milliseconds (default `300`); `delay={0}` opens it at 
 | Input | Result |
 | --- | --- |
 | Hover | Opens after `delay`, closes shortly after the pointer leaves |
-| Keyboard focus | Opens immediately |
+| Keyboard focus (Tab, arrows, Home, End) | Opens immediately |
+| Focus moved by a script | Nothing |
+| Focus leaves the trigger | Closes |
 | <kbd>Escape</kbd> | Dismisses it |
 
 - **WCAG 1.4.13:** the tooltip is hoverable, dismissible with Escape, and stays while hovered or focused.

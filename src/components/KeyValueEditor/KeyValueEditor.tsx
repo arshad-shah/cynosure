@@ -10,6 +10,7 @@ import type { Size } from "../../tokens/schema.js";
 import { Button } from "../Button/Button.js";
 import { Checkbox } from "../Checkbox/Checkbox.js";
 import { IconButton } from "../IconButton/IconButton.js";
+import { Select } from "../Select/Select.js";
 import { SortableList } from "../SortableList/SortableList.js";
 import { TextArea } from "../TextArea/TextArea.js";
 import { TextField } from "../TextField/TextField.js";
@@ -18,6 +19,8 @@ import { fromBulkText, type KeyValuePair, newPairId, pairName, toBulkText } from
 export type { KeyValuePair };
 
 export interface KeyValueEditorTokens {
+  /** Width of each row's Type select, with `rowTypes`. Default 8rem. */
+  typeWidth: string;
   /** Space between the fields of a row. */
   gap: string;
 }
@@ -45,6 +48,14 @@ export interface KeyValueEditorLabels {
   attach: (name: string) => string;
   /** With `allowFiles`: the button that takes a row's file away. Default "Remove the file from avatar". */
   detach: (name: string) => string;
+  /** With `rowTypes`: the Type select of each row, named "Type (token)". Default "Type". */
+  type: string;
+  /** With `rowTypes`: the plain text type. Default "Text". */
+  typeText: string;
+  /** With `rowTypes`: the masked type. Default "Secret". */
+  typeSecret: string;
+  /** With `rowTypes` and `allowFiles`: the file type. Default "File". */
+  typeFile: string;
   /** Toggle to the text view. Default "Edit as text". */
   bulk: string;
   /** The text view's field. Default "Headers as text: one key: value per line, # turns a line off". */
@@ -66,6 +77,11 @@ export interface KeyValueEditorProps {
   bulkEdit?: boolean;
   /** A button per row to make its value a file instead of text (multipart form fields). `accept` limits the types. */
   allowFiles?: boolean;
+  /**
+   * A Type select per row, so the user decides what a pair is: Text, Secret (the value masked, `secret: true`) or,
+   * with `allowFiles`, File (choosing it opens the file picker). Default false: `secret` is set by the app only.
+   */
+  rowTypes?: boolean;
   /** File types for `allowFiles`, as for `<input accept>`. */
   accept?: string | undefined;
   /** Turns off every field and button. */
@@ -89,6 +105,10 @@ const DEFAULT_LABELS: KeyValueEditorLabels = {
   enable: (name) => `Use ${name}`,
   attach: (name) => `Attach a file to ${name}`,
   detach: (name) => `Remove the file from ${name}`,
+  type: "Type",
+  typeText: "Text",
+  typeSecret: "Secret",
+  typeFile: "File",
   bulk: "Edit as text",
   bulkField: (label) => `${label} as text: one key: value per line, # turns a line off`,
 };
@@ -106,6 +126,7 @@ export function KeyValueEditor({
   toggleable = true,
   bulkEdit = true,
   allowFiles = false,
+  rowTypes = false,
   accept,
   disabled = false,
   size = "md",
@@ -141,6 +162,18 @@ export function KeyValueEditor({
     const pair = { id: newPairId(), key: "", value: "" };
     focusNext.current = pair.id;
     setRows([...rows, pair]);
+  };
+  const pickFile = (id: string) => {
+    picking.current = id;
+    picker.current?.click();
+  };
+  const setType = (pair: KeyValuePair, type: string) => {
+    if (type === "file") pickFile(pair.id);
+    else
+      update(pair.id, {
+        secret: type === "secret",
+        ...(pair.file ? { file: undefined, value: "" } : {}),
+      });
   };
   const remove = (id: string) => {
     const at = rows.findIndex((r) => r.id === id);
@@ -202,6 +235,22 @@ export function KeyValueEditor({
               onChange={(value) => update(pair.id, { value })}
             />
           )}
+          {rowTypes && (
+            <Select
+              label={`${text.type} (${name})`}
+              labelHidden
+              className="cy-key-value-editor-type"
+              size={size}
+              disabled={disabled}
+              value={pair.file ? "file" : pair.secret ? "secret" : "text"}
+              onChange={(type) => setType(pair, type)}
+              options={[
+                { value: "text", label: text.typeText },
+                { value: "secret", label: text.typeSecret },
+                ...(allowFiles ? [{ value: "file", label: text.typeFile }] : []),
+              ]}
+            />
+          )}
           {allowFiles &&
             (pair.file ? (
               <IconButton
@@ -219,10 +268,7 @@ export function KeyValueEditor({
                 variant="ghost"
                 size={size}
                 disabled={disabled}
-                onClick={() => {
-                  picking.current = pair.id;
-                  picker.current?.click();
-                }}
+                onClick={() => pickFile(pair.id)}
               />
             ))}
           <IconButton

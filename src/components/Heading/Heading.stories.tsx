@@ -436,3 +436,25 @@ export const PassesIdDataAndRef: Story = rootAttributesStory<HTMLHeadingElement>
   ),
   "cy-heading",
 );
+
+/** `role` and every `aria-*` attribute reach the heading element. */
+export const PassesRoleAndAria: Story = {
+  render: () => (
+    <>
+      <Heading level={2} aria-live="polite" aria-atomic aria-describedby="x" id="live">
+        Saved
+      </Heading>
+      <Heading level={3} role="presentation" id="plain">
+        Decoration
+      </Heading>
+      <p id="x">All changes are saved.</p>
+    </>
+  ),
+  play: async ({ canvasElement }) => {
+    await expect(canvasElement.querySelector("#plain")).toHaveAttribute("role", "presentation");
+    const live = canvasElement.querySelector("#live") as HTMLElement;
+    await expect(live).toHaveAttribute("aria-live", "polite");
+    await expect(live).toHaveAttribute("aria-atomic", "true");
+    await expect(live).toHaveAttribute("aria-describedby", "x");
+  },
+};

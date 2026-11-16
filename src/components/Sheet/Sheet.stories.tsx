@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { useState } from "react";
+import { StrictMode, useState } from "react";
 import { expect, fn, waitFor } from "storybook/test";
 import { computeUnderHostileHost } from "../../test/hostile.js";
 import { Button } from "../Button/Button.js";
@@ -238,5 +238,36 @@ export const TouchOpensAndCloses: Story = {
     await expect(toggle).toBeChecked();
     await userEvent.pointer({ keys: "[TouchA]", target: el });
     await settledClosed(el);
+  },
+};
+
+function MountsOpen() {
+  const [open, setOpen] = useState(false);
+  return (
+    <StrictMode>
+      <Button onClick={() => setOpen(true)}>Settings</Button>
+      {open && (
+        <Sheet open onOpenChange={setOpen} title="Settings">
+          <Button>Reset</Button>
+        </Sheet>
+      )}
+    </StrictMode>
+  );
+}
+
+/** Opened from the keyboard, its close button's tooltip stays shut while focus moves in, and one Escape closes it. */
+export const OneEscapeClosesRightAfterOpening: Story = {
+  render: () => <MountsOpen />,
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.tab();
+    await userEvent.keyboard("{Enter}");
+    const el = dialogEl();
+    await waitFor(() => expect(el.open).toBe(true));
+    await waitFor(() => expect(canvas.getByRole("button", { name: "Reset" })).toHaveFocus());
+    await new Promise((r) => setTimeout(r, 450));
+    const shown = [...document.querySelectorAll(".cy-tooltip")].filter((t) => t.matches(":popover-open"));
+    await expect(shown).toEqual([]);
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() => expect(el.isConnected && el.open).toBe(false));
   },
 };

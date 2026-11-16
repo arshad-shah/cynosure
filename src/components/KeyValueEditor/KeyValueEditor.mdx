@@ -42,20 +42,30 @@ For multipart form fields, `allowFiles` adds a button to each row that picks a f
 
 <Canvas of={Stories.FileValuedRows} />
 
+## Letting the user mark a pair secret
+
+`rowTypes` adds a Type select to each row ("Type (token)"), so the user decides what a pair is: Text, or Secret, which masks the value and sets `secret: true` on the pair. With `allowFiles` it also offers File: choosing it opens the file picker, and choosing Text again takes the file away.
+
+```tsx
+<KeyValueEditor label="Variables" pairs={vars} onChange={setVars} rowTypes />
+```
+
+<Canvas of={Stories.UserMarksAPairSecret} />
+
 ## Props
 
 <ArgTypes of={Stories} />
 
 ## Behaviour and accessibility
 
-- **Names:** every field is named for its row ("Value (Authorization)"), and so are the checkbox ("Use Authorization") and the remove button ("Remove Authorization").
+- **Names:** every field is named for its row ("Value (Authorization)"), and so are the checkbox ("Use Authorization") the remove button ("Remove Authorization") and, with `rowTypes`, the Type select ("Type (Authorization)").
 - **Reordering:** drag a row's grip, or focus it and press Space, the arrows, then Space (Escape cancels); moves are announced.
 - **Focus:** Add focuses the new row's key field; removing a row focuses the row that took its place, or Add.
 - **Touch:** grips and buttons have 44px hit areas on touch screens.
 
 ## Theming
 
-Token: `--cy-key-value-editor-gap`. Rows, fields and buttons follow the SortableList, TextField and Button tokens.
+Tokens: `--cy-key-value-editor-gap`, and `--cy-key-value-editor-type-width` (the Type select's width with `rowTypes`, default 8rem). Rows, fields and buttons follow the SortableList, TextField and Button tokens.
 
 ## Related
 

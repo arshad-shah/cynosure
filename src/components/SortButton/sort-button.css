@@ -61,3 +61,10 @@
 .cy-sort-button-icon.cy-sort-button-icon {
   flex: none;
 }
+/* rank: the column's place among several sort keys, small and tabular after the icon. */
+.cy-sort-button-rank.cy-sort-button-rank {
+  flex: none;
+  font-size: var(--cy-font-size-xs);
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--cy-font-weight-medium);
+}

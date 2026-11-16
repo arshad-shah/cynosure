@@ -144,6 +144,32 @@ export const TooltipInsideClosesFirst: Story = {
   },
 };
 
+/**
+ * Opened from the keyboard, the popover moves focus to its first control, an IconButton: focus a script moved shows no
+ * tooltip, so one Escape closes the popover. Tab onto it later shows the tip.
+ */
+export const FocusMovedInOpensNoTooltip: Story = {
+  render: (args) => (
+    <Popover {...args} label="Tools" trigger={(p) => <Button {...p}>Tools</Button>}>
+      <IconButton icon={filter} label="Filter rows" />
+    </Popover>
+  ),
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const trigger = canvas.getByRole("button", { name: "Tools" });
+    await userEvent.tab();
+    await expect(trigger).toHaveFocus();
+    await userEvent.keyboard("{Enter}");
+    const dialog = await canvas.findByRole("dialog", { name: "Tools" });
+    await waitFor(() => expect(canvas.getByRole("button", { name: "Filter rows" })).toHaveFocus());
+    await new Promise((r) => setTimeout(r, 450));
+    const tip = canvasElement.ownerDocument.querySelector(".cy-tooltip") as HTMLElement;
+    await expect(isOpen(tip)).toBe(false);
+    await userEvent.keyboard("{Escape}");
+    await settledClosed(dialog);
+    await expect(trigger).toHaveFocus();
+  },
+};
+
 export const ModalKeepsTabInside: Story = {
   args: { modal: true },
   play: async ({ canvas, userEvent }) => {

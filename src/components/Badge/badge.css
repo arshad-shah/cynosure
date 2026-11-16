@@ -76,6 +76,20 @@
   }
 }
 
+/* onRemove: the remove IconButton (xs) sits in the badge's end padding, so the chip stays as tall as a small control. */
+.cy-badge-remove.cy-badge-remove {
+  flex: none;
+  margin-block: calc(var(--cy-space-2) * -1);
+  margin-inline: calc(var(--cy-space-1) * -1) calc(var(--cy-space-2) * -1);
+  font-size: var(--cy-font-size-md);
+  letter-spacing: normal;
+  text-transform: none;
+}
+.cy-badge[data-size="sm"] > .cy-badge-remove {
+  margin-block: calc(var(--cy-space-1) * -1);
+  margin-inline-end: calc(var(--cy-space-1) * -1);
+}
+
 .cy-badge-dot.cy-badge-dot {
   flex: none;
   inline-size: 0.6em;
@@ -98,6 +112,20 @@
   }
 }
 @media (forced-colors: active) {
+  /* onRemove: the remove IconButton (xs) sits in the badge's end padding, so the chip stays as tall as a small control. */
+  .cy-badge-remove.cy-badge-remove {
+    flex: none;
+    margin-block: calc(var(--cy-space-2) * -1);
+    margin-inline: calc(var(--cy-space-1) * -1) calc(var(--cy-space-2) * -1);
+    font-size: var(--cy-font-size-md);
+    letter-spacing: normal;
+    text-transform: none;
+  }
+  .cy-badge[data-size="sm"] > .cy-badge-remove {
+    margin-block: calc(var(--cy-space-1) * -1);
+    margin-inline-end: calc(var(--cy-space-1) * -1);
+  }
+
   .cy-badge-dot.cy-badge-dot {
     background: CanvasText;
   }

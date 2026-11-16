@@ -50,7 +50,11 @@ export const ARowPerItemWithAHandle: Story = {
 export const KeyboardPicksUpMovesAndDrops: Story = {
   play: async ({ args, canvas, canvasElement, userEvent }) => {
     const status = canvas.getByRole("status");
+    // Reached with Tab, so its tooltip shows (focus a script moves shows none).
     canvas.getByRole("button", { name: "Move Inbox" }).focus();
+    await userEvent.tab({ shift: true });
+    await userEvent.tab();
+    await expect(canvas.getByRole("button", { name: "Move Inbox" })).toHaveFocus();
     await userEvent.keyboard(" ");
     await expect(canvas.getByRole("button", { name: "Move Inbox" })).toHaveAttribute("aria-pressed", "true");
     await expect(status).toHaveTextContent("Inbox picked up. Position 1 of 4.");

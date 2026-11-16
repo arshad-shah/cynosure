@@ -8,6 +8,9 @@
   block-size: 100%;
   min-inline-size: 0;
   min-block-size: 0;
+  /* maxHeight sets --_max-block inline; declaring it here stops a nested area inheriting its parent's. */
+  --_max-block: var(--cy-scroll-area-max-height, none);
+  max-block-size: var(--_max-block);
 }
 .cy-scroll-area-viewport.cy-scroll-area-viewport {
   min-inline-size: 0;

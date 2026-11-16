@@ -146,6 +146,64 @@ export const FormValueRequiredAndReset: Story = {
   },
 };
 
+/**
+ * `emptyOption` is a first option for no value ("Any"): choosing it sets "" with no sentinel, the trigger shows its
+ * label, and the form submits "". It is reached by the keys and type-ahead like any option, and works with groups.
+ */
+export const EmptyOptionForNoValue: Story = {
+  render: (args) => (
+    <form data-testid="form">
+      <Select
+        {...args}
+        label="Level"
+        name="level"
+        emptyOption="Any level"
+        defaultValue="warn"
+        options={[
+          { value: "error", label: "Error", group: "Problems" },
+          { value: "warn", label: "Warning", group: "Problems" },
+          { value: "info", label: "Info", group: "Other" },
+        ]}
+      />
+    </form>
+  ),
+  play: async ({ args, canvas, canvasElement, userEvent }) => {
+    const form = canvas.getByTestId("form") as HTMLFormElement;
+    const trigger = canvas.getByRole("combobox", { name: "Level" });
+    await expect(trigger).toHaveTextContent("Warning");
+    // The empty option is first, outside the groups, and chosen with a click.
+    await userEvent.click(trigger);
+    await waitFor(() => expect(isOpen(list(canvasElement))).toBe(true));
+    const options = canvas.getAllByRole("option");
+    await expect(options[0]).toHaveAccessibleName("Any level");
+    await expect(options[0]?.closest('[role="group"]')).toBeNull();
+    await userEvent.click(canvas.getByRole("option", { name: "Any level" }));
+    await expect(args.onChange).toHaveBeenLastCalledWith("");
+    await expect(trigger).toHaveTextContent("Any level");
+    await expect(trigger.querySelector("[data-placeholder]")).toBeNull();
+    await expect(new FormData(form).get("level")).toBe("");
+    // Keyboard: it opens on the empty option (the current value), Down picks the next, Home goes back to it.
+    await userEvent.keyboard("{ArrowDown}");
+    await waitFor(() => expect(active(canvasElement)).toBe("Any level"));
+    await userEvent.keyboard("{ArrowDown}{Enter}");
+    await expect(args.onChange).toHaveBeenLastCalledWith("error");
+    await userEvent.keyboard("{ArrowDown}{Home}");
+    await expect(active(canvasElement)).toBe("Any level");
+    await userEvent.keyboard("{Enter}");
+    await expect(args.onChange).toHaveBeenLastCalledWith("");
+    // Type-ahead finds it by its label.
+    await userEvent.keyboard("i");
+    await waitFor(() => expect(active(canvasElement)).toBe("Info"));
+    await new Promise((r) => setTimeout(r, 600));
+    await userEvent.keyboard("a");
+    await expect(active(canvasElement)).toBe("Any level");
+    await userEvent.keyboard("{Escape}");
+    // Reset goes back to the default value.
+    form.reset();
+    await waitFor(() => expect(trigger).toHaveTextContent("Warning"));
+  },
+};
+
 function Controlled() {
   const [value, setValue] = useState("cherry");
   return (

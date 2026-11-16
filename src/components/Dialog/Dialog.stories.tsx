@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { useEffect, useRef, useState } from "react";
+import { StrictMode, useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { renderToStaticMarkup } from "react-dom/server";
 import { expect, fn, waitFor } from "storybook/test";
@@ -783,6 +783,97 @@ export const TouchCloseTarget: Story = {
     const hit = getComputedStyle(close, "::before");
     await expect(Number.parseFloat(hit.blockSize || hit.height)).toBeGreaterThanOrEqual(44);
     await userEvent.pointer({ keys: "[TouchA]", target: close });
+    await settledClosed(el);
+  },
+};
+
+/** A focus view open from the start (as tools' Pomodoro): the tooltips that could show on the way in. */
+function FocusView() {
+  const [open, setOpen] = useState(true);
+  return (
+    <>
+      <Button onClick={() => setOpen(true)}>Edit profile</Button>
+      <Dialog open={open} onOpenChange={setOpen} title="Focus view" titleHidden size="full">
+        <Button size="lg">Pause</Button>
+      </Dialog>
+    </>
+  );
+}
+
+const shownTips = () =>
+  [...document.querySelectorAll<HTMLElement>(".cy-tooltip")].filter((t) => t.matches(":popover-open"));
+
+/**
+ * Opening never leaves the close button's tooltip up: showModal focuses the close button for a moment before focus
+ * moves to the content, and that passing focus must not open a tip that then takes the first Escape. One Escape
+ * closes the dialog, opened with the keyboard or open from the start.
+ */
+export const OneEscapeClosesRightAfterOpening: Story = {
+  render: () => <FocusView />,
+  play: async ({ canvas, userEvent }) => {
+    const el = dialogEl();
+    await waitFor(() => expect(el.open).toBe(true));
+    await waitFor(() => expect(canvas.getByRole("button", { name: "Pause" })).toHaveFocus());
+    // Long enough for any delayed or warm-up opening to have happened.
+    await new Promise((r) => setTimeout(r, 450));
+    await expect(shownTips()).toEqual([]);
+    await userEvent.keyboard("{Escape}");
+    await settledClosed(el);
+
+    // Opened again from the keyboard (focus-visible everywhere): the same.
+    const trigger = canvas.getByRole("button", { name: "Edit profile" });
+    trigger.focus();
+    await userEvent.keyboard("{Enter}");
+    await waitFor(() => expect(el.open).toBe(true));
+    await waitFor(() => expect(canvas.getByRole("button", { name: "Pause" })).toHaveFocus());
+    await new Promise((r) => setTimeout(r, 450));
+    await expect(shownTips()).toEqual([]);
+    await userEvent.keyboard("{Escape}");
+    await settledClosed(el);
+    await expect(trigger).toHaveFocus();
+  },
+};
+
+function MountsOpen() {
+  const [shown, setShown] = useState(false);
+  return (
+    <StrictMode>
+      <Button onClick={() => setShown(true)}>Start focus</Button>
+      {shown && <FocusView />}
+    </StrictMode>
+  );
+}
+
+/** Mounted already open, from a key press, under StrictMode (effects run twice): still no tip, one Escape. */
+export const MountedOpenFromTheKeyboard: Story = {
+  render: () => <MountsOpen />,
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.tab();
+    await expect(canvas.getByRole("button", { name: "Start focus" })).toHaveFocus();
+    await userEvent.keyboard("{Enter}");
+    const el = dialogEl();
+    await waitFor(() => expect(el.open).toBe(true));
+    await waitFor(() => expect(canvas.getByRole("button", { name: "Pause" })).toHaveFocus());
+    await new Promise((r) => setTimeout(r, 450));
+    await expect(shownTips()).toEqual([]);
+    await userEvent.keyboard("{Escape}");
+    await settledClosed(el);
+  },
+};
+
+/** Tab to the close button shows its tooltip (keyboard focus); focus moved away by script hides it again. */
+export const CloseTooltipFollowsFocus: Story = {
+  render: () => <FocusView />,
+  play: async ({ canvas, userEvent }) => {
+    const el = dialogEl();
+    await waitFor(() => expect(canvas.getByRole("button", { name: "Pause" })).toHaveFocus());
+    await userEvent.tab({ shift: true });
+    const close = canvas.getByRole("button", { name: "Close" });
+    await expect(close).toHaveFocus();
+    await waitFor(() => expect(shownTips().map((t) => t.textContent)).toEqual(["Close"]));
+    canvas.getByRole("button", { name: "Pause" }).focus();
+    await waitFor(() => expect(shownTips()).toEqual([]));
+    await userEvent.keyboard("{Escape}");
     await settledClosed(el);
   },
 };

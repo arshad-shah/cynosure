@@ -59,6 +59,16 @@ The list has a maximum height and scrolls. Long labels truncate with an ellipsis
 - **`id`:** the trigger's id.
 - **Named and described from outside:** `aria-labelledby` names the trigger by other elements (a column heading) instead of its label; pair it with `labelHidden`. Your `aria-describedby` ids are read first, then the trigger's own description and error: they are merged, never replaced. The list is named by the same elements.
 
+## No value: "Any" or "None"
+
+`emptyOption` adds a first option for no value, with that label. Choosing it sets the value to `""`, so a filter needs no sentinel such as `"__any"`; the trigger then shows the label, not the placeholder, and a form submits `""`. It sits before any groups and is reached by the arrows, Home and type-ahead like any option. With `required` it still counts as no choice.
+
+```tsx
+<Select label="Level" emptyOption="Any level" value={level} onChange={setLevel} options={levels} />
+```
+
+<Canvas of={Stories.EmptyOptionForNoValue} />
+
 ## Trailing text, dimmed options and a footer action
 
 An option's `trailing` is drawn at the end of its row in the list, smaller and muted (a shortcut, a count); the trigger shows the label only. `dimmed` draws an option muted while it stays choosable. `footer` pins an action under the options, `{ label, icon?, onSelect }`: it is the last option the arrow keys reach (End and PageDown too), and Enter, Space or a press closes the list and runs it. The value does not change, and Tab passes over it.

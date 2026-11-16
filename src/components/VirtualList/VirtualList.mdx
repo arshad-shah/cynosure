@@ -88,6 +88,18 @@ const log = useRef<VirtualListHandle>(null);
 
 <Canvas of={Stories.SectionHeadingsStayPinned} />
 
+## Rows fetched by position, rows that expand
+
+`onRangeChange(start, end)` reports the rows in view (the first, and one past the last) whenever they change: on mount, on scrolling and on resizing, and never twice for the same rows. Use it when the rows live elsewhere (a log held in a worker, a server) and are fetched by position; render a placeholder for a row until it arrives.
+
+With `wrap`, every row is measured as it renders and again whenever its height changes, so a row that expands (details shown under it on `onAction`) pushes the rows after it down, and back when it closes.
+
+```tsx
+<VirtualList label="Log" items={slots} getKey={(s) => s.id} renderItem={(s) => s.line ?? "…"} wrap onRangeChange={(start, end) => worker.fetch(start, end)} />
+```
+
+<Canvas of={Stories.ExpandingRowsAreMeasuredAgain} />
+
 ## Props
 
 <ArgTypes of={Stories} />

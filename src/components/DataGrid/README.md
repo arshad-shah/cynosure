@@ -1,8 +1,9 @@
 # DataGrid
 
-A read-only grid for large results (query results, table data): only the rows and columns in view are rendered, so a
-hundred thousand rows by fifty columns scroll and move focus as quickly as twenty. It has a sticky header, sorting,
-resizable columns, row, cell or range selection copied as tab-separated text, and the APG grid keyboard. For a short,
+A grid for large results (query results, table data): only the rows and columns in view are rendered, so a
+hundred thousand rows by fifty columns scroll and move focus as quickly as twenty. It has a sticky header, sorting by
+one or several columns, column filters, cell editing, row details, resizable, movable and hideable columns, row, cell
+or range selection copied as tab-separated text, and the APG grid keyboard. For a short,
 semantic table use `Table`.
 
 ```tsx
@@ -32,23 +33,29 @@ const columns: DataGridColumn<Row>[] = fields.map((f) => ({
 />;
 ```
 
-| Prop                                                               | Default  | Notes                                                                                                                                  |
-| ------------------------------------------------------------------ | -------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| `label`                                                            | –        | Accessible name of the grid                                                                                                            |
-| `columns`                                                          | –        | `key`, `header`, `width`, `minWidth`, `maxWidth`, `align`, `sortable`, `resizable`, `cell`, `value`, `tooltip`, `cellKind`, `cellTone` |
-| `rows`, `getRowId`                                                 | –        | The data and a stable id per row                                                                                                       |
-| `sort` / `defaultSort` / `onSortChange`                            | unsorted | `TableSort` (`{ key, direction }`), shared with `Table`; `null` is unsorted                                                            |
-| `manualSort`                                                       | `false`  | You sort the rows (on a server); the grid shows and reports the sort                                                                   |
-| `onColumnResize`                                                   | –        | `(key, width)` after a drag of the header's edge or Alt+Left/Right on the header                                                       |
-| `selectionMode`                                                    | `none`   | `none` · `row` · `cell` · `range`                                                                                                      |
-| `selected` / `defaultSelected` / `onSelectionChange`               | `[]`     | Row ids, with `selectionMode="row"`                                                                                                    |
-| `selectedRange` / `defaultSelectedRange` / `onSelectedRangeChange` | `null`   | `{ anchor, focus }`, each `{ rowId, key }`, with `cell` or `range`                                                                     |
-| `onRowClick`                                                       | –        | A cell of the row was clicked or tapped                                                                                                |
-| `onAction`                                                         | –        | Enter on a cell, or a double-click                                                                                                     |
-| `onEndReached`                                                     | –        | The last rows came into view (once per row count): append the next rows                                                                |
-| `size`                                                             | `md`     | `sm` is dense (28px rows under a 32px header)                                                                                          |
-| `labels`                                                           | –        | `empty`: the message when there are no rows                                                                                            |
-| `className` / `style`                                              | –        | Layout only (`blockSize` sets the height)                                                                                              |
+| Prop                                                               | Default  | Notes                                                                                                                                                                                      |
+| ------------------------------------------------------------------ | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `label`                                                            | –        | Accessible name of the grid                                                                                                                                                                |
+| `columns`                                                          | –        | `key`, `header`, `label`, `width`, `minWidth`, `maxWidth`, `align`, `sortable`, `resizable`, `cell`, `value`, `tooltip`, `cellKind`, `cellTone`, `editable`, `editor`, `options`, `filter` |
+| `rows`, `getRowId`                                                 | –        | The data and a stable id per row                                                                                                                                                           |
+| `sort` / `defaultSort` / `onSortChange`                            | unsorted | `TableSort` (`{ key, direction }`), shared with `Table`; `null` is unsorted                                                                                                                |
+| `multiSort`, `sorts` / `defaultSorts` / `onSortsChange`            | –        | Shift+click or Shift+Enter adds a sort key; sorted headers show their priority                                                                                                             |
+| `filters` / `defaultFilters` / `onFiltersChange`, `manualFilter`   | `{}`     | The filter row's text by column key (columns with `filter`)                                                                                                                                |
+| `columnMenu`                                                       | `false`  | A menu per header (button, Alt+Down, Shift+F10): sort, move left/right, hide, show columns                                                                                                 |
+| `columnOrder` / `hiddenColumns` (+ defaults and `on…Change`)       | –        | Column keys in display order; hidden column keys                                                                                                                                           |
+| `renderRowDetails`, `expandedRows` / `onExpandedRowsChange`        | –        | A toggle column that opens a measured panel under the row                                                                                                                                  |
+| `onCellEdit`                                                       | –        | `(row, key, value)` after an edit of an `editable` column                                                                                                                                  |
+| `manualSort`                                                       | `false`  | You sort the rows (on a server); the grid shows and reports the sort                                                                                                                       |
+| `onColumnResize`                                                   | –        | `(key, width)` after a drag of the header's edge or Alt+Left/Right on the header                                                                                                           |
+| `selectionMode`                                                    | `none`   | `none` · `row` · `cell` · `range`                                                                                                                                                          |
+| `selected` / `defaultSelected` / `onSelectionChange`               | `[]`     | Row ids, with `selectionMode="row"`                                                                                                                                                        |
+| `selectedRange` / `defaultSelectedRange` / `onSelectedRangeChange` | `null`   | `{ anchor, focus }`, each `{ rowId, key }`, with `cell` or `range`                                                                                                                         |
+| `onRowClick`                                                       | –        | A cell of the row was clicked or tapped                                                                                                                                                    |
+| `onAction`                                                         | –        | Enter on a cell, or a double-click                                                                                                                                                         |
+| `onEndReached`                                                     | –        | The last rows came into view (once per row count): append the next rows                                                                                                                    |
+| `size`                                                             | `md`     | `sm` is dense (28px rows under a 32px header)                                                                                                                                              |
+| `labels`                                                           | –        | `empty`, `edit(name)`, `invalidNumber`, `filter(name)`, `filterPlaceholder`, `columnMenu(name)`, menu items, `sortRank(n)`, `showDetails`, `hideDetails`, `details`                        |
+| `className` / `style`                                              | –        | Layout only (`blockSize` sets the height)                                                                                                                                                  |
 
 Columns: `width` is in CSS pixels (default 160; a new value replaces a width the user dragged). `cell` formats the
 value (default: the value as text); `value` is the raw value sorting compares and copying writes (default `row[key]`).
@@ -58,6 +65,13 @@ tone (`accent`, `neutral`, `danger`, `success`, `warning`, `info`), over the kin
 
 Paging is not built in: put a `Pagination` under the grid and give the grid one page of rows. For "load more", append
 rows in `onEndReached`.
+
+Editing: `editable` (or `(row) => boolean`) and `editor` (`text`, `number`, `select` with `options`). Enter or F2 edits
+the focused cell, a character starts the field with it, a double-click edits; Enter commits, Tab commits and moves on,
+Escape cancels, leaving commits. A number editor gives a number or null and refuses other text.
+
+Filters: `filter: "text"` (contains, ignoring case), `"number"` (`40`, `>30`, `<=40`, `30..40`) or `(row, query) =>
+boolean`, in a row of fields under the header, reached with Tab.
 
 ## Behaviour
 
@@ -87,3 +101,4 @@ rows in `onEndReached`.
 - `--cy-data-grid-cell-padding`: Inline padding of a cell.
 - `--cy-data-grid-null-color`: Text colour of cells whose cellKind is "null" (an empty value).
 - `--cy-data-grid-number-color`: Text colour of cells whose cellKind is "number".
+- `--cy-data-grid-details-background`: background of an open row's details panel.

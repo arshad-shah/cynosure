@@ -186,3 +186,26 @@ export const TouchHitArea: Story = {
     await expect(args.onClick).toHaveBeenCalledTimes(1);
   },
 };
+
+/**
+ * `rank`: one of several sort keys shows its place, small and hidden from assistive technology (say it in the label);
+ * `onClick` gets the event, so a Shift+click can add a sort key.
+ */
+export const RankAndShiftClick: Story = {
+  args: { direction: "descending", rank: 2 },
+  play: async ({ args, canvas, canvasElement, userEvent }) => {
+    const button = canvas.getByRole("button", { name: "Name" });
+    const rank = canvasElement.querySelector(".cy-sort-button-rank") as HTMLElement;
+    await expect(rank).toHaveTextContent("2");
+    await expect(rank).toHaveAttribute("aria-hidden", "true");
+    // Smaller than the label.
+    await expect(Number.parseFloat(getComputedStyle(rank).fontSize)).toBeLessThan(
+      Number.parseFloat(getComputedStyle(button).fontSize),
+    );
+    await userEvent.keyboard("{Shift>}");
+    await userEvent.click(button);
+    await userEvent.keyboard("{/Shift}");
+    const click = (args.onClick as ReturnType<typeof fn>).mock.lastCall?.[0] as MouseEvent;
+    await expect(click.shiftKey).toBe(true);
+  },
+};

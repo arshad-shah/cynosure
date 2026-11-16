@@ -73,6 +73,18 @@ Actions show while their row is hovered, focused or selected, and always on scre
 
 <Canvas of={Stories.FilterShowsMatchesWithTheirAncestors} />
 
+## Search without filtering, and revealing an item
+
+`highlight` marks a query in every shown label, ignoring case, without hiding or opening anything: the tree stays whole while people step through the matches. To show an item chosen elsewhere (the next match, a node picked on a map, a link), call `handle.reveal(id, { align })`: it opens the item's closed ancestors (through `onExpandedChange`), scrolls it into view, in a virtual tree too, and makes it the tree's tab stop without taking focus. `align` is `nearest` (default), `start` or `center`. It returns false for an id the tree does not hold (only known children are searched).
+
+```tsx
+<Tree label="Document" items={nodes} virtual highlight={query} handle={tree} selected={[hit]} />
+// next match
+setHit(next); tree.current?.reveal(next, { align: "center" });
+```
+
+<Canvas of={Stories.RevealOpensAncestorsAndScrolls} />
+
 ## Loading from a store
 
 When children are fetched somewhere else (a store), put them in `children` when they arrive and say what is happening with `loadingIds` and `errorIds`. `onRetry` is called when a failed item is retried; `renderError(item, retry)` and `renderEmpty(item)` draw the error row and the row under an open item with no children. With `loadChildren`, the `handle`'s `reload(id)` loads an item's children again.

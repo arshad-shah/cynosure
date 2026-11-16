@@ -14,6 +14,7 @@ import { star } from "../../icons/star.js";
 import { users } from "../../icons/users.js";
 import { contrast } from "../../test/color.js";
 import { computeUnderHostileHost } from "../../test/hostile.js";
+import { focusWithTab } from "../../test/keys.js";
 import { shownFully } from "../../test/settle.js";
 import { CynosureTheme } from "../../theme/CynosureTheme.js";
 import { Badge } from "../Badge/Badge.js";
@@ -687,7 +688,7 @@ export const AnActivityBar: Story = {
     await expect(notify).toHaveBeenCalledTimes(1);
     await expect(args.onNavigate).toHaveBeenCalledTimes(1);
     // Tooltips sit on the inline end, away from the window edge.
-    settingsRow.focus();
+    focusWithTab(settingsRow);
     await waitFor(() => expect(tipOf(settingsRow).matches(":popover-open")).toBe(true));
     await shownFully(tipOf(settingsRow));
     await expect(rect(tipOf(settingsRow)).left).toBeGreaterThanOrEqual(rect(settingsRow).right);
@@ -731,12 +732,12 @@ export const ARailOnTheEnd: Story = {
     await expect(bar.right).toBe("0px");
     await expect(bar.left).not.toBe("0px");
     // Tooltips open towards the inline start.
-    searchRow.focus();
+    focusWithTab(searchRow);
     await waitFor(() => expect(tipOf(searchRow).matches(":popover-open")).toBe(true));
     await shownFully(tipOf(searchRow));
     await expect(rect(tipOf(searchRow)).right).toBeLessThanOrEqual(rect(searchRow).left);
     const bellButton = canvas.getByRole("button", { name: "Notifications" });
-    bellButton.focus();
+    focusWithTab(bellButton);
     await waitFor(() => expect(tipOf(bellButton).matches(":popover-open")).toBe(true));
     await shownFully(tipOf(bellButton));
     await expect(rect(tipOf(bellButton)).right).toBeLessThanOrEqual(rect(bellButton).left);

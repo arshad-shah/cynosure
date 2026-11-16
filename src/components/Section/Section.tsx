@@ -1,5 +1,11 @@
 import { type AriaRole, type CSSProperties, forwardRef, type ReactNode } from "react";
-import { type LayoutAttributes, type Space, space } from "../../foundations/layout.js";
+import {
+  type BlockProps,
+  type LayoutAttributes,
+  type Space,
+  space,
+  useBlock,
+} from "../../foundations/layout.js";
 import { Container, type ContainerProps } from "../Container/Container.js";
 
 export interface SectionTokens {
@@ -19,7 +25,7 @@ declare module "../../tokens/schema.js" {
   }
 }
 
-export interface SectionProps extends LayoutAttributes {
+export interface SectionProps extends BlockProps, LayoutAttributes {
   /**
    * The band's background: `plain` (none, the page shows through), `surface`, `soft` (a quiet tint) or `accent` (a
    * soft tint of the accent colour). Text colours stay readable on each. Default "plain".
@@ -65,6 +71,8 @@ export const Section = forwardRef<HTMLElement, SectionProps>(function Section(
     contained = true,
     size = "lg",
     as = "section",
+    inert,
+    disabled,
     className,
     style,
     children,
@@ -73,12 +81,14 @@ export const Section = forwardRef<HTMLElement, SectionProps>(function Section(
   ref,
 ) {
   const Tag = as;
+  const block = useBlock(ref, { inert, disabled });
   const vars = paddingBlock ? { "--_pad-block": space(paddingBlock) } : {};
   return (
     <Tag
-      // One component, several elements: the ref is the element's own, typed as the common HTMLElement.
-      ref={ref as never}
       {...rest}
+      // One component, several elements: the ref is the element's own, typed as the common HTMLElement.
+      ref={block.ref as never}
+      data-cy-disabled={block["data-cy-disabled"]}
       className={`cy-section${className ? ` ${className}` : ""}`}
       data-variant={variant}
       style={{ ...vars, ...style } as CSSProperties}

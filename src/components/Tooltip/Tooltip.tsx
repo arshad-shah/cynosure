@@ -9,6 +9,7 @@ import {
   useState,
 } from "react";
 import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js";
+import { deepActiveElement } from "../../foundations/focus.js";
 import { useDismiss } from "../../overlay/dismiss.js";
 import { usePopover } from "../../overlay/floating.js";
 import type { Placement } from "../../overlay/position.js";
@@ -35,7 +36,7 @@ export interface TooltipProps {
   /** Preferred side; flips when it does not fit. Default "top". */
   placement?: Placement;
   /**
-   * Hover delay in ms (focus opens immediately). `0` opens it at once, for toolbars. Skipped while another tooltip is
+   * Hover delay in ms (keyboard focus opens it on the next frame). `0` opens it at once, for toolbars. Skipped while another tooltip is
    * shown or closed less than 300 ms ago (moving along a toolbar). Default 300.
    */
   delay?: number;
@@ -80,6 +81,28 @@ const isWarm = () => {
 };
 
 /**
+ * The last key pressed in each document, and when, if it moves focus (Tab, the arrows, Home, End, Page Up/Down). A
+ * tip opens on focus only when such a key, the last one pressed, moved it there: focus a script moves (a dialog or
+ * popover focusing its first control after Enter, focus returning to a trigger after Escape) is not the user reaching
+ * for the control.
+ */
+const NAVIGATION_KEYS = /^(Tab|Arrow(Up|Down|Left|Right)|Home|End|PageUp|PageDown)$/;
+const NAVIGATION_MS = 500;
+const navigatedAt = new WeakMap<Document, number>();
+function watchNavigation(doc: Document) {
+  if (navigatedAt.has(doc)) return;
+  navigatedAt.set(doc, Number.NEGATIVE_INFINITY);
+  doc.addEventListener(
+    "keydown",
+    (event) =>
+      navigatedAt.set(doc, NAVIGATION_KEYS.test(event.key) ? performance.now() : Number.NEGATIVE_INFINITY),
+    true,
+  );
+}
+const navigatedJustNow = (doc: Document) =>
+  performance.now() - (navigatedAt.get(doc) ?? Number.NEGATIVE_INFINITY) < NAVIGATION_MS;
+
+/**
  * Whether the text `whenTruncated` names is cut short: measured after every render (the text may change while the box
  * keeps its width) and, through one ResizeObserver, whenever its box is resized (the window, a neighbour). Off: false.
  */
@@ -106,7 +129,8 @@ function useTruncated(whenTruncated: TooltipProps["whenTruncated"], trigger: () 
 
 /**
  * Tooltip in the top layer (Popover API), positioned against its trigger. Opens on hover after `delay` and on
- * keyboard focus; dismissible with Escape; hoverable; never opens on touch (WCAG 1.4.13).
+ * keyboard focus (focus moved by Tab, the arrows, Home or End; never focus a script moves), closing when focus leaves
+ * by any route; dismissible with Escape; hoverable; never opens on touch (WCAG 1.4.13).
  */
 export function Tooltip({
   content,
@@ -127,6 +151,10 @@ export function Tooltip({
   const triggerRef = useRef<HTMLElement | null>(null);
   // Focus that follows a pointer press (mouse or touch) is not keyboard focus: hover handles mouse, touch never opens.
   const pointerFocus = useRef(false);
+  // The pointer is over the trigger or the tip: focus leaving does not close a tip the pointer still holds open.
+  const hovered = useRef(false);
+  // The frame after a keyboard focus, when the tip opens if the trigger still has it (see onFocus).
+  const focusFrame = useRef(0);
 
   const cut = useTruncated(whenTruncated, trigger);
   const disabled = off || (whenTruncated ? !cut : false);
@@ -144,7 +172,29 @@ export function Tooltip({
     timer.current = setTimeout(() => setOpen(false), wait);
   }, []);
 
-  useEffect(() => () => clearTimeout(timer.current), []);
+  useEffect(() => {
+    const doc = anchor.current?.ownerDocument;
+    if (doc) watchNavigation(doc);
+  }, []);
+  useEffect(
+    () => () => {
+      clearTimeout(timer.current);
+      cancelAnimationFrame(focusFrame.current);
+    },
+    [],
+  );
+  // While shown, focus moving anywhere outside the trigger closes it, by any route: a click elsewhere, a script's
+  // focus(), a dialog moving focus in. Only the pointer resting on the trigger or the tip keeps it.
+  useEffect(() => {
+    if (!open) return;
+    const root = anchor.current?.ownerDocument;
+    const onFocusIn = () => {
+      const active = deepActiveElement(root);
+      if (!hovered.current && !(active && anchor.current?.contains(active))) hide();
+    };
+    root?.addEventListener("focusin", onFocusIn, true);
+    return () => root?.removeEventListener("focusin", onFocusIn, true);
+  }, [open, hide]);
   // Counted while shown, for the warm-up; closing (or unmounting while shown) starts the warm window.
   useEffect(() => {
     const el = tip.current;
@@ -175,19 +225,43 @@ export function Tooltip({
     <span
       ref={anchor}
       className={className ? `cy-tooltip-anchor ${className}` : "cy-tooltip-anchor"}
-      onPointerEnter={(e) => e.pointerType !== "touch" && show(delay)}
-      onPointerLeave={() => hide(120)}
+      onPointerEnter={(e) => {
+        if (e.pointerType === "touch") return;
+        hovered.current = true;
+        show(delay);
+      }}
+      onPointerLeave={() => {
+        hovered.current = false;
+        hide(120);
+      }}
       onPointerDown={() => {
         pointerFocus.current = true;
         hide();
       }}
       onFocus={(e) => {
-        if (!pointerFocus.current && (e.target as HTMLElement).matches(":focus-visible")) show(0);
+        const target = e.target as HTMLElement;
+        const keyboard =
+          !pointerFocus.current && target.matches(":focus-visible") && navigatedJustNow(target.ownerDocument);
         pointerFocus.current = false;
+        if (!keyboard) return;
+        // Only focus a navigation key moved here opens it (watchNavigation), and only if the trigger still has focus
+        // on the next frame: focus that only passes through (a modal dialog's showModal focusing its close button
+        // before the dialog moves focus to its content) opens nothing, so it never leaves a tip up that would take the
+        // first Escape.
+        cancelAnimationFrame(focusFrame.current);
+        focusFrame.current = requestAnimationFrame(() => {
+          if (
+            target.isConnected &&
+            deepActiveElement(target.ownerDocument) === target &&
+            target.matches(":focus-visible")
+          )
+            show(0);
+        });
       }}
       onBlur={() => {
         pointerFocus.current = false;
-        hide();
+        cancelAnimationFrame(focusFrame.current);
+        if (!hovered.current) hide();
       }}
     >
       {disabled || !describe

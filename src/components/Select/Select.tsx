@@ -5,6 +5,7 @@ import {
   type ReactNode,
   useCallback,
   useId,
+  useMemo,
   useRef,
   useState,
 } from "react";
@@ -87,6 +88,12 @@ export interface SelectProps extends FieldLayoutProps {
   onChange?: (value: string) => void;
   /** Shown while nothing is chosen. Default "Select…". */
   placeholder?: string;
+  /**
+   * A first option meaning "no value" ("Any", "None"), with this label: choosing it sets the value to `""` (no
+   * sentinel value), the trigger then shows this label, and a form submits `""`. It sits before the groups and is
+   * reached by the keys and type-ahead like any option. With `required` it still counts as no choice.
+   */
+  emptyOption?: string | undefined;
   /** Submits the value with its form under this name. */
   name?: string;
   /** The form will not submit until a value is chosen; also draws the required marker. */
@@ -142,7 +149,8 @@ export function Select({
   layout,
   width,
   error,
-  options,
+  options: given,
+  emptyOption,
   footer,
   value,
   defaultValue = "",
@@ -161,6 +169,11 @@ export function Select({
   style,
 }: SelectProps) {
   const iconSize = iconSizeFor(size);
+  // The empty option is one more option before the others, with the value "".
+  const options = useMemo(
+    () => (emptyOption === undefined ? given : [{ value: "", label: emptyOption }, ...given]),
+    [given, emptyOption],
+  );
   const listId = `cy-select-${useId().replace(/:/g, "")}`;
   const trigger = useRef<HTMLButtonElement | null>(null);
   const list = useRef<HTMLDivElement | null>(null);
