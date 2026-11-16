@@ -7,7 +7,16 @@ import { CynosureTheme } from "../../theme/CynosureTheme.js";
 import { Badge } from "../Badge/Badge.js";
 import { Button } from "../Button/Button.js";
 import { Stack } from "../Stack/Stack.js";
-import { Table, type TableColumn } from "./Table.js";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  type TableColumn,
+  TableFoot,
+  TableHead,
+  TableHeaderCell,
+  TableRow,
+} from "./Table.js";
 
 interface Member {
   id: string;
@@ -373,5 +382,216 @@ export const StableUnderHostileHost: Story = {
       const { clean, hostile } = computeUnderHostileHost(canvasElement, selector, props);
       await expect({ selector, ...hostile }).toEqual({ selector, ...clean });
     }
+  },
+};
+
+/** The same members written as markup: the compound form. */
+function StaticMembers({ selected = "", sticky = false }: { selected?: string; sticky?: boolean }) {
+  const [sort, setSort] = useState<"ascending" | "descending" | "none">("none");
+  const rows =
+    sort === "none"
+      ? ROWS
+      : [...ROWS].sort((a, b) => (sort === "ascending" ? 1 : -1) * a.name.localeCompare(b.name));
+  return (
+    <Table caption="Members, by hand" stickyHeader={sticky} data-testid="static">
+      <TableHead>
+        <TableRow>
+          <TableHeaderCell
+            sort={sort}
+            onSort={() =>
+              setSort(sort === "ascending" ? "descending" : sort === "descending" ? "none" : "ascending")
+            }
+          >
+            Name
+          </TableHeaderCell>
+          <TableHeaderCell>Role</TableHeaderCell>
+          <TableHeaderCell align="end" width="6rem">
+            Seats
+          </TableHeaderCell>
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        {rows.map((m) => (
+          <TableRow key={m.id} selected={m.id === selected} data-id={m.id}>
+            <TableHeaderCell>{m.name}</TableHeaderCell>
+            <TableCell>
+              <Badge>{m.role}</Badge>
+            </TableCell>
+            <TableCell align="end">{m.seats ?? "–"}</TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+      <TableFoot>
+        <TableRow>
+          <TableHeaderCell colSpan={2}>Total</TableHeaderCell>
+          <TableCell align="end">112</TableCell>
+        </TableRow>
+      </TableFoot>
+    </Table>
+  );
+}
+
+export const CompoundFormIsTheSameTable: Story = {
+  render: (args) => (
+    <Stack gap="6">
+      <Table {...args} />
+      <StaticMembers selected="2" />
+    </Stack>
+  ),
+  play: async ({ canvas }) => {
+    const table = canvas.getByRole("table", { name: "Members, by hand" });
+    // Headers in the head are column headers; in the body and foot, row headers.
+    await expect(
+      within(table)
+        .getAllByRole("columnheader")
+        .map((h) => h.textContent),
+    ).toEqual(["Name", "Role", "Seats"]);
+    await expect(
+      within(table)
+        .getAllByRole("rowheader")
+        .map((h) => h.textContent),
+    ).toEqual(["Grace", "ada", "Linus", "Barbara", "Total"]);
+    await expect(within(table).getByRole("rowheader", { name: "Total" })).toHaveAttribute("colspan", "2");
+    // It looks like the data-driven table: the same paddings, header background, row lines and alignment.
+    const data = canvas.getByRole("table", { name: "Team members" });
+    const look = (el: Element) => {
+      const s = getComputedStyle(el);
+      return [
+        s.paddingTop,
+        s.paddingInlineStart,
+        s.backgroundColor,
+        s.borderBottomWidth,
+        s.fontSize,
+        s.fontWeight,
+        s.color,
+      ];
+    };
+    const head = (t: HTMLElement) => within(t).getAllByRole("columnheader")[1] as HTMLElement;
+    await expect(look(head(table))).toEqual(look(head(data)));
+    const rowHeader = (t: HTMLElement) => within(t).getAllByRole("rowheader")[0] as HTMLElement;
+    await expect(look(rowHeader(table))).toEqual(look(rowHeader(data)));
+    const cell = (t: HTMLElement) => within(t).getAllByRole("cell")[0] as HTMLElement;
+    await expect(look(cell(table))).toEqual(look(cell(data)));
+    await expect(getComputedStyle(within(table).getAllByRole("cell")[1] as HTMLElement).textAlign).toBe(
+      "end",
+    );
+    await expect(getComputedStyle(table.closest(".cy-table") as Element).borderTopWidth).toBe(
+      getComputedStyle(data.closest(".cy-table") as Element).borderTopWidth,
+    );
+    // A selected row takes the selected background; its id and data-* attributes reach the row.
+    const ada = table.querySelector('[data-id="2"]') as HTMLElement;
+    await expect(ada).toHaveAttribute("data-selected");
+    await expect(getComputedStyle(ada.children[1] as Element).backgroundColor).not.toBe(
+      getComputedStyle(table.querySelector('[data-id="1"]')?.children[1] as Element).backgroundColor,
+    );
+    // The last body row has no line under it; the foot has a line above it.
+    const lastBody = table.querySelector("tbody tr:last-child td") as HTMLElement;
+    await expect(getComputedStyle(lastBody).borderBottomWidth).toBe("0px");
+    const foot = table.querySelector("tfoot td") as HTMLElement;
+    await expect(Number.parseFloat(getComputedStyle(foot).borderTopWidth)).toBeGreaterThan(0);
+    // `width` sizes the column.
+    await expect((within(table).getAllByRole("columnheader")[2] as HTMLElement).style.inlineSize).toBe(
+      "6rem",
+    );
+  },
+};
+
+export const CompoundFormSortsWithSortButtons: Story = {
+  render: () => <StaticMembers />,
+  play: async ({ canvas, userEvent }) => {
+    const table = canvas.getByRole("table", { name: "Members, by hand" });
+    const name = within(table).getByRole("columnheader", { name: /Name/ });
+    await expect(name).toHaveAttribute("aria-sort", "none");
+    // Only the header given `onSort` is a button; the others say nothing about sorting.
+    await expect(within(table).getAllByRole("button")).toHaveLength(1);
+    await expect(within(table).getByRole("columnheader", { name: "Role" })).not.toHaveAttribute("aria-sort");
+    await userEvent.click(within(name).getByRole("button"));
+    await expect(name).toHaveAttribute("aria-sort", "ascending");
+    await expect(within(table).getAllByRole("rowheader")[0]).toHaveTextContent("ada");
+    // Keyboard: the sort button is reachable and Enter presses it.
+    within(name).getByRole("button").focus();
+    await userEvent.keyboard("{Enter}");
+    await expect(name).toHaveAttribute("aria-sort", "descending");
+    await expect(within(table).getAllByRole("rowheader")[0]).toHaveTextContent("Linus");
+  },
+};
+
+export const CompoundFormStickyHeaderAndSize: Story = {
+  render: () => (
+    <Stack gap="6">
+      <div style={{ "--cy-table-max-height": "8rem" } as CSSProperties}>
+        <StaticMembers sticky />
+      </div>
+      <Table caption="Small" size="sm">
+        <TableBody>
+          <TableRow>
+            <TableCell>One</TableCell>
+          </TableRow>
+        </TableBody>
+      </Table>
+    </Stack>
+  ),
+  play: async ({ canvas, userEvent }) => {
+    // The sticky form scrolls inside a focusable region named by the caption, and the header stays at the top.
+    const region = canvas.getByRole("region", { name: "Members, by hand" });
+    await userEvent.tab();
+    await expect(region).toHaveFocus();
+    region.scrollTop = 40;
+    const header = within(region).getAllByRole("columnheader")[1] as HTMLElement;
+    await waitFor(() =>
+      expect(Math.abs(header.getBoundingClientRect().top - region.getBoundingClientRect().top)).toBeLessThan(
+        2,
+      ),
+    );
+    // `size` sets the density of the written cells too.
+    const small = within(canvas.getByRole("table", { name: "Small" })).getByRole("cell");
+    await expect(Number.parseFloat(getComputedStyle(small).fontSize)).toBeLessThan(
+      Number.parseFloat(getComputedStyle(within(region).getAllByRole("cell")[0] as Element).fontSize),
+    );
+  },
+};
+
+export const CompoundFormHeadersAndCorners: Story = {
+  render: () => (
+    <Table caption="Seats by quarter" className="layout-mine">
+      <TableHead>
+        <TableRow selected>
+          <TableCell />
+          <TableHeaderCell scope="colgroup" colSpan={2} className="mine">
+            2026
+          </TableHeaderCell>
+        </TableRow>
+        <TableRow>
+          <TableCell />
+          <TableHeaderCell sort="descending">Q1</TableHeaderCell>
+          <TableHeaderCell>Q2</TableHeaderCell>
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        <TableRow>
+          <TableHeaderCell scope="row">Seats</TableHeaderCell>
+          <TableCell align="end" rowSpan={1}>
+            10
+          </TableCell>
+          <TableCell align="end">12</TableCell>
+        </TableRow>
+      </TableBody>
+    </Table>
+  ),
+  play: async ({ canvas }) => {
+    const table = canvas.getByRole("table", { name: "Seats by quarter" });
+    await expect(table.closest(".cy-table")).toHaveClass("layout-mine");
+    const year = within(table).getByRole("columnheader", { name: "2026" });
+    await expect(year).toHaveAttribute("scope", "colgroup");
+    await expect(year).toHaveClass("mine");
+    // `selected` marks body rows only.
+    await expect(year.closest("tr")).not.toHaveAttribute("data-selected");
+    // A sort shown without `onSort` is announced but is no button (the app sorts elsewhere).
+    const q1 = within(table).getByRole("columnheader", { name: "Q1" });
+    await expect(q1).toHaveAttribute("aria-sort", "descending");
+    await expect(within(table).queryByRole("button")).toBeNull();
+    // An empty corner cell in the head looks like a header cell.
+    const corner = table.querySelector("thead td") as HTMLElement;
+    await expect(getComputedStyle(corner).backgroundColor).toBe(getComputedStyle(q1).backgroundColor);
   },
 };

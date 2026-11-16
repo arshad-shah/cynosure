@@ -46,13 +46,52 @@ With `stickyHeader` the body scrolls inside the table up to `--cy-table-max-heig
 
 <Canvas of={Stories.StickyHeaderScrolls} />
 
+## Written as markup
+
+When the rows are not a list of records (a few fixed rows, cells that differ row by row, a totals row), write them with the compound form instead of `columns` and `rows`. It is the same table, with the same stylesheet and look; `caption`, `captionHidden`, `stickyHeader` and `size` work the same.
+
+```tsx
+import { Table, TableBody, TableCell, TableFoot, TableHead, TableHeaderCell, TableRow } from "@arshad-shah/cynosure";
+
+<Table caption="Invoice">
+  <TableHead>
+    <TableRow>
+      <TableHeaderCell>Item</TableHeaderCell>
+      <TableHeaderCell align="end" width="8rem">Price</TableHeaderCell>
+    </TableRow>
+  </TableHead>
+  <TableBody>
+    {lines.map((line) => (
+      <TableRow key={line.id} selected={line.id === chosen}>
+        <TableHeaderCell>{line.name}</TableHeaderCell>
+        <TableCell align="end">{line.price}</TableCell>
+      </TableRow>
+    ))}
+  </TableBody>
+  <TableFoot>
+    <TableRow>
+      <TableHeaderCell>Total</TableHeaderCell>
+      <TableCell align="end">{total}</TableCell>
+    </TableRow>
+  </TableFoot>
+</Table>
+```
+
+- `TableHeaderCell` is a column header in `TableHead` and a row header in `TableBody` and `TableFoot` (`scope` overrides it). `width` sizes its column.
+- `sort` and `onSort` make a header a [SortButton](?path=/docs/components-controls-sortbutton--docs) with `aria-sort`; you sort the rows. `sort` alone announces a sort made elsewhere.
+- `TableRow selected` takes the selected background (body rows). `align`, `colSpan` and `rowSpan` work on both kinds of cell.
+- `TableFoot` is set apart by a line above it.
+- Every part takes `id`, `data-*`, `className` (layout) and a `ref`. A part used outside its place throws an error naming where it belongs.
+
+<Canvas of={Stories.CompoundFormIsTheSameTable} />
+
 ## Props
 
 <ArgTypes of={Stories} />
 
 ## Behaviour and accessibility
 
-- **Semantics:** a native table with a caption; column headers, and a row header per row (the first column, or the one marked `rowHeader`), so screen readers announce context with every cell.
+- **Semantics:** a native table with a caption; column headers, and a row header per row (the first column, or the one marked `rowHeader`; in the compound form, each `TableHeaderCell` in the body), so screen readers announce context with every cell.
 - **Sorting:** sortable headers carry `aria-sort` and contain a button; Enter or Space sorts.
 - **Selection:** native checkboxes in the first column; Space toggles; the select-all reports "mixed".
 - **Empty:** one cell across all columns says so (`labels.empty`).
