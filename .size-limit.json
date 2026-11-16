@@ -786,5 +786,11 @@
     "path": ["dist/components/ColorSample/ColorSample.js", "dist/styles/color-sample.css"],
     "limit": "3 kB",
     "gzip": true
+  },
+  {
+    "name": "CanvasStage (JS + CSS)",
+    "path": ["dist/components/CanvasStage/CanvasStage.js", "dist/styles/canvas-stage.css"],
+    "limit": "3 kB",
+    "gzip": true
   }
 ]

@@ -66,6 +66,12 @@ export {
   isISODate,
   toISODate,
 } from "./components/Calendar/index.js";
+export {
+  CanvasStage,
+  type CanvasStageLabels,
+  type CanvasStageProps,
+  type CanvasStageTokens,
+} from "./components/CanvasStage/index.js";
 export { Card, type CardProps, type CardTokens } from "./components/Card/index.js";
 export {
   ChatMessage,
