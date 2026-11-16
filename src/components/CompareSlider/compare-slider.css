@@ -20,6 +20,18 @@
   user-select: none;
   cursor: ew-resize;
   touch-action: pan-y;
+  /* Zoomed past the frame: a press pans (a finger too) and the view is a tab stop with its own ring. */
+  &[data-pannable] {
+    cursor: grab;
+    touch-action: none;
+  }
+  &[data-panning] {
+    cursor: grabbing;
+  }
+  &:focus-visible {
+    outline: var(--cy-border-focus) solid var(--cy-color-ring);
+    outline-offset: var(--cy-border-focus);
+  }
 }
 /* Boxed: the frame takes the shape of the first picture (set from script as --_ratio), and both sides fill it. */
 .cy-compare-slider.cy-compare-slider[data-boxed] {
@@ -42,6 +54,7 @@
    two sides of different sizes (or shapes) line up and both show whole. */
 .cy-compare-slider-stage.cy-compare-slider-stage {
   display: grid;
+  transform-origin: 0 0;
   font-size: inherit;
   & > * {
     grid-area: 1 / 1;
@@ -96,6 +109,7 @@
   background: var(--_c);
   box-shadow: 0 0 0 var(--cy-border-width) color-mix(in oklab, black 30%, transparent);
   font-size: inherit;
+  cursor: ew-resize;
   &::before {
     content: "";
     position: absolute;

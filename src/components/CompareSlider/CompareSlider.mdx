@@ -36,6 +36,29 @@ Control the divider with `value` and `onChange` (percent of the width showing `b
 
 <Canvas of={Stories.Controlled} />
 
+## Zoom and pan
+
+`zoom` takes the same settings as DocumentViewport, so [ZoomControls](?path=/docs/components-structure-zoomcontrols--docs) drives it: `{ kind: "fit-page" }` (the default) shows the whole box, and `{ kind: "percent", value: 100 }` is actual size, one picture pixel per CSS pixel. Both sides scale together and the frame keeps its size. Larger than the frame, the sides pan: drag the picture, use the wheel, or Tab to the view and use the arrows. A press on the divider's line still drags the divider. `zoomable` adds Ctrl/Cmd+wheel, pinch and Ctrl/Cmd with = - 0.
+
+```tsx
+const [zoom, setZoom] = useState<ZoomSetting>({ kind: "fit-page" });
+const [scale, setScale] = useState(1);
+
+<ZoomControls zoom={zoom} percent={scale * 100} onZoomChange={setZoom} />
+<CompareSlider
+  beforeSrc={original}
+  beforeAlt="Original"
+  afterSrc={optimised}
+  afterAlt="Optimised"
+  zoom={zoom}
+  onZoomChange={setZoom}
+  onScaleChange={setScale}
+  zoomable
+/>
+```
+
+<Canvas of={Stories.ZoomFitOrActualSize} />
+
 ## Props
 
 <ArgTypes of={Stories} />
@@ -43,9 +66,11 @@ Control the divider with `value` and `onChange` (percent of the width showing `b
 ## Behaviour and accessibility
 
 - **Role:** the divider is a slider named "Comparison", read as "40% before". Rename it and the tags with `labels`.
-- **Pointer:** press anywhere on the picture to jump the divider there (and focus it), then drag; Escape mid-drag puts it back.
+- **Pointer:** at fit, press anywhere on the picture to jump the divider there (and focus it), then drag; Escape mid-drag puts it back. Zoomed past the frame, a press on the picture pans and a press on the divider's line drags the divider.
+- **Zoomed view:** while it pans, the frame is a tab stop (a group named "Zoomed comparison") before the divider; its arrows pan 40px, 200px with Shift. The wheel pans it too; at fit the wheel scrolls the page. A new zoom setting is announced ("Zoom 100%").
+- **Zoom keys** (`zoomable`): Ctrl/Cmd and =, - or 0 zoom in, out and to 100% while focus is inside; Ctrl/Cmd+wheel and pinches zoom around the pointer.
 - **Keyboard:** arrows move 1%, Shift+arrows and Page Up/Down 10%, Home and End go to the ends.
-- **Touch:** a sideways drag moves the divider at once and a tap jumps it; an upward or downward swipe scrolls the page. The divider's hit area is 44px on touch screens.
+- **Touch:** at fit, a sideways drag moves the divider at once and a tap jumps it; an upward or downward swipe scrolls the page. Zoomed past the frame, a finger pans the picture (`touch-action: none`) and two fingers pinch (`zoomable`). The divider's hit area is 44px on touch screens.
 
 <Canvas of={Stories.KeyboardMovesTheDivider} />
 
@@ -55,4 +80,4 @@ Tokens: `--cy-compare-slider-divider` and `--cy-compare-slider-grip-size`.
 
 ## Related
 
-[Slider](?path=/docs/components-controls-slider--docs) · [SplitPane](?path=/docs/components-structure-splitpane--docs) · [SelectionFrame](?path=/docs/components-controls-selectionframe--docs)
+[Slider](?path=/docs/components-controls-slider--docs) · [ZoomControls](?path=/docs/components-structure-zoomcontrols--docs) · [Image](?path=/docs/components-feedback-and-display-image--docs) · [SplitPane](?path=/docs/components-structure-splitpane--docs) · [SelectionFrame](?path=/docs/components-controls-selectionframe--docs)
