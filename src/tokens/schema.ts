@@ -44,7 +44,10 @@ export interface ColorTokens {
   onDanger: string;
   info: string;
   onInfo: string;
-  /** Text versions of each tone, readable (≥ 4.5:1) on the surface and on the tone's soft tint. */
+  /**
+   * Text versions of each tone, readable (≥ 4.5:1) on the background, the surfaces, the soft fill and the tone's soft
+   * tint.
+   */
   accentText: string;
   dangerText: string;
   successText: string;
