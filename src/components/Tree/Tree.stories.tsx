@@ -483,6 +483,108 @@ export const SearchMovesTheSelection: Story = {
   },
 };
 
+function Revealing() {
+  const tree = useRef<TreeHandle>(null);
+  const [selected, setSelected] = useState<string[]>([]);
+  const [expanded, setExpanded] = useState<string[]>([]);
+  return (
+    <div style={{ display: "grid", gap: 8 }}>
+      <Button
+        onClick={() => {
+          setSelected(["n-640-3"]);
+          tree.current?.reveal("n-640-3", { align: "center" });
+        }}
+      >
+        Show leaf
+      </Button>
+      <Button onClick={() => tree.current?.reveal("nowhere")}>Show missing</Button>
+      <Tree
+        label="Document"
+        items={huge}
+        virtual
+        handle={tree}
+        selected={selected}
+        onSelectionChange={setSelected}
+        expanded={expanded}
+        onExpandedChange={setExpanded}
+        style={{ blockSize: 300 }}
+      />
+      <output data-testid="expanded">{expanded.join(",")}</output>
+    </div>
+  );
+}
+
+/**
+ * `handle.reveal(id)` shows an item chosen elsewhere (a map, a search): it opens the item's closed ancestors (through
+ * `onExpandedChange`), scrolls a virtual tree to it and makes it the tab stop, leaving focus where it is.
+ */
+export const RevealOpensAncestorsAndScrolls: Story = {
+  render: () => <Revealing />,
+  play: async ({ canvas, userEvent }) => {
+    const show = canvas.getByRole("button", { name: "Show leaf" });
+    await expect(canvas.queryByRole("treeitem", { name: "leaf 640.3" })).toBeNull();
+    await userEvent.click(show);
+    const row = await canvas.findByRole("treeitem", { name: "leaf 640.3" });
+    await expect(canvas.getByTestId("expanded")).toHaveTextContent(/^n-640$/);
+    await expect(row).toHaveAttribute("aria-selected", "true");
+    const tree = canvas.getByRole("tree").getBoundingClientRect();
+    const box = row.getBoundingClientRect();
+    // Centred, and focus stays on the button.
+    await expect(Math.abs(box.top + box.height / 2 - (tree.top + tree.height / 2))).toBeLessThan(box.height);
+    await expect(show).toHaveFocus();
+    // Past the other button, Tab enters the tree on the revealed item.
+    await userEvent.tab();
+    await userEvent.tab();
+    await expect(row).toHaveFocus();
+    // An id the tree does not hold changes nothing.
+    await userEvent.click(canvas.getByRole("button", { name: "Show missing" }));
+    await expect(canvas.getByTestId("expanded")).toHaveTextContent(/^n-640$/);
+  },
+};
+
+function RevealSmall() {
+  const tree = useRef<TreeHandle>(null);
+  return (
+    <>
+      <Button onClick={() => tree.current?.reveal("dialog")}>Show Dialog.tsx</Button>
+      <Tree label="Files" items={project} handle={tree} onExpandedChange={revealedOpen} />
+    </>
+  );
+}
+const revealedOpen = fn();
+
+/** Uncontrolled and not virtual, `reveal` opens the ancestors itself and the item becomes the tab stop. */
+export const RevealInAnUncontrolledTree: Story = {
+  render: () => <RevealSmall />,
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    await expect(visible(canvasElement)).toEqual(["src", "docs", "locked.bin", "package.json"]);
+    await userEvent.click(canvas.getByRole("button", { name: "Show Dialog.tsx" }));
+    await waitFor(() => expect(canvas.getByRole("treeitem", { name: "Dialog.tsx" })).toBeVisible());
+    await expect(revealedOpen).toHaveBeenLastCalledWith(["src", "components"]);
+    await expect(canvas.getByRole("treeitem", { name: "Dialog.tsx" })).toHaveAttribute("tabindex", "0");
+  },
+};
+
+/** `highlight` marks a query in every shown label without hiding or opening anything (search with match navigation). */
+export const HighlightMarksWithoutFiltering: Story = {
+  args: { highlight: "  TSX ", defaultExpanded: ["src", "components"] },
+  play: async ({ canvasElement }) => {
+    await expect(visible(canvasElement)).toEqual([
+      "src",
+      "components",
+      "Button.tsx",
+      "Card.tsx",
+      "Dialog.tsx",
+      "index.ts",
+      "docs",
+      "locked.bin",
+      "package.json",
+    ]);
+    const marks = [...canvasElement.querySelectorAll("mark")].map((m) => m.textContent);
+    await expect(marks).toEqual(["tsx", "tsx", "tsx"]);
+  },
+};
+
 export const StableUnderHostileHost: Story = {
   args: { defaultSelected: ["index"] },
   play: async ({ canvasElement }) => {
