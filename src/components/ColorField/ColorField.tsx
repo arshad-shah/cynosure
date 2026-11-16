@@ -72,6 +72,11 @@ export interface ColorFieldProps extends FieldLayoutProps {
   disabled?: boolean;
   /** Size of the field. Default "md". */
   size?: Size;
+  /**
+   * Show the picker (area, hue, opacity, swatches) on the page above the text, not behind the swatch button: for a
+   * page whose job is picking a colour. It fills the field's width. Default false.
+   */
+  inline?: boolean;
   /** Replace the built-in English text: the picker's controls and the error for text that is not a colour. */
   labels?: Partial<ColorFieldLabels>;
   /** Added to the root element, for layout. */
@@ -163,6 +168,7 @@ export function ColorField({
   required,
   disabled,
   size = "md",
+  inline = false,
   labels,
   className,
   style,
@@ -206,6 +212,7 @@ export function ColorField({
   // Dragging in the area through detent; Escape puts the colour back.
   useDrag(area, {
     onStart: ({ point }) => {
+      if (disabled) return false;
       dragFrom.current = color;
       area.current?.focus();
       fromPoint(point);
@@ -216,6 +223,7 @@ export function ColorField({
     },
   });
   const onAreaKey = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (disabled) return;
     // Saturation along x, brightness along y; Shift for bigger steps.
     const axis = { min: 0, max: 1, step: 0.01, arrowsOnly: true };
     const s = stepKey(event, { ...axis, value: color.s, axis: "x" });
@@ -239,7 +247,93 @@ export function ColorField({
     .join(" ")} / ${alpha ? color.a : 1})`;
   const pct = (n: number) => Math.round(n * 100);
 
-  const trigger = (
+  const sample = (
+    <span className="cy-color-field-swatch cy-reset" style={{ "--_c": swatch } as CSSProperties} />
+  );
+  const picker = (
+    <div
+      className="cy-color-field-picker cy-reset"
+      data-inline={inline ? "" : undefined}
+      {...(inline && { role: "group", "aria-label": text.pick })}
+    >
+      <div
+        ref={area}
+        role="slider"
+        tabIndex={disabled ? undefined : 0}
+        aria-disabled={disabled || undefined}
+        aria-label={text.area}
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={pct(color.s)}
+        aria-valuetext={`${text.area}: ${pct(color.s)}%, ${pct(color.v)}%`}
+        className="cy-color-field-area cy-reset"
+        style={
+          {
+            "--_hue": `hsl(${round(color.h)} 100% 50%)`,
+            "--_x": `${color.s * 100}%`,
+            "--_y": `${(1 - color.v) * 100}%`,
+          } as CSSProperties
+        }
+        onKeyDown={onAreaKey}
+      >
+        <span className="cy-color-field-area-thumb cy-reset" />
+      </div>
+      {/* Hue and opacity tracks are drawn with the colours they choose (Slider's trackContent: no fill). */}
+      <Slider
+        label={text.hue}
+        labelHidden
+        min={0}
+        max={360}
+        value={round(color.h)}
+        disabled={disabled === true}
+        onChange={(h) => set({ ...color, h: h as number })}
+        className="cy-color-field-hue"
+        trackContent={<span className="cy-color-field-strip cy-reset" data-strip="hue" />}
+      />
+      {alpha && (
+        <Slider
+          label={text.alpha}
+          labelHidden
+          min={0}
+          max={100}
+          value={pct(color.a)}
+          disabled={disabled === true}
+          labels={{ value: (v) => `${v}%` }}
+          onChange={(a) => set({ ...color, a: (a as number) / 100 })}
+          className="cy-color-field-alpha"
+          trackContent={
+            <span
+              className="cy-color-field-strip cy-reset"
+              data-strip="alpha"
+              style={
+                {
+                  "--_c": `rgb(${hsvToRgb(color)
+                    .map((n) => Math.round(n * 255))
+                    .join(" ")})`,
+                } as CSSProperties
+              }
+            />
+          }
+        />
+      )}
+      {swatches && swatches.length > 0 && (
+        <ColorSwatches
+          label={text.swatches}
+          swatches={swatches}
+          size="sm"
+          value={current}
+          disabled={disabled === true}
+          onChange={(v) => {
+            const next = fromText(v);
+            if (next) set(next);
+          }}
+        />
+      )}
+    </div>
+  );
+  const trigger = inline ? (
+    sample
+  ) : (
     <Popover
       label={text.pick}
       size="sm"
@@ -253,85 +347,15 @@ export function ColorField({
           aria-label={text.pick}
           className="cy-color-field-trigger"
         >
-          <span className="cy-color-field-swatch cy-reset" style={{ "--_c": swatch } as CSSProperties} />
+          {sample}
         </Button>
       )}
     >
-      <div className="cy-color-field-picker cy-reset">
-        <div
-          ref={area}
-          role="slider"
-          tabIndex={0}
-          aria-label={text.area}
-          aria-valuemin={0}
-          aria-valuemax={100}
-          aria-valuenow={pct(color.s)}
-          aria-valuetext={`${text.area}: ${pct(color.s)}%, ${pct(color.v)}%`}
-          className="cy-color-field-area cy-reset"
-          style={
-            {
-              "--_hue": `hsl(${round(color.h)} 100% 50%)`,
-              "--_x": `${color.s * 100}%`,
-              "--_y": `${(1 - color.v) * 100}%`,
-            } as CSSProperties
-          }
-          onKeyDown={onAreaKey}
-        >
-          <span className="cy-color-field-area-thumb cy-reset" />
-        </div>
-        {/* Hue and opacity tracks are drawn with the colours they choose (Slider's trackContent: no fill). */}
-        <Slider
-          label={text.hue}
-          labelHidden
-          min={0}
-          max={360}
-          value={round(color.h)}
-          onChange={(h) => set({ ...color, h: h as number })}
-          className="cy-color-field-hue"
-          trackContent={<span className="cy-color-field-strip cy-reset" data-strip="hue" />}
-        />
-        {alpha && (
-          <Slider
-            label={text.alpha}
-            labelHidden
-            min={0}
-            max={100}
-            value={pct(color.a)}
-            labels={{ value: (v) => `${v}%` }}
-            onChange={(a) => set({ ...color, a: (a as number) / 100 })}
-            className="cy-color-field-alpha"
-            trackContent={
-              <span
-                className="cy-color-field-strip cy-reset"
-                data-strip="alpha"
-                style={
-                  {
-                    "--_c": `rgb(${hsvToRgb(color)
-                      .map((n) => Math.round(n * 255))
-                      .join(" ")})`,
-                  } as CSSProperties
-                }
-              />
-            }
-          />
-        )}
-        {swatches && swatches.length > 0 && (
-          <ColorSwatches
-            label={text.swatches}
-            swatches={swatches}
-            size="sm"
-            value={current}
-            onChange={(v) => {
-              const next = fromText(v);
-              if (next) set(next);
-            }}
-          />
-        )}
-      </div>
+      {picker}
     </Popover>
   );
 
-  return (
+  const field = (
     <TextField
       label={label}
       labelHidden={labelHidden}
@@ -342,8 +366,10 @@ export function ColorField({
       required={required}
       disabled={disabled}
       size={size}
-      className={className ? `cy-color-field ${className}` : "cy-color-field"}
-      {...(style ? { style } : {})}
+      {...(!inline && {
+        className: className ? `cy-color-field ${className}` : "cy-color-field",
+        ...(style ? { style } : {}),
+      })}
       autoComplete="off"
       spellCheck={false}
       value={draft ?? current}
@@ -380,5 +406,16 @@ export function ColorField({
         </>
       }
     />
+  );
+  if (!inline) return field;
+  return (
+    <div
+      className={className ? `cy-color-field ${className}` : "cy-color-field"}
+      data-inline=""
+      {...(style ? { style } : {})}
+    >
+      {picker}
+      {field}
+    </div>
   );
 }
