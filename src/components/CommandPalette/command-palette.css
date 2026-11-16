@@ -143,6 +143,16 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+/* Why a disabled command cannot run, after its label. */
+.cy-command-palette-reason.cy-command-palette-reason {
+  flex: none;
+  max-inline-size: 50%;
+  overflow: hidden;
+  color: var(--cy-color-muted);
+  font-size: var(--cy-font-size-sm);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 /* The command's group, as a tag between the label and the shortcut (in search results and recent commands). */
 .cy-command-palette-tag.cy-command-palette-tag {
   flex: none;

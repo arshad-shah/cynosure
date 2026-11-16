@@ -30,6 +30,12 @@
       "main" minmax(0, 1fr)
       / minmax(0, 1fr);
   }
+  &[data-brand] {
+    grid-template:
+      "brand header" auto
+      "nav main" minmax(0, 1fr)
+      / auto minmax(0, 1fr);
+  }
   &[data-tabs] {
     grid-template:
       "header" auto
@@ -62,6 +68,29 @@
   padding: var(--cy-space-4) var(--cy-space-6);
   border-block-end: var(--cy-border-width) solid var(--_line);
   background: var(--cy-app-shell-header-background, var(--cy-color-surface));
+  font-size: inherit;
+}
+/* The brand at the head of the navigation column: as tall as the bar, as wide as the column (never wider). */
+.cy-app-shell-brand.cy-app-shell-brand {
+  grid-area: brand;
+  display: flex;
+  align-items: center;
+  min-inline-size: 0;
+  min-block-size: calc(var(--cy-control-height-lg) + 2 * var(--cy-space-4));
+  padding: var(--cy-space-4) var(--cy-space-6);
+  overflow: hidden;
+  contain: inline-size;
+  border-block-end: var(--cy-border-width) solid var(--_line);
+  border-inline-end: var(--cy-border-width) solid var(--_line);
+  background: var(--cy-app-shell-nav-background, var(--cy-color-surface));
+  font-size: inherit;
+}
+/* The brand in the top bar (narrow, or no navigation column). */
+.cy-app-shell-mark.cy-app-shell-mark {
+  display: flex;
+  flex: none;
+  align-items: center;
+  min-inline-size: 0;
   font-size: inherit;
 }
 .cy-app-shell-bar.cy-app-shell-bar {

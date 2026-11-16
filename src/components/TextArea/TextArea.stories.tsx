@@ -771,3 +771,30 @@ export const DescribedFromOutside: Story = {
     await expect(area).toHaveAccessibleDescription(/^Shown on your profile Markdown works\./);
   },
 };
+
+const monoFont = () => getComputedStyle(document.documentElement).getPropertyValue("--cy-font-mono").trim();
+
+export const MonospaceForCodeAndTokens: Story = {
+  args: { label: "Token", monospace: true, defaultValue: "eyJhbGciOiJIUzI1NiJ9.e30.sig", rows: 2 },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const area = canvas.getByRole("textbox", { name: "Token" });
+    // The mono font token, so token characters line up; typing and the label are unchanged.
+    await expect(getComputedStyle(area).fontFamily.replace(/\s/g, "")).toBe(monoFont().replace(/\s/g, ""));
+    await userEvent.type(area, "x");
+    await expect(area).toHaveValue("eyJhbGciOiJIUzI1NiJ9.e30.sigx");
+    const label = canvas.getByText("Token");
+    await expect(getComputedStyle(label).fontFamily).not.toBe(getComputedStyle(area).fontFamily);
+    const shell = computeUnderHostileHost(canvasElement, ".cy-text-area-input", ["font-family", "font-size"]);
+    await expect(shell.hostile).toEqual(shell.clean);
+  },
+};
+
+export const ProportionalByDefault: Story = {
+  args: { label: "Notes" },
+  play: async ({ canvas }) => {
+    const area = canvas.getByRole("textbox", { name: "Notes" });
+    await expect(getComputedStyle(area).fontFamily.replace(/\s/g, "")).not.toBe(
+      monoFont().replace(/\s/g, ""),
+    );
+  },
+};

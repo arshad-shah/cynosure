@@ -1,4 +1,5 @@
 import { type CSSProperties, type KeyboardEvent, type ReactNode, useId, useRef, useState } from "react";
+import { useCanvasSize } from "../../foundations/canvas-size.js";
 import { useControllableState } from "../../foundations/controllable.js";
 import { isRtl } from "../../foundations/dir.js";
 import { useDrag } from "../../foundations/drag.js";
@@ -6,6 +7,8 @@ import { stepKey } from "../../foundations/keys.js";
 import { clamp } from "../../foundations/math.js";
 
 export interface SplitPaneTokens {
+  /** Space between the panes once they stack (`stackBelow`). */
+  stackGap: string;
   /** Thickness of the visible divider line. */
   dividerSize: string;
   /** Divider colour (the accent shows while dragging or focused). */
@@ -66,6 +69,12 @@ export interface SplitPaneProps {
   defaultCollapsed?: boolean | undefined;
   /** Called when the divider collapses or expands the pane (Enter, or a key or drag that opens it). */
   onCollapsedChange?: ((collapsed: boolean) => void) | undefined;
+  /**
+   * Stack the panes, one after the other at full width with no divider, while the SplitPane's own width (its
+   * container's, not the window's) is under this many pixels. The size is kept for when it is wide again; a collapsed
+   * pane stays hidden. Default: never stack.
+   */
+  stackBelow?: number | undefined;
   /** Added to the root element, for layout. */
   className?: string;
   /** Layout only. Restyle through --cy-split-pane-* tokens. */
@@ -106,6 +115,7 @@ export function SplitPane({
   collapsed: collapsedProp,
   defaultCollapsed,
   onCollapsedChange,
+  stackBelow,
   className,
   style,
 }: SplitPaneProps) {
@@ -133,6 +143,9 @@ export function SplitPane({
   const dragFrom = useRef({ size: current, collapsed });
   const keyFrom = useRef<number | null>(null);
   const vertical = orientation === "vertical";
+  const { width } = useCanvasSize(root);
+  // Not before the first measure (width 0), so a server render and the first paint keep the split.
+  const stacked = stackBelow !== undefined && width > 0 && width < stackBelow;
 
   const set = (next: number) => {
     const value = round(clamp(next, min, max));
@@ -221,6 +234,7 @@ export function SplitPane({
       data-orientation={orientation}
       data-anchor={anchor}
       data-dragging={dragging ? "" : undefined}
+      data-stacked={stacked ? "" : undefined}
       style={{ "--_size": px ? `${shown}px` : `${shown}%`, ...style } as CSSProperties}
     >
       <div
@@ -231,23 +245,25 @@ export function SplitPane({
       >
         {start}
       </div>
-      {/* biome-ignore lint/a11y/useSemanticElements: an APG window splitter is a focusable separator; <hr> cannot take focus or a value */}
-      <div
-        role="separator"
-        tabIndex={0}
-        aria-label={label}
-        aria-controls={`${id}-${anchor}`}
-        aria-orientation={vertical ? "horizontal" : "vertical"}
-        aria-valuenow={shown}
-        aria-valuemin={collapsible ? 0 : min}
-        aria-valuemax={max}
-        aria-valuetext={px ? `${Math.round(shown)} pixels` : `${Math.round(shown)}%`}
-        ref={divider}
-        className="cy-split-pane-divider cy-reset"
-        onKeyDown={onKeyDown}
-        onKeyUp={endKeyResize}
-        onBlur={endKeyResize}
-      />
+      {!stacked && (
+        // biome-ignore lint/a11y/useSemanticElements: an APG window splitter is a focusable separator; <hr> cannot take focus or a value
+        <div
+          role="separator"
+          tabIndex={0}
+          aria-label={label}
+          aria-controls={`${id}-${anchor}`}
+          aria-orientation={vertical ? "horizontal" : "vertical"}
+          aria-valuenow={shown}
+          aria-valuemin={collapsible ? 0 : min}
+          aria-valuemax={max}
+          aria-valuetext={px ? `${Math.round(shown)} pixels` : `${Math.round(shown)}%`}
+          ref={divider}
+          className="cy-split-pane-divider cy-reset"
+          onKeyDown={onKeyDown}
+          onKeyUp={endKeyResize}
+          onBlur={endKeyResize}
+        />
+      )}
       <div
         id={`${id}-end`}
         className="cy-split-pane-pane cy-reset"

@@ -251,8 +251,10 @@ function derivePalette(
   const b = { ...base, ...explicit };
   const status = (k: "success" | "warning" | "danger" | "info") => bestContrast(b[k], ON_CANDIDATES);
   const roles = accentRoles(explicit.accent ?? accent, b.surface);
-  // The strongest tint components use is ~24% of the tone over the surface (soft hover).
-  const text = (tone: string) => readableOn(tone, [b.surface, mix(tone, b.surface, 0.24)], dark);
+  // Tone text sits on the page, the surfaces, the soft fill (selected and hovered rows) and the strongest tint
+  // components use, ~24% of the tone over the surface (soft hover); it reaches 4.5:1 on all of them.
+  const fills = [b.bg, b.surface, b.surfaceRaised, b.soft];
+  const text = (tone: string) => readableOn(tone, [...fills, mix(tone, b.surface, 0.24)], dark);
   const colors = {
     ...b,
     ...roles,

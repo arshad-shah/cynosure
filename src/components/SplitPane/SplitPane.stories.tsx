@@ -672,3 +672,74 @@ export const AnchoredStableUnderHostileHost: Story = {
     }
   },
 };
+
+/* A container that narrows while the window stays wide: stacking follows the container, not the viewport. */
+function NarrowingContainer({ stackBelow = 480 }: { stackBelow?: number }) {
+  const [width, setWidth] = useState(600);
+  const [size, setSize] = useState(40);
+  return (
+    <div>
+      <Button onClick={() => setWidth(width === 600 ? 360 : 600)}>
+        {width === 600 ? "Narrow" : "Widen"}
+      </Button>
+      <div data-testid="container" style={{ inlineSize: width, blockSize: 300 }}>
+        <SplitPane
+          label="Resize the token"
+          start={pane("Token")}
+          end={pane("Claims")}
+          size={size}
+          onSizeChange={setSize}
+          stackBelow={stackBelow}
+        />
+      </div>
+    </div>
+  );
+}
+
+export const StacksOnANarrowContainer: Story = {
+  render: () => <NarrowingContainer />,
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const split = root(canvasElement);
+    const start = startPane(canvasElement);
+    const end = endPane(canvasElement);
+    // Wide: side by side, with a divider that resizes.
+    await expect(canvas.getByRole("separator", { name: "Resize the token" })).toHaveAttribute(
+      "aria-valuenow",
+      "40",
+    );
+    await expect(box(start).right).toBeLessThanOrEqual(box(end).left + 1);
+    await userEvent.click(canvas.getByRole("separator"));
+    await userEvent.keyboard("{ArrowRight}");
+    await expect(canvas.getByRole("separator")).toHaveAttribute("aria-valuenow", "45");
+
+    // The container narrows below 480px (the window does not): the panes stack, full width, with no divider.
+    await userEvent.click(canvas.getByRole("button", { name: "Narrow" }));
+    await waitFor(() => expect(canvas.queryByRole("separator")).toBeNull());
+    await expect(split).toHaveAttribute("data-stacked");
+    await expect(box(end).top).toBeGreaterThanOrEqual(box(start).bottom);
+    await expect(Math.round(box(start).width)).toBe(Math.round(box(split).width));
+    await expect(Math.round(box(end).width)).toBe(Math.round(box(split).width));
+    await expect(start).toHaveTextContent("Token");
+    await expect(end).toHaveTextContent("Claims");
+
+    // Wide again: side by side at the size it had.
+    await userEvent.click(canvas.getByRole("button", { name: "Widen" }));
+    const divider = await canvas.findByRole("separator");
+    await expect(divider).toHaveAttribute("aria-valuenow", "45");
+    await expect(split).not.toHaveAttribute("data-stacked");
+    await expect(box(start).right).toBeLessThanOrEqual(box(end).left + 1);
+  },
+};
+
+export const StackedStableUnderHostileHost: Story = {
+  render: () => <NarrowingContainer stackBelow={2000} />,
+  play: async ({ canvasElement }) => {
+    await waitFor(() => expect(root(canvasElement)).toHaveAttribute("data-stacked"));
+    const { clean, hostile } = computeUnderHostileHost(canvasElement, '[data-pane="end"]', [
+      "display",
+      "inline-size",
+      "margin-top",
+    ]);
+    await expect(hostile).toEqual(clean);
+  },
+};

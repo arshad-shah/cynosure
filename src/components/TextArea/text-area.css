@@ -137,6 +137,9 @@
   &[data-size="lg"] .cy-text-area-input {
     font-size: var(--cy-font-size-lg);
   }
+  &[data-monospace] .cy-text-area-input {
+    font-family: var(--cy-text-area-mono-font, var(--cy-font-mono));
+  }
   &[data-variant="soft"] .cy-text-area-input {
     background: var(--cy-text-area-soft-bg, var(--cy-color-soft));
     border-color: transparent;

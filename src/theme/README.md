@@ -27,7 +27,9 @@ export function App() {
 
 A theme fixed to one mode (`createTheme({ mode: "dark" })`, or a named theme such as Midnight from `defineTheme` / `createThemeRegistry`) keeps that mode whatever `mode` says: the wrapper, and any wrapper nested in it, gets `data-cy-mode` of the theme's own mode. See [Named themes](../../docs/theming.md#named-themes).
 
-`useCynosureTheme()` returns `{ theme, palette, colors, fontSize }` for code that cannot read CSS variables (canvas, charts): the nearest wrapper's theme, the palette it shows (`light`, `dark`, `light-contrast`, `dark-contrast`), that palette's colours as hex and the type ramp in px. It re-renders when the theme, mode or contrast changes. Without a wrapper it reports Cynosure's own theme following the OS.
+`useCynosureTheme()` returns `{ theme, palette, colors, fontSize, resolveColor }` for code that cannot read CSS variables (canvas, charts): the nearest wrapper's theme, the palette it shows (`light`, `dark`, `light-contrast`, `dark-contrast`), that palette's colours as hex and the type ramp in px. It re-renders when the theme, mode or contrast changes. Without a wrapper it reports Cynosure's own theme following the OS.
+
+`resolveColor(value, within?)` resolves any CSS colour value (a colour, `var(--x)` or a bare `--x`, `color-mix()`, `light-dark()`) as the theme's wrapper (or `within`) sees it, as `#rrggbb` / `#rrggbbaa`, or `""` when it is no colour, unset, on the server or before mount. It is a new function for each palette, so effects that list it re-resolve product colours built on Cynosure's when the mode or contrast changes. Call it in an effect.
 
 ```tsx
 const { theme, palette, colors } = useCynosureTheme();
@@ -36,7 +38,7 @@ useEffect(() => addTheme("app", swiftChartTheme(theme, palette)), [theme, palett
 
 `useColorMode({ storage, key })` accepts any `{ get, set }` storage, sync or async (e.g. `chrome.storage`). Every hook and ThemeToggle on one key stays together: in the same tab directly, and across tabs through localStorage's `storage` event (the default storage) or the storage's optional `subscribe(key, onChange)`, which returns a function that stops (wire it to `chrome.storage.onChanged` or a `BroadcastChannel`).
 
-`themeInitScript({ key, selector })` returns the text of a tiny script that applies the mode saved in localStorage before the first paint, so dark-mode visitors never see a light flash. Cynosure injects nothing: place it early in the page yourself (inline in `<head>`, or written to a file when the content security policy forbids inline scripts). It marks `<html>` by default (apps that own the page) or the element matching `selector`. It reads localStorage only, so async storage such as `chrome.storage` cannot use it.
+`themeInitScript({ key, selector })` returns the text of a tiny script that applies the mode saved in localStorage before the first paint, so dark-mode visitors never see a light flash. Cynosure injects nothing: place it early in the page yourself (inline in `<head>`, or written to a file when the content security policy forbids inline scripts). It marks `<html>` by default (apps that own the page) or the element matching `selector`. With nothing valid saved it marks `system` (unless the element already has a `data-cy-mode`), so an unthemed root follows the OS from the first paint instead of showing light. It reads localStorage only, so async storage such as `chrome.storage` cannot use it.
 
 ```astro
 <script is:inline set:html={themeInitScript()} />

@@ -239,6 +239,39 @@ describe("tone text roles", () => {
   );
 });
 
+describe("tone text on every fill text sits on", () => {
+  const tones = ["accent", "danger", "success", "warning", "info"] as const;
+  it.each([
+    "#3ddc97",
+    "#c2410c",
+    "#e8462e",
+    "#d4a843",
+    "#14b8a6",
+    "#2563eb",
+    "#7c3aed",
+    "#ec4899",
+    "#facc15",
+    "#22d3ee",
+  ])(
+    "tone text reaches 4.5:1 on the background, the surfaces and the soft fill (selected rows) for accent %s",
+    (accent) => {
+      const { palettes } = createTheme({ accent });
+      for (const p of [palettes.light, palettes.dark]) {
+        for (const tone of tones) {
+          const text = p[`${tone}Text`];
+          for (const fill of [p.bg, p.surface, p.surfaceRaised, p.soft])
+            expect(contrastRatio(text, fill)).toBeGreaterThanOrEqual(4.5);
+        }
+      }
+    },
+  );
+
+  it("keeps 4.5:1 on a product's own soft fill", () => {
+    const { palettes } = createTheme({ accent: "#3ddc97", palettes: { light: { soft: "#dcd5c8" } } });
+    expect(contrastRatio(palettes.light.accentText, palettes.light.soft)).toBeGreaterThanOrEqual(4.5);
+  });
+});
+
 describe("review minors", () => {
   it("M1: garbage inside rgb()/hsl() names the original input", () => {
     expect(() => createTheme({ accent: "rgb(x y z)" })).toThrow(/rgb\(x y z\)/);

@@ -1,0 +1,14 @@
+/* form: its fields in a column with a token gap. Root never carries .cy-reset. */
+.cy-form.cy-form {
+  box-sizing: border-box !important;
+  display: flex;
+  flex-direction: column;
+  gap: var(--_gap, var(--cy-form-gap, var(--cy-space-4)));
+  margin: 0;
+  padding: 0;
+  border: 0;
+  letter-spacing: normal;
+  text-transform: none;
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-font-size-md);
+}

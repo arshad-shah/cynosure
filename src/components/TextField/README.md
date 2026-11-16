@@ -22,6 +22,7 @@ Single-line input with label, description, error, icons and an optional clear bu
 | `addonEnd`                                                                              | –           | Controls inside the field's end, after the input (NumberField's steppers)                                                                                     |
 | `boxRef`                                                                                | –           | The field's box, to anchor a list to the whole field (Combobox, TagInput)                                                                                     |
 | `clearable`                                                                             | `false`     | Clear button while filled; `labels.clear` overrides "Clear"                                                                                                   |
+| `monospace`                                                                             | `false`     | Types in the mono font (`--cy-font-mono`): keys, ids, hashes, tokens                                                                                          |
 | `required`, `disabled`, `readOnly`, `name`, `maxLength`, `autoComplete`, `inputMode`, … | –           | Native input attributes                                                                                                                                       |
 
 Works in native forms: `FormData`, `form.reset()` and `required` validation. With `type="search"` the browser's own search decorations are hidden (use `clearable`).
@@ -30,6 +31,7 @@ Works in native forms: `FormData`, `form.reset()` and `required` validation. Wit
 
 ## Tokens
 
+- `--cy-text-field-mono-font`: the font of a `monospace` field. Default `--cy-font-mono`.
 - `--cy-text-field-padding-inline-xs`: Inline padding of an `xs` field. Default `--cy-space-4`.
 - `--cy-text-field-height-xs`: Height of an `xs` field. Default `--cy-control-height-xs` (20px at comfortable scale).
 

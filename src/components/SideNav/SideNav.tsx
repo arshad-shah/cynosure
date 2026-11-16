@@ -1,5 +1,6 @@
 import {
   type CSSProperties,
+  isValidElement,
   type MouseEvent,
   type ReactElement,
   type ReactNode,
@@ -11,6 +12,7 @@ import type { DataAttributes } from "../../foundations/attributes.js";
 import { ButtonBase } from "../../foundations/ButtonBase/ButtonBase.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
 import { LinkBase } from "../../foundations/LinkBase/LinkBase.js";
+import { useNavRail } from "../../foundations/nav-rail.js";
 import { chevronDown } from "../../icons/chevron-down.js";
 import type { IconData } from "../../icons/types.js";
 import type { Size } from "../../tokens/schema.js";
@@ -112,9 +114,10 @@ export interface SideNavProps {
   renderLink?: (props: NavLinkProps) => ReactElement;
   /**
    * Icon-only rail; labels show in tooltips and stay the accessible names. Give top-level items icons. Groups do not
-   * open inside the rail: choosing one calls `onCollapsedChange(false)` so you can widen the navigation.
+   * open inside the rail: choosing one calls `onCollapsedChange(false)` so you can widen the navigation. Default: the
+   * rail of the AppShell column it sits in (`navCollapsed`, which a group chosen in the rail expands), else false.
    */
-  collapsed?: boolean;
+  collapsed?: boolean | undefined;
   /** Called with `false` when a group is chosen in the collapsed rail. */
   onCollapsedChange?: (collapsed: boolean) => void;
   /** Group ids expanded at first (groups holding `current` always are). */
@@ -136,9 +139,10 @@ export interface SideNavProps {
   /**
    * Entries pinned to the bottom of the navigation, such as Settings or a notifications action: items, sections and
    * actions, as in `items`, and in the same Tab order after them. The navigation then fills its container's height. In a
-   * bar they end the row.
+   * bar they end the row. Or any content of your own, such as a Help `Menu` and a `ThemeToggle`: it is placed as it
+   * is, after the items in the Tab order (in the rail too: give it a compact form there).
    */
-  footer?: NavEntry[] | undefined;
+  footer?: NavEntry[] | ReactNode;
   /** Added to the root element, for layout. */
   className?: string;
   /** Layout only. Restyle through --cy-side-nav-* tokens. */
@@ -147,6 +151,10 @@ export interface SideNavProps {
 
 const isSection = (entry: NavEntry): entry is NavSection => !("id" in entry);
 const isAction = (entry: NavItem | NavAction): entry is NavAction => "kind" in entry;
+/** Footer entries, as opposed to content (elements, text, fragments). */
+const isEntries = (footer: unknown): footer is NavEntry[] =>
+  Array.isArray(footer) &&
+  footer.every((e) => typeof e === "object" && e !== null && !isValidElement(e) && "label" in e);
 
 /** Ids of the groups that lead to `id`. */
 function ancestors(items: NavItem[], id: string | undefined, trail: string[] = []): string[] | null {
@@ -168,7 +176,7 @@ export function SideNav({
   current,
   onNavigate,
   renderLink = defaultLink,
-  collapsed = false,
+  collapsed: collapsedProp,
   onCollapsedChange,
   defaultExpanded = [],
   layout = "column",
@@ -180,13 +188,16 @@ export function SideNav({
 }: SideNavProps) {
   const id = useId();
   const bar = layout === "bar";
+  const shell = useNavRail();
+  const collapsed = collapsedProp ?? shell?.collapsed ?? false;
+  const entries = isEntries(footer) ? footer : undefined;
   // The collapsed rail: icons only, the labels and headings hidden from sight (still their names).
   const rail = collapsed && !bar;
   // Tooltips in the rail open away from the window edge the navigation sits on.
   const tipSide = placement === "end" ? "start" : "end";
   const flat = (entries: NavEntry[]) =>
     entries.flatMap((entry) => (isSection(entry) ? entry.items : [entry]));
-  const all = [...flat(items), ...flat(footer ?? [])];
+  const all = [...flat(items), ...flat(entries ?? [])];
   const places = all.filter((entry) => !isAction(entry)) as NavItem[];
   const [expanded, setExpanded] = useState(
     () => new Set([...defaultExpanded, ...(ancestors(places, current) ?? [])]),
@@ -258,6 +269,7 @@ export function SideNav({
               // The rail has no room for children: ask for the full navigation with this group open.
               setExpanded((o) => new Set([...o, item.id]));
               onCollapsedChange?.(false);
+              if (collapsedProp === undefined) shell?.setCollapsed(false);
             } else toggle(item.id);
           }}
         >
@@ -360,7 +372,8 @@ export function SideNav({
       ),
     );
   // A bar is one row: sections flattened, the footer's entries at its end.
-  const hasFooter = !bar && footer !== undefined && footer.length > 0;
+  const ownFooter = entries || footer == null || footer === false ? undefined : (footer as ReactNode);
+  const hasFooter = !bar && ((entries?.length ?? 0) > 0 || ownFooter !== undefined);
 
   return (
     <nav
@@ -374,7 +387,10 @@ export function SideNav({
       style={style}
     >
       {bar ? render(all, "s") : render(items, "s")}
-      {hasFooter && <div className="cy-side-nav-footer cy-reset">{render(footer, "f")}</div>}
+      {hasFooter && (
+        <div className="cy-side-nav-footer cy-reset">{ownFooter ?? render(entries as NavEntry[], "f")}</div>
+      )}
+      {bar && ownFooter !== undefined && <div className="cy-side-nav-footer cy-reset">{ownFooter}</div>}
     </nav>
   );
 }

@@ -1,5 +1,12 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { type ReactElement, useEffect, useRef, useState, useSyncExternalStore } from "react";
+import {
+  type CSSProperties,
+  type ReactElement,
+  useEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
 import { createRoot } from "react-dom/client";
 import { expect, waitFor } from "storybook/test";
 import { Button } from "../components/Button/Button.js";
@@ -10,6 +17,7 @@ import { TextField } from "../components/TextField/TextField.js";
 import { createStyleSheet } from "../styles/inline.js";
 import { computeUnderHostileHost } from "../test/hostile.js";
 import { emulateMedia } from "../test/media.js";
+import { mix } from "../tokens/color.js";
 import {
   createTheme,
   createThemeRegistry,
@@ -600,5 +608,134 @@ export const FixedModeThemeOnTheDocument: Story = {
     const html = document.documentElement;
     await waitFor(() => expect(html.getAttribute("data-cy-mode")).toBe("dark"));
     await expect(chart(canvasElement).dataset.palette).toBe("dark");
+  },
+};
+
+/* Product colours built on Cynosure's: a mix, a light-dark pair, a plain colour, a missing one. */
+const PRODUCT_COLOURS = [
+  "var(--cy-color-bg)",
+  "--chart-mix",
+  "var(--chart-pair)",
+  "#ff000080",
+  "rgb(0 128 0)",
+  "--missing",
+  "not a colour",
+] as const;
+const productVars = {
+  "--chart-mix": "color-mix(in oklab, var(--cy-color-accent) 50%, var(--cy-color-bg))",
+  "--chart-pair": "light-dark(#112233, #445566)",
+} as CSSProperties;
+
+function ProductColours() {
+  const { palette, colors, resolveColor } = useCynosureTheme();
+  const [resolved, setResolved] = useState<string[]>([]);
+  useEffect(() => setResolved(PRODUCT_COLOURS.map((value) => resolveColor(value))), [resolveColor]);
+  return (
+    <output
+      data-testid="resolved"
+      style={{ background: "var(--cy-color-bg)", color: "var(--cy-color-ink)" }}
+      data-palette={palette}
+      data-bg={colors.bg}
+      data-accent={colors.accent}
+    >
+      {resolved.join(" ")}
+    </output>
+  );
+}
+
+function ProductColourPage() {
+  const [mode, setMode] = useState<"light" | "dark">("light");
+  return (
+    <CynosureTheme theme={createTheme({ accent: "#e8462e" })} mode={mode} style={productVars}>
+      <Button onClick={() => setMode(mode === "light" ? "dark" : "light")}>Switch mode</Button>
+      <ProductColours />
+    </CynosureTheme>
+  );
+}
+
+const channels = (hex: string) => [1, 3, 5].map((i) => Number.parseInt(hex.slice(i, i + 2), 16));
+const near = (a: string, b: string) =>
+  channels(a).every((v, i) => Math.abs(v - (channels(b)[i] as number)) <= 2);
+
+async function expectResolved(out: HTMLElement, pair: string) {
+  await waitFor(() => expect(out.textContent?.split(" ")[0]).toBe(out.dataset.bg));
+  const [bg, mixed, paired, translucent, green, ...rest] = (out.textContent ?? "").split(" ");
+  await expect(bg).toBe(out.dataset.bg);
+  await expect(near(mixed as string, mix(out.dataset.accent as string, out.dataset.bg as string, 0.5))).toBe(
+    true,
+  );
+  await expect(paired).toBe(pair);
+  await expect(translucent).toBe("#ff000080");
+  await expect(green).toBe("#008000");
+  // A missing custom property and a value that is no colour resolve to nothing; split keeps the two empty strings.
+  await expect(rest).toEqual(["", ""]);
+}
+
+export const ResolvesProductColours: Story = {
+  args: { children: null },
+  render: () => <ProductColourPage />,
+  play: async ({ canvas, userEvent }) => {
+    const out = await canvas.findByTestId("resolved");
+    await expectResolved(out, "#112233");
+    await userEvent.click(canvas.getByRole("button", { name: "Switch mode" }));
+    // The resolver changes with the palette, so the effect resolves again in the dark palette.
+    await waitFor(() => expect(out.dataset.palette).toBe("dark"));
+    await expectResolved(out, "#445566");
+    await expect(out.dataset.bg).toBe(createTheme({ accent: "#e8462e" }).palettes.dark.bg);
+    // Resolving leaves nothing behind in the wrapper.
+    await expect(out.parentElement?.querySelector("span[hidden]")).toBeNull();
+  },
+};
+
+export const ResolvesProductColoursInAShadowRoot: Story = {
+  args: { children: null },
+  render: () => (
+    <ShadowHost
+      content={
+        <CynosureTheme mode="dark" style={productVars}>
+          <ProductColours />
+        </CynosureTheme>
+      }
+    />
+  ),
+  play: async ({ canvas }) => {
+    const host = await canvas.findByTestId("host");
+    await waitFor(() => expect(host.shadowRoot?.querySelector('[data-testid="resolved"]')).toBeTruthy());
+    await expectResolved(
+      host.shadowRoot?.querySelector('[data-testid="resolved"]') as HTMLElement,
+      "#445566",
+    );
+  },
+};
+
+function ProductColoursOnDocument() {
+  return (
+    <CynosureTheme target="document" mode="dark">
+      <ProductColours />
+    </CynosureTheme>
+  );
+}
+
+export const ResolvesProductColoursOnTheDocument: Story = {
+  args: { children: null },
+  beforeEach: () => {
+    const html = document.documentElement;
+    html.style.setProperty(
+      "--chart-mix",
+      "color-mix(in oklab, var(--cy-color-accent) 50%, var(--cy-color-bg))",
+    );
+    html.style.setProperty("--chart-pair", "light-dark(#112233, #445566)");
+    return () => {
+      html.style.removeProperty("--chart-mix");
+      html.style.removeProperty("--chart-pair");
+    };
+  },
+  render: () => <ProductColoursOnDocument />,
+  play: async ({ canvas }) => {
+    const html = document.documentElement;
+    const before = html.childElementCount;
+    const out = await canvas.findByTestId("resolved");
+    await expectResolved(out, "#445566");
+    await expect(html.childElementCount).toBe(before);
   },
 };

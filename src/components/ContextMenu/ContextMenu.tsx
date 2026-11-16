@@ -151,12 +151,11 @@ export function ContextMenu<K = undefined>({
     } else setInner(false);
   }, [report]);
   // Uncontrolled, the change is reported once it happens (a second right-click while open reports nothing new).
-  const first = useRef(true);
+  // Only real changes: effects that run twice (StrictMode, a page shown again by Activity) report nothing.
+  const reported = useRef(open);
   useEffect(() => {
-    if (first.current) {
-      first.current = false;
-      return;
-    }
+    if (reported.current === open) return;
+    reported.current = open;
     if (!latest.current.controlled) report(open, latest.current.current);
   }, [open, report]);
 

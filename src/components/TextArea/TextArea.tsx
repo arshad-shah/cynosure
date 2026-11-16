@@ -26,6 +26,8 @@ import { Field, type FieldLayoutProps } from "../Field/Field.js";
 import { OptionList, OptionListItem, OptionListNote } from "../OptionList/OptionList.js";
 
 export interface TextAreaTokens {
+  /** The font of a `monospace` field. Default `--cy-font-mono`. */
+  monoFont: string;
   readonlyBg: string;
   radius: string;
   paddingInline: string;
@@ -79,6 +81,8 @@ export interface TextAreaProps extends NativeArea, FieldLayoutProps {
   description?: ReactNode;
   /** Error message shown below the field; it is announced and marks the field invalid. */
   error?: ReactNode;
+  /** Types in the mono font (`--cy-font-mono`): code, JSON and tokens. Default false. */
+  monospace?: boolean | undefined;
   /** The text (controlled). */
   value?: string;
   /** Starting text when uncontrolled. */
@@ -158,6 +162,7 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(function 
     showCount = false,
     size = "md",
     variant = "outline",
+    monospace = false,
     labels,
     trigger,
     suggestions,
@@ -374,6 +379,7 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(function 
             className="cy-text-area"
             data-size={size}
             data-variant={variant}
+            data-monospace={monospace ? "" : undefined}
             data-disabled={disabled ? "" : undefined}
           >
             <div ref={box} className="cy-text-area-box">
