@@ -61,6 +61,19 @@
 .cy-text.cy-text[data-size="2xl"] {
   font-size: var(--cy-font-size-2xl);
 }
+/* Display sizes: a large figure (a countdown, a clock). Larger than 2xl, with a tighter line height. */
+.cy-text.cy-text:is([data-size="3xl"], [data-size="4xl"], [data-size="5xl"]) {
+  line-height: var(--cy-text-display-line-height, 1.1);
+}
+.cy-text.cy-text[data-size="3xl"] {
+  font-size: var(--cy-text-size-3xl, calc(var(--cy-font-size-2xl) * 1.4));
+}
+.cy-text.cy-text[data-size="4xl"] {
+  font-size: var(--cy-text-size-4xl, calc(var(--cy-font-size-2xl) * 2));
+}
+.cy-text.cy-text[data-size="5xl"] {
+  font-size: var(--cy-text-size-5xl, calc(var(--cy-font-size-2xl) * 3));
+}
 
 .cy-text.cy-text[data-weight="regular"] {
   font-weight: var(--cy-font-weight-regular);
