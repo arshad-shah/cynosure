@@ -27,6 +27,11 @@
 .cy-key-value-editor-check.cy-key-value-editor-check {
   flex: none;
 }
+/* rowTypes: the Type select is as wide as its longest word, never squeezed by the fields. */
+.cy-key-value-editor-type.cy-key-value-editor-type {
+  flex: none;
+  inline-size: var(--cy-key-value-editor-type-width, 8rem);
+}
 .cy-key-value-editor-actions.cy-key-value-editor-actions {
   display: flex;
   flex-wrap: wrap;
