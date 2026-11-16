@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 import { expect, fn } from "storybook/test";
+import { textContrast } from "../../test/color.js";
 import { computeUnderHostileHost } from "../../test/hostile.js";
 import { TONES } from "../../tokens/schema.js";
 import { Button } from "../Button/Button.js";
@@ -46,6 +47,15 @@ export const PressFlipsABit: Story = {
     await expect(pressed(canvasElement)).toBe("1000000000000111");
     await userEvent.click(canvas.getByRole("button", { name: "Bit 15" }));
     await expect(args.onChange).toHaveBeenLastCalledWith(0x0007n);
+  },
+};
+
+/** A set bit's 1 reads clearly on its fill, as an unset bit's 0 does on the surface. */
+export const SetBitsAreReadable: Story = {
+  play: async ({ canvas }) => {
+    for (const name of ["Bit 15", "Bit 0", "Bit 1"]) {
+      await expect(textContrast(canvas.getByRole("button", { name })), name).toBeGreaterThanOrEqual(4.5);
+    }
   },
 };
 
