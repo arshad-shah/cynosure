@@ -7,18 +7,21 @@ Small status or category label in Cynosure's mono "eyebrow" style. Every tone ×
 <Badge tone="danger" variant="solid">Failed</Badge>
 <Badge color="#2f7d4a">GET</Badge>
 <Badge tone="danger" dot="live">Recording</Badge>
+<Badge onRemove={() => removeFilter("GET")}>GET</Badge>
 ```
 
-| Prop                  | Default   | Notes                                                                                                  |
-| --------------------- | --------- | ------------------------------------------------------------------------------------------------------ |
-| `tone`                | `neutral` | `accent` · `neutral` · `danger` · `success` · `warning` · `info`                                       |
-| `variant`             | `soft`    | `soft` · `solid` · `outline`                                                                           |
-| `size`                | `md`      | `sm` · `md` · `lg`                                                                                     |
-| `icon`                | –         | Facet icon                                                                                             |
-| `color`               | –         | A category colour (any CSS colour), e.g. HTTP methods or calendar categories; overrides `tone`         |
-| `dot`                 | –         | `true` for a steady dot, `"live"` for a pulsing one (recording, connected); still under reduced motion |
-| `label`               | –         | The name of a status dot alone; without it the dot is decoration, hidden from assistive technology     |
-| `id`, `data-*`, `ref` | –         | Set on the root element (a link target, test or state hooks)                                           |
+| Prop                                    | Default   | Notes                                                                                                  |
+| --------------------------------------- | --------- | ------------------------------------------------------------------------------------------------------ |
+| `tone`                                  | `neutral` | `accent` · `neutral` · `danger` · `success` · `warning` · `info`                                       |
+| `variant`                               | `soft`    | `soft` · `solid` · `outline`                                                                           |
+| `size`                                  | `md`      | `sm` · `md` · `lg`                                                                                     |
+| `icon`                                  | –         | Facet icon                                                                                             |
+| `color`                                 | –         | A category colour (any CSS colour), e.g. HTTP methods or calendar categories; overrides `tone`         |
+| `dot`                                   | –         | `true` for a steady dot, `"live"` for a pulsing one (recording, connected); still under reduced motion |
+| `label`                                 | –         | The name of a status dot alone; without it the dot is decoration, hidden from assistive technology     |
+| `onRemove`                              | –         | A remove IconButton at the end, named "Remove <text>": a removable chip (an active filter)             |
+| `labels`                                | –         | `{ remove }`: the remove button's name (default "Remove <text>", or "Remove" for rich content)         |
+| `id`, `data-*`, `role`, `aria-*`, `ref` | –         | Set on the root element (a link target, test or state hooks)                                           |
 
 ## Status dot
 

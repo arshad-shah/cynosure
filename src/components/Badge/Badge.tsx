@@ -1,8 +1,10 @@
 import { type CSSProperties, forwardRef, type ReactNode } from "react";
 import type { RootAttributes } from "../../foundations/attributes.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
+import { close } from "../../icons/index.js";
 import type { IconData } from "../../icons/types.js";
 import type { Size, Tone } from "../../tokens/schema.js";
+import { IconButton } from "../IconButton/IconButton.js";
 
 export interface BadgeTokens {
   radius: string;
@@ -32,10 +34,24 @@ interface BadgeBaseProps extends RootAttributes {
   color?: string | undefined;
   /** A dot before the text: `true` for a steady one, `"live"` for a pulsing one (recording, connected). */
   dot?: boolean | "live";
+  /**
+   * Makes the badge a removable chip (an active filter): a remove button at its end, named "Remove <text>", calls
+   * this when pressed. Remove the badge in it and move focus to a sensible place (the next chip, or the field the
+   * filters came from).
+   */
+  onRemove?: (() => void) | undefined;
+  /** Replace the built-in English text: the remove button's name. */
+  labels?: Partial<BadgeLabels> | undefined;
   /** Added to the root element, for layout. */
   className?: string;
   /** Layout only. */
   style?: CSSProperties;
+}
+
+/** Badge's built-in text. */
+export interface BadgeLabels {
+  /** Name of the remove button. Default: "Remove <text>" when the badge's text is plain, else "Remove". */
+  remove: string;
 }
 
 export type BadgeProps = BadgeBaseProps &
@@ -69,6 +85,8 @@ export const Badge = forwardRef<HTMLSpanElement, BadgeProps>(function Badge(
     color,
     dot,
     label,
+    onRemove,
+    labels,
     className,
     style,
     ...rest
@@ -99,6 +117,21 @@ export const Badge = forwardRef<HTMLSpanElement, BadgeProps>(function Badge(
       )}
       {icon && <Icon icon={icon} size="sm" />}
       {children}
+      {onRemove && !alone && (
+        <IconButton
+          icon={close}
+          label={
+            labels?.remove ??
+            (typeof children === "string" || typeof children === "number" ? `Remove ${children}` : "Remove")
+          }
+          size="xs"
+          // On a solid badge the button is filled like it; otherwise it is ghost in the badge's text colour.
+          variant={variant === "solid" ? "solid" : "ghost"}
+          {...(color ? { color } : { tone })}
+          wrapperClassName="cy-badge-remove"
+          onClick={onRemove}
+        />
+      )}
     </span>
   );
 });

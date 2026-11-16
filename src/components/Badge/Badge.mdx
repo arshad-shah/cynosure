@@ -5,7 +5,7 @@ import * as Stories from "./Badge.stories";
 
 # Badge
 
-A small status or category label in the mono "eyebrow" style. It only labels; it does nothing when clicked. For an action use [Button](?path=/docs/components-controls-button--docs).
+A small status or category label in the mono "eyebrow" style. It only labels, unless `onRemove` makes it a removable chip. For an action use [Button](?path=/docs/components-controls-button--docs).
 
 <Canvas of={Stories.EveryToneAndVariantIsReadable} />
 
@@ -17,7 +17,7 @@ A small status or category label in the mono "eyebrow" style. It only labels; it
 - **`solid`:** a status that must stand out. **`outline`:** a label in busy or tinted surroundings.
 
 **Use something else when:**
-- it can be clicked or dismissed: [Button](?path=/docs/components-controls-button--docs)
+- it can be clicked: [Button](?path=/docs/components-controls-button--docs)
 - it navigates: [Link](?path=/docs/components-controls-link--docs)
 - it shows progress: [LoadingDots](?path=/docs/components-feedback-and-display-loadingdots--docs)
 
@@ -49,13 +49,32 @@ Tone carries meaning, but keep the text meaningful too: don't rely on colour alo
 
 <Canvas of={Stories.DotWithoutText} />
 
+## Removable chip
+
+`onRemove` adds a remove button at the end of the badge: an IconButton named "Remove" and the text (`labels.remove` replaces it; it is plain "Remove" when the text is not plain text, so give `labels.remove` then). It is ghost in the badge's text colour, or filled like a solid badge, and keeps a 24px hit area (44px under a coarse pointer) without making the chip taller. Remove the badge in `onRemove` and move focus somewhere sensible: the next chip, or the field the filters came from.
+
+```tsx
+{filters.map((f) => (
+  <Badge key={f} onRemove={() => removeFilter(f)}>{f}</Badge>
+))}
+```
+
+<Canvas of={Stories.RemovableChip} />
+
+| Key (remove button focused) | Does |
+| --- | --- |
+| Tab | Moves to the next chip's remove button |
+| Enter / Space | Calls `onRemove` |
+
+For a list of tags the user types, use [TagInput](?path=/docs/components-controls-taginput--docs).
+
 ## Props
 
 <ArgTypes of={Stories} />
 
 ## Attributes
 
-`id`, any `data-*` attribute and the `ref` go to the root element.
+`id`, any `data-*` attribute, `role`, any `aria-*` attribute and the `ref` go to the root element.
 
 ## Theming
 
