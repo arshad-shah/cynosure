@@ -329,6 +329,15 @@ export const StableUnderHostileHost: Story = {
   },
 };
 
+/** A pixel's colour, within 2 per channel (browsers may colour-manage a canvas). */
+const pixel = async (ctx: OffscreenCanvasRenderingContext2D, x: number, y: number, want: number[]) => {
+  const got = [...ctx.getImageData(x, y, 1, 1).data].slice(0, 3);
+  await expect({ got, near: got.every((v, i) => Math.abs(v - (want[i] as number)) <= 2) }).toEqual({
+    got,
+    near: true,
+  });
+};
+
 /** `color` and `background` set the two colours (dark on light still); the SVG and PNG exports match what is shown. */
 export const ColoursAndExport: Story = {
   args: { color: "#1d3557", background: "#f1faee", label: "Our site" },
@@ -349,8 +358,8 @@ export const ColoursAndExport: Story = {
     ) as OffscreenCanvasRenderingContext2D;
     ctx.drawImage(bitmap, 0, 0);
     // The corner is quiet zone (background); the finder pattern's corner is the dark colour.
-    await expect([...ctx.getImageData(1, 1, 1, 1).data].slice(0, 3)).toEqual([241, 250, 238]);
-    await expect([...ctx.getImageData(4 * 4 + 1, 4 * 4 + 1, 1, 1).data].slice(0, 3)).toEqual([29, 53, 87]);
+    await pixel(ctx, 1, 1, [241, 250, 238]);
+    await pixel(ctx, 4 * 4 + 1, 4 * 4 + 1, [29, 53, 87]);
   },
 };
 
@@ -367,6 +376,6 @@ export const PngWithALogo: Story = {
     ) as OffscreenCanvasRenderingContext2D;
     ctx.drawImage(bitmap, 0, 0);
     const middle = Math.floor(bitmap.width / 2);
-    await expect([...ctx.getImageData(middle, middle, 1, 1).data].slice(0, 3)).toEqual([255, 0, 0]);
+    await pixel(ctx, middle, middle, [255, 0, 0]);
   },
 };
