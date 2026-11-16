@@ -140,3 +140,51 @@
   background: var(--cy-color-surface);
   font-size: var(--cy-font-size-sm);
 }
+
+/* tokenize: each kind in the palette's syntax colour (readable on the code background in every palette). */
+.cy-code-block-token.cy-code-block-token {
+  font-size: inherit;
+  &[data-kind="comment"] {
+    color: var(--cy-color-syntax-comment);
+    font-style: italic;
+  }
+  &[data-kind="keyword"] {
+    color: var(--cy-color-syntax-keyword);
+  }
+  &[data-kind="string"] {
+    color: var(--cy-color-syntax-string);
+  }
+  &[data-kind="number"] {
+    color: var(--cy-color-syntax-number);
+  }
+  &[data-kind="function"] {
+    color: var(--cy-color-syntax-function);
+  }
+  &[data-kind="type"] {
+    color: var(--cy-color-syntax-type);
+  }
+  &[data-kind="variable"] {
+    color: var(--cy-color-syntax-variable);
+  }
+  &[data-kind="property"] {
+    color: var(--cy-color-syntax-property);
+  }
+  &[data-kind="operator"],
+  &[data-kind="punctuation"] {
+    color: var(--cy-color-syntax-operator);
+  }
+  &[data-kind="tag"] {
+    color: var(--cy-color-syntax-tag);
+  }
+  &[data-kind="attribute"] {
+    color: var(--cy-color-syntax-attribute);
+  }
+  &[data-kind="regexp"] {
+    color: var(--cy-color-syntax-regexp);
+  }
+}
+@media (forced-colors: active) {
+  .cy-code-block-token.cy-code-block-token {
+    color: CanvasText;
+  }
+}

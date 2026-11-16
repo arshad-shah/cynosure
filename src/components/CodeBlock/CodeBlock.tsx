@@ -48,6 +48,28 @@ function cut(code: string, maxLines: number, maxChars: number) {
 const defaultActive = (lines: readonly number[]) =>
   `${lines.length === 1 ? "Line" : "Lines"} ${lines.join(", ")} highlighted`;
 
+/** What a stretch of code is, for its colour: one of the palette's syntax roles (`--cy-color-syntax-*`). */
+export type SyntaxKind =
+  | "comment"
+  | "keyword"
+  | "string"
+  | "number"
+  | "function"
+  | "type"
+  | "variable"
+  | "property"
+  | "operator"
+  | "punctuation"
+  | "tag"
+  | "attribute"
+  | "regexp";
+
+/** A stretch of code and its kind; without a kind (or with one CodeBlock does not know) it is plain text. */
+export interface SyntaxToken {
+  text: string;
+  kind?: SyntaxKind | undefined;
+}
+
 export interface CodeBlockProps {
   /** The code to show and copy. One final new line is not shown as an empty last line. */
   code: string;
@@ -60,6 +82,12 @@ export interface CodeBlockProps {
    * bundles none. Without it the code is plain text.
    */
   highlight?: ((code: string, language?: string) => ReactNode) | undefined;
+  /**
+   * Your tokenizer, returning the code as `{ text, kind }` stretches in order: CodeBlock colours each kind with the
+   * palette's syntax colours (readable on the code's background in every palette), so no CSS of yours is needed.
+   * `punctuation` takes the operators' colour. `highlight`, when given too, wins.
+   */
+  tokenize?: ((code: string, language?: string) => readonly SyntaxToken[]) | undefined;
   /** Show line numbers beside the code. Left out when `wrap` is on. */
   lineNumbers?: boolean;
   /** Lines to mark (1-based), such as the line a debugger is on. Marked behind the text and read out. */
@@ -101,6 +129,7 @@ export function CodeBlock({
   language,
   title,
   highlight,
+  tokenize,
   lineNumbers = false,
   activeLines,
   wrap = false,
@@ -131,7 +160,19 @@ export function CodeBlock({
   const marked = !wrap && activeLines?.length ? activeLines.filter((n) => n >= 1 && n <= lines.length) : [];
   const body = (
     <code className="cy-code-block-code cy-reset" data-language={language}>
-      {highlight ? highlight(shown, language) : shown}
+      {highlight
+        ? highlight(shown, language)
+        : tokenize
+          ? tokenize(shown, language).map((token, i) =>
+              token.kind ? (
+                <span key={i} className="cy-code-block-token" data-kind={token.kind}>
+                  {token.text}
+                </span>
+              ) : (
+                token.text
+              ),
+            )
+          : shown}
     </code>
   );
   return (

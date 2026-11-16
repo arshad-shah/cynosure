@@ -1,1 +1,8 @@
-export { CodeBlock, type CodeBlockLabels, type CodeBlockProps, type CodeBlockTokens } from "./CodeBlock.js";
+export {
+  CodeBlock,
+  type CodeBlockLabels,
+  type CodeBlockProps,
+  type CodeBlockTokens,
+  type SyntaxKind,
+  type SyntaxToken,
+} from "./CodeBlock.js";

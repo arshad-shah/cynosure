@@ -39,6 +39,14 @@ Cynosure bundles no highlighter. Pass `highlight`, a function from the code and 
 
 <Canvas of={Stories.BringYourOwnHighlighter} />
 
+A tokenizer of your own needs no CSS: `tokenize` returns `{ text, kind }` stretches and CodeBlock colours each kind with the palette's syntax colours (`--cy-color-syntax-*`; `punctuation` takes the operators'), which read at 4.5:1 on the code's background in light and dark and 7:1 in the contrast palettes.
+
+```tsx
+<CodeBlock code={json} language="json" tokenize={(code) => myTokens(code).map((t) => ({ text: t.value, kind: t.type }))} />
+```
+
+<Canvas of={Stories.TokensTakeThePalettesSyntaxColours} />
+
 ## Line numbers and wrapping
 
 `lineNumbers` adds a gutter that screen readers skip and selections leave out. `wrap` wraps long lines instead of scrolling sideways; line numbers are then left out because they could not line up.

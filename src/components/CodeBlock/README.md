@@ -15,6 +15,7 @@ import { CodeBlock } from "@arshad-shah/cynosure";
 | `title`                 | –       | File name or caption for the header (names the block)                                               |
 | `language`              | –       | Shown when there is no `title`; passed to `highlight`; set as `data-language`                       |
 | `highlight`             | –       | `(code, language) => ReactNode`, e.g. Shiki or Prism output                                         |
+| `tokenize`              | –       | `(code, language) => { text, kind? }[]`: coloured with the palette's syntax tokens, no CSS needed   |
 | `lineNumbers`           | `false` | A gutter of numbers, hidden from screen readers and never copied                                    |
 | `wrap`                  | `false` | Wrap long lines instead of scrolling sideways (line numbers are then left out)                      |
 | `actions`               | –       | Buttons in the header before the copy button, e.g. "Insert into editor"                             |
@@ -27,6 +28,8 @@ import { CodeBlock } from "@arshad-shah/cynosure";
 - Tall code scrolls inside the block (`--cy-code-block-max-height`); line numbers scroll with it.
 
 - `activeLines` (1-based): mark lines, such as the line a debugger is on. A band sits behind the text, the gutter number is bold, and "Line 3 highlighted" is read out (`labels.active`).
+
+Your own tokenizer: `tokenize` returns the code as `{ text, kind }` stretches (`SyntaxKind`: comment, keyword, string, number, function, type, variable, property, operator, punctuation, tag, attribute, regexp), and each kind takes its `--cy-color-syntax-*` colour, readable on the code's background in light, dark and the contrast palettes. A stretch with no kind, or one it does not know, is plain text. `highlight` wins when both are given. See [docs/code-editors.md](../../../docs/code-editors.md).
 
 Very long code (megabytes of output): `maxLines` and `maxChars` show only the start, found without splitting all of it, and the highlighter gets only that. A "Show all 5,000 lines" button under the code (`aria-expanded`, `aria-controls` the code; `labels.showAll`, `labels.showLess`) shows the rest and back. Copying, and the `code` your actions use, is always the whole text.
 

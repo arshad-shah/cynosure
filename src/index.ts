@@ -93,6 +93,8 @@ export {
   type CodeBlockLabels,
   type CodeBlockProps,
   type CodeBlockTokens,
+  type SyntaxKind,
+  type SyntaxToken,
 } from "./components/CodeBlock/index.js";
 export {
   ColorField,

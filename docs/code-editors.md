@@ -49,3 +49,5 @@ const highlighter = await createHighlighter({
 ## With CodeBlock
 
 CodeBlock takes your highlighter through `highlight`. Its output is coloured by `syntax.css` when it uses Prism, highlight.js or Shiki's `css-variables` classes.
+
+A tokenizer of your own needs no CSS: pass `tokenize`, returning the code as `{ text, kind }` stretches (`SyntaxKind`: `comment`, `keyword`, `string`, `number`, `function`, `type`, `variable`, `property`, `operator`, `punctuation`, `tag`, `attribute`, `regexp`). CodeBlock colours each kind with the role's `--cy-color-syntax-*` token (punctuation with the operators'), so it reads at 4.5:1 (7:1 in the contrast palettes) on the code's background and follows the theme.
