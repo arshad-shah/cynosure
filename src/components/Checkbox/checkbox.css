@@ -6,6 +6,19 @@
   --cy-choice-strike-width: var(--cy-checkbox-strike-width, max(var(--cy-border-width), 0.0625em));
 }
 
+/* A pictured card (variant="card" with media): the box sits over the picture's top end corner, on the surface so it
+   reads on any picture. The card draws the focus ring, so the box does not draw a second one. */
+.cy-checkbox-card.cy-checkbox-card > .cy-checkbox {
+  position: absolute;
+  z-index: 1;
+  inset-block-start: calc(var(--cy-choice-card-padding, var(--cy-space-3)) + var(--cy-space-2));
+  inset-inline-end: calc(var(--cy-choice-card-padding, var(--cy-space-3)) + var(--cy-space-2));
+  margin: 0;
+  &:has(> input:focus-visible) {
+    box-shadow: none;
+  }
+}
+
 .cy-checkbox.cy-checkbox {
   font-size: inherit;
   line-height: inherit;

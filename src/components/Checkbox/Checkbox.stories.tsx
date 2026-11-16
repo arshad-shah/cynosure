@@ -17,6 +17,7 @@ const meta = {
     checked: { control: "boolean" },
     indeterminate: { control: "boolean" },
     strikeWhenChecked: { control: "boolean" },
+    variant: { control: "inline-radio", options: ["row", "card"] },
     disabled: { control: "boolean" },
     required: { control: "boolean" },
     label: { control: "text" },
@@ -363,5 +364,105 @@ export const ShiftClickAndRovingTabIndex: Story = {
     await userEvent.click(first);
     await userEvent.keyboard("{/Shift}");
     await expect(shift()).toEqual([false, true]);
+  },
+};
+
+const page = (n: number) => (
+  <span data-testid={`page-${n}`} style={{ display: "grid", placeItems: "center", blockSize: 120 }}>
+    {`Page ${n}`}
+  </span>
+);
+const cardOf = (box: HTMLElement) => box.closest(".cy-choice") as HTMLElement;
+
+/** `variant="card"`: a grid of pages to tick. The whole card, picture included, ticks; Shift still reads on the event. */
+export const CardsTickByPicture: Story = {
+  tags: ["visual"],
+  render: (args) => (
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 10rem)", gap: 12 }}>
+      {[1, 2, 3].map((n) => (
+        <Checkbox
+          key={n}
+          {...args}
+          variant="card"
+          media={page(n)}
+          label={`Page ${n} of 3`}
+          defaultChecked={n === 2}
+        />
+      ))}
+    </div>
+  ),
+  play: async ({ canvas, args, userEvent }) => {
+    const first = canvas.getByRole("checkbox", { name: "Page 1 of 3" });
+    const second = canvas.getByRole("checkbox", { name: "Page 2 of 3" });
+    // A press on the picture ticks the card, and the event is the click.
+    await userEvent.click(canvas.getByTestId("page-1"));
+    await expect(first).toBeChecked();
+    const last = () => {
+      const call = (args.onChange as ReturnType<typeof fn>).mock.lastCall as [boolean, ChangeEvent];
+      return [call[0], (call[1].nativeEvent as MouseEvent).shiftKey];
+    };
+    await expect(last()).toEqual([true, false]);
+    // Shift+click on another picture: the range selection can read Shift.
+    await userEvent.keyboard("{Shift>}");
+    await userEvent.click(canvas.getByTestId("page-3"));
+    await userEvent.keyboard("{/Shift}");
+    await expect(canvas.getByRole("checkbox", { name: "Page 3 of 3" })).toBeChecked();
+    await expect(last()).toEqual([true, true]);
+    // The box stays drawn, in the picture's top end corner.
+    const box = (first.parentElement as HTMLElement).getBoundingClientRect();
+    // The picture box: the card's media part, which holds the page.
+    const picture = (canvas.getByTestId("page-1").parentElement as HTMLElement).getBoundingClientRect();
+    await expect(box.width).toBeGreaterThanOrEqual(14);
+    await expect(box.top).toBeGreaterThanOrEqual(picture.top - 0.5);
+    await expect(box.bottom).toBeLessThan(picture.top + picture.height / 2);
+    await expect(box.right).toBeLessThanOrEqual(picture.right + 0.5);
+    await expect(box.left).toBeGreaterThan(picture.left + picture.width / 2);
+    // A ticked card looks chosen: its border differs from an unticked one once the fade ends.
+    await userEvent.click(second);
+    await expect(second).not.toBeChecked();
+    await settled(cardOf(first));
+    await settled(cardOf(second));
+    await expect(getComputedStyle(cardOf(first)).borderTopColor).not.toBe(
+      getComputedStyle(cardOf(second)).borderTopColor,
+    );
+    // Keyboard: Tab reaches each box and Space ticks it.
+    first.focus();
+    await userEvent.tab();
+    await expect(second).toHaveFocus();
+    await userEvent.keyboard(" ");
+    await expect(second).toBeChecked();
+  },
+};
+
+/** A card without a picture keeps its box beside nothing: it sits above the label, in the flow. */
+export const CardWithoutPicture: Story = {
+  args: { variant: "card", label: "Include the cover" },
+  render: (args) => (
+    <div style={{ inlineSize: "10rem" }}>
+      <Checkbox {...args} />
+    </div>
+  ),
+  play: async ({ canvas, userEvent }) => {
+    const input = canvas.getByRole("checkbox", { name: "Include the cover" });
+    const box = (input.parentElement as HTMLElement).getBoundingClientRect();
+    const label = canvas.getByText("Include the cover").getBoundingClientRect();
+    await expect(box.bottom).toBeLessThanOrEqual(label.top + 0.5);
+    await userEvent.click(canvas.getByText("Include the cover"));
+    await expect(input).toBeChecked();
+  },
+};
+
+export const CardTapOnTouch: Story = {
+  tags: ["touch", "!dev"],
+  render: (args) => (
+    <div style={{ inlineSize: "10rem" }}>
+      <Checkbox {...args} variant="card" media={page(1)} label="Page 1" />
+    </div>
+  ),
+  play: async ({ canvas, userEvent }) => {
+    const input = canvas.getByRole("checkbox", { name: "Page 1" });
+    await userEvent.pointer({ keys: "[TouchA]", target: canvas.getByTestId("page-1") });
+    await expect(input).toBeChecked();
+    await expect(cardOf(input).getBoundingClientRect().height).toBeGreaterThanOrEqual(44);
   },
 };
