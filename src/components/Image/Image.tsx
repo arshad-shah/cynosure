@@ -96,6 +96,21 @@ interface OverlayProps {
   children: ReactNode;
 }
 
+const KEYWORDS: Record<string, string> = {
+  left: "0%",
+  top: "0%",
+  center: "50%",
+  right: "100%",
+  bottom: "100%",
+};
+
+/** A computed `object-position` as [x, y] (browsers give percents and pixels; keywords are read too, y first or not). */
+function positionOf(value: string): [string | undefined, string | undefined] {
+  const [a, b = "center"] = value.split(" ");
+  const [x, y] = a === "top" || a === "bottom" || b === "left" || b === "right" ? [b, a] : [a, b];
+  return [KEYWORDS[x ?? ""] ?? x, KEYWORDS[y ?? ""] ?? y];
+}
+
 /** One `object-position` component (a percent of the free space, or pixels) as an offset; anything else centres. */
 const offsetOf = (part: string | undefined, free: number) =>
   part?.endsWith("px")
@@ -116,7 +131,7 @@ function Overlay({ frame, img, fit, position, label, children }: OverlayProps) {
     const pick = fit === "contain" ? Math.min : Math.max;
     const scale = pick(w / pic.naturalWidth, h / pic.naturalHeight);
     const [width, height] = [pic.naturalWidth * scale, pic.naturalHeight * scale];
-    const [x, y] = getComputedStyle(pic).objectPosition.split(" ");
+    const [x, y] = positionOf(getComputedStyle(pic).objectPosition);
     setRect({
       left: pic.offsetLeft + offsetOf(x, w - width),
       top: pic.offsetTop + offsetOf(y, h - height),
