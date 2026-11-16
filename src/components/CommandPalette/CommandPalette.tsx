@@ -1,4 +1,13 @@
-import { type CSSProperties, Fragment, type KeyboardEvent, useId, useMemo, useRef, useState } from "react";
+import {
+  type CSSProperties,
+  Fragment,
+  type KeyboardEvent,
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js";
 import { useControllableState } from "../../foundations/controllable.js";
 import { DialogBase } from "../../foundations/DialogBase/DialogBase.js";
@@ -7,11 +16,13 @@ import { useHotkey } from "../../foundations/hotkey.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
 import { InputBase } from "../../foundations/InputBase/InputBase.js";
 import { isComposing } from "../../foundations/keys.js";
+import { LiveRegion, useLiveMessage } from "../../foundations/LiveRegion/LiveRegion.js";
 import { useActiveOption } from "../../foundations/listbox.js";
 import { textMatchAt, textMatches } from "../../foundations/text-match.js";
 import { search } from "../../icons/search.js";
 import type { IconData } from "../../icons/types.js";
 import { useDismiss } from "../../overlay/dismiss.js";
+import type { ColorModeStorage } from "../../theme/use-color-mode.js";
 import { Badge } from "../Badge/Badge.js";
 import { HighlightedText } from "../HighlightedText/HighlightedText.js";
 import { Kbd } from "../Kbd/Kbd.js";
@@ -39,7 +50,15 @@ export interface Command {
   /** More words that find it ("save" also finds "Write to disk"). */
   keywords?: string[];
   disabled?: boolean;
+  /**
+   * Why a `disabled` command cannot run ("Open a document first"). It is shown in the row and is the option's
+   * description; such a command can be reached with the arrows, and Enter or a click on it announces the reason.
+   */
+  disabledReason?: string | undefined;
 }
+
+/** Where recently run commands are kept: sync or async, as `useColorMode`'s storage (`chrome.storage` works too). */
+export type CommandPaletteStorage = Pick<ColorModeStorage, "get" | "set">;
 
 /** What a `filter` says about a command that matches: how well, and which letters of its label. */
 export interface CommandMatch {
@@ -56,6 +75,8 @@ export interface CommandPaletteLabels {
   empty: string;
   /** Heading of the recently run commands, shown before you type. */
   recent: string;
+  /** Announced when a disabled command with a `disabledReason` is chosen. */
+  unavailable: (label: string, reason: string) => string;
 }
 
 /** The commands a custom filter keeps, lowest score first (a stable sort), with the positions it marked. */
@@ -99,8 +120,24 @@ export interface CommandPaletteProps {
    * every word of the query in the label or keywords, label prefixes first, the words marked.
    */
   filter?: ((command: Command, query: string) => CommandMatch | boolean | null | undefined) | undefined;
+  /**
+   * Called with the query whenever it changes (typing, and "" each time the palette opens), for commands made from
+   * it ("Go to line 42"): pass them in `commands`. A custom `filter` then decides whether they show.
+   */
+  onQueryChange?: ((query: string) => void) | undefined;
   /** How many recently run commands to list before you type (default 5, 0 for none). */
   recentLimit?: number;
+  /** Controlled: the ids of the recently run commands, newest first. */
+  recent?: string[] | undefined;
+  /** Called with the new list of recent ids (newest first, at most 20) when a command runs. */
+  onRecentChange?: ((recent: string[]) => void) | undefined;
+  /**
+   * Keep the recently run commands between visits under this storage key (opt-in; uncontrolled use). Read after
+   * mount, written when a command runs, as JSON. Ids no command has any more are skipped, not removed.
+   */
+  recentKey?: string | undefined;
+  /** Where `recentKey` keeps them: localStorage by default; any `{ get, set }`, sync or async. Never throws. */
+  recentStorage?: CommandPaletteStorage | undefined;
   /** Replace the built-in English text: the palette's name, the placeholder, the empty note and the recent heading. */
   labels?: Partial<CommandPaletteLabels>;
   /** Added to the panel, for layout. */
@@ -114,7 +151,61 @@ const DEFAULT_LABELS: CommandPaletteLabels = {
   placeholder: "Search commands",
   empty: "No commands found",
   recent: "Recent",
+  unavailable: (label, reason) => `${label} is unavailable: ${reason}`,
 };
+
+const localStore: CommandPaletteStorage = {
+  get: (k) => globalThis.localStorage?.getItem(k) ?? null,
+  set: (k, v) => globalThis.localStorage?.setItem(k, v),
+};
+const parseIds = (raw: string | null): string[] | null => {
+  try {
+    const ids: unknown = JSON.parse(raw ?? "null");
+    return Array.isArray(ids) ? ids.filter((x): x is string => typeof x === "string") : null;
+  } catch {
+    return null;
+  }
+};
+
+/** Recently run ids: controlled, or kept in state and (with `key`) in storage. Storage errors are ignored. */
+function useRecent(
+  value: string[] | undefined,
+  onChange: ((recent: string[]) => void) | undefined,
+  key: string | undefined,
+  storage: CommandPaletteStorage | undefined,
+): [string[], (next: string[]) => void] {
+  const [current, set] = useControllableState(value, [] as string[], onChange);
+  const store = useRef(storage ?? localStore);
+  store.current = storage ?? localStore;
+  const touched = useRef(false);
+  useEffect(() => {
+    if (!key || value !== undefined) return;
+    touched.current = false;
+    let live = true;
+    const apply = (raw: string | null) => {
+      const ids = parseIds(raw);
+      if (live && ids && !touched.current) set(ids);
+    };
+    try {
+      const raw = store.current.get(key);
+      if (raw instanceof Promise) raw.then(apply, () => {});
+      else apply(raw);
+    } catch {}
+    return () => {
+      live = false;
+    };
+  }, [key, value, set]);
+  const update = (next: string[]) => {
+    touched.current = true;
+    set(next);
+    if (!key || value !== undefined) return;
+    try {
+      const done = store.current.set(key, JSON.stringify(next));
+      if (done instanceof Promise) done.catch(() => {});
+    } catch {}
+  };
+  return [current, update];
+}
 
 /** The words of a query. */
 const wordsOf = (query: string) => query.split(/\s+/).filter(Boolean);
@@ -136,7 +227,12 @@ export function CommandPalette({
   onOpenChange,
   shortcut = "mod+k",
   filter,
+  onQueryChange,
   recentLimit = 5,
+  recent: recentProp,
+  onRecentChange,
+  recentKey,
+  recentStorage,
   labels,
   className,
   style,
@@ -144,8 +240,13 @@ export function CommandPalette({
   const text = { ...DEFAULT_LABELS, ...labels };
   const id = useId().replace(/:/g, "");
   const [isOpen, setOpen] = useControllableState(open, defaultOpen, onOpenChange);
-  const [query, setQuery] = useState("");
-  const [recent, setRecent] = useState<string[]>([]);
+  const [query, setQueryState] = useState("");
+  const setQuery = (next: string) => {
+    setQueryState(next);
+    onQueryChange?.(next);
+  };
+  const [recent, setRecent] = useRecent(recentProp, onRecentChange, recentKey, recentStorage);
+  const [said, say] = useLiveMessage();
   const dialog = useRef<HTMLDialogElement>(null);
   const input = useRef<HTMLInputElement>(null);
   const list = useRef<HTMLDivElement>(null);
@@ -185,7 +286,9 @@ export function CommandPalette({
     list,
     open: isOpen,
     count: rows.length,
-    usable: (i) => !rows[i]?.command.disabled,
+    // A disabled command that says why can be reached, so its reason is read; a bare disabled one is skipped.
+    usable: (i) => !rows[i]?.command.disabled || !!rows[i]?.command.disabledReason,
+    keyOf: (i) => rows[i] && `${rows[i].section}-${rows[i].command.id}`,
     wrap: true,
   });
 
@@ -194,6 +297,7 @@ export function CommandPalette({
     if (!isOpen) return;
     returnTo.current = deepActiveElement();
     setQuery("");
+    say("");
     setActive(0);
     input.current?.focus();
   }, [isOpen]);
@@ -206,8 +310,12 @@ export function CommandPalette({
   });
 
   const run = (command: Command | undefined) => {
-    if (!command || command.disabled) return;
-    setRecent((r) => [command.id, ...r.filter((x) => x !== command.id)].slice(0, 20));
+    if (!command) return;
+    if (command.disabled) {
+      if (command.disabledReason) say(text.unavailable(command.label, command.disabledReason));
+      return;
+    }
+    setRecent([command.id, ...recent.filter((x) => x !== command.id)].slice(0, 20));
     setOpen(false);
     onRun(command.id);
   };
@@ -295,6 +403,7 @@ export function CommandPalette({
               {section.items.map((command) => {
                 index++;
                 const i = index;
+                const reason = command.disabled ? command.disabledReason : undefined;
                 return (
                   <Fragment key={`${section.name}-${command.id}`}>
                     <div
@@ -303,9 +412,10 @@ export function CommandPalette({
                       tabIndex={-1}
                       aria-selected={i === active}
                       aria-disabled={command.disabled || undefined}
+                      aria-describedby={reason ? `${optionId(i)}-why` : undefined}
                       data-active={i === active || undefined}
                       className="cy-command-palette-item cy-reset"
-                      onPointerMove={() => !command.disabled && setActive(i)}
+                      onPointerMove={() => (!command.disabled || reason) && setActive(i)}
                       onPointerDown={(e) => e.preventDefault()}
                       onClick={() => run(command)}
                       onKeyDown={() => {}}
@@ -318,6 +428,11 @@ export function CommandPalette({
                           positions={positions?.get(command.id)}
                         />
                       </span>
+                      {reason && (
+                        <span id={`${optionId(i)}-why`} className="cy-command-palette-reason cy-reset">
+                          {reason}
+                        </span>
+                      )}
                       {section.tagged && command.group && (
                         <Badge size="sm" className="cy-command-palette-tag">
                           {command.group}
@@ -331,6 +446,7 @@ export function CommandPalette({
             </div>
           ))}
         </div>
+        <LiveRegion {...said} />
       </div>
     </DialogBase>
   );
