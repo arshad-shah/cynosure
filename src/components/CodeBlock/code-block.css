@@ -131,3 +131,12 @@
     box-shadow: inset calc(var(--cy-border-width) * 2) 0 0 Highlight;
   }
 }
+
+/* Under cut code (maxLines, maxChars): the "Show all" button, on the header's surface. */
+.cy-code-block-more.cy-code-block-more {
+  display: flex;
+  padding: var(--cy-space-1) var(--cy-space-2);
+  border-block-start: var(--cy-border-width) solid var(--cy-color-line);
+  background: var(--cy-color-surface);
+  font-size: var(--cy-font-size-sm);
+}

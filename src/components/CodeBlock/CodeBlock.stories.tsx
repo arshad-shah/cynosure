@@ -332,3 +332,68 @@ export const StableUnderHostileHost: Story = {
     }
   },
 };
+
+const BIG = Array.from({ length: 5000 }, (_, i) => `line ${i + 1}`).join("\n");
+const preOf = (el: Element) => el.querySelector(".cy-code-block-pre") as HTMLElement;
+
+/** `maxLines`: very long code shows its first lines and a "Show all" button; copying always takes all of it. */
+export const LongCodeShowsTheFirstLines: Story = {
+  args: {
+    code: BIG,
+    title: "dump.txt",
+    language: undefined,
+    maxLines: 20,
+    lineNumbers: true,
+    highlight: fn((c: string) => c),
+  },
+  play: async ({ args, canvas, canvasElement, userEvent }) => {
+    const pre = preOf(canvasElement);
+    await expect(pre.textContent?.split("\n")).toHaveLength(20);
+    await expect(pre).toHaveTextContent("line 20");
+    await expect(pre).not.toHaveTextContent("line 21");
+    // The highlighter only gets what is shown, and the gutter numbers it.
+    await expect(
+      (((args.highlight as ReturnType<typeof fn>).mock.lastCall ?? [""])[0] as string).split("\n"),
+    ).toHaveLength(20);
+    await expect(canvasElement.querySelectorAll(".cy-code-block-gutter > span")).toHaveLength(20);
+    // Copy takes the whole text.
+    await userEvent.click(canvas.getByRole("button", { name: "Copy" }));
+    await expect(args.copy).toHaveBeenCalledWith(BIG);
+    // Show all: every line, and the button says it shows less now.
+    const more = canvas.getByRole("button", { name: "Show all 5,000 lines" });
+    await expect(more).toHaveAttribute("aria-expanded", "false");
+    await expect(more).toHaveAttribute("aria-controls", pre.id);
+    await userEvent.click(more);
+    await expect(preOf(canvasElement)).toHaveTextContent("line 5000");
+    const less = canvas.getByRole("button", { name: "Show less" });
+    await expect(less).toHaveAttribute("aria-expanded", "true");
+    await userEvent.click(less);
+    await expect(preOf(canvasElement)).not.toHaveTextContent("line 21");
+  },
+};
+
+/** One enormous line (Base64): `maxChars` cuts it, and the button counts characters. */
+export const OneHugeLineIsCutByCharacters: Story = {
+  args: {
+    code: "QUJD".repeat(50000),
+    title: undefined,
+    language: undefined,
+    maxChars: 4096,
+    labels: { showLess: "Weniger" },
+  },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    await expect(preOf(canvasElement).textContent).toHaveLength(4096);
+    await userEvent.click(canvas.getByRole("button", { name: "Show all 200,000 characters" }));
+    await expect(preOf(canvasElement).textContent).toHaveLength(200000);
+    await expect(canvas.getByRole("button", { name: "Weniger" })).toBeInTheDocument();
+  },
+};
+
+/** Code within the limits shows whole, with no button. */
+export const ShortCodeHasNoShowAll: Story = {
+  args: { maxLines: 20, maxChars: 4096 },
+  play: async ({ canvas, canvasElement }) => {
+    await expect(preOf(canvasElement)).toHaveTextContent("chunkSizeWarningLimit");
+    await expect(canvas.queryByRole("button", { name: /Show/ })).toBeNull();
+  },
+};

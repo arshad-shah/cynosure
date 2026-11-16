@@ -47,6 +47,16 @@ Cynosure bundles no highlighter. Pass `highlight`, a function from the code and 
 
 <Canvas of={Stories.Wrapped} />
 
+## Very long code
+
+`maxLines` shows only the first lines, and `maxChars` the first characters (for one enormous line such as Base64). A "Show all" button under the code shows the rest, and "Show less" cuts it again. Only the shown part is highlighted and drawn; the copy button, and the `code` you give your actions (a Download), always take the whole text.
+
+```tsx
+<CodeBlock code={output} maxLines={200} maxChars={65536} actions={<Button size="sm" onClick={() => download(output)}>Download</Button>} />
+```
+
+<Canvas of={Stories.LongCodeShowsTheFirstLines} />
+
 ## Actions
 
 `actions` puts your own buttons in the header, before the copy button: "Insert into editor", "Run". Use `Button` or `IconButton` at `size="sm"`. They keep their size when the block is narrow (the title gives way) and come before the copy button in the tab order. With `copyable={false}` and no title the header still shows, holding the actions.
