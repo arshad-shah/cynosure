@@ -16,6 +16,7 @@ Inline text link built on `LinkBase` (safe schemes only). Tone colours use each 
 | `underline`    | `always`  | `hover` (on hover and focus) or `none`; keep it in running text, drop it only where the place says "link" (navigation, footers) |
 | `onClick`      | –         | Called when the link is activated                                                                                               |
 | `aria-current` | –         | `"page"` for the page being shown, in a navigation bar                                                                          |
+| `renderLink`   | –         | Render the anchor with your router: `(props) => <RouterLink {...props} to={props.href} />`; it keeps Link's look                |
 
 ## Tokens
 

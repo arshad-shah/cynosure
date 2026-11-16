@@ -3,10 +3,12 @@ import {
   type CSSProperties,
   forwardRef,
   type MouseEventHandler,
+  type ReactElement,
   type ReactNode,
+  type Ref,
 } from "react";
 import { Icon } from "../../foundations/Icon/Icon.js";
-import { LinkBase } from "../../foundations/LinkBase/LinkBase.js";
+import { LinkBase, safeHref } from "../../foundations/LinkBase/LinkBase.js";
 import { external as externalIcon } from "../../icons/external.js";
 import type { Size, Tone } from "../../tokens/schema.js";
 
@@ -19,6 +21,37 @@ declare module "../../tokens/schema.js" {
   interface ComponentTokens {
     link: LinkTokens;
   }
+}
+
+/**
+ * What `renderLink` receives: spread all of it onto your router's link component, mapping `href` to its own prop
+ * (`to`). It carries Link's class and data attributes (its look), its state and its handlers.
+ */
+export interface LinkRenderProps {
+  /** Where the link goes; undefined when `href` used a scheme that is not allowed (`javascript:`). */
+  href: string | undefined;
+  /** Link's styling; keep it on the element. */
+  className: string;
+  /** The tone, read by Link's stylesheet; keep it on the element. */
+  "data-tone": Tone;
+  /** The size, read by Link's stylesheet; keep it on the element. */
+  "data-size": Size | "inherit";
+  /** When the underline shows (absent for `always`), read by Link's stylesheet; keep it on the element. */
+  "data-underline"?: "hover" | "none" | undefined;
+  /** Link's `aria-current`. */
+  "aria-current"?: AriaAttributes["aria-current"] | undefined;
+  /** `_blank` for an `external` link. */
+  target?: "_blank" | undefined;
+  /** A safe `rel` (`noopener noreferrer`) for an `external` link. */
+  rel?: string | undefined;
+  /** Link's `onClick`; keep it on the element. */
+  onClick?: MouseEventHandler<HTMLAnchorElement> | undefined;
+  /** Link's `style` (layout only). */
+  style?: CSSProperties | undefined;
+  /** Forwarded to the anchor. */
+  ref: Ref<HTMLAnchorElement>;
+  /** The text, and the external icon and announcement. */
+  children: ReactNode;
 }
 
 export interface LinkProps {
@@ -42,6 +75,11 @@ export interface LinkProps {
   "aria-current"?: AriaAttributes["aria-current"];
   /** Called when the link is activated. */
   onClick?: MouseEventHandler<HTMLAnchorElement>;
+  /**
+   * Render the anchor with your router: `(props) => <RouterLink {...props} to={props.href} />`. It receives Link's
+   * class, data attributes and handlers, so the router's element looks and behaves like a Link. Default: a plain link.
+   */
+  renderLink?: ((props: LinkRenderProps) => ReactElement) | undefined;
   /** Replace the built-in English text: `external` is read out after a link that opens in a new tab. */
   labels?: { external?: string };
   /** Added to the root element, for layout. */
@@ -60,6 +98,7 @@ export const Link = forwardRef<HTMLAnchorElement, LinkProps>(function Link(
     external = false,
     underline = "always",
     onClick,
+    renderLink,
     labels,
     className,
     style,
@@ -67,19 +106,8 @@ export const Link = forwardRef<HTMLAnchorElement, LinkProps>(function Link(
   },
   ref,
 ) {
-  return (
-    <LinkBase
-      ref={ref}
-      href={href}
-      onClick={onClick}
-      className={`cy-link${className ? ` ${className}` : ""}`}
-      data-tone={tone}
-      data-size={size}
-      data-underline={underline === "always" ? undefined : underline}
-      aria-current={current}
-      style={style}
-      {...(external ? { target: "_blank" } : {})}
-    >
+  const content = (
+    <>
       {children}
       {external && (
         <>
@@ -87,6 +115,28 @@ export const Link = forwardRef<HTMLAnchorElement, LinkProps>(function Link(
           <span className="cy-visually-hidden"> {labels?.external ?? "(opens in new tab)"}</span>
         </>
       )}
+    </>
+  );
+  const props = {
+    className: `cy-link${className ? ` ${className}` : ""}`,
+    "data-tone": tone,
+    "data-size": size,
+    "data-underline": underline === "always" ? undefined : underline,
+    "aria-current": current,
+    onClick,
+    style,
+  };
+  if (renderLink)
+    return renderLink({
+      ...props,
+      ref,
+      href: safeHref(href),
+      ...(external ? { target: "_blank" as const, rel: "noopener noreferrer" } : {}),
+      children: content,
+    });
+  return (
+    <LinkBase ref={ref} href={href} {...props} {...(external ? { target: "_blank" } : {})}>
+      {content}
     </LinkBase>
   );
 });

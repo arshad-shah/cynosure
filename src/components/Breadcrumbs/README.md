@@ -22,6 +22,7 @@ import { Breadcrumbs } from "@arshad-shah/cynosure";
 | `maxItems`            | every item                                          | With more items: the first and the last `maxItems - 1` stay, the rest go into a menu. Under 2 counts as 2 |
 | `separator`           | `chevronRight`                                      | Facet icon between crumbs; decorative, mirrored in right-to-left text                                     |
 | `size`                | `md`                                                | `sm` · `md` (text size)                                                                                   |
+| `renderLink`          | –                                                   | Render the crumbs' links with your router, as Link's `renderLink`; menu choices click the same element    |
 | `labels`              | `{ nav: "Breadcrumb", more: "Show the full path" }` | Landmark name; name of the "more" button and its menu                                                     |
 | `className` / `style` | –                                                   | Layout only                                                                                               |
 

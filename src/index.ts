@@ -235,7 +235,7 @@ export {
   type KeyValueEditorTokens,
   type KeyValuePair,
 } from "./components/KeyValueEditor/index.js";
-export { Link, type LinkProps } from "./components/Link/index.js";
+export { Link, type LinkProps, type LinkRenderProps } from "./components/Link/index.js";
 export {
   List,
   type ListItem,
