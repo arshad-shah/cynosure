@@ -1,4 +1,4 @@
-import type { AriaAttributes, HTMLAttributes } from "react";
+import type { AriaAttributes, DOMAttributes, HTMLAttributes } from "react";
 
 /** A step of the theme's space scale (`--cy-space-0` … `--cy-space-10`). */
 export type Space = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" | "10";
@@ -37,8 +37,21 @@ export const BREAKPOINTS = { sm: "30rem", md: "45rem", lg: "60rem", xl: "75rem" 
 /** A named width of the layout scale (`BREAKPOINTS`). */
 export type Breakpoint = keyof typeof BREAKPOINTS;
 
-/** Attributes every layout primitive passes to its element: an id to link to, a role and ARIA attributes. */
-export interface LayoutAttributes extends Pick<HTMLAttributes<HTMLElement>, "id" | "role">, AriaAttributes {}
+/** Any `data-*` attribute, passed to the element as given. */
+export interface DataAttributes {
+  [attribute: `data-${string}`]: string | number | boolean | undefined;
+}
+
+/**
+ * Attributes every layout primitive passes to its element: an id to link to, a role, ARIA attributes, any `data-*`
+ * attribute, `tabIndex` (a scrolling region keyboard users can reach), `dir`, `lang`, and every event handler
+ * (a drop zone's drag events, a pointer handler on a canvas column). The `ref` is the element too.
+ */
+export interface LayoutAttributes
+  extends Pick<HTMLAttributes<HTMLElement>, "id" | "role" | "tabIndex" | "dir" | "lang">,
+    Omit<DOMAttributes<HTMLElement>, "children" | "dangerouslySetInnerHTML">,
+    AriaAttributes,
+    DataAttributes {}
 
 /** Showing or hiding a layout box by the width of the window, with no script. */
 export interface VisibilityProps {

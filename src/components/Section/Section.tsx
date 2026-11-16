@@ -1,5 +1,5 @@
 import { type AriaRole, type CSSProperties, forwardRef, type ReactNode } from "react";
-import { type Space, space } from "../../foundations/layout.js";
+import { type LayoutAttributes, type Space, space } from "../../foundations/layout.js";
 import { Container, type ContainerProps } from "../Container/Container.js";
 
 export interface SectionTokens {
@@ -19,7 +19,7 @@ declare module "../../tokens/schema.js" {
   }
 }
 
-export interface SectionProps {
+export interface SectionProps extends LayoutAttributes {
   /**
    * The band's background: `plain` (none, the page shows through), `surface`, `soft` (a quiet tint) or `accent` (a
    * soft tint of the accent colour). Text colours stay readable on each. Default "plain".
