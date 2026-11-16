@@ -246,6 +246,13 @@ export {
   type HotkeyFieldTokens,
 } from "./components/HotkeyField/index.js";
 export { HoverCard, type HoverCardProps, type HoverCardTokens } from "./components/HoverCard/index.js";
+export {
+  HtmlPreview,
+  type HtmlPreviewLabels,
+  type HtmlPreviewProps,
+  type HtmlPreviewTokens,
+  htmlPolicy,
+} from "./components/HtmlPreview/index.js";
 export { IconButton, type IconButtonProps } from "./components/IconButton/index.js";
 export { IconTile, type IconTileProps, type IconTileTokens } from "./components/IconTile/index.js";
 export { Image, type ImageProps, type ImageRegion, type ImageTokens } from "./components/Image/index.js";
@@ -621,6 +628,7 @@ export { useControllableState } from "./foundations/controllable.js";
 export { DialogBase, type DialogBaseProps } from "./foundations/DialogBase/index.js";
 export { type DragOptions, type DragSession, useDrag } from "./foundations/drag.js";
 export { FileInputBase, type FileInputBaseProps, setInputFiles } from "./foundations/FileInputBase/index.js";
+export { FrameBase, type FrameBaseProps } from "./foundations/FrameBase/index.js";
 export { type FieldRender, useField } from "./foundations/field.js";
 export { HiddenValue, type HiddenValueProps } from "./foundations/HiddenValue/HiddenValue.js";
 export {

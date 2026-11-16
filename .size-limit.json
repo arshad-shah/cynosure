@@ -792,5 +792,17 @@
     "path": ["dist/components/CanvasStage/CanvasStage.js", "dist/styles/canvas-stage.css"],
     "limit": "3 kB",
     "gzip": true
+  },
+  {
+    "name": "FrameBase",
+    "path": ["dist/foundations/FrameBase/FrameBase.js"],
+    "limit": "3 kB",
+    "gzip": true
+  },
+  {
+    "name": "HtmlPreview (JS + CSS)",
+    "path": ["dist/components/HtmlPreview/HtmlPreview.js", "dist/styles/html-preview.css"],
+    "limit": "3 kB",
+    "gzip": true
   }
 ]

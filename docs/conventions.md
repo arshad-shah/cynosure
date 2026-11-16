@@ -4,7 +4,7 @@ The rules in `AGENTS.md` are enforced by `pnpm check`:
 
 | Rule                | What fails                                                                                                                |
 | ------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| `native-elements`   | `<button a input textarea select dialog details summary option>` outside `src/foundations`                                |
+| `native-elements`   | `<button a input textarea select dialog details summary option iframe video>` outside `src/foundations`                   |
 | `title-attr`        | any `title=` (native tooltip)                                                                                             |
 | `glyphs`            | emoji or text glyphs (✓ × › → …) in JSX text                                                                              |
 | `literals`          | hex or px literals in component CSS/TSX outside `var()` fallbacks                                                         |

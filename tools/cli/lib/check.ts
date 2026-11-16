@@ -21,6 +21,8 @@ const NATIVE = new Set([
   "details",
   "summary",
   "option",
+  "iframe",
+  "video",
 ]);
 // Emoji and common text glyphs used as fake icons.
 const GLYPHS = /[\p{Extended_Pictographic}✓✔✕✖×▸▾▴◂›‹»«←→↑↓⌄⌃☰⋯]/u;
@@ -354,6 +356,7 @@ export const FOUNDATION_USERS: Record<string, readonly string[]> = {
   ChoiceBase: ["Checkbox", "RadioGroup", "SegmentedControl", "Switch"],
   DialogBase: ["CommandPalette", "Dialog"],
   FileInputBase: ["FileDrop", "KeyValueEditor"],
+  FrameBase: ["HtmlPreview"],
 };
 const FREE_FOUNDATIONS = new Set(["Icon", "HiddenValue", "LiveRegion"]);
 
