@@ -46,6 +46,17 @@
     border-style: dotted;
     background: transparent;
   }
+  /* variant="button": only the button (and what it reports under it), no zone. */
+  &[data-variant="button"] {
+    display: inline-flex;
+    align-items: flex-start;
+    gap: var(--cy-space-2);
+    padding: 0;
+    border: 0;
+    background: transparent;
+    text-align: start;
+    vertical-align: middle;
+  }
 }
 .cy-file-drop-icon.cy-file-drop-icon {
   color: var(--cy-color-muted);
