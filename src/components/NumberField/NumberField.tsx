@@ -49,8 +49,9 @@ export interface NumberFieldProps extends FieldLayoutProps {
   onChange?: ((value: number | null) => void) | undefined;
   /**
    * When typed text becomes the value. `"blur"`: on Enter or leaving the field. `"input"`: also as it is typed, each
-   * time the text reads as a number within `min` and `max` (a live preview); the text is left as typed until Enter or
-   * leaving the field, which clamp and rewrite it as before. Steps commit at once either way. Default "blur".
+   * time the text reads as a number within `min` and `max` (a live preview), and as `null` when it is emptied unless
+   * the field is `required`; the text is left as typed until Enter or leaving the field, which clamp and rewrite it
+   * as before. Steps commit at once either way. Default "blur".
    */
   commit?: "blur" | "input" | undefined;
   /**
@@ -300,7 +301,12 @@ export function NumberField({
   // commit="input": the text as typed becomes the value once it reads as a number in range; the text stays as typed.
   const onType = (text: string) => {
     setDraft(text);
-    if (commitOn !== "input" || text.trim() === "") return;
+    if (commitOn !== "input") return;
+    // Emptied: "no value" when the field allows it; a required field keeps its value until a number is typed.
+    if (text.trim() === "") {
+      if (!required && current !== null) setCurrent(null);
+      return;
+    }
     const parsed = parseNumber(text, locale, formatOptions);
     if (parsed === null || parsed !== limit(parsed) || parsed === current) return;
     setCurrent(parsed);

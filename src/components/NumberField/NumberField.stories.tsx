@@ -418,8 +418,9 @@ export const CommitWhileTyping: Story = {
   play: async ({ args, canvas, userEvent }) => {
     const input = canvas.getByRole("spinbutton", { name: "Opacity" });
     await userEvent.clear(input);
-    // Empty is not applied while typing (the person is about to type a number).
-    await expect(args.onChange).not.toHaveBeenCalled();
+    // The field may be empty (not required): emptying it applies "no value" at once.
+    await expect(args.onChange).toHaveBeenLastCalledWith(null);
+    await expect(input).not.toHaveAttribute("aria-valuenow");
     await userEvent.type(input, "7");
     await expect(args.onChange).toHaveBeenLastCalledWith(7);
     await userEvent.type(input, "5");
@@ -427,12 +428,25 @@ export const CommitWhileTyping: Story = {
     await expect(input).toHaveAttribute("aria-valuenow", "75");
     // Out of range or unreadable: not applied until it is again; the text is left as typed.
     await userEvent.type(input, "0");
-    await expect(args.onChange).toHaveBeenCalledTimes(2);
+    await expect(args.onChange).toHaveBeenCalledTimes(3);
     await expect(input).toHaveValue("750");
     // Leaving the field settles it as before: clamped and written back.
     await userEvent.tab();
     await expect(args.onChange).toHaveBeenLastCalledWith(100);
     await expect(input).toHaveValue("100");
+  },
+};
+
+export const CommitWhileTypingKeepsARequiredValue: Story = {
+  args: { label: "Opacity", min: 0, max: 100, defaultValue: 50, commit: "input", required: true },
+  play: async ({ args, canvas, userEvent }) => {
+    const input = canvas.getByRole("spinbutton", { name: "Opacity" });
+    await userEvent.clear(input);
+    // Required: emptying is a step on the way to a new number, so the value stays until one is typed.
+    await expect(args.onChange).not.toHaveBeenCalled();
+    await expect(input).toHaveAttribute("aria-valuenow", "50");
+    await userEvent.type(input, "8");
+    await expect(args.onChange).toHaveBeenLastCalledWith(8);
   },
 };
 

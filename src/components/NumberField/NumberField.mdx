@@ -29,7 +29,7 @@ import { NumberField } from "@arshad-shah/cynosure";
 
 ## Live values while typing
 
-`commit="input"` also applies the typed text as it is typed, whenever it reads as a number within `min` and `max`: a preview follows the keys. Text that is out of range or unreadable is not applied until it is again, and the text is left as typed until Enter or leaving the field, which clamp it and write it back in the field's format.
+`commit="input"` also applies the typed text as it is typed, whenever it reads as a number within `min` and `max`: a preview follows the keys. Emptying the field applies `null` at once, unless it is `required`, when the value stays until a number is typed. Text that is out of range or unreadable is not applied until it is again, and the text is left as typed until Enter or leaving the field, which clamp it and write it back in the field's format.
 
 <Canvas of={Stories.CommitWhileTyping} />
 
