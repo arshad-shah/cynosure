@@ -153,6 +153,37 @@ export const ReadOnlyShowsColoursWithoutAChoice: Story = {
   },
 };
 
+export const PlainStringsAndProductClasses: Story = {
+  render: () => (
+    <>
+      <ColorSwatches label="Read only" swatches={["rgb(1 2 3)"]} readOnly className="product-palette" />
+      <ColorSwatches
+        label="Pick"
+        swatches={["var(--brand-unknown)"]}
+        value="var(--brand-unknown)"
+        onChange={() => {}}
+        className="product-picker"
+      />
+    </>
+  ),
+  play: async ({ canvas }) => {
+    // A plain string is named by its value, read only or not; the product's class sits beside Cynosure's.
+    await expect(canvas.getByRole("group", { name: "Read only" })).toHaveClass(
+      "cy-color-swatches",
+      "product-palette",
+    );
+    await expect(canvas.getByRole("img", { name: "rgb(1 2 3)" })).toBeVisible();
+    await expect(canvas.getByRole("radiogroup", { name: "Pick" })).toHaveClass(
+      "cy-color-swatches",
+      "product-picker",
+    );
+    // A colour Cynosure cannot read is still chosen by its spelling, with a tick.
+    const swatch = canvas.getByRole("radio", { name: "var(--brand-unknown)" });
+    await expect(swatch).toHaveAttribute("aria-checked", "true");
+    await expect(swatch.querySelector("svg")).not.toBeNull();
+  },
+};
+
 export const TouchSwatches: Story = {
   tags: ["touch", "!dev"],
   play: async ({ canvas, userEvent }) => {

@@ -349,7 +349,15 @@ export const MaxHeightCapsTheArea: Story = {
   },
 };
 
-function Jump({ dir }: { dir?: "rtl" }) {
+function Jump({
+  dir,
+  direction = "both",
+  label = "Results",
+}: {
+  dir?: "rtl";
+  direction?: ScrollAreaProps["direction"];
+  label?: string;
+}) {
   const handle = useRef<ScrollAreaHandle>(null);
   const target = useRef<HTMLSpanElement>(null);
   const go = (align?: "start" | "center") =>
@@ -368,7 +376,7 @@ function Jump({ dir }: { dir?: "rtl" }) {
         </Button>
       </Stack>
       <div style={{ blockSize: 160, inlineSize: 300 }}>
-        <ScrollArea label="Results" direction="both" handle={handle}>
+        <ScrollArea label={label} direction={direction} handle={handle}>
           <div style={{ inlineSize: 1200, blockSize: 1200, paddingBlockStart: 700, paddingInlineStart: 800 }}>
             <span ref={target} style={{ display: "inline-block", inlineSize: 60, blockSize: 20 }}>
               Match
@@ -429,6 +437,27 @@ export const ScrollIntoViewNearestFromPastAndInView: Story = {
     const [top, left] = [region.scrollTop, region.scrollLeft];
     await userEvent.click(canvas.getByRole("button", { name: "Nearest" }));
     await expect([region.scrollTop, region.scrollLeft]).toEqual([top, left]);
+  },
+};
+
+export const ScrollIntoViewKeepsToTheAreaAxis: Story = {
+  render: () => (
+    <>
+      <Jump direction="vertical" label="Down" />
+      <Jump direction="horizontal" label="Across" />
+    </>
+  ),
+  play: async ({ canvas, userEvent }) => {
+    const vertical = canvas.getByRole("region", { name: "Down" });
+    const horizontal = canvas.getByRole("region", { name: "Across" });
+    const [nearV, nearH] = canvas.getAllByRole("button", { name: "Nearest" });
+    // A vertical area only scrolls up and down to the element, a horizontal one only sideways.
+    await userEvent.click(nearV as HTMLElement);
+    await expect(vertical.scrollTop).toBeGreaterThan(0);
+    await expect(vertical.scrollLeft).toBe(0);
+    await userEvent.click(nearH as HTMLElement);
+    await expect(horizontal.scrollLeft).toBeGreaterThan(0);
+    await expect(horizontal.scrollTop).toBe(0);
   },
 };
 

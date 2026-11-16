@@ -108,6 +108,47 @@ export const FilesItDoesNotTakeAreTurnedAway: Story = {
   },
 };
 
+export const MultipleTakesEveryFileOfAnyType: Story = {
+  args: { multiple: true, accept: undefined, ratio: undefined, className: "product-stage" },
+  play: async ({ args, canvas, canvasElement }) => {
+    const stage = stageOf(canvasElement);
+    // Without a ratio the stage sizes to its content; the product's class sits beside Cynosure's.
+    await expect(stage).not.toHaveAttribute("data-ratio");
+    await expect(stage).toHaveClass("cy-canvas-stage", "product-stage");
+    drag(canvas.getByTestId("surface"), [png, riv])();
+    // With `multiple` and no `accept`, every dropped file is taken and none turned away.
+    await expect(args.onFiles).toHaveBeenCalledWith([png, riv]);
+    await expect(args.onReject).not.toHaveBeenCalled();
+  },
+};
+
+export const OnlyWrongFilesCallsOnlyOnReject: Story = {
+  play: async ({ args, canvas }) => {
+    drag(canvas.getByTestId("surface"), [png])();
+    await expect(args.onReject).toHaveBeenCalledWith([png]);
+    await expect(args.onFiles).not.toHaveBeenCalled();
+  },
+};
+
+export const CrossingAChildKeepsTheDropHint: Story = {
+  play: async ({ canvas, canvasElement }) => {
+    const stage = stageOf(canvasElement);
+    const surface = canvas.getByTestId("surface");
+    const data = new DataTransfer();
+    data.items.add(riv);
+    const fire = (target: Element, type: string) =>
+      target.dispatchEvent(new DragEvent(type, { bubbles: true, cancelable: true, dataTransfer: data }));
+    // Entering the stage, then its canvas, then leaving the stage's own edge for the canvas: still over the stage.
+    fire(stage, "dragenter");
+    fire(surface, "dragenter");
+    fire(stage, "dragleave");
+    await waitFor(() => expect(stage).toHaveAttribute("data-over"));
+    // Leaving the canvas for outside ends it.
+    fire(surface, "dragleave");
+    await waitFor(() => expect(stage).not.toHaveAttribute("data-over"));
+  },
+};
+
 export const TextDragsAndLeavingAreIgnored: Story = {
   play: async ({ args, canvas, canvasElement }) => {
     const stage = stageOf(canvasElement);
@@ -117,6 +158,12 @@ export const TextDragsAndLeavingAreIgnored: Story = {
     canvas.getByTestId("surface").dispatchEvent(enter);
     await expect(enter.defaultPrevented).toBe(false);
     await expect(stage).not.toHaveAttribute("data-over");
+    // Dragging text over the stage or dropping it there is not taken either.
+    for (const type of ["dragover", "drop"]) {
+      const event = new DragEvent(type, { bubbles: true, cancelable: true, dataTransfer: data });
+      canvas.getByTestId("surface").dispatchEvent(event);
+      await expect(event.defaultPrevented).toBe(false);
+    }
     // A file dragged in and out again leaves nothing behind.
     drag(canvas.getByTestId("surface"), [riv], "dragleave")();
     await expect(stage).not.toHaveAttribute("data-over");
