@@ -40,6 +40,19 @@ Mark columns `sortable` and their headers become buttons (a [SortButton](?path=/
 
 <Canvas of={Stories.SelectingRows} />
 
+## Tinted columns and cells
+
+A column's `tone` tints its header and cells; a function of the row tints cell by cell, for a heat grid. In markup, `TableCell` and `TableHeaderCell` take `tone`. A tint is colour only and is not read out: say the same in the cell's text.
+
+```tsx
+const columns = [
+  { key: "zone", header: "Zone" },
+  { key: "h9", header: "09:00", tone: (r) => (r.working[9] ? "success" : undefined) },
+];
+```
+
+<Canvas of={Stories.TintedColumnsAndCells} />
+
 ## Sticky header
 
 With `stickyHeader` the body scrolls inside the table up to `--cy-table-max-height` and the header stays in view. The scroller is a focusable region named by the caption, so keyboard users can scroll it.
@@ -102,7 +115,7 @@ import { Table, TableBody, TableCell, TableFoot, TableHead, TableHeaderCell, Tab
 
 ## Theming
 
-Tokens: `--cy-table-header-background`, `--cy-table-selected-background` and `--cy-table-max-height`.
+Tokens: `--cy-table-header-background`, `--cy-table-selected-background`, `--cy-table-max-height` and `--cy-table-tint-mix` (how much of the tone a tinted cell mixes into the surface, 14%).
 
 ## Related
 

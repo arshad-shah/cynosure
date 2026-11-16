@@ -22,7 +22,7 @@ import { Table } from "@arshad-shah/cynosure";
 | Prop                           | Default    | Notes                                                                                         |
 | ------------------------------ | ---------- | --------------------------------------------------------------------------------------------- |
 | `caption` / `captionHidden`    | – / false  | The table's name, shown above it (or only announced)                                          |
-| `columns`                      | –          | `{ key, header, cell?, sortable?, sortValue?, align?, width?, rowHeader? }`                   |
+| `columns`                      | –          | `{ key, header, cell?, sortable?, sortValue?, align?, width?, rowHeader?, tone? }`            |
 | `rows` / `getRowId`            | –          | The data and a stable id per row                                                              |
 | `sort` / `defaultSort`         | – / `null` | `{ key, direction: "ascending" \| "descending" }`; headers cycle ascending → descending → off |
 | `onSortChange`                 | –          | Every sort change                                                                             |
@@ -36,6 +36,7 @@ import { Table } from "@arshad-shah/cynosure";
 | `id`, `data-*`, `ref`          | –          | Set on the root element (the bordered wrapper), in both forms                                 |
 - Text sorts in the locale's order ignoring case and with numbers in order; numbers sort as numbers; empty values go last.
 - The first column (or the one marked `rowHeader`) is a row header.
+- **Tints:** a column's `tone` tints its header and every cell; `tone: (row) => tone | undefined` tints cell by cell, for a heat grid (working hours, the best overlap). In markup, `TableCell` and `TableHeaderCell` take `tone`. The tone is mixed into the surface (`--cy-table-tint-mix`, 14%) and the text stays in the ink colour; a tint is not read out, so say the same in the cell's text. A selected row's background wins over a tint.
 - Sort buttons are SortButtons: `aria-sort` on their header and a 44px hit area on touch screens.
 
 ## Written as markup
@@ -75,3 +76,4 @@ Every part takes `id`, `data-*`, `className`, `style` and a `ref`. `onSort` make
 ## Tokens
 
 - `--cy-table-header-background`, `--cy-table-selected-background`, `--cy-table-max-height`
+- `--cy-table-tint-mix`: how much of the tone a tinted cell mixes into the surface (default 14%)

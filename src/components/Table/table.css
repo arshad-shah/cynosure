@@ -86,6 +86,28 @@
     z-index: 1;
   }
 }
+/* tone: a cell (or a column's cells and header) tinted with its tone over the surface; the text stays readable. */
+.cy-table-th.cy-table-th[data-tone],
+.cy-table-td.cy-table-td[data-tone] {
+  --_tint: var(--cy-color-ink);
+  background: color-mix(in oklab, var(--_tint) var(--cy-table-tint-mix, 14%), var(--cy-color-surface));
+  color: var(--cy-color-ink);
+  &[data-tone="accent"] {
+    --_tint: var(--cy-color-accent);
+  }
+  &[data-tone="danger"] {
+    --_tint: var(--cy-color-danger);
+  }
+  &[data-tone="success"] {
+    --_tint: var(--cy-color-success);
+  }
+  &[data-tone="warning"] {
+    --_tint: var(--cy-color-warning);
+  }
+  &[data-tone="info"] {
+    --_tint: var(--cy-color-info);
+  }
+}
 .cy-table-rowheader.cy-table-rowheader {
   color: var(--cy-color-ink);
   font-weight: var(--cy-font-weight-medium);
