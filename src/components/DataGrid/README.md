@@ -79,6 +79,8 @@ rows in `onEndReached`.
 
 ## Tokens
 
+- `--cy-data-grid-details-background`: background of an open row's details panel
+
 - `--cy-data-grid-height`: Height of the grid (it scrolls inside, in both directions).
 - `--cy-data-grid-row-height`: Height of a row (never less than the hit area: 44px on a touch screen).
 - `--cy-data-grid-header-height`: Height of the header row.

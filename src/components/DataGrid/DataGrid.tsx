@@ -1,6 +1,7 @@
 import {
   type ClipboardEvent,
   type CSSProperties,
+  type FocusEvent,
   type KeyboardEvent,
   type MouseEvent,
   type ReactNode,
@@ -12,18 +13,28 @@ import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js
 import { useControllableState } from "../../foundations/controllable.js";
 import { isRtl } from "../../foundations/dir.js";
 import { useDrag } from "../../foundations/drag.js";
+import { Icon } from "../../foundations/Icon/Icon.js";
 import { isComposing, stepKey } from "../../foundations/keys.js";
 import { clamp } from "../../foundations/math.js";
-import { nextSort, sortRows, type TableSort } from "../../foundations/sort.js";
+import { nextSorts, sortRowsBy, type TableSort } from "../../foundations/sort.js";
+import { textMatches } from "../../foundations/text-match.js";
 import { useVirtualWindow } from "../../foundations/virtual-window.js";
+import { chevronRight } from "../../icons/chevron-right.js";
+import { moreVertical } from "../../icons/more-vertical.js";
 import type { Tone } from "../../tokens/schema.js";
+import { IconButton } from "../IconButton/IconButton.js";
+import { Menu, type MenuEntry } from "../Menu/Menu.js";
+import { Select } from "../Select/Select.js";
 import { SortButton } from "../SortButton/SortButton.js";
+import { TextField } from "../TextField/TextField.js";
 import { Tooltip } from "../Tooltip/Tooltip.js";
 
 /** The value inside a cell: its tooltip shows only while this is cut short. */
 const cellValue = (cell: HTMLElement) => cell.querySelector<HTMLElement>(".cy-data-grid-value");
 
 export interface DataGridTokens {
+  /** Background of an open row's details panel. */
+  detailsBackground: string;
   /** Height of the grid (it scrolls inside, in both directions). */
   height: string;
   /** Height of a row (never less than the hit area: 44px on a touch screen). */
@@ -83,6 +94,29 @@ export interface DataGridColumn<Row> {
   cellKind?: (row: Row) => DataGridCellKind | undefined;
   /** Colours the cell's text with a tone (a status, a match); it wins over the kind's colour. Nothing: no tone. */
   cellTone?: (row: Row) => Tone | undefined;
+  /**
+   * The column's name as plain text, for the cell editor, the filter field and the column menu ("Edit Name"). Default:
+   * `header` when it is text, else `key`.
+   */
+  label?: string | undefined;
+  /**
+   * The cells can be edited (all, or the rows this returns true for): Enter or F2 opens the editor, typing a character
+   * starts it with that character, a double-click opens it. The grid's `onCellEdit` receives the new value.
+   */
+  editable?: boolean | ((row: Row) => boolean) | undefined;
+  /**
+   * How a cell is edited: `text` (default, a string), `number` (a number, or null when emptied; anything else is
+   * refused) or `select` (one of `options`, committed as it is chosen).
+   */
+  editor?: "text" | "number" | "select" | undefined;
+  /** The choices of a `select` editor. */
+  options?: { value: string; label: string }[] | undefined;
+  /**
+   * A field for this column in a filter row under the header. `text` keeps rows whose value holds the typed text
+   * (ignoring case); `number` takes a number or a comparison (`>30`, `<=40`, `30..40`); a function `(row, query)` keeps
+   * the rows it returns true for. An empty field filters nothing.
+   */
+  filter?: "text" | "number" | ((row: Row, query: string) => boolean) | undefined;
 }
 
 /** One cell, by its row's id and its column's key (so it survives sorting and loading more rows). */
@@ -100,6 +134,34 @@ export interface DataGridRange {
 export interface DataGridLabels {
   /** Shown when there are no rows. */
   empty: ReactNode;
+  /** The cell editor's name, from the column's name. Default "Edit Name". */
+  edit: (column: string) => string;
+  /** Shown under a number editor holding text that is not a number. Default "Enter a number". */
+  invalidNumber: string;
+  /** A filter field's name, from the column's name. Default "Filter Name". */
+  filter: (column: string) => string;
+  /** The filter fields' placeholder. Default "Filter…". */
+  filterPlaceholder: string;
+  /** A column menu's name and button, from the column's name. Default "Name column options". */
+  columnMenu: (column: string) => string;
+  /** Column menu items. Defaults "Sort ascending", "Sort descending", "Clear sort". */
+  sortAscending: string;
+  sortDescending: string;
+  clearSort: string;
+  /** Column menu items. Defaults "Move left", "Move right" (the reading direction's start and end). */
+  moveLeft: string;
+  moveRight: string;
+  /** Column menu item. Default "Hide column". */
+  hide: string;
+  /** The column menu's submenu of every column, to show or hide each. Default "Columns". */
+  columns: string;
+  /** Said after a sorted header's name when the grid sorts by several columns. Default "sort 2". */
+  sortRank: (rank: number) => string;
+  /** The row details toggle. Defaults "Show details", "Hide details". */
+  showDetails: string;
+  hideDetails: string;
+  /** The header of the row details toggles' column. Default "Details". */
+  details: string;
 }
 
 export interface DataGridProps<Row> {
@@ -119,6 +181,55 @@ export interface DataGridProps<Row> {
   onSortChange?: ((sort: TableSort | null) => void) | undefined;
   /** You sort the rows (e.g. on a server); the grid only shows and reports the sort. */
   manualSort?: boolean;
+  /**
+   * Shift+click (or Shift+Enter) on a sortable header adds it as the next sort key, turns it around, then removes it;
+   * a plain press sorts by that column alone. Sorted headers show their priority.
+   */
+  multiSort?: boolean;
+  /** Every sort key in priority order (controlled), for `multiSort`. Wins over `sort`. */
+  sorts?: TableSort[] | undefined;
+  /** Sort keys at the start when uncontrolled. */
+  defaultSorts?: TableSort[];
+  /** Called with every sort key when they change; `onSortChange` gets the first. */
+  onSortsChange?: ((sorts: TableSort[]) => void) | undefined;
+  /** The filter fields' text by column key (controlled), for columns with `filter`. */
+  filters?: Record<string, string> | undefined;
+  /** Filter text at the start when uncontrolled. */
+  defaultFilters?: Record<string, string>;
+  /** Called with every filter field's text when one changes. */
+  onFiltersChange?: ((filters: Record<string, string>) => void) | undefined;
+  /** You filter the rows (e.g. on a server); the grid only shows the fields and reports their text. */
+  manualFilter?: boolean;
+  /**
+   * A menu on every header (its button, Alt+Down, Shift+F10 or the context menu key on the header): sort, move the
+   * column left or right, hide it, and show hidden columns again.
+   */
+  columnMenu?: boolean;
+  /** Column keys in display order (controlled); columns it leaves out follow in their own order. */
+  columnOrder?: string[] | undefined;
+  /** Column order at the start when uncontrolled. */
+  defaultColumnOrder?: string[];
+  /** Called with every column key in the new order when a column is moved. */
+  onColumnOrderChange?: ((keys: string[]) => void) | undefined;
+  /** Keys of the hidden columns (controlled). */
+  hiddenColumns?: string[] | undefined;
+  /** Hidden columns at the start when uncontrolled. */
+  defaultHiddenColumns?: string[];
+  /** Called with the hidden column keys when one is hidden or shown. */
+  onHiddenColumnsChange?: ((keys: string[]) => void) | undefined;
+  /**
+   * Row details: a first column whose cell shows or hides this content in a panel under the row (a click, Enter or
+   * Space on it). The rows below move down; the grid stays virtual.
+   */
+  renderRowDetails?: ((row: Row) => ReactNode) | undefined;
+  /** Ids of the rows whose details are open (controlled). */
+  expandedRows?: string[] | undefined;
+  /** Rows open at the start when uncontrolled. */
+  defaultExpandedRows?: string[];
+  /** Called with the ids of the open rows when one opens or closes. */
+  onExpandedRowsChange?: ((ids: string[]) => void) | undefined;
+  /** A cell was edited: its row, its column's key and the new value (a string, a number or null, or an option's value). */
+  onCellEdit?: ((row: Row, key: string, value: unknown) => void) | undefined;
   /** Called when a column's width has been changed by dragging its edge or by Alt+Left/Right, with the new width. */
   onColumnResize?: ((key: string, width: number) => void) | undefined;
   /**
@@ -150,7 +261,7 @@ export interface DataGridProps<Row> {
   onEndReached?: (() => void) | undefined;
   /** Row height and text size: "sm" is dense. Default "md". */
   size?: "sm" | "md";
-  /** Replace the built-in English text: the message when there are no rows. */
+  /** Replace the built-in English text: the empty message, the editor, filter, column menu and details names. */
   labels?: Partial<DataGridLabels>;
   /** Added to the root element, for layout. */
   className?: string;
@@ -158,7 +269,47 @@ export interface DataGridProps<Row> {
   style?: CSSProperties;
 }
 
-const DEFAULT_LABELS: DataGridLabels = { empty: "Nothing to show" };
+const DEFAULT_LABELS: DataGridLabels = {
+  empty: "Nothing to show",
+  edit: (column) => `Edit ${column}`,
+  invalidNumber: "Enter a number",
+  filter: (column) => `Filter ${column}`,
+  filterPlaceholder: "Filter…",
+  columnMenu: (column) => `${column} column options`,
+  sortAscending: "Sort ascending",
+  sortDescending: "Sort descending",
+  clearSort: "Clear sort",
+  moveLeft: "Move left",
+  moveRight: "Move right",
+  hide: "Hide column",
+  columns: "Columns",
+  sortRank: (rank) => `sort ${rank}`,
+  showDetails: "Show details",
+  hideDetails: "Hide details",
+  details: "Details",
+};
+/** The key of the row details toggle column, never a data column's. */
+const DETAILS = "\u0000details";
+/** Width of the details toggle column, in CSS pixels: a 44px hit area on touch screens. */
+const DETAILS_WIDTH = 44;
+/** A data column's plain-text name. */
+const nameOf = <Row,>(c: DataGridColumn<Row>) => c.label ?? (typeof c.header === "string" ? c.header : c.key);
+const canEdit = <Row,>(c: DataGridColumn<Row>, row: Row) =>
+  c.key !== DETAILS && (typeof c.editable === "function" ? c.editable(row) : c.editable === true);
+
+/** Whether a number filter's query keeps `value`. Text that is no number or comparison keeps everything. */
+function numberFilter(value: unknown, query: string): boolean {
+  const num = String.raw`(-?\d+(?:\.\d+)?)`;
+  const range = new RegExp(`^${num}\\s*\\.\\.\\s*${num}$`).exec(query);
+  const compare = new RegExp(`^(<=|>=|<|>|=)?\\s*${num}$`).exec(query);
+  if (!range && !compare) return true;
+  const n = typeof value === "number" ? value : value === null || value === "" ? Number.NaN : Number(value);
+  if (!Number.isFinite(n)) return false;
+  if (range) return n >= Number(range[1]) && n <= Number(range[2]);
+  const [, op = "=", at] = compare as RegExpExecArray;
+  const to = Number(at);
+  return op === "<" ? n < to : op === "<=" ? n <= to : op === ">" ? n > to : op === ">=" ? n >= to : n === to;
+}
 const DEFAULT_WIDTH = 160;
 const DEFAULT_MIN = 48;
 /** Keyboard resizing: an arrow moves the edge this far, Shift+arrow `RESIZE_BIG`. */
@@ -179,18 +330,39 @@ const cellAttr = (row: number, col: number) => `${row}:${col}`;
 
 /**
  * A data grid for large results: rows and columns rendered only where they are in view (a hundred thousand rows by
- * fifty columns stay quick), a sticky header, sorting, resizable columns, row, cell or range selection copied as
- * tab-separated text, and the APG grid keyboard. Read-only: cells show what `cell` renders.
+ * fifty columns stay quick), a sticky header, sorting by one or more columns, column filters, resizable, movable and
+ * hideable columns, cell editing, row details, row, cell or range selection copied as tab-separated text, and the APG
+ * grid keyboard.
  */
 export function DataGrid<Row>({
   label,
-  columns,
+  columns: given,
   rows,
   getRowId,
   sort,
   defaultSort = null,
   onSortChange,
   manualSort = false,
+  multiSort = false,
+  sorts,
+  defaultSorts,
+  onSortsChange,
+  filters,
+  defaultFilters = {},
+  onFiltersChange,
+  manualFilter = false,
+  columnMenu = false,
+  columnOrder,
+  defaultColumnOrder = [],
+  onColumnOrderChange,
+  hiddenColumns,
+  defaultHiddenColumns = [],
+  onHiddenColumnsChange,
+  renderRowDetails,
+  expandedRows,
+  defaultExpandedRows = [],
+  onExpandedRowsChange,
+  onCellEdit,
   onColumnResize,
   selectionMode = "none",
   selected,
@@ -210,13 +382,49 @@ export function DataGrid<Row>({
   const text = { ...DEFAULT_LABELS, ...labels };
   const root = useRef<HTMLDivElement>(null);
   const head = useRef<HTMLDivElement>(null);
-  const [currentSort, setSort] = useControllableState<TableSort | null>(sort, defaultSort, onSortChange);
+  // Every sort key in priority order; `sort` and `onSortChange` speak for the first.
+  const [sortList, setSortList] = useControllableState<TableSort[]>(
+    sorts ?? (sort === undefined ? undefined : sort ? [sort] : []),
+    defaultSorts ?? (defaultSort ? [defaultSort] : []),
+    (next) => {
+      onSortsChange?.(next);
+      onSortChange?.(next[0] ?? null);
+    },
+  );
+  const [filterText, setFilterText] = useControllableState(filters, defaultFilters, onFiltersChange);
+  const [order, setOrder] = useControllableState(columnOrder, defaultColumnOrder, onColumnOrderChange);
+  const [hidden, setHidden] = useControllableState(
+    hiddenColumns,
+    defaultHiddenColumns,
+    onHiddenColumnsChange,
+  );
+  const [expanded, setExpanded] = useControllableState(
+    expandedRows,
+    defaultExpandedRows,
+    onExpandedRowsChange,
+  );
   const [chosenRows, setChosenRows] = useControllableState(selected, defaultSelected, onSelectionChange);
   const [range, setRange] = useControllableState<DataGridRange | null>(
     selectedRange,
     defaultSelectedRange,
     onSelectedRangeChange,
   );
+
+  // The columns in display order (the given order, then `order`), all of them and the ones shown.
+  const ordered = useMemo(() => {
+    const byKey = new Map(given.map((c) => [c.key, c]));
+    const first = order.flatMap((k) => byKey.get(k) ?? []);
+    const placed = new Set(first);
+    return [...first, ...given.filter((c) => !placed.has(c))];
+  }, [given, order]);
+  const hiddenSet = useMemo(() => new Set(hidden), [hidden]);
+  const dataColumns = useMemo(() => ordered.filter((c) => !hiddenSet.has(c.key)), [ordered, hiddenSet]);
+  const details = !!renderRowDetails;
+  const columns = useMemo<DataGridColumn<Row>[]>(
+    () => (details ? [{ key: DETAILS, header: null, width: DETAILS_WIDTH }, ...dataColumns] : dataColumns),
+    [details, dataColumns],
+  );
+  const isDetails = (c: DataGridColumn<Row> | undefined) => c?.key === DETAILS;
 
   // Widths the user set, each remembered with the `width` prop it replaced (a new prop value wins again).
   const [resized, setResized] = useState<Record<string, { from: number | undefined; width: number }>>({});
@@ -236,12 +444,32 @@ export function DataGrid<Row>({
     return next;
   };
 
-  // Work over every row happens once per change of the rows or the sort, never per scroll.
+  // Work over every row happens once per change of the rows, the filters or the sort, never per scroll.
+  const filtering = given.some((c) => c.filter && (filterText[c.key] ?? "").trim());
+  const kept = useMemo(() => {
+    if (manualFilter || !filtering) return rows;
+    const active = given.flatMap((c) => {
+      const query = (filterText[c.key] ?? "").trim();
+      return c.filter && query ? [{ c, query }] : [];
+    });
+    return rows.filter((row) =>
+      active.every(({ c, query }) =>
+        typeof c.filter === "function"
+          ? c.filter(row, query)
+          : c.filter === "number"
+            ? numberFilter(rawValue(row, c), query)
+            : textMatches(asText(rawValue(row, c)), query),
+      ),
+    );
+  }, [rows, given, filterText, filtering, manualFilter]);
   const shown = useMemo(() => {
-    if (manualSort || !currentSort) return rows;
-    const column = columns.find((c) => c.key === currentSort.key);
-    return column ? sortRows(rows, (row) => rawValue(row, column), currentSort.direction) : rows;
-  }, [rows, columns, currentSort, manualSort]);
+    if (manualSort || !sortList.length) return kept;
+    const byKey = new Map(given.map((c) => [c.key, c]));
+    const usable = sortList.filter((s) => byKey.has(s.key));
+    return usable.length
+      ? sortRowsBy(kept, usable, (row, key) => rawValue(row, byKey.get(key) as DataGridColumn<Row>))
+      : kept;
+  }, [kept, given, sortList, manualSort]);
   const ids = useMemo(() => shown.map(getRowId), [shown, getRowId]);
   const rowIndex = useMemo(() => new Map(ids.map((id, i) => [id, i])), [ids]);
   const chosenSet = useMemo(() => new Set(chosenRows), [chosenRows]);
@@ -274,6 +502,29 @@ export function DataGrid<Row>({
   /** Where Shift+click and Shift+arrows extend from, in row mode. */
   const rowAnchor = useRef<string | null>(null);
 
+  // Row details: the open rows (by display index, in order) and each panel's measured height.
+  const openSet = useMemo(() => new Set(details ? expanded : []), [details, expanded]);
+  const openRows = useMemo(
+    () => (details ? expanded.flatMap((id) => rowIndex.get(id) ?? []).sort((a, b) => a - b) : []),
+    [details, expanded, rowIndex],
+  );
+  const [panelSizes, setPanelSizes] = useState<ReadonlyMap<string, number>>(() => new Map());
+  const [rowBase, setRowBase] = useState(0);
+  const sizes = useMemo(() => {
+    if (!openRows.length || !rowBase) return undefined;
+    const out = new Array<number>(ids.length).fill(rowBase);
+    for (const r of openRows) out[r] = rowBase + (panelSizes.get(ids[r] as string) ?? rowBase * 2);
+    return out;
+  }, [openRows, rowBase, ids, panelSizes]);
+  /** Rows before `r` whose panel is open: each adds a row to the grid's numbering. */
+  const panelsBefore = (r: number) => {
+    let n = 0;
+    for (const o of openRows) if (o < r) n++;
+    return n;
+  };
+  const filterRow = given.some((c) => c.filter);
+  const headRows = filterRow ? 2 : 1;
+
   const [headerSize, setHeaderSize] = useState(0);
   const rowsWin = useVirtualWindow(root, {
     count: shown.length,
@@ -281,6 +532,7 @@ export function DataGrid<Row>({
     keep: activeRow,
     inset: headerSize,
     overscan: 4,
+    ...(sizes ? { sizes } : {}),
   });
   const colsWin = useVirtualWindow(root, {
     count: columns.length,
@@ -292,6 +544,64 @@ export function DataGrid<Row>({
   useClientLayoutEffect(() => {
     const h = (head.current as HTMLDivElement).offsetHeight;
     if (h !== headerSize) setHeaderSize(h);
+    // A row's own height (the panels' rows are measured without them), for placing rows when panels are open.
+    if (details && rowsWin.rowSize !== rowBase && !sizes) setRowBase(rowsWin.rowSize);
+  });
+  // Each open panel is measured as it renders and again when it changes size.
+  const panelObserver = useRef<ResizeObserver | null>(null);
+  useClientLayoutEffect(() => {
+    if (!details) return;
+    const observer = new ResizeObserver((entries) => {
+      const sized: [string, number][] = [];
+      for (const { target } of entries) {
+        const id = (target as HTMLElement).dataset.rowId;
+        const h = (target as HTMLElement).offsetHeight;
+        if (id !== undefined && h) sized.push([id, h]);
+      }
+      if (sized.length)
+        setPanelSizes((all) => {
+          const changed = sized.filter(([id, h]) => all.get(id) !== h);
+          return changed.length ? new Map([...all, ...changed]) : all;
+        });
+    });
+    panelObserver.current = observer;
+    return () => {
+      observer.disconnect();
+      panelObserver.current = null;
+    };
+  }, [details]);
+  useClientLayoutEffect(() => {
+    const observer = panelObserver.current;
+    if (!observer) return;
+    observer.disconnect();
+    for (const panel of root.current?.querySelectorAll(".cy-data-grid-details-row") ?? [])
+      observer.observe(panel);
+  });
+
+  // Editing: the cell being edited, by its row's id and its column's key, and the text in the editor.
+  const [editing, setEditingState] = useState<{
+    id: string;
+    key: string;
+    draft: string;
+    invalid: boolean;
+  } | null>(null);
+  const editingRef = useRef(editing);
+  const setEditing = (next: typeof editing) => {
+    editingRef.current = next;
+    setEditingState(next);
+  };
+  const editingAt = editing
+    ? { row: rowIndex.get(editing.id) ?? -1, col: colIndex(editing.key) }
+    : { row: -1, col: -1 };
+  const editorFocus = useRef(false);
+  useClientLayoutEffect(() => {
+    if (!editorFocus.current) return;
+    editorFocus.current = false;
+    const field = root.current?.querySelector<HTMLElement>(
+      ".cy-data-grid-editor input, .cy-data-grid-editor [role='combobox']",
+    );
+    field?.focus({ preventScroll: true });
+    if (field instanceof HTMLInputElement) field.setSelectionRange(field.value.length, field.value.length);
   });
 
   useClientLayoutEffect(() => {
@@ -344,6 +654,167 @@ export function DataGrid<Row>({
     } else if (selectionMode === "cell" || selectionMode === "range") selectCells(row, col, how === "extend");
   };
 
+  const toggleDetails = (row: number) => {
+    const id = ids[row] as string;
+    setExpanded(openSet.has(id) ? expanded.filter((k) => k !== id) : [...expanded, id]);
+  };
+
+  // ── Editing ──
+  const startEdit = (row: number, col: number, draft?: string) => {
+    const column = columns[col] as DataGridColumn<Row>;
+    setActive({ row, col });
+    editorFocus.current = true;
+    setEditing({
+      id: ids[row] as string,
+      key: column.key,
+      draft: draft ?? asText(rawValue(shown[row] as Row, column)),
+      invalid: false,
+    });
+  };
+  /** Ends the edit with `value` (or the editor's text): false when a number editor holds no number. */
+  const commit = (value?: string) => {
+    const e = editingRef.current;
+    if (!e) return true;
+    const r = rowIndex.get(e.id);
+    const column = given.find((c) => c.key === e.key);
+    if (r === undefined || !column) {
+      setEditing(null);
+      return true;
+    }
+    const draft = value ?? e.draft;
+    let out: unknown = draft;
+    if (column.editor === "number") {
+      const t = draft.trim();
+      const n = Number(t);
+      if (t && !Number.isFinite(n)) {
+        setEditing({ ...e, invalid: true });
+        return false;
+      }
+      out = t ? n : null;
+    }
+    setEditing(null);
+    onCellEdit?.(shown[r] as Row, e.key, out);
+    return true;
+  };
+  const cancelEdit = () => setEditing(null);
+  const onEditorKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    // The grid's keys stay out of the editor; a Select's own keys (opening, choosing) go first.
+    event.stopPropagation();
+    if (event.defaultPrevented || isComposing(event)) return;
+    const { row, col } = editingAt;
+    if (event.key === "Escape") {
+      event.preventDefault();
+      cancelEdit();
+      go(row, col);
+    } else if (event.key === "Enter") {
+      event.preventDefault();
+      if (commit()) go(row, col);
+    } else if (event.key === "Tab") {
+      event.preventDefault();
+      if (!commit()) return;
+      const step = event.shiftKey ? -1 : 1;
+      const to = col + step;
+      if (to >= 0 && to < columns.length) go(row, to);
+      else if (row + step >= 0 && row + step < shown.length)
+        go(row + step, step > 0 ? 0 : columns.length - 1);
+      else go(row, col);
+    }
+  };
+  // Leaving the editor (a click elsewhere, focus moved away) commits it; text that is no number is dropped.
+  const onEditorBlur = (event: FocusEvent<HTMLDivElement>) => {
+    const next = event.relatedTarget as Node | null;
+    if (next && event.currentTarget.contains(next)) return;
+    if (!commit()) cancelEdit();
+  };
+
+  // ── Column menu ──
+  const [menuFor, setMenuFor] = useState<string | null>(null);
+  const moveColumn = (key: string, step: -1 | 1) => {
+    const keys = ordered.map((c) => c.key);
+    const shownKeys = dataColumns.map((c) => c.key);
+    const neighbour = shownKeys[shownKeys.indexOf(key) + step];
+    if (neighbour === undefined) return;
+    const rest = keys.filter((k) => k !== key);
+    const at = rest.indexOf(neighbour) + (step > 0 ? 1 : 0);
+    rest.splice(at, 0, key);
+    setOrder(rest);
+  };
+  /** The header to focus once the columns have changed (a column moved, hidden or shown from its menu). */
+  const focusHeader = useRef<string | null>(null);
+  const colsRef = useRef(columns);
+  colsRef.current = columns;
+  const menuOpen = useRef(menuFor);
+  menuOpen.current = menuFor;
+  useClientLayoutEffect(() => {
+    const key = focusHeader.current;
+    if (key === null) return;
+    focusHeader.current = null;
+    const at = columns.findIndex((c) => c.key === key);
+    if (at >= 0) go(-1, at);
+  });
+  const runMenu = (key: string, value: string) => {
+    const shownKeys = dataColumns.map((c) => c.key);
+    focusHeader.current = key;
+    if (value === "sort:asc" || value === "sort:desc")
+      setSortList([{ key, direction: value === "sort:asc" ? "ascending" : "descending" }]);
+    else if (value === "sort:clear") setSortList(sortList.filter((s) => s.key !== key));
+    else if (value === "move:left" || value === "move:right") moveColumn(key, value === "move:left" ? -1 : 1);
+    else if (value === "hide") {
+      if (shownKeys.length <= 1) return;
+      setHidden([...hidden, key]);
+      // Its neighbour's header takes focus: its own is gone.
+      const at = shownKeys.indexOf(key);
+      focusHeader.current = shownKeys[at + 1] ?? shownKeys[at - 1] ?? null;
+    } else if (value.startsWith("show:")) {
+      const which = value.slice(5);
+      if (hiddenSet.has(which)) setHidden(hidden.filter((k) => k !== which));
+      else if (shownKeys.length > 1) {
+        setHidden([...hidden, which]);
+        if (which === key) focusHeader.current = shownKeys.find((k) => k !== key) ?? null;
+      }
+    }
+  };
+  const menuItems = (column: DataGridColumn<Row>): MenuEntry[] => {
+    const shownKeys = dataColumns.map((c) => c.key);
+    const at = shownKeys.indexOf(column.key);
+    const sorted = sortList.some((s) => s.key === column.key);
+    const entries: MenuEntry[] = [];
+    if (column.sortable)
+      entries.push({
+        items: [
+          { value: "sort:asc", label: text.sortAscending },
+          { value: "sort:desc", label: text.sortDescending },
+          ...(sorted ? [{ value: "sort:clear", label: text.clearSort }] : []),
+        ],
+      });
+    entries.push({
+      items: [
+        { value: "move:left", label: text.moveLeft, disabled: at <= 0 },
+        { value: "move:right", label: text.moveRight, disabled: at >= shownKeys.length - 1 },
+      ],
+    });
+    entries.push({
+      items: [
+        { value: "hide", label: text.hide, disabled: shownKeys.length <= 1 },
+        {
+          value: "columns",
+          label: text.columns,
+          items: ordered.map((c) => {
+            const visible = !hiddenSet.has(c.key);
+            return {
+              value: `show:${c.key}`,
+              label: nameOf(c),
+              kind: "checkbox" as const,
+              checked: visible,
+              disabled: visible && shownKeys.length <= 1,
+            };
+          }),
+        },
+      ],
+    });
+    return entries;
+  };
+
   const copyText = () => {
     let r0 = 0;
     let r1 = -1;
@@ -354,20 +825,18 @@ export function DataGrid<Row>({
       only = chosenSet;
       r1 = shown.length - 1;
     } else if (box) ({ top: r0, bottom: r1, start: c0, end: c1 } = box);
+    const copied = columns.slice(c0, c1 + 1).filter((c) => !isDetails(c));
     const lines: string[] = [];
     for (let r = r0; r <= r1; r++) {
       if (only && !only.has(ids[r] as string)) continue;
       const row = shown[r] as Row;
-      lines.push(
-        columns
-          .slice(c0, c1 + 1)
-          .map((c) => tsvField(rawValue(row, c)))
-          .join("\t"),
-      );
+      lines.push(copied.map((c) => tsvField(rawValue(row, c))).join("\t"));
     }
     return lines.join("\n");
   };
   const onCopy = (event: ClipboardEvent<HTMLDivElement>) => {
+    // A field (a filter, an editor) copies its own text.
+    if ((event.target as HTMLElement).closest?.("input, textarea")) return;
     // Text selected inside the cells (by dragging) copies as text, the browser's way; otherwise the selected cells.
     // In a shadow root, Chromium keeps the selection on the root; elsewhere the document has it.
     const doc = (root.current as HTMLDivElement).getRootNode() as Partial<Pick<Document, "getSelection">>;
@@ -379,9 +848,11 @@ export function DataGrid<Row>({
     event.clipboardData.setData("text/plain", tsv);
   };
 
-  /** The cell an event came from, as display indices. */
+  /** The cell an event came from, as display indices; never one inside a menu, an editor or a details panel. */
   const cellOf = (target: EventTarget) => {
-    const el = (target as HTMLElement).closest?.<HTMLElement>("[data-cell]");
+    const t = target as HTMLElement;
+    if (t.closest?.('[role="menu"], .cy-data-grid-editor, .cy-data-grid-details-row')) return null;
+    const el = t.closest?.<HTMLElement>("[data-cell]");
     if (!el || !root.current?.contains(el)) return null;
     const [row, col] = (el.dataset.cell as string).split(":").map(Number) as [number, number];
     return { row, col, el };
@@ -395,6 +866,25 @@ export function DataGrid<Row>({
     const ctrl = event.ctrlKey || event.metaKey;
     const rtl = isRtl(at.el);
     const column = columns[col] as DataGridColumn<Row>;
+    if (row < 0 && !isDetails(column)) {
+      // The column menu: Alt+Down, Shift+F10 or the context menu key on a header.
+      if (
+        columnMenu &&
+        ((event.altKey && event.key === "ArrowDown") ||
+          (event.shiftKey && event.key === "F10") ||
+          event.key === "ContextMenu")
+      ) {
+        event.preventDefault();
+        setMenuFor(column.key);
+        return;
+      }
+      // Shift+Enter or Shift+Space on a sortable header adds it as a sort key.
+      if (multiSort && column.sortable && event.shiftKey && (event.key === "Enter" || event.key === " ")) {
+        event.preventDefault();
+        setSortList(nextSorts(sortList, column.key, true));
+        return;
+      }
+    }
     // Alt+Left/Right on a resizable header moves its edge (and on other headers, nothing).
     if (row < 0 && event.altKey && (event.key === "ArrowLeft" || event.key === "ArrowRight")) {
       if (!column.resizable) return;
@@ -411,6 +901,22 @@ export function DataGrid<Row>({
         arrowsOnly: true,
       }) as number;
       onColumnResize?.(column.key, resize(col, to));
+      return;
+    }
+    if (row >= 0 && isDetails(column) && (event.key === "Enter" || event.key === " ")) {
+      event.preventDefault();
+      toggleDetails(row);
+      return;
+    }
+    const editable = row >= 0 && canEdit(column, shown[row] as Row);
+    if (editable && (event.key === "Enter" || event.key === "F2")) {
+      event.preventDefault();
+      startEdit(row, col);
+      return;
+    }
+    if (editable && event.key.length === 1 && event.key !== " " && !ctrl && !event.altKey) {
+      event.preventDefault();
+      startEdit(row, col, column.editor === "select" ? undefined : event.key);
       return;
     }
     const page = Math.max(
@@ -474,6 +980,10 @@ export function DataGrid<Row>({
     const at = cellOf(event.target);
     if (!at || at.row < 0) return;
     go(at.row, at.col);
+    if (isDetails(columns[at.col])) {
+      toggleDetails(at.row);
+      return;
+    }
     select(
       at.row,
       at.col,
@@ -517,6 +1027,41 @@ export function DataGrid<Row>({
     inlineSize: colsWin.sizeOf(col),
   });
   const multi = selectionMode === "row" || selectionMode === "range";
+  const ranked = sortList.length > 1;
+  const panelCount = openRows.length;
+
+  /** The editor in the cell being edited: a TextField, or a Select for a `select` column. */
+  const editor = (column: DataGridColumn<Row>) => {
+    const e = editing as NonNullable<typeof editing>;
+    const name = text.edit(nameOf(column));
+    return (
+      // biome-ignore lint/a11y/noStaticElementInteractions: delegated keys and focus for the field inside
+      <div className="cy-data-grid-editor cy-reset" onKeyDown={onEditorKeyDown} onBlur={onEditorBlur}>
+        {column.editor === "select" ? (
+          <Select
+            label={name}
+            labelHidden
+            size="sm"
+            options={column.options ?? []}
+            value={e.draft}
+            onChange={(value) => {
+              if (commit(value)) go(editingAt.row, editingAt.col);
+            }}
+          />
+        ) : (
+          <TextField
+            label={name}
+            labelHidden
+            size="sm"
+            value={e.draft}
+            inputMode={column.editor === "number" ? "decimal" : undefined}
+            error={e.invalid ? text.invalidNumber : undefined}
+            onChange={(draft) => setEditing({ ...e, draft, invalid: false })}
+          />
+        )}
+      </div>
+    );
+  };
 
   // A windowed grid places its rows and cells by offset, and a cell can sit in a Tooltip's anchor: elements with grid
   // roles, as the APG data grid allows, rather than a table's. Focus is on the cells (one tab stop), not the rows.
@@ -528,7 +1073,7 @@ export function DataGrid<Row>({
         ref={root}
         role="grid"
         aria-label={label}
-        aria-rowcount={shown.length + 1}
+        aria-rowcount={shown.length + headRows + panelCount}
         aria-colcount={columns.length}
         aria-multiselectable={multi || undefined}
         className="cy-data-grid-scroll cy-reset"
@@ -540,7 +1085,10 @@ export function DataGrid<Row>({
         onClick={onClick}
         onDoubleClick={(e) => {
           const at = cellOf(e.target);
-          if (at && at.row >= 0) onAction?.(shown[at.row] as Row, at.row);
+          if (!at || at.row < 0 || isDetails(columns[at.col])) return;
+          if (canEdit(columns[at.col] as DataGridColumn<Row>, shown[at.row] as Row))
+            startEdit(at.row, at.col);
+          else onAction?.(shown[at.row] as Row, at.row);
         }}
         // With a selection mode, Shift+click selects cells, not text.
         onMouseDown={(e) => {
@@ -558,17 +1106,40 @@ export function DataGrid<Row>({
             <div role="row" aria-rowindex={1} className="cy-data-grid-header-row cy-reset">
               {colsWin.indices.map((c) => {
                 const column = columns[c] as DataGridColumn<Row>;
-                const sorted = currentSort?.key === column.key ? currentSort.direction : undefined;
-                const keys = column.resizable ? "Alt+ArrowLeft Alt+ArrowRight" : undefined;
+                if (isDetails(column))
+                  return (
+                    <div
+                      key={column.key}
+                      role="columnheader"
+                      aria-colindex={c + 1}
+                      className="cy-data-grid-header cy-reset"
+                      style={place(c)}
+                      data-cell={cellAttr(-1, c)}
+                      tabIndex={tabStop(-1, c)}
+                    >
+                      <span className="cy-visually-hidden">{text.details}</span>
+                    </div>
+                  );
+                const rank = sortList.findIndex((s) => s.key === column.key);
+                const sorted = rank >= 0 ? sortList[rank]?.direction : undefined;
+                const name = nameOf(column);
+                const keys =
+                  [
+                    column.resizable && "Alt+ArrowLeft Alt+ArrowRight",
+                    columnMenu && "Alt+ArrowDown Shift+F10",
+                  ]
+                    .filter(Boolean)
+                    .join(" ") || undefined;
                 return (
                   <div
                     key={column.key}
                     role="columnheader"
                     aria-colindex={c + 1}
-                    aria-sort={column.sortable ? (sorted ?? "none") : undefined}
+                    aria-sort={column.sortable ? (rank === 0 ? sorted : "none") : undefined}
                     className="cy-data-grid-header cy-reset"
                     data-align={column.align}
                     data-sortable={column.sortable ? "" : undefined}
+                    data-sorted={sorted ? "" : undefined}
                     style={place(c)}
                     {...(column.sortable
                       ? {}
@@ -582,16 +1153,48 @@ export function DataGrid<Row>({
                       <SortButton
                         fill
                         direction={sorted}
+                        rank={ranked && rank >= 0 ? rank + 1 : undefined}
                         align={column.align}
                         data-cell={cellAttr(-1, c)}
                         tabIndex={tabStop(-1, c)}
                         aria-keyshortcuts={keys}
-                        onClick={() => setSort(nextSort(currentSort, column.key))}
+                        onClick={(event) =>
+                          setSortList(nextSorts(sortList, column.key, multiSort && event.shiftKey))
+                        }
                       >
                         {column.header}
+                        {ranked && rank >= 0 && (
+                          <span className="cy-visually-hidden">{text.sortRank(rank + 1)}</span>
+                        )}
                       </SortButton>
                     ) : (
                       <span className="cy-data-grid-label cy-reset">{column.header}</span>
+                    )}
+                    {columnMenu && (
+                      <Menu
+                        label={text.columnMenu(name)}
+                        items={menuItems(column)}
+                        open={menuFor === column.key}
+                        onOpenChange={(open) => setMenuFor(open ? column.key : null)}
+                        onSelect={(value) => runMenu(column.key, value)}
+                        trigger={(props) => (
+                          <IconButton
+                            {...props}
+                            icon={moreVertical}
+                            label={text.columnMenu(name)}
+                            variant="ghost"
+                            size="xs"
+                            tabIndex={-1}
+                            wrapperClassName="cy-data-grid-menu"
+                            // Focus coming back from the menu goes on to the header: the grid's keys act from there.
+                            onFocus={() => {
+                              if (menuOpen.current !== null) return;
+                              const at = colsRef.current.findIndex((k) => k.key === column.key);
+                              if (at >= 0) go(-1, at);
+                            }}
+                          />
+                        )}
+                      />
                     )}
                     {column.resizable && (
                       <span className="cy-data-grid-resize cy-reset" data-col={c} aria-hidden="true" />
@@ -600,35 +1203,89 @@ export function DataGrid<Row>({
                 );
               })}
             </div>
+            {filterRow && (
+              <div role="row" aria-rowindex={2} className="cy-data-grid-filter-row cy-reset">
+                {colsWin.indices.map((c) => {
+                  const column = columns[c] as DataGridColumn<Row>;
+                  return (
+                    <div
+                      key={column.key}
+                      role="gridcell"
+                      aria-colindex={c + 1}
+                      className="cy-data-grid-filter cy-reset"
+                      style={place(c)}
+                    >
+                      {column.filter && (
+                        <TextField
+                          label={text.filter(nameOf(column))}
+                          labelHidden
+                          size="xs"
+                          placeholder={text.filterPlaceholder}
+                          value={filterText[column.key] ?? ""}
+                          inputMode={column.filter === "number" ? "decimal" : undefined}
+                          className="cy-data-grid-filter-field"
+                          onChange={(query) => setFilterText({ ...filterText, [column.key]: query })}
+                        />
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
           <div role="rowgroup" className="cy-data-grid-body cy-reset" style={{ blockSize: rowsWin.total }}>
             {shown.length === 0 ? (
-              <div role="row" aria-rowindex={2} className="cy-data-grid-empty-row cy-reset">
+              <div role="row" aria-rowindex={headRows + 1} className="cy-data-grid-empty-row cy-reset">
                 <div role="gridcell" aria-colspan={columns.length} className="cy-data-grid-empty cy-reset">
                   {text.empty}
                 </div>
               </div>
             ) : (
-              rowsWin.indices.map((r) => {
+              rowsWin.indices.flatMap((r) => {
                 const row = shown[r] as Row;
                 const id = ids[r] as string;
                 const rowChosen = selectionMode === "row" ? chosenSet.has(id) : undefined;
-                return (
+                const open = openSet.has(id);
+                const index = r + headRows + 1 + panelsBefore(r);
+                const offset = rowsWin.offsetOf(r);
+                const line = (
                   <div
                     key={id}
                     role="row"
-                    aria-rowindex={r + 2}
+                    aria-rowindex={index}
                     aria-selected={rowChosen}
                     className="cy-data-grid-row cy-reset"
-                    style={{ insetBlockStart: rowsWin.offsetOf(r) }}
+                    style={{ insetBlockStart: offset }}
                   >
                     {colsWin.indices.map((c) => {
                       const column = columns[c] as DataGridColumn<Row>;
                       const inBox = box
                         ? r >= box.top && r <= box.bottom && c >= box.start && c <= box.end
                         : false;
-                      const content = column.cell ? column.cell(row) : asText(rawValue(row, column));
-                      const tip = column.tooltip?.(row);
+                      if (isDetails(column))
+                        return (
+                          <div
+                            key={column.key}
+                            role="gridcell"
+                            aria-colindex={c + 1}
+                            aria-label={open ? text.hideDetails : text.showDetails}
+                            aria-expanded={open}
+                            data-cell={cellAttr(r, c)}
+                            data-open={open ? "" : undefined}
+                            tabIndex={tabStop(r, c)}
+                            className="cy-data-grid-cell cy-data-grid-toggle cy-reset"
+                            style={place(c)}
+                          >
+                            <Icon icon={chevronRight} size="sm" flipRtl className="cy-data-grid-chevron" />
+                          </div>
+                        );
+                      const isEditing = editingAt.row === r && editingAt.col === c;
+                      const content = isEditing
+                        ? editor(column)
+                        : column.cell
+                          ? column.cell(row)
+                          : asText(rawValue(row, column));
+                      const tip = isEditing ? undefined : column.tooltip?.(row);
                       const cell = (
                         <div
                           key={column.key}
@@ -641,11 +1298,16 @@ export function DataGrid<Row>({
                           data-align={column.align}
                           data-kind={column.cellKind?.(row)}
                           data-tone={column.cellTone?.(row)}
+                          data-editing={isEditing ? "" : undefined}
                           tabIndex={tabStop(r, c)}
                           className="cy-data-grid-cell cy-reset"
                           style={place(c)}
                         >
-                          <span className="cy-data-grid-value cy-reset">{content}</span>
+                          {isEditing ? (
+                            content
+                          ) : (
+                            <span className="cy-data-grid-value cy-reset">{content}</span>
+                          )}
                         </div>
                       );
                       return tip === null || tip === undefined || tip === "" ? (
@@ -663,6 +1325,30 @@ export function DataGrid<Row>({
                     })}
                   </div>
                 );
+                if (!open || !renderRowDetails) return [line];
+                return [
+                  line,
+                  <div
+                    key={`${id}-details`}
+                    role="row"
+                    aria-rowindex={index + 1}
+                    data-row-id={id}
+                    className="cy-data-grid-details-row cy-reset"
+                    style={{
+                      insetBlockStart: offset + (rowBase || rowsWin.rowSize),
+                      insetInlineStart: colsWin.view.top,
+                      inlineSize: colsWin.view.height || undefined,
+                    }}
+                  >
+                    <div
+                      role="gridcell"
+                      aria-colspan={columns.length}
+                      className="cy-data-grid-details cy-reset"
+                    >
+                      {renderRowDetails(row)}
+                    </div>
+                  </div>,
+                ];
               })
             )}
           </div>
