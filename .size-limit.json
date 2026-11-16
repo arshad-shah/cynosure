@@ -2,7 +2,7 @@
   {
     "name": "all CSS",
     "path": "dist/styles.css",
-    "limit": "39.4 kB",
+    "limit": "39.71 kB",
     "gzip": true
   },
   {
@@ -123,7 +123,7 @@
       "dist/overlay/use-anchored-position.js",
       "dist/styles/tooltip.css"
     ],
-    "limit": "3.11 kB",
+    "limit": "3.53 kB",
     "gzip": true
   },
   {
@@ -133,13 +133,13 @@
       "dist/foundations/HiddenValue/HiddenValue.js",
       "dist/styles/select.css"
     ],
-    "limit": "4.01 kB",
+    "limit": "4.07 kB",
     "gzip": true
   },
   {
     "name": "Badge",
     "path": ["dist/components/Badge/Badge.js", "dist/styles/badge.css"],
-    "limit": "1.36 kB",
+    "limit": "1.60 kB",
     "gzip": true
   },
   {
@@ -157,7 +157,7 @@
   {
     "name": "Stack",
     "path": ["dist/components/Stack/Stack.js", "dist/styles/stack.css"],
-    "limit": "0.96 kB",
+    "limit": "1.01 kB",
     "gzip": true
   },
   {
@@ -168,7 +168,7 @@
       "dist/styles/stack.css",
       "dist/styles/inline.css"
     ],
-    "limit": "1.75 kB",
+    "limit": "1.80 kB",
     "gzip": true
   },
   {
@@ -190,7 +190,7 @@
       "dist/foundations/roving-focus.js",
       "dist/styles/toolbar.css"
     ],
-    "limit": "1.86 kB",
+    "limit": "1.91 kB",
     "gzip": true
   },
   {
@@ -289,7 +289,7 @@
   {
     "name": "Slider",
     "path": ["dist/components/Slider/Slider.js", "dist/styles/slider.css"],
-    "limit": "3.49 kB",
+    "limit": "3.70 kB",
     "gzip": true
   },
   {
@@ -301,7 +301,7 @@
   {
     "name": "Tree",
     "path": ["dist/components/Tree/Tree.js", "dist/styles/tree.css"],
-    "limit": "5.85 kB",
+    "limit": "6.27 kB",
     "gzip": true
   },
   {
@@ -329,7 +329,7 @@
   {
     "name": "Grid",
     "path": ["dist/components/Grid/Grid.js", "dist/styles/grid.css"],
-    "limit": "2.04 kB",
+    "limit": "2.08 kB",
     "gzip": true
   },
   {
@@ -469,7 +469,7 @@
   {
     "name": "VirtualList",
     "path": ["dist/components/VirtualList/VirtualList.js", "dist/styles/virtual-list.css"],
-    "limit": "4.5 kB",
+    "limit": "4.60 kB",
     "gzip": true
   },
   {
@@ -487,7 +487,7 @@
   {
     "name": "KeyValueEditor",
     "path": ["dist/components/KeyValueEditor/KeyValueEditor.js", "dist/styles/key-value-editor.css"],
-    "limit": "2.25 kB",
+    "limit": "2.49 kB",
     "gzip": true
   },
   {
@@ -660,7 +660,7 @@
   {
     "name": "Section (JS + CSS)",
     "path": ["dist/components/Section/Section.js", "dist/styles/section.css"],
-    "limit": "0.82 kB",
+    "limit": "873 B",
     "gzip": true
   },
   {
@@ -684,7 +684,7 @@
   {
     "name": "StatusBar (JS + CSS)",
     "path": ["dist/components/StatusBar/StatusBar.js", "dist/styles/status-bar.css"],
-    "limit": "2.14 kB",
+    "limit": "2.15 kB",
     "gzip": true
   },
   {
@@ -700,7 +700,7 @@
       "dist/foundations/use-follow.js",
       "dist/styles/scroll-area.css"
     ],
-    "limit": "1.83 kB",
+    "limit": "1.89 kB",
     "gzip": true
   },
   {
@@ -736,7 +736,7 @@
   {
     "name": "DataGrid",
     "path": ["dist/components/DataGrid/DataGrid.js", "dist/styles/data-grid.css"],
-    "limit": "5.69 kB",
+    "limit": "9.98 kB",
     "gzip": true
   },
   {
@@ -760,7 +760,7 @@
   {
     "name": "SortButton",
     "path": ["dist/components/SortButton/SortButton.js", "dist/styles/sort-button.css"],
-    "limit": "1.02 kB",
+    "limit": "1.12 kB",
     "gzip": true
   },
   {
