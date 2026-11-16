@@ -31,6 +31,12 @@ import { SortButton } from "@arshad-shah/cynosure";
 
 <Canvas of={Stories.FillsItsCell} />
 
+## Several sort keys
+
+`rank` shows the column's place among several sort keys (1 is the first), small after the icon, as DataGrid's multi-column sort does. It is decorative: say the place in the label too (DataGrid adds "sort 2" in hidden text). `onClick` receives the click, so a Shift+click can add the column as another key.
+
+<Canvas of={Stories.RankAndShiftClick} />
+
 ## Props
 
 <ArgTypes of={Stories} />
