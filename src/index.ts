@@ -629,10 +629,14 @@ export {
 export type { PersistStorage } from "./foundations/persisted.js";
 export {
   type QrLevel,
+  type QrLogo,
   type QrOptions,
+  type QrToPngOptions,
   type QrToSvgOptions,
+  qrContrast,
   qrMatrix,
   qrPath,
+  qrToPng,
   qrToSvg,
 } from "./foundations/qr.js";
 export { type RovingOptions, useRovingFocus } from "./foundations/roving-focus.js";

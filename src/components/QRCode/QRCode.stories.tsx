@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { CSSProperties } from "react";
 import { expect } from "storybook/test";
 import { Icon } from "../../foundations/Icon/Icon.js";
-import { qrMatrix } from "../../foundations/qr.js";
+import { qrMatrix, qrToPng } from "../../foundations/qr.js";
 import { globe } from "../../icons/index.js";
 import { contrast } from "../../test/color.js";
 import { computeUnderHostileHost } from "../../test/hostile.js";
@@ -23,6 +23,8 @@ const meta = {
     label: { control: "text" },
     labels: { control: "object" },
     icon: { control: false },
+    color: { control: "color" },
+    background: { control: "color" },
   },
 } satisfies Meta<typeof QRCode>;
 export default meta;
@@ -324,5 +326,47 @@ export const StableUnderHostileHost: Story = {
     }
     const ink = computeUnderHostileHost(canvasElement, ".cy-qr-code-modules", ["fill"]);
     await expect(ink.hostile).toEqual(ink.clean);
+  },
+};
+
+/** `color` and `background` set the two colours (dark on light still); the SVG and PNG exports match what is shown. */
+export const ColoursAndExport: Story = {
+  args: { color: "#1d3557", background: "#f1faee", label: "Our site" },
+  play: async ({ canvasElement }) => {
+    const modules = canvasElement.querySelector(".cy-qr-code-modules") as SVGPathElement;
+    await expect(getComputedStyle(modules).fill).toBe("rgb(29, 53, 87)");
+    await expect(
+      getComputedStyle(canvasElement.querySelector(".cy-qr-code") as Element).backgroundColor,
+    ).toBe("rgb(241, 250, 238)");
+    // A PNG of the same code, as many device pixels per module as asked, in the same colours.
+    const png = await qrToPng(URL, { color: "#1d3557", background: "#f1faee", scale: 4 });
+    await expect(png.type).toBe("image/png");
+    const bitmap = await createImageBitmap(png);
+    const n = qrMatrix(URL, { level: "M" }).length + 8;
+    await expect([bitmap.width, bitmap.height]).toEqual([n * 4, n * 4]);
+    const ctx = new OffscreenCanvas(bitmap.width, bitmap.height).getContext(
+      "2d",
+    ) as OffscreenCanvasRenderingContext2D;
+    ctx.drawImage(bitmap, 0, 0);
+    // The corner is quiet zone (background); the finder pattern's corner is the dark colour.
+    await expect([...ctx.getImageData(1, 1, 1, 1).data].slice(0, 3)).toEqual([241, 250, 238]);
+    await expect([...ctx.getImageData(4 * 4 + 1, 4 * 4 + 1, 1, 1).data].slice(0, 3)).toEqual([29, 53, 87]);
+  },
+};
+
+/** A logo in the PNG: it is drawn in the middle, on the light colour, with the level raised to H. */
+export const PngWithALogo: Story = {
+  play: async () => {
+    const logo = `data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"><rect width="10" height="10" fill="red"/></svg>')}`;
+    const png = await qrToPng(URL, { logo: { href: logo }, scale: 4 });
+    const bitmap = await createImageBitmap(png);
+    const n = qrMatrix(URL, { level: "H" }).length + 8;
+    await expect(bitmap.width).toBe(n * 4);
+    const ctx = new OffscreenCanvas(bitmap.width, bitmap.height).getContext(
+      "2d",
+    ) as OffscreenCanvasRenderingContext2D;
+    ctx.drawImage(bitmap, 0, 0);
+    const middle = Math.floor(bitmap.width / 2);
+    await expect([...ctx.getImageData(middle, middle, 1, 1).data].slice(0, 3)).toEqual([255, 0, 0]);
   },
 };

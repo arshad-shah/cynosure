@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import { describe, expect, it } from "vitest";
-import { type QrLevel, qrMatrix, qrPath, qrToSvg } from "../../src/foundations/qr";
+import { type QrLevel, qrContrast, qrMatrix, qrPath, qrToSvg } from "../../src/foundations/qr";
 
 const rows = (m: boolean[][]) => m.map((r) => r.map((v) => (v ? "1" : "0")).join(""));
 const hash = (m: boolean[][]) => createHash("sha256").update(rows(m).join("\n")).digest("hex").slice(0, 16);
@@ -147,5 +147,50 @@ describe("qrToSvg", () => {
     expect(svg).toContain('fill="ivory"');
     // No size: the SVG fills what holds it.
     expect(svg).not.toMatch(/<svg[^>]*width=/);
+  });
+});
+
+describe("qrToSvg with a logo", () => {
+  const value = "https://cynosure.arshadshah.com";
+  it("raises the level to H, clears the modules under the logo and draws it in the middle", () => {
+    const svg = qrToSvg(value, {
+      level: "L",
+      quietZone: 4,
+      logo: { href: "data:image/png;base64,AAAA", size: 0.2 },
+    });
+    const matrix = qrMatrix(value, { level: "H" });
+    const n = matrix.length;
+    const box = n + 8;
+    expect(svg).toContain(`viewBox="0 0 ${box} ${box}"`);
+    // The logo square: a fifth of the code (quiet zone left out), centred, on the light colour.
+    const side = Math.ceil(n * 0.2);
+    const from = Math.floor((n - side) / 2);
+    expect(svg).toContain(
+      `<image href="data:image/png;base64,AAAA" x="${from + 4}" y="${from + 4}" width="${side}" height="${side}"`,
+    );
+    // No dark module is drawn inside it, and the rest are the level-H code's.
+    const d = /<path fill="#000" d="([^"]*)"/.exec(svg)?.[1] ?? "";
+    const cleared = matrix.map((row, y) =>
+      row.map((dark, x) => dark && !(x >= from && x < from + side && y >= from && y < from + side)),
+    );
+    expect(d).toBe(qrPath(cleared, 4));
+  });
+
+  it("escapes the logo's address", () => {
+    expect(qrToSvg("1", { logo: { href: 'a"b' } })).toContain('href="a&quot;b"');
+  });
+});
+
+describe("qrContrast", () => {
+  it("passes dark on light with enough contrast", () => {
+    expect(qrContrast("#000", "#fff")).toEqual({ ratio: 21, scans: true });
+    expect(qrContrast("#000080", "rgb(255 255 240)").scans).toBe(true);
+  });
+  it("fails a pale code, and light on dark (inverted codes do not scan on many phones)", () => {
+    expect(qrContrast("#bbbbbb", "#ffffff").scans).toBe(false);
+    expect(qrContrast("#ffffff", "#000000")).toEqual({ ratio: 21, scans: false });
+  });
+  it("cannot judge a colour it cannot read", () => {
+    expect(qrContrast("var(--x)", "#fff")).toEqual({ ratio: Number.NaN, scans: false });
   });
 });
