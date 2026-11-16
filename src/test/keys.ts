@@ -17,3 +17,13 @@ export async function pressKey(key: string): Promise<boolean> {
   await command(key);
   return true;
 }
+
+/**
+ * Focuses `el` as the Tab key would: a Tab key press reaches the document first, so a Tooltip, which opens only on
+ * focus a navigation key moved, treats it as keyboard focus. For stories that check a tip shown on keyboard focus of an
+ * element Tab would take several presses to reach.
+ */
+export function focusWithTab(el: HTMLElement) {
+  el.ownerDocument.dispatchEvent(new KeyboardEvent("keydown", { key: "Tab", bubbles: true }));
+  el.focus();
+}
