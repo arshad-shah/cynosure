@@ -1,4 +1,5 @@
 import { type CSSProperties, type ReactNode, useEffect, useId, useRef, useState } from "react";
+import { acceptsFile } from "../../foundations/accept-file.js";
 import { FileInputBase, setInputFiles } from "../../foundations/FileInputBase/FileInputBase.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
 import { LiveRegion, useLiveMessage } from "../../foundations/LiveRegion/LiveRegion.js";
@@ -127,19 +128,7 @@ const DEFAULT_LABELS: FileDropLabels = {
 /** What a chosen item is called: a File's name, or a path as given. */
 const nameOf = (item: File | string) => (typeof item === "string" ? item : item.name);
 
-/** Whether `file` matches an `accept` list (extensions, exact MIME types and `type/*` wildcards), as browsers do. */
-export function acceptsFile(file: File, accept: string | undefined): boolean {
-  if (!accept) return true;
-  const name = file.name.toLowerCase();
-  const type = file.type.toLowerCase();
-  return accept
-    .split(",")
-    .map((a) => a.trim().toLowerCase())
-    .filter(Boolean)
-    .some((a) =>
-      a.startsWith(".") ? name.endsWith(a) : a.endsWith("/*") ? type.startsWith(a.slice(0, -1)) : type === a,
-    );
-}
+export { acceptsFile };
 
 /**
  * A place to add files: drop them on it, or press its button to pick them. Checks type, size and count, explains

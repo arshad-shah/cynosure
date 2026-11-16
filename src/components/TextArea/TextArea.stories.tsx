@@ -799,3 +799,69 @@ export const ProportionalByDefault: Story = {
     await expect(fontList(getComputedStyle(area).fontFamily)).not.toBe(monoFont());
   },
 };
+
+/** Drags `items` (files, or text) over `target`: enter and over, then the returned function drops. */
+function dragOver(target: Element, items: { files?: File[]; text?: string }) {
+  const data = new DataTransfer();
+  for (const f of items.files ?? []) data.items.add(f);
+  if (items.text) data.setData("text/plain", items.text);
+  const fire = (type: string) => {
+    const event = new DragEvent(type, { bubbles: true, cancelable: true, dataTransfer: data });
+    target.dispatchEvent(event);
+    return event;
+  };
+  fire("dragenter");
+  const over = fire("dragover");
+  return { over, drop: () => fire("drop"), leave: () => fire("dragleave") };
+}
+
+/** `onFiles`: files dropped on the field are handed over (those `accept` allows); a text file's contents can be read. */
+export const DroppedFilesGoToTheCaller: Story = {
+  args: { label: "Input", accept: ".txt,text/plain", onFiles: fn(), onChange: fn() },
+  play: async ({ args, canvas }) => {
+    const area = canvas.getByRole("textbox", { name: "Input" });
+    const notes = new File(["hello from a file"], "notes.txt", { type: "text/plain" });
+    const picture = new File(["x"], "a.png", { type: "image/png" });
+    const drag = dragOver(area, { files: [notes, picture] });
+    await expect(drag.over.defaultPrevented).toBe(true);
+    // While files are over it, the field shows it takes them.
+    await waitFor(() => expect(area.closest(".cy-text-area")).toHaveAttribute("data-over"));
+    const dropped = drag.drop();
+    await expect(dropped.defaultPrevented).toBe(true);
+    await expect(args.onFiles).toHaveBeenCalledWith([notes]);
+    await expect(area.closest(".cy-text-area")).not.toHaveAttribute("data-over");
+    const [file] = ((args.onFiles as ReturnType<typeof fn>).mock.lastCall ?? [[]])[0] as File[];
+    await expect(await (file as File).text()).toBe("hello from a file");
+    // The text itself is not changed by the drop: the caller decides.
+    await expect(area).toHaveValue("");
+    await expect(args.onChange).not.toHaveBeenCalled();
+    // Only refused files: nothing is handed over.
+    dragOver(area, { files: [picture] }).drop();
+    await expect(args.onFiles).toHaveBeenCalledTimes(1);
+    // A drag that leaves clears the state.
+    const away = dragOver(area, { files: [notes] });
+    await waitFor(() => expect(area.closest(".cy-text-area")).toHaveAttribute("data-over"));
+    away.leave();
+    await waitFor(() => expect(area.closest(".cy-text-area")).not.toHaveAttribute("data-over"));
+  },
+};
+
+/** Dragged text is the browser's to drop, and without `onFiles` files are not taken either. */
+export const TextDropsStayNative: Story = {
+  args: { label: "Input", onFiles: fn() },
+  render: (args) => (
+    <>
+      <TextArea {...args} />
+      <TextArea label="Plain" />
+    </>
+  ),
+  play: async ({ args, canvas }) => {
+    const text = dragOver(canvas.getByRole("textbox", { name: "Input" }), { text: "words" });
+    await expect(text.over.defaultPrevented).toBe(false);
+    await expect(args.onFiles).not.toHaveBeenCalled();
+    const plain = dragOver(canvas.getByRole("textbox", { name: "Plain" }), {
+      files: [new File(["x"], "a.txt", { type: "text/plain" })],
+    });
+    await expect(plain.over.defaultPrevented).toBe(false);
+  },
+};

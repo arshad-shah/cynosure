@@ -20,6 +20,7 @@ Multi-line input that grows with its content from `rows` up to `maxRows`, then s
 | `resizable`                                  | `true`           | Shows the corner grip for setting a height (see below)                                                                                  |
 | `monospace`                                  | `false`          | Types in the mono font (`--cy-font-mono`): code, JSON, tokens                                                                           |
 | `trigger` / `suggestions` / `onMention`      | –                | Mentions: see below                                                                                                                     |
+| `onFiles` / `accept`                         | –                | Files dropped on the field (those `accept` allows); the text is not changed, read a file with `file.text()`                             |
 | `labels.loading`                             | `"Loading…"`     | The suggestion list's loading note (the field's label names it)                                                                         |
 
 Mentions: with `trigger` (such as `"@"`) and `suggestions` (a list filtered by the query, or a function of the query returning items or a promise), typing the trigger at the start of a word opens the shared drop-down list (`OptionList` on `useListboxLayer`) below the box. Arrows move, Enter or Tab inserts the item's `value` and a space in place of the trigger and query (a native edit: `onChange` hears it and Undo reverts it), Escape closes it for that mention, and `onMention(item)` is called. While open, the textarea carries `aria-controls` and `aria-activedescendant` (it keeps `aria-autocomplete="list"` and `aria-haspopup="listbox"`; a textarea may not take `aria-expanded`). Keys the list uses are not passed to `onKeyDown`. IME-safe: the query is read when a composition ends.
@@ -27,6 +28,8 @@ Mentions: with `trigger` (such as `"@"`) and `suggestions` (a list filtered by t
 ```tsx
 <TextArea label="Message" trigger="@" suggestions={(q) => api.people(q)} onMention={(p) => track(p.value)} />;
 ```
+
+Dropped files: with `onFiles`, files dragged over the field give it the accent border and fill, and a drop hands over the ones `accept` allows (nothing is called when none are). The drop never changes the text, so the caller decides: `onFiles={async ([f]) => setValue(await f.text())}`. Dragged text still drops natively, and without `onFiles` files are left to the browser.
 
 Works in native forms (`FormData`, reset restores value, count and height, `required`).
 

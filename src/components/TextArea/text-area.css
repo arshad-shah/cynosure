@@ -120,6 +120,12 @@
   }
 }
 /* Keep the last line of text clear of the grip. */
+/* Files dragged over a field that takes them (onFiles): the accent border and its soft fill. */
+.cy-text-area[data-over] .cy-text-area-input.cy-text-area-input {
+  border-color: var(--cy-color-accent);
+  background: var(--cy-color-accent-soft);
+}
+
 .cy-text-area-box:has(> .cy-text-area-grip) > .cy-text-area-input.cy-text-area-input {
   padding-block-end: max(var(--cy-text-area-padding-block, var(--cy-space-4)), var(--cy-hit-min, 24px));
 }
