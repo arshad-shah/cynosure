@@ -16,6 +16,9 @@
   font-weight: var(--cy-font-weight-regular);
   font-variant-numeric: var(--cy-text-field-numeric, normal);
   line-height: normal;
+  .cy-text-field[data-monospace] > & {
+    font-family: var(--cy-text-field-mono-font, var(--cy-font-mono));
+  }
   letter-spacing: normal;
   text-transform: none;
   appearance: none;

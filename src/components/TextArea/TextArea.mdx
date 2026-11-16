@@ -68,6 +68,10 @@ The list drops below the whole box, at least as wide as it, and moves above it w
 
 - **`variant`:** `outline` (default) or `soft`.
 - **`size`:** `sm`, `md` or `lg`.
+- **`monospace`:** types in the mono font (`--cy-font-mono`), for code, JSON and tokens.
+
+<Canvas of={Stories.MonospaceForCodeAndTokens} />
+
 - **`labelHidden`:** hides the label visually while it still names the field. Prefer a visible label.
 - **Named and described from outside:** `aria-labelledby` names the field by other elements (a column heading) instead of its label; pair it with `labelHidden`. Your `aria-describedby` ids are read first, then the field's own description and error: they are merged, never replaced. The counter's id comes last.
 - Native textarea attributes such as `name`, `required`, `disabled`, `readOnly` and `maxLength` pass through.
@@ -92,7 +96,7 @@ The list drops below the whole box, at least as wide as it, and moves above it w
 
 ## Theming
 
-Tokens: `--cy-text-area-{radius,padding-inline,padding-block,bg,border,soft-bg,readonly-bg}` (`readonly-bg` is the fill of a read-only area).
+Tokens: `--cy-text-area-{radius,padding-inline,padding-block,bg,border,soft-bg,readonly-bg}` (`readonly-bg` is the fill of a read-only area), and `--cy-text-area-mono-font`, the font of a `monospace` area (default `--cy-font-mono`).
 
 ```ts
 createTheme({ components: { textArea: { radius: "10px", paddingBlock: "10px" } } });

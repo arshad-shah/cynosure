@@ -23,6 +23,8 @@ import { Field, type FieldLayoutProps } from "../Field/Field.js";
 import { IconButton } from "../IconButton/IconButton.js";
 
 export interface TextFieldTokens {
+  /** The font of a `monospace` field. Default `--cy-font-mono`. */
+  monoFont: string;
   readonlyBg: string;
   paddingInlineXs: string;
   heightXs: string;
@@ -89,6 +91,8 @@ export interface TextFieldProps extends NativeInput, FieldLayoutProps {
   iconEnd?: IconData | undefined;
   /** Shows a clear button while the field has a value. */
   clearable?: boolean;
+  /** Types in the mono font (`--cy-font-mono`): keys, ids, hashes and tokens. Default false. */
+  monospace?: boolean | undefined;
   /** Controls inside the field's start, before the input (ColorField's swatch button). */
   addonStart?: ReactNode;
   /** Controls inside the field's end, after the input (NumberField's steppers). */
@@ -133,6 +137,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(function T
     iconStart,
     iconEnd,
     clearable = false,
+    monospace = false,
     revealable = false,
     addonStart,
     addonEnd,
@@ -195,6 +200,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(function T
           className="cy-text-field"
           data-size={size}
           data-variant={variant}
+          data-monospace={monospace ? "" : undefined}
           data-invalid={field.invalid ? "" : undefined}
           data-disabled={disabled ? "" : undefined}
         >
