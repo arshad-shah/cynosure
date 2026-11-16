@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { describe, expect, it } from "vitest";
-import { type QrLevel, qrContrast, qrMatrix, qrPath, qrToSvg } from "../../src/foundations/qr";
+import { type QrLevel, qrMatrix, qrPath, qrToSvg } from "../../src/foundations/qr";
+import { qrContrast } from "../../src/foundations/qr-export";
 
 const rows = (m: boolean[][]) => m.map((r) => r.map((v) => (v ? "1" : "0")).join(""));
 const hash = (m: boolean[][]) => createHash("sha256").update(rows(m).join("\n")).digest("hex").slice(0, 16);

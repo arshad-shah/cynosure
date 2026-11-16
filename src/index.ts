@@ -631,14 +631,12 @@ export {
   type QrLevel,
   type QrLogo,
   type QrOptions,
-  type QrToPngOptions,
   type QrToSvgOptions,
-  qrContrast,
   qrMatrix,
   qrPath,
-  qrToPng,
   qrToSvg,
 } from "./foundations/qr.js";
+export { type QrToPngOptions, qrContrast, qrToPng } from "./foundations/qr-export.js";
 export { type RovingOptions, useRovingFocus } from "./foundations/roving-focus.js";
 export { TextAreaBase, type TextAreaBaseProps } from "./foundations/TextAreaBase/TextAreaBase.js";
 export type { BrandInfo, IconCategory, IconData, IconMotion, IconNode } from "./icons/types.js";
