@@ -126,6 +126,7 @@ import { themeInitScript } from "@arshad-shah/cynosure";
 ```
 
 - `key` must match `useColorMode({ key })`; `selector` marks an app root instead of `<html>`.
+- With nothing valid saved (or storage blocked) it marks `system`, so a dark-OS visitor sees dark from the first paint; a `data-cy-mode` the page already set is kept.
 - It contains no `<`, so it is safe to inline. For a content security policy without inline scripts, write the text to a file at build time and load that.
 - It reads localStorage only; async storage (such as `chrome.storage`) cannot be read before paint.
 

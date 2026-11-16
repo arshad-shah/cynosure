@@ -18,12 +18,22 @@ describe("themeInitScript", () => {
     expect(document.documentElement.getAttribute("data-cy-mode")).toBe("dark");
   });
 
-  it("leaves the page alone when nothing valid is saved", () => {
+  it("follows the OS when nothing valid is saved, so a dark OS never sees a light first paint", () => {
     run(themeInitScript());
-    expect(document.documentElement.hasAttribute("data-cy-mode")).toBe(false);
+    expect(document.documentElement.getAttribute("data-cy-mode")).toBe("system");
+    document.documentElement.removeAttribute("data-cy-mode");
     localStorage.setItem("cy-color-mode", "purple");
     run(themeInitScript());
-    expect(document.documentElement.hasAttribute("data-cy-mode")).toBe(false);
+    expect(document.documentElement.getAttribute("data-cy-mode")).toBe("system");
+  });
+
+  it("keeps a mode the page itself set when nothing is saved", () => {
+    document.documentElement.setAttribute("data-cy-mode", "dark");
+    run(themeInitScript());
+    expect(document.documentElement.getAttribute("data-cy-mode")).toBe("dark");
+    localStorage.setItem("cy-color-mode", "light");
+    run(themeInitScript());
+    expect(document.documentElement.getAttribute("data-cy-mode")).toBe("light");
   });
 
   it("never throws when storage is blocked", () => {
