@@ -11,6 +11,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { deepActiveElement } from "../../foundations/focus.js";
 import type { VirtualAnchor } from "../../overlay/use-anchored-position.js";
 import { type MenuEntry, MenuPanel } from "../Menu/Menu.js";
 
@@ -47,7 +48,9 @@ export interface ContextMenuProps<K = undefined> {
    * (any value, such as the row's item) that `label`, `items`, `onSelect` and `onOpenChange` receive back. One menu
    * then serves them all, beside the list rather than inside it.
    */
-  children: (props: ContextMenuTargetProps, targetFor: (key: K) => ContextMenuKeyTargetProps) => ReactNode;
+  children?:
+    | ((props: ContextMenuTargetProps, targetFor: (key: K) => ContextMenuKeyTargetProps) => ReactNode)
+    | undefined;
   /** Accessible name of the menu; with many targets, a function of the key of the target it opened for. */
   label: string | ((key: K) => string);
   /**
@@ -57,8 +60,23 @@ export interface ContextMenuProps<K = undefined> {
   items: MenuEntry[] | ((key: K) => MenuEntry[]);
   /** Called when an item is chosen, with its `value` (and, with many targets, the key of the target). */
   onSelect: (value: string, key: K) => void;
-  /** Called when the menu opens or closes, e.g. to highlight the row it belongs to (with many targets, its key). */
+  /**
+   * Called when the menu opens or closes, e.g. to highlight the row it belongs to (with many targets, its key). With
+   * `open`, it is the request: a right-click asks for `true`, Escape, a choice or an outside press for `false`.
+   */
   onOpenChange?: ((open: boolean, key: K) => void) | undefined;
+  /**
+   * Whether the menu is open, for an app that opens it itself: a canvas finds the object under the pointer (or the
+   * selected one, for Shift+F10) and opens the menu for it at `anchor`, with that object's `label` and `items`.
+   * Pair with `onOpenChange`. Focus returns to what had it when the menu opened.
+   */
+  open?: boolean | undefined;
+  /**
+   * Where the menu opens when the app opens it: a point (`{ x, y }`, client coordinates, such as a pointer event's
+   * `clientX` and `clientY`) or any element or virtual anchor. Without it, a menu the app opens sits under its target.
+   * Used while `open` is controlled; a right-click on a target still opens at the pointer.
+   */
+  anchor?: { x: number; y: number } | VirtualAnchor | undefined;
   /** The browser's own menu shows instead. */
   disabled?: boolean;
   /** Added to the menu panel, for layout. */
@@ -87,37 +105,79 @@ export function ContextMenu<K = undefined>({
   items,
   onSelect,
   onOpenChange,
+  open: openProp,
+  anchor: anchorProp,
   disabled = false,
   className,
   style,
 }: ContextMenuProps<K>) {
   const id = useId();
-  const [open, setOpen] = useState(false);
+  const controlled = openProp !== undefined;
+  const [inner, setInner] = useState(false);
+  const open = controlled ? openProp : inner;
   // The target the menu is open for (or was last open for), by its key; focus returns to its element.
   const [current, setCurrent] = useState<{ key: K; keyed: boolean } | null>(null);
   const target = useRef<HTMLElement>(null);
+  // Where focus goes back to: the target that opened it, or what had focus when the app opened it.
+  const returnTo = useRef<HTMLElement | null>(null);
   const anchor = useRef<HTMLElement | VirtualAnchor | null>(null);
+  // A target asked to open (a right-click, a long press, Shift+F10), as opposed to the app opening it.
+  const asked = useRef(false);
   const press = useRef<{ x: number; y: number; timer: ReturnType<typeof setTimeout> } | null>(null);
-  const latest = useRef({ disabled, onOpenChange, current });
-  latest.current = { disabled, onOpenChange, current };
+  const latest = useRef({ disabled, onOpenChange, current, open, controlled });
+  latest.current = { disabled, onOpenChange, current, open, controlled };
 
-  const show = useCallback((key: K, keyed: boolean, el: HTMLElement, at: HTMLElement | VirtualAnchor) => {
-    target.current = el;
-    anchor.current = at;
-    setCurrent({ key, keyed });
-    setOpen(true);
+  const report = useCallback((next: boolean, at: { key: K; keyed: boolean } | null) => {
+    const { onOpenChange } = latest.current;
+    if (at?.keyed) onOpenChange?.(next, at.key);
+    else (onOpenChange as ((open: boolean) => void) | undefined)?.(next);
   }, []);
-  const close = useCallback(() => setOpen(false), []);
+  const show = useCallback(
+    (key: K, keyed: boolean, el: HTMLElement, at: HTMLElement | VirtualAnchor) => {
+      returnTo.current = el;
+      anchor.current = at;
+      asked.current = true;
+      const next = { key, keyed };
+      setCurrent(next);
+      if (latest.current.controlled) {
+        if (!latest.current.open) report(true, next);
+      } else setInner(true);
+    },
+    [report],
+  );
+  const close = useCallback(() => {
+    if (latest.current.controlled) {
+      if (latest.current.open) report(false, latest.current.current);
+    } else setInner(false);
+  }, [report]);
+  // Uncontrolled, the change is reported once it happens (a second right-click while open reports nothing new).
   const first = useRef(true);
   useEffect(() => {
     if (first.current) {
       first.current = false;
       return;
     }
-    const { onOpenChange, current } = latest.current;
-    if (current?.keyed) onOpenChange?.(open, current.key);
-    else (onOpenChange as ((open: boolean) => void) | undefined)?.(open);
-  }, [open]);
+    if (!latest.current.controlled) report(open, latest.current.current);
+  }, [open, report]);
+
+  // Opened by the app, not by a target: remember what had focus, and place it at `anchor` (else under the target).
+  const wasOpen = useRef(false);
+  const fromApp = useRef(false);
+  if (open && !wasOpen.current) {
+    fromApp.current = !asked.current;
+    if (fromApp.current) {
+      returnTo.current = deepActiveElement() ?? target.current;
+      anchor.current = target.current;
+    }
+  }
+  // A request the app turned down is forgotten, so its next opening counts as its own.
+  if (!open) asked.current = false;
+  wasOpen.current = open;
+  if (open && fromApp.current && anchorProp)
+    anchor.current =
+      "getBoundingClientRect" in anchorProp
+        ? anchorProp
+        : { getBoundingClientRect: () => new DOMRect(anchorProp.x, anchorProp.y, 0, 0) };
 
   const cancelPress = useCallback(() => {
     if (press.current) clearTimeout(press.current.timer);
@@ -169,7 +229,7 @@ export function ContextMenu<K = undefined>({
   };
   return (
     <>
-      {children({ ref: target, ...handlers(undefined as K, false) }, targetFor)}
+      {children?.({ ref: target, ...handlers(undefined as K, false) }, targetFor)}
       <MenuPanel
         id={id}
         label={typeof label === "function" ? (current ? label(key) : "") : label}
@@ -182,7 +242,7 @@ export function ContextMenu<K = undefined>({
         placement="bottom"
         offset={2}
         inside={[]}
-        returnFocus={target}
+        returnFocus={returnTo}
         className={className}
         style={style}
       />

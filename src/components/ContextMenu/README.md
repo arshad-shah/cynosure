@@ -14,14 +14,16 @@ import { ContextMenu } from "@arshad-shah/cynosure";
 </ContextMenu>;
 ```
 
-| Prop                  | Default | Notes                                                                              |
-| --------------------- | ------- | ---------------------------------------------------------------------------------- |
-| `children`            | –       | `(props) => element`: spread `props` (ref and handlers) onto one focusable element |
-| `label`               | –       | Accessible name of the menu                                                        |
-| `items` / `onSelect`  | –       | Same entries as `Menu` (`MenuItem` or `MenuSection`)                               |
-| `onOpenChange`        | –       | Called with `true` / `false`, e.g. to highlight the row the menu belongs to        |
-| `disabled`            | `false` | The browser's own menu shows instead                                               |
-| `className` / `style` | –       | Layout only, applied to the panel                                                  |
+| Prop                  | Default | Notes                                                                                                    |
+| --------------------- | ------- | -------------------------------------------------------------------------------------------------------- |
+| `children`            | –       | `(props) => element`: spread `props` (ref and handlers) onto one focusable element; optional with `open` |
+| `label`               | –       | Accessible name of the menu                                                                              |
+| `items` / `onSelect`  | –       | Same entries as `Menu` (`MenuItem` or `MenuSection`)                                                     |
+| `onOpenChange`        | –       | Called with `true` / `false`, e.g. to highlight the row the menu belongs to                              |
+| `open`                | –       | Controlled: the app opens it itself (a canvas object with no element of its own)                         |
+| `anchor`              | –       | Where the app opens it: `{ x, y }` in client coordinates, or an element                                  |
+| `disabled`            | `false` | The browser's own menu shows instead                                                                     |
+| `className` / `style` | –       | Layout only, applied to the panel                                                                        |
 - Right-click opens the menu with its corner at the pointer; the keyboard opens it under the target. It stays on screen near edges.
 - Touch: a 500ms press opens it (iOS sends no `contextmenu` event); a tap or a scroll does not. Add `-webkit-touch-callout: none` and `user-select: none` to the target so the system's own callout does not appear.
 - Focus moves to the first item and returns to the target when the menu closes.
@@ -47,6 +49,23 @@ For the rows of a list or the tabs of a tab list, use one ContextMenu for all of
   }
 </ContextMenu>;
 ```
+
+## Opened by the app, at a point
+
+Objects drawn on a canvas have no element of their own. Find the object yourself (under a right-click, or the selected one for Shift+F10) and open the menu for it with `open` and `anchor`:
+
+```tsx
+<ContextMenu
+  open={menu !== null}
+  anchor={menu ?? undefined} // { x, y } in client coordinates
+  onOpenChange={(open) => !open && setMenu(null)}
+  label={menu ? `${menu.shape.name} actions` : ""}
+  items={shapeCommands}
+  onSelect={(command) => run(command, menu?.shape)}
+/>;
+```
+
+`onOpenChange(false)` reports Escape, a choice, Tab or an outside press; focus returns to what had it when the menu opened. With a target as well, a menu the app opens without `anchor` sits under the target, and a right-click asks to open through `onOpenChange(true)`.
 
 ## Tokens
 
