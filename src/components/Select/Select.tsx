@@ -102,6 +102,15 @@ export interface SelectProps extends FieldLayoutProps {
   variant?: "outline" | "soft";
   /** Replace the built-in English text: the placeholder, the empty list and the required message. */
   labels?: { placeholder?: string; empty?: string; required?: string };
+  /** Id of the trigger (the combobox); the label, description and error ids are built from it. Default: generated. */
+  id?: string | undefined;
+  /**
+   * Ids of the element(s) that name the control instead of its own label (a column heading, a label elsewhere in
+   * the layout); the list is named by them too. Pair with `labelHidden`.
+   */
+  "aria-labelledby"?: string | undefined;
+  /** Ids of more elements that describe the control, read before its own description and error. */
+  "aria-describedby"?: string | undefined;
   /** Added to the root element, for layout. */
   className?: string;
   /** Layout only. */
@@ -145,6 +154,9 @@ export function Select({
   size = "md",
   variant = "outline",
   labels,
+  id,
+  "aria-labelledby": labelledBy,
+  "aria-describedby": describedBy,
   className,
   style,
 }: SelectProps) {
@@ -268,6 +280,8 @@ export function Select({
       error={error ?? (missing && !current ? (labels?.required ?? "Please choose a value.") : undefined)}
       required={required}
       size={size}
+      id={id}
+      describedBy={describedBy}
       className={className}
       style={style}
     >
@@ -278,7 +292,7 @@ export function Select({
             id={field.id}
             role="combobox"
             className="cy-select-trigger"
-            aria-labelledby={field.labelId}
+            aria-labelledby={labelledBy ?? field.labelId}
             aria-describedby={field.describedBy}
             aria-invalid={field.invalid || undefined}
             aria-required={required || undefined}
@@ -301,7 +315,7 @@ export function Select({
           <OptionList
             ref={list}
             id={listId}
-            aria-labelledby={field.labelId}
+            aria-labelledby={labelledBy ?? field.labelId}
             footer={
               footer && {
                 action: footer,

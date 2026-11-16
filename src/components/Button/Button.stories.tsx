@@ -119,6 +119,43 @@ export const Disabled: Story = {
   },
 };
 
+export const DisabledWithAReason: Story = {
+  render: (args) => (
+    <form data-testid="form" onSubmit={(e) => e.preventDefault()}>
+      <Button {...args} type="submit" aria-disabled="true" aria-describedby="why">
+        Export
+      </Button>
+      <Button {...args} aria-busy="true" data-testid="busy">
+        Sync
+      </Button>
+      <Button {...args} data-testid="enabled">
+        Import
+      </Button>
+      <span id="why">Choose a file first</span>
+    </form>
+  ),
+  play: async ({ canvas, args, userEvent }) => {
+    const button = canvas.getByRole("button", { name: "Export" });
+    // The caller's state is kept, not overwritten: still focusable, announced as disabled, with its reason.
+    await expect(button).toHaveAttribute("aria-disabled", "true");
+    await expect(button).toHaveAccessibleDescription("Choose a file first");
+    await expect(canvas.getByTestId("busy")).toHaveAttribute("aria-busy", "true");
+    const submitted = fn();
+    (canvas.getByTestId("form") as HTMLFormElement).addEventListener("submit", submitted);
+    await userEvent.tab();
+    await expect(button).toHaveFocus();
+    await userEvent.keyboard("{Enter}");
+    await userEvent.keyboard(" ");
+    await userEvent.click(button);
+    await userEvent.pointer({ keys: "[TouchA]", target: button });
+    await expect(args.onClick).not.toHaveBeenCalled();
+    await expect(submitted).not.toHaveBeenCalled();
+    // It looks disabled too.
+    const opacity = (el: Element) => Number(getComputedStyle(el).opacity);
+    await expect(opacity(button)).toBeLessThan(opacity(canvas.getByTestId("enabled")));
+  },
+};
+
 export const TouchTap: Story = {
   play: async ({ canvas, args, userEvent }) => {
     await userEvent.pointer({ keys: "[TouchA]", target: canvas.getByRole("button", { name: "Export" }) });

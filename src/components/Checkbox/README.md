@@ -8,15 +8,18 @@ A native checkbox under a drawn Facet box: forms (`FormData`, reset, `required`)
 <Checkbox label="Buy oat milk" strikeWhenChecked checked={done} onChange={setDone} />
 ```
 
-| Prop                                               | Default  | Notes                                                        |
-| -------------------------------------------------- | -------- | ------------------------------------------------------------ |
-| `label` / `description`                            | –        | Description linked via `aria-describedby`                    |
-| `checked` / `defaultChecked` / `onChange(checked)` | –        | Controlled or uncontrolled                                   |
-| `indeterminate`                                    | `false`  | Announced as mixed                                           |
-| `strikeWhenChecked`                                | `false`  | Checklist style: a checked label is struck through and muted |
-| `size`                                             | `md`     | box 14 · 16 · 20 px                                          |
-| `tone`                                             | `accent` | Fill colour when checked                                     |
-| `name`, `value`, `required`, `disabled`            | –        | Native                                                       |
+| Prop                                                      | Default  | Notes                                                                                         |
+| --------------------------------------------------------- | -------- | --------------------------------------------------------------------------------------------- |
+| `label` / `description`                                   | –        | Description linked via `aria-describedby`                                                     |
+| `labelHidden`                                             | `false`  | The label stays for assistive tech but takes no space (a selection column)                    |
+| `aria-labelledby` / `aria-describedby`                    | –        | Named by other elements instead of the label; your describing ids come before the description |
+| `tabIndex`                                                | –        | On the input: `-1` for a roving grid                                                          |
+| `checked` / `defaultChecked` / `onChange(checked, event)` | –        | Controlled or uncontrolled                                                                    |
+| `indeterminate`                                           | `false`  | Announced as mixed                                                                            |
+| `strikeWhenChecked`                                       | `false`  | Checklist style: a checked label is struck through and muted                                  |
+| `size`                                                    | `md`     | box 14 · 16 · 20 px                                                                           |
+| `tone`                                                    | `accent` | Fill colour when checked                                                                      |
+| `name`, `value`, `required`, `disabled`                   | –        | Native                                                                                        |
 - `strikeWhenChecked` is for lists of tasks: while the box is checked (not while `indeterminate`), the label is struck through and takes the muted colour, and the description is muted with it. The muted label keeps 4.5:1 contrast on the surface in light and dark; in forced colours the strike stays, in the system text colour. The colour change is a transition and stops under reduced motion. The checked state is still what assistive technology announces: the strike is only its visual echo. The row is a [Choice](../Choice/README.md) (its `strikeWhenChecked`); Switch and RadioGroup use the same row but do not offer the prop.
 
 ## Tokens

@@ -66,6 +66,7 @@ With `group`, Field renders a `fieldset` and the label names the whole group ins
 
 - **Label:** a `label` linked to the control, or the group label when `group` is set.
 - **Hidden label:** `labelHidden` keeps the label for assistive tech but takes no space. Prefer visible labels.
+- **More descriptions:** `describedBy` takes ids of other elements that describe the control; they come before the field's own description and error in `field.describedBy`. Controls pass their `aria-describedby` through it, so a caller's ids are merged, never replaced.
 - **Description and error:** linked through `aria-describedby`. The error also announces itself.
 - **Size:** `xs`, `sm`, `md` (default) or `lg`; an `xs` control has the `sm` label.
 - **Split layout:** the order in the page stays label, description, control, then error, so screen readers and the Tab key meet them as in the stacked layout. Right-to-left text mirrors the row.

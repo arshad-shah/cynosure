@@ -25,4 +25,12 @@ describe("useField", () => {
     expect(result.current.describedBy).toBeUndefined();
     expect(result.current.invalid).toBe(false);
   });
+  it("puts a caller's describedby ids before its own", () => {
+    const { result } = renderHook(() =>
+      useField({ id: "email", description: "Help", error: "Bad", describedBy: " hint other " }),
+    );
+    expect(result.current.describedBy).toBe("hint other email-description email-error");
+    const { result: alone } = renderHook(() => useField({ id: "x", describedBy: "hint" }));
+    expect(alone.current.describedBy).toBe("hint");
+  });
 });

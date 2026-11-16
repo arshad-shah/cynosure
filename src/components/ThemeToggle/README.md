@@ -1,6 +1,6 @@
 # ThemeToggle
 
-Light / dark / system switch built from `SegmentedControl` with the Facet `sun`, `moon` and `monitor` icons. Uncontrolled it manages and persists the mode with `useColorMode` (any `{ get, set }` storage, sync or async).
+Light / dark / system switch built from `SegmentedControl` with the Facet `sun`, `moon` and `monitor` icons. Uncontrolled it manages and persists the mode with `useColorMode` (any `{ get, set }` storage, sync or async), and follows a mode chosen in another tab under the same key (localStorage's `storage` event, or the storage's `subscribe`).
 
 ```tsx
 const { mode } = useColorMode();

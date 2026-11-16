@@ -46,7 +46,9 @@ Pass `value` and `onChange(mode)` to own the state. `mode` is `"light"`, `"dark"
 
 ## Persistence
 
-Uncontrolled mode is stored in `localStorage` by default. Pass `storage` (any `{ get, set }` object, sync or async, such as one backed by `chrome.storage`) to persist elsewhere.
+Uncontrolled mode is stored in `localStorage` by default. Pass `storage` (any `{ get, set }` object, sync or async, such as one backed by `chrome.storage`) to persist elsewhere. Toggles on one `storageKey` follow each other, also across tabs: localStorage's `storage` event by default, or the storage's `subscribe(key, onChange)` when it has one.
+
+<Canvas of={Stories.FollowsAnotherTab} />
 
 ## Props
 

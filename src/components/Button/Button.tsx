@@ -150,8 +150,12 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
     setArmed(false);
   };
   useEffect(() => () => clearTimeout(timer.current), []);
+  // A caller's `aria-disabled` and `aria-busy` are kept and merged with the button's own (disabled with a reason:
+  // it stays focusable and its description can say why).
+  const ariaOff = loading || rest["aria-disabled"] === true || rest["aria-disabled"] === "true";
+  const busy = loading || rest["aria-busy"] === true || rest["aria-busy"] === "true";
   const press = (event: MouseEvent<HTMLButtonElement>) => {
-    if (loading) return event.preventDefault();
+    if (ariaOff) return event.preventDefault();
     if (confirm !== undefined && !armed) {
       setArmed(true);
       clearTimeout(timer.current);
@@ -170,6 +174,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
     "data-full": fullWidth ? "" : undefined,
     "data-square": square ? "" : undefined,
     "data-loading": loading ? "" : undefined,
+    "data-disabled": ariaOff && !loading ? "" : undefined,
     "data-armed": armed ? "" : undefined,
     style: color ? ({ "--_tone": color, ...rest.style } as CSSProperties) : rest.style,
   };
@@ -204,8 +209,8 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       ref={ref}
       {...rest}
       {...shared}
-      aria-busy={loading || undefined}
-      aria-disabled={loading || undefined}
+      aria-busy={busy || undefined}
+      aria-disabled={ariaOff || undefined}
       onClick={press}
       onMouseDown={keepFocus ? (event) => event.preventDefault() : rest.onMouseDown}
       onPointerDown={(event) => {

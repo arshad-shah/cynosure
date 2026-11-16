@@ -572,3 +572,18 @@ export const LayoutHooks: Story = {
     await expect(field(canvasElement).style.maxInlineSize).toBe("320px");
   },
 };
+
+export const DescribedFromOutside: Story = {
+  args: { description: "Works in every window" },
+  render: (args) => (
+    <div>
+      <span id="hk-hint">Avoid shortcuts the browser uses</span>
+      <HotkeyField {...args} aria-describedby="hk-hint" />
+    </div>
+  ),
+  play: async ({ canvas }) => {
+    await expect(canvas.getByRole("group", { name: "Command palette" })).toHaveAccessibleDescription(
+      "Avoid shortcuts the browser uses Works in every window",
+    );
+  },
+};

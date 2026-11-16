@@ -116,6 +116,30 @@ export const TooltipShowsAndDismisses: Story = {
   },
 };
 
+export const InstantTooltipForToolbars: Story = {
+  render: (args) => (
+    <div style={{ display: "flex", gap: 8 }}>
+      <IconButton {...args} icon={copy} label="Copy" tooltipDelay={0} />
+      <IconButton {...args} icon={trash} label="Delete" />
+    </div>
+  ),
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const [instant, slow] = [...canvasElement.querySelectorAll(".cy-tooltip")] as HTMLElement[];
+    await userEvent.hover(canvas.getByRole("button", { name: "Copy" }));
+    // tooltipDelay={0}: open at once, long before the default 300 ms hover delay.
+    await new Promise((r) => setTimeout(r, 60));
+    await expect(instant?.matches(":popover-open")).toBe(true);
+    await userEvent.unhover(canvas.getByRole("button", { name: "Copy" }));
+    await waitFor(() => expect(instant?.matches(":popover-open")).toBe(false));
+    // Past the tooltips' shared warm-up, so the default delay applies again.
+    await new Promise((r) => setTimeout(r, 400));
+    await userEvent.hover(canvas.getByRole("button", { name: "Delete" }));
+    await new Promise((r) => setTimeout(r, 60));
+    await expect(slow?.matches(":popover-open")).toBe(false);
+    await waitFor(() => expect(slow?.matches(":popover-open")).toBe(true));
+  },
+};
+
 export const ForwardsConsumerHandlersAndClassName: Story = {
   args: {
     className: "toolbar-action",

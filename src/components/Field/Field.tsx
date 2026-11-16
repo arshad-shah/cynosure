@@ -67,6 +67,11 @@ export interface FieldProps extends FieldLayoutProps {
   labelHidden?: boolean | undefined;
   /** Label a group of controls (radio groups) instead of one control. */
   group?: boolean | undefined;
+  /**
+   * Ids of other elements that describe the control (a caller's `aria-describedby`): read before the field's own
+   * description and error, never replaced by them.
+   */
+  describedBy?: string | undefined;
   /** Id for the control; the label, description and error ids are built from it. Default: a generated id. */
   id?: string | undefined;
   /** Added to the root element, for layout. */
@@ -88,12 +93,13 @@ export function Field({
   width,
   group,
   labelHidden,
+  describedBy,
   id,
   className,
   style,
   children,
 }: FieldProps) {
-  const field = useField({ id, description, error });
+  const field = useField({ id, description, error, describedBy });
   // A hidden label stays in the accessibility tree; out of the flow, the grid gap collapses with it.
   const labelClass = labelHidden ? "cy-field-label cy-visually-hidden" : "cy-field-label";
   const split = layout === "split";

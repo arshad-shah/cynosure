@@ -284,3 +284,40 @@ export const WhenTruncatedMeasuresTheTrigger: Story = {
     await expect(canvasElement.ownerDocument.querySelector(".cy-tooltip")).toBeNull();
   },
 };
+
+export const NeighboursOpenAtOnceOnceOneIsShown: Story = {
+  render: () => (
+    <div style={{ display: "flex", gap: 8 }}>
+      <Tooltip content="Bold" delay={400}>
+        <Button data-testid="a">B</Button>
+      </Tooltip>
+      <Tooltip content="Italic" delay={400}>
+        <Button data-testid="b">I</Button>
+      </Tooltip>
+    </div>
+  ),
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const [bold, italic] = [...canvasElement.ownerDocument.querySelectorAll(".cy-tooltip")] as HTMLElement[];
+    // Start cold: past the warm-up of any tip an earlier story showed.
+    await pause(400);
+    await userEvent.hover(canvas.getByTestId("a"));
+    await pause(60);
+    await expect(isOpen(bold as HTMLElement)).toBe(false);
+    await waitFor(() => expect(isOpen(bold as HTMLElement)).toBe(true));
+    // Warm: moving to a neighbour while a tip is shown (or just after) skips its delay, as toolbars do.
+    await userEvent.hover(canvas.getByTestId("b"));
+    await pause(60);
+    await expect(isOpen(italic as HTMLElement)).toBe(true);
+    await waitFor(() => expect(isOpen(bold as HTMLElement)).toBe(false));
+    // Cold again a while after the last tip closed: the delay is back.
+    await userEvent.unhover(canvas.getByTestId("b"));
+    await waitFor(() => expect(isOpen(italic as HTMLElement)).toBe(false));
+    await pause(500);
+    await userEvent.hover(canvas.getByTestId("a"));
+    await pause(60);
+    await expect(isOpen(bold as HTMLElement)).toBe(false);
+    await waitFor(() => expect(isOpen(bold as HTMLElement)).toBe(true));
+    await userEvent.unhover(canvas.getByTestId("a"));
+    await waitFor(() => expect(isOpen(bold as HTMLElement)).toBe(false));
+  },
+};

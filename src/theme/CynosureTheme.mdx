@@ -109,6 +109,7 @@ const { mode, setMode, resolved } = useColorMode({ storage, key });
 
 - `mode` is `light`, `dark` or `system`; `resolved` is the actual `light` or `dark` after applying the OS preference.
 - The choice is persisted through `storage` (localStorage by default) under `key` (default `cy-color-mode`). `storage` is any `{ get, set }` object, sync or async, for example `chrome.storage`.
+- Every `useColorMode` and ThemeToggle on one `key` follows a change: in the same tab at once, and from another tab through localStorage's `storage` event (default storage). A custom storage can report changes made elsewhere with an optional `subscribe(key, onChange)` that returns an unsubscribe function, for example from `chrome.storage.onChanged`.
 - It never throws: unavailable or invalid storage falls back to `system`, and a failed write keeps the in-memory value.
 - The first render is always `system` and storage is read after mount, so it is safe for server rendering and hydration.
 - Several hooks with the same `key` on one page stay in sync.

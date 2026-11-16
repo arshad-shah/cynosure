@@ -23,14 +23,23 @@ declare module "../../tokens/schema.js" {
 export interface ChoiceControlProps {
   /** The control's label. Pressing it toggles the control. */
   label: ReactNode;
+  /**
+   * Keep the label for assistive tech but take no space (a grid cell, a row whose heading says what it is). Prefer
+   * visible labels. Default false.
+   */
+  labelHidden?: boolean | undefined;
   /** Help text shown under the label and read with the control. */
   description?: ReactNode | undefined;
   /** Controlled: whether it is on. */
   checked?: boolean | undefined;
   /** On at first, when uncontrolled. */
   defaultChecked?: boolean | undefined;
-  /** Called when the person turns it on or off, with the new state. */
-  onChange?: ((checked: boolean) => void) | undefined;
+  /**
+   * Called when the person turns it on or off, with the new state and the change event. For a checkbox or switch the
+   * event's `nativeEvent` is the click that toggled it, so `event.nativeEvent.shiftKey` tells a Shift+click (range
+   * selection) from a plain one.
+   */
+  onChange?: ((checked: boolean, event: ChangeEvent<HTMLInputElement>) => void) | undefined;
   /** Name it is submitted under in a form, when on. */
   name?: string | undefined;
   /** The value submitted with `name` when on. The browser sends "on" when this is not set. */
@@ -45,6 +54,15 @@ export interface ChoiceControlProps {
   tone?: Tone | undefined;
   /** Id of the native input; one is generated when not set. */
   id?: string | undefined;
+  /** Ids of the element(s) that name the control instead of its label (a column heading). Pair with `labelHidden`. */
+  "aria-labelledby"?: string | undefined;
+  /** Ids of more elements that describe the control, read before its own description. */
+  "aria-describedby"?: string | undefined;
+  /**
+   * The input's tab order: `-1` takes it out of the Tab sequence while it stays focusable, for a grid or list that
+   * moves focus itself (roving tabindex). Default: in the sequence.
+   */
+  tabIndex?: number | undefined;
   /** Added to the root element (the label that wraps the row), for layout. */
   className?: string | undefined;
   /** Layout only, applied to the root element. */
@@ -56,6 +74,7 @@ export interface ChoiceInput {
   id: string;
   "aria-labelledby": string;
   "aria-describedby": string | undefined;
+  tabIndex?: number | undefined;
   name?: string | undefined;
   value?: string | undefined;
   required?: boolean | undefined;
@@ -93,6 +112,7 @@ export interface ChoiceProps extends Omit<ChoiceControlProps, "tone"> {
 export function Choice({
   control,
   label,
+  labelHidden = false,
   description,
   checked,
   defaultChecked,
@@ -102,11 +122,13 @@ export function Choice({
   media,
   size = "md",
   id,
+  "aria-labelledby": labelledBy,
+  "aria-describedby": describedBy,
   className,
   style,
   ...input
 }: ChoiceProps) {
-  const field = useField({ id, description });
+  const field = useField({ id, description, describedBy });
   return (
     <label
       htmlFor={field.id}
@@ -120,13 +142,13 @@ export function Choice({
       {control({
         ...input,
         id: field.id,
-        "aria-labelledby": field.labelId,
+        "aria-labelledby": labelledBy ?? field.labelId,
         "aria-describedby": field.describedBy,
         ...(checked !== undefined ? { checked } : { defaultChecked }),
-        onChange: (e) => onChange?.(e.currentTarget.checked),
+        onChange: (e) => onChange?.(e.currentTarget.checked, e),
       })}
       {variant === "card" && media !== undefined && <span className="cy-choice-media">{media}</span>}
-      <span className="cy-choice-text">
+      <span className={labelHidden ? "cy-choice-text cy-visually-hidden" : "cy-choice-text"}>
         <span id={field.labelId} className="cy-choice-label">
           {label}
         </span>

@@ -70,6 +70,12 @@ The muted label keeps a contrast of at least 4.5:1 against the surface in light 
 
 - **Forms:** values reach `FormData`, form reset restores the initial state, and `required` is enforced by the browser.
 - **Whole row:** the label and description are part of the click target.
+- **Named and described from outside:** `aria-labelledby` names the input by other elements (a column heading) instead of its label; pair it with `labelHidden`, which keeps the label for assistive tech but takes no space. Your `aria-describedby` ids are read before the description.
+- **Roving focus:** `tabIndex={-1}` reaches the input, for a grid or list that moves focus itself.
+- **The change event:** `onChange(checked, event)`. The event's `nativeEvent` is the click that toggled the input, so `event.nativeEvent.shiftKey` tells a Shift+click (select a range of rows) from a plain one.
+
+<Canvas of={Stories.ShiftClickAndRovingTabIndex} />
+
 - **Done style:** with `strikeWhenChecked` the checked state is still what is announced; the strike only shows it. In forced colours the muted colour is dropped and the strike stays, in the system text colour. The colour change is a transition and is switched off under reduced motion.
 
 ## Touch

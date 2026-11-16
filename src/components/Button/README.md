@@ -19,6 +19,7 @@ import { download, trash } from "@arshad-shah/cynosure/icons";
 | `icon` / `iconEnd`    | –         | Facet icons; inline-start / inline-end (RTL aware)                                                                                                                      |
 | `loading`             | `false`   | Centred `LoadingDots`, `aria-busy`, ignores activation, keeps width                                                                                                     |
 | `pressed`             | –         | Toggle button (`aria-pressed`)                                                                                                                                          |
+| `aria-disabled`       | –         | `"true"`: looks disabled and ignores activation but stays focusable, so `aria-describedby` can say why. Kept with `loading`                                             |
 | `type`                | `button`  | Never submits unless `type="submit"`                                                                                                                                    |
 | `fullWidth`           | `false`   | Fills its container                                                                                                                                                     |
 | `square`              | `false`   | As wide as it is tall, no padding, for one icon as the content. Prefer `IconButton`, which sets it and adds the label and tooltip                                       |
