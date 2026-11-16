@@ -59,6 +59,22 @@ A child Stack or Inline with `grow` takes the free space in the row, so the item
 
 `id`, `role`, any `aria-*` or `data-*` attribute, `tabIndex`, `dir`, `lang` and every event handler (pointer, keyboard, drag and drop, focus) go to Inline's element, and so does `ref`: a Inline can be a drop zone, a landmark or a group without a wrapper `div`. It stays layout: give a box that reacts to clicks or keys a role and a name, or use the component made for it (Button, Card, ListRow).
 
+## Meta line
+
+`separator` puts a mark between the children: `dot` for a meta line under a title ("PDF · 3 pages · 1.2 MB"), `line` for a thin upright rule. Each child, text included, becomes one item, and empty children (`null`, `false`) are left out, so a value that is missing leaves no stray mark. The mark is drawn in the gap by CSS, not typed, so screen readers read only the values; render it `as="ul"` when the values are a list worth announcing. Colour and size come from `--cy-inline-separator-color` and `--cy-inline-separator-size`. For terms with values, use [DescriptionList](?path=/docs/components-feedback-and-display-descriptionlist--docs) with `layout="inline"`.
+
+```tsx
+<Text as="div" size="sm" tone="muted">
+  <Inline separator="dot" gap="2" wrap>
+    PDF
+    {pages} pages
+    {size && formatBytes(size)}
+  </Inline>
+</Text>
+```
+
+<Canvas of={Stories.SeparatorMakesAMetaLine} />
+
 ## Props
 
 <ArgTypes of={Stories} />

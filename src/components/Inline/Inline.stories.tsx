@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import type React from "react";
 import { useEffect, useRef, useState } from "react";
 import { expect } from "storybook/test";
 import { Badge } from "../Badge/Badge.js";
@@ -193,5 +194,90 @@ export const PassesHandlersDataAndRef: Story = {
     await userEvent.keyboard("{Enter}");
     await expect(canvas.getByTestId("log")).toHaveTextContent("enter-pointer,click,enter");
     await expect(zone).toHaveAttribute("data-state", "used");
+  },
+};
+
+const before = (el: Element) => getComputedStyle(el, "::before");
+
+export const SeparatorMakesAMetaLine: Story = {
+  args: { separator: "dot", gap: "2" },
+  argTypes: { separator: { control: "inline-radio", options: [undefined, "dot", "line"] } },
+  render: (args) => (
+    <Inline {...args} data-testid="meta">
+      PDF
+      <span>3 pages</span>
+      {null}
+      {false}
+      <Badge tone="success">Signed</Badge>
+      1.2 MB
+    </Inline>
+  ),
+  play: async ({ canvas }) => {
+    const meta = canvas.getByTestId("meta");
+    // Every child, text included, is one item; empty children are left out.
+    const items = [...meta.children] as HTMLElement[];
+    await expect(items.map((i) => i.textContent)).toEqual(["PDF", "3 pages", "Signed", "1.2 MB"]);
+    // A dot before every item but the first, drawn by CSS (no text: nothing extra is read out).
+    await expect(before(items[0] as HTMLElement).content).toBe("none");
+    for (const item of items.slice(1)) {
+      const dot = before(item);
+      await expect(dot.content).toBe('""');
+      await expect(Number.parseFloat(dot.width)).toBeGreaterThan(1);
+      await expect(dot.width).toBe(dot.height);
+      await expect(dot.borderRadius).not.toBe("0px");
+    }
+    await expect(meta.textContent).toBe("PDF3 pagesSigned1.2 MB");
+    // The dot sits in the gap: gap, dot, gap between two items' text.
+    const first = (items[0] as HTMLElement).getBoundingClientRect();
+    const second = (items[1] as HTMLElement).getBoundingClientRect();
+    const gap = Number.parseFloat(getComputedStyle(meta).columnGap);
+    const dot = Number.parseFloat(before(items[1] as HTMLElement).width);
+    const mark = Number.parseFloat(before(items[1] as HTMLElement).marginInlineEnd);
+    await expect(second.left - first.right).toBeCloseTo(gap, 0);
+    await expect(mark).toBeCloseTo(gap, 0);
+    await expect(dot).toBeLessThan(gap * 2);
+  },
+};
+
+export const SeparatorLineAndTokens: Story = {
+  args: { separator: "line" },
+  render: (args) => (
+    <div style={{ "--cy-inline-separator-color": "rgb(200, 0, 0)" } as React.CSSProperties}>
+      <Inline {...args} data-testid="meta">
+        <span>Draft</span>
+        <span>Edited 2 min ago</span>
+      </Inline>
+    </div>
+  ),
+  play: async ({ canvas }) => {
+    const item = canvas.getByTestId("meta").children[1] as HTMLElement;
+    const line = before(item);
+    // A thin upright rule, in the token's colour.
+    await expect(Number.parseFloat(line.width)).toBeLessThanOrEqual(2);
+    await expect(Number.parseFloat(line.height)).toBeGreaterThan(8);
+    await expect(line.backgroundColor).toBe("rgb(200, 0, 0)");
+  },
+};
+
+export const SeparatorInAListAndRightToLeft: Story = {
+  args: { separator: "dot", as: "ul", "aria-label": "File details" },
+  render: (args) => (
+    <div dir="rtl">
+      <Inline {...args}>
+        <span>PDF</span>
+        <span>3 pages</span>
+      </Inline>
+    </div>
+  ),
+  play: async ({ canvas }) => {
+    // In a list, each item is a list item.
+    const list = canvas.getByRole("list", { name: "File details" });
+    const items = canvas.getAllByRole("listitem");
+    await expect(items.map((i) => i.textContent)).toEqual(["PDF", "3 pages"]);
+    await expect(getComputedStyle(list).listStyleType).toBe("none");
+    // Right to left: the second item sits to the left, and its dot on its right, between the two.
+    const [a, b] = items.map((i) => i.getBoundingClientRect()) as [DOMRect, DOMRect];
+    await expect(b.right).toBeLessThan(a.left + 1);
+    await expect(Number.parseFloat(before(items[1] as HTMLElement).marginInlineEnd)).toBeGreaterThan(0);
   },
 };
