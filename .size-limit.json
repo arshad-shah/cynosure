@@ -774,5 +774,11 @@
     "path": ["dist/components/Form/Form.js", "dist/styles/form.css"],
     "limit": "870 B",
     "gzip": true
+  },
+  {
+    "name": "BitField (JS + CSS)",
+    "path": ["dist/components/BitField/BitField.js", "dist/styles/bit-field.css"],
+    "limit": "3 kB",
+    "gzip": true
   }
 ]

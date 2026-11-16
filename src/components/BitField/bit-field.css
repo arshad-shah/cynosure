@@ -1,0 +1,36 @@
+/*
+ * bit-field: a toolbar of square pressed Buttons, one per bit, in groups. Bits read highest first, left to right, in
+ * every writing direction (as numbers are written), so the field is left to right.
+ */
+.cy-bit-field.cy-bit-field {
+  box-sizing: border-box !important;
+  display: block;
+  margin: 0;
+  direction: ltr;
+  color: var(--cy-color-ink);
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-font-size-md);
+  line-height: var(--cy-font-line-height);
+  letter-spacing: normal;
+  text-transform: none;
+  font-variant-numeric: tabular-nums;
+  /* Toolbar's own tokens: no padding round the bits, the groups' gap between groups. */
+  --cy-toolbar-padding: 0;
+  --cy-toolbar-gap: var(--cy-bit-field-gap, var(--cy-space-4));
+  &[data-size="sm"] {
+    font-size: var(--cy-font-size-sm);
+  }
+  &[data-size="lg"] {
+    font-size: var(--cy-font-size-lg);
+  }
+}
+.cy-bit-field-bits.cy-bit-field-bits {
+  font-size: inherit;
+}
+.cy-bit-field-group.cy-bit-field-group {
+  box-sizing: border-box !important;
+  display: inline-flex;
+  gap: var(--cy-bit-field-bit-gap, var(--cy-space-1));
+  margin: 0;
+  font-size: inherit;
+}

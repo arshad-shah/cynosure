@@ -41,6 +41,12 @@ export {
 } from "./components/Avatar/index.js";
 export { Badge, type BadgeProps } from "./components/Badge/index.js";
 export {
+  BitField,
+  type BitFieldLabels,
+  type BitFieldProps,
+  type BitFieldTokens,
+} from "./components/BitField/index.js";
+export {
   type BreadcrumbItem,
   Breadcrumbs,
   type BreadcrumbsProps,
