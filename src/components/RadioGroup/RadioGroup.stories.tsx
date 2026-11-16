@@ -226,3 +226,19 @@ export const StableUnderHostileHost: Story = {
     await expect(hostile).toEqual(clean);
   },
 };
+
+export const DescribedFromOutside: Story = {
+  args: { description: "Sent on Mondays" },
+  render: (args) => (
+    <div>
+      <span id="rg-hint">You can change it later</span>
+      <RadioGroup {...args} aria-describedby="rg-hint" />
+    </div>
+  ),
+  play: async ({ canvas }) => {
+    // The caller's description comes first, then the group's own.
+    await expect(canvas.getByRole("group", { name: "Digest" })).toHaveAccessibleDescription(
+      "You can change it later Sent on Mondays",
+    );
+  },
+};

@@ -94,6 +94,8 @@ export interface HotkeyFieldProps extends FieldLayoutProps {
   size?: Size;
   /** Replace the built-in English text: the buttons, the prompt and the announcements. */
   labels?: Partial<HotkeyFieldLabels>;
+  /** Ids of more elements that describe the field, read before its own description and error. */
+  "aria-describedby"?: string | undefined;
   /** Added to the root element, for layout. */
   className?: string;
   /** Layout only. Restyle through --cy-hotkey-field-* tokens. */
@@ -136,6 +138,7 @@ export const HotkeyField = forwardRef<HTMLDivElement, HotkeyFieldProps>(function
     disabled = false,
     size = "md",
     labels,
+    "aria-describedby": describedBy,
     className,
     style,
   },
@@ -217,6 +220,7 @@ export const HotkeyField = forwardRef<HTMLDivElement, HotkeyFieldProps>(function
       style={style}
     >
       <Field
+        describedBy={describedBy}
         group
         label={label}
         labelHidden={labelHidden}
