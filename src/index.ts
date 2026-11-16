@@ -235,7 +235,7 @@ export {
 export { HoverCard, type HoverCardProps, type HoverCardTokens } from "./components/HoverCard/index.js";
 export { IconButton, type IconButtonProps } from "./components/IconButton/index.js";
 export { IconTile, type IconTileProps, type IconTileTokens } from "./components/IconTile/index.js";
-export { Image, type ImageProps, type ImageTokens } from "./components/Image/index.js";
+export { Image, type ImageProps, type ImageRegion, type ImageTokens } from "./components/Image/index.js";
 export { Inline, type InlineProps } from "./components/Inline/index.js";
 export { Kbd, type KbdProps } from "./components/Kbd/index.js";
 export {

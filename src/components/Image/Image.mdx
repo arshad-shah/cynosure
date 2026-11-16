@@ -78,6 +78,23 @@ The picture is replaced by a quiet box with the image icon and the `alt` text, i
 
 It is shown once the picture has loaded (never over the placeholder or the fallback), takes no presses, and is hidden from assistive technology unless `overlayLabel` names it.
 
+### Regions
+
+`regions` outlines areas of the picture given in its own pixels (`{ x, y, width, height, label?, tone? }`), such as where each code was found in a scan. They are drawn on the same box as `overlay`, so they land on the picture at any size, `fit` and `position`. A `label` is a tag in the region's top-start corner; `tone` colours the outline and the tag.
+
+```tsx
+<Image
+  src={scan}
+  alt="Scanned label"
+  ratio={1}
+  fit="contain"
+  regions={codes.map((c, i) => ({ ...c.box, label: `Code ${i + 1}` }))}
+  overlayLabel={`${codes.length} codes found`}
+/>
+```
+
+<Canvas of={Stories.RegionsOutlineThePicture} />
+
 ## Props
 
 <ArgTypes of={Stories} />
@@ -108,7 +125,7 @@ Nothing in Image can be pressed. To make a picture a link or a button, put it in
 
 ## Theming
 
-Tokens: `--cy-image-radius` (the corners of every Image, whatever its `radius` prop says), `--cy-image-fallback-background`, `--cy-image-fallback-color`, `--cy-image-caption-gap` and `--cy-image-caption-color`. The placeholder is themed through the Skeleton tokens.
+Tokens: `--cy-image-radius` (the corners of every Image, whatever its `radius` prop says), `--cy-image-fallback-background`, `--cy-image-fallback-color`, `--cy-image-caption-gap`, `--cy-image-caption-color`, `--cy-image-region-color` (the outline of a region with no tone) and `--cy-image-region-width`. The placeholder is themed through the Skeleton tokens.
 
 ```ts
 createTheme({ components: { image: { radius: "8px", captionGap: "4px" } } });

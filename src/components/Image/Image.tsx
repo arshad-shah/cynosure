@@ -14,6 +14,7 @@ import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js
 import { Icon } from "../../foundations/Icon/Icon.js";
 import { useImageOutcome } from "../../foundations/image-outcome.js";
 import { image } from "../../icons/image.js";
+import type { Tone } from "../../tokens/schema.js";
 import { AspectRatio, type AspectRatioRadius } from "../AspectRatio/AspectRatio.js";
 import { Skeleton } from "../Skeleton/Skeleton.js";
 
@@ -28,6 +29,26 @@ export interface ImageTokens {
   captionGap: string;
   /** Text colour of the caption. */
   captionColor: string;
+  /** Outline colour of a region with no `tone`. */
+  regionColor: string;
+  /** Outline width of a region. */
+  regionWidth: string;
+}
+
+/** An area of the picture to outline (a code found in a scan, a face, a crop), in the picture's own pixels. */
+export interface ImageRegion {
+  /** From the picture's left edge, in its natural pixels. */
+  x: number;
+  /** From the picture's top edge, in its natural pixels. */
+  y: number;
+  width: number;
+  height: number;
+  /** A short tag shown at the region's top-start corner ("Code 1"). */
+  label?: string | undefined;
+  /** Colour of the outline and its tag. Default: the `--cy-image-region-color` token (the accent). */
+  tone?: Tone | undefined;
+  /** A stable key, when regions are added and removed. Default: its index. */
+  id?: string | undefined;
 }
 
 declare module "../../tokens/schema.js" {
@@ -73,7 +94,13 @@ export interface ImageProps {
    * loaded; never while it loads or after it fails. It takes no presses, and is decorative unless `overlayLabel` is set.
    */
   overlay?: ReactNode;
-  /** Names the overlay for assistive technology, as an image of its own ("Safe zone, 80% of the icon"). */
+  /**
+   * Areas of the picture to outline, in the picture's own (natural) pixels, e.g. where each code was found in a scan.
+   * Drawn on the overlay's box, so they land on the picture at any size, `fit` and `position`, under `overlay`'s
+   * content. Decorative unless `overlayLabel` is set; then each region's label is read too.
+   */
+  regions?: readonly ImageRegion[] | undefined;
+  /** Names the overlay (and the regions) for assistive technology, as an image of its own ("Safe zone, 80% of the icon"). */
   overlayLabel?: string | undefined;
   /** A caption under the picture: wraps it in a `figure` named by the caption. */
   caption?: ReactNode;
@@ -88,6 +115,7 @@ export interface ImageProps {
 }
 
 interface OverlayProps {
+  regions: readonly ImageRegion[] | undefined;
   frame: RefObject<HTMLElement | null>;
   img: RefObject<HTMLImageElement | null>;
   fit: "cover" | "contain";
@@ -121,12 +149,15 @@ const offsetOf = (part: string | undefined, free: number) =>
  * The overlay on the picture's own box: the image's content box as `object-fit` and `object-position` draw it in the
  * img's box, measured again whenever the frame resizes. Rendered only once the picture has loaded.
  */
-function Overlay({ frame, img, fit, position, label, children }: OverlayProps) {
+function Overlay({ frame, img, fit, position, label, regions, children }: OverlayProps) {
   const size = useCanvasSize(frame);
   const [rect, setRect] = useState<CSSProperties | null>(null);
+  const [natural, setNatural] = useState({ width: 1, height: 1 });
   useClientLayoutEffect(() => {
     const pic = img.current;
     if (!pic?.naturalWidth || !pic.naturalHeight) return;
+    if (pic.naturalWidth !== natural.width || pic.naturalHeight !== natural.height)
+      setNatural({ width: pic.naturalWidth, height: pic.naturalHeight });
     const [w, h] = [pic.offsetWidth, pic.offsetHeight];
     const pick = fit === "contain" ? Math.min : Math.max;
     const scale = pick(w / pic.naturalWidth, h / pic.naturalHeight);
@@ -146,6 +177,25 @@ function Overlay({ frame, img, fit, position, label, children }: OverlayProps) {
       style={rect}
       {...(label ? { role: "img", "aria-label": label } : { "aria-hidden": true })}
     >
+      {regions && regions.length > 0 && (
+        <span className="cy-image-regions cy-reset">
+          {regions.map((region, i) => (
+            <span
+              key={region.id ?? i}
+              className="cy-image-region"
+              data-tone={region.tone}
+              style={{
+                left: `${(region.x / natural.width) * 100}%`,
+                top: `${(region.y / natural.height) * 100}%`,
+                width: `${(region.width / natural.width) * 100}%`,
+                height: `${(region.height / natural.height) * 100}%`,
+              }}
+            >
+              {region.label && <span className="cy-image-region-label">{region.label}</span>}
+            </span>
+          ))}
+        </span>
+      )}
       {children}
     </span>
   );
@@ -169,6 +219,7 @@ export const Image = forwardRef<HTMLImageElement, ImageProps>(function Image(
     fallback,
     caption,
     overlay,
+    regions,
     overlayLabel,
     onLoad,
     onError,
@@ -252,8 +303,15 @@ export const Image = forwardRef<HTMLImageElement, ImageProps>(function Image(
       style={caption ? undefined : style}
     >
       {ratio === undefined ? content : <AspectRatio ratio={ratio}>{content}</AspectRatio>}
-      {overlay !== undefined && state === "loaded" && (
-        <Overlay frame={frameRef} img={el} fit={fit} position={position} label={overlayLabel}>
+      {(overlay !== undefined || (regions && regions.length > 0)) && state === "loaded" && (
+        <Overlay
+          frame={frameRef}
+          img={el}
+          fit={fit}
+          position={position}
+          label={overlayLabel}
+          regions={regions}
+        >
           {overlay}
         </Overlay>
       )}

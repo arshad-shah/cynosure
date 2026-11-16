@@ -85,6 +85,66 @@
   }
 }
 
+/* Regions: outlines placed in percents of the picture's box, so they follow it at any size. */
+.cy-image-regions.cy-image-regions {
+  position: relative;
+}
+.cy-image-region.cy-image-region {
+  --_c: var(--cy-image-region-color, var(--cy-color-accent));
+  --_on: var(--cy-color-on-accent);
+  box-sizing: border-box !important;
+  position: absolute;
+  margin: 0;
+  padding: 0;
+  outline: var(--cy-image-region-width, calc(2 * var(--cy-border-width))) solid var(--_c);
+  font-size: inherit;
+  &[data-tone="neutral"] {
+    --_c: var(--cy-color-ink);
+    --_on: var(--cy-color-bg);
+  }
+  &[data-tone="accent"] {
+    --_c: var(--cy-color-accent);
+    --_on: var(--cy-color-on-accent);
+  }
+  &[data-tone="success"] {
+    --_c: var(--cy-color-success);
+    --_on: var(--cy-color-on-success);
+  }
+  &[data-tone="warning"] {
+    --_c: var(--cy-color-warning);
+    --_on: var(--cy-color-on-warning);
+  }
+  &[data-tone="danger"] {
+    --_c: var(--cy-color-danger);
+    --_on: var(--cy-color-on-danger);
+  }
+  &[data-tone="info"] {
+    --_c: var(--cy-color-info);
+    --_on: var(--cy-color-on-info);
+  }
+}
+/* The tag sits inside the region's top-start corner, so the frame's clipping never cuts it off. */
+.cy-image-region-label.cy-image-region-label {
+  box-sizing: border-box !important;
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 0;
+  max-inline-size: 100%;
+  overflow: hidden;
+  margin: 0;
+  padding: 0 var(--cy-space-2);
+  border-end-end-radius: var(--cy-radius-sm);
+  background: var(--_c);
+  color: var(--_on);
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-font-size-xs);
+  font-weight: var(--cy-font-weight-medium);
+  line-height: var(--cy-font-line-height);
+  letter-spacing: normal;
+  text-transform: none;
+  white-space: nowrap;
+}
+
 .cy-image-fallback.cy-image-fallback {
   box-sizing: border-box !important;
   display: grid;
@@ -137,6 +197,10 @@
 }
 
 @media (forced-colors: active) {
+  .cy-image-region.cy-image-region {
+    --_c: Highlight;
+    --_on: HighlightText;
+  }
   .cy-image-fallback.cy-image-fallback[data-default] {
     outline: var(--cy-border-width) solid CanvasText;
     outline-offset: calc(-1 * var(--cy-border-width));
