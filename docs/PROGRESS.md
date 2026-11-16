@@ -28,6 +28,8 @@
 
 **Verification (Chromium, here):** check, lint, typecheck, test (896), build and size pass. Each batch's story suite passed on its own branch: 1803 for e2; 1870 with one failure for e1, which was fixed and that story rerun. Firefox and WebKit run in CI.
 
+**CI on #176 (2026-11-16, afternoon):** branch coverage fell to 94.99% with the new components. Stories for CanvasStage, ColorSwatches and ScrollArea brought it back to 95.14% (2838 tests, Chromium). The visual job then failed on Pagination compact, Breadcrumbs collapses-the-middle and PanZoomCanvas fits-its-content. These diffs are intended: a script-focused button no longer shows its tooltip, and ZoomControls adds Fit width. Two Breadcrumbs `settled` timeouts only followed the screenshot retries, and pass once the screenshots match. The `visual-baselines` workflow regenerated the screenshots (660d9fb), and they were reviewed. Next: CI green, then Arshad merges #176 and the version PR (0.8.0).
+
 **Now (2026-11-16, later):** 0.7.0 is being assembled from three merged or open pull requests, all approved by Arshad, who also approved the release itself.
 - **#172** (merged): the tools migration gaps of issue #171, from branches `gaps/a` and `gaps/b`.
 - **#174** (merged): what the tools redesign needs.
