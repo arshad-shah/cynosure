@@ -47,6 +47,7 @@
   border: calc(2 * var(--cy-border-width)) solid var(--_c);
   border-radius: var(--cy-radius-sm);
   background: var(--cy-color-surface-raised);
+  translate: var(--_tx, 0) var(--_ty, 0);
   touch-action: none;
   font-size: inherit;
   &::after {
@@ -88,6 +89,35 @@
   &[data-handle="e"],
   &[data-handle="w"] {
     cursor: ew-resize;
+  }
+}
+/*
+ * A small object (`data-compact`, set below `compactBelow` on screen): the handles across a short side are hidden and
+ * the rest move half a hit area outward, so no hit area lies over the body. x: narrow, y: short, xy: both.
+ */
+.cy-selection-frame[data-compact*="x"] > .cy-selection-frame-handle.cy-selection-frame-handle {
+  &:is([data-handle="n"], [data-handle="s"]) {
+    display: none;
+  }
+  &:is([data-handle="nw"], [data-handle="w"], [data-handle="sw"]) {
+    --_tx: calc(var(--_hit) / -2);
+  }
+  &:is([data-handle="ne"], [data-handle="e"], [data-handle="se"]) {
+    --_tx: calc(var(--_hit) / 2);
+  }
+}
+.cy-selection-frame[data-compact*="y"] > .cy-selection-frame-handle.cy-selection-frame-handle {
+  &:is([data-handle="e"], [data-handle="w"]) {
+    display: none;
+  }
+  &:is([data-handle="nw"], [data-handle="n"], [data-handle="ne"]) {
+    --_ty: calc(var(--_hit) / -2);
+  }
+  &:is([data-handle="sw"], [data-handle="s"], [data-handle="se"]) {
+    --_ty: calc(var(--_hit) / 2);
+  }
+  &[data-handle="rotate"] {
+    --_ty: calc(var(--_hit) / -2);
   }
 }
 .cy-selection-frame-rotate.cy-selection-frame-rotate {

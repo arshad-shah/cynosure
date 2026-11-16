@@ -63,6 +63,9 @@ function Board({
             Largest
           </Button>
         )}
+        <Button size="sm" onClick={() => canvas.current?.zoom({ kind: "fit-width" })}>
+          Fit width
+        </Button>
         <Button
           size="sm"
           onClick={() => canvas.current?.centerOn({ x: 1080, y: 740, width: 120, height: 60 })}
@@ -464,6 +467,20 @@ export const FitZoomAndCentreFromTheApp: Story = {
     await expect(Math.abs(c.left + c.width / 2 - (r.left + r.width / 2))).toBeLessThan(2);
     await userEvent.click(canvas.getByRole("button", { name: "Fit" }));
     await waitFor(() => expect(viewOf(canvasElement).scale).toBeLessThan(0.5));
+  },
+};
+
+export const ZoomSettingsThroughTheHandle: Story = {
+  render: () => <Board start={{ x: 0, y: 0, scale: 1 }} minimap={false} />,
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    // `zoom(setting)` takes what ZoomControls reports: fit-width fits the bounds' width with their top in view.
+    await userEvent.click(canvas.getByRole("button", { name: "Fit width" }));
+    const r = box(surface(canvasElement));
+    const pad = Math.min(r.width, r.height) * 0.05;
+    const view = viewOf(canvasElement);
+    await expect(view.scale).toBeCloseTo((r.width - 2 * pad) / BOUNDS.width, 3);
+    await expect(view.x + BOUNDS.x * view.scale).toBeCloseTo(pad, 0);
+    await expect(view.y + BOUNDS.y * view.scale).toBeCloseTo(pad, 0);
   },
 };
 

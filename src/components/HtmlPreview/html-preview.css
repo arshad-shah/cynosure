@@ -1,0 +1,33 @@
+/* html-preview: an optional notice above a sandboxed frame. The frame has a light page behind the document. */
+.cy-html-preview.cy-html-preview {
+  box-sizing: border-box !important;
+  display: grid;
+  gap: var(--cy-html-preview-gap, var(--cy-space-3));
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+  color: var(--cy-color-ink);
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-font-size-md);
+  font-weight: var(--cy-font-weight-regular);
+  line-height: var(--cy-font-line-height);
+  letter-spacing: normal;
+  text-transform: none;
+}
+.cy-html-preview-frame.cy-html-preview-frame {
+  box-sizing: border-box !important;
+  display: block;
+  inline-size: 100%;
+  block-size: var(--cy-html-preview-height, calc(var(--cy-space-10) * 8));
+  max-inline-size: 100%;
+  margin: 0;
+  padding: 0;
+  border: var(--cy-border-width) solid var(--cy-color-line);
+  border-radius: var(--cy-html-preview-radius, var(--cy-radius-md));
+  background: var(--cy-html-preview-background, white);
+  font-size: var(--cy-font-size-md);
+  [data-ratio] > & {
+    block-size: auto;
+    aspect-ratio: var(--_ratio);
+  }
+}

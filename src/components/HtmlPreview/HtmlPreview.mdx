@@ -1,0 +1,51 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./HtmlPreview.stories";
+
+<Meta of={Stories} />
+
+# HtmlPreview
+
+Untrusted HTML shown safely, in a sandboxed frame with a content security policy, with remote images as an opt-in.
+
+<Canvas of={Stories.ShowsHtmlInASandbox} />
+
+## When to use
+
+- **Showing HTML you did not write:** an HTTP response, an email, a rendered template.
+
+**Use something else when:**
+- the HTML is source to read: [CodeBlock](?path=/docs/components-feedback-and-display-codeblock--docs)
+- the content is your own: render it, or use [Prose](?path=/docs/components-feedback-and-display-prose--docs)
+
+## Usage
+
+```tsx
+<HtmlPreview label="Response preview" html={body} />
+```
+
+The frame has every sandbox restriction, and its document starts with a policy that lets nothing load or run except inline styles and pictures, fonts and media embedded in the HTML. `htmlPolicy(remoteImages)` gives that policy.
+
+## Remote images
+
+Remote pictures tell a server the preview was opened, so they are blocked until allowed. While they are and the HTML refers to one, a notice offers to show them; its button calls `onRemoteImagesChange(true)`, and the policy then lets `https:` pictures (only pictures) load. Control it with `remoteImages`, or turn the notice off with `notice={false}` and offer your own switch.
+
+<Canvas of={Stories.RemoteImagesAreAnOptIn} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+- **Name:** the frame is named by `label` (`aria-label`, not a tooltip).
+- **Scripts:** never run, inline or in event attributes (tested).
+- **Size:** fills its width; `ratio` keeps a width-to-height ratio, otherwise the height is `--cy-html-preview-height`.
+- **Page:** HTML is written for a light page, so the frame's background stays white in every theme (`--cy-html-preview-background`).
+
+## Theming
+
+Tokens: `--cy-html-preview-height`, `--cy-html-preview-background`, `--cy-html-preview-radius` and `--cy-html-preview-gap`. The notice uses the Notice tokens.
+
+## Related
+
+[Notice](?path=/docs/components-feedback-and-display-notice--docs) · [CodeBlock](?path=/docs/components-feedback-and-display-codeblock--docs) · [AspectRatio](?path=/docs/components-structure-aspectratio--docs)

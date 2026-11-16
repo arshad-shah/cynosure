@@ -133,6 +133,26 @@ export const PlainStringsAndDisabled: Story = {
   },
 };
 
+export const ReadOnlyShowsColoursWithoutAChoice: Story = {
+  render: () => <ColorSwatches label="Palette" swatches={BRAND} readOnly value="rgb(29 27 24)" />,
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    // A labelled group of named colour images: nothing to choose, no tab stop.
+    const group = canvas.getByRole("group", { name: "Palette" });
+    await expect(canvas.queryByRole("radiogroup")).toBeNull();
+    await expect(canvas.queryAllByRole("radio")).toHaveLength(0);
+    const images = canvas.getAllByRole("img");
+    await expect(images.map((i) => i.getAttribute("aria-label"))).toEqual(BRAND.map((b) => b.label));
+    await expect(group.querySelectorAll("button")).toHaveLength(0);
+    await userEvent.tab();
+    await expect(canvasElement.contains(document.activeElement)).toBe(false);
+    // Each swatch still shows its colour, with no tick or ring for `value`.
+    const ink = images[1] as HTMLElement;
+    await expect(getComputedStyle(ink).getPropertyValue("--_swatch").trim()).toBe("rgb(29 27 24)");
+    await expect(ink.querySelector("svg")).toBeNull();
+    await expect(getComputedStyle(ink).cursor).not.toBe("pointer");
+  },
+};
+
 export const TouchSwatches: Story = {
   tags: ["touch", "!dev"],
   play: async ({ canvas, userEvent }) => {

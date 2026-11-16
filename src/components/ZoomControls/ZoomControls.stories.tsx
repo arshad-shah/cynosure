@@ -1,10 +1,11 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { useState } from "react";
-import { expect, fn, waitFor } from "storybook/test";
+import { useRef, useState } from "react";
+import { expect, fn, waitFor, within } from "storybook/test";
 import type { ZoomSetting } from "../../foundations/zoom.js";
 import { computeUnderHostileHost } from "../../test/hostile.js";
 import { shownFully } from "../../test/settle.js";
 import { DocumentViewport } from "../DocumentViewport/DocumentViewport.js";
+import { type CanvasView, PanZoomCanvas, type PanZoomCanvasHandle } from "../PanZoomCanvas/PanZoomCanvas.js";
 import { ZoomControls, type ZoomControlsProps } from "./ZoomControls.js";
 
 /** The controls on their own: fit modes come to 87% here. */
@@ -157,6 +158,101 @@ export const DrivesADocumentViewport: Story = {
     await expect(canvas.getByTestId("zoom")).toHaveTextContent('{"kind":"fit-width"}');
     await waitFor(() => expect(page.getBoundingClientRect().width).toBeLessThan(600));
     await expect(canvas.getByRole("button", { name: /^Zoom \d+%$/ })).not.toHaveAccessibleName("Zoom 110%");
+  },
+};
+
+export const DrivesAPanZoomCanvas: Story = {
+  render: () => {
+    function Board() {
+      const canvas = useRef<PanZoomCanvasHandle>(null);
+      const [view, setView] = useState<CanvasView>({ x: 0, y: 0, scale: 1 });
+      return (
+        <div style={{ blockSize: 300, inlineSize: 400 }}>
+          <PanZoomCanvas
+            label="Map"
+            handle={canvas}
+            view={view}
+            onViewChange={setView}
+            min={50}
+            max={200}
+            bounds={{ x: 0, y: 0, width: 1600, height: 1200 }}
+            overlays={{
+              "top-end": (
+                <ZoomControls
+                  percent={view.scale * 100}
+                  onZoomChange={(z) => canvas.current?.zoom(z)}
+                  min={50}
+                  max={200}
+                  steps={[50, 100, 200]}
+                  fits={[]}
+                  buttons={["fit", "actual-size"]}
+                />
+              ),
+            }}
+          >
+            <div style={{ position: "absolute", left: 0, top: 0, width: 1600, height: 1200 }} />
+          </PanZoomCanvas>
+          <output data-testid="scale">{view.scale}</output>
+        </div>
+      );
+    }
+    return <Board />;
+  },
+  play: async ({ canvas, userEvent }) => {
+    const scale = () => Number(canvas.getByTestId("scale").textContent);
+    const toolbar = canvas.getByRole("toolbar", { name: "Zoom" });
+    // Fit to view: the whole content in the canvas, here at the canvas's own lower limit.
+    await userEvent.click(canvas.getByRole("button", { name: "Fit to view" }));
+    await waitFor(() => expect(scale()).toBeCloseTo(0.5, 2));
+    await expect(canvas.getByRole("button", { name: "Zoom out" })).toBeDisabled();
+    // Actual size is 100%.
+    await userEvent.click(canvas.getByRole("button", { name: "Actual size" }));
+    await waitFor(() => expect(scale()).toBe(1));
+    // Zoom in goes through the canvas's own steps: 100 to 200, then stops.
+    await userEvent.click(canvas.getByRole("button", { name: "Zoom in" }));
+    await waitFor(() => expect(scale()).toBe(2));
+    await expect(canvas.getByRole("button", { name: "Zoom in" })).toBeDisabled();
+    // The menu has no document fit modes; the preset the canvas is at is checked, without a `zoom` setting.
+    await userEvent.click(canvas.getByRole("button", { name: "Zoom 200%" }));
+    await shownFully(await canvas.findByRole("menu"));
+    await expect(canvas.queryByRole("menuitemradio", { name: "Fit width" })).toBeNull();
+    await expect(canvas.queryByRole("menuitemradio", { name: "Fit page" })).toBeNull();
+    await expect(canvas.getByRole("menuitemradio", { name: "200%" })).toHaveAttribute("aria-checked", "true");
+    await userEvent.click(canvas.getByRole("menuitemradio", { name: "75%" }));
+    await waitFor(() => expect(scale()).toBe(0.75));
+    // One tab stop still: the arrows reach the fit and actual size buttons.
+    await waitFor(() => expect(canvas.queryByRole("menu")).toBeNull());
+    const buttons = within(toolbar)
+      .getAllByRole("button")
+      .map((b) => b.getAttribute("aria-label"));
+    await expect(buttons).toEqual(["Zoom out", "Zoom 75%", "Zoom in", "Fit to view", "Actual size"]);
+  },
+};
+
+export const FitAndActualSizeButtons: Story = {
+  render: () => (
+    <Alone
+      start={{ kind: "percent", value: 150 }}
+      fits={["fit-page"]}
+      buttons={["fit", "actual-size"]}
+      labels={{ fit: "Ganze Seite", actualSize: "Originalgröße" }}
+    />
+  ),
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    await userEvent.click(canvas.getByRole("button", { name: "Originalgröße" }));
+    await expect(zoomOf(canvasElement)).toEqual({ kind: "percent", value: 100 });
+    // Fit applies the whole content fit (`fit-page`).
+    await userEvent.click(canvas.getByRole("button", { name: "Ganze Seite" }));
+    await expect(zoomOf(canvasElement)).toEqual({ kind: "fit-page" });
+    // `fits` limits the menu's fit modes.
+    await userEvent.click(canvas.getByRole("button", { name: "Zoom 87%" }));
+    await shownFully(await canvas.findByRole("menu"));
+    await expect(canvas.getByRole("menuitemradio", { name: "Fit page" })).toHaveAttribute(
+      "aria-checked",
+      "true",
+    );
+    await expect(canvas.queryByRole("menuitemradio", { name: "Fit width" })).toBeNull();
+    await userEvent.keyboard("{Escape}");
   },
 };
 

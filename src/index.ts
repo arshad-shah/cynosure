@@ -66,6 +66,21 @@ export {
   isISODate,
   toISODate,
 } from "./components/Calendar/index.js";
+export {
+  type CameraError,
+  type CameraErrorKind,
+  CameraView,
+  type CameraViewHandle,
+  type CameraViewLabels,
+  type CameraViewProps,
+  type CameraViewTokens,
+} from "./components/CameraView/index.js";
+export {
+  CanvasStage,
+  type CanvasStageLabels,
+  type CanvasStageProps,
+  type CanvasStageTokens,
+} from "./components/CanvasStage/index.js";
 export { Card, type CardProps, type CardTokens } from "./components/Card/index.js";
 export {
   ChatMessage,
@@ -103,6 +118,13 @@ export {
   type ColorFieldTokens,
   readColor,
 } from "./components/ColorField/index.js";
+export {
+  ColorSample,
+  type ColorSampleLabels,
+  type ColorSampleProps,
+  type ColorSampleTokens,
+  sampleContrast,
+} from "./components/ColorSample/index.js";
 export {
   type ColorSwatch,
   ColorSwatches,
@@ -233,9 +255,16 @@ export {
   type HotkeyFieldTokens,
 } from "./components/HotkeyField/index.js";
 export { HoverCard, type HoverCardProps, type HoverCardTokens } from "./components/HoverCard/index.js";
+export {
+  HtmlPreview,
+  type HtmlPreviewLabels,
+  type HtmlPreviewProps,
+  type HtmlPreviewTokens,
+  htmlPolicy,
+} from "./components/HtmlPreview/index.js";
 export { IconButton, type IconButtonProps } from "./components/IconButton/index.js";
 export { IconTile, type IconTileProps, type IconTileTokens } from "./components/IconTile/index.js";
-export { Image, type ImageProps, type ImageTokens } from "./components/Image/index.js";
+export { Image, type ImageProps, type ImageRegion, type ImageTokens } from "./components/Image/index.js";
 export { Inline, type InlineProps } from "./components/Inline/index.js";
 export { Kbd, type KbdProps } from "./components/Kbd/index.js";
 export {
@@ -595,9 +624,11 @@ export {
 } from "./components/VirtualList/index.js";
 export { VisuallyHidden, type VisuallyHiddenProps } from "./components/VisuallyHidden/index.js";
 export {
+  type ZoomButton,
   ZoomControls,
   type ZoomControlsLabels,
   type ZoomControlsProps,
+  type ZoomFit,
 } from "./components/ZoomControls/index.js";
 export type { DataAttributes, RootAttributes } from "./foundations/attributes.js";
 export { ButtonBase, type ButtonBaseProps } from "./foundations/ButtonBase/ButtonBase.js";
@@ -606,6 +637,7 @@ export { useControllableState } from "./foundations/controllable.js";
 export { DialogBase, type DialogBaseProps } from "./foundations/DialogBase/index.js";
 export { type DragOptions, type DragSession, useDrag } from "./foundations/drag.js";
 export { FileInputBase, type FileInputBaseProps, setInputFiles } from "./foundations/FileInputBase/index.js";
+export { FrameBase, type FrameBaseProps } from "./foundations/FrameBase/index.js";
 export { type FieldRender, useField } from "./foundations/field.js";
 export { HiddenValue, type HiddenValueProps } from "./foundations/HiddenValue/HiddenValue.js";
 export {
@@ -639,6 +671,7 @@ export {
 export { type QrToPngOptions, qrContrast, qrToPng } from "./foundations/qr-export.js";
 export { type RovingOptions, useRovingFocus } from "./foundations/roving-focus.js";
 export { TextAreaBase, type TextAreaBaseProps } from "./foundations/TextAreaBase/TextAreaBase.js";
+export { VideoBase, type VideoBaseProps } from "./foundations/VideoBase/index.js";
 export type { BrandInfo, IconCategory, IconData, IconMotion, IconNode } from "./icons/types.js";
 export { type DismissOptions, type DismissReason, useDismiss } from "./overlay/dismiss.js";
 export * from "./theme/index.js";

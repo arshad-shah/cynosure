@@ -35,7 +35,12 @@ export interface ColorSwatchesProps {
   /** The chosen colour, matched by colour (so "#FFF" and "white" are the same swatch). */
   value?: string | undefined;
   /** Called when a swatch is chosen (pressed, or reached with the arrow keys), with that swatch's `value`. */
-  onChange: (value: string) => void;
+  onChange?: ((value: string) => void) | undefined;
+  /**
+   * Show the colours without offering a choice: a group of named colour images, with no tab stop, no tick and no
+   * `onChange` (a palette, a scheme's colours). For one colour, or text on a colour, use ColorSample.
+   */
+  readOnly?: boolean;
   /** No swatch can be chosen. */
   disabled?: boolean;
   /** Size of each swatch. Default "md". */
@@ -67,6 +72,7 @@ export function ColorSwatches({
   value,
   onChange,
   disabled = false,
+  readOnly = false,
   size = "md",
   className,
   style,
@@ -78,6 +84,29 @@ export function ColorSwatches({
   const byKey = useRef(false);
   const chosen = key(value);
   const items = swatches.map((s) => (typeof s === "string" ? { value: s } : s));
+  if (readOnly)
+    return (
+      // biome-ignore lint/a11y/useSemanticElements: a group of colour images, not form controls (fieldset)
+      <div
+        ref={group}
+        role="group"
+        aria-label={label}
+        className={className ? `cy-color-swatches ${className}` : "cy-color-swatches"}
+        data-size={size}
+        data-readonly=""
+        style={style}
+      >
+        {items.map((item) => (
+          <span
+            key={item.value}
+            role="img"
+            aria-label={item.label ?? item.value}
+            className="cy-color-swatches-swatch cy-reset"
+            style={{ "--_swatch": item.value } as CSSProperties}
+          />
+        ))}
+      </div>
+    );
   return (
     <div
       ref={group}
@@ -110,9 +139,9 @@ export function ColorSwatches({
             className="cy-color-swatches-swatch cy-reset"
             data-light={lightness(item.value) > 0.4 ? "" : undefined}
             style={{ "--_swatch": item.value } as CSSProperties}
-            onClick={() => onChange(item.value)}
+            onClick={() => onChange?.(item.value)}
             // Arrow keys move focus (roving); in a radio group the swatch they reach is chosen too, once one is.
-            onFocus={() => byKey.current && chosen !== undefined && !on && onChange(item.value)}
+            onFocus={() => byKey.current && chosen !== undefined && !on && onChange?.(item.value)}
           >
             {on && <Icon icon={check} size="sm" />}
           </ButtonBase>

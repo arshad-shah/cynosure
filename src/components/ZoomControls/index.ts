@@ -1,1 +1,7 @@
-export { ZoomControls, type ZoomControlsLabels, type ZoomControlsProps } from "./ZoomControls.js";
+export {
+  type ZoomButton,
+  ZoomControls,
+  type ZoomControlsLabels,
+  type ZoomControlsProps,
+  type ZoomFit,
+} from "./ZoomControls.js";

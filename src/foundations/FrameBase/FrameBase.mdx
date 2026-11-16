@@ -1,0 +1,38 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./FrameBase.stories";
+
+<Meta of={Stories} />
+
+# FrameBase
+
+The native `<iframe>` for Cynosure, and the only module allowed to render one. It shows a document from `srcDoc` with every sandbox restriction unless `sandbox` lists tokens. It is a foundation: no visual opinions, so composites style it.
+
+## Who uses it
+
+[HtmlPreview](?path=/docs/components-feedback-and-display-htmlpreview--docs).
+
+## When to use it directly
+
+Only when building a new composite that shows a document in a frame.
+
+**Use a component instead when** you want to show untrusted HTML: HtmlPreview adds a content security policy and the remote-images opt-in.
+
+<Canvas of={Stories.SandboxedByDefault} />
+
+## Usage
+
+```tsx
+import { FrameBase } from "@arshad-shah/cynosure";
+
+<FrameBase label="Response preview" srcDoc={html} />
+```
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour
+
+- **Sandbox:** `sandbox=""` by default, so scripts never run (tested), forms do not submit, nothing pops up, and the document is another origin the page cannot reach into.
+- **Name:** `aria-label`, never `title` (a native tooltip).
+- **Referrer:** none is sent.

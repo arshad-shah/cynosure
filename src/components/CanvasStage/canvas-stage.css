@@ -1,0 +1,84 @@
+/*
+ * canvas-stage: a sized box holding a product's drawing surface (stretched to fill it), with a centred overlay slot
+ * and, while files are dragged over it, a drop message covering it. The overlay layer lets presses through to the
+ * surface; only its content takes them.
+ */
+.cy-canvas-stage.cy-canvas-stage {
+  box-sizing: border-box !important;
+  position: relative;
+  display: grid;
+  inline-size: 100%;
+  block-size: 100%;
+  min-block-size: var(--cy-canvas-stage-min-height, calc(var(--cy-space-10) * 5));
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: var(--cy-border-width) solid var(--cy-color-line);
+  border-radius: var(--cy-canvas-stage-radius, var(--cy-radius-md));
+  background: var(--cy-canvas-stage-background, var(--cy-color-soft));
+  color: var(--cy-color-ink);
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-font-size-md);
+  font-weight: var(--cy-font-weight-regular);
+  line-height: var(--cy-font-line-height);
+  letter-spacing: normal;
+  text-transform: none;
+  &[data-ratio] {
+    block-size: auto;
+    min-block-size: 0;
+    aspect-ratio: var(--_ratio);
+  }
+  &[data-over] {
+    border-color: var(--cy-color-accent);
+  }
+}
+.cy-canvas-stage-surface.cy-canvas-stage-surface {
+  grid-area: 1 / 1;
+  display: grid;
+  min-inline-size: 0;
+  min-block-size: 0;
+  & > * {
+    box-sizing: border-box;
+    inline-size: 100%;
+    block-size: 100%;
+    max-inline-size: 100%;
+    min-block-size: 0;
+  }
+}
+.cy-canvas-stage-overlay.cy-canvas-stage-overlay {
+  box-sizing: border-box !important;
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  padding: var(--cy-space-5);
+  font-size: var(--cy-font-size-md);
+  pointer-events: none;
+  &[data-drop] {
+    background: var(
+      --cy-canvas-stage-drop-background,
+      color-mix(in oklab, var(--cy-color-accent) 18%, transparent)
+    );
+    outline: calc(2 * var(--cy-border-width)) dashed var(--cy-color-accent);
+    outline-offset: calc(-1 * var(--cy-space-3));
+  }
+}
+.cy-canvas-stage-slot.cy-canvas-stage-slot {
+  max-inline-size: 100%;
+  pointer-events: auto;
+}
+.cy-canvas-stage-drop.cy-canvas-stage-drop {
+  box-sizing: border-box !important;
+  margin: 0;
+  padding: var(--cy-space-2) var(--cy-space-4);
+  border-radius: var(--cy-radius-sm);
+  background: var(--cy-color-surface-raised);
+  color: var(--cy-color-ink);
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-font-size-md);
+  font-weight: var(--cy-font-weight-medium);
+  line-height: var(--cy-font-line-height);
+  letter-spacing: normal;
+  text-transform: none;
+}
