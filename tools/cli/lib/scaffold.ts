@@ -1,9 +1,14 @@
 /** Generators behind `cy new …`. Deterministic: same input, same files; refuses to overwrite. */
+import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { createRequire } from "node:module";
+import { join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+import * as facet from "../../../src/icons/facet";
 import type { IconCategory, IconData, IconNode } from "../../../src/icons/types";
 import { validateIcon } from "../../../src/icons/validate";
 import { COMPONENT_GROUPS, type ComponentGroup } from "../../component-groups";
+import { sameDrawing } from "../../icon-drawing";
 import { optimizeIcon } from "../../icon-optimize";
 
 /** `IconButton` → `icon-button`, `QRCode` → `qr-code` (the same names `cy check` expects). */
@@ -60,12 +65,21 @@ export const iconId = (name: string) => (RESERVED.has(camel(name)) ? `${camel(na
 const lowerFirst = (s: string) => camel(kebab(s));
 
 /** Sorts whole `export { … } from "…";` statements (they may span several lines once formatted). */
+/** The repository's own Biome and its config, so generated files come out exactly as `pnpm lint` wants them. */
+const REPO = resolve(fileURLToPath(new URL(".", import.meta.url)), "../../..");
+const BIOME = createRequire(import.meta.url).resolve("@biomejs/biome/bin/biome");
+
+/**
+ * Orders an entry file's export statements the way Biome's organize-imports step does (by module source, with
+ * Biome's own comparison: `./book-marked.js` before `./bookmark.js`), by running the text through Biome itself
+ * rather than imitating its rules, so `cy new` never writes an entry that `pnpm lint` then rejects.
+ */
 export function sortExports(text: string): string {
-  const statements = text.match(/export[\s\S]*?;\s*(?:\n|$)/g) ?? [];
-  const clean = statements.map((s) => s.trim());
-  const named = clean.filter((s) => s.startsWith("export {")).sort((a, b) => a.localeCompare(b));
-  const rest = clean.filter((s) => !s.startsWith("export {"));
-  return `${[...named, ...rest].join("\n")}\n`;
+  return execFileSync(
+    process.execPath,
+    [BIOME, "check", "--write", `--config-path=${join(REPO, "biome.json")}`, "--stdin-file-path=entry.ts"],
+    { input: text, encoding: "utf8", cwd: REPO },
+  );
 }
 
 const tsx = (
@@ -372,6 +386,12 @@ export function scaffoldIcon(root: string, name: string, svg: string, category: 
   if (errors.length) throw new Error(`Icon "${name}" is not a valid Facet icon:\n- ${errors.join("\n- ")}`);
   const file = join(root, "src/icons", `${name}.ts`);
   if (existsSync(file)) throw new Error(`Icon ${name} already exists`);
+  // Facet holds each drawing once: a second name for an existing drawing belongs in keywords.ts instead.
+  const twin = sameDrawing(icon, Object.values(facet) as IconData[]);
+  if (twin)
+    throw new Error(
+      `Icon "${name}" draws the same as the existing icon "${twin.name}": use it, and add "${name}" to its search words in src/icons/keywords.ts`,
+    );
   const id = iconId(name);
   writeFileSync(
     file,
