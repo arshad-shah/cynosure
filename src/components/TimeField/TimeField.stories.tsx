@@ -351,6 +351,27 @@ export const LimitsInThePicker: Story = {
   },
 };
 
+export const PressingARowAfterTheColumnMovedChoosesOnlyThatRow: Story = {
+  args: { picker: true, defaultValue: "16:45", min: "09:00", max: "17:30", step: 15 },
+  play: async ({ args, canvas, userEvent }) => {
+    const picker = await openPicker(canvas, userEvent);
+    const hours = picker.getByRole("listbox", { name: "Hours" });
+    await waitFor(() => expect(offLens(hours)).toBeLessThan(2));
+    // The column moves (the browser bringing a row into view), then the person presses an hour that is not allowed.
+    const eight = within(hours).getByRole("option", { name: "08" }) as HTMLElement;
+    hours.scrollTo({
+      top: eight.offsetTop - hours.clientHeight / 2 + eight.offsetHeight / 2,
+      behavior: "instant",
+    });
+    await userEvent.click(eight);
+    // The press is not a scroll by hand: nothing is chosen, and the column goes back to the time.
+    await new Promise((r) => setTimeout(r, 300));
+    await expect(args.onChange).not.toHaveBeenCalled();
+    await waitFor(() => expect(chosen(hours)).toBe("16"));
+    await waitFor(() => expect(offLens(hours)).toBeLessThan(2));
+  },
+};
+
 export const ScrollingAColumnChooses: Story = {
   args: { picker: true, defaultValue: "09:30", min: "06:00" },
   play: async ({ args, canvas, userEvent }) => {
