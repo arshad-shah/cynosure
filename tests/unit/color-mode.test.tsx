@@ -136,4 +136,56 @@ describe("useColorMode", () => {
     const { result } = renderHook(() => useColorMode({ storage }));
     expect(result.current.mode).toBe("system");
   });
+
+  it("follows a mode chosen in another tab (localStorage's storage event) for its key only", () => {
+    localStorage.clear();
+    const { result } = renderHook(() => useColorMode({ key: "site-mode" }));
+    const fromAnotherTab = (key: string | null, newValue: string | null) =>
+      act(() => {
+        window.dispatchEvent(new StorageEvent("storage", { key, newValue, storageArea: localStorage }));
+      });
+    fromAnotherTab("site-mode", "dark");
+    expect(result.current.mode).toBe("dark");
+    fromAnotherTab("other-key", "light");
+    expect(result.current.mode).toBe("dark");
+    fromAnotherTab("site-mode", "purple");
+    expect(result.current.mode).toBe("system");
+    fromAnotherTab("site-mode", "light");
+    // The other tab cleared every key (localStorage.clear()): back to system.
+    fromAnotherTab(null, null);
+    expect(result.current.mode).toBe("system");
+  });
+
+  it("follows changes a custom storage reports through subscribe (chrome.storage.onChanged)", () => {
+    let report: ((value: string | null) => void) | undefined;
+    const unsubscribed = { count: 0 };
+    const storage = {
+      get: () => "light",
+      set: () => {},
+      subscribe: (key: string, onChange: (value: string | null) => void) => {
+        expect(key).toBe("ext-mode");
+        report = onChange;
+        return () => void unsubscribed.count++;
+      },
+    };
+    const { result, unmount } = renderHook(() => useColorMode({ storage, key: "ext-mode" }));
+    expect(result.current.mode).toBe("light");
+    act(() => report?.("dark"));
+    expect(result.current.mode).toBe("dark");
+    // A custom storage is not localStorage: its storage events are not followed.
+    act(() => {
+      window.dispatchEvent(new StorageEvent("storage", { key: "ext-mode", newValue: "light" }));
+    });
+    expect(result.current.mode).toBe("dark");
+    unmount();
+    expect(unsubscribed.count).toBe(1);
+  });
+
+  it("two hooks on one key in the same tab stay together", () => {
+    localStorage.clear();
+    const a = renderHook(() => useColorMode({ key: "same" }));
+    const b = renderHook(() => useColorMode({ key: "same" }));
+    act(() => a.result.current.setMode("dark"));
+    expect(b.result.current.mode).toBe("dark");
+  });
 });
