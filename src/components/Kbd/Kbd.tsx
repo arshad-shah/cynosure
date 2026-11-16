@@ -1,4 +1,5 @@
-import { type CSSProperties, Fragment } from "react";
+import { type CSSProperties, Fragment, forwardRef } from "react";
+import type { RootAttributes } from "../../foundations/attributes.js";
 import { shortcutKeys, useApple } from "../../foundations/hotkey.js";
 import type { Size } from "../../tokens/schema.js";
 
@@ -39,7 +40,7 @@ const SPOKEN: Record<string, string> = {
   right: "Right arrow",
 };
 
-export interface KbdProps {
+export interface KbdProps extends RootAttributes {
   /**
    * Keys in order, e.g. ["Ctrl", "K"]; or a shortcut as `useHotkey` writes it ("mod+k"), shown with this platform's
    * names (Cmd on Apple, Ctrl elsewhere) and hidden on touch-only screens, where a shortcut means nothing.
@@ -56,12 +57,17 @@ export interface KbdProps {
 }
 
 /** Keyboard shortcut: drawn key caps for sight, a spoken combination for screen readers. */
-export function Kbd({ keys, size = "md", label, className, style }: KbdProps) {
+export const Kbd = forwardRef<HTMLElement, KbdProps>(function Kbd(
+  { keys, size = "md", label, className, style, ...rest },
+  ref,
+) {
   const apple = useApple();
   const caps = typeof keys === "string" ? shortcutKeys(keys, apple) : keys;
   const spoken = label ?? caps.map((k) => SPOKEN[k.toLowerCase()] ?? k).join(" plus ");
   return (
     <kbd
+      ref={ref}
+      {...rest}
       className={`cy-kbd${className ? ` ${className}` : ""}`}
       data-size={size}
       data-shortcut={typeof keys === "string" || undefined}
@@ -78,4 +84,4 @@ export function Kbd({ keys, size = "md", label, className, style }: KbdProps) {
       <span className="cy-visually-hidden">{spoken}</span>
     </kbd>
   );
-}
+});

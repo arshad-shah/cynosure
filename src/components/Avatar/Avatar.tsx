@@ -8,6 +8,7 @@ import {
   useContext,
   useRef,
 } from "react";
+import type { RootAttributes } from "../../foundations/attributes.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
 import { useImageOutcome } from "../../foundations/image-outcome.js";
 import type { IconData } from "../../icons/types.js";
@@ -87,7 +88,7 @@ function toneOf(name: string): Tone {
 /** The size an AvatarGroup gives its avatars. */
 const GroupSize = createContext<AvatarSize | undefined>(undefined);
 
-export interface AvatarProps {
+export interface AvatarProps extends RootAttributes {
   /** Who or what it is: the accessible name, and where the initials come from. An empty name is not announced. */
   name: string;
   /** Replaces the initials worked out from `name` (one or two characters). */
@@ -138,6 +139,7 @@ export const Avatar = forwardRef<HTMLSpanElement, AvatarProps>(function Avatar(
     decorative = false,
     className,
     style,
+    ...rest
   },
   ref,
 ) {
@@ -151,6 +153,7 @@ export const Avatar = forwardRef<HTMLSpanElement, AvatarProps>(function Avatar(
   return (
     <span
       ref={ref}
+      {...rest}
       className={`cy-avatar${className ? ` ${className}` : ""}`}
       {...(decorative || !name.trim()
         ? { "aria-hidden": true }

@@ -1,4 +1,5 @@
 import { type CSSProperties, forwardRef } from "react";
+import type { RootAttributes } from "../../foundations/attributes.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
 import type { IconData } from "../../icons/types.js";
 import type { Size, Tone } from "../../tokens/schema.js";
@@ -24,7 +25,7 @@ declare module "../../tokens/schema.js" {
   }
 }
 
-export interface IconTileProps {
+export interface IconTileProps extends RootAttributes {
   /** The Facet icon drawn on the tile. */
   icon: IconData;
   /**
@@ -48,12 +49,23 @@ export interface IconTileProps {
 
 /** A Facet icon on a tinted square or circle: a feature's mark, a stat's or a list item's icon. */
 export const IconTile = forwardRef<HTMLSpanElement, IconTileProps>(function IconTile(
-  { icon, label, size = "md", tone = "accent", variant = "soft", shape = "square", className, style },
+  {
+    icon,
+    label,
+    size = "md",
+    tone = "accent",
+    variant = "soft",
+    shape = "square",
+    className,
+    style,
+    ...rest
+  },
   ref,
 ) {
   return (
     <span
       ref={ref}
+      {...rest}
       className={`cy-icon-tile${className ? ` ${className}` : ""}`}
       {...(label ? { role: "img", "aria-label": label } : { "aria-hidden": true })}
       data-size={size}

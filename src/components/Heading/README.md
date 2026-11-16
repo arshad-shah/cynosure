@@ -22,6 +22,7 @@ import { Heading } from "@arshad-shah/cynosure";
 | `truncate`            | `false`            | `true`: one line with an ellipsis. A number: cut after that many lines                                                      |
 | `id`                  | –                  | For `aria-labelledby` and links to the section                                                                              |
 | `className` / `style` | –                  | Layout only                                                                                                                 |
+| `id`, `data-*`, `ref` | –                  | Set on the root element (a link target, test or state hooks)                                                                |
 
 The ref is the heading element (`HTMLHeadingElement`).
 

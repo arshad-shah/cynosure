@@ -33,6 +33,7 @@ import { Table } from "@arshad-shah/cynosure";
 | `stickyHeader`                 | `false`    | Body scrolls inside the table (`--cy-table-max-height`); the scroller is a focusable region   |
 | `size`                         | `md`       | Row density: `sm` · `md` · `lg`                                                               |
 | `labels`                       | –          | `selectRow(rowName)`, `selectAll`, `empty`                                                    |
+| `id`, `data-*`, `ref`          | –          | Set on the root element (the bordered wrapper), in both forms                                 |
 - Text sorts in the locale's order ignoring case and with numbers in order; numbers sort as numbers; empty values go last.
 - The first column (or the one marked `rowHeader`) is a row header.
 - Sort buttons are SortButtons: `aria-sort` on their header and a 44px hit area on touch screens.

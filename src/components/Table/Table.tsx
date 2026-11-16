@@ -4,6 +4,8 @@ import {
   forwardRef,
   type ReactElement,
   type ReactNode,
+  type Ref,
+  type RefAttributes,
   useContext,
   useId,
   useMemo,
@@ -142,11 +144,13 @@ function TableFrame({
   className,
   style,
   children,
+  frameRef,
   ...rest
-}: TableFrameProps & { children: ReactNode }) {
+}: TableFrameProps & { children: ReactNode; frameRef?: Ref<HTMLDivElement> | undefined }) {
   const id = useId();
   return (
     <div
+      ref={frameRef}
       {...rest}
       className={className ? `cy-table ${className}` : "cy-table"}
       data-size={size}
@@ -172,18 +176,29 @@ function TableFrame({
   );
 }
 
+/** Table's two call signatures: the compound form, and the data-driven form for any row type. */
+export interface TableComponent {
+  (props: TableStaticProps & RefAttributes<HTMLDivElement>): ReactElement;
+  <Row>(props: TableProps<Row> & RefAttributes<HTMLDivElement>): ReactElement;
+}
+
 /**
  * Rows of data with headers: sortable columns, optional row selection, and a sticky header. A semantic `<table>`, so
  * screen readers announce headers with every cell. Give it `columns` and `rows`, or write the rows as markup with
  * `TableHead`, `TableBody`, `TableRow`, `TableHeaderCell` and `TableCell` (the compound form, same look).
+ * The ref is the root element (the wrapper with the border, which scrolls).
  */
-export function Table(props: TableStaticProps): ReactElement;
-export function Table<Row>(props: TableProps<Row>): ReactElement;
-export function Table<Row>(props: TableProps<Row> | TableStaticProps): ReactElement {
-  if (props.columns) return <DataTable {...(props as TableProps<Row>)} />;
-  const { children, ...frame } = props as TableStaticProps;
-  return <TableFrame {...frame}>{children}</TableFrame>;
-}
+export const Table = forwardRef<HTMLDivElement, TableProps<unknown> | TableStaticProps>(
+  function Table(props, ref) {
+    if (props.columns) return <DataTable {...(props as TableProps<unknown>)} frameRef={ref} />;
+    const { children, ...frame } = props as TableStaticProps;
+    return (
+      <TableFrame {...frame} frameRef={ref}>
+        {children}
+      </TableFrame>
+    );
+  },
+) as unknown as TableComponent;
 
 function DataTable<Row>({
   caption,
@@ -204,8 +219,9 @@ function DataTable<Row>({
   labels,
   className,
   style,
+  frameRef,
   ...rest
-}: TableProps<Row>) {
+}: TableProps<Row> & { frameRef?: Ref<HTMLDivElement> | undefined }) {
   const text = { ...DEFAULT_LABELS, ...labels };
   const [currentSort, setSort] = useControllableState<TableSort | null>(sort, defaultSort, onSortChange);
   const [chosenIds, setChosen] = useControllableState(selected, defaultSelected, onSelectionChange);
@@ -240,6 +256,7 @@ function DataTable<Row>({
   return (
     <TableFrame
       {...rest}
+      frameRef={frameRef}
       caption={caption}
       captionHidden={captionHidden}
       stickyHeader={stickyHeader}

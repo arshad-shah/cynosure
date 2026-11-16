@@ -4,6 +4,7 @@ import { expect, userEvent } from "storybook/test";
 import { chartBar, folder, zap } from "../../icons/index.js";
 import { textContrast } from "../../test/color.js";
 import { computeUnderHostileHost } from "../../test/hostile.js";
+import { ROOT_ATTRIBUTES, rootAttributesStory } from "../../test/root-attributes.js";
 import { Button } from "../Button/Button.js";
 import { IconTile } from "./IconTile.js";
 
@@ -252,3 +253,8 @@ export const StableUnderHostileHost: Story = {
     }
   },
 };
+
+export const PassesIdDataAndRef: Story = rootAttributesStory<HTMLSpanElement>(
+  (ref) => <IconTile ref={ref} {...ROOT_ATTRIBUTES} icon={folder} />,
+  "cy-icon-tile",
+);

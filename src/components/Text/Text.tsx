@@ -1,4 +1,5 @@
 import { type CSSProperties, forwardRef, type ReactNode } from "react";
+import type { RootAttributes } from "../../foundations/attributes.js";
 import type { Tone } from "../../tokens/schema.js";
 
 export interface TextTokens {
@@ -22,7 +23,7 @@ declare module "../../tokens/schema.js" {
   }
 }
 
-export interface TextProps {
+export interface TextProps extends RootAttributes {
   /**
    * Element to render. `strong` is bold unless `weight` says otherwise; `p`, `div` and `figcaption` are blocks, the
    * rest are inline. Default "span".
@@ -96,6 +97,7 @@ export const Text = forwardRef<HTMLElement, TextProps>(function Text(
     className,
     style,
     children,
+    ...rest
   },
   ref,
 ) {
@@ -104,6 +106,7 @@ export const Text = forwardRef<HTMLElement, TextProps>(function Text(
     <Tag
       // One component, nine elements: the ref is the element's own, typed as the common HTMLElement.
       ref={ref as never}
+      {...rest}
       id={id}
       className={className ? `cy-text ${className}` : "cy-text"}
       data-variant={variant === "body" ? undefined : variant}

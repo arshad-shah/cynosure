@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { type CSSProperties, useState } from "react";
+import { type CSSProperties, useEffect, useRef, useState } from "react";
 import { expect, fn, waitFor, within } from "storybook/test";
 import { contrast } from "../../test/color.js";
 import { computeUnderHostileHost } from "../../test/hostile.js";
@@ -606,5 +606,34 @@ export const SelectionCheckboxesTakeOnlyTheirBox: Story = {
       // The name is a hidden label: no gap or text space beside the box, so the column stays narrow.
       await expect(row.getBoundingClientRect().width - box.getBoundingClientRect().width).toBeLessThan(1);
     }
+  },
+};
+
+export const RefIsTheRootInBothForms: Story = {
+  render: (args) => {
+    function Both() {
+      const data = useRef<HTMLDivElement>(null);
+      const markup = useRef<HTMLDivElement>(null);
+      const [seen, setSeen] = useState("");
+      useEffect(() => setSeen(`${data.current?.className}|${markup.current?.className}`), []);
+      return (
+        <Stack gap="4">
+          <Table {...args} ref={data} />
+          <Table caption="By hand" ref={markup}>
+            <TableBody>
+              <TableRow>
+                <TableCell>One</TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+          <output data-testid="refs">{seen}</output>
+        </Stack>
+      );
+    }
+    return <Both />;
+  },
+  play: async ({ canvas }) => {
+    // Each ref is the table's root element: its wrapper, which carries the border and scrolls.
+    await expect(canvas.getByTestId("refs")).toHaveTextContent("cy-table|cy-table");
   },
 };

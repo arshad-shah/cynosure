@@ -493,6 +493,7 @@ export {
   TableCell,
   type TableCellProps,
   type TableColumn,
+  type TableComponent,
   TableFoot,
   type TableFootProps,
   type TableFrameProps,

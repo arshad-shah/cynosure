@@ -3,6 +3,7 @@ import type { CSSProperties } from "react";
 import { expect, fn, userEvent, within } from "storybook/test";
 import { arrowDown, arrowUp, minus, users } from "../../icons/index.js";
 import { computeUnderHostileHost } from "../../test/hostile.js";
+import { ROOT_ATTRIBUTES, rootAttributesStory } from "../../test/root-attributes.js";
 import { Grid } from "../Grid/Grid.js";
 import { Stat } from "./Stat.js";
 
@@ -355,3 +356,8 @@ export const StableUnderHostileHost: Story = {
     }
   },
 };
+
+export const PassesIdDataAndRef: Story = rootAttributesStory<HTMLElement>(
+  (ref) => <Stat ref={ref} {...ROOT_ATTRIBUTES} label="Users" value="1,204" />,
+  "cy-stat",
+);
