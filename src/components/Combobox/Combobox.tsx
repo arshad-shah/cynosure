@@ -157,7 +157,8 @@ export function Combobox({
   const labelOf = (v: string) => options.find((o) => o.value === v)?.label ?? (allowCustom ? v : "");
   const [typedText, setText, resetText] = useControllableState(
     inputValue,
-    () => labelOf(defaultValue),
+    // A controlled value shows its label from the start, as a default one does.
+    () => labelOf(value ?? defaultValue),
     onInputChange,
   );
   const [open, setOpen] = useState(false);
@@ -220,15 +221,18 @@ export function Combobox({
     else setText(labelOf(current));
   };
 
-  // The chosen option's label changed under the text (options arrived late, or the value was set from outside):
-  // text that showed the old label follows, unless the person is typing.
+  // The value was set from outside: the text shows its label (none for an empty value), unless the person is typing.
+  // The chosen option's label changed under the text (options arrived late): text that showed the old label follows.
   const shownLabel = labelOf(current);
   const lastLabel = useRef(shownLabel);
+  const lastValue = useRef(current);
   useEffect(() => {
     const was = lastLabel.current;
-    if (shownLabel === was) return;
+    const moved = lastValue.current !== current;
     lastLabel.current = shownLabel;
-    if (shownLabel && !typing && typedText === was) setText(shownLabel);
+    lastValue.current = current;
+    if (typing || typedText === shownLabel) return;
+    if (moved || (shownLabel && shownLabel !== was && typedText === was)) setText(shownLabel);
   });
 
   useListboxLayer({ anchor, list, open, onClose: () => setOpen(false) });

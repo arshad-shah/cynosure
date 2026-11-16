@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 import { expect, fn, spyOn, waitFor } from "storybook/test";
+import { setInputFiles } from "../../foundations/FileInputBase/FileInputBase.js";
 import { contrast } from "../../test/color.js";
 import { computeUnderHostileHost } from "../../test/hostile.js";
 import { CynosureTheme } from "../../theme/CynosureTheme.js";
@@ -540,5 +541,67 @@ export const StableUnderHostileHost: Story = {
       const { clean, hostile } = computeUnderHostileHost(canvasElement, selector, props);
       await expect({ selector, ...hostile }).toEqual({ selector, ...clean });
     }
+  },
+};
+
+/** `variant="button"`: only the picker button (no zone), for one action among others; checks and forms as before. */
+export const ButtonVariantPicksWithoutAZone: Story = {
+  tags: ["visual"],
+  args: {
+    variant: "button",
+    multiple: false,
+    accept: ".txt",
+    hint: undefined,
+    labels: { chooseOne: "Open file" },
+  },
+  play: async ({ args, canvas, canvasElement, userEvent }) => {
+    const button = canvas.getByRole("button", { name: "Open file" });
+    // No zone: no prompt, no dashed border, and the root is only as wide as the button.
+    await expect(canvas.queryByText("Drop files here, or")).toBeNull();
+    await expect(getComputedStyle(zone(canvasElement)).borderTopStyle).toBe("none");
+    await expect(
+      Math.abs(zone(canvasElement).getBoundingClientRect().width - button.getBoundingClientRect().width),
+    ).toBeLessThan(1);
+    // The button opens the file dialog.
+    const input = nativeInput(canvasElement);
+    await expect(input).toHaveAttribute("accept", ".txt");
+    const open = spyOn(input, "click").mockImplementation(() => {});
+    await userEvent.click(button);
+    await expect(open).toHaveBeenCalledTimes(1);
+    open.mockRestore();
+    // Picked files come back, are checked and announced; a refused one is said why.
+    const notes = file("notes.txt", "text/plain");
+    await userEvent.upload(input, notes);
+    await expect(args.onFiles).toHaveBeenLastCalledWith([notes]);
+    await expect(canvas.getByRole("status")).toHaveTextContent("1 file added");
+    // A drop on the button is not a drop zone's: nothing is taken.
+    drag(button, [file("b.txt", "text/plain")])();
+    await expect(args.onFiles).toHaveBeenCalledTimes(1);
+    // Keyboard: one tab stop, the button.
+    (document.activeElement as HTMLElement | null)?.blur();
+    await userEvent.tab();
+    await expect(button).toHaveFocus();
+  },
+};
+
+export const ButtonVariantRejectsAndDisables: Story = {
+  args: { variant: "button", multiple: false, accept: ".txt", hint: undefined },
+  render: (args) => (
+    <Stack>
+      <FileDrop {...args} className="live" />
+      <FileDrop {...args} disabled className="off" />
+    </Stack>
+  ),
+  play: async ({ args, canvasElement }) => {
+    const live = canvasElement.querySelector(".live") as HTMLElement;
+    // A file the dialog let through though it does not match (a dialog's "All files" choice).
+    const input = live.querySelector("input") as HTMLInputElement;
+    setInputFiles(input, [file("a.png", "image/png")]);
+    input.dispatchEvent(new Event("change", { bubbles: true }));
+    await expect(args.onReject).toHaveBeenCalledTimes(1);
+    await expect(live.querySelector('[role="alert"]')).toHaveTextContent(
+      "a.png: this type of file is not accepted",
+    );
+    await expect((canvasElement.querySelector(".off button") as HTMLButtonElement).disabled).toBe(true);
   },
 };

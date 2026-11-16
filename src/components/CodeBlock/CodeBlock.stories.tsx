@@ -332,3 +332,147 @@ export const StableUnderHostileHost: Story = {
     }
   },
 };
+
+const BIG = Array.from({ length: 5000 }, (_, i) => `line ${i + 1}`).join("\n");
+const preOf = (el: Element) => el.querySelector(".cy-code-block-pre") as HTMLElement;
+
+/** `maxLines`: very long code shows its first lines and a "Show all" button; copying always takes all of it. */
+export const LongCodeShowsTheFirstLines: Story = {
+  args: {
+    code: BIG,
+    title: "dump.txt",
+    language: undefined,
+    maxLines: 20,
+    lineNumbers: true,
+    highlight: fn((c: string) => c),
+  },
+  play: async ({ args, canvas, canvasElement, userEvent }) => {
+    const pre = preOf(canvasElement);
+    await expect(pre.textContent?.split("\n")).toHaveLength(20);
+    await expect(pre).toHaveTextContent("line 20");
+    await expect(pre).not.toHaveTextContent("line 21");
+    // The highlighter only gets what is shown, and the gutter numbers it.
+    await expect(
+      (((args.highlight as ReturnType<typeof fn>).mock.lastCall ?? [""])[0] as string).split("\n"),
+    ).toHaveLength(20);
+    await expect(canvasElement.querySelectorAll(".cy-code-block-gutter > span")).toHaveLength(20);
+    // Copy takes the whole text.
+    await userEvent.click(canvas.getByRole("button", { name: "Copy" }));
+    await expect(args.copy).toHaveBeenCalledWith(BIG);
+    // Show all: every line, and the button says it shows less now.
+    const more = canvas.getByRole("button", { name: "Show all 5,000 lines" });
+    await expect(more).toHaveAttribute("aria-expanded", "false");
+    await expect(more).toHaveAttribute("aria-controls", pre.id);
+    await userEvent.click(more);
+    await expect(preOf(canvasElement)).toHaveTextContent("line 5000");
+    const less = canvas.getByRole("button", { name: "Show less" });
+    await expect(less).toHaveAttribute("aria-expanded", "true");
+    await userEvent.click(less);
+    await expect(preOf(canvasElement)).not.toHaveTextContent("line 21");
+  },
+};
+
+/** One enormous line (Base64): `maxChars` cuts it, and the button counts characters. */
+export const OneHugeLineIsCutByCharacters: Story = {
+  args: {
+    code: "QUJD".repeat(50000),
+    title: undefined,
+    language: undefined,
+    maxChars: 4096,
+    labels: { showLess: "Weniger" },
+  },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    await expect(preOf(canvasElement).textContent).toHaveLength(4096);
+    await userEvent.click(canvas.getByRole("button", { name: "Show all 200,000 characters" }));
+    await expect(preOf(canvasElement).textContent).toHaveLength(200000);
+    await expect(canvas.getByRole("button", { name: "Weniger" })).toBeInTheDocument();
+  },
+};
+
+/** Code within the limits shows whole, with no button. */
+export const ShortCodeHasNoShowAll: Story = {
+  args: { maxLines: 20, maxChars: 4096 },
+  play: async ({ canvas, canvasElement }) => {
+    await expect(preOf(canvasElement)).toHaveTextContent("chunkSizeWarningLimit");
+    await expect(canvas.queryByRole("button", { name: /Show/ })).toBeNull();
+  },
+};
+
+const KINDS = [
+  "comment",
+  "keyword",
+  "string",
+  "number",
+  "function",
+  "type",
+  "variable",
+  "property",
+  "operator",
+  "punctuation",
+  "tag",
+  "attribute",
+  "regexp",
+] as const;
+/** A stand-in tokenizer: one token of every kind, each named by its kind, plus plain text between them. */
+const tokenize = fn(() => KINDS.flatMap((kind) => [{ text: kind, kind }, { text: " " }]));
+
+/**
+ * `tokenize`: your tokenizer returns `{ text, kind }` and CodeBlock colours each kind from the palette's syntax tokens,
+ * readable on the code's background in light, dark and more contrast; no CSS of yours.
+ */
+export const TokensTakeThePalettesSyntaxColours: Story = {
+  tags: ["visual"],
+  args: { code: "ignored by the stand-in", language: "ts", title: undefined, tokenize },
+  render: (args) => (
+    <Stack gap="4">
+      {(
+        [
+          ["light", "normal"],
+          ["dark", "normal"],
+          ["light", "more"],
+          ["dark", "more"],
+        ] as const
+      ).map(([mode, more]) => (
+        <CynosureTheme key={`${mode}-${more}`} mode={mode} contrast={more}>
+          <div className="surface">
+            <CodeBlock {...args} title={`${mode}, ${more} contrast`} />
+          </div>
+        </CynosureTheme>
+      ))}
+    </Stack>
+  ),
+  play: async ({ canvasElement }) => {
+    await expect(tokenize).toHaveBeenCalledWith("ignored by the stand-in", "ts");
+    for (const surface of canvasElement.querySelectorAll(".surface")) {
+      const background = getComputedStyle(surface.querySelector(".cy-code-block") as Element).backgroundColor;
+      const colours = new Set<string>();
+      for (const kind of KINDS) {
+        const token = surface.querySelector(`[data-kind="${kind}"]`) as HTMLElement;
+        await expect(token).toHaveTextContent(kind);
+        const colour = getComputedStyle(token).color;
+        colours.add(colour);
+        await expect({ kind, ok: contrast(colour, background) >= 4.5 }).toEqual({ kind, ok: true });
+      }
+      // The kinds are told apart by colour (punctuation shares the operators' colour).
+      await expect(colours.size).toBeGreaterThanOrEqual(10);
+      // The code is still the text: copying and reading it see no markup.
+      await expect((surface.querySelector("code") as HTMLElement).textContent).toBe(
+        KINDS.map((k) => `${k} `).join(""),
+      );
+    }
+  },
+};
+
+/** A token of an unknown kind (or none) is plain text in the ink colour. */
+export const UnknownKindsArePlain: Story = {
+  args: {
+    code: "a b",
+    tokenize: () => [{ text: "a", kind: "mystery" as "keyword" }, { text: " b" }],
+  },
+  play: async ({ canvasElement }) => {
+    const code = canvasElement.querySelector("code") as HTMLElement;
+    const token = canvasElement.querySelector('[data-kind="mystery"]') as HTMLElement;
+    await expect(getComputedStyle(token).color).toBe(getComputedStyle(code).color);
+    await expect(code).toHaveTextContent("a b");
+  },
+};

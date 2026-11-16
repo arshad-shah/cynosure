@@ -20,21 +20,67 @@
   user-select: none;
   cursor: ew-resize;
   touch-action: pan-y;
+  /* Zoomed past the frame: a press pans (a finger too) and the view is a tab stop with its own ring. */
+  &[data-pannable] {
+    cursor: grab;
+    touch-action: none;
+  }
+  &[data-panning] {
+    cursor: grabbing;
+  }
+  &:focus-visible {
+    outline: var(--cy-border-focus) solid var(--cy-color-ring);
+    outline-offset: var(--cy-border-focus);
+  }
+}
+/* Boxed: the frame takes the shape of the first picture (set from script as --_ratio), and both sides fill it. */
+.cy-compare-slider.cy-compare-slider[data-boxed] {
+  aspect-ratio: var(--_ratio);
 }
 .cy-compare-slider-layer.cy-compare-slider-layer {
   grid-area: 1 / 1;
   min-inline-size: 0;
+  overflow: hidden;
   font-size: inherit;
-  & > img,
-  & > video,
-  & > canvas {
-    display: block;
+  &[data-side="before"] {
+    clip-path: inset(0 calc(100% - var(--_pos)) 0 0);
+  }
+  [data-boxed] > & {
+    position: absolute;
+    inset: 0;
+  }
+}
+/* Each side's content, in one box. Any child is stretched to it; pictures, videos and canvases are contained in it, so
+   two sides of different sizes (or shapes) line up and both show whole. */
+.cy-compare-slider-stage.cy-compare-slider-stage {
+  display: grid;
+  transform-origin: 0 0;
+  font-size: inherit;
+  & > * {
+    grid-area: 1 / 1;
+    min-inline-size: 0;
     inline-size: 100%;
+  }
+  & > :is(img, video, canvas) {
+    display: block;
     block-size: auto;
     pointer-events: none;
   }
-  &[data-side="before"] {
-    clip-path: inset(0 calc(100% - var(--_pos)) 0 0);
+  [data-boxed] > * > & {
+    position: absolute;
+    inset: 0;
+    grid-template: minmax(0, 1fr) / minmax(0, 1fr);
+    & > * {
+      box-sizing: border-box;
+      block-size: 100%;
+      max-inline-size: none;
+      max-block-size: none;
+      margin: 0;
+    }
+    & > :is(img, video, canvas) {
+      object-fit: contain;
+      object-position: 50% 50%;
+    }
   }
 }
 .cy-compare-slider-tag.cy-compare-slider-tag {
@@ -63,6 +109,7 @@
   background: var(--_c);
   box-shadow: 0 0 0 var(--cy-border-width) color-mix(in oklab, black 30%, transparent);
   font-size: inherit;
+  cursor: ew-resize;
   &::before {
     content: "";
     position: absolute;

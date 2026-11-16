@@ -32,6 +32,16 @@ import { FileDrop } from "@arshad-shah/cynosure";
 
 <Canvas of={Stories.ChecksTypeSizeAndCount} />
 
+## A button, no zone
+
+`variant="button"` draws only the picker button (with the upload icon), for picking a file as one action among others, such as Open file beside Paste and Clear under a text box. Nothing is dropped on it; the checks, `onFiles`, `onPick`, form submission and announcements work as in a zone, and refused files are listed under it. Name it with `labels.chooseOne` or `labels.choose`.
+
+```tsx
+<FileDrop variant="button" accept=".txt,.json" labels={{ chooseOne: "Open file" }} onFiles={([file]) => open(file)} />
+```
+
+<Canvas of={Stories.ButtonVariantPicksWithoutAZone} />
+
 ## The whole window
 
 With `target="window"`, files dropped anywhere in the window are taken, for an app that opens whatever is dropped on it. An overlay covers the page while files are dragged in; text and links dragged over the page are left alone.

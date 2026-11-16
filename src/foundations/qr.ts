@@ -1,7 +1,8 @@
 /**
  * QR code encoder (ISO/IEC 18004), pure and dependency-free: versions 1 to 40, levels L, M, Q and H, numeric,
  * alphanumeric or byte (UTF-8) mode, Reed–Solomon error correction, and the mask with the lowest standard penalty.
- * QRCode draws with it; it is also exported for pages without React (`qrMatrix`, `qrPath`, `qrToSvg`).
+ * QRCode draws with it; it is also exported for pages without React (`qrMatrix`, `qrPath`, `qrToSvg`). `qr-export.ts`
+ * adds `qrToPng` and `qrContrast` for saving a code.
  */
 
 /** Error correction level: how much of the code can be damaged or covered and still scan (L 7%, M 15%, Q 25%, H 30%). */
@@ -354,6 +355,14 @@ export function qrPath(matrix: boolean[][], quietZone = 4): string {
   return d;
 }
 
+/** A logo in the middle of an exported code. It covers modules, so the level is raised to H. */
+export interface QrLogo {
+  /** The picture's address (a data URL keeps the file standalone; another site's picture must allow CORS for PNG). */
+  href: string;
+  /** Width and height as a share of the code (the quiet zone left out). Default 0.2; at most 0.3. */
+  size?: number;
+}
+
 export interface QrToSvgOptions extends QrOptions {
   /** Light modules around the code, which scanners need (the standard asks for 4). Default 4. */
   quietZone?: number;
@@ -361,14 +370,34 @@ export interface QrToSvgOptions extends QrOptions {
   size?: number | string;
   /** Accessible name. Default "QR code". */
   label?: string;
-  /** Colour of the dark modules. Default black. */
+  /** Colour of the dark modules. Default black. Check a pair with `qrContrast`. */
   color?: string;
   /** Colour of the light modules and the quiet zone. Default white. */
   background?: string;
+  /** A logo in the middle: the modules under it are left out and the level is H. */
+  logo?: QrLogo | undefined;
 }
 
 const escapeAttr = (text: string) =>
   text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+
+/**
+ * The modules of a code, with those under a logo cleared, and where the logo goes (in modules, quiet zone left out).
+ * `qrToSvg` and `qrToPng` draw from it.
+ */
+export function qrLayout(value: string, options: QrOptions & { logo?: QrLogo | undefined }) {
+  const { logo, ...rest } = options;
+  const matrix = qrMatrix(value, logo ? { ...rest, level: "H" } : rest);
+  if (!logo) return { matrix, spot: null };
+  const n = matrix.length;
+  const side = Math.ceil(n * Math.min(0.3, Math.max(0, logo.size ?? 0.2)));
+  const from = Math.floor((n - side) / 2);
+  const inside = (i: number) => i >= from && i < from + side;
+  return {
+    matrix: matrix.map((row, y) => row.map((dark, x) => dark && !(inside(x) && inside(y)))),
+    spot: { from, side },
+  };
+}
 
 /**
  * A QR code as a standalone SVG string, for pages without React and for files (an email, a print, a download). Its
@@ -383,17 +412,23 @@ export function qrToSvg(
     label = "QR code",
     color = "#000",
     background = "#fff",
+    logo,
     ...options
   }: QrToSvgOptions = {},
 ): string {
-  const matrix = qrMatrix(value, options);
+  const { matrix, spot } = qrLayout(value, { ...options, logo });
   const q = Math.max(0, Math.floor(quietZone));
   const box = matrix.length + q * 2;
   const length = typeof size === "number" ? `${size}px` : size;
   const dims = length ? ` width="${escapeAttr(length)}" height="${escapeAttr(length)}"` : "";
+  const picture =
+    logo && spot
+      ? `<image href="${escapeAttr(logo.href)}" x="${spot.from + q}" y="${spot.from + q}" width="${spot.side}" ` +
+        `height="${spot.side}" preserveAspectRatio="xMidYMid meet"/>`
+      : "";
   return (
     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${box} ${box}"${dims} shape-rendering="crispEdges" ` +
     `role="img" aria-label="${escapeAttr(label)}"><rect width="${box}" height="${box}" fill="${escapeAttr(background)}"/>` +
-    `<path fill="${escapeAttr(color)}" d="${qrPath(matrix, q)}"/></svg>`
+    `<path fill="${escapeAttr(color)}" d="${qrPath(matrix, q)}"/>${picture}</svg>`
   );
 }

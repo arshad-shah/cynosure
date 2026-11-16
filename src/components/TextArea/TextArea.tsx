@@ -1,5 +1,6 @@
 import {
   type CSSProperties,
+  type DragEvent,
   forwardRef,
   type KeyboardEvent,
   type ReactNode,
@@ -12,6 +13,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { acceptsFile } from "../../foundations/accept-file.js";
 import { useDrag } from "../../foundations/drag.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
 import { isComposing } from "../../foundations/keys.js";
@@ -113,6 +115,14 @@ export interface TextAreaProps extends NativeArea, FieldLayoutProps {
   suggestions?: TextAreaSuggestions | undefined;
   /** Called with the suggestion chosen, after it is inserted. */
   onMention?: ((item: TextAreaMention) => void) | undefined;
+  /**
+   * Take files dropped on the field: called with those `accept` allows (none: nothing is called). The drop does not
+   * change the text; read a text file with `await files[0].text()` and set the value. While files are dragged over it
+   * the field shows it takes them. Dragged text still drops as the browser does it. Without it, files are not taken.
+   */
+  onFiles?: ((files: File[]) => void) | undefined;
+  /** With `onFiles`: the file types taken, as for `<input accept>` (".txt,.json,text/*"). Default: any. */
+  accept?: string | undefined;
   /** Replace the built-in English text: the character counter and the suggestion list's loading note. */
   labels?: Partial<TextAreaLabels>;
   /** Added to the root element, for layout. */
@@ -167,6 +177,8 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(function 
     trigger,
     suggestions,
     onMention,
+    onFiles,
+    accept,
     maxLength,
     required,
     disabled,
@@ -186,6 +198,38 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(function 
   const text = { ...DEFAULT_LABELS, ...labels };
   const inner = useRef<HTMLTextAreaElement | null>(null);
   const [count, setCount] = useState((value ?? defaultValue ?? "").length);
+  // Dropped files (`onFiles`): whether files are over the field, counted through the enter and leave of its children.
+  const [over, setOver] = useState(false);
+  const depth = useRef(0);
+  const carriesFiles = (event: DragEvent) =>
+    !!onFiles && !disabled && [...(event.dataTransfer?.types ?? [])].includes("Files");
+  const dropHandlers = onFiles
+    ? {
+        onDragEnter: (event: DragEvent<HTMLTextAreaElement>) => {
+          if (!carriesFiles(event)) return;
+          event.preventDefault();
+          depth.current += 1;
+          setOver(true);
+        },
+        onDragOver: (event: DragEvent<HTMLTextAreaElement>) => {
+          if (!carriesFiles(event)) return;
+          event.preventDefault();
+          event.dataTransfer.dropEffect = "copy";
+        },
+        onDragLeave: () => {
+          depth.current = Math.max(0, depth.current - 1);
+          if (depth.current === 0) setOver(false);
+        },
+        onDrop: (event: DragEvent<HTMLTextAreaElement>) => {
+          if (!carriesFiles(event)) return;
+          event.preventDefault();
+          depth.current = 0;
+          setOver(false);
+          const taken = [...event.dataTransfer.files].filter((file) => acceptsFile(file, accept));
+          if (taken.length) onFiles(taken);
+        },
+      }
+    : {};
   // Height chosen with the grip: becomes the floor (and lifts the cap) for content-driven sizing.
   const manual = useRef(0);
   const grip = useRef<HTMLSpanElement>(null);
@@ -381,11 +425,13 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(function 
             data-variant={variant}
             data-monospace={monospace ? "" : undefined}
             data-disabled={disabled ? "" : undefined}
+            data-over={over ? "" : undefined}
           >
             <div ref={box} className="cy-text-area-box">
               <TextAreaBase
                 ref={ref}
                 {...rest}
+                {...dropHandlers}
                 {...(mentions
                   ? {
                       "aria-autocomplete": "list" as const,

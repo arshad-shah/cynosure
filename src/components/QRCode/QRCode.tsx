@@ -42,6 +42,13 @@ export interface QRCodeProps {
   level?: QrLevel;
   /** Light modules around the code, which scanners need to find it. The standard asks for 4. Default 4. */
   quietZone?: number;
+  /**
+   * Colour of the dark modules, any CSS colour (default: the `--cy-qr-code-color` token). Keep it darker than
+   * `background` with at least 4:1 contrast, or phones may not scan it: check a pair with `qrContrast`.
+   */
+  color?: string | undefined;
+  /** Colour of the light modules and the quiet zone, any CSS colour (default: the `--cy-qr-code-background` token). */
+  background?: string | undefined;
   /** Accessible name. Default `labels.name` ("QR code"). Say where it leads, and show the link as text too. */
   label?: string;
   /** Built-in strings. */
@@ -61,7 +68,19 @@ const DEFAULT_LABELS: QRCodeLabels = { name: "QR code" };
 
 /** A QR code drawn as one crisp SVG path, dark on light in every colour mode so phones can scan it. */
 export const QRCode = forwardRef<HTMLDivElement, QRCodeProps>(function QRCode(
-  { value, size = "md", level = "M", quietZone = 4, label, labels, icon, className, style },
+  {
+    value,
+    size = "md",
+    level = "M",
+    quietZone = 4,
+    color,
+    background,
+    label,
+    labels,
+    icon,
+    className,
+    style,
+  },
   ref,
 ) {
   const hasIcon = icon != null && icon !== false;
@@ -71,7 +90,11 @@ export const QRCode = forwardRef<HTMLDivElement, QRCodeProps>(function QRCode(
     const matrix = qrMatrix(value, { level: used });
     return { box: matrix.length + q * 2, d: qrPath(matrix, q) };
   }, [value, used, q]);
-  const sizing = typeof size === "number" ? ({ "--_size": `${size}px` } as CSSProperties) : undefined;
+  const sizing = {
+    ...(typeof size === "number" ? { "--_size": `${size}px` } : {}),
+    ...(color ? { "--_ink": color } : {}),
+    ...(background ? { "--_paper": background } : {}),
+  } as CSSProperties;
   return (
     <div
       ref={ref}
@@ -80,7 +103,7 @@ export const QRCode = forwardRef<HTMLDivElement, QRCodeProps>(function QRCode(
       className={`cy-qr-code${className ? ` ${className}` : ""}`}
       data-size={typeof size === "number" ? undefined : size}
       data-level={used}
-      style={sizing || style ? { ...sizing, ...style } : undefined}
+      style={Object.keys(sizing).length || style ? { ...sizing, ...style } : undefined}
     >
       <svg
         className="cy-reset cy-qr-code-svg"

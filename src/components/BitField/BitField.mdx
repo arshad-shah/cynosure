@@ -1,0 +1,67 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./BitField.stories";
+
+<Meta of={Stories} />
+
+# BitField
+
+The bits of a number as a row of toggle buttons, highest first and grouped by byte, with one tab stop. For one on or off setting use [Switch](?path=/docs/components-controls-switch--docs); for a set of named options, [Checkbox](?path=/docs/components-controls-checkbox--docs).
+
+<Canvas of={Stories.PressFlipsABit} />
+
+## When to use
+
+- The bits of a number in a converter, a flags register or a permissions mask, where each bit is flipped on its own.
+
+**Use something else when:**
+- the options have names, not positions: [Checkbox](?path=/docs/components-controls-checkbox--docs)
+- one of a few values is chosen: [SegmentedControl](?path=/docs/components-controls-segmentedcontrol--docs)
+
+## Usage
+
+```tsx
+import { BitField } from "@arshad-shah/cynosure";
+
+const [word, setWord] = useState(0x8005n);
+<BitField label="Bits" bits={16} value={word} onChange={setWord} />
+```
+
+The value is a `bigint` (`BigInt(n)` from a number), so words of 64 bits and more work; only the low `bits` bits are shown. `groupSize` groups by byte (8, the default) or by hex digit (4); the lowest group always ends at bit 0.
+
+<Canvas of={Stories.GroupsAndLabels} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+It is a [Toolbar](?path=/docs/components-structure-toolbar--docs) of square [Button](?path=/docs/components-controls-button--docs)s with `aria-pressed`. Each bit is named "Bit 7" (`labels.bit`) and shows 1 or 0; each group is a `group` named "Bits 15 to 8" (`labels.group`).
+
+| Key | Result |
+| --- | --- |
+| <kbd>Tab</kbd> | Into the field (one stop), and out of it |
+| <kbd>Left arrow</kbd> <kbd>Right arrow</kbd> | The previous or next bit, across groups |
+| <kbd>Home</kbd> <kbd>End</kbd> | The highest or the lowest bit |
+| <kbd>Space</kbd> <kbd>Enter</kbd> | Flips the bit |
+
+<Canvas of={Stories.KeyboardMovesAndFlips} />
+
+The bits stay highest first, left to right, in right-to-left pages too, as numbers are written.
+
+## Touch
+
+Each bit has the Button's hit area: at least 24px, 44px on coarse pointers.
+
+## Theming
+
+| Token | Controls |
+| --- | --- |
+| `--cy-bit-field-gap` | Space between groups |
+| `--cy-bit-field-bit-gap` | Space between the bits of a group |
+
+A set bit takes the `tone` (default accent) as a solid Button; a clear one is an outline neutral Button, so Button's tokens restyle both.
+
+## Related
+
+[Toolbar](?path=/docs/components-structure-toolbar--docs) · [Button](?path=/docs/components-controls-button--docs) · [SegmentedControl](?path=/docs/components-controls-segmentedcontrol--docs) · [NumberField](?path=/docs/components-controls-numberfield--docs)

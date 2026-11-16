@@ -1,5 +1,6 @@
-import { type CSSProperties, type ReactNode, useId } from "react";
+import { type CSSProperties, type ReactNode, useId, useState } from "react";
 import type { Size } from "../../tokens/schema.js";
+import { Button } from "../Button/Button.js";
 import { CopyButton, type CopyButtonLabels } from "../CopyButton/CopyButton.js";
 
 export interface CodeBlockTokens {
@@ -22,10 +23,52 @@ export interface CodeBlockLabels extends CopyButtonLabels {
   region: string;
   /** Read after the code when lines are marked. Default: "Line 3 highlighted" / "Lines 3, 4 highlighted". */
   active: (lines: readonly number[]) => string;
+  /** The button that shows all of cut code (`maxLines`, `maxChars`). Default: "Show all 5,000 lines" (or characters). */
+  showAll: (total: { lines: number; chars: number }) => string;
+  /** The same button once all is shown. Default: "Show less". */
+  showLess: string;
+}
+
+const count = (n: number, one: string) => `${n.toLocaleString("en")} ${one}${n === 1 ? "" : "s"}`;
+const defaultShowAll = ({ lines, chars }: { lines: number; chars: number }) =>
+  `Show all ${lines > 1 ? count(lines, "line") : count(chars, "character")}`;
+
+/** The first `maxLines` lines and `maxChars` characters of `code`, found without splitting all of it. */
+function cut(code: string, maxLines: number, maxChars: number) {
+  let end = Math.min(code.length, maxChars);
+  let at = -1;
+  for (let line = 0; line < maxLines; line++) {
+    at = code.indexOf("\n", at + 1);
+    if (at < 0 || at >= end) return code.slice(0, end);
+  }
+  end = Math.min(end, at);
+  return code.slice(0, end);
 }
 
 const defaultActive = (lines: readonly number[]) =>
   `${lines.length === 1 ? "Line" : "Lines"} ${lines.join(", ")} highlighted`;
+
+/** What a stretch of code is, for its colour: one of the palette's syntax roles (`--cy-color-syntax-*`). */
+export type SyntaxKind =
+  | "comment"
+  | "keyword"
+  | "string"
+  | "number"
+  | "function"
+  | "type"
+  | "variable"
+  | "property"
+  | "operator"
+  | "punctuation"
+  | "tag"
+  | "attribute"
+  | "regexp";
+
+/** A stretch of code and its kind; without a kind (or with one CodeBlock does not know) it is plain text. */
+export interface SyntaxToken {
+  text: string;
+  kind?: SyntaxKind | undefined;
+}
 
 export interface CodeBlockProps {
   /** The code to show and copy. One final new line is not shown as an empty last line. */
@@ -39,6 +82,12 @@ export interface CodeBlockProps {
    * bundles none. Without it the code is plain text.
    */
   highlight?: ((code: string, language?: string) => ReactNode) | undefined;
+  /**
+   * Your tokenizer, returning the code as `{ text, kind }` stretches in order: CodeBlock colours each kind with the
+   * palette's syntax colours (readable on the code's background in every palette), so no CSS of yours is needed.
+   * `punctuation` takes the operators' colour. `highlight`, when given too, wins.
+   */
+  tokenize?: ((code: string, language?: string) => readonly SyntaxToken[]) | undefined;
   /** Show line numbers beside the code. Left out when `wrap` is on. */
   lineNumbers?: boolean;
   /** Lines to mark (1-based), such as the line a debugger is on. Marked behind the text and read out. */
@@ -50,6 +99,13 @@ export interface CodeBlockProps {
    * `IconButton` at `size="sm"`; they come before the copy button in the reading and tab order.
    */
   actions?: ReactNode;
+  /**
+   * Show only the first lines of very long code, with a "Show all" button under it (megabytes of output). The
+   * highlighter gets only what is shown; copying (and `code` in your actions) is always the whole text.
+   */
+  maxLines?: number | undefined;
+  /** Show only the first characters, as `maxLines` does: for one enormous line (Base64, a hex dump). */
+  maxChars?: number | undefined;
   /** Show the copy button. Default true. */
   copyable?: boolean;
   /** Passed to the copy button (extensions can copy through their own channel). */
@@ -73,20 +129,30 @@ export function CodeBlock({
   language,
   title,
   highlight,
+  tokenize,
   lineNumbers = false,
   activeLines,
   wrap = false,
   actions,
   copyable = true,
   copy,
+  maxLines,
+  maxChars,
   size = "md",
   labels,
   className,
   style,
 }: CodeBlockProps) {
   const id = useId();
+  const [all, setAll] = useState(false);
   // One final new line is a file ending, not an empty last line.
-  const shown = code.replace(/\n$/, "");
+  const whole = code.replace(/\n$/, "");
+  const preview =
+    maxLines !== undefined || maxChars !== undefined
+      ? cut(whole, maxLines ?? Number.POSITIVE_INFINITY, maxChars ?? Number.POSITIVE_INFINITY)
+      : whole;
+  const longer = preview.length < whole.length;
+  const shown = all ? whole : preview;
   const lines = shown.split("\n");
   const name = typeof title === "string" ? title : (language ?? labels?.region ?? "Code");
   const heading = title ?? language;
@@ -94,7 +160,19 @@ export function CodeBlock({
   const marked = !wrap && activeLines?.length ? activeLines.filter((n) => n >= 1 && n <= lines.length) : [];
   const body = (
     <code className="cy-code-block-code cy-reset" data-language={language}>
-      {highlight ? highlight(shown, language) : shown}
+      {highlight
+        ? highlight(shown, language)
+        : tokenize
+          ? tokenize(shown, language).map((token, i) =>
+              token.kind ? (
+                <span key={i} className="cy-code-block-token" data-kind={token.kind}>
+                  {token.text}
+                </span>
+              ) : (
+                token.text
+              ),
+            )
+          : shown}
     </code>
   );
   return (
@@ -139,11 +217,20 @@ export function CodeBlock({
           </span>
         )}
         {wrap ? (
-          <pre className="cy-code-block-pre cy-reset">{body}</pre>
+          <pre id={`${id}-code`} className="cy-code-block-pre cy-reset">
+            {body}
+          </pre>
         ) : (
           // A scrolling region must be reachable by keyboard: it is focusable and named.
-          // biome-ignore lint/a11y/noNoninteractiveTabindex lint/a11y/useSemanticElements: the scrolling pre itself is the focusable, named region
-          <pre className="cy-code-block-pre cy-reset" tabIndex={0} role="region" aria-label={name}>
+          // biome-ignore lint/a11y/useSemanticElements: the scrolling pre itself is the focusable, named region
+          <pre
+            id={`${id}-code`}
+            className="cy-code-block-pre cy-reset"
+            // biome-ignore lint/a11y/noNoninteractiveTabindex: the scrolling pre itself is the focusable, named region
+            tabIndex={0}
+            role="region"
+            aria-label={name}
+          >
             {marked.map((n) => (
               <span
                 key={n}
@@ -156,6 +243,24 @@ export function CodeBlock({
           </pre>
         )}
       </div>
+      {longer && (
+        <div className="cy-code-block-more cy-reset">
+          <Button
+            size="sm"
+            variant="ghost"
+            aria-expanded={all}
+            aria-controls={`${id}-code`}
+            onClick={() => setAll(!all)}
+          >
+            {all
+              ? (labels?.showLess ?? "Show less")
+              : (labels?.showAll ?? defaultShowAll)({
+                  lines: whole.split("\n").length,
+                  chars: whole.length,
+                })}
+          </Button>
+        </div>
+      )}
       {marked.length > 0 && (
         <span className="cy-visually-hidden">{(labels?.active ?? defaultActive)(marked)}</span>
       )}

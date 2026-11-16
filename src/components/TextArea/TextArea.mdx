@@ -64,6 +64,18 @@ Give a `trigger` character and `suggestions`, and typing the trigger at the star
 
 The list drops below the whole box, at least as wide as it, and moves above it when there is no room below (a chat input at the bottom of a window). It is the same list as [Select](?path=/docs/components-controls-select--docs), [Combobox](?path=/docs/components-controls-combobox--docs) and [TagInput](?path=/docs/components-controls-taginput--docs) use ([OptionList](?path=/docs/components-controls-optionlist--docs)).
 
+## Dropped files
+
+With `onFiles`, files dropped on the field are handed over (those `accept` allows); while they are dragged over it the field shows the accent border. The drop never changes the text, so open a text file yourself:
+
+```tsx
+<TextArea label="Input" value={text} onChange={setText} accept=".txt,.json,text/*" onFiles={async ([file]) => setText(await file.text())} />
+```
+
+Dragged text still drops as the browser does it. Pair it with `FileDrop variant="button"` for picking the same files.
+
+<Canvas of={Stories.DroppedFilesGoToTheCaller} />
+
 ## Options
 
 - **`variant`:** `outline` (default) or `soft`.

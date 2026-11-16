@@ -38,6 +38,11 @@ export interface ZoomGestureOptions {
    * page; Ctrl/Cmd+wheel still zooms, so the page itself never does.
    */
   ignore?: ((path: EventTarget[]) => boolean) | undefined;
+  /**
+   * False: nothing zooms by gesture (Ctrl/Cmd+wheel is left to the browser, pinches and the zoom keys do nothing);
+   * presses (`claim`), Space+drag and `onPan` still work. Default true.
+   */
+  zoomable?: boolean | undefined;
 }
 
 /**
@@ -51,10 +56,19 @@ export interface ZoomGestureOptions {
  */
 export function useZoomGestures(
   scroller: RefObject<HTMLElement | null>,
-  { percent, onZoom, onPan, min = MIN_PERCENT, max = MAX_PERCENT, claim, ignore }: ZoomGestureOptions,
+  {
+    percent,
+    onZoom,
+    onPan,
+    min = MIN_PERCENT,
+    max = MAX_PERCENT,
+    claim,
+    ignore,
+    zoomable = true,
+  }: ZoomGestureOptions,
 ) {
-  const latest = useRef({ percent, onZoom, onPan, min, max, claim, ignore });
-  latest.current = { percent, onZoom, onPan, min, max, claim, ignore };
+  const latest = useRef({ percent, onZoom, onPan, min, max, claim, ignore, zoomable });
+  latest.current = { percent, onZoom, onPan, min, max, claim, ignore, zoomable };
   /** True while two fingers are down: the first one's drag must not pan meanwhile. */
   const pinching = useRef(false);
   const [panning, setPanning] = useState(false);
@@ -87,6 +101,7 @@ export function useZoomGestures(
         pan(-e.deltaX, -e.deltaY);
         return;
       }
+      if (!latest.current.zoomable) return;
       // The browser's own page zoom must not happen on top of ours.
       e.preventDefault();
       const { percent: shown, min: lo, max: hi } = latest.current;
@@ -104,7 +119,7 @@ export function useZoomGestures(
     const onDown = (e: PointerEvent) => {
       if (e.pointerType !== "touch" || latest.current.ignore?.(e.composedPath())) return;
       touches.set(e.pointerId, { x: e.clientX, y: e.clientY });
-      if (touches.size === 2) {
+      if (touches.size === 2 && latest.current.zoomable) {
         pinch = { distance: spread().distance || 1, percent: latest.current.percent };
         pinching.current = true;
       }
@@ -186,6 +201,7 @@ export function useZoomGestures(
     onKeyDown: (event: KeyboardEvent<HTMLElement>) => {
       const { percent: p, onZoom: zoom, min: lo, max: hi } = latest.current;
       if (event.ctrlKey || event.metaKey) {
+        if (!latest.current.zoomable) return;
         const next =
           event.key === "=" || event.key === "+"
             ? zoomStep(p, 1, lo, hi)

@@ -26,7 +26,7 @@ import { Choice, ChoiceBase } from "@arshad-shah/cynosure";
 | `tabIndex`                                                | –       | On the input: `-1` for a grid or list that moves focus itself (roving tabindex)                                  |
 | `checked` / `defaultChecked` / `onChange(checked, event)` | –       | Controlled or uncontrolled; passed to the input through `input`                                                  |
 | `strikeWhenChecked`                                       | `false` | While the input is checked (not mixed), the label is struck through and muted                                    |
-| `variant`                                                 | `row`   | `row` · `card`: a bordered card with `media` above the label (RadioGroup's cards)                                |
+| `variant`                                                 | `row`   | `row` · `card`: a bordered card with `media` above the label (RadioGroup's and Checkbox's cards)                 |
 | `media`                                                   | –       | A card's picture, above the label                                                                                |
 | `size`                                                    | `md`    | Text size: `sm` · `md` · `lg`                                                                                    |
 | `name`, `value`, `required`, `disabled`, `id`             | –       | Passed to the input; `disabled` also dims the row                                                                |
