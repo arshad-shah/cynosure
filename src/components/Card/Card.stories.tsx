@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { type CSSProperties, useEffect, useRef, useState } from "react";
 import { expect, fn, waitFor, within } from "storybook/test";
 import { computeUnderHostileHost } from "../../test/hostile.js";
+import { fakeRouter } from "../../test/router.js";
 import { Badge } from "../Badge/Badge.js";
 import { Button } from "../Button/Button.js";
 import { Card } from "./Card.js";
@@ -601,5 +602,29 @@ export const PassesIdDataAndRef: Story = {
     await expect(root).toHaveAttribute("data-state", "ready");
     await expect(root).toHaveAttribute("data-row", "3");
     await expect(canvas.getByTestId("ref")).toHaveTextContent("ready");
+  },
+};
+
+export const RendersYourRoutersLink: Story = {
+  render: () => {
+    const router = fakeRouter();
+    (window as unknown as { cardRouter: typeof router }).cardRouter = router;
+    return (
+      <Card href="/projects/1" renderLink={router.renderLink} title="Cynosure" edge="accent" data-row="1">
+        A UI library
+      </Card>
+    );
+  },
+  play: async ({ canvas, userEvent }) => {
+    const { visits } = (window as unknown as { cardRouter: ReturnType<typeof fakeRouter> }).cardRouter;
+    const card = canvas.getByRole("link", { name: /Cynosure/ });
+    await expect(card).toHaveAttribute("data-router", "yes");
+    await expect(card).toHaveAttribute("href", "/app/projects/1");
+    await expect(card).toHaveClass("cy-card");
+    await expect(card).toHaveAttribute("data-interactive");
+    await expect(card).toHaveAttribute("data-edge");
+    await expect(card).toHaveAttribute("data-row", "1");
+    await userEvent.click(card);
+    await expect(visits).toEqual(["/projects/1"]);
   },
 };

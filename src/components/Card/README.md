@@ -11,7 +11,7 @@ Content container with `variant` (`surface`, `outline`, `soft`), `padding` (`non
 <Card as="section" title="Connection" description="Where the client connects." actions={<Button size="sm">Edit</Button>}>…</Card>
 ```
 
-Interactive cards render through `LinkBase` (`href`, unsafe schemes are not linked) or `ButtonBase` (`onClick`, `disabled`). Keep their content non-interactive: one card, one target.
+Interactive cards render through `LinkBase` (`href`, unsafe schemes are not linked) or `ButtonBase` (`onClick`, `disabled`). Keep their content non-interactive: one card, one target. `renderLink` renders a link card with your router, with Link's `renderLink` contract (`LinkRenderProps`).
 
 - `edge`: a coloured edge on the inline-start side (left in left-to-right text, right in right-to-left), for a category or a status. A tone name (`accent`, `neutral`, `danger`, `success`, `warning`, `info`) uses that tone's colour token; any other string is a CSS colour. It is the card's own start border, so it follows the card's radius, works with every `variant` and `tone`, on link and button cards and with `actions`, and keeps its colour on hover and focus. The content starts after it. In forced colours it stays as a thicker edge in the system text colour.
 - `title`, `description` and `headingLevel` (default 3): a header above the content. In a static or link card the title is a heading; in a button card it is plain text (a button may not hold a heading) and the header and body are spans. A `section`, `article` or `aside` card is named by its title. With `actions`, the header shares its row with them and the title wraps before them, on static, link and button cards alike.

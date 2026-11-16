@@ -12,7 +12,7 @@ import {
 import { ButtonBase, type ButtonBaseProps } from "../../foundations/ButtonBase/ButtonBase.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
 import { iconSizeFor } from "../../foundations/icon-size.js";
-import { LinkBase } from "../../foundations/LinkBase/LinkBase.js";
+import { anchor, type RenderLink } from "../../foundations/LinkBase/LinkBase.js";
 import type { IconData } from "../../icons/types.js";
 import type { DenseSize, Tone } from "../../tokens/schema.js";
 import { LoadingDots } from "../LoadingDots/LoadingDots.js";
@@ -86,6 +86,11 @@ export interface ButtonProps extends Omit<ButtonBaseProps, "children" | "classNa
   /** With `href`: receives the link element (the forwarded ref is for the button element). */
   linkRef?: Ref<HTMLAnchorElement> | undefined;
   /**
+   * With `href`: render the link with your router, `(props) => <RouterLink {...props} to={props.href} />`, as Link's
+   * `renderLink`; it receives this component's class, data attributes and handlers. Default: a plain link.
+   */
+  renderLink?: RenderLink | undefined;
+  /**
    * Square: as wide as it is tall, with no padding, for one icon as the content. Prefer IconButton, which sets it and
    * adds the required label and its tooltip. Default false.
    */
@@ -129,6 +134,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
     href,
     target,
     linkRef,
+    renderLink,
     square = false,
     confirm,
     keepFocus = false,
@@ -189,21 +195,18 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
     </>
   );
   if (href !== undefined)
-    return (
-      <LinkBase
-        ref={linkRef}
-        href={href}
-        target={target}
-        {...shared}
-        id={rest.id}
-        data-testid={rest["data-testid"]}
-        aria-label={rest["aria-label"]}
-        aria-current={rest["aria-current"]}
-        onClick={onClick as unknown as (e: MouseEvent<HTMLAnchorElement>) => void}
-      >
-        {content}
-      </LinkBase>
-    );
+    return anchor(renderLink, {
+      ref: linkRef,
+      href,
+      target,
+      ...shared,
+      id: rest.id,
+      "data-testid": rest["data-testid"],
+      "aria-label": rest["aria-label"],
+      "aria-current": rest["aria-current"],
+      onClick: onClick as unknown as (e: MouseEvent<HTMLAnchorElement>) => void,
+      children: content,
+    });
   return (
     <ButtonBase
       ref={ref}

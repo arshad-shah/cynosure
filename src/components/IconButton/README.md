@@ -17,4 +17,4 @@ The tooltip opens on hover and keyboard focus and closes on Escape, blur or poin
 | `wrapperClassName` | –       | Added to the element around the button (the tooltip's anchor, the box the parent lays out), for layout only |
 | `className`        | –       | Added to the button itself, for layout only                                                                 |
 
-`aria-current` (for example `"page"`) is set on the element whether it is a button or, with `href`, a link.
+`aria-current` (for example `"page"`) is set on the element whether it is a button or, with `href`, a link. With `href`, `renderLink` renders the link with your router, as on Button.

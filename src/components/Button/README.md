@@ -32,7 +32,7 @@ Every variant × tone pair is distinct and keeps text at ≥ 4.5:1 (tested). Sof
 
 **Accessibility and touch:** hit area ≥ 24px always and ≥ 44px on coarse pointers; Enter and Space activate; visible focus ring (also in forced-colors mode); long labels truncate with an ellipsis.
 
-- `href` (with `target`): a real link styled as a button; only safe URLs are linked. A link takes `target`, `id`, `aria-label`, `aria-current`, `className`, `style`, `data-testid` and `onClick`; the other button attributes (`disabled`, `loading`, `pressed`, `type`, `confirm`, `keepFocus`) do not apply to it. The forwarded ref is the button's; `linkRef` receives the link element.
+- `href` (with `target`): a real link styled as a button; only safe URLs are linked. A link takes `target`, `id`, `aria-label`, `aria-current`, `className`, `style`, `data-testid` and `onClick`; the other button attributes (`disabled`, `loading`, `pressed`, `type`, `confirm`, `keepFocus`) do not apply to it. The forwarded ref is the button's; `linkRef` receives the link element. `renderLink` renders the link with your router, with Link's `renderLink` contract (`LinkRenderProps`); IconButton passes it through.
 - `aria-current`: set on the element in both forms. A link to the page being shown takes `aria-current="page"` (as Pagination does with `getHref`), so a screen reader says "current page".
 - `confirm`: ask before acting, in place. The first press shows this text ("Press again to delete"); a second press within 4 seconds acts; Escape, leaving or the timeout disarms it.
 - `keepFocus`: a pointer press leaves focus where it was, for on-screen keypads beside a field.

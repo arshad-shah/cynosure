@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useRef, useState } from "react";
 import { expect, fn, waitFor, within } from "storybook/test";
 import { computeUnderHostileHost } from "../../test/hostile.js";
+import { fakeRouter } from "../../test/router.js";
 import { Button } from "../Button/Button.js";
 import { Pagination, pageCount, pageRange } from "./Pagination.js";
 
@@ -1036,5 +1037,26 @@ export const StableUnderHostileHost: Story = {
       await expect(hostile, selector).toEqual(clean);
     }
     await waitFor(() => expect(canvasElement.querySelector(".cy-pagination")).toBeVisible());
+  },
+};
+
+export const RendersYourRoutersLinks: Story = {
+  args: { getHref: (page) => `/members?page=${page}`, defaultPage: 2 },
+  render: (args) => {
+    const router = fakeRouter();
+    (window as unknown as { pageRouter: typeof router }).pageRouter = router;
+    return <Pagination {...args} renderLink={router.renderLink} />;
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    const { visits } = (window as unknown as { pageRouter: ReturnType<typeof fakeRouter> }).pageRouter;
+    // Pages and the previous and next steps are all the router's links.
+    const three = canvas.getByRole("link", { name: "Page 3" });
+    await expect(three).toHaveAttribute("data-router", "yes");
+    await expect(three).toHaveAttribute("href", "/app/members?page=3");
+    await expect(canvas.getByRole("link", { name: "Next page" })).toHaveAttribute("data-router", "yes");
+    await userEvent.click(three);
+    await expect(visits).toEqual(["/members?page=3"]);
+    await expect(args.onChange).toHaveBeenLastCalledWith(3, expect.anything());
+    await expect(canvas.getByRole("link", { name: "Page 3" })).toHaveAttribute("aria-current", "page");
   },
 };

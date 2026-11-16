@@ -1,4 +1,5 @@
 import { type CSSProperties, forwardRef, type ReactNode, useState } from "react";
+import type { RenderLink } from "../../foundations/LinkBase/LinkBase.js";
 import { menu } from "../../icons/menu.js";
 import { Container, type ContainerProps } from "../Container/Container.js";
 import { IconButton } from "../IconButton/IconButton.js";
@@ -56,6 +57,12 @@ export interface SiteHeaderProps {
   brand?: ReactNode;
   /** Where the brand links to. `false` shows the brand without a link. Default "/". */
   brandHref?: string | false;
+  /**
+   * Render the brand and navigation links with your router, `(props) => <RouterLink {...props} to={props.href} />`,
+   * as Link's `renderLink`: in the bar and in the narrow screens' menu (where SideNav draws them). Default: plain
+   * links.
+   */
+  renderLink?: RenderLink | undefined;
   /** The site navigation, as data. Each link is a real link; the `current` one is marked for assistive technology. */
   nav?: SiteHeaderLink[];
   /** Controls at the inline end, such as a ThemeToggle, a search button or a sign-in Button. They stay in the bar. */
@@ -98,6 +105,7 @@ export const SiteHeader = forwardRef<HTMLElement, SiteHeaderProps>(function Site
   {
     brand,
     brandHref = "/",
+    renderLink,
     nav = [],
     actions,
     sticky = true,
@@ -134,7 +142,13 @@ export const SiteHeader = forwardRef<HTMLElement, SiteHeaderProps>(function Site
               <div className="cy-site-header-brand">{brand}</div>
             ) : (
               // A Link (its focus ring and colour), drawn as the brand by the span inside it.
-              <Link href={brandHref} tone="neutral" underline="none" className="cy-site-header-brand-link">
+              <Link
+                href={brandHref}
+                tone="neutral"
+                underline="none"
+                className="cy-site-header-brand-link"
+                renderLink={renderLink}
+              >
                 <span className="cy-site-header-brand">{brand}</span>
               </Link>
             ))}
@@ -150,6 +164,7 @@ export const SiteHeader = forwardRef<HTMLElement, SiteHeaderProps>(function Site
                       underline="none"
                       aria-current={item.current ? "page" : undefined}
                       className="cy-site-header-link-anchor"
+                      renderLink={renderLink}
                     >
                       <span className="cy-site-header-link">{item.label}</span>
                     </Link>
@@ -182,6 +197,7 @@ export const SiteHeader = forwardRef<HTMLElement, SiteHeaderProps>(function Site
             current={current < 0 ? undefined : String(current)}
             // Choosing a link closes the menu; the browser then follows it.
             onNavigate={() => setOpen(false)}
+            {...(renderLink ? { renderLink } : {})}
             className="cy-site-header-sheet-nav"
           />
         </Sheet>

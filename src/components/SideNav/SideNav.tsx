@@ -7,6 +7,7 @@ import {
   useId,
   useState,
 } from "react";
+import type { DataAttributes } from "../../foundations/attributes.js";
 import { ButtonBase } from "../../foundations/ButtonBase/ButtonBase.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
 import { LinkBase } from "../../foundations/LinkBase/LinkBase.js";
@@ -78,8 +79,11 @@ export interface NavAction {
 
 export type NavEntry = NavItem | NavSection | NavAction;
 
-/** What `renderLink` receives: spread it onto your router's link component. */
-export interface NavLinkProps {
+/**
+ * What `renderLink` receives: spread it onto your router's link component. It fits `LinkRenderProps`, so one router
+ * renderer serves SideNav and every other component with a `renderLink`.
+ */
+export interface NavLinkProps extends DataAttributes {
   /** The item's `href`. */
   href: string;
   /** The item's styling; keep it on the link. */

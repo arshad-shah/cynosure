@@ -13,7 +13,7 @@ import {
 } from "react";
 import { ButtonBase } from "../../foundations/ButtonBase/ButtonBase.js";
 import { isRtl } from "../../foundations/dir.js";
-import { LinkBase } from "../../foundations/LinkBase/LinkBase.js";
+import { anchor, type RenderLink } from "../../foundations/LinkBase/LinkBase.js";
 import { useRovingFocus } from "../../foundations/roving-focus.js";
 import type { Size, Tone } from "../../tokens/schema.js";
 import { Badge } from "../Badge/Badge.js";
@@ -182,6 +182,11 @@ export interface ListRowProps {
   onClick?: MouseEventHandler<HTMLElement> | undefined;
   /** Makes the row a link (rendered through LinkBase, so unsafe schemes are not linked). Wins over a button. */
   href?: string | undefined;
+  /**
+   * With `href`: render the link with your router, `(props) => <RouterLink {...props} to={props.href} />`, as Link's
+   * `renderLink`; it receives this component's class, data attributes and handlers. Default: a plain link.
+   */
+  renderLink?: RenderLink | undefined;
   /** Added to the row (`li`), for layout. */
   className?: string;
   /** Layout only. Restyle through --cy-list-row-* tokens. */
@@ -209,6 +214,7 @@ export const ListRow = forwardRef<HTMLLIElement, ListRowProps>(function ListRow(
     wrap = false,
     onClick,
     href,
+    renderLink,
     className,
     style,
   },
@@ -277,15 +283,14 @@ export const ListRow = forwardRef<HTMLLIElement, ListRowProps>(function ListRow(
       )}
       <span className="cy-list-row-text cy-reset">
         {href != null ? (
-          <LinkBase
-            {...control}
-            ref={main as RefObject<HTMLAnchorElement>}
-            href={href}
-            onClick={onClick}
-            aria-current={active ? "page" : undefined}
-          >
-            {title}
-          </LinkBase>
+          anchor(renderLink, {
+            ...control,
+            ref: main as RefObject<HTMLAnchorElement>,
+            href,
+            onClick,
+            "aria-current": active ? "page" : undefined,
+            children: title,
+          })
         ) : onClick ? (
           <ButtonBase
             {...control}

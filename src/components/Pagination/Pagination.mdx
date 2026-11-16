@@ -60,6 +60,8 @@ With `getHref`, every page number and every control that leads to another page i
 
 ### With a client-side router
 
+`renderLink` renders every page link with your router's link component, with the same contract as [Link](?path=/docs/components-controls-link--docs)'s, so the router handles the navigation itself. Without it, the next paragraph's `onChange` pattern works with plain links.
+
 `onChange` is called with the page and the click event. Call `event.preventDefault()` to stop the browser following the link, then navigate yourself. The links still work without JavaScript and open in a new tab.
 
 ```tsx
