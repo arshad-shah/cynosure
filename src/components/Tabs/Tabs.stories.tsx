@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { useState } from "react";
+import { Activity, StrictMode, useState } from "react";
 import { expect, fn, waitFor, within } from "storybook/test";
 import { code, info, list, plus } from "../../icons/index.js";
 import { computeUnderHostileHost } from "../../test/hostile.js";
@@ -1476,5 +1476,34 @@ export const TabShortcut: Story = {
   render: () => <OverflowModes width={1400} />,
   play: async ({ canvas }) => {
     await expect(canvas.getByRole("tab", { name: "Annotate" })).toHaveAttribute("aria-keyshortcuts", "Alt+3");
+  },
+};
+
+/* StrictMode runs every effect twice on mount, and Activity runs them again each time a hidden page is shown. */
+function KeptAlivePage() {
+  const [shown, setShown] = useState(true);
+  return (
+    <StrictMode>
+      <Button onClick={() => setShown((s) => !s)}>{shown ? "Hide page" : "Show page"}</Button>
+      <Activity mode={shown ? "visible" : "hidden"}>{withCommands()}</Activity>
+    </StrictMode>
+  );
+}
+
+export const SurvivesEffectsRunningTwice: Story = {
+  render: () => <KeptAlivePage />,
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    await expect(canvas.getAllByRole("tab")).toHaveLength(4);
+    await expect(commands()).not.toHaveBeenCalled();
+    // Hidden and shown again: the effects run once more, and the menu still works.
+    await userEvent.click(canvas.getByRole("button", { name: "Hide page" }));
+    await userEvent.click(canvas.getByRole("button", { name: "Show page" }));
+    const b = await canvas.findByRole("tab", { name: "b.ts" });
+    await userEvent.pointer({ keys: "[MouseRight]", target: b });
+    await waitFor(() => expect(menuPanel()).not.toBeNull());
+    await userEvent.click(within(menuPanel() as HTMLElement).getByRole("menuitem", { name: "Close others" }));
+    await expect(commands()).toHaveBeenLastCalledWith("others", "b.ts");
+    await expect(orderOf(canvasElement)).toBe("b.ts");
+    await waitFor(() => expect(menuPanel()).toBeNull());
   },
 };

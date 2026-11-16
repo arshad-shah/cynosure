@@ -108,12 +108,11 @@ export function ContextMenu<K = undefined>({
     setOpen(true);
   }, []);
   const close = useCallback(() => setOpen(false), []);
-  const first = useRef(true);
+  // Reports changes only: effects that run twice (StrictMode, a page shown again by Activity) report nothing.
+  const reported = useRef(open);
   useEffect(() => {
-    if (first.current) {
-      first.current = false;
-      return;
-    }
+    if (reported.current === open) return;
+    reported.current = open;
     const { onOpenChange, current } = latest.current;
     if (current?.keyed) onOpenChange?.(open, current.key);
     else (onOpenChange as ((open: boolean) => void) | undefined)?.(open);
