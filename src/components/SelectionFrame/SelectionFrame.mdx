@@ -50,6 +50,12 @@ const [region, setRegion] = useState<FrameBox | null>(null);
 
 <Canvas of={Stories.DrawANewBox} />
 
+## Small objects
+
+An object smaller than its handles (a tick, a line of highlight) would be covered by them, leaving nothing to drag. Below `compactBelow` on screen (twice the hit area: 48px, or 88px on touch screens), the handles across the short side are hidden and the others move half a hit area outward. The whole body then moves the object, and the corner handles (and Alt+arrows) still resize it.
+
+<Canvas of={Stories.SmallObjectsKeepTheirBodyFree} />
+
 ## Props
 
 <ArgTypes of={Stories} />
@@ -57,7 +63,7 @@ const [region, setRegion] = useState<FrameBox | null>(null);
 ## Behaviour and accessibility
 
 - **Role:** a focusable group named by `label`, described to screen readers as a "selection" (`labels.roleDescription`). Describe the keys nearby with `aria-describedby`.
-- **Pointer, pen and touch:** through detent's pointer path; a finger held briefly drags, a quick swipe still scrolls the page; Escape cancels a drag.
+- **Pointer, pen and touch:** through detent's pointer path; dragging the body moves the object (after 4px of travel; a finger held briefly), a quick swipe still scrolls the page; Escape cancels a drag.
 - **Rotation:** handles turn with the object, and a drag is read in the object's own axes so the opposite edge stays where it is. Shift snaps rotation to 15°.
 - **Bounds:** with `bounds`, moving stops at the edges and resizing an unrotated object stops its grabbed edge there.
 - **Touch:** handles have a 44px hit area on touch screens; the rotate handle sits further out.

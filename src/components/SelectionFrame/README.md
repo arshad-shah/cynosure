@@ -27,6 +27,7 @@ import { SelectionFrame } from "@arshad-shah/cynosure";
 | `draw`                    | `false`    | Drag anywhere on the layer to draw a new box (region select, crop, grid area)               |
 | `scale`                   | `1`        | CSS pixels per unit                                                                         |
 | `resizable` / `rotatable` | `false`    | Eight resize handles / a rotate handle above                                                |
+| `compactBelow`            | 48 / 88    | On-screen px: a smaller side hides the handles across it and moves the rest outside         |
 | `keepAspect`              | `false`    | Keep the ratio (Shift does it for one drag)                                                 |
 | `minSize`, `bounds`       | `1`, –     | Smallest size; area to stay inside                                                          |
 | `step` / `largeStep`      | `1` / `10` | Arrow-key amounts                                                                           |
@@ -43,6 +44,8 @@ The geometry helpers are exported for your own tools: `moveBy`, `resizeBy`, `res
 - Pointer gestures go through detent (`bindPointer`): one input path for mouse, touch and pen; on touch, a finger held briefly drags and a quick swipe still scrolls.
 - Handles follow the rotation; a drag is read in the object's own axes so the opposite edge stays put.
 - Handles have a 24px hit area (44px on touch screens).
+- **Dragging the body moves it** with a mouse, pen or finger: detent's 4px of travel (a press alone focuses), and on touch a finger held 200ms.
+- **Small objects keep their body free.** When the object is narrower or shorter on screen than `compactBelow` (twice the hit area: 48px, 88px on touch screens), the handles across that short side are hidden and the others move half a hit area outward, so no hit area lies over the body: a tick or a line of highlight can still be dragged by its body and resized by the corner handles (or Alt+arrows). The frame carries `data-compact` (`x`, `y` or `xy`).
 
 ## Tokens
 
