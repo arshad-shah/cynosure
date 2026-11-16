@@ -76,6 +76,55 @@ export const EscapeCancelsADrag: Story = {
   },
 };
 
+/**
+ * A held arrow key repeats (onChange each step) and commits once, when it is let go; with `commitDelay`, separate
+ * presses commit once, after that long without a key, and leaving the slider commits at once.
+ */
+export const KeysCommitOnReleaseOrAfterAPause: Story = {
+  render: (args) => (
+    <>
+      <Slider {...args} label="Volume" />
+      <Slider {...args} label="Contrast" commitDelay={300} />
+    </>
+  ),
+  play: async ({ args, canvas, userEvent }) => {
+    const commit = args.onCommit as ReturnType<typeof fn>;
+    const change = args.onChange as ReturnType<typeof fn>;
+    const volume = canvas.getByRole("slider", { name: "Volume" });
+    volume.focus();
+    // Held: three key repeats, no commit until the key is released.
+    await userEvent.keyboard("{ArrowRight>3}");
+    await expect(volume).toHaveAttribute("aria-valuenow", "43");
+    await expect(change).toHaveBeenCalledTimes(3);
+    await expect(commit).not.toHaveBeenCalled();
+    await userEvent.keyboard("{/ArrowRight}");
+    await expect(commit).toHaveBeenCalledTimes(1);
+    await expect(commit).toHaveBeenLastCalledWith(43);
+    // A key that changes nothing (End twice at the end) commits nothing more.
+    await userEvent.keyboard("{End}");
+    await expect(commit).toHaveBeenLastCalledWith(100);
+    commit.mockClear();
+    await userEvent.keyboard("{End}");
+    await expect(commit).not.toHaveBeenCalled();
+
+    // commitDelay: three separate presses, one commit after the pause.
+    commit.mockClear();
+    const contrast = canvas.getByRole("slider", { name: "Contrast" });
+    contrast.focus();
+    await userEvent.keyboard("{ArrowRight}{ArrowRight}{ArrowRight}");
+    await expect(contrast).toHaveAttribute("aria-valuenow", "43");
+    await expect(commit).not.toHaveBeenCalled();
+    await waitFor(() => expect(commit).toHaveBeenCalledTimes(1), { timeout: 1000 });
+    await expect(commit).toHaveBeenLastCalledWith(43);
+    // Leaving before the pause commits at once.
+    await userEvent.keyboard("{ArrowLeft}");
+    await expect(commit).toHaveBeenCalledTimes(1);
+    volume.focus();
+    await expect(commit).toHaveBeenCalledTimes(2);
+    await expect(commit).toHaveBeenLastCalledWith(42);
+  },
+};
+
 export const KeyboardFollowsTheApgSlider: Story = {
   play: async ({ args, canvas, userEvent }) => {
     const thumb = canvas.getByRole("slider", { name: "Volume" });
