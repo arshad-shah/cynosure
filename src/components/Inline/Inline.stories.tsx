@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import type React from "react";
 import { useEffect, useRef, useState } from "react";
 import { expect } from "storybook/test";
+import { blockingStory } from "../../test/blocking.js";
 import { Badge } from "../Badge/Badge.js";
 import { Inline } from "./Inline.js";
 
@@ -281,3 +282,10 @@ export const SeparatorInAListAndRightToLeft: Story = {
     await expect(Number.parseFloat(before(items[1] as HTMLElement).marginInlineEnd)).toBeGreaterThan(0);
   },
 };
+
+/** `inert` blocks the region (no focus, no clicks); `disabled` also dims it; clearing them gives it back. */
+export const InertOrDisabledBlocksTheRegion: Story = blockingStory((p, inside) => (
+  <Inline data-testid="region" {...p}>
+    {inside}
+  </Inline>
+));

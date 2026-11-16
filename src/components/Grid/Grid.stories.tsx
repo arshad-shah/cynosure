@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { type ReactNode, useEffect, useRef, useState } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { expect, waitFor } from "storybook/test";
+import { blockingStory } from "../../test/blocking.js";
 import { computeUnderHostileHost } from "../../test/hostile.js";
 import { BREAKPOINT_NAMES, expectVisibilityFollowsTheWindow } from "../../test/visibility.js";
 import { Card } from "../Card/Card.js";
@@ -848,3 +849,10 @@ export const PassesHandlersDataAndRef: Story = {
     await expect(zone).toHaveAttribute("data-state", "used");
   },
 };
+
+/** `inert` blocks the region (no focus, no clicks); `disabled` also dims it; clearing them gives it back. */
+export const InertOrDisabledBlocksTheRegion: Story = blockingStory((p, inside) => (
+  <Grid data-testid="region" columns={2} {...p}>
+    {inside}
+  </Grid>
+));

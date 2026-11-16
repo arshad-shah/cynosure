@@ -1,5 +1,6 @@
 import { type CSSProperties, type ElementType, forwardRef, type ReactNode } from "react";
 import {
+  type BlockProps,
   type BoxProps,
   boxAttrs,
   type LayoutAttributes,
@@ -7,11 +8,12 @@ import {
   paddingVars,
   type Space,
   space,
+  useBlock,
   type VisibilityProps,
   visibilityAttrs,
 } from "../../foundations/layout.js";
 
-export interface StackProps extends PaddingProps, VisibilityProps, BoxProps, LayoutAttributes {
+export interface StackProps extends PaddingProps, VisibilityProps, BoxProps, BlockProps, LayoutAttributes {
   /** Space token between children. */
   gap?: Space;
   /** Lay the children out in a column (the default) or in a row. For a row, Inline adds wrapping and centring. */
@@ -59,6 +61,8 @@ export const Stack = forwardRef<HTMLElement, StackProps>(function Stack(
     fill,
     minSize,
     overflow,
+    inert,
+    disabled,
     as = "div",
     className,
     style,
@@ -68,10 +72,11 @@ export const Stack = forwardRef<HTMLElement, StackProps>(function Stack(
   ref,
 ) {
   const Tag = as as ElementType;
+  const block = useBlock(ref, { inert, disabled });
   return (
     <Tag
-      ref={ref}
       {...rest}
+      {...block}
       className={`cy-stack${className ? ` ${className}` : ""}`}
       data-direction={direction === "row" ? "row" : undefined}
       data-align={align}
