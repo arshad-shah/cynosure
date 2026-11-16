@@ -595,9 +595,11 @@ export {
 } from "./components/VirtualList/index.js";
 export { VisuallyHidden, type VisuallyHiddenProps } from "./components/VisuallyHidden/index.js";
 export {
+  type ZoomButton,
   ZoomControls,
   type ZoomControlsLabels,
   type ZoomControlsProps,
+  type ZoomFit,
 } from "./components/ZoomControls/index.js";
 export type { DataAttributes, RootAttributes } from "./foundations/attributes.js";
 export { ButtonBase, type ButtonBaseProps } from "./foundations/ButtonBase/ButtonBase.js";

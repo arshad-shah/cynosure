@@ -14,7 +14,7 @@ import { useControllableState } from "../../foundations/controllable.js";
 import { type DragSession, useDrag } from "../../foundations/drag.js";
 import { LiveRegion } from "../../foundations/LiveRegion/LiveRegion.js";
 import { clamp } from "../../foundations/math.js";
-import { clampPercent, MAX_PERCENT, MIN_PERCENT } from "../../foundations/zoom.js";
+import { clampPercent, MAX_PERCENT, MIN_PERCENT, type ZoomSetting } from "../../foundations/zoom.js";
 import { useZoomGestures, type ZoomAnchor } from "../../foundations/zoom-gestures.js";
 
 export interface PanZoomCanvasTokens {
@@ -51,6 +51,11 @@ export interface PanZoomCanvasHandle {
   fit: (rect?: CanvasRect) => void;
   /** Zooms to a percent around the viewport's centre. */
   zoomTo: (percent: number) => void;
+  /**
+   * Applies a ZoomControls choice: a percent zooms around the centre (`zoomTo`), `fit-page` fits `bounds` (`fit`) and
+   * `fit-width` fits their width, keeping their top in view. So `onZoomChange={(z) => canvas.current?.zoom(z)}`.
+   */
+  zoom: (setting: ZoomSetting) => void;
   /** Centers a rect (a node) without changing the zoom. */
   centerOn: (rect: CanvasRect) => void;
   /** @deprecated The earlier spelling of `centerOn`; it does the same. */
@@ -254,6 +259,13 @@ export const PanZoomCanvas = forwardRef<PanZoomCanvasHandle, PanZoomCanvasProps>
       scale: s,
     });
   };
+  /** Fits the width of `bounds`, their top just inside the canvas. */
+  const fitWidth = () => {
+    if (!bounds || !size.width) return;
+    const pad = Math.min(size.width, size.height) * 0.05;
+    const s = clamp((size.width - 2 * pad) / bounds.width, minScale, maxScale);
+    go({ x: (size.width - bounds.width * s) / 2 - bounds.x * s, y: pad - bounds.y * s, scale: s });
+  };
   const centerOn = (rect: CanvasRect) => {
     const { scale } = latest.current;
     go({
@@ -262,9 +274,12 @@ export const PanZoomCanvas = forwardRef<PanZoomCanvasHandle, PanZoomCanvasProps>
       scale,
     });
   };
+  const zoomTo = (p: number) => zoomAround(clampPercent(p, min, max) / 100, centre());
   const api = (): PanZoomCanvasHandle => ({
     fit,
-    zoomTo: (p) => zoomAround(clampPercent(p, min, max) / 100, centre()),
+    zoomTo,
+    zoom: (setting) =>
+      setting.kind === "percent" ? zoomTo(setting.value) : setting.kind === "fit-width" ? fitWidth() : fit(),
     centerOn,
     centreOn: centerOn,
   });

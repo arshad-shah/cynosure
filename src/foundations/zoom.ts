@@ -25,12 +25,20 @@ export const ZOOM_STEPS = [
 
 /**
  * The next step above (1) or below (-1) `percent`; from between two steps it goes to the nearer one that way. Steps
- * outside `min` and `max` (default 25 and 800) are skipped; past the last one it stops at the limit.
+ * outside `min` and `max` (default 25 and 800) are skipped; past the last one it stops at the limit. `steps` replaces
+ * `ZOOM_STEPS` (a canvas with steps of its own); it is read in ascending order.
  */
-export function zoomStep(percent: number, direction: 1 | -1, min = MIN_PERCENT, max = MAX_PERCENT): number {
+export function zoomStep(
+  percent: number,
+  direction: 1 | -1,
+  min = MIN_PERCENT,
+  max = MAX_PERCENT,
+  steps: readonly number[] = ZOOM_STEPS,
+): number {
   const p = clampPercent(percent, min, max);
-  if (direction === 1) return Math.min(ZOOM_STEPS.find((s) => s > p) ?? max, max);
-  return Math.max([...ZOOM_STEPS].reverse().find((s) => s < p) ?? min, min);
+  const sorted = [...steps].sort((a, b) => a - b);
+  if (direction === 1) return Math.min(sorted.find((s) => s > p) ?? max, max);
+  return Math.max(sorted.reverse().find((s) => s < p) ?? min, min);
 }
 
 /**

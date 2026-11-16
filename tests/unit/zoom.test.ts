@@ -29,6 +29,13 @@ describe("zoom", () => {
     expect(zoomStep(250, 1, 20, 300)).toBe(300);
     expect(zoomStep(300, 1, 20, 300)).toBe(300);
     expect(zoomStep(280, 1, 20, 280)).toBe(280);
+  });
+  it("steps through steps of its own when given them, in any order", () => {
+    expect(zoomStep(100, 1, 25, 800, [200, 50, 100])).toBe(200);
+    expect(zoomStep(100, -1, 25, 800, [200, 50, 100])).toBe(50);
+    expect(zoomStep(75, 1, 25, 800, [50, 100, 200])).toBe(100);
+    expect(zoomStep(200, 1, 25, 300, [50, 100, 200])).toBe(300);
+    expect(zoomStep(50, -1, 30, 800, [50, 100])).toBe(30);
     expect(zoomStep(40, -1, 40, 300)).toBe(40);
   });
   it("fits the widest page, or the whole page, inside the viewport", () => {
