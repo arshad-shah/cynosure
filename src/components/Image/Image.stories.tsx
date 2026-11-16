@@ -686,10 +686,11 @@ export const LabelledOverlayIsAnnounced: Story = {
 export const OverlayWaitsForThePicture: Story = {
   render: (args) => (
     <>
+      {/* The broken picture comes first: placed below the far one, a lazy picture never starts loading in WebKit. */}
+      <Image {...args} src={broken(3)} alt="Broken" ratio={1} overlay={ring} className="broken" />
       <FarBelow>
         <Image {...args} src={picture(64, 64)} alt="Waiting" ratio={1} overlay={ring} className="waiting" />
       </FarBelow>
-      <Image {...args} src={broken(3)} alt="Broken" ratio={1} overlay={ring} className="broken" />
     </>
   ),
   play: async ({ canvasElement }) => {
