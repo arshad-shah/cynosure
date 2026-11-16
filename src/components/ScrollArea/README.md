@@ -24,12 +24,13 @@ const area = useRef<ScrollAreaHandle>(null);
 | `label`               | –          | Names the area as a region; it is then a tab stop whenever there is something to scroll                                  |
 | `direction`           | `vertical` | `vertical` · `horizontal` · `both`; the other axis is clipped                                                            |
 | `follow`              | `false`    | Keep the end in view while content is added; scrolling up lets go, scrolling back to the end follows again               |
+| `maxHeight`           | token      | The tallest the area gets, any CSS length (`20rem`, `50vh`); it grows with its content up to it, then scrolls            |
 | `onScroll`            | –          | Every scroll, with the scrolling element's event                                                                         |
 | `onAtBottomChange`    | –          | `false` when the view leaves the end, `true` when it is back (by scrolling or by content growing past it). Starts `true` |
 | `overlay`             | –          | Pinned at the bottom centre over the area, outside the region; it does not scroll                                        |
 | `handle`              | –          | `scrollToEnd()` (resumes `follow`) and `scrollIntoView(element, { align })`, `align` `nearest` · `start` · `center`      |
 | `className` / `style` | –          | Layout only                                                                                                              |
-- **Filling:** the area is `flex: 1 1 0%` and 100% of its parent both ways, with a minimum size of 0, so in a flex column it takes what the header and footer leave and scrolls instead of making the page longer. In a parent with no height of its own it is as tall as its content (give it `style={{ maxBlockSize: … }}`).
+- **Filling:** the area is `flex: 1 1 0%` and 100% of its parent both ways, with a minimum size of 0, so in a flex column it takes what the header and footer leave and scrolls instead of making the page longer. In a parent with no height of its own it is as tall as its content, up to `maxHeight` (any CSS length) or the `--cy-scroll-area-max-height` token, and then scrolls.
 - **Following** is shared with VirtualList (`useFollow` in `src/foundations/use-follow.ts`): only a move up releases it, so a fast stream never drops out on its own.
 - **`scrollIntoView`** scrolls only the area, never the page around it, and works in right-to-left text.
 
@@ -45,4 +46,6 @@ A finger pans the area with the browser's own scrolling; nothing intercepts it. 
 
 ## Tokens
 
-None of its own: the root is an [OverlayFrame](../OverlayFrame/README.md), so `--cy-overlay-frame-offset` (space between the bottom edge and the overlay) and `--cy-overlay-frame-layer` set on it move the overlay.
+- `--cy-scroll-area-max-height`: the tallest an area gets (any CSS length) when `maxHeight` is not set; default `none`.
+
+The root is an [OverlayFrame](../OverlayFrame/README.md), so `--cy-overlay-frame-offset` (space between the bottom edge and the overlay) and `--cy-overlay-frame-layer` set on it move the overlay.

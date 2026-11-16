@@ -316,6 +316,39 @@ export const FillsItsParent: Story = {
   },
 };
 
+/** In a parent with no height of its own, `maxHeight` (or the token) stops the area growing and it scrolls. */
+export const MaxHeightCapsTheArea: Story = {
+  render: () => (
+    <>
+      <ScrollArea label="Capped" maxHeight="10rem" data-testid="capped">
+        {lines(30)}
+      </ScrollArea>
+      <ScrollArea label="Short" maxHeight="10rem" data-testid="short">
+        {lines(2)}
+      </ScrollArea>
+      <div style={{ ["--cy-scroll-area-max-height" as string]: "6rem" }}>
+        <ScrollArea label="Token" data-testid="token">
+          {lines(30)}
+        </ScrollArea>
+      </div>
+    </>
+  ),
+  play: async ({ canvas }) => {
+    const rem = Number.parseFloat(getComputedStyle(document.documentElement).fontSize);
+    const height = (id: string) => canvas.getByTestId(id).getBoundingClientRect().height;
+    await expect(Math.abs(height("capped") - 10 * rem)).toBeLessThan(1);
+    const capped = canvas.getByRole("region", { name: "Capped" });
+    await expect(capped.scrollHeight).toBeGreaterThan(capped.clientHeight);
+    // A tab stop, since there is something to scroll.
+    await waitFor(() => expect(capped).toHaveAttribute("tabindex", "0"));
+    // Short content keeps its own height under the cap.
+    await expect(height("short")).toBeLessThan(10 * rem - 1);
+    await expect(canvas.getByRole("region", { name: "Short" })).not.toHaveAttribute("tabindex");
+    // The token caps every area under it.
+    await expect(Math.abs(height("token") - 6 * rem)).toBeLessThan(1);
+  },
+};
+
 function Jump({ dir }: { dir?: "rtl" }) {
   const handle = useRef<ScrollAreaHandle>(null);
   const target = useRef<HTMLSpanElement>(null);

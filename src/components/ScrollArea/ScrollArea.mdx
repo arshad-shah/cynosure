@@ -70,6 +70,16 @@ With `follow`, the end stays in view while content is added. Scrolling up lets g
 
 <Canvas of={Stories.DirectionPicksTheAxes} />
 
+## Height
+
+The area fills its parent. In a parent with no height of its own (a card, a block in a page) it grows with its content: `maxHeight` (any CSS length, `"20rem"`, `"50vh"`) stops it there and it scrolls. Short content keeps its own height. The `--cy-scroll-area-max-height` token sets the cap for every area under it.
+
+```tsx
+<ScrollArea label="History" maxHeight="20rem">{rows}</ScrollArea>
+```
+
+<Canvas of={Stories.MaxHeightCapsTheArea} />
+
 ## Props
 
 <ArgTypes of={Stories} />
@@ -93,7 +103,7 @@ A finger pans the area with the browser's own scrolling; nothing intercepts it. 
 
 ## Theming
 
-No tokens of its own: the overlay's place comes from OverlayFrame's `--cy-overlay-frame-offset` (space between the bottom edge and the overlay, default `--cy-space-4`) and `--cy-overlay-frame-layer`. The area itself draws nothing: give the parent its background and border.
+`--cy-scroll-area-max-height` is the tallest an area gets when `maxHeight` is not set (default `none`). The overlay's place comes from OverlayFrame's `--cy-overlay-frame-offset` (space between the bottom edge and the overlay, default `--cy-space-4`) and `--cy-overlay-frame-layer`. The area itself draws nothing: give the parent its background and border.
 
 ## Related
 
