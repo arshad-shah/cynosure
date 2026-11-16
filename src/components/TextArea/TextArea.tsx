@@ -173,6 +173,7 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(function 
     onBlur,
     onCompositionStart,
     onCompositionEnd,
+    "aria-describedby": describedByProp,
     ...rest
   },
   forwarded,
@@ -359,6 +360,7 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(function 
       error={error}
       required={required}
       size={size}
+      describedBy={describedByProp}
       id={id}
       className={className}
       style={style}

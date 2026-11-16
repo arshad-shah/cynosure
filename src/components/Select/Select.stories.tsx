@@ -644,3 +644,28 @@ export const SplitSettingsRow: Story = {
     await waitFor(() => expect(theme).toHaveAttribute("aria-expanded", "false"));
   },
 };
+
+export const IdAndNamedAndDescribedFromOutside: Story = {
+  render: (args) => (
+    <div>
+      <span id="sel-heading">Favourite fruit</span>
+      <span id="sel-hint">For the menu</span>
+      <Select
+        {...args}
+        id="sel-fruit"
+        labelHidden
+        description="Pick one"
+        aria-labelledby="sel-heading"
+        aria-describedby="sel-hint"
+      />
+    </div>
+  ),
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const trigger = canvas.getByRole("combobox", { name: "Favourite fruit" });
+    await expect(trigger).toHaveAttribute("id", "sel-fruit");
+    await expect(trigger).toHaveAccessibleDescription("For the menu Pick one");
+    await userEvent.click(trigger);
+    await expect(list(canvasElement)).toHaveAccessibleName("Favourite fruit");
+    await userEvent.keyboard("{Escape}");
+  },
+};

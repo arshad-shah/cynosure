@@ -1,7 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import type { CSSProperties } from "react";
+import { type CSSProperties, useEffect, useRef, useState } from "react";
 import { expect, fn, waitFor, within } from "storybook/test";
 import { computeUnderHostileHost } from "../../test/hostile.js";
+import { fakeRouter } from "../../test/router.js";
 import { Badge } from "../Badge/Badge.js";
 import { Button } from "../Button/Button.js";
 import { Card } from "./Card.js";
@@ -576,5 +577,54 @@ export const CurrentCardOfASet: Story = {
     current.append(probe);
     await expect(getComputedStyle(current).borderTopColor).toBe(getComputedStyle(probe).color);
     probe.remove();
+  },
+};
+
+export const PassesIdDataAndRef: Story = {
+  render: (args) => {
+    function WithRef() {
+      const ref = useRef<HTMLElement>(null);
+      const [seen, setSeen] = useState("");
+      useEffect(() => setSeen(ref.current?.dataset.state ?? ""), []);
+      return (
+        <>
+          <Card {...args} ref={ref} id="tip" data-state="ready" data-row={3} />
+          <output data-testid="ref">{seen}</output>
+        </>
+      );
+    }
+    return <WithRef />;
+  },
+  play: async ({ canvasElement, canvas }) => {
+    const root = canvasElement.querySelector("#tip") as HTMLElement;
+    // The id and any data-* attribute land on the component's root, and the ref is that element.
+    await expect(root).toHaveClass("cy-card");
+    await expect(root).toHaveAttribute("data-state", "ready");
+    await expect(root).toHaveAttribute("data-row", "3");
+    await expect(canvas.getByTestId("ref")).toHaveTextContent("ready");
+  },
+};
+
+export const RendersYourRoutersLink: Story = {
+  render: () => {
+    const router = fakeRouter();
+    (window as unknown as { cardRouter: typeof router }).cardRouter = router;
+    return (
+      <Card href="/projects/1" renderLink={router.renderLink} title="Cynosure" edge="accent" data-row="1">
+        A UI library
+      </Card>
+    );
+  },
+  play: async ({ canvas, userEvent }) => {
+    const { visits } = (window as unknown as { cardRouter: ReturnType<typeof fakeRouter> }).cardRouter;
+    const card = canvas.getByRole("link", { name: /Cynosure/ });
+    await expect(card).toHaveAttribute("data-router", "yes");
+    await expect(card).toHaveAttribute("href", "/app/projects/1");
+    await expect(card).toHaveClass("cy-card");
+    await expect(card).toHaveAttribute("data-interactive");
+    await expect(card).toHaveAttribute("data-edge");
+    await expect(card).toHaveAttribute("data-row", "1");
+    await userEvent.click(card);
+    await expect(visits).toEqual(["/projects/1"]);
   },
 };

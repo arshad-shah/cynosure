@@ -38,6 +38,10 @@ IconButton accepts the Button props `variant`, `tone`, `size`, `loading`, `press
 
 <Canvas of={Stories.Danger} />
 
+## Links
+
+With `href` the IconButton is a link that looks like one, and `renderLink` renders it with your router, as on [Button](?path=/docs/components-controls-button--docs). The label stays its accessible name.
+
 ## Props
 
 <ArgTypes of={Stories} />
@@ -52,6 +56,10 @@ IconButton accepts the Button props `variant`, `tone`, `size`, `loading`, `press
 
 - **Name:** `label` is set as `aria-label`. There is no native `title` tooltip.
 - **Tooltip placement:** `tooltipPlacement` defaults to `top`.
+- **Tooltip delay:** `tooltipDelay` is the hover delay of the label tooltip (default `300` ms, as Tooltip's `delay`); `0` opens it at once, for toolbars.
+
+<Canvas of={Stories.InstantTooltipForToolbars} />
+
 - **Current item:** `aria-current` (for example `"page"`) is set on the element, whether it is a button or, with `href`, a link.
 - **Everything else** works as in Button: `type` defaults to `button`.
 

@@ -12,7 +12,7 @@ import {
 import { ButtonBase, type ButtonBaseProps } from "../../foundations/ButtonBase/ButtonBase.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
 import { iconSizeFor } from "../../foundations/icon-size.js";
-import { LinkBase } from "../../foundations/LinkBase/LinkBase.js";
+import { anchor, type RenderLink } from "../../foundations/LinkBase/LinkBase.js";
 import type { IconData } from "../../icons/types.js";
 import type { DenseSize, Tone } from "../../tokens/schema.js";
 import { LoadingDots } from "../LoadingDots/LoadingDots.js";
@@ -86,6 +86,11 @@ export interface ButtonProps extends Omit<ButtonBaseProps, "children" | "classNa
   /** With `href`: receives the link element (the forwarded ref is for the button element). */
   linkRef?: Ref<HTMLAnchorElement> | undefined;
   /**
+   * With `href`: render the link with your router, `(props) => <RouterLink {...props} to={props.href} />`, as Link's
+   * `renderLink`; it receives this component's class, data attributes and handlers. Default: a plain link.
+   */
+  renderLink?: RenderLink | undefined;
+  /**
    * Square: as wide as it is tall, with no padding, for one icon as the content. Prefer IconButton, which sets it and
    * adds the required label and its tooltip. Default false.
    */
@@ -129,6 +134,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
     href,
     target,
     linkRef,
+    renderLink,
     square = false,
     confirm,
     keepFocus = false,
@@ -150,8 +156,12 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
     setArmed(false);
   };
   useEffect(() => () => clearTimeout(timer.current), []);
+  // A caller's `aria-disabled` and `aria-busy` are kept and merged with the button's own (disabled with a reason:
+  // it stays focusable and its description can say why).
+  const ariaOff = loading || rest["aria-disabled"] === true || rest["aria-disabled"] === "true";
+  const busy = loading || rest["aria-busy"] === true || rest["aria-busy"] === "true";
   const press = (event: MouseEvent<HTMLButtonElement>) => {
-    if (loading) return event.preventDefault();
+    if (ariaOff) return event.preventDefault();
     if (confirm !== undefined && !armed) {
       setArmed(true);
       clearTimeout(timer.current);
@@ -170,6 +180,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
     "data-full": fullWidth ? "" : undefined,
     "data-square": square ? "" : undefined,
     "data-loading": loading ? "" : undefined,
+    "data-disabled": ariaOff && !loading ? "" : undefined,
     "data-armed": armed ? "" : undefined,
     style: color ? ({ "--_tone": color, ...rest.style } as CSSProperties) : rest.style,
   };
@@ -184,28 +195,25 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
     </>
   );
   if (href !== undefined)
-    return (
-      <LinkBase
-        ref={linkRef}
-        href={href}
-        target={target}
-        {...shared}
-        id={rest.id}
-        data-testid={rest["data-testid"]}
-        aria-label={rest["aria-label"]}
-        aria-current={rest["aria-current"]}
-        onClick={onClick as unknown as (e: MouseEvent<HTMLAnchorElement>) => void}
-      >
-        {content}
-      </LinkBase>
-    );
+    return anchor(renderLink, {
+      ref: linkRef,
+      href,
+      target,
+      ...shared,
+      id: rest.id,
+      "data-testid": rest["data-testid"],
+      "aria-label": rest["aria-label"],
+      "aria-current": rest["aria-current"],
+      onClick: onClick as unknown as (e: MouseEvent<HTMLAnchorElement>) => void,
+      children: content,
+    });
   return (
     <ButtonBase
       ref={ref}
       {...rest}
       {...shared}
-      aria-busy={loading || undefined}
-      aria-disabled={loading || undefined}
+      aria-busy={busy || undefined}
+      aria-disabled={ariaOff || undefined}
       onClick={press}
       onMouseDown={keepFocus ? (event) => event.preventDefault() : rest.onMouseDown}
       onPointerDown={(event) => {

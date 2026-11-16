@@ -21,6 +21,7 @@ import { zap } from "@arshad-shah/cynosure/icons";
 | `variant`             | `soft`   | `soft` (tinted fill) · `solid` (full tone) · `outline` (tinted border, surface)  |
 | `shape`               | `square` | `square` (radius from the theme's radius factor) · `circle`                      |
 | `className` / `style` | –        | Layout only                                                                      |
+| `id`, `data-*`, `ref` | –        | Set on the root element (a link target, test or state hooks)                     |
 
 The forwarded ref is the root `span`.
 

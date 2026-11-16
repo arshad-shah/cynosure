@@ -371,3 +371,20 @@ export const StableUnderHostileHostWithTiles: Story = {
     }
   },
 };
+
+export const NamedByAHeading: Story = {
+  render: (args) => (
+    <section>
+      <h3 id="fruit-heading">Fruit to buy</h3>
+      <List {...args} aria-labelledby="fruit-heading" id="fruit" data-state="ready" />
+    </section>
+  ),
+  play: async ({ canvas }) => {
+    // The heading names the list, and the id and data-* reach the list element.
+    const list = canvas.getByRole("list", { name: "Fruit to buy" });
+    await expect(list).toHaveAttribute("aria-labelledby", "fruit-heading");
+    await expect(list).not.toHaveAttribute("aria-label");
+    await expect(list).toHaveAttribute("id", "fruit");
+    await expect(list).toHaveAttribute("data-state", "ready");
+  },
+};

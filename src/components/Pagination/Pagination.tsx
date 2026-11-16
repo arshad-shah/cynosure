@@ -2,6 +2,7 @@ import { type CSSProperties, forwardRef, type MouseEvent, useRef } from "react";
 import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js";
 import { useControllableState } from "../../foundations/controllable.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
+import type { RenderLink } from "../../foundations/LinkBase/LinkBase.js";
 import { clamp } from "../../foundations/math.js";
 import { chevronFirst } from "../../icons/chevron-first.js";
 import { chevronLast } from "../../icons/chevron-last.js";
@@ -109,6 +110,11 @@ export interface PaginationProps {
    * `onChange` still fires on a plain click.
    */
   getHref?: ((page: number) => string) | undefined;
+  /**
+   * With `getHref`: render the page links with your router, `(props) => <RouterLink {...props} to={props.href} />`,
+   * as Link's `renderLink` (pages, previous, next, first and last). Default: plain links.
+   */
+  renderLink?: RenderLink | undefined;
   /** Disables every control. Default false. */
   disabled?: boolean;
   /** Height and text size of the controls. Default "md". */
@@ -133,6 +139,7 @@ export const Pagination = forwardRef<HTMLElement, PaginationProps>(function Pagi
     variant = "pages",
     showEdges = false,
     getHref,
+    renderLink,
     disabled = false,
     size = "md",
     labels,
@@ -183,6 +190,7 @@ export const Pagination = forwardRef<HTMLElement, PaginationProps>(function Pagi
           flipRtl
           disabled={off}
           href={hrefTo(to, off)}
+          renderLink={renderLink}
           onClick={go(to)}
         />
       </li>
@@ -225,6 +233,7 @@ export const Pagination = forwardRef<HTMLElement, PaginationProps>(function Pagi
                   aria-current={item === current ? "page" : undefined}
                   disabled={disabled}
                   href={hrefTo(item, disabled)}
+                  renderLink={renderLink}
                   onClick={go(item)}
                 >
                   {item}

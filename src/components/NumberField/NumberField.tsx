@@ -6,10 +6,22 @@ import { HiddenValue } from "../../foundations/HiddenValue/HiddenValue.js";
 import { ariaNumber, clamp, plainNumber, roundLike, snapToStep } from "../../foundations/math.js";
 import { minus } from "../../icons/minus.js";
 import { plus } from "../../icons/plus.js";
+import type { IconData } from "../../icons/types.js";
 import type { Size } from "../../tokens/schema.js";
 import type { FieldLayoutProps } from "../Field/Field.js";
 import { IconButton } from "../IconButton/IconButton.js";
 import { TextField } from "../TextField/TextField.js";
+
+export interface NumberFieldTokens {
+  /** Colour of the `unit` text after the number. Default --cy-color-muted. */
+  unitColor: string;
+}
+
+declare module "../../tokens/schema.js" {
+  interface ComponentTokens {
+    numberField: NumberFieldTokens;
+  }
+}
 
 export interface NumberFieldLabels {
   /** Stepper button names. Defaults: "Decrease", "Increase". */
@@ -30,8 +42,32 @@ export interface NumberFieldProps extends FieldLayoutProps {
   value?: number | null | undefined;
   /** Starting value when uncontrolled; `null` is empty. */
   defaultValue?: number | null;
-  /** Called with the new value when it is committed: a step, Enter, or leaving the field. */
+  /**
+   * Called with the new value when it is committed: a step, Enter, or leaving the field; with `commit="input"` also
+   * while typing.
+   */
   onChange?: ((value: number | null) => void) | undefined;
+  /**
+   * When typed text becomes the value. `"blur"`: on Enter or leaving the field. `"input"`: also as it is typed, each
+   * time the text reads as a number within `min` and `max` (a live preview), and as `null` when it is emptied unless
+   * the field is `required`; the text is left as typed until Enter or leaving the field, which clamp and rewrite it
+   * as before. Steps commit at once either way. Default "blur".
+   */
+  commit?: "blur" | "input" | undefined;
+  /**
+   * Text after the number, inside the field ("px", "ms", "×"), for a unit `formatOptions` cannot write. It is not part
+   * of the typed text, and is read with the value ("12 px").
+   */
+  unit?: string | undefined;
+  /** Icon of the decrease stepper. Default: minus. */
+  decrementIcon?: IconData | undefined;
+  /** Icon of the increase stepper. Default: plus. */
+  incrementIcon?: IconData | undefined;
+  /**
+   * Make the − and + buttons Tab stops (each shows its name as a tooltip on focus); pressing one keeps focus on it.
+   * Default false: the field is one Tab stop, as in the APG spinbutton, and a press returns focus to the input.
+   */
+  steppersFocusable?: boolean | undefined;
   /** Smallest value. Typed and stepped values are kept at or above it, and Home jumps to it. */
   min?: number | undefined;
   /** Largest value. Typed and stepped values are kept at or below it, and End jumps to it. */
@@ -69,6 +105,12 @@ export interface NumberFieldProps extends FieldLayoutProps {
    * mid-drag puts it back. The keys and the steppers still work as before.
    */
   scrub?: boolean;
+  /** Id of the input; the label, description and error ids are built from it. Default: generated. */
+  id?: string | undefined;
+  /** Ids of the element(s) that name the field instead of its label (a column heading). Pair with `labelHidden`. */
+  "aria-labelledby"?: string | undefined;
+  /** Ids of more elements that describe the field, read before its own description and error. */
+  "aria-describedby"?: string | undefined;
   /** Added to the root element, for layout. */
   className?: string;
   /** Layout only. */
@@ -204,6 +246,11 @@ export function NumberField({
   locale,
   formatOptions,
   hideSteppers = false,
+  commit: commitOn = "blur",
+  unit,
+  decrementIcon = minus,
+  incrementIcon = plus,
+  steppersFocusable = false,
   name,
   form,
   required,
@@ -214,6 +261,9 @@ export function NumberField({
   variant = "outline",
   labels,
   scrub = false,
+  id,
+  "aria-labelledby": labelledBy,
+  "aria-describedby": describedBy,
   className,
   style,
 }: NumberFieldProps) {
@@ -230,19 +280,36 @@ export function NumberField({
     [locale, formatOptions],
   );
   const shown = (n: number | null) => (n === null ? "" : format.format(n));
+  const spoken = (n: number) => (unit ? `${shown(n)} ${unit}` : shown(n));
 
   const limit = (n: number) => clamp(n, min ?? Number.NEGATIVE_INFINITY, max ?? Number.POSITIVE_INFINITY);
   const commit = (next: number | null) => {
     setDraft(null);
     if (next !== current) setCurrent(next);
+    return next;
   };
-  const stepBy = (delta: number) => {
-    if (disabled || readOnly) return;
+  const stepBy = (delta: number): number | null => {
+    if (disabled || readOnly) return current;
     const base = min ?? 0;
     const from = draft !== null ? (parseNumber(draft, locale, formatOptions) ?? current) : current;
     const start = from ?? (delta > 0 ? (min ?? 0) : (max ?? 0));
     // Snap onto the step grid (counted from min), without floating-point noise (0.3, not 0.30000000000000004).
-    commit(limit(from === null ? roundLike(start, step, base) : snapToStep(start + delta, step, base)));
+    return commit(
+      limit(from === null ? roundLike(start, step, base) : snapToStep(start + delta, step, base)),
+    );
+  };
+  // commit="input": the text as typed becomes the value once it reads as a number in range; the text stays as typed.
+  const onType = (text: string) => {
+    setDraft(text);
+    if (commitOn !== "input") return;
+    // Emptied: "no value" when the field allows it; a required field keeps its value until a number is typed.
+    if (text.trim() === "") {
+      if (!required && current !== null) setCurrent(null);
+      return;
+    }
+    const parsed = parseNumber(text, locale, formatOptions);
+    if (parsed === null || parsed !== limit(parsed) || parsed === current) return;
+    setCurrent(parsed);
   };
   const commitDraft = () => {
     if (draft === null) return;
@@ -317,6 +384,9 @@ export function NumberField({
         className={className ? `cy-number-field ${className}` : "cy-number-field"}
         {...(style ? { style } : {})}
         role="spinbutton"
+        id={id}
+        aria-labelledby={labelledBy}
+        aria-describedby={describedBy}
         inputMode={integers ? "numeric" : "decimal"}
         autoComplete="off"
         autoCorrect="off"
@@ -324,44 +394,56 @@ export function NumberField({
         aria-valuenow={ariaNumber(current)}
         aria-valuemin={ariaNumber(min)}
         aria-valuemax={ariaNumber(max)}
-        aria-valuetext={current === null ? undefined : shown(current)}
+        aria-valuetext={current === null ? undefined : spoken(current)}
         required={required}
         disabled={disabled}
         readOnly={readOnly}
         placeholder={placeholder}
         form={form}
         value={draft ?? shown(current)}
-        onChange={setDraft}
+        onChange={onType}
         onKeyDown={onKeyDown}
         onBlur={commitDraft}
         addonEnd={
-          !hideSteppers && (
-            <span className="cy-number-field-steppers">
-              <IconButton
-                icon={minus}
-                label={text.decrement}
-                variant="ghost"
-                size="sm"
-                tabIndex={-1}
-                disabled={disabled || readOnly || atMin}
-                onClick={() => {
-                  stepBy(-step);
-                  input.current?.focus();
-                }}
-              />
-              <IconButton
-                icon={plus}
-                label={text.increment}
-                variant="ghost"
-                size="sm"
-                tabIndex={-1}
-                disabled={disabled || readOnly || atMax}
-                onClick={() => {
-                  stepBy(step);
-                  input.current?.focus();
-                }}
-              />
-            </span>
+          (unit || !hideSteppers) && (
+            <>
+              {unit && (
+                <span className="cy-number-field-unit" aria-hidden="true">
+                  {unit}
+                </span>
+              )}
+              {!hideSteppers && (
+                <span className="cy-number-field-steppers">
+                  <IconButton
+                    icon={decrementIcon}
+                    label={text.decrement}
+                    variant="ghost"
+                    size="sm"
+                    tabIndex={steppersFocusable ? undefined : -1}
+                    disabled={disabled || readOnly || atMin}
+                    onClick={() => {
+                      const next = stepBy(-step);
+                      // A focusable stepper keeps focus, unless it is now disabled at the limit (focus would be lost).
+                      if (!steppersFocusable || (next !== null && min !== undefined && next <= min))
+                        input.current?.focus();
+                    }}
+                  />
+                  <IconButton
+                    icon={incrementIcon}
+                    label={text.increment}
+                    variant="ghost"
+                    size="sm"
+                    tabIndex={steppersFocusable ? undefined : -1}
+                    disabled={disabled || readOnly || atMax}
+                    onClick={() => {
+                      const next = stepBy(step);
+                      if (!steppersFocusable || (next !== null && max !== undefined && next >= max))
+                        input.current?.focus();
+                    }}
+                  />
+                </span>
+              )}
+            </>
           )
         }
       />

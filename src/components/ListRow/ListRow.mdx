@@ -66,7 +66,7 @@ import { alert, play, trash } from "@arshad-shah/cynosure/icons";
 
 ## Links
 
-With `href` the row is a link (through LinkBase: unsafe schemes such as `javascript:` are not linked).
+With `href` the row is a link (through LinkBase: unsafe schemes such as `javascript:` are not linked). `renderLink` renders the link with your router's link component, with the same contract as [Link](?path=/docs/components-controls-link--docs)'s: spread the props it receives (the class, `data-*` attributes and handlers are the look and behaviour) and map `href` to the router's own prop.
 
 <Canvas of={Stories.RowsAsLinks} />
 

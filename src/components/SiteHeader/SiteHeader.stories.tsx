@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import type { ReactNode } from "react";
 import { expect, waitFor, within } from "storybook/test";
 import { computeUnderHostileHost } from "../../test/hostile.js";
+import { fakeRouter } from "../../test/router.js";
 import { shownFully } from "../../test/settle.js";
 import { Button } from "../Button/Button.js";
 import { SiteHeader, type SiteHeaderLink } from "./SiteHeader.js";
@@ -416,6 +417,50 @@ export const TouchHitAreas: Story = {
     for (const link of within(dialog).getAllByRole("link"))
       await expect(box(link).height).toBeGreaterThanOrEqual(44);
     await userEvent.keyboard("{Escape}");
+    await waitFor(() => expect(dialog.open).toBe(false));
+  },
+};
+
+export const RendersYourRoutersLinks: Story = {
+  render: (args) => {
+    const router = fakeRouter();
+    (window as unknown as { headerRouter: typeof router }).headerRouter = router;
+    return <SiteHeader {...args} renderLink={router.renderLink} />;
+  },
+  play: async ({ canvas, userEvent }) => {
+    const { visits } = (window as unknown as { headerRouter: ReturnType<typeof fakeRouter> }).headerRouter;
+    const nav = canvas.getByRole("navigation", { name: "Main" });
+    const docs = within(nav).getByRole("link", { name: "Docs" });
+    await expect(docs).toHaveAttribute("data-router", "yes");
+    await expect(docs).toHaveAttribute("href", "/app#docs");
+    await expect(docs).toHaveAttribute("aria-current", "page");
+    // The brand goes through the router too.
+    await expect(canvas.getByRole("link", { name: "Acme" })).toHaveAttribute("data-router", "yes");
+    await userEvent.click(within(nav).getByRole("link", { name: "Blog" }));
+    await expect(visits).toEqual(["#blog"]);
+  },
+};
+
+export const RendersYourRoutersLinksInTheMenu: Story = {
+  render: (args) => {
+    const router = fakeRouter();
+    (window as unknown as { menuRouter: typeof router }).menuRouter = router;
+    return (
+      <Page width={400}>
+        <SiteHeader {...args} renderLink={router.renderLink} />
+      </Page>
+    );
+  },
+  play: async ({ canvas, userEvent }) => {
+    const { visits } = (window as unknown as { menuRouter: ReturnType<typeof fakeRouter> }).menuRouter;
+    await userEvent.click(canvas.getByRole("button", { name: "Open menu" }));
+    const dialog = await openSheet();
+    await shownFully(dialog.querySelector(".cy-dialog-panel") as Element);
+    // The menu's links are the router's too, and choosing one closes the menu.
+    const pricing = within(dialog).getByRole("link", { name: "Pricing" });
+    await expect(pricing).toHaveAttribute("data-router", "yes");
+    await userEvent.click(pricing);
+    await expect(visits).toEqual(["#pricing"]);
     await waitFor(() => expect(dialog.open).toBe(false));
   },
 };

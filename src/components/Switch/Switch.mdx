@@ -37,6 +37,7 @@ import { Switch } from "@arshad-shah/cynosure";
 - **`size`:** `sm`, `md` or `lg`.
 - **`tone`:** colours the track when on: `accent` (default), `neutral`, `danger`, `success`, `warning` or `info`.
 - **`name` and `value`:** native, so the switch submits with a form.
+- **`labelHidden`, `aria-labelledby`, `aria-describedby`, `tabIndex`, `id`:** as on Checkbox: named by other elements, extra descriptions merged before its own, roving focus. `onChange(checked, event)` passes the change event too.
 
 A Switch has no `strikeWhenChecked`: that checklist style belongs to [Checkbox](?path=/docs/components-controls-checkbox--docs). A switch that is on keeps a plain label.
 

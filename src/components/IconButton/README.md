@@ -11,9 +11,10 @@ The tooltip opens on hover and keyboard focus and closes on Escape, blur or poin
 | Prop               | Default | Notes                                                                                                       |
 | ------------------ | ------- | ----------------------------------------------------------------------------------------------------------- |
 | `tooltipPlacement` | `top`   | Where the label tooltip appears                                                                             |
+| `tooltipDelay`     | `300`   | Hover delay of the label tooltip in ms; `0` opens it at once (a toolbar)                                    |
 | `flipRtl`          | `false` | The icon points along the reading direction (previous, next): mirrored in right-to-left text                |
 | `iconColor`        | –       | Any CSS colour for the icon (a status shown for a moment, as CopyButton does)                               |
 | `wrapperClassName` | –       | Added to the element around the button (the tooltip's anchor, the box the parent lays out), for layout only |
 | `className`        | –       | Added to the button itself, for layout only                                                                 |
 
-`aria-current` (for example `"page"`) is set on the element whether it is a button or, with `href`, a link.
+`aria-current` (for example `"page"`) is set on the element whether it is a button or, with `href`, a link. With `href`, `renderLink` renders the link with your router, as on Button.

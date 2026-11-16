@@ -58,6 +58,9 @@ import { Choice, ChoiceBase } from "@arshad-shah/cynosure";
 
 - **Name and description:** the label names the input and the description is linked with `aria-describedby`.
 - **Forms:** the input is native, so `FormData`, reset and `required` work as the browser does them.
+- **Named and described from outside:** `aria-labelledby` names the input by other elements (a column heading) instead of its label; pair it with `labelHidden`, which keeps the label for assistive tech but takes no space. Your `aria-describedby` ids are read before the description.
+- **Roving focus:** `tabIndex={-1}` reaches the input, for a grid or list that moves focus itself.
+- **The change event:** `onChange(checked, event)`. The event's `nativeEvent` is the click that toggled the input, so `event.nativeEvent.shiftKey` tells a Shift+click (select a range of rows) from a plain one.
 - **Disabled:** the input is disabled and the row is dimmed with a not-allowed cursor.
 - **Done style:** the checked state is what is announced; the strike only shows it. In forced colours the strike stays, in the system text colour; under reduced motion the change is instant (no transition), but the muted colour and strike still apply.
 

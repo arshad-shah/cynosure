@@ -26,6 +26,7 @@ import { Button, SiteHeader, ThemeToggle } from "@arshad-shah/cynosure";
 | --------------------- | --------- | -------------------------------------------------------------------------------------------------------- |
 | `brand`               | –         | Logo or site name at the inline start                                                                    |
 | `brandHref`           | `/`       | Where the brand links; `false` for no link                                                               |
+| `renderLink`          | –         | Render the brand and navigation links with your router, in the bar and the narrow menu (Link's contract) |
 | `nav`                 | `[]`      | `{ label, href, current? }[]`; `current` sets `aria-current="page"`                                      |
 | `actions`             | –         | Controls at the inline end; they stay in the bar at every width                                          |
 | `sticky`              | `true`    | Stays at the top of the window, over a blurred view of the page                                          |

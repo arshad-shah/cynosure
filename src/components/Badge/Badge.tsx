@@ -1,4 +1,5 @@
-import type { CSSProperties, ReactNode } from "react";
+import { type CSSProperties, forwardRef, type ReactNode } from "react";
+import type { RootAttributes } from "../../foundations/attributes.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
 import type { IconData } from "../../icons/types.js";
 import type { Size, Tone } from "../../tokens/schema.js";
@@ -15,7 +16,7 @@ declare module "../../tokens/schema.js" {
   }
 }
 
-interface BadgeBaseProps {
+interface BadgeBaseProps extends RootAttributes {
   /** Semantic colour. Default "neutral". */
   tone?: Tone;
   /** Fill style. Default "soft". */
@@ -58,22 +59,28 @@ export type BadgeProps = BadgeBaseProps &
   );
 
 /** Small status or category label in the mono "eyebrow" style; without text, a status dot. */
-export function Badge({
-  children,
-  tone = "neutral",
-  variant = "soft",
-  size = "md",
-  icon,
-  color,
-  dot,
-  label,
-  className,
-  style,
-}: BadgeProps) {
+export const Badge = forwardRef<HTMLSpanElement, BadgeProps>(function Badge(
+  {
+    children,
+    tone = "neutral",
+    variant = "soft",
+    size = "md",
+    icon,
+    color,
+    dot,
+    label,
+    className,
+    style,
+    ...rest
+  },
+  ref,
+) {
   // Without text it is a status dot: an image named by `label`, or decoration without one.
   const alone = children == null;
   return (
     <span
+      ref={ref}
+      {...rest}
       className={`cy-badge${className ? ` ${className}` : ""}`}
       {...(alone ? (label ? { role: "img", "aria-label": label } : { "aria-hidden": true }) : {})}
       data-dot-only={alone ? "" : undefined}
@@ -94,4 +101,4 @@ export function Badge({
       {children}
     </span>
   );
-}
+});

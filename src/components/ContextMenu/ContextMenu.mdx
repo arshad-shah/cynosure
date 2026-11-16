@@ -51,6 +51,33 @@ For the rows of a list or the tabs of a tab list, use one ContextMenu for all of
 
 <Canvas of={Stories.OneMenuForManyTargets} />
 
+## Opened by the app, at a point
+
+Things drawn on a canvas have no element each to spread target props onto. The app finds the object itself (the one under a right-click, or the selected one for Shift+F10) and opens the menu for it: `open` controls it, `anchor` places it at a point (`{ x, y }` in client coordinates, such as the event's `clientX` and `clientY`; or any element or virtual anchor), and `label` and `items` are the ones for that object. `onOpenChange(false)` reports Escape, a choice, Tab or an outside press. Focus returns to what had it when the menu opened (the canvas). `children` is optional here; with a target as well, a menu the app opens without `anchor` sits under the target, and a right-click asks to open through `onOpenChange(true)`.
+
+```tsx
+const [menu, setMenu] = useState<{ shape: Shape; x: number; y: number } | null>(null);
+
+<canvas
+  onContextMenu={(e) => {
+    const shape = shapeAt(e.clientX, e.clientY);
+    if (!shape) return;
+    e.preventDefault();
+    setMenu({ shape, x: e.clientX, y: e.clientY });
+  }}
+/>
+<ContextMenu
+  open={menu !== null}
+  anchor={menu ?? undefined}
+  onOpenChange={(open) => !open && setMenu(null)}
+  label={menu ? `${menu.shape.name} actions` : ""}
+  items={shapeCommands}
+  onSelect={(command) => run(command, menu?.shape)}
+/>
+```
+
+<Canvas of={Stories.OpenedByTheAppAtAPoint} />
+
 ## Coloured icons
 
 Because the item type is Menu's, `iconTone` and `iconColor` colour an item's icon here as well, with the meaning of [Icon](?path=/docs/foundations-icon--docs)'s `tone` and `color`. Icons without them stay muted, and a disabled item shows its icon muted.
@@ -70,7 +97,7 @@ Because the item type is Menu's, `iconTone` and `iconColor` colour an item's ico
 | Long press (500ms) on touch    | Opens at the finger; a tap or a scroll does not           |
 | Arrow keys, Home, End, letters | Move through items (as in Menu)                           |
 | Enter / Space                  | Run the item and close                                    |
-| Escape, Tab, click outside     | Close; focus returns to the target                        |
+| Escape, Tab, click outside     | Close; focus returns to the target (or, opened by the app, to what had focus) |
 
 - The target gets `aria-keyshortcuts="Shift+F10"`. Mention the menu in the target's description if it holds commands found nowhere else.
 - Near the edges of the window the menu flips to stay on screen.

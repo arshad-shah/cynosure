@@ -14,17 +14,18 @@ One choice from a short list, on native radios: arrow keys move and select (wrap
 />;
 ```
 
-| Prop                                         | Default         | Notes                                                                              |
-| -------------------------------------------- | --------------- | ---------------------------------------------------------------------------------- |
-| `label` / `description` / `error`            | –               | Group label through `Field`                                                        |
-| `labelHidden`                                | `false`         | Visually hides the group label; it still names the group. Prefer visible labels    |
-| `options`                                    | –               | `{ value, label, description?, disabled?, media? }[]`; `media` is a card's picture |
-| `value` / `defaultValue` / `onChange(value)` | –               | Controlled or uncontrolled                                                         |
-| `orientation`                                | `vertical`      | `vertical` · `horizontal` (lists only)                                             |
-| `variant`                                    | `list`          | `list` · `card`: picture cards in a grid                                           |
-| `columns`                                    | `2`             | Cards per row; a narrow container wraps to fewer                                   |
-| `size` / `tone`                              | `md` / `accent` | Shared vocabulary                                                                  |
-| `name`, `required`, `disabled`               | –               | Native                                                                             |
+| Prop                                         | Default         | Notes                                                                                   |
+| -------------------------------------------- | --------------- | --------------------------------------------------------------------------------------- |
+| `label` / `description` / `error`            | –               | Group label through `Field`                                                             |
+| `labelHidden`                                | `false`         | Visually hides the group label; it still names the group. Prefer visible labels         |
+| `aria-describedby`                           | –               | Ids of more elements that describe the group, read before its own description and error |
+| `options`                                    | –               | `{ value, label, description?, disabled?, media? }[]`; `media` is a card's picture      |
+| `value` / `defaultValue` / `onChange(value)` | –               | Controlled or uncontrolled                                                              |
+| `orientation`                                | `vertical`      | `vertical` · `horizontal` (lists only)                                                  |
+| `variant`                                    | `list`          | `list` · `card`: picture cards in a grid                                                |
+| `columns`                                    | `2`             | Cards per row; a narrow container wraps to fewer                                        |
+| `size` / `tone`                              | `md` / `accent` | Shared vocabulary                                                                       |
+| `name`, `required`, `disabled`               | –               | Native                                                                                  |
 
 ## Cards
 

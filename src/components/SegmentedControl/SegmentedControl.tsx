@@ -1,9 +1,10 @@
-import { type CSSProperties, useId } from "react";
+import { type CSSProperties, type KeyboardEvent, useId } from "react";
 import { ChoiceBase } from "../../foundations/ChoiceBase/ChoiceBase.js";
 import { useControllableState } from "../../foundations/controllable.js";
 import { HiddenValue } from "../../foundations/HiddenValue/HiddenValue.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
 import { iconSizeFor } from "../../foundations/icon-size.js";
+import { seekEnabled } from "../../foundations/listbox.js";
 import type { IconData } from "../../icons/types.js";
 import type { DenseSize, Tone } from "../../tokens/schema.js";
 
@@ -85,6 +86,21 @@ export function SegmentedControl({
     defaultValue,
     onChange,
   );
+  // The arrows are the native radios' own; Home and End jump to the first and last segment that can be chosen.
+  const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (disabled || (event.key !== "Home" && event.key !== "End")) return;
+    if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
+    const usable = (i: number) => !options[i]?.disabled;
+    const index =
+      event.key === "Home"
+        ? seekEnabled(options.length, -1, 1, usable)
+        : seekEnabled(options.length, options.length, -1, usable);
+    const option = options[index];
+    if (!option) return;
+    event.preventDefault();
+    (event.currentTarget.querySelector(`[id="${groupName}-${option.value}"]`) as HTMLElement | null)?.focus();
+    if (option.value !== current) setCurrent(option.value);
+  };
   return (
     <div
       role="radiogroup"
@@ -95,6 +111,7 @@ export function SegmentedControl({
       data-full={fullWidth ? "" : undefined}
       data-icon-only={iconOnly ? "" : undefined}
       style={style}
+      onKeyDown={onKeyDown}
     >
       {/* Always present, so a form's reset restores the default; it submits only when there is a name and a value. */}
       <HiddenValue

@@ -1,4 +1,5 @@
-import type { CSSProperties, ReactNode } from "react";
+import { type CSSProperties, forwardRef, type ReactNode } from "react";
+import type { RootAttributes } from "../../foundations/attributes.js";
 import type { Size } from "../../tokens/schema.js";
 
 export interface DescriptionListTokens {
@@ -24,7 +25,7 @@ export interface DescriptionItem {
   detail: ReactNode | ReactNode[];
 }
 
-export interface DescriptionListProps {
+export interface DescriptionListProps extends RootAttributes {
   /** The terms and their details, in order. */
   items: DescriptionItem[];
   /**
@@ -43,16 +44,14 @@ export interface DescriptionListProps {
 }
 
 /** Term and detail pairs: settings summaries, metadata, the facts about a record. */
-export function DescriptionList({
-  items,
-  layout = "auto",
-  divided = false,
-  size = "md",
-  className,
-  style,
-}: DescriptionListProps) {
+export const DescriptionList = forwardRef<HTMLDivElement, DescriptionListProps>(function DescriptionList(
+  { items, layout = "auto", divided = false, size = "md", className, style, ...rest },
+  ref,
+) {
   return (
     <div
+      ref={ref}
+      {...rest}
       className={className ? `cy-description-list ${className}` : "cy-description-list"}
       data-layout={layout}
       data-size={size}
@@ -76,4 +75,4 @@ export function DescriptionList({
       </dl>
     </div>
   );
-}
+});

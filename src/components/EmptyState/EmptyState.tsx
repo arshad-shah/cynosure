@@ -1,4 +1,5 @@
-import { type CSSProperties, createElement, type ReactNode } from "react";
+import { type CSSProperties, createElement, forwardRef, type ReactNode } from "react";
+import type { RootAttributes } from "../../foundations/attributes.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
 import type { IconData } from "../../icons/types.js";
 import type { Size } from "../../tokens/schema.js";
@@ -15,7 +16,7 @@ declare module "../../tokens/schema.js" {
   }
 }
 
-export interface EmptyStateProps {
+export interface EmptyStateProps extends RootAttributes {
   /** A Facet icon shown above the title (decorative). */
   icon?: IconData | undefined;
   /** The heading: what is empty or missing. */
@@ -38,18 +39,14 @@ export interface EmptyStateProps {
 }
 
 /** What to show where content will be: no items yet, no search results, nothing selected. */
-export function EmptyState({
-  icon,
-  title,
-  description,
-  actions,
-  headingLevel = 3,
-  size = "md",
-  className,
-  style,
-}: EmptyStateProps) {
+export const EmptyState = forwardRef<HTMLDivElement, EmptyStateProps>(function EmptyState(
+  { icon, title, description, actions, headingLevel = 3, size = "md", className, style, ...rest },
+  ref,
+) {
   return (
     <div
+      ref={ref}
+      {...rest}
       className={className ? `cy-empty-state ${className}` : "cy-empty-state"}
       data-size={size}
       style={style}
@@ -64,4 +61,4 @@ export function EmptyState({
       {actions && <div className="cy-empty-state-actions cy-reset">{actions}</div>}
     </div>
   );
-}
+});

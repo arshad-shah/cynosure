@@ -1,11 +1,11 @@
-import { type CSSProperties, forwardRef, type MouseEvent, useRef } from "react";
+import { type CSSProperties, forwardRef, type MouseEvent, type ReactElement, useRef } from "react";
 import { Icon } from "../../foundations/Icon/Icon.js";
 import { chevronRight } from "../../icons/chevron-right.js";
 import { moreHorizontal } from "../../icons/more-horizontal.js";
 import type { IconData } from "../../icons/types.js";
 import { Button } from "../Button/Button.js";
 import { IconButton } from "../IconButton/IconButton.js";
-import { Link } from "../Link/Link.js";
+import { Link, type LinkRenderProps } from "../Link/Link.js";
 import { Menu } from "../Menu/Menu.js";
 
 export interface BreadcrumbsTokens {
@@ -50,6 +50,12 @@ export interface BreadcrumbsProps {
   /** Text size. Default "md". */
   size?: "sm" | "md";
   /**
+   * Render the crumbs' links with your router: `(props) => <RouterLink {...props} to={props.href} />`, as Link's
+   * `renderLink` (it is handed to each crumb's Link, so the router's element keeps the crumb's look). A crumb chosen
+   * from the menu of hidden items is a click on that element. Default: a plain link.
+   */
+  renderLink?: ((props: LinkRenderProps) => ReactElement) | undefined;
+  /**
    * Replace the built-in English text: `nav` names the landmark (default "Breadcrumb"), `more` names the button and
    * the menu of hidden items (default "Show the full path").
    */
@@ -62,7 +68,7 @@ export interface BreadcrumbsProps {
 
 /** The trail from the top of a site or app to the current page (APG breadcrumb): links, then the current page. */
 export const Breadcrumbs = forwardRef<HTMLElement, BreadcrumbsProps>(function Breadcrumbs(
-  { items, maxItems, separator = chevronRight, size = "md", labels, className, style },
+  { items, maxItems, separator = chevronRight, size = "md", renderLink, labels, className, style },
   ref,
 ) {
   const list = useRef<HTMLOListElement>(null);
@@ -94,6 +100,7 @@ export const Breadcrumbs = forwardRef<HTMLElement, BreadcrumbsProps>(function Br
             tone="neutral"
             size={size}
             className="cy-breadcrumbs-link"
+            renderLink={renderLink}
             {...(item.onClick ? { onClick: item.onClick } : {})}
           >
             {content}

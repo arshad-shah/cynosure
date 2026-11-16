@@ -324,13 +324,42 @@ describe("cy new component", () => {
   });
 });
 
+describe("cy new icon duplicates", () => {
+  it("refuses an icon that draws the same as an existing one, naming it", () => {
+    const root = sandbox();
+    const svg = '<svg viewBox="0 0 24 24"><path d="m6.5 6.5 11 11m0-11-11 11"/></svg>';
+    expect(() => scaffoldIcon(root, "cross-mark", svg, "actions")).toThrow(
+      /same as the existing icon "close"/,
+    );
+    expect(existsSync(join(root, "src/icons/cross-mark.ts"))).toBe(false);
+  });
+});
+
 describe("sortExports", () => {
   it("keeps multi-line export statements intact while sorting", () => {
     const input =
       'export { Zed } from "./z.js";\nexport {\n  Alpha,\n  type AlphaProps,\n} from "./a.js";\nexport * from "./theme/index.js";\n';
     expect(sortExports(input)).toBe(
-      'export {\n  Alpha,\n  type AlphaProps,\n} from "./a.js";\nexport { Zed } from "./z.js";\nexport * from "./theme/index.js";\n',
+      'export {\n  Alpha,\n  type AlphaProps,\n} from "./a.js";\nexport * from "./theme/index.js";\nexport { Zed } from "./z.js";\n',
     );
+  });
+
+  it("orders exports by module source exactly as Biome does", () => {
+    // The old comparison (whole statements, localeCompare) put bookmark before bookMarked and
+    // chevronsUpDown before chevronUp, which `pnpm lint` then rejected.
+    const sorted =
+      'export { bookMarked } from "./book-marked.js";\nexport { bookmark } from "./bookmark.js";\n' +
+      'export { chevronUp } from "./chevron-up.js";\nexport { chevronsUpDown } from "./chevrons-up-down.js";\n';
+    const old =
+      'export { bookmark } from "./bookmark.js";\nexport { bookMarked } from "./book-marked.js";\n' +
+      'export { chevronsUpDown } from "./chevrons-up-down.js";\nexport { chevronUp } from "./chevron-up.js";\n';
+    expect(sortExports(old)).toBe(sorted);
+    expect(sortExports(sorted)).toBe(sorted);
+  });
+
+  it("leaves the real icon entry unchanged (it is already lint-clean)", () => {
+    const facet = readFileSync(join(repo, "src/icons/facet.ts"), "utf8");
+    expect(sortExports(facet)).toBe(facet);
   });
 });
 

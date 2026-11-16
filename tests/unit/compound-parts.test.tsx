@@ -34,3 +34,20 @@ describe("ListRow", () => {
     quiet.mockRestore();
   });
 });
+
+describe("Table parts", () => {
+  it("explain when used outside <Table> or outside a section", async () => {
+    const { TableBody, TableCell, TableFoot, TableHead, TableHeaderCell, TableRow } = await import(
+      "../../src/components/Table/Table"
+    );
+    const quiet = vi.spyOn(console, "error").mockImplementation(() => {});
+    expect(() => render(<TableHead />)).toThrow("<TableHead> must be inside <Table>");
+    expect(() => render(<TableBody />)).toThrow("<TableBody> must be inside <Table>");
+    expect(() => render(<TableFoot />)).toThrow("<TableFoot> must be inside <Table>");
+    const inside = "must be inside <TableHead>, <TableBody> or <TableFoot>";
+    expect(() => render(<TableRow />)).toThrow(`<TableRow> ${inside}`);
+    expect(() => render(<TableHeaderCell />)).toThrow(`<TableHeaderCell> ${inside}`);
+    expect(() => render(<TableCell />)).toThrow(`<TableCell> ${inside}`);
+    quiet.mockRestore();
+  });
+});

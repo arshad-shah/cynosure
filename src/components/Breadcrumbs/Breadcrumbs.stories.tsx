@@ -5,6 +5,7 @@ import * as icons from "../../icons/index.js";
 import { arrowRight, file, folder, home } from "../../icons/index.js";
 import { computeUnderHostileHost } from "../../test/hostile.js";
 import { shownFully } from "../../test/settle.js";
+import type { LinkRenderProps } from "../Link/Link.js";
 import { type BreadcrumbItem, Breadcrumbs } from "./Breadcrumbs.js";
 
 const iconMapping: Record<string, unknown> = {};
@@ -534,5 +535,45 @@ export const StableUnderHostileHost: Story = {
     const before = nav.getBoundingClientRect().height;
     const { hostile } = computeUnderHostileHost(canvasElement, ".cy-breadcrumbs", ["height"]);
     await expect(Number.parseFloat(hostile.height as string)).toBeCloseTo(before, 0);
+  },
+};
+
+const routed = fn();
+export const RendersYourRoutersLinks: Story = {
+  args: {
+    items: deep,
+    maxItems: 3,
+    renderLink: ({ href, ...props }: LinkRenderProps) => (
+      <a
+        {...props}
+        href={`/app${href}`}
+        data-router="yes"
+        onClick={(event) => {
+          props.onClick?.(event);
+          event.preventDefault();
+          routed(href);
+        }}
+      />
+    ),
+  },
+  argTypes: { renderLink: { control: false } },
+  play: async ({ canvas, userEvent }) => {
+    routed.mockClear();
+    const home = canvas.getByRole("link", { name: "Home" });
+    await expect(home).toHaveAttribute("data-router", "yes");
+    await expect(home).toHaveAttribute("href", "/app/");
+    // The crumb keeps its look: a neutral Link, laid out as a crumb.
+    await expect(home).toHaveClass("cy-link");
+    await expect(home).toHaveClass("cy-breadcrumbs-link");
+    await userEvent.click(home);
+    await expect(routed).toHaveBeenLastCalledWith("/");
+    // A hidden crumb chosen from the menu goes through the router too.
+    await userEvent.click(canvas.getByRole("button", { name: "Show the full path" }));
+    const menu = await canvas.findByRole("menu");
+    await shownFully(menu);
+    await userEvent.click(within(menu).getByRole("menuitem", { name: "Projects" }));
+    await expect(routed).toHaveBeenLastCalledWith("/projects");
+    // The current page stays plain text.
+    await expect(canvas.getByText("Notes").closest("a")).toBeNull();
   },
 };

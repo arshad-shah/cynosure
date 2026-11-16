@@ -35,6 +35,20 @@ import { Link } from "@arshad-shah/cynosure";
 <Canvas of={Stories.ExternalAnnouncesNewTab} />
 <Canvas of={Stories.ExternalLabelOverride} />
 
+## With your router
+
+`renderLink` renders the anchor with your router's link component. It receives Link's class and data attributes (its look), `aria-current`, the click handler, the ref and the content; spread them all onto the router's link and map `href` to its own prop. An `href` with a scheme that is not allowed (`javascript:`) arrives as `undefined`, and `external` arrives as `target` and a safe `rel`. Breadcrumbs takes the same `renderLink` for its crumbs; SideNav has its own.
+
+```tsx
+import { Link as RouterLink } from "react-router";
+
+<Link href="/settings" renderLink={({ href, ...props }) => <RouterLink {...props} to={href ?? "/"} />}>
+  Settings
+</Link>
+```
+
+<Canvas of={Stories.RendersYourRoutersLink} />
+
 ## Tone and size
 
 `tone` defaults to `accent`; text uses each tone's readable text colour. `size` defaults to `inherit`, so the link matches the surrounding text; `sm`, `md` and `lg` set a fixed size.

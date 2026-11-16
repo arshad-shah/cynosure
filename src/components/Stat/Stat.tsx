@@ -1,4 +1,5 @@
 import { type CSSProperties, forwardRef, type MouseEventHandler, type ReactNode } from "react";
+import type { RootAttributes } from "../../foundations/attributes.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
 import { arrowDown } from "../../icons/arrow-down.js";
 import { arrowUp } from "../../icons/arrow-up.js";
@@ -57,7 +58,7 @@ export interface StatLabels {
   flat: (value: string) => string;
 }
 
-export interface StatProps {
+export interface StatProps extends RootAttributes {
   /** What is measured ("Revenue"). Read before the value. */
   label: ReactNode;
   /** The figure ("£12,400"). Digits are tabular, so stats in a row line up. */
@@ -134,6 +135,7 @@ export const Stat = forwardRef<HTMLElement, StatProps>(function Stat(
     labels,
     className,
     style,
+    ...rest
   },
   ref,
 ) {
@@ -143,6 +145,7 @@ export const Stat = forwardRef<HTMLElement, StatProps>(function Stat(
   const card = (
     <Card
       ref={ref}
+      {...rest}
       as={as}
       variant={variant}
       padding={PADDING[size]}

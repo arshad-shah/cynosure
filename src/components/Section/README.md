@@ -13,15 +13,15 @@ import { Heading, Section } from "@arshad-shah/cynosure";
 <Section variant="accent" paddingBlock="10" size="md">…call to action…</Section>
 ```
 
-| Prop                                          | Default                             | Notes                                                            |
-| --------------------------------------------- | ----------------------------------- | ---------------------------------------------------------------- |
-| `variant`                                     | `plain`                             | `plain` (no background) · `surface` · `soft` · `accent`          |
-| `paddingBlock`                                | `--cy-section-padding-block` (80px) | Space token for the padding above and below                      |
-| `contained`                                   | `true`                              | Content in a centred Container; `false` lets it fill the band    |
-| `size`                                        | `lg`                                | The inner Container's `size`: `sm` · `md` · `lg` · `xl` · `full` |
-| `as`                                          | `section`                           | `section` · `div` · `header` · `footer` · `aside` · `article`    |
-| `id`, `aria-labelledby`, `aria-label`, `role` | –                                   | Set on the root                                                  |
-| `className` / `style`                         | –                                   | Layout only                                                      |
+| Prop                                                                        | Default                             | Notes                                                            |
+| --------------------------------------------------------------------------- | ----------------------------------- | ---------------------------------------------------------------- |
+| `variant`                                                                   | `plain`                             | `plain` (no background) · `surface` · `soft` · `accent`          |
+| `paddingBlock`                                                              | `--cy-section-padding-block` (80px) | Space token for the padding above and below                      |
+| `contained`                                                                 | `true`                              | Content in a centred Container; `false` lets it fill the band    |
+| `size`                                                                      | `lg`                                | The inner Container's `size`: `sm` · `md` · `lg` · `xl` · `full` |
+| `as`                                                                        | `section`                           | `section` · `div` · `header` · `footer` · `aside` · `article`    |
+| `id`, `role`, `aria-*`, `data-*`, `tabIndex`, `dir`, `lang`, event handlers | –                                   | Set on the root                                                  |
+| `className` / `style`                                                       | –                                   | Layout only                                                      |
 
 The ref goes to the root element.
 

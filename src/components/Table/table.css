@@ -98,6 +98,10 @@
     background: var(--cy-table-selected-background, var(--cy-color-accent-soft));
   }
 }
+/* The compound form's footer (totals): a line above it, as the rows above lose theirs at the end of the body. */
+.cy-table-foot.cy-table-foot > :first-child > * {
+  border-block-start: var(--cy-border-width) solid var(--cy-color-line);
+}
 .cy-table-select.cy-table-select {
   inline-size: var(--cy-border-width);
   padding-inline-end: 0;

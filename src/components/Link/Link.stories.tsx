@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, fn } from "storybook/test";
 import { textContrast } from "../../test/color.js";
 import { computeUnderHostileHost } from "../../test/hostile.js";
-import { Link } from "./Link.js";
+import { Link, type LinkRenderProps } from "./Link.js";
 
 const meta = {
   title: "Components/Controls/Link",
@@ -115,5 +115,68 @@ export const UnderlineChoices: Story = {
     await expect(canvas.getByRole("link", { name: "Never" })).toHaveAttribute("aria-current", "page");
     await userEvent.tab();
     await expect(getComputedStyle(canvas.getByRole("link", { name: "Never" })).outlineStyle).toBe("solid");
+  },
+};
+
+/** Stands in for a router's link component: it renders its own anchor and takes over the click. */
+const RouterLink = ({ to, ...props }: Omit<LinkRenderProps, "href"> & { to: string }) => (
+  <a
+    {...props}
+    href={to}
+    data-router="yes"
+    onClick={(event) => {
+      props.onClick?.(event);
+      event.preventDefault();
+    }}
+  />
+);
+
+export const RendersYourRoutersLink: Story = {
+  args: {
+    href: "/docs",
+    tone: "neutral",
+    underline: "hover",
+    "aria-current": "page",
+    onClick: fn(),
+    renderLink: ({ href, ...props }) => <RouterLink {...props} to={href ?? ""} />,
+  },
+  argTypes: { renderLink: { control: false } },
+  play: async ({ args, canvas, userEvent }) => {
+    const link = canvas.getByRole("link", { name: "Read the docs" });
+    // The router's element, with Link's look and state on it.
+    await expect(link).toHaveAttribute("data-router", "yes");
+    await expect(link).toHaveAttribute("href", "/docs");
+    await expect(link).toHaveClass("cy-link");
+    await expect(link).toHaveAttribute("data-tone", "neutral");
+    await expect(link).toHaveAttribute("data-underline", "hover");
+    await expect(link).toHaveAttribute("aria-current", "page");
+    await expect(getComputedStyle(link).textDecorationLine).toBe("none");
+    await userEvent.click(link);
+    link.focus();
+    await userEvent.keyboard("{Enter}");
+    await expect(args.onClick).toHaveBeenCalledTimes(2);
+  },
+};
+
+export const RouterLinkKeepsSafetyAndExternal: Story = {
+  args: {
+    href: "javascript:alert(1)",
+    renderLink: (props) => <RouterLink {...props} to={props.href ?? "#unsafe"} />,
+  },
+  argTypes: { renderLink: { control: false } },
+  render: (args) => (
+    <>
+      <Link {...args} />{" "}
+      <Link {...args} href="https://example.com" external>
+        Elsewhere
+      </Link>
+    </>
+  ),
+  play: async ({ canvas }) => {
+    // An unsafe scheme is never handed to the router.
+    await expect(canvas.getByText("Read the docs").closest("a")).toHaveAttribute("href", "#unsafe");
+    const out = canvas.getByRole("link", { name: "Elsewhere (opens in new tab)" });
+    await expect(out).toHaveAttribute("target", "_blank");
+    await expect(out).toHaveAttribute("rel", "noopener noreferrer");
   },
 };

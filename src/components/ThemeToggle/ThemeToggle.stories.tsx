@@ -135,3 +135,18 @@ export const ReadsItsOwnKey: Story = {
     await waitFor(() => expect(canvas.getByRole("radio", { name: "Dark" })).toBeChecked());
   },
 };
+
+export const FollowsAnotherTab: Story = {
+  args: { storageKey: "cy-story-tab-mode" },
+  play: async ({ canvas }) => {
+    // Another tab saves a mode under the same key: this toggle follows, through localStorage's storage event.
+    const fromAnotherTab = (newValue: string) =>
+      window.dispatchEvent(
+        new StorageEvent("storage", { key: "cy-story-tab-mode", newValue, storageArea: localStorage }),
+      );
+    fromAnotherTab("dark");
+    await waitFor(() => expect(canvas.getByRole("radio", { name: "Dark" })).toBeChecked());
+    fromAnotherTab("light");
+    await waitFor(() => expect(canvas.getByRole("radio", { name: "Light" })).toBeChecked());
+  },
+};

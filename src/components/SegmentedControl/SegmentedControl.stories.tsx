@@ -47,6 +47,34 @@ export const ArrowKeysSelect: Story = {
   },
 };
 
+export const HomeAndEndJumpToTheEnds: Story = {
+  args: {
+    defaultValue: "b",
+    options: [
+      { value: "a", label: "Day", disabled: true },
+      { value: "b", label: "Week" },
+      { value: "c", label: "Month" },
+      { value: "d", label: "Year" },
+      { value: "e", label: "Decade", disabled: true },
+    ],
+  },
+  play: async ({ canvas, args, userEvent }) => {
+    canvas.getByRole("radio", { name: "Week" }).focus();
+    // End: the last segment that can be chosen (disabled ones are skipped), checked and focused.
+    await userEvent.keyboard("{End}");
+    await expect(canvas.getByRole("radio", { name: "Year" })).toBeChecked();
+    await expect(canvas.getByRole("radio", { name: "Year" })).toHaveFocus();
+    await expect(args.onChange).toHaveBeenLastCalledWith("d");
+    await userEvent.keyboard("{Home}");
+    await expect(canvas.getByRole("radio", { name: "Week" })).toBeChecked();
+    await expect(canvas.getByRole("radio", { name: "Week" })).toHaveFocus();
+    await expect(args.onChange).toHaveBeenLastCalledWith("b");
+    // Already there: no change is reported.
+    await userEvent.keyboard("{Home}");
+    await expect(args.onChange).toHaveBeenCalledTimes(2);
+  },
+};
+
 export const IconOnlySegmentsAreNamed: Story = {
   tags: ["visual"],
   args: {

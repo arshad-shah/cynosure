@@ -10,27 +10,34 @@ import { NumberField } from "@arshad-shah/cynosure";
   formatOptions={{ style: "currency", currency: "EUR" }} />;
 ```
 
-| Prop                                               | Default     | Notes                                                                                    |
-| -------------------------------------------------- | ----------- | ---------------------------------------------------------------------------------------- |
-| `layout` / `width`                                 | `stack` / – | `split` settings row and the control width, as on `Field`                                |
-| `value` / `defaultValue`                           | – / `null`  | A number, or `null` for empty                                                            |
-| `onChange`                                         | –           | Called when a value is committed: a step, Enter, or leaving the field                    |
-| `min` / `max`                                      | –           | Typed and stepped values are clamped; Home/End jump to them                              |
-| `step` / `largeStep`                               | `1` / 10×   | Arrows and steppers / Page Up and Down; stepped values snap to `step` counted from `min` |
-| `locale` / `formatOptions`                         | browser / – | How numbers are read and written (`Intl.NumberFormat`: currency, percent, units, digits) |
-| `hideSteppers`                                     | `false`     | Hide − and + (the keyboard still steps)                                                  |
-| `name`, `form`, `required`, `disabled`, `readOnly` | –           | Forms receive the plain number ("1234.5"), not the formatted text                        |
-| `labels`                                           | –           | `decrement` ("Decrease"), `increment` ("Increase")                                       |
+| Prop                                               | Default      | Notes                                                                                                                                                                                     |
+| -------------------------------------------------- | ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `layout` / `width`                                 | `stack` / –  | `split` settings row and the control width, as on `Field`                                                                                                                                 |
+| `id` / `aria-labelledby` / `aria-describedby`      | –            | The input's id; named by other elements instead of the label (pair with `labelHidden`); your describing ids come before its own                                                           |
+| `value` / `defaultValue`                           | – / `null`   | A number, or `null` for empty                                                                                                                                                             |
+| `onChange`                                         | –            | Called when a value is committed: a step, Enter, or leaving the field                                                                                                                     |
+| `commit`                                           | `"blur"`     | `"input"`: also applied as it is typed, whenever the text reads as a number within `min` and `max`, and as `null` when emptied unless `required` (text left as typed until Enter or blur) |
+| `min` / `max`                                      | –            | Typed and stepped values are clamped; Home/End jump to them                                                                                                                               |
+| `step` / `largeStep`                               | `1` / 10×    | Arrows and steppers / Page Up and Down; stepped values snap to `step` counted from `min`                                                                                                  |
+| `locale` / `formatOptions`                         | browser / –  | How numbers are read and written (`Intl.NumberFormat`: currency, percent, units, digits)                                                                                                  |
+| `unit`                                             | –            | Text after the number ("px", "ms") for units `formatOptions` cannot write; read with the value ("12 px"), not typed                                                                       |
+| `hideSteppers`                                     | `false`      | Hide − and + (the keyboard still steps)                                                                                                                                                   |
+| `decrementIcon` / `incrementIcon`                  | minus / plus | Facet icons for the steppers                                                                                                                                                              |
+| `steppersFocusable`                                | `false`      | Steppers become Tab stops (their names show as tooltips on focus); a press keeps focus on the stepper                                                                                     |
+| `name`, `form`, `required`, `disabled`, `readOnly` | –            | Forms receive the plain number ("1234.5"), not the formatted text                                                                                                                         |
+| `labels`                                           | –            | `decrement` ("Decrease"), `increment` ("Increase")                                                                                                                                        |
 
 Also takes TextField's `label`, `labelHidden`, `description`, `error`, `placeholder`, `size` and `variant`. `parseNumber(text, locale, options)` is exported for reading numbers elsewhere; it reads whatever `Intl.NumberFormat` writes for that locale and options (other digits such as Arabic-Indic, currency, percent and unit text, accounting brackets).
 
 - `role="spinbutton"` with `aria-valuenow`, `aria-valuemin`, `aria-valuemax` and the formatted value as `aria-valuetext`.
-- Typing commits on Enter or leaving the field; unreadable text goes back to the last value; an empty field is `null`.
+- Typing commits on Enter or leaving the field (with `commit="input"`, also as it is typed, once the text reads as a number in range, and `null` once emptied unless `required`); unreadable text goes back to the last value; an empty field is `null`.
 - Percent values are typed as people say them (20 means 20%) and stored as fractions (0.2).
-- The steppers are not tab stops; their hit areas are at least 24px, 44px on touch screens.
+- The steppers are not tab stops unless `steppersFocusable`; their hit areas are at least 24px, 44px on touch screens. A focusable stepper that reaches its limit hands focus to the input.
 
 - `scrub`: drag the label sideways to change the value, as design tools do: one `step` every 4 pixels, Shift for ten; Escape mid-drag puts it back. A vertical swipe still scrolls on touch screens.
 
 ## Tokens
 
-Uses TextField's tokens (`--cy-text-field-*`).
+Uses TextField's tokens (`--cy-text-field-*`), and:
+
+- `--cy-number-field-unit-color`: colour of the `unit` text. Default `--cy-color-muted`.

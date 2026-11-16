@@ -3,6 +3,7 @@ import { type CSSProperties, createRef } from "react";
 import { expect, userEvent } from "storybook/test";
 import { textContrast } from "../../test/color.js";
 import { computeUnderHostileHost } from "../../test/hostile.js";
+import { ROOT_ATTRIBUTES, rootAttributesStory } from "../../test/root-attributes.js";
 import { TextField } from "../TextField/TextField.js";
 import { Text } from "./Text.js";
 
@@ -686,3 +687,12 @@ export const StableUnderHostileHost: Story = {
     await expect(hostile).toEqual({ "text-transform": "uppercase", "font-weight": "900" });
   },
 };
+
+export const PassesIdDataAndRef: Story = rootAttributesStory<HTMLElement>(
+  (ref) => (
+    <Text ref={ref} {...ROOT_ATTRIBUTES}>
+      Body copy
+    </Text>
+  ),
+  "cy-text",
+);

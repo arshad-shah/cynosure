@@ -51,6 +51,7 @@ import { mail } from "@arshad-shah/cynosure/icons";
 - **`iconStart` and `iconEnd`:** icons at either edge, flipped in right-to-left layouts.
 - **`addonStart` and `addonEnd`:** controls inside the field before or after the input (ColorField's swatch button, NumberField's steppers).
 - **`labelHidden`:** hides the label visually while it still names the field. Prefer a visible label.
+- **Named and described from outside:** `aria-labelledby` names the field by other elements (a column heading) instead of its label; pair it with `labelHidden`. Your `aria-describedby` ids are read first, then the field's own description and error: they are merged, never replaced.
 - Native input attributes such as `name`, `required`, `readOnly`, `maxLength`, `autoComplete` and `inputMode` pass through.
 
 ## Props

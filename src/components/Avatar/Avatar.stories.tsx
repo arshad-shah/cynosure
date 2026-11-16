@@ -6,6 +6,7 @@ import { expect, userEvent, waitFor } from "storybook/test";
 import { folder, user } from "../../icons/index.js";
 import { textContrast } from "../../test/color.js";
 import { computeUnderHostileHost } from "../../test/hostile.js";
+import { ROOT_ATTRIBUTES, rootAttributesStory } from "../../test/root-attributes.js";
 import { Button } from "../Button/Button.js";
 import { Avatar, AvatarGroup } from "./Avatar.js";
 
@@ -700,3 +701,8 @@ export const MissingPictureWithoutScript: Story = {
     await expect(img.naturalWidth).toBe(0);
   },
 };
+
+export const PassesIdDataAndRef: Story = rootAttributesStory<HTMLSpanElement>(
+  (ref) => <Avatar ref={ref} {...ROOT_ATTRIBUTES} name="Ada Lovelace" />,
+  "cy-avatar",
+);

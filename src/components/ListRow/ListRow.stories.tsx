@@ -8,6 +8,7 @@ import { createStyleSheet } from "../../styles/inline.js";
 import { rgb } from "../../test/color.js";
 import { computeUnderHostileHost } from "../../test/hostile.js";
 import { realHover } from "../../test/hover.js";
+import { fakeRouter } from "../../test/router.js";
 import { shownFully } from "../../test/settle.js";
 import { Avatar } from "../Avatar/Avatar.js";
 import { Badge } from "../Badge/Badge.js";
@@ -659,5 +660,33 @@ export const WorksInsideAShadowRoot: Story = {
     await userEvent.keyboard("{ArrowRight}");
     await expect(root.activeElement).toBe(open("Two"));
     await expect(getComputedStyle(two as Element).fontFamily).not.toBe("");
+  },
+};
+
+export const RendersYourRoutersLink: Story = {
+  render: () => {
+    const router = fakeRouter();
+    (window as unknown as { rowRouter: typeof router }).rowRouter = router;
+    return (
+      <ListRows label="Reports">
+        <ListRow
+          label="Revenue"
+          description="Line chart"
+          href="/reports/revenue"
+          active
+          renderLink={router.renderLink}
+        />
+      </ListRows>
+    );
+  },
+  play: async ({ canvas, userEvent }) => {
+    const { visits } = (window as unknown as { rowRouter: ReturnType<typeof fakeRouter> }).rowRouter;
+    const row = canvas.getByRole("link", { name: "Revenue" });
+    await expect(row).toHaveAttribute("data-router", "yes");
+    await expect(row).toHaveAttribute("href", "/app/reports/revenue");
+    await expect(row).toHaveAttribute("aria-current", "page");
+    await expect(row).toHaveAccessibleDescription(/Line chart/);
+    await userEvent.click(row);
+    await expect(visits).toEqual(["/reports/revenue"]);
   },
 };

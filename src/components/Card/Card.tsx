@@ -6,11 +6,13 @@ import {
   forwardRef,
   type MouseEventHandler,
   type ReactNode,
+  type Ref,
   useId,
 } from "react";
+import type { RootAttributes } from "../../foundations/attributes.js";
 import { ButtonBase } from "../../foundations/ButtonBase/ButtonBase.js";
 import { type Edge, edgeProps } from "../../foundations/edge.js";
-import { LinkBase } from "../../foundations/LinkBase/LinkBase.js";
+import { anchor, type RenderLink } from "../../foundations/LinkBase/LinkBase.js";
 import type { Tone } from "../../tokens/schema.js";
 
 export interface CardTokens {
@@ -32,7 +34,7 @@ declare module "../../tokens/schema.js" {
   }
 }
 
-export interface CardProps {
+export interface CardProps extends RootAttributes {
   /** `surface` raised panel, `outline` border only, `soft` tone-tinted fill. */
   variant?: "surface" | "outline" | "soft";
   /** Space between the card's edge and its content. Default "md". */
@@ -61,6 +63,11 @@ export interface CardProps {
   href?: string;
   /** With `href`: where it opens, e.g. `_blank`. */
   target?: string;
+  /**
+   * With `href`: render the link with your router, `(props) => <RouterLink {...props} to={props.href} />`, as Link's
+   * `renderLink`; it receives this component's class, data attributes and handlers. Default: a plain link.
+   */
+  renderLink?: RenderLink | undefined;
   /** Makes the whole card a button. */
   onClick?: MouseEventHandler<HTMLElement>;
   /** With `onClick` (and no `href`): the card cannot be pressed. */
@@ -110,6 +117,7 @@ export const Card = forwardRef<HTMLElement, CardProps>(function CardRender(props
     as = "div",
     href,
     target,
+    renderLink,
     onClick,
     disabled,
     actions,
@@ -163,18 +171,15 @@ export const Card = forwardRef<HTMLElement, CardProps>(function CardRender(props
     "data-tone": tone,
   };
   if (href !== undefined)
-    return (
-      <LinkBase
-        ref={ref as never}
-        {...common}
-        href={href}
-        target={target}
-        data-interactive=""
-        onClick={onClick}
-      >
-        {content}
-      </LinkBase>
-    );
+    return anchor(renderLink, {
+      ref: ref as Ref<HTMLAnchorElement>,
+      ...common,
+      href,
+      target,
+      "data-interactive": "",
+      onClick,
+      children: content,
+    });
   if (onClick)
     return (
       <ButtonBase ref={ref as never} {...common} onClick={onClick} disabled={disabled} data-interactive="">

@@ -40,6 +40,8 @@ import { lock, zap } from "@arshad-shah/cynosure/icons";
 | `divided`             | `false`                      | A line between items, the gap split around it                                            |
 | `size`                | `md`                         | `sm` · `md` · `lg`: text size, and the markers with it                                   |
 | `label`               | –                            | Names the list for assistive technology when no heading above it does                    |
+| `aria-labelledby`     | –                            | The id of the heading that names the list, instead of `label`                            |
+| `id`, `data-*`, `ref` | –                            | Set on the root element (a link target, test or state hooks)                             |
 | `className` / `style` | –                            | Layout only                                                                              |
 
 The forwarded ref is the `ul` or `ol`.

@@ -28,6 +28,7 @@ One row recording at a time on a settings page: control `recording`.
 | ------------------------------------------------------ | ----------- | ----------------------------------------------------------------------------------------- |
 | `layout` / `width`                                     | `stack` / – | `split` settings row and the control width, as on `Field`                                 |
 | `label`                                                | –           | Names the group (fieldset); `labelHidden` keeps it for screen readers only                |
+| `aria-describedby`                                     | –           | Ids of more elements that describe the group, read before its own description and error   |
 | `description`, `error`                                 | –           | As Field                                                                                  |
 | `value` / `defaultValue` / `onChange`                  | `""`        | The shortcut string (`mod` is Command on Apple platforms, Control elsewhere); `""` = none |
 | `recording` / `defaultRecording` / `onRecordingChange` | `false`     | Controlled or not; reports every start and stop                                           |

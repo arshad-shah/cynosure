@@ -9,3 +9,5 @@ Keyboard shortcut: drawn key caps joined by a drawn separator (no "+" glyph), wi
 ## Tokens
 
 - `--cy-kbd-{radius,bg,border}`
+
+- `id`, any `data-*` attribute and the `ref` go to the root element.
