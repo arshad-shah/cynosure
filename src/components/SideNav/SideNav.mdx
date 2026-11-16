@@ -46,7 +46,7 @@ Groups open and close with a click, Enter or Space. A group holding the current 
 
 ## Collapsed rail
 
-`collapsed` shows icons only. Labels appear in tooltips on hover and keyboard focus and stay the accessible names. Give top-level items icons. Groups do not open inside the rail; choosing one calls `onCollapsedChange(false)` and opens the group, so the navigation can widen.
+`collapsed` shows icons only. Labels appear in tooltips on hover and keyboard focus and stay the accessible names. Give top-level items icons. Groups do not open inside the rail; choosing one calls `onCollapsedChange(false)` and opens the group, so the navigation can widen. Leave `collapsed` unset in an [AppShell](?path=/docs/components-structure-appshell--docs) column and the SideNav follows the shell's rail (`navToggle`, `navCollapsed`), which a group chosen in the rail expands.
 
 <Canvas of={Stories.RailExpandsToTheGroup} />
 
@@ -54,7 +54,7 @@ In the rail an item's `badge` shrinks onto the top inline-end corner of its icon
 
 ## Activity bar
 
-A collapsed SideNav on its own, without AppShell, is an editor's activity bar. `footer` takes entries pinned to the bottom (Settings, a notifications action): the same items, sections and actions as `items`, after them in the Tab order. With a footer the navigation fills its container's height. `placement="end"` is for a rail on the inline end of the window, such as a secondary activity bar: the current item's indicator moves to the side facing the content and the tooltips open towards it.
+A collapsed SideNav on its own, without AppShell, is an editor's activity bar. `footer` takes entries pinned to the bottom (Settings, a notifications action): the same items, sections and actions as `items`, after them in the Tab order. With a footer the navigation fills its container's height. `footer` also takes any content of your own instead of entries, such as a Help [Menu](?path=/docs/components-overlays-menu--docs) and a [ThemeToggle](?path=/docs/components-controls-themetoggle--docs): it is placed as it is, at the bottom and after the items in the Tab order (in the rail too, so give it a compact form there). `placement="end"` is for a rail on the inline end of the window, such as a secondary activity bar: the current item's indicator moves to the side facing the content and the tooltips open towards it.
 
 ```tsx
 <SideNav

@@ -1,13 +1,4 @@
-import {
-  type CSSProperties,
-  Fragment,
-  type KeyboardEvent,
-  useEffect,
-  useId,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { type CSSProperties, Fragment, type KeyboardEvent, useId, useMemo, useRef, useState } from "react";
 import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js";
 import { useControllableState } from "../../foundations/controllable.js";
 import { DialogBase } from "../../foundations/DialogBase/DialogBase.js";
@@ -18,11 +9,11 @@ import { InputBase } from "../../foundations/InputBase/InputBase.js";
 import { isComposing } from "../../foundations/keys.js";
 import { LiveRegion, useLiveMessage } from "../../foundations/LiveRegion/LiveRegion.js";
 import { useActiveOption } from "../../foundations/listbox.js";
+import { type PersistStorage, usePersistedState } from "../../foundations/persisted.js";
 import { textMatchAt, textMatches } from "../../foundations/text-match.js";
 import { search } from "../../icons/search.js";
 import type { IconData } from "../../icons/types.js";
 import { useDismiss } from "../../overlay/dismiss.js";
-import type { ColorModeStorage } from "../../theme/use-color-mode.js";
 import { Badge } from "../Badge/Badge.js";
 import { HighlightedText } from "../HighlightedText/HighlightedText.js";
 import { Kbd } from "../Kbd/Kbd.js";
@@ -58,7 +49,7 @@ export interface Command {
 }
 
 /** Where recently run commands are kept: sync or async, as `useColorMode`'s storage (`chrome.storage` works too). */
-export type CommandPaletteStorage = Pick<ColorModeStorage, "get" | "set">;
+export type CommandPaletteStorage = PersistStorage;
 
 /** What a `filter` says about a command that matches: how well, and which letters of its label. */
 export interface CommandMatch {
@@ -154,58 +145,15 @@ const DEFAULT_LABELS: CommandPaletteLabels = {
   unavailable: (label, reason) => `${label} is unavailable: ${reason}`,
 };
 
-const localStore: CommandPaletteStorage = {
-  get: (k) => globalThis.localStorage?.getItem(k) ?? null,
-  set: (k, v) => globalThis.localStorage?.setItem(k, v),
-};
-const parseIds = (raw: string | null): string[] | null => {
+const parseIds = (raw: string): string[] | undefined => {
   try {
-    const ids: unknown = JSON.parse(raw ?? "null");
-    return Array.isArray(ids) ? ids.filter((x): x is string => typeof x === "string") : null;
+    const ids: unknown = JSON.parse(raw);
+    return Array.isArray(ids) ? ids.filter((x): x is string => typeof x === "string") : undefined;
   } catch {
-    return null;
+    return undefined;
   }
 };
-
-/** Recently run ids: controlled, or kept in state and (with `key`) in storage. Storage errors are ignored. */
-function useRecent(
-  value: string[] | undefined,
-  onChange: ((recent: string[]) => void) | undefined,
-  key: string | undefined,
-  storage: CommandPaletteStorage | undefined,
-): [string[], (next: string[]) => void] {
-  const [current, set] = useControllableState(value, [] as string[], onChange);
-  const store = useRef(storage ?? localStore);
-  store.current = storage ?? localStore;
-  const touched = useRef(false);
-  useEffect(() => {
-    if (!key || value !== undefined) return;
-    touched.current = false;
-    let live = true;
-    const apply = (raw: string | null) => {
-      const ids = parseIds(raw);
-      if (live && ids && !touched.current) set(ids);
-    };
-    try {
-      const raw = store.current.get(key);
-      if (raw instanceof Promise) raw.then(apply, () => {});
-      else apply(raw);
-    } catch {}
-    return () => {
-      live = false;
-    };
-  }, [key, value, set]);
-  const update = (next: string[]) => {
-    touched.current = true;
-    set(next);
-    if (!key || value !== undefined) return;
-    try {
-      const done = store.current.set(key, JSON.stringify(next));
-      if (done instanceof Promise) done.catch(() => {});
-    } catch {}
-  };
-  return [current, update];
-}
+const NO_RECENT: string[] = [];
 
 /** The words of a query. */
 const wordsOf = (query: string) => query.split(/\s+/).filter(Boolean);
@@ -245,7 +193,12 @@ export function CommandPalette({
     setQueryState(next);
     onQueryChange?.(next);
   };
-  const [recent, setRecent] = useRecent(recentProp, onRecentChange, recentKey, recentStorage);
+  const [recent, setRecent] = usePersistedState(recentProp, NO_RECENT, onRecentChange, {
+    key: recentKey,
+    storage: recentStorage,
+    parse: parseIds,
+    serialize: JSON.stringify,
+  });
   const [said, say] = useLiveMessage();
   const dialog = useRef<HTMLDialogElement>(null);
   const input = useRef<HTMLInputElement>(null);

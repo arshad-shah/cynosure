@@ -10,16 +10,20 @@ import { AppShell, SideNav } from "@arshad-shah/cynosure";
 </AppShell>;
 ```
 
-| Prop                  | Default | Notes                                                                                             |
-| --------------------- | ------- | ------------------------------------------------------------------------------------------------- |
-| `header`              | –       | Top bar content (brand, search, account)                                                          |
-| `nav`                 | –       | The navigation, usually a `SideNav`                                                               |
-| `children`            | –       | The page, rendered in `<main>`                                                                    |
-| `tabs`                | –       | A bottom tab bar when narrow: `<SideNav layout="bar">` with the main sections                     |
-| `collapseBelow`       | `768`   | Shell width (px) below which the navigation moves into a drawer                                   |
-| `onNarrowChange`      | –       | `(narrow)` each time the shell becomes narrow or wide again, for code outside the shell           |
-| `labels`              | –       | `openNav` ("Open navigation"), `nav` ("Navigation", the drawer title), `skip` ("Skip to content") |
-| `className` / `style` | –       | Layout only                                                                                       |
+| Prop                                                            | Default          | Notes                                                                                                                                                                       |
+| --------------------------------------------------------------- | ---------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `header`                                                        | –                | Top bar content (brand, search, account)                                                                                                                                    |
+| `nav`                                                           | –                | The navigation, usually a `SideNav`                                                                                                                                         |
+| `brand`                                                         | –                | The product's mark: heads the navigation column (wide), or starts the top bar (narrow, no `nav`)                                                                            |
+| `navToggle`                                                     | `false`          | A bar button that collapses the column to SideNav's rail and back (wide only)                                                                                               |
+| `navCollapsed` / `defaultNavCollapsed` / `onNavCollapsedChange` | – / `false` / –  | The rail, controlled or not; a SideNav in the column follows it unless given `collapsed`                                                                                    |
+| `navCollapsedKey` / `navCollapsedStorage`                       | – / localStorage | Remember the rail between visits under a key; any sync or async `{ get, set }`                                                                                              |
+| `children`                                                      | –                | The page, rendered in `<main>`                                                                                                                                              |
+| `tabs`                                                          | –                | A bottom tab bar when narrow: `<SideNav layout="bar">` with the main sections                                                                                               |
+| `collapseBelow`                                                 | `768`            | Shell width (px) below which the navigation moves into a drawer                                                                                                             |
+| `onNarrowChange`                                                | –                | `(narrow)` each time the shell becomes narrow or wide again, for code outside the shell                                                                                     |
+| `labels`                                                        | –                | `openNav` ("Open navigation"), `nav` ("Navigation", the drawer title), `skip` ("Skip to content"), `collapseNav` ("Collapse navigation"), `expandNav` ("Expand navigation") |
+| `className` / `style`                                           | –                | Layout only                                                                                                                                                                 |
 - Fills its container's height; the content and the navigation scroll on their own while the bar stays.
 - Responds to its own width, not the window's, so it works in side panels and embedded views.
 - In the drawer, choosing a link or item closes it (group toggles do not) and focus returns to the menu button.
@@ -41,7 +45,8 @@ function Toolbar() {
 
 - `narrow` is `true` while the shell's own width is below `collapseBelow`, the same test that moves the navigation into the drawer.
 - It is `false` on the server and on the first client render, so server markup hydrates without a mismatch. The shell measures itself before the first paint and renders again if it is narrow.
-- Outside an AppShell the hook does not throw. It returns `{ narrow: false }`.
+- Outside an AppShell the hook does not throw. It returns `{ narrow: false, navCollapsed: false }`.
+- `navCollapsed` is `true` while the column shows as a rail (never while narrow): a brand can switch to a compact mark.
 - Code outside the shell uses `onNarrowChange`. It is called once per change. A shell that mounts narrow calls it with `true` right after mounting; a shell that mounts wide does not call it until it narrows.
 - There is no hook for the drawer: the shell closes it itself when a link or button inside it is pressed.
 

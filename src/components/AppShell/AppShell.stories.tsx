@@ -572,3 +572,138 @@ export const StableUnderHostileHost: Story = {
     }
   },
 };
+
+const navOf = (canvas: { getByRole: (r: "navigation", o: { name: string }) => HTMLElement }) =>
+  canvas.getByRole("navigation", { name: "Main" });
+
+export const BrandAboveTheNavigation: Story = {
+  args: { brand: <strong data-testid="brand">Acme Tools</strong> },
+  play: async ({ canvas, canvasElement }) => {
+    const brand = canvas.getByTestId("brand");
+    const nav = navOf(canvas);
+    // Wide: the brand heads the navigation column, beside the top bar, above the first item.
+    await expect(box(brand).bottom).toBeLessThanOrEqual(box(nav).top);
+    const column = brand.closest(".cy-app-shell-brand") as HTMLElement;
+    await expect(Math.round(box(column).left)).toBe(Math.round(box(nav.parentElement as Element).left));
+    await expect(Math.round(box(column).width)).toBe(Math.round(box(nav.parentElement as Element).width));
+    await expect(canvas.getByRole("banner")).not.toContainElement(brand);
+    // Narrow: the column goes, so the brand moves into the top bar after the menu button.
+    frame(canvasElement).style.inlineSize = "600px";
+    await waitFor(
+      () => expect(canvas.getByRole("button", { name: "Open navigation" })).toBeVisible(),
+      RESIZE,
+    );
+    const moved = canvas.getByTestId("brand");
+    await expect(canvas.getByRole("banner")).toContainElement(moved);
+    await expect(box(moved).left).toBeGreaterThanOrEqual(
+      box(canvas.getByRole("button", { name: "Open navigation" })).right,
+    );
+  },
+};
+
+export const CollapsesTheNavigationToARail: Story = {
+  args: { navToggle: true, onNavCollapsedChange: fn() },
+  play: async ({ args, canvas, userEvent }) => {
+    const nav = navOf(canvas);
+    const wide = box(nav).width;
+    const toggle = canvas.getByRole("button", { name: "Collapse navigation" });
+    await expect(toggle).toHaveAttribute("aria-controls", nav.parentElement?.id);
+    await userEvent.click(toggle);
+    // The SideNav in the column becomes its icon rail; the button now expands it.
+    await waitFor(() => expect(navOf(canvas)).toHaveAttribute("data-collapsed"));
+    await expect(box(navOf(canvas)).width).toBeLessThan(wide);
+    await expect(args.onNavCollapsedChange).toHaveBeenLastCalledWith(true);
+    const expand = canvas.getByRole("button", { name: "Expand navigation" });
+    await expect(expand).toHaveFocus();
+    // From the keyboard too.
+    await userEvent.keyboard("{Enter}");
+    await waitFor(() => expect(navOf(canvas)).not.toHaveAttribute("data-collapsed"));
+    await expect(args.onNavCollapsedChange).toHaveBeenLastCalledWith(false);
+    await expect(canvas.getByRole("button", { name: "Collapse navigation" })).toHaveFocus();
+    // A group chosen in the rail widens the navigation again, so it can open.
+    await userEvent.click(canvas.getByRole("button", { name: "Collapse navigation" }));
+    await waitFor(() => expect(navOf(canvas)).toHaveAttribute("data-collapsed"));
+    await userEvent.click(within(navOf(canvas)).getByRole("button", { name: "Team" }));
+    await waitFor(() => expect(navOf(canvas)).not.toHaveAttribute("data-collapsed"));
+  },
+};
+
+export const ARailTheAppHolds: Story = {
+  args: { navToggle: true, navCollapsed: true, onNavCollapsedChange: fn() },
+  play: async ({ args, canvas, userEvent }) => {
+    await expect(navOf(canvas)).toHaveAttribute("data-collapsed");
+    await userEvent.click(canvas.getByRole("button", { name: "Expand navigation" }));
+    await expect(args.onNavCollapsedChange).toHaveBeenCalledWith(false);
+    // Controlled: it stays as the app says.
+    await expect(navOf(canvas)).toHaveAttribute("data-collapsed");
+  },
+};
+
+const RAIL_KEY = "cy-story-nav-rail";
+
+export const TheRailIsRememberedUnderAKey: Story = {
+  beforeEach: () => {
+    localStorage.setItem(RAIL_KEY, "true");
+    return () => localStorage.removeItem(RAIL_KEY);
+  },
+  args: { navToggle: true, navCollapsedKey: RAIL_KEY },
+  play: async ({ canvas, userEvent }) => {
+    await waitFor(() => expect(navOf(canvas)).toHaveAttribute("data-collapsed"));
+    await userEvent.click(canvas.getByRole("button", { name: "Expand navigation" }));
+    await waitFor(() => expect(navOf(canvas)).not.toHaveAttribute("data-collapsed"));
+    await expect(localStorage.getItem(RAIL_KEY)).toBe("false");
+  },
+};
+
+export const NarrowShowsTheMenuNotTheRailToggle: Story = {
+  args: { navToggle: true, defaultNavCollapsed: true },
+  render: (args) => <Demo {...args} width={420} />,
+  play: async ({ canvas, userEvent }) => {
+    const open = await waitFor(() => canvas.getByRole("button", { name: "Open navigation" }), RESIZE);
+    await expect(canvas.queryByRole("button", { name: /(Collapse|Expand) navigation/ })).toBeNull();
+    // In the drawer the navigation is full width, whatever the rail was.
+    await userEvent.click(open);
+    const dialog = sheet() as HTMLDialogElement;
+    await waitFor(() => expect(dialog.open).toBe(true));
+    await expect(within(dialog).getByRole("navigation", { name: "Main" })).not.toHaveAttribute(
+      "data-collapsed",
+    );
+    await userEvent.keyboard("{Escape}");
+  },
+};
+
+export const RailToggleLabelsOverride: Story = {
+  args: {
+    navToggle: true,
+    labels: { collapseNav: "Réduire la navigation", expandNav: "Agrandir la navigation" },
+  },
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole("button", { name: "Réduire la navigation" }));
+    await expect(await canvas.findByRole("button", { name: "Agrandir la navigation" })).toBeVisible();
+  },
+};
+
+export const TouchRailToggle: Story = {
+  tags: ["touch", "!dev"],
+  args: { navToggle: true },
+  play: async ({ canvas, userEvent }) => {
+    const toggle = canvas.getByRole("button", { name: "Collapse navigation" });
+    const hit = getComputedStyle(toggle, "::before");
+    await expect(Number.parseFloat(hit.height)).toBeGreaterThanOrEqual(44);
+    await userEvent.pointer({ keys: "[TouchA]", target: toggle });
+    await waitFor(() => expect(navOf(canvas)).toHaveAttribute("data-collapsed"));
+  },
+};
+
+export const BrandAndRailUnderHostileHost: Story = {
+  args: { navToggle: true, brand: <strong>Acme Tools</strong> },
+  play: async ({ canvasElement }) => {
+    const { clean, hostile } = computeUnderHostileHost(canvasElement, ".cy-app-shell-brand", [
+      "display",
+      "padding-top",
+      "border-bottom-width",
+      "background-color",
+    ]);
+    await expect(hostile).toEqual(clean);
+  },
+};

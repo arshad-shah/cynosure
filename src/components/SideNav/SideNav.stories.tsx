@@ -18,7 +18,9 @@ import { shownFully } from "../../test/settle.js";
 import { CynosureTheme } from "../../theme/CynosureTheme.js";
 import { Badge } from "../Badge/Badge.js";
 import { Button } from "../Button/Button.js";
+import { Menu } from "../Menu/Menu.js";
 import { Stack } from "../Stack/Stack.js";
+import { ThemeToggle } from "../ThemeToggle/ThemeToggle.js";
 import { type NavEntry, SideNav } from "./SideNav.js";
 
 const ITEMS: NavEntry[] = [
@@ -822,5 +824,76 @@ export const FooterStableUnderHostileHost: Story = {
       const { clean, hostile } = computeUnderHostileHost(canvasElement, selector, props);
       await expect({ selector, ...hostile }).toEqual({ selector, ...clean });
     }
+  },
+};
+
+/** A footer of the product's own controls: a Help menu and the colour mode. */
+const helpPicked = fn();
+const ControlsFooter = (
+  <>
+    <Menu
+      label="Help"
+      items={[
+        { value: "docs", label: "Documentation" },
+        { value: "keys", label: "Keyboard shortcuts" },
+      ]}
+      onSelect={helpPicked}
+      trigger={(props) => (
+        <Button {...props} variant="ghost">
+          Help
+        </Button>
+      )}
+    />
+    <ThemeToggle variant="cycle" storageKey="cy-story-side-nav-footer" />
+  </>
+);
+
+export const AFooterOfAnyContent: Story = {
+  args: { label: "Main", items: ITEMS, footer: ControlsFooter, current: "home" },
+  render: (args) => tall(args),
+  play: async ({ canvas, userEvent }) => {
+    const nav = canvas.getByRole("navigation", { name: "Main" });
+    const help = canvas.getByRole("button", { name: "Help" });
+    const toggle = canvas.getByRole("button", { name: /Colour mode/ });
+    // Inside the navigation, pinned to its bottom, under the items.
+    await expect(nav).toContainElement(help);
+    await expect(nav).toContainElement(toggle);
+    await expect(rect(nav).bottom - rect(toggle).bottom).toBeLessThan(48);
+    await expect(rect(help).top).toBeGreaterThan(
+      rect(canvas.getByRole("link", { name: /Inbox/ })).bottom + 100,
+    );
+    // In the Tab order after the items, and working as themselves.
+    canvas.getByRole("button", { name: "Settings" }).focus();
+    await userEvent.tab();
+    await expect(help).toHaveFocus();
+    await userEvent.keyboard("{Enter}");
+    await waitFor(() => expect(document.querySelector('[role="menu"]:popover-open')).not.toBeNull());
+    await userEvent.keyboard("{Enter}");
+    await expect(helpPicked).toHaveBeenLastCalledWith("docs");
+  },
+};
+
+export const AFooterOfContentInTheRail: Story = {
+  args: { label: "Main", items: ITEMS, footer: ControlsFooter, current: "home", collapsed: true },
+  render: (args) => tall(args),
+  play: async ({ canvas }) => {
+    const nav = canvas.getByRole("navigation", { name: "Main" });
+    await expect(nav).toHaveAttribute("data-collapsed");
+    // The rail keeps the content (the product decides how it fits), at its bottom.
+    await expect(nav).toContainElement(canvas.getByRole("button", { name: "Help" }));
+    await expect(rect(nav).height).toBeCloseTo((nav.parentElement as HTMLElement).clientHeight, 0);
+  },
+};
+
+export const AFooterOfContentUnderHostileHost: Story = {
+  args: { label: "Main", items: ITEMS, footer: ControlsFooter },
+  render: (args) => tall(args),
+  play: async ({ canvasElement }) => {
+    const { clean, hostile } = computeUnderHostileHost(canvasElement, ".cy-side-nav-footer", [
+      "display",
+      "margin-top",
+      "gap",
+    ]);
+    await expect(hostile).toEqual(clean);
   },
 };

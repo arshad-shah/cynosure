@@ -11,7 +11,11 @@ import {
   useState,
 } from "react";
 import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js";
+import { NavRailContext } from "../../foundations/nav-rail.js";
+import { type PersistStorage, usePersistedState } from "../../foundations/persisted.js";
 import { menu } from "../../icons/menu.js";
+import { panelLeftClose } from "../../icons/panel-left-close.js";
+import { panelLeftOpen } from "../../icons/panel-left-open.js";
 import { IconButton } from "../IconButton/IconButton.js";
 import { Sheet } from "../Sheet/Sheet.js";
 import { SkipLink } from "../SkipLink/SkipLink.js";
@@ -38,6 +42,10 @@ export interface AppShellLabels {
   nav: string;
   /** The skip link, shown on keyboard focus. Default: "Skip to content". */
   skip: string;
+  /** The rail button (`navToggle`) while the navigation is full width. Default: "Collapse navigation". */
+  collapseNav: string;
+  /** The rail button while the navigation is a rail. Default: "Expand navigation". */
+  expandNav: string;
 }
 
 export interface AppShellProps {
@@ -45,6 +53,30 @@ export interface AppShellProps {
   header?: ReactNode;
   /** The navigation, usually a `SideNav`. Beside the content when wide; in a drawer when narrow. */
   nav?: ReactNode;
+  /**
+   * The product's mark, at the head of the navigation column beside the top bar (wide), or at the start of the top
+   * bar after the menu button (narrow, or with no `nav`). It never widens the column: in the rail, show a compact mark
+   * (`useAppShell().navCollapsed`).
+   */
+  brand?: ReactNode;
+  /**
+   * A button at the start of the top bar that collapses the navigation column to SideNav's icon rail and back (wide
+   * only; narrow, the menu button opens the drawer instead). Its name comes from `labels.collapseNav` / `expandNav`.
+   */
+  navToggle?: boolean | undefined;
+  /**
+   * Whether the navigation column is collapsed to its rail (controlled). A SideNav in the column follows it unless
+   * it is given `collapsed` itself; a group chosen in the rail expands it. In the drawer it is always full width.
+   */
+  navCollapsed?: boolean | undefined;
+  /** Whether it starts collapsed, when uncontrolled. Default false. */
+  defaultNavCollapsed?: boolean | undefined;
+  /** Called with the new value when the rail button, or a group chosen in the rail, changes it. */
+  onNavCollapsedChange?: ((collapsed: boolean) => void) | undefined;
+  /** Remember the rail between visits under this storage key (opt-in; uncontrolled use). Read after mount. */
+  navCollapsedKey?: string | undefined;
+  /** Where `navCollapsedKey` keeps it: localStorage by default; any `{ get, set }`, sync or async. Never throws. */
+  navCollapsedStorage?: PersistStorage | undefined;
   /**
    * A bottom tab bar on narrow screens, usually `<SideNav layout="bar">` with the app's three to five main sections.
    * Hidden when wide, where `nav` shows instead.
@@ -75,7 +107,11 @@ const DEFAULT_LABELS: AppShellLabels = {
   openNav: "Open navigation",
   nav: "Navigation",
   skip: "Skip to content",
+  collapseNav: "Collapse navigation",
+  expandNav: "Expand navigation",
 };
+
+const parseFlag = (raw: string) => (raw === "true" ? true : raw === "false" ? false : undefined);
 
 /** What `useAppShell()` returns. */
 export interface AppShellState {
@@ -84,14 +120,16 @@ export interface AppShellState {
    * on the server, on the first client render (it is measured before the first paint) and outside an AppShell.
    */
   narrow: boolean;
+  /** Whether the navigation column shows as a rail (never while `narrow`). `false` outside an AppShell. */
+  navCollapsed: boolean;
 }
 
-const WIDE: AppShellState = { narrow: false };
+const WIDE: AppShellState = { narrow: false, navCollapsed: false };
 const Context = createContext<AppShellState>(WIDE);
 
 /**
  * The state of the nearest AppShell, for anything rendered in its `header`, `nav`, `tabs` or content: `{ narrow }`.
- * Outside an AppShell it does not throw; it returns `{ narrow: false }`.
+ * Outside an AppShell it does not throw; it returns `{ narrow: false, navCollapsed: false }`.
  */
 export function useAppShell(): AppShellState {
   return useContext(Context);
@@ -104,6 +142,13 @@ export function useAppShell(): AppShellState {
 export function AppShell({
   header,
   nav,
+  brand,
+  navToggle = false,
+  navCollapsed: navCollapsedProp,
+  defaultNavCollapsed = false,
+  onNavCollapsedChange,
+  navCollapsedKey,
+  navCollapsedStorage,
   tabs,
   children,
   collapseBelow = 768,
@@ -117,6 +162,18 @@ export function AppShell({
   const root = useRef<HTMLDivElement>(null);
   const [narrow, setNarrow] = useState(false);
   const [drawer, setDrawer] = useState(false);
+  const [collapsed, setCollapsed] = usePersistedState(
+    navCollapsedProp,
+    defaultNavCollapsed,
+    onNavCollapsedChange,
+    {
+      key: navCollapsedKey,
+      storage: navCollapsedStorage,
+      parse: parseFlag,
+      serialize: String,
+    },
+  );
+  const rail = useMemo(() => ({ collapsed, setCollapsed }), [collapsed, setCollapsed]);
 
   useClientLayoutEffect(() => {
     const el = root.current;
@@ -142,7 +199,10 @@ export function AppShell({
     told.current = narrow;
     notify.current?.(narrow);
   }, [narrow]);
-  const state = useMemo(() => ({ narrow }), [narrow]);
+  const state = useMemo(() => ({ narrow, navCollapsed: collapsed && !narrow }), [narrow, collapsed]);
+  // The brand heads the navigation column when there is one beside the content; otherwise it starts the top bar.
+  const brandInColumn = brand != null && !!nav && !narrow;
+  const railButton = navToggle && !!nav && !narrow;
 
   // Choosing a destination in the drawer closes it; group toggles (aria-expanded) keep it open.
   const onDrawerClick = (event: MouseEvent<HTMLElement>) => {
@@ -159,12 +219,26 @@ export function AppShell({
         data-narrow={narrow ? "" : undefined}
         data-nav={nav ? "" : undefined}
         data-tabs={tabs && narrow ? "" : undefined}
+        data-brand={brandInColumn ? "" : undefined}
         style={style}
       >
         {/* Moves focus to main without touching the URL (the app's router owns it). */}
         <SkipLink href={`#${id}-main`} labels={{ skip: text.skip }} contained className="cy-app-shell-skip" />
-        {(header || (nav && narrow)) && (
+        {brandInColumn && <div className="cy-app-shell-brand cy-reset">{brand}</div>}
+        {(header || (nav && narrow) || railButton || (brand != null && !brandInColumn)) && (
           <header className="cy-app-shell-header cy-reset">
+            {railButton && (
+              <IconButton
+                icon={collapsed ? panelLeftOpen : panelLeftClose}
+                flipRtl
+                label={collapsed ? text.expandNav : text.collapseNav}
+                variant="ghost"
+                tone="neutral"
+                tooltipPlacement="end"
+                aria-controls={`${id}-nav`}
+                onClick={() => setCollapsed(!collapsed)}
+              />
+            )}
             {nav && narrow && (
               <IconButton
                 icon={menu}
@@ -176,10 +250,15 @@ export function AppShell({
                 onClick={() => setDrawer(true)}
               />
             )}
+            {brand != null && !brandInColumn && <div className="cy-app-shell-mark cy-reset">{brand}</div>}
             <div className="cy-app-shell-bar cy-reset">{header}</div>
           </header>
         )}
-        {nav && !narrow && <div className="cy-app-shell-nav cy-reset">{nav}</div>}
+        {nav && !narrow && (
+          <div id={`${id}-nav`} className="cy-app-shell-nav cy-reset">
+            <NavRailContext.Provider value={rail}>{nav}</NavRailContext.Provider>
+          </div>
+        )}
         <main id={`${id}-main`} tabIndex={-1} className="cy-app-shell-main cy-reset">
           {children}
         </main>
