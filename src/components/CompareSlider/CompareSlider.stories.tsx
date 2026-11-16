@@ -3,6 +3,7 @@ import { useState } from "react";
 import { expect, fn, waitFor } from "storybook/test";
 import { computeUnderHostileHost } from "../../test/hostile.js";
 import { Button } from "../Button/Button.js";
+import { Image } from "../Image/Image.js";
 import { CompareSlider } from "./CompareSlider.js";
 
 const side = (name: string, background: string) => (
@@ -224,6 +225,115 @@ export const StableUnderHostileHost: Story = {
   play: async ({ canvasElement }) => {
     const props = ["display", "overflow", "font-size", "box-sizing", "width", "background-color"];
     for (const selector of [".cy-compare-slider", ".cy-compare-slider-divider", ".cy-compare-slider-tag"]) {
+      const { clean, hostile } = computeUnderHostileHost(canvasElement, selector, props);
+      await expect({ selector, ...hostile }).toEqual({ selector, ...clean });
+    }
+  },
+};
+
+/** Pictures without a network: an SVG as a data URL, a new address each call. */
+let serial = 0;
+const picture = (width: number, height: number, fill: string) =>
+  `data:image/svg+xml,${encodeURIComponent(
+    `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}"><!-- ${++serial} --><rect width="100%" height="100%" fill="${fill}"/></svg>`,
+  )}`;
+const rect = (el: Element) => el.getBoundingClientRect();
+/** Within a pixel: layouts round differently from browser to browser. */
+const same = async (a: DOMRect, b: DOMRect) => {
+  for (const side of ["left", "top", "width", "height"] as const) {
+    await expect(Math.abs(a[side] - b[side])).toBeLessThan(1);
+  }
+};
+const ready = (el: Element) =>
+  waitFor(
+    () => {
+      for (const img of el.querySelectorAll("img")) expect(img.complete && img.naturalWidth > 0).toBe(true);
+      expect(root(el).style.getPropertyValue("--_ratio")).not.toBe("");
+    },
+    { timeout: 3000 },
+  );
+
+/** `beforeSrc` / `afterSrc`: two pictures of different sizes share one box, the before picture's shape, and fit it. */
+export const SourcesShareOneBox: Story = {
+  tags: ["visual"],
+  args: {
+    before: undefined,
+    after: undefined,
+    beforeSrc: picture(600, 400, "teal"),
+    beforeAlt: "Original, 600 by 400",
+    afterSrc: picture(150, 100, "navy"),
+    afterAlt: "Compressed, 150 by 100",
+  },
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const original = canvas.getByRole("img", { name: "Original, 600 by 400" });
+    const compressed = canvas.getByRole("img", { name: "Compressed, 150 by 100" });
+    await ready(canvasElement);
+    const frame = rect(root(canvasElement));
+    // As wide as the container, as tall as the before picture's shape makes it.
+    await expect(Math.abs(frame.height - (frame.width * 2) / 3)).toBeLessThan(1);
+    await same(rect(original), frame);
+    await same(rect(compressed), frame);
+    // The divider still splits them and moves.
+    const divider = canvas.getByRole("slider");
+    divider.focus();
+    await userEvent.keyboard("{End}");
+    await expect(divider).toHaveAttribute("aria-valuenow", "100");
+  },
+};
+
+/** A side of another shape is shown whole inside the shared box (contained), centred. */
+export const DifferentShapesFitTheBox: Story = {
+  args: {
+    before: undefined,
+    after: undefined,
+    beforeSrc: picture(400, 200, "teal"),
+    beforeAlt: "Wide",
+    afterSrc: picture(200, 200, "navy"),
+    afterAlt: "Square",
+  },
+  play: async ({ canvas, canvasElement }) => {
+    await ready(canvasElement);
+    const frame = rect(root(canvasElement));
+    await expect(Math.abs(frame.height - frame.width / 2)).toBeLessThan(1);
+    const square = canvas.getByRole("img", { name: "Square" });
+    await same(rect(square), frame);
+    await expect(getComputedStyle(square).objectFit).toBe("contain");
+    // The square is drawn whole, in the middle of the box.
+    await expect(getComputedStyle(square).objectPosition).toBe("50% 50%");
+  },
+};
+
+/** Any child is laid out in the shared box: Images on both sides line up with each other and with the frame. */
+export const AnyChildSharesTheBox: Story = {
+  render: (args) => (
+    <CompareSlider
+      {...args}
+      before={<Image src={picture(300, 200, "teal")} alt="Before" ratio={3 / 2} fit="contain" />}
+      after={<Image src={picture(900, 600, "navy")} alt="After" ratio={3 / 2} fit="contain" />}
+    />
+  ),
+  play: async ({ canvas, canvasElement }) => {
+    await ready(canvasElement);
+    const frame = rect(root(canvasElement));
+    await expect(Math.abs(frame.height - (frame.width * 2) / 3)).toBeLessThan(1);
+    await same(rect(canvas.getByRole("img", { name: "Before" })), frame);
+    await same(rect(canvas.getByRole("img", { name: "After" })), frame);
+  },
+};
+
+export const BoxedStableUnderHostileHost: Story = {
+  args: {
+    before: undefined,
+    after: undefined,
+    beforeSrc: picture(300, 200, "teal"),
+    beforeAlt: "Before",
+    afterSrc: picture(300, 200, "navy"),
+    afterAlt: "After",
+  },
+  play: async ({ canvasElement }) => {
+    await ready(canvasElement);
+    const props = ["display", "position", "width", "height", "max-width", "object-fit", "box-sizing"];
+    for (const selector of [".cy-compare-slider", ".cy-compare-slider-stage", ".cy-compare-slider-img"]) {
       const { clean, hostile } = computeUnderHostileHost(canvasElement, selector, props);
       await expect({ selector, ...hostile }).toEqual({ selector, ...clean });
     }

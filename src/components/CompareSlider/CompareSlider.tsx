@@ -1,4 +1,5 @@
-import { type CSSProperties, type KeyboardEvent, type ReactNode, useRef } from "react";
+import { type CSSProperties, type KeyboardEvent, type ReactNode, useRef, useState } from "react";
+import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js";
 import { useControllableState } from "../../foundations/controllable.js";
 import { useDrag } from "../../foundations/drag.js";
 import { stepKey } from "../../foundations/keys.js";
@@ -28,10 +29,21 @@ export interface CompareSliderLabels {
 }
 
 export interface CompareSliderProps {
-  /** Shown on the start side of the divider (e.g. the original image). */
-  before: ReactNode;
-  /** Shown on the other side (e.g. the edited image). Both should be the same size. */
-  after: ReactNode;
+  /**
+   * Shown on the start side of the divider (e.g. the original image), stretched to the shared box; an `img`, `video`
+   * or `canvas` is contained in it. Or give `beforeSrc`.
+   */
+  before?: ReactNode;
+  /** Address of the start side's picture, drawn contained in the shared box, instead of `before`. */
+  beforeSrc?: string | undefined;
+  /** With `beforeSrc`: what its picture shows (`""` when the tags say it all). */
+  beforeAlt?: string | undefined;
+  /** Shown on the other side (e.g. the edited image), in the same box as `before`. Or give `afterSrc`. */
+  after?: ReactNode;
+  /** Address of the end side's picture, drawn contained in the shared box, instead of `after`. */
+  afterSrc?: string | undefined;
+  /** With `afterSrc`: what its picture shows. */
+  afterAlt?: string | undefined;
   /** Divider position: percent of the width showing `before`. */
   value?: number | undefined;
   /** The divider's starting position when uncontrolled, 0 to 100. Default 50. */
@@ -62,6 +74,10 @@ const DEFAULT_LABELS: CompareSliderLabels = {
 export function CompareSlider({
   before,
   after,
+  beforeSrc,
+  beforeAlt,
+  afterSrc,
+  afterAlt,
   value,
   defaultValue = 50,
   onChange,
@@ -108,19 +124,71 @@ export function CompareSlider({
     set(next);
   };
 
+  // The shared box: the shape of the first picture, video or canvas (the before side's, else the after side's), once
+  // its size is known. Until then (and with no media at all) the sides lay out in the flow, the taller one setting the
+  // height.
+  const [natural, setNatural] = useState<{ width: number; height: number } | null>(null);
+  useClientLayoutEffect(() => {
+    const el = area.current as HTMLDivElement;
+    const media =
+      el.querySelector<HTMLElement>('[data-side="before"] :is(img, video, canvas)') ??
+      el.querySelector<HTMLElement>('[data-side="after"] :is(img, video, canvas)');
+    const measure = () => {
+      const size =
+        media instanceof HTMLImageElement
+          ? { width: media.naturalWidth, height: media.naturalHeight }
+          : media instanceof HTMLVideoElement
+            ? { width: media.videoWidth, height: media.videoHeight }
+            : media instanceof HTMLCanvasElement
+              ? { width: media.width, height: media.height }
+              : null;
+      const next = size && size.width > 0 && size.height > 0 ? size : null;
+      setNatural((last) => (last?.width === next?.width && last?.height === next?.height ? last : next));
+    };
+    measure();
+    if (!media) return;
+    media.addEventListener("load", measure);
+    media.addEventListener("loadedmetadata", measure);
+    return () => {
+      media.removeEventListener("load", measure);
+      media.removeEventListener("loadedmetadata", measure);
+    };
+  });
+
+  const side = (which: "before" | "after", content: ReactNode, src?: string, alt?: string) => (
+    <div className="cy-compare-slider-layer cy-reset" data-side={which}>
+      <div className="cy-compare-slider-stage cy-reset">
+        {src === undefined ? (
+          content
+        ) : (
+          <img
+            className="cy-compare-slider-img cy-reset"
+            src={src}
+            alt={alt ?? ""}
+            draggable={false}
+            decoding="async"
+          />
+        )}
+      </div>
+    </div>
+  );
+
   const shown = Math.round(position);
   return (
     <div
       ref={area}
       className={className ? `cy-compare-slider ${className}` : "cy-compare-slider"}
-      style={{ "--_pos": `${position}%`, ...style } as CSSProperties}
+      data-boxed={natural ? "" : undefined}
+      style={
+        {
+          "--_pos": `${position}%`,
+          ...(natural ? { "--_ratio": `${natural.width} / ${natural.height}` } : {}),
+          ...style,
+        } as CSSProperties
+      }
     >
-      <div className="cy-compare-slider-layer cy-reset" data-side="after">
-        {after}
-      </div>
-      <div className="cy-compare-slider-layer cy-reset" data-side="before">
-        {before}
-      </div>
+      {side("after", after, afterSrc, afterAlt)}
+      {side("before", before, beforeSrc, beforeAlt)}
       {showTags && (
         <>
           <span className="cy-compare-slider-tag cy-reset" data-side="before" aria-hidden="true">

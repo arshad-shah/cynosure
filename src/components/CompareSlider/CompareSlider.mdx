@@ -22,10 +22,17 @@ Two versions of the same thing, one over the other, split by a divider people mo
 ```tsx
 import { CompareSlider } from "@arshad-shah/cynosure";
 
-<CompareSlider before={<img src={original} alt="Original" />} after={<img src={edited} alt="Edited" />} />
+<CompareSlider beforeSrc={original} beforeAlt="Original" afterSrc={edited} afterAlt="Edited" />
+<CompareSlider before={<canvas ref={left} />} after={<canvas ref={right} />} />
 ```
 
-`before` and `after` should be the same size. Control the divider with `value` and `onChange` (percent of the width showing `before`).
+## One box for both sides
+
+The two sides share one box: the shape of the first picture, video or canvas (the before side's, else the after side's), as wide as the container. `beforeSrc` and `afterSrc` (each with its alt text) draw the pictures for you; two pictures of different sizes, or even shapes, are both contained in the box, centred, so they always line up. Any other child is stretched to the box; a Cynosure [Image](?path=/docs/components-feedback-and-display-image--docs) lines up when given the same `ratio` and `fit="contain"`. With no media at all the sides lay out in the flow and the taller sets the height.
+
+<Canvas of={Stories.SourcesShareOneBox} />
+
+Control the divider with `value` and `onChange` (percent of the width showing `before`).
 
 <Canvas of={Stories.Controlled} />
 
