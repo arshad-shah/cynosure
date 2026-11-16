@@ -10,17 +10,18 @@ import { NumberField } from "@arshad-shah/cynosure";
   formatOptions={{ style: "currency", currency: "EUR" }} />;
 ```
 
-| Prop                                               | Default     | Notes                                                                                    |
-| -------------------------------------------------- | ----------- | ---------------------------------------------------------------------------------------- |
-| `layout` / `width`                                 | `stack` / – | `split` settings row and the control width, as on `Field`                                |
-| `value` / `defaultValue`                           | – / `null`  | A number, or `null` for empty                                                            |
-| `onChange`                                         | –           | Called when a value is committed: a step, Enter, or leaving the field                    |
-| `min` / `max`                                      | –           | Typed and stepped values are clamped; Home/End jump to them                              |
-| `step` / `largeStep`                               | `1` / 10×   | Arrows and steppers / Page Up and Down; stepped values snap to `step` counted from `min` |
-| `locale` / `formatOptions`                         | browser / – | How numbers are read and written (`Intl.NumberFormat`: currency, percent, units, digits) |
-| `hideSteppers`                                     | `false`     | Hide − and + (the keyboard still steps)                                                  |
-| `name`, `form`, `required`, `disabled`, `readOnly` | –           | Forms receive the plain number ("1234.5"), not the formatted text                        |
-| `labels`                                           | –           | `decrement` ("Decrease"), `increment` ("Increase")                                       |
+| Prop                                               | Default     | Notes                                                                                                                           |
+| -------------------------------------------------- | ----------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `layout` / `width`                                 | `stack` / – | `split` settings row and the control width, as on `Field`                                                                       |
+| `id` / `aria-labelledby` / `aria-describedby`      | –           | The input's id; named by other elements instead of the label (pair with `labelHidden`); your describing ids come before its own |
+| `value` / `defaultValue`                           | – / `null`  | A number, or `null` for empty                                                                                                   |
+| `onChange`                                         | –           | Called when a value is committed: a step, Enter, or leaving the field                                                           |
+| `min` / `max`                                      | –           | Typed and stepped values are clamped; Home/End jump to them                                                                     |
+| `step` / `largeStep`                               | `1` / 10×   | Arrows and steppers / Page Up and Down; stepped values snap to `step` counted from `min`                                        |
+| `locale` / `formatOptions`                         | browser / – | How numbers are read and written (`Intl.NumberFormat`: currency, percent, units, digits)                                        |
+| `hideSteppers`                                     | `false`     | Hide − and + (the keyboard still steps)                                                                                         |
+| `name`, `form`, `required`, `disabled`, `readOnly` | –           | Forms receive the plain number ("1234.5"), not the formatted text                                                               |
+| `labels`                                           | –           | `decrement` ("Decrease"), `increment` ("Increase")                                                                              |
 
 Also takes TextField's `label`, `labelHidden`, `description`, `error`, `placeholder`, `size` and `variant`. `parseNumber(text, locale, options)` is exported for reading numbers elsewhere; it reads whatever `Intl.NumberFormat` writes for that locale and options (other digits such as Arabic-Indic, currency, percent and unit text, accounting brackets).
 

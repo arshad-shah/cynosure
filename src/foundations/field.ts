@@ -4,6 +4,8 @@ export interface FieldOptions {
   id?: string | undefined;
   description?: unknown;
   error?: unknown;
+  /** Ids of elements outside the field that also describe the control (a caller's `aria-describedby`), read first. */
+  describedBy?: string | undefined;
 }
 
 export interface FieldRender {
@@ -17,12 +19,16 @@ export interface FieldRender {
 }
 
 /** Stable ids linking a control to its label, description and error. */
-export function useField({ id, description, error }: FieldOptions): FieldRender {
+export function useField({ id, description, error, describedBy }: FieldOptions): FieldRender {
   const generated = useId().replace(/:/g, "");
   const base = id ?? `cy-${generated}`;
   const hasDescription = description !== undefined && description !== null && description !== false;
   const invalid = error !== undefined && error !== null && error !== false && error !== "";
-  const ids = [hasDescription ? `${base}-description` : "", invalid ? `${base}-error` : ""].filter(Boolean);
+  const ids = [
+    describedBy?.trim() ?? "",
+    hasDescription ? `${base}-description` : "",
+    invalid ? `${base}-error` : "",
+  ].filter(Boolean);
   return {
     id: base,
     labelId: `${base}-label`,

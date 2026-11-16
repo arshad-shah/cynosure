@@ -421,3 +421,31 @@ export const TouchDragsWithoutScrolling: Story = {
     await waitFor(() => expect(thumb).toHaveAttribute("aria-valuenow", "60"));
   },
 };
+
+export const IdAndNamedAndDescribedFromOutside: Story = {
+  render: (args) => (
+    <div>
+      <span id="sl-heading">Master volume</span>
+      <span id="sl-hint">All outputs</span>
+      <Slider {...args} id="sl-volume" labelHidden aria-labelledby="sl-heading" aria-describedby="sl-hint" />
+      <Slider
+        label="Price"
+        defaultValue={[10, 40]}
+        id="sl-price"
+        aria-labelledby="sl-heading"
+        aria-describedby="sl-hint"
+      />
+    </div>
+  ),
+  play: async ({ canvas }) => {
+    const thumb = canvas.getByRole("slider", { name: "Master volume" });
+    await expect(thumb).toHaveAttribute("id", "sl-volume");
+    await expect(thumb).toHaveAccessibleDescription("All outputs");
+    // A range: the group carries the id and the outside name; each thumb is described too.
+    const group = canvas.getByRole("group", { name: "Master volume" });
+    await expect(group).toHaveAttribute("id", "sl-price");
+    await expect(canvas.getByRole("slider", { name: "Price, minimum" })).toHaveAccessibleDescription(
+      "All outputs",
+    );
+  },
+};

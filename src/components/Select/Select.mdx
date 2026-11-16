@@ -56,6 +56,8 @@ The list has a maximum height and scrolls. Long labels truncate with an ellipsis
 - **`error` and `description`:** shown under the field and linked to the trigger.
 - **`labels`:** override `placeholder`, `empty` (no options) and `required` (validation message).
 - **`labelHidden`:** hides the label visually while it still names the trigger. Prefer a visible label.
+- **`id`:** the trigger's id.
+- **Named and described from outside:** `aria-labelledby` names the trigger by other elements (a column heading) instead of its label; pair it with `labelHidden`. Your `aria-describedby` ids are read first, then the trigger's own description and error: they are merged, never replaced. The list is named by the same elements.
 
 ## Trailing text, dimmed options and a footer action
 

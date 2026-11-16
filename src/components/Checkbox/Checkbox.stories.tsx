@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { type CSSProperties, useState } from "react";
+import { type ChangeEvent, type CSSProperties, useState } from "react";
 import { expect, fn, waitFor } from "storybook/test";
 import { rgb, textContrast } from "../../test/color.js";
 import { computeUnderHostileHost } from "../../test/hostile.js";
@@ -38,9 +38,9 @@ export const ClickSpaceAndLabelToggle: Story = {
     await expect(box).not.toBeChecked();
     await userEvent.click(canvas.getByText("Email me updates"));
     await expect(box).toBeChecked();
-    await expect(args.onChange).toHaveBeenNthCalledWith(1, true);
-    await expect(args.onChange).toHaveBeenNthCalledWith(2, false);
-    await expect(args.onChange).toHaveBeenNthCalledWith(3, true);
+    await expect(args.onChange).toHaveBeenNthCalledWith(1, true, expect.anything());
+    await expect(args.onChange).toHaveBeenNthCalledWith(2, false, expect.anything());
+    await expect(args.onChange).toHaveBeenNthCalledWith(3, true, expect.anything());
   },
 };
 
@@ -104,7 +104,7 @@ export const CoarsePointerRow: Story = {
     const row = canvasElement.querySelector(".cy-choice") as HTMLElement;
     await expect(row.getBoundingClientRect().height).toBeGreaterThanOrEqual(44);
     await userEvent.pointer({ keys: "[TouchA]", target: canvas.getByText("Email me updates") });
-    await expect(args.onChange).toHaveBeenCalledWith(true);
+    await expect(args.onChange).toHaveBeenCalledWith(true, expect.anything());
   },
 };
 
@@ -334,5 +334,34 @@ export const DoneTokensRestyleTheStrike: Story = {
       Number.parseFloat(label.textDecorationThickness),
     ]).toEqual(["line-through", [0, 110, 0], 3]);
     await expect(rgb(getComputedStyle(part(canvasElement, "description")).color)).toEqual([0, 110, 0]);
+  },
+};
+
+export const ShiftClickAndRovingTabIndex: Story = {
+  render: (args) => (
+    <div>
+      <Checkbox {...args} label="Row 1" tabIndex={-1} />
+      <Checkbox label="Row 2" />
+    </div>
+  ),
+  play: async ({ canvas, args, userEvent }) => {
+    const first = canvas.getByRole("checkbox", { name: "Row 1" });
+    // tabIndex reaches the input: out of the Tab order, still focusable by script (a roving grid).
+    await expect(first).toHaveAttribute("tabindex", "-1");
+    await userEvent.tab();
+    await expect(canvas.getByRole("checkbox", { name: "Row 2" })).toHaveFocus();
+    first.focus();
+    await expect(first).toHaveFocus();
+    // The change event comes with the state; its native event is the click, so Shift is readable.
+    await userEvent.click(first);
+    const shift = () => {
+      const call = (args.onChange as ReturnType<typeof fn>).mock.lastCall as [boolean, ChangeEvent];
+      return [call[0], (call[1].nativeEvent as MouseEvent).shiftKey];
+    };
+    await expect(shift()).toEqual([true, false]);
+    await userEvent.keyboard("{Shift>}");
+    await userEvent.click(first);
+    await userEvent.keyboard("{/Shift}");
+    await expect(shift()).toEqual([false, true]);
   },
 };

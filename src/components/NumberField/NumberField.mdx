@@ -62,6 +62,7 @@ With `name`, the form receives the plain number ("1234.5"), whatever the text sh
 - **Steppers:** not tab stops (the field is one stop, as in the APG pattern); their hit areas are at least 24px, 44px on touch screens; pressing one keeps focus in the field.
 - **Mobile keyboards:** `inputmode` is `numeric` for whole non-negative numbers and `decimal` otherwise.
 - **Labels:** "Decrease" and "Increase" are in `labels`.
+- **Named and described from outside:** `aria-labelledby` names the field by other elements (a column heading) instead of its label; pair it with `labelHidden`. Your `aria-describedby` ids are read first, then the field's own description and error: they are merged, never replaced. `id` is the input's.
 
 ## Theming
 

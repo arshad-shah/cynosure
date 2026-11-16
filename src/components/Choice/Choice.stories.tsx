@@ -56,9 +56,9 @@ export const LabelNamesAndTogglesTheControl: Story = {
     await expect(box).toHaveFocus();
     await userEvent.keyboard(" ");
     await expect(box).toBeChecked();
-    await expect(args.onChange).toHaveBeenNthCalledWith(1, true);
-    await expect(args.onChange).toHaveBeenNthCalledWith(2, false);
-    await expect(args.onChange).toHaveBeenNthCalledWith(3, true);
+    await expect(args.onChange).toHaveBeenNthCalledWith(1, true, expect.anything());
+    await expect(args.onChange).toHaveBeenNthCalledWith(2, false, expect.anything());
+    await expect(args.onChange).toHaveBeenNthCalledWith(3, true, expect.anything());
   },
 };
 
@@ -221,7 +221,7 @@ export const CoarsePointerRow: Story = {
     const row = canvasElement.querySelector(".cy-choice") as HTMLElement;
     await expect(row.getBoundingClientRect().height).toBeGreaterThanOrEqual(44);
     await userEvent.pointer({ keys: "[TouchA]", target: canvas.getByText("Show hidden files") });
-    await expect(args.onChange).toHaveBeenCalledWith(true);
+    await expect(args.onChange).toHaveBeenCalledWith(true, expect.anything());
   },
 };
 
@@ -248,5 +248,31 @@ export const StableUnderHostileHost: Story = {
       "color",
     ]);
     await expect(description.hostile).toEqual(description.clean);
+  },
+};
+
+export const NamedAndDescribedFromOutsideWithAHiddenLabel: Story = {
+  render: (args) => (
+    <div>
+      <span id="ch-heading">Hidden files</span>
+      <span id="ch-hint">Dot files too</span>
+      <Choice
+        {...args}
+        id="ch-box"
+        labelHidden
+        description="In every folder"
+        aria-labelledby="ch-heading"
+        aria-describedby="ch-hint"
+      />
+    </div>
+  ),
+  play: async ({ canvas, canvasElement }) => {
+    const box = canvas.getByRole("checkbox", { name: "Hidden files" });
+    await expect(box).toHaveAttribute("id", "ch-box");
+    await expect(box).toHaveAccessibleDescription("Dot files too In every folder");
+    // labelHidden: the row's own label takes no space but is still in the page.
+    const text = canvasElement.querySelector(".cy-choice-text") as HTMLElement;
+    await expect(text.getBoundingClientRect().width).toBeLessThanOrEqual(1);
+    await expect(getComputedStyle(text).position).toBe("absolute");
   },
 };

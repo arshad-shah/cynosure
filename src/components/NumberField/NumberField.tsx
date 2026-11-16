@@ -69,6 +69,12 @@ export interface NumberFieldProps extends FieldLayoutProps {
    * mid-drag puts it back. The keys and the steppers still work as before.
    */
   scrub?: boolean;
+  /** Id of the input; the label, description and error ids are built from it. Default: generated. */
+  id?: string | undefined;
+  /** Ids of the element(s) that name the field instead of its label (a column heading). Pair with `labelHidden`. */
+  "aria-labelledby"?: string | undefined;
+  /** Ids of more elements that describe the field, read before its own description and error. */
+  "aria-describedby"?: string | undefined;
   /** Added to the root element, for layout. */
   className?: string;
   /** Layout only. */
@@ -214,6 +220,9 @@ export function NumberField({
   variant = "outline",
   labels,
   scrub = false,
+  id,
+  "aria-labelledby": labelledBy,
+  "aria-describedby": describedBy,
   className,
   style,
 }: NumberFieldProps) {
@@ -317,6 +326,9 @@ export function NumberField({
         className={className ? `cy-number-field ${className}` : "cy-number-field"}
         {...(style ? { style } : {})}
         role="spinbutton"
+        id={id}
+        aria-labelledby={labelledBy}
+        aria-describedby={describedBy}
         inputMode={integers ? "numeric" : "decimal"}
         autoComplete="off"
         autoCorrect="off"

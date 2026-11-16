@@ -389,3 +389,25 @@ export const StableUnderHostileHost: Story = {
     await expect(getComputedStyle(input).fontVariantNumeric).toBe("tabular-nums");
   },
 };
+
+export const IdAndNamedAndDescribedFromOutside: Story = {
+  render: (args) => (
+    <div>
+      <span id="nf-heading">Guests</span>
+      <span id="nf-hint">Adults only</span>
+      <NumberField
+        {...args}
+        id="nf-guests"
+        labelHidden
+        description="Up to 20"
+        aria-labelledby="nf-heading"
+        aria-describedby="nf-hint"
+      />
+    </div>
+  ),
+  play: async ({ canvas }) => {
+    const input = canvas.getByRole("spinbutton", { name: "Guests" });
+    await expect(input).toHaveAttribute("id", "nf-guests");
+    await expect(input).toHaveAccessibleDescription("Adults only Up to 20");
+  },
+};

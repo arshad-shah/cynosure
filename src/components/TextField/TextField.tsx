@@ -144,6 +144,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(function T
     className,
     style,
     onKeyDown,
+    "aria-describedby": describedBy,
     ...rest
   },
   forwarded,
@@ -183,6 +184,7 @@ export const TextField = forwardRef<HTMLInputElement, TextFieldProps>(function T
       error={error}
       required={required}
       size={size}
+      describedBy={describedBy}
       id={id}
       className={className}
       style={style}

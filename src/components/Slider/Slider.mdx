@@ -63,6 +63,8 @@ Give three or more numbers for as many thumbs, each held between its neighbours:
 
 ## Behaviour and accessibility
 
+- **Named and described from outside:** `id` goes on the slider (a range's group); `aria-labelledby` names it by other elements instead of `label` (pair with `labelHidden`; a range's thumbs keep "label, minimum"), and `aria-describedby` describes every thumb. A `<label for>` cannot name a slider (it is not a form control): use `aria-labelledby`.
+
 | Input | Result |
 | --- | --- |
 | <kbd>Right</kbd> / <kbd>Up</kbd> | Up by `step` (in right-to-left text, <kbd>Right</kbd> lowers it) |
