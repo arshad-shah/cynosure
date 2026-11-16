@@ -19,9 +19,6 @@
 .cy-color-field-picker.cy-color-field-picker[data-inline] {
   inline-size: 100%;
 }
-.cy-color-field[data-inline] .cy-color-field-swatch.cy-color-field-swatch {
-  margin-inline: var(--cy-space-3);
-}
 .cy-color-field-area.cy-color-field-area[aria-disabled] {
   opacity: 0.55;
   cursor: not-allowed;
@@ -43,6 +40,9 @@
     repeating-conic-gradient(var(--cy-color-soft) 0 25%, var(--cy-color-surface) 0 50%) 50% /
     var(--cy-space-4) var(--cy-space-4);
   font-size: var(--cy-font-size-md);
+}
+.cy-color-field[data-inline] .cy-color-field-swatch.cy-color-field-swatch {
+  margin-inline: var(--cy-space-3);
 }
 .cy-color-field-picker.cy-color-field-picker {
   display: grid;

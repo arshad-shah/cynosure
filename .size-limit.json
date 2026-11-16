@@ -780,5 +780,11 @@
     "path": ["dist/components/BitField/BitField.js", "dist/styles/bit-field.css"],
     "limit": "1.13 kB",
     "gzip": true
+  },
+  {
+    "name": "ColorSample (JS + CSS)",
+    "path": ["dist/components/ColorSample/ColorSample.js", "dist/styles/color-sample.css"],
+    "limit": "3 kB",
+    "gzip": true
   }
 ]

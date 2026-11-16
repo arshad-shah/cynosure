@@ -59,6 +59,10 @@
     cursor: not-allowed;
     opacity: 0.5;
   }
+  /* Read-only: a picture of the colour, not a control. */
+  [data-readonly] > & {
+    cursor: default;
+  }
 }
 @media (pointer: coarse) {
   .cy-color-swatches.cy-color-swatches {

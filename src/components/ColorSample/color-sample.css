@@ -1,0 +1,80 @@
+/*
+ * color-sample: a surface painted with any colour (over a checkerboard, so a translucent colour reads as one), with a
+ * hairline so a colour like the page's still shows its edge. With an ink, sample text on it and a contrast line below.
+ */
+.cy-color-sample.cy-color-sample {
+  --_h: var(--cy-color-sample-height, calc(var(--cy-space-10) * 3));
+  --_text: var(--cy-font-size-2xl);
+  box-sizing: border-box !important;
+  display: grid;
+  gap: var(--cy-color-sample-gap, var(--cy-space-3));
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+  color: var(--cy-color-ink);
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-font-size-md);
+  font-weight: var(--cy-font-weight-regular);
+  line-height: var(--cy-font-line-height);
+  letter-spacing: normal;
+  text-transform: none;
+  &[data-size="sm"] {
+    --_h: calc(var(--cy-color-sample-height, calc(var(--cy-space-10) * 3)) / 2);
+    --_text: var(--cy-font-size-lg);
+  }
+  &[data-size="lg"] {
+    --_h: calc(var(--cy-color-sample-height, calc(var(--cy-space-10) * 3)) * 5 / 3);
+    --_text: calc(var(--cy-font-size-2xl) * 1.6);
+  }
+}
+.cy-color-sample-surface.cy-color-sample-surface {
+  display: grid;
+  place-items: center;
+  block-size: var(--_h);
+  padding: var(--cy-space-4);
+  border: var(--cy-border-width) solid color-mix(in oklab, var(--cy-color-ink) 20%, transparent);
+  border-radius: var(--cy-color-sample-radius, var(--cy-radius-md));
+  background:
+    linear-gradient(var(--_bg), var(--_bg)),
+    repeating-conic-gradient(var(--cy-color-soft) 0 25%, var(--cy-color-surface) 0 50%) 0 0 /
+    var(--cy-space-5) var(--cy-space-5);
+  font-size: var(--cy-font-size-md);
+  overflow: hidden;
+}
+.cy-color-sample-text.cy-color-sample-text {
+  box-sizing: border-box !important;
+  margin: 0;
+  color: var(--_ink);
+  font-family: var(--cy-font-sans);
+  font-size: var(--_text);
+  font-weight: var(--cy-font-weight-medium);
+  line-height: 1.2;
+  letter-spacing: normal;
+  text-align: center;
+  text-transform: none;
+  overflow-wrap: anywhere;
+}
+.cy-color-sample-contrast.cy-color-sample-contrast {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--cy-space-2);
+  font-size: var(--cy-font-size-sm);
+}
+.cy-color-sample-ratio.cy-color-sample-ratio {
+  box-sizing: border-box !important;
+  margin: 0;
+  margin-inline-end: var(--cy-space-2);
+  font-family: var(--cy-font-sans);
+  font-size: var(--cy-font-size-sm);
+  font-weight: var(--cy-font-weight-medium);
+  font-variant-numeric: tabular-nums;
+  line-height: var(--cy-font-line-height);
+  letter-spacing: normal;
+  text-transform: none;
+}
+@media (forced-colors: active) {
+  .cy-color-sample-surface.cy-color-sample-surface {
+    forced-color-adjust: none;
+  }
+}

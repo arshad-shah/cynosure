@@ -104,6 +104,13 @@ export {
   readColor,
 } from "./components/ColorField/index.js";
 export {
+  ColorSample,
+  type ColorSampleLabels,
+  type ColorSampleProps,
+  type ColorSampleTokens,
+  sampleContrast,
+} from "./components/ColorSample/index.js";
+export {
   type ColorSwatch,
   ColorSwatches,
   type ColorSwatchesProps,
