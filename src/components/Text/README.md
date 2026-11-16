@@ -29,6 +29,7 @@ import { Text } from "@arshad-shah/cynosure";
 | `dateTime`            | –         | With `as="time"`: machine-readable date                                                                              |
 | `id`                  | –         | For `aria-labelledby` and `aria-describedby`                                                                         |
 | `className` / `style` | –         | Layout only                                                                                                          |
+| `id`, `data-*`, `ref` | –         | Set on the root element (a link target, test or state hooks)                                                         |
 
 The ref is forwarded to the element.
 

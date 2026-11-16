@@ -41,6 +41,12 @@ import { copy, edit, moreHorizontal, trash } from "@arshad-shah/cynosure/icons";
 
 `trigger` is a render prop: spread its props onto a [Button](?path=/docs/components-controls-button--docs) or [IconButton](?path=/docs/components-controls-iconbutton--docs). Sections (`{ label, items }`) render as a named group after a separator.
 
+## Placement
+
+`placement` picks the side of the trigger (default `bottom`; it flips when there is no room). `align` lines the menu up with the trigger across that side: `start`, `center` or `end`, following the reading direction, such as `end` for a "more" button at the end of a row. `offset` sets the gap in pixels, over the `--cy-menu-offset` token.
+
+<Canvas of={Stories.AlignAndOffsetPlaceTheMenu} />
+
 ## Sections without a label
 
 A section with no `label` (`{ items: [...] }`) is set apart by separator lines before and after it, without a group name: undo/redo, then cut/copy/paste.

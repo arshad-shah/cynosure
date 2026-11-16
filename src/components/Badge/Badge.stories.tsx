@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { useEffect, useRef, useState } from "react";
 import { expect } from "storybook/test";
 import { check } from "../../icons/index.js";
 import { textContrast } from "../../test/color.js";
@@ -152,5 +153,32 @@ export const StableUnderHostileHost: Story = {
       "border-radius",
     ]);
     await expect(hostile).toEqual(clean);
+  },
+};
+
+export const PassesIdDataAndRef: Story = {
+  render: (args) => {
+    function WithRef() {
+      const ref = useRef<HTMLSpanElement>(null);
+      const [seen, setSeen] = useState("");
+      useEffect(() => setSeen(ref.current?.dataset.state ?? ""), []);
+      return (
+        <>
+          <Badge tone={args.tone ?? "accent"} ref={ref} id="tip" data-state="ready" data-row={3}>
+            Draft
+          </Badge>
+          <output data-testid="ref">{seen}</output>
+        </>
+      );
+    }
+    return <WithRef />;
+  },
+  play: async ({ canvasElement, canvas }) => {
+    const root = canvasElement.querySelector("#tip") as HTMLElement;
+    // The id and any data-* attribute land on the component's root, and the ref is that element.
+    await expect(root).toHaveClass("cy-badge");
+    await expect(root).toHaveAttribute("data-state", "ready");
+    await expect(root).toHaveAttribute("data-row", "3");
+    await expect(canvas.getByTestId("ref")).toHaveTextContent("ready");
   },
 };

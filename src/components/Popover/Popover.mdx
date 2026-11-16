@@ -51,6 +51,12 @@ Popovers nest, and Escape closes one layer at a time: an inner popover first, th
 
 <Canvas of={Stories.WidthMatchesTheTrigger} />
 
+## Alignment and gap
+
+`align` lines the panel up with its trigger across the side it opens on: `start`, `center` or `end`, following the reading direction (beside the trigger, `start` is the top edge and `end` the bottom). Unset, the panel starts at the trigger's start edge above or below it, and is centred beside it. `offset` is the gap in pixels (default 6).
+
+<Canvas of={Stories.AlignLinesThePanelUpWithTheTrigger} />
+
 ## Props
 
 <ArgTypes of={Stories} />
@@ -63,8 +69,10 @@ Popovers nest, and Escape closes one layer at a time: an inner popover first, th
 | <kbd>Escape</kbd> | Closes the topmost layer and returns focus to its trigger |
 | Pointer down outside | Closes it |
 | <kbd>Tab</kbd> with `modal` | Cycles inside the panel |
+| <kbd>Tab</kbd> past the last control, without `modal` | Closes it; focus stays where Tab put it |
 
 - **Focus:** on open, focus moves to the first control inside, or to the panel itself when it has none, so screen readers land in it (`initialFocus` changes this). On close, focus returns to the trigger unless you already moved it somewhere else.
+- **Focus leaving:** a non-modal panel closes when focus moves out of it to anything but its trigger or anchor (Tab past its last control, a click into another field), so it never hangs open over what has focus. Shift+Tab back to the trigger keeps it open. `closeOnFocusOut={false}` keeps it open until Escape, an outside press or the trigger closes it.
 - **Anchor:** an anchor element counts as part of the popover, like the trigger: pressing it is not an outside press.
 - **Role:** the panel is a dialog named by `label`. With `modal` it is `aria-modal` and keeps Tab inside.
 - **Position:** the panel prefers `placement`, flips to the other side when there is no room, and stays inside the viewport. `start` and `end` follow the reading direction.

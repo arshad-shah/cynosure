@@ -11,7 +11,7 @@ import { Checkbox } from "../Checkbox/Checkbox.js";
 import { IconButton } from "../IconButton/IconButton.js";
 import { Stack } from "../Stack/Stack.js";
 import { TextField } from "../TextField/TextField.js";
-import { Popover } from "./Popover.js";
+import { Popover, type PopoverTriggerProps } from "./Popover.js";
 
 const meta = {
   title: "Components/Overlays/Popover",
@@ -611,5 +611,127 @@ export const TouchOpensWithoutTakingFocus: Story = {
     await expect(box).not.toHaveFocus();
     await userEvent.pointer({ keys: "[TouchA]", target: box });
     await expect(box).toBeChecked();
+  },
+};
+
+/** A wide trigger, so the three alignments land in different places. */
+const wideTrigger = (props: PopoverTriggerProps) => (
+  <Button {...props} style={{ inlineSize: 360 }}>
+    Filters
+  </Button>
+);
+
+export const AlignLinesThePanelUpWithTheTrigger: Story = {
+  args: { trigger: wideTrigger, size: "sm", width: "fixed", align: "end" },
+  argTypes: { align: { control: "inline-radio", options: ["start", "center", "end"] } },
+  play: async ({ canvas, userEvent }) => {
+    const trigger = canvas.getByRole("button", { name: "Filters" });
+    await userEvent.click(trigger);
+    const dialog = await canvas.findByRole("dialog", { name: "Filters" });
+    await shownFully(dialog);
+    const t = trigger.getBoundingClientRect();
+    // `end`: the panel's end edge meets the trigger's.
+    await waitFor(() => expect(Math.abs(dialog.getBoundingClientRect().right - t.right)).toBeLessThan(1));
+    await userEvent.keyboard("{Escape}");
+    await settledClosed(dialog);
+  },
+};
+
+export const AlignCenterAndStartInRtl: Story = {
+  args: { trigger: wideTrigger, size: "sm", width: "fixed" },
+  render: (args) => (
+    <div dir="rtl">
+      <Popover {...args} align="center" label="Centred" />
+      <div style={{ blockSize: 260 }} />
+      <Popover
+        {...args}
+        align="start"
+        label="Start"
+        trigger={(props) => (
+          <Button {...props} style={{ inlineSize: 360 }}>
+            Sort
+          </Button>
+        )}
+      />
+    </div>
+  ),
+  play: async ({ canvas, userEvent }) => {
+    const centred = canvas.getByRole("button", { name: "Filters" });
+    await userEvent.click(centred);
+    const one = await canvas.findByRole("dialog", { name: "Centred" });
+    await shownFully(one);
+    const c = centred.getBoundingClientRect();
+    const p = one.getBoundingClientRect();
+    await expect(Math.abs(p.left + p.width / 2 - (c.left + c.width / 2))).toBeLessThan(1);
+    await userEvent.keyboard("{Escape}");
+    await settledClosed(one);
+    // `start` in right-to-left text: the right edges meet.
+    const start = canvas.getByRole("button", { name: "Sort" });
+    await userEvent.click(start);
+    const two = await canvas.findByRole("dialog", { name: "Start" });
+    await shownFully(two);
+    await waitFor(() =>
+      expect(Math.abs(two.getBoundingClientRect().right - start.getBoundingClientRect().right)).toBeLessThan(
+        1,
+      ),
+    );
+  },
+};
+
+export const OffsetSetsTheGap: Story = {
+  args: { offset: 20 },
+  play: async ({ canvas, userEvent }) => {
+    const trigger = canvas.getByRole("button", { name: "Filters" });
+    await userEvent.click(trigger);
+    const dialog = await canvas.findByRole("dialog", { name: "Filters" });
+    await shownFully(dialog);
+    await waitFor(() =>
+      expect(dialog.getBoundingClientRect().top - trigger.getBoundingClientRect().bottom).toBeCloseTo(20, 0),
+    );
+  },
+};
+
+const withNextButton: NonNullable<Story["render"]> = (args) => (
+  <>
+    <Popover {...args} />
+    <Button>Next on the page</Button>
+  </>
+);
+
+export const TabOutOfTheLastControlCloses: Story = {
+  render: withNextButton,
+  play: async ({ args, canvas, userEvent }) => {
+    const trigger = canvas.getByRole("button", { name: "Filters" });
+    await userEvent.click(trigger);
+    const dialog = await canvas.findByRole("dialog", { name: "Filters" });
+    await shownFully(dialog);
+    // Shift+Tab back to the trigger keeps it open: the trigger belongs to it.
+    await userEvent.tab({ shift: true });
+    await expect(trigger).toHaveFocus();
+    await expect(isOpen(dialog)).toBe(true);
+    await userEvent.tab();
+    await userEvent.tab();
+    await userEvent.tab();
+    await expect(canvas.getByRole("button", { name: "Apply" })).toHaveFocus();
+    await expect(isOpen(dialog)).toBe(true);
+    // Tab past the last control leaves the panel: it closes, and focus stays where Tab put it.
+    await userEvent.tab();
+    await settledClosed(dialog);
+    await expect(canvas.getByRole("button", { name: "Next on the page" })).toHaveFocus();
+    await expect(args.onOpenChange).toHaveBeenLastCalledWith(false);
+  },
+};
+
+export const CloseOnFocusOutFalseStaysOpen: Story = {
+  args: { closeOnFocusOut: false },
+  render: withNextButton,
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole("button", { name: "Filters" }));
+    const dialog = await canvas.findByRole("dialog", { name: "Filters" });
+    await shownFully(dialog);
+    canvas.getByRole("button", { name: "Apply" }).focus();
+    await userEvent.tab();
+    await expect(canvas.getByRole("button", { name: "Next on the page" })).toHaveFocus();
+    await expect(isOpen(dialog)).toBe(true);
   },
 };

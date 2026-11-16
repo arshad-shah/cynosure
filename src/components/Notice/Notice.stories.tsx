@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { useEffect, useRef, useState } from "react";
 import { expect, fn, waitFor } from "storybook/test";
 import { backdrop, contrast, textContrast } from "../../test/color.js";
 import { computeUnderHostileHost } from "../../test/hostile.js";
@@ -315,5 +316,30 @@ export const Defaults: Story = {
     await expect(notice).toHaveClass("host-notice");
     await expect(canvasElement.querySelector(".cy-notice-icon")).not.toBeNull();
     await expect(canvas.queryByRole("button")).toBeNull();
+  },
+};
+
+export const PassesIdDataAndRef: Story = {
+  render: (args) => {
+    function WithRef() {
+      const ref = useRef<HTMLDivElement>(null);
+      const [seen, setSeen] = useState("");
+      useEffect(() => setSeen(ref.current?.dataset.state ?? ""), []);
+      return (
+        <>
+          <Notice {...args} ref={ref} id="tip" data-state="ready" data-row={3} />
+          <output data-testid="ref">{seen}</output>
+        </>
+      );
+    }
+    return <WithRef />;
+  },
+  play: async ({ canvasElement, canvas }) => {
+    const root = canvasElement.querySelector("#tip") as HTMLElement;
+    // The id and any data-* attribute land on the component's root, and the ref is that element.
+    await expect(root).toHaveClass("cy-notice");
+    await expect(root).toHaveAttribute("data-state", "ready");
+    await expect(root).toHaveAttribute("data-row", "3");
+    await expect(canvas.getByTestId("ref")).toHaveTextContent("ready");
   },
 };

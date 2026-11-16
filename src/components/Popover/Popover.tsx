@@ -1,9 +1,17 @@
-import { type CSSProperties, type KeyboardEvent, type ReactNode, type Ref, useId, useRef } from "react";
+import {
+  type CSSProperties,
+  type FocusEvent,
+  type KeyboardEvent,
+  type ReactNode,
+  type Ref,
+  useId,
+  useRef,
+} from "react";
 import { useControllableState } from "../../foundations/controllable.js";
 import { deepActiveElement } from "../../foundations/focus.js";
 import { useDismiss } from "../../overlay/dismiss.js";
 import { usePopover } from "../../overlay/floating.js";
-import type { Placement } from "../../overlay/position.js";
+import { type Align, crossAlign, type Placement } from "../../overlay/position.js";
 import { useAnchoredPosition, type VirtualAnchor } from "../../overlay/use-anchored-position.js";
 import type { Size } from "../../tokens/schema.js";
 
@@ -56,6 +64,14 @@ export interface PopoverProps {
   onOpenChange?: (open: boolean) => void;
   /** Preferred side; flips when it does not fit. `start`/`end` follow the reading direction. */
   placement?: Placement;
+  /**
+   * Which edges line up with the trigger's across the side it opens on: `start`, `center` or `end` (the start and end
+   * edges follow the reading direction; beside the trigger, `start` is the top edge and `end` the bottom). Default:
+   * the start edge above or below, centred beside.
+   */
+  align?: Align | undefined;
+  /** Gap between the trigger (or anchor) and the panel, in pixels. Default 6. */
+  offset?: number | undefined;
   /** Panel width preset: the most it grows to (or, with `width="fixed"`, its width). */
   size?: Size;
   /**
@@ -73,6 +89,12 @@ export interface PopoverProps {
   initialFocus?: "first" | "panel" | "none";
   /** Keep Tab inside the panel until it closes. */
   modal?: boolean;
+  /**
+   * Close a non-modal panel when focus moves out of it to somewhere other than the trigger or anchor (Tab past its
+   * last control, a click into another field), so it never hangs open over what has focus. Default true; false keeps
+   * it open until Escape, an outside press or the trigger closes it.
+   */
+  closeOnFocusOut?: boolean;
   /** Added to the panel, for layout. */
   className?: string;
   /** Layout only, applied to the panel. */
@@ -93,10 +115,13 @@ export function Popover({
   defaultOpen = false,
   onOpenChange,
   placement = "bottom",
+  align,
+  offset = 6,
   size = "md",
   width = "content",
   initialFocus = "first",
   modal = false,
+  closeOnFocusOut = true,
   className,
   style,
   children,
@@ -133,7 +158,7 @@ export function Popover({
     const first = initialFocus === "first" ? el.querySelector<HTMLElement>(FOCUSABLE) : null;
     (first ?? el).focus({ preventScroll: true });
   });
-  useAnchoredPosition(anchor ? placed : triggerRef, panel, isOpen, placement, 6, "start");
+  useAnchoredPosition(anchor ? placed : triggerRef, panel, isOpen, placement, offset, crossAlign(align));
   useDismiss({
     open: isOpen,
     onClose: () => setOpen(false),
@@ -155,6 +180,15 @@ export function Popover({
       event.preventDefault();
       first.focus();
     }
+  };
+
+  // Focus leaving for an element outside the panel, trigger and anchor closes a non-modal panel. Focus going nowhere
+  // (a click on plain page, another window) is left to the outside press, or keeps it open.
+  const leave = (event: FocusEvent<HTMLDivElement>) => {
+    if (modal || !closeOnFocusOut) return;
+    const to = event.relatedTarget as Node | null;
+    if (!to || [panel, triggerRef, anchorEl].some((r) => r.current?.contains(to))) return;
+    setOpen(false);
   };
 
   return (
@@ -179,6 +213,7 @@ export function Popover({
         data-width={width === "content" ? undefined : width}
         style={style}
         onKeyDown={trap}
+        onBlur={leave}
       >
         {children}
       </div>

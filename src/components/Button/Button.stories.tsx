@@ -3,13 +3,15 @@ import { useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { expect, fn, waitFor } from "storybook/test";
 import * as icons from "../../icons/index.js";
-import { chevronDown, copy, download, trash } from "../../icons/index.js";
+import { chevronDown, copy, download, settings, trash } from "../../icons/index.js";
 import { createStyleSheet } from "../../styles/inline.js";
 import { backdrop, contrast, rgb, textContrast } from "../../test/color.js";
 import { computeUnderHostileHost } from "../../test/hostile.js";
 import { realHover } from "../../test/hover.js";
+import { fakeRouter } from "../../test/router.js";
 import { CynosureTheme } from "../../theme/index.js";
 import { createTheme } from "../../tokens/index.js";
+import { IconButton } from "../IconButton/IconButton.js";
 import { TextField } from "../TextField/TextField.js";
 import { Button } from "./Button.js";
 
@@ -739,5 +741,43 @@ export const LinkTakesIdAndRef: Story = {
     await expect(link).toHaveAttribute("id", "docs-link");
     // linkRef receives the link element.
     await waitFor(() => expect(canvas.getByTestId("tag")).toHaveTextContent("A"));
+  },
+};
+
+export const RendersYourRoutersLink: Story = {
+  render: () => {
+    const router = fakeRouter();
+    (window as unknown as { buttonRouter: typeof router }).buttonRouter = router;
+    return (
+      <div style={{ display: "flex", gap: 8 }}>
+        <Button href="/docs" variant="solid" tone="accent" renderLink={router.renderLink} aria-current="page">
+          Read the docs
+        </Button>
+        <IconButton href="/settings" icon={settings} label="Settings" renderLink={router.renderLink} />
+        <Button href="https://example.com" target="_blank" renderLink={router.renderLink}>
+          Example
+        </Button>
+      </div>
+    );
+  },
+  play: async ({ canvas, userEvent }) => {
+    const { visits } = (window as unknown as { buttonRouter: ReturnType<typeof fakeRouter> }).buttonRouter;
+    const docs = canvas.getByRole("link", { name: "Read the docs" });
+    // The router's element, with the button's look and state on it.
+    await expect(docs).toHaveAttribute("data-router", "yes");
+    await expect(docs).toHaveAttribute("href", "/app/docs");
+    await expect(docs).toHaveClass("cy-button");
+    await expect(docs).toHaveAttribute("data-variant", "solid");
+    await expect(docs).toHaveAttribute("aria-current", "page");
+    await userEvent.click(docs);
+    await expect(visits).toEqual(["/docs"]);
+    // IconButton takes it too, and keeps its name.
+    const icon = canvas.getByRole("link", { name: "Settings" });
+    await expect(icon).toHaveAttribute("data-router", "yes");
+    icon.focus();
+    await userEvent.keyboard("{Enter}");
+    await expect(visits).toEqual(["/docs", "/settings"]);
+    // A new tab keeps a safe rel.
+    await expect(canvas.getByRole("link", { name: "Example" })).toHaveAttribute("rel", "noopener noreferrer");
   },
 };

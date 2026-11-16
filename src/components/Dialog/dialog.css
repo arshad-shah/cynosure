@@ -164,6 +164,10 @@
 .cy-dialog-header.cy-dialog-header:has(> .cy-visually-hidden) {
   justify-content: flex-end;
 }
+/* A hidden title and no close button: nothing to show, so the header takes no room (the title stays in the tree). */
+.cy-dialog-header.cy-dialog-header[data-empty] {
+  display: contents;
+}
 
 /* Narrow container: a centred dialog becomes a bottom sheet (a full one already fills the container). */
 @container cy-dialog (inline-size < 36rem) {

@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect } from "storybook/test";
 import { computeUnderHostileHost } from "../../test/hostile.js";
+import { ROOT_ATTRIBUTES, rootAttributesStory } from "../../test/root-attributes.js";
 import { Kbd } from "./Kbd.js";
 
 const meta = {
@@ -73,3 +74,8 @@ export const StableUnderHostileHost: Story = {
     await expect(hostile).toEqual(clean);
   },
 };
+
+export const PassesIdDataAndRef: Story = rootAttributesStory<HTMLElement>(
+  (ref) => <Kbd ref={ref} {...ROOT_ATTRIBUTES} keys={["Ctrl", "K"]} />,
+  "cy-kbd",
+);

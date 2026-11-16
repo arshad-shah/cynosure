@@ -42,6 +42,16 @@ import { home } from "@arshad-shah/cynosure/icons";
 
 Items are data, not children. The last item is always the current page, so its `href` and `onClick` are ignored. An earlier item is a link with `href`, a button with only `onClick`, and plain text with neither.
 
+## With your router
+
+`renderLink` renders each crumb's link with your router's link component. It is Link's `renderLink`, handed to every crumb, so the router's element keeps the crumb's look: spread the props it receives and map `href` to the router's own prop. A crumb chosen from the menu of hidden items is a click on that same element, so it routes too.
+
+```tsx
+<Breadcrumbs items={trail} renderLink={({ href, ...props }) => <RouterLink {...props} to={href ?? "/"} />} />
+```
+
+<Canvas of={Stories.RendersYourRoutersLinks} />
+
 ## Collapsing a long trail
 
 With more items than `maxItems`, the first item and the last `maxItems - 1` stay. The ones between go into a menu behind a "more" button, listed in trail order. Values under 2 count as 2.

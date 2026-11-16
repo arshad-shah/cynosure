@@ -20,6 +20,8 @@ An item with `items` opens a **submenu** beside it (end side, flipping at the vi
 
 `open`, `defaultOpen` and `onOpenChange` make the menu controllable, to open it from a keyboard shortcut.
 
+`placement` picks the side (default `bottom`, flipping when there is no room); `align` lines the menu up with the trigger across it (`start`, `center` or `end`, following the reading direction; unset, the start edge above or below, centred beside); `offset` is the gap in pixels (default the `--cy-menu-offset` token).
+
 - Enter, Space, click or Down open on the first item; Up opens on the last.
 - Up, Down, Home and End move (wrapping, skipping disabled items); typing jumps to the next matching item (within the focused menu).
 - Enter, Space or click selects and closes; checkable items stay open.

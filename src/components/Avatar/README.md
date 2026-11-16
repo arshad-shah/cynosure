@@ -32,6 +32,7 @@ import { folder } from "@arshad-shah/cynosure/icons";
 | `labels`              | English   | `{ online, away, busy, offline }`: the spoken status names                                                                                                               |
 | `decorative`          | `false`   | Hides the avatar from assistive technology, for when the name is written beside it                                                                                       |
 | `className` / `style` | –         | Layout only                                                                                                                                                              |
+| `id`, `data-*`, `ref` | –         | Set on the root element (a link target, test or state hooks)                                                                                                             |
 
 ## AvatarGroup
 

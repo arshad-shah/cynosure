@@ -55,6 +55,7 @@ import { alert, play, trash } from "@arshad-shah/cynosure/icons";
 | `tone`                   | –       | A rail and a faint wash in the tone's colour; its word ("Error") is read before the title |
 | `wrap`                   | `false` | The title wraps instead of being cut                                                      |
 | `onClick` / `href`       | –       | Makes the row a button or a link (`href` wins; unsafe schemes are not linked)             |
+| `renderLink`             | –       | With `href`: render the link with your router (Link's `LinkRenderProps` contract)         |
 | `className` / `style`    | –       | Layout only                                                                               |
 
 ## Keyboard, focus and touch

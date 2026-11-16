@@ -235,7 +235,7 @@ export {
   type KeyValueEditorTokens,
   type KeyValuePair,
 } from "./components/KeyValueEditor/index.js";
-export { Link, type LinkProps } from "./components/Link/index.js";
+export { Link, type LinkProps, type LinkRenderProps, type RenderLink } from "./components/Link/index.js";
 export {
   List,
   type ListItem,
@@ -488,10 +488,25 @@ export { Switch, type SwitchProps, type SwitchTokens } from "./components/Switch
 export {
   type SortDirection,
   Table,
+  TableBody,
+  type TableBodyProps,
+  TableCell,
+  type TableCellProps,
   type TableColumn,
+  type TableComponent,
+  TableFoot,
+  type TableFootProps,
+  type TableFrameProps,
+  TableHead,
+  TableHeaderCell,
+  type TableHeaderCellProps,
+  type TableHeadProps,
   type TableLabels,
   type TableProps,
+  TableRow,
+  type TableRowProps,
   type TableSort,
+  type TableStaticProps,
   type TableTokens,
 } from "./components/Table/index.js";
 export {
@@ -574,6 +589,7 @@ export {
   type ZoomControlsLabels,
   type ZoomControlsProps,
 } from "./components/ZoomControls/index.js";
+export type { DataAttributes, RootAttributes } from "./foundations/attributes.js";
 export { ButtonBase, type ButtonBaseProps } from "./foundations/ButtonBase/ButtonBase.js";
 export { ChoiceBase, type ChoiceBaseProps } from "./foundations/ChoiceBase/ChoiceBase.js";
 export { useControllableState } from "./foundations/controllable.js";

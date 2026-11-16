@@ -47,6 +47,14 @@ By default the header stays at the top while the page scrolls, over a blurred vi
 
 <Canvas of={Stories.StickyWhileThePageScrolls} />
 
+## With your router
+
+`renderLink` renders the brand and every navigation link with your router's link component, in the bar and in the narrow screens' menu, with the same contract as [Link](?path=/docs/components-controls-link--docs)'s (`LinkRenderProps`). SideNav's `renderLink` takes the same function.
+
+```tsx
+<SiteHeader brand="Acme" nav={nav} renderLink={({ href, ...props }) => <RouterLink {...props} to={href ?? "/"} />} />
+```
+
 ## Props
 
 <ArgTypes of={Stories} />

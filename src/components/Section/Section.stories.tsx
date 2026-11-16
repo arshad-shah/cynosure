@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import type { CSSProperties } from "react";
+import { type CSSProperties, useEffect, useRef, useState } from "react";
 import { expect } from "storybook/test";
 import { computeUnderHostileHost } from "../../test/hostile.js";
 import { Button } from "../Button/Button.js";
@@ -219,5 +219,53 @@ export const StableUnderHostileHost: Story = {
       "background-color",
     ]);
     await expect(hostile).toEqual(clean);
+  },
+};
+
+export const PassesHandlersDataAndRef: Story = {
+  render: () => {
+    function Zone() {
+      const ref = useRef<HTMLElement>(null);
+      const [log, setLog] = useState<string[]>([]);
+      const [hasRef, setHasRef] = useState(false);
+      useEffect(() => setHasRef(ref.current?.dataset.zone === "drop"), []);
+      return (
+        <>
+          <Section
+            ref={ref}
+            variant="soft"
+            data-zone="drop"
+            data-state={log.length ? "used" : "idle"}
+            aria-label="Drop zone"
+            role="region"
+            tabIndex={0}
+            onClick={() => setLog((l) => [...l, "click"])}
+            onKeyDown={(e) => e.key === "Enter" && setLog((l) => [...l, "enter"])}
+            onDragOver={(e) => e.preventDefault()}
+            onPointerEnter={() => setLog((l) => [...l, "enter-pointer"])}
+          >
+            <span>Drop files</span>
+            <span>here</span>
+          </Section>
+          <output data-testid="log">{log.join(",")}</output>
+          <output data-testid="ref">{String(hasRef)}</output>
+        </>
+      );
+    }
+    return <Zone />;
+  },
+  play: async ({ canvas, userEvent }) => {
+    const zone = canvas.getByRole("region", { name: "Drop zone" });
+    // Any data-* attribute reaches the element, and the ref is the element itself.
+    await expect(zone).toHaveAttribute("data-zone", "drop");
+    await expect(zone).toHaveAttribute("data-state", "idle");
+    await expect(canvas.getByTestId("ref")).toHaveTextContent("true");
+    // Event handlers run on the element: pointer, click and keys (it is focusable with tabIndex).
+    await userEvent.hover(zone);
+    await userEvent.click(zone);
+    await expect(zone).toHaveFocus();
+    await userEvent.keyboard("{Enter}");
+    await expect(canvas.getByTestId("log")).toHaveTextContent("enter-pointer,click,enter");
+    await expect(zone).toHaveAttribute("data-state", "used");
   },
 };

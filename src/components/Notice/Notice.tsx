@@ -1,4 +1,5 @@
-import { type CSSProperties, type ReactNode, useState } from "react";
+import { type CSSProperties, forwardRef, type ReactNode, useState } from "react";
+import type { RootAttributes } from "../../foundations/attributes.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
 import { TONE_ICONS } from "../../foundations/tone-icons.js";
 import { close as closeIcon } from "../../icons/close.js";
@@ -25,7 +26,7 @@ export interface NoticeLabels {
   dismiss: string;
 }
 
-export interface NoticeProps {
+export interface NoticeProps extends RootAttributes {
   /**
    * Colour and icon. `danger` is `role="alert"` (announced even when it mounts filled); the others are `role="status"`,
    * whose content changes are announced politely.
@@ -59,25 +60,31 @@ export interface NoticeProps {
 }
 
 /** An inline message about part of the page: a status, a warning or an error that stays until it is resolved. */
-export function Notice({
-  tone = "info",
-  variant = "soft",
-  size = "md",
-  title,
-  action,
-  dismissible = false,
-  onDismiss,
-  icon,
-  labels,
-  className,
-  style,
-  children,
-}: NoticeProps) {
+export const Notice = forwardRef<HTMLDivElement, NoticeProps>(function Notice(
+  {
+    tone = "info",
+    variant = "soft",
+    size = "md",
+    title,
+    action,
+    dismissible = false,
+    onDismiss,
+    icon,
+    labels,
+    className,
+    style,
+    children,
+    ...rest
+  },
+  ref,
+) {
   const [hidden, setHidden] = useState(false);
   if (hidden) return null;
   const glyph = icon === undefined ? TONE_ICONS[tone] : icon;
   return (
     <div
+      ref={ref}
+      {...rest}
       role={tone === "danger" ? "alert" : "status"}
       className={className ? `cy-notice ${className}` : "cy-notice"}
       data-tone={tone}
@@ -110,4 +117,4 @@ export function Notice({
       </div>
     </div>
   );
-}
+});

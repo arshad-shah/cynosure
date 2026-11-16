@@ -1,3 +1,34 @@
+/* One child of a separated row (`separator`), and the mark before every one but the first, drawn in the gap: the
+   item's ::before, with the row's gap after it. It is a box, not a character, so nothing extra is read out. */
+.cy-inline-item {
+  display: inline-flex;
+  align-items: center;
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+}
+.cy-inline[data-separator] > .cy-inline-item + .cy-inline-item::before {
+  content: "";
+  flex: none;
+  margin-inline-end: var(--_gap);
+  background: var(--cy-inline-separator-color, var(--cy-color-muted));
+}
+.cy-inline[data-separator="dot"] > .cy-inline-item + .cy-inline-item::before {
+  inline-size: var(--cy-inline-separator-size, 0.25em);
+  block-size: var(--cy-inline-separator-size, 0.25em);
+  border-radius: 50%;
+}
+.cy-inline[data-separator="line"] > .cy-inline-item + .cy-inline-item::before {
+  inline-size: var(--cy-border-width);
+  block-size: calc(4 * var(--cy-inline-separator-size, 0.25em));
+}
+@media (forced-colors: active) {
+  .cy-inline[data-separator] > .cy-inline-item + .cy-inline-item::before {
+    forced-color-adjust: none;
+    background: CanvasText;
+  }
+}
+
 /* Inline is a Stack in a row (Stack's direction="row"); it adds centring by default and wrapping. Stack's [data-align]
    rules are more specific, so `align` still wins over the centring. */
 .cy-inline.cy-inline {

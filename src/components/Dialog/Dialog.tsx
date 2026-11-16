@@ -56,6 +56,12 @@ export interface DialogProps {
   /** Escape, the backdrop and the close button close it (default). `false` leaves only your actions. */
   dismissible?: boolean;
   /**
+   * Show the close button in the header (default, when `dismissible`). `false` hides it while Escape and the backdrop
+   * still close the dialog: for a dialog whose own actions close it, or a progress overlay. With `titleHidden` too,
+   * the header takes no room.
+   */
+  closeButton?: boolean;
+  /**
    * Keep the content in the DOM while the dialog is closed. By default a closed dialog renders nothing inside it: the
    * content mounts when it opens and unmounts once the closing transition has ended, so every opening starts fresh.
    * Set it for content whose state must survive closing (a half-filled form) or that is expensive to rebuild.
@@ -109,6 +115,7 @@ export function DialogFrame({
   actions,
   size = "md",
   dismissible = true,
+  closeButton = true,
   keepMounted = false,
   titleHidden = false,
   labels,
@@ -120,6 +127,7 @@ export function DialogFrame({
 }: DialogFrameProps) {
   const id = useId();
   const text = { ...DEFAULT_LABELS, ...labels };
+  const showClose = dismissible && closeButton;
   const [isOpen, setOpen] = useControllableState(open, defaultOpen, onOpenChange);
   const dialog = useRef<HTMLDialogElement>(null);
   const toastHost = useContext(ToastHostContext);
@@ -212,7 +220,7 @@ export function DialogFrame({
           className={["cy-dialog-panel cy-reset", parts?.panel, className].filter(Boolean).join(" ")}
           style={style}
         >
-          <div className="cy-dialog-header cy-reset">
+          <div className="cy-dialog-header cy-reset" data-empty={(titleHidden && !showClose) || undefined}>
             <h2
               id={`${id}-title`}
               className={
@@ -221,7 +229,7 @@ export function DialogFrame({
             >
               {title}
             </h2>
-            {dismissible && (
+            {showClose && (
               <IconButton
                 icon={closeIcon}
                 label={text.close}

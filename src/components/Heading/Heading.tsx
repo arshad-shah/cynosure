@@ -1,4 +1,5 @@
 import { type CSSProperties, forwardRef, type ReactNode } from "react";
+import type { RootAttributes } from "../../foundations/attributes.js";
 
 export interface HeadingTokens {
   /** Font size of `size="xs"` (the default for level 6). */
@@ -34,7 +35,7 @@ declare module "../../tokens/schema.js" {
 export type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
 export type HeadingSize = "xs" | "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "display";
 
-export interface HeadingProps {
+export interface HeadingProps extends RootAttributes {
   /** The element rendered (`h1` to `h6`) and so the heading's place in the page outline. Default 2. */
   level?: HeadingLevel;
   /**
@@ -75,6 +76,7 @@ export const Heading = forwardRef<HTMLHeadingElement, HeadingProps>(function Hea
     className,
     style,
     children,
+    ...rest
   },
   ref,
 ) {
@@ -83,6 +85,7 @@ export const Heading = forwardRef<HTMLHeadingElement, HeadingProps>(function Hea
   return (
     <Tag
       ref={ref}
+      {...rest}
       id={id}
       className={`cy-heading${className ? ` ${className}` : ""}`}
       data-size={size ?? SIZE_BY_LEVEL[level - 1]}

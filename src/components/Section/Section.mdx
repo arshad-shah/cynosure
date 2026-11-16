@@ -47,6 +47,10 @@ A Section fills its parent's width. For bands from edge to edge of the window, p
 
 <Canvas of={Stories.PaddingUsesSpaceTokens} />
 
+## Attributes and events
+
+`id`, `role`, any `aria-*` or `data-*` attribute, `tabIndex`, `dir`, `lang` and every event handler (pointer, keyboard, drag and drop, focus) go to Section's element, and so does `ref`: a Section can be a drop zone, a landmark or a group without a wrapper `div`. It stays layout: give a box that reacts to clicks or keys a role and a name, or use the component made for it (Button, Card, ListRow).
+
 ## Props
 
 <ArgTypes of={Stories} />

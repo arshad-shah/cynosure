@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, waitFor } from "storybook/test";
 import { contrast } from "../../test/color.js";
 import { computeUnderHostileHost } from "../../test/hostile.js";
+import { ROOT_ATTRIBUTES, rootAttributesStory } from "../../test/root-attributes.js";
 import { CynosureTheme } from "../../theme/CynosureTheme.js";
 import { Badge } from "../Badge/Badge.js";
 import { Stack } from "../Stack/Stack.js";
@@ -222,3 +223,8 @@ export const StableUnderHostileHost: Story = {
     }
   },
 };
+
+export const PassesIdDataAndRef: Story = rootAttributesStory<HTMLDivElement>(
+  (ref) => <DescriptionList ref={ref} {...ROOT_ATTRIBUTES} items={[{ term: "Size", detail: "1.2 MB" }]} />,
+  "cy-description-list",
+);

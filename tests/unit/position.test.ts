@@ -86,4 +86,12 @@ describe("computePosition alignment", () => {
       600 - 120 - 8,
     );
   });
+  it("aligns to the anchor's end edge with end (the inline end in RTL, the bottom edge beside it)", () => {
+    const box = { width: 320, height: 200 };
+    expect(computePosition(rect(200, 100, 220), box, viewport, "bottom", 4, "ltr", "end").x).toBe(420 - 320);
+    expect(computePosition(rect(200, 100, 220), box, viewport, "bottom", 4, "rtl", "end").x).toBe(200);
+    expect(computePosition(rect(200, 300, 100, 240), box, viewport, "end", 4, "ltr", "end").y).toBe(
+      540 - 200,
+    );
+  });
 });

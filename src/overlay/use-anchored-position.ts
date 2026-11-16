@@ -15,7 +15,7 @@ export function useAnchoredPosition(
   open: boolean,
   placement: Placement,
   offset = 6,
-  align: "center" | "start" | "flush" = "center",
+  align: "center" | "start" | "flush" | "end" = "center",
   onPlace?: (placement: Placement) => void,
 ) {
   useClientLayoutEffect(() => {

@@ -3,6 +3,16 @@ import { clamp } from "../foundations/math.js";
 
 export type Placement = "top" | "bottom" | "start" | "end";
 
+/** Which edges of a floating surface line up with its anchor's, across the side it opens on. */
+export type Align = "start" | "center" | "end";
+
+/**
+ * A public `align` as `computePosition`'s alignment. Unset keeps the default: flush with the start edge above or below,
+ * centred beside. `start` is flush with the start edge, or the top edge beside it.
+ */
+export const crossAlign = (align: Align | undefined) =>
+  align === undefined ? "start" : align === "start" ? "flush" : align;
+
 interface Box {
   left: number;
   top: number;
@@ -24,17 +34,25 @@ export function computePosition(
   dir: "ltr" | "rtl",
   /**
    * Cross-axis alignment: centred on the anchor; `start`, flush with its start edge for top/bottom (lists, menus);
-   * `flush`, that and also flush with its top edge for start/end (submenus beside their item).
+   * `flush`, that and also flush with its top edge for start/end (submenus beside their item); `end`, flush with its
+   * end edge for top/bottom and its bottom edge for start/end.
    */
-  align: "center" | "start" | "flush" = "center",
+  align: "center" | "start" | "flush" | "end" = "center",
 ): { x: number; y: number; placement: Placement } {
+  const startX = dir === "rtl" ? anchor.right - floating.width : anchor.left;
+  const endX = dir === "rtl" ? anchor.left : anchor.right - floating.width;
   const crossX =
-    align !== "center"
-      ? dir === "rtl"
-        ? anchor.right - floating.width
-        : anchor.left
-      : anchor.left + anchor.width / 2 - floating.width / 2;
-  const crossY = align === "flush" ? anchor.top : anchor.top + anchor.height / 2 - floating.height / 2;
+    align === "center"
+      ? anchor.left + anchor.width / 2 - floating.width / 2
+      : align === "end"
+        ? endX
+        : startX;
+  const crossY =
+    align === "flush"
+      ? anchor.top
+      : align === "end"
+        ? anchor.bottom - floating.height
+        : anchor.top + anchor.height / 2 - floating.height / 2;
   const place = (p: Placement) => {
     const physical =
       p === "start"

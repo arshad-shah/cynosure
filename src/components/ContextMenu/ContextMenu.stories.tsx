@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import type { Ref } from "react";
+import { type Ref, useState } from "react";
 import { expect, fn, waitFor } from "storybook/test";
 import { copy } from "../../icons/copy.js";
 import { flag } from "../../icons/flag.js";
@@ -8,6 +8,7 @@ import { trash } from "../../icons/trash.js";
 import { backdrop, contrast, rgb } from "../../test/color.js";
 import { computeUnderHostileHost } from "../../test/hostile.js";
 import { settled, shownFully } from "../../test/settle.js";
+import { Button } from "../Button/Button.js";
 import type { MenuEntry } from "../Menu/Menu.js";
 import { ContextMenu } from "./ContextMenu.js";
 
@@ -455,5 +456,192 @@ export const ManyTargetsDisabled: Story = {
     await new Promise((r) => setTimeout(r, 100));
     await expect(isOpen()).toBe(false);
     await expect(notes).toHaveFocus();
+  },
+};
+
+/** Shapes drawn on one canvas: no element per shape, so the app finds the one under the pointer itself. */
+const SHAPES = [
+  { id: "circle", label: "Circle", x: 40, y: 30, w: 100, h: 80 },
+  { id: "square", label: "Square", x: 200, y: 30, w: 100, h: 80 },
+];
+
+function ShapeCanvas({
+  onSelect,
+  onOpenChange,
+}: {
+  onSelect: (v: string) => void;
+  onOpenChange: (o: boolean) => void;
+}) {
+  const [menuFor, setMenuFor] = useState<{ shape: (typeof SHAPES)[number]; x: number; y: number } | null>(
+    null,
+  );
+  const [selected, setSelected] = useState(SHAPES[0]);
+  const hit = (el: HTMLElement, x: number, y: number) => {
+    const r = el.getBoundingClientRect();
+    return SHAPES.find(
+      (s) => x - r.left >= s.x && x - r.left <= s.x + s.w && y - r.top >= s.y && y - r.top <= s.y + s.h,
+    );
+  };
+  return (
+    <>
+      <div
+        data-testid="canvas"
+        // biome-ignore lint/a11y/noNoninteractiveTabindex: the canvas takes focus, as a drawing surface does
+        tabIndex={0}
+        role="application"
+        aria-label={`Drawing, ${selected?.label} selected`}
+        style={{ position: "relative", inlineSize: 340, blockSize: 140, background: "var(--cy-color-soft)" }}
+        onContextMenu={(event) => {
+          const shape = hit(event.currentTarget, event.clientX, event.clientY);
+          if (!shape) return;
+          event.preventDefault();
+          setSelected(shape);
+          setMenuFor({ shape, x: event.clientX, y: event.clientY });
+        }}
+        onKeyDown={(event) => {
+          if (!(event.key === "F10" && event.shiftKey) || !selected) return;
+          event.preventDefault();
+          const r = event.currentTarget.getBoundingClientRect();
+          setMenuFor({
+            shape: selected,
+            x: r.left + selected.x + selected.w / 2,
+            y: r.top + selected.y + selected.h / 2,
+          });
+        }}
+      >
+        {SHAPES.map((s) => (
+          <span
+            key={s.id}
+            aria-hidden="true"
+            style={{
+              position: "absolute",
+              insetInlineStart: s.x,
+              insetBlockStart: s.y,
+              inlineSize: s.w,
+              blockSize: s.h,
+              background: "var(--cy-color-line)",
+              borderRadius: s.id === "circle" ? "50%" : 0,
+            }}
+          />
+        ))}
+      </div>
+      <ContextMenu
+        open={menuFor !== null}
+        anchor={menuFor ?? undefined}
+        onOpenChange={(open) => {
+          onOpenChange(open);
+          if (!open) setMenuFor(null);
+        }}
+        label={menuFor ? `${menuFor.shape.label} actions` : ""}
+        items={[
+          { value: "duplicate", label: "Duplicate", icon: copy },
+          { value: "delete", label: "Delete", icon: trash, tone: "danger" },
+        ]}
+        onSelect={(value) => onSelect(`${value}:${menuFor?.shape.id}`)}
+      />
+    </>
+  );
+}
+
+const shapeCanvas: NonNullable<Story["render"]> = (args) => (
+  <ShapeCanvas onSelect={args.onSelect} onOpenChange={args.onOpenChange as (o: boolean) => void} />
+);
+
+export const OpenedByTheAppAtAPoint: Story = {
+  render: shapeCanvas,
+  play: async ({ args, canvas, userEvent }) => {
+    const area = canvas.getByTestId("canvas");
+    area.focus();
+    const r = area.getBoundingClientRect();
+    const at = { clientX: r.left + 250, clientY: r.top + 70 };
+    await userEvent.pointer({ keys: "[MouseRight]", target: area, coords: at });
+    await shownFully(menu());
+    // The app opened it for the shape under the pointer, with its corner at the pointer.
+    await expect(menu()).toHaveAccessibleName("Square actions");
+    const panel = menu().getBoundingClientRect();
+    await expect(Math.abs(panel.left - at.clientX)).toBeLessThan(6);
+    await expect(Math.abs(panel.top - at.clientY)).toBeLessThan(6);
+    await expect(document.activeElement).toHaveTextContent("Duplicate");
+    await userEvent.keyboard("{ArrowDown}{Enter}");
+    await expect(args.onSelect).toHaveBeenCalledWith("delete:square");
+    await waitFor(() => expect(isOpen()).toBe(false));
+    await expect(args.onOpenChange).toHaveBeenLastCalledWith(false);
+    // Focus goes back to what had it: the canvas.
+    await expect(area).toHaveFocus();
+  },
+};
+
+export const OpenedByTheAppFromTheKeyboard: Story = {
+  render: shapeCanvas,
+  play: async ({ args, canvas, userEvent }) => {
+    const area = canvas.getByTestId("canvas");
+    area.focus();
+    await userEvent.keyboard("{Shift>}{F10}{/Shift}");
+    await shownFully(menu());
+    await expect(menu()).toHaveAccessibleName("Circle actions");
+    // At the point the app gave: the selected shape's centre.
+    const r = area.getBoundingClientRect();
+    await expect(Math.abs(menu().getBoundingClientRect().left - (r.left + 90))).toBeLessThan(6);
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() => expect(isOpen()).toBe(false));
+    await expect(args.onOpenChange).toHaveBeenLastCalledWith(false);
+    await expect(area).toHaveFocus();
+    // An outside press closes it too, through onOpenChange.
+    await userEvent.keyboard("{Shift>}{F10}{/Shift}");
+    await shownFully(menu());
+    await userEvent.click(document.body);
+    await waitFor(() => expect(isOpen()).toBe(false));
+  },
+};
+
+export const ControlledWithATarget: Story = {
+  render: (args) => {
+    function Controlled() {
+      const [open, setOpen] = useState(false);
+      return (
+        <>
+          <Button onClick={() => setOpen(true)}>Show actions</Button>
+          <ContextMenu
+            {...args}
+            open={open}
+            onOpenChange={(o) => {
+              args.onOpenChange?.(o, undefined);
+              setOpen(o);
+            }}
+          >
+            {(props) => (
+              <div
+                {...props}
+                ref={props.ref as Ref<HTMLDivElement>}
+                // biome-ignore lint/a11y/noNoninteractiveTabindex: a focusable row, so keyboard users can open its menu
+                tabIndex={0}
+                data-testid="target"
+                style={{ inlineSize: 320, blockSize: 60 }}
+              >
+                report.pdf
+              </div>
+            )}
+          </ContextMenu>
+        </>
+      );
+    }
+    return <Controlled />;
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    // Opened by the app without a point: it sits under its target.
+    await userEvent.click(canvas.getByRole("button", { name: "Show actions" }));
+    await shownFully(menu());
+    const box = canvas.getByTestId("target").getBoundingClientRect();
+    await expect(menu().getBoundingClientRect().top).toBeGreaterThanOrEqual(box.bottom);
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() => expect(isOpen()).toBe(false));
+    await expect(canvas.getByRole("button", { name: "Show actions" })).toHaveFocus();
+    // A right-click still asks to open; controlled, it opens because the app agrees.
+    await userEvent.pointer({ keys: "[MouseRight]", target: canvas.getByTestId("target") });
+    await shownFully(menu());
+    await expect(args.onOpenChange).toHaveBeenLastCalledWith(true, undefined);
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() => expect(isOpen()).toBe(false));
+    await expect(canvas.getByTestId("target")).toHaveFocus();
   },
 };

@@ -6,7 +6,7 @@ import {
   type ReactNode,
 } from "react";
 import { Icon } from "../../foundations/Icon/Icon.js";
-import { LinkBase } from "../../foundations/LinkBase/LinkBase.js";
+import { anchor, type RenderLink } from "../../foundations/LinkBase/LinkBase.js";
 import { external as externalIcon } from "../../icons/external.js";
 import type { Size, Tone } from "../../tokens/schema.js";
 
@@ -20,6 +20,8 @@ declare module "../../tokens/schema.js" {
     link: LinkTokens;
   }
 }
+
+export type { LinkRenderProps, RenderLink } from "../../foundations/LinkBase/LinkBase.js";
 
 export interface LinkProps {
   /** Where the link goes. */
@@ -42,6 +44,11 @@ export interface LinkProps {
   "aria-current"?: AriaAttributes["aria-current"];
   /** Called when the link is activated. */
   onClick?: MouseEventHandler<HTMLAnchorElement>;
+  /**
+   * Render the anchor with your router: `(props) => <RouterLink {...props} to={props.href} />`. It receives Link's
+   * class, data attributes and handlers, so the router's element looks and behaves like a Link. Default: a plain link.
+   */
+  renderLink?: RenderLink | undefined;
   /** Replace the built-in English text: `external` is read out after a link that opens in a new tab. */
   labels?: { external?: string };
   /** Added to the root element, for layout. */
@@ -60,6 +67,7 @@ export const Link = forwardRef<HTMLAnchorElement, LinkProps>(function Link(
     external = false,
     underline = "always",
     onClick,
+    renderLink,
     labels,
     className,
     style,
@@ -67,19 +75,8 @@ export const Link = forwardRef<HTMLAnchorElement, LinkProps>(function Link(
   },
   ref,
 ) {
-  return (
-    <LinkBase
-      ref={ref}
-      href={href}
-      onClick={onClick}
-      className={`cy-link${className ? ` ${className}` : ""}`}
-      data-tone={tone}
-      data-size={size}
-      data-underline={underline === "always" ? undefined : underline}
-      aria-current={current}
-      style={style}
-      {...(external ? { target: "_blank" } : {})}
-    >
+  const content = (
+    <>
       {children}
       {external && (
         <>
@@ -87,6 +84,22 @@ export const Link = forwardRef<HTMLAnchorElement, LinkProps>(function Link(
           <span className="cy-visually-hidden"> {labels?.external ?? "(opens in new tab)"}</span>
         </>
       )}
-    </LinkBase>
+    </>
   );
+  const props = {
+    className: `cy-link${className ? ` ${className}` : ""}`,
+    "data-tone": tone,
+    "data-size": size,
+    "data-underline": underline === "always" ? undefined : underline,
+    "aria-current": current,
+    onClick,
+    style,
+  };
+  return anchor(renderLink, {
+    ...props,
+    ref,
+    href,
+    ...(external ? { target: "_blank" } : {}),
+    children: content,
+  });
 });

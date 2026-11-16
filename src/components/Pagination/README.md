@@ -21,6 +21,7 @@ import { Pagination, pageCount } from "@arshad-shah/cynosure";
 | `variant`                     | `pages` | `pages` numbered · `compact` previous and next around "Page 3 of 10"                          |
 | `showEdges`                   | `false` | First-page and last-page controls                                                             |
 | `getHref`                     | –       | `(page) => string`. Page numbers, previous and next become real links; `onChange` still fires |
+| `renderLink`                  | –       | With `getHref`: render the page links with your router (Link's `LinkRenderProps` contract)    |
 | `disabled`                    | `false` | Disables every control                                                                        |
 | `size`                        | `md`    | `sm` · `md` (Button heights)                                                                  |
 | `labels`                      | –       | `nav`, `previous`, `next`, `first`, `last`, `page(n)`, `status(page, count)`                  |

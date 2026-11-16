@@ -33,6 +33,7 @@ import { users } from "@arshad-shah/cynosure/icons";
 | `onClick`             | –         | With `href`: called when the link is followed                                                    |
 | `labels`              | English   | `{ up, down, flat }`: functions from the delta's value (without its sign) to the spoken words    |
 | `className` / `style` | –         | Layout only                                                                                      |
+| `id`, `data-*`, `ref` | –         | Set on the root element (a link target, test or state hooks)                                     |
 
 The forwarded ref is the Card element (the link with `href`).
 

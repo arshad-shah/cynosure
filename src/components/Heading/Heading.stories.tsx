@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect } from "storybook/test";
 import { computeUnderHostileHost } from "../../test/hostile.js";
+import { ROOT_ATTRIBUTES, rootAttributesStory } from "../../test/root-attributes.js";
 import { Heading, type HeadingLevel, type HeadingSize } from "./Heading.js";
 
 const LEVELS: HeadingLevel[] = [1, 2, 3, 4, 5, 6];
@@ -426,3 +427,12 @@ export const StableUnderHostileHost: Story = {
     await expect(clean["box-sizing"]).toBe("border-box");
   },
 };
+
+export const PassesIdDataAndRef: Story = rootAttributesStory<HTMLHeadingElement>(
+  (ref) => (
+    <Heading ref={ref} {...ROOT_ATTRIBUTES}>
+      Settings
+    </Heading>
+  ),
+  "cy-heading",
+);
