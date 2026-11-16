@@ -16,6 +16,8 @@ import { anchor, type RenderLink } from "../../foundations/LinkBase/LinkBase.js"
 import type { Tone } from "../../tokens/schema.js";
 
 export interface CardTokens {
+  /** Narrowest the header's title gets before the actions move under it. Default: 12rem. */
+  titleMin: string;
   /** Font size of the `title`. Default: the large font size. */
   titleSize: string;
   /** Border colour of the current card of a set (`aria-current`). Default: the accent. */

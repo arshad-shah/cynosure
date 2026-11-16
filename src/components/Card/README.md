@@ -21,6 +21,7 @@ Interactive cards render through `LinkBase` (`href`, unsafe schemes are not link
 
 ## Tokens
 
+- `--cy-card-title-min`: narrowest the header's title gets before the actions move under it (default 12rem)
 - `--cy-card-bg`, `--cy-card-border`, `--cy-card-current-border`, `--cy-card-radius`, `--cy-card-shadow`, `--cy-card-soft-mix`
 - `--cy-card-edge-width`: thickness of the `edge` (default `--cy-space-2`)
 - `--cy-card-title-size`: font size of the `title` (default `--cy-font-size-lg`)

@@ -2,7 +2,7 @@
   {
     "name": "all CSS",
     "path": "dist/styles.css",
-    "limit": "40.72 kB",
+    "limit": "40.74 kB",
     "gzip": true
   },
   {
@@ -180,7 +180,7 @@
   {
     "name": "Card",
     "path": ["dist/components/Card/Card.js", "dist/styles/card.css"],
-    "limit": "2.26 kB",
+    "limit": "2.28 kB",
     "gzip": true
   },
   {

@@ -135,6 +135,8 @@
    (link or button) card the frame keeps a column for them that the header stops before (subgrid). */
 .cy-card-header.cy-card-header {
   display: flex;
+  /* The actions move under the title when both no longer fit on one row, instead of squeezing the title. */
+  flex-wrap: wrap;
   align-items: flex-start;
   gap: var(--cy-space-4);
   font-size: inherit;
@@ -144,7 +146,7 @@
 }
 .cy-card-heading.cy-card-heading {
   display: flex;
-  flex: 1;
+  flex: 1 1 var(--cy-card-title-min, 12rem);
   flex-direction: column;
   gap: var(--cy-space-2);
   min-inline-size: 0;
@@ -177,7 +179,9 @@
 }
 .cy-card-header > .cy-card-actions.cy-card-actions {
   position: static;
-  flex: none;
+  flex: 0 1 auto;
+  flex-wrap: wrap;
+  max-inline-size: 100%;
 }
 .cy-card-frame[data-header] {
   grid-template-columns: minmax(0, 1fr) auto;
