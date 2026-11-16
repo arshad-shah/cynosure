@@ -56,6 +56,28 @@ The picture is replaced by a quiet box with the image icon and the `alt` text, i
 
 <Canvas of={Stories.CaptionMakesAFigure} />
 
+## Overlay
+
+`overlay` is drawn over the picture's own box, not the frame's: with `fit="contain"` the letterbox is left out, with `cover` the cropped part is included, and without a `ratio` it is the picture. It moves and scales with the picture, and its content is stretched to that box, so an SVG with a `viewBox` draws in the picture's own proportions: a safe-zone ring, crop marks, a grid.
+
+```tsx
+<Image
+  src={favicon}
+  alt="Favicon"
+  ratio={2}
+  fit="contain"
+  overlay={
+    <svg viewBox="0 0 100 100">
+      <circle cx="50" cy="50" r="40" fill="none" stroke="currentColor" strokeDasharray="4 3" />
+    </svg>
+  }
+/>
+```
+
+<Canvas of={Stories.OverlayFollowsThePicture} />
+
+It is shown once the picture has loaded (never over the placeholder or the fallback), takes no presses, and is hidden from assistive technology unless `overlayLabel` names it.
+
 ## Props
 
 <ArgTypes of={Stories} />
@@ -75,6 +97,7 @@ The picture is replaced by a quiet box with the image icon and the `alt` text, i
 - **Placeholder:** the Skeleton is hidden from assistive technology and stops moving under reduced motion.
 - **Loading:** `lazy` by default, so pictures far below the screen wait. Use `loading="eager"` for a picture at the top of the page. `decoding` is `async`.
 - **Root element:** with a `ratio` or a `caption` it is a block as wide as its container (a `div` or a `figure`), so keep it out of paragraphs. Otherwise it is an inline `span` the size of the picture.
+- **Overlay:** decorative (`aria-hidden`) unless `overlayLabel` is set; then it is an image of its own named by the label. Pointer events pass through it to the picture.
 - **Ref:** the `img` element. There is none while the fallback is shown.
 - **Native behaviour:** dragging and the context menu are the browser's own.
 - **Right-to-left:** nothing changes. Pictures are not mirrored and `position` is physical, as in CSS.

@@ -70,6 +70,21 @@
   pointer-events: none;
 }
 
+/* The overlay sits on the picture's own box (placed from script), above it, and stretches its content to that box. */
+.cy-image-overlay.cy-image-overlay {
+  box-sizing: border-box !important;
+  position: absolute;
+  display: grid;
+  margin: 0;
+  font-size: inherit;
+  pointer-events: none;
+  & > * {
+    grid-area: 1 / 1;
+    inline-size: 100%;
+    block-size: 100%;
+  }
+}
+
 .cy-image-fallback.cy-image-fallback {
   box-sizing: border-box !important;
   display: grid;
