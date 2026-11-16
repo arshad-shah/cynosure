@@ -2,6 +2,32 @@
 
 ## Status
 
+**Now (2026-11-16, afternoon):** 0.7.0 is on npm. 0.8.0 is ready on the release branch and holds the last gaps from the tools migration, approved by Arshad. Two batches went in.
+
+- **Data and lists (`gaps/e1`).**
+  - DataGrid gains cell editing, multi-column sort, column filters, a column menu (sort, move, hide, show) and row details.
+  - VirtualList `onRangeChange`; Tree `handle.reveal` and `highlight`; Select `emptyOption`; Badge `onRemove`; ScrollArea `maxHeight`; KeyValueEditor `rowTypes`.
+  - `inert` and `disabled` on the layout primitives and Toolbar.
+  - Slider commits when the key is released, or after `commitDelay`.
+  - `role` and `aria-*` are typed on `RootAttributes`.
+  - **Tooltip fix (patch):** the Dialog "Close" tip no longer opens on script focus and swallows the first Escape.
+- **Media and canvas (`gaps/e2`).**
+  - ZoomControls for any canvas (`fits`, `buttons`, `steps`), plus PanZoomCanvas `handle.zoom`.
+  - ColorField `inline`; new ColorSample (contrast ratio with AA/AAA badges); ColorSwatches `readOnly`.
+  - New CameraView, with a VideoBase foundation.
+  - Image `regions`; Text sizes 3xl–5xl.
+  - New CanvasStage, and new HtmlPreview with a FrameBase foundation; `cy check` keeps iframe and video to foundations.
+  - SelectionFrame: dragging the body now works, and new `compactBelow`.
+  - Page-overlay drawing was judged to be PDF product drawing and stays in tools.
+
+**Decisions:**
+- **Tooltips:** a tooltip opens on focus only after a navigation key (Tab, arrows, Home, End, Page Up or Down) within 500 ms, and closes on any focus move outside its trigger.
+- **Slider:** `onCommit` fires when the key is released, which changes the timing for every Slider user.
+- **DataGrid budget:** grows to about 9.97 kB, because it now uses Menu, Select and TextField.
+- **All-CSS budget:** set to the measured 40.72 kB.
+
+**Verification (Chromium, here):** check, lint, typecheck, test (896), build and size pass. Each batch's story suite passed on its own branch: 1803 for e2; 1870 with one failure for e1, which was fixed and that story rerun. Firefox and WebKit run in CI.
+
 **Now (2026-11-16, later):** 0.7.0 is being assembled from three merged or open pull requests, all approved by Arshad, who also approved the release itself.
 - **#172** (merged): the tools migration gaps of issue #171, from branches `gaps/a` and `gaps/b`.
 - **#174** (merged): what the tools redesign needs.
