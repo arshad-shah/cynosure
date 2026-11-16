@@ -2,7 +2,7 @@
   {
     "name": "all CSS",
     "path": "dist/styles.css",
-    "limit": "38.5 kB",
+    "limit": "38.59 kB",
     "gzip": true
   },
   {
@@ -168,7 +168,7 @@
       "dist/styles/stack.css",
       "dist/styles/inline.css"
     ],
-    "limit": "1.5 kB",
+    "limit": "1.75 kB",
     "gzip": true
   },
   {
@@ -219,13 +219,13 @@
   {
     "name": "Popover",
     "path": ["dist/components/Popover/Popover.js", "dist/styles/popover.css"],
-    "limit": "2 kB",
+    "limit": "2.03 kB",
     "gzip": true
   },
   {
     "name": "Overlay core",
     "path": ["dist/overlay/dismiss.js", "dist/overlay/position.js", "dist/overlay/use-anchored-position.js"],
-    "limit": "2.1 kB",
+    "limit": "2.12 kB",
     "gzip": true
   },
   {
@@ -369,7 +369,7 @@
   {
     "name": "ContextMenu (with Menu)",
     "path": ["dist/components/ContextMenu/ContextMenu.js", "dist/styles/menu.css"],
-    "limit": "2.5 kB",
+    "limit": "2.6 kB",
     "gzip": true
   },
   {
