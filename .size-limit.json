@@ -2,7 +2,7 @@
   {
     "name": "all CSS",
     "path": "dist/styles.css",
-    "limit": "38.62 kB",
+    "limit": "38.82 kB",
     "gzip": true
   },
   {
@@ -13,7 +13,7 @@
       "dist/tokens/defaults.js",
       "dist/tokens/to-css.js"
     ],
-    "limit": "6.93 kB",
+    "limit": "6.96 kB",
     "gzip": true
   },
   {
@@ -63,7 +63,7 @@
       "dist/foundations/InputBase/InputBase.js",
       "dist/styles/text-field.css"
     ],
-    "limit": "2.61 kB",
+    "limit": "2.66 kB",
     "gzip": true
   },
   {
@@ -79,7 +79,7 @@
       "dist/foundations/TextAreaBase/TextAreaBase.js",
       "dist/styles/text-area.css"
     ],
-    "limit": "4.39 kB",
+    "limit": "4.43 kB",
     "gzip": true
   },
   {
@@ -311,7 +311,7 @@
       "dist/foundations/hotkey.js",
       "dist/styles/command-palette.css"
     ],
-    "limit": "5.2 kB",
+    "limit": "5.63 kB",
     "gzip": true
   },
   {
@@ -375,13 +375,13 @@
   {
     "name": "SideNav (with Tooltip)",
     "path": ["dist/components/SideNav/SideNav.js", "dist/styles/side-nav.css"],
-    "limit": "3.51 kB",
+    "limit": "3.69 kB",
     "gzip": true
   },
   {
     "name": "AppShell",
     "path": ["dist/components/AppShell/AppShell.js", "dist/styles/app-shell.css"],
-    "limit": "1.95 kB",
+    "limit": "2.43 kB",
     "gzip": true
   },
   {
@@ -405,7 +405,7 @@
   {
     "name": "SplitPane",
     "path": ["dist/components/SplitPane/SplitPane.js", "dist/styles/split-pane.css"],
-    "limit": "2.42 kB",
+    "limit": "2.55 kB",
     "gzip": true
   },
   {
@@ -772,7 +772,7 @@
   {
     "name": "Form (JS + CSS)",
     "path": ["dist/components/Form/Form.js", "dist/styles/form.css"],
-    "limit": "3 kB",
+    "limit": "870 B",
     "gzip": true
   }
 ]
