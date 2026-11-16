@@ -359,14 +359,17 @@ export const NamedAndDescribedFromOutside: Story = {
   },
 };
 
-const monoFont = () => getComputedStyle(document.documentElement).getPropertyValue("--cy-font-mono").trim();
-const family = (el: Element) => getComputedStyle(el).fontFamily.replace(/\s/g, "");
+// Browsers serialise font lists differently (WebKit drops the quotes), so compare names only.
+const fontList = (value: string) => value.replace(/["'\s]/g, "");
+const monoFont = () =>
+  fontList(getComputedStyle(document.documentElement).getPropertyValue("--cy-font-mono"));
+const family = (el: Element) => fontList(getComputedStyle(el).fontFamily);
 
 export const MonospaceForKeysAndIds: Story = {
   args: { label: "Key id", placeholder: undefined, monospace: true, defaultValue: "kid-0f3a" },
   play: async ({ canvas, canvasElement, userEvent }) => {
     const input = canvas.getByRole("textbox", { name: "Key id" });
-    await expect(family(input)).toBe(monoFont().replace(/\s/g, ""));
+    await expect(family(input)).toBe(monoFont());
     await userEvent.type(input, "9");
     await expect(input).toHaveValue("kid-0f3a9");
     const shell = computeUnderHostileHost(canvasElement, ".cy-text-field-input", ["font-family"]);
@@ -376,8 +379,6 @@ export const MonospaceForKeysAndIds: Story = {
 
 export const ProportionalByDefault: Story = {
   play: async ({ canvas }) => {
-    await expect(family(canvas.getByRole("textbox", { name: "Email" }))).not.toBe(
-      monoFont().replace(/\s/g, ""),
-    );
+    await expect(family(canvas.getByRole("textbox", { name: "Email" }))).not.toBe(monoFont());
   },
 };
