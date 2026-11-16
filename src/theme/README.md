@@ -27,7 +27,9 @@ export function App() {
 
 A theme fixed to one mode (`createTheme({ mode: "dark" })`, or a named theme such as Midnight from `defineTheme` / `createThemeRegistry`) keeps that mode whatever `mode` says: the wrapper, and any wrapper nested in it, gets `data-cy-mode` of the theme's own mode. See [Named themes](../../docs/theming.md#named-themes).
 
-`useCynosureTheme()` returns `{ theme, palette, colors, fontSize }` for code that cannot read CSS variables (canvas, charts): the nearest wrapper's theme, the palette it shows (`light`, `dark`, `light-contrast`, `dark-contrast`), that palette's colours as hex and the type ramp in px. It re-renders when the theme, mode or contrast changes. Without a wrapper it reports Cynosure's own theme following the OS.
+`useCynosureTheme()` returns `{ theme, palette, colors, fontSize, resolveColor }` for code that cannot read CSS variables (canvas, charts): the nearest wrapper's theme, the palette it shows (`light`, `dark`, `light-contrast`, `dark-contrast`), that palette's colours as hex and the type ramp in px. It re-renders when the theme, mode or contrast changes. Without a wrapper it reports Cynosure's own theme following the OS.
+
+`resolveColor(value, within?)` resolves any CSS colour value (a colour, `var(--x)` or a bare `--x`, `color-mix()`, `light-dark()`) as the theme's wrapper (or `within`) sees it, as `#rrggbb` / `#rrggbbaa`, or `""` when it is no colour, unset, on the server or before mount. It is a new function for each palette, so effects that list it re-resolve product colours built on Cynosure's when the mode or contrast changes. Call it in an effect.
 
 ```tsx
 const { theme, palette, colors } = useCynosureTheme();

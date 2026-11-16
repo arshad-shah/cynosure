@@ -8,6 +8,7 @@ import {
   resolveColors,
   type Theme,
 } from "../tokens/index.js";
+import { resolveCssColor } from "./resolve-color.js";
 import { ThemeContext } from "./theme-context.js";
 
 /** The theme in force where `useCynosureTheme` is called, resolved for code that cannot read CSS variables. */
@@ -20,6 +21,15 @@ export interface CynosureThemeValue {
   colors: ColorTokens;
   /** The type ramp in px, already multiplied by the theme's scale. */
   fontSize: GlobalTokens["font"]["size"];
+  /**
+   * Resolves any CSS colour value as the theme's wrapper sees it: a colour, `var(--x)` or a bare `--x` (a product's own
+   * colour role), `color-mix()`, `light-dark()`. Returns `#rrggbb` (`#rrggbbaa` when translucent), or "" for a value
+   * that is no colour, a custom property that is not set, on the server and before the wrapper mounts. Call it after
+   * render (in an effect): a new function comes with each palette, so an effect that lists it resolves again when the
+   * palette changes. Product properties must be set on the wrapper or above it; pass `within` (a canvas, say) to
+   * resolve where that element sits instead, which is also how to use it with no CynosureTheme above.
+   */
+  resolveColor: (value: string, within?: Element | null) => string;
 }
 
 let fallback: Theme | undefined;
@@ -39,8 +49,17 @@ export function useCynosureTheme(): CynosureThemeValue {
   const dark = mode === "system" ? systemDark : mode === "dark";
   const more = state ? state.more : osMore;
   const palette = `${dark ? "dark" : "light"}${more ? "-contrast" : ""}` as PaletteName;
-  return useMemo(
-    () => ({ theme, palette, colors: resolveColors(theme, palette), fontSize: theme.global.font.size }),
-    [theme, palette],
-  );
+  const host = state?.host;
+  return useMemo(() => {
+    const scheme = dark ? "dark" : "light";
+    const resolveColor = (value: string, within?: Element | null) =>
+      resolveCssColor(value, within ?? host?.() ?? null, scheme);
+    return {
+      theme,
+      palette,
+      colors: resolveColors(theme, palette),
+      fontSize: theme.global.font.size,
+      resolveColor,
+    };
+  }, [theme, palette, dark, host]);
 }
