@@ -130,6 +130,9 @@ export const InstantTooltipForToolbars: Story = {
     await new Promise((r) => setTimeout(r, 60));
     await expect(instant?.matches(":popover-open")).toBe(true);
     await userEvent.unhover(canvas.getByRole("button", { name: "Copy" }));
+    await waitFor(() => expect(instant?.matches(":popover-open")).toBe(false));
+    // Past the tooltips' shared warm-up, so the default delay applies again.
+    await new Promise((r) => setTimeout(r, 400));
     await userEvent.hover(canvas.getByRole("button", { name: "Delete" }));
     await new Promise((r) => setTimeout(r, 60));
     await expect(slow?.matches(":popover-open")).toBe(false);

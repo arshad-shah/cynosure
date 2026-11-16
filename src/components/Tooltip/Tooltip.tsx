@@ -34,7 +34,10 @@ export interface TooltipProps {
   children: ReactElement<Record<string, unknown>>;
   /** Preferred side; flips when it does not fit. Default "top". */
   placement?: Placement;
-  /** Hover delay in ms (focus opens immediately). `0` opens it at once, for toolbars. Default 300. */
+  /**
+   * Hover delay in ms (focus opens immediately). `0` opens it at once, for toolbars. Skipped while another tooltip is
+   * shown or closed less than 300 ms ago (moving along a toolbar). Default 300.
+   */
   delay?: number;
   /**
    * Added to the element around the trigger (the anchor, the box the parent lays out), for layout: a grid area,
@@ -59,6 +62,22 @@ export interface TooltipProps {
    */
   whenTruncated?: boolean | ((trigger: HTMLElement) => HTMLElement | null) | undefined;
 }
+
+/**
+ * Warm-up shared by every Tooltip on the page: while one is shown, and for `WARM_MS` after the last one closes, a
+ * hovered neighbour opens without its delay (moving along a toolbar shows each tip at once).
+ */
+const WARM_MS = 300;
+const warm = { shown: new Set<HTMLElement>(), until: 0 };
+const isWarm = () => {
+  if (Date.now() < warm.until) return true;
+  for (const tip of warm.shown) {
+    // A tip still in the page and shown; one that left the page without closing no longer counts.
+    if (tip.isConnected && tip.matches(":popover-open")) return true;
+    warm.shown.delete(tip);
+  }
+  return false;
+};
 
 /**
  * Whether the text `whenTruncated` names is cut short: measured after every render (the text may change while the box
@@ -117,7 +136,7 @@ export function Tooltip({
   const show = useCallback((wait: number) => {
     clearTimeout(timer.current);
     if (disabledNow.current) return;
-    if (wait <= 0) setOpen(true);
+    if (wait <= 0 || isWarm()) setOpen(true);
     else timer.current = setTimeout(() => setOpen(true), wait);
   }, []);
   const hide = useCallback((wait = 0) => {
@@ -126,6 +145,16 @@ export function Tooltip({
   }, []);
 
   useEffect(() => () => clearTimeout(timer.current), []);
+  // Counted while shown, for the warm-up; closing (or unmounting while shown) starts the warm window.
+  useEffect(() => {
+    const el = tip.current;
+    if (!open || !el) return;
+    warm.shown.add(el);
+    return () => {
+      warm.shown.delete(el);
+      warm.until = Date.now() + WARM_MS;
+    };
+  }, [open]);
   // Disabled while open (a label stopped being cut short): close, so it does not reappear when enabled again.
   useEffect(() => {
     if (disabled) {

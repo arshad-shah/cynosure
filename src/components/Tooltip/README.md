@@ -19,6 +19,8 @@ Short supplementary text for a control, rendered in the top layer (Popover API) 
 | `describe`      | `true`  | `false`: the tip repeats the trigger's name (a label cut short), so it is hidden from assistive tech and describes nothing          |
 | `whenTruncated` | –       | Shown only while text is cut short: `true` measures the trigger, a function picks the element inside it; implies `describe={false}` |
 
+Warm-up: while a tooltip is shown, and for 300 ms after it closes, a hovered neighbour opens without its delay (moving along a toolbar).
+
 Behaviour (WCAG 1.4.13): hoverable, dismissible with Escape, stays while hovered or focused, never opens on touch. Follows its trigger on scroll and resize.
 
 ## Tokens
