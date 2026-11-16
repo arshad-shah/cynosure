@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import { useEffect, useRef } from "react";
+import { type ComponentProps, useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
-import { expect, fn, waitFor } from "storybook/test";
+import { expect, fn, waitFor, within } from "storybook/test";
 import { isApple } from "../../foundations/hotkey.js";
 import { copy, download, edit, eye, file } from "../../icons/index.js";
 import { createStyleSheet } from "../../styles/inline.js";
@@ -398,5 +398,202 @@ export const TouchRows: Story = {
     await expect(row.getBoundingClientRect().height).toBeGreaterThanOrEqual(44);
     await userEvent.pointer({ keys: "[TouchA]", target: row });
     await expect(args.onRun).toHaveBeenCalledWith("rename");
+  },
+};
+
+/* Commands built from the query: a number offers "Go to line N". */
+function GoToLine({
+  onRun,
+  onQueryChange,
+}: {
+  onRun: (id: string) => void;
+  onQueryChange: (q: string) => void;
+}) {
+  const [query, setQuery] = useState("");
+  const line = /^\d+$/.test(query.trim()) ? query.trim() : "";
+  const built: Command[] = line ? [{ id: `line:${line}`, label: `Go to line ${line}`, group: "Go" }] : [];
+  return (
+    <CommandPalette
+      defaultOpen
+      commands={[...built, ...commands]}
+      filter={(command, q) => command.id.startsWith("line:") || command.label.toLowerCase().includes(q)}
+      onRun={onRun}
+      onQueryChange={(q) => {
+        onQueryChange(q);
+        setQuery(q);
+      }}
+    />
+  );
+}
+
+export const CommandsBuiltFromTheQuery: Story = {
+  render: (args) => <GoToLine onRun={args.onRun} onQueryChange={args.onQueryChange as (q: string) => void} />,
+  args: { onQueryChange: fn() },
+  play: async ({ args, canvas, userEvent }) => {
+    const input = await canvas.findByRole("combobox");
+    await waitFor(() => expect(input).toHaveFocus());
+    await userEvent.keyboard("42");
+    // Every change of the query is reported, and the commands made from it are listed and run like any other.
+    await expect(args.onQueryChange).toHaveBeenCalledWith("4");
+    await expect(args.onQueryChange).toHaveBeenLastCalledWith("42");
+    await waitFor(() => expect(activeLabel(input)).toContain("Go to line 42"));
+    await userEvent.keyboard("{Backspace}");
+    await waitFor(() => expect(activeLabel(input)).toContain("Go to line 4"));
+    await userEvent.keyboard("{Enter}");
+    await expect(args.onRun).toHaveBeenCalledWith("line:4");
+  },
+};
+
+const RECENT_KEY = "cy-story-recent-commands";
+const recentStored = () => JSON.parse(localStorage.getItem(RECENT_KEY) ?? "null");
+
+function Remountable(
+  props: Partial<ComponentProps<typeof CommandPalette>> & { onRun: (id: string) => void },
+) {
+  const [mount, setMount] = useState(0);
+  return (
+    <>
+      <Button onClick={() => setMount((m) => m + 1)}>Reload</Button>
+      <CommandPalette key={mount} commands={commands} {...props} />
+    </>
+  );
+}
+
+export const RecentCommandsPersistUnderAKey: Story = {
+  beforeEach: () => {
+    localStorage.setItem(RECENT_KEY, JSON.stringify(["preview", "gone"]));
+    return () => localStorage.removeItem(RECENT_KEY);
+  },
+  render: (args) => <Remountable onRun={args.onRun} recentKey={RECENT_KEY} />,
+  play: async ({ canvas, userEvent }) => {
+    // What was saved comes back (ids no command has any more are skipped).
+    await userEvent.keyboard(MOD_K);
+    await waitFor(() => expect(palette().open).toBe(true));
+    await waitFor(() =>
+      expect(canvas.getByRole("group", { name: "Recent" })).toHaveTextContent("Toggle preview"),
+    );
+    await userEvent.keyboard("rename{Enter}");
+    await settledClosed(palette());
+    await expect(recentStored()).toEqual(["rename", "preview", "gone"]);
+    // A new palette (a reload) reads them again, newest first.
+    await userEvent.click(canvas.getByRole("button", { name: "Reload" }));
+    await userEvent.keyboard(MOD_K);
+    await waitFor(() => expect(palette().open).toBe(true));
+    const recent = canvas.getByRole("group", { name: "Recent" });
+    await waitFor(() =>
+      expect(
+        within(recent)
+          .getAllByRole("option")
+          .map((o) => o.textContent),
+      ).toEqual([expect.stringContaining("Rename"), expect.stringContaining("Toggle preview")]),
+    );
+  },
+};
+
+const asyncStore = new Map<string, string>([["recent", JSON.stringify(["copy-path"])]]);
+const asyncStorage = {
+  get: async (key: string) => asyncStore.get(key) ?? null,
+  set: async (key: string, value: string) => {
+    asyncStore.set(key, value);
+  },
+};
+const brokenStorage = {
+  get: () => {
+    throw new Error("blocked");
+  },
+  set: () => {
+    throw new Error("blocked");
+  },
+};
+
+export const RecentCommandsInAsyncOrBrokenStorage: Story = {
+  render: (args) => (
+    <>
+      <Remountable onRun={args.onRun} recentKey="recent" recentStorage={asyncStorage} shortcut="mod+k" />
+      <Remountable onRun={args.onRun} recentKey="recent" recentStorage={brokenStorage} shortcut="mod+j" />
+    </>
+  ),
+  play: async ({ args, canvas, userEvent }) => {
+    await userEvent.keyboard(MOD_K);
+    await waitFor(() => expect(canvas.getByRole("group", { name: "Recent" })).toHaveTextContent("Copy path"));
+    await userEvent.keyboard("save{Enter}");
+    await waitFor(() => expect(asyncStore.get("recent")).toBe(JSON.stringify(["save", "copy-path"])));
+    // Storage that throws never breaks the palette: it keeps its recent list in memory.
+    await userEvent.keyboard(isApple() ? "{Meta>}j{/Meta}" : "{Control>}j{/Control}");
+    const second = document.querySelectorAll("dialog.cy-command-palette")[1] as HTMLDialogElement;
+    await waitFor(() => expect(second.open).toBe(true));
+    await userEvent.keyboard("rename{Enter}");
+    await expect(args.onRun).toHaveBeenLastCalledWith("rename");
+  },
+};
+
+export const ControlledRecentCommands: Story = {
+  args: { defaultOpen: true, recent: ["copy-path"], onRecentChange: fn() },
+  play: async ({ args, canvas, userEvent }) => {
+    await expect(canvas.getByRole("group", { name: "Recent" })).toHaveTextContent("Copy path");
+    const input = canvas.getByRole("combobox");
+    await waitFor(() => expect(input).toHaveFocus());
+    await userEvent.keyboard("rename{Enter}");
+    await expect(args.onRecentChange).toHaveBeenCalledWith(["rename", "copy-path"]);
+  },
+};
+
+const withReason: Command[] = [
+  { id: "open", label: "Open file", group: "File" },
+  {
+    id: "export",
+    label: "Export as PDF",
+    group: "File",
+    disabled: true,
+    disabledReason: "Open a document first",
+  },
+  { id: "print", label: "Print", group: "File", disabled: true },
+  { id: "close", label: "Close file", group: "File" },
+];
+
+export const ADisabledCommandSaysWhy: Story = {
+  args: { defaultOpen: true, commands: withReason },
+  play: async ({ args, canvas, userEvent }) => {
+    const input = await canvas.findByRole("combobox");
+    await waitFor(() => expect(input).toHaveFocus());
+    const exportRow = canvas.getByRole("option", { name: /Export as PDF/ });
+    // The reason is shown in the row and is the option's description.
+    await expect(exportRow).toHaveTextContent("Open a document first");
+    await expect(exportRow).toHaveAttribute("aria-disabled", "true");
+    await expect(exportRow).toHaveAccessibleDescription("Open a document first");
+    // Arrows reach a command that says why (a bare disabled one is still skipped), so the reason is read.
+    await userEvent.keyboard("{ArrowDown}");
+    await expect(activeLabel(input)).toContain("Export as PDF");
+    // Enter or a click runs nothing and announces the reason.
+    await userEvent.keyboard("{Enter}");
+    await expect(args.onRun).not.toHaveBeenCalled();
+    await waitFor(() =>
+      expect(canvas.getByRole("status")).toHaveTextContent(
+        "Export as PDF is unavailable: Open a document first",
+      ),
+    );
+    await expect(palette().open).toBe(true);
+    await userEvent.click(exportRow);
+    await expect(args.onRun).not.toHaveBeenCalled();
+    await userEvent.keyboard("{ArrowDown}");
+    await expect(activeLabel(input)).toContain("Close file");
+  },
+};
+
+export const DisabledReasonLabelsOverride: Story = {
+  args: {
+    defaultOpen: true,
+    commands: withReason,
+    labels: { unavailable: (label, reason) => `${label} indisponible : ${reason}` },
+  },
+  play: async ({ canvas, userEvent }) => {
+    const input = await canvas.findByRole("combobox");
+    await waitFor(() => expect(input).toHaveFocus());
+    await userEvent.keyboard("{ArrowDown}{Enter}");
+    await waitFor(() =>
+      expect(canvas.getByRole("status")).toHaveTextContent(
+        "Export as PDF indisponible : Open a document first",
+      ),
+    );
   },
 };

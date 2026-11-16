@@ -7,6 +7,8 @@ export interface ThemeState {
   theme: Theme | undefined;
   mode: ColorMode;
   more: boolean;
+  /** The element the theme is painted on (its wrapper, or `<html>` for `target="document"`), once mounted. */
+  host: () => Element | null;
 }
 
 export const ThemeContext = createContext<ThemeState | null>(null);

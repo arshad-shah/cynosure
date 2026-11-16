@@ -18,6 +18,7 @@ Multi-line input that grows with its content from `rows` up to `maxRows`, then s
 | `labels.count(n, max)`                       | `"n / max"`      | Override the counter text                                                                                                               |
 | `size` / `variant`                           | `md` / `outline` | `sm` · `md` · `lg`; `outline` · `soft`                                                                                                  |
 | `resizable`                                  | `true`           | Shows the corner grip for setting a height (see below)                                                                                  |
+| `monospace`                                  | `false`          | Types in the mono font (`--cy-font-mono`): code, JSON, tokens                                                                           |
 | `trigger` / `suggestions` / `onMention`      | –                | Mentions: see below                                                                                                                     |
 | `labels.loading`                             | `"Loading…"`     | The suggestion list's loading note (the field's label names it)                                                                         |
 
@@ -32,5 +33,6 @@ Works in native forms (`FormData`, reset restores value, count and height, `requ
 ## Tokens
 
 - `--cy-text-area-{radius,padding-inline,padding-block,bg,border,soft-bg,readonly-bg}` (`readonly-bg` is the fill of a read-only area)
+- `--cy-text-area-mono-font`: the font of a `monospace` area. Default `--cy-font-mono`.
 
 Drag the corner grip (pointer or touch) to set a height; the box keeps it and still grows with content up to `maxRows` (or the chosen height, if taller). `resizable={false}` removes the grip; disabled areas have none. The grip is a hand-made, `aria-hidden` pointer affordance: keyboard users get content growth instead. The grip stays a small square in the corner on every device; on touch screens only its invisible tap area grows to 44px, and the text keeps a bottom margin so it never runs under the grip.

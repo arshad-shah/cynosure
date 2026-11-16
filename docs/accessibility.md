@@ -59,14 +59,14 @@ Contrast is checked at three levels.
 
 **1. When a theme is built.** `createTheme` computes colours so that text pairs reach a ratio, and the unit tests (`tests/unit/tokens.test.ts`, `tests/unit/editor-themes.test.ts`) assert the result:
 
-| Pair                                                                                                       | Ratio | Palettes tested                                                     |
-| ---------------------------------------------------------------------------------------------------------- | ----- | ------------------------------------------------------------------- |
-| On-accent text on the accent fill                                                                          | 4.5:1 | light, for seven accents including white, black and an OKLCH colour |
-| On-accent text on the hover and active fills                                                               | 4.5:1 | light and dark, six accents                                         |
-| Tone text (`accent`, `danger`, `success`, `warning`, `info`) on the surface and on its strongest soft tint | 4.5:1 | light and dark, five accents                                        |
-| Code colours on every surface code sits on                                                                 | 4.5:1 | light and dark                                                      |
-| Code colours in the contrast palettes                                                                      | 7:1   | light-contrast and dark-contrast                                    |
-| Muted text on the background in the contrast palettes                                                      | 7:1   | light-contrast and dark-contrast                                    |
+| Pair                                                                                                                                    | Ratio | Palettes tested                                                            |
+| --------------------------------------------------------------------------------------------------------------------------------------- | ----- | -------------------------------------------------------------------------- |
+| On-accent text on the accent fill                                                                                                       | 4.5:1 | light, for seven accents including white, black and an OKLCH colour        |
+| On-accent text on the hover and active fills                                                                                            | 4.5:1 | light and dark, six accents                                                |
+| Tone text (`accent`, `danger`, `success`, `warning`, `info`) on the background, the surfaces, the soft fill and its strongest soft tint | 4.5:1 | light and dark, ten accents (`#3ddc97` among them) and a product soft fill |
+| Code colours on every surface code sits on                                                                                              | 4.5:1 | light and dark                                                             |
+| Code colours in the contrast palettes                                                                                                   | 7:1   | light-contrast and dark-contrast                                           |
+| Muted text on the background in the contrast palettes                                                                                   | 7:1   | light-contrast and dark-contrast                                           |
 
 **2. As rendered.** Play tests read computed colours from the page and measure the ratio against what is actually behind the element (`src/test/color.ts`). These assert 4.5:1 for text in Button (every variant and tone), Badge (every tone and variant), Link (every tone), Notice (title and body in every tone, in light and dark), EmptyState, DescriptionList, Steps, SideNav, Prose and CodeBlock. A few non-text parts are held to 3:1: the ProgressBar fill against its track, a Steps border against the page and the ColorField swatch border.
 

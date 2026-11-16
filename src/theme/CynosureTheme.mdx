@@ -96,10 +96,21 @@ const list = useSyncExternalStore(themes.subscribe, themes.list); // for the pic
 ## useCynosureTheme
 
 ```tsx
-const { theme, palette, colors, fontSize } = useCynosureTheme();
+const { theme, palette, colors, fontSize, resolveColor } = useCynosureTheme();
 ```
 
 For canvas engines and chart libraries, which cannot read `var(--…)`: the nearest wrapper's theme, the palette it shows (`light`, `dark`, `light-contrast` or `dark-contrast`), that palette's colours as hex (including `seriesColors`, eight chart colours that read 3:1 on the page) and the type ramp in px. It re-renders when the theme, mode or contrast changes, so a canvas redraws and a chart re-registers its theme (`swiftChartTheme(theme, palette)`). Pass `mode` to `CynosureTheme` so the hook knows a mode the page chose.
+
+### Product colours: resolveColor
+
+```tsx
+const { resolveColor } = useCynosureTheme();
+useEffect(() => draw({ grid: resolveColor("--chart-grid"), line: resolveColor("var(--chart-1)") }), [resolveColor]);
+```
+
+`colors` holds only Cynosure's own roles. `resolveColor(value, within?)` resolves any CSS colour value where the theme is painted: a colour, `var(--x)` or a bare `--x` (a product role defined on the wrapper or above it, including `color-mix()` and `light-dark()` built on `--cy-color-*`). It returns `#rrggbb`, or `#rrggbbaa` when translucent, and `""` for a value that is no colour, an unset custom property, on the server and before the wrapper mounts. A new function comes with each palette, so an effect that lists it resolves again when the mode or contrast changes. Call it after render (in an effect). `within` resolves where another element sits (a canvas inside a section that sets its own roles); it is also how to use it with no `CynosureTheme` above. It adds a hidden probe to that element and removes it before returning.
+
+<Canvas of={Stories.ResolvesProductColours} />
 
 ## useColorMode
 
@@ -126,6 +137,7 @@ import { themeInitScript } from "@arshad-shah/cynosure";
 ```
 
 - `key` must match `useColorMode({ key })`; `selector` marks an app root instead of `<html>`.
+- With nothing valid saved (or storage blocked) it marks `system`, so a dark-OS visitor sees dark from the first paint; a `data-cy-mode` the page already set is kept.
 - It contains no `<`, so it is safe to inline. For a content security policy without inline scripts, write the text to a file at build time and load that.
 - It reads localStorage only; async storage (such as `chrome.storage`) cannot be read before paint.
 

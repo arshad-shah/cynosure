@@ -68,6 +68,24 @@ A [SideNav](?path=/docs/components-structure-sidenav--docs) entry with `kind: "a
 
 <Canvas of={Stories.TabBarWithAPrimaryAction} />
 
+## The brand and the rail
+
+`brand` is the product's mark. While the shell is wide it heads the navigation column, beside the top bar and as tall as it; it never widens the column. Narrow (or with no `nav`), it moves to the start of the top bar, after the menu button.
+
+<Canvas of={Stories.BrandAboveTheNavigation} />
+
+`navToggle` adds a button at the start of the bar that collapses the navigation column to SideNav's icon rail and back. A SideNav in the column follows it unless you give it `collapsed` yourself, and choosing a group in the rail expands the column so the group can open. The button is named by `labels.collapseNav` ("Collapse navigation") or `labels.expandNav` ("Expand navigation") and points at the column with `aria-controls`. Narrow, the menu button takes its place and the drawer always shows the full navigation.
+
+```tsx
+<AppShell brand={<Logo compact={useAppShell().navCollapsed} />} nav={<SideNav label="Main" items={items} />} navToggle navCollapsedKey="app:nav-rail">
+```
+
+- **Controlled:** `navCollapsed` and `onNavCollapsedChange`; `defaultNavCollapsed` to start collapsed.
+- **Remembered:** `navCollapsedKey` keeps it between visits, in localStorage or any `{ get, set }` storage, sync or async (`navCollapsedStorage`). It is read after mount; storage errors are ignored.
+- **Inside the shell:** `useAppShell().navCollapsed` says whether the rail shows (never while narrow), for a brand that switches to a compact mark.
+
+<Canvas of={Stories.CollapsesTheNavigationToARail} />
+
 ### Reading the narrow state
 
 Do not repeat the breakpoint in your product. Anything rendered inside the shell (header, navigation, tabs, content) reads it with `useAppShell()`. Code outside the shell uses `onNarrowChange`.
@@ -85,7 +103,7 @@ function Toolbar() {
 
 - `narrow` is `true` while the shell's own width is below `collapseBelow`.
 - It is `false` on the server and on the first client render, so server markup hydrates without a mismatch. The shell measures itself before the first paint and renders again if it is narrow.
-- Outside an AppShell the hook does not throw. It returns `{ narrow: false }`.
+- Outside an AppShell the hook does not throw. It returns `{ narrow: false, navCollapsed: false }`.
 - `onNarrowChange` is called once per change. A shell that mounts narrow calls it with `true` right after mounting; a shell that mounts wide does not call it until it narrows.
 - There is no hook for the drawer: the shell closes it itself when a link or button inside it is pressed.
 

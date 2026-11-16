@@ -60,6 +60,12 @@ The SplitPane fills its container, so give the container a size. Each pane scrol
 
 <Canvas of={Stories.ToggledFromAButton} />
 
+## Stacking on a narrow container
+
+`stackBelow={480}` stacks the panes, one after the other at full width and their own height with no divider, while the SplitPane itself is narrower than 480px. It measures its own width (its container's), not the window's, so a SplitPane in a narrow column or a side panel stacks while the page is wide. The size is kept and comes back when it is wide again; a collapsed pane stays hidden. Before the first measure (and on the server) it is split.
+
+<Canvas of={Stories.StacksOnANarrowContainer} />
+
 ## Props
 
 <ArgTypes of={Stories} />
@@ -84,7 +90,7 @@ The SplitPane fills its container, so give the container a size. Each pane scrol
 
 ## Theming
 
-Tokens: `--cy-split-pane-divider-size` and `--cy-split-pane-divider`.
+Tokens: `--cy-split-pane-divider-size`, `--cy-split-pane-divider` and `--cy-split-pane-stack-gap` (the space between stacked panes, default `--cy-space-5`).
 
 ## Related
 

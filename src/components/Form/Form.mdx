@@ -1,0 +1,67 @@
+import { ArgTypes, Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as Stories from "./Form.stories";
+
+<Meta of={Stories} />
+
+# Form
+
+A group of fields that submits as one: Enter in any text field submits it, after the fields' own validation, and `onSubmit` gets the values. The page never navigates.
+
+<Canvas of={Stories.EnterSubmitsTheValues} />
+
+## When to use
+
+- **A few fields that belong together and are sent together:** a password for an encrypted file, a key to verify a signature with, a sign-in.
+
+**Use something else when:**
+- the fields apply as they change (a settings panel): lay them out with a [Stack](?path=/docs/components-structure-stack--docs) and handle each `onChange`
+- one field searches as you type: a [SearchField](?path=/docs/components-controls-searchfield--docs)
+
+## Usage
+
+```tsx
+import { Button, Form, TextField } from "@arshad-shah/cynosure";
+
+<Form label="Unlock the document" onSubmit={(values) => unlock(values.get("password") as string)}>
+  <TextField label="Password" name="password" type="password" required />
+  <Button type="submit">Unlock</Button>
+</Form>
+```
+
+Fields are read by their `name`, as in any HTML form, and `onSubmit(values, event)` receives them as `FormData` (with the submit button's own name and value when one was pressed). Without `onSubmit` it is a native form that posts to `action`.
+
+## Enter in a group without a button
+
+A browser submits on Enter only when the form has a submit button or a single field. Form submits from any text field either way, so a group of fields with its buttons elsewhere (a toolbar, a dialog's footer) still submits on Enter. Enter in a text area is a new line; a field that takes Enter itself (TagInput adding a tag, Combobox picking an option) keeps it; an IME's Enter confirms its composition.
+
+<Canvas of={Stories.EnterSubmitsAGroupWithoutAButton} />
+
+## Validation
+
+Submitting runs the fields' own validation first (`required`, `type`, `pattern`, a DateField's typed date): an invalid field stops it, the browser says why and focus moves to that field. `noValidate` skips it.
+
+<Canvas of={Stories.InvalidFieldsBlockTheSubmit} />
+
+## Props
+
+<ArgTypes of={Stories} />
+
+## Behaviour and accessibility
+
+| Input | Result |
+| --- | --- |
+| <kbd>Enter</kbd> in a text field | Submits, if the fields are valid |
+| <kbd>Enter</kbd> in a text area | A new line |
+| A `type="submit"` Button | Submits, if the fields are valid |
+| A `type="reset"` Button | Puts every field back to its starting value |
+
+- **Landmark:** `label` (or `aria-labelledby`) names the form, which makes it a `form` landmark. Without a name it is not one.
+- **Layout:** fields stack in a column, `gap` apart (a space token).
+
+## Theming
+
+Tokens: `--cy-form-gap`, the space between fields when `gap` is not given (default `--cy-space-4`).
+
+## Related
+
+[TextField](?path=/docs/components-controls-textfield--docs) · [Field](?path=/docs/components-feedback-and-display-field--docs) · [Button](?path=/docs/components-controls-button--docs) · [Stack](?path=/docs/components-structure-stack--docs)

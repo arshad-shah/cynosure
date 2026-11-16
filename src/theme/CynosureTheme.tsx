@@ -1,4 +1,12 @@
-import { type CSSProperties, type ReactNode, useContext, useMemo } from "react";
+import {
+  type CSSProperties,
+  type ReactNode,
+  type RefObject,
+  useCallback,
+  useContext,
+  useMemo,
+  useRef,
+} from "react";
 import { useClientLayoutEffect } from "../foundations/client-layout-effect.js";
 import { useMediaQuery } from "../foundations/media-query.js";
 import { type Theme, themeProperties } from "../tokens/index.js";
@@ -49,14 +57,20 @@ export function CynosureTheme({
   const ownMode = theme?.mode ?? (mode && (fixed ?? mode));
   const parentMode = parent?.mode;
   const parentMore = parent?.more;
+  const wrapper = useRef<HTMLElement>(null);
+  const host = useCallback(
+    () => (target === "document" ? document.documentElement : wrapper.current),
+    [target],
+  );
   // What useCynosureTheme reads below this wrapper: the same theme, mode and contrast the wrapper paints.
   const state = useMemo<ThemeState>(
     () => ({
       theme: painted,
       mode: fixed ?? mode ?? parentMode ?? "system",
       more: theme || contrast ? more : (parentMore ?? more),
+      host,
     }),
-    [painted, fixed, mode, parentMode, theme, contrast, more, parentMore],
+    [painted, fixed, mode, parentMode, theme, contrast, more, parentMore, host],
   );
 
   useClientLayoutEffect(() => {
@@ -85,6 +99,7 @@ export function CynosureTheme({
   return (
     <ThemeContext.Provider value={state}>
       <Tag
+        ref={wrapper as RefObject<HTMLDivElement>}
         className={className ? `cy-theme ${className}` : "cy-theme"}
         data-cy-mode={ownMode}
         data-cy-contrast={contrast}

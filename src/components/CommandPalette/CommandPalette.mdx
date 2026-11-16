@@ -56,6 +56,28 @@ Before anything is typed, commands are listed under their `group` headings. Sear
 
 <Canvas of={Stories.CustomFilterRanksAndMarksItsPositions} />
 
+## Commands made from the query
+
+`onQueryChange(query)` hears every change of the search text (and `""` each time the palette opens). Build commands from it and pass them in `commands`, such as "Go to line 42" for a number; a custom `filter` decides whether they show. The active command stays the same while the list changes under it, if it is still there.
+
+<Canvas of={Stories.CommandsBuiltFromTheQuery} />
+
+## Recent commands between visits
+
+Recently run commands live in the palette's state. `recentKey` keeps them between visits, in localStorage by default (as JSON ids, newest first, at most 20), or in any `{ get, set }` storage, sync or async, given as `recentStorage` (`chrome.storage` in an extension). It is read after mount and written when a command runs; storage that throws or is missing is ignored, and ids that no command has any more are skipped. To hold the list yourself, pass `recent` and `onRecentChange`.
+
+```tsx
+<CommandPalette commands={commands} onRun={run} recentKey="app:recent-commands" />
+```
+
+<Canvas of={Stories.RecentCommandsPersistUnderAKey} />
+
+## Saying why a command is disabled
+
+`disabledReason` on a `disabled` command says why it cannot run. The reason is shown in its row and is the option's description, and the arrows reach it (a disabled command without a reason is skipped), so a screen reader reads it with the command. Enter or a click runs nothing and announces `labels.unavailable(label, reason)` ("Export as PDF is unavailable: Open a document first").
+
+<Canvas of={Stories.ADisabledCommandSaysWhy} />
+
 ## Shortcuts with useHotkey
 
 ```tsx
@@ -77,8 +99,8 @@ Shortcuts with Ctrl, Command or Alt work everywhere, text fields included. Plain
 | --- | --- |
 | <kbd>Ctrl</kbd> / <kbd>Command</kbd> + <kbd>K</kbd> | Opens or closes it from anywhere |
 | Typing | Filters the commands into one flat list, each tagged with its group |
-| <kbd>Down</kbd> / <kbd>Up</kbd> | Next / previous command, wrapping around; disabled ones are skipped |
-| <kbd>Enter</kbd> or a click | Runs the command and closes |
+| <kbd>Down</kbd> / <kbd>Up</kbd> | Next / previous command, wrapping around; disabled ones are skipped unless they have a `disabledReason` |
+| <kbd>Enter</kbd> or a click | Runs the command and closes; on a disabled command with a reason, announces the reason |
 | <kbd>Escape</kbd> or the backdrop | Closes; focus returns to where it was |
 
 - **Roles:** a modal `dialog` named by `labels.title`, holding a `combobox` search field and a `listbox` of `option`s in named `group`s (search results are one unnamed group). A row's group tag is part of its name. The active command is `aria-activedescendant`, so focus stays in the search field.

@@ -48,6 +48,7 @@ import { mail } from "@arshad-shah/cynosure/icons";
 
 - **`variant`:** `outline` (default) or `soft` (tinted, borderless until focus).
 - **`size`:** `xs`, `sm`, `md` or `lg`. Heights match Button and Select. `xs` is a 20px field with smaller text and icons, and `xs` clear and reveal buttons, for dense desktop chrome. The transparent input reaches past the field's edges, so it is still 24px to press (44px on coarse pointers) while the field looks 20px. Addons keep their own size.
+- **`monospace`:** types in the mono font (`--cy-font-mono`), for keys, ids, hashes and tokens.
 - **`iconStart` and `iconEnd`:** icons at either edge, flipped in right-to-left layouts.
 - **`addonStart` and `addonEnd`:** controls inside the field before or after the input (ColorField's swatch button, NumberField's steppers).
 - **`labelHidden`:** hides the label visually while it still names the field. Prefer a visible label.
@@ -67,7 +68,7 @@ import { mail } from "@arshad-shah/cynosure/icons";
 
 ## Theming
 
-Tokens: `--cy-text-field-{height-xs,height-sm,height-md,height-lg,radius,padding-inline,padding-inline-xs,bg,border,soft-bg,readonly-bg}` (`readonly-bg` is the fill of a read-only field), and `--cy-text-field-numeric`, the typed text's `font-variant-numeric` (`tabular-nums` in DateField, NumberField and TimeField). The border, background, radius and read-only fill fall back to Field's shared skin, `--cy-field-control-{border,bg,radius,sunken-bg}`, which HotkeyField's box reads too.
+Tokens: `--cy-text-field-{height-xs,height-sm,height-md,height-lg,radius,padding-inline,padding-inline-xs,bg,border,soft-bg,readonly-bg}` (`readonly-bg` is the fill of a read-only field), and `--cy-text-field-numeric`, the typed text's `font-variant-numeric` (`tabular-nums` in DateField, NumberField and TimeField), and `--cy-text-field-mono-font`, the font of a `monospace` field (default `--cy-font-mono`). The border, background, radius and read-only fill fall back to Field's shared skin, `--cy-field-control-{border,bg,radius,sunken-bg}`, which HotkeyField's box reads too.
 
 ```ts
 createTheme({ components: { textField: { radius: "10px", paddingInline: "14px" } } });

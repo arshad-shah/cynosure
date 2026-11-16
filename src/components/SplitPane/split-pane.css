@@ -35,6 +35,15 @@
   &[data-dragging][data-orientation="vertical"] {
     cursor: row-resize;
   }
+  /* Narrower than stackBelow: the panes follow one another at full width and their own height, with no divider. */
+  &[data-stacked] {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: none;
+    grid-auto-rows: auto;
+    row-gap: var(--cy-split-pane-stack-gap, var(--cy-space-5));
+    block-size: auto;
+    overflow: visible;
+  }
 }
 .cy-split-pane-pane.cy-split-pane-pane {
   min-inline-size: 0;
@@ -43,6 +52,12 @@
   font-size: inherit;
   &[data-collapsed] {
     visibility: hidden;
+  }
+  [data-stacked] > & {
+    overflow: visible;
+  }
+  [data-stacked] > &[data-collapsed] {
+    display: none;
   }
 }
 .cy-split-pane-divider.cy-split-pane-divider {
