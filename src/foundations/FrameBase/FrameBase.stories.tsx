@@ -27,12 +27,15 @@ export const SandboxedByDefault: Story = {
 
 export const ScriptsDoNotRun: Story = {
   args: { srcDoc: `<script>parent.postMessage("ran", "*")</script>` },
-  play: async () => {
+  play: async ({ canvasElement }) => {
+    const frame = canvasElement.querySelector("iframe") as HTMLIFrameElement;
     let ran = false;
     const listen = (e: MessageEvent) => {
       if (e.data === "ran") ran = true;
     };
+    // Listen, then load the document again, so a script that did run could not have done so unheard.
     window.addEventListener("message", listen);
+    frame.srcdoc = `${frame.srcdoc} `;
     await new Promise((r) => setTimeout(r, 300));
     window.removeEventListener("message", listen);
     await expect(ran).toBe(false);
@@ -41,15 +44,20 @@ export const ScriptsDoNotRun: Story = {
 
 export const TokensWhenAsked: Story = {
   args: { srcDoc: `<script>parent.postMessage("allowed", "*")</script>`, sandbox: "allow-scripts" },
-  play: async () => {
-    const got = await new Promise<string>((resolve) => {
+  play: async ({ canvasElement }) => {
+    const frame = canvasElement.querySelector("iframe") as HTMLIFrameElement;
+    // Listen first, then load the document again: a fast engine (WebKit) runs the script before play starts, so a
+    // listener added after the first load would miss its message.
+    const got = new Promise<string>((resolve) => {
       const listen = (e: MessageEvent) => {
+        if (e.source !== frame.contentWindow) return;
         window.removeEventListener("message", listen);
         resolve(String(e.data));
       };
       window.addEventListener("message", listen);
       setTimeout(() => resolve("nothing"), 2000);
     });
-    await expect(got).toBe("allowed");
+    frame.srcdoc = `${frame.srcdoc} `;
+    await expect(await got).toBe("allowed");
   },
 };

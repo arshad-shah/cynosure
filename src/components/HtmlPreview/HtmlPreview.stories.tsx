@@ -56,6 +56,9 @@ export const ScriptsNeverRun: Story = {
     };
     window.addEventListener("message", listen);
     await waitFor(() => expect(frameOf(canvasElement)).toBeInTheDocument());
+    // Load the document again now that we listen, so a script that did run could not have done so unheard.
+    const frame = frameOf(canvasElement) as HTMLIFrameElement;
+    frame.srcdoc = `${frame.srcdoc} `;
     await new Promise((r) => setTimeout(r, 300));
     window.removeEventListener("message", listen);
     await expect(ran).toBe(false);
