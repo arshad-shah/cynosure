@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import type { CSSProperties } from "react";
+import { type CSSProperties, useEffect, useRef, useState } from "react";
 import { expect, fn, waitFor, within } from "storybook/test";
 import { computeUnderHostileHost } from "../../test/hostile.js";
 import { Badge } from "../Badge/Badge.js";
@@ -576,5 +576,30 @@ export const CurrentCardOfASet: Story = {
     current.append(probe);
     await expect(getComputedStyle(current).borderTopColor).toBe(getComputedStyle(probe).color);
     probe.remove();
+  },
+};
+
+export const PassesIdDataAndRef: Story = {
+  render: (args) => {
+    function WithRef() {
+      const ref = useRef<HTMLElement>(null);
+      const [seen, setSeen] = useState("");
+      useEffect(() => setSeen(ref.current?.dataset.state ?? ""), []);
+      return (
+        <>
+          <Card {...args} ref={ref} id="tip" data-state="ready" data-row={3} />
+          <output data-testid="ref">{seen}</output>
+        </>
+      );
+    }
+    return <WithRef />;
+  },
+  play: async ({ canvasElement, canvas }) => {
+    const root = canvasElement.querySelector("#tip") as HTMLElement;
+    // The id and any data-* attribute land on the component's root, and the ref is that element.
+    await expect(root).toHaveClass("cy-card");
+    await expect(root).toHaveAttribute("data-state", "ready");
+    await expect(root).toHaveAttribute("data-row", "3");
+    await expect(canvas.getByTestId("ref")).toHaveTextContent("ready");
   },
 };

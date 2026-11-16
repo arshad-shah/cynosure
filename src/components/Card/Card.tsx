@@ -8,6 +8,7 @@ import {
   type ReactNode,
   useId,
 } from "react";
+import type { RootAttributes } from "../../foundations/attributes.js";
 import { ButtonBase } from "../../foundations/ButtonBase/ButtonBase.js";
 import { type Edge, edgeProps } from "../../foundations/edge.js";
 import { LinkBase } from "../../foundations/LinkBase/LinkBase.js";
@@ -32,7 +33,7 @@ declare module "../../tokens/schema.js" {
   }
 }
 
-export interface CardProps {
+export interface CardProps extends RootAttributes {
   /** `surface` raised panel, `outline` border only, `soft` tone-tinted fill. */
   variant?: "surface" | "outline" | "soft";
   /** Space between the card's edge and its content. Default "md". */

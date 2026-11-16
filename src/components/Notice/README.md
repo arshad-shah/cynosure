@@ -8,18 +8,19 @@ An inline message about part of the page that stays until it is resolved or dism
 </Notice>;
 ```
 
-| Prop          | Default                  | Notes                                                                     |
-| ------------- | ------------------------ | ------------------------------------------------------------------------- |
-| `tone`        | `info`                   | Any tone; sets the tint, title colour and icon                            |
-| `variant`     | `soft`                   | `soft` tinted panel; `solid` the tone's solid colour with its text colour |
-| `size`        | `md`                     | `sm`: less padding; title and message share one line when they fit        |
-| `title`       | –                        | Short, bold first line                                                    |
-| `children`    | –                        | Body text                                                                 |
-| `action`      | –                        | One or two Buttons; they drop under the text below a width of 26rem       |
-| `dismissible` | `false`                  | Close button; hides the Notice unless you pass `onDismiss` and unmount it |
-| `onDismiss`   | –                        | Called when the close button is pressed; with it, hiding is up to you     |
-| `icon`        | the tone's icon          | Another Facet icon, or `null` for none                                    |
-| `labels`      | `{ dismiss: "Dismiss" }` | Built-in strings                                                          |
+| Prop                  | Default                  | Notes                                                                     |
+| --------------------- | ------------------------ | ------------------------------------------------------------------------- |
+| `tone`                | `info`                   | Any tone; sets the tint, title colour and icon                            |
+| `variant`             | `soft`                   | `soft` tinted panel; `solid` the tone's solid colour with its text colour |
+| `size`                | `md`                     | `sm`: less padding; title and message share one line when they fit        |
+| `title`               | –                        | Short, bold first line                                                    |
+| `children`            | –                        | Body text                                                                 |
+| `action`              | –                        | One or two Buttons; they drop under the text below a width of 26rem       |
+| `dismissible`         | `false`                  | Close button; hides the Notice unless you pass `onDismiss` and unmount it |
+| `onDismiss`           | –                        | Called when the close button is pressed; with it, hiding is up to you     |
+| `icon`                | the tone's icon          | Another Facet icon, or `null` for none                                    |
+| `labels`              | `{ dismiss: "Dismiss" }` | Built-in strings                                                          |
+| `id`, `data-*`, `ref` | –                        | Set on the root element (a link target, test or state hooks)              |
 - `role="alert"` for `danger` (announced even when it appears filled), `role="status"` otherwise: content changes are announced, but a status Notice that mounts already filled is usually only read in place. For a passing message that must be announced, use Toast. The icon is decorative.
 - Title and body are at least 4.5:1 in every tone and both variants, in light and dark modes; on a fill, the icons are at least 3:1.
 - `solid` uses the tone's `--cy-color-on-<tone>` text colour (neutral fills with the ink and writes in the page background).

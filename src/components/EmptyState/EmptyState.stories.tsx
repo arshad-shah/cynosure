@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
+import { useEffect, useRef, useState } from "react";
 import { expect, fn } from "storybook/test";
 import { folderOpen, search } from "../../icons/index.js";
 import { textContrast } from "../../test/color.js";
@@ -164,5 +165,30 @@ export const AsThePageItself: Story = {
     await expect(h1.tagName).toBe("H1");
     await expect(getComputedStyle(h1).fontSize).toBe(getComputedStyle(h3).fontSize);
     await expect(getComputedStyle(h1).fontWeight).toBe(getComputedStyle(h3).fontWeight);
+  },
+};
+
+export const PassesIdDataAndRef: Story = {
+  render: (args) => {
+    function WithRef() {
+      const ref = useRef<HTMLDivElement>(null);
+      const [seen, setSeen] = useState("");
+      useEffect(() => setSeen(ref.current?.dataset.state ?? ""), []);
+      return (
+        <>
+          <EmptyState {...args} ref={ref} id="tip" data-state="ready" data-row={3} />
+          <output data-testid="ref">{seen}</output>
+        </>
+      );
+    }
+    return <WithRef />;
+  },
+  play: async ({ canvasElement, canvas }) => {
+    const root = canvasElement.querySelector("#tip") as HTMLElement;
+    // The id and any data-* attribute land on the component's root, and the ref is that element.
+    await expect(root).toHaveClass("cy-empty-state");
+    await expect(root).toHaveAttribute("data-state", "ready");
+    await expect(root).toHaveAttribute("data-row", "3");
+    await expect(canvas.getByTestId("ref")).toHaveTextContent("ready");
   },
 };

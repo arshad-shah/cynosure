@@ -1,4 +1,5 @@
 import { type CSSProperties, forwardRef, type ReactNode } from "react";
+import type { RootAttributes } from "../../foundations/attributes.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
 import { check } from "../../icons/check.js";
 import type { IconData } from "../../icons/types.js";
@@ -45,7 +46,7 @@ export interface ListItem {
 
 export type ListMarker = "disc" | "number" | "check" | "icon" | "tile" | "none";
 
-export interface ListProps {
+export interface ListProps extends RootAttributes {
   /** The items, in order. */
   items: ListItem[];
   /**
@@ -69,6 +70,8 @@ export interface ListProps {
   size?: Size;
   /** Names the list for assistive technology ("Install steps"), when no heading above it does. */
   label?: string | undefined;
+  /** The id of the element that names the list (the heading above it), instead of `label`. */
+  "aria-labelledby"?: string | undefined;
   /** Added to the root element, for layout. */
   className?: string;
   /** Layout only. Restyle through --cy-list-* tokens. */
@@ -101,6 +104,7 @@ export const List = forwardRef<HTMLUListElement | HTMLOListElement, ListProps>(f
     label,
     className,
     style,
+    ...rest
   },
   ref,
 ) {
@@ -117,6 +121,7 @@ export const List = forwardRef<HTMLUListElement | HTMLOListElement, ListProps>(f
   return (
     <Tag
       ref={ref as never}
+      {...rest}
       // Explicit: Safari drops the list role from a list drawn without bullets.
       role="list"
       aria-label={label}

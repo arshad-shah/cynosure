@@ -1,4 +1,5 @@
 import type { AriaAttributes, DOMAttributes, HTMLAttributes } from "react";
+import type { DataAttributes } from "./attributes.js";
 
 /** A step of the theme's space scale (`--cy-space-0` … `--cy-space-10`). */
 export type Space = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" | "10";
@@ -36,11 +37,6 @@ export const BREAKPOINTS = { sm: "30rem", md: "45rem", lg: "60rem", xl: "75rem" 
 
 /** A named width of the layout scale (`BREAKPOINTS`). */
 export type Breakpoint = keyof typeof BREAKPOINTS;
-
-/** Any `data-*` attribute, passed to the element as given. */
-export interface DataAttributes {
-  [attribute: `data-${string}`]: string | number | boolean | undefined;
-}
 
 /**
  * Attributes every layout primitive passes to its element: an id to link to, a role, ARIA attributes, any `data-*`

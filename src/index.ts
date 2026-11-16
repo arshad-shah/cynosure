@@ -574,6 +574,7 @@ export {
   type ZoomControlsLabels,
   type ZoomControlsProps,
 } from "./components/ZoomControls/index.js";
+export type { DataAttributes, RootAttributes } from "./foundations/attributes.js";
 export { ButtonBase, type ButtonBaseProps } from "./foundations/ButtonBase/ButtonBase.js";
 export { ChoiceBase, type ChoiceBaseProps } from "./foundations/ChoiceBase/ChoiceBase.js";
 export { useControllableState } from "./foundations/controllable.js";
