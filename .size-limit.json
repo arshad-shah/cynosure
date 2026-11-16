@@ -804,5 +804,17 @@
     "path": ["dist/components/HtmlPreview/HtmlPreview.js", "dist/styles/html-preview.css"],
     "limit": "3 kB",
     "gzip": true
+  },
+  {
+    "name": "VideoBase",
+    "path": ["dist/foundations/VideoBase/VideoBase.js"],
+    "limit": "3 kB",
+    "gzip": true
+  },
+  {
+    "name": "CameraView (JS + CSS)",
+    "path": ["dist/components/CameraView/CameraView.js", "dist/styles/camera-view.css"],
+    "limit": "3 kB",
+    "gzip": true
   }
 ]

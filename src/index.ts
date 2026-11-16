@@ -67,6 +67,15 @@ export {
   toISODate,
 } from "./components/Calendar/index.js";
 export {
+  type CameraError,
+  type CameraErrorKind,
+  CameraView,
+  type CameraViewHandle,
+  type CameraViewLabels,
+  type CameraViewProps,
+  type CameraViewTokens,
+} from "./components/CameraView/index.js";
+export {
   CanvasStage,
   type CanvasStageLabels,
   type CanvasStageProps,
@@ -662,6 +671,7 @@ export {
 export { type QrToPngOptions, qrContrast, qrToPng } from "./foundations/qr-export.js";
 export { type RovingOptions, useRovingFocus } from "./foundations/roving-focus.js";
 export { TextAreaBase, type TextAreaBaseProps } from "./foundations/TextAreaBase/TextAreaBase.js";
+export { VideoBase, type VideoBaseProps } from "./foundations/VideoBase/index.js";
 export type { BrandInfo, IconCategory, IconData, IconMotion, IconNode } from "./icons/types.js";
 export { type DismissOptions, type DismissReason, useDismiss } from "./overlay/dismiss.js";
 export * from "./theme/index.js";

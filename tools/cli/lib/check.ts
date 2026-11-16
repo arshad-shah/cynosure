@@ -357,6 +357,7 @@ export const FOUNDATION_USERS: Record<string, readonly string[]> = {
   DialogBase: ["CommandPalette", "Dialog"],
   FileInputBase: ["FileDrop", "KeyValueEditor"],
   FrameBase: ["HtmlPreview"],
+  VideoBase: ["CameraView"],
 };
 const FREE_FOUNDATIONS = new Set(["Icon", "HiddenValue", "LiveRegion"]);
 
