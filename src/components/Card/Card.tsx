@@ -84,14 +84,14 @@ export interface CardProps extends RootAttributes {
   /** The card's content. Keep it non-interactive when the card is a link or a button. */
   children?: ReactNode;
   /** Accessible name of the card, set on the card element. */
-  "aria-label"?: string;
+  "aria-label"?: string | undefined;
   /**
    * Marks a link or button card as the current one of a set: `"page"` for the page being shown (a card grid of
    * sections), or `"step"`, `"location"`, `true`. Read by screen readers, and the card's border takes the accent.
    */
   "aria-current"?: AriaAttributes["aria-current"];
   /** Set on the card element, to find it in tests. */
-  "data-testid"?: string;
+  "data-testid"?: string | undefined;
 }
 
 /** Content container. With `href` or `onClick` the whole card is one link or button (no nested controls). */

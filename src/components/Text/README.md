@@ -14,22 +14,22 @@ import { Text } from "@arshad-shah/cynosure";
 <Text as="time" dateTime="2026-03-12" variant="caption">12 March</Text>
 ```
 
-| Prop                  | Default   | Notes                                                                                                                |
-| --------------------- | --------- | -------------------------------------------------------------------------------------------------------------------- |
-| `as`                  | `span`    | `span`, `p`, `div`, `label`, `strong`, `em`, `small`, `time`, `figcaption`                                           |
-| `variant`             | `body`    | `lead` (larger, muted), `caption` (small, muted), `eyebrow` (small, uppercase, tracked, mono), `code` (mono)         |
-| `size`                | variant's | `xs`, `sm`, `md`, `lg`, `xl`, `2xl`: the `--cy-font-size-*` tokens. Body and code are `md`                           |
-| `weight`              | `regular` | `regular`, `medium`, `bold`. Eyebrow and `as="strong"` are bold                                                      |
-| `tone`                | `inherit` | `inherit`, `neutral`, `muted`, `accent`, `success`, `warning`, `danger`, `info`. Lead, caption and eyebrow are muted |
-| `align`               | –         | `start`, `center`, `end`; follows the reading direction. Makes an inline element a block                             |
-| `truncate`            | `false`   | `true`: one line with an ellipsis. A number: that many lines                                                         |
-| `wrap`                | –         | `pre`: keep spaces and line breaks (still wraps at the edge). `break`: break long ids and URLs anywhere              |
-| `numeric`             | `false`   | Tabular figures, so digits line up                                                                                   |
-| `htmlFor`             | –         | With `as="label"`: id of the control                                                                                 |
-| `dateTime`            | –         | With `as="time"`: machine-readable date                                                                              |
-| `id`                  | –         | For `aria-labelledby` and `aria-describedby`                                                                         |
-| `className` / `style` | –         | Layout only                                                                                                          |
-| `id`, `data-*`, `ref` | –         | Set on the root element (a link target, test or state hooks)                                                         |
+| Prop                                    | Default   | Notes                                                                                                                |
+| --------------------------------------- | --------- | -------------------------------------------------------------------------------------------------------------------- |
+| `as`                                    | `span`    | `span`, `p`, `div`, `label`, `strong`, `em`, `small`, `time`, `figcaption`                                           |
+| `variant`                               | `body`    | `lead` (larger, muted), `caption` (small, muted), `eyebrow` (small, uppercase, tracked, mono), `code` (mono)         |
+| `size`                                  | variant's | `xs`, `sm`, `md`, `lg`, `xl`, `2xl`: the `--cy-font-size-*` tokens. Body and code are `md`                           |
+| `weight`                                | `regular` | `regular`, `medium`, `bold`. Eyebrow and `as="strong"` are bold                                                      |
+| `tone`                                  | `inherit` | `inherit`, `neutral`, `muted`, `accent`, `success`, `warning`, `danger`, `info`. Lead, caption and eyebrow are muted |
+| `align`                                 | –         | `start`, `center`, `end`; follows the reading direction. Makes an inline element a block                             |
+| `truncate`                              | `false`   | `true`: one line with an ellipsis. A number: that many lines                                                         |
+| `wrap`                                  | –         | `pre`: keep spaces and line breaks (still wraps at the edge). `break`: break long ids and URLs anywhere              |
+| `numeric`                               | `false`   | Tabular figures, so digits line up                                                                                   |
+| `htmlFor`                               | –         | With `as="label"`: id of the control                                                                                 |
+| `dateTime`                              | –         | With `as="time"`: machine-readable date                                                                              |
+| `id`                                    | –         | For `aria-labelledby` and `aria-describedby`                                                                         |
+| `className` / `style`                   | –         | Layout only                                                                                                          |
+| `id`, `data-*`, `role`, `aria-*`, `ref` | –         | Set on the root element (a link target, test or state hooks, a live region)                                          |
 
 The ref is forwarded to the element.
 

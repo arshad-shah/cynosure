@@ -94,7 +94,7 @@ Text is not interactive, so it has no keyboard behaviour.
 - **Eyebrow:** the uppercase is visual only. The text in the DOM keeps its case.
 - **Contrast:** every tone and the muted variants keep 4.5:1 on the page background (tested).
 - **Host CSS:** host rules for `span` and `div` (weight, case, letter spacing, colour, size, line height) do not change Text (tested).
-- **Attributes:** `id`, any `data-*` attribute and the `ref` go to the root element.
+- **Attributes:** `id`, any `data-*` attribute, `role`, any `aria-*` attribute and the `ref` go to the root element, so status text can be a live region (`role="status"` with `aria-live`).
 
 ## Touch
 

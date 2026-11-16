@@ -696,3 +696,27 @@ export const PassesIdDataAndRef: Story = rootAttributesStory<HTMLElement>(
   ),
   "cy-text",
 );
+
+/** `role` and every `aria-*` attribute reach the element, so status text can be a live region. */
+export const PassesRoleAndAria: Story = {
+  render: () => (
+    <>
+      <Text role="status" aria-live="polite" aria-atomic aria-label="Upload" id="live">
+        3 of 5 files uploaded
+      </Text>
+      <Text as="p" aria-hidden aria-describedby="live" data-testid="hidden">
+        Decoration
+      </Text>
+    </>
+  ),
+  play: async ({ canvasElement }) => {
+    const live = canvasElement.querySelector("#live") as HTMLElement;
+    await expect(live).toHaveAttribute("role", "status");
+    await expect(live).toHaveAttribute("aria-live", "polite");
+    await expect(live).toHaveAttribute("aria-atomic", "true");
+    await expect(live).toHaveAccessibleName("Upload");
+    const hidden = canvasElement.querySelector('[data-testid="hidden"]') as HTMLElement;
+    await expect(hidden).toHaveAttribute("aria-hidden", "true");
+    await expect(hidden).toHaveAttribute("aria-describedby", "live");
+  },
+};
