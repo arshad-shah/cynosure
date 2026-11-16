@@ -2,7 +2,7 @@
   {
     "name": "all CSS",
     "path": "dist/styles.css",
-    "limit": "39.39 kB",
+    "limit": "39.4 kB",
     "gzip": true
   },
   {
@@ -35,7 +35,7 @@
       "dist/foundations/ButtonBase/ButtonBase.js",
       "dist/styles/button.css"
     ],
-    "limit": "2.89 kB",
+    "limit": "2.9 kB",
     "gzip": true
   },
   {
