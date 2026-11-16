@@ -280,6 +280,39 @@ export const Pressed: Story = {
   },
 };
 
+/**
+ * A pressed button stays readable in every variant and tone, light and dark: a solid one keeps its fill (its
+ * text is made for it), the others take the tone's tint with the tone's text.
+ */
+export const PressedIsReadable: Story = {
+  render: () => (
+    <>
+      {(["light", "dark"] as const).map((mode) => (
+        <CynosureTheme key={mode} mode={mode} style={{ padding: 12, background: "var(--cy-color-bg)" }}>
+          {(["solid", "soft", "outline", "ghost"] as const).map((variant) =>
+            (["accent", "neutral", "danger", "success"] as const).map((tone) => (
+              <Button key={`${variant}-${tone}`} variant={variant} tone={tone} pressed data-check="">
+                On
+              </Button>
+            )),
+          )}
+        </CynosureTheme>
+      ))}
+    </>
+  ),
+  play: async ({ canvasElement }) => {
+    const buttons = [...canvasElement.querySelectorAll<HTMLElement>("[data-check]")];
+    await expect(buttons).toHaveLength(32);
+    for (const button of buttons) {
+      const label = button.querySelector(".cy-button-label") ?? button;
+      await expect(
+        textContrast(label),
+        `${button.dataset.variant} ${button.dataset.tone} in ${button.closest("[data-cy-mode]")?.getAttribute("data-cy-mode")}`,
+      ).toBeGreaterThanOrEqual(4.5);
+    }
+  },
+};
+
 function PressedToggle(props: React.ComponentProps<typeof Button>) {
   const [on, setOn] = useState(false);
   return <Button {...props} pressed={on} onClick={() => setOn(!on)} />;

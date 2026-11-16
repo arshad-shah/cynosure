@@ -15,6 +15,7 @@ A checkbox with a label, for choices that are independent of each other. It is a
 - A single agreement or preference saved with a form.
 - A "select all" row with `indeterminate` when only some items are chosen.
 - A list of tasks, with `strikeWhenChecked` so a finished task reads as done.
+- A grid of pictures to tick (the pages of a document), with `variant="card"` and `media`.
 
 **Use something else when:**
 - the change applies immediately: [Switch](?path=/docs/components-controls-switch--docs)
@@ -56,6 +57,27 @@ The muted label keeps a contrast of at least 4.5:1 against the surface in light 
 
 <Canvas of={Stories.DoneLabelIsReadableInLightAndDark} />
 
+## Cards
+
+`variant="card"` draws a bordered card with `media` above the label. The whole card, picture included, ticks the box, which stays drawn over the picture's top end corner; a ticked card has the accent border and soft background. The label names the checkbox, not the picture. `onChange(checked, event)` is unchanged, so a Shift+click on a picture still reads `event.nativeEvent.shiftKey` for range selection. Lay cards out with [Grid](?path=/docs/components-structure-grid--docs).
+
+```tsx
+<Grid columns={4}>
+  {pages.map((p) => (
+    <Checkbox
+      key={p.number}
+      variant="card"
+      media={<Image src={p.thumbnail} alt="" />}
+      label={`Page ${p.number}`}
+      checked={chosen.has(p.number)}
+      onChange={(on, event) => pick(p.number, on, event.nativeEvent.shiftKey)}
+    />
+  ))}
+</Grid>
+```
+
+<Canvas of={Stories.CardsTickByPicture} />
+
 ## Props
 
 <ArgTypes of={Stories} />
@@ -64,7 +86,7 @@ The muted label keeps a contrast of at least 4.5:1 against the surface in light 
 
 | Input | Result |
 | --- | --- |
-| Click or tap the box or label | Toggles |
+| Click or tap the box or label (a card's picture too) | Toggles |
 | <kbd>Space</kbd> | Toggles |
 | <kbd>Tab</kbd> | Focus with a visible ring |
 

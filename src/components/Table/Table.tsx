@@ -13,7 +13,7 @@ import {
 import type { RootAttributes } from "../../foundations/attributes.js";
 import { useControllableState } from "../../foundations/controllable.js";
 import { nextSort, type SortDirection, sortRows, type TableSort } from "../../foundations/sort.js";
-import type { Size } from "../../tokens/schema.js";
+import type { Size, Tone } from "../../tokens/schema.js";
 import { Checkbox } from "../Checkbox/Checkbox.js";
 import { SortButton } from "../SortButton/SortButton.js";
 
@@ -24,6 +24,8 @@ export interface TableTokens {
   selectedBackground: string;
   /** Tallest the table gets before its body scrolls (with `stickyHeader`). */
   maxHeight: string;
+  /** How much of the tone a tinted cell (`tone`) mixes into the surface. Default 14%. */
+  tintMix: string;
 }
 
 declare module "../../tokens/schema.js" {
@@ -49,6 +51,11 @@ export interface TableColumn<Row> {
   width?: string;
   /** This column's cells name their rows (screen readers announce it with each cell). Default: the first column. */
   rowHeader?: boolean;
+  /**
+   * Tints the column: a tone tints its header and every cell; a function of the row tints cell by cell (a heat grid of
+   * working hours), returning a tone or nothing. A tint is not read out: say the same in the cell's text.
+   */
+  tone?: Tone | ((row: Row) => Tone | undefined) | undefined;
 }
 
 export interface TableLabels {
@@ -286,6 +293,7 @@ function DataTable<Row>({
                 scope="col"
                 className="cy-table-th cy-reset"
                 data-align={column.align}
+                data-tone={typeof column.tone === "string" ? column.tone : undefined}
                 aria-sort={column.sortable ? (sorted ?? "none") : undefined}
                 style={column.width ? { inlineSize: column.width } : undefined}
               >
@@ -334,17 +342,24 @@ function DataTable<Row>({
                 )}
                 {columns.map((column) => {
                   const content = column.cell ? column.cell(row) : (cellValue(row, column.key) as ReactNode);
+                  const tone = typeof column.tone === "function" ? column.tone(row) : column.tone;
                   return column === headerColumn ? (
                     <th
                       key={column.key}
                       scope="row"
                       className="cy-table-td cy-table-rowheader cy-reset"
                       data-align={column.align}
+                      data-tone={tone}
                     >
                       {content}
                     </th>
                   ) : (
-                    <td key={column.key} className="cy-table-td cy-reset" data-align={column.align}>
+                    <td
+                      key={column.key}
+                      className="cy-table-td cy-reset"
+                      data-align={column.align}
+                      data-tone={tone}
+                    >
                       {content}
                     </td>
                   );
@@ -446,6 +461,8 @@ interface TableCellBase extends TablePartProps {
   colSpan?: number | undefined;
   /** Rows the cell spans. */
   rowSpan?: number | undefined;
+  /** Tints the cell in a tone (a heat grid, a highlighted column). Not read out: say the same in its text. */
+  tone?: Tone | undefined;
 }
 
 export interface TableHeaderCellProps extends TableCellBase {
@@ -464,7 +481,10 @@ export interface TableHeaderCellProps extends TableCellBase {
 
 /** A header cell (`<th>`): a column header in the head, a row header in the body or foot. */
 export const TableHeaderCell = forwardRef<HTMLTableCellElement, TableHeaderCellProps>(
-  function TableHeaderCell({ align, width, scope, sort, onSort, className, style, children, ...rest }, ref) {
+  function TableHeaderCell(
+    { align, width, scope, sort, onSort, tone, className, style, children, ...rest },
+    ref,
+  ) {
     const section = useSection("TableHeaderCell", ["head", "body", "foot"], SECTIONS);
     const head = section === "head";
     const sortable = onSort !== undefined || sort !== undefined;
@@ -476,6 +496,7 @@ export const TableHeaderCell = forwardRef<HTMLTableCellElement, TableHeaderCellP
         scope={scope ?? (head ? "col" : "row")}
         className={cx(head ? "cy-table-th cy-reset" : "cy-table-td cy-table-rowheader cy-reset", className)}
         data-align={align}
+        data-tone={tone}
         aria-sort={sortable ? (direction ?? "none") : undefined}
         style={width ? { inlineSize: width, ...style } : style}
       >
@@ -495,7 +516,7 @@ export type TableCellProps = TableCellBase;
 
 /** A data cell (`<td>`) of the compound form. */
 export const TableCell = forwardRef<HTMLTableCellElement, TableCellProps>(function TableCell(
-  { align, className, children, ...rest },
+  { align, tone, className, children, ...rest },
   ref,
 ) {
   const section = useSection("TableCell", ["head", "body", "foot"], SECTIONS);
@@ -505,6 +526,7 @@ export const TableCell = forwardRef<HTMLTableCellElement, TableCellProps>(functi
       {...rest}
       className={cx(section === "head" ? "cy-table-th cy-reset" : "cy-table-td cy-reset", className)}
       data-align={align}
+      data-tone={tone}
     >
       {children}
     </td>

@@ -607,3 +607,34 @@ export const OptionIconColourIsStableUnderHostileHost: Story = {
     );
   },
 };
+
+/** A `value` set by the app (no `inputValue`): the input shows its label at once, and follows a change from outside. */
+export const ControlledValueShowsItsLabel: Story = {
+  render: (args) => {
+    function Zone() {
+      const [value, setValue] = useState("banana");
+      return (
+        <>
+          <Combobox {...args} value={value} onChange={setValue} />
+          <Button onClick={() => setValue("grape")}>Pick grape</Button>
+          <Button onClick={() => setValue("")}>Clear</Button>
+        </>
+      );
+    }
+    return <Zone />;
+  },
+  play: async ({ canvas, userEvent }) => {
+    const input = canvas.getByRole("combobox", { name: "Fruit" });
+    await expect(input).toHaveValue("Banana");
+    await userEvent.click(canvas.getByRole("button", { name: "Pick grape" }));
+    await waitFor(() => expect(input).toHaveValue("Grape"));
+    // Typed text is replaced by a value set from outside once the person has left the field.
+    await userEvent.clear(input);
+    await userEvent.type(input, "App");
+    await userEvent.tab();
+    await userEvent.click(canvas.getByRole("button", { name: "Clear" }));
+    await waitFor(() => expect(input).toHaveValue(""));
+    await userEvent.click(canvas.getByRole("button", { name: "Pick grape" }));
+    await waitFor(() => expect(input).toHaveValue("Grape"));
+  },
+};

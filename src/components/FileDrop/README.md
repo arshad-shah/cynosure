@@ -24,6 +24,7 @@ import { FileDrop } from "@arshad-shah/cynosure";
 | `maxFiles`                        | –       | Most files in one go, with `multiple`; more are refused as `count`                                                           |
 | `maxSize`                         | –       | Largest file, in bytes                                                                                                       |
 | `hint`                            | –       | Shown under the button and read as its description                                                                           |
+| `variant`                         | `zone`  | `button`: only the picker button, with the upload icon, for one action among others (no zone, no drop)                       |
 | `target`                          | `zone`  | `window`: files dropped anywhere in the window are taken (see below)                                                         |
 | `name`, `form`, `required`        | –       | Forms submit the accepted files, dropped or picked                                                                           |
 | `disabled`                        | `false` | Turns off dropping and the button                                                                                            |

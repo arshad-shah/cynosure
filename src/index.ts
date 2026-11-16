@@ -41,6 +41,12 @@ export {
 } from "./components/Avatar/index.js";
 export { Badge, type BadgeProps } from "./components/Badge/index.js";
 export {
+  BitField,
+  type BitFieldLabels,
+  type BitFieldProps,
+  type BitFieldTokens,
+} from "./components/BitField/index.js";
+export {
   type BreadcrumbItem,
   Breadcrumbs,
   type BreadcrumbsProps,
@@ -87,6 +93,8 @@ export {
   type CodeBlockLabels,
   type CodeBlockProps,
   type CodeBlockTokens,
+  type SyntaxKind,
+  type SyntaxToken,
 } from "./components/CodeBlock/index.js";
 export {
   ColorField,
@@ -621,12 +629,14 @@ export {
 export type { PersistStorage } from "./foundations/persisted.js";
 export {
   type QrLevel,
+  type QrLogo,
   type QrOptions,
   type QrToSvgOptions,
   qrMatrix,
   qrPath,
   qrToSvg,
 } from "./foundations/qr.js";
+export { type QrToPngOptions, qrContrast, qrToPng } from "./foundations/qr-export.js";
 export { type RovingOptions, useRovingFocus } from "./foundations/roving-focus.js";
 export { TextAreaBase, type TextAreaBaseProps } from "./foundations/TextAreaBase/TextAreaBase.js";
 export type { BrandInfo, IconCategory, IconData, IconMotion, IconNode } from "./icons/types.js";

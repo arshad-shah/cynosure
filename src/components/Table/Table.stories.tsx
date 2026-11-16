@@ -637,3 +637,69 @@ export const RefIsTheRootInBothForms: Story = {
     await expect(canvas.getByTestId("refs")).toHaveTextContent("cy-table|cy-table");
   },
 };
+
+const bg = (el: Element | null) => getComputedStyle(el as Element).backgroundColor;
+
+/** `tone` on a column tints all its cells (and its header); a function of the row tints cell by cell (a heat grid). */
+export const TintedColumnsAndCells: Story = {
+  tags: ["visual"],
+  args: {
+    columns: [
+      { key: "name", header: "Name" },
+      { key: "role", header: "Role", tone: "accent" },
+      {
+        key: "seats",
+        header: "Seats",
+        align: "end",
+        tone: (m: Member) => ((m.seats ?? 0) >= 10 ? "success" : undefined),
+      },
+    ] satisfies TableColumn<Member>[],
+  },
+  play: async ({ canvas, canvasElement }) => {
+    const plain = bg(canvas.getByRole("cell", { name: "Owner" }).parentElement?.querySelector("th") ?? null);
+    const owner = canvas.getByRole("cell", { name: "Owner" });
+    await expect(owner).toHaveAttribute("data-tone", "accent");
+    await expect(bg(owner)).not.toBe(plain);
+    await expect(canvas.getByRole("columnheader", { name: "Role" })).toHaveAttribute("data-tone", "accent");
+    // Per row: 10 and 100 seats are tinted, 2 and none are not, and the header is left alone.
+    const seats = [...canvasElement.querySelectorAll("tbody tr")].map(
+      (tr) => tr.lastElementChild?.getAttribute("data-tone") ?? null,
+    );
+    await expect(seats).toEqual(["success", null, null, "success"]);
+    await expect(canvas.getByRole("columnheader", { name: "Seats" })).not.toHaveAttribute("data-tone");
+    // The text keeps its contrast on the tint.
+    await expect(contrast(getComputedStyle(owner).color, bg(owner))).toBeGreaterThanOrEqual(4.5);
+  },
+};
+
+/** The compound form: `tone` on TableCell and TableHeaderCell. */
+export const CompoundCellsTakeATone: Story = {
+  render: () => (
+    <Table caption="Working hours">
+      <TableHead>
+        <TableRow>
+          <TableHeaderCell>Zone</TableHeaderCell>
+          <TableHeaderCell tone="success">09:00</TableHeaderCell>
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        <TableRow>
+          <TableHeaderCell>London</TableHeaderCell>
+          <TableCell tone="success">Working</TableCell>
+        </TableRow>
+        <TableRow>
+          <TableHeaderCell>Tokyo</TableHeaderCell>
+          <TableCell tone="danger">Asleep</TableCell>
+        </TableRow>
+      </TableBody>
+    </Table>
+  ),
+  play: async ({ canvas }) => {
+    const working = canvas.getByRole("cell", { name: "Working" });
+    const asleep = canvas.getByRole("cell", { name: "Asleep" });
+    await expect(working).toHaveAttribute("data-tone", "success");
+    await expect(bg(working)).not.toBe(bg(asleep));
+    await expect(bg(working)).not.toBe(bg(canvas.getByRole("rowheader", { name: "London" })));
+    await expect(canvas.getByRole("columnheader", { name: "09:00" })).toHaveAttribute("data-tone", "success");
+  },
+};

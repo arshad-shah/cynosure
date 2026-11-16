@@ -11,17 +11,18 @@ import { globe } from "@arshad-shah/cynosure/icons";
 <QRCode value={wifi} size={240} level="Q" />
 ```
 
-| Prop                  | Default   | Notes                                                                                     |
-| --------------------- | --------- | ----------------------------------------------------------------------------------------- |
-| `value`               | –         | The text to encode, usually a URL                                                         |
-| `size`                | `md`      | `sm` · `md` · `lg` from the tokens, or a number of pixels; never wider than its container |
-| `level`               | `M`       | Error correction: `L` 7%, `M` 15%, `Q` 25%, `H` 30% of the code can be lost               |
-| `quietZone`           | `4`       | Light modules around the code; scanners need them (the standard asks for 4)               |
-| `label`               | "QR code" | Accessible name; say where it leads                                                       |
-| `labels`              | –         | `{ name }`: the default name                                                              |
-| `icon`                | –         | A logo in the centre, on the light colour; raises the level to `H`                        |
-| `className` / `style` | –         | Layout only                                                                               |
-| `ref`                 | –         | The root (a `div` with `role="img"`)                                                      |
+| Prop                   | Default   | Notes                                                                                     |
+| ---------------------- | --------- | ----------------------------------------------------------------------------------------- |
+| `value`                | –         | The text to encode, usually a URL                                                         |
+| `size`                 | `md`      | `sm` · `md` · `lg` from the tokens, or a number of pixels; never wider than its container |
+| `level`                | `M`       | Error correction: `L` 7%, `M` 15%, `Q` 25%, `H` 30% of the code can be lost               |
+| `quietZone`            | `4`       | Light modules around the code; scanners need them (the standard asks for 4)               |
+| `label`                | "QR code" | Accessible name; say where it leads                                                       |
+| `labels`               | –         | `{ name }`: the default name                                                              |
+| `color` / `background` | tokens    | The two colours, any CSS colour; keep dark on light at 4:1 or more (`qrContrast`)         |
+| `icon`                 | –         | A logo in the centre, on the light colour; raises the level to `H`                        |
+| `className` / `style`  | –         | Layout only                                                                               |
+| `ref`                  | –         | The root (a `div` with `role="img"`)                                                      |
 - **Dark on light, always.** Many phone cameras cannot read an inverted code (light modules on dark), so the code keeps dark modules on a light square in dark mode too: the root sets `color-scheme: light`, so the theme's `light-dark()` colours resolve to the light palette's ink and surface inside it. The light square and its quiet zone also set the code apart from a dark page. Forced-colours mode leaves it alone for the same reason. To change the colours, set both tokens and keep the dark one dark (at least 4.5:1).
 - **Size.** A longer value needs a denser code (a higher version), drawn in the same box. At `sm` (96px by default) keep URLs short. `value` longer than the code can hold (2,953 bytes at `L`, 1,273 at `H`) throws a `RangeError`.
 - **Icon.** It covers about 4% of the code (`--cy-qr-code-icon-size`, 20% of the width); level H recovers what it hides. Keep it at 22% or below: in decoder checks, larger icons hid too much of small codes.
@@ -41,6 +42,13 @@ qrPath(matrix, 4); // path data, one unit per module, offset by the quiet zone
 ```
 
 `qrToSvg` writes its colours into the SVG (`color`, `background`; black on white by default), so it scans without the stylesheet.
+
+Export what is shown: pass the same `value`, `level`, `quietZone`, `color` and `background` to `qrToSvg` (a string) or `qrToPng` (a PNG `Blob`, `scale` pixels per module, default 8; browser only) and offer it as a download. Both take `logo: { href, size? }` (a share of the code, default 0.2, at most 0.3): the level becomes H, the modules under the logo are left out and the picture is drawn in the middle. A logo from another site must allow CORS for the PNG. `qrContrast(color, background)` returns `{ ratio, scans }`: `scans` is false for less than 4:1, for light modules on dark (inverted codes fail on many phones), and for a colour it cannot read (hex, rgb(), hsl() and oklch() are read).
+
+```ts
+const { scans } = qrContrast(fg, bg);
+const blob = await qrToPng(url, { color: fg, background: bg, logo: { href: logoDataUrl }, scale: 10 });
+```
 
 ## Tokens
 

@@ -199,8 +199,11 @@
   &:active:not(:disabled, [aria-disabled="true"]) {
     transform: scale(var(--cy-button-press-scale, 0.97));
   }
-  &[data-pressed] {
+  /* Pressed: the tone's tint and border with the tone's text. A solid button is already filled, and its text is
+     made for that fill, so it keeps both (a tint under on-tone text could not be read). */
+  &[data-pressed]:not([data-variant="solid"]) {
     --_bg: color-mix(in oklab, var(--_tone) var(--_soft), var(--cy-color-surface));
+    --_fg: var(--_tone-text);
     --_border: var(--_tone);
   }
   &:focus-visible {

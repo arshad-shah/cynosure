@@ -55,6 +55,8 @@ const meta = {
     caption: { control: "text" },
     placeholder: { control: false },
     fallback: { control: false },
+    overlay: { control: false },
+    overlayLabel: { control: "text" },
   },
   decorators: [(Story) => <div style={{ maxWidth: 420 }}>{Story()}</div>],
 } satisfies Meta<typeof Image>;
@@ -539,7 +541,7 @@ export const StableUnderHostileHost: Story = {
   args: { loading: "eager" },
   render: (args) => (
     <div style={{ display: "grid", gap: 8 }}>
-      <Image {...args} ratio={2} radius="card" caption="The hill at noon" className="boxed" />
+      <Image {...args} ratio={2} radius="card" caption="The hill at noon" className="boxed" overlay={ring} />
       <div>
         <Image {...args} src={picture(120, 60)} width={120} height={60} className="natural" />
       </div>
@@ -548,6 +550,7 @@ export const StableUnderHostileHost: Story = {
   ),
   play: async ({ canvasElement }) => {
     await loaded(canvasElement, ".boxed .cy-image");
+    await waitFor(() => expect(canvasElement.querySelector(".boxed .cy-image-overlay")).not.toBeNull());
     await loaded(canvasElement, ".natural");
     await failed(canvasElement, ".failed");
     await waitFor(() =>
@@ -560,6 +563,10 @@ export const StableUnderHostileHost: Story = {
       [".boxed .cy-image", ["display", "width", "height", "overflow", "border-top-left-radius", ...text]],
       [".boxed img", ["display", "position", "width", "height", "max-width", "object-fit", "opacity"]],
       [".boxed figcaption", ["display", "box-sizing", ...text]],
+      [
+        ".boxed .cy-image-overlay",
+        ["display", "position", "width", "height", "box-sizing", "pointer-events"],
+      ],
       [".natural", ["display", "width", "height", "box-sizing", "vertical-align"]],
       [".natural img", ["display", "width", "height", "max-width", "box-sizing"]],
       [
@@ -574,5 +581,122 @@ export const StableUnderHostileHost: Story = {
       await expect({ selector, ...hostile }).toEqual({ selector, ...clean });
     }
     await expect(box(frameOf(canvasElement, ".natural")).height).toBeCloseTo(60, 0);
+  },
+};
+
+/** A safe-zone ring: a dashed circle at 80% of whatever box it is drawn in. */
+const ring = (
+  <svg data-testid="ring" viewBox="0 0 100 100" aria-hidden="true">
+    <circle cx="50" cy="50" r="40" fill="none" stroke="crimson" strokeDasharray="4 3" />
+  </svg>
+);
+const overlayOf = (el: ParentNode) => el.querySelector(".cy-image-overlay") as HTMLElement;
+const near = async (a: DOMRect, b: { left: number; top: number; width: number; height: number }) => {
+  await expect(a.left).toBeCloseTo(b.left, 0);
+  await expect(a.top).toBeCloseTo(b.top, 0);
+  await expect(a.width).toBeCloseTo(b.width, 0);
+  await expect(a.height).toBeCloseTo(b.height, 0);
+};
+
+/** `overlay` is drawn over the picture's own box: here a square icon shown whole in a wide frame. */
+export const OverlayFollowsThePicture: Story = {
+  tags: ["visual"],
+  args: { src: picture(64, 64, "navy"), alt: "Favicon", ratio: 2, fit: "contain", overlay: ring },
+  play: async ({ canvasElement }) => {
+    await loaded(canvasElement);
+    const frame = box(frameOf(canvasElement));
+    // The picture is a square in the middle of a 2:1 frame; the overlay is that square, not the frame.
+    await waitFor(() =>
+      near(box(overlayOf(canvasElement)), {
+        left: frame.left + frame.height / 2,
+        top: frame.top,
+        width: frame.height,
+        height: frame.height,
+      }),
+    );
+    // Its content fills it, so the ring is at 80% of the picture at any size.
+    await near(
+      box(canvasElement.querySelector("[data-testid=ring]") as Element),
+      box(overlayOf(canvasElement)),
+    );
+    // Decorative without a label, and it never takes a press.
+    await expect(overlayOf(canvasElement)).toHaveAttribute("aria-hidden", "true");
+    await expect(getComputedStyle(overlayOf(canvasElement)).pointerEvents).toBe("none");
+    // It scales with the picture: a narrower container gives a smaller square, still the overlay's box.
+    (frameOf(canvasElement).parentElement as HTMLElement).style.maxWidth = "200px";
+    await waitFor(async () => {
+      const small = box(frameOf(canvasElement));
+      await expect(small.width).toBeLessThanOrEqual(200.5);
+      await near(box(overlayOf(canvasElement)), {
+        left: small.left + small.height / 2,
+        top: small.top,
+        width: small.height,
+        height: small.height,
+      });
+    });
+  },
+};
+
+/** With `cover` the picture is larger than the frame and cropped; the overlay is the whole picture, cropped with it. */
+export const OverlayCoversACroppedPicture: Story = {
+  args: { src: picture(400, 100), alt: "", ratio: 1, fit: "cover", position: "left", overlay: ring },
+  play: async ({ canvasElement }) => {
+    await loaded(canvasElement);
+    const frame = box(frameOf(canvasElement));
+    // A 4:1 picture covering a square: as tall as the frame, four times as wide, its left edge on the frame's.
+    await waitFor(() =>
+      near(box(overlayOf(canvasElement)), {
+        left: frame.left,
+        top: frame.top,
+        width: frame.height * 4,
+        height: frame.height,
+      }),
+    );
+  },
+};
+
+/** Without a ratio the picture is its own box: the overlay covers it exactly. */
+export const OverlayOnANaturalSizePicture: Story = {
+  args: { src: picture(120, 80), alt: "", width: 120, height: 80, overlay: ring },
+  play: async ({ canvas, canvasElement }) => {
+    await loaded(canvasElement);
+    await near(box(overlayOf(canvasElement)), box(canvas.getByRole("presentation", { hidden: true })));
+  },
+};
+
+/** An overlay with a label is part of the picture's meaning: an image of its own, named by the label. */
+export const LabelledOverlayIsAnnounced: Story = {
+  args: {
+    src: picture(64, 64),
+    alt: "Favicon",
+    ratio: 1,
+    overlay: ring,
+    overlayLabel: "Safe zone, 80% of the icon",
+  },
+  play: async ({ canvas, canvasElement }) => {
+    await loaded(canvasElement);
+    await expect(canvas.getByRole("img", { name: "Safe zone, 80% of the icon" })).toBe(
+      overlayOf(canvasElement),
+    );
+    await expect(overlayOf(canvasElement)).not.toHaveAttribute("aria-hidden");
+  },
+};
+
+/** Until the picture has loaded there is no box to draw on, and a failed picture has none at all. */
+export const OverlayWaitsForThePicture: Story = {
+  render: (args) => (
+    <>
+      {/* The broken picture comes first: placed below the far one, a lazy picture never starts loading in WebKit. */}
+      <Image {...args} src={broken(3)} alt="Broken" ratio={1} overlay={ring} className="broken" />
+      <FarBelow>
+        <Image {...args} src={picture(64, 64)} alt="Waiting" ratio={1} overlay={ring} className="waiting" />
+      </FarBelow>
+    </>
+  ),
+  play: async ({ canvasElement }) => {
+    await failed(canvasElement, ".broken");
+    await expect(frameOf(canvasElement, ".broken").querySelector(".cy-image-overlay")).toBeNull();
+    await expect(stateOf(canvasElement, ".waiting")).toBe("loading");
+    await expect(frameOf(canvasElement, ".waiting").querySelector(".cy-image-overlay")).toBeNull();
   },
 };

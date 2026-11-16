@@ -69,6 +69,19 @@ const matrix = qrMatrix("HELLO", { level: "Q" });
 qrPath(matrix, 4);
 ```
 
+## Colours and export
+
+`color` and `background` set the two colours (any CSS colour). Keep dark modules on a light background with at least 4:1 contrast: `qrContrast(color, background)` returns `{ ratio, scans }` to check a pair a person picked. To download what is shown, pass the same options to `qrToSvg` or `qrToPng` (a PNG `Blob`, `scale` pixels per module). Both take `logo: { href, size? }`: the level becomes H, the modules under it are left out and the picture is drawn in the middle.
+
+```tsx
+<QRCode value={url} color={fg} background={bg} label="Our site" />
+
+const { scans } = qrContrast(fg, bg);
+const png = await qrToPng(url, { color: fg, background: bg, logo: { href: logo }, scale: 10 });
+```
+
+<Canvas of={Stories.ColoursAndExport} />
+
 `qrMatrix` picks the smallest version that holds the text, in numeric, alphanumeric or UTF-8 byte mode. It throws a `RangeError` when the text does not fit in version 40 (2,953 bytes at `L`, 1,273 at `H`).
 
 ## Props

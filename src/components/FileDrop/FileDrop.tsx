@@ -1,4 +1,5 @@
 import { type CSSProperties, type ReactNode, useEffect, useId, useRef, useState } from "react";
+import { acceptsFile } from "../../foundations/accept-file.js";
 import { FileInputBase, setInputFiles } from "../../foundations/FileInputBase/FileInputBase.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
 import { LiveRegion, useLiveMessage } from "../../foundations/LiveRegion/LiveRegion.js";
@@ -84,6 +85,12 @@ export interface FileDropProps {
    * overlay covers the page while they are dragged in (for an app whose whole page is a drop target).
    */
   target?: "zone" | "window";
+  /**
+   * `zone` (default): a drop zone with a prompt and the picker button. `button`: only the picker button (with the
+   * upload icon), for one action among others (Open file beside Paste and Clear); nothing is dropped on it, and the
+   * checks, `onFiles`, `onPick`, forms and announcements work as in a zone. Rejections are listed under it.
+   */
+  variant?: "zone" | "button";
   /** Shown under the prompt, e.g. "PNG or JPG, up to 5 MB". */
   hint?: ReactNode;
   /** Name the accepted files are submitted under in a form. */
@@ -121,19 +128,7 @@ const DEFAULT_LABELS: FileDropLabels = {
 /** What a chosen item is called: a File's name, or a path as given. */
 const nameOf = (item: File | string) => (typeof item === "string" ? item : item.name);
 
-/** Whether `file` matches an `accept` list (extensions, exact MIME types and `type/*` wildcards), as browsers do. */
-export function acceptsFile(file: File, accept: string | undefined): boolean {
-  if (!accept) return true;
-  const name = file.name.toLowerCase();
-  const type = file.type.toLowerCase();
-  return accept
-    .split(",")
-    .map((a) => a.trim().toLowerCase())
-    .filter(Boolean)
-    .some((a) =>
-      a.startsWith(".") ? name.endsWith(a) : a.endsWith("/*") ? type.startsWith(a.slice(0, -1)) : type === a,
-    );
-}
+export { acceptsFile };
 
 /**
  * A place to add files: drop them on it, or press its button to pick them. Checks type, size and count, explains
@@ -152,6 +147,7 @@ export function FileDrop({
   maxFiles,
   hint,
   target = "zone",
+  variant = "zone",
   name,
   form,
   required,
@@ -229,7 +225,8 @@ export function FileDrop({
   };
   const latest = useRef(take);
   latest.current = take;
-  const whole = target === "window";
+  const button = variant === "button";
+  const whole = !button && target === "window";
   const overlay = useRef<HTMLDivElement>(null);
   usePopover(overlay, whole && over);
 
@@ -269,13 +266,14 @@ export function FileDrop({
       reset();
     };
   }, [whole, disabled]);
-  const local = !whole;
+  const local = !whole && !button;
 
   return (
     // biome-ignore lint/a11y/noStaticElementInteractions: drag and drop target; the button inside is the accessible way in
     <div
       className={className ? `cy-file-drop ${className}` : "cy-file-drop"}
       data-size={size}
+      data-variant={button ? "button" : undefined}
       data-over={over ? "" : undefined}
       data-disabled={disabled ? "" : undefined}
       data-invalid={problems.length ? "" : undefined}
@@ -303,10 +301,14 @@ export function FileDrop({
         take([...event.dataTransfer.files], true);
       }}
     >
-      <Icon icon={upload} size="lg" className="cy-file-drop-icon" />
-      <span className="cy-file-drop-prompt cy-reset" id={`${id}-prompt`}>
-        {over ? text.dragging : text.prompt}
-      </span>
+      {!button && (
+        <>
+          <Icon icon={upload} size="lg" className="cy-file-drop-icon" />
+          <span className="cy-file-drop-prompt cy-reset" id={`${id}-prompt`}>
+            {over ? text.dragging : text.prompt}
+          </span>
+        </>
+      )}
       <Button
         ref={chooser}
         variant="outline"
@@ -314,6 +316,7 @@ export function FileDrop({
         size={size}
         disabled={disabled}
         loading={picking}
+        icon={button ? upload : undefined}
         aria-describedby={hint ? `${id}-hint` : undefined}
         onClick={() => (onPick ? pick(onPick) : input.current?.click())}
       >
