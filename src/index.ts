@@ -193,6 +193,7 @@ export {
   type ToolbarAnchor,
   useSelectionAnchor,
 } from "./components/FloatingToolbar/index.js";
+export { Form, type FormProps, type FormTokens } from "./components/Form/index.js";
 export {
   GRID_BREAKPOINTS,
   Grid,
