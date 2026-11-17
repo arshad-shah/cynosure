@@ -522,9 +522,13 @@ export function TimeField({
                           className="cy-time-field-column cy-reset"
                           onKeyDown={onListKey(i)}
                           onClick={(event) => {
+                            // A press chooses its own row, never the one a scroll just before it stopped on.
+                            clearTimeout(timers.current[i]);
+                            byHand.current[i] = false;
                             const option = (event.target as HTMLElement).closest<HTMLElement>("[data-index]");
                             const row = col.rows[Number(option?.dataset.index ?? -1)];
                             if (row && !row.disabled) choose(row.time);
+                            else setSettled((n) => n + 1);
                           }}
                           onScroll={onScroll(i)}
                           onWheel={scrolledByHand(i)}

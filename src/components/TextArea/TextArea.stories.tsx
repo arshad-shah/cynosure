@@ -118,10 +118,10 @@ export const FormResetRestoresValueCountAndHeight: Story = {
     await userEvent.type(area, "{enter}b{enter}c{enter}d");
     await expect(new FormData(form).get("notes")).toBe("a\nb\nc\nd");
     form.reset();
-    await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
     await expect(area).toHaveValue("a");
-    await expect(canvasElementCounter(area)).toHaveTextContent("1 / 50");
-    await expect(area.getBoundingClientRect().height).toBe(start);
+    // The count and height follow on the next frame, and React renders the count after it: wait for them.
+    await waitFor(() => expect(canvasElementCounter(area)).toHaveTextContent("1 / 50"));
+    await waitFor(() => expect(area.getBoundingClientRect().height).toBe(start));
   },
 };
 
