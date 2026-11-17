@@ -51,6 +51,27 @@ A progress bar says how far a task has got. A **meter** measures something that 
 
 <Canvas of={Stories.StepsLightUpToTheValue} />
 
+## Segments and markers
+
+`segments` draws parts end to end instead of one fill, starting at `offset` (in the same units as `max`): a request's timing (DNS, connect, wait, download) or a waterfall row. Each part has a `label`, read out with its value ("DNS 12, Connect 30"), and a `tone` or a category `color` (any CSS colour); a part with neither takes the bar's `tone`. `marker` draws a thin mark across the track at a value, such as a budget or a target, read with the value as `markerLabel` (default "marker at 75%").
+
+```tsx
+<ProgressBar
+  label="Request timing"
+  max={200}
+  offset={20}
+  marker={150}
+  markerLabel="budget 150 ms"
+  segments={[
+    { value: 12, label: "DNS", tone: "info" },
+    { value: 30, label: "Connect", tone: "warning" },
+    { value: 80, label: "Wait", tone: "success" },
+  ]}
+/>
+```
+
+<Canvas of={Stories.SegmentsForTimings} />
+
 ## A slim bar in a row
 
 With `labelHidden` and no `showValue`, the bar is only its track: no label row, as tall as `size` makes it, and still named by `label`. Put it in a row of text (a query plan's cost, a quota beside its number) and give it the space with `style={{ flex: 1 }}`; it fills from the reading start in right-to-left text too.

@@ -19,6 +19,7 @@ import { DateField } from "@arshad-shah/cynosure";
 | `name`, `form`, `required`            | –           | Forms submit the date (`YYYY-MM-DD`), never half-typed text; a form will not submit while the text is not an available date, and a form reset brings back `defaultValue` |
 | `disabled`, `readOnly`, `size`        | –, `md`     | Read-only fields have no picker                                                                                                                                          |
 | `labels`                              | –           | `open`, `invalid`, `unavailable`, `previous`, `next`                                                                                                                     |
+| `className` / `style`                 | –           | Layout only                                                                                                                                                              |
 - Typing: `2026/1/5`, `2026.1.5` and `2026-1-5` are all read as `2026-01-05` when the field loses focus or Enter is pressed. Text that is not a date stays as typed, with "Enter a date as YYYY-MM-DD" shown and announced as the field's error; a date outside the limits, or unavailable, says so.
 - Up and Down step the date a day (Shift: a month), from what is typed if it is a date; the limits stop them.
 - The calendar button opens the picker with focus on the chosen day (or today). Choosing a day closes it and returns focus to the field; Escape closes it without choosing.

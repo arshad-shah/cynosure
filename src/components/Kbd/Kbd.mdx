@@ -21,6 +21,18 @@ import { Kbd } from "@arshad-shah/cynosure";
 
 `keys` lists the keys in order. Keys are joined by a drawn separator, not a "+" character. `size` is `sm`, `md` (default) or `lg`.
 
+## A shortcut for this platform
+
+`keys` also takes a shortcut as `useHotkey` writes it (`"mod+shift+k"`), shown with this platform's names: `mod` is Cmd on Apple platforms and Ctrl elsewhere, `alt` is Option or Alt, `meta` is Cmd or Win. Pass the same string to `useHotkey` and to Kbd, so the hint always matches the shortcut.
+
+```tsx
+<Kbd keys="mod+shift+k" />
+```
+
+<Canvas of={Stories.AShortcutForThisPlatform} />
+
+On touch-only screens (no hover, coarse pointer) a shortcut string is hidden, since there is no keyboard to press it on. Keys given as a list are content (a help page) and stay.
+
 ## Spoken text
 
 Common names are spoken in full: Ctrl as Control, Cmd as Command, Esc as Escape, and so on. For symbols or unusual keys, set `label` to say what you mean.
@@ -33,7 +45,7 @@ Common names are spoken in full: Ctrl as Control, Cmd as Command, Esc as Escape,
 
 ## Attributes
 
-`id`, any `data-*` attribute and the `ref` go to the root element.
+`id`, any `data-*` attribute, `role`, any `aria-*` attribute and the `ref` go to the root element.
 
 ## Theming
 

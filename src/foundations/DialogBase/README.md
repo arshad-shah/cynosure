@@ -1,6 +1,6 @@
 # DialogBase (foundation)
 
-The only module allowed to render a native `<dialog>`. Components use `Dialog` or `Sheet`.
+The only module allowed to render a native `<dialog>`. Components use `Dialog` or `Sheet`; only Dialog and CommandPalette build on it directly.
 
 - `open` drives `showModal()` (or `show()` with `modal={false}`) and `close()`.
 - A `cancel` event (Escape, the Android back gesture) has its default prevented and becomes `onCancel`, so the `open` prop stays in charge.

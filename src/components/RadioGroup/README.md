@@ -26,6 +26,7 @@ One choice from a short list, on native radios: arrow keys move and select (wrap
 | `columns`                                    | `2`             | Cards per row; a narrow container wraps to fewer                                        |
 | `size` / `tone`                              | `md` / `accent` | Shared vocabulary                                                                       |
 | `name`, `required`, `disabled`               | –               | Native                                                                                  |
+| `className` / `style`                        | –               | Layout only                                                                             |
 
 ## Cards
 

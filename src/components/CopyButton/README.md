@@ -14,6 +14,7 @@ An IconButton that copies a value to the clipboard, shows a check (or an error) 
 | `labels`                                          | `{ copy: "Copy", copied: "Copied", failed: "Could not copy" }` | Name, tooltip and announcement                                         |
 | `timeout`                                         | `2000`                                                         | Milliseconds before it returns to the copy state                       |
 | `onCopy` / `onError`                              | –                                                              | Called with the text, or with the error                                |
-| `size`, `variant`, `disabled`, `tooltipPlacement` | `md`, `ghost`                                                  | As IconButton                                                          |
+| `size`, `variant`, `disabled`, `tooltipPlacement` | `md`, `ghost`, –, `top`                                        | As IconButton                                                          |
+| `className` / `style`                             | –                                                              | Layout only                                                            |
 - Never throws: a missing clipboard (insecure context, some extension pages), a refused permission or a throwing writer all show the failed state.
 - The result is announced through a live `role="status"` that exists before the click; the button's name changes with it.

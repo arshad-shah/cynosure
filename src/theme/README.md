@@ -17,13 +17,15 @@ export function App() {
 }
 ```
 
-| Prop       | Default | Notes                                                                                  |
-| ---------- | ------- | -------------------------------------------------------------------------------------- |
-| `theme`    | inherit | Result of `createTheme()`. Applied as custom properties on the wrapper.                |
-| `mode`     | inherit | `light`, `dark` or `system` (follows the OS).                                          |
-| `contrast` | inherit | `normal`, `more` or `system`.                                                          |
-| `target`   | `self`  | `document` themes `<html>`; only for apps that own the page, never in content scripts. |
-| `as`       | `div`   | The wrapper uses `display: contents`, so it never affects layout.                      |
+| Prop        | Default | Notes                                                                                                                             |
+| ----------- | ------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `theme`     | inherit | Result of `createTheme()`. Applied as custom properties on the wrapper.                                                           |
+| `mode`      | inherit | `light`, `dark` or `system` (follows the OS).                                                                                     |
+| `contrast`  | –       | `normal`, `more` or `system`; left out, it follows the OS, as `system` does (a nested wrapper with no `theme` keeps its parent's) |
+| `target`    | `self`  | `document` themes `<html>`; only for apps that own the page, never in content scripts.                                            |
+| `as`        | `div`   | `div` or `span`. The wrapper uses `display: contents`, so it never affects layout.                                                |
+| `className` | –       | Added to the wrapper; not used with `target="document"`, which renders no wrapper.                                                |
+| `style`     | –       | Layout only (margin, placement). Restyle through tokens.                                                                          |
 
 A theme fixed to one mode (`createTheme({ mode: "dark" })`, or a named theme such as Midnight from `defineTheme` / `createThemeRegistry`) keeps that mode whatever `mode` says: the wrapper, and any wrapper nested in it, gets `data-cy-mode` of the theme's own mode. See [Named themes](../../docs/theming.md#named-themes).
 

@@ -17,4 +17,5 @@ const { mode } = useColorMode();
 | `variant`                  | `segmented`     | `segmented` (three choices side by side) · `cycle` (one icon button, see below) |
 | `labels`                   | English         | `label`, `light`, `dark`, `system`, `cycle(current, next)`                      |
 | `size`                     | `md`            | Shared vocabulary                                                               |
+| `className` / `style`      | –               | Layout only                                                                     |
 - `variant="cycle"`: one icon button that steps light, dark, system, for tight headers. Its name says the current mode and the next ("Colour mode: Light. Switch to Dark"); `labels.cycle(current, next)` overrides it.

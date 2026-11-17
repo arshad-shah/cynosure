@@ -59,7 +59,7 @@ The update replaces the toast's options (its timer starts again with the new `du
 - Each Toaster has its own store (no globals); `useToast()` outside a Toaster throws.
 - Announced once: `role="status"` (polite), `role="alert"` (assertive) for `danger`. The text is inserted once, into a live element that already exists.
 - Timers pause while the pointer is over the toasts, while focus is inside them and while the page is hidden.
-- On touch, a horizontal swipe of 64px dismisses; a shorter one springs back. Every close button has a 44px hit area on coarse pointers.
+- On touch, a horizontal swipe of 64px dismisses; a shorter one, or Escape during the swipe, puts it back. Every close button has a 44px hit area on coarse pointers.
 - No motion under reduced motion. Never writes to `<html>` or `<body>`.
 - Inside an open Dialog or Sheet (within the Toaster), toasts show in the dialog, above its backdrop, instead of under it where the modal would make them inert. When it closes they move back to the page with their remaining time, and are not announced again.
 

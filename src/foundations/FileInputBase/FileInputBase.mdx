@@ -9,7 +9,7 @@ The native `<input type="file">` for Cynosure, and the only module allowed to re
 
 ## Who uses it
 
-[FileDrop](?path=/docs/components-controls-filedrop--docs).
+[FileDrop](?path=/docs/components-controls-filedrop--docs) and [KeyValueEditor](?path=/docs/components-controls-keyvalueeditor--docs) (a file as a row's value, with `allowFiles`).
 
 ## When to use it directly
 
@@ -31,6 +31,8 @@ setInputFiles(input, droppedFiles);
 ```
 
 ## Props
+
+It accepts every native input attribute except `type`, `value`, `defaultValue` and `onChange`; use `onFiles` instead of `onChange`.
 
 <ArgTypes of={Stories} />
 

@@ -57,6 +57,18 @@ Popovers nest, and Escape closes one layer at a time: an inner popover first, th
 
 <Canvas of={Stories.AlignLinesThePanelUpWithTheTrigger} />
 
+## At a point or beside an element
+
+`anchor` places the panel against something other than its trigger: a point (`{ x, y }` in viewport pixels, such as where a canvas was clicked), any element, or a virtual anchor (anything with `getBoundingClientRect`). `trigger` is then optional; control the panel with `open`, and focus goes back to where it was when it closes.
+
+```tsx
+<Popover label="Add a note" anchor={at ?? undefined} open={at !== null} onOpenChange={(o) => !o && setAt(null)}>
+  <TextField label="Note" />
+</Popover>
+```
+
+<Canvas of={Stories.OpenAtAPoint} />
+
 ## Props
 
 <ArgTypes of={Stories} />

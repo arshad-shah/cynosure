@@ -28,6 +28,7 @@ const [scale, setScale] = useState(1);
 | `onVisiblePagesChange`, `onCurrentPageChange`, `onScaleChange` | –         | The pages in view, the one most in view, and the scale the zoom came to                                     |
 | `scrollTo`                                                     | –         | `{ id, nonce, rect?, focus? }`: a new `nonce` scrolls to the page, or centres `rect` on it                  |
 | `labels`                                                       | –         | `page(n, total)`, `zoom(percent)`                                                                           |
+| `className` / `style`                                          | –         | Layout only, on the scrolling root (give it a height)                                                       |
 - The viewport is a named region and a tab stop; each page is a group named "Page 3 of 12", focusable for go-to-page.
 - Zooming keeps the point under the pointer (or the centre, from keys and buttons) in place.
 - One finger scrolls; two fingers pinch. Give it a height: it fills its container, and its width never comes from the pages.

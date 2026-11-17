@@ -86,7 +86,7 @@ In the picker (with `picker`):
 - **Errors** are the field's description and set `aria-invalid`.
 - **Limits:** `min` and `max` stop the arrows and the day track; typed times outside them are explained; their rows in the picker are disabled.
 - **The picker** is a dialog named by `labels.open`. Each column is a listbox named by `labels.hours`, `labels.minutes` or `labels.seconds`; the day track is a slider that reads out the time.
-- **Scrolling** a column chooses the row it stops on. With reduced motion the columns jump instead of gliding.
+- **Pressing** a row chooses that row only; a press on a row the limits rule out chooses nothing. **Scrolling** a column chooses the row it stops on. With reduced motion the columns jump instead of gliding.
 - **Right to left:** hours, minutes and seconds keep their order.
 
 ## Touch

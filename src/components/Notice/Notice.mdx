@@ -64,7 +64,7 @@ The Notice measures its own width. Below 26rem the actions move under the text, 
 - **To announce a non-danger message** that appears later, keep the Notice mounted and change its content, or use a [Toast](?path=/docs/components-overlays-toast--docs), which is built to be announced once.
 - **Icon:** decorative; the tone is also carried by the words.
 - **Contrast:** title and body are at least 4.5:1 in every tone and both variants, in light and dark modes. On a fill the tone icon and the close icon are at least 3:1.
-- **Attributes:** `id`, any `data-*` attribute and the `ref` go to the root element.
+- **Attributes:** `id`, any `data-*` attribute, any `aria-*` attribute (`aria-live`, `aria-labelledby`) and the `ref` go to the root element. The role stays Notice's own (`alert` or `status`).
 
 ## Touch
 

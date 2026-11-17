@@ -24,6 +24,9 @@ const steps = [
 | `size`                | `md`         | `sm` · `md` · `lg`                                                                                                                                             |
 | `labels`              | –            | `list` ("Progress"), `complete`, `current`, `upcoming`, `error`: read after each label                                                                         |
 | `className` / `style` | –            | Layout only                                                                                                                                                    |
+
+## Behaviour and accessibility
+
 - An ordered list named "Progress"; the current step carries `aria-current="step"` and every step says its state ("Account, completed").
 - Steps that can be chosen are buttons in tab order; hit area ≥ 24px, ≥ 44px on touch screens.
 - Finished steps show a tick on the accent colour; a step marked `error` shows an alert on the danger colour.

@@ -27,6 +27,10 @@ Vertical layout with token gaps (`gap="0"` … `"10"` map to `--cy-space-*`), al
 | `hideBelow` / `hideAbove`                                                   | –          | Hidden while the window is narrower than / at least this breakpoint (`sm` 30rem, `md` 45rem, `lg` 60rem, `xl` 75rem). No script                      |
 | `id`, `role`, `aria-*`, `data-*`, `tabIndex`, `dir`, `lang`, event handlers | –          | Passed to the element, as is `ref`: a link target, a named landmark or group, a drop zone's or canvas column's handlers, `data-*` for tests or state |
 | `as`                                                                        | `div`      | Neutral element only                                                                                                                                 |
+| `className` / `style`                                                       | –          | Layout only                                                                                                                                          |
+
+## Notes
+
 - Padding is a space token (`--cy-space-*`) applied with logical properties, inside the stack's width. `"0"` is a value: `padding="4" paddingInline="0"` pads the top and bottom only.
 - A nested Stack or Inline has no padding unless it asks for it; it never inherits its parent's.
 - `grow`, `shrink`, `fill`, `minSize` and `overflow` (`BoxProps` in `src/foundations/layout.ts`, shared with Inline and Grid) become `data-cy-*` attributes styled in `src/styles/base.css`. For a keyboard-scrollable area use ScrollArea.

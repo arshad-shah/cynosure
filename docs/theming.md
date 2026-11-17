@@ -53,13 +53,20 @@ themes.register(JSON.parse(pluginJson)); // throws CynosureThemeError for bad in
 Canvas engines and chart libraries cannot read `var(--…)`. `useCynosureTheme()` returns the theme in force where it is called, resolved:
 
 ```tsx
-const { theme, palette, colors, fontSize } = useCynosureTheme();
+const { theme, palette, colors, fontSize, resolveColor } = useCynosureTheme();
 // palette: "light" | "dark" | "light-contrast" | "dark-contrast"
 // colors: that palette as hex (color-mix() values worked out), fontSize: the type ramp in px
 useEffect(() => addTheme("app", swiftChartTheme(theme, palette)), [theme, palette]);
 ```
 
 It reads the nearest `CynosureTheme` (Cynosure's own theme, following the OS, when there is none) and re-renders when the theme, mode or contrast changes, including the OS setting a `system` mode follows. Pass the user's mode to `CynosureTheme` (from `useColorMode`) so the hook knows it.
+
+`resolveColor(value, within?)` resolves any CSS colour as the theme's wrapper sees it (a colour, `var(--x)` or a bare `--x` for a product's own colour role, `color-mix()`, `light-dark()`) to `#rrggbb`, or `#rrggbbaa` when translucent. It answers `""` for a value that is no colour, a custom property that is not set, on the server and before the wrapper mounts, so call it in an effect; a new function comes with each palette, so an effect that lists it runs again when the palette changes. Pass `within` (a canvas, say) to resolve where that element sits, which also works with no `CynosureTheme` above.
+
+```tsx
+const { resolveColor } = useCynosureTheme();
+useEffect(() => draw(canvas, resolveColor("--app-highlight")), [resolveColor]);
+```
 
 Without React, `resolveColors(theme, palette)` gives the same colours.
 

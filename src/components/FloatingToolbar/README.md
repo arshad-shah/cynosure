@@ -24,8 +24,9 @@ const anchor = useSelectionAnchor(editorRef);
 | `side`                 | `top`          | Preferred side; flips when there is no room                                            |
 | `onEscape`             | –              | Escape inside the bar; focus then returns to where it came from                        |
 | `hotkey`               | `alt+f10`      | Moves focus into the bar while it is open; `false` for none                            |
+| `className` / `style`  | –              | Layout only                                                                            |
 
-`DockedToolbar` takes `label`, `labels` (`{ move }`, the grip's name: "Move to the other side"), `open`, `onEscape`, `hotkey`, `keepVisible` (a ref kept in view above the bar by scrolling the page) and `trailing` (pinned after the row).
+`DockedToolbar` takes `label`, `labels` (`{ move }`, the grip's name: "Move to the other side"), `open`, `onEscape`, `hotkey`, `keepVisible` (a ref kept in view above the bar by scrolling the page), `trailing` (pinned after the row), `edge`, `onEdgeChange` and `floating` (below), and `className` / `style` (layout only).
 
 `DockedToolbar` also docks elsewhere, so products need no separate palette or dock component:
 

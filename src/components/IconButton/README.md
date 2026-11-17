@@ -10,6 +10,8 @@ The tooltip opens on hover and keyboard focus and closes on Escape, blur or poin
 
 | Prop               | Default | Notes                                                                                                       |
 | ------------------ | ------- | ----------------------------------------------------------------------------------------------------------- |
+| `icon`             | –       | The Facet icon shown in the button; sized to match `size`                                                   |
+| `label`            | –       | Required: the accessible name (`aria-label`) and the tooltip text                                           |
 | `tooltipPlacement` | `top`   | Where the label tooltip appears                                                                             |
 | `tooltipDelay`     | `300`   | Hover delay of the label tooltip in ms; `0` opens it at once (a toolbar)                                    |
 | `flipRtl`          | `false` | The icon points along the reading direction (previous, next): mirrored in right-to-left text                |

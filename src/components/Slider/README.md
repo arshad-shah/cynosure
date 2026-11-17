@@ -25,12 +25,16 @@ Picks a number, a range with two thumbs, or several values (gradient stops), by 
 | `disabled`                                    | `false`      | Not focusable, not submitted                                                                                                                       |
 | `size`                                        | `md`         | Track and thumb size                                                                                                                               |
 | `labels`                                      | –            | `minimum`, `maximum` (range thumb names), `thumb(index, count)` (names with three or more), `value(v)` for `aria-valuetext`                        |
+
+## Behaviour and accessibility
+
 - Keys: arrows by `step`, Shift+arrows and Page Up/Down by `largeStep`, Home, End. In right-to-left text, Right lowers the value. Escape during a drag cancels it and restores the value from before the press.
 - A press on the track moves the nearest thumb and keeps dragging; thumbs stop at their neighbours. Among thumbs on one spot, the press takes the one that can move that way.
 - Touch: the thumb's hit area is 44px (invisibly); horizontal drags belong to the slider while vertical swipes still scroll the page.
 
-Tokens: `--cy-slider-track-{sm,md,lg}`, `--cy-slider-thumb-{sm,md,lg}`, `--cy-slider-track`, `--cy-slider-length`.
-
 ## Tokens
 
-- `--cy-slider-length`: length of a vertical slider's track
+- `--cy-slider-track-{sm,md,lg}`: track thickness per size (2px, 4px, 6px)
+- `--cy-slider-thumb-{sm,md,lg}`: thumb diameter per size (12px, 16px, 20px)
+- `--cy-slider-track`: the empty bar colour
+- `--cy-slider-length`: length of a vertical slider's track (160px)

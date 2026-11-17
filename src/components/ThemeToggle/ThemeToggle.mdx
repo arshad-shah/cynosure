@@ -44,9 +44,15 @@ Pass `value` and `onChange(mode)` to own the state. `mode` is `"light"`, `"dark"
 <ThemeToggle value={mode} onChange={setMode} size="sm" />
 ```
 
+## One button
+
+`variant="cycle"` is one icon [IconButton](?path=/docs/components-controls-iconbutton--docs) that steps light, dark, system, for tight headers. It shows the current mode's icon, and its name says the current mode and the next ("Colour mode: Light. Switch to Dark"); `labels.cycle(current, next)` replaces it.
+
+<Canvas of={Stories.OneButtonCycle} />
+
 ## Persistence
 
-Uncontrolled mode is stored in `localStorage` by default. Pass `storage` (any `{ get, set }` object, sync or async, such as one backed by `chrome.storage`) to persist elsewhere. Toggles on one `storageKey` follow each other, also across tabs: localStorage's `storage` event by default, or the storage's `subscribe(key, onChange)` when it has one.
+Uncontrolled mode is stored in `localStorage` by default. Pass `storage` (any `{ get, set }` object, sync or async, such as one backed by `chrome.storage`) to persist elsewhere. `storageKey` (default `cy-color-mode`) is the key it is saved under: give each product on a shared origin its own, and pass the same one to `themeInitScript({ key })`. Toggles on one `storageKey` follow each other, also across tabs: localStorage's `storage` event by default, or the storage's `subscribe(key, onChange)` when it has one.
 
 <Canvas of={Stories.FollowsAnotherTab} />
 
@@ -56,7 +62,7 @@ Uncontrolled mode is stored in `localStorage` by default. Pass `storage` (any `{
 
 ## Behaviour and accessibility
 
-- **Names:** the group is named "Colour mode" and the options "Light", "Dark" and "System". Override them with `labels` (`label`, `light`, `dark`, `system`) when you localise.
+- **Names:** the group is named "Colour mode" and the options "Light", "Dark" and "System". Override them with `labels` (`label`, `light`, `dark`, `system`, and `cycle` for the one-button variant) when you localise.
 - **Keyboard:** it behaves as its SegmentedControl: arrow keys move and select, and activating the current option does nothing.
 - **Icon-only:** the icons carry no visible text, but each option keeps its accessible name.
 
@@ -64,7 +70,7 @@ Uncontrolled mode is stored in `localStorage` by default. Pass `storage` (any `{
 
 ## Theming
 
-ThemeToggle has no tokens of its own. It uses the SegmentedControl tokens: `--cy-segmented-control-{radius,track-bg,active-bg,padding}`.
+ThemeToggle has no tokens of its own. It uses the SegmentedControl tokens: `--cy-segmented-control-{radius,track-bg,active-bg,padding}`. The `cycle` variant is an IconButton and takes its tokens.
 
 ```ts
 createTheme({ components: { segmentedControl: { radius: "999px" } } });

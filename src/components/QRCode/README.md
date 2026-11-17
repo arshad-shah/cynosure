@@ -3,7 +3,7 @@
 A QR code drawn as one SVG path: crisp at any size, coloured by tokens. It encodes the text itself (`src/foundations/qr.ts`, no dependency): versions 1 to 40, levels L, M, Q and H, numeric, alphanumeric or UTF-8 byte mode, and the mask with the lowest standard penalty. The output matches the `qrcode` npm package module for module (unit-tested).
 
 ```tsx
-import { QRCode } from "@arshad-shah/cynosure";
+import { Icon, QRCode } from "@arshad-shah/cynosure";
 import { globe } from "@arshad-shah/cynosure/icons";
 
 <QRCode value="https://cynosure.arshadshah.com" label="Open the documentation on your phone" />

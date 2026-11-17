@@ -11,21 +11,21 @@ import { Pagination, pageCount } from "@arshad-shah/cynosure";
 <Pagination count={10} page={page} getHref={(p) => `?page=${p}`} />  // real links
 ```
 
-| Prop                          | Default | Notes                                                                                         |
-| ----------------------------- | ------- | --------------------------------------------------------------------------------------------- |
-| `count`                       | –       | Required. How many pages. One page or fewer renders nothing                                   |
-| `page` / `defaultPage`        | – / `1` | The current page, from 1. Controlled or uncontrolled. Values out of range are clamped         |
-| `onChange`                    | –       | `(page, event) => void`, on every press that changes the page. `event` is the click           |
-| `siblings`                    | `1`     | Pages shown each side of the current one                                                      |
-| `boundaries`                  | `1`     | Pages always shown at each end                                                                |
-| `variant`                     | `pages` | `pages` numbered · `compact` previous and next around "Page 3 of 10"                          |
-| `showEdges`                   | `false` | First-page and last-page controls                                                             |
-| `getHref`                     | –       | `(page) => string`. Page numbers, previous and next become real links; `onChange` still fires |
-| `renderLink`                  | –       | With `getHref`: render the page links with your router (Link's `LinkRenderProps` contract)    |
-| `disabled`                    | `false` | Disables every control                                                                        |
-| `size`                        | `md`    | `sm` · `md` (Button heights)                                                                  |
-| `labels`                      | –       | `nav`, `previous`, `next`, `first`, `last`, `page(n)`, `status(page, count)`                  |
-| `className` / `style` / `ref` | –       | On the `nav`. Layout only                                                                     |
+| Prop                          | Default | Notes                                                                                                      |
+| ----------------------------- | ------- | ---------------------------------------------------------------------------------------------------------- |
+| `count`                       | –       | Required. How many pages. One page or fewer renders nothing                                                |
+| `page` / `defaultPage`        | – / `1` | The current page, from 1. Controlled or uncontrolled. Values out of range are clamped                      |
+| `onChange`                    | –       | `(page, event) => void`, on every press that changes the page. `event` is the click                        |
+| `siblings`                    | `1`     | Pages shown each side of the current one                                                                   |
+| `boundaries`                  | `1`     | Pages always shown at each end                                                                             |
+| `variant`                     | `pages` | `pages` numbered · `compact` previous and next around "Page 3 of 10"                                       |
+| `showEdges`                   | `false` | First-page and last-page controls                                                                          |
+| `getHref`                     | –       | `(page) => string`. Page numbers, previous, next, first and last become real links; `onChange` still fires |
+| `renderLink`                  | –       | With `getHref`: render the page links with your router (Link's `LinkRenderProps` contract)                 |
+| `disabled`                    | `false` | Disables every control                                                                                     |
+| `size`                        | `md`    | `sm` · `md` (Button heights)                                                                               |
+| `labels`                      | –       | `nav`, `previous`, `next`, `first`, `last`, `page(n)`, `status(page, count)`                               |
+| `className` / `style` / `ref` | –       | On the `nav`. Layout only                                                                                  |
 
 Helpers, exported beside the component:
 

@@ -21,7 +21,7 @@ import { ContextMenu } from "@arshad-shah/cynosure";
 | `items` / `onSelect`  | –       | Same entries as `Menu` (`MenuItem` or `MenuSection`)                                                     |
 | `onOpenChange`        | –       | Called with `true` / `false`, e.g. to highlight the row the menu belongs to                              |
 | `open`                | –       | Controlled: the app opens it itself (a canvas object with no element of its own)                         |
-| `anchor`              | –       | Where the app opens it: `{ x, y }` in client coordinates, or an element                                  |
+| `anchor`              | –       | Where the app opens it: `{ x, y }` in client coordinates, or any element or virtual anchor               |
 | `disabled`            | `false` | The browser's own menu shows instead                                                                     |
 | `className` / `style` | –       | Layout only, applied to the panel                                                                        |
 - Right-click opens the menu with its corner at the pointer; the keyboard opens it under the target. It stays on screen near edges.

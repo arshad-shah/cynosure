@@ -16,6 +16,7 @@ A compact single choice (view switchers, modes, theme) on native radios: arrow k
 | `disabled`                                   | `false`          | Disables every segment; the value is not submitted                                        |
 | `iconOnly` / `fullWidth`                     | `false`          | Visual options                                                                            |
 | `size` / `tone`                              | `md` / `neutral` | `xs` (20px, dense chrome) · `sm` · `md` · `lg`; tone colours the active segment's content |
+| `className` / `style`                        | –                | Layout only                                                                               |
 
 ## Tokens
 

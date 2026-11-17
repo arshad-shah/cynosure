@@ -55,6 +55,16 @@ With `name`, the form receives the plain number ("1234.5"), whatever the text sh
 
 <Canvas of={Stories.FormsGetThePlainNumber} />
 
+## Scrubbing the label
+
+`scrub` lets people drag the label sideways to change the value, as design tools do: one `step` every 4 pixels, ten with Shift. Escape during the drag puts the value back. The keys and steppers work as before, and a vertical swipe still scrolls on touch screens.
+
+```tsx
+<NumberField label="Width" defaultValue={100} min={0} max={500} unit="px" scrub />
+```
+
+<Canvas of={Stories.ScrubTheLabel} />
+
 ## Props
 
 <ArgTypes of={Stories} />

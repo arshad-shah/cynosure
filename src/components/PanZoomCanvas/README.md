@@ -26,6 +26,8 @@ canvas.current?.centerOn(tableRect);
 | `overlays`                              | –            | Controls in the corners: `{ "top-start", "top-end", "bottom-start", "bottom-end" }`; they do not pan or zoom and keep their own pointer and keys |
 | `labels`                                | –            | `zoom(percent)`                                                                                                                                  |
 | `handle`                                | –            | `fit(rect?)`, `zoomTo(percent)`, `zoom(setting)` (a ZoomControls choice), `centerOn(rect)` (also on `ref`, with the older `centreOn`)            |
+| `children`                              | –            | The content, absolutely placed in canvas units                                                                                                   |
+| `className` / `style`                   | –            | Layout only (give it a height)                                                                                                                   |
 - Pointer: drag the empty background (or hold Space and drag anywhere) to pan; the wheel pans; Ctrl/Cmd+wheel zooms around the pointer. Presses on your content stay yours; claim them with `claimPress` to drag nodes (below).
 - Touch: one finger pans, two pinch-zoom around their midpoint.
 - Keyboard (focus on the canvas): arrows pan (Shift: further), Ctrl/Cmd and = - 0 zoom, Shift+1 fits. Zoom changes are announced.

@@ -36,7 +36,7 @@ With Vite (Astro uses Vite too), the adapter does this for you: see `docs/adapte
 
 ## Light and dark without a flash
 
-`themeInitScript()` returns a tiny script that sets the saved colour mode before the first paint. Inline it in the `<head>` (not in browser extensions: their pages block inline scripts):
+`themeInitScript()` returns a tiny script that sets the saved colour mode before the first paint; with nothing saved it marks `system`, so the page follows the OS from the first paint. Inline it in the `<head>` (not in browser extensions: their pages block inline scripts):
 
 ```astro
 ---

@@ -33,6 +33,7 @@ import { TimeField } from "@arshad-shah/cynosure";
 | `name`, `form`, `required`            | –           | Forms receive the `HH:MM` value, also when it is shown as 12-hour, never half-typed text; a form will not submit while the text is not an allowed time, and a form reset brings back `defaultValue` |
 | `disabled`, `readOnly`, `size`        | –, `md`     | A read-only field has no picker button                                                                                                                                                              |
 | `labels`                              | –           | `invalid`, `unavailable`, `open`, `hours`, `minutes`, `seconds`, `am`, `pm`, `period`, `dayTrack`, `now`                                                                                            |
+| `className` / `style`                 | –           | Layout only                                                                                                                                                                                         |
 
 ## Typing
 
@@ -47,7 +48,7 @@ Off unless you pass `picker`.
 
 - The clock button at the end of the field opens a Popover (a dialog named by `labels.open`). It opens on the field's time, or on the earliest allowed time with nothing chosen when the field is empty or not a time.
 - **Columns.** Hours, minutes and (with `seconds`) seconds are listboxes. The chosen row of each sits in one lens, so the lens reads as the time. A choice applies at once; there is no confirm button.
-  - Click a row, or scroll the column (wheel, finger): it chooses the row it comes to rest on. Rows the limits rule out are struck through and cannot be chosen; a column stopped on one goes to the nearest allowed time.
+  - Click a row to choose that row, and only that row, even if the column has just moved. Scroll the column (wheel, finger) and it chooses the row it comes to rest on. Rows the limits rule out are struck through and cannot be chosen: a press on one chooses nothing and the column goes back to the chosen time, and a column scrolled to one goes to the nearest allowed time.
   - Up and Down roll the focused column, Home and End go to its first and last allowed row, digits seek (`1` then `4` is 14), Left and Right change column, Enter closes the picker and returns focus to the field, Escape closes it.
   - Hours and minutes read left to right in every language.
 - **AM/PM** (when the time is shown as 12-hour): a SegmentedControl beside the lens; `A` and `P` from any column do the same. A half the limits leave nothing in is disabled.

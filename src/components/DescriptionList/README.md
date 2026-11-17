@@ -15,14 +15,14 @@ import { DescriptionList } from "@arshad-shah/cynosure";
 />;
 ```
 
-| Prop                  | Default | Notes                                                                                         |
-| --------------------- | ------- | --------------------------------------------------------------------------------------------- |
-| `items`               | –       | `{ term, detail, id? }`; `detail` can be an array; `id` is needed when `term` is not a string |
-| `layout`              | `auto`  | `auto` (inline from 28rem of the list's own width, stacked below) · `inline` · `stacked`      |
-| `divided`             | `false` | Lines between rows                                                                            |
-| `size`                | `md`    | `sm` · `md` · `lg`                                                                            |
-| `className` / `style` | –       | Layout only                                                                                   |
-| `id`, `data-*`, `ref` | –       | Set on the root element (a link target, test or state hooks)                                  |
+| Prop                                    | Default | Notes                                                                                         |
+| --------------------------------------- | ------- | --------------------------------------------------------------------------------------------- |
+| `items`                                 | –       | `{ term, detail, id? }`; `detail` can be an array; `id` is needed when `term` is not a string |
+| `layout`                                | `auto`  | `auto` (inline from 28rem of the list's own width, stacked below) · `inline` · `stacked`      |
+| `divided`                               | `false` | Lines between rows                                                                            |
+| `size`                                  | `md`    | `sm` · `md` · `lg`                                                                            |
+| `className` / `style`                   | –       | Layout only                                                                                   |
+| `id`, `role`, `aria-*`, `data-*`, `ref` | –       | Set on the root element (a link target, test or state hooks)                                  |
 - A native `<dl>`: screen readers announce terms and their definitions.
 - Inline terms share one column, no wider than `--cy-description-list-term-width` (40%); long terms wrap inside it.
 - `auto` responds to the list's width, not the window's, so it works in side panels and popups.

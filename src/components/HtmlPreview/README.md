@@ -18,7 +18,7 @@ import { HtmlPreview } from "@arshad-shah/cynosure";
 | `ratio`                                                         | –       | Width divided by height of the frame; default height `--cy-html-preview-height`             |
 | `labels`                                                        | –       | `blocked`, `allow`                                                                          |
 | `className` / `style`                                           | –       | Layout only                                                                                 |
-| `id`, `data-*`, `ref`                                           | –       | Set on the root element                                                                     |
+| `id`, `data-*`, `role`, `aria-*`, `ref`                         | –       | Set on the root element                                                                     |
 
 ## Behaviour
 

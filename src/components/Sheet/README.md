@@ -8,11 +8,11 @@ A Dialog docked to an edge: the bottom (full width), the inline end or the inlin
 </Sheet>;
 ```
 
-| Prop                    | Default  | Notes                                                                                                                                          |
-| ----------------------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| `side`                  | `bottom` | `bottom` (full width, up to 85% tall) · `end` (full height; left in RTL) · `start` (full height; a navigation drawer; right in RTL)            |
-| `size`                  | `md`     | Width of an `end` or `start` sheet: `sm` 320 · `md` 400 · `lg` 560 px                                                                          |
-| every other Dialog prop | –        | `open`, `defaultOpen`, `onOpenChange`, `title`, `titleHidden`, `description`, `actions`, `dismissible`, `closeButton`, `keepMounted`, `labels` |
+| Prop                    | Default  | Notes                                                                                                                                                                            |
+| ----------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `side`                  | `bottom` | `bottom` (full width, up to 85% tall) · `end` (full height; left in RTL) · `start` (full height; a navigation drawer; right in RTL)                                              |
+| `size`                  | `md`     | Width of an `end` or `start` sheet: `sm` 320 · `md` 400 · `lg` 560 px                                                                                                            |
+| every other Dialog prop | –        | `open`, `defaultOpen`, `onOpenChange`, `title`, `titleHidden`, `description`, `actions`, `dismissible`, `closeButton`, `keepMounted`, `labels`, `className`, `style`, `children` |
 - Slides in from its edge; no motion under reduced motion.
 - As in Dialog, the content is mounted only while the sheet is open and unmounts after it has slid out, so every opening starts fresh. `keepMounted` keeps it in the DOM while closed (a drawer whose scroll position or expanded sections should survive).
 - The bottom sheet keeps its actions above the home indicator (`safe-area-inset-bottom`).

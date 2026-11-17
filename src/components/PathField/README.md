@@ -24,6 +24,7 @@ import { PathField } from "@arshad-shah/cynosure";
 | `placeholder`, `iconStart`                     | –                | Hint while empty; an icon leading the field                                                           |
 | `size` / `variant`                             | `md` / `outline` | `xs`–`lg`; the Browse button is one step smaller so it fits inside the field (at `xs` it is `xs` too) |
 | `labels`                                       | –                | `browse` ("Browse…"), `clear` ("Clear")                                                               |
+| `className` / `style`                          | –                | Layout only                                                                                           |
 - Browse is busy (`aria-busy`) and cannot be pressed again until `onPick` settles; `null`, or a rejected promise, leaves the path as it was.
 - The clear button shows while there is a path; it empties the field and focuses it. Tab order: input, clear, Browse.
 - Disabled: the field and Browse are disabled and there is no clear button. Touch: 44px hit areas.
