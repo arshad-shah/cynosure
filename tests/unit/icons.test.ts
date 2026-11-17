@@ -1,4 +1,6 @@
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
+import * as brands from "../../src/brands";
 import * as icons from "../../src/icons";
 import { ICON_KEYWORDS } from "../../src/icons/keywords";
 import { ICON_CATEGORIES, type IconData } from "../../src/icons/types";
@@ -15,6 +17,20 @@ describe("Facet icon set", () => {
     expect(shipped.length).toBeGreaterThanOrEqual(120);
     expect(new Set(shipped.map((i) => i.name)).size).toBe(shipped.length);
     expect(new Set(shipped.map((i) => i.category))).toEqual(new Set(ICON_CATEGORIES));
+  });
+  it("is counted right where the documentation states a count (the README and the Icons guide)", () => {
+    const read = (path: string) => readFileSync(new URL(`../../${path}`, import.meta.url), "utf8");
+    expect(read("README.md")).toContain(
+      `${shipped.length} Facet stroke icons in ${ICON_CATEGORIES.length} categories`,
+    );
+    expect(read("docs/icons.md")).toContain(
+      `${shipped.length} icons in ${ICON_CATEGORIES.length} categories`,
+    );
+    const marks = Object.values(brands).filter(
+      (v) => typeof v === "object" && v !== null && "body" in v,
+    ).length;
+    expect(read("README.md")).toContain(`${marks} official brand marks`);
+    expect(read("docs/icons.md")).toContain(`the official logos of ${marks} companies and projects`);
   });
   it("covers commerce, nature, travel, health, development, charts, home and social", () => {
     const byName = Object.fromEntries(shipped.map((i) => [i.name, i.category]));

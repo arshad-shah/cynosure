@@ -20,6 +20,7 @@ import { isRtl } from "../../foundations/dir.js";
 import { ariaKeyShortcuts, shortcutKeys } from "../../foundations/hotkey.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
 import { LiveRegion, useLiveMessage } from "../../foundations/LiveRegion/LiveRegion.js";
+import { cssPixels } from "../../foundations/layout.js";
 import { clamp } from "../../foundations/math.js";
 import { motionMs } from "../../foundations/motion.js";
 import { usePrinting } from "../../foundations/printing.js";
@@ -348,7 +349,7 @@ export function TabList({
     if (!list || !tab || !list.contains(tab)) return;
     const max = list.scrollWidth - list.clientWidth;
     if (max <= 0) return;
-    const pad = Number.parseFloat(getComputedStyle(list).getPropertyValue("--cy-space-9")) || 0;
+    const pad = cssPixels(list, "var(--cy-space-9)", 0);
     const rtl = isRtl(list);
     // Physical position from the left edge of the scrollable content (RTL scrollLeft runs from 0 down to -max).
     const current = rtl ? list.scrollLeft + max : list.scrollLeft;

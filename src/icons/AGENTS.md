@@ -15,3 +15,5 @@ One file per icon exporting typed `IconData`. Add icons only with `pnpm cy new i
 `validateIcon` (run by tests and the generator) rejects text, any fill, unknown categories, off-grid geometry and bad names. The gallery story `Foundations/Icon → Gallery` shows every icon.
 
 `iconToSvg` (`to-svg.ts`) escapes every attribute value it writes and leaves out parts and attributes whose names are not plain names, since its callers (Astro, plain JS) are not type-checked; `tests/unit/brands.test.tsx` covers it and its parity with the React `Icon`.
+
+**Counts:** the README and `docs/icons.md` are the only places that state how many icons, categories and brand marks there are; `tests/unit/icons.test.ts` fails until they match, so a new icon updates both. Elsewhere, link to them instead of repeating a number or a list.

@@ -1,14 +1,10 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { expect, test } from "vitest";
+import { kebab as tokenName } from "../../src/tokens/to-css.js";
+import { kebabName } from "../../tools/cli/lib/check.js";
 
 const src = fileURLToPath(new URL("../../src/", import.meta.url));
-/** As `themeToCss` names a component token: `sizeSm` → `size-sm`, `size3xl` → `size-3xl`. */
-const kebab = (s: string) =>
-  s
-    .replace(/([a-z0-9])([A-Z])/g, "$1-$2")
-    .replace(/([a-z])(\d)/g, "$1-$2")
-    .toLowerCase();
 
 /** Each component folder with a stylesheet: the `--cy-<component>-*` tokens it reads, and the tokens it declares. */
 const folders = ["components", "foundations"].flatMap((group) =>
@@ -26,13 +22,13 @@ const folders = ["components", "foundations"].flatMap((group) =>
 test("every component token a stylesheet reads is declared in the component's Tokens type", () => {
   const missing: string[] = [];
   for (const { name, css, tsx } of folders) {
-    const prefix = `--cy-${kebab(name)}-`;
+    const prefix = `--cy-${kebabName(name)}-`;
     const read = new Set([...css.matchAll(/var\((--cy-[a-z0-9-]+)/g)].map((m) => m[1] as string));
     const own = [...read].filter((t) => t.startsWith(prefix));
     if (own.length === 0) continue;
     const body = tsx.match(new RegExp(`export interface ${name}Tokens \\{([\\s\\S]*?)\\n\\}`))?.[1] ?? "";
     const declared = new Set(
-      [...body.matchAll(/^\s+"?([a-zA-Z0-9-]+)"?\??:/gm)].map((m) => kebab(m[1] as string)),
+      [...body.matchAll(/^\s+"?([a-zA-Z0-9-]+)"?\??:/gm)].map((m) => tokenName(m[1] as string)),
     );
     for (const token of own) if (!declared.has(token.slice(prefix.length))) missing.push(`${name}: ${token}`);
   }

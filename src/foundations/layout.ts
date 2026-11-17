@@ -128,3 +128,17 @@ export function useBlock<E extends HTMLElement>(ref: Ref<E> | undefined, { inert
   );
   return { ref: callback, "data-cy-disabled": disabled ? "" : undefined };
 }
+
+/**
+ * A CSS length as pixels, measured on `el`: `value` may be `var(--x)`, `calc()`, `rem` or anything a length takes. A
+ * custom property's computed value is its text, not a length, so it is resolved through a real length property set
+ * for the moment of reading. `fallback` when it is no length (the property unset, the stylesheet missing).
+ */
+export function cssPixels(el: HTMLElement, value: string, fallback: number): number {
+  const prop = "scroll-margin-top";
+  const before = [el.style.getPropertyValue(prop), el.style.getPropertyPriority(prop)] as const;
+  el.style.setProperty(prop, value);
+  const px = Number.parseFloat(getComputedStyle(el).scrollMarginTop);
+  el.style.setProperty(prop, ...before);
+  return Number.isFinite(px) ? px : fallback;
+}

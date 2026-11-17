@@ -23,15 +23,12 @@ const theme = createTheme({ accent: "#e8462e", scale: "compact" });
 
 **What is here:**
 
-- **Foundations:** the only modules with native elements (ButtonBase, LinkBase, InputBase, FileInputBase, TextAreaBase, ChoiceBase, DialogBase, FrameBase, VideoBase) and the parts every component may use (HiddenValue, LiveRegion, Icon).
-- **Controls:** Button, IconButton, CopyButton, Link, TextField, NumberField, SearchField, TextArea, Select, Combobox, TagInput, Checkbox, Switch, RadioGroup, SegmentedControl, Slider, DateField, TimeField, Checklist, Pagination, ColorField, ColorSwatches, KeyValueEditor, FileDrop, PathField, SignaturePad, SelectionFrame, CompareSlider, ThemeToggle, Choice, OptionList, HotkeyField, SortButton, RowActions, Rating, BitField, CameraView. Every form control works in native forms (FormData, reset, required).
-- **Structure:** AppShell (`useAppShell`), TitleBar, StatusBar, Container, PageHeader, Stack, Inline, Grid, ScrollArea, Divider, AspectRatio, Breadcrumbs, SideNav, SplitPane, Card, Toolbar, Tabs, Disclosure, Accordion, Tree, SortableList, VirtualList, Calendar, DocumentViewport, PanZoomCanvas, ZoomControls, Section, SiteHeader, SiteFooter, SkipLink, ListRow (`ListRows`), OverlayFrame, VisuallyHidden, Form, CanvasStage.
-- **Overlays:** Tooltip, HoverCard, Popover, FloatingToolbar (`DockedToolbar`), Menu, Menubar, ContextMenu, Dialog, ProgressOverlay, Sheet, CommandPalette (`useHotkey`), Toast (`Toaster`, `useToast`). The floating ones sit in the browser top layer and share one Escape and outside-click stack.
-- **Feedback and display:** Notice, EmptyState, ErrorBoundary, ProgressBar, Steps, LoadingDots, Skeleton, DescriptionList, Stat, List, Table, Text, Heading, Prose, Avatar (`AvatarGroup`), IconTile, Image, CodeBlock, Announcer (`useAnnounce`), Badge, Kbd, Field, DataGrid, HighlightedText, ChatMessage, QRCode, DeviceFrame, ColorSample, HtmlPreview.
+- **Foundations:** the only modules with native elements, and the parts every component may use (Icon, HiddenValue, LiveRegion).
+- **Components** in four groups, as in the sidebar: Controls, Structure, Overlays, and Feedback and display. Every form control works in native forms (FormData, reset, required); the floating ones sit in the browser top layer and share one Escape and outside-click stack. The full list is the README's "Components".
 
 **Use the toolbar** to switch mode, contrast, scale and product accent on every story, and to render under a **hostile host** stylesheet (Tailwind preflight plus aggressive globals). Cynosure must look identical either way.
 
 - Works on a page, inside a shadow root (`@arshad-shah/cynosure/styles.inline`), and in extension popups.
 - One runtime dependency (`@arshad-shah/detent`, for pointer dragging), no CSS-in-JS, no writes to `<html>`, `<head>` or `<body>`.
-- Icons: 479 Facet stroke icons in 25 categories, drawn on the Cynosure grid with softened squares and built-in micro-animations; 98 official brand marks; and `iconToSvg` for pages without React.
+- Icons: Facet stroke icons, drawn on the Cynosure grid with softened squares and built-in micro-animations; official brand marks; and `iconToSvg` for pages without React.
 - One prop vocabulary everywhere: `size`, `tone`, `variant`, `color`, plus behaviour props. Every story has controls for all of them.

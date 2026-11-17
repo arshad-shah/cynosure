@@ -2,6 +2,14 @@
 
 ## Status
 
+**Now (2026-11-17, duplication pass): Arshad: "remember no duplication".** Today's work was checked for copies and each one now has a single source.
+- `tabStops(root)` in `focus.ts` replaces the same `FOCUSABLE` selector in Popover and Dialog. Both now open on the first control Tab reaches (a radio group's checked radio): story `OpeningFocusesTheFirstTabStop`, which failed first.
+- `cssPixels(el, value, fallback)` in `layout.ts` is the one way to read a token's length in script. It serves Popover's offset (moved from `floatingOffset`), DocumentViewport's gap (its `row-gap` CSS workaround removed) and Tabs' reveal padding (a `parseFloat` of a custom property).
+- `cy new token` and `tests/unit/component-tokens.test.ts` use the real token naming (`to-css.ts` `kebab`) and `check.ts` `kebabName`, not copies.
+- The component lists in `docs/migration.md` and Storybook's Introduction became links to the README's list, which is the only list. Icon and brand counts are stated only in the README and `docs/icons.md`, and `tests/unit/icons.test.ts` fails when they are wrong.
+- New icons: no other icon means the same thing (`page-number` is a page, `list-ordered` a list), and the generator refuses identical drawings.
+- Budgets raised by a few bytes: createTheme + themeToCss 7.54 kB, TextArea 4.71 kB, Tabs 8.27 kB.
+
 **Now (2026-11-17, later): six Facet icons for tools (479 in all), same branch.** `flip-horizontal` and `flip-vertical` (editing, flip: two triangles pointing away from a dashed axis, so they never read as `swap`), `pixelate` (editing, pop: uneven mosaic blocks in a frame, unlike `grid` and `table`), `image-code` (media, pop), `step-marker` (editing, pop: a circled 1) and `key-pair` (security, tilt: a padlock and an upright key; two horizontal keys read as sliders). Made with `cy new icon`, motion set by hand, search words in `keywords.ts`, checked at 16, 20 and 24px in light and dark beside the stand-ins they replace. `ICONS_BY_NAME_BUDGET` 24.5 → 25 kB (24.68 measured).
 - **Size budgets corrected:** the review's fixes were measured before the last two fixers finished, so the pushed commit failed `pnpm size` on 21 entries. All are now set to what the build measures, for Arshad to review: DataGrid 9.98 → 10.16 kB, Tree 6.27 → 6.38, NumberField 3.33 → 3.43, CommandPalette 5.63 → 5.67, ColorField 3.72 → 3.78, CameraView 2.87 → 2.94, DialogBase 0.52 → 0.60, HoverCard 0.91 → 0.97, DateField 1.85 → 1.91, PathField 1.07 → 1.13, SplitPane 2.55 → 2.60, TimeField 5.93 → 5.96, Form 870 → 893 B, and under 20 B each for useRovingFocus, Card, Toolbar, Tabs, Popover, VirtualList, Rating and CanvasStage.
 - **Verification:** lint, typecheck, check, test (954), `icons:optimize --check`, size, and the Icon stories (Chromium) pass.

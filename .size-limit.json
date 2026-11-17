@@ -13,7 +13,7 @@
       "dist/tokens/defaults.js",
       "dist/tokens/to-css.js"
     ],
-    "limit": "7.53 kB",
+    "limit": "7.54 kB",
     "gzip": true
   },
   {
@@ -79,7 +79,7 @@
       "dist/foundations/TextAreaBase/TextAreaBase.js",
       "dist/styles/text-area.css"
     ],
-    "limit": "4.7 kB",
+    "limit": "4.71 kB",
     "gzip": true
   },
   {
@@ -196,7 +196,7 @@
   {
     "name": "Tabs",
     "path": ["dist/components/Tabs/Tabs.js", "dist/foundations/roving-focus.js", "dist/styles/tabs.css"],
-    "limit": "8.26 kB",
+    "limit": "8.27 kB",
     "gzip": true
   },
   {

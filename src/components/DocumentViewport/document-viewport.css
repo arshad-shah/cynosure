@@ -4,8 +4,6 @@
  */
 .cy-document-viewport.cy-document-viewport {
   --_gap: var(--cy-document-viewport-gap, var(--cy-space-6));
-  /* No effect on a block box: the gap as a computed length in pixels, which the layout maths reads. */
-  row-gap: var(--_gap);
   position: relative;
   display: block;
   box-sizing: border-box !important;

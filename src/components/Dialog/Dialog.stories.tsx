@@ -12,6 +12,7 @@ import { createTheme } from "../../tokens/index.js";
 import { Button } from "../Button/Button.js";
 import { IconButton } from "../IconButton/IconButton.js";
 import { Menu } from "../Menu/Menu.js";
+import { RadioGroup } from "../RadioGroup/RadioGroup.js";
 import { Stack } from "../Stack/Stack.js";
 import { TextField } from "../TextField/TextField.js";
 import { Dialog, type DialogProps } from "./Dialog.js";
@@ -408,6 +409,27 @@ export const WithoutACloseButtonStillDismisses: Story = {
     await openWith(canvas, (e) => userEvent.click(e));
     await userEvent.click(el);
     await settledClosed(el);
+  },
+};
+
+/** Opening focuses the first control Tab would reach: in a radio group, its checked radio, not the first one. */
+export const OpeningFocusesTheFirstTabStop: Story = {
+  args: {
+    children: (
+      <RadioGroup
+        label="Plan"
+        name="plan"
+        defaultValue="team"
+        options={[
+          { value: "solo", label: "Solo" },
+          { value: "team", label: "Team" },
+        ]}
+      />
+    ),
+  },
+  play: async ({ canvas, userEvent }) => {
+    await openWith(canvas, (e) => userEvent.click(e));
+    await waitFor(() => expect(canvas.getByRole("radio", { name: "Team" })).toHaveFocus());
   },
 };
 

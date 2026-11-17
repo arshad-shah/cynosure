@@ -2,7 +2,7 @@ import { type CSSProperties, type ReactNode, useContext, useEffect, useId, useRe
 import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js";
 import { useControllableState } from "../../foundations/controllable.js";
 import { DialogBase } from "../../foundations/DialogBase/DialogBase.js";
-import { deepActiveElement, reachable } from "../../foundations/focus.js";
+import { deepActiveElement, reachable, tabStops } from "../../foundations/focus.js";
 import { transitionTime } from "../../foundations/motion.js";
 import { close as closeIcon } from "../../icons/close.js";
 import { useDismiss } from "../../overlay/dismiss.js";
@@ -89,8 +89,6 @@ export interface DialogFrameProps extends DialogProps {
 }
 
 const DEFAULT_LABELS: DialogLabels = { close: "Close" };
-const FOCUSABLE =
-  'button:not([disabled]), [href], input:not([disabled]):not([type="hidden"]):not([aria-hidden="true"]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
 export function DialogFrame({
   open,
@@ -172,10 +170,7 @@ export function DialogFrame({
   // dialog itself (so the close button's tooltip does not pop up on open).
   useClientLayoutEffect(() => {
     if (!isOpen) return;
-    const first =
-      body.current?.querySelector<HTMLElement>(FOCUSABLE) ??
-      footer.current?.querySelector<HTMLElement>(FOCUSABLE) ??
-      dialog.current;
+    const first = tabStops(body.current)[0] ?? tabStops(footer.current)[0] ?? dialog.current;
     first?.focus({ preventScroll: true });
   }, [isOpen]);
 

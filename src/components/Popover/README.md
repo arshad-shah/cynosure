@@ -24,7 +24,7 @@ A floating panel (non-modal dialog) anchored to its trigger, in the browser top 
 | `closeOnFocusOut`                       | `true`    | A non-modal panel closes when focus moves outside it, its trigger and its anchor (Tab past its last control)              |
 | `children`                              | –         | The panel's content                                                                                                       |
 | `className` / `style`                   | –         | On the panel. Layout only                                                                                                 |
-- Focus moves to the first control inside (or the panel itself) and returns to the trigger on close. `initialFocus="panel"` focuses the panel; `initialFocus="none"` leaves focus where it is, and Tab from the trigger (or from an anchor the panel follows in the document) moves into it.
+- Focus moves to the first control inside that Tab reaches (or the panel itself) and returns to the trigger on close. `initialFocus="panel"` focuses the panel; `initialFocus="none"` leaves focus where it is, and Tab from the trigger (or from an anchor the panel follows in the document) moves into it.
 - Without `modal`, focus moving out of the panel (to anything but its trigger or anchor) closes it, so it never hangs open over what has focus; `closeOnFocusOut={false}` keeps it open.
 - An anchor element counts as inside, like the trigger: pressing it does not close the panel.
 - Escape closes only the topmost layer (nested popovers, a tooltip inside), via `useDismiss`. A click outside closes it, as does clicking the trigger again.

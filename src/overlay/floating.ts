@@ -1,5 +1,6 @@
 import { type RefObject, useRef, useState } from "react";
 import { useClientLayoutEffect } from "../foundations/client-layout-effect.js";
+import { cssPixels } from "../foundations/layout.js";
 import type { VirtualAnchor } from "./use-anchored-position.js";
 
 /** An element shown with the Popover API (top layer, rendered in place: nothing is added to `<body>`). */
@@ -47,17 +48,9 @@ export function useFloatingAnchor(anchor: FloatingAnchor) {
   return { ref, present };
 }
 
-/**
- * The surface's `--_offset` in pixels. A custom property's computed value is its text (`0.5rem`, `calc(…)`), not a
- * length, so it is resolved through a real length property set for the moment of reading.
- */
+/** The surface's `--_offset` in pixels (`0.5rem`, `calc(…)` and the rest resolved). */
 export function floatingOffset(el: HTMLElement, fallback = 8) {
-  const prop = "scroll-margin-top";
-  const before = [el.style.getPropertyValue(prop), el.style.getPropertyPriority(prop)] as const;
-  el.style.setProperty(prop, "var(--_offset)");
-  const px = Number.parseFloat(getComputedStyle(el).scrollMarginTop);
-  el.style.setProperty(prop, ...before);
-  return Number.isFinite(px) ? px : fallback;
+  return cssPixels(el, "var(--_offset)", fallback);
 }
 
 /** The gap to keep from the anchor, read from the surface's `--_offset` (a token that always resolves) when it opens. */

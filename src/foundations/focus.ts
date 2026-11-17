@@ -8,6 +8,15 @@ export function deepActiveElement(doc: Document | null = typeof document === "un
   return active as HTMLElement | null;
 }
 
+/** Controls that can take focus. Not all are Tab stops (a roving item, an unchecked radio): see `tabStops`. */
+const FOCUSABLE =
+  'button:not([disabled]), [href], input:not([disabled]):not([type="hidden"]):not([aria-hidden="true"]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+/** The elements inside `root` that Tab lands on, in document order: where a Dialog or Popover puts focus, and traps it. */
+export function tabStops(root: ParentNode | null | undefined): HTMLElement[] {
+  return root ? [...root.querySelectorAll<HTMLElement>(FOCUSABLE)].filter(isTabStop) : [];
+}
+
 /**
  * Whether Tab can land on `el`: a focusable element with no negative `tabIndex` (a roving item that is not the
  * current one), not inert, rendered, and not an unchecked radio of a group with a checked one (Tab enters a radio

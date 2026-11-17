@@ -2,6 +2,7 @@ import { type CSSProperties, type ReactNode, useEffect, useRef, useState } from 
 import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js";
 import { useControllableState } from "../../foundations/controllable.js";
 import { LiveRegion } from "../../foundations/LiveRegion/LiveRegion.js";
+import { cssPixels } from "../../foundations/layout.js";
 import { useVirtualWindow } from "../../foundations/virtual-window.js";
 import { anchoredScroll, type ZoomSetting, zoomScale } from "../../foundations/zoom.js";
 import { useZoomGestures, type ZoomAnchor } from "../../foundations/zoom-gestures.js";
@@ -135,12 +136,11 @@ export function DocumentViewport({
   const text = { ...DEFAULT_LABELS, ...labels };
   const scroller = useRef<HTMLElement>(null);
   const [setting, setSetting] = useControllableState(zoom, defaultZoom, onZoomChange);
-  // The gap comes from the token, in pixels, for the layout maths: the stylesheet sets it as the scroller's
-  // `row-gap`, computed to pixels whatever unit the token uses. Without the stylesheet it stays 16.
+  // The gap comes from the token, in pixels whatever its unit, for the layout maths. Without the stylesheet it is 16.
   const [gap, setGap] = useState(16);
   useClientLayoutEffect(() => {
-    const g = Number.parseFloat(getComputedStyle(scroller.current as HTMLElement).rowGap);
-    if (Number.isFinite(g) && g !== gap) setGap(g);
+    const g = cssPixels(scroller.current as HTMLElement, "var(--_gap)", 16);
+    if (g !== gap) setGap(g);
   });
 
   // The viewport's size feeds the fit modes; the windowing measures it.
