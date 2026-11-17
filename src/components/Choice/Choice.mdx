@@ -35,7 +35,7 @@ import { Choice, ChoiceBase } from "@arshad-shah/cynosure";
 />
 ```
 
-`control` receives the input's props: its `id`, `aria-labelledby`, `aria-describedby`, `checked` or `defaultChecked`, `onChange`, and `name`, `value`, `required` and `disabled`. Spread them onto [ChoiceBase](?path=/docs/foundations-choicebase--docs), which hides the native input over your drawing. The input must be a direct child of the element `control` returns. `onChange` on Choice receives the new `checked` boolean.
+`control` receives the input's props: its `id`, `aria-labelledby`, `aria-describedby`, `tabIndex`, `checked` or `defaultChecked`, `onChange`, and `name`, `value`, `required` and `disabled`. Spread them onto [ChoiceBase](?path=/docs/foundations-choicebase--docs), which hides the native input over your drawing. The input must be a direct child of the element `control` returns. `onChange` on Choice receives the new `checked` boolean.
 
 <Canvas of={Stories.ControlledAndUncontrolled} />
 
@@ -44,6 +44,10 @@ import { Choice, ChoiceBase } from "@arshad-shah/cynosure";
 `strikeWhenChecked` strikes through and mutes the label while the input is checked (and not indeterminate), and mutes the description with it. An input placed inside the label does not count.
 
 <Canvas of={Stories.StrikeWhenCheckedAndItsTokens} />
+
+## Cards
+
+`variant="card"` draws the row as a bordered card with `media` (a thumbnail, a font sample, a swatch) above the label. The card shows the state, with the accent border and soft background while its input is checked and the focus ring while focused, so the control should hide its own look. RadioGroup's picture cards and Checkbox's `variant="card"` are Choice cards.
 
 ## Props
 
@@ -75,6 +79,11 @@ The row is at least 24px tall, and 44px on coarse pointers, where the control is
 | `--cy-choice-gap` | Space between the control and the text. Default `--cy-space-4`. |
 | `--cy-choice-done-color` | Label and description colour of a checked `strikeWhenChecked` row. Default `--cy-color-muted`. Checkbox sets it from `--cy-checkbox-done-color`. |
 | `--cy-choice-strike-width` | Thickness of the strike. Default: the border width, or 1/16 of the text size when that is larger. Checkbox sets it from `--cy-checkbox-strike-width`. |
+| `--cy-choice-card-radius` | Corner radius of a card. Default `--cy-radius-card`. |
+| `--cy-choice-card-padding` | Padding inside a card. Default `--cy-space-3`. |
+| `--cy-choice-card-checked-background` | Background of a checked card. Default `--cy-color-accent-soft`. |
+| `--cy-choice-media-background` | Background behind a card's picture. Default `--cy-color-bg`. |
+| `--cy-choice-media-min-height` | Least height of a card's picture. Default 4rem. |
 
 ```ts
 createTheme({ components: { choice: { gap: "12px" } } });

@@ -33,6 +33,7 @@ import { folder } from "@arshad-shah/cynosure/icons";
 | `decorative`          | `false`   | Hides the avatar from assistive technology, for when the name is written beside it                                                                                       |
 | `className` / `style` | –         | Layout only                                                                                                                                                              |
 | `id`, `data-*`, `ref` | –         | Set on the root element (a link target, test or state hooks)                                                                                                             |
+| `role`, `aria-*`      | –         | Set on the root element; the avatar's own `role="img"`, name and `aria-hidden` win                                                                                       |
 
 ## AvatarGroup
 
@@ -44,6 +45,7 @@ import { folder } from "@arshad-shah/cynosure/icons";
 | `size`                | `md`     | The size of every avatar in the group                            |
 | `labels`              | English  | `{ more(count, names) }`: the accessible name of the "+N" avatar |
 | `className` / `style` | –        | Layout only                                                      |
+| `ref`                 | –        | The group element                                                |
 
 ## Behaviour
 

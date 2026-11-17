@@ -21,6 +21,7 @@ Small status or category label in Cynosure's mono "eyebrow" style. Every tone ×
 | `label`                                 | –         | The name of a status dot alone; without it the dot is decoration, hidden from assistive technology     |
 | `onRemove`                              | –         | A remove IconButton at the end, named "Remove <text>": a removable chip (an active filter)             |
 | `labels`                                | –         | `{ remove }`: the remove button's name (default "Remove <text>", or "Remove" for rich content)         |
+| `className` / `style`                   | –         | Layout only                                                                                            |
 | `id`, `data-*`, `role`, `aria-*`, `ref` | –         | Set on the root element (a link target, test or state hooks)                                           |
 
 ## Status dot

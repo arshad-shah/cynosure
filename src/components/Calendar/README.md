@@ -38,6 +38,7 @@ import { Calendar } from "@arshad-shah/cynosure";
 | `markDay`                             | –                 | `(date, state)` returns `{ tone?, dots?, label? }`: marks, not markup |
 | `labels`                              | –                 | `previous`, `next`, `monthPicker`, `previousYear`, `nextYear`         |
 | `size`                                | `md`              | `sm` · `md` · `lg`                                                    |
+| `className` / `style`                 | –                 | Layout only                                                           |
 - Keys: arrows move a day (left and right follow the reading direction) or a week; Home and End go to the ends of the week; Page Up and Down move a month, with Shift a year (31 January plus a month is the end of February); Enter or Space chooses.
 - Each day is named by its full date ("Tuesday 10 November 2026", in the locale's words) followed by any `renderDay` content; today has `aria-current="date"`. The month title is announced as it changes.
 - Days of the previous and next months fill the first and last weeks, muted; choosing one moves there.

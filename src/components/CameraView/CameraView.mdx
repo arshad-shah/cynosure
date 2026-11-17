@@ -48,6 +48,10 @@ A refusal, no camera, or a camera held by another app is explained in a danger N
 
 <Canvas of={Stories.PermissionRefused} />
 
+A camera that stops while running (unplugged, or access taken back) is reported the same way, with `kind: "lost"` and `labels.lost` ("The camera stopped. Check that it is connected, then try again."), and the view turns off instead of showing a black picture.
+
+<Canvas of={Stories.CameraLostWhileRunning} />
+
 ## Props
 
 <ArgTypes of={Stories} />

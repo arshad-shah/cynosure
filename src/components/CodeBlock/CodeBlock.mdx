@@ -55,6 +55,12 @@ A tokenizer of your own needs no CSS: `tokenize` returns `{ text, kind }` stretc
 
 <Canvas of={Stories.Wrapped} />
 
+## Marked lines
+
+`activeLines` (1-based) marks lines, such as the line a debugger is on: a band sits behind the text, the gutter number is bold, and "Line 3 highlighted" is read after the code (`labels.active`).
+
+<Canvas of={Stories.MarkedLines} />
+
 ## Very long code
 
 `maxLines` shows only the first lines, and `maxChars` the first characters (for one enormous line such as Base64). A "Show all" button under the code shows the rest, and "Show less" cuts it again. Only the shown part is highlighted and drawn; the copy button, and the `code` you give your actions (a Download), always take the whole text.

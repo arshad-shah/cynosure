@@ -35,6 +35,10 @@ Text that is not a colour is kept so it can be fixed, the field is marked invali
 
 <Canvas of={Stories.InvalidTextIsExplained} />
 
+While the text is not a colour, the input is invalid (its validity message is `labels.invalid`), so a form around it will not submit: it would send the last good colour. A form reset clears the text and the error.
+
+<Canvas of={Stories.InvalidTextBlocksTheForm} />
+
 ## Opacity
 
 With `alpha`, an opacity slider joins the picker and the value keeps opacity (`#0000ff80`, `rgb(0 0 255 / 0.5)`). Without it, opacity in typed text is dropped.
@@ -65,7 +69,7 @@ With `alpha`, an opacity slider joins the picker and the value keeps opacity (`#
 
 | Input | Result |
 | --- | --- |
-| Typing, then <kbd>Enter</kbd> or leaving | Reads the colour |
+| Typing, then <kbd>Enter</kbd> or leaving | Reads the colour (an <kbd>Enter</kbd> while an input method is composing does not) |
 | Swatch button | Opens the picker (a dialog popover); with `inline` the picker is always shown |
 | Area: <kbd>Left</kbd> / <kbd>Right</kbd> | Saturation down / up (<kbd>Shift</kbd>: by ten) |
 | Area: <kbd>Up</kbd> / <kbd>Down</kbd> | Brightness up / down |
@@ -75,7 +79,7 @@ With `alpha`, an opacity slider joins the picker and the value keeps opacity (`#
 - **Roles:** the input is a labelled text field; the area is a `slider` whose value text names both saturation and brightness; hue and opacity are Sliders.
 - **Swatch:** drawn over a checkerboard so opacity shows, with an outline that stays visible on any colour (at least 3:1 against the field).
 - **Eyedropper:** shown only where the browser offers the EyeDropper API; cancelling it changes nothing.
-- **Forms:** with `name`, the formatted value is submitted; reset restores the default.
+- **Forms:** with `name`, the formatted value is submitted; reset restores the default and clears text that is not a colour. While the text is not a colour, the form will not submit.
 
 ## Touch
 

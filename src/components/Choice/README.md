@@ -45,7 +45,6 @@ The root is a `<label>` for the input, so pressing the label or description togg
 - `--cy-choice-card-checked-background`: background of a checked card
 - `--cy-choice-card-radius`: corner radius of a card
 - `--cy-choice-card-padding`: padding inside a card
-
 - `--cy-choice-gap`: space between the control and the text (default `--cy-space-4`)
 - `--cy-choice-done-color`: label and description colour of a checked `strikeWhenChecked` row (default `--cy-color-muted`; keep it at 4.5:1 or more). Checkbox sets it from `--cy-checkbox-done-color`.
 - `--cy-choice-strike-width`: thickness of the strike (default: the border width, or 1/16 of the text size when that is larger). Checkbox sets it from `--cy-checkbox-strike-width`.
