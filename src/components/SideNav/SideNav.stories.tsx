@@ -14,7 +14,7 @@ import { star } from "../../icons/star.js";
 import { users } from "../../icons/users.js";
 import { contrast } from "../../test/color.js";
 import { computeUnderHostileHost } from "../../test/hostile.js";
-import { focusWithTab } from "../../test/keys.js";
+import { focusWithTab, pressKey } from "../../test/keys.js";
 import { shownFully } from "../../test/settle.js";
 import { CynosureTheme } from "../../theme/CynosureTheme.js";
 import { Badge } from "../Badge/Badge.js";
@@ -47,6 +47,7 @@ const ITEMS: NavEntry[] = [
 ];
 
 const meta = {
+  tags: ["serial"],
   title: "Components/Structure/SideNav",
   component: SideNav,
   args: { label: "Main", items: ITEMS, current: "inbox", collapsed: false, size: "md", onNavigate: fn() },
@@ -382,7 +383,9 @@ export const BarActionWithTheKeyboard: Story = {
     await userEvent.tab({ shift: true });
     const action = canvas.getByRole("button", { name: "Add" });
     await expect(action).toHaveFocus();
-    // Focus is shown with the ring.
+    // Focus is shown with the ring. The tabs above are synthetic, and a browser shows the ring only once it knows the
+    // keyboard is in use (an earlier story may have left it thinking the pointer was): a real, harmless key tells it.
+    await pressKey("Shift");
     await waitFor(() => expect(getComputedStyle(action).boxShadow).toContain("0px 0px 0px"));
     await userEvent.keyboard("{Enter}");
     await expect(add).toHaveBeenCalledTimes(1);
