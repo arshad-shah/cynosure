@@ -3,6 +3,17 @@ import { useControllableState } from "../../foundations/controllable.js";
 import type { Size } from "../../tokens/schema.js";
 import { Disclosure } from "../Disclosure/Disclosure.js";
 
+export interface AccordionTokens {
+  /** Space between the cards with `variant="card"`. */
+  gap: string;
+}
+
+declare module "../../tokens/schema.js" {
+  interface ComponentTokens {
+    accordion: AccordionTokens;
+  }
+}
+
 interface Shared {
   /** `plain` no chrome, `line` a divider under each section, `card` bordered surfaces. Default "line". */
   variant?: "plain" | "line" | "card";

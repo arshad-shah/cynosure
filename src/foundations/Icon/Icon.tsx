@@ -2,6 +2,25 @@ import { type CSSProperties, createElement } from "react";
 import type { IconData } from "../../icons/types.js";
 import type { Tone } from "../../tokens/schema.js";
 
+export interface IconTokens {
+  /** Size of `md` icons where it is set, over `sizeMd` (components set it on their own elements, as QRCode does for its logo). */
+  size: string;
+  /** Size of `size="sm"`. */
+  sizeSm: string;
+  /** Size of `size="md"`, the default. */
+  sizeMd: string;
+  /** Size of `size="lg"`. */
+  sizeLg: string;
+  /** Stroke width of Facet icons (unitless, in the 24 grid). */
+  stroke: string;
+}
+
+declare module "../../tokens/schema.js" {
+  interface ComponentTokens {
+    icon: IconTokens;
+  }
+}
+
 export interface IconProps {
   /** The icon to draw: a Facet icon or a brand mark. */
   icon: IconData;

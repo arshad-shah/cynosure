@@ -3,7 +3,9 @@ import type { ColorTokens, Theme } from "./schema.js";
 /** Tokens live on the document root and shadow hosts only, so nested theme wrappers inherit from their ancestors. */
 export const DEFAULT_SELECTOR = ":where(:root,:host)";
 
-const kebab = (s: string) => s.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`);
+/** `ringColor` → `ring-color`, `size3xl` → `size-3xl` (a number after a letter starts a word, as in `--cy-font-size-3xl`). */
+const kebab = (s: string) =>
+  s.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`).replace(/([a-z])(\d)/g, "$1-$2");
 const MS = new Set(["motion-fast", "motion-base", "motion-slow"]);
 const UNITLESS = /^(scale|radius-factor|radius-segment|font-weight-|font-line-height|z-)/;
 

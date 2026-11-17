@@ -16,6 +16,7 @@ const kebab = (s: string) =>
   s
     .replace(/([a-z0-9])([A-Z])/g, "$1-$2")
     .replace(/([A-Z])([A-Z][a-z])/g, "$1-$2")
+    .replace(/([a-z])(\d)/g, "$1-$2")
     .toLowerCase();
 const camel = (s: string) => s.replace(/-(\w)/g, (_, c: string) => c.toUpperCase());
 const RESERVED = new Set([
