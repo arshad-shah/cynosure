@@ -132,6 +132,10 @@ export const ICON_KEYWORDS = {
   "signature-initials": ["initials", "initial here", "sign", "monogram", "paraph", "letters"],
   "signature-next": ["next signature", "sign next", "next place to sign", "go to", "forward", "jump"],
   "page-rotate": ["rotate clockwise", "turn page", "orientation", "rotate right"],
+  "flip-horizontal": ["mirror", "flip left right", "reflect", "horizontal flip", "symmetry"],
+  "flip-vertical": ["mirror", "flip upside down", "reflect", "vertical flip", "symmetry"],
+  pixelate: ["mosaic", "pixels", "censor", "redact", "blur", "obscure", "anonymise"],
+  "step-marker": ["numbered step", "callout", "annotation", "badge", "number", "marker", "tutorial"],
   "page-rotate-ccw": [
     "rotate counterclockwise",
     "rotate anticlockwise",
@@ -215,6 +219,7 @@ export const ICON_KEYWORDS = {
   binary: ["bits", "zeros and ones", "base 2", "bytes", "code"],
 
   // media
+  "image-code": ["code to image", "code screenshot", "snippet", "carbon", "share code", "picture"],
   camera: ["photo", "picture", "capture", "snapshot", "photograph"],
   gif: ["animation", "animated image", "meme", "clip"],
   headphones: ["audio", "listen", "music", "sound", "headset"],
@@ -278,6 +283,16 @@ export const ICON_KEYWORDS = {
 
   // security
   key: ["password", "access", "credential", "api key", "secret", "unlock", "login"],
+  "key-pair": [
+    "public key",
+    "private key",
+    "keypair",
+    "asymmetric",
+    "encryption",
+    "ssh",
+    "pgp",
+    "generate keys",
+  ],
   lock: ["secure", "private", "password", "protected", "padlock", "closed"],
   shield: ["security", "protect", "safe", "guard", "defence", "privacy"],
   "shield-alert": ["security warning", "threat", "risk", "vulnerable", "unsafe"],

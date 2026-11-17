@@ -8,8 +8,8 @@ import { pathToFileURL } from "node:url";
 import { gzipSync } from "node:zlib";
 import { build, type Rolldown } from "vite";
 
-/** The budget in bytes, gzipped: the measured size (24.04 kB, 463 icons) with a little room. Raise it when icons are added. */
-export const ICONS_BY_NAME_BUDGET = 24_500;
+/** The budget in bytes, gzipped: the measured size (24.68 kB, 479 icons) with a little room. Raise it when icons are added. */
+export const ICONS_BY_NAME_BUDGET = 25_000;
 
 /** The minified, gzipped size of `src/icons/by-name.ts` as one bundle, in bytes. */
 export async function iconsByNameSize(): Promise<number> {

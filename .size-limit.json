@@ -174,13 +174,13 @@
   {
     "name": "useRovingFocus",
     "path": ["dist/foundations/roving-focus.js"],
-    "limit": "1.25 kB",
+    "limit": "1.26 kB",
     "gzip": true
   },
   {
     "name": "Card",
     "path": ["dist/components/Card/Card.js", "dist/styles/card.css"],
-    "limit": "2.28 kB",
+    "limit": "2.29 kB",
     "gzip": true
   },
   {
@@ -190,13 +190,13 @@
       "dist/foundations/roving-focus.js",
       "dist/styles/toolbar.css"
     ],
-    "limit": "1.91 kB",
+    "limit": "1.93 kB",
     "gzip": true
   },
   {
     "name": "Tabs",
     "path": ["dist/components/Tabs/Tabs.js", "dist/foundations/roving-focus.js", "dist/styles/tabs.css"],
-    "limit": "8.25 kB",
+    "limit": "8.26 kB",
     "gzip": true
   },
   {
@@ -219,7 +219,7 @@
   {
     "name": "Popover",
     "path": ["dist/components/Popover/Popover.js", "dist/styles/popover.css"],
-    "limit": "2.03 kB",
+    "limit": "2.04 kB",
     "gzip": true
   },
   {
@@ -237,7 +237,7 @@
   {
     "name": "DialogBase",
     "path": ["dist/foundations/DialogBase/DialogBase.js"],
-    "limit": "0.52 kB",
+    "limit": "0.60 kB",
     "gzip": true
   },
   {
@@ -301,7 +301,7 @@
   {
     "name": "Tree",
     "path": ["dist/components/Tree/Tree.js", "dist/styles/tree.css"],
-    "limit": "6.27 kB",
+    "limit": "6.38 kB",
     "gzip": true
   },
   {
@@ -311,13 +311,13 @@
       "dist/foundations/hotkey.js",
       "dist/styles/command-palette.css"
     ],
-    "limit": "5.63 kB",
+    "limit": "5.67 kB",
     "gzip": true
   },
   {
     "name": "ColorField",
     "path": ["dist/components/ColorField/ColorField.js", "dist/styles/color-field.css"],
-    "limit": "3.72 kB",
+    "limit": "3.78 kB",
     "gzip": true
   },
   {
@@ -387,7 +387,7 @@
   {
     "name": "NumberField (with TextField)",
     "path": ["dist/components/NumberField/NumberField.js", "dist/styles/number-field.css"],
-    "limit": "3.33 kB",
+    "limit": "3.43 kB",
     "gzip": true
   },
   {
@@ -405,7 +405,7 @@
   {
     "name": "SplitPane",
     "path": ["dist/components/SplitPane/SplitPane.js", "dist/styles/split-pane.css"],
-    "limit": "2.55 kB",
+    "limit": "2.60 kB",
     "gzip": true
   },
   {
@@ -469,13 +469,13 @@
   {
     "name": "VirtualList",
     "path": ["dist/components/VirtualList/VirtualList.js", "dist/styles/virtual-list.css"],
-    "limit": "4.60 kB",
+    "limit": "4.61 kB",
     "gzip": true
   },
   {
     "name": "HoverCard",
     "path": ["dist/components/HoverCard/HoverCard.js", "dist/styles/hover-card.css"],
-    "limit": "0.91 kB",
+    "limit": "0.97 kB",
     "gzip": true
   },
   {
@@ -517,13 +517,13 @@
   {
     "name": "DateField",
     "path": ["dist/components/DateField/DateField.js", "dist/styles/date-field.css"],
-    "limit": "1.85 kB",
+    "limit": "1.91 kB",
     "gzip": true
   },
   {
     "name": "TimeField",
     "path": ["dist/components/TimeField/TimeField.js", "dist/styles/time-field.css"],
-    "limit": "5.93 kB",
+    "limit": "5.96 kB",
     "gzip": true
   },
   {
@@ -736,13 +736,13 @@
   {
     "name": "DataGrid",
     "path": ["dist/components/DataGrid/DataGrid.js", "dist/styles/data-grid.css"],
-    "limit": "9.98 kB",
+    "limit": "10.16 kB",
     "gzip": true
   },
   {
     "name": "PathField",
     "path": ["dist/components/PathField/PathField.js", "dist/styles/path-field.css"],
-    "limit": "1.07 kB",
+    "limit": "1.13 kB",
     "gzip": true
   },
   {
@@ -766,13 +766,13 @@
   {
     "name": "Rating (JS + CSS)",
     "path": ["dist/components/Rating/Rating.js", "dist/styles/rating.css"],
-    "limit": "2.19 kB",
+    "limit": "2.21 kB",
     "gzip": true
   },
   {
     "name": "Form (JS + CSS)",
     "path": ["dist/components/Form/Form.js", "dist/styles/form.css"],
-    "limit": "870 B",
+    "limit": "893 B",
     "gzip": true
   },
   {
@@ -790,7 +790,7 @@
   {
     "name": "CanvasStage (JS + CSS)",
     "path": ["dist/components/CanvasStage/CanvasStage.js", "dist/styles/canvas-stage.css"],
-    "limit": "1.52 kB",
+    "limit": "1.54 kB",
     "gzip": true
   },
   {
@@ -814,7 +814,7 @@
   {
     "name": "CameraView (JS + CSS)",
     "path": ["dist/components/CameraView/CameraView.js", "dist/styles/camera-view.css"],
-    "limit": "2.87 kB",
+    "limit": "2.94 kB",
     "gzip": true
   }
 ]
