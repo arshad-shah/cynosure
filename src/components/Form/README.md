@@ -18,7 +18,7 @@ import { Button, Form, TextField } from "@arshad-shah/cynosure";
 | `gap`                 | `--cy-form-gap` | Space token between the fields, stacked in a column                                           |
 | `noValidate`, …       | –               | Native form attributes pass through; the ref is the form element                              |
 | `className` / `style` | –               | Layout only                                                                                   |
-- Enter in a text field submits through `requestSubmit()`, so validation runs and a `required` field left empty stops it. Enter in a text area is a new line; a field that handles Enter itself (TagInput, Combobox) prevents it and keeps it; an IME's Enter is ignored; Enter with a modifier key is left alone.
+- Enter in a text field submits through `requestSubmit()`, so validation runs and a `required` field left empty stops it. Enter in a text area is a new line; a field that handles Enter itself (TagInput, Combobox) prevents it and keeps it; an IME's Enter is ignored; Enter with a modifier key is left alone. A field that commits its text on Enter (NumberField, DateField, TimeField, ColorField) is rendered first, so the form submits the value just committed.
 - A `type="submit"` Button submits; `type="reset"` restores the fields.
 
 ## Tokens

@@ -8,10 +8,26 @@ export class CynosureThemeError extends Error {
 /** Linear-free sRGB triple, each channel 0..1. */
 export type Rgb = [number, number, number];
 
+const NUMBER = /^([+-]?(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?)([a-z%]*)$/;
+
+/** A number, or a percentage of `scale`; NaN for anything else (a unit, a word). */
 function num(part: string, scale: number): number {
-  const p = part.trim();
-  return p.endsWith("%") ? (Number.parseFloat(p) / 100) * scale : Number.parseFloat(p);
+  const [, n, unit] = NUMBER.exec(part.trim()) ?? [];
+  if (unit === "") return Number(n);
+  return unit === "%" ? (Number(n) / 100) * scale : Number.NaN;
 }
+
+const TO_DEG: Record<string, number> = { "": 1, deg: 1, grad: 0.9, rad: 180 / Math.PI, turn: 360 };
+
+/** A hue in degrees (bare, `deg`, `grad`, `rad` or `turn`), wrapped into 0..360; NaN for any other unit. */
+function hue(part: string): number {
+  const [, n, unit = ""] = NUMBER.exec(part.trim()) ?? [];
+  const factor = TO_DEG[unit];
+  return factor === undefined ? Number.NaN : (((Number(n) * factor) % 360) + 360) % 360;
+}
+
+/** hsl() saturation or lightness as 0..1: a percentage, or (modern syntax) a bare number out of 100. */
+const percent = (part: string) => num(part.trim().endsWith("%") ? part : `${part}%`, 1);
 
 /** Parses hex, rgb(), hsl() and oklch() colours. Throws CynosureThemeError for anything else. */
 export function parseColor(input: string): Rgb {
@@ -28,10 +44,11 @@ export function parseColor(input: string): Rgb {
     const finite = (values: number[]) => values.every(Number.isFinite);
     const rgbParts = [num(a, 255), num(b, 255), num(c, 255)];
     if (fn[1] === "rgb" && finite(rgbParts)) return rgbParts.map((v) => clamp(v / 255)) as Rgb;
-    const hslParts = [Number.parseFloat(a), num(b, 1), num(c, 1)];
+    const hslParts = [hue(a), percent(b), percent(c)];
     if (fn[1] === "hsl" && finite(hslParts)) return hslToRgb(...(hslParts as [number, number, number]));
-    const values = [num(a, 1), num(b, 0.4), Number.parseFloat(c)];
-    if (values.every(Number.isFinite)) return oklchToRgb(...(values as [number, number, number]));
+    const values = [num(a, 1), num(b, 0.4), hue(c)];
+    if (fn[1] === "oklch" && values.every(Number.isFinite))
+      return oklchToRgb(...(values as [number, number, number]));
   }
   throw new CynosureThemeError(
     `Cynosure cannot read the colour "${input}". Use hex, rgb(), hsl() or oklch().`,

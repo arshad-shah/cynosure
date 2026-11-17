@@ -297,6 +297,8 @@ export function TagInput({
         });
         return;
       case "Escape":
+        // Handled here (back to the field), so an enclosing dialog or popover does not close too.
+        event.preventDefault();
         toInput();
         return;
     }

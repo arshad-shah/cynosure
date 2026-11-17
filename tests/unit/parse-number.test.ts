@@ -67,4 +67,22 @@ describe("parseNumber", () => {
     expect(parseNumber("-", "en-US")).toBeNull();
     expect(parseNumber("1-2", "en-US")).toBeNull();
   });
+
+  it("rejects text with characters it does not know, rather than dropping them", () => {
+    expect(parseNumber("1e5", "en-US")).toBeNull();
+    expect(parseNumber("12abc3", "en-US")).toBeNull();
+    expect(parseNumber("5$", "en-US")).toBeNull();
+    expect(parseNumber("1#2", "de-DE")).toBeNull();
+  });
+
+  it("reads every script's decimal digits, whatever the locale", () => {
+    // Full-width digits, as a Japanese or Chinese keyboard types them.
+    expect(parseNumber("1２3", "en-US")).toBe(123);
+    expect(parseNumber("４２", "en-US")).toBe(42);
+    expect(parseNumber("٤٢", "en-US")).toBe(42);
+    expect(parseNumber("४२.५", "en-US")).toBe(42.5);
+    // Mathematical digits run in blocks of ten, back to back.
+    expect(parseNumber("\u{1D7D0}\u{1D7E1}", "en-US")).toBe(29);
+    expect(parseNumber("+5", "en-US")).toBe(5);
+  });
 });

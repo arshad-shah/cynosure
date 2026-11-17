@@ -647,6 +647,20 @@ export const TooltipInsideDoesNotSwallowTheBackdropClick: Story = {
   },
 };
 
+export const NotDismissibleStaysOpenWhenTheBrowserClosesIt: Story = {
+  args: { dismissible: false, title: "Exporting", children: "Working…" },
+  render: (args) => <Dialog {...args} open />,
+  play: async ({ args }) => {
+    const el = dialogEl();
+    await waitFor(() => expect(el.open).toBe(true));
+    // A close the page could not veto (the browser's own, after repeated close requests) shows it again.
+    el.close();
+    await waitFor(() => expect(el.open).toBe(true));
+    await expect(el.matches(":modal")).toBe(true);
+    await expect(args.onOpenChange).not.toHaveBeenCalled();
+  },
+};
+
 export const NeverWritesToBody: Story = {
   play: async ({ canvas, userEvent }) => {
     const changes: MutationRecord[] = [];

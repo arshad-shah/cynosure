@@ -29,7 +29,7 @@ A search-and-run list of commands in a modal dialog, opened from anywhere with C
 - `filter` replaces that search (a fuzzy matcher of your own). It is called for each command while there is a query: return `{ score, positions }` (lower scores first, ties in `commands`' order; `positions` are the label's matched characters, marked), `true` to keep the command unmarked, or `null`/`false` to drop it.
 - Browsing (nothing typed), commands are listed under their `group` headings. Search results are one flat list in rank order, and each row shows its group as a small Badge; so do the recent commands.
 - A `disabled` command with a `disabledReason` shows the reason (its description), is reached by the arrows and announces the reason when chosen; one without a reason is skipped.
-- Arrows wrap; Enter or a click runs; Escape, the backdrop or the shortcut close. Focus returns to where it was.
+- Arrows wrap; Enter or a click runs; Escape, the backdrop or the shortcut close. Focus returns to where it was; opened from a menu item, to the button that opened the menu.
 - A command's `shortcut` (`["Ctrl", "S"]`, or `"mod+s"` for this platform's key names) is display only, so bind those keys with `useHotkey`.
 - Works in shadow roots (extension content scripts): the shortcut is heard from inside them.
 

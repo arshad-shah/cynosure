@@ -1,4 +1,4 @@
-import { type CSSProperties, type KeyboardEvent, type ReactNode, useId } from "react";
+import { type CSSProperties, type KeyboardEvent, type ReactNode, useEffect, useId, useRef } from "react";
 import { ChoiceBase } from "../../foundations/ChoiceBase/ChoiceBase.js";
 import type { Size, Tone } from "../../tokens/schema.js";
 import { Choice } from "../Choice/Choice.js";
@@ -37,7 +37,7 @@ export interface RadioGroupProps {
   error?: ReactNode;
   /** The choices: `{ value, label, description?, disabled? }`. */
   options: RadioOption[];
-  /** Native group name (generated when omitted). */
+  /** Native group name, submitted with the value. Without it the radios share a generated name and nothing is submitted. */
   name?: string;
   /** Controlled selected value. */
   value?: string;
@@ -116,6 +116,16 @@ export function RadioGroup({
 }: RadioGroupProps) {
   const generated = useId();
   const groupName = name ?? `cy-radio-${generated}`;
+  const group = useRef<HTMLDivElement>(null);
+  // Without `name` the radios still need one to be a group (arrows, one checked, required, reset), but nothing is
+  // submitted under it, as with every other field: the generated name is taken out of the form's data.
+  useEffect(() => {
+    const owner = group.current?.querySelector("input")?.form;
+    if (name !== undefined || !owner) return;
+    const drop = (event: FormDataEvent) => event.formData.delete(groupName);
+    owner.addEventListener("formdata", drop);
+    return () => owner.removeEventListener("formdata", drop);
+  }, [name, groupName]);
   return (
     <Field
       describedBy={describedBy}
@@ -132,6 +142,7 @@ export function RadioGroup({
       {() => (
         // biome-ignore lint/a11y/noStaticElementInteractions: delegated arrow keys for the native radios inside
         <div
+          ref={group}
           className="cy-radio-group"
           data-orientation={variant === "card" ? undefined : orientation}
           data-variant={variant === "card" ? "card" : undefined}

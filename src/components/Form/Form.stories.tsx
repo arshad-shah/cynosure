@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react-vite";
 import { expect, fn, waitFor } from "storybook/test";
 import { computeUnderHostileHost } from "../../test/hostile.js";
 import { Button } from "../Button/Button.js";
+import { NumberField } from "../NumberField/NumberField.js";
 import { TagInput } from "../TagInput/TagInput.js";
 import { TextArea } from "../TextArea/TextArea.js";
 import { TextField } from "../TextField/TextField.js";
@@ -126,6 +127,24 @@ export const EnterWhileComposingDoesNotSubmit: Story = {
     // An IME's Enter confirms the composition, never the form.
     field.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true, isComposing: true }));
     await expect(args.onSubmit).not.toHaveBeenCalled();
+  },
+};
+
+/** A field that commits its text on Enter (NumberField) submits the committed value, not the one before it. */
+export const EnterSubmitsTheValueAFieldJustCommitted: Story = {
+  args: { label: "Copies" },
+  render: (args) => (
+    <Form {...args}>
+      <NumberField label="Count" name="count" defaultValue={1} />
+      <TextField label="Note" name="note" />
+    </Form>
+  ),
+  play: async ({ args, canvas, userEvent }) => {
+    const field = canvas.getByRole("spinbutton", { name: "Count" });
+    await userEvent.clear(field);
+    await userEvent.type(field, "42{Enter}");
+    await expect(args.onSubmit).toHaveBeenCalledTimes(1);
+    await expect(sent(args.onSubmit)).toEqual({ count: "42", note: "" });
   },
 };
 

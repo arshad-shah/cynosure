@@ -25,7 +25,7 @@ One choice from a short list, on native radios: arrow keys move and select (wrap
 | `variant`                                    | `list`          | `list` · `card`: picture cards in a grid                                                |
 | `columns`                                    | `2`             | Cards per row; a narrow container wraps to fewer                                        |
 | `size` / `tone`                              | `md` / `accent` | Shared vocabulary                                                                       |
-| `name`, `required`, `disabled`               | –               | Native                                                                                  |
+| `name`, `required`, `disabled`               | –               | Native; without `name` nothing is submitted                                             |
 | `className` / `style`                        | –               | Layout only                                                                             |
 
 ## Cards

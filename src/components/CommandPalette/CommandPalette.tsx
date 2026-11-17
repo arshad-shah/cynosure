@@ -2,7 +2,7 @@ import { type CSSProperties, Fragment, type KeyboardEvent, useId, useMemo, useRe
 import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js";
 import { useControllableState } from "../../foundations/controllable.js";
 import { DialogBase } from "../../foundations/DialogBase/DialogBase.js";
-import { deepActiveElement } from "../../foundations/focus.js";
+import { deepActiveElement, reachable } from "../../foundations/focus.js";
 import { useHotkey } from "../../foundations/hotkey.js";
 import { Icon } from "../../foundations/Icon/Icon.js";
 import { InputBase } from "../../foundations/InputBase/InputBase.js";
@@ -204,6 +204,10 @@ export function CommandPalette({
   const input = useRef<HTMLInputElement>(null);
   const list = useRef<HTMLDivElement>(null);
   const returnTo = useRef<HTMLElement | null>(null);
+  const wasOpen = useRef(false);
+  // Where focus was before opening: read while rendering, because DialogBase's showModal moves it first.
+  if (isOpen && !wasOpen.current) returnTo.current = deepActiveElement();
+  wasOpen.current = isOpen;
 
   useHotkey(shortcut, () => setOpen(!isOpen));
 
@@ -245,14 +249,17 @@ export function CommandPalette({
     wrap: true,
   });
 
-  // Opening: remember where focus was, start fresh, and focus the search field.
+  // Opening: start fresh and focus the search field. Closing: if focus came from a menu item (hidden now), return
+  // it to the button that opened the menu.
   useClientLayoutEffect(() => {
     if (!isOpen) return;
-    returnTo.current = deepActiveElement();
     setQuery("");
     say("");
     setActive(0);
     input.current?.focus();
+    return () => {
+      returnTo.current = reachable(returnTo.current);
+    };
   }, [isOpen]);
   useDismiss({
     open: isOpen,

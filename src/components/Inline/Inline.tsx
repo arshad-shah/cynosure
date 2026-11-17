@@ -1,5 +1,6 @@
 import { Children, type CSSProperties, forwardRef, type ReactNode } from "react";
 import type {
+  BlockProps,
   BoxProps,
   LayoutAttributes,
   PaddingProps,
@@ -21,7 +22,7 @@ declare module "../../tokens/schema.js" {
   }
 }
 
-export interface InlineProps extends PaddingProps, VisibilityProps, BoxProps, LayoutAttributes {
+export interface InlineProps extends PaddingProps, VisibilityProps, BoxProps, BlockProps, LayoutAttributes {
   /** Space token between children. */
   gap?: Space;
   /** Cross-axis alignment of children. They are centred when it is not set. */

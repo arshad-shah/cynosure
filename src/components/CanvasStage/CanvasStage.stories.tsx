@@ -149,6 +149,35 @@ export const CrossingAChildKeepsTheDropHint: Story = {
   },
 };
 
+export const DragOverTheOverlayEndsWhenItLeaves: Story = {
+  render: (args) => (
+    <CanvasStage {...args} overlay={<Button>Open a file</Button>}>
+      <canvas data-testid="surface" />
+    </CanvasStage>
+  ),
+  play: async ({ canvas, canvasElement }) => {
+    const stage = stageOf(canvasElement);
+    const button = canvas.getByRole("button", { name: "Open a file" });
+    const data = new DataTransfer();
+    data.items.add(riv);
+    const fire = (target: Element, type: string) =>
+      target.dispatchEvent(new DragEvent(type, { bubbles: true, cancelable: true, dataTransfer: data }));
+    // A file comes in over the overlay's button: the drop hint covers the stage.
+    fire(button, "dragenter");
+    await waitFor(() => expect(stage).toHaveAttribute("data-over"));
+    const hint = (stage.querySelector("[data-drop]") as HTMLElement).firstElementChild as HTMLElement;
+    // As the browser does, the hint now under the pointer is entered and the button left (a browser sends no
+    // leave to an element taken out of the page).
+    fire(hint, "dragenter");
+    if (button.isConnected) fire(button, "dragleave");
+    // Leaving the hint for outside the stage ends the drag: the hint goes and the overlay is back.
+    fire(hint, "dragleave");
+    await waitFor(() => expect(stage).not.toHaveAttribute("data-over"));
+    await expect(canvas.queryByText("Drop to open")).toBeNull();
+    await expect(canvas.getByRole("button", { name: "Open a file" })).toBeVisible();
+  },
+};
+
 export const TextDragsAndLeavingAreIgnored: Story = {
   play: async ({ args, canvas, canvasElement }) => {
     const stage = stageOf(canvasElement);

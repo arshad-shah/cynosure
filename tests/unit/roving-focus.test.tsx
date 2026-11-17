@@ -180,3 +180,20 @@ describe("useRovingFocus with current", () => {
     expect(getByText("A").tabIndex).toBe(0);
   });
 });
+
+describe("useRovingFocus in a shadow root", () => {
+  it("keeps the tab stop on the focused item when the group changes, not on the selection", async () => {
+    const host = document.createElement("div");
+    document.body.append(host);
+    const mount = document.createElement("div");
+    host.attachShadow({ mode: "open" }).append(mount);
+    const { getByText, rerender } = render(<Current current={0} follow />, { container: mount });
+    act(() => getByText("C").focus());
+    expect(getByText("C").tabIndex).toBe(0);
+    // A change inside the group (the current entry moves) while focus stays on C, deep inside the shadow root.
+    rerender(<Current current={1} follow />);
+    await act(async () => {});
+    expect(getByText("C").tabIndex).toBe(0);
+    host.remove();
+  });
+});

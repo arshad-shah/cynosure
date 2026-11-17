@@ -6,6 +6,7 @@ import {
   type KeyboardEvent,
   type ReactNode,
 } from "react";
+import { flushSync } from "react-dom";
 import { isComposing } from "../../foundations/keys.js";
 import { type Space, space } from "../../foundations/layout.js";
 
@@ -76,7 +77,11 @@ export const Form = forwardRef<HTMLFormElement, FormProps>(function Form(
       return;
     // One way in for every case: the browser's own implicit submission would fire too, and only with a button.
     event.preventDefault();
-    event.currentTarget.requestSubmit();
+    // A field that commits its text on Enter (NumberField, DateField) has just set its value: render it into the form
+    // first, so the submit reads the committed value, not the one before it.
+    const form = event.currentTarget;
+    flushSync(() => {});
+    form.requestSubmit();
   };
   return (
     <form

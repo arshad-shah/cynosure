@@ -29,7 +29,7 @@ A modal dialog in the browser top layer, built on the `DialogBase` foundation (n
 | `actions`                               | –                    | Buttons along the bottom, outside the scrolling content                                                                                |
 | `size`                                  | `md`                 | Width preset: `sm` 360 · `md` 480 · `lg` 640 px (never wider than the container), or `full`: the whole viewport, inside the safe areas |
 | `titleHidden`                           | `false`              | Hide the title visually; it stays the accessible name and `h2`                                                                         |
-| `dismissible`                           | `true`               | Escape, backdrop and close button; `false` leaves only your actions                                                                    |
+| `dismissible`                           | `true`               | Escape, backdrop and close button; `false` leaves only your actions (a close the browser forces shows it again)                        |
 | `closeButton`                           | `true`               | Show the close button; `false` hides it while Escape and the backdrop still close the dialog                                           |
 | `keepMounted`                           | `false`              | Keep the content in the DOM while closed (state survives closing)                                                                      |
 | `labels`                                | `{ close: "Close" }` | Built-in strings                                                                                                                       |

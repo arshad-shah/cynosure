@@ -5,6 +5,7 @@ import { Icon } from "../../foundations/Icon/Icon.js";
 import { hash } from "../../icons/index.js";
 import { computeUnderHostileHost } from "../../test/hostile.js";
 import { Button } from "../Button/Button.js";
+import { Dialog } from "../Dialog/Dialog.js";
 import { Stack } from "../Stack/Stack.js";
 import { TagInput } from "./TagInput.js";
 
@@ -134,6 +135,30 @@ export const ArrowKeysThroughTags: Story = {
     await expect(canvas.getByRole("button", { name: "Remove design" })).toHaveAttribute("tabindex", "-1");
     await userEvent.keyboard("{ArrowLeft}{Escape}");
     await expect(input).toHaveFocus();
+  },
+};
+
+export const EscapeOnATagStaysInsideADialog: Story = {
+  render: (args) => (
+    <Dialog title="Edit topics" defaultOpen>
+      <TagInput {...args} />
+    </Dialog>
+  ),
+  play: async ({ canvas, userEvent }) => {
+    const dialog = document.querySelector("dialog.cy-dialog") as HTMLDialogElement;
+    await waitFor(() => expect(dialog.open).toBe(true));
+    const input = canvas.getByRole("textbox", { name: "Topics" });
+    input.focus();
+    await userEvent.keyboard("{ArrowLeft}");
+    await expect(canvas.getByRole("button", { name: "Remove design" })).toHaveFocus();
+    // Escape on a tag returns to the field and does nothing else: the dialog stays open.
+    await userEvent.keyboard("{Escape}");
+    await expect(input).toHaveFocus();
+    await new Promise((r) => setTimeout(r, 50));
+    await expect(dialog.open).toBe(true);
+    // Escape in the field is the dialog's.
+    await userEvent.keyboard("{Escape}");
+    await waitFor(() => expect(dialog.open).toBe(false));
   },
 };
 

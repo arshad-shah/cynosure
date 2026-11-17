@@ -81,7 +81,7 @@ Pass `value` and `onChange(value)` to own the state. Without `value`, the group 
 | <kbd>Up</kbd>, <kbd>Down</kbd> in cards | Move a row (by the columns shown) and select; stay put at the first or last row or on a disabled card |
 | Click, tap | Selects the option |
 
-- **Native radios:** the group shares one `name` (generated when omitted), so forms, `form.reset()` and `required` validation are native.
+- **Native radios:** the group shares one `name`, so forms, `form.reset()` and `required` validation are native. Without `name` the radios share a generated one, which is never submitted.
 - **Group label:** the label, description and error are linked to the group through `Field`.
 - **Right-to-left:** arrow keys follow the reading direction.
 - **Cards:** the native radio stays in each card, visually hidden; the label names it and the picture is not read. The chosen card has an accent border and soft background (`Highlight` in forced colours), the focused one the focus ring.

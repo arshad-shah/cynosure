@@ -1452,3 +1452,171 @@ export const TouchOpensRowDetails: Story = {
     await expect(canvas.getByText("Details of row 1")).toBeVisible();
   },
 };
+
+let valueCalls = 0;
+let idCalls = 0;
+const COUNTED_ROWS = Array.from({ length: 10_000 }, (_, i) => i);
+const COUNTED_COLUMNS: DataGridColumn<number>[] = [
+  {
+    key: "n",
+    header: "Number",
+    sortable: true,
+    value: (r) => {
+      valueCalls++;
+      return r;
+    },
+  },
+  { key: "half", header: "Half", value: (r) => Math.floor(r / 2) },
+];
+/** Ten thousand rows sorted by the parent, with an inline `getRowId` and a parent that renders again. */
+function Counted() {
+  const [renders, setRenders] = useState(0);
+  return (
+    <Stack gap="3" data-renders={renders}>
+      <DataGrid
+        label="Counted"
+        columns={COUNTED_COLUMNS}
+        rows={COUNTED_ROWS}
+        getRowId={(r) => {
+          idCalls++;
+          return String(r);
+        }}
+        sort={{ key: "n", direction: "descending" }}
+      />
+      <Button onClick={() => setRenders((n) => n + 1)}>Render again</Button>
+    </Stack>
+  );
+}
+
+/**
+ * Scrolling a sorted grid, or the parent rendering again with an inline `getRowId` and a new `sort` object of the same
+ * sort, sorts and keys nothing again. Counted, not timed: sorting ten thousand rows reads well over 100,000 values.
+ */
+export const ScrollingDoesNotSortOrKeyAgain: Story = {
+  render: () => <Counted />,
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const g = canvas.getByRole("grid", { name: "Counted" });
+    await waitFor(() => expect(cell(canvasElement, "9999")).toBeVisible());
+    valueCalls = 0;
+    idCalls = 0;
+    for (const n of [1, 2, 3, 4, 5]) {
+      g.scrollTop = n * 4000;
+      // The rows at the new position are rendered (rows are at most 60px tall).
+      await waitFor(() =>
+        expect(
+          Math.max(
+            ...[...canvasElement.querySelectorAll(".cy-data-grid-row")].map((r) =>
+              Number(r.getAttribute("aria-rowindex")),
+            ),
+          ),
+        ).toBeGreaterThan((n * 4000) / 60),
+      );
+    }
+    // Only the cells rendered at each position read a value: a few hundred at most, never the whole column.
+    await expect(valueCalls).toBeLessThan(2000);
+    await expect(idCalls).toBe(0);
+    await userEvent.click(canvas.getByRole("button", { name: "Render again" }));
+    await userEvent.click(canvas.getByRole("button", { name: "Render again" }));
+    await expect(valueCalls).toBeLessThan(2000);
+    await expect(idCalls).toBe(0);
+  },
+};
+
+/**
+ * A hidden column neither filters nor sorts: what shapes the rows is always on screen. Its filter text and sort are
+ * kept, and apply again when the column is shown.
+ */
+export const AHiddenColumnNeitherFiltersNorSorts: Story = {
+  args: {
+    ...people,
+    rows: TEAM,
+    columns: [
+      { key: "name", header: "Name", filter: "text", sortable: true },
+      {
+        key: "age",
+        header: "Age",
+        align: "end",
+        filter: "number",
+        sortable: true,
+      },
+      { key: "city", header: "City", filter: "text" },
+    ],
+    columnMenu: true,
+  } as Partial<DataGridProps<unknown>>,
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    await userEvent.type(canvas.getByRole("textbox", { name: "Filter City" }), "Lon");
+    await expect(names(canvasElement)).toEqual(["Cy", "Bo"]);
+    await userEvent.click(canvas.getByRole("button", { name: "Age" }));
+    await userEvent.click(canvas.getByRole("button", { name: "Age" }));
+    await expect(names(canvasElement)).toEqual(["Cy", "Bo"]);
+    // Hiding City drops its filter; hiding Age drops its sort.
+    await userEvent.click(canvas.getByRole("button", { name: "City column options" }));
+    await userEvent.click(await canvas.findByRole("menuitem", { name: "Hide column" }));
+    await expect(names(canvasElement)).toEqual(["Cy", "Al", "Ann", "Bo"]);
+    await userEvent.click(canvas.getByRole("button", { name: "Age column options" }));
+    await userEvent.click(await canvas.findByRole("menuitem", { name: "Hide column" }));
+    await expect(names(canvasElement)).toEqual(["Cy", "Ann", "Bo", "Al"]);
+    // Shown again, the column's filter is back in its field and applies again.
+    await userEvent.click(canvas.getByRole("button", { name: "Name column options" }));
+    await userEvent.click(await canvas.findByRole("menuitem", { name: "Columns" }));
+    await userEvent.click(await canvas.findByRole("menuitemcheckbox", { name: "City" }));
+    await expect(canvas.getByRole("textbox", { name: "Filter City" })).toHaveValue("Lon");
+    await expect(names(canvasElement)).toEqual(["Cy", "Bo"]);
+  },
+};
+
+/** People whose parent adds a person at the top. */
+function Growing() {
+  const [rows, setRows] = useState(PEOPLE);
+  return (
+    <Stack gap="3">
+      <DataGrid {...(people as DataGridProps<Person>)} rows={rows} />
+      <Button
+        onClick={() =>
+          setRows((all) => [{ id: `n${all.length}`, name: "Ken", age: 83, city: "Berkeley" }, ...all])
+        }
+      >
+        Add a person
+      </Button>
+    </Stack>
+  );
+}
+
+/** The tab stop stays on its cell's row when rows are added above it. */
+export const TabStopFollowsItsRowWhenRowsChange: Story = {
+  render: () => <Growing />,
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    await userEvent.click(cell(canvasElement, "Linus"));
+    await expect(focused()).toBe("Linus");
+    await userEvent.click(canvas.getByRole("button", { name: "Add a person" }));
+    await expect(names(canvasElement)).toEqual(["Ken", "Grace", "ada", "Linus", "Barbara"]);
+    await userEvent.tab({ shift: true });
+    await expect(focused()).toBe("Linus");
+  },
+};
+
+/** A grid whose density the parent switches. */
+function Density() {
+  const [size, setSize] = useState<"sm" | "md">("md");
+  return (
+    <Stack gap="3">
+      <DataGrid {...huge} columns={HUGE_COLUMNS.slice(0, 4)} size={size} />
+      <Button onClick={() => setSize((s) => (s === "md" ? "sm" : "md"))}>Switch density</Button>
+    </Stack>
+  );
+}
+
+/** Changing `size` places the rows at their new height: no gaps, no overlap. */
+export const ChangingSizeRePlacesTheRows: Story = {
+  render: () => <Density />,
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const top = (text: string) => cell(canvasElement, text).getBoundingClientRect().top;
+    const height = () => cell(canvasElement, "R1C1").getBoundingClientRect().height;
+    const tall = height();
+    await expect(top("R2C1") - top("R1C1")).toBeCloseTo(tall, 0);
+    await userEvent.click(canvas.getByRole("button", { name: "Switch density" }));
+    await waitFor(() => expect(height()).toBeLessThan(tall));
+    await waitFor(() => expect(top("R2C1") - top("R1C1")).toBeCloseTo(height(), 0));
+    await expect(top("R5C1") - top("R1C1")).toBeCloseTo(4 * height(), 0);
+  },
+};

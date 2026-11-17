@@ -135,6 +135,24 @@ export const ArrowsStepThePartUnderTheCaret: Story = {
   },
 };
 
+/** Keys that belong to an input method's composition are not the field's: no step, no commit. */
+export const KeysWhileComposingAreTheInputMethods: Story = {
+  args: { defaultValue: "09:30" },
+  play: async ({ args, canvas, userEvent }) => {
+    const field = canvas.getByRole("textbox", { name: "Start time" });
+    await userEvent.click(field);
+    field.dispatchEvent(
+      new KeyboardEvent("keydown", { key: "ArrowUp", bubbles: true, cancelable: true, isComposing: true }),
+    );
+    await expect(field).toHaveValue("09:30");
+    await userEvent.clear(field);
+    await userEvent.type(field, "11:00");
+    // Safari reports the composing Enter only as keyCode 229.
+    field.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true, keyCode: 229 }));
+    await expect(args.onChange).not.toHaveBeenCalled();
+  },
+};
+
 export const ArrowsSnapTheMinutesToTheStep: Story = {
   args: { defaultValue: "09:32", step: 15 },
   play: async ({ args, canvas, userEvent }) => {

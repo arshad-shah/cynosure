@@ -14,6 +14,9 @@ export interface IconToSvgOptions {
 const escapeAttr = (text: string) =>
   text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
+/** An element or attribute name; parts and attributes with any other name are left out (icon data can come from JS). */
+const NAME = /^[a-z][a-z0-9-]*$/i;
+
 /**
  * An icon (Facet or a brand mark) as an SVG string, for pages without React: Astro components, static HTML, plain
  * TypeScript. The markup is the same as the React `Icon`'s, so the icon stylesheet (`styles/icon.css`, or
@@ -30,8 +33,8 @@ export function iconToSvg(
   const attrs = [
     `class="${escapeAttr(className ? `cy-reset cy-icon ${className}` : "cy-reset cy-icon")}"`,
     `viewBox="0 0 24 24"`,
-    typeof size === "number" ? "" : `data-size="${size}"`,
-    icon.motion ? `data-motion="${icon.motion}"` : "",
+    typeof size === "number" ? "" : `data-size="${escapeAttr(String(size))}"`,
+    icon.motion ? `data-motion="${escapeAttr(String(icon.motion))}"` : "",
     icon.fill ? `data-fill=""` : "",
     style ? `style="${escapeAttr(style)}"` : "",
     `focusable="false"`,
@@ -40,8 +43,10 @@ export function iconToSvg(
     .filter(Boolean)
     .join(" ");
   const parts = icon.body
+    .filter(([tag]) => NAME.test(tag))
     .map(([tag, { animate, ...rest }]) => {
       const a = Object.entries(rest)
+        .filter(([k]) => NAME.test(k))
         .map(([k, v]) => `${k}="${escapeAttr(String(v))}"`)
         .join(" ");
       return `<${tag} ${a}${animate ? ` class="cy-icon-animate"` : ""}></${tag}>`;

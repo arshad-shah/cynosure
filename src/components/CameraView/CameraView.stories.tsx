@@ -186,6 +186,50 @@ export const PermissionRefused: Story = {
   },
 };
 
+export const CameraLostWhileRunning: Story = {
+  args: { defaultActive: true },
+  play: async ({ args, canvas, canvasElement }) => {
+    const video = videoOf(canvasElement);
+    await waitFor(() => expect(video.srcObject).toBe(fakes.streams[0]));
+    // The camera is unplugged (or access taken back): the browser ends its track.
+    const track = fakes.streams[0]?.getVideoTracks()[0] as MediaStreamTrack;
+    track.stop();
+    track.dispatchEvent(new Event("ended"));
+    // The view says so, turns off and offers Start again, instead of a black picture.
+    await expect(await canvas.findByRole("alert")).toHaveTextContent(
+      "The camera stopped. Check that it is connected, then try again.",
+    );
+    await expect(args.onError).toHaveBeenLastCalledWith({ kind: "lost" });
+    await expect(args.onActiveChange).toHaveBeenLastCalledWith(false);
+    await waitFor(() => expect(video.srcObject).toBeNull());
+    await expect(canvas.getByRole("button", { name: "Start camera" })).toBeEnabled();
+  },
+};
+
+export const StoppingLeavesThePagesAnimationFrames: Story = {
+  args: { defaultActive: true, onFrame: fn() },
+  play: async ({ args, canvas, canvasElement, userEvent }) => {
+    const video = videoOf(canvasElement);
+    await waitFor(() => expect(args.onFrame).toHaveBeenCalledWith(video), { timeout: 3000 });
+    // Where frames come through the video's own callback, stopping cancels that, never an animation frame: its
+    // number may be another script's animation frame.
+    const real = window.cancelAnimationFrame;
+    const cancelled: number[] = [];
+    window.cancelAnimationFrame = (id) => {
+      cancelled.push(id);
+      real.call(window, id);
+    };
+    try {
+      await userEvent.click(canvas.getByRole("button", { name: "Stop camera" }));
+      await waitFor(() => expect(video.srcObject).toBeNull());
+    } finally {
+      window.cancelAnimationFrame = real;
+    }
+    if ("requestVideoFrameCallback" in video) await expect(cancelled).toEqual([]);
+    else await expect(cancelled).toHaveLength(1);
+  },
+};
+
 export const EveryFailureHasItsWords: Story = {
   render: (args) => <CameraView {...args} />,
   beforeEach: withCameras({ fail: "NotReadableError" }),

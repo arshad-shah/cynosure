@@ -107,12 +107,46 @@ function tsxRules(root: string, file: string, out: Violation[], fonts: Set<strin
   const at = (node: ts.Node) => source.getLineAndCharacterOfPosition(node.getStart()).line + 1;
   const push = (rule: string, node: ts.Node, message: string) =>
     out.push({ rule, file: rel, line: at(node), message });
+  // `const Tag = "button"` makes `<Tag>` and `createElement(Tag)` a native element too.
+  const aliases = new Map<string, string>();
+  const collect = (node: ts.Node) => {
+    if (
+      ts.isVariableDeclaration(node) &&
+      ts.isIdentifier(node.name) &&
+      node.initializer &&
+      ts.getCombinedNodeFlags(node) & ts.NodeFlags.Const
+    ) {
+      const init = ts.isAsExpression(node.initializer) ? node.initializer.expression : node.initializer;
+      if (ts.isStringLiteralLike(init)) aliases.set(node.name.text, init.text);
+    }
+    ts.forEachChild(node, collect);
+  };
+  collect(source);
+  /** The tag a JSX tag name or createElement/jsx first argument names: a string, or a const holding one. */
+  const tagOf = (node: ts.Node): string | undefined =>
+    ts.isStringLiteralLike(node) ? node.text : ts.isIdentifier(node) ? aliases.get(node.text) : undefined;
+  /** A `title` key in an object literal of props (`{...{ title }}`, `createElement("span", { title })`). */
+  const titleKey = (node: ts.Node | undefined) =>
+    node && ts.isObjectLiteralExpression(node)
+      ? node.properties.find(
+          (p) =>
+            (ts.isPropertyAssignment(p) || ts.isShorthandPropertyAssignment(p)) &&
+            (ts.isIdentifier(p.name) || ts.isStringLiteral(p.name)) &&
+            p.name.text === "title",
+        )
+      : undefined;
   const visit = (node: ts.Node) => {
     if (ts.isJsxOpeningElement(node) || ts.isJsxSelfClosingElement(node)) {
       const tag = node.tagName.getText(source);
-      const intrinsic = /^[a-z]/.test(tag);
+      const intrinsic = /^[a-z]/.test(tag) || NATIVE.has(aliases.get(tag) ?? "");
       if (!inFoundations && NATIVE.has(tag))
         push("native-elements", node, `<${tag}> outside src/foundations; use the Cynosure component`);
+      else if (!inFoundations && NATIVE.has(aliases.get(tag) ?? ""))
+        push(
+          "native-elements",
+          node,
+          `<${tag}> (a "${aliases.get(tag)}") outside src/foundations; use the Cynosure component`,
+        );
       if (!inFoundations && intrinsic) {
         const attrs = new Map(
           node.attributes.properties
@@ -132,6 +166,8 @@ function tsxRules(root: string, file: string, out: Violation[], fonts: Set<strin
           );
       }
       for (const attr of node.attributes.properties) {
+        if (ts.isJsxSpreadAttribute(attr) && intrinsic && titleKey(attr.expression))
+          push("title-attr", attr, "title creates a native tooltip; use Tooltip or a label");
         if (!ts.isJsxAttribute(attr)) continue;
         const name = attr.name.getText(source);
         if (intrinsic && name === "title")
@@ -151,14 +187,16 @@ function tsxRules(root: string, file: string, out: Violation[], fonts: Set<strin
       }
     }
     if (
-      !inFoundations &&
       ts.isCallExpression(node) &&
-      node.expression.getText(source).endsWith("createElement") &&
-      node.arguments[0] &&
-      ts.isStringLiteral(node.arguments[0]) &&
-      NATIVE.has(node.arguments[0].text)
-    )
-      push("native-elements", node, `createElement("${node.arguments[0].text}") outside src/foundations`);
+      /(^|\.)(createElement|_?jsxs?|jsxDEV)$/.test(node.expression.getText(source)) &&
+      node.arguments[0]
+    ) {
+      const tag = tagOf(node.arguments[0]);
+      if (!inFoundations && tag && NATIVE.has(tag))
+        push("native-elements", node, `${node.expression.getText(source)}("${tag}") outside src/foundations`);
+      if (tag && /^[a-z]/.test(tag) && titleKey(node.arguments[1]))
+        push("title-attr", node, "title creates a native tooltip; use Tooltip or a label");
+    }
     if (ts.isJsxText(node) && GLYPHS.test(node.getText(source)))
       push("glyphs", node, "text or emoji glyph used as an icon; use <Icon>");
     if (

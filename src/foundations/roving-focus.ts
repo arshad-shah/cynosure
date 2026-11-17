@@ -1,5 +1,6 @@
 import { type RefObject, useEffect } from "react";
 import { isRtl } from "./dir.js";
+import { deepActiveElement } from "./focus.js";
 
 export interface RovingOptions {
   orientation?: "horizontal" | "vertical" | "both";
@@ -61,7 +62,7 @@ export function useRovingFocus(container: RefObject<HTMLElement | null>, options
     const sync = () => {
       // While focus is elsewhere the stop follows the selection (APG tabs, radios); otherwise keep the current stop
       // if it is still here, falling back to the first enabled item.
-      if (!root.contains(document.activeElement)) stop = selected() ?? stop;
+      if (!root.contains(deepActiveElement(root.ownerDocument))) stop = selected() ?? stop;
       if (!stop || !root.contains(stop) || !enabled(stop)) stop = items().find(enabled);
       if (stop) setStop(stop);
     };

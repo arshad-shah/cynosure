@@ -181,11 +181,30 @@ function contrastPalette(p: ColorTokens, dark: boolean): ColorTokens {
 
 const SAFE_NAME = /^[a-z][a-z0-9-]*$/i;
 const SAFE_KEY = /^[a-z0-9][a-z0-9-]*$/i;
-const UNSAFE_VALUE = /[;{}<>\\\n\r]|\/\*/;
+/** Characters and functions that could escape a declaration or a <style> block, start an at-rule, or fetch a URL. */
+const UNSAFE_VALUE = /[;{}<>\\@\n\r]|\/\*|\b(?:url|image|image-set)\(/i;
+const CLOSE: Record<string, string> = { "(": ")", "[": "]" };
 
-/** Rejects values that could escape a declaration or a <style> block when serialised. */
+/** True when every quote is closed and every bracket outside quotes is closed in order. */
+function balanced(value: string): boolean {
+  const open: string[] = [];
+  let quote = "";
+  for (const c of value) {
+    if (quote) {
+      if (c === quote) quote = "";
+    } else if (c === '"' || c === "'") quote = c;
+    else if (c in CLOSE) open.push(CLOSE[c] as string);
+    else if ((c === ")" || c === "]") && open.pop() !== c) return false;
+  }
+  return !quote && open.length === 0;
+}
+
+/**
+ * Rejects values that could escape a declaration or a <style> block when serialised (an unclosed quote or bracket
+ * swallows the rest of the stylesheet), start an at-rule, or make the page fetch a URL.
+ */
 function safeValue(where: string, value: string): string {
-  if (UNSAFE_VALUE.test(value))
+  if (UNSAFE_VALUE.test(value) || !balanced(value))
     throw new CynosureThemeError(`Cynosure token ${where} has an unsafe value "${value}".`);
   return value;
 }

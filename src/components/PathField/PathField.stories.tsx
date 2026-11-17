@@ -190,6 +190,28 @@ export const InAForm: Story = {
   },
 };
 
+/** A form reset puts back `defaultValue`, typed or picked, in the field and in what the form submits. */
+export const FormResetRestoresTheDefault: Story = {
+  args: { name: "db", defaultValue: "/srv/a.db" },
+  render: (args) => (
+    <form data-testid="form">
+      <PathField {...args} />
+    </form>
+  ),
+  play: async ({ canvas, canvasElement, userEvent }) => {
+    const form = canvasElement.querySelector("form") as HTMLFormElement;
+    const field = canvas.getByRole("textbox", { name: "Database file" });
+    await userEvent.click(canvas.getByRole("button", { name: "Browse…" }));
+    await waitFor(() => expect(field).toHaveValue("/home/me/data/app.db"));
+    form.reset();
+    await waitFor(() => expect(field).toHaveValue("/srv/a.db"));
+    await expect(new FormData(form).get("db")).toBe("/srv/a.db");
+    await userEvent.type(field, "x");
+    form.reset();
+    await waitFor(() => expect(field).toHaveValue("/srv/a.db"));
+  },
+};
+
 export const InAFormByItsId: Story = {
   args: { name: "db", defaultValue: "/srv/a.db", form: "path-form" },
   render: (args) => (

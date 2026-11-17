@@ -743,3 +743,29 @@ export const StackedStableUnderHostileHost: Story = {
     await expect(hostile).toEqual(clean);
   },
 };
+
+export const Labels: Story = {
+  render: (args) => (
+    <div style={{ display: "grid", gridTemplateRows: "1fr 1fr", blockSize: "100%" }}>
+      <SplitPane {...args} labels={{ percent: (n) => `${n} pour cent` }} />
+      <SplitPane
+        {...args}
+        label="Redimensionner"
+        unit="px"
+        defaultSize={200}
+        labels={{ pixels: (n) => `${n} pixels de large` }}
+      />
+    </div>
+  ),
+  play: async ({ canvas }) => {
+    // The divider's spoken value is in your words, in percent or in pixels.
+    await expect(canvas.getByRole("separator", { name: "Resize the file list" })).toHaveAttribute(
+      "aria-valuetext",
+      "50 pour cent",
+    );
+    await expect(canvas.getByRole("separator", { name: "Redimensionner" })).toHaveAttribute(
+      "aria-valuetext",
+      "200 pixels de large",
+    );
+  },
+};

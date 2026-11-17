@@ -20,7 +20,7 @@ A floating panel (non-modal dialog) anchored to its trigger, in the browser top 
 | `size`                                  | `md`      | Width preset: `sm` 240 · `md` 320 · `lg` 420 px                                                                           |
 | `width`                                 | `content` | `content` (up to the preset) · `trigger` (at least the trigger's or anchor's width) · `fixed` (exactly the preset)        |
 | `initialFocus`                          | `first`   | `first` control · the `panel` itself · `none` (focus stays where it is, such as a field being typed in)                   |
-| `modal`                                 | `false`   | Keep Tab inside the panel                                                                                                 |
+| `modal`                                 | `false`   | Keep Tab inside the panel (cycling through its tab stops: a toolbar or radio group counts once)                           |
 | `closeOnFocusOut`                       | `true`    | A non-modal panel closes when focus moves outside it, its trigger and its anchor (Tab past its last control)              |
 | `children`                              | –         | The panel's content                                                                                                       |
 | `className` / `style`                   | –         | On the panel. Layout only                                                                                                 |

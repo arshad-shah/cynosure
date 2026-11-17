@@ -14,17 +14,17 @@ import { PathField } from "@arshad-shah/cynosure";
 />;
 ```
 
-| Prop                                           | Default          | Notes                                                                                                 |
-| ---------------------------------------------- | ---------------- | ----------------------------------------------------------------------------------------------------- |
-| `layout` / `width`                             | `stack` / –      | `split` settings row and the control width, as on `Field`                                             |
-| `onPick`                                       | –                | `() => Promise<string \| null>`: the chosen path, or `null` when cancelled                            |
-| `value` / `defaultValue` / `onChange`          | – / `""`         | The path; `onChange` is called when it is typed, picked or cleared                                    |
-| `label`, `labelHidden`, `description`, `error` | –                | As TextField                                                                                          |
-| `name`, `form`, `required`, `disabled`         | –                | The path is submitted under `name`; `required` blocks the form while it is empty                      |
-| `placeholder`, `iconStart`                     | –                | Hint while empty; an icon leading the field                                                           |
-| `size` / `variant`                             | `md` / `outline` | `xs`–`lg`; the Browse button is one step smaller so it fits inside the field (at `xs` it is `xs` too) |
-| `labels`                                       | –                | `browse` ("Browse…"), `clear` ("Clear")                                                               |
-| `className` / `style`                          | –                | Layout only                                                                                           |
+| Prop                                           | Default          | Notes                                                                                                                     |
+| ---------------------------------------------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `layout` / `width`                             | `stack` / –      | `split` settings row and the control width, as on `Field`                                                                 |
+| `onPick`                                       | –                | `() => Promise<string \| null>`: the chosen path, or `null` when cancelled                                                |
+| `value` / `defaultValue` / `onChange`          | – / `""`         | The path; `onChange` is called when it is typed, picked or cleared                                                        |
+| `label`, `labelHidden`, `description`, `error` | –                | As TextField                                                                                                              |
+| `name`, `form`, `required`, `disabled`         | –                | The path is submitted under `name`; `required` blocks the form while it is empty; a form reset brings back `defaultValue` |
+| `placeholder`, `iconStart`                     | –                | Hint while empty; an icon leading the field                                                                               |
+| `size` / `variant`                             | `md` / `outline` | `xs`–`lg`; the Browse button is one step smaller so it fits inside the field (at `xs` it is `xs` too)                     |
+| `labels`                                       | –                | `browse` ("Browse…"), `clear` ("Clear")                                                                                   |
+| `className` / `style`                          | –                | Layout only                                                                                                               |
 - Browse is busy (`aria-busy`) and cannot be pressed again until `onPick` settles; `null`, or a rejected promise, leaves the path as it was.
 - The clear button shows while there is a path; it empties the field and focuses it. Tab order: input, clear, Browse.
 - Disabled: the field and Browse are disabled and there is no clear button. Touch: 44px hit areas.

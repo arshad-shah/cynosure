@@ -1,4 +1,4 @@
-import { type RefObject, useMemo, useState } from "react";
+import { type RefObject, useMemo, useRef, useState } from "react";
 import { useClientLayoutEffect } from "./client-layout-effect.js";
 import { isRtl } from "./dir.js";
 import { alignedScroll, type ScrollAlign } from "./scroll-align.js";
@@ -81,6 +81,9 @@ export function useVirtualWindow(
   }: VirtualWindowOptions,
 ): VirtualWindow {
   const [view, setView] = useState({ top: 0, height: 0, width: 0, row: 0 });
+  // The scroller and the measured row are both observed: a row whose height changes (a new `size`, new tokens) is
+  // measured again even when the scroller keeps its size.
+  const watch = useRef<{ observer: ResizeObserver; row: Element | null } | null>(null);
   useClientLayoutEffect(() => {
     const el = scroller.current;
     if (!enabled || !el) return;
@@ -100,8 +103,23 @@ export function useVirtualWindow(
     measure();
     const observer = new ResizeObserver(measure);
     observer.observe(el);
-    return () => observer.disconnect();
+    watch.current = { observer, row: null };
+    return () => {
+      observer.disconnect();
+      watch.current = null;
+    };
   }, [enabled, rowSelector, estimate, count > 0, axis]);
+  // After each render, observe the row that is measured when it is another element (scrolling replaces it). Finding
+  // it reads no layout; the observer measures after layout.
+  useClientLayoutEffect(() => {
+    const w = watch.current;
+    if (!w || !rowSelector) return;
+    const row = scroller.current?.querySelector(rowSelector) ?? null;
+    if (row === w.row) return;
+    if (w.row) w.observer.unobserve(w.row);
+    if (row) w.observer.observe(row);
+    w.row = row;
+  });
 
   const rowSize = view.row || estimate;
   // With sizes: each row's start, `gap` apart.

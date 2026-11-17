@@ -135,11 +135,12 @@ export function DocumentViewport({
   const text = { ...DEFAULT_LABELS, ...labels };
   const scroller = useRef<HTMLElement>(null);
   const [setting, setSetting] = useControllableState(zoom, defaultZoom, onZoomChange);
-  // The gap comes from the token, in pixels, for the layout maths.
+  // The gap comes from the token, in pixels, for the layout maths: the stylesheet sets it as the scroller's
+  // `row-gap`, computed to pixels whatever unit the token uses. Without the stylesheet it stays 16.
   const [gap, setGap] = useState(16);
   useClientLayoutEffect(() => {
-    const g = Number.parseFloat(getComputedStyle(scroller.current as HTMLElement).getPropertyValue("--_gap"));
-    if (g !== gap) setGap(g);
+    const g = Number.parseFloat(getComputedStyle(scroller.current as HTMLElement).rowGap);
+    if (Number.isFinite(g) && g !== gap) setGap(g);
   });
 
   // The viewport's size feeds the fit modes; the windowing measures it.

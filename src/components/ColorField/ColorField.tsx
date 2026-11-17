@@ -1,7 +1,8 @@
 import { type CSSProperties, type KeyboardEvent, type ReactNode, useEffect, useRef, useState } from "react";
+import { useDraft } from "../../foundations/draft.js";
 import { useDrag } from "../../foundations/drag.js";
 import { HiddenValue } from "../../foundations/HiddenValue/HiddenValue.js";
-import { stepKey } from "../../foundations/keys.js";
+import { isComposing, stepKey } from "../../foundations/keys.js";
 import { clamp } from "../../foundations/math.js";
 import { droplet } from "../../icons/droplet.js";
 import { type Rgb, rgbToOklch, toHex } from "../../tokens/color.js";
@@ -180,8 +181,11 @@ export function ColorField({
   const external = value === undefined ? null : fromText(value, inner.h);
   const color = external && write(external, "rgb", true) !== write(inner, "rgb", true) ? external : inner;
   const current = write(color, format, alpha);
-  const [draft, setDraft] = useState<string | null>(null);
-  const [invalid, setInvalid] = useState(false);
+  const input = useRef<HTMLInputElement>(null);
+  // A form will not submit while the text is not a colour (the value it would submit is the last good one).
+  const { draft, setDraft, problem, setProblem, settle } = useDraft(input, (typed) =>
+    fromText(typed, color.h) ? null : text.invalid,
+  );
   const area = useRef<HTMLDivElement>(null);
   const dragFrom = useRef<Hsva | null>(null);
   const [dropper, setDropper] = useState(false);
@@ -190,15 +194,14 @@ export function ColorField({
   const set = (next: Hsva) => {
     const out = write(next, format, alpha);
     setInner(next);
-    setDraft(null);
-    setInvalid(false);
+    settle();
     if (out !== current) onChange?.(out);
   };
   const commit = () => {
     if (draft === null) return;
     const next = fromText(draft, color.h);
     if (next) set(alpha ? next : { ...next, a: 1 });
-    else setInvalid(true);
+    else setProblem(text.invalid);
   };
 
   const fromPoint = (point: { x: number; y: number }) => {
@@ -357,12 +360,13 @@ export function ColorField({
 
   const field = (
     <TextField
+      ref={input}
       label={label}
       labelHidden={labelHidden}
       layout={layout}
       width={width}
       description={description}
-      error={error ?? (invalid ? text.invalid : undefined)}
+      error={error ?? problem ?? undefined}
       required={required}
       disabled={disabled}
       size={size}
@@ -375,11 +379,12 @@ export function ColorField({
       value={draft ?? current}
       onChange={(next) => {
         setDraft(next);
-        setInvalid(false);
+        setProblem(null);
       }}
       onBlur={commit}
       onKeyDown={(e) => {
-        if (e.key === "Enter") commit();
+        // An input method's Enter is its own.
+        if (e.key === "Enter" && !isComposing(e)) commit();
       }}
       addonStart={trigger}
       addonEnd={
@@ -399,8 +404,7 @@ export function ColorField({
             disabled={disabled}
             onReset={() => {
               setInner(fromText(defaultValue) ?? inner);
-              setDraft(null);
-              setInvalid(false);
+              settle();
             }}
           />
         </>

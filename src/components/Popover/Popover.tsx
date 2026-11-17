@@ -8,7 +8,7 @@ import {
   useRef,
 } from "react";
 import { useControllableState } from "../../foundations/controllable.js";
-import { deepActiveElement } from "../../foundations/focus.js";
+import { deepActiveElement, isTabStop } from "../../foundations/focus.js";
 import { useDismiss } from "../../overlay/dismiss.js";
 import { usePopover } from "../../overlay/floating.js";
 import { type Align, crossAlign, type Placement } from "../../overlay/position.js";
@@ -168,7 +168,7 @@ export function Popover({
 
   const trap = (event: KeyboardEvent<HTMLDivElement>) => {
     if (!modal || event.key !== "Tab") return;
-    const items = [...event.currentTarget.querySelectorAll<HTMLElement>(FOCUSABLE)];
+    const items = [...event.currentTarget.querySelectorAll<HTMLElement>(FOCUSABLE)].filter(isTabStop);
     if (!items.length) return;
     const first = items[0] as HTMLElement;
     const last = items[items.length - 1] as HTMLElement;

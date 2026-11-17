@@ -32,7 +32,7 @@ Fields are read by their `name`, as in any HTML form, and `onSubmit(values, even
 
 ## Enter in a group without a button
 
-A browser submits on Enter only when the form has a submit button or a single field. Form submits from any text field either way, so a group of fields with its buttons elsewhere (a toolbar, a dialog's footer) still submits on Enter. Enter in a text area is a new line; a field that takes Enter itself (TagInput adding a tag, Combobox picking an option) keeps it; an IME's Enter confirms its composition.
+A browser submits on Enter only when the form has a submit button or a single field. Form submits from any text field either way, so a group of fields with its buttons elsewhere (a toolbar, a dialog's footer) still submits on Enter. Enter in a text area is a new line; a field that takes Enter itself (TagInput adding a tag, Combobox picking an option) keeps it; an IME's Enter confirms its composition. A field that commits its text on Enter (NumberField, DateField, TimeField) submits the value it has just committed.
 
 <Canvas of={Stories.EnterSubmitsAGroupWithoutAButton} />
 

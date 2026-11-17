@@ -1,4 +1,5 @@
 import { type CSSProperties, type ReactNode, useRef } from "react";
+import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js";
 import {
   type FloatingAnchor,
   type PopoverEl,
@@ -53,12 +54,16 @@ export function HoverCard({ open, anchor, placement = "end", children, className
   usePopover(card, shown);
   const offset = useFloatingOffset(card, shown);
   useAnchoredPosition(target.ref, card, shown, placement, offset);
+  // Nothing in it can be focused or clicked. Set as a property: React 18 drops `inert={true}`.
+  useClientLayoutEffect(() => {
+    if (card.current) card.current.inert = true;
+  }, []);
   return (
     <div
       ref={card}
       className={className ? `cy-hover-card ${className}` : "cy-hover-card"}
       aria-hidden="true"
-      {...{ popover: "manual", inert: true }}
+      {...{ popover: "manual" }}
       style={style}
     >
       {children}

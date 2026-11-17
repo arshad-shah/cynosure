@@ -8,6 +8,7 @@ import { createStyleSheet } from "../../styles/inline.js";
 import { computeUnderHostileHost } from "../../test/hostile.js";
 import { shownFully } from "../../test/settle.js";
 import { Button } from "../Button/Button.js";
+import { Menu } from "../Menu/Menu.js";
 import { type Command, CommandPalette } from "./CommandPalette.js";
 
 /** The palette's shortcut as the platform running the test has it: Command+K on Apple platforms, Ctrl+K elsewhere. */
@@ -595,5 +596,37 @@ export const DisabledReasonLabelsOverride: Story = {
         "Export as PDF indisponible : Open a document first",
       ),
     );
+  },
+};
+
+function MenuOpensPalette() {
+  const [open, setOpen] = useState(false);
+  return (
+    <>
+      {/* Before the Menu in the tree, so the palette opens while the menu item still has focus. */}
+      <CommandPalette commands={commands} onRun={() => {}} open={open} onOpenChange={setOpen} />
+      <Menu
+        label="Go"
+        trigger={(p) => <Button {...p}>Go</Button>}
+        items={[{ value: "palette", label: "Command palette" }]}
+        onSelect={() => setOpen(true)}
+      />
+    </>
+  );
+}
+
+export const FocusReturnsToTheMenuButtonAfterAMenuItemOpenedIt: Story = {
+  render: () => <MenuOpensPalette />,
+  play: async ({ canvas, userEvent }) => {
+    const go = canvas.getByRole("button", { name: "Go" });
+    await userEvent.click(go);
+    await userEvent.click(await canvas.findByRole("menuitem", { name: "Command palette" }));
+    const el = palette();
+    await waitFor(() => expect(el.open).toBe(true));
+    await waitFor(() => expect(canvas.getByRole("combobox", { name: "Command palette" })).toHaveFocus());
+    await userEvent.keyboard("{Escape}");
+    await settledClosed(el);
+    // The menu item it came from is hidden now; focus lands on the button that opened the menu.
+    await waitFor(() => expect(go).toHaveFocus());
   },
 };

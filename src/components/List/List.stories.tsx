@@ -388,3 +388,14 @@ export const NamedByAHeading: Story = {
     await expect(list).toHaveAttribute("data-state", "ready");
   },
 };
+
+export const NamedByAriaLabel: Story = {
+  args: { "aria-label": "Fruit to buy" },
+  play: async ({ canvas }) => {
+    // Without `label`, an `aria-label` passed straight to the list still names it.
+    await expect(canvas.getByRole("list", { name: "Fruit to buy" })).toHaveAttribute(
+      "aria-label",
+      "Fruit to buy",
+    );
+  },
+};

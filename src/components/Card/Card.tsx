@@ -160,12 +160,16 @@ export const Card = forwardRef<HTMLElement, CardProps>(function CardRender(props
   ) : (
     children
   );
-  // A sectioning card is a landmark or an article: its title names it.
+  // A sectioning card is a landmark or an article: its title names it, unless you name it yourself.
   const named =
-    own && title != null && !rest["aria-label"] && (as === "section" || as === "article" || as === "aside");
+    own &&
+    title != null &&
+    !rest["aria-label"] &&
+    !rest["aria-labelledby"] &&
+    (as === "section" || as === "article" || as === "aside");
   const common = {
     ...rest,
-    "aria-labelledby": named ? titleId : undefined,
+    "aria-labelledby": named ? titleId : rest["aria-labelledby"],
     className: className ? `cy-card ${className}` : "cy-card",
     ...edgeProps(edge, style),
     "data-variant": variant,

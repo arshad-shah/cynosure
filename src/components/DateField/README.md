@@ -21,7 +21,7 @@ import { DateField } from "@arshad-shah/cynosure";
 | `labels`                              | –           | `open`, `invalid`, `unavailable`, `previous`, `next`                                                                                                                     |
 | `className` / `style`                 | –           | Layout only                                                                                                                                                              |
 - Typing: `2026/1/5`, `2026.1.5` and `2026-1-5` are all read as `2026-01-05` when the field loses focus or Enter is pressed. Text that is not a date stays as typed, with "Enter a date as YYYY-MM-DD" shown and announced as the field's error; a date outside the limits, or unavailable, says so.
-- Up and Down step the date a day (Shift: a month), from what is typed if it is a date; the limits stop them.
+- Up and Down step the date a day (Shift: a month), from what is typed if it is a date, skipping dates `isDateDisabled` refuses; the limits stop them.
 - The calendar button opens the picker with focus on the chosen day (or today). Choosing a day closes it and returns focus to the field; Escape closes it without choosing.
 - Dates are written `YYYY-MM-DD` whatever the locale: one unambiguous form for tools and forms. The calendar's month and day names follow `locale`.
 

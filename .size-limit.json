@@ -2,7 +2,7 @@
   {
     "name": "all CSS",
     "path": "dist/styles.css",
-    "limit": "40.74 kB",
+    "limit": "40.75 kB",
     "gzip": true
   },
   {
@@ -13,7 +13,7 @@
       "dist/tokens/defaults.js",
       "dist/tokens/to-css.js"
     ],
-    "limit": "6.96 kB",
+    "limit": "7.53 kB",
     "gzip": true
   },
   {
@@ -106,7 +106,7 @@
   {
     "name": "RadioGroup",
     "path": ["dist/components/RadioGroup/RadioGroup.js", "dist/styles/radio-group.css"],
-    "limit": "1.82 kB",
+    "limit": "1.96 kB",
     "gzip": true
   },
   {
@@ -174,7 +174,7 @@
   {
     "name": "useRovingFocus",
     "path": ["dist/foundations/roving-focus.js"],
-    "limit": "1.24 kB",
+    "limit": "1.25 kB",
     "gzip": true
   },
   {

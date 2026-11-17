@@ -852,7 +852,8 @@ export const ContextMenuNameOverride: Story = {
 
 // ── Loading driven from outside: the handle's reload, and loadingIds / errorIds from a store ──
 
-function Reloadable() {
+/** `delay(n)`: how long load `n` takes (100 ms each by default). */
+function Reloadable({ delay = () => 100 }: { delay?: (n: number) => number }) {
   const tree = useRef<TreeHandle>(null);
   const loads = useRef(0);
   return (
@@ -870,7 +871,7 @@ function Reloadable() {
         loadChildren={(item) =>
           new Promise((resolve) => {
             const n = ++loads.current;
-            setTimeout(() => resolve([{ id: `${item.id}-${n}`, label: `${item.id} load ${n}` }]), 100);
+            setTimeout(() => resolve([{ id: `${item.id}-${n}`, label: `${item.id} load ${n}` }]), delay(n));
           })
         }
       />
@@ -898,6 +899,23 @@ export const ReloadRunsLoadChildrenAgain: Story = {
     await userEvent.click(canvas.getByRole("button", { name: "Reload nothing" }));
     await userEvent.click(canvas.getByRole("button", { name: "Reload static" }));
     await expect(canvas.getByRole("treeitem", { name: "remote load 3" })).toBeInTheDocument();
+  },
+};
+
+/** Reloading again before the last load answered: the latest load wins, whichever answers last. */
+export const AnOlderLoadNeverOverwritesANewerOne: Story = {
+  // Load 2 is slow and load 3 fast: load 2 answers last.
+  render: () => <Reloadable delay={(n) => (n === 2 ? 400 : 50)} />,
+  play: async ({ canvas, userEvent }) => {
+    const remote = canvas.getByRole("treeitem", { name: "remote" });
+    await userEvent.click(remote.querySelector(".cy-tree-chevron") as HTMLElement);
+    await canvas.findByRole("treeitem", { name: "remote load 1" });
+    await userEvent.click(canvas.getByRole("button", { name: "Reload remote" }));
+    await userEvent.click(canvas.getByRole("button", { name: "Reload remote" }));
+    // Both have answered by now.
+    await new Promise((r) => setTimeout(r, 600));
+    await expect(canvas.getByRole("treeitem", { name: "remote load 3" })).toBeInTheDocument();
+    await expect(canvas.queryByRole("treeitem", { name: "remote load 2" })).toBeNull();
   },
 };
 

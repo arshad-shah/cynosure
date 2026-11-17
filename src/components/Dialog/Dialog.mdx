@@ -50,7 +50,7 @@ Put Cancel first and the main action last. The content scrolls between the title
 
 ## Confirmations
 
-With `dismissible={false}` there is no close button and Escape and the backdrop do nothing: the person must pick one of your actions. Focus starts on the first action, so put the safe one first.
+With `dismissible={false}` there is no close button and Escape and the backdrop do nothing: the person must pick one of your actions. If the browser closes it anyway (an uncancelable close request), it is shown again. Focus starts on the first action, so put the safe one first.
 
 <Canvas of={Stories.NotDismissible} />
 

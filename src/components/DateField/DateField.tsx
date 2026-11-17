@@ -2,6 +2,7 @@ import { type CSSProperties, type KeyboardEvent, type ReactNode, useEffect, useR
 import { useControllableState } from "../../foundations/controllable.js";
 import { useDraft } from "../../foundations/draft.js";
 import { HiddenValue } from "../../foundations/HiddenValue/HiddenValue.js";
+import { isComposing } from "../../foundations/keys.js";
 import { calendar } from "../../icons/calendar.js";
 import type { Size } from "../../tokens/schema.js";
 import { Calendar } from "../Calendar/Calendar.js";
@@ -154,17 +155,23 @@ export function DateField({
     if (date !== current) setCurrent(date);
   };
 
-  // Up and Down step the date by a day (Shift: a month), skipping nothing: limits stop it.
+  // Up and Down step the date by a day (Shift: a month) to the next available one; limits stop it. An input method's
+  // keys are its own.
   const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+    if (isComposing(event)) return;
     if (event.key === "Enter") commit();
     if ((event.key !== "ArrowUp" && event.key !== "ArrowDown") || readOnly) return;
     const from = draft === null ? current : isISODate(normalise(draft)) ? normalise(draft) : null;
     if (!from) return;
     event.preventDefault();
     const by = event.key === "ArrowUp" ? 1 : -1;
-    const next = event.shiftKey ? addMonths(from, by) : addDays(from, by);
-    if ((min !== undefined && next < min) || (max !== undefined && next > max)) return;
-    choose(next);
+    let next = from;
+    // Bounded, for an isDateDisabled that refuses every date and no limit to stop at (ten years of days).
+    for (let tries = 0; tries < 3660; tries++) {
+      next = event.shiftKey ? addMonths(next, by) : addDays(next, by);
+      if ((min !== undefined && next < min) || (max !== undefined && next > max)) return;
+      if (!isDateDisabled?.(next)) return choose(next);
+    }
   };
 
   // The picker opens on the chosen day (the APG date picker), not on its first button. A ref, not an id lookup, so it

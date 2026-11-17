@@ -56,6 +56,40 @@ export function themeProperties(theme: Theme, options: { contrast?: boolean } = 
   return Object.fromEntries(pairs.map(([k, v]) => [`--cy-${k}`, v]));
 }
 
+/** Splits a selector list at its top-level commas (not those inside `:is(…)` or `:host(…)`). */
+function splitList(selector: string): string[] {
+  const parts: string[] = [];
+  let depth = 0;
+  let start = 0;
+  for (let i = 0; i < selector.length; i++) {
+    const c = selector[i];
+    if (c === "(" || c === "[") depth++;
+    else if (c === ")" || c === "]") depth--;
+    else if (c === "," && depth === 0) {
+      parts.push(selector.slice(start, i).trim());
+      start = i + 1;
+    }
+  }
+  return [...parts, selector.slice(start).trim()];
+}
+
+const HOST = /^:host(?:\((.*)\))?$/;
+
+/**
+ * Qualifies a selector with an attribute condition, as a list of selectors. A shadow host only matches as `:host(…)`
+ * (`:host[x]` never matches), so `:host` parts are qualified inside it; other lists are wrapped in `:is()` so the
+ * condition applies to every selector in them.
+ */
+function scope(selector: string): (attr: string) => string[] {
+  const parts = splitList(selector);
+  if (!parts.some((p) => HOST.test(p))) {
+    const host = parts.length > 1 ? `:is(${selector})` : selector;
+    return (attr) => [`${host}${attr}`];
+  }
+  return (attr) =>
+    parts.map((p) => (HOST.test(p) ? `:host(${HOST.exec(p)?.[1] ?? ""}${attr})` : `${p}${attr}`));
+}
+
 /**
  * Serialises a theme to CSS. The base block holds global, component and light/dark colour tokens
  * (via light-dark()); modes switch through `color-scheme`, contrast through an override block.
@@ -71,21 +105,21 @@ export function themeToCss(theme: Theme, selector: string = DEFAULT_SELECTOR): s
   ];
   const contrast = decl(colorPairs(theme.palettes["light-contrast"], theme.palettes["dark-contrast"]));
   const normal = decl(colorPairs(light, dark));
-  // Selector lists are wrapped in :is() so attribute qualifiers apply to every selector in the list.
-  const host = selector.includes(",") ? `:is(${selector})` : selector;
-  const scoped = (attr: string) => (selector === DEFAULT_SELECTOR ? `:where(${attr})` : `${host}${attr}`);
   const isDefault = selector === DEFAULT_SELECTOR;
+  const scoped = scope(selector);
   // On an OS set to more contrast, a wrapper with contrast="normal" (and no theme of its own) puts the normal colours
   // back over the contrast ones it inherits. It comes after the contrast rule, so it wins at equal specificity.
+  const followsOs = [...scoped(":not([data-cy-contrast])"), ...scoped('[data-cy-contrast="system"]')];
   const undo = isDefault
     ? `:where([data-cy-contrast="normal"]){${normal}}`
-    : `${scoped('[data-cy-contrast="system"]')} [data-cy-contrast="normal"]{${normal}}`;
+    : `${followsOs.map((s) => `${s} [data-cy-contrast="normal"]`).join(",")}{${normal}}`;
+  const rule = (attr: string) => (isDefault ? `:where(${attr})` : scoped(attr).join(","));
   return [
     `${selector}{${decl(base)}}`,
-    `${scoped('[data-cy-mode="light"]')}{color-scheme:light}`,
-    `${scoped('[data-cy-mode="dark"]')}{color-scheme:dark}`,
-    `${scoped('[data-cy-mode="system"]')}{color-scheme:light dark}`,
-    `@media (prefers-contrast:more){${isDefault ? ':where(:root:not([data-cy-contrast]),:host,[data-cy-contrast="system"])' : scoped('[data-cy-contrast="system"]')}{${contrast}}${undo}}`,
-    `${scoped('[data-cy-contrast="more"]')}{${contrast}}`,
+    `${rule('[data-cy-mode="light"]')}{color-scheme:light}`,
+    `${rule('[data-cy-mode="dark"]')}{color-scheme:dark}`,
+    `${rule('[data-cy-mode="system"]')}{color-scheme:light dark}`,
+    `@media (prefers-contrast:more){${isDefault ? ':where(:root:not([data-cy-contrast]),:host,[data-cy-contrast="system"])' : followsOs.join(",")}{${contrast}}${undo}}`,
+    `${rule('[data-cy-contrast="more"]')}{${contrast}}`,
   ].join("\n");
 }

@@ -9,9 +9,28 @@ export interface TableSort {
 const collator = new Intl.Collator(undefined, { numeric: true, sensitivity: "base" });
 const empty = (v: unknown) => v === null || v === undefined || v === "";
 
+/** A value that orders as a number: a number, a bigint, a boolean (false first) or a valid Date (by its time). */
+const numeric = (v: unknown): number | bigint | undefined =>
+  typeof v === "number" || typeof v === "bigint"
+    ? v
+    : typeof v === "boolean"
+      ? Number(v)
+      : v instanceof Date && !Number.isNaN(v.getTime())
+        ? v.getTime()
+        : undefined;
+
+function compare(x: unknown, y: unknown): number {
+  const a = numeric(x);
+  const b = numeric(y);
+  if (a === undefined || b === undefined) return collator.compare(String(x), String(y));
+  // Mixed number and bigint compare without converting either (`<` works across the two).
+  return a < b ? -1 : a > b ? 1 : 0;
+}
+
 /**
- * `rows` sorted by `get(row)` (a new array): numbers as numbers, everything else in the locale's order with numbers
- * inside text compared as numbers; empty values (null, undefined, "") last in either direction.
+ * `rows` sorted by `get(row)` (a new array): numbers, bigints, booleans (false first) and dates (by time) as numbers,
+ * everything else in the locale's order with numbers inside text compared as numbers; empty values (null, undefined,
+ * "") last in either direction.
  */
 export function sortRows<Row>(
   rows: readonly Row[],
@@ -24,9 +43,7 @@ export function sortRows<Row>(
     const y = get(b);
     const xEmpty = empty(x);
     if (xEmpty || empty(y)) return xEmpty === empty(y) ? 0 : xEmpty ? 1 : -1;
-    const by =
-      typeof x === "number" && typeof y === "number" ? x - y : collator.compare(String(x), String(y));
-    return by * sign;
+    return compare(x, y) * sign;
   });
 }
 

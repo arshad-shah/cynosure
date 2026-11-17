@@ -72,7 +72,7 @@ The SplitPane fills its container, so give the container a size. Each pane scrol
 
 ## Behaviour and accessibility
 
-- **Role:** the divider is a focusable `separator` named by `label`, with the anchored pane's size (the start pane unless `anchor="end"`; 0 when collapsed) as `aria-valuenow` and `aria-controls` pointing at that pane.
+- **Role:** the divider is a focusable `separator` named by `label`, with the anchored pane's size (the start pane unless `anchor="end"`; 0 when collapsed) as `aria-valuenow`, the same in words as `aria-valuetext` ("50%", or "240 pixels" with `unit="px"`; `labels.percent` and `labels.pixels` replace them) and `aria-controls` pointing at that pane.
 - **Keyboard:** the keys move the divider, so the anchored pane grows or shrinks with it.
 
 | Key                | Action                                                                                        |

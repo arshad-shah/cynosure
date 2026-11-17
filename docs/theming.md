@@ -14,9 +14,9 @@ const theme = createTheme({
 });
 ```
 
-`createTheme` derives accent hover/active (OKLCH), soft and ring mixes, on-accent text with WCAG contrast ≥ 4.5:1, the code colours (`--cy-color-syntax-*`, keywords from the accent; see [Code editors](code-editors.md)) and eight chart series colours. Invalid colours or unsafe values throw `CynosureThemeError`.
+`createTheme` derives accent hover/active (OKLCH), soft and ring mixes, on-accent text with WCAG contrast ≥ 4.5:1, the code colours (`--cy-color-syntax-*`, keywords from the accent; see [Code editors](code-editors.md)) and eight chart series colours. Colours are hex, `rgb()`, `hsl()` (hue in degrees, `deg`, `grad`, `rad` or `turn`, wrapped into one turn; saturation and lightness as percentages or, in the space-separated syntax, bare numbers out of 100) or `oklch()`. Invalid colours or unsafe values throw `CynosureThemeError`: a value cannot hold `; { } < > \ @`, a comment, `url(`, `image(` or `image-set(`, or an unclosed quote or bracket (balanced quotes are fine, as in `'"Hanken Grotesk", system-ui'`).
 
-Apply it: `<CynosureTheme theme={theme} mode="system">`, at build time with `themeToCss(theme)`, or in a shadow root with `styles.inline` plus `themeToCss(theme, ":host")`. Modes: `light | dark | system`; contrast: `normal | more | system`. `useColorMode({ storage })` persists the user's choice.
+Apply it: `<CynosureTheme theme={theme} mode="system">`, at build time with `themeToCss(theme)`, or in a shadow root with `styles.inline` plus `themeToCss(theme, ":host")`. With a selector of your own, the mode and contrast rules are scoped to it (`:host` is qualified as `:host([data-cy-mode="dark"])`, the only form a shadow host matches), and an element with no `data-cy-contrast` follows the OS contrast setting, as the document root does by default. Modes: `light | dark | system`; contrast: `normal | more | system`. `useColorMode({ storage })` persists the user's choice.
 
 ## Named themes
 

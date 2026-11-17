@@ -80,7 +80,7 @@ Popovers nest, and Escape closes one layer at a time: an inner popover first, th
 | Click, tap, <kbd>Enter</kbd>, <kbd>Space</kbd> on the trigger | Opens or closes |
 | <kbd>Escape</kbd> | Closes the topmost layer and returns focus to its trigger |
 | Pointer down outside | Closes it |
-| <kbd>Tab</kbd> with `modal` | Cycles inside the panel |
+| <kbd>Tab</kbd> with `modal` | Cycles through the panel's tab stops (a toolbar or radio group is one stop) |
 | <kbd>Tab</kbd> past the last control, without `modal` | Closes it; focus stays where Tab put it |
 
 - **Focus:** on open, focus moves to the first control inside, or to the panel itself when it has none, so screen readers land in it (`initialFocus` changes this). On close, focus returns to the trigger unless you already moved it somewhere else.

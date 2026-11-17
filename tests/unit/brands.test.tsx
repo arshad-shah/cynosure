@@ -56,4 +56,17 @@ describe("iconToSvg", () => {
       'aria-label="&quot;&gt;&lt;script&gt;"',
     );
   });
+  it("escapes a size and motion from untyped callers, and drops part names that are not names", () => {
+    const evil = '"><script>alert(1)</script>';
+    const svg = icons.iconToSvg({ ...icons.check, motion: evil } as never, { size: evil as never });
+    expect(svg).not.toContain("<script>");
+    expect(svg).toContain('data-size="&quot;&gt;&lt;script&gt;alert(1)&lt;/script&gt;"');
+    expect(svg).toContain('data-motion="&quot;&gt;&lt;script&gt;alert(1)&lt;/script&gt;"');
+    const part = icons.iconToSvg({
+      ...icons.check,
+      body: [["path onload=alert(1)", { 'd="M0" onclick': "x" }]],
+    } as never);
+    expect(part).not.toContain("onload");
+    expect(part).not.toContain("onclick");
+  });
 });

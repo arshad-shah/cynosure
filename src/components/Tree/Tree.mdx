@@ -87,7 +87,7 @@ setHit(next); tree.current?.reveal(next, { align: "center" });
 
 ## Loading from a store
 
-When children are fetched somewhere else (a store), put them in `children` when they arrive and say what is happening with `loadingIds` and `errorIds`. `onRetry` is called when a failed item is retried; `renderError(item, retry)` and `renderEmpty(item)` draw the error row and the row under an open item with no children. With `loadChildren`, the `handle`'s `reload(id)` loads an item's children again.
+When children are fetched somewhere else (a store), put them in `children` when they arrive and say what is happening with `loadingIds` and `errorIds`. `onRetry` is called when a failed item is retried; `renderError(item, retry)` and `renderEmpty(item)` draw the error row and the row under an open item with no children. With `loadChildren`, the `handle`'s `reload(id)` loads an item's children again; when loads overlap, only the latest one's answer is kept, whichever arrives last.
 
 <Canvas of={Stories.LoadingAndErrorsFromAStore} />
 

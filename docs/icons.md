@@ -67,7 +67,7 @@ The marks come from [Simple Icons](https://simpleicons.org) (CC0). The trademark
 
 ## Without React
 
-`iconToSvg` returns the same markup as `Icon`, as a string, for Astro components, static HTML or plain TypeScript. Load `@arshad-shah/cynosure/styles/icon.css` (or the full `styles.css`) so it sizes and colours the same way.
+`iconToSvg` returns the same markup as `Icon`, as a string, for Astro components, static HTML or plain TypeScript. Load `@arshad-shah/cynosure/styles/icon.css` (or the full `styles.css`) so it sizes and colours the same way. Every attribute value it writes is escaped (the size, label, colour, classes and the icon's own data), and icon parts or attributes whose names are not plain names are left out, so props from untyped callers (Astro, plain JS) cannot add markup.
 
 ```ts
 import { iconToSvg, search } from "@arshad-shah/cynosure/icons";

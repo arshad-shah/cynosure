@@ -56,6 +56,24 @@ export const KeyboardSteps: Story = {
   },
 };
 
+/** Keys that belong to an input method's composition are not the field's: no step, no commit. */
+export const KeysWhileComposingAreTheInputMethods: Story = {
+  play: async ({ args, canvas, userEvent }) => {
+    const input = canvas.getByRole("spinbutton", { name: "Seats" });
+    await userEvent.click(input);
+    input.dispatchEvent(
+      new KeyboardEvent("keydown", { key: "ArrowUp", bubbles: true, cancelable: true, isComposing: true }),
+    );
+    await expect(input).toHaveValue("5");
+    await userEvent.clear(input);
+    await userEvent.type(input, "12");
+    // Safari reports the composing Enter only as keyCode 229.
+    input.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true, keyCode: 229 }));
+    await expect(args.onChange).not.toHaveBeenCalled();
+    await expect(input).toHaveAttribute("aria-valuenow", "5");
+  },
+};
+
 export const SteppersWithThePointer: Story = {
   play: async ({ canvas, userEvent }) => {
     const input = canvas.getByRole("spinbutton", { name: "Seats" });

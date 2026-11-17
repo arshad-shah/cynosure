@@ -12,6 +12,7 @@ import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js
 import { useControllableState } from "../../foundations/controllable.js";
 import { useDraft } from "../../foundations/draft.js";
 import { HiddenValue } from "../../foundations/HiddenValue/HiddenValue.js";
+import { isComposing } from "../../foundations/keys.js";
 import { isTypeaheadKey, seekEnabled, useTypeahead } from "../../foundations/listbox.js";
 import { clamp } from "../../foundations/math.js";
 import { alignedScroll } from "../../foundations/scroll-align.js";
@@ -294,6 +295,8 @@ export function TimeField({
   };
 
   const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+    // An input method's keys are its own.
+    if (isComposing(event)) return;
     if (event.key === "Enter") commit();
     if ((event.key !== "ArrowUp" && event.key !== "ArrowDown") || readOnly) return;
     const from = parseTime(shown);
