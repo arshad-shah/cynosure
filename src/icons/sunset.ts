@@ -4,8 +4,8 @@ export const sunset: IconData = {
   name: "sunset",
   category: "nature",
   body: [
-    ["path", { d: "M3 18.5h18m-14.5 0a5.5 5.5 0 0 1 11 0M4.9 12.9l1.6 1.6m12.6-1.6-1.6 1.6" }],
-    ["path", { d: "M12 3.5V10M9.5 7.5 12 10l2.5-2.5", animate: true }],
+    ["path", { d: "M3 18.5h18m-14.5 0a5.5 5.5 0 0 1 11 0M6.35 12.85l-1.8-1.8m13.1 1.8 1.8-1.8" }],
+    ["path", { d: "M12 3.75v6.5M9.75 8 12 10.25 14.25 8", animate: true }],
   ],
   motion: "drop",
 };

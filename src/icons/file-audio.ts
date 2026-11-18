@@ -5,8 +5,8 @@ export const fileAudio: IconData = {
   category: "files",
   body: [
     ["path", { d: "M14 3.5H7a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-10zm0 0v5h5" }],
-    ["path", { d: "M11 17.5V12l3.5 1", animate: true }],
-    ["circle", { cx: 9.5, cy: 17.5, r: 1.5 }],
+    ["circle", { cx: 11, cy: 16.25, r: 1.75 }],
+    ["path", { d: "M12.75 16.25V10.5l2.5 1", animate: true }],
   ],
   motion: "pop",
 };

@@ -11,7 +11,7 @@ export const gamepad: IconData = {
         animate: true,
       },
     ],
-    ["path", { d: "M8 10v3.5m-1.75-1.75h3.5M15.5 11h.01m1.99 2h.01" }],
+    ["path", { d: "M8 10v3m-1.5-1.5h3m5.5-1h.01m1.75 1.75h.01" }],
   ],
   motion: "tilt",
 };

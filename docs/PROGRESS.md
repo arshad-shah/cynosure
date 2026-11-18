@@ -2,6 +2,18 @@
 
 ## Status
 
+**Now (2026-11-18, later): every Facet icon checked for overdraw, grazing and slash clearance (Arshad: "over line drawing is against design", "list-todo is not legible", the new file icons "look bad").**
+- **Rules** (now in `src/icons/AGENTS.md`): a stroke is drawn once; lines meet by ending on each other; strokes that do not meet keep a gap; a slash runs 3.5 to 20.5 and everything it crosses out is cut 0.75 clear of it.
+- **Tooling:** `tools/icon-geometry.ts` reads paths, rects and circles into exact lines, cubics and arcs. `tests/unit/icons.test.ts` adds "never draws one stroke over another" and "keeps a slash clear". The slash cuts and overdraw trims were computed exactly, not by hand.
+- **Fixed:**
+  - Slash icons rebuilt from their base icon with one clearance: 9 new ones and `eye-off`, `star-off`, `image-off`, `wifi-off`, `power-off`, whose slashes crossed or grazed their strokes.
+  - 18 icons drew strokes twice (`bold`'s bar, `thumbs-up`'s cuff, `hand`'s fingers, `gift`'s ribbon, letter stems and others); the duplicate stretch is trimmed and the stroke now ends on the line.
+  - 9 icons with strokes grazing edge to edge got gaps.
+  - `sunrise` and `sunset` rays now clear the sun.
+  - Redrawn: `list-todo` (a tick and an open box; the tick inside a box did not read), `file-audio` and `file-video` (same box and weight as the file family), `alarm-clock`, `gamepad`, `fingerprint`, `calendar-clock`, `cloud-upload` and `cloud-download` (open-bottom cloud).
+- **Left as designed:** the 2-unit spacing of parallel strokes (charts, `server`, `file-lock`); `user`'s head and shoulders; `bike`'s chain-stay near the wheel (0.12; a frame redraw).
+- **Verification:** `icons:optimize --check` (every icon stored as small as it draws), icon tests (540), the whole set at 1x in light and dark.
+
 **Now (2026-11-18): 47 more Facet icons (526 in all), same branch.** Proposed from the gaps in the set and the products on the migration list, shown to Arshad as drafts, then the weak ones redrawn after comparing with Lucide and Tabler (reference only; every drawing is Facet's own): `fingerprint` (three open ridges 3 apart, not a blob), `phone-off` (handset in two parts; its slash runs the other way because the handset lies along the usual one), `file-audio` (a note, as `music`), `audio-waveform` (five bars), `circle-progress` (a quarter wedge; a half disc read as "D" and a split circle is `contrast`), `flashlight-off`.
 - **The set:** "off" states cut around the slash (`bell-off`, `mic-off`, `video-off`, `camera-off`, `cloud-off`, `pin-off`, `plug-off`, `phone-off`, `flashlight-off`), `filter-x`, double chevrons, two-way arrows, four people icons, task status (`circle-dashed`, `circle-progress`, `kanban`, `list-todo`), calendars, `alarm-clock`, `sunset`, media (`audio-waveform`, `music`, `film`, `volume-1`, `shuffle`, `picture-in-picture`, `captions`, `circle-pause`, `monitor-up`), `cloud-upload`, `cloud-download`, `file-audio`, `file-video`, `phone`, `reply`, `mail-open`, `fingerprint`, `flashlight`, `gamepad`, `aspect-ratio`.
 - **Left out as duplicates:** `rss` (a brand mark already; `tests/unit/brands.test.tsx` caught it), `file-spreadsheet` (draws as `file-grid`), `volume-2` (is `volume`), `milestone` (`flag`, `signpost`), `badge-check` (`shield-check`), `plug-zap` (`plug`), `webhook` (every drawing read as `share` or `network`; "webhook" is now a search word of `api`), `swatch-book` (read as a letter; `palette`).
