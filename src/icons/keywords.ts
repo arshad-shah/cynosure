@@ -7,6 +7,10 @@
  */
 export const ICON_KEYWORDS = {
   // arrows
+  "arrow-up-down": ["two way", "vertical resize", "reorder", "height", "scroll"],
+  "arrow-left-right": ["two way", "horizontal resize", "exchange", "request response", "width"],
+  "chevrons-right": ["double right", "fast forward", "last", "forward fast", "expand right"],
+  "chevrons-left": ["double left", "rewind", "first", "back fast", "collapse left"],
   "arrow-down": ["south", "below", "descend", "decrease", "lower"],
   "arrow-down-left": ["south west", "diagonal", "incoming", "received"],
   "arrow-left": ["west", "back", "previous", "return"],
@@ -39,6 +43,8 @@ export const ICON_KEYWORDS = {
   "more-vertical": ["ellipsis", "dots", "options", "overflow", "kebab"],
 
   // actions
+  "filter-x": ["clear filters", "remove filter", "reset filters", "no filter"],
+  "pin-off": ["unpin", "detach", "remove pin", "unstick"],
   bookmark: ["save", "favourite", "favorite", "read later", "mark"],
   close: ["x", "cross", "dismiss", "cancel", "remove", "clear", "exit"],
   copy: ["duplicate", "clone", "clipboard"],
@@ -74,6 +80,7 @@ export const ICON_KEYWORDS = {
   "ocr-scan": ["ocr", "recognise text", "scan text", "text recognition", "extract text", "read"],
 
   // editing
+  "list-todo": ["checklist", "tasks", "to do list", "checkboxes", "done"],
   "delete-left": ["backspace", "erase", "delete", "remove character", "keyboard key", "clear"],
   "align-center": ["text", "centre", "middle", "paragraph"],
   "align-justify": ["text", "full width", "paragraph", "block"],
@@ -151,6 +158,8 @@ export const ICON_KEYWORDS = {
   "rotate-ccw": ["rotate left", "counter-clockwise", "anticlockwise", "turn", "reset"],
 
   // files
+  "file-video": ["video file", "movie file", "mp4", "webm", "clip"],
+  "file-audio": ["audio file", "music file", "mp3", "wav", "sound file", "recording"],
   archive: ["box", "store", "zip", "backup", "storage"],
   "book-marked": ["bookmark", "reading list", "saved", "library", "notebook", "journal"],
   "book-open": ["read", "docs", "documentation", "manual", "guide", "library"],
@@ -187,6 +196,9 @@ export const ICON_KEYWORDS = {
   "image-off": ["no image", "image missing", "broken image", "no preview", "hidden"],
 
   // data
+  "cloud-download": ["download", "restore", "sync down", "fetch", "import from cloud"],
+  "cloud-upload": ["upload", "backup", "sync up", "save to cloud", "publish"],
+  "cloud-off": ["offline", "no connection", "sync off", "disconnected", "no internet"],
   activity: ["pulse", "heartbeat", "monitor", "health", "graph", "vitals"],
   boxes: ["plugins", "extensions", "packages", "modules", "stack", "dependencies"],
   braces: ["curly brackets", "code", "json", "object", "block"],
@@ -219,6 +231,17 @@ export const ICON_KEYWORDS = {
   binary: ["bits", "zeros and ones", "base 2", "bytes", "code"],
 
   // media
+  "circle-pause": ["pause", "paused", "on hold", "suspend", "hold"],
+  shuffle: ["random", "randomise", "mix", "scramble", "random order"],
+  captions: ["subtitles", "cc", "closed captions", "transcript", "subtitle"],
+  "picture-in-picture": ["pip", "mini player", "floating video", "overlay video"],
+  "volume-1": ["volume low", "quiet", "sound low", "speaker", "audio level"],
+  film: ["movie", "video", "cinema", "reel", "frames", "clip"],
+  music: ["song", "audio", "notes", "track", "melody", "playlist"],
+  "audio-waveform": ["sound", "recording", "voice", "levels", "audio", "wave"],
+  "camera-off": ["no camera", "camera blocked", "camera denied", "camera lost", "photo off"],
+  "video-off": ["camera off", "no video", "stop video", "video muted"],
+  "mic-off": ["mute", "microphone off", "muted", "no audio", "silence"],
   "image-code": ["code to image", "code screenshot", "snippet", "carbon", "share code", "picture"],
   camera: ["photo", "picture", "capture", "snapshot", "photograph"],
   gif: ["animation", "animated image", "meme", "clip"],
@@ -237,6 +260,10 @@ export const ICON_KEYWORDS = {
   "play-circle": ["play", "start", "video", "run", "resume", "circle play"],
 
   // communication
+  "mail-open": ["read", "opened", "read email", "envelope open", "message read"],
+  reply: ["respond", "answer", "reply to", "back", "return message"],
+  "phone-off": ["hang up", "end call", "no calls", "call ended", "decline"],
+  phone: ["call", "telephone", "contact", "dial", "mobile"],
   "at-sign": ["email", "mention", "address", "username", "handle"],
   bell: ["notification", "alert", "alarm", "reminder", "ring"],
   inbox: ["mail", "messages", "tray", "received", "incoming"],
@@ -249,6 +276,9 @@ export const ICON_KEYWORDS = {
   forward: ["send to", "pass on", "hand off", "route", "export"],
 
   // status
+  "circle-progress": ["in progress", "started", "partial", "doing", "under way"],
+  "circle-dashed": ["to do", "todo", "not started", "draft", "pending", "backlog"],
+  "bell-off": ["mute notifications", "silent", "do not disturb", "notifications off", "quiet"],
   alert: ["warning", "caution", "attention", "exclamation", "triangle"],
   "alert-circle": ["warning", "error", "attention", "exclamation", "problem"],
   ban: ["block", "forbidden", "not allowed", "prohibited", "no", "disabled"],
@@ -272,6 +302,10 @@ export const ICON_KEYWORDS = {
   "plus-circle": ["add", "new", "create", "plus", "insert", "circle plus"],
 
   // time
+  "alarm-clock": ["alarm", "wake up", "reminder", "snooze", "ring"],
+  "calendar-clock": ["scheduled", "appointment", "reminder", "due", "deadline", "time slot"],
+  "calendar-x": ["cancelled", "unavailable", "missed", "no event", "event removed"],
+  "calendar-check": ["booked", "confirmed", "attended", "done date", "event confirmed"],
   calendar: ["date", "day", "month", "schedule", "event", "agenda"],
   "calendar-days": ["date picker", "dates", "month view", "days", "schedule", "agenda"],
   "calendar-plus": ["add event", "new date", "schedule", "book", "appointment"],
@@ -282,6 +316,7 @@ export const ICON_KEYWORDS = {
   timer: ["stopwatch", "countdown", "duration", "alarm", "pomodoro"],
 
   // security
+  fingerprint: ["biometric", "identity", "touch id", "unique id", "hash", "uuid"],
   key: ["password", "access", "credential", "api key", "secret", "unlock", "login"],
   "key-pair": [
     "public key",
@@ -329,6 +364,10 @@ export const ICON_KEYWORDS = {
   "shield-x": ["blocked", "insecure", "not protected", "denied", "threat", "invalid signature", "shield"],
 
   // people
+  "circle-user": ["avatar", "profile", "account", "person", "me"],
+  "user-x": ["remove user", "block", "banned", "reject member", "deny"],
+  "user-check": ["verified user", "approved", "member", "following", "attended"],
+  "user-minus": ["remove user", "remove member", "unfollow", "kick"],
   bot: ["robot", "ai", "assistant", "automation", "machine", "agent"],
   "graduation-cap": ["education", "school", "learn", "student", "university", "course", "degree"],
   user: ["person", "account", "profile", "avatar", "member", "me"],
@@ -337,6 +376,11 @@ export const ICON_KEYWORDS = {
   "id-card": ["my details", "profile", "contact card", "identity", "badge", "autofill", "vcard"],
 
   // devices
+  "flashlight-off": ["torch off", "light off", "flash off", "no light"],
+  flashlight: ["torch", "light", "flash", "lamp", "illuminate"],
+  gamepad: ["game", "controller", "joystick", "play", "arcade", "gaming"],
+  "plug-off": ["disconnected", "unplugged", "no connection", "offline", "disconnect"],
+  "monitor-up": ["screen share", "share screen", "present", "cast", "upload screen"],
   calculator: ["maths", "math", "numbers", "sum", "compute", "arithmetic"],
   command: ["cmd", "mac", "shortcut", "keyboard", "apple key"],
   cpu: ["processor", "chip", "hardware", "performance", "core"],
@@ -360,6 +404,7 @@ export const ICON_KEYWORDS = {
   "battery-warning": ["battery alert", "critical", "low power", "empty", "warning"],
 
   // design
+  "aspect-ratio": ["ratio", "proportions", "resize", "crop ratio", "16:9", "frame size"],
   "axis-3d": ["three dimensions", "xyz", "coordinates", "space", "model"],
   blend: ["mix", "overlap", "merge", "opacity", "blend mode"],
   brush: ["paint", "draw", "art", "stroke", "style"],
@@ -394,6 +439,7 @@ export const ICON_KEYWORDS = {
   wand: ["magic", "auto", "enhance", "auto format", "magic wand"],
 
   // layout
+  kanban: ["board", "columns", "tasks", "workflow", "sprint", "project"],
   collapse: ["shrink", "fold", "minimise", "minimize", "close", "less"],
   columns: ["layout", "split", "side by side", "two columns", "vertical"],
   expand: ["grow", "unfold", "enlarge", "open", "more", "fullscreen"],
@@ -479,6 +525,7 @@ export const ICON_KEYWORDS = {
   "shopping-bag": ["cart", "buy", "purchase", "shop", "store", "basket", "order"],
 
   // nature
+  sunset: ["dusk", "evening", "maghrib", "sundown", "sun down"],
   "cloud-rain": ["weather", "rainy", "shower", "forecast", "wet", "drizzle"],
   "cloud-snow": ["weather", "snowy", "winter", "forecast", "flurries", "cold"],
   "cloud-lightning": ["weather", "storm", "thunder", "thunderstorm", "forecast", "bolt"],
@@ -534,7 +581,7 @@ export const ICON_KEYWORDS = {
   container: ["docker", "image", "shipping", "deploy", "isolated", "pod"],
   variable: ["value", "parameter", "placeholder", "x", "environment", "token"],
   "file-diff": ["changes", "patch", "added removed", "compare", "review"],
-  api: ["interface", "connect", "integration", "endpoint", "plug in", "socket"],
+  api: ["interface", "connect", "integration", "endpoint", "plug in", "socket", "webhook"],
   "git-branch": ["version control", "fork", "branch", "source control", "merge"],
   code: ["developer", "source", "html", "programming", "angle brackets", "embed"],
   terminal: ["console", "command line", "shell", "prompt", "cli", "bash"],
