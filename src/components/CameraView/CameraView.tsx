@@ -225,12 +225,14 @@ export const CameraView = forwardRef<HTMLDivElement, CameraViewProps>(function C
         setStream(got);
         const track = got.getVideoTracks()[0];
         // A camera unplugged, or access taken back, ends the track: say so and turn off, not a black picture.
-        track?.addEventListener("ended", () => {
-          if (gone) return;
-          setError("lost");
-          latest.current.onError?.({ kind: "lost" });
-          latest.current.setOn(false);
-        });
+        // Through the handler property: Firefox ran it but not an `addEventListener` listener on the same track.
+        if (track)
+          track.onended = () => {
+            if (gone) return;
+            setError("lost");
+            latest.current.onError?.({ kind: "lost" });
+            latest.current.setOn(false);
+          };
         setCanTorch(!!(track?.getCapabilities?.() as { torch?: boolean } | undefined)?.torch);
         // Names are only given once access is allowed, so list the cameras now.
         const list = (await navigator.mediaDevices.enumerateDevices?.()) ?? [];
@@ -251,7 +253,10 @@ export const CameraView = forwardRef<HTMLDivElement, CameraViewProps>(function C
     );
     return () => {
       gone = true;
-      for (const t of live?.getTracks() ?? []) t.stop();
+      for (const t of live?.getTracks() ?? []) {
+        t.onended = null;
+        t.stop();
+      }
       setStream(null);
       setCanTorch(false);
     };
