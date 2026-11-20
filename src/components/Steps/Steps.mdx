@@ -36,6 +36,12 @@ Steps before `current` are complete and steps after it upcoming. Set a step's `s
 
 <Canvas of={Stories.ErrorsAndOverrides} />
 
+## A numbered how-to
+
+Leave out `current` for steps to follow rather than progress (install, open, pick a city): every step is numbered alike, none is current, no status is read, and the list is named "Steps" (`labels.list`).
+
+<Canvas of={Stories.NumberedHowTo} />
+
 ## Choosing a step
 
 Pass `onStepSelect` and each step becomes a button that calls it with the step's `id`. The current step and steps with `disabled: true` do nothing when pressed. Which steps may be visited is your decision: disable the ones that are not ready.
@@ -52,7 +58,7 @@ Pass `onStepSelect` and each step becomes a button that calls it with the step's
 
 ## Behaviour and accessibility
 
-- **Structure:** an ordered list named "Progress" (`labels.list`). The current step has `aria-current="step"`, and each step says its state after its label: "completed", "current step", "not started" or "has a problem" (all in `labels`).
+- **Structure:** an ordered list named "Progress" (`labels.list`; "Steps" without `current`). The current step has `aria-current="step"`, and each step says its state after its label: "completed", "current step", "not started" or "has a problem" (all in `labels`).
 - **Keyboard** (with `onStepSelect`):
 
 | Key                 | Action                         |

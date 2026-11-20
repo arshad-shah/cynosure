@@ -97,7 +97,7 @@ Avatar has no keyboard or pointer behaviour: it cannot be focused or pressed.
 - **Contrast:** fallback initials keep 4.5:1 or better in every tone (tested).
 - **Right to left:** the status dot sits at the left corner and a group overlaps towards the left.
 - **Forced colours:** an outline keeps the avatar's shape and the status dot draws in the text colour.
-- **Attributes:** `id`, any `data-*` attribute and the `ref` go to the root element.
+- **Attributes:** `id`, `role`, any `data-*` or `aria-*` attribute and the `ref` go to the root element; the avatar's own `role="img"`, name and `aria-hidden` win.
 
 ## Touch
 

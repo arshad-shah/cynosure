@@ -95,7 +95,7 @@ export function Rating({
   style,
 }: RatingProps) {
   const text = { ...DEFAULT_LABELS, ...labels };
-  const [current, setCurrent] = useControllableState(value, defaultValue, onChange);
+  const [current, setCurrent, resetCurrent] = useControllableState(value, defaultValue, onChange);
   const [hover, setHover] = useState<number | null>(null);
   const live = !readOnly && !disabled;
   const shown = Math.min(max, Math.max(0, live && hover !== null ? hover : current));
@@ -192,7 +192,14 @@ export function Rating({
         {stars}
       </span>
       {number}
-      {name !== undefined && <HiddenValue name={name} value={String(current)} />}
+      {name !== undefined && (
+        <HiddenValue
+          name={name}
+          value={String(current)}
+          disabled={disabled}
+          onReset={() => resetCurrent(defaultValue)}
+        />
+      )}
     </span>
   );
 }

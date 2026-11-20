@@ -26,7 +26,7 @@ import { TagInput } from "@arshad-shah/cynosure";
 Also takes TextField's `label`, `labelHidden`, `description`, `error`, `placeholder`, `size` and `variant`.
 
 - With `suggestions` the input is an APG combobox with a listbox (Arrow Up/Down, Enter, Escape); without, a plain text box.
-- Keyboard: Backspace in an empty field takes the last tag back into the field to edit ("Editing design" is announced; Enter or leaving the field adds it again); Arrow Left at the start of the field moves into the tags, Arrow Left/Right move between them, Delete or Backspace removes one, Arrow Right past the last or Escape returns to the field. Tags are not tab stops.
+- Keyboard: Backspace in an empty field takes the last tag back into the field to edit ("Editing design" is announced; Enter or leaving the field adds it again); Arrow Left at the start of the field moves into the tags, Arrow Left/Right move between them, Delete or Backspace removes one, Arrow Right past the last or Escape returns to the field (that Escape does not also close an enclosing dialog). Tags are not tab stops.
 - Leaving the field adds what was typed. Additions and removals are announced.
 - Refusals (duplicate, too many, `validate`) keep the text so it can be fixed.
 

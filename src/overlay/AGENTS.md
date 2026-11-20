@@ -11,6 +11,9 @@ Shared machinery for everything that floats: Tooltip, Select, Popover, Menu, Dia
   - `outside` can be a function instead (Dialog: "the pointer went down on the backdrop"); then the layer closes only if it is the topmost, so a backdrop click with a Menu open inside closes just the Menu. Listeners run in the order layers opened, so an outer layer decides before its nested ones close.
   - Focus returns to `returnFocus` only when it was inside the layer or lost to the body.
 
+- `floating.ts`: `usePopover` (shows or hides a manual popover before paint), `useFloatingAnchor` (a ref or a virtual anchor, such as a selection or a point) and `useFloatingOffset` (the gap from the anchor, read from the surface's CSS).
+- `listbox-layer.ts`: `useListboxLayer`, the drop-down list layer shared by Select, Combobox, TagInput, OptionList and TextArea's mentions: popover, anchored position under the field and dismissal in one call.
+
 - `toast-host.ts`: `ToastHostContext`. An open Dialog (inside a Toaster) registers a container inside itself; the Toaster portals its region into the latest one, so toasts are above the modal and not inert. Kept separate so Dialog does not import Toast.
 
 Rules: every overlay uses the top layer (the Popover API, `popover="manual"` spread as `{...{ popover: "manual" }}`; modal dialogs use `DialogBase`'s `showModal`) and `useDismiss`. Never write to `<html>` or `<body>`. Tests: `tests/unit/dismiss.test.tsx` plus the nested stories in Popover.

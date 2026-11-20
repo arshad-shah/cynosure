@@ -4,7 +4,12 @@ export const imageOff: IconData = {
   name: "image-off",
   category: "files",
   body: [
-    ["path", { d: "M9 4.5h8.5a3 3 0 0 1 3 3V14M15 19.5H6.5a3 3 0 0 1-3-3V10m8.5 4.8-5 4.7" }],
+    [
+      "path",
+      {
+        d: "M8.04 4.5h9.46a3 3 0 0 1 3 3v9a3 3 0 0 1-.03.43m-4.51 2.57H6.5a3 3 0 0 1-3-3v-9a3 3 0 0 1 .03-.43M20.5 15.5 16 11l-.75.71m-3.64 3.44L7 19.5",
+      },
+    ],
     ["path", { d: "M3.5 3.5l17 17", animate: true }],
   ],
   motion: "pop",

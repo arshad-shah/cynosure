@@ -9,19 +9,22 @@ How far a task has got: uploads, exports, multi-step setups. A labelled `role="p
 <ProgressBar label="Password strength" meter steps={4} max={4} value={3} valueText="Good" tone="success" showValue />
 ```
 
-| Prop            | Default  | Notes                                                                                  |
-| --------------- | -------- | -------------------------------------------------------------------------------------- |
-| `label`         | –        | Accessible name, shown above the bar                                                   |
-| `labelHidden`   | `false`  | Keep the name for screen readers only                                                  |
-| `value` / `max` | – / 100  | Clamped to 0…`max`. Leave `value` out when the amount is unknown                       |
-| `indeterminate` | `false`  | Unknown amount: a sweeping segment, `aria-busy`, no `aria-valuenow`                    |
-| `showValue`     | `false`  | Shows the value text at the end of the label row                                       |
-| `tone`          | `accent` | `accent` · `success` · `warning` · `danger` · `info` · `neutral`                       |
-| `size`          | `md`     | Thickness: `xs` 2 · `sm` 4 · `md` 8 · `lg` 12 px (`xs` also sets smaller text)         |
-| `labels`        | –        | `value(value, max)` for the value text and `aria-valuetext` (default "40%")            |
-| `meter`         | `false`  | `role="meter"`: a measurement, never indeterminate (a missing value reads 0)           |
-| `valueText`     | –        | The value in words ("Strong", "Step 2 of 5"), shown and read instead of the percentage |
-| `steps`         | –        | Draw N separate pills, lit up to round(value / max times N); not with `segments`       |
+| Prop                     | Default  | Notes                                                                                                     |
+| ------------------------ | -------- | --------------------------------------------------------------------------------------------------------- |
+| `label`                  | –        | Accessible name, shown above the bar                                                                      |
+| `labelHidden`            | `false`  | Keep the name for screen readers only                                                                     |
+| `value` / `max`          | – / 100  | Clamped to 0…`max`. Leave `value` out when the amount is unknown                                          |
+| `indeterminate`          | `false`  | Unknown amount: a sweeping segment, `aria-busy`, no `aria-valuenow`                                       |
+| `showValue`              | `false`  | Shows the value text at the end of the label row                                                          |
+| `tone`                   | `accent` | `accent` · `success` · `warning` · `danger` · `info` · `neutral`                                          |
+| `size`                   | `md`     | Thickness: `xs` 2 · `sm` 4 · `md` 8 · `lg` 12 px (`xs` also sets smaller text)                            |
+| `labels`                 | –        | `value(value, max)` for the value text and `aria-valuetext` (default "40%")                               |
+| `meter`                  | `false`  | `role="meter"`: a measurement, never indeterminate (a missing value reads 0)                              |
+| `valueText`              | –        | The value in words ("Strong", "Step 2 of 5"), shown and read instead of the percentage                    |
+| `steps`                  | –        | Draw N separate pills, lit up to round(value / max times N); not with `segments`                          |
+| `segments` / `offset`    | – / 0    | Parts drawn end to end from `offset` (in `max` units), each `{ value, label, tone?, color? }` (see below) |
+| `marker` / `markerLabel` | –        | A thin mark at a value, read with the value (default "marker at 75%")                                     |
+| `className` / `style`    | –        | Layout only                                                                                               |
 - The fill uses the tone's text colour, which stays at 3:1 or more against the track in light and dark modes.
 - Fills from the inline start (right in right-to-left text). The indeterminate segment stands still in the middle under reduced motion.
 

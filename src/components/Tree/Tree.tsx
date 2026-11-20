@@ -6,6 +6,7 @@ import {
   type ReactNode,
   type Ref,
   useCallback,
+  useEffect,
   useId,
   useImperativeHandle,
   useMemo,
@@ -398,15 +399,34 @@ export function Tree<T = unknown>(props: TreeProps<T>) {
     rowElement(tabStop)?.focus({ preventScroll: virtual });
   });
 
+  // Each item's latest request: an answer to an earlier one (a reload came after it) or after unmount is ignored.
+  const requests = useRef(new Map<string, number>());
+  const mounted = useRef(true);
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
+  /** Starts a new request for `id`, superseding any in flight; returns whether it is still the latest. */
+  const request = (id: string) => {
+    const n = (requests.current.get(id) ?? 0) + 1;
+    requests.current.set(id, n);
+    return () => mounted.current && requests.current.get(id) === n;
+  };
   // Fetch an item's children, with a loading row meanwhile and a failure row if it fails.
   const fetchChildren = (item: TreeItem<never>, from: NonNullable<typeof loadChildren>) => {
+    const latest = request(item.id);
     setStatus((s) => ({ ...s, [item.id]: "loading" }));
     from(item).then(
       (kids) => {
+        if (!latest()) return;
         setLoaded((l) => ({ ...l, [item.id]: kids }));
         setStatus(({ [item.id]: _, ...rest }) => rest);
       },
-      () => setStatus((s) => ({ ...s, [item.id]: "failed" })),
+      () => {
+        if (latest()) setStatus((s) => ({ ...s, [item.id]: "failed" }));
+      },
     );
   };
   const load = (item: TreeItem<never>) => {
@@ -424,12 +444,24 @@ export function Tree<T = unknown>(props: TreeProps<T>) {
     isOpen,
     loadChildren,
     fetchChildren,
+    request,
     open,
     setOpen,
     shutIds,
     filter,
   });
-  latest.current = { items, loaded, isOpen, loadChildren, fetchChildren, open, setOpen, shutIds, filter };
+  latest.current = {
+    items,
+    loaded,
+    isOpen,
+    loadChildren,
+    fetchChildren,
+    request,
+    open,
+    setOpen,
+    shutIds,
+    filter,
+  };
   /** The item `reveal` asked for, shown once its row is there. */
   const revealing = useRef<{ id: string; align: ScrollAlign } | null>(null);
   useClientLayoutEffect(() => {
@@ -449,7 +481,7 @@ export function Tree<T = unknown>(props: TreeProps<T>) {
     handle,
     () => ({
       reload: (id) => {
-        const { items, loaded, isOpen, loadChildren, fetchChildren } = latest.current;
+        const { items, loaded, isOpen, loadChildren, fetchChildren, request } = latest.current;
         const find = (list: TreeItem<never>[] | undefined): TreeItem<never> | undefined => {
           for (const item of list ?? []) {
             const found = item.id === id ? item : find(item.children ?? loaded[item.id]);
@@ -460,9 +492,12 @@ export function Tree<T = unknown>(props: TreeProps<T>) {
         const item = find(items);
         if (!item || item.children || !loadChildren) return;
         setLoaded(({ [id]: _, ...rest }) => rest);
-        // Open: load now. Closed: the children load the next time it opens.
+        // Open: load now. Closed: the children load the next time it opens. An answer still on its way is dropped.
         if (isOpen(id)) fetchChildren(item, loadChildren);
-        else setStatus(({ [id]: _, ...rest }) => rest);
+        else {
+          request(id);
+          setStatus(({ [id]: _, ...rest }) => rest);
+        }
       },
       reveal: (id, { align = "nearest" } = {}) => {
         const { items, loaded, isOpen, open, setOpen, shutIds, filter } = latest.current;

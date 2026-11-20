@@ -14,7 +14,19 @@ APG menu button: a list of commands in the top layer.
 />;
 ```
 
-Items: `value`, `label`, `icon`, `iconTone` and `iconColor`, `shortcut` (shown with Kbd, exposed as `aria-keyshortcuts`), `disabled`, `tone` (`neutral` or `danger`), `kind` (`checkbox` or `radio`) with `checked`, and `keepOpen` (checkable items keep the menu open by default, for several toggles in a row; `keepOpen: false` closes it, as for a zoom choice). Sections (`{ label, items }`) render as a named group after a separator; a section without a `label` (`{ items }`) is set apart by separator lines only, with no group.
+| Prop                                    | Default  | Notes                                                                                                                       |
+| --------------------------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `trigger`                               | –        | Required. `(props) => <Button {...props}>…</Button>`: spread the props (ref, click, keys, ARIA) onto a Button or IconButton |
+| `label`                                 | –        | Required. Accessible name of the menu                                                                                       |
+| `items`                                 | –        | Required. Items, items with `items` (a submenu) and sections (`{ label?, items }`)                                          |
+| `onSelect`                              | –        | Required. Called with the chosen item's `value`, from any level                                                             |
+| `open` / `defaultOpen` / `onOpenChange` | `false`  | Controlled or not; reports the trigger, Escape, a choice, Tab and a click outside                                           |
+| `placement`                             | `bottom` | `top` · `bottom` · `start` · `end`; flips when there is no room                                                             |
+| `align`                                 | –        | `start` · `center` · `end`; unset, the start edge above or below, centred beside                                            |
+| `offset`                                | –        | Gap from the trigger in pixels; default the `--cy-menu-offset` token                                                        |
+| `className` / `style`                   | –        | Layout only, on the panel                                                                                                   |
+
+Items: `value`, `label`, `icon`, `iconTone` and `iconColor`, `shortcut` (`["Ctrl", "E"]`, or `"mod+e"` for this platform's names; shown with Kbd, exposed as `aria-keyshortcuts`), `disabled`, `tone` (`neutral` or `danger`), `kind` (`checkbox` or `radio`) with `checked`, and `keepOpen` (checkable items keep the menu open by default, for several toggles in a row; `keepOpen: false` closes it, as for a zoom choice). Sections (`{ label, items }`) render as a named group after a separator; a section without a `label` (`{ items }`) is set apart by separator lines only, with no group.
 
 An item with `items` opens a **submenu** beside it (end side, flipping at the viewport edge), nested to any depth. Its entries are plain data like the rest, so they can come from plugins. The parent item is a `menuitem` with `aria-haspopup="menu"`, `aria-expanded` and a chevron; its own `value` is never selected. `onSelect` receives the value chosen at any level, and a choice closes the whole tree.
 

@@ -4,6 +4,10 @@ import { Choice, type ChoiceControlProps } from "../Choice/Choice.js";
 export interface SwitchTokens {
   width: string;
   height: string;
+  /** Track height of `size="sm"`. */
+  heightSm: string;
+  /** Track height of `size="lg"`. */
+  heightLg: string;
   thumbSize: string;
   offBg: string;
 }

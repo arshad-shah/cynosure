@@ -45,6 +45,7 @@ export function App() {
 - **`contrast`:** `normal`, `more` or `system`. When omitted it follows the OS, like `system`. `normal` keeps the normal palettes even on an OS set to more contrast, with or without a `theme`.
 - **`target`:** `self` (default) themes only the wrapper; `document` themes `<html>`.
 - **`as`:** `div` (default) or `span`. The wrapper uses `display: contents`, so it does not affect layout.
+- **`className`:** added to the wrapper. Not used with `target="document"`, which renders no wrapper.
 - **`style`:** layout only (margin, placement). Restyle through tokens.
 
 ## Nesting and modes
@@ -66,7 +67,7 @@ export function App() {
 ```ts
 const theme = createTheme({
   accent: "#e8462e", // any hex, rgb(), hsl(), oklch()
-  scale: "compact", // compact 0.875 · comfortable 1 · spacious 1.2 · or a number
+  scale: "compact", // compact 0.875 · comfortable 1 · spacious 1.2 · or a number from 0.5 to 3
   radius: 1, // multiplier on the Facet radius (0.3 × control height)
   font: { sans: "Hanken Grotesk, system-ui" },
   motion: "reduced", // or partial durations/easings

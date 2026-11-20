@@ -47,6 +47,7 @@ import { Sheet, Switch } from "@arshad-shah/cynosure";
 
 - **Sides:** `bottom` is full width and up to 85% of the height; `end` is full height and docks to the right (left in right-to-left text); `start` is full height and docks to the left (right in right-to-left text).
 - **Size:** `size` sets the width of an `end` or `start` sheet.
+- **Header:** `closeButton={false}` hides the close button while Escape and the backdrop still close the sheet, for a sheet whose own actions close it. With `titleHidden` as well, the header takes no room and the title still names the sheet. `dismissible={false}` leaves only your actions: Escape and the backdrop no longer close it.
 - **Mounting:** the content is in the DOM only while the sheet is open, and is removed once it has slid out, so every opening starts fresh. `keepMounted` keeps it while closed, for a drawer whose scroll position or expanded sections should survive.
 - Everything else (focus, roles, shadow DOM, no writes to `<body>`) is the same as [Dialog](?path=/docs/components-overlays-dialog--docs).
 

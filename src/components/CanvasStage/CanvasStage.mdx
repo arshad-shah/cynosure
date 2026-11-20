@@ -49,7 +49,7 @@ With `onFiles`, the whole stage takes files: while they are dragged over it, `la
 ## Behaviour and accessibility
 
 - **Role:** a group named by `label`. Name the surface inside it for what it shows.
-- **Overlay:** centred; only its content takes presses, so around it the surface still gets them. It hides while files are dragged over.
+- **Overlay:** centred; only its content takes presses, so around it the surface still gets them. It hides while files are dragged over the stage, and stays mounted while hidden, so a drag that came in over it still ends the drop hint when it leaves.
 - **Keyboard:** the stage adds no keys and no tab stop. Dropping is pointer-only, so give keyboard users a picker too (a FileDrop button in the overlay or a toolbar).
 - **Host CSS:** host rules for `div` and `span` do not change it (tested).
 

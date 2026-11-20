@@ -3,7 +3,7 @@
 A pad to draw a signature with a mouse, finger or pen. A pen's pressure and tilt shape the line; a mouse or finger draws a steady line, like a ballpoint. One pointer draws at a time, and a palm resting on the screen while a pen is in use is ignored.
 
 ```tsx
-import { SignaturePad, inkToSvg } from "@arshad-shah/cynosure";
+import { Button, type InkStroke, SignaturePad, inkToSvg } from "@arshad-shah/cynosure";
 
 const [strokes, setStrokes] = useState<InkStroke[]>([]);
 
@@ -14,15 +14,17 @@ const [strokes, setStrokes] = useState<InkStroke[]>([]);
 const svg = inkToSvg(strokes, { width: 600, height: 200, ink: "#1d1b18", weight: "medium" });
 ```
 
-| Prop                 | Default            | Notes                                                                                     |
-| -------------------- | ------------------ | ----------------------------------------------------------------------------------------- |
-| `label`              | –                  | Accessible name of the pad                                                                |
-| `value` / `onChange` | –                  | Strokes in the pad's space; `onChange` once per finished stroke. Undo and clear are yours |
-| `ink`                | ink token          | Any CSS colour; without it the ink follows light and dark modes                           |
-| `weight`             | `medium`           | `thin` · `medium` · `bold`                                                                |
-| `space`              | shown pixels       | Coordinate space strokes are recorded in, so a signature keeps its shape at any size      |
-| `width` / `height`   | full width / token | Fixed CSS pixel size                                                                      |
-| `disabled`           | `false`            |                                                                                           |
+| Prop                  | Default            | Notes                                                                                     |
+| --------------------- | ------------------ | ----------------------------------------------------------------------------------------- |
+| `label`               | –                  | Accessible name of the pad                                                                |
+| `value` / `onChange`  | –                  | Strokes in the pad's space; `onChange` once per finished stroke. Undo and clear are yours |
+| `ink`                 | ink token          | Any CSS colour; without it the ink follows light and dark modes                           |
+| `weight`              | `medium`           | `thin` · `medium` · `bold`                                                                |
+| `space`               | shown pixels       | Coordinate space strokes are recorded in, so a signature keeps its shape at any size      |
+| `width` / `height`    | full width / token | Fixed CSS pixel size                                                                      |
+| `disabled`            | `false`            | Stops drawing; the strokes so far stay shown                                              |
+| `aria-describedby`    | –                  | Ids of text that explains the pad, such as another way to sign                            |
+| `className` / `style` | –                  | Layout only                                                                               |
 
 Helpers: `inkToSvg(strokes, { width, height, ink, weight })` for saving or placing in a PDF, `inkPath(stroke, weight)` for one stroke's path data (only M, C and Z), and `inkOutline` / `penPressure` for custom renderers.
 

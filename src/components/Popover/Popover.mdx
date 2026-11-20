@@ -57,6 +57,18 @@ Popovers nest, and Escape closes one layer at a time: an inner popover first, th
 
 <Canvas of={Stories.AlignLinesThePanelUpWithTheTrigger} />
 
+## At a point or beside an element
+
+`anchor` places the panel against something other than its trigger: a point (`{ x, y }` in viewport pixels, such as where a canvas was clicked), any element, or a virtual anchor (anything with `getBoundingClientRect`). `trigger` is then optional; control the panel with `open`, and focus goes back to where it was when it closes.
+
+```tsx
+<Popover label="Add a note" anchor={at ?? undefined} open={at !== null} onOpenChange={(o) => !o && setAt(null)}>
+  <TextField label="Note" />
+</Popover>
+```
+
+<Canvas of={Stories.OpenAtAPoint} />
+
 ## Props
 
 <ArgTypes of={Stories} />
@@ -68,10 +80,10 @@ Popovers nest, and Escape closes one layer at a time: an inner popover first, th
 | Click, tap, <kbd>Enter</kbd>, <kbd>Space</kbd> on the trigger | Opens or closes |
 | <kbd>Escape</kbd> | Closes the topmost layer and returns focus to its trigger |
 | Pointer down outside | Closes it |
-| <kbd>Tab</kbd> with `modal` | Cycles inside the panel |
+| <kbd>Tab</kbd> with `modal` | Cycles through the panel's tab stops (a toolbar or radio group is one stop) |
 | <kbd>Tab</kbd> past the last control, without `modal` | Closes it; focus stays where Tab put it |
 
-- **Focus:** on open, focus moves to the first control inside, or to the panel itself when it has none, so screen readers land in it (`initialFocus` changes this). On close, focus returns to the trigger unless you already moved it somewhere else.
+- **Focus:** on open, focus moves to the first control inside that Tab reaches, or to the panel itself when it has none, so screen readers land in it (`initialFocus` changes this). On close, focus returns to the trigger unless you already moved it somewhere else.
 - **Focus leaving:** a non-modal panel closes when focus moves out of it to anything but its trigger or anchor (Tab past its last control, a click into another field), so it never hangs open over what has focus. Shift+Tab back to the trigger keeps it open. `closeOnFocusOut={false}` keeps it open until Escape, an outside press or the trigger closes it.
 - **Anchor:** an anchor element counts as part of the popover, like the trigger: pressing it is not an outside press.
 - **Role:** the panel is a dialog named by `label`. With `modal` it is `aria-modal` and keeps Tab inside.

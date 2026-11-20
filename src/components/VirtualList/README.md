@@ -20,7 +20,7 @@ import { VirtualList } from "@arshad-shah/cynosure";
 | Prop                                  | Default  | Notes                                                                                                                           |
 | ------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------- |
 | `label`                               | –        | Accessible name                                                                                                                 |
-| `items`, `getKey`, `renderItem`       | –        | `renderItem(item, { index, selected, disabled })`                                                                               |
+| `items`, `getKey`, `renderItem`       | –        | `renderItem(item, { index, selected, disabled })`; `getKey` may be inline (rows are keyed again only when `items` changes)      |
 | `wrap`                                | `false`  | Rows wrap and take the height they need; each is measured as it renders and again when it grows or shrinks (a row that expands) |
 | `onRangeChange`                       | –        | `(start, end)`: the rows in view (end exclusive) when they change, to fetch rows by position                                    |
 | `follow`                              | `false`  | Stays at the end as rows arrive, while scrolled there (logs, feeds)                                                             |

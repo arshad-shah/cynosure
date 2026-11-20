@@ -667,3 +667,23 @@ export const RendersYourRoutersLink: Story = {
     await expect(visits).toEqual(["/projects/1"]);
   },
 };
+
+export const NamedByYourOwnHeading: Story = {
+  render: () => (
+    <div style={{ display: "grid", gap: 12, inlineSize: 320 }}>
+      <h2 id="billing-heading">Billing</h2>
+      <Card as="section" aria-labelledby="billing-heading" data-testid="untitled">
+        Plan and invoices.
+      </Card>
+      <h2 id="usage-heading">Usage</h2>
+      <Card as="section" title="This month" aria-labelledby="usage-heading" data-testid="titled">
+        12 of 50 seats.
+      </Card>
+    </div>
+  ),
+  play: async ({ canvas }) => {
+    // An `aria-labelledby` you pass names the card, with or without a title of its own.
+    await expect(canvas.getByRole("region", { name: "Billing" })).toBe(canvas.getByTestId("untitled"));
+    await expect(canvas.getByRole("region", { name: "Usage" })).toBe(canvas.getByTestId("titled"));
+  },
+};

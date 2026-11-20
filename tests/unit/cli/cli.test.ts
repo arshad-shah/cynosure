@@ -115,6 +115,36 @@ describe("cy check", () => {
     );
     expect(check(root).find((v) => v.rule === "native-elements")?.file).toBe("src/components/Button/Ce.tsx");
   });
+  it.each([
+    ["jsx()", 'import { jsx } from "react/jsx-runtime";\nexport const C = () => jsx("input", {});\n'],
+    [
+      "React.createElement()",
+      'import React from "react";\nexport const C = () => React.createElement("select");\n',
+    ],
+    ["a const tag in JSX", 'const Tag = "button";\nexport const C = () => <Tag type="button">x</Tag>;\n'],
+    [
+      "a const tag in createElement",
+      'import { createElement } from "react";\nconst T = "a";\nexport const C = () => createElement(T);\n',
+    ],
+  ])("flags a native element made through %s outside foundations", (_, code) => {
+    const root = sandbox();
+    write(root, "src/components/Button/Ce.tsx", code);
+    expect(check(root).find((v) => v.rule === "native-elements")?.file).toBe("src/components/Button/Ce.tsx");
+  });
+  it("leaves const tags that are not native elements, and native ones in foundations", () => {
+    const root = sandbox();
+    write(
+      root,
+      "src/components/Button/Ce.tsx",
+      'const Tag = "span";\nexport const C = () => <Tag>x</Tag>;\n',
+    );
+    write(
+      root,
+      "src/foundations/Icon/Ce.tsx",
+      'const Tag = "button";\nexport const C = () => <Tag>x</Tag>;\n',
+    );
+    expect(rules(root)).not.toContain("native-elements");
+  });
   it("flags glyphs inside JSX string expressions", () => {
     const root = sandbox();
     write(
@@ -177,6 +207,34 @@ describe("cy check", () => {
     const root = sandbox();
     write(root, "src/components/Button/T.tsx", 'export const T = () => <span title="Saved">x</span>;\n');
     expect(rules(root)).toContain("title-attr");
+  });
+  it.each([
+    ["an object spread", 'export const T = () => <span {...{ title: "Saved" }}>x</span>;\n'],
+    [
+      "a shorthand key in a spread",
+      'const title = "Saved";\nexport const T = () => <span {...{ title }}>x</span>;\n',
+    ],
+    [
+      "createElement props",
+      'import { createElement } from "react";\nexport const T = () => createElement("span", { title: "Saved" });\n',
+    ],
+    [
+      "jsx() props",
+      'import { jsx } from "react/jsx-runtime";\nexport const T = () => jsx("span", { "title": "Saved" });\n',
+    ],
+  ])("flags a title set through %s", (_, code) => {
+    const root = sandbox();
+    write(root, "src/components/Button/T.tsx", code);
+    expect(rules(root)).toContain("title-attr");
+  });
+  it("allows a title key spread onto a Cynosure component", () => {
+    const root = sandbox();
+    write(
+      root,
+      "src/components/Button/T.tsx",
+      'const Card = (p: { title: string }) => null;\nexport const T = () => <Card {...{ title: "Summary" }} />;\n',
+    );
+    expect(rules(root)).not.toContain("title-attr");
   });
   it("flags hex and px literals in component CSS but allows var() fallbacks", () => {
     const root = sandbox();

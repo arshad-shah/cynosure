@@ -72,6 +72,27 @@ export const FormResetAndRequired: Story = {
   },
 };
 
+/** Without `name` nothing is submitted, as with every other field; required, reset and the arrows still work. */
+export const WithoutANameNothingIsSubmitted: Story = {
+  render: ({ name: _, ...args }) => (
+    <form data-testid="form">
+      <RadioGroup {...args} required />
+    </form>
+  ),
+  play: async ({ canvas, userEvent }) => {
+    const form = canvas.getByTestId("form") as HTMLFormElement;
+    await expect(form.checkValidity()).toBe(false);
+    await userEvent.click(canvas.getByText("Daily"));
+    await expect(form.checkValidity()).toBe(true);
+    await expect([...new FormData(form).keys()]).toEqual([]);
+    await userEvent.keyboard("{ArrowDown}");
+    await expect(canvas.getByRole("radio", { name: /Weekly/ })).toBeChecked();
+    await expect(canvas.getByRole("radio", { name: "Daily" })).not.toBeChecked();
+    form.reset();
+    await expect(canvas.getByRole("radio", { name: /Weekly/ })).not.toBeChecked();
+  },
+};
+
 function Controlled() {
   const [value, setValue] = useState("daily");
   return (

@@ -26,7 +26,7 @@ Interactive components follow the WAI-ARIA Authoring Practices Guide (APG) patte
 | [Calendar](../src/components/Calendar/README.md)                                               | One Tab stop on the focused day; arrows by day and week; Home and End to the ends of the week; Page Up and Page Down by month, with Shift by year; Enter or Space chooses                                                                                                                  |
 | [SortableList](../src/components/SortableList/README.md)                                       | Space or Enter picks a row up and drops it; arrows move it; Home and End move it to the ends; Escape cancels; Tab drops it in place                                                                                                                                                        |
 | [Dialog](../src/components/Dialog/README.md), [Sheet](../src/components/Sheet/README.md)       | Focus moves inside on open and returns on close; Escape closes                                                                                                                                                                                                                             |
-| [Tooltip](../src/components/Tooltip/README.md)                                                 | Opens at once on keyboard focus; Escape dismisses                                                                                                                                                                                                                                          |
+| [Tooltip](../src/components/Tooltip/README.md)                                                 | Opens on keyboard focus (Tab, arrows, Home, End, Page Up or Down), never on focus a script moves; closes when focus leaves the trigger; Escape dismisses                                                                                                                                   |
 
 **Roving focus.** `useRovingFocus` (`src/foundations/roving-focus.ts`) gives a group one Tab stop: arrows move between items and skip disabled ones, Home and End jump, horizontal arrows follow the reading direction, and while focus is elsewhere the Tab stop follows the selected item. Text inputs inside a group keep their own arrow, Home and End keys. Tabs, Toolbar, Menu, Menubar, ListRow, StatusBar and ColorSwatches use it. The slider-style keys (Slider, SplitPane, CompareSlider, ColorField's area, DataGrid) come from one shared helper, `stepKey` in `src/foundations/keys.ts`.
 
@@ -49,7 +49,7 @@ Every pressable control has a hit area of at least 24px, and at least 44px on co
 
 How it works: the control carries an invisible `::before` sized `max(100%, var(--_hit))`. `--_hit` is `--cy-hit-min` (24px), and switches to `--cy-hit-coarse` (44px) under `@media (pointer: coarse)`. Both are global tokens (`hit.min`, `hit.coarse`), so a theme can raise them. Components built from Button and IconButton get the hit area from them; list-like components make the row itself 44px on coarse pointers instead (Menu and Select rows, Disclosure triggers, Calendar days).
 
-How it is tested: stories tagged `touch` run in their own test project, a Chromium context with `hasTouch` and `isMobile` set. They first assert that `(pointer: coarse)` matches, then measure the `::before` and expect at least 44px, then tap with a touch pointer and expect the action to fire. 68 story files have at least one such story. The 24px floor is measured the same way in the ordinary browser projects (for example Button's `HitTargetCompact`: a `sm` button in a compact theme is under 24px tall and its hit area is not).
+How it is tested: stories tagged `touch` run in their own test project, a Chromium context with `hasTouch` and `isMobile` set. They first assert that `(pointer: coarse)` matches, then measure the `::before` and expect at least 44px, then tap with a touch pointer and expect the action to fire. 71 story files have at least one such story. The 24px floor is measured the same way in the ordinary browser projects (for example Button's `HitTargetCompact`: a `sm` button in a compact theme is under 24px tall and its hit area is not).
 
 Tooltip never opens on touch, so nothing depends on hover there.
 
@@ -76,7 +76,7 @@ Contrast is checked at three levels.
 
 ## Forced colours (Windows High Contrast)
 
-Coverage is partial and specific. 52 of the 105 stylesheets in `src/components` and `src/foundations` have a `@media (forced-colors: active)` block; each fixes one thing that would otherwise vanish when the system replaces colours. The rest rely on the browser's defaults for native elements, borders and text.
+Coverage is partial and specific. 54 of the 111 stylesheets in `src/components` and `src/foundations` have a `@media (forced-colors: active)` block; each fixes one thing that would otherwise vanish when the system replaces colours. The rest rely on the browser's defaults for native elements, borders and text.
 
 | What is restored                                                 | Components                                                                                                                                                                                 |
 | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -103,7 +103,7 @@ A product can also switch motion off for everyone with `createTheme({ motion: "r
 
 **Names.** Controls take their accessible name from a prop, not from luck: `label` on fields, sliders, toolbars, segmented controls and navigation; `title` on Dialog and Sheet (rendered as the `h2` and used as the dialog's name, with `description` as its description). [IconButton](../src/components/IconButton/README.md) requires `label` in its types; it is both the name and the tooltip text. [Field](../src/components/Field/README.md) links descriptions through `aria-describedby`, and an error is announced (`role="alert"`), linked, and marks the control invalid.
 
-**Built-in strings.** Any text a component supplies itself ("Close", "Dismiss", "Copy", "Skip to content", "(opens in new tab)") is English by default and can be replaced through a typed `labels` prop. 52 components have one, and stories test the override (AppShell's, for example, runs with German strings).
+**Built-in strings.** Any text a component supplies itself ("Close", "Dismiss", "Copy", "Skip to content", "(opens in new tab)") is English by default and can be replaced through a typed `labels` prop. 58 components have one, and stories test the override (AppShell's, for example, runs with German strings).
 
 **Announcements.**
 
@@ -121,7 +121,7 @@ A product can also switch motion off for everyone with `createTheme({ motion: "r
 
 ## Text direction and zoom
 
-**Right to left.** Set `dir="rtl"` on any ancestor; components read the computed direction (`isRtl` in `src/foundations/dir.ts`), so nothing needs a prop. The stylesheets use logical properties for spacing, sizing and placement (`margin-inline`, `padding-block`, `inline-size`, `inset-inline`). Physical sides appear only where the edge itself is physical: Container's gutters and a `size="full"` Dialog's panel pad to `env(safe-area-inset-left)` and `env(safe-area-inset-right)`, and DeviceFrame's content pads on the left to clear a turned phone's camera island. Keys follow the reading direction: horizontal arrows in roving groups, Tabs, Toolbar, Tree (Left and Right swap), Calendar and SplitPane, and in a Slider Right lowers the value. Sheet's `start` and `end` sides and Toast's `start` and `end` positions follow it as well. 65 story files include a `dir="rtl"` play test.
+**Right to left.** Set `dir="rtl"` on any ancestor; components read the computed direction (`isRtl` in `src/foundations/dir.ts`), so nothing needs a prop. The stylesheets use logical properties for spacing, sizing and placement (`margin-inline`, `padding-block`, `inline-size`, `inset-inline`). Physical sides appear only where the edge itself is physical: Container's gutters and a `size="full"` Dialog's panel pad to `env(safe-area-inset-left)` and `env(safe-area-inset-right)`, and DeviceFrame's content pads on the left to clear a turned phone's camera island. Keys follow the reading direction: horizontal arrows in roving groups, Tabs, Toolbar, Tree (Left and Right swap), Calendar and SplitPane, and in a Slider Right lowers the value. Sheet's `start` and `end` sides and Toast's `start` and `end` positions follow it as well. 66 story files include a `dir="rtl"` play test.
 
 **Scale.** Sizes are tokens in px, multiplied by the theme's `scale`: `compact` 0.875, `comfortable` 1, `spacious` 1.2, or any number. Scale changes control heights, spacing and font sizes together (a `md` control is 28, 32 or 38.4px tall). The hit-area tokens are not scaled, so a compact theme keeps its 24px and 44px minimums. Token values are emitted in px, not rem, so they follow browser zoom but not a change to the browser's default font size alone; use `scale` to offer larger controls.
 
@@ -130,7 +130,7 @@ A product can also switch motion off for everyone with `createTheme({ motion: "r
 - **Stories are the tests.** Every story has a play function, and `pnpm test:stories` runs them all in real browsers: Chromium, Firefox and WebKit, plus the touch project (Chromium with touch and mobile emulation) for stories tagged `touch`. See [Testing](./testing.md).
 - **Behaviour only.** A test names a behaviour and fails when it breaks: pointer, keyboard, touch, focus, values, disabled, labels override, RTL, hostile host, and shadow root where relevant. There are no "it renders" or snapshot-only tests.
 - **axe on every story**, in every one of those browsers, with violations as errors.
-- **Hostile host.** `computeUnderHostileHost` compares computed styles with and without aggressive host CSS (Tailwind's preflight plus globals that force colours, sizes, letter spacing and `box-sizing` on everything). 103 story files use it.
+- **Hostile host.** `computeUnderHostileHost` compares computed styles with and without aggressive host CSS (Tailwind's preflight plus globals that force colours, sizes, letter spacing and `box-sizing` on everything). 109 story files use it.
 - **Unit tests** cover the contrast maths, the layer stack (`tests/unit/dismiss.test.tsx`), roving focus, type-ahead and the slider keys.
 - **`cy check`** (`pnpm check`, see [Conventions](./conventions.md)) fails the build on the rules that protect accessibility:
 

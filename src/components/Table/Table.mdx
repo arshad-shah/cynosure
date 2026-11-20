@@ -92,7 +92,7 @@ import { Table, TableBody, TableCell, TableFoot, TableHead, TableHeaderCell, Tab
 
 - `TableHeaderCell` is a column header in `TableHead` and a row header in `TableBody` and `TableFoot` (`scope` overrides it). `width` sizes its column.
 - `sort` and `onSort` make a header a [SortButton](?path=/docs/components-controls-sortbutton--docs) with `aria-sort`; you sort the rows. `sort` alone announces a sort made elsewhere.
-- `TableRow selected` takes the selected background (body rows). `align`, `colSpan` and `rowSpan` work on both kinds of cell.
+- `TableRow selected` takes the selected background (body rows). `align`, `colSpan`, `rowSpan` and `tone` work on both kinds of cell.
 - `TableFoot` is set apart by a line above it.
 - Every part takes `id`, `data-*`, `className` (layout) and a `ref`. A part used outside its place throws an error naming where it belongs.
 
@@ -110,7 +110,7 @@ import { Table, TableBody, TableCell, TableFoot, TableHead, TableHeaderCell, Tab
 - **Empty:** one cell across all columns says so (`labels.empty`).
 - **Touch:** sort buttons have a 44px hit area on touch screens.
 - **Contrast:** headers, cells and selected rows keep 4.5:1 in light and dark modes.
-- **Attributes:** in both forms, `id`, any `data-*` attribute and the `ref` go to the root element (the bordered wrapper that scrolls).
+- **Attributes:** in both forms, `id`, `role`, any `aria-*` or `data-*` attribute and the `ref` go to the root element (the bordered wrapper that scrolls).
 - **Direction:** columns follow the text direction; end-aligned cells sit at the inline end.
 
 ## Theming

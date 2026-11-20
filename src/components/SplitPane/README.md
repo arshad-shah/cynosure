@@ -43,7 +43,12 @@ import { SplitPane } from "@arshad-shah/cynosure";
 | `collapsible`                                          | see notes          | Enter collapses the anchored pane and restores it; on when `collapsed` or `defaultCollapsed` is given                                     |
 | `collapsed` / `defaultCollapsed` / `onCollapsedChange` | – / `false` / –    | Collapse the anchored pane from a menu or button; the size is remembered                                                                  |
 | `stackBelow`                                           | –                  | Stack the panes (full width, no divider) while the SplitPane's own width is under this many px; measured on the container, not the window |
-- The divider is a focusable `role="separator"` with `aria-valuenow` (the anchored pane's size, 0 when collapsed), `aria-valuemin`, `aria-valuemax` and `aria-controls` (the anchored pane).
+| `labels`                                               | English            | `percent(n)` and `pixels(n)`: the divider's spoken value (`aria-valuetext`), "50%" or "240 pixels" by default                             |
+| `className` / `style`                                  | –                  | Layout only                                                                                                                               |
+
+## Behaviour and accessibility
+
+- The divider is a focusable `role="separator"` with `aria-valuenow` (the anchored pane's size, 0 when collapsed), `aria-valuemin`, `aria-valuemax`, `aria-valuetext` (the size in words, "50%" or "240 pixels", overridable through `labels`) and `aria-controls` (the anchored pane).
 - Arrow keys move the divider (Left and Right side by side, flipped in right-to-left text; Up and Down stacked), so with `anchor="end"` Left grows a right sidebar and Up grows a bottom dock. Shift+Arrow moves it 10 times `step`, and Page Up and Page Down grow and shrink the anchored pane by 10 times `step`. Home and End go to the limits. Enter collapses and restores.
 - Collapsed, a key that grows the pane opens it as if from 0: an arrow at `min`, Shift+Arrow and Page Up at 10 times `step` (at least `min`), End at `max`; dragging the divider opens it where the pointer is. Escape during a drag puts back the size, and the collapse, it started from.
 - Its hit area is at least 24px wide, 44px on touch screens, while the line stays thin.
@@ -51,6 +56,6 @@ import { SplitPane } from "@arshad-shah/cynosure";
 
 ## Tokens
 
-- `--cy-split-pane-divider-size`: line thickness
-- `--cy-split-pane-divider`: line colour
+- `--cy-split-pane-divider-size`: line thickness (`--cy-border-width`)
+- `--cy-split-pane-divider`: line colour (`--cy-color-line`; the accent while dragging or focused)
 - `--cy-split-pane-stack-gap`: space between stacked panes (`stackBelow`). Default `--cy-space-5`.

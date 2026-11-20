@@ -43,7 +43,7 @@ import { NumberField } from "@arshad-shah/cynosure";
 
 ## Formats and locales
 
-Numbers are read and written with `Intl.NumberFormat` for `locale` (default: the browser's) and `formatOptions`: currencies, percents, units, fixed digits. People can type group separators, the local decimal mark and a typographic minus. Percents are typed as people say them: 20 means 20%, stored as 0.2.
+Numbers are read and written with `Intl.NumberFormat` for `locale` (default: the browser's) and `formatOptions`: currencies, percents, units, fixed digits. People can type group separators, the local decimal mark, a typographic minus and digits of any script (full-width `４２` from a Japanese keyboard); text with any other character (`1e5`) is unreadable. Percents are typed as people say them: 20 means 20%, stored as 0.2.
 
 <Canvas of={Stories.CurrencyAndPercent} />
 
@@ -54,6 +54,16 @@ Numbers are read and written with `Intl.NumberFormat` for `locale` (default: the
 With `name`, the form receives the plain number ("1234.5"), whatever the text shows. Reset restores `defaultValue`; disabled fields are not submitted; `required` makes an empty field invalid.
 
 <Canvas of={Stories.FormsGetThePlainNumber} />
+
+## Scrubbing the label
+
+`scrub` lets people drag the label sideways to change the value, as design tools do: one `step` every 4 pixels, ten with Shift. Escape during the drag puts the value back. The keys and steppers work as before, and a vertical swipe still scrolls on touch screens.
+
+```tsx
+<NumberField label="Width" defaultValue={100} min={0} max={500} unit="px" scrub />
+```
+
+<Canvas of={Stories.ScrubTheLabel} />
 
 ## Props
 

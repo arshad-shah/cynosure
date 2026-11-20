@@ -12,6 +12,7 @@ import { createTheme } from "../../tokens/index.js";
 import { Button } from "../Button/Button.js";
 import { IconButton } from "../IconButton/IconButton.js";
 import { Menu } from "../Menu/Menu.js";
+import { RadioGroup } from "../RadioGroup/RadioGroup.js";
 import { Stack } from "../Stack/Stack.js";
 import { TextField } from "../TextField/TextField.js";
 import { Dialog, type DialogProps } from "./Dialog.js";
@@ -411,6 +412,27 @@ export const WithoutACloseButtonStillDismisses: Story = {
   },
 };
 
+/** Opening focuses the first control Tab would reach: in a radio group, its checked radio, not the first one. */
+export const OpeningFocusesTheFirstTabStop: Story = {
+  args: {
+    children: (
+      <RadioGroup
+        label="Plan"
+        name="plan"
+        defaultValue="team"
+        options={[
+          { value: "solo", label: "Solo" },
+          { value: "team", label: "Team" },
+        ]}
+      />
+    ),
+  },
+  play: async ({ canvas, userEvent }) => {
+    await openWith(canvas, (e) => userEvent.click(e));
+    await waitFor(() => expect(canvas.getByRole("radio", { name: "Team" })).toHaveFocus());
+  },
+};
+
 export const ProgressOverlayWithAHiddenTitle: Story = {
   args: { closeButton: false, titleHidden: true, title: "Exporting", description: undefined, size: "sm" },
   render: (args) => (
@@ -644,6 +666,20 @@ export const TooltipInsideDoesNotSwallowTheBackdropClick: Story = {
     await waitFor(() => expect(document.querySelector(".cy-tooltip:popover-open")).not.toBeNull());
     await userEvent.click(el);
     await settledClosed(el);
+  },
+};
+
+export const NotDismissibleStaysOpenWhenTheBrowserClosesIt: Story = {
+  args: { dismissible: false, title: "Exporting", children: "Working…" },
+  render: (args) => <Dialog {...args} open />,
+  play: async ({ args }) => {
+    const el = dialogEl();
+    await waitFor(() => expect(el.open).toBe(true));
+    // A close the page could not veto (the browser's own, after repeated close requests) shows it again.
+    el.close();
+    await waitFor(() => expect(el.open).toBe(true));
+    await expect(el.matches(":modal")).toBe(true);
+    await expect(args.onOpenChange).not.toHaveBeenCalled();
   },
 };
 

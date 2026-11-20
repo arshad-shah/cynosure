@@ -18,7 +18,10 @@ import { SortableList } from "@arshad-shah/cynosure";
 | `layout`                 | `list`   | `list` (rows) or `grid` (tiles that wrap: file grids, page thumbnails)                                       |
 | `size`                   | `md`     | `sm` · `md` · `lg`                                                                                           |
 | `labels`                 | –        | `handle(label)`, `instructions`, `pickedUp`, `moved`, `dropped` (label, position, total), `cancelled(label)` |
-- Keyboard: Space or Enter picks a row up and drops it; Arrow Up/Down move it (in a grid, Left/Right move one place, following the reading direction, and Up/Down a whole row); Home/End move it to the ends; Escape cancels and puts it back; Tab drops it where it is.
+
+## Behaviour and accessibility
+
+- Keyboard: Space or Enter picks a row up and drops it; Arrow Up/Down move it (in a grid, Left/Right move one place, following the reading direction, and Up/Down a whole row); Home/End move it to the ends; Escape cancels and puts it back; Tab drops it where it is. Focus leaving the handle mid-move cancels it.
 - Each handle is a "Move …" button described by the instructions; `aria-pressed` shows the row being moved; picks, moves, drops and cancels are announced politely.
 - Dragging uses [detent](https://detent.arshadshah.com) (pointer, touch and pen in one path, animated with FLIP, auto-scrolling long lists); touch dragging on a handle does not scroll the page; handles have a 44px hit area on touch screens.
 

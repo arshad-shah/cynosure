@@ -7,6 +7,10 @@ import { Choice, type ChoiceControlProps } from "../Choice/Choice.js";
 
 export interface CheckboxTokens {
   size: string;
+  /** Box size of `size="sm"` (RadioGroup's circles too). */
+  sizeSm: string;
+  /** Box size of `size="lg"` (RadioGroup's circles too). */
+  sizeLg: string;
   radius: string;
   border: string;
   doneColor: string;

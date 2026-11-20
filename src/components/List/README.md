@@ -28,21 +28,21 @@ import { lock, zap } from "@arshad-shah/cynosure/icons";
 />
 ```
 
-| Prop                  | Default                      | Notes                                                                                    |
-| --------------------- | ---------------------------- | ---------------------------------------------------------------------------------------- |
-| `items`               | –                            | Required. `{ id?, label, description?, icon?, tone? }[]`                                 |
-| `marker`              | `disc`                       | `disc` · `number` · `check` · `icon` · `tile` · `none`                                   |
-| `as`                  | `ol` with numbers, else `ul` | Set it when the order matters but the markers are not numbers, or the other way round    |
-| `start`               | `1`                          | First number with `marker="number"` (also the `ol`'s `start`)                            |
-| `icon`                | –                            | Every item's icon for `icon` and `tile`; an item's own `icon` wins; with neither, a disc |
-| `tone`                | per marker                   | Marker colour: muted discs, `success` ticks, `accent` otherwise. An item's `tone` wins   |
-| `gap`                 | `md`                         | `none` · `sm` · `md` · `lg`: space between items                                         |
-| `divided`             | `false`                      | A line between items, the gap split around it                                            |
-| `size`                | `md`                         | `sm` · `md` · `lg`: text size, and the markers with it                                   |
-| `label`               | –                            | Names the list for assistive technology when no heading above it does                    |
-| `aria-labelledby`     | –                            | The id of the heading that names the list, instead of `label`                            |
-| `id`, `data-*`, `ref` | –                            | Set on the root element (a link target, test or state hooks)                             |
-| `className` / `style` | –                            | Layout only                                                                              |
+| Prop                                    | Default                      | Notes                                                                                           |
+| --------------------------------------- | ---------------------------- | ----------------------------------------------------------------------------------------------- |
+| `items`                                 | –                            | Required. `{ id?, label, description?, icon?, tone? }[]`                                        |
+| `marker`                                | `disc`                       | `disc` · `number` · `check` · `icon` · `tile` · `none`                                          |
+| `as`                                    | `ol` with numbers, else `ul` | Set it when the order matters but the markers are not numbers, or the other way round           |
+| `start`                                 | `1`                          | First number with `marker="number"` (also the `ol`'s `start`)                                   |
+| `icon`                                  | –                            | Every item's icon for `icon` and `tile`; an item's own `icon` wins; with neither, a disc        |
+| `tone`                                  | per marker                   | Marker colour: muted discs, `success` ticks, `accent` otherwise. An item's `tone` wins          |
+| `gap`                                   | `md`                         | `none` · `sm` · `md` · `lg`: space between items                                                |
+| `divided`                               | `false`                      | A line between items, the gap split around it                                                   |
+| `size`                                  | `md`                         | `sm` · `md` · `lg`: text size, and the markers with it                                          |
+| `label`                                 | –                            | Names the list for assistive technology when no heading above it does                           |
+| `aria-labelledby`                       | –                            | The id of the heading that names the list, instead of `label`                                   |
+| `id`, `data-*`, `role`, `aria-*`, `ref` | –                            | Set on the root element (a link target, test or state hooks); the list's own `role="list"` wins |
+| `className` / `style`                   | –                            | Layout only                                                                                     |
 
 The forwarded ref is the `ul` or `ol`.
 

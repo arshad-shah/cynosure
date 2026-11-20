@@ -12,16 +12,16 @@ import { zap } from "@arshad-shah/cynosure/icons";
 <IconTile icon={zap} size="lg" shape="circle" />
 ```
 
-| Prop                  | Default  | Notes                                                                            |
-| --------------------- | -------- | -------------------------------------------------------------------------------- |
-| `icon`                | –        | Required. A Facet icon                                                           |
-| `label`               | –        | Makes the tile `role="img"` with this name. Without it the tile is `aria-hidden` |
-| `size`                | `md`     | `sm` · `md` · `lg`: the control heights, so they scale with the theme            |
-| `tone`                | `accent` | `accent` · `neutral` · `danger` · `success` · `warning` · `info`                 |
-| `variant`             | `soft`   | `soft` (tinted fill) · `solid` (full tone) · `outline` (tinted border, surface)  |
-| `shape`               | `square` | `square` (radius from the theme's radius factor) · `circle`                      |
-| `className` / `style` | –        | Layout only                                                                      |
-| `id`, `data-*`, `ref` | –        | Set on the root element (a link target, test or state hooks)                     |
+| Prop                                    | Default  | Notes                                                                                   |
+| --------------------------------------- | -------- | --------------------------------------------------------------------------------------- |
+| `icon`                                  | –        | Required. A Facet icon                                                                  |
+| `label`                                 | –        | Makes the tile `role="img"` with this name. Without it the tile is `aria-hidden`        |
+| `size`                                  | `md`     | `sm` · `md` · `lg`: the control heights, so they scale with the theme                   |
+| `tone`                                  | `accent` | `accent` · `neutral` · `danger` · `success` · `warning` · `info`                        |
+| `variant`                               | `soft`   | `soft` (tinted fill) · `solid` (full tone) · `outline` (tinted border, surface)         |
+| `shape`                                 | `square` | `square` (radius from the theme's radius factor) · `circle`                             |
+| `className` / `style`                   | –        | Layout only                                                                             |
+| `id`, `data-*`, `role`, `aria-*`, `ref` | –        | Set on the root element; the tile's own `role="img"`, `aria-label` or `aria-hidden` win |
 
 The forwarded ref is the root `span`.
 

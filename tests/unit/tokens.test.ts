@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { CynosureThemeError, contrastRatio, createTheme, themeToCss } from "../../src/tokens";
-import { mix, parseColor, rgbToOklch } from "../../src/tokens/color";
+import { mix, parseColor, rgbToOklch, toHex } from "../../src/tokens/color";
 
 describe("default palettes (approved Facet values)", () => {
   it("light palette matches", () => {
@@ -171,6 +171,25 @@ describe("colour input formats", () => {
   });
 });
 
+describe("hsl() hues and modern syntax", () => {
+  const hex = (input: string) => toHex(parseColor(input));
+  it.each([
+    ["hsl(-120 100% 50%)", "#0000ff"],
+    ["hsl(600 100% 50%)", "#0000ff"],
+    ["hsl(240 100 50)", "#0000ff"],
+    ["hsl(240deg 100% 50%)", "#0000ff"],
+    ["hsl(0.5turn 100% 50%)", "#00ffff"],
+    ["hsl(200grad 100% 50%)", "#00ffff"],
+    ["hsl(3.14159265rad 100% 50%)", "#00ffff"],
+    ["hsla(120, 100%, 25%, 0.5)", "#008000"],
+  ])("reads %s as %s", (input, expected) => {
+    expect(hex(input)).toBe(expected);
+  });
+  it.each(["hsl(240px 100% 50%)", "hsl(240 100% 50px)", "hsl(1x 100% 50%)"])("rejects %s", (input) => {
+    expect(() => parseColor(input)).toThrow(CynosureThemeError);
+  });
+});
+
 describe("theme options", () => {
   it("font families and partial motion override defaults", () => {
     const t = createTheme({ font: { sans: "Hanken Grotesk, system-ui" }, motion: { base: 90 } });
@@ -196,10 +215,36 @@ describe("themeToCss with a custom selector", () => {
   it("scopes mode and contrast rules to that selector", () => {
     const css = themeToCss(createTheme(), ".app");
     expect(css).toContain('.app[data-cy-mode="dark"]{color-scheme:dark}');
-    expect(css).toContain('@media (prefers-contrast:more){.app[data-cy-contrast="system"]{');
+    expect(css).toContain(
+      '@media (prefers-contrast:more){.app:not([data-cy-contrast]),.app[data-cy-contrast="system"]{',
+    );
     expect(css).toContain(
       '.app[data-cy-contrast="system"] [data-cy-contrast="normal"]{--cy-color-bg:light-dark(#f4f1ea,#14120f)',
     );
+  });
+  it("follows the OS contrast on a scoped element with no contrast attribute, as the default selector does", () => {
+    const css = themeToCss(createTheme(), ".app");
+    expect(css).toContain(".app:not([data-cy-contrast]),");
+    expect(css).toContain('.app:not([data-cy-contrast]) [data-cy-contrast="normal"],');
+  });
+  it("qualifies :host through :host(), the only form that matches a shadow host", () => {
+    const css = themeToCss(createTheme(), ":host");
+    expect(css.startsWith(":host{")).toBe(true);
+    expect(css).toContain(':host([data-cy-mode="dark"]){color-scheme:dark}');
+    expect(css).toContain(':host([data-cy-contrast="more"]){');
+    expect(css).toContain(
+      '@media (prefers-contrast:more){:host(:not([data-cy-contrast])),:host([data-cy-contrast="system"]){',
+    );
+    expect(css).toContain(':host([data-cy-contrast="system"]) [data-cy-contrast="normal"]{');
+    expect(css).not.toMatch(/:host\[/);
+  });
+  it("qualifies :host() and a list holding :host one selector at a time", () => {
+    expect(themeToCss(createTheme(), ":host(.x)")).toContain(
+      ':host(.x[data-cy-mode="dark"]){color-scheme:dark}',
+    );
+    const css = themeToCss(createTheme(), ".app, :host");
+    expect(css).toContain('.app[data-cy-mode="dark"],:host([data-cy-mode="dark"]){color-scheme:dark}');
+    expect(css).not.toMatch(/:host\)?\[/);
   });
 });
 
@@ -291,6 +336,34 @@ describe("review minors", () => {
     const css = themeToCss(createTheme(), ".a, .b");
     expect(css).toContain(':is(.a, .b)[data-cy-mode="dark"]{color-scheme:dark}');
     expect(css).not.toContain('.b[data-cy-mode="dark"]');
+  });
+});
+
+describe("unsafe theme values", () => {
+  it.each([
+    ["an unclosed double quote", '"Hanken Grotesk, system-ui'],
+    ["an unclosed single quote", "'Hanken Grotesk, system-ui"],
+    ["an unclosed bracket", "calc(1px + 2px"],
+    ["a stray closing bracket", "1px)"],
+    ["an unclosed square bracket", "[a"],
+    ["crossed brackets", "calc(1px [) 2px]"],
+    ["a remote url()", "url(https://example.com/x.png)"],
+    ["a quoted url", 'URL("https://example.com/x.png")'],
+    ["image()", "image(https://example.com/x.png)"],
+    ["image-set()", 'image-set("https://example.com/x.png" 1x)'],
+    ["an at-rule", "@import x"],
+  ])("rejects %s", (_, value) => {
+    expect(() => createTheme({ font: { sans: value } })).toThrow(CynosureThemeError);
+    expect(() => createTheme({ components: { button: { radius: value } } })).toThrow(/unsafe/);
+  });
+  it.each([
+    '"Hanken Grotesk", system-ui',
+    "'Hanken Grotesk', system-ui",
+    '"It\'s", serif',
+    "calc(var(--cy-space-4) * 2)",
+    '"a (b", serif',
+  ])("keeps the balanced value %s", (value) => {
+    expect(createTheme({ font: { sans: value } }).global.font.sans).toBe(value);
   });
 });
 

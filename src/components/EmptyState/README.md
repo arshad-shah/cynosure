@@ -15,14 +15,15 @@ What to show where content will be: no items yet, no search results, nothing sel
 />;
 ```
 
-| Prop                  | Default | Notes                                                                           |
-| --------------------- | ------- | ------------------------------------------------------------------------------- |
-| `icon`                | –       | Facet icon, decorative                                                          |
-| `title`               | –       | A real heading                                                                  |
-| `headingLevel`        | `3`     | 1 to 6, to fit the page outline; 1 when the empty state is the page (not found) |
-| `description`         | –       | One or two sentences                                                            |
-| `actions`             | –       | Buttons for the next step; they wrap when narrow                                |
-| `size`                | `md`    | `sm` for panels and popups                                                      |
-| `id`, `data-*`, `ref` | –       | Set on the root element (a link target, test or state hooks)                    |
+| Prop                                    | Default | Notes                                                                           |
+| --------------------------------------- | ------- | ------------------------------------------------------------------------------- |
+| `icon`                                  | –       | Facet icon, decorative                                                          |
+| `title`                                 | –       | A real heading                                                                  |
+| `headingLevel`                          | `3`     | 1 to 6, to fit the page outline; 1 when the empty state is the page (not found) |
+| `description`                           | –       | One or two sentences                                                            |
+| `actions`                               | –       | Buttons for the next step; they wrap when narrow                                |
+| `size`                                  | `md`    | `sm` for panels and popups                                                      |
+| `className` / `style`                   | –       | Layout only                                                                     |
+| `id`, `role`, `aria-*`, `data-*`, `ref` | –       | Set on the root element (a link target, test or state hooks)                    |
 
 Tokens: `--cy-empty-state-gap`, `--cy-empty-state-padding`, `--cy-empty-state-max-width`.

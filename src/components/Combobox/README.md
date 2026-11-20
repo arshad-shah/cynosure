@@ -23,16 +23,21 @@ A text input with a list of suggestions (WAI-ARIA APG editable combobox). Type t
 | `placeholder`                                  | –                | Hint shown in the input while it is empty                                                     |
 | `size` / `variant`                             | `md` / `outline` | `sm` · `md` · `lg`; `outline` · `soft` (tinted, borderless until focus)                       |
 | `name`, `required`, `disabled`                 | –                | Native form behaviour through a hidden value                                                  |
-| `labels`                                       | –                | `empty`, `loading`, `required`                                                                |
+| `iconStart`                                    | –                | Icon at the start of the input                                                                |
+| `labels`                                       | –                | `empty` ("No matches"), `loading` ("Loading…"), `required` ("Please choose a value.")         |
+| `className` / `style`                          | –                | Layout only                                                                                   |
 - Focus stays in the input; the active option is `aria-activedescendant`, so late results never interrupt typing.
 - While typing, the text is marked where it appears in each option's label (HighlightedText).
 - Leaving with text that matches nothing restores the last choice (unless `allowCustom`); leaving it empty clears the value.
-- Escape: closes the list, then clears the text, then (with nothing to undo) reaches an enclosing Dialog.
-
+- Escape: closes the list, then clears the text and the value, then (with nothing to undo) reaches an enclosing Dialog.
+- A controlled `value` shows its option's label in the input from the first render, and a value set from outside replaces the text (or clears it) unless the person is typing.
 - `iconTone` and `iconColor` on an option colour its `icon` in the list, with the meaning of Icon's `tone` and `color` (`iconColor` is any CSS colour and overrides `iconTone`), the same two fields as Select and Menu options. The active and the selected option keep the colour; a disabled option shows the icon without it, muted with its row. The input shows text only (`iconStart` is the field's own icon).
-
-Tokens: `--cy-combobox-list-max-height`, `--cy-combobox-list-max-width`, `--cy-combobox-list-bg`, `--cy-combobox-option-active-bg` (and TextField's for the input). The list is an [OptionList](../OptionList/README.md); these tokens set its `--cy-option-list-*` tokens.
 
 ## Tokens
 
-- `--cy-combobox-list-max-width`: widest the option list may grow
+- `--cy-combobox-list-max-height`: tallest the option list gets before it scrolls (default `min(320px, 60vh)`)
+- `--cy-combobox-list-max-width`: widest the option list may grow (default 480px)
+- `--cy-combobox-list-bg`: background of the option list
+- `--cy-combobox-option-active-bg`: background of the active option
+
+The input uses TextField's tokens. The list is an [OptionList](../OptionList/README.md); these tokens set its `--cy-option-list-*` tokens.

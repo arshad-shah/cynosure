@@ -5,6 +5,7 @@ export {
   type AccordionMultipleProps,
   type AccordionProps,
   type AccordionSingleProps,
+  type AccordionTokens,
 } from "./components/Accordion/index.js";
 export {
   type Announce,
@@ -486,7 +487,12 @@ export {
   type SortableListTokens,
 } from "./components/SortableList/index.js";
 export { SortButton, type SortButtonProps, type SortButtonTokens } from "./components/SortButton/index.js";
-export { SplitPane, type SplitPaneProps, type SplitPaneTokens } from "./components/SplitPane/index.js";
+export {
+  SplitPane,
+  type SplitPaneLabels,
+  type SplitPaneProps,
+  type SplitPaneTokens,
+} from "./components/SplitPane/index.js";
 export {
   type BoxOverflow,
   type BoxProps,
@@ -603,7 +609,7 @@ export {
   type ToastTone,
   useToast,
 } from "./components/Toast/index.js";
-export { Toolbar, type ToolbarProps } from "./components/Toolbar/index.js";
+export { Toolbar, type ToolbarProps, type ToolbarTokens } from "./components/Toolbar/index.js";
 export { Tooltip, type TooltipProps } from "./components/Tooltip/index.js";
 export {
   Tree,
@@ -649,7 +655,7 @@ export {
   shortcutKeys,
   useHotkey,
 } from "./foundations/hotkey.js";
-export { Icon, type IconProps } from "./foundations/Icon/Icon.js";
+export { Icon, type IconProps, type IconTokens } from "./foundations/Icon/Icon.js";
 export { InputBase, type InputBaseProps } from "./foundations/InputBase/InputBase.js";
 export { LinkBase, type LinkBaseProps } from "./foundations/LinkBase/LinkBase.js";
 export {

@@ -127,6 +127,46 @@ export const ArrowsStepTheDate: Story = {
   },
 };
 
+/** Weekends are unavailable: the arrows skip over them, and stop when nothing available is left before a limit. */
+export const ArrowsSkipUnavailableDates: Story = {
+  args: {
+    defaultValue: "2026-11-13",
+    max: "2026-11-15",
+    isDateDisabled: (date: string) => [0, 6].includes(new Date(`${date}T00:00:00Z`).getUTCDay()),
+  },
+  play: async ({ args, canvas, userEvent }) => {
+    const field = canvas.getByRole("textbox", { name: "Due date" });
+    await userEvent.click(field);
+    // Friday 13th: Saturday and Sunday are taken, and the max follows them, so Up does nothing.
+    await userEvent.keyboard("{ArrowUp}");
+    await expect(field).toHaveValue("2026-11-13");
+    await expect(args.onChange).not.toHaveBeenCalled();
+    // From Monday 16th typed past the max, Down skips back over the weekend to Friday.
+    await userEvent.clear(field);
+    await userEvent.type(field, "2026-11-16{ArrowDown}");
+    await expect(field).toHaveValue("2026-11-13");
+  },
+};
+
+/** Keys that belong to an input method's composition are not the field's. */
+export const KeysWhileComposingAreTheInputMethods: Story = {
+  args: { defaultValue: "2026-11-10" },
+  play: async ({ args, canvas, userEvent }) => {
+    const field = canvas.getByRole("textbox", { name: "Due date" });
+    await userEvent.click(field);
+    field.dispatchEvent(
+      new KeyboardEvent("keydown", { key: "ArrowUp", bubbles: true, cancelable: true, isComposing: true }),
+    );
+    await expect(field).toHaveValue("2026-11-10");
+    await userEvent.clear(field);
+    await userEvent.type(field, "2026-11-2");
+    // Safari reports the composing Enter only as keyCode 229.
+    field.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true, keyCode: 229 }));
+    await expect(field).not.toHaveAttribute("aria-invalid", "true");
+    await expect(args.onChange).not.toHaveBeenCalled();
+  },
+};
+
 export const FormsAndReadOnly: Story = {
   render: (args) => (
     <form data-testid="form">

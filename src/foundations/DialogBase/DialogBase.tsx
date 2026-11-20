@@ -1,4 +1,4 @@
-import { type DialogHTMLAttributes, forwardRef, useImperativeHandle, useRef } from "react";
+import { type DialogHTMLAttributes, forwardRef, useImperativeHandle, useRef, useState } from "react";
 import { useClientLayoutEffect } from "../client-layout-effect.js";
 
 export interface DialogBaseProps
@@ -9,7 +9,10 @@ export interface DialogBaseProps
   modal?: boolean;
   /** A close request (Escape, the Android back gesture). Its default is prevented so `open` stays in charge. */
   onCancel?: () => void;
-  /** The browser closed the dialog while `open` was still true (a close request it would not let us cancel). */
+  /**
+   * The browser closed the dialog while `open` was still true (a close request it would not let us cancel). If `open`
+   * is still true after it, the dialog is shown again.
+   */
   onClose?: () => void;
 }
 
@@ -25,12 +28,21 @@ export const DialogBase = forwardRef<HTMLDialogElement, DialogBaseProps>(functio
   useImperativeHandle(ref, () => el.current as HTMLDialogElement);
   const latest = useRef({ open, onCancel, onClose });
   latest.current = { open, onCancel, onClose };
+  // Counts closes the page did not ask for, so the effect below runs again and shows a dialog `open` still wants.
+  const [closed, setClosed] = useState(0);
 
   useClientLayoutEffect(() => {
     const dialog = el.current as HTMLDialogElement;
-    if (open && !dialog.open) modal ? dialog.showModal() : dialog.show();
-    if (!open && dialog.open) dialog.close();
-  }, [open, modal]);
+    // Without the dialog API (jsdom, where products run unit tests) the `open` attribute stands in for it.
+    if (open && !dialog.open) {
+      if (typeof dialog.showModal !== "function") dialog.open = true;
+      else modal ? dialog.showModal() : dialog.show();
+    }
+    if (!open && dialog.open) {
+      if (typeof dialog.close !== "function") dialog.open = false;
+      else dialog.close();
+    }
+  }, [open, modal, closed]);
 
   useClientLayoutEffect(() => {
     const dialog = el.current as HTMLDialogElement;
@@ -40,7 +52,9 @@ export const DialogBase = forwardRef<HTMLDialogElement, DialogBaseProps>(functio
     };
     // `close` is queued as a task: a late event for a dialog that was closed and reopened since must not close it.
     const close = () => {
-      if (latest.current.open && !dialog.open) latest.current.onClose?.();
+      if (!latest.current.open || dialog.open) return;
+      latest.current.onClose?.();
+      setClosed((n) => n + 1);
     };
     dialog.addEventListener("cancel", cancel);
     dialog.addEventListener("close", close);

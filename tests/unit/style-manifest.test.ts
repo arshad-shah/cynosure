@@ -1,4 +1,5 @@
-import { readdirSync, readFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { cssSources } from "../../tools/build-css";
@@ -51,5 +52,34 @@ describe("stylesheet manifest", () => {
         }
       }
     expect([...new Set(missing)]).toEqual([]);
+  });
+});
+
+describe("stylesheet manifest of components that import each other", () => {
+  it("gives each one every stylesheet it reaches, whichever is worked out first", () => {
+    const root = mkdtempSync(join(tmpdir(), "cy-manifest-"));
+    try {
+      const file = (path: string, text: string) => {
+        mkdirSync(join(root, path, ".."), { recursive: true });
+        writeFileSync(join(root, path), text);
+      };
+      file(
+        "index.ts",
+        'export { A } from "./components/A/A.js";\nexport { B } from "./components/B/B.js";\n',
+      );
+      // A imports B and D; B imports A back, so B reaches D through A.
+      file(
+        "components/A/A.tsx",
+        'import { B } from "../B/B.js";\nimport { D } from "../D/D.js";\nexport const A = 1;\n',
+      );
+      file("components/B/B.tsx", 'import { A } from "../A/A.js";\nexport const B = 1;\n');
+      file("components/D/D.tsx", "export const D = 1;\n");
+      for (const n of ["a", "b", "d"]) file(`components/${n.toUpperCase()}/${n}.css`, "");
+      const m = styleManifest(root);
+      expect(new Set(m.A)).toEqual(new Set(["base.css", "a.css", "b.css", "d.css"]));
+      expect(new Set(m.B)).toEqual(new Set(["base.css", "a.css", "b.css", "d.css"]));
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
   });
 });

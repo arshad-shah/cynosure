@@ -21,6 +21,18 @@ declare module "../../tokens/schema.js" {
   }
 }
 
+export interface SplitPaneLabels {
+  /** The divider's spoken value in percent (`unit="percent"`). Default "50%". */
+  percent: (value: number) => string;
+  /** The divider's spoken value in pixels (`unit="px"`). Default "240 pixels". */
+  pixels: (value: number) => string;
+}
+
+const DEFAULT_LABELS: SplitPaneLabels = {
+  percent: (value) => `${value}%`,
+  pixels: (value) => `${value} pixels`,
+};
+
 export interface SplitPaneProps {
   /** The first pane (left, or right in right-to-left text; top when vertical). */
   start: ReactNode;
@@ -75,6 +87,8 @@ export interface SplitPaneProps {
    * pane stays hidden. Default: never stack.
    */
   stackBelow?: number | undefined;
+  /** Replace the built-in English text: the divider's spoken value. */
+  labels?: Partial<SplitPaneLabels>;
   /** Added to the root element, for layout. */
   className?: string;
   /** Layout only. Restyle through --cy-split-pane-* tokens. */
@@ -116,9 +130,11 @@ export function SplitPane({
   defaultCollapsed,
   onCollapsedChange,
   stackBelow,
+  labels,
   className,
   style,
 }: SplitPaneProps) {
+  const text = { ...DEFAULT_LABELS, ...labels };
   const px = unit === "px";
   const min = minProp ?? (px ? 120 : 10);
   const max = maxProp ?? (px ? 600 : 90);
@@ -256,7 +272,7 @@ export function SplitPane({
           aria-valuenow={shown}
           aria-valuemin={collapsible ? 0 : min}
           aria-valuemax={max}
-          aria-valuetext={px ? `${Math.round(shown)} pixels` : `${Math.round(shown)}%`}
+          aria-valuetext={px ? text.pixels(Math.round(shown)) : text.percent(Math.round(shown))}
           ref={divider}
           className="cy-split-pane-divider cy-reset"
           onKeyDown={onKeyDown}

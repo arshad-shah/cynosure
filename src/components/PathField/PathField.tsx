@@ -1,5 +1,6 @@
 import { type CSSProperties, forwardRef, type ReactNode, useState } from "react";
 import { useControllableState } from "../../foundations/controllable.js";
+import { HiddenValue } from "../../foundations/HiddenValue/HiddenValue.js";
 import type { IconData } from "../../icons/types.js";
 import type { DenseSize } from "../../tokens/schema.js";
 import { Button } from "../Button/Button.js";
@@ -105,7 +106,7 @@ export const PathField = forwardRef<HTMLInputElement, PathFieldProps>(function P
   ref,
 ) {
   const text = { ...DEFAULT_LABELS, ...labels };
-  const [path, setPath] = useControllableState(value, defaultValue, onChange);
+  const [path, setPath, resetPath] = useControllableState(value, defaultValue, onChange);
   const [picking, setPicking] = useState(false);
 
   const pick = () => {
@@ -159,6 +160,8 @@ export const PathField = forwardRef<HTMLInputElement, PathFieldProps>(function P
           </Button>
         }
       />
+      {/* Not submitted (the text field is): only listens for the form's reset to restore defaultValue. */}
+      <HiddenValue form={form} value="" disabled onReset={() => resetPath(defaultValue)} />
     </div>
   );
 });

@@ -2,26 +2,26 @@
 
 The rules in `AGENTS.md` are enforced by `pnpm check`:
 
-| Rule                | What fails                                                                                                                |
-| ------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| `native-elements`   | `<button a input textarea select dialog details summary option iframe video>` outside `src/foundations`                   |
-| `title-attr`        | any `title=` (native tooltip)                                                                                             |
-| `glyphs`            | emoji or text glyphs (✓ × › → …) in JSX text                                                                              |
-| `literals`          | hex or px literals in component CSS/TSX outside `var()` fallbacks                                                         |
-| `inherit-chain`     | an element with a `cy-*` class that neither carries `cy-reset` nor has a stylesheet declaring its `font-size`             |
-| `import-extensions` | a relative import in shipped `.ts`/`.tsx` source without an explicit `.js` (or `.css`, `.json`…) extension                |
-| `structure`         | a component without a stories file containing `play:` or a README                                                         |
-| `story-group`       | a component in no README `## Components` group, or whose story title is not `Components/<group>/<Name>`                   |
-| `own-styles`        | a stylesheet not named `<kebab-folder>.css`, or a selector naming another component's class                               |
-| `own-classes`       | a component putting another component's class in `className` (render that component)                                      |
-| `hidden-text`       | a hand-written visually-hidden rule (`clip-path: inset(50%)`); use `.cy-visually-hidden`                                  |
-| `foundation-use`    | a composite using a foundation part not listed in `FOUNDATION_USERS` (`tools/cli/lib/check.ts`)                           |
-| `live-region`       | `role="status"`, `"alert"`, `"log"` or `aria-live` on `.cy-visually-hidden` text outside foundations; render `LiveRegion` |
-| `docs`              | a component or foundation without a hand-written `<Name>.mdx` using `<Meta of={Stories} />`                               |
-| `touch-hidden`      | a story tagged `touch` without `!dev` (it would fail on the published Storybook)                                          |
-| `serial-stories`    | a story file calling `emulateMedia`, `realHover` or `pressKey` whose meta is not tagged `serial`                          |
-| `scaffold-todo`     | an unfinished `TODO(cy)` from a generator                                                                                 |
-| `agents`            | a documented folder without `AGENTS.md`                                                                                   |
+| Rule                | What fails                                                                                                                                                                        |
+| ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `native-elements`   | `<button a input textarea select dialog details summary option iframe video>` outside `src/foundations`, as JSX, `createElement`/`jsx` with a string, or a `const Tag = "button"` |
+| `title-attr`        | any `title=` (native tooltip) on a DOM element, including a `title` key in a spread object or `createElement`/`jsx` props                                                         |
+| `glyphs`            | emoji or text glyphs (✓ × › → …) in JSX text                                                                                                                                      |
+| `literals`          | hex or px literals in component CSS/TSX outside `var()` fallbacks                                                                                                                 |
+| `inherit-chain`     | an element with a `cy-*` class that neither carries `cy-reset` nor has a stylesheet declaring its `font-size`                                                                     |
+| `import-extensions` | a relative import in shipped `.ts`/`.tsx` source without an explicit `.js` (or `.css`, `.json`…) extension                                                                        |
+| `structure`         | a component without a stories file containing `play:` or a README                                                                                                                 |
+| `story-group`       | a component in no README `## Components` group, or whose story title is not `Components/<group>/<Name>`                                                                           |
+| `own-styles`        | a stylesheet not named `<kebab-folder>.css`, or a selector naming another component's class                                                                                       |
+| `own-classes`       | a component putting another component's class in `className` (render that component)                                                                                              |
+| `hidden-text`       | a hand-written visually-hidden rule (`clip-path: inset(50%)`); use `.cy-visually-hidden`                                                                                          |
+| `foundation-use`    | a composite using a foundation part not listed in `FOUNDATION_USERS` (`tools/cli/lib/check.ts`)                                                                                   |
+| `live-region`       | `role="status"`, `"alert"`, `"log"` or `aria-live` on `.cy-visually-hidden` text outside foundations; render `LiveRegion`                                                         |
+| `docs`              | a component or foundation without a hand-written `<Name>.mdx` using `<Meta of={Stories} />`                                                                                       |
+| `touch-hidden`      | a story tagged `touch` without `!dev` (it would fail on the published Storybook)                                                                                                  |
+| `serial-stories`    | a story file calling `emulateMedia`, `realHover` or `pressKey` whose meta is not tagged `serial`                                                                                  |
+| `scaffold-todo`     | an unfinished `TODO(cy)` from a generator                                                                                                                                         |
+| `agents`            | a documented folder without `AGENTS.md`                                                                                                                                           |
 
 Naming: components PascalCase; CSS classes `cy-<kebab>`, inner parts `cy-<kebab>-<part>`; tokens `--cy-<component>-<prop>`; private custom properties `--_name`. Props: `className`/`style` are for layout only; restyle through tokens. Strings: English defaults, overridable via a typed `labels` prop.
 

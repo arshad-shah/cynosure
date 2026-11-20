@@ -3,6 +3,7 @@ import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js
 import { useControllableState } from "../../foundations/controllable.js";
 import { useDrag } from "../../foundations/drag.js";
 import { HiddenValue } from "../../foundations/HiddenValue/HiddenValue.js";
+import { isComposing } from "../../foundations/keys.js";
 import { ariaNumber, clamp, plainNumber, roundLike, snapToStep } from "../../foundations/math.js";
 import { minus } from "../../icons/minus.js";
 import { plus } from "../../icons/plus.js";
@@ -180,6 +181,18 @@ function marksOf(locale: string | undefined, options: Intl.NumberFormatOptions |
 /** Bidirectional marks some locales put around signs (Arabic's U+061C before the minus). */
 const BIDI = /[\u061c\u200e\u200f\u202a-\u202e\u2066-\u2069]/g;
 
+const DECIMAL_DIGIT = /^\p{Nd}$/u;
+/**
+ * The value of any script's decimal digit (full-width ２, Arabic-Indic ٢…): Unicode lays them out in runs whose length
+ * is a multiple of ten, each starting at a zero, so the value is the distance from the run's start, modulo ten.
+ */
+function digitValue(c: string): number {
+  const at = c.codePointAt(0) ?? 0;
+  let start = at;
+  while (DECIMAL_DIGIT.test(String.fromCodePoint(start - 1))) start--;
+  return (at - start) % 10;
+}
+
 /**
  * Reads what a person typed, or what the field wrote, in `locale` and `options`: the locale's digits (Arabic-Indic,
  * Devanagari…), group separators, decimal mark and minus, a typographic minus, currency, percent and unit text, and
@@ -200,7 +213,7 @@ export function parseNumber(
       t = t.split(affix).join(" ");
   t = t.replace(/\p{Nd}/gu, (c) => {
     const local = digits.indexOf(c);
-    return local >= 0 ? String(local) : c;
+    return String(local >= 0 ? local : digitValue(c));
   });
   t = t.replace(/[()]/g, "");
   const minusMark = minus.replace(BIDI, "");
@@ -212,11 +225,8 @@ export function parseNumber(
     t = t.split(group).join("");
     if (group === "’") t = t.split("'").join("");
   }
-  const cleaned = t
-    .replace(/\s/g, "")
-    .split(decimal)
-    .join(".")
-    .replace(/[^\d.-]/g, "");
+  // A leading plus is allowed; any other character left over makes the text unreadable ("1e5" is not 15).
+  const cleaned = t.replace(/\s/g, "").split(decimal).join(".").replace(/^\+/, "");
   if (!/^-?\d*\.?\d+$|^-?\d+\.?$/.test(cleaned)) return null;
   let n = Number(cleaned);
   if (!Number.isFinite(n)) return null;
@@ -320,6 +330,8 @@ export function NumberField({
   };
 
   const onKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+    // An input method's keys are its own.
+    if (isComposing(event)) return;
     const big = largeStep ?? step * 10;
     const moves: Record<string, () => void> = {
       ArrowUp: () => stepBy(step),

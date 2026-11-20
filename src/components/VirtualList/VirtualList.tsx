@@ -193,7 +193,10 @@ export function VirtualList<T>({
 
   // Work over the whole list happens once per change of the items or the selection, never per scroll: keys, where
   // each key is, and the chosen keys as a Set (so nothing below scans a list per row).
-  const keys = useMemo(() => items.map((item, i) => getKey(item, i)), [items, getKey]);
+  // `getKey` is read through a ref: an inline function (a new one each render) keys the rows only when they change.
+  const keyOf = useRef(getKey);
+  keyOf.current = getKey;
+  const keys = useMemo(() => items.map((item, i) => keyOf.current(item, i)), [items]);
   const indexOf = useMemo(() => new Map(keys.map((k, i) => [k, i])), [keys]);
   const pickedSet = useMemo(() => new Set(picked), [picked]);
   const header = (i: number) => !!isHeader?.(items[i] as T);

@@ -1,6 +1,6 @@
 # CameraView
 
-A live camera: Start and Stop, a choice of camera, a torch switch where the camera has one, every frame offered to `onFrame` (a QR scanner reads it), and stills through `handle`. Failures (refused, missing, in use, unsupported) are explained in words. The stream is stopped whenever the camera is turned off, another camera is chosen, or the view leaves the page.
+A live camera: Start and Stop, a choice of camera, a torch switch where the camera has one, every frame offered to `onFrame` (a QR scanner reads it), and stills through `handle`. Failures (refused, missing, in use, unsupported, lost while running) are explained in words. The stream is stopped whenever the camera is turned off, another camera is chosen, or the view leaves the page.
 
 ```tsx
 import { CameraView, type CameraViewHandle } from "@arshad-shah/cynosure";
@@ -12,20 +12,20 @@ const camera = useRef<CameraViewHandle>(null);
 const photo = await camera.current?.capture("image/jpeg", 0.9);
 ```
 
-| Prop                                          | Default       | Notes                                                                                                           |
-| --------------------------------------------- | ------------- | --------------------------------------------------------------------------------------------------------------- |
-| `label`                                       | –             | Names the picture (and its stage)                                                                               |
-| `active` / `defaultActive` / `onActiveChange` | `false`       | Whether the camera runs; `onActiveChange(false)` also when it fails to start                                    |
-| `deviceId` / `onDeviceChange`                 | –             | The camera in use, chosen from the list (shown when there is more than one)                                     |
-| `facingMode`                                  | `environment` | Which camera to ask for when none is chosen: `environment` (back) or `user` (selfie)                            |
-| `mirror`                                      | for `user`    | Show the picture as a mirror                                                                                    |
-| `torch` / `onTorchChange`                     | `false`       | The torch switch, shown when the camera has a torch                                                             |
-| `onFrame`                                     | –             | Called with the video element for every new frame while running                                                 |
-| `onError`                                     | –             | `{ kind, cause }`: `denied`, `not-found`, `in-use`, `unsupported` or `failed`                                   |
-| `ratio`                                       | `4 / 3`       | Width divided by height of the picture                                                                          |
-| `handle`                                      | –             | `capture(type?, quality?)` (a Blob), `frame()` (ImageData), `video()`                                           |
-| `labels`                                      | –             | `start`, `stop`, `off`, `camera`, `unnamed(i)`, `torch`, `denied`, `notFound`, `inUse`, `unsupported`, `failed` |
-| `className` / `style`                         | –             | Layout only                                                                                                     |
+| Prop                                          | Default       | Notes                                                                                                                   |
+| --------------------------------------------- | ------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `label`                                       | –             | Names the picture (and its stage)                                                                                       |
+| `active` / `defaultActive` / `onActiveChange` | `false`       | Whether the camera runs; `onActiveChange(false)` also when it fails to start or stops on its own                        |
+| `deviceId` / `onDeviceChange`                 | –             | The camera in use, chosen from the list (shown when there is more than one)                                             |
+| `facingMode`                                  | `environment` | Which camera to ask for when none is chosen: `environment` (back) or `user` (selfie)                                    |
+| `mirror`                                      | for `user`    | Show the picture as a mirror                                                                                            |
+| `torch` / `onTorchChange`                     | `false`       | The torch switch, shown when the camera has a torch                                                                     |
+| `onFrame`                                     | –             | Called with the video element for every new frame while running                                                         |
+| `onError`                                     | –             | `{ kind, cause }`: `denied`, `not-found`, `in-use`, `unsupported`, `failed` or `lost`                                   |
+| `ratio`                                       | `4 / 3`       | Width divided by height of the picture                                                                                  |
+| `handle`                                      | –             | `capture(type?, quality?)` (a Blob), `frame()` (ImageData), `video()`                                                   |
+| `labels`                                      | –             | `start`, `stop`, `off`, `camera`, `unnamed(i)`, `torch`, `denied`, `notFound`, `inUse`, `unsupported`, `failed`, `lost` |
+| `className` / `style`                         | –             | Layout only                                                                                                             |
 
 ## Behaviour
 
@@ -34,6 +34,7 @@ const photo = await camera.current?.capture("image/jpeg", 0.9);
 - **Torch.** Shown when the camera's track reports a torch; the switch applies `{ advanced: [{ torch }] }` and is applied again to each new stream that can take it.
 - **Frames.** `onFrame(video)` runs once per new video frame (`requestVideoFrameCallback`, or each animation frame where it is missing) while the camera runs, and stops with it. `handle.capture()` and `handle.frame()` take the picture as it is now, at the camera's own size, or give null while it is off.
 - **Failures.** A refusal, no camera, a camera held by another app or any other failure is shown in a danger Notice (`role="alert"`, so it is announced), reported to `onError`, and the camera is off again with Start ready to retry. Without camera support (an old browser, a page not on HTTPS) Start is disabled and a warning says so.
+- **Lost.** When the camera stops while running (unplugged, or access taken back), the view shows `labels.lost` ("The camera stopped. Check that it is connected, then try again.") in the same Notice, calls `onError({ kind: "lost" })` and turns off (`onActiveChange(false)`), instead of leaving a black picture.
 - **Mirror.** A selfie camera (`facingMode="user"`) is shown as a mirror; `capture()` and `frame()` are never mirrored.
 
 ## Tokens

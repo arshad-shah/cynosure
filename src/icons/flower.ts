@@ -12,7 +12,7 @@ export const flower: IconData = {
       },
     ],
     ["circle", { cx: 12, cy: 8.5, r: 1.5, animate: true }],
-    ["path", { d: "M12 15v6m0-2c-2.5 0-4-1.25-4-3.5 2.5 0 4 1.25 4 3.5" }],
+    ["path", { d: "M12 15v2.14m0 2.26V21m0-2c-2.5 0-4-1.25-4-3.5 2.5 0 4 1.25 4 3.5" }],
   ],
   motion: "pop",
 };

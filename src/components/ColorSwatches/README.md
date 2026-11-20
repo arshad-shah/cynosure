@@ -13,13 +13,14 @@ import { ColorSwatches } from "@arshad-shah/cynosure";
 />;
 ```
 
-| Prop                 | Default       | Notes                                                                                      |
-| -------------------- | ------------- | ------------------------------------------------------------------------------------------ |
-| `label`              | –             | Name of the group                                                                          |
-| `swatches`           | –             | Any CSS colours, as strings or `{ value, label }` (the label is spoken; default the value) |
-| `value` / `onChange` | –             | Matched by colour, so "#FFF" and "white" are the same swatch                               |
-| `disabled`, `size`   | `false`, `md` |                                                                                            |
-| `readOnly`           | `false`       | Show the colours without a choice: a group of named colour images, no tab stop, no tick    |
+| Prop                  | Default       | Notes                                                                                      |
+| --------------------- | ------------- | ------------------------------------------------------------------------------------------ |
+| `label`               | –             | Name of the group                                                                          |
+| `swatches`            | –             | Any CSS colours, as strings or `{ value, label }` (the label is spoken; default the value) |
+| `value` / `onChange`  | –             | Matched by colour, so "#FFF" and "white" are the same swatch                               |
+| `disabled`, `size`    | `false`, `md` |                                                                                            |
+| `readOnly`            | `false`       | Show the colours without a choice: a group of named colour images, no tab stop, no tick    |
+| `className` / `style` | –             | Layout only                                                                                |
 - One tab stop; arrow keys move and choose (once a colour is chosen); Home and End jump. Tab only focuses: it never replaces a colour that matches no swatch.
 - The chosen swatch has a ring and a tick that is dark on light colours and light on dark ones. Transparent colours show over a checkerboard.
 - Hit areas are at least 24px, 44px on touch screens.

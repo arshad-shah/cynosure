@@ -14,9 +14,9 @@ const theme = createTheme({
 });
 ```
 
-`createTheme` derives accent hover/active (OKLCH), soft and ring mixes, on-accent text with WCAG contrast ≥ 4.5:1, the code colours (`--cy-color-syntax-*`, keywords from the accent; see [Code editors](code-editors.md)) and eight chart series colours. Invalid colours or unsafe values throw `CynosureThemeError`.
+`createTheme` derives accent hover/active (OKLCH), soft and ring mixes, on-accent text with WCAG contrast ≥ 4.5:1, the code colours (`--cy-color-syntax-*`, keywords from the accent; see [Code editors](code-editors.md)) and eight chart series colours. Colours are hex, `rgb()`, `hsl()` (hue in degrees, `deg`, `grad`, `rad` or `turn`, wrapped into one turn; saturation and lightness as percentages or, in the space-separated syntax, bare numbers out of 100) or `oklch()`. Invalid colours or unsafe values throw `CynosureThemeError`: a value cannot hold `; { } < > \ @`, a comment, `url(`, `image(` or `image-set(`, or an unclosed quote or bracket (balanced quotes are fine, as in `'"Hanken Grotesk", system-ui'`).
 
-Apply it: `<CynosureTheme theme={theme} mode="system">`, at build time with `themeToCss(theme)`, or in a shadow root with `styles.inline` plus `themeToCss(theme, ":host")`. Modes: `light | dark | system`; contrast: `normal | more | system`. `useColorMode({ storage })` persists the user's choice.
+Apply it: `<CynosureTheme theme={theme} mode="system">`, at build time with `themeToCss(theme)`, or in a shadow root with `styles.inline` plus `themeToCss(theme, ":host")`. With a selector of your own, the mode and contrast rules are scoped to it (`:host` is qualified as `:host([data-cy-mode="dark"])`, the only form a shadow host matches), and an element with no `data-cy-contrast` follows the OS contrast setting, as the document root does by default. Modes: `light | dark | system`; contrast: `normal | more | system`. `useColorMode({ storage })` persists the user's choice.
 
 ## Named themes
 
@@ -53,13 +53,20 @@ themes.register(JSON.parse(pluginJson)); // throws CynosureThemeError for bad in
 Canvas engines and chart libraries cannot read `var(--…)`. `useCynosureTheme()` returns the theme in force where it is called, resolved:
 
 ```tsx
-const { theme, palette, colors, fontSize } = useCynosureTheme();
+const { theme, palette, colors, fontSize, resolveColor } = useCynosureTheme();
 // palette: "light" | "dark" | "light-contrast" | "dark-contrast"
 // colors: that palette as hex (color-mix() values worked out), fontSize: the type ramp in px
 useEffect(() => addTheme("app", swiftChartTheme(theme, palette)), [theme, palette]);
 ```
 
 It reads the nearest `CynosureTheme` (Cynosure's own theme, following the OS, when there is none) and re-renders when the theme, mode or contrast changes, including the OS setting a `system` mode follows. Pass the user's mode to `CynosureTheme` (from `useColorMode`) so the hook knows it.
+
+`resolveColor(value, within?)` resolves any CSS colour as the theme's wrapper sees it (a colour, `var(--x)` or a bare `--x` for a product's own colour role, `color-mix()`, `light-dark()`) to `#rrggbb`, or `#rrggbbaa` when translucent. It answers `""` for a value that is no colour, a custom property that is not set, on the server and before the wrapper mounts, so call it in an effect; a new function comes with each palette, so an effect that lists it runs again when the palette changes. Pass `within` (a canvas, say) to resolve where that element sits, which also works with no `CynosureTheme` above.
+
+```tsx
+const { resolveColor } = useCynosureTheme();
+useEffect(() => draw(canvas, resolveColor("--app-highlight")), [resolveColor]);
+```
 
 Without React, `resolveColors(theme, palette)` gives the same colours.
 

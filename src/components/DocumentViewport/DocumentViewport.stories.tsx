@@ -333,3 +333,43 @@ export const StableUnderHostileHost: Story = {
     }
   },
 };
+
+/** A viewport at 100% with the gap token given, its first two pages placed. */
+function Gapped({ gap, dir }: { gap: string; dir?: "rtl" }) {
+  return (
+    <div dir={dir} style={{ inlineSize: 400, blockSize: 300 }}>
+      <DocumentViewport
+        label="Contract"
+        pages={PAGES}
+        defaultZoom={{ kind: "percent", value: 100 }}
+        style={{ "--cy-document-viewport-gap": gap } as React.CSSProperties}
+        renderPage={() => null}
+      />
+    </div>
+  );
+}
+
+export const GapInAnyLength: Story = {
+  render: () => <Gapped gap="1.25rem" />,
+  play: async ({ canvas, canvasElement }) => {
+    const region = viewport(canvasElement);
+    const rem = Number.parseFloat(getComputedStyle(document.documentElement).fontSize);
+    // A gap in rem is measured in pixels: page 1 starts one gap down, page 2 one gap under page 1.
+    const first = canvas.getByRole("group", { name: "Page 1 of 40" }).getBoundingClientRect();
+    const second = canvas.getByRole("group", { name: "Page 2 of 40" }).getBoundingClientRect();
+    await expect(first.top - region.getBoundingClientRect().top).toBeCloseTo(1.25 * rem, 0);
+    await expect(second.top - first.bottom).toBeCloseTo(1.25 * rem, 0);
+  },
+};
+
+export const GapAsACalculation: Story = {
+  render: () => <Gapped gap="calc(1rem + 4px)" />,
+  play: async ({ canvas }) => {
+    const rem = Number.parseFloat(getComputedStyle(document.documentElement).fontSize);
+    // A calculated gap is measured too, and the pages render at their size, one gap apart.
+    const first = canvas.getByRole("group", { name: "Page 1 of 40" }).getBoundingClientRect();
+    const second = canvas.getByRole("group", { name: "Page 2 of 40" }).getBoundingClientRect();
+    await expect(first.width).toBeCloseTo(600, 0);
+    await expect(second.top - first.bottom).toBeCloseTo(rem + 4, 0);
+  },
+};

@@ -464,6 +464,46 @@ export const ScrollingDoesNotWalkEveryRow: Story = {
   },
 };
 
+/** A parent that shows the range in view (so it renders again on each scroll) and keys rows with an inline arrow. */
+function RangeShown() {
+  const [range, setRange] = useState("");
+  return (
+    <div style={{ display: "grid", gap: 8 }}>
+      <Files
+        getKey={(e) => {
+          keyCalls++;
+          return e.id;
+        }}
+        onRangeChange={(start, end) => setRange(`${start + 1} to ${end + 1}`)}
+      />
+      <span>{`Showing ${range}`}</span>
+    </div>
+  );
+}
+
+/** An inline `getKey` (a new function each render of the parent) does not key every row again either. */
+export const AnInlineGetKeyDoesNotWalkEveryRow: Story = {
+  render: () => <RangeShown />,
+  play: async ({ canvas, canvasElement }) => {
+    const box = list(canvasElement);
+    await waitFor(() => expect(canvas.getByRole("option", { name: "File 1" })).toBeInTheDocument());
+    keyCalls = 0;
+    for (const n of [1, 2, 3, 4, 5]) {
+      box.scrollTop = n * 2000;
+      await waitFor(() =>
+        expect(
+          [...box.querySelectorAll<HTMLElement>('[role="option"]')].some(
+            (r) => r.offsetTop <= box.scrollTop && r.offsetTop + r.offsetHeight > box.scrollTop,
+          ),
+        ).toBe(true),
+      );
+    }
+    // The parent rendered again with the range in view.
+    await expect(canvas.getByText(/^Showing/).textContent).not.toMatch(/^Showing (1 to)?$/);
+    await expect(keyCalls).toBe(0);
+  },
+};
+
 /** A request log, as the tools app shows one: wrapped lines, new entries arriving, a button to jump back. */
 function Log({ follow = true }: { follow?: boolean }) {
   const [lines, setLines] = useState<Entry[]>(() =>

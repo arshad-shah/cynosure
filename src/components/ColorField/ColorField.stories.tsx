@@ -61,6 +61,47 @@ export const InvalidTextIsExplained: Story = {
   },
 };
 
+/** A form will not submit while the text is not a colour (it would send the last good one). */
+export const InvalidTextBlocksTheForm: Story = {
+  args: { name: "accent" },
+  render: (args) => (
+    <form data-testid="form">
+      <ColorField {...args} />
+    </form>
+  ),
+  play: async ({ canvas, userEvent }) => {
+    const form = canvas.getByTestId("form") as HTMLFormElement;
+    const input = canvas.getByRole("textbox", { name: "Accent" }) as HTMLInputElement;
+    await userEvent.clear(input);
+    await userEvent.type(input, "not a colour");
+    await expect(form.checkValidity()).toBe(false);
+    await expect(input.validationMessage).toMatch(/Enter a colour such as/);
+    // Fixed, or put back by a reset: the form submits again.
+    await userEvent.clear(input);
+    await userEvent.type(input, "teal{Enter}");
+    await expect(form.checkValidity()).toBe(true);
+    await userEvent.clear(input);
+    await userEvent.type(input, "nope");
+    form.reset();
+    await waitFor(() => expect(input).toHaveValue("#3366ff"));
+    await expect(form.checkValidity()).toBe(true);
+  },
+};
+
+/** Keys that belong to an input method's composition are not the field's: Enter does not commit. */
+export const EnterWhileComposingDoesNotCommit: Story = {
+  play: async ({ args, canvas, userEvent }) => {
+    const input = canvas.getByRole("textbox", { name: "Accent" });
+    await userEvent.clear(input);
+    await userEvent.type(input, "teal");
+    input.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true, isComposing: true }));
+    // Safari reports the composing Enter only as keyCode 229.
+    input.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true, keyCode: 229 }));
+    await expect(args.onChange).not.toHaveBeenCalled();
+    await expect(input).toHaveValue("teal");
+  },
+};
+
 export const OutputFormats: Story = {
   render: (args) => (
     <>

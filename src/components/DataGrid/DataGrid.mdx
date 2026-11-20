@@ -41,7 +41,7 @@ Columns are `width` CSS pixels wide (default 160). `cell` formats a value for di
 
 ### Sorting
 
-A `sortable` column's header is a button (a [SortButton](?path=/docs/components-controls-sortbutton--docs) filling the header cell): ascending, descending, then unsorted. The sort is a `TableSort` (`{ key, direction }`), the same as [Table](?path=/docs/components-feedback-and-display-table--docs)'s. Numbers compare as numbers, text in the locale's order, and empty values go last either way. Control it with `sort` and `onSortChange`; with `manualSort` you sort the rows (on a server) and the grid only shows and reports the sort.
+A `sortable` column's header is a button (a [SortButton](?path=/docs/components-controls-sortbutton--docs) filling the header cell): ascending, descending, then unsorted. The sort is a `TableSort` (`{ key, direction }`), the same as [Table](?path=/docs/components-feedback-and-display-table--docs)'s. Numbers compare as numbers (and dates by time, booleans false first), text in the locale's order, and empty values go last either way. Control it with `sort` and `onSortChange`; with `manualSort` you sort the rows (on a server) and the grid only shows and reports the sort.
 
 <Canvas of={Stories.SortingCyclesAndCompares} />
 
@@ -93,7 +93,7 @@ A column with `filter` gets a field in a filter row under the header (named "Fil
 
 ### Column menu: moving and hiding columns
 
-`columnMenu` puts a menu on every header: its button, or Alt+Down, Shift+F10 or the context menu key on the focused header. It sorts the column (when `sortable`), moves it left or right, hides it, and its Columns submenu shows or hides any column; the last shown column cannot be hidden. Focus comes back to the header. The order and the hidden columns are `columnOrder` / `onColumnOrderChange` and `hiddenColumns` / `onHiddenColumnsChange`, controlled or not; columns left out of `columnOrder` follow in their own order.
+`columnMenu` puts a menu on every header: its button, or Alt+Down, Shift+F10 or the context menu key on the focused header. It sorts the column (when `sortable`), moves it left or right, hides it, and its Columns submenu shows or hides any column; the last shown column cannot be hidden. Focus comes back to the header. The order and the hidden columns are `columnOrder` / `onColumnOrderChange` and `hiddenColumns` / `onHiddenColumnsChange`, controlled or not; columns left out of `columnOrder` follow in their own order. A hidden column neither filters nor sorts the rows, so what shapes them is always on screen; its filter text and sort are kept and apply again when it is shown (with `manualFilter` or `manualSort`, leaving them out is yours to do).
 
 <Canvas of={Stories.ColumnMenuHidesAndReorders} />
 

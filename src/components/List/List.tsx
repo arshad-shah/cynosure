@@ -124,7 +124,7 @@ export const List = forwardRef<HTMLUListElement | HTMLOListElement, ListProps>(f
       {...rest}
       // Explicit: Safari drops the list role from a list drawn without bullets.
       role="list"
-      aria-label={label}
+      aria-label={label ?? rest["aria-label"]}
       start={Tag === "ol" && start !== 1 ? start : undefined}
       className={className ? `cy-list ${className}` : "cy-list"}
       data-marker={marker}

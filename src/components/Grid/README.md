@@ -31,6 +31,7 @@ import { Grid, GridItem } from "@arshad-shah/cynosure";
 | `inert` / `disabled`                                                        | `false`    | Block the region: nothing inside can be focused or clicked and assistive technology skips it (HTML `inert`); `disabled` also dims it                                                                       |
 | `hideBelow` / `hideAbove`                                                   | –          | Hidden while the window is narrower than / at least this breakpoint (`sm` 30rem, `md` 45rem, `lg` 60rem, `xl` 75rem). No script                                                                            |
 | `id`, `role`, `aria-*`, `data-*`, `tabIndex`, `dir`, `lang`, event handlers | –          | Passed to the element, as is `ref`: a link target, a named landmark or group, a drop zone's or canvas column's handlers, `data-*` for tests or state                                                       |
+| `className` / `style`                                                       | –          | Layout only                                                                                                                                                                                                |
 
 `GridItem`: `span` (columns, or `full` for the whole row; clamped to the columns a `columns` grid has at its current width), `rowSpan`, `as` (`div`, `li`, `section`, `article`, `aside`). Plain children need no wrapper.
 
@@ -63,13 +64,15 @@ import { Grid, GridItem } from "@arshad-shah/cynosure";
 
 ## GridItem
 
-| Prop                                              | Default | Notes                                                                                                              |
-| ------------------------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------ |
-| `span`                                            | `1`     | Columns to span, or `full`. In a grid with `columns` per breakpoint, one per breakpoint: `{ base: "full", md: 2 }` |
-| `rowSpan`                                         | `1`     | Rows to span                                                                                                       |
-| `order`                                           | `0`     | Visual position (CSS `order`), or one per breakpoint. The reading and tab order stay the source order              |
-| `sticky` / `stickyOffset`                         | – / `0` | Stays in view while the page scrolls past its row, keeping its own height (a sidebar)                              |
-| `overflow`                                        | –       | `hidden` · `auto` · `visible`, as on Grid (a wide table that scrolls sideways in its column)                       |
-| `hideBelow` / `hideAbove`, `id`, `role`, `aria-*` | –       | As on Grid                                                                                                         |
+| Prop                                                                  | Default | Notes                                                                                                              |
+| --------------------------------------------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------ |
+| `span`                                                                | `1`     | Columns to span, or `full`. In a grid with `columns` per breakpoint, one per breakpoint: `{ base: "full", md: 2 }` |
+| `rowSpan`                                                             | `1`     | Rows to span                                                                                                       |
+| `order`                                                               | `0`     | Visual position (CSS `order`), or one per breakpoint. The reading and tab order stay the source order              |
+| `sticky` / `stickyOffset`                                             | – / `0` | Stays in view while the page scrolls past its row, keeping its own height (a sidebar)                              |
+| `overflow`                                                            | –       | `hidden` · `auto` · `visible`, as on Grid (a wide table that scrolls sideways in its column)                       |
+| `hideBelow` / `hideAbove`, `id`, `role`, `aria-*`, `data-*`, handlers | –       | As on Grid                                                                                                         |
+| `as`                                                                  | `div`   | `div` · `li` · `section` · `article` · `aside`                                                                     |
+| `className` / `style`                                                 | –       | Layout only                                                                                                        |
 
 **Unequal columns that change with the width:** give the grid equal columns per breakpoint and the items a span per breakpoint. `columns={{ base: 1, md: 3 }}` with a main item of `span={{ md: 2 }}` is one column on phones and two to one from `md`; `order={{ base: 2, md: 1 }}` moves it after its sibling on phones only. Item spans and orders per breakpoint follow the grid's own width, like its columns.

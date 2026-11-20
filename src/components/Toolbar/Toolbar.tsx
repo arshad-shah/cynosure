@@ -2,6 +2,19 @@ import { type CSSProperties, type ReactNode, useRef } from "react";
 import { type BlockProps, useBlock } from "../../foundations/layout.js";
 import { TOOLBAR_ITEMS, useRovingFocus } from "../../foundations/roving-focus.js";
 
+export interface ToolbarTokens {
+  /** Space between the controls. */
+  gap: string;
+  /** Space around the controls, inside the toolbar. */
+  padding: string;
+}
+
+declare module "../../tokens/schema.js" {
+  interface ComponentTokens {
+    toolbar: ToolbarTokens;
+  }
+}
+
 export interface ToolbarProps extends BlockProps {
   /** Accessible name (required: a toolbar must be named). */
   label: string;

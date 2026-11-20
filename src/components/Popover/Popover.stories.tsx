@@ -9,6 +9,7 @@ import { shownFully } from "../../test/settle.js";
 import { Button } from "../Button/Button.js";
 import { Checkbox } from "../Checkbox/Checkbox.js";
 import { IconButton } from "../IconButton/IconButton.js";
+import { RadioGroup } from "../RadioGroup/RadioGroup.js";
 import { Stack } from "../Stack/Stack.js";
 import { TextField } from "../TextField/TextField.js";
 import { Popover, type PopoverTriggerProps } from "./Popover.js";
@@ -182,6 +183,45 @@ export const ModalKeepsTabInside: Story = {
     await expect(canvas.getByRole("checkbox", { name: "Only errors" })).toHaveFocus();
     await userEvent.tab({ shift: true });
     await expect(canvas.getByRole("button", { name: "Apply" })).toHaveFocus();
+  },
+};
+
+const withNextButton: NonNullable<Story["render"]> = (args) => (
+  <>
+    <Popover {...args} />
+    <Button>Next on the page</Button>
+  </>
+);
+
+export const ModalTrapSkipsControlsThatAreNoTabStop: Story = {
+  args: {
+    modal: true,
+    children: (
+      <Stack gap="4">
+        <Button>Apply</Button>
+        <RadioGroup
+          label="Digest"
+          name="digest"
+          defaultValue="daily"
+          options={[
+            { value: "daily", label: "Daily" },
+            { value: "weekly", label: "Weekly" },
+          ]}
+        />
+      </Stack>
+    ),
+  },
+  render: withNextButton,
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(canvas.getByRole("button", { name: "Filters" }));
+    await waitFor(() => expect(canvas.getByRole("button", { name: "Apply" })).toHaveFocus());
+    // The checked radio is the panel's last tab stop; the unchecked one is not, so Tab from it wraps.
+    await userEvent.tab();
+    await expect(canvas.getByRole("radio", { name: "Daily" })).toHaveFocus();
+    await userEvent.tab();
+    await expect(canvas.getByRole("button", { name: "Apply" })).toHaveFocus();
+    await userEvent.tab({ shift: true });
+    await expect(canvas.getByRole("radio", { name: "Daily" })).toHaveFocus();
   },
 };
 
@@ -716,13 +756,6 @@ export const OffsetSetsTheGap: Story = {
     );
   },
 };
-
-const withNextButton: NonNullable<Story["render"]> = (args) => (
-  <>
-    <Popover {...args} />
-    <Button>Next on the page</Button>
-  </>
-);
 
 export const TabOutOfTheLastControlCloses: Story = {
   render: withNextButton,

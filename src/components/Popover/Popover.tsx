@@ -8,7 +8,7 @@ import {
   useRef,
 } from "react";
 import { useControllableState } from "../../foundations/controllable.js";
-import { deepActiveElement } from "../../foundations/focus.js";
+import { deepActiveElement, tabStops } from "../../foundations/focus.js";
 import { useDismiss } from "../../overlay/dismiss.js";
 import { usePopover } from "../../overlay/floating.js";
 import { type Align, crossAlign, type Placement } from "../../overlay/position.js";
@@ -99,12 +99,9 @@ export interface PopoverProps {
   className?: string;
   /** Layout only, applied to the panel. */
   style?: CSSProperties;
-  /** The panel's content. Focus moves to its first focusable element on open (see `initialFocus`). */
+  /** The panel's content. Focus moves to its first Tab stop on open (see `initialFocus`). */
   children?: ReactNode;
 }
-
-const FOCUSABLE =
-  'button:not([disabled]), [href], input:not([disabled]):not([type="hidden"]):not([aria-hidden="true"]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
 /** Floating panel in the top layer, anchored to its trigger. Escape, outside clicks and focus return are shared. */
 export function Popover({
@@ -155,7 +152,7 @@ export function Popover({
     if (width === "trigger" && against)
       el.style.setProperty("--_anchor-w", `${against.getBoundingClientRect().width}px`);
     if (initialFocus === "none") return;
-    const first = initialFocus === "first" ? el.querySelector<HTMLElement>(FOCUSABLE) : null;
+    const first = initialFocus === "first" ? tabStops(el)[0] : undefined;
     (first ?? el).focus({ preventScroll: true });
   });
   useAnchoredPosition(anchor ? placed : triggerRef, panel, isOpen, placement, offset, crossAlign(align));
@@ -168,7 +165,7 @@ export function Popover({
 
   const trap = (event: KeyboardEvent<HTMLDivElement>) => {
     if (!modal || event.key !== "Tab") return;
-    const items = [...event.currentTarget.querySelectorAll<HTMLElement>(FOCUSABLE)];
+    const items = tabStops(event.currentTarget);
     if (!items.length) return;
     const first = items[0] as HTMLElement;
     const last = items[items.length - 1] as HTMLElement;

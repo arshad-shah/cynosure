@@ -30,8 +30,8 @@ declare module "../../tokens/schema.js" {
   }
 }
 
-/** Why the camera could not start. */
-export type CameraErrorKind = "denied" | "not-found" | "in-use" | "unsupported" | "failed";
+/** Why the camera could not start, or (`lost`) why it stopped on its own. */
+export type CameraErrorKind = "denied" | "not-found" | "in-use" | "unsupported" | "failed" | "lost";
 
 export interface CameraError {
   kind: CameraErrorKind;
@@ -62,6 +62,8 @@ export interface CameraViewLabels {
   unsupported: string;
   /** Anything else. */
   failed: string;
+  /** The camera stopped while running (unplugged, or access taken back). */
+  lost: string;
 }
 
 export interface CameraViewHandle {
@@ -96,7 +98,10 @@ export interface CameraViewProps extends RootAttributes {
   onTorchChange?: ((on: boolean) => void) | undefined;
   /** Called with the video element for every new frame while the camera runs (a QR scanner reads it). */
   onFrame?: ((video: HTMLVideoElement) => void) | undefined;
-  /** Called when the camera fails to start, with why. The reason is also shown. */
+  /**
+   * Called when the camera fails to start, or with `lost` when it stops on its own (unplugged, access taken back),
+   * with why. The reason is also shown, and the camera is turned off.
+   */
   onError?: ((error: CameraError) => void) | undefined;
   /** Width divided by height of the picture. Default 4 / 3. */
   ratio?: number | string;
@@ -122,6 +127,7 @@ const DEFAULT_LABELS: CameraViewLabels = {
   inUse: "The camera is in use by another app.",
   unsupported: "This browser cannot use a camera here.",
   failed: "The camera could not start.",
+  lost: "The camera stopped. Check that it is connected, then try again.",
 };
 const MESSAGES: Record<CameraErrorKind, keyof CameraViewLabels> = {
   denied: "denied",
@@ -129,6 +135,7 @@ const MESSAGES: Record<CameraErrorKind, keyof CameraViewLabels> = {
   "in-use": "inUse",
   unsupported: "unsupported",
   failed: "failed",
+  lost: "lost",
 };
 
 /** Sorts what getUserMedia threw into a reason people can act on. */
@@ -217,6 +224,15 @@ export const CameraView = forwardRef<HTMLDivElement, CameraViewProps>(function C
         setError(null);
         setStream(got);
         const track = got.getVideoTracks()[0];
+        // A camera unplugged, or access taken back, ends the track: say so and turn off, not a black picture.
+        // Through the handler property: Firefox ran it but not an `addEventListener` listener on the same track.
+        if (track)
+          track.onended = () => {
+            if (gone) return;
+            setError("lost");
+            latest.current.onError?.({ kind: "lost" });
+            latest.current.setOn(false);
+          };
         setCanTorch(!!(track?.getCapabilities?.() as { torch?: boolean } | undefined)?.torch);
         // Names are only given once access is allowed, so list the cameras now.
         const list = (await navigator.mediaDevices.enumerateDevices?.()) ?? [];
@@ -237,7 +253,10 @@ export const CameraView = forwardRef<HTMLDivElement, CameraViewProps>(function C
     );
     return () => {
       gone = true;
-      for (const t of live?.getTracks() ?? []) t.stop();
+      for (const t of live?.getTracks() ?? []) {
+        t.onended = null;
+        t.stop();
+      }
       setStream(null);
       setCanTorch(false);
     };
@@ -257,7 +276,8 @@ export const CameraView = forwardRef<HTMLDivElement, CameraViewProps>(function C
     if (!stream || !el || !onFrame) return;
     let stopped = false;
     let id = 0;
-    const each = el.requestVideoFrameCallback
+    const byVideo = !!el.requestVideoFrameCallback;
+    const each = byVideo
       ? (fn: () => void) => {
           id = el.requestVideoFrameCallback(fn);
         }
@@ -272,8 +292,9 @@ export const CameraView = forwardRef<HTMLDivElement, CameraViewProps>(function C
     each(tick);
     return () => {
       stopped = true;
-      if (el.cancelVideoFrameCallback) el.cancelVideoFrameCallback(id);
-      cancelAnimationFrame(id);
+      // Each kind of handle is cancelled by its own function: the number may also be another script's frame.
+      if (byVideo) el.cancelVideoFrameCallback(id);
+      else cancelAnimationFrame(id);
     };
   }, [stream, onFrame !== undefined]);
 

@@ -24,9 +24,10 @@ A select-only combobox (WAI-ARIA APG): the trigger is a Cynosure button with `ro
 | `footer`                                      | –                | `{ label, icon?, onSelect }`: an action pinned under the options (see below)                                                       |
 | `value` / `defaultValue` / `onChange(value)`  | –                | Controlled or uncontrolled                                                                                                         |
 | `emptyOption`                                 | –                | Label of a first option for no value ("Any", "None"): chosen, the value is `""` and the trigger shows this label                   |
-| `placeholder`                                 | `"Select…"`      | Also `labels.placeholder`; `labels.empty` for no options                                                                           |
+| `placeholder`                                 | `"Select…"`      | Also `labels.placeholder`; `labels.empty` for no options, `labels.required` for the required message ("Please choose a value.")    |
 | `size` / `variant`                            | `md` / `outline` | Shared vocabulary; `size` also takes `xs` (20px, dense chrome)                                                                     |
 | `name`, `required`, `disabled`                | –                | `required` participates in form validation                                                                                         |
+| `className` / `style`                         | –                | Layout only                                                                                                                        |
 
 **Keyboard:** ArrowDown/Up, Enter or Space open; arrows, Home, End, PageUp, PageDown move (disabled skipped); Enter, Space or Tab select; Escape closes without change; typing jumps (ignored during IME composition). Coarse pointers get 44px rows.
 

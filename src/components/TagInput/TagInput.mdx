@@ -56,14 +56,15 @@ With `name`, each tag is submitted as its own value under that name (`formData.g
 - **Roles:** the input is a text box, or an APG combobox with a listbox when `suggestions` is set. The tags are a list named "Tags"; each has a "Remove …" button.
 - **Keyboard:**
 
-| Key                          | Where           | Action                                     |
-| ---------------------------- | --------------- | ------------------------------------------ |
-| Enter / `,`                  | Field           | Add the typed text (or the active suggestion) |
-| Backspace                    | Empty field     | Take the last tag back into the field to edit |
-| Arrow Left                   | Start of field  | Move to the last tag                        |
-| Arrow Left / Right           | Tags            | Move between tags; past the last, back to the field |
-| Delete / Backspace           | Tag             | Remove it                                   |
-| Escape                       | Tags or list    | Back to the field / close the list          |
+| Key                | Where                      | Action                                              |
+| ------------------ | -------------------------- | --------------------------------------------------- |
+| Enter / `,`        | Field                      | Add the typed text (or the active suggestion)       |
+| Backspace          | Empty field                | Take the last tag back into the field to edit       |
+| Arrow Down / Up    | Field (with `suggestions`) | Open the list, then move through it                 |
+| Arrow Left         | Start of field             | Move to the last tag                                |
+| Arrow Left / Right | Tags                       | Move between tags; past the last, back to the field |
+| Delete / Backspace | Tag                        | Remove it                                           |
+| Escape             | Tags or list               | Back to the field / close the list                  |
 
 - **Tab order:** the field is one tab stop; tags are reached with the arrow keys.
 - **Paste:** text with commas or new lines becomes several tags.

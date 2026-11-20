@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { nextSorts, sortRowsBy } from "../../src/foundations/sort.js";
+import { nextSorts, sortRows, sortRowsBy } from "../../src/foundations/sort.js";
 
 const rows = [
   { name: "Cy", age: 40, city: "London" },
@@ -33,6 +33,25 @@ describe("sortRowsBy", () => {
   });
   it("keeps the given order without keys", () => {
     expect(sortRowsBy(rows, [], get)).toEqual(rows);
+  });
+});
+
+describe("sortRows", () => {
+  it("sorts dates by time, not by their text", () => {
+    // 1 January 2026 is a Thursday: as text, "Fri …" < "Mon …" < "Thu …" and the weekday would decide.
+    const days = [new Date(2026, 0, 5), new Date(2026, 0, 1), new Date(2026, 0, 2)];
+    expect(sortRows(days, (d) => d, "ascending").map((d) => d.getDate())).toEqual([1, 2, 5]);
+    expect(sortRows(days, (d) => d, "descending").map((d) => d.getDate())).toEqual([5, 2, 1]);
+  });
+  it("sorts booleans false first and bigints as numbers", () => {
+    expect(sortRows([true, false, true], (v) => v, "ascending")).toEqual([false, true, true]);
+    expect(sortRows([10n, -2n, 9007199254740993n, -10n, 3n], (v) => v, "ascending")).toEqual([
+      -10n,
+      -2n,
+      3n,
+      10n,
+      9007199254740993n,
+    ]);
   });
 });
 

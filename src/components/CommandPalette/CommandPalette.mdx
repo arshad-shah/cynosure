@@ -101,7 +101,7 @@ Shortcuts with Ctrl, Command or Alt work everywhere, text fields included. Plain
 | Typing | Filters the commands into one flat list, each tagged with its group |
 | <kbd>Down</kbd> / <kbd>Up</kbd> | Next / previous command, wrapping around; disabled ones are skipped unless they have a `disabledReason` |
 | <kbd>Enter</kbd> or a click | Runs the command and closes; on a disabled command with a reason, announces the reason |
-| <kbd>Escape</kbd> or the backdrop | Closes; focus returns to where it was |
+| <kbd>Escape</kbd> or the backdrop | Closes; focus returns to where it was (opened from a menu item, to the button that opened the menu) |
 
 - **Roles:** a modal `dialog` named by `labels.title`, holding a `combobox` search field and a `listbox` of `option`s in named `group`s (search results are one unnamed group). A row's group tag is part of its name. The active command is `aria-activedescendant`, so focus stays in the search field.
 - **Fresh each time:** the search field is empty whenever it opens.

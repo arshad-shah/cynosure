@@ -20,16 +20,20 @@ A colour input. Type any CSS colour (a hex code, `rgb()`, `hsl()`, `oklch()` or 
 | `inline`                                       | `false`     | The picker (area, hue, opacity, swatches) on the page above the text, full width |
 | `name`, `required`, `disabled`                 | –           | Native form behaviour through a hidden value                                     |
 | `labels`                                       | –           | `pick`, `area`, `hue`, `alpha`, `eyedropper`, `swatches` ("Swatches"), `invalid` |
-- Typed text is read on Enter or when leaving the field; text that is not a colour shows `labels.invalid` and changes nothing.
+| `className` / `style`                          | –           | Layout only                                                                      |
+- Typed text is read on Enter or when leaving the field (Enter while an input method is composing does not commit); text that is not a colour shows `labels.invalid` and changes nothing.
+- While the text is not a colour, the input is invalid (its validity message is `labels.invalid`), so a form around it will not submit: it would send the last good colour. A form reset clears the text and the error.
 - The area is a keyboard slider: Left/Right for saturation, Up/Down for brightness, Shift for steps of ten.
 - The eyedropper button appears only where `EyeDropper` exists (Chromium today).
 - `inline` shows the picker on the page, above the text and as wide as the field, for a page whose job is picking a colour: no swatch button and no popover (the swatch stays as a sample). It is a group named by `labels.pick`; with `disabled` its area and sliders are disabled too.
 - `readColor(text)` is exported: it reads any CSS colour (alpha included) into sRGB.
-
-Tokens: `--cy-color-field-swatch-size`, `--cy-color-field-area-height`, `--cy-color-field-picker-width` (and TextField's for the field).
 
 Pass `swatches` (any CSS colours, or `{ value, label }`) to offer brand, preset or recent colours in the picker as a [ColorSwatches](../ColorSwatches/README.md) group; keep recent colours yourself.
 
 ## Tokens
 
 - `--cy-color-field-picker-width`: width of the picker popover (default 216px)
+- `--cy-color-field-swatch-size`: size of the swatch beside the text (default 18px)
+- `--cy-color-field-area-height`: height of the saturation and brightness area (default 160px)
+
+The field uses TextField's tokens.

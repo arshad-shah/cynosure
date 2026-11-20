@@ -316,6 +316,13 @@ const DEFAULT_MIN = 48;
 const RESIZE_STEP = 8;
 const RESIZE_BIG = 64;
 
+/** Whether two sort lists (or two missing ones) say the same thing. */
+const sameSorts = (a: readonly TableSort[] | undefined, b: readonly TableSort[] | undefined) =>
+  a === b ||
+  (!!a &&
+    !!b &&
+    a.length === b.length &&
+    a.every((s, i) => s.key === b[i]?.key && s.direction === b[i]?.direction));
 const rawValue = <Row,>(row: Row, column: DataGridColumn<Row>) =>
   column.value ? column.value(row) : (row as Record<string, unknown>)[column.key];
 /** A raw value as text: empty for null and undefined, JSON for objects. */
@@ -382,9 +389,13 @@ export function DataGrid<Row>({
   const text = { ...DEFAULT_LABELS, ...labels };
   const root = useRef<HTMLDivElement>(null);
   const head = useRef<HTMLDivElement>(null);
-  // Every sort key in priority order; `sort` and `onSortChange` speak for the first.
+  // Every sort key in priority order; `sort` and `onSortChange` speak for the first. A controlled sort is kept by
+  // what it says, not by identity, so a parent passing a new object of the same sort each render sorts nothing again.
+  const givenSorts = sorts ?? (sort === undefined ? undefined : sort ? [sort] : []);
+  const sameGiven = useRef(givenSorts);
+  if (!sameSorts(sameGiven.current, givenSorts)) sameGiven.current = givenSorts;
   const [sortList, setSortList] = useControllableState<TableSort[]>(
-    sorts ?? (sort === undefined ? undefined : sort ? [sort] : []),
+    sameGiven.current,
     defaultSorts ?? (defaultSort ? [defaultSort] : []),
     (next) => {
       onSortsChange?.(next);
@@ -444,11 +455,12 @@ export function DataGrid<Row>({
     return next;
   };
 
-  // Work over every row happens once per change of the rows, the filters or the sort, never per scroll.
-  const filtering = given.some((c) => c.filter && (filterText[c.key] ?? "").trim());
+  // Work over every row happens once per change of the rows, the filters or the sort, never per scroll. Only the
+  // columns shown filter and sort: a hidden column's filter and sort are kept, and apply again when it is shown.
+  const filtering = dataColumns.some((c) => c.filter && (filterText[c.key] ?? "").trim());
   const kept = useMemo(() => {
     if (manualFilter || !filtering) return rows;
-    const active = given.flatMap((c) => {
+    const active = dataColumns.flatMap((c) => {
       const query = (filterText[c.key] ?? "").trim();
       return c.filter && query ? [{ c, query }] : [];
     });
@@ -461,16 +473,19 @@ export function DataGrid<Row>({
             : textMatches(asText(rawValue(row, c)), query),
       ),
     );
-  }, [rows, given, filterText, filtering, manualFilter]);
+  }, [rows, dataColumns, filterText, filtering, manualFilter]);
   const shown = useMemo(() => {
     if (manualSort || !sortList.length) return kept;
-    const byKey = new Map(given.map((c) => [c.key, c]));
+    const byKey = new Map(dataColumns.map((c) => [c.key, c]));
     const usable = sortList.filter((s) => byKey.has(s.key));
     return usable.length
       ? sortRowsBy(kept, usable, (row, key) => rawValue(row, byKey.get(key) as DataGridColumn<Row>))
       : kept;
-  }, [kept, given, sortList, manualSort]);
-  const ids = useMemo(() => shown.map(getRowId), [shown, getRowId]);
+  }, [kept, dataColumns, sortList, manualSort]);
+  // `getRowId` is read through a ref: an inline function (a new one each render) keys the rows only when they change.
+  const rowIdOf = useRef(getRowId);
+  rowIdOf.current = getRowId;
+  const ids = useMemo(() => shown.map((row) => rowIdOf.current(row)), [shown]);
   const rowIndex = useMemo(() => new Map(ids.map((id, i) => [id, i])), [ids]);
   const chosenSet = useMemo(() => new Set(chosenRows), [chosenRows]);
   const colIndex = (key: string) => columns.findIndex((c) => c.key === key);
@@ -494,10 +509,26 @@ export function DataGrid<Row>({
     };
   })();
 
-  // The cell with the tab stop: row -1 is the header.
-  const [active, setActive] = useState({ row: 0, col: 0 });
-  const activeRow = clamp(active.row, -1, shown.length - 1);
-  const activeCol = clamp(active.col, 0, columns.length - 1);
+  // The cell with the tab stop: row -1 is the header. Kept by its row's id and its column's key too, so it stays on
+  // its cell when rows or columns change around it (and falls back to its place when they are gone).
+  const [active, setActiveState] = useState<{ row: number; col: number; id?: string; key?: string }>({
+    row: 0,
+    col: 0,
+  });
+  const setActive = ({ row, col }: { row: number; col: number }) =>
+    setActiveState({
+      row,
+      col,
+      ...(row >= 0 && ids[row] !== undefined ? { id: ids[row] } : {}),
+      ...(columns[col] ? { key: columns[col].key } : {}),
+    });
+  const activeRow = clamp(
+    (active.id === undefined ? undefined : rowIndex.get(active.id)) ?? active.row,
+    -1,
+    shown.length - 1,
+  );
+  const keyCol = active.key === undefined ? -1 : colIndex(active.key);
+  const activeCol = clamp(keyCol >= 0 ? keyCol : active.col, 0, columns.length - 1);
   const moveFocus = useRef(false);
   /** Where Shift+click and Shift+arrows extend from, in row mode. */
   const rowAnchor = useRef<string | null>(null);

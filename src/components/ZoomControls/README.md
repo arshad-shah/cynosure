@@ -27,7 +27,7 @@ Zoom out, the current percent (a menu of fit modes and preset percents) and zoom
 | `presets`      | 50, 75, 100, 125, 150, 200, 400 | Percents in the menu (those between `min` and `max`)                                                  |
 | `fits`         | `["fit-width", "fit-page"]`     | Fit modes in the menu, in order; `[]` for none                                                        |
 | `buttons`      | –                               | After zoom in: `"fit"` (reports `fit-page`, the whole content) and `"actual-size"` (100%)             |
-| `size`         | `sm`                            |                                                                                                       |
+| `size`         | `sm`                            | `sm` · `md` · `lg`: the size of every button                                                          |
 | `labels`       | –                               | `group`, `zoomIn`, `zoomOut`, `menu(percent)`, `fitWidth`, `fitPage`, `fit`, `actualSize`             |
 - Zoom in and out go through the steps (… 90, 100, 110, 125 … unless `steps` is given) and stop at `min` and `max` (25% and 800% unless given).
 - The menu button reads "Zoom 125%"; the current choice is checked.

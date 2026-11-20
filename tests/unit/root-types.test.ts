@@ -30,7 +30,7 @@ test("the root entry exports the types its components' props are written in", ()
     expect(names, name).toContain(name);
 });
 
-test("layout primitives accept an id, a role and ARIA attributes", () => {
+test("layout primitives accept an id, a role, ARIA attributes and blocking (inert, disabled)", () => {
   const file = ts.createSourceFile(
     `${root}__layout-check.tsx`,
     `import { Container, Grid, GridItem, Inline, Stack } from "./index.js";
@@ -38,7 +38,10 @@ test("layout primitives accept an id, a role and ARIA attributes", () => {
      export const b = <Inline id="i" role="toolbar" aria-labelledby="l" hideBelow="md" />;
      export const c = <Container id="c" aria-label="Main column" hideAbove="lg" />;
      export const d = <Grid id="g" role="list" aria-label="Cards" columns="2fr 1fr" />;
-     export const e = <GridItem id="gi" role="listitem" sticky stickyOffset="4rem" span={{ base: "full", md: 2 }} order={{ md: 1 }} />;`,
+     export const e = <GridItem id="gi" role="listitem" sticky stickyOffset="4rem" span={{ base: "full", md: 2 }} order={{ md: 1 }} />;
+     export const f = <Stack inert disabled />;
+     export const g = <Inline inert disabled />;
+     export const h = <Grid inert disabled />;`,
     ts.ScriptTarget.ES2022,
     true,
     ts.ScriptKind.TSX,

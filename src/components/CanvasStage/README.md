@@ -40,7 +40,7 @@ import { CanvasStage, FileDrop, ProgressBar } from "@arshad-shah/cynosure";
 ## Behaviour
 
 - **Size.** With `ratio` the stage keeps it at any width; without one it fills its parent's height, at least `--cy-canvas-stage-min-height`. The surface is stretched to the stage; size a canvas's pixels to it yourself (`useCanvasSize` style).
-- **Overlay.** Centred, and only its content takes presses; around it, presses reach the surface. It hides while files are dragged over the stage.
+- **Overlay.** Centred, and only its content takes presses; around it, presses reach the surface. It hides while files are dragged over the stage, and stays mounted while hidden (its state is kept, and a drag that came in over it still ends the drop hint when it leaves).
 - **Dropping files.** With `onFiles`, files dragged anywhere over the stage show `labels.drop` over it and a ring; a drop passes the files that match `accept` (the first one only, unless `multiple`) to `onFiles` and the rest to `onReject`. Dragged text and links are left alone. Give keyboard users another way in (a FileDrop button in the overlay or a toolbar): dropping is pointer-only.
 
 ## Tokens

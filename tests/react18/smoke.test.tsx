@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { Button } from "../../src/components/Button/Button";
 import { Combobox } from "../../src/components/Combobox/Combobox";
+import { HoverCard } from "../../src/components/HoverCard/HoverCard";
 import { Select } from "../../src/components/Select/Select";
 import { Slider } from "../../src/components/Slider/Slider";
 import { TextField } from "../../src/components/TextField/TextField";
@@ -130,5 +131,17 @@ describe("Cynosure on React 18", () => {
     });
     expect(onChange).toHaveBeenCalledWith("banana");
     expect(input.value).toBe("Banana");
+  });
+
+  it("HoverCard keeps its content out of focus (inert, which React 18 drops as a prop)", () => {
+    const anchor = document.createElement("span");
+    document.body.append(anchor);
+    const host = mount(
+      <HoverCard open anchor={{ current: anchor }}>
+        <a href="#more">More</a>
+      </HoverCard>,
+    );
+    anchor.remove();
+    expect((host.querySelector(".cy-hover-card") as HTMLElement).inert).toBe(true);
   });
 });

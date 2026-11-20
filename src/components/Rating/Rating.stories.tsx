@@ -170,6 +170,28 @@ export const SubmitsWithAForm: Story = {
   },
 };
 
+/** A form reset puts back `defaultValue` (without reporting a change); a disabled rating is not submitted. */
+export const FormResetAndDisabled: Story = {
+  args: { name: "stars", defaultValue: 2 },
+  render: (args) => (
+    <form aria-label="Review">
+      <Rating {...args} />
+      <Rating label="Locked" name="locked" defaultValue={5} disabled />
+    </form>
+  ),
+  play: async ({ args, canvas, userEvent }) => {
+    const form = canvas.getByRole("form", { name: "Review" }) as HTMLFormElement;
+    await expect(new FormData(form).get("locked")).toBeNull();
+    canvas.getByRole("slider", { name: "Your rating" }).focus();
+    await userEvent.keyboard("{ArrowRight}");
+    await expect(new FormData(form).get("stars")).toBe("3");
+    form.reset();
+    await waitFor(() => expect(new FormData(form).get("stars")).toBe("2"));
+    await expect(canvas.getByRole("slider", { name: "Your rating" })).toHaveAttribute("aria-valuenow", "2");
+    await expect(args.onChange).toHaveBeenCalledTimes(1);
+  },
+};
+
 /** Controlled: the stars follow `value`. */
 export const Controlled: Story = {
   render: function Render(args) {

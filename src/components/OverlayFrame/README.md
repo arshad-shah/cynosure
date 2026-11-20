@@ -15,6 +15,7 @@ import { OverlayFrame } from "@arshad-shah/cynosure";
 | `overlay`             | –       | Pinned at the bottom centre; `null`, `undefined` or `false` render nothing |
 | `children`            | –       | One element that fills the frame (it shares the frame's single grid cell)  |
 | `className` / `style` | –       | Layout only                                                                |
+| `data-testid`, `ref`  | –       | Set on the root element (the frame)                                        |
 
 The frame is always rendered, overlay or not, so an overlay that comes and goes never remounts the content or loses its scroll position. The overlay sits outside the content (outside a listbox or a named region), above content raised with a z-index up to 2 (a sticky heading).
 

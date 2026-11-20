@@ -30,7 +30,7 @@ import { copy, trash } from "@arshad-shah/cynosure/icons";
 
 ## Tone and variant
 
-IconButton accepts the Button props `variant`, `tone`, `size`, `loading`, `pressed`, `disabled` and `type`, except `children`, `iconEnd` and `fullWidth`.
+IconButton accepts the Button props `variant`, `tone`, `size`, `loading`, `pressed`, `disabled` and `type`, except `children`, `iconEnd`, `fullWidth` and `square`, which it sets.
 
 `size="xs"` is a 20px square with a smaller icon, for dense toolbars; it is still 24px to press (44px on coarse pointers).
 
@@ -55,6 +55,7 @@ With `href` the IconButton is a link that looks like one, and `renderLink` rende
 | <kbd>Esc</kbd>, blur, pointer leave | Closes the tooltip |
 
 - **Name:** `label` is set as `aria-label`. There is no native `title` tooltip.
+- **Focus from a script:** the tooltip opens on focus only when the keyboard moved it there (<kbd>Tab</kbd>, the arrows, <kbd>Home</kbd>, <kbd>End</kbd>, <kbd>Page Up</kbd>/<kbd>Page Down</kbd>), so a dialog that focuses its close button on opening does not show the tip, and the first <kbd>Esc</kbd> closes the dialog.
 - **Tooltip placement:** `tooltipPlacement` defaults to `top`.
 - **Tooltip delay:** `tooltipDelay` is the hover delay of the label tooltip (default `300` ms, as Tooltip's `delay`); `0` opens it at once, for toolbars.
 

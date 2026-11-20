@@ -24,6 +24,9 @@ import { Skeleton } from "@arshad-shah/cynosure";
 | `size`                | `md`    | Text size the lines stand in for: each line is that text's line height               |
 | `width` / `height`    | –       | Any CSS length. Default: full width; a block is one line tall; a circle is two lines |
 | `className` / `style` | –       | Layout only                                                                          |
+
+## Behaviour and accessibility
+
 - Hidden from assistive technology (`aria-hidden`). Mark the region that owns it `aria-busy="true"` while it loads, and announce failures in the page.
 - A highlight sweeps along the reading direction (right to left in right-to-left text) and stops under reduced motion.
 - A text skeleton has the same height as the text it replaces at the same `size`.

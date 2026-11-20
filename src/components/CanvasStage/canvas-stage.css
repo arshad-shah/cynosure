@@ -55,6 +55,9 @@
   padding: var(--cy-space-5);
   font-size: var(--cy-font-size-md);
   pointer-events: none;
+  &[data-hidden] {
+    visibility: hidden;
+  }
   &[data-drop] {
     background: var(
       --cy-canvas-stage-drop-background,

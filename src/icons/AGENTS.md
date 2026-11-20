@@ -13,3 +13,9 @@ One file per icon exporting typed `IconData`. Add icons only with `pnpm cy new i
 **No duplicates:** Facet holds each drawing once. `cy new icon` refuses an icon that draws the same as an existing one and names it (add the new name to that icon's search words instead), and `tests/unit/icons.test.ts` fails while two icons share a drawing. Drawings are compared by `drawingKey` (`tools/icon-drawing.ts`): `animate` ignored, numbers rounded, elements sorted, `fill` kept. The generator orders `facet.ts` by running it through the repository's own Biome, so a new icon never fails `pnpm lint`.
 
 `validateIcon` (run by tests and the generator) rejects text, any fill, unknown categories, off-grid geometry and bad names. The gallery story `Foundations/Icon → Gallery` shows every icon.
+
+`iconToSvg` (`to-svg.ts`) escapes every attribute value it writes and leaves out parts and attributes whose names are not plain names, since its callers (Astro, plain JS) are not type-checked; `tests/unit/brands.test.tsx` covers it and its parity with the React `Icon`.
+
+**Counts:** the README and `docs/icons.md` are the only places that state how many icons, categories and brand marks there are; `tests/unit/icons.test.ts` fails until they match, so a new icon updates both. Elsewhere, link to them instead of repeating a number or a list.
+
+**Strokes:** a stroke is drawn once. Where one line meets another it ends on it (a join), never runs along it; two strokes that do not meet keep a visible gap (0.75 or more where it matters at 16px), never graze. A slash (`-off` icons) runs 3.5 to 20.5 on a diagonal and everything it crosses out is cut back to 0.75 clear of it (2.5 from its centre line), as `eye-off`, `bell-off` and the rest are. `tools/icon-geometry.ts` reads the strokes exactly (lines, curves, arcs); `tests/unit/icons.test.ts` fails on a stroke drawn over another (`overdraw`) and on a slash closer than 0.75.

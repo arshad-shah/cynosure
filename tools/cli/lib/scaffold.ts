@@ -7,16 +7,13 @@ import { fileURLToPath } from "node:url";
 import * as facet from "../../../src/icons/facet";
 import type { IconCategory, IconData, IconNode } from "../../../src/icons/types";
 import { validateIcon } from "../../../src/icons/validate";
+import { kebab as tokenName } from "../../../src/tokens/to-css";
 import { COMPONENT_GROUPS, type ComponentGroup } from "../../component-groups";
 import { sameDrawing } from "../../icon-drawing";
 import { optimizeIcon } from "../../icon-optimize";
+import { kebabName as kebab } from "./check";
 
 /** `IconButton` → `icon-button`, `QRCode` → `qr-code` (the same names `cy check` expects). */
-const kebab = (s: string) =>
-  s
-    .replace(/([a-z0-9])([A-Z])/g, "$1-$2")
-    .replace(/([A-Z])([A-Z][a-z])/g, "$1-$2")
-    .toLowerCase();
 const camel = (s: string) => s.replace(/-(\w)/g, (_, c: string) => c.toUpperCase());
 const RESERVED = new Set([
   "package",
@@ -333,7 +330,7 @@ export function addComponentToken(root: string, path: string, doc: string): void
   if (new RegExp(`\\n\\s+${token}: string;`).test(text)) throw new Error(`${path} already exists`);
   writeFileSync(file, text.replace(anchor, `${anchor}  ${token}: string;\n`));
   const readmePath = join(dir, "README.md");
-  const line = `- \`--cy-${kebab(component)}-${kebab(token)}\`: ${doc}\n`;
+  const line = `- \`--cy-${tokenName(component)}-${tokenName(token)}\`: ${doc}\n`;
   const md = readFileSync(readmePath, "utf8");
   writeFileSync(
     readmePath,

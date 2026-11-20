@@ -9,7 +9,7 @@ The native `<a>` for Cynosure, and the only module allowed to render one. It is 
 
 ## Who uses it
 
-[Link](?path=/docs/components-controls-link--docs) and [Card](?path=/docs/components-structure-card--docs) (when it navigates), and any composite that navigates.
+[Link](?path=/docs/components-controls-link--docs), [Button](?path=/docs/components-controls-button--docs)'s link form (and so IconButton's), [Card](?path=/docs/components-structure-card--docs) and [ListRow](?path=/docs/components-structure-listrow--docs) when they navigate, and [SideNav](?path=/docs/components-structure-sidenav--docs). A component given a `renderLink` (your router's link) renders that instead, with the same safe `href` and `rel`.
 
 ## When to use it directly
 
@@ -42,6 +42,7 @@ It accepts every native anchor attribute.
 - **Safe schemes only:** `href` is checked by `safeHref` (internal to LinkBase). Relative, hash and query URLs, and `http`, `https`, `mailto` and `tel` are linked. Anything else, including `javascript:`, is dropped and the anchor gets no `href`.
 - **Parsed like a browser:** `safeHref` strips tab and newline characters anywhere and leading control characters before checking, so obfuscated `javascript:` URLs cannot slip through. An unparseable absolute URL is dropped.
 - The ref reaches the native `<a>`.
+- **Router links:** a component's `renderLink` receives the same checked `href` (`undefined` for an unsafe one) and the same `rel` for `target="_blank"`.
 
 <Canvas of={Stories.DropsJavascriptHrefs} />
 <Canvas of={Stories.AllowsOnlySafeSchemes} />

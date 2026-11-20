@@ -134,8 +134,10 @@ export const CanvasStage = forwardRef<HTMLDivElement, CanvasStageProps>(function
       })}
     >
       <div className="cy-canvas-stage-surface cy-reset">{children}</div>
-      {overlay != null && !over && (
-        <div className="cy-canvas-stage-overlay">
+      {/* Kept in the page while files are over the stage, only hidden: a drag that came in over the overlay gets
+          its leave, which the browser never sends to a removed element, so the drop hint ends with the drag. */}
+      {overlay != null && (
+        <div className="cy-canvas-stage-overlay" data-hidden={over ? "" : undefined}>
           <div className="cy-canvas-stage-slot cy-reset">{overlay}</div>
         </div>
       )}

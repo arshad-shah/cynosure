@@ -2,7 +2,7 @@ import { type CSSProperties, type ReactNode, useContext, useEffect, useId, useRe
 import { useClientLayoutEffect } from "../../foundations/client-layout-effect.js";
 import { useControllableState } from "../../foundations/controllable.js";
 import { DialogBase } from "../../foundations/DialogBase/DialogBase.js";
-import { deepActiveElement } from "../../foundations/focus.js";
+import { deepActiveElement, reachable, tabStops } from "../../foundations/focus.js";
 import { transitionTime } from "../../foundations/motion.js";
 import { close as closeIcon } from "../../icons/close.js";
 import { useDismiss } from "../../overlay/dismiss.js";
@@ -89,22 +89,6 @@ export interface DialogFrameProps extends DialogProps {
 }
 
 const DEFAULT_LABELS: DialogLabels = { close: "Close" };
-const FOCUSABLE =
-  'button:not([disabled]), [href], input:not([disabled]):not([type="hidden"]):not([aria-hidden="true"]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
-
-/**
- * Where focus can actually go back to. A Dialog opened from a Menu item remembers that item, but the menu has closed
- * (hidden, still in the DOM): fall back to the button that controls the hidden popover.
- */
-function reachable(el: HTMLElement | null): HTMLElement | null {
-  if (!el) return null;
-  // A closed popover can still be fading out (displayed), so ask the popover, not only the layout.
-  const popover = el.closest<HTMLElement>("[popover][id]");
-  const closed = popover ? !popover.matches(":popover-open") : el.checkVisibility?.() === false;
-  if (!closed) return el;
-  const root = el.getRootNode() as Document | ShadowRoot;
-  return (popover && root.querySelector<HTMLElement>(`[aria-controls="${CSS.escape(popover.id)}"]`)) ?? el;
-}
 
 export function DialogFrame({
   open,
@@ -186,10 +170,7 @@ export function DialogFrame({
   // dialog itself (so the close button's tooltip does not pop up on open).
   useClientLayoutEffect(() => {
     if (!isOpen) return;
-    const first =
-      body.current?.querySelector<HTMLElement>(FOCUSABLE) ??
-      footer.current?.querySelector<HTMLElement>(FOCUSABLE) ??
-      dialog.current;
+    const first = tabStops(body.current)[0] ?? tabStops(footer.current)[0] ?? dialog.current;
     first?.focus({ preventScroll: true });
   }, [isOpen]);
 
@@ -207,7 +188,7 @@ export function DialogFrame({
       ref={dialog}
       open={isOpen}
       onCancel={dismiss}
-      onClose={() => setOpen(false)}
+      onClose={dismiss}
       className={parts ? `cy-dialog ${parts.root}` : "cy-dialog"}
       tabIndex={-1}
       data-size={size}

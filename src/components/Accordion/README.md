@@ -22,10 +22,12 @@ Stacked Disclosures with shared state.
 | `size`                                     | `md`     | `sm` · `md` · `lg`                                          |
 | `headingLevel`                             | `3`      | Heading wrapping each header                                |
 | `regions`                                  | `true`   | Open sections are labelled regions; turn off for long lists |
+| `className` / `style`                      | –        | Layout only                                                 |
 
+`AccordionItem`: `value` (unique), `summary` (header text), `children`.
 
 APG accordion: every header is a Tab stop; Up and Down move between headers (wrapping), Home and End jump. A non-collapsible open header is `aria-disabled`.
 
-Tokens: `--cy-accordion-gap` (card spacing) plus the Disclosure tokens.
+**Tokens:** `--cy-accordion-gap` (the space between cards with `variant="card"`; `AccordionTokens.gap`, set with `createTheme({ components: { accordion: { gap: "12px" } } })`) plus the Disclosure tokens.
 
 **Printing:** a printout has every section open. Closed content is always in the page, so the print stylesheet only expands it.

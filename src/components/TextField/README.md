@@ -23,11 +23,11 @@ Single-line input with label, description, error, icons and an optional clear bu
 | `boxRef`                                                                                | –           | The field's box, to anchor a list to the whole field (Combobox, TagInput)                                                                                     |
 | `clearable`                                                                             | `false`     | Clear button while filled; `labels.clear` overrides "Clear"                                                                                                   |
 | `monospace`                                                                             | `false`     | Types in the mono font (`--cy-font-mono`): keys, ids, hashes, tokens                                                                                          |
+| `revealable`                                                                            | `false`     | With `type="password"`: a Show/Hide button for API keys, tokens and passwords (`labels.show`, `labels.hide`)                                                  |
 | `required`, `disabled`, `readOnly`, `name`, `maxLength`, `autoComplete`, `inputMode`, … | –           | Native input attributes                                                                                                                                       |
+| `className` / `style`                                                                   | –           | Layout only                                                                                                                                                   |
 
 Works in native forms: `FormData`, `form.reset()` and `required` validation. With `type="search"` the browser's own search decorations are hidden (use `clearable`).
-
-- `revealable` (with `type="password"`): a Show/Hide button for API keys, tokens and passwords (`labels.show`, `labels.hide`).
 
 ## Tokens
 

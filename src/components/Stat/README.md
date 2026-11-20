@@ -34,6 +34,7 @@ import { users } from "@arshad-shah/cynosure/icons";
 | `labels`              | English   | `{ up, down, flat }`: functions from the delta's value (without its sign) to the spoken words    |
 | `className` / `style` | –         | Layout only                                                                                      |
 | `id`, `data-*`, `ref` | –         | Set on the root element (a link target, test or state hooks)                                     |
+| `role`, `aria-*`      | –         | Set on the root element; a role or ARIA state the stat sets itself wins                          |
 
 The forwarded ref is the Card element (the link with `href`).
 

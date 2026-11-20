@@ -89,16 +89,31 @@ export function styleManifest(root = "src", order: string[] = []): Record<string
     const i = order.findIndex((f) => basename(f) === css);
     return i < 0 ? order.length : i;
   };
-  const closure = new Map<string, Set<string>>();
-  const cssOf = (file: string): Set<string> => {
-    const known = closure.get(file);
-    if (known) return known;
+  // Per file: its own and borrowed stylesheets, and what it imports. A component's set is the union over every file
+  // it reaches, walked afresh for each one, so an import cycle can never leave a partial set behind.
+  const local = new Map<string, { css: string[]; deps: string[] }>();
+  const facts = (file: string) => {
+    let known = local.get(file);
+    if (!known) {
+      const css = [...ownCss(file, root)];
+      for (const m of readFileSync(file, "utf8").matchAll(BORROWED))
+        css.push(...(m[1] ?? "").split(/[ ,]+/).filter(Boolean));
+      known = { css, deps: valueImports(file) };
+      local.set(file, known);
+    }
+    return known;
+  };
+  const cssOf = (entry: string): Set<string> => {
     const found = new Set<string>();
-    closure.set(file, found); // cycles end here
-    for (const css of ownCss(file, root)) found.add(css);
-    for (const m of readFileSync(file, "utf8").matchAll(BORROWED))
-      for (const css of (m[1] ?? "").split(/[ ,]+/).filter(Boolean)) found.add(css);
-    for (const dep of valueImports(file)) for (const css of cssOf(dep)) found.add(css);
+    const seen = new Set<string>();
+    const stack = [entry];
+    for (let file = stack.pop(); file !== undefined; file = stack.pop()) {
+      if (seen.has(file)) continue;
+      seen.add(file);
+      const { css, deps } = facts(file);
+      for (const c of css) found.add(c);
+      stack.push(...deps);
+    }
     return found;
   };
   const manifest: Record<string, string[]> = {};

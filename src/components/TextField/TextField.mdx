@@ -38,6 +38,12 @@ import { mail } from "@arshad-shah/cynosure/icons";
 
 <Canvas of={Stories.ClearButton} />
 
+## Show and hide a secret
+
+`revealable` with `type="password"` adds a Show button that turns the value into plain text, then Hide to mask it again; it is a toggle (`aria-pressed`). Rename it with `labels.show` and `labels.hide`. For API keys, tokens and passwords.
+
+<Canvas of={Stories.RevealASecret} />
+
 ## Errors and disabled
 
 `error` marks the field invalid (`aria-invalid`) and shows the message with the field. `description` adds help text.

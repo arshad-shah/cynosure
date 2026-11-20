@@ -7,16 +7,18 @@ Inline text link built on `LinkBase` (safe schemes only). Tone colours use each 
 <Link href="https://example.com" external>Example</Link>   // new tab, icon, "(opens in new tab)"
 ```
 
-| Prop           | Default   | Notes                                                                                                                           |
-| -------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| `href`         | –         | Relative, `http(s)`, `mailto` or `tel`                                                                                          |
-| `tone`         | `accent`  | `accent` · `neutral` · `danger` · `success` · `warning` · `info`                                                                |
-| `size`         | `inherit` | `inherit` · `sm` · `md` · `lg`                                                                                                  |
-| `external`     | `false`   | `target="_blank"`, safe `rel`, external icon, announced text (`labels.external`)                                                |
-| `underline`    | `always`  | `hover` (on hover and focus) or `none`; keep it in running text, drop it only where the place says "link" (navigation, footers) |
-| `onClick`      | –         | Called when the link is activated                                                                                               |
-| `aria-current` | –         | `"page"` for the page being shown, in a navigation bar                                                                          |
-| `renderLink`   | –         | Render the anchor with your router: `(props) => <RouterLink {...props} to={props.href} />`; it keeps Link's look                |
+| Prop                  | Default   | Notes                                                                                                                           |
+| --------------------- | --------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `href`                | –         | Relative, `http(s)`, `mailto` or `tel`                                                                                          |
+| `tone`                | `accent`  | `accent` · `neutral` · `danger` · `success` · `warning` · `info`                                                                |
+| `size`                | `inherit` | `inherit` · `sm` · `md` · `lg`                                                                                                  |
+| `external`            | `false`   | `target="_blank"`, safe `rel`, external icon, announced text (`labels.external`)                                                |
+| `underline`           | `always`  | `hover` (on hover and focus) or `none`; keep it in running text, drop it only where the place says "link" (navigation, footers) |
+| `onClick`             | –         | Called when the link is activated                                                                                               |
+| `aria-current`        | –         | `"page"` for the page being shown, in a navigation bar                                                                          |
+| `renderLink`          | –         | Render the anchor with your router: `(props) => <RouterLink {...props} to={props.href} />`; it keeps Link's look                |
+| `labels`              | –         | `external`: read out after a link that opens in a new tab (default "(opens in new tab)")                                        |
+| `className` / `style` | –         | Layout only                                                                                                                     |
 
 ## Tokens
 

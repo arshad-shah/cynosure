@@ -55,6 +55,7 @@ import { StatusBar, StatusBarSegment } from "@arshad-shah/cynosure";
 | `placement`                             | `top`     | Side the popover opens on (it flips when it does not fit)                            |
 | `open` / `defaultOpen` / `onOpenChange` | –         | Controlled or uncontrolled popover state                                             |
 | `disabled`                              | `false`   | A clickable segment that cannot be used; it leaves the arrow-key order               |
+| `className` / `style`                   | –         | Layout only                                                                          |
 
 ## Accessibility
 

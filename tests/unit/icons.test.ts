@@ -1,9 +1,12 @@
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
+import * as brands from "../../src/brands";
 import * as icons from "../../src/icons";
 import { ICON_KEYWORDS } from "../../src/icons/keywords";
 import { ICON_CATEGORIES, type IconData } from "../../src/icons/types";
 import { validateIcon } from "../../src/icons/validate";
 import { drawingKey, duplicateDrawings } from "../../tools/icon-drawing";
+import { elementPath, overdraw, parsePath, STROKE, samplePoints, toSegment } from "../../tools/icon-geometry";
 
 const shipped = Object.values(icons).filter(
   (v): v is IconData => typeof v === "object" && v !== null && "body" in v,
@@ -15,6 +18,54 @@ describe("Facet icon set", () => {
     expect(shipped.length).toBeGreaterThanOrEqual(120);
     expect(new Set(shipped.map((i) => i.name)).size).toBe(shipped.length);
     expect(new Set(shipped.map((i) => i.category))).toEqual(new Set(ICON_CATEGORIES));
+  });
+  it("is counted right where the documentation states a count (the README and the Icons guide)", () => {
+    const read = (path: string) => readFileSync(new URL(`../../${path}`, import.meta.url), "utf8");
+    expect(read("README.md")).toContain(
+      `${shipped.length} Facet stroke icons in ${ICON_CATEGORIES.length} categories`,
+    );
+    expect(read("docs/icons.md")).toContain(
+      `${shipped.length} icons in ${ICON_CATEGORIES.length} categories`,
+    );
+    const marks = Object.values(brands).filter(
+      (v) => typeof v === "object" && v !== null && "body" in v,
+    ).length;
+    expect(read("README.md")).toContain(`${marks} official brand marks`);
+    expect(read("docs/icons.md")).toContain(`the official logos of ${marks} companies and projects`);
+  });
+  it("never draws one stroke over another", () => {
+    const drawnTwice = shipped.flatMap((icon) => overdraw(icon).map((found) => `${icon.name}: ${found}`));
+    expect(drawnTwice).toEqual([]);
+  });
+  it("keeps a slash clear of what it crosses out (0.75 between the strokes)", () => {
+    const clear = STROKE + 0.75;
+    const corner = (p: number[], x: number, y: number) =>
+      Math.abs((p[0] as number) - x) < 1e-6 && Math.abs((p[1] as number) - y) < 1e-6;
+    const tooClose: string[] = [];
+    for (const icon of shipped) {
+      const slash = icon.body.findIndex(([tag, attrs]) => {
+        if (tag !== "path") return false;
+        const subs = parsePath(String((attrs as { d: string }).d));
+        const seg = subs.length === 1 && subs[0]?.length === 1 ? subs[0][0] : undefined;
+        if (seg?.k !== "L") return false;
+        return (
+          (corner(seg.p0, 3.5, 3.5) && corner(seg.p1, 20.5, 20.5)) ||
+          (corner(seg.p0, 20.5, 3.5) && corner(seg.p1, 3.5, 20.5))
+        );
+      });
+      if (slash < 0) continue;
+      const line = parsePath(String((icon.body[slash] as [string, { d: string }])[1].d))[0]?.[0];
+      if (line?.k !== "L") continue;
+      const nearest = Math.min(
+        ...icon.body
+          .filter((_, k) => k !== slash)
+          .flatMap(([tag, attrs]) => parsePath(elementPath(tag, attrs)))
+          .flatMap((segs) => samplePoints(segs))
+          .map((p) => toSegment(p, line.p0, line.p1)),
+      );
+      if (nearest < clear - 0.02) tooClose.push(`${icon.name}: ${(nearest - STROKE).toFixed(2)}`);
+    }
+    expect(tooClose).toEqual([]);
   });
   it("covers commerce, nature, travel, health, development, charts, home and social", () => {
     const byName = Object.fromEntries(shipped.map((i) => [i.name, i.category]));
