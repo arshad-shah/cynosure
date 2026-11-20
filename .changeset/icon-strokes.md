@@ -1,5 +1,0 @@
----
-"@arshad-shah/cynosure": patch
----
-
-Facet icons are drawn cleanly at every size: no stroke is drawn over another, a slash keeps 0.75 clear of what it crosses out, and strokes that do not meet no longer graze. Slash icons rebuilt to that rule: `bellOff`, `micOff`, `videoOff`, `cameraOff`, `cloudOff`, `pinOff`, `plugOff`, `phoneOff`, `flashlightOff`, `eyeOff`, `starOff`, `imageOff`, `wifiOff`, `powerOff`. Strokes no longer drawn twice in `bold`, `thumbsUp`, `thumbsDown`, `hand`, `gift`, `atSign`, `brush`, `caseLower`, `caseUpper`, `matchCase`, `circleUser`, `database`, `flower`, `gitMerge`, `hardDrive`, `listTree`, `scrollText` and `bookMarked`. Gaps opened in `shapes`, `bed`, `idCard`, `piggyBank`, `scissors`, `fileCompress`, `fileConvert`, `filePen` and `pageMerge`; `sunrise` and `sunset` rays clear the sun. `listTodo` (a tick and an open box), `fileAudio`, `fileVideo`, `alarmClock`, `gamepad`, `fingerprint`, `calendarClock`, `cloudUpload` and `cloudDownload` redrawn. New unit tests keep it so.
