@@ -189,10 +189,11 @@ export const PermissionRefused: Story = {
 export const CameraLostWhileRunning: Story = {
   args: { defaultActive: true },
   play: async ({ args, canvas, canvasElement }) => {
+    // The stream on screen now (read again each time: the story may have mounted more than once).
+    await waitFor(() => expect(videoOf(canvasElement).srcObject).toBe(fakes.streams.at(-1)));
     const video = videoOf(canvasElement);
-    await waitFor(() => expect(video.srcObject).toBe(fakes.streams[0]));
     // The camera is unplugged (or access taken back): the browser ends its track.
-    const track = fakes.streams[0]?.getVideoTracks()[0] as MediaStreamTrack;
+    const track = (video.srcObject as MediaStream).getVideoTracks()[0] as MediaStreamTrack;
     track.stop();
     track.dispatchEvent(new Event("ended"));
     // The view says so, turns off and offers Start again, instead of a black picture.
